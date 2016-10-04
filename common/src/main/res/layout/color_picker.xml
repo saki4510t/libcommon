@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/color_picker_frame"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/color_picker_margin_vertical"
+    android:paddingLeft="@dimen/color_picker_margin_horizontal"
+    android:paddingRight="@dimen/color_picker_margin_horizontal"
+    android:paddingTop="@dimen/color_picker_margin_vertical" >
+
+</FrameLayout>

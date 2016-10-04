@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+	<item android:state_checked="false">
+		<layer-list>
+			<item>
+				<shape>
+					<size android:height="10dp" android:width="40dp" />
+					<gradient
+					    android:angle="270"
+					    android:centerColor="#7fc0c0c0"
+					    android:centerX="0.5"
+					    android:centerY="0.5"
+					    android:endColor="#7fc0c0c0"
+					    android:gradientRadius="10"
+					    android:startColor="#7fc0c0c0"
+					    android:type="linear" />
+					<corners android:radius="8dp" />
+					<solid android:color="#7fc0c0c0" />
+					<stroke
+					    android:width="1dip"
+					    android:color="#7f808080" />
+				</shape>
+			</item>
+						<item android:right="20dp">
+			    <shape>
+					<size android:height="10dp" android:width="20dp" />
+					<gradient
+					    android:angle="270"
+					    android:centerColor="#7fB0C4DE"
+					    android:centerX="0.5"
+					    android:centerY="0.5"
+					    android:endColor="#7f778899"
+					    android:gradientRadius="10"
+					    android:startColor="#7fADD8E6"
+					    android:type="linear" />
+					<corners android:radius="8dp" />
+					<stroke
+					    android:width="1dip"
+					    android:color="#7f808080" />
+				</shape>
+			</item>
+		</layer-list>
+	</item>
+    <item android:state_checked="true">
+		<layer-list>
+			<item>
+			    <shape>
+					<size android:height="10dp" android:width="40dp" />
+					<corners android:radius="8dp" />
+					<solid android:color="#7fffffff" />
+					<stroke android:width="1dip" android:color="#7f808080" />
+				</shape>
+			</item>
+			<item android:left="20dp">
+				<shape>
+					<size android:height="10dp" android:width="20dp" />
+					<corners android:radius="8dp" />
+					<gradient
+					    android:angle="270"
+					    android:centerColor="#7fB0C4DE"
+					    android:centerX="0.5"
+					    android:centerY="0.5"
+					    android:endColor="#7f778899"
+					    android:gradientRadius="10"
+					    android:startColor="#7fADD8E6"
+					    android:type="linear" />
+					<stroke android:width="1dip"
+					    android:color="#7f808080" />
+				</shape>
+			</item>
+        </layer-list>
+	</item>
+		
+</selector>

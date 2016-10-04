@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:android="http://schemas.android.com/apk/res/android" >
+	<style name="SeekBarPreference_title" parent="@android:style/TextAppearance.Large"></style>
+	<style name="SeekBarPreference_summary" parent="@android:style/TextAppearance.Small">
+		<!-- <item name="android:textColor">#ffa500</item> -->
+	</style>
+	<!-- レイアウトファイルのIDの予約 -->
+	<item type="id" name="seekbar" />
+	<item type="id" name="seekbar_value_label" />
+
+	<!-- レイアウト属性 -->
+	<declare-styleable name="SeekBarPreference">
+		<!-- 最小値 -->
+		<attr name="min_value" format="integer|reference" default="0" />
+		<!-- 最大値 -->
+		<attr name="max_value" format="integer|reference" default="100" />
+		<!-- デフォルト値 -->
+		<attr name="default_value" format="integer|reference" default="0" />
+		<!-- レイアウトリソースID -->
+		<attr name="seekbar_layout" format="reference" default="0" />
+		<!-- シークバーのID -->
+		<attr name="seekbar_id" format="reference" default="@id/seekbar"/>
+		<!-- 値表示用TextViewのID -->
+		<attr name="seekbar_label_id" format="reference" default="@id/seekbar_value_label"/>
+		<!-- 値を表示する際のスケール -->
+		<attr name="scale_value" format="float" default="1" />
+		<!-- 値を表示する際のフォーマット, プレファレンスに保存されるのは最大値〜最小値の整数 -->
+		<attr name="value_format" format="string|reference" default="1" />
+	</declare-styleable>
+</resources>

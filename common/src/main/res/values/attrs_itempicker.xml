@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+            
+    <!-- カスタム属性を定義 -->
+
+	<declare-styleable name="ItemPicker">
+	    <attr name="ItemPickerIncrementSrc" format="reference" />
+	    <attr name="ItemPickerDecrementSrc" format="reference" />
+	    <attr name="ItemPickerIncrementBackground" format="reference" />
+	    <attr name="ItemPickerDecrementBackground" format="reference" />
+	    <attr name="ItemPickerEditTextBackground" format="reference" />
+		<attr name="ItemPickerMinItemValue" format="integer" />
+		<attr name="ItemPickerMaxItemValue" format="integer" />
+		<attr name="ItemPickerCurrentItemValue" format="integer" />
+		<attr name="ItemPickerSpeed" format="integer" />
+		<attr name="ItemPickerDisplayedValue" format="reference" />
+	</declare-styleable>
+	
+</resources>

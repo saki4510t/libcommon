@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+            
+    <!-- カスタム属性を定義 -->
+
+	<declare-styleable name="TimePicker">
+	    <attr name="TimePickerDefaultValue" format="integer" />
+	</declare-styleable>
+</resources>

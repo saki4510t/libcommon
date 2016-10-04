@@ -1,0 +1,33 @@
+package com.serenegiant.mediaeffect;
+/*
+ * Androusb
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
+ * Distributed under the terms of the GNU Lesser General Public License (LGPL v3.0) License.
+ * License details are in the file license.txt, distributed as part of this software.
+ */
+
+import android.media.effect.EffectContext;
+import android.media.effect.EffectFactory;
+
+public class MediaEffectRotate extends MediaEffect {
+	/**
+	 * コンストラクタ
+	 * GLコンテキスト内で生成すること
+	 *
+	 * @param effect_context
+	 * @param angle The angle of rotation in degrees. This will be rounded to the nearest multiple of 90.
+	 */
+	public MediaEffectRotate(final EffectContext effect_context, final int angle) {
+		super(effect_context, EffectFactory.EFFECT_ROTATE);
+		setParameter(angle);
+	}
+
+	/**
+	 * @param angle The angle of rotation in degrees. This will be rounded to the nearest multiple of 90.
+	 * @return
+	 */
+	public MediaEffectRotate setParameter(final int angle) {
+		setParameter("angle", angle);
+		return this;
+	}
+}
