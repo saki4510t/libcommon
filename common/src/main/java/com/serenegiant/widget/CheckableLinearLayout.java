@@ -3,7 +3,7 @@ package com.serenegiant.widget;
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,11 +20,12 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 
-public class CheckableLinearLayout extends LinearLayout implements Checkable {
+public class CheckableLinearLayout extends LinearLayout implements Checkable, Touchable {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "CheckableLinearLayout";
@@ -80,4 +81,16 @@ public class CheckableLinearLayout extends LinearLayout implements Checkable {
         return drawableState;
     }
 
+	private float mTouchX, mTouchY;
+	@Override
+	public boolean onInterceptTouchEvent(final MotionEvent ev) {
+		mTouchX = ev.getX();
+		mTouchY = ev.getY();
+		return super.onInterceptTouchEvent(ev);
+	}
+
+	@Override
+	public float touchX() { return mTouchX; }
+	@Override
+	public float touchY() { return mTouchY; }
 }

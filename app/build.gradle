@@ -11,8 +11,8 @@ android {
         applicationId "com.serenegiant.libcommon"
         minSdkVersion 14
         targetSdkVersion versionTarget
-        versionCode 1
-        versionName "1.0"
+        versionCode versionCondeNum
+        versionName versionNameString
     }
     buildTypes {
         release {

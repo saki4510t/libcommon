@@ -3,7 +3,7 @@ package com.serenegiant.widget;
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
 
-public class CheckableRelativeLayout extends RelativeLayout implements Checkable {
+public class CheckableRelativeLayout extends RelativeLayout implements Checkable, Touchable {
 
 	private boolean mIsChecked;
 	private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
@@ -78,4 +78,16 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
         return drawableState;
     }
 
+	private float mTouchX, mTouchY;
+	@Override
+	public boolean onInterceptTouchEvent(final MotionEvent ev) {
+		mTouchX = ev.getX();
+		mTouchY = ev.getY();
+		return super.onInterceptTouchEvent(ev);
+	}
+
+	@Override
+	public float touchX() { return mTouchX; }
+	@Override
+	public float touchY() { return mTouchY; }
 }

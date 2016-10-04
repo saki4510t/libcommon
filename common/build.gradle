@@ -3,7 +3,7 @@ apply plugin: 'com.android.library'
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,7 +29,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion versionTarget
-        versionCode 1
+        versionCode versionCondeNum
         versionName versionNameString
     }
     buildTypes {

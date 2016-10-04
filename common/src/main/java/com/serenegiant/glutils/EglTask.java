@@ -3,7 +3,7 @@ package com.serenegiant.glutils;
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,11 @@ public abstract class EglTask extends MessageTask {
 	public EglTask(final EGLBase.IContext sharedContext, final int flags) {
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
 		init(flags, 0, sharedContext);
+	}
+
+	public EglTask(final int max_version, final EGLBase.IContext sharedContext, final int flags) {
+//		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
+		init(flags, max_version, sharedContext);
 	}
 
 	@Override

@@ -3,7 +3,7 @@ package com.serenegiant.dialog;
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2015 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,7 +38,7 @@ import com.serenegiant.widget.ColorPickerView.ColorPickerListener;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class ColorPickerDialog extends DialogFragment {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = "ColorPickerDialog";
 
 	private static final String KEY_TITLE_ID = "title_id";
