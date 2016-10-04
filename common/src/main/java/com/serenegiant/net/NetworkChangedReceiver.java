@@ -32,6 +32,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.ComponentUtils;
 
 /**
  * ネットワークの接続状態が変更された時のブロードキャストを処理するためのBroadcastReceiver
@@ -131,6 +132,14 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 		 */
 		public void onNetworkChanged(
 			final int isConnectedOrConnecting, final int isConnected, final int activeNetworkMask);
+	}
+
+	public static void enable(final Context context) {
+		ComponentUtils.enable(context, NetworkChangedReceiver.class);
+	}
+
+	public static void disable(final Context context) {
+		ComponentUtils.disable(context, NetworkChangedReceiver.class);
 	}
 
 	/**
