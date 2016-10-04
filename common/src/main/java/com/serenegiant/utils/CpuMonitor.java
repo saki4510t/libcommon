@@ -23,6 +23,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
+ * Modified 2016 t_saki@serenegiant.com
+ *
  * Simple CPU monitor.  The caller creates a CpuMonitor object which can then
  * be used via sampleCpuUtilization() to collect the percentual use of the
  * cumulative CPU capacity for all CPUs running at their nominal frequency.  3
