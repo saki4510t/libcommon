@@ -108,4 +108,291 @@ public class ShaderConst {
 		+ "void main() {\n"
 		+ "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n"
 		+ "}";
+
+//
+	// Simple fragment shader for use with "normal" 2D textures.
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"void main() {\n" +
+		"    gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_2D
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
+
+	// Fragment shader that converts color to black & white with a simple transformation.
+	private static final String FRAGMENT_SHADER_BW_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"void main() {\n" +
+		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
+		"    float color = tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11;\n" +
+		"    gl_FragColor = vec4(color, color, color, 1.0);\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_BW
+		= String.format(FRAGMENT_SHADER_BW_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_BW
+		= String.format(FRAGMENT_SHADER_BW_BASE, HEADER_OES, SAMPLER_OES);
+
+	// Fragment shader that attempts to produce a high contrast image
+	private static final String FRAGMENT_SHADER_NIGHT_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"void main() {\n" +
+		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
+		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
+		"    gl_FragColor = vec4(color, color + 0.15, color, 1.0);\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_NIGHT
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_NIGHT
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE, HEADER_OES, SAMPLER_OES);
+
+	// Fragment shader that applies a Chroma Key effect, making green pixels transparent
+	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"void main() {\n" +
+		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
+		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
+		"    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){ \n" +
+		"        gl_FragColor = vec4(0, 0, 0, 0.0);\n" +
+		"    }else{ \n" +
+		"        gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
+		"    }\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_CHROMA_KEY
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE, HEADER_OES, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_SQUEEZE_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    r = pow(r, 1.0/1.8) * 0.8;\n"+  // Squeeze it
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+	public static final String FRAGMENT_SHADER_SQUEEZE
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_SQUEEZE
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE, HEADER_OES, SAMPLER_OES);
+
+	public static final String FRAGMENT_SHADER_EXT_TWIRL =
+		"#version 100\n" +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    phi = phi + (1.0 - smoothstep(-0.5, 0.5, r)) * 4.0;\n"+ // Twirl it
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_TUNNEL = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    if (r > 0.5) r = 0.5;\n"+ // Tunnel
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_BULGE = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    r = r * smoothstep(-0.1, 0.5, r);\n"+ // Bulge
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_DENT = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    r = 2.0 * r - r * smoothstep(0.0, 0.7, r);\n"+ // Dent
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_FISHEYE = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x); // to polar coords \n"+
+		"    r = r * r / sqrt(2.0);\n"+ // Fisheye
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_STRETCH = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    vec2 s = sign(normCoord + uPosition);\n"+
+		"    normCoord = abs(normCoord);\n"+
+		"    normCoord = 0.5 * normCoord + 0.5 * smoothstep(0.25, 0.5, normCoord) * normCoord;\n"+
+		"    normCoord = s * normCoord;\n"+
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_EXT_MIRROR = SHADER_VERSION +
+		"#extension GL_OES_EGL_image_external : require\n" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform samplerExternalOES sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    normCoord.x = normCoord.x * sign(normCoord.x + uPosition.x);\n"+
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_SOBEL_BASE = SHADER_VERSION +
+		"%s" +
+		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
+		"precision highp float;\n" +
+		"varying       vec2 vTextureCoord;\n" +
+		"uniform %s    sTexture;\n" +
+		"uniform float uKernel[18];\n" +
+		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
+		"uniform float uColorAdjust;\n" +
+		"void main() {\n" +
+		"    vec3 t0 = texture2D(sTexture, vTextureCoord + uTexOffset[0]).rgb;\n" +
+		"    vec3 t1 = texture2D(sTexture, vTextureCoord + uTexOffset[1]).rgb;\n" +
+		"    vec3 t2 = texture2D(sTexture, vTextureCoord + uTexOffset[2]).rgb;\n" +
+		"    vec3 t3 = texture2D(sTexture, vTextureCoord + uTexOffset[3]).rgb;\n" +
+		"    vec3 t4 = texture2D(sTexture, vTextureCoord + uTexOffset[4]).rgb;\n" +
+		"    vec3 t5 = texture2D(sTexture, vTextureCoord + uTexOffset[5]).rgb;\n" +
+		"    vec3 t6 = texture2D(sTexture, vTextureCoord + uTexOffset[6]).rgb;\n" +
+		"    vec3 t7 = texture2D(sTexture, vTextureCoord + uTexOffset[7]).rgb;\n" +
+		"    vec3 t8 = texture2D(sTexture, vTextureCoord + uTexOffset[8]).rgb;\n" +
+		"    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]\n" +
+		"              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]\n" +
+		"              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];\n" +
+		//		"    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
+		//		"              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
+		//		"              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
+		//		"    float mag = length(abs(sumH) + abs(sumV));\n" +
+		"    float mag = length(sumH);\n" +
+		"    gl_FragColor = vec4(vec3(mag), 1.0);\n" +
+		"}\n";
+
+	public static final String FRAGMENT_SHADER_SOBEL
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_SOBEL
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE, HEADER_OES, SAMPLER_OES);
+
+	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
+	public static final float[] KERNEL_SOBEL_H = { 1f, 0f, -1f, 2f, 0f, -2f, 1f, 0f, -1f, };	// ソーベル(1次微分)
+	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
+	public static final float[] KERNEL_SOBEL2_H = { 3f, 0f, -3f, 10f, 0f, -10f, 3f, 0f, -3f, };
+	public static final float[] KERNEL_SOBEL2_V = { 3f, 10f, 3f, 0f, 0f, 0f, -3f, -10f, -3f, };
+	public static final float[] KERNEL_SHARPNESS = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// シャープネス
+	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
+	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
+	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均
+	public static final float[] KERNEL_GAUSSIAN = { 1/16f, 2/16f, 1/16f, 2/16f, 4/16f, 2/16f, 1/16f, 2/16f, 1/16f, };	// ガウシアン(ノイズ除去/)
+	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
+	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分)
+
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE = SHADER_VERSION +
+		"%s" +
+		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
+		"precision highp float;\n" +
+		"varying       vec2 vTextureCoord;\n" +
+		"uniform %s    sTexture;\n" +
+		"uniform float uKernel[18];\n" +
+		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
+		"uniform float uColorAdjust;\n" +
+		"void main() {\n" +
+		"    vec4 sum = vec4(0.0);\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];\n" +
+		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];\n" +
+		"    gl_FragColor = sum + uColorAdjust;\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_FILT3x3
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_FILT3x3
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES, SAMPLER_OES);
+
 }
