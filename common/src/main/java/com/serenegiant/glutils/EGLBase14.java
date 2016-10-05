@@ -52,7 +52,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static class Context extends IContext {
-		private final EGLContext eglContext;
+		public final EGLContext eglContext;
 
 		private Context(final EGLContext context) {
 			eglContext = context;
@@ -60,9 +60,9 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	}
 
 	public static class Config extends IConfig {
-		private final EGLConfig eglConfig;
+		public final EGLConfig eglConfig;
 
-		Config(final EGLConfig eglConfig) {
+		private Config(final EGLConfig eglConfig) {
 			this.eglConfig = eglConfig;
 		}
 	}

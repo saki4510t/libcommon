@@ -18,6 +18,8 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.content.Context;
+
 import com.serenegiant.utils.MessageTask;
 
 public abstract class EglTask extends MessageTask {
@@ -75,6 +77,18 @@ public abstract class EglTask extends MessageTask {
 
 	protected EGLBase getEgl() {
 		return mEgl;
+	}
+
+	protected EGLBase.IContext getEGLContext() {
+		return mEgl.getContext();
+	}
+
+	protected EGLBase.IConfig getConfig() {
+		return mEgl.getConfig();
+	}
+
+	protected EGLBase.IGL getGl() {
+		return mEgl.getGl();
 	}
 
 	protected EGLBase.IContext getContext() {

@@ -59,25 +59,25 @@ public class EGLBase10 extends EGLBase {
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static class Context extends IContext {
-		private final EGLContext eglContext;
+		public final EGLContext eglContext;
 
-		Context(final EGLContext context) {
+		private Context(final EGLContext context) {
 			eglContext = context;
 		}
 	}
 
 	public static class GL extends IGL {
-		javax.microedition.khronos.opengles.GL gl;
+		public final javax.microedition.khronos.opengles.GL gl;
 
-		GL(final javax.microedition.khronos.opengles.GL gl) {
+		private GL(final javax.microedition.khronos.opengles.GL gl) {
 			this.gl = gl;
 		}
 	}
 
 	public static class Config extends IConfig {
-		private final EGLConfig eglConfig;
+		public final EGLConfig eglConfig;
 
-		Config(final EGLConfig eglConfig) {
+		private Config(final EGLConfig eglConfig) {
 			this.eglConfig = eglConfig;
 		}
 	}
