@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.os.Build;
+import android.support.annotation.Nullable;
 
 public abstract class EGLBase {
 	public static final Object EGL_LOCK = new Object();
@@ -49,6 +50,12 @@ public abstract class EGLBase {
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static abstract class IContext {
+	}
+
+	public static abstract class IConfig {
+	}
+
+	public static abstract class IGL {
 	}
 
 	/**
@@ -88,6 +95,18 @@ public abstract class EGLBase {
 	 * @return
 	 */
 	public abstract IContext getContext();
+
+	/**
+	 * EGLコンフィグを取得する
+	 * @return
+	 */
+	public abstract IConfig getConfig();
+
+	/**
+	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
+	 * @return 有効なEGLレンダリングコンテキストが無ければnull
+	 */
+	public abstract @Nullable IGL getGl();
 	/**
 	 * 指定したSurfaceからEglSurfaceを生成する
 	 * 生成したEglSurfaceをmakeCurrentした状態で戻る

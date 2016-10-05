@@ -24,8 +24,10 @@ import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLSurface;
+import android.opengl.GLES20;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -40,7 +42,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL14.EGL_NO_CONTEXT);
 
-    private EGLConfig mEglConfig = null;
+    private Config mEglConfig = null;
     @NonNull private Context mContext = EGL_NO_CONTEXT;
 //	private EGLContext mEglContext = EGL14.EGL_NO_CONTEXT;
 	private EGLDisplay mEglDisplay = EGL14.EGL_NO_DISPLAY;
@@ -54,6 +56,14 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
 		private Context(final EGLContext context) {
 			eglContext = context;
+		}
+	}
+
+	public static class Config extends IConfig {
+		private final EGLConfig eglConfig;
+
+		Config(final EGLConfig eglConfig) {
+			this.eglConfig = eglConfig;
 		}
 	}
 
@@ -197,6 +207,24 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	}
 
 	/**
+	 * EGLコンフィグを取得する
+	 * @return
+	 */
+	@Override
+	public Config getConfig() {
+		return mEglConfig;
+	}
+
+	/**
+	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
+	 * @return 有効なEGLレンダリングコンテキストが無ければnull
+	 */
+	@Override
+	public @Nullable IGL getGl() {
+		return null;
+	}
+
+	/**
 	 * EGLレンダリングコンテキストとスレッドの紐付けを解除する
 	 */
 	@Override
@@ -238,7 +266,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
 		sharedContext = sharedContext != null ? sharedContext : EGL_NO_CONTEXT;
         if ((mContext == null) || (mContext.eglContext == EGL14.EGL_NO_CONTEXT)) {
-            mEglConfig = getConfig(with_depth_buffer, isRecordable);
+            mEglConfig = new Config(getConfig(with_depth_buffer, isRecordable));
             if (mEglConfig == null) {
                 throw new RuntimeException("chooseConfig failed");
             }
@@ -293,7 +321,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         	EGL14.EGL_CONTEXT_CLIENT_VERSION, 2,
         	EGL14.EGL_NONE
         };
-        final Context context = new Context(EGL14.eglCreateContext(mEglDisplay, mEglConfig, sharedContext.eglContext, attrib_list, 0));
+        final Context context = new Context(EGL14.eglCreateContext(mEglDisplay, mEglConfig.eglConfig, sharedContext.eglContext, attrib_list, 0));
         checkEglError("eglCreateContext");
         return context;
     }
@@ -336,7 +364,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         };
 		EGLSurface result = null;
 		try {
-			result = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig, nativeWindow, surfaceAttribs, 0);
+			result = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig.eglConfig, nativeWindow, surfaceAttribs, 0);
 		} catch (final IllegalArgumentException e) {
 			Log.e(TAG, "eglCreateWindowSurface", e);
 		}
@@ -355,7 +383,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         };
 		EGLSurface result = null;
 		try {
-			result = EGL14.eglCreatePbufferSurface(mEglDisplay, mEglConfig, surfaceAttribs, 0);
+			result = EGL14.eglCreatePbufferSurface(mEglDisplay, mEglConfig.eglConfig, surfaceAttribs, 0);
 	        checkEglError("eglCreatePbufferSurface");
 	        if (result == null) {
 	            throw new RuntimeException("surface was null");

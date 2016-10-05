@@ -49,7 +49,7 @@ public class EGLBase10 extends EGLBase {
 
     private EGL10 mEgl = null;
 	private EGLDisplay mEglDisplay = null;
-    private EGLConfig mEglConfig = null;
+    private Config mEglConfig = null;
     private int mGlVersion = 2;
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
@@ -63,6 +63,22 @@ public class EGLBase10 extends EGLBase {
 
 		Context(final EGLContext context) {
 			eglContext = context;
+		}
+	}
+
+	public static class GL extends IGL {
+		javax.microedition.khronos.opengles.GL gl;
+
+		GL(final javax.microedition.khronos.opengles.GL gl) {
+			this.gl = gl;
+		}
+	}
+
+	public static class Config extends IConfig {
+		private final EGLConfig eglConfig;
+
+		Config(final EGLConfig eglConfig) {
+			this.eglConfig = eglConfig;
 		}
 	}
 
@@ -275,6 +291,24 @@ public class EGLBase10 extends EGLBase {
 	}
 
 	/**
+	 * EGLコンフィグを取得する
+	 * @return
+	 */
+	@Override
+	public Config getConfig() {
+		return mEglConfig;
+	}
+
+	/**
+	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
+	 * @return 有効なEGLレンダリングコンテキストが無ければnull
+	 */
+	@Override
+	public @Nullable GL getGl() {
+		return (mContext != null) && (mContext.eglContext != null) ? new GL(mContext.eglContext.getGL()) : null;
+	}
+
+	/**
 	 * EGLレンダリングコンテキストとスレッドの紐付けを解除する
 	 */
 	@Override
@@ -343,7 +377,7 @@ public class EGLBase10 extends EGLBase {
             final EGLContext context = createContext(sharedContext, config, 3);
             if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {
                 //Log.d(TAG, "Got GLES 3 config");
-            	mEglConfig = config;
+            	mEglConfig = new Config(config);
             	mContext = new Context(context);
                 mGlVersion = 3;
             }
@@ -358,7 +392,7 @@ public class EGLBase10 extends EGLBase {
 				// create EGL rendering context
 				final EGLContext context = createContext(sharedContext, config, 2);
 				checkEglError("eglCreateContext");
-				mEglConfig = config;
+				mEglConfig = new Config(config);
 				mContext = new Context(context);
 				mGlVersion = 2;
 			} catch (final Exception e) {
@@ -370,7 +404,7 @@ public class EGLBase10 extends EGLBase {
 					// create EGL rendering context
 					final EGLContext context = createContext(sharedContext, config, 2);
 					checkEglError("eglCreateContext");
-					mEglConfig = config;
+					mEglConfig = new Config(config);
 					mContext = new Context(context);
 					mGlVersion = 2;
 				}
@@ -468,7 +502,7 @@ public class EGLBase10 extends EGLBase {
 		EGLSurface result = null;
 		try {
 			// SC-06DだとSurfaceを渡せない, SurfaceTexture/SurfaceHolder/SurfaceViewの3つだけ
-			result = mEgl.eglCreateWindowSurface(mEglDisplay, mEglConfig, nativeWindow, surfaceAttribs);
+			result = mEgl.eglCreateWindowSurface(mEglDisplay, mEglConfig.eglConfig, nativeWindow, surfaceAttribs);
             if (result == null || result == EGL10.EGL_NO_SURFACE) {
                 final int error = mEgl.eglGetError();
                 if (error == EGL10.EGL_BAD_NATIVE_WINDOW) {
@@ -497,7 +531,7 @@ public class EGLBase10 extends EGLBase {
         mEgl.eglWaitGL();
 		EGLSurface result = null;
 		try {
-			result = mEgl.eglCreatePbufferSurface(mEglDisplay, mEglConfig, surfaceAttribs);
+			result = mEgl.eglCreatePbufferSurface(mEglDisplay, mEglConfig.eglConfig, surfaceAttribs);
 	        checkEglError("eglCreatePbufferSurface");
 	        if (result == null) {
 	            throw new RuntimeException("surface was null");
