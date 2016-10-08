@@ -18,44 +18,42 @@ package com.serenegiant.dialog;
  *  limitations under the License.
 */
 
+import com.serenegiant.utils.BuildCheck;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.app.Fragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
-
-/**
- * パーミッション要求前に説明用のダイアログを表示するためのDialogFragment
- */
-public class MessageDialogFragment extends DialogFragment {
+public class MessageDialogFragmentV4 extends DialogFragment {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = MessageDialogFragment.class.getSimpleName();
+	private static final String TAG = MessageDialogFragmentV4.class.getSimpleName();
 
 	public static interface MessageDialogListener {
-		public void onMessageDialogResult(final MessageDialogFragment dialog, final int requestCode, final String[] permissions, final boolean result);
+		public void onMessageDialogResult(final MessageDialogFragmentV4 dialog, final int requestCode, final String[] permissions, final boolean result);
 	}
 
-	public static MessageDialogFragment showDialog(final Activity parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
-		final MessageDialogFragment dialog = newInstance(requestCode, id_title, id_message, permissions);
-		dialog.show(parent.getFragmentManager(), TAG);
+	public static MessageDialogFragmentV4 showDialog(final FragmentActivity parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
+		final MessageDialogFragmentV4 dialog = newInstance(requestCode, id_title, id_message, permissions);
+		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
 
-	public static MessageDialogFragment showDialog(final Fragment parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
-		final MessageDialogFragment dialog = newInstance(requestCode, id_title, id_message, permissions);
+	public static MessageDialogFragmentV4 showDialog(final Fragment parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
+		final MessageDialogFragmentV4 dialog = newInstance(requestCode, id_title, id_message, permissions);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getFragmentManager(), TAG);
 		return dialog;
 	}
 
-	public static MessageDialogFragment newInstance(final int requestCode, final int id_title, final int id_message, final String[] permissions) {
-		final MessageDialogFragment fragment = new MessageDialogFragment();
+	public static MessageDialogFragmentV4 newInstance(final int requestCode, final int id_title, final int id_message, final String[] permissions) {
+		final MessageDialogFragmentV4 fragment = new MessageDialogFragmentV4();
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
 		args.putInt("requestCode", requestCode);
@@ -68,7 +66,7 @@ public class MessageDialogFragment extends DialogFragment {
 
 	private MessageDialogListener mDialogListener;
 
-	public MessageDialogFragment() {
+	public MessageDialogFragmentV4() {
 		super();
 		// デフォルトコンストラクタが必要
 	}
@@ -102,9 +100,9 @@ public class MessageDialogFragment extends DialogFragment {
 	}
 
 //	@Override
-//    public void onCreate(final Bundle savedInstanceState) {
-//    	super.onCreate(savedInstanceState);
-//    	final Bundle args = savedInstanceState != null ? savedInstanceState : getArguments();
+//	public void onCreate(final Bundle savedInstanceState) {
+//		super.onCreate(savedInstanceState);
+//		final Bundle args = savedInstanceState != null ? savedInstanceState : getArguments();
 //	}
 
 	@Override
@@ -127,7 +125,7 @@ public class MessageDialogFragment extends DialogFragment {
 						// 本当はここでパーミッション要求をしたいだけどこのダイアログがdismissしてしまって結果を受け取れないので
 						// 呼び出し側へ返してそこでパーミッション要求する。なのでこのダイアログは単にメッセージを表示するだけ
 						try {
-							mDialogListener.onMessageDialogResult(MessageDialogFragment.this, requestCode, permissions, true);
+							mDialogListener.onMessageDialogResult(MessageDialogFragmentV4.this, requestCode, permissions, true);
 						} catch (final Exception e) {
 							Log.w(TAG, e);
 						}
@@ -139,7 +137,7 @@ public class MessageDialogFragment extends DialogFragment {
 					@Override
 					public void onClick(final DialogInterface dialog, int whichButton) {
 						try {
-							mDialogListener.onMessageDialogResult(MessageDialogFragment.this, requestCode, permissions, false);
+							mDialogListener.onMessageDialogResult(MessageDialogFragmentV4.this, requestCode, permissions, false);
 						} catch (final Exception e) {
 							Log.w(TAG, e);
 						}
