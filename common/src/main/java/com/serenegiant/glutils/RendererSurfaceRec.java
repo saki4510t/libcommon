@@ -8,13 +8,32 @@ import android.opengl.Matrix;
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
 class RendererSurfaceRec {
+
+	/**
+	 * ファクトリーメソッド
+	 * @param egl
+	 * @param surface
+	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
+	 * @return
+	 */
+	static RendererSurfaceRec newInstance(final EGLBase egl, final Object surface, final int maxFps) {
+		return (maxFps > 0)
+			? new RendererSurfaceRecHasWait(egl, surface, maxFps)
+			: new RendererSurfaceRec(egl, surface);
+	}
+
 	/** 元々の分配描画用Surface */
 	private Object mSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private EGLBase.IEglSurface mTargetSurface;
 	final float[] mMvpMatrix = new float[16];
 
-	public RendererSurfaceRec(final EGLBase egl, final Object surface) {
+	/**
+	 * コンストラクタ, ファクトリーメソッドの使用を矯正するためprivate
+	 * @param egl
+	 * @param surface
+	 */
+	private RendererSurfaceRec(final EGLBase egl, final Object surface) {
 		mSurface = surface;
 		mTargetSurface = egl.createFromSurface(surface);
 		Matrix.setIdentityM(mMvpMatrix, 0);
@@ -48,24 +67,31 @@ class RendererSurfaceRec {
 		mTargetSurface.swap();
 	}
 
-	static class RendererSurfaceRecHasWait extends RendererSurfaceRec {
-		private long mPrevDraw;
+	private static class RendererSurfaceRecHasWait extends RendererSurfaceRec {
+		private long mNextDraw;
 		private final long mIntervalsNs;
-		public RendererSurfaceRecHasWait(final EGLBase egl, final Object surface, final int maxFps) {
+
+		/**
+		 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
+		 * @param egl
+		 * @param surface
+		 * @param maxFps 正数
+		 */
+		private RendererSurfaceRecHasWait(final EGLBase egl, final Object surface, final int maxFps) {
 			super(egl, surface);
-			mIntervalsNs = (maxFps > 0) ? 1000000000L / maxFps : 0L;
-			mPrevDraw = System.nanoTime();
+			mIntervalsNs = 1000000000L / maxFps;
+			mNextDraw = System.nanoTime() + mIntervalsNs;
 		}
 
 		@Override
 		public boolean canDraw() {
-			return (mIntervalsNs == 0L) || ((System.nanoTime() - mPrevDraw) > mIntervalsNs);
+			return System.nanoTime() > mNextDraw;
 		}
 
 		@Override
 		public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
+			mNextDraw = System.nanoTime() + mIntervalsNs;
 			super.draw(drawer, textId, texMatrix);
-			mPrevDraw = System.nanoTime();
 		}
 	}
 

@@ -516,9 +516,7 @@ public class RendererHolder implements IRendererHolder {
 				RendererSurfaceRec client = mClients.get(id);
 				if (client == null) {
 					try {
-						client = (maxFps > 0)
-							? new RendererSurfaceRec.RendererSurfaceRecHasWait(getEgl(), surface, maxFps)
-							: new RendererSurfaceRec(getEgl(), surface);
+						client = RendererSurfaceRec.newInstance(getEgl(), surface, maxFps);
 						setMirror(client, mMirror);
 						mClients.append(id, client);
 					} catch (final Exception e) {
