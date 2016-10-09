@@ -23,7 +23,6 @@ import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.graphics.SurfaceTexture.OnFrameAvailableListener;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
@@ -266,6 +265,12 @@ public class EffectRendererHolder implements IRendererHolder {
 	}
 
 	@Override
+	public void addSurface(final int id, final Surface surface, final boolean isRecordable, final int maxFps) {
+//		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
+		mRendererTask.addSurface(id, surface, maxFps);
+	}
+
+	@Override
 	public void removeSurface(final int id) {
 //		if (DEBUG) Log.v(TAG, "removeSurface:id=" + id);
 		mRendererTask.removeSurface(id);
@@ -373,39 +378,15 @@ public class EffectRendererHolder implements IRendererHolder {
 	private static final int REQUEST_ADD_SURFACE = 3;
 	private static final int REQUEST_REMOVE_SURFACE = 4;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
-	private static final int REQUEST_CHANGE_EFFECT = 6;
-	private static final int REQUEST_MIRROR = 7;
+	private static final int REQUEST_MIRROR = 6;
+	private static final int REQUEST_CHANGE_EFFECT = 7;
 	private static final int REQUEST_SET_PARAMS = 8;
 
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
+	 * TODO RendererHolder#RendererTaskの共通部分をまとめる
 	 */
 	private static final class RendererTask extends EglTask {
-
-		private final class RendererSurfaceRec {
-			/** 元々の分配描画用Surface */
-			private Object mSurface;
-			/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
-			private EGLBase.IEglSurface mTargetSurface;
-			final float[] mMvpMatrix = new float[16];
-
-			public RendererSurfaceRec(final EGLBase egl, final Object surface) {
-				mSurface = surface;
-				mTargetSurface = egl.createFromSurface(surface);
-				Matrix.setIdentityM(mMvpMatrix, 0);
-			}
-
-			/**
-			 * 生成したEglSurfaceを破棄する
-			 */
-			public void release() {
-				if (mTargetSurface != null) {
-					mTargetSurface.release();
-					mTargetSurface = null;
-				}
-				mSurface = null;
-			}
-		}
 
 		private final Object mClientSync = new Object();
 		private final SparseArray<RendererSurfaceRec> mClients = new SparseArray<RendererSurfaceRec>();
@@ -491,7 +472,7 @@ public class EffectRendererHolder implements IRendererHolder {
 				handleResize(arg1, arg2);
 				break;
 			case REQUEST_ADD_SURFACE:
-				handleAddSurface(arg1, obj);
+				handleAddSurface(arg1, obj, arg2);
 				break;
 			case REQUEST_REMOVE_SURFACE:
 				handleRemoveSurface(arg1);
@@ -538,11 +519,15 @@ public class EffectRendererHolder implements IRendererHolder {
 		 * @param surface
 		 */
 		public void addSurface(final int id, final Object surface) {
+			addSurface(id, surface, -1);
+		}
+
+		public void addSurface(final int id, final Object surface, final int maxFps) {
 			checkFinished();
 			synchronized (mClientSync) {
 				if ((surface != null) && (mClients.get(id) == null)) {
 					for ( ; ; ) {
-						if (offer(REQUEST_ADD_SURFACE, id, surface)) {
+						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
 								mClientSync.wait();
 							} catch (final InterruptedException e) {
@@ -677,14 +662,9 @@ public class EffectRendererHolder implements IRendererHolder {
 				RendererSurfaceRec client;
 				for (int i = n - 1; i >= 0; i--) {
 					client = mClients.valueAt(i);
-					if (client != null) {
+					if ((client != null) && client.canDraw()) {
 						try {
-							client.mTargetSurface.makeCurrent();
-							// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけどハングアップする機種があるのでクリアしとく
-							GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-							mDrawer.setMvpMatrix(client.mMvpMatrix, 0);
-							mDrawer.draw(mTexId, mTexMatrix, 0);
-							client.mTargetSurface.swap();
+							client.draw(mDrawer, mTexId, mTexMatrix);
 						} catch (final Exception e) {
 							// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
 							Log.w(TAG, e);
@@ -710,14 +690,16 @@ public class EffectRendererHolder implements IRendererHolder {
 		 * @param id
 		 * @param surface
 		 */
-		private void handleAddSurface(final int id, final Object surface) {
+		private void handleAddSurface(final int id, final Object surface, final int maxFps) {
 //			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
 			synchronized (mClientSync) {
 				RendererSurfaceRec client = mClients.get(id);
 				if (client == null) {
 					try {
-						client = new RendererSurfaceRec(getEgl(), surface);
+						client = (maxFps > 0)
+							? new RendererSurfaceRec.RendererSurfaceRecHasWait(getEgl(), surface, maxFps)
+							: new RendererSurfaceRec(getEgl(), surface);
 						setMirror(client, mMirror);
 						mClients.append(id, client);
 					} catch (final Exception e) {
@@ -776,13 +758,11 @@ public class EffectRendererHolder implements IRendererHolder {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
-					if (client != null && client.mSurface instanceof Surface) {
-						if (!((Surface)client.mSurface).isValid()) {
-							final int id = mClients.keyAt(i);
-//							if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
-							mClients.valueAt(i).release();
-							mClients.remove(id);
-						}
+					if ((client != null) && !client.isValid()) {
+						final int id = mClients.keyAt(i);
+//						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
+						mClients.valueAt(i).release();
+						mClients.remove(id);
 					}
 				}
 			}
@@ -792,6 +772,7 @@ public class EffectRendererHolder implements IRendererHolder {
 		/**
 		 * マスターSurfaceを再生成する
 		 */
+		@SuppressLint("NewApi")
 		private void handleReCreateMasterSurface() {
 			makeCurrent();
 			handleReleaseMasterSurface();
