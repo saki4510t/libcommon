@@ -234,4 +234,18 @@ public class FileUtils {
 		}
 		return 0;
 	}
+
+	/**
+	 * ファイル名末尾の拡張子を取り除く
+	 * @param path
+	 * @return
+	 */
+	public static final String removeFileExtension(final String path) {
+		final int ix = !TextUtils.isEmpty(path) ? path.lastIndexOf(".") : -1;
+		if (ix > 0) {
+			return path.substring(0, ix);
+		} else {
+			return path;
+		}
+	}
 }

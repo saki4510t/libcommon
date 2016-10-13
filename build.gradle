@@ -24,11 +24,11 @@ task clean(type: Delete) {
 
 ext {
 	supportLibVersion = '24.2.1'  // variable that can be referenced to keep support libs consistent
-	versionBuildTool = "24.0.2"
+	versionBuildTool = "24.0.3"
 	versionCompiler = 24
 	versionTarget = 23
-    versionCondeNum = 11
-    versionNameString = '1.0.11'
+    versionCondeNum = 12
+    versionNameString = '1.0.12'
 	javaSourceCompatibility = JavaVersion.VERSION_1_7
 	javaTargetCompatibility = JavaVersion.VERSION_1_7
 }
