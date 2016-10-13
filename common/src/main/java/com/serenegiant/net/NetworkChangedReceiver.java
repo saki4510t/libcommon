@@ -248,6 +248,14 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	/** コールバックリスナー */
 	private OnNetworkChangedListener mListener;
 
+	/**
+	 * デフォルトコンストラクタ
+	 * AndroidManifest.xmlで登録する場合
+	 */
+	public NetworkChangedReceiver() {
+		mListener = null;
+	}
+
 	/** コンストラクタ */
 	private NetworkChangedReceiver(final OnNetworkChangedListener listener) {
 		mListener = listener;
