@@ -198,7 +198,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int sqareBits(byte v) {
+	public static int squareBits(byte v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -208,7 +208,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int sqareBits(short v) {
+	public static int squareBits(short v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -218,7 +218,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int sqareBits(int v) {
+	public static int squareBits(int v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -228,7 +228,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int sqareBits(long v) {
+	public static int squareBits(long v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
