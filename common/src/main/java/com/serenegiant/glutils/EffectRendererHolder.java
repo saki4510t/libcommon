@@ -234,6 +234,22 @@ public class EffectRendererHolder implements IRendererHolder {
 // IRendererHolderの実装
 //================================================================================
 	@Override
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	@Override
+	public void release() {
+//		if (DEBUG) Log.v(TAG, "release:");
+		mRendererTask.release();
+		synchronized (mSync) {
+			isRunning = false;
+			mSync.notifyAll();
+		}
+//		if (DEBUG) Log.v(TAG, "release:finished");
+	}
+
+	@Override
 	public Surface getSurface() {
 		return mRendererTask.getSurface();
 	}
@@ -322,17 +338,6 @@ public class EffectRendererHolder implements IRendererHolder {
 			}
 		}
 //		if (DEBUG) Log.v(TAG, "captureStill終了");
-	}
-
-	@Override
-	public void release() {
-//		if (DEBUG) Log.v(TAG, "release:");
-		mRendererTask.release();
-		synchronized (mSync) {
-			isRunning = false;
-			mSync.notifyAll();
-		}
-//		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
 //================================================================================

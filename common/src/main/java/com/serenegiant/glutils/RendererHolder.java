@@ -78,6 +78,25 @@ public class RendererHolder implements IRendererHolder {
 //================================================================================
 // IRendererHolderの実装
 //================================================================================
+	@Override
+	public boolean isRunning() {
+		return isRunning;
+	}
+
+	/**
+	 * 関係するすべてのリソースを開放する。再利用できない
+	 */
+	@Override
+	public void release() {
+	//		if (DEBUG) Log.v(TAG, "release:");
+		mRendererTask.release();
+		synchronized (mSync) {
+			isRunning = false;
+			mSync.notifyAll();
+		}
+//		if (DEBUG) Log.v(TAG, "release:finished");
+	}
+
 	/**
 	 * マスター用の映像を受け取るためのSurfaceを取得
 	 * @return
@@ -205,20 +224,6 @@ public class RendererHolder implements IRendererHolder {
 			}
 		}
 //		if (DEBUG) Log.v(TAG, "captureStill終了");
-	}
-
-	/**
-	 * 関係するすべてのリソースを開放する。再利用できない
-	 */
-	@Override
-	public void release() {
-//		if (DEBUG) Log.v(TAG, "release:");
-		mRendererTask.release();
-		synchronized (mSync) {
-			isRunning = false;
-			mSync.notifyAll();
-		}
-//		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
 //================================================================================

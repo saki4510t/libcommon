@@ -25,7 +25,11 @@ import android.view.Surface;
  * 分配描画インターフェース
  */
 public interface IRendererHolder extends IRendererCommon {
-
+	/**
+	 * 実行中かどうか
+	 * @return
+	 */
+	public boolean isRunning();
 	/**
 	 * 関係するすべてのリソースを開放する。再利用できない
 	 */
