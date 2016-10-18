@@ -129,9 +129,9 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	 * @param withDepthBuffer
 	 * @param isRecordable
 	 */
-	public EGLBase14(final int maxClientVersion, final Context sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+	public EGLBase14(final int maxClientVersion, final Context sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "Constructor:");
-		init(maxClientVersion, sharedContext, withDepthBuffer, isRecordable);
+		init(maxClientVersion, sharedContext, withDepthBuffer, stencilBits, isRecordable);
 	}
 
 	/**
@@ -250,7 +250,9 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		EGL14.eglWaitNative(EGL14.EGL_CORE_NATIVE_ENGINE);
 	}
 
-	private void init(final int maxClientVersion, Context sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+	private void init(final int maxClientVersion, Context sharedContext,
+		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
 //		if (DEBUG) Log.v(TAG, "init:");
         if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("EGL already set up");
@@ -272,7 +274,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		EGLConfig config;
 		if (maxClientVersion >= 3) {
 			// GLES3で取得できるかどうか試してみる
-			config = getConfig(3, withDepthBuffer, isRecordable);
+			config = getConfig(3, withDepthBuffer, stencilBits, isRecordable);
 			if (config != null) {
 				final EGLContext context = createContext(sharedContext, config, 3);
 				if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {	// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
@@ -284,7 +286,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		}
 		// GLES3で取得できなかった時はGLES2を試みる
 		if ((maxClientVersion >= 2) && ((mContext == null) || (mContext.eglContext == EGL14.EGL_NO_CONTEXT))) {
-			config = getConfig(2, withDepthBuffer, isRecordable);
+			config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new RuntimeException("chooseConfig failed");
 			}
@@ -297,7 +299,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 				mGlVersion = 2;
 			} catch (final Exception e) {
 				if (isRecordable) {
-					config = getConfig(2, withDepthBuffer, false);
+					config = getConfig(2, withDepthBuffer, stencilBits, false);
 					if (config == null) {
 						throw new RuntimeException("chooseConfig failed");
 					}
@@ -311,7 +313,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 			}
         }
         if ((mContext == null) || (mContext.eglContext == EGL14.EGL_NO_CONTEXT)) {
-			config = getConfig(1, withDepthBuffer, isRecordable);
+			config = getConfig(1, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new RuntimeException("chooseConfig failed");
 			}
@@ -464,7 +466,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
     }
 
     @SuppressWarnings("unused")
-    private EGLConfig getConfig(final int version, final boolean hasDepthBuffer, final boolean isRecordable) {
+    private EGLConfig getConfig(final int version, final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
 		int renderableType = EGL_OPENGL_ES2_BIT;
 		if (version >= 3) {
 			renderableType |= EGL_OPENGL_ES3_BIT_KHR;
@@ -483,9 +485,9 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 			EGL14.EGL_NONE
         };
         int offset = 10;
-        if (false) {				// ステンシルバッファ(常時未使用)
+        if (stencilBits > 0) {	// ステンシルバッファ(常時未使用)
         	attribList[offset++] = EGL14.EGL_STENCIL_SIZE;
-        	attribList[offset++] = 8;
+        	attribList[offset++] = stencilBits;
         }
         if (hasDepthBuffer) {	// デプスバッファ
         	attribList[offset++] = EGL14.EGL_DEPTH_SIZE;

@@ -34,16 +34,16 @@ public abstract class EGLBase {
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
 	 * @param maxClientVersion
 	 * @param sharedContext
-	 * @param withDepthBuffer
+	 * @param withDepthBuffer trueなら16ビットのデプスバッファ有り, falseならデプスバッファなし
+	 * @param stencilBits 0以下ならステンシルバッファなし
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
-		// FIXME 今はEGLBase10とEGLBase14は同等では無いのでEGLBaseを優先して生成する
+	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 		if (isEGL14Supported() && (/*(sharedContext == null) ||*/ (sharedContext instanceof EGLBase14.Context))) {
-			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, isRecordable);
+			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
 		} else {
-			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, isRecordable);
+			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
 		}
 	}
 

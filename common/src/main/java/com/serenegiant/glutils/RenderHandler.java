@@ -176,7 +176,7 @@ public final class RenderHandler extends Handler {
     			mSurface = surface instanceof Surface ? (Surface)surface
     				: (surface instanceof SurfaceTexture ? new Surface((SurfaceTexture)surface) : null);
     		}
-    		mEgl = EGLBase.createFrom(3, shardContext, false, isRecordable);
+    		mEgl = EGLBase.createFrom(3, shardContext, false, 0, isRecordable);
     		try {
 	   			mTargetSurface = mEgl.createFromSurface(surface);
 	    		mDrawer = new GLDrawer2D(isRecordable);

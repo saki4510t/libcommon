@@ -24,8 +24,12 @@ public abstract class EglTask extends MessageTask {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "EglTask";
 
-	public static final int EGL_FLAG_DEPTH_BUFFER = 1;
-	public static final int EGL_FLAG_RECORDABLE = 2;
+	public static final int EGL_FLAG_DEPTH_BUFFER = 0x01;
+	public static final int EGL_FLAG_RECORDABLE = 0x02;
+	public static final int EGL_FLAG_STENCIL_1BIT = 0x04;
+//	public static final int EGL_FLAG_STENCIL_2BIT = 0x08;
+//	public static final int EGL_FLAG_STENCIL_4BIT = 0x10;
+	public static final int EGL_FLAG_STENCIL_8BIT = 0x20;
 
 	private EGLBase mEgl = null;
 	private EGLBase.IEglSurface mEglHolder;
@@ -35,9 +39,9 @@ public abstract class EglTask extends MessageTask {
 		init(flags, 0, sharedContext);
 	}
 
-	public EglTask(final int max_version, final EGLBase.IContext sharedContext, final int flags) {
+	public EglTask(final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		init(flags, max_version, sharedContext);
+		init(flags, maxClientVersion, sharedContext);
 	}
 
 	/**
@@ -47,10 +51,15 @@ public abstract class EglTask extends MessageTask {
 	 */
 	@Override
 	protected void onInit(final int flags, final int maxClientVersion, final Object sharedContext) {
-		if ((sharedContext == null) || (sharedContext instanceof EGLBase.IContext))
+		if ((sharedContext == null) || (sharedContext instanceof EGLBase.IContext)) {
+			final int stencilBits
+				= (flags & EGL_FLAG_STENCIL_1BIT) == EGL_FLAG_STENCIL_1BIT ? 1
+					: ((flags & EGL_FLAG_STENCIL_8BIT) == EGL_FLAG_STENCIL_8BIT ? 8 : 0);
 			mEgl = EGLBase.createFrom(maxClientVersion, (EGLBase.IContext)sharedContext,
 				(flags & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
+				stencilBits,
 				(flags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
+		}
 		if (mEgl == null) {
 			callOnError(new RuntimeException("failed to create EglCore"));
 			releaseSelf();
