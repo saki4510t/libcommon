@@ -64,6 +64,7 @@ public class EGLBase10 extends EGLBase {
 		private Context(final EGLContext context) {
 			eglContext = context;
 		}
+
 	}
 
 	public static class GL extends IGL {
@@ -82,6 +83,11 @@ public class EGLBase10 extends EGLBase {
 		}
 	}
 
+	/**
+	 * Android4.1.2だとSurfaceを使えない。
+	 * SurfaceTexture/SurfaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
+	 * SurfaceHolderはインターフェースなのでSurfaceHolderを継承したダミークラスを生成して食わす
+	 */
 	public static class MySurfaceHolder implements SurfaceHolder {
 		private final Surface surface;
 
@@ -222,13 +228,14 @@ public class EGLBase10 extends EGLBase {
 
 	/**
 	 * コンストラクタ
+	 * @param maxClientVersion
 	 * @param sharedContext 共有コンテキストを使用する場合に指定
-	 * @param with_depth_buffer
+	 * @param withDepthBuffer
 	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
 	 */
-	public EGLBase10(final Context sharedContext, final boolean with_depth_buffer, final boolean isRecordable) {
+	public EGLBase10(final int maxClientVersion, final Context sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "Constructor:");
-		init(sharedContext, with_depth_buffer, isRecordable);
+		init(maxClientVersion, sharedContext, withDepthBuffer, isRecordable);
 	}
 
 	/**
@@ -343,7 +350,7 @@ public class EGLBase10 extends EGLBase {
 
 	/**
 	 * GLESバージョンを取得する
-	 * @return 2または3
+	 * @return 1, 2または3
 	 */
 	@Override
     public int getGlVersion() {
@@ -352,11 +359,12 @@ public class EGLBase10 extends EGLBase {
 
 	/**
 	 * 初期化の下請け
+	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param withDepthBuffer
 	 * @param isRecordable
 	 */
-	private final void init(@Nullable Context sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+	private final void init(final int maxClientVersion, @Nullable Context sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "init:");
 		sharedContext = sharedContext != null ? sharedContext : EGL_NO_CONTEXT;
 		if (mEgl == null) {
@@ -365,25 +373,29 @@ public class EGLBase10 extends EGLBase {
 	        if (mEglDisplay == EGL10.EGL_NO_DISPLAY) {
 	            throw new RuntimeException("eglGetDisplay failed");
 	        }
+	        // EGLのバージョンを取得
 			final int[] version = new int[2];
 	        if (!mEgl.eglInitialize(mEglDisplay, version)) {
 	        	mEglDisplay = null;
 	            throw new RuntimeException("eglInitialize failed");
 	        }
 		}
-        // GLES3で取得できるかどうか試してみる
-		EGLConfig config = getConfig(3, withDepthBuffer, isRecordable);
-        if (config != null) {
-            final EGLContext context = createContext(sharedContext, config, 3);
-            if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {
-                //Log.d(TAG, "Got GLES 3 config");
-            	mEglConfig = new Config(config);
-            	mContext = new Context(context);
-                mGlVersion = 3;
-            }
-        }
-        // GLES3で取得できなかった時はGLES2を試みる
-		if ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT)) {
+		EGLConfig config;
+		if (maxClientVersion >= 3) {
+			// GLES3で取得できるかどうか試してみる
+			config = getConfig(3, withDepthBuffer, isRecordable);
+			if (config != null) {
+				final EGLContext context = createContext(sharedContext, config, 3);
+				if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {	// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
+					//Log.d(TAG, "Got GLES 3 config");
+					mEglConfig = new Config(config);
+					mContext = new Context(context);
+					mGlVersion = 3;
+				}
+			}
+		}
+		// GLES3で取得できなかった時はGLES2を試みる
+		if ((maxClientVersion >= 2) && ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT))) {
             config = getConfig(2, withDepthBuffer, isRecordable);
             if (config == null) {
                	throw new RuntimeException("chooseConfig failed");
@@ -410,10 +422,22 @@ public class EGLBase10 extends EGLBase {
 				}
 			}
         }
+        if ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT)) {
+			config = getConfig(1, withDepthBuffer, isRecordable);
+			if (config == null) {
+				throw new RuntimeException("chooseConfig failed");
+			}
+			// create EGL rendering context
+			final EGLContext context = createContext(sharedContext, config, 1);
+			checkEglError("eglCreateContext");
+			mEglConfig = new Config(config);
+			mContext = new Context(context);
+			mGlVersion = 1;
+		}
         // confirm whether the EGL rendering context is successfully created
 		final int[] values = new int[1];
 		mEgl.eglQueryContext(mEglDisplay, mContext.eglContext, EGL_CONTEXT_CLIENT_VERSION, values);
-//		if (DEBUG) Log.d(TAG, "EGLContext created, client version " + values[0]);
+		Log.d(TAG, "EGLContext created, client version " + values[0]);
         makeDefault();
 	}
 
@@ -460,7 +484,6 @@ public class EGLBase10 extends EGLBase {
         	EGL10.EGL_NONE
         };
         final EGLContext context = mEgl.eglCreateContext(mEglDisplay, config, sharedContext.eglContext, attrib_list);
-//		checkEglError("eglCreateContext");
         return context;
     }
 
@@ -592,7 +615,7 @@ public class EGLBase10 extends EGLBase {
         	attribList[offset++] = EGL10.EGL_DEPTH_SIZE;
         	attribList[offset++] = 16;
         }
-        if (isRecordable && (BuildCheck.isAndroid4_3())) {	// MediaCodecの入力用Surfaceの場合
+        if (isRecordable && BuildCheck.isAndroid4_3()) {	// MediaCodecの入力用Surfaceの場合
         	attribList[offset++] = EGL_RECORDABLE_ANDROID;	// A-1000F(Android4.1.2)はこのフラグをつけるとうまく動かない
         	attribList[offset++] = 1;
         }

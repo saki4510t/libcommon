@@ -32,17 +32,18 @@ public abstract class EGLBase {
 
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
+	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param withDepthBuffer
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final IContext sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
-		// FIXME 今はEGLBaseとEGLBase14は同等では無いのでEGLBaseを優先して生成する
+	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+		// FIXME 今はEGLBase10とEGLBase14は同等では無いのでEGLBaseを優先して生成する
 		if (isEGL14Supported() && (/*(sharedContext == null) ||*/ (sharedContext instanceof EGLBase14.Context))) {
-			return new EGLBase14((EGLBase14.Context)sharedContext, withDepthBuffer, isRecordable);
+			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, isRecordable);
 		} else {
-			return new EGLBase10((EGLBase10.Context)sharedContext, withDepthBuffer, isRecordable);
+			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, isRecordable);
 		}
 	}
 
@@ -85,7 +86,7 @@ public abstract class EGLBase {
 	public abstract String queryString(final int what);
 	/**
 	 * GLESバージョンを取得する
-	 * @return 2または3
+	 * @return 1, 2または3
 	 */
 	public abstract int getGlVersion();
 	/**

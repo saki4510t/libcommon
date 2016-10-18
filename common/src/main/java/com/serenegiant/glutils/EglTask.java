@@ -18,8 +18,6 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.content.Context;
-
 import com.serenegiant.utils.MessageTask;
 
 public abstract class EglTask extends MessageTask {
@@ -42,12 +40,17 @@ public abstract class EglTask extends MessageTask {
 		init(flags, max_version, sharedContext);
 	}
 
+	/**
+	 * @param flags
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 */
 	@Override
-	protected void onInit(final int arg1, final int arg2, final Object obj) {
-		if ((obj == null) || (obj instanceof EGLBase.IContext))
-			mEgl = EGLBase.createFrom((EGLBase.IContext)obj,
-				(arg1 & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
-				(arg1 & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
+	protected void onInit(final int flags, final int maxClientVersion, final Object sharedContext) {
+		if ((sharedContext == null) || (sharedContext instanceof EGLBase.IContext))
+			mEgl = EGLBase.createFrom(maxClientVersion, (EGLBase.IContext)sharedContext,
+				(flags & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
+				(flags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
 		if (mEgl == null) {
 			callOnError(new RuntimeException("failed to create EglCore"));
 			releaseSelf();

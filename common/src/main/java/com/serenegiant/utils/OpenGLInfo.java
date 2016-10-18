@@ -36,7 +36,7 @@ public class OpenGLInfo {
 	public static JSONObject get() throws JSONException {
 		JSONObject result = new JSONObject();
 		try {
-	    	final EGLBase egl = EGLBase.createFrom(null, false, false);
+	    	final EGLBase egl = EGLBase.createFrom(3, null, false, false);
 	    	final EGLBase.IEglSurface dummy = egl.createOffscreen(1, 1);
 	    	dummy.makeCurrent();
 	    	try {

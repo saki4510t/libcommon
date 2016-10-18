@@ -982,7 +982,7 @@ public class EffectRendererHolder implements IRendererHolder {
 		}
 
 		private final void init() {
-	    	egl = EGLBase.createFrom(mRendererTask.getContext(), false, false);
+	    	egl = EGLBase.createFrom(3, mRendererTask.getContext(), false, false);
 	    	captureSurface = egl.createOffscreen(mRendererTask.mVideoWidth, mRendererTask.mVideoHeight);
 	    	drawer = new GLDrawer2D(true);
 	    	drawer.getMvpMatrix()[5] *= -1.0f;	// flip up-side down

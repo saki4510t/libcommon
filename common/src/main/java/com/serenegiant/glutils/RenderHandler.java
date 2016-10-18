@@ -29,6 +29,7 @@ import android.view.SurfaceHolder;
 
 /**
  * Draw shared texture on specific whole Surface using OpenGL|ES
+ * this will deprecate soon because I don't use this now
  */
 public final class RenderHandler extends Handler {
 //	private static final boolean DEBUG = false;	// FIXME set false on release
@@ -175,7 +176,7 @@ public final class RenderHandler extends Handler {
     			mSurface = surface instanceof Surface ? (Surface)surface
     				: (surface instanceof SurfaceTexture ? new Surface((SurfaceTexture)surface) : null);
     		}
-    		mEgl = EGLBase.createFrom(shardContext, false, isRecordable);
+    		mEgl = EGLBase.createFrom(3, shardContext, false, isRecordable);
     		try {
 	   			mTargetSurface = mEgl.createFromSurface(surface);
 	    		mDrawer = new GLDrawer2D(isRecordable);
