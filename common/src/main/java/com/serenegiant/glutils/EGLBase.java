@@ -32,6 +32,19 @@ public abstract class EGLBase {
 
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
+	 * maxClientVersion=3
+	 * @param sharedContext
+	 * @param withDepthBuffer
+	 * @param stencilBits
+	 * @param isRecordable
+	 * @return
+	 */
+	public static EGLBase createFrom(final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+		return createFrom(3, sharedContext, withDepthBuffer, stencilBits, isRecordable);
+	}
+
+	/**
+	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param withDepthBuffer trueなら16ビットのデプスバッファ有り, falseならデプスバッファなし
@@ -40,7 +53,8 @@ public abstract class EGLBase {
 	 * @return
 	 */
 	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
-		if (isEGL14Supported() && (/*(sharedContext == null) ||*/ (sharedContext instanceof EGLBase14.Context))) {
+		// clientVersionが1以下なら必ずEGLBase10を使う
+		if ((maxClientVersion > 1) && isEGL14Supported() && (/*(sharedContext == null) ||*/ (sharedContext instanceof EGLBase14.Context))) {
 			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
 		} else {
 			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);

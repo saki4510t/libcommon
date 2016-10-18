@@ -23,7 +23,9 @@ import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
+import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
+import android.opengl.GLES20;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -35,6 +37,7 @@ import android.view.SurfaceView;
 import com.serenegiant.utils.BuildCheck;
 
 import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.opengles.GL10;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EGLBase14 extends EGLBase {	// API >= 17
@@ -58,6 +61,14 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
 		private Context(final EGLContext context) {
 			eglContext = context;
+		}
+	}
+
+	public static class GL extends IGL {
+		public final javax.microedition.khronos.opengles.GL gl;
+
+		private GL(final javax.microedition.khronos.opengles.GL gl) {
+			this.gl = gl;
 		}
 	}
 
@@ -95,11 +106,20 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		@Override
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);
+			if (mEglBase.getGlVersion() >= 2) {
+				GLES20.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+			} else {
+				((GL10)mEglBase.getGl()).glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+			}
 		}
 
 		@Override
 		public void swap() {
 			mEglBase.swap(mEglSurface);
+		}
+
+		public void setPresentationTime(final long nsecs) {
+			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, nsecs);
 		}
 
 		@Override
@@ -152,8 +172,6 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	/**
 	 * 指定したSurfaceからEglSurfaceを生成する
 	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
-	 * Android4.1.2だとSurfaceを使えない。SurfaceTexture/SufaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
-	 * しかもAIDLで送れるのはSurfaceだけなのに
 	 * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder
 	 * @return
 	 */
@@ -269,7 +287,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
             throw new RuntimeException("eglInitialize failed");
         }
 
-		sharedContext = sharedContext != null ? sharedContext : EGL_NO_CONTEXT;
+		sharedContext = (sharedContext != null) ? sharedContext : EGL_NO_CONTEXT;
 
 		EGLConfig config;
 		if (maxClientVersion >= 3) {
@@ -373,6 +391,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         	EGL14.EGL_NONE
         };
 		final EGLContext context = EGL14.eglCreateContext(mEglDisplay, config, sharedContext.eglContext, attrib_list, 0);
+//		checkEglError("eglCreateContext");
         return context;
     }
 
@@ -415,7 +434,16 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		EGLSurface result = null;
 		try {
 			result = EGL14.eglCreateWindowSurface(mEglDisplay, mEglConfig.eglConfig, nativeWindow, surfaceAttribs, 0);
-		} catch (final IllegalArgumentException e) {
+			if (result == null || result == EGL14.EGL_NO_SURFACE) {
+				final int error = EGL14.eglGetError();
+				if (error == EGL14.EGL_BAD_NATIVE_WINDOW) {
+					Log.e(TAG, "createWindowSurface returned EGL_BAD_NATIVE_WINDOW.");
+				}
+				throw new RuntimeException("createWindowSurface failed error=" + error);
+			}
+			makeCurrent(result);
+			// 画面サイズ・フォーマットの取得
+		} catch (final Exception e) {
 			Log.e(TAG, "eglCreateWindowSurface", e);
 		}
 		return result;
@@ -465,7 +493,6 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         }
     }
 
-    @SuppressWarnings("unused")
     private EGLConfig getConfig(final int version, final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
 		int renderableType = EGL_OPENGL_ES2_BIT;
 		if (version >= 3) {
@@ -515,13 +542,13 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 				}
 				config = internalGetConfig(attribList);
 			}
-			if (config == null) {
-				Log.w(TAG, "try to fallback to RGB565");
-				attribList[3] = 5;
-				attribList[5] = 6;
-				attribList[7] = 5;
-				config = internalGetConfig(attribList);
-			}
+		}
+		if (config == null) {
+			Log.w(TAG, "try to fallback to RGB565");
+			attribList[3] = 5;
+			attribList[5] = 6;
+			attribList[7] = 5;
+			config = internalGetConfig(attribList);
 		}
         return config;
     }
