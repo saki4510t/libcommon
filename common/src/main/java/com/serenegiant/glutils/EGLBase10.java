@@ -188,7 +188,7 @@ public class EGLBase10 extends EGLBase {
 			if (mEglBase.getGlVersion() >= 2) {
 				GLES20.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			} else {
-				((GL10)mEglBase.getGl()).glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+				((GL10)mEglBase.getGl().gl).glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			}
 		}
 
