@@ -54,7 +54,7 @@ public class GLTextureES1 {
 			mTexHeight = h;
 		}
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
-		mTextureId = GLHelper.initTex(gl, mTextureTarget, filter_param);
+		mTextureId = GL1Helper.initTex(gl, mTextureTarget, filter_param);
 		// テクスチャのメモリ領域を確保する
 		gl.glTexImage2D(mTextureTarget,
 			0,							// ミップマップレベル0(ミップマップしない)

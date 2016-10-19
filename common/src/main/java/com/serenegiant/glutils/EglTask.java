@@ -99,10 +99,6 @@ public abstract class EglTask extends MessageTask {
 		return mEgl.getConfig();
 	}
 
-	protected EGLBase.IGL getGl() {
-		return mEgl.getGl();
-	}
-
 	protected EGLBase.IContext getContext() {
 		return mEgl != null ? mEgl.getContext() : null;
 	}

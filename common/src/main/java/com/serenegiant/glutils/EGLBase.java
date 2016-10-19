@@ -19,7 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.os.Build;
-import android.support.annotation.Nullable;
+
 
 public abstract class EGLBase {
 	public static final Object EGL_LOCK = new Object();
@@ -29,6 +29,18 @@ public abstract class EGLBase {
 	public static final int EGL_OPENGL_ES2_BIT = 4;
 	public static final int EGL_OPENGL_ES3_BIT_KHR = 0x0040;
 //	public static final int EGL_SWAP_BEHAVIOR_PRESERVED_BIT = 0x0400;
+
+	/**
+	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
+	 * maxClientVersion=3, ステンシルバッファなし
+	 * @param sharedContext
+	 * @param withDepthBuffer
+	 * @param isRecordable
+	 * @return
+	 */
+	public static EGLBase createFrom(final IContext sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+		return createFrom(3, sharedContext, withDepthBuffer, 0, isRecordable);
+	}
 
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
@@ -67,10 +79,10 @@ public abstract class EGLBase {
 	public static abstract class IContext {
 	}
 
+	/**
+	 * EGLコンフィグのホルダークラス
+	 */
 	public static abstract class IConfig {
-	}
-
-	public static abstract class IGL {
 	}
 
 	/**
@@ -118,15 +130,8 @@ public abstract class EGLBase {
 	public abstract IConfig getConfig();
 
 	/**
-	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
-	 * @return 有効なEGLレンダリングコンテキストが無ければnull
-	 */
-	public abstract @Nullable IGL getGl();
-	/**
 	 * 指定したSurfaceからEglSurfaceを生成する
 	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
-	 * Android4.1.2だとSurfaceを使えない。SurfaceTexture/SufaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
-	 * しかもAIDLで送れるのはSurfaceだけなのに
 	 * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder
 	 * @return
 	 */

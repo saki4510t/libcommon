@@ -27,12 +27,11 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
-import javax.microedition.khronos.opengles.GL10;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.opengl.EGL14;
+import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -65,14 +64,6 @@ public class EGLBase10 extends EGLBase {
 
 		private Context(final EGLContext context) {
 			eglContext = context;
-		}
-	}
-
-	public static class GL extends IGL {
-		public final javax.microedition.khronos.opengles.GL gl;
-
-		private GL(final javax.microedition.khronos.opengles.GL gl) {
-			this.gl = gl;
 		}
 	}
 
@@ -188,7 +179,7 @@ public class EGLBase10 extends EGLBase {
 			if (mEglBase.getGlVersion() >= 2) {
 				GLES20.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			} else {
-				((GL10)mEglBase.getGl().gl).glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+				GLES10.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			}
 		}
 
@@ -307,15 +298,6 @@ public class EGLBase10 extends EGLBase {
 	@Override
 	public Config getConfig() {
 		return mEglConfig;
-	}
-
-	/**
-	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
-	 * @return 有効なEGLレンダリングコンテキストが無ければnull
-	 */
-	@Override
-	public @Nullable GL getGl() {
-		return (mContext != null) && (mContext.eglContext != null) ? new GL(mContext.eglContext.getGL()) : null;
 	}
 
 	/**
@@ -497,7 +479,7 @@ public class EGLBase10 extends EGLBase {
 
         if (!mEgl.eglDestroyContext(mEglDisplay, mContext.eglContext)) {
             Log.e("destroyContext", "display:" + mEglDisplay + " context: " + mContext.eglContext);
-            Log.e(TAG, "eglDestroyContex:" + mEgl.eglGetError());
+            Log.e(TAG, "eglDestroyContext:" + mEgl.eglGetError());
         }
         mContext = EGL_NO_CONTEXT;
     }

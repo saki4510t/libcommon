@@ -19,6 +19,8 @@ package com.serenegiant.utils;
 */
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
 
 import android.util.Log;
 
@@ -95,6 +97,20 @@ public class BufferHelper {
 	 */
 	public static final int findAnnexB(byte[] array, int offset) {
 		return byteComp(array, offset, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
+	}
+
+	private static final int SIZEOF_FLOAT = 4;
+	/**
+	 * Allocates a direct float buffer, and populates it with the float array data.
+	 */
+	public static FloatBuffer createFloatBuffer(final float[] coords) {
+		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+		final ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT);
+		bb.order(ByteOrder.nativeOrder());
+		final FloatBuffer fb = bb.asFloatBuffer();
+		fb.put(coords);
+		fb.position(0);
+		return fb;
 	}
 
 }

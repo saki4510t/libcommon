@@ -25,19 +25,16 @@ import android.opengl.EGLContext;
 import android.opengl.EGLDisplay;
 import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
+import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.os.Build;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
 import com.serenegiant.utils.BuildCheck;
-
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.opengles.GL10;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EGLBase14 extends EGLBase {	// API >= 17
@@ -61,14 +58,6 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
 		private Context(final EGLContext context) {
 			eglContext = context;
-		}
-	}
-
-	public static class GL extends IGL {
-		public final javax.microedition.khronos.opengles.GL gl;
-
-		private GL(final javax.microedition.khronos.opengles.GL gl) {
-			this.gl = gl;
 		}
 	}
 
@@ -109,7 +98,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 			if (mEglBase.getGlVersion() >= 2) {
 				GLES20.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			} else {
-				((GL10)mEglBase.getGl()).glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+				GLES10.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			}
 		}
 
@@ -237,15 +226,6 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	}
 
 	/**
-	 * GLインスタンスを取得する, GLES1のときのみ有効, GLES2, GLES3のときはnullを返す
-	 * @return 有効なEGLレンダリングコンテキストが無ければnull
-	 */
-	@Override
-	public @Nullable IGL getGl() {
-		return null;
-	}
-
-	/**
 	 * EGLレンダリングコンテキストとスレッドの紐付けを解除する
 	 */
 	@Override
@@ -365,7 +345,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
             }
             return false;
         }
-        // attach EGL renderring context to specific EGL window surface
+        // attach EGL rendering context to specific EGL window surface
         if (!EGL14.eglMakeCurrent(mEglDisplay, surface, surface, mContext.eglContext)) {
             Log.w("TAG", "eglMakeCurrent" + EGL14.eglGetError());
             return false;
@@ -400,7 +380,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 
         if (!EGL14.eglDestroyContext(mEglDisplay, mContext.eglContext)) {
             Log.e("destroyContext", "display:" + mEglDisplay + " context: " + mContext.eglContext);
-            Log.e(TAG, "eglDestroyContex:" + EGL14.eglGetError());
+            Log.e(TAG, "eglDestroyContext:" + EGL14.eglGetError());
         }
         mContext = EGL_NO_CONTEXT;
         if (mDefaultContext != EGL14.EGL_NO_CONTEXT) {
@@ -420,7 +400,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 	}
 
 	private final int getSurfaceHeight(final EGLSurface surface) {
-		final boolean ret = EGL14.eglQuerySurface(mEglDisplay, surface, EGL10.EGL_HEIGHT, mSurfaceDimension, 1);
+		final boolean ret = EGL14.eglQuerySurface(mEglDisplay, surface, EGL14.EGL_HEIGHT, mSurfaceDimension, 1);
 		if (!ret) mSurfaceDimension[1] = 0;
 		return mSurfaceDimension[1];
 	}
@@ -535,7 +515,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 				for (int i = 10; i < n - 1; i += 2) {
 					if (attribList[i] == EGL_RECORDABLE_ANDROID) {
 						for (int j = i; j < n; j++) {
-							attribList[j] = EGL10.EGL_NONE;
+							attribList[j] = EGL14.EGL_NONE;
 						}
 						break;
 					}
