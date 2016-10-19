@@ -65,6 +65,9 @@ public class GLDrawer2D implements IDrawer2D {
 //		+ "}";
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+	private static final int FLOAT_SZ = Float.SIZE / 8;
+	private static final int VERTEX_NUM = 4;
+	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
@@ -76,9 +79,6 @@ public class GLDrawer2D implements IDrawer2D {
     int muTexMatrixLoc;
 	private final float[] mMvpMatrix = new float[16];
 
-	private static final int FLOAT_SZ = Float.SIZE / 8;
-	private static final int VERTEX_NUM = 4;
-	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
@@ -146,6 +146,7 @@ public class GLDrawer2D implements IDrawer2D {
 	public void getMvpMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
+
 	/**
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
 	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する

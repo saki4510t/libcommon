@@ -75,22 +75,6 @@ public final class GLHelper {
 	}
 
 	/**
-	 * OpenGL|ESのエラーをチェックしてlogCatに出力する
-	 * @param op
-	 */
-	public static void checkGlErrorV1(final String op) {
-		final int error = GLES10.glGetError();
-		if (error != GLES10.GL_NO_ERROR) {
-			final String msg = op + ": glError 0x" + Integer.toHexString(error);
-			Log.e(TAG, msg);
-			new Throwable(msg).printStackTrace();
-//         	if (DEBUG) {
-//	            throw new RuntimeException(msg);
-//       	}
-		}
-	}
-
-	/**
 	 * テクスチャ名を生成, テクスチャユニットはGL_TEXTURE0, クランプ方法はGL_CLAMP_TO_EDGE
 	 * @param texTarget
 	 * @param filter_param テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
@@ -101,7 +85,7 @@ public final class GLHelper {
 	}
 
 	/**
-	 * テクスチャ名を生成(GL_TEXTURE0のみ)
+	 * テクスチャ名を生成
 	 * @param texTarget
 	 * @param texUnit テクスチャユニット, GL_TEXTURE0...GL_TEXTURE31
 	 * @param min_filter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
