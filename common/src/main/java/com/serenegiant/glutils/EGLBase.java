@@ -65,8 +65,7 @@ public abstract class EGLBase {
 	 * @return
 	 */
 	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
-		// clientVersionが1以下なら必ずEGLBase10を使う
-		if ((maxClientVersion > 1) && isEGL14Supported() && (/*(sharedContext == null) ||*/ (sharedContext instanceof EGLBase14.Context))) {
+		if (isEGL14Supported() && ((sharedContext == null) || (sharedContext instanceof EGLBase14.Context))) {
 			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
 		} else {
 			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);

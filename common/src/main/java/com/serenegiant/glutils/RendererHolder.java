@@ -254,7 +254,7 @@ public class RendererHolder implements IRendererHolder {
 		private int mMirror = -1;
 
 		public RendererTask(final RendererHolder parent, final int width, final int height) {
-			super(null, EglTask.EGL_FLAG_RECORDABLE);
+			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
 			mParent = parent;
 			mVideoWidth = width;
 			mVideoHeight = height;

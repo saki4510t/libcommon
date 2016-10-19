@@ -36,7 +36,7 @@ public abstract class EglTask extends MessageTask {
 
 	public EglTask(final EGLBase.IContext sharedContext, final int flags) {
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		init(flags, 0, sharedContext);
+		init(flags, 3, sharedContext);
 	}
 
 	public EglTask(final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {

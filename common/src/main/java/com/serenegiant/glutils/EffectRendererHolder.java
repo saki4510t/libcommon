@@ -409,7 +409,7 @@ public class EffectRendererHolder implements IRendererHolder {
 		private int mEffect;
 
 		public RendererTask(final EffectRendererHolder parent, final int width, final int height) {
-			super(null, EglTask.EGL_FLAG_RECORDABLE);
+			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
 			mParent = parent;
 			mVideoWidth = width;
 			mVideoHeight = height;
