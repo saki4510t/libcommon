@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.glutils.es1;
 
 /*
  * Copyright (c) 2014 saki t_saki@serenegiant.com
@@ -10,24 +10,24 @@ package com.serenegiant.glutils;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.opengl.GLES10;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.text.TextUtils;
 
-import java.io.IOException;
+import com.serenegiant.glutils.ITexture;
 
-import javax.microedition.khronos.opengles.GL10;
+import java.io.IOException;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
-public class GLTextureES1 {
+public class GLTexture implements ITexture {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
-	private final GL10 mGl;
-	/* package */int mTextureTarget = GL10.GL_TEXTURE_2D;	// GL_TEXTURE_EXTERNAL_OESはだめ
-	/* package */int mTextureUnit = GL10.GL_TEXTURE0;
+	/* package */int mTextureTarget = GLES10.GL_TEXTURE_2D;	// GL_TEXTURE_EXTERNAL_OESはだめ
+	/* package */int mTextureUnit = GLES10.GL_TEXTURE0;
 	/* package */int mTextureId;
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
@@ -39,9 +39,8 @@ public class GLTextureES1 {
 	 * @param height テクスチャサイズ
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
-	public GLTextureES1(final GL10 gl, final int width, final int height, final int filter_param) {
+	public GLTexture(final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
-		mGl = gl;
 		// テクスチャに使うビットマップは縦横サイズが2の乗数でないとダメ。
 		// 更に、ミップマップするなら正方形でないとダメ
 		// 指定したwidth/heightと同じか大きい2の乗数にする
@@ -54,15 +53,15 @@ public class GLTextureES1 {
 			mTexHeight = h;
 		}
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
-		mTextureId = GL1Helper.initTex(gl, mTextureTarget, filter_param);
+		mTextureId = GLHelper.initTex(mTextureTarget, filter_param);
 		// テクスチャのメモリ領域を確保する
-		gl.glTexImage2D(mTextureTarget,
+		GLES10.glTexImage2D(mTextureTarget,
 			0,							// ミップマップレベル0(ミップマップしない)
-			GL10.GL_RGBA,				// 内部フォーマット
+			GLES10.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
 			0,							// 境界幅
-			GL10.GL_RGBA,				// 引き渡すデータのフォーマット
-			GL10.GL_UNSIGNED_BYTE,		// データの型
+			GLES10.GL_RGBA,				// 引き渡すデータのフォーマット
+			GLES10.GL_UNSIGNED_BYTE,		// データの型
 			null);						// ピクセルデータ無し
 		// テクスチャ変換行列を初期化
 		Matrix.setIdentityM(mTexMatrix, 0);
@@ -81,6 +80,7 @@ public class GLTextureES1 {
 	 * テクスチャを破棄
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出すこと
 	 */
+	@Override
 	public void release() {
 //		if (DEBUG) Log.v(TAG, "release:");
 		if (mTextureId > 0) {
@@ -92,40 +92,46 @@ public class GLTextureES1 {
 	/**
 	 * このインスタンスで管理しているテクスチャを有効にする(バインドする)
 	 */
+	@Override
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
-		mGl.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
-		mGl.glBindTexture(mTextureTarget, mTextureId);
+		GLES10.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
+		GLES10.glBindTexture(mTextureTarget, mTextureId);
 	}
 
 	/**
 	 * このインスタンスで管理しているテクスチャを無効にする(アンバインドする)
 	 */
+	@Override
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
-		mGl.glBindTexture(mTextureTarget, 0);
+		GLES10.glBindTexture(mTextureTarget, 0);
 	}
 
 	/**
 	 * テクスチャターゲットを取得(GL_TEXTURE_2D)
 	 * @return
 	 */
+	@Override
 	public int getTexTarget() { return mTextureTarget; }
 	/**
 	 * テクスチャ名を取得
 	 * @return
 	 */
+	@Override
 	public int getTexture() { return mTextureId; }
 	/**
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
 	 */
+	@Override
 	public float[] getTexMatrix() { return mTexMatrix; }
 	/**
 	 * テクスチャ座標変換行列のコピーを取得
 	 * @param matrix 領域チェックしていないのでoffset位置から16個以上確保しておくこと
 	 * @param offset
 	 */
+	@Override
 	public void getTexMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
 	}
@@ -133,11 +139,13 @@ public class GLTextureES1 {
 	 * テクスチャ幅を取得
 	 * @return
 	 */
+	@Override
 	public int getTexWidth() { return mTexWidth; }
 	/**
 	 * テクスチャ高さを取得
 	 * @return
 	 */
+	@Override
 	public int getTexHeight() { return mTexHeight; }
 
 	/**
@@ -145,6 +153,7 @@ public class GLTextureES1 {
 	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
 	 * @param filePath
 	 */
+	@Override
 	public void loadTexture(final String filePath) throws NullPointerException, IOException {
 //		if (DEBUG) Log.v(TAG, "loadTexture:path=" + filePath);
 		if (TextUtils.isEmpty(filePath))

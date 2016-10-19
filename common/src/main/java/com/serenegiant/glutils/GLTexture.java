@@ -31,7 +31,7 @@ import android.text.TextUtils;
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
-public class GLTexture {
+public class GLTexture implements ITexture {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
@@ -89,6 +89,7 @@ public class GLTexture {
 	 * テクスチャを破棄
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出すこと
 	 */
+	@Override
 	public void release() {
 //		if (DEBUG) Log.v(TAG, "release:");
 		if (mTextureId > 0) {
@@ -100,6 +101,7 @@ public class GLTexture {
 	/**
 	 * このインスタンスで管理しているテクスチャを有効にする(バインドする)
 	 */
+	@Override
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
 		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
@@ -109,6 +111,7 @@ public class GLTexture {
 	/**
 	 * このインスタンスで管理しているテクスチャを無効にする(アンバインドする)
 	 */
+	@Override
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
 		GLES20.glBindTexture(mTextureTarget, 0);
@@ -118,22 +121,26 @@ public class GLTexture {
 	 * テクスチャターゲットを取得(GL_TEXTURE_2D)
 	 * @return
 	 */
+	@Override
 	public int getTexTarget() { return mTextureTarget; }
 	/**
 	 * テクスチャ名を取得
 	 * @return
 	 */
+	@Override
 	public int getTexture() { return mTextureId; }
 	/**
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
 	 */
+	@Override
 	public float[] getTexMatrix() { return mTexMatrix; }
 	/**
 	 * テクスチャ座標変換行列のコピーを取得
 	 * @param matrix 領域チェックしていないのでoffset位置から16個以上確保しておくこと
 	 * @param offset
 	 */
+	@Override
 	public void getTexMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
 	}
@@ -141,11 +148,13 @@ public class GLTexture {
 	 * テクスチャ幅を取得
 	 * @return
 	 */
+	@Override
 	public int getTexWidth() { return mTexWidth; }
 	/**
 	 * テクスチャ高さを取得
 	 * @return
 	 */
+	@Override
 	public int getTexHeight() { return mTexHeight; }
 
 	/**
@@ -153,6 +162,7 @@ public class GLTexture {
 	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
 	 * @param filePath
 	 */
+	@Override
 	public void loadTexture(final String filePath) throws NullPointerException, IOException {
 //		if (DEBUG) Log.v(TAG, "loadTexture:path=" + filePath);
 		if (TextUtils.isEmpty(filePath))

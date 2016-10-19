@@ -30,7 +30,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2D {
+public class GLDrawer2D implements IDrawer2D {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
@@ -108,6 +108,7 @@ public class GLDrawer2D {
 	/**
 	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 */
+	@Override
 	public void release() {
 		if (hProgram >= 0) {
 			GLES20.glDeleteProgram(hProgram);
@@ -119,6 +120,7 @@ public class GLDrawer2D {
 	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
 	 * @return
 	 */
+	@Override
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}
@@ -129,7 +131,8 @@ public class GLDrawer2D {
 	 * @param offset
 	 * @return
 	 */
-	public GLDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
+	@Override
+	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
 	}
@@ -139,16 +142,18 @@ public class GLDrawer2D {
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
+	@Override
 	public void getMvpMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
 	/**
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
 	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する
-	 * @param tex_id texture ID
+	 * @param texId texture ID
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 */
-	public synchronized void draw(final int tex_id, final float[] tex_matrix, final int offset) {
+	@Override
+	public synchronized void draw(final int texId, final float[] tex_matrix, final int offset) {
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
 		GLES20.glUseProgram(hProgram);
@@ -159,7 +164,7 @@ public class GLDrawer2D {
 		// モデルビュー変換行列をセット
 		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(mTexTarget, tex_id);
+		GLES20.glBindTexture(mTexTarget, texId);
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 		GLES20.glBindTexture(mTexTarget, 0);
         GLES20.glUseProgram(0);
@@ -170,8 +175,9 @@ public class GLDrawer2D {
 	 * Textureオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
 	 * @param texture
 	 */
-	public void draw(final GLTexture texture) {
-		draw(texture.mTextureId, texture.mTexMatrix, 0);
+	@Override
+	public void draw(final ITexture texture) {
+		draw(texture.getTexture(), texture.getTexMatrix(), 0);
 	}
 
 	/**
