@@ -38,6 +38,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import com.serenegiant.utils.BuildCheck;
 
@@ -145,28 +146,37 @@ public class EGLBase10 extends EGLBase {
 		 * @param eglBase
 		 * @param surface
 		 */
-		private EglSurface(final EGLBase10 eglBase, final Object surface) {
+		private EglSurface(final EGLBase10 eglBase, final Object surface) throws IllegalArgumentException {
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
 			if ((surface instanceof Surface) && !BuildCheck.isAndroid4_2()) {
 				// Android4.1.2だとSurfaceを使えない。SurfaceTexture/SurfaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
 				// SurfaceHolderはインターフェースなのでSurfaceHolderを継承したダミークラスを生成して食わす
 				mEglSurface = mEglBase.createWindowSurface(new MySurfaceHolder((Surface) surface));
-			} else {
+			} else if ((surface instanceof Surface)
+				|| (surface instanceof SurfaceHolder)
+				|| (surface instanceof SurfaceTexture)
+				|| (surface instanceof SurfaceView)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
+			} else {
+				throw new IllegalArgumentException("unsupported surface");
 			}
 		}
 
 		/**
 		 * 指定した大きさを持つオフスクリーンEglSurface(PBuffer)
-		 * @param egl
+		 * @param eglBase
 		 * @param width
 		 * @param height
 		 */
-		private EglSurface(final EGLBase10 egl, final int width, final int height) {
+		private EglSurface(final EGLBase10 eglBase, final int width, final int height) {
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
-			mEglBase = egl;
-			mEglSurface = mEglBase.createOffscreenSurface(width, height);
+			mEglBase = eglBase;
+			if ((width <= 0) || (height <= 0)) {
+				mEglSurface = mEglBase.createOffscreenSurface(1, 1);
+			} else {
+				mEglSurface = mEglBase.createOffscreenSurface(width, height);
+			}
 		}
 
 		/**
@@ -498,13 +508,13 @@ public class EGLBase10 extends EGLBase {
 		return value[0];
 	}
 
+	/**
+	 * nativeWindow should be one of the SurfaceView, Surface, SurfaceHolder and SurfaceTexture
+	 * @param nativeWindow
+	 * @return
+	 */
     private final EGLSurface createWindowSurface(final Object nativeWindow) {
 //		if (DEBUG) Log.v(TAG, "createWindowSurface:nativeWindow=" + nativeWindow);
-
-		if (!(nativeWindow instanceof Surface)
-			&& !(nativeWindow instanceof SurfaceTexture)
-			&& !(nativeWindow instanceof SurfaceHolder))
-			throw new RuntimeException("unsupported window type");
 
 		final int[] surfaceAttribs = {
             EGL10.EGL_NONE
@@ -523,6 +533,7 @@ public class EGLBase10 extends EGLBase {
 			// 画面サイズ・フォーマットの取得
 		} catch (final Exception e) {
 			Log.e(TAG, "eglCreateWindowSurface", e);
+			throw new IllegalArgumentException(e);
 		}
 		return result;
 	}

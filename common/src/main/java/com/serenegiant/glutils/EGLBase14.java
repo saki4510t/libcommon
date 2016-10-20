@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.TargetApi;
+import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -76,20 +77,33 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		private final EGLBase14 mEglBase;
 		private EGLSurface mEglSurface = EGL14.EGL_NO_SURFACE;
 
-		private EglSurface(final EGLBase14 eglBase, final Object surface) {
+		private EglSurface(final EGLBase14 eglBase, final Object surface) throws IllegalArgumentException {
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
-			if (!(surface instanceof SurfaceView)
-				&& !(surface instanceof Surface)
-				&& !(surface instanceof SurfaceHolder))
-				throw new IllegalArgumentException("unsupported surface");
 			mEglBase = eglBase;
-			mEglSurface = mEglBase.createWindowSurface(surface);
+			if ((surface instanceof Surface)
+				|| (surface instanceof SurfaceHolder)
+				|| (surface instanceof SurfaceTexture)
+				|| (surface instanceof SurfaceView)) {
+				mEglSurface = mEglBase.createWindowSurface(surface);
+			} else {
+				throw new IllegalArgumentException("unsupported surface");
+			}
 		}
 
-		private EglSurface(final EGLBase14 egl, final int width, final int height) {
+		/**
+		 * 指定した大きさを持つオフスクリーンEglSurface(PBuffer)
+		 * @param eglBase
+		 * @param width
+		 * @param height
+		 */
+		private EglSurface(final EGLBase14 eglBase, final int width, final int height) {
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
-			mEglBase = egl;
-			mEglSurface = mEglBase.createOffscreenSurface(width, height);
+			mEglBase = eglBase;
+			if ((width <= 0) || (height <= 0)) {
+				mEglSurface = mEglBase.createOffscreenSurface(1, 1);
+			} else {
+				mEglSurface = mEglBase.createOffscreenSurface(width, height);
+			}
 		}
 
 		@Override
@@ -405,11 +419,16 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 		return mSurfaceDimension[1];
 	}
 
-    private EGLSurface createWindowSurface(final Object nativeWindow) {
-//		if (DEBUG) Log.v(TAG, "createWindowSurface:");
+	/**
+	 * nativeWindow should be one of the Surface, SurfaceHolder and SurfaceTexture
+	 * @param nativeWindow
+	 * @return
+	 */
+    private final EGLSurface createWindowSurface(final Object nativeWindow) {
+//		if (DEBUG) Log.v(TAG, "createWindowSurface:nativeWindow=" + nativeWindow);
 
         final int[] surfaceAttribs = {
-                EGL14.EGL_NONE
+			EGL14.EGL_NONE
         };
 		EGLSurface result = null;
 		try {
@@ -425,6 +444,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 			// 画面サイズ・フォーマットの取得
 		} catch (final Exception e) {
 			Log.e(TAG, "eglCreateWindowSurface", e);
+			throw new IllegalArgumentException(e);
 		}
 		return result;
 	}
@@ -432,7 +452,7 @@ public class EGLBase14 extends EGLBase {	// API >= 17
     /**
      * Creates an EGL surface associated with an offscreen buffer.
      */
-    private EGLSurface createOffscreenSurface(final int width, final int height) {
+    private final EGLSurface createOffscreenSurface(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
         final int[] surfaceAttribs = {
                 EGL14.EGL_WIDTH, width,
