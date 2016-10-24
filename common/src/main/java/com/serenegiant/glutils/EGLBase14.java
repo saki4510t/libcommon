@@ -121,8 +121,13 @@ public class EGLBase14 extends EGLBase {	// API >= 17
 			mEglBase.swap(mEglSurface);
 		}
 
-		public void setPresentationTime(final long nsecs) {
-			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, nsecs);
+		@Override
+		public void swap(final long presentationTimeNs) {
+			mEglBase.swap(mEglSurface, presentationTimeNs);
+		}
+
+		public void setPresentationTime(final long presentationTimeNs) {
+			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, presentationTimeNs);
 		}
 
 		@Override
@@ -376,6 +381,17 @@ public class EGLBase14 extends EGLBase {	// API >= 17
         }
         return EGL14.EGL_SUCCESS;
     }
+
+    private int swap(final EGLSurface surface, final long presentationTimeNs) {
+//		if (DEBUG) Log.v(TAG, "swap:");
+		EGLExt.eglPresentationTimeANDROID(mEglDisplay, surface, presentationTimeNs);
+        if (!EGL14.eglSwapBuffers(mEglDisplay, surface)) {
+        	final int err = EGL14.eglGetError();
+//        	if (DEBUG) Log.w(TAG, "swap:err=" + err);
+            return err;
+        }
+        return EGL14.EGL_SUCCESS;
+	}
 
     private EGLContext createContext(final Context sharedContext, final EGLConfig config, final int version) {
 //		if (DEBUG) Log.v(TAG, "createContext:");

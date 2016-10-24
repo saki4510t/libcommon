@@ -202,12 +202,17 @@ public class EGLBase10 extends EGLBase {
 		}
 
 		@Override
+		public void swap(final long presentationTimeNs) {
+			mEglBase.swap(mEglSurface, presentationTimeNs);
+		}
+
+		@Override
 		public IContext getContext() {
 			return mEglBase.getContext();
 		}
 
-		public void setPresentationTime(final long nsecs) {
-//			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, nsecs);
+		public void setPresentationTime(final long presentationTimeNs) {
+//			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, presentationTimeNs);
 		}
 
 		/**
@@ -464,6 +469,24 @@ public class EGLBase10 extends EGLBase {
 
 	private final int swap(final EGLSurface surface) {
 //		if (DEBUG) Log.v(TAG, "swap:");
+        if (!mEgl.eglSwapBuffers(mEglDisplay, surface)) {
+        	final int err = mEgl.eglGetError();
+//        	if (DEBUG) Log.w(TAG, "swap:err=" + err);
+            return err;
+        }
+        return EGL10.EGL_SUCCESS;
+    }
+
+	/**
+	 * swap rendering buffer with presentation time[ns]
+	 * presentationTimeNs is ignored on this method
+	 * @param surface
+	 * @param ignored
+	 * @return
+	 */
+	private final int swap(final EGLSurface surface, final long ignored) {
+//		if (DEBUG) Log.v(TAG, "swap:");
+//		EGLExt.eglPresentationTimeANDROID(mEglDisplay, surface, presentationTimeNs);
         if (!mEgl.eglSwapBuffers(mEglDisplay, surface)) {
         	final int err = mEgl.eglGetError();
 //        	if (DEBUG) Log.w(TAG, "swap:err=" + err);
