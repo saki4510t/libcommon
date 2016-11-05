@@ -80,16 +80,26 @@ public final class ItemPickerPreference extends Preference {
 	@Override
 	protected Object onGetDefaultValue(final TypedArray a, final int index) {
 //		if (DEBUG) Log.v(TAG, "onGetDefaultValue:");
-		return super.onGetDefaultValue(a, index);
+//		return super.onGetDefaultValue(a, index);
+		return a.getInt(index, 0);
 	}
 
 	@Override
 	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
 //		if (DEBUG) Log.v(TAG, "onSetInitialValue:");
+		int def = preferenceValue;
+		if (defaultValue instanceof Integer) {
+			def = (Integer)defaultValue;
+		} else if (defaultValue instanceof String) {
+			try {
+				def = Integer.parseInt((String)defaultValue);
+			} catch (final Exception e) {
+			}
+		}
 		if (restorePersistedValue) {
-			preferenceValue = getPersistedInt(preferenceValue);
+			preferenceValue = getPersistedInt(def);
 		} else {
-			preferenceValue = (Integer)defaultValue;
+			preferenceValue = def;
 			persistInt(preferenceValue);
 		}
 	}
