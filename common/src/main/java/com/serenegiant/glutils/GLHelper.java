@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -257,6 +258,7 @@ public final class GLHelper {
 	/**
 	 * Writes GL version info to the log.
 	 */
+	@SuppressLint("InlinedApi")
 	public static void logVersionInfo() {
 		Log.i(TAG, "vendor  : " + GLES20.glGetString(GLES20.GL_VENDOR));
 		Log.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));

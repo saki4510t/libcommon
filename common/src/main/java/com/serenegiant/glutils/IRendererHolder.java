@@ -61,20 +61,20 @@ public interface IRendererHolder extends IRendererCommon {
 
 	/**
 	 * 分配描画用のSurfaceを追加
-	 * @param id 普通はSurface#hashCodeを使う
-	 * @param surface
+	 * @param id 普通は#hashCodeを使う
+	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
 	 * @param isRecordable
 	 */
-	public void addSurface(final int id, final Surface surface, final boolean isRecordable);
+	public void addSurface(final int id, final Object surface, final boolean isRecordable);
 
 	/**
 	 * 分配描画用のSurfaceを追加
-	 * @param id 普通はSurface#hashCodeを使う
-	 * @param surface
+	 * @param id 普通は#hashCodeを使う
+	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
 	 * @param isRecordable
 	 * @param maxFps 0以下なら制限しない
 	 */
-	public void addSurface(final int id, final Surface surface, final boolean isRecordable, final int maxFps);
+	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps);
 
 	/**
 	 * 分配描画用のSurfaceを削除

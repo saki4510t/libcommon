@@ -35,6 +35,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 
 import com.serenegiant.utils.BuildCheck;
 
@@ -149,13 +150,13 @@ public class RendererHolder implements IRendererHolder {
 	 * @param isRecordable
 	 */
 	@Override
-	public void addSurface(final int id, final Surface surface, final boolean isRecordable) {
+	public void addSurface(final int id, final Object surface, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface);
 	}
 
 	@Override
-	public void addSurface(final int id, final Surface surface, final boolean isRecordable, final int maxFps) {
+	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface, maxFps);
 	}
@@ -362,6 +363,9 @@ public class RendererHolder implements IRendererHolder {
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
 			checkFinished();
+			if (!((surface instanceof SurfaceTexture) || (surface instanceof Surface) || (surface instanceof SurfaceHolder))) {
+				throw new IllegalArgumentException("Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
+			}
 			synchronized (mClientSync) {
 				if ((surface != null) && (mClients.get(id) == null)) {
 					for ( ; ; ) {
