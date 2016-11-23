@@ -38,4 +38,37 @@ public class Stacktrace {
 		}
 		Log.i(TAG, sb.toString());
 	}
+
+	public static String asString() {
+		final Throwable t = new Throwable();
+		final StringBuilder sb = new StringBuilder();
+		final StackTraceElement[] elms = t.getStackTrace();
+		boolean top = true;
+		if (elms != null) {
+			for (final StackTraceElement elm: elms) {
+				if (!top && (elm != null)) {
+					sb.append(elm.toString()).append("\n");
+				} else {
+					top = false;
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	public static String asString(final Throwable t) {
+		final StringBuilder sb = new StringBuilder();
+		final StackTraceElement[] elms = t.getStackTrace();
+		boolean top = true;
+		if (elms != null) {
+			for (final StackTraceElement elm: elms) {
+				if (!top && (elm != null)) {
+					sb.append(elm.toString()).append("\n");
+				} else {
+					top = false;
+				}
+			}
+		}
+		return sb.toString();
+	}
 }
