@@ -78,6 +78,11 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	private boolean mEnableSubWindow;
 	/**
+	 * 子Viewの位置を入れ替えるかどうか
+	 * true: View1とView2の位置を入れ替える
+	 */
+	private boolean mFlipChildPos;
+	/**
 	 * サブウインドウ表示する時の大きさの比率
 	 */
 	private float mSubWindowScale;
@@ -102,6 +107,7 @@ public class TwoPainViewGroup extends FrameLayout {
 		mOrientation = a.getInt(R.styleable.TwoPainViewGroup_orientation, HORIZONTAL);
 		mDisplayMode = a.getInt(R.styleable.TwoPainViewGroup_displayMode, MODE_SPLIT);
 		mEnableSubWindow = a.getBoolean(R.styleable.TwoPainViewGroup_enableSubWindow, true);
+		mFlipChildPos = a.getBoolean(R.styleable.TwoPainViewGroup_flipChildPos, false);
 		mSubWindowScale = a.getFloat(R.styleable.TwoPainViewGroup_subWindowScale, DEFAULT_SUB_WINDOW_SCALE);
 		if ((mSubWindowScale <= 0) || (mSubWindowScale >= 1.0f)) {
 			mSubWindowScale = DEFAULT_SUB_WINDOW_SCALE;
@@ -254,6 +260,29 @@ public class TwoPainViewGroup extends FrameLayout {
 		}
 	}
 
+	/**
+	 * 子Viewの位置を入れ替えるかどうかを設定
+	 * @param flip
+	 */
+	public void setFlipChildPos(final boolean flip) {
+		synchronized (mSync) {
+			if (flip != mFlipChildPos) {
+				mFlipChildPos = flip;
+				startLayout();
+			}
+		}
+	}
+
+	/**
+	 * 子Viewの位置を入れ替えるかどうかを取得
+	 * @return
+	 */
+	public boolean getFlipChildPos() {
+		synchronized (mSync) {
+			return mFlipChildPos;
+		}
+	}
+
 //--------------------------------------------------------------------------------
 	@Override
 	protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
@@ -378,17 +407,21 @@ public class TwoPainViewGroup extends FrameLayout {
 
 	private void onMeasureSelect1(final int maxWidth, final int maxHeight, final int widthMeasureSpec, final int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasureSelect1:");
-		callChildMeasure(mChild1, maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
+		callChildMeasure(ch1, maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
 		if (mEnableSubWindow) {
-			callChildMeasure(mChild2, (int)(maxWidth * mSubWindowScale), (int)(maxHeight * mSubWindowScale), widthMeasureSpec, heightMeasureSpec);
+			callChildMeasure(ch2, (int)(maxWidth * mSubWindowScale), (int)(maxHeight * mSubWindowScale), widthMeasureSpec, heightMeasureSpec);
 		}
 	}
 
 	private void onMeasureSelect2(final int maxWidth, final int maxHeight, final int widthMeasureSpec, final int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasureSelect2:");
-		callChildMeasure(mChild2, maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
+		callChildMeasure(ch2, maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
 		if (mEnableSubWindow) {
-			callChildMeasure(mChild1, (int)(maxWidth * mSubWindowScale), (int)(maxHeight * mSubWindowScale), widthMeasureSpec, heightMeasureSpec);
+			callChildMeasure(ch1, (int)(maxWidth * mSubWindowScale), (int)(maxHeight * mSubWindowScale), widthMeasureSpec, heightMeasureSpec);
 		}
 	}
 
@@ -401,8 +434,10 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	private void onMeasureHorizontal(final int maxWidth, final int maxHeight, final int widthMeasureSpec, final int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasureHorizontal:");
-		callChildMeasure(mChild1, maxWidth >>> 1, maxHeight, widthMeasureSpec, heightMeasureSpec);
-		callChildMeasure(mChild2, maxWidth >>> 1, maxHeight, widthMeasureSpec, heightMeasureSpec);
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
+		callChildMeasure(ch1, maxWidth >>> 1, maxHeight, widthMeasureSpec, heightMeasureSpec);
+		callChildMeasure(ch2, maxWidth >>> 1, maxHeight, widthMeasureSpec, heightMeasureSpec);
 	}
 
 	/**
@@ -414,8 +449,10 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	private void onMeasureVertical(final int maxWidth, final int maxHeight, final int widthMeasureSpec, final int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasureVertical:");
-		callChildMeasure(mChild1, maxWidth, maxHeight >>> 1, widthMeasureSpec, heightMeasureSpec);
-		callChildMeasure(mChild2, maxWidth, maxHeight >>> 1, widthMeasureSpec, heightMeasureSpec);
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
+		callChildMeasure(ch1, maxWidth, maxHeight >>> 1, widthMeasureSpec, heightMeasureSpec);
+		callChildMeasure(ch2, maxWidth, maxHeight >>> 1, widthMeasureSpec, heightMeasureSpec);
 	}
 
 	/**
@@ -471,7 +508,7 @@ public class TwoPainViewGroup extends FrameLayout {
 		final int n = getChildCount();
 		if (n == 1) {
 			// 1個しか子Viewが無い時
-			callChildLayout(0, changed, _left, _top, _right, _bottom);
+			callChildLayout(mChild1, changed, _left, _top, _right, _bottom);
 		} else if (n > 0) {
 			// 子Viewが2個ある時
 			switch (mDisplayMode) {
@@ -505,46 +542,50 @@ public class TwoPainViewGroup extends FrameLayout {
 	private final Rect mChildRect = new Rect();
 	private void onLayoutSelect1(final boolean changed, final int left, final int top, final int right, final int bottom) {
 //		if (DEBUG) Log.v(TAG, "onLayoutSelect1:");
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		final int paddingLeft = getPaddingLeft();
 		final int paddingTop = getPaddingTop();
-		callChildLayout(0, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, bottom - paddingTop);
+		callChildLayout(ch1, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, bottom - paddingTop);
 		if (mEnableSubWindow) {
 			// child2の位置はchild1の左下
-			final int _bottom = mChild1.getBottom();
-			final int _right = mChild1.getRight();
-			final int w = mChild2.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
-			final int h = mChild2.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
+			final int _bottom = ch1.getBottom();
+			final int _right = ch1.getRight();
+			final int w = ch2.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
+			final int h = ch2.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
 			switch (mOrientation) {
 			case VERTICAL:
-				callChildLayout(1, changed, _right - w, _bottom - h, _right, _bottom);
+				callChildLayout(ch2, changed, _right - w, _bottom - h, _right, _bottom);
 				break;
 //			case HORIZONTAL:
 			default:
-				callChildLayout(1, changed, _right - w, _bottom - h, _right, _bottom);
+				callChildLayout(ch2, changed, _right - w, _bottom - h, _right, _bottom);
 			}
 		}
 	}
 
 	private void onLayoutSelect2(final boolean changed, final int left, final int top, final int right, final int bottom) {
 //		if (DEBUG) Log.v(TAG, "onLayoutSelect2:");
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		final int paddingLeft = getPaddingLeft();
 		final int paddingTop = getPaddingTop();
-		callChildLayout(1, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, bottom - paddingTop);
+		callChildLayout(ch2, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, bottom - paddingTop);
 		if (mEnableSubWindow) {
 			// child1の位置はchild2の左下か右上
-			final int _left = mChild2.getLeft();
-			final int _top = mChild2.getTop();
-			final int _right = mChild2.getRight();
-			final int _bottom = mChild2.getBottom();
-			final int w = mChild1.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
-			final int h = mChild1.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
+			final int _left = ch2.getLeft();
+			final int _top = ch2.getTop();
+			final int _right = ch2.getRight();
+			final int _bottom = ch2.getBottom();
+			final int w = ch1.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
+			final int h = ch1.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
 			switch (mOrientation) {
 			case VERTICAL:
-				callChildLayout(0, changed, _right - w, _top, _right, _top + h);
+				callChildLayout(ch1, changed, _right - w, _top, _right, _top + h);
 				break;
 //			case HORIZONTAL:
 			default:
-				callChildLayout(0, changed, _left, _bottom - h, _left + w, _bottom);
+				callChildLayout(ch1, changed, _left, _bottom - h, _left + w, _bottom);
 				break;
 			}
 		}
@@ -560,11 +601,13 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	private void onLayoutHorizontal(final boolean changed, final int left, final int top, final int right, final int bottom) {
 //		if (DEBUG) Log.v(TAG, "onLayoutHorizontal:");
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		final int w2 = (right - left) >>> 1;
 		final int paddingLeft = getPaddingLeft();
 		final int paddingTop = getPaddingTop();
-		callChildLayout(0, changed, left - paddingLeft, top - paddingTop, left - paddingLeft + w2, bottom - paddingTop);
-		callChildLayout(1, changed, left - paddingLeft + w2, top - paddingTop, right - paddingLeft, bottom - paddingTop);
+		callChildLayout(ch1, changed, left - paddingLeft, top - paddingTop, left - paddingLeft + w2, bottom - paddingTop);
+		callChildLayout(ch2, changed, left - paddingLeft + w2, top - paddingTop, right - paddingLeft, bottom - paddingTop);
 	}
 
 	/**
@@ -577,16 +620,18 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	private void onLayoutVertical(final boolean changed, final int left, final int top, final int right, final int bottom) {
 //		if (DEBUG) Log.v(TAG, "onLayoutVertical:");
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		final int h2 = (bottom - top) >>> 1;
 		final int paddingLeft = getPaddingLeft();
 		final int paddingTop = getPaddingTop();
-		callChildLayout(0, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, top - paddingTop + h2);
-		callChildLayout(1, changed, left - paddingLeft, top - paddingTop + h2, right -paddingLeft, bottom - paddingTop);
+		callChildLayout(ch1, changed, left - paddingLeft, top - paddingTop, right - paddingLeft, top - paddingTop + h2);
+		callChildLayout(ch2, changed, left - paddingLeft, top - paddingTop + h2, right -paddingLeft, bottom - paddingTop);
 	}
 
 	/**
 	 * 指定した子Viewの#layoutを呼び出す
-	 * @param ix
+	 * @param child
 	 * @param changed
 	 * @param left
 	 * @param top
@@ -594,8 +639,7 @@ public class TwoPainViewGroup extends FrameLayout {
 	 * @param bottom
 	 */
 	@SuppressLint("NewApi")
-	private void callChildLayout(final int ix, final boolean changed, final int left, final int top, final int right, final int bottom) {
-		final View child = ix == 0 ? mChild1 : mChild2;
+	private void callChildLayout(final View child, final boolean changed, final int left, final int top, final int right, final int bottom) {
 		final LayoutParams lp = (LayoutParams) child.getLayoutParams();
 
 		final int width = child.getMeasuredWidth();
@@ -645,7 +689,7 @@ public class TwoPainViewGroup extends FrameLayout {
 	}
 
 //--------------------------------------------------------------------------------
-	private void startLayout() {
+	public void startLayout() {
 		if (isInEditMode() || (getChildCount() < 2)) {
 			requestLayout();
 		}
@@ -660,29 +704,30 @@ public class TwoPainViewGroup extends FrameLayout {
 	private void startLayoutOnUI() {
 		// FIXME ここでアニメーションを実行する。LayoutAnimationControllerを使う?
 		// 今はrequestLayoutを呼び出しているのですぐに大きさが切り替わる
-		final View v1 = mChild1, v2 = mChild2;
+		final View ch1 = mFlipChildPos ? mChild2 : mChild1;
+		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		try {
 			switch (mDisplayMode) {
 			case MODE_SELECT_1:
-				removeView(v1);
-				addView(v1, 0);
-				v1.setVisibility(VISIBLE);
-				v2.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
+				removeView(ch1);
+				addView(ch1, 0);
+				ch1.setVisibility(VISIBLE);
+				ch2.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
 				break;
 			case MODE_SELECT_2:
-				removeView(v2);
-				addView(v2, 0);
-				v1.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
-				v2.setVisibility(VISIBLE);
+				removeView(ch2);
+				addView(ch2, 0);
+				ch1.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
+				ch2.setVisibility(VISIBLE);
 				break;
 			case MODE_SPLIT:
-				v1.setVisibility(VISIBLE);
-				v2.setVisibility(VISIBLE);
+				ch1.setVisibility(VISIBLE);
+				ch2.setVisibility(VISIBLE);
 				break;
 			}
 		} finally {
-			mChild1 = v1;
-			mChild2 = v2;
+			mChild1 = mFlipChildPos ? ch2 : ch1;
+			mChild2 = mFlipChildPos ? ch1 : ch2;
 		}
 
 		requestLayout();

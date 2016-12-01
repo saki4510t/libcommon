@@ -12,6 +12,8 @@
 		</attr>
 		<attr name="enableSubWindow" default="true" format="boolean">
 		</attr>
+		<attr name="flipChildPos" default="false" format="boolean">
+		</attr>
 		<attr name="subWindowScale" default="0.2" format="float">
 		</attr>
 	</declare-styleable>
