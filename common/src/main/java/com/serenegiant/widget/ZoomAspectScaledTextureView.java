@@ -20,6 +20,7 @@ package com.serenegiant.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -28,6 +29,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
 
+import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 
 public class ZoomAspectScaledTextureView extends AspectScaledTextureView
@@ -180,11 +182,17 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	}
 
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs) {
-		super(context, attrs, 0);
+		this(context, attrs, 0);
 	}
 
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
+		try {
+			mHandleTouchEvent = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
+		} finally {
+			a.recycle();
+		}
 	}
 
 	@SuppressLint("ClickableViewAccessibility")

@@ -43,9 +43,9 @@ public class AspectRatioFrameLayout extends FrameLayout implements IAspectRatioV
 
 	public AspectRatioFrameLayout(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.AspectRatioFrameLayout, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IAspectRatioView, defStyleAttr, 0);
 		try {
-			mRequestedAspect = a.getFloat(R.styleable.AspectRatioFrameLayout_aspect_ratio, -1.0f);
+			mRequestedAspect = a.getFloat(R.styleable.IAspectRatioView_aspect_ratio, -1.0f);
 		} finally {
 			a.recycle();
 		}

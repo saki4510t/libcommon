@@ -19,10 +19,13 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.view.TextureView;
+
+import com.serenegiant.common.R;
 
 public class AspectScaledTextureView extends TextureView
 	implements TextureView.SurfaceTextureListener, IAspectRatioView, IScaledView {
@@ -42,6 +45,18 @@ public class AspectScaledTextureView extends TextureView
 
 	public AspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IAspectRatioView, defStyleAttr, 0);
+		try {
+			mRequestedAspect = a.getFloat(R.styleable.IAspectRatioView_aspect_ratio, -1.0f);
+		} finally {
+			a.recycle();
+		}
+		a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IScaledView, defStyleAttr, 0);
+		try {
+			mScaleMode = a.getInt(R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+		} finally {
+			a.recycle();
+		}
 	}
 
 	/**
@@ -157,6 +172,7 @@ public class AspectScaledTextureView extends TextureView
 	public void setScaleMode(final int scale_mode) {
 		if (mScaleMode != scale_mode) {
 			mScaleMode = scale_mode;
+			requestLayout();
 		}
 	}
 

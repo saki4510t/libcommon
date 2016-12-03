@@ -20,8 +20,23 @@
 */
 -->
 <resources>
-	<declare-styleable name="AspectRatioFrameLayout">
+	<declare-styleable name="IAspectRatioView">
 		<!-- アスペクト比, 負なら未設定 -->
 		<attr name="aspect_ratio" format="float" default="-1.0" />
 	</declare-styleable>
+
+	<declare-styleable name="IScaledView">
+		<!-- スケールの種類 -->
+		<attr name="scale_mode" default="scale_none" >
+			<enum name="keep_aspect" value="0" />
+			<enum name="stretch_to_fit" value="1" />
+			<enum name="crop_center" value="2" />
+		</attr>
+	</declare-styleable>
+
+	<declare-styleable name="ZoomAspectScaledTextureView">
+		<!-- タッチ操作による回転拡大縮小を有効にするかどうか -->
+		<attr name="handle_touch_event" format="boolean" default="true"/>
+	</declare-styleable>
+
 </resources>
