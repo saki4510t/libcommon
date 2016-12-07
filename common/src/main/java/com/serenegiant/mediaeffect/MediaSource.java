@@ -150,7 +150,7 @@ public class MediaSource implements ISource {
 
 	/**
 	 * 入力用オフスクリーンに映像をセット
-	 * @param drawer オフスクリーン描画用FullFrameRect
+	 * @param drawer オフスクリーン描画用GLDrawer2D
 	 * @param tex_id
 	 * @param tex_matrix
 	 * @return
