@@ -163,8 +163,17 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 		final NetworkChangedReceiver receiver = new NetworkChangedReceiver(listener);
 		final IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
-		context.registerReceiver(receiver, intentFilter);
+		synchronized (sSync) {
+			context.registerReceiver(receiver, intentFilter);
+			sGlobalReceiverNum++;
+		}
 		return receiver;
+	}
+
+	public static boolean isGlobalRegistered() {
+		synchronized (sSync) {
+			return sGlobalReceiverNum > 0;
+		}
 	}
 
 	/**
@@ -175,8 +184,11 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 */
 	public static void unregisterGlobal(final Context context, final NetworkChangedReceiver receiver) {
 		if (DEBUG) Log.v(TAG, "unregisterGlobal:");
-		if ((context != null) && (receiver != null)) {
-			context.unregisterReceiver(receiver);
+		synchronized (sSync) {
+			if ((context != null) && (receiver != null)) {
+				sGlobalReceiverNum--;
+				context.unregisterReceiver(receiver);
+			}
 		}
 	}
 
@@ -233,6 +245,7 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 
 //================================================================================
 	private static final Object sSync = new Object();
+	private static int sGlobalReceiverNum;
 	/** 接続中または接続準備中のネットワークのフラグ */
 	private static int sIsConnectedOrConnecting = 0;
 	/** 接続中のネットワークのフラグ */
