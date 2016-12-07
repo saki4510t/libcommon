@@ -52,6 +52,7 @@ public class AspectScaledTextureView extends TextureView
 		} finally {
 			a.recycle();
 		}
+		setSurfaceTextureListener(this);
 	}
 
 	/**
