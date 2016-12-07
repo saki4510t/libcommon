@@ -29,7 +29,7 @@ class RendererSurfaceRec {
 	final float[] mMvpMatrix = new float[16];
 
 	/**
-	 * コンストラクタ, ファクトリーメソッドの使用を矯正するためprivate
+	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
 	 * @param egl
 	 * @param surface
 	 */
@@ -64,6 +64,24 @@ class RendererSurfaceRec {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		drawer.setMvpMatrix(mMvpMatrix, 0);
 		drawer.draw(textId, texMatrix, 0);
+		mTargetSurface.swap();
+	}
+
+	/**
+	 * #drawの代わりにOpenGL|ES2を使って自前で描画する場合は
+	 * #makeCurrentでレンダリングコンテキストを切り替えてから
+	 * 描画後#swapを呼ぶ
+	 */
+	public void makeCurrent() {
+		mTargetSurface.makeCurrent();
+	}
+
+	/**
+	 * #drawの代わりにOpenGL|ES2を使って自前で描画する場合は
+	 * #makeCurrentでレンダリングコンテキストを切り替えてから
+	 * 描画後#swapを呼ぶ
+	 */
+	public void swap() {
 		mTargetSurface.swap();
 	}
 
