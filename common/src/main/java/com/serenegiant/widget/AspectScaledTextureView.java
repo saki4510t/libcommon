@@ -45,15 +45,10 @@ public class AspectScaledTextureView extends TextureView
 
 	public AspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IAspectRatioView, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AspectScaledTextureView, defStyleAttr, 0);
 		try {
-			mRequestedAspect = a.getFloat(R.styleable.IAspectRatioView_aspect_ratio, -1.0f);
-		} finally {
-			a.recycle();
-		}
-		a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IScaledView, defStyleAttr, 0);
-		try {
-			mScaleMode = a.getInt(R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mRequestedAspect = a.getFloat(R.styleable.AspectScaledTextureView_aspect_ratio, -1.0f);
+			mScaleMode = a.getInt(R.styleable.AspectScaledTextureView_scale_mode, SCALE_MODE_KEEP_ASPECT);
 		} finally {
 			a.recycle();
 		}
