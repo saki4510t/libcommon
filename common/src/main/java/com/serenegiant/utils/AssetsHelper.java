@@ -33,6 +33,7 @@ public class AssetsHelper {
 		int r = reader.read(buf);
 		while (r > 0) {
 			sb.append(buf, 0, r);
+			r = reader.read(buf);
 		}
 		return sb.toString();
 	}
