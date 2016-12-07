@@ -27,13 +27,39 @@ import android.content.SharedPreferences;
  */
 public class PrefHelper {
 	public static int getShort(final SharedPreferences pref, final String key, final short defaultValue) {
+		boolean success = false;
 		short result = defaultValue;
 		try {
 			result = (short)pref.getInt(key, defaultValue);
+			success = true;
 		} catch (final Exception e) {
+		}
+		if (!success) {
 			try {
-				result = Short.parseShort(pref.getString(key, Short.toString(defaultValue)));
-			} catch (final Exception e1) {
+				final String v = pref.getString(key, Short.toString(defaultValue));
+				try {
+					result = (short)Integer.parseInt(v);
+					success = true;
+				} catch (final Exception e1) {
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = (short)Integer.parseInt(v, 16);
+						success = true;
+					} catch (final Exception e2) {
+
+					}
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = (short)Integer.parseInt("0x" + v, 16);
+					} catch (final Exception e2) {
+
+					}
+				}
+			} catch (final Exception e) {
 				// ignore
 			}
 		}
@@ -41,13 +67,39 @@ public class PrefHelper {
 	}
 
 	public static int getInt(final SharedPreferences pref, final String key, final int defaultValue) {
+		boolean success = false;
 		int result = defaultValue;
 		try {
-			result = pref.getInt(key, defaultValue);
+			result = (int)pref.getLong(key, defaultValue);
+			success = true;
 		} catch (final Exception e) {
+		}
+		if (!success) {
 			try {
-				result = Integer.parseInt(pref.getString(key, Integer.toString(defaultValue)));
-			} catch (final Exception e1) {
+				final String v = pref.getString(key, Integer.toString(defaultValue));
+				try {
+					result = (int)Long.parseLong(v);
+					success = true;
+				} catch (final Exception e1) {
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = (int)Long.parseLong(v, 16);
+						success = true;
+					} catch (final Exception e2) {
+
+					}
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = (int)Long.parseLong("0x" + v, 16);
+					} catch (final Exception e2) {
+
+					}
+				}
+			} catch (final Exception e) {
 				// ignore
 			}
 		}
@@ -55,13 +107,39 @@ public class PrefHelper {
 	}
 
 	public static long getLong(final SharedPreferences pref, final String key, final long defaultValue) {
+		boolean success = false;
 		long result = defaultValue;
 		try {
 			result = pref.getLong(key, defaultValue);
+			success = true;
 		} catch (final Exception e) {
+		}
+		if (!success) {
 			try {
-				result = Long.parseLong(pref.getString(key, Long.toString(defaultValue)));
-			} catch (final Exception e1) {
+				final String v = pref.getString(key, Long.toString(defaultValue));
+				try {
+					result = Long.parseLong(v);
+					success = true;
+				} catch (final Exception e1) {
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = Long.parseLong(v, 16);
+						success = true;
+					} catch (final Exception e2) {
+
+					}
+				}
+				if (!success) {
+					// 16進文字列かも
+					try {
+						result = Long.parseLong("0x" + v, 16);
+					} catch (final Exception e2) {
+
+					}
+				}
+			} catch (final Exception e) {
 				// ignore
 			}
 		}
@@ -74,7 +152,7 @@ public class PrefHelper {
 			result = pref.getFloat(key, defaultValue);
 		} catch (final Exception e) {
 			try {
-				result = Float.parseFloat(pref.getString(key, Float.toString(defaultValue)));
+				result = (float)Double.parseDouble(pref.getString(key, Float.toString(defaultValue)));
 			} catch (final Exception e1) {
 				// ignore
 			}
