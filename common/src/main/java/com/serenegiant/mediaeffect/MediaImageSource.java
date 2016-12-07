@@ -32,10 +32,10 @@ public class MediaImageSource extends MediaSource {
 	public MediaImageSource(final Bitmap src) {
 		super(src.getWidth(), src.getHeight());
 		mImageOffscreen = new TextureOffscreen(mWidth, mHeight, false);
-		SetSource(src);
+		setSource(src);
 	}
 
-	public ISource SetSource(final Bitmap bitmap) {
+	public ISource setSource(final Bitmap bitmap) {
 		mImageOffscreen.loadBitmap(bitmap);
 		reset();
 		return this;
