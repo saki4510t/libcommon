@@ -18,6 +18,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -65,6 +67,8 @@ public final class UriHelper {
 	 * @param uri The Uri to query.
 	 * @author paulburke
 	 */
+	@SuppressLint("NewApi")
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static String getPath(final Context context, final Uri uri) {
 		Log.i(TAG, "getPath:uri=" + uri);
 
@@ -75,8 +79,10 @@ public final class UriHelper {
 	        if (isExternalStorageDocument(uri)) {
 	            final String docId = DocumentsContract.getDocumentId(uri);
 				Log.i(TAG, "getPath:isDocumentUri,docId=" + docId);
-				Log.i(TAG, "getPath:isDocumentUri,getTreeDocumentId=" + DocumentsContract.getTreeDocumentId(uri));
-	            final String[] split = docId.split(":");
+				if (BuildCheck.isLollipop()) {
+					Log.i(TAG, "getPath:isDocumentUri,getTreeDocumentId=" + DocumentsContract.getTreeDocumentId(uri));
+				}
+				final String[] split = docId.split(":");
 	            final String type = split[0];
 
 				Log.i(TAG, "getPath:type=" + type);
