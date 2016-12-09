@@ -25,6 +25,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
+import android.os.SystemClock;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.ViewConfiguration;
@@ -86,6 +87,8 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	 */
     private static final int CHECK_TIMEOUT
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
+    private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout() * 2;
+    private static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
     /**
 	 * ラディアンを度に変換するための係数
 	 */
@@ -216,6 +219,7 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 			switch (mState) {
 			case STATE_WAITING:
 				removeCallbacks(mWaitImageReset);
+				// pass through
 			case STATE_DRAGING:
 				if (event.getPointerCount() > 1) {
 					startCheck(event);
@@ -258,9 +262,19 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 			break;
 		}
 		case MotionEvent.ACTION_CANCEL:
+			// pass through
 		case MotionEvent.ACTION_UP:
 			removeCallbacks(mWaitImageReset);
 			removeCallbacks(mStartCheckRotate);
+			if ((actionCode == MotionEvent.ACTION_UP) && (mState == STATE_WAITING)) {
+				final long downTime = SystemClock.uptimeMillis() - event.getDownTime();
+				if (downTime > LONG_PRESS_TIMEOUT) {
+					performLongClick();
+				} else if (downTime < TAP_TIMEOUT) {
+					performClick();
+				}
+			}
+			// pass through
 		case MotionEvent.ACTION_POINTER_UP:
 			setState(STATE_NON);
 			break;
