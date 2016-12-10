@@ -30,7 +30,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2D implements IDrawer2D {
+public class GLDrawer2D implements IDrawer2dES2 {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
@@ -85,14 +85,25 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。通常の2Dテキスチャならfalse
 	 */
 	public GLDrawer2D(final boolean isOES) {
+		this(VERTICES, TEXCOORD, isOES);
+	}
+
+	/**
+	 * コンストラクタ
+	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
+	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。通常の2Dテキスチャならfalse
+	 */
+	public GLDrawer2D(final float[] vertices, final float[] texcoord, final boolean isOES) {
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pVertex.put(VERTICES);
+		pVertex.put(vertices);
 		pVertex.flip();
 		pTexCoord = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pTexCoord.put(TEXCOORD);
+		pTexCoord.put(texcoord);
 		pTexCoord.flip();
 
 		if (isOES) {
@@ -185,6 +196,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * TextureOffscreenオブジェクトを描画するためのヘルパーメソッド
 	 * @param offscreen
 	 */
+	@Override
 	public void draw(final TextureOffscreen offscreen) {
 		draw(offscreen.getTexture(), offscreen.getTexMatrix(), 0);
 	}
@@ -236,6 +248,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public int glGetAttribLocation(final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetAttribLocation(hProgram, name);
@@ -247,6 +260,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @param name
 	 * @return
 	 */
+	@Override
 	public int glGetUniformLocation(final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetUniformLocation(hProgram, name);
@@ -255,6 +269,7 @@ public class GLDrawer2D implements IDrawer2D {
 	/**
 	 * glUseProgramが呼ばれた状態で返る
 	 */
+	@Override
 	public void glUseProgram() {
 		GLES20.glUseProgram(hProgram);
 	}
