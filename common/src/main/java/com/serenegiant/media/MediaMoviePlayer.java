@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -25,6 +26,7 @@ import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -34,6 +36,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaMoviePlayer {
     private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
     private static final String TAG_STATIC = "MediaMoviePlayer:";
@@ -164,8 +167,8 @@ public class MediaMoviePlayer {
      * request pause playing<br>
      * this function is un-implemented yet
      */
-    public final void pasuse() {
-    	if (DEBUG) Log.v(TAG, "pasuse:");
+    public final void pause() {
+    	if (DEBUG) Log.v(TAG, "pause:");
     	synchronized (mSync) {
     		mRequest = REQ_PAUSE;
     		mSync.notifyAll();
