@@ -128,6 +128,14 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	}
 
 	/**
+	 * 外部テクスチャを使うかどうか
+	 * @return
+	 */
+	public boolean isOES() {
+		return mTexTarget == GL_TEXTURE_EXTERNAL_OES;
+	}
+
+	/**
 	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
 	 * @return
 	 */
@@ -240,6 +248,19 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	 */
 	public void updateShader(final String fs) {
 		updateShader(VERTEX_SHADER, fs);
+	}
+
+	/**
+	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
+	 */
+	public void resetShader() {
+		release();
+		if (isOES()) {
+			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
+		} else {
+			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE);
+		}
+		init();
 	}
 
 	/**
