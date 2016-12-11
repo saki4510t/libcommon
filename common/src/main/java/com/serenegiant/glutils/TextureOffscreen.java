@@ -259,7 +259,7 @@ public class TextureOffscreen {
 
 		createFrameBuffer(width, height);
 		// カラーバッファのためにテクスチャを生成する
-		final int tex_name = GLHelper.initTex(TEX_TARGET, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST, GLES20.GL_NEAREST, GLES20.GL_CLAMP_TO_EDGE);
+		final int tex_name = GLHelper.initTex(TEX_TARGET, GLES20.GL_TEXTURE0, GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
 		// テクスチャのメモリ領域を確保する
 		GLES20.glTexImage2D(TEX_TARGET, 0, GLES20.GL_RGBA, mTexWidth, mTexHeight, 0,
 			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
