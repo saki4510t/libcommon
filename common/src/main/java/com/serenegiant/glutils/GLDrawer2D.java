@@ -66,9 +66,9 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 	private static final int FLOAT_SZ = Float.SIZE / 8;
-	private static final int VERTEX_NUM = 4;
-	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
+	private final int VERTEX_NUM;
+	private final int VERTEX_SZ;
 	private final FloatBuffer pVertex;
 	private final FloatBuffer pTexCoord;
 	private final int mTexTarget;
@@ -96,6 +96,9 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。通常の2Dテキスチャならfalse
 	 */
 	public GLDrawer2D(final float[] vertices, final float[] texcoord, final boolean isOES) {
+		VERTEX_NUM = Math.min(vertices != null ? vertices.length : 0, texcoord != null ? texcoord.length : 0) / 2;
+		VERTEX_SZ = VERTEX_NUM * 2;
+
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
