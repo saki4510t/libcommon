@@ -18,7 +18,9 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.res.AssetFileDescriptor;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -30,6 +32,8 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
+
+import com.serenegiant.utils.BuildCheck;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -108,16 +112,29 @@ public class MediaMoviePlayer {
 
     /**
      * request to prepare movie playing
-     * @param src_movie
+     * @param src
      */
-    public final void prepare(final String src_movie) {
+    public final void prepare(final String src) {
     	if (DEBUG) Log.v(TAG, "prepare:");
     	synchronized (mSync) {
-    		mSourcePath = src_movie;
+    		mSource = src;
     		mRequest = REQ_PREPARE;
     		mSync.notifyAll();
     	}
     }
+
+	/**
+	 * request to prepare movie playing
+	 * @param src
+	 */
+	public final void prepare(final AssetFileDescriptor src) {
+		if (DEBUG) Log.v(TAG, "prepare:");
+		synchronized (mSync) {
+			mSource = src;
+			mRequest = REQ_PREPARE;
+			mSync.notifyAll();
+		}
+	}
 
     /**
      * request to start playing movie
@@ -229,7 +246,7 @@ public class MediaMoviePlayer {
 	private final Object mSync = new Object();
 	private volatile boolean mIsRunning;
 	private int mState;
-	private String mSourcePath;
+	private Object mSource;
 	private long mDuration;
 	private int mRequest;
 	private long mRequestTime;
@@ -392,7 +409,7 @@ public class MediaMoviePlayer {
 		boolean local_isRunning = true;
 		switch (req) {
 		case REQ_PREPARE:
-			handlePrepare(mSourcePath);
+			handlePrepare(mSource);
 			break;
 		case REQ_START:
 		case REQ_PAUSE:
@@ -522,32 +539,40 @@ public class MediaMoviePlayer {
 //
 //--------------------------------------------------------------------------------
 	/**
-	 * @param source_file
+	 * @param source
 	 * @throws IOException
 	 */
-	private final void handlePrepare(final String source_file) throws IOException {
-		if (DEBUG) Log.v(TAG, "handlePrepare:" + source_file);
+	private final void handlePrepare(final Object source) throws IOException {
+		if (DEBUG) Log.v(TAG, "handlePrepare:" + source);
         synchronized (mSync) {
 			if (mState != STATE_STOP) {
 				throw new RuntimeException("invalid state:" + mState);
 			}
 		}
-        final File src = new File(source_file);
-        if (TextUtils.isEmpty(source_file) || !src.canRead()) {
-            throw new FileNotFoundException("Unable to read " + source_file);
-        }
-        mVideoTrackIndex = mAudioTrackIndex = -1;
-		mMetadata = new MediaMetadataRetriever();
-		mMetadata.setDataSource(source_file);
+		mVideoTrackIndex = mAudioTrackIndex = -1;
+		if (source instanceof String) {
+			final String srcString = (String)source;
+			final File src = new File(srcString);
+			if (TextUtils.isEmpty(srcString) || !src.canRead()) {
+				throw new FileNotFoundException("Unable to read " + source);
+			}
+			mMetadata = new MediaMetadataRetriever();
+			mMetadata.setDataSource((String)source);
+		} else if (source instanceof AssetFileDescriptor) {
+			mMetadata = new MediaMetadataRetriever();
+			mMetadata.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
+		} else {
+			throw new IllegalArgumentException("unknown source type:source=" + source);
+		}
 		updateMovieInfo();
 		// preparation for video playback
-		mVideoTrackIndex = internal_prepare_video(source_file);
+		mVideoTrackIndex = internal_prepare_video(source);
 		// preparation for audio playback
 		if (mAudioEnabled)
-			mAudioTrackIndex = internal_prepare_audio(source_file);
+			mAudioTrackIndex = internal_prepare_audio(source);
 		mHasAudio = mAudioTrackIndex >= 0;
 		if ((mVideoTrackIndex < 0) && (mAudioTrackIndex < 0)) {
-			throw new RuntimeException("No video and audio track found in " + source_file);
+			throw new RuntimeException("No video and audio track found in " + source);
 		}
 		synchronized (mSync) {
 			mState = STATE_PREPARED;
@@ -556,14 +581,26 @@ public class MediaMoviePlayer {
 	}
 
 	/**
-	 * @param source_path
+	 * @param source
 	 * @return first video track index, -1 if not found
 	 */
-	protected int internal_prepare_video(final String source_path) {
+	@SuppressLint("NewApi")
+	protected int internal_prepare_video(final Object source) {
 		int trackindex = -1;
 		mVideoMediaExtractor = new MediaExtractor();
 		try {
-			mVideoMediaExtractor.setDataSource(source_path);
+			if (source instanceof String) {
+				mVideoMediaExtractor.setDataSource((String)source);
+			} else if (source instanceof AssetFileDescriptor) {
+				if (BuildCheck.isAndroid7()) {
+					mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
+				} else {
+					mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
+				}
+			} else {
+				// ここには来ないけど
+				throw new IllegalArgumentException("unknown source type:source=" + source);
+			}
 			trackindex = selectTrack(mVideoMediaExtractor, "video/");
 			if (trackindex >= 0) {
 				mVideoMediaExtractor.selectTrack(trackindex);
@@ -581,14 +618,26 @@ public class MediaMoviePlayer {
 	}
 
 	/**
-	 * @param source_file
+	 * @param source
 	 * @return first audio track index, -1 if not found
 	 */
-	protected int internal_prepare_audio(final String source_file) {
+	@SuppressLint("NewApi")
+	protected int internal_prepare_audio(final Object source) {
 		int trackindex = -1;
 		mAudioMediaExtractor = new MediaExtractor();
 		try {
-			mAudioMediaExtractor.setDataSource(source_file);
+			if (source instanceof String) {
+				mAudioMediaExtractor.setDataSource((String)source);
+			} else if (source instanceof AssetFileDescriptor) {
+				if (BuildCheck.isAndroid7()) {
+					mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
+				} else {
+					mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
+				}
+			} else {
+				// ここには来ないけど
+				throw new IllegalArgumentException("unknown source type:source=" + source);
+			}
 			trackindex = selectTrack(mAudioMediaExtractor, "audio/");
 			if (trackindex >= 0) {
 				mAudioMediaExtractor.selectTrack(trackindex);
