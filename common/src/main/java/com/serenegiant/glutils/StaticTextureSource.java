@@ -74,12 +74,14 @@ public class StaticTextureSource {
 	 */
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+		isRunning = false;
 		synchronized (mSync) {
-			isRunning = false;
 			mSync.notifyAll();
-			if (mRendererTask != null) {
-				mRendererTask.release();
-			}
+		}
+		if (mRendererTask != null) {
+			mRendererTask.release();
+		}
+		synchronized (mSync) {
 			mRendererTask = null;
 			mSync.notifyAll();
 		}
