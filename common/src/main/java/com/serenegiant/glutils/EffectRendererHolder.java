@@ -72,8 +72,19 @@ public class EffectRendererHolder implements IRendererHolder {
 	 *    1.0f, 0.5f, 0.8f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.5)と明度(x0.8)を少し落とす
 	 * }
 	 */
-	public static final int EFFECT_NUM = 10;
 	public static final int EFFECT_EMPHASIZE_RED_YELLOW = 9;
+	/**
+	 * 赤色黄色と白を強調
+	 * setParamsはfloat[12] {
+	 *    0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
+	 *    0.50f, 1.0f,		// 強調する彩度下限, 上限
+	 *    0.40f, 1.0f,		// 強調する明度下限, 上限
+	 *    1.0f, 1.0f, 5.0f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+	 *    1.0f, 0.5f, 0.8f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.5)と明度(x0.8)を少し落とす
+	 * 白のパラメータは今はなし
+	 */
+	public static final int EFFECT_EMPHASIZE_RED_YELLOW_WHITE = 10;
+	public static final int EFFECT_NUM = 11;
 
 	/**
 	 * グレースケール変換のためのフラグメントシェーダーのベース文字列
@@ -180,19 +191,13 @@ public class EffectRendererHolder implements IRendererHolder {
 		"varying vec2 vTextureCoord;\n" +
 		"uniform %s sTexture;\n" +
 		"uniform float uParams[" + MAX_PARAM_NUM + "];\n" +
-//		"const float h_lower = 0.17;\n" +	// 赤色&黄色の色相下側閾値(色相の赤と黄色は隣り合わせ), 約65/360
-//		"const float h_upper = 0.85;\n" +	// 赤の色相上側閾値, 約306/360
-//		"const float s_min = 0.50;\n" +		// 赤・黄強調する際の彩度下限(彩度がこれより大きくなければ強調しない)
-//		"const float s_max = 1.0;\n" +		// 赤・黄強調する際の彩度上限(彩度がこれより低くなければ強調しない)
-//		"const float v_min = 0.40;\n" +		// 赤・黄強調する際の明度下限(明度がこれより大きくなければ強調しない)
-//		"const float v_max = 1.0;\n" +		// 赤・黄強調する際の明度上限(明度がこれより低くなければ強調しない)
 		FUNC_RGB2HSV +
 		FUNC_HSV2RGB +
 		"void main() {\n" +
 		"    vec3 hsv = rgb2hsv(texture2D(sTexture, vTextureCoord).rgb);\n" +	// RGBをHSVに変換
-		"    if ( ((hsv.g >= uParams[2]) && (hsv.g <= uParams[3]))\n" +
-		"        && ((hsv.b >= uParams[4]) && (hsv.b <= uParams[5]))\n" +
-		"        && ((hsv.r <= uParams[0]) || (hsv.r >= uParams[1])) ) {\n" +
+		"    if ( ((hsv.g >= uParams[2]) && (hsv.g <= uParams[3]))\n" +			// s
+		"        && ((hsv.b >= uParams[4]) && (hsv.b <= uParams[5]))\n" +		// v
+		"        && ((hsv.r <= uParams[0]) || (hsv.r >= uParams[1])) ) {\n" +	// h
 		"        hsv = hsv * vec3(uParams[6], uParams[7], uParams[8]);\n" +		// 赤色と黄色の範囲
 		"    } else {\n" +
 		"        hsv = hsv * vec3(uParams[9], uParams[10], uParams[11]);\n" +	// それ以外なら
@@ -200,8 +205,36 @@ public class EffectRendererHolder implements IRendererHolder {
 		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +		// HSVをRGBに戻す
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_GREEN_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_GREEN_BASE, HEADER_OES, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE, HEADER_OES, SAMPLER_OES);
+
+	/**
+	 * 赤と黄色を強調するためのフラグメントシェーダーのベース文字列
+	 */
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE = SHADER_VERSION +
+		"%s" +
+		"precision mediump float;\n" +
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"uniform float uParams[" + MAX_PARAM_NUM + "];\n" +
+		FUNC_RGB2HSV +
+		FUNC_HSV2RGB +
+		"void main() {\n" +
+		"    vec3 hsv = rgb2hsv(texture2D(sTexture, vTextureCoord).rgb);\n" +	// RGBをHSVに変換
+		"    if ( ((hsv.g >= uParams[2]) && (hsv.g <= uParams[3]))\n" +			// s
+		"        && ((hsv.b >= uParams[4]) && (hsv.b <= uParams[5]))\n" +		// v
+		"        && ((hsv.r <= uParams[0]) || (hsv.r >= uParams[1])) ) {\n" +	// h
+		"        hsv = hsv * vec3(uParams[6], uParams[7], uParams[8]);\n" +		// 赤色と黄色の範囲
+		"    } else if ((hsv.g < uParams[12]) && (hsv.b < uParams[13])) {\n" +	// 彩度が一定以下, 明度が一定以下なら
+		"        hsv = hsv * vec3(1.0, 0.0, 2.0);\n" +							// 色相そのまま, 彩度0, 明度x2
+		"    } else {\n" +
+		"        hsv = hsv * vec3(uParams[9], uParams[10], uParams[11]);\n" +	// それ以外なら
+		"    }\n" +
+		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +		// HSVをRGBに戻す
+	"}\n";
+
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE, HEADER_OES, SAMPLER_OES);
 
 	private final Object mSync = new Object();
 	private final RenderHolderCallback mCallback;
@@ -873,6 +906,9 @@ public class EffectRendererHolder implements IRendererHolder {
 				break;
 			case EFFECT_EMPHASIZE_RED_YELLOW:
 				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES);
+				break;
+			case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
+				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES);
 				break;
 			}
 			muParamsLoc = mDrawer.glGetUniformLocation("uParams");
