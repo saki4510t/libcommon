@@ -72,8 +72,8 @@ public class EffectRendererHolder implements IRendererHolder {
 	 *    1.0f, 0.5f, 0.8f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.5)と明度(x0.8)を少し落とす
 	 * }
 	 */
-	public static final int EFFECT_EMPHASIZE_RED_GREEN = 9;
 	public static final int EFFECT_NUM = 10;
+	public static final int EFFECT_EMPHASIZE_RED_YELLOW = 9;
 
 	/**
 	 * グレースケール変換のためのフラグメントシェーダーのベース文字列
@@ -174,7 +174,7 @@ public class EffectRendererHolder implements IRendererHolder {
 	/**
 	 * 赤と黄色を強調するためのフラグメントシェーダーのベース文字列
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_GREEN_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE = SHADER_VERSION +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -426,7 +426,7 @@ public class EffectRendererHolder implements IRendererHolder {
 			mDrawer = new GLDrawer2D(true);	// GL_TEXTURE_EXTERNAL_OESを使う
 			handleReCreateMasterSurface();
 			mParams.clear();
-			mParams.put(EFFECT_EMPHASIZE_RED_GREEN, new float[] {
+			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
 				0.50f, 1.0f,		// 強調する彩度下限, 上限
 				0.40f, 1.0f,		// 強調する明度下限, 上限
@@ -871,8 +871,8 @@ public class EffectRendererHolder implements IRendererHolder {
 			case EFFECT_BIN_REVERSE_GREEN:
 				mDrawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES);
 				break;
-			case EFFECT_EMPHASIZE_RED_GREEN:
-				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_GREEN_OES);
+			case EFFECT_EMPHASIZE_RED_YELLOW:
+				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES);
 				break;
 			}
 			muParamsLoc = mDrawer.glGetUniformLocation("uParams");
