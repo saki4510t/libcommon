@@ -534,7 +534,7 @@ public class EffectRendererHolder implements IRendererHolder {
 				throw new IllegalArgumentException("Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
 			synchronized (mClientSync) {
-				if ((surface != null) && (mClients.get(id) == null)) {
+				if (mClients.get(id) == null) {
 					for ( ; ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {

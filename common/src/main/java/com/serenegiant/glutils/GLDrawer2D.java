@@ -34,35 +34,6 @@ public class GLDrawer2D implements IDrawer2dES2 {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
-//	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;
-//	public static final int GL_TEXTURE_2D			= 0x0DE1;
-
-//	public static final String VERTEX_SHADER
-//		= "uniform mat4 uMVPMatrix;\n"
-//		+ "uniform mat4 uTexMatrix;\n"
-//		+ "attribute highp vec4 aPosition;\n"
-//		+ "attribute highp vec4 aTextureCoord;\n"
-//		+ "varying highp vec2 vTextureCoord;\n"
-//		+ "\n"
-//		+ "void main() {\n"
-//		+ "	gl_Position = uMVPMatrix * aPosition;\n"
-//		+ "	vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n"
-//		+ "}\n";
-//	public static final String FRAGMENT_SHADER_SIMPLE_OES
-//		= "#extension GL_OES_EGL_image_external : require\n"
-//		+ "precision mediump float;\n"
-//		+ "uniform samplerExternalOES sTexture;\n"
-//		+ "varying highp vec2 vTextureCoord;\n"
-//		+ "void main() {\n"
-//		+ "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n"
-//		+ "}";
-//	public static final String FRAGMENT_SHADER_SIMPLE
-//		= "precision mediump float;\n"
-//		+ "uniform sampler2D sTexture;\n"
-//		+ "varying highp vec2 vTextureCoord;\n"
-//		+ "void main() {\n"
-//		+ "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n"
-//		+ "}";
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 	private static final int FLOAT_SZ = Float.SIZE / 8;

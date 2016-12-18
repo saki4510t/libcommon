@@ -21,7 +21,7 @@ import android.view.SurfaceHolder;
  * 出力するためのクラス
  */
 public class StaticTextureSource {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = StaticTextureSource.class.getSimpleName();
 
 	private final Object mSync = new Object();
