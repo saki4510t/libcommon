@@ -1,0 +1,33 @@
+package com.serenegiant.video;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2016 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+import java.nio.ByteBuffer;
+
+import android.media.MediaCodec;
+import android.media.MediaFormat;
+
+public abstract class Muxer {
+	public abstract int addTrack(final MediaFormat format);
+	public abstract void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+	public abstract void start();
+	public abstract void stop();
+	public abstract void release();
+	public abstract boolean isStarted();
+}
