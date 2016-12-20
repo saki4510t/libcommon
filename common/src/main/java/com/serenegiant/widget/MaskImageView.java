@@ -76,10 +76,12 @@ public class MaskImageView extends ImageView {
     	final int padding_left = getPaddingLeft();
     	final int padding_top = getPaddingTop();
     	final int sz = Math.min(width - padding_left - getPaddingRight(), height - padding_top - getPaddingBottom());
-    	final int left =  (width - sz) / 2 + padding_left;
-    	final int top = (height - sz) / 2 + padding_top;
-        mMaskBounds.set(left, top, left + sz, top + sz);
-		mMaskedPaint.setMaskFilter(new BlurMaskFilter(sz * 2 / 3.0f, BlurMaskFilter.Blur.NORMAL));
+		final int left =  (width - sz) / 2 + padding_left;
+		final int top = (height - sz) / 2 + padding_top;
+		mMaskBounds.set(left, top, left + sz, top + sz);
+		if (sz > 0) {
+			mMaskedPaint.setMaskFilter(new BlurMaskFilter(sz * 2 / 3.0f, BlurMaskFilter.Blur.NORMAL));
+		}
 
         // View自体のサイズはそのまま
 		mViewBoundsF.set(0, 0, width, height);
