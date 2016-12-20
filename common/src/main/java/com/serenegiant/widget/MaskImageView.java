@@ -79,7 +79,7 @@ public class MaskImageView extends ImageView {
 		final int left =  (width - sz) / 2 + padding_left;
 		final int top = (height - sz) / 2 + padding_top;
 		mMaskBounds.set(left, top, left + sz, top + sz);
-		if (sz > 0) {
+		if (sz > 3) {
 			mMaskedPaint.setMaskFilter(new BlurMaskFilter(sz * 2 / 3.0f, BlurMaskFilter.Blur.NORMAL));
 		}
 
