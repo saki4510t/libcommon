@@ -42,19 +42,24 @@ public class ViewAnimationHelper {
 	public static void fadeIn(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "fadeIn:target=" + target);
 		if (target == null) return;
-		target.setVisibility(View.VISIBLE);
-		target.setTag(R.id.anim_type, ANIMATION_FADE_IN);	// フェードインの時の印
-		target.setTag(R.id.anim_listener, listener);
-		target.setScaleX(1.0f);
-		target.setScaleY(1.0f);
-		target.setAlpha(0.0f);
-		final ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "alpha", 0f, 1f );
-		objectAnimator.addListener(mAnimatorListener);
-		if (BuildCheck.isJellyBeanMR2())
-			objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
-		objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
-		objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
-	    objectAnimator.start();						// アニメーションを開始
+		UIThreadHelper.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				target.setVisibility(View.VISIBLE);
+				target.setTag(R.id.anim_type, ANIMATION_FADE_IN);	// フェードインの時の印
+				target.setTag(R.id.anim_listener, listener);
+				target.setScaleX(1.0f);
+				target.setScaleY(1.0f);
+				target.setAlpha(0.0f);
+				final ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "alpha", 0f, 1f );
+				objectAnimator.addListener(mAnimatorListener);
+				if (BuildCheck.isJellyBeanMR2())
+					objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
+				objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
+				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
+			    objectAnimator.start();						// アニメーションを開始
+			}
+		});
 	}
 
 	/**
@@ -67,20 +72,24 @@ public class ViewAnimationHelper {
 	@SuppressLint("NewApi")
 	public static void fadeOut(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "fadeOut,target=" + target);
-		if (target == null) return;
-		if (target.getVisibility() == View.VISIBLE) {
-			target.setTag(R.id.anim_type, ANIMATION_FADE_OUT);	// フェードアウトの印
-			target.setTag(R.id.anim_listener, listener);
-			target.setScaleX(1.0f);
-			target.setScaleY(1.0f);
-			target.setAlpha(1.0f);
-			final ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "alpha", 1f, 0f );
-			objectAnimator.addListener(mAnimatorListener);
-			if (BuildCheck.isAndroid4_3())
-				objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
-			objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
-			objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
-		    objectAnimator.start();						// アニメーションを開始
+		if ((target != null) && (target.getVisibility() == View.VISIBLE)) {
+			UIThreadHelper.runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					target.setTag(R.id.anim_type, ANIMATION_FADE_OUT);	// フェードアウトの印
+					target.setTag(R.id.anim_listener, listener);
+					target.setScaleX(1.0f);
+					target.setScaleY(1.0f);
+					target.setAlpha(1.0f);
+					final ObjectAnimator objectAnimator = ObjectAnimator.ofFloat(target, "alpha", 1f, 0f );
+					objectAnimator.addListener(mAnimatorListener);
+					if (BuildCheck.isAndroid4_3())
+						objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
+					objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
+					objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
+					objectAnimator.start();						// アニメーションを開始
+				}
+			});
 		}
 	}
 
@@ -95,21 +104,26 @@ public class ViewAnimationHelper {
 	public static void zoomIn(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "zoomIn:target=" + target);
 		if (target == null) return;
-		target.setVisibility(View.VISIBLE);
-		target.setTag(R.id.anim_type, ANIMATION_ZOOM_IN);	// ズームインの時の印
-		target.setTag(R.id.anim_listener, listener);
-		target.setScaleX(0.0f);
-		target.setScaleY(0.0f);
-		target.setAlpha(1.0f);
-		final PropertyValuesHolder scale_x = PropertyValuesHolder.ofFloat( "scaleX", 0.01f, 1f);
-		final PropertyValuesHolder scale_y = PropertyValuesHolder.ofFloat( "scaleY", 0.01f, 1f);
-		final ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(target, scale_x, scale_y);
-		objectAnimator.addListener(mAnimatorListener);
-		if (BuildCheck.isJellyBeanMR2())
-			objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
-		objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
-		objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
-	    objectAnimator.start();						// アニメーションを開始
+		UIThreadHelper.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				target.setVisibility(View.VISIBLE);
+				target.setTag(R.id.anim_type, ANIMATION_ZOOM_IN);	// ズームインの時の印
+				target.setTag(R.id.anim_listener, listener);
+				target.setScaleX(0.0f);
+				target.setScaleY(0.0f);
+				target.setAlpha(1.0f);
+				final PropertyValuesHolder scale_x = PropertyValuesHolder.ofFloat( "scaleX", 0.01f, 1f);
+				final PropertyValuesHolder scale_y = PropertyValuesHolder.ofFloat( "scaleY", 0.01f, 1f);
+				final ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(target, scale_x, scale_y);
+				objectAnimator.addListener(mAnimatorListener);
+				if (BuildCheck.isJellyBeanMR2())
+					objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
+				objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
+				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
+			    objectAnimator.start();						// アニメーションを開始
+			}
+		});
 	}
 
 	/**
@@ -123,21 +137,26 @@ public class ViewAnimationHelper {
 	public static void zoomOut(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "zoomIn:target=" + target);
 		if (target == null) return;
-		target.setVisibility(View.VISIBLE);
-		target.setTag(R.id.anim_type, ANIMATION_ZOOM_OUT);	// ズームアウトの時の印
-		target.setTag(R.id.anim_listener, listener);
-		target.setScaleX(1.0f);
-		target.setScaleY(1.0f);
-		target.setAlpha(1.0f);
-		final PropertyValuesHolder scale_x = PropertyValuesHolder.ofFloat( "scaleX", 1f, 0f);
-		final PropertyValuesHolder scale_y = PropertyValuesHolder.ofFloat( "scaleY", 1f, 0f);
-		final ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(target, scale_x, scale_y);
-		objectAnimator.addListener(mAnimatorListener);
-		if (BuildCheck.isJellyBeanMR2())
-			objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
-		objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
-		objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
-		objectAnimator.start();						// アニメーションを開始
+		UIThreadHelper.runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
+				target.setVisibility(View.VISIBLE);
+				target.setTag(R.id.anim_type, ANIMATION_ZOOM_OUT);	// ズームアウトの時の印
+				target.setTag(R.id.anim_listener, listener);
+				target.setScaleX(1.0f);
+				target.setScaleY(1.0f);
+				target.setAlpha(1.0f);
+				final PropertyValuesHolder scale_x = PropertyValuesHolder.ofFloat( "scaleX", 1f, 0f);
+				final PropertyValuesHolder scale_y = PropertyValuesHolder.ofFloat( "scaleY", 1f, 0f);
+				final ObjectAnimator objectAnimator = ObjectAnimator.ofPropertyValuesHolder(target, scale_x, scale_y);
+				objectAnimator.addListener(mAnimatorListener);
+				if (BuildCheck.isJellyBeanMR2())
+					objectAnimator.setAutoCancel(true);		// API >= 18 同じターゲットに対して別のAnimatorが開始したら自分をキャンセルする
+				objectAnimator.setDuration(duration > 0 ? duration : DEFAULT_DURATION_MS);
+				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
+				objectAnimator.start();						// アニメーションを開始
+			}
+		});
 	}
 
 	/**
@@ -168,27 +187,33 @@ public class ViewAnimationHelper {
 			if (target == null) return;	// これはありえないはずだけど
 
 			final ViewAnimationListener listener = (ViewAnimationListener)target.getTag(R.id.anim_listener);
+			final int animType;
+			try {
+				animType = (Integer)target.getTag(R.id.anim_type);
+			} catch (final Exception e) {
+				return;
+			}
 			if (listener != null) {
-				int animType = ANIMATION_UNKNOWN;
-				try {
-					animType = (Integer)target.getTag(R.id.anim_type);
-				} catch (final Exception e) {
-				}
-				try {
-					switch (event) {
-					case 0:
-						listener.onAnimationStart(anim, target, animType);
-						break;
-					case 1:
-						listener.onAnimationEnd(anim, target, animType);
-						break;
-					case 2:
-						listener.onAnimationCancel(anim, target, animType);
-						break;
+				UIThreadHelper.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							switch (event) {
+							case 0:
+								listener.onAnimationStart(anim, target, animType);
+								break;
+							case 1:
+								listener.onAnimationEnd(anim, target, animType);
+								break;
+							case 2:
+								listener.onAnimationCancel(anim, target, animType);
+								break;
+							}
+						} catch (final Exception e) {
+							Log.w(TAG, e);
+						}
 					}
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
+				});
 			}
 		}
 	}
