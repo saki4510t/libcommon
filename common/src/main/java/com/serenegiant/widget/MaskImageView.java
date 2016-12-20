@@ -71,7 +71,10 @@ public class MaskImageView extends ImageView {
 		}
 	}
 
+	@Override
     protected synchronized void onSizeChanged(int width, int height, int old_width, int old_height) {
+    	super.onSizeChanged(width, height, old_width, old_height);
+    	if ((width == 0) || (height == 0)) return;
     	// paddingを考慮してマスク用のDrawableのサイズを計算
     	final int padding_left = getPaddingLeft();
     	final int padding_top = getPaddingTop();
