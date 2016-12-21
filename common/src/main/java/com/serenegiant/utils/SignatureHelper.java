@@ -67,10 +67,14 @@ public class SignatureHelper {
 				final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
 				// 全部つなげて返す
+				int cnt = 0;
 				final StringBuilder sb = new StringBuilder();
 				for (int i = 0; i < packageInfo.signatures.length; i++) {
 					final Signature signature = packageInfo.signatures[i];
 					if (signature != null) {
+						if (cnt != 0) {
+							sb.append('/');
+						}
 						sb.append(signature.toCharsString());
 					}
 				}
