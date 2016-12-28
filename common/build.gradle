@@ -31,6 +31,7 @@ android {
         targetSdkVersion versionTarget
         versionCode versionCondeNum
         versionName versionNameString
+        buildConfigField "String", "STL_NAME", "\"${project.property("STL_NAME")}\""
     }
     buildTypes {
         release {
