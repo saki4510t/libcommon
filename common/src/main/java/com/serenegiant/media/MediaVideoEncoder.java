@@ -18,10 +18,12 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -29,9 +31,10 @@ import com.serenegiant.common.BuildConfig;
 
 import java.io.IOException;
 
-public class VideoEncoder extends Encoder {
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+public class MediaVideoEncoder extends MediaEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
-	private static final String TAG = "Encoder";
+	private static final String TAG = "MediaEncoder";
 
 	private static final String MIME_TYPE = "video/avc";
 	private static final int FRAME_RATE = 25;
@@ -40,8 +43,14 @@ public class VideoEncoder extends Encoder {
 	private int mVideoWidth = 1280;
 	private int mVideoHeight = 720;
 
-	public VideoEncoder(MediaMovieRecorder muxer, IMediaCodecCallback listener) {
+	public MediaVideoEncoder(final MediaMovieRecorder muxer, final IMediaCodecCallback listener) {
+		this(1280, 720, muxer, listener);
+	}
+
+	public MediaVideoEncoder(final int width, final int height, final MediaMovieRecorder muxer, final IMediaCodecCallback listener) {
 		super(false, muxer, listener);
+		mVideoWidth = width;
+		mVideoHeight = height;
 	}
 
 	@Override

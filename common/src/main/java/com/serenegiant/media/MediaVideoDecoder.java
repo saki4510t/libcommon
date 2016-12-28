@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
@@ -32,7 +33,8 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class VideoDecoder extends Decoder {
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+public class MediaVideoDecoder extends MediaDecoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 
 	private Surface mSurface;

@@ -1,4 +1,4 @@
-package com.serenegiant.video;
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself

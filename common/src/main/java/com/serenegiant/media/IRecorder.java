@@ -1,4 +1,4 @@
-package com.serenegiant.video;
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -60,7 +60,7 @@ public interface IRecorder {
 	 */
 //	public static final int STATE_STOPPED = 6;
 
-	public abstract void setMuxer(Muxer muxer);
+	public abstract void setMuxer(IMuxer muxer);
 
 	/**
 	 * Encoderの準備
@@ -83,9 +83,9 @@ public interface IRecorder {
 
 	public abstract Surface getInputSurface();
 
-	public abstract Encoder getVideoEncoder();
+	public abstract com.serenegiant.video.Encoder getVideoEncoder();
 
-	public abstract Encoder getAudioEncoder();
+	public abstract com.serenegiant.video.Encoder getAudioEncoder();
 
 	/**
 	 * Muxerが出力開始しているかどうかを返す
@@ -113,7 +113,7 @@ public interface IRecorder {
 
 	public abstract int getState();
 
-	public abstract Muxer getMuxer();
+	public abstract IMuxer getMuxer();
 
 	public abstract String getOutputPath();
 

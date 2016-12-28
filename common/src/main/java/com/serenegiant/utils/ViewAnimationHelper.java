@@ -42,7 +42,7 @@ public class ViewAnimationHelper {
 	public static void fadeIn(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "fadeIn:target=" + target);
 		if (target == null) return;
-		UIThreadHelper.runOnUiThread(new Runnable() {
+		target.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				target.setVisibility(View.VISIBLE);
@@ -59,7 +59,7 @@ public class ViewAnimationHelper {
 				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
 			    objectAnimator.start();						// アニメーションを開始
 			}
-		});
+		}, 100);
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class ViewAnimationHelper {
 	public static void fadeOut(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "fadeOut,target=" + target);
 		if ((target != null) && (target.getVisibility() == View.VISIBLE)) {
-			UIThreadHelper.runOnUiThread(new Runnable() {
+			target.postDelayed(new Runnable() {
 				@Override
 				public void run() {
 					target.setTag(R.id.anim_type, ANIMATION_FADE_OUT);	// フェードアウトの印
@@ -89,7 +89,7 @@ public class ViewAnimationHelper {
 					objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
 					objectAnimator.start();						// アニメーションを開始
 				}
-			});
+			}, 100);
 		}
 	}
 
@@ -104,7 +104,7 @@ public class ViewAnimationHelper {
 	public static void zoomIn(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "zoomIn:target=" + target);
 		if (target == null) return;
-		UIThreadHelper.runOnUiThread(new Runnable() {
+		target.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				target.setVisibility(View.VISIBLE);
@@ -123,7 +123,7 @@ public class ViewAnimationHelper {
 				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
 			    objectAnimator.start();						// アニメーションを開始
 			}
-		});
+		}, 100);
 	}
 
 	/**
@@ -137,7 +137,7 @@ public class ViewAnimationHelper {
 	public static void zoomOut(final View target, final long duration, final long startDelay, final ViewAnimationListener listener) {
 //		if (DEBUG) Log.v(TAG, "zoomIn:target=" + target);
 		if (target == null) return;
-		UIThreadHelper.runOnUiThread(new Runnable() {
+		target.postDelayed(new Runnable() {
 			@Override
 			public void run() {
 				target.setVisibility(View.VISIBLE);
@@ -156,7 +156,7 @@ public class ViewAnimationHelper {
 				objectAnimator.setStartDelay(startDelay > 0 ? startDelay : 0);	// 開始までの時間
 				objectAnimator.start();						// アニメーションを開始
 			}
-		});
+		}, 100);
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class ViewAnimationHelper {
 				return;
 			}
 			if (listener != null) {
-				UIThreadHelper.runOnUiThread(new Runnable() {
+				target.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						try {
@@ -213,7 +213,7 @@ public class ViewAnimationHelper {
 							Log.w(TAG, e);
 						}
 					}
-				});
+				}, 100);
 			}
 		}
 	}

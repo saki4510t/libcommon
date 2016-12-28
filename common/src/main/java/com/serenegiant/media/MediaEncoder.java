@@ -18,8 +18,10 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.common.BuildConfig;
@@ -27,7 +29,8 @@ import com.serenegiant.common.BuildConfig;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
-public abstract class Encoder implements IMediaCodec {
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+public abstract class MediaEncoder implements IMediaCodec {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private final String TAG = getClass().getSimpleName();
 
@@ -74,7 +77,7 @@ public abstract class Encoder implements IMediaCodec {
 
 	private final IMediaCodecCallback mCallback;
 
-	public Encoder(final boolean is_audio, AbstractRecorder muxer, IMediaCodecCallback listener) {
+	public MediaEncoder(final boolean is_audio, AbstractRecorder muxer, IMediaCodecCallback listener) {
 		if (listener == null) throw new NullPointerException("MediaEncoderListener is null");
 		if (muxer == null) throw new NullPointerException("MediaMuxerWrapper is null");
 		mIsAudio = is_audio;
@@ -247,7 +250,7 @@ public abstract class Encoder implements IMediaCodec {
 			} // end of while
 			// release all related objects
 			release();
-			if (DEBUG) Log.d(TAG, "Encoder thread exiting");
+			if (DEBUG) Log.d(TAG, "MediaEncoder thread exiting");
 			synchronized (mSync) {
 				mRequestStop = true;
 				mIsCapturing = false;

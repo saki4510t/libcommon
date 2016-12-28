@@ -1,4 +1,4 @@
-package com.serenegiant.video;
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -23,11 +23,11 @@ import java.nio.ByteBuffer;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 
-public abstract class Muxer {
-	public abstract int addTrack(final MediaFormat format);
-	public abstract void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
-	public abstract void start();
-	public abstract void stop();
-	public abstract void release();
-	public abstract boolean isStarted();
+public interface IMuxer {
+	public int addTrack(final MediaFormat format);
+	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+	public void start();
+	public void stop();
+	public void release();
+	public boolean isStarted();
 }

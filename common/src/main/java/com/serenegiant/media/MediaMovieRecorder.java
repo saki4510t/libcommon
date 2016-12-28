@@ -18,9 +18,11 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -29,6 +31,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMovieRecorder extends AbstractRecorder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private static final String TAG = "MediaMovieRecorder";
@@ -46,9 +49,9 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	public MediaMovieRecorder(final String output_path, final boolean audio_recording) throws IOException {
 		super(output_path);
 		mMediaMuxer = new MediaMuxer(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-		new VideoEncoder(this, mMediaCodecCallback);
+		new MediaVideoEncoder(this, mMediaCodecCallback);
 		if (audio_recording) {
-			new AudioEncoder(this, mMediaCodecCallback);
+			new MediaAudioEncoder(this, mMediaCodecCallback);
 		}
 		hasAudioEncoder = audio_recording;
 	}
@@ -62,22 +65,22 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	}
 
 	public void setVideoSize(final int width, final int height) {
-		((VideoEncoder)mVideoEncoder).setVideoSize(width, height);
+		((MediaVideoEncoder)mVideoEncoder).setVideoSize(width, height);
 	}
 
 	@Override
 	public int getWidth() {
-		return mVideoEncoder != null ? ((VideoEncoder)mVideoEncoder).getWidth() : 0;
+		return mVideoEncoder != null ? ((MediaVideoEncoder)mVideoEncoder).getWidth() : 0;
 	}
 
 	@Override
 	public int getHeight() {
-		return mVideoEncoder != null ? ((VideoEncoder)mVideoEncoder).getHeight() : 0;
+		return mVideoEncoder != null ? ((MediaVideoEncoder)mVideoEncoder).getHeight() : 0;
 	}
 
 	@Override
 	public Surface getInputSurface() throws IllegalStateException {
-		return ((VideoEncoder)mVideoEncoder).getInputSurface();
+		return ((MediaVideoEncoder)mVideoEncoder).getInputSurface();
 	}
 
 	@Override

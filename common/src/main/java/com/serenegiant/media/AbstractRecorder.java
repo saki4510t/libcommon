@@ -36,7 +36,7 @@ public abstract class AbstractRecorder {
 	protected int mEncoderCount, mStartedCount;
 	protected volatile boolean mIsStarted;
 
-	protected Encoder mVideoEncoder, mAudioEncoder;
+	protected MediaEncoder mVideoEncoder, mAudioEncoder;
 
 	public AbstractRecorder(String output_path) {
 		mOutputPath = output_path;
@@ -91,7 +91,7 @@ public abstract class AbstractRecorder {
 	 * assign encoder to this class. this is called from encoder.
 	 * @param encoder
 	 */
-	/*package*/ void addEncoder(Encoder encoder) {
+	/*package*/ void addEncoder(MediaEncoder encoder) {
 		if (encoder.isAudio()) {
 			if (mAudioEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");

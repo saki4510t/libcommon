@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaCodec;
@@ -25,6 +26,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.media.MediaRecorder;
+import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.common.BuildConfig;
@@ -32,9 +34,10 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-public class AudioEncoder extends Encoder {
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+public class MediaAudioEncoder extends MediaEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
-	private static final String TAG = "AudioEncoder";
+	private static final String TAG = "MediaAudioEncoder";
 
 	private static final String MIME_TYPE = "audio/mp4a-latm";
 	private static final int SAMPLE_RATE = 44100;		// 44.1[KHz] is only setting guaranteed to be available on all devices.
@@ -44,7 +47,7 @@ public class AudioEncoder extends Encoder {
 
 	private AudioThread mAudioThread = null;
 
-	public AudioEncoder(MediaMovieRecorder muxer, IMediaCodecCallback listener) {
+	public MediaAudioEncoder(MediaMovieRecorder muxer, IMediaCodecCallback listener) {
 		super(true, muxer, listener);
 	}
 

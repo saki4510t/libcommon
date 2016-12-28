@@ -18,12 +18,14 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -35,9 +37,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
-public abstract class Decoder implements IMediaCodec {
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+public abstract class MediaDecoder implements IMediaCodec {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
-	private static final String TAG_STATIC = Decoder.class.getSimpleName();
+	private static final String TAG_STATIC = MediaDecoder.class.getSimpleName();
 	protected final String TAG = getClass().getSimpleName();
 
 	/*
@@ -80,7 +83,7 @@ public abstract class Decoder implements IMediaCodec {
 
 	protected int mState = STATE_UNINITIALIZED;
 
-	public Decoder() {
+	public MediaDecoder() {
 	}
 
 	public void setCallback(IMediaCodecCallback callback) {

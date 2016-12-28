@@ -21,13 +21,13 @@ package com.serenegiant.video;
 import java.nio.ByteBuffer;
 
 public abstract class Encoder {
-	/* package */ abstract void prepare()  throws Exception;
-	/* package */ abstract void start();;
-	/* package */ abstract void stop();
-	/* package */ abstract void signalEndOfInputStream();
-	/* package */ abstract void release();
-	/* package */ abstract void encode(final ByteBuffer buffer);
-	/* package */ abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
+	public abstract void prepare()  throws Exception;
+	public abstract void start();;
+	public abstract void stop();
+	public abstract void signalEndOfInputStream();
+	public abstract void release();
+	public abstract void encode(final ByteBuffer buffer);
+	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
 	public abstract void frameAvailableSoon();
 	public abstract boolean isCapturing();
 	public abstract String getOutputPath();
