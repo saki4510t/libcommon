@@ -14,6 +14,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
@@ -215,10 +216,9 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
     		mRequestDrain = 0;
 			mSync.notify();
         }
-        final boolean isRunning = true;
         boolean localRequestStop;
         boolean localRequestDrain;
-    	while (isRunning) {
+    	for ( ; ; ) {
         	synchronized (mSync) {
         		localRequestStop = mRequestStop;
         		localRequestDrain = (mRequestDrain > 0);
@@ -305,12 +305,12 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
     	// ・・・らしいので空バッファを送る。encode内でBUFFER_FLAG_END_OF_STREAMを付けてセットする
-        encode((ByteBuffer)null, 0, getInputPTSUs());
+        encode(null, 0, getInputPTSUs());
 	}
 
     // encodeはnative側からアクセスするので変更時は注意
 	@Override
-	public void encode(final ByteBuffer buffer){/* VideoEncoder以外は特に何もしない */};
+	public void encode(final ByteBuffer buffer){/* VideoEncoder以外は特に何もしない */}
 
 	@Override
 	public boolean isCapturing() {
@@ -368,7 +368,7 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
 	private final void drain() {
 //    	if (DEBUG) Log.v(TAG, "drain:encoder=" + this);
     	if (mMediaCodec == null) return;
-    	ByteBuffer[] encoderOutputBuffers = null;
+    	ByteBuffer[] encoderOutputBuffers;
     	try {
     		encoderOutputBuffers = mMediaCodec.getOutputBuffers();
     	} catch (final IllegalStateException e) {
@@ -749,10 +749,10 @@ LOOP:	while (mIsCapturing) {
 	 * @param len 検索するバイト数
 	 * @return 一致した先頭位置、一致しなければ-1
 	 */
-	protected final int byteComp(final byte[] array, final int offset, final byte[] search, final int len) {
+	protected final int byteComp(@NonNull final byte[] array, final int offset, @NonNull final byte[] search, final int len) {
 		int index = -1;
-		final int n0 = array != null ? array.length : 0;
-		final int ns = search != null ? search.length : 0;
+		final int n0 = array.length;
+		final int ns = search.length;
 		if ((n0 >= offset + len) && (ns >= len)) {
 			for (int i = offset; i < n0 - len; i++) {
 				int j = len - 1;

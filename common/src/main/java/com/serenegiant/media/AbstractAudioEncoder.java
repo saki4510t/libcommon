@@ -103,10 +103,8 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
             for (int j = 0; j < types.length; j++) {
 //            	if (DEBUG) Log.i(TAG, "supportedType:" + codecInfo.getName() + ",MIME=" + types[j]);
                 if (types[j].equalsIgnoreCase(mimeType)) {
-                	if (result == null) {
-                		result = codecInfo;
-               			break LOOP;
-                	}
+               		result = codecInfo;
+               		break LOOP;
                 }
             }
         }

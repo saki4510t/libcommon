@@ -257,11 +257,11 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder {
         return outFormat;
 	}
 
-	@Override
-	public void prepare() throws Exception {
-		// TODO Auto-generated method stub
-
-	}
+//	@Override
+//	public void prepare() throws Exception {
+//		// TODO Auto-generated method stub
+//
+//	}
 
 	/**
 	 * 指定したカラーフォーマットをこのEncoderで使用可能かどうかを返す
@@ -296,10 +296,8 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder {
 //        		String.format("codec:%s,MIME:%s,colorFormat:%s,%d",
 //        			codecInfo.getName(), mimeType, getColorFormatName(colorFormat), colorFormat));
             if (isRecognizedVideoFormat(colorFormat)) {
-            	if (result == 0) {
-            		result = colorFormat;
-            	}
-                break;	// if (!DEBUG) break;
+				result = colorFormat;
+				break;	// if (!DEBUG) break;
             }
         }
 //		if (result == 0)

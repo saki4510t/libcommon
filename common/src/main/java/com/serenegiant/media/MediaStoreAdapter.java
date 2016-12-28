@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -375,7 +376,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 			if (hashCode != 0) {
 				// 指定したhashCodeのMediaStoreAdapterインスタンスのキャッシュをクリアする
 				final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
-				final String key_prefix = String.format("%d_", hashCode);
+				final String key_prefix = String.format(Locale.US, "%d_", hashCode);
 				final Set<String> keys = snapshot.keySet();
 				for (final String key : keys) {
 					if (key.startsWith(key_prefix)) {
@@ -392,7 +393,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	}
 
 	private static String getKey(final long hashCode, final long id) {
-		return String.format("%d_%d", hashCode, id);
+		return String.format(Locale.US, "%d_%d", hashCode, id);
 	}
 
 	private static final Bitmap getImageThumbnail(final ContentResolver cr, final long hashCode, final long id, final int requestWidth, final int requestHeight)

@@ -29,6 +29,7 @@ import com.serenegiant.common.BuildConfig;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
+@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaEncoder implements IMediaCodec {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -154,10 +155,7 @@ public abstract class MediaEncoder implements IMediaCodec {
 	}
 
 	protected boolean callErrorHandler(final Exception e) {
-		if (mCallback != null) {
-			return mCallback.onError(this, e);
-		}
-		return false;
+		return mCallback != null && mCallback.onError(this, e);
 	}
 
 	protected void callOnPrepared() {
@@ -199,7 +197,6 @@ public abstract class MediaEncoder implements IMediaCodec {
 			}
 		}
 	}
-
 
 	private final Runnable mEncodeTask = new Runnable() {
 		/**

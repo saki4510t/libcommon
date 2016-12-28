@@ -22,8 +22,6 @@ import java.io.IOException;
 
 import android.view.Surface;
 
-import com.serenegiant.media.Encoder;
-
 public interface IRecorder {
 
 	public interface RecorderCallback {

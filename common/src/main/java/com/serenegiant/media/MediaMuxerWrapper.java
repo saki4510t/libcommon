@@ -21,12 +21,13 @@ package com.serenegiant.media;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import android.annotation.TargetApi;
 import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.os.Build;
 
-import com.serenegiant.media.IMuxer;
-
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerWrapper implements IMuxer {
 
 	private final MediaMuxer mMuxer;

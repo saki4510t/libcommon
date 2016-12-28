@@ -30,7 +30,9 @@ import android.view.Surface;
 import com.serenegiant.common.BuildConfig;
 
 import java.io.IOException;
+import java.util.Locale;
 
+@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaVideoEncoder extends MediaEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -96,7 +98,7 @@ public class MediaVideoEncoder extends MediaEncoder {
 
 	public void setVideoSize(final int width, final int height) throws IllegalArgumentException, IllegalStateException {
 		if (width <= 0 || height <= 0)
-			throw new IllegalArgumentException(String.format("size(%d,%d)", width, height));
+			throw new IllegalArgumentException(String.format(Locale.US, "size(%d,%d)", width, height));
 		if (isRunning())
 			throw new IllegalStateException("already start capturing");
 		mVideoWidth = width;
@@ -172,8 +174,7 @@ public class MediaVideoEncoder extends MediaEncoder {
 		for (int i = 0; i < caps.colorFormats.length; i++) {
 			colorFormat = caps.colorFormats[i];
 			if (isRecognizedViewFormat(colorFormat)) {
-				if (result == 0)
-					result = colorFormat;
+				result = colorFormat;
 				break;
 			}
 		}

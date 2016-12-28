@@ -40,6 +40,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@SuppressWarnings("deprecation")
+@SuppressLint("InlinedApi")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaMoviePlayer {
     private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること

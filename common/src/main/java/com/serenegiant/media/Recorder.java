@@ -470,12 +470,17 @@ public abstract class Recorder implements IRecorder {
    			sendEmptyMessage(MSG_SEND_QUIT);
     	}
 
+		@SuppressWarnings("ConstantConditions")
 		@Override
 		public final void handleMessage(final Message msg) {
-			final Recorder recorder = mThread.mWeakRecorder != null ? mThread.mWeakRecorder.get() : null;
+			final Recorder recorder = mThread.mWeakRecorder.get();
 			if (recorder == null) {
 //				Log.w(TAG, "unexpectedly recorder is null");
-				Looper.myLooper().quit();
+				try {
+					Looper.myLooper().quit();
+				} catch (final Exception e) {
+					// ignore
+				}
 				return;
 			}
 			switch (msg.what) {
@@ -490,7 +495,11 @@ public abstract class Recorder implements IRecorder {
             	}
 				break;
 			case MSG_SEND_QUIT:
-				Looper.myLooper().quit();
+				try {
+					Looper.myLooper().quit();
+				} catch (final Exception e) {
+					// ignore
+				}
 				break;
 			default:
 				super.handleMessage(msg);

@@ -181,7 +181,7 @@ public class AudioSampler extends IAudioSampler {
 		        try {
 		        	if (mIsCapturing) {
 //		        		if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
-		                int readBytes = 0;
+		                int readBytes;
 		                ByteBuffer buffer;
 		                audioRecord.startRecording();
 		                try {

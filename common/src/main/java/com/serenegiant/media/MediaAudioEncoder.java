@@ -34,6 +34,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaAudioEncoder extends MediaEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -200,10 +201,8 @@ public class MediaAudioEncoder extends MediaEncoder {
 			for (int j = 0; j < types.length; j++) {
 				if (DEBUG) Log.i(TAG, "supportedType:" + codecInfo.getName() + ",MIME=" + types[j]);
 				if (types[j].equalsIgnoreCase(mimeType)) {
-					if (result == null) {
-						result = codecInfo;
-						break LOOP;
-					}
+					result = codecInfo;
+					break LOOP;
 				}
 			}
 		}

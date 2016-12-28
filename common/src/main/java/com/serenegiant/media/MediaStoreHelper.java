@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
@@ -32,15 +33,18 @@ import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 
 import com.serenegiant.utils.ThreadPool;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.Locale;
 import java.util.concurrent.FutureTask;
 
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaStoreHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreHelper.class.getSimpleName();
@@ -141,7 +145,7 @@ public class MediaStoreHelper {
 			case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
 				return "playlist";
 			default:
-				return String.format("unknown:%d", mediaType);
+				return String.format(Locale.US, "unknown:%d", mediaType);
 			}
 		}
 	}
@@ -192,7 +196,7 @@ public class MediaStoreHelper {
 	    }
 
 	    @Override
-		public void draw(final Canvas canvas) {
+		public void draw(@NonNull final Canvas canvas) {
 	        final Rect bounds = getBounds();
 	        if (mBitmap != null) {
 	            canvas.save();
@@ -387,7 +391,7 @@ public class MediaStoreHelper {
 	}
 
 	protected static final Bitmap getImage(final ContentResolver cr, final long id, final int requestWidth, final int requestHeight)
-		throws FileNotFoundException, IOException {
+		throws IOException {
 
 		Bitmap result = null;
 		final ParcelFileDescriptor pfd = cr.openFileDescriptor(
