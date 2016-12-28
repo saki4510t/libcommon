@@ -1,4 +1,4 @@
-package com.serenegiant.video;
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -20,12 +20,12 @@ package com.serenegiant.video;
 
 import java.nio.ByteBuffer;
 
-public abstract class Encoder {
+public interface Encoder {
 	public abstract void prepare()  throws Exception;
 	public abstract void start();;
 	public abstract void stop();
-	public abstract void signalEndOfInputStream();
 	public abstract void release();
+	public abstract void signalEndOfInputStream();
 	public abstract void encode(final ByteBuffer buffer);
 	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
 	public abstract void frameAvailableSoon();

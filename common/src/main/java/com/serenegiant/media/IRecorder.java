@@ -22,6 +22,8 @@ import java.io.IOException;
 
 import android.view.Surface;
 
+import com.serenegiant.media.Encoder;
+
 public interface IRecorder {
 
 	public interface RecorderCallback {
@@ -83,9 +85,9 @@ public interface IRecorder {
 
 	public abstract Surface getInputSurface();
 
-	public abstract com.serenegiant.video.Encoder getVideoEncoder();
+	public abstract Encoder getVideoEncoder();
 
-	public abstract com.serenegiant.video.Encoder getAudioEncoder();
+	public abstract Encoder getAudioEncoder();
 
 	/**
 	 * Muxerが出力開始しているかどうかを返す
