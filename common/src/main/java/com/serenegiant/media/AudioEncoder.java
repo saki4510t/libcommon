@@ -34,7 +34,7 @@ public class AudioEncoder extends AbstractEncoder {
     protected final int mChannelCount;
 	protected final int mSampleRate;
 
-	public AudioEncoder(final Recorder recorder, final EncoderListener listener,
+	public AudioEncoder(final IRecorder recorder, final EncoderListener listener,
 						final int audio_source, final int audio_channels) {
 
 		super(AUDIO_MIME_TYPE, recorder, listener);

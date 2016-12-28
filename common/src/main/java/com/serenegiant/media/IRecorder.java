@@ -19,7 +19,10 @@ package com.serenegiant.media;
 */
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 
+import android.media.MediaCodec;
+import android.media.MediaFormat;
 import android.view.Surface;
 
 public interface IRecorder {
@@ -60,14 +63,14 @@ public interface IRecorder {
 	 */
 //	public static final int STATE_STOPPED = 6;
 
-	public abstract void setMuxer(IMuxer muxer);
+	public void setMuxer(final IMuxer muxer);
 
 	/**
 	 * Encoderの準備
 	 * 割り当てられているMediaEncoderの下位クラスのインスタンスの#prepareを呼び出す
 	 * @throws IOException
 	 */
-	public abstract void prepare();
+	public void prepare();
 
 	/**
 	 * キャプチャ開始要求
@@ -79,49 +82,55 @@ public interface IRecorder {
 	 * キャプチャ終了要求
 	 * 割り当てられているEncoderの下位クラスの#stopRecordingを呼び出す
 	 */
-	public abstract void stopRecording();
+	public void stopRecording();
 
-	public abstract Surface getInputSurface();
+	public Surface getInputSurface();
 
-	public abstract Encoder getVideoEncoder();
+	public Encoder getVideoEncoder();
 
-	public abstract Encoder getAudioEncoder();
+	public Encoder getAudioEncoder();
 
 	/**
 	 * Muxerが出力開始しているかどうかを返す
 	 * @return
 	 */
-	public abstract boolean isStarted();
+	public boolean isStarted();
 
 	/**
 	 * エンコーダーの初期化が終わって書き込み可能になったかどうかを返す
 	 * @return
 	 */
-	public abstract boolean isReady();
+	public boolean isReady();
 
 	/**
 	 * 終了処理中かどうかを返す
 	 * @return
 	 */
-	public abstract boolean isStopping();
+	public boolean isStopping();
 
 	/**
 	 * 終了したかどうかを返す
 	 * @return
 	 */
-	public abstract boolean isStopped();
+	public boolean isStopped();
 
-	public abstract int getState();
+	public int getState();
 
-	public abstract IMuxer getMuxer();
+	public IMuxer getMuxer();
 
-	public abstract String getOutputPath();
+	public String getOutputPath();
 
-	public abstract void frameAvailableSoon();
+	public void frameAvailableSoon();
 
 	/**
 	 * 関連するリソースを開放する
 	 */
-	public abstract void release();
+	public void release();
 
+	public void addEncoder(final Encoder encoder);
+	public void removeEncoder(final Encoder encoder);
+	public boolean start(final Encoder encoder);
+	public void stop(final Encoder encoder);
+	public int addTrack(final Encoder encoder, final MediaFormat format);
+	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
 }

@@ -36,12 +36,12 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder {
 	protected int mSampleRate;
     protected int mBitRate;
 
-	public AbstractAudioEncoder(final Recorder recorder, final EncoderListener listener,
+	public AbstractAudioEncoder(final IRecorder recorder, final EncoderListener listener,
 								final int audio_source, final int audio_channels) {
 		this(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 	}
 
-	public AbstractAudioEncoder(final Recorder recorder, final EncoderListener listener,
+	public AbstractAudioEncoder(final IRecorder recorder, final EncoderListener listener,
 		final int audio_source, final int audio_channels, final int sample_rate, final int bit_rate) {
 
 		super(AUDIO_MIME_TYPE, recorder, listener);

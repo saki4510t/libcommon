@@ -32,7 +32,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder {
 
 	protected Surface mInputSurface;
 
-    public SurfaceEncoder(final Recorder recorder, final EncoderListener listener) {
+    public SurfaceEncoder(final IRecorder recorder, final EncoderListener listener) {
 		super(MIME_AVC, recorder, listener);
     }
 

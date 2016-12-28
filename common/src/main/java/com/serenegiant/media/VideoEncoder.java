@@ -52,8 +52,8 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 //	private final WeakReference<AbstractUVCCamera>mCamera;
     private final boolean mAlign16;
 
-	public VideoEncoder(final Recorder muxer, final EncoderListener listener, /*final AbstractUVCCamera camera,*/ final boolean align16) {
-		super(MIME_AVC, muxer, listener);
+	public VideoEncoder(final Recorder recorder, final EncoderListener listener, /*final AbstractUVCCamera camera,*/ final boolean align16) {
+		super(MIME_AVC, recorder, listener);
 //		if (DEBUG) Log.i(TAG, "コンストラクタ:");
 		mAlign16 = align16;
 //		mCamera = new WeakReference<AbstractUVCCamera>(camera);
@@ -146,7 +146,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してMuxerをスタートさせる
 	 */
 	@Override
-	public synchronized boolean startRecorder(final Recorder recorder, final MediaFormat outFormat) {
+	public synchronized boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
 //		if (DEBUG) Log.i(TAG, "startRecorder:outFormat=" + outFormat);
         // MediaCodecがセットした実際の高さ・幅に調整し直す
 		int w, h;

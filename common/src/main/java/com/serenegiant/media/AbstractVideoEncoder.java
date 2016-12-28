@@ -128,7 +128,7 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder {
     protected int mColorFormat;
     protected int mWidth, mHeight;
 
-    public AbstractVideoEncoder(final String mime, final Recorder recorder, final EncoderListener listener) {
+    public AbstractVideoEncoder(final String mime, final IRecorder recorder, final EncoderListener listener) {
 		super(mime, recorder, listener);
     }
 

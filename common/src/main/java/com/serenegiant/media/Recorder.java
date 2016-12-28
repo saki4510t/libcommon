@@ -221,7 +221,8 @@ public abstract class Recorder implements IRecorder {
 	 * 同じRecorderに対して映像用・音声用をそれぞれ最大１つしか設定できない
 	 * @param encoder
 	 */
-	public  synchronized void addEncoder(final Encoder encoder) {
+	@Override
+	public synchronized void addEncoder(final Encoder encoder) {
 //		if (DEBUG) Log.v(TAG, "addEncoder:encoder=" + encoder);
 		// ここの例外に引っかかるのはプログラムミス
 		synchronized (this) {
@@ -245,7 +246,8 @@ public abstract class Recorder implements IRecorder {
 	 * Encoderの下位クラスから呼び出される
 	 * @param encoder
 	 */
-	public  synchronized void removeEncoder(final Encoder encoder) {
+	@Override
+	public synchronized void removeEncoder(final Encoder encoder) {
 		if ((encoder instanceof VideoEncoder) || (encoder instanceof SurfaceEncoder)) {
 			mVideoEncoder = null;
 			mVideoStarted = false;
@@ -262,7 +264,8 @@ public abstract class Recorder implements IRecorder {
 	 * 複数のエンコーダー使用時には開始するまでブロックする
 	 * @return true Muxerがstartしている
 	 */
-	public  synchronized boolean start(final Encoder encoder) {
+	@Override
+	public synchronized boolean start(final Encoder encoder) {
 //		if (DEBUG) Log.v(TAG,  "start:mEncoderCount=" + mEncoderCount + ",mStartedCount=" + mStartedCount);
 		if (mState != STATE_STARTING)
 			throw new IllegalStateException("muxer has not prepared:state=");
@@ -299,7 +302,8 @@ public abstract class Recorder implements IRecorder {
 	/**
 	 * Muxerを停止させる。複数のエンコーダーが動作している時は最後の１個から呼び出された時に実際にstopさせる
 	 */
-	public  synchronized void stop(final Encoder encoder) {
+	@Override
+	public synchronized void stop(final Encoder encoder) {
 //		if (DEBUG) Log.v(TAG,  "stop:mState=" + mState + ", mEncoderCount=" + mEncoderCount + ",mStartedCount=" + mStartedCount);
 		if (encoder.equals(mVideoEncoder)) {
 			if (mVideoStarted) {
@@ -331,7 +335,8 @@ public abstract class Recorder implements IRecorder {
 	 * @return
 	 * @throws Exception
 	 */
-	public  synchronized int addTrack(final Encoder encoder, final MediaFormat format) {
+	@Override
+	public synchronized int addTrack(final Encoder encoder, final MediaFormat format) {
 //		if (DEBUG) Log.i(TAG, "addTrack:");
 		int trackIx;
 		try {
@@ -353,7 +358,8 @@ public abstract class Recorder implements IRecorder {
 	 * @param byteBuf
 	 * @param bufferInfo
 	 */
-	public  void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+	@Override
+	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
 		try {
 			if (mStartedCount > 0) {
 				mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);

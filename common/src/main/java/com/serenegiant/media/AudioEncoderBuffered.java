@@ -34,7 +34,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	protected final LinkedBlockingQueue<AudioData> mPool = new LinkedBlockingQueue<AudioData>(MAX_POOL_SIZE);
 	protected final LinkedBlockingQueue<AudioData> mAudioQueue = new LinkedBlockingQueue<AudioData>(MAX_QUEUE_SIZE);
 
-	public AudioEncoderBuffered(final Recorder recorder, final EncoderListener listener,
+	public AudioEncoderBuffered(final IRecorder recorder, final EncoderListener listener,
 								final int audio_source, final int audio_channels) {
 		super(recorder, listener, audio_source, audio_channels);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");

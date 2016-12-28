@@ -60,7 +60,7 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
     /**
      * Recorderオブジェクトへの参照
      */
-    private Recorder mRecorder;
+    private IRecorder mRecorder;
     /**
      * フラグの排他制御用
      */
@@ -91,7 +91,7 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
 	}
 
 //********************************************************************************
-    public AbstractEncoder(final String mime_type, final Recorder recorder, final EncoderListener listener) {
+    public AbstractEncoder(final String mime_type, final IRecorder recorder, final EncoderListener listener) {
     	if (listener == null) throw new NullPointerException("EncodeListener is null");
     	if (recorder == null) throw new NullPointerException("IMuxer is null");
     	MIME_TYPE = mime_type;
@@ -376,7 +376,7 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
     		return;
     	}
         int encoderStatus, count = 0;
-        final Recorder recorder = mRecorder;
+        final IRecorder recorder = mRecorder;
         if (recorder == null) {
 //        	throw new NullPointerException("muxer is unexpectedly null");
 //        	Log.w(TAG, "muxer is unexpectedly null");
@@ -479,7 +479,7 @@ LOOP:	while (mIsCapturing) {
 	/**
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる
 	 */
-	public boolean startRecorder(final Recorder recorder, final MediaFormat outFormat) {
+	public boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
 //		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat);
        	mTrackIndex = recorder.addTrack(this, outFormat);
        	if (mTrackIndex >= 0) {

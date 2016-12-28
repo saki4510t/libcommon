@@ -34,7 +34,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	private final IAudioSampler mSampler;
 	private int frame_count = 0;
 
-	public AudioSamplerEncoder(final Recorder recorder, final EncoderListener listener,
+	public AudioSamplerEncoder(final IRecorder recorder, final EncoderListener listener,
 							   final int audio_source, IAudioSampler sampler) {
 		super(recorder, listener, audio_source,
 			sampler != null ? sampler.getChannels() : 1,
