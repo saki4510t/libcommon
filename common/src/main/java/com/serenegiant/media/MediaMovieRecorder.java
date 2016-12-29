@@ -42,13 +42,13 @@ public class MediaMovieRecorder extends AbstractRecorder {
 		public void onStop(MediaMovieRecorder recorder);
 	}
 
-	private final MediaMuxer mMediaMuxer;	// API >= 18
+	private final IMuxer mMuxer;
 	private IRecorderCallback mRecorderCallback;
 	private final boolean hasAudioEncoder;
 
 	public MediaMovieRecorder(final String output_path, final boolean audio_recording) throws IOException {
 		super(output_path);
-		mMediaMuxer = new MediaMuxer(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+		mMuxer = new MediaMuxerWrapper(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);	// API >= 18
 		new MediaVideoEncoder(this, mMediaCodecCallback);
 		if (audio_recording) {
 			new MediaAudioEncoder(this, mMediaCodecCallback);
@@ -86,21 +86,21 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	@Override
 	protected void internal_start() {
 		if (DEBUG) Log.v(TAG, "internal_start:");
-		mMediaMuxer.start();
+		mMuxer.start();
 	}
 
 	@Override
 	protected void internal_stop() {
 		if (DEBUG) Log.v(TAG, "internal_stop:");
-		mMediaMuxer.stop();
-		mMediaMuxer.release();
+		mMuxer.stop();
+		mMuxer.release();
 	}
 
 	@Override
 	int addTrack(final MediaFormat format) {
 		if (mIsStarted)
 			throw new IllegalStateException("muxer already started");
-		final int trackIx = mMediaMuxer.addTrack(format);
+		final int trackIx = mMuxer.addTrack(format);
 		if (DEBUG) Log.i(TAG, "addTrack:trackNum=" + mEncoderCount + ",trackIx=" + trackIx + ",format=" + format);
 		return trackIx;
 	}
@@ -108,7 +108,7 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	@Override
 	void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
 		if (mIsStarted)
-			mMediaMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
+			mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 	}
 
 	private final IMediaCodecCallback mMediaCodecCallback = new IMediaCodecCallback() {
