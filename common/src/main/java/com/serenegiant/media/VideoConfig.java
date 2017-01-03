@@ -93,8 +93,30 @@ public class VideoConfig {
 	 * @return
 	 */
 	public static int getBitrate(final int width, final int height) {
-		final int captureFps =  getCaptureFps();
-		int r = (int)(Math.floor(BPP * captureFps * width * height / 1000 / 100) * 100) * 1000;
+		return getBitrate(width, height, getCaptureFps(), BPP);
+	}
+
+	/**
+	 * ビットレートを計算[bps]
+	 * @param width
+	 * @param height
+	 * @param frameRate
+	 * @return
+	 */
+	public static int getBitrate(final int width, final int height, final int frameRate) {
+		return getBitrate(width, height, frameRate, BPP);
+	}
+
+	/**
+	 * ビットレートを計算[bps]
+	 * @param width
+	 * @param height
+	 * @param frameRate
+	 * @param bpp
+	 * @return
+	 */
+	public static int getBitrate(final int width, final int height, final int frameRate, final float bpp) {
+		int r = (int)(Math.floor(bpp * frameRate * width * height / 1000 / 100) * 100) * 1000;
 		if (r < 200000) r = 200000;
 		else if (r > 14000000) r = 14000000;
 //		Log.d(TAG, String.format("bitrate=%d[kbps]", r / 1024));
@@ -134,14 +156,14 @@ public class VideoConfig {
 	}
 
 	/**
-	 * ファイルサイズを計算[バイト/分]
+	 * 概略ファイルサイズを計算[バイト/分]
 	 * @param width
 	 * @param height
 	 * @return
 	 */
 	public static int getSizeRate(final int width, final int height) {
 		final int bitrate = getBitrate(width, height);
-		return bitrate * 60 / 8;	// bytes/sec
+		return bitrate * 60 / 8;	// bits/sec -> bytes/min
 	}
 
 }
