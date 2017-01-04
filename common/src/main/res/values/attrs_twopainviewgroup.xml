@@ -9,6 +9,8 @@
 			<enum name="split" value="0"/>
 			<enum name="select1" value="1"/>
 			<enum name="select2" value="2"/>
+			<enum name="single1" value="3"/>
+			<enum name="single2" value="4"/>
 		</attr>
 		<attr name="enableSubWindow" default="true" format="boolean">
 		</attr>

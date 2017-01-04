@@ -39,13 +39,21 @@ public class TwoPainViewGroup extends FrameLayout {
 	 */
 	public static final int MODE_SPLIT = 0x00;
 	/**
-	 * 左Viewを全画面で表示
+	 * 左Viewを全画面で表示, 右Viewは小さく表示
 	 */
 	public static final int MODE_SELECT_1 = 0x01;
 	/**
-	 * 右Viewを全画面で表示
+	 * 右Viewを全画面で表示, 左Viewは小さく表示
 	 */
 	public static final int MODE_SELECT_2 = 0x02;
+	/**
+	 * 左Viewを全画面で表示, 右Viewは非表示
+	 */
+	public static final int MODE_SINGLE_1 = 0x03;
+	/**
+	 * 右Viewを全画面で表示, 左Viewは非表示
+	 */
+	public static final int MODE_SINGLE_2 = 0x04;
 
 	private static final int DEFAULT_WIDTH = 200;
 	private static final int DEFAULT_HEIGHT = 200;
@@ -315,9 +323,9 @@ public class TwoPainViewGroup extends FrameLayout {
 			final View child = getChildAt(i);
 			if (child.getVisibility() != GONE) {
 				measureChildWithMargins(child, childWidthSpec, 0, childHeightSpec, 0);
-				if (((mDisplayMode == MODE_SPLIT)
-					|| (mDisplayMode == MODE_SELECT_1) && (child == mChild1))
-					|| ((mDisplayMode == MODE_SELECT_2) && (child == mChild2))) {
+				if ((mDisplayMode == MODE_SPLIT)
+					|| (((mDisplayMode == MODE_SELECT_1) || (mDisplayMode == MODE_SINGLE_1)) && (child == mChild1))
+					|| (((mDisplayMode == MODE_SELECT_2) || (mDisplayMode == MODE_SINGLE_1)) && (child == mChild2)) ) {
 
 					final MarginLayoutParams lp = (MarginLayoutParams)child.getLayoutParams();
 					maxWidth = Math.max(maxWidth,
@@ -378,9 +386,11 @@ public class TwoPainViewGroup extends FrameLayout {
 			// 子Viewが2個ある時
 			switch (mDisplayMode) {
 			case MODE_SELECT_1:
+			case MODE_SINGLE_1:
 				onMeasureSelect1(maxChildWidth, maxChildHeight, widthMeasureSpec, heightMeasureSpec);
 				break;
 			case MODE_SELECT_2:
+			case MODE_SINGLE_2:
 				onMeasureSelect2(maxChildWidth, maxChildHeight, widthMeasureSpec, heightMeasureSpec);
 				break;
 //			case MODE_SPLIT:
@@ -513,9 +523,11 @@ public class TwoPainViewGroup extends FrameLayout {
 			// 子Viewが2個ある時
 			switch (mDisplayMode) {
 			case MODE_SELECT_1:
+			case MODE_SINGLE_1:
 				onLayoutSelect1(changed, _left, _top, _right, _bottom);
 				break;
 			case MODE_SELECT_2:
+			case MODE_SINGLE_2:
 				onLayoutSelect2(changed, _left, _top, _right, _bottom);
 				break;
 //			case MODE_SPLIT:
@@ -709,15 +721,17 @@ public class TwoPainViewGroup extends FrameLayout {
 		try {
 			switch (mDisplayMode) {
 			case MODE_SELECT_1:
+			case MODE_SINGLE_1:
 				removeView(ch1);
 				addView(ch1, 0);
 				ch1.setVisibility(VISIBLE);
-				ch2.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
+				ch2.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_1) ? VISIBLE: INVISIBLE);
 				break;
 			case MODE_SELECT_2:
+			case MODE_SINGLE_2:
 				removeView(ch2);
 				addView(ch2, 0);
-				ch1.setVisibility(mEnableSubWindow ? VISIBLE: INVISIBLE);
+				ch1.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_2) ? VISIBLE: INVISIBLE);
 				ch2.setVisibility(VISIBLE);
 				break;
 			case MODE_SPLIT:
