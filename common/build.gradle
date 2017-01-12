@@ -29,7 +29,7 @@ android {
     defaultConfig {
         minSdkVersion 14
         targetSdkVersion versionTarget
-        versionCode versionCondeNum
+        versionCode versionCodeNum
         versionName versionNameString
         buildConfigField "String", "STL_NAME", "\"${project.property("STL_NAME")}\""
     }
