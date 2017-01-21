@@ -107,7 +107,11 @@ public class GyroHelper {
 	public void stop() {
 		synchronized (mSync) {
 			if (mRegistered && (mSensorManager != null)) {
-				mSensorManager.unregisterListener(mSensorEventListener);
+				try {
+					mSensorManager.unregisterListener(mSensorEventListener);
+				} catch (final Exception e) {
+					// ignore
+				}
 			}
 			mRegistered = false;
 		}

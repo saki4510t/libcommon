@@ -340,7 +340,7 @@ public class BluetoothManager {
 		try {
 			getContext().unregisterReceiver(mBroadcastReceiver);
 		} catch (final Exception e) {
-			Log.w(TAG, e);
+			// ignore
 		}
 	}
 

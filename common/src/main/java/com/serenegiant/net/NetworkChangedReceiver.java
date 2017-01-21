@@ -187,7 +187,11 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 		synchronized (sSync) {
 			if ((context != null) && (receiver != null)) {
 				sGlobalReceiverNum--;
-				context.unregisterReceiver(receiver);
+				try {
+					context.unregisterReceiver(receiver);
+				} catch (final Exception e) {
+					// ignore
+				}
 			}
 		}
 	}
@@ -240,7 +244,11 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	public static void unregisterLocal(final Context context, final NetworkChangedReceiver receiver) {
 		if (DEBUG) Log.v(TAG, "unregisterLocal:");
 		final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
-		broadcastManager.unregisterReceiver(receiver);
+		try {
+			broadcastManager.unregisterReceiver(receiver);
+		} catch (final Exception e) {
+			// ignore
+		}
 	}
 
 //================================================================================
