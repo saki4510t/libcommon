@@ -127,16 +127,32 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder {
 
     protected int mColorFormat;
     protected int mWidth, mHeight;
+    protected int mBitRate = -1;
+	protected int mFramerate = -1;
+    protected int mIFrameIntervals = -1;
 
     public AbstractVideoEncoder(final String mime, final IRecorder recorder, final EncoderListener listener) {
 		super(mime, recorder, listener);
     }
 
+	/**
+	 * 動画サイズをセット
+	 * ビットレートもサイズとVideoConfigの設定値に合わせて変更される
+	 * @param width
+	 * @param height
+	 */
     public void setVideoSize(final int width, final int height) {
 //    	Log.d(TAG, String.format("setVideoSize(%d,%d)", width, height));
     	mWidth = width;
     	mHeight = height;
+		mBitRate = VideoConfig.getBitrate(width, height);
     }
+
+	public void setVideoConfig(final int bitRate, final int frameRate, final int iFrameIntervals) {
+		mBitRate = bitRate;
+		mFramerate = frameRate;
+		mIFrameIntervals = iFrameIntervals;
+	}
 
     public int getWidth() {
     	return mWidth;

@@ -88,9 +88,9 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         // MediaCodecに適用するパラメータを設定する。
         // 誤った設定をするとMediaCodec#configureが復帰不可能な例外を生成する
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mColorFormat);	// API >= 16
-        format.setInteger(MediaFormat.KEY_BIT_RATE, VideoConfig.getBitrate(mWidth, mHeight));
-        format.setInteger(MediaFormat.KEY_FRAME_RATE, VideoConfig.captureFps);
-        format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, VideoConfig.getIFrame());
+		format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate > 0 ? mBitRate : VideoConfig.getBitrate(mWidth, mHeight));
+		format.setInteger(MediaFormat.KEY_FRAME_RATE, mFramerate > 0 ? mFramerate : VideoConfig.captureFps);
+		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, mIFrameIntervals > 0 ? mIFrameIntervals : VideoConfig.getIFrame());
 //		format.setInteger(MediaFormat.KEY_WIDTH, currentConfig.width);
 //		format.setInteger(MediaFormat.KEY_HEIGHT, currentConfig.height);
 //		if (DEBUG) Log.i(TAG, "format: " + format);
