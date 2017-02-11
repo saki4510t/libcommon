@@ -43,6 +43,7 @@
     <color name="TRANSPARENT">#00000000</color>
     <color name="BLACK">#ff000000</color>
     <color name="ALICEBLUE">#fff0f8ff</color>
+    <color name="HALF_CLEAR_ALICEBLUE">#7ff0f8ff</color>
     <color name="DARKCYAN">#ff008b8b</color>
     <color name="LIGHTYELLOW">#ffffffe0</color>
     <color name="CORAL">#ffff7f50</color>

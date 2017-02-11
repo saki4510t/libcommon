@@ -88,7 +88,7 @@ public abstract class MessageTask implements Runnable {
 	private final int mMaxRequest;
 	private final LinkedBlockingQueue<Request> mRequestPool;	// FIXME これはArrayListにした方が速いかも
 	private final LinkedBlockingDeque<Request> mRequestQueue;
-	private boolean mIsRunning, mFinished;
+	private volatile boolean mIsRunning, mFinished;
 	private Thread mWorkerThread;
 
 	/**
@@ -140,7 +140,8 @@ public abstract class MessageTask implements Runnable {
 	 */
 	protected void init(final int arg1, final int arg2, final Object obj) {
 		mFinished = false;
-		offer(REQUEST_TASK_START, arg1, arg2, obj);
+		mRequestQueue.offer(obtain(REQUEST_TASK_START, arg1, arg2, obj));
+//		offer(REQUEST_TASK_START, arg1, arg2, obj);
 	}
 
 	/** 初期化処理 */
@@ -149,10 +150,10 @@ public abstract class MessageTask implements Runnable {
 	/** 要求処理ループ開始直前に呼ばれる */
 	protected abstract void onStart();
 
-	/** onStopの直前に呼び出される */
+	/** onStopの直前に呼び出される, interruptされた時は呼び出されない */
 	protected void onBeforeStop() {}
 
-	/** 停止処理 */
+	/** 停止処理, interruptされた時は呼び出されない */
 	protected abstract void onStop();
 
 	/** onStop後に呼び出される。onStopで例外発生しても呼ばれる */
@@ -218,8 +219,8 @@ public abstract class MessageTask implements Runnable {
 					mIsRunning = false;
 					mFinished = true;
 				}
-				mSync.notifyAll();
 			}
+			mSync.notifyAll();
 		}
 		if (mIsRunning) {
 			try {
@@ -278,21 +279,24 @@ LOOP:	for (; mIsRunning; ) {
 				break;
 			}
 		}
+		final boolean interrupted = Thread.interrupted();
 		synchronized (mSync) {
 			mWorkerThread = null;
 			mIsRunning = false;
 			mFinished = true;
 		}
-		try {
-			onBeforeStop();
-			onStop();
-		} catch (final Exception e) {
-			callOnError(e);
+		if (!interrupted) {
+			try {
+				onBeforeStop();
+				onStop();
+			} catch (final Exception e) {
+				callOnError(e);
+			}
 		}
 		try {
 			onRelease();
 		} catch (final Exception e) {
-			callOnError(e);
+			// callOnError(e);
 		}
 		synchronized (mSync) {
 			mSync.notifyAll();
@@ -367,7 +371,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final int arg1, final int arg2) {
-		return !mFinished && mRequestQueue.offer(obtain(request, arg1, arg2, null));
+		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, arg1, arg2, null));
 	}
 
 	/**
@@ -377,7 +381,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final int arg1) {
-		return mRequestQueue.offer(obtain(request, arg1, 0, null));
+		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, arg1, 0, null));
 	}
 
 	/**
@@ -386,7 +390,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request) {
-		return !mFinished && mRequestQueue.offer(obtain(request, 0, 0, null));
+		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, 0, 0, null));
 	}
 
 	/**
@@ -396,7 +400,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final Object obj) {
-		return !mFinished && mRequestQueue.offer(obtain(request, 0, 0, obj));
+		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, 0, 0, obj));
 	}
 
 	/**
@@ -406,7 +410,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param arg2
 	 */
 	public boolean offerFirst(final int request, final int arg1, final int arg2, final Object obj) {
-		return !mFinished && mRequestQueue.offerFirst(obtain(request, arg1, arg2, obj));
+		return !mFinished && mIsRunning && mRequestQueue.offerFirst(obtain(request, arg1, arg2, obj));
 	}
 
 	/**
@@ -451,6 +455,7 @@ LOOP:	for (; mIsRunning; ) {
 
 	public void removeRequest(final Request request) {
 		for (final Request req: mRequestQueue) {
+			if (!mIsRunning || mFinished) break;
 			if (req.equals(request)) {
 				mRequestQueue.remove(req);
 				mRequestPool.offer(req);
@@ -460,6 +465,7 @@ LOOP:	for (; mIsRunning; ) {
 
 	public void removeRequest(final int request) {
 		for (final Request req: mRequestQueue) {
+			if (!mIsRunning || mFinished) break;
 			if (req.request == request) {
 				mRequestQueue.remove(req);
 				mRequestPool.offer(req);
@@ -479,18 +485,27 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param interrupt trueなら実行中のタスクをinterruptする
 	 */
 	public void release(final boolean interrupt) {
-		mRequestQueue.clear();
-		synchronized (mSync) {
-			if (mIsRunning) {
-				mIsRunning = false;
-				mRequestQueue.offerFirst(obtain(REQUEST_TASK_QUIT, 0, 0, null));
-				if (interrupt && (mWorkerThread != null)) {
-					mWorkerThread.interrupt();
-				}
-				try {
-					mSync.wait();
-				} catch (final InterruptedException e) {
-					// ignore
+		final boolean b = mIsRunning;
+		mIsRunning = false;
+		if (!mFinished) {
+			mRequestQueue.clear();
+			mRequestQueue.offerFirst(obtain(REQUEST_TASK_QUIT, 0, 0, null));
+			synchronized (mSync) {
+				if (b) {
+					final long current = Thread.currentThread().getId();
+					final long id = mWorkerThread != null ? mWorkerThread.getId() : current;
+					if (id != current) {
+						if (interrupt && (mWorkerThread != null)) {
+							mWorkerThread.interrupt();
+						}
+						for ( ; !mFinished ; ) {
+							try {
+								mSync.wait(300);
+							} catch (final InterruptedException e) {
+								// ignore
+							}
+						}
+					}
 				}
 			}
 		}
@@ -500,12 +515,10 @@ LOOP:	for (; mIsRunning; ) {
 	 * 実行中のタスクが終了後開放する
 	 */
 	public void releaseSelf() {
-		mRequestQueue.clear();
-		synchronized (mSync) {
-			if (mIsRunning) {
-				mIsRunning = false;
-				mRequestQueue.offerFirst(obtain(REQUEST_TASK_QUIT, 0, 0, null));
-			}
+		mIsRunning = false;
+		if (!mFinished) {
+			mRequestQueue.clear();
+			mRequestQueue.offerFirst(obtain(REQUEST_TASK_QUIT, 0, 0, null));
 		}
 	}
 
