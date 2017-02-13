@@ -33,7 +33,7 @@ import java.nio.ByteOrder;
 @SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaReaper implements Runnable {
-	private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaReaper.class.getSimpleName();
 
 	public static final int REAPER_VIDEO = 0;
