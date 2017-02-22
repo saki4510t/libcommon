@@ -18,23 +18,32 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
-import android.media.MediaFormat;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.MediaInfo;
 
-import java.io.IOException;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaCodecHelper {
+	private static final String TAG = MediaCodecHelper.class.getSimpleName();
+
 	public static final String MIME_AVC = "video/avc";
+	@SuppressWarnings("deprecation")
+	@SuppressLint("InlinedApi")
+	public static final int BUFFER_FLAG_KEY_FRAME
+		= BuildCheck.isLollipop() ? MediaCodec.BUFFER_FLAG_KEY_FRAME : MediaCodec.BUFFER_FLAG_SYNC_FRAME;
+	/** codec specific dataのスタートマーカー = AnnexBのスタートマーカーと同じ */
+	public static final byte[] START_MARKER = BufferHelper.ANNEXB_START_MARK;
 
 	/**
 	 * 非圧縮image/videoで使用可能なカラーフォーマット
@@ -234,6 +243,9 @@ public class MediaCodecHelper {
         return result;
     }
 
+	/**
+	 * コーデックの一覧をログに出力する
+	 */
 	public static final void dumpVideoCodecEncoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
@@ -246,7 +258,7 @@ public class MediaCodecHelper {
             // エンコーダーの一覧からMIMEが一致するものを選択する
             final String[] types = codecInfo.getSupportedTypes();
             for (int j = 0; j < types.length; j++) {
-//            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
+            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
             	// カラーフォーマットを出力する
             	selectColorFormat(codecInfo, types[j]);
             }
@@ -338,6 +350,12 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		return true;
 	}
 
+	/**
+	 * プロファイルレベルと文字列にする
+	 * @param mimeType
+	 * @param profileLevel
+	 * @return
+	 */
 	public static String getProfileLevelString(final String mimeType, final MediaCodecInfo.CodecProfileLevel profileLevel) {
 		String result = null;
 		if (mimeType.equalsIgnoreCase("video/avc")) {
@@ -498,44 +516,12 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	}
 
 	/**
-	 * codec specific dataの先頭マーカー
-	 */
-	protected static final byte[] START_MARK = { 0, 0, 0, 1, };
-
-	/**
-	 * byte[]を検索して一致する先頭インデックスを返す
-	 * @param array 検索されるbyte[]
-	 * @param search 検索するbyte[]
-	 * @param len 検索するバイト数
-	 * @return 一致した先頭位置、一致しなければ-1
-	 */
-	public static final int byteComp(@NonNull final byte[] array, final int offset, @NonNull final byte[] search, final int len) {
-		int index = -1;
-		final int n0 = array.length;
-		final int ns = search.length;
-		if ((n0 >= offset + len) && (ns >= len)) {
-			for (int i = offset; i < n0 - len; i++) {
-				int j = len - 1;
-				while (j >= 0) {
-					if (array[i + j] != search[j]) break;
-					j--;
-				}
-				if (j < 0) {
-					index = i;
-					break;
-				}
-			}
-		}
-		return index;
-	}
-
-	/**
 	 * codec specific dataの先頭マーカー位置を検索
 	 * @param array
 	 * @param offset
 	 * @return
 	 */
 	public static final int findStartMarker(@NonNull final byte[] array, final int offset) {
-		return byteComp(array, offset, START_MARK, START_MARK.length);
+		return BufferHelper.byteComp(array, offset, START_MARKER, START_MARKER.length);
 	}
 }
