@@ -46,7 +46,7 @@ public class UdpBeacon {
 	private static final Charset CHARSET = Charset.forName("UTF-8");
 
 	/**
-	 * ビーコン受信時のコールバック
+	 * ビーコン受信時のコールバック　FIXME extraを渡せるようにする
 	 */
 	public interface UdpBeaconCallback {
 		/**
@@ -68,37 +68,88 @@ public class UdpBeacon {
 	 * version     1 byte, %x01
 	 * UUID        16 bytes
 	 * port        2 bytes in network order = big endian = same as usual byte order of Java
+	 * extra len   1 byte, optional
+	 * extra       1-255 bytes, optional
 	 */
 	private static class Beacon {
 		public static final String BEACON_IDENTITY = "SAKI";
 
 		private final UUID uuid;
 		private final int listenPort;
+		private final int extraBytes;
+		private final ByteBuffer extras;
 		public Beacon(final ByteBuffer buffer) {
 			uuid = new UUID(buffer.getLong(), buffer.getLong());
 			final int port = buffer.getShort();
 			listenPort = port < 0 ? (0xffff) & port : port;
+			if (buffer.remaining() > 1) {
+				// length(1byte) + extra data(max 255 bytes)
+				extraBytes = buffer.get() & 0xff;
+				if (extraBytes > 0) {
+					extras = ByteBuffer.allocateDirect(extraBytes);
+					extras.put(buffer);
+					extras.flip();
+				} else {
+					extras = null;
+				}
+			} else {
+				extraBytes = 0;
+				extras = null;
+			}
 		}
 
 		public Beacon(final UUID uuid, final int port) {
+			this(uuid, port, 0);
+		}
+
+		public Beacon(final UUID uuid, final int port, final int extras) {
 			this.uuid = uuid;
 			listenPort = port;
+			extraBytes = extras & 0xff;
+			if (extraBytes > 0) {
+				this.extras = ByteBuffer.allocateDirect(extraBytes);
+			} else {
+				this.extras = null;
+			}
 		}
 
 		public byte[] asBytes() {
-			final byte[] bytes = new byte[BEACON_SIZE];
+			final byte[] bytes = new byte[BEACON_SIZE + (extraBytes > 0 ? extraBytes + 1 : 0)];
 			final ByteBuffer buffer = ByteBuffer.wrap(bytes);
 			buffer.put(BEACON_IDENTITY.getBytes());
 			buffer.put(BEACON_VERSION);
 			buffer.putLong(uuid.getMostSignificantBits());
 			buffer.putLong(uuid.getLeastSignificantBits());
 			buffer.putShort((short) listenPort);
+			if (extraBytes > 0) {
+				buffer.put((byte)extraBytes);
+				extras.clear();
+				extras.flip();
+				buffer.put(extras);
+			}
 			buffer.flip();
 			return bytes;
 		}
 
+		public ByteBuffer extra() {
+			return extras;
+		}
+
+		public void extra(final byte[] extra) {
+			extra(ByteBuffer.wrap(extra));
+		}
+
+		public void extra(final ByteBuffer extra) {
+			final int n = extra != null ? extra.remaining() : -1;
+			if ((extraBytes > 0) && (extraBytes <= n)) {
+				extras.clear();
+				extras.put(extra);
+				extras.flip();
+			}
+		}
+
 		public String toString() {
-			return String.format(Locale.US, "Beacon(%s,port=%d)", uuid.toString(), listenPort);
+			return String.format(Locale.US, "Beacon(%s,port=%d,extra=%d)", uuid.toString(), listenPort, extraBytes);
 		}
 	}
 
