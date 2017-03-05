@@ -32,7 +32,7 @@
     <color name="status_text">@color/WHITE</color>
     <color name="viewfinder_laser">#ffcc0000</color> <!-- Android standard ICS color -->
     <color name="viewfinder_mask">#60000000</color>
-    <!-- Web colors -->
+    <!-- transparent colors -->
     <color name="CLEAR">#00000000</color>
     <color name="HALF_CLEAR_WHITE">#7fffffff</color>
     <color name="QUATER_CLEAR_WHITE">#3fffffff</color>
@@ -41,6 +41,7 @@
 	<color name="HALF_CLEAR_GRAY">#7f808080</color>
 	<color name="QUATER_CLEAR_GRAY">#3f808080</color>
     <color name="TRANSPARENT">#00000000</color>
+    <!-- Web colors -->
     <color name="BLACK">#ff000000</color>
     <color name="ALICEBLUE">#fff0f8ff</color>
     <color name="HALF_CLEAR_ALICEBLUE">#7ff0f8ff</color>
