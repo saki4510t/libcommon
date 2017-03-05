@@ -28,7 +28,7 @@ import com.serenegiant.common.R;
  * This class exists purely to cancel long click events, that got
  * started in NumberPicker
  */
-final class ItemPickerButton extends ImageButton {
+public final class ItemPickerButton extends ImageButton {
 
     private ItemPicker mNumberPicker;
 
