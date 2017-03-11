@@ -104,13 +104,29 @@ public class BufferHelper {
 	}
 
 	/**
-	 * AnnexBのスタートマーカーを探してインデックスを返す
-	 * @param array
+	 * AnnexBのスタートマーカー(N[00] 00 00 01 (N ≧ 0))を探して先頭インデックスを返す
+	 * 返り値が0以上の場合は、返り値+3がpayloadの先頭位置(nalu headerのはず)
+	 * @param data
 	 * @param offset
 	 * @return 見つからなければ負
 	 */
-	public static final int findAnnexB(byte[] array, int offset) {
-		return byteComp(array, offset, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
+	public static final int findAnnexB(final byte[] data, final int offset) {
+		int result = -1;
+		if (data != null) {
+			final int len = data.length - 4;	// 本当はlength-3までだけどpayloadが無いのは無効とみなしてlength-4までとする
+			for (int i = offset; i < len; i++) {
+				// 最低2つは連続して0x00でないとだめ
+				if ((data[i] != 0x00) || (data[i+1] != 0x00)) {
+					continue;
+				}
+				// 3つ目が0x01ならOK
+				if (data[i+2] == 0x01) {
+					result = i;
+					break;
+				}
+			}
+		}
+		return result;
 	}
 
 	private static final int SIZEOF_FLOAT = 4;
