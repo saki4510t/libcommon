@@ -32,6 +32,8 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 
+import java.util.Locale;
+
 public final class SeekBarPreference extends Preference {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "BrightnessOffsetSeekBarPreference";
@@ -63,7 +65,7 @@ public final class SeekBarPreference extends Preference {
 		mLabelTvId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_label_id, 0);
 		mMinValue = attribs.getInt(R.styleable.SeekBarPreference_min_value, 0);
 		mMaxValue = attribs.getInt(R.styleable.SeekBarPreference_max_value, 100);
-		mDefaultValue = attribs.getInt(R.styleable.SeekBarPreference_default_value, 0);
+		mDefaultValue = attribs.getInt(R.styleable.SeekBarPreference_default_value, mMinValue);
 		mScaleValue = attribs.getFloat(R.styleable.SeekBarPreference_scale_value, 1.0f);
 		String fmt = attribs.getString(R.styleable.SeekBarPreference_value_format);
 		try {
@@ -173,7 +175,7 @@ public final class SeekBarPreference extends Preference {
 		try {
 			return String.format(mFmtStr, value * mScaleValue);
 		} catch (final Exception e) {
-			return String.format("%f", value * mScaleValue);
+			return String.format(Locale.US, "%f", value * mScaleValue);
 		}
 	}
 }
