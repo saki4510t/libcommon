@@ -60,9 +60,9 @@ public final class SeekBarPreference extends Preference {
 	public SeekBarPreference(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		TypedArray attribs = context.obtainStyledAttributes(attrs, R.styleable.SeekBarPreference, defStyle, 0);
-		mSeekbarLayoutId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_layout, 0);
-		mSeekbarId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_id, 0);
-		mLabelTvId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_label_id, 0);
+		mSeekbarLayoutId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_layout, R.layout.seekbar_preference);
+		mSeekbarId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_id, R.id.seekbar);
+		mLabelTvId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_label_id, R.id.seekbar_value_label);
 		mMinValue = attribs.getInt(R.styleable.SeekBarPreference_min_value, 0);
 		mMaxValue = attribs.getInt(R.styleable.SeekBarPreference_max_value, 100);
 		mDefaultValue = attribs.getInt(R.styleable.SeekBarPreference_default_value, mMinValue);
