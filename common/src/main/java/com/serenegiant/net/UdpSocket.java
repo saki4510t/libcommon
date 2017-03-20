@@ -92,8 +92,14 @@ public class UdpSocket {
 	public void release() {
 		if (channel != null) {
 			try {
+				try {
+					setSoTimeout(200);
+				} catch (final Exception e) {
+					// ignore
+				}
 				channel.close();
-			} catch (IOException e) {
+			} catch (final Exception e) {
+				// ignore
 			}
 		}
 		channel = null;
