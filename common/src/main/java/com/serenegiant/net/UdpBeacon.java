@@ -164,6 +164,7 @@ public class UdpBeacon {
 	private final UUID uuid;
 	private final byte[] beaconBytes;
 	private final long mBeaconIntervalsMs;
+	private final long mRcvMinIntervalsMs;
 	private Thread mBeaconThread;
 	private boolean mReceiveOnly;
 	private volatile boolean mIsRunning;
@@ -176,7 +177,7 @@ public class UdpBeacon {
 	 * @param callback
 	 */
 	public UdpBeacon(@Nullable final UdpBeaconCallback callback) {
-		this(callback, BEACON_UDP_PORT, DEFAULT_BEACON_SEND_INTERVALS_MS, false);
+		this(callback, BEACON_UDP_PORT, DEFAULT_BEACON_SEND_INTERVALS_MS, false, 0);
 	}
 
 	/**
@@ -186,7 +187,7 @@ public class UdpBeacon {
 	 * @param beacon_intervals_ms ビーコン送信周期[ミリ秒]
 	 */
 	public UdpBeacon(@Nullable final UdpBeaconCallback callback, final long beacon_intervals_ms) {
-		this(callback, BEACON_UDP_PORT, beacon_intervals_ms, false);
+		this(callback, BEACON_UDP_PORT, beacon_intervals_ms, false, 0);
 	}
 
 	/**
@@ -197,7 +198,22 @@ public class UdpBeacon {
 	 * @param receiveOnly ビーコンを送信せずに受信だけ行うかどうか, true:ビーコン送信しない
 	 */
 	public UdpBeacon(@Nullable final UdpBeaconCallback callback, final boolean receiveOnly) {
-		this(callback, BEACON_UDP_PORT, DEFAULT_BEACON_SEND_INTERVALS_MS, false);
+		this(callback, BEACON_UDP_PORT, DEFAULT_BEACON_SEND_INTERVALS_MS, false, 0);
+	}
+
+	/**
+	 * コンストラクタ
+	 * ビーコンポート番号は9999
+	 * ビーコン送信周期は3000ミリ秒
+	 * @param callback
+	 * @param receiveOnly ビーコンを送信せずに受信だけ行うかどうか, true:ビーコン送信しない
+	 * @param rcv_min_intervals_ms 最小受信間隔[ミリ秒]
+	 */
+	public UdpBeacon(@Nullable final UdpBeaconCallback callback,
+		final boolean receiveOnly, final long rcv_min_intervals_ms) {
+		
+		this(callback, BEACON_UDP_PORT, DEFAULT_BEACON_SEND_INTERVALS_MS,
+			false, rcv_min_intervals_ms);
 	}
 
 	/**
@@ -207,8 +223,26 @@ public class UdpBeacon {
 	 * @param beacon_intervals_ms
 	 * @param receiveOnly ビーコンを送信せずに受信だけ行うかどうか, true:ビーコン送信しない
 	 */
-	public UdpBeacon(@Nullable final UdpBeaconCallback callback, final long beacon_intervals_ms, final boolean receiveOnly) {
-		this(callback, BEACON_UDP_PORT, beacon_intervals_ms, receiveOnly);
+	public UdpBeacon(@Nullable final UdpBeaconCallback callback,
+		final long beacon_intervals_ms, final boolean receiveOnly) {
+		
+		this(callback, BEACON_UDP_PORT, beacon_intervals_ms, receiveOnly, 0);
+	}
+
+	/**
+	 * コンストラクタ
+	 * ビーコンポート番号は9999
+	 * @param callback
+	 * @param beacon_intervals_ms
+	 * @param receiveOnly ビーコンを送信せずに受信だけ行うかどうか, true:ビーコン送信しない
+	 * @param rcv_min_intervals_ms 最小受信間隔[ミリ秒]
+	 */
+	public UdpBeacon(@Nullable final UdpBeaconCallback callback,
+		final long beacon_intervals_ms, final boolean receiveOnly,
+		final long rcv_min_intervals_ms) {
+		
+		this(callback, BEACON_UDP_PORT, beacon_intervals_ms,
+			receiveOnly, rcv_min_intervals_ms);
 	}
 
 	/**
@@ -217,8 +251,12 @@ public class UdpBeacon {
 	 * @param port ビーコン用のポート番号
 	 * @param beacon_intervals_ms ビーコン送信周期[ミリ秒], receiveOnly=trueなら無効
 	 * @param receiveOnly ビーコンを送信せずに受信だけ行うかどうか, true:ビーコン送信しない
+	 * @param rcv_min_intervals_ms 最小受信間隔[ミリ秒]
 	 */
-	public UdpBeacon(@Nullable final UdpBeaconCallback callback, final int port, final long beacon_intervals_ms, final boolean receiveOnly) {
+	public UdpBeacon(@Nullable final UdpBeaconCallback callback, final int port,
+		final long beacon_intervals_ms, final boolean receiveOnly,
+		final long rcv_min_intervals_ms) {
+		
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (callback != null) {
 			mCallbacks.add(callback);
@@ -229,6 +267,7 @@ public class UdpBeacon {
 		beaconBytes = beacon.asBytes();
 		mBeaconIntervalsMs = beacon_intervals_ms;
 		mReceiveOnly = receiveOnly;
+		mRcvMinIntervalsMs = rcv_min_intervals_ms;
 	}
 
 	public void finalize() throws Throwable {
@@ -499,7 +538,17 @@ public class UdpBeacon {
 		public void run() {
 			final ByteBuffer buffer = ByteBuffer.allocateDirect(256);
 			final UdpSocket socket = mUdpSocket;
+			long next_rcv = SystemClock.elapsedRealtime();
 			for ( ; mIsRunning && !mReleased ; ) {
+				if (mRcvMinIntervalsMs > 0) {
+					final long t = next_rcv - SystemClock.elapsedRealtime();
+					if (t > 0) {
+						if (waitWithoutException(this, t)) {
+							break;
+						}
+					}
+					next_rcv = SystemClock.elapsedRealtime() + mRcvMinIntervalsMs;
+				}
 				// ゲスト端末からのブロードキャストを受け取る,
 				// 受け取るまでは待ち状態になる...けどタイムアウトで抜けてくる
 				try {
