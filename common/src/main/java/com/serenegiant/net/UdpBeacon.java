@@ -19,6 +19,8 @@ package com.serenegiant.net;
 */
 
 import android.os.Handler;
+import android.os.SystemClock;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -27,6 +29,7 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import java.io.IOException;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedChannelException;
 import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.UUID;
@@ -44,6 +47,8 @@ public class UdpBeacon {
 	public static final int BEACON_SIZE = 23;
 	private static final long DEFAULT_BEACON_SEND_INTERVALS_MS = 3000;
 	private static final Charset CHARSET = Charset.forName("UTF-8");
+	/** ソケットのタイムアウト[ミリ秒] */
+	private static final int SO_TIMEOUT_MS = 2000;
 
 	/**
 	 * ビーコン受信時のコールバック　FIXME extraを渡せるようにする
@@ -157,7 +162,6 @@ public class UdpBeacon {
 	private final CopyOnWriteArraySet<UdpBeaconCallback> mCallbacks = new CopyOnWriteArraySet<UdpBeaconCallback>();
 	private Handler mAsyncHandler;
 	private final UUID uuid;
-	private final Beacon beacon;
 	private final byte[] beaconBytes;
 	private final long mBeaconIntervalsMs;
 	private Thread mBeaconThread;
@@ -221,7 +225,7 @@ public class UdpBeacon {
 		}
 		mAsyncHandler = HandlerThreadHandler.createHandler("UdpBeaconAsync");
 		uuid = UUID.randomUUID();
-		beacon = new Beacon(uuid, port);
+		final Beacon beacon = new Beacon(uuid, port);
 		beaconBytes = beacon.asBytes();
 		mBeaconIntervalsMs = beacon_intervals_ms;
 		mReceiveOnly = receiveOnly;
@@ -385,7 +389,24 @@ public class UdpBeacon {
 			}
 		}
 	}
-
+	
+	/**
+	 * 例外生成せずに一定時間待機する
+	 * @param wait_time_ms
+	 * @return true: インターラプトされた時
+	 */
+	private boolean waitWithoutException(final Object sync, final long wait_time_ms) {
+		boolean result = false;
+		synchronized (sync) {
+			try {
+				sync.wait(wait_time_ms);
+			} catch (final InterruptedException e) {
+				result = true;
+			}
+		}
+		return result;
+	}
+	
 	private final class BeaconShotTask implements Runnable {
 		private final int shotNums;
 
@@ -397,18 +418,14 @@ public class UdpBeacon {
 		public void run() {
 			try {
 				final UdpSocket socket = new UdpSocket(BEACON_UDP_PORT);
-				socket.setReuseAddress(true);	// 他のソケットでも同じアドレスを利用可能にする
-				socket.setSoTimeout(200);		// タイムアウト200ミリ秒
+				socket.setReuseAddress(true);		// 他のソケットでも同じアドレスを利用可能にする
+				socket.setSoTimeout(SO_TIMEOUT_MS);	// タイムアウト
 				try {
 					for (int i = 0; i < shotNums; i++) {
 						if (mReleased) break;
 						sendBeacon(socket);
-						synchronized (mSync) {
-							try {
-								mSync.wait(mBeaconIntervalsMs);
-							} catch (final InterruptedException e) {
-								break;
-							}
+						if (waitWithoutException(this, mBeaconIntervalsMs)) {
+							break;
 						}
 					}
 				} finally {
@@ -418,8 +435,11 @@ public class UdpBeacon {
 				callOnError(e);
 			}
 		}
-	};
-
+	}
+	
+	/**
+	 * ビーコンの送信スレッド
+	 */
 	private final Runnable mBeaconTask = new Runnable() {
 		@Override
 		public void run() {
@@ -427,62 +447,36 @@ public class UdpBeacon {
 			try {
 				final UdpSocket socket = new UdpSocket(BEACON_UDP_PORT);
 				socket.setReceiveBufferSize(256);
-				socket.setReuseAddress(true);	// 他のソケットでも同じアドレスを利用可能にする
-				socket.setSoTimeout(200);		// タイムアウト200ミリ秒
-				long next_send = System.currentTimeMillis();
+				socket.setReuseAddress(true);		// 他のソケットでも同じアドレスを利用可能にする
+				socket.setSoTimeout(SO_TIMEOUT_MS);	// タイムアウト
+				final Thread rcvThread = new Thread(new ReceiverTask(socket));
+				rcvThread.start();
+				long next_send = SystemClock.elapsedRealtime();
 				try {
 					for ( ; mIsRunning && !mReleased ; ) {
-						// 受信のみでなければ指定時間毎にビーコン送信
-						if (!mReceiveOnly && (System.currentTimeMillis() >= next_send)) {
-							next_send = System.currentTimeMillis() + mBeaconIntervalsMs;
-							sendBeacon(socket);
-						}
-						// ゲスト端末からのブロードキャストを受け取る,
-						// 受け取るまでは待ち状態になる...けどタイムアウトで抜けてくる
-						try {
-							buffer.clear();
-							final int length = socket.receive(buffer);
-							if (!mIsRunning) break;
-							buffer.rewind();
-							if (length == BEACON_SIZE) {
-								if (buffer.get() != 'S'
-									|| buffer.get() != 'A'
-									|| buffer.get() != 'K'
-									|| buffer.get() != 'I'
-									|| buffer.get() != BEACON_VERSION) {
-									continue;
-								}
-								final Beacon remote_beacon = new Beacon(buffer);
-								if (!uuid.equals(remote_beacon.uuid)) {
-									// 自分のuuidと違う時
-									final String remoteAddr = socket.remote();
-									final int remotePort = socket.remotePort();
-									synchronized (mSync) {
-										if (mAsyncHandler == null) break;
-										mAsyncHandler.post(new Runnable() {
-											@Override
-											public void run() {
-												for (final UdpBeaconCallback callback: mCallbacks) {
-													try {
-														callback.onReceiveBeacon(remote_beacon.uuid, remoteAddr, remotePort);
-													} catch (final Exception e) {
-														mCallbacks.remove(callback);
-														Log.w(TAG, e);
-													}
-												}
-											}
-										});
-									}
-								}
+						if (!mReceiveOnly) {
+							// 受信のみでなければ指定時間毎にビーコン送信
+							final long t = next_send - SystemClock.elapsedRealtime();
+							if (!mReceiveOnly && (t <= 0)) {
+								next_send = SystemClock.elapsedRealtime() + mBeaconIntervalsMs;
+								sendBeacon(socket);
+							} else if (waitWithoutException(this, t)) {	// 残り時間を待機
+								break;
 							}
-						} catch (final IOException e) {
-							// タイムアウトで抜けてきた時, 無視する
+						} else if (waitWithoutException(this, SO_TIMEOUT_MS)) {	// ソケットタイムアウト時間待機
+							break;
 						}
 					}
 				} finally {
+					mIsRunning = false;
 					socket.release();
+					try {
+						rcvThread.interrupt();
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
 				}
-			} catch (final SocketException e) {
+			} catch (final Exception e) {
 				callOnError(e);
 			}
 			mIsRunning = false;
@@ -491,6 +485,73 @@ public class UdpBeacon {
 			}
 		}
 	};
+	
+	/**
+	 * ビーコンの受信スレッド
+	 */
+	private class ReceiverTask implements Runnable {
+		private final UdpSocket mUdpSocket;
+		private ReceiverTask(@NonNull final UdpSocket udpSocket) {
+			mUdpSocket = udpSocket;
+		}
+		
+		@Override
+		public void run() {
+			final ByteBuffer buffer = ByteBuffer.allocateDirect(256);
+			final UdpSocket socket = mUdpSocket;
+			for ( ; mIsRunning && !mReleased ; ) {
+				// ゲスト端末からのブロードキャストを受け取る,
+				// 受け取るまでは待ち状態になる...けどタイムアウトで抜けてくる
+				try {
+					buffer.clear();
+					final int length = socket.receive(buffer);
+					if (!mIsRunning) break;
+					buffer.rewind();
+					if (length == BEACON_SIZE) {
+						if (buffer.get() != 'S'
+							|| buffer.get() != 'A'
+							|| buffer.get() != 'K'
+							|| buffer.get() != 'I'
+							|| buffer.get() != BEACON_VERSION) {
+							continue;
+						}
+						final Beacon remote_beacon = new Beacon(buffer);
+						if (!uuid.equals(remote_beacon.uuid)) {
+							// 自分のuuidと違う時
+							final String remoteAddr = socket.remote();
+							final int remotePort = socket.remotePort();
+							synchronized (mSync) {
+								if (mAsyncHandler == null) break;
+								mAsyncHandler.post(new Runnable() {
+									@Override
+									public void run() {
+										for (final UdpBeaconCallback callback: mCallbacks) {
+											try {
+												callback.onReceiveBeacon(remote_beacon.uuid, remoteAddr, remotePort);
+											} catch (final Exception e) {
+												mCallbacks.remove(callback);
+												Log.w(TAG, e);
+											}
+										}
+									}
+								});
+							}
+						}
+					}
+				} catch (final ClosedChannelException e) {
+					// ソケットが閉じられた時
+					break;
+				} catch (final IOException e) {
+					// タイムアウトで抜けてきた時, 無視する
+				} catch (final IllegalStateException e) {
+					break;
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+					break;
+				}
+			}
+		}
+	}
 
 	/**
 	 * UDPでビーコンをブロードキャストする
