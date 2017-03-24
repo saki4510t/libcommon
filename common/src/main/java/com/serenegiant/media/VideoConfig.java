@@ -30,7 +30,7 @@ public class VideoConfig {
 	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
 	 */
 	private static float BPP = 0.25f;
-	public static final int FPS_MIN = 1;
+	public static final int FPS_MIN = 2;
 	public static final int FPS_MAX = 30;
 	/**
 	 * I-frame(単独で圧縮された単独再生可能な一番劣化の少ないキーフレーム)間の秒数@30fps
