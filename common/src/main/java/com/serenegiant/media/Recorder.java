@@ -91,7 +91,7 @@ public abstract class Recorder implements IRecorder {
 			if (mAudioEncoder != null)
 				mAudioEncoder.prepare();
 		} catch (final Exception e) {
-			Log.w(TAG, "prepare:", e);
+			callOnError(e);
 			return;
 		}
 		synchronized(this) {
