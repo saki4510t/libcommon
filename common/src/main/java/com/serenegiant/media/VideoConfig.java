@@ -29,7 +29,7 @@ public class VideoConfig {
 	 * BPP(Bits Per Pixel)
 	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
 	 */
-	public static float BPP = 0.25f;	// FIXME 可変にする
+	private static float BPP = 0.25f;
 	public static final int FPS_MIN = 1;
 	public static final int FPS_MAX = 30;
 	/**
@@ -46,7 +46,7 @@ public class VideoConfig {
 	/**
 	 * エンコード時のFPS
 	 */
-	public static int captureFps = 15;
+	private static int captureFps = 15;
 	/**
 	 * 最大録画時間[ミリ秒], 負数=制限なし
 	 */
@@ -60,6 +60,10 @@ public class VideoConfig {
 	 */
 	public static  int maxRepeats = 1;
 
+	public static void setCaptureFps(final int fps) {
+		captureFps = fps > FPS_MAX ? FPS_MAX : (fps < FPS_MIN ? FPS_MIN : fps);
+	}
+	
 	public static int getCaptureFps() {
 		return captureFps > FPS_MAX ? FPS_MAX : (captureFps < FPS_MIN ? FPS_MIN : captureFps);
 	}
