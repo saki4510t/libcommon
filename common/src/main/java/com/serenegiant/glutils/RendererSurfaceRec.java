@@ -27,6 +27,7 @@ class RendererSurfaceRec {
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private EGLBase.IEglSurface mTargetSurface;
 	final float[] mMvpMatrix = new float[16];
+	protected volatile boolean mEnable = true;
 
 	/**
 	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
@@ -54,8 +55,16 @@ class RendererSurfaceRec {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
 
+	public boolean isEnabled() {
+		return mEnable;
+	}
+	
+	public void setEnabled(final boolean enable) {
+		mEnable = enable;
+	}
+	
 	public boolean canDraw() {
-		return true;
+		return mEnable;
 	}
 
 	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
@@ -103,7 +112,7 @@ class RendererSurfaceRec {
 
 		@Override
 		public boolean canDraw() {
-			return System.nanoTime() > mNextDraw;
+			return mEnable && (System.nanoTime() > mNextDraw);
 		}
 
 		@Override

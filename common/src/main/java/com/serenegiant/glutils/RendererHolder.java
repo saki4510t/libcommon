@@ -172,6 +172,26 @@ public class RendererHolder implements IRendererHolder {
 	}
 
 	/**
+	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
+	 * @param id
+	 * @return
+	 */
+	@Override
+	public boolean isEnabled(final int id) {
+		return mRendererTask.isEnabled(id);
+	}
+
+	/**
+	 * 分配描画用のSurfaceへの描画の有効・無効を切替
+	 * @param id
+	 * @param enable
+	 */
+	@Override
+	public void setEnabled(final int id, final boolean enable) {
+		mRendererTask.setEnabled(id, enable);
+	}
+
+	/**
 	 * 強制的に現在の最新のフレームを描画要求する
 	 * 分配描画用Surface全てが更新されるので注意
 	 */
@@ -367,8 +387,8 @@ public class RendererHolder implements IRendererHolder {
 				throw new IllegalArgumentException("Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
 			synchronized (mClientSync) {
-				if ((surface != null) && (mClients.get(id) == null)) {
-					for ( ; ; ) {
+				if (mClients.get(id) == null) {
+					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
 								mClientSync.wait();
@@ -395,7 +415,7 @@ public class RendererHolder implements IRendererHolder {
 		public void removeSurface(final int id) {
 			synchronized (mClientSync) {
 				if (mClients.get(id) != null) {
-					for ( ; ; ) {
+					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_REMOVE_SURFACE, id)) {
 							try {
 								mClientSync.wait();
@@ -411,6 +431,22 @@ public class RendererHolder implements IRendererHolder {
 							}
 						}
 					}
+				}
+			}
+		}
+
+		public boolean isEnabled(final int id) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec rec = mClients.get(id);
+				return rec != null && rec.isEnabled();
+			}
+		}
+		
+		public void setEnabled(final int id, final boolean enable) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec rec = mClients.get(id);
+				if (rec != null) {
+					rec.setEnabled(enable);
 				}
 			}
 		}

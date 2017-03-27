@@ -327,6 +327,16 @@ public class EffectRendererHolder implements IRendererHolder {
 	}
 
 	@Override
+	public boolean isEnabled(final int id) {
+		return mRendererTask.isEnabled(id);
+	}
+	
+	@Override
+	public void setEnabled(final int id, final boolean enable) {
+		mRendererTask.setEnabled(id, enable);
+	}
+
+	@Override
 	public void requestFrame() {
 		mRendererTask.removeRequest(REQUEST_DRAW);
 		mRendererTask.offer(REQUEST_DRAW);
@@ -568,7 +578,7 @@ public class EffectRendererHolder implements IRendererHolder {
 			}
 			synchronized (mClientSync) {
 				if (mClients.get(id) == null) {
-					for ( ; ; ) {
+					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
 								mClientSync.wait();
@@ -595,7 +605,7 @@ public class EffectRendererHolder implements IRendererHolder {
 		public void removeSurface(final int id) {
 			synchronized (mClientSync) {
 				if (mClients.get(id) != null) {
-					for ( ; ; ) {
+					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_REMOVE_SURFACE, id)) {
 							try {
 								mClientSync.wait();
@@ -611,6 +621,22 @@ public class EffectRendererHolder implements IRendererHolder {
 							}
 						}
 					}
+				}
+			}
+		}
+
+		public boolean isEnabled(final int id) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec rec = mClients.get(id);
+				return rec != null && rec.isEnabled();
+			}
+		}
+		
+		public void setEnabled(final int id, final boolean enable) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec rec = mClients.get(id);
+				if (rec != null) {
+					rec.setEnabled(enable);
 				}
 			}
 		}

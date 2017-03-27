@@ -83,6 +83,19 @@ public interface IRendererHolder extends IRendererCommon {
 	public void removeSurface(final int id);
 
 	/**
+	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
+	 * @param id
+	 * @return
+	 */
+	public boolean isEnabled(final int id);
+	
+	/**
+	 * 分配描画用のSurfaceへの描画の有効・無効を切替
+	 * @param id
+	 * @param enable
+	 */
+	public void setEnabled(final int id, final boolean enable);
+	/**
 	 * 強制的に現在の最新のフレームを描画要求する
 	 * 分配描画用Surface全てが更新されるので注意
 	 */
