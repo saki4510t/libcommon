@@ -68,7 +68,11 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 	private final int mTitleId;
 	private final ValueSelectorAdapterListener mListener;
 
-	public ValueSelectorAdapter(final Context context, @LayoutRes final int layout_resource, final int title_id, final int entries_resource, final int values_resource, final ValueSelectorAdapterListener listener) {
+	public ValueSelectorAdapter(final Context context,
+		@LayoutRes final int layout_resource, final int title_id,
+		final int entries_resource, final int values_resource,
+		final ValueSelectorAdapterListener listener) {
+		
 		super(context, layout_resource, createEntries(context, entries_resource, values_resource));
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = layout_resource;
