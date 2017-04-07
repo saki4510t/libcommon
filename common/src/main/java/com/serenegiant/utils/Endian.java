@@ -1,10 +1,24 @@
 package com.serenegiant.utils;
 
-/**
- * Created by saki on 2017/04/07.
+/*
+ * libcommon
+ * utility/helper classes for myself
  *
- */
-public class BytesHelper {
+ * Copyright (c) 2014-2017 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+public class Endian {
 	public static boolean be2boolean(final byte[] bytes, final int offset) {
 		return bytes[offset] != 0;
 	}
@@ -97,10 +111,20 @@ public class BytesHelper {
 		bytes[offset + 1] = (byte) (value);
 		bytes[offset] = (byte) (value >>> 8);
 	}
+
+	public static void char2le(final byte[] bytes, final int offset, final char value) {
+		bytes[offset] = (byte) (value);
+		bytes[offset + 1] = (byte) (value >>> 8);
+	}
 	
 	public static void short2be(final byte[] b, final int offset, final short value) {
 		b[offset + 1] = (byte) (value);
 		b[offset] = (byte) (value >>> 8);
+	}
+
+	public static void short2le(final byte[] b, final int offset, final short value) {
+		b[offset] = (byte) (value);
+		b[offset + 1] = (byte) (value >>> 8);
 	}
 	
 	public static void int2be(final byte[] bytes, final int offset, final int value) {
@@ -109,9 +133,20 @@ public class BytesHelper {
 		bytes[offset + 1] = (byte) (value >>> 16);
 		bytes[offset] = (byte) (value >>> 24);
 	}
+
+	public static void int2le(final byte[] bytes, final int offset, final int value) {
+		bytes[offset] = (byte) (value);
+		bytes[offset + 1] = (byte) (value >>> 8);
+		bytes[offset + 2] = (byte) (value >>> 16);
+		bytes[offset + 3] = (byte) (value >>> 24);
+	}
 	
 	public static void float2be(final byte[] bytes, final int offset, final float value) {
 		int2be(bytes, offset, Float.floatToIntBits(value));
+	}
+
+	public static void float2le(final byte[] bytes, final int offset, final float value) {
+		int2le(bytes, offset, Float.floatToIntBits(value));
 	}
 	
 	public static void long2be(final byte[] bytes, final int offset, long val) {
@@ -124,8 +159,23 @@ public class BytesHelper {
 		bytes[offset + 1] = (byte) (val >>> 48);
 		bytes[offset] = (byte) (val >>> 56);
 	}
+
+	public static void long2le(final byte[] bytes, final int offset, long val) {
+		bytes[offset] = (byte) (val);
+		bytes[offset + 1] = (byte) (val >>> 8);
+		bytes[offset + 2] = (byte) (val >>> 16);
+		bytes[offset + 3] = (byte) (val >>> 24);
+		bytes[offset + 4] = (byte) (val >>> 32);
+		bytes[offset + 5] = (byte) (val >>> 40);
+		bytes[offset + 6] = (byte) (val >>> 48);
+		bytes[offset + 7] = (byte) (val >>> 56);
+	}
 	
 	public static void double2be(final byte[] bytes, final int offset, final double value) {
 		long2be(bytes, offset, Double.doubleToLongBits(value));
+	}
+
+	public static void double2le(final byte[] bytes, final int offset, final double value) {
+		long2le(bytes, offset, Double.doubleToLongBits(value));
 	}
 }
