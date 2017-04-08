@@ -18,6 +18,8 @@ package com.serenegiant.net;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -35,7 +37,9 @@ import java.nio.charset.Charset;
 public class ChannelHelper {
 	private static final Charset UTF8 = Charset.forName("UTF-8");
 
-	public static boolean readBoolean(final ByteChannel channel) throws IOException {
+	public static boolean readBoolean(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(1);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 1) throw new IOException();
@@ -43,7 +47,9 @@ public class ChannelHelper {
 		return buf.get() != 0;
 	}
 
-	public static byte readByte(final ByteChannel channel) throws IOException {
+	public static byte readByte(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(1);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 1) throw new IOException();
@@ -51,7 +57,9 @@ public class ChannelHelper {
 		return buf.get();
 	}
 
-	public static char readChar(final ByteChannel channel) throws IOException {
+	public static char readChar(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(2);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 2) throw new IOException();
@@ -59,7 +67,9 @@ public class ChannelHelper {
 		return buf.getChar();
 	}
 
-	public static short readShort(final ByteChannel channel) throws IOException {
+	public static short readShort(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(2);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 2) throw new IOException();
@@ -67,7 +77,9 @@ public class ChannelHelper {
 		return buf.getShort();
 	}
 
-	public static int readInt(final ByteChannel channel) throws IOException {
+	public static int readInt(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(4);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 4) throw new IOException();
@@ -75,7 +87,9 @@ public class ChannelHelper {
 		return buf.getInt();
 	}
 
-	public static long readLong(final ByteChannel channel) throws IOException {
+	public static long readLong(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(8);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 8) throw new IOException();
@@ -83,7 +97,9 @@ public class ChannelHelper {
 		return buf.getLong();
 	}
 
-	public static float readFloat(final ByteChannel channel) throws IOException {
+	public static float readFloat(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(4);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 4) throw new IOException();
@@ -91,7 +107,9 @@ public class ChannelHelper {
 		return buf.getFloat();
 	}
 
-	public static double readDouble(final ByteChannel channel) throws IOException {
+	public static double readDouble(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(8);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 8) throw new IOException();
@@ -99,7 +117,9 @@ public class ChannelHelper {
 		return buf.getDouble();
 	}
 	
-	public static String readString(final ByteChannel channel) throws IOException {
+	public static String readString(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int bytes = readInt(channel);
 		final byte[] buf = new byte[bytes];
 		final ByteBuffer b = ByteBuffer.wrap(buf);
@@ -108,7 +128,9 @@ public class ChannelHelper {
 		return new String(buf, UTF8);
 	}
 	
-	public static boolean[] readBooleanArray(final ByteChannel channel) throws IOException {
+	public static boolean[] readBooleanArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n);
 		final int readBytes = channel.read(buf);
@@ -121,7 +143,9 @@ public class ChannelHelper {
 		return result;
 	}
 
-	public static byte[] readByteArray(final ByteChannel channel) throws IOException {
+	public static byte[] readByteArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final byte[] result = new byte[n];
 		final ByteBuffer buf = ByteBuffer.wrap(result);
@@ -130,7 +154,9 @@ public class ChannelHelper {
 		return result;
 	}
 
-	public static char[] readCharArray(final ByteChannel channel) throws IOException {
+	public static char[] readCharArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
 		final int readBytes = channel.read(buf);
@@ -146,7 +172,9 @@ public class ChannelHelper {
 		}
 	}
 
-	public static short[] readShortArray(final ByteChannel channel) throws IOException {
+	public static short[] readShortArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
 		final int readBytes = channel.read(buf);
@@ -162,7 +190,9 @@ public class ChannelHelper {
 		}
 	}
 
-	public static int[] readIntArray(final ByteChannel channel) throws IOException {
+	public static int[] readIntArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
 		final int readBytes = channel.read(buf);
@@ -178,7 +208,9 @@ public class ChannelHelper {
 		}
 	}
 
-	public static long[] readLongArray(final ByteChannel channel) throws IOException {
+	public static long[] readLongArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
 		final int readBytes = channel.read(buf);
@@ -194,7 +226,9 @@ public class ChannelHelper {
 		}
 	}
 	
-	public static float[] readFloatArray(final ByteChannel channel) throws IOException {
+	public static float[] readFloatArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
 		final int readBytes = channel.read(buf);
@@ -210,7 +244,9 @@ public class ChannelHelper {
 		}
 	}
 
-	public static double[] readDoubleArray(final ByteChannel channel) throws IOException {
+	public static double[] readDoubleArray(@NonNull final ByteChannel channel)
+		throws IOException {
+		
 		final int n = readInt(channel);
 		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
 		final int readBytes = channel.read(buf);
@@ -225,70 +261,118 @@ public class ChannelHelper {
 			return b;
 		}
 	}
+	
+	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel)
+		throws IOException {
+		
+		final int n = readInt(channel);
+		final ByteBuffer buf = ByteBuffer.allocateDirect(n);
+		final int readBytes = channel.read(buf);
+		if (readBytes != n) throw new IOException();
+		buf.position(n);
+		buf.flip();
+		return buf;
+	}
 
-	public static  void write(final ByteChannel channel, final boolean value) throws IOException {
+	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel,
+		@NonNull final ByteBuffer buf) throws IOException {
+		
+		final int n = readInt(channel);
+		if (buf.remaining() < n) {
+			final ByteBuffer temp = ByteBuffer.allocate(n);
+			channel.read(temp);	// dummy read
+			throw new IOException();
+		}
+		final int readBytes = channel.read(buf);
+		if (readBytes != n) throw new IOException();
+		buf.position(n);
+		buf.flip();
+		return buf;
+	}
+
+	public static  void write(@NonNull final ByteChannel channel,
+		final boolean value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(1);
 		buf.put((byte)(value ? 1 : 0));
 		buf.flip();
 		channel.write(buf);
 	}
 
-	public static  void write(final ByteChannel channel, final byte value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final byte value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(1);
 		buf.put(value);
 		buf.flip();
 		channel.write(buf);
 	}
 
-	public static  void write(final ByteChannel channel, final char value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final char value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(2);
 		buf.putChar(value);
 		buf.flip();
 		channel.write(buf);
 	}
 	
-	public static  void write(final ByteChannel channel, final short value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final short value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(2);
 		buf.putShort(value);
 		buf.flip();
 		channel.write(buf);
 	}
 
-	public static  void write(final ByteChannel channel, final int value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final int value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putInt(value);
 		buf.flip();
 		channel.write(buf);
 	}
 	
-	public static  void write(final ByteChannel channel, final long value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final long value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(8);
 		buf.putLong(value);
 		buf.flip();
 		channel.write(buf);
 	}
 
-	public static  void write(final ByteChannel channel, final float value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final float value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(4);
 		buf.putFloat(value);
 		buf.flip();
 		channel.write(buf);
 	}
 	
-	public static  void write(final ByteChannel channel, final double value) throws IOException {
+	public static  void write(@NonNull final ByteChannel channel,
+		final double value) throws IOException {
+		
 		final ByteBuffer buf = ByteBuffer.allocate(8);
 		buf.putDouble(value);
 		buf.flip();
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final String value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final String value) throws IOException {
+		
 		final byte[] buf = value.getBytes(UTF8);
 		write(channel, buf.length);
 		channel.write(ByteBuffer.wrap(buf));
 	}
 
-	public static void write(final ByteChannel channel, final boolean[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final boolean[] value) throws IOException {
+		
 		final int n = value.length;
 		write(channel, n);
 		final ByteBuffer buf = ByteBuffer.allocate(n);
@@ -299,12 +383,16 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final byte[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final byte[] value) throws IOException {
+		
 		write(channel, value.length);
 		channel.write(ByteBuffer.wrap(value));
 	}
 	
-	public static void write(final ByteChannel channel, final char[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final char[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
 		for (int i = 0; i < n; i++) {
@@ -314,7 +402,9 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final short[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final short[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
 		for (int i = 0; i < n; i++) {
@@ -324,7 +414,9 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final int[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final int[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
 		for (int i = 0; i < n; i++) {
@@ -334,7 +426,9 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final long[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final long[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
 		for (int i = 0; i < n; i++) {
@@ -344,7 +438,9 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final float[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final float[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
 		for (int i = 0; i < n; i++) {
@@ -354,7 +450,9 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
-	public static void write(final ByteChannel channel, final double[] value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final double[] value) throws IOException {
+		
 		final int n = value.length;
 		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
 		for (int i = 0; i < n; i++) {
@@ -364,7 +462,10 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 	
-	public static void write(final ByteChannel channel, final ByteBuffer value) throws IOException {
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final ByteBuffer value) throws IOException {
+		
+		write(channel, value.remaining());
 		channel.write(value);
 	}
 	
