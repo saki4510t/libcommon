@@ -155,7 +155,7 @@ public class VideoConfig {
 	 * 現在のBPP設定を取得
 	 * @return
 	 */
-	public float bpp() {
+	public static float bpp() {
 		return BPP;
 	}
 
