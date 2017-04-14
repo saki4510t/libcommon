@@ -19,10 +19,13 @@ package com.serenegiant.media;
 */
 
 import java.io.IOException;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.support.annotation.IntDef;
 import android.view.Surface;
 
 public interface IRecorder {
@@ -62,6 +65,11 @@ public interface IRecorder {
 	 * キャプチャ終了
 	 */
 //	public static final int STATE_STOPPED = 6;
+
+	@IntDef({STATE_UNINITIALIZED, STATE_INITIALIZED, STATE_PREPARED,
+		STATE_STARTING, STATE_STARTED, STATE_STOPPING})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface RecorderState {}
 
 	public void setMuxer(final IMuxer muxer);
 

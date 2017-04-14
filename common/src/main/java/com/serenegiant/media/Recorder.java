@@ -38,6 +38,7 @@ public abstract class Recorder implements IRecorder {
 	private final RecorderCallback mCallback;
 	protected IMuxer mMuxer;
 	private volatile int mEncoderCount, mStartedCount;
+	@RecorderState
 	private int mState;
 	protected Encoder mVideoEncoder;
 	protected Encoder mAudioEncoder;
