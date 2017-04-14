@@ -551,6 +551,9 @@ public class UdpBeacon {
 				}
 				// ゲスト端末からのブロードキャストを受け取る,
 				// 受け取るまでは待ち状態になる...けどタイムアウトで抜けてくる
+				// UDPなので同一ネットワークのUDPパケットはみんな受け取ってしまうので
+				// 端末によっては負荷が高くなることがある。
+				// できるだけ速く処理すること!
 				try {
 					buffer.clear();
 					final int length = socket.receive(buffer);
