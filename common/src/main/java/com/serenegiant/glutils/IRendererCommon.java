@@ -24,7 +24,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 public interface IRendererCommon {
-	// IRendererHolder, CameraViewInterfaceと一致させること
 	public static final int MIRROR_NORMAL = 0;
 	public static final int MIRROR_HORIZONTAL = 1;
 	public static final int MIRROR_VERTICAL = 2;
