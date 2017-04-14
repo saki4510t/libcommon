@@ -36,7 +36,13 @@ import java.nio.charset.Charset;
  */
 public class ChannelHelper {
 	private static final Charset UTF8 = Charset.forName("UTF-8");
-
+	
+	/**
+	 * ByteChannelからbooleanを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static boolean readBoolean(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -46,7 +52,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.get() != 0;
 	}
-
+	
+	/**
+	 * ByteChannelからbyeを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static byte readByte(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -56,7 +68,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.get();
 	}
-
+	
+	/**
+	 * ByteChannelからcharを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static char readChar(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -66,7 +84,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.getChar();
 	}
-
+	
+	/**
+	 * ByteChannelからshortを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static short readShort(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -76,7 +100,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.getShort();
 	}
-
+	
+	/**
+	 * ByteChannelからintを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static int readInt(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -86,7 +116,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.getInt();
 	}
-
+	
+	/**
+	 * ByteChannelからlongを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static long readLong(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -96,7 +132,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.getLong();
 	}
-
+	
+	/**
+	 * ByteChannelからfloatを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static float readFloat(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -106,7 +148,13 @@ public class ChannelHelper {
 		buf.clear();
 		return buf.getFloat();
 	}
-
+	
+	/**
+	 * ByteChannelからdoubleを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static double readDouble(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -117,6 +165,12 @@ public class ChannelHelper {
 		return buf.getDouble();
 	}
 	
+	/**
+	 * ByteChannelからStringを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static String readString(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -128,6 +182,12 @@ public class ChannelHelper {
 		return new String(buf, UTF8);
 	}
 	
+	/**
+	 * ByteChannelからboolean配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static boolean[] readBooleanArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -142,7 +202,13 @@ public class ChannelHelper {
 		}
 		return result;
 	}
-
+	
+	/**
+	 * ByteChannelからbyte配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static byte[] readByteArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -153,7 +219,13 @@ public class ChannelHelper {
 		if (readBytes != n) throw new IOException();
 		return result;
 	}
-
+	
+	/**
+	 * ByteChannelからchar配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static char[] readCharArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -171,7 +243,13 @@ public class ChannelHelper {
 			return b;
 		}
 	}
-
+	
+	/**
+	 * ByteChannelからshort配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static short[] readShortArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -189,7 +267,13 @@ public class ChannelHelper {
 			return b;
 		}
 	}
-
+	
+	/**
+	 * ByteChannelからint配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static int[] readIntArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -207,7 +291,13 @@ public class ChannelHelper {
 			return b;
 		}
 	}
-
+	
+	/**
+	 * ByteChannelからlong配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static long[] readLongArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -226,6 +316,12 @@ public class ChannelHelper {
 		}
 	}
 	
+	/**
+	 * ByteChannelからfloat配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static float[] readFloatArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -243,7 +339,13 @@ public class ChannelHelper {
 			return b;
 		}
 	}
-
+	
+	/**
+	 * ByteChannelからdouble配列を読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static double[] readDoubleArray(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -262,6 +364,12 @@ public class ChannelHelper {
 		}
 	}
 	
+	/**
+	 * ByteChannelからByteBufferを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
 	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel)
 		throws IOException {
 		
@@ -273,7 +381,16 @@ public class ChannelHelper {
 		buf.flip();
 		return buf;
 	}
-
+	
+	/**
+	 * ByteChannelからByteBufferを読み込む
+	 * 指定したbufがnullまたは読み込むサイズよりも小さい場合は
+	 * ダミーリード後IOExceptionを投げる
+	 * @param channel
+	 * @param buf
+	 * @return
+	 * @throws IOException
+	 */
 	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel,
 		@NonNull final ByteBuffer buf) throws IOException {
 		
@@ -289,7 +406,13 @@ public class ChannelHelper {
 		buf.flip();
 		return buf;
 	}
-
+	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final boolean value) throws IOException {
 		
@@ -299,6 +422,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final byte value) throws IOException {
 		
@@ -308,6 +437,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final char value) throws IOException {
 		
@@ -317,6 +452,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final short value) throws IOException {
 		
@@ -326,6 +467,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final int value) throws IOException {
 		
@@ -335,6 +482,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final long value) throws IOException {
 		
@@ -344,6 +497,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final float value) throws IOException {
 		
@@ -353,6 +512,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static  void write(@NonNull final ByteChannel channel,
 		final double value) throws IOException {
 		
@@ -362,6 +527,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final String value) throws IOException {
 		
@@ -370,6 +541,12 @@ public class ChannelHelper {
 		channel.write(ByteBuffer.wrap(buf));
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final boolean[] value) throws IOException {
 		
@@ -383,6 +560,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final byte[] value) throws IOException {
 		
@@ -390,6 +573,12 @@ public class ChannelHelper {
 		channel.write(ByteBuffer.wrap(value));
 	}
 	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final char[] value) throws IOException {
 		
@@ -402,6 +591,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final short[] value) throws IOException {
 		
@@ -414,6 +609,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final int[] value) throws IOException {
 		
@@ -426,6 +627,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final long[] value) throws IOException {
 		
@@ -438,6 +645,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final float[] value) throws IOException {
 		
@@ -450,6 +663,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final double[] value) throws IOException {
 		
@@ -462,6 +681,12 @@ public class ChannelHelper {
 		channel.write(buf);
 	}
 	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final ByteBuffer value) throws IOException {
 		
