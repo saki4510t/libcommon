@@ -82,7 +82,7 @@ public class DumbRenderer implements IRenderer {
 	}
 
 	@Override
-	public void setMirror(final int mirror) {
+	public void setMirror(@MirrorMode final int mirror) {
 		synchronized (mSync) {
 			if (mRendererTask != null) {
 				mRendererTask.offer(REQUEST_MIRROR, mirror % 4);

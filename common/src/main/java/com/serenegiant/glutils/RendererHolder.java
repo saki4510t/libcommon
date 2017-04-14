@@ -139,7 +139,7 @@ public class RendererHolder implements IRendererHolder {
 	 * @param mirror
 	 */
 	@Override
-	public void setMirror(final int mirror) {
+	public void setMirror(@MirrorMode final int mirror) {
 		mRendererTask.mirror(mirror % MIRROR_NUM);
 	}
 

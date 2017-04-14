@@ -314,7 +314,7 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 //	}
 
 //================================================================================
-	public void setMirror(final int mirror) {
+	public void setMirror(@MirrorMode final int mirror) {
 		if (mMirrorMode != mirror) {
 			mMirrorMode = mirror;
 			applyMirrorMode();
