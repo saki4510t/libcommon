@@ -309,6 +309,12 @@ public class EffectRendererHolder implements IRendererHolder {
 	}
 
 	@Override
+	@MirrorMode
+	public int getMirror() {
+		return mRendererTask.mirror();
+	}
+
+	@Override
 	public void addSurface(final int id, final Object surface, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface);
@@ -449,7 +455,8 @@ public class EffectRendererHolder implements IRendererHolder {
 		final float[] mTexMatrix = new float[16];
 		private Surface mMasterSurface;
 		private int mVideoWidth, mVideoHeight;
-		private int mMirror = -1;
+		@MirrorMode
+		private int mMirror = MIRROR_NORMAL;
 		private int mEffect;
 
 		public RendererTask(final EffectRendererHolder parent, final int width, final int height) {
@@ -682,6 +689,11 @@ public class EffectRendererHolder implements IRendererHolder {
 			}
 		}
 
+		@MirrorMode
+		public int mirror() {
+			return mMirror;
+		}
+		
 		/**
 		 * 分配描画用のマスターSurfaceが有効かどうかをチェックして無効なら再生成する
 		 */

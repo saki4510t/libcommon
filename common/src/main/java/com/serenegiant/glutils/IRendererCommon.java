@@ -39,4 +39,10 @@ public interface IRendererCommon {
 	 * @param mirror 0:通常, 1:左右反転, 2:上下反転, 3:上下左右反転
 	 */
 	public void setMirror(@MirrorMode final int mirror);
+	
+	/**
+	 * 映像を上下左右反転させるかどうかを取得
+	 * @return 0:通常, 1:左右反転, 2:上下反転, 3:上下左右反転
+	 */
+	public @MirrorMode int getMirror();
 }

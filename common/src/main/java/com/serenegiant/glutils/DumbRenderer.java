@@ -42,6 +42,8 @@ public class DumbRenderer implements IRenderer {
 	/** レンダリングスレッド用のHandler排他制御用オブジェクト */
 	private final Object mSync = new Object();
 	private RendererTask mRendererTask;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	public DumbRenderer(final EGLBase.IContext sharedContext, final int flags, final RendererDelegater delegater) {
 		mRendererTask = new RendererTask(sharedContext, flags, delegater);
@@ -84,12 +86,21 @@ public class DumbRenderer implements IRenderer {
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		synchronized (mSync) {
-			if (mRendererTask != null) {
-				mRendererTask.offer(REQUEST_MIRROR, mirror % 4);
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				if (mRendererTask != null) {
+					mRendererTask.offer(REQUEST_MIRROR, mirror % 4);
+				}
 			}
 		}
 	}
 
+	@Override
+	@MirrorMode
+	public int getMirror() {
+		return mMirror;
+	}
+	
 	@Override
 	public void resize(final int width, final int height) {
 		synchronized (mSync) {

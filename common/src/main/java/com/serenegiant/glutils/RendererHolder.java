@@ -143,6 +143,12 @@ public class RendererHolder implements IRendererHolder {
 		mRendererTask.mirror(mirror % MIRROR_NUM);
 	}
 
+	@Override
+	@MirrorMode
+	public int getMirror() {
+		return mRendererTask.mirror();
+	}
+
 	/**
 	 * 分配描画用のSurfaceを追加
 	 * @param id 普通はSurface#hashCodeを使う
@@ -272,7 +278,8 @@ public class RendererHolder implements IRendererHolder {
 		final float[] mTexMatrix = new float[16];
 		private Surface mMasterSurface;
 		private int mVideoWidth, mVideoHeight;
-		private int mMirror = -1;
+		@MirrorMode
+		private int mMirror = MIRROR_NORMAL;
 
 		public RendererTask(final RendererHolder parent, final int width, final int height) {
 			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
@@ -480,6 +487,11 @@ public class RendererHolder implements IRendererHolder {
 			}
 		}
 
+		@MirrorMode
+		public int mirror() {
+			return mMirror;
+		}
+		
 		/**
 		 * 分配描画用のマスターSurfaceが有効かどうかをチェックして無効なら再生成する
 		 */

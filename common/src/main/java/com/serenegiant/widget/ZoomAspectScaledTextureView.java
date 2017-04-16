@@ -178,7 +178,8 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	 */
 	private Runnable mStartCheckRotate;
 
-    private int mMirrorMode = -1;
+	@MirrorMode
+    private int mMirrorMode = MIRROR_NORMAL;
 
 	public ZoomAspectScaledTextureView(final Context context) {
 		this(context, null, 0);
@@ -289,7 +290,7 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureAvailable(surface, width, height);
-		setMirror(0);	// 0はデフォルトだから適用しなくていいけど
+		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
 	}
 
 	/**
@@ -314,6 +315,7 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 //	}
 
 //================================================================================
+	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		if (mMirrorMode != mirror) {
 			mMirrorMode = mirror;
@@ -321,6 +323,12 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 		}
 	}
 
+	@Override
+	@MirrorMode
+	public int getMirror() {
+		return mMirrorMode;
+	}
+	
 	public void setEnableHandleTouchEvent(final boolean enabled) {
 		mHandleTouchEvent = enabled;
 	}
@@ -330,6 +338,7 @@ public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	}
 
 //================================================================================
+	@Override
 	protected void init() {
 		// set the initial state to idle, get and save the internal Matrix.
 		mState = -1; setState(STATE_NON);
