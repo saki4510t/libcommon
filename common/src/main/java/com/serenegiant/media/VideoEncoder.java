@@ -211,11 +211,6 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 		return -1;
 	}
 
-	@Override
-	public Surface getInputSurface() {
-		return null;
-	}
-
 	// nativeメソッド(nativeCreate/nativeDestroyの２つはクラス内のフィールドにアクセスするためstaticじゃないよ)
 	private final native long nativeCreate();
 	private final native void nativeDestroy(long id_encoder);

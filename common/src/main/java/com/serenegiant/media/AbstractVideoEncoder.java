@@ -15,7 +15,6 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.Surface;
 
 import com.serenegiant.utils.BuildCheck;
 
@@ -163,8 +162,6 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder {
     }
 
     public abstract int getCaptureFormat();
-    public abstract Surface getInputSurface();
-
 
     /**
      * 指定したMIMEで使用可能がcodecの一覧の中から先頭のものを取得する

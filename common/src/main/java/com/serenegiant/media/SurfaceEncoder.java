@@ -26,7 +26,7 @@ import android.os.Build;
 import android.view.Surface;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class SurfaceEncoder extends AbstractVideoEncoder {
+public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "SurfaceEncoder";
 
