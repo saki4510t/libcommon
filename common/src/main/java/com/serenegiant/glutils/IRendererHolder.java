@@ -113,6 +113,14 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 */
 	public void captureStillAsync(final String path);
+	
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機しない
+	 * @param path
+	 * @param captureCompression JPEGの圧縮率, pngの時は無視
+	 */
+	public void captureStillAsync(final String path, final int captureCompression);
 
 	/**
 	 * 静止画を撮影する
@@ -120,5 +128,13 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 */
 	public void captureStill(final String path);
+
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機する
+	 * @param path
+	 * @param captureCompression JPEGの圧縮率, pngの時は無視
+	 */
+	public void captureStill(final String path, final int captureCompression);
 
 }

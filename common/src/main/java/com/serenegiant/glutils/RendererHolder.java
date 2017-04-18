@@ -52,6 +52,7 @@ public class RendererHolder implements IRendererHolder {
 	private final RenderHolderCallback mCallback;
 	private volatile boolean isRunning;
 	private File mCaptureFile;
+	private int mCaptureCompression;
 
 	private final RendererTask mRendererTask;
 
@@ -223,10 +224,22 @@ public class RendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void captureStillAsync(final String path) {
+		captureStillAsync(path, 90);
+	}
+	
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機しない
+	 * @param path
+	 * @param captureCompression
+	 */
+	@Override
+	public void captureStillAsync(final String path, final int captureCompression) {
 //		if (DEBUG) Log.v(TAG, "captureStill:" + path);
 		final File file = new File(path);
 		synchronized (mSync) {
 			mCaptureFile = file;
+			mCaptureCompression = captureCompression;
 			mSync.notifyAll();
 		}
 	}
@@ -238,10 +251,21 @@ public class RendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void captureStill(final String path) {
+		captureStill(path, 90);
+	}
+	
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機する
+	 * @param path
+	 */
+	@Override
+	public void captureStill(final String path, final int captureCompression) {
 //		if (DEBUG) Log.v(TAG, "captureStill:" + path);
 		final File file = new File(path);
 		synchronized (mSync) {
 			mCaptureFile = file;
+			mCaptureCompression = captureCompression;
 			mSync.notifyAll();
 			try {
 //				if (DEBUG) Log.v(TAG, "静止画撮影待ち");
@@ -557,6 +581,7 @@ public class RendererHolder implements IRendererHolder {
 				} catch (final Exception e) {
 				}
 			}
+			makeCurrent();
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			GLES20.glFlush();
 		}
@@ -802,6 +827,7 @@ public class RendererHolder implements IRendererHolder {
 			int width = -1, height = -1;
 			ByteBuffer buf = null;
 			File captureFile = null;
+			int captureCompression = 90;
 //			if (DEBUG) Log.v(TAG, "captureTask loop");
 			for (; isRunning ;) {
 				synchronized (mSync) {
@@ -817,6 +843,10 @@ public class RendererHolder implements IRendererHolder {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
 							captureFile = mCaptureFile;
 							mCaptureFile = null;
+							captureCompression = mCaptureCompression;
+							if ((captureCompression <= 0) || (captureCompression >= 100)) {
+								captureCompression = 90;
+							}
 						}
 						continue;
 					}
@@ -849,7 +879,7 @@ public class RendererHolder implements IRendererHolder {
 					            final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, 90, os);
+					            bmp.compress(compressFormat, captureCompression, os);
 					            bmp.recycle();
 					            os.flush();
 					        } finally {
@@ -873,6 +903,7 @@ public class RendererHolder implements IRendererHolder {
 			int width = -1, height = -1;
 			ByteBuffer buf = null;
 			File captureFile = null;
+			int captureCompression = 90;
 //			if (DEBUG) Log.v(TAG, "captureTask loop");
 			for (; isRunning ;) {
 				synchronized (mSync) {
@@ -888,6 +919,10 @@ public class RendererHolder implements IRendererHolder {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
 							captureFile = mCaptureFile;
 							mCaptureFile = null;
+							captureCompression = mCaptureCompression;
+							if ((captureCompression <= 0) || (captureCompression >= 100)) {
+								captureCompression = 90;
+							}
 						}
 						continue;
 					}
@@ -920,7 +955,7 @@ public class RendererHolder implements IRendererHolder {
 					            final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, 90, os);
+					            bmp.compress(compressFormat, captureCompression, os);
 					            bmp.recycle();
 					            os.flush();
 					        } finally {
