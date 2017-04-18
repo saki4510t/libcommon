@@ -896,6 +896,7 @@ public class RendererHolder implements IRendererHolder {
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
+			mSync.notifyAll();
 		}
 
 		// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する
@@ -972,6 +973,7 @@ public class RendererHolder implements IRendererHolder {
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
+			mSync.notifyAll();
 		}
 
 		private final void release() {
