@@ -18,10 +18,6 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-/**
- * プライベートスレッド上でOpenGL|ESを使って描画するための
- * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
- */
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLContext;
@@ -43,7 +39,7 @@ import android.view.SurfaceView;
 import com.serenegiant.utils.BuildCheck;
 
 /**
- * EGLを使用してSurfaceおよびオフスクリーン(PBuffer)へOpenGL|ESで描画をするためのクラス
+ * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
 public class EGLBase10 extends EGLBase {
 //	private static final boolean DEBUG = false;	// FIXME set false on release

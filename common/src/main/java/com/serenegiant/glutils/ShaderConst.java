@@ -342,10 +342,10 @@ public class ShaderConst {
 		"    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]\n" +
 		"              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]\n" +
 		"              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];\n" +
-		//		"    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
-		//		"              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
-		//		"              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
-		//		"    float mag = length(abs(sumH) + abs(sumV));\n" +
+//		"    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
+//		"              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
+//		"              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
+//		"    float mag = length(abs(sumH) + abs(sumV));\n" +
 		"    float mag = length(sumH);\n" +
 		"    gl_FragColor = vec4(vec3(mag), 1.0);\n" +
 		"}\n";

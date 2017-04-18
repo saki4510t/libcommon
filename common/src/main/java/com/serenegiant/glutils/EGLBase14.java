@@ -37,6 +37,9 @@ import android.view.SurfaceView;
 
 import com.serenegiant.utils.BuildCheck;
 
+/**
+ * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EGLBase14 extends EGLBase {	// API >= 17
 //	private static final boolean DEBUG = false;	// TODO set false on release

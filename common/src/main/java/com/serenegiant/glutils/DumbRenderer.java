@@ -39,7 +39,7 @@ public class DumbRenderer implements IRenderer {
 		public void onMirror(final EGLBase eglBase, final int mirror);
 	}
 
-	/** レンダリングスレッド用のHandler排他制御用オブジェクト */
+	/** レンダリングスレッドの排他制御用オブジェクト */
 	private final Object mSync = new Object();
 	private RendererTask mRendererTask;
 	@MirrorMode

@@ -31,6 +31,7 @@ import android.view.SurfaceHolder;
  * Draw shared texture on specific whole Surface using OpenGL|ES
  * this will deprecate soon because I don't use this now
  */
+@Deprecated
 public final class RenderHandler extends Handler {
 //	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = "RenderHandler";
@@ -86,7 +87,7 @@ public final class RenderHandler extends Handler {
 				mThread.mSync.wait();
 			} catch (final InterruptedException e) {
 			}
-			return mThread.mSurface != null ? mThread.mSurface.isValid() : false;
+			return mThread.mSurface != null && mThread.mSurface.isValid();
 		}
 	}
 

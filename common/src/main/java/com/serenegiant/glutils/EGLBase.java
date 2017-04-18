@@ -20,7 +20,9 @@ package com.serenegiant.glutils;
 
 import android.os.Build;
 
-
+/**
+ * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
+ */
 public abstract class EGLBase {
 	public static final Object EGL_LOCK = new Object();
 
