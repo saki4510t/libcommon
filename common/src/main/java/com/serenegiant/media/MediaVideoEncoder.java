@@ -34,7 +34,7 @@ import java.util.Locale;
 
 @SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class MediaVideoEncoder extends MediaEncoder {
+public class MediaVideoEncoder extends MediaEncoder implements ISurfaceEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private static final String TAG = "MediaEncoder";
 
@@ -45,11 +45,15 @@ public class MediaVideoEncoder extends MediaEncoder {
 	private int mVideoWidth = 1280;
 	private int mVideoHeight = 720;
 
-	public MediaVideoEncoder(final MediaMovieRecorder muxer, final IMediaCodecCallback listener) {
+	public MediaVideoEncoder(final MediaMovieRecorder muxer,
+		final IMediaCodecCallback listener) {
+		
 		this(1280, 720, muxer, listener);
 	}
 
-	public MediaVideoEncoder(final int width, final int height, final MediaMovieRecorder muxer, final IMediaCodecCallback listener) {
+	public MediaVideoEncoder(final int width, final int height,
+		final MediaMovieRecorder muxer, final IMediaCodecCallback listener) {
+		
 		super(false, muxer, listener);
 		mVideoWidth = width;
 		mVideoHeight = height;
@@ -68,8 +72,10 @@ public class MediaVideoEncoder extends MediaEncoder {
 		}
 		if (DEBUG) Log.i(TAG, "selected codec: " + videoCodecInfo.getName());
 
-		final MediaFormat format = MediaFormat.createVideoFormat(MIME_TYPE, mVideoWidth, mVideoHeight);
-		format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);	// API >= 18
+		final MediaFormat format = MediaFormat.createVideoFormat(
+			MIME_TYPE, mVideoWidth, mVideoHeight);
+		format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+			MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);	// API >= 18
 		format.setInteger(MediaFormat.KEY_BIT_RATE, calcBitRate());
 		format.setInteger(MediaFormat.KEY_FRAME_RATE, FRAME_RATE);
 		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, 10);
@@ -96,15 +102,19 @@ public class MediaVideoEncoder extends MediaEncoder {
 		super.release();
 	}
 
-	public void setVideoSize(final int width, final int height) throws IllegalArgumentException, IllegalStateException {
+	public void setVideoSize(final int width, final int height)
+		throws IllegalArgumentException, IllegalStateException {
+		
 		if (width <= 0 || height <= 0)
-			throw new IllegalArgumentException(String.format(Locale.US, "size(%d,%d)", width, height));
+			throw new IllegalArgumentException(
+				String.format(Locale.US, "size(%d,%d)", width, height));
 		if (isRunning())
 			throw new IllegalStateException("already start capturing");
 		mVideoWidth = width;
 		mVideoHeight = height;
 	}
 
+	@Override
 	public Surface getInputSurface() throws IllegalStateException {
 		if (mSurface == null)
 			throw new IllegalStateException("not prepared yet");
@@ -178,8 +188,10 @@ public class MediaVideoEncoder extends MediaEncoder {
 				break;
 			}
 		}
-		if (result == 0)
-			Log.e(TAG, "couldn't find a good color format for " + codecInfo.getName() + " / " + mimeType);
+		if (result == 0) {
+			Log.e(TAG, "couldn't find a good color format for "
+				+ codecInfo.getName() + " / " + mimeType);
+		}
 		return result;
 	}
 

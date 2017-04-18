@@ -26,7 +26,6 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
-import android.view.Surface;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class VideoEncoder extends AbstractVideoEncoder {
