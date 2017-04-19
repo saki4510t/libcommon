@@ -26,5 +26,5 @@ import android.view.Surface;
  * と思ったけど、メソッドも移動した
  */
 public interface ISurfaceEncoder {
-	public abstract Surface getInputSurface();
+	public Surface getInputSurface();
 }
