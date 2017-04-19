@@ -36,7 +36,7 @@ import java.nio.ByteBuffer;
 
 @SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public class MediaAudioEncoder extends MediaEncoder {
+public class MediaAudioEncoder extends MediaEncoder implements IAudioEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private static final String TAG = "MediaAudioEncoder";
 

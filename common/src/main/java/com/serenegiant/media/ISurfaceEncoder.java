@@ -25,6 +25,6 @@ import android.view.Surface;
  * 単にSurfaceを使って映像をエンコードすることをマークするだけ...
  * と思ったけど、メソッドも移動した
  */
-public interface ISurfaceEncoder {
+public interface ISurfaceEncoder extends IVideoEncoder {
 	public Surface getInputSurface();
 }

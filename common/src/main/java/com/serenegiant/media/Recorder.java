@@ -147,8 +147,8 @@ public abstract class Recorder implements IRecorder {
 
 	@Override
 	public Surface getInputSurface() {
-		return (mVideoEncoder instanceof SurfaceEncoder)
-			? ((SurfaceEncoder)mVideoEncoder).getInputSurface() : null;
+		return (mVideoEncoder instanceof ISurfaceEncoder)
+			? ((ISurfaceEncoder)mVideoEncoder).getInputSurface() : null;
 	}
 
 	@Override
@@ -230,7 +230,7 @@ public abstract class Recorder implements IRecorder {
 			if (mState > STATE_INITIALIZED)
 				throw new IllegalStateException("addEncoder already prepared/started");
 		}
-		if (encoder.isAudio()) {
+		if (encoder instanceof IAudioEncoder) {
 			if (mAudioEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");
 			mAudioEncoder = encoder;
@@ -249,7 +249,7 @@ public abstract class Recorder implements IRecorder {
 	 */
 	@Override
 	public synchronized void removeEncoder(final Encoder encoder) {
-		if ((encoder instanceof VideoEncoder) || (encoder instanceof SurfaceEncoder)) {
+		if (encoder instanceof IVideoEncoder) {
 			mVideoEncoder = null;
 			mVideoStarted = false;
 		} else if (encoder instanceof AudioEncoder) {

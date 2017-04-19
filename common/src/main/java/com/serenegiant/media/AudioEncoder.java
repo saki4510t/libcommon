@@ -23,7 +23,7 @@ import android.os.Build;
  * FIXME 今はAbstractEncoderから直接継承しているのをAbstractAudioEncoderを継承するように変更する
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public class AudioEncoder extends AbstractEncoder {
+public class AudioEncoder extends AbstractEncoder implements IAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AudioEncoder";
 

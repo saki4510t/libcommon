@@ -20,7 +20,8 @@ import android.os.Build;
  * 音声データをMediaCodecでエンコードするためのクラス
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public abstract class AbstractAudioEncoder extends AbstractEncoder {
+public abstract class AbstractAudioEncoder extends AbstractEncoder
+	implements IAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AbstractAudioEncoder";
 

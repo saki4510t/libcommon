@@ -20,7 +20,8 @@ import com.serenegiant.utils.BuildCheck;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 @SuppressWarnings("deprecation")
-public abstract class AbstractVideoEncoder extends AbstractEncoder {
+public abstract class AbstractVideoEncoder extends AbstractEncoder
+	implements IVideoEncoder {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AbstractVideoEncoder";

@@ -1,4 +1,5 @@
 package com.serenegiant.media;
+
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,19 +19,8 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-
-public interface Encoder {
-	public abstract void prepare()  throws Exception;
-	public abstract void start();;
-	public abstract void stop();
-	public abstract void release();
-	public abstract void signalEndOfInputStream();
-	public abstract void encode(final ByteBuffer buffer);
-	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
-	public abstract void frameAvailableSoon();
-	public abstract boolean isCapturing();
-	public abstract String getOutputPath();
-	@Deprecated
-	public abstract boolean isAudio();
+/**
+ * 音声エンコーダーであることを示すためのマーカーインターフェース
+ */
+public interface IAudioEncoder {
 }
