@@ -806,13 +806,18 @@ public class RendererHolder implements IRendererHolder {
 				}
 			}
 			init();
-			if (eglBase.getGlVersion() > 2) {
-				captureLoopGLES3();
-			} else {
-				captureLoopGLES2();
+			try {
+				if (eglBase.getGlVersion() > 2) {
+					captureLoopGLES3();
+				} else {
+					captureLoopGLES2();
+				}
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			} finally {
+				// release resources
+				release();
 			}
-			// release resources
-			release();
 //			if (DEBUG) Log.v(TAG, "captureTask finished");
 		}
 
@@ -896,7 +901,9 @@ public class RendererHolder implements IRendererHolder {
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
-			mSync.notifyAll();
+			synchronized (mSync) {
+				mSync.notifyAll();
+			}
 		}
 
 		// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する
@@ -973,7 +980,9 @@ public class RendererHolder implements IRendererHolder {
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
-			mSync.notifyAll();
+			synchronized (mSync) {
+				mSync.notifyAll();
+			}
 		}
 
 		private final void release() {
