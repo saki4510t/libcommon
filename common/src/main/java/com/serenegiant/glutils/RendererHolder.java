@@ -731,7 +731,7 @@ public class RendererHolder implements IRendererHolder {
 		private void handleClear(final int id, final int color) {
 			synchronized (mClientSync) {
 				final RendererSurfaceRec client = mClients.get(id);
-				if (client != null) {
+				if ((client != null) && client.isValid()) {
 					client.clear(color);
 				}
 			}
@@ -746,7 +746,7 @@ public class RendererHolder implements IRendererHolder {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
-					if ((client != null) && !client.isValid()) {
+					if ((client != null) && client.isValid()) {
 						client.clear(color);
 					}
 				}

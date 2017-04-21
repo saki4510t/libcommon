@@ -763,22 +763,6 @@ public class EffectRendererHolder implements IRendererHolder {
 			offer(REQUEST_CLEAR_ALL, color);
 		}
 
-		/**
-		 * 分配描画用Surface全てを指定した色で塗りつぶす
-		 * @param color
-		 */
-		private void handleClearAll(final int color) {
-			synchronized (mClientSync) {
-				final int n = mClients.size();
-				for (int i = 0; i < n; i++) {
-					final RendererSurfaceRec client = mClients.valueAt(i);
-					if ((client != null) && !client.isValid()) {
-						client.clear(color);
-					}
-				}
-			}
-		}
-
 		public boolean isEnabled(final int id) {
 			synchronized (mClientSync) {
 				final RendererSurfaceRec rec = mClients.get(id);
@@ -1006,8 +990,24 @@ public class EffectRendererHolder implements IRendererHolder {
 		private void handleClear(final int id, final int color) {
 			synchronized (mClientSync) {
 				final RendererSurfaceRec client = mClients.get(id);
-				if (client != null) {
+				if ((client != null) && client.isValid()) {
 					client.clear(color);
+				}
+			}
+		}
+
+		/**
+		 * 分配描画用Surface全てを指定した色で塗りつぶす
+		 * @param color
+		 */
+		private void handleClearAll(final int color) {
+			synchronized (mClientSync) {
+				final int n = mClients.size();
+				for (int i = 0; i < n; i++) {
+					final RendererSurfaceRec client = mClients.valueAt(i);
+					if ((client != null) && client.isValid()) {
+						client.clear(color);
+					}
 				}
 			}
 		}
