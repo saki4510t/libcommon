@@ -273,6 +273,9 @@ public class EffectRendererHolder implements IRendererHolder {
 		return isRunning;
 	}
 
+	/**
+	 * 関係するすべてのリソースを開放する。再利用できない
+	 */
 	@Override
 	public void release() {
 //		if (DEBUG) Log.v(TAG, "release:");
@@ -284,71 +287,140 @@ public class EffectRendererHolder implements IRendererHolder {
 //		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
+	/**
+	 * マスター用の映像を受け取るためのSurfaceを取得
+	 * @return
+	 */
 	@Override
 	public Surface getSurface() {
 		return mRendererTask.getSurface();
 	}
 
+	/**
+	 * マスター用の映像を受け取るためのSurfaceTextureを取得
+	 * @return
+	 */
 	@Override
 	public SurfaceTexture getSurfaceTexture() {
 		return mRendererTask.getSurfaceTexture();
 	}
 
+	/**
+	 * マスター用の映像を受け取るためのマスターをチェックして無効なら再生成要求する
+	 */
 	@Override
 	public void reset() {
 		mRendererTask.checkMasterSurface();
 	}
 
+	/**
+	 * マスター映像サイズをサイズ変更要求
+	 * @param width
+	 * @param height
+	 */
 	@Override
 	public void resize(final int width, final int height) {
 		mRendererTask.resize(width, height);
 	}
 
+	/**
+	 * ミラーモードをセット
+	 * @param mirror
+	 */
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		mRendererTask.mirror(mirror % MIRROR_NUM);
 	}
-
+	
+	/**
+	 * 現在のミラーモードを取得
+	 * @return
+	 */
 	@Override
 	@MirrorMode
 	public int getMirror() {
 		return mRendererTask.mirror();
 	}
 
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * @param id 普通はSurface#hashCodeを使う
+	 * @param surface
+	 * @param isRecordable
+	 */
 	@Override
 	public void addSurface(final int id, final Object surface, final boolean isRecordable) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface);
 	}
 
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * @param id 普通はSurface#hashCodeを使う
+	 * @param surface
+	 * @param isRecordable
+	 * @param maxFps
+	 */
 	@Override
 	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface, maxFps);
 	}
 
+	/**
+	 * 分配描画用のSurfaceを削除
+	 * @param id
+	 */
 	@Override
 	public void removeSurface(final int id) {
 //		if (DEBUG) Log.v(TAG, "removeSurface:id=" + id);
 		mRendererTask.removeSurface(id);
 	}
 
+	/**
+	 * 分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param id
+	 * @param color
+	 */
+	@Override
+	public void clearSurface(final int id, final int color) {
+		mRendererTask.clearSurface(id, color);
+	}
+
+	/**
+	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
+	 * @param id
+	 * @return
+	 */
 	@Override
 	public boolean isEnabled(final int id) {
 		return mRendererTask.isEnabled(id);
 	}
 	
+	/**
+	 * 分配描画用のSurfaceへの描画の有効・無効を切替
+	 * @param id
+	 * @param enable
+	 */
 	@Override
 	public void setEnabled(final int id, final boolean enable) {
 		mRendererTask.setEnabled(id, enable);
 	}
 
+	/**
+	 * 強制的に現在の最新のフレームを描画要求する
+	 * 分配描画用Surface全てが更新されるので注意
+	 */
 	@Override
 	public void requestFrame() {
 		mRendererTask.removeRequest(REQUEST_DRAW);
 		mRendererTask.offer(REQUEST_DRAW);
 	}
 
+	/**
+	 * 追加されている分配描画用のSurfaceの数を取得
+	 * @return
+	 */
 	@Override
 	public int getCount() {
 		return mRendererTask.getCount();
@@ -458,8 +530,9 @@ public class EffectRendererHolder implements IRendererHolder {
 	private static final int REQUEST_REMOVE_SURFACE = 4;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 	private static final int REQUEST_MIRROR = 6;
-	private static final int REQUEST_CHANGE_EFFECT = 7;
-	private static final int REQUEST_SET_PARAMS = 8;
+	private static final int REQUEST_CLEAR = 7;
+	private static final int REQUEST_CHANGE_EFFECT = 8;
+	private static final int REQUEST_SET_PARAMS = 9;
 
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
@@ -560,11 +633,14 @@ public class EffectRendererHolder implements IRendererHolder {
 			case REQUEST_RECREATE_MASTER_SURFACE:
 				handleReCreateMasterSurface();
 				break;
-			case REQUEST_CHANGE_EFFECT:
-				handleChangeEffect(arg1);
-				break;
 			case REQUEST_MIRROR:
 				handleMirror(arg1);
+				break;
+			case REQUEST_CLEAR:
+				handleClear(arg1, arg2);
+				break;
+			case REQUEST_CHANGE_EFFECT:
+				handleChangeEffect(arg1);
 				break;
 			case REQUEST_SET_PARAMS:
 				handleSetParam(arg1, (float[])obj);
@@ -654,6 +730,16 @@ public class EffectRendererHolder implements IRendererHolder {
 					}
 				}
 			}
+		}
+
+		/**
+		 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
+		 * @param id
+		 * @param color
+		 */
+		public void clearSurface(final int id, final int color) {
+			checkFinished();
+			offer(REQUEST_CLEAR, id, color);
 		}
 
 		public boolean isEnabled(final int id) {
@@ -825,6 +911,9 @@ public class EffectRendererHolder implements IRendererHolder {
 				final RendererSurfaceRec client = mClients.get(id);
 				if (client != null) {
 					mClients.remove(id);
+					if (client.isValid()) {
+						client.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
+					}
 					client.release();
 				}
 				checkSurface();
@@ -870,6 +959,20 @@ public class EffectRendererHolder implements IRendererHolder {
 				}
 			}
 //			if (DEBUG) Log.v(TAG, "checkSurface:finished");
+		}
+
+		/**
+		 * 指定したIDの分配描画用Surfaceを指定した色で塗りつぶすｒ
+		 * @param id
+		 * @param color
+		 */
+		private void handleClear(final int id, final int color) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec client = mClients.get(id);
+				if (client != null) {
+					client.clear(color);
+				}
+			}
 		}
 
 		/**

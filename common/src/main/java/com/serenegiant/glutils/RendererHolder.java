@@ -144,6 +144,10 @@ public class RendererHolder implements IRendererHolder {
 		mRendererTask.mirror(mirror % MIRROR_NUM);
 	}
 
+	/**
+	 * 現在のミラーモードを取得
+	 * @return
+	 */
 	@Override
 	@MirrorMode
 	public int getMirror() {
@@ -162,6 +166,13 @@ public class RendererHolder implements IRendererHolder {
 		mRendererTask.addSurface(id, surface);
 	}
 
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * @param id 普通はSurface#hashCodeを使う
+	 * @param surface
+	 * @param isRecordable
+	 * @param maxFps
+	 */
 	@Override
 	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps) {
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
@@ -176,6 +187,16 @@ public class RendererHolder implements IRendererHolder {
 	public void removeSurface(final int id) {
 //		if (DEBUG) Log.v(TAG, "removeSurface:id=" + id);
 		mRendererTask.removeSurface(id);
+	}
+
+	/**
+	 * 分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param id
+	 * @param color
+	 */
+	@Override
+	public void clearSurface(final int id, final int color) {
+		mRendererTask.clearSurface(id, color);
 	}
 
 	/**
@@ -286,6 +307,7 @@ public class RendererHolder implements IRendererHolder {
 	private static final int REQUEST_REMOVE_SURFACE = 4;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 	private static final int REQUEST_MIRROR = 6;
+	private static final int REQUEST_CLEAR = 7;
 
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
@@ -373,6 +395,9 @@ public class RendererHolder implements IRendererHolder {
 				break;
 			case REQUEST_MIRROR:
 				handleMirror(arg1);
+				break;
+			case REQUEST_CLEAR:
+				handleClear(arg1, arg2);
 				break;
 			}
 			return null;
@@ -465,7 +490,17 @@ public class RendererHolder implements IRendererHolder {
 				}
 			}
 		}
-
+		
+		/**
+		 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
+		 * @param id
+		 * @param color
+		 */
+		public void clearSurface(final int id, final int color) {
+			checkFinished();
+			offer(REQUEST_CLEAR, id, color);
+		}
+		
 		public boolean isEnabled(final int id) {
 			synchronized (mClientSync) {
 				final RendererSurfaceRec rec = mClients.get(id);
@@ -621,13 +656,16 @@ public class RendererHolder implements IRendererHolder {
 				final RendererSurfaceRec client = mClients.get(id);
 				if (client != null) {
 					mClients.remove(id);
+					if (client.isValid()) {
+						client.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
+					}
 					client.release();
 				}
 				checkSurface();
 				mClientSync.notifyAll();
 			}
 		}
-
+				
 		/**
 		 * 念の為に分配描画先のSurfaceを全て破棄する
 		 */
@@ -666,6 +704,20 @@ public class RendererHolder implements IRendererHolder {
 				}
 			}
 //			if (DEBUG) Log.v(TAG, "checkSurface:finished");
+		}
+
+		/**
+		 * 指定したIDの分配描画用Surfaceを指定した色で塗りつぶすｒ
+		 * @param id
+		 * @param color
+		 */
+		private void handleClear(final int id, final int color) {
+			synchronized (mClientSync) {
+				final RendererSurfaceRec client = mClients.get(id);
+				if (client != null) {
+					client.clear(color);
+				}
+			}
 		}
 
 		/**

@@ -50,15 +50,27 @@ class RendererSurfaceRec {
 		}
 		mSurface = null;
 	}
-
+	
+	/**
+	 * Surfaceが有効かどうかを取得する
+	 * @return
+	 */
 	public boolean isValid() {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
-
+	
+	/**
+	 * Surfaceへの描画が有効かどうかを取得する
+	 * @return
+	 */
 	public boolean isEnabled() {
 		return mEnable;
 	}
 	
+	/**
+	 * Surfaceへの描画を一時的に有効/無効にする
+	 * @param enable
+	 */
 	public void setEnabled(final boolean enable) {
 		mEnable = enable;
 	}
@@ -75,7 +87,23 @@ class RendererSurfaceRec {
 		drawer.draw(textId, texMatrix, 0);
 		mTargetSurface.swap();
 	}
-
+	
+	/**
+	 * 指定した色で全面を塗りつぶす
+	 * @param color
+	 */
+	public void clear(final int color) {
+		mTargetSurface.makeCurrent();
+		GLES20.glClearColor(
+			((color & 0x00ff0000) >>> 16) / 255.0f,	// R
+			((color & 0x0000ff00) >>>  8) / 255.0f,	// G
+			((color & 0x000000ff)) / 255.0f,		// B
+			((color & 0xff000000) >>> 24) / 255.0f	// A
+		);
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		mTargetSurface.swap();
+	}
+	
 	/**
 	 * #drawの代わりにOpenGL|ES2を使って自前で描画する場合は
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから

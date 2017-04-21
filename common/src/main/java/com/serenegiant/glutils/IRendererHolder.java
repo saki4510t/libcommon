@@ -81,7 +81,14 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param id
 	 */
 	public void removeSurface(final int id);
-
+	
+	/**
+	 * 分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param id
+	 * @param color
+	 */
+	public void clearSurface(final int id, final int color);
+	
 	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
 	 * @param id
@@ -95,6 +102,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param enable
 	 */
 	public void setEnabled(final int id, final boolean enable);
+
 	/**
 	 * 強制的に現在の最新のフレームを描画要求する
 	 * 分配描画用Surface全てが更新されるので注意
