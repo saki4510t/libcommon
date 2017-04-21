@@ -90,6 +90,12 @@ public interface IRendererHolder extends IRendererCommon {
 	public void clearSurface(final int id, final int color);
 	
 	/**
+	 * 分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param color
+	 */
+	public void clearSurfaceAll(final int color);
+	
+	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
 	 * @param id
 	 * @return

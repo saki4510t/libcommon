@@ -388,6 +388,14 @@ public class EffectRendererHolder implements IRendererHolder {
 	}
 
 	/**
+	 * 分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param color
+	 */
+	public void clearSurfaceAll(final int color) {
+		mRendererTask.clearSurfaceAll(color);
+	}
+
+	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
 	 * @param id
 	 * @return
@@ -531,8 +539,9 @@ public class EffectRendererHolder implements IRendererHolder {
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 	private static final int REQUEST_MIRROR = 6;
 	private static final int REQUEST_CLEAR = 7;
-	private static final int REQUEST_CHANGE_EFFECT = 8;
-	private static final int REQUEST_SET_PARAMS = 9;
+	private static final int REQUEST_CLEAR_ALL = 8;
+	private static final int REQUEST_CHANGE_EFFECT = 9;
+	private static final int REQUEST_SET_PARAMS = 10;
 
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
@@ -639,6 +648,9 @@ public class EffectRendererHolder implements IRendererHolder {
 			case REQUEST_CLEAR:
 				handleClear(arg1, arg2);
 				break;
+			case REQUEST_CLEAR_ALL:
+				handleClearAll(arg1);
+				break;
 			case REQUEST_CHANGE_EFFECT:
 				handleChangeEffect(arg1);
 				break;
@@ -740,6 +752,31 @@ public class EffectRendererHolder implements IRendererHolder {
 		public void clearSurface(final int id, final int color) {
 			checkFinished();
 			offer(REQUEST_CLEAR, id, color);
+		}
+
+		/**
+		 * 分配描画用のSurfaceを指定した色で塗りつぶす
+		 * @param color
+		 */
+		public void clearSurfaceAll(final int color) {
+			checkFinished();
+			offer(REQUEST_CLEAR_ALL, color);
+		}
+
+		/**
+		 * 分配描画用Surface全てを指定した色で塗りつぶす
+		 * @param color
+		 */
+		private void handleClearAll(final int color) {
+			synchronized (mClientSync) {
+				final int n = mClients.size();
+				for (int i = 0; i < n; i++) {
+					final RendererSurfaceRec client = mClients.valueAt(i);
+					if ((client != null) && !client.isValid()) {
+						client.clear(color);
+					}
+				}
+			}
 		}
 
 		public boolean isEnabled(final int id) {
