@@ -47,6 +47,8 @@ import static com.serenegiant.glutils.ShaderConst.*;
 public class RendererHolder implements IRendererHolder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = RendererHolder.class.getSimpleName();
+	private static final String RENDERER_THREAD_NAME = "RendererHolder";
+	private static final String CAPTURE_THREAD_NAME = "CaptureTask";
 
 	private final Object mSync = new Object();
 	private final RenderHolderCallback mCallback;
@@ -60,12 +62,12 @@ public class RendererHolder implements IRendererHolder {
 //		if (DEBUG) Log.v(TAG, "Constructor");
 		mCallback = callback;
 		mRendererTask = new RendererTask(this, width, height);
-		new Thread(mRendererTask, TAG).start();
+		new Thread(mRendererTask, RENDERER_THREAD_NAME).start();
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
 			throw new RuntimeException("failed to start renderer thread");
 		}
-		new Thread(mCaptureTask, "CaptureTask").start();
+		new Thread(mCaptureTask, CAPTURE_THREAD_NAME).start();
 		synchronized (mSync) {
 			if (!isRunning) {
 				try {
