@@ -102,6 +102,7 @@ public class MediaVideoEncoder extends MediaEncoder implements ISurfaceEncoder {
 		super.release();
 	}
 
+	@Override
 	public void setVideoSize(final int width, final int height)
 		throws IllegalArgumentException, IllegalStateException {
 		
@@ -121,10 +122,12 @@ public class MediaVideoEncoder extends MediaEncoder implements ISurfaceEncoder {
 		return mSurface;
 	}
 
+	@Override
 	public int getWidth() {
 		return mVideoWidth;
 	}
 
+	@Override
 	public int getHeight() {
 		return mVideoHeight;
 	}

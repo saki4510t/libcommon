@@ -141,7 +141,9 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
 	 * @param width
 	 * @param height
 	 */
-    public void setVideoSize(final int width, final int height) {
+	@Override
+	public void setVideoSize(final int width, final int height)
+		throws IllegalArgumentException, IllegalStateException {
 //    	Log.d(TAG, String.format("setVideoSize(%d,%d)", width, height));
     	mWidth = width;
     	mHeight = height;
@@ -154,10 +156,12 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
 		mIFrameIntervals = iFrameIntervals;
 	}
 
+	@Override
     public int getWidth() {
     	return mWidth;
     }
 
+	@Override
     public int getHeight() {
     	return mHeight;
     }

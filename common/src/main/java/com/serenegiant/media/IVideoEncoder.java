@@ -20,7 +20,11 @@ package com.serenegiant.media;
 */
 
 /**
- * 動画エンコーダーであることを示すためのマーカーインターフェース
+ * 動画エンコーダーインターフェース
  */
 public interface IVideoEncoder {
+	public void setVideoSize(final int width, final int height)
+		throws IllegalArgumentException, IllegalStateException;
+	public int getWidth();
+	public int getHeight();
 }
