@@ -23,17 +23,24 @@ import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.TextureView;
 
 import com.serenegiant.common.R;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 public class AspectScaledTextureView extends TextureView
-	implements TextureView.SurfaceTextureListener, IAspectRatioView, IScaledView {
+	implements TextureView.SurfaceTextureListener, IAspectRatioView, IScaledView, ITextureView {
+	
+	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();
 	private int mScaleMode = SCALE_MODE_KEEP_ASPECT;
 	private double mRequestedAspect = -1.0;		// initially use default window size
 	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
+	private final Set<ITextureViewCallback> mCallbacks = new CopyOnWriteArraySet<ITextureViewCallback>();
 
 	public AspectScaledTextureView(final Context context) {
 		this(context, null, 0);
@@ -52,7 +59,7 @@ public class AspectScaledTextureView extends TextureView
 		} finally {
 			a.recycle();
 		}
-		setSurfaceTextureListener(this);
+		super.setSurfaceTextureListener(this);
 	}
 
 	/**
@@ -107,6 +114,29 @@ public class AspectScaledTextureView extends TextureView
 		}
 		init();
 	}
+	
+	/**
+	 * 内部で使っているのでこのクラスと子クラスではsetSurfaceTextureListenerを呼び出せないように変更。
+	 * SurfaceTextureListenerを割り振りたい時は代わりに#register/#unregisterを使うこと
+	 * @param listener
+	 */
+	@Override
+	public final void setSurfaceTextureListener(final SurfaceTextureListener listener) {
+		throw new IllegalArgumentException("can not call setSurfaceTextureListener on this class.\n"
+			+ "Use register/unregister instead.");
+	}
+	
+	@Override
+	public void register(final ITextureViewCallback callback) {
+		if (callback != null) {
+			mCallbacks.add(callback);
+		}
+	}
+	
+	@Override
+	public void unregister(final ITextureViewCallback callback) {
+		mCallbacks.remove(callback);
+	}
 
 	protected void onResize(final int width, final int height) {
 	}
@@ -118,21 +148,52 @@ public class AspectScaledTextureView extends TextureView
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		mHasSurface = true;
 		init();
+		for (final ITextureViewCallback callback: mCallbacks) {
+			try {
+				callback.onSurfaceTextureAvailable(surface, width, height);
+			} catch (final Exception e) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, e);
+			}
+		}
 	}
 
 	@Override
 	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
-
+		for (final ITextureViewCallback callback: mCallbacks) {
+			try {
+				callback.onSurfaceTextureSizeChanged(surface, width, height);
+			} catch (final Exception e) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, e);
+			}
+		}
 	}
 
 	@Override
 	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
+		mHasSurface = false;
+		for (final ITextureViewCallback callback: mCallbacks) {
+			try {
+				callback.onSurfaceTextureDestroyed(surface);
+			} catch (final Exception e) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, e);
+			}
+		}
 		return false;
 	}
 
 	@Override
 	public void onSurfaceTextureUpdated(final SurfaceTexture surface) {
-		mHasSurface = false;
+		for (final ITextureViewCallback callback: mCallbacks) {
+			try {
+				callback.onSurfaceTextureUpdated(surface);
+			} catch (final Exception e) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, e);
+			}
+		}
 	}
 
 //================================================================================

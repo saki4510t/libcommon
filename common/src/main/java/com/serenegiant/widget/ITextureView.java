@@ -18,7 +18,8 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
-import android.view.TextureView;
 
-public interface ITextureViewCallback extends TextureView.SurfaceTextureListener {
+public interface ITextureView {
+	public void register(final ITextureViewCallback callback);
+	public void unregister(final ITextureViewCallback callback);
 }
