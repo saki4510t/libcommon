@@ -65,7 +65,7 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
      */
     protected MediaCodec mMediaCodec;				// API >= 16(Android4.1.2)
     /**
-     * エンコード用バッファ
+     * エンコード用バッファ情報
      */
     private MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
 
