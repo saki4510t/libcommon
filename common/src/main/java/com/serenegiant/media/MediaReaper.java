@@ -1,3 +1,4 @@
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -16,8 +17,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
-
-package com.serenegiant.media;
 
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
