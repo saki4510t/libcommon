@@ -783,14 +783,16 @@ public class RendererHolder implements IRendererHolder {
 		 * マスターSurfaceを破棄する
 		 */
 		private void handleReleaseMasterSurface() {
-			try {
-				if (mParent.mCallback != null) {
-					mParent.mCallback.onDestroy();
+			if (mMasterSurface != null) {
+				mMasterSurface = null;
+				try {
+					if (mParent.mCallback != null) {
+						mParent.mCallback.onDestroy();
+					}
+				} catch (final Exception e) {
+					Log.w(TAG, e);
 				}
-			} catch (final Exception e) {
-				Log.w(TAG, e);
 			}
-			mMasterSurface = null;
 			if (mMasterTexture != null) {
 				mMasterTexture.release();
 				mMasterTexture = null;
