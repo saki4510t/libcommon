@@ -22,7 +22,7 @@ package com.serenegiant.media;
 /**
  * 動画エンコーダーインターフェース
  */
-public interface IVideoEncoder {
+public interface IVideoEncoder extends Encoder {
 	public void setVideoSize(final int width, final int height)
 		throws IllegalArgumentException, IllegalStateException;
 	public int getWidth();

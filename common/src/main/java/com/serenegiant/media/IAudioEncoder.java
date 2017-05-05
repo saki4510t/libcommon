@@ -21,5 +21,5 @@ package com.serenegiant.media;
 /**
  * 音声エンコーダーであることを示すためのマーカーインターフェース
  */
-public interface IAudioEncoder {
+public interface IAudioEncoder extends Encoder {
 }
