@@ -125,19 +125,27 @@ public abstract class MediaEncoder implements IMediaCodec {
 	}
 
 	/**
-	 * the method to indicate frame data is soon available or already available
-	 * @return return true if encoder is ready to encod.
+	 * 出力ファイルのパスを返す
+	 * @return
 	 */
-	public boolean frameAvailableSoon() {
+	public String getOutputPath() {
+		final AbstractRecorder recorder = mWeakMuxer.get();
+		return recorder != null ? recorder.getOutputPath() : null;
+	}
+
+	/**
+	 * the method to indicate frame data is soon available or already available
+	 * @return return true if encoder is ready to encode.
+	 */
+	public void frameAvailableSoon() {
 //    	if (DEBUG) Log.v(TAG, "frameAvailableSoon");
 		synchronized (mSync) {
 			if (!mIsCapturing || mRequestStop) {
-				return false;
+				return;
 			}
 			mRequestDrain++;
 			mSync.notifyAll();
 		}
-		return true;
 	}
 
 	@Override
@@ -150,6 +158,10 @@ public abstract class MediaEncoder implements IMediaCodec {
 		return mIsCapturing;
 	}
 
+	public boolean isCapturing() {
+		return mIsCapturing;
+	}
+	
 	public boolean isAudio() {
 		return mIsAudio;
 	}
@@ -291,7 +303,7 @@ public abstract class MediaEncoder implements IMediaCodec {
 		callOnRelease();
 	}
 
-	protected void signalEndOfInputStream() {
+	public void signalEndOfInputStream() {
 		if (DEBUG) Log.d(TAG, "sending EOS to encoder");
 		// signalEndOfInputStream is only available for video encoding with surface
 		// and equivalent sending a empty buffer with BUFFER_FLAG_END_OF_STREAM flag.
@@ -299,13 +311,17 @@ public abstract class MediaEncoder implements IMediaCodec {
 		encode(null, 0, getPTSUs());
 	}
 
+	public void encode(final ByteBuffer buffer) {
+		encode(buffer, buffer.capacity(), getPTSUs());
+	}
+	
 	/**
 	 * Method to set byte array to the MediaCodec encoder
 	 * @param buffer
 	 * @param length　length of byte array, zero means EOS.
 	 * @param presentationTimeUs
 	 */
-	protected void encode(final ByteBuffer buffer, int length, long presentationTimeUs) {
+	public void encode(final ByteBuffer buffer, int length, long presentationTimeUs) {
 		if (!mIsCapturing || mRequestStop || (mMediaCodec == null)) return;
 		final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
 		while (mIsCapturing) {

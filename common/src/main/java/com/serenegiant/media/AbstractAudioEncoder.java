@@ -130,7 +130,9 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	}
 
 	@Override
-	protected MediaFormat createOutputFormat(final byte[] csd, final int size, final int ix0, final int ix1) {
+	protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+		final int ix0, final int ix1, final int ix2) {
+		
 		MediaFormat outFormat;
         if (ix0 >= 0) {
 //        	Log.w(TAG, "csd may be wrong, it may be for video");

@@ -440,8 +440,9 @@ LOOP:	while (mIsCapturing) {
                         encodedData.position(0);
                         final int ix0 = byteComp(tmp, 0, START_MARK, START_MARK.length);
                         final int ix1 = byteComp(tmp, ix0+1, START_MARK, START_MARK.length);
+						final int ix2 = byteComp(tmp, ix1+1, START_MARK, START_MARK.length);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1);
+                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!startRecorder(recorder, outFormat))
                         	break LOOP;
                     }
@@ -486,7 +487,8 @@ LOOP:	while (mIsCapturing) {
 //		if (DEBUG) Log.v(TAG, "drain:finished");
     }
 
-    protected abstract MediaFormat createOutputFormat(byte[] csd, int size, int ix0, int ix1);
+    protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
+    	final int ix0, final int ix1, final int ix2);
 
 	/**
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる

@@ -161,4 +161,7 @@ public abstract class AbstractRecorder {
 
 	public abstract Surface getInputSurface() throws IllegalStateException;
 
+	public String getOutputPath() {
+		return mOutputPath;
+	}
 }

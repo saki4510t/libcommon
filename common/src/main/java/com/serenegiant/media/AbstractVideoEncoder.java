@@ -266,7 +266,9 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
     }
 
 	@Override
-	protected MediaFormat createOutputFormat(final byte[] csd, final int size, final int ix0, final int ix1) {
+	protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+		final int ix0, final int ix1, final int ix2) {
+		
 		final MediaFormat outFormat;
         if (ix0 >= 0) {
             outFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
@@ -275,7 +277,7 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
         	csd0.flip();
             outFormat.setByteBuffer("csd-0", csd0);
             if (ix1 > ix0) {
-				// FIXME ここのサイズはsize-ix1、今はたまたまix0=0だから大丈夫なのかも
+				final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
             	final ByteBuffer csd1 = ByteBuffer.allocateDirect(size - ix1 + ix0).order(ByteOrder.nativeOrder());
             	csd1.put(csd, ix1, size - ix1 + ix0);
             	csd1.flip();
