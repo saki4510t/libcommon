@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
@@ -26,6 +27,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.Surface;
+
+import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.utils.BuildCheck;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -37,10 +41,11 @@ import java.util.concurrent.TimeUnit;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractFakeEncoder implements Encoder {
-	private static final boolean DEBUG = true;	// FIXME 実働時にはfalseにすること
+
+//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AbstractFakeEncoder.class.getSimpleName();
 
-	private static final class FrameData {
+	static final class FrameData {
 		private final WeakReference<AbstractFakeEncoder> mWeakParent;
 		public ByteBuffer data;
 		public long presentationTimeUs;
@@ -80,20 +85,26 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
+	@SuppressLint("InlinedApi")
+	private static final int BUFFER_FLAG_KEY_FRAME
+		= BuildCheck.isLollipop()
+			? MediaCodec.BUFFER_FLAG_KEY_FRAME : MediaCodec.BUFFER_FLAG_SYNC_FRAME;
+
 	/**
 	 * フレームプールの最大数
 	 */
-	private static final int MAX_POOL_SZ = 6;
+	private static final int MAX_POOL_SZ = 16;
 	/**
 	 * フレームキューの最大数
 	 */
-	private static final int MAX_QUEUE_SZ = 4;
+	private static final int MAX_QUEUE_SZ = 14;
 	/**
 	 * デフォルトのフレームサイズ
 	 */
-	private static final int DEFAULT_FRAME_SZ = 1024;
+	protected static final int DEFAULT_FRAME_SZ = 1024;
 	
-	private static final long MAX_WAIT_FRAME_MS = 20;
+	private static final long MAX_WAIT_FRAME_MS = 100;
 	
 	/**
 	 * エンコード実行中フラグ
@@ -138,7 +149,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フレームキュー
 	 */
-	private final LinkedBlockingQueue<FrameData> mFrameQueue = new LinkedBlockingQueue<FrameData>(MAX_QUEUE_SZ);
+	private final LinkedBlockingQueue<FrameData> mFrameQueue
+		= new LinkedBlockingQueue<FrameData>(MAX_QUEUE_SZ);
 	/**
 	 * デフォルトのフレームサイズ
 	 */
@@ -147,27 +159,46 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * フレーム情報(ワーク用)
 	 */
 	private final MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-
-	public AbstractFakeEncoder(final String mime_type, final IRecorder recorder,
-		final EncoderListener listener) {
+	
+	/**
+	 * コンストラクタ
+	 * フレームデータのデフォルトサイズはDEFAULT_FRAME_SZ=1024バイト
+	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 */
+	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
+							   @NonNull final EncoderListener listener) {
 		
-		this(mime_type, recorder, listener, DEFAULT_FRAME_SZ);
+		this(mimeType, recorder, listener, DEFAULT_FRAME_SZ);
 	}
 	
-	public AbstractFakeEncoder(final String mime_type, final IRecorder recorder,
-		final EncoderListener listener, final int defaultFrameSz) {
+	/**
+	 * コンストラクタ
+ 	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz デフォルトで確保するフレームデータのサイズ
+	 */
+	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
+							   @NonNull final EncoderListener listener, final int defaultFrameSz) {
 		
-		if (listener == null) throw new NullPointerException("EncodeListener is null");
-		if (recorder == null) throw new NullPointerException("IMuxer is null");
-		MIME_TYPE = mime_type;
+		MIME_TYPE = mimeType;
 		mRecorder = recorder;
 		mListener = listener;
 		mDefaultFrameSz = defaultFrameSz;
 		recorder.addEncoder(this);
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+//		if (DEBUG) Log.v(TAG, "finalize:");
+		release();
+		super.finalize();
+	}
+
 	/**
-	 * 出力用のMuxerWrapperを返す
+	 * 出力用のIRecorderを返す
 	 * @return
 	 */
 	public IRecorder getRecorder() {
@@ -183,46 +214,16 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		return mRecorder != null ? mRecorder.getOutputPath() : null;
 	}
 
-	@Override
-	protected void finalize() throws Throwable {
-//		if (DEBUG) Log.v(TAG, "finalize:");
-		mRecorder = null;
-		release();
-		super.finalize();
-	}
-
 	/**
 	 * 子クラスでOverrideした時でもEncoder#releaseを呼び出すこと
 	 */
 	@Override
-	public  void release() {
-//		if (DEBUG) Log.d(TAG, "release:");
-		if (mIsCapturing) {
-			try {
-				mListener.onStopEncode(this);
-			} catch (final Exception e) {
-//				Log.e(TAG, "failed onStopped", e);
-			}
+	public  synchronized void release() {
+//		if (DEBUG) Log.v(TAG, "release:");
+		if (mRecorder != null) {
+			internalRelease();
 		}
-		mIsCapturing = false;
-        if (mRecorderStarted) {
-        	mRecorderStarted = false;
-        	if (mRecorder != null) {
-       			try {
-//    				if (DEBUG) Log.v(TAG, "call MuxerWrapper#stop");
-       				mRecorder.stop(this);
-    			} catch (final Exception e) {
-//    				Log.e(TAG, "failed stopping muxer", e);
-    			}
-//				mRecorder = null;
-        	}
-        }
-		try {
-			mListener.onDestroy(this);
-		} catch (final Exception e) {
-//			Log.e(TAG, "destroy:", e);
-		}
-		mRecorder = null;
+//		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
 	/**
@@ -233,14 +234,14 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + this);
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
-    	// ・・・らしいので空バッファを送る。encode内でBUFFER_FLAG_END_OF_STREAMを付けてセットする
+    	// ・・・らしいので空バッファを送る。
     	final FrameData frame = obtain(0);
     	frame.set(null, 0, 0, getInputPTSUs(), MediaCodec.BUFFER_FLAG_END_OF_STREAM);
     	offer(frame);
 	}
 
 	/**
-	 * このクラスではサポートしていない
+	 * このクラスではサポートしていない。
 	 * 代わりに#queueFrameへエンコード済みのフレームを渡すこと
 	 * encodeはnative側からアクセスするので変更時は注意
 	 * @param buffer
@@ -251,7 +252,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	}
 	
 	/**
-	 * このクラスではサポートしていない
+	 * このクラスではサポートしていない。
 	 * 代わりに#queueFrameへエンコード済みのフレームを渡すこと
 	 * @param buffer
 	 * @param length
@@ -273,14 +274,14 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @return true: 正常にキューに追加できた
 	 * @throws IllegalStateException
 	 */
-	public boolean queueFrame(@Nullable final ByteBuffer buffer, final int offset, final int size,
+	public boolean queueFrame(@Nullable final ByteBuffer buffer,
+		final int offset, final int size,
 		final long presentationTimeUs, final int flags) throws IllegalStateException {
 		
-		synchronized (mSync) {
-			if (!mIsCapturing) {
-				throw new IllegalStateException();
-			}
+		if (!mIsCapturing) {
+			throw new IllegalStateException();
 		}
+		if (mRequestStop) return false;
 		final FrameData frame = obtain(size);
 		frame.set(buffer, offset, size, presentationTimeUs, flags);
 		return offer(frame);
@@ -288,23 +289,33 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	
 	@Override
 	public boolean isCapturing() {
-        synchronized (mSync) {
-            return mIsCapturing;
-        }
+		return mIsCapturing;
+	}
+	
+	/**
+	 * エンコードの準備(IRecorderから呼び出される)
+	 * @throws Exception
+	 */
+	@Override
+	public void prepare() throws Exception {
+//		if (DEBUG) Log.v(TAG, "prepare:");
+		mTrackIndex = -1;
+		mRecorderStarted = false;
+		mIsCapturing = true;
+		mRequestStop = mIsEOS = false;
+		callOnStartEncode(null, -1, false);
 	}
 
 	/**
-	 * エンコード開始要求(Recorderから呼び出される)
+	 * エンコード開始要求(IRecorderから呼び出される)
 	 */
 	@Override
 	public void start() {
-//		if (DEBUG) Log.v(TAG, "start");
+//		if (DEBUG) Log.v(TAG, "start:");
 		synchronized (mSync) {
-			if (!mIsCapturing) {
+			if (mIsCapturing && !mRequestStop) {
 				initPool();
-				mIsCapturing = true;
-				mRequestStop = false;
-				// エンコーダースレッドを生成
+				// フレーム処理スレッドを生成＆起床
 				new Thread(mDrainTask, getClass().getSimpleName()).start();
 				try {
 					mSync.wait();	// エンコーダースレッド起床待ち
@@ -313,24 +324,27 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				}
 			}
 		}
+//		if (DEBUG) Log.v(TAG, "start:finished");
 	}
 	
 	/**
-	 * エンコーダ終了要求(Recorderから呼び出される)
+	 * エンコーダ終了要求(IRecorderから呼び出される)
 	 */
 	@Override
 	public void stop() {
-//		if (DEBUG) Log.v(TAG, "stop");
+//		if (DEBUG) Log.v(TAG, "stop:mRequestStop=" + mRequestStop);
 		synchronized (mSync) {
 			if (/*!mIsCapturing ||*/ mRequestStop) {
 				return;
 			}
 			// 終了要求
-			signalEndOfInputStream();
 			mRequestStop = true;	// 新規のフレームを受けないようにする
+			signalEndOfInputStream();
 			mSync.notifyAll();
 		}
-		// 本当のところいつ終了するのかはわからないので、呼び出し元スレッドを遅延させないために終了待ちせずに直ぐに返る
+		// 本当のところいつ終了するのかはわからないので、
+		// 呼び出し元スレッドを遅延させないために終了待ちせずに直ぐに返る
+//		if (DEBUG) Log.v(TAG, "stop:finished");
 	}
 
 	/**
@@ -339,7 +353,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	@Override
 	public void frameAvailableSoon() {
-//		if (DEBUG) Log.v(TAG, "AbstractEncoder#frameAvailableSoon");
+//		if (DEBUG) Log.v(TAG, "frameAvailableSoon:");
 		synchronized (mSync) {
 			if (!mIsCapturing || mRequestStop) {
 				return;
@@ -382,6 +396,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * フレームプールを初期化する
 	 */
 	protected void initPool() {
+//		if (DEBUG) Log.v(TAG, "initPool:");
 		mFrameQueue.clear();
 		synchronized (mPool) {
 			mPool.clear();
@@ -391,6 +406,21 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		}
 	}
 	
+	/**
+	 * フレームプールとキューを空にする
+	 */
+	protected void clearFrames() {
+//		if (DEBUG) Log.v(TAG, "clearFrames:");
+		synchronized (mPool) {
+			mPool.clear();
+		}
+		mFrameQueue.clear();
+		cnt = 0;
+	}
+	
+	/**
+	 * 生成したフレームの数
+	 */
 	private int cnt = 0;
 	
 	/**
@@ -403,7 +433,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		synchronized (mPool) {
 			if (mPool.isEmpty()) {
 				cnt++;
-				if (DEBUG) Log.v(TAG, "obtain:create new FrameData, total=" + cnt);
+//				if (DEBUG) Log.v(TAG, "obtain:create new FrameData, total=" + cnt);
 				result = new FrameData(this, mDefaultFrameSz);
 			} else {
 				result = mPool.remove(mPool.size() - 1);
@@ -420,12 +450,12 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	protected boolean offer(@NonNull final FrameData frame) {
 		boolean result = mFrameQueue.offer(frame);
 		if (!result) {
-			if (DEBUG) Log.w(TAG, "offer:先頭を破棄する");
+//			if (DEBUG) Log.w(TAG, "offer:先頭を破棄する");
 		    final FrameData head = mFrameQueue.poll();
 			result = mFrameQueue.offer(frame);
-			if (!result) {
-				if (DEBUG) Log.w(TAG, "offer:frame dropped");
-			}
+//			if (!result) {
+//				if (DEBUG) Log.w(TAG, "offer:frame dropped");
+//			}
 			if (head != null) {
 				recycle(head);
 			}
@@ -440,12 +470,14 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @return
 	 */
 	protected FrameData waitFrame(final long waitTimeMs) {
+//		if (DEBUG) Log.v(TAG, "waitFrame:");
 		FrameData result = null;
 		try {
 			result = mFrameQueue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
 		} catch (InterruptedException e) {
 			// ignore
 		}
+//		if (DEBUG) Log.v(TAG, "waitFrame:result=" + result);
 		return result;
 	}
 	
@@ -454,127 +486,182 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param frame
 	 */
 	protected void recycle(@NonNull final FrameData frame) {
+//		if (DEBUG) Log.v(TAG, "recycle:");
 		synchronized (mPool) {
 			if (mPool.size() < MAX_POOL_SZ) {
 				mPool.add(frame);
 			} else {
+//				if (DEBUG) Log.v(TAG, "recycle:フレームプールがいっぱいで戻せなかった");
 				cnt--;
 			}
 		}
 	}
 //================================================================================
-
+	/**
+	 * フレーム処理ループの実体
+	 */
 	private final Runnable mDrainTask = new Runnable() {
 		@Override
 		public void run() {
-			drainLoop();
+//			if (DEBUG) Log.v(TAG, "mDrainTask:");
+			synchronized (mSync) {
+				mRequestStop = false;
+				mSync.notify();
+			}
+			for ( ; mIsCapturing ; ) {
+				final FrameData frame = waitFrame(MAX_WAIT_FRAME_MS);
+				if (frame != null) {
+					try {
+						handleFrame(frame);
+					} finally {
+						recycle(frame);
+					}
+				}
+			} // end of while
+			synchronized (mSync) {
+				mRequestStop = true;
+				mIsCapturing = false;
+			}
+//			if (DEBUG) Log.v(TAG, "mDrainTask:finished");
 		}
 	};
 	
-	private void drainLoop() {
-		synchronized (mSync) {
-			mRequestStop = false;
-			mSync.notify();
-		}
-		for ( ; mIsCapturing ; ) {
-			final FrameData frame = waitFrame(MAX_WAIT_FRAME_MS);
-			if (frame != null) {
-				try {
-					handleFrame(frame);
-				} finally {
-					recycle(frame);
-				}
-			} else if (mRequestStop) {
-				break;
-			}
-		} // end of while
-		synchronized (mSync) {
-			mRequestStop = true;
-			mIsCapturing = false;
-		}
-	}
-	
+	/**
+	 * 1フレーム分の処理
+	 * @param frame
+	 */
 	protected void handleFrame(final FrameData frame) {
+//		if (DEBUG) Log.v(TAG, "handleFrame:");
 		final IRecorder recorder = mRecorder;
 		if (recorder == null) {
 //			throw new NullPointerException("muxer is unexpectedly null");
-//			Log.w(TAG, "muxer is unexpectedly null");
+			Log.w(TAG, "muxer is unexpectedly null");
 			return;
 		}
-		mBufferInfo.set(0, frame.size, frame.presentationTimeUs, frame.flags);
-		if (!mRecorderStarted && ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)) {
-//			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_CODEC_CONFIG");
+		mBufferInfo.set(frame.offset, frame.size, frame.presentationTimeUs, frame.flags);
+		if (!mRecorderStarted
+			&& (((mBufferInfo.flags & BUFFER_FLAG_KEY_FRAME) == BUFFER_FLAG_KEY_FRAME)
+				|| ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0))
+			) {
+//			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_KEY_FRAME");
 			// csd-0とcsd-1が同時に来ているはずなので分離してセットする
 			final byte[] tmp = new byte[mBufferInfo.size];
 			frame.data.position(0);
 			frame.data.get(tmp, 0, mBufferInfo.size);
 			frame.data.position(0);
-			final int ix0 = byteComp(tmp, 0, START_MARK, START_MARK.length);
-			final int ix1 = byteComp(tmp, ix0+1, START_MARK, START_MARK.length);
-//			if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-			final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1);
-			if (!startRecorder(recorder, outFormat)) {
+			final int ix0 = BufferHelper.findAnnexB(tmp, 0);
+			final int ix1 = BufferHelper.findAnnexB(tmp, ix0 + 1);
+			final int ix2 = BufferHelper.findAnnexB(tmp, ix1 + 1);
+//			if (DEBUG) Log.i(TAG, String.format("ix0=%d,ix1=%d,ix2=%d", ix0, ix1, ix2));
+			try {
+				final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
+				if (!startRecorder(recorder, outFormat)) {
+					Log.w(TAG, "handleFrame:failed to start recorder");
+					return;
+				}
+			} catch (final Exception e) {
 				return;
 			}
-			mBufferInfo.size = 0;
+			if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+				mBufferInfo.size = 0;
+			}
 		}
 		
 		if (mRecorderStarted && (mBufferInfo.size != 0)) {
-			// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
-			if (mRecorderStarted) {
-				// ファイルに出力(presentationTimeUsを調整)
-				try {
-					mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-					recorder.writeSampleData(mTrackIndex, frame.data, mBufferInfo);
-//					prevOutputPTSUs = mBufferInfo.presentationTimeUs;
-               	 } catch (final TimeoutException e) {
-//					if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
-					recorder.stopRecording();
-				} catch (final Exception e) {
-//					if (DEBUG) Log.w(TAG, e);
-					recorder.stopRecording();
-				}
+			try {
+				mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
+				recorder.writeSampleData(mTrackIndex, frame.data, mBufferInfo);
+			 } catch (final TimeoutException e) {
+//				if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
+				recorder.stopRecording();
+			} catch (final Exception e) {
+//				if (DEBUG) Log.w(TAG, e);
+				recorder.stopRecording();
 			}
 		}
 		if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-			// ストリーム終了指示が来た時
+//			if (DEBUG) Log.v(TAG, "ストリーム終了指示が来た");
 			stopRecorder(recorder);
 		}
 //		if (DEBUG) Log.v(TAG, "handleFrame:finished");
 	}
-
-	protected abstract MediaFormat createOutputFormat(byte[] csd, int size, int ix0, int ix1);
+	
+	/**
+	 * Muxer初期化用のMediaFormatを生成する
+	 * @param csd
+	 * @param size
+	 * @param ix0
+	 * @param ix1
+	 * @param ix2
+	 * @return
+	 */
+	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
+		final int ix0, final int ix1, final int ix2);
 
 	/**
-	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる
+	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してIRecorderをスタートさせる
 	 */
-	public boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
-//		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat);
+	protected boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
+//		if (DEBUG) Log.i(TAG, "startRecorder:outFormat=" + outFormat);
 		mTrackIndex = recorder.addTrack(this, outFormat);
 		if (mTrackIndex >= 0) {
 			mRecorderStarted = true;
 			if (!recorder.start(this)) {
 				// startは全てのエンコーダーがstartを呼ぶまで返ってこない
-				// falseを返した時はmuxerをスタート出来てない。何らかの異常
-//				Log.e(TAG, "failed to start muxer mTrackIndex=" + mTrackIndex);
+				// falseを返した時は何らかの異常でmuxerをスタート出来てない。
+				Log.e(TAG, "failed to start muxer mTrackIndex=" + mTrackIndex);
 			}
     	} else {
-//			Log.e(TAG, "failed to addTrack: mTrackIndex=" + mTrackIndex);
+			Log.e(TAG, "failed to addTrack: mTrackIndex=" + mTrackIndex);
 			recorder.removeEncoder(this);
 		}
 		return recorder.isStarted();
 	}
-
-	public void stopRecorder(final IRecorder recorder) {
-		mRecorderStarted = mIsCapturing = false;
+	
+	/**
+	 * BUFFER_FLAG_END_OF_STREAMを受け取った時の処理、IRecorderを終了させる。
+	 * @param recorder
+	 */
+	protected void stopRecorder(final IRecorder recorder) {
+//		if (DEBUG) Log.d(TAG, "stopRecorder:mRecorder=" + mRecorder);
+		if (mRecorder != null) {
+			internalRelease();
+		}
 	}
 
-	/**
-	 * 前回Recorderに書き込んだ際のpresentationTimeUs
-	 */
-	private long prevOutputPTSUs = -1;
-//	private long firstOutputPTSUs = -1;
+	private void internalRelease() {
+//		if (DEBUG) Log.d(TAG, "internalRelease:");
+		mIsEOS = true;
+		if (mIsCapturing) {
+			mIsCapturing = false;
+			try {
+				mListener.onStopEncode(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "failed onStopped", e);
+			}
+		}
+		if (mRecorderStarted) {
+			mRecorderStarted = false;
+			if (mRecorder != null) {
+				try {
+//					if (DEBUG) Log.v(TAG, "call IRecorder#stop");
+					mRecorder.stop(this);
+				} catch (final Exception e) {
+					Log.e(TAG, "failed stopping muxer", e);
+				}
+			}
+		}
+		try {
+			mListener.onDestroy(this);
+		} catch (final Exception e) {
+			Log.e(TAG, "destroy:", e);
+		}
+		mRecorder = null;
+		clearFrames();
+//		if (DEBUG) Log.d(TAG, "internalRelease:finished");
+	}
 
+//================================================================================
 	/**
 	 * 前回MediaCodecへのエンコード時に使ったpresentationTimeUs
 	 */
@@ -588,10 +675,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	protected long getInputPTSUs() {
 		long result = System.nanoTime() / 1000L;
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
-/*		if (result <= prevOutputPTSUs) {
-			Log.w(TAG, "input pts smaller than previous output PTS");
-			result = (prevOutputPTSUs - result) + result;
-		} */
 		if (result <= prevInputPTSUs) {
 			result = prevInputPTSUs + 9643;
 		}
@@ -600,50 +683,21 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	}
 
 	/**
+	 * 前回Recorderに書き込んだ際のpresentationTimeUs
+	 */
+	private long prevOutputPTSUs = -1;
+
+	/**
 	 * Muxerの今回の書き込み用のpresentationTimeUs値を取得
 	 * @return
 	 */
 	protected long getNextOutputPTSUs(long presentationTimeUs) {
-//		long result = System.nanoTime() / 1000L;
-//		 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
-/*		if (result < prevOutputPTSUs)
-			result = (prevOutputPTSUs - result) + result; */
+		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 		if (presentationTimeUs <= prevOutputPTSUs) {
 			presentationTimeUs = prevOutputPTSUs + 9643;
 		}
 		prevOutputPTSUs = presentationTimeUs;
 		return presentationTimeUs;
-	}
-
-	/**
-	 * codec specific dataの先頭マーカー
-	 */
-	protected static final byte[] START_MARK = { 0, 0, 0, 1, };
-	/**
-	 * byte[]を検索して一致する先頭インデックスを返す
-	 * @param array 検索されるbyte[]
-	 * @param search 検索するbyte[]
-	 * @param len 検索するバイト数
-	 * @return 一致した先頭位置、一致しなければ-1
-	 */
-	protected final int byteComp(@NonNull final byte[] array, final int offset, @NonNull final byte[] search, final int len) {
-		int index = -1;
-		final int n0 = array.length;
-		final int ns = search.length;
-		if ((n0 >= offset + len) && (ns >= len)) {
-			for (int i = offset; i < n0 - len; i++) {
-				int j = len - 1;
-				while (j >= 0) {
-					if (array[i + j] != search[j]) break;
-					j--;
-				}
-				if (j < 0) {
-					index = i;
-					break;
-				}
-			}
-		}
-		return index;
 	}
 
 }

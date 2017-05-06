@@ -28,23 +28,62 @@ import java.nio.ByteOrder;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class FakeVideoEncoder extends AbstractFakeEncoder
 	implements IVideoEncoder {
+	
+//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final String TAG = FakeVideoEncoder.class.getSimpleName();
 
+	public static final String MIME_AVC = "video/avc";
+	
 	protected int mWidth, mHeight;
-
+	
+	/**
+	 * コンストラクタ
+	 * H.264/AVC用
+	 * @param recorder
+	 * @param listener
+	 */
+	public FakeVideoEncoder(final IRecorder recorder, final EncoderListener listener) {
+		
+		super(MIME_AVC, recorder, listener);
+	}
+	
+	/**
+	 * コンストラクタ
+	 * @param mime_type
+	 * @param recorder
+	 * @param listener
+	 */
 	public FakeVideoEncoder(final String mime_type,
 		final IRecorder recorder, final EncoderListener listener) {
 		
 		super(mime_type, recorder, listener);
 	}
 	
-	public FakeVideoEncoder(final String mime_type,
-		final IRecorder recorder, final EncoderListener listener, final int defaultFrameSz) {
+	/**
+	 * コンストラクタ
+	 * H.264/AVC用
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz
+	 */
+	public FakeVideoEncoder(final IRecorder recorder,
+		final EncoderListener listener, final int defaultFrameSz) {
 		
-		super(mime_type, recorder, listener, defaultFrameSz);
+		super(MIME_AVC, recorder, listener, defaultFrameSz);
 	}
 	
-	@Override
-	public void prepare() throws Exception {
+	/**
+	 * コンストラクタ
+	 * @param mime_type
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz
+	 */
+	public FakeVideoEncoder(final String mime_type,
+		final IRecorder recorder, final EncoderListener listener,
+		final int defaultFrameSz) {
+		
+		super(mime_type, recorder, listener, defaultFrameSz);
 	}
 	
 	@Deprecated
@@ -53,10 +92,20 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		return false;
 	}
 	
+	/**
+	 * Muxer初期化用のMediaFormatを生成する
+	 * @param csd
+	 * @param size
+	 * @param ix0
+	 * @param ix1
+	 * @param ix2
+	 * @return
+	 */
 	@Override
 	protected MediaFormat createOutputFormat(final byte[] csd,
-		final int size, final int ix0, final int ix1) {
+		final int size, final int ix0, final int ix1, final int ix2) {
 		
+//		if (DEBUG) Log.v(TAG, "createOutputFormat:");
 		final MediaFormat outFormat;
         if (ix0 >= 0) {
             outFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
@@ -65,17 +114,20 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
         	csd0.put(csd, ix0, ix1 - ix0);
         	csd0.flip();
             outFormat.setByteBuffer("csd-0", csd0);
+//			if (DEBUG) BufferHelper.dumpByteBuffer("sps", csd0, 0, csd0 != null ? csd0.capacity() : 0);
             if (ix1 > ix0) {
-				// FIXME ここのサイズはsize-ix1、今はたまたまix0=0だから大丈夫なのかも
-            	final ByteBuffer csd1 = ByteBuffer.allocateDirect(size - ix1 + ix0)
+				final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
+            	final ByteBuffer csd1 = ByteBuffer.allocateDirect(sz)
             		.order(ByteOrder.nativeOrder());
-            	csd1.put(csd, ix1, size - ix1 + ix0);
+            	csd1.put(csd, ix1, sz);
             	csd1.flip();
                 outFormat.setByteBuffer("csd-1", csd1);
+//				if (DEBUG) BufferHelper.dumpByteBuffer("pps", csd1, 0, csd1 != null ? csd1.capacity() : 0);
             }
         } else {
         	throw new RuntimeException("unexpected csd data came.");
         }
+//		if (DEBUG) Log.v(TAG, "createOutputFormat:result=" + outFormat);
         return outFormat;
 	}
 	
@@ -83,6 +135,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	public void setVideoSize(final int width, final int height)
 		throws IllegalArgumentException, IllegalStateException {
 	
+//		if (DEBUG) Log.v(TAG, "setVideoSize:");
 		mWidth = width;
 		mHeight = height;
 	}
