@@ -46,9 +46,18 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	private IRecorderCallback mRecorderCallback;
 	private final boolean hasAudioEncoder;
 
-	public MediaMovieRecorder(final String output_path, final boolean audio_recording) throws IOException {
+	public MediaMovieRecorder(final String output_path,
+		final boolean audio_recording) throws IOException {
+		
+		this(output_path, audio_recording, false);
+	}
+
+	public MediaMovieRecorder(final String output_path,
+		final boolean audio_recording, final boolean useVideoMuxer) throws IOException {
 		super(output_path);
-		mMuxer = new MediaMuxerWrapper(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);	// API >= 18
+		mMuxer = useVideoMuxer
+			? new VideoMuxer(output_path)	// API >= 16
+			: new MediaMuxerWrapper(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);	// API >= 18
 		new MediaVideoEncoder(this, mMediaCodecCallback);
 		if (audio_recording) {
 			new MediaAudioEncoder(this, mMediaCodecCallback);
