@@ -94,38 +94,40 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フレームプールの最大数
 	 */
-	private static final int MAX_POOL_SZ = 16;
+	private static final int DEFAULT_MAX_POOL_SZ = 8;
 	/**
 	 * フレームキューの最大数
 	 */
-	private static final int MAX_QUEUE_SZ = 14;
+	private static final int DEFAULT_MAX_QUEUE_SZ = 6;
 	/**
 	 * デフォルトのフレームサイズ
 	 */
-	protected static final int DEFAULT_FRAME_SZ = 1024;
-	
+	private static final int DEFAULT_FRAME_SZ = 1024;
+	/**
+	 * フレームの待ち時間
+	 */
 	private static final long MAX_WAIT_FRAME_MS = 100;
 	
 	/**
 	 * エンコード実行中フラグ
 	 */
-	protected volatile boolean mIsCapturing;
+	private volatile boolean mIsCapturing;
 	/**
 	 * 終了要求フラグ(新規エンコード禁止フラグ)
 	 */
-	protected volatile boolean mRequestStop;
+	private volatile boolean mRequestStop;
 	/**
 	 * ファイルへの出力中フラグ
 	 */
-	protected volatile boolean mRecorderStarted;
+	private volatile boolean mRecorderStarted;
 	/**
 	 * 終了フラグ
 	 */
-	protected boolean mIsEOS;
+	private boolean mIsEOS;
 	/**
 	 * トラックインデックス
 	 */
-	protected int mTrackIndex;
+	private int mTrackIndex;
 	/**
 	 * Recorderオブジェクトへの参照
 	 */
@@ -133,7 +135,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フラグの排他制御用
 	 */
-	protected final Object mSync = new Object();
+	private final Object mSync = new Object();
 	/**
 	 * エンコーダーイベントコールバックリスナー
 	 */
@@ -141,7 +143,15 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * MIME
 	 */
-	protected final String MIME_TYPE;
+	private final String MIME_TYPE;
+	/**
+	 * フレームサイズ
+	 */
+	private final int FRAME_SZ;
+	/**
+	 * プールサイズ
+	 */
+	private final int MAX_POOL_SZ;
 	/**
 	 * フレームプール
 	 */
@@ -149,12 +159,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フレームキュー
 	 */
-	private final LinkedBlockingQueue<FrameData> mFrameQueue
-		= new LinkedBlockingQueue<FrameData>(MAX_QUEUE_SZ);
-	/**
-	 * デフォルトのフレームサイズ
-	 */
-	private final int mDefaultFrameSz;
+	private final LinkedBlockingQueue<FrameData> mFrameQueue;
 	/**
 	 * フレーム情報(ワーク用)
 	 */
@@ -168,9 +173,24 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param listener
 	 */
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
-							   @NonNull final EncoderListener listener) {
+		@NonNull final EncoderListener listener) {
 		
-		this(mimeType, recorder, listener, DEFAULT_FRAME_SZ);
+		this(mimeType, recorder, listener, DEFAULT_FRAME_SZ,
+			DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+	}
+	
+	/**
+	 * コンストラクタ
+	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 * @param frameSz
+	 */
+	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener, final int frameSz) {
+		
+		this(mimeType, recorder, listener, frameSz,
+			DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 	
 	/**
@@ -178,15 +198,19 @@ public abstract class AbstractFakeEncoder implements Encoder {
  	 * @param mimeType
 	 * @param recorder
 	 * @param listener
-	 * @param defaultFrameSz デフォルトで確保するフレームデータのサイズ
+	 * @param frameSz デフォルトで確保するフレームデータのサイズ
 	 */
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
-							   @NonNull final EncoderListener listener, final int defaultFrameSz) {
+		@NonNull final EncoderListener listener, final int frameSz,
+		final int maxPoolSz, final int maxQueueSz) {
 		
 		MIME_TYPE = mimeType;
+		FRAME_SZ = frameSz;
+		MAX_POOL_SZ = maxPoolSz;
 		mRecorder = recorder;
 		mListener = listener;
-		mDefaultFrameSz = defaultFrameSz;
+		mFrameQueue = new LinkedBlockingQueue<FrameData>(maxQueueSz);
+		
 		recorder.addEncoder(this);
 	}
 
@@ -401,7 +425,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		synchronized (mPool) {
 			mPool.clear();
 			for (int i = 0; i < MAX_POOL_SZ; i++) {
-				mPool.add(new FrameData(this, mDefaultFrameSz));
+				mPool.add(new FrameData(this, FRAME_SZ));
 			}
 		}
 	}
@@ -434,7 +458,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			if (mPool.isEmpty()) {
 				cnt++;
 //				if (DEBUG) Log.v(TAG, "obtain:create new FrameData, total=" + cnt);
-				result = new FrameData(this, mDefaultFrameSz);
+				result = new FrameData(this, FRAME_SZ);
 			} else {
 				result = mPool.remove(mPool.size() - 1);
 				result.resize(newSize);
@@ -554,7 +578,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			final int ix2 = BufferHelper.findAnnexB(tmp, ix1 + 1);
 //			if (DEBUG) Log.i(TAG, String.format("ix0=%d,ix1=%d,ix2=%d", ix0, ix1, ix2));
 			try {
-				final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
+				final MediaFormat outFormat = createOutputFormat(MIME_TYPE,
+					tmp, mBufferInfo.size, ix0, ix1, ix2);
 				if (!startRecorder(recorder, outFormat)) {
 					Log.w(TAG, "handleFrame:failed to start recorder");
 					return;
@@ -595,7 +620,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param ix2
 	 * @return
 	 */
-	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
+	protected abstract MediaFormat createOutputFormat(final String mime,
+		final byte[] csd, final int size,
 		final int ix0, final int ix1, final int ix2);
 
 	/**

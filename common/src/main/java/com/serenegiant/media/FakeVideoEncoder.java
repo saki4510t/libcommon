@@ -42,9 +42,39 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param recorder
 	 * @param listener
 	 */
-	public FakeVideoEncoder(final IRecorder recorder, final EncoderListener listener) {
+	public FakeVideoEncoder(final IRecorder recorder,
+		final EncoderListener listener) {
 		
 		super(MIME_AVC, recorder, listener);
+	}
+	
+	/**
+	 * コンストラクタ
+	 * H.264/AVC用
+	 * @param recorder
+	 * @param listener
+	 * @param frameSz
+	 */
+	public FakeVideoEncoder(final IRecorder recorder,
+		final EncoderListener listener, final int frameSz) {
+		
+		super(MIME_AVC, recorder, listener, frameSz);
+	}
+
+	/**
+	 * コンストラクタ
+	 * H.264/AVC用
+	 * @param recorder
+	 * @param listener
+	 * @param frameSz
+	 * @param maxPoolSz
+	 * @param maxQueueSz
+	 */
+	public FakeVideoEncoder(final IRecorder recorder,
+		final EncoderListener listener, final int frameSz,
+		final int maxPoolSz, final int maxQueueSz) {
+		
+		super(MIME_AVC, recorder, listener, frameSz, maxPoolSz, maxQueueSz);
 	}
 	
 	/**
@@ -61,19 +91,6 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	
 	/**
 	 * コンストラクタ
-	 * H.264/AVC用
-	 * @param recorder
-	 * @param listener
-	 * @param defaultFrameSz
-	 */
-	public FakeVideoEncoder(final IRecorder recorder,
-		final EncoderListener listener, final int defaultFrameSz) {
-		
-		super(MIME_AVC, recorder, listener, defaultFrameSz);
-	}
-	
-	/**
-	 * コンストラクタ
 	 * @param mime_type
 	 * @param recorder
 	 * @param listener
@@ -84,6 +101,22 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		final int defaultFrameSz) {
 		
 		super(mime_type, recorder, listener, defaultFrameSz);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param mime_type
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz
+	 * @param maxPoolSz
+	 * @param maxQueueSz
+	 */
+	public FakeVideoEncoder(final String mime_type,
+		final IRecorder recorder, final EncoderListener listener,
+		final int defaultFrameSz, final int maxPoolSz, final int maxQueueSz) {
+		
+		super(mime_type, recorder, listener, defaultFrameSz, maxPoolSz, maxQueueSz);
 	}
 	
 	@Deprecated
@@ -102,13 +135,14 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @return
 	 */
 	@Override
-	protected MediaFormat createOutputFormat(final byte[] csd,
-		final int size, final int ix0, final int ix1, final int ix2) {
+	protected MediaFormat createOutputFormat(final String mime,
+		final byte[] csd, final int size,
+		final int ix0, final int ix1, final int ix2) {
 		
 //		if (DEBUG) Log.v(TAG, "createOutputFormat:");
 		final MediaFormat outFormat;
         if (ix0 >= 0) {
-            outFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
+            outFormat = MediaFormat.createVideoFormat(mime, mWidth, mHeight);
         	final ByteBuffer csd0 = ByteBuffer.allocateDirect(ix1 - ix0)
         		.order(ByteOrder.nativeOrder());
         	csd0.put(csd, ix0, ix1 - ix0);
