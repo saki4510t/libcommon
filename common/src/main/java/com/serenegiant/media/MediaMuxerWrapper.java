@@ -27,6 +27,9 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
 
+/**
+ * MediaMuxerをIMuxerインターフェースでラップ
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerWrapper implements IMuxer {
 

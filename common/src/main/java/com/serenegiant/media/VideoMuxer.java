@@ -31,7 +31,8 @@ import android.os.Build;
 /**
  * MediaMuxerがAPI>=18でしか使えないので、localに移植
  * 使い方はオリジナルのMediaMuxerとほぼ同じ
- * 普通はMuxer経由で使う
+ * 普通はIMuxer経由で使う
+ * libcommon内にはnative側が入ってないのでクラッシュするよ^^;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public final class VideoMuxer implements IMuxer {
