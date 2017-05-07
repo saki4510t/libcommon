@@ -18,15 +18,23 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 import android.util.Log;
 
 public class BufferHelper {
 
+	private static final char HEX[] = {
+		'0', '1', '2', '3',
+		'4', '5', '6', '7',
+		'8', '9', 'a', 'b',
+		'c', 'd', 'e', 'f'};
+	
 	private static final int BUF_LEN = 256;
 	public static final void dumpByteBuffer(final String tag,
 		final ByteBuffer buffer, final int offset, final int size) {
@@ -35,11 +43,12 @@ public class BufferHelper {
 	}
 
 	public static final void dumpByteBuffer(final String tag,
-		final ByteBuffer buffer, final int offset, final int _size, final boolean findAnnexB) {
+		final ByteBuffer _buffer, final int offset, final int _size, final boolean findAnnexB) {
 
 	    final byte[] dump = new byte[BUF_LEN];
 //		if (DEBUG) Log.i(TAG, "dumpByteBuffer:" + buffer);
-		if (buffer == null) return;
+		if (_buffer == null) return;
+		final ByteBuffer buffer = _buffer.duplicate();
 		final int n = buffer.limit();
 		final int pos = buffer.position();
 //		final int cap = buffer.capacity();
@@ -67,7 +76,6 @@ public class BufferHelper {
 			}
 		}
 		Log.i(tag, "dumpByteBuffer:" + sb.toString());
-		buffer.position(pos);
 	}
 
     /**
@@ -142,5 +150,54 @@ public class BufferHelper {
 		fb.position(0);
 		return fb;
 	}
-
+	
+	/**
+	 * 16進文字列をパースしてByteBufferとして返す
+	 * @param hexString
+	 * @return
+	 * @throws NumberFormatException
+	 */
+	public static ByteBuffer from(final String hexString) throws NumberFormatException {
+		final ByteArrayOutputStream out = new ByteArrayOutputStream();
+		final int n = !TextUtils.isEmpty(hexString) ? hexString.length() : 0;
+		for (int i = 0; i < n; i += 2) {
+			final int b = Integer.parseInt(hexString.substring(i, i + 2), 16);
+			out.write(b);
+		}
+		return ByteBuffer.wrap(out.toByteArray());
+	}
+	
+	/**
+	 * byte配列を16進文字列に変換する
+	 * @param bytes
+	 * @return
+	 */
+	public String toHexString(final byte[] bytes) {
+		final int n = (bytes != null) ? bytes.length : 0;
+		final StringBuilder sb = new StringBuilder(n * 2 + 2);
+		for (int i = 0; i < n; i++) {
+			final byte b = bytes[i];
+			sb.append(HEX[(0xf0 & b) >>> 4]);
+			sb.append(HEX[0x0f & b]);
+		}
+		return sb.toString();
+	}
+	
+	/**
+	 * ByteBufferを16進文字列に変換する
+	 * @param buffer
+	 * @return
+	 */
+	public String toHexString(final ByteBuffer buffer) {
+		if (buffer == null) return null;
+		final ByteBuffer _buffer = buffer.duplicate();
+		final int n = _buffer.remaining();
+		final StringBuilder sb = new StringBuilder(n * 2 + 2);
+		for (int i = 0; i < n; i++) {
+			final byte b = _buffer.get();
+			sb.append(HEX[(0xf0 & b) >>> 4]);
+			sb.append(HEX[0x0f & b]);
+		}
+		return sb.toString();
+	}
 }
