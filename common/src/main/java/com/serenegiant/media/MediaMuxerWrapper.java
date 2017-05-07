@@ -26,15 +26,18 @@ import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
+import android.util.Log;
 
 /**
  * MediaMuxerをIMuxerインターフェースでラップ
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerWrapper implements IMuxer {
+	private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
 
 	private final MediaMuxer mMuxer;
 	private volatile boolean mIsStarted;
+	private boolean mReleased;
 
 	public MediaMuxerWrapper(final String output_path, final int format) throws IOException {
 		mMuxer = new MediaMuxer(output_path, format);
@@ -58,14 +61,23 @@ public class MediaMuxerWrapper implements IMuxer {
 
 	@Override
 	public void stop() {
-		mIsStarted = false;
-		mMuxer.stop();
+		if (mIsStarted) {
+			mIsStarted = false;
+			mMuxer.stop();
+		}
 	}
 
 	@Override
 	public void release() {
 		mIsStarted = false;
-		mMuxer.release();
+		if (!mReleased) {
+			mReleased = true;
+			try {
+				mMuxer.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		}
 	}
 
 	@Override
