@@ -23,6 +23,7 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -39,7 +40,7 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public abstract class AbstractFakeEncoder implements Encoder {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
@@ -695,11 +696,11 @@ public abstract class AbstractFakeEncoder implements Encoder {
 
 	/**
 	 * 今回の書き込み用のpresentationTimeUs値を取得
-	 * System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
+	 * SystemClock.elapsedRealtimeNanos()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	*/
 	protected long getInputPTSUs() {
-		long result = System.nanoTime() / 1000L;
+		long result = SystemClock.elapsedRealtimeNanos() / 1000L;
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 		if (result <= prevInputPTSUs) {
 			result = prevInputPTSUs + 9643;

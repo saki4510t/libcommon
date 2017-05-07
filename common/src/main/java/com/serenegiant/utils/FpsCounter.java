@@ -18,6 +18,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.os.SystemClock;
+
 public class FpsCounter {
 	private int cnt, prevCnt;
 	private long startTime, prevTime;
@@ -28,7 +30,7 @@ public class FpsCounter {
 
 	public synchronized FpsCounter reset() {
 		cnt = prevCnt = 0;
-		startTime = prevTime = System.nanoTime() - 1;
+		startTime = prevTime = SystemClock.elapsedRealtimeNanos() - 1;
 		return this;
 	}
 

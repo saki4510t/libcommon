@@ -18,13 +18,16 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.SystemClock;
 import android.util.Log;
 
 import com.serenegiant.common.BuildConfig;
+import com.serenegiant.utils.BuildCheck;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -462,8 +465,14 @@ LOOP:	while (mIsCapturing)
 	 * get next encoding presentationTimeUs
 	 * @return
 	 */
+    @SuppressLint("NewApi")
 	protected long getPTSUs() {
-		long result = System.nanoTime() / 1000L;
+		long result;
+    	if (BuildCheck.isJellyBeanMr1()) {
+			result = SystemClock.elapsedRealtimeNanos() / 1000L;
+		} else {
+			result = System.nanoTime() / 1000L;
+		}
 		// presentationTimeUs should be monotonic
 		// otherwise muxer fail to write
 		if (result < prevOutputPTSUs)

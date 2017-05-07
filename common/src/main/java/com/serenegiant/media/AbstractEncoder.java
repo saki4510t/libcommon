@@ -21,15 +21,18 @@ package com.serenegiant.media;
 import java.nio.ByteBuffer;
 import java.util.List;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.MediaInfo;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -527,11 +530,17 @@ LOOP:	while (mIsCapturing) {
 
 	/**
 	 * 今回の書き込み用のpresentationTimeUs値を取得
-     * System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
+     * SystemClock.elapsedRealtimeNanos()/System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	 */
-    protected long getInputPTSUs() {
-		long result = System.nanoTime() / 1000L;
+    @SuppressLint("NewApi")
+	protected long getInputPTSUs() {
+		long result;
+    	if (BuildCheck.isJellyBeanMr1()) {
+			result = SystemClock.elapsedRealtimeNanos() / 1000L;
+		} else {
+			result = System.nanoTime() / 1000L;
+		}
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 /*		if (result <= prevOutputPTSUs) {
 			Log.w(TAG, "input pts smaller than previous output PTS");

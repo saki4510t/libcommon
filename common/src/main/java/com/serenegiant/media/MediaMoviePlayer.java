@@ -29,6 +29,7 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -1016,8 +1017,8 @@ public class MediaMoviePlayer {
 	 */
 	protected long adjustPresentationTime(final Object sync, final long startTime, final long presentationTimeUs) {
 		if (startTime > 0) {
-			for (long t = presentationTimeUs - (System.nanoTime() / 1000 - startTime);
-					t > 0; t = presentationTimeUs - (System.nanoTime() / 1000 - startTime)) {
+			for (long t = presentationTimeUs - (SystemClock.elapsedRealtimeNanos() / 1000 - startTime);
+				 t > 0; t = presentationTimeUs - (SystemClock.elapsedRealtimeNanos() / 1000 - startTime)) {
 				synchronized (sync) {
 					try {
 						sync.wait(t / 1000, (int)((t % 1000) * 1000));
@@ -1029,7 +1030,7 @@ public class MediaMoviePlayer {
 			}
 			return startTime;
 		} else {
-			return System.nanoTime() / 1000;
+			return SystemClock.elapsedRealtimeNanos() / 1000;
 		}
 	}
 
