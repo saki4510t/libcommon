@@ -147,7 +147,7 @@ class RendererSurfaceRec {
 
 		@Override
 		public boolean canDraw() {
-			return mEnable && (System.nanoTime() > mNextDraw);
+			return mEnable && (System.nanoTime() - mNextDraw > 0);
 		}
 
 		@Override
@@ -176,7 +176,7 @@ class RendererSurfaceRec {
 
 		@Override
 		public boolean canDraw() {
-			return mEnable && (SystemClock.elapsedRealtimeNanos() > mNextDraw);
+			return mEnable && (SystemClock.elapsedRealtimeNanos() - mNextDraw > 0);
 		}
 
 		@Override
