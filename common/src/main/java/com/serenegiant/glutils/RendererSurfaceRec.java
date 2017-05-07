@@ -1,7 +1,12 @@
 package com.serenegiant.glutils;
 
+import android.annotation.TargetApi;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.Build;
+import android.os.SystemClock;
+
+import com.serenegiant.utils.BuildCheck;
 
 /**
  * Created by saki on 2016/10/09.
@@ -18,8 +23,10 @@ class RendererSurfaceRec {
 	 */
 	static RendererSurfaceRec newInstance(final EGLBase egl, final Object surface, final int maxFps) {
 		return (maxFps > 0)
-			? new RendererSurfaceRecHasWait(egl, surface, maxFps)
-			: new RendererSurfaceRec(egl, surface);
+			? (BuildCheck.isJellyBeanMr1()
+				? new RendererSurfaceRecHasWaitAPI17(egl, surface, maxFps)	// API>=17
+				: new RendererSurfaceRecHasWait(egl, surface, maxFps))		// API<17
+			: new RendererSurfaceRec(egl, surface);	// no limitation of maxFps
 	}
 
 	/** 元々の分配描画用Surface */
@@ -146,6 +153,35 @@ class RendererSurfaceRec {
 		@Override
 		public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
 			mNextDraw = System.nanoTime() + mIntervalsNs;
+			super.draw(drawer, textId, texMatrix);
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+	private static class RendererSurfaceRecHasWaitAPI17 extends RendererSurfaceRec {
+		private long mNextDraw;
+		private final long mIntervalsNs;
+
+		/**
+		 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
+		 * @param egl
+		 * @param surface
+		 * @param maxFps 正数
+		 */
+		private RendererSurfaceRecHasWaitAPI17(final EGLBase egl, final Object surface, final int maxFps) {
+			super(egl, surface);
+			mIntervalsNs = 1000000000L / maxFps;
+			mNextDraw = SystemClock.elapsedRealtimeNanos() + mIntervalsNs;
+		}
+
+		@Override
+		public boolean canDraw() {
+			return mEnable && (SystemClock.elapsedRealtimeNanos() > mNextDraw);
+		}
+
+		@Override
+		public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
+			mNextDraw = SystemClock.elapsedRealtimeNanos() + mIntervalsNs;
 			super.draw(drawer, textId, texMatrix);
 		}
 	}
