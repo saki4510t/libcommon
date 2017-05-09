@@ -50,7 +50,9 @@ public class MediaMuxerWrapper implements IMuxer {
 
 	@Override
 	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final BufferInfo bufferInfo) {
-		mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
+		if (!mReleased) {
+			mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
+		}
 	}
 
 	@Override
@@ -82,7 +84,7 @@ public class MediaMuxerWrapper implements IMuxer {
 
 	@Override
 	public boolean isStarted() {
-		return mIsStarted;
+		return mIsStarted && !mReleased;
 	}
 
 }

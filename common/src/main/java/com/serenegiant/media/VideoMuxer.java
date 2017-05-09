@@ -57,6 +57,7 @@ public final class VideoMuxer implements IMuxer {
     protected long mNativePtr;
     //
 	private volatile boolean mIsStarted;
+	private boolean mReleased;
 
 	public VideoMuxer(final String path) {
 		mNativePtr = nativeCreate(path);
@@ -70,6 +71,7 @@ public final class VideoMuxer implements IMuxer {
 	public void release() {
 //    	if (DEBUG) Log.v(TAG, "release:");
 		if (mNativePtr != 0) {
+			mReleased = true;
 			nativeDestroy(mNativePtr);
 			mNativePtr = 0;
 		}
@@ -164,7 +166,7 @@ public final class VideoMuxer implements IMuxer {
 	@Override
 	public void writeSampleData(final int trackIndex, final ByteBuffer buf, final MediaCodec.BufferInfo bufferInfo) {
 		int res = 1;
-		if (mNativePtr != 0) {
+		if (!mReleased && (mNativePtr != 0)) {
 			res = nativeWriteSampleData(mNativePtr, trackIndex, buf,
 				bufferInfo.offset, bufferInfo.size, bufferInfo.presentationTimeUs, bufferInfo.flags);
 		}
@@ -192,7 +194,7 @@ public final class VideoMuxer implements IMuxer {
 
 	@Override
 	public boolean isStarted() {
-		return mIsStarted;
+		return mIsStarted && !mReleased;
 	}
 
 }
