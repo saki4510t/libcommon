@@ -82,7 +82,7 @@ public abstract class MediaReaper implements Runnable {
 		}
 	}
 
-	protected final Object mSync = new Object();
+	private final Object mSync = new Object();
 	private final WeakReference<MediaCodec> mWeakEncoder;
 	private final ReaperListener mListener;
 	private final int mReaperType;
@@ -115,14 +115,15 @@ public abstract class MediaReaper implements Runnable {
 
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		mRequestStop = true;
-		mIsRunning = false;
-		final MediaCodec encoder = mWeakEncoder.get();
-    	if (encoder != null) {
-    		try {
-    			encoder.release();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
+		if (mIsRunning && !mRequestStop) {
+			mRequestStop = true;
+			final MediaCodec encoder = mWeakEncoder.get();
+			if (encoder != null) {
+				try {
+					encoder.release();
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
 			}
 		}
 		synchronized (mSync) {
@@ -152,7 +153,7 @@ public abstract class MediaReaper implements Runnable {
         }
         boolean localRequestStop;
         boolean localRequestDrain;
-    	for ( ; ; ) {
+    	for ( ; mIsRunning ; ) {
         	synchronized (mSync) {
         		localRequestStop = mRequestStop;
         		localRequestDrain = (mRequestDrain > 0);
