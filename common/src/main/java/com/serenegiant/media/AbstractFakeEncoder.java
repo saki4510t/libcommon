@@ -548,7 +548,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				final FrameData frame = waitFrame(MAX_WAIT_FRAME_MS);
 				if (frame != null) {
 					try {
-						handleFrame(frame);
+						if (mIsCapturing) {
+							handleFrame(frame);
+						}
 					} finally {
 						recycle(frame);
 					}
