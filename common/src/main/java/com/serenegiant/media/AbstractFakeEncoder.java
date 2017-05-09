@@ -166,6 +166,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	private final MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
 	
+	private Thread mDrainThread;
+	
 	/**
 	 * コンストラクタ
 	 * フレームデータのデフォルトサイズはDEFAULT_FRAME_SZ=1024バイト
@@ -245,6 +247,14 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	@Override
 	public  synchronized void release() {
 //		if (DEBUG) Log.v(TAG, "release:");
+		try {
+			if (mDrainThread != null) {
+				mDrainThread.interrupt();
+			}
+		} catch (final Exception e) {
+			Log.w(TAG, e);
+		}
+		mDrainThread = null;
 		if (mRecorder != null) {
 			internalRelease();
 		}
@@ -341,7 +351,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			if (mIsCapturing && !mRequestStop) {
 				initPool();
 				// フレーム処理スレッドを生成＆起床
-				new Thread(mDrainTask, getClass().getSimpleName()).start();
+				mDrainThread = new Thread(mDrainTask, getClass().getSimpleName());
+				mDrainThread.start();
 				try {
 					mSync.wait();	// エンコーダースレッド起床待ち
 				} catch (final InterruptedException e) {
@@ -499,7 +510,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		FrameData result = null;
 		try {
 			result = mFrameQueue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			// ignore
 		}
 //		if (DEBUG) Log.v(TAG, "waitFrame:result=" + result);
@@ -547,6 +558,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				mRequestStop = true;
 				mIsCapturing = false;
 			}
+			mDrainThread = null;
 //			if (DEBUG) Log.v(TAG, "mDrainTask:finished");
 		}
 	};
