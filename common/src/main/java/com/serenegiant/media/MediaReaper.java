@@ -123,14 +123,14 @@ public abstract class MediaReaper implements Runnable {
 		if (DEBUG) Log.v(TAG, "release:");
 		if (mIsRunning && !mRequestStop) {
 			mRequestStop = true;
-			final MediaCodec encoder = mWeakEncoder.get();
-			if (encoder != null) {
-				try {
-					encoder.release();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-			}
+//			final MediaCodec encoder = mWeakEncoder.get();
+//			if (encoder != null) {
+//				try {
+//					encoder.release();
+//				} catch (final Exception e) {
+//					Log.w(TAG, e);
+//				}
+//			}
 		}
 		synchronized (mSync) {
 			mSync.notifyAll();
