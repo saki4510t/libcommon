@@ -51,7 +51,9 @@ public abstract class MediaReaper implements Runnable {
 		public static final String MIME_AVC = "video/avc";
 		private final int mWidth;
 		private final int mHeight;
-		public VideoReaper(final MediaCodec encoder, @NonNull final ReaperListener listener, final int width, final int height) {
+		public VideoReaper(final MediaCodec encoder, @NonNull final ReaperListener listener,
+			final int width, final int height) {
+			
 			super(REAPER_VIDEO, encoder, listener);
 			if (DEBUG) Log.v(TAG, "VideoReaper#コンストラクタ");
 			mWidth = width;
@@ -59,19 +61,23 @@ public abstract class MediaReaper implements Runnable {
 		}
 
 		@Override
-		protected MediaFormat createOutputFormat(final byte[] csd, final int size, final int ix0, final int ix1) {
+		protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+			final int ix0, final int ix1, final int ix2) {
+			
 			if (DEBUG) Log.v(TAG, "VideoReaper#createOutputFormat");
 			final MediaFormat outFormat;
 			if (ix0 >= 0) {
 				outFormat = MediaFormat.createVideoFormat(MIME_AVC, mWidth, mHeight);
-				final ByteBuffer csd0 = ByteBuffer.allocateDirect(ix1 - ix0).order(ByteOrder.nativeOrder());
+				final ByteBuffer csd0 = ByteBuffer.allocateDirect(ix1 - ix0)
+					.order(ByteOrder.nativeOrder());
 				csd0.put(csd, ix0, ix1 - ix0);
 				csd0.flip();
 				outFormat.setByteBuffer("csd-0", csd0);
 				if (ix1 > ix0) {
-					// FIXME ここのサイズはsize-ix1、今はたまたまix0=0だから大丈夫なのかも
-					final ByteBuffer csd1 = ByteBuffer.allocateDirect(size - ix1 + ix0).order(ByteOrder.nativeOrder());
-					csd1.put(csd, ix1, size - ix1 + ix0);
+					final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
+					final ByteBuffer csd1 = ByteBuffer.allocateDirect(sz)
+						.order(ByteOrder.nativeOrder());
+					csd1.put(csd, ix1, sz);
 					csd1.flip();
 					outFormat.setByteBuffer("csd-1", csd1);
 				}
@@ -244,8 +250,9 @@ LOOP:	for ( ; mIsRunning ; ) {
                         encodedData.position(0);
                         final int ix0 = MediaCodecHelper.findStartMarker(tmp, 0);
                         final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0+1);
+						final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1+1);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1);
+                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!callOnFormatChanged(outFormat))
                         	break LOOP;
                     }
@@ -284,7 +291,8 @@ LOOP:	for ( ; mIsRunning ; ) {
 //		if (DEBUG) Log.v(TAG, "drain:finished");
     }
 
-	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size, final int ix0, final int ix1);
+	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
+		final int ix0, final int ix1, final int ix2);
 
 	private boolean callOnFormatChanged(final MediaFormat format) {
 		try {
