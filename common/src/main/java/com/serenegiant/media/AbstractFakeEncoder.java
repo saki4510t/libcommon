@@ -88,7 +88,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	
 	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
-	private static final int BUFFER_FLAG_KEY_FRAME
+	public static final int BUFFER_FLAG_KEY_FRAME
 		= BuildCheck.isLollipop()
 			? MediaCodec.BUFFER_FLAG_KEY_FRAME : MediaCodec.BUFFER_FLAG_SYNC_FRAME;
 
