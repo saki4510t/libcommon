@@ -589,9 +589,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_KEY_FRAME");
 			// csd-0とcsd-1が同時に来ているはずなので分離してセットする
 			final byte[] tmp = new byte[mBufferInfo.size];
-			frame.data.position(0);
-			frame.data.get(tmp, 0, mBufferInfo.size);
-			frame.data.position(0);
+			final ByteBuffer b = frame.data.duplicate();
+			b.clear();
+			b.get(tmp, 0, mBufferInfo.size);
 			final int ix0 = BufferHelper.findAnnexB(tmp, 0);
 			final int ix1 = BufferHelper.findAnnexB(tmp, ix0 + 1);
 			final int ix2 = BufferHelper.findAnnexB(tmp, ix1 + 1);
