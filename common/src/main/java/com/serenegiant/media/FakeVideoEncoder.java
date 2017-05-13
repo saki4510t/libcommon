@@ -148,7 +148,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
         	csd0.put(csd, ix0, ix1 - ix0);
         	csd0.flip();
             outFormat.setByteBuffer("csd-0", csd0);
-//			if (DEBUG) BufferHelper.dumpByteBuffer("sps", csd0, 0, csd0 != null ? csd0.capacity() : 0);
+//			if (DEBUG) BufferHelper.dump("sps", csd0, 0, csd0 != null ? csd0.capacity() : 0);
             if (ix1 > ix0) {
 				final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
             	final ByteBuffer csd1 = ByteBuffer.allocateDirect(sz)
@@ -156,7 +156,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
             	csd1.put(csd, ix1, sz);
             	csd1.flip();
                 outFormat.setByteBuffer("csd-1", csd1);
-//				if (DEBUG) BufferHelper.dumpByteBuffer("pps", csd1, 0, csd1 != null ? csd1.capacity() : 0);
+//				if (DEBUG) BufferHelper.dump("pps", csd1, 0, csd1 != null ? csd1.capacity() : 0);
             }
         } else {
         	throw new RuntimeException("unexpected csd data came.");

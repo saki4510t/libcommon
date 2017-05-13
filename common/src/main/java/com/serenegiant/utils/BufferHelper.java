@@ -36,23 +36,23 @@ public class BufferHelper {
 		'c', 'd', 'e', 'f'};
 	
 	private static final int BUF_LEN = 256;
-	public static final void dumpByteBuffer(final String tag,
+	public static final void dump(final String tag,
 		final ByteBuffer buffer, final int offset, final int size) {
 
-		dumpByteBuffer(tag, buffer, offset, size, false);
+		dump(tag, buffer, offset, size, false);
 	}
 
-	public static final void dumpByteBuffer(final String tag,
+	public static final void dump(final String tag,
 		final ByteBuffer _buffer, final int offset, final int _size, final boolean findAnnexB) {
 
 	    final byte[] dump = new byte[BUF_LEN];
-//		if (DEBUG) Log.i(TAG, "dumpByteBuffer:" + buffer);
+//		if (DEBUG) Log.i(TAG, "dump:" + buffer);
 		if (_buffer == null) return;
 		final ByteBuffer buffer = _buffer.duplicate();
 		final int n = buffer.limit();
 		final int pos = buffer.position();
 //		final int cap = buffer.capacity();
-//		if (DEBUG) Log.i(TAG, "dumpByteBuffer:limit=" + n + ",capacity=" + cap + ",position=" + buffer.position());
+//		if (DEBUG) Log.i(TAG, "dump:limit=" + n + ",capacity=" + cap + ",position=" + buffer.position());
 		int size = _size;
 		if (size > n) size = n;
 		buffer.position(offset);
@@ -75,7 +75,7 @@ public class BufferHelper {
 				} while (index >= 0);
 			}
 		}
-		Log.i(tag, "dumpByteBuffer:" + sb.toString());
+		Log.i(tag, "dump:" + sb.toString());
 	}
 
     /**
