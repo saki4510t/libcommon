@@ -277,7 +277,7 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
         	csd0.flip();
             outFormat.setByteBuffer("csd-0", csd0);
             if (ix1 > ix0) {
-				final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
+				final int sz = (ix2 > ix1) ? (ix2 - ix1) : (size - ix1);
             	final ByteBuffer csd1 = ByteBuffer.allocateDirect(size - ix1 + ix0).order(ByteOrder.nativeOrder());
             	csd1.put(csd, ix1, size - ix1 + ix0);
             	csd1.flip();

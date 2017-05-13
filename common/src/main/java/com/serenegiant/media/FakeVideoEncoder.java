@@ -150,7 +150,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
             outFormat.setByteBuffer("csd-0", csd0);
 //			if (DEBUG) BufferHelper.dump("sps", csd0, 0, csd0 != null ? csd0.capacity() : 0);
             if (ix1 > ix0) {
-				final int sz = (ix2 > ix1) ? (ix2 - ix1 + ix0) : (size - ix1 + ix0);
+				final int sz = (ix2 > ix1) ? (ix2 - ix1) : (size - ix1);
             	final ByteBuffer csd1 = ByteBuffer.allocateDirect(sz)
             		.order(ByteOrder.nativeOrder());
             	csd1.put(csd, ix1, sz);
