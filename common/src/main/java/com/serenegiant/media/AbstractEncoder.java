@@ -442,8 +442,8 @@ LOOP:	while (mIsCapturing) {
                         encodedData.get(tmp, mBufferInfo.offset, mBufferInfo.size);
                         encodedData.position(0);
                         final int ix0 = byteComp(tmp, 0, START_MARK, START_MARK.length);
-                        final int ix1 = byteComp(tmp, ix0+1, START_MARK, START_MARK.length);
-						final int ix2 = byteComp(tmp, ix1+1, START_MARK, START_MARK.length);
+                        final int ix1 = byteComp(tmp, ix0 + 3, START_MARK, START_MARK.length);
+						final int ix2 = byteComp(tmp, ix1 + 3, START_MARK, START_MARK.length);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
                         final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!startRecorder(recorder, outFormat))

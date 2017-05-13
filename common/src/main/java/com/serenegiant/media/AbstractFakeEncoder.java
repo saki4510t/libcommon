@@ -593,8 +593,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			b.clear();
 			b.get(tmp, 0, mBufferInfo.size);
 			final int ix0 = BufferHelper.findAnnexB(tmp, 0);
-			final int ix1 = BufferHelper.findAnnexB(tmp, ix0 + 1);
-			final int ix2 = BufferHelper.findAnnexB(tmp, ix1 + 1);
+			final int ix1 = BufferHelper.findAnnexB(tmp, ix0 + 3);
+			final int ix2 = BufferHelper.findAnnexB(tmp, ix1 + 3);
 //			if (DEBUG) Log.i(TAG, String.format("ix0=%d,ix1=%d,ix2=%d", ix0, ix1, ix2));
 			try {
 				final MediaFormat outFormat = createOutputFormat(MIME_TYPE,

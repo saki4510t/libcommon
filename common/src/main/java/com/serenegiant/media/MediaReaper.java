@@ -249,8 +249,8 @@ LOOP:	for ( ; mIsRunning ; ) {
                         encodedData.get(tmp, mBufferInfo.offset, mBufferInfo.size);
                         encodedData.position(0);
                         final int ix0 = MediaCodecHelper.findStartMarker(tmp, 0);
-                        final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0+1);
-						final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1+1);
+                        final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0 + 3);
+						final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1 + 3);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
                         final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!callOnFormatChanged(outFormat))
