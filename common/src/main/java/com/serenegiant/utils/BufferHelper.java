@@ -143,22 +143,31 @@ public class BufferHelper {
 	 * @return 見つからなければ負
 	 */
 	public static final int findAnnexB(final byte[] data, final int offset) {
-		int result = -1;
 		if (data != null) {
-			final int len = data.length - 4;	// 本当はlength-3までだけどpayloadが無いのは無効とみなしてlength-4までとする
-			for (int i = offset; i < len; i++) {
+			final int len5 = data.length - 5;	// 本当はlength-3までだけどpayloadが無いのは無効とみなしてlength-4までとする
+			for (int i = offset; i < len5; i++) {
+				// 最低3つは連続して0x00
+				if ((data[i] != 0x00) || (data[i+1] != 0x00) || (data[i+2] != 0x00)) {
+					continue;
+				}
+				// 4つ目が0x01ならOK
+				if (data[i+3] == 0x01) {
+					return i;
+				}
+			}
+			final int len4 = data.length - 4;	// 本当はlength-3までだけどpayloadが無いのは無効とみなしてlength-4までとする
+			for (int i = offset; i < len4; i++) {
 				// 最低2つは連続して0x00でないとだめ
 				if ((data[i] != 0x00) || (data[i+1] != 0x00)) {
 					continue;
 				}
 				// 3つ目が0x01ならOK
 				if (data[i+2] == 0x01) {
-					result = i;
-					break;
+					return i;
 				}
 			}
 		}
-		return result;
+		return -1;
 	}
 
 	private static final int SIZEOF_FLOAT = 4;
