@@ -232,6 +232,10 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		return mRecorder;
 	}
 
+	public boolean isRecorderStarted() {
+		return mRecorderStarted;
+	}
+	
 	/**
 	 * 出力ファイルのパスを返す
 	 * @return
