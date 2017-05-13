@@ -78,6 +78,30 @@ public class BufferHelper {
 		Log.i(tag, "dump:" + sb.toString());
 	}
 
+	public static final void dump(final String tag,
+		final byte[] buffer, final int offset, final int _size, final boolean findAnnexB) {
+
+		final int n = buffer != null ? buffer.length : 0;
+		if (n == 0) return;
+		int size = _size;
+		if (size > n) size = n;
+		final StringBuilder sb = new StringBuilder();
+		int sz;
+		for (int i = offset; i < size; i ++) {
+			sb.append(String.format("%02x", buffer[i]));
+		}
+		if (findAnnexB) {
+			int index = -1;
+			do {
+				index = byteComp(buffer, index+1, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
+				if (index >= 0) {
+					Log.i(tag, "found ANNEXB: start index=" + index);
+				}
+			} while (index >= 0);
+		}
+		Log.i(tag, "dump:" + sb.toString());
+	}
+
     /**
      * codec specific dataのスタートマーカー
 	 * AnnexBのスタートマーカーと同じ
