@@ -122,6 +122,10 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	private volatile boolean mRecorderStarted;
 	/**
+	 * キーフレーム待ち
+	 */
+	private volatile boolean mWaitingKeyFrame;
+	/**
 	 * 終了フラグ
 	 */
 	private boolean mIsEOS;
@@ -340,7 +344,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //		if (DEBUG) Log.v(TAG, "prepare:");
 		mTrackIndex = -1;
 		mRecorderStarted = false;
-		mIsCapturing = true;
+		mIsCapturing = mWaitingKeyFrame = true;
 		mRequestStop = mIsEOS = false;
 		callOnStartEncode(null, -1, false);
 	}
@@ -582,10 +586,12 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			return;
 		}
 		mBufferInfo.set(frame.offset, frame.size, frame.presentationTimeUs, frame.flags);
+		final boolean isKeyFrame
+			= ((mBufferInfo.flags & BUFFER_FLAG_KEY_FRAME) == BUFFER_FLAG_KEY_FRAME);
+
 		if (!mRecorderStarted
-			&& (((mBufferInfo.flags & BUFFER_FLAG_KEY_FRAME) == BUFFER_FLAG_KEY_FRAME)
-				|| ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0))
-			) {
+			&& (isKeyFrame
+				|| ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0)) ) {
 //			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_KEY_FRAME");
 			// csd-0とcsd-1が同時に来ているはずなので分離してセットする
 			final byte[] tmp = new byte[mBufferInfo.size];
@@ -606,12 +612,16 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			} catch (final Exception e) {
 				return;
 			}
-			if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-				mBufferInfo.size = 0;
-			}
+		}
+		if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+			mBufferInfo.size = 0;
 		}
 		
-		if (mRecorderStarted && (mBufferInfo.size != 0)) {
+		// レコーダーの初期化済み＆フレームデータがある＆キーフレーム待機中でないかキーフレームが来たとき
+		if (mRecorderStarted && (mBufferInfo.size != 0)
+			&& (isKeyFrame || !mWaitingKeyFrame)) {
+
+			mWaitingKeyFrame = false;
 			try {
 				mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
 				recorder.writeSampleData(mTrackIndex, frame.data, mBufferInfo);
