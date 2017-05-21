@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /*
@@ -102,6 +103,30 @@ public abstract class Pool<T> {
 		}
 	}
 	
+	/**
+	 * 使用済みオブジェクトをプールに返却する
+	 * @param objects
+	 */
+	public void recycle(@NonNull final Collection<T> objects) {
+		for (final T obj: objects) {
+			if (obj != null) {
+				recycle(obj);
+			}
+		}
+	}
+
+	/**
+	 * 使用済みオブジェクトをプールに返却する
+	 * @param objects
+	 */
+	public void recycle(@NonNull final T[] objects) {
+		for (final T obj: objects) {
+			if (obj != null) {
+				recycle(obj);
+			}
+		}
+	}
+		
 	/**
 	 * プールを空にする
 	 */
