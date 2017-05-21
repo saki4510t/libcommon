@@ -696,7 +696,9 @@ public class RendererHolder implements IRendererHolder {
 				for (int i = 0; i < n; i++) {
 					client = mClients.valueAt(i);
 					if (client != null) {
-						makeCurrent();
+						if (client.isValid()) {
+							client.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
+						}
 						client.release();
 					}
 				}
