@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -922,8 +923,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private final void init() {
 	    	eglBase = EGLBase.createFrom(3, mRendererTask.getContext(), false, 0, false);
 	    	captureSurface = eglBase.createOffscreen(mRendererTask.mVideoWidth, mRendererTask.mVideoHeight);
+			Matrix.setIdentityM(mMvpMatrix, 0);
 	    	drawer = new GLDrawer2D(true);
-	    	drawer.getMvpMatrix()[5] *= -1.0f;	// flip up-side down
 		}
 
 		private final void captureLoopGLES2() {
@@ -965,6 +966,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
 					if (isRunning) {
+						setMirror(mMvpMatrix, mRendererTask.mMirror);
+						mMvpMatrix[5] *= -1.0f;	// flip up-side down
+						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
 						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
@@ -1044,6 +1048,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
 					if (isRunning) {
+						setMirror(mMvpMatrix, mRendererTask.mMirror);
+						mMvpMatrix[5] *= -1.0f;	// flip up-side down
+						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
 						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
