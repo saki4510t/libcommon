@@ -232,7 +232,7 @@ public abstract class Recorder implements IRecorder {
 		}
 		if (encoder instanceof IAudioEncoder) {
 			if (mAudioEncoder != null)
-				throw new IllegalArgumentException("Video encoder already added.");
+				throw new IllegalArgumentException("Audio encoder already added.");
 			mAudioEncoder = encoder;
 		} else {
 			if (mVideoEncoder != null)
