@@ -234,7 +234,8 @@ public abstract class Recorder implements IRecorder {
 			if (mAudioEncoder != null)
 				throw new IllegalArgumentException("Audio encoder already added.");
 			mAudioEncoder = encoder;
-		} else {
+		}
+		if (encoder instanceof IVideoEncoder) {
 			if (mVideoEncoder != null)
 				throw new IllegalArgumentException("Video encoder already added.");
 			mVideoEncoder = encoder;
@@ -249,10 +250,12 @@ public abstract class Recorder implements IRecorder {
 	 */
 	@Override
 	public synchronized void removeEncoder(final Encoder encoder) {
+//		if (DEBUG) Log.v(TAG, "removeEncoder:encoder=" + encoder);
 		if (encoder instanceof IVideoEncoder) {
 			mVideoEncoder = null;
 			mVideoStarted = false;
-		} else if (encoder instanceof AudioEncoder) {
+		}
+		if (encoder instanceof AudioEncoder) {
 			mAudioEncoder = null;
 			mAudioStarted = false;
 		}
@@ -345,7 +348,7 @@ public abstract class Recorder implements IRecorder {
 				throw new IllegalStateException("muxer not ready:state=" + mState);
 			trackIx = mMuxer.addTrack(format);
 		} catch (final Exception e) {
-//			Log.w(TAG, "addTrack:", e);
+			Log.w(TAG, "addTrack:", e);
 			trackIx = -1;
 			removeEncoder(encoder);
 		}

@@ -61,8 +61,8 @@ public final class VideoEncoder extends AbstractVideoEncoder {
     }
 
 	@Override
-	public void prepare() throws Exception {
-//		if (DEBUG) Log.i(TAG, "prepare:");
+	protected boolean internalPrepare() throws Exception {
+//		if (DEBUG) Log.i(TAG, "internalPrepare:");
         mRecorderStarted = false;
         mIsCapturing = true;
         mIsEOS = false;
@@ -70,7 +70,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         final MediaCodecInfo codecInfo = selectVideoCodec(MIME_AVC);
         if (codecInfo == null) {
 			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_AVC);
-            return;
+            return true;
         }
 //		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 //		if (DEBUG) Log.i(TAG, "selected colorFormat: " + mColorFormat);
@@ -112,8 +112,9 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 		if (camera == null)
 			throw new RuntimeException("unexpectedly camera instance is null");
         camera.setEncoder(this); */
-//		if (DEBUG) Log.i(TAG, "prepare finished");
-        callOnStartEncode(null, -1, mayFail);
+//		if (DEBUG) Log.i(TAG, "internalPrepare:finished");
+
+		return mayFail;
 	}
 
 	@Override

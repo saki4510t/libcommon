@@ -66,8 +66,8 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	}
 
 	@Override
-	public void prepare() throws Exception {
-//		if (DEBUG) Log.v(TAG, "prepare:");
+	protected boolean internalPrepare() throws Exception {
+//		if (DEBUG) Log.v(TAG, "internalPrepare:");
         mTrackIndex = -1;
         mRecorderStarted = mIsEOS = false;
 
@@ -75,7 +75,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
         final MediaCodecInfo audioCodecInfo = selectAudioCodec(MIME_TYPE);
         if (audioCodecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
-            return;
+            return true;
         }
 //		if (DEBUG) Log.i(TAG, "selected codec: " + audioCodecInfo.getName());
 
@@ -92,8 +92,8 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 		mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
         mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mMediaCodec.start();
-//		if (DEBUG) Log.i(TAG, "prepare finished");
-        callOnStartEncode(null, -1, false);
+//		if (DEBUG) Log.i(TAG, "internalPrepare:finished");
+		return false;
 	}
 
     /**

@@ -27,17 +27,15 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.MediaInfo;
 import com.serenegiant.utils.Time;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public abstract class AbstractEncoder implements Encoder, Runnable {
+public abstract class AbstractEncoder implements Encoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AbstractEncoder.class.getSimpleName();
 
@@ -116,14 +114,6 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
 		recorder.addEncoder(this);
         // 効率化のために先に生成しておく(drain内で毎回生成するとGCの影響が大きくなる)
         mBufferInfo = new MediaCodec.BufferInfo();
-        synchronized (mSync) {
-            // エンコーダースレッドを生成
-            new Thread(this, getClass().getSimpleName()).start();
-            try {
-            	mSync.wait();	// エンコーダースレッド起床待ち
-            } catch (final InterruptedException e) {
-            }
-        }
     }
 
     /**
@@ -143,6 +133,10 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
     	return mRecorder != null ? mRecorder.getOutputPath() : null;
     }
 
+	public int getCaptureFormat() {
+		return -1;
+	}
+
     @Override
 	protected void finalize() throws Throwable {
 //    	if (DEBUG) Log.v(TAG, "finalize:");
@@ -151,19 +145,28 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
         super.finalize();
 	}
 
-	/**
-	 * prepareの最後に呼び出すこと
-	 * @param source
-	 * @param captureFormat
-	 */
-	protected void callOnStartEncode(final Surface source, final int captureFormat, final boolean mayFail) {
-//		if (DEBUG) Log.v(TAG, "callOnStartEncode:mListener=" + mListener);
-       	try {
-       		mListener.onStartEncode(this, source, captureFormat, mayFail);
-       	} catch (final Exception e) {
+	@Override
+	public final void prepare() throws Exception {
+		final boolean mayFail = internalPrepare();
+		final Surface surface = (this instanceof ISurfaceEncoder) ?
+			((ISurfaceEncoder)this).getInputSurface() : null;
+		try {
+			mListener.onStartEncode(this, surface, getCaptureFormat(), mayFail);
+		} catch (final Exception e) {
 			Log.w(TAG, e);
-        }
+		}
+		synchronized (mSync) {
+			// エンコーダースレッドを生成
+			new Thread(mDrainTask, getClass().getSimpleName()).start();
+			try {
+				mSync.wait(1000);	// エンコーダースレッド起床待ち
+			} catch (final InterruptedException e) {
+				// ignore
+			}
+		}
 	}
+	
+	protected abstract boolean internalPrepare() throws Exception;
 
 	/**
 	 * エラー発生時に呼び出す
@@ -223,48 +226,65 @@ public abstract class AbstractEncoder implements Encoder, Runnable {
     }
 
 //********************************************************************************
-    // エンコーダースレッドの実行ループ
-    @Override
-	public void run() {
-		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY); // THREAD_PRIORITY_URGENT_AUDIO
-        synchronized (mSync) {
-            mRequestStop = false;
-    		mRequestDrain = 0;
-			mSync.notify();
-        }
-        boolean localRequestStop;
-        boolean localRequestDrain;
-    	for ( ; ; ) {
-        	synchronized (mSync) {
-        		localRequestStop = mRequestStop;
-        		localRequestDrain = (mRequestDrain > 0);
-        		if (localRequestDrain)
-        			mRequestDrain--;
-        	}
-    		if (localRequestStop) {
-    	    	drain();
-    			signalEndOfInputStream();
-    	    	drain();
-    	        release();
-    	        break;
-    		}
-    		if (localRequestDrain) {
-    			drain();
-    		} else {
-    	        synchronized (mSync) {
-    	        	try {
-						mSync.wait(50);
+	private final Runnable mDrainTask = new Runnable() {
+		// ドレインスレッドの実体
+		@Override
+		public void run() {
+			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY); // THREAD_PRIORITY_URGENT_AUDIO
+			synchronized (mSync) {
+				mRequestStop = false;
+				mRequestDrain = 0;
+				mSync.notify();	// スレッド起床通知
+			}
+			boolean localRequestStop = false;
+			boolean localRequestDrain;
+			// #startが呼ばれるまで待機
+			for ( ; !mIsCapturing && !localRequestStop ; ) {
+				synchronized (mSync) {
+				try {
+					mSync.wait(10);
+				} catch (final InterruptedException e) {
+					break;
+				}
+				localRequestStop = mRequestStop;
+				mRequestDrain = 0;
+			}
+		}
+		// エンコード済みデータの処理ループ
+		for ( ; ; ) {
+			synchronized (mSync) {
+				localRequestStop = mRequestStop;
+				localRequestDrain = (mRequestDrain > 0);
+				if (localRequestDrain)
+					mRequestDrain--;
+			}
+			if (localRequestStop) {
+				drain();
+				signalEndOfInputStream();
+				drain();
+				release();
+				break;
+			}
+			if (localRequestDrain) {
+				drain();
+			} else {
+				synchronized (mSync) {
+					try {
+						mSync.wait(30);
 					} catch (final InterruptedException e) {
 						break;
 					}
-    	        }
-    		}
-    	} // end of while
-        synchronized (mSync) {
-        	mRequestStop = true;
-            mIsCapturing = false;
-        }
-    }
+				}
+			}
+		} // end of for
+		// 終了
+		synchronized (mSync) {
+			mRequestStop = true;
+			mIsCapturing = false;
+			mSync.notifyAll();
+		}
+	}
+};
 
 //********************************************************************************
 	/**
@@ -498,19 +518,34 @@ LOOP:	while (mIsCapturing) {
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる
 	 */
 	public boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
-//		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat);
-       	mTrackIndex = recorder.addTrack(this, outFormat);
-       	if (mTrackIndex >= 0) {
-	       	mRecorderStarted = true;
-	       	if (!recorder.start(this)) {
-	       		// startは全てのエンコーダーがstartを呼ぶまで返ってこない
-	       		// falseを返した時はmuxerをスタート出来てない。何らかの異常
-//	       		Log.e(TAG, "failed to start muxer mTrackIndex=" + mTrackIndex);
-	       	}
-       	} else {
-//			Log.e(TAG, "failed to addTrack: mTrackIndex=" + mTrackIndex);
-       		recorder.removeEncoder(this);
-       	}
+//		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat + ",state=" + recorder.getState());
+		if (recorder.getState() != IRecorder.STATE_STARTING) {
+			for (int i = 0; i < 10; i++) {
+				if (recorder.getState() == IRecorder.STATE_STARTING) {
+					break;
+				}
+//				Log.v(TAG, "sleep");
+				try {
+					Thread.sleep(10);
+				} catch (final InterruptedException e) {
+					break;
+				}
+			}
+		}
+		if (recorder.getState() == IRecorder.STATE_STARTING) {
+			mTrackIndex = recorder.addTrack(this, outFormat);
+			if (mTrackIndex >= 0) {
+				mRecorderStarted = true;
+				if (!recorder.start(this)) {
+					// startは全てのエンコーダーがstartを呼ぶまで返ってこない
+					// falseを返した時はmuxerをスタート出来てない。何らかの異常
+	//	       		Log.e(TAG, "failed to start muxer mTrackIndex=" + mTrackIndex);
+				}
+			} else {
+	//			Log.e(TAG, "failed to addTrack: mTrackIndex=" + mTrackIndex);
+				recorder.removeEncoder(this);
+			}
+		}
        	return recorder.isStarted();
 	}
 

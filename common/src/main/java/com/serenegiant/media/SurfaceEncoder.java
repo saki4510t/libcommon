@@ -50,7 +50,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 	}
 
 	@Override
-	public void prepare() throws Exception {
+	protected boolean internalPrepare() throws Exception {
         mTrackIndex = -1;
         mRecorderStarted = false;
         mIsCapturing = true;
@@ -59,7 +59,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         final MediaCodecInfo codecInfo = selectVideoCodec(MIME_AVC);
         if (codecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_AVC);
-            return;
+            return true;
         }
 //		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 //		/*if (DEBUG) */dumpProfileLevel(VIDEO_MIME_TYPE, codecInfo);
@@ -86,7 +86,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         mInputSurface = mMediaCodec.createInputSurface();	// API >= 18
         mMediaCodec.start();
 
-        callOnStartEncode(mInputSurface, getCaptureFormat(), mayFail);
+		return mayFail;
 	}
 
     /**

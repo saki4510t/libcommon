@@ -178,8 +178,6 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
     	return mHeight;
     }
 
-    public abstract int getCaptureFormat();
-
     /**
      * 指定したMIMEで使用可能がcodecの一覧の中から先頭のものを取得する
      * もし使用可能なのがなければnullを返す
@@ -288,12 +286,6 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
         }
         return outFormat;
 	}
-
-//	@Override
-//	public void prepare() throws Exception {
-//		// TODO Auto-generated method stub
-//
-//	}
 
 	/**
 	 * 指定したカラーフォーマットをこのEncoderで使用可能かどうかを返す
