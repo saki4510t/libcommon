@@ -28,6 +28,7 @@ import android.util.Log;
 
 import com.serenegiant.common.BuildConfig;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Time;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -467,12 +468,7 @@ LOOP:	while (mIsCapturing)
 	 */
     @SuppressLint("NewApi")
 	protected long getPTSUs() {
-		long result;
-    	if (BuildCheck.isJellyBeanMr1()) {
-			result = SystemClock.elapsedRealtimeNanos() / 1000L;
-		} else {
-			result = System.nanoTime() / 1000L;
-		}
+		long result = Time.nanoTime() / 1000L;
 		// presentationTimeUs should be monotonic
 		// otherwise muxer fail to write
 		if (result < prevOutputPTSUs)

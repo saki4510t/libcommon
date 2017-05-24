@@ -31,6 +31,7 @@ import android.view.Surface;
 
 import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Time;
 
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
@@ -724,11 +725,10 @@ public abstract class AbstractFakeEncoder implements Encoder {
 
 	/**
 	 * 今回の書き込み用のpresentationTimeUs値を取得
-	 * SystemClock.elapsedRealtimeNanos()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	*/
 	protected long getInputPTSUs() {
-		long result = SystemClock.elapsedRealtimeNanos() / 1000L;
+		long result = Time.nanoTime() / 1000L;
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 		if (result <= prevInputPTSUs) {
 			result = prevInputPTSUs + 9643;

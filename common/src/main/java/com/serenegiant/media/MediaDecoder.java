@@ -34,6 +34,7 @@ import android.view.Surface;
 
 import com.serenegiant.common.BuildConfig;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Time;
 
 import java.io.FileDescriptor;
 import java.io.IOException;
@@ -599,8 +600,8 @@ public abstract class MediaDecoder implements IMediaCodec {
 			return adjustPresentationTimeAPI17(startTime, presentationTimeUs);
 		}
 		if (startTime > 0) {
-			for (long t = presentationTimeUs - (System.nanoTime() / 1000 - startTime);
-				 t > 0; t = presentationTimeUs - (System.nanoTime() / 1000 - startTime)) {
+			for (long t = presentationTimeUs - (Time.nanoTime() / 1000 - startTime);
+				 t > 0; t = presentationTimeUs - (Time.nanoTime() / 1000 - startTime)) {
 				synchronized (mSync) {
 					try {
 						mSync.wait(t / 1000, (int)((t % 1000) * 1000));
@@ -613,15 +614,15 @@ public abstract class MediaDecoder implements IMediaCodec {
 			}
 			return startTime;
 		} else {
-			return System.nanoTime() / 1000;
+			return Time.nanoTime() / 1000;
 		}
 	}
 
 	@SuppressLint("NewApi")
 	protected long adjustPresentationTimeAPI17(final long startTime, final long presentationTimeUs) {
 		if (startTime > 0) {
-			for (long t = presentationTimeUs - (SystemClock.elapsedRealtimeNanos() / 1000 - startTime);
-				 t > 0; t = presentationTimeUs - (SystemClock.elapsedRealtimeNanos() / 1000 - startTime)) {
+			for (long t = presentationTimeUs - (Time.nanoTime() / 1000 - startTime);
+				 t > 0; t = presentationTimeUs - (Time.nanoTime() / 1000 - startTime)) {
 				synchronized (mSync) {
 					try {
 						mSync.wait(t / 1000, (int)((t % 1000) * 1000));
@@ -634,7 +635,7 @@ public abstract class MediaDecoder implements IMediaCodec {
 			}
 			return startTime;
 		} else {
-			return SystemClock.elapsedRealtimeNanos() / 1000;
+			return Time.nanoTime() / 1000;
 		}
 	}
 

@@ -29,6 +29,7 @@ import android.os.SystemClock;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Time;
 
 public abstract class IAudioSampler {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -284,17 +285,11 @@ public abstract class IAudioSampler {
 
 	/**
 	 * 今回の書き込み用のpresentationTimeUs値を取得
-     * SystemClock.elapsedRealtimeNanos()/System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	 */
     @SuppressLint("NewApi")
 	protected long getInputPTSUs() {
-		long result;
-    	if (BuildCheck.isJellyBeanMr1()) {
-			result = SystemClock.elapsedRealtimeNanos() / 1000L;
-		} else {
-			result = System.nanoTime() / 1000L;
-		}
+		long result = Time.nanoTime() / 1000L;
 		if (result <= prevInputPTSUs) {
 			result = prevInputPTSUs + 9643;
 		}

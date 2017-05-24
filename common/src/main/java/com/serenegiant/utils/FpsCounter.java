@@ -30,7 +30,7 @@ public class FpsCounter {
 
 	public synchronized FpsCounter reset() {
 		cnt = prevCnt = 0;
-		startTime = prevTime = SystemClock.elapsedRealtimeNanos() - 1;
+		startTime = prevTime = Time.nanoTime() - 1;
 		return this;
 	}
 
@@ -46,7 +46,7 @@ public class FpsCounter {
 	 * @return
 	 */
 	public synchronized FpsCounter update() {
-		final long t = System.nanoTime();
+		final long t = Time.nanoTime();
 		fps = (cnt - prevCnt) * 1000000000.0f / (t - prevTime);
 		prevCnt = cnt;
 		prevTime = t;

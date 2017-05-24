@@ -34,6 +34,7 @@ import android.view.Surface;
 
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.MediaInfo;
+import com.serenegiant.utils.Time;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractEncoder implements Encoder, Runnable {
@@ -530,17 +531,11 @@ LOOP:	while (mIsCapturing) {
 
 	/**
 	 * 今回の書き込み用のpresentationTimeUs値を取得
-     * SystemClock.elapsedRealtimeNanos()/System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	 */
     @SuppressLint("NewApi")
 	protected long getInputPTSUs() {
-		long result;
-    	if (BuildCheck.isJellyBeanMr1()) {
-			result = SystemClock.elapsedRealtimeNanos() / 1000L;
-		} else {
-			result = System.nanoTime() / 1000L;
-		}
+		long result = Time.nanoTime() / 1000L;
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 /*		if (result <= prevOutputPTSUs) {
 			Log.w(TAG, "input pts smaller than previous output PTS");
@@ -558,7 +553,7 @@ LOOP:	while (mIsCapturing) {
      * @return
      */
     protected long getNextOutputPTSUs(long presentationTimeUs) {
-//		long result = System.nanoTime() / 1000L;
+//		long result = Time.nanoTime() / 1000L;
 		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
 /*		if (result < prevOutputPTSUs)
 			result = (prevOutputPTSUs - result) + result; */
