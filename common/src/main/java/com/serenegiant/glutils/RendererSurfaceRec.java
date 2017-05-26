@@ -61,6 +61,12 @@ class RendererSurfaceRec {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
 	
+	private void check() throws IllegalStateException {
+		if (mTargetSurface == null) {
+			throw new IllegalStateException("already released");
+		}
+	}
+	
 	/**
 	 * Surfaceへの描画が有効かどうかを取得する
 	 * @return
@@ -82,12 +88,14 @@ class RendererSurfaceRec {
 	}
 
 	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
-		mTargetSurface.makeCurrent();
-		// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけどハングアップする機種があるのでクリアしとく
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-		drawer.setMvpMatrix(mMvpMatrix, 0);
-		drawer.draw(textId, texMatrix, 0);
-		mTargetSurface.swap();
+		if (mTargetSurface != null) {
+			mTargetSurface.makeCurrent();
+			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけどハングアップする機種があるのでクリアしとく
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			drawer.setMvpMatrix(mMvpMatrix, 0);
+			drawer.draw(textId, texMatrix, 0);
+			mTargetSurface.swap();
+		}
 	}
 	
 	/**
@@ -95,15 +103,17 @@ class RendererSurfaceRec {
 	 * @param color
 	 */
 	public void clear(final int color) {
-		mTargetSurface.makeCurrent();
-		GLES20.glClearColor(
-			((color & 0x00ff0000) >>> 16) / 255.0f,	// R
-			((color & 0x0000ff00) >>>  8) / 255.0f,	// G
-			((color & 0x000000ff)) / 255.0f,		// B
-			((color & 0xff000000) >>> 24) / 255.0f	// A
-		);
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-		mTargetSurface.swap();
+		if (mTargetSurface != null) {
+			mTargetSurface.makeCurrent();
+			GLES20.glClearColor(
+				((color & 0x00ff0000) >>> 16) / 255.0f,	// R
+				((color & 0x0000ff00) >>>  8) / 255.0f,	// G
+				((color & 0x000000ff)) / 255.0f,		// B
+				((color & 0xff000000) >>> 24) / 255.0f	// A
+			);
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			mTargetSurface.swap();
+		}
 	}
 	
 	/**
@@ -111,7 +121,8 @@ class RendererSurfaceRec {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
-	public void makeCurrent() {
+	public void makeCurrent() throws IllegalStateException {
+		check();
 		mTargetSurface.makeCurrent();
 	}
 
@@ -120,7 +131,8 @@ class RendererSurfaceRec {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
-	public void swap() {
+	public void swap() throws IllegalStateException {
+		check();
 		mTargetSurface.swap();
 	}
 
