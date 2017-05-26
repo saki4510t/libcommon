@@ -21,6 +21,8 @@ package com.serenegiant.utils;
 
 import android.content.SharedPreferences;
 
+import java.util.Map;
+
 /**
  * Created by saki on 2016/11/05.
  *
@@ -166,6 +168,27 @@ public class PrefHelper {
 			result = Double.parseDouble(pref.getString(key, Double.toString(defaultValue)));
 		} catch (final Exception e1) {
 			// ignore
+		}
+		return result;
+	}
+
+	public static boolean getBoolean(final SharedPreferences pref, final String key, final boolean default_value) {
+		boolean result = default_value;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = pref.getBoolean(key, default_value);
+			} catch (final Exception e) {
+				result = ObjectHelper.asBoolean(getObject(pref, key));
+			}
+		}
+		return result;
+	}
+
+	private static final Object getObject(final SharedPreferences pref, final String key) {
+		Object result = null;
+		if ((pref != null) && pref.contains(key)) {
+			final Map<String, ?> all = pref.getAll();
+			result = all.get(key);
 		}
 		return result;
 	}
