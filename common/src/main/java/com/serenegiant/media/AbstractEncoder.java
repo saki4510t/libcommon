@@ -259,14 +259,30 @@ public abstract class AbstractEncoder implements Encoder {
 					mRequestDrain--;
 			}
 			if (localRequestStop) {
-				drain();
-				signalEndOfInputStream();
-				drain();
+				try {
+					drain();
+				} catch (final Exception e) {
+					// ignore
+				}
+				try {
+					signalEndOfInputStream();
+				} catch (final Exception e) {
+					// ignore
+				}
+				try {
+					drain();
+				} catch (final Exception e) {
+					// ignore
+				}
 				release();
 				break;
 			}
 			if (localRequestDrain) {
-				drain();
+				try {
+					drain();
+				} catch (final Exception e) {
+					mRequestStop = true;
+				}
 			} else {
 				synchronized (mSync) {
 					try {
