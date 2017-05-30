@@ -92,7 +92,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, mIFrameIntervals > 0 ? mIFrameIntervals : VideoConfig.getIFrame());
 //		format.setInteger(MediaFormat.KEY_WIDTH, currentConfig.width);
 //		format.setInteger(MediaFormat.KEY_HEIGHT, currentConfig.height);
-		Log.i(TAG, "format: " + format);
+		Log.d(TAG, "format: " + format);
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
         mMediaCodec = MediaCodec.createEncoderByType(MIME_AVC);
