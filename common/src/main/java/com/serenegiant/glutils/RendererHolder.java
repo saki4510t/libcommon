@@ -50,10 +50,6 @@ public class RendererHolder extends AbstractRendererHolder {
 		public MyRendererTask(final RendererHolder parent, final int width, final int height) {
 			super(parent, width, height);
 		}
-
-		@Override
-		protected void internalOnStart() {
-		}
 	}
 
 }

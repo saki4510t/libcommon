@@ -296,6 +296,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		@Override
 		protected void internalOnStart() {
 //			if (DEBUG) Log.v(TAG, "onStart:");
+			super.internalOnStart();
 			mParams.clear();
 			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
@@ -404,16 +405,6 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 			}
 		}
-
-		/**
-		 * TextureSurfaceで映像を受け取った際のコールバックリスナー
-		 */
-		private final OnFrameAvailableListener mOnFrameAvailableListener = new OnFrameAvailableListener() {
-			@Override
-			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-				offer(REQUEST_DRAW);
-			}
-		};
 
 	}
 
