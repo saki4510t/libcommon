@@ -46,6 +46,16 @@ public class PrefHelper {
 				}
 				if (!success) {
 					// 16進文字列かも
+					if (v.startsWith("0x") || v.startsWith("0X")) {
+						try {
+							result = (short)Integer.parseInt(v.substring(2), 16);
+							success = true;
+						} catch (final Exception e1) {
+						}
+					}
+				}
+				if (!success) {
+					// 16進文字列かも
 					try {
 						result = (short)Integer.parseInt(v, 16);
 						success = true;
@@ -86,6 +96,16 @@ public class PrefHelper {
 				}
 				if (!success) {
 					// 16進文字列かも
+					if (v.startsWith("0x") || v.startsWith("0X")) {
+						try {
+							result = (int)Long.parseLong(v.substring(2), 16);
+							success = true;
+						} catch (final Exception e1) {
+						}
+					}
+				}
+				if (!success) {
+					// 16進文字列かも
 					try {
 						result = (int)Long.parseLong(v, 16);
 						success = true;
@@ -123,6 +143,16 @@ public class PrefHelper {
 					result = Long.parseLong(v);
 					success = true;
 				} catch (final Exception e1) {
+				}
+				if (!success) {
+					// 16進文字列かも
+					if (v.startsWith("0x") || v.startsWith("0X")) {
+						try {
+							result = Long.parseLong(v.substring(2), 16);
+							success = true;
+						} catch (final Exception e1) {
+						}
+					}
 				}
 				if (!success) {
 					// 16進文字列かも
