@@ -262,9 +262,9 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	private static int sActiveNetworkMask = 0;
 
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
-	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+	public static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
 	/** アプリケーションローカルブロードキャスト用のインテントフィルター文字列 */
-	private static final String ACTION_LOCAL_CONNECTIVITY_CHANGE = "com.serenegiant.net.CONNECTIVITY_CHANGE";
+	public static final String ACTION_LOCAL_CONNECTIVITY_CHANGE = "com.serenegiant.net.CONNECTIVITY_CHANGE";
 
 	/** コールバックリスナー */
 	private OnNetworkChangedListener mListener;
