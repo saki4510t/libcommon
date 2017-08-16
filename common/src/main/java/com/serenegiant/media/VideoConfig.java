@@ -30,8 +30,11 @@ public class VideoConfig {
 	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
 	 */
 	private static float BPP = 0.25f;
+	public static final float BPP_MIN = 0.01f;
+	public static float BPP_MAX = 0.30f;
+
 	public static final int FPS_MIN = 2;
-	public static final int FPS_MAX = 30;
+	public static final int FPS_MAX = 121;
 	/**
 	 * I-frame(単独で圧縮された単独再生可能な一番劣化の少ないキーフレーム)間の秒数@30fps
 	 */
@@ -94,10 +97,29 @@ public class VideoConfig {
 	 * ビットレートを計算[bps]
 	 * @param width
 	 * @param height
+	 * @param frameRate
+	 * @param bpp
+	 * @return
+	 */
+	public static int calcBitrate(final int width, final int height,
+		final int frameRate, final float bpp) {
+
+		int r = (int)(Math.floor(bpp * frameRate * width * height / 1000 / 100) * 100) * 1000;
+		if (r < 200000) r = 200000;
+		else if (r > 20000000) r = 20000000;
+//		Log.d(TAG, String.format("bitrate=%d[kbps]", r / 1024));
+		return r;
+	}
+
+
+	/**
+	 * ビットレートを計算[bps]
+	 * @param width
+	 * @param height
 	 * @return
 	 */
 	public static int getBitrate(final int width, final int height) {
-		return getBitrate(width, height, getCaptureFps(), BPP);
+		return calcBitrate(width, height, getCaptureFps(), BPP);
 	}
 
 	/**
@@ -108,7 +130,7 @@ public class VideoConfig {
 	 * @return
 	 */
 	public static int getBitrate(final int width, final int height, final int frameRate) {
-		return getBitrate(width, height, frameRate, BPP);
+		return calcBitrate(width, height, frameRate, BPP);
 	}
 
 	/**
@@ -116,37 +138,59 @@ public class VideoConfig {
 	 * @param width
 	 * @param height
 	 * @param frameRate
-	 * @param bpp
 	 * @return
 	 */
 	public static int getBitrate(final int width, final int height, final int frameRate, final float bpp) {
-		int r = (int)(Math.floor(bpp * frameRate * width * height / 1000 / 100) * 100) * 1000;
-		if (r < 200000) r = 200000;
-		else if (r > 14000000) r = 14000000;
-//		Log.d(TAG, String.format("bitrate=%d[kbps]", r / 1024));
-		return r;
+		return calcBitrate(width, height, frameRate, bpp);
 	}
 
 	/**
 	 * BPPを計算
 	 * @param width
 	 * @param height
+	 * @param captureFps
 	 * @param bitrate
 	 * @return
 	 */
-	public static void setBPP(final int width, final int height, final int bitrate) {
-		final int captureFps =  getCaptureFps();
-		BPP = bitrate / (float)(captureFps * width * height);
+	public static float calcBPP(final int width, final int height,
+		final int captureFps, final int bitrate) {
+
+		return bitrate / (float)(captureFps * width * height);
+	}
+
+	/**
+	 * BPPを計算
+	 * captureFpsは#getCaptureFpsを使用
+	 * @param width
+	 * @param height
+	 * @param bitrate
+	 * @return
+	 */
+	public static float calcBPP(final int width, final int height,
+		final int bitrate) {
+
+		return calcBPP(width, height, getCaptureFps(), bitrate);
 	}
 
 	/**
 	 * BPPをセット
-	 * @param bpp [0.05,0.3]
+	 * @param width
+	 * @param height
+	 * @param bitrate
+	 * @return
+	 */
+	public static void setBPP(final int width, final int height, final int bitrate) {
+		BPP = calcBPP(width, height, bitrate);
+	}
+
+	/**
+	 * BPPをセット
+	 * @param bpp [BPP_MIN==0.01f, BPP_MAX]
 	 * @throws IllegalArgumentException
 	 */
 	public static void setBPP(final float bpp) throws IllegalArgumentException {
-		if ((bpp < 0.05f) || (bpp > 0.30f)) {
-			throw new IllegalArgumentException("bpp should be within [0.05,0.3]");
+		if ((bpp < BPP_MIN) || (bpp > BPP_MAX)) {
+			throw new IllegalArgumentException("bpp should be within [BPP_MIN, BPP_MAX]");
 		}
 		BPP = bpp;
 	}
@@ -160,7 +204,8 @@ public class VideoConfig {
 	}
 
 	/**
-	 * 概略ファイルサイズを計算[バイト/分]
+	 * 現在の設定で生成される概略ファイルサイズを計算[バイト/分]
+	 * 音声データ分は含まない
 	 * @param width
 	 * @param height
 	 * @return
