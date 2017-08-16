@@ -271,8 +271,11 @@ public class UdpBeacon {
 	}
 
 	public void finalize() throws Throwable {
-		release();
-		super.finalize();
+		try {
+			release();
+		} finally {
+			super.finalize();
+		}
 	}
 
 	/**
