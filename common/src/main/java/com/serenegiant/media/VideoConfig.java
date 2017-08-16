@@ -177,10 +177,12 @@ public class VideoConfig {
 	 * @param width
 	 * @param height
 	 * @param bitrate
-	 * @return
+	 * @throws IllegalArgumentException
 	 */
-	public static void setBPP(final int width, final int height, final int bitrate) {
-		BPP = calcBPP(width, height, bitrate);
+	public static void setBPP(final int width, final int height, final int bitrate)
+		throws IllegalArgumentException {
+
+		setBPP(calcBPP(width, height, bitrate));
 	}
 
 	/**
