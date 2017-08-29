@@ -239,9 +239,9 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
     public static int[] recognizedFormats;
 	static {
 		recognizedFormats = new int[] {
-        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
-        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
-        	MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar,
+        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,			// deprecation
+        	MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,		// deprecation
+        	MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar,	// deprecation
 		};
 	}
 
@@ -355,13 +355,13 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
      */
     protected static final boolean isSemiPlanarYUV(final int colorFormat) {
         switch (colorFormat) {
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:					// deprecation
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:			// deprecation
                 return false;
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:				// deprecation
+            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:		// deprecation
+            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:	// deprecation
+            case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:		// deprecation
                 return true;
             default:
                 throw new RuntimeException("unknown format " + colorFormat);
