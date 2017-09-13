@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.SurfaceTexture;
+import android.support.annotation.NonNull;
 import android.view.Surface;
 
 /**
@@ -95,6 +96,14 @@ public interface IRendererHolder extends IRendererCommon {
 	 */
 	public void clearSurfaceAll(final int color);
 	
+	/**
+	 * モデルビュー変換行列をセット
+	 * @param id
+	 * @param offset
+	 * @param matrix offset以降に16要素以上
+	 */
+	public void setMvpMatrix(final int id, final int offset, @NonNull final float[] matrix);
+
 	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得
 	 * @param id

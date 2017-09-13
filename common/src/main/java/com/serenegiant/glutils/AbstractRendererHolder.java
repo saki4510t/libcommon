@@ -54,8 +54,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static final int REQUEST_REMOVE_SURFACE = 4;
 	protected static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 	protected static final int REQUEST_MIRROR = 6;
-	protected static final int REQUEST_CLEAR = 7;
-	protected static final int REQUEST_CLEAR_ALL = 8;
+	protected static final int REQUEST_ROTATE = 7;
+	protected static final int REQUEST_CLEAR = 8;
+	protected static final int REQUEST_CLEAR_ALL = 9;
+	protected static final int REQUEST_SET_MVP = 10;
 
 	protected final Object mSync = new Object();
 	private final RenderHolderCallback mCallback;
@@ -205,6 +207,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	public void clearSurfaceAll(final int color) {
 		mRendererTask.clearSurfaceAll(color);
+	}
+
+	public void setMvpMatrix(final int id,
+		final int offset, @NonNull final float[] matrix) {
+		mRendererTask.setMvpMatrix(id, offset, matrix);
 	}
 
 	/**
@@ -372,6 +379,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private Surface mMasterSurface;
 		@MirrorMode
 		private int mMirror = MIRROR_NORMAL;
+		private int mRotation = 0;
 		
 		public BaseRendererTask(final AbstractRendererHolder parent, final int width, final int height) {
 			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
@@ -442,11 +450,17 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			case REQUEST_MIRROR:
 				handleMirror(arg1);
 				break;
+			case REQUEST_ROTATE:
+				handleRotate(arg1, arg2);
+				break;
 			case REQUEST_CLEAR:
 				handleClear(arg1, arg2);
 				break;
 			case REQUEST_CLEAR_ALL:
 				handleClearAll(arg1);
+				break;
+			case REQUEST_SET_MVP:
+				handleSetMvp(arg1, arg2, obj);
 				break;
 			}
 			return null;
@@ -553,6 +567,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public void clearSurfaceAll(final int color) {
 			checkFinished();
 			offer(REQUEST_CLEAR_ALL, color);
+		}
+		
+		public void setMvpMatrix(final int id,
+			final int offset, @NonNull final float[] matrix) {
+			checkFinished();
+			offer(REQUEST_SET_MVP, id, offset, matrix);
 		}
 		
 		public boolean isEnabled(final int id) {
@@ -795,6 +815,26 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				}
 			}
 		}
+	
+		/**
+		 * モデルビュー変換行列を適用する
+		 * @param id
+		 * @param offset
+		 * @param mvp
+		 */
+		protected void handleSetMvp(final int id,
+			final int offset, final Object mvp) {
+
+			if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
+				final float[] array = (float[])mvp;
+				synchronized (mClientSync) {
+					final RendererSurfaceRec client = mClients.get(id);
+					if ((client != null) && client.isValid()) {
+						System.arraycopy(array, offset, client.mMvpMatrix, 0, 16);
+					}
+				}
+			}
+		}
 		
 		/**
 		 * マスターSurfaceを再生成する
@@ -873,6 +913,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			RendererHolder.setMirror(client.mMvpMatrix, mirror);
 		}
 	
+		protected void handleRotate(final int id, final int degree) {
+			// FIXME 未実装
+		}
+		
 		/**
 		 * TextureSurfaceで映像を受け取った際のコールバックリスナー
 		 */
@@ -1173,5 +1217,27 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			break;
 		}
 	}
-
+	
+	/**
+	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
+	 * @param mvp
+	 * @param degrees
+	 */
+	protected static void rotate(final float[] mvp, final int degrees) {
+		if ((degrees % 180) != 0) {
+			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+		}
+	}
+	
+	/**
+	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
+	 * @param mvp
+	 * @param degrees
+	 */
+	protected static void setRotation(final float[] mvp, final int degrees) {
+		Matrix.setIdentityM(mvp, 0);
+		if ((degrees % 180) != 0) {
+			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+		}
+	}
 }
