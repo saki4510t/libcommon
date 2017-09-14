@@ -272,8 +272,8 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 //================================================================================
 // 実装
 //================================================================================
-	private static final int REQUEST_CHANGE_EFFECT = 9;
-	private static final int REQUEST_SET_PARAMS = 10;
+	private static final int REQUEST_CHANGE_EFFECT = 100;
+	private static final int REQUEST_SET_PARAMS = 101;
 
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
