@@ -393,5 +393,36 @@ public final class BuildCheck {
 	public static boolean isAndroid7() {
 		return check(Build.VERSION_CODES.N);
 	}
+	
+	/**
+	 * API>=25
+ 	 * @return
+	 */
+	public static boolean isNMR1() {
+		return check(Build.VERSION_CODES.N_MR1);
+	}
+	
+	/**
+	 * API>=25
+ 	 * @return
+	 */
+	public static boolean isNougatMR1() {
+		return check(Build.VERSION_CODES.N_MR1);
+	}
 
+	/**
+	 * おれおれぇー API>=26
+	 * @return
+	 */
+	public static boolean isO() {
+		return check(Build.VERSION_CODES.O);
+	}
+	
+	/**
+	 * おれおれぇー API>=26
+	 * @return
+	 */
+	public static boolean isOreo() {
+		return check(Build.VERSION_CODES.O);
+	}
 }
