@@ -213,7 +213,11 @@ public class SDUtils {
 // ファイル削除要求
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static boolean requestDeleteDocument(final Context context, final Uri uri) {
-		return BuildCheck.isKitKat() && DocumentsContract.deleteDocument(context.getContentResolver(), uri);
+		try {
+			return BuildCheck.isKitKat() && DocumentsContract.deleteDocument(context.getContentResolver(), uri);
+		} catch (final FileNotFoundException e) {
+			return false;
+		}
 	}
 
 	/**
@@ -222,6 +226,7 @@ public class SDUtils {
 	 * @param request_code
 	 * @return
 	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static boolean hasStorageAccess(final Context context, final int request_code) {
 		boolean found = false;
 		if (BuildCheck.isLollipop()) {
