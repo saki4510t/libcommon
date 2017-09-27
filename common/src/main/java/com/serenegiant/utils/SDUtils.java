@@ -45,12 +45,29 @@ public class SDUtils {
 //********************************************************************************
 // Storage Access Framework関係
 //********************************************************************************
+	
+	/**
+	 * ActivityまたはFragmentの#onActivityResultメソッドの処理のうち
+	 * Storage Access Framework関係の処理を行うためのdelegater
+	 */
 	public interface handleOnResultDelegater {
 		public void onResult(final int requestCode, final Uri uri, final Intent data);
 		public void onFailed(final int requestCode, final Intent data);
 	}
+	
+	/**
+	 * ActivityまたはFragmentの#onActivityResultメソッドの処理をdelegaterで
+	 * 処理するためのヘルパーメソッド
+	 * @param context
+	 * @param requestCode
+	 * @param resultCode
+	 * @param data
+	 * @param delegater
+	 */
+	public static void handleOnResult(final Context context,
+		final int requestCode, final int resultCode,
+		final Intent data, final handleOnResultDelegater delegater) {
 
-	public static void handleOnResult(final Context context, final int requestCode, final int resultCode, final Intent data, final handleOnResultDelegater delegater) {
 		if ((data != null) && (delegater != null)) {
 			final String action = data.getAction();
 			if (resultCode == Activity.RESULT_OK) {
@@ -71,19 +88,37 @@ public class SDUtils {
 			}
 		}
 	}
-
+	
+	/**
+	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
+	 * @param request_code
+	 * @return
+	 */
 	private static String getKey(final int request_code) {
 		return String.format(Locale.US, "SDUtils-%d", request_code);
 	}
-
+	
+	/**
+	 * uriを共有プレファレンスに保存する
+	 * @param context
+	 * @param key
+	 * @param uri
+	 */
 	private static void saveUri(final Context context, final String key, final Uri uri) {
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if (pref != null) {
 			pref.edit().putString(key, uri.toString()).apply();
 		}
 	}
-
-	@Nullable private static Uri loadUri(final Context context, final String key) {
+	
+	/**
+	 * 共有プレファレンスの保存しているuriを取得する
+	 * @param context
+	 * @param key
+	 * @return
+	 */
+	@Nullable
+	private static Uri loadUri(final Context context, final String key) {
 		Uri result = null;
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
@@ -95,7 +130,12 @@ public class SDUtils {
 		}
 		return result;
 	}
-
+	
+	/**
+	 * 共有プレファレンスに保存しているuriを消去する
+	 * @param context
+	 * @param key
+	 */
 	private static void clearUri(final Context context, final String key) {
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
@@ -106,100 +146,223 @@ public class SDUtils {
 			}
 		}
 	}
-
-// ファイル読み込み用のUriを要求
+	
+	/**
+	 * ファイル読み込み用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final Activity activity, final String mime_type, final int request_code) {
+	public static void requestOpenDocument(final Activity activity,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareOpenDocumentIntent(mime_type), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル読み込み用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final FragmentActivity activity, final String mime_type, final int request_code) {
+	public static void requestOpenDocument(final FragmentActivity activity,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareOpenDocumentIntent(mime_type), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル読み込み用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param fragment
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final android.app.Fragment fragment, final String mime_type, final int request_code) {
+	public static void requestOpenDocument(final android.app.Fragment fragment,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareOpenDocumentIntent(mime_type), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル読み込み用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param fragment
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final android.support.v4.app.Fragment fragment, final String mime_type, final int request_code) {
+	public static void requestOpenDocument(final android.support.v4.app.Fragment fragment,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareOpenDocumentIntent(mime_type), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル読み込み用のUriを要求するヘルパーメソッド
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param mime_type
+	 * @return
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private static Intent prepareOpenDocumentIntent(final String mime_type) {
 		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.setType(mime_type);
 		return intent;
 	}
-
-// ファイル保存用のUriを要求
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final Activity activity, final String mime_type, final int request_code) {
+	public static void requestCreateDocument(final Activity activity,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareCreateDocument(mime_type, null), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param default_name
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final Activity activity, final String mime_type, final String default_name, final int request_code) {
+	public static void requestCreateDocument(final Activity activity,
+		final String mime_type, final String default_name, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareCreateDocument(mime_type, default_name), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final FragmentActivity activity, final String mime_type, final int request_code) {
+	public static void requestCreateDocument(final FragmentActivity activity,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareCreateDocument(mime_type, null), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param activity
+	 * @param mime_type
+	 * @param default_name
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final FragmentActivity activity, final String mime_type, final String default_name, final int request_code) {
+	public static void requestCreateDocument(final FragmentActivity activity,
+		final String mime_type, final String default_name, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			activity.startActivityForResult(prepareCreateDocument(mime_type, default_name), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param fragment
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.app.Fragment fragment, final String mime_type, final int request_code) {
+	public static void requestCreateDocument(final android.app.Fragment fragment,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareCreateDocument(mime_type, null), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param fragment
+	 * @param mime_type
+	 * @param default_name
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.app.Fragment fragment, final String mime_type, final String default_name, final int request_code) {
+	public static void requestCreateDocument(final android.app.Fragment fragment,
+		final String mime_type, final String default_name, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareCreateDocument(mime_type, default_name), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param fragment
+	 * @param mime_type
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment, final String mime_type, final int request_code) {
+	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment,
+		final String mime_type, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareCreateDocument(mime_type, null), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+ 	 * @param fragment
+	 * @param mime_type
+	 * @param default_name
+	 * @param request_code
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment, final String mime_type, final String default_name, final int request_code) {
+	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment,
+		final String mime_type, final String default_name, final int request_code) {
+
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareCreateDocument(mime_type, default_name), request_code);
 		}
 	}
-
+	
+	/**
+	 * ファイル保存用のUriを要求するヘルパーメソッド
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param mime_type
+	 * @param default_name
+	 * @return
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private static Intent prepareCreateDocument(final String mime_type, final String default_name) {
 		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
@@ -210,7 +373,13 @@ public class SDUtils {
 		return intent;
 	}
 
-// ファイル削除要求
+	/**
+	 * ファイル削除要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param context
+	 * @param uri
+	 * @return
+	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static boolean requestDeleteDocument(final Context context, final Uri uri) {
 		try {
@@ -363,8 +532,11 @@ public class SDUtils {
 	 * @param tree_uri
 	 * @return
 	 */
+	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(final Context context, final int request_code, final Uri tree_uri) {
+	public static Uri requestStorageAccessPermission(final Context context,
+		final int request_code, final Uri tree_uri) {
+
 		if (BuildCheck.isLollipop()) {
 			context.getContentResolver().takePersistableUriPermission(tree_uri,
 				Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
@@ -381,7 +553,9 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static void releaseStorageAccessPermission(final Context context, final int request_code) {
+	public static void releaseStorageAccessPermission(final Context context,
+		final int request_code) {
+
 		if (BuildCheck.isLollipop()) {
 			final String key = getKey(request_code);
 			final Uri uri = loadUri(context, key);
@@ -399,6 +573,7 @@ public class SDUtils {
 	 * @param tree_id
 	 * @return
 	 */
+	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static File createStorageDir(final Context context, final int tree_id) {
 		Log.i(TAG, "createStorageDir:");
@@ -406,7 +581,16 @@ public class SDUtils {
 			final Uri tree_uri = getStorageUri(context, tree_id);
 			if (tree_uri != null) {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
-				return new File(UriHelper.getPath(context, save_tree.getUri()));
+				final String path = UriHelper.getPath(context, save_tree.getUri());
+				if (!TextUtils.isEmpty(path)) {
+					final File dir = new File(path);
+					if (dir.canWrite()) {
+						dir.mkdirs();
+						return dir;
+					} else if (dir.canRead()) {
+						return dir;
+					}
+				}
 			}
 		}
 		return null;
@@ -420,8 +604,11 @@ public class SDUtils {
 	 * @param file_name
 	 * @return
 	 */
+	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(final Context context, final int tree_id, final String mime, final String file_name) {
+	public static File createStorageFile(final Context context,
+		final int tree_id, final String mime, final String file_name) {
+
 		Log.i(TAG, "createStorageFile:" + file_name);
 		return createStorageFile(context, getStorageUri(context, tree_id), mime, file_name);
 	}
@@ -434,14 +621,20 @@ public class SDUtils {
 	 * @param file_name
 	 * @return
 	 */
+	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(final Context context, final Uri tree_uri, final String mime, final String file_name) {
+	public static File createStorageFile(final Context context,
+		final Uri tree_uri, final String mime, final String file_name) {
 		Log.i(TAG, "createStorageFile:" + file_name);
+
 		if (BuildCheck.isLollipop()) {
 			if ((context != null) && (tree_uri != null) && !TextUtils.isEmpty(file_name)) {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
 				final DocumentFile target = save_tree.createFile(mime, file_name);
-				return new File(UriHelper.getPath(context, target.getUri()));
+				final String path = UriHelper.getPath(context, target.getUri());
+				if (!TextUtils.isEmpty(path)) {
+					return new File(path);
+				}
 			}
 		}
 		return null;
@@ -456,7 +649,9 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(final Context context, final int tree_id, final String mime, final String file_name) {
+	public static int createStorageFileFD(final Context context,
+		final int tree_id, final String mime, final String file_name) {
+
 		Log.i(TAG, "createStorageFileFD:" + file_name);
 		return createStorageFileFD(context, getStorageUri(context, tree_id), mime, file_name);
 	}
@@ -470,7 +665,9 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(final Context context, final Uri tree_uri, final String mime, final String file_name) {
+	public static int createStorageFileFD(final Context context,
+		final Uri tree_uri, final String mime, final String file_name) {
+
 		Log.i(TAG, "createStorageFileFD:" + file_name);
 		if (BuildCheck.isLollipop()) {
 			if ((context != null) && (tree_uri != null) && !TextUtils.isEmpty(file_name)) {
