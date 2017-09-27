@@ -29,6 +29,9 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.Log;
 
 import java.io.File;
@@ -61,6 +64,50 @@ public final class UriHelper {
 		return path;
 	}
 
+	public static final String[] STANDARD_DIRECTORIES;
+	
+	 static {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			STANDARD_DIRECTORIES = new String[] {
+				Environment.DIRECTORY_MUSIC,
+				Environment.DIRECTORY_PODCASTS,
+				Environment.DIRECTORY_RINGTONES,
+				Environment.DIRECTORY_ALARMS,
+				Environment.DIRECTORY_NOTIFICATIONS,
+				Environment.DIRECTORY_PICTURES,
+				Environment.DIRECTORY_MOVIES,
+				Environment.DIRECTORY_DOWNLOADS,
+				Environment.DIRECTORY_DCIM,
+				Environment.DIRECTORY_DOCUMENTS,	// API>= 19
+			};
+		} else {
+			STANDARD_DIRECTORIES = new String[] {
+				Environment.DIRECTORY_MUSIC,
+				Environment.DIRECTORY_PODCASTS,
+				Environment.DIRECTORY_RINGTONES,
+				Environment.DIRECTORY_ALARMS,
+				Environment.DIRECTORY_NOTIFICATIONS,
+				Environment.DIRECTORY_PICTURES,
+				Environment.DIRECTORY_MOVIES,
+				Environment.DIRECTORY_DOWNLOADS,
+				Environment.DIRECTORY_DCIM,
+			};
+		}
+	}
+
+	public static boolean isStandardDirectory(final @NonNull String dir) {
+		try {
+			for (final String valid : STANDARD_DIRECTORIES) {
+				if (valid.equals(dir)) {
+						return true;
+				}
+			}
+		} catch (final Exception e) {
+			Log.w(TAG, e);
+		}
+		return false;
+	}
+
 	/**
 	 * Uriからローカルパスに変換できればpathを返す
 	 * @param context The context.
@@ -68,6 +115,7 @@ public final class UriHelper {
 	 * @author paulburke
 	 */
 	@SuppressLint("NewApi")
+	@Nullable
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static String getPath(final Context context, final Uri uri) {
 		Log.i(TAG, "getPath:uri=" + uri);
@@ -88,7 +136,17 @@ public final class UriHelper {
 				Log.i(TAG, "getPath:type=" + type);
 
 	            if ("primary".equalsIgnoreCase(type)) {
-	                return Environment.getExternalStorageDirectory() + "/" + split[1];
+	            	final String path =
+	                	Environment.getExternalStorageDirectory() + "/";
+					return (split.length > 1) ? path + split[1] : path;
+				} else if ("home".equalsIgnoreCase(type)) {
+					if ((split.length > 1) && isStandardDirectory(split[1])) {
+						return Environment.getExternalStoragePublicDirectory(
+							split[1]) + "/";
+					}
+					final String path = Environment.getExternalStoragePublicDirectory(
+						Environment.DIRECTORY_DOCUMENTS) + "/";
+					return (split.length > 1) ? path + split[1] : path;
 	            } else {
 					// プライマリストレージ以外の時は前から順に探す
 	            	final String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -100,25 +158,27 @@ public final class UriHelper {
 						final File dir = dirs[i];
 						Log.i(TAG, "getPath:" + i + ")dir=" + dir);
 						if ((dir != null) && dir.getAbsolutePath().startsWith(primary)) continue;
-						final String dir_path = dir.getAbsolutePath();
-						final String[] dir_elements = dir_path.split("/");
-						final int m = dir_elements != null ? dir_elements.length : 0;
-						if ((m > 1) && "storage".equalsIgnoreCase(dir_elements[1])) {
-							boolean found = false;
-							sb.setLength(0);
-							sb.append('/').append(dir_elements[1]);
-							for (int j = 2; j < m; j++) {
-								if ("Android".equalsIgnoreCase(dir_elements[j])) {
-									found = true;
-									break;
+						final String dir_path = dir != null ? dir.getAbsolutePath() : null;
+						if (!TextUtils.isEmpty(dir_path)) {
+							final String[] dir_elements = dir_path.split("/");
+							final int m = dir_elements.length;
+							if ((m > 1) && "storage".equalsIgnoreCase(dir_elements[1])) {
+								boolean found = false;
+								sb.setLength(0);
+								sb.append('/').append(dir_elements[1]);
+								for (int j = 2; j < m; j++) {
+									if ("Android".equalsIgnoreCase(dir_elements[j])) {
+										found = true;
+										break;
+									}
+									sb.append('/').append(dir_elements[j]);
 								}
-								sb.append('/').append(dir_elements[j]);
-							}
-							if (found) {
-								final File path = new File(new File(sb.toString()), split[1]);
-								Log.i(TAG, "getPath:path=" + path);
-								if (path.exists() && path.canWrite()) {
-									return path.getAbsolutePath();
+								if (found) {
+									final File path = new File(new File(sb.toString()), split[1]);
+									Log.i(TAG, "getPath:path=" + path);
+									if (path.exists() && path.canWrite()) {
+										return path.getAbsolutePath();
+									}
 								}
 							}
 						}
