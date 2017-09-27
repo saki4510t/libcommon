@@ -28,6 +28,7 @@ import java.util.Locale;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -37,17 +38,27 @@ public class FileUtils {
     public static String DIR_NAME = "UsbWebCamera";
 	private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 
+	@NonNull
+	public static String getDirName() {
+		return !TextUtils.isEmpty(DIR_NAME)
+			? "Serenegiant" : DIR_NAME;
+	}
+	
     /**
      * キャプチャ用のファイル名を生成
      * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
      * @param ext .mp4 .png または .jpeg
      * @return 書き込み出来なければnullを返す
      */
-    public static final File getCaptureFile(final Context context, final String type, final String ext, final int save_tree_id) {
+    public static final File getCaptureFile(final Context context,
+    	final String type, final String ext, final int save_tree_id) {
+
     	return getCaptureFile(context, type, null, ext, save_tree_id);
     }
 
-	public static final File getCaptureFile(final Context context, final String type, final String prefix, final String ext, final int save_tree_id) {
+	public static final File getCaptureFile(final Context context,
+		final String type, final String prefix, final String ext, final int save_tree_id) {
+
 	// 保存先のファイル名を生成
 		File result = null;
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
@@ -57,6 +68,9 @@ public class FileUtils {
 			if ((result == null) || !result.canWrite()) {
 				Log.w(TAG, "なんでか書き込めん");
 				result = null;
+			}
+			if (result != null) {
+				result = new File(result, getDirName());
 			}
 		}
 		if (result == null) {
@@ -77,14 +91,18 @@ public class FileUtils {
 	}
 
 	@SuppressLint("NewApi")
-	public static final File getCaptureDir(final Context context, final String type, final int save_tree_id) {
+	public static final File getCaptureDir(final Context context,
+		final String type, final int save_tree_id) {
+
 //		Log.i(TAG, "getCaptureDir:save_tree_id=" + save_tree_id + ", context=" + context);
 		File result = null;
 		if ((save_tree_id > 0) && SDUtils.hasStorageAccess(context, save_tree_id)) {
 			result = SDUtils.createStorageDir(context, save_tree_id);
 //			Log.i(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
-		final File dir = result != null ? result : new File(Environment.getExternalStoragePublicDirectory(type), DIR_NAME);
+		final File dir = result != null
+			? new File(result, getDirName())
+			: new File(Environment.getExternalStoragePublicDirectory(type), getDirName());
 		dir.mkdirs();	// Nexus5だとパスが全部存在しないと値がちゃんと返ってこないのでパスを生成
 //		Log.i(TAG, "getCaptureDir:" + result);
         if (dir.canWrite()) {
@@ -110,7 +128,8 @@ public class FileUtils {
     	try {
     		String line;
     		final Process proc = runtime.exec("mount");
-    		final BufferedReader br = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+    		final BufferedReader br = new BufferedReader(
+    			new InputStreamReader(proc.getInputStream()));
     		while ((line = br.readLine()) != null) {
 //    			Log.i(TAG, "getExternalMounts:" + line);
     			if (line.contains("secure")) continue;
@@ -157,7 +176,8 @@ public class FileUtils {
     	if (context == null) return false;
     	return checkFreeSpace(context, FREE_RATIO,
     		max_duration > 0	// 最大録画時間が設定されている時
-        	? (max_duration - (System.currentTimeMillis() - start_time)) / 60000.f * FREE_SIZE_MINUTE + FREE_SIZE_OFFSET
+        	? (max_duration - (System.currentTimeMillis() - start_time)) / 60000.f
+        		* FREE_SIZE_MINUTE + FREE_SIZE_OFFSET
         	: FREE_SIZE, save_tree_id);
     }
 
@@ -167,7 +187,9 @@ public class FileUtils {
      * @param minFree 最小空き容量[バイト]
      * @return 使用可能であればtrue
      */
-    public static final boolean checkFreeSpace(final Context context, final float ratio, final float minFree, final int save_tree_id) {
+    public static final boolean checkFreeSpace(final Context context,
+    	final float ratio, final float minFree, final int save_tree_id) {
+
 //    	if (DEBUG) Log.v(TAG, String.format("checkFreeSpace:ratio=%f,min=%f", ratio, minFree));
 //		Log.i(TAG, "checkFreeSpace:context=" + context + ", save_tree_id=" + save_tree_id);
     	if (context == null) return false;
@@ -204,7 +226,9 @@ public class FileUtils {
 	 * @param save_tree_id
 	 * @return
 	 */
-	public static final long getAvailableFreeSpace(final Context context, final String type, final int save_tree_id) {
+	public static final long getAvailableFreeSpace(final Context context,
+		final String type, final int save_tree_id) {
+
 		long result = 0;
 		if (context != null) {
 			final File dir = getCaptureDir(context, type, save_tree_id);
@@ -222,7 +246,9 @@ public class FileUtils {
 	 * @param save_tree_id
 	 * @return
 	 */
-	public static final float getFreeRatio(final Context context, final String type, final int save_tree_id) {
+	public static final float getFreeRatio(final Context context,
+		final String type, final int save_tree_id) {
+
 		if (context != null) {
 			final File dir = getCaptureDir(context, type, save_tree_id);
 			if (dir != null) {
