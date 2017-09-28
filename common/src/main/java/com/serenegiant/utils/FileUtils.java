@@ -40,7 +40,7 @@ public class FileUtils {
 
 	@NonNull
 	public static String getDirName() {
-		return !TextUtils.isEmpty(DIR_NAME)
+		return TextUtils.isEmpty(DIR_NAME)
 			? "Serenegiant" : DIR_NAME;
 	}
 	
