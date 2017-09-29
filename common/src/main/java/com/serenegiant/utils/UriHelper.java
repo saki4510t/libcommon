@@ -135,54 +135,62 @@ public final class UriHelper {
 
 				Log.i(TAG, "getPath:type=" + type);
 
-	            if ("primary".equalsIgnoreCase(type)) {
-	            	final String path =
-	                	Environment.getExternalStorageDirectory() + "/";
-					return (split.length > 1) ? path + split[1] : path;
-				} else if ("home".equalsIgnoreCase(type)) {
-					if ((split.length > 1) && isStandardDirectory(split[1])) {
-						return Environment.getExternalStoragePublicDirectory(
-							split[1]) + "/";
-					}
-					final String path = Environment.getExternalStoragePublicDirectory(
-						Environment.DIRECTORY_DOCUMENTS) + "/";
-					return (split.length > 1) ? path + split[1] : path;
-	            } else {
-					// プライマリストレージ以外の時は前から順に探す
-	            	final String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
-					Log.i(TAG, "getPath:primary=" + primary);
-					final File[] dirs = context.getExternalFilesDirs(null);
-					final int n = dirs != null ? dirs.length : 0;
-					final StringBuilder sb = new StringBuilder();
-					for (int i = 0; i < n; i++) {
-						final File dir = dirs[i];
-						Log.i(TAG, "getPath:" + i + ")dir=" + dir);
-						if ((dir != null) && dir.getAbsolutePath().startsWith(primary)) continue;
-						final String dir_path = dir != null ? dir.getAbsolutePath() : null;
-						if (!TextUtils.isEmpty(dir_path)) {
-							final String[] dir_elements = dir_path.split("/");
-							final int m = dir_elements.length;
-							if ((m > 1) && "storage".equalsIgnoreCase(dir_elements[1])) {
-								boolean found = false;
-								sb.setLength(0);
-								sb.append('/').append(dir_elements[1]);
-								for (int j = 2; j < m; j++) {
-									if ("Android".equalsIgnoreCase(dir_elements[j])) {
-										found = true;
-										break;
+				if (type != null) {
+					if ("primary".equalsIgnoreCase(type)) {
+						final String path =
+							Environment.getExternalStorageDirectory() + "/";
+						return (split.length > 1) ? path + split[1] : path;
+					} else if ("home".equalsIgnoreCase(type)) {
+						if ((split.length > 1) && isStandardDirectory(split[1])) {
+							return Environment.getExternalStoragePublicDirectory(
+								split[1]) + "/";
+						}
+						final String path = Environment.getExternalStoragePublicDirectory(
+							Environment.DIRECTORY_DOCUMENTS) + "/";
+						return (split.length > 1) ? path + split[1] : path;
+					} else {
+						// プライマリストレージ以外の時は前から順に探す
+						final String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
+						Log.i(TAG, "getPath:primary=" + primary);
+						final File[] dirs = context.getExternalFilesDirs(null);
+						final int n = dirs != null ? dirs.length : 0;
+						final StringBuilder sb = new StringBuilder();
+						for (int i = 0; i < n; i++) {
+							final File dir = dirs[i];
+							Log.i(TAG, "getPath:" + i + ")dir=" + dir);
+							if ((dir != null) && dir.getAbsolutePath().startsWith(primary)) {
+								// プライマリストレージはスキップ
+								continue;
+							}
+							final String dir_path = dir != null ? dir.getAbsolutePath() : null;
+							if (!TextUtils.isEmpty(dir_path)) {
+								final String[] dir_elements = dir_path.split("/");
+								final int m = dir_elements.length;
+								if ((m > 2) && "storage".equalsIgnoreCase(dir_elements[1])
+									&& type.equalsIgnoreCase(dir_elements[2])) {
+
+									boolean found = false;
+									sb.setLength(0);
+									sb.append('/').append(dir_elements[1]);
+									for (int j = 2; j < m; j++) {
+										if ("Android".equalsIgnoreCase(dir_elements[j])) {
+											found = true;
+											break;
+										}
+										sb.append('/').append(dir_elements[j]);
 									}
-									sb.append('/').append(dir_elements[j]);
-								}
-								if (found) {
-									final File path = new File(new File(sb.toString()), split[1]);
-									Log.i(TAG, "getPath:path=" + path);
-									if (path.exists() && path.canWrite()) {
+									if (found) {
+										final File path = new File(new File(sb.toString()), split[1]);
+										Log.i(TAG, "getPath:path=" + path);
+										// 見つかったパスが読み込みまたは読み書きできるかどうかは関知しない
 										return path.getAbsolutePath();
 									}
 								}
 							}
 						}
 					}
+				} else {
+					Log.w(TAG, "unexpectedly type is null");
 				}
 	        } else if (isDownloadsDocument(uri)) {
 				// DownloadsProvider
@@ -222,6 +230,7 @@ public final class UriHelper {
 	        return uri.getPath();
 	    }
 
+		Log.w(TAG, "unexpectedly not found,uri=" + uri);
 	    return null;
 	}
 
