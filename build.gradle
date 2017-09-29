@@ -28,8 +28,8 @@ ext {
 	versionBuildTool = "26.0.0"
 	versionCompiler = 26
 	versionTarget = 23
-    versionCodeNum = 112
-    versionNameString = '1.7.4'
+    versionCodeNum = 113
+    versionNameString = '1.7.5'
 	javaSourceCompatibility = JavaVersion.VERSION_1_7
 	javaTargetCompatibility = JavaVersion.VERSION_1_7
 }
