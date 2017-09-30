@@ -537,16 +537,32 @@ public class SDUtils {
 	public static Uri requestStorageAccessPermission(final Context context,
 		final int request_code, final Uri tree_uri) {
 
+		return requestStorageAccessPermission(context,
+			request_code, tree_uri,
+			Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+	}
+	
+	/**
+	 * 恒常的にアクセスできるようにパーミッションを要求する
+	 * @param context
+	 * @param tree_uri
+	 * @param flags
+	 * @return
+	 */
+	@Nullable
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccessPermission(final Context context,
+		final int request_code, final Uri tree_uri, final int flags) {
+
 		if (BuildCheck.isLollipop()) {
-			context.getContentResolver().takePersistableUriPermission(tree_uri,
-				Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+			context.getContentResolver().takePersistableUriPermission(tree_uri, flags);
 			saveUri(context, getKey(request_code), tree_uri);
 			return tree_uri;
 		} else {
 			return null;
 		}
 	}
-
+	
 	/**
 	 * 恒常的にアクセスできるように取得したパーミッションを開放する
 	 * @param context
