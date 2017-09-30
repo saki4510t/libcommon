@@ -28,6 +28,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.provider.DocumentsContract;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.provider.DocumentFile;
@@ -66,7 +67,7 @@ public class SDUtils {
 	 * @param data
 	 * @param delegater
 	 */
-	public static void handleOnResult(final Context context,
+	public static void handleOnResult(@NonNull final Context context,
 		final int requestCode, final int resultCode,
 		final Intent data, final handleOnResultDelegater delegater) {
 
@@ -96,6 +97,7 @@ public class SDUtils {
 	 * @param request_code
 	 * @return
 	 */
+	@NonNull
 	private static String getKey(final int request_code) {
 		return String.format(Locale.US, "SDUtils-%d", request_code);
 	}
@@ -106,7 +108,8 @@ public class SDUtils {
 	 * @param key
 	 * @param uri
 	 */
-	private static void saveUri(final Context context, final String key, final Uri uri) {
+	private static void saveUri(@NonNull final Context context,
+		@NonNull final String key, @NonNull final Uri uri) {
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if (pref != null) {
 			pref.edit().putString(key, uri.toString()).apply();
@@ -120,7 +123,7 @@ public class SDUtils {
 	 * @return
 	 */
 	@Nullable
-	private static Uri loadUri(final Context context, final String key) {
+	private static Uri loadUri(@NonNull final Context context, @NonNull final String key) {
 		Uri result = null;
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
@@ -138,7 +141,7 @@ public class SDUtils {
 	 * @param context
 	 * @param key
 	 */
-	private static void clearUri(final Context context, final String key) {
+	private static void clearUri(@NonNull final Context context, @Nullable final String key) {
 		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
 			try {
@@ -157,7 +160,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final Activity activity,
+	public static void requestOpenDocument(@NonNull final Activity activity,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -173,7 +176,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final FragmentActivity activity,
+	public static void requestOpenDocument(@NonNull final FragmentActivity activity,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -189,7 +192,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final android.app.Fragment fragment,
+	public static void requestOpenDocument(@NonNull final android.app.Fragment fragment,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -205,7 +208,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(final android.support.v4.app.Fragment fragment,
+	public static void requestOpenDocument(@NonNull final android.support.v4.app.Fragment fragment,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -220,7 +223,7 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	private static Intent prepareOpenDocumentIntent(final String mime_type) {
+	private static Intent prepareOpenDocumentIntent(@NonNull final String mime_type) {
 		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.setType(mime_type);
 		return intent;
@@ -234,7 +237,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final Activity activity,
+	public static void requestCreateDocument(@NonNull final Activity activity,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -251,7 +254,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final Activity activity,
+	public static void requestCreateDocument(@NonNull final Activity activity,
 		final String mime_type, final String default_name, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -267,7 +270,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final FragmentActivity activity,
+	public static void requestCreateDocument(@NonNull final FragmentActivity activity,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -284,7 +287,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final FragmentActivity activity,
+	public static void requestCreateDocument(@NonNull final FragmentActivity activity,
 		final String mime_type, final String default_name, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -300,7 +303,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final android.app.Fragment fragment,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -317,7 +320,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final android.app.Fragment fragment,
 		final String mime_type, final String default_name, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -333,7 +336,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final android.support.v4.app.Fragment fragment,
 		final String mime_type, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -350,7 +353,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(final android.support.v4.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final android.support.v4.app.Fragment fragment,
 		final String mime_type, final String default_name, final int request_code) {
 
 		if (BuildCheck.isKitKat()) {
@@ -383,9 +386,10 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static boolean requestDeleteDocument(final Context context, final Uri uri) {
+	public static boolean requestDeleteDocument(@NonNull final Context context, final Uri uri) {
 		try {
-			return BuildCheck.isKitKat() && DocumentsContract.deleteDocument(context.getContentResolver(), uri);
+			return BuildCheck.isKitKat()
+				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
 		} catch (final FileNotFoundException e) {
 			return false;
 		}
@@ -398,13 +402,16 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static boolean hasStorageAccess(final Context context, final int request_code) {
+	public static boolean hasStorageAccess(@NonNull final Context context,
+		final int request_code) {
+
 		boolean found = false;
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = loadUri(context, getKey(request_code));
 			if (uri != null) {
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
-				final List<UriPermission> list = context.getContentResolver().getPersistedUriPermissions();
+				final List<UriPermission> list
+					= context.getContentResolver().getPersistedUriPermissions();
 				for (final UriPermission item: list) {
 					if (item.getUri().equals(uri)) {
 						// request_codeに対応するUriへのパーミッションを恒常的に保持していた時
@@ -424,7 +431,9 @@ public class SDUtils {
 	 * @return 既にrequest_codeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(final Activity activity, final int request_code) {
+	public static Uri requestStorageAccess(@NonNull final Activity activity,
+		final int request_code) {
+
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = getStorageUri(activity, request_code);
 			if (uri == null) {
@@ -443,7 +452,9 @@ public class SDUtils {
 	 * @return 既にrequest_codeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(final FragmentActivity activity, final int request_code) {
+	public static Uri requestStorageAccess(@NonNull final FragmentActivity activity,
+		final int request_code) {
+
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = getStorageUri(activity, request_code);
 			if (uri == null) {
@@ -462,7 +473,9 @@ public class SDUtils {
 	 * @return 既にrequest_codeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(final android.app.Fragment fragment, final int request_code) {
+	public static Uri requestStorageAccess(@NonNull final android.app.Fragment fragment,
+		final int request_code) {
+
 		final Uri uri = getStorageUri(fragment.getActivity(), request_code);
 		if (uri == null) {
 			// request_codeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
@@ -478,7 +491,9 @@ public class SDUtils {
 	 * @return 既にrequest_codeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(final android.support.v4.app.Fragment fragment, final int request_code) {
+	public static Uri requestStorageAccess(@NonNull final android.support.v4.app.Fragment fragment,
+		final int request_code) {
+
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = getStorageUri(fragment.getActivity(), request_code);
 			if (uri == null) {
@@ -498,13 +513,16 @@ public class SDUtils {
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
-	public static Uri getStorageUri(final Context context, final int request_code) {
+	public static Uri getStorageUri(@NonNull final Context context,
+		final int request_code) {
+
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = loadUri(context, getKey(request_code));
 			if (uri != null) {
 				boolean found = false;
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
-				final List<UriPermission> list = context.getContentResolver().getPersistedUriPermissions();
+				final List<UriPermission> list
+					= context.getContentResolver().getPersistedUriPermissions();
 				for (final UriPermission item: list) {
 					if (item.getUri().equals(uri)) {
 						// request_codeに対応するUriへのパーミッションを恒常的に保持していた時
@@ -537,7 +555,7 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(final Context context,
+	public static Uri requestStorageAccessPermission(@NonNull final Context context,
 		final int request_code, final Uri tree_uri) {
 
 		return requestStorageAccessPermission(context,
@@ -554,7 +572,7 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(final Context context,
+	public static Uri requestStorageAccessPermission(@NonNull final Context context,
 		final int request_code, final Uri tree_uri, final int flags) {
 
 		if (BuildCheck.isLollipop()) {
@@ -572,7 +590,7 @@ public class SDUtils {
 	 * @param request_code
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static void releaseStorageAccessPermission(final Context context,
+	public static void releaseStorageAccessPermission(@NonNull final Context context,
 		final int request_code) {
 
 		if (BuildCheck.isLollipop()) {
@@ -593,7 +611,7 @@ public class SDUtils {
 	 * @param tree_id
 	 * @return
 	 */
-	public static DocumentFile getStorage(final Context context,
+	public static DocumentFile getStorage(@NonNull final Context context,
 		final int tree_id) {
 		
 		return getStorage(context, tree_id, null);
@@ -606,7 +624,7 @@ public class SDUtils {
 	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
 	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
 	 */
-	public static DocumentFile getStorage(final Context context,
+	public static DocumentFile getStorage(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs) {
 
 		if (BuildCheck.isLollipop()) {
@@ -646,7 +664,7 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static DocumentFile getStorageFile(final Context context,
+	public static DocumentFile getStorageFile(@NonNull final Context context,
 		final int tree_id, final String mime, final String file_name) {
 
 		return getStorageFile(context, tree_id, null, mime, file_name);
@@ -662,7 +680,7 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static DocumentFile getStorageFile(final Context context,
+	public static DocumentFile getStorageFile(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
 		final String mime, final String file_name) {
 
@@ -684,7 +702,7 @@ public class SDUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream getStorageOutputStream(final Context context,
+	public static OutputStream getStorageOutputStream(@NonNull final Context context,
 		final int tree_id,
 		final String mime, final String file_name) throws FileNotFoundException {
 		
@@ -701,7 +719,7 @@ public class SDUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream getStorageOutputStream(final Context context,
+	public static OutputStream getStorageOutputStream(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
 		final String mime, final String file_name) throws FileNotFoundException {
 
@@ -724,7 +742,7 @@ public class SDUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getStorageInputStream(final Context context,
+	public static InputStream getStorageInputStream(@NonNull final Context context,
 		final int tree_id,
 		final String mime, final String file_name) throws FileNotFoundException {
 		
@@ -741,7 +759,7 @@ public class SDUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getStorageInputStream(final Context context,
+	public static InputStream getStorageInputStream(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
 		final String mime, final String file_name) throws FileNotFoundException {
 
@@ -766,7 +784,7 @@ public class SDUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static ParcelFileDescriptor getStorageFileFD(final Context context,
+	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
 		final String mime, final String file_name) throws FileNotFoundException {
 
@@ -789,8 +807,9 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageDir(final Context context, final int tree_id) {
-		Log.i(TAG, "createStorageDir:");
+	public static File createStorageDir(@NonNull final Context context,
+		final int tree_id) {
+
 		if (BuildCheck.isLollipop()) {
 			final Uri tree_uri = getStorageUri(context, tree_id);
 			if (tree_uri != null) {
@@ -814,10 +833,9 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(final Context context,
+	public static File createStorageFile(@NonNull final Context context,
 		final int tree_id, final String mime, final String file_name) {
 
-		Log.i(TAG, "createStorageFile:" + file_name);
 		return createStorageFile(context, getStorageUri(context, tree_id), mime, file_name);
 	}
 
@@ -831,12 +849,12 @@ public class SDUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(final Context context,
+	public static File createStorageFile(@NonNull final Context context,
 		final Uri tree_uri, final String mime, final String file_name) {
 		Log.i(TAG, "createStorageFile:" + file_name);
 
 		if (BuildCheck.isLollipop()) {
-			if ((context != null) && (tree_uri != null) && !TextUtils.isEmpty(file_name)) {
+			if ((tree_uri != null) && !TextUtils.isEmpty(file_name)) {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
 				final DocumentFile target = save_tree.createFile(mime, file_name);
 				final String path = UriHelper.getPath(context, target.getUri());
@@ -857,7 +875,7 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(final Context context,
+	public static int createStorageFileFD(@NonNull final Context context,
 		final int tree_id, final String mime, final String file_name) {
 
 		Log.i(TAG, "createStorageFileFD:" + file_name);
@@ -873,12 +891,12 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(final Context context,
+	public static int createStorageFileFD(@NonNull final Context context,
 		final Uri tree_uri, final String mime, final String file_name) {
 
 		Log.i(TAG, "createStorageFileFD:" + file_name);
 		if (BuildCheck.isLollipop()) {
-			if ((context != null) && (tree_uri != null) && !TextUtils.isEmpty(file_name)) {
+			if ((tree_uri != null) && !TextUtils.isEmpty(file_name)) {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
 				final DocumentFile target = save_tree.createFile(mime, file_name);
 				try {
