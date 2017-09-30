@@ -36,6 +36,8 @@ import android.util.Log;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.List;
 import java.util.Locale;
 
@@ -646,7 +648,6 @@ public class SDUtils {
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static DocumentFile getStorageFile(final Context context,
 		final int tree_id, final String mime, final String file_name) {
-		Log.i(TAG, "getStorageFile:" + file_name);
 
 		return getStorageFile(context, tree_id, null, mime, file_name);
 	}
@@ -662,11 +663,11 @@ public class SDUtils {
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static DocumentFile getStorageFile(final Context context,
-		final int tree_id, @Nullable final String dirs, final String mime, final String file_name) {
-		Log.i(TAG, "getStorageFile:" + file_name);
+		final int tree_id, @Nullable final String dirs,
+		final String mime, final String file_name) {
 
 		if (BuildCheck.isLollipop()) {
-			DocumentFile tree = getStorage(context, tree_id, dirs);
+			final DocumentFile tree = getStorage(context, tree_id, dirs);
 			if (tree != null) {
 				return tree.createFile(mime, file_name);
 			}
@@ -674,6 +675,85 @@ public class SDUtils {
 		return null;
 	}
 	
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param tree_id
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static OutputStream getStorageOutputStream(final Context context,
+		final int tree_id,
+		final String mime, final String file_name) throws FileNotFoundException {
+		
+		return getStorageOutputStream(context, tree_id, null, mime, file_name);
+	}
+	
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param tree_id
+	 * @param dirs
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static OutputStream getStorageOutputStream(final Context context,
+		final int tree_id, @Nullable final String dirs,
+		final String mime, final String file_name) throws FileNotFoundException {
+
+		if (BuildCheck.isLollipop()) {
+			final DocumentFile tree = getStorage(context, tree_id, dirs);
+			if (tree != null) {
+				return context.getContentResolver().openOutputStream(
+					tree.createFile(mime, file_name).getUri());
+			}
+		}
+		throw new FileNotFoundException();
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下に入力用ファイルを生成してInputStreamとして返す
+	 * @param context
+	 * @param tree_id
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static InputStream getStorageInputStream(final Context context,
+		final int tree_id,
+		final String mime, final String file_name) throws FileNotFoundException {
+		
+		return getStorageInputStream(context, tree_id, null, mime, file_name);
+	}
+	
+	/**
+	 * 指定したUriが存在する時にその下に入力用ファイルを生成してInputStreamとして返す
+	 * @param context
+	 * @param tree_id
+	 * @param dirs
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static InputStream getStorageInputStream(final Context context,
+		final int tree_id, @Nullable final String dirs,
+		final String mime, final String file_name) throws FileNotFoundException {
+
+		if (BuildCheck.isLollipop()) {
+			final DocumentFile tree = getStorage(context, tree_id, dirs);
+			if (tree != null) {
+				return context.getContentResolver().openInputStream(
+					tree.createFile(mime, file_name).getUri());
+			}
+		}
+		throw new FileNotFoundException();
+	}
 //================================================================================
 	/**
 	 * 指定したidに対応するUriが存在する時にその下にファイルを生成するためのpathを返す
