@@ -754,6 +754,32 @@ public class SDUtils {
 		}
 		throw new FileNotFoundException();
 	}
+	
+	/**
+	 * 指定したUriが存在する時にその下に入力用ファイルを生成して入出力用のファイルディスクリプタを返す
+	 * @param context
+	 * @param tree_id
+	 * @param dirs
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static ParcelFileDescriptor getStorageFileFD(final Context context,
+		final int tree_id, @Nullable final String dirs,
+		final String mime, final String file_name) throws FileNotFoundException {
+
+		if (BuildCheck.isLollipop()) {
+			final DocumentFile tree = getStorage(context, tree_id, dirs);
+			if (tree != null) {
+				return context.getContentResolver().openFileDescriptor(
+						tree.createFile(mime, file_name).getUri(), "rw");
+			}
+		}
+		throw new FileNotFoundException();
+	}
+	
 //================================================================================
 	/**
 	 * 指定したidに対応するUriが存在する時にその下にファイルを生成するためのpathを返す
