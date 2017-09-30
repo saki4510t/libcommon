@@ -495,7 +495,8 @@ public class SDUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Nullable private static Uri getStorageUri(final Context context, final int request_code) {
+	@Nullable
+	public static Uri getStorageUri(final Context context, final int request_code) {
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = loadUri(context, getKey(request_code));
 			if (uri != null) {
@@ -583,8 +584,99 @@ public class SDUtils {
 		}
 	}
 
+//================================================================================
 	/**
-	 *
+	 * 指定したidに対応するUriが存在する時に対応するDocumentFileを返す
+	 * @param context
+	 * @param tree_id
+	 * @return
+	 */
+	public static DocumentFile getStorage(final Context context,
+		final int tree_id) {
+		
+		return getStorage(context, tree_id, null);
+	}
+	
+	/**
+	 * 指定したidに対応するUriが存在する時にその下にディレクトリを生成する
+	 * @param context
+	 * @param tree_id
+	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
+	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
+	 */
+	public static DocumentFile getStorage(final Context context,
+		final int tree_id, @Nullable final String dirs) {
+
+		if (BuildCheck.isLollipop()) {
+			final Uri tree_uri = getStorageUri(context, tree_id);
+			if (tree_uri != null) {
+				DocumentFile tree = DocumentFile.fromTreeUri(context, tree_uri);
+				if (tree.canWrite()) {
+					if (dirs != null) {
+						final String[] dir = dirs.split("/");
+						for (final String d: dir) {
+							if (!TextUtils.isEmpty(d)) {
+								final DocumentFile t = tree.findFile(d);
+								if (t != null) {
+									// 既に存在している時は何もしない
+									tree = t;
+								} else {
+									// 存在しないときはディレクトリを生成
+									tree = tree.createDirectory(d);
+								}
+							}
+						}
+					}
+					return tree;
+				}
+			}
+		}
+		return null;
+	}
+	
+	/**
+	 * 指定したUriが存在する時にその下にファイルを生成するためのpathを返す
+	 * @param context
+	 * @param tree_id
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 */
+	@Nullable
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static DocumentFile getStorageFile(final Context context,
+		final int tree_id, final String mime, final String file_name) {
+		Log.i(TAG, "getStorageFile:" + file_name);
+
+		return getStorageFile(context, tree_id, null, mime, file_name);
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下にファイルを生成する
+	 * @param context
+	 * @param tree_id
+	 * @param mime
+	 * @param file_name
+	 * @return
+	 */
+	@Nullable
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static DocumentFile getStorageFile(final Context context,
+		final int tree_id, @Nullable final String dirs, final String mime, final String file_name) {
+		Log.i(TAG, "getStorageFile:" + file_name);
+
+		if (BuildCheck.isLollipop()) {
+			DocumentFile tree = getStorage(context, tree_id, dirs);
+			if (tree != null) {
+				return tree.createFile(mime, file_name);
+			}
+		}
+		return null;
+	}
+	
+//================================================================================
+	/**
+	 * 指定したidに対応するUriが存在する時にその下にファイルを生成するためのpathを返す
 	 * @param context
 	 * @param tree_id
 	 * @return
@@ -599,13 +691,7 @@ public class SDUtils {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
 				final String path = UriHelper.getPath(context, save_tree.getUri());
 				if (!TextUtils.isEmpty(path)) {
-					final File dir = new File(path);
-					if (dir.canWrite()) {
-						dir.mkdirs();
-						return dir;
-					} else if (dir.canRead()) {
-						return dir;
-					}
+					return new File(path);
 				}
 			}
 		}
@@ -613,7 +699,7 @@ public class SDUtils {
 	}
 
 	/**
-	 * 指定したidに対応するUriが存在する時にその下にファイルを生成するためのpathを返す
+	 * 指定したidに対応するUriが存在する時にその下に指定したFileを生成して返す
 	 * @param context
 	 * @param tree_id
 	 * @param mime
@@ -690,7 +776,8 @@ public class SDUtils {
 				final DocumentFile save_tree = DocumentFile.fromTreeUri(context, tree_uri);
 				final DocumentFile target = save_tree.createFile(mime, file_name);
 				try {
-					final ParcelFileDescriptor fd = context.getContentResolver().openFileDescriptor(target.getUri(), "rw");
+					final ParcelFileDescriptor fd
+						= context.getContentResolver().openFileDescriptor(target.getUri(), "rw");
 					return fd != null ? fd.getFd() : 0;
 				} catch (final FileNotFoundException e) {
 					Log.w(TAG, e);
