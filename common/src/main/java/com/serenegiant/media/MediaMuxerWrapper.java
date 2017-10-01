@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import java.io.FileDescriptor;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -26,6 +27,7 @@ import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 /**
@@ -43,6 +45,11 @@ public class MediaMuxerWrapper implements IMuxer {
 		mMuxer = new MediaMuxer(output_path, format);
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	public MediaMuxerWrapper(final FileDescriptor fd, final int format) throws IOException {
+		mMuxer = new MediaMuxer(fd, format);
+	}
+	
 	@Override
 	public int addTrack(final MediaFormat format) {
 		return mMuxer.addTrack(format);
