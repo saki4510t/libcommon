@@ -110,9 +110,11 @@ public final class UriHelper {
 
 	/**
 	 * Uriからローカルパスに変換できればpathを返す
+	 * secondary storageの場合はパーミッションが無くて
+	 * 直接はアクセスできないはずなので単なる表示用の文字列
 	 * @param context The context.
 	 * @param uri The Uri to query.
-	 * @author paulburke
+	 * @author paulburke 色々変えたのはsakiちゃん
 	 */
 	@SuppressLint("NewApi")
 	@Nullable
