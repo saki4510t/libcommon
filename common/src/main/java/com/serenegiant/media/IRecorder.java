@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.v4.provider.DocumentFile;
 import android.view.Surface;
 
@@ -127,8 +128,10 @@ public interface IRecorder {
 
 	public IMuxer getMuxer();
 
+	@Nullable
 	public String getOutputPath();
 	
+	@Nullable
 	public DocumentFile getOutputFile();
 
 	public void frameAvailableSoon();
