@@ -191,9 +191,6 @@ public abstract class Recorder implements IRecorder {
 		return mMuxer;
 	}
 
-//	@Override
-//	public abstract String getOutputPath();
-
 	@Override
 	public void frameAvailableSoon() {
 		if (mVideoEncoder != null)
