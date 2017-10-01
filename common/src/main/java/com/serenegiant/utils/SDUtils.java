@@ -696,6 +696,37 @@ public class SDUtils {
 	}
 	
 	/**
+	 * 全容量と空き容量を返す
+	 * ディレクトリでない場合やアクセス出来ない場合はnullを返す
+	 * @param context
+	 * @param dir
+	 * @return
+	 */
+	@Nullable
+	public static StorageInfo getStorageInfo(@NonNull final Context context,
+		@NonNull final DocumentFile dir) {
+		
+		try {
+			final String path = UriHelper.getPath(context, dir.getUri());
+			if (path != null) {
+				// FIXME もしプライマリーストレージの場合はアクセス権無くても容量取得できるかも
+				final File file = new File(path);
+				if (file.isDirectory() && file.canRead()) {
+					final long total = file.getTotalSpace();
+					long free = file.getFreeSpace();
+					if (free < file.getUsableSpace()) {
+						free = file.getUsableSpace();
+					}
+					return new StorageInfo(total, free);
+				}
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+		return null;
+	}
+	
+	/**
 	 * 指定したUriが存在する時に対応するファイルを参照するためのDocumentFileオブジェクトを生成する
 	 * @param context
 	 * @param tree_id
