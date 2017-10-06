@@ -55,7 +55,7 @@ public class SDUtils {
 	 * Storage Access Framework関係の処理を行うためのdelegater
 	 */
 	public interface handleOnResultDelegater {
-		public void onResult(final int requestCode, final Uri uri, final Intent data);
+		public boolean onResult(final int requestCode, final Uri uri, final Intent data);
 		public void onFailed(final int requestCode, final Intent data);
 	}
 	
@@ -67,30 +67,31 @@ public class SDUtils {
 	 * @param resultCode
 	 * @param data
 	 * @param delegater
+	 * @return true if successfully handled, false otherwise
 	 */
-	public static void handleOnResult(@NonNull final Context context,
+	public static boolean handleOnResult(@NonNull final Context context,
 		final int requestCode, final int resultCode,
-		final Intent data, final handleOnResultDelegater delegater) {
+		final Intent data, @NonNull final handleOnResultDelegater delegater) {
 
-		if ((data != null) && (delegater != null)) {
-			final String action = data.getAction();
+		if (data != null) {
 			if (resultCode == Activity.RESULT_OK) {
 				final Uri uri = data.getData();
 				if (uri != null) {
 					try {
-						delegater.onResult(requestCode, uri, data);
-						return;
+						return delegater.onResult(requestCode, uri, data);
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
 				}
 			}
-			try {
-				clearUri(context, getKey(requestCode));
-				delegater.onFailed(requestCode, data);
-			} catch (final Exception e) {
-			}
 		}
+		try {
+			clearUri(context, getKey(requestCode));
+			delegater.onFailed(requestCode, data);
+		} catch (final Exception e) {
+			Log.w(TAG, e);
+		}
+		return false;
 	}
 	
 	/**
