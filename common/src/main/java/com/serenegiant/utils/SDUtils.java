@@ -641,16 +641,18 @@ public class SDUtils {
 					for (final String d: dir) {
 						if (!TextUtils.isEmpty(d)) {
 							final DocumentFile t = tree.findFile(d);
-							if (t != null) {
+							if ((t != null) && t.isDirectory()) {
 								// 既に存在している時は何もしない
 								tree = t;
-							} else {
+							} else if (t == null) {
 								if (tree.canWrite()) {
 									// 存在しないときはディレクトリを生成
 									tree = tree.createDirectory(d);
 								} else {
 									throw new IOException("can't create directory");
 								}
+							} else {
+								throw new IOException("file with same name already exists");
 							}
 						}
 					}
@@ -679,16 +681,18 @@ public class SDUtils {
 			for (final String d: dir) {
 				if (!TextUtils.isEmpty(d)) {
 					final DocumentFile t = tree.findFile(d);
-					if (t != null) {
+					if ((t != null) && t.isDirectory()) {
 						// 既に存在している時は何もしない
 						tree = t;
-					} else {
+					} else if (t == null) {
 						if (tree.canWrite()) {
 							// 存在しないときはディレクトリを生成
 							tree = tree.createDirectory(d);
 						} else {
 							throw new IOException("can't create directory");
 						}
+					} else {
+						throw new IOException("can't create directory");
 					}
 				}
 			}
