@@ -40,6 +40,9 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -702,6 +705,31 @@ public class SDUtils {
 			}
 		}
 		return tree;
+	}
+	
+	/**
+	 * 指定したディレクトリ配下に存在するファイルの一覧を取得
+	 * @param context
+	 * @param dir
+	 * @param filter nullなら存在するファイルを全て追加
+	 * @return
+	 * @throws IOException
+	 */
+	@NonNull
+	public static Collection<DocumentFile> listFiles(@NonNull final Context context,
+		@NonNull final DocumentFile dir,
+		@Nullable final FileFilter filter) throws IOException {
+
+		final Collection<DocumentFile> result = new ArrayList<DocumentFile>();
+		if (dir.isDirectory()) {
+			final DocumentFile[] files = dir.listFiles();
+			for (final DocumentFile file: files) {
+				if ((filter == null) || (filter.accept(file))) {
+					result.add(file);
+				}
+			}
+		}
+		return result;
 	}
 	
 	/**
