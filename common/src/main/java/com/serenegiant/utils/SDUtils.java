@@ -656,7 +656,7 @@ public class SDUtils {
 									throw new IOException("can't create directory");
 								}
 							} else {
-								throw new IOException("file with same name already exists");
+								throw new IOException("can't create directory, file with same name already exists");
 							}
 						}
 					}
@@ -696,7 +696,7 @@ public class SDUtils {
 							throw new IOException("can't create directory");
 						}
 					} else {
-						throw new IOException("can't create directory");
+						throw new IOException("can't create directory, file with same name already exists");
 					}
 				}
 			}
@@ -740,15 +740,15 @@ public class SDUtils {
 	 * @param context
 	 * @param tree_id
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static DocumentFile getStorageFile(@NonNull final Context context,
-		final int tree_id, final String mime, final String file_name) throws IOException {
+		final int tree_id, final String mime, final String name) throws IOException {
 
-		return getStorageFile(context, tree_id, null, mime, file_name);
+		return getStorageFile(context, tree_id, null, mime, name);
 	}
 
 	/**
@@ -756,19 +756,28 @@ public class SDUtils {
 	 * @param context
 	 * @param tree_id
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static DocumentFile getStorageFile(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, tree_id, dirs);
 			if (tree != null) {
-				return tree.createFile(mime, file_name);
+				final DocumentFile file = tree.findFile(name);
+				if (file != null) {
+					if (file.isFile()) {
+						return file;
+					} else {
+						throw new IOException("directory with same name already exists");
+					}
+				} else {
+					return tree.createFile(mime, name);
+				}
 			}
 		}
 		return null;
@@ -789,7 +798,19 @@ public class SDUtils {
 		final String mime, final String name) throws IOException {
 		
 		final DocumentFile tree = getStorage(context, parent, dirs);
-		return tree != null ? tree.createFile(mime, name) : null;
+		if (tree != null) {
+			final DocumentFile file = tree.findFile(name);
+			if (file != null) {
+				if (file.isFile()) {
+					return file;
+				} else {
+					throw new IOException("directory with same name already exists");
+				}
+			} else {
+				return tree.createFile(mime, name);
+			}
+		}
+		return null;
 	}
 		
 	/**
@@ -797,16 +818,16 @@ public class SDUtils {
 	 * @param context
 	 * @param tree_id
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static OutputStream getStorageOutputStream(@NonNull final Context context,
 		final int tree_id,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 		
-		return getStorageOutputStream(context, tree_id, null, mime, file_name);
+		return getStorageOutputStream(context, tree_id, null, mime, name);
 	}
 	
 	/**
@@ -815,43 +836,63 @@ public class SDUtils {
 	 * @param tree_id
 	 * @param dirs
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static OutputStream getStorageOutputStream(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, tree_id, dirs);
 			if (tree != null) {
+				final DocumentFile file = tree.findFile(name);
+				if (file != null) {
+					if (file.isFile()) {
+						return context.getContentResolver().openOutputStream(
+							file.getUri());
+					} else {
+						throw new IOException("directory with same name already exists");
+					}
+				} else {
+					return context.getContentResolver().openOutputStream(
+						tree.createFile(mime, name).getUri());
+				}
+			}
+		}
+		throw new FileNotFoundException();
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param parent
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static OutputStream getStorageOutputStream(@NonNull final Context context,
+		@NonNull final DocumentFile parent, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		final DocumentFile tree = getStorage(context, parent, dirs);
+		if (tree != null) {
+			final DocumentFile file = tree.findFile(name);
+			if (file != null) {
+				if (file.isFile()) {
+					return context.getContentResolver().openOutputStream(
+						file.getUri());
+				} else {
+					throw new IOException("directory with same name already exists");
+				}
+			} else {
 				return context.getContentResolver().openOutputStream(
-					tree.createFile(mime, file_name).getUri());
+					tree.createFile(mime, name).getUri());
 			}
-		}
-		throw new FileNotFoundException();
-	}
-
-	/**
-	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
-	 * @param context
-	 * @param parent
-	 * @param dirs
-	 * @param mime
-	 * @param file_name
-	 * @return
-	 * @throws FileNotFoundException
-	 */
-	public static OutputStream getStorageOutputStream(@NonNull final Context context,
-		@NonNull final DocumentFile parent, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
-
-		final DocumentFile tree = getStorage(context, parent, dirs);
-		if (tree != null) {
-			return context.getContentResolver().openOutputStream(
-				tree.createFile(mime, file_name).getUri());
 		}
 		throw new FileNotFoundException();
 	}
@@ -861,38 +902,45 @@ public class SDUtils {
 	 * @param context
 	 * @param tree_id
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static InputStream getStorageInputStream(@NonNull final Context context,
 		final int tree_id,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 		
-		return getStorageInputStream(context, tree_id, null, mime, file_name);
+		return getStorageInputStream(context, tree_id, null, mime, name);
 	}
 	
 	/**
-	 * 指定したUriが存在する時にその下に入力用ファイルを生成してInputStreamとして返す
+	 * 指定したUriが存在する時にその下の入力用ファイルをInputStreamとして返す
 	 * @param context
 	 * @param tree_id
 	 * @param dirs
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static InputStream getStorageInputStream(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, tree_id, dirs);
 			if (tree != null) {
-				return context.getContentResolver().openInputStream(
-					tree.createFile(mime, file_name).getUri());
+				final DocumentFile file = tree.findFile(name);
+				if (file != null) {
+					if (file.isFile()) {
+						return context.getContentResolver().openInputStream(
+							file.getUri());
+					} else {
+						throw new IOException("directory with same name already exists");
+					}
+				}
 			}
 		}
 		throw new FileNotFoundException();
@@ -904,18 +952,25 @@ public class SDUtils {
 	 * @param parent
 	 * @param dirs
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	public static InputStream getStorageInputStream(@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		final DocumentFile tree = getStorage(context, parent, dirs);
 		if (tree != null) {
-			return context.getContentResolver().openInputStream(
-				tree.createFile(mime, file_name).getUri());
+			final DocumentFile file = tree.findFile(name);
+			if (file != null) {
+				if (file.isFile()) {
+					return context.getContentResolver().openInputStream(
+						file.getUri());
+				} else {
+					throw new IOException("directory with same name already exists");
+				}
+			}
 		}
 		throw new FileNotFoundException();
 	}
@@ -926,20 +981,30 @@ public class SDUtils {
 	 * @param tree_id
 	 * @param dirs
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
 		final int tree_id, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, tree_id, dirs);
 			if (tree != null) {
-				return context.getContentResolver().openFileDescriptor(
-					tree.createFile(mime, file_name).getUri(), "rw");
+				final DocumentFile file = tree.findFile(name);
+				if (file != null) {
+					if (file.isFile()) {
+						return context.getContentResolver().openFileDescriptor(
+							file.getUri(), "rw");
+					} else {
+						throw new IOException("directory with same name already exists");
+					}
+				} else {
+					return context.getContentResolver().openFileDescriptor(
+						tree.createFile(mime, name).getUri(), "rw");
+				}
 			}
 		}
 		throw new FileNotFoundException();
@@ -951,18 +1016,28 @@ public class SDUtils {
 	 * @param parent
 	 * @param dirs
 	 * @param mime
-	 * @param file_name
+	 * @param name
 	 * @return
 	 * @throws IOException
 	 */
 	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
-		final String mime, final String file_name) throws IOException {
+		final String mime, final String name) throws IOException {
 
 		final DocumentFile tree = getStorage(context, parent, dirs);
 		if (tree != null) {
-			return context.getContentResolver().openFileDescriptor(
-				tree.createFile(mime, file_name).getUri(), "rw");
+			final DocumentFile file = tree.findFile(name);
+			if (file != null) {
+				if (file.isFile()) {
+					return context.getContentResolver().openFileDescriptor(
+						file.getUri(), "rw");
+				} else {
+					throw new IOException("directory with same name already exists");
+				}
+			} else {
+				return context.getContentResolver().openFileDescriptor(
+					tree.createFile(mime, name).getUri(), "rw");
+			}
 		}
 		throw new FileNotFoundException();
 	}
