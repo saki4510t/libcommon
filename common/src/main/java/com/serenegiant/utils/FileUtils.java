@@ -274,4 +274,25 @@ public class FileUtils {
 			return path;
 		}
 	}
+	
+	/**
+	 * ファイル名末尾の拡張子を置換する
+	 * pathがnullまたは空文字なら何もしない
+	 * 拡張子がなければ新しい拡張子を付与する
+	 * @param path
+	 * @param newExt ドット付きの拡張子文字列
+	 * @return
+	 */
+	public static final String replaceFileExtension(final String path,
+		@NonNull final String newExt) {
+		if (!TextUtils.isEmpty(path)) {
+			final int ix = path.lastIndexOf(".");
+			if (ix > 0) {
+				return path.substring(0, ix) + newExt;
+			} else {
+				return path + newExt;
+			}
+		}
+		return path;	// == null or empty string
+	}
 }
