@@ -607,6 +607,10 @@ public class SDUtils {
 	}
 
 //================================================================================
+	public interface FileFilter {
+		public boolean accept(final DocumentFile file);
+	}
+	
 	/**
 	 * 指定したidに対応するUriが存在する時に対応するDocumentFileを返す
 	 * @param context
