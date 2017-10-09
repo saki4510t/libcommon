@@ -37,7 +37,7 @@ import android.util.Log;
 import java.io.File;
 
 public final class UriHelper {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = UriHelper.class.getSimpleName();
 	/**
 	 * UriからPathへの変換処理
@@ -120,22 +120,23 @@ public final class UriHelper {
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static String getPath(final Context context, final Uri uri) {
-		Log.i(TAG, "getPath:uri=" + uri);
+		if (DEBUG) Log.i(TAG, "getPath:uri=" + uri);
 
 	    if (BuildCheck.isKitKat() && DocumentsContract.isDocumentUri(context, uri)) {
 			// DocumentProvider
-	    	Log.i(TAG, "getPath:isDocumentUri,getAuthority=" + uri.getAuthority());
+			if (DEBUG) Log.i(TAG, "getPath:isDocumentUri,getAuthority=" + uri.getAuthority());
 	        // ExternalStorageProvider
 	        if (isExternalStorageDocument(uri)) {
 	            final String docId = DocumentsContract.getDocumentId(uri);
-				Log.i(TAG, "getPath:isDocumentUri,docId=" + docId);
-				if (BuildCheck.isLollipop()) {
-					Log.i(TAG, "getPath:isDocumentUri,getTreeDocumentId=" + DocumentsContract.getTreeDocumentId(uri));
+				if (DEBUG) Log.i(TAG, "getPath:isDocumentUri,docId=" + docId);
+				if (BuildCheck.isLollipop() && DEBUG) {
+					Log.i(TAG, "getPath:isDocumentUri,getTreeDocumentId="
+						+ DocumentsContract.getTreeDocumentId(uri));
 				}
 				final String[] split = docId.split(":");
 	            final String type = split[0];
 
-				Log.i(TAG, "getPath:type=" + type);
+				if (DEBUG) Log.i(TAG, "getPath:type=" + type);
 
 				if (type != null) {
 					if ("primary".equalsIgnoreCase(type)) {
@@ -153,13 +154,13 @@ public final class UriHelper {
 					} else {
 						// プライマリストレージ以外の時は前から順に探す
 						final String primary = Environment.getExternalStorageDirectory().getAbsolutePath();
-						Log.i(TAG, "getPath:primary=" + primary);
+						if (DEBUG) Log.i(TAG, "getPath:primary=" + primary);
 						final File[] dirs = context.getExternalFilesDirs(null);
 						final int n = dirs != null ? dirs.length : 0;
 						final StringBuilder sb = new StringBuilder();
 						for (int i = 0; i < n; i++) {
 							final File dir = dirs[i];
-							Log.i(TAG, "getPath:" + i + ")dir=" + dir);
+							if (DEBUG) Log.i(TAG, "getPath:" + i + ")dir=" + dir);
 							if ((dir != null) && dir.getAbsolutePath().startsWith(primary)) {
 								// プライマリストレージはスキップ
 								continue;
@@ -183,7 +184,7 @@ public final class UriHelper {
 									}
 									if (found) {
 										final File path = new File(new File(sb.toString()), split[1]);
-										Log.i(TAG, "getPath:path=" + path);
+										if (DEBUG) Log.i(TAG, "getPath:path=" + path);
 										// 見つかったパスが読み込みまたは読み書きできるかどうかは関知しない
 										return path.getAbsolutePath();
 									}
