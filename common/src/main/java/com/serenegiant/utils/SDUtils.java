@@ -610,7 +610,7 @@ public class SDUtils {
 
 //================================================================================
 	public interface FileFilter {
-		public boolean accept(final DocumentFile file);
+		public boolean accept(@NonNull final DocumentFile file);
 	}
 	
 	/**
