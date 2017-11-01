@@ -139,12 +139,10 @@ public class AudioSampler extends IAudioSampler {
 	            audioRecord = new AudioRecord(src, sampling_rate,
 	            	(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
 	            	format, buffer_size);
-	            if (audioRecord != null) {
-    	            if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-    	            	audioRecord.release();
-    	            	audioRecord = null;
-    	            }
-	            }
+				if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
+					audioRecord.release();
+					audioRecord = null;
+				}
             } catch (final Exception e) {
             	audioRecord = null;
             }
