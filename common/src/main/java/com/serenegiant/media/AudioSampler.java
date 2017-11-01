@@ -23,6 +23,7 @@ import java.nio.ByteBuffer;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 /**
  * AudioRecordを使って音声データを取得し、登録したコールバックへ分配するためのクラス
@@ -30,7 +31,7 @@ import android.media.MediaRecorder;
  */
 public class AudioSampler extends IAudioSampler {
 //	private static final boolean DEBUG = false;
-//	private static final String TAG = "AudioSampler";
+	private static final String TAG = AudioSampler.class.getSimpleName();
 
 	private AudioThread mAudioThread;
     private final int AUDIO_SOURCE;
@@ -187,33 +188,50 @@ public class AudioSampler extends IAudioSampler {
 		                	for ( ; mIsCapturing ;) {
 		                		data = obtain();
 		                		if (data != null) {
-			                		buffer = data.mBuffer;
-			                		buffer.clear();
-			                		// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
-			                		try {
-			                			readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
-			                		} catch (final Exception e) {
-//			    		        		Log.w(TAG, "AudioRecord#read failed:", e);
-			    		        		callOnError(e);
-			                			break;
-			                		}
-					    			if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-//					    				Log.e(TAG, "Read error ERROR_BAD_VALUE");
-					    				err_count++;
-					    				recycle(data);
-					    			} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-//					    				Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-					    				err_count++;
-					    				recycle(data);
-			                		} else if (readBytes > 0) {
-			                			err_count = 0;
-			                			data.presentationTimeUs = getInputPTSUs();
-			                			data.size = readBytes;
-			                			buffer.position(readBytes);
-			                			buffer.flip();
-			                			// 音声データキューに追加する
-			                			addAudioData(data);
-					    			}
+									if (audioRecord.getRecordingState()
+										!= AudioRecord.RECORDSTATE_RECORDING) {
+
+										if (err_count == 0) {
+											Log.e(TAG, "not a recording state");
+										}
+										err_count++;
+										recycle(data);
+										if (err_count > 20) {
+											break;
+										} else {
+											continue;
+										}
+									}
+									buffer = data.mBuffer;
+									buffer.clear();
+									// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
+									try {
+										readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
+									} catch (final Exception e) {
+//										Log.w(TAG, "AudioRecord#read failed:", e);
+										callOnError(e);
+										break;
+									}
+									if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
+										if (err_count == 0) {
+											Log.e(TAG, "Read error ERROR_BAD_VALUE");
+										}
+										err_count++;
+									} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
+										if (err_count == 0) {
+											Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
+										}
+										err_count++;
+										recycle(data);
+									} else if (readBytes > 0) {
+										err_count = 0;
+										data.presentationTimeUs = getInputPTSUs();
+										data.size = readBytes;
+										buffer.position(readBytes);
+										buffer.flip();
+										// 音声データキューに追加する
+										addAudioData(data);
+									}
 		                		}
 				    			if (err_count > 10) break;
 		                	}
