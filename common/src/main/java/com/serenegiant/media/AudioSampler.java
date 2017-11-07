@@ -20,10 +20,13 @@ package com.serenegiant.media;
 
 import java.nio.ByteBuffer;
 
+import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
+
+import com.serenegiant.utils.BuildCheck;
 
 /**
  * AudioRecordを使って音声データを取得し、登録したコールバックへ分配するためのクラス
@@ -117,6 +120,7 @@ public class AudioSampler extends IAudioSampler {
 		return buffer_size;
 	}
 
+	@SuppressLint("NewApi")
 	public static AudioRecord createAudioRecord(
 		final int source, final int sampling_rate, final int channels, final int format, final int buffer_size) {
 
@@ -137,9 +141,22 @@ public class AudioSampler extends IAudioSampler {
 		AudioRecord audioRecord = null;
 		for (final int src: AUDIO_SOURCES) {
             try {
-	            audioRecord = new AudioRecord(src, sampling_rate,
-	            	(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
-	            	format, buffer_size);
+            	if (BuildCheck.isAndroid6()) {
+					audioRecord = new AudioRecord.Builder()
+						.setAudioSource(src)
+						.setAudioFormat(new AudioFormat.Builder()
+							.setEncoding(format)
+							.setSampleRate(sampling_rate)
+							.setChannelMask((channels == 1
+								? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO))
+							.build())
+						.setBufferSizeInBytes(buffer_size)
+						.build();
+				} else {
+					audioRecord = new AudioRecord(src, sampling_rate,
+						(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
+						format, buffer_size);
+				}
 				if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
 					audioRecord.release();
 					audioRecord = null;
