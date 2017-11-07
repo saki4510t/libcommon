@@ -173,83 +173,106 @@ public class AudioSampler extends IAudioSampler {
 			// will enable the headphone
 			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
 */
-    		final AudioRecord audioRecord = createAudioRecord(
-    			AUDIO_SOURCE, SAMPLING_RATE, CHANNEL_COUNT, AUDIO_FORMAT, BUFFER_SIZE);
-            int err_count = 0;
-            if (audioRecord != null) {
-		        try {
-		        	if (mIsCapturing) {
-//		        		if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
-		                int readBytes;
-		                ByteBuffer buffer;
-		                audioRecord.startRecording();
-		                try {
-		                	AudioData data;
-		                	for ( ; mIsCapturing ;) {
-		                		data = obtain();
-		                		if (data != null) {
-									if (audioRecord.getRecordingState()
-										!= AudioRecord.RECORDSTATE_RECORDING) {
+			int retry = 3;
+			for ( ; mIsCapturing && (retry > 0) ; ) {
+				final AudioRecord audioRecord = createAudioRecord(
+					AUDIO_SOURCE, SAMPLING_RATE, CHANNEL_COUNT, AUDIO_FORMAT, BUFFER_SIZE);
+				int err_count = 0;
+				if (audioRecord != null) {
+					try {
+						if (mIsCapturing) {
+//		        			if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
+							int readBytes;
+							ByteBuffer buffer;
+							audioRecord.startRecording();
+							try {
+								AudioData data;
+								for ( ; mIsCapturing ;) {
+									data = obtain();
+									if (data != null) {
+										if (audioRecord.getRecordingState()
+											!= AudioRecord.RECORDSTATE_RECORDING) {
 
-										if (err_count == 0) {
-											Log.e(TAG, "not a recording state");
+											if (err_count == 0) {
+												Log.e(TAG, "not a recording state");
+											}
+											err_count++;
+											recycle(data);
+											if (err_count > 20) {
+												retry--;
+												break;
+											} else {
+												Thread.sleep(100);
+												continue;
+											}
 										}
-										err_count++;
-										recycle(data);
-										if (err_count > 20) {
+										buffer = data.mBuffer;
+										buffer.clear();
+										// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
+										try {
+											readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
+										} catch (final Exception e) {
+//											Log.w(TAG, "AudioRecord#read failed:", e);
+											retry--;
+											callOnError(e);
+											recycle(data);
 											break;
-										} else {
-											continue;
 										}
-									}
-									buffer = data.mBuffer;
-									buffer.clear();
-									// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
-									try {
-										readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
-									} catch (final Exception e) {
-//										Log.w(TAG, "AudioRecord#read failed:", e);
-										callOnError(e);
+										if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read error ERROR_BAD_VALUE");
+											}
+											err_count++;
+											recycle(data);
+										} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
+											}
+											err_count++;
+											recycle(data);
+										} else if (readBytes > 0) {
+											err_count = 0;
+											data.presentationTimeUs = getInputPTSUs();
+											data.size = readBytes;
+											buffer.position(readBytes);
+											buffer.flip();
+											// 音声データキューに追加する
+											addAudioData(data);
+										}
+									} // end of if (data != null)
+									if (err_count > 10) {
+										retry--;
 										break;
 									}
-									if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-										if (err_count == 0) {
-											Log.e(TAG, "Read error ERROR_BAD_VALUE");
-										}
-										err_count++;
-									} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-										if (err_count == 0) {
-											Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-										}
-										err_count++;
-										recycle(data);
-									} else if (readBytes > 0) {
-										err_count = 0;
-										data.presentationTimeUs = getInputPTSUs();
-										data.size = readBytes;
-										buffer.position(readBytes);
-										buffer.flip();
-										// 音声データキューに追加する
-										addAudioData(data);
-									}
-		                		}
-				    			if (err_count > 10) break;
-		                	}
-		                } finally {
-		                	audioRecord.stop();
-		                }
-		        	}
-		        } catch (final Exception e) {
-//	        		Log.w(TAG, "exception on AudioRecord:", e);
-	        		callOnError(e);
-		        } finally {
-		        	audioRecord.release();
-		        }
-            } else {
-//        		Log.w(TAG, "AudioRecord failed to initialize");
-        		callOnError(new RuntimeException("AudioRecord failed to initialize"));
-            }
-        	AudioSampler.this.stop();
+								}
+							} finally {
+								audioRecord.stop();
+							}
+						}
+					} catch (final Exception e) {
+//	        			Log.w(TAG, "exception on AudioRecord:", e);
+						retry--;
+						callOnError(e);
+					} finally {
+						audioRecord.release();
+					}
+					if (mIsCapturing && (err_count > 0) && (retry > 0)) {
+						// キャプチャリング中でエラーからのリカバリー処理が必要なときは0.5秒待機
+						for (int i = 0; mIsCapturing && (i < 5); i++) {
+							try {
+								Thread.sleep(100);
+							} catch (final InterruptedException e) {
+								break;
+							}
+						}
+					}
+				} else {
+//        			Log.w(TAG, "AudioRecord failed to initialize");
+					callOnError(new RuntimeException("AudioRecord failed to initialize"));
+					retry = 0;	// 初期化できんかったときはリトライしない
+				}
+			}	// end of for
+			AudioSampler.this.stop();
 //    		if (DEBUG) Log.v(TAG, "AudioThread:finished");
     	} // #run
     }
