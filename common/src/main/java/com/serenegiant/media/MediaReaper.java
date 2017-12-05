@@ -41,7 +41,8 @@ public abstract class MediaReaper implements Runnable {
 	public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
 
 	public interface ReaperListener {
-		public void writeSampleData(final int reaperType, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+		public void writeSampleData(final int reaperType,
+			final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
 		public void onOutputFormatChanged(final MediaFormat format);
 		public void onStop();
 		public void onError(final Exception e);
@@ -103,7 +104,9 @@ public abstract class MediaReaper implements Runnable {
 	private volatile boolean mIsEOS;
 
 
-	public MediaReaper(final int trackIndex, final MediaCodec encoder, @NonNull final ReaperListener listener) {
+	public MediaReaper(final int trackIndex,
+		final MediaCodec encoder, @NonNull final ReaperListener listener) {
+
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mWeakEncoder = new WeakReference<MediaCodec>(encoder);
 		mListener = listener;
@@ -150,7 +153,8 @@ public abstract class MediaReaper implements Runnable {
 
 	@Override
 	public void run() {
-		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY); // THREAD_PRIORITY_URGENT_AUDIO
+		android.os.Process.setThreadPriority(
+			android.os.Process.THREAD_PRIORITY_DISPLAY); // THREAD_PRIORITY_URGENT_AUDIO
         synchronized (mSync) {
 			mIsRunning = true;
             mRequestStop = false;
@@ -252,7 +256,8 @@ LOOP:	for ( ; mIsRunning ; ) {
                         final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0 + 2);
 						final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1 + 2);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
+                        final MediaFormat outFormat
+                        	= createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!callOnFormatChanged(outFormat))
                         	break LOOP;
                     }
@@ -269,7 +274,8 @@ LOOP:	for ( ; mIsRunning ; ) {
                     }
                     // ファイルに出力(presentationTimeUsを調整)
                     try {
-	                   	mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
+	                   	mBufferInfo.presentationTimeUs
+	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
 	                   	mListener.writeSampleData(mReaperType, encodedData, mBufferInfo);
                     } catch (final TimeoutException e) {
 //						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
