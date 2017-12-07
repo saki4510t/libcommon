@@ -27,6 +27,7 @@ import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
@@ -51,12 +52,12 @@ public class MediaMuxerWrapper implements IMuxer {
 	}
 	
 	@Override
-	public int addTrack(final MediaFormat format) {
+	public int addTrack(@NonNull final MediaFormat format) {
 		return mMuxer.addTrack(format);
 	}
 
 	@Override
-	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final BufferInfo bufferInfo) {
+	public void writeSampleData(final int trackIndex, @NonNull final ByteBuffer byteBuf, @NonNull final BufferInfo bufferInfo) {
 		if (!mReleased) {
 			mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 		}

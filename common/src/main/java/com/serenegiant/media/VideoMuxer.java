@@ -27,6 +27,7 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.support.annotation.NonNull;
 
 /**
  * MediaMuxerがAPI>=18でしか使えないので、localに移植
@@ -86,7 +87,7 @@ public final class VideoMuxer implements IMuxer {
 	private int mLastTrackIndex = -1;
 	@SuppressLint("InlinedApi")
 	@Override
-	public int addTrack(final MediaFormat format) {
+	public int addTrack(@NonNull final MediaFormat format) {
         if (format == null) {
             throw new IllegalArgumentException("format must not be null.");
         }
@@ -164,7 +165,7 @@ public final class VideoMuxer implements IMuxer {
  	}
 
 	@Override
-	public void writeSampleData(final int trackIndex, final ByteBuffer buf, final MediaCodec.BufferInfo bufferInfo) {
+	public void writeSampleData(final int trackIndex, @NonNull final ByteBuffer buf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
 		int res = 1;
 		if (!mReleased && (mNativePtr != 0)) {
 			res = nativeWriteSampleData(mNativePtr, trackIndex, buf,

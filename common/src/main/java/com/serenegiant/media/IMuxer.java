@@ -22,14 +22,16 @@ import java.nio.ByteBuffer;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.support.annotation.NonNull;
 
 /**
  * MediaMuxerとVideoMuxerを共通で扱えるようにするためのインターフェース
  */
 public interface IMuxer {
-	public int addTrack(final MediaFormat format);
+	public int addTrack(@NonNull final MediaFormat format);
 	public void writeSampleData(final int trackIndex,
-		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+		@NonNull final ByteBuffer byteBuf,
+		@NonNull final MediaCodec.BufferInfo bufferInfo);
 	public void start();
 	public void stop();
 	public void release();
