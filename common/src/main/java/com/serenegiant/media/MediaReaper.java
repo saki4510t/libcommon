@@ -22,9 +22,12 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -38,14 +41,21 @@ public abstract class MediaReaper implements Runnable {
 	public static final int REAPER_VIDEO = 0;
 	public static final int REAPER_AUDIO = 1;
 
+	@IntDef({REAPER_VIDEO,
+		REAPER_AUDIO,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	@interface ReaperType {}
+
 	public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
 
 	public interface ReaperListener {
-		public void writeSampleData(final int reaperType,
+		public void writeSampleData(@NonNull final MediaReaper reaper,
 			final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
-		public void onOutputFormatChanged(final MediaFormat format);
-		public void onStop();
-		public void onError(final Exception e);
+		public void onOutputFormatChanged(@NonNull final MediaReaper reaper,
+			@NonNull final MediaFormat format);
+		public void onStop(@NonNull final MediaReaper reaper);
+		public void onError(@NonNull final MediaReaper reaper, final Exception e);
 	}
 
 	public static class VideoReaper extends MediaReaper {
@@ -92,6 +102,7 @@ public abstract class MediaReaper implements Runnable {
 	private final Object mSync = new Object();
 	private final WeakReference<MediaCodec> mWeakEncoder;
 	private final ReaperListener mListener;
+	@ReaperType
 	private final int mReaperType;
 	/**
 	 * エンコード用バッファ
@@ -104,13 +115,13 @@ public abstract class MediaReaper implements Runnable {
 	private volatile boolean mIsEOS;
 
 
-	public MediaReaper(final int trackIndex,
+	public MediaReaper(@ReaperType final int reaperType,
 		final MediaCodec encoder, @NonNull final ReaperListener listener) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mWeakEncoder = new WeakReference<MediaCodec>(encoder);
 		mListener = listener;
-		mReaperType = trackIndex;
+		mReaperType = reaperType;
 		mBufferInfo = new MediaCodec.BufferInfo();
 		synchronized (mSync) {
 			// Reaperスレッドを生成
@@ -151,6 +162,11 @@ public abstract class MediaReaper implements Runnable {
         }
     }
 
+	@ReaperType
+	public int reaperType() {
+		return mReaperType;
+	}
+	
 	@Override
 	public void run() {
 		android.os.Process.setThreadPriority(
@@ -276,7 +292,7 @@ LOOP:	for ( ; mIsRunning ; ) {
                     try {
 	                   	mBufferInfo.presentationTimeUs
 	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-	                   	mListener.writeSampleData(mReaperType, encodedData, mBufferInfo);
+	                   	mListener.writeSampleData(MediaReaper.this, encodedData, mBufferInfo);
                     } catch (final TimeoutException e) {
 //						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
 						callOnError(e);
@@ -302,7 +318,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 
 	private boolean callOnFormatChanged(final MediaFormat format) {
 		try {
-			mListener.onOutputFormatChanged(format);
+			mListener.onOutputFormatChanged(this, format);
 			mRecorderStarted = true;
 			return true;
 		} catch (final Exception e) {
@@ -313,7 +329,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 
 	private void callOnStop() {
 		try {
-			mListener.onStop();
+			mListener.onStop(this);
 		} catch (final Exception e) {
 			callOnError(e);
 		}
@@ -321,7 +337,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 
 	private void callOnError(final Exception e) {
 		try {
-			mListener.onError(e);
+			mListener.onError(this, e);
 		} catch (final Exception e1) {
 			Log.w(TAG, e1);
 		}
