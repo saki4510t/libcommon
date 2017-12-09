@@ -78,9 +78,12 @@ public class Texture2dProgram {
     private int mTextureTarget;
 
 	protected boolean mHasKernel2;
-    private final float[] mKernel = new float[KERNEL_SIZE3x3 * 2];	// Inputs for convolution filter based shaders
-    private final float[] mSummedTouchPosition = new float[2];	// Summed touch event delta
-    private final float[] mLastTouchPosition = new float[2];	// Raw location of last touch event
+	/** Inputs for convolution filter based shaders */
+    private final float[] mKernel = new float[KERNEL_SIZE3x3 * 2];
+    /** Summed touch event delta */
+    private final float[] mSummedTouchPosition = new float[2];
+    /** Raw location of last touch event */
+    private final float[] mLastTouchPosition = new float[2];
     private float[] mTexOffset;
     private float mColorAdjust;
     private final int[] mFlags = new int[4];
@@ -100,7 +103,9 @@ public class Texture2dProgram {
     /**
      * Prepares the program in the current EGL context.
      */
-    protected Texture2dProgram(final ProgramType programType, final int target, final String vss, final String fss) {
+    protected Texture2dProgram(final ProgramType programType,
+    	final int target, final String vss, final String fss) {
+
 		mProgramType = programType;
 
 		float[] kernel = null, kernel2 = null;
@@ -195,7 +200,8 @@ public class Texture2dProgram {
 				case GLES11Ext.GL_TEXTURE_EXTERNAL_OES:
 					break;
 				default:
-					throw new IllegalArgumentException("target should be GL_TEXTURE_2D or GL_TEXTURE_EXTERNAL_OES");
+					throw new IllegalArgumentException(
+						"target should be GL_TEXTURE_2D or GL_TEXTURE_EXTERNAL_OES");
 				}
 				mTextureTarget = target;
 				mProgramHandle = GLHelper.loadShader(vss, fss);
@@ -255,10 +261,14 @@ public class Texture2dProgram {
         GLES20.glBindTexture(mTextureTarget, texId);
 		GLHelper.checkGlError("glBindTexture " + texId);
 
-        GLES20.glTexParameterf(mTextureTarget, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-        GLES20.glTexParameterf(mTextureTarget, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
-        GLES20.glTexParameteri(mTextureTarget, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
-        GLES20.glTexParameteri(mTextureTarget, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameterf(mTextureTarget,
+        	GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+        GLES20.glTexParameterf(mTextureTarget,
+        	GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+        GLES20.glTexParameteri(mTextureTarget,
+        	GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_CLAMP_TO_EDGE);
+        GLES20.glTexParameteri(mTextureTarget,
+        	GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_CLAMP_TO_EDGE);
 		GLHelper.checkGlError("glTexParameter");
 
         return texId;
@@ -275,8 +285,10 @@ public class Texture2dProgram {
 			if (ev.getAction() == MotionEvent.ACTION_MOVE){
 				// A finger is dragging about
 				if (mTexHeight != 0 && mTexWidth != 0){
-					mSummedTouchPosition[0] += (2 * (ev.getX() - mLastTouchPosition[0])) / mTexWidth;
-					mSummedTouchPosition[1] += (2 * (ev.getY() - mLastTouchPosition[1])) / -mTexHeight;
+					mSummedTouchPosition[0]
+						+= (2 * (ev.getX() - mLastTouchPosition[0])) / mTexWidth;
+					mSummedTouchPosition[1]
+						+= (2 * (ev.getY() - mLastTouchPosition[1])) / -mTexHeight;
 					mLastTouchPosition[0] = ev.getX();
 					mLastTouchPosition[1] = ev.getY();
 				}
@@ -371,9 +383,12 @@ public class Texture2dProgram {
      * @param texBuffer Buffer with vertex texture data.
      * @param texStride Width, in bytes, of the texture data for each vertex.
      */
-    public void draw(final float[] mvpMatrix, final int mvpMatrixOffset, final FloatBuffer vertexBuffer, final int firstVertex,
-                     final int vertexCount, final int coordsPerVertex, final int vertexStride,
-                     final float[] texMatrix, final int texMatrixOffset, final FloatBuffer texBuffer, final int textureId, final int texStride) {
+    public void draw(final float[] mvpMatrix, final int mvpMatrixOffset,
+    	final FloatBuffer vertexBuffer, final int firstVertex,
+        final int vertexCount, final int coordsPerVertex, final int vertexStride,
+        final float[] texMatrix, final int texMatrixOffset,
+        final FloatBuffer texBuffer, final int textureId, final int texStride) {
+
 		GLHelper.checkGlError("draw start");
 
         // シェーダープログラムを選択
@@ -458,7 +473,8 @@ public class Texture2dProgram {
 			if (muTexOffsetLoc < 0) {
 				muTexOffsetLoc = -1;
 			}
-//			GLHelper.checkLocation(muTexOffsetLoc, "uTexOffset");	// 未使用だと削除されてしまうのでチェックしない
+			// 未使用だと削除されてしまうのでチェックしない
+//			GLHelper.checkLocation(muTexOffsetLoc, "uTexOffset");
 
 			// initialize default values
 			if (kernel == null) {
@@ -475,7 +491,8 @@ public class Texture2dProgram {
 			if (muColorAdjustLoc < 0) {
 				muColorAdjustLoc = -1;
 			}
-//			GLHelper.checkLocation(muColorAdjustLoc, "uColorAdjust");	// 未使用だと削除されてしまうのでチェックしない
+			// 未使用だと削除されてしまうのでチェックしない
+//			GLHelper.checkLocation(muColorAdjustLoc, "uColorAdjust");
 
 			muTouchPositionLoc = GLES20.glGetUniformLocation(mProgramHandle, "uPosition");
 			if (muTouchPositionLoc < 0) {

@@ -108,7 +108,9 @@ public class StaticTextureSource {
 	 * @param surface
 	 * @param isRecordable
 	 */
-	public void addSurface(final int id, final Object surface, final boolean isRecordable) {
+	public void addSurface(final int id, final Object surface,
+		final boolean isRecordable) {
+
 		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		synchronized (mSync) {
 			mRendererTask.addSurface(id, surface);
@@ -122,7 +124,9 @@ public class StaticTextureSource {
 	 * @param isRecordable
 	 * @param maxFps コンストラクタで指定した値より大きくしても速く描画されるわけではない
 	 */
-	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps) {
+	public void addSurface(final int id, final Object surface,
+		final boolean isRecordable, final int maxFps) {
+
 		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		synchronized (mSync) {
 			mRendererTask.addSurface(id, surface, maxFps);
@@ -201,14 +205,17 @@ public class StaticTextureSource {
 
 	private static class RendererTask extends EglTask {
 		private final Object mClientSync = new Object();
-		private final SparseArray<RendererSurfaceRec> mClients = new SparseArray<RendererSurfaceRec>();
+		private final SparseArray<RendererSurfaceRec> mClients
+			= new SparseArray<RendererSurfaceRec>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
 		private int mVideoWidth, mVideoHeight;
 		private TextureOffscreen mImageSource;
 
-		public RendererTask(final StaticTextureSource parent, final int width, final int height, final float fps) {
+		public RendererTask(final StaticTextureSource parent,
+			final int width, final int height, final float fps) {
+
 			super(3, null, 0);
 			mParent = parent;
 			mVideoWidth = width;
@@ -261,7 +268,9 @@ public class StaticTextureSource {
 		}
 
 		@Override
-		protected Object processRequest(final int request, final int arg1, final int arg2, final Object obj) {
+		protected Object processRequest(final int request,
+			final int arg1, final int arg2, final Object obj) {
+
 			switch (request) {
 			case REQUEST_DRAW:
 				handleDraw();
@@ -295,11 +304,15 @@ public class StaticTextureSource {
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
 			checkFinished();
-			if (!((surface instanceof SurfaceTexture) || (surface instanceof Surface) || (surface instanceof SurfaceHolder))) {
-				throw new IllegalArgumentException("Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
+			if (!((surface instanceof SurfaceTexture)
+				|| (surface instanceof Surface)
+					|| (surface instanceof SurfaceHolder))) {
+
+				throw new IllegalArgumentException(
+					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
 			synchronized (mClientSync) {
-				if ((surface != null) && (mClients.get(id) == null)) {
+				if (mClients.get(id) == null) {
 					for ( ; ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {

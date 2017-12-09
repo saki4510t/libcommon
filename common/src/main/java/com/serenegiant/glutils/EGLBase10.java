@@ -142,13 +142,19 @@ public class EGLBase10 extends EGLBase {
 		 * @param eglBase
 		 * @param surface
 		 */
-		private EglSurface(final EGLBase10 eglBase, final Object surface) throws IllegalArgumentException {
+		private EglSurface(final EGLBase10 eglBase, final Object surface)
+			throws IllegalArgumentException {
+
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
 			if ((surface instanceof Surface) && !BuildCheck.isAndroid4_2()) {
-				// Android4.1.2だとSurfaceを使えない。SurfaceTexture/SurfaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
-				// SurfaceHolderはインターフェースなのでSurfaceHolderを継承したダミークラスを生成して食わす
-				mEglSurface = mEglBase.createWindowSurface(new MySurfaceHolder((Surface) surface));
+				// Android4.1.2だとSurfaceを使えない。
+				// SurfaceTexture/SurfaceHolderの場合は内部で
+				// Surfaceを生成して使っているにもかかわらず。
+				// SurfaceHolderはインターフェースなのでSurfaceHolderを
+				// 継承したダミークラスを生成して食わす
+				mEglSurface = mEglBase.createWindowSurface(
+					new MySurfaceHolder((Surface) surface));
 			} else if ((surface instanceof Surface)
 				|| (surface instanceof SurfaceHolder)
 				|| (surface instanceof SurfaceTexture)
@@ -183,9 +189,11 @@ public class EGLBase10 extends EGLBase {
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);
 			if (mEglBase.getGlVersion() >= 2) {
-				GLES20.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+				GLES20.glViewport(0, 0,
+					mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			} else {
-				GLES10.glViewport(0, 0, mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+				GLES10.glViewport(0, 0,
+					mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
 			}
 		}
 
@@ -208,7 +216,8 @@ public class EGLBase10 extends EGLBase {
 		}
 
 		public void setPresentationTime(final long presentationTimeNs) {
-//			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay, mEglSurface, presentationTimeNs);
+//			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
+// 				mEglSurface, presentationTimeNs);
 		}
 
 		/**
@@ -217,8 +226,10 @@ public class EGLBase10 extends EGLBase {
 		 */
 		@Override
 		public boolean isValid() {
-			return (mEglSurface != null) && (mEglSurface != EGL10.EGL_NO_SURFACE)
-				&& (mEglBase.getSurfaceWidth(mEglSurface) > 0) && (mEglBase.getSurfaceHeight(mEglSurface) > 0);
+			return (mEglSurface != null)
+				&& (mEglSurface != EGL10.EGL_NO_SURFACE)
+				&& (mEglBase.getSurfaceWidth(mEglSurface) > 0)
+				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
 
 		/**
@@ -238,9 +249,13 @@ public class EGLBase10 extends EGLBase {
 	 * @param maxClientVersion
 	 * @param sharedContext 共有コンテキストを使用する場合に指定
 	 * @param withDepthBuffer
-	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
+	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
+	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
 	 */
-	public EGLBase10(final int maxClientVersion, final Context sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+	public EGLBase10(final int maxClientVersion,
+		final Context sharedContext, final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
 //		if (DEBUG) Log.v(TAG, "Constructor:");
 		init(maxClientVersion, sharedContext, withDepthBuffer, stencilBits, isRecordable);
 	}
@@ -254,7 +269,8 @@ public class EGLBase10 extends EGLBase {
     	destroyContext();
         mContext = EGL_NO_CONTEXT;
    		if (mEgl == null) return;
-   		mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
+   		mEgl.eglMakeCurrent(mEglDisplay,
+   			EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 //		mEgl.eglReleaseThread();	// XXX これを入れるとハングアップする機種がある
    		mEgl.eglTerminate(mEglDisplay);
     	mEglDisplay = null;
@@ -317,7 +333,9 @@ public class EGLBase10 extends EGLBase {
 	@Override
 	public void makeDefault() {
 //		if (DEBUG) Log.v(TAG, "makeDefault:");
-	    if (!mEgl.eglMakeCurrent(mEglDisplay, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT)) {
+	    if (!mEgl.eglMakeCurrent(mEglDisplay,
+	    	EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT)) {
+
 			Log.w(TAG, "makeDefault:eglMakeCurrent:err=" + mEgl.eglGetError());
 	    }
 	}
@@ -360,7 +378,8 @@ public class EGLBase10 extends EGLBase {
 	 * @param withDepthBuffer
 	 * @param isRecordable
 	 */
-	private final void init(final int maxClientVersion, @Nullable Context sharedContext,
+	private final void init(final int maxClientVersion,
+		@Nullable Context sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 //		if (DEBUG) Log.v(TAG, "init:");
@@ -384,7 +403,8 @@ public class EGLBase10 extends EGLBase {
 			config = getConfig(3, withDepthBuffer, stencilBits, isRecordable);
 			if (config != null) {
 				final EGLContext context = createContext(sharedContext, config, 3);
-				if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {	// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
+				if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {
+					// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
 					//Log.d(TAG, "Got GLES 3 config");
 					mEglConfig = new Config(config);
 					mContext = new Context(context);
@@ -393,7 +413,9 @@ public class EGLBase10 extends EGLBase {
 			}
 		}
 		// GLES3で取得できなかった時はGLES2を試みる
-		if ((maxClientVersion >= 2) && ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT))) {
+		if ((maxClientVersion >= 2)
+			&& ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT))) {
+
             config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
             if (config == null) {
                	throw new RuntimeException("chooseConfig failed");
@@ -434,7 +456,8 @@ public class EGLBase10 extends EGLBase {
 		}
         // confirm whether the EGL rendering context is successfully created
 		final int[] values = new int[1];
-		mEgl.eglQueryContext(mEglDisplay, mContext.eglContext, EGL_CONTEXT_CLIENT_VERSION, values);
+		mEgl.eglQueryContext(mEglDisplay,
+			mContext.eglContext, EGL_CONTEXT_CLIENT_VERSION, values);
 		Log.d(TAG, "EGLContext created, client version " + values[0]);
         makeDefault();
 	}
@@ -491,14 +514,18 @@ public class EGLBase10 extends EGLBase {
         return EGL10.EGL_SUCCESS;
     }
 
-    private final EGLContext createContext(@NonNull final Context sharedContext, final EGLConfig config, final int version) {
+    private final EGLContext createContext(
+    	@NonNull final Context sharedContext,
+    	final EGLConfig config, final int version) {
+
 //		if (DEBUG) Log.v(TAG, "createContext:");
 
         final int[] attrib_list = {
         	EGL_CONTEXT_CLIENT_VERSION, version,
         	EGL10.EGL_NONE
         };
-        final EGLContext context = mEgl.eglCreateContext(mEglDisplay, config, sharedContext.eglContext, attrib_list);
+        final EGLContext context = mEgl.eglCreateContext(
+        	mEglDisplay, config, sharedContext.eglContext, attrib_list);
 //		checkEglError("eglCreateContext");
         return context;
     }
@@ -507,7 +534,8 @@ public class EGLBase10 extends EGLBase {
 //		if (DEBUG) Log.v(TAG, "destroyContext:");
 
         if (!mEgl.eglDestroyContext(mEglDisplay, mContext.eglContext)) {
-            Log.e("destroyContext", "display:" + mEglDisplay + " context: " + mContext.eglContext);
+            Log.e("destroyContext", "display:" + mEglDisplay
+            	+ " context: " + mContext.eglContext);
             Log.e(TAG, "eglDestroyContext:" + mEgl.eglGetError());
         }
         mContext = EGL_NO_CONTEXT;
@@ -515,14 +543,16 @@ public class EGLBase10 extends EGLBase {
 
 	private final int getSurfaceWidth(final EGLSurface surface) {
 		final int[] value = new int[1];
-		final boolean ret = mEgl.eglQuerySurface(mEglDisplay, surface, EGL10.EGL_WIDTH, value);
+		final boolean ret = mEgl.eglQuerySurface(mEglDisplay,
+			surface, EGL10.EGL_WIDTH, value);
 		if (!ret) value[0] = 0;
 		return value[0];
 	}
 
 	private final int getSurfaceHeight(final EGLSurface surface) {
 		final int[] value = new int[1];
-		final boolean ret = mEgl.eglQuerySurface(mEglDisplay, surface, EGL10.EGL_HEIGHT, value);
+		final boolean ret = mEgl.eglQuerySurface(mEglDisplay,
+			surface, EGL10.EGL_HEIGHT, value);
 		if (!ret) value[0] = 0;
 		return value[0];
 	}
@@ -540,7 +570,8 @@ public class EGLBase10 extends EGLBase {
         };
 		EGLSurface result = null;
 		try {
-			result = mEgl.eglCreateWindowSurface(mEglDisplay, mEglConfig.eglConfig, nativeWindow, surfaceAttribs);
+			result = mEgl.eglCreateWindowSurface(mEglDisplay,
+				mEglConfig.eglConfig, nativeWindow, surfaceAttribs);
             if (result == null || result == EGL10.EGL_NO_SURFACE) {
                 final int error = mEgl.eglGetError();
                 if (error == EGL10.EGL_BAD_NATIVE_WINDOW) {
@@ -570,7 +601,8 @@ public class EGLBase10 extends EGLBase {
         mEgl.eglWaitGL();
 		EGLSurface result = null;
 		try {
-			result = mEgl.eglCreatePbufferSurface(mEglDisplay, mEglConfig.eglConfig, surfaceAttribs);
+			result = mEgl.eglCreatePbufferSurface(mEglDisplay,
+				mEglConfig.eglConfig, surfaceAttribs);
 	        checkEglError("eglCreatePbufferSurface");
 	        if (result == null) {
 	            throw new RuntimeException("surface was null");
@@ -602,7 +634,9 @@ public class EGLBase10 extends EGLBase {
         }
     }
 
-	private final EGLConfig getConfig(final int version, final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
+	private final EGLConfig getConfig(final int version,
+		final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
         int renderableType = EGL_OPENGL_ES2_BIT;
         if (version >= 3) {
             renderableType |= EGL_OPENGL_ES3_BIT_KHR;
@@ -616,7 +650,8 @@ public class EGLBase10 extends EGLBase {
         	EGL10.EGL_ALPHA_SIZE, 8,
 //        	EGL10.EGL_SURFACE_TYPE, EGL10.EGL_WINDOW_BIT | swapBehavior,
         	EGL10.EGL_NONE, EGL10.EGL_NONE,	//EGL10.EGL_STENCIL_SIZE, 8,
-        	EGL10.EGL_NONE, EGL10.EGL_NONE,	// EGL_RECORDABLE_ANDROID, 1,	// this flag need to recording of MediaCodec
+			// this flag need to recording of MediaCodec
+        	EGL10.EGL_NONE, EGL10.EGL_NONE,	// EGL_RECORDABLE_ANDROID, 1,
         	EGL10.EGL_NONE,	EGL10.EGL_NONE,	// with_depth_buffer ? EGL10.EGL_DEPTH_SIZE : EGL10.EGL_NONE,
 											// with_depth_buffer ? 16 : 0,
 			EGL10.EGL_NONE
@@ -630,8 +665,10 @@ public class EGLBase10 extends EGLBase {
         	attribList[offset++] = EGL10.EGL_DEPTH_SIZE;
         	attribList[offset++] = 16;
         }
-        if (isRecordable && BuildCheck.isAndroid4_3()) {	// MediaCodecの入力用Surfaceの場合
-        	attribList[offset++] = EGL_RECORDABLE_ANDROID;	// A-1000F(Android4.1.2)はこのフラグをつけるとうまく動かない
+        if (isRecordable && BuildCheck.isAndroid4_3()) {
+        	// MediaCodecの入力用Surfaceの場合
+			// A-1000F(Android4.1.2)はこのフラグをつけるとうまく動かない
+        	attribList[offset++] = EGL_RECORDABLE_ANDROID;
         	attribList[offset++] = 1;
         }
         for (int i = attribList.length - 1; i >= offset; i--) {
@@ -666,7 +703,9 @@ public class EGLBase10 extends EGLBase {
     private EGLConfig internalGetConfig(final int[] attribList) {
 		final EGLConfig[] configs = new EGLConfig[1];
 		final int[] numConfigs = new int[1];
-		if (!mEgl.eglChooseConfig(mEglDisplay, attribList, configs, configs.length, numConfigs)) {
+		if (!mEgl.eglChooseConfig(mEglDisplay,
+			attribList, configs, configs.length, numConfigs)) {
+
 			return null;
 		}
 		return configs[0];

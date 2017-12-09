@@ -27,6 +27,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.utils.AssetsHelper;
@@ -64,7 +65,8 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int initTex(final int texTarget, final int filter_param) {
-		return initTex(texTarget, GLES20.GL_TEXTURE0, filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+		return initTex(texTarget, GLES20.GL_TEXTURE0,
+			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
 	}
 
 	/**
@@ -76,7 +78,9 @@ public final class GLHelper {
 	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE
 	 * @return
 	 */
-	public static int initTex(final int texTarget, final int texUnit, final int min_filter, final int mag_filter, final int wrap) {
+	public static int initTex(final int texTarget, final int texUnit,
+		final int min_filter, final int mag_filter, final int wrap) {
+
 //		if (DEBUG) Log.v(TAG, "initTex:target=" + texTarget);
 		final int[] tex = new int[1];
 		GLES20.glActiveTexture(texUnit);
@@ -119,12 +123,16 @@ public final class GLHelper {
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
 
 		//Create Nearest Filtered Texture
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
 		//Different possible texture parameters, e.g. GLES20.GL_CLAMP_TO_EDGE
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
+		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
 
 		//Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
 		GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
@@ -149,7 +157,8 @@ public final class GLHelper {
 		// draw the text centered
 		canvas.drawText(text, 16, 112, textPaint);
 
-		final int texture = initTex(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
+		final int texture = initTex(GLES20.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE0, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
 
 		// Alpha blending
 		// GLES20.glEnable(GLES20.GL_BLEND);
@@ -170,7 +179,9 @@ public final class GLHelper {
 	 * @param fss_asset source file name in Assets of fragment shader
 	 * @return
 	 */
-	public static int loadShader(final Context context, final String vss_asset, final String fss_asset) {
+	public static int loadShader(@NonNull final Context context,
+		final String vss_asset, final String fss_asset) {
+
 		int program = 0;
 		try {
 			final String vss = AssetsHelper.loadString(context.getAssets(), vss_asset);

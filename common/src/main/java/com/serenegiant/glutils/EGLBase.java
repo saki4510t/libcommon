@@ -40,7 +40,9 @@ public abstract class EGLBase {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final IContext sharedContext, final boolean withDepthBuffer, final boolean isRecordable) {
+	public static EGLBase createFrom(final IContext sharedContext,
+		final boolean withDepthBuffer, final boolean isRecordable) {
+
 		return createFrom(3, sharedContext, withDepthBuffer, 0, isRecordable);
 	}
 
@@ -53,8 +55,11 @@ public abstract class EGLBase {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
-		return createFrom(3, sharedContext, withDepthBuffer, stencilBits, isRecordable);
+	public static EGLBase createFrom(final IContext sharedContext,
+		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
+		return createFrom(3, sharedContext,
+			withDepthBuffer, stencilBits, isRecordable);
 	}
 
 	/**
@@ -66,11 +71,20 @@ public abstract class EGLBase {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final int maxClientVersion, final IContext sharedContext, final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
-		if (isEGL14Supported() && ((sharedContext == null) || (sharedContext instanceof EGLBase14.Context))) {
-			return new EGLBase14(maxClientVersion, (EGLBase14.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
+	public static EGLBase createFrom(final int maxClientVersion,
+		final IContext sharedContext, final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
+		if (isEGL14Supported() && ((sharedContext == null)
+			|| (sharedContext instanceof EGLBase14.Context))) {
+
+			return new EGLBase14(maxClientVersion,
+				(EGLBase14.Context)sharedContext,
+				withDepthBuffer, stencilBits, isRecordable);
 		} else {
-			return new EGLBase10(maxClientVersion, (EGLBase10.Context)sharedContext, withDepthBuffer, stencilBits, isRecordable);
+			return new EGLBase10(maxClientVersion,
+				(EGLBase10.Context)sharedContext,
+				withDepthBuffer, stencilBits, isRecordable);
 		}
 	}
 

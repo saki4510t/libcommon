@@ -66,7 +66,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
 	 * @param isRecordable
 	 */
-	public void addSurface(final int id, final Object surface, final boolean isRecordable);
+	public void addSurface(final int id, final Object surface,
+		final boolean isRecordable);
 
 	/**
 	 * 分配描画用のSurfaceを追加
@@ -75,7 +76,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param isRecordable
 	 * @param maxFps 0以下なら制限しない
 	 */
-	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps);
+	public void addSurface(final int id, final Object surface,
+		final boolean isRecordable, final int maxFps);
 
 	/**
 	 * 分配描画用のSurfaceを削除
@@ -102,7 +104,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param offset
 	 * @param matrix offset以降に16要素以上
 	 */
-	public void setMvpMatrix(final int id, final int offset, @NonNull final float[] matrix);
+	public void setMvpMatrix(final int id,
+		final int offset, @NonNull final float[] matrix);
 
 	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得

@@ -56,12 +56,16 @@ public final class RenderHandler extends Handler {
 		return thread.getHandler();
 	}
 
-	public final void setEglContext(final EGLBase.IContext sharedContext, final int tex_id, final Object surface, final boolean isRecordable) {
+	public final void setEglContext(final EGLBase.IContext sharedContext,
+		final int tex_id, final Object surface, final boolean isRecordable) {
 //		if (DEBUG) Log.i(TAG, "RenderHandler:setEglContext:");
-		if (!(surface instanceof Surface) && !(surface instanceof SurfaceTexture) && !(surface instanceof SurfaceHolder))
+		if (!(surface instanceof Surface)
+			&& !(surface instanceof SurfaceTexture)
+			&& !(surface instanceof SurfaceHolder))
 			throw new RuntimeException("unsupported window type:" + surface);
 		mTexId = tex_id;
-		sendMessage(obtainMessage(MSG_RENDER_SET_GLCONTEXT, isRecordable ? 1 : 0, 0, new ContextParams(sharedContext, surface)));
+		sendMessage(obtainMessage(MSG_RENDER_SET_GLCONTEXT,
+			isRecordable ? 1 : 0, 0, new ContextParams(sharedContext, surface)));
 	}
 
 	public final void draw() {
@@ -170,12 +174,14 @@ public final class RenderHandler extends Handler {
     	 * @param shardContext
     	 * @param surface
     	 */
-    	public final void handleSetEglContext(final EGLBase.IContext shardContext, final Object surface, final boolean isRecordable) {
+    	public final void handleSetEglContext(final EGLBase.IContext shardContext,
+    		final Object surface, final boolean isRecordable) {
 //    		if (DEBUG) Log.i(TAG_THREAD, "setEglContext:");
     		release();
     		synchronized (mSync) {
     			mSurface = surface instanceof Surface ? (Surface)surface
-    				: (surface instanceof SurfaceTexture ? new Surface((SurfaceTexture)surface) : null);
+    				: (surface instanceof SurfaceTexture
+    					? new Surface((SurfaceTexture)surface) : null);
     		}
     		mEgl = EGLBase.createFrom(3, shardContext, false, 0, isRecordable);
     		try {

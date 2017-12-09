@@ -28,14 +28,18 @@ public class RendererHolder extends AbstractRendererHolder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = RendererHolder.class.getSimpleName();
 
-	public RendererHolder(final int width, final int height, @Nullable final RenderHolderCallback callback) {
+	public RendererHolder(final int width, final int height,
+		@Nullable final RenderHolderCallback callback) {
+
 //		if (DEBUG) Log.v(TAG, "Constructor");
 		super(width, height, callback);
 //		if (DEBUG) Log.v(TAG, "Constructor:finished");
 	}
 
 	@NonNull
-	protected RendererTask createRendererTask(final int width, final int height) {
+	protected RendererTask createRendererTask(
+		final int width, final int height) {
+
 		return new MyRendererTask(this, width, height);
 	}
 	
@@ -47,7 +51,9 @@ public class RendererHolder extends AbstractRendererHolder {
 	 */
 	private static final class MyRendererTask extends RendererTask {
 
-		public MyRendererTask(final RendererHolder parent, final int width, final int height) {
+		public MyRendererTask(final RendererHolder parent,
+			final int width, final int height) {
+
 			super(parent, width, height);
 		}
 	}

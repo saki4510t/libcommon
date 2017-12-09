@@ -53,7 +53,8 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。通常の2Dテキスチャならfalse
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
+	 * 				通常の2Dテキスチャならfalse
 	 */
 	public GLDrawer2D(final boolean isOES) {
 		this(VERTICES, TEXCOORD, isOES);
@@ -64,10 +65,15 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
 	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
 	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。通常の2Dテキスチャならfalse
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
+	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2D(final float[] vertices, final float[] texcoord, final boolean isOES) {
-		VERTEX_NUM = Math.min(vertices != null ? vertices.length : 0, texcoord != null ? texcoord.length : 0) / 2;
+	public GLDrawer2D(final float[] vertices,
+		final float[] texcoord, final boolean isOES) {
+
+		VERTEX_NUM = Math.min(
+			vertices != null ? vertices.length : 0,
+			texcoord != null ? texcoord.length : 0) / 2;
 		VERTEX_SZ = VERTEX_NUM * 2;
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
@@ -144,10 +150,13 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
 	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する
 	 * @param texId texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
+	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される。
+	 * 					領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 */
 	@Override
-	public synchronized void draw(final int texId, final float[] tex_matrix, final int offset) {
+	public synchronized void draw(final int texId,
+		final float[] tex_matrix, final int offset) {
+
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
 		GLES20.glUseProgram(hProgram);
@@ -280,10 +289,14 @@ public class GLDrawer2D implements IDrawer2dES2 {
 		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
 		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
 		//
-		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
-		GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0);
-		GLES20.glVertexAttribPointer(maPositionLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
-		GLES20.glVertexAttribPointer(maTextureCoordLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+		GLES20.glUniformMatrix4fv(muMVPMatrixLoc,
+			1, false, mMvpMatrix, 0);
+		GLES20.glUniformMatrix4fv(muTexMatrixLoc,
+			1, false, mMvpMatrix, 0);
+		GLES20.glVertexAttribPointer(maPositionLoc,
+			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
+		GLES20.glVertexAttribPointer(maTextureCoordLoc,
+			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
 	}

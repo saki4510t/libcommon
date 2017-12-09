@@ -18,7 +18,9 @@ class RendererSurfaceRec {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	static RendererSurfaceRec newInstance(final EGLBase egl, final Object surface, final int maxFps) {
+	static RendererSurfaceRec newInstance(final EGLBase egl,
+		final Object surface, final int maxFps) {
+
 		return (maxFps > 0)
 			? new RendererSurfaceRecHasWait(egl, surface, maxFps)
 			: new RendererSurfaceRec(egl, surface);	// no limitation of maxFps
@@ -90,7 +92,8 @@ class RendererSurfaceRec {
 	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
-			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけどハングアップする機種があるのでクリアしとく
+			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
+			// ハングアップする機種があるのでクリアしとく
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			drawer.setMvpMatrix(mMvpMatrix, 0);
 			drawer.draw(textId, texMatrix, 0);
@@ -146,7 +149,9 @@ class RendererSurfaceRec {
 		 * @param surface
 		 * @param maxFps 正数
 		 */
-		private RendererSurfaceRecHasWait(final EGLBase egl, final Object surface, final int maxFps) {
+		private RendererSurfaceRecHasWait(final EGLBase egl,
+			final Object surface, final int maxFps) {
+
 			super(egl, surface);
 			mIntervalsNs = 1000000000L / maxFps;
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
@@ -158,7 +163,9 @@ class RendererSurfaceRec {
 		}
 
 		@Override
-		public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
+		public void draw(final GLDrawer2D drawer,
+			final int textId, final float[] texMatrix) {
+
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 			super.draw(drawer, textId, texMatrix);
 		}

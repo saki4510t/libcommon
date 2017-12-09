@@ -45,7 +45,9 @@ public class DumbRenderer implements IRenderer {
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 
-	public DumbRenderer(final EGLBase.IContext sharedContext, final int flags, final RendererDelegater delegater) {
+	public DumbRenderer(final EGLBase.IContext sharedContext,
+		final int flags, final RendererDelegater delegater) {
+
 		mRendererTask = new RendererTask(sharedContext, flags, delegater);
 		new Thread(mRendererTask, TAG).start();
 		if (!mRendererTask.waitReady()) {
@@ -133,7 +135,9 @@ public class DumbRenderer implements IRenderer {
 		/** 映像を左右反転させるかどうか */
 		private boolean mirror;
 
-		public RendererTask(final EGLBase.IContext sharedContext, final int flags, @NonNull final RendererDelegater delegater) {
+		public RendererTask(final EGLBase.IContext sharedContext,
+			final int flags, @NonNull final RendererDelegater delegater) {
+
 			super(sharedContext, flags);
 			mDelegater = delegater;
 		}
@@ -159,7 +163,9 @@ public class DumbRenderer implements IRenderer {
 		}
 
 		@Override
-		protected Object processRequest(final int request, final int arg1, final int arg2, final Object obj) throws TaskBreak {
+		protected Object processRequest(final int request,
+			final int arg1, final int arg2, final Object obj) throws TaskBreak {
+
 			switch (request) {
 			case REQUEST_SET_SURFACE:
 				handleSetSurface(obj);

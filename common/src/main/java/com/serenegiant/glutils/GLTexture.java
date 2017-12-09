@@ -181,7 +181,8 @@ public class GLTexture implements ITexture {
 				inSampleSize = (int)Math.ceil(imageWidth / (float)mTexWidth);
 			}
 		}
-//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),tex(%d,%d),inSampleSize=%d", imageWidth, imageHeight, mTexWidth, mTexHeight, inSampleSize));
+//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),tex(%d,%d),inSampleSize=%d",
+// 			imageWidth, imageHeight, mTexWidth, mTexHeight, inSampleSize));
 		// 実際の読み込み処理
 		options.inSampleSize = inSampleSize;
 		options.inJustDecodeBounds = false;
@@ -197,7 +198,8 @@ public class GLTexture implements ITexture {
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = mImageWidth / (float)mTexWidth;
 		mTexMatrix[5] = mImageHeight / (float)mTexHeight;
-//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),scale(%f,%f)", mImageWidth, mImageHeight, mMvpMatrix[0], mMvpMatrix[5]));
+//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),scale(%f,%f)",
+// 			mImageWidth, mImageHeight, mMvpMatrix[0], mMvpMatrix[5]));
 		bind();
 		GLUtils.texImage2D(mTextureTarget, 0, texture, 0);
 		unbind();

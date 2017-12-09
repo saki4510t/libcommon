@@ -163,7 +163,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param isRecordable
 	 */
 	@Override
-	public void addSurface(final int id, final Object surface, final boolean isRecordable) {
+	public void addSurface(final int id,
+		final Object surface, final boolean isRecordable) {
+
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface);
 	}
@@ -176,7 +178,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param maxFps
 	 */
 	@Override
-	public void addSurface(final int id, final Object surface, final boolean isRecordable, final int maxFps) {
+	public void addSurface(final int id,
+		final Object surface, final boolean isRecordable, final int maxFps) {
+
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface, maxFps);
 	}
@@ -370,7 +374,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //--------------------------------------------------------------------------------
 	protected abstract static class BaseRendererTask extends EglTask {
 		private final Object mClientSync = new Object();
-		private final SparseArray<RendererSurfaceRec> mClients = new SparseArray<RendererSurfaceRec>();
+		private final SparseArray<RendererSurfaceRec> mClients
+			= new SparseArray<RendererSurfaceRec>();
 		private final AbstractRendererHolder mParent;
 		private int mVideoWidth, mVideoHeight;
 		final float[] mTexMatrix = new float[16];
@@ -381,7 +386,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private int mMirror = MIRROR_NORMAL;
 		private int mRotation = 0;
 		
-		public BaseRendererTask(final AbstractRendererHolder parent, final int width, final int height) {
+		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
+			final int width, final int height) {
+
 			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
 			mParent = parent;
 			mVideoWidth = width;
@@ -430,7 +437,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		protected abstract void internalOnStop();
 
 		@Override
-		protected Object processRequest(final int request, final int arg1, final int arg2, final Object obj) {
+		protected Object processRequest(final int request,
+			final int arg1, final int arg2, final Object obj) {
+
 			switch (request) {
 			case REQUEST_DRAW:
 				handleDraw();
@@ -500,10 +509,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param id
 		 * @param surface
 		 */
-		public void addSurface(final int id, final Object surface, final int maxFps) {
+		public void addSurface(final int id,
+			final Object surface, final int maxFps) {
+
 			checkFinished();
-			if (!((surface instanceof SurfaceTexture) || (surface instanceof Surface) || (surface instanceof SurfaceHolder))) {
-				throw new IllegalArgumentException("Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
+			if (!((surface instanceof SurfaceTexture)
+				|| (surface instanceof Surface)
+				|| (surface instanceof SurfaceHolder))) {
+
+				throw new IllegalArgumentException(
+					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
 			synchronized (mClientSync) {
 				if (mClients.get(id) == null) {
@@ -697,15 +712,19 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		protected abstract void preprocess();
-		protected abstract void onDrawClient(final RendererSurfaceRec client, final int texId, final float[] texMatrix);
+		protected abstract void onDrawClient(
+			@NonNull final RendererSurfaceRec client,
+			final int texId, final float[] texMatrix);
 		
 		/**
 		 * 指定したIDの分配描画先Surfaceを追加する
 		 * @param id
 		 * @param surface
 		 */
-		protected void handleAddSurface(final int id, final Object surface, final int maxFps) {
-	//			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
+		protected void handleAddSurface(final int id,
+			final Object surface, final int maxFps) {
+
+//			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
 			synchronized (mClientSync) {
 				RendererSurfaceRec client = mClients.get(id);
@@ -920,7 +939,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		/**
 		 * TextureSurfaceで映像を受け取った際のコールバックリスナー
 		 */
-		private final SurfaceTexture.OnFrameAvailableListener mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
+		private final SurfaceTexture.OnFrameAvailableListener
+			mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
+
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 				offer(REQUEST_DRAW);
@@ -936,7 +957,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		protected GLDrawer2D mDrawer;
 
-		public RendererTask(final AbstractRendererHolder parent, final int width, final int height) {
+		public RendererTask(@NonNull final AbstractRendererHolder parent,
+			final int width, final int height) {
+
 			super(parent, width, height);
 		}
 
@@ -958,7 +981,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 		
 		@Override
-		protected void onDrawClient(final RendererSurfaceRec client, final int texId, final float[] texMatrix) {
+		protected void onDrawClient(@NonNull final RendererSurfaceRec client,
+			final int texId, final float[] texMatrix) {
+
 			client.draw(mDrawer, texId, texMatrix);
 		}
 	}
@@ -1007,7 +1032,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		private final void init() {
 	    	eglBase = EGLBase.createFrom(3, mRendererTask.getContext(), false, 0, false);
-	    	captureSurface = eglBase.createOffscreen(mRendererTask.width(), mRendererTask.height());
+	    	captureSurface = eglBase.createOffscreen(
+	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
 	    	drawer = new GLDrawer2D(true);
 			setupCaptureDrawer(drawer);
@@ -1040,7 +1066,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 						continue;
 					}
-					if (buf == null | width != mRendererTask.width() || height != mRendererTask.height()) {
+					if ((buf == null)
+						|| (width != mRendererTask.width())
+						|| height != mRendererTask.height()) {
+
 						width = mRendererTask.width();
 						height = mRendererTask.height();
 						buf = ByteBuffer.allocateDirect(width * height * 4);
@@ -1059,7 +1088,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
 				        buf.clear();
-				        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+				        GLES20.glReadPixels(0, 0, width, height,
+				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
 				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
 				        if (captureFile.toString().endsWith(".jpg")) {
@@ -1069,7 +1099,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						try {
 					        try {
 					            os = new BufferedOutputStream(new FileOutputStream(captureFile));
-					            final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+					            final Bitmap bmp = Bitmap.createBitmap(
+					            	width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
 					            bmp.compress(compressFormat, captureCompression, os);
@@ -1122,7 +1153,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 						continue;
 					}
-					if (buf == null | width != mRendererTask.width() || height != mRendererTask.height()) {
+					if ((buf == null)
+						|| (width != mRendererTask.width())
+						|| (height != mRendererTask.height())) {
+
 						width = mRendererTask.width();
 						height = mRendererTask.height();
 						buf = ByteBuffer.allocateDirect(width * height * 4);
@@ -1141,7 +1175,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
 				        buf.clear();
-				        GLES20.glReadPixels(0, 0, width, height, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+				        GLES20.glReadPixels(0, 0, width, height,
+				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
 				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
 				        if (captureFile.toString().endsWith(".jpg")) {
@@ -1151,7 +1186,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						try {
 					        try {
 					            os = new BufferedOutputStream(new FileOutputStream(captureFile));
-					            final Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+					            final Bitmap bmp = Bitmap.createBitmap(
+					            	width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
 					            bmp.compress(compressFormat, captureCompression, os);

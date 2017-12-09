@@ -261,7 +261,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param params
 	 * @throws IllegalArgumentException effectが範囲外ならIllegalArgumentException生成
 	 */
-	public void setParams(final int effect, final float[] params) throws IllegalArgumentException {
+	public void setParams(final int effect, final float[] params)
+		throws IllegalArgumentException {
+
 		if ((effect > EFFECT_NON) && (effect < EFFECT_NUM)) {
 			((MyRendererTask)mRendererTask).setParams(effect, params);
 		} else {
@@ -285,7 +287,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		private float[] mCurrentParams;
 		private int mEffect;
 
-		public MyRendererTask(final EffectRendererHolder parent, final int width, final int height) {
+		public MyRendererTask(final EffectRendererHolder parent,
+			final int width, final int height) {
+
 			super(parent, width, height);
 		}
 
@@ -311,7 +315,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		}
 
 		@Override
-		protected Object processRequest(final int request, final int arg1, final int arg2, final Object obj) {
+		protected Object processRequest(final int request,
+			final int arg1, final int arg2, final Object obj) {
+
 			Object result = null;
 			switch (request) {
 			case REQUEST_CHANGE_EFFECT:
@@ -399,7 +405,8 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		}
 
 		private void updateParams() {
-			final int n = Math.min(mCurrentParams != null ? mCurrentParams.length : 0, MAX_PARAM_NUM);
+			final int n = Math.min(mCurrentParams != null
+				? mCurrentParams.length : 0, MAX_PARAM_NUM);
 			if ((muParamsLoc >= 0) && (n > 0)) {
 				mDrawer.glUseProgram();
 				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
