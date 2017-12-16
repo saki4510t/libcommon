@@ -99,6 +99,38 @@ public abstract class MediaReaper implements Runnable {
 		}
 	}
 
+	public static class AudioReaper extends MediaReaper {
+		private static final String MIME_TYPE = "audio/mp4a-latm";
+		
+		private final int mSampleRate;
+		private final int mChannelCount;
+		
+		public AudioReaper(final MediaCodec encoder, @NonNull final ReaperListener listener,
+			final int sampleRate, final int channelCount) {
+
+			super(REAPER_AUDIO, encoder, listener);
+			mSampleRate = sampleRate;
+			mChannelCount = channelCount;
+		}
+		
+		@Override
+		protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+			final int ix0, final int ix1, final int ix2) {
+
+			MediaFormat outFormat;
+	        if (ix0 >= 0) {
+	//        	Log.w(TAG, "csd may be wrong, it may be for video");
+	        }
+	        // audioの時はSTART_MARKが無いので全体をコピーして渡す
+	        outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
+	        final ByteBuffer csd0 = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+	        csd0.put(csd, 0, size);
+	        csd0.flip();
+	        outFormat.setByteBuffer("csd-0", csd0);
+	        return outFormat;
+		}
+	}
+	
 	private final Object mSync = new Object();
 	private final WeakReference<MediaCodec> mWeakEncoder;
 	private final ReaperListener mListener;
