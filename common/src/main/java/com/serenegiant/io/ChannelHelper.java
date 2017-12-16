@@ -1,4 +1,4 @@
-package com.serenegiant.net;
+package com.serenegiant.io;
 /*
  * libcommon
  * utility/helper classes for myself
