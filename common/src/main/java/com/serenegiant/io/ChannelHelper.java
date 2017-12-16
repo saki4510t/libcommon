@@ -19,9 +19,11 @@ package com.serenegiant.io;
 */
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
 import java.nio.FloatBuffer;
@@ -45,8 +47,22 @@ public class ChannelHelper {
 	 */
 	public static boolean readBoolean(@NonNull final ByteChannel channel)
 		throws IOException {
+
+		return readBoolean(channel, null);
+	}
+
+	/**
+	 * ByteChannelからbooleanを読み込む
+	 * @param channel
+	 * @param work
+	 * @return
+	 * @throws IOException
+	 */
+	public static boolean readBoolean(
+		@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(1);
+		final ByteBuffer buf = checkBuffer(work, 1);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 1) throw new IOException();
 		buf.clear();
@@ -62,13 +78,25 @@ public class ChannelHelper {
 	public static byte readByte(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(1);
+		return readByte(channel, null);
+	}
+	
+	/**
+	 * ByteChannelからbyeを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte readByte(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 1);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 1) throw new IOException();
 		buf.clear();
 		return buf.get();
 	}
-	
+
 	/**
 	 * ByteChannelからcharを読み込む
 	 * @param channel
@@ -78,13 +106,26 @@ public class ChannelHelper {
 	public static char readChar(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(2);
+		return readChar(channel, null);
+	}
+	
+	/**
+	 * ByteChannelからcharを読み込む
+	 * @param channel
+	 * @param work
+	 * @return
+	 * @throws IOException
+	 */
+	public static char readChar(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 2);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 2) throw new IOException();
 		buf.clear();
 		return buf.getChar();
 	}
-	
+
 	/**
 	 * ByteChannelからshortを読み込む
 	 * @param channel
@@ -94,13 +135,26 @@ public class ChannelHelper {
 	public static short readShort(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(2);
+		return readShort(channel, null);
+	}
+	
+	/**
+	 * ByteChannelからshortを読み込む
+	 * @param channel
+	 * @param work
+	 * @return
+	 * @throws IOException
+	 */
+	public static short readShort(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 2);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 2) throw new IOException();
 		buf.clear();
 		return buf.getShort();
 	}
-	
+
 	/**
 	 * ByteChannelからintを読み込む
 	 * @param channel
@@ -110,13 +164,26 @@ public class ChannelHelper {
 	public static int readInt(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(4);
+		return readInt(channel, null);
+	}
+	
+	/**
+	 * ByteChannelからintを読み込む
+	 * @param channel
+	 * @param work
+	 * @return
+	 * @throws IOException
+	 */
+	public static int readInt(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 4);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 4) throw new IOException();
 		buf.clear();
 		return buf.getInt();
 	}
-	
+
 	/**
 	 * ByteChannelからlongを読み込む
 	 * @param channel
@@ -126,13 +193,26 @@ public class ChannelHelper {
 	public static long readLong(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(8);
+		return readLong(channel, null);
+	}
+	
+	/**
+	 * ByteChannelからlongを読み込む
+	 * @param channel
+	 * @param work
+	 * @return
+	 * @throws IOException
+	 */
+	public static long readLong(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 8);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 8) throw new IOException();
 		buf.clear();
 		return buf.getLong();
 	}
-	
+
 	/**
 	 * ByteChannelからfloatを読み込む
 	 * @param channel
@@ -150,6 +230,22 @@ public class ChannelHelper {
 	}
 	
 	/**
+	 * ByteChannelからfloatを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
+	public static float readFloat(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 4);
+		final int readBytes = channel.read(buf);
+		if (readBytes != 4) throw new IOException();
+		buf.clear();
+		return buf.getFloat();
+	}
+
+	/**
 	 * ByteChannelからdoubleを読み込む
 	 * @param channel
 	 * @return
@@ -158,7 +254,19 @@ public class ChannelHelper {
 	public static double readDouble(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(8);
+		return readDouble(channel, null);
+	}
+
+	/**
+	 * ByteChannelからdoubleを読み込む
+	 * @param channel
+	 * @return
+	 * @throws IOException
+	 */
+	public static double readDouble(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer work) throws IOException {
+
+		final ByteBuffer buf = checkBuffer(work, 8);
 		final int readBytes = channel.read(buf);
 		if (readBytes != 8) throw new IOException();
 		buf.clear();
@@ -230,7 +338,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 2).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 2) throw new IOException();
 		buf.clear();
@@ -254,7 +362,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 2).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 2) throw new IOException();
 		buf.clear();
@@ -278,7 +386,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 4).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 4) throw new IOException();
 		buf.clear();
@@ -302,7 +410,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 8).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 8) throw new IOException();
 		buf.clear();
@@ -326,7 +434,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 4).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 4) throw new IOException();
 		buf.clear();
@@ -350,7 +458,7 @@ public class ChannelHelper {
 		throws IOException {
 		
 		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
+		final ByteBuffer buf = ByteBuffer.allocate(n * 8).order(ByteOrder.BIG_ENDIAN);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n * 8) throw new IOException();
 		buf.clear();
@@ -373,13 +481,7 @@ public class ChannelHelper {
 	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel)
 		throws IOException {
 		
-		final int n = readInt(channel);
-		final ByteBuffer buf = ByteBuffer.allocateDirect(n);
-		final int readBytes = channel.read(buf);
-		if (readBytes != n) throw new IOException();
-		buf.position(n);
-		buf.flip();
-		return buf;
+		return readByteBuffer(channel, null, true);
 	}
 	
 	/**
@@ -394,16 +496,47 @@ public class ChannelHelper {
 	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel,
 		@NonNull final ByteBuffer buf) throws IOException {
 		
+		return readByteBuffer(channel, buf, false);
+	}
+
+	/**
+	 * ByteChannelからByteBufferを読み込む
+	 * @param channel
+	 * @param readBuf
+	 * @param canReAllocate trueなら　指定したreadBufのremainingが読み込むサイズよりも小さい場合は
+	 * 						IOExceptionを投げる、falseなら必要な分を確保し直す
+	 * @return 読み込めた時はpositionは元のまま(読んだデータの先頭), limitをデータの最後に変更して返す
+	 * canReAllocate=falseなら元のreadBufとは異なるByteBufferを返すかもしれない
+	 * IOExceptionを投げた時は内容・position,limitは不定
+	 * @throws IOException
+	 */
+	public static ByteBuffer readByteBuffer(@NonNull final ByteChannel channel,
+		@Nullable final ByteBuffer readBuf, final boolean canReAllocate)
+			throws IOException {
+		
 		final int n = readInt(channel);
-		if (buf.remaining() < n) {
-			final ByteBuffer temp = ByteBuffer.allocate(n);
-			channel.read(temp);	// dummy read
-			throw new IOException();
+		final int pos = readBuf != null ? readBuf.position() : 0;
+		ByteBuffer buf = readBuf;
+		if ((buf == null) || (buf.remaining() < n)) {
+			if (canReAllocate) {
+				if (buf == null) {
+					buf = ByteBuffer.allocateDirect(n);
+				} else {
+					final ByteBuffer temp = ByteBuffer.allocateDirect(
+						readBuf.limit() + n);
+					buf.flip();
+					temp.put(buf);
+					buf = temp;
+				}
+			} else {
+				throw new IOException();
+			}
 		}
+		buf.limit(pos + n);
 		final int readBytes = channel.read(buf);
 		if (readBytes != n) throw new IOException();
-		buf.position(n);
-		buf.flip();
+		buf.position(pos);
+		buf.limit(pos + n);
 		return buf;
 	}
 	
@@ -413,10 +546,24 @@ public class ChannelHelper {
 	 * @param value
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
 		final boolean value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(1);
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static  void write(@NonNull final ByteChannel channel,
+		final boolean value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 1);
 		buf.put((byte)(value ? 1 : 0));
 		buf.flip();
 		channel.write(buf);
@@ -428,10 +575,24 @@ public class ChannelHelper {
 	 * @param value
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
 		final byte value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(1);
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		final byte value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 1);
 		buf.put(value);
 		buf.flip();
 		channel.write(buf);
@@ -443,25 +604,53 @@ public class ChannelHelper {
 	 * @param value
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
 		final char value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(2);
-		buf.putChar(value);
-		buf.flip();
-		channel.write(buf);
+		write(channel, value, null);
 	}
 	
 	/**
 	 * ByteChannelへ書き込む
 	 * @param channel
 	 * @param value
+	 * @param work
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
+		final char value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 2);
+		buf.putChar(value);
+		buf.flip();
+		channel.write(buf);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
 		final short value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(2);
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		final short value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 2);
 		buf.putShort(value);
 		buf.flip();
 		channel.write(buf);
@@ -473,25 +662,53 @@ public class ChannelHelper {
 	 * @param value
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
 		final int value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(4);
-		buf.putInt(value);
-		buf.flip();
-		channel.write(buf);
+		write(channel, value, null);
 	}
 	
 	/**
 	 * ByteChannelへ書き込む
 	 * @param channel
 	 * @param value
+	 * @param work
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
+		final int value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 4);
+		buf.putInt(value);
+		buf.flip();
+		channel.write(buf);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
 		final long value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(8);
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		final long value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 8);
 		buf.putLong(value);
 		buf.flip();
 		channel.write(buf);
@@ -503,25 +720,53 @@ public class ChannelHelper {
 	 * @param value
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
 		final float value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(4);
-		buf.putFloat(value);
-		buf.flip();
-		channel.write(buf);
+		write(channel, value, null);
 	}
 	
 	/**
 	 * ByteChannelへ書き込む
 	 * @param channel
 	 * @param value
+	 * @param work
 	 * @throws IOException
 	 */
-	public static  void write(@NonNull final ByteChannel channel,
+	public static void write(@NonNull final ByteChannel channel,
+		final float value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 4);
+		buf.putFloat(value);
+		buf.flip();
+		channel.write(buf);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
 		final double value) throws IOException {
 		
-		final ByteBuffer buf = ByteBuffer.allocate(8);
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		final double value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
+		final ByteBuffer buf = checkBuffer(work, 8);
 		buf.putDouble(value);
 		buf.flip();
 		channel.write(buf);
@@ -550,9 +795,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final boolean[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final boolean[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		write(channel, n);
-		final ByteBuffer buf = ByteBuffer.allocate(n);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n);
 		for (int i = 0; i < n; i++) {
 			buf.put((byte)(value[i] ? 1 : 0));
 		}
@@ -582,8 +841,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final char[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final char[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 2);
 		for (int i = 0; i < n; i++) {
 			buf.putChar(value[i]);
 		}
@@ -600,8 +874,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final short[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final short[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 2);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 2);
 		for (int i = 0; i < n; i++) {
 			buf.putShort(value[i]);
 		}
@@ -618,8 +907,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final int[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final int[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 4);
 		for (int i = 0; i < n; i++) {
 			buf.putInt(value[i]);
 		}
@@ -636,8 +940,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final long[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final long[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 8);
 		for (int i = 0; i < n; i++) {
 			buf.putLong(value[i]);
 		}
@@ -654,8 +973,23 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final float[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final float[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 4);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 4);
 		for (int i = 0; i < n; i++) {
 			buf.putFloat(value[i]);
 		}
@@ -672,15 +1006,30 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final double[] value) throws IOException {
 		
+		write(channel, value, null);
+	}
+	
+	/**
+	 * ByteChannelへ書き込む
+	 * @param channel
+	 * @param value
+	 * @param work
+	 * @throws IOException
+	 */
+	public static void write(@NonNull final ByteChannel channel,
+		@NonNull final double[] value,
+		@Nullable final ByteBuffer work) throws IOException {
+		
 		final int n = value.length;
-		final ByteBuffer buf = ByteBuffer.allocate(n * 8);
+		write(channel, n, work);
+		final ByteBuffer buf = checkBuffer(work, n * 8);
 		for (int i = 0; i < n; i++) {
 			buf.putDouble(value[i]);
 		}
 		buf.flip();
 		channel.write(buf);
 	}
-	
+
 	/**
 	 * ByteChannelへ書き込む
 	 * @param channel
@@ -694,4 +1043,24 @@ public class ChannelHelper {
 		channel.write(value);
 	}
 	
+	/**
+	 * 作業用のバッファーのサイズをチェックして足りなければ新規に確保して返す
+	 * 作業用バッファーは必要サイズ分がremainingになるように
+	 * clearしてlimitをセットして返す
+	 * @param work
+	 * @param sz
+	 * @return
+	 */
+	private static ByteBuffer checkBuffer(
+		@Nullable final ByteBuffer work, final int sz) {
+
+		ByteBuffer buf = work;
+		if ((buf == null) || (work.capacity() < sz)) {
+			buf = ByteBuffer.allocateDirect(sz);
+		}
+		buf.order(ByteOrder.BIG_ENDIAN);
+		buf.clear();
+		buf.limit(sz);
+		return buf;
+	}
 }
