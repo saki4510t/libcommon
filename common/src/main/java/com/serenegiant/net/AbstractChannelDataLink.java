@@ -41,7 +41,7 @@ public abstract class AbstractChannelDataLink {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = AbstractChannelDataLink.class.getSimpleName();
 
-	static final Charset UTF8 = Charset.forName("UTF-8");
+	private static final Charset UTF8 = Charset.forName("UTF-8");
 
 	public interface Callback {
 		public void onConnect(final AbstractClient client);
@@ -50,22 +50,22 @@ public abstract class AbstractChannelDataLink {
 		public void onError(final AbstractClient client, final Exception e);
 	}
 	
-	static final int REQ_RELEASE = -9;
-	static final int TYPE_UNKNOWN = -1;
-	static final int TYPE_NULL = 0;
-	static final int TYPE_BYTE_BUFFER = 1;
-	static final int TYPE_STRING = 2;
-	static final int TYPE_BOOL = 10;
-	static final int TYPE_INT = 11;
-	static final int TYPE_LONG = 12;
-	static final int TYPE_FLOAT = 20;
-	static final int TYPE_DOUBLE = 21;
-	static final int TYPE_BYTE_ARRAY = 30;
-	static final int TYPE_BOOL_ARRAY = 31;
-	static final int TYPE_INT_ARRAY = 32;
-	static final int TYPE_LONG_ARRAY = 33;
-	static final int TYPE_FLOAT_ARRAY = 40;
-	static final int TYPE_DOUBLE_ARRAY = 41;
+	private static final int REQ_RELEASE = -9;
+	private static final int TYPE_UNKNOWN = -1;
+	private static final int TYPE_NULL = 0;
+	private static final int TYPE_BYTE_BUFFER = 1;
+	private static final int TYPE_STRING = 2;
+	private static final int TYPE_BOOL = 10;
+	private static final int TYPE_INT = 11;
+	private static final int TYPE_LONG = 12;
+	private static final int TYPE_FLOAT = 20;
+	private static final int TYPE_DOUBLE = 21;
+	private static final int TYPE_BYTE_ARRAY = 30;
+	private static final int TYPE_BOOL_ARRAY = 31;
+	private static final int TYPE_INT_ARRAY = 32;
+	private static final int TYPE_LONG_ARRAY = 33;
+	private static final int TYPE_FLOAT_ARRAY = 40;
+	private static final int TYPE_DOUBLE_ARRAY = 41;
 
 	private final Set<AbstractClient> mClients = new CopyOnWriteArraySet<AbstractClient>();
 	private final Set<Callback> mCallbacks = new CopyOnWriteArraySet<Callback>();
