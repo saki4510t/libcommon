@@ -18,6 +18,8 @@ package com.serenegiant.io;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -51,12 +53,14 @@ public class WritableOutputStreamWrapper extends OutputStream implements IWritab
 	}
 
 	@Override
-	public void write(final byte[] b) throws IOException {
+	public void write(@NonNull final byte[] b) throws IOException {
 		mParent.write(b);
 	}
 
 	@Override
-	public void write(final byte[] b, final int off, final int len) throws IOException {
+	public void write(@NonNull final byte[] b, final int off, final int len)
+		throws IOException {
+
 		mParent.write(b, off, len);
 	}
 
