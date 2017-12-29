@@ -665,6 +665,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 
+		protected AbstractRendererHolder getParent() {
+			return mParent;
+		}
+
 //================================================================================
 // ワーカースレッド上での処理
 //================================================================================
