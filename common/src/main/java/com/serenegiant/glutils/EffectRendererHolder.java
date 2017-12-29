@@ -247,12 +247,13 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		FUNC_RGB2HSV +
 		FUNC_HSV2RGB +
 		"void main() {\n" +
-		"    vec3 hsv = rgb2hsv(texture2D(sTexture, vTextureCoord).rgb);\n" +	// RGBをHSVに変換
-		"    if ( ((hsv.g >= uParams[2]) && (hsv.g <= uParams[3]))\n" +			// s
-		"        && ((hsv.b >= uParams[4]) && (hsv.b <= uParams[5]))\n" +		// v
-		"        && ((hsv.r <= uParams[0]) || (hsv.r >= uParams[1])) ) {\n" +	// h
+		"    vec3 rgb = texture2D(sTexture, vTextureCoord).rgb;\n" +			// RGB
+		"    vec3 hsv = rgb2hsv(rgb);\n" +										// RGBをHSVに変換
+		"    if (   ((hsv.r >= uParams[0]) && (hsv.r <= uParams[1]))\n" +		// h
+		"        && ((hsv.g >= uParams[2]) && (hsv.g <= uParams[3]))\n" +		// s
+		"        && ((hsv.b >= uParams[4]) && (hsv.b <= uParams[5])) ) {\n" +	// v
 		"        hsv = hsv * vec3(uParams[6], uParams[7], uParams[8]);\n" +		// 黄色の範囲
-		"    } else if ((hsv.g < uParams[12]) && (hsv.b < uParams[13])) {\n" +	// 彩度が一定以下, 明度が一定以下なら
+		"    } else if ((hsv.g < uParams[12]) && (hsv.b > uParams[13])) {\n" +	// 彩度が一定以下, 明度が一定以上なら
 		"        hsv = hsv * vec3(1.0, 0.0, 2.0);\n" +							// 色相そのまま, 彩度0, 明度x2
 		"    } else {\n" +
 		"        hsv = hsv * vec3(uParams[9], uParams[10], uParams[11]);\n" +	// それ以外なら
@@ -375,6 +376,22 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				0.40f, 1.0f,		// 強調する明度下限, 上限
 				1.0f, 1.0f, 5.0f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
 				1.0f, 1.0f, 1.0f,	// 通常時のファクター(H, S, Vの順)
+			});
+			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW_WHITE, new float[] {
+				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
+				0.50f, 1.0f,		// 強調する彩度下限, 上限
+				0.40f, 1.0f,		// 強調する明度下限, 上限
+				1.0f, 1.0f, 5.0f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+				1.0f, 1.0f, 1.0f,	// 通常時のファクター(H, S, Vの順)
+			});
+			mParams.put(EFFECT_EMPHASIZE_YELLOW_WHITE, new float[] {
+				0.10f, 0.19f,			// 黄色の色相h下側閾値, 上側閾値
+				0.30f, 1.00f,			// 強調する彩度s下限, 上限
+				0.30f, 1.00f,			// 強調する明度v下限, 上限
+				1.00f, 1.00f, 5.00f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+				1.00f, 0.80f, 0.80f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.8)と明度(x0.8)を少し落とす
+				0.15f, 0.40f,			// 白強調時の彩度上限, 白強調時の明度下限
+				0, 0, 0, 0,				// ダミー
 			});
 			mEffect = EFFECT_NON;
 			handleChangeEffect(EFFECT_NON);
