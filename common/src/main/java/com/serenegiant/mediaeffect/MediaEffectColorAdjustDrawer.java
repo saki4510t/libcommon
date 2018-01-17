@@ -59,7 +59,9 @@ public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer.MediaEffectS
 		super.preDraw(tex_ids, tex_matrix, offset);
 		// 色調整オフセット
 		if (muColorAdjustLoc >= 0) {
-			GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);
+			synchronized (mSync) {
+				GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);
+			}
 		}
 	}
 }
