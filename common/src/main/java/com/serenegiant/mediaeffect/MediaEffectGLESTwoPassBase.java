@@ -18,6 +18,8 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
+
 import com.serenegiant.glutils.TextureOffscreen;
 
 public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
@@ -87,7 +89,7 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 	 * @param out_tex_id
 	 */
 	@Override
-	public void apply(final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
 		if (!mEnabled) return;
 		// パス1
 		if (mOutputOffscreen == null) {

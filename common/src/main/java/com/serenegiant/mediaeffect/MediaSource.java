@@ -18,6 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.glutils.GLDrawer2D;
@@ -104,6 +105,7 @@ public class MediaSource implements ISource {
 		return mHeight;
 	}
 
+	@NonNull
 	@Override
 	public int[] getSourceTexId() {
 		return mSrcTexIds;

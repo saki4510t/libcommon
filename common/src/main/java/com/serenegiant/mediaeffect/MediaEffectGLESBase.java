@@ -139,7 +139,9 @@ public class MediaEffectGLESBase implements IEffect {
 	 * @param out_tex_id
 	 */
 	@Override
-	public void apply(final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] src_tex_ids,
+		final int width, final int height, final int out_tex_id) {
+
 		if (!mEnabled) return;
 		if (mOutputOffscreen == null) {
 			mOutputOffscreen = new TextureOffscreen(width, height, false);

@@ -21,6 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.media.effect.Effect;
 import android.media.effect.EffectContext;
 import android.media.effect.EffectFactory;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 public class MediaEffect implements IEffect {
@@ -43,7 +44,7 @@ public class MediaEffect implements IEffect {
 	}
 
 	@Override
-	public void apply(final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src_tex_ids[0], width, height, out_tex_id);
 		}

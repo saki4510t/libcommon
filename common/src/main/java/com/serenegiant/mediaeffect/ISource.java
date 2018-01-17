@@ -18,6 +18,8 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
+
 import com.serenegiant.glutils.TextureOffscreen;
 
 public interface ISource {
@@ -31,6 +33,7 @@ public interface ISource {
 	public ISource apply(IEffect effect);
 	public int getWidth();
 	public int getHeight();
+	@NonNull
 	public int[] getSourceTexId();
 	public int getOutputTexId();
 	public float[] getTexMatrix();
