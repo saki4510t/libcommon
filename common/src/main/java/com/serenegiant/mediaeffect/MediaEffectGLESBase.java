@@ -18,6 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.glutils.TextureOffscreen;
@@ -153,7 +154,7 @@ public class MediaEffectGLESBase implements IEffect {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids[0], mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
@@ -170,7 +171,7 @@ public class MediaEffectGLESBase implements IEffect {
 		final int[] src_tex_ids = src.getSourceTexId();
 		output_tex.bind();
 		try {
-			mDrawer.apply(src_tex_ids[0], output_tex.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, output_tex.getTexMatrix(), 0);
 		} finally {
 			output_tex.unbind();
 		}

@@ -27,6 +27,7 @@ import com.serenegiant.glutils.TextureOffscreen;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.util.Locale;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -46,22 +47,41 @@ public class MediaEffectDrawer {
 	private final int mTexTarget;
 	private final int muMVPMatrixLoc;
 	private final int muTexMatrixLoc;
+	private final int[] muTexLoc;
 	private final float[] mMvpMatrix = new float[16];
 	private int hProgram;
 
 	public MediaEffectDrawer() {
-		this(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		this(1, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+	}
+
+	public MediaEffectDrawer(final int numTex) {
+		this(numTex, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
 	}
 
 	public MediaEffectDrawer(final String fss) {
-		this(false, VERTEX_SHADER, fss);
+		this(1, false, VERTEX_SHADER, fss);
+	}
+
+	public MediaEffectDrawer(final int numTex, final String fss) {
+		this(numTex, false, VERTEX_SHADER, fss);
 	}
 
 	public MediaEffectDrawer(final boolean isOES, final String fss) {
-		this(isOES, VERTEX_SHADER, fss);
+		this(1, isOES, VERTEX_SHADER, fss);
+	}
+
+	public MediaEffectDrawer(final int numTex, final boolean isOES, final String fss) {
+		this(numTex, isOES, VERTEX_SHADER, fss);
 	}
 
 	public MediaEffectDrawer(final boolean isOES, final String vss, final String fss) {
+		this(1, isOES, VERTEX_SHADER, fss);
+	}
+	
+	public MediaEffectDrawer(final int numTex,
+		final boolean isOES, final String vss, final String fss) {
+
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		final FloatBuffer pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 			.order(ByteOrder.nativeOrder()).asFloatBuffer();
@@ -72,12 +92,19 @@ public class MediaEffectDrawer {
 		pTexCoord.put(TEXCOORD);
 		pTexCoord.flip();
 
+		// テクスチャ用のロケーションは最低でも1つは確保する
+		muTexLoc = new int[numTex > 0 ? numTex : 1];
 		hProgram = GLHelper.loadShader(vss, fss);
 		GLES20.glUseProgram(hProgram);
 		final int maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
 		final int maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
         muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
         muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
+        muTexLoc[0] = GLES20.glGetUniformLocation(hProgram, "sTexture");
+        for (int i = 1; i < numTex; i++) {
+			muTexLoc[i] = GLES20.glGetUniformLocation(hProgram,
+				String.format(Locale.US, "sTexture%d", i + 1));
+		}
         // モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
 		//
@@ -143,15 +170,15 @@ public class MediaEffectDrawer {
 
 	/**
 	 * preDraw => draw => postDrawを順に呼び出す
-	 * @param tex_id texture ID
+	 * @param tex_ids texture ID
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void apply(final int tex_id, final float[] tex_matrix, final int offset) {
+	protected void apply(final int[] tex_ids, final float[] tex_matrix, final int offset) {
 		synchronized (mSync) {
 			GLES20.glUseProgram(hProgram);
-			preDraw(tex_id, tex_matrix, offset);
-			draw(tex_id, tex_matrix, offset);
+			preDraw(tex_ids, tex_matrix, offset);
+			draw(tex_ids, tex_matrix, offset);
 			postDraw();
 		}
 	}
@@ -160,11 +187,11 @@ public class MediaEffectDrawer {
 	 * 描画の前処理
 	 * テクスチャ変換行列/モデルビュー変換行列を代入, テクスチャをbindする
 	 * mSyncはロックされて呼び出される
-	 * @param tex_id texture ID
+	 * @param tex_ids texture ID
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void preDraw(final int tex_id, final float[] tex_matrix, final int offset) {
+	protected void preDraw(final int[] tex_ids, final float[] tex_matrix, final int offset) {
 		if ((muTexMatrixLoc >= 0) && (tex_matrix != null)) {
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
 		}
@@ -172,17 +199,19 @@ public class MediaEffectDrawer {
 			GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 		}
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(mTexTarget, tex_id);
+		GLES20.glBindTexture(mTexTarget, tex_ids[0]);
+		GLES20.glUniform1i(muTexLoc[0], 0);
+		// FIXME ここでmuTexLocを使う？
 	}
 
 	/**
 	 * 実際の描画実行, GLES20.glDrawArraysを呼び出すだけ
 	 * mSyncはロックされて呼び出される
-	 * @param tex_id texture ID
+	 * @param tex_ids texture ID
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void draw(final int tex_id, final float[] tex_matrix, final int offset) {
+	protected void draw(final int[] tex_ids, final float[] tex_matrix, final int offset) {
 //		if (DEBUG) Log.v(TAG, "draw");
 		// これが実際の描画
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
