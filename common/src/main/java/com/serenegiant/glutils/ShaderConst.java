@@ -37,6 +37,8 @@ public class ShaderConst {
 	public static final int KERNEL_SIZE3x3 = 9;
 	public static final int KERNEL_SIZE5x５ = 25;
 
+	public static final int NO_TEXTURE = -1;
+
 // 関数文字列定義
 	/**
 	 * RGBをHSVに変換
