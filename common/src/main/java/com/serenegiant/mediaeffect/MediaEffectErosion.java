@@ -30,7 +30,9 @@ public class MediaEffectErosion extends MediaEffectGLESBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectErosion";
 
-	private static class MediaEffectErosionDrawer extends MediaEffectDrawer {
+	private static class MediaEffectErosionDrawer
+		extends MediaEffectDrawer.MediaEffectSingleDrawer {
+
 		private final int muTexOffsetLoc;	// テクスチャオフセット
 		private final float[] mTexOffset = new float[82];
 		private float mTexWidth;

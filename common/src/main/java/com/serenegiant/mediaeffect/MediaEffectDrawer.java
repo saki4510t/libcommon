@@ -20,6 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.support.annotation.NonNull;
 
 import com.serenegiant.glutils.GLHelper;
 import com.serenegiant.glutils.TextureOffscreen;
@@ -43,43 +44,144 @@ public class MediaEffectDrawer {
 	private static final int VERTEX_NUM = 4;
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
-	protected final Object mSync = new Object();
-	private final int mTexTarget;
-	private final int muMVPMatrixLoc;
-	private final int muTexMatrixLoc;
-	private final int[] muTexLoc;
-	private final float[] mMvpMatrix = new float[16];
-	private int hProgram;
+	private static final int[] TEX_NUMBERS = {
+		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,
+		GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
+		GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5,
+		GLES20.GL_TEXTURE6, GLES20.GL_TEXTURE7,
+		GLES20.GL_TEXTURE8, GLES20.GL_TEXTURE9,
+		GLES20.GL_TEXTURE10, GLES20.GL_TEXTURE11,
+		GLES20.GL_TEXTURE12, GLES20.GL_TEXTURE13,
+		GLES20.GL_TEXTURE14, GLES20.GL_TEXTURE15,
+		GLES20.GL_TEXTURE16, GLES20.GL_TEXTURE17,
+		GLES20.GL_TEXTURE18, GLES20.GL_TEXTURE19,
+		GLES20.GL_TEXTURE20, GLES20.GL_TEXTURE21,
+		GLES20.GL_TEXTURE22, GLES20.GL_TEXTURE23,
+		GLES20.GL_TEXTURE24, GLES20.GL_TEXTURE25,
+		GLES20.GL_TEXTURE26, GLES20.GL_TEXTURE27,
+		GLES20.GL_TEXTURE28, GLES20.GL_TEXTURE29,
+		GLES20.GL_TEXTURE30, GLES20.GL_TEXTURE31,
+	};
+	
+	public static MediaEffectDrawer newInstance() {
+		return new MediaEffectSingleDrawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+	}
 
-	public MediaEffectDrawer() {
+	public static MediaEffectDrawer newInstance(final int numTex) {
+		if (numTex <= 1) {
+			return new MediaEffectSingleDrawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		} else {
+			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		}
+	}
+
+	public static MediaEffectDrawer newInstance(final String fss) {
+		return new MediaEffectSingleDrawer(false, VERTEX_SHADER, fss);
+	}
+
+	public static MediaEffectDrawer newInstance(final int numTex, final String fss) {
+		if (numTex <= 1) {
+			return new MediaEffectSingleDrawer(false, VERTEX_SHADER, fss);
+		} else {
+			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER, fss);
+		}
+	}
+
+	public static MediaEffectDrawer newInstance(final boolean isOES, final String fss) {
+		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+	}
+
+	public static MediaEffectDrawer newInstance(final int numTex, final boolean isOES, final String fss) {
+		if (numTex <= 1) {
+			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+		} else {
+			return new MediaEffectDrawer(numTex, isOES, VERTEX_SHADER, fss);
+		}
+	}
+
+	public static MediaEffectDrawer newInstance(final boolean isOES, final String vss, final String fss) {
+		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+	}
+	
+	public static MediaEffectDrawer newInstance(final int numTex,
+		final boolean isOES, final String vss, final String fss) {
+
+		if (numTex <= 1) {
+			return new MediaEffectSingleDrawer(isOES, vss, fss);
+		} else {
+			return new MediaEffectDrawer(numTex, isOES, vss, fss);
+		}
+	}
+	
+	/**
+	 * テクスチャを1枚しか使わない場合はこちらを使うこと
+	 */
+	protected static class MediaEffectSingleDrawer extends MediaEffectDrawer {
+		protected MediaEffectSingleDrawer(
+			final boolean isOES, final String vss, final String fss) {
+			super(1, isOES, vss, fss);
+		}
+
+		/**
+		 * テクスチャのバインド処理
+		 * mSyncはロックされて呼び出される
+		 * @param tex_ids texture ID
+		 */
+		protected void bindTexture(@NonNull final int[] tex_ids) {
+			if (tex_ids[0] != NO_TEXTURE) {
+				GLES20.glActiveTexture(TEX_NUMBERS[0]);
+				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
+				GLES20.glUniform1i(muTexLoc[0], 0);
+			}
+		}
+	
+		/**
+		 * 描画後の後処理, テクスチャのunbind, プログラムをデフォルトに戻す
+		 * mSyncはロックされて呼び出される
+		 */
+		protected void unbindTexture() {
+			GLES20.glActiveTexture(TEX_NUMBERS[0]);
+			GLES20.glBindTexture(mTexTarget, 0);
+		}
+	}
+
+	protected final Object mSync = new Object();
+	protected final int mTexTarget;
+	protected final int muMVPMatrixLoc;
+	protected final int muTexMatrixLoc;
+	protected final int[] muTexLoc;
+	protected final float[] mMvpMatrix = new float[16];
+	protected int hProgram;
+
+	protected MediaEffectDrawer() {
 		this(1, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
 	}
 
-	public MediaEffectDrawer(final int numTex) {
+	protected MediaEffectDrawer(final int numTex) {
 		this(numTex, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
 	}
 
-	public MediaEffectDrawer(final String fss) {
+	protected MediaEffectDrawer(final String fss) {
 		this(1, false, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectDrawer(final int numTex, final String fss) {
+	protected MediaEffectDrawer(final int numTex, final String fss) {
 		this(numTex, false, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectDrawer(final boolean isOES, final String fss) {
+	protected MediaEffectDrawer(final boolean isOES, final String fss) {
 		this(1, isOES, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectDrawer(final int numTex, final boolean isOES, final String fss) {
+	protected MediaEffectDrawer(final int numTex, final boolean isOES, final String fss) {
 		this(numTex, isOES, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectDrawer(final boolean isOES, final String vss, final String fss) {
+	protected MediaEffectDrawer(final boolean isOES, final String vss, final String fss) {
 		this(1, isOES, VERTEX_SHADER, fss);
 	}
 	
-	public MediaEffectDrawer(final int numTex,
+	protected MediaEffectDrawer(final int numTex,
 		final boolean isOES, final String vss, final String fss) {
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
@@ -174,7 +276,7 @@ public class MediaEffectDrawer {
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void apply(final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	protected void apply(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
 		synchronized (mSync) {
 			GLES20.glUseProgram(hProgram);
 			preDraw(tex_ids, tex_matrix, offset);
@@ -191,19 +293,28 @@ public class MediaEffectDrawer {
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void preDraw(final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	protected void preDraw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
 		if ((muTexMatrixLoc >= 0) && (tex_matrix != null)) {
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
 		}
 		if (muMVPMatrixLoc >= 0) {
 			GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 		}
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(mTexTarget, tex_ids[0]);
-		GLES20.glUniform1i(muTexLoc[0], 0);
-		// FIXME ここでmuTexLocを使う？
+		bindTexture(tex_ids);
 	}
 
+	protected void bindTexture(@NonNull final int[] tex_ids) {
+		final int n = tex_ids.length < muTexLoc.length
+			? tex_ids.length : muTexLoc.length;
+		for (int i = 0; i < n; i++) {
+			if (tex_ids[i] != NO_TEXTURE) {
+				GLES20.glActiveTexture(TEX_NUMBERS[i]);
+				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
+				GLES20.glUniform1i(muTexLoc[i], i);
+			}
+		}
+	}
+	
 	/**
 	 * 実際の描画実行, GLES20.glDrawArraysを呼び出すだけ
 	 * mSyncはロックされて呼び出される
@@ -211,7 +322,7 @@ public class MediaEffectDrawer {
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void draw(final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	protected void draw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
 //		if (DEBUG) Log.v(TAG, "draw");
 		// これが実際の描画
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
@@ -222,8 +333,14 @@ public class MediaEffectDrawer {
 	 * mSyncはロックされて呼び出される
 	 */
 	protected void postDraw() {
-		GLES20.glBindTexture(mTexTarget, 0);
+		unbindTexture();
         GLES20.glUseProgram(0);
 	}
 
+	protected void unbindTexture() {
+		for (int i = 0; i < muTexLoc.length; i++) {
+			GLES20.glActiveTexture(TEX_NUMBERS[i]);
+			GLES20.glBindTexture(mTexTarget, 0);
+		}
+	}
 }

@@ -39,29 +39,40 @@ public class MediaEffectGLESBase implements IEffect {
 
 	/**
 	 * フラグメントシェーダーを指定する場合のコンストラクタ(頂点シェーダーはデフォルトを使用)
+	 * @param numTex
 	 * @param shader
 	 */
-	public MediaEffectGLESBase(final String shader) {
-		this(new MediaEffectDrawer(false, VERTEX_SHADER, shader));
+	public MediaEffectGLESBase(final int numTex, final String shader) {
+		this(MediaEffectDrawer.newInstance(numTex, false, VERTEX_SHADER, shader));
 	}
 
 	/**
 	 * フラグメントシェーダーを指定する場合のコンストラクタ(頂点シェーダーはデフォルトを使用)
+	 * @param numTex
 	 * @param shader
 	 */
-	public MediaEffectGLESBase(final boolean isOES, final String shader) {
-		this(new MediaEffectDrawer(isOES, VERTEX_SHADER, shader));
+	public MediaEffectGLESBase(final int numTex,
+		final boolean isOES, final String shader) {
+
+		this(MediaEffectDrawer.newInstance(numTex, isOES, VERTEX_SHADER, shader));
 	}
 
 	/**
 	 * 頂点シェーダーとフラグメントシェーダーを指定する場合のコンストラクタ
+	 * @param numTex
 	 * @param vss
 	 * @param fss
 	 */
-	public MediaEffectGLESBase(final boolean isOES, final String vss, final String fss) {
-		this(new MediaEffectDrawer(isOES, vss, fss));
-	}
+	public MediaEffectGLESBase(final int numTex,
+		final boolean isOES, final String vss, final String fss) {
 
+		this(MediaEffectDrawer.newInstance(numTex, isOES, vss, fss));
+	}
+	
+	/**
+	 * コンストラクタ
+	 * @param drawer
+	 */
 	public MediaEffectGLESBase(final MediaEffectDrawer drawer) {
 		mDrawer = drawer;
 //		resize(256, 256);

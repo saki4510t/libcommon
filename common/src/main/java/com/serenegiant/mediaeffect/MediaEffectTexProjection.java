@@ -34,7 +34,9 @@ public class MediaEffectTexProjection extends MediaEffectGLESBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectTexProjection";
 
-	private static class MediaEffectTexProjectionDrawer extends MediaEffectDrawer {
+	private static class MediaEffectTexProjectionDrawer
+		extends MediaEffectDrawer.MediaEffectSingleDrawer {
+
 		private float[] texMatrix2 = new float[9];
 		private final int muTexMatrixLoc2;
 

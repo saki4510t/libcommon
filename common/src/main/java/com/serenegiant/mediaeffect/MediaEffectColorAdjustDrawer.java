@@ -23,7 +23,10 @@ import android.support.annotation.NonNull;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
-public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer {
+/**
+ * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ
+ */
+public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer.MediaEffectSingleDrawer {
 	private int muColorAdjustLoc;		// 色調整
 	private float mColorAdjust;
 

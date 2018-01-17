@@ -27,23 +27,32 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 	protected final MediaEffectKernel3x3Drawer mDrawer2;
 	protected TextureOffscreen mOutputOffscreen2;
 
-	public MediaEffectGLESTwoPassBase(final boolean isOES, final String fss) {
-		super(isOES, fss);
+	public MediaEffectGLESTwoPassBase(final int numTex,
+		final boolean isOES, final String fss) {
+
+		super(numTex, isOES, fss);
 		mDrawer2 = null;
 	}
 
-	public MediaEffectGLESTwoPassBase(final String vss, final String fss) {
-		super(false, vss, fss);
+	public MediaEffectGLESTwoPassBase(final int numTex,
+		final String vss, final String fss) {
+
+		super(numTex, false, vss, fss);
 		mDrawer2 = null;
 	}
 
-	public MediaEffectGLESTwoPassBase(final boolean isOES, final String vss, final String fss) {
-		super(isOES, vss, fss);
+	public MediaEffectGLESTwoPassBase(final int numTex,
+		final boolean isOES, final String vss, final String fss) {
+
+		super(numTex, isOES, vss, fss);
 		mDrawer2 = null;
 	}
 
-	public MediaEffectGLESTwoPassBase(final boolean isOES, final String vss1, final String fss1, final String vss2, final String fss2) {
-		super(isOES, vss1, fss1);
+	public MediaEffectGLESTwoPassBase(final int numTex, final boolean isOES,
+		final String vss1, final String fss1,
+		final String vss2, final String fss2) {
+
+		super(numTex, isOES, vss1, fss1);
 		if (!vss1.equals(vss2) || !fss1.equals(fss2)) {
 			mDrawer2 = new MediaEffectKernel3x3Drawer(isOES, vss2, fss2);
 		} else {

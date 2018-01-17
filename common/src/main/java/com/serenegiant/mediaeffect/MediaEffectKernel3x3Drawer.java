@@ -25,6 +25,10 @@ import com.serenegiant.glutils.GLHelper;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
+/**
+ * カーネル行列を用いた映像フィルタ処理
+ * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ
+ */
 public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 
 	public static final int KERNEL_SIZE = 9;
