@@ -19,6 +19,7 @@ package com.serenegiant.mediaeffect;
 */
 
 import android.opengl.GLES20;
+import android.support.annotation.NonNull;
 
 import com.serenegiant.glutils.GLHelper;
 
@@ -41,8 +42,10 @@ public class MediaEffectDilation extends MediaEffectGLESBase {
 		}
 
 		@Override
-		protected void preDraw(final int tex_id, final float[] tex_matrix, final int offset) {
-			super.preDraw(tex_id, tex_matrix, offset);
+		protected void preDraw(@NonNull final int[] tex_ids,
+			final float[] tex_matrix, final int offset) {
+
+			super.preDraw(tex_ids, tex_matrix, offset);
 			// テクセルオフセット
 			if (muTexOffsetLoc >= 0) {
 				GLES20.glUniform2fv(muTexOffsetLoc, 41, mTexOffset, 0);

@@ -19,6 +19,7 @@ package com.serenegiant.mediaeffect;
 */
 
 import android.opengl.GLES20;
+import android.support.annotation.NonNull;
 
 import com.serenegiant.glutils.GLHelper;
 
@@ -101,8 +102,10 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 	}
 
 	@Override
-	protected void preDraw(final int tex_id, final float[] tex_matrix, final int offset) {
-		super.preDraw(tex_id, tex_matrix, offset);
+	protected void preDraw(@NonNull final int[] tex_ids,
+		final float[] tex_matrix, final int offset) {
+
+		super.preDraw(tex_ids, tex_matrix, offset);
 		// カーネル関数(行列)
 		if (muKernelLoc >= 0) {
 			GLES20.glUniform1fv(muKernelLoc, KERNEL_SIZE, mKernel, 0);

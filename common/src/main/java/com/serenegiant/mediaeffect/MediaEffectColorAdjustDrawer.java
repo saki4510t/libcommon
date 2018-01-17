@@ -19,6 +19,7 @@ package com.serenegiant.mediaeffect;
 */
 
 import android.opengl.GLES20;
+import android.support.annotation.NonNull;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -49,8 +50,10 @@ public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer {
 	}
 
 	@Override
-	protected void preDraw(final int tex_id, final float[] tex_matrix, final int offset) {
-		super.preDraw(tex_id, tex_matrix, offset);
+	protected void preDraw(@NonNull final int[] tex_ids,
+		final float[] tex_matrix, final int offset) {
+
+		super.preDraw(tex_ids, tex_matrix, offset);
 		// 色調整オフセット
 		if (muColorAdjustLoc >= 0) {
 			GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);

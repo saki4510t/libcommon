@@ -20,6 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.graphics.Matrix;
 import android.opengl.GLES20;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.glutils.GLHelper;
@@ -45,13 +46,15 @@ public class MediaEffectTexProjection extends MediaEffectGLESBase {
 		}
 
 		@Override
-		protected void preDraw(final int tex_id, final float[] tex_matrix, final int offset) {
+		protected void preDraw(@NonNull final int[] tex_ids,
+			final float[] tex_matrix, final int offset) {
+
 			// テクスチャ変換行列をセット
 			if (muTexMatrixLoc2 >= 0) {
 				GLES20.glUniformMatrix3fv(muTexMatrixLoc2, 1, false, texMatrix2, 0);
 				GLHelper.checkGlError("glUniformMatrix3fv");
 			}
-			super.preDraw(tex_id, tex_matrix, offset);
+			super.preDraw(tex_ids, tex_matrix, offset);
 		}
 
 		public void reset() {

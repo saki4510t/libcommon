@@ -97,7 +97,7 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids[0], mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
@@ -112,11 +112,12 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 			mOutputOffscreen2.assignTexture(out_tex_id, width, height);
 		}
 		mOutputOffscreen2.bind();
+		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
 		try {
 			if (mDrawer2 != null) {
-				mDrawer2.apply(mOutputOffscreen.getTexture(), mOutputOffscreen2.getTexMatrix(), 0);
+				mDrawer2.apply(ids, mOutputOffscreen2.getTexMatrix(), 0);
 			} else {
-				mDrawer.apply(mOutputOffscreen.getTexture(), mOutputOffscreen2.getTexMatrix(), 0);
+				mDrawer.apply(ids, mOutputOffscreen2.getTexMatrix(), 0);
 			}
 		} finally {
 			mOutputOffscreen2.unbind();
@@ -136,17 +137,18 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids[0], mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
 		// パス2
 		output_tex.bind();
+		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
 		try {
 			if (mDrawer2 != null) {
-				mDrawer2.apply(mOutputOffscreen.getTexture(), output_tex.getTexMatrix(), 0);
+				mDrawer2.apply(ids, output_tex.getTexMatrix(), 0);
 			} else {
-				mDrawer.apply(mOutputOffscreen.getTexture(), output_tex.getTexMatrix(), 0);
+				mDrawer.apply(ids, output_tex.getTexMatrix(), 0);
 			}
 		} finally {
 			output_tex.unbind();
