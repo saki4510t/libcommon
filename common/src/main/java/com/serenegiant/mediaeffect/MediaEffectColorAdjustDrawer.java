@@ -26,7 +26,9 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ
  */
-public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer.MediaEffectSingleDrawer {
+public class MediaEffectColorAdjustDrawer
+	extends MediaEffectDrawer.MediaEffectSingleDrawer {
+
 	private int muColorAdjustLoc;		// 色調整
 	private float mColorAdjust;
 
@@ -34,11 +36,15 @@ public class MediaEffectColorAdjustDrawer extends MediaEffectDrawer.MediaEffectS
 		this(false, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectColorAdjustDrawer(final boolean isOES, final String fss) {
+	public MediaEffectColorAdjustDrawer(final boolean isOES,
+		final String fss) {
+
 		this(isOES, VERTEX_SHADER, fss);
 	}
 
-	public MediaEffectColorAdjustDrawer(final boolean isOES, final String vss, final String fss) {
+	public MediaEffectColorAdjustDrawer(final boolean isOES,
+		final String vss, final String fss) {
+
 		super(isOES, vss, fss);
 		muColorAdjustLoc = GLES20.glGetUniformLocation(getProgram(), "uColorAdjust");
 		if (muColorAdjustLoc < 0) {

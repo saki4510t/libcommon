@@ -30,7 +30,9 @@ public class MediaEffectBitmapOverlay extends MediaEffect {
 	 * @param effect_context
 	 * @param bitmap The overlay bitmap.
 	 */
-	public MediaEffectBitmapOverlay(final EffectContext effect_context, final Bitmap bitmap) {
+	public MediaEffectBitmapOverlay(final EffectContext effect_context,
+		final Bitmap bitmap) {
+
 		super(effect_context, EffectFactory.EFFECT_BITMAPOVERLAY);
 		setParameter(bitmap);
 	}

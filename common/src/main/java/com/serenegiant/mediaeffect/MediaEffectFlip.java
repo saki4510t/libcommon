@@ -30,7 +30,9 @@ public class MediaEffectFlip extends MediaEffect {
 	 * @param flip_vertical
 	 * @param flip_horizontal
 	 */
-	public MediaEffectFlip(final EffectContext effect_context, final boolean flip_vertical, final boolean flip_horizontal) {
+	public MediaEffectFlip(final EffectContext effect_context,
+		final boolean flip_vertical, final boolean flip_horizontal) {
+
 		super(effect_context, EffectFactory.EFFECT_FLIP);
 		setParameter(flip_vertical, flip_horizontal);
 	}
@@ -41,7 +43,9 @@ public class MediaEffectFlip extends MediaEffect {
 	 * @param flip_horizontal
 	 * @return
 	 */
-	public MediaEffectFlip setParameter(final boolean flip_vertical, final boolean flip_horizontal) {
+	public MediaEffectFlip setParameter(
+		final boolean flip_vertical, final boolean flip_horizontal) {
+
 		setParameter("vertical", flip_vertical);
 		setParameter("horizontal", flip_horizontal);
 		return this;

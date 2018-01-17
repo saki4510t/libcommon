@@ -27,7 +27,8 @@ public class MediaEffectAutoFix extends MediaEffect {
 	 * GLコンテキスト内で生成すること
 	 *
 	 * @param effect_context
-	 * @param scale The scale of the adjustment. between 0 and 1. Zero means no adjustment, while 1 indicates the maximum amount of adjustment.
+	 * @param scale The scale of the adjustment. between 0 and 1.
+	 * Zero means no adjustment, while 1 indicates the maximum amount of adjustment.
 	 */
 	public MediaEffectAutoFix(final EffectContext effect_context, final float scale) {
 		super(effect_context, EffectFactory.EFFECT_AUTOFIX);
@@ -35,7 +36,8 @@ public class MediaEffectAutoFix extends MediaEffect {
 	}
 
 	/**
-	 * @param scale The scale of the adjustment. between 0 and 1. Zero means no adjustment, while 1 indicates the maximum amount of adjustment.
+	 * @param scale The scale of the adjustment. between 0 and 1.
+	 * Zero means no adjustment, while 1 indicates the maximum amount of adjustment.
 	 * @return
 	 */
 	public MediaEffectAutoFix setParameter(final float scale) {

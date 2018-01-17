@@ -27,7 +27,9 @@ public class MediaEffectTint extends MediaEffect {
 	 * GLコンテキスト内で生成すること
 	 *
 	 * @param effect_context
-	 * @param tint The color of the tint. representing an ARGB color with 8 bits per channel. May be created using Color class.
+	 * @param tint The color of the tint.
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
 	 */
 	public MediaEffectTint(final EffectContext effect_context, final int tint) {
 		super(effect_context, EffectFactory.EFFECT_TINT);
@@ -35,7 +37,9 @@ public class MediaEffectTint extends MediaEffect {
 	}
 
 	/**
-	 * @param tint The color of the tint. representing an ARGB color with 8 bits per channel. May be created using Color class.
+	 * @param tint The color of the tint.
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
 	 * @return
 	 */
 	public MediaEffectTint setParameter(final int tint) {

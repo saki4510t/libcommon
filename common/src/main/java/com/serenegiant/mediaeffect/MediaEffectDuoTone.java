@@ -27,20 +27,32 @@ public class MediaEffectDuoTone extends MediaEffect {
 	 * GLコンテキスト内で生成すること
 	 *
 	 * @param effect_context
-	 * @param first_color The first color tone. representing an ARGB color with 8 bits per channel. May be created using Color class.
-	 * @param second_color The second color tone. Integer, representing an ARGB color with 8 bits per channel. May be created using Color class.
+	 * @param first_color The first color tone.
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
+	 * @param second_color The second color tone. Integer,
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
 	 */
-	public MediaEffectDuoTone(final EffectContext effect_context, final int first_color, final int second_color) {
+	public MediaEffectDuoTone(final EffectContext effect_context,
+		final int first_color, final int second_color) {
+
 		super(effect_context, EffectFactory.EFFECT_DUOTONE);
 		setParameter(first_color, second_color);
 	}
 
 	/**
-	 * @param first_color The first color tone. representing an ARGB color with 8 bits per channel. May be created using Color class.
-	 * @param second_color The second color tone. Integer, representing an ARGB color with 8 bits per channel. May be created using Color class.
+	 * @param first_color The first color tone.
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
+	 * @param second_color The second color tone. Integer,
+	 * 			representing an ARGB color with 8 bits per channel.
+	 * 			May be created using Color class.
 	 * @return
 	 */
-	public MediaEffectDuoTone setParameter(final int first_color, final int second_color) {
+	public MediaEffectDuoTone setParameter(
+		final int first_color, final int second_color) {
+
 		setParameter("first_color", first_color);
 		setParameter("second_color", second_color);
 		return this;

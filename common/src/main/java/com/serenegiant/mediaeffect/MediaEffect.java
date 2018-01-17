@@ -44,7 +44,9 @@ public class MediaEffect implements IEffect {
 	}
 
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids, final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] src_tex_ids,
+		final int width, final int height, final int out_tex_id) {
+
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src_tex_ids[0], width, height, out_tex_id);
 		}
@@ -53,7 +55,9 @@ public class MediaEffect implements IEffect {
 	@Override
 	public void apply(final ISource src) {
 		if (mEnabled && (mEffect != null)) {
-			mEffect.apply(src.getSourceTexId()[0], src.getWidth(), src.getHeight(), src.getOutputTexId());
+			mEffect.apply(src.getSourceTexId()[0],
+				src.getWidth(), src.getHeight(),
+				src.getOutputTexId());
 		}
 	}
 

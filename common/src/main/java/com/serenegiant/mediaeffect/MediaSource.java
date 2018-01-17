@@ -89,7 +89,9 @@ public class MediaSource implements ISource {
 				mSrcTexIds[0] = mSourceScreen.getTexture();
 			}
 			needSwap = !needSwap;
-//			effect.apply(mSrcTexIds, mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(), mOutputScreen.getTexture());
+//			effect.apply(mSrcTexIds,
+// 				mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(),
+// 				mOutputScreen.getTexture());
 			effect.apply(this); // このメソッド呼び出しは1つ上のコメントアウトしてある行と結果は等価だけど効率はいい。
 		}
 		return this;
@@ -157,7 +159,9 @@ public class MediaSource implements ISource {
 	 * @param tex_matrix
 	 * @return
 	 */
-	public MediaSource setSource(final GLDrawer2D drawer, final int tex_id, final float[] tex_matrix) {
+	public MediaSource setSource(final GLDrawer2D drawer,
+		final int tex_id, final float[] tex_matrix) {
+
 		mSourceScreen.bind();
 		try {
 			drawer.draw(tex_id, tex_matrix, 0);

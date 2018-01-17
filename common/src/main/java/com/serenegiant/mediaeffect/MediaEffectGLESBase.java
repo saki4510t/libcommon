@@ -172,7 +172,8 @@ public class MediaEffectGLESBase implements IEffect {
 	}
 
 	/**
-	 * if your source texture comes from ISource, please use this method instead of #apply(final int [], int, int, int)
+	 * if your source texture comes from ISource,
+	 * please use this method instead of #apply(final int [], int, int, int)
 	 * @param src
 	 */
 	@Override

@@ -123,7 +123,8 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 
 	public void setKernel(final float[] values, final float colorAdj) {
 		if ((values == null) || (values.length < KERNEL_SIZE)) {
-			throw new IllegalArgumentException("Kernel size is " + (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE);
+			throw new IllegalArgumentException("Kernel size is "
+				+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE);
 		}
 		synchronized (mSync) {
 			System.arraycopy(values, 0, mKernel, 0, KERNEL_SIZE);

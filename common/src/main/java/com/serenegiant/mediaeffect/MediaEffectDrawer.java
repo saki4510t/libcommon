@@ -91,7 +91,9 @@ public class MediaEffectDrawer {
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
 	}
 
-	public static MediaEffectDrawer newInstance(final int numTex, final boolean isOES, final String fss) {
+	public static MediaEffectDrawer newInstance(final int numTex,
+		final boolean isOES, final String fss) {
+
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
 		} else {
@@ -99,7 +101,9 @@ public class MediaEffectDrawer {
 		}
 	}
 
-	public static MediaEffectDrawer newInstance(final boolean isOES, final String vss, final String fss) {
+	public static MediaEffectDrawer newInstance(final boolean isOES,
+		final String vss, final String fss) {
+
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
 	}
 	
@@ -173,11 +177,15 @@ public class MediaEffectDrawer {
 		this(1, isOES, VERTEX_SHADER, fss);
 	}
 
-	protected MediaEffectDrawer(final int numTex, final boolean isOES, final String fss) {
+	protected MediaEffectDrawer(final int numTex,
+		final boolean isOES, final String fss) {
+
 		this(numTex, isOES, VERTEX_SHADER, fss);
 	}
 
-	protected MediaEffectDrawer(final boolean isOES, final String vss, final String fss) {
+	protected MediaEffectDrawer(final boolean isOES,
+		final String vss, final String fss) {
+
 		this(1, isOES, VERTEX_SHADER, fss);
 	}
 	
@@ -218,10 +226,12 @@ public class MediaEffectDrawer {
         	GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, mMvpMatrix, 0);
 		}
 		// 頂点座標配列を割り当てる
-		GLES20.glVertexAttribPointer(maPositionLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
+		GLES20.glVertexAttribPointer(maPositionLoc,
+			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		// テクスチャ座標配列を割り当てる
-		GLES20.glVertexAttribPointer(maTextureCoordLoc, 2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+		GLES20.glVertexAttribPointer(maTextureCoordLoc,
+			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
 	}
 
@@ -273,7 +283,8 @@ public class MediaEffectDrawer {
 	/**
 	 * preDraw => draw => postDrawを順に呼び出す
 	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
+	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
 	protected void apply(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
@@ -290,7 +301,8 @@ public class MediaEffectDrawer {
 	 * テクスチャ変換行列/モデルビュー変換行列を代入, テクスチャをbindする
 	 * mSyncはロックされて呼び出される
 	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
+	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
 	protected void preDraw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
@@ -319,7 +331,8 @@ public class MediaEffectDrawer {
 	 * 実際の描画実行, GLES20.glDrawArraysを呼び出すだけ
 	 * mSyncはロックされて呼び出される
 	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.領域チェックしていないのでoffsetから16個以上確保しておくこと
+	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
 	protected void draw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
