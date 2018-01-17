@@ -35,38 +35,6 @@ public class MediaEffectDrawer {
 	protected TextureOffscreen mOutputOffscreen;
 	protected boolean mEnabled = true;
 
-//	public static final String SHADER_VERSION = "#version 100\n";
-//	public static final String HEADER_2D = "";
-//	public static final String SAMPLER_2D = "sampler2D";
-
-//	public static final String HEADER_OES = "#extension GL_OES_EGL_image_external : require\n";
-//	public static final String SAMPLER_OES = "samplerExternalOES";
-
-//	public static final String VERTEX_SHADER = SHADER_VERSION +
-//		"uniform mat4 uMVPMatrix;\n" +		// モデルビュー変換行列
-//		"uniform mat4 uTexMatrix;\n" +		// テクスチャ変換行列
-//		"attribute highp vec4 aPosition;\n" +		// 頂点座標
-//		"attribute highp vec4 aTextureCoord;\n" +	// テクスチャ情報
-//		"varying highp vec2 vTextureCoord;\n" +	// フラグメントシェーダーへ引き渡すテクスチャ座標
-//		"void main() {\n" +
-//			"gl_Position = uMVPMatrix * aPosition;\n" +
-//			"vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
-//		"}\n";
-
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
-		"%s" +
-		"precision mediump float;\n" +
-		"varying vec2 vTextureCoord;\n" +
-		"uniform %s sTexture;\n" +
-		"void main() {\n" +
-			"gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-	"}\n";
-
-	protected static final String FRAGMENT_SHADER_2D
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
-	protected static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
-
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 

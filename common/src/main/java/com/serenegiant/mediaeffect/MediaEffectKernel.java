@@ -18,6 +18,8 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
+import com.serenegiant.glutils.ShaderConst;
+
 import static com.serenegiant.glutils.ShaderConst.*;
 
 public class MediaEffectKernel extends MediaEffectGLESBase {
@@ -25,7 +27,7 @@ public class MediaEffectKernel extends MediaEffectGLESBase {
 	private static final String TAG = "MediaEffectKernel";
 
 	public MediaEffectKernel() {
-		super(new MediaEffectKernel3x3Drawer(false, VERTEX_SHADER, MediaEffectKernel3x3Drawer.FRAGMENT_SHADER_2D));
+		super(new MediaEffectKernel3x3Drawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D));
 	}
 
 	public MediaEffectKernel(final float[] kernel) {
