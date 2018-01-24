@@ -1,7 +1,7 @@
 package com.serenegiant.glutils;
 /*
  * Copyright 2014 Google Inc. All rights reserved.
- * Modified 2014-2016 t_saki@serenegiant.com
+ * Modified 2014-2018 t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
