@@ -19,27 +19,36 @@
 
 package com.serenegiant.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.serenegiant.common.R;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 public abstract class BaseService extends Service {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = BaseService.class.getSimpleName();
 
+	private static final int NOTIFICATION_ID = R.string.service_name;
+
 	protected final Object mSync = new Object();
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	private Handler mAsyncHandler;
 	private LocalBroadcastManager mLocalBroadcastManager;
+	private NotificationManager mNotificationManager;
 	private volatile boolean mDestroyed;
 
 	@Override
@@ -48,6 +57,7 @@ public abstract class BaseService extends Service {
 		if (DEBUG) Log.v(TAG, "onCreate:");
 		final Context app_context = getApplicationContext();
 		synchronized (mSync) {
+			mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 			mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 			final IntentFilter filter = createIntentFilter();
 			if ((filter != null) && filter.countActions() > 0) {
@@ -80,6 +90,7 @@ public abstract class BaseService extends Service {
 				}
 				mLocalBroadcastManager = null;
 			}
+			mNotificationManager = null;
 		}
 		super.onDestroy();
 	}
@@ -122,22 +133,80 @@ public abstract class BaseService extends Service {
 	}
 
 //================================================================================
-//================================================================================
-	protected Handler getAsyncHandler() {
-		if (mDestroyed) throw new IllegalStateException("already destroyed");
+	/**
+	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
+	 * @param title_id
+	 * @param content_id
+	 * @param intent
+	 */
+	protected void showNotification(final int icon_id, final int title_id, final int content_id, final PendingIntent intent) {
 		synchronized (mSync) {
-			return mAsyncHandler;
+			if (mNotificationManager != null) {
+				try {
+					final String title = getString(title_id);
+					final String content = getString(content_id);
+					final Notification notification = new NotificationCompat.Builder(this, null)
+						.setContentTitle(title)
+						.setContentText(content)
+						.setSmallIcon(R.drawable.ic_notification)  // the status icon
+						.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification))
+						.setStyle(new NotificationCompat.BigTextStyle()
+							.setBigContentTitle(title)
+							.bigText(content)
+							.setSummaryText(content))
+						.setContentIntent(intent)
+						.build();
+					startForeground(NOTIFICATION_ID, notification);
+					mNotificationManager.notify(NOTIFICATION_ID, notification);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
+			}
 		}
 	}
 
-	protected void runOnUiThread(final Runnable task) {
+	/**
+	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
+	 */
+	protected void releaseNotification() {
+		showNotification(R.drawable.ic_notification, R.string.service_name, R.string.service_stop, null);
+		stopForeground(true);
+		synchronized (mSync) {
+			if (mNotificationManager != null) {
+				mNotificationManager.cancel(NOTIFICATION_ID);
+				mNotificationManager = null;
+			}
+		}
+	}
+
+	/**
+	 * 通知領域からアクティビティを起動するためのインテントを生成する
+	 * @return
+	 */
+	protected abstract PendingIntent contextIntent();
+
+//================================================================================
+	/**
+	 * メインスレッド/UIスレッド上で処理を実行する
+	 * @param task
+	 * @throws IllegalStateException
+	 */
+	protected void runOnUiThread(final Runnable task) throws IllegalStateException {
 		if (task == null) return;
 		if (mDestroyed) throw new IllegalStateException("already destroyed");
 		mUIHandler.removeCallbacks(task);
 		mUIHandler.post(task);
 	}
 
-	protected void runOnUiThread(@Nullable final Runnable task, final long delay) {
+	/**
+	 * メインスレッド/UIスレッド上で処理を実行する
+	 * @param task
+	 * @param delay
+	 * @throws IllegalStateException
+	 */
+	protected void runOnUiThread(@Nullable final Runnable task, final long delay)
+		throws IllegalStateException {
+
 		if (task == null) return;
 		if (mDestroyed) throw new IllegalStateException("already destroyed");
 		mUIHandler.removeCallbacks(task);
@@ -148,16 +217,31 @@ public abstract class BaseService extends Service {
 		}
 	}
 
+	/**
+	 * メインスレッド/UIスレッドの実行予定の処理をキャンセルする
+	 * @param task
+	 */
 	protected void removeFromUiThread(@Nullable final Runnable task) {
 		mUIHandler.removeCallbacks(task);
 	}
 
+	/**
+	 * ワーカースレッド上で処理を実行する
+	 * @param task
+	 * @throws IllegalStateException
+	 */
 	protected void queueEvent(@Nullable final Runnable task) throws IllegalStateException {
 		if (task == null) return;
 		if (mDestroyed) throw new IllegalStateException("already destroyed");
 		queueEvent(task, 0);
 	}
 
+	/**
+	 * ワーカースレッド上で処理を実行する
+	 * @param task
+	 * @param delay
+	 * @throws IllegalStateException
+	 */
 	protected void queueEvent(@Nullable final Runnable task, final long delay) throws IllegalStateException {
 		if (task == null) return;
 		if (mDestroyed) throw new IllegalStateException("already destroyed");
@@ -175,6 +259,10 @@ public abstract class BaseService extends Service {
 		}
 	}
 
+	/**
+	 * ワーカースレッドの上の処理をキャンセルする
+	 * @param task
+	 */
 	protected void removeEvent(@Nullable final Runnable task) {
 		synchronized (mSync) {
 			if (mAsyncHandler != null) {
@@ -183,4 +271,10 @@ public abstract class BaseService extends Service {
 		}
 	}
 
+	protected Handler getAsyncHandler() throws IllegalStateException {
+		if (mDestroyed) throw new IllegalStateException("already destroyed");
+		synchronized (mSync) {
+			return mAsyncHandler;
+		}
+	}
 }
