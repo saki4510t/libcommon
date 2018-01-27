@@ -30,7 +30,10 @@ import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.DrawableRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -135,29 +138,58 @@ public abstract class BaseService extends Service {
 //================================================================================
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
-	 * @param title_id
-	 * @param content_id
+	 * @param smallIconId
+	 * @param titleIdd
+	 * @param contentId
 	 * @param intent
 	 */
-	protected void showNotification(final int icon_id, final int title_id, final int content_id, final PendingIntent intent) {
+	protected void showNotification(@DrawableRes final int smallIconId,
+		@StringRes final int titleIdd, @StringRes final int contentId,
+		final PendingIntent intent) {
+
+		showNotification(NOTIFICATION_ID,
+			getString(R.string.service_name),
+			smallIconId, R.drawable.ic_notification,
+			titleIdd, contentId, intent);
+	}
+	
+	/**
+	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
+	 * @param notificationId
+	 * @param smallIconId
+	 * @param titleIdd
+	 * @param contentId
+	 * @param intent
+	 */
+	protected void showNotification(final int notificationId,
+		@NonNull final String channelId,
+		@DrawableRes final int smallIconId,
+		@DrawableRes final int largeIconId,
+		@StringRes final int titleIdd, @StringRes final int contentId,
+		final PendingIntent intent) {
+
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
 				try {
-					final String title = getString(title_id);
-					final String content = getString(content_id);
-					final Notification notification = new NotificationCompat.Builder(this, null)
+					final String title = getString(titleIdd);
+					final String content = getString(contentId);
+					final NotificationCompat.Builder builder
+						= new NotificationCompat.Builder(this, channelId)
 						.setContentTitle(title)
 						.setContentText(content)
-						.setSmallIcon(R.drawable.ic_notification)  // the status icon
-						.setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.ic_notification))
+						.setSmallIcon(smallIconId)  // the status icon
 						.setStyle(new NotificationCompat.BigTextStyle()
 							.setBigContentTitle(title)
 							.bigText(content)
 							.setSummaryText(content))
-						.setContentIntent(intent)
-						.build();
-					startForeground(NOTIFICATION_ID, notification);
-					mNotificationManager.notify(NOTIFICATION_ID, notification);
+						.setContentIntent(intent);
+					if (largeIconId != 0) {
+						builder.setLargeIcon(
+							BitmapFactory.decodeResource(getResources(), largeIconId));
+					}
+					final Notification notification = builder.build();
+					startForeground(notificationId, notification);
+					mNotificationManager.notify(notificationId, notification);
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
@@ -169,11 +201,26 @@ public abstract class BaseService extends Service {
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
 	protected void releaseNotification() {
-		showNotification(R.drawable.ic_notification, R.string.service_name, R.string.service_stop, null);
+		releaseNotification(NOTIFICATION_ID,
+			getString(R.string.service_name),
+			R.drawable.ic_notification, R.drawable.ic_notification,
+			R.string.service_name, R.string.service_stop);
+	}
+	
+	/**
+	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
+	 */
+	protected void releaseNotification(final int notificationId,
+		@NonNull final String channelId,
+		@DrawableRes final int smallIconId,
+		@DrawableRes final int largeIconId,
+		@StringRes final int titleIdd, @StringRes final int contentId) {
+
+		showNotification(notificationId, channelId, smallIconId, largeIconId, titleIdd, contentId, null);
 		stopForeground(true);
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
-				mNotificationManager.cancel(NOTIFICATION_ID);
+				mNotificationManager.cancel(notificationId);
 				mNotificationManager = null;
 			}
 		}
