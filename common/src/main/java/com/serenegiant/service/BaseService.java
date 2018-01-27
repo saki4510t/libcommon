@@ -82,7 +82,9 @@ public abstract class BaseService extends Service {
 		if (DEBUG) Log.v(TAG, "onDestroy:");
 		mDestroyed = true;
 		synchronized (mSync) {
+			mUIHandler.removeCallbacksAndMessages(null);
 			if (mAsyncHandler != null) {
+				mAsyncHandler.removeCallbacksAndMessages(null);
 				try {
 					mAsyncHandler.getLooper().quit();
 				} catch (final Exception e) {
