@@ -19,7 +19,10 @@
 
 package com.serenegiant.service;
 
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -28,6 +31,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.support.annotation.DrawableRes;
@@ -39,6 +43,7 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 public abstract class BaseService extends Service {
@@ -157,7 +162,7 @@ public abstract class BaseService extends Service {
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param notificationId
 	 * @param smallIconId
-	 * @param titleIdd
+	 * @param titleId
 	 * @param contentId
 	 * @param intent
 	 */
@@ -165,7 +170,7 @@ public abstract class BaseService extends Service {
 		@NonNull final String channelId,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleIdd, @StringRes final int contentId,
+		@StringRes final int titleId, @StringRes final int contentId,
 		final PendingIntent intent) {
 
 		synchronized (mSync) {
@@ -174,7 +179,7 @@ public abstract class BaseService extends Service {
 					final NotificationCompat.Builder builder
 						= createNotificationBuilder(notificationId,
 							channelId, smallIconId, largeIconId,
-							titleIdd, contentId, intent);
+							titleId, contentId, intent);
 					final Notification notification = createNotification(builder);
 					startForeground(notificationId, notification);
 					mNotificationManager.notify(notificationId, notification);
@@ -199,6 +204,23 @@ public abstract class BaseService extends Service {
 		return builder.build();
 	}
 	
+	@TargetApi(Build.VERSION_CODES.O)
+	protected final String createNotificationChannel(
+		@NonNull final String channelId,
+		@NonNull final String title) {
+
+		final NotificationManager manager
+			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		if (manager.getNotificationChannel(channelId) == null) {
+			final NotificationChannel channel
+					= new NotificationChannel(channelId, title, NotificationManager.IMPORTANCE_HIGH);
+			channel.setImportance(NotificationManager.IMPORTANCE_NONE);
+			channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+			manager.createNotificationChannel(channel);
+		}
+	    return channelId;
+	}
+
 	/**
 	 * NotificationCompat.Builderを生成する
 	 * #showNotificationを呼び出す際に割り込めるように
@@ -221,6 +243,9 @@ public abstract class BaseService extends Service {
 
 		final String title = getString(titleIdd);
 		final String content = getString(contentId);
+		if (BuildCheck.isOreo()) {
+			createNotificationChannel(channelId, title);
+		}
 		final NotificationCompat.Builder builder
 			= new NotificationCompat.Builder(this, channelId)
 			.setContentTitle(title)
@@ -251,6 +276,7 @@ public abstract class BaseService extends Service {
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
+	@SuppressLint("NewApi")
 	protected void releaseNotification(final int notificationId,
 		@NonNull final String channelId,
 		@DrawableRes final int smallIconId,
@@ -262,7 +288,13 @@ public abstract class BaseService extends Service {
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
 				mNotificationManager.cancel(notificationId);
-				mNotificationManager = null;
+				if (BuildCheck.isOreo()) {
+					try {
+						mNotificationManager.deleteNotificationChannel(channelId);
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
+				}
 			}
 		}
 	}
