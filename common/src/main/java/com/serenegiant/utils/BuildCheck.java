@@ -425,4 +425,28 @@ public final class BuildCheck {
 	public static boolean isOreo() {
 		return check(Build.VERSION_CODES.O);
 	}
+	
+	/**
+	 * おれおれぇー API>=26
+	 * @return
+	 */
+	public static boolean isAndroid8() {
+		return check(Build.VERSION_CODES.O);
+	}
+	
+	/**
+	 * おれおれぇー API>=27
+	 * @return
+	 */
+	public static boolean isOMR1() {
+		return check(Build.VERSION_CODES.O_MR1);
+	}
+
+	/**
+	 * おれおれぇー MR1 API>=27
+	 * @return
+	 */
+	public static boolean isOreoMR1() {
+		return check((Build.VERSION_CODES.O_MR1));
+	}
 }
