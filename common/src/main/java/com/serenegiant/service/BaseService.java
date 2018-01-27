@@ -171,23 +171,11 @@ public abstract class BaseService extends Service {
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
 				try {
-					final String title = getString(titleIdd);
-					final String content = getString(contentId);
 					final NotificationCompat.Builder builder
-						= new NotificationCompat.Builder(this, channelId)
-						.setContentTitle(title)
-						.setContentText(content)
-						.setSmallIcon(smallIconId)  // the status icon
-						.setStyle(new NotificationCompat.BigTextStyle()
-							.setBigContentTitle(title)
-							.bigText(content)
-							.setSummaryText(content))
-						.setContentIntent(intent);
-					if (largeIconId != 0) {
-						builder.setLargeIcon(
-							BitmapFactory.decodeResource(getResources(), largeIconId));
-					}
-					final Notification notification = builder.build();
+						= createNotificationBuilder(notificationId,
+							channelId, smallIconId, largeIconId,
+							titleIdd, contentId, intent);
+					final Notification notification = createNotification(builder);
 					startForeground(notificationId, notification);
 					mNotificationManager.notify(notificationId, notification);
 				} catch (final Exception e) {
@@ -196,7 +184,60 @@ public abstract class BaseService extends Service {
 			}
 		}
 	}
+	
+	/**
+	 * NotificationCompat.BuilderからNotificationを生成する
+	 * #showNotificationを呼び出す際に割り込めるように。
+	 * このメソッドでは単にNotificationCompat.Builder#buildを呼ぶだけ
+	 * @param builder
+	 * @return
+	 */
+	@NonNull
+	protected Notification createNotification(
+		@NonNull final NotificationCompat.Builder builder) {
+		
+		return builder.build();
+	}
+	
+	/**
+	 * NotificationCompat.Builderを生成する
+	 * #showNotificationを呼び出す際に割り込めるように
+	 * @param notificationId
+	 * @param channelId
+	 * @param smallIconId
+	 * @param largeIconId
+	 * @param titleIdd
+	 * @param contentId
+	 * @param intent
+	 * @return
+	 */
+	protected NotificationCompat.Builder createNotificationBuilder(
+		final int notificationId,
+		@NonNull final String channelId,
+		@DrawableRes final int smallIconId,
+		@DrawableRes final int largeIconId,
+		@StringRes final int titleIdd, @StringRes final int contentId,
+		final PendingIntent intent) {
 
+		final String title = getString(titleIdd);
+		final String content = getString(contentId);
+		final NotificationCompat.Builder builder
+			= new NotificationCompat.Builder(this, channelId)
+			.setContentTitle(title)
+			.setContentText(content)
+			.setSmallIcon(smallIconId)  // the status icon
+			.setStyle(new NotificationCompat.BigTextStyle()
+				.setBigContentTitle(title)
+				.bigText(content)
+				.setSummaryText(content))
+			.setContentIntent(intent);
+		if (largeIconId != 0) {
+			builder.setLargeIcon(
+				BitmapFactory.decodeResource(getResources(), largeIconId));
+		}
+		return builder;
+	}
+	
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
