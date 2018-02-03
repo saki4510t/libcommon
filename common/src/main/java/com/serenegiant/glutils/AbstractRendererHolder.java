@@ -373,7 +373,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 	protected abstract static class BaseRendererTask extends EglTask {
-		private final Object mClientSync = new Object();
 		private final SparseArray<RendererSurfaceRec> mClients
 			= new SparseArray<RendererSurfaceRec>();
 		private final AbstractRendererHolder mParent;
@@ -520,19 +519,19 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				throw new IllegalArgumentException(
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				if (mClients.get(id) == null) {
 					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
-								mClientSync.wait();
+								mClients.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
 							break;
 						} else {
 							try {
-								mClientSync.wait(10);
+								mClients.wait(10);
 							} catch (InterruptedException e) {
 								break;
 							}
@@ -547,19 +546,19 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param id
 		 */
 		public void removeSurface(final int id) {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				if (mClients.get(id) != null) {
 					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_REMOVE_SURFACE, id)) {
 							try {
-								mClientSync.wait();
+								mClients.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
 							break;
 						} else {
 							try {
-								mClientSync.wait(10);
+								mClients.wait(10);
 							} catch (InterruptedException e) {
 								break;
 							}
@@ -591,14 +590,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 		
 		public boolean isEnabled(final int id) {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final RendererSurfaceRec rec = mClients.get(id);
 				return rec != null && rec.isEnabled();
 			}
 		}
 		
 		public void setEnabled(final int id, final boolean enable) {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final RendererSurfaceRec rec = mClients.get(id);
 				if (rec != null) {
 					rec.setEnabled(enable);
@@ -611,7 +610,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public int getCount() {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				return mClients.size();
 			}
 		}
@@ -693,7 +692,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mParent.notifyCapture();
 			preprocess();
 			// 各Surfaceへ描画する
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final int n = mClients.size();
 				RendererSurfaceRec client;
 				for (int i = n - 1; i >= 0; i--) {
@@ -730,7 +729,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				RendererSurfaceRec client = mClients.get(id);
 				if (client == null) {
 					try {
@@ -743,7 +742,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				} else {
 					Log.w(TAG, "surface is already added: id=" + id);
 				}
-				mClientSync.notifyAll();
+				mClients.notifyAll();
 			}
 		}
 	
@@ -753,7 +752,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		protected void handleRemoveSurface(final int id) {
 	//			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final RendererSurfaceRec client = mClients.get(id);
 				if (client != null) {
 					mClients.remove(id);
@@ -763,7 +762,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					client.release();
 				}
 				checkSurface();
-				mClientSync.notifyAll();
+				mClients.notifyAll();
 			}
 		}
 				
@@ -772,7 +771,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		protected void handleRemoveAll() {
 	//			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final int n = mClients.size();
 				RendererSurfaceRec client;
 				for (int i = 0; i < n; i++) {
@@ -794,7 +793,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		protected void checkSurface() {
 	//			if (DEBUG) Log.v(TAG, "checkSurface");
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
@@ -815,7 +814,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param color
 		 */
 		protected void handleClear(final int id, final int color) {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final RendererSurfaceRec client = mClients.get(id);
 				if ((client != null) && client.isValid()) {
 					client.clear(color);
@@ -828,7 +827,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param color
 		 */
 		protected void handleClearAll(final int color) {
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
@@ -850,7 +849,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 			if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
 				final float[] array = (float[])mvp;
-				synchronized (mClientSync) {
+				synchronized (mClients) {
 					final RendererSurfaceRec client = mClients.get(id);
 					if ((client != null) && client.isValid()) {
 						System.arraycopy(array, offset, client.mMvpMatrix, 0, 16);
@@ -916,7 +915,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		protected void handleMirror(final int mirror) {
 			mMirror = mirror;
-			synchronized (mClientSync) {
+			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
