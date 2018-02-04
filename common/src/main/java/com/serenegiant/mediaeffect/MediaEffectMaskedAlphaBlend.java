@@ -62,7 +62,7 @@ public class MediaEffectMaskedAlphaBlend extends MediaEffectGLESBase {
 	 * @param isOES
 	 */
 	public MediaEffectMaskedAlphaBlend(final boolean isOES) {
-		super(new MediaEffectDrawer(3,
+		super(MediaEffectDrawer.newInstance(3,
 			isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER));
 	}
 }
