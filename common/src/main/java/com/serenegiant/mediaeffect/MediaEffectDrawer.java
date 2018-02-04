@@ -44,24 +44,24 @@ public class MediaEffectDrawer {
 	private static final int VERTEX_NUM = 4;
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
-	private static final int[] TEX_NUMBERS = {
-		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,
-		GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
-		GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5,
-		GLES20.GL_TEXTURE6, GLES20.GL_TEXTURE7,
-		GLES20.GL_TEXTURE8, GLES20.GL_TEXTURE9,
-		GLES20.GL_TEXTURE10, GLES20.GL_TEXTURE11,
-		GLES20.GL_TEXTURE12, GLES20.GL_TEXTURE13,
-		GLES20.GL_TEXTURE14, GLES20.GL_TEXTURE15,
-		GLES20.GL_TEXTURE16, GLES20.GL_TEXTURE17,
-		GLES20.GL_TEXTURE18, GLES20.GL_TEXTURE19,
-		GLES20.GL_TEXTURE20, GLES20.GL_TEXTURE21,
-		GLES20.GL_TEXTURE22, GLES20.GL_TEXTURE23,
-		GLES20.GL_TEXTURE24, GLES20.GL_TEXTURE25,
-		GLES20.GL_TEXTURE26, GLES20.GL_TEXTURE27,
-		GLES20.GL_TEXTURE28, GLES20.GL_TEXTURE29,
-		GLES20.GL_TEXTURE30, GLES20.GL_TEXTURE31,
-	};
+//	private static final int[] TEX_NUMBERS = {
+//		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,
+//		GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
+//		GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5,
+//		GLES20.GL_TEXTURE6, GLES20.GL_TEXTURE7,
+//		GLES20.GL_TEXTURE8, GLES20.GL_TEXTURE9,
+//		GLES20.GL_TEXTURE10, GLES20.GL_TEXTURE11,
+//		GLES20.GL_TEXTURE12, GLES20.GL_TEXTURE13,
+//		GLES20.GL_TEXTURE14, GLES20.GL_TEXTURE15,
+//		GLES20.GL_TEXTURE16, GLES20.GL_TEXTURE17,
+//		GLES20.GL_TEXTURE18, GLES20.GL_TEXTURE19,
+//		GLES20.GL_TEXTURE20, GLES20.GL_TEXTURE21,
+//		GLES20.GL_TEXTURE22, GLES20.GL_TEXTURE23,
+//		GLES20.GL_TEXTURE24, GLES20.GL_TEXTURE25,
+//		GLES20.GL_TEXTURE26, GLES20.GL_TEXTURE27,
+//		GLES20.GL_TEXTURE28, GLES20.GL_TEXTURE29,
+//		GLES20.GL_TEXTURE30, GLES20.GL_TEXTURE31,
+//	};
 	
 	public static MediaEffectDrawer newInstance() {
 		return new MediaEffectSingleDrawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
@@ -132,8 +132,8 @@ public class MediaEffectDrawer {
 		 * @param tex_ids texture ID
 		 */
 		protected void bindTexture(@NonNull final int[] tex_ids) {
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			if (tex_ids[0] != NO_TEXTURE) {
-				GLES20.glActiveTexture(TEX_NUMBERS[0]);
 				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
 			}
@@ -144,7 +144,7 @@ public class MediaEffectDrawer {
 		 * mSyncはロックされて呼び出される
 		 */
 		protected void unbindTexture() {
-			GLES20.glActiveTexture(TEX_NUMBERS[0]);
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}
@@ -318,9 +318,9 @@ public class MediaEffectDrawer {
 	protected void bindTexture(@NonNull final int[] tex_ids) {
 		final int n = tex_ids.length < muTexLoc.length
 			? tex_ids.length : muTexLoc.length;
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		for (int i = 0; i < n; i++) {
 			if (tex_ids[i] != NO_TEXTURE) {
-				GLES20.glActiveTexture(TEX_NUMBERS[i]);
 				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);
 			}
@@ -351,8 +351,8 @@ public class MediaEffectDrawer {
 	}
 
 	protected void unbindTexture() {
+		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		for (int i = 0; i < muTexLoc.length; i++) {
-			GLES20.glActiveTexture(TEX_NUMBERS[i]);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}
