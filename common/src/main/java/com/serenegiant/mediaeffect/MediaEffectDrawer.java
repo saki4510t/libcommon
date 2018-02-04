@@ -287,7 +287,7 @@ public class MediaEffectDrawer {
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void apply(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	public void apply(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
 		synchronized (mSync) {
 			GLES20.glUseProgram(hProgram);
 			preDraw(tex_ids, tex_matrix, offset);
