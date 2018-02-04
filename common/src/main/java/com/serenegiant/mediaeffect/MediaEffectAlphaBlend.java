@@ -68,7 +68,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 		 * @param isOES
 		 */
 		protected MediaEffectAlphaBlendDrawer(final float initMixRate, final boolean isOES) {
-			super(2, isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER);
+			super(2, isOES, isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER);
 			int loc = GLES20.glGetUniformLocation(getProgram(), "uMixRate");
 			if (loc < 0) {
 				loc = -1;
