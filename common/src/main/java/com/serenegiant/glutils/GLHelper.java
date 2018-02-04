@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
@@ -92,6 +93,130 @@ public final class GLHelper {
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, mag_filter);
 		return tex[0];
 	}
+	
+	/**
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+	 * @param n 生成するテキスチャ名の数, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
+	 * @param texTarget
+	 * @param filter_param
+	 * @return
+	 */
+	public static int[] initTexes(final int n,
+		final int texTarget, final int filter_param) {
+		
+		return initTexes(new int[n], texTarget,
+			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+	}
+
+	/**
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+	 * @param texIds テクスチャ名配列, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
+	 * @param texTarget
+	 * @param filter_param
+	 * @return
+	 */
+	public static int[] initTexes(@NonNull final int[] texIds,
+		final int texTarget, final int filter_param) {
+		
+		return initTexes(texIds, texTarget,
+			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+	}
+
+	/**
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+ 	 * @param n 生成するテキスチャ名の数, 最大32
+	 * @param texTarget
+	 * @param min_filter
+	 * @param mag_filter
+	 * @param wrap
+	 * @return
+	 */
+	public static int[] initTexes(final int n,
+		final int texTarget, final int min_filter, final int mag_filter, final int wrap) {
+		
+		return initTexes(new int[n], texTarget, min_filter, mag_filter, wrap);
+	}
+
+	/**
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+	 * @param texIds テクスチャ名配列, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
+	 * @param texTarget
+	 * @param min_filter
+	 * @param mag_filter
+	 * @param wrap
+	 * @return
+	 */
+	public static int[] initTexes(@NonNull final int[] texIds,
+		final int texTarget, final int min_filter, final int mag_filter, final int wrap) {
+
+		int[] textureUnits = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
+		final int n = texIds.length > textureUnits[0]
+			? textureUnits[0] : texIds.length;
+		for (int i = 0; i < n; i++) {
+			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
+				min_filter, mag_filter, wrap);
+		}
+		return texIds;
+	}
+	
+	/**
+	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
+	 * @param n 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
+	 * @param texTarget
+	 * @param texUnit
+	 * @param min_filter
+	 * @param mag_filter
+	 * @param wrap
+	 * @return
+	 */
+	public static int[] initTexes(final int n,
+		final int texTarget, final int texUnit,
+			final int min_filter, final int mag_filter, final int wrap) {
+
+		return initTexes(new int[n], texTarget, texUnit,
+			min_filter, mag_filter, wrap);
+	}
+	
+	/**
+	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
+	 * @param texIds 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
+	 * @param texTarget
+	 * @param texUnit
+	 * @param filter_param
+	 * @return
+	 */
+	public static int[] initTexes(@NonNull final int[] texIds,
+		final int texTarget, final int texUnit, final int filter_param) {
+		
+		return initTexes(texIds, texTarget, texUnit,
+			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+	}
+	
+	/**
+	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
+	 * @param texIds
+	 * @param texTarget
+	 * @param texUnit
+	 * @param min_filter
+	 * @param mag_filter
+	 * @param wrap
+	 * @return
+	 */
+	public static int[] initTexes(@NonNull final int[] texIds,
+		final int texTarget, final int texUnit,
+		final int min_filter, final int mag_filter, final int wrap) {
+
+		int[] textureUnits = new int[1];
+		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
+		final int n = texIds.length > textureUnits[0]
+			? textureUnits[0] : texIds.length;
+		for (int i = 0; i < n; i++) {
+			texIds[i] = GLHelper.initTex(texTarget, texUnit,
+				min_filter, mag_filter, wrap);
+		}
+		return texIds;
+	}
 
 	/**
 	 * delete specific texture
@@ -102,7 +227,21 @@ public final class GLHelper {
 		GLES20.glDeleteTextures(1, tex, 0);
 	}
 
+	/**
+	 * delete specific texture
+	 */
+	public static void deleteTex(@NonNull final int[] tex) {
+//		if (DEBUG) Log.v(TAG, "deleteTex:");
+		GLES20.glDeleteTextures(tex.length, tex, 0);
+	}
+
 	public static int loadTextureFromResource(final Context context, final int resId) {
+		return loadTextureFromResource(context, resId, null);
+	}
+	
+	@SuppressLint("NewApi")
+	@SuppressWarnings("deprecation")
+	public static int loadTextureFromResource(final Context context, final int resId, final Resources.Theme theme) {
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
 		// get a canvas to paint over the bitmap
@@ -111,7 +250,12 @@ public final class GLHelper {
 
 		// get a background image from resources
 		// note the image format must match the bitmap format
-		final Drawable background = context.getResources().getDrawable(resId);
+		final Drawable background;
+		if (BuildCheck.isAndroid5()) {
+			background = context.getResources().getDrawable(resId, theme);
+		} else {
+			background = context.getResources().getDrawable(resId);
+		}
 		background.setBounds(0, 0, 256, 256);
 		background.draw(canvas); // draw the background to our bitmap
 
