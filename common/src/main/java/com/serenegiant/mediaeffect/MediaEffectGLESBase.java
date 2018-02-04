@@ -171,6 +171,19 @@ public class MediaEffectGLESBase implements IEffect {
 		}
 	}
 
+	@Override
+	public void apply(@NonNull final int [] src_tex_ids,
+		@NonNull final TextureOffscreen output) {
+
+		if (!mEnabled) return;
+		output.bind();
+		try {
+			mDrawer.apply(src_tex_ids, output.getTexMatrix(), 0);
+		} finally {
+			output.unbind();
+		}
+	}
+
 	/**
 	 * if your source texture comes from ISource,
 	 * please use this method instead of #apply(final int [], int, int, int)

@@ -136,6 +136,37 @@ public class MediaEffectGLESTwoPassBase extends MediaEffectGLESBase {
 	}
 
 	@Override
+	public void apply(@NonNull final int[] src_tex_ids,
+		@NonNull final TextureOffscreen output) {
+
+
+		if (!mEnabled) return;
+		// パス1
+		if (mOutputOffscreen == null) {
+			mOutputOffscreen = new TextureOffscreen(
+				output.getWidth(), output.getHeight(), false);
+		}
+		mOutputOffscreen.bind();
+		try {
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
+		} finally {
+			mOutputOffscreen.unbind();
+		}
+		// パス2
+		output.bind();
+		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
+		try {
+			if (mDrawer2 != null) {
+				mDrawer2.apply(ids, output.getTexMatrix(), 0);
+			} else {
+				mDrawer.apply(ids, output.getTexMatrix(), 0);
+			}
+		} finally {
+			output.unbind();
+		}
+	}
+	
+	@Override
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
 		final TextureOffscreen output_tex = src.getOutputTexture();
