@@ -59,7 +59,16 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 		 * @param initMixRate
 		 */
 		protected MediaEffectAlphaBlendDrawer(final float initMixRate) {
-			super(2, FRAGMENT_SHADER);
+			this(initMixRate, false);
+		}
+		
+		/**
+		 * コンストラクタ
+		 * @param initMixRate
+		 * @param isOES
+		 */
+		protected MediaEffectAlphaBlendDrawer(final float initMixRate, final boolean isOES) {
+			super(2, isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER);
 			int loc = GLES20.glGetUniformLocation(getProgram(), "uMixRate");
 			if (loc < 0) {
 				loc = -1;
@@ -67,7 +76,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 			muMixRate = loc;
 			setMixRate(initMixRate);
 		}
-		
+
 		/**
 		 * アルファブレンディング比率セット
 		 * @param mixRate

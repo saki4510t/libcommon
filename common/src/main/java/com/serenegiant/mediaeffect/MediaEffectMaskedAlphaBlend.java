@@ -54,7 +54,15 @@ public class MediaEffectMaskedAlphaBlend extends MediaEffectGLESBase {
 	 * コンストラクタ
 	 */
 	public MediaEffectMaskedAlphaBlend() {
-		super(new MediaEffectDrawer(2, FRAGMENT_SHADER));
+		this(false);
 	}
-
+	
+	/**
+	 * コンストラクタ
+	 * @param isOES
+	 */
+	public MediaEffectMaskedAlphaBlend(final boolean isOES) {
+		super(new MediaEffectDrawer(2,
+			isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER));
+	}
 }
