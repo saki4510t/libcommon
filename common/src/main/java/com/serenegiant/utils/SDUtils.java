@@ -18,6 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -27,6 +28,7 @@ import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
+import android.os.StatFs;
 import android.provider.DocumentsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -499,7 +501,8 @@ public class SDUtils {
 		final int request_code) {
 
 		if (BuildCheck.isLollipop()) {
-			final Uri uri = getStorageUri(fragment.getActivity(), request_code);
+			final Activity activity = fragment.getActivity();
+			final Uri uri = activity != null ? getStorageUri(activity, request_code) : null;
 			if (uri == null) {
 				// request_codeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
 				fragment.startActivityForResult(prepareStorageAccessPermission(), request_code);
@@ -738,6 +741,7 @@ public class SDUtils {
 	 * @param dir
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	@Nullable
 	public static StorageInfo getStorageInfo(@NonNull final Context context,
 		@NonNull final DocumentFile dir) {
@@ -758,6 +762,15 @@ public class SDUtils {
 			}
 		} catch (final Exception e) {
 			// ignore
+		}
+		if (BuildCheck.isJellyBeanMR2()) {
+			try {
+				final String path = UriHelper.getPath(context, dir.getUri());
+				final StatFs fs = new StatFs(path);
+				return new StorageInfo(fs.getTotalBytes(), fs.getAvailableBytes());
+			} catch (final Exception e) {
+				// ignore
+			}
 		}
 		return null;
 	}
