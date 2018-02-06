@@ -27,12 +27,13 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.support.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.utils.MediaInfo;
 import com.serenegiant.utils.Time;
+
+import static com.serenegiant.utils.BufferHelper.*;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractEncoder implements Encoder {
@@ -481,9 +482,9 @@ LOOP:	while (mIsCapturing) {
                         encodedData.position(0);
                         encodedData.get(tmp, mBufferInfo.offset, mBufferInfo.size);
                         encodedData.position(0);
-                        final int ix0 = byteComp(tmp, 0, START_MARK, START_MARK.length);
-                        final int ix1 = byteComp(tmp, ix0 + 2, START_MARK, START_MARK.length);
-						final int ix2 = byteComp(tmp, ix1 + 2, START_MARK, START_MARK.length);
+                        final int ix0 = byteComp(tmp, 0, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
+                        final int ix1 = byteComp(tmp, ix0 + 2, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
+						final int ix2 = byteComp(tmp, ix1 + 2, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
                         final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
                         if (!startRecorder(recorder, outFormat))
@@ -617,228 +618,5 @@ LOOP:	while (mIsCapturing) {
 		prevOutputPTSUs = presentationTimeUs;
 		return presentationTimeUs;
     }
-
-//********************************************************************************
-//********************************************************************************
-    /**
-     * プロファイル・レベルが低ければtrueを返す
-     * @param mimeType
-     * @param info
-     * @return
-     */
-    public static boolean checkProfileLevel(final String mimeType, final MediaCodecInfo info) {
-        if (info != null) {
-        	if (mimeType.equalsIgnoreCase("video/avc")) {
-                final MediaCodecInfo.CodecCapabilities caps = getCodecCapabilities(info, mimeType);
-		        final MediaCodecInfo.CodecProfileLevel[] profileLevel = caps.profileLevels;
-		        for (int j = 0; j < profileLevel.length; j++) {
-		        	if (profileLevel[j].level >= MediaCodecInfo.CodecProfileLevel.AVCLevel5)
-		        		return false;
-		        }
-        	}
-        }
-    	return true;
-    }
-
-    public static void dumpProfileLevel(final String mimeType, final MediaCodecInfo info) {
-        if (info != null) {
-//        	Log.i(TAG, "dumpProfileLevel:codec=" + info.getName());
-/*            final MediaCodecInfo.CodecCapabilities caps = getCodecCapabilities(info, mimeType);
-	        final MediaCodecInfo.CodecProfileLevel[] profileLevel = caps.profileLevels;
-	        for (int j = 0; j < profileLevel.length; j++) {
-	        	Log.i(TAG, getProfileLevelString(mimeType, profileLevel[j]));
-	        } */
-        }
-    }
-
-    public static String getProfileLevelString(final String mimeType, final MediaCodecInfo.CodecProfileLevel profileLevel) {
-    	String result = null;
-    	if (mimeType.equalsIgnoreCase("video/avc")) {
-	    	switch (profileLevel.profile) {
-	        // from OMX_VIDEO_AVCPROFILETYPE
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline:	// 0x01;
-	    		result = "profile:AVCProfileBaseline"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileMain:		// 0x02;
-	    		result = "profile:AVCProfileMain"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileExtended:	// 0x04;
-	    		result = "profile:AVCProfileExtended"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh:		// 0x08;
-	    		result = "profile:AVCProfileHigh"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh10:		// 0x10;
-	    		result = "profile:AVCProfileHigh10"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh422:	// 0x20;
-	    		result = "profile:AVCProfileHigh422"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh444:	// 0x40;
-	    		result = "profile:AVCProfileHigh444"; break;
-	    	default:
-	    		result = "profile:unknown " + profileLevel.profile; break;
-	    	}
-    		switch (profileLevel.level) {
-            // from OMX_VIDEO_AVCLEVELTYPE
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel1:		// 0x01;
-	    		result = result + ",level=AVCLevel1"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel1b:		// 0x02;
-	    		result = result + ",level=AVCLevel1b"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel11:		// 0x04;
-	    		result = result + ",level=AVCLevel11"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel12:		// 0x08;
-	    		result = result + ",level=AVCLevel12"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel13:		// 0x10;
-	    		result = result + ",level=AVCLevel13"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel2:		// 0x20;
-	    		result = result + ",level=AVCLevel2"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel21:		// 0x40;
-	    		result = result + ",level=AVCLevel21"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel22:		// 0x80;
-	    		result = result + ",level=AVCLevel22"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel3:		// 0x100;
-	    		result = result + ",level=AVCLevel3"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel31:		// 0x200;
-	    		result = result + ",level=AVCLevel31"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel32:		// 0x400;
-	    		result = result + ",level=AVCLevel32"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel4:		// 0x800;
-	    		result = result + ",level=AVCLevel4"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel41:		// 0x1000;
-	    		result = result + ",level=AVCLevel41"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel42:		// 0x2000;
-	    		result = result + ",level=AVCLevel42"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel5:		// 0x4000;
-	    		result = result + ",level=AVCLevel5"; break;
-	    	case MediaCodecInfo.CodecProfileLevel.AVCLevel51:		// 0x8000;
-	    		result = result + ",level=AVCLevel51"; break;
-	    	default:
-	    		result = result + ",level=unknown " + profileLevel.level; break;
-    		}
-    	} else if (mimeType.equalsIgnoreCase("video/h263")) {
-	    	switch (profileLevel.profile) {
-	    	// from OMX_VIDEO_H263PROFILETYPE
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileBaseline:				// 0x01;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileH320Coding:			// 0x02;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileBackwardCompatible:	// 0x04;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV2:					// 0x08;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV3:					// 0x10;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileHighCompression:		// 0x20;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileInternet:				// 0x40;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileInterlace:				// 0x80;
-	    	case MediaCodecInfo.CodecProfileLevel.H263ProfileHighLatency:			// 0x100;
-	    	default:
-	    		result = "profile:unknown " + profileLevel.profile; break;
-	    	}
-    		switch (profileLevel.level) {
-            // from OMX_VIDEO_H263LEVELTYPE
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level10:					// 0x01;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level20:					// 0x02;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level30:					// 0x04;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level40:					// 0x08;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level45:					// 0x10;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level50:					// 0x20;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level60:					// 0x40;
-	    	case MediaCodecInfo.CodecProfileLevel.H263Level70:					// 0x80;
-	    	default:
-	    		result = result + ",level=unknown " + profileLevel.level; break;
-    		}
-    	} else if (mimeType.equalsIgnoreCase("video/mpeg4")) {
-	    	switch (profileLevel.profile) {
-            // from OMX_VIDEO_MPEG4PROFILETYPE
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimple:			// 0x01;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleScalable:	// 0x02;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCore:				// 0x04;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileMain:				// 0x08;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileNbit:				// 0x10;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileScalableTexture:	// 0x20;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFace:		// 0x40;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFBA:		// 0x80;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileBasicAnimated:	// 0x100;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileHybrid:			// 0x200;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedRealTime:	// 0x400;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCoreScalable:		// 0x800;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCoding:	// 0x1000;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCore:		// 0x2000;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedScalable:	// 0x4000;
-	    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedSimple:	// 0x8000;
-	    	default:
-	    		result = "profile:unknown " + profileLevel.profile; break;
-	    	}
-    		switch (profileLevel.level) {
-            // from OMX_VIDEO_MPEG4LEVELTYPE
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level0:			// 0x01;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level0b:			// 0x02;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level1:			// 0x04;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level2:			// 0x08;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level3:			// 0x10;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level4:			// 0x20;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level4a:			// 0x40;
-        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level5:			// 0x80;
-	    	default:
-	    		result = result + ",level=unknown " + profileLevel.level; break;
-    		}
-    	} else if (mimeType.equalsIgnoreCase("ausio/aac")) {
-            // from OMX_AUDIO_AACPROFILETYPE
-	    	switch (profileLevel.level) {
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectMain:		// 1;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectLC:			// 2;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectSSR:			// 3;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectLTP:			// 4;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectHE:			// 5;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectScalable:	// 6;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectERLC:		// 17;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectLD:			// 23;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectHE_PS:		// 29;
-	    	case MediaCodecInfo.CodecProfileLevel.AACObjectELD:			// 39;
-	    	default:
-	    		result = "profile:unknown " + profileLevel.profile; break;
-	    	}
-    	} else if (mimeType.equalsIgnoreCase("video/vp8")) {
-	    	switch (profileLevel.profile) {
-            // from OMX_VIDEO_VP8PROFILETYPE
-	    	case MediaCodecInfo.CodecProfileLevel.VP8ProfileMain:		// 0x01;
-	    	default:
-	    		result = "profile:unknown " + profileLevel.profile; break;
-	    	}
-			switch (profileLevel.level) {
-            // from OMX_VIDEO_VP8LEVELTYPE
-	    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version0:	// 0x01;
-	    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version1:	// 0x02;
-	    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version2:	// 0x04;
-	    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version3:	// 0x08;
-	    	default:
-	    		result = result + ",level=unknown " + profileLevel.level; break;
-	    	}
-    	}
-
-    	return result;
-    }
-
-    /**
-     * codec specific dataの先頭マーカー
-     */
-	protected static final byte[] START_MARK = { 0, 0, 0, 1, };
-	/**
-	 * byte[]を検索して一致する先頭インデックスを返す
-	 * @param array 検索されるbyte[]
-	 * @param search 検索するbyte[]
-	 * @param len 検索するバイト数
-	 * @return 一致した先頭位置、一致しなければ-1
-	 */
-	protected final int byteComp(@NonNull final byte[] array, final int offset, @NonNull final byte[] search, final int len) {
-		int index = -1;
-		final int n0 = array.length;
-		final int ns = search.length;
-		if ((n0 >= offset + len) && (ns >= len)) {
-			for (int i = offset; i < n0 - len; i++) {
-				int j = len - 1;
-				while (j >= 0) {
-					if (array[i + j] != search[j]) break;
-					j--;
-				}
-				if (j < 0) {
-					index = i;
-					break;
-				}
-			}
-		}
-		return index;
-	}
 
 }
