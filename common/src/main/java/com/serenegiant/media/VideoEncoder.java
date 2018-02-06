@@ -146,7 +146,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してMuxerをスタートさせる
 	 */
 	@Override
-	public synchronized boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
+	protected synchronized boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
 //		if (DEBUG) Log.i(TAG, "startRecorder:outFormat=" + outFormat);
         // MediaCodecがセットした実際の高さ・幅に調整し直す
 		int w, h;
@@ -171,7 +171,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 	}
 
 	@Override
-	public void stopRecorder(final IRecorder recorder) {
+	protected void stopRecorder(final IRecorder recorder) {
 		if (mRecorderStarted) {
 /*			final AbstractUVCCamera camera = mCamera.get();
 			if (camera != null) {

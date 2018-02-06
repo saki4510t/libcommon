@@ -536,7 +536,7 @@ LOOP:	while (mIsCapturing) {
 	/**
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる
 	 */
-	public boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
+	protected boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
 //		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat + ",state=" + recorder.getState());
 		if (recorder.getState() != IRecorder.STATE_STARTING) {
 			for (int i = 0; i < 10; i++) {
@@ -568,7 +568,7 @@ LOOP:	while (mIsCapturing) {
        	return recorder.isStarted();
 	}
 
-	public void stopRecorder(final IRecorder recorder) {
+	protected void stopRecorder(final IRecorder recorder) {
    		mRecorderStarted = mIsCapturing = false;
 	}
 
