@@ -360,7 +360,9 @@ public abstract class Recorder implements IRecorder {
 	 * @param bufferInfo
 	 */
 	@Override
-	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+	public void writeSampleData(final int trackIndex,
+		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+
 		try {
 			if (mStartedCount > 0) {
 				mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);

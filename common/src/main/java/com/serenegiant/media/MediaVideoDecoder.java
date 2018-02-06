@@ -68,7 +68,9 @@ public class MediaVideoDecoder extends MediaDecoder {
 	}
 
 	@Override
-	protected MediaCodec createCodec(final MediaExtractor media_extractor, final int track_index, final MediaFormat format)
+	protected MediaCodec createCodec(final MediaExtractor media_extractor,
+		final int track_index, final MediaFormat format)
+
 		throws IOException {
 
 		if (Build.VERSION.SDK_INT > 18) {
@@ -84,7 +86,8 @@ public class MediaVideoDecoder extends MediaDecoder {
 	@Override
 	protected Surface getOutputSurface() {
 		if (mSurface == null) {
-			IllegalArgumentException e = new IllegalArgumentException("need to call setSurface before prepare");
+			final IllegalArgumentException e
+				= new IllegalArgumentException("need to call setSurface before prepare");
 			if (!callErrorHandler(e)) {
 				throw e;
 			}
@@ -93,7 +96,10 @@ public class MediaVideoDecoder extends MediaDecoder {
 	}
 
 	@Override
-	protected boolean handleOutput(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
+	protected boolean handleOutput(final ByteBuffer buffer,
+		final int offset, final int size,
+		final long presentationTimeUs) {
+
 		return false;
 	}
 

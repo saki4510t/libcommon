@@ -28,6 +28,7 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -64,7 +65,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		this(context, id_layout, true);
 	}
 
-	public MediaStoreImageAdapter(final Context context, final int id_layout, final boolean needQuery) {
+	public MediaStoreImageAdapter(final Context context,
+		final int id_layout, final boolean needQuery) {
+
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = id_layout;
 		mCr = context.getContentResolver();
@@ -90,7 +93,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public Object instantiateItem(final ViewGroup container, final int position) {
+	public Object instantiateItem(@NonNull final ViewGroup container,
+		final int position) {
+
 		if (DEBUG) Log.v(TAG, "instantiateItem:position=" + position);
 		final View view = mInflater.inflate(mLayoutId, container, false);
 		ViewHolder holder;
@@ -124,7 +129,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public void destroyItem(final ViewGroup container, final int position, final Object object) {
+	public void destroyItem(@NonNull final ViewGroup container,
+		final int position, @NonNull final Object object) {
+
 		if (DEBUG) Log.v(TAG, "destroyItem:position=" + position);
 		if (object instanceof View) {
 			container.removeView((View)object);
@@ -132,7 +139,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public int getItemPosition(final Object object) {
+	public int getItemPosition(@NonNull final Object object) {
 		// FIXME ここはobject=ViewからMediaInfo#idを取得してpositionを検索し直さないとだめかも
 		return super.getItemPosition(object);
 	}
@@ -161,7 +168,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	@Override
-	public boolean isViewFromObject(final View view, final Object object) {
+	public boolean isViewFromObject(@NonNull final View view,
+		@NonNull final Object object) {
+
 		return view.equals(object);
 	}
 
@@ -215,7 +224,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		mQueryHandler.requery();
 	}
 
-	protected MediaStoreHelper.LoaderDrawable createLoaderDrawable(final ContentResolver cr, final MediaInfo info) {
+	protected MediaStoreHelper.LoaderDrawable createLoaderDrawable(
+		final ContentResolver cr, final MediaInfo info) {
+
 		return new ImageLoaderDrawable(cr, info.width, info.height);
 	}
 
@@ -227,7 +238,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
 		private final MediaStoreImageAdapter mAdapter;
-		public MyAsyncQueryHandler(final ContentResolver cr, final MediaStoreImageAdapter adapter) {
+		public MyAsyncQueryHandler(final ContentResolver cr,
+			final MediaStoreImageAdapter adapter) {
+
 			super(cr);
 			mAdapter = adapter;
 		}
@@ -240,7 +253,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected void onQueryComplete(final int token, final Object cookie, final Cursor cursor) {
+		protected void onQueryComplete(final int token,
+			final Object cookie, final Cursor cursor) {
+
 //			super.onQueryComplete(token, cookie, cursor);	// this is empty method
 			final Cursor oldCursor = mAdapter.swapCursor(cursor);
 			if ((oldCursor != null) && !oldCursor.isClosed())
@@ -280,7 +295,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	private static class ImageLoaderDrawable extends MediaStoreHelper.LoaderDrawable {
-		public ImageLoaderDrawable(final ContentResolver cr, final int width, final int height) {
+		public ImageLoaderDrawable(final ContentResolver cr,
+			final int width, final int height) {
+
 			super(cr, width, height);
 		}
 
@@ -301,7 +318,10 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected Bitmap loadBitmap(final ContentResolver cr, final int mediaType, final int hashCode, final long id, final int requestWidth, final int requestHeight) {
+		protected Bitmap loadBitmap(final ContentResolver cr,
+			final int mediaType, final int hashCode,
+			final long id, final int requestWidth, final int requestHeight) {
+
 			Bitmap result = null;
 			try {
 				result = MediaStoreHelper.getImage(cr, id, requestWidth, requestHeight);

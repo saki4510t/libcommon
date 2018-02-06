@@ -326,7 +326,9 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		return MediaInfo.getCodecInfoAt(ix);
 	}
 
-	public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(final MediaCodecInfo codecInfo, final String mimeType) {
+	public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(
+		final MediaCodecInfo codecInfo, final String mimeType) {
+
 		return MediaInfo.getCodecCapabilities(codecInfo, mimeType);
 	}
 
@@ -336,7 +338,9 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param info
 	 * @return
 	 */
-	public static boolean checkProfileLevel(final String mimeType, final MediaCodecInfo info) {
+	public static boolean checkProfileLevel(final String mimeType,
+		final MediaCodecInfo info) {
+
 		if (info != null) {
 			if (mimeType.equalsIgnoreCase("video/avc")) {
 				final MediaCodecInfo.CodecCapabilities caps = getCodecCapabilities(info, mimeType);
@@ -356,7 +360,9 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param profileLevel
 	 * @return
 	 */
-	public static String getProfileLevelString(final String mimeType, final MediaCodecInfo.CodecProfileLevel profileLevel) {
+	public static String getProfileLevelString(final String mimeType,
+		final MediaCodecInfo.CodecProfileLevel profileLevel) {
+
 		String result = null;
 		if (mimeType.equalsIgnoreCase("video/avc")) {
 			switch (profileLevel.profile) {

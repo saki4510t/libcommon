@@ -42,12 +42,16 @@ public class MediaMuxerWrapper implements IMuxer {
 	private volatile boolean mIsStarted;
 	private boolean mReleased;
 
-	public MediaMuxerWrapper(final String output_path, final int format) throws IOException {
+	public MediaMuxerWrapper(final String output_path, final int format)
+		throws IOException {
+
 		mMuxer = new MediaMuxer(output_path, format);
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.O)
-	public MediaMuxerWrapper(final FileDescriptor fd, final int format) throws IOException {
+	public MediaMuxerWrapper(final FileDescriptor fd, final int format)
+		throws IOException {
+
 		mMuxer = new MediaMuxer(fd, format);
 	}
 	
@@ -57,7 +61,9 @@ public class MediaMuxerWrapper implements IMuxer {
 	}
 
 	@Override
-	public void writeSampleData(final int trackIndex, @NonNull final ByteBuffer byteBuf, @NonNull final BufferInfo bufferInfo) {
+	public void writeSampleData(final int trackIndex,
+		@NonNull final ByteBuffer byteBuf, @NonNull final BufferInfo bufferInfo) {
+
 		if (!mReleased) {
 			mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 		}

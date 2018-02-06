@@ -53,7 +53,10 @@ public class MediaMoviePlayer {
 	private final IFrameCallback mCallback;
 	private final boolean mAudioEnabled;
 
-	public MediaMoviePlayer(final Surface outputSurface, final IFrameCallback callback, final boolean audio_enable) throws NullPointerException {
+	public MediaMoviePlayer(final Surface outputSurface,
+		final IFrameCallback callback, final boolean audio_enable)
+			throws NullPointerException {
+
     	if (DEBUG) Log.v(TAG, "Constructor:");
     	if ((outputSurface == null) || (callback == null))
     		throw new NullPointerException("outputSurface and callback should not be null");

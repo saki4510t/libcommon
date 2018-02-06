@@ -165,7 +165,9 @@ public final class VideoMuxer implements IMuxer {
  	}
 
 	@Override
-	public void writeSampleData(final int trackIndex, @NonNull final ByteBuffer buf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
+	public void writeSampleData(final int trackIndex,
+		@NonNull final ByteBuffer buf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
+
 		int res = 1;
 		if (!mReleased && (mNativePtr != 0)) {
 			res = nativeWriteSampleData(mNativePtr, trackIndex, buf,
@@ -188,10 +190,13 @@ public final class VideoMuxer implements IMuxer {
 	private final native long nativeCreateFromFD(final int fd);
 	private final native void nativeDestroy(final long id_encoder);
 
-	private static final native int nativeAddTrack(final long id_muxer, final String[] keys, final Object[] values);
+	private static final native int nativeAddTrack(final long id_muxer,
+		final String[] keys, final Object[] values);
 	private static final native int nativeStart(final long id_muxer);
 	private static final native int nativeStop(final long id_muxer);
-	private static final native int nativeWriteSampleData(final long id_muxer, final int trackIndex, final ByteBuffer buf, final int offset, final int size, final long presentationTimeUs, final int flags);
+	private static final native int nativeWriteSampleData(final long id_muxer,
+		final int trackIndex, final ByteBuffer buf, final int offset, final int size,
+		final long presentationTimeUs, final int flags);
 
 	@Override
 	public boolean isStarted() {

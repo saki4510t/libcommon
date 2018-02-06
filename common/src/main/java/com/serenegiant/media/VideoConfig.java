@@ -140,7 +140,9 @@ public class VideoConfig {
 	 * @param frameRate
 	 * @return
 	 */
-	public static int getBitrate(final int width, final int height, final int frameRate, final float bpp) {
+	public static int getBitrate(final int width, final int height,
+		final int frameRate, final float bpp) {
+
 		return calcBitrate(width, height, frameRate, bpp);
 	}
 

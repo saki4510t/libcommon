@@ -27,7 +27,6 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.net.Uri;
 import android.os.Build;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -122,7 +121,9 @@ public abstract class MediaDecoder implements IMediaCodec {
 		}
 	}
 
-	public void setDataSource(final String path, final Map<String, String> headers) throws IOException {
+	public void setDataSource(final String path, final Map<String, String> headers)
+		throws IOException {
+
 		release();
 		try {
 			mMediaMetadataRetriever = new MediaMetadataRetriever();
@@ -154,7 +155,9 @@ public abstract class MediaDecoder implements IMediaCodec {
 		}
 	}
 
-	public void setDataSource(final FileDescriptor fd, final long offset, final long length) throws IOException {
+	public void setDataSource(final FileDescriptor fd, final long offset, final long length)
+		throws IOException {
+
 		release();
 		try {
 			mMediaMetadataRetriever = new MediaMetadataRetriever();
@@ -170,7 +173,9 @@ public abstract class MediaDecoder implements IMediaCodec {
 		}
 	}
 
-	public void setDataSource(final Context context, final Uri uri, final Map<String, String> headers) throws IOException {
+	public void setDataSource(final Context context, final Uri uri,
+		final Map<String, String> headers) throws IOException {
+
 		release();
 		try {
 			mMediaMetadataRetriever = new MediaMetadataRetriever();
@@ -254,7 +259,9 @@ public abstract class MediaDecoder implements IMediaCodec {
 	protected abstract int handlePrepare(MediaExtractor media_extractor);
 	protected abstract Surface getOutputSurface();
 
-	protected MediaCodec createCodec(final MediaExtractor media_extractor, final int track_index, final MediaFormat format) throws IOException {
+	protected MediaCodec createCodec(final MediaExtractor media_extractor,
+		final int track_index, final MediaFormat format) throws IOException {
+
 		if (DEBUG) Log.v(TAG, "createCodec:");
 		MediaCodec codec = null;
 		if (track_index >= 0) {
@@ -385,7 +392,8 @@ public abstract class MediaDecoder implements IMediaCodec {
 
 		if (mMediaExtractor != null) {
 			if (DEBUG) Log.d(TAG, "handleSeek:" + newTime);
-			mMediaExtractor.seekTo(newTime, MediaExtractor.SEEK_TO_PREVIOUS_SYNC/*SEEK_TO_CLOSEST_SYNC*/);
+			mMediaExtractor.seekTo(newTime,
+				MediaExtractor.SEEK_TO_PREVIOUS_SYNC/*SEEK_TO_CLOSEST_SYNC*/);
 			mMediaExtractor.advance();
 		}
 		mRequestTime = -1;
@@ -491,6 +499,7 @@ public abstract class MediaDecoder implements IMediaCodec {
 
 	/**
 	 */
+	@SuppressWarnings("deprecation")
 	protected void internal_handleOutput() {
 		final int decoderStatus = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);
 		if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -512,8 +521,11 @@ public abstract class MediaDecoder implements IMediaCodec {
 				doRender = !handleOutput(mOutputBuffers[decoderStatus],
 						0, mBufferInfo.size, mBufferInfo.presentationTimeUs);
 				if (doRender) {
-					if ((mCallback == null) || !mCallback.onFrameAvailable(this, mBufferInfo.presentationTimeUs))
+					if ((mCallback == null)
+						|| !mCallback.onFrameAvailable(this, mBufferInfo.presentationTimeUs)) {
+						
 						mStartTime = adjustPresentationTime(mStartTime, mBufferInfo.presentationTimeUs);
+					}
 				}
 			}
 			mMediaCodec.releaseOutputBuffer(decoderStatus, doRender);
@@ -532,7 +544,8 @@ public abstract class MediaDecoder implements IMediaCodec {
 	 * @param presentationTimeUs
 	 * @return if return false, presentation time adjustment is executed internally.
 	 */
-	protected abstract boolean handleOutput(ByteBuffer buffer, int offset, int size, long presentationTimeUs);
+	protected abstract boolean handleOutput(ByteBuffer buffer,
+		int offset, int size, long presentationTimeUs);
 
 	protected boolean callErrorHandler(final Exception e) {
 		if (mCallback != null) {

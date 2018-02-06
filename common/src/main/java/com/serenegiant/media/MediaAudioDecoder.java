@@ -104,7 +104,9 @@ public class MediaAudioDecoder extends MediaDecoder {
 	}
 
 	@Override
-	protected boolean handleOutput(ByteBuffer buffer, int offset, int size, long presentationTimeUs) {
+	protected boolean handleOutput(ByteBuffer buffer,
+		int offset, int size, long presentationTimeUs) {
+
 		if (mAudioOutTempBuf.length < size) {
 			mAudioOutTempBuf = new byte[size];
 		}

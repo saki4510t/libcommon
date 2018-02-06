@@ -51,7 +51,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 //	private final WeakReference<AbstractUVCCamera>mCamera;
     private final boolean mAlign16;
 
-	public VideoEncoder(final Recorder recorder, final EncoderListener listener, /*final AbstractUVCCamera camera,*/ final boolean align16) {
+	public VideoEncoder(final Recorder recorder, final EncoderListener listener, final boolean align16) {
 		super(MIME_AVC, recorder, listener);
 //		if (DEBUG) Log.i(TAG, "コンストラクタ:");
 		mAlign16 = align16;
@@ -87,9 +87,12 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         // MediaCodecに適用するパラメータを設定する。
         // 誤った設定をするとMediaCodec#configureが復帰不可能な例外を生成する
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mColorFormat);	// API >= 16
-		format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate > 0 ? mBitRate : VideoConfig.getBitrate(mWidth, mHeight));
-		format.setInteger(MediaFormat.KEY_FRAME_RATE, mFramerate > 0 ? mFramerate : VideoConfig.getCaptureFps());
-		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, mIFrameIntervals > 0 ? mIFrameIntervals : VideoConfig.getIFrame());
+		format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate > 0
+			? mBitRate : VideoConfig.getBitrate(mWidth, mHeight));
+		format.setInteger(MediaFormat.KEY_FRAME_RATE, mFramerate > 0
+			? mFramerate : VideoConfig.getCaptureFps());
+		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, mIFrameIntervals > 0
+			? mIFrameIntervals : VideoConfig.getIFrame());
 //		format.setInteger(MediaFormat.KEY_WIDTH, currentConfig.width);
 //		format.setInteger(MediaFormat.KEY_HEIGHT, currentConfig.height);
 		Log.d(TAG, "format: " + format);
@@ -146,7 +149,9 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してMuxerをスタートさせる
 	 */
 	@Override
-	protected synchronized boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
+	protected synchronized boolean startRecorder(final IRecorder recorder,
+		final MediaFormat outFormat) {
+	
 //		if (DEBUG) Log.i(TAG, "startRecorder:outFormat=" + outFormat);
         // MediaCodecがセットした実際の高さ・幅に調整し直す
 		int w, h;

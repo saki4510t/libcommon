@@ -129,7 +129,8 @@ public class MediaStoreHelper {
 
 		@Override
 		public String toString() {
-			return String.format("MediaInfo(title=%s,displayName=%s, mediaType=%s,mime=%s,data=%s)", title, displayName, mediaType(), mime, data);
+			return String.format("MediaInfo(title=%s,displayName=%s, mediaType=%s,mime=%s,data=%s)",
+				title, displayName, mediaType(), mime, data);
 		}
 
 		private String mediaType() {

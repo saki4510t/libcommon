@@ -115,7 +115,9 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	}
 
 	@Override
-	void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+	void writeSampleData(final int trackIndex,
+		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+
 		if (mIsStarted)
 			mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 	}
@@ -123,7 +125,8 @@ public class MediaMovieRecorder extends AbstractRecorder {
 	private final IMediaCodecCallback mMediaCodecCallback = new IMediaCodecCallback() {
 		@Override
 		public void onPrepared(IMediaCodec codec) {
-			final boolean isPrepared = mVideoEncoder.isPrepared() && (!hasAudioEncoder || mAudioEncoder.isPrepared());
+			final boolean isPrepared = mVideoEncoder.isPrepared()
+				&& (!hasAudioEncoder || mAudioEncoder.isPrepared());
 			if (DEBUG) Log.v(TAG, "onPrepared:isPrepared=" + isPrepared);
 			if (isPrepared && (mRecorderCallback != null)) {
 				try {
@@ -136,7 +139,8 @@ public class MediaMovieRecorder extends AbstractRecorder {
 
 		@Override
 		public void onStart(IMediaCodec codec) {
-			final boolean isStarted = mVideoEncoder.isRunning() && (!hasAudioEncoder || mAudioEncoder.isRunning());
+			final boolean isStarted = mVideoEncoder.isRunning()
+				&& (!hasAudioEncoder || mAudioEncoder.isRunning());
 			if (DEBUG) Log.v(TAG, "onStart:isStarted=" + isStarted);
 			if (isStarted && (mRecorderCallback != null)) {
 				try {

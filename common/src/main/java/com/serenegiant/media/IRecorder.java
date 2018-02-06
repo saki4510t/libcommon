@@ -146,5 +146,6 @@ public interface IRecorder {
 	public boolean start(final Encoder encoder);
 	public void stop(final Encoder encoder);
 	public int addTrack(final Encoder encoder, final MediaFormat format);
-	public void writeSampleData(final int trackIndex, final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+	public void writeSampleData(final int trackIndex,
+		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
 }
