@@ -281,6 +281,9 @@ public abstract class AbstractEncoder implements Encoder {
 				try {
 					drain();
 				} catch (final Exception e) {
+					if (!mRequestStop) {
+						callOnError(e);
+					}
 					mRequestStop = true;
 				}
 			} else {
