@@ -367,6 +367,7 @@ public abstract class Recorder implements IRecorder {
 			}
 		} catch (final Exception e) {
 //			if (DEBUG) Log.w(TAG, "writeSampleData:", e);
+			callOnError(e);
 		}
 	}
 
