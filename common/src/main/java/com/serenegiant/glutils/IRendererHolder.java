@@ -62,6 +62,8 @@ public interface IRendererHolder extends IRendererCommon {
 
 	/**
 	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通は#hashCodeを使う
 	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
 	 * @param isRecordable
@@ -71,6 +73,8 @@ public interface IRendererHolder extends IRendererCommon {
 
 	/**
 	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通は#hashCodeを使う
 	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
 	 * @param isRecordable
@@ -81,9 +85,18 @@ public interface IRendererHolder extends IRendererCommon {
 
 	/**
 	 * 分配描画用のSurfaceを削除
+	 * このメソッドは指定したSurfaceが削除されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id
 	 */
 	public void removeSurface(final int id);
+	
+	/**
+	 * 分配描画用のSurfaceを全て削除
+	 * このメソッドはSurfaceが削除されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 */
+	public void removeSurfaceAll();
 	
 	/**
 	 * 分配描画用のSurfaceを指定した色で塗りつぶす

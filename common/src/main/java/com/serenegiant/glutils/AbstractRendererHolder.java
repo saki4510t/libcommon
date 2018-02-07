@@ -52,6 +52,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static final int REQUEST_UPDATE_SIZE = 2;
 	protected static final int REQUEST_ADD_SURFACE = 3;
 	protected static final int REQUEST_REMOVE_SURFACE = 4;
+	protected static final int REQUEST_REMOVE_SURFACE_ALL = 12;
 	protected static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 	protected static final int REQUEST_MIRROR = 6;
 	protected static final int REQUEST_ROTATE = 7;
@@ -158,6 +159,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 	/**
 	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通はSurface#hashCodeを使う
 	 * @param surface
 	 * @param isRecordable
@@ -172,6 +175,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 	/**
 	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通はSurface#hashCodeを使う
 	 * @param surface
 	 * @param isRecordable
@@ -186,7 +191,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 	/**
-	 * 分配描画用のSurfaceを削除
+	 * 分配描画用のSurfaceを削除要求する。
+	 * このメソッドは指定したSurfaceが削除されるか
+	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id
 	 */
 	@Override
@@ -195,6 +202,17 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		mRendererTask.removeSurface(id);
 	}
 
+	/**
+	 * 分配描画用のSurfaceを全て削除要求する
+	 * このメソッドはSurfaceが削除されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 */
+	@Override
+	public void removeSurfaceAll() {
+//		if (DEBUG) Log.v(TAG, "removeSurfaceAll:id=" + id);
+		mRendererTask.removeSurfaceAll();
+	}
+	
 	/**
 	 * 分配描画用のSurfaceを指定した色で塗りつぶす
 	 * @param id
@@ -452,6 +470,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			case REQUEST_REMOVE_SURFACE:
 				handleRemoveSurface(arg1);
 				break;
+			case REQUEST_REMOVE_SURFACE_ALL:
+				handleRemoveAll();
+				break;
 			case REQUEST_RECREATE_MASTER_SURFACE:
 				handleReCreateMasterSurface();
 				break;
@@ -496,6 +517,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 		/**
 		 * 分配描画用のSurfaceを追加
+		 * このメソッドは指定したSurfaceが追加されるか
+		 * interruptされるまでカレントスレッドをブロックする。
 		 * @param id
 		 * @param surface
 		 */
@@ -505,6 +528,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 		/**
 		 * 分配描画用のSurfaceを追加
+		 * このメソッドは指定したSurfaceが追加されるか
+		 * interruptされるまでカレントスレッドをブロックする。
 		 * @param id
 		 * @param surface
 		 */
@@ -530,9 +555,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 							}
 							break;
 						} else {
+							// キューに追加できなかった時は待機する
 							try {
-								mClients.wait(10);
-							} catch (InterruptedException e) {
+								mClients.wait(5);
+							} catch (final InterruptedException e) {
 								break;
 							}
 						}
@@ -543,6 +569,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 		/**
 		 * 分配描画用のSurfaceを削除
+		 * このメソッドは指定したSurfaceが削除されるか
+		 * interruptされるまでカレントスレッドをブロックする。
 		 * @param id
 		 */
 		public void removeSurface(final int id) {
@@ -557,9 +585,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 							}
 							break;
 						} else {
+							// キューに追加できなかった時は待機する
 							try {
-								mClients.wait(10);
-							} catch (InterruptedException e) {
+								mClients.wait(5);
+							} catch (final InterruptedException e) {
 								break;
 							}
 						}
@@ -567,7 +596,34 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				}
 			}
 		}
-		
+	
+	/**
+	 * 分配描画用のSurfaceを全て削除する
+	 * このメソッドはSurfaceが削除されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 */
+	public void removeSurfaceAll() {
+			synchronized (mClients) {
+				for ( ; isRunning() ; ) {
+					if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
+						try {
+							mClients.wait();
+						} catch (final InterruptedException e) {
+							// ignore
+						}
+						break;
+					} else {
+						// キューに追加できなかった時は待機する
+						try {
+							mClients.wait(5);
+						} catch (final InterruptedException e) {
+							break;
+						}
+					}
+				}
+			}
+		}
+				
 		/**
 		 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
 		 * @param id
@@ -784,6 +840,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					}
 				}
 				mClients.clear();
+				mClients.notifyAll();
 			}
 	//			if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 		}
