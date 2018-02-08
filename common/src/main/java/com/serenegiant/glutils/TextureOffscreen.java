@@ -340,7 +340,7 @@ public class TextureOffscreen {
 		if (mDepthBufferObj >= 0) {
 			names[0] = mDepthBufferObj;
 			GLES20.glDeleteRenderbuffers(1, names, 0);
-			mDepthBufferObj = 0;
+			mDepthBufferObj = -1;
 		}
 		// オフスクリーンのカラーバッファ用のテクスチャを破棄
 		if (mFBOTextureName >= 0) {
