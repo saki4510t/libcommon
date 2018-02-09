@@ -35,6 +35,7 @@ public class TextureOffscreen {
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
 	private final int TEX_TARGET;
+	private final int TEX_UNIT;
 	private final boolean mHasDepthBuffer, mAdjustPower2;
 	/** 描画領域サイズ */
 	private int mWidth, mHeight;
@@ -49,15 +50,33 @@ public class TextureOffscreen {
 
 	/**
 	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width
 	 * @param height
 	 */
 	public TextureOffscreen(final int width, final int height) {
-		this(GLES20.GL_TEXTURE_2D, width, height, false, DEFAULT_ADJUST_POWER2);
+		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, false, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 */
+	public TextureOffscreen(final int tex_unit,
+		final int width, final int height) {
+
+		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height,
+			false, DEFAULT_ADJUST_POWER2);
 	}
 
 	/**
 	 * コンストラクタ(GL_TEXTURE_2D)
+	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width dimension of offscreen(width)
 	 * @param height dimension of offscreen(height)
 	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
@@ -65,11 +84,29 @@ public class TextureOffscreen {
 	public TextureOffscreen(final int width, final int height,
 		final boolean use_depth_buffer) {
 
-		this(GLES20.GL_TEXTURE_2D, width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
 	}
 
 	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	public TextureOffscreen(final int tex_unit,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height,
+			use_depth_buffer, DEFAULT_ADJUST_POWER2);
+	}
+	
+	/**
 	 * コンストラクタ(GL_TEXTURE_2D)
+	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
@@ -78,53 +115,54 @@ public class TextureOffscreen {
 	public TextureOffscreen(final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		this(GLES20.GL_TEXTURE_2D, width, height, use_depth_buffer, adjust_power2);
+		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, use_depth_buffer, adjust_power2);
 	}
-
+	
 	/**
-	 * コンストラクタ
-	 * @param tex_target GL_TEXTURE_2D
+	 * コンストラクタ(GL_TEXTURE_2D)
+	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public TextureOffscreen(final int tex_target, final int width, final int height,
+	public TextureOffscreen(final int tex_unit,
+		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		if (DEBUG) Log.v(TAG, "Constructor");
-		TEX_TARGET =  tex_target;
-		mWidth = width;
-		mHeight = height;
-		mHasDepthBuffer = use_depth_buffer;
-		mAdjustPower2 = adjust_power2;
-		prepareFramebuffer(width, height);
+		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height, use_depth_buffer, adjust_power2);
 	}
 
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ, デプスバッファなし
 	 * @param tex_id
+	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 */
-	public TextureOffscreen(final int tex_id,
+	public TextureOffscreen(final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
-		this(GLES20.GL_TEXTURE_2D, tex_id, width, height,
+		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			width, height,
 			false, DEFAULT_ADJUST_POWER2);
 	}
 
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * @param tex_unit
 	 * @param tex_id
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 */
-	public TextureOffscreen(final int tex_id,
+	public TextureOffscreen(final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
-		this(GLES20.GL_TEXTURE_2D, tex_id, width, height,
+		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			width, height,
 			use_depth_buffer, DEFAULT_ADJUST_POWER2);
 	}
 
@@ -137,19 +175,24 @@ public class TextureOffscreen {
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public TextureOffscreen(final int tex_target, final int tex_id,
+	public TextureOffscreen(final int tex_target, final int tex_unit, final int tex_id,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
 		if (DEBUG) Log.v(TAG, "Constructor");
 		TEX_TARGET = tex_target;
+		TEX_UNIT = tex_unit;
 		mWidth = width;
 		mHeight = height;
 		mHasDepthBuffer = use_depth_buffer;
 		mAdjustPower2 = adjust_power2;
 
 		createFrameBuffer(width, height);
-		assignTexture(tex_id, width, height);
+		int tex = tex_id;
+		if (tex < 0) {
+			tex = genTexture(tex_target, tex_unit, mTexWidth, mTexHeight);
+		}
+		assignTexture(tex, width, height);
 	}
 
 	/** 破棄する */
@@ -223,6 +266,7 @@ public class TextureOffscreen {
 			createFrameBuffer(width, height);
 		}
 		mFBOTextureName = texture_name;
+		GLES20.glActiveTexture(TEX_UNIT);
 		 // フレームバッファオブジェクトをbindする
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
 		GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
@@ -263,6 +307,7 @@ public class TextureOffscreen {
 			releaseFrameBuffer();
 			createFrameBuffer(width, height);
 		}
+		GLES20.glActiveTexture(TEX_UNIT);
 		GLES20.glBindTexture(TEX_TARGET, mFBOTextureName);
 		GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
 		GLES20.glBindTexture(TEX_TARGET, 0);
@@ -271,28 +316,27 @@ public class TextureOffscreen {
 		mTexMatrix[0] = width / (float)mTexWidth;
 		mTexMatrix[5] = height / (float)mTexHeight;
 	}
-
-    /**
-	 * オフスクリーン描画用のフレームバッファを準備する。
-	 * 内部で#createFrameBufferと#assignTextureを呼び出す
+	
+	/**
+	 * カラーバッファのためにテクスチャを生成する
+	 * @param tex_target
+	 * @param tex_unit
+	 * @param tex_width
+	 * @param tex_height
+	 * @return
 	 */
-    private final void prepareFramebuffer(final int width, final int height) {
-		GLHelper.checkGlError("prepareFramebuffer start");
-
-		createFrameBuffer(width, height);
+	private static int genTexture(final int tex_target, final int tex_unit,
+		final int tex_width, final int tex_height) {
 		// カラーバッファのためにテクスチャを生成する
-		final int tex_name = GLHelper.initTex(TEX_TARGET,
-			GLES20.GL_TEXTURE0,
+		final int tex_name = GLHelper.initTex(tex_target, tex_unit,
 			GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
 		// テクスチャのメモリ領域を確保する
-		GLES20.glTexImage2D(TEX_TARGET, 0, GLES20.GL_RGBA, mTexWidth, mTexHeight, 0,
+		GLES20.glTexImage2D(tex_target, 0, GLES20.GL_RGBA, tex_width, tex_height, 0,
 			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 		GLHelper.checkGlError("glTexImage2D");
-
-		// テクスチャをこのオフスクリーンに割り当てる
-		assignTexture(tex_name, width, height);
-    }
-
+		return tex_name;
+	}
+	
 	/** オフスクリーン描画用のフレームバッファオブジェクトを生成する */
 	private final void createFrameBuffer(final int width, final int height) {
 		final int[] ids = new int[1];
@@ -386,5 +430,13 @@ public class TextureOffscreen {
 	 */
 	public int getTexHeight() {
 		return mTexHeight;
+	}
+	
+	public int getTexTarget() {
+		return TEX_TARGET;
+	}
+	
+	public int getTexUnit() {
+		return TEX_UNIT;
 	}
 }
