@@ -41,7 +41,7 @@ import com.serenegiant.utils.BuildCheck;
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
-public class EGLBase10 extends EGLBase {
+/*package*/ class EGLBase10 extends EGLBase {
 //	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = "EGLBase10";
 
