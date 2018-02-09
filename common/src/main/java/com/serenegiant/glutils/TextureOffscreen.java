@@ -207,6 +207,8 @@ public class TextureOffscreen {
 	 */
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
+		GLES20.glActiveTexture(TEX_UNIT);
+		GLES20.glBindTexture(TEX_TARGET, mFBOTextureName);
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
 		GLES20.glViewport(0, 0, mWidth, mHeight);
 	}
@@ -217,6 +219,8 @@ public class TextureOffscreen {
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+		GLES20.glActiveTexture(TEX_UNIT);
+		GLES20.glBindTexture(TEX_TARGET, 0);
 	}
 
 	private final float[] mResultMatrix = new float[16];
