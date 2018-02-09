@@ -35,21 +35,37 @@ public class GLTexture implements ITexture {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
-	/* package */int mTextureTarget = GLES20.GL_TEXTURE_2D;	// GL_TEXTURE_EXTERNAL_OESはだめ
-	/* package */int mTextureUnit = GLES20.GL_TEXTURE0;
+	/* package */final int mTextureTarget;
+	/* package */final int mTextureUnit ;
 	/* package */int mTextureId;
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
 	/* package */int mImageWidth, mImageHeight;
-
+	
 	/**
 	 * コンストラクタ
+	 * テクスチャユニットが常時GL_TEXTURE0なので複数のテクスチャを同時に使えない
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
 	public GLTexture(final int width, final int height, final int filter_param) {
+		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height, filter_param);
+	}
+	
+	/**
+	 * コンストラクタ
+	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
+	 */
+	public GLTexture(final int texTarget, final int texUnit,
+		final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
+		mTextureTarget = texTarget;
+		mTextureUnit = texUnit;
 		// テクスチャに使うビットマップは縦横サイズが2の乗数でないとダメ。
 		// 更に、ミップマップするなら正方形でないとダメ
 		// 指定したwidth/heightと同じか大きい2の乗数にする
@@ -81,8 +97,11 @@ public class GLTexture implements ITexture {
 
 	@Override
 	protected void finalize() throws Throwable {
-		release();	// GLコンテキスト内じゃない可能性があるのであまり良くないけど
-		super.finalize();
+		try {
+			release();	// GLコンテキスト内じゃない可能性があるのであまり良くないけど
+		} finally {
+			super.finalize();
+		}
 	}
 
 	/**
@@ -114,6 +133,7 @@ public class GLTexture implements ITexture {
 	@Override
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
+		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES20.glBindTexture(mTextureTarget, 0);
 	}
 
@@ -186,14 +206,20 @@ public class GLTexture implements ITexture {
 		// 実際の読み込み処理
 		options.inSampleSize = inSampleSize;
 		options.inJustDecodeBounds = false;
-		Bitmap bitmap = BitmapFactory.decodeFile(filePath, options);
+		loadTexture(BitmapFactory.decodeFile(filePath, options));
+	}
+	
+	/**
+	 * 指定したビットマップをテクスチャに読み込む
+ 	 * @param bitmap
+	 */
+	public void loadTexture(final Bitmap bitmap) throws NullPointerException {
 		mImageWidth = bitmap.getWidth();	// 読み込んだイメージのサイズを取得
 		mImageHeight = bitmap.getHeight();
 		Bitmap texture = Bitmap.createBitmap(mTexWidth, mTexHeight, Bitmap.Config.ARGB_8888);
 		final Canvas canvas = new Canvas(texture);
 		canvas.drawBitmap(bitmap, 0, 0, null);
 		bitmap.recycle();
-		bitmap = null;
 		// テクスチャ座標変換行列を設定(読み込んだイメージサイズがテクスチャサイズにフィットするようにスケール変換)
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = mImageWidth / (float)mTexWidth;
@@ -204,6 +230,5 @@ public class GLTexture implements ITexture {
 		GLUtils.texImage2D(mTextureTarget, 0, texture, 0);
 		unbind();
 		texture.recycle();
-		texture = null;
 	}
 }

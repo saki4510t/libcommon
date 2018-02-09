@@ -18,6 +18,8 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.graphics.Bitmap;
+
 import java.io.IOException;
 
 public interface ITexture {
@@ -36,4 +38,5 @@ public interface ITexture {
 	int getTexHeight();
 
 	void loadTexture(String filePath) throws NullPointerException, IOException;
+	void loadTexture(Bitmap bitmap) throws NullPointerException;
 }
