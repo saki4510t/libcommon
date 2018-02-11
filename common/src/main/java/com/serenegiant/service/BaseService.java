@@ -23,6 +23,7 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
+import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -40,11 +41,14 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.common.R;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
+
+import java.util.List;
 
 public abstract class BaseService extends Service {
 	private static final boolean DEBUG = false;	// FIXME set false on production
@@ -174,13 +178,37 @@ public abstract class BaseService extends Service {
 		@DrawableRes final int largeIconId,
 		@StringRes final int titleId, @StringRes final int contentId,
 		final PendingIntent intent) {
+		
+		showNotification(notificationId, channelId, null, null,
+			smallIconId, largeIconId, titleId, contentId, intent);
+	}
+	
+	/**
+	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
+	 * こっちはAndroid 8以降でのグループid/グループ名の指定可能
+	 * @param notificationId
+	 * @param groupId
+	 * @param groupName
+	 * @param smallIconId
+	 * @param titleId
+	 * @param contentId
+	 * @param intent
+	 */
+	protected void showNotification(final int notificationId,
+		@NonNull final String channelId,
+		@Nullable final String groupId, @Nullable final String groupName,
+		@DrawableRes final int smallIconId,
+		@DrawableRes final int largeIconId,
+		@StringRes final int titleId, @StringRes final int contentId,
+		final PendingIntent intent) {
 
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
 				try {
 					final NotificationCompat.Builder builder
 						= createNotificationBuilder(notificationId,
-							channelId, smallIconId, largeIconId,
+							channelId, groupId, groupName,
+							smallIconId, largeIconId,
 							titleId, contentId, intent);
 					final Notification notification = createNotification(builder);
 					startForeground(notificationId, notification);
@@ -196,6 +224,13 @@ public abstract class BaseService extends Service {
 	 * NotificationCompat.BuilderからNotificationを生成する
 	 * #showNotificationを呼び出す際に割り込めるように。
 	 * このメソッドでは単にNotificationCompat.Builder#buildを呼ぶだけ
+	 * showNotification
+	 * 	-> createNotificationBuilder
+	 * 		-> (createNotificationChannel
+	 * 			-> (createNotificationChannelGroup)
+	 * 			-> setupNotificationChannel)
+	 * 	-> createNotification
+	 * 	-> startForeground -> NotificationManager#notify
 	 * @param builder
 	 * @return
 	 */
@@ -206,28 +241,136 @@ public abstract class BaseService extends Service {
 		return builder.build();
 	}
 	
+	/**
+	 * Android 8以降用にNotificationChannelを生成する処理
+	 * 後方互換用なので内部では使っていない
+	 * @param channelId
+	 * @param title
+	 * @return
+	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.O)
 	protected final String createNotificationChannel(
 		@NonNull final String channelId,
 		@NonNull final String title) {
+		
+		return createNotificationChannel(channelId, null, null,
+			title, NotificationManager.IMPORTANCE_NONE);
+	}
+	
+	/**
+	 * Android 8以降用にNotificationChannelを生成する処理
+	 * NotificationManager#getNotificationChannelがnullを
+	 * 返したときのみ新規に作成する
+	 * #createNotificationBuilderから呼ばれる
+	 * showNotification
+	 * 	-> createNotificationBuilder
+	 * 		-> (createNotificationChannel
+	 * 			-> (createNotificationChannelGroup)
+	 * 			-> setupNotificationChannel)
+	 * 	-> createNotification
+	 * 	-> startForeground -> NotificationManager#notify
+	 * @param channelId
+	 * @param title
+	 * @param importance
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.O)
+	protected final String createNotificationChannel(
+		@NonNull final String channelId,
+		@Nullable final String groupId, @Nullable final String groupName,
+		@NonNull final String title, final int importance) {
 
 		final NotificationManager manager
 			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		if (manager.getNotificationChannel(channelId) == null) {
 			final NotificationChannel channel
-					= new NotificationChannel(channelId, title, NotificationManager.IMPORTANCE_HIGH);
-			channel.setImportance(NotificationManager.IMPORTANCE_NONE);
-			channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+				= new NotificationChannel(channelId, title, importance);
+			if (!TextUtils.isEmpty(groupId)) {
+				createNotificationChannelGroup(groupId, groupName);
+				channel.setGroup(groupId);
+			}
+			setupNotificationChannel(channel);
 			manager.createNotificationChannel(channel);
 		}
 	    return channelId;
 	}
+	
+	/**
+	 * Android 8以降用にNotificationChannelGroupを生成する処理
+	 * NotificationManager#getNotificationChannelGroupsに同じグループidの
+	 * ものが存在しない時のみ新規に作成する
+	 * #createNotificationBuilderから呼ばれる
+	 * showNotification
+	 * 	-> createNotificationBuilder
+	 * 		-> (createNotificationChannel
+	 * 			-> (createNotificationChannelGroup)
+	 * 			-> setupNotificationChannel)
+	 * 	-> createNotification
+	 * 	-> startForeground -> NotificationManager#notify
+	 * @param groupId
+	 * @param groupName
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.O)
+	protected String createNotificationChannelGroup(
+		@Nullable final String groupId, @Nullable final String groupName) {
+		
+		if (!TextUtils.isEmpty(groupId)) {
+			final NotificationManager manager
+				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			final List<NotificationChannelGroup> groups
+				= manager.getNotificationChannelGroups();
 
+			NotificationChannelGroup found = null;
+			for (final NotificationChannelGroup group: groups) {
+				if (groupId.equals(group.getId())) {
+					found = group;
+					break;
+				}
+			}
+			if (found == null) {
+				found = new NotificationChannelGroup(groupId,
+					TextUtils.isEmpty(groupName) ? groupId : groupName);
+				manager.createNotificationChannelGroup(found);
+			}
+		}
+		
+		return groupId;
+	}
+	
+	/**
+	 * NotificationChannelの設定処理, 元々は#createNotificationChannelの
+	 * 一部だったのを分離
+	 * #createNotificationChannelから呼ばれる
+	 * showNotification
+	 * 	-> createNotificationBuilder
+	 * 		-> (createNotificationChannel
+	 * 			-> (createNotificationChannelGroup)
+	 * 			-> setupNotificationChannel)
+	 * 	-> createNotification
+	 * 	-> startForeground -> NotificationManager#notify
+	 * @param channel
+	 */
+	@TargetApi(Build.VERSION_CODES.O)
+	protected void setupNotificationChannel(@NonNull final NotificationChannel channel) {
+		channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+	}
+	
 	/**
 	 * NotificationCompat.Builderを生成する
 	 * #showNotificationを呼び出す際に割り込めるように
+	 * showNotification
+	 * 	-> createNotificationBuilder
+	 * 		-> (createNotificationChannel
+	 * 			-> (createNotificationChannelGroup)
+	 * 			-> setupNotificationChannel)
+	 * 	-> createNotification
+	 * 	-> startForeground -> NotificationManager#notify
 	 * @param notificationId
 	 * @param channelId
+	 * @param groupId
+	 * @param groupName
 	 * @param smallIconId
 	 * @param largeIconId
 	 * @param titleIdd
@@ -235,9 +378,11 @@ public abstract class BaseService extends Service {
 	 * @param intent
 	 * @return
 	 */
+	@SuppressLint("InlinedApi")
 	protected NotificationCompat.Builder createNotificationBuilder(
 		final int notificationId,
 		@NonNull final String channelId,
+		@Nullable final String groupId, @Nullable final String groupName,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
 		@StringRes final int titleIdd, @StringRes final int contentId,
@@ -246,7 +391,8 @@ public abstract class BaseService extends Service {
 		final String title = getString(titleIdd);
 		final String content = getString(contentId);
 		if (BuildCheck.isOreo()) {
-			createNotificationChannel(channelId, title);
+			createNotificationChannel(channelId, groupId, groupName,
+				title, NotificationManager.IMPORTANCE_NONE);
 		}
 		final NotificationCompat.Builder builder
 			= new NotificationCompat.Builder(this, channelId)
@@ -258,6 +404,10 @@ public abstract class BaseService extends Service {
 				.bigText(content)
 				.setSummaryText(content))
 			.setContentIntent(intent);
+		if (!TextUtils.isEmpty(groupId)) {
+			builder.setGroup(groupId);
+			// XXX 最初だけbuilder.setGroupSummaryが必要かも?
+		}
 		if (largeIconId != 0) {
 			builder.setLargeIcon(
 				BitmapFactory.decodeResource(getResources(), largeIconId));
