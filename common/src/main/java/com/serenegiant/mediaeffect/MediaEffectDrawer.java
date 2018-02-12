@@ -23,7 +23,6 @@ import android.opengl.Matrix;
 import android.support.annotation.NonNull;
 
 import com.serenegiant.glutils.GLHelper;
-import com.serenegiant.glutils.TextureOffscreen;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -34,7 +33,6 @@ import static com.serenegiant.glutils.ShaderConst.*;
 
 public class MediaEffectDrawer {
 
-	protected TextureOffscreen mOutputOffscreen;
 	protected boolean mEnabled = true;
 
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
