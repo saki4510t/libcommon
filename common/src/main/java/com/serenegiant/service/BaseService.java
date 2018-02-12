@@ -60,7 +60,6 @@ public abstract class BaseService extends Service {
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	private Handler mAsyncHandler;
 	private LocalBroadcastManager mLocalBroadcastManager;
-	private NotificationManager mNotificationManager;
 	private volatile boolean mDestroyed;
 
 	@Override
@@ -69,7 +68,6 @@ public abstract class BaseService extends Service {
 		if (DEBUG) Log.v(TAG, "onCreate:");
 		final Context app_context = getApplicationContext();
 		synchronized (mSync) {
-			mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
 			mLocalBroadcastManager = LocalBroadcastManager.getInstance(getApplicationContext());
 			final IntentFilter filter = createIntentFilter();
 			if ((filter != null) && filter.countActions() > 0) {
@@ -104,7 +102,6 @@ public abstract class BaseService extends Service {
 				}
 				mLocalBroadcastManager = null;
 			}
-			mNotificationManager = null;
 		}
 		super.onDestroy();
 	}
@@ -253,23 +250,21 @@ public abstract class BaseService extends Service {
 		final boolean isForegroundService,
 		final PendingIntent intent) {
 
-		synchronized (mSync) {
-			if (mNotificationManager != null) {
-				try {
-					final NotificationCompat.Builder builder
-						= createNotificationBuilder(notificationId,
-							channelId, groupId, groupName,
-							smallIconId, largeIconId,
-							titleId, contentId, intent);
-					final Notification notification = createNotification(builder);
-					if (isForegroundService) {
-						startForeground(notificationId, notification);
-					}
-					mNotificationManager.notify(notificationId, notification);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
+		final NotificationManager manager
+			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		try {
+			final NotificationCompat.Builder builder
+				= createNotificationBuilder(notificationId,
+					channelId, groupId, groupName,
+					smallIconId, largeIconId,
+					titleId, contentId, intent);
+			final Notification notification = createNotification(builder);
+			if (isForegroundService) {
+				startForeground(notificationId, notification);
 			}
+			manager.notify(notificationId, notification);
+		} catch (final Exception e) {
+			Log.w(TAG, e);
 		}
 	}
 	
@@ -513,16 +508,14 @@ public abstract class BaseService extends Service {
 	protected void cancelNotification(final int notificationId,
 		@Nullable final String channelId) {
 
-		synchronized (mSync) {
-			if (mNotificationManager != null) {
-				mNotificationManager.cancel(notificationId);
-				if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
-					try {
-						mNotificationManager.deleteNotificationChannel(channelId);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					}
-				}
+		final NotificationManager manager
+			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		manager.cancel(notificationId);
+		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
+			try {
+				manager.deleteNotificationChannel(channelId);
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
 		}
 	}
