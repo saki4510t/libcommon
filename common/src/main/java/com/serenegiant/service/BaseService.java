@@ -437,10 +437,23 @@ public abstract class BaseService extends Service {
 
 		showNotification(notificationId, channelId, smallIconId, largeIconId, titleIdd, contentId, null);
 		stopForeground(true);
+		cancelNotification(notificationId, channelId);
+	}
+	
+	/**
+	 * 通知領域を開放する。フォアグラウンドサービスの状態は変化しない
+	 * @param notificationId
+	 * @param channelId Android 8以降でnull以外なら対応するNotificationChannelを削除する.
+	 * 			nullまたはAndroid 8未満の場合は何もしない
+	 */
+	@SuppressLint("NewApi")
+	protected void cancelNotification(final int notificationId,
+		@Nullable final String channelId) {
+
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
 				mNotificationManager.cancel(notificationId);
-				if (BuildCheck.isOreo()) {
+				if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
 					try {
 						mNotificationManager.deleteNotificationChannel(channelId);
 					} catch (final Exception e) {
@@ -449,6 +462,18 @@ public abstract class BaseService extends Service {
 				}
 			}
 		}
+	}
+
+	/**
+	 * 通知領域を開放する。
+	 * フォアグラウンドサービスの状態は変化しない。
+	 * Android 8以降のNotificationChannelを削除しない
+	 * @param notificationId
+	 */
+	@SuppressLint("NewApi")
+	protected void cancelNotification(final int notificationId) {
+
+		cancelNotification(notificationId, null);
 	}
 
 	/**
