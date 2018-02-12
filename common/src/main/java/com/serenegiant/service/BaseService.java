@@ -143,6 +143,196 @@ public abstract class BaseService extends Service {
 	}
 
 //================================================================================
+	
+	/**
+	 * Notification生成用のファクトリークラス
+	 * XXX 単独クラスにするかも
+	 */
+	public static abstract class NotificationFactory {
+	
+		protected final String channelId;
+		protected final String channelTitle;
+		protected final int importance;
+		protected final String groupId;
+		protected final String groupName;
+		@DrawableRes
+		protected final int smallIconId;
+		@DrawableRes
+		protected final int largeIconId;
+		
+		public NotificationFactory(
+			@NonNull final String channelId, @Nullable final String channelTitle,
+			@DrawableRes final int smallIconId) {
+	
+			this(channelId, channelId, 0,
+				null, null, smallIconId, R.drawable.ic_notification);
+		}
+
+		public NotificationFactory(
+			@NonNull final String channelId, @Nullable final String channelTitle,
+			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
+
+			this(channelId, channelId, 0,
+				null, null, smallIconId, largeIconId);
+		}
+
+		public NotificationFactory(
+			@NonNull final String channelId,
+			@Nullable final String channelTitle,
+			final int importance,
+			@Nullable final String groupId, @Nullable final String groupName,
+			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
+			
+			this.channelId = channelId;
+			this.channelTitle = TextUtils.isEmpty(channelTitle) ? channelId : channelTitle;
+			this.importance = importance;
+			this.groupId = groupId;
+			this.groupName = TextUtils.isEmpty(groupName) ? groupId : groupName;
+			this.smallIconId = smallIconId;
+			this.largeIconId = largeIconId;
+		}
+		
+		/**
+		 * Notification生成用のファクトリーメソッド
+		 * @param context
+		 * @param title
+		 * @param content
+		 * @return
+		 */
+		@SuppressLint("NewApi")
+		protected Notification createNotification(final Context context,
+			@NonNull final CharSequence title, @NonNull final CharSequence content) {
+
+			if (BuildCheck.isOreo()) {
+				createNotificationChannel(context);
+			}
+			
+			final NotificationCompat.Builder builder
+				= createNotificationBuilder(context, title, content);
+			
+			return builder.build();
+		}
+		
+		/**
+		 * Android 8以降用にNotificationChannelを生成する処理
+		 * NotificationManager#getNotificationChannelがnullを
+		 * 返したときのみ新規に作成する
+		 * #createNotificationBuilderから呼ばれる
+		 * showNotification
+		 * 	-> createNotificationBuilder
+		 * 		-> (createNotificationChannel
+		 * 			-> (createNotificationChannelGroup)
+		 * 			-> setupNotificationChannel)
+		 * 	-> createNotification
+		 * 	-> startForeground -> NotificationManager#notify
+		 * @param context
+		 * @return
+		 */
+		@TargetApi(Build.VERSION_CODES.O)
+		protected void createNotificationChannel(
+			@NonNull final Context context) {
+	
+			final NotificationManager manager
+				= (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+			if (manager.getNotificationChannel(channelId) == null) {
+				if (manager.getNotificationChannel(channelId) == null) {
+					final NotificationChannel channel
+						= new NotificationChannel(channelId, channelTitle, importance);
+					if (!TextUtils.isEmpty(groupId)) {
+						createNotificationChannelGroup(context, groupId, groupName);
+						channel.setGroup(groupId);
+					}
+					channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+					manager.createNotificationChannel(channel);
+				}
+			}
+		}
+		
+		/**
+		 * Android 8以降用にNotificationChannelGroupを生成する処理
+		 * NotificationManager#getNotificationChannelGroupsに同じグループidの
+		 * ものが存在しない時のみ新規に作成する
+		 * #createNotificationBuilderから呼ばれる
+		 * showNotification
+		 * 	-> createNotificationBuilder
+		 * 		-> (createNotificationChannel
+		 * 			-> (createNotificationChannelGroup)
+		 * 			-> setupNotificationChannel)
+		 * 	-> createNotification
+		 * 	-> startForeground -> NotificationManager#notify
+		 * @param groupId
+		 * @param groupName
+		 * @return
+		 */
+		@TargetApi(Build.VERSION_CODES.O)
+		protected void createNotificationChannelGroup(
+			@NonNull final Context context,
+			@Nullable final String groupId, @Nullable final String groupName) {
+			
+			if (!TextUtils.isEmpty(groupId)) {
+				final NotificationManager manager
+					= (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+				final List<NotificationChannelGroup> groups
+					= manager.getNotificationChannelGroups();
+	
+				NotificationChannelGroup found = null;
+				for (final NotificationChannelGroup group: groups) {
+					if (groupId.equals(group.getId())) {
+						found = group;
+						break;
+					}
+				}
+				if (found == null) {
+					found = new NotificationChannelGroup(groupId,
+						TextUtils.isEmpty(groupName) ? groupId : groupName);
+					manager.createNotificationChannelGroup(found);
+				}
+			}
+		}
+		
+		@SuppressLint("InlinedApi")
+		protected NotificationCompat.Builder createNotificationBuilder(
+			@NonNull final Context context,
+			@NonNull final CharSequence title, @NonNull final CharSequence content) {
+	
+			final NotificationCompat.Builder builder
+				= new NotificationCompat.Builder(context, channelId)
+				.setContentTitle(title)
+				.setContentText(content)
+				.setSmallIcon(smallIconId)  // the status icon
+				.setStyle(new NotificationCompat.BigTextStyle()
+					.setBigContentTitle(title)
+					.bigText(content)
+					.setSummaryText(content));
+			final PendingIntent contentIntent = createContentIntent();
+			if (contentIntent != null) {
+				builder.setContentIntent(contentIntent);
+			}
+			final PendingIntent deleteIntent = createDeleteIntent();
+			if (deleteIntent != null) {
+				builder.setDeleteIntent(deleteIntent);
+			}
+			if (!TextUtils.isEmpty(groupId)) {
+				builder.setGroup(groupId);
+				// XXX 最初だけbuilder.setGroupSummaryが必要かも?
+			}
+			if (largeIconId != 0) {
+				builder.setLargeIcon(
+					BitmapFactory.decodeResource(context.getResources(), largeIconId));
+			}
+			return builder;
+		}
+		
+		protected boolean isForegroundService() {
+			return true;
+		}
+		
+		protected abstract PendingIntent createContentIntent();
+		protected PendingIntent createDeleteIntent() {
+			return null;
+		}
+	}
+
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param smallIconId
@@ -252,194 +442,41 @@ public abstract class BaseService extends Service {
 		final boolean isForegroundService,
 		final PendingIntent intent) {
 
-		final NotificationManager manager
-			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		try {
-			final NotificationCompat.Builder builder
-				= createNotificationBuilder(notificationId,
-					channelId, groupId, groupName,
-					smallIconId, largeIconId,
-					title, content, intent);
-			final Notification notification = createNotification(builder);
-			if (isForegroundService) {
-				startForeground(notificationId, notification);
-			}
-			manager.notify(notificationId, notification);
-		} catch (final Exception e) {
-			Log.w(TAG, e);
-		}
-	}
+		showNotification(notificationId, title, content,
+			new NotificationFactory(channelId, channelId, 0,
+				groupId, groupName, smallIconId, largeIconId) {
 
-	/**
-	 * NotificationCompat.BuilderからNotificationを生成する
-	 * #showNotificationを呼び出す際に割り込めるように。
-	 * このメソッドでは単にNotificationCompat.Builder#buildを呼ぶだけ
-	 * showNotification
-	 * 	-> createNotificationBuilder
-	 * 		-> (createNotificationChannel
-	 * 			-> (createNotificationChannelGroup)
-	 * 			-> setupNotificationChannel)
-	 * 	-> createNotification
-	 * 	-> startForeground -> NotificationManager#notify
-	 * @param builder
-	 * @return
-	 */
-	@NonNull
-	protected Notification createNotification(
-		@NonNull final NotificationCompat.Builder builder) {
-		
-		return builder.build();
+				@Override
+					protected boolean isForegroundService() {
+						return isForegroundService;
+					}
+					
+					@Override
+					protected PendingIntent createContentIntent() {
+						return intent;
+					}
+			}
+		);
 	}
 	
 	/**
-	 * Android 8以降用にNotificationChannelを生成する処理
-	 * 後方互換用なので内部では使っていない
-	 * @param channelId
+	 * 通知領域に指定したメッセージを表示する。
+	 * @param notificationId
 	 * @param title
-	 * @return
+	 * @param content
+	 * @param factory
 	 */
-	@Deprecated
-	@TargetApi(Build.VERSION_CODES.O)
-	protected final String createNotificationChannel(
-		@NonNull final String channelId,
-		@NonNull final String title) {
-		
-		return createNotificationChannel(channelId, null, null,
-			title, NotificationManager.IMPORTANCE_NONE);
-	}
-	
-	/**
-	 * Android 8以降用にNotificationChannelを生成する処理
-	 * NotificationManager#getNotificationChannelがnullを
-	 * 返したときのみ新規に作成する
-	 * #createNotificationBuilderから呼ばれる
-	 * showNotification
-	 * 	-> createNotificationBuilder
-	 * 		-> (createNotificationChannel
-	 * 			-> (createNotificationChannelGroup)
-	 * 			-> setupNotificationChannel)
-	 * 	-> createNotification
-	 * 	-> startForeground -> NotificationManager#notify
-	 * @param channelId
-	 * @param title
-	 * @param importance
-	 * @return
-	 */
-	@TargetApi(Build.VERSION_CODES.O)
-	protected final String createNotificationChannel(
-		@NonNull final String channelId,
-		@Nullable final String groupId, @Nullable final String groupName,
-		@NonNull final CharSequence title, final int importance) {
-
-		final NotificationManager manager
-			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-		if (manager.getNotificationChannel(channelId) == null) {
-			final NotificationChannel channel
-				= new NotificationChannel(channelId, title, importance);
-			if (!TextUtils.isEmpty(groupId)) {
-				createNotificationChannelGroup(groupId, groupName);
-				channel.setGroup(groupId);
-			}
-			setupNotificationChannel(channel);
-			manager.createNotificationChannel(channel);
-		}
-	    return channelId;
-	}
-	
-	/**
-	 * Android 8以降用にNotificationChannelGroupを生成する処理
-	 * NotificationManager#getNotificationChannelGroupsに同じグループidの
-	 * ものが存在しない時のみ新規に作成する
-	 * #createNotificationBuilderから呼ばれる
-	 * showNotification
-	 * 	-> createNotificationBuilder
-	 * 		-> (createNotificationChannel
-	 * 			-> (createNotificationChannelGroup)
-	 * 			-> setupNotificationChannel)
-	 * 	-> createNotification
-	 * 	-> startForeground -> NotificationManager#notify
-	 * @param groupId
-	 * @param groupName
-	 * @return
-	 */
-	@TargetApi(Build.VERSION_CODES.O)
-	protected String createNotificationChannelGroup(
-		@Nullable final String groupId, @Nullable final String groupName) {
-		
-		if (!TextUtils.isEmpty(groupId)) {
-			final NotificationManager manager
-				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-			final List<NotificationChannelGroup> groups
-				= manager.getNotificationChannelGroups();
-
-			NotificationChannelGroup found = null;
-			for (final NotificationChannelGroup group: groups) {
-				if (groupId.equals(group.getId())) {
-					found = group;
-					break;
-				}
-			}
-			if (found == null) {
-				found = new NotificationChannelGroup(groupId,
-					TextUtils.isEmpty(groupName) ? groupId : groupName);
-				manager.createNotificationChannelGroup(found);
-			}
-		}
-		
-		return groupId;
-	}
-	
-	/**
-	 * NotificationChannelの設定処理, 元々は#createNotificationChannelの
-	 * 一部だったのを分離
-	 * #createNotificationChannelから呼ばれる
-	 * showNotification
-	 * 	-> createNotificationBuilder
-	 * 		-> (createNotificationChannel
-	 * 			-> (createNotificationChannelGroup)
-	 * 			-> setupNotificationChannel)
-	 * 	-> createNotification
-	 * 	-> startForeground -> NotificationManager#notify
-	 * @param channel
-	 */
-	@TargetApi(Build.VERSION_CODES.O)
-	protected void setupNotificationChannel(@NonNull final NotificationChannel channel) {
-		channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-	}
-	
-	@SuppressLint("InlinedApi")
-	protected NotificationCompat.Builder createNotificationBuilder(
-		final int notificationId,
-		@NonNull final String channelId,
-		@Nullable final String groupId, @Nullable final String groupName,
-		@DrawableRes final int smallIconId,
-		@DrawableRes final int largeIconId,
+	protected void showNotification(final int notificationId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
-		final PendingIntent intent) {
-
-		if (BuildCheck.isOreo()) {
-			createNotificationChannel(channelId, groupId, groupName,
-				title, NotificationManager.IMPORTANCE_NONE);
+		@NonNull final NotificationFactory factory) {
+	
+		final NotificationManager manager
+			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+		final Notification notification = factory.createNotification(this, content, title);
+		if (factory.isForegroundService()) {
+			startForeground(notificationId, notification);
 		}
-		final NotificationCompat.Builder builder
-			= new NotificationCompat.Builder(this, channelId)
-			.setContentTitle(title)
-			.setContentText(content)
-			.setSmallIcon(smallIconId)  // the status icon
-			.setStyle(new NotificationCompat.BigTextStyle()
-				.setBigContentTitle(title)
-				.bigText(content)
-				.setSummaryText(content))
-			.setContentIntent(intent);
-		if (!TextUtils.isEmpty(groupId)) {
-			builder.setGroup(groupId);
-			// XXX 最初だけbuilder.setGroupSummaryが必要かも?
-		}
-		if (largeIconId != 0) {
-			builder.setLargeIcon(
-				BitmapFactory.decodeResource(getResources(), largeIconId));
-		}
-		return builder;
+		manager.notify(notificationId, notification);
 	}
 
 	/**
