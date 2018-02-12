@@ -160,10 +160,31 @@ public abstract class BaseService extends Service {
 
 		showNotification(NOTIFICATION_ID,
 			getString(R.string.service_name),
+			null, null,
 			smallIconId, R.drawable.ic_notification,
-			titleIdd, contentId, intent);
+			titleIdd, contentId, true, intent);
 	}
 	
+	/**
+	 * 通知領域に指定したメッセージを表示する。
+	 * @param smallIconId
+	 * @param titleIdd
+	 * @param contentId
+	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
+	 * @param intent
+	 */
+	protected void showNotification(@DrawableRes final int smallIconId,
+		@StringRes final int titleIdd, @StringRes final int contentId,
+		final boolean isForegroundService,
+		final PendingIntent intent) {
+
+		showNotification(NOTIFICATION_ID,
+			getString(R.string.service_name),
+			null, null,
+			smallIconId, R.drawable.ic_notification,
+			titleIdd, contentId, isForegroundService, intent);
+	}
+
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param notificationId
@@ -180,7 +201,8 @@ public abstract class BaseService extends Service {
 		final PendingIntent intent) {
 		
 		showNotification(notificationId, channelId, null, null,
-			smallIconId, largeIconId, titleId, contentId, intent);
+			smallIconId, largeIconId,
+			titleId, contentId, true, intent);
 	}
 	
 	/**
@@ -201,6 +223,35 @@ public abstract class BaseService extends Service {
 		@DrawableRes final int largeIconId,
 		@StringRes final int titleId, @StringRes final int contentId,
 		final PendingIntent intent) {
+		
+		showNotification(notificationId, channelId,
+			groupId, groupName,
+			smallIconId, largeIconId,
+			titleId, contentId, true, intent);
+	}
+	
+	/**
+	 * 通知領域に指定したメッセージを表示する。
+	 * こっちはAndroid 8以降でのグループid/グループ名の指定可能
+	 * @param notificationId
+	 * @param channelId
+	 * @param groupId
+	 * @param groupName
+	 * @param smallIconId
+	 * @param largeIconId
+	 * @param titleId
+	 * @param contentId
+	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
+	 * @param intent
+	 */
+	protected void showNotification(final int notificationId,
+		@NonNull final String channelId,
+		@Nullable final String groupId, @Nullable final String groupName,
+		@DrawableRes final int smallIconId,
+		@DrawableRes final int largeIconId,
+		@StringRes final int titleId, @StringRes final int contentId,
+		final boolean isForegroundService,
+		final PendingIntent intent) {
 
 		synchronized (mSync) {
 			if (mNotificationManager != null) {
@@ -211,7 +262,9 @@ public abstract class BaseService extends Service {
 							smallIconId, largeIconId,
 							titleId, contentId, intent);
 					final Notification notification = createNotification(builder);
-					startForeground(notificationId, notification);
+					if (isForegroundService) {
+						startForeground(notificationId, notification);
+					}
 					mNotificationManager.notify(notificationId, notification);
 				} catch (final Exception e) {
 					Log.w(TAG, e);
