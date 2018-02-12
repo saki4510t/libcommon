@@ -38,7 +38,6 @@ import android.os.Looper;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -147,31 +146,32 @@ public abstract class BaseService extends Service {
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param smallIconId
-	 * @param titleIdd
-	 * @param contentId
+	 * @param title
+	 * @param content
 	 * @param intent
 	 */
 	protected void showNotification(@DrawableRes final int smallIconId,
-		@StringRes final int titleIdd, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final PendingIntent intent) {
 
 		showNotification(NOTIFICATION_ID,
 			getString(R.string.service_name),
 			null, null,
 			smallIconId, R.drawable.ic_notification,
-			titleIdd, contentId, true, intent);
+			title, content,
+			true, intent);
 	}
-	
+
 	/**
 	 * 通知領域に指定したメッセージを表示する。
 	 * @param smallIconId
-	 * @param titleIdd
-	 * @param contentId
+	 * @param title
+	 * @param content
 	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
 	 * @param intent
 	 */
 	protected void showNotification(@DrawableRes final int smallIconId,
-		@StringRes final int titleIdd, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final boolean isForegroundService,
 		final PendingIntent intent) {
 
@@ -179,27 +179,29 @@ public abstract class BaseService extends Service {
 			getString(R.string.service_name),
 			null, null,
 			smallIconId, R.drawable.ic_notification,
-			titleIdd, contentId, isForegroundService, intent);
+			title, content,
+			isForegroundService, intent);
 	}
 
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param notificationId
 	 * @param smallIconId
-	 * @param titleId
-	 * @param contentId
+	 * @param title
+	 * @param content
 	 * @param intent
 	 */
 	protected void showNotification(final int notificationId,
 		@NonNull final String channelId,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleId, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final PendingIntent intent) {
 		
 		showNotification(notificationId, channelId, null, null,
 			smallIconId, largeIconId,
-			titleId, contentId, true, intent);
+			title, content,
+			true, intent);
 	}
 	
 	/**
@@ -209,8 +211,8 @@ public abstract class BaseService extends Service {
 	 * @param groupId
 	 * @param groupName
 	 * @param smallIconId
-	 * @param titleId
-	 * @param contentId
+	 * @param title
+	 * @param content
 	 * @param intent
 	 */
 	protected void showNotification(final int notificationId,
@@ -218,15 +220,15 @@ public abstract class BaseService extends Service {
 		@Nullable final String groupId, @Nullable final String groupName,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleId, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final PendingIntent intent) {
 		
 		showNotification(notificationId, channelId,
 			groupId, groupName,
 			smallIconId, largeIconId,
-			titleId, contentId, true, intent);
+			title, content, true, intent);
 	}
-	
+
 	/**
 	 * 通知領域に指定したメッセージを表示する。
 	 * こっちはAndroid 8以降でのグループid/グループ名の指定可能
@@ -236,8 +238,8 @@ public abstract class BaseService extends Service {
 	 * @param groupName
 	 * @param smallIconId
 	 * @param largeIconId
-	 * @param titleId
-	 * @param contentId
+	 * @param title
+	 * @param content
 	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
 	 * @param intent
 	 */
@@ -246,7 +248,7 @@ public abstract class BaseService extends Service {
 		@Nullable final String groupId, @Nullable final String groupName,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleId, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final boolean isForegroundService,
 		final PendingIntent intent) {
 
@@ -257,7 +259,7 @@ public abstract class BaseService extends Service {
 				= createNotificationBuilder(notificationId,
 					channelId, groupId, groupName,
 					smallIconId, largeIconId,
-					titleId, contentId, intent);
+					title, content, intent);
 			final Notification notification = createNotification(builder);
 			if (isForegroundService) {
 				startForeground(notificationId, notification);
@@ -267,7 +269,7 @@ public abstract class BaseService extends Service {
 			Log.w(TAG, e);
 		}
 	}
-	
+
 	/**
 	 * NotificationCompat.BuilderからNotificationを生成する
 	 * #showNotificationを呼び出す際に割り込めるように。
@@ -327,7 +329,7 @@ public abstract class BaseService extends Service {
 	protected final String createNotificationChannel(
 		@NonNull final String channelId,
 		@Nullable final String groupId, @Nullable final String groupName,
-		@NonNull final String title, final int importance) {
+		@NonNull final CharSequence title, final int importance) {
 
 		final NotificationManager manager
 			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -405,27 +407,6 @@ public abstract class BaseService extends Service {
 		channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
 	}
 	
-	/**
-	 * NotificationCompat.Builderを生成する
-	 * #showNotificationを呼び出す際に割り込めるように
-	 * showNotification
-	 * 	-> createNotificationBuilder
-	 * 		-> (createNotificationChannel
-	 * 			-> (createNotificationChannelGroup)
-	 * 			-> setupNotificationChannel)
-	 * 	-> createNotification
-	 * 	-> startForeground -> NotificationManager#notify
-	 * @param notificationId
-	 * @param channelId
-	 * @param groupId
-	 * @param groupName
-	 * @param smallIconId
-	 * @param largeIconId
-	 * @param titleIdd
-	 * @param contentId
-	 * @param intent
-	 * @return
-	 */
 	@SuppressLint("InlinedApi")
 	protected NotificationCompat.Builder createNotificationBuilder(
 		final int notificationId,
@@ -433,11 +414,9 @@ public abstract class BaseService extends Service {
 		@Nullable final String groupId, @Nullable final String groupName,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleIdd, @StringRes final int contentId,
+		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final PendingIntent intent) {
 
-		final String title = getString(titleIdd);
-		final String content = getString(contentId);
 		if (BuildCheck.isOreo()) {
 			createNotificationChannel(channelId, groupId, groupName,
 				title, NotificationManager.IMPORTANCE_NONE);
@@ -462,7 +441,7 @@ public abstract class BaseService extends Service {
 		}
 		return builder;
 	}
-	
+
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
@@ -470,7 +449,7 @@ public abstract class BaseService extends Service {
 		releaseNotification(NOTIFICATION_ID,
 			getString(R.string.service_name),
 			R.drawable.ic_notification, R.drawable.ic_notification,
-			R.string.service_name, R.string.service_stop);
+			getString(R.string.service_name), getString(R.string.service_stop));
 	}
 	
 	/**
@@ -481,9 +460,9 @@ public abstract class BaseService extends Service {
 		@NonNull final String channelId,
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
-		@StringRes final int titleIdd, @StringRes final int contentId) {
+		@NonNull final CharSequence title, @NonNull final CharSequence content) {
 
-		showNotification(notificationId, channelId, smallIconId, largeIconId, titleIdd, contentId, null);
+		showNotification(notificationId, channelId, smallIconId, largeIconId, title, content, null);
 		releaseNotification(notificationId, channelId);
 	}
 	
