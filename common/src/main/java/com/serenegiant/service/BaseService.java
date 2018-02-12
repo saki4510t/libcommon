@@ -436,10 +436,20 @@ public abstract class BaseService extends Service {
 		@StringRes final int titleIdd, @StringRes final int contentId) {
 
 		showNotification(notificationId, channelId, smallIconId, largeIconId, titleIdd, contentId, null);
+		releaseNotification(notificationId, channelId);
+	}
+	
+	/**
+	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
+	 */
+	@SuppressLint("NewApi")
+	protected void releaseNotification(final int notificationId,
+		@NonNull final String channelId) {
+
 		stopForeground(true);
 		cancelNotification(notificationId, channelId);
 	}
-	
+
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスの状態は変化しない
 	 * @param notificationId
