@@ -160,19 +160,23 @@ public abstract class BaseService extends Service {
 		@DrawableRes
 		protected final int largeIconId;
 		
+		@SuppressLint("InlinedApi")
 		public NotificationFactory(
 			@NonNull final String channelId, @Nullable final String channelTitle,
 			@DrawableRes final int smallIconId) {
 	
-			this(channelId, channelId, 0,
+			this(channelId, channelId,
+				BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
 				null, null, smallIconId, R.drawable.ic_notification);
 		}
 
+		@SuppressLint("InlinedApi")
 		public NotificationFactory(
 			@NonNull final String channelId, @Nullable final String channelTitle,
 			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
 
-			this(channelId, channelId, 0,
+			this(channelId, channelId,
+				BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
 				null, null, smallIconId, largeIconId);
 		}
 
