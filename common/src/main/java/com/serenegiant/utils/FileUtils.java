@@ -29,6 +29,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -164,7 +165,35 @@ public class FileUtils {
     public static float FREE_SIZE = 300 * 1024 * 1024;		// 空き領域が300MB以上ならOK
     public static float FREE_SIZE_MINUTE = 40 * 1024 * 1024;	// 1分当たりの動画容量(5Mbpsで38MBぐらいなので)
 	public static long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
-
+	
+	/**
+	 * ストレージの情報を取得
+	 * @param context
+	 * @param type
+	 * @param save_tree_id
+	 * @return アクセスできなければnull
+	 */
+	@Nullable
+	public static StorageInfo getStorageInfo(final Context context,
+		@NonNull final String type, final int save_tree_id) {
+	    
+		if (context != null) {
+			try {
+				// 外部保存領域が書き込み可能な場合
+				// 外部ストレージへのパーミッションがないとnullが返ってくる
+				final File dir = getCaptureDir(context, type, save_tree_id);
+//					Log.i(TAG, "checkFreeSpace:dir=" + dir);
+				if (dir != null) {
+					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
+					return new StorageInfo(dir.getTotalSpace(), (long)freeSpace);
+				}
+			} catch (final Exception e) {
+				Log.w("getStorageInfo:", e);
+			}
+		}
+	    return null;
+	}
+	
     /**
      * プライマリー外部ストレージの空き容量のチェック
      * プライマリー外部ストレージの空き容量がFREE_RATIO(5%)以上かつFREE_SIZE(20MB)以上ならtrueを返す
