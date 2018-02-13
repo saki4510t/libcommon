@@ -43,7 +43,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 		"void main() {\n" +
 		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
 		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
-		"    gl_FragColor = gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * uMixRate), tex1.a);\n" +
+		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * uMixRate), tex1.a);\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
