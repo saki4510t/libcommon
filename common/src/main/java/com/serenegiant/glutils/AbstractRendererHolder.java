@@ -402,6 +402,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@MirrorMode
 		private int mMirror = MIRROR_NORMAL;
 		private int mRotation = 0;
+		private volatile boolean mIsFirstFrameRendered;
 		
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height) {
@@ -736,18 +737,36 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				offer(REQUEST_RECREATE_MASTER_SURFACE);
 				return;
 			}
-			try {
-				makeCurrent();
-				mMasterTexture.updateTexImage();
-				mMasterTexture.getTransformMatrix(mTexMatrix);
-			} catch (final Exception e) {
-				Log.e(TAG, "draw:thread id =" + Thread.currentThread().getId(), e);
-				offer(REQUEST_RECREATE_MASTER_SURFACE);
-				return;
+			if (mIsFirstFrameRendered) {
+				try {
+					makeCurrent();
+					handleUpdateTexture();
+				} catch (final Exception e) {
+					Log.e(TAG, "draw:thread id =" + Thread.currentThread().getId(), e);
+					offer(REQUEST_RECREATE_MASTER_SURFACE);
+					return;
+				}
+				mParent.notifyCapture();
+				preprocess();
+				handleDrawClients();
+				mParent.callOnFrameAvailable();
 			}
-			mParent.notifyCapture();
-			preprocess();
-			// 各Surfaceへ描画する
+			makeCurrent();
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			GLES20.glFlush();
+		}
+
+		protected void handleUpdateTexture() {
+			mMasterTexture.updateTexImage();
+			mMasterTexture.getTransformMatrix(mTexMatrix);
+		}
+		
+		protected abstract void preprocess();
+	
+		/**
+		 * 各Surfaceへ描画する
+		 */
+		protected void handleDrawClients() {
 			synchronized (mClients) {
 				final int n = mClients.size();
 				RendererSurfaceRec client;
@@ -764,13 +783,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					}
 				}
 			}
-			mParent.callOnFrameAvailable();
-			makeCurrent();
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			GLES20.glFlush();
 		}
-
-		protected abstract void preprocess();
+	
+		/**
+		 * Surface1つの描画処理
+		 * @param client
+		 * @param texId
+		 * @param texMatrix
+		 */
 		protected abstract void onDrawClient(
 			@NonNull final RendererSurfaceRec client,
 			final int texId, final float[] texMatrix);
@@ -999,11 +1019,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		/**
 		 * TextureSurfaceで映像を受け取った際のコールバックリスナー
 		 */
-		private final SurfaceTexture.OnFrameAvailableListener
+		protected final SurfaceTexture.OnFrameAvailableListener
 			mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
 
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
+				removeRequest(REQUEST_DRAW);
+				mIsFirstFrameRendered = true;
 				offer(REQUEST_DRAW);
 			}
 		};
