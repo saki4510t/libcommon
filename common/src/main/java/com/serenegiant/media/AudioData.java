@@ -18,62 +18,19 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
+import android.support.annotation.IntRange;
 
-public class AudioData {
-//	private static final boolean DEBUG = false;
-//	private static final String TAG = "AudioData";
-
-//	private static int count = 0;
-
-	ByteBuffer mBuffer;
-	int size;
-	long presentationTimeUs;
-
-	public AudioData(final int size) {
-		mBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
-//		if (DEBUG) Log.i(TAG, "create new AudioData:" + ++count);
-	}
-
-	public void set(final ByteBuffer buffer, final int _size, final long _presentationTimeUs) {
-		presentationTimeUs = _presentationTimeUs;
-		size = _size;
-		if (mBuffer == null || mBuffer.capacity() < _size) {
-			mBuffer = ByteBuffer.allocateDirect(_size).order(ByteOrder.nativeOrder());
-		}
-		mBuffer.clear();
-		mBuffer.put(buffer);
-		mBuffer.position(_size);
-		mBuffer.flip();
-	}
-
-	public void clear() {
-		size = 0;
-		mBuffer.clear();
-	}
-
-	public int size() {
-		return size;
-	}
-
-	public long presentationTimeUs() {
-		return presentationTimeUs;
-	}
-
-	public void get(final byte[] buffer) {
-		if ((buffer == null) || (buffer.length < size)) {
-			throw new ArrayIndexOutOfBoundsException("");
-		}
-		mBuffer.clear();
-		mBuffer.get(buffer);
-	}
-
-	public void get(final ByteBuffer buffer) {
-		if ((buffer == null) || (buffer.remaining() < size)) {
-			throw new ArrayIndexOutOfBoundsException("");
-		}
-		mBuffer.clear();
-		buffer.put(mBuffer);
+/**
+ * MediaDataのシモニム, Deprecatedなので代わりにMediaDataを使うこと
+ */
+@Deprecated
+public class AudioData extends MediaData {
+	/**
+	 * コンストラクタ
+	 *
+	 * @param size データ保持用の内部バッファのデフォルトサイズ
+	 */
+	public AudioData(@IntRange(from = 1) final int size) {
+		super(size);
 	}
 }
