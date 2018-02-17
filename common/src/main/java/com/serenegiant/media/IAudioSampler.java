@@ -25,10 +25,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
-import android.os.SystemClock;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.Time;
 
 public abstract class IAudioSampler {
@@ -67,8 +65,8 @@ public abstract class IAudioSampler {
 	private final int MAX_QUEUE_SIZE = 200;
 
 	// 音声データキュー用
-	private final LinkedBlockingQueue<AudioData> mPool = new LinkedBlockingQueue<AudioData>(MAX_POOL_SIZE);
-	private final LinkedBlockingQueue<AudioData> mAudioQueue = new LinkedBlockingQueue<AudioData>(MAX_QUEUE_SIZE);
+	private final LinkedBlockingQueue<MediaData> mPool = new LinkedBlockingQueue<MediaData>(MAX_POOL_SIZE);
+	private final LinkedBlockingQueue<MediaData> mAudioQueue = new LinkedBlockingQueue<MediaData>(MAX_QUEUE_SIZE);
 
 	// コールバック用
 	private CallbackThread mCallbackThread;
@@ -191,7 +189,7 @@ public abstract class IAudioSampler {
 	 * 音声データ取得時のコールバックを呼び出す
 	 * @param data
 	 */
-	private void callOnData(final AudioData data) {
+	private void callOnData(final MediaData data) {
 		synchronized (mCallbackSync) {
 			for (final SoundSamplerCallback callback: mCallbacks) {
 				try {
@@ -226,7 +224,7 @@ public abstract class IAudioSampler {
 		mAudioQueue.clear();
 		mPool.clear();
 		for (int i = 0; i < 8; i++) {
-			mPool.add(new AudioData(default_buffer_size));
+			mPool.add(new MediaData(default_buffer_size));
 		}
 	}
 
@@ -239,15 +237,15 @@ public abstract class IAudioSampler {
 	 * プールがからの場合には最大MAX_POOL_SIZE個までは新規生成する
 	 * @return
 	 */
-	protected AudioData obtain() {
+	protected MediaData obtain() {
 //		if (DEBUG) Log.v(TAG, "obtain:" + mPool.size() + ",mBufferNum=" + mBufferNum);
-		AudioData result = null;
+		MediaData result = null;
 		if (!mPool.isEmpty()) {
 			// プールに空バッファが有る時
 			result = mPool.poll();
 		} else if (mBufferNum < MAX_POOL_SIZE) {
-//			if (DEBUG) Log.i(TAG, "create AudioData");
-			result = new AudioData(mDefaultBufferSize);
+//			if (DEBUG) Log.i(TAG, "create MediaData");
+			result = new MediaData(mDefaultBufferSize);
 			mBufferNum++;
 		}
 		if (result != null)
@@ -260,7 +258,7 @@ public abstract class IAudioSampler {
 	 * 使用済みの音声データバッファを再利用するためにプールに戻す
 	 * @param data
 	 */
-	protected void recycle(final AudioData data) {
+	protected void recycle(final MediaData data) {
 //		if (DEBUG) Log.v(TAG, "recycle:" + mPool.size());
 		if (!mPool.offer(data)) {
 			// ここには来ないはず
@@ -269,12 +267,12 @@ public abstract class IAudioSampler {
 		}
 	}
 
-	protected void addAudioData(final AudioData data) {
-//		if (DEBUG) Log.v(TAG, "addAudioData:" + mAudioQueue.size());
+	protected void addMediaData(final MediaData data) {
+//		if (DEBUG) Log.v(TAG, "addMediaData:" + mAudioQueue.size());
 		mAudioQueue.offer(data);
 	}
 
-	protected AudioData pollAudioData(final long timout_msec) throws InterruptedException {
+	protected MediaData pollMediaData(final long timout_msec) throws InterruptedException {
 		return mAudioQueue.poll(timout_msec, TimeUnit.MILLISECONDS);
 	}
 
@@ -309,10 +307,10 @@ public abstract class IAudioSampler {
     	public final void run() {
 //    		if (DEBUG) Log.i(TAG, "CallbackThread:start");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			AudioData data;
+			MediaData data;
     		for (; mIsCapturing ;) {
     			try {
-					data = pollAudioData(100);
+					data = pollMediaData(100);
 				} catch (final InterruptedException e) {
 					break;
 				}

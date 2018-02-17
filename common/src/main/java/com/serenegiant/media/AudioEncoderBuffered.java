@@ -43,8 +43,8 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	 * キューに入れる音声データのバッファサイズ
 	 */
 	protected int mBufferSize = SAMPLES_PER_FRAME;
-	protected final LinkedBlockingQueue<AudioData> mPool = new LinkedBlockingQueue<AudioData>(MAX_POOL_SIZE);
-	protected final LinkedBlockingQueue<AudioData> mAudioQueue = new LinkedBlockingQueue<AudioData>(MAX_QUEUE_SIZE);
+	protected final LinkedBlockingQueue<MediaData> mPool = new LinkedBlockingQueue<MediaData>(MAX_POOL_SIZE);
+	protected final LinkedBlockingQueue<MediaData> mAudioQueue = new LinkedBlockingQueue<MediaData>(MAX_QUEUE_SIZE);
 
 	public AudioEncoderBuffered(final IRecorder recorder, final EncoderListener listener,
 								final int audio_source, final int audio_channels) {
@@ -75,14 +75,14 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	}
 
 	private int mBufferNum = 0;
-	private AudioData obtain() {
-		AudioData result = null;
+	private MediaData obtain() {
+		MediaData result = null;
 		try {
 			result = mPool.poll(20, TimeUnit.MILLISECONDS);
 		} catch (final InterruptedException e) {
 		}
 		if ((result == null) && (mBufferNum < MAX_POOL_SIZE) ) {
-			result = new AudioData(mBufferSize);
+			result = new MediaData(mBufferSize);
 			mBufferNum++;
 		}
 		if (result != null)
@@ -90,7 +90,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		return result;
 	}
 
-	protected void recycle(final AudioData data) {
+	protected void recycle(final MediaData data) {
 		mPool.offer(data);
 	}
 
@@ -125,7 +125,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		                ByteBuffer buffer;
 		                audioRecord.startRecording();
 		                try {
-		                	AudioData data;
+		                	MediaData data;
 		                	for ( ; ;) {
 		                		synchronized (mSync) {
 			                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
@@ -184,7 +184,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 
     	@Override
     	public final void run() {
-			AudioData data;
+			MediaData data;
 			int frame_count = 0;
     		for (; ;) {
         		synchronized (mSync) {

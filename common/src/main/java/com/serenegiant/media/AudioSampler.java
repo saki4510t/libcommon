@@ -203,7 +203,7 @@ public class AudioSampler extends IAudioSampler {
 							ByteBuffer buffer;
 							audioRecord.startRecording();
 							try {
-								AudioData data;
+								MediaData data;
 								for ( ; mIsCapturing ;) {
 									data = obtain();
 									if (data != null) {
@@ -254,7 +254,7 @@ public class AudioSampler extends IAudioSampler {
 											buffer.position(readBytes);
 											buffer.flip();
 											// 音声データキューに追加する
-											addAudioData(data);
+											addMediaData(data);
 										}
 									} // end of if (data != null)
 									if (err_count > 10) {
