@@ -18,6 +18,8 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.os.Build;
+
 /**
  * 従来はプレビュー解像度=動画の解像度の設定用に使用していたが
  * 今後は動画解像度用のみに使用してプレビュー解像度はDeviceSettingから取得する
@@ -62,6 +64,17 @@ public class VideoConfig {
 	 * 負は回数制限なし, 1以上なら指定回数繰り返し
 	 */
 	public static  int maxRepeats = 1;
+
+	/**
+	 * trueならMediaMuxerを使う、 falseならVideoMuxerを使う
+	 * ・・・VideoMuxerを使ってnative側での最大録画時間チェックを有効にするため常にfalse
+	 */
+	public static boolean sUseMediaMuxer = (Build.VERSION.SDK_INT >= 18) && false;
+
+	/**
+	 * SurfaceEncoderを使って動画キャプチャをするかどうか
+	 */
+	public static boolean sIsSurfaceCapture = (Build.VERSION.SDK_INT >= 18) && false;
 
 	public static void setCaptureFps(final int fps) {
 		captureFps = fps > FPS_MAX ? FPS_MAX : (fps < FPS_MIN ? FPS_MIN : fps);
