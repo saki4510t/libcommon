@@ -29,10 +29,10 @@ import java.nio.ByteOrder;
 
 public class MediaData {
 
-	ByteBuffer mBuffer;
-	int flags;
-	int size;
-	long presentationTimeUs;
+	/*package*/ByteBuffer mBuffer;
+	/*package*/int flags;
+	/*package*/int size;
+	/*package*/long presentationTimeUs;
 	
 	/**
 	 * コンストラクタ
@@ -176,5 +176,16 @@ public class MediaData {
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void get(@NonNull final MediaCodec.BufferInfo info) {
 		info.set(0, size, presentationTimeUs, flags);
+	}
+	
+	/**
+	 * 内部で保持しているByteBufferを返す
+ 	 * @return
+	 */
+	public ByteBuffer get() {
+		mBuffer.clear();
+		mBuffer.limit(size);
+		mBuffer.flip();
+		return mBuffer;
 	}
 }
