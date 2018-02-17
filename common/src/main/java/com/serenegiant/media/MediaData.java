@@ -91,6 +91,31 @@ public class MediaData {
 	}
 	
 	/**
+	 * データをセット
+	 * @param buffer
+	 * @param info
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public void set(@NonNull ByteBuffer buffer,
+		@NonNull final MediaCodec.BufferInfo info) {
+	
+		presentationTimeUs = info.presentationTimeUs;
+		size = info.size;
+		flags = info.flags;
+		final int offset = info.offset;
+		if (mBuffer == null || mBuffer.capacity() < size) {
+			mBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+		}
+		buffer.limit(offset + size);
+		buffer.flip();
+		buffer.position(offset);
+		mBuffer.clear();
+		mBuffer.put(buffer);
+		mBuffer.position(size);
+		mBuffer.flip();
+	}
+	
+	/**
 	 * データをクリア
 	 */
 	public void clear() {
