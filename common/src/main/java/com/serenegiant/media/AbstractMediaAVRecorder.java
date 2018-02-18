@@ -125,6 +125,9 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 					if (pfd != null) {
 						setupMuxer(pfd.getFd());
 						return;
+					} else {
+						// ここには来ないはずだけど
+						throw new IOException("could not create ParcelFileDescriptor");
 					}
 				} catch (final Exception e) {
 					if (pfd != null) {
