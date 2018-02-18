@@ -81,12 +81,11 @@ public class MediaData {
 		if (mBuffer == null || mBuffer.capacity() < _size) {
 			mBuffer = ByteBuffer.allocateDirect(_size).order(ByteOrder.nativeOrder());
 		}
-		buffer.limit(_offset + _size);
+		buffer.position(_offset + _size);
 		buffer.flip();
 		buffer.position(_offset);
 		mBuffer.clear();
 		mBuffer.put(buffer);
-		mBuffer.position(_size);
 		mBuffer.flip();
 	}
 	
@@ -106,12 +105,11 @@ public class MediaData {
 		if (mBuffer == null || mBuffer.capacity() < size) {
 			mBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
 		}
-		buffer.limit(offset + size);
+		buffer.position(offset + size);
 		buffer.flip();
 		buffer.position(offset);
 		mBuffer.clear();
 		mBuffer.put(buffer);
-		mBuffer.position(size);
 		mBuffer.flip();
 	}
 	
@@ -149,7 +147,7 @@ public class MediaData {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
-		mBuffer.limit(size);
+		mBuffer.position(size);
 		mBuffer.flip();
 		mBuffer.get(buffer);
 	}
@@ -164,7 +162,7 @@ public class MediaData {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
-		mBuffer.limit(size);
+		mBuffer.position(size);
 		mBuffer.flip();
 		buffer.put(mBuffer);
 	}
@@ -184,7 +182,7 @@ public class MediaData {
 	 */
 	public ByteBuffer get() {
 		mBuffer.clear();
-		mBuffer.limit(size);
+		mBuffer.position(size);
 		mBuffer.flip();
 		return mBuffer;
 	}
