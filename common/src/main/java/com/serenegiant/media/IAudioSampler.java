@@ -188,11 +188,16 @@ public abstract class IAudioSampler {
 	 * 音声データ取得時のコールバックを呼び出す
 	 * @param data
 	 */
-	private void callOnData(final MediaData data) {
+	private void callOnData(@NonNull final MediaData data) {
+		final ByteBuffer buf = data.mBuffer;
+		final int size = data.size;
+		final long pts = data.presentationTimeUs;
 		for (final SoundSamplerCallback callback: mCallbacks) {
 			try {
-				data.mBuffer.rewind();
-				callback.onData(data.mBuffer, data.size, data.presentationTimeUs);
+				buf.clear();
+				buf.position(size);
+				buf.flip();
+				callback.onData(buf, size, pts);
 			} catch (final Exception e) {
 				mCallbacks.remove(callback);
 				Log.w(TAG, "callOnData:", e);
