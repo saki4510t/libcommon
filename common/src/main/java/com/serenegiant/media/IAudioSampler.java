@@ -25,6 +25,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.utils.Time;
@@ -254,7 +255,7 @@ public abstract class IAudioSampler {
 	 * 使用済みの音声データバッファを再利用するためにプールに戻す
 	 * @param data
 	 */
-	protected void recycle(final MediaData data) {
+	protected void recycle(@NonNull final MediaData data) {
 //		if (DEBUG) Log.v(TAG, "recycle:" + mPool.size());
 		if (!mPool.offer(data)) {
 			// ここには来ないはず
@@ -263,9 +264,9 @@ public abstract class IAudioSampler {
 		}
 	}
 
-	protected void addMediaData(final MediaData data) {
+	protected boolean addMediaData(@NonNull final MediaData data) {
 //		if (DEBUG) Log.v(TAG, "addMediaData:" + mAudioQueue.size());
-		mAudioQueue.offer(data);
+		return mAudioQueue.offer(data);
 	}
 
 	protected MediaData pollMediaData(final long timeout_msec) throws InterruptedException {
