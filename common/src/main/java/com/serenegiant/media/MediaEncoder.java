@@ -23,11 +23,9 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.os.SystemClock;
 import android.util.Log;
 
 import com.serenegiant.common.BuildConfig;
-import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.Time;
 
 import java.lang.ref.WeakReference;
