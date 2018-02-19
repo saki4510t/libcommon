@@ -272,8 +272,8 @@ public abstract class IAudioSampler {
 		mAudioQueue.offer(data);
 	}
 
-	protected MediaData pollMediaData(final long timout_msec) throws InterruptedException {
-		return mAudioQueue.poll(timout_msec, TimeUnit.MILLISECONDS);
+	protected MediaData pollMediaData(final long timeout_msec) throws InterruptedException {
+		return mAudioQueue.poll(timeout_msec, TimeUnit.MILLISECONDS);
 	}
 
 	/**
