@@ -19,8 +19,8 @@ package com.serenegiant.media;
 */
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -71,7 +71,7 @@ public abstract class IAudioSampler {
 	// コールバック用
 	private CallbackThread mCallbackThread;
 	private final Object mCallbackSync = new Object();
-	private final List<SoundSamplerCallback> mCallbacks = new ArrayList<SoundSamplerCallback>();
+	private final Set<SoundSamplerCallback> mCallbacks = new CopyOnWriteArraySet<SoundSamplerCallback>();
 	protected volatile boolean mIsCapturing;
 
 	public IAudioSampler() {
@@ -86,9 +86,7 @@ public abstract class IAudioSampler {
 			stop();
 		}
 //		mIsCapturing = false;	// 念の為に
-		synchronized (mCallbackSync) {
-			mCallbacks.clear();
-		}
+		mCallbacks.clear();
 //		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
@@ -133,7 +131,7 @@ public abstract class IAudioSampler {
 	 * @param callback
 	 */
 	public void addCallback(final SoundSamplerCallback callback) {
-		synchronized (mCallbackSync) {
+		if (callback != null) {
 			mCallbacks.add(callback);
 		}
 	}
@@ -143,7 +141,7 @@ public abstract class IAudioSampler {
 	 * @param callback
 	 */
 	public void removeCallback(final SoundSamplerCallback callback) {
-		synchronized (mCallbackSync) {
+		if (callback != null) {
 			for (; mCallbacks.remove(callback); );
 		}
 	}
@@ -190,14 +188,13 @@ public abstract class IAudioSampler {
 	 * @param data
 	 */
 	private void callOnData(final MediaData data) {
-		synchronized (mCallbackSync) {
-			for (final SoundSamplerCallback callback: mCallbacks) {
-				try {
-					data.mBuffer.rewind();
-					callback.onData(data.mBuffer, data.size, data.presentationTimeUs);
-				} catch (final Exception e) {
-					Log.w(TAG, "callOnData:", e);
-				}
+		for (final SoundSamplerCallback callback: mCallbacks) {
+			try {
+				data.mBuffer.rewind();
+				callback.onData(data.mBuffer, data.size, data.presentationTimeUs);
+			} catch (final Exception e) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, "callOnData:", e);
 			}
 		}
     }
@@ -207,13 +204,12 @@ public abstract class IAudioSampler {
 	 * @param e
 	 */
     protected void callOnError(final Exception e) {
-		synchronized (mCallbackSync) {
-			for (final SoundSamplerCallback callback: mCallbacks) {
-				try {
-					callback.onError(e);
-				} catch (final Exception e1) {
-					Log.w(TAG, "callOnError:", e1);
-				}
+		for (final SoundSamplerCallback callback: mCallbacks) {
+			try {
+				callback.onError(e);
+			} catch (final Exception e1) {
+				mCallbacks.remove(callback);
+				Log.w(TAG, "callOnError:", e1);
 			}
 		}
     }
