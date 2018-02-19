@@ -46,6 +46,7 @@ public class AudioSampler extends IAudioSampler {
 	public AudioSampler(final int audio_source, final int channel_num,
 		final int sampling_rate, final int samples_per_frame, final int frames_per_buffer) {
 
+		super();
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		// パラメータを保存
 		AUDIO_SOURCE = audio_source;
