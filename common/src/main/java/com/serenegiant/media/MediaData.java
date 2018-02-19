@@ -51,11 +51,11 @@ public class MediaData {
 	/**
 	 * データをセット
 	 * @param buffer
-	 * @param _size
-	 * @param _presentationTimeUs
+	 * @param size
+	 * @param presentationTimeUs
 	 */
 	public void set(@NonNull final ByteBuffer buffer,
-		@IntRange(from=0)final int _size, final long _presentationTimeUs) {
+		@IntRange(from=0)final int size, final long presentationTimeUs) {
 		set(buffer, 0, size, presentationTimeUs, 0);
 	}
 	
