@@ -394,7 +394,10 @@ public abstract class AbstractEncoder implements Encoder {
 	        if (inputBufferIndex >= 0) {
 	            final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
 	            inputBuffer.clear();
-	            if (buffer != null) {
+	            if ((buffer != null) && (length > 0)) {
+	            	buffer.clear();
+	            	buffer.position(length);
+	            	buffer.flip();
 	            	inputBuffer.put(buffer);
 	            }
 //	            if (DEBUG) Log.v(TAG, "encode:queueInputBuffer");
