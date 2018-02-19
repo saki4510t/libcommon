@@ -20,6 +20,7 @@ package com.serenegiant.utils;
 */
 
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import java.util.Map;
 
@@ -28,194 +29,100 @@ import java.util.Map;
  *
  */
 public class PrefHelper {
-	public static int getShort(final SharedPreferences pref, final String key, final short defaultValue) {
-		boolean success = false;
+	public static int getShort(@Nullable final SharedPreferences pref,
+		final String key, final short defaultValue) {
+
 		short result = defaultValue;
-		try {
-			result = (short)pref.getInt(key, defaultValue);
-			success = true;
-		} catch (final Exception e) {
-		}
-		if (!success) {
-			try {
-				final String v = pref.getString(key, Short.toString(defaultValue));
-				try {
-					result = (short)Integer.parseInt(v);
-					success = true;
-				} catch (final Exception e1) {
-				}
-				if (!success) {
-					// 16進文字列かも
-					if (v.startsWith("0x") || v.startsWith("0X")) {
-						try {
-							result = (short)Integer.parseInt(v.substring(2), 16);
-							success = true;
-						} catch (final Exception e1) {
-						}
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = (short)Integer.parseInt(v, 16);
-						success = true;
-					} catch (final Exception e2) {
-
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = (short)Integer.parseInt("0x" + v, 16);
-					} catch (final Exception e2) {
-
-					}
-				}
-			} catch (final Exception e) {
-				// ignore
-			}
-		}
-		return result;
-	}
-
-	public static int getInt(final SharedPreferences pref, final String key, final int defaultValue) {
-		boolean success = false;
-		int result = defaultValue;
-		try {
-			result = (int)pref.getLong(key, defaultValue);
-			success = true;
-		} catch (final Exception e) {
-		}
-		if (!success) {
-			try {
-				final String v = pref.getString(key, Integer.toString(defaultValue));
-				try {
-					result = (int)Long.parseLong(v);
-					success = true;
-				} catch (final Exception e1) {
-				}
-				if (!success) {
-					// 16進文字列かも
-					if (v.startsWith("0x") || v.startsWith("0X")) {
-						try {
-							result = (int)Long.parseLong(v.substring(2), 16);
-							success = true;
-						} catch (final Exception e1) {
-						}
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = (int)Long.parseLong(v, 16);
-						success = true;
-					} catch (final Exception e2) {
-
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = (int)Long.parseLong("0x" + v, 16);
-					} catch (final Exception e2) {
-
-					}
-				}
-			} catch (final Exception e) {
-				// ignore
-			}
-		}
-		return result;
-	}
-
-	public static long getLong(final SharedPreferences pref, final String key, final long defaultValue) {
-		boolean success = false;
-		long result = defaultValue;
-		try {
-			result = pref.getLong(key, defaultValue);
-			success = true;
-		} catch (final Exception e) {
-		}
-		if (!success) {
-			try {
-				final String v = pref.getString(key, Long.toString(defaultValue));
-				try {
-					result = Long.parseLong(v);
-					success = true;
-				} catch (final Exception e1) {
-				}
-				if (!success) {
-					// 16進文字列かも
-					if (v.startsWith("0x") || v.startsWith("0X")) {
-						try {
-							result = Long.parseLong(v.substring(2), 16);
-							success = true;
-						} catch (final Exception e1) {
-						}
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = Long.parseLong(v, 16);
-						success = true;
-					} catch (final Exception e2) {
-
-					}
-				}
-				if (!success) {
-					// 16進文字列かも
-					try {
-						result = Long.parseLong("0x" + v, 16);
-					} catch (final Exception e2) {
-
-					}
-				}
-			} catch (final Exception e) {
-				// ignore
-			}
-		}
-		return result;
-	}
-
-	public static float getFloat(final SharedPreferences pref, final String key, final float defaultValue) {
-		float result = defaultValue;
-		try {
-			result = pref.getFloat(key, defaultValue);
-		} catch (final Exception e) {
-			try {
-				result = (float)Double.parseDouble(pref.getString(key, Float.toString(defaultValue)));
-			} catch (final Exception e1) {
-				// ignore
-			}
-		}
-		return result;
-	}
-
-	public static double getDouble(final SharedPreferences pref, final String key, final double defaultValue) {
-		double result = defaultValue;
-		try {
-			result = Double.parseDouble(pref.getString(key, Double.toString(defaultValue)));
-		} catch (final Exception e1) {
-			// ignore
-		}
-		return result;
-	}
-
-	public static boolean getBoolean(final SharedPreferences pref, final String key, final boolean default_value) {
-		boolean result = default_value;
 		if ((pref != null) && pref.contains(key)) {
 			try {
-				result = pref.getBoolean(key, default_value);
+				result = (short)pref.getInt(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asBoolean(getObject(pref, key));
+				result = ObjectHelper.asShort(getObject(pref, key), defaultValue);
 			}
 		}
 		return result;
 	}
 
-	private static final Object getObject(final SharedPreferences pref, final String key) {
-		Object result = null;
+	public static int getInt(@Nullable final SharedPreferences pref,
+		final String key, final int defaultValue) {
+
+		int result = defaultValue;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = pref.getInt(key, defaultValue);
+			} catch (final Exception e) {
+				result = ObjectHelper.asInt(getObject(pref, key), defaultValue);
+			}
+		}
+		return result;
+	}
+
+	public static long getLong(@Nullable final SharedPreferences pref,
+		final String key, final long defaultValue) {
+
+		long result = defaultValue;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = pref.getLong(key, defaultValue);
+			} catch (final Exception e) {
+				result = ObjectHelper.asLong(getObject(pref, key), defaultValue);
+			}
+		}
+		return result;
+	}
+
+	public static float getFloat(@Nullable final SharedPreferences pref,
+		final String key, final float defaultValue) {
+
+		float result = defaultValue;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = pref.getFloat(key, defaultValue);
+			} catch (final Exception e) {
+				result = ObjectHelper.asFloat(getObject(pref, key), defaultValue);
+			}
+		}
+		return result;
+	}
+
+	public static double getDouble(@Nullable final SharedPreferences pref,
+		final String key, final double defaultValue) {
+
+		double result = defaultValue;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = Double.parseDouble(pref.getString(key, Double.toString(defaultValue)));
+			} catch (final Exception e) {
+				result = ObjectHelper.asDouble(getObject(pref, key), defaultValue);
+			}
+		}
+		return result;
+	}
+
+	public static boolean getBoolean(@Nullable final SharedPreferences pref,
+		final String key, final boolean defaultValue) {
+
+		boolean result = defaultValue;
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = pref.getBoolean(key, defaultValue);
+			} catch (final Exception e) {
+				result = ObjectHelper.asBoolean(getObject(pref, key), defaultValue);
+			}
+		}
+		return result;
+	}
+
+	public static final Object getObject(@Nullable final SharedPreferences pref,
+		final String key) {
+
+		return getObject(pref, key, null);
+	}
+
+	public static final Object getObject(@Nullable final SharedPreferences pref,
+		final String key, final Object defaultValue) {
+
+		Object result = defaultValue;
 		if ((pref != null) && pref.contains(key)) {
 			final Map<String, ?> all = pref.getAll();
 			result = all.get(key);

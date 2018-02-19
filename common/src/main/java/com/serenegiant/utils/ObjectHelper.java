@@ -22,7 +22,7 @@ import android.text.TextUtils;
 
 public class ObjectHelper {
 
-	public static boolean asBoolean(final Object val) {
+	public static boolean asBoolean(final Object val, final boolean defaultValue) {
 		if (val instanceof Boolean) {
 			return (Boolean)val;
 		} else if (val instanceof Byte) {
@@ -40,35 +40,101 @@ public class ObjectHelper {
 		} else if (val instanceof Number) {
 			return ((Number)val).doubleValue() != 0;
 		} else if (val instanceof String) {
-			if (TextUtils.isEmpty((String)val)) {
-				try {
-					// 数字の文字列
-					return Double.parseDouble((String)val) != 0;
-				} catch (final Exception e) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
-						// 整数数字の文字列でDoubleでは変換できない時(16進数文字列とか)
-						return Integer.parseInt((String)val) != 0;
+						return Integer.parseInt(v.substring(2), 16) != 0;
 					} catch (final Exception e1) {
-						// これは"true"かどうかを比較するだけ
-						return  Boolean.parseBoolean((String)val);
+						//
 					}
 				}
-			} else {
-				return false;
+				try {
+					// 数字の文字列
+					return Double.parseDouble(v) != 0;
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Integer.parseInt(v, 16) != 0;
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Integer.parseInt("0x" + v, 16) != 0;
+				} catch (final Exception e) {
+					//
+				}
+				return  Boolean.parseBoolean((String)val);
 			}
 		}
-		return val != null;
+		return defaultValue;
 	}
 
-	public static int asInt(final Object val) {
-		if (val instanceof Integer) {
-			return (Integer)val;
-		} else if (val instanceof Boolean) {
+	public static short asShort(final Object val, final short defaultValue) {
+		if (val instanceof Boolean) {
+			return (Boolean)val ? (short)1 : (short)0;
+		} else if (val instanceof Byte) {
+			return ((Byte)val);
+		} else if (val instanceof Short) {
+			return ((Short)val);
+		} else if (val instanceof Integer) {
+			return ((Integer)val).shortValue();
+		} else if (val instanceof Long) {
+			return ((Long)val).shortValue();
+		} else if (val instanceof Float) {
+			return ((Float)val).shortValue();
+		} else if (val instanceof Double) {
+			return ((Double)val).shortValue();
+		} else if (val instanceof Number) {
+			return ((Number)val).shortValue();
+		} else if (val instanceof String) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
+					try {
+						return (short)Integer.parseInt(v.substring(2), 16);
+					} catch (final Exception e1) {
+						//
+					}
+				}
+				try {
+					// 数字の文字列
+					return ((Double)Double.parseDouble(v)).shortValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Integer)Integer.parseInt(v, 16)).shortValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Integer)Integer.parseInt("0x" + v, 16)).shortValue();
+				} catch (final Exception e) {
+					//
+				}
+				return  Boolean.parseBoolean((String)val) ? (short)1 : (short)0;
+			}
+		}
+		return defaultValue;
+	}
+
+	public static int asInt(final Object val, final int defaultValue) {
+		if (val instanceof Boolean) {
 			return ((Boolean)val) ? 1 : 0;
 		} else if (val instanceof Byte) {
 			return ((Byte)val);
 		} else if (val instanceof Short) {
 			return ((Short)val);
+		} else if (val instanceof Integer) {
+			return (Integer)val;
 		} else if (val instanceof Long) {
 			return ((Long)val).intValue();
 		} else if (val instanceof Float) {
@@ -78,24 +144,193 @@ public class ObjectHelper {
 		} else if (val instanceof Number) {
 			return ((Number)val).intValue();
 		} else if (val instanceof String) {
-			if (TextUtils.isEmpty((String)val)) {
-				try {
-					// 数字の文字列
-					final Double v = Double.parseDouble((String)val);
-					return v.intValue();
-				} catch (final Exception e) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
-						// 整数数字の文字列でDoubleでは変換できない時(16進数文字列とか)
-						return Integer.parseInt((String)val);
+						return Integer.parseInt(v.substring(2), 16);
 					} catch (final Exception e1) {
-						// これは"true"かどうかを比較するだけ
-						return  Boolean.parseBoolean((String)val) ? 1 : 0;
+						//
 					}
 				}
-			} else {
-				return 0;
+				try {
+					// 数字の文字列
+					return ((Double)Double.parseDouble(v)).intValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Integer.parseInt(v, 16);
+				} catch (final Exception e2) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Integer.parseInt("0x" + v, 16);
+				} catch (final Exception e2) {
+					//
+				}
+				return Boolean.parseBoolean((String)val) ? 1 : 0;
 			}
 		}
-		return val != null ? val.hashCode() : 0;
+		return defaultValue;
+	}
+	
+	public static long asLong(final Object val, final long defaultValue) {
+		if (val instanceof Boolean) {
+			return ((Boolean)val) ? 1 : 0;
+		} else if (val instanceof Byte) {
+			return ((Byte)val);
+		} else if (val instanceof Short) {
+			return ((Short)val);
+		} else if (val instanceof Integer) {
+			return (Integer)val;
+		} else if (val instanceof Long) {
+			return (Long)val;
+		} else if (val instanceof Float) {
+			return ((Float)val).longValue();
+		} else if (val instanceof Double) {
+			return ((Double)val).longValue();
+		} else if (val instanceof Number) {
+			return ((Number)val).longValue();
+		} else if (val instanceof String) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
+					try {
+						return Long.parseLong(v.substring(2), 16);
+					} catch (final Exception e1) {
+						//
+					}
+				}
+				try {
+					// 数字の文字列
+					return ((Double)Double.parseDouble(v)).longValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Long.parseLong(v, 16);
+				} catch (final Exception e2) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return Long.parseLong("0x" + v, 16);
+				} catch (final Exception e2) {
+					//
+				}
+				return Boolean.parseBoolean((String)val) ? 1 : 0;
+			}
+		}
+		return defaultValue;
+	}
+
+	public static float asFloat(final Object val, final float defaultValue) {
+		if (val instanceof Boolean) {
+			return ((Boolean)val) ? 1 : 0;
+		} else if (val instanceof Byte) {
+			return ((Byte)val);
+		} else if (val instanceof Short) {
+			return ((Short)val);
+		} else if (val instanceof Integer) {
+			return (Integer)val;
+		} else if (val instanceof Long) {
+			return ((Long)val).floatValue();
+		} else if (val instanceof Float) {
+			return (Float)val;
+		} else if (val instanceof Double) {
+			return ((Double)val).floatValue();
+		} else if (val instanceof Number) {
+			return ((Number)val).floatValue();
+		} else if (val instanceof String) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
+					try {
+						return ((Long)Long.parseLong(v.substring(2), 16)).floatValue();
+					} catch (final Exception e1) {
+						//
+					}
+				}
+				try {
+					// 数字の文字列
+					return ((Double)Double.parseDouble(v)).floatValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Long)Long.parseLong(v, 16)).floatValue();
+				} catch (final Exception e2) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Long)Long.parseLong("0x" + v, 16)).floatValue();
+				} catch (final Exception e2) {
+					//
+				}
+				return Boolean.parseBoolean((String)val) ? 1 : 0;
+			}
+		}
+		return defaultValue;
+	}
+
+	public static double asDouble(final Object val, final double defaultValue) {
+		if (val instanceof Boolean) {
+			return ((Boolean)val) ? 1 : 0;
+		} else if (val instanceof Byte) {
+			return ((Byte)val);
+		} else if (val instanceof Short) {
+			return ((Short)val);
+		} else if (val instanceof Integer) {
+			return (Integer)val;
+		} else if (val instanceof Long) {
+			return ((Long)val).doubleValue();
+		} else if (val instanceof Float) {
+			return (Float)val;
+		} else if (val instanceof Double) {
+			return (Double)val;
+		} else if (val instanceof Number) {
+			return ((Number)val).doubleValue();
+		} else if (val instanceof String) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
+					try {
+						return ((Long)Long.parseLong(v.substring(2), 16)).doubleValue();
+					} catch (final Exception e1) {
+						//
+					}
+				}
+				try {
+					// 数字の文字列
+					return Double.parseDouble(v);
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Long)Long.parseLong(v, 16)).doubleValue();
+				} catch (final Exception e2) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Long)Long.parseLong("0x" + v, 16)).doubleValue();
+				} catch (final Exception e2) {
+					//
+				}
+				return Boolean.parseBoolean((String)val) ? 1 : 0;
+			}
+		}
+		return defaultValue;
 	}
 }
