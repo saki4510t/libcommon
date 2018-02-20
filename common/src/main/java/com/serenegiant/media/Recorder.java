@@ -58,6 +58,7 @@ public abstract class Recorder implements IRecorder {
     // エンコーダー自体のスレッドで遅延メッセージを送ると30秒のつもりが46秒とか掛かっちゃうから
     private EosHandler mEosHandler;
     protected long mStartTime;
+    private volatile boolean mReleased;
 
 	/**
 	 * コンストラクタ
@@ -74,10 +75,12 @@ public abstract class Recorder implements IRecorder {
 	 */
 	@Override
 	public void setMuxer(final IMuxer muxer) {
-		mMuxer = muxer;
-		mEncoderCount = mStartedCount = 0;
-		synchronized(this) {
-			mState = STATE_INITIALIZED;
+		if (!mReleased) {
+			mMuxer = muxer;
+			mEncoderCount = mStartedCount = 0;
+			synchronized(this) {
+				mState = STATE_INITIALIZED;
+			}
 		}
 	}
 
@@ -94,8 +97,12 @@ public abstract class Recorder implements IRecorder {
 	public void prepare() {
 //		if (DEBUG) Log.v(TAG, "prepare:");
 		synchronized(this) {
-			if (mState != STATE_INITIALIZED)
+			if (mReleased) {
+				throw new IllegalStateException("already released");
+			}
+			if (mState != STATE_INITIALIZED) {
 				throw new IllegalStateException("prepare:state=" + mState);
+			}
 		}
 		try {
 			if (mVideoEncoder != null)
@@ -116,8 +123,12 @@ public abstract class Recorder implements IRecorder {
 	public void startRecording() throws IllegalStateException {
 //		if (DEBUG) Log.v(TAG, "start:state=" + mState);
 		synchronized(this) {
-			if (mState != STATE_PREPARED)
+			if (mReleased) {
+				throw new IllegalStateException("already released");
+			}
+			if (mState != STATE_PREPARED) {
 				throw new IllegalStateException("start:not prepared");
+			}
 			mState = STATE_STARTING;
 		}
 //		if (DEBUG) Log.v(TAG, "call encoder#start");
@@ -174,12 +185,13 @@ public abstract class Recorder implements IRecorder {
 
 	@Override
 	public synchronized boolean isStarted() {
-		return mState == STATE_STARTED;
+		return !mReleased && (mState == STATE_STARTED);
 	}
 
 	@Override
 	public synchronized boolean isReady() {
-		return mState == STATE_STARTED || mState == STATE_PREPARED;
+		return !mReleased
+			&& (mState == STATE_STARTED || mState == STATE_PREPARED);
 	}
 
 	@Override
@@ -190,6 +202,10 @@ public abstract class Recorder implements IRecorder {
 	@Override
 	public synchronized boolean isStopped() {
 		return mState <= STATE_INITIALIZED;
+	}
+
+	public boolean isReleased() {
+		return mReleased;
 	}
 
 	@Override
@@ -204,24 +220,28 @@ public abstract class Recorder implements IRecorder {
 
 	@Override
 	public void frameAvailableSoon() {
-		if (mVideoEncoder != null)
+		if (mVideoEncoder != null) {
 			mVideoEncoder.frameAvailableSoon();
+		}
 	}
 
 	@Override
 	public void release() {
-		if (mAudioEncoder != null) {
-			mAudioEncoder.release();
-			mAudioEncoder = null;
+		if (!mReleased) {
+			mReleased = true;
+			if (mAudioEncoder != null) {
+				mAudioEncoder.release();
+			}
+			if (mVideoEncoder != null) {
+				mVideoEncoder.release();
+			}
+			if (mMuxer != null) {
+				mMuxer.release();
+			}
 		}
-		if (mVideoEncoder != null) {
-			mVideoEncoder.release();
-			mVideoEncoder = null;
-		}
-		if (mMuxer != null) {
-			mMuxer.release();
-			mMuxer = null;
-		}
+		mAudioEncoder = null;
+		mVideoEncoder = null;
+		mMuxer = null;
 	}
 //================================================================================
 	/**
@@ -235,8 +255,12 @@ public abstract class Recorder implements IRecorder {
 //		if (DEBUG) Log.v(TAG, "addEncoder:encoder=" + encoder);
 		// ここの例外に引っかかるのはプログラムミス
 		synchronized (this) {
-			if (mState > STATE_INITIALIZED)
+			if (mReleased) {
+				throw new IllegalStateException("already released");
+			}
+			if (mState > STATE_INITIALIZED) {
 				throw new IllegalStateException("addEncoder already prepared/started");
+			}
 		}
 		if (encoder instanceof IAudioEncoder) {
 			if (mAudioEncoder != null)
@@ -279,8 +303,12 @@ public abstract class Recorder implements IRecorder {
 	@Override
 	public synchronized boolean start(final Encoder encoder) {
 //		if (DEBUG) Log.v(TAG,  "start:mEncoderCount=" + mEncoderCount + ",mStartedCount=" + mStartedCount);
-		if (mState != STATE_STARTING)
+		if (mReleased) {
+			throw new IllegalStateException("already released");
+		}
+		if (mState != STATE_STARTING) {
 			throw new IllegalStateException("muxer has not prepared:state=");
+		}
 		if (encoder.equals(mVideoEncoder)) {
 			mVideoStarted = true;
 		} else if (encoder.equals(mAudioEncoder)) {
@@ -352,8 +380,12 @@ public abstract class Recorder implements IRecorder {
 //		if (DEBUG) Log.i(TAG, "addTrack:");
 		int trackIx;
 		try {
-			if (mState != STATE_STARTING)
+			if (mReleased) {
+				throw new IllegalStateException("already released");
+			}
+			if (mState != STATE_STARTING) {
 				throw new IllegalStateException("muxer not ready:state=" + mState);
+			}
 			trackIx = mMuxer.addTrack(format);
 		} catch (final Exception e) {
 			Log.w(TAG, "addTrack:", e);
@@ -375,7 +407,7 @@ public abstract class Recorder implements IRecorder {
 		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
 
 		try {
-			if (mStartedCount > 0) {
+			if (!mReleased && (mStartedCount > 0)) {
 				mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 			}
 		} catch (final Exception e) {
@@ -417,11 +449,13 @@ public abstract class Recorder implements IRecorder {
 
 	protected void callOnError(final Exception e) {
 //		if (DEBUG) Log.v(TAG, "callOnError:");
-		if (mCallback != null)
-		try {
-			mCallback.onError(e);
-		} catch (final Exception e1) {
-			Log.e(TAG, "onError:", e);
+		if (!mReleased) {
+			if (mCallback != null)
+			try {
+				mCallback.onError(e);
+			} catch (final Exception e1) {
+				Log.e(TAG, "onError:", e);
+			}
 		}
 	}
 
