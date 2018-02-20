@@ -23,6 +23,7 @@ import android.media.MediaCodec;
 import android.os.Build;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -44,8 +45,8 @@ public class MediaData {
 	 * コンストラクタ
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 */
-	public MediaData(@IntRange(from=1)final int size) {
-		mBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+	public MediaData(@IntRange(from=0)final int size) {
+		resize(size);
 	}
 	
 	/**
@@ -70,7 +71,7 @@ public class MediaData {
 	 * @param _presentationTimeUs
 	 * @param _flags
 	 */
-	public void set(@NonNull final ByteBuffer buffer,
+	public void set(@Nullable final ByteBuffer buffer,
 		@IntRange(from=0) final int _offset,
 		@IntRange(from=0)final int _size,
 		final long _presentationTimeUs, final int _flags) {
@@ -78,15 +79,14 @@ public class MediaData {
 		presentationTimeUs = _presentationTimeUs;
 		size = _size;
 		flags = _flags;
-		if (mBuffer == null || mBuffer.capacity() < _size) {
-			mBuffer = ByteBuffer.allocateDirect(_size).order(ByteOrder.nativeOrder());
+		resize(_size);
+		if (buffer != null) {
+			buffer.position(_offset + _size);
+			buffer.flip();
+			buffer.position(_offset);
+			mBuffer.put(buffer);
+			mBuffer.flip();
 		}
-		buffer.position(_offset + _size);
-		buffer.flip();
-		buffer.position(_offset);
-		mBuffer.clear();
-		mBuffer.put(buffer);
-		mBuffer.flip();
 	}
 	
 	/**
@@ -95,22 +95,36 @@ public class MediaData {
 	 * @param info
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	public void set(@NonNull ByteBuffer buffer,
+	public void set(@Nullable ByteBuffer buffer,
 		@NonNull final MediaCodec.BufferInfo info) {
 	
 		presentationTimeUs = info.presentationTimeUs;
-		size = info.size;
+		size = buffer != null ? info.size : 0;
 		flags = info.flags;
 		final int offset = info.offset;
-		if (mBuffer == null || mBuffer.capacity() < size) {
-			mBuffer = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
+		resize(size);
+		if (buffer != null) {
+			buffer.position(offset + size);
+			buffer.flip();
+			buffer.position(offset);
 		}
-		buffer.position(offset + size);
-		buffer.flip();
-		buffer.position(offset);
-		mBuffer.clear();
 		mBuffer.put(buffer);
 		mBuffer.flip();
+	}
+	
+	/**
+	 * 必要に応じて内部のByteBufferの容量を変更する、
+	 * 保持しているデータサイズ(sizeフィールド)は変更しない
+	 * @param newSize
+	 * @return
+	 */
+	public MediaData resize(@IntRange(from=0)final int newSize) {
+		if ((mBuffer == null) || (mBuffer.capacity() < newSize)) {
+			mBuffer = ByteBuffer.allocateDirect(newSize)
+				.order(ByteOrder.nativeOrder());
+		}
+		mBuffer.clear();
+		return this;
 	}
 	
 	/**

@@ -23,7 +23,6 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.os.SystemClock;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -33,9 +32,7 @@ import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.Time;
 
-import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -47,46 +44,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AbstractFakeEncoder.class.getSimpleName();
 
-	static final class FrameData {
-		private final WeakReference<AbstractFakeEncoder> mWeakParent;
-		public ByteBuffer data;
-		public long presentationTimeUs;
-		public int offset;
-		public int size;
-		public int flags;
-		
-		FrameData(final AbstractFakeEncoder parent, final int frameSize) {
-			mWeakParent = new WeakReference<AbstractFakeEncoder>(parent);
-			resize(frameSize);
-		}
-		
-		void resize(final int newSize) {
-			final int sz = newSize > 0 ? newSize : DEFAULT_FRAME_SZ;
-			if ((data == null) || (data.capacity() < sz)) {
-				data = ByteBuffer.allocateDirect(sz)
-					.order(ByteOrder.nativeOrder());
-			}
-			data.clear();
-		}
-		
-		void set(@Nullable final ByteBuffer buffer, final int offset, final int size,
-			final long presentationTimeUs, final int flags) {
-			
-			resize(size);
-			if (buffer != null) {
-				buffer.position(offset + size);
-				buffer.flip();
-				buffer.position(offset);
-				data.put(buffer);
-			}
-			data.flip();
-			this.presentationTimeUs = presentationTimeUs;
-			this.offset = offset;
-			this.size = size;
-			this.flags = flags;
-		}
-	}
-	
 	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
@@ -161,11 +118,11 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フレームプール
 	 */
-	private final List<FrameData> mPool = new ArrayList<FrameData>();
+	private final List<MediaData> mPool = new ArrayList<MediaData>();
 	/**
 	 * フレームキュー
 	 */
-	private final LinkedBlockingQueue<FrameData> mFrameQueue;
+	private final LinkedBlockingQueue<MediaData> mFrameQueue;
 	/**
 	 * フレーム情報(ワーク用)
 	 */
@@ -217,7 +174,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		MAX_POOL_SZ = maxPoolSz;
 		mRecorder = recorder;
 		mListener = listener;
-		mFrameQueue = new LinkedBlockingQueue<FrameData>(maxQueueSz);
+		mFrameQueue = new LinkedBlockingQueue<MediaData>(maxQueueSz);
 		
 		recorder.addEncoder(this);
 	}
@@ -279,7 +236,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
     	// ・・・らしいので空バッファを送る。
-    	final FrameData frame = obtain(0);
+    	final MediaData frame = obtain(0);
     	frame.set(null, 0, 0, getInputPTSUs(), MediaCodec.BUFFER_FLAG_END_OF_STREAM);
     	offer(frame);
 	}
@@ -326,7 +283,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			throw new IllegalStateException();
 		}
 		if (mRequestStop) return false;
-		final FrameData frame = obtain(size);
+		final MediaData frame = obtain(size);
 		frame.set(buffer, offset, size, presentationTimeUs, flags);
 		return offer(frame);
 	}
@@ -446,7 +403,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		synchronized (mPool) {
 			mPool.clear();
 			for (int i = 0; i < MAX_POOL_SZ; i++) {
-				mPool.add(new FrameData(this, FRAME_SZ));
+				mPool.add(new MediaData(FRAME_SZ));
 			}
 		}
 	}
@@ -473,13 +430,13 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param newSize
 	 * @return
 	 */
-	protected FrameData obtain(final int newSize) {
-		FrameData result;
+	protected MediaData obtain(final int newSize) {
+		MediaData result;
 		synchronized (mPool) {
 			if (mPool.isEmpty()) {
 				cnt++;
 //				if (DEBUG) Log.v(TAG, "obtain:create new FrameData, total=" + cnt);
-				result = new FrameData(this, FRAME_SZ);
+				result = new MediaData(FRAME_SZ);
 			} else {
 				result = mPool.remove(mPool.size() - 1);
 				result.resize(newSize);
@@ -492,11 +449,11 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * フレームキューにフレームデータを追加する
 	 * @param frame
 	 */
-	protected boolean offer(@NonNull final FrameData frame) {
+	protected boolean offer(@NonNull final MediaData frame) {
 		boolean result = mFrameQueue.offer(frame);
 		if (!result) {
 //			if (DEBUG) Log.w(TAG, "offer:先頭を破棄する");
-		    final FrameData head = mFrameQueue.poll();
+		    final MediaData head = mFrameQueue.poll();
 			result = mFrameQueue.offer(frame);
 //			if (!result) {
 //				if (DEBUG) Log.w(TAG, "offer:frame dropped");
@@ -514,9 +471,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param waitTimeMs 最大待ち時間[ミリ秒]
 	 * @return
 	 */
-	protected FrameData waitFrame(final long waitTimeMs) {
+	protected MediaData waitFrame(final long waitTimeMs) {
 //		if (DEBUG) Log.v(TAG, "waitFrame:");
-		FrameData result = null;
+		MediaData result = null;
 		try {
 			result = mFrameQueue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
 		} catch (final InterruptedException e) {
@@ -530,7 +487,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * フレームプールにフレームを戻す
 	 * @param frame
 	 */
-	protected void recycle(@NonNull final FrameData frame) {
+	protected void recycle(@NonNull final MediaData frame) {
 //		if (DEBUG) Log.v(TAG, "recycle:");
 		synchronized (mPool) {
 			if (mPool.size() < MAX_POOL_SZ) {
@@ -554,7 +511,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				mSync.notify();
 			}
 			for ( ; mIsCapturing ; ) {
-				final FrameData frame = waitFrame(MAX_WAIT_FRAME_MS);
+				final MediaData frame = waitFrame(MAX_WAIT_FRAME_MS);
 				if (frame != null) {
 					try {
 						if (mIsCapturing) {
@@ -578,7 +535,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * 1フレーム分の処理
 	 * @param frame
 	 */
-	protected void handleFrame(final FrameData frame) {
+	protected void handleFrame(final MediaData frame) {
 //		if (DEBUG) Log.v(TAG, "handleFrame:");
 		final IRecorder recorder = mRecorder;
 		if (recorder == null) {
@@ -586,7 +543,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			Log.w(TAG, "muxer is unexpectedly null");
 			return;
 		}
-		mBufferInfo.set(frame.offset, frame.size, frame.presentationTimeUs, frame.flags);
+		mBufferInfo.set(0, frame.size, frame.presentationTimeUs, frame.flags);
 		final boolean isKeyFrame
 			= ((mBufferInfo.flags & BUFFER_FLAG_KEY_FRAME) == BUFFER_FLAG_KEY_FRAME);
 
@@ -596,7 +553,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_KEY_FRAME");
 			// csd-0とcsd-1が同時に来ているはずなので分離してセットする
 			final byte[] tmp = new byte[mBufferInfo.size];
-			final ByteBuffer b = frame.data.duplicate();
+			final ByteBuffer b = frame.mBuffer.duplicate();
 			b.clear();
 			b.get(tmp, 0, mBufferInfo.size);
 			final int ix0 = BufferHelper.findAnnexB(tmp, 0);
@@ -625,7 +582,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			mWaitingKeyFrame = false;
 			try {
 				mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-				recorder.writeSampleData(mTrackIndex, frame.data, mBufferInfo);
+				recorder.writeSampleData(mTrackIndex, frame.mBuffer, mBufferInfo);
 			 } catch (final TimeoutException e) {
 //				if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
 				recorder.stopRecording();
