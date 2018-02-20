@@ -80,7 +80,7 @@ public class MediaData {
 		size = _size;
 		flags = _flags;
 		resize(_size);
-		if (buffer != null) {
+		if ((buffer != null) && (_size > _offset)) {
 			buffer.position(_offset + _size);
 			buffer.flip();
 			buffer.position(_offset);
@@ -103,13 +103,13 @@ public class MediaData {
 		flags = info.flags;
 		final int offset = info.offset;
 		resize(size);
-		if (buffer != null) {
+		if ((buffer != null) && (size > offset)) {
 			buffer.position(offset + size);
 			buffer.flip();
 			buffer.position(offset);
+			mBuffer.put(buffer);
+			mBuffer.flip();
 		}
-		mBuffer.put(buffer);
-		mBuffer.flip();
 	}
 	
 	/**
