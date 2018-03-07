@@ -46,6 +46,7 @@ public class SysFs {
 		= new HashMap<String, WeakReference<ReentrantReadWriteLock>>();
 
 	private final String mPath;
+	private final String mName;
 	protected final ReentrantReadWriteLock mLock;
 	private final Lock mReadLock;
 	private final Lock mWriteLock;
@@ -56,6 +57,7 @@ public class SysFs {
 			throw new IOException(path + " does not exist or can't read.");
 		}
 		mPath = path;
+		mName = f.getName();
 		ReentrantReadWriteLock lock = null;
 		synchronized (sSysFs) {
 			if (sSysFs.containsKey(path)) {
@@ -89,6 +91,10 @@ public class SysFs {
 		return mPath;
 	}
 	
+	public String getName() {
+		return mName;
+	}
+
 	public String read() throws IOException {
 		String result = null;
 		mReadLock.lock();
