@@ -116,7 +116,8 @@ public class SysFs {
 		try {
 			final FileWriter out = new FileWriter(mPath);
 			try {
-				new BufferedWriter(out).write(value);
+				out.write(value);
+				out.flush();
 			} finally {
 				out.close();
 			}
