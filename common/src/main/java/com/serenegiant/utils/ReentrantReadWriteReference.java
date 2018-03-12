@@ -152,6 +152,16 @@ public class ReentrantReadWriteReference<T> {
 	}
 	
 	/**
+	 * swap reference with write lock
+	 * @param ref
+	 * @return previous referenced object, will be null
+	 */
+	@Nullable
+	public T swap(@Nullable final T ref) {
+		return set(ref);
+	}
+	
+	/**
 	 * return whether this holds reference or not
 	 * if other thread holds write lock, this will return true
 	 * @return

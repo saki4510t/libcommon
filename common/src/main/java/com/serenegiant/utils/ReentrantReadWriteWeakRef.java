@@ -158,6 +158,16 @@ public class ReentrantReadWriteWeakRef<T> {
 	public T clear() {
 		return set((T)null);
 	}
+	
+	/**
+	 * swap reference with write lock
+	 * @param ref
+	 * @return previous referenced object, will be null
+	 */
+	@Nullable
+	public T swap(final ReentrantReadWriteWeakRef<T> ref) {
+		return set(ref);
+	}
 
 	/**
 	 * return whether this holds reference or not
