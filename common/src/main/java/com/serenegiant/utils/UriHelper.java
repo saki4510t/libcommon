@@ -45,20 +45,22 @@ public final class UriHelper {
 	 * @param uri
 	 * @return String パスが見つからなければnull
 	 */
-	public static String getAbsolutePath(final ContentResolver cr, final Uri uri) {
+	public static String getAbsolutePath(final ContentResolver cr, @Nullable final Uri uri) {
 		String path = null;
-		try {
-			final String[] columns = { MediaStore.Images.Media.DATA };
-			final Cursor cursor = cr.query(uri, columns, null, null, null);
-			if (cursor != null)
+		if (uri != null) {
 			try {
-				if (cursor.moveToFirst())
-				path = cursor.getString(0);
-			} finally {
-				cursor.close();
+				final String[] columns = { MediaStore.Images.Media.DATA };
+				final Cursor cursor = cr.query(uri, columns, null, null, null);
+				if (cursor != null)
+				try {
+					if (cursor.moveToFirst())
+					path = cursor.getString(0);
+				} finally {
+					cursor.close();
+				}
+			} catch (final Exception e) {
+//				if (DEBUG) Log.w(TAG, e);
 			}
-		} catch (final Exception e) {
-//			if (DEBUG) Log.w(TAG, e);
 		}
 //		Log.v("UriHandler", "getAbsolutePath:" + path);
 		return path;
@@ -217,21 +219,25 @@ public final class UriHelper {
 	                contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 	            }
 
-	            final String selection = "_id=?";
-	            final String[] selectionArgs = new String[] { split[1] };
-
-	            return getDataColumn(context, contentUri, selection, selectionArgs);
+				if (contentUri != null) {
+					final String selection = "_id=?";
+					final String[] selectionArgs = new String[] { split[1] };
+	
+					return getDataColumn(context, contentUri, selection, selectionArgs);
+				}
 	        }
-	    } else if ("content".equalsIgnoreCase(uri.getScheme())) {
-			// MediaStore (and general)
-			if (isGooglePhotosUri(uri)) {
-				return uri.getLastPathSegment();
+		} else if (uri != null) {
+	    	if ("content".equalsIgnoreCase(uri.getScheme())) {
+				// MediaStore (and general)
+				if (isGooglePhotosUri(uri)) {
+					return uri.getLastPathSegment();
+				}
+				return getDataColumn(context, uri, null, null);
+			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+				// File
+				return uri.getPath();
 			}
-	        return getDataColumn(context, uri, null, null);
-	    } else if ("file".equalsIgnoreCase(uri.getScheme())) {
-			// File
-	        return uri.getPath();
-	    }
+		}
 
 		Log.w(TAG, "unexpectedly not found,uri=" + uri);
 	    return null;
@@ -247,7 +253,8 @@ public final class UriHelper {
 	 * @param selectionArgs (Optional) Selection arguments used in the query.
 	 * @return The value of the _data column, which is typically a file path.
 	 */
-	public static String getDataColumn(final Context context, final Uri uri, final String selection, final String[] selectionArgs) {
+	public static String getDataColumn(@NonNull final Context context,
+		@NonNull final Uri uri, final String selection, final String[] selectionArgs) {
 
 	    Cursor cursor = null;
 	    final String column = "_data";
@@ -271,7 +278,7 @@ public final class UriHelper {
 	 * @param uri The Uri to check.
 	 * @return Whether the Uri authority is ExternalStorageProvider.
 	 */
-	public static boolean isExternalStorageDocument(final Uri uri) {
+	public static boolean isExternalStorageDocument(@NonNull final Uri uri) {
 	    return "com.android.externalstorage.documents".equals(uri.getAuthority());
 	}
 
@@ -279,7 +286,7 @@ public final class UriHelper {
 	 * @param uri The Uri to check.
 	 * @return Whether the Uri authority is DownloadsProvider.
 	 */
-	public static boolean isDownloadsDocument(final Uri uri) {
+	public static boolean isDownloadsDocument(@NonNull final Uri uri) {
 	    return "com.android.providers.downloads.documents".equals(uri.getAuthority());
 	}
 
@@ -287,11 +294,11 @@ public final class UriHelper {
 	 * @param uri The Uri to check.
 	 * @return Whether the Uri authority is MediaProvider.
 	 */
-	public static boolean isMediaDocument(final Uri uri) {
+	public static boolean isMediaDocument(@NonNull final Uri uri) {
 	    return "com.android.providers.media.documents".equals(uri.getAuthority());
 	}
 
-	public static boolean isGooglePhotosUri(final Uri uri) {
+	public static boolean isGooglePhotosUri(@NonNull final Uri uri) {
 		return "com.google.android.apps.photos.content".equals(uri.getAuthority());
 	}
 
