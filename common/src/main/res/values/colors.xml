@@ -35,11 +35,11 @@
     <!-- transparent colors -->
     <color name="CLEAR">#00000000</color>
     <color name="HALF_CLEAR_WHITE">#7fffffff</color>
-    <color name="QUATER_CLEAR_WHITE">#3fffffff</color>
+    <color name="QUARTER_CLEAR_WHITE">#3fffffff</color>
 	<color name="HALF_CLEAR_BLACK">#7f000000</color>
-	<color name="QUATER_CLEAR_BLACK">#3f000000</color>
+	<color name="QUARTER_CLEAR_BLACK">#3f000000</color>
 	<color name="HALF_CLEAR_GRAY">#7f808080</color>
-	<color name="QUATER_CLEAR_GRAY">#3f808080</color>
+	<color name="QUARTER_CLEAR_GRAY">#3f808080</color>
     <color name="TRANSPARENT">#00000000</color>
     <!-- Web colors -->
     <color name="BLACK">#ff000000</color>

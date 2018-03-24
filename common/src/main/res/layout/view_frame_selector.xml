@@ -22,7 +22,7 @@
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
 	android:orientation="vertical"
-	android:background="@color/QUATER_CLEAR_WHITE"
+	android:background="@color/QUARTER_CLEAR_WHITE"
 	android:layout_width="380dp"
 	android:layout_height="match_parent">
 
