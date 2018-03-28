@@ -27,8 +27,6 @@ import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
 
 public class NetworkHelper {
 	private static final String TAG = NetworkHelper.class.getSimpleName();
@@ -40,6 +38,18 @@ public class NetworkHelper {
 				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
 					if (!addr.isLoopbackAddress() && (addr instanceof Inet4Address)) {
 						return addr.getHostAddress();
+					}
+				}
+			}
+			// フォールバックする, 最初に見つかったInet4Address以外のアドレスを返す,
+			// Bluetooth PANやWi-Fi Directでの接続時など
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+			
+				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
+					final InetAddress ad = addr.getAddress();
+					
+					if (!ad.isLoopbackAddress() && !(ad instanceof Inet4Address)) {
+						return ad.getHostAddress();
 					}
 				}
 			}
