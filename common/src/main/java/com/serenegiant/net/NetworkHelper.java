@@ -23,30 +23,42 @@ import android.util.Log;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 
 public class NetworkHelper {
 	private static final String TAG = NetworkHelper.class.getSimpleName();
 
 	public static String getLocalIPv4Address() {
 		try {
-			for (final Enumeration<NetworkInterface> networkInterfaceEnum = NetworkInterface.getNetworkInterfaces();
-				networkInterfaceEnum.hasMoreElements(); ) {
-
-				final NetworkInterface networkInterface =
-					networkInterfaceEnum.nextElement();
-				for (final Enumeration<InetAddress> ipAddressEnum = networkInterface.getInetAddresses();
-					ipAddressEnum.hasMoreElements(); ) {
-
-					final InetAddress addr = ipAddressEnum.nextElement();
-					if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+			
+				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+					if (!addr.isLoopbackAddress() && (addr instanceof Inet4Address)) {
 						return addr.getHostAddress();
 					}
 				}
 			}
-		} catch (final SocketException e) {
+//			for (final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+//				 (interfaces != null)
+// 					&& interfaces.hasMoreElements(); ) {
+//
+//				final NetworkInterface intf =
+//					interfaces.nextElement();
+//				for (final Enumeration<InetAddress> addrs = intf.getInetAddresses();
+//					addrs.hasMoreElements(); ) {
+//
+//					final InetAddress addr = addrs.nextElement();
+//					if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
+//						return addr.getHostAddress();
+//					}
+//				}
+//			}
+		} catch (final SocketException | NullPointerException e) {
 			Log.e(TAG, "getLocalIPv4Address", e);
 		}
 		return null;
@@ -54,21 +66,31 @@ public class NetworkHelper {
 
 	public static String getLocalIPv6Address() {
 		try {
-			for (final Enumeration<NetworkInterface> networkInterfaceEnum = NetworkInterface.getNetworkInterfaces();
-				networkInterfaceEnum.hasMoreElements(); ) {
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+			
+				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
 
-				final NetworkInterface networkInterface =
-					networkInterfaceEnum.nextElement();
-				for (final Enumeration<InetAddress> ipAddressEnum = networkInterface.getInetAddresses();
-					 ipAddressEnum.hasMoreElements(); ) {
-
-					final InetAddress addr = ipAddressEnum.nextElement();
-					if (!addr.isLoopbackAddress() && addr instanceof Inet6Address) {
+					if (!addr.isLoopbackAddress() && (addr instanceof Inet6Address)) {
 						return addr.getHostAddress();
 					}
 				}
 			}
-		} catch (final SocketException e) {
+//			for (final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
+//				 (interfaces != null)
+//				 	&& interfaces.hasMoreElements(); ) {
+//
+//				final NetworkInterface intf =
+//					interfaces.nextElement();
+//				for (final Enumeration<InetAddress> addrs = intf.getInetAddresses();
+//					 addrs.hasMoreElements(); ) {
+//
+//					final InetAddress addr = addrs.nextElement();
+//					if (!addr.isLoopbackAddress() && addr instanceof Inet6Address) {
+//						return addr.getHostAddress();
+//					}
+//				}
+//			}
+		} catch (final SocketException | NullPointerException e) {
 			Log.w(TAG, "getLocalIPv6Address", e);
 		}
 		return null;
