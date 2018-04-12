@@ -44,7 +44,9 @@ public class IEnum {
 	 * @param <E>
 	 * @return
 	 */
-	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final int id) {
+	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final int id)
+		throws IllegalArgumentException {
+
 		E result;
 		for (final E e: enumClazz.getEnumConstants()) {
 			if (e.id() == id) {
@@ -61,7 +63,9 @@ public class IEnum {
 	 * @param <E>
 	 * @return
 	 */
-	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final String label) {
+	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final String label)
+		throws IllegalArgumentException {
+
 		E result;
 		if (!TextUtils.isEmpty(label)) {
 			for (final E e: enumClazz.getEnumConstants()) {
@@ -77,6 +81,46 @@ public class IEnum {
 			}
 		}
 		throw new IllegalArgumentException();
+	}
+	
+	/**
+	 * find enum specified by Class and id/label
+	 * if enum not found by id, try to find with label
+	 * @param enumClazz
+	 * @param id
+	 * @param label
+	 * @param <E>
+	 * @return
+	 */
+	public static <E extends EnumInterface> E as(final Class<E> enumClazz,
+		final int id, final String label) throws IllegalArgumentException {
+		
+		try {
+			return as(enumClazz, id);
+		} catch (final IllegalArgumentException e) {
+			// ignore
+		}
+		return as(enumClazz, label);
+	}
+
+	/**
+	 * find enum specified by Class and id/label
+	 * if enum not found by label, try to find with id
+	 * @param enumClazz
+	 * @param label
+	 * @param id
+	 * @param <E>
+	 * @return
+	 */
+	public static <E extends EnumInterface> E as(final Class<E> enumClazz,
+		final String label, final int id) throws IllegalArgumentException {
+		
+		try {
+			return as(enumClazz, label);
+		} catch (final IllegalArgumentException e) {
+			// ignore
+		}
+		return as(enumClazz, id);
 	}
 
 	/**
@@ -101,7 +145,9 @@ public class IEnum {
 		return result;
 	}
 
-	public static JSONObject put(final JSONObject payload, final String key, final EnumInterface v) throws JSONException {
+	public static JSONObject put(final JSONObject payload, final String key, final EnumInterface v)
+		throws JSONException {
+
 		payload.put(key, v.label());
 		return payload;
 	}
