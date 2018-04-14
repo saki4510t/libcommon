@@ -27,6 +27,17 @@ import android.view.accessibility.AccessibilityManager;
 
 public class TalkBackHelper {
 	/**
+	 * Accessibilityが有効になっているかどうかを取得
+	 * @param context
+	 * @return
+	 */
+	public static boolean isEnabled(@NonNull final Context context) {
+		final AccessibilityManager manager = (AccessibilityManager) context
+			.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		return manager.isEnabled();
+	}
+
+	/**
 	 * 指定したテキストをTalkBackで読み上げる(TalkBackが有効な場合)
 	 * @param text
 	 */
