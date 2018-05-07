@@ -61,7 +61,6 @@ public class BufferHelper {
 		for (int i = offset; i < size; i += BUF_LEN) {
     		sz = i + BUF_LEN < size ? BUF_LEN : size - i;
 			buffer.get(dump, 0, sz);
-			sb.setLength(0);
 			for (int j = 0; j < sz; j++) {
 				sb.append(String.format("%02x", dump[j]));
 			}
