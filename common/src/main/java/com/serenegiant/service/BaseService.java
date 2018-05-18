@@ -221,7 +221,7 @@ public abstract class BaseService extends Service {
 		 * Android 8以降用にNotificationChannelを生成する処理
 		 * NotificationManager#getNotificationChannelがnullを
 		 * 返したときのみ新規に作成する
-		 * #createNotificationBuilderから呼ばれる
+		 * #createNotificationrから呼ばれる
 		 * showNotification
 		 * 	-> createNotificationBuilder
 		 * 		-> (createNotificationChannel
@@ -247,9 +247,25 @@ public abstract class BaseService extends Service {
 						channel.setGroup(groupId);
 					}
 					channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-					manager.createNotificationChannel(channel);
+					manager.createNotificationChannel(setupNotificationChannel(channel));
 				}
 			}
+		}
+		
+		/**
+		 * Android 8以降用にNotificationChannelを生成する処理
+		 * NotificationManager#getNotificationChannelがnullを
+		 * 返したときのみ新規に作成する
+		 * NotificationManager#createNotificationChannelが呼ばれる直前に
+		 * #createNotificationChannelrから呼ばれる
+		 * @param channel
+		 * @return
+		 */
+		@NonNull
+		protected NotificationChannel setupNotificationChannel(
+			@NonNull final NotificationChannel channel) {
+			
+			return channel;
 		}
 		
 		/**
@@ -289,11 +305,28 @@ public abstract class BaseService extends Service {
 				if (found == null) {
 					found = new NotificationChannelGroup(groupId,
 						TextUtils.isEmpty(groupName) ? groupId : groupName);
-					manager.createNotificationChannelGroup(found);
+					manager.createNotificationChannelGroup(
+						setupNotificationChannelGroup(found));
 				}
 			}
 		}
 		
+		/**
+		 * Android 8以降用にNotificationChannelGroupを生成する処理
+		 * NotificationManager#getNotificationChannelGroupsに同じグループidの
+		 * ものが存在しない時のみ新規に作成する
+		 * NotificationManager#createNotificationChannelGroupが呼ばれる直前に
+		 * #createNotificationChannelGroupから呼ばれる
+		 * @param group
+		 * @return
+		 */
+		@NonNull
+		protected NotificationChannelGroup setupNotificationChannelGroup(
+			@NonNull final NotificationChannelGroup group) {
+			
+			return group;
+		}
+
 		@SuppressLint("InlinedApi")
 		protected NotificationCompat.Builder createNotificationBuilder(
 			@NonNull final Context context,
