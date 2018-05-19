@@ -18,6 +18,8 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -25,6 +27,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
+import android.media.MediaRecorder;
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -33,6 +37,18 @@ import com.serenegiant.utils.Time;
 public abstract class IAudioSampler {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
+
+	public static final int AUDIO_SOURCE_UAC = 100;
+	@IntDef({
+		MediaRecorder.AudioSource.DEFAULT,
+		MediaRecorder.AudioSource.MIC,
+		MediaRecorder.AudioSource.CAMCORDER,
+		MediaRecorder.AudioSource.VOICE_RECOGNITION,
+		MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+		AUDIO_SOURCE_UAC,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface AudioSource {}
 
 	/**
 	 * 音声データ取得コールバックインターフェース
