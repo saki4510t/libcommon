@@ -125,6 +125,7 @@ public class AudioSampler extends IAudioSampler {
 	public static AudioRecord createAudioRecord(
 		final int source, final int sampling_rate, final int channels, final int format, final int buffer_size) {
 
+		@AudioSource
 		final int[] AUDIO_SOURCES = new int[] {
 			MediaRecorder.AudioSource.DEFAULT,		// ここ(1つ目)は引数で置き換えられる
 			MediaRecorder.AudioSource.CAMCORDER,	// これにするとUSBオーディオルーティングが有効な場合でも内蔵マイクからの音になる
@@ -137,6 +138,7 @@ public class AudioSampler extends IAudioSampler {
 		switch (source) {
 		case 1:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動
 		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
+		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
 		default:AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動(UACのopenに失敗した時など)
 		}
 		AudioRecord audioRecord = null;
