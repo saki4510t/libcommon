@@ -27,11 +27,14 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
+import android.media.AudioFormat;
+import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.Time;
 
 public abstract class IAudioSampler {
@@ -49,6 +52,58 @@ public abstract class IAudioSampler {
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface AudioSource {}
+
+	@SuppressLint("NewApi")
+	public static AudioRecord createAudioRecord(
+		final int source, final int sampling_rate, final int channels, final int format, final int buffer_size) {
+
+		@AudioSource
+		final int[] AUDIO_SOURCES = new int[] {
+			MediaRecorder.AudioSource.DEFAULT,		// ここ(1つ目)は引数で置き換えられる
+			MediaRecorder.AudioSource.CAMCORDER,	// これにするとUSBオーディオルーティングが有効な場合でも内蔵マイクからの音になる
+			MediaRecorder.AudioSource.MIC,
+			MediaRecorder.AudioSource.DEFAULT,
+			MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+			MediaRecorder.AudioSource.VOICE_RECOGNITION,
+		};
+
+		switch (source) {
+		case 1:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動
+		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
+		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
+		default:AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動(UACのopenに失敗した時など)
+		}
+		AudioRecord audioRecord = null;
+		for (final int src: AUDIO_SOURCES) {
+            try {
+            	if (BuildCheck.isAndroid6()) {
+					audioRecord = new AudioRecord.Builder()
+						.setAudioSource(src)
+						.setAudioFormat(new AudioFormat.Builder()
+							.setEncoding(format)
+							.setSampleRate(sampling_rate)
+							.setChannelMask((channels == 1
+								? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO))
+							.build())
+						.setBufferSizeInBytes(buffer_size)
+						.build();
+				} else {
+					audioRecord = new AudioRecord(src, sampling_rate,
+						(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
+						format, buffer_size);
+				}
+				if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
+					audioRecord.release();
+					audioRecord = null;
+				}
+            } catch (final Exception e) {
+            	audioRecord = null;
+            }
+            if (audioRecord != null)
+            	break;
+    	}
+		return audioRecord;
+	}
 
 	/**
 	 * 音声データ取得コールバックインターフェース
