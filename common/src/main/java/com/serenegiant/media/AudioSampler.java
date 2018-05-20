@@ -196,7 +196,8 @@ LOOP:							for ( ; mIsCapturing ;) {
 											// 音声データキューに追加する
 											addMediaData(data);
 											continue;
-										} else if (readBytes == AudioRecord.SUCCESS) {
+										} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
+											err_count = 0;
 											recycle(data);
 											continue;
 										} else if (readBytes == AudioRecord.ERROR) {
