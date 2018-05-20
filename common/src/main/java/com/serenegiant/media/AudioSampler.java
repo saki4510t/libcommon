@@ -138,7 +138,7 @@ public class AudioSampler extends IAudioSampler {
 			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
 */
 			int retry = 3;
-			for ( ; mIsCapturing && (retry > 0) ; ) {
+RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
 				final AudioRecord audioRecord = createAudioRecord(
 					AUDIO_SOURCE, SAMPLING_RATE, CHANNEL_COUNT, AUDIO_FORMAT, BUFFER_SIZE);
 				int err_count = 0;
@@ -151,50 +151,43 @@ public class AudioSampler extends IAudioSampler {
 							audioRecord.startRecording();
 							try {
 								MediaData data;
-								for ( ; mIsCapturing ;) {
+LOOP:							for ( ; mIsCapturing ;) {
 									data = obtain();
 									if (data != null) {
-										if (audioRecord.getRecordingState()
+										// check recording state
+										final int recordingState = audioRecord.getRecordingState();
+										if (recordingState
 											!= AudioRecord.RECORDSTATE_RECORDING) {
 
 											if (err_count == 0) {
-												Log.e(TAG, "not a recording state");
+												Log.e(TAG, "not a recording state," + recordingState);
 											}
 											err_count++;
 											recycle(data);
 											if (err_count > 20) {
 												retry--;
-												break;
+												break LOOP;
 											} else {
 												Thread.sleep(100);
 												continue;
 											}
 										}
+										// try to read audio data
 										buffer = data.mBuffer;
 										buffer.clear();
 										// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
 										try {
 											readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
 										} catch (final Exception e) {
-//											Log.w(TAG, "AudioRecord#read failed:", e);
+											Log.e(TAG, "AudioRecord#read failed:" + e);
+											err_count++;
 											retry--;
+											recycle(data);
 											callOnError(e);
-											recycle(data);
-											break;
+											break LOOP;
 										}
-										if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-											if (err_count == 0) {
-												Log.e(TAG, "Read error ERROR_BAD_VALUE");
-											}
-											err_count++;
-											recycle(data);
-										} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-											if (err_count == 0) {
-												Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-											}
-											err_count++;
-											recycle(data);
-										} else if (readBytes > 0) {
+										if (readBytes > 0) {
+											// 正常に読み込めた時
 											err_count = 0;
 											data.presentationTimeUs = getInputPTSUs();
 											data.size = readBytes;
@@ -202,13 +195,41 @@ public class AudioSampler extends IAudioSampler {
 											buffer.flip();
 											// 音声データキューに追加する
 											addMediaData(data);
+											continue;
+										} else if (readBytes == AudioRecord.SUCCESS) {
+											recycle(data);
+											continue;
+										} else if (readBytes == AudioRecord.ERROR) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read error ERROR");
+											}
+										} else if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read error ERROR_BAD_VALUE");
+											}
+										} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
+											}
+										} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
+											Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
+											err_count++;
+											retry--;
+											recycle(data);
+											break LOOP;
+										} else if (readBytes < 0) {
+											if (err_count == 0) {
+												Log.e(TAG, "Read returned unknown err " + readBytes);
+											}
 										}
+										err_count++;
+										recycle(data);
 									} // end of if (data != null)
 									if (err_count > 10) {
 										retry--;
-										break;
+										break LOOP;
 									}
-								}
+								} // end of for ( ; mIsCapturing ;)
 							} finally {
 								audioRecord.stop();
 							}
@@ -226,7 +247,7 @@ public class AudioSampler extends IAudioSampler {
 							try {
 								Thread.sleep(100);
 							} catch (final InterruptedException e) {
-								break;
+								break RETRY_LOOP;
 							}
 						}
 					}
