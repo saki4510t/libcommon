@@ -26,13 +26,14 @@ import java.util.concurrent.TimeUnit;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 /**
  *　FIFOキューによるバッファリング付きのAudioEncoder
  */
 public class AudioEncoderBuffered extends AbstractAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "AudioEncoderBuffered";
+	private static final String TAG = AudioEncoderBuffered.class.getSimpleName();
 
 	private final int MAX_POOL_SIZE = 100;
 	private final int MAX_QUEUE_SIZE = 100;
@@ -114,22 +115,20 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 			// will enable the headphone
 			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
 */
-    		final AudioRecord audioRecord = AudioSampler.createAudioRecord(
+    		final AudioRecord audioRecord = IAudioSampler.createAudioRecord(
     			mAudioSource, mSampleRate, mChannelCount, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
 			int err_count = 0;
             if (audioRecord != null) {
 	            try {
 	            	if (mIsCapturing) {
-	//    				if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
+//						if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
 		                int readBytes;
 		                ByteBuffer buffer;
 		                audioRecord.startRecording();
 		                try {
 		                	MediaData data;
-		                	for ( ; ;) {
-		                		synchronized (mSync) {
-			                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
-			                	}
+		                	for ( ; ; ) {
+		                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
 		                		data = obtain();
 		                		buffer = data.mBuffer;
 		                		buffer.clear();
@@ -139,29 +138,51 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 //		    		        		Log.w(TAG, "AudioRecord#read failed:", e);
 		                			break;
 		                		}
-				    			if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-//				    				Log.e(TAG, "Read error ERROR_BAD_VALUE");
-				    				err_count++;
-				    				recycle(data);
-				    			} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-//				    				Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-				    				err_count++;
-				    				recycle(data);
-		                		} else if (readBytes > 0) {
-				    			    // 内蔵マイクからの音声入力をエンコーダーにセット
-		                			err_count = 0;
-		                			data.presentationTimeUs = getInputPTSUs();
-		                			data.size = readBytes;
-		                			buffer.position(readBytes);
-		                			buffer.flip();
-		                			mAudioQueue.offer(data);
-				    			}
-				    			if (err_count > 10) break;
-		                	}
+								if (readBytes > 0) {
+									// 内蔵マイクからの音声入力をエンコーダーにセット
+									err_count = 0;
+									data.presentationTimeUs = getInputPTSUs();
+									data.size = readBytes;
+									buffer.position(readBytes);
+									buffer.flip();
+									mAudioQueue.offer(data);
+									continue;
+								} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
+									err_count = 0;
+									recycle(data);
+									continue;
+								} else if (readBytes == AudioRecord.ERROR) {
+									if (err_count == 0) {
+										Log.e(TAG, "Read error ERROR");
+									}
+								} else if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
+									if (err_count == 0) {
+										Log.e(TAG, "Read error ERROR_BAD_VALUE");
+									}
+								} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
+									if (err_count == 0) {
+										Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
+									}
+								} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
+									Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
+									recycle(data);
+									// FIXME AudioRecordを再生成しないといけない
+									break;
+								} else if (readBytes < 0) {
+									if (err_count == 0) {
+										Log.e(TAG, "Read returned unknown err " + readBytes);
+									}
+								}
+								err_count++;
+								recycle(data);
+				    			if (err_count > 10) {
+				    				break;
+								}
+		                	}	// end of for ( ; ; )
 		                } finally {
 		                	audioRecord.stop();
 		                }
-	            	}
+	            	}	// if (mIsCapturing)
 	            } catch (final Exception e) {
 //	        		Log.e(TAG, "exception on AudioRecord:", e);
 	            } finally {
@@ -169,7 +190,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	            }
 //	    	} else {
 //        		Log.w(TAG, "AudioRecord failed to initialize");
-	    	}
+	    	}	// if (audioRecord != null)
 //			if (DEBUG) Log.v(TAG, "AudioThread:finished");
     	}
     }
