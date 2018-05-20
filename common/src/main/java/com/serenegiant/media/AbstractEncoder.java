@@ -50,7 +50,7 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * 終了要求フラグ(新規エンコード禁止フラグ)
      */
-    protected boolean mRequestStop;
+    protected volatile boolean mRequestStop;
     /**
      * ファイルへの出力中フラグ
      */
@@ -58,7 +58,7 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * 終了フラグ
      */
-    protected boolean mIsEOS;
+    protected volatile boolean mIsEOS;
     /**
      * トラックインデックス
      */
