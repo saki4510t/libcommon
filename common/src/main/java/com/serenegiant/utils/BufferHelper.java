@@ -204,7 +204,7 @@ public class BufferHelper {
 	 * @param bytes
 	 * @return
 	 */
-	public String toHexString(final byte[] bytes) {
+	public static String toHexString(final byte[] bytes) {
 		final int n = (bytes != null) ? bytes.length : 0;
 		final StringBuilder sb = new StringBuilder(n * 2 + 2);
 		for (int i = 0; i < n; i++) {
@@ -220,7 +220,7 @@ public class BufferHelper {
 	 * @param buffer
 	 * @return
 	 */
-	public String toHexString(final ByteBuffer buffer) {
+	public static String toHexString(final ByteBuffer buffer) {
 		if (buffer == null) return null;
 		final ByteBuffer _buffer = buffer.duplicate();
 		final int n = _buffer.remaining();
