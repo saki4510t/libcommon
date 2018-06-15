@@ -239,16 +239,14 @@ public abstract class BaseService extends Service {
 			final NotificationManager manager
 				= (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
 			if (manager.getNotificationChannel(channelId) == null) {
-				if (manager.getNotificationChannel(channelId) == null) {
-					final NotificationChannel channel
-						= new NotificationChannel(channelId, channelTitle, importance);
-					if (!TextUtils.isEmpty(groupId)) {
-						createNotificationChannelGroup(context, groupId, groupName);
-						channel.setGroup(groupId);
-					}
-					channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
-					manager.createNotificationChannel(setupNotificationChannel(channel));
+				final NotificationChannel channel
+					= new NotificationChannel(channelId, channelTitle, importance);
+				if (!TextUtils.isEmpty(groupId)) {
+					createNotificationChannelGroup(context, groupId, groupName);
+					channel.setGroup(groupId);
 				}
+				channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+				manager.createNotificationChannel(setupNotificationChannel(channel));
 			}
 		}
 		
