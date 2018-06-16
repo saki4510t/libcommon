@@ -562,13 +562,7 @@ public abstract class BaseService extends Service {
 		final NotificationManager manager
 			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 		manager.cancel(notificationId);
-		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
-			try {
-				manager.deleteNotificationChannel(channelId);
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
+		releaseNotificationChannel(channelId);
 	}
 
 	/**
@@ -581,6 +575,41 @@ public abstract class BaseService extends Service {
 	protected void cancelNotification(final int notificationId) {
 
 		cancelNotification(notificationId, null);
+	}
+	
+	/**
+	 * 指定したNotificationChannelを破棄する
+	 * @param channelId
+	 */
+	@SuppressLint("NewApi")
+	protected void releaseNotificationChannel(@Nullable final String channelId) {
+		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
+			final NotificationManager manager
+				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			try {
+				manager.deleteNotificationChannel(channelId);
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		}
+	}
+	
+	/**
+	 * 指定したNotificationGroupを削除する
+	 * @param groupId
+	 */
+	@SuppressLint("NewApi")
+	protected void releaseNotificationGroup(@NonNull final String groupId) {
+
+		if (!TextUtils.isEmpty(groupId) && BuildCheck.isOreo()) {
+			final NotificationManager manager
+				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			try {
+				manager.deleteNotificationChannelGroup(groupId);
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		}
 	}
 
 	/**
