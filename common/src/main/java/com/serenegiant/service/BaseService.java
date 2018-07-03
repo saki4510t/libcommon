@@ -657,6 +657,14 @@ public abstract class BaseService extends Service {
 	protected void removeFromUiThread(@Nullable final Runnable task) {
 		mUIHandler.removeCallbacks(task);
 	}
+	
+	/**
+	 * メインスレッド/UIスレッドの未実行処理をキャンセルする
+	 * @param token
+	 */
+	protected void removeFromUiThreadAll(@Nullable final Object token) {
+		mUIHandler.removeCallbacksAndMessages(token);
+	}
 
 	/**
 	 * ワーカースレッド上で処理を実行する
@@ -704,6 +712,18 @@ public abstract class BaseService extends Service {
 		}
 	}
 
+	/**
+	 * ワーカースレッド上の待機中の処理をキャンセルする
+	 * @param token
+	 */
+	protected void removeEventAll(@Nullable final Object token) {
+		synchronized (mSync) {
+			if (mAsyncHandler != null) {
+				mAsyncHandler.removeCallbacksAndMessages(token);
+			}
+		}
+	}
+	
 	protected Handler getAsyncHandler() throws IllegalStateException {
 		if (mDestroyed) throw new IllegalStateException("already destroyed");
 		synchronized (mSync) {
