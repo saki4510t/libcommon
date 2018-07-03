@@ -27,8 +27,8 @@ task clean(type: Delete) {
 }
 
 ext {
-	javaSourceCompatibility = JavaVersion.VERSION_1_7
-	javaTargetCompatibility = JavaVersion.VERSION_1_7
+	javaSourceCompatibility = JavaVersion.VERSION_1_8
+	javaTargetCompatibility = JavaVersion.VERSION_1_8
 
 	versionBuildTool = "27.0.3"
 	versionCompiler = 27
