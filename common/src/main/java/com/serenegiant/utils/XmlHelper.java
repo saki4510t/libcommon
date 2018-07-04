@@ -166,7 +166,7 @@ public class XmlHelper {
 	 */
 	public static final CharSequence getAttributeText(@NonNull final Context context,
 		@NonNull final XmlPullParser parser,
-		final String namespace, final String name, final String defaultValue) {
+		final String namespace, final String name, final CharSequence defaultValue) {
 
 		CharSequence result;
 		try {
