@@ -141,8 +141,47 @@ public class XmlHelper {
 			if (!TextUtils.isEmpty(result) && result.startsWith("@")) {
 				final String r = result.substring(1);
 				final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
-				if (resId > 0)
+				if (resId > 0) {
 					result = context.getResources().getString(resId);
+				}
+			}
+		} catch (final Resources.NotFoundException e) {
+			result = defaultValue;
+		} catch (final NumberFormatException e) {
+			result = defaultValue;
+		} catch (final NullPointerException e) {
+			result = defaultValue;
+		}
+		return result;
+	}
+
+	/**
+	 * read as String attribute with default value from xml(w/o exception throws)
+	 * resource string id is also resolved into string
+	 * @param parser
+	 * @param namespace
+	 * @param name
+	 * @param defaultValue
+	 * @return
+	 */
+	public static final CharSequence getAttributeText(@NonNull final Context context,
+		@NonNull final XmlPullParser parser,
+		final String namespace, final String name, final String defaultValue) {
+
+		CharSequence result;
+		try {
+			result = parser.getAttributeValue(namespace, name);
+			if (result == null)
+				result = defaultValue;
+			if (!TextUtils.isEmpty(result)) {
+				final String s = result.toString();
+				if (s.startsWith("@")) {
+					final String r = s.substring(1);
+					final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
+					if (resId > 0) {
+						result = context.getResources().getText(resId);
+					}
+				}
 			}
 		} catch (final Resources.NotFoundException e) {
 			result = defaultValue;
