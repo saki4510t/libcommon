@@ -19,6 +19,8 @@ package com.serenegiant.utils;
 */
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.text.TextUtils;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -103,11 +105,11 @@ public class SysFs {
 		return mName;
 	}
 
-	public String readString() throws IOException {
+	public String readString(@Nullable final String name) throws IOException {
 		String result;
 		mReadLock.lock();
 		try {
-			final FileReader in = new FileReader(mPath);
+			final FileReader in = new FileReader(getPath(name));
 			try {
 				result = new BufferedReader(in).readLine();
 			} finally {
@@ -119,13 +121,17 @@ public class SysFs {
 		return result;
 	}
 
-	public byte[] readBytes() throws IOException {
+	public String readString() throws IOException {
+		return readString(null);
+	}
+
+	public byte[] readBytes(@Nullable final String name) throws IOException {
 		byte[] result;
 		mReadLock.lock();
 		try {
 			final byte[] buf = new byte[512];
 			final MyByteArrayOutputStream out = new MyByteArrayOutputStream(1024);
-			final InputStream in = new BufferedInputStream(new FileInputStream(mPath));
+			final InputStream in = new BufferedInputStream(new FileInputStream(getPath(name)));
 			try {
 				int available = in.available();
 				for (; available > 0; ) {
@@ -145,10 +151,14 @@ public class SysFs {
 		return result;
 	}
 
-	public byte readByte() throws IOException {
+	public byte[] readBytes() throws IOException {
+		return readBytes(null);
+	}
+	
+	public byte readByte(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readByte();
 			} finally {
@@ -159,10 +169,14 @@ public class SysFs {
 		}
 	}
 
-	public short readShort() throws IOException {
+	public byte readByte() throws IOException {
+		return readByte(null);
+	}
+	
+	public short readShort(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readShort();
 			} finally {
@@ -173,10 +187,14 @@ public class SysFs {
 		}
 	}
 
-	public int readInt() throws IOException {
+	public short readShort() throws IOException {
+		return readShort(null);
+	}
+	
+	public int readInt(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readInt();
 			} finally {
@@ -187,10 +205,14 @@ public class SysFs {
 		}
 	}
 
-	public long readLong() throws IOException {
+	public int readInt() throws IOException {
+		return readInt(null);
+	}
+	
+	public long readLong(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readLong();
 			} finally {
@@ -201,10 +223,14 @@ public class SysFs {
 		}
 	}
 
-	public float readFloat() throws IOException {
+	public long readLong() throws IOException {
+		return readLong(null);
+	}
+	
+	public float readFloat(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readFloat();
 			} finally {
@@ -215,10 +241,14 @@ public class SysFs {
 		}
 	}
 
-	public double readDouble() throws IOException {
+	public float readFloat() throws IOException {
+		return readFloat(null);
+	}
+	
+	public double readDouble(@Nullable final String name) throws IOException {
 		mReadLock.lock();
 		try {
-			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			final DataInputStream in = new DataInputStream(new FileInputStream(getPath(name)));
 			try {
 				return in.readDouble();
 			} finally {
@@ -229,14 +259,27 @@ public class SysFs {
 		}
 	}
 
-	public void write(@NonNull final byte[] value) throws IOException {
-		write(value, 0, value.length);
+	public double readDouble() throws IOException {
+		return readDouble(null);
 	}
 	
-	public void write(@NonNull final byte[] value, final int offset, final int length) throws IOException {
+	public void write(@Nullable final String name, @NonNull final byte[] value)
+		throws IOException {
+
+		write(name, value, 0, value.length);
+	}
+
+	public void write(@NonNull final byte[] value) throws IOException {
+		write(null, value, 0, value.length);
+	}
+	
+	public void write(@Nullable final String name,
+		@NonNull final byte[] value, final int offset, final int length)
+			throws IOException {
+
 		mWriteLock.lock();
 		try {
-			final OutputStream out = new FileOutputStream(mPath);
+			final OutputStream out = new FileOutputStream(getPath(name));
 			try {
 				out.write(value, offset, length);
 				out.flush();
@@ -248,10 +291,18 @@ public class SysFs {
 		}
 	}
 
-	public void write(@NonNull final String value) throws IOException {
+	public void write(@NonNull final byte[] value, final int offset, final int length)
+		throws IOException {
+		
+		write(null, value, offset, length);
+	}
+	
+	public void write(@Nullable final String name, @NonNull final String value)
+		throws IOException {
+
 		mWriteLock.lock();
 		try {
-			final FileWriter out = new FileWriter(mPath);
+			final FileWriter out = new FileWriter(getPath(name));
 			try {
 				out.write(value);
 				out.flush();
@@ -263,10 +314,14 @@ public class SysFs {
 		}
 	}
 	
-	public void write(final boolean value) throws IOException {
+	public void write(@NonNull final String value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name, final boolean value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeBoolean(value);
 				out.flush();
@@ -278,10 +333,14 @@ public class SysFs {
 		}
 	}
 
-	public void write(final byte value) throws IOException {
+	public void write(final boolean value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name,  final byte value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeByte(value);
 				out.flush();
@@ -293,10 +352,14 @@ public class SysFs {
 		}
 	}
 	
-	public void write(final short value) throws IOException {
+	public void write(final byte value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name,  final short value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeShort(value);
 				out.flush();
@@ -308,10 +371,14 @@ public class SysFs {
 		}
 	}
 
-	public void write(final int value) throws IOException {
+	public void write(final short value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name, final int value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeInt(value);
 				out.flush();
@@ -323,10 +390,14 @@ public class SysFs {
 		}
 	}
 
-	public void write(final float value) throws IOException {
+	public void write(final int value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name,  final float value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeFloat(value);
 				out.flush();
@@ -338,10 +409,14 @@ public class SysFs {
 		}
 	}
 
-	public void write(final double value) throws IOException {
+	public void write(final float value) throws IOException {
+		write(null, value);
+	}
+	
+	public void write(@Nullable final String name, final double value) throws IOException {
 		mWriteLock.lock();
 		try {
-			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(getPath(name)));
 			try {
 				out.writeDouble(value);
 				out.flush();
@@ -353,6 +428,10 @@ public class SysFs {
 		}
 	}
 
+	public void write(final double value) throws IOException {
+		write(null, value);
+	}
+
 	@Override
 	public String toString() {
 		try {
@@ -362,6 +441,15 @@ public class SysFs {
 		}
 	}
 
+	private File getPath(@Nullable final String name) {
+		if (TextUtils.isEmpty(name)) {
+			return new File(mPath);
+		} else {
+			File f = new File(mPath);
+			return new File(f, name);
+		}
+	}
+	
 	private static class MyByteArrayOutputStream extends ByteArrayOutputStream {
 		public MyByteArrayOutputStream() {
 			super();
