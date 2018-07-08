@@ -20,13 +20,21 @@ package com.serenegiant.utils;
 
 import android.support.annotation.NonNull;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -95,8 +103,8 @@ public class SysFs {
 		return mName;
 	}
 
-	public String read() throws IOException {
-		String result = null;
+	public String readString() throws IOException {
+		String result;
 		mReadLock.lock();
 		try {
 			final FileReader in = new FileReader(mPath);
@@ -110,7 +118,136 @@ public class SysFs {
 		}
 		return result;
 	}
+
+	public byte[] readBytes() throws IOException {
+		byte[] result;
+		mReadLock.lock();
+		try {
+			final byte[] buf = new byte[512];
+			final MyByteArrayOutputStream out = new MyByteArrayOutputStream(1024);
+			final InputStream in = new BufferedInputStream(new FileInputStream(mPath));
+			try {
+				int available = in.available();
+				for (; available > 0; ) {
+					final int bytes = in.read(buf);
+					if (bytes > 0) {
+						out.write(buf, 0, bytes);
+					}
+					available = in.available();
+				}
+				result = out.toByteArray();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+		return result;
+	}
+
+	public byte readByte() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readByte();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public short readShort() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readShort();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public int readInt() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readInt();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public long readLong() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readLong();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public float readFloat() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readFloat();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public double readDouble() throws IOException {
+		mReadLock.lock();
+		try {
+			final DataInputStream in = new DataInputStream(new FileInputStream(mPath));
+			try {
+				return in.readDouble();
+			} finally {
+				in.close();
+			}
+		} finally {
+			mReadLock.unlock();
+		}
+	}
+
+	public void write(@NonNull final byte[] value) throws IOException {
+		write(value, 0, value.length);
+	}
 	
+	public void write(@NonNull final byte[] value, final int offset, final int length) throws IOException {
+		mWriteLock.lock();
+		try {
+			final OutputStream out = new FileOutputStream(mPath);
+			try {
+				out.write(value, offset, length);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
 	public void write(@NonNull final String value) throws IOException {
 		mWriteLock.lock();
 		try {
@@ -126,12 +263,128 @@ public class SysFs {
 		}
 	}
 	
+	public void write(final boolean value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeBoolean(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
+	public void write(final byte value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeByte(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+	
+	public void write(final short value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeShort(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
+	public void write(final int value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeInt(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
+	public void write(final float value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeFloat(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
+	public void write(final double value) throws IOException {
+		mWriteLock.lock();
+		try {
+			final DataOutputStream out = new DataOutputStream(new FileOutputStream(mPath));
+			try {
+				out.writeDouble(value);
+				out.flush();
+			} finally {
+				out.close();
+			}
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
 	@Override
 	public String toString() {
 		try {
-			return String.format(Locale.US, "%s=%s", mPath, read());
+			return String.format(Locale.US, "%s=%s", mPath, readString());
 		} catch (IOException e) {
 			return String.format(Locale.US, "%s=null", mPath);
+		}
+	}
+
+	private static class MyByteArrayOutputStream extends ByteArrayOutputStream {
+		public MyByteArrayOutputStream() {
+			super();
+		}
+	 
+		public MyByteArrayOutputStream(final int size) {
+			super(size);
+		}
+	 
+		/**
+		 * return backed byte array as wrapped ByteBuffer
+		 * @return
+		 */
+			public ByteBuffer getByteBuffer() {
+				return ByteBuffer.wrap(buf, 0, size());
+			}
+	
+		/**
+		 * return backed byte array(without copy)
+		 * @return
+		 */
+		public byte[] getBuffer() {
+			return buf;
 		}
 	}
 }
