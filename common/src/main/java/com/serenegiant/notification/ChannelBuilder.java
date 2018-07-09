@@ -62,7 +62,7 @@ import static com.serenegiant.utils.XmlHelper.getAttributeText;
  */
 @SuppressLint("InlinedApi")
 public class ChannelBuilder {
-	private static final boolean DEBUG = true; // set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = ChannelBuilder.class.getSimpleName();
 	
 	/**

@@ -49,7 +49,7 @@ import java.lang.annotation.RetentionPolicy;
  * 通知発行用のヘルパークラスを追加
  */
 public abstract class NotificationBuilder extends NotificationCompat.Builder {
-	private static final boolean DEBUG = true; // set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = NotificationBuilder.class.getSimpleName();
 
 	public interface IntentFactory {
