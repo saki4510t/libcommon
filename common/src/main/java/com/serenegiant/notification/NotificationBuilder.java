@@ -58,31 +58,58 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 			@Nullable final PendingIntent intent);
 
 		@Nullable
-		default public PendingIntent createDeleteIntent(
-			@Nullable final PendingIntent intent) {
-
-			return intent;
-		}
+		public PendingIntent createDeleteIntent(@Nullable final PendingIntent intent);
 
 		@Nullable
-		default public PendingIntent createFullScreenIntent(
-			@Nullable final PendingIntent intent) {
+		public PendingIntent createFullScreenIntent(@Nullable final PendingIntent intent);
 		
-			return intent;
-		}
+		public boolean isHighPriorityFullScreenIntent(final boolean highPriority);
 		
-		default public boolean isHighPriorityFullScreenIntent(
-			final boolean highPriority) {
-		
-			return highPriority;
-		}
 	}
 
 	public interface NotificationBuilderFactory extends IntentFactory {
 		public void setupBuilder(
 			@NonNull final NotificationBuilder builder);
 	}
-	
+
+	public static class DefaultIntentFactory
+		implements NotificationBuilderFactory {
+
+		@Nullable
+		public PendingIntent createContentIntent(
+			@Nullable final PendingIntent intent) {
+			
+			return intent;
+		}
+
+		@Nullable
+		@Override
+		public PendingIntent createDeleteIntent(
+			@Nullable final PendingIntent intent) {
+
+			return intent;
+		}
+
+		@Nullable
+		@Override
+		public PendingIntent createFullScreenIntent(
+			@Nullable final PendingIntent intent) {
+		
+			return intent;
+		}
+
+		@Override
+		public boolean isHighPriorityFullScreenIntent(
+			final boolean highPriority) {
+		
+			return highPriority;
+		}
+		
+		public void setupBuilder(
+			@NonNull final NotificationBuilder builder) {
+		}
+	}
+
 	/**
 	 * Notification発行用のヘルパーメソッド
 	 * @param context
