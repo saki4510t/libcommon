@@ -65,6 +65,8 @@ public class ChannelBuilder {
 	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = ChannelBuilder.class.getSimpleName();
 	
+	public static final String DEFAULT_CHANNEL_ID = NotificationChannel.DEFAULT_CHANNEL_ID;
+
 	/**
 	 * フレームワークのアノテーションがhide指定💩なので
 	 * しかたなく自前で再定義
@@ -118,7 +120,7 @@ public class ChannelBuilder {
 	 */
 	@NonNull
 	public static ChannelBuilder getBuilder(@NonNull final Context context,
-											@NonNull final String channelId) {
+		@NonNull final String channelId) {
 		
 		if (DEBUG) Log.v(TAG, "getBuilder:" + channelId);
 		final NotificationManager manager
@@ -328,7 +330,7 @@ public class ChannelBuilder {
 	@NonNull
 	private final Context mContext;
 	@NonNull
-	private String channelId = NotificationChannel.DEFAULT_CHANNEL_ID;
+	private String channelId = DEFAULT_CHANNEL_ID;
 	@Nullable
 	private CharSequence name;
 	@Importance
@@ -353,14 +355,14 @@ public class ChannelBuilder {
 	
 	/**
 	 * コンストラクタ
-	 * チャネルidはNotificationChannel.DEFAULT_CHANNEL_IDになる
+	 * チャネルidはDEFAULT_CHANNEL_IDになる
 	 * 新規に作成するとわかっている場合・上書きする場合を除いて#getBuilderを使うほうがいい。
 	 */
 	public ChannelBuilder(@NonNull final Context context) {
 
 		this(context,
-			NotificationChannel.DEFAULT_CHANNEL_ID,
-			NotificationChannel.DEFAULT_CHANNEL_ID,
+			DEFAULT_CHANNEL_ID,
+			DEFAULT_CHANNEL_ID,
 			NotificationManager.IMPORTANCE_NONE,
 			null, null);
 	}
@@ -368,7 +370,7 @@ public class ChannelBuilder {
 	/**
 	 * コンストラクタ
 	 * 新規に作成するとわかっている場合・既存設定を上書きする場合を除いて#getBuilderを使うほうがいい。
-	 * @param channelId nullならチャネルidはNotificationChannel.DEFAULT_CHANNEL_IDになる
+	 * @param channelId nullならチャネルidはDEFAULT_CHANNEL_IDになる
 	 * @param name
 	 * @param importance
 	 */
@@ -386,7 +388,7 @@ public class ChannelBuilder {
 	/**
 	 * コンストラクタ
 	 * 新規に作成するとわかっている場合・既存設定を上書きする場合を除いて#getBuilderを使うほうがいい。
-	 * @param channelId nullならチャネルidはNotificationChannel.DEFAULT_CHANNEL_IDになる
+	 * @param channelId nullならチャネルidはDEFAULT_CHANNEL_IDになる
 	 * @param name
 	 * @param importance
 	 * @param groupId
@@ -402,7 +404,7 @@ public class ChannelBuilder {
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		this.mContext = context;
 		this.channelId = TextUtils.isEmpty(channelId)
-			? NotificationChannel.DEFAULT_CHANNEL_ID : channelId;
+			? DEFAULT_CHANNEL_ID : channelId;
 		this.name = name;
 		this.importance = importance;
 		this.groupId = groupId;
@@ -447,13 +449,13 @@ public class ChannelBuilder {
 	
 	/**
 	 * チャネルidをセット
-	 * @param channelId nullならチャネルidはNotificationChannel.DEFAULT_CHANNEL_IDになる
+	 * @param channelId nullならチャネルidはDEFAULT_CHANNEL_IDになる
 	 * @return
 	 */
 	public ChannelBuilder setId(@Nullable final String channelId) {
 		// nullや空文字列にならなようにする
 		this.channelId = TextUtils.isEmpty(channelId)
-			? NotificationChannel.DEFAULT_CHANNEL_ID : channelId;
+			? DEFAULT_CHANNEL_ID : channelId;
 		return this;
 	}
 	

@@ -284,12 +284,24 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	/**
 	 * フォアグラウンドサービス用に通知を発行する
  	 * @param service
+	 * @param notificationId
+	 * @return
+	 */
+	public NotificationBuilder notifyForeground(@NonNull final Service service,
+		final int notificationId) {
+		
+		return notifyForeground(service, null, notificationId);
+	}
+	
+	/**
+	 * フォアグラウンドサービス用に通知を発行する
+ 	 * @param service
 	 * @param tag
 	 * @param notificationId
 	 * @return
 	 */
 	public NotificationBuilder notifyForeground(@NonNull final Service service,
-												@Nullable final String tag, final int notificationId) {
+		@Nullable final String tag, final int notificationId) {
 		final Notification notification = build();
 		service.startForeground(notificationId, notification);
 		notify(service, tag, notificationId, notification);
@@ -450,7 +462,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @return
 	 */
 	public NotificationBuilder setChannelGroup(@Nullable final String groupId,
-											   @Nullable final String groupName) {
+		@Nullable final String groupName) {
 
 		mChannelBuilder.setGroup(groupId, groupName);
 		return this;
@@ -595,7 +607,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	
 	@Override
 	public NotificationBuilder setFullScreenIntent(final PendingIntent intent,
-												   final boolean highPriority) {
+		final boolean highPriority) {
 
 		super.setFullScreenIntent(intent, highPriority);
 		mFullScreenIntent = intent;
