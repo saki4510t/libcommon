@@ -604,12 +604,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 	
-	/**
-	 * 分配描画用のSurfaceを全て削除する
-	 * このメソッドはSurfaceが削除されるか
-	 * interruptされるまでカレントスレッドをブロックする。
-	 */
-	public void removeSurfaceAll() {
+		/**
+		 * 分配描画用のSurfaceを全て削除する
+		 * このメソッドはSurfaceが削除されるか
+		 * interruptされるまでカレントスレッドをブロックする。
+		 */
+		public void removeSurfaceAll() {
 			synchronized (mClients) {
 				for ( ; isRunning() ; ) {
 					if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
