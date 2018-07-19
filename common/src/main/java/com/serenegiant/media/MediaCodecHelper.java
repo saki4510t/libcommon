@@ -37,8 +37,8 @@ import java.util.List;
 public class MediaCodecHelper {
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();
 
-	public static final String MIME_AVC = "video/avc";
-	public static final String MIME_MP4A = "audio/mp4a-latm";
+	public static final String MIME_VIDEO_AVC = "video/avc";		// h.264
+	public static final String MIME_AUDIO_AAC = "audio/mp4a-latm";	// AAC
 	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
