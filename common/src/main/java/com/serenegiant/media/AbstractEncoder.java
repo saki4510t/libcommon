@@ -19,18 +19,15 @@ package com.serenegiant.media;
 */
 
 import java.nio.ByteBuffer;
-import java.util.List;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.utils.MediaInfo;
 import com.serenegiant.utils.Time;
 
 import static com.serenegiant.utils.BufferHelper.*;
@@ -88,22 +85,6 @@ public abstract class AbstractEncoder implements Encoder {
      * MIME
      */
     protected final String MIME_TYPE;
-
-	public static final int getCodecCount() {
-		return MediaInfo.getCodecCount();
-	}
-
-	public static final List<MediaCodecInfo> getCodecs() {
-		return MediaInfo.getCodecs();
-	}
-
-	public static final MediaCodecInfo getCodecInfoAt(final int ix) {
-		return MediaInfo.getCodecInfoAt(ix);
-	}
-
-	public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(final MediaCodecInfo codecInfo, final String mimeType) {
-		return MediaInfo.getCodecCapabilities(codecInfo, mimeType);
-	}
 
 //********************************************************************************
     public AbstractEncoder(final String mime_type, final IRecorder recorder, final EncoderListener listener) {

@@ -40,8 +40,6 @@ public class AudioEncoder extends AbstractEncoder implements IAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AudioEncoder.class.getSimpleName();
 
-	public static final String AUDIO_MIME_TYPE = "audio/mp4a-latm";
-
     private AudioThread mAudioThread = null;
     protected final int mAudioSource;
     protected final int mChannelCount;
@@ -50,7 +48,7 @@ public class AudioEncoder extends AbstractEncoder implements IAudioEncoder {
 	public AudioEncoder(final IRecorder recorder, final EncoderListener listener,
 						final int audio_source, final int audio_channels) {
 
-		super(AUDIO_MIME_TYPE, recorder, listener);
+		super(MediaCodecHelper.MIME_AUDIO_AAC, recorder, listener);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mAudioSource = audio_source;
 		mSampleRate = AbstractAudioEncoder.DEFAULT_SAMPLE_RATE;
@@ -67,7 +65,7 @@ public class AudioEncoder extends AbstractEncoder implements IAudioEncoder {
         mRecorderStarted = mIsEOS = false;
 
 // 内蔵マイクから音声を取り込んでAACにエンコードするためのMediaCodecの準備
-        final MediaCodecInfo audioCodecInfo = selectAudioCodec(MIME_TYPE);
+        final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioCodec(MIME_TYPE);
         if (audioCodecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
             return true;
@@ -222,34 +220,6 @@ public class AudioEncoder extends AbstractEncoder implements IAudioEncoder {
             }
 //			if (DEBUG) Log.v(TAG, "AudioThread:finished");
     	}
-    }
-
-    /**
-     * 指定したMIMEに一致する最初のコーデックを選択する
-     * @param mimeType
-     * @return
-     */
-	private static final MediaCodecInfo selectAudioCodec(final String mimeType) {
-//    	if (DEBUG) Log.v(TAG, "selectAudioCodec:");
-
-    	MediaCodecInfo result = null;
-    	// コーデックの一覧を取得
-        final int numCodecs = getCodecCount();
-LOOP:	for (int i = 0; i < numCodecs; i++) {
-        	final MediaCodecInfo codecInfo = getCodecInfoAt(i);
-            if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
-                continue;
-            }
-            final String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-//            	if (DEBUG) Log.i(TAG, "supportedType:" + codecInfo.getName() + ",MIME=" + types[j]);
-                if (types[j].equalsIgnoreCase(mimeType)) {
-               		result = codecInfo;
-           			break LOOP;
-                }
-            }
-        }
-   		return result;
     }
 
 	@Override

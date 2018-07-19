@@ -119,24 +119,4 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
         return outFormat;
 	}
 
-	public static final void dumpVideoCodecEncoders() {
-//    	if (DEBUG) Log.v(TAG, "dumpMediaCodecEncoders:");
-    	// コーデックの一覧を取得
-        final int numCodecs = getCodecCount();
-        for (int i = 0; i < numCodecs; i++) {
-        	final MediaCodecInfo codecInfo = getCodecInfoAt(i);	// API >= 16
-
-            if (!codecInfo.isEncoder()) {	// エンコーダーでない(デコーダー)はとばす
-                continue;
-            }
-            // エンコーダーの一覧からMIMEが一致するものを選択する
-            final String[] types = codecInfo.getSupportedTypes();
-            for (int j = 0; j < types.length; j++) {
-//            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
-            	// カラーフォーマットを出力する
-            	MediaCodecHelper.selectColorFormat(codecInfo, types[j]);
-            }
-        }
-    }
-
 }
