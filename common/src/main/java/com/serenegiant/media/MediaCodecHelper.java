@@ -38,6 +38,7 @@ public class MediaCodecHelper {
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();
 
 	public static final String MIME_AVC = "video/avc";
+	public static final String MIME_MP4A = "audio/mp4a-latm";
 	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
@@ -290,7 +291,7 @@ public class MediaCodecHelper {
 	 * @param mimeType
 	* @return
 	 */
-	private static final MediaCodecInfo selectAudioCodec(final String mimeType) {
+	public static final MediaCodecInfo selectAudioCodec(final String mimeType) {
 //    	if (DEBUG) Log.v(TAG, "selectAudioCodec:");
 
  		MediaCodecInfo result = null;
