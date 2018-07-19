@@ -36,11 +36,6 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	implements IAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AbstractAudioEncoder";
-	/**
-	 * Deprecated, use MediaCodecHelper.MIME_AUDIO_AAC instead.
-	 */
-	@Deprecated
-	public static final String AUDIO_MIME_TYPE = "audio/mp4a-latm";
 
 	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
 	public static final int DEFAULT_BIT_RATE = 64000;		// 64[kbps]		5-320[kbps]

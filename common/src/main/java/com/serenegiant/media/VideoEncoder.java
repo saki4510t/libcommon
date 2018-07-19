@@ -50,9 +50,10 @@ public final class VideoEncoder extends AbstractVideoEncoder {
     //
 //	private final WeakReference<AbstractUVCCamera>mCamera;
     private final boolean mAlign16;
+    private int mColorFormat;
 
 	public VideoEncoder(final Recorder recorder, final EncoderListener listener, final boolean align16) {
-		super(MIME_AVC, recorder, listener);
+		super(MediaCodecHelper.MIME_VIDEO_AVC, recorder, listener);
 //		if (DEBUG) Log.i(TAG, "コンストラクタ:");
 		mAlign16 = align16;
 //		mCamera = new WeakReference<AbstractUVCCamera>(camera);
@@ -67,9 +68,9 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         mIsCapturing = true;
         mIsEOS = false;
 
-        final MediaCodecInfo codecInfo = selectVideoCodec(MIME_AVC);
+        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoCodec(MediaCodecHelper.MIME_VIDEO_AVC);
         if (codecInfo == null) {
-			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_AVC);
+			Log.e(TAG, "Unable to find an appropriate codec for " + MediaCodecHelper.MIME_VIDEO_AVC);
             return true;
         }
 //		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
@@ -82,8 +83,9 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         	= ((mWidth >= 1000) || (mHeight >= 1000));
 //        	&& checkProfileLevel(VIDEO_MIME_TYPE, codecInfo);	// SC-06DでCodecInfo#getCapabilitiesForTypeが返ってこない/凄い時間がかかるのでコメントアウト
 
-        final MediaFormat format = MediaFormat.createVideoFormat(MIME_AVC, mWidth, mHeight);
+        final MediaFormat format = MediaFormat.createVideoFormat(MediaCodecHelper.MIME_VIDEO_AVC, mWidth, mHeight);
 
+		mColorFormat = MediaCodecHelper.selectColorFormat(codecInfo, MediaCodecHelper.MIME_VIDEO_AVC);
         // MediaCodecに適用するパラメータを設定する。
         // 誤った設定をするとMediaCodec#configureが復帰不可能な例外を生成する
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, mColorFormat);	// API >= 16
@@ -98,7 +100,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
 		Log.d(TAG, "format: " + format);
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
-        mMediaCodec = MediaCodec.createEncoderByType(MIME_AVC);
+        mMediaCodec = MediaCodec.createEncoderByType(MediaCodecHelper.MIME_VIDEO_AVC);
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mMediaCodec.start();
 //		if (DEBUG) Log.v(TAG, "MediaCodec start");
@@ -107,7 +109,8 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         	if ((mWidth / 16) * 16 != mWidth) mWidth = ((mWidth / 16) + 1) * 16;
         	if ((mHeight / 16) * 16 != mHeight) mHeight = ((mHeight / 16) + 1) * 16;
         }
-		nativePrepare(mNativePtr, mWidth, mHeight, mColorFormat);
+		nativePrepare(mNativePtr, mWidth, mHeight,
+			MediaCodecHelper.selectColorFormat(codecInfo, MediaCodecHelper.MIME_VIDEO_AVC));
 //		if (DEBUG) Log.i(TAG, String.format("request(%d,%d),align(%d,%d)", EncoderConfig.currentConfig.width, EncoderConfig.currentConfig.height, width, height));
 		// native側でMediaCodecへ書き込むための設定
 		// 先にコーデックへの入力を開始しないとdrainが回らない

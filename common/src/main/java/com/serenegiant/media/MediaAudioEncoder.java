@@ -23,7 +23,6 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
 import android.media.MediaFormat;
 import android.media.MediaRecorder;
 import android.os.Build;
@@ -40,7 +39,7 @@ public class MediaAudioEncoder extends MediaEncoder implements IAudioEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private static final String TAG = "MediaAudioEncoder";
 
-	private static final String MIME_TYPE = "audio/mp4a-latm";
+	private static final String MIME_TYPE = MediaCodecHelper.MIME_AUDIO_AAC;
 	private static final int SAMPLE_RATE = 44100;		// 44.1[KHz] is only setting guaranteed to be available on all devices.
 	private static final int BIT_RATE = 64000;			// 64[kbps]　5-320[kbps]
 	public static final int SAMPLES_PER_FRAME = 1024;	// AAC, bytes/frame/channel
@@ -58,7 +57,7 @@ public class MediaAudioEncoder extends MediaEncoder implements IAudioEncoder {
 		mTrackIndex = -1;
 		mMuxerStarted = mIsEOS = false;
 		// prepare MediaCodec for AAC encoding of audio data from internal mic.
-		final MediaCodecInfo audioCodecInfo = selectAudioCodec(MIME_TYPE);
+		final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioCodec(MIME_TYPE);
 		if (audioCodecInfo == null) {
 			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
 			return;
@@ -179,34 +178,6 @@ public class MediaAudioEncoder extends MediaEncoder implements IAudioEncoder {
 			}
 			if (DEBUG) Log.v(TAG, "AudioThread:finished");
 		}
-	}
-
-	/**
-	 * select the first codec that match a specific MIME type
-	 * @param mimeType
-	 * @return
-	 */
-	private static final MediaCodecInfo selectAudioCodec(String mimeType) {
-		if (DEBUG) Log.v(TAG, "selectAudioCodec:");
-
-		MediaCodecInfo result = null;
-		// get the list of available codecs
-		final int numCodecs = MediaCodecList.getCodecCount();
-		LOOP:	for (int i = 0; i < numCodecs; i++) {
-			final MediaCodecInfo codecInfo = MediaCodecList.getCodecInfoAt(i);
-			if (!codecInfo.isEncoder()) {	// skipp decoder
-				continue;
-			}
-			final String[] types = codecInfo.getSupportedTypes();
-			for (int j = 0; j < types.length; j++) {
-				if (DEBUG) Log.i(TAG, "supportedType:" + codecInfo.getName() + ",MIME=" + types[j]);
-				if (types[j].equalsIgnoreCase(mimeType)) {
-					result = codecInfo;
-					break LOOP;
-				}
-			}
-		}
-		return result;
 	}
 
 }
