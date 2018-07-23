@@ -134,7 +134,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param height
 	 */
 	@Override
-	public void resize(final int width, final int height) {
+	public void resize(final int width, final int height)
+		throws IllegalStateException {
+
 		mRendererTask.resize(width, height);
 	}
 
@@ -167,7 +169,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void addSurface(final int id,
-		final Object surface, final boolean isRecordable) {
+		final Object surface, final boolean isRecordable)
+			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface);
@@ -184,7 +187,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void addSurface(final int id,
-		final Object surface, final boolean isRecordable, final int maxFps) {
+		final Object surface, final boolean isRecordable, final int maxFps)
+			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface, maxFps);
@@ -529,7 +533,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param id
 		 * @param surface
 		 */
-		public void addSurface(final int id, final Object surface) {
+		public void addSurface(final int id, final Object surface)
+			throws IllegalStateException, IllegalArgumentException {
+
 			addSurface(id, surface, -1);
 		}
 	
@@ -541,7 +547,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param surface
 		 */
 		public void addSurface(final int id,
-			final Object surface, final int maxFps) {
+			final Object surface, final int maxFps)
+				throws IllegalStateException, IllegalArgumentException {
 
 			checkFinished();
 			if (!((surface instanceof SurfaceTexture)
@@ -683,7 +690,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param width
 		 * @param height
 		 */
-		public void resize(final int width, final int height) {
+		public void resize(final int width, final int height)
+			throws IllegalStateException {
+
 			checkFinished();
 			if ((mVideoWidth != width) || (mVideoHeight != height)) {
 				offer(REQUEST_UPDATE_SIZE, width, height);

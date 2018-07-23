@@ -58,7 +58,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param width
 	 * @param height
 	 */
-	public void resize(final int width, final int height);
+	public void resize(final int width, final int height)
+		throws IllegalStateException;
 
 	/**
 	 * 分配描画用のSurfaceを追加
@@ -69,7 +70,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param isRecordable
 	 */
 	public void addSurface(final int id, final Object surface,
-		final boolean isRecordable);
+		final boolean isRecordable)
+			throws IllegalStateException, IllegalArgumentException;
 
 	/**
 	 * 分配描画用のSurfaceを追加
@@ -81,7 +83,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param maxFps 0以下なら制限しない
 	 */
 	public void addSurface(final int id, final Object surface,
-		final boolean isRecordable, final int maxFps);
+		final boolean isRecordable, final int maxFps)
+			throws IllegalStateException, IllegalArgumentException;
 
 	/**
 	 * 分配描画用のSurfaceを削除
