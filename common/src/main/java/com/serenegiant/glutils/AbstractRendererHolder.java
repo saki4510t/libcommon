@@ -721,9 +721,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 	
-		protected void checkFinished() {
+		protected void checkFinished() throws IllegalStateException {
 			if (isFinished()) {
-				throw new RuntimeException("already finished");
+				throw new IllegalStateException("already finished");
 			}
 		}
 
