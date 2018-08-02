@@ -65,7 +65,7 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 
 	@NonNull
 	@Override
-	public View getView(final int position, final View convertView, final ViewGroup parent) {
+	public View getView(final int position, final View convertView, @NonNull final ViewGroup parent) {
 		View rootView = convertView;
 		if (rootView == null) {
 			final TextView label;
@@ -87,10 +87,10 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 				if (holder.addressTv != null) {
 					holder.addressTv.setText(item.address);
 				}
-				if (holder.icon != null) {
-					// FIXME 接続状態によるアイコンの変更は未実装
+//				if (holder.icon != null) {
+//					// FIXME 接続状態によるアイコンの変更は未実装
 //					holder.icon.setImageResource(item.isPaired() ? R.mipmap.ic_paired : R.mipmap.ic_not_paired);
-				}
+//				}
 			}
 		} catch (final Exception e) {
 			Log.w(TAG, e);
