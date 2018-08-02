@@ -31,11 +31,12 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
-import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
+
+import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -150,8 +151,8 @@ public class BluetoothManager {
 	 * ペアリング済みのBluetooth機器一覧を取得する
 	 * @return Bluetoothに対応していないまたは無効ならnull
 	 */
-	public static @Nullable
-	Set<BluetoothDevice> getBondedDevices() {
+	@Nullable
+	public static Set<BluetoothDevice> getBondedDevices() {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && adapter.isEnabled()) {
 			return adapter.getBondedDevices();
@@ -246,8 +247,10 @@ public class BluetoothManager {
 		public void onReceive(final byte[] message, final int length);
 	}
 
-	@NonNull private final Object mSync = new Object();
-	@NonNull private final WeakReference<Context> mWeakContext;
+	@NonNull
+	private final Object mSync = new Object();
+	@NonNull
+	private final WeakReference<Context> mWeakContext;
 	/** コールバックリスナー保持用 */
 	private final Set<BluetoothManagerCallback> mCallbacks = new CopyOnWriteArraySet<BluetoothManagerCallback>();
 	/**
@@ -255,14 +258,17 @@ public class BluetoothManager {
 	 * Android同士でつなぐなら任意で可。
 	 * PC等のBluetoothシリアル通信を行うならUUID_SPPを使う
 	 */
-	@NonNull private final UUID mSecureProfileUUID;
+	@NonNull
+	private final UUID mSecureProfileUUID;
 	/**
 	 * インセキュア接続に使用するプロトコル(プロファイル)を識別するためのUUID
 	 * Android同士でつなぐなら任意で可。
 	 * PC等のBluetoothシリアル通信を行うならUUID_SPPを使う
 	 */
-	@NonNull private final UUID mInSecureProfileUUID;
-	@NonNull private final BluetoothAdapter mAdapter;
+	@NonNull
+	private final UUID mInSecureProfileUUID;
+	@NonNull
+	private final BluetoothAdapter mAdapter;
 	/** サービス名, 任意 */
 	private final String mName;
 	private volatile int mState;
@@ -287,7 +293,10 @@ public class BluetoothManager {
 	 * @param secureProfileUUID 接続に使用するプロトコル(プロファイル)を識別するためのUUID。セキュア接続用。Android同士でつなぐなら任意で可。PC等のBluetoothシリアル通信を行うならUUID_SPPを使う
 	 * @param callback
 	 */
-	public BluetoothManager(@NonNull final Context context, final String name, @NonNull final UUID secureProfileUUID, @NonNull final BluetoothManagerCallback callback) {
+	public BluetoothManager(@NonNull final Context context, final String name,
+		@NonNull final UUID secureProfileUUID,
+		@NonNull final BluetoothManagerCallback callback) {
+
 		this(context, name, secureProfileUUID, null, callback);
 	}
 
@@ -299,7 +308,11 @@ public class BluetoothManager {
 	 * @param inSecureProfileUUID 接続に使用するプロトコル(プロファイル)を識別するためのUUID。インセキュア接続用。Android同士でつなぐなら任意で可。PC等のBluetoothシリアル通信を行うならUUID_SPPを使う nullならsecureProfileUUIDを使う
 	 * @param callback
 	 */
-	public BluetoothManager(@NonNull final Context context, final String name, @NonNull final UUID secureProfileUUID, @Nullable final UUID inSecureProfileUUID, @NonNull final BluetoothManagerCallback callback) {
+	public BluetoothManager(@NonNull final Context context, final String name,
+		@NonNull final UUID secureProfileUUID,
+		@Nullable final UUID inSecureProfileUUID,
+		@NonNull final BluetoothManagerCallback callback) {
+
 		mWeakContext = new WeakReference<Context>(context);
 		mName = !TextUtils.isEmpty(name) ? name : Build.MODEL + "_" + Build.ID;
 		mSecureProfileUUID = secureProfileUUID;
@@ -312,9 +325,7 @@ public class BluetoothManager {
 			throw new IllegalStateException("bluetoothに対応していないか無効になっている");
 		}
 		mState = STATE_NONE;
-		final HandlerThread thread = new HandlerThread(TAG);
-		thread.start();
-		mAsyncHandler = new Handler(thread.getLooper());
+		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		final IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
 		filter.addAction(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
 		context.registerReceiver(mBroadcastReceiver, filter);
@@ -450,7 +461,9 @@ public class BluetoothManager {
 	 * @throws IllegalArgumentException アドレスが不正
 	 * @throws IllegalStateException
 	 */
-	public void connect(final String macAddress) throws IllegalArgumentException, IllegalStateException {
+	public void connect(final String macAddress)
+		throws IllegalArgumentException, IllegalStateException {
+
 		checkReleased();
 		connect(mAdapter.getRemoteDevice(macAddress));
 	}
@@ -514,7 +527,9 @@ public class BluetoothManager {
 	 * @param len
 	 * @throws IllegalStateException
 	 */
-	public void send(final byte[] message, final int offset, final int len) throws IllegalStateException {
+	public void send(final byte[] message, final int offset, final int len)
+		throws IllegalStateException {
+
 //		if (DEBUG) Log.d(TAG, "send");
 		synchronized (mSync) {
 			checkReleased();
@@ -667,16 +682,13 @@ public class BluetoothManager {
 		}
 		synchronized (mSync) {
 			if (mAsyncHandler != null) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						for (final BluetoothManagerCallback callback: mCallbacks) {
-							try {
-								callback.onDiscover(devices);
-							} catch (final Exception e) {
-								mCallbacks.remove(callback);
-								Log.w(TAG, e);
-							}
+				mAsyncHandler.post(() -> {
+					for (final BluetoothManagerCallback callback: mCallbacks) {
+						try {
+							callback.onDiscover(devices);
+						} catch (final Exception e) {
+							mCallbacks.remove(callback);
+							Log.w(TAG, e);
 						}
 					}
 				});
@@ -695,16 +707,13 @@ public class BluetoothManager {
 		synchronized (mSync) {
 			if (isReleased()) return;
 			if (mAsyncHandler != null) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						for (final BluetoothManagerCallback callback: mCallbacks) {
-							try {
-								callback.onConnect(device.getName(), device.getAddress());
-							} catch (final Exception e) {
-								mCallbacks.remove(callback);
-								Log.w(TAG, e);
-							}
+				mAsyncHandler.post(() -> {
+					for (final BluetoothManagerCallback callback: mCallbacks) {
+						try {
+							callback.onConnect(device.getName(), device.getAddress());
+						} catch (final Exception e) {
+							mCallbacks.remove(callback);
+							Log.w(TAG, e);
 						}
 					}
 				});
@@ -720,16 +729,13 @@ public class BluetoothManager {
 		synchronized (mSync) {
 			if (isReleased()) return;
 			if (mAsyncHandler != null) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						for (final BluetoothManagerCallback callback: mCallbacks) {
-							try {
-								callback.onDisconnect();
-							} catch (final Exception e) {
-								mCallbacks.remove(callback);
-								Log.w(TAG, e);
-							}
+				mAsyncHandler.post(() -> {
+					for (final BluetoothManagerCallback callback: mCallbacks) {
+						try {
+							callback.onDisconnect();
+						} catch (final Exception e) {
+							mCallbacks.remove(callback);
+							Log.w(TAG, e);
 						}
 					}
 				});
@@ -750,16 +756,13 @@ public class BluetoothManager {
 		synchronized (mSync) {
 			if (isReleased()) return;
 			if (mAsyncHandler != null) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						for (final BluetoothManagerCallback callback: mCallbacks) {
-							try {
-								callback.onFailed();
-							} catch (final Exception e) {
-								mCallbacks.remove(callback);
-								Log.w(TAG, e);
-							}
+				mAsyncHandler.post(() -> {
+					for (final BluetoothManagerCallback callback: mCallbacks) {
+						try {
+							callback.onFailed();
+						} catch (final Exception e) {
+							mCallbacks.remove(callback);
+							Log.w(TAG, e);
 						}
 					}
 				});
@@ -783,16 +786,13 @@ public class BluetoothManager {
 		synchronized (mSync) {
 			if (isReleased()) return;
 			if (mAsyncHandler != null) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						for (final BluetoothManagerCallback callback: mCallbacks) {
-							try {
-								callback.onReceive(msg, length);
-							} catch (final Exception e) {
-								mCallbacks.remove(callback);
-								Log.w(TAG, e);
-							}
+				mAsyncHandler.post(() -> {
+					for (final BluetoothManagerCallback callback: mCallbacks) {
+						try {
+							callback.onReceive(msg, length);
+						} catch (final Exception e) {
+							mCallbacks.remove(callback);
+							Log.w(TAG, e);
 						}
 					}
 				});
@@ -1049,7 +1049,9 @@ LOOP:		for ( ; mState != STATE_CONNECTED ; ) {
 	 * @param secure セキュア接続用のBluetoothSocketを生成するならtrue
 	 * @return
 	 */
-	private BluetoothSocket createBluetoothSocket(final BluetoothDevice device, final boolean secure) throws IOException {
+	private BluetoothSocket createBluetoothSocket(final BluetoothDevice device,
+		final boolean secure) throws IOException {
+
 		// 接続を行うためのBluetoothSocketを生成
 		return secure
 			? device.createRfcommSocketToServiceRecord(mSecureProfileUUID)				// セキュア接続
@@ -1068,8 +1070,11 @@ LOOP:		for ( ; mState != STATE_CONNECTED ; ) {
 		 * @param secure セキュア接続用のBluetoothSocketを生成するならtrue
 		 * @throws IOException
 		 */
-		public ConnectingThread(final BluetoothDevice device, final boolean secure) throws IOException {
-			super("ConnectingThread:" + mName, createBluetoothSocket(device, secure));
+		public ConnectingThread(final BluetoothDevice device, final boolean secure)
+			throws IOException {
+
+			super("ConnectingThread:" + mName,
+				createBluetoothSocket(device, secure));
 
 			mmDevice = device;
 		}
