@@ -18,6 +18,7 @@ package com.serenegiant.bluetooth;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
@@ -54,6 +55,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  *	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
  * のパーミッションが必要
  */
+@SuppressLint("MissingPermission")
 public class BluetoothManager {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = BluetoothManager.class.getSimpleName();
