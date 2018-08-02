@@ -32,6 +32,9 @@ import android.widget.TextView;
 import com.serenegiant.common.R;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class BluetoothDeviceInfoRecyclerAdapter
@@ -107,6 +110,57 @@ public class BluetoothDeviceInfoRecyclerAdapter
 		return mValues.size();
 	}
 	
+	public BluetoothDeviceInfo getItem(final int index)
+		throws IndexOutOfBoundsException {
+
+		return mValues.get(index);
+	}
+
+	public void add(@NonNull BluetoothDeviceInfo info) {
+		mValues.add(info);
+		notifyDataSetChanged();
+	}
+
+	public void add(final int index, @NonNull BluetoothDeviceInfo info) {
+		mValues.add(index, info);
+		notifyDataSetChanged();
+	}
+
+	public void addAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
+		mValues.addAll(collection);
+		notifyDataSetChanged();
+	}
+	
+	public void remove(final BluetoothDeviceInfo info) {
+		mValues.remove(info);
+		notifyDataSetChanged();
+	}
+
+	public void remove(final int index) {
+		mValues.remove(index);
+		notifyDataSetChanged();
+	}
+	
+	public void removeAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
+		mValues.removeAll(collection);
+		notifyDataSetChanged();
+	}
+
+	public void retainAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
+		mValues.retainAll(collection);
+		notifyDataSetChanged();
+	}
+
+	public void clear() {
+		mValues.clear();
+		notifyDataSetChanged();
+	}
+
+	public void sort(final Comparator<? super BluetoothDeviceInfo> comparator) {
+		Collections.sort(mValues, comparator);
+		notifyDataSetChanged();
+	}
+
 	public class ViewHolder extends RecyclerView.ViewHolder {
 		public final View mView;
 		public final ImageView icon;
