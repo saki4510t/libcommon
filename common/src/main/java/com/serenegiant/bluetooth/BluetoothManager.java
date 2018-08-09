@@ -348,12 +348,12 @@ public class BluetoothManager {
 					}
 					mAsyncHandler = null;
 				}
+				try {
+					getContext().unregisterReceiver(mBroadcastReceiver);
+				} catch (final Exception e) {
+					// ignore
+				}
 			}
-		}
-		try {
-			getContext().unregisterReceiver(mBroadcastReceiver);
-		} catch (final Exception e) {
-			// ignore
 		}
 	}
 
