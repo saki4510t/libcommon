@@ -18,6 +18,8 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.support.annotation.Nullable;
+
 import com.serenegiant.utils.MessageTask;
 
 public abstract class EglTask extends MessageTask {
@@ -105,6 +107,7 @@ public abstract class EglTask extends MessageTask {
 		return mEgl.getConfig();
 	}
 
+	@Nullable
 	protected EGLBase.IContext getContext() {
 		return mEgl != null ? mEgl.getContext() : null;
 	}
