@@ -113,6 +113,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
+	@Nullable
+	public EGLBase.IContext getContext() {
+		return mRendererTask.getContext();
+	}
+
 	/**
 	 * マスター用の映像を受け取るためのSurfaceを取得
 	 * @return
