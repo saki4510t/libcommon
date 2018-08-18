@@ -93,6 +93,7 @@ public abstract class EGLBase {
 	 */
 	public static abstract class IContext {
 		public abstract long getNativeHandle();
+		public abstract Object getEGLContext();
 	}
 
 	/**

@@ -65,11 +65,17 @@ import com.serenegiant.utils.BuildCheck;
 			eglContext = context;
 		}
 		
+		@Override
 		@SuppressLint("NewApi")
 		public long getNativeHandle() {
 			return eglContext != null ?
 				(BuildCheck.isLollipop()
 					? eglContext.getNativeHandle() : eglContext.getHandle()) : 0L;
+		}
+	
+		@Override
+		public Object getEGLContext() {
+			return eglContext;
 		}
 	}
 
