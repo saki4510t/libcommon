@@ -92,6 +92,7 @@ public abstract class EGLBase {
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static abstract class IContext {
+		public abstract long getNativeHandle();
 	}
 
 	/**

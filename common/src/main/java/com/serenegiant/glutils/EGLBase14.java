@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
@@ -62,6 +63,13 @@ import com.serenegiant.utils.BuildCheck;
 
 		private Context(final EGLContext context) {
 			eglContext = context;
+		}
+		
+		@SuppressLint("NewApi")
+		public long getNativeHandle() {
+			return eglContext != null ?
+				(BuildCheck.isLollipop()
+					? eglContext.getNativeHandle() : eglContext.getHandle()) : 0L;
 		}
 	}
 

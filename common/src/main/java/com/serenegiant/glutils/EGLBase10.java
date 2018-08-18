@@ -62,6 +62,11 @@ import com.serenegiant.utils.BuildCheck;
 		private Context(final EGLContext context) {
 			eglContext = context;
 		}
+		
+		public long getNativeHandle() {
+			return 0L;
+		}
+		
 	}
 
 	public static class Config extends IConfig {
