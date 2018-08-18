@@ -31,16 +31,26 @@ public class RendererHolder extends AbstractRendererHolder {
 	public RendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
-//		if (DEBUG) Log.v(TAG, "Constructor");
-		super(width, height, callback);
-//		if (DEBUG) Log.v(TAG, "Constructor:finished");
+		this(width, height,
+			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			callback);
+	}
+
+	public RendererHolder(final int width, final int height,
+		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height,
+			maxClientVersion, sharedContext, flags,
+			callback);
 	}
 
 	@NonNull
-	protected RendererTask createRendererTask(
-		final int width, final int height) {
+	protected RendererTask createRendererTask(final int width, final int height,
+		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
 
-		return new MyRendererTask(this, width, height);
+		return new MyRendererTask(this, width, height,
+			maxClientVersion, sharedContext, flags);
 	}
 	
 //================================================================================
@@ -49,12 +59,20 @@ public class RendererHolder extends AbstractRendererHolder {
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
 	 */
-	private static final class MyRendererTask extends RendererTask {
+	protected static final class MyRendererTask extends RendererTask {
 
 		public MyRendererTask(final RendererHolder parent,
 			final int width, final int height) {
 
 			super(parent, width, height);
+		}
+
+		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
+			final int width, final int height,
+			final int maxClientVersion,
+			final EGLBase.IContext sharedContext, final int flags) {
+
+			super(parent, width, height, maxClientVersion, sharedContext, flags);
 		}
 	}
 

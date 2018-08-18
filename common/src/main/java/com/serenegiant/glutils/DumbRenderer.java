@@ -35,6 +35,11 @@ public class DumbRenderer implements IRenderer {
 		public void onStop(final EGLBase eglBase);
 		public void onSetSurface(final EGLBase eglBase, final Object surface);
 		public void onResize(final EGLBase eglBase, final int width, final int height);
+		/**
+		 * 描画実行
+		 * @param eglBase
+		 * @param args #requestRenderの引数
+		 */
 		public void onDraw(final EGLBase eglBase, final Object... args);
 		public void onMirror(final EGLBase eglBase, final int mirror);
 	}
@@ -48,7 +53,14 @@ public class DumbRenderer implements IRenderer {
 	public DumbRenderer(final EGLBase.IContext sharedContext,
 		final int flags, final RendererDelegater delegater) {
 
-		mRendererTask = new RendererTask(sharedContext, flags, delegater);
+		this(3, sharedContext, flags, delegater);
+	}
+
+	public DumbRenderer(final int maxClientVersion,
+		final EGLBase.IContext sharedContext,
+		final int flags, final RendererDelegater delegater) {
+
+		mRendererTask = new RendererTask(maxClientVersion, sharedContext, flags, delegater);
 		new Thread(mRendererTask, TAG).start();
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -138,10 +150,17 @@ public class DumbRenderer implements IRenderer {
 		public RendererTask(final EGLBase.IContext sharedContext,
 			final int flags, @NonNull final RendererDelegater delegater) {
 
-			super(sharedContext, flags);
-			mDelegater = delegater;
+			this(3, sharedContext, flags, delegater);
 		}
 
+		public RendererTask(final int maxClientVersion,
+			final EGLBase.IContext sharedContext,
+			final int flags, @NonNull final RendererDelegater delegater) {
+
+			super(maxClientVersion, sharedContext, flags);
+			mDelegater = delegater;
+		}
+		
 		@Override
 		protected void onStart() {
 			makeCurrent();

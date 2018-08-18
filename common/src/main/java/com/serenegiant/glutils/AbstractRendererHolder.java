@@ -61,6 +61,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static final int REQUEST_SET_MVP = 10;
 
 	protected final Object mSync = new Object();
+	@Nullable
 	private final RenderHolderCallback mCallback;
 	protected volatile boolean isRunning;
 
@@ -71,8 +72,18 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected AbstractRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 		
+		this(width, height,
+			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			callback);
+	}
+
+	protected AbstractRendererHolder(final int width, final int height,
+		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final RenderHolderCallback callback) {
+		
 		mCallback = callback;
-		mRendererTask = createRendererTask(width, height);
+		mRendererTask = createRendererTask(width, height,
+			maxClientVersion, sharedContext, flags);
 		new Thread(mRendererTask, RENDERER_THREAD_NAME).start();
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -346,7 +357,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 	@NonNull
-	protected abstract RendererTask createRendererTask(final int width, final int height);
+	protected abstract RendererTask createRendererTask(final int width, final int height,
+		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags);
 	
 	protected void startCaptureTask() {
 		new Thread(mCaptureTask, CAPTURE_THREAD_NAME).start();
@@ -417,12 +429,20 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height) {
 
-			super(3, null, EglTask.EGL_FLAG_RECORDABLE);
+			this(parent, width, height,
+				3, null, EglTask.EGL_FLAG_RECORDABLE);
+		}
+
+		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
+			final int width, final int height,
+			final int maxClientVersion,
+			final EGLBase.IContext sharedContext, final int flags) {
+	
+			super(maxClientVersion, sharedContext, flags);
 			mParent = parent;
 			mVideoWidth = width;
 			mVideoHeight = height;
 		}
-
 		/**
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 		 */
@@ -1058,6 +1078,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			final int width, final int height) {
 
 			super(parent, width, height);
+		}
+
+		public RendererTask(@NonNull final AbstractRendererHolder parent,
+			final int width, final int height,
+			final int maxClientVersion,
+			final EGLBase.IContext sharedContext, final int flags) {
+			
+			super(parent, width, height, maxClientVersion, sharedContext, flags);
 		}
 
 		@Override
