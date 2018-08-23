@@ -134,10 +134,12 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 			final int isConnectedOrConnecting, final int isConnected, final int activeNetworkMask);
 	}
 
+	@Deprecated
 	public static void enable(final Context context) {
 		ComponentUtils.enable(context, NetworkChangedReceiver.class);
 	}
 
+	@Deprecated
 	public static void disable(final Context context) {
 		ComponentUtils.disable(context, NetworkChangedReceiver.class);
 	}
