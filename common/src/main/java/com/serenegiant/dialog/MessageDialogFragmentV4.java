@@ -21,9 +21,9 @@ package com.serenegiant.dialog;
 import com.serenegiant.utils.BuildCheck;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
@@ -73,11 +73,11 @@ public class MessageDialogFragmentV4 extends DialogFragment {
 
 	@SuppressLint("NewApi")
 	@Override
-	public void onAttach(final Activity activity) {
-		super.onAttach(activity);
+	public void onAttach(final Context context) {
+		super.onAttach(context);
 		// コールバックインターフェースを取得
-		if (activity instanceof MessageDialogListener) {
-			mDialogListener = (MessageDialogListener)activity;
+		if (context instanceof MessageDialogListener) {
+			mDialogListener = (MessageDialogListener)context;
 		}
 		if (mDialogListener == null) {
 			final Fragment fragment = getTargetFragment();
@@ -95,7 +95,7 @@ public class MessageDialogFragmentV4 extends DialogFragment {
 		}
 		if (mDialogListener == null) {
 //			Log.w(TAG, "caller activity/fragment must implement PermissionDetailDialogFragmentListener");
-        	throw new ClassCastException(activity.toString());
+        	throw new ClassCastException(context.toString());
 		}
 	}
 
