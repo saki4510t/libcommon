@@ -43,8 +43,9 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-	api "com.android.support:support-v4:${supportLibVersion}"
-	api "com.android.support:recyclerview-v7:${supportLibVersion}"
+	implementation "com.android.support:support-v4:${supportLibVersion}"
+	implementation "com.android.support:recyclerview-v7:${supportLibVersion}"
+	implementation "com.android.support:preference-v7:${supportLibVersion}"
 }
 
 def repo = new File(rootDir, "repository")
