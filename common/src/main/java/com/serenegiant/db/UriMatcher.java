@@ -246,7 +246,7 @@ public class UriMatcher
                         }
                         break;
                     case NUMBER:
-                    	// セグメントの先頭に有る正負符号は数字の一部として扱うように変更
+                    	// XXX saki セグメントの先頭に有る正負符号は数字の一部として扱うように変更
                         final int lk = u.length();
                         for (int k = 0; k < lk; k++) {
                             final char c = u.charAt(k);
