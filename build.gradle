@@ -36,6 +36,6 @@ ext {
 
 	supportLibVersion = '27.1.1'  // variable that can be referenced to keep support libs consistent
 
-    versionCodeNum = 205
-    versionNameString = '2.12.0'
+    versionCodeNum = 206
+    versionNameString = '2.12.1'
 }
