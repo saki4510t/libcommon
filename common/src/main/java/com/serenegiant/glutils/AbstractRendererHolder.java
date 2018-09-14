@@ -1186,8 +1186,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 						if (mCaptureFile != null) {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
-//							captureFile = mCaptureFile;
-							mCaptureFile = null;
 							captureCompression = mCaptureCompression;
 							if ((captureCompression <= 0) || (captureCompression >= 100)) {
 								captureCompression = 90;
@@ -1200,7 +1198,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					if (DEBUG) Log.v(TAG, "#captureLoopGLES2:start capture");
 					if ((buf == null)
 						|| (width != mRendererTask.width())
-						|| height != mRendererTask.height()) {
+						|| (height != mRendererTask.height())) {
 
 						width = mRendererTask.width();
 						height = mRendererTask.height();
@@ -1273,7 +1271,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 						if (mCaptureFile != null) {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
-							mCaptureFile = null;
 							captureCompression = mCaptureCompression;
 							if ((captureCompression <= 0) || (captureCompression >= 100)) {
 								captureCompression = 90;
