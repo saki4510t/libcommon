@@ -998,11 +998,20 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		protected void handleReleaseMasterSurface() {
 			if (mMasterSurface != null) {
+				try {
+					mMasterSurface.release();
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
 				mMasterSurface = null;
 				mParent.callOnDestroy();
 			}
 			if (mMasterTexture != null) {
-				mMasterTexture.release();
+				try {
+					mMasterTexture.release();
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
 				mMasterTexture = null;
 			}
 			if (mTexId != 0) {
