@@ -445,8 +445,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 			super(maxClientVersion, sharedContext, flags);
 			mParent = parent;
-			mVideoWidth = width;
-			mVideoHeight = height;
+			mVideoWidth = width > 0 ? width : 640;
+			mVideoHeight = height > 0 ? height : 480;
 		}
 		/**
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
@@ -468,7 +468,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@Override
 		protected void onStop() {
-//				if (DEBUG) Log.v(TAG, "onStop");
+//			if (DEBUG) Log.v(TAG, "onStop");
 			synchronized (mParent.mSync) {
 				mParent.isRunning = false;
 				mParent.mSync.notifyAll();
@@ -536,7 +536,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public Surface getSurface() {
-	//			if (DEBUG) Log.v(TAG, "getSurface:" + mMasterSurface);
+//			if (DEBUG) Log.v(TAG, "getSurface:" + mMasterSurface);
 			checkMasterSurface();
 			return mMasterSurface;
 		}
@@ -546,7 +546,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public SurfaceTexture getSurfaceTexture() {
-	//		if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mMasterTexture);
+//		if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mMasterTexture);
 			checkMasterSurface();
 			return mMasterTexture;
 		}
@@ -719,7 +719,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			throws IllegalStateException {
 
 			checkFinished();
-			if ((mVideoWidth != width) || (mVideoHeight != height)) {
+			if ( ((width > 0) && (height > 0))
+				&& ((mVideoWidth != width) || (mVideoHeight != height)) ) {
+
 				offer(REQUEST_UPDATE_SIZE, width, height);
 			}
 		}
@@ -1219,7 +1221,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	}
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
-					if (isRunning) {
+					if (isRunning && (width > 0) && (height > 0)) {
 						setMirror(mMvpMatrix, mRendererTask.mirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
@@ -1253,6 +1255,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						} catch (final IOException e) {
 							Log.w(TAG, "failed to save file", e);
 						}
+					} else if (isRunning) {
+						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES2:静止画撮影終了");
 					mCaptureFile = null;
@@ -1304,7 +1308,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	}
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
-					if (isRunning) {
+					if (isRunning && (width > 0) && (height > 0)) {
 						setMirror(mMvpMatrix, mRendererTask.mirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
@@ -1338,6 +1342,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						} catch (final IOException e) {
 							Log.w(TAG, "failed to save file", e);
 						}
+					} else if (isRunning) {
+						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES3:静止画撮影終了");
 					mCaptureFile = null;
