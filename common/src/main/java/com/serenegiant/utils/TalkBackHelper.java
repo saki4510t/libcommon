@@ -22,6 +22,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.accessibility.AccessibilityEventCompat;
+import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
@@ -39,21 +40,59 @@ public class TalkBackHelper {
 
 	/**
 	 * 指定したテキストをTalkBackで読み上げる(TalkBackが有効な場合)
+	 * @param context
 	 * @param text
+	 * @throws IllegalStateException
 	 */
 	public static void announceText(@NonNull final Context context,
-		@Nullable final CharSequence text) {
+		@Nullable final CharSequence text) throws IllegalStateException {
 
-		if ((text == null) || (context == null)) return;
+		if (TextUtils.isEmpty(text) || (context == null)) return;
 		final AccessibilityManager manager = (AccessibilityManager) context
 			.getSystemService(Context.ACCESSIBILITY_SERVICE);
-		if (manager.isEnabled()) {
+		if ((manager != null) && manager.isEnabled()) {
 			final AccessibilityEvent event = AccessibilityEvent.obtain();
-			event.setEventType(AccessibilityEventCompat.TYPE_ANNOUNCEMENT);
-		    event.setClassName(TalkBackHelper.class.getName());
-		    event.setPackageName(context.getPackageName());
-		    event.getText().add(text);
-		    manager.sendAccessibilityEvent(event);
+			if (event != null) {
+				event.setEventType(AccessibilityEventCompat.TYPE_ANNOUNCEMENT);
+				event.setClassName(TalkBackHelper.class.getName());
+				event.setPackageName(context.getPackageName());
+				event.getText().add(text);
+				manager.sendAccessibilityEvent(event);
+			} else {
+				throw new IllegalStateException("failed to obtain AccessibilityEvent");
+			}
+		} else {
+			throw new IllegalStateException("AccessibilityManager is not available/or disabled");
+		}
+	}
+
+	/**
+	 * 指定したテキストをTalkBackで読み上げる(TalkBackが有効な場合)
+	 * @param context
+	 * @param text
+	 * @throws IllegalStateException
+	 */
+	public static void announceText(@NonNull final Context context,
+		@Nullable final CharSequence[] text) throws IllegalStateException {
+
+		if ((text == null) || (text.length == 0) || (context == null)) return;
+		final AccessibilityManager manager = (AccessibilityManager) context
+			.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		if ((manager != null) && manager.isEnabled()) {
+			final AccessibilityEvent event = AccessibilityEvent.obtain();
+			if (event != null) {
+				event.setEventType(AccessibilityEventCompat.TYPE_ANNOUNCEMENT);
+				event.setClassName(TalkBackHelper.class.getName());
+				event.setPackageName(context.getPackageName());
+				for (final CharSequence t: text) {
+					event.getText().add(t);
+				}
+				manager.sendAccessibilityEvent(event);
+			} else {
+				throw new IllegalStateException("failed to obtain AccessibilityEvent");
+			}
+		} else {
+			throw new IllegalStateException("AccessibilityManager is not available/or disabled");
 		}
 	}
 }
