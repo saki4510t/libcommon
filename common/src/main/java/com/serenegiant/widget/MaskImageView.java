@@ -27,13 +27,13 @@ import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
-import android.widget.ImageView;
 
 /**
  * Drawableで指定したMaskの不透過部分に対応するイメージを表示するImageView
  */
-public class MaskImageView extends ImageView {
+public class MaskImageView extends AppCompatImageView {
 
 	private final Paint mMaskedPaint = new Paint();
 	private final Paint mCopyPaint = new Paint();
@@ -96,7 +96,7 @@ public class MaskImageView extends ImageView {
 	@Override
 	protected synchronized void onDraw(final Canvas canvas) {
 		final int saveCount = canvas.saveLayer(mViewBoundsF, mCopyPaint,
-			Canvas.HAS_ALPHA_LAYER_SAVE_FLAG | Canvas.FULL_COLOR_LAYER_SAVE_FLAG);
+			Canvas.ALL_SAVE_FLAG);
 		try {
 			if (mMaskDrawable != null) {
 				mMaskDrawable.draw(canvas);
