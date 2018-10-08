@@ -47,7 +47,7 @@ public class ObjectHelper {
 					try {
 						return Integer.parseInt(v.substring(2), 16) != 0;
 					} catch (final Exception e1) {
-						//
+						return Long.parseLong(v.substring(2), 16) != 0;
 					}
 				}
 				try {
@@ -64,11 +64,63 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				try {
-					return Integer.parseInt("0x" + v, 16) != 0;
+					return Long.parseLong(v, 16) != 0;
 				} catch (final Exception e) {
 					//
 				}
 				return  Boolean.parseBoolean((String)val);
+			}
+		}
+		return defaultValue;
+	}
+
+	public static byte asByte(final Object val, final byte defaultValue) {
+		if (val instanceof Boolean) {
+			return (Boolean)val ? (byte)1 : (byte)0;
+		} else if (val instanceof Byte) {
+			return ((Byte)val);
+		} else if (val instanceof Short) {
+			return ((Short)val).byteValue();
+		} else if (val instanceof Integer) {
+			return ((Integer)val).byteValue();
+		} else if (val instanceof Long) {
+			return ((Long)val).byteValue();
+		} else if (val instanceof Float) {
+			return ((Float)val).byteValue();
+		} else if (val instanceof Double) {
+			return ((Double)val).byteValue();
+		} else if (val instanceof Number) {
+			return ((Number)val).byteValue();
+		} else if (val instanceof String) {
+			if (!TextUtils.isEmpty((String)val)) {
+				final String v = (String)val;
+				// 16進文字列かも
+				if (v.startsWith("0x") || v.startsWith("0X")) {
+					try {
+						return (byte)Integer.parseInt(v.substring(2), 16);
+					} catch (final Exception e1) {
+						return (byte)Long.parseLong(v.substring(2), 16);
+					}
+				}
+				try {
+					// 数字の文字列
+					return ((Double)Double.parseDouble(v)).byteValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Integer)Integer.parseInt(v, 16)).byteValue();
+				} catch (final Exception e) {
+					//
+				}
+				// 16進文字列かも
+				try {
+					return ((Long)Long.parseLong(v, 16)).byteValue();
+				} catch (final Exception e) {
+					//
+				}
+				return  Boolean.parseBoolean((String)val) ? (byte)1 : (byte)0;
 			}
 		}
 		return defaultValue;
@@ -99,7 +151,7 @@ public class ObjectHelper {
 					try {
 						return (short)Integer.parseInt(v.substring(2), 16);
 					} catch (final Exception e1) {
-						//
+						return (short)Long.parseLong(v.substring(2), 16);
 					}
 				}
 				try {
@@ -116,7 +168,7 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				try {
-					return ((Integer)Integer.parseInt("0x" + v, 16)).shortValue();
+					return ((Long)Long.parseLong(v, 16)).shortValue();
 				} catch (final Exception e) {
 					//
 				}
@@ -151,7 +203,7 @@ public class ObjectHelper {
 					try {
 						return Integer.parseInt(v.substring(2), 16);
 					} catch (final Exception e1) {
-						//
+						return ((Long)Long.parseLong(v.substring(2), 16)).intValue();
 					}
 				}
 				try {
@@ -168,8 +220,8 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				try {
-					return Integer.parseInt("0x" + v, 16);
-				} catch (final Exception e2) {
+					return ((Long)Long.parseLong(v, 16)).intValue();
+				} catch (final Exception e) {
 					//
 				}
 				return Boolean.parseBoolean((String)val) ? 1 : 0;
@@ -215,12 +267,6 @@ public class ObjectHelper {
 				// 16進文字列かも
 				try {
 					return Long.parseLong(v, 16);
-				} catch (final Exception e2) {
-					//
-				}
-				// 16進文字列かも
-				try {
-					return Long.parseLong("0x" + v, 16);
 				} catch (final Exception e2) {
 					//
 				}
@@ -270,12 +316,6 @@ public class ObjectHelper {
 				} catch (final Exception e2) {
 					//
 				}
-				// 16進文字列かも
-				try {
-					return ((Long)Long.parseLong("0x" + v, 16)).floatValue();
-				} catch (final Exception e2) {
-					//
-				}
 				return Boolean.parseBoolean((String)val) ? 1 : 0;
 			}
 		}
@@ -319,12 +359,6 @@ public class ObjectHelper {
 				// 16進文字列かも
 				try {
 					return ((Long)Long.parseLong(v, 16)).doubleValue();
-				} catch (final Exception e2) {
-					//
-				}
-				// 16進文字列かも
-				try {
-					return ((Long)Long.parseLong("0x" + v, 16)).doubleValue();
 				} catch (final Exception e2) {
 					//
 				}

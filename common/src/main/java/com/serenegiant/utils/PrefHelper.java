@@ -37,7 +37,8 @@ public class PrefHelper {
 			try {
 				result = (short)pref.getInt(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asShort(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asShort(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
@@ -51,7 +52,8 @@ public class PrefHelper {
 			try {
 				result = pref.getInt(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asInt(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asInt(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
@@ -65,7 +67,8 @@ public class PrefHelper {
 			try {
 				result = pref.getLong(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asLong(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asLong(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
@@ -79,7 +82,8 @@ public class PrefHelper {
 			try {
 				result = pref.getFloat(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asFloat(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asFloat(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
@@ -93,7 +97,8 @@ public class PrefHelper {
 			try {
 				result = Double.parseDouble(pref.getString(key, Double.toString(defaultValue)));
 			} catch (final Exception e) {
-				result = ObjectHelper.asDouble(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asDouble(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
@@ -107,7 +112,8 @@ public class PrefHelper {
 			try {
 				result = pref.getBoolean(key, defaultValue);
 			} catch (final Exception e) {
-				result = ObjectHelper.asBoolean(getObject(pref, key), defaultValue);
+				result = ObjectHelper.asBoolean(
+					getObject(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;
