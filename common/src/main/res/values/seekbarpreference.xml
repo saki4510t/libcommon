@@ -20,7 +20,7 @@
 */
 -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android" >
-	<style name="SeekBarPreference_title" parent="@android:style/TextAppearance.Large"></style>
+	<style name="SeekBarPreference_title" parent="@android:style/TextAppearance.Large"/>
 	<style name="SeekBarPreference_summary" parent="@android:style/TextAppearance.Small">
 		<!-- <item name="android:textColor">#ffa500</item> -->
 	</style>
