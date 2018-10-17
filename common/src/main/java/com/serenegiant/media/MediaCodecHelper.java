@@ -24,6 +24,7 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.serenegiant.utils.BufferHelper;
@@ -146,10 +147,23 @@ public class MediaCodecHelper {
 	public static final int OMX_COLOR_FormatMax = 0x7FFFFFFF;
 
 	/**
+	 * 指定したMIMEに一致する最初の動画エンコード用コーデックを選択する
+	 * もし使用可能なのがなければnullを返す
+	 * @param mimeType
+	 */
+	@Deprecated
+	@Nullable
+	public static MediaCodecInfo selectVideoCodec(final String mimeType) {
+		return selectVideoEncoder(mimeType);
+	}
+
+	/**
 	 * 指定したMIMEで使用可能がcodecの一覧の中から先頭のものを取得する
 	 * もし使用可能なのがなければnullを返す
+	 * @param mimeType
 	 */
-	public static MediaCodecInfo selectVideoCodec(final String mimeType) {
+	@Nullable
+	public static MediaCodecInfo selectVideoEncoder(final String mimeType) {
 		// コーデックの一覧を取得
 		final int numCodecs = getCodecCount();
 		for (int i = 0; i < numCodecs; i++) {
@@ -372,11 +386,24 @@ public class MediaCodecHelper {
 
 //================================================================================
 	/**
-	 * 指定したMIMEに一致する最初のコーデックを選択する
+	 * 指定したMIMEに一致する最初の音声エンコード用コーデックを選択する
 	 * @param mimeType
-	* @return
+	 * @return
 	 */
+	@Deprecated
+	@Nullable
 	public static final MediaCodecInfo selectAudioCodec(final String mimeType) {
+		return selectAudioEncoder(mimeType);
+	}
+	
+	/**
+	 * 指定したMIMEに一致する最初の音声エンコード用コーデックを選択する
+	 * 対応するものがなければnullを返す
+	 * @param mimeType
+	 * @return
+	 */
+	@Nullable
+	public static final MediaCodecInfo selectAudioEncoder(final String mimeType) {
 //    	if (DEBUG) Log.v(TAG, "selectAudioCodec:");
 
  		MediaCodecInfo result = null;
