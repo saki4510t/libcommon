@@ -302,7 +302,15 @@ public class MediaCodecHelper {
 	/**
 	 * コーデックの一覧をログに出力する
 	 */
+	@Deprecated
 	public static final void dumpVideoCodecEncoders() {
+		dumpEncoders();
+	}
+
+	/**
+	 * エンコード用コーデックの一覧をログに出力する
+	 */
+	public static final void dumpEncoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
@@ -311,7 +319,29 @@ public class MediaCodecHelper {
             if (!codecInfo.isEncoder()) {	// エンコーダーでない(デコーダー)はとばす
                 continue;
             }
-            // エンコーダーの一覧からMIMEが一致するものを選択する
+			// コーデックの一覧を出力する
+            final String[] types = codecInfo.getSupportedTypes();
+            for (int j = 0; j < types.length; j++) {
+            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
+            	// カラーフォーマットを出力する
+            	selectColorFormat(codecInfo, types[j]);
+            }
+        }
+    }
+
+	/**
+	 * デコード用コーデックの一覧をログに出力する
+	 */
+	public static final void dumpDecoders() {
+    	// コーデックの一覧を取得
+        final int numCodecs = getCodecCount();
+        for (int i = 0; i < numCodecs; i++) {
+        	final MediaCodecInfo codecInfo = getCodecInfoAt(i);	// API >= 16
+
+            if (codecInfo.isEncoder()) {	// エンコーダーはとばす
+                continue;
+            }
+            // コーデックの一覧を出力する
             final String[] types = codecInfo.getSupportedTypes();
             for (int j = 0; j < types.length; j++) {
             	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
