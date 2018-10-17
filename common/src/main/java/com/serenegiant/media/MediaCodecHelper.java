@@ -30,6 +30,7 @@ import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.MediaInfo;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -195,6 +196,60 @@ public class MediaCodecHelper {
 		}
 		return null;
 	}
+	
+	/**
+	 * 指定したmimeに対応するビデオコーデックのエンコーダー一覧を取得する
+	 * @param mimeType
+	 * @return
+	 */
+	@NonNull
+	public static List<MediaCodecInfo> getVideoEncoderInfos(final String mimeType) {
+		final List<MediaCodecInfo> result = new ArrayList<>();
+		// コーデックの一覧を取得
+		final int numCodecs = getCodecCount();
+		for (int i = 0; i < numCodecs; i++) {
+			final MediaCodecInfo codecInfo = getCodecInfoAt(i);
+
+			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
+				continue;
+			}
+			// エンコーダーの一覧からMIMEが一致してカラーフォーマットが使用可能なものを選択する
+/*			// こっちの方法で選択すると
+			// W/OMXCodec(20608): Failed to set standard component role 'video_encoder.avc'.
+			// って表示されて、OMX.Nvidia.mp4.encoder
+			// が選択される
+			final MediaCodecInfo.CodecCapabilities caps;
+			Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+			try {
+				caps = getCodecCapabilities(codecInfo, mimeType);
+			} finally {
+				Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
+			}
+			final int[] colorFormats = caps.colorFormats;
+			final int n = colorFormats != null ? colorFormats.length : 0;
+			int colorFormat;
+			for (int j = 0; j < n; j++) {
+				colorFormat = colorFormats[j];
+				if (isRecognizedVideoFormat(colorFormat)) {
+					result.add(codecInfo);
+				}
+			} */
+// こっちで選択すると、xxx.h264.encoderが選択される
+			final String[] types = codecInfo.getSupportedTypes();
+			final int n = types.length;
+			int format;
+			for (int j = 0; j < n; j++) {
+				if (types[j].equalsIgnoreCase(mimeType)) {
+//                	if (DEBUG) Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME=" + types[j]);
+					format = selectColorFormat(codecInfo, mimeType);
+					if (format > 0) {
+						result.add(codecInfo);
+					}
+				}
+			}
+		}
+		return result;
+	}
 
 	/**
 	 * 使用可能なカラーフォーマットを設定
@@ -314,6 +369,32 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		return result;
 	}
 
+	/**
+	 * 指定したmimeに対応する音声コーデックのエンコーダー一覧を取得する
+	 * @param mimeType
+	 * @return
+	 */
+	@NonNull
+	public static List<MediaCodecInfo> getAudioEncoderInfos(final String mimeType) {
+		final List<MediaCodecInfo> result = new ArrayList<>();
+		
+		// コーデックの一覧を取得
+		final int numCodecs = getCodecCount();
+LOOP:	for (int i = 0; i < numCodecs; i++) {
+			final MediaCodecInfo codecInfo = getCodecInfoAt(i);
+			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
+				continue;
+			}
+			final String[] types = codecInfo.getSupportedTypes();
+			for (int j = 0; j < types.length; j++) {
+//				if (DEBUG) Log.i(TAG, "supportedType:" + codecInfo.getName() + ",MIME=" + types[j]);
+				if (types[j].equalsIgnoreCase(mimeType)) {
+					result.add(codecInfo);
+				}
+			}
+		}
+		return result;
+	}
 //================================================================================
 	public static final int getCodecCount() {
 		return MediaInfo.getCodecCount();
