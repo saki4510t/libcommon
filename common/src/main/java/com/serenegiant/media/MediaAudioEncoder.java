@@ -57,7 +57,7 @@ public class MediaAudioEncoder extends MediaEncoder implements IAudioEncoder {
 		mTrackIndex = -1;
 		mMuxerStarted = mIsEOS = false;
 		// prepare MediaCodec for AAC encoding of audio data from internal mic.
-		final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioCodec(MIME_TYPE);
+		final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioEncoder(MIME_TYPE);
 		if (audioCodecInfo == null) {
 			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
 			return;

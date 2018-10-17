@@ -56,7 +56,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         mIsCapturing = true;
         mIsEOS = false;
 
-        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoCodec(MediaCodecHelper.MIME_VIDEO_AVC);
+        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoEncoder(MediaCodecHelper.MIME_VIDEO_AVC);
         if (codecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_AVC);
             return true;

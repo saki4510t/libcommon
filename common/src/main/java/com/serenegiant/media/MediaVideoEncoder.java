@@ -64,7 +64,7 @@ public class MediaVideoEncoder extends MediaEncoder implements ISurfaceEncoder {
 		mTrackIndex = -1;
 		mMuxerStarted = mIsEOS = false;
 
-		final MediaCodecInfo videoCodecInfo = MediaCodecHelper.selectVideoCodec(MIME_TYPE);
+		final MediaCodecInfo videoCodecInfo = MediaCodecHelper.selectVideoEncoder(MIME_TYPE);
 		if (videoCodecInfo == null) {
 			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
 			return;

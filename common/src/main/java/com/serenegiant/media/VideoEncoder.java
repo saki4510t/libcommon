@@ -68,7 +68,7 @@ public final class VideoEncoder extends AbstractVideoEncoder {
         mIsCapturing = true;
         mIsEOS = false;
 
-        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoCodec(MediaCodecHelper.MIME_VIDEO_AVC);
+        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoEncoder(MediaCodecHelper.MIME_VIDEO_AVC);
         if (codecInfo == null) {
 			Log.e(TAG, "Unable to find an appropriate codec for " + MediaCodecHelper.MIME_VIDEO_AVC);
             return true;

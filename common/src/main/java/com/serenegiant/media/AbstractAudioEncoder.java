@@ -70,7 +70,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
         mRecorderStarted = mIsEOS = false;
 
 // 音声を取り込んでAACにエンコードするためのMediaCodecの準備
-        final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioCodec(MIME_TYPE);
+        final MediaCodecInfo audioCodecInfo = MediaCodecHelper.selectAudioEncoder(MIME_TYPE);
         if (audioCodecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
             return true;
