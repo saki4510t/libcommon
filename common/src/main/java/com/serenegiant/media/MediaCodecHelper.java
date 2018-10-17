@@ -485,7 +485,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 			default:
 				result = result + ",level=unknown " + profileLevel.level; break;
 			}
-		} else if (mimeType.equalsIgnoreCase("ausio/aac")) {
+		} else if (mimeType.equalsIgnoreCase("audio/aac")) {
 			// from OMX_AUDIO_AACPROFILETYPE
 			switch (profileLevel.level) {
 			case MediaCodecInfo.CodecProfileLevel.AACObjectMain:		// 1;
