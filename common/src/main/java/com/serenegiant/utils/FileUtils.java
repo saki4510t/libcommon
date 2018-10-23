@@ -51,21 +51,21 @@ public class FileUtils {
      * @param ext .mp4 .png または .jpeg
      * @return 書き込み出来なければnullを返す
      */
-    public static final File getCaptureFile(final Context context,
-    	final String type, final String ext, final int save_tree_id) {
+    public static final File getCaptureFile(@NonNull final Context context,
+    	final String type, final String ext, final int saveTreeId) {
 
-    	return getCaptureFile(context, type, null, ext, save_tree_id);
+    	return getCaptureFile(context, type, null, ext, saveTreeId);
     }
 
-	public static final File getCaptureFile(final Context context,
-		final String type, final String prefix, final String ext, final int save_tree_id) {
+	public static final File getCaptureFile(@NonNull final Context context,
+		final String type, final String prefix, final String ext, final int saveTreeId) {
 
 	// 保存先のファイル名を生成
 		File result = null;
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
-		if ((save_tree_id > 0) && SDUtils.hasStorageAccess(context, save_tree_id)) {
-//			result = SDUtils.createStorageFile(context, save_tree_id, "*/*", file_name);
-			result = SDUtils.createStorageDir(context, save_tree_id);
+		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
+//			result = SDUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
+			result = SDUtils.createStorageDir(context, saveTreeId);
 			if ((result == null) || !result.canWrite()) {
 				Log.w(TAG, "なんでか書き込めん");
 				result = null;
@@ -92,13 +92,13 @@ public class FileUtils {
 	}
 
 	@SuppressLint("NewApi")
-	public static final File getCaptureDir(final Context context,
-		final String type, final int save_tree_id) {
+	public static final File getCaptureDir(@NonNull final Context context,
+		final String type, final int saveTreeId) {
 
-//		Log.i(TAG, "getCaptureDir:save_tree_id=" + save_tree_id + ", context=" + context);
+//		Log.i(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
-		if ((save_tree_id > 0) && SDUtils.hasStorageAccess(context, save_tree_id)) {
-			result = SDUtils.createStorageDir(context, save_tree_id);
+		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
+			result = SDUtils.createStorageDir(context, saveTreeId);
 //			Log.i(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
 		final File dir = result != null

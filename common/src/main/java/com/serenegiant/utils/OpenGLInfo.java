@@ -20,6 +20,7 @@ package com.serenegiant.utils;
 
 import java.nio.IntBuffer;
 import java.util.Arrays;
+import java.util.Locale;
 
 import javax.microedition.khronos.egl.EGL10;
 
@@ -119,7 +120,7 @@ public class OpenGLInfo {
 		    	}
 		    	try {
 			        GLES20.glGetIntegerv(GLES20.GL_MAX_VIEWPORT_DIMS, val);
-			        glinfo.put("GL_MAX_VIEWPORT_DIMS", String.format("%d x %d", val.get(0), val.get(1)));
+			        glinfo.put("GL_MAX_VIEWPORT_DIMS", String.format(Locale.US, "%d x %d", val.get(0), val.get(1)));
 		    	} catch (Exception e) {
 		    		glinfo.put("GL_MAX_VIEWPORT_DIMS", e.getMessage());
 		    	}

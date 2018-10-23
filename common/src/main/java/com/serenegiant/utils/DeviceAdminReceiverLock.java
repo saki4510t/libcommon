@@ -24,13 +24,14 @@ import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 
 public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 
 	public static final String EXTRA_REQUEST_FINISH = "EXTRA_REQUEST_FINISH";
 
 	private static final int REQ_SCREEN_LOCK = 412809;
-	public static void requestScreenLock(final Activity activity, final boolean finish) {
+	public static void requestScreenLock(@NonNull final Activity activity, final boolean finish) {
 		if (!checkScreenLock(activity, finish)) {
 			// スクリーンをロックできなかった時はデバイス管理者が無効になってるはずなのでデバイス管理者有効画面を表示する
 			final Intent intent = new Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN);
@@ -44,7 +45,7 @@ public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 	 * スクリーンロックを行う
 	 * @return スクリーンロックできればtrue
 	 */
-	private static boolean checkScreenLock(final Activity activity, final boolean finish) {
+	private static boolean checkScreenLock(@NonNull final Activity activity, final boolean finish) {
 		final ComponentName cn = new ComponentName(activity, DeviceAdminReceiverLock.class);
 		final DevicePolicyManager dpm = (DevicePolicyManager)activity.getSystemService(Context.DEVICE_POLICY_SERVICE);
 		if (dpm.isAdminActive(cn)){
@@ -58,7 +59,7 @@ public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 		return false;
 	}
 
-	public static boolean onActivityResult(final Activity activity, final int requestCode, final int resultCode, final Intent data) {
+	public static boolean onActivityResult(@NonNull final Activity activity, final int requestCode, final int resultCode, final Intent data) {
 		switch (requestCode) {
 		case REQ_SCREEN_LOCK:
 			if (resultCode == Activity.RESULT_OK) {
@@ -66,7 +67,7 @@ public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 				// 有効になった
 				checkScreenLock(activity, finish);
 				return true;
-			} else {
+//			} else {
 				// キャンセルされた or 有効化出来なかった
 			}
 		}

@@ -36,12 +36,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.support.annotation.NonNull;
 
 public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	/* package */static final String LOG_NAME = "crashrepo.txt";
 	/* package */static final String MAIL_TO = "t_saki@serenegiant.com";
 
-	public static void registerCrashHandler(final Context app_context) {
+	public static void registerCrashHandler(@NonNull final Context app_context) {
 		Thread.setDefaultUncaughtExceptionHandler(new CrashExceptionHandler(app_context));
 	}
 
@@ -72,7 +73,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	private final WeakReference<PackageInfo> mWeakPackageInfo;
 	private final UncaughtExceptionHandler mHandler;
 
-	private CrashExceptionHandler(final Context context) {
+	private CrashExceptionHandler(@NonNull final Context context) {
 		mWeakContext = new WeakReference<Context>(context);
 		try {
 			mWeakPackageInfo = new WeakReference<PackageInfo>(

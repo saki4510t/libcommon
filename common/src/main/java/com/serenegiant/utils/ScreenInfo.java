@@ -24,6 +24,7 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.graphics.Point;
+import android.support.annotation.NonNull;
 import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
@@ -32,7 +33,7 @@ public class ScreenInfo {
 
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
-	public static JSONObject get(final Activity activity) throws JSONException {
+	public static JSONObject get(@NonNull final Activity activity) throws JSONException {
 		final JSONObject result = new JSONObject();
 		try {
 			final WindowManager wm = activity.getWindowManager();

@@ -35,9 +35,7 @@ public class ThreadPool {
 			TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
 
 	static {
-		if (Build.VERSION.SDK_INT >= 9) {
-			EXECUTOR.allowCoreThreadTimeOut(true);	// this makes core threads can terminate
-		}
+		EXECUTOR.allowCoreThreadTimeOut(true);	// this makes core threads can terminate
 	}
 
 	public static void preStartAllCoreThreads() {

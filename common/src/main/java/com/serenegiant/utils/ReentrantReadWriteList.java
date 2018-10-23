@@ -133,6 +133,7 @@ public class ReentrantReadWriteList<V> implements List<V> {
 	 * can not modify underlying list using returned iterator
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public ListIterator<V> listIterator() {
 		mReadLock.lock();

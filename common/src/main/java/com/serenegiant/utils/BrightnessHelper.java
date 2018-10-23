@@ -19,10 +19,11 @@ package com.serenegiant.utils;
 */
 
 import android.app.Activity;
+import android.support.annotation.NonNull;
 import android.view.WindowManager;
 
 public class BrightnessHelper {
-	public static void setBrightness(final Activity activity, final float brightness) {
+	public static void setBrightness(@NonNull final Activity activity, final float brightness) {
 		final WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
 		float _brightness = brightness;
 		if (brightness > 1.0f) {
@@ -32,7 +33,7 @@ public class BrightnessHelper {
 		activity.getWindow().setAttributes(lp);
 	}
 
-	public float getBrightness(final Activity activity) {
+	public float getBrightness(@NonNull final Activity activity) {
 		final WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
 		return lp.screenBrightness;
 	}

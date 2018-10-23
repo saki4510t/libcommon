@@ -18,8 +18,6 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import android.os.SystemClock;
-
 public class FpsCounter {
 	private int cnt, prevCnt;
 	private long startTime, prevTime;

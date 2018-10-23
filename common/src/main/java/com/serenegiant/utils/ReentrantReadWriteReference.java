@@ -41,7 +41,7 @@ public class ReentrantReadWriteReference<T> {
 	 * constructor
 	 * @param obj
 	 */
-	public ReentrantReadWriteReference(final T obj) {
+	public ReentrantReadWriteReference(@Nullable final T obj) {
 		set(obj);
 	}
 	
@@ -49,7 +49,7 @@ public class ReentrantReadWriteReference<T> {
 	 * copy constructor
 	 * @param ref
 	 */
-	public ReentrantReadWriteReference(final WeakReference<T> ref) {
+	public ReentrantReadWriteReference(@Nullable final WeakReference<T> ref) {
 		set(ref);
 	}
 	
@@ -57,7 +57,7 @@ public class ReentrantReadWriteReference<T> {
 	 * copy constructor
 	 * @param ref
 	 */
-	public ReentrantReadWriteReference(final ReentrantReadWriteReference<T> ref) {
+	public ReentrantReadWriteReference(@Nullable final ReentrantReadWriteReference<T> ref) {
 		if (ref != null) {
 			set(ref.get());
 		}
@@ -138,7 +138,8 @@ public class ReentrantReadWriteReference<T> {
 	 * @param ref
 	 * @return previous referenced object, will be null
 	 */
-	public T set(final ReentrantReadWriteReference<T> ref) {
+	@Nullable
+	public T set(@Nullable final ReentrantReadWriteReference<T> ref) {
 		return set(ref != null ? ref.get() : null);
 	}
 	

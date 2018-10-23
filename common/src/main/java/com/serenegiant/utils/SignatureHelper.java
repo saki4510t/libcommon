@@ -23,6 +23,7 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.nio.ByteBuffer;
@@ -36,7 +37,7 @@ public class SignatureHelper {
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
 	 */
-	public static boolean checkSignature(final Context context, final String key)
+	public static boolean checkSignature(@Nullable final Context context, final String key)
 		throws IllegalArgumentException, PackageManager.NameNotFoundException {
 
 		if ((context == null) || TextUtils.isEmpty(key)) {
@@ -45,6 +46,7 @@ public class SignatureHelper {
 		final Signature expected = new Signature(key);
 		boolean result = true;
 		final PackageManager pm = context.getPackageManager();
+		// FIXME Deprecated対策をする
 		@SuppressLint("PackageManagerGetSignatures")
 		final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 		// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
@@ -59,10 +61,12 @@ public class SignatureHelper {
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
 	 */
+	@Nullable
 	public static String getSignature(final Context context) {
 		if (context != null) {
 			final PackageManager pm = context.getPackageManager();
 			try {
+				// FIXME Deprecated対策をする
 				@SuppressLint("PackageManagerGetSignatures")
 				final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
@@ -80,6 +84,7 @@ public class SignatureHelper {
 				}
 				return sb.toString();
 			} catch (final Exception e) {
+				// ignore
 			}
 		}
 		return null;
@@ -90,10 +95,12 @@ public class SignatureHelper {
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
 	 */
+	@Nullable
 	public static byte[] getSignatureBytes(final Context context) {
 		if (context != null) {
 			final PackageManager pm = context.getPackageManager();
 			try {
+				// FIXME Deprecated対策をする
 				@SuppressLint("PackageManagerGetSignatures")
 				final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
 				ByteBuffer result = ByteBuffer.allocate(1024);
@@ -123,6 +130,7 @@ public class SignatureHelper {
 					return bytes;
 				}
 			} catch (final Exception e) {
+				// ignore
 			}
 		}
 		return null;

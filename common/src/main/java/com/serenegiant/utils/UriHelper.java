@@ -45,7 +45,8 @@ public final class UriHelper {
 	 * @param uri
 	 * @return String パスが見つからなければnull
 	 */
-	public static String getAbsolutePath(final ContentResolver cr, @Nullable final Uri uri) {
+	@Nullable
+	public static String getAbsolutePath(@NonNull final ContentResolver cr, @Nullable final Uri uri) {
 		String path = null;
 		if (uri != null) {
 			try {
@@ -121,7 +122,7 @@ public final class UriHelper {
 	@SuppressLint("NewApi")
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static String getPath(final Context context, final Uri uri) {
+	public static String getPath(@NonNull final Context context, final Uri uri) {
 		if (DEBUG) Log.i(TAG, "getPath:uri=" + uri);
 
 	    if (BuildCheck.isKitKat() && DocumentsContract.isDocumentUri(context, uri)) {
@@ -253,6 +254,7 @@ public final class UriHelper {
 	 * @param selectionArgs (Optional) Selection arguments used in the query.
 	 * @return The value of the _data column, which is typically a file path.
 	 */
+	@Nullable
 	public static String getDataColumn(@NonNull final Context context,
 		@NonNull final Uri uri, final String selection, final String[] selectionArgs) {
 

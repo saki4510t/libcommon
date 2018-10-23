@@ -29,7 +29,7 @@ import java.util.Map;
  *
  */
 public class PrefHelper {
-	public static int getShort(@Nullable final SharedPreferences pref,
+	public static short get(@Nullable final SharedPreferences pref,
 		final String key, final short defaultValue) {
 
 		short result = defaultValue;
@@ -44,7 +44,7 @@ public class PrefHelper {
 		return result;
 	}
 
-	public static int getInt(@Nullable final SharedPreferences pref,
+	public static int get(@Nullable final SharedPreferences pref,
 		final String key, final int defaultValue) {
 
 		int result = defaultValue;
@@ -59,7 +59,7 @@ public class PrefHelper {
 		return result;
 	}
 
-	public static long getLong(@Nullable final SharedPreferences pref,
+	public static long get(@Nullable final SharedPreferences pref,
 		final String key, final long defaultValue) {
 
 		long result = defaultValue;
@@ -74,7 +74,7 @@ public class PrefHelper {
 		return result;
 	}
 
-	public static float getFloat(@Nullable final SharedPreferences pref,
+	public static float get(@Nullable final SharedPreferences pref,
 		final String key, final float defaultValue) {
 
 		float result = defaultValue;
@@ -89,7 +89,7 @@ public class PrefHelper {
 		return result;
 	}
 
-	public static double getDouble(@Nullable final SharedPreferences pref,
+	public static double get(@Nullable final SharedPreferences pref,
 		final String key, final double defaultValue) {
 
 		double result = defaultValue;
@@ -104,7 +104,7 @@ public class PrefHelper {
 		return result;
 	}
 
-	public static boolean getBoolean(@Nullable final SharedPreferences pref,
+	public static boolean get(@Nullable final SharedPreferences pref,
 		final String key, final boolean defaultValue) {
 
 		boolean result = defaultValue;
@@ -113,7 +113,7 @@ public class PrefHelper {
 				result = pref.getBoolean(key, defaultValue);
 			} catch (final Exception e) {
 				result = ObjectHelper.asBoolean(
-					getObject(pref, key, defaultValue), defaultValue);
+					get(pref, key, defaultValue), defaultValue);
 			}
 		}
 		return result;

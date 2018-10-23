@@ -28,8 +28,11 @@ import org.json.JSONObject;
 
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.text.TextUtils;
 
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public final class MediaInfo {
 
 	public static JSONObject get() throws JSONException {
@@ -70,15 +73,15 @@ public final class MediaInfo {
 		        		Thread.currentThread().setPriority(Thread.NORM_PRIORITY);
 		        	}
 		        	try {
-			            final int[] colorFormats = capabilities.colorFormats;
-			            final int m = colorFormats != null ? colorFormats.length : 0;
-			            if (m > 0) {
-				        	final JSONObject caps = new JSONObject();
-				            for (int k = 0; k < m; k++) {
-				            	caps.put(String.format("COLOR_FORMAT(%d)", k), getColorFormatName(colorFormats[k]));
-				            }
-			            	codec.put("COLOR_FORMATS", caps);
-			            }
+						final int[] colorFormats = capabilities.colorFormats;
+						final int m = colorFormats != null ? colorFormats.length : 0;
+						if (m > 0) {
+							final JSONObject caps = new JSONObject();
+							for (int k = 0; k < m; k++) {
+								caps.put(String.format(Locale.US, "COLOR_FORMAT(%d)", k), getColorFormatName(colorFormats[k]));
+							}
+							codec.put("COLOR_FORMATS", caps);
+						}
 		        	} catch (final Exception e) {
 		            	codec.put("COLOR_FORMATS", e.getMessage());
 		        	}
@@ -240,7 +243,7 @@ public final class MediaInfo {
     }
 
     public static String getProfileLevelString(final String mimeType, final MediaCodecInfo.CodecProfileLevel profileLevel) {
-    	String result = null;
+    	String result;
     	if (!TextUtils.isEmpty(mimeType)) {
 	    	if (mimeType.equalsIgnoreCase("video/avc")) {
 		    	switch (profileLevel.profile) {

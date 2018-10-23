@@ -18,6 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.KeyguardManager;
 import android.content.Context;
@@ -35,15 +36,16 @@ import android.view.WindowManager;
 public class PowerHelper {
 	private static final String TAG = "PowerHelper";
 
-	public static void wake(final Activity activity, final boolean disable_keyguard, final long lock_delayed) {
+	@SuppressLint({"MissingPermission", "WakelockTimeout"})
+	public static void wake(final Activity activity, final boolean disableKeyguard, final long lockDelayed) {
 		try {
 			// スリープ状態から起床(android.permission.WAKE_LOCKが必要)
 			final PowerManager.WakeLock wakelock = ((PowerManager)activity.getSystemService(Context.POWER_SERVICE))
 				.newWakeLock(PowerManager.FULL_WAKE_LOCK
 							| PowerManager.ACQUIRE_CAUSES_WAKEUP
-							| PowerManager.ON_AFTER_RELEASE, "disableLock");
-			if (lock_delayed > 0) {
-				wakelock.acquire(lock_delayed);
+							| PowerManager.ON_AFTER_RELEASE, "PowerHelper:disableLock");
+			if (lockDelayed > 0) {
+				wakelock.acquire(lockDelayed);
 			} else {
 				wakelock.acquire();
 			}
