@@ -33,10 +33,11 @@ import java.lang.annotation.RetentionPolicy;
 public interface IRendererHolder extends IRendererCommon {
 	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;
 
-	public static final int OUTPUT_FORMAT_JPEG = 0;
-	public static final int OUTPUT_FORMAT_PNG = 1;
+	public static final int OUTPUT_FORMAT_JPEG = 0;	// Bitmap.CompressFormat.JPEG
+	public static final int OUTPUT_FORMAT_PNG = 1;	// Bitmap.CompressFormat.PNG
+	public static final int OUTPUT_FORMAT_WEBP = 2;	// Bitmap.CompressFormat.WEBP
 
-	@IntDef({OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_PNG})
+	@IntDef({OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_PNG, OUTPUT_FORMAT_WEBP})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface StillCaptureFormat {}
 
