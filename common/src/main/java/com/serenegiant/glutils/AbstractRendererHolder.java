@@ -1239,7 +1239,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
 				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-				        if (mCaptureFile.toString().endsWith(".jpg")) {
+				        final String path = mCaptureFile.toString().toLowerCase();
+						if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
 				        	compressFormat = Bitmap.CompressFormat.JPEG;
 				        }
 				        BufferedOutputStream os = null;
@@ -1326,9 +1327,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
 				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-				        if (mCaptureFile.toString().endsWith(".jpg")) {
-				        	compressFormat = Bitmap.CompressFormat.JPEG;
-				        }
+						final String path = mCaptureFile.toString().toLowerCase();
+						if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+							compressFormat = Bitmap.CompressFormat.JPEG;
+						}
 				        BufferedOutputStream os = null;
 						try {
 					        try {
