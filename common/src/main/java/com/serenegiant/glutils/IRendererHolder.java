@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.SurfaceTexture;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Surface;
@@ -27,6 +28,7 @@ import android.view.Surface;
  * 分配描画インターフェース
  */
 public interface IRendererHolder extends IRendererCommon {
+	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;
 	/**
 	 * 実行中かどうか
 	 * @return
@@ -166,7 +168,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
 	 */
-	public void captureStillAsync(final String path, final int captureCompression);
+	public void captureStillAsync(final String path,
+		@IntRange(from = 1L,to = 99L) final int captureCompression);
 
 	/**
 	 * 静止画を撮影する
@@ -181,6 +184,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
 	 */
-	public void captureStill(final String path, final int captureCompression);
+	public void captureStill(final String path,
+		@IntRange(from = 1L,to = 99L) final int captureCompression);
 
 }

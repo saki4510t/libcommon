@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -303,7 +304,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@Override
 	public void captureStillAsync(final String path) {
 		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path);
-		captureStillAsync(path, 90);
+		captureStillAsync(path, DEFAULT_CAPTURE_COMPRESSION);
 	}
 	
 	/**
@@ -313,7 +314,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param captureCompression
 	 */
 	@Override
-	public void captureStillAsync(final String path, final int captureCompression) {
+	public void captureStillAsync(final String path,
+		@IntRange(from = 1L,to = 99L) final int captureCompression) {
+
 		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path + ",captureCompression=" + captureCompression);
 		final File file = new File(path);
 		synchronized (mSync) {
@@ -332,7 +335,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@Override
 	public void captureStill(final String path) {
 		if (DEBUG) Log.v(TAG, "captureStill:" + path);
-		captureStill(path, 90);
+		captureStill(path, DEFAULT_CAPTURE_COMPRESSION);
 	}
 	
 	/**
@@ -341,7 +344,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param path
 	 */
 	@Override
-	public void captureStill(final String path, final int captureCompression) {
+	public void captureStill(final String path,
+		@IntRange(from = 1L,to = 99L)final int captureCompression) {
+
 		if (DEBUG) Log.v(TAG, "captureStill:" + path + ",captureCompression=" + captureCompression);
 		final File file = new File(path);
 		synchronized (mSync) {
@@ -372,6 +377,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				try {
 					mSync.wait();
 				} catch (final InterruptedException e) {
+					// ignore
 				}
 			}
 		}
