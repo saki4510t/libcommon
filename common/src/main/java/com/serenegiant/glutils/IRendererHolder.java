@@ -160,6 +160,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * 撮影完了を待機しない
 	 * @param path
 	 */
+	@Deprecated
 	public void captureStillAsync(final String path);
 	
 	/**
@@ -168,6 +169,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
 	 */
+	@Deprecated
 	public void captureStillAsync(final String path,
 		@IntRange(from = 1L,to = 99L) final int captureCompression);
 

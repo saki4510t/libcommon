@@ -301,6 +301,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 撮影完了を待機しない
 	 * @param path
 	 */
+	@Deprecated
 	@Override
 	public void captureStillAsync(final String path) {
 		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path);
@@ -313,6 +314,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param path
 	 * @param captureCompression
 	 */
+	@Deprecated
 	@Override
 	public void captureStillAsync(final String path,
 		@IntRange(from = 1L,to = 99L) final int captureCompression) {
