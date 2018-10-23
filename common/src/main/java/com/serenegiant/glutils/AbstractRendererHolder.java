@@ -19,10 +19,13 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.Matrix;
+import android.os.Build;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,10 +37,10 @@ import android.view.SurfaceHolder;
 import com.serenegiant.utils.BuildCheck;
 
 import java.io.BufferedOutputStream;
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
@@ -64,10 +67,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected final Object mSync = new Object();
 	@Nullable
 	private final RenderHolderCallback mCallback;
-	protected volatile boolean isRunning;
+	private volatile boolean isRunning;
 
-	private File mCaptureFile;
-	private int mCaptureCompression;
+	private OutputStream mCaptureStream;
+	@StillCaptureFormat
+	private int mCaptureFormat;
+	@IntRange(from = 1L,to = 99L)
+	private int mCaptureCompression = DEFAULT_CAPTURE_COMPRESSION;
 	protected final RendererTask mRendererTask;
 
 	protected AbstractRendererHolder(final int width, final int height,
@@ -303,9 +309,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Deprecated
 	@Override
-	public void captureStillAsync(final String path) {
+	public void captureStillAsync(@NonNull final String path)
+		throws FileNotFoundException, IllegalStateException {
+
 		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path);
-		captureStillAsync(path, DEFAULT_CAPTURE_COMPRESSION);
+
+		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
+			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, false);
 	}
 	
 	/**
@@ -316,17 +326,15 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Deprecated
 	@Override
-	public void captureStillAsync(final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression) {
+	public void captureStillAsync(@NonNull final String path,
+		@IntRange(from = 1L,to = 99L) final int captureCompression)
+			throws FileNotFoundException, IllegalStateException {
 
-		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path + ",captureCompression=" + captureCompression);
-		final File file = new File(path);
-		synchronized (mSync) {
-			mCaptureFile = file;
-			mCaptureCompression = captureCompression;
-			mSync.notifyAll();
-		}
-		if (DEBUG) Log.v(TAG, "captureStillAsync:終了");
+		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path
+			+ ",captureCompression=" + captureCompression);
+
+		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
+			getCaptureFormat(path), captureCompression, false);
 	}
 
 	/**
@@ -335,9 +343,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param path
 	 */
 	@Override
-	public void captureStill(final String path) {
+	public void captureStill(@NonNull final String path)
+		throws FileNotFoundException, IllegalStateException {
+
 		if (DEBUG) Log.v(TAG, "captureStill:" + path);
-		captureStill(path, DEFAULT_CAPTURE_COMPRESSION);
+
+		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
+			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, true);
 	}
 	
 	/**
@@ -346,27 +358,120 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param path
 	 */
 	@Override
-	public void captureStill(final String path,
-		@IntRange(from = 1L,to = 99L)final int captureCompression) {
+	public void captureStill(@NonNull final String path,
+		@IntRange(from = 1L,to = 99L)final int captureCompression)
+			throws FileNotFoundException, IllegalStateException {
 
-		if (DEBUG) Log.v(TAG, "captureStill:" + path + ",captureCompression=" + captureCompression);
-		final File file = new File(path);
+		if (DEBUG) Log.v(TAG, "captureStill:" + path
+			+ ",captureCompression=" + captureCompression);
+		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
+			getCaptureFormat(path), captureCompression, true);
+	}
+
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機する
+	 * @param out
+	 * @param captureFormat
+	 * @param captureCompression
+	 */
+	@Override
+	public void captureStill(@NonNull final OutputStream out,
+		@StillCaptureFormat final int captureFormat,
+		@IntRange(from = 1L,to = 99L) final int captureCompression)
+			throws IllegalStateException {
+		
+		captureStill(out, captureFormat, captureCompression, true);
+	}
+	
+	/**
+	 * 実際の静止画撮影要求メソッド
+	 * @param out
+	 * @param captureFormat
+	 * @param captureCompression
+	 * @param needWait 撮影完了を待機するを待機するかどうか
+	 */
+	private void captureStill(@NonNull final OutputStream out,
+		@StillCaptureFormat final int captureFormat,
+		@IntRange(from = 1L,to = 99L) final int captureCompression,
+		final boolean needWait) throws IllegalStateException {
+
 		synchronized (mSync) {
-			mCaptureFile = file;
+			if (!isRunning) {
+				throw new IllegalStateException("already released?");
+			}
+			if (mCaptureStream != null) {
+				throw new IllegalStateException("already run still capturing now");
+			}
+			mCaptureStream = out;
+			mCaptureFormat = captureFormat;
 			mCaptureCompression = captureCompression;
 			mSync.notifyAll();
-			for ( ; isRunning && (mCaptureFile != null) ; ) {
-				try {
-					if (DEBUG) Log.v(TAG, "静止画撮影待ち");
-					mSync.wait(1000);
-				} catch (final InterruptedException e) {
-					// ignore
+			if (needWait) {
+				// 撮影完了街をする場合
+				for ( ; isRunning && (mCaptureStream != null) ; ) {
+					try {
+						if (DEBUG) Log.v(TAG, "静止画撮影待ち");
+						mSync.wait(1000);
+					} catch (final InterruptedException e) {
+						// ignore
+					}
 				}
 			}
 		}
 		if (DEBUG) Log.v(TAG, "captureStill:終了");
 	}
+	
+	/**
+	 * パス文字列の拡張子を調べて静止画圧縮フォーマットを取得する。
+	 * jpeg(jpg)/png/webpのいずれでもなければIllegalArgumentExceptionを投げる
+	 * @param path
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	@StillCaptureFormat
+	private static int getCaptureFormat(@NonNull final String path)
+		throws IllegalArgumentException {
 
+		int result;
+		final String _path = path.toLowerCase();
+		if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
+			result = OUTPUT_FORMAT_JPEG;
+		} else if (path.endsWith(".png")) {
+			result = OUTPUT_FORMAT_PNG;
+		} else if (path.endsWith(".webp")) {
+			result = OUTPUT_FORMAT_WEBP;
+		} else {
+			throw new IllegalArgumentException("unknown compress format(extension)");
+		}
+		return result;
+	}
+	
+	/**
+	 * 静止画圧縮フォーマットをBitmap.CompressFormatに変換する
+	 * @param captureFormat
+	 * @return
+	 */
+	private static Bitmap.CompressFormat getCaptureFormat(
+		@StillCaptureFormat final int captureFormat) {
+
+		Bitmap.CompressFormat result;
+		switch (captureFormat) {
+		case OUTPUT_FORMAT_JPEG:
+			result = Bitmap.CompressFormat.JPEG;
+			break;
+		case OUTPUT_FORMAT_PNG:
+			result = Bitmap.CompressFormat.PNG;
+			break;
+		case OUTPUT_FORMAT_WEBP:
+			result = Bitmap.CompressFormat.WEBP;
+			break;
+		default:
+			result = Bitmap.CompressFormat.JPEG;
+			break;
+		}
+		return result;
+	}
 //--------------------------------------------------------------------------------
 	@NonNull
 	protected abstract RendererTask createRendererTask(final int width, final int height,
@@ -1160,13 +1265,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					try {
 						mSync.wait(1000);
 					} catch (final InterruptedException e) {
+						break;
 					}
 				}
 			}
-			if (mRendererTask.isRunning()) {
+			if (isRunning) {
 				init();
 				try {
-					if (eglBase.getGlVersion() > 2) {
+					if ((eglBase.getGlVersion() > 2) && (BuildCheck.isAndroid4_3())) {
 						captureLoopGLES3();
 					} else {
 						captureLoopGLES2();
@@ -1182,7 +1288,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		private final void init() {
-	    	eglBase = EGLBase.createFrom(3, mRendererTask.getContext(), false, 0, false);
+	    	eglBase = EGLBase.createFrom(3,
+	    		mRendererTask.getContext(), false, 0, false);
 	    	captureSurface = eglBase.createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
@@ -1193,24 +1300,24 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private final void captureLoopGLES2() {
 			int width = -1, height = -1;
 			ByteBuffer buf = null;
-			int captureCompression = 90;
+			int captureCompression = DEFAULT_CAPTURE_COMPRESSION;
 //			if (DEBUG) Log.v(TAG, "captureTask loop");
 			for (; isRunning ;) {
 				synchronized (mSync) {
-					if (mCaptureFile == null) {
+					if (mCaptureStream == null) {
 						try {
 							mSync.wait();
 						} catch (final InterruptedException e) {
 							break;
 						}
-						if (mCaptureFile != null) {
+						if (mCaptureStream != null) {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
 							captureCompression = mCaptureCompression;
 							if ((captureCompression <= 0) || (captureCompression >= 100)) {
 								captureCompression = 90;
 							}
 						} else {
-							// 起床されたけどmCaptureFileがnullだった
+							// 起床されたけどmCaptureStreamがnullだった
 							continue;
 						}
 					}
@@ -1240,27 +1347,20 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				        GLES20.glReadPixels(0, 0, width, height,
 				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
-				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-				        final String path = mCaptureFile.toString().toLowerCase();
-						if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-				        	compressFormat = Bitmap.CompressFormat.JPEG;
-				        }
-				        BufferedOutputStream os = null;
+				        final Bitmap.CompressFormat compressFormat
+				        	= getCaptureFormat(mCaptureFormat);
 						try {
 					        try {
-					            os = new BufferedOutputStream(new FileOutputStream(mCaptureFile));
 					            final Bitmap bmp = Bitmap.createBitmap(
 					            	width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, captureCompression, os);
+					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
 					            bmp.recycle();
-					            os.flush();
+								mCaptureStream.flush();
 					        } finally {
-					            if (os != null) os.close();
+					            mCaptureStream.close();
 					        }
-						} catch (final FileNotFoundException e) {
-							Log.w(TAG, "failed to save file", e);
 						} catch (final IOException e) {
 							Log.w(TAG, "failed to save file", e);
 						}
@@ -1268,7 +1368,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES2:静止画撮影終了");
-					mCaptureFile = null;
+					mCaptureStream = null;
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
@@ -1277,7 +1377,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 
-		// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		private final void captureLoopGLES3() {
 			int width = -1, height = -1;
 			ByteBuffer buf = null;
@@ -1285,20 +1385,20 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //			if (DEBUG) Log.v(TAG, "captureTask loop");
 			for (; isRunning ;) {
 				synchronized (mSync) {
-					if (mCaptureFile == null) {
+					if (mCaptureStream == null) {
 						try {
 							mSync.wait();
 						} catch (final InterruptedException e) {
 							break;
 						}
-						if (mCaptureFile != null) {
+						if (mCaptureStream != null) {
 //							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
 							captureCompression = mCaptureCompression;
 							if ((captureCompression <= 0) || (captureCompression >= 100)) {
 								captureCompression = 90;
 							}
 						} else {
-							// 起床されたけどmCaptureFileがnullだった
+							// 起床されたけどmCaptureStreamがnullだった
 							continue;
 						}
 					}
@@ -1325,30 +1425,24 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
 				        buf.clear();
-				        GLES20.glReadPixels(0, 0, width, height,
-				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+						// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する
+				        GLES30.glReadPixels(0, 0, width, height,
+							GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, buf);
 //				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
-				        Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
-						final String path = mCaptureFile.toString().toLowerCase();
-						if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-							compressFormat = Bitmap.CompressFormat.JPEG;
-						}
-				        BufferedOutputStream os = null;
+						final Bitmap.CompressFormat compressFormat
+							= getCaptureFormat(mCaptureFormat);
 						try {
 					        try {
-					            os = new BufferedOutputStream(new FileOutputStream(mCaptureFile));
 					            final Bitmap bmp = Bitmap.createBitmap(
 					            	width, height, Bitmap.Config.ARGB_8888);
 						        buf.clear();
 					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, captureCompression, os);
+					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
 					            bmp.recycle();
-					            os.flush();
+								mCaptureStream.flush();
 					        } finally {
-					            if (os != null) os.close();
+					            mCaptureStream.close();
 					        }
-						} catch (final FileNotFoundException e) {
-							Log.w(TAG, "failed to save file", e);
 						} catch (final IOException e) {
 							Log.w(TAG, "failed to save file", e);
 						}
@@ -1356,7 +1450,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES3:静止画撮影終了");
-					mCaptureFile = null;
+					mCaptureStream = null;
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)

@@ -25,8 +25,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.Surface;
 
+import java.io.FileNotFoundException;
+import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+
 /**
  * 分配描画インターフェース
  */
@@ -173,7 +176,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param path
 	 */
 	@Deprecated
-	public void captureStillAsync(@NonNull final String path);
+	public void captureStillAsync(@NonNull final String path)
+		throws FileNotFoundException, IllegalStateException;
 	
 	/**
 	 * 静止画を撮影する
@@ -183,14 +187,16 @@ public interface IRendererHolder extends IRendererCommon {
 	 */
 	@Deprecated
 	public void captureStillAsync(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression);
+		@IntRange(from = 1L,to = 99L) final int captureCompression)
+			throws FileNotFoundException, IllegalStateException;
 
 	/**
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
 	 */
-	public void captureStill(@NonNull final String path);
+	public void captureStill(@NonNull final String path)
+		throws FileNotFoundException, IllegalStateException;
 
 	/**
 	 * 静止画を撮影する
@@ -199,6 +205,18 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
 	 */
 	public void captureStill(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression);
+		@IntRange(from = 1L,to = 99L) final int captureCompression)
+			throws FileNotFoundException, IllegalStateException;
 
+	/**
+	 * 静止画を撮影する
+	 * 撮影完了を待機する
+	 * @param out
+	 * @param stillCaptureFormat
+	 * @param captureCompression
+	 */
+	public void captureStill(@NonNull final OutputStream out,
+		@StillCaptureFormat final int stillCaptureFormat,
+		@IntRange(from = 1L,to = 99L) final int captureCompression)
+			throws IllegalStateException;
 }
