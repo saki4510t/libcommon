@@ -420,11 +420,13 @@ public final class BitmapHelper {
 
 	/**
 	 * ファイルからビットマップを読み込んで指定した幅・高さに最も近い大きさのBitmapとして返す
+	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
 	 * @param in
 	 * @param requestWidth
 	 * @param requestHeight
 	 * @return
 	 */
+	@Deprecated
 	public static Bitmap asBitmap(final InputStream in, final int requestWidth, final int requestHeight) {
 		Bitmap bitmap = null;
 		if (in != null) {
@@ -441,11 +443,13 @@ public final class BitmapHelper {
 
 	/**
 	 * ファイルからビットマップデータを読み込んで指定した幅・高さのBitmapとして返す
+	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
 	 * @param in
 	 * @param requestWidth
 	 * @param requestHeight
 	 * @return
 	 */
+	@Deprecated
 	public static Bitmap asBitmapStrictSize(final InputStream in, final int requestWidth, final int requestHeight) {
 		Bitmap bitmap = null;
 		if (in != null) {
