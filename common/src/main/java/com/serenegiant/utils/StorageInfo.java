@@ -27,4 +27,12 @@ public class StorageInfo {
 		totalBytes = total;
 		freeBytes = free;
 	}
+	
+	@Override
+	public String toString() {
+		return "StorageInfo{" +
+			"totalBytes=" + totalBytes +
+			", freeBytes=" + freeBytes +
+			'}';
+	}
 }
