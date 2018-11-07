@@ -28,6 +28,8 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -161,7 +163,9 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @param listener
 	 * @return
 	 */
-	public static NetworkChangedReceiver registerGlobal(final Context context, final OnNetworkChangedListener listener) {
+	public static NetworkChangedReceiver registerGlobal(@NonNull final Context context,
+		@Nullable final OnNetworkChangedListener listener) {
+
 		if (DEBUG) Log.v(TAG, "registerGlobal:");
 		final NetworkChangedReceiver receiver = new NetworkChangedReceiver(listener);
 		final IntentFilter intentFilter = new IntentFilter();
@@ -185,10 +189,12 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @param context
 	 * @param receiver　#registerGlobalが返したNetworkChangedReceiver
 	 */
-	public static void unregisterGlobal(final Context context, final NetworkChangedReceiver receiver) {
+	public static void unregisterGlobal(@NonNull final Context context,
+		@NonNull final NetworkChangedReceiver receiver) {
+
 		if (DEBUG) Log.v(TAG, "unregisterGlobal:");
 		synchronized (sSync) {
-			if ((context != null) && (receiver != null)) {
+			if (receiver != null) {
 				sGlobalReceiverNum--;
 				try {
 					context.unregisterReceiver(receiver);
@@ -205,17 +211,21 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @param listener
 	 * @return
 	 */
-	public static NetworkChangedReceiver registerLocal(final Context context, final OnNetworkChangedListener listener) {
+	public static NetworkChangedReceiver registerLocal(@NonNull final Context context,
+		@NonNull final OnNetworkChangedListener listener) {
+
 		if (DEBUG) Log.v(TAG, "registerLocal:");
 		final NetworkChangedReceiver receiver = new NetworkChangedReceiver(listener);
 		final IntentFilter intentFilter = new IntentFilter();
 		intentFilter.addAction(ACTION_LOCAL_CONNECTIVITY_CHANGE);
-		final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
+		final LocalBroadcastManager broadcastManager
+			= LocalBroadcastManager.getInstance(context.getApplicationContext());
 		broadcastManager.registerReceiver(receiver, intentFilter);
 		Handler handler = null;
 		try {
 			handler = new Handler(Looper.getMainLooper());
 		} catch (final Exception e) {
+			//
 		}
 		final int isConnectedOrConnecting;
 		final int isConnected;
@@ -244,9 +254,12 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @param context
 	 * @param receiver
 	 */
-	public static void unregisterLocal(final Context context, final NetworkChangedReceiver receiver) {
+	public static void unregisterLocal(@NonNull final Context context,
+		@NonNull final NetworkChangedReceiver receiver) {
+
 		if (DEBUG) Log.v(TAG, "unregisterLocal:");
-		final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
+		final LocalBroadcastManager broadcastManager
+			= LocalBroadcastManager.getInstance(context.getApplicationContext());
 		try {
 			broadcastManager.unregisterReceiver(receiver);
 		} catch (final Exception e) {
@@ -270,18 +283,20 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	public static final String ACTION_LOCAL_CONNECTIVITY_CHANGE = "com.serenegiant.net.CONNECTIVITY_CHANGE";
 
 	/** コールバックリスナー */
+	@Nullable
 	private OnNetworkChangedListener mListener;
 
 	/**
 	 * デフォルトコンストラクタ
 	 * AndroidManifest.xmlで登録する場合
 	 */
+	@Deprecated
 	public NetworkChangedReceiver() {
 		mListener = null;
 	}
 
 	/** コンストラクタ */
-	private NetworkChangedReceiver(final OnNetworkChangedListener listener) {
+	private NetworkChangedReceiver(@Nullable final OnNetworkChangedListener listener) {
 		mListener = listener;
 	}
 
@@ -333,19 +348,20 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 */
 	@SuppressLint("NewApi")
 	private void onReceiveGlobal(final Context context, final Intent intent) {
-		final ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-		final LocalBroadcastManager broadcastManager = LocalBroadcastManager.getInstance(context.getApplicationContext());
-//		final NetworkInfo wifi = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
-//		final NetworkInfo mobile = connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
+		final ConnectivityManager connMgr
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final LocalBroadcastManager broadcastManager
+			= LocalBroadcastManager.getInstance(context.getApplicationContext());
 
 		int isConnectedOrConnecting = 0;
 		int isConnected = 0;
 
 		if (BuildCheck.isAndroid5()) {	// API>=21
-			final Network[] networks = connectivityManager.getAllNetworks();
+			final Network[] networks = connMgr.getAllNetworks();
 			if (networks != null) {
 				for (final Network network: networks) {
-					final NetworkInfo info = connectivityManager.getNetworkInfo(network);
+					final NetworkInfo info = connMgr.getNetworkInfo(network);
 					if (info != null) {
 						isConnectedOrConnecting |= info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
 						isConnected |= info.isConnected() ? (1 << info.getType()) : 0;
@@ -355,14 +371,14 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 		} else {
 			final int n = NETWORKS.length;
 			for (int i = 0; i < n; i += 2) {
-				final NetworkInfo info = connectivityManager.getNetworkInfo(NETWORKS[i]);
+				final NetworkInfo info = connMgr.getNetworkInfo(NETWORKS[i]);
 				if (info != null) {
 					isConnectedOrConnecting |= info.isConnectedOrConnecting() ? NETWORKS[i + 1] : 0;
 					isConnected |= info.isConnected() ? NETWORKS[i + 1] : 0;
 				}
 			}
 		}
-		final NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+		final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 		final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
 		synchronized (sSync) {
 			sIsConnectedOrConnecting = isConnectedOrConnecting;
@@ -427,7 +443,9 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @return
 	 */
 	public static boolean isWifiNetworkReachable(final Context context) {
-		final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final ConnectivityManager connMgr
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 		if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 			final int type = activeNetworkInfo.getType();
@@ -459,7 +477,9 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * @return
 	 */
 	public static boolean isMobileNetworkReachable(final Context context) {
-		final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final ConnectivityManager connMgr
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 		if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 			final int type = activeNetworkInfo.getType();
@@ -486,7 +506,9 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
 	 */
 	public static boolean isNetworkReachable(final Context context) {
-		final ConnectivityManager connMgr = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final ConnectivityManager connMgr
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
 		final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 		return (activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting());
 	}
