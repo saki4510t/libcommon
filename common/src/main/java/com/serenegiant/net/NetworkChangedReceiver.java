@@ -42,6 +42,7 @@ import com.serenegiant.utils.ComponentUtils;
  * それ以外は(グローバルBroadcastReceiverがブロードキャストする)ローカルブロードキャストを受信すること
  * これのためだけにsupport library v4が要るにゃぁ
  */
+@Deprecated
 @SuppressLint("MissingPermission")
 public class NetworkChangedReceiver extends BroadcastReceiver {
 	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
