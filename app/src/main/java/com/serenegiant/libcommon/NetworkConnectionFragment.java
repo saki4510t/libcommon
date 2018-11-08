@@ -7,6 +7,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.serenegiant.net.ConnectivityHelper;
+
 
 /**
  * A simple {@link BaseFragment} subclass.
@@ -16,6 +18,8 @@ import android.view.ViewGroup;
 public class NetworkConnectionFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = NetworkConnectionFragment.class.getSimpleName();
+
+	private ConnectivityHelper mHelper;
 
 	public NetworkConnectionFragment() {
 		super();
@@ -37,6 +41,9 @@ public class NetworkConnectionFragment extends BaseFragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (mHelper == null) {
+			mHelper = new ConnectivityHelper(requireContext());
+		}
 	}
 	
 	@Override
@@ -45,4 +52,21 @@ public class NetworkConnectionFragment extends BaseFragment {
 		return inflater.inflate(R.layout.fragment_network_connection, container, false);
 	}
 	
+	@Override
+	protected void internalOnResume() {
+		super.internalOnResume();
+	}
+	
+	@Override
+	protected void internalOnPause() {
+		super.internalOnPause();
+	}
+	
+	@Override
+	protected void internalRelease() {
+		if (mHelper != null) {
+			mHelper.release();
+		}
+		super.internalRelease();
+	}
 }
