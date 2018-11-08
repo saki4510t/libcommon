@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.serenegiant.libcommon.dummy.DummyContent;
+import com.serenegiant.libcommon.list.DummyContent;
 
 public class MainActivity extends AppCompatActivity
 	implements TitleFragment.OnListFragmentInteractionListener {

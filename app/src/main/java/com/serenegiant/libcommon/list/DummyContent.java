@@ -1,4 +1,4 @@
-package com.serenegiant.libcommon.dummy;
+package com.serenegiant.libcommon.list;
 
 import android.content.Context;
 import android.support.annotation.ArrayRes;

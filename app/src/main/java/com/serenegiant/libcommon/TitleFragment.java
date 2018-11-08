@@ -11,8 +11,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.serenegiant.libcommon.dummy.DummyContent;
-import com.serenegiant.libcommon.dummy.DummyContent.DummyItem;
+import com.serenegiant.libcommon.list.DummyContent;
+import com.serenegiant.libcommon.list.DummyContent.DummyItem;
+import com.serenegiant.libcommon.list.MyItemRecyclerViewAdapter;
 
 /**
  * A fragment representing a list of Items.

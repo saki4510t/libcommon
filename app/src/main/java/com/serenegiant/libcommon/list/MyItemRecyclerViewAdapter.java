@@ -1,4 +1,4 @@
-package com.serenegiant.libcommon;
+package com.serenegiant.libcommon.list;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
@@ -7,11 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.serenegiant.libcommon.R;
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener;
-import com.serenegiant.libcommon.dummy.DummyContent.DummyItem;
+import com.serenegiant.libcommon.list.DummyContent.DummyItem;
 
 import java.util.List;
-import java.util.Locale;
 
 /**
  * {@link RecyclerView.Adapter} that can display a {@link DummyItem} and makes a call to the
