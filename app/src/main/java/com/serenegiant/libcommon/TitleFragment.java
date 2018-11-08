@@ -3,7 +3,6 @@ package com.serenegiant.libcommon;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -21,7 +20,7 @@ import com.serenegiant.libcommon.list.MyItemRecyclerViewAdapter;
  * Activities containing this fragment MUST implement the {@link OnListFragmentInteractionListener}
  * interface.
  */
-public class TitleFragment extends Fragment {
+public class TitleFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = TitleFragment.class.getSimpleName();
 	

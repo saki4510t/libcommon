@@ -3,18 +3,17 @@ package com.serenegiant.libcommon;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 
 /**
- * A simple {@link Fragment} subclass.
+ * A simple {@link BaseFragment} subclass.
  * Use the {@link NetworkConnectionFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class NetworkConnectionFragment extends Fragment {
+public class NetworkConnectionFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = NetworkConnectionFragment.class.getSimpleName();
 
