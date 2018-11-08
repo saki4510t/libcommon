@@ -28,6 +28,7 @@ public class MyItemRecyclerViewAdapter extends RecyclerView.Adapter<MyItemRecycl
 		mListener = listener;
 	}
 	
+	@NonNull
 	@Override
 	public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
 		View view = LayoutInflater.from(parent.getContext())

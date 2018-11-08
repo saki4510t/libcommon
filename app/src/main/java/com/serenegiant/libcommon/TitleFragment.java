@@ -25,9 +25,8 @@ public class TitleFragment extends Fragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = TitleFragment.class.getSimpleName();
 	
-	// TODO: Customize parameter argument names
 	private static final String ARG_COLUMN_COUNT = "column-count";
-	// TODO: Customize parameters
+
 	private int mColumnCount = 1;
 	private OnListFragmentInteractionListener mListener;
 	
@@ -39,18 +38,17 @@ public class TitleFragment extends Fragment {
 		super();
 	}
 	
-	// TODO: Customize parameter initialization
 	@SuppressWarnings("unused")
-	public static TitleFragment newInstance(int columnCount) {
-		TitleFragment fragment = new TitleFragment();
-		Bundle args = new Bundle();
+	public static TitleFragment newInstance(final int columnCount) {
+		final TitleFragment fragment = new TitleFragment();
+		final Bundle args = new Bundle();
 		args.putInt(ARG_COLUMN_COUNT, columnCount);
 		fragment.setArguments(args);
 		return fragment;
 	}
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
 		if (getArguments() != null) {
@@ -80,7 +78,7 @@ public class TitleFragment extends Fragment {
 	
 	
 	@Override
-	public void onAttach(Context context) {
+	public void onAttach(final Context context) {
 		super.onAttach(context);
 		if (context instanceof OnListFragmentInteractionListener) {
 			mListener = (OnListFragmentInteractionListener) context;
@@ -92,8 +90,8 @@ public class TitleFragment extends Fragment {
 	
 	@Override
 	public void onDetach() {
-		super.onDetach();
 		mListener = null;
+		super.onDetach();
 	}
 	
 	/**
@@ -107,7 +105,6 @@ public class TitleFragment extends Fragment {
 	 * >Communicating with Other Fragments</a> for more information.
 	 */
 	public interface OnListFragmentInteractionListener {
-		// TODO: Update argument type and name
 		void onListFragmentInteraction(DummyItem item);
 	}
 }

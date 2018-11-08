@@ -28,7 +28,6 @@ public class NetworkConnectionFragment extends Fragment {
 	 *
 	 * @return A new instance of fragment NetworkConnectionFragment.
 	 */
-	// TODO: Rename and change types and number of parameters
 	public static NetworkConnectionFragment newInstance() {
 		NetworkConnectionFragment fragment = new NetworkConnectionFragment();
 		final Bundle args = new Bundle();
