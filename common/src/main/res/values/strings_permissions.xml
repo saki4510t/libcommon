@@ -27,4 +27,6 @@
 	<string name="permission_camera_finish">No camera access permission. \nApp will finish soon</string>
 	<string name="permission_camera_reason">Camera access permission is necessary for fallback to built in camera.</string>
 	<string name="permission_camera_request">Camera access permission is necessary for fallback to built in camera.</string>
+	<!-- ハードウエアID・通話状態へのアクセスパーミッション -->
+	<string name="permission_hardware_id_request">Permission to access phone state/hardware id necessary for calling.</string>
 </resources>

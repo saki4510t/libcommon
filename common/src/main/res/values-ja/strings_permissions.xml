@@ -27,4 +27,6 @@
 	<string name="permission_camera_finish">内蔵カメラへのアクセス許可がありません。\n終了します</string>
 	<string name="permission_camera_reason">内蔵カメラへフォールバックするには内蔵カメラへのアクセス許可が必要です。</string>
 	<string name="permission_camera_request">内蔵カメラへのアクセス許可が必要です</string>
+	<!-- ハードウエアID・通話状態へのアクセスパーミッション -->
+	<string name="permission_hardware_id_request">通話するにはハードウエアID/通話状態へのアクセス許可が必要です。</string>
 </resources>
