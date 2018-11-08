@@ -46,6 +46,7 @@ public class ConnectivityHelper {
 	
 	private final WeakReference<Context> mWeakContext;
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;
+	private ConnectivityManager.NetworkCallback mNetworkCallback;
 	private BroadcastReceiver mNetworkChangedReceiver;
 
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
@@ -55,17 +56,21 @@ public class ConnectivityHelper {
 	public ConnectivityHelper(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
+		final ConnectivityManager manager = requireConnectivityManager();
 		if (BuildCheck.isLollipop()) {
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
-			requireConnectivityManager().addDefaultNetworkActiveListener(mOnNetworkActiveListener);
+			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);
+			mNetworkCallback = new MyNetworkCallback();
+			manager.registerDefaultNetworkCallback(mNetworkCallback);
 		} else {
 			mNetworkChangedReceiver = new NetworkChangedReceiver(
 				new OnNetworkChangedListener() {
 					@Override
 					public void onNetworkChanged(final int isConnectedOrConnecting,
 						final int isConnected, final int activeNetworkMask) {
-							ConnectivityHelper.this.onNetworkChanged(
-								isConnectedOrConnecting, isConnected, activeNetworkMask);
+
+						ConnectivityHelper.this.onNetworkChanged(
+							isConnectedOrConnecting, isConnected, activeNetworkMask);
 					}
 				}
 			);
@@ -90,13 +95,19 @@ public class ConnectivityHelper {
 		final Context context = getContext();
 		if (context != null) {
 			if (BuildCheck.isLollipop()) {
+				final ConnectivityManager manager = requireConnectivityManager();
 				if (mOnNetworkActiveListener != null) {
 					try {
-						requireConnectivityManager().removeDefaultNetworkActiveListener(mOnNetworkActiveListener);
+						manager
+							.removeDefaultNetworkActiveListener(mOnNetworkActiveListener);
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
 					mOnNetworkActiveListener = null;
+				}
+				if (mNetworkCallback != null) {
+					manager.unregisterNetworkCallback(mNetworkCallback);
+					mNetworkCallback = null;
 				}
 			}
 			if (mNetworkChangedReceiver != null) {
@@ -157,10 +168,18 @@ public class ConnectivityHelper {
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private class MyOnNetworkActiveListener implements ConnectivityManager.OnNetworkActiveListener {
+	private class MyOnNetworkActiveListener
+		implements ConnectivityManager.OnNetworkActiveListener {
+
+		private final String TAG = MyOnNetworkActiveListener.class.getSimpleName();
+
+		public MyOnNetworkActiveListener() {
+			if (DEBUG) Log.v(TAG, "Constructor:");
+		}
+
 		@Override
 		public void onNetworkActive() {
-	
+			if (DEBUG) Log.v(TAG, "onNetworkActive:");
 		}
 	}
 	
@@ -176,19 +195,19 @@ public class ConnectivityHelper {
 		@Override
 		public void onAvailable(final Network network) {
 			super.onAvailable(network);
-			if (DEBUG) Log.v(TAG, "onAvailable:");
+			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
 		}
 		
 		@Override
 		public void onLosing(final Network network, final int maxMsToLive) {
 			super.onLosing(network, maxMsToLive);
-			if (DEBUG) Log.v(TAG, "onLosing:");
+			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s),", network));
 		}
 		
 		@Override
 		public void onLost(final Network network) {
 			super.onLost(network);
-			if (DEBUG) Log.v(TAG, "onLost:");
+			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s),", network));
 		}
 		
 		@Override
@@ -200,13 +219,13 @@ public class ConnectivityHelper {
 		@Override
 		public void onCapabilitiesChanged(final Network network, final NetworkCapabilities networkCapabilities) {
 			super.onCapabilitiesChanged(network, networkCapabilities);
-			if (DEBUG) Log.v(TAG, "onCapabilitiesChanged:");
+			if (DEBUG) Log.v(TAG, String.format("onCapabilitiesChanged:Network(%s),", network) + networkCapabilities);
 		}
 		
 		@Override
 		public void onLinkPropertiesChanged(final Network network, final LinkProperties linkProperties) {
 			super.onLinkPropertiesChanged(network, linkProperties);
-			if (DEBUG) Log.v(TAG, "onLinkPropertiesChanged:");
+			if (DEBUG) Log.v(TAG, String.format("onLinkPropertiesChanged:Network(%s),", network) + linkProperties);
 		}
 	}
 	
@@ -222,6 +241,7 @@ public class ConnectivityHelper {
 	
 	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
+		private final String TAG = NetworkChangedReceiver.class.getSimpleName();
 		/**
 		 * The Mobile data connection.  When active, all data traffic
 		 * will use this network type's interface by default
@@ -344,7 +364,8 @@ public class ConnectivityHelper {
 					for (final Network network: networks) {
 						final NetworkInfo info = connMgr.getNetworkInfo(network);
 						if (info != null) {
-							isConnectedOrConnecting |= info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
+							isConnectedOrConnecting |=
+								info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
 							isConnected |= info.isConnected() ? (1 << info.getType()) : 0;
 						}
 					}
@@ -361,7 +382,8 @@ public class ConnectivityHelper {
 			}
 			final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
 			final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
-			if (DEBUG) Log.v(TAG, String.format("onNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
+			if (DEBUG) Log.v(TAG, String.format(
+				"onNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
 				isConnectedOrConnecting, isConnected, activeNetworkMask));
 			// コールバックリスナーを呼び出す
 			callOnNetworkChanged(isConnectedOrConnecting, isConnected, activeNetworkMask);
