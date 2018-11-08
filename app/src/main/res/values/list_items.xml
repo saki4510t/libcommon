@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="item0" translatable="false">NetworkConnection</string>
+	<string name="item1" translatable="false">Dummy</string>
+
+	<string-array name="list_items">
+		<item>@string/item0</item>
+		<item>@string/item1</item>
+	</string-array>
+</resources>
