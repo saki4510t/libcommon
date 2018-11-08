@@ -29,13 +29,16 @@ import android.net.LinkProperties;
 import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
+import android.net.NetworkRequest;
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.lang.ref.WeakReference;
 
@@ -44,7 +47,9 @@ public class ConnectivityHelper {
 	private static final boolean DEBUG = true; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
 	
+	private final Object mSync = new Object();
 	private final WeakReference<Context> mWeakContext;
+	private Handler mAsyncHandler;
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;
 	private ConnectivityManager.NetworkCallback mNetworkCallback;
 	private BroadcastReceiver mNetworkChangedReceiver;
@@ -56,12 +61,22 @@ public class ConnectivityHelper {
 	public ConnectivityHelper(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
+		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		final ConnectivityManager manager = requireConnectivityManager();
 		if (BuildCheck.isLollipop()) {
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
-			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);
+			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 			mNetworkCallback = new MyNetworkCallback();
-			manager.registerDefaultNetworkCallback(mNetworkCallback);
+			// ACCESS_NETWORK_STATEパーミッションが必要
+			if (BuildCheck.isNougat()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
+			} else if (BuildCheck.isOreo()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
+			} else {
+				manager.registerNetworkCallback(new NetworkRequest.Builder()
+					.build(),
+					mNetworkCallback);	// API>=21
+			}
 		} else {
 			mNetworkChangedReceiver = new NetworkChangedReceiver(
 				new OnNetworkChangedListener() {
@@ -117,6 +132,16 @@ public class ConnectivityHelper {
 					Log.w(TAG, e);
 				}
 				mNetworkChangedReceiver = null;
+			}
+		}
+		synchronized (mSync) {
+			if (mAsyncHandler != null) {
+				try {
+					mAsyncHandler.getLooper().quit();
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
+				mAsyncHandler = null;
 			}
 		}
 	}
@@ -195,37 +220,44 @@ public class ConnectivityHelper {
 		@Override
 		public void onAvailable(final Network network) {
 			super.onAvailable(network);
+			// ネットワークの準備ができた時
 			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
-		}
-		
-		@Override
-		public void onLosing(final Network network, final int maxMsToLive) {
-			super.onLosing(network, maxMsToLive);
-			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s),", network));
-		}
-		
-		@Override
-		public void onLost(final Network network) {
-			super.onLost(network);
-			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s),", network));
-		}
-		
-		@Override
-		public void onUnavailable() {
-			super.onUnavailable();
-			if (DEBUG) Log.v(TAG, "onUnavailable:");
 		}
 		
 		@Override
 		public void onCapabilitiesChanged(final Network network, final NetworkCapabilities networkCapabilities) {
 			super.onCapabilitiesChanged(network, networkCapabilities);
+			// 接続が完了してネットワークの状態が変わった時
 			if (DEBUG) Log.v(TAG, String.format("onCapabilitiesChanged:Network(%s),", network) + networkCapabilities);
 		}
 		
 		@Override
 		public void onLinkPropertiesChanged(final Network network, final LinkProperties linkProperties) {
 			super.onLinkPropertiesChanged(network, linkProperties);
+			// ネットワークのリンク状態が変わった時
 			if (DEBUG) Log.v(TAG, String.format("onLinkPropertiesChanged:Network(%s),", network) + linkProperties);
+		}
+
+		@Override
+		public void onLosing(final Network network, final int maxMsToLive) {
+			super.onLosing(network, maxMsToLive);
+			// 接続を失いそうな時
+			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s),", network));
+		}
+		
+		@Override
+		public void onLost(final Network network) {
+			super.onLost(network);
+			// 接続を失った時
+			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s),", network));
+		}
+		
+		@Override
+		public void onUnavailable() {
+			super.onUnavailable();
+			// ネットワークが見つからなかった時
+			// なんだろ？来ない？
+			if (DEBUG) Log.v(TAG, "onUnavailable:");
 		}
 	}
 	
