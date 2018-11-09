@@ -57,42 +57,11 @@ public class ConnectivityHelper {
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
 
-	@SuppressLint("NewApi")
 	public ConnectivityHelper(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
-		final ConnectivityManager manager = requireConnectivityManager();
-		if (BuildCheck.isLollipop()) {
-			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
-			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
-			mNetworkCallback = new MyNetworkCallback();
-			// ACCESS_NETWORK_STATEパーミッションが必要
-			if (BuildCheck.isNougat()) {
-				manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
-			} else if (BuildCheck.isOreo()) {
-				manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
-			} else {
-				manager.registerNetworkCallback(new NetworkRequest.Builder()
-					.build(),
-					mNetworkCallback);	// API>=21
-			}
-		} else {
-			mNetworkChangedReceiver = new NetworkChangedReceiver(
-				new OnNetworkChangedListener() {
-					@Override
-					public void onNetworkChanged(final int isConnectedOrConnecting,
-						final int isConnected, final int activeNetworkMask) {
-
-						ConnectivityHelper.this.onNetworkChanged(
-							isConnectedOrConnecting, isConnected, activeNetworkMask);
-					}
-				}
-			);
-			final IntentFilter intentFilter = new IntentFilter();
-			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
-				context.registerReceiver(mNetworkChangedReceiver, intentFilter);
-		}
+		init(context);
 	}
 	
 	@Override
@@ -188,6 +157,41 @@ public class ConnectivityHelper {
 	}
 
 //================================================================================
+	@SuppressLint("NewApi")
+	private void init(@NonNull final Context context) {
+		final ConnectivityManager manager = requireConnectivityManager();
+		if (BuildCheck.isLollipop()) {
+			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
+			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
+			mNetworkCallback = new MyNetworkCallback();
+			// ACCESS_NETWORK_STATEパーミッションが必要
+			if (BuildCheck.isNougat()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
+			} else if (BuildCheck.isOreo()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
+			} else {
+				manager.registerNetworkCallback(new NetworkRequest.Builder()
+					.build(),
+					mNetworkCallback);	// API>=21
+			}
+		} else {
+			mNetworkChangedReceiver = new NetworkChangedReceiver(
+				new OnNetworkChangedListener() {
+					@Override
+					public void onNetworkChanged(final int isConnectedOrConnecting,
+						final int isConnected, final int activeNetworkMask) {
+		
+						ConnectivityHelper.this.onNetworkChanged(
+							isConnectedOrConnecting, isConnected, activeNetworkMask);
+					}
+				}
+			);
+			final IntentFilter intentFilter = new IntentFilter();
+			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
+				context.registerReceiver(mNetworkChangedReceiver, intentFilter);
+		}
+	}
+	
 	private void onNetworkChanged(final int isConnectedOrConnecting,
 		final int isConnected, final int activeNetworkMask) {
 	}
@@ -225,17 +229,25 @@ public class ConnectivityHelper {
 		}
 		
 		@Override
-		public void onCapabilitiesChanged(final Network network, final NetworkCapabilities networkCapabilities) {
+		public void onCapabilitiesChanged(final Network network,
+			final NetworkCapabilities networkCapabilities) {
+
 			super.onCapabilitiesChanged(network, networkCapabilities);
 			// 接続が完了してネットワークの状態が変わった時
-			if (DEBUG) Log.v(TAG, String.format("onCapabilitiesChanged:Network(%s),", network) + networkCapabilities);
+			if (DEBUG) Log.v(TAG,
+			String.format("onCapabilitiesChanged:Network(%s),", network)
+				+ networkCapabilities);
 		}
 		
 		@Override
-		public void onLinkPropertiesChanged(final Network network, final LinkProperties linkProperties) {
+		public void onLinkPropertiesChanged(final Network network,
+			final LinkProperties linkProperties) {
+
 			super.onLinkPropertiesChanged(network, linkProperties);
 			// ネットワークのリンク状態が変わった時
-			if (DEBUG) Log.v(TAG, String.format("onLinkPropertiesChanged:Network(%s),", network) + linkProperties);
+			if (DEBUG) Log.v(TAG,
+				String.format("onLinkPropertiesChanged:Network(%s),", network)
+				+ linkProperties);
 		}
 
 		@Override
@@ -268,7 +280,9 @@ public class ConnectivityHelper {
 		 * @param activeNetworkMask アクティブなネットワークの選択マスク 接続しているネットワークがなければ0
 		 */
 		public void onNetworkChanged(
-			final int isConnectedOrConnecting, final int isConnected, final int activeNetworkMask);
+			final int isConnectedOrConnecting,
+			final int isConnected,
+			final int activeNetworkMask);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -279,13 +293,15 @@ public class ConnectivityHelper {
 		 * will use this network type's interface by default
 		 * (it has a default route)
 		 */
-		public static final int NETWORK_TYPE_MOBILE = 1 << ConnectivityManager.TYPE_MOBILE;	// 1 << 0
+		public static final int NETWORK_TYPE_MOBILE
+			= 1 << ConnectivityManager.TYPE_MOBILE;	// 1 << 0
 		/**
 		 * The WIFI data connection.  When active, all data traffic
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_WIFI = 1 << ConnectivityManager.TYPE_WIFI;	// 1 << 1
+		public static final int NETWORK_TYPE_WIFI
+			= 1 << ConnectivityManager.TYPE_WIFI;	// 1 << 1
 	
 		/**
 		 * An MMS-specific Mobile data connection.  This network type may use the
@@ -293,7 +309,8 @@ public class ConnectivityHelper {
 		 * one.  This is used by applications needing to talk to the carrier's
 		 * Multimedia Messaging Service servers.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_MMS = 1 << ConnectivityManager.TYPE_MOBILE_MMS;	// 1 << 2
+		public static final int NETWORK_TYPE_MOBILE_MMS
+			= 1 << ConnectivityManager.TYPE_MOBILE_MMS;	// 1 << 2
 	
 		/**
 		 * A SUPL-specific Mobile data connection.  This network type may use the
@@ -301,7 +318,8 @@ public class ConnectivityHelper {
 		 * one.  This is used by applications needing to talk to the carrier's
 		 * Secure User Plane Location servers for help locating the device.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_SUPL = 1 << ConnectivityManager.TYPE_MOBILE_SUPL;	// 1 << 3
+		public static final int NETWORK_TYPE_MOBILE_SUPL
+			= 1 << ConnectivityManager.TYPE_MOBILE_SUPL;	// 1 << 3
 	
 		/**
 		 * A DUN-specific Mobile data connection.  This network type may use the
@@ -309,7 +327,8 @@ public class ConnectivityHelper {
 		 * one.  This is sometimes by the system when setting up an upstream connection
 		 * for tethering so that the carrier is aware of DUN traffic.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_DUN = 1 << ConnectivityManager.TYPE_MOBILE_DUN;	// 1 << 4
+		public static final int NETWORK_TYPE_MOBILE_DUN
+			= 1 << ConnectivityManager.TYPE_MOBILE_DUN;	// 1 << 4
 	
 		/**
 		 * A High Priority Mobile data connection.  This network type uses the
@@ -318,14 +337,16 @@ public class ConnectivityHelper {
 		 * Mobile DNS servers and only IP's explicitly requested via requestRouteToHost
 		 * will route over this interface if no default route exists.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_HIPRI = 1 << ConnectivityManager.TYPE_MOBILE_HIPRI;	// 1 << 5
+		public static final int NETWORK_TYPE_MOBILE_HIPRI
+			= 1 << ConnectivityManager.TYPE_MOBILE_HIPRI;	// 1 << 5
 	
 		/**
 		 * The WiMAX data connection.  When active, all data traffic
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_WIMAX = 1 << ConnectivityManager.TYPE_WIMAX;	// 1 << 6
+		public static final int NETWORK_TYPE_WIMAX
+			= 1 << ConnectivityManager.TYPE_WIMAX;	// 1 << 6
 	
 		/**
 		 * The Bluetooth data connection.  When active, all data traffic
@@ -333,14 +354,16 @@ public class ConnectivityHelper {
 		 * (it has a default route).
 		 * XXX 単にBluetooth機器を検出しただけじゃこの値は来ない, Bluetooth経由のネットワークに接続しないとダメみたい
 		 */
-		public static final int NETWORK_TYPE_BLUETOOTH = 1 << ConnectivityManager.TYPE_BLUETOOTH;	// 1 << 7
+		public static final int NETWORK_TYPE_BLUETOOTH
+			= 1 << ConnectivityManager.TYPE_BLUETOOTH;	// 1 << 7
 	
 		/**
 		 * The Ethernet data connection.  When active, all data traffic
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_ETHERNET = 1 << ConnectivityManager.TYPE_ETHERNET;	// 1 << 9
+		public static final int NETWORK_TYPE_ETHERNET
+			= 1 << ConnectivityManager.TYPE_ETHERNET;	// 1 << 9
 
 		/** ネットワーク種とそのビットマスク対の配列 */
 		private static final int[] NETWORKS;
