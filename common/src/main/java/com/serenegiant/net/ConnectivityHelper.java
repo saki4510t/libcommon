@@ -558,8 +558,8 @@ public class ConnectivityHelper {
 		final boolean isWiFi;
 		if (BuildCheck.isOreo()) {
 			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
-				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)	// API>=21
-				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE);	// API>=26
+				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
+//				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE);	// API>=26 これはWi-Fi端末間での近接情報の発見機能
 		} else {
 			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
 				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
