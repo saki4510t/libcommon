@@ -177,17 +177,7 @@ public class ConnectivityHelper {
 					mNetworkCallback);	// API>=21
 			}
 		} else {
-			mNetworkChangedReceiver = new NetworkChangedReceiver(
-				new OnNetworkChangedListener() {
-					@Override
-					public void onNetworkChanged(final int isConnectedOrConnecting,
-						final int isConnected, final int activeNetworkMask) {
-		
-						ConnectivityHelper.this.onNetworkChanged(
-							isConnectedOrConnecting, isConnected, activeNetworkMask);
-					}
-				}
-			);
+			mNetworkChangedReceiver = new NetworkChangedReceiver(this);
 			final IntentFilter intentFilter = new IntentFilter();
 			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
 				requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
@@ -273,18 +263,6 @@ public class ConnectivityHelper {
 			// なんだろ？来ない？
 			if (DEBUG) Log.v(TAG, "onUnavailable:");
 		}
-	}
-	
-	private interface OnNetworkChangedListener {
-		/**
-		 * @param isConnectedOrConnecting 接続中かread/write可能
-		 * @param isConnected read/write可能
-		 * @param activeNetworkMask アクティブなネットワークの選択マスク 接続しているネットワークがなければ0
-		 */
-		public void onNetworkChanged(
-			final int isConnectedOrConnecting,
-			final int isConnected,
-			final int activeNetworkMask);
 	}
 	
 	@SuppressWarnings("deprecation")
@@ -385,9 +363,9 @@ public class ConnectivityHelper {
 		}
 
 		@NonNull
-		private final OnNetworkChangedListener mListener;
-		public NetworkChangedReceiver(@NonNull final OnNetworkChangedListener listener) {
-			mListener = listener;
+		private final ConnectivityHelper mParent;
+		public NetworkChangedReceiver(@NonNull final ConnectivityHelper parent) {
+			mParent = parent;
 		}
 	
 		@Override
@@ -443,19 +421,7 @@ public class ConnectivityHelper {
 				"onNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
 				isConnectedOrConnecting, isConnected, activeNetworkMask));
 			// コールバックリスナーを呼び出す
-			callOnNetworkChanged(isConnectedOrConnecting, isConnected, activeNetworkMask);
-		}
-
-		private void callOnNetworkChanged(final int isConnectedOrConnecting,
-			final int isConnected, final int activeNetworkInfo) {
-
-			if (mListener != null) {
-				try {
-					mListener.onNetworkChanged(isConnectedOrConnecting, isConnected, activeNetworkInfo);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-			}
+			mParent.onNetworkChanged(isConnectedOrConnecting, isConnected, activeNetworkMask);
 		}
 	}
 
