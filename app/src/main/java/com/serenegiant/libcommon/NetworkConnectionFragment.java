@@ -3,6 +3,7 @@ package com.serenegiant.libcommon;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,6 +56,12 @@ public class NetworkConnectionFragment extends BaseFragment {
 	@Override
 	protected void internalOnResume() {
 		super.internalOnResume();
+		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:"
+			+ ConnectivityHelper.isWifiNetworkReachable(requireContext()));
+		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:"
+			+ ConnectivityHelper.isMobileNetworkReachable(requireContext()));
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:"
+			+ ConnectivityHelper.isNetworkReachable(requireContext()));
 	}
 	
 	@Override
