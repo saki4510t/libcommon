@@ -55,7 +55,8 @@ public class ConnectivityHelper {
 	private BroadcastReceiver mNetworkChangedReceiver;
 
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
-	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE = "android.net.conn.CONNECTIVITY_CHANGE";
+	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
+		= "android.net.conn.CONNECTIVITY_CHANGE";
 
 	public ConnectivityHelper(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "Constructor:");
