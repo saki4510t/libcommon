@@ -449,4 +449,28 @@ public final class BuildCheck {
 	public static boolean isOreoMR1() {
 		return check((Build.VERSION_CODES.O_MR1));
 	}
+	
+	/**
+	 * おっ！ぱい API>=28
+	 * @return
+	 */
+	public static boolean isP() {
+		return check((Build.VERSION_CODES.P));
+	}
+
+	/**
+	 * おっ！ぱい API>=28
+	 * @return
+	 */
+	public static boolean isPie() {
+		return check((Build.VERSION_CODES.P));
+	}
+
+	/**
+	 * おっ！ぱい API>=28
+	 * @return
+	 */
+	public static boolean isAndroid9() {
+		return check((Build.VERSION_CODES.P));
+	}
 }
