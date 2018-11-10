@@ -43,7 +43,7 @@ public class NetworkConnectionFragment extends BaseFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (mHelper == null) {
-			mHelper = new ConnectivityHelper(requireContext());
+			mHelper = new ConnectivityHelper(requireContext(), mConnectivityCallback);
 		}
 	}
 	
@@ -76,4 +76,19 @@ public class NetworkConnectionFragment extends BaseFragment {
 		}
 		super.internalRelease();
 	}
+
+	private final ConnectivityHelper.ConnectivityCallback
+		mConnectivityCallback = new ConnectivityHelper.ConnectivityCallback() {
+
+		@Override
+		public void onNetworkChanged(final int activeNetworkType) {
+			if (DEBUG) Log.v(TAG, "onNetworkChanged:"
+				+ ConnectivityHelper.getNetworkTypeString(activeNetworkType));
+		}
+		
+		@Override
+		public void onError(final Throwable t) {
+			Log.w(TAG, t);
+		}
+	};
 }

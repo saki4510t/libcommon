@@ -34,33 +34,53 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.lang.ref.WeakReference;
+import java.util.Locale;
 
 @SuppressLint("MissingPermission")
 public class ConnectivityHelper {
 	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
 	
+	public static final int NETWORK_TYPE_NON = 0;
+	public static final int NETWORK_TYPE_MOBILE = 1;
+	public static final int NETWORK_TYPE_WIFI = 1 << 1;
+	public static final int NETWORK_TYPE_BLUETOOTH = 1 << 7;
+	public static final int NETWORK_TYPE_ETHERNET = 1 << 9;
+
+	public interface ConnectivityCallback {
+		/**
+		 * @param activeNetworkType
+		 */
+		public void onNetworkChanged(final int activeNetworkType);
+		public void onError(final Throwable t);
+	}
+
 	private final Object mSync = new Object();
 	private final WeakReference<Context> mWeakContext;
+	@NonNull
+	private final ConnectivityCallback mCallback;
 	private Handler mAsyncHandler;
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;
 	private ConnectivityManager.NetworkCallback mNetworkCallback;
 	private BroadcastReceiver mNetworkChangedReceiver;
+	private int mActiveNetworkType = NETWORK_TYPE_NON;
 
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
 		= "android.net.conn.CONNECTIVITY_CHANGE";
 
-	public ConnectivityHelper(@NonNull final Context context) {
+	public ConnectivityHelper(@NonNull final Context context,
+		@NonNull final ConnectivityCallback callback) {
+
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
+		mCallback = callback;
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		init();
 	}
@@ -77,6 +97,7 @@ public class ConnectivityHelper {
 	@SuppressLint("NewApi")
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+		updateActiveNetwork(NETWORK_TYPE_NON);
 		final Context context = getContext();
 		if (context != null) {
 			if (BuildCheck.isLollipop()) {
@@ -107,6 +128,7 @@ public class ConnectivityHelper {
 		synchronized (mSync) {
 			if (mAsyncHandler != null) {
 				try {
+					mAsyncHandler.removeCallbacksAndMessages(null);
 					mAsyncHandler.getLooper().quit();
 				} catch (final Exception e) {
 					Log.w(TAG, e);
@@ -157,6 +179,11 @@ public class ConnectivityHelper {
 		return connManager;
 	}
 
+	public int getActiveNetworkType() {
+		synchronized (mSync) {
+			return mActiveNetworkType;
+		}
+	}
 //================================================================================
 	@SuppressLint("NewApi")
 	private void init() {
@@ -184,8 +211,90 @@ public class ConnectivityHelper {
 		}
 	}
 	
-	private void onNetworkChanged(final int isConnectedOrConnecting,
-		final int isConnected, final int activeNetworkMask) {
+	private void callOnNetworkChanged(final int activeNetworkType) {
+
+		synchronized (mSync) {
+			if (mAsyncHandler != null) {
+				mAsyncHandler.post(() -> {
+					try {
+						mCallback.onNetworkChanged(activeNetworkType);
+					} catch (final Exception e) {
+						callOnError(e);
+					}
+				});
+			} else {
+				Log.w(TAG, "already released?");
+			}
+		}
+	}
+
+	private void callOnError(final Throwable t) {
+		synchronized (mSync) {
+			if (mAsyncHandler != null) {
+				mAsyncHandler.post(() -> {
+					try {
+						mCallback.onError(t);
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
+				});
+			} else {
+				Log.w(TAG, "already released?");
+			}
+		}
+	}
+
+//	@SuppressLint("NewApi")
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private void updateActiveNetwork(final Network network) {
+		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
+	
+		final ConnectivityManager manager = requireConnectivityManager();
+		final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+
+		int activeNetworkType = NETWORK_TYPE_NON;
+		if (isWifiNetworkReachable(capabilities, info)) {
+			activeNetworkType = NETWORK_TYPE_WIFI;
+		} else if (isMobileNetworkReachable(capabilities, info)) {
+			activeNetworkType = NETWORK_TYPE_MOBILE;
+		} else if (isBluetoothNetworkReachable(capabilities, info)) {
+			activeNetworkType = NETWORK_TYPE_BLUETOOTH;
+		} else if (isNetworkReachable(capabilities, info)) {
+			activeNetworkType = NETWORK_TYPE_ETHERNET;
+		}
+		updateActiveNetwork(activeNetworkType);
+	}
+
+	private void updateActiveNetwork(@Nullable final NetworkInfo activeNetworkInfo) {
+		final int type = (activeNetworkInfo != null)
+			&& (activeNetworkInfo.isConnectedOrConnecting())
+				? activeNetworkInfo.getType() : -1/*TYPE_NON*/;
+		int activeNetworkType = NETWORK_TYPE_NON;
+		switch (type) {
+		case -1:
+			break;
+		case ConnectivityManager.TYPE_MOBILE:
+			activeNetworkType = NETWORK_TYPE_MOBILE;
+			break;
+		case ConnectivityManager.TYPE_WIFI:
+			activeNetworkType = NETWORK_TYPE_WIFI;
+			break;
+		case ConnectivityManager.TYPE_ETHERNET:
+			activeNetworkType = NETWORK_TYPE_ETHERNET;
+			break;
+		}
+		updateActiveNetwork(activeNetworkType);
+	}
+	
+	private void updateActiveNetwork(final int activeNetworkType) {
+		synchronized (mSync) {
+			if (mActiveNetworkType != activeNetworkType) {
+				final int prev = mActiveNetworkType;
+				mActiveNetworkType = activeNetworkType;
+				callOnNetworkChanged(activeNetworkType);
+			}
+		}
 	}
 
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -218,6 +327,7 @@ public class ConnectivityHelper {
 			super.onAvailable(network);
 			// ネットワークの準備ができた時
 			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
+			updateActiveNetwork(network);
 		}
 		
 		@Override
@@ -229,6 +339,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG,
 			String.format("onCapabilitiesChanged:Network(%s),", network)
 				+ networkCapabilities);
+			updateActiveNetwork(network);
 		}
 		
 		@Override
@@ -254,6 +365,7 @@ public class ConnectivityHelper {
 			super.onLost(network);
 			// 接続を失った時
 			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s),", network));
+			updateActiveNetwork(network);
 		}
 		
 		@Override
@@ -262,6 +374,7 @@ public class ConnectivityHelper {
 			// ネットワークが見つからなかった時
 			// なんだろ？来ない？
 			if (DEBUG) Log.v(TAG, "onUnavailable:");
+			updateActiveNetwork(NETWORK_TYPE_NON);
 		}
 	}
 	
@@ -273,14 +386,14 @@ public class ConnectivityHelper {
 		 * will use this network type's interface by default
 		 * (it has a default route)
 		 */
-		public static final int NETWORK_TYPE_MOBILE
+		private static final int TYPE_MASK_MOBILE
 			= 1 << ConnectivityManager.TYPE_MOBILE;	// 1 << 0
 		/**
 		 * The WIFI data connection.  When active, all data traffic
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_WIFI
+		private static final int TYPE_MASK_WIFI
 			= 1 << ConnectivityManager.TYPE_WIFI;	// 1 << 1
 	
 		/**
@@ -289,7 +402,7 @@ public class ConnectivityHelper {
 		 * one.  This is used by applications needing to talk to the carrier's
 		 * Multimedia Messaging Service servers.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_MMS
+		private static final int TYPE_MASK_MOBILE_MMS
 			= 1 << ConnectivityManager.TYPE_MOBILE_MMS;	// 1 << 2
 	
 		/**
@@ -298,7 +411,7 @@ public class ConnectivityHelper {
 		 * one.  This is used by applications needing to talk to the carrier's
 		 * Secure User Plane Location servers for help locating the device.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_SUPL
+		private static final int TYPE_MASK_MOBILE_SUPL
 			= 1 << ConnectivityManager.TYPE_MOBILE_SUPL;	// 1 << 3
 	
 		/**
@@ -307,7 +420,7 @@ public class ConnectivityHelper {
 		 * one.  This is sometimes by the system when setting up an upstream connection
 		 * for tethering so that the carrier is aware of DUN traffic.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_DUN
+		private static final int TYPE_MASK_MOBILE_DUN
 			= 1 << ConnectivityManager.TYPE_MOBILE_DUN;	// 1 << 4
 	
 		/**
@@ -317,7 +430,7 @@ public class ConnectivityHelper {
 		 * Mobile DNS servers and only IP's explicitly requested via requestRouteToHost
 		 * will route over this interface if no default route exists.
 		 */
-		public static final int NETWORK_TYPE_MOBILE_HIPRI
+		private static final int TYPE_MASK_MOBILE_HIPRI
 			= 1 << ConnectivityManager.TYPE_MOBILE_HIPRI;	// 1 << 5
 	
 		/**
@@ -325,7 +438,7 @@ public class ConnectivityHelper {
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_WIMAX
+		private static final int TYPE_MASK_WIMAX
 			= 1 << ConnectivityManager.TYPE_WIMAX;	// 1 << 6
 	
 		/**
@@ -334,7 +447,7 @@ public class ConnectivityHelper {
 		 * (it has a default route).
 		 * XXX 単にBluetooth機器を検出しただけじゃこの値は来ない, Bluetooth経由のネットワークに接続しないとダメみたい
 		 */
-		public static final int NETWORK_TYPE_BLUETOOTH
+		private static final int TYPE_MASK_BLUETOOTH
 			= 1 << ConnectivityManager.TYPE_BLUETOOTH;	// 1 << 7
 	
 		/**
@@ -342,23 +455,23 @@ public class ConnectivityHelper {
 		 * will use this network type's interface by default
 		 * (it has a default route).
 		 */
-		public static final int NETWORK_TYPE_ETHERNET
+		private static final int TYPE_MASK_ETHERNET
 			= 1 << ConnectivityManager.TYPE_ETHERNET;	// 1 << 9
 
 		/** ネットワーク種とそのビットマスク対の配列 */
 		private static final int[] NETWORKS;
 		static {
 			NETWORKS = new int[] {
-				ConnectivityManager.TYPE_MOBILE, NETWORK_TYPE_MOBILE,
-				ConnectivityManager.TYPE_WIFI, NETWORK_TYPE_WIFI,
-				ConnectivityManager.TYPE_MOBILE_MMS, NETWORK_TYPE_MOBILE_MMS,
-				ConnectivityManager.TYPE_MOBILE_SUPL, NETWORK_TYPE_MOBILE_SUPL,
-				ConnectivityManager.TYPE_MOBILE_DUN, NETWORK_TYPE_MOBILE_DUN,
-				ConnectivityManager.TYPE_MOBILE_HIPRI, NETWORK_TYPE_MOBILE_HIPRI,
-				ConnectivityManager.TYPE_WIMAX, NETWORK_TYPE_WIMAX,
-				ConnectivityManager.TYPE_BLUETOOTH, NETWORK_TYPE_BLUETOOTH,
-				ConnectivityManager.TYPE_ETHERNET, NETWORK_TYPE_ETHERNET,
-//				ConnectivityManager.TYPE_VPN, NETWORK_TYPE_VPN,
+				ConnectivityManager.TYPE_MOBILE, TYPE_MASK_MOBILE,
+				ConnectivityManager.TYPE_WIFI, TYPE_MASK_WIFI,
+				ConnectivityManager.TYPE_MOBILE_MMS, TYPE_MASK_MOBILE_MMS,
+				ConnectivityManager.TYPE_MOBILE_SUPL, TYPE_MASK_MOBILE_SUPL,
+				ConnectivityManager.TYPE_MOBILE_DUN, TYPE_MASK_MOBILE_DUN,
+				ConnectivityManager.TYPE_MOBILE_HIPRI, TYPE_MASK_MOBILE_HIPRI,
+				ConnectivityManager.TYPE_WIMAX, TYPE_MASK_WIMAX,
+				ConnectivityManager.TYPE_BLUETOOTH, TYPE_MASK_BLUETOOTH,
+				ConnectivityManager.TYPE_ETHERNET, TYPE_MASK_ETHERNET,
+//				ConnectivityManager.TYPE_VPN, TYPE_MASK_VPN,
 			};
 		}
 
@@ -384,44 +497,42 @@ public class ConnectivityHelper {
 		 */
 		@SuppressLint("NewApi")
 		private void onReceiveGlobal(final Context context, final Intent intent) {
-			final ConnectivityManager connMgr
+			final ConnectivityManager manager
 				= (ConnectivityManager) context
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
-			final LocalBroadcastManager broadcastManager
-				= LocalBroadcastManager.getInstance(context.getApplicationContext());
 	
-			int isConnectedOrConnecting = 0;
-			int isConnected = 0;
-	
-			if (BuildCheck.isAndroid5()) {	// API>=21
-				final Network[] networks = connMgr.getAllNetworks();
-				if (networks != null) {
-					for (final Network network: networks) {
-						final NetworkInfo info = connMgr.getNetworkInfo(network);
-						if (info != null) {
-							isConnectedOrConnecting |=
-								info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
-							isConnected |= info.isConnected() ? (1 << info.getType()) : 0;
-						}
-					}
-				}
-			} else {
-				final int n = NETWORKS.length;
-				for (int i = 0; i < n; i += 2) {
-					final NetworkInfo info = connMgr.getNetworkInfo(NETWORKS[i]);
-					if (info != null) {
-						isConnectedOrConnecting |= info.isConnectedOrConnecting() ? NETWORKS[i + 1] : 0;
-						isConnected |= info.isConnected() ? NETWORKS[i + 1] : 0;
-					}
-				}
-			}
-			final NetworkInfo activeNetworkInfo = connMgr.getActiveNetworkInfo();
-			final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
-			if (DEBUG) Log.v(TAG, String.format(
-				"onNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
-				isConnectedOrConnecting, isConnected, activeNetworkMask));
+//			int isConnectedOrConnecting = 0;
+//			int isConnected = 0;
+//
+//			if (BuildCheck.isAndroid5()) {	// API>=21
+//				final Network[] networks = manager.getAllNetworks();
+//				if (networks != null) {
+//					for (final Network network: networks) {
+//						final NetworkInfo info = manager.getNetworkInfo(network);
+//						if (info != null) {
+//							isConnectedOrConnecting |=
+//								info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
+//							isConnected |= info.isConnected() ? (1 << info.getType()) : 0;
+//						}
+//					}
+//				}
+//			} else {
+//				final int n = NETWORKS.length;
+//				for (int i = 0; i < n; i += 2) {
+//					final NetworkInfo info = manager.getNetworkInfo(NETWORKS[i]);
+//					if (info != null) {
+//						isConnectedOrConnecting |= info.isConnectedOrConnecting() ? NETWORKS[i + 1] : 0;
+//						isConnected |= info.isConnected() ? NETWORKS[i + 1] : 0;
+//					}
+//				}
+//			}
+			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
+//			final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
+//			if (DEBUG) Log.v(TAG, String.format(
+//				"callOnNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
+//				isConnectedOrConnecting, isConnected, activeNetworkMask));
 			// コールバックリスナーを呼び出す
-			mParent.onNetworkChanged(isConnectedOrConnecting, isConnected, activeNetworkMask);
+			mParent.updateActiveNetwork(activeNetworkInfo);
 		}
 	}
 
@@ -583,6 +694,16 @@ public class ConnectivityHelper {
 		return isMobile && isNetworkReachable(capabilities, info);
 	}
 
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private static boolean isBluetoothNetworkReachable(
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final NetworkInfo info) {
+
+		return
+			capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)// API>=21
+				&& isNetworkReachable(capabilities, info);
+	}
+
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isNetworkReachable(
@@ -613,4 +734,22 @@ public class ConnectivityHelper {
 			+ ",FOREGROUND=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));
 		return isConnectedOrConnecting && hasCapability;
 	}
+
+	public static String getNetworkTypeString(final int networkType) {
+		switch (networkType) {
+		case NETWORK_TYPE_NON:
+			return "NON";
+		case NETWORK_TYPE_MOBILE:
+			return "MOBILE";
+		case NETWORK_TYPE_WIFI:
+			return "WIFI";
+		case NETWORK_TYPE_BLUETOOTH:
+			return "BLUETOOTH";
+		case NETWORK_TYPE_ETHERNET:
+			return "ETHERNET";
+		default:
+			return String.format(Locale.US, "UNKNOWN(%d)", networkType);
+		}
+	}
+
 }
