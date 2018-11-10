@@ -44,7 +44,7 @@ import java.lang.ref.WeakReference;
 
 @SuppressLint("MissingPermission")
 public class ConnectivityHelper {
-	private static final boolean DEBUG = true; // FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
 	
 	private final Object mSync = new Object();
@@ -61,7 +61,7 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
-		init(context);
+		init();
 	}
 	
 	@Override
@@ -158,7 +158,8 @@ public class ConnectivityHelper {
 
 //================================================================================
 	@SuppressLint("NewApi")
-	private void init(@NonNull final Context context) {
+	private void init() {
+		if (DEBUG) Log.v(TAG, "init:");
 		final ConnectivityManager manager = requireConnectivityManager();
 		if (BuildCheck.isLollipop()) {
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
@@ -188,7 +189,7 @@ public class ConnectivityHelper {
 			);
 			final IntentFilter intentFilter = new IntentFilter();
 			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
-				context.registerReceiver(mNetworkChangedReceiver, intentFilter);
+				requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
 		}
 	}
 	
@@ -455,5 +456,194 @@ public class ConnectivityHelper {
 				}
 			}
 		}
+	}
+
+//================================================================================
+// ここ以下はポーリングでネットワーク状態をチェックするためのスタティックメソッド
+//================================================================================
+	/**
+	 * WiFiネットワークが使用可能かどうかを返す
+	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static boolean isWifiNetworkReachable(@NonNull final Context context) {
+		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:");
+		final ConnectivityManager manager
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (BuildCheck.isLollipop()) {
+			if (BuildCheck.isMarshmallow()) {
+				final Network network = manager.getActiveNetwork();	// API>=23
+				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+				return isWifiNetworkReachable(capabilities, info);
+			} else {
+				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+				for (final Network network: allNetworks) {
+					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+					if (isWifiNetworkReachable(capabilities, info)) {
+						return true;
+					}
+				}
+			}
+		} else {
+			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
+			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
+				final int type = activeNetworkInfo.getType();
+				return (type == ConnectivityManager.TYPE_WIFI)
+					|| (type == ConnectivityManager.TYPE_WIMAX)
+					|| (type == ConnectivityManager.TYPE_BLUETOOTH)
+					|| (type == ConnectivityManager.TYPE_ETHERNET);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * モバイルネットワークが使用可能かどうかを返す
+	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static boolean isMobileNetworkReachable(@NonNull final Context context) {
+		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:");
+		final ConnectivityManager manager
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		if (BuildCheck.isLollipop()) {
+			if (BuildCheck.isMarshmallow()) {
+				final Network network = manager.getActiveNetwork();	// API>=23
+				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+				return isMobileNetworkReachable(capabilities, info);
+			} else {
+				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+				for (final Network network: allNetworks) {
+					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+					if (isMobileNetworkReachable(capabilities, info)) {
+						return true;
+					}
+				}
+			}
+		} else {
+			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
+			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
+				final int type = activeNetworkInfo.getType();
+				return (type == ConnectivityManager.TYPE_MOBILE);
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * ネットワークが使用可能かどうかをチェック
+	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
+	 */
+	@SuppressLint("NewApi")
+	public static boolean isNetworkReachable(@NonNull final Context context) {
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:");
+		final ConnectivityManager manager
+			= (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+		if (BuildCheck.isLollipop()) {
+			if (BuildCheck.isMarshmallow()) {
+				final Network network = manager.getActiveNetwork();	// API>=23
+				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+				return isNetworkReachable(capabilities, info);
+			} else {
+				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+				for (final Network network: allNetworks) {
+					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					if (isNetworkReachable(capabilities, info)) {
+						return true;
+					}
+				}
+			}
+			return false;
+		} else {
+			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
+			return (activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting());
+		}
+	}
+
+	@SuppressLint("NewApi")
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private static boolean isWifiNetworkReachable(
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final NetworkInfo info) {
+
+		final boolean isWiFi;
+		if (BuildCheck.isOreo()) {
+			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
+				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)	// API>=21
+				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE);	// API>=26
+		} else {
+			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
+				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
+		}
+		return isWiFi && isNetworkReachable(capabilities, info);
+	}
+	
+	@SuppressLint("NewApi")
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private static boolean isMobileNetworkReachable(
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final NetworkInfo info) {
+
+		final boolean isMobile;
+		if (BuildCheck.isOreoMR1()) {
+			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)// API>=21
+				|| capabilities.hasTransport(NetworkCapabilities.	TRANSPORT_LOWPAN);	// API>=27
+		} else {
+			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);// API>=21
+		}
+		return isMobile && isNetworkReachable(capabilities, info);
+	}
+
+	@SuppressLint("NewApi")
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private static boolean isNetworkReachable(
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final NetworkInfo info) {
+
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:capabilities=" + capabilities);
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:info=" + info);
+		final NetworkInfo.DetailedState state = info.getDetailedState();
+		final boolean isConnectedOrConnecting
+			= (state == NetworkInfo.DetailedState.CONNECTED)
+				|| (state == NetworkInfo.DetailedState.CONNECTING);
+		final boolean hasCapability;
+		if (BuildCheck.isPie()) {
+			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
+				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)			// API>=23
+				&& (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)	// API>=28
+					|| capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));	// API>=28
+		} else if (BuildCheck.isMarshmallow()) {
+			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
+				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);		// API>=23
+		} else {
+			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);// API>=21
+		}
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:isConnectedOrConnecting="
+			+ isConnectedOrConnecting + ",hasCapability=" + hasCapability
+			+ ",NOT_SUSPENDED=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+			+ ",FOREGROUND=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));
+		return isConnectedOrConnecting && hasCapability;
 	}
 }
