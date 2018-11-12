@@ -384,99 +384,6 @@ public class ConnectivityHelper {
 	
 	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
-		/**
-		 * The Mobile data connection.  When active, all data traffic
-		 * will use this network type's interface by default
-		 * (it has a default route)
-		 */
-		private static final int TYPE_MASK_MOBILE
-			= 1 << ConnectivityManager.TYPE_MOBILE;	// 1 << 0
-		/**
-		 * The WIFI data connection.  When active, all data traffic
-		 * will use this network type's interface by default
-		 * (it has a default route).
-		 */
-		private static final int TYPE_MASK_WIFI
-			= 1 << ConnectivityManager.TYPE_WIFI;	// 1 << 1
-	
-		/**
-		 * An MMS-specific Mobile data connection.  This network type may use the
-		 * same network interface as TYPE_MOBILE or it may use a different
-		 * one.  This is used by applications needing to talk to the carrier's
-		 * Multimedia Messaging Service servers.
-		 */
-		private static final int TYPE_MASK_MOBILE_MMS
-			= 1 << ConnectivityManager.TYPE_MOBILE_MMS;	// 1 << 2
-	
-		/**
-		 * A SUPL-specific Mobile data connection.  This network type may use the
-		 * same network interface as TYPE_MOBILE or it may use a different
-		 * one.  This is used by applications needing to talk to the carrier's
-		 * Secure User Plane Location servers for help locating the device.
-		 */
-		private static final int TYPE_MASK_MOBILE_SUPL
-			= 1 << ConnectivityManager.TYPE_MOBILE_SUPL;	// 1 << 3
-	
-		/**
-		 * A DUN-specific Mobile data connection.  This network type may use the
-		 * same network interface as TYPE_MOBILE or it may use a different
-		 * one.  This is sometimes by the system when setting up an upstream connection
-		 * for tethering so that the carrier is aware of DUN traffic.
-		 */
-		private static final int TYPE_MASK_MOBILE_DUN
-			= 1 << ConnectivityManager.TYPE_MOBILE_DUN;	// 1 << 4
-	
-		/**
-		 * A High Priority Mobile data connection.  This network type uses the
-		 * same network interface as TYPE_MOBILE but the routing setup
-		 * is different.  Only requesting processes will have access to the
-		 * Mobile DNS servers and only IP's explicitly requested via requestRouteToHost
-		 * will route over this interface if no default route exists.
-		 */
-		private static final int TYPE_MASK_MOBILE_HIPRI
-			= 1 << ConnectivityManager.TYPE_MOBILE_HIPRI;	// 1 << 5
-	
-		/**
-		 * The WiMAX data connection.  When active, all data traffic
-		 * will use this network type's interface by default
-		 * (it has a default route).
-		 */
-		private static final int TYPE_MASK_WIMAX
-			= 1 << ConnectivityManager.TYPE_WIMAX;	// 1 << 6
-	
-		/**
-		 * The Bluetooth data connection.  When active, all data traffic
-		 * will use this network type's interface by default
-		 * (it has a default route).
-		 * XXX 単にBluetooth機器を検出しただけじゃこの値は来ない, Bluetooth経由のネットワークに接続しないとダメみたい
-		 */
-		private static final int TYPE_MASK_BLUETOOTH
-			= 1 << ConnectivityManager.TYPE_BLUETOOTH;	// 1 << 7
-	
-		/**
-		 * The Ethernet data connection.  When active, all data traffic
-		 * will use this network type's interface by default
-		 * (it has a default route).
-		 */
-		private static final int TYPE_MASK_ETHERNET
-			= 1 << ConnectivityManager.TYPE_ETHERNET;	// 1 << 9
-
-		/** ネットワーク種とそのビットマスク対の配列 */
-		private static final int[] NETWORKS;
-		static {
-			NETWORKS = new int[] {
-				ConnectivityManager.TYPE_MOBILE, TYPE_MASK_MOBILE,
-				ConnectivityManager.TYPE_WIFI, TYPE_MASK_WIFI,
-				ConnectivityManager.TYPE_MOBILE_MMS, TYPE_MASK_MOBILE_MMS,
-				ConnectivityManager.TYPE_MOBILE_SUPL, TYPE_MASK_MOBILE_SUPL,
-				ConnectivityManager.TYPE_MOBILE_DUN, TYPE_MASK_MOBILE_DUN,
-				ConnectivityManager.TYPE_MOBILE_HIPRI, TYPE_MASK_MOBILE_HIPRI,
-				ConnectivityManager.TYPE_WIMAX, TYPE_MASK_WIMAX,
-				ConnectivityManager.TYPE_BLUETOOTH, TYPE_MASK_BLUETOOTH,
-				ConnectivityManager.TYPE_ETHERNET, TYPE_MASK_ETHERNET,
-//				ConnectivityManager.TYPE_VPN, TYPE_MASK_VPN,
-			};
-		}
 		private static final String TAG = NetworkChangedReceiver.class.getSimpleName();
 
 		@NonNull
@@ -505,39 +412,8 @@ public class ConnectivityHelper {
 				= (ConnectivityManager) context
 					.getSystemService(Context.CONNECTIVITY_SERVICE);
 	
-//			int isConnectedOrConnecting = 0;
-//			int isConnected = 0;
-//
-//			if (BuildCheck.isAndroid5()) {	// API>=21
-//				final Network[] networks = manager.getAllNetworks();
-//				if (networks != null) {
-//					for (final Network network: networks) {
-//						final NetworkInfo info = manager.getNetworkInfo(network);
-//						if (info != null) {
-//							isConnectedOrConnecting |=
-//								info.isConnectedOrConnecting() ? (1 << info.getType()) : 0;
-//							isConnected |= info.isConnected() ? (1 << info.getType()) : 0;
-//						}
-//					}
-//				}
-//			} else {
-//				final int n = NETWORKS.length;
-//				for (int i = 0; i < n; i += 2) {
-//					final NetworkInfo info = manager.getNetworkInfo(NETWORKS[i]);
-//					if (info != null) {
-//						isConnectedOrConnecting |= info.isConnectedOrConnecting() ? NETWORKS[i + 1] : 0;
-//						isConnected |= info.isConnected() ? NETWORKS[i + 1] : 0;
-//					}
-//				}
-//			}
-			@Nullable
-			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
-//			final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
-//			if (DEBUG) Log.v(TAG, String.format(
-//				"callOnNetworkChanged:isConnectedOrConnecting=%08x,isConnected=%08x,activeNetworkMask=%08x",
-//				isConnectedOrConnecting, isConnected, activeNetworkMask));
 			// コールバックリスナーを呼び出す
-			mParent.updateActiveNetwork(activeNetworkInfo);
+			mParent.updateActiveNetwork(manager.getActiveNetworkInfo());
 		}
 	}
 
