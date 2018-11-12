@@ -34,6 +34,7 @@ import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresPermission;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
@@ -42,7 +43,6 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 
-@SuppressLint("MissingPermission")
 public class ConnectivityHelper {
 	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
@@ -75,6 +75,7 @@ public class ConnectivityHelper {
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
 		= "android.net.conn.CONNECTIVITY_CHANGE";
 
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public ConnectivityHelper(@NonNull final Context context,
 		@NonNull final ConnectivityCallback callback) {
 
@@ -105,14 +106,14 @@ public class ConnectivityHelper {
 				if (mOnNetworkActiveListener != null) {
 					try {
 						manager
-							.removeDefaultNetworkActiveListener(mOnNetworkActiveListener);
+							.removeDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
 					mOnNetworkActiveListener = null;
 				}
 				if (mNetworkCallback != null) {
-					manager.unregisterNetworkCallback(mNetworkCallback);
+					manager.unregisterNetworkCallback(mNetworkCallback);	// API>=21
 					mNetworkCallback = null;
 				}
 			}
@@ -186,6 +187,7 @@ public class ConnectivityHelper {
 	}
 //================================================================================
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	private void init() {
 		if (DEBUG) Log.v(TAG, "init:");
 		final ConnectivityManager manager = requireConnectivityManager();
@@ -244,7 +246,7 @@ public class ConnectivityHelper {
 		}
 	}
 
-//	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void updateActiveNetwork(final Network network) {
 		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
@@ -326,6 +328,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "Constructor:");
 		}
 		
+		@SuppressLint("MissingPermission")
 		@Override
 		public void onAvailable(final Network network) {
 			super.onAvailable(network);
@@ -334,6 +337,7 @@ public class ConnectivityHelper {
 			updateActiveNetwork(network);
 		}
 		
+		@SuppressLint("MissingPermission")
 		@Override
 		public void onCapabilitiesChanged(final Network network,
 			final NetworkCapabilities networkCapabilities) {
@@ -364,6 +368,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s)", network));
 		}
 		
+		@SuppressLint("MissingPermission")
 		@Override
 		public void onLost(final Network network) {
 			super.onLost(network);
@@ -382,6 +387,7 @@ public class ConnectivityHelper {
 		}
 	}
 	
+	@SuppressLint("MissingPermission")
 	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
 		private static final String TAG = NetworkChangedReceiver.class.getSimpleName();
@@ -406,7 +412,6 @@ public class ConnectivityHelper {
 		 * @param context
 		 * @param intent
 		 */
-//		@SuppressLint("NewApi")
 		private void onReceiveGlobal(final Context context, final Intent intent) {
 			final ConnectivityManager manager
 				= (ConnectivityManager) context
@@ -427,6 +432,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isWifiNetworkReachable(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:");
 		final ConnectivityManager manager
@@ -477,6 +483,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isMobileNetworkReachable(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:");
 		final ConnectivityManager manager
@@ -520,6 +527,7 @@ public class ConnectivityHelper {
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isNetworkReachable(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:");
 		final ConnectivityManager manager
