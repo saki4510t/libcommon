@@ -380,7 +380,6 @@ public class ConnectivityHelper {
 	
 	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
-		private final String TAG = NetworkChangedReceiver.class.getSimpleName();
 		/**
 		 * The Mobile data connection.  When active, all data traffic
 		 * will use this network type's interface by default
@@ -474,6 +473,7 @@ public class ConnectivityHelper {
 //				ConnectivityManager.TYPE_VPN, TYPE_MASK_VPN,
 			};
 		}
+		private static final String TAG = NetworkChangedReceiver.class.getSimpleName();
 
 		@NonNull
 		private final ConnectivityHelper mParent;
