@@ -250,18 +250,22 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
 	
 		final ConnectivityManager manager = requireConnectivityManager();
+		@Nullable
 		final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+		@Nullable
 		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 
 		int activeNetworkType = NETWORK_TYPE_NON;
-		if (isWifiNetworkReachable(capabilities, info)) {
-			activeNetworkType = NETWORK_TYPE_WIFI;
-		} else if (isMobileNetworkReachable(capabilities, info)) {
-			activeNetworkType = NETWORK_TYPE_MOBILE;
-		} else if (isBluetoothNetworkReachable(capabilities, info)) {
-			activeNetworkType = NETWORK_TYPE_BLUETOOTH;
-		} else if (isNetworkReachable(capabilities, info)) {
-			activeNetworkType = NETWORK_TYPE_ETHERNET;
+		if ((capabilities != null) && (info != null)) {
+			if (isWifiNetworkReachable(capabilities, info)) {
+				activeNetworkType = NETWORK_TYPE_WIFI;
+			} else if (isMobileNetworkReachable(capabilities, info)) {
+				activeNetworkType = NETWORK_TYPE_MOBILE;
+			} else if (isBluetoothNetworkReachable(capabilities, info)) {
+				activeNetworkType = NETWORK_TYPE_BLUETOOTH;
+			} else if (isNetworkReachable(capabilities, info)) {
+				activeNetworkType = NETWORK_TYPE_ETHERNET;
+			}
 		}
 		updateActiveNetwork(activeNetworkType);
 	}
@@ -337,7 +341,7 @@ public class ConnectivityHelper {
 			super.onCapabilitiesChanged(network, networkCapabilities);
 			// 接続が完了してネットワークの状態が変わった時
 			if (DEBUG) Log.v(TAG,
-			String.format("onCapabilitiesChanged:Network(%s),", network)
+			String.format("onCapabilitiesChanged:Network(%s)", network)
 				+ networkCapabilities);
 			updateActiveNetwork(network);
 		}
@@ -357,14 +361,14 @@ public class ConnectivityHelper {
 		public void onLosing(final Network network, final int maxMsToLive) {
 			super.onLosing(network, maxMsToLive);
 			// 接続を失いそうな時
-			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s),", network));
+			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s)", network));
 		}
 		
 		@Override
 		public void onLost(final Network network) {
 			super.onLost(network);
 			// 接続を失った時
-			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s),", network));
+			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s)", network));
 			updateActiveNetwork(network);
 		}
 		
@@ -495,7 +499,7 @@ public class ConnectivityHelper {
 		 * @param context
 		 * @param intent
 		 */
-		@SuppressLint("NewApi")
+//		@SuppressLint("NewApi")
 		private void onReceiveGlobal(final Context context, final Intent intent) {
 			final ConnectivityManager manager
 				= (ConnectivityManager) context
@@ -526,6 +530,7 @@ public class ConnectivityHelper {
 //					}
 //				}
 //			}
+			@Nullable
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 //			final int activeNetworkMask = (activeNetworkInfo != null ? 1 << activeNetworkInfo.getType() : 0);
 //			if (DEBUG) Log.v(TAG, String.format(
@@ -554,11 +559,14 @@ public class ConnectivityHelper {
 		if (BuildCheck.isLollipop()) {
 			if (BuildCheck.isMarshmallow()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
+				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				@Nullable
 				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				return isWifiNetworkReachable(capabilities, info);
+				return (capabilities != null) && (info != null)
+					&& isWifiNetworkReachable(capabilities, info);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
@@ -566,7 +574,9 @@ public class ConnectivityHelper {
 					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-					if (isWifiNetworkReachable(capabilities, info)) {
+					if ((capabilities != null) && (info != null)
+						&& isWifiNetworkReachable(capabilities, info)) {
+
 						return true;
 					}
 				}
@@ -603,7 +613,8 @@ public class ConnectivityHelper {
 				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				return isMobileNetworkReachable(capabilities, info);
+				return (capabilities != null) && (info != null)
+					&& isMobileNetworkReachable(capabilities, info);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
@@ -611,7 +622,9 @@ public class ConnectivityHelper {
 					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-					if (isMobileNetworkReachable(capabilities, info)) {
+					if ((capabilities != null) && (info != null)
+						&& isMobileNetworkReachable(capabilities, info)) {
+
 						return true;
 					}
 				}
@@ -642,13 +655,15 @@ public class ConnectivityHelper {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
 				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
-				return isNetworkReachable(capabilities, info);
+				return (capabilities != null) && (info != null)
+					&& isNetworkReachable(capabilities, info);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
 					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
 					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
-					if (isNetworkReachable(capabilities, info)) {
+					if ((capabilities != null) && (info != null)
+						&& isNetworkReachable(capabilities, info)) {
 						return true;
 					}
 				}
