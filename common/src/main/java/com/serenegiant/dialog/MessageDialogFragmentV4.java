@@ -21,57 +21,111 @@ package com.serenegiant.dialog;
 import com.serenegiant.utils.BuildCheck;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
+import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 
-public class MessageDialogFragmentV4 extends DialogFragment {
+public class MessageDialogFragmentV4 extends DialogFragmentEx {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MessageDialogFragmentV4.class.getSimpleName();
 
+	private static final String ARGS_KEY_PERMISSIONS = "permissions";
+	
+	/**
+	 * ダイアログの表示結果を受け取るためのコールバックリスナー
+	 */
 	public static interface MessageDialogListener {
-		public void onMessageDialogResult(final MessageDialogFragmentV4 dialog, final int requestCode, final String[] permissions, final boolean result);
+		public void onMessageDialogResult(
+			@NonNull final MessageDialogFragmentV4 dialog, final int requestCode,
+			@NonNull final String[] permissions, final boolean result);
 	}
 
-	public static MessageDialogFragmentV4 showDialog(final FragmentActivity parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
-		final MessageDialogFragmentV4 dialog = newInstance(requestCode, id_title, id_message, permissions);
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param id_message
+	 * @param permissions
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static MessageDialogFragmentV4 showDialog(
+		@NonNull final FragmentActivity parent, final int requestCode,
+		@StringRes final int id_title, @StringRes final int id_message,
+		@NonNull final String[] permissions) throws IllegalStateException {
+
+		final MessageDialogFragmentV4 dialog
+			= newInstance(requestCode, id_title, id_message, permissions);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
+	
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param id_message
+	 * @param permissions
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static MessageDialogFragmentV4 showDialog(
+		@NonNull final Fragment parent, final int requestCode,
+		@StringRes final int id_title, @StringRes final int id_message,
+		@NonNull final String[] permissions) throws IllegalStateException {
 
-	public static MessageDialogFragmentV4 showDialog(final Fragment parent, final int requestCode, final int id_title, final int id_message, final String[] permissions) {
-		final MessageDialogFragmentV4 dialog = newInstance(requestCode, id_title, id_message, permissions);
+		final MessageDialogFragmentV4 dialog
+			= newInstance(requestCode, id_title, id_message, permissions);
 		dialog.setTargetFragment(parent, parent.getId());
-		dialog.show(parent.getFragmentManager(), TAG);
+		dialog.show(parent.requireFragmentManager(), TAG);
 		return dialog;
 	}
 
-	public static MessageDialogFragmentV4 newInstance(final int requestCode, final int id_title, final int id_message, final String[] permissions) {
+	/**
+	 * ダイアログ生成のためのヘルパーメソッド
+	 * ダイアログ自体を直接生成せずにこのメソッドを呼び出すこと
+	 * @param requestCode
+	 * @param id_title
+	 * @param id_message
+	 * @param permissions
+	 * @return
+	 */
+	public static MessageDialogFragmentV4 newInstance(
+		final int requestCode,
+		@StringRes final int id_title, @StringRes final int id_message,
+		@NonNull final String[] permissions) {
+
 		final MessageDialogFragmentV4 fragment = new MessageDialogFragmentV4();
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
-		args.putInt("requestCode", requestCode);
-		args.putInt("title", id_title);
-		args.putInt("message", id_message);
-		args.putStringArray("permissions", permissions != null ? permissions : new String[]{});
+		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
+		args.putInt(ARGS_KEY_ID_TITLE, id_title);
+		args.putInt(ARGS_KEY_ID_MESSAGE, id_message);
+		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
 	private MessageDialogListener mDialogListener;
 
+	/**
+	 * コンストラクタ, 直接生成せずに#newInstanceを使うこと
+	 */
 	public MessageDialogFragmentV4() {
 		super();
 		// デフォルトコンストラクタが必要
 	}
 
-	@SuppressLint("NewApi")
 	@Override
 	public void onAttach(final Context context) {
 		super.onAttach(context);
@@ -105,46 +159,55 @@ public class MessageDialogFragmentV4 extends DialogFragment {
 //		final Bundle args = savedInstanceState != null ? savedInstanceState : getArguments();
 //	}
 
+	@NonNull
 	@Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-		final Bundle args = savedInstanceState != null ? savedInstanceState : getArguments();
-		final int requestCode = getArguments().getInt("requestCode");
-		final int id_title = getArguments().getInt("title");
-		final int id_message = getArguments().getInt("message");
-		final String[] permissions = args.getStringArray("permissions");
+		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
+		final int id_title = args.getInt(ARGS_KEY_ID_TITLE);
+		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
 
-
-		return new AlertDialog.Builder(getActivity())
+		final Activity activity = requireActivity();
+		return new AlertDialog.Builder(activity)
 			.setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(id_title)
 			.setMessage(id_message)
-			.setPositiveButton(android.R.string.ok,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, final int whichButton) {
-						// 本当はここでパーミッション要求をしたいだけどこのダイアログがdismissしてしまって結果を受け取れないので
-						// 呼び出し側へ返してそこでパーミッション要求する。なのでこのダイアログは単にメッセージを表示するだけ
-						try {
-							mDialogListener.onMessageDialogResult(MessageDialogFragmentV4.this, requestCode, permissions, true);
-						} catch (final Exception e) {
-							Log.w(TAG, e);
-						}
-					}
-				}
-			)
-			.setNegativeButton(android.R.string.cancel,
-				new DialogInterface.OnClickListener() {
-					@Override
-					public void onClick(final DialogInterface dialog, int whichButton) {
-						try {
-							mDialogListener.onMessageDialogResult(MessageDialogFragmentV4.this, requestCode, permissions, false);
-						} catch (final Exception e) {
-							Log.w(TAG, e);
-						}
-					}
-				}
-			)
+			.setPositiveButton(android.R.string.ok, mOnClickListener)
+			.setNegativeButton(android.R.string.cancel, mOnClickListener)
 			.create();
 	}
 
+	private final DialogInterface.OnClickListener mOnClickListener
+		= new DialogInterface.OnClickListener() {
+		@Override
+		public void onClick(final DialogInterface dialog, final int which) {
+			// 本当はここでパーミッション要求をしたいだけどこのダイアログがdismissしてしまって結果を受け取れないので
+			// 呼び出し側へ返してそこでパーミッション要求する。なのでこのダイアログは単にメッセージを表示するだけ
+			callOnMessageDialogResult(which == DialogInterface.BUTTON_POSITIVE);
+		}
+	};
+
+	@Override
+	public void onCancel(final DialogInterface dialog) {
+		super.onCancel(dialog);
+		callOnMessageDialogResult(false);
+	}
+	
+	/**
+	 * コールバックリスナー呼び出しのためのヘルパーメソッド
+	 * @param result
+	 */
+	private void callOnMessageDialogResult(final boolean result)
+		throws IllegalStateException {
+
+		final Bundle args = requireArguments();
+		final int requestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
+		final String[] permissions = args.getStringArray(ARGS_KEY_PERMISSIONS);
+		try {
+			mDialogListener.onMessageDialogResult(
+				MessageDialogFragmentV4.this,
+				requestCode, permissions, result);
+		} catch (final Exception e) {
+			Log.w(TAG, e);
+		}
+	}
 }

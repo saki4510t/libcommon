@@ -146,8 +146,9 @@ public class MainActivity extends AppCompatActivity
 	 */
 	@SuppressLint("NewApi")
 	@Override
-	public void onMessageDialogResult(final MessageDialogFragmentV4 dialog,
-		final int requestCode, final String[] permissions, final boolean result) {
+	public void onMessageDialogResult(
+		@NonNull final MessageDialogFragmentV4 dialog, final int requestCode,
+		@NonNull final String[] permissions, final boolean result) {
 		
 		if (result) {
 			// メッセージダイアログでOKを押された時はパーミッション要求する

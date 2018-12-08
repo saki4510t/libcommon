@@ -26,7 +26,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import android.support.annotation.StringRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -37,11 +37,10 @@ import com.serenegiant.common.R;
 import com.serenegiant.widget.ColorPickerView;
 import com.serenegiant.widget.ColorPickerView.ColorPickerListener;
 
-public class ColorPickerDialogV4 extends DialogFragment {
+public class ColorPickerDialogV4 extends DialogFragmentEx {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "ColorPickerDialog";
 
-	private static final String KEY_TITLE_ID = "title_id";
 	private static final String KEY_COLOR_INIT = "initial_color";
 	private static final String KEY_COLOR_CURRENT = "current_color";
 
@@ -52,41 +51,79 @@ public class ColorPickerDialogV4 extends DialogFragment {
 	private int mCurrentColor = DEFAULT_COLOR;
 	private boolean isCanceled;
 
+	/**
+	 * 色が変更されたときのコールバックリスナー
+	 */
 	public interface OnColorChangedListener {
 		void onColorChanged(ColorPickerDialogV4 dialog, int color);
 		void onCancel(ColorPickerDialogV4 dialog);
 		void onDismiss(ColorPickerDialogV4 dialog, int color);
 	}
 
-	public static ColorPickerDialogV4 show(final FragmentActivity parent, final int titleResId, final int initialColor) {
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param titleResId
+	 * @param initialColor
+	 * @return
+	 */
+	public static ColorPickerDialogV4 show(
+		@NonNull final FragmentActivity parent,
+		@StringRes final int titleResId, final int initialColor) {
+
 		final ColorPickerDialogV4 dialog = newInstance(titleResId, initialColor);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
 
-	public static ColorPickerDialogV4 show(final Fragment parent, final int titleResId, final int initialColor) {
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param titleResId
+	 * @param initialColor
+	 * @return
+	 */
+	public static ColorPickerDialogV4 show(
+		@NonNull final Fragment parent,
+		@StringRes final int titleResId, final int initialColor) {
+	
 		final ColorPickerDialogV4 dialog = newInstance(titleResId, initialColor);
 		dialog.setTargetFragment(parent, 0);
 		dialog.show(parent.getFragmentManager(), TAG);
 		return dialog;
 	}
 
-	public static ColorPickerDialogV4 newInstance(final int titleResId, final int initialColor) {
+	/**
+	 * フラグメント生成のためのヘルパーメソッド
+	 * @param titleResId
+	 * @param initialColor
+	 * @return
+	 */
+	public static ColorPickerDialogV4 newInstance(
+		@StringRes final int titleResId, final int initialColor) {
+	
 		final ColorPickerDialogV4 dialog = new ColorPickerDialogV4();
 		dialog.setArguments(titleResId, initialColor);
 		return dialog;
 	}
 
+	/**
+	 * コンストラクタ, 直接生成せずに#newInstanceを使うこと
+	 */
 	public ColorPickerDialogV4() {
+		super();
 		// デフォルトコンストラクタが必要
 	}
 
-	public void setArguments(final int titleResId, final int initialColor) {
-		final Bundle bundle = new Bundle();
-		bundle.putInt(KEY_TITLE_ID, titleResId);
-		bundle.putInt(KEY_COLOR_INIT, initialColor);
-		bundle.remove(KEY_COLOR_CURRENT);
-		setArguments(bundle);
+	public void setArguments(@StringRes final int titleResId, final int initialColor) {
+		Bundle args = getArguments();
+		if (args == null) {
+			args = new Bundle();
+		}
+		args.putInt(ARGS_KEY_ID_TITLE, titleResId);
+		args.putInt(KEY_COLOR_INIT, initialColor);
+		args.remove(KEY_COLOR_CURRENT);
+		setArguments(args);
 	}
 
 	@Override
@@ -96,23 +133,19 @@ public class ColorPickerDialogV4 extends DialogFragment {
 		// 通常起動の場合はsavedInstanceState==null,
 		// システムに破棄されたのが自動生成した時は
 		// onSaveInstanceStateで保存した値が入ったBundleオブジェクトが入っている
-		final Bundle args = getArguments();
-		if (args != null) {
-			mTitleResId = args.getInt(KEY_TITLE_ID);
-			mCurrentColor = mInitialColor = args.getInt(KEY_COLOR_INIT, DEFAULT_COLOR);
-		}
+		final Bundle args = requireArguments();
+		mTitleResId = args.getInt(ARGS_KEY_ID_TITLE);
+		mCurrentColor = mInitialColor = args.getInt(KEY_COLOR_INIT, DEFAULT_COLOR);
 		if (savedInstanceState != null) {
 			mCurrentColor = savedInstanceState.getInt(KEY_COLOR_CURRENT, mInitialColor);
 		}
 	}
 
 	@Override
-	public void onSaveInstanceState(final Bundle outState) {
+	public void onSaveInstanceState(@NonNull final Bundle outState) {
 		super.onSaveInstanceState(outState);
 		if (DEBUG) Log.v(TAG, "onSaveInstanceState:");
-		if (outState != null) {
-			outState.putInt(KEY_COLOR_CURRENT, mCurrentColor);
-		}
+		outState.putInt(KEY_COLOR_CURRENT, mCurrentColor);
 	}
 
 	@Override
@@ -156,17 +189,19 @@ public class ColorPickerDialogV4 extends DialogFragment {
 		if (DEBUG) Log.v(TAG, "onCreateDialog:");
 		if (DEBUG) Log.i(TAG, String.format("onCreateDialog:mCurrentColor=%x", mCurrentColor));
 
-		final Activity activity = getActivity();
-		final FrameLayout rootView = (FrameLayout)LayoutInflater.from(activity).inflate(R.layout.color_picker, null);
+		final Activity activity = requireActivity();
+		final FrameLayout rootView
+			= (FrameLayout)LayoutInflater.from(activity)
+				.inflate(R.layout.color_picker, null);
 		final FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
 			FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT);
-		final ColorPickerView view = new ColorPickerView(getActivity());
+		final ColorPickerView view = new ColorPickerView(activity);
 		view.setColor(mCurrentColor);
 		view.setColorPickerListener(mColorPickerListener);
 		rootView.addView(view, params);
 		final AlertDialog dialog = new AlertDialog.Builder(activity)
-			.setPositiveButton(R.string.color_picker_select, mOnClickListner)
-			.setNegativeButton(R.string.color_picker_cancel, mOnClickListner)
+			.setPositiveButton(R.string.color_picker_select, mOnClickListener)
+			.setNegativeButton(R.string.color_picker_cancel, mOnClickListener)
 			.setTitle(mTitleResId != 0 ? mTitleResId : R.string.color_picker_default_title)
 			.setView(rootView)
 			.create();
@@ -207,7 +242,9 @@ public class ColorPickerDialogV4 extends DialogFragment {
 		}
 	};
 
-	private final DialogInterface.OnClickListener mOnClickListner = new DialogInterface.OnClickListener() {
+	private final DialogInterface.OnClickListener mOnClickListener
+		= new DialogInterface.OnClickListener() {
+
 		@Override
 		public void onClick(final DialogInterface dialog, final int which) {
 			if (DEBUG) Log.v(TAG, "onClick:which=" + which);
