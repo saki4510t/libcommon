@@ -33,6 +33,8 @@ import com.serenegiant.utils.BuildCheck;
 /**
  * パーミッション要求前に説明用のダイアログを表示するためのDialogFragment
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class MessageDialogFragment extends DialogFragment {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MessageDialogFragment.class.getSimpleName();

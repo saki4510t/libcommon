@@ -36,6 +36,8 @@ import com.serenegiant.common.R;
 import com.serenegiant.widget.ColorPickerView;
 import com.serenegiant.widget.ColorPickerView.ColorPickerListener;
 
+@SuppressWarnings("deprecation")
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public class ColorPickerDialog extends DialogFragment {
 	private static final boolean DEBUG = false;
