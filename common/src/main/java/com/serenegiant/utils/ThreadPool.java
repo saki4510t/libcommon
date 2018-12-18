@@ -18,7 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import android.os.Build;
+import android.support.annotation.NonNull;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -44,7 +44,11 @@ public class ThreadPool {
 		EXECUTOR.prestartAllCoreThreads();
 	}
 
-	public static void queueEvent(final Runnable command) {
+	public static void queueEvent(@NonNull final Runnable command) {
 		EXECUTOR.execute(command);
+	}
+	
+	public static boolean removeEvent(@NonNull final Runnable command) {
+		return EXECUTOR.remove(command);
 	}
 }
