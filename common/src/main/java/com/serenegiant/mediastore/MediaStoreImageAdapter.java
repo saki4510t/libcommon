@@ -1,4 +1,4 @@
-package com.serenegiant.media;
+package com.serenegiant.mediastore;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -29,6 +29,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.view.PagerAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -41,7 +42,7 @@ import com.serenegiant.common.R;
 
 import java.io.IOException;
 
-import static com.serenegiant.media.MediaStoreHelper.*;
+import static com.serenegiant.mediastore.MediaStoreHelper.*;
 
 public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -92,6 +93,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 	}
 
+	@NonNull
 	@Override
 	public Object instantiateItem(@NonNull final ViewGroup container,
 		final int position) {
@@ -105,15 +107,15 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			if (holder == null) {
 				holder = new ViewHolder();
 			}
-			final TextView tv = holder.mTitleView = (TextView)view.findViewById(R.id.title);
-			final ImageView iv = holder.mImageView = (ImageView)view.findViewById(R.id.thumbnail);
+			final TextView tv = holder.mTitleView = view.findViewById(R.id.title);
+			final ImageView iv = holder.mImageView = view.findViewById(R.id.thumbnail);
 			if (holder.info == null) {
 				holder.info = new MediaStoreHelper.MediaInfo();
 			}
 			holder.info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = iv.getDrawable();
-			if ((drawable == null) || !(drawable instanceof MediaStoreHelper.LoaderDrawable)) {
+			if (!(drawable instanceof MediaStoreHelper.LoaderDrawable)) {
 				drawable = createLoaderDrawable(mCr, holder.info);
 				iv.setImageDrawable(drawable);
 			}
@@ -174,7 +176,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		return view.equals(object);
 	}
 
-	protected void changeCursor(final Cursor cursor) {
+	protected void changeCursor(@Nullable final Cursor cursor) {
 		final Cursor old = swapCursor(cursor);
 		if ((old != null) && !old.isClosed()) {
 			old.close();

@@ -1,4 +1,4 @@
-package com.serenegiant.media;
+package com.serenegiant.mediastore;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -34,6 +34,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v4.util.LruCache;
 import android.support.v4.widget.CursorAdapter;
 import android.util.Log;
@@ -46,7 +47,7 @@ import android.widget.TextView;
 import com.serenegiant.common.R;
 import com.serenegiant.utils.ThreadPool;
 
-import static com.serenegiant.media.MediaStoreHelper.*;
+import static com.serenegiant.mediastore.MediaStoreHelper.*;
 
 public class MediaStoreAdapter extends CursorAdapter {
 
@@ -106,7 +107,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final ImageView iv = holder.mImageView;
 		final TextView tv = holder.mTitleView;
 		Drawable drawable = iv.getDrawable();
-		if ((drawable == null) || !(drawable instanceof LoaderDrawable)) {
+		if (!(drawable instanceof LoaderDrawable)) {
 			drawable = createLoaderDrawable(mCr);
 			iv.setImageDrawable(drawable);
 		}
@@ -367,7 +368,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 			final int cacheSize = 1024 * 1024 * mMemClass / CACHE_RATE;	// [MB] => [bytes]
 			sThumbnailCache = new LruCache<String, Bitmap>(cacheSize) {
 				@Override
-				protected int sizeOf(String key, Bitmap bitmap) {
+				protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
 					// control memory usage instead of bitmap counts
 					return bitmap.getRowBytes() * bitmap.getHeight();	// [bytes]
 				}
@@ -403,7 +404,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	private static final Bitmap getImageThumbnail(final ContentResolver cr,
 		final long hashCode, final long id, final int requestWidth, final int requestHeight)
-			throws FileNotFoundException, IOException {
+			throws IOException {
 		
 		// try to get from internal thumbnail cache(in memory), this may be redundant
 		final String key = getKey(hashCode, id);
