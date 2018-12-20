@@ -63,9 +63,9 @@ public class FileUtils {
 	// 保存先のファイル名を生成
 		File result = null;
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
-		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
-//			result = SDUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
-			result = SDUtils.createStorageDir(context, saveTreeId);
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+//			result = SAFUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
+			result = SAFUtils.createStorageDir(context, saveTreeId);
 			if ((result == null) || !result.canWrite()) {
 				Log.w(TAG, "なんでか書き込めん");
 				result = null;
@@ -97,8 +97,8 @@ public class FileUtils {
 
 //		Log.i(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
-		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
-			result = SDUtils.createStorageDir(context, saveTreeId);
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+			result = SAFUtils.createStorageDir(context, saveTreeId);
 //			Log.i(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
 		final File dir = result != null

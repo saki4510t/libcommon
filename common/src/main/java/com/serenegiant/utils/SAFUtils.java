@@ -47,13 +47,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * Storage Access Framework用のヘルパークラス
- * @Deprecated SAFUtilsクラスへ移行すること
- */
-@Deprecated
-public class SDUtils {
-	private static final String TAG = SDUtils.class.getSimpleName();
+public class SAFUtils {
+	private static final String TAG = SAFUtils.class.getSimpleName();
 
 //********************************************************************************
 // Storage Access Framework関係
@@ -80,7 +75,7 @@ public class SDUtils {
 	 */
 	public static boolean handleOnResult(@NonNull final Context context,
 		final int requestCode, final int resultCode,
-		final Intent data, @NonNull final handleOnResultDelegater delegater) {
+		final Intent data, @NonNull final SAFUtils.handleOnResultDelegater delegater) {
 
 		if (data != null) {
 			if (resultCode == Activity.RESULT_OK) {
@@ -110,7 +105,7 @@ public class SDUtils {
 	 */
 	@NonNull
 	private static String getKey(final int requestCode) {
-		return String.format(Locale.US, "SDUtils-%d", requestCode);
+		return String.format(Locale.US, "SDUtils-%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
 	}
 	
 	/**
@@ -727,7 +722,7 @@ public class SDUtils {
 	@NonNull
 	public static Collection<DocumentFile> listFiles(@NonNull final Context context,
 		@NonNull final DocumentFile dir,
-		@Nullable final FileFilter filter) throws IOException {
+		@Nullable final SAFUtils.FileFilter filter) throws IOException {
 
 		final Collection<DocumentFile> result = new ArrayList<DocumentFile>();
 		if (dir.isDirectory()) {
@@ -859,7 +854,7 @@ public class SDUtils {
 		}
 		return null;
 	}
-		
+	
 	/**
 	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
 	 * @param context
@@ -871,8 +866,8 @@ public class SDUtils {
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static OutputStream getStorageOutputStream(@NonNull final Context context,
-		final int treeId,
-		final String mime, final String name) throws IOException {
+													  final int treeId,
+													  final String mime, final String name) throws IOException {
 		
 		return getStorageOutputStream(context, treeId, null, mime, name);
 	}
@@ -955,8 +950,8 @@ public class SDUtils {
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static InputStream getStorageInputStream(@NonNull final Context context,
-		final int treeId,
-		final String mime, final String name) throws IOException {
+													final int treeId,
+													final String mime, final String name) throws IOException {
 		
 		return getStorageInputStream(context, treeId, null, mime, name);
 	}
@@ -1034,8 +1029,8 @@ public class SDUtils {
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
-		final int treeId, @Nullable final String dirs,
-		final String mime, final String name) throws IOException {
+														final int treeId, @Nullable final String dirs,
+														final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, treeId, dirs);
@@ -1200,5 +1195,71 @@ public class SDUtils {
 			}
 		}
 		return 0;
+	}
+
+	/**
+	 * 指定したDocumentFileが指し示すフォルダの下に指定した相対パスのディレクトリ階層を生成する
+	 * フォルダが存在していない時に書き込み可能でなければIOExceptionを投げる
+	 * @param context
+	 * @param baseDoc
+	 * @param dirs
+	 * @return
+	 * @throws IOException
+	 */
+	public static DocumentFile getDocumentFile(@NonNull Context context,
+		@NonNull final DocumentFile baseDoc, @Nullable final String dirs)
+			throws IOException {
+		
+		DocumentFile tree = baseDoc;
+		if (!TextUtils.isEmpty(dirs)) {
+			final String[] dir = dirs.split("/");
+			for (final String d: dir) {
+				if (!TextUtils.isEmpty(d)) {
+					final DocumentFile t = tree.findFile(d);
+					if ((t != null) && t.isDirectory()) {
+						// 既に存在している時は何もしない
+						tree = t;
+					} else if (t == null) {
+						if (tree.canWrite()) {
+							// 存在しないときはディレクトリを生成
+							tree = tree.createDirectory(d);
+						} else {
+							throw new IOException("can't create directory");
+						}
+					} else {
+						throw new IOException("can't create directory, file with same name already exists");
+					}
+				}
+			}
+		}
+		return tree;
+	}
+	
+	/**
+	 * 指定したUriがDocumentFileの下に存在するフォルダを指し示していれば
+	 * 対応するDocumentFileを取得して返す
+	 * フォルダが存在していない時に書き込み可能でなければIOExceptionを投げる
+	 * @param context
+	 * @param baseDoc
+	 * @param uri
+	 * @return
+	 * @throws IOException
+	 */
+	public static DocumentFile getDocumentFile(@NonNull Context context,
+		@NonNull final DocumentFile baseDoc, @Nullable final Uri uri)
+			throws IOException {
+		
+		if (uri != null) {
+			final String basePathString = UriHelper.getPath(context, baseDoc.getUri());
+			final String uriString = UriHelper.getPath(context, uri);
+			if (!TextUtils.isEmpty(basePathString)
+				&& !TextUtils.isEmpty(uriString)
+				&& uriString.startsWith(basePathString)) {
+				
+				return getDocumentFile(context, baseDoc,
+					uriString.substring(basePathString.length()));
+			}
+		}
+		return null;
 	}
 }

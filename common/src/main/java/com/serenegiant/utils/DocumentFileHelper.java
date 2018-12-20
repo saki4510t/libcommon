@@ -30,8 +30,9 @@ import java.io.IOException;
 /**
  * Created by saki on 2018/03/21.
  *
+ * @Deprecated SAFUtilsクラスへ移行すること
  */
-
+@Deprecated
 public class DocumentFileHelper {
 	
 	/**

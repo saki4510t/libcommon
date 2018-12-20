@@ -27,7 +27,7 @@ import android.support.v4.provider.DocumentFile;
 import android.text.TextUtils;
 
 import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.SDUtils;
+import com.serenegiant.utils.SAFUtils;
 import com.serenegiant.utils.StorageInfo;
 import com.serenegiant.utils.UriHelper;
 
@@ -78,13 +78,13 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 		mSaveTreeId = saveTreeId;
 		String ext = _ext;
 		if (TextUtils.isEmpty(ext)) ext = ".mp4";
-		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
 			mOutputPath = FileUtils.getCaptureFile(context,
 				Environment.DIRECTORY_MOVIES, prefix, ext, saveTreeId).toString();
 			final String file_name = (TextUtils.isEmpty(prefix)
 				? FileUtils.getDateTimeString()
 				: prefix + FileUtils.getDateTimeString()) + ext;
-			final int fd = SDUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
+			final int fd = SAFUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
 			setupMuxer(fd);
 		} else {
 			try {
@@ -114,8 +114,8 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 		super(callback);
 		mWeakContext = new WeakReference<Context>(context);
 		mSaveTreeId = saveTreeId;
-		if ((saveTreeId > 0) && SDUtils.hasStorageAccess(context, saveTreeId)) {
-			DocumentFile tree = SDUtils.getStorageFile(context, saveTreeId, dirs, "*/*", fileName);
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+			DocumentFile tree = SAFUtils.getStorageFile(context, saveTreeId, dirs, "*/*", fileName);
 			if (tree != null) {
 				mOutputPath = UriHelper.getPath(context, tree.getUri());
 				final ParcelFileDescriptor pfd
@@ -207,7 +207,7 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	protected boolean check() {
 		final Context context = mWeakContext.get();
 		final StorageInfo info = mOutputFile != null
-			? SDUtils.getStorageInfo(context, mOutputFile) : null;
+			? SAFUtils.getStorageInfo(context, mOutputFile) : null;
 		if ((info != null) && (info.totalBytes != 0)) {
 			return ((info.freeBytes/ (float)info.totalBytes) < FileUtils.FREE_RATIO)
 				|| (info.freeBytes < FileUtils.FREE_SIZE);
