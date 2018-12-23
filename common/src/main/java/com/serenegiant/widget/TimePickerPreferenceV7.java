@@ -20,6 +20,8 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -37,22 +39,25 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 	private final long mDefaultValue;
 	private TimePicker picker = null;
 
-	public TimePickerPreferenceV7(final Context ctxt) {
-		this(ctxt, null);
+	public TimePickerPreferenceV7(@NonNull final Context context) {
+		this(context, null);
 	}
 
-	public TimePickerPreferenceV7(final Context ctxt, final AttributeSet attrs) {
-		this(ctxt, attrs, android.R.attr.dialogPreferenceStyle);
+	public TimePickerPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs) {
+
+		this(context, attrs, android.R.attr.dialogPreferenceStyle);
 	}
 
-	public TimePickerPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {
+	public TimePickerPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyle) {
+
 		super(context, attrs, defStyle);
 
-        TypedArray a = context.obtainStyledAttributes(
-        		attrs, R.styleable.TimePicker, defStyle, 0);
+        final TypedArray a = context.obtainStyledAttributes(
+			attrs, R.styleable.TimePicker, defStyle, 0);
         mDefaultValue = (long)a.getFloat(R.styleable.TimePicker_TimePickerDefaultValue, -1);
         a.recycle();
-        a = null;
 
         setPositiveButtonText(android.R.string.ok);
 		setNegativeButtonText(android.R.string.cancel);
@@ -67,8 +72,8 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 	}
 
 	@Override
-	protected void onBindDialogView(final View v) {
-		super.onBindDialogView(v);
+	protected void onBindDialogView(@NonNull final View view) {
+		super.onBindDialogView(view);
 		picker.setCurrentHour(calendar.get(Calendar.HOUR_OF_DAY));
 		picker.setCurrentMinute(calendar.get(Calendar.MINUTE));
 	}
@@ -94,19 +99,32 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 		return (a.getString(index));
 	}
 
+//	@Override
+//	protected void onSetInitialValue(final boolean restoreValue, final Object defaultValue) {
+//		final long v = mDefaultValue > 0 ? mDefaultValue : System.currentTimeMillis();
+//		if (restoreValue) {
+//			long persistedValue;
+//			try {
+//				persistedValue = getPersistedLong(v);
+//			} catch (final Exception e) {
+//				// Stale persisted data may be the wrong type
+//				persistedValue = v;
+//			}
+//			calendar.setTimeInMillis(persistedValue);
+//		} else if (defaultValue != null) {
+//			calendar.setTimeInMillis(Long.parseLong((String) defaultValue));
+//		} else {
+//			// !restoreValue, defaultValue == null
+//			calendar.setTimeInMillis(v);
+//		}
+//
+//		setSummary(getSummary());
+//	}
+
 	@Override
-	protected void onSetInitialValue(final boolean restoreValue, final Object defaultValue) {
+	protected void onSetInitialValue(@Nullable final Object defaultValue) {
 		final long v = mDefaultValue > 0 ? mDefaultValue : System.currentTimeMillis();
-		if (restoreValue) {
-			long persistedValue;
-			try {
-				persistedValue = getPersistedLong(v);
-			} catch (final Exception e) {
-				// Stale persisted data may be the wrong type
-				persistedValue = v;
-			}
-			calendar.setTimeInMillis(persistedValue);
-		} else if (defaultValue != null) {
+		if (defaultValue != null) {
 			calendar.setTimeInMillis(Long.parseLong((String) defaultValue));
 		} else {
 			// !restoreValue, defaultValue == null

@@ -12,6 +12,9 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.CallSuper;
 import android.support.annotation.DrawableRes;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v7.preference.Preference;
 import android.text.TextUtils;
@@ -46,22 +49,24 @@ public class DialogPreferenceV7 extends Preference
 	 */
 	private int mWhichButtonClicked;
 	
-	public DialogPreferenceV7(final Context context) {
+	public DialogPreferenceV7(@NonNull final Context context) {
 		this(context, null, 0, 0);
 	}
 	
-	public DialogPreferenceV7(final Context context, final AttributeSet attrs) {
+	public DialogPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs) {
+
 		this(context, attrs, 0, 0);
 	}
 	
-	public DialogPreferenceV7(final Context context,
-							  final AttributeSet attrs, final int defStyleAttr) {
+	public DialogPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyleAttr) {
 		
 		this(context, attrs, defStyleAttr, 0);
 	}
 	
-	public DialogPreferenceV7(final Context context,
-							  final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
+	public DialogPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
 		
 		super(context, attrs, defStyleAttr, defStyleRes);
 		final TypedArray a = context.obtainStyledAttributes(attrs,
@@ -95,7 +100,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param dialogTitle The title.
 	 */
-	public void setDialogTitle(CharSequence dialogTitle) {
+	public void setDialogTitle(final CharSequence dialogTitle) {
 		mDialogTitle = dialogTitle;
 	}
 	
@@ -103,7 +108,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param dialogTitleResId The dialog title as a resource.
 	 * @see #setDialogTitle(CharSequence)
 	 */
-	public void setDialogTitle(int dialogTitleResId) {
+	public void setDialogTitle(@StringRes final int dialogTitleResId) {
 		setDialogTitle(getContext().getString(dialogTitleResId));
 	}
 	
@@ -112,6 +117,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @return The title.
 	 */
+	@Nullable
 	public CharSequence getDialogTitle() {
 		return mDialogTitle;
 	}
@@ -126,7 +132,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param dialogMessage The message.
 	 */
-	public void setDialogMessage(CharSequence dialogMessage) {
+	public void setDialogMessage(final CharSequence dialogMessage) {
 		mDialogMessage = dialogMessage;
 	}
 	
@@ -134,7 +140,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param dialogMessageResId The dialog message as a resource.
 	 * @see #setDialogMessage(CharSequence)
 	 */
-	public void setDialogMessage(int dialogMessageResId) {
+	public void setDialogMessage(@StringRes final int dialogMessageResId) {
 		setDialogMessage(getContext().getString(dialogMessageResId));
 	}
 	
@@ -152,7 +158,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param dialogIcon The icon, as a {@link Drawable}.
 	 */
-	public void setDialogIcon(Drawable dialogIcon) {
+	public void setDialogIcon(final Drawable dialogIcon) {
 		mDialogIcon = dialogIcon;
 	}
 	
@@ -162,7 +168,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param dialogIconRes The icon, as a resource ID.
 	 */
-	public void setDialogIcon(@DrawableRes int dialogIconRes) {
+	public void setDialogIcon(@DrawableRes final int dialogIconRes) {
 		mDialogIcon = getContext().getResources().getDrawable(dialogIconRes);
 	}
 	
@@ -181,7 +187,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param positiveButtonText The text of the positive button.
 	 */
-	public void setPositiveButtonText(CharSequence positiveButtonText) {
+	public void setPositiveButtonText(final CharSequence positiveButtonText) {
 		mPositiveButtonText = positiveButtonText;
 	}
 	
@@ -189,7 +195,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param positiveButtonTextResId The positive button text as a resource.
 	 * @see #setPositiveButtonText(CharSequence)
 	 */
-	public void setPositiveButtonText(@StringRes int positiveButtonTextResId) {
+	public void setPositiveButtonText(@StringRes final int positiveButtonTextResId) {
 		setPositiveButtonText(getContext().getString(positiveButtonTextResId));
 	}
 	
@@ -209,7 +215,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param negativeButtonText The text of the negative button.
 	 */
-	public void setNegativeButtonText(CharSequence negativeButtonText) {
+	public void setNegativeButtonText(final CharSequence negativeButtonText) {
 		mNegativeButtonText = negativeButtonText;
 	}
 	
@@ -217,7 +223,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param negativeButtonTextResId The negative button text as a resource.
 	 * @see #setNegativeButtonText(CharSequence)
 	 */
-	public void setNegativeButtonText(@StringRes int negativeButtonTextResId) {
+	public void setNegativeButtonText(@StringRes final int negativeButtonTextResId) {
 		setNegativeButtonText(getContext().getString(negativeButtonTextResId));
 	}
 	
@@ -238,7 +244,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param dialogLayoutResId The layout resource ID to be inflated.
 	 * @see #setDialogMessage(CharSequence)
 	 */
-	public void setDialogLayoutResource(int dialogLayoutResId) {
+	public void setDialogLayoutResource(@LayoutRes final int dialogLayoutResId) {
 		mDialogLayoutResId = dialogLayoutResId;
 	}
 	
@@ -248,6 +254,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @return The layout resource.
 	 */
+	@LayoutRes
 	public int getDialogLayoutResource() {
 		return mDialogLayoutResId;
 	}
@@ -259,7 +266,7 @@ public class DialogPreferenceV7 extends Preference
 	 * Do not {@link AlertDialog.Builder#create()} or
 	 * {@link AlertDialog.Builder#show()}.
 	 */
-	protected void onPrepareDialogBuilder(AlertDialog.Builder builder) {
+	protected void onPrepareDialogBuilder(@NonNull final AlertDialog.Builder builder) {
 	}
 	
 	@Override
@@ -276,7 +283,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @param state Optional instance state to restore on the dialog
 	 */
-	protected void showDialog(Bundle state) {
+	protected void showDialog(final Bundle state) {
 		Context context = getContext();
 		
 		mWhichButtonClicked = DialogInterface.BUTTON_NEGATIVE;
@@ -323,7 +330,7 @@ public class DialogPreferenceV7 extends Preference
 	/**
 	 * Sets the required flags on the dialog window to enable input method window to show up.
 	 */
-	private void requestInputMethod(Dialog dialog) {
+	private void requestInputMethod(@NonNull final Dialog dialog) {
 		Window window = dialog.getWindow();
 		window.setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 	}
@@ -353,7 +360,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param view The content View of the dialog, if it is custom.
 	 */
 	@CallSuper
-	protected void onBindDialogView(View view) {
+	protected void onBindDialogView(@NonNull final View view) {
 		View dialogMessageView = view.findViewById(R.id.message);
 		
 		if (dialogMessageView != null) {
@@ -375,12 +382,12 @@ public class DialogPreferenceV7 extends Preference
 	}
 	
 	@Override
-	public void onClick(DialogInterface dialog, int which) {
+	public void onClick(final DialogInterface dialog, int which) {
 		mWhichButtonClicked = which;
 	}
 	
 	@Override
-	public void onDismiss(DialogInterface dialog) {
+	public void onDismiss(final DialogInterface dialog) {
 
 		mDialog = null;
 		onDialogClosed(mWhichButtonClicked == DialogInterface.BUTTON_POSITIVE);
@@ -412,6 +419,7 @@ public class DialogPreferenceV7 extends Preference
 	 *
 	 * @return The dialog, or null if a dialog is not being shown.
 	 */
+	@Nullable
 	public Dialog getDialog() {
 		return mDialog;
 	}

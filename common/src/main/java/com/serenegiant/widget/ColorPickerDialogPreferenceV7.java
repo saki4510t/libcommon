@@ -19,6 +19,8 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
@@ -30,15 +32,19 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 	private int mColor = 0xffff0000;
 	private boolean changed;
 
-	public ColorPickerDialogPreferenceV7(final Context context) {
+	public ColorPickerDialogPreferenceV7(@NonNull final Context context) {
 		this(context, null, 0);
 	}
 
-	public ColorPickerDialogPreferenceV7(final Context context, final AttributeSet attrs) {
+	public ColorPickerDialogPreferenceV7(@NonNull final Context context,
+		@Nullable final AttributeSet attrs) {
+
 		this(context, attrs, 0);
 	}
 
-	public ColorPickerDialogPreferenceV7(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public ColorPickerDialogPreferenceV7(@NonNull final Context context,
+		@NonNull final AttributeSet attrs, final int defStyleAttr) {
+
 		super(context, attrs, defStyleAttr);
 	}
 
@@ -57,13 +63,13 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 	}
 
 	@Override
-	protected void onBindDialogView(final View v) {
-		super.onBindDialogView(v);
+	protected void onBindDialogView(@NonNull final View view) {
+		super.onBindDialogView(view);
 //		if (DEBUG) Log.v(TAG, "onBindDialogView:" + v);
 		mColor = getPersistedInt(mColor);
 		changed = false;
-		if (v instanceof ColorPickerView) {
-			((ColorPickerView)v).setColor(mColor);
+		if (view instanceof ColorPickerView) {
+			((ColorPickerView)view).setColor(mColor);
 		}
 	}
 
@@ -80,14 +86,22 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 		super.onDialogClosed(positiveResult || changed);
 	}
 
+//	@Override
+//	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
+//		if (restorePersistedValue) {
+//			mColor = getPersistedInt(mColor);
+//		} else {
+//			mColor = (Integer)defaultValue;
+//			persistInt(mColor);
+//		}
+//	}
+
 	@Override
-	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
-		if (restorePersistedValue) {
-			mColor = getPersistedInt(mColor);
-		} else {
+	protected void onSetInitialValue(@Nullable final Object defaultValue) {
+		if (defaultValue != null) {
 			mColor = (Integer)defaultValue;
-			persistInt(mColor);
 		}
+		persistInt(mColor);
 	}
 
 	private final ColorPickerView.ColorPickerListener
