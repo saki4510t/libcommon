@@ -45,7 +45,7 @@ public final class VideoMuxer implements IMuxer {
 	static {
 		if (!isLoaded) {
 			System.loadLibrary("c++_shared");
-			System.loadLibrary("jpeg-turbo1500");
+			System.loadLibrary("jpeg-turbo2000");
 			System.loadLibrary("png16");
 			System.loadLibrary("common");
 			System.loadLibrary("mediaencoder");
