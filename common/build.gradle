@@ -44,7 +44,7 @@ android {
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
 	implementation "androidx.legacy:legacy-support-v4:${supportLibVersion}"
-	implementation "androidx.appcompat:appcompat:${supportLibVersion}"
+	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${supportLibVersion}"
 	implementation "androidx.preference:preference:${supportLibVersion}"
 }
