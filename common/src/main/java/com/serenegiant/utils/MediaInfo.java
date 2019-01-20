@@ -29,7 +29,7 @@ import org.json.JSONObject;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 import android.text.TextUtils;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)

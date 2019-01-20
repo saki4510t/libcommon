@@ -20,8 +20,8 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
 

@@ -10,13 +10,13 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.support.annotation.CallSuper;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.LayoutRes;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v7.preference.Preference;
+import androidx.annotation.CallSuper;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.StringRes;
+import androidx.preference.Preference;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -70,11 +70,11 @@ public class DialogPreferenceV7 extends Preference
 		
 		super(context, attrs, defStyleAttr, defStyleRes);
 		final TypedArray a = context.obtainStyledAttributes(attrs,
-			android.support.v7.preference.R.styleable.DialogPreference,
+			androidx.preference.R.styleable.DialogPreference,
 			defStyleAttr, defStyleRes);
 		
 		mDialogTitle = a.getString(
-			android.support.v7.preference.R.styleable.DialogPreference_dialogTitle);
+			androidx.preference.R.styleable.DialogPreference_dialogTitle);
 		if (mDialogTitle == null) {
 			// Fall back on the regular title of the preference
 			// (the one that is seen in the list)
@@ -82,15 +82,15 @@ public class DialogPreferenceV7 extends Preference
 		}
 		
 		mDialogMessage = a.getString(
-			android.support.v7.preference.R.styleable.DialogPreference_dialogMessage);
+			androidx.preference.R.styleable.DialogPreference_dialogMessage);
 		mDialogIcon = a.getDrawable(
-			android.support.v7.preference.R.styleable.DialogPreference_dialogIcon);
+			androidx.preference.R.styleable.DialogPreference_dialogIcon);
 		mPositiveButtonText = a.getString(
-			android.support.v7.preference.R.styleable.DialogPreference_positiveButtonText);
+			androidx.preference.R.styleable.DialogPreference_positiveButtonText);
 		mNegativeButtonText = a.getString(
-			android.support.v7.preference.R.styleable.DialogPreference_negativeButtonText);
+			androidx.preference.R.styleable.DialogPreference_negativeButtonText);
 		mDialogLayoutResId = a.getResourceId(
-			android.support.v7.preference.R.styleable.DialogPreference_dialogLayout,
+			androidx.preference.R.styleable.DialogPreference_dialogLayout,
 			mDialogLayoutResId);
 		a.recycle();
 	}

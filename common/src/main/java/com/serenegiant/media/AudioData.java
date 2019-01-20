@@ -18,7 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.support.annotation.IntRange;
+import androidx.annotation.IntRange;
 
 /**
  * MediaDataのシモニム, Deprecatedなので代わりにMediaDataを使うこと

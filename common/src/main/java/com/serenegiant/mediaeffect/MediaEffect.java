@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.media.effect.Effect;
 import android.media.effect.EffectContext;
 import android.media.effect.EffectFactory;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.serenegiant.glutils.TextureOffscreen;

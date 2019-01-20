@@ -22,7 +22,7 @@ import java.nio.ByteBuffer;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * MediaMuxerとVideoMuxerを共通で扱えるようにするためのインターフェース

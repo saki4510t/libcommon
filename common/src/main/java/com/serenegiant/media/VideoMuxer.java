@@ -27,7 +27,7 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * MediaMuxerがAPI>=18でしか使えないので、localに移植

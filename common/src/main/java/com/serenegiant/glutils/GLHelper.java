@@ -28,7 +28,7 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.utils.AssetsHelper;

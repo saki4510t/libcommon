@@ -31,8 +31,8 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.net.Uri;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.util.Log;
 
 public final class PermissionCheck {

@@ -26,7 +26,7 @@ package com.serenegiant.utils;
 
 import android.annotation.TargetApi;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class RefCountedAutoCloseable<T extends AutoCloseable> implements AutoCloseable {

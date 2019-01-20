@@ -1,8 +1,8 @@
 package com.serenegiant.libcommon.list;
 
 import android.content.Context;
-import android.support.annotation.ArrayRes;
-import android.support.annotation.NonNull;
+import androidx.annotation.ArrayRes;
+import androidx.annotation.NonNull;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -18,7 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;

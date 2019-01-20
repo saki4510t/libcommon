@@ -31,8 +31,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -138,7 +138,7 @@ public class BluetoothManager {
 	 * @return true Bluetoothに対応していて既に有効になっている
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
 	 */
-	public static boolean requestBluetoothEnable(@NonNull final android.support.v4.app.Fragment fragment, final int requestCode) throws SecurityException {
+	public static boolean requestBluetoothEnable(@NonNull final androidx.fragment.app.Fragment fragment, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
 			final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);

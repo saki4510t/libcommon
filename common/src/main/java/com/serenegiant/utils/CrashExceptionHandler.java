@@ -36,7 +36,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	/* package */static final String LOG_NAME = "crashrepo.txt";

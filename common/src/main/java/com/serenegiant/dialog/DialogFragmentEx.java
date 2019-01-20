@@ -1,8 +1,8 @@
 package com.serenegiant.dialog;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
+import androidx.annotation.NonNull;
+import androidx.fragment.app.DialogFragment;
 
 public abstract class DialogFragmentEx extends DialogFragment {
 	protected static final String ARGS_KEY_REQUEST_CODE = "requestCode";

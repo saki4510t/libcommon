@@ -18,7 +18,7 @@ package com.serenegiant.view.animation;
  *  limitations under the License.
 */
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;

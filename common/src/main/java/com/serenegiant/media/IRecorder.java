@@ -25,9 +25,9 @@ import java.nio.ByteBuffer;
 
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.support.annotation.IntDef;
-import android.support.annotation.Nullable;
-import android.support.v4.provider.DocumentFile;
+import androidx.annotation.IntDef;
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 import android.view.Surface;
 
 public interface IRecorder {

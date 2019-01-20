@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.serenegiant.glutils.GLHelper;
 

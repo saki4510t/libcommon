@@ -18,7 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.serenegiant.utils.MessageTask;
 

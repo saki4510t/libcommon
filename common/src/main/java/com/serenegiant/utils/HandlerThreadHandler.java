@@ -21,8 +21,8 @@ package com.serenegiant.utils;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";

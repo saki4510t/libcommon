@@ -21,7 +21,7 @@ package com.serenegiant.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class ComponentUtils {
 	public static void disable(@NonNull final Context context, final Class<?> clazz) {

@@ -18,7 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.glutils.GLDrawer2D;

@@ -29,12 +29,12 @@ import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.IntDef;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.annotation.DrawableRes;
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import android.widget.RemoteViews;
 
 import com.serenegiant.utils.BuildCheck;

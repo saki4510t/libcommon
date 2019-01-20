@@ -20,7 +20,7 @@ package com.serenegiant.utils;
 
 import android.os.Handler;
 import android.os.Looper;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 public final class UIThreadHelper {

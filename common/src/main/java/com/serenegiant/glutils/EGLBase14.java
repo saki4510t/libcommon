@@ -30,7 +30,7 @@ import android.opengl.EGLSurface;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;

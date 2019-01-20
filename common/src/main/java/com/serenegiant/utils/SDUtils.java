@@ -30,10 +30,11 @@ import android.os.Build;
 import android.os.ParcelFileDescriptor;
 import android.os.StatFs;
 import android.provider.DocumentsContract;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.provider.DocumentFile;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.documentfile.provider.DocumentFile;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -220,7 +221,7 @@ public class SDUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(@NonNull final android.support.v4.app.Fragment fragment,
+	public static void requestOpenDocument(@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -348,7 +349,7 @@ public class SDUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final android.support.v4.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -365,7 +366,7 @@ public class SDUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final android.support.v4.app.Fragment fragment,
+	public static void requestCreateDocument(@NonNull final Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -504,7 +505,7 @@ public class SDUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(@NonNull final android.support.v4.app.Fragment fragment,
+	public static Uri requestStorageAccess(@NonNull final Fragment fragment,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {

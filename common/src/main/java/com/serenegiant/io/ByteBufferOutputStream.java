@@ -29,7 +29,7 @@ OTHER DEALINGS IN THE SOFTWARE.
 For more information, please refer to <http://unlicense.org/>
  */
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import java.io.OutputStream;
 import java.nio.BufferOverflowException;

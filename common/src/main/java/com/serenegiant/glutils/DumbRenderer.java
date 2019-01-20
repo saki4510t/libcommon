@@ -19,7 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.SurfaceTexture;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
 

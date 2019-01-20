@@ -19,7 +19,7 @@ package com.serenegiant.net;
 */
 
 import android.annotation.SuppressLint;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;

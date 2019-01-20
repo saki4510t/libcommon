@@ -20,7 +20,7 @@ package com.serenegiant.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.xmlpull.v1.XmlPullParser;

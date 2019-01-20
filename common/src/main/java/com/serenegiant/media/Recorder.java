@@ -32,8 +32,8 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.os.ParcelFileDescriptor;
-import android.support.annotation.NonNull;
-import android.support.v4.provider.DocumentFile;
+import androidx.annotation.NonNull;
+import androidx.documentfile.provider.DocumentFile;
 import android.util.Log;
 import android.view.Surface;
 
