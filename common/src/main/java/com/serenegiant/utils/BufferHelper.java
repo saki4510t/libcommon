@@ -204,10 +204,24 @@ public class BufferHelper {
 	 * @param bytes
 	 * @return
 	 */
-	public static String toHexString(final byte[] bytes) {
+	public static String toHexString(@NonNull final byte[] bytes) {
+		return toHexString(bytes, 0, bytes.length);
+	}
+
+	/**
+	 * byte配列を16進文字列に変換する
+	 * @param bytes
+	 * @param offset
+	 * @param len 出力する最大バイト数
+	 * @return
+	 */
+	public static String toHexString(final byte[] bytes,
+		final int offset, final int len) {
+
 		final int n = (bytes != null) ? bytes.length : 0;
+		final int m = n > offset + len ? offset + len : n;
 		final StringBuilder sb = new StringBuilder(n * 2 + 2);
-		for (int i = 0; i < n; i++) {
+		for (int i = offset; i < m; i++) {
 			final byte b = bytes[i];
 			sb.append(HEX[(0xf0 & b) >>> 4]);
 			sb.append(HEX[0x0f & b]);
