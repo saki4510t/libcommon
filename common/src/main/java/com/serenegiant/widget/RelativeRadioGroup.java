@@ -174,7 +174,7 @@ public class RelativeRadioGroup extends RelativeLayout {
 
     private void setCheckedStateForView(int viewId, boolean checked) {
         View checkedView = findViewById(viewId);
-        if (checkedView != null && checkedView instanceof RadioButton) {
+        if (checkedView instanceof RadioButton) {
             ((RadioButton) checkedView).setChecked(checked);
         }
     }

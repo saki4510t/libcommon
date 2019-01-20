@@ -35,7 +35,7 @@ import com.serenegiant.glutils.IRendererCommon;
 
 public class ZoomAspectScaledTextureView extends AspectScaledTextureView
 	implements IRendererCommon {
-	private boolean mHandleTouchEvent = true;
+	private boolean mHandleTouchEvent;
 	// constants
 	/**
 	 * State: idle

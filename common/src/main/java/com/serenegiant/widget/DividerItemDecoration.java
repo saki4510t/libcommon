@@ -24,6 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.DrawableRes;
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
@@ -69,8 +70,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration  {
 	}
 
 	@Override
-	public void onDraw(final Canvas canvas,
-		final RecyclerView parent, final RecyclerView.State state) {
+	public void onDraw(@NonNull final Canvas canvas,
+		@NonNull final RecyclerView parent, @NonNull final RecyclerView.State state) {
 
 		if (mDivider == null) return;
 		if (mOrientation == VERTICAL_LIST) {
@@ -117,8 +118,8 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration  {
 	}
 
 	@Override
-	public void getItemOffsets(final Rect outRect, final View view,
-		final RecyclerView parent, final RecyclerView.State state) {
+	public void getItemOffsets(@NonNull final Rect outRect, @NonNull final View view,
+		@NonNull final RecyclerView parent, @NonNull final RecyclerView.State state) {
 
 		final int position = parent.getChildAdapterPosition(view);
 		if (mDivider == null) {

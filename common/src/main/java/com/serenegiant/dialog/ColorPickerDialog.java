@@ -127,21 +127,27 @@ public class ColorPickerDialog extends DialogFragment {
 			// 親がフラグメントの場合
 			mListener = (OnColorChangedListener) getTargetFragment();
 		} catch (final NullPointerException e1) {
+			// ignore
 		} catch (final ClassCastException e) {
+			// ignore
 		}
 		if (mListener == null)
 		try {
 			// 親がフラグメントの場合
 			mListener = (OnColorChangedListener) getParentFragment();
 		} catch (final NullPointerException e1) {
+			// ignore
 		} catch (final ClassCastException e) {
+			// ignore
 		}
 		if (mListener == null)
 		try {
 			// 親がActivityの場合
 			mListener = (OnColorChangedListener) activity;
 		} catch (final ClassCastException e) {
+			// ignore
 		} catch (final NullPointerException e1) {
+			// ignore
 		}
 		if (mListener == null) {
 			// FIXME 呼び出し元がコールバックメソッドを実装していない時

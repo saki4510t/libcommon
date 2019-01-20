@@ -20,15 +20,16 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
-import android.widget.ImageButton;
 
 import com.serenegiant.common.R;
+
+import androidx.appcompat.widget.AppCompatImageButton;
 
 /**
  * This class exists purely to cancel long click events, that got
  * started in NumberPicker
  */
-public final class ItemPickerButton extends ImageButton {
+public final class ItemPickerButton extends AppCompatImageButton {
 
     private ItemPicker mNumberPicker;
 

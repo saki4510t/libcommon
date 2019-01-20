@@ -21,7 +21,6 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 
 public class ColorPickerDialogPreference extends DialogPreference {

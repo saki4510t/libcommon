@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
@@ -30,8 +31,8 @@ import android.widget.RelativeLayout;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 
 public final class ItemPickerPreferenceV7 extends Preference {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-//	private static final String TAG = "ItemPickerPreference";
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final String TAG = ItemPickerPreferenceV7.class.getSimpleName();
 
 	private int preferenceValue;
 	private int mMinValue = 1, mMaxValue = 100;
@@ -99,6 +100,7 @@ public final class ItemPickerPreferenceV7 extends Preference {
 			try {
 				def = Integer.parseInt((String)defaultValue);
 			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
 			}
 		}
 		if (restorePersistedValue) {

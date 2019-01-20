@@ -53,7 +53,6 @@ public class TimePickerPreference extends DialogPreference {
         		attrs, R.styleable.TimePicker, defStyle, 0);
         mDefaultValue = (long)a.getFloat(R.styleable.TimePicker_TimePickerDefaultValue, -1);
         a.recycle();
-        a = null;
 
         setPositiveButtonText(android.R.string.ok);
 		setNegativeButtonText(android.R.string.cancel);

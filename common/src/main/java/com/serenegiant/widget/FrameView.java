@@ -60,7 +60,7 @@ public class FrameView extends View {
 	private int mScaleType, mScaleColor, mTickColor;
 	private float mScaleWidth;
 	private float mRotation;
-	private float mScale = 1.0f;
+	private float mScale;
 	private float mCenterX, mCenterY;
 	private float mWidth, mHeight;
 	private float mRadius, mRadius2, mRadius4, mRadiusQ;
@@ -88,7 +88,6 @@ public class FrameView extends View {
 		mRotation = attribs.getFloat(R.styleable.FrameView_scale_rotation, 0);
 		mScale = attribs.getFloat(R.styleable.FrameView_scale_scale, 1.0f);
 		attribs.recycle();
-		attribs = null;
 		mPaint.setStyle(Paint.Style.STROKE);
 //		if (DEBUG) Log.v(TAG, "mFrameWidth=" + mFrameWidth);
 	}

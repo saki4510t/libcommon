@@ -71,19 +71,20 @@ public abstract class CustomRecycleViewAdapter<T>
 	}
 
 	@Override
-	public void onAttachedToRecyclerView(final RecyclerView recyclerView) {
+	public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
 		mRecycleView = recyclerView;
 	}
 
 	@Override
-	public void onDetachedFromRecyclerView(final RecyclerView recyclerView) {
+	public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
 		mRecycleView = null;
 		super.onDetachedFromRecyclerView(recyclerView);
 	}
 
+	@NonNull
 	@Override
-    public ViewHolder<T> onCreateViewHolder(final ViewGroup parent, final int viewType) {
+    public ViewHolder<T> onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
 		final LayoutInflater inflater = getLayoutInflater(parent.getContext());
         final View view = onCreateItemView(inflater, parent, viewType);
 		view.setOnClickListener(mOnClickListener);
@@ -221,6 +222,7 @@ public abstract class CustomRecycleViewAdapter<T>
             mView = view;
         }
 
+		@NonNull
         @Override
         public String toString() {
             return super.toString() + " '" + mItem + "'";

@@ -21,10 +21,14 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.preference.Preference;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
 public class MultilineLabelPreference extends Preference {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = MultilineLabelPreference.class.getSimpleName();
+
 	public MultilineLabelPreference(final Context context) {
 		super(context);
 	}
@@ -54,6 +58,7 @@ public class MultilineLabelPreference extends Preference {
 			final TextView summary = (TextView)view.findViewById(android.R.id.summary);
 			summary.setSingleLine(false);
 		} catch (final Exception e) {
+			if (DEBUG) Log.w(TAG, e);
 		}
 	}
 }

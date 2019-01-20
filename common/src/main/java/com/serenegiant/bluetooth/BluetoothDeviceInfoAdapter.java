@@ -71,9 +71,9 @@ public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo
 			final TextView label;
 			rootView = mInflater.inflate(mLayoutId, parent, false);
 			final ViewHolder holder = new ViewHolder();
-			holder.nameTv = (TextView) rootView.findViewById(R.id.name);
-			holder.addressTv = (TextView)rootView.findViewById(R.id.address);
-			holder.icon = (ImageView)rootView.findViewById(R.id.icon);
+			holder.nameTv = rootView.findViewById(R.id.name);
+			holder.addressTv = rootView.findViewById(R.id.address);
+			holder.icon = rootView.findViewById(R.id.icon);
 			rootView.setTag(holder);
 		}
 		final ViewHolder holder = (ViewHolder)rootView.getTag();

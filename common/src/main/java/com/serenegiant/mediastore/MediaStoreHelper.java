@@ -122,11 +122,13 @@ public class MediaStoreHelper {
 					width = cursor.getInt(PROJ_INDEX_WIDTH);
 					height = cursor.getInt(PROJ_INDEX_HEIGHT);
 				} catch (final Exception e) {
+					// ignore
 				}
 			}
 			return this;
 		}
 
+		@NonNull
 		@Override
 		public String toString() {
 			return String.format("MediaInfo(title=%s,displayName=%s, mediaType=%s,mime=%s,data=%s)",

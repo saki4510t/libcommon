@@ -103,7 +103,7 @@ public final class SeekBarPreference extends Preference {
 			params.addRule(RelativeLayout.BELOW, android.R.id.summary);
 			parent.addView(extraview, params);
 
-			final SeekBar seekBar = (SeekBar)extraview.findViewById(mSeekbarId);
+			final SeekBar seekBar = extraview.findViewById(mSeekbarId);
 			if (seekBar != null) {
 				seekBar.setMax(mMaxValue - mMinValue);
 				final int progress = preferenceValue - mMinValue;
@@ -112,7 +112,7 @@ public final class SeekBarPreference extends Preference {
 				seekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
 				seekBar.setEnabled(isEnabled());
 			}
-			mTextView = (TextView)extraview.findViewById(R.id.seekbar_value_label);
+			mTextView = extraview.findViewById(R.id.seekbar_value_label);
 			if (mTextView != null) {
 				setValueLabel(preferenceValue, false);
 				mTextView.setEnabled(isEnabled());

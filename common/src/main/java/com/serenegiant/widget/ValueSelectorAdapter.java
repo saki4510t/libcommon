@@ -20,6 +20,9 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -34,7 +37,7 @@ import java.util.List;
 
 
 public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.ValueEntry> {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = ValueSelectorAdapter.class.getSimpleName();
 
 	public interface ValueSelectorAdapterListener {
@@ -80,8 +83,9 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 		mListener = listener;
 	}
 
+	@NonNull
 	@Override
-	public View getView(final int position, final View convertView, final ViewGroup parent) {
+	public View getView(final int position, final View convertView, @NonNull final ViewGroup parent) {
 		View rootView = convertView;
 		if (rootView == null) {
 			final TextView label;
@@ -91,13 +95,13 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 				holder.titleTv = (TextView)rootView;
 			} else {
 				try {
-					holder.titleTv = (TextView) rootView.findViewById(mTitleId);
+					holder.titleTv = rootView.findViewById(mTitleId);
 				} catch (final Exception e) {
 					holder.titleTv = null;
 				}
 				if (holder.titleTv == null) {
 					try {
-						holder.titleTv = (TextView) rootView.findViewById(R.id.title);
+						holder.titleTv = rootView.findViewById(R.id.title);
 					} catch (final Exception e) {
 						holder.titleTv = null;
 					}
@@ -117,7 +121,7 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 	}
 
 	@Override
-	public View getDropDownView(final int position, final View convertView, final ViewGroup parent) {
+	public View getDropDownView(final int position, final View convertView, @NonNull final ViewGroup parent) {
 		return getView(position, convertView, parent);
 	}
 
@@ -144,6 +148,7 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 				try {
 					mListener.onTouch(v, event, position);
 				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
 				}
 			}
 			return false;

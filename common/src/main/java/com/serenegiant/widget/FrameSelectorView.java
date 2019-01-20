@@ -32,6 +32,8 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 
+import java.util.Locale;
+
 
 public class FrameSelectorView extends LinearLayout {
 //	private static final boolean DEBUG = false;	// 実同時はfalseにすること
@@ -232,9 +234,10 @@ public class FrameSelectorView extends LinearLayout {
 				break;
 			}
 		}
-		for (int i = ix; i < 7; i++) {
-			mColors[i] = mColors[i + 1];
-		}
+//		for (int i = ix; i < 7; i++) {
+//			mColors[i] = mColors[i + 1];
+//		}
+		System.arraycopy(mColors, ix, mColors, ix + 1, 7);
 		mColors[7] = color;
 		updateColors(mColors);
 	}
@@ -250,7 +253,7 @@ public class FrameSelectorView extends LinearLayout {
 				if ((colors != null) && (colors.length >= 8)) {
 					for (int i = 0; i < 8; i++) {
 						final int id = COLOR_BTN_IDS[i];
-						final ImageButton button = (ImageButton)findViewById(id);
+						final ImageButton button = findViewById(id);
 						if (button != null) {
 							button.setBackgroundColor(colors[i]);
 						}
@@ -267,45 +270,45 @@ public class FrameSelectorView extends LinearLayout {
 	private void initView(final View rootView) {
 		// フレーム選択ボタン
 		ImageButton button;
-		mFrameButtons[0] = (ImageButton)rootView.findViewById(R.id.frame_frame_button);
+		mFrameButtons[0] = rootView.findViewById(R.id.frame_frame_button);
 		mFrameButtons[0].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[1] = (ImageButton)rootView.findViewById(R.id.frame_cross_button);
+		mFrameButtons[1] = rootView.findViewById(R.id.frame_cross_button);
 		mFrameButtons[1].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[2] = (ImageButton)rootView.findViewById(R.id.frame_cross_quarter_button);
+		mFrameButtons[2] = rootView.findViewById(R.id.frame_cross_quarter_button);
 		mFrameButtons[2].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[3] = (ImageButton)rootView.findViewById(R.id.frame_circle_button);
+		mFrameButtons[3] = rootView.findViewById(R.id.frame_circle_button);
 		mFrameButtons[3].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[4] = (ImageButton)rootView.findViewById(R.id.frame_circle2_button);
+		mFrameButtons[4] = rootView.findViewById(R.id.frame_circle2_button);
 		mFrameButtons[4].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[5] = (ImageButton)rootView.findViewById(R.id.frame_cross_circle_button);
+		mFrameButtons[5] = rootView.findViewById(R.id.frame_cross_circle_button);
 		mFrameButtons[5].setOnClickListener(mOnFrameClickListener);
-		mFrameButtons[6] = (ImageButton)rootView.findViewById(R.id.frame_cross_circle2_button);
+		mFrameButtons[6] = rootView.findViewById(R.id.frame_cross_circle2_button);
 		mFrameButtons[6].setOnClickListener(mOnFrameClickListener);
 		// 色選択ボタン
-		button = (ImageButton)rootView.findViewById(R.id.color1_button);
+		button = rootView.findViewById(R.id.color1_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color2_button);
+		button = rootView.findViewById(R.id.color2_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color3_button);
+		button = rootView.findViewById(R.id.color3_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color4_button);
+		button = rootView.findViewById(R.id.color4_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color5_button);
+		button = rootView.findViewById(R.id.color5_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color6_button);
+		button = rootView.findViewById(R.id.color6_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color7_button);
+		button = rootView.findViewById(R.id.color7_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color8_button);
+		button = rootView.findViewById(R.id.color8_button);
 		button.setOnClickListener(mOnColorClickListener);
-		button = (ImageButton)rootView.findViewById(R.id.color_select_button);
+		button = rootView.findViewById(R.id.color_select_button);
 		button.setOnClickListener(mOnColorClickListener);
 		// スケール選択ラジオボタン
-		mScaleTypeRadioGroup = (RadioGroup)rootView.findViewById(R.id.scale_type_radiogroup);
+		mScaleTypeRadioGroup = rootView.findViewById(R.id.scale_type_radiogroup);
 		mScaleTypeRadioGroup.setOnCheckedChangeListener(mOnCheckedChangeListener);
 		// ライン幅
-		mLineWidthTv = (TextView)rootView.findViewById(R.id.line_width_textview);
-		mSeekBar = (SeekBar)rootView.findViewById(R.id.line_width_seekbar);
+		mLineWidthTv = rootView.findViewById(R.id.line_width_textview);
+		mSeekBar = rootView.findViewById(R.id.line_width_seekbar);
 		mSeekBar.setOnSeekBarChangeListener(mOnSeekBarChangeListener);
 	}
 
@@ -370,7 +373,7 @@ public class FrameSelectorView extends LinearLayout {
 		@Override
 		public void onProgressChanged(final SeekBar seekBar, final int progress, final boolean fromUser) {
 			if (mLineWidthTv != null) {
-				mLineWidthTv.setText(String.format("%4.1fpx", progress / 10.0f));
+				mLineWidthTv.setText(String.format(Locale.US, "%4.1fpx", progress / 10.0f));
 			}
 			if (fromUser && (mCallback != null)) {
 				try {

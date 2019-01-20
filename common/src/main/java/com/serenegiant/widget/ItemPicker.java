@@ -55,6 +55,8 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 
+import androidx.annotation.NonNull;
+
 /**
  * A view for selecting a number or string-array
  */
@@ -164,11 +166,10 @@ public final class ItemPicker extends LinearLayout {
         final int decrementBackground = a.getResourceId(R.styleable.ItemPicker_ItemPickerDecrementBackground, -1);
         final int incrementSrc = a.getResourceId(R.styleable.ItemPicker_ItemPickerIncrementSrc, -1);
         final int decrementSrc = a.getResourceId(R.styleable.ItemPicker_ItemPickerDecrementSrc, -1);
-        final int editTextBackground = a.getResourceId(R.styleable.ItemPicker_ItemPickerEditTextBackground, -1);;
+        final int editTextBackground = a.getResourceId(R.styleable.ItemPicker_ItemPickerEditTextBackground, -1);
         final int currentValue = a.getInt(R.styleable.ItemPicker_ItemPickerCurrentItemValue, -1);
         final int speed = a.getInt(R.styleable.ItemPicker_ItemPickerSpeed, -1);
         a.recycle();
-        a = null;
 
         final OnClickListener clickListener = new OnClickListener() {
         	@Override
@@ -223,7 +224,7 @@ public final class ItemPicker extends LinearLayout {
 
         final InputFilter inputFilter = new NumberPickerInputFilter();
         mNumberInputFilter = new NumberRangeKeyListener();
-        mIncrementButton = (ItemPickerButton) findViewById(R.id.increment);
+        mIncrementButton = findViewById(R.id.increment);
         mIncrementButton.setOnClickListener(clickListener);
         mIncrementButton.setOnLongClickListener(longClickListener);
         mIncrementButton.setNumberPicker(this);
@@ -232,7 +233,7 @@ public final class ItemPicker extends LinearLayout {
         if (incrementSrc != -1)
         	mIncrementButton.setImageResource(incrementSrc);
 
-        mDecrementButton = (ItemPickerButton) findViewById(R.id.decrement);
+        mDecrementButton = findViewById(R.id.decrement);
         mDecrementButton.setOnClickListener(clickListener);
         mDecrementButton.setOnLongClickListener(longClickListener);
         mDecrementButton.setNumberPicker(this);
@@ -241,7 +242,7 @@ public final class ItemPicker extends LinearLayout {
         if (decrementSrc != -1)
         	mDecrementButton.setImageResource(decrementSrc);
 
-        mText = (EditText) findViewById(R.id.input);
+        mText = findViewById(R.id.input);
         mText.setOnFocusChangeListener(focusListener);
         mText.setFilters(new InputFilter[] {inputFilter});
         mText.setRawInputType(InputType.TYPE_CLASS_NUMBER);
@@ -508,6 +509,7 @@ public final class ItemPicker extends LinearLayout {
             return InputType.TYPE_CLASS_NUMBER;
         }
 
+        @NonNull
         @Override
         protected char[] getAcceptedChars() {
             return DIGIT_CHARACTERS;

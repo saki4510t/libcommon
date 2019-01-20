@@ -459,7 +459,7 @@ public class ColorPickerView extends View {
 		if (mShowAlphaSlider != showAlpha) {
 			mShowAlphaSlider = showAlpha;
 			postInvalidate();
-		};
+		}
 	}
 
 	/**

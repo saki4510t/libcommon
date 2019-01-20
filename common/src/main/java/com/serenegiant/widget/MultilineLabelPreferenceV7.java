@@ -22,9 +22,13 @@ import android.content.Context;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.TextView;
 
 public class MultilineLabelPreferenceV7 extends Preference {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = MultilineLabelPreferenceV7.class.getSimpleName();
+
 	public MultilineLabelPreferenceV7(final Context context) {
 		super(context);
 	}
@@ -54,6 +58,7 @@ public class MultilineLabelPreferenceV7 extends Preference {
 			final TextView summary = (TextView)holder.findViewById(android.R.id.summary);
 			summary.setSingleLine(false);
 		} catch (final Exception e) {
+			if (DEBUG) Log.w(TAG, e);
 		}
 	}
 }
