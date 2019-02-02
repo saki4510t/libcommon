@@ -19,11 +19,13 @@ package com.serenegiant.utils;
 */
 
 import android.content.Context;
-import android.content.res.Resources;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
 import org.xmlpull.v1.XmlPullParser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * XmlPullParserのヘルパークラス
@@ -38,37 +40,15 @@ public class XmlHelper {
 	 * @param defaultValue
 	 * @return
 	 */
-	public static final int getAttributeInteger(@NonNull final Context context,
+	public static final int getAttribute(@NonNull final Context context,
 		@NonNull final XmlPullParser parser,
 		final String namespace, final String name, final int defaultValue) {
 
-		int result = defaultValue;
 		try {
-			String v = parser.getAttributeValue(namespace, name);
-			if (!TextUtils.isEmpty(v) && v.startsWith("@")) {
-				final String r = v.substring(1);
-				final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
-				if (resId > 0) {
-					result = context.getResources().getInteger(resId);
-				}
-			} else {
-                int radix = 10;
-                if (v != null && v.length() > 2 && v.charAt(0) == '0' &&
-                    (v.charAt(1) == 'x' || v.charAt(1) == 'X')) {
-                    // allow hex values starting with 0x or 0X
-                    radix = 16;
-                    v = v.substring(2);
-                }
-				result = Integer.parseInt(v, radix);
-			}
-		} catch (final Resources.NotFoundException e) {
-			result = defaultValue;
-		} catch (final NumberFormatException e) {
-			result = defaultValue;
-		} catch (final NullPointerException e) {
-			result = defaultValue;
+			return ResourceHelper.get(context, parser.getAttributeValue(namespace, name), defaultValue);
+		} catch (final Exception e) {
+			return defaultValue;
 		}
-		return result;
 	}
 
 	/**
@@ -82,42 +62,15 @@ public class XmlHelper {
 	 * @param defaultValue
 	 * @return
 	 */
-	public static final boolean getAttributeBoolean(@NonNull final Context context,
+	public static final boolean getAttribute(@NonNull final Context context,
 		@NonNull final XmlPullParser parser,
 		final String namespace, final String name, final boolean defaultValue) {
 
-		boolean result = defaultValue;
 		try {
-			String v = parser.getAttributeValue(namespace, name);
-			if ("TRUE".equalsIgnoreCase(v)) {
-				result = true;
-			} else if ("FALSE".equalsIgnoreCase(v)) {
-				result = false;
-			} else if (!TextUtils.isEmpty(v) && v.startsWith("@")) {
-				final String r = v.substring(1);
-				final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
-				if (resId > 0) {
-					result = context.getResources().getBoolean(resId);
-				}
-			} else {
-                int radix = 10;
-                if (v != null && v.length() > 2 && v.charAt(0) == '0' &&
-                    (v.charAt(1) == 'x' || v.charAt(1) == 'X')) {
-                    // allow hex values starting with 0x or 0X
-                    radix = 16;
-                    v = v.substring(2);
-                }
-				final int val = Integer.parseInt(v, radix);
-				result = val != 0;
-			}
-		} catch (final Resources.NotFoundException e) {
-			result = defaultValue;
-		} catch (final NumberFormatException e) {
-			result = defaultValue;
-		} catch (final NullPointerException e) {
-			result = defaultValue;
+			return ResourceHelper.get(context, parser.getAttributeValue(namespace, name), defaultValue);
+		} catch (final Exception e) {
+			return defaultValue;
 		}
-		return result;
 	}
 
 	/**
@@ -129,30 +82,15 @@ public class XmlHelper {
 	 * @param defaultValue
 	 * @return
 	 */
-	public static final String getAttributeString(@NonNull final Context context,
+	public static final String getAttribute(@NonNull final Context context,
 		@NonNull final XmlPullParser parser,
 		final String namespace, final String name, final String defaultValue) {
 
-		String result;
 		try {
-			result = parser.getAttributeValue(namespace, name);
-			if (result == null)
-				result = defaultValue;
-			if (!TextUtils.isEmpty(result) && result.startsWith("@")) {
-				final String r = result.substring(1);
-				final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
-				if (resId > 0) {
-					result = context.getResources().getString(resId);
-				}
-			}
-		} catch (final Resources.NotFoundException e) {
-			result = defaultValue;
-		} catch (final NumberFormatException e) {
-			result = defaultValue;
-		} catch (final NullPointerException e) {
-			result = defaultValue;
+			return ResourceHelper.get(context, parser.getAttributeValue(namespace, name), defaultValue);
+		} catch (final Exception e) {
+			return defaultValue;
 		}
-		return result;
 	}
 
 	/**
@@ -164,31 +102,71 @@ public class XmlHelper {
 	 * @param defaultValue
 	 * @return
 	 */
-	public static final CharSequence getAttributeText(@NonNull final Context context,
+	public static final CharSequence getAttribute(@NonNull final Context context,
 		@NonNull final XmlPullParser parser,
 		final String namespace, final String name, final CharSequence defaultValue) {
 
-		CharSequence result;
 		try {
-			result = parser.getAttributeValue(namespace, name);
-			if (result == null)
-				result = defaultValue;
-			if (!TextUtils.isEmpty(result)) {
-				final String s = result.toString();
-				if (s.startsWith("@")) {
-					final String r = s.substring(1);
-					final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
-					if (resId > 0) {
-						result = context.getResources().getText(resId);
-					}
+			return ResourceHelper.get(context, parser.getAttributeValue(namespace, name), defaultValue);
+		} catch (final Exception e) {
+			return defaultValue;
+		}
+	}
+	
+	public static final int[] getAttribute(@NonNull final Context context,
+		@NonNull final XmlPullParser parser,
+		final String namespace, final String name, final int[] defaultValue) {
+		
+		int[] result = defaultValue;
+		
+		final String valueString = getAttribute(context, parser, namespace, name, "");
+		if (!TextUtils.isEmpty(valueString)) {
+			final String[] values = valueString.split(",");
+			final List<Integer> list = new ArrayList<>();
+			final int n = values.length;
+			for (final String value: values) {
+				try {
+					list.add(ResourceHelper.get(context, parser.getAttributeValue(namespace, name), 0));
+				} catch (final Exception e) {
+					// ignore
 				}
 			}
-		} catch (final Resources.NotFoundException e) {
-			result = defaultValue;
-		} catch (final NumberFormatException e) {
-			result = defaultValue;
-		} catch (final NullPointerException e) {
-			result = defaultValue;
+			if (list.size() > 0) {
+				result = new int[list.size()];
+				int i = 0;
+				for (final Integer value: list) {
+					result[i++] = value;
+				}
+			}
+		}
+		return result;
+	}
+
+	public static final boolean[] getAttribute(@NonNull final Context context,
+		@NonNull final XmlPullParser parser,
+		final String namespace, final String name, final boolean[] defaultValue) {
+		
+		boolean[] result = defaultValue;
+		
+		final String valueString = getAttribute(context, parser, namespace, name, "");
+		if (!TextUtils.isEmpty(valueString)) {
+			final String[] values = valueString.split(",");
+			final List<Boolean> list = new ArrayList<>();
+			final int n = values.length;
+			for (final String value: values) {
+				try {
+					list.add(ResourceHelper.get(context, parser.getAttributeValue(namespace, name), false));
+				} catch (final Exception e) {
+					// ignore
+				}
+			}
+			if (list.size() > 0) {
+				result = new boolean[list.size()];
+				int i = 0;
+				for (final Boolean value: list) {
+					result[i++] = value;
+				}
+			}
 		}
 		return result;
 	}
