@@ -37,6 +37,7 @@ import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.ObjectHelper;
+import com.serenegiant.utils.XmlHelper;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
@@ -50,11 +51,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import static com.serenegiant.utils.XmlHelper.getAttributeBoolean;
-import static com.serenegiant.utils.XmlHelper.getAttributeInteger;
-import static com.serenegiant.utils.XmlHelper.getAttributeString;
-import static com.serenegiant.utils.XmlHelper.getAttributeText;
 
 /**
  * Android 8 (API26)以降でのNotificationChannel作成用のヘルパークラス
@@ -221,8 +217,8 @@ public class ChannelBuilder {
 				&& (tag.equalsIgnoreCase("notificationChannel"))) {
 				
 				if (eventType == XmlPullParser.START_TAG) {
-					final String channelId = getAttributeString(context, parser,
-						null, "channelId", null);
+					final String channelId = XmlHelper.getAttribute(context, parser,
+						null, "channelId", "");
 		   			if (!TextUtils.isEmpty(channelId)) {
 		   				builder = ChannelBuilder.getBuilder(context, channelId)
 		   					.setCreateIfExists(false);	// xmlから読み込む場合のデフォルトはfalse
@@ -232,18 +228,18 @@ public class ChannelBuilder {
 		   					if (!TextUtils.isEmpty(attrName)) {
 		   						switch (attrName) {
 								case "name":
-									builder.setName(getAttributeText(context, parser,
+									builder.setName(XmlHelper.getAttribute(context, parser,
 										null, "name", builder.getName()));
 									break;
 								case "importance":
 									@Importance
-									final int importance = getAttributeInteger(context, parser,
+									final int importance = XmlHelper.getAttribute(context, parser,
 										null, "importance", builder.getImportance());
 									builder.setImportance(importance);
 									break;
 								case "lockscreenVisibility":
 									final int lockscreenVisibility
-										= getAttributeInteger(context, parser,
+										= XmlHelper.getAttribute(context, parser,
 										null, "lockscreenVisibility",
 										builder.getLockscreenVisibility());
 									if (NOTIFICATION_VISIBILITY.contains(lockscreenVisibility)) {
@@ -251,31 +247,31 @@ public class ChannelBuilder {
 									}
 									break;
 								case "bypassDnd":
-									builder.setBypassDnd(getAttributeBoolean(context, parser,
+									builder.setBypassDnd(XmlHelper.getAttribute(context, parser,
 										null, "bypassDnd",
 										builder.canBypassDnd()));
 									break;
 								case "showBadge":
-									builder.setShowBadge(getAttributeBoolean(context, parser,
+									builder.setShowBadge(XmlHelper.getAttribute(context, parser,
 										null, "showBadge",
 										builder.canShowBadge()));
 									break;
 								case "description":
-									builder.setDescription(getAttributeString(context, parser,
+									builder.setDescription(XmlHelper.getAttribute(context, parser,
 										null, "description", builder.getDescription()));
 									break;
 								case "light":
-									builder.setLightColor(getAttributeInteger(context, parser,
+									builder.setLightColor(XmlHelper.getAttribute(context, parser,
 										null, "light",
 										builder.getLightColor()));
 								case "enableLights":
-									builder.enableLights(getAttributeBoolean(context, parser,
+									builder.enableLights(XmlHelper.getAttribute(context, parser,
 										null, "enableLights",
 										builder.shouldShowLights()));
 									break;
 								case "vibrationPattern":
-									final String patternString = getAttributeString(context, parser,
-										null, "vibrationPattern", null);
+									final String patternString = XmlHelper.getAttribute(context, parser,
+										null, "vibrationPattern", "");
 									if (!TextUtils.isEmpty(patternString)) {
 										final String[] pats = patternString.trim().split(",");
 										if (pats.length > 0) {
@@ -293,19 +289,19 @@ public class ChannelBuilder {
 									}
 									break;
 								case "enableVibration":
-									builder.enableVibration(getAttributeBoolean(context, parser,
+									builder.enableVibration(XmlHelper.getAttribute(context, parser,
 										null, "enableVibration",
 										builder.shouldVibrate()));
 									break;
 								case "sound":
-									final String uriString = getAttributeString(context, parser,
-										null, "sound", null);
+									final String uriString = XmlHelper.getAttribute(context, parser,
+										null, "sound", "");
 									if (!TextUtils.isEmpty(uriString)) {
 										builder.setSound(Uri.parse(uriString), null);
 									}
 									break;
 								case "createIfExists":
-									builder.setCreateIfExists(getAttributeBoolean(context, parser,
+									builder.setCreateIfExists(XmlHelper.getAttribute(context, parser,
 										null, "createIfExists",
 										false));	// xmlから読み込む場合のデフォルトはfalse
 									break;
