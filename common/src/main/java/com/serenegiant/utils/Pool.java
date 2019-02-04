@@ -28,6 +28,7 @@ import java.util.List;
 public abstract class Pool<T> {
 
 	private final List<T> mPool = new ArrayList<T>();
+	private final int mInitNum;
 	private final int mMaxNumInPool;
 	private final int mLimitNum;
 	private int mCreatedObjects;
@@ -48,9 +49,18 @@ public abstract class Pool<T> {
 	 * @param limitNum 最大生成数
 	 */
 	public Pool(final int initNum, final int maxNumInPool, final int limitNum) {
+		mInitNum = initNum;
 		mMaxNumInPool = maxNumInPool < limitNum ? maxNumInPool : limitNum;
 		mLimitNum = limitNum;
-		for (int i = 0; (i < initNum) && (i < mMaxNumInPool); i++) {
+		init();
+	}
+	
+	/**
+	 * プール内のオブジェクトを破棄して新たに初期数まで確保する
+	 */
+	public void init() {
+		clear();
+		for (int i = 0; (i < mInitNum) && (i < mMaxNumInPool); i++) {
 			final T obj = createObject();
 			if (obj != null) {
 				mPool.add(obj);
@@ -58,7 +68,7 @@ public abstract class Pool<T> {
 			}
 		}
 	}
-	
+
 	/**
 	 * プールからオブジェクトTを取得する。もしプールが空で最大生成数を超えている場合にはnullを返す
 	 * @param args
