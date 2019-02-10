@@ -399,13 +399,6 @@ public final class DeviceFilter {
 	 * @return
 	 */
 	public boolean matches(@NonNull final UsbDevice device) {
-		if ((device.getDeviceClass() == 0)
-			&& (device.getDeviceSubclass() == 0)
-			&& (device.getDeviceProtocol() == 0)) {
-			
-			return interfaceMatches(device);
-		}
-
 		if (mVendorId != -1 && device.getVendorId() != mVendorId) {
 			return false;
 		}
