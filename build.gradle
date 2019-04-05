@@ -34,9 +34,9 @@ ext {
 	versionCompiler = 28
 	versionTarget = 28
 
+	// variable that can be referenced to keep support libs consistent
 	supportLibVersion = '1.0.0'
 	androidXVersion = '1.1.0-alpha03'
-	// variable that can be referenced to keep support libs consistent
 	constraintLibVersion = '1.1.3'
 
     versionCodeNum = 226
