@@ -35,7 +35,7 @@ ext {
 	versionTarget = 28
 
 	supportLibVersion = '1.0.0'
-	androidXVersion = '1.0.2'
+	androidXVersion = '1.1.0-alpha03'
 	// variable that can be referenced to keep support libs consistent
 	constraintLibVersion = '1.1.3'
 
