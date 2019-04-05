@@ -126,7 +126,7 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	}
 
 	@Override
-	public void onAttach(final Context context) {
+	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		// コールバックインターフェースを取得
 		if (context instanceof MessageDialogListener) {
@@ -186,7 +186,7 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	};
 
 	@Override
-	public void onCancel(final DialogInterface dialog) {
+	public void onCancel(@NonNull final DialogInterface dialog) {
 		super.onCancel(dialog);
 		callOnMessageDialogResult(false);
 	}

@@ -149,7 +149,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	}
 
 	@Override
-	public void onAttach(final Context context) {
+	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		isCanceled = false;
 		if (DEBUG) Log.v(TAG, "onAttach:");
@@ -216,14 +216,14 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	}
 
 	@Override
-	public void onCancel(final DialogInterface dialog) {
+	public void onCancel(@NonNull final DialogInterface dialog) {
 		super.onCancel(dialog);
 		if (DEBUG) Log.v(TAG, "onCancel:");
 		isCanceled = true;
 	}
 
 	@Override
-	public void onDismiss(final DialogInterface dialog) {
+	public void onDismiss(@NonNull final DialogInterface dialog) {
 		super.onDismiss(dialog);
 		if (mListener != null) {
 			if (isCanceled) {
