@@ -39,6 +39,6 @@ ext {
 	androidXVersion = '1.1.0-alpha03'
 	constraintLibVersion = '1.1.3'
 
-    versionCodeNum = 227
-    versionNameString = '4.2.4'
+    versionCodeNum = 228
+    versionNameString = '4.2.5'
 }
