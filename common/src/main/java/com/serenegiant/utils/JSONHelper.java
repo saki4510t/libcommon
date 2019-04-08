@@ -20,6 +20,7 @@ package com.serenegiant.utils;
 
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -54,6 +55,26 @@ public class JSONHelper {
 				} catch (final Exception e1) {
 					try {
 						result = payload.getBoolean(key) ? 1 :0;
+					} catch (final Exception e2) {
+						Log.w(TAG, e2);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	public static long optLong(final JSONArray payload, final int index, final long defaultValue) {
+		long result = defaultValue;
+		if (payload.length() > index) {
+			try {
+				result = payload.getLong(index);
+			} catch (final JSONException e) {
+				try {
+					result = Long.parseLong(payload.getString(index));
+				} catch (final Exception e1) {
+					try {
+						result = payload.getBoolean(index) ? 1 :0;
 					} catch (final Exception e2) {
 						Log.w(TAG, e2);
 					}
@@ -99,6 +120,26 @@ public class JSONHelper {
 		return result;
 	}
 
+	public static int optInt(final JSONArray payload, final int index, final int defaultValue) {
+		int result = defaultValue;
+		if (payload.length() > index) {
+			try {
+				result = payload.getInt(index);
+			} catch (final JSONException e) {
+				try {
+					result = Integer.parseInt(payload.getString(index));
+				} catch (final Exception e1) {
+					try {
+						result = payload.getBoolean(index) ? 1 :0;
+					} catch (final Exception e2) {
+						Log.w(TAG, e2);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
 	public static boolean getBoolean(final JSONObject payload, final String key, final boolean defaultValue) throws JSONException {
 		boolean result = defaultValue;
 		if (payload.has(key)) {
@@ -126,6 +167,26 @@ public class JSONHelper {
 				} catch (JSONException e1) {
 					try {
 						result = payload.getDouble(key) != 0;
+					} catch (JSONException e2) {
+						Log.w(TAG, e2);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	public static boolean optBoolean(final JSONArray payload, final int index, final boolean defaultValue) {
+		boolean result = defaultValue;
+		if (payload.length() > index) {
+			try {
+				result = payload.getBoolean(index);
+			} catch (final Exception e) {
+				try {
+					result = payload.getInt(index) != 0;
+				} catch (JSONException e1) {
+					try {
+						result = payload.getDouble(index) != 0;
 					} catch (JSONException e2) {
 						Log.w(TAG, e2);
 					}
