@@ -326,7 +326,7 @@ public final class USBMonitor implements Const {
 	public List<UsbDevice> getDeviceList() {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
 		if (destroyed) return result;
-		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
+		final HashMap<String, UsbDevice> deviceList = getDeviceList(mUsbManager);
 		if (deviceList != null) {
 			if (mDeviceFilters.isEmpty()) {
 				result.addAll(deviceList.values());
@@ -385,7 +385,7 @@ public final class USBMonitor implements Const {
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 */
 	public final void dumpDevices() {
-		final HashMap<String, UsbDevice> list = mUsbManager != null ? mUsbManager.getDeviceList() : null;
+		final HashMap<String, UsbDevice> list = getDeviceList(mUsbManager);
 		if (list != null) {
 			final Set<String> keys = list.keySet();
 			if (keys != null && keys.size() > 0) {
@@ -1479,5 +1479,17 @@ public final class USBMonitor implements Const {
 			}
 		}
 		return hasPermission;
+	}
+
+	private static HashMap<String, UsbDevice> getDeviceList(UsbManager usbManager) {
+		HashMap<String, UsbDevice> list = null;
+		if (null != usbManager) {
+			try {
+				list = usbManager.getDeviceList();
+			} catch (Throwable e) {
+				Log.w(TAG, e);
+			}
+		}
+		return list;
 	}
 }
