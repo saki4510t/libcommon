@@ -30,6 +30,8 @@ import java.nio.ByteOrder;
 
 public class MediaData {
 
+	@NonNull
+	private ByteOrder mByteOrder = ByteOrder.nativeOrder();
 	/*package*/ByteBuffer mBuffer;
 	/*package*/int flags;
 	/*package*/int size;
@@ -43,12 +45,47 @@ public class MediaData {
 
 	/**
 	 * コンストラクタ
+	 */
+	public MediaData(@NonNull final ByteOrder order) {
+		mByteOrder = order;
+	}
+
+	/**
+	 * コンストラクタ
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 */
 	public MediaData(@IntRange(from=0)final int size) {
 		resize(size);
 	}
 	
+	/**
+	 * コンストラクタ
+	 * @param size データ保持用の内部バッファのデフォルトサイズ
+	 * @param order
+	 */
+	public MediaData(@IntRange(from=0)final int size, @NonNull final ByteOrder order) {
+		mByteOrder = order;
+		resize(size);
+	}
+
+	/**
+	 * コピーコンストラクタ(ディープコピー)
+	 * @param src
+	 */
+	public MediaData(@NonNull MediaData src) {
+		mByteOrder = src.mByteOrder;
+		set(src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+	}
+
+	/**
+	 * データをセット
+	 * このオブジェクトのエンディアンは変更されないので注意
+	 * @param src
+	 */
+	public void set(@NonNull MediaData src) {
+		set(src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+	}
+
 	/**
 	 * データをセット
 	 * @param buffer
@@ -121,7 +158,7 @@ public class MediaData {
 	public MediaData resize(@IntRange(from=0)final int newSize) {
 		if ((mBuffer == null) || (mBuffer.capacity() < newSize)) {
 			mBuffer = ByteBuffer.allocateDirect(newSize)
-				.order(ByteOrder.nativeOrder());
+				.order(mByteOrder);
 		}
 		mBuffer.clear();
 		return this;
@@ -157,7 +194,7 @@ public class MediaData {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	public void get(final byte[] buffer) throws ArrayIndexOutOfBoundsException {
-		if ((buffer == null) || (buffer.length < size)) {
+		if ((mBuffer == null) || (size <= 0)|| (buffer == null) || (buffer.length < size)) {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
@@ -172,7 +209,7 @@ public class MediaData {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	public void get(final ByteBuffer buffer) throws ArrayIndexOutOfBoundsException {
-		if ((buffer == null) || (buffer.remaining() < size)) {
+		if ((mBuffer == null) || (size <= 0) || (buffer == null) || (buffer.remaining() < size)) {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
@@ -192,12 +229,35 @@ public class MediaData {
 	
 	/**
 	 * 内部で保持しているByteBufferを返す
+	 * FIXME ByteBuffer#asReadOnlyBufferを返すように修正する
  	 * @return
 	 */
 	public ByteBuffer get() {
-		mBuffer.clear();
-		mBuffer.position(size);
-		mBuffer.flip();
+		if (mBuffer != null) {
+			mBuffer.clear();
+			mBuffer.position(size);
+			mBuffer.flip();
+		}
 		return mBuffer;
+	}
+
+	/**
+	 * 内部で保持しているByteBufferのバイトオーダーを返す
+	 * @return
+	 */
+	@NonNull
+	public ByteOrder order() {
+		return mByteOrder;
+	}
+
+	/**
+	 * 内部で保持しているByteBufferのバイトオーダーを変更する
+	 * @param order
+	 */
+	public void order(@NonNull final ByteOrder order) {
+		mByteOrder = order;
+		if (mBuffer != null) {
+			mBuffer.order(order);
+		}
 	}
 }
