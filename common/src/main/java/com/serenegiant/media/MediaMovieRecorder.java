@@ -31,6 +31,8 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import androidx.annotation.Nullable;
+
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMovieRecorder extends AbstractRecorder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
@@ -54,10 +56,18 @@ public class MediaMovieRecorder extends AbstractRecorder {
 
 	public MediaMovieRecorder(final String output_path,
 		final boolean audio_recording, final boolean useVideoMuxer) throws IOException {
+
+		this(output_path, audio_recording, useVideoMuxer, null);
+	}
+
+	public MediaMovieRecorder(final String output_path,
+		final boolean audio_recording, final boolean useVideoMuxer,
+		@Nullable Recorder.IMuxerFactory factory) throws IOException {
+
 		super(output_path);
-		mMuxer = useVideoMuxer
-			? new VideoMuxer(output_path)	// API >= 16
-			: new MediaMuxerWrapper(output_path, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);	// API >= 18
+		mMuxer = (factory != null)
+			? factory.createMuxer(useVideoMuxer, output_path)
+			: new Recorder.DefaultFactory().createMuxer(useVideoMuxer, output_path);
 		new MediaVideoEncoder(this, mMediaCodecCallback);
 		if (audio_recording) {
 			new MediaAudioEncoder(this, mMediaCodecCallback);
