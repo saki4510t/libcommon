@@ -57,7 +57,7 @@ public abstract class Recorder implements IRecorder {
 		@SuppressLint("InlinedApi")
 		public IMuxer createMuxer(final boolean useMediaMuxer, final String output_oath) throws IOException {
 			IMuxer result;
-			if (VideoConfig.sUseMediaMuxer) {
+			if (useMediaMuxer) {
 				result = new MediaMuxerWrapper(output_oath,
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
@@ -70,7 +70,7 @@ public abstract class Recorder implements IRecorder {
 		@SuppressLint("NewApi")
 		public IMuxer createMuxer(final boolean useMediaMuxer, final int fd) throws IOException {
 			IMuxer result;
-			if (VideoConfig.sUseMediaMuxer) {
+			if (useMediaMuxer) {
 				if (BuildCheck.isOreo()) {
 					final ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(fd);
 					result = new MediaMuxerWrapper(pfd.getFileDescriptor(),
@@ -91,7 +91,7 @@ public abstract class Recorder implements IRecorder {
 			@NonNull final DocumentFile file) throws IOException {
 
 			IMuxer result = null;
-			if (VideoConfig.sUseMediaMuxer) {
+			if (useMediaMuxer) {
 				if (BuildCheck.isOreo()) {
 					result = new MediaMuxerWrapper(context.getContentResolver()
 						.openFileDescriptor(file.getUri(), "rw").getFileDescriptor(),
