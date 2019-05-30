@@ -96,7 +96,7 @@ public final class USBMonitor implements Const {
 		 * USB機器が取り外されたか電源が切られた時(open中であればonDisconnectの後に呼ばれる)
 		 * @param device
 		 */
-		public void onDettach(@NonNull final UsbDevice device);
+		public void onDetach(@NonNull final UsbDevice device);
 		/**
 		 * パーミッション要求結果が返ってきた時
 		 * @param device
@@ -686,7 +686,7 @@ public final class USBMonitor implements Const {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mOnDeviceConnectListener.onDettach(device);
+					mOnDeviceConnectListener.onDetach(device);
 				}
 			});
 		}
