@@ -26,7 +26,6 @@ import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -39,6 +38,7 @@ import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -49,7 +49,7 @@ import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.util.List;
 
-public abstract class BaseService extends Service {
+public abstract class BaseService extends LifecycleService {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = BaseService.class.getSimpleName();
 

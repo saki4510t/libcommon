@@ -47,6 +47,7 @@ dependencies {
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${supportLibVersion}"
 	implementation "androidx.preference:preference:${supportLibVersion}"
+	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 }
 
 def repo = new File(rootDir, "repository")
