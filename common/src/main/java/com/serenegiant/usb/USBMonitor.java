@@ -104,15 +104,13 @@ public final class USBMonitor implements Const {
 		 */
 		public void onPermission(@NonNull final UsbDevice device, final boolean hasPermission);
 		/**
-		 * FIXME 今はこれを呼び出す前にopenしているけど実際にはパーミッション要求結果が帰ってきた時のコールバックなのでonPermissionに変えてopen処理をしないように修正する
-		 * USB機器がopenされた時
+		 * USB機器がopenされた時,
+		 * 4.xx.yyと異なりUsbControlBlock#cloneでも呼ばれる
 		 * @param device
 		 * @param ctrlBlock
-		 * @param createNew
 		 */
-		@Deprecated
-		public void onConnect(@NonNull final UsbDevice device,
-			@NonNull final UsbControlBlock ctrlBlock, boolean createNew);
+		public void onConnected(@NonNull final UsbDevice device,
+			@NonNull final UsbControlBlock ctrlBlock);
 		/**
 		 * open中のUSB機器が取り外されたか電源が切られた時
 		 * デバイスは既にclose済み(2015/01/06呼び出すタイミングをclose前からclose後に変更)
@@ -601,49 +599,30 @@ public final class USBMonitor implements Const {
 	 * パーミッション要求結果が返ってきた時の処理
 	 * @param device
 	 */
-	@SuppressWarnings("deprecation")
 	private final void processPermission(@NonNull final UsbDevice device) {
 		final boolean hasPermission = hasPermission(device);
 		if (mOnDeviceConnectListener != null) {
 			mOnDeviceConnectListener.onPermission(device, hasPermission);
 		}
-		if (hasPermission) {
-			// パーミッションがあれば接続処理
-			// FIXME onConnectコールバックを削除したらここの処理も削除する
-			processConnect(device);
-		}
 	}
 
 	/**
-	 * 指定したUSB機器との接続をopenする
+	 * 指定したUSB機器をopenした時の処理
 	 * @param device
 	 */
-	@SuppressWarnings({"DeprecatedIsStillUsed", "deprecation"})
-	@Deprecated
-	private final void processConnect(@NonNull final UsbDevice device) {
+	private final void processConnect(@NonNull final UsbDevice device,
+		@NonNull final UsbControlBlock ctrlBlock) {
+
 		if (destroyed) return;
 //		if (DEBUG) Log.v(TAG, "processConnect:");
 		if (hasPermission(device)) {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
-	//				if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
-					UsbControlBlock ctrlBlock;
+//					if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
 					final boolean createNew;
-					ctrlBlock = mCtrlBlocks.get(device);
-					if (ctrlBlock == null) {
-						try {
-							ctrlBlock = openDevice(device);
-							createNew = true;
-						} catch (final IOException e) {
-							callOnError(device, e);
-							return;
-						}
-					} else {
-						createNew = false;
-					}
 					if (mOnDeviceConnectListener != null) {
-						mOnDeviceConnectListener.onConnect(device, ctrlBlock, createNew);
+						mOnDeviceConnectListener.onConnected(device, ctrlBlock);
 					}
 				}
 			});
@@ -1138,6 +1117,7 @@ public final class USBMonitor implements Const {
 			} else {
 				throw new IOException("could not connect to device " + name);
 			}
+			monitor.processConnect(device, this);
 		}
 
 		/**
@@ -1161,6 +1141,7 @@ public final class USBMonitor implements Const {
 			mBusNum = src.mBusNum;
 			mDevNum = src.mDevNum;
 			// FIXME USBMonitor.mCtrlBlocksに追加する(今はHashMapなので追加すると置き換わってしまうのでだめ, ListかHashMapにListをぶら下げる?)
+			monitor.processConnect(device, this);
 		}
 
 		/**
