@@ -38,8 +38,12 @@ import java.lang.ref.WeakReference;
  * Recorderの実装用ヘルパー
  */
 public abstract class AbstractMediaAVRecorder extends Recorder {
+
 	protected final WeakReference<Context> mWeakContext;
 	protected final int mSaveTreeId;	// SDカードへの出力を試みるかどうか
+	@NonNull
+	private final IMuxerFactory mMuxerFactory;
+
 	protected String mOutputPath;
 	protected DocumentFile mOutputFile;
 
@@ -53,10 +57,11 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	 */
 	public AbstractMediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String ext, final int saveTreeId)
+		final String ext, final int saveTreeId,
+		@Nullable final IMuxerFactory factory)
 			throws IOException {
 
-		this(context, callback, null, ext, saveTreeId);
+		this(context, callback, null, ext, saveTreeId, factory);
 	}
 	
 	/**
@@ -66,15 +71,17 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	 * @param prefix
 	 * @param _ext
 	 * @param saveTreeId
+	 * @param factory
 	 * @throws IOException
 	 */
 	public AbstractMediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String prefix, final String _ext, final int saveTreeId)
-			throws IOException {
+		final String prefix, final String _ext, final int saveTreeId,
+		@Nullable final IMuxerFactory factory) throws IOException {
 
 		super(callback);
 		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new DefaultFactory();
 		mSaveTreeId = saveTreeId;
 		String ext = _ext;
 		if (TextUtils.isEmpty(ext)) ext = ".mp4";
@@ -104,15 +111,17 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	 * @param saveTreeId
 	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
 	 * @param fileName
+	 * @param factory
 	 * @throws IOException
 	 */
 	public AbstractMediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName)
-			throws IOException {
+		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
+		@Nullable final IMuxerFactory factory) throws IOException {
 		
 		super(callback);
 		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new DefaultFactory();
 		mSaveTreeId = saveTreeId;
 		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
 			DocumentFile tree = SAFUtils.getStorageFile(context, saveTreeId, dirs, "*/*", fileName);
@@ -146,14 +155,17 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	 * @param context
 	 * @param callback
 	 * @param output
+	 * @param factory
 	 * @throws IOException
 	 */
 	public AbstractMediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final DocumentFile output) throws IOException {
+		@NonNull final DocumentFile output,
+		@Nullable final IMuxerFactory factory) throws IOException {
 		
 		super(callback);
 		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new DefaultFactory();
 		mSaveTreeId = 0;
 		mOutputFile = output;
 		mOutputPath = UriHelper.getPath(context, output.getUri());
@@ -165,15 +177,17 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 	 * @param context
 	 * @param callback
 	 * @param outputPath
+	 * @param factory
 	 * @throws IOException
 	 */
 	public AbstractMediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final String outputPath)
-			throws IOException {
+		@NonNull final String outputPath,
+		@Nullable final IMuxerFactory factory) throws IOException {
 
 		super(callback);
 		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new DefaultFactory();
 		mSaveTreeId = 0;
 		mOutputPath = outputPath;
 		if (TextUtils.isEmpty(outputPath)) {
@@ -223,10 +237,18 @@ public abstract class AbstractMediaAVRecorder extends Recorder {
 		return mWeakContext.get();
 	}
 
-	protected abstract void setupMuxer(final int fd) throws IOException;
-	protected abstract void setupMuxer(
-		@NonNull final String output)  throws IOException;
-	protected abstract void setupMuxer(
+	protected void setupMuxer(final int fd) throws IOException {
+		setMuxer(mMuxerFactory.createMuxer(VideoConfig.sUseMediaMuxer, fd));
+	}
+
+	protected void setupMuxer(@NonNull final String output) throws IOException {
+		setMuxer(mMuxerFactory.createMuxer(VideoConfig.sUseMediaMuxer, output));
+	}
+
+	protected void setupMuxer(
 		@NonNull final Context context,
-		@NonNull final DocumentFile output)  throws IOException;
+		@NonNull final DocumentFile output) throws IOException {
+
+		setMuxer(mMuxerFactory.createMuxer(context, VideoConfig.sUseMediaMuxer, output));
+	}
 }

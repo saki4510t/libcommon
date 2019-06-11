@@ -31,9 +31,6 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaAVRecorder.class.getSimpleName();
 
-	@NonNull
-	private final IMuxerFactory mMuxerFactory;
-
 	/**
 	 * コンストラクタ
 	 * @param context
@@ -47,7 +44,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String ext, final int saveTreeId)
 			throws IOException {
 
-		this(context, callback, ext, saveTreeId, null);
+		super(context, callback, ext, saveTreeId, null);
 	}
 	
 	/**
@@ -64,8 +61,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String ext, final int saveTreeId,
 		@Nullable final IMuxerFactory factory) throws IOException {
 
-		super(context, callback, null, ext, saveTreeId);
-		mMuxerFactory = factory != null ? factory : new DefaultFactory();
+		super(context, callback, null, ext, saveTreeId, factory);
 	}
 
 	/**
@@ -82,7 +78,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String prefix, final String _ext, final int saveTreeId)
 			throws IOException {
 
-		this(context, callback, prefix, _ext, saveTreeId, null);
+		super(context, callback, prefix, _ext, saveTreeId, null);
 	}
 	
 	/**
@@ -100,8 +96,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String prefix, final String _ext, final int saveTreeId,
 		@Nullable final IMuxerFactory factory) throws IOException {
 
-		super(context, callback, prefix, _ext, saveTreeId);
-		mMuxerFactory = factory != null ? factory : new DefaultFactory();
+		super(context, callback, prefix, _ext, saveTreeId, factory);
 	}
 
 	/**
@@ -118,7 +113,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName)
 			throws IOException {
 		
-		this(context, callback, saveTreeId, dirs, fileName, null);
+		super(context, callback, saveTreeId, dirs, fileName, null);
 	}
 	
 	/**
@@ -136,8 +131,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
 		@Nullable final IMuxerFactory factory) throws IOException {
 
-		super(context, callback, saveTreeId, dirs, fileName);
-		mMuxerFactory = factory != null ? factory : new DefaultFactory();
+		super(context, callback, saveTreeId, dirs, fileName, factory);
 	}
 
 	/**
@@ -167,8 +161,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final DocumentFile output,
 		@Nullable final IMuxerFactory factory) throws IOException {
 
-		super(context, callback, output);
-		mMuxerFactory = factory != null ? factory : new DefaultFactory();
+		super(context, callback, output, factory);
 	}
 
 	/**
@@ -183,7 +176,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final String outputPath)
 			throws IOException {
 
-		this(context, callback, outputPath, null);
+		super(context, callback, outputPath, null);
 	}
 	
 	/**
@@ -198,26 +191,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final String outputPath,
 		@Nullable final IMuxerFactory factory) throws IOException {
 
-		super(context, callback, outputPath);
-		mMuxerFactory = factory != null ? factory : new DefaultFactory();
+		super(context, callback, outputPath, factory);
 	}
 
-	@Override
-	protected void setupMuxer(final int fd) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(VideoConfig.sUseMediaMuxer, fd));
-	}
-	
-	@Override
-	protected void setupMuxer(@NonNull final String output) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(VideoConfig.sUseMediaMuxer, output));
-	}
-	
-	@Override
-	protected void setupMuxer(
-		@NonNull final Context context,
-		@NonNull final DocumentFile output) throws IOException {
-
-		setMuxer(mMuxerFactory.createMuxer(context, VideoConfig.sUseMediaMuxer, output));
-	}
-	
 }
