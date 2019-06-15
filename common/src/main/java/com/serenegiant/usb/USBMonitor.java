@@ -209,7 +209,7 @@ public final class USBMonitor implements Const {
 		// 接続チェック用Runnableを削除
 		mDeviceCounts = 0;
 		if (!destroyed) {
-			mAsyncHandler.removeCallbacks(mDeviceCheckRunnable);
+			mAsyncHandler.removeCallbacksAndMessages(null);
 		}
 		if (mPermissionIntent != null) {
 //			if (DEBUG) Log.i(TAG, "unregister:");
