@@ -345,10 +345,6 @@ public abstract class AbstractEncoder implements Encoder {
         encode(null, 0, getInputPTSUs());
 	}
 
-    // encodeはnative側からアクセスするので変更時は注意
-	@Override
-	public void encode(final ByteBuffer buffer){/* VideoEncoder以外は特に何もしない */}
-
 	@Override
 	public boolean isCapturing() {
         synchronized (mSync) {

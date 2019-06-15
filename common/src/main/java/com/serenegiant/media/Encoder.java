@@ -26,7 +26,6 @@ public interface Encoder {
 	public abstract void stop();
 	public abstract void release();
 	public abstract void signalEndOfInputStream();
-	public abstract void encode(final ByteBuffer buffer);
 	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
 	public abstract void frameAvailableSoon();
 	public abstract boolean isCapturing();
