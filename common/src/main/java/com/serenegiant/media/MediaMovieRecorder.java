@@ -62,12 +62,12 @@ public class MediaMovieRecorder extends AbstractRecorder {
 
 	public MediaMovieRecorder(final String output_path,
 		final boolean audio_recording, final boolean useVideoMuxer,
-		@Nullable Recorder.IMuxerFactory factory) throws IOException {
+		@Nullable IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(output_path);
 		mMuxer = (factory != null)
 			? factory.createMuxer(useVideoMuxer, output_path)
-			: new Recorder.DefaultFactory().createMuxer(useVideoMuxer, output_path);
+			: new IMuxer.DefaultFactory().createMuxer(useVideoMuxer, output_path);
 		new MediaVideoEncoder(this, mMediaCodecCallback);
 		if (audio_recording) {
 			new MediaAudioEncoder(this, mMediaCodecCallback);

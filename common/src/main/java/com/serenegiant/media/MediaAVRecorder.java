@@ -59,7 +59,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final String ext, final int saveTreeId,
-		@Nullable final IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(context, callback, null, ext, saveTreeId, factory);
 	}
@@ -94,7 +94,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final String prefix, final String _ext, final int saveTreeId,
-		@Nullable final IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(context, callback, prefix, _ext, saveTreeId, factory);
 	}
@@ -129,7 +129,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
-		@Nullable final IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(context, callback, saveTreeId, dirs, fileName, factory);
 	}
@@ -159,7 +159,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@NonNull final DocumentFile output,
-		@Nullable final IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(context, callback, output, factory);
 	}
@@ -189,7 +189,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@NonNull final String outputPath,
-		@Nullable final IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
 		super(context, callback, outputPath, factory);
 	}
