@@ -19,18 +19,40 @@ package com.serenegiant.media;
 */
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.Environment;
+import android.os.ParcelFileDescriptor;
+import android.text.TextUtils;
+
+import com.serenegiant.utils.FileUtils;
+import com.serenegiant.utils.SAFUtils;
+import com.serenegiant.utils.StorageInfo;
+import com.serenegiant.utils.UriHelper;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
 @SuppressLint("NewApi")
-public class MediaAVRecorder extends AbstractMediaAVRecorder {
+public class MediaAVRecorder extends Recorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaAVRecorder.class.getSimpleName();
 
+	@NonNull
+	private final WeakReference<Context> mWeakContext;
+	protected final int mSaveTreeId;	// SDカードへの出力を試みるかどうか
+	@NonNull
+	private final IMuxer.IMuxerFactory mMuxerFactory;
+	@NonNull
+	private final IRecorderConfig mRecorderConfig;
+
+	protected String mOutputPath;
+	protected DocumentFile mOutputFile;
+
+//--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
 	 * @param context
@@ -41,10 +63,9 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String ext, final int saveTreeId)
-			throws IOException {
+		final String ext, final int saveTreeId) throws IOException {
 
-		super(context, callback, ext, saveTreeId, null);
+		this(context, callback, null, ext, saveTreeId, null, null);
 	}
 	
 	/**
@@ -61,7 +82,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String ext, final int saveTreeId,
 		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
-		super(context, callback, null, ext, saveTreeId, factory);
+		this(context, callback, null, ext, saveTreeId, factory);
 	}
 
 	/**
@@ -78,7 +99,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String prefix, final String _ext, final int saveTreeId)
 			throws IOException {
 
-		super(context, callback, prefix, _ext, saveTreeId, null);
+		this(context, callback, prefix, _ext, saveTreeId, null);
 	}
 	
 	/**
@@ -96,7 +117,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final String prefix, final String _ext, final int saveTreeId,
 		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
-		super(context, callback, prefix, _ext, saveTreeId, factory);
+		this(context, callback, prefix, _ext, saveTreeId, factory, null);
 	}
 
 	/**
@@ -113,7 +134,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName)
 			throws IOException {
 		
-		super(context, callback, saveTreeId, dirs, fileName, null);
+		this(context, callback, saveTreeId, dirs, fileName, null, null);
 	}
 	
 	/**
@@ -131,7 +152,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
 		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
-		super(context, callback, saveTreeId, dirs, fileName, factory);
+		this(context, callback, saveTreeId, dirs, fileName, factory, null);
 	}
 
 	/**
@@ -145,7 +166,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@Nullable final RecorderCallback callback,
 		@NonNull final DocumentFile output) throws IOException {
 		
-		this(context, callback, output, null);
+		this(context, callback, output, null, null);
 	}
 	
 	/**
@@ -161,7 +182,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final DocumentFile output,
 		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
-		super(context, callback, output, factory);
+		this(context, callback, output, factory, null);
 	}
 
 	/**
@@ -176,7 +197,7 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final String outputPath)
 			throws IOException {
 
-		super(context, callback, outputPath, null);
+		this(context, callback, outputPath, null, null);
 	}
 	
 	/**
@@ -191,7 +212,208 @@ public class MediaAVRecorder extends AbstractMediaAVRecorder {
 		@NonNull final String outputPath,
 		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
 
-		super(context, callback, outputPath, factory);
+		this(context, callback, outputPath, factory, null);
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param prefix
+	 * @param _ext
+	 * @param saveTreeId
+	 * @param factory
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		final String prefix, final String _ext, final int saveTreeId,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@Nullable final IRecorderConfig config) throws IOException {
+
+		super(callback);
+		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
+		mSaveTreeId = saveTreeId;
+		String ext = _ext;
+		if (TextUtils.isEmpty(ext)) {
+			ext = ".mp4";
+		}
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+			mOutputPath = FileUtils.getCaptureFile(context,
+				Environment.DIRECTORY_MOVIES, prefix, ext, saveTreeId).toString();
+			final String file_name = (TextUtils.isEmpty(prefix)
+				? FileUtils.getDateTimeString()
+				: prefix + FileUtils.getDateTimeString()) + ext;
+			final int fd = SAFUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
+			setupMuxer(fd);
+		} else {
+			try {
+				mOutputPath = FileUtils.getCaptureFile(context,
+					Environment.DIRECTORY_MOVIES, prefix, ext, 0).toString();
+			} catch (final Exception e) {
+				throw new IOException("This app has no permission of writing external storage");
+			}
+			setupMuxer(mOutputPath);
+		}
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param saveTreeId
+	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
+	 * @param fileName
+	 * @param factory
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@Nullable final IRecorderConfig config) throws IOException {
+
+		super(callback);
+		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
+		mSaveTreeId = saveTreeId;
+		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+			DocumentFile tree = SAFUtils.getStorageFile(context,
+				saveTreeId, dirs, "*/*", fileName);
+			if (tree != null) {
+				mOutputPath = UriHelper.getPath(context, tree.getUri());
+				final ParcelFileDescriptor pfd
+					= context.getContentResolver().openFileDescriptor(
+						tree.getUri(), "rw");
+				try {
+					if (pfd != null) {
+						setupMuxer(pfd.getFd());
+						return;
+					} else {
+						// ここには来ないはずだけど
+						throw new IOException("could not create ParcelFileDescriptor");
+					}
+				} catch (final Exception e) {
+					if (pfd != null) {
+						pfd.close();
+					}
+					throw e;
+				}
+			}
+		}
+		// フォールバックはしない
+		throw new IOException("path not found/can't write");
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param output
+	 * @param factory
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		@NonNull final DocumentFile output,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@Nullable final IRecorderConfig config) throws IOException {
+
+		super(callback);
+		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
+		mSaveTreeId = 0;
+		mOutputFile = output;
+		mOutputPath = UriHelper.getPath(context, output.getUri());
+		setupMuxer(context, output);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param outputPath
+	 * @param factory
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		@NonNull final String outputPath,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@Nullable final IRecorderConfig config) throws IOException {
+
+		super(callback);
+		mWeakContext = new WeakReference<Context>(context);
+		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
+		mSaveTreeId = 0;
+		mOutputPath = outputPath;
+		if (TextUtils.isEmpty(outputPath)) {
+			try {
+				mOutputPath = FileUtils.getCaptureFile(context,
+					Environment.DIRECTORY_MOVIES, null, ".mp4", 0).toString();
+			} catch (final Exception e) {
+				throw new IOException("This app has no permission of writing external storage");
+			}
+		}
+		setupMuxer(mOutputPath);
+	}
+
+//--------------------------------------------------------------------------------
+	@Nullable
+	@Override
+	public String getOutputPath() {
+		return mOutputPath;
+	}
+
+	@Nullable
+	@Override
+	public DocumentFile getOutputFile() {
+		return mOutputFile;
+	}
+
+	/**
+	 * ディスクの空き容量をチェックして足りなければtrueを返す
+	 * @return true: 空き容量が足りない
+	 */
+	@Override
+	protected boolean check() {
+		final Context context = mWeakContext.get();
+		final StorageInfo info = mOutputFile != null
+			? SAFUtils.getStorageInfo(context, mOutputFile) : null;
+		if ((info != null) && (info.totalBytes != 0)) {
+			return ((info.freeBytes/ (float)info.totalBytes) < FileUtils.FREE_RATIO)
+				|| (info.freeBytes < FileUtils.FREE_SIZE);
+		}
+		return (context == null)
+			|| ((mOutputFile == null)
+				&& !FileUtils.checkFreeSpace(context,
+					VideoConfig.maxDuration, mStartTime, mSaveTreeId));
+	}
+
+	@Nullable
+	protected Context getContext() {
+		return mWeakContext.get();
+	}
+
+	protected void setupMuxer(final int fd) throws IOException {
+		setMuxer(mMuxerFactory.createMuxer(mRecorderConfig.useMediaMuxer(), fd));
+	}
+
+	protected void setupMuxer(@NonNull final String output) throws IOException {
+		setMuxer(mMuxerFactory.createMuxer(mRecorderConfig.useMediaMuxer(), output));
+	}
+
+	protected void setupMuxer(
+		@NonNull final Context context,
+		@NonNull final DocumentFile output) throws IOException {
+
+		setMuxer(mMuxerFactory.createMuxer(context, mRecorderConfig.useMediaMuxer(), output));
 	}
 
 }
