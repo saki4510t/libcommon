@@ -37,11 +37,18 @@ public abstract class Recorder implements IRecorder {
 
 	public static final long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
 
-		}
+	public interface IRecorderConfig {
+		public boolean useMediaMuxer();
+	}
 
+	public static class DefaultRecorderConfig implements IRecorderConfig {
+		@Override
+		public boolean useMediaMuxer() {
+			return VideoConfig.sUseMediaMuxer && BuildCheck.isAndroid4_3();
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	private final RecorderCallback mCallback;
 	protected IMuxer mMuxer;
 	private volatile int mEncoderCount, mStartedCount;
