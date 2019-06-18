@@ -23,6 +23,7 @@ import android.os.Build;
 /**
  * 従来はプレビュー解像度=動画の解像度の設定用に使用していたが
  * 今後は動画解像度用のみに使用してプレビュー解像度はDeviceSettingから取得する
+ * FIXME staticフィールド・staticメソッドを使っているのをやめる
  */
 public class VideoConfig {
 //	private static final String TAG = "VideoConfig";
