@@ -1,4 +1,4 @@
-package com.serenegiant.media;
+package com.serenegiant.media.exceptions;
 /*
  * libcommon
  * utility/helper classes for myself

@@ -26,6 +26,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.media.exceptions.TimeoutException;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
