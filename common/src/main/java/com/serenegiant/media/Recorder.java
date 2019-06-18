@@ -108,10 +108,12 @@ public abstract class Recorder implements IRecorder {
 			}
 		}
 		try {
-			if (mVideoEncoder != null)
+			if (mVideoEncoder != null) {
 				mVideoEncoder.prepare();
-			if (mAudioEncoder != null)
+			}
+			if (mAudioEncoder != null) {
 				mAudioEncoder.prepare();
+			}
 		} catch (final Exception e) {
 			callOnError(e);
 			return;
@@ -136,12 +138,15 @@ public abstract class Recorder implements IRecorder {
 		}
 //		if (DEBUG) Log.v(TAG, "call encoder#start");
 		mStartTime = System.currentTimeMillis();
-		if (mVideoEncoder != null)
+		if (mVideoEncoder != null) {
 			mVideoEncoder.start();
-		if (mAudioEncoder != null)
+		}
+		if (mAudioEncoder != null) {
 			mAudioEncoder.start();
-    	if (mEosHandler == null)
+		}
+    	if (mEosHandler == null) {
     		mEosHandler = EosHandler.createHandler(this);
+		}
     	mEosHandler.startCheckFreeSpace();	// 空き容量のチェック開始
 	}
 
@@ -328,8 +333,9 @@ public abstract class Recorder implements IRecorder {
 				notifyAll();
 				callOnStarted();
 				// 最大録画時間をセット
-				if (mEosHandler != null)
+				if (mEosHandler != null) {
 					mEosHandler.setDuration(VideoConfig.maxDuration);
+				}
 				break;
 			} else {
 				try {
@@ -422,42 +428,46 @@ public abstract class Recorder implements IRecorder {
 //================================================================================
 	protected void callOnPrepared() {
 //		if (DEBUG) Log.v(TAG, "callOnPrepared:");
-		if (mCallback != null)
-		try {
-			mCallback.onPrepared(this);
-		} catch (final Exception e) {
-			Log.e(TAG, "onPrepared:", e);
+		if (mCallback != null) {
+			try {
+				mCallback.onPrepared(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "onPrepared:", e);
+			}
 		}
 	}
 
 	protected void callOnStarted() {
 //		if (DEBUG) Log.v(TAG, "callOnStarted:");
-		if (mCallback != null)
-		try {
-			mCallback.onStarted(this);
-		} catch (final Exception e) {
-			Log.e(TAG, "onStarted:", e);
+		if (mCallback != null) {
+			try {
+				mCallback.onStarted(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "onStarted:", e);
+			}
 		}
 	}
 
 	protected void callOnStopped() {
 //		if (DEBUG) Log.v(TAG, "callOnStopped:");
-		if (mCallback != null)
-		try {
-			mCallback.onStopped(this);
-		} catch (final Exception e) {
-			Log.e(TAG, "onStopped:", e);
+		if (mCallback != null) {
+			try {
+				mCallback.onStopped(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "onStopped:", e);
+			}
 		}
 	}
 
 	protected void callOnError(final Exception e) {
 //		if (DEBUG) Log.v(TAG, "callOnError:");
 		if (!mReleased) {
-			if (mCallback != null)
-			try {
-				mCallback.onError(e);
-			} catch (final Exception e1) {
-				Log.e(TAG, "onError:", e);
+			if (mCallback != null) {
+				try {
+					mCallback.onError(e);
+				} catch (final Exception e1) {
+					Log.e(TAG, "onError:", e);
+				}
 			}
 		}
 	}
