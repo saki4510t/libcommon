@@ -19,87 +19,225 @@ package com.serenegiant.media;
 */
 
 import android.os.Build;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
 
 /**
  * 従来はプレビュー解像度=動画の解像度の設定用に使用していたが
  * 今後は動画解像度用のみに使用してプレビュー解像度はDeviceSettingから取得する
- * FIXME staticフィールド・staticメソッドを使っているのをやめる
  */
-public class VideoConfig {
-//	private static final String TAG = "VideoConfig";
+public class VideoConfig implements Parcelable {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = VideoConfig.class.getSimpleName();
 
-	/**
-	 * BPP(Bits Per Pixel)
-	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
-	 */
-	private static float BPP = 0.25f;
 	public static final float BPP_MIN = 0.01f;
 	public static float BPP_MAX = 0.30f;
 
 	public static final int FPS_MIN = 2;
 	public static final int FPS_MAX = 121;
+
+	private static final int IFRAME_MIN = 1;
+	private static final int IFRAME_MAX = 30;
+
+	public static final VideoConfig DEFAULT_CONFIG = new VideoConfig();
+
+	/**
+	 * DEFAULT_CONFIGを引き継いだ新しいVideoConfigオブジェクトを生成
+	 * @return
+	 */
+	public static VideoConfig createDefault() {
+		final VideoConfig result = new VideoConfig();
+		result.set(DEFAULT_CONFIG);
+
+		return result;
+	}
+
+	/**
+	 * BPP(Bits Per Pixel)
+	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
+	 */
+	private float BPP = 0.25f;
+
 	/**
 	 * I-frame(単独で圧縮された単独再生可能な一番劣化の少ないキーフレーム)間の秒数@30fps
 	 */
-    private static float IFRAME_INTERVAL = 10;
-	private static final int IFRAME_MIN = 1;
-	private static final int IFRAME_MAX = 30;
+    private float mIframeIntervalsS = 10;
 	/**
 	 * I-Frameの間隔 300 = 30fpsの時に10秒間隔 = 300フレームに1回
 	 */
-	private static float IFI = IFRAME_INTERVAL * 30.0f;
+	private float mNumFramesBetweenIframeOn30fps = mIframeIntervalsS * 30.0f;
 
 	/**
 	 * エンコード時のFPS
 	 */
-	private static int captureFps = 15;
+	private int mCaptureFps = 15;
 	/**
 	 * 最大録画時間[ミリ秒], 負数=制限なし
 	 */
-	public static long maxDuration = 30 * 1000L;
-	/**
-	 * 繰り返し休止時間[ミリ秒](とりあえず60秒)
-	 */
-	public static  long repeatInterval = 60 * 1000L;
-	/**
-	 * 負は回数制限なし, 1以上なら指定回数繰り返し
-	 */
-	public static  int maxRepeats = 1;
+	private long mMaxDuration = 30 * 1000L;
 
 	/**
 	 * trueならMediaMuxerを使う、 falseならVideoMuxerを使う
 	 * ・・・VideoMuxerを使ってnative側での最大録画時間チェックを有効にするため常にfalse
 	 */
-	public static boolean sUseMediaMuxer = (Build.VERSION.SDK_INT >= 18) && false;
+	private boolean mUseMediaMuxer = (Build.VERSION.SDK_INT >= 18);
 
 	/**
 	 * SurfaceEncoderを使って動画キャプチャをするかどうか
 	 */
-	public static boolean sIsSurfaceCapture = (Build.VERSION.SDK_INT >= 18) && false;
+	public boolean mUseSurfaceCapture = (Build.VERSION.SDK_INT >= 18);
 
-	public static void setCaptureFps(final int fps) {
-		captureFps = fps > FPS_MAX ? FPS_MAX : (fps < FPS_MIN ? FPS_MIN : fps);
-	}
-	
-	public static int getCaptureFps() {
-		return captureFps > FPS_MAX ? FPS_MAX : (captureFps < FPS_MIN ? FPS_MIN : captureFps);
-	}
-
-	public static void setIFrame(final float iframe_interval) {
-		IFRAME_INTERVAL = iframe_interval;
-		IFI = IFRAME_INTERVAL * 30.f;
+	/**
+	 * デフォルトコンストラクタ
+	 * DEFAULT_CONFIGの設定値を引き継いで生成することを強制するためにprivateに設定
+	 * デフォルトコンストラクタの代わりにstaticメソッドのVideoConfig#createDefaultを使うこと
+	 */
+	private VideoConfig() {
 	}
 
-	public static final int getIFrame() {
-		final int fps = getCaptureFps();
+	/**
+	 * コピーコンストラクタ
+	 * @param src
+	 */
+	public VideoConfig(@NonNull final VideoConfig src) {
+		BPP = src.BPP;
+		mIframeIntervalsS = src.mIframeIntervalsS;
+		mNumFramesBetweenIframeOn30fps = src.mNumFramesBetweenIframeOn30fps;
+		mCaptureFps = src.mCaptureFps;
+		mMaxDuration = src.mMaxDuration;
+		mUseMediaMuxer = src.mUseMediaMuxer;
+		mUseSurfaceCapture = src.mUseSurfaceCapture;
+	}
+
+	public VideoConfig set(@NonNull final VideoConfig src) {
+		BPP = src.BPP;
+		mIframeIntervalsS = src.mIframeIntervalsS;
+		mNumFramesBetweenIframeOn30fps = src.mNumFramesBetweenIframeOn30fps;
+		mCaptureFps = src.mCaptureFps;
+		mMaxDuration = src.mMaxDuration;
+		mUseMediaMuxer = src.mUseMediaMuxer;
+		mUseSurfaceCapture = src.mUseSurfaceCapture;
+
+		return this;
+	}
+
+	/**
+	 * 最大録画時間[ミリ秒], 負数=制限なし
+	 * @return
+	 */
+	public long maxDuration() {
+		return mMaxDuration;
+	}
+
+	/**
+	 * 最大録画時間[ミリ秒], 負数=制限なし
+	 * @param duration
+	 * @return
+	 */
+	@NonNull
+	public VideoConfig setMaxDuration(final long duration) {
+		mMaxDuration = duration;
+
+		return this;
+	}
+
+	/**
+	 * MediaMuxerを使うかどうかを取得
+	 * @return　API<18なら常時false
+	 */
+	public boolean useMediaMuxer() {
+		return mUseMediaMuxer;
+	}
+
+	/**
+	 * MediaMuxerを使うかどうかをセット、ただしAPI>=18のみ
+	 * @param use
+	 * @return
+	 */
+	@NonNull
+	public VideoConfig setUseMediaMuxer(final boolean use) {
+		mUseMediaMuxer = use & (Build.VERSION.SDK_INT >= 18);
+
+		return this;
+	}
+
+	/**
+	 * Surface経由での動画エンコードを使うかどうかを取得
+	 * @return　API<18なら常時false
+	 */
+	public boolean useSurfaceCapture() {
+		return mUseSurfaceCapture;
+	}
+
+	/**
+	 * Surface経由での動画エンコードを使うかどうかをセット、ただしAPI>=18のみ
+	 * @param use
+	 * @return
+	 */
+	@NonNull
+	public VideoConfig setUseSurfaceCapture(final boolean use) {
+		mUseSurfaceCapture = use & (Build.VERSION.SDK_INT >= 18);
+
+		return this;
+	}
+
+	/**
+	 * エンコード時のFPS
+	 * @param fps
+	 * @return
+	 */
+	@NonNull
+	public VideoConfig setCaptureFps(final int fps) {
+		mCaptureFps = fps > FPS_MAX ? FPS_MAX : (fps < FPS_MIN ? FPS_MIN : fps);
+
+		return this;
+	}
+
+	/**
+	 * エンコード時のFPS
+	 * @return
+	 */
+	public int captureFps() {
+		return mCaptureFps > FPS_MAX ? FPS_MAX : (mCaptureFps < FPS_MIN ? FPS_MIN : mCaptureFps);
+	}
+
+	/**
+	 * I-Frameの間隔[秒]@30fpsをセット
+	 * @param iFrameIntervalSecs
+	 * @return
+	 */
+	@NonNull
+	public VideoConfig setIFrameIntervals(final float iFrameIntervalSecs) {
+		mIframeIntervalsS = iFrameIntervalSecs;
+		mNumFramesBetweenIframeOn30fps = mIframeIntervalsS * 30.f;
+
+		return this;
+	}
+
+	/**
+	 * I-Frameの間隔[秒]@30fpsを取得
+	 * @return
+	 */
+	public int iFrameIntervals() {
+		return (int)mIframeIntervalsS;
+	}
+
+	/**
+	 * エンコード時のFPSにおけるI-Frame間隔を取得
+	 * @return
+	 */
+	public final int calcIFrameIntervals() {
+		final int fps = captureFps();
 		float iframe;
 		try {
 			if (fps < 2)
 				iframe = IFRAME_MIN;
 			else
-				iframe = (float)Math.ceil(IFI / fps);
+				iframe = (float)Math.ceil(mNumFramesBetweenIframeOn30fps / fps);
 		} catch (final Exception e) {
-			iframe = IFRAME_INTERVAL;
+			iframe = mIframeIntervalsS;
 		}
 		if ((int)iframe < IFRAME_MIN) iframe = IFRAME_MIN;
 		else if ((int)iframe > IFRAME_MAX) iframe = IFRAME_MAX;
@@ -115,7 +253,7 @@ public class VideoConfig {
 	 * @param bpp
 	 * @return
 	 */
-	public static int calcBitrate(final int width, final int height,
+	private static int calcBitrate(final int width, final int height,
 		final int frameRate, final float bpp) {
 
 		int r = (int)(Math.floor(bpp * frameRate * width * height / 1000 / 100) * 100) * 1000;
@@ -127,13 +265,13 @@ public class VideoConfig {
 
 
 	/**
-	 * ビットレートを計算[bps]
+	 * エンコード時のFPSにおけるビットレートを計算[bps]
 	 * @param width
 	 * @param height
 	 * @return
 	 */
-	public static int getBitrate(final int width, final int height) {
-		return calcBitrate(width, height, getCaptureFps(), BPP);
+	public int getBitrate(final int width, final int height) {
+		return calcBitrate(width, height, captureFps(), BPP);
 	}
 
 	/**
@@ -143,7 +281,7 @@ public class VideoConfig {
 	 * @param frameRate
 	 * @return
 	 */
-	public static int getBitrate(final int width, final int height, final int frameRate) {
+	public int getBitrate(final int width, final int height, final int frameRate) {
 		return calcBitrate(width, height, frameRate, BPP);
 	}
 
@@ -154,7 +292,7 @@ public class VideoConfig {
 	 * @param frameRate
 	 * @return
 	 */
-	public static int getBitrate(final int width, final int height,
+	public int getBitrate(final int width, final int height,
 		final int frameRate, final float bpp) {
 
 		return calcBitrate(width, height, frameRate, bpp);
@@ -168,7 +306,7 @@ public class VideoConfig {
 	 * @param bitrate
 	 * @return
 	 */
-	public static float calcBPP(final int width, final int height,
+	private static float calcBPP(final int width, final int height,
 		final int captureFps, final int bitrate) {
 
 		return bitrate / (float)(captureFps * width * height);
@@ -182,10 +320,10 @@ public class VideoConfig {
 	 * @param bitrate
 	 * @return
 	 */
-	public static float calcBPP(final int width, final int height,
+	public float calcBPP(final int width, final int height,
 		final int bitrate) {
 
-		return calcBPP(width, height, getCaptureFps(), bitrate);
+		return calcBPP(width, height, captureFps(), bitrate);
 	}
 
 	/**
@@ -195,10 +333,13 @@ public class VideoConfig {
 	 * @param bitrate
 	 * @throws IllegalArgumentException
 	 */
-	public static void setBPP(final int width, final int height, final int bitrate)
+	@NonNull
+	public VideoConfig setBPP(final int width, final int height, final int bitrate)
 		throws IllegalArgumentException {
 
 		setBPP(calcBPP(width, height, bitrate));
+
+		return this;
 	}
 
 	/**
@@ -206,18 +347,21 @@ public class VideoConfig {
 	 * @param bpp [BPP_MIN==0.01f, BPP_MAX]
 	 * @throws IllegalArgumentException
 	 */
-	public static void setBPP(final float bpp) throws IllegalArgumentException {
+	@NonNull
+	public VideoConfig setBPP(final float bpp) throws IllegalArgumentException {
 		if ((bpp < BPP_MIN) || (bpp > BPP_MAX)) {
 			throw new IllegalArgumentException("bpp should be within [BPP_MIN, BPP_MAX]");
 		}
 		BPP = bpp;
+
+		return this;
 	}
 
 	/**
 	 * 現在のBPP設定を取得
 	 * @return
 	 */
-	public static float bpp() {
+	public float bpp() {
 		return BPP;
 	}
 
@@ -228,9 +372,53 @@ public class VideoConfig {
 	 * @param height
 	 * @return
 	 */
-	public static int getSizeRate(final int width, final int height) {
+	public int getSizeRate(final int width, final int height) {
 		final int bitrate = getBitrate(width, height);
 		return bitrate * 60 / 8;	// bits/sec -> bytes/min
 	}
 
+//================================================================================
+// Parcelable関係の実装
+
+	/**
+	 * Parcelable用のコンストラクタ
+	 * @param in
+	 */
+	protected VideoConfig(final Parcel in) {
+		BPP = in.readFloat();
+		mIframeIntervalsS = in.readFloat();
+		mNumFramesBetweenIframeOn30fps = in.readFloat();
+		mCaptureFps = in.readInt();
+		mMaxDuration = in.readLong();
+		mUseMediaMuxer = in.readByte() != 0;
+		mUseSurfaceCapture = in.readByte() != 0;
+	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeFloat(BPP);
+		dest.writeFloat(mIframeIntervalsS);
+		dest.writeFloat(mNumFramesBetweenIframeOn30fps);
+		dest.writeInt(mCaptureFps);
+		dest.writeLong(mMaxDuration);
+		dest.writeByte((byte) (mUseMediaMuxer ? 1 : 0));
+		dest.writeByte((byte) (mUseSurfaceCapture ? 1 : 0));
+	}
+
+	public static final Creator<VideoConfig> CREATOR = new Creator<VideoConfig>() {
+		@Override
+		public VideoConfig createFromParcel(Parcel in) {
+			return new VideoConfig(in);
+		}
+
+		@Override
+		public VideoConfig[] newArray(int size) {
+			return new VideoConfig[size];
+		}
+	};
 }

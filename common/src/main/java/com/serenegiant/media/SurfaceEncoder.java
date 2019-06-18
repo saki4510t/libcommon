@@ -75,11 +75,11 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         // 復帰不可能な例外を生成する
         format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);	// API >= 18
         format.setInteger(MediaFormat.KEY_BIT_RATE, mBitRate > 0
-        	? mBitRate : VideoConfig.getBitrate(mWidth, mHeight));
+        	? mBitRate : getConfig().getBitrate(mWidth, mHeight));
         format.setInteger(MediaFormat.KEY_FRAME_RATE, mFramerate > 0
-        	? mFramerate : VideoConfig.getCaptureFps());
+        	? mFramerate : getConfig().captureFps());
         format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, mIFrameIntervals > 0
-        	? mIFrameIntervals : VideoConfig.getIFrame());
+        	? mIFrameIntervals : getConfig().calcIFrameIntervals());
 //		if (DEBUG) Log.d(TAG, "format: " + format);
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する

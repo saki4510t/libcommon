@@ -73,6 +73,8 @@ public interface IRecorder {
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface RecorderState {}
 
+	public VideoConfig getConfig();
+
 	public void setMuxer(final IMuxer muxer);
 
 	/**

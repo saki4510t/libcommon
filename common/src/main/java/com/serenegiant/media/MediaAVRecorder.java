@@ -46,8 +46,6 @@ public class MediaAVRecorder extends Recorder {
 	protected final int mSaveTreeId;	// SDカードへの出力を試みるかどうか
 	@NonNull
 	private final IMuxer.IMuxerFactory mMuxerFactory;
-	@NonNull
-	private final IRecorderConfig mRecorderConfig;
 
 	protected String mOutputPath;
 	protected DocumentFile mOutputFile;
@@ -230,12 +228,11 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		final String prefix, final String _ext, final int saveTreeId,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final IRecorderConfig config) throws IOException {
+		@Nullable final VideoConfig config) throws IOException {
 
-		super(callback);
+		super(callback, config);
 		mWeakContext = new WeakReference<Context>(context);
 		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
-		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
 		mSaveTreeId = saveTreeId;
 		String ext = _ext;
 		if (TextUtils.isEmpty(ext)) {
@@ -274,12 +271,11 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final IRecorderConfig config) throws IOException {
+		@Nullable final VideoConfig config) throws IOException {
 
-		super(callback);
+		super(callback, config);
 		mWeakContext = new WeakReference<Context>(context);
 		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
-		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
 		mSaveTreeId = saveTreeId;
 		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
 			DocumentFile tree = SAFUtils.getStorageFile(context,
@@ -321,12 +317,11 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		@NonNull final DocumentFile output,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final IRecorderConfig config) throws IOException {
+		@Nullable final VideoConfig config) throws IOException {
 
-		super(callback);
+		super(callback, config);
 		mWeakContext = new WeakReference<Context>(context);
 		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
-		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
 		mSaveTreeId = 0;
 		mOutputFile = output;
 		mOutputPath = UriHelper.getPath(context, output.getUri());
@@ -345,12 +340,11 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		@NonNull final String outputPath,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final IRecorderConfig config) throws IOException {
+		@Nullable final VideoConfig config) throws IOException {
 
-		super(callback);
+		super(callback, config);
 		mWeakContext = new WeakReference<Context>(context);
 		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
-		mRecorderConfig = config != null ? config : new DefaultRecorderConfig();
 		mSaveTreeId = 0;
 		mOutputPath = outputPath;
 		if (TextUtils.isEmpty(outputPath)) {
@@ -393,7 +387,7 @@ public class MediaAVRecorder extends Recorder {
 		return (context == null)
 			|| ((mOutputFile == null)
 				&& !FileUtils.checkFreeSpace(context,
-					VideoConfig.maxDuration, mStartTime, mSaveTreeId));
+					getConfig().maxDuration(), mStartTime, mSaveTreeId));
 	}
 
 	@Nullable
@@ -402,18 +396,18 @@ public class MediaAVRecorder extends Recorder {
 	}
 
 	protected void setupMuxer(final int fd) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(mRecorderConfig.useMediaMuxer(), fd));
+		setMuxer(mMuxerFactory.createMuxer(getConfig().useMediaMuxer(), fd));
 	}
 
 	protected void setupMuxer(@NonNull final String output) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(mRecorderConfig.useMediaMuxer(), output));
+		setMuxer(mMuxerFactory.createMuxer(getConfig().useMediaMuxer(), output));
 	}
 
 	protected void setupMuxer(
 		@NonNull final Context context,
 		@NonNull final DocumentFile output) throws IOException {
 
-		setMuxer(mMuxerFactory.createMuxer(context, mRecorderConfig.useMediaMuxer(), output));
+		setMuxer(mMuxerFactory.createMuxer(context, getConfig().useMediaMuxer(), output));
 	}
 
 }

@@ -29,7 +29,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.utils.BuildCheck;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public abstract class Recorder implements IRecorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -37,19 +38,10 @@ public abstract class Recorder implements IRecorder {
 
 	public static final long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
 
-	public interface IRecorderConfig {
-		public boolean useMediaMuxer();
-	}
-
-	public static class DefaultRecorderConfig implements IRecorderConfig {
-		@Override
-		public boolean useMediaMuxer() {
-			return VideoConfig.sUseMediaMuxer && BuildCheck.isAndroid4_3();
-		}
-	}
-
 //--------------------------------------------------------------------------------
 	private final RecorderCallback mCallback;
+	@NonNull
+	private final VideoConfig mVideoConfig;
 	protected IMuxer mMuxer;
 	private volatile int mEncoderCount, mStartedCount;
 	@RecorderState
@@ -66,11 +58,19 @@ public abstract class Recorder implements IRecorder {
 	/**
 	 * コンストラクタ
 	 */
-	public Recorder(final RecorderCallback callback) {
+	public Recorder(final RecorderCallback callback,
+		@Nullable final VideoConfig config) {
 		mCallback = callback;
+		mVideoConfig = config != null ? config : VideoConfig.createDefault();
 		synchronized(this) {
 			mState = STATE_UNINITIALIZED;
 		}
+	}
+
+	@NonNull
+	@Override
+	public VideoConfig getConfig() {
+		return mVideoConfig;
 	}
 
 	/* (non-Javadoc)
@@ -334,7 +334,7 @@ public abstract class Recorder implements IRecorder {
 				callOnStarted();
 				// 最大録画時間をセット
 				if (mEosHandler != null) {
-					mEosHandler.setDuration(VideoConfig.maxDuration);
+					mEosHandler.setDuration(mVideoConfig.maxDuration());
 				}
 				break;
 			} else {

@@ -31,6 +31,8 @@ import android.view.Surface;
 import com.serenegiant.media.exceptions.TimeoutException;
 import com.serenegiant.utils.Time;
 
+import androidx.annotation.NonNull;
+
 import static com.serenegiant.utils.BufferHelper.*;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
@@ -88,9 +90,12 @@ public abstract class AbstractEncoder implements Encoder {
     protected final String MIME_TYPE;
 
 //********************************************************************************
-    public AbstractEncoder(final String mime_type, final IRecorder recorder, final EncoderListener listener) {
+    public AbstractEncoder(final String mime_type,
+    	@NonNull final IRecorder recorder,
+    	@NonNull final EncoderListener listener) {
+
     	if (listener == null) throw new NullPointerException("EncodeListener is null");
-    	if (recorder == null) throw new NullPointerException("IMuxer is null");
+    	if (recorder == null) throw new NullPointerException("recorder is null");
     	MIME_TYPE = mime_type;
     	mRecorder = recorder;
     	mListener = listener;
@@ -103,9 +108,15 @@ public abstract class AbstractEncoder implements Encoder {
      * 出力用のMuxerWrapperを返す
      * @return
      */
+    @NonNull
 	public IRecorder getRecorder() {
     	return mRecorder;
     }
+
+	@NonNull
+	public VideoConfig getConfig() {
+		return mRecorder.getConfig();
+	}
 
     /**
      * 出力ファイルのパスを返す
