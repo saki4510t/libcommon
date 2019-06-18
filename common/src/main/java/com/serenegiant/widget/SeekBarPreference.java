@@ -34,6 +34,7 @@ import com.serenegiant.common.R;
 
 import java.util.Locale;
 
+@Deprecated
 public final class SeekBarPreference extends Preference {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "BrightnessOffsetSeekBarPreference";

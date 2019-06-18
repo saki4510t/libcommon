@@ -32,6 +32,7 @@ import android.widget.TimePicker;
 
 import com.serenegiant.common.R;
 
+@Deprecated
 public class TimePickerPreference extends DialogPreference {
 
 	private final Calendar calendar;

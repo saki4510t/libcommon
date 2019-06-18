@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+@Deprecated
 public class MultilineLabelPreference extends Preference {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MultilineLabelPreference.class.getSimpleName();

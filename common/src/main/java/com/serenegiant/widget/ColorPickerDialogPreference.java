@@ -23,6 +23,7 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 
+@Deprecated
 public class ColorPickerDialogPreference extends DialogPreference {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = ColorPickerDialogPreference.class.getSimpleName();

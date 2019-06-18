@@ -29,6 +29,7 @@ import android.widget.RelativeLayout;
 
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 
+@Deprecated
 public final class ItemPickerPreference extends Preference {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = ItemPickerPreference.class.getSimpleName();
