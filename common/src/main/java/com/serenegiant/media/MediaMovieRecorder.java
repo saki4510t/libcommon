@@ -33,6 +33,7 @@ import java.nio.ByteBuffer;
 
 import androidx.annotation.Nullable;
 
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMovieRecorder extends AbstractRecorder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;

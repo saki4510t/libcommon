@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import java.io.IOException;
 
+@Deprecated
 public interface IMediaCodec {
 	static final int TIMEOUT_USEC = 10000;	// 10[msec]
 	public void prepare() throws IOException;

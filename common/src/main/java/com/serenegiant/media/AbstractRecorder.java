@@ -28,6 +28,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@Deprecated
 public abstract class AbstractRecorder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
 	private static final String TAG = "AbstractRecorder";

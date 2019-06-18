@@ -40,6 +40,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.Map;
 
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaDecoder implements IMediaCodec {
 	private static final boolean DEBUG = BuildConfig.DEBUG;

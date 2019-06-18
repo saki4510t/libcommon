@@ -34,7 +34,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("deprecation")
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaAudioDecoder extends MediaDecoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;

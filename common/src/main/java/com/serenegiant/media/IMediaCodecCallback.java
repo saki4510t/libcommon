@@ -21,6 +21,7 @@ package com.serenegiant.media;
 /**
  * callback interface
  */
+@Deprecated
 public interface IMediaCodecCallback {
 	/**
 	 * called when preparing finished

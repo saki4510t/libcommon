@@ -31,7 +31,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.util.Locale;
 
-@SuppressWarnings("deprecation")
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaVideoEncoder extends MediaEncoder implements ISurfaceEncoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;

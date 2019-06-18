@@ -31,7 +31,7 @@ import com.serenegiant.utils.Time;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("deprecation")
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaEncoder implements IMediaCodec {
 	private static final boolean DEBUG = BuildConfig.DEBUG;

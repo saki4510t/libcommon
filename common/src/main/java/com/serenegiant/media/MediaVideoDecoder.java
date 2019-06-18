@@ -33,6 +33,7 @@ import com.serenegiant.common.BuildConfig;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaVideoDecoder extends MediaDecoder {
 	private static final boolean DEBUG = BuildConfig.DEBUG;
