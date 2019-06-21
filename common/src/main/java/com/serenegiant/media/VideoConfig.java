@@ -377,6 +377,19 @@ public class VideoConfig implements Parcelable {
 		return bitrate * 60 / 8;	// bits/sec -> bytes/min
 	}
 
+	@NonNull
+	@Override
+	public String toString() {
+		return "VideoConfig{" +
+			"BPP=" + BPP +
+			", mIframeIntervalsS=" + mIframeIntervalsS +
+			", mNumFramesBetweenIframeOn30fps=" + mNumFramesBetweenIframeOn30fps +
+			", mCaptureFps=" + mCaptureFps +
+			", mMaxDuration=" + mMaxDuration +
+			", mUseMediaMuxer=" + mUseMediaMuxer +
+			", mUseSurfaceCapture=" + mUseSurfaceCapture +
+			'}';
+	}
 //================================================================================
 // Parcelable関係の実装
 
