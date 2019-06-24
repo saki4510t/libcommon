@@ -37,8 +37,8 @@ public class AspectScaledTextureView extends TextureView
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();
-	private int mScaleMode = SCALE_MODE_KEEP_ASPECT;
-	private double mRequestedAspect = -1.0;		// initially use default window size
+	private int mScaleMode;
+	private double mRequestedAspect;		// initially use default window size
 	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
 	private final Set<SurfaceTextureListener> mListeners = new CopyOnWriteArraySet<SurfaceTextureListener>();
 
