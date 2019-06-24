@@ -18,6 +18,11 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
+
 /**
  * コンテンツの拡大縮小方法をセット可能なViewのインターフェース
  */
@@ -29,10 +34,18 @@ public interface IScaledView {
 	/** アスペクト比を保って短辺がフィットするようにCROP_CENTER */
 	public static final int SCALE_MODE_CROP = 2;
 
+	@IntDef({
+		SCALE_MODE_KEEP_ASPECT,
+		SCALE_MODE_STRETCH_TO_FIT,
+		SCALE_MODE_CROP})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface ScaleMode {}
+
 	/**
 	 * 拡大縮小方法をセット
 	 * @param scaleMode SCALE_MODE_KEEP_ASPECT, SCALE_MODE_STRETCH, SCALE_MODE_CROP
 	 */
-	public void setScaleMode(final int scaleMode);
+	public void setScaleMode(@ScaleMode final int scaleMode);
+	@ScaleMode
 	public int getScaleMode();
 }

@@ -37,6 +37,7 @@ public class AspectScaledTextureView extends TextureView
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();
+	@ScaleMode
 	private int mScaleMode;
 	private double mRequestedAspect;		// initially use default window size
 	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
@@ -226,13 +227,14 @@ public class AspectScaledTextureView extends TextureView
 //================================================================================
 
 	@Override
-	public void setScaleMode(final int scale_mode) {
+	public void setScaleMode(@ScaleMode final int scale_mode) {
 		if (mScaleMode != scale_mode) {
 			mScaleMode = scale_mode;
 			requestLayout();
 		}
 	}
 
+	@ScaleMode
 	@Override
 	public int getScaleMode() {
 		return mScaleMode;
