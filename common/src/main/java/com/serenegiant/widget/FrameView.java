@@ -29,6 +29,11 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
+
 public class FrameView extends View {
 //	private static final boolean DEBUG = false;	// FIXME 実同時はfalseにすること
 	private static final String TAG = FrameView.class.getSimpleName();
@@ -44,10 +49,29 @@ public class FrameView extends View {
 	public static final int FRAME_TYPE_CROSS_CIRCLE2 = 7;
 	public static final int FRAME_TYPE_NUMS = 8;
 
+	@IntDef({
+		FRAME_TYPE_NONE,
+		FRAME_TYPE_FRAME,
+		FRAME_TYPE_CROSS_FULL,
+		FRAME_TYPE_CROSS_QUARTER,
+		FRAME_TYPE_CIRCLE,
+		FRAME_TYPE_CROSS_CIRCLE,
+		FRAME_TYPE_CIRCLE_2,
+		FRAME_TYPE_CROSS_CIRCLE2})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface FrameType {}
+
 	public static final int SCALE_TYPE_NONE = 0;
 	public static final int SCALE_TYPE_INCH = 1;
 	public static final int SCALE_TYPE_MM = 2;
 	public static final int SCALE_TYPE_NUMS = 3;
+
+	@IntDef({
+		SCALE_TYPE_NONE,
+		SCALE_TYPE_INCH,
+		SCALE_TYPE_MM})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface ScaleType {}
 
 	private static final float DEFAULT_FRAME_WIDTH_DP = 3.0f;
 
@@ -55,9 +79,13 @@ public class FrameView extends View {
 	private final RectF mBoundsRect = new RectF();
 	private final DisplayMetrics metrics;
 	private final float defaultFrameWidth;
-	private int mFrameType, mFrameColor;
+	@FrameType
+	private int mFrameType;
+	private int mFrameColor;
 	private float mFrameWidth;
-	private int mScaleType, mScaleColor, mTickColor;
+	@ScaleType
+	private int mScaleType;
+	private int mScaleColor, mTickColor;
 	private float mScaleWidth;
 	private float mRotation;
 	private float mScale;
@@ -251,7 +279,7 @@ public class FrameView extends View {
 	 * フレームの種類を設定
 	 * @param type 範囲外なら無視される
 	 */
-	public void setFrameType(final int type) {
+	public void setFrameType(@FrameType final int type) {
 		if ((mFrameType != type) && (type >= FRAME_TYPE_NONE) && (type < FRAME_TYPE_NUMS)) {
 			mFrameType = type;
 			postInvalidate();
@@ -262,6 +290,7 @@ public class FrameView extends View {
 	 * フレームの種類を取得
 	 * @return
 	 */
+	@FrameType
 	public int getFrameType() {
 		return mFrameType;
 	}
@@ -340,7 +369,7 @@ public class FrameView extends View {
 	 * 目盛りの種類を設定
 	 * @param type
 	 */
-	public void setScaleType(final int type) {
+	public void setScaleType(@ScaleType final int type) {
 		if ((mScaleType != type) && (type >= 0) && (type < SCALE_TYPE_NUMS)) {
 			mScaleType = type;
 			postInvalidate();
@@ -351,6 +380,7 @@ public class FrameView extends View {
 	 * 目盛りの種類を取得
 	 * @return
 	 */
+	@ScaleType
 	public int getScaleType() {
 		return mScaleType;
 	}
