@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -20,52 +20,49 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceViewHolder;
+import android.preference.Preference;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.serenegiant.widget.ItemPicker;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 
-public final class ItemPickerPreferenceV7 extends Preference {
+@Deprecated
+public final class ItemPickerPreference extends Preference {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = ItemPickerPreferenceV7.class.getSimpleName();
+	private static final String TAG = ItemPickerPreference.class.getSimpleName();
 
 	private int preferenceValue;
 	private int mMinValue = 1, mMaxValue = 100;
 	private ItemPicker mItemPicker;
 
-	public ItemPickerPreferenceV7(final Context context) {
+	public ItemPickerPreference(final Context context) {
 		super(context);
 	}
 
-	public ItemPickerPreferenceV7(final Context context, final AttributeSet attrs) {
+	public ItemPickerPreference(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
 
-	public ItemPickerPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {
+	public ItemPickerPreference(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
-		super.onBindViewHolder(holder);
+	protected void onBindView(final View view) {
+//		if (DEBUG) Log.v(TAG, "onBindView:");
+		super.onBindView(view);
 		RelativeLayout parent = null;
-		if (holder.itemView instanceof ViewGroup) {
-			final ViewGroup group = (ViewGroup)holder.itemView;
-			for (int i = group.getChildCount() - 1; i >= 0; i--) {
-				final View v = group.getChildAt(i);
-				if (v instanceof RelativeLayout) {
-					parent = (RelativeLayout)v;
-					break;
-				}
+		final ViewGroup group = (ViewGroup)view;
+		for (int i = group.getChildCount() - 1; i >= 0; i--) {
+			final View v = group.getChildAt(i);
+			if (v instanceof RelativeLayout) {
+				parent = (RelativeLayout)v;
+				break;
 			}
-		}
-		if (parent == null) {
-			throw new RuntimeException("unexpected item view type");
 		}
 		// ItemPickerを生成
 		mItemPicker = new ItemPicker(getContext());

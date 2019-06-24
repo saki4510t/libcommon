@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.preference;
 
 /*
  * libcommon
@@ -20,6 +20,9 @@ package com.serenegiant.utils;
 */
 
 import android.content.SharedPreferences;
+
+import com.serenegiant.utils.ObjectHelper;
+
 import androidx.annotation.Nullable;
 
 import java.util.Map;

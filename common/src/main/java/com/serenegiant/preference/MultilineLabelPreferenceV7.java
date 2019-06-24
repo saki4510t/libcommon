@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself

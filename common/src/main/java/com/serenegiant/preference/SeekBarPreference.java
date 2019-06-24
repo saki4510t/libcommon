@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -20,8 +20,7 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import androidx.preference.Preference;
-import androidx.preference.PreferenceViewHolder;
+import android.preference.Preference;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -35,7 +34,8 @@ import com.serenegiant.common.R;
 
 import java.util.Locale;
 
-public final class SeekBarPreferenceV7 extends Preference {
+@Deprecated
+public final class SeekBarPreference extends Preference {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "BrightnessOffsetSeekBarPreference";
 	private static int sDefaultValue = 1;
@@ -54,11 +54,11 @@ public final class SeekBarPreferenceV7 extends Preference {
 	// preference全体を変えてしまう時は、onCreateViewで必要なViewを生成する
 	//			setWidgetLayoutResource(R.layout.seekbar_preference);
 
-	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs) {
+	public SeekBarPreference(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {
+	public SeekBarPreference(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		TypedArray attribs = context.obtainStyledAttributes(attrs, R.styleable.SeekBarPreference, defStyle, 0);
 		mSeekbarLayoutId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_layout, R.layout.seekbar_preference);
@@ -79,23 +79,18 @@ public final class SeekBarPreferenceV7 extends Preference {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
-		super.onBindViewHolder(holder);
+	protected void onBindView(final View view) {
+		super.onBindView(view);
 //		if (DEBUG) Log.w(TAG, "onBindView:");
 		if ((mSeekbarLayoutId == 0) || (mSeekbarId == 0)) return;
 		RelativeLayout parent = null;
-		final ViewGroup group;
-		if (holder.itemView instanceof ViewGroup) {
-			group = (ViewGroup)holder.itemView;
-			for (int i = group.getChildCount() - 1; i >= 0; i--) {
-				final View v = group.getChildAt(i);
-				if (v instanceof RelativeLayout) {
-					parent = (RelativeLayout)v;
-					break;
-				}
+		final ViewGroup group = (ViewGroup)view;
+		for (int i = group.getChildCount() - 1; i >= 0; i--) {
+			final View v = group.getChildAt(i);
+			if (v instanceof RelativeLayout) {
+				parent = (RelativeLayout)v;
+				break;
 			}
-		} else {
-			group = null;
 		}
 		if (parent == null) return;	// これにかかることはないはず
 		// Seekbar(と値表示用のラベル入ったレイアウト)を生成する

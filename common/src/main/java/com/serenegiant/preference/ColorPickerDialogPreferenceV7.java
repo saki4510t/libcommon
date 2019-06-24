@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -24,6 +24,8 @@ import androidx.annotation.Nullable;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.serenegiant.widget.ColorPickerView;
 
 public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること

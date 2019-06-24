@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -28,6 +28,7 @@ import android.view.View;
 import android.widget.TimePicker;
 
 import com.serenegiant.common.R;
+import com.serenegiant.preference.DialogPreferenceV7;
 
 import java.util.Calendar;
 import java.util.Date;

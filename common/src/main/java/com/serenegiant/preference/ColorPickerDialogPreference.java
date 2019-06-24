@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -22,6 +22,8 @@ import android.content.Context;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.serenegiant.widget.ColorPickerView;
 
 @Deprecated
 public class ColorPickerDialogPreference extends DialogPreference {
