@@ -25,14 +25,12 @@ import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 
-public class CheckableLinearLayout extends LinearLayout implements Checkable, Touchable {
+public class CheckableLinearLayout extends LinearLayout implements CheckableEx, Touchable {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "CheckableLinearLayout";
 
 	private boolean mChecked;
-
-    private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
 
 	public CheckableLinearLayout(final Context context) {
 		this(context, null);

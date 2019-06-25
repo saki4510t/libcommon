@@ -26,10 +26,9 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
 
-public class CheckableRelativeLayout extends RelativeLayout implements Checkable, Touchable {
+public class CheckableRelativeLayout extends RelativeLayout implements CheckableEx, Touchable {
 
 	private boolean mIsChecked;
-	private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
 
 	public CheckableRelativeLayout(final Context context) {
 		this(context, null);

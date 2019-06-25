@@ -24,12 +24,11 @@ import android.widget.Checkable;
 
 import androidx.appcompat.widget.AppCompatImageView;
 
-public class CheckableImageView extends AppCompatImageView implements Checkable {
+public class CheckableImageView extends AppCompatImageView implements CheckableEx {
 	private static final boolean DEBUG = false; // 実同時はfalseにすること
 	private static final String TAG = CheckableImageView.class.getSimpleName();
 
 	private boolean mIsChecked;
-	private static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
 
 	public CheckableImageView(Context context) {
 		this(context, null, 0);
