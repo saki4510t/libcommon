@@ -132,16 +132,28 @@ public final class SeekBarPreferenceV7 extends Preference {
 		return a.getInt(index, mDefaultValue);
 	}
 
+//	@Override
+//	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
+////		if (DEBUG) Log.w(TAG, "onSetInitialValue:restorePersistedValue=" + restorePersistedValue + ",defaultValue=" + defaultValue);
+//		try {
+//			preferenceValue = (Integer)defaultValue;
+//		} catch (final Exception e) {
+//			preferenceValue = mDefaultValue;
+//		}
+//		if (restorePersistedValue) {
+//			preferenceValue = getPersistedInt(preferenceValue);
+//		}
+//		persistInt(preferenceValue);
+//	}
+
 	@Override
-	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
-//		if (DEBUG) Log.w(TAG, "onSetInitialValue:restorePersistedValue=" + restorePersistedValue + ",defaultValue=" + defaultValue);
+	protected void onSetInitialValue(final Object defaultValue) {
+//		if (DEBUG) Log.w(TAG, "onSetInitialValue:defaultValue=" + defaultValue);
 		try {
 			preferenceValue = (Integer)defaultValue;
 		} catch (final Exception e) {
+//			preferenceValue = getPersistedInt(preferenceValue);
 			preferenceValue = mDefaultValue;
-		}
-		if (restorePersistedValue) {
-			preferenceValue = getPersistedInt(preferenceValue);
 		}
 		persistInt(preferenceValue);
 	}

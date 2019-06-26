@@ -91,8 +91,29 @@ public final class ItemPickerPreferenceV7 extends Preference {
 		return a.getInt(index, 0);
 	}
 
+//	@Override
+//	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
+////		if (DEBUG) Log.v(TAG, "onSetInitialValue:");
+//		int def = preferenceValue;
+//		if (defaultValue instanceof Integer) {
+//			def = (Integer)defaultValue;
+//		} else if (defaultValue instanceof String) {
+//			try {
+//				def = Integer.parseInt((String)defaultValue);
+//			} catch (final Exception e) {
+//				if (DEBUG) Log.w(TAG, e);
+//			}
+//		}
+//		if (restorePersistedValue) {
+//			preferenceValue = getPersistedInt(def);
+//		} else {
+//			preferenceValue = def;
+//			persistInt(preferenceValue);
+//		}
+//	}
+
 	@Override
-	protected void onSetInitialValue(final boolean restorePersistedValue, final Object defaultValue) {
+	protected void onSetInitialValue(final Object defaultValue) {
 //		if (DEBUG) Log.v(TAG, "onSetInitialValue:");
 		int def = preferenceValue;
 		if (defaultValue instanceof Integer) {
@@ -104,12 +125,8 @@ public final class ItemPickerPreferenceV7 extends Preference {
 				if (DEBUG) Log.w(TAG, e);
 			}
 		}
-		if (restorePersistedValue) {
-			preferenceValue = getPersistedInt(def);
-		} else {
-			preferenceValue = def;
-			persistInt(preferenceValue);
-		}
+		preferenceValue = def;
+		persistInt(preferenceValue);
 	}
 
 	private final OnChangedListener mOnChangeListener = new OnChangedListener() {
