@@ -44,16 +44,7 @@ public class MultilineLabelPreferenceV7 extends Preference {
 	@Override
 	public void onBindViewHolder(final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
-//		if (DEBUG) Log.w(TAG, "onBindView:");
-/*		RelativeLayout parent = null;
-		final ViewGroup group = (ViewGroup)view;
-		for (int i = group.getChildCount() - 1; i >= 0; i--) {
-			final View v = group.getChildAt(i);
-			if (v instanceof RelativeLayout) {
-				parent = (RelativeLayout)v;
-				break;
-			}
-		} */
+//		if (DEBUG) Log.w(TAG, "onBindViewHolder:");
 		try {
 			final TextView summary = (TextView)holder.findViewById(android.R.id.summary);
 			summary.setSingleLine(false);
