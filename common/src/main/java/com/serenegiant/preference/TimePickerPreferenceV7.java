@@ -124,23 +124,23 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 
 	@Override
 	protected void onSetInitialValue(@Nullable final Object defaultValue) {
-		final long v = mDefaultValue > 0 ? mDefaultValue : System.currentTimeMillis();
-		if (defaultValue != null) {
-			calendar.setTimeInMillis(Long.parseLong((String) defaultValue));
-		} else {
-			// !restoreValue, defaultValue == null
-			calendar.setTimeInMillis(v);
+		long value = mDefaultValue > 0 ? mDefaultValue : System.currentTimeMillis();
+		if (defaultValue instanceof String) {
+			value = Long.parseLong((String) defaultValue);
+		} else if (defaultValue instanceof Long) {
+			value = (Long)defaultValue;
 		}
-
+		calendar.setTimeInMillis(value);
+		persistLong(calendar.getTimeInMillis());
 		setSummary(getSummary());
 	}
 
 	@Override
 	public CharSequence getSummary() {
 		if (calendar == null) {
-			return null;
+			return super.getSummary();
 		}
 		return DateFormat.getTimeFormat(getContext()).format(
-				new Date(calendar.getTimeInMillis()));
+			new Date(calendar.getTimeInMillis()));
 	}
 }
