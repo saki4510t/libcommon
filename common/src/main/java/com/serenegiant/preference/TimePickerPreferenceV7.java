@@ -22,6 +22,8 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.TypedArrayUtils;
+
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
 import android.view.View;
@@ -47,7 +49,8 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 	public TimePickerPreferenceV7(@NonNull final Context context,
 		@Nullable final AttributeSet attrs) {
 
-		this(context, attrs, android.R.attr.dialogPreferenceStyle);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public TimePickerPreferenceV7(@NonNull final Context context,

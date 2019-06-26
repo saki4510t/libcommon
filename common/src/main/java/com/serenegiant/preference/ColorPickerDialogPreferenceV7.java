@@ -21,10 +21,12 @@ package com.serenegiant.preference;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.serenegiant.common.R;
 import com.serenegiant.widget.ColorPickerView;
 
 public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
@@ -35,13 +37,14 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 	private boolean changed;
 
 	public ColorPickerDialogPreferenceV7(@NonNull final Context context) {
-		this(context, null, 0);
+		this(context, null);
 	}
 
 	public ColorPickerDialogPreferenceV7(@NonNull final Context context,
 		@Nullable final AttributeSet attrs) {
 
-		this(context, attrs, 0);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public ColorPickerDialogPreferenceV7(@NonNull final Context context,

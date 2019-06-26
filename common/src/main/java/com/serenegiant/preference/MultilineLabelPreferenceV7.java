@@ -19,22 +19,27 @@ package com.serenegiant.preference;
 */
 
 import android.content.Context;
+
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.serenegiant.common.R;
+
 public class MultilineLabelPreferenceV7 extends Preference {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MultilineLabelPreferenceV7.class.getSimpleName();
 
 	public MultilineLabelPreferenceV7(final Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public MultilineLabelPreferenceV7(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle,
+			android.R.attr.preferenceStyle));
 	}
 
 	public MultilineLabelPreferenceV7(final Context context, final AttributeSet attrs, final int defStyleAttr) {

@@ -20,6 +20,8 @@ package com.serenegiant.preference;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -54,8 +56,13 @@ public final class SeekBarPreferenceV7 extends Preference {
 	// preference全体を変えてしまう時は、onCreateViewで必要なViewを生成する
 	//			setWidgetLayoutResource(R.layout.seekbar_preference);
 
+	public SeekBarPreferenceV7(final Context context) {
+		this(context, null);
+	}
+
 	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.seekBarPreferenceStyle,
+			android.R.attr.preferenceStyle));
 	}
 
 	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {

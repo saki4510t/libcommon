@@ -34,6 +34,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -68,13 +69,14 @@ public class DialogPreferenceV7 extends Preference
 	private int mWhichButtonClicked;
 	
 	public DialogPreferenceV7(@NonNull final Context context) {
-		this(context, null, 0, 0);
+		this(context, null);
 	}
 	
 	public DialogPreferenceV7(@NonNull final Context context,
 		@Nullable final AttributeSet attrs) {
 
-		this(context, attrs, 0, 0);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 	
 	public DialogPreferenceV7(@NonNull final Context context,
@@ -87,6 +89,7 @@ public class DialogPreferenceV7 extends Preference
 		@Nullable final AttributeSet attrs, final int defStyleAttr, final int defStyleRes) {
 		
 		super(context, attrs, defStyleAttr, defStyleRes);
+
 		final TypedArray a = context.obtainStyledAttributes(attrs,
 			androidx.preference.R.styleable.DialogPreference,
 			defStyleAttr, defStyleRes);

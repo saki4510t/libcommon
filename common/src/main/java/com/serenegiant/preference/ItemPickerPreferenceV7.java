@@ -20,6 +20,8 @@ package com.serenegiant.preference;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+
+import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
@@ -28,6 +30,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.serenegiant.common.R;
 import com.serenegiant.widget.ItemPicker;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 
@@ -40,11 +43,12 @@ public final class ItemPickerPreferenceV7 extends Preference {
 	private ItemPicker mItemPicker;
 
 	public ItemPickerPreferenceV7(final Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public ItemPickerPreferenceV7(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public ItemPickerPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {
