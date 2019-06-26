@@ -305,7 +305,7 @@ public class DialogPreferenceV7 extends Preference
 		Context context = getContext();
 		
 		mWhichButtonClicked = DialogInterface.BUTTON_NEGATIVE;
-		// XXX 本当はDialogFragmentにしたいけど親ActivityのFragmentManagerを取得する方法がないのでとりあえずAlartDialogのままにする
+		// XXX 本当はDialogFragmentにしたいけど親ActivityのFragmentManagerを取得する方法がないのでとりあえずAlertDialogのままにする
 		mBuilder = new AlertDialog.Builder(context)
 			.setTitle(mDialogTitle)
 			.setIcon(mDialogIcon)
