@@ -34,6 +34,8 @@ import com.serenegiant.common.R;
 
 import java.util.Locale;
 
+import androidx.core.content.res.TypedArrayUtils;
+
 @Deprecated
 public final class SeekBarPreference extends Preference {
 //	private static final boolean DEBUG = false;
@@ -54,8 +56,13 @@ public final class SeekBarPreference extends Preference {
 	// preference全体を変えてしまう時は、onCreateViewで必要なViewを生成する
 	//			setWidgetLayoutResource(R.layout.seekbar_preference);
 
+	public SeekBarPreference(final Context context) {
+		this(context, null);
+	}
+
 	public SeekBarPreference(final Context context, final AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.seekBarPreferenceStyle,
+			android.R.attr.preferenceStyle));
 	}
 
 	public SeekBarPreference(final Context context, final AttributeSet attrs, final int defStyle) {

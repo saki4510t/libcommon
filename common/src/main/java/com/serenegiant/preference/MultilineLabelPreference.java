@@ -25,17 +25,22 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.serenegiant.common.R;
+
+import androidx.core.content.res.TypedArrayUtils;
+
 @Deprecated
 public class MultilineLabelPreference extends Preference {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MultilineLabelPreference.class.getSimpleName();
 
 	public MultilineLabelPreference(final Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public MultilineLabelPreference(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle,
+			android.R.attr.preferenceStyle));
 	}
 
 	public MultilineLabelPreference(final Context context, final AttributeSet attrs, final int defStyleAttr) {

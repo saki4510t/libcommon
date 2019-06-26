@@ -27,8 +27,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
+import com.serenegiant.common.R;
 import com.serenegiant.widget.ItemPicker;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
+
+import androidx.core.content.res.TypedArrayUtils;
 
 @Deprecated
 public final class ItemPickerPreference extends Preference {
@@ -40,11 +43,12 @@ public final class ItemPickerPreference extends Preference {
 	private ItemPicker mItemPicker;
 
 	public ItemPickerPreference(final Context context) {
-		super(context);
+		this(context, null);
 	}
 
 	public ItemPickerPreference(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public ItemPickerPreference(final Context context, final AttributeSet attrs, final int defStyle) {

@@ -32,6 +32,8 @@ import android.widget.TimePicker;
 
 import com.serenegiant.common.R;
 
+import androidx.core.content.res.TypedArrayUtils;
+
 @Deprecated
 public class TimePickerPreference extends DialogPreference {
 
@@ -39,12 +41,13 @@ public class TimePickerPreference extends DialogPreference {
 	private final long mDefaultValue;
 	private TimePicker picker = null;
 
-	public TimePickerPreference(final Context ctxt) {
-		this(ctxt, null);
+	public TimePickerPreference(final Context context) {
+		this(context, null);
 	}
 
-	public TimePickerPreference(final Context ctxt, final AttributeSet attrs) {
-		this(ctxt, attrs, android.R.attr.dialogPreferenceStyle);
+	public TimePickerPreference(final Context context, final AttributeSet attrs) {
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public TimePickerPreference(final Context context, final AttributeSet attrs, final int defStyle) {

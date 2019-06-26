@@ -23,7 +23,10 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 
+import com.serenegiant.common.R;
 import com.serenegiant.widget.ColorPickerView;
+
+import androidx.core.content.res.TypedArrayUtils;
 
 @Deprecated
 public class ColorPickerDialogPreference extends DialogPreference {
@@ -34,11 +37,12 @@ public class ColorPickerDialogPreference extends DialogPreference {
 	private boolean changed;
 
 	public ColorPickerDialogPreference(final Context context) {
-		this(context, null, 0);
+		this(context, null);
 	}
 
 	public ColorPickerDialogPreference(final Context context, final AttributeSet attrs) {
-		this(context, attrs, 0);
+		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+			android.R.attr.dialogPreferenceStyle));
 	}
 
 	public ColorPickerDialogPreference(final Context context, final AttributeSet attrs, final int defStyleAttr) {
