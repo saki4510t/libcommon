@@ -32,9 +32,9 @@ public class NumberPickerPreferenceFragmentCompat extends PreferenceDialogFragme
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = NumberPickerPreferenceFragmentCompat.class.getSimpleName();
 
-	private static final String SAVE_STATE_MIN_VALUE = "NumberPickerPreferenceFragmentCompat.minValue";
-	private static final String SAVE_STATE_MAX_VALUE = "NumberPickerPreferenceFragmentCompat.maxValue";
-	private static final String SAVE_STATE_VALUE = "NumberPickerPreferenceFragmentCompat.value";
+	private static final String SAVE_STATE_MIN_VALUE = "NumberPickerPreferenceFragment.minValue";
+	private static final String SAVE_STATE_MAX_VALUE = "NumberPickerPreferenceFragment.maxValue";
+	private static final String SAVE_STATE_VALUE = "NumberPickerPreferenceFragment.value";
 
 	public static NumberPickerPreferenceFragmentCompat newInstance(final String key) {
 		final NumberPickerPreferenceFragmentCompat fragment = new NumberPickerPreferenceFragmentCompat();
