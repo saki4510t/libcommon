@@ -20,17 +20,24 @@ package com.serenegiant.utils;
 
 import android.app.Activity;
 import androidx.annotation.NonNull;
+
+import android.view.Window;
 import android.view.WindowManager;
 
 public class BrightnessHelper {
 	public static void setBrightness(@NonNull final Activity activity, final float brightness) {
-		final WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
+		if (activity.isFinishing()) return;
+		final Window win = activity.getWindow();
+		final WindowManager.LayoutParams lp = win.getAttributes();
 		float _brightness = brightness;
 		if (brightness > 1.0f) {
 			_brightness = 1.0f;
+		} else if (brightness < -1.0f) {
+			_brightness = -1.0f;
 		}
 		lp.screenBrightness = _brightness;
-		activity.getWindow().setAttributes(lp);
+		lp.buttonBrightness = _brightness;
+		win.setAttributes(lp);
 	}
 
 	public float getBrightness(@NonNull final Activity activity) {
