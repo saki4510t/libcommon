@@ -41,6 +41,6 @@ ext {
 	androidXLifecycleExt = '2.0.0'
 	constraintLibVersion = '1.1.3'
 
-    versionCodeNum = 247
-    versionNameString = '5.4.1'
+    versionCodeNum = 248
+    versionNameString = '5.4.2'
 }
