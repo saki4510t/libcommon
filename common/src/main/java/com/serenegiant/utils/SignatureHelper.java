@@ -37,6 +37,7 @@ public class SignatureHelper {
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
 	 */
+	@SuppressLint("NewApi")
 	public static boolean checkSignature(@Nullable final Context context, final String key)
 		throws IllegalArgumentException, PackageManager.NameNotFoundException {
 
@@ -46,12 +47,24 @@ public class SignatureHelper {
 		final Signature expected = new Signature(key);
 		boolean result = true;
 		final PackageManager pm = context.getPackageManager();
-		// FIXME Deprecated対策をする
-		@SuppressLint("PackageManagerGetSignatures")
-		final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+		final Signature[] signatures;
+		if (BuildCheck.isPie()) {
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNING_CERTIFICATES);
+			if (packageInfo.signingInfo.hasMultipleSigners()) {
+				signatures = packageInfo.signingInfo.getApkContentsSigners();
+			} else {
+				signatures = packageInfo.signingInfo.getSigningCertificateHistory();
+			}
+		} else {
+			@SuppressLint("PackageManagerGetSignatures")
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNATURES);
+			signatures = packageInfo.signatures;
+		}
 		// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
-		for (int i = 0; i < packageInfo.signatures.length; i++) {
-			result &= expected.equals(packageInfo.signatures[i]);
+		for (int i = 0; i < signatures.length; i++) {
+			result &= expected.equals(signatures[i]);
 		}
 		return result;
 	}
@@ -61,20 +74,33 @@ public class SignatureHelper {
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
 	 */
+	@SuppressLint("NewApi")
 	@Nullable
 	public static String getSignature(final Context context) {
 		if (context != null) {
 			final PackageManager pm = context.getPackageManager();
 			try {
-				// FIXME Deprecated対策をする
-				@SuppressLint("PackageManagerGetSignatures")
-				final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+				final Signature[] signatures;
+				if (BuildCheck.isPie()) {
+					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+						PackageManager.GET_SIGNING_CERTIFICATES);
+					if (packageInfo.signingInfo.hasMultipleSigners()) {
+						signatures = packageInfo.signingInfo.getApkContentsSigners();
+					} else {
+						signatures = packageInfo.signingInfo.getSigningCertificateHistory();
+					}
+				} else {
+					@SuppressLint("PackageManagerGetSignatures")
+					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+						PackageManager.GET_SIGNATURES);
+					signatures = packageInfo.signatures;
+				}
 				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
 				// 全部つなげて返す
 				int cnt = 0;
 				final StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < packageInfo.signatures.length; i++) {
-					final Signature signature = packageInfo.signatures[i];
+				for (int i = 0; i < signatures.length; i++) {
+					final Signature signature = signatures[i];
 					if (signature != null) {
 						if (cnt != 0) {
 							sb.append('/');
@@ -95,19 +121,32 @@ public class SignatureHelper {
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
 	 */
+	@SuppressLint("NewApi")
 	@Nullable
 	public static byte[] getSignatureBytes(final Context context) {
 		if (context != null) {
 			final PackageManager pm = context.getPackageManager();
 			try {
-				// FIXME Deprecated対策をする
-				@SuppressLint("PackageManagerGetSignatures")
-				final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
+				final Signature[] signatures;
+				if (BuildCheck.isPie()) {
+					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+						PackageManager.GET_SIGNING_CERTIFICATES);
+					if (packageInfo.signingInfo.hasMultipleSigners()) {
+						signatures = packageInfo.signingInfo.getApkContentsSigners();
+					} else {
+						signatures = packageInfo.signingInfo.getSigningCertificateHistory();
+					}
+				} else {
+					@SuppressLint("PackageManagerGetSignatures")
+					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+						PackageManager.GET_SIGNATURES);
+					signatures = packageInfo.signatures;
+				}
 				ByteBuffer result = ByteBuffer.allocate(1024);
 				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
 				// 全部つなげて返す
-				for (int i = 0; i < packageInfo.signatures.length; i++) {
-					final Signature signature = packageInfo.signatures[i];
+				for (int i = 0; i < signatures.length; i++) {
+					final Signature signature = signatures[i];
 					if (signature != null) {
 						final byte[] bytes = signature.toByteArray();
 						final int n = bytes != null ? bytes.length : 0;
