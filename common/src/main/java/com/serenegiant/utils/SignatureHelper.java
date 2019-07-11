@@ -23,6 +23,8 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
@@ -38,10 +40,10 @@ public class SignatureHelper {
 	 * @throws PackageManager.NameNotFoundException
 	 */
 	@SuppressLint("NewApi")
-	public static boolean checkSignature(@Nullable final Context context, final String key)
+	public static boolean checkSignature(@NonNull final Context context, final String key)
 		throws IllegalArgumentException, PackageManager.NameNotFoundException {
 
-		if ((context == null) || TextUtils.isEmpty(key)) {
+		if (TextUtils.isEmpty(key)) {
 			throw new IllegalArgumentException("context or key is null");
 		}
 		final Signature expected = new Signature(key);
@@ -73,104 +75,97 @@ public class SignatureHelper {
 	 * apkの署名を取得
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
+	 * @throws PackageManager.NameNotFoundException
 	 */
 	@SuppressLint("NewApi")
 	@Nullable
-	public static String getSignature(final Context context) {
-		if (context != null) {
-			final PackageManager pm = context.getPackageManager();
-			try {
-				final Signature[] signatures;
-				if (BuildCheck.isPie()) {
-					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
-						PackageManager.GET_SIGNING_CERTIFICATES);
-					if (packageInfo.signingInfo.hasMultipleSigners()) {
-						signatures = packageInfo.signingInfo.getApkContentsSigners();
-					} else {
-						signatures = packageInfo.signingInfo.getSigningCertificateHistory();
-					}
-				} else {
-					@SuppressLint("PackageManagerGetSignatures")
-					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
-						PackageManager.GET_SIGNATURES);
-					signatures = packageInfo.signatures;
+	public static String getSignature(@NonNull final Context context)
+		throws PackageManager.NameNotFoundException {
+
+		final PackageManager pm = context.getPackageManager();
+		final Signature[] signatures;
+		if (BuildCheck.isPie()) {
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNING_CERTIFICATES);
+			if (packageInfo.signingInfo.hasMultipleSigners()) {
+				signatures = packageInfo.signingInfo.getApkContentsSigners();
+			} else {
+				signatures = packageInfo.signingInfo.getSigningCertificateHistory();
+			}
+		} else {
+			@SuppressLint("PackageManagerGetSignatures")
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNATURES);
+			signatures = packageInfo.signatures;
+		}
+		// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
+		// 全部つなげて返す
+		int cnt = 0;
+		final StringBuilder sb = new StringBuilder();
+		for (int i = 0; i < signatures.length; i++) {
+			final Signature signature = signatures[i];
+			if (signature != null) {
+				if (cnt != 0) {
+					sb.append('/');
 				}
-				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
-				// 全部つなげて返す
-				int cnt = 0;
-				final StringBuilder sb = new StringBuilder();
-				for (int i = 0; i < signatures.length; i++) {
-					final Signature signature = signatures[i];
-					if (signature != null) {
-						if (cnt != 0) {
-							sb.append('/');
-						}
-						sb.append(signature.toCharsString());
-					}
-				}
-				return sb.toString();
-			} catch (final Exception e) {
-				// ignore
+				sb.append(signature.toCharsString());
 			}
 		}
-		return null;
+		return sb.toString();
 	}
 
 	/**
 	 * apkの署名を取得
 	 * @param context
 	 * @return 署名を取得できなければnull, 複数の署名があれば全てを繋げて返す
+	 * @throws PackageManager.NameNotFoundException
 	 */
 	@SuppressLint("NewApi")
 	@Nullable
-	public static byte[] getSignatureBytes(final Context context) {
-		if (context != null) {
-			final PackageManager pm = context.getPackageManager();
-			try {
-				final Signature[] signatures;
-				if (BuildCheck.isPie()) {
-					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
-						PackageManager.GET_SIGNING_CERTIFICATES);
-					if (packageInfo.signingInfo.hasMultipleSigners()) {
-						signatures = packageInfo.signingInfo.getApkContentsSigners();
-					} else {
-						signatures = packageInfo.signingInfo.getSigningCertificateHistory();
-					}
-				} else {
-					@SuppressLint("PackageManagerGetSignatures")
-					final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
-						PackageManager.GET_SIGNATURES);
-					signatures = packageInfo.signatures;
-				}
-				ByteBuffer result = ByteBuffer.allocate(1024);
-				// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
-				// 全部つなげて返す
-				for (int i = 0; i < signatures.length; i++) {
-					final Signature signature = signatures[i];
-					if (signature != null) {
-						final byte[] bytes = signature.toByteArray();
-						final int n = bytes != null ? bytes.length : 0;
-						if (n > 0) {
-							if (n > result.remaining()) {
-								result.flip();
-								final ByteBuffer temp = ByteBuffer.allocate(result.capacity() + n * 2);
-								temp.put(result);
-								result = temp;
-							}
-							result.put(bytes);
-						}
-					}
-				}
-				result.flip();
-				final int n = result.limit();
-				if (n > 0) {
-					final byte[] bytes = new byte[n];
-					result.get(bytes);
-					return bytes;
-				}
-			} catch (final Exception e) {
-				// ignore
+	public static byte[] getSignatureBytes(@NonNull final Context context)
+		throws PackageManager.NameNotFoundException {
+
+		final PackageManager pm = context.getPackageManager();
+		final Signature[] signatures;
+		if (BuildCheck.isPie()) {
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNING_CERTIFICATES);
+			if (packageInfo.signingInfo.hasMultipleSigners()) {
+				signatures = packageInfo.signingInfo.getApkContentsSigners();
+			} else {
+				signatures = packageInfo.signingInfo.getSigningCertificateHistory();
 			}
+		} else {
+			@SuppressLint("PackageManagerGetSignatures")
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNATURES);
+			signatures = packageInfo.signatures;
+		}
+		ByteBuffer result = ByteBuffer.allocate(1024);
+		// 通常[0]のみだけど、悪さをするやつが元の署名を残したまま後ろに署名を追加したりするので全てをチェックすべし
+		// 全部つなげて返す
+		for (int i = 0; i < signatures.length; i++) {
+			final Signature signature = signatures[i];
+			if (signature != null) {
+				final byte[] bytes = signature.toByteArray();
+				final int n = bytes != null ? bytes.length : 0;
+				if (n > 0) {
+					if (n > result.remaining()) {
+						result.flip();
+						final ByteBuffer temp = ByteBuffer.allocate(result.capacity() + n * 2);
+						temp.put(result);
+						result = temp;
+					}
+					result.put(bytes);
+				}
+			}
+		}
+		result.flip();
+		final int n = result.limit();
+		if (n > 0) {
+			final byte[] bytes = new byte[n];
+			result.get(bytes);
+			return bytes;
 		}
 		return null;
 	}
