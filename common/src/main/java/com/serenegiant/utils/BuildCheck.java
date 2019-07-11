@@ -35,6 +35,10 @@ public final class BuildCheck {
 		return (Build.VERSION.SDK_INT == Build.VERSION_CODES.CUR_DEVELOPMENT);
 	}
 
+	public static boolean isAPI1() {
+		return check((Build.VERSION_CODES.BASE));
+	}
+
 	/**
 	 * October 2008: The original, first, version of Android.  Yay!, API>=1
 	 * @return
@@ -43,12 +47,20 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.BASE);
 	}
 
+	public static boolean isAPI2() {
+		return check((Build.VERSION_CODES.BASE_1_1));
+	}
+
 	/**
 	 * February 2009: First Android update, officially called 1.1., API>=2
 	 * @return
 	 */
 	public static boolean isBase11() {
 		return check(Build.VERSION_CODES.BASE_1_1);
+	}
+
+	public static boolean isAPI3() {
+		return check((Build.VERSION_CODES.CUPCAKE));
 	}
 
 	/**
@@ -67,6 +79,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.CUPCAKE);
 	}
 
+	public static boolean isAPI4() {
+		return check((Build.VERSION_CODES.DONUT));
+	}
+
 	/**
 	 * September 2009: Android 1.6., API>=4
 	 * @return
@@ -81,6 +97,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid1_6() {
 		return check(Build.VERSION_CODES.DONUT);
+	}
+
+	public static boolean isAPI5() {
+		return check((Build.VERSION_CODES.ECLAIR));
 	}
 
 	/**
@@ -99,6 +119,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.ECLAIR);
 	}
 
+	public static boolean isAPI6() {
+		return check((Build.VERSION_CODES.ECLAIR_0_1));
+	}
+
 	/**
 	 * December 2009: Android 2.0.1, API>=6
 	 * @return
@@ -107,12 +131,20 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.ECLAIR_0_1);
 	}
 
+	public static boolean isAPI7() {
+		return check((Build.VERSION_CODES.ECLAIR_MR1));
+	}
+
 	/**
 	 * January 2010: Android 2.1, API>=7
 	 * @return
 	 */
 	public static boolean isEclairMR1() {
 		return check(Build.VERSION_CODES.ECLAIR_MR1);
+	}
+
+	public static boolean isAPI8() {
+		return check((Build.VERSION_CODES.FROYO));
 	}
 
 	/**
@@ -131,6 +163,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.FROYO);
 	}
 
+	public static boolean isAPI9() {
+		return check((Build.VERSION_CODES.GINGERBREAD));
+	}
+
 	/**
 	 * November 2010: Android 2.3, API>=9
 	 * @return
@@ -145,6 +181,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid2_3() {
 		return check(Build.VERSION_CODES.GINGERBREAD);
+	}
+
+	public static boolean isAPI10() {
+		return check((Build.VERSION_CODES.GINGERBREAD_MR1));
 	}
 
 	/**
@@ -163,6 +203,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.GINGERBREAD_MR1);
 	}
 
+	public static boolean isAPI11() {
+		return check((Build.VERSION_CODES.HONEYCOMB));
+	}
+
 	/**
 	 * February 2011: Android 3.0., API>=11
 	 * @return
@@ -177,6 +221,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid3() {
 		return check(Build.VERSION_CODES.HONEYCOMB);
+	}
+
+	public static boolean isAPI12() {
+		return check((Build.VERSION_CODES.HONEYCOMB_MR1));
 	}
 
 	/**
@@ -195,6 +243,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.HONEYCOMB_MR1);
 	}
 
+	public static boolean isAPI13() {
+		return check((Build.VERSION_CODES.HONEYCOMB_MR2));
+	}
+
 	/**
 	 * June 2011: Android 3.2., API>=13
 	 * @return
@@ -209,6 +261,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid3_2() {
 		return check(Build.VERSION_CODES.HONEYCOMB_MR2);
+	}
+
+	public static boolean isAPI14() {
+		return check((Build.VERSION_CODES.ICE_CREAM_SANDWICH));
 	}
 
 	/**
@@ -227,6 +283,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.ICE_CREAM_SANDWICH);
 	}
 
+	public static boolean isAPI15() {
+		return check((Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1));
+	}
+
 	/**
 	 * December 2011: Android 4.0.3., API>=15
 	 * @return
@@ -241,6 +301,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid4_0_3() {
 		return check(Build.VERSION_CODES.ICE_CREAM_SANDWICH_MR1);
+	}
+
+	public static boolean isAPI16() {
+		return check((Build.VERSION_CODES.JELLY_BEAN));
 	}
 
 	/**
@@ -259,6 +323,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.JELLY_BEAN);
 	}
 
+	public static boolean isAPI17() {
+		return check((Build.VERSION_CODES.JELLY_BEAN_MR1));
+	}
+
 	/**
 	 * November 2012: Android 4.2, Moar jelly beans!, API>=17
 	 * @return
@@ -273,6 +341,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid4_2() {
 		return check(Build.VERSION_CODES.JELLY_BEAN_MR1);
+	}
+
+	public static boolean isAPI18() {
+		return check((Build.VERSION_CODES.JELLY_BEAN_MR2));
 	}
 
 	/**
@@ -291,6 +363,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.JELLY_BEAN_MR2);
 	}
 
+	public static boolean isAPI99() {
+		return check((Build.VERSION_CODES.KITKAT));
+	}
+
 	/**
 	 * October 2013: Android 4.4, KitKat, another tasty treat., API>=19
 	 * @return
@@ -307,12 +383,20 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.KITKAT);
 	}
 
+	public static boolean isAPI20() {
+		return check((Build.VERSION_CODES.KITKAT_WATCH));
+	}
+
 	/**
 	 * Android 4.4W: KitKat for watches, snacks on the run., API>=20
 	 * @return
 	 */
 	public static boolean isKitKatWatch() {
-		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH);
+		return check(Build.VERSION_CODES.KITKAT_WATCH);
+	}
+
+	public static boolean isAPI21() {
+		return check((Build.VERSION_CODES.LOLLIPOP));
 	}
 
 	/**
@@ -320,7 +404,7 @@ public final class BuildCheck {
 	 * @return
 	 */
 	public static boolean isL() {
-		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+		return check(Build.VERSION_CODES.LOLLIPOP);
 	}
 
 	/**
@@ -328,7 +412,7 @@ public final class BuildCheck {
 	 * @return
 	 */
 	public static boolean isLollipop() {
-		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+		return check(Build.VERSION_CODES.LOLLIPOP);
 	}
 
 	/**
@@ -339,12 +423,20 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.LOLLIPOP);
 	}
 
+	public static boolean isAPI22() {
+		return check((Build.VERSION_CODES.LOLLIPOP_MR1));
+	}
+
 	/**
 	 * Lollipop with an extra sugar coating on the outside!, API>=22
 	 * @return
 	 */
 	public static boolean isLollipopMR1() {
 		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1);
+	}
+
+	public static boolean isAPI23() {
+		return check((Build.VERSION_CODES.M));
 	}
 
 	/**
@@ -371,6 +463,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.M);
 	}
 
+	public static boolean isAPI24() {
+		return check((Build.VERSION_CODES.N));
+	}
+
 	/**
 	 * 虫歯の元, API >= 24
 	 * @return
@@ -394,6 +490,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.N);
 	}
 	
+	public static boolean isAPI25() {
+		return check((Build.VERSION_CODES.N_MR1));
+	}
+
 	/**
 	 * API>=25
  	 * @return
@@ -408,6 +508,10 @@ public final class BuildCheck {
 	 */
 	public static boolean isNougatMR1() {
 		return check(Build.VERSION_CODES.N_MR1);
+	}
+
+	public static boolean isAPI26() {
+		return check((Build.VERSION_CODES.O));
 	}
 
 	/**
@@ -434,6 +538,10 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.O);
 	}
 	
+	public static boolean isAPI27() {
+		return check((Build.VERSION_CODES.O_MR1));
+	}
+
 	/**
 	 * おれおれぇー API>=27
 	 * @return
@@ -450,6 +558,10 @@ public final class BuildCheck {
 		return check((Build.VERSION_CODES.O_MR1));
 	}
 	
+	public static boolean isAPI28() {
+		return check((Build.VERSION_CODES.P));
+	}
+
 	/**
 	 * おっ！ぱい API>=28
 	 * @return
@@ -472,5 +584,13 @@ public final class BuildCheck {
 	 */
 	public static boolean isAndroid9() {
 		return check((Build.VERSION_CODES.P));
+	}
+
+	public static boolean isAPI29() {
+		return check((Build.VERSION_CODES.Q));
+	}
+
+	public static boolean isQ() {
+		return check((Build.VERSION_CODES.Q));
 	}
 }
