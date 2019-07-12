@@ -29,6 +29,8 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
 import java.nio.ByteBuffer;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 public class SignatureHelper {
 	/**
@@ -170,4 +172,42 @@ public class SignatureHelper {
 		return null;
 	}
 
+	/**
+	 * apk署名のハッシュを取得
+	 * @param context
+	 * @param algorithm ハッシュのアルゴリズム, "SHA-1", "MD5", "SHA-256"
+	 * @return
+	 * @throws PackageManager.NameNotFoundException
+	 * @throws NoSuchAlgorithmException
+	 */
+	@SuppressLint("NewApi")
+	public static byte[] getSignaturesDigest(
+		@NonNull final Context context, @NonNull final String algorithm)
+		throws PackageManager.NameNotFoundException, NoSuchAlgorithmException {
+
+		final PackageManager pm = context.getPackageManager();
+		final Signature[] signatures;
+		if (BuildCheck.isPie()) {
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNING_CERTIFICATES);
+			if (packageInfo.signingInfo.hasMultipleSigners()) {
+				signatures = packageInfo.signingInfo.getApkContentsSigners();
+			} else {
+				signatures = packageInfo.signingInfo.getSigningCertificateHistory();
+			}
+		} else {
+			@SuppressLint("PackageManagerGetSignatures")
+			final PackageInfo packageInfo = pm.getPackageInfo(context.getPackageName(),
+				PackageManager.GET_SIGNATURES);
+			signatures = packageInfo.signatures;
+		}
+		final MessageDigest digest = MessageDigest.getInstance(algorithm);
+		for (int i = 0; i < signatures.length; i++) {
+			final Signature signature = signatures[i];
+			if (signature != null) {
+				digest.update(signature.toByteArray());
+			}
+		}
+		return digest.digest();
+	}
 }
