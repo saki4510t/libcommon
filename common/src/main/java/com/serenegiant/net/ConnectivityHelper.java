@@ -184,11 +184,7 @@ public class ConnectivityHelper {
 //--------------------------------------------------------------------------------
 	@Nullable
 	private Context getContext() {
-		final Context context = mWeakContext.get();
-		if (context == null) {
-			throw new IllegalStateException("context is already released");
-		}
-		return context;
+		return mWeakContext.get();
 	}
 
 	@NonNull
