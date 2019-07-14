@@ -157,6 +157,31 @@ public class ConnectivityHelper {
 		return false;
 	}
 	
+	public int getActiveNetworkType() {
+		synchronized (mSync) {
+			return mActiveNetworkType;
+		}
+	}
+
+	public boolean isNetworkReachable() {
+		return getActiveNetworkType() != NETWORK_TYPE_NON;
+	}
+
+	public boolean isWifiNetworkReachable() {
+		final int active = getActiveNetworkType();
+		return (active == NETWORK_TYPE_WIFI)
+			|| (active == NETWORK_TYPE_ETHERNET);
+	}
+
+	public boolean isMobileNetworkReachable() {
+		return getActiveNetworkType() == NETWORK_TYPE_MOBILE;
+	}
+
+	public boolean isBluetoothNetworkReachable() {
+		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
+	}
+
+//--------------------------------------------------------------------------------
 	@Nullable
 	private Context getContext() {
 		final Context context = mWeakContext.get();
@@ -186,30 +211,6 @@ public class ConnectivityHelper {
 			throw new IllegalStateException("failed to get ConnectivityManager");
 		}
 		return connManager;
-	}
-
-	public int getActiveNetworkType() {
-		synchronized (mSync) {
-			return mActiveNetworkType;
-		}
-	}
-
-	public boolean isNetworkReachable() {
-		return getActiveNetworkType() != NETWORK_TYPE_NON;
-	}
-
-	public boolean isWifiNetworkReachable() {
-		final int active = getActiveNetworkType();
-		return (active == NETWORK_TYPE_WIFI)
-			|| (active == NETWORK_TYPE_ETHERNET);
-	}
-
-	public boolean isMobileNetworkReachable() {
-		return getActiveNetworkType() == NETWORK_TYPE_MOBILE;
-	}
-
-	public boolean isBluetoothNetworkReachable() {
-		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
 	}
 
 //--------------------------------------------------------------------------------
