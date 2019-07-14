@@ -190,7 +190,7 @@ public class ConnectivityHelper {
 	@NonNull
 	private Context requireContext() throws IllegalStateException {
 		final Context context = mWeakContext.get();
-		if (mIsReleased || (context == null)) {
+		if (context == null) {
 			throw new IllegalStateException("context is already released");
 		}
 		return context;
