@@ -609,6 +609,7 @@ public class ConnectivityHelper {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isWifiNetworkReachable(
