@@ -72,6 +72,7 @@ public class ConnectivityHelper {
 	private ConnectivityManager.NetworkCallback mNetworkCallback;	// API>=21
 	private BroadcastReceiver mNetworkChangedReceiver;
 	private int mActiveNetworkType = NETWORK_TYPE_NON;
+	private volatile boolean mIsReleased = false;
 
 	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
@@ -100,6 +101,7 @@ public class ConnectivityHelper {
 	@SuppressLint("NewApi")
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+		mIsReleased = true;
 		updateActiveNetwork(NETWORK_TYPE_NON);
 		final Context context = getContext();
 		if (context != null) {
@@ -167,7 +169,7 @@ public class ConnectivityHelper {
 	@NonNull
 	private Context requireContext() throws IllegalStateException {
 		final Context context = mWeakContext.get();
-		if (context == null) {
+		if (mIsReleased || (context == null)) {
 			throw new IllegalStateException("context is already released");
 		}
 		return context;
