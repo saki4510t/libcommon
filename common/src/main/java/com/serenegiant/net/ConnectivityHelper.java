@@ -105,7 +105,7 @@ public class ConnectivityHelper {
 		updateActiveNetwork(NETWORK_TYPE_NON);
 		final Context context = getContext();
 		if (context != null) {
-			if (BuildCheck.isLollipop()) {
+			if (BuildCheck.isAPI21()) {
 				final ConnectivityManager manager = requireConnectivityManager();
 				if (mOnNetworkActiveListener != null) {
 					try {
@@ -218,21 +218,21 @@ public class ConnectivityHelper {
 	private void init() {
 		if (DEBUG) Log.v(TAG, "init:");
 		final ConnectivityManager manager = requireConnectivityManager();
-		if (BuildCheck.isLollipop()) {
+		if (BuildCheck.isAPI21()) {
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
 			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 			mNetworkCallback = new MyNetworkCallback();
 			// ACCESS_NETWORK_STATEパーミッションが必要
 			if (BuildCheck.isAPI23()) {
 				updateActiveNetwork(manager.getActiveNetwork());	// API>=23
-				if (BuildCheck.isNougat()) {
+				if (BuildCheck.isAPI24()) {
 					manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
-				} else if (BuildCheck.isOreo()) {
+				} else if (BuildCheck.isAPI26()) {
 					manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
 				}
 			} else {
-				manager.registerNetworkCallback(new NetworkRequest.Builder()
-					.build(),
+				manager.registerNetworkCallback(
+					new NetworkRequest.Builder().build(),
 					mNetworkCallback);	// API>=21
 			}
 		} else {
@@ -487,8 +487,8 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager
 			= (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if (BuildCheck.isLollipop()) {
-			if (BuildCheck.isMarshmallow()) {
+		if (BuildCheck.isAPI21()) {
+			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
@@ -538,8 +538,8 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager
 			= (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		if (BuildCheck.isLollipop()) {
-			if (BuildCheck.isMarshmallow()) {
+		if (BuildCheck.isAPI21()) {
+			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
 				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
@@ -583,9 +583,9 @@ public class ConnectivityHelper {
 			= (ConnectivityManager) context
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 
-		if (BuildCheck.isLollipop()) {
+		if (BuildCheck.isAPI21()) {
 			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
-			if (BuildCheck.isMarshmallow()) {
+			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
 				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
@@ -616,7 +616,7 @@ public class ConnectivityHelper {
 		@NonNull final NetworkInfo info) {
 
 		final boolean isWiFi;
-		if (BuildCheck.isOreo()) {
+		if (BuildCheck.isAPI26()) {
 			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
 				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
 //				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI_AWARE);	// API>=26 これはWi-Fi端末間での近接情報の発見機能
@@ -634,7 +634,7 @@ public class ConnectivityHelper {
 		@NonNull final NetworkInfo info) {
 
 		final boolean isMobile;
-		if (BuildCheck.isOreoMR1()) {
+		if (BuildCheck.isAPI27()) {
 			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)// API>=21
 				|| capabilities.hasTransport(NetworkCapabilities.	TRANSPORT_LOWPAN);	// API>=27
 		} else {
@@ -666,12 +666,12 @@ public class ConnectivityHelper {
 			= (state == NetworkInfo.DetailedState.CONNECTED)
 				|| (state == NetworkInfo.DetailedState.CONNECTING);
 		final boolean hasCapability;
-		if (BuildCheck.isPie()) {
+		if (BuildCheck.isAPI28()) {
 			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
 				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)			// API>=23
 				&& (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)	// API>=28
 					|| capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));	// API>=28
-		} else if (BuildCheck.isMarshmallow()) {
+		} else if (BuildCheck.isAPI23()) {
 			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
 				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);		// API>=23
 		} else {
