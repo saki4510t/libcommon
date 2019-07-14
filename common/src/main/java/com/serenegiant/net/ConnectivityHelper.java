@@ -333,7 +333,7 @@ public class ConnectivityHelper {
 		
 		@SuppressLint("MissingPermission")
 		@Override
-		public void onAvailable(final Network network) {
+		public void onAvailable(@NonNull final Network network) {
 			super.onAvailable(network);
 			// ネットワークの準備ができた時
 			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
@@ -342,8 +342,8 @@ public class ConnectivityHelper {
 		
 		@SuppressLint("MissingPermission")
 		@Override
-		public void onCapabilitiesChanged(final Network network,
-			final NetworkCapabilities networkCapabilities) {
+		public void onCapabilitiesChanged(@NonNull final Network network,
+			@NonNull final NetworkCapabilities networkCapabilities) {
 
 			super.onCapabilitiesChanged(network, networkCapabilities);
 			// 接続が完了してネットワークの状態が変わった時
@@ -354,8 +354,8 @@ public class ConnectivityHelper {
 		}
 		
 		@Override
-		public void onLinkPropertiesChanged(final Network network,
-			final LinkProperties linkProperties) {
+		public void onLinkPropertiesChanged(@NonNull final Network network,
+			@NonNull final LinkProperties linkProperties) {
 
 			super.onLinkPropertiesChanged(network, linkProperties);
 			// ネットワークのリンク状態が変わった時
@@ -365,7 +365,7 @@ public class ConnectivityHelper {
 		}
 
 		@Override
-		public void onLosing(final Network network, final int maxMsToLive) {
+		public void onLosing(@NonNull final Network network, final int maxMsToLive) {
 			super.onLosing(network, maxMsToLive);
 			// 接続を失いそうな時
 			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s)", network));
@@ -373,7 +373,7 @@ public class ConnectivityHelper {
 		
 		@SuppressLint("MissingPermission")
 		@Override
-		public void onLost(final Network network) {
+		public void onLost(@NonNull final Network network) {
 			super.onLost(network);
 			// 接続を失った時
 			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s)", network));
