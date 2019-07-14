@@ -209,7 +209,7 @@ public class ConnectivityHelper {
 			mNetworkChangedReceiver = new NetworkChangedReceiver(this);
 			final IntentFilter intentFilter = new IntentFilter();
 			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
-				requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
+			requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
 		}
 	}
 	
@@ -254,6 +254,7 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager = requireConnectivityManager();
 		@Nullable
 		final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+		// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
 		@Nullable
 		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 
@@ -535,6 +536,7 @@ public class ConnectivityHelper {
 				.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		if (BuildCheck.isLollipop()) {
+			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
 			if (BuildCheck.isMarshmallow()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21

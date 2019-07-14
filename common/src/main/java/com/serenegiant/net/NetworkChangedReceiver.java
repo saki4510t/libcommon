@@ -41,6 +41,7 @@ import com.serenegiant.utils.ComponentUtils;
  * システムグローバルなブロードキャストを受信するためのBroadcastReceiverはアプリ内で1つだけ登録して
  * それ以外は(グローバルBroadcastReceiverがブロードキャストする)ローカルブロードキャストを受信すること
  * これのためだけにsupport library v4が要るにゃぁ
+ * 削除予定なので代わりにConnectivityHelperを使うこと
  */
 @Deprecated
 @SuppressLint("MissingPermission")
