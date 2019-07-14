@@ -187,6 +187,25 @@ public class ConnectivityHelper {
 			return mActiveNetworkType;
 		}
 	}
+
+	public boolean isNetworkReachable() {
+		return getActiveNetworkType() != NETWORK_TYPE_NON;
+	}
+
+	public boolean isWifiNetworkReachable() {
+		final int active = getActiveNetworkType();
+		return (active == NETWORK_TYPE_WIFI)
+			|| (active == NETWORK_TYPE_ETHERNET);
+	}
+
+	public boolean isMobileNetworkReachable() {
+		return getActiveNetworkType() == NETWORK_TYPE_MOBILE;
+	}
+
+	public boolean isBluetoothNetworkReachable() {
+		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
+	}
+
 //================================================================================
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
