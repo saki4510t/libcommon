@@ -480,6 +480,7 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isWifiNetworkReachable(@NonNull final Context context) {
@@ -531,6 +532,7 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isMobileNetworkReachable(@NonNull final Context context) {
@@ -575,6 +577,7 @@ public class ConnectivityHelper {
 	 * ネットワークが使用可能かどうかをチェック
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isNetworkReachable(@NonNull final Context context) {
