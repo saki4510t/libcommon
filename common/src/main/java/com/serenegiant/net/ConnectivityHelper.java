@@ -223,10 +223,13 @@ public class ConnectivityHelper {
 			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 			mNetworkCallback = new MyNetworkCallback();
 			// ACCESS_NETWORK_STATEパーミッションが必要
-			if (BuildCheck.isNougat()) {
-				manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
-			} else if (BuildCheck.isOreo()) {
-				manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
+			if (BuildCheck.isAPI23()) {
+				updateActiveNetwork(manager.getActiveNetwork());	// API>=23
+				if (BuildCheck.isNougat()) {
+					manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
+				} else if (BuildCheck.isOreo()) {
+					manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
+				}
 			} else {
 				manager.registerNetworkCallback(new NetworkRequest.Builder()
 					.build(),
@@ -277,29 +280,33 @@ public class ConnectivityHelper {
 //--------------------------------------------------------------------------------
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private void updateActiveNetwork(final Network network) {
+	private void updateActiveNetwork(@Nullable final Network network) {
 		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
-	
-		final ConnectivityManager manager = requireConnectivityManager();
-		@Nullable
-		final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-		// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
-		@Nullable
-		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 
-		int activeNetworkType = NETWORK_TYPE_NON;
-		if ((capabilities != null) && (info != null)) {
-			if (isWifiNetworkReachable(capabilities, info)) {
-				activeNetworkType = NETWORK_TYPE_WIFI;
-			} else if (isMobileNetworkReachable(capabilities, info)) {
-				activeNetworkType = NETWORK_TYPE_MOBILE;
-			} else if (isBluetoothNetworkReachable(capabilities, info)) {
-				activeNetworkType = NETWORK_TYPE_BLUETOOTH;
-			} else if (isNetworkReachable(capabilities, info)) {
-				activeNetworkType = NETWORK_TYPE_ETHERNET;
+		if (network != null) {
+			final ConnectivityManager manager = requireConnectivityManager();
+			@Nullable
+			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
+			@Nullable
+			final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+
+			int activeNetworkType = NETWORK_TYPE_NON;
+			if ((capabilities != null) && (info != null)) {
+				if (isWifiNetworkReachable(capabilities, info)) {
+					activeNetworkType = NETWORK_TYPE_WIFI;
+				} else if (isMobileNetworkReachable(capabilities, info)) {
+					activeNetworkType = NETWORK_TYPE_MOBILE;
+				} else if (isBluetoothNetworkReachable(capabilities, info)) {
+					activeNetworkType = NETWORK_TYPE_BLUETOOTH;
+				} else if (isNetworkReachable(capabilities, info)) {
+					activeNetworkType = NETWORK_TYPE_ETHERNET;
+				}
 			}
+			updateActiveNetwork(activeNetworkType);
+		} else {
+			updateActiveNetwork(NETWORK_TYPE_NON);
 		}
-		updateActiveNetwork(activeNetworkType);
 	}
 
 	private void updateActiveNetwork(@Nullable final NetworkInfo activeNetworkInfo) {
@@ -344,9 +351,18 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "Constructor:");
 		}
 
+		@SuppressLint("MissingPermission")
+		@TargetApi(Build.VERSION_CODES.M)
 		@Override
 		public void onNetworkActive() {
 			if (DEBUG) Log.v(TAG, "onNetworkActive:");
+			if (BuildCheck.isAPI23()) {
+				try {
+					updateActiveNetwork(requireConnectivityManager().getActiveNetwork());	// API>=23
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
+			}
 		}
 	}
 	
