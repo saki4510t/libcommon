@@ -115,7 +115,11 @@ public class ConnectivityHelper {
 					mOnNetworkActiveListener = null;
 				}
 				if (mNetworkCallback != null) {
-					manager.unregisterNetworkCallback(mNetworkCallback);	// API>=21
+					try {
+						manager.unregisterNetworkCallback(mNetworkCallback);	// API>=21
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
 					mNetworkCallback = null;
 				}
 			}
@@ -206,7 +210,7 @@ public class ConnectivityHelper {
 		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
 	}
 
-//================================================================================
+//--------------------------------------------------------------------------------
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	private void init() {
@@ -233,7 +237,8 @@ public class ConnectivityHelper {
 			requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
 		}
 	}
-	
+
+//--------------------------------------------------------------------------------
 	private void callOnNetworkChanged(final int activeNetworkType) {
 
 		synchronized (mSync) {
@@ -267,6 +272,7 @@ public class ConnectivityHelper {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void updateActiveNetwork(final Network network) {
@@ -325,9 +331,10 @@ public class ConnectivityHelper {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private class MyOnNetworkActiveListener
-		implements ConnectivityManager.OnNetworkActiveListener {
+		implements ConnectivityManager.OnNetworkActiveListener {	// API>= 21
 
 		private final String TAG = MyOnNetworkActiveListener.class.getSimpleName();
 
@@ -341,8 +348,9 @@ public class ConnectivityHelper {
 		}
 	}
 	
+//--------------------------------------------------------------------------------
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private class MyNetworkCallback extends ConnectivityManager.NetworkCallback {
+	private class MyNetworkCallback extends ConnectivityManager.NetworkCallback {	// API>=21
 		private final String TAG = MyNetworkCallback.class.getSimpleName();
 	
 		public MyNetworkCallback() {
@@ -408,7 +416,8 @@ public class ConnectivityHelper {
 			updateActiveNetwork(NETWORK_TYPE_NON);
 		}
 	}
-	
+
+//--------------------------------------------------------------------------------
 	@SuppressLint("MissingPermission")
 	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
