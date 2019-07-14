@@ -66,8 +66,10 @@ public class ConnectivityHelper {
 	@NonNull
 	private final ConnectivityCallback mCallback;
 	private Handler mAsyncHandler;
-	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;
-	private ConnectivityManager.NetworkCallback mNetworkCallback;
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private ConnectivityManager.NetworkCallback mNetworkCallback;	// API>=21
 	private BroadcastReceiver mNetworkChangedReceiver;
 	private int mActiveNetworkType = NETWORK_TYPE_NON;
 
