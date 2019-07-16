@@ -25,12 +25,12 @@ import androidx.preference.Preference;
 import androidx.preference.PreferenceFragment;
 import androidx.preference.PreferenceFragmentCompat;
 
-public class onDisplayPreferenceDialogDelegater {
+public class OnDisplayPreferenceDialogDelegater {
 	private static final boolean DEBUG = false; //set false on production
-	private static final String TAG = onDisplayPreferenceDialogDelegater.class.getSimpleName();
+	private static final String TAG = OnDisplayPreferenceDialogDelegater.class.getSimpleName();
 
 	private static final String DIALOG_FRAGMENT_TAG =
-         "com.serenegiant.preference.onDisplayPreferenceDialogDelegater.DIALOG";
+         "com.serenegiant.preference.OnDisplayPreferenceDialogDelegater.DIALOG";
 
 	/**
 	 * PreferenceFragmentCompat#onDisplayPreferenceDialogのヘルパーメソッド
