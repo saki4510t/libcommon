@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<style name="SubTitlePreference_subtitle" parent="@android:style/TextAppearance.Small"/>
+
+	<!-- レイアウトファイルのIDの予約 -->
+	<item type="id" name="subtitle" />
+
+	<!-- レイアウト属性 -->
+	<declare-styleable name="SubTitlePreference">
+		<!-- レイアウトリソースID -->
+		<attr name="subtitle_layout" format="reference" default="0" />
+		<!-- 値表示用TextViewのID -->
+		<attr name="subtitle_id" format="reference" default="@id/subtitle"/>
+		<attr name="subtitle" format="string|reference"/>
+	</declare-styleable>
+</resources>
