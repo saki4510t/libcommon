@@ -48,10 +48,7 @@ public class VideoConfig implements Parcelable {
 	 * @return
 	 */
 	public static VideoConfig createDefault() {
-		final VideoConfig result = new VideoConfig();
-		result.set(DEFAULT_CONFIG);
-
-		return result;
+		return new VideoConfig(DEFAULT_CONFIG);
 	}
 
 	/**
