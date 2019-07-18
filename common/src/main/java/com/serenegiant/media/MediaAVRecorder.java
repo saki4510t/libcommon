@@ -19,7 +19,6 @@ package com.serenegiant.media;
 */
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -41,11 +40,7 @@ public class MediaAVRecorder extends Recorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaAVRecorder.class.getSimpleName();
 
-	@NonNull
-	private final WeakReference<Context> mWeakContext;
 	protected final int mSaveTreeId;	// SDカードへの出力を試みるかどうか
-	@NonNull
-	private final IMuxer.IMuxerFactory mMuxerFactory;
 
 	protected String mOutputPath;
 	protected DocumentFile mOutputFile;
@@ -63,7 +58,7 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		final String ext, final int saveTreeId) throws IOException {
 
-		this(context, callback, null, ext, saveTreeId, null, null);
+		this(context, callback, null, null,null, ext, saveTreeId);
 	}
 	
 	/**
@@ -77,10 +72,10 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String ext, final int saveTreeId,
-		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory,
+		final String ext, final int saveTreeId) throws IOException {
 
-		this(context, callback, null, ext, saveTreeId, factory);
+		this(context, callback, null, null, ext, saveTreeId);
 	}
 
 	/**
@@ -97,7 +92,7 @@ public class MediaAVRecorder extends Recorder {
 		final String prefix, final String _ext, final int saveTreeId)
 			throws IOException {
 
-		this(context, callback, prefix, _ext, saveTreeId, null);
+		this(context, callback, null, null, prefix, _ext, saveTreeId);
 	}
 	
 	/**
@@ -112,10 +107,10 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String prefix, final String _ext, final int saveTreeId,
-		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory,
+		final String prefix, final String _ext, final int saveTreeId) throws IOException {
 
-		this(context, callback, prefix, _ext, saveTreeId, factory, null);
+		this(context, callback, null, factory, prefix, _ext, saveTreeId);
 	}
 
 	/**
@@ -132,7 +127,7 @@ public class MediaAVRecorder extends Recorder {
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName)
 			throws IOException {
 		
-		this(context, callback, saveTreeId, dirs, fileName, null, null);
+		this(context, callback, null, null, saveTreeId, dirs, fileName);
 	}
 	
 	/**
@@ -147,10 +142,10 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
-		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory,
+		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName) throws IOException {
 
-		this(context, callback, saveTreeId, dirs, fileName, factory, null);
+		this(context, callback, null, factory, saveTreeId, dirs, fileName);
 	}
 
 	/**
@@ -164,7 +159,7 @@ public class MediaAVRecorder extends Recorder {
 		@Nullable final RecorderCallback callback,
 		@NonNull final DocumentFile output) throws IOException {
 		
-		this(context, callback, output, null, null);
+		this(context, callback, null, null, output);
 	}
 	
 	/**
@@ -177,10 +172,10 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final DocumentFile output,
-		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@NonNull final DocumentFile output) throws IOException {
 
-		this(context, callback, output, factory, null);
+		this(context, callback, null, factory, output);
 	}
 
 	/**
@@ -192,25 +187,25 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final String outputPath)
-			throws IOException {
+		@NonNull final String outputPath) throws IOException {
 
-		this(context, callback, outputPath, null, null);
+		this(context, callback, null, null, outputPath);
 	}
 	
 	/**
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
+	 * @param factory
 	 * @param outputPath
 	 * @throws IOException
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final String outputPath,
-		@Nullable final IMuxer.IMuxerFactory factory) throws IOException {
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@NonNull final String outputPath) throws IOException {
 
-		this(context, callback, outputPath, factory, null);
+		this(context, callback, null, factory, outputPath);
 	}
 
 //--------------------------------------------------------------------------------
@@ -226,13 +221,11 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final String prefix, final String _ext, final int saveTreeId,
+		@Nullable final VideoConfig config,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final VideoConfig config) throws IOException {
+		final String prefix, final String _ext, final int saveTreeId) throws IOException {
 
-		super(callback, config);
-		mWeakContext = new WeakReference<Context>(context);
-		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		super(context, callback, config, factory);
 		mSaveTreeId = saveTreeId;
 		String ext = _ext;
 		if (TextUtils.isEmpty(ext)) {
@@ -261,6 +254,7 @@ public class MediaAVRecorder extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
+	 * @param config
 	 * @param saveTreeId
 	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
 	 * @param fileName
@@ -269,13 +263,11 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName,
+		@Nullable final VideoConfig config,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final VideoConfig config) throws IOException {
+		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName) throws IOException {
 
-		super(callback, config);
-		mWeakContext = new WeakReference<Context>(context);
-		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		super(context, callback, config, factory);
 		mSaveTreeId = saveTreeId;
 		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
 			DocumentFile tree = SAFUtils.getStorageFile(context,
@@ -309,19 +301,18 @@ public class MediaAVRecorder extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
-	 * @param output
+	 * @param config
 	 * @param factory
+	 * @param output
 	 * @throws IOException
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final DocumentFile output,
+		@Nullable final VideoConfig config,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final VideoConfig config) throws IOException {
+		@NonNull final DocumentFile output) throws IOException {
 
-		super(callback, config);
-		mWeakContext = new WeakReference<Context>(context);
-		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		super(context, callback, config, factory);
 		mSaveTreeId = 0;
 		mOutputFile = output;
 		mOutputPath = UriHelper.getPath(context, output.getUri());
@@ -332,19 +323,18 @@ public class MediaAVRecorder extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
-	 * @param outputPath
+	 * @param config
 	 * @param factory
+	 * @param outputPath
 	 * @throws IOException
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
-		@NonNull final String outputPath,
+		@Nullable final VideoConfig config,
 		@Nullable final IMuxer.IMuxerFactory factory,
-		@Nullable final VideoConfig config) throws IOException {
+		@NonNull final String outputPath) throws IOException {
 
-		super(callback, config);
-		mWeakContext = new WeakReference<Context>(context);
-		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
+		super(context, callback, config, factory);
 		mSaveTreeId = 0;
 		mOutputPath = outputPath;
 		if (TextUtils.isEmpty(outputPath)) {
@@ -377,7 +367,7 @@ public class MediaAVRecorder extends Recorder {
 	 */
 	@Override
 	protected boolean check() {
-		final Context context = mWeakContext.get();
+		final Context context = requireContext();
 		final StorageInfo info = mOutputFile != null
 			? SAFUtils.getStorageInfo(context, mOutputFile) : null;
 		if ((info != null) && (info.totalBytes != 0)) {
@@ -390,24 +380,19 @@ public class MediaAVRecorder extends Recorder {
 					getConfig().maxDuration(), mStartTime, mSaveTreeId));
 	}
 
-	@Nullable
-	protected Context getContext() {
-		return mWeakContext.get();
-	}
-
 	protected void setupMuxer(final int fd) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(getConfig().useMediaMuxer(), fd));
+		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), fd));
 	}
 
 	protected void setupMuxer(@NonNull final String output) throws IOException {
-		setMuxer(mMuxerFactory.createMuxer(getConfig().useMediaMuxer(), output));
+		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), output));
 	}
 
 	protected void setupMuxer(
 		@NonNull final Context context,
 		@NonNull final DocumentFile output) throws IOException {
 
-		setMuxer(mMuxerFactory.createMuxer(context, getConfig().useMediaMuxer(), output));
+		setMuxer(getMuxerFactory().createMuxer(context, getConfig().useMediaMuxer(), output));
 	}
 
 }
