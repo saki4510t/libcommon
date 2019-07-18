@@ -75,8 +75,6 @@ public interface IRecorder {
 
 	public VideoConfig getConfig();
 
-	public void setMuxer(final IMuxer muxer);
-
 	/**
 	 * Encoderの準備
 	 * 割り当てられているMediaEncoderの下位クラスのインスタンスの#prepareを呼び出す
@@ -127,6 +125,8 @@ public interface IRecorder {
 	public boolean isStopped();
 
 	public int getState();
+
+	public void setMuxer(final IMuxer muxer);
 
 	public IMuxer getMuxer();
 
