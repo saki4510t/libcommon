@@ -21,6 +21,7 @@ package com.serenegiant.media;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 
+import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Handler;
@@ -39,7 +40,11 @@ public abstract class Recorder implements IRecorder {
 	public static final long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
 
 //--------------------------------------------------------------------------------
+	@NonNull
+	private final WeakReference<Context> mWeakContext;
 	private final RecorderCallback mCallback;
+	@NonNull
+	private final IMuxer.IMuxerFactory mMuxerFactory;
 	@NonNull
 	private final VideoConfig mVideoConfig;
 	protected IMuxer mMuxer;
@@ -58,10 +63,15 @@ public abstract class Recorder implements IRecorder {
 	/**
 	 * コンストラクタ
 	 */
-	public Recorder(final RecorderCallback callback,
-		@Nullable final VideoConfig config) {
+	public Recorder(@NonNull final Context context,
+		final RecorderCallback callback,
+		@Nullable final VideoConfig config,
+		@Nullable final IMuxer.IMuxerFactory factory) {
+
+		mWeakContext = new WeakReference<Context>(context);
 		mCallback = callback;
 		mVideoConfig = config != null ? config : VideoConfig.createDefault();
+		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
 		synchronized(this) {
 			mState = STATE_UNINITIALIZED;
 		}
@@ -85,6 +95,25 @@ public abstract class Recorder implements IRecorder {
 				mState = STATE_INITIALIZED;
 			}
 		}
+	}
+
+	@Nullable
+	protected Context getContext() {
+		return mWeakContext.get();
+	}
+
+	@NonNull
+	protected Context requireContext() throws IllegalStateException {
+		final Context context = getContext();
+		if (context == null) {
+			throw new IllegalStateException();
+		}
+		return context;
+	}
+
+	@NonNull
+	protected IMuxer.IMuxerFactory getMuxerFactory() {
+		return mMuxerFactory;
 	}
 
 	/**
