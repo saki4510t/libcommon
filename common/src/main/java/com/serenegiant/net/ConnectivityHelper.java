@@ -35,6 +35,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
+
 import android.util.Log;
 
 import com.serenegiant.utils.BuildCheck;
@@ -65,6 +66,7 @@ public class ConnectivityHelper {
 	private final WeakReference<Context> mWeakContext;
 	@NonNull
 	private final ConnectivityCallback mCallback;
+	private final Handler mUIHandler;
 	private Handler mAsyncHandler;
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
@@ -78,15 +80,21 @@ public class ConnectivityHelper {
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
 		= "android.net.conn.CONNECTIVITY_CHANGE";
 
-	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public ConnectivityHelper(@NonNull final Context context,
 		@NonNull final ConnectivityCallback callback) {
 
 		if (DEBUG) Log.v(TAG, "Constructor:");
 		mWeakContext = new WeakReference<>(context);
 		mCallback = callback;
+		mUIHandler = new Handler(context.getMainLooper());
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
-		init();
+		mUIHandler.post(new Runnable() {
+			@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+			@Override
+			public void run() {
+				init();
+			}
+		});
 	}
 	
 	@Override
@@ -135,6 +143,7 @@ public class ConnectivityHelper {
 			}
 		}
 		synchronized (mSync) {
+			mUIHandler.removeCallbacksAndMessages(null);
 			if (mAsyncHandler != null) {
 				try {
 					mAsyncHandler.removeCallbacksAndMessages(null);
