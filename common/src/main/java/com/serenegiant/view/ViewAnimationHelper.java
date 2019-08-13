@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.view;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -27,6 +27,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.BuildCheck;
 
 public class ViewAnimationHelper {
 	private static final String TAG = ViewAnimationHelper.class.getSimpleName();
