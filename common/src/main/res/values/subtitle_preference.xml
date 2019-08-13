@@ -12,5 +12,6 @@
 		<!-- 値表示用TextViewのID -->
 		<attr name="subtitle_id" format="reference" default="@id/subtitle"/>
 		<attr name="subtitle" format="string|reference"/>
+		<attr name="subtitle_visibility" format="integer|reference"/>
 	</declare-styleable>
 </resources>

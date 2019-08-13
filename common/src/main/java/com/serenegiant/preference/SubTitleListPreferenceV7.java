@@ -29,10 +29,12 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.StringRes;
+import androidx.annotation.UiThread;
 import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.ListPreference;
 import androidx.preference.PreferenceViewHolder;
@@ -46,7 +48,9 @@ public final class SubTitleListPreferenceV7 extends ListPreference {
 	@IdRes
 	private final int mSubTitleTvId;
 	private CharSequence mSubTitle;
-	private TextView mTextView;
+	private TextView mSubTitleTextView;
+	@ViewUtils.Visibility
+	private int mSubTitleVisibility;
 
 	// setWidgetLayoutResource()はPreference画面のpreferenceリストの右側に表示されるView
 	// (例えばチェックボックスとか)のレイアウトを差し替えるときに使う
@@ -68,6 +72,7 @@ public final class SubTitleListPreferenceV7 extends ListPreference {
 		mSubTitleLayoutId = attribs.getResourceId(R.styleable.SubTitlePreference_subtitle_layout, R.layout.subtitle);
 		mSubTitleTvId = attribs.getResourceId(R.styleable.SubTitlePreference_subtitle_id, R.id.subtitle);
 		mSubTitle = attribs.getString(R.styleable.SubTitlePreference_subtitle);
+		mSubTitleVisibility = attribs.getInteger(R.styleable.SubTitlePreference_subtitle_visibility, View.VISIBLE);
 		attribs.recycle();
 	}
 
@@ -114,26 +119,34 @@ public final class SubTitleListPreferenceV7 extends ListPreference {
 				summary.setLayoutParams(params);
 			}
 
-			mTextView = extraview.findViewById(mSubTitleTvId);
+			mSubTitleTextView = extraview.findViewById(mSubTitleTvId);
 			setSubtitle(mSubTitle);
 		}
 	}
 
-
+	@UiThread
 	public void setSubtitle(@StringRes final int subtitleId) {
-		if (mTextView != null) {
-			mTextView.setText(subtitleId);
-			mSubTitle = mTextView.getText();
-			mTextView.setVisibility(TextUtils.isEmpty(mSubTitle) ? View.GONE : View.VISIBLE);
+		if (mSubTitleTextView != null) {
+			mSubTitleTextView.setText(subtitleId);
+			mSubTitle = mSubTitleTextView.getText();
+			mSubTitleTextView.setVisibility(TextUtils.isEmpty(mSubTitle) ? View.GONE : mSubTitleVisibility);
 		}
 	}
 
+	@UiThread
 	public void setSubtitle(final CharSequence subtitle) {
 		mSubTitle = subtitle;
-		if (mTextView != null) {
-			mTextView.setText(subtitle);
-			mTextView.setVisibility(TextUtils.isEmpty(mSubTitle) ? View.GONE : View.VISIBLE);
+		if (mSubTitleTextView != null) {
+			mSubTitleTextView.setText(subtitle);
+			mSubTitleTextView.setVisibility(TextUtils.isEmpty(mSubTitle) ? View.GONE : mSubTitleVisibility);
 		}
 	}
 
+	@UiThread
+	public void setSubTitleVisibility(@ViewUtils.Visibility final int visibility) {
+		mSubTitleVisibility = visibility;
+		if (mSubTitleTextView != null) {
+			mSubTitleTextView.setVisibility(visibility);
+		}
+	}
 }
