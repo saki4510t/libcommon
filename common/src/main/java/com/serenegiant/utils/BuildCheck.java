@@ -363,7 +363,7 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.JELLY_BEAN_MR2);
 	}
 
-	public static boolean isAPI99() {
+	public static boolean isAPI19() {
 		return check((Build.VERSION_CODES.KITKAT));
 	}
 
