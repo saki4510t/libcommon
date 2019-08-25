@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 /**
+ * FIXME Android6か7辺りからパーミッションがなくて値を取得できないのでtopまたはuptimeまたはvmstatを使うように修正
  * Modified 2016 t_saki@serenegiant.com
  *
  * Simple CPU monitor.  The caller creates a CpuMonitor object which can then
