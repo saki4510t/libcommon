@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
  * 従来はプレビュー解像度=動画の解像度の設定用に使用していたが
  * 今後は動画解像度用のみに使用してプレビュー解像度はDeviceSettingから取得する
  */
-public class VideoConfig implements Parcelable {
+public class VideoConfig implements Parcelable, Cloneable {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoConfig.class.getSimpleName();
 
@@ -41,12 +41,17 @@ public class VideoConfig implements Parcelable {
 	private static final int IFRAME_MIN = 1;
 	private static final int IFRAME_MAX = 30;
 
-	public static final VideoConfig DEFAULT_CONFIG = new VideoConfig();
+	public static final VideoConfig DEFAULT_CONFIG = new VideoConfig(
+		0.25f, 10, 10 * 30.0f,
+		15, 30 * 1000L,
+		(Build.VERSION.SDK_INT >= 18), (Build.VERSION.SDK_INT >= 18)
+	);
 
 	/**
 	 * DEFAULT_CONFIGを引き継いだ新しいVideoConfigオブジェクトを生成
 	 * @return
 	 */
+	@Deprecated
 	public static VideoConfig createDefault() {
 		return new VideoConfig(DEFAULT_CONFIG);
 	}
@@ -55,43 +60,43 @@ public class VideoConfig implements Parcelable {
 	 * BPP(Bits Per Pixel)
 	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
 	 */
-	private float BPP = 0.25f;
+	private float BPP;
 
 	/**
 	 * I-frame(単独で圧縮された単独再生可能な一番劣化の少ないキーフレーム)間の秒数@30fps
 	 */
-    private float mIframeIntervalsS = 10;
+    private float mIframeIntervalsS;
 	/**
 	 * I-Frameの間隔 300 = 30fpsの時に10秒間隔 = 300フレームに1回
 	 */
-	private float mNumFramesBetweenIframeOn30fps = mIframeIntervalsS * 30.0f;
+	private float mNumFramesBetweenIframeOn30fps;
 
 	/**
 	 * エンコード時のFPS
 	 */
-	private int mCaptureFps = 15;
+	private int mCaptureFps;
 	/**
 	 * 最大録画時間[ミリ秒], 負数=制限なし
 	 */
-	private long mMaxDuration = 30 * 1000L;
+	private long mMaxDuration;
 
 	/**
 	 * trueならMediaMuxerを使う、 falseならVideoMuxerを使う
 	 * ・・・VideoMuxerを使ってnative側での最大録画時間チェックを有効にするため常にfalse
 	 */
-	private boolean mUseMediaMuxer = (Build.VERSION.SDK_INT >= 18);
+	private boolean mUseMediaMuxer;
 
 	/**
 	 * SurfaceEncoderを使って動画キャプチャをするかどうか
 	 */
-	public boolean mUseSurfaceCapture = (Build.VERSION.SDK_INT >= 18);
+	private boolean mUseSurfaceCapture;
 
 	/**
 	 * デフォルトコンストラクタ
-	 * DEFAULT_CONFIGの設定値を引き継いで生成することを強制するためにprivateに設定
-	 * デフォルトコンストラクタの代わりにstaticメソッドのVideoConfig#createDefaultを使うこと
+	 * 生成時のDEFAULT_CONFIGの設定値を引き継ぐ
 	 */
-	private VideoConfig() {
+	public VideoConfig() {
+		this(DEFAULT_CONFIG);
 	}
 
 	/**
@@ -108,6 +113,41 @@ public class VideoConfig implements Parcelable {
 		mUseSurfaceCapture = src.mUseSurfaceCapture;
 	}
 
+	/**
+	 * DEFAULT_CONFIG生成用コンストラクタ
+	 * @param BPP
+	 * @param mIframeIntervalsS
+	 * @param mNumFramesBetweenIframeOn30fps
+	 * @param mCaptureFps
+	 * @param mMaxDuration
+	 * @param mUseMediaMuxer
+	 * @param mUseSurfaceCapture
+	 */
+	private VideoConfig(final float BPP, final float mIframeIntervalsS,
+		final float mNumFramesBetweenIframeOn30fps, final int mCaptureFps,
+		final long mMaxDuration,
+		final boolean mUseMediaMuxer, final boolean mUseSurfaceCapture) {
+
+		this.BPP = BPP;
+		this.mIframeIntervalsS = mIframeIntervalsS;
+		this.mNumFramesBetweenIframeOn30fps = mNumFramesBetweenIframeOn30fps;
+		this.mCaptureFps = mCaptureFps;
+		this.mMaxDuration = mMaxDuration;
+		this.mUseMediaMuxer = mUseMediaMuxer;
+		this.mUseSurfaceCapture = mUseSurfaceCapture;
+	}
+
+	@NonNull
+	@Override
+	public VideoConfig clone() throws CloneNotSupportedException {
+		return (VideoConfig) super.clone();
+	}
+
+	/**
+	 * セッター
+	 * @param src
+	 * @return
+	 */
 	public VideoConfig set(@NonNull final VideoConfig src) {
 		BPP = src.BPP;
 		mIframeIntervalsS = src.mIframeIntervalsS;

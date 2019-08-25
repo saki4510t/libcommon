@@ -70,7 +70,7 @@ public abstract class Recorder implements IRecorder {
 
 		mWeakContext = new WeakReference<Context>(context);
 		mCallback = callback;
-		mVideoConfig = config != null ? config : VideoConfig.createDefault();
+		mVideoConfig = config != null ? config : new VideoConfig();
 		mMuxerFactory = factory != null ? factory : new IMuxer.DefaultFactory();
 		synchronized(this) {
 			mState = STATE_UNINITIALIZED;
