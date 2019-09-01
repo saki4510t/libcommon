@@ -18,8 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.graphics.SurfaceTexture;
-import android.view.Surface;
+import androidx.annotation.NonNull;
 
 public interface IRenderer extends IRendererCommon {
 
@@ -32,13 +31,7 @@ public interface IRenderer extends IRendererCommon {
 	 * 描画先のSurfaceをセット
 	 * @param surface
 	 */
-	public void setSurface(final Surface surface);
-
-	/**
-	 * 描画先のSurfaceをセット
-	 * @param surface
-	 */
-	public void setSurface(final SurfaceTexture surface);
+	public void setSurface(@NonNull final Object surface) throws IllegalArgumentException;
 
 	/**
 	 * Surfaceサイズを変更

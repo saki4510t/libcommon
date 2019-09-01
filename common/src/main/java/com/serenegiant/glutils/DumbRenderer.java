@@ -22,6 +22,8 @@ import android.graphics.SurfaceTexture;
 import androidx.annotation.NonNull;
 import android.util.Log;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 /**
  * OpenGL|ESでのSurfaceへの描画処理をDelegaterを介して行うためのIRenderer
@@ -31,17 +33,17 @@ public class DumbRenderer implements IRenderer {
 	private static final String TAG = DumbRenderer.class.getSimpleName();
 
 	public interface RendererDelegater {
-		public void onStart(final EGLBase eglBase);
-		public void onStop(final EGLBase eglBase);
-		public void onSetSurface(final EGLBase eglBase, final Object surface);
-		public void onResize(final EGLBase eglBase, final int width, final int height);
+		public void onStart(@NonNull final EGLBase eglBase);
+		public void onStop(@NonNull final EGLBase eglBase);
+		public void onSetSurface(@NonNull final EGLBase eglBase, @NonNull final Object surface);
+		public void onResize(@NonNull final EGLBase eglBase, final int width, final int height);
 		/**
 		 * 描画実行
 		 * @param eglBase
 		 * @param args #requestRenderの引数
 		 */
-		public void onDraw(final EGLBase eglBase, final Object... args);
-		public void onMirror(final EGLBase eglBase, final int mirror);
+		public void onDraw(@NonNull final EGLBase eglBase, final Object... args);
+		public void onMirror(@NonNull final EGLBase eglBase, final int mirror);
 	}
 
 	/** レンダリングスレッドの排他制御用オブジェクト */
@@ -80,20 +82,19 @@ public class DumbRenderer implements IRenderer {
 	}
 
 	@Override
-	public void setSurface(final Surface surface) {
-		synchronized (mSync) {
-			if (mRendererTask != null) {
-				mRendererTask.offer(REQUEST_SET_SURFACE, surface);
-			}
-		}
-	}
+	public void setSurface(@NonNull final Object surface) throws IllegalArgumentException{
+		if ((surface instanceof Surface)
+			|| (surface instanceof SurfaceHolder)
+			|| (surface instanceof SurfaceTexture)
+			|| (surface instanceof SurfaceView)) {
 
-	@Override
-	public void setSurface(final SurfaceTexture surface) {
-		synchronized (mSync) {
-			if (mRendererTask != null) {
-				mRendererTask.offer(REQUEST_SET_SURFACE, surface);
+			synchronized (mSync) {
+				if (mRendererTask != null) {
+					mRendererTask.offer(REQUEST_SET_SURFACE, surface);
+				}
 			}
+		} else {
+			throw new IllegalArgumentException("unsupported surface:" + surface);
 		}
 	}
 
