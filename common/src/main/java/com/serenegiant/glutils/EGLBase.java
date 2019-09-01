@@ -28,11 +28,19 @@ import androidx.annotation.Nullable;
 public abstract class EGLBase {
 	public static final Object EGL_LOCK = new Object();
 
+//--------------------------------------------------------------------------------
+// 定数
+//--------------------------------------------------------------------------------
+
 	public static final int EGL_RECORDABLE_ANDROID = 0x3142;
 	public static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
 	public static final int EGL_OPENGL_ES2_BIT = 4;
 	public static final int EGL_OPENGL_ES3_BIT_KHR = 0x0040;
 //	public static final int EGL_SWAP_BEHAVIOR_PRESERVED_BIT = 0x0400;
+
+//--------------------------------------------------------------------------------
+// ヘルパーメソッド
+//--------------------------------------------------------------------------------
 
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
@@ -126,6 +134,9 @@ public abstract class EGLBase {
 		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2);
 	}
 
+//--------------------------------------------------------------------------------
+// インターフェースメソッド
+//--------------------------------------------------------------------------------
 	/**
 	 * 関連するリソースを破棄する
 	 */
