@@ -31,6 +31,8 @@ import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.opengl.GLES30;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -45,13 +47,15 @@ import com.serenegiant.utils.BuildCheck;
 //	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = "EGLBase10";
 
+	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
+
+	@NonNull
+	private Context mContext = EGL_NO_CONTEXT;
     private EGL10 mEgl = null;
 	private EGLDisplay mEglDisplay = null;
     private Config mEglConfig = null;
     private int mGlVersion = 2;
 
-	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
-	@NonNull private Context mContext = EGL_NO_CONTEXT;
 
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
@@ -202,12 +206,19 @@ import com.serenegiant.utils.BuildCheck;
 		@Override
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);
-			if (mEglBase.getGlVersion() >= 2) {
+			final int glVersion = mEglBase.getGlVersion();
+			if (glVersion >= 3) {
+				GLES30.glViewport(0, 0,
+					mEglBase.getSurfaceWidth(mEglSurface),
+					mEglBase.getSurfaceHeight(mEglSurface));
+			} else if (mEglBase.getGlVersion() >= 2) {
 				GLES20.glViewport(0, 0,
-					mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+					mEglBase.getSurfaceWidth(mEglSurface),
+					mEglBase.getSurfaceHeight(mEglSurface));
 			} else {
 				GLES10.glViewport(0, 0,
-					mEglBase.getSurfaceWidth(mEglSurface), mEglBase.getSurfaceHeight(mEglSurface));
+					mEglBase.getSurfaceWidth(mEglSurface),
+					mEglBase.getSurfaceHeight(mEglSurface));
 			}
 		}
 

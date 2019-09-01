@@ -29,6 +29,7 @@ import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -50,12 +51,13 @@ import com.serenegiant.utils.BuildCheck;
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL14.EGL_NO_CONTEXT);
 
-    private Config mEglConfig = null;
-    @NonNull private Context mContext = EGL_NO_CONTEXT;
-//	private EGLContext mEglContext = EGL14.EGL_NO_CONTEXT;
+	@NonNull
+	private Context mContext = EGL_NO_CONTEXT;
 	private EGLDisplay mEglDisplay = EGL14.EGL_NO_DISPLAY;
-	private EGLContext mDefaultContext = EGL14.EGL_NO_CONTEXT;
+    private Config mEglConfig = null;
 	private int mGlVersion = 2;
+
+	private EGLContext mDefaultContext = EGL14.EGL_NO_CONTEXT;
 
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
@@ -134,7 +136,12 @@ import com.serenegiant.utils.BuildCheck;
 		@Override
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);
-			if (mEglBase.getGlVersion() >= 2) {
+			final int glVersion = mEglBase.getGlVersion();
+			if (glVersion >= 3) {
+				GLES30.glViewport(0, 0,
+					mEglBase.getSurfaceWidth(mEglSurface),
+					mEglBase.getSurfaceHeight(mEglSurface));
+			} else if (mEglBase.getGlVersion() >= 2) {
 				GLES20.glViewport(0, 0,
 					mEglBase.getSurfaceWidth(mEglSurface),
 					mEglBase.getSurfaceHeight(mEglSurface));
