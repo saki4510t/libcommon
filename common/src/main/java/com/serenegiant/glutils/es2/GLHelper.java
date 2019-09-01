@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.glutils.es2;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -31,6 +31,7 @@ import android.opengl.GLUtils;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.glutils.ShaderConst;
 import com.serenegiant.utils.AssetsHelper;
 import com.serenegiant.utils.BuildCheck;
 

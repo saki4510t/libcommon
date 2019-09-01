@@ -23,7 +23,7 @@ import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.glutils.es2.GLHelper;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 

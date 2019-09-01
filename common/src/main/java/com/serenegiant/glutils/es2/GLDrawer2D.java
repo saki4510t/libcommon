@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.glutils.es2;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -25,6 +25,12 @@ import java.nio.FloatBuffer;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import com.serenegiant.glutils.IDrawer2D;
+import com.serenegiant.glutils.ITexture;
+import com.serenegiant.glutils.TextureOffscreen;
+
+import androidx.annotation.NonNull;
+
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
@@ -48,6 +54,7 @@ public class GLDrawer2D implements IDrawer2dES2 {
     int maTextureCoordLoc;
     int muMVPMatrixLoc;
     int muTexMatrixLoc;
+    @NonNull
 	private final float[] mMvpMatrix = new float[16];
 
 	/**

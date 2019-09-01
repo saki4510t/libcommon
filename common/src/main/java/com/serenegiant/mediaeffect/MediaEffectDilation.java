@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.glutils.es2.GLHelper;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 

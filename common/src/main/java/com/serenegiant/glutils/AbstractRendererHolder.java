@@ -34,6 +34,8 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.utils.BuildCheck;
 
 import java.io.BufferedOutputStream;
@@ -1244,7 +1246,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 
-	protected void setupCaptureDrawer(final GLDrawer2D drawer) {
+	protected void setupCaptureDrawer(final IDrawer2D drawer) {
 	}
 	
 	/**
@@ -1253,7 +1255,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private final Runnable mCaptureTask = new Runnable() {
     	EGLBase eglBase;
     	EGLBase.IEglSurface captureSurface;
-    	GLDrawer2D drawer;
+		IDrawer2D drawer;
 		final float[] mMvpMatrix = new float[16];
 
     	@Override

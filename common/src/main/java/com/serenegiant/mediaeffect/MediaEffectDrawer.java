@@ -22,7 +22,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.glutils.es2.GLHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;

@@ -25,6 +25,8 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.glutils.es2.GLDrawer2D;
+
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
@@ -344,9 +346,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param drawer GLDrawer2Dインスタンス
 	 */
 	protected void handleDefaultEffect(final int effect,
-		@NonNull final IDrawer2dES2 drawer) {
+		@NonNull final GLDrawer2D drawer) {
 
-		if (drawer instanceof GLDrawer2D) {
+		if (drawer instanceof IDrawer2D) {
 			((GLDrawer2D) drawer).resetShader();
 		}
 	}

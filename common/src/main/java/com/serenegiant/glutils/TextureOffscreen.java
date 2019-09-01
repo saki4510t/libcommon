@@ -24,6 +24,8 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.serenegiant.glutils.es2.GLHelper;
+
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる

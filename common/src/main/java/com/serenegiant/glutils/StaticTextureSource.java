@@ -29,6 +29,9 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLHelper;
+
 /**
  * MediaCodecのデコーダーでデコードした動画や
  * カメラからの映像の代わりに静止画をSurfaceへ

@@ -106,7 +106,7 @@ class RendererSurfaceRec {
 		return mEnable;
 	}
 
-	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
+	public void draw(final IDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
 			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
@@ -180,7 +180,7 @@ class RendererSurfaceRec {
 		}
 
 		@Override
-		public void draw(final GLDrawer2D drawer,
+		public void draw(final IDrawer2D drawer,
 			final int textId, final float[] texMatrix) {
 
 			mNextDraw = Time.nanoTime() + mIntervalsNs;

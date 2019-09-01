@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.glutils.es2;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -17,6 +17,8 @@ package com.serenegiant.glutils;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+
+import com.serenegiant.glutils.IDrawer2D;
 
 public interface IDrawer2dES2 extends IDrawer2D {
 	public int glGetAttribLocation(final String name);

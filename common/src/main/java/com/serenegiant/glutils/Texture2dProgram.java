@@ -21,6 +21,8 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.view.MotionEvent;
 
+import com.serenegiant.glutils.es2.GLHelper;
+
 import java.nio.FloatBuffer;
 
 import static com.serenegiant.glutils.ShaderConst.*;
@@ -482,30 +484,30 @@ public class Texture2dProgram {
 			}
 			setKernel(kernel, 0f);
 			setTexSize(256, 256);
-			}
-			if (kernel2 != null) {
-				setKernel2(kernel2);
-			}
+		}
+		if (kernel2 != null) {
+			setKernel2(kernel2);
+		}
 
-			muColorAdjustLoc = GLES20.glGetUniformLocation(mProgramHandle, "uColorAdjust");
-			if (muColorAdjustLoc < 0) {
-				muColorAdjustLoc = -1;
-			}
-			// 未使用だと削除されてしまうのでチェックしない
-//			GLHelper.checkLocation(muColorAdjustLoc, "uColorAdjust");
+		muColorAdjustLoc = GLES20.glGetUniformLocation(mProgramHandle, "uColorAdjust");
+		if (muColorAdjustLoc < 0) {
+			muColorAdjustLoc = -1;
+		}
+		// 未使用だと削除されてしまうのでチェックしない
+//		GLHelper.checkLocation(muColorAdjustLoc, "uColorAdjust");
 
-			muTouchPositionLoc = GLES20.glGetUniformLocation(mProgramHandle, "uPosition");
-			if (muTouchPositionLoc < 0) {
-				// Shader doesn't use position
-				muTouchPositionLoc = -1;
-			} else {
-				// initialize default values
-				//handleTouchEvent(new float[]{0f, 0f});
-			}
-			muFlagsLoc = GLES20.glGetUniformLocation(mProgramHandle, "uFlags");
-			if (muFlagsLoc < 0) {
-				muFlagsLoc = -1;
-			} else {
+		muTouchPositionLoc = GLES20.glGetUniformLocation(mProgramHandle, "uPosition");
+		if (muTouchPositionLoc < 0) {
+			// Shader doesn't use position
+			muTouchPositionLoc = -1;
+		} else {
+			// initialize default values
+			//handleTouchEvent(new float[]{0f, 0f});
+		}
+		muFlagsLoc = GLES20.glGetUniformLocation(mProgramHandle, "uFlags");
+		if (muFlagsLoc < 0) {
+			muFlagsLoc = -1;
+		} else {
 		}
 	}
 

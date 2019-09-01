@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLDrawer2D;
 import com.serenegiant.glutils.TextureOffscreen;
 
 public class MediaSource implements ISource {

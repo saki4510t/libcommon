@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.glutils.es2;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -27,6 +27,9 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.text.TextUtils;
+
+import com.serenegiant.glutils.ITexture;
+import com.serenegiant.glutils.es2.GLHelper;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
