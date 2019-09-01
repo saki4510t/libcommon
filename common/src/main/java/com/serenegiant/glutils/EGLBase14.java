@@ -31,6 +31,8 @@ import android.opengl.GLES10;
 import android.opengl.GLES20;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -92,7 +94,7 @@ import com.serenegiant.utils.BuildCheck;
 	 */
 	public static class EglSurface implements IEglSurface {
 		private final EGLBase14 mEglBase;
-		private EGLSurface mEglSurface = EGL14.EGL_NO_SURFACE;
+		private EGLSurface mEglSurface;
 
 		private EglSurface(final EGLBase14 eglBase, final Object surface)
 			throws IllegalArgumentException {
@@ -111,6 +113,7 @@ import com.serenegiant.utils.BuildCheck;
 
 		/**
 		 * 指定した大きさを持つオフスクリーンEglSurface(PBuffer)
+		 * width/heightの少なくとも一方が0以下なら最小サイズとして1x1のオフスクリーンにする
 		 * @param eglBase
 		 * @param width
 		 * @param height
@@ -121,6 +124,7 @@ import com.serenegiant.utils.BuildCheck;
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
 			if ((width <= 0) || (height <= 0)) {
+				// width/heightの少なくとも一方が0以下なら最小サイズで1x1のオフスクリーンを生成する
 				mEglSurface = mEglBase.createOffscreenSurface(1, 1);
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
@@ -186,7 +190,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * @param isRecordable
 	 */
 	public EGLBase14(final int maxClientVersion,
-		final Context sharedContext, final boolean withDepthBuffer,
+		@Nullable final Context sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
 //		if (DEBUG) Log.v(TAG, "Constructor:");
@@ -300,7 +304,16 @@ import com.serenegiant.utils.BuildCheck;
 		EGL14.eglWaitNative(EGL14.EGL_CORE_NATIVE_ENGINE);
 	}
 
-	private void init(final int maxClientVersion, Context sharedContext,
+	/**
+	 * 初期化の下請け
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param withDepthBuffer
+	 * @param stencilBits
+	 * @param isRecordable
+	 */
+	private void init(final int maxClientVersion,
+		@Nullable Context sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 //		if (DEBUG) Log.v(TAG, "init:");
@@ -490,7 +503,7 @@ import com.serenegiant.utils.BuildCheck;
         final int[] surfaceAttribs = {
 			EGL14.EGL_NONE
         };
-		EGLSurface result = null;
+		EGLSurface result;
 		try {
 			result = EGL14.eglCreateWindowSurface(mEglDisplay,
 				mEglConfig.eglConfig, nativeWindow, surfaceAttribs, 0);
@@ -544,7 +557,6 @@ import com.serenegiant.utils.BuildCheck;
         		EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_SURFACE, EGL14.EGL_NO_CONTEXT);
         	EGL14.eglDestroySurface(mEglDisplay, surface);
         }
-        surface = EGL14.EGL_NO_SURFACE;
 //		if (DEBUG) Log.v(TAG, "destroySurface:finished");
 	}
 

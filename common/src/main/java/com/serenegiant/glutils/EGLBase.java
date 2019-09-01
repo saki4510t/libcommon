@@ -20,6 +20,8 @@ package com.serenegiant.glutils;
 
 import android.os.Build;
 
+import androidx.annotation.Nullable;
+
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
@@ -40,7 +42,7 @@ public abstract class EGLBase {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final IContext sharedContext,
+	public static EGLBase createFrom(@Nullable final IContext sharedContext,
 		final boolean withDepthBuffer, final boolean isRecordable) {
 
 		return createFrom(3, sharedContext, withDepthBuffer, 0, isRecordable);
@@ -55,7 +57,7 @@ public abstract class EGLBase {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(final IContext sharedContext,
+	public static EGLBase createFrom(@Nullable final IContext sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 		return createFrom(3, sharedContext,
@@ -72,7 +74,7 @@ public abstract class EGLBase {
 	 * @return
 	 */
 	public static EGLBase createFrom(final int maxClientVersion,
-		final IContext sharedContext, final boolean withDepthBuffer,
+		@Nullable final IContext sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
 		if (isEGL14Supported() && ((sharedContext == null)

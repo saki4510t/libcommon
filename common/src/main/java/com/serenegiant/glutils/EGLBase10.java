@@ -145,7 +145,7 @@ import com.serenegiant.utils.BuildCheck;
 	 */
 	public static class EglSurface implements IEglSurface {
 		private final EGLBase10 mEglBase;
-		private EGLSurface mEglSurface = EGL10.EGL_NO_SURFACE;
+		private EGLSurface mEglSurface;
 
 		/**
 		 * Surface(Surface/SurfaceTexture/SurfaceHolder)に関係付けられたEglSurface
@@ -157,18 +157,21 @@ import com.serenegiant.utils.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
+			final Object _surface;
 			if ((surface instanceof Surface) && !BuildCheck.isAndroid4_2()) {
 				// Android4.1.2だとSurfaceを使えない。
 				// SurfaceTexture/SurfaceHolderの場合は内部で
 				// Surfaceを生成して使っているにもかかわらず。
 				// SurfaceHolderはインターフェースなのでSurfaceHolderを
 				// 継承したダミークラスを生成して食わす
-				mEglSurface = mEglBase.createWindowSurface(
-					new MySurfaceHolder((Surface) surface));
-			} else if ((surface instanceof Surface)
-				|| (surface instanceof SurfaceHolder)
-				|| (surface instanceof SurfaceTexture)
-				|| (surface instanceof SurfaceView)) {
+				_surface = new MySurfaceHolder((Surface) surface);
+			} else {
+				_surface = surface;
+			}
+			if ((_surface instanceof Surface)
+				|| (_surface instanceof SurfaceHolder)
+				|| (_surface instanceof SurfaceTexture)
+				|| (_surface instanceof SurfaceView)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
@@ -177,6 +180,7 @@ import com.serenegiant.utils.BuildCheck;
 
 		/**
 		 * 指定した大きさを持つオフスクリーンEglSurface(PBuffer)
+		 * width/heightの少なくとも一方が0以下なら最小サイズとして1x1のオフスクリーンにする
 		 * @param eglBase
 		 * @param width
 		 * @param height
@@ -263,7 +267,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
 	 */
 	public EGLBase10(final int maxClientVersion,
-		final Context sharedContext, final boolean withDepthBuffer,
+		@Nullable final Context sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
 //		if (DEBUG) Log.v(TAG, "Constructor:");
@@ -386,6 +390,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param withDepthBuffer
+	 * @param stencilBits
 	 * @param isRecordable
 	 */
 	private final void init(final int maxClientVersion,
@@ -578,7 +583,7 @@ import com.serenegiant.utils.BuildCheck;
 		final int[] surfaceAttribs = {
             EGL10.EGL_NONE
         };
-		EGLSurface result = null;
+		EGLSurface result;
 		try {
 			result = mEgl.eglCreateWindowSurface(mEglDisplay,
 				mEglConfig.eglConfig, nativeWindow, surfaceAttribs);
@@ -600,6 +605,8 @@ import com.serenegiant.utils.BuildCheck;
 
     /**
      * Creates an EGL surface associated with an offscreen buffer.
+     * @param width
+     * @param height
      */
     private final EGLSurface createOffscreenSurface(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
@@ -625,6 +632,10 @@ import com.serenegiant.utils.BuildCheck;
 		return result;
     }
 
+	/**
+	 * オフスクリーンサーフェースを破棄
+	 * @param surface
+	 */
 	private final void destroyWindowSurface(EGLSurface surface) {
 //		if (DEBUG) Log.v(TAG, "destroySurface:");
 
@@ -633,7 +644,6 @@ import com.serenegiant.utils.BuildCheck;
         		EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
         	mEgl.eglDestroySurface(mEglDisplay, surface);
         }
-        surface = EGL10.EGL_NO_SURFACE;
 //		if (DEBUG) Log.v(TAG, "destroySurface:finished");
 	}
 
