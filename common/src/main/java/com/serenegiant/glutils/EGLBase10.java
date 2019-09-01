@@ -147,7 +147,7 @@ import com.serenegiant.utils.BuildCheck;
 	/**
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
-	public static class EglSurface implements IEglSurface {
+	private static class EglSurface implements IEglSurface {
 		private final EGLBase10 mEglBase;
 		private EGLSurface mEglSurface;
 
@@ -310,7 +310,7 @@ import com.serenegiant.utils.BuildCheck;
      * @return
      */
 	@Override
-	public EglSurface createFromSurface(final Object nativeWindow) {
+	public IEglSurface createFromSurface(final Object nativeWindow) {
 //		if (DEBUG) Log.v(TAG, "createFromSurface:");
 		final EglSurface eglSurface = new EglSurface(this, nativeWindow);
 		eglSurface.makeCurrent();
@@ -325,7 +325,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * @return
 	 */
 	@Override
-	public EglSurface createOffscreen(final int width, final int height) {
+	public IEglSurface createOffscreen(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreen:");
 		final EglSurface eglSurface = new EglSurface(this, width, height);
 		eglSurface.makeCurrent();
