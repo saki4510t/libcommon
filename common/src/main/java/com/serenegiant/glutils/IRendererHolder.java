@@ -44,6 +44,10 @@ public interface IRendererHolder extends IRendererCommon {
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface StillCaptureFormat {}
 
+	public interface OnCapturedListener {
+		public void onCaptured(@NonNull final IRendererHolder rendererHolder, final boolean success);
+	}
+
 	/**
 	 * 実行中かどうか
 	 * @return
@@ -172,31 +176,12 @@ public interface IRendererHolder extends IRendererCommon {
 
 	/**
 	 * 静止画を撮影する
-	 * 撮影完了を待機しない
-	 * @param path
-	 */
-	@Deprecated
-	public void captureStillAsync(@NonNull final String path)
-		throws FileNotFoundException, IllegalStateException;
-	
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機しない
-	 * @param path
-	 * @param captureCompression JPEGの圧縮率, pngの時は無視
-	 */
-	@Deprecated
-	public void captureStillAsync(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression)
-			throws FileNotFoundException, IllegalStateException;
-
-	/**
-	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
 	 */
-	public void captureStill(@NonNull final String path)
-		throws FileNotFoundException, IllegalStateException;
+	public void captureStill(@NonNull final String path,
+		@Nullable final OnCapturedListener listener)
+			throws FileNotFoundException, IllegalStateException;
 
 	/**
 	 * 静止画を撮影する
@@ -205,7 +190,8 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
 	 */
 	public void captureStill(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression)
+		@IntRange(from = 1L,to = 99L) final int captureCompression,
+		@Nullable final OnCapturedListener listener)
 			throws FileNotFoundException, IllegalStateException;
 
 	/**
@@ -217,6 +203,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 */
 	public void captureStill(@NonNull final OutputStream out,
 		@StillCaptureFormat final int stillCaptureFormat,
-		@IntRange(from = 1L,to = 99L) final int captureCompression)
+		@IntRange(from = 1L,to = 99L) final int captureCompression,
+		@Nullable final OnCapturedListener listener)
 			throws IllegalStateException;
 }

@@ -76,6 +76,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private int mCaptureFormat;
 	@IntRange(from = 1L,to = 99L)
 	private int mCaptureCompression = DEFAULT_CAPTURE_COMPRESSION;
+	private OnCapturedListener mOnCapturedListener;
 	protected final RendererTask mRendererTask;
 
 	protected AbstractRendererHolder(final int width, final int height,
@@ -306,52 +307,18 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 	/**
 	 * 静止画を撮影する
-	 * 撮影完了を待機しない
-	 * @param path
-	 */
-	@Deprecated
-	@Override
-	public void captureStillAsync(@NonNull final String path)
-		throws FileNotFoundException, IllegalStateException {
-
-		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path);
-
-		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, false);
-	}
-	
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機しない
-	 * @param path
-	 * @param captureCompression
-	 */
-	@Deprecated
-	@Override
-	public void captureStillAsync(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression)
-			throws FileNotFoundException, IllegalStateException {
-
-		if (DEBUG) Log.v(TAG, "captureStillAsync:" + path
-			+ ",captureCompression=" + captureCompression);
-
-		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), captureCompression, false);
-	}
-
-	/**
-	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
 	 */
 	@Override
-	public void captureStill(@NonNull final String path)
-		throws FileNotFoundException, IllegalStateException {
+	public void captureStill(@NonNull final String path,
+		@Nullable final OnCapturedListener listener)
+			throws FileNotFoundException, IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "captureStill:" + path);
 
 		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, true);
+			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, listener);
 	}
 	
 	/**
@@ -361,42 +328,28 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void captureStill(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L)final int captureCompression)
+		@IntRange(from = 1L,to = 99L)final int captureCompression,
+		@Nullable final OnCapturedListener listener)
 			throws FileNotFoundException, IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "captureStill:" + path
 			+ ",captureCompression=" + captureCompression);
 		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), captureCompression, true);
+			getCaptureFormat(path), captureCompression, listener);
 	}
 
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param out
-	 * @param captureFormat
-	 * @param captureCompression
-	 */
-	@Override
-	public void captureStill(@NonNull final OutputStream out,
-		@StillCaptureFormat final int captureFormat,
-		@IntRange(from = 1L,to = 99L) final int captureCompression)
-			throws IllegalStateException {
-		
-		captureStill(out, captureFormat, captureCompression, true);
-	}
-	
 	/**
 	 * 実際の静止画撮影要求メソッド
 	 * @param out
 	 * @param captureFormat
 	 * @param captureCompression
-	 * @param needWait 撮影完了を待機するを待機するかどうか
+	 * @param listener
 	 */
-	private void captureStill(@NonNull final OutputStream out,
+	@Override
+	public void captureStill(@NonNull final OutputStream out,
 		@StillCaptureFormat final int captureFormat,
 		@IntRange(from = 1L,to = 99L) final int captureCompression,
-		final boolean needWait) throws IllegalStateException {
+		@Nullable final OnCapturedListener listener) throws IllegalStateException {
 
 		synchronized (mSync) {
 			if (!isRunning) {
@@ -408,18 +361,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mCaptureStream = out;
 			mCaptureFormat = captureFormat;
 			mCaptureCompression = captureCompression;
+			mOnCapturedListener = listener;
 			mSync.notifyAll();
-			if (needWait) {
-				// 撮影完了街をする場合
-				for ( ; isRunning && (mCaptureStream != null) ; ) {
-					try {
-						if (DEBUG) Log.v(TAG, "静止画撮影待ち");
-						mSync.wait(1000);
-					} catch (final InterruptedException e) {
-						// ignore
-					}
-				}
-			}
 		}
 		if (DEBUG) Log.v(TAG, "captureStill:終了");
 	}
@@ -1324,6 +1267,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 					}
 					if (DEBUG) Log.v(TAG, "#captureLoopGLES2:start capture");
+					boolean success = false;
 					if ((buf == null)
 						|| (width != mRendererTask.width())
 						|| (height != mRendererTask.height())) {
@@ -1360,6 +1304,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
 					            bmp.recycle();
 								mCaptureStream.flush();
+								success = true;
 					        } finally {
 					            mCaptureStream.close();
 					        }
@@ -1371,6 +1316,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES2:静止画撮影終了");
 					mCaptureStream = null;
+					if (mOnCapturedListener != null) {
+						try {
+							mOnCapturedListener.onCaptured(AbstractRendererHolder.this, success);
+						} catch (final Exception e) {
+							if (DEBUG) Log.w(TAG, e);
+						}
+					}
+					mOnCapturedListener = null;
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
@@ -1405,6 +1358,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						}
 					}
 					if (DEBUG) Log.v(TAG, "#captureLoopGLES3:start capture");
+					boolean success = false;
 					if ((buf == null)
 						|| (width != mRendererTask.width())
 						|| (height != mRendererTask.height())) {
@@ -1442,6 +1396,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
 					            bmp.recycle();
 								mCaptureStream.flush();
+								success = true;
 					        } finally {
 					            mCaptureStream.close();
 					        }
@@ -1453,6 +1408,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					}
 					if (DEBUG) Log.i(TAG, "#captureLoopGLES3:静止画撮影終了");
 					mCaptureStream = null;
+					if (mOnCapturedListener != null) {
+						try {
+							mOnCapturedListener.onCaptured(AbstractRendererHolder.this, success);
+						} catch (final Exception e) {
+							if (DEBUG) Log.w(TAG, e);
+						}
+					}
+					mOnCapturedListener = null;
 					mSync.notifyAll();
 				}	// end of synchronized (mSync)
 			}	// end of for (; isRunning ;)
