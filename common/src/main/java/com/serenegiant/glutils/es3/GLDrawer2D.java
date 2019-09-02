@@ -41,7 +41,7 @@ import static com.serenegiant.glutils.ShaderConst.VERTEX_SHADER;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2DES3 implements IDrawer2dES3 {
+public class GLDrawer2D implements IDrawer2dES3 {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
@@ -68,7 +68,7 @@ public class GLDrawer2DES3 implements IDrawer2dES3 {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
 	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2DES3(final boolean isOES) {
+	public GLDrawer2D(final boolean isOES) {
 		this(VERTICES, TEXCOORD, isOES);
 	}
 
@@ -80,8 +80,8 @@ public class GLDrawer2DES3 implements IDrawer2dES3 {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
 	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2DES3(final float[] vertices,
-						 final float[] texcoord, final boolean isOES) {
+	public GLDrawer2D(final float[] vertices,
+					  final float[] texcoord, final boolean isOES) {
 
 		VERTEX_NUM = Math.min(
 			vertices != null ? vertices.length : 0,
