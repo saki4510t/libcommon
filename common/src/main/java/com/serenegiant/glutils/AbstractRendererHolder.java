@@ -1196,10 +1196,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 静止画を非同期でキャプチャするためのRunnable
 	 */
 	private final Runnable mCaptureTask = new Runnable() {
-    	EGLBase eglBase;
-    	EGLBase.IEglSurface captureSurface;
-		IDrawer2D drawer;
-		final float[] mMvpMatrix = new float[16];
+    	private EGLBase eglBase;
+		private EGLBase.IEglSurface captureSurface;
+		private IDrawer2D drawer;
+		private final float[] mMvpMatrix = new float[16];
 
     	@Override
 		public void run() {
