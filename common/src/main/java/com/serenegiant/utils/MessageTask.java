@@ -97,9 +97,7 @@ public abstract class MessageTask implements Runnable {
 	 * プールは空で生成
 	 */
 	public MessageTask() {
-		mMaxRequest = -1;
-		mRequestPool = new LinkedBlockingQueue<Request>();
-		mRequestQueue = new LinkedBlockingDeque<Request>();
+		this(-1, 0);
 	}
 
 	/**
@@ -108,12 +106,7 @@ public abstract class MessageTask implements Runnable {
 	 * @param init_num　プールするRequestの初期数を指定
 	 */
 	public MessageTask(final int init_num) {
-		mMaxRequest = -1;
-		mRequestPool = new LinkedBlockingQueue<Request>();
-		mRequestQueue = new LinkedBlockingDeque<Request>();
-		for (int i = 0; i < init_num; i++) {
-			if (!mRequestPool.offer(new Request())) break;
-		}
+		this(-1, init_num);
 	}
 
 	/**
