@@ -196,6 +196,7 @@ public abstract class MessageTask implements Runnable {
 	public void run() {
 		Request request = null;
 		mIsRunning = true;
+		mFinished = false;
 		try {
 			request = mRequestQueue.take();
 		} catch (final InterruptedException e) {
