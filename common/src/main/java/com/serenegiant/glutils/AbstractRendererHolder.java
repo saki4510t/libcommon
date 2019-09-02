@@ -292,7 +292,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void requestFrame() {
-		mRendererTask.removeRequest(REQUEST_DRAW);
 		mRendererTask.offer(REQUEST_DRAW);
 	}
 
@@ -832,6 +831,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * 実際の描画処理
 		 */
 		protected void handleDraw() {
+			removeRequest(REQUEST_DRAW);
 			if ((mMasterSurface == null) || (!mMasterSurface.isValid())) {
 				Log.e(TAG, "checkMasterSurface:invalid master surface");
 				offer(REQUEST_RECREATE_MASTER_SURFACE);
@@ -860,7 +860,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mMasterTexture.updateTexImage();
 			mMasterTexture.getTransformMatrix(mTexMatrix);
 		}
-		
+
 		protected abstract void preprocess();
 	
 		/**
