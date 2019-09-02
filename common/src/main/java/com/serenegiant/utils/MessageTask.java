@@ -251,8 +251,9 @@ LOOP:	for (; mIsRunning; ) {
 						break LOOP;
 					} catch (final Exception e) {
 						request.setResult(null);
-						if (callOnError(e))
+						if (callOnError(e)) {
 							break LOOP;
+						}
 					}
 					break;
 				default:
