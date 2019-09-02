@@ -927,7 +927,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param id
 		 */
 		protected void handleRemoveSurface(final int id) {
-	//			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
+//			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mClients) {
 				final RendererSurfaceRec client = mClients.get(id);
 				if (client != null) {
@@ -946,7 +946,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * 念の為に分配描画先のSurfaceを全て破棄する
 		 */
 		protected void handleRemoveAll() {
-	//			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
+//			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 			synchronized (mClients) {
 				final int n = mClients.size();
 				RendererSurfaceRec client;
@@ -962,27 +962,27 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mClients.clear();
 				mClients.notifyAll();
 			}
-	//			if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
+//			if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 		}
 	
 		/**
 		 * 分配描画先のSurfaceが有効かどうかをチェックして無効なものは削除する
 		 */
 		protected void checkSurface() {
-	//			if (DEBUG) Log.v(TAG, "checkSurface");
+//			if (DEBUG) Log.v(TAG, "checkSurface");
 			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
 					if ((client != null) && !client.isValid()) {
 						final int id = mClients.keyAt(i);
-	//						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
+//						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
 						mClients.valueAt(i).release();
 						mClients.remove(id);
 					}
 				}
 			}
-	//			if (DEBUG) Log.v(TAG, "checkSurface:finished");
+//			if (DEBUG) Log.v(TAG, "checkSurface:finished");
 		}
 	
 		/**
