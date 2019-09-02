@@ -77,7 +77,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@IntRange(from = 1L,to = 99L)
 	private int mCaptureCompression = DEFAULT_CAPTURE_COMPRESSION;
 	private OnCapturedListener mOnCapturedListener;
-	protected final RendererTask mRendererTask;
+	protected final BaseRendererTask mRendererTask;
 
 	protected AbstractRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
@@ -418,7 +418,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 //--------------------------------------------------------------------------------
 	@NonNull
-	protected abstract RendererTask createRendererTask(final int width, final int height,
+	protected abstract BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags);
 	
 	protected void startCaptureTask() {
@@ -487,13 +487,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private int mMirror = MIRROR_NORMAL;
 		private int mRotation = 0;
 		private volatile boolean mIsFirstFrameRendered;
-		
-		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
-			final int width, final int height) {
 
-			this(parent, width, height,
-				3, null, EglTask.EGL_FLAG_RECORDABLE);
-		}
+		protected GLDrawer2D mDrawer;
 
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
@@ -543,8 +538,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			return false;
 		}
 		
-		protected abstract void internalOnStart();
-		protected abstract void internalOnStop();
+		protected void internalOnStart() {
+			mDrawer = new GLDrawer2D(true);
+		}
+
+		protected void internalOnStop() {
+			if (mDrawer != null) {
+				mDrawer.release();
+				mDrawer = null;
+			}
+		}
 
 		@Override
 		protected Object processRequest(final int request,
@@ -861,8 +864,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mMasterTexture.getTransformMatrix(mTexMatrix);
 		}
 
-		protected abstract void preprocess();
-	
+		protected void preprocess() {
+		}
+
 		/**
 		 * 各Surfaceへ描画する
 		 */
@@ -891,9 +895,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param texId
 		 * @param texMatrix
 		 */
-		protected abstract void onDrawClient(
-			@NonNull final RendererSurfaceRec client,
-			final int texId, final float[] texMatrix);
+		protected void onDrawClient(@NonNull final RendererSurfaceRec client,
+			final int texId, final float[] texMatrix) {
+
+			client.draw(mDrawer, texId, texMatrix);
+		}
 		
 		/**
 		 * 指定したIDの分配描画先Surfaceを追加する
@@ -1141,52 +1147,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 	}
 	
-	/**
-	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
-	 */
-	protected abstract static class RendererTask extends BaseRendererTask {
-
-		protected GLDrawer2D mDrawer;
-
-		public RendererTask(@NonNull final AbstractRendererHolder parent,
-			final int width, final int height) {
-
-			super(parent, width, height);
-		}
-
-		public RendererTask(@NonNull final AbstractRendererHolder parent,
-			final int width, final int height,
-			final int maxClientVersion,
-			final EGLBase.IContext sharedContext, final int flags) {
-			
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
-		}
-
-		@Override
-		protected void internalOnStart() {
-			mDrawer = new GLDrawer2D(true);
-		}
-		
-		@Override
-		protected void internalOnStop() {
-			if (mDrawer != null) {
-				mDrawer.release();
-				mDrawer = null;
-			}
-		}
-
-		@Override
-		protected void preprocess() {
-		}
-		
-		@Override
-		protected void onDrawClient(@NonNull final RendererSurfaceRec client,
-			final int texId, final float[] texMatrix) {
-
-			client.draw(mDrawer, texId, texMatrix);
-		}
-	}
-
 //--------------------------------------------------------------------------------
 
 	protected void setupCaptureDrawer(final IDrawer2D drawer) {

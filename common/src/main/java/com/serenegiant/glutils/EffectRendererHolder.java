@@ -285,7 +285,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 
 	@Override
 	@NonNull
-	protected RendererTask createRendererTask(final int width, final int height,
+	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
@@ -348,9 +348,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	protected void handleDefaultEffect(final int effect,
 		@NonNull final GLDrawer2D drawer) {
 
-		if (drawer instanceof IDrawer2D) {
-			((GLDrawer2D) drawer).resetShader();
-		}
+		drawer.resetShader();
 	}
 	
 //================================================================================
@@ -362,18 +360,12 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	/**
 	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
 	 */
-	protected static final class MyRendererTask extends RendererTask {
+	protected static final class MyRendererTask extends BaseRendererTask {
 
 		private final SparseArray<float[]> mParams = new SparseArray<float[]>();
 		private int muParamsLoc;
 		private float[] mCurrentParams;
 		private int mEffect;
-
-		public MyRendererTask(final EffectRendererHolder parent,
-			final int width, final int height) {
-
-			super(parent, width, height);
-		}
 
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
