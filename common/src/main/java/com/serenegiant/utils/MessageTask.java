@@ -117,8 +117,13 @@ public abstract class MessageTask implements Runnable {
 	 */
 	public MessageTask(final int max_request, final int init_num) {
 		mMaxRequest = max_request;
-		mRequestPool = new LinkedBlockingQueue<Request>(max_request);
-		mRequestQueue = new LinkedBlockingDeque<Request>(max_request);
+		if (max_request > 0) {
+			mRequestPool = new LinkedBlockingQueue<Request>(max_request);
+			mRequestQueue = new LinkedBlockingDeque<Request>(max_request);
+		} else {
+			mRequestPool = new LinkedBlockingQueue<Request>();
+			mRequestQueue = new LinkedBlockingDeque<Request>();
+		}
 		for (int i = 0; i < init_num; i++) {
 			if (!mRequestPool.offer(new Request())) break;
 		}
