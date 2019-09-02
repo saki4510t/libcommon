@@ -448,9 +448,13 @@ LOOP:	for (; mIsRunning; ) {
 		return !mFinished && (task != null) && offer(REQUEST_TASK_RUN, task);
 	}
 
+	/**
+	 * Remove specific request from queue
+	 * @param request
+	 */
 	public void removeRequest(final Request request) {
 		for (final Request req: mRequestQueue) {
-			if (!mIsRunning || mFinished) break;
+			if (!mIsRunning || mFinished || !mRequestQueue.contains(request)) break;
 			if (req.equals(request)) {
 				mRequestQueue.remove(req);
 				mRequestPool.offer(req);
@@ -458,6 +462,10 @@ LOOP:	for (; mIsRunning; ) {
 		}
 	}
 
+	/**
+	 * Remove specific request from queue
+	 * @param request
+	 */
 	public void removeRequest(final int request) {
 		for (final Request req: mRequestQueue) {
 			if (!mIsRunning || mFinished) break;
