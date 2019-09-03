@@ -406,6 +406,10 @@ public final class CameraGLView extends GLSurfaceView {
 			}
 		}
 
+		/**
+		 * OnFrameAvailableListenerインターフェースの実装
+		 * @param st
+		 */
 		@Override
 		public void onFrameAvailable(final SurfaceTexture st) {
 			requestUpdateTex = true;
@@ -575,9 +579,11 @@ public final class CameraGLView extends GLSurfaceView {
 							parent.setVideoSize(previewSize.width, previewSize.height);
 						}
 					});
+					// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
 					final SurfaceTexture st = parent.getSurfaceTexture();
 					st.setDefaultBufferSize(previewSize.width, previewSize.height);
 					parent.mRendererHolder.addSurface(1, st, false);
+					// カメラ映像取得用SurfaceTexture(IRendererHolder#getSurfaceTexture)をセット
 					mCamera.setPreviewTexture(parent.mRendererHolder.getSurfaceTexture());
 				} catch (final IOException e) {
 					Log.e(TAG, "startPreview:", e);
