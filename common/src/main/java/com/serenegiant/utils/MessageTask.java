@@ -21,7 +21,6 @@ package com.serenegiant.utils;
 import android.util.Log;
 
 import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import androidx.annotation.Nullable;
 
@@ -88,7 +87,7 @@ public abstract class MessageTask implements Runnable {
 	private final Object mSync = new Object();
 	/** プール/キューのサイズ, -1なら無制限 */
 	private final int mMaxRequest;
-	private final LinkedBlockingQueue<Request> mRequestPool;	// FIXME これはArrayListにした方が速いかも
+	private final ReentrantReadWriteList<Request> mRequestPool;
 	private final LinkedBlockingDeque<Request> mRequestQueue;
 	private volatile boolean mIsRunning, mFinished;
 	private Thread mWorkerThread;
@@ -121,14 +120,14 @@ public abstract class MessageTask implements Runnable {
 	public MessageTask(final int max_request, final int init_num) {
 		mMaxRequest = max_request;
 		if (max_request > 0) {
-			mRequestPool = new LinkedBlockingQueue<Request>(max_request);
+			mRequestPool = new ReentrantReadWriteList<Request>();
 			mRequestQueue = new LinkedBlockingDeque<Request>(max_request);
 		} else {
-			mRequestPool = new LinkedBlockingQueue<Request>();
+			mRequestPool = new ReentrantReadWriteList<Request>();
 			mRequestQueue = new LinkedBlockingDeque<Request>();
 		}
 		for (int i = 0; i < init_num; i++) {
-			if (!mRequestPool.offer(new Request())) break;
+			if (!mRequestPool.add(new Request())) break;
 		}
 	}
 
@@ -282,7 +281,7 @@ LOOP:	for (; mIsRunning; ) {
 				}
 				request.request = request.request_for_result = REQUEST_TASK_NON;
 				// プールへ返却する
-				mRequestPool.offer(request);
+				mRequestPool.add(request);
 			} catch (final InterruptedException e) {
 				break;
 			}
@@ -337,7 +336,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return Request
 	 */
 	protected Request obtain(final int request, final int arg1, final int arg2, final Object obj) {
-		Request req = mRequestPool.poll();
+		Request req = mRequestPool.removeLast();
 		if (req != null) {
 			req.request = request;
 			req.arg1 = arg1;
@@ -483,7 +482,7 @@ LOOP:	for (; mIsRunning; ) {
 			if (!mIsRunning || mFinished || !mRequestQueue.contains(request)) break;
 			if (req.equals(request)) {
 				mRequestQueue.remove(req);
-				mRequestPool.offer(req);
+				mRequestPool.add(req);
 			}
 		}
 	}
@@ -497,7 +496,7 @@ LOOP:	for (; mIsRunning; ) {
 			if (!mIsRunning || mFinished) break;
 			if (req.request == request) {
 				mRequestQueue.remove(req);
-				mRequestPool.offer(req);
+				mRequestPool.add(req);
 			}
 		}
 	}
