@@ -379,9 +379,10 @@ public final class CameraGLView extends GLSurfaceView {
 					break;
 				}
 				}
-				if (mDrawer != null)
+				if (mDrawer != null) {
 					mDrawer.setMvpMatrix(mMvpMatrix, 0);
 			}
+		}
 		}
 
 		private volatile boolean requestUpdateTex = false;
