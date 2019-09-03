@@ -383,7 +383,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final int arg1, final Object obj) {
-		return !mFinished && mRequestQueue.offer(obtain(request, arg1, 0, obj));
+		return offer(request, arg1, 0, obj);
 	}
 
 	/**
@@ -394,7 +394,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final int arg1, final int arg2) {
-		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, arg1, arg2, null));
+		return offer(request, arg1, arg2, null);
 	}
 
 	/**
@@ -404,7 +404,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final int arg1) {
-		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, arg1, 0, null));
+		return offer(request, arg1, 0, null);
 	}
 
 	/**
@@ -413,7 +413,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request) {
-		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, 0, 0, null));
+		return offer(request, 0, 0, null);
 	}
 
 	/**
@@ -423,7 +423,7 @@ LOOP:	for (; mIsRunning; ) {
 	 * @return true if success offer
 	 */
 	public boolean offer(final int request, final Object obj) {
-		return !mFinished && mIsRunning && mRequestQueue.offer(obtain(request, 0, 0, obj));
+		return offer(request, 0, 0, obj);
 	}
 
 	/**
