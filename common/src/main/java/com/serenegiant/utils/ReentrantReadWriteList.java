@@ -1,17 +1,4 @@
 package com.serenegiant.utils;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ListIterator;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantReadWriteLock;
-
 /*
  * libcommon
  * utility/helper classes for myself
@@ -30,6 +17,19 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
+
 public class ReentrantReadWriteList<V> implements List<V> {
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
 	private final Lock mReadLock = mSensorLock.readLock();
