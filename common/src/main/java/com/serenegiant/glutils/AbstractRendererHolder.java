@@ -420,11 +420,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 		return result;
 	}
+
 //--------------------------------------------------------------------------------
 	@NonNull
 	protected abstract BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags);
 	
+//--------------------------------------------------------------------------------
 	protected void startCaptureTask() {
 		new Thread(mCaptureTask, CAPTURE_THREAD_NAME).start();
 		synchronized (mSync) {
@@ -934,7 +936,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				if (client == null) {
 					try {
 						client = RendererSurfaceRec.newInstance(getEgl(), surface, maxFps);
-						setMirror(client, mMirror);
+						setMirror(client.mMvpMatrix, mMirror);
 						mClients.append(id, client);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -1140,20 +1142,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				for (int i = 0; i < n; i++) {
 					final RendererSurfaceRec client = mClients.valueAt(i);
 					if (client != null) {
-						setMirror(client, mirror);
+						setMirror(client.mMvpMatrix, mirror);
 					}
 				}
 			}
-		}
-	
-		/**
-		 * handleMirrorの下請け
-		 * @param client
-		 * @param mirror
-		 */
-		@WorkerThread
-		protected void setMirror(final RendererSurfaceRec client, final int mirror) {
-			RendererHolder.setMirror(client.mMvpMatrix, mirror);
 		}
 	
 		@WorkerThread
