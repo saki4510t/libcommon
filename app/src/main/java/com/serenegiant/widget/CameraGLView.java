@@ -43,6 +43,7 @@ import com.serenegiant.glutils.RenderHolderCallback;
 import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.es2.GLDrawer2D;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -281,7 +282,11 @@ public final class CameraGLView extends GLSurfaceView {
 			hTex = mDrawer.initTex();
 			// create SurfaceTexture with texture ID.
 			mSTexture = new SurfaceTexture(hTex);
-			mSTexture.setOnFrameAvailableListener(this);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				mSTexture.setOnFrameAvailableListener(this, HandlerThreadHandler.createHandler(TAG));
+			} else {
+				mSTexture.setOnFrameAvailableListener(this);
+			}
 			// clear screen with yellow color so that you can see rendering rectangle
 			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 			final CameraGLView parent = mWeakParent.get();
