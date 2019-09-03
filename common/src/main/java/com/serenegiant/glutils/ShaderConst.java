@@ -38,7 +38,7 @@ public class ShaderConst {
 	public static final String SAMPLER_OES = "samplerExternalOES";
 
 	public static final int KERNEL_SIZE3x3 = 9;
-	public static final int KERNEL_SIZE5x５ = 25;
+	public static final int KERNEL_SIZE5x5 = 25;
 
 	public static final int NO_TEXTURE = -1;
 
