@@ -27,6 +27,7 @@ import android.hardware.Camera;
 import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
@@ -97,7 +98,7 @@ public final class CameraGLView extends GLSurfaceView {
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "CameraGLView:");
 		mRenderer = new CameraSurfaceRenderer(this);
-		setEGLContextClientVersion(2);	// GLES 2.0, API >= 8
+		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
 		setRenderer(mRenderer);
 	}
 
