@@ -1168,7 +1168,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-				removeRequest(REQUEST_DRAW);
 				mIsFirstFrameRendered = true;
 				offer(REQUEST_DRAW);
 			}
