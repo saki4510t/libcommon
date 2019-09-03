@@ -306,7 +306,7 @@ import com.serenegiant.utils.BuildCheck;
     /**
      * 指定したSurfaceからEglSurfaceを生成する
      * 生成したEglSurfaceをmakeCurrentした状態で戻る
-     * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder
+     * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder/SurfaceView
      * @return
      */
 	@Override

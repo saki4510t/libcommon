@@ -169,7 +169,7 @@ public abstract class EGLBase {
 	/**
 	 * 指定したSurfaceからEglSurfaceを生成する
 	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
-	 * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder
+	 * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder/SurfaceView
 	 * @return
 	 */
 	public abstract IEglSurface createFromSurface(final Object nativeWindow);
