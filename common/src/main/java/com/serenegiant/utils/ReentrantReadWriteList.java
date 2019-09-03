@@ -83,32 +83,6 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		}
 	}
 	
-	/**
-	 *
-	 * @param ix
-	 * @param value
-	 * @throws IndexOutOfBoundsException
-	 */
-	@Override
-	public void add(final int ix, final V value) throws IndexOutOfBoundsException {
-		mWriteLock.lock();
-		try {
-			mList.add(ix, value);
-		} finally {
-			mWriteLock.unlock();
-		}
-	}
-	
-	@Override
-	public V remove(final int ix) {
-		mWriteLock.lock();
-		try {
-			return mList.remove(ix);
-		} finally {
-			mWriteLock.unlock();
-		}
-	}
-	
 	@Override
 	public int indexOf(final Object o) {
 		mReadLock.lock();
@@ -174,35 +148,6 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		return result;
 	}
 	
-	/**
-	 * put specific value into this list
-	 * @param value
-	 * @return
-	 */
-	@Override
-	public boolean add(@NonNull final V value) {
-		Boolean result;
-		mWriteLock.lock();
-		try {
-			result = mList.add(value);
-		} finally {
-			mWriteLock.unlock();
-		}
-		return result;
-	}
-	
-	@Override
-	public boolean remove(final Object value) {
-		Boolean result;
-		mWriteLock.lock();
-		try {
-			result = mList.remove(value);
-		} finally {
-			mWriteLock.unlock();
-		}
-		return result;
-	}
-	
 	@Override
 	public boolean containsAll(@NonNull final Collection<?> collection) {
 		boolean result;
@@ -215,54 +160,39 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		return result;
 	}
 	
+	/**
+	 * put specific value into this list
+	 * @param value
+	 * @return
+	 */
 	@Override
-	public boolean addAll(@NonNull final Collection<? extends V> collection) {
-		Boolean result;
+	public boolean add(@NonNull final V value) {
+		boolean result;
 		mWriteLock.lock();
 		try {
-			result = mList.addAll(collection);
+			result = mList.add(value);
 		} finally {
 			mWriteLock.unlock();
 		}
 		return result;
 	}
-	
+
+	/**
+	 *
+	 * @param ix
+	 * @param value
+	 * @throws IndexOutOfBoundsException
+	 */
 	@Override
-	public boolean addAll(final int ix, @NonNull final Collection<? extends V> collection) {
-		Boolean result;
+	public void add(final int ix, final V value) throws IndexOutOfBoundsException {
 		mWriteLock.lock();
 		try {
-			result = mList.addAll(ix, collection);
+			mList.add(ix, value);
 		} finally {
 			mWriteLock.unlock();
 		}
-		return result;
 	}
-	
-	@Override
-	public boolean removeAll(@NonNull final Collection<?> collection) {
-		Boolean result;
-		mWriteLock.lock();
-		try {
-			result = mList.removeAll(collection);
-		} finally {
-			mWriteLock.unlock();
-		}
-		return result;
-	}
-	
-	@Override
-	public boolean retainAll(@NonNull final Collection<?> collection) {
-		Boolean result;
-		mWriteLock.lock();
-		try {
-			result = mList.retainAll(collection);
-		} finally {
-			mWriteLock.unlock();
-		}
-		return result;
-	}
-	
+
 	/**
 	 * If the specified value does not exist in this list add it and return true
 	 * otherwise return false
@@ -283,6 +213,77 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		return result;
 	}
 
+	@Override
+	public boolean addAll(@NonNull final Collection<? extends V> collection) {
+		boolean result;
+		mWriteLock.lock();
+		try {
+			result = mList.addAll(collection);
+		} finally {
+			mWriteLock.unlock();
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean addAll(final int ix, @NonNull final Collection<? extends V> collection) {
+		boolean result;
+		mWriteLock.lock();
+		try {
+			result = mList.addAll(ix, collection);
+		} finally {
+			mWriteLock.unlock();
+		}
+		return result;
+	}
+
+	@Nullable
+	@Override
+	public V remove(final int ix) {
+		mWriteLock.lock();
+		try {
+			return ((ix >= 0) && (ix < mList.size())) ? mList.remove(ix) : null;
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
+	@Override
+	public boolean remove(final Object value) {
+		boolean result;
+		mWriteLock.lock();
+		try {
+			result = mList.remove(value);
+		} finally {
+			mWriteLock.unlock();
+		}
+		return result;
+	}
+
+	@Override
+	public boolean removeAll(@NonNull final Collection<?> collection) {
+		boolean result;
+		mWriteLock.lock();
+		try {
+			result = mList.removeAll(collection);
+		} finally {
+			mWriteLock.unlock();
+		}
+		return result;
+	}
+	
+	@Override
+	public boolean retainAll(@NonNull final Collection<?> collection) {
+		boolean result;
+		mWriteLock.lock();
+		try {
+			result = mList.retainAll(collection);
+		} finally {
+			mWriteLock.unlock();
+		}
+		return result;
+	}
+	
 	@Override
 	public void clear() {
 		mWriteLock.lock();
