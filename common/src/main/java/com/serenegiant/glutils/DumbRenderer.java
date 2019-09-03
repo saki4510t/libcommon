@@ -20,6 +20,8 @@ package com.serenegiant.glutils;
 
 import android.graphics.SurfaceTexture;
 import androidx.annotation.NonNull;
+import androidx.annotation.WorkerThread;
+
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
@@ -162,6 +164,7 @@ public class DumbRenderer implements IRenderer {
 			mDelegater = delegater;
 		}
 		
+		@WorkerThread
 		@Override
 		protected void onStart() {
 			makeCurrent();
@@ -172,6 +175,7 @@ public class DumbRenderer implements IRenderer {
 			}
 		}
 
+		@WorkerThread
 		@Override
 		protected void onStop() {
 			makeCurrent();
@@ -182,6 +186,7 @@ public class DumbRenderer implements IRenderer {
 			}
 		}
 
+		@WorkerThread
 		@Override
 		protected Object processRequest(final int request,
 			final int arg1, final int arg2, final Object obj) throws TaskBreak {
@@ -203,6 +208,7 @@ public class DumbRenderer implements IRenderer {
 			return null;
 		}
 
+		@WorkerThread
 		private void handleSetSurface(final Object surface) {
 			makeCurrent();
 			try {
@@ -212,6 +218,7 @@ public class DumbRenderer implements IRenderer {
 			}
 		}
 
+		@WorkerThread
 		private void handleResize(final int width, final int height) {
 			if ((surfaceWidth != width) || (surfaceHeight != height)) {
 				surfaceWidth = width;
@@ -226,6 +233,7 @@ public class DumbRenderer implements IRenderer {
 			}
 		}
 
+		@WorkerThread
 		private void handleDraw(final Object... args) {
 			makeCurrent();
 			try {
@@ -235,6 +243,7 @@ public class DumbRenderer implements IRenderer {
 			}
 		}
 
+		@WorkerThread
 		private void handleMirror(final int mirror) {
 			makeCurrent();
 			try {

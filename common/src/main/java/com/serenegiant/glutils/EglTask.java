@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 import com.serenegiant.utils.MessageTask;
 
@@ -52,6 +53,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 */
+	@WorkerThread
 	@Override
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
@@ -83,11 +85,13 @@ public abstract class EglTask extends MessageTask {
 		return result;
 	}
 
+	@WorkerThread
 	@Override
 	protected void onBeforeStop() {
 		mEglHolder.makeCurrent();
 	}
 
+	@WorkerThread
 	@Override
 	protected void onRelease() {
 		mEglHolder.release();

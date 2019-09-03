@@ -24,6 +24,8 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -229,6 +231,7 @@ public class StaticTextureSource {
 		/**
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 		 */
+		@WorkerThread
 		@Override
 		protected void onStart() {
 			if (DEBUG) Log.v(TAG, "onStart:");
@@ -244,6 +247,7 @@ public class StaticTextureSource {
 		/**
 		 * ワーカースレッド終了時の処理(ここはまだワーカースレッド上)
 		 */
+		@WorkerThread
 		@Override
 		protected void onStop() {
 			if (DEBUG) Log.v(TAG, "onStop");
@@ -270,6 +274,7 @@ public class StaticTextureSource {
 			return false;
 		}
 
+		@WorkerThread
 		@Override
 		protected Object processRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
@@ -393,6 +398,7 @@ public class StaticTextureSource {
 		/**
 		 * 実際の描画処理
 		 */
+		@WorkerThread
 		private void handleDraw() {
 //			if (DEBUG) Log.v(TAG, "handleDraw:");
 			makeCurrent();
@@ -429,6 +435,7 @@ public class StaticTextureSource {
 		 * @param id
 		 * @param surface
 		 */
+		@WorkerThread
 		private void handleAddSurface(final int id, final Object surface, final int maxFps) {
 			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
@@ -452,6 +459,7 @@ public class StaticTextureSource {
 		 * 指定したIDの分配描画先Surfaceを破棄する
 		 * @param id
 		 */
+		@WorkerThread
 		private void handleRemoveSurface(final int id) {
 			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mClientSync) {
@@ -468,6 +476,7 @@ public class StaticTextureSource {
 		/**
 		 * 念の為に分配描画先のSurfaceを全て破棄する
 		 */
+		@WorkerThread
 		private void handleRemoveAll() {
 			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 			synchronized (mClientSync) {
@@ -488,6 +497,7 @@ public class StaticTextureSource {
 		/**
 		 * 分配描画先のSurfaceが有効かどうかをチェックして無効なものは削除する
 		 */
+		@WorkerThread
 		private void checkSurface() {
 			if (DEBUG) Log.v(TAG, "checkSurface");
 			synchronized (mClientSync) {
@@ -509,6 +519,7 @@ public class StaticTextureSource {
 		 * ソース静止画をセット
 		 * @param bitmap
 		 */
+		@WorkerThread
 		private void handleSetBitmap(final Bitmap bitmap) {
 			if (DEBUG) Log.v(TAG, "handleSetBitmap:bitmap=" + bitmap);
 			final int width = bitmap.getWidth();

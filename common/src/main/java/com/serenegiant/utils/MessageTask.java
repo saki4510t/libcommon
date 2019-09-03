@@ -23,6 +23,7 @@ import android.util.Log;
 import java.util.concurrent.LinkedBlockingDeque;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 public abstract class MessageTask implements Runnable {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -145,18 +146,23 @@ public abstract class MessageTask implements Runnable {
 	}
 
 	/** 初期化処理 */
+	@WorkerThread
 	protected abstract void onInit(final int arg1, final int arg2, final Object obj);
 
 	/** 要求処理ループ開始直前に呼ばれる */
+	@WorkerThread
 	protected abstract void onStart();
 
 	/** onStopの直前に呼び出される, interruptされた時は呼び出されない */
+	@WorkerThread
 	protected void onBeforeStop() {}
 
 	/** 停止処理, interruptされた時は呼び出されない */
+	@WorkerThread
 	protected abstract void onStop();
 
 	/** onStop後に呼び出される。onStopで例外発生しても呼ばれる */
+	@WorkerThread
 	protected abstract void onRelease();
 
 	/**
@@ -171,6 +177,7 @@ public abstract class MessageTask implements Runnable {
 
 	/** 要求メッセージの処理(内部メッセージは来ない)
 	 * TaskBreakをthrowすると要求メッセージ処理ループを終了する */
+	@WorkerThread
 	protected abstract Object processRequest(final int request, final int arg1, final int arg2, final Object obj) throws TaskBreak;
 
 	/** 要求メッセージを取り出す処理(要求メッセージがなければブロックされる) */

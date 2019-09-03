@@ -22,6 +22,8 @@ import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
+
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -375,6 +377,21 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
 		}
 
+		public void changeEffect(final int effect) {
+			checkFinished();
+			if (mEffect != effect) {
+				offer(REQUEST_CHANGE_EFFECT, effect);
+			}
+		}
+
+		public void setParams(final int effect, @NonNull final float[] params) {
+			checkFinished();
+			offer(REQUEST_SET_PARAMS, effect, 0, params);
+		}
+
+//================================================================================
+// ワーカースレッド上での処理
+//================================================================================
 		/**
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 		 */
@@ -412,6 +429,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 //			if (DEBUG) Log.v(TAG, "onStart:finished");
 		}
 
+		@WorkerThread
 		@Override
 		protected Object processRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
@@ -431,25 +449,11 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			return result;
 		}
 
-		public void changeEffect(final int effect) {
-			checkFinished();
-			if (mEffect != effect) {
-				offer(REQUEST_CHANGE_EFFECT, effect);
-			}
-		}
-
-		public void setParams(final int effect, @NonNull final float[] params) {
-			checkFinished();
-			offer(REQUEST_SET_PARAMS, effect, 0, params);
-		}
-
-//================================================================================
-// ワーカースレッド上での処理
-//================================================================================
 		/**
 		 * 映像効果を変更
 		 * @param effect
 		 */
+		@WorkerThread
 		protected void handleChangeEffect(final int effect) {
 			mEffect = effect;
 			switch (effect) {
@@ -509,6 +513,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		 * @param effect
 		 * @param params
 		 */
+		@WorkerThread
 		private void handleSetParam(final int effect, @NonNull final float[] params) {
 			if ((effect < EFFECT_NON) || (mEffect == effect)) {
 				mCurrentParams = params;
@@ -522,6 +527,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		/**
 		 * 映像効果用のパラメータをGPUへ適用
 		 */
+		@WorkerThread
 		private void updateParams() {
 			final int n = Math.min(mCurrentParams != null
 				? mCurrentParams.length : 0, MAX_PARAM_NUM);

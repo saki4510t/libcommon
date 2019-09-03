@@ -18,6 +18,8 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import androidx.annotation.WorkerThread;
+
 /**
  * Created by saki on 2018/02/10.
  * 共有コンテキストのマスターをを保持するためだけのクラス
@@ -64,16 +66,19 @@ public class GLMasterContext {
 			super(maxClientVersion, null, flags);
 		}
 		
+		@WorkerThread
 		@Override
 		protected void onStart() {
 			// do nothing
 		}
 		
+		@WorkerThread
 		@Override
 		protected void onStop() {
 			// do nothing
 		}
 		
+		@WorkerThread
 		@Override
 		protected Object processRequest(final int request,
 			final int arg1, final int arg2, final Object obj) throws TaskBreak {
