@@ -381,8 +381,8 @@ public final class CameraGLView extends GLSurfaceView {
 				}
 				if (mDrawer != null) {
 					mDrawer.setMvpMatrix(mMvpMatrix, 0);
+				}
 			}
-		}
 		}
 
 		private volatile boolean requestUpdateTex = false;
@@ -586,12 +586,18 @@ public final class CameraGLView extends GLSurfaceView {
 							parent.setVideoSize(previewSize.width, previewSize.height);
 						}
 					});
-					// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
+					// カメラ映像のプレビュー表示用SurfaceTextureを生成
 					final SurfaceTexture st = parent.getSurfaceTexture();
 					st.setDefaultBufferSize(previewSize.width, previewSize.height);
-					parent.mRendererHolder.addSurface(1, st, false);
-					// カメラ映像取得用SurfaceTexture(IRendererHolder#getSurfaceTexture)をセット
-					mCamera.setPreviewTexture(parent.mRendererHolder.getSurfaceTexture());
+					if (false) {
+						// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
+						parent.mRendererHolder.addSurface(1, st, false);
+						// カメラ映像取得用SurfaceTexture(IRendererHolder#getSurfaceTexture)をセット
+						mCamera.setPreviewTexture(parent.mRendererHolder.getSurfaceTexture());
+					} else {
+						// こっちはIRendererを経由せずに直接カメラにプレビュー表示用SurfaceTextureをセットする
+						mCamera.setPreviewTexture(st);
+					}
 				} catch (final IOException e) {
 					Log.e(TAG, "startPreview:", e);
 					if (mCamera != null) {
