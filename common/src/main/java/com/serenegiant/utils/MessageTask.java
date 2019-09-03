@@ -203,6 +203,14 @@ public abstract class MessageTask implements Runnable {
 		return mWorkerThreadId == Thread.currentThread().getId();
 	}
 
+	protected int getMaxRequest() {
+		return mMaxRequest;
+	}
+
+	protected int getCurrentRequests() {
+		return mRequestQueue.size();
+	}
+
 	@Override
 	public void run() {
 		Request request = null;
