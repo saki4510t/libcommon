@@ -92,6 +92,7 @@ public abstract class MessageTask implements Runnable {
 	private final LinkedBlockingDeque<Request> mRequestQueue;
 	private volatile boolean mIsRunning, mFinished;
 	private Thread mWorkerThread;
+	private long mWorkerThreadId;
 
 	/**
 	 * コンストラクタ
@@ -199,6 +200,10 @@ public abstract class MessageTask implements Runnable {
 		return mFinished;
 	}
 
+	protected boolean isOnWorkerThread() {
+		return mWorkerThreadId == Thread.currentThread().getId();
+	}
+
 	@Override
 	public void run() {
 		Request request = null;
@@ -213,6 +218,7 @@ public abstract class MessageTask implements Runnable {
 		synchronized (mSync) {
 			if (mIsRunning) {
 				mWorkerThread = Thread.currentThread();
+				mWorkerThreadId = mWorkerThread.getId();
 				try {
 					onInit(request.arg1, request.arg2, request.obj);
 				} catch (final Exception e) {
@@ -284,6 +290,7 @@ LOOP:	for (; mIsRunning; ) {
 		final boolean interrupted = Thread.interrupted();
 		synchronized (mSync) {
 			mWorkerThread = null;
+			mWorkerThreadId = 0;
 			mIsRunning = false;
 			mFinished = true;
 		}
@@ -418,7 +425,6 @@ LOOP:	for (; mIsRunning; ) {
 	/**
 	 * offer request to run on worker thread and wait for result
 	 * caller thread is blocked until the request finished running on worker thread
-	 * FIXME このメソッドはMessageTaskを実行中のスレッド上で呼び出すとデッドロックする
 	 * @param request
 	 * @param arg1
 	 * @param arg2
@@ -428,16 +434,29 @@ LOOP:	for (; mIsRunning; ) {
 	public Object offerAndWait(final int request, final int arg1, final int arg2, final Object obj) {
 		if (!mFinished && (request > REQUEST_TASK_NON)) {
 			final Request req = obtain(REQUEST_TASK_RUN_AND_WAIT, arg1, arg2, obj);
-			synchronized (req) {
-				req.request_for_result = request;
-				req.result = null;
-				mRequestQueue.offer(req);
-				for (; mIsRunning && (req.request_for_result != REQUEST_TASK_NON); ) {
-					try {
-						req.wait(100);
-					} catch (final InterruptedException e) {
-						break;
+			if (!isOnWorkerThread()) {
+				// ワーカースレッド上でなければワーカースレッド上での実行要求＆結果を待機する
+				synchronized (req) {
+					req.request_for_result = request;
+					req.result = null;
+					mRequestQueue.offer(req);
+					for (; mIsRunning && (req.request_for_result != REQUEST_TASK_NON); ) {
+						try {
+							req.wait(100);
+						} catch (final InterruptedException e) {
+							break;
+						}
 					}
+				}
+			} else {
+				// ワーカースレッド上ならここで実行する
+				try {
+					req.setResult(processRequest(req.request_for_result, req.arg1, req.arg2, req.obj));
+				} catch (final TaskBreak e) {
+					req.setResult(null);
+				} catch (final Exception e) {
+					req.setResult(null);
+					callOnError(e);
 				}
 			}
 			return req.result;
