@@ -591,7 +591,7 @@ public final class CameraGLView extends GLSurfaceView {
 					// カメラ映像のプレビュー表示用SurfaceTextureを生成
 					final SurfaceTexture st = parent.getSurfaceTexture();
 					st.setDefaultBufferSize(previewSize.width, previewSize.height);
-					if (false) {
+					if (true) {
 						// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
 						parent.mRendererHolder.addSurface(1, st, false);
 						// カメラ映像取得用SurfaceTexture(IRendererHolder#getSurfaceTexture)をセット
