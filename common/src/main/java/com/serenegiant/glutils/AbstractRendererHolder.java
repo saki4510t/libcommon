@@ -83,12 +83,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 		
 		this(width, height,
-			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			3,
+			null,
+			EglTask.EGL_FLAG_RECORDABLE,
 			callback);
 	}
 
 	protected AbstractRendererHolder(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext,
+		final int flags,
 		@Nullable final RenderHolderCallback callback) {
 		
 		mCallback = callback;
