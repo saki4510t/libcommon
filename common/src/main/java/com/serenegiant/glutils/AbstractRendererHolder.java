@@ -480,7 +480,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 //--------------------------------------------------------------------------------
-	protected static class BaseRendererTask extends EglTask {
+	protected static class BaseRendererTask extends EglTask
+		implements SurfaceTexture.OnFrameAvailableListener {
 
 		private final SparseArray<RendererSurfaceRec> mClients
 			= new SparseArray<RendererSurfaceRec>();
@@ -1083,7 +1084,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if (BuildCheck.isAndroid4_1()) {
 				mMasterTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
 			}
-			mMasterTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
+			mMasterTexture.setOnFrameAvailableListener(this);
 			mParent.callOnCreate(mMasterSurface);
 		}
 	
@@ -1167,16 +1168,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		/**
 		 * TextureSurfaceで映像を受け取った際のコールバックリスナー
 		 */
-		protected final SurfaceTexture.OnFrameAvailableListener
-			mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
-
-			@Override
-			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-				mIsFirstFrameRendered = true;
-				offer(REQUEST_DRAW, 0, 0, null);
-			}
-		};
-
+		@Override
+		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
+			mIsFirstFrameRendered = true;
+			offer(REQUEST_DRAW, 0, 0, null);
+		}
 	}
 	
 //--------------------------------------------------------------------------------
