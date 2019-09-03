@@ -474,7 +474,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 //--------------------------------------------------------------------------------
-	protected abstract static class BaseRendererTask extends EglTask {
+	protected static class BaseRendererTask extends EglTask {
 		private final SparseArray<RendererSurfaceRec> mClients
 			= new SparseArray<RendererSurfaceRec>();
 		private final AbstractRendererHolder mParent;

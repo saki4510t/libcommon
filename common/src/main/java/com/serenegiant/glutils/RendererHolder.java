@@ -49,25 +49,8 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
 
-		return new MyRendererTask(this, width, height,
+		return new BaseRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
 	}
 	
-//================================================================================
-// 実装
-//================================================================================
-	/**
-	 * ワーカースレッド上でOpenGL|ESを用いてマスター映像を分配描画するためのインナークラス
-	 */
-	protected static final class MyRendererTask extends BaseRendererTask {
-
-		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
-			final int width, final int height,
-			final int maxClientVersion,
-			final EGLBase.IContext sharedContext, final int flags) {
-
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
-		}
-	}
-
 }
