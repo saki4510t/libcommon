@@ -405,7 +405,9 @@ public final class CameraGLView extends GLSurfaceView {
 				mSTexture.getTransformMatrix(mStMatrix);
 			}
 			// draw to preview screen
-			mDrawer.draw(hTex, mStMatrix, 0);
+			if (mDrawer != null) {
+				mDrawer.draw(hTex, mStMatrix, 0);
+			}
 			flip = !flip;
 			if (flip) {	// ~30fps
 				synchronized (this) {
