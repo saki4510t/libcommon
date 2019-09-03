@@ -866,9 +866,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				handleDrawClients();
 				mParent.callOnFrameAvailable();
 			}
+			// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 			makeCurrent();
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			GLES20.glFlush();
+			GLES20.glFlush();	// XXX これいるかな？
 		}
 
 		@WorkerThread
