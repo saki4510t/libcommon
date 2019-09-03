@@ -122,6 +122,13 @@ public class MainActivity extends AppCompatActivity
 			fragment = NetworkConnectionFragment.newInstance();
 			break;
 		case 1:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = CameraFragment.newInstance();
 			break;
 		default:
 			break;

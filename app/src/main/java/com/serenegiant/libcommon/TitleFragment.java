@@ -26,17 +26,6 @@ public class TitleFragment extends BaseFragment {
 	
 	private static final String ARG_COLUMN_COUNT = "column-count";
 
-	private int mColumnCount = 1;
-	private OnListFragmentInteractionListener mListener;
-	
-	/**
-	 * Mandatory empty constructor for the fragment manager to instantiate the
-	 * fragment (e.g. upon screen orientation changes).
-	 */
-	public TitleFragment() {
-		super();
-	}
-	
 	@SuppressWarnings("unused")
 	public static TitleFragment newInstance(final int columnCount) {
 		final TitleFragment fragment = new TitleFragment();
@@ -45,7 +34,30 @@ public class TitleFragment extends BaseFragment {
 		fragment.setArguments(args);
 		return fragment;
 	}
-	
+
+//--------------------------------------------------------------------------------
+	private int mColumnCount = 1;
+	private OnListFragmentInteractionListener mListener;
+
+	/**
+	 * Mandatory empty constructor for the fragment manager to instantiate the
+	 * fragment (e.g. upon screen orientation changes).
+	 */
+	public TitleFragment() {
+		super();
+	}
+
+	@Override
+	public void onAttach(@NonNull final Context context) {
+		super.onAttach(context);
+		if (context instanceof OnListFragmentInteractionListener) {
+			mListener = (OnListFragmentInteractionListener) context;
+		} else {
+			throw new RuntimeException(context.toString()
+				+ " must implement OnListFragmentInteractionListener");
+		}
+	}
+
 	@Override
 	public void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -73,18 +85,6 @@ public class TitleFragment extends BaseFragment {
 			recyclerView.setAdapter(new MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener));
 		}
 		return view;
-	}
-	
-	
-	@Override
-	public void onAttach(final Context context) {
-		super.onAttach(context);
-		if (context instanceof OnListFragmentInteractionListener) {
-			mListener = (OnListFragmentInteractionListener) context;
-		} else {
-			throw new RuntimeException(context.toString()
-				+ " must implement OnListFragmentInteractionListener");
-		}
 	}
 	
 	@Override

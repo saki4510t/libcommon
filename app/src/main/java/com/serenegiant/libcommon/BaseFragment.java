@@ -6,8 +6,11 @@ import android.os.Handler;
 import android.os.Looper;
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
+import androidx.annotation.StyleRes;
 import androidx.fragment.app.Fragment;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.widget.Toast;
 
 import com.serenegiant.utils.BuildCheck;
@@ -24,7 +27,7 @@ public class BaseFragment extends Fragment {
 	}
 
 	@Override
-	public void onAttach(final Context context) {
+	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG + ":async");
 	}
@@ -221,6 +224,19 @@ public class BaseFragment extends Fragment {
 				mAsyncHandler.removeCallbacksAndMessages(null);
 			}
 		}
+	}
+
+//================================================================================
+	@NonNull
+	protected LayoutInflater getThemedLayoutInflater(
+		@NonNull final LayoutInflater inflater, @StyleRes final int layout_style) {
+
+		if (DEBUG) Log.v(TAG, "getThemedLayoutInflater:");
+		final Activity context = getActivity();
+		// create ContextThemeWrapper from the original Activity Context with the custom theme
+		final Context contextThemeWrapper = new ContextThemeWrapper(context, layout_style);
+		// clone the inflater using the ContextThemeWrapper
+		return inflater.cloneInContext(contextThemeWrapper);
 	}
 
 //================================================================================
