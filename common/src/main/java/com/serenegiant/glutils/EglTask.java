@@ -36,13 +36,12 @@ public abstract class EglTask extends MessageTask {
 	private EGLBase mEgl = null;
 	private EGLBase.IEglSurface mEglHolder;
 
-	public EglTask(final EGLBase.IContext sharedContext, final int flags) {
-//		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		init(flags, 3, sharedContext);
+	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		this(3, sharedContext, flags);
 	}
 
 	public EglTask(final int maxClientVersion,
-		final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
 		init(flags, maxClientVersion, sharedContext);

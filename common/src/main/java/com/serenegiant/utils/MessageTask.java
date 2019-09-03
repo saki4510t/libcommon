@@ -23,6 +23,8 @@ import android.util.Log;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import androidx.annotation.Nullable;
+
 public abstract class MessageTask implements Runnable {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MessageTask.class.getSimpleName();
@@ -136,7 +138,7 @@ public abstract class MessageTask implements Runnable {
 	 * @param arg2
 	 * @param obj
 	 */
-	protected void init(final int arg1, final int arg2, final Object obj) {
+	protected void init(final int arg1, final int arg2, @Nullable final Object obj) {
 		mFinished = false;
 		mRequestQueue.offer(obtain(REQUEST_TASK_START, arg1, arg2, obj));
 //		offer(REQUEST_TASK_START, arg1, arg2, obj);
