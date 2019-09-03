@@ -120,7 +120,7 @@ public final class CameraGLView extends GLSurfaceView {
 	public synchronized void onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:");
 		if (mCameraHandler != null) {
-			// just request stop prviewing
+			// just request stop previewing
 			mCameraHandler.stopPreview(false);
 		}
 		if (mRendererHolder != null) {
