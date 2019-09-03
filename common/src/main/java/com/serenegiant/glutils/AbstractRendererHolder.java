@@ -481,6 +481,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 	protected static class BaseRendererTask extends EglTask {
+
 		private final SparseArray<RendererSurfaceRec> mClients
 			= new SparseArray<RendererSurfaceRec>();
 		private final AbstractRendererHolder mParent;
@@ -1147,10 +1148,20 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				}
 			}
 		}
-	
+
+		/**
+		 * 描画する映像の回転を設定
+		 * @param id
+		 * @param degree
+		 */
 		@WorkerThread
 		protected void handleRotate(final int id, final int degree) {
-			// FIXME 未実装
+			synchronized (mClients) {
+				final RendererSurfaceRec client = mClients.get(id);
+				if (client != null) {
+					setRotation(client.mMvpMatrix, degree);
+				}
+			}
 		}
 		
 		/**
@@ -1423,6 +1434,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	};
 
 //================================================================================
+	@WorkerThread
 	protected static void setMirror(final float[] mvp, final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL:
