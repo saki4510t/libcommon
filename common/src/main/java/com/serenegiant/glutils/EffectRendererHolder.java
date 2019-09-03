@@ -27,8 +27,6 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.serenegiant.glutils.es2.GLDrawer2D;
-
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
@@ -348,7 +346,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param drawer GLDrawer2Dインスタンス
 	 */
 	protected void handleDefaultEffect(final int effect,
-		@NonNull final GLDrawer2D drawer) {
+		@NonNull final IShaderDrawer2d drawer) {
 
 		drawer.resetShader();
 	}
@@ -456,56 +454,59 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		@WorkerThread
 		protected void handleChangeEffect(final int effect) {
 			mEffect = effect;
-			switch (effect) {
-			case EFFECT_NON:
-				mDrawer.updateShader(FRAGMENT_SHADER_SIMPLE_OES);
-				break;
-			case EFFECT_GRAY:
-				mDrawer.updateShader(FRAGMENT_SHADER_GRAY_OES);
-				break;
-			case EFFECT_GRAY_REVERSE:
-				mDrawer.updateShader(FRAGMENT_SHADER_GRAY_REVERSE_OES);
-				break;
-			case EFFECT_BIN:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_OES);
-				break;
-			case EFFECT_BIN_YELLOW:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_YELLOW_OES);
-				break;
-			case EFFECT_BIN_GREEN:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_GREEN_OES);
-				break;
-			case EFFECT_BIN_REVERSE:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_OES);
-				break;
-			case EFFECT_BIN_REVERSE_YELLOW:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_YELLOW_OES);
-				break;
-			case EFFECT_BIN_REVERSE_GREEN:
-				mDrawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES);
-				break;
-			case EFFECT_EMPHASIZE_RED_YELLOW:
-				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES);
-				break;
-			case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
-				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES);
-				break;
-			case EFFECT_EMPHASIZE_YELLOW_WHITE:
-				mDrawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES);
-				break;
-			default:
-				try {
-					((EffectRendererHolder)getParent())
-						.handleDefaultEffect(effect, mDrawer);
-				} catch (final Exception e) {
-					mDrawer.resetShader();
-					Log.w(TAG, e);
+			if (mDrawer instanceof IShaderDrawer2d) {
+				final IShaderDrawer2d drawer = (IShaderDrawer2d) mDrawer;
+				switch (effect) {
+				case EFFECT_NON:
+					drawer.updateShader(FRAGMENT_SHADER_SIMPLE_OES);
+					break;
+				case EFFECT_GRAY:
+					drawer.updateShader(FRAGMENT_SHADER_GRAY_OES);
+					break;
+				case EFFECT_GRAY_REVERSE:
+					drawer.updateShader(FRAGMENT_SHADER_GRAY_REVERSE_OES);
+					break;
+				case EFFECT_BIN:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_OES);
+					break;
+				case EFFECT_BIN_YELLOW:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_YELLOW_OES);
+					break;
+				case EFFECT_BIN_GREEN:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_GREEN_OES);
+					break;
+				case EFFECT_BIN_REVERSE:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_OES);
+					break;
+				case EFFECT_BIN_REVERSE_YELLOW:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_YELLOW_OES);
+					break;
+				case EFFECT_BIN_REVERSE_GREEN:
+					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES);
+					break;
+				case EFFECT_EMPHASIZE_RED_YELLOW:
+					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES);
+					break;
+				case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
+					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES);
+					break;
+				case EFFECT_EMPHASIZE_YELLOW_WHITE:
+					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES);
+					break;
+				default:
+					try {
+						((EffectRendererHolder)getParent())
+							.handleDefaultEffect(effect, drawer);
+					} catch (final Exception e) {
+						drawer.resetShader();
+						Log.w(TAG, e);
+					}
+					break;
 				}
-				break;
+				muParamsLoc = drawer.glGetUniformLocation("uParams");
+				mCurrentParams = mParams.get(effect);
+				updateParams();
 			}
-			muParamsLoc = mDrawer.glGetUniformLocation("uParams");
-			mCurrentParams = mParams.get(effect);
-			updateParams();
 		}
 		
 		/**
@@ -532,7 +533,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			final int n = Math.min(mCurrentParams != null
 				? mCurrentParams.length : 0, MAX_PARAM_NUM);
 			if ((muParamsLoc >= 0) && (n > 0)) {
-				mDrawer.glUseProgram();
+				if (mDrawer instanceof IShaderDrawer2d) {
+					((IShaderDrawer2d)mDrawer).glUseProgram();
+				}
 				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 			}
 		}

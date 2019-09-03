@@ -36,7 +36,6 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.serenegiant.glutils.es2.GLDrawer2D;
 import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.utils.BuildCheck;
 
@@ -496,7 +495,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private int mRotation = 0;
 		private volatile boolean mIsFirstFrameRendered;
 
-		protected GLDrawer2D mDrawer;
+		protected IDrawer2D mDrawer;
 
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
@@ -781,7 +780,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		
 		@WorkerThread
 		protected void internalOnStart() {
-			mDrawer = new GLDrawer2D(true);
+			mDrawer = createDrawer(isGLES3());
 		}
 
 		@WorkerThread
@@ -926,6 +925,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * 指定したIDの分配描画先Surfaceを追加する
 		 * @param id
 		 * @param surface
+		 * @param maxFps
 		 */
 		@WorkerThread
 		protected void handleAddSurface(final int id,
@@ -1226,7 +1226,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	    	captureSurface = eglBase.createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
-	    	drawer = new GLDrawer2D(true);
+			drawer = createDrawer(eglBase.getGlVersion() > 2);
 			setupCaptureDrawer(drawer);
 		}
 
@@ -1472,6 +1472,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		Matrix.setIdentityM(mvp, 0);
 		if ((degrees % 180) != 0) {
 			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+		}
+	}
+
+	private static IDrawer2D createDrawer(final boolean isGLES3) {
+		if (isGLES3) {
+			return new com.serenegiant.glutils.es3.GLDrawer2D(true);
+		} else {
+			return new com.serenegiant.glutils.es2.GLDrawer2D(true);
 		}
 	}
 }

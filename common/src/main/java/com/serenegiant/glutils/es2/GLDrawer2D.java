@@ -26,6 +26,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
+import com.serenegiant.glutils.IShaderDrawer2d;
 import com.serenegiant.glutils.ITexture;
 import com.serenegiant.glutils.TextureOffscreen;
 
@@ -36,7 +37,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2D implements IDrawer2dES2 {
+public class GLDrawer2D implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
@@ -224,6 +225,7 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
 	 */
+	@Override
 	public synchronized void updateShader(final String vs, final String fs) {
 		release();
 		hProgram = GLHelper.loadShader(vs, fs);
@@ -243,6 +245,7 @@ public class GLDrawer2D implements IDrawer2dES2 {
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
+	@Override
 	public void resetShader() {
 		release();
 		if (isOES()) {

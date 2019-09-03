@@ -1,4 +1,4 @@
-package com.serenegiant.glutils.es2;
+package com.serenegiant.glutils;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,10 +18,12 @@ package com.serenegiant.glutils.es2;
  *  limitations under the License.
 */
 
-import com.serenegiant.glutils.IDrawer2D;
-
-public interface IDrawer2dES2 extends IDrawer2D {
+public interface IShaderDrawer2d extends IDrawer2D {
 	public int glGetAttribLocation(final String name);
 	public int glGetUniformLocation(final String name);
 	public void glUseProgram();
+
+	public void resetShader();
+	public void updateShader(final String vs, final String fs);
+	public void updateShader(final String fs);
 }

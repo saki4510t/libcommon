@@ -22,9 +22,9 @@ import android.opengl.GLES30;
 import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
+import com.serenegiant.glutils.IShaderDrawer2d;
 import com.serenegiant.glutils.ITexture;
 import com.serenegiant.glutils.TextureOffscreen;
-import com.serenegiant.glutils.es2.GLHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,16 +32,12 @@ import java.nio.FloatBuffer;
 
 import androidx.annotation.NonNull;
 
-import static com.serenegiant.glutils.ShaderConst.FRAGMENT_SHADER_SIMPLE;
-import static com.serenegiant.glutils.ShaderConst.FRAGMENT_SHADER_SIMPLE_OES;
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_2D;
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
-import static com.serenegiant.glutils.ShaderConst.VERTEX_SHADER;
+import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2D implements IDrawer2dES3 {
+public class GLDrawer2D implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
@@ -229,6 +225,7 @@ public class GLDrawer2D implements IDrawer2dES3 {
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
 	 */
+	@Override
 	public synchronized void updateShader(final String vs, final String fs) {
 		release();
 		hProgram = GLHelper.loadShader(vs, fs);
@@ -241,6 +238,7 @@ public class GLDrawer2D implements IDrawer2dES3 {
 	 * glUseProgramが呼ばれた状態で返る
 	 * @param fs フラグメントシェーダー文字列
 	 */
+	@Override
 	public void updateShader(final String fs) {
 		updateShader(VERTEX_SHADER, fs);
 	}
@@ -248,6 +246,7 @@ public class GLDrawer2D implements IDrawer2dES3 {
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
+	@Override
 	public void resetShader() {
 		release();
 		if (isOES()) {

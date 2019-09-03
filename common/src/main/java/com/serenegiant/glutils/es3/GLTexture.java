@@ -1,4 +1,4 @@
-package com.serenegiant.glutils.es2;
+package com.serenegiant.glutils.es3;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,17 +18,17 @@ package com.serenegiant.glutils.es2;
  *  limitations under the License.
 */
 
-import java.io.IOException;
-
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.text.TextUtils;
 
 import com.serenegiant.glutils.ITexture;
+
+import java.io.IOException;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
@@ -52,7 +52,7 @@ public class GLTexture implements ITexture {
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
 	public GLTexture(final int width, final int height, final int filter_param) {
-		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height, filter_param);
+		this(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, width, height, filter_param);
 	}
 	
 	/**
@@ -64,7 +64,7 @@ public class GLTexture implements ITexture {
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
 	public GLTexture(final int texTarget, final int texUnit,
-		final int width, final int height, final int filter_param) {
+					 final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		mTextureTarget = texTarget;
 		mTextureUnit = texUnit;
@@ -82,13 +82,13 @@ public class GLTexture implements ITexture {
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
 		mTextureId = GLHelper.initTex(mTextureTarget, filter_param);
 		// テクスチャのメモリ領域を確保する
-		GLES20.glTexImage2D(mTextureTarget,
+		GLES30.glTexImage2D(mTextureTarget,
 			0,							// ミップマップレベル0(ミップマップしない)
-			GLES20.GL_RGBA,				// 内部フォーマット
+			GLES30.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
 			0,							// 境界幅
-			GLES20.GL_RGBA,				// 引き渡すデータのフォーマット
-			GLES20.GL_UNSIGNED_BYTE,	// データの型
+			GLES30.GL_RGBA,				// 引き渡すデータのフォーマット
+			GLES30.GL_UNSIGNED_BYTE,	// データの型
 			null);						// ピクセルデータ無し
 		// テクスチャ変換行列を初期化
 		Matrix.setIdentityM(mTexMatrix, 0);
@@ -125,8 +125,8 @@ public class GLTexture implements ITexture {
 	@Override
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
-		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
-		GLES20.glBindTexture(mTextureTarget, mTextureId);
+		GLES30.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
+		GLES30.glBindTexture(mTextureTarget, mTextureId);
 	}
 
 	/**
@@ -135,8 +135,8 @@ public class GLTexture implements ITexture {
 	@Override
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
-		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
-		GLES20.glBindTexture(mTextureTarget, 0);
+		GLES30.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
+		GLES30.glBindTexture(mTextureTarget, 0);
 	}
 
 	/**
