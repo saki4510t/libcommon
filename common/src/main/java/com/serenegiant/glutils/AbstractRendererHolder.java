@@ -865,8 +865,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					offer(REQUEST_RECREATE_MASTER_SURFACE);
 					return;
 				}
-				mParent.notifyCapture();
 				preprocess();
+				mParent.notifyCapture();
 				handleDrawClients();
 				mParent.callOnFrameAvailable();
 			}
