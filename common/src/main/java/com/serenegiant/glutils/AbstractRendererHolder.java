@@ -401,15 +401,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		Bitmap.CompressFormat result;
 		switch (captureFormat) {
-		case OUTPUT_FORMAT_JPEG:
-			result = Bitmap.CompressFormat.JPEG;
-			break;
 		case OUTPUT_FORMAT_PNG:
 			result = Bitmap.CompressFormat.PNG;
 			break;
 		case OUTPUT_FORMAT_WEBP:
 			result = Bitmap.CompressFormat.WEBP;
 			break;
+		case OUTPUT_FORMAT_JPEG:
 		default:
 			result = Bitmap.CompressFormat.JPEG;
 			break;
