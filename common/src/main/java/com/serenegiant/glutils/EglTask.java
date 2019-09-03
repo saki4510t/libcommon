@@ -35,7 +35,7 @@ public abstract class EglTask extends MessageTask {
 	public static final int EGL_FLAG_STENCIL_8BIT = 0x20;
 
 	private EGLBase mEgl = null;
-	private EGLBase.IEglSurface mEglHolder;
+	private EGLBase.IEglSurface mEglMasterSurface;
 
 	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
 		this(3, sharedContext, flags);
@@ -73,28 +73,28 @@ public abstract class EglTask extends MessageTask {
 			callOnError(new RuntimeException("failed to create EglCore"));
 			releaseSelf();
 		} else {
-			mEglHolder = mEgl.createOffscreen(1, 1);
-			mEglHolder.makeCurrent();
+			mEglMasterSurface = mEgl.createOffscreen(1, 1);
+			mEglMasterSurface.makeCurrent();
 		}
 	}
 
 	@Override
 	protected Request takeRequest() throws InterruptedException {
 		final Request result = super.takeRequest();
-		mEglHolder.makeCurrent();
+		mEglMasterSurface.makeCurrent();
 		return result;
 	}
 
 	@WorkerThread
 	@Override
 	protected void onBeforeStop() {
-		mEglHolder.makeCurrent();
+		mEglMasterSurface.makeCurrent();
 	}
 
 	@WorkerThread
 	@Override
 	protected void onRelease() {
-		mEglHolder.release();
+		mEglMasterSurface.release();
 		mEgl.release();
 	}
 
@@ -116,7 +116,7 @@ public abstract class EglTask extends MessageTask {
 	}
 
 	protected void makeCurrent() {
-		mEglHolder.makeCurrent();
+		mEglMasterSurface.makeCurrent();
 	}
 
 	protected boolean isGLES3() {
