@@ -23,6 +23,7 @@ import android.opengl.GLES20;
 /**
  * Created by saki on 16/08/26.
  * フラグメントシェーダーとかの文字列定数達を集める
+ * FIXME これはまだGLES20のみなのでGLES30用のを作る
  */
 public class ShaderConst {
 	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;
