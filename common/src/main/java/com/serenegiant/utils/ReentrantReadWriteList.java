@@ -248,6 +248,16 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		}
 	}
 
+	@Nullable
+	public V removeLast() {
+		mWriteLock.lock();
+		try {
+			return !mList.isEmpty() ? mList.remove(mList.size() - 1) : null;
+		} finally {
+			mWriteLock.unlock();
+		}
+	}
+
 	@Override
 	public boolean remove(final Object value) {
 		boolean result;
