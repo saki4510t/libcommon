@@ -451,12 +451,14 @@ public final class CameraGLView extends GLSurfaceView {
 		public void stopPreview(final boolean needWait) {
 			synchronized (this) {
 				sendEmptyMessage(MSG_PREVIEW_STOP);
-				if (needWait && (mThread != null) && mThread.mIsRunning) {
-					try {
-						if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
-						wait();
-					} catch (final InterruptedException e) {
-						// ignore
+				if (needWait) {
+					for (; (mThread != null) && mThread.mIsRunning ; ) {
+						try {
+							if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
+							wait(1000);
+						} catch (final InterruptedException e) {
+							// ignore
+						}
 					}
 				}
 			}
