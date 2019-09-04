@@ -130,6 +130,14 @@ public class MainActivity extends AppCompatActivity
 			}
 			fragment = CameraFragment.newInstance();
 			break;
+		case 2:
+			if (BuildCheck.isAndroid9()
+				&& !checkPermissionCamera()) {
+
+				return;
+			}
+			fragment = UsbFragment.newInstance();
+			break;
 		default:
 			break;
 		}
