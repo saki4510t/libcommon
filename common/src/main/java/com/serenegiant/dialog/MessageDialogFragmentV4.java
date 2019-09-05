@@ -166,7 +166,7 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
 
 		final Activity activity = requireActivity();
-		return new AlertDialog.Builder(activity/* FIXME themeResIdを指定する */)
+		return new AlertDialog.Builder(activity, getTheme())
 			.setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(id_title)
 			.setMessage(id_message)
