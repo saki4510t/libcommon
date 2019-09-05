@@ -205,7 +205,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		view.setColor(mCurrentColor);
 		view.setColorPickerListener(mColorPickerListener);
 		rootView.addView(view, params);
-		final AlertDialog dialog = new AlertDialog.Builder(activity)
+		final AlertDialog dialog = new AlertDialog.Builder(activity/* FIXME themeResIdを指定する */)
 			.setPositiveButton(R.string.color_picker_select, mOnClickListener)
 			.setNegativeButton(R.string.color_picker_cancel, mOnClickListener)
 			.setTitle(mTitleResId != 0 ? mTitleResId : R.string.color_picker_default_title)
