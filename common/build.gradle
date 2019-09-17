@@ -43,10 +43,10 @@ android {
 
 dependencies {
     api fileTree(dir: 'libs', include: ['*.jar'])
-	implementation "androidx.legacy:legacy-support-v4:${supportLibVersion}"
+	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
-	implementation "androidx.recyclerview:recyclerview:${supportLibVersion}"
-	implementation "androidx.preference:preference:${supportLibVersion}"
+	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
+	implementation "androidx.preference:preference:${androidXPreference}"
 	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 }
 
