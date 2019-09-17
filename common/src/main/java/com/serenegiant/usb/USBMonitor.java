@@ -100,9 +100,8 @@ public final class USBMonitor implements Const {
 		/**
 		 * パーミッション要求結果が返ってきた時
 		 * @param device
-		 * @param hasPermission
 		 */
-		public void onPermission(@NonNull final UsbDevice device, final boolean hasPermission);
+		public void onPermission(@NonNull final UsbDevice device);
 		/**
 		 * USB機器がopenされた時,
 		 * 4.xx.yyと異なりUsbControlBlock#cloneでも呼ばれる
@@ -451,7 +450,7 @@ public final class USBMonitor implements Const {
 			if (device != null) {
 				if (mUsbManager.hasPermission(device)) {
 					// 既にパーミッションが有れば接続する
-					processPermission(device);	// processConnect(device);
+					processPermission(device);
 				} else {
 					try {
 						// パーミッションがなければ要求する
@@ -523,7 +522,8 @@ public final class USBMonitor implements Const {
 				synchronized (USBMonitor.this) {
 					final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 					if ((device != null)
-						&& intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
+						&& (hasPermission(device)
+							|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
 						// パーミッションを取得できた時・・・デバイスとの通信の準備をする
 						processPermission(device);
 						return;
@@ -598,9 +598,8 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 */
 	private final void processPermission(@NonNull final UsbDevice device) {
-		final boolean hasPermission = hasPermission(device);
 		if (mOnDeviceConnectListener != null) {
-			mOnDeviceConnectListener.onPermission(device, hasPermission);
+			mOnDeviceConnectListener.onPermission(device);
 		}
 	}
 

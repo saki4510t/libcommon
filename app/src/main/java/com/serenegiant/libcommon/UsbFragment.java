@@ -123,7 +123,7 @@ public class UsbFragment extends BaseFragment {
 		}
 
 		@Override
-		public void onPermission(@NonNull final UsbDevice device, final boolean hasPermission) {
+		public void onPermission(@NonNull final UsbDevice device) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:");
 			// パーミッションを取得できた時
 		}
