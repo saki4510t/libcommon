@@ -543,8 +543,8 @@ public final class USBMonitor implements Const {
 				}
 			} else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
 				// デバイスが取り付けられた時の処理・・・SC-06DはこのActionが来ない.ACTION_USB_DEVICE_DETACHEDは来る
-				// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからないので、addActionはせずに
-				// マニュフェストにintent filterを追加＆ポーリングでデバイス接続を確認するように変更
+				// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからない
+				// Android5以降なら大丈夫そう
 				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 				processAttach(device);
 			} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
