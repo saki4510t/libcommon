@@ -71,20 +71,6 @@ public final class USBMonitor implements Const {
 	private static final String ACTION_USB_PERMISSION_BASE = "com.serenegiant.USB_PERMISSION.";
 	private final String ACTION_USB_PERMISSION = ACTION_USB_PERMISSION_BASE + hashCode();
 
-	private  final ConcurrentHashMap<UsbDevice, UsbDeviceState>
-		mDeviceStates = new ConcurrentHashMap<>();
-
-	private final WeakReference<Context> mWeakContext;
-	private final UsbManager mUsbManager;
-	private final OnDeviceConnectListener mOnDeviceConnectListener;
-	private PendingIntent mPermissionIntent = null;
-	private List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
-
-	/**
-	 * コールバックをワーカースレッドで呼び出すためのハンドラー
-	 */
-	private final Handler mAsyncHandler;
-	private volatile boolean destroyed;
 	/**
 	 * USB機器の状態変更時のコールバックリスナー
 	 */
@@ -130,6 +116,21 @@ public final class USBMonitor implements Const {
 		 */
 		public void onError(final UsbDevice device, final Throwable t);
 	}
+
+	private  final ConcurrentHashMap<UsbDevice, UsbDeviceState>
+		mDeviceStates = new ConcurrentHashMap<>();
+
+	private final WeakReference<Context> mWeakContext;
+	private final UsbManager mUsbManager;
+	private final OnDeviceConnectListener mOnDeviceConnectListener;
+	private PendingIntent mPermissionIntent = null;
+	private List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
+
+	/**
+	 * コールバックをワーカースレッドで呼び出すためのハンドラー
+	 */
+	private final Handler mAsyncHandler;
+	private volatile boolean destroyed;
 
 	public USBMonitor(@NonNull final Context context,
 		@NonNull final OnDeviceConnectListener listener) {
