@@ -692,7 +692,7 @@ public final class USBMonitor implements Const {
 	 * @return
 	 */
 	public static String getDeviceKeyNameWithSerial(final Context context, final UsbDevice device) {
-		final USBMonitor.UsbDeviceInfo info = getDeviceInfo(context, device);
+		final UsbDeviceInfo info = getDeviceInfo(context, device);
 		return UsbUtils.getDeviceKeyName(device, true, info.serial, info.manufacturer, info.configCounts, info.version);
 	}
 
