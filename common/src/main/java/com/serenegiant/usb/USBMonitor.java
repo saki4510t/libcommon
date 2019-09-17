@@ -56,6 +56,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * FIXME USB機器のモニター機能とパーミッション要求/open/close等を分割する
+ */
 public final class USBMonitor implements Const {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
