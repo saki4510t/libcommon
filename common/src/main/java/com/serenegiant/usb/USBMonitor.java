@@ -318,6 +318,7 @@ public final class USBMonitor implements Const {
 	 * 設定してあるDeviceFilterに合うデバイスのリストを取得。合うのが無ければ空Listを返す(nullは返さない)
 	 * @return
 	 */
+	@NonNull
 	public List<UsbDevice> getDeviceList() {
 		return getDeviceList(mDeviceFilters);
 	}
@@ -327,6 +328,7 @@ public final class USBMonitor implements Const {
 	 * @param filters nullならフィルターしない
 	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
 	 */
+	@NonNull
 	public List<UsbDevice> getDeviceList(final List<DeviceFilter> filters) {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
 		if (destroyed) return result;
@@ -357,6 +359,7 @@ public final class USBMonitor implements Const {
 	 * @param filter nullならフィルターしない
 	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
 	 */
+	@NonNull
 	public List<UsbDevice> getDeviceList(final DeviceFilter filter) {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
 		if (destroyed) return result;
@@ -375,6 +378,7 @@ public final class USBMonitor implements Const {
 	 * デバイスリストを取得(フィルター無し)
 	 * @return
 	 */
+	@Nullable
 	public Iterator<UsbDevice> getDevices() {
 		if (destroyed) return null;
 		Iterator<UsbDevice> iterator = null;
@@ -961,6 +965,7 @@ public final class USBMonitor implements Const {
 		 * @throws CloneNotSupportedException
 		 */
 		@SuppressWarnings("CloneDoesntCallSuperClone")
+		@NonNull
 		@Override
 		public UsbControlBlock clone() throws CloneNotSupportedException {
 			final UsbControlBlock ctrlblock;
