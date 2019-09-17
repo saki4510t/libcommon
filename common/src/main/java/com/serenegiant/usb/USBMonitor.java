@@ -1400,12 +1400,6 @@ public final class USBMonitor implements Const {
 			return super.equals(o);
 		}
 
-//		@Override
-//		protected void finalize() throws Throwable {
-///			close();
-//			super.finalize();
-//		}
-
 		private synchronized void checkConnection() throws IllegalStateException {
 			if (mConnection == null) {
 				throw new IllegalStateException("already closed");
@@ -1413,36 +1407,4 @@ public final class USBMonitor implements Const {
 		}
 	}
 
-//	private void requestPermissionDialog(final Context context, final UsbDevice device, final String packageName, PendingIntent pi) {
-//		final int uid = Binder.getCallingUid();
-//
-//		// compare uid with packageName to foil apps pretending to be someone else
-//		try {
-//			final ApplicationInfo aInfo = context.getPackageManager().getApplicationInfo(packageName, 0);
-//			if (aInfo.uid != uid) {
-//				throw new IllegalArgumentException("package " + packageName +
-//					" does not match caller's uid " + uid);
-//			}
-//		} catch (PackageManager.NameNotFoundException e) {
-//			throw new IllegalArgumentException("package " + packageName + " not found");
-//		}
-//
-//		final long identity = Binder.clearCallingIdentity();
-//		final Intent intent = new Intent();
-//		intent.setClassName("com.android.systemui",
-//          "com.android.systemui.usb.UsbPermissionActivity");
-//		intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//		intent.putExtra(Intent.EXTRA_INTENT, pi);
-//		intent.putExtra("package", packageName);
-//		intent.putExtra(Intent.EXTRA_UID, uid);
-//		intent.putExtra(UsbManager.EXTRA_DEVICE, device);
-//		try {
-//			// システムアプリにしてandroid.permission.MANAGE_USBパーミッションが無いと呼び出せない
-//			context.startActivity(intent);
-//		} catch (ActivityNotFoundException e) {
-//			Log.e(TAG, "unable to start UsbPermissionActivity");
-//		} finally {
-//			Binder.restoreCallingIdentity(identity);
-//		}
-//	}
 }
