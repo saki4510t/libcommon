@@ -117,14 +117,16 @@ public final class USBMonitor implements Const {
 		public void onError(final UsbDevice device, final Throwable t);
 	}
 
+	/** USB機器の接続状態を保持 */
 	private  final ConcurrentHashMap<UsbDevice, UsbDeviceState>
 		mDeviceStates = new ConcurrentHashMap<>();
 
 	private final WeakReference<Context> mWeakContext;
 	private final UsbManager mUsbManager;
+	@NonNull
 	private final OnDeviceConnectListener mOnDeviceConnectListener;
 	private PendingIntent mPermissionIntent = null;
-	private List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
+	private final List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
 
 	/**
 	 * コールバックをワーカースレッドで呼び出すためのハンドラー
@@ -132,8 +134,14 @@ public final class USBMonitor implements Const {
 	private final Handler mAsyncHandler;
 	private volatile boolean destroyed;
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param listener
+	 */
 	public USBMonitor(@NonNull final Context context,
 		@NonNull final OnDeviceConnectListener listener) {
+
 		if (DEBUG) Log.v(TAG, "USBMonitor:コンストラクタ");
 		mWeakContext = new WeakReference<Context>(context);
 		mUsbManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
@@ -321,7 +329,28 @@ public final class USBMonitor implements Const {
 	 */
 	@NonNull
 	public List<UsbDevice> getDeviceList() {
-		return getDeviceList(mDeviceFilters);
+		final List<UsbDevice> result = new ArrayList<UsbDevice>();
+		if (destroyed) return result;
+		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
+		if (deviceList != null) {
+			if (mDeviceFilters.isEmpty()) {
+				result.addAll(deviceList.values());
+			} else {
+				for (final UsbDevice device: deviceList.values() ) {
+					for (final DeviceFilter filter: mDeviceFilters) {
+						if ((filter != null) && filter.matches(device)) {
+							// フィルタにマッチした時
+							if (!filter.isExclude) {
+								// excludeで無い時のみ追加する
+								result.add(device);
+							}
+							break;
+						}
+					}
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
@@ -329,6 +358,7 @@ public final class USBMonitor implements Const {
 	 * @param filters nullならフィルターしない
 	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
 	 */
+	@Deprecated
 	@NonNull
 	public List<UsbDevice> getDeviceList(final List<DeviceFilter> filters) {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
@@ -360,6 +390,7 @@ public final class USBMonitor implements Const {
 	 * @param filter nullならフィルターしない
 	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
 	 */
+	@Deprecated
 	@NonNull
 	public List<UsbDevice> getDeviceList(final DeviceFilter filter) {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
@@ -379,6 +410,7 @@ public final class USBMonitor implements Const {
 	 * デバイスリストを取得(フィルター無し)
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public Iterator<UsbDevice> getDevices() {
 		if (destroyed) return null;
@@ -500,7 +532,7 @@ public final class USBMonitor implements Const {
 			mDeviceStates.put(device, state);
 			return state.mCtrlBlock;
 		} else {
-			throw new IOException("has no permission");
+			throw new IOException("has no permission or invalid UsbDevice(already disconnected?)");
 		}
 	}
 	
@@ -597,7 +629,7 @@ public final class USBMonitor implements Const {
 				}
 			}
 			final int n = mChanged.size();
-			if ((mOnDeviceConnectListener != null) && (n > 0)) {
+			if (n > 0) {
 				for (int i = 0; i < n; i++) {
 					final UsbDevice device = mChanged.get(i);
 					mAsyncHandler.post(new Runnable() {
@@ -617,9 +649,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 */
 	private final void processPermission(@NonNull final UsbDevice device) {
-		if (mOnDeviceConnectListener != null) {
-			mOnDeviceConnectListener.onPermission(device);
-		}
+		mOnDeviceConnectListener.onPermission(device);
 	}
 
 	/**
@@ -637,56 +667,64 @@ public final class USBMonitor implements Const {
 				public void run() {
 //					if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
 					final boolean createNew;
-					if (mOnDeviceConnectListener != null) {
-						mOnDeviceConnectListener.onConnected(device, ctrlBlock);
-					}
+					mOnDeviceConnectListener.onConnected(device, ctrlBlock);
 				}
 			});
 		}
 	}
 
+	/**
+	 * ユーザーキャンセル等でパーミッションを取得できなかったときの処理
+	 * @param device
+	 */
 	private final void processCancel(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processCancel:");
 		updatePermission(device, false);
-		if (mOnDeviceConnectListener != null) {
-			mAsyncHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mOnDeviceConnectListener.onCancel(device);
-				}
-			});
-		}
+		mAsyncHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				mOnDeviceConnectListener.onCancel(device);
+			}
+		});
 	}
 
+	/**
+	 * 端末にUSB機器が接続されたときの処理
+	 * @param device
+	 */
 	private final void processAttach(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processAttach:");
 		hasPermission(device);
-		if (mOnDeviceConnectListener != null) {
-			mAsyncHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mOnDeviceConnectListener.onAttach(device);
-				}
-			});
-		}
+		mAsyncHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				mOnDeviceConnectListener.onAttach(device);
+			}
+		});
 	}
 
+	/**
+	 * 端末からUSB機器が取り外されたときの処理
+	 * @param device
+	 */
 	private final void processDettach(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processDettach:");
 		updatePermission(device, false);
-		if (mOnDeviceConnectListener != null) {
-			mAsyncHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mOnDeviceConnectListener.onDetach(device);
-				}
-			});
-		}
+		mAsyncHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				mOnDeviceConnectListener.onDetach(device);
+			}
+		});
 	}
 
+	/**
+	 * USB機器との接続がcloseされたときの処理
+	 * @param device
+	 */
 	private void callOnDisconnect(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "callOnDisconnect:");
@@ -694,28 +732,29 @@ public final class USBMonitor implements Const {
 		if (state != null) {
 			state.mCtrlBlock = null;
 		}
-		if (mOnDeviceConnectListener != null) {
-			mAsyncHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mOnDeviceConnectListener.onDisconnect(device);
-				}
-			});
-		}
+		mAsyncHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				mOnDeviceConnectListener.onDisconnect(device);
+			}
+		});
 	}
 
+	/**
+	 * エラーコールバック呼び出し処理
+	 * @param device
+	 * @param t
+	 */
 	private void callOnError(@NonNull final UsbDevice device,
 		@NonNull final Throwable t) {
 
 		if (DEBUG) Log.v(TAG, "callOnError:");
-		if (mOnDeviceConnectListener != null) {
-			mAsyncHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					mOnDeviceConnectListener.onError(device, t);
-				}
-			});
-		}
+		mAsyncHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				mOnDeviceConnectListener.onError(device, t);
+			}
+		});
 	}
 
 	/**
@@ -740,6 +779,9 @@ public final class USBMonitor implements Const {
 		return getDeviceKeyNameWithSerial(context, device).hashCode();
 	}
 
+	/**
+	 * 機器情報保持のためのヘルパークラス
+	 */
 	public static class UsbDeviceInfo {
 		/** 機器が対応しているUSB規格 */
 		public String usb_version;
@@ -780,7 +822,9 @@ public final class USBMonitor implements Const {
 	 * @param languages
 	 * @return
 	 */
-	private static String getString(final UsbDeviceConnection connection, final int id, final int languageCount, final byte[] languages) {
+	private static String getString(@NonNull final UsbDeviceConnection connection,
+		final int id, final int languageCount, final byte[] languages) {
+
 		final byte[] work = new byte[256];
 		String result = null;
 		for (int i = 1; i <= languageCount; i++) {
@@ -821,7 +865,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 * @return
 	 */
-	public static UsbDeviceInfo getDeviceInfo(final Context context, final UsbDevice device) {
+	public static UsbDeviceInfo getDeviceInfo(@NonNull final Context context, final UsbDevice device) {
 		return updateDeviceInfo((UsbManager)context.getSystemService(Context.USB_SERVICE), device, new UsbDeviceInfo());
 	}
 
@@ -833,7 +877,9 @@ public final class USBMonitor implements Const {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static UsbDeviceInfo updateDeviceInfo(final UsbManager manager, final UsbDevice device, final UsbDeviceInfo _info) {
+	public static UsbDeviceInfo updateDeviceInfo(@Nullable final UsbManager manager,
+		final UsbDevice device, final UsbDeviceInfo _info) {
+
 		final UsbDeviceInfo info = _info != null ? _info : new UsbDeviceInfo();
 		info.clear();
 
@@ -1451,6 +1497,9 @@ public final class USBMonitor implements Const {
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface UsbConnectionState {}
 
+	/**
+	 * USB機器の接続状態を保持するためのクラス
+	 */
 	private static class UsbDeviceState {
 		@NonNull
 		private final UsbDevice mDevice;
