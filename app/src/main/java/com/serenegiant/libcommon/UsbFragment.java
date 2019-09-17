@@ -135,8 +135,7 @@ public class UsbFragment extends BaseFragment {
 		}
 
 		@Override
-		public void onDisconnect(@NonNull final UsbDevice device,
-			final USBMonitor.UsbControlBlock ctrlBlock) {
+		public void onDisconnect(@NonNull final UsbDevice device) {
 
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDisconnect:");
 			// USB機器がcloseした時

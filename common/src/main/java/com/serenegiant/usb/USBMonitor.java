@@ -115,10 +115,8 @@ public final class USBMonitor implements Const {
 		 * open中のUSB機器が取り外されたか電源が切られた時
 		 * デバイスは既にclose済み(2015/01/06呼び出すタイミングをclose前からclose後に変更)
 		 * @param device
-		 * @param ctrlBlock
 		 */
-		public void onDisconnect(@NonNull final UsbDevice device,
-			final UsbControlBlock ctrlBlock);
+		public void onDisconnect(@NonNull final UsbDevice device);
 		/**
 		 * キャンセルまたはユーザーからパーミッションを得られなかった時
 		 * @param device
@@ -1380,7 +1378,7 @@ public final class USBMonitor implements Const {
 				final USBMonitor monitor = mWeakMonitor.get();
 				if (monitor != null) {
 					if (monitor.mOnDeviceConnectListener != null) {
-						monitor.mOnDeviceConnectListener.onDisconnect(mWeakDevice.get(), UsbControlBlock.this);
+						monitor.mOnDeviceConnectListener.onDisconnect(getDevice());
 					}
 					monitor.mCtrlBlocks.remove(getDevice());	// 2014/09/22 追加 mCtrlBlocksから削除する
 				}
