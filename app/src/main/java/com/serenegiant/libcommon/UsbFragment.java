@@ -92,7 +92,7 @@ public class UsbFragment extends BaseFragment {
 		if (DEBUG) Log.v(TAG, "onDestroy:");
 		try {
 			if ((mUSBMonitor != null) && mUSBMonitor.isRegistered()) {
-				if (DEBUG) Log.v(TAG, "onCreate:unregister USBMonitor");
+				if (DEBUG) Log.v(TAG, "onDestroy:unregister USBMonitor");
 				mUSBMonitor.unregister();
 			}
 		} catch (final Exception e) {
