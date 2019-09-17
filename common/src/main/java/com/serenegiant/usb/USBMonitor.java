@@ -44,8 +44,6 @@ import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -56,7 +54,6 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -455,7 +452,7 @@ public final class USBMonitor implements Const {
 	 */
 	public final boolean hasPermission(final UsbDevice device) {
 		return !destroyed
-			&& updatePermission(device, device != null && mUsbManager.hasPermission(device));
+			&& updateDeviceState(device, device != null && mUsbManager.hasPermission(device));
 	}
 
 	/**
@@ -464,15 +461,10 @@ public final class USBMonitor implements Const {
 	 * @param hasPermission
 	 * @return hasPermission
 	 */
-	private boolean updatePermission(final UsbDevice device, final boolean hasPermission) {
-		if (DEBUG) Log.v(TAG, "updatePermission:");
+	private boolean updateDeviceState(final UsbDevice device, final boolean hasPermission) {
+		if (DEBUG) Log.v(TAG, "updateDeviceState:");
 		if (device != null) {
-			UsbDeviceState state = mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
-			if (state == null) {
-				state = new UsbDeviceState(device);
-			}
-			state.setState(hasPermission ? USB_CONNECTION_STATE_HAS_PERMISSION : USB_CONNECTION_STATE_ATTACHED);
-			mDeviceStates.put(device, state);
+			requireDeviceState(device);
 		}
 		return hasPermission;
 	}
@@ -522,14 +514,10 @@ public final class USBMonitor implements Const {
 	public UsbControlBlock openDevice(final UsbDevice device) throws IOException {
 		if (DEBUG) Log.v(TAG, "openDevice:device=" + device);
 		if (hasPermission(device)) {
-			UsbDeviceState state = mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
-			if (state == null) {
-				state = new UsbDeviceState(device);
-			}
+			final UsbDeviceState state = requireDeviceState(device);
 			if (state.mCtrlBlock == null) {
 				state.mCtrlBlock = new UsbControlBlock(USBMonitor.this, device);    // この中でopenDeviceする
 			}
-			mDeviceStates.put(device, state);
 			return state.mCtrlBlock;
 		} else {
 			throw new IOException("has no permission or invalid UsbDevice(already disconnected?)");
@@ -680,7 +668,7 @@ public final class USBMonitor implements Const {
 	private final void processCancel(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processCancel:");
-		updatePermission(device, false);
+		updateDeviceState(device, false);
 		mAsyncHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -712,7 +700,7 @@ public final class USBMonitor implements Const {
 	private final void processDettach(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processDettach:");
-		updatePermission(device, false);
+		updateDeviceState(device, false);
 		mAsyncHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -728,7 +716,7 @@ public final class USBMonitor implements Const {
 	private void callOnDisconnect(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "callOnDisconnect:");
-		final UsbDeviceState state = mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
+		final UsbDeviceState state = getDeviceState(device);
 		if (state != null) {
 			state.mCtrlBlock = null;
 		}
@@ -1485,17 +1473,21 @@ public final class USBMonitor implements Const {
 		}
 	}
 
-	private static final int USB_CONNECTION_STATE_ATTACHED = 0;
-	private static final int USB_CONNECTION_STATE_HAS_PERMISSION = 1;
-	private static final int USB_CONNECTION_STATE_CONNECTED = 2;
+	@Nullable
+	private UsbDeviceState getDeviceState(@Nullable final UsbDevice device) {
+		return mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
+	}
 
-	@IntDef({
-		USB_CONNECTION_STATE_ATTACHED,
-		USB_CONNECTION_STATE_HAS_PERMISSION,
-		USB_CONNECTION_STATE_CONNECTED,
-	})
-	@Retention(RetentionPolicy.SOURCE)
-	public @interface UsbConnectionState {}
+	@NonNull
+	private UsbDeviceState requireDeviceState(@NonNull final UsbDevice device) {
+		UsbDeviceState state = mDeviceStates.containsKey(device)
+			? mDeviceStates.get(device) : null;
+		if (state == null) {
+			state = new UsbDeviceState(device);
+			mDeviceStates.put(device, state);
+		}
+		return state;
+	}
 
 	/**
 	 * USB機器の接続状態を保持するためのクラス
@@ -1503,15 +1495,10 @@ public final class USBMonitor implements Const {
 	private static class UsbDeviceState {
 		@NonNull
 		private final UsbDevice mDevice;
-		private int mState = USB_CONNECTION_STATE_ATTACHED;
 		private UsbControlBlock mCtrlBlock;
 
 		private UsbDeviceState(@NonNull final UsbDevice device) {
 			mDevice = device;
-		}
-
-		private void setState(@UsbConnectionState final int state) {
-			mState = state;
 		}
 
 		@NonNull
@@ -1524,7 +1511,6 @@ public final class USBMonitor implements Const {
 				mCtrlBlock.close();
 				mCtrlBlock = null;
 			}
-			mState = USB_CONNECTION_STATE_HAS_PERMISSION;
 		}
 
 		private boolean isOpened() {
