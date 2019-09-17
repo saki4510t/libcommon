@@ -61,7 +61,7 @@ import androidx.annotation.Nullable;
  */
 public final class USBMonitor implements Const {
 
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = "USBMonitor";
 
 	private static final String ACTION_USB_PERMISSION_BASE = "com.serenegiant.USB_PERMISSION.";
@@ -134,13 +134,13 @@ public final class USBMonitor implements Const {
 
 	public USBMonitor(@NonNull final Context context,
 		@NonNull final OnDeviceConnectListener listener) {
-//		if (DEBUG) Log.v(TAG, "USBMonitor:コンストラクタ");
+		if (DEBUG) Log.v(TAG, "USBMonitor:コンストラクタ");
 		mWeakContext = new WeakReference<Context>(context);
 		mUsbManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
 		mOnDeviceConnectListener = listener;
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		destroyed = false;
-//		if (DEBUG) Log.v(TAG, "USBMonitor:mUsbManager=" + mUsbManager);
+		if (DEBUG) Log.v(TAG, "USBMonitor:mUsbManager=" + mUsbManager);
 	}
 
 	/**
@@ -148,7 +148,7 @@ public final class USBMonitor implements Const {
 	 * 一旦destroyを呼ぶと再利用は出来ない
 	 */
 	public void destroy() {
-//		if (DEBUG) Log.i(TAG, "destroy:");
+		if (DEBUG) Log.i(TAG, "destroy:");
 		unregister();
 		if (!destroyed) {
 			destroyed = true;
@@ -184,7 +184,7 @@ public final class USBMonitor implements Const {
 	public synchronized void register() throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		if (mPermissionIntent == null) {
-//			if (DEBUG) Log.i(TAG, "register:");
+			if (DEBUG) Log.i(TAG, "register:");
 			final Context context = mWeakContext.get();
 			if (context != null) {
 				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
@@ -212,7 +212,7 @@ public final class USBMonitor implements Const {
 			mAsyncHandler.removeCallbacksAndMessages(null);
 		}
 		if (mPermissionIntent != null) {
-//			if (DEBUG) Log.i(TAG, "unregister:");
+			if (DEBUG) Log.i(TAG, "unregister:");
 			final Context context = mWeakContext.get();
 			try {
 				if (context != null) {
@@ -451,7 +451,7 @@ public final class USBMonitor implements Const {
 	 * @return パーミッション要求が失敗したらtrueを返す
 	 */
 	public synchronized boolean requestPermission(final UsbDevice device) {
-//		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
 		boolean result = false;
 		if (isRegistered()) {
 			if (device != null) {
@@ -488,6 +488,7 @@ public final class USBMonitor implements Const {
 	 * @throws SecurityException パーミッションがなければSecurityExceptionを投げる
 	 */
 	public UsbControlBlock openDevice(final UsbDevice device) throws IOException {
+		if (DEBUG) Log.v(TAG, "openDevice:device=" + device);
 		if (hasPermission(device)) {
 			UsbControlBlock result = mCtrlBlocks.get(device);
 			if (result == null) {
@@ -618,7 +619,7 @@ public final class USBMonitor implements Const {
 		@NonNull final UsbControlBlock ctrlBlock) {
 
 		if (destroyed) return;
-//		if (DEBUG) Log.v(TAG, "processConnect:");
+		if (DEBUG) Log.v(TAG, "processConnect:");
 		if (hasPermission(device)) {
 			mAsyncHandler.post(new Runnable() {
 				@Override
@@ -635,7 +636,7 @@ public final class USBMonitor implements Const {
 
 	private final void processCancel(final UsbDevice device) {
 		if (destroyed) return;
-//		if (DEBUG) Log.v(TAG, "processCancel:");
+		if (DEBUG) Log.v(TAG, "processCancel:");
 		updatePermission(device, false);
 		if (mOnDeviceConnectListener != null) {
 			mAsyncHandler.post(new Runnable() {
@@ -649,7 +650,7 @@ public final class USBMonitor implements Const {
 
 	private final void processAttach(final UsbDevice device) {
 		if (destroyed) return;
-//		if (DEBUG) Log.v(TAG, "processAttach:");
+		if (DEBUG) Log.v(TAG, "processAttach:");
 		hasPermission(device);
 		if (mOnDeviceConnectListener != null) {
 			mAsyncHandler.post(new Runnable() {
@@ -663,7 +664,7 @@ public final class USBMonitor implements Const {
 
 	private final void processDettach(final UsbDevice device) {
 		if (destroyed) return;
-//		if (DEBUG) Log.v(TAG, "processDettach:");
+		if (DEBUG) Log.v(TAG, "processDettach:");
 		updatePermission(device, false);
 		if (mOnDeviceConnectListener != null) {
 			mAsyncHandler.post(new Runnable() {
@@ -678,6 +679,7 @@ public final class USBMonitor implements Const {
 	private void callOnError(@NonNull final UsbDevice device,
 		@NonNull final Throwable t) {
 
+		if (DEBUG) Log.v(TAG, "callOnError:");
 		if (mOnDeviceConnectListener != null) {
 			mAsyncHandler.post(new Runnable() {
 				@Override
@@ -1362,7 +1364,7 @@ public final class USBMonitor implements Const {
 		 * Java内でインターフェースをopenして使う時は開いているインターフェースも閉じる
 		 */
 		public synchronized void close() {
-//			if (DEBUG) Log.i(TAG, "UsbControlBlock#close:");
+			if (DEBUG) Log.i(TAG, "UsbControlBlock#close:");
 
 			if (mConnection != null) {
 				// 2015/01/06 closeしてからonDisconnectを呼び出すように変更
