@@ -48,7 +48,6 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
@@ -348,74 +347,6 @@ public final class USBMonitor implements Const {
 			}
 		}
 		return result;
-	}
-
-	/**
-	 * 指定したDeviceFilterに合うデバイスのリストを取得
-	 * @param filters nullならフィルターしない
-	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
-	 */
-	@Deprecated
-	@NonNull
-	public List<UsbDevice> getDeviceList(final List<DeviceFilter> filters) {
-		final List<UsbDevice> result = new ArrayList<UsbDevice>();
-		if (destroyed) return result;
-		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
-		if (deviceList != null) {
-			if ((filters == null) || filters.isEmpty()) {
-				result.addAll(deviceList.values());
-			} else {
-				for (final UsbDevice device: deviceList.values() ) {
-					for (final DeviceFilter filter: filters) {
-						if ((filter != null) && filter.matches(device)) {
-							// フィルタにマッチした時
-							if (!filter.isExclude) {
-								// excludeで無い時のみ追加する
-								result.add(device);
-							}
-							break;
-						}
-					}
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * 指定したDeviceFilterに合うデバイスのリストを取得
-	 * @param filter nullならフィルターしない
-	 * @return 合うデバイスが無ければ空のListを返す(nullは返さない)
-	 */
-	@Deprecated
-	@NonNull
-	public List<UsbDevice> getDeviceList(final DeviceFilter filter) {
-		final List<UsbDevice> result = new ArrayList<UsbDevice>();
-		if (destroyed) return result;
-		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
-		if (deviceList != null) {
-			for (final UsbDevice device: deviceList.values() ) {
-				if ((filter == null) || (filter.matches(device) && !filter.isExclude)) {
-					result.add(device);
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * デバイスリストを取得(フィルター無し)
-	 * @return
-	 */
-	@Deprecated
-	@Nullable
-	public Iterator<UsbDevice> getDevices() {
-		if (destroyed) return null;
-		Iterator<UsbDevice> iterator = null;
-		final HashMap<String, UsbDevice> list = mUsbManager.getDeviceList();
-		if (list != null)
-			iterator = list.values().iterator();
-		return iterator;
 	}
 
 	/**
@@ -968,8 +899,6 @@ public final class USBMonitor implements Const {
 		private final WeakReference<UsbDevice> mWeakDevice;
 		protected UsbDeviceConnection mConnection;
 		protected final UsbDeviceInfo mInfo;
-		private final int mBusNum;
-		private final int mDevNum;
 		private final SparseArray<SparseArray<UsbInterface>> mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
 
 		/**
@@ -992,21 +921,21 @@ public final class USBMonitor implements Const {
 			}
 			mInfo = updateDeviceInfo(monitor.mUsbManager, device, null);
 			final String name = device.getDeviceName();
-			final String[] v = !TextUtils.isEmpty(name) ? name.split("/") : null;
-			int busnum = 0;
-			int devnum = 0;
-			if (v != null) {
-				busnum = Integer.parseInt(v[v.length-2]);
-				devnum = Integer.parseInt(v[v.length-1]);
-			}
-			mBusNum = busnum;
-			mDevNum = devnum;
+//			final String[] v = !TextUtils.isEmpty(name) ? name.split("/") : null;
+//			int busnum = 0;
+//			int devnum = 0;
+//			if (v != null) {
+//				busnum = Integer.parseInt(v[v.length-2]);
+//				devnum = Integer.parseInt(v[v.length-1]);
+//			}
+///			mBusNum = busnum;
+//			mDevNum = devnum;
 			if (mConnection != null) {
 //				if (DEBUG) {
 					final int desc = mConnection.getFileDescriptor();
 					final byte[] rawDesc = mConnection.getRawDescriptors();
 					Log.i(TAG, String.format(Locale.US,
-						"name=%s,desc=%d,busnum=%d,devnum=%d,rawDesc=", name, desc, busnum, devnum)
+						"name=%s,desc=%d,rawDesc=", name, desc)
 							+ BufferHelper.toHexString(rawDesc, 0, 16));
 //				}
 			} else {
@@ -1033,8 +962,6 @@ public final class USBMonitor implements Const {
 			mInfo = updateDeviceInfo(monitor.mUsbManager, device, null);
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
 			mWeakDevice = new WeakReference<UsbDevice>(device);
-			mBusNum = src.mBusNum;
-			mDevNum = src.mDevNum;
 			// FIXME USBMonitor.mCtrlBlocksに追加する(今はHashMapなので追加すると置き換わってしまうのでだめ, ListかHashMapにListをぶら下げる?)
 			monitor.processConnect(device, this);
 		}
@@ -1267,16 +1194,6 @@ public final class USBMonitor implements Const {
 		 */
 		public String getSerial() {
 			return mInfo.serial;
-		}
-
-		@Deprecated
-		public int getBusNum() {
-			return mBusNum;
-		}
-
-		@Deprecated
-		public int getDevNum() {
-			return mDevNum;
 		}
 
 		/**
