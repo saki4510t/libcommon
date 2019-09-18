@@ -419,6 +419,24 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
+	 * 指定したデバイス名に対応するUsbDeviceを取得する
+	 * @param name　UsbDevice#getDeviceNameで取得できる値
+	 * @return 見つからなければnull
+	 */
+	@Nullable
+	public UsbDevice findDevice(final String name) {
+		UsbDevice result = null;
+		final List<UsbDevice> devices = getDeviceList();
+		for (final UsbDevice device: devices) {
+			if (device.getDeviceName().equals(name)) {
+				result = device;
+				break;
+			}
+		}
+		return result;
+	}
+
+	/**
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 */
 	public final void dumpDevices() {
