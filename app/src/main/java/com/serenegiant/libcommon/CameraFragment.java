@@ -41,21 +41,25 @@ public class CameraFragment extends AbstractCameraFragment {
 
 	@Override
 	protected boolean isRecording() {
+		// FIXME 未実装
 		return false;
 	}
 
 	@Override
 	protected void internalStartRecording() {
 		if (DEBUG) Log.v(TAG, "internalStartRecording:");
+		// FIXME 未実装
 	}
 
 	@Override
 	protected void internalStopRecording() {
 		if (DEBUG) Log.v(TAG, "internalStopRecording:");
+		// FIXME 未実装
 	}
 
 	@Override
 	protected void onFrameAvailable() {
+		// FIXME 未実装
 	}
 
 }
