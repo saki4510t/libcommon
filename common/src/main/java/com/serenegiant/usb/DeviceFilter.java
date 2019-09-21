@@ -32,6 +32,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbInterface;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -51,7 +53,7 @@ import androidx.annotation.XmlRes;
 
 import static com.serenegiant.utils.XmlHelper.getAttribute;
 
-public final class DeviceFilter {
+public final class DeviceFilter implements Parcelable {
 
 	private static final String TAG = "DeviceFilter";
 
@@ -161,6 +163,21 @@ public final class DeviceFilter {
 		this.isExclude = isExclude;
 /*		Log.i(TAG, String.format("vendorId=0x%04x,productId=0x%04x,class=0x%02x,subclass=0x%02x,protocol=0x%02x",
 			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
+	}
+
+	protected DeviceFilter(final Parcel in) {
+		mVendorId = in.readInt();
+		mProductId = in.readInt();
+		mClass = in.readInt();
+		mSubclass = in.readInt();
+		mIntfClass = in.createIntArray();
+		mIntfSubClass = in.createIntArray();
+		mIntfProtocol = in.createIntArray();
+		mProtocol = in.readInt();
+		mManufacturerName = in.readString();
+		mProductName = in.readString();
+		mSerialNumber = in.readString();
+		isExclude = in.readByte() != 0;
 	}
 
 	/**
@@ -525,5 +542,38 @@ public final class DeviceFilter {
 			+ ",isExclude=" + isExclude
 			+ "]";
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeInt(mVendorId);
+		dest.writeInt(mProductId);
+		dest.writeInt(mClass);
+		dest.writeInt(mSubclass);
+		dest.writeIntArray(mIntfClass);
+		dest.writeIntArray(mIntfSubClass);
+		dest.writeIntArray(mIntfProtocol);
+		dest.writeInt(mProtocol);
+		dest.writeString(mManufacturerName);
+		dest.writeString(mProductName);
+		dest.writeString(mSerialNumber);
+		dest.writeByte((byte) (isExclude ? 1 : 0));
+	}
+
+	public static final Creator<DeviceFilter> CREATOR = new Creator<DeviceFilter>() {
+		@Override
+		public DeviceFilter createFromParcel(Parcel in) {
+			return new DeviceFilter(in);
+		}
+
+		@Override
+		public DeviceFilter[] newArray(int size) {
+			return new DeviceFilter[size];
+		}
+	};
 
 }
