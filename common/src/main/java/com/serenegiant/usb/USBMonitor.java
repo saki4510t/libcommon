@@ -367,6 +367,21 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
+	 * 接続中のUSB機器に対してattachイベントを再生成させる
+	 */
+	public void refreshDevices() {
+		final List<UsbDevice> devices = getDeviceList();
+		for (final UsbDevice device: devices) {
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mOnDeviceConnectListener.onAttach(device);
+				}
+			});
+		}
+	}
+
+	/**
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 */
 	public final void dumpDevices() {
