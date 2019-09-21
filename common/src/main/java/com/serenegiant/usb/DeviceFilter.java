@@ -67,12 +67,12 @@ public final class DeviceFilter implements Parcelable {
 	public final int mSubclass;
 	// USB interface class (or -1 for unspecified)
 	@Nullable
-	public final int mIntfClass[];
+	public final int[] mIntfClass;
 	// USB interface subclass (or -1 for unspecified)
 	@Nullable
-	public final int mIntfSubClass[];
+	public final int[] mIntfSubClass;
 	@Nullable
-	public final int mIntfProtocol[];
+	public final int[] mIntfProtocol;
 	// USB device protocol (or -1 for unspecified)
 	public final int mProtocol;
 	// USB device manufacturer name string (or null for unspecified)
