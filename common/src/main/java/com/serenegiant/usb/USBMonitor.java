@@ -200,10 +200,9 @@ public final class USBMonitor implements Const {
 			} else {
 				throw new IllegalStateException("context already released");
 			}
-			if (!BuildCheck.isAndroid5()) {
-				// XXX 古い一部機種はACTION_USB_DEVICE_ATTACHEDが来ないのでポーリングで接続チェックする
-				mAsyncHandler.postDelayed(mDeviceCheckRunnable, 500);
-			}
+			// すでに接続＆パーミッションを保持しているUSB機器にはATTACHイベントが来ないので
+			// 少なくとも1回はポーリングする
+			mAsyncHandler.postDelayed(mDeviceCheckRunnable, 500);
 		}
 	}
 
@@ -577,7 +576,9 @@ public final class USBMonitor implements Const {
 					});
 				}
 			}
-			mAsyncHandler.postDelayed(mDeviceCheckRunnable, 1000);	// 1秒に1回確認
+			if (!BuildCheck.isAndroid5()) {
+				mAsyncHandler.postDelayed(mDeviceCheckRunnable, 1000);	// 1秒に1回確認
+			}
 		}
 	};
 
