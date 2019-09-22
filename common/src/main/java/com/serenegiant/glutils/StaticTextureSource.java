@@ -412,7 +412,7 @@ public class StaticTextureSource {
 						if ((client != null) && client.canDraw()) {
 							try {
 								client.draw(mDrawer, texId, null); // client.draw(mDrawer, mTexId, mTexMatrix);
-								GLHelper.checkGlError("handleSetBitmap");
+								GLHelper.checkGlError("handleDraw");
 							} catch (final Exception e) {
 								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
 								mClients.removeAt(i);
