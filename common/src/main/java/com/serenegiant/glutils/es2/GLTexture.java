@@ -83,13 +83,13 @@ public class GLTexture implements ITexture {
 		mTextureId = GLHelper.initTex(mTextureTarget, filter_param);
 		// テクスチャのメモリ領域を確保する
 		GLES20.glTexImage2D(mTextureTarget,
-			0,							// ミップマップレベル0(ミップマップしない)
+			0,					// ミップマップレベル0(ミップマップしない)
 			GLES20.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
-			0,							// 境界幅
+			0,					// 境界幅
 			GLES20.GL_RGBA,				// 引き渡すデータのフォーマット
 			GLES20.GL_UNSIGNED_BYTE,	// データの型
-			null);						// ピクセルデータ無し
+			null);				// ピクセルデータ無し
 		// テクスチャ変換行列を初期化
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = width / (float)mTexWidth;
