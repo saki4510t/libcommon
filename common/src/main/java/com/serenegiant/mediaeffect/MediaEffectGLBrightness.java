@@ -21,9 +21,9 @@ package com.serenegiant.mediaeffect;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** 明るさ調整([-1.0f,+1.0f], RGB各成分に単純加算), 0だと無調整 */
-public class MediaEffectBrightness extends MediaEffectGLESBase {
+public class MediaEffectGLBrightness extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectBrightness";
+	private static final String TAG = "MediaEffectGLBrightness";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -40,11 +40,11 @@ public class MediaEffectBrightness extends MediaEffectGLESBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
 
-	public MediaEffectBrightness() {
+	public MediaEffectGLBrightness() {
 		this(0.0f);
 	}
 
-	public MediaEffectBrightness(final float brightness) {
+	public MediaEffectGLBrightness(final float brightness) {
 		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
 		setParameter(brightness);
 	}
@@ -54,7 +54,7 @@ public class MediaEffectBrightness extends MediaEffectGLESBase {
 	 * @param brightness [-1.0f,+1.0f], RGB各成分に単純加算)
 	 * @return
 	 */
-	public MediaEffectBrightness setParameter(final float brightness) {
+	public MediaEffectGLBrightness setParameter(final float brightness) {
 		setEnable(brightness != 0.0f);
 		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(brightness);
 		return this;

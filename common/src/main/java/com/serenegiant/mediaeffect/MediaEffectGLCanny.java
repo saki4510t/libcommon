@@ -23,9 +23,9 @@ import android.util.Log;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** Cannyエッジ検出フィルタ */
-public class MediaEffectCanny extends MediaEffectGLESBase {
+public class MediaEffectGLCanny extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectCanny";
+	private static final String TAG = "MediaEffectGLCanny";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -116,17 +116,17 @@ public class MediaEffectCanny extends MediaEffectGLESBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
 
-	public MediaEffectCanny() {
+	public MediaEffectGLCanny() {
 		super(new MediaEffectKernel3x3Drawer(false, FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
-	public MediaEffectCanny(final float threshold) {
+	public MediaEffectGLCanny(final float threshold) {
 		this();
 		setParameter(threshold);
 	}
 
-	public MediaEffectCanny setParameter(final float threshold) {
+	public MediaEffectGLCanny setParameter(final float threshold) {
 		((MediaEffectKernel3x3Drawer)mDrawer).setColorAdjust(threshold);
 		return this;
 	}

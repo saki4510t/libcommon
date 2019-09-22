@@ -28,9 +28,9 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * OpenGL|ES2のフラグメントシェーダーで映像効果を与える時の基本クラス
  */
-public class MediaEffectGLESBase implements IEffect {
+public class MediaEffectGLBase implements IEffect {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectGLESBase";
+	private static final String TAG = "MediaEffectGLBase";
 
 	protected TextureOffscreen mOutputOffscreen;
 	protected volatile boolean mEnabled = true;
@@ -42,7 +42,7 @@ public class MediaEffectGLESBase implements IEffect {
 	 * @param numTex
 	 * @param shader
 	 */
-	public MediaEffectGLESBase(final int numTex, final String shader) {
+	public MediaEffectGLBase(final int numTex, final String shader) {
 		this(MediaEffectDrawer.newInstance(numTex, false, VERTEX_SHADER, shader));
 	}
 
@@ -51,8 +51,8 @@ public class MediaEffectGLESBase implements IEffect {
 	 * @param numTex
 	 * @param shader
 	 */
-	public MediaEffectGLESBase(final int numTex,
-		final boolean isOES, final String shader) {
+	public MediaEffectGLBase(final int numTex,
+							 final boolean isOES, final String shader) {
 
 		this(MediaEffectDrawer.newInstance(numTex, isOES, VERTEX_SHADER, shader));
 	}
@@ -63,8 +63,8 @@ public class MediaEffectGLESBase implements IEffect {
 	 * @param vss
 	 * @param fss
 	 */
-	public MediaEffectGLESBase(final int numTex,
-		final boolean isOES, final String vss, final String fss) {
+	public MediaEffectGLBase(final int numTex,
+							 final boolean isOES, final String vss, final String fss) {
 
 		this(MediaEffectDrawer.newInstance(numTex, isOES, vss, fss));
 	}
@@ -73,7 +73,7 @@ public class MediaEffectGLESBase implements IEffect {
 	 * コンストラクタ
 	 * @param drawer
 	 */
-	public MediaEffectGLESBase(final MediaEffectDrawer drawer) {
+	public MediaEffectGLBase(final MediaEffectDrawer drawer) {
 		mDrawer = drawer;
 //		resize(256, 256);
 	}
@@ -102,7 +102,7 @@ public class MediaEffectGLESBase implements IEffect {
 	 * @param offset
 	 * @return
 	 */
-	public MediaEffectGLESBase setMvpMatrix(final float[] matrix, final int offset) {
+	public MediaEffectGLBase setMvpMatrix(final float[] matrix, final int offset) {
 		mDrawer.setMvpMatrix(matrix, offset);
 		return this;
 	}
@@ -117,7 +117,7 @@ public class MediaEffectGLESBase implements IEffect {
 	}
 
 	@Override
-	public MediaEffectGLESBase resize(final int width, final int height) {
+	public MediaEffectGLBase resize(final int width, final int height) {
 		// ISourceを使う時は出力用オフスクリーンは不要なのと
 		// ISourceを使わない時は描画時にチェックして生成するのでresize時には生成しないように変更
 /*		if ((mOutputOffscreen == null) || (width != mOutputOffscreen.getWidth())

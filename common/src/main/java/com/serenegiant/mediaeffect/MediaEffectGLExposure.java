@@ -23,9 +23,9 @@ import android.util.Log;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** 露出調整, -10〜+10, 0だと無調整 */
-public class MediaEffectExposure extends MediaEffectGLESBase {
+public class MediaEffectGLExposure extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectExposure";
+	private static final String TAG = "MediaEffectGLExposure";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -42,12 +42,12 @@ public class MediaEffectExposure extends MediaEffectGLESBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
 
-	public MediaEffectExposure() {
+	public MediaEffectGLExposure() {
 		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
-	public MediaEffectExposure(final float exposure) {
+	public MediaEffectGLExposure(final float exposure) {
 		this();
 		setParameter(exposure);
 	}
@@ -57,7 +57,7 @@ public class MediaEffectExposure extends MediaEffectGLESBase {
 	 * @param exposure -10〜+10, 0は無調整
 	 * @return
 	 */
-	public MediaEffectExposure setParameter(final float exposure) {
+	public MediaEffectGLExposure setParameter(final float exposure) {
 		setEnable(exposure != 0.0f);
 		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(exposure);
 		return this;

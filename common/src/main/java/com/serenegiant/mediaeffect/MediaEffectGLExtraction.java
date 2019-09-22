@@ -23,9 +23,9 @@ import android.util.Log;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** 色抽出フィルタ */
-public class MediaEffectExtraction extends MediaEffectGLESBase {
+public class MediaEffectGLExtraction extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectExtraction";
+	private static final String TAG = "MediaEffectGLExtraction";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -76,7 +76,7 @@ public class MediaEffectExtraction extends MediaEffectGLESBase {
 
 	private final float[] mLimit = new float[KERNEL_SIZE3x3];
 
-	public MediaEffectExtraction() {
+	public MediaEffectGLExtraction() {
 		super(new MediaEffectKernel3x3Drawer(FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mLimit[0] = 0.0f;	mLimit[1] = 1.0f;	// H上下限
@@ -97,7 +97,7 @@ public class MediaEffectExtraction extends MediaEffectGLESBase {
 	 * @param color_adjust 0より大きければ2値化時のしきい値, 0以下なら2値化なし
 	 * @return
 	 */
-	public MediaEffectExtraction setParameter(
+	public MediaEffectGLExtraction setParameter(
 		final float lowerH, final float upperH,
 		final float lowerS, final float upperS,
 		final float lowerV, final float upperV,
@@ -105,7 +105,7 @@ public class MediaEffectExtraction extends MediaEffectGLESBase {
 		return setParameter(lowerH, upperH, lowerS, upperS, lowerV, upperV, 0.0f, 0.0f, 0.0f, color_adjust);
 	}
 
-	public MediaEffectExtraction setParameter(
+	public MediaEffectGLExtraction setParameter(
 		final float lowerH, final float upperH,
 		final float lowerS, final float upperS,
 		final float lowerV, final float upperV,
@@ -131,7 +131,7 @@ public class MediaEffectExtraction extends MediaEffectGLESBase {
 	 * @param color_adjust 0より大きければ2値化時のしきい値, 0以下なら2値化なし
 	 * @return
 	 */
-	public MediaEffectExtraction setParameter(final float[] limit, final float color_adjust) {
+	public MediaEffectGLExtraction setParameter(final float[] limit, final float color_adjust) {
 		if ((limit == null) || (limit.length < 6)) {
 			throw new IllegalArgumentException("limit is null or short");
 		}

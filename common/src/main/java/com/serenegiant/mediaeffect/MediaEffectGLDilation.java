@@ -26,9 +26,9 @@ import com.serenegiant.glutils.es2.GLHelper;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** Dilation(膨張)フィルタ */
-public class MediaEffectDilation extends MediaEffectGLESBase {
+public class MediaEffectGLDilation extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectDilation";
+	private static final String TAG = "MediaEffectGLDilation";
 
 	private static class MediaEffectDilationDrawer
 		extends MediaEffectDrawer.MediaEffectSingleDrawer {
@@ -261,7 +261,7 @@ public class MediaEffectDilation extends MediaEffectGLESBase {
 		}
 	}
 
-	public MediaEffectDilation() {
+	public MediaEffectGLDilation() {
 		this(1);
 	}
 
@@ -269,13 +269,13 @@ public class MediaEffectDilation extends MediaEffectGLESBase {
 	 * 膨張範囲を指定して生成
 	 * @param radius 1, 2, 3, 4
 	 */
-	public MediaEffectDilation(final int radius) {
+	public MediaEffectGLDilation(final int radius) {
 		super(new MediaEffectDilationDrawer(getFragmentShader(radius)));
 		setTexSize(256, 256);
 	}
 
 	@Override
-	public MediaEffectDilation resize(final int width, final int height) {
+	public MediaEffectGLDilation resize(final int width, final int height) {
 		super.resize(width, height);
 		setTexSize(width, height);
 		return this;

@@ -18,14 +18,14 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-public class MediaEffectEmboss extends MediaEffectKernel {
+public class MediaEffectGLEmboss extends MediaEffectGLKernel {
 
 	private float mIntensity;
-	public MediaEffectEmboss() {
+	public MediaEffectGLEmboss() {
 		this(1.0f);
 	}
 
-	public MediaEffectEmboss(final float intensity) {
+	public MediaEffectGLEmboss(final float intensity) {
 		super(new float[] {
 				intensity * (-2.0f), -intensity, 0.0f,
 				-intensity, 1.0f, intensity,
@@ -34,7 +34,7 @@ public class MediaEffectEmboss extends MediaEffectKernel {
 		mIntensity = intensity;
 	}
 
-	public MediaEffectEmboss setParameter(final float intensity) {
+	public MediaEffectGLEmboss setParameter(final float intensity) {
 		if (mIntensity != intensity) {
 			mIntensity = intensity;
 			setParameter(new float[] {

@@ -20,12 +20,10 @@ package com.serenegiant.mediaeffect;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
-/**
- * FIXME ポスタライズ, うまく動かない
- */
-public class MediaEffectPosterize extends MediaEffectGLESBase {
+/** 彩度調整([-1.0f,+1.0f]), 0だと無調整 */
+public class MediaEffectGLSaturate extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectBrightness";
+	private static final String TAG = "MediaEffectGLBrightness";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -33,31 +31,34 @@ public class MediaEffectPosterize extends MediaEffectGLESBase {
 		"varying       vec2 vTextureCoord;\n" +
 		"uniform %s    sTexture;\n" +
 		"uniform float uColorAdjust;\n" +
+		FUNC_GET_INTENSITY +
 		"void main() {\n" +
-		"    vec4 tex = texture2D(sTexture, vTextureCoord);\n" +
-		"    gl_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;\n" +
+		"    highp vec4 tex = texture2D(sTexture, vTextureCoord);\n" +
+		"    highp float intensity = getIntensity(tex.rgb);\n" +
+		"    highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);\n" +
+		"    gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
 
-	public MediaEffectPosterize() {
-		this(10.0f);
+	public MediaEffectGLSaturate() {
+		this(0.0f);
 	}
 
-	public MediaEffectPosterize(final float posterize) {
+	public MediaEffectGLSaturate(final float saturation) {
 		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
-		setParameter(posterize);
+		setParameter(saturation);
 	}
 
 	/**
-	 * 階調レベルをセット
-	 * @param posterize [1,256]
+	 * 彩度調整
+	 * @param saturation [-1.0f,+1.0f], 0なら無調整)
 	 * @return
 	 */
-	public MediaEffectPosterize setParameter(final float posterize) {
-		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(posterize);
+	public MediaEffectGLSaturate setParameter(final float saturation) {
+		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(saturation + 1.0f);
 		return this;
 	}
 }

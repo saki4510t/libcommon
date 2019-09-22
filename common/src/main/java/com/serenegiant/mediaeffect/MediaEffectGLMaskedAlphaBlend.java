@@ -26,9 +26,9 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * で合成するためのクラス
  */
 
-public class MediaEffectMaskedAlphaBlend extends MediaEffectGLESBase {
+public class MediaEffectGLMaskedAlphaBlend extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectMaskedAlphaBlend";
+	private static final String TAG = "MediaEffectGLMaskedAlphaBlend";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -53,7 +53,7 @@ public class MediaEffectMaskedAlphaBlend extends MediaEffectGLESBase {
 	/**
 	 * コンストラクタ
 	 */
-	public MediaEffectMaskedAlphaBlend() {
+	public MediaEffectGLMaskedAlphaBlend() {
 		this(false);
 	}
 	
@@ -61,7 +61,7 @@ public class MediaEffectMaskedAlphaBlend extends MediaEffectGLESBase {
 	 * コンストラクタ
 	 * @param isOES
 	 */
-	public MediaEffectMaskedAlphaBlend(final boolean isOES) {
+	public MediaEffectGLMaskedAlphaBlend(final boolean isOES) {
 		super(MediaEffectDrawer.newInstance(3, isOES,
 			isOES ? FRAGMENT_SHADER_EXT : FRAGMENT_SHADER));
 	}

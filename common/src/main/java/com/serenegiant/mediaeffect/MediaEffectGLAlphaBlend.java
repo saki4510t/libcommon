@@ -29,9 +29,9 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * mix == 1.0ならテクスチャ2のみ
  * mix == 0.5なら半分ずつを合成
  */
-public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
+public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectAlphaBlend";
+	private static final String TAG = "MediaEffectGLAlphaBlend";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
 		"%s" +
@@ -104,7 +104,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 	 * コンストラクタ
 	 * アルファブレンディング比率は0.5(半分ずつ)
 	 */
-	public MediaEffectAlphaBlend() {
+	public MediaEffectGLAlphaBlend() {
 		this(0.5f);
 	}
 	
@@ -112,7 +112,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 	 * コンストラクタ
 	 * @param mixRate アルファブレンディング比率セット
 	 */
-	public MediaEffectAlphaBlend(final float mixRate) {
+	public MediaEffectGLAlphaBlend(final float mixRate) {
 		super(new MediaEffectAlphaBlendDrawer(mixRate));
 		setParameter(mixRate);
 	}
@@ -122,7 +122,7 @@ public class MediaEffectAlphaBlend extends MediaEffectGLESBase {
 	 * @param mixRate [-1.0f,+1.0f]
 	 * @return
 	 */
-	public MediaEffectAlphaBlend setParameter(final float mixRate) {
+	public MediaEffectGLAlphaBlend setParameter(final float mixRate) {
 		setEnable(true);
 		((MediaEffectAlphaBlendDrawer)mDrawer).setMixRate(mixRate);
 		return this;

@@ -18,30 +18,28 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import com.serenegiant.glutils.ShaderConst;
-
 import static com.serenegiant.glutils.ShaderConst.*;
 
-public class MediaEffectKernel extends MediaEffectGLESBase {
+public class MediaEffectGLKernel extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectKernel";
+	private static final String TAG = "MediaEffectGLKernel";
 
-	public MediaEffectKernel() {
+	public MediaEffectGLKernel() {
 		super(new MediaEffectKernel3x3Drawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D));
 	}
 
-	public MediaEffectKernel(final float[] kernel) {
+	public MediaEffectGLKernel(final float[] kernel) {
 		this();
 		setParameter(kernel, 0.0f);
 	}
 
-	public MediaEffectKernel(final float[] kernel, final float color_adjust) {
+	public MediaEffectGLKernel(final float[] kernel, final float color_adjust) {
 		this();
 		setParameter(kernel, color_adjust);
 	}
 
 	@Override
-	public MediaEffectKernel resize(final int width, final int height) {
+	public MediaEffectGLKernel resize(final int width, final int height) {
 		super.resize(width, height);
 		setTexSize(width, height);
 		return this;
@@ -68,7 +66,7 @@ public class MediaEffectKernel extends MediaEffectGLESBase {
 	 * @param color_adjust
 	 * @return
 	 */
-	public MediaEffectKernel setParameter(final float[] kernel, final float color_adjust) {
+	public MediaEffectGLKernel setParameter(final float[] kernel, final float color_adjust) {
 		setKernel(kernel, color_adjust);
 		return this;
 	}

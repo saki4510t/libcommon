@@ -30,9 +30,9 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * うまく動かない, Matrixの計算がダメなのかも
  */
-public class MediaEffectTexProjection extends MediaEffectGLESBase {
+public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectTexProjection";
+	private static final String TAG = "MediaEffectGLTexProjection";
 
 	private static class MediaEffectTexProjectionDrawer
 		extends MediaEffectDrawer.MediaEffectSingleDrawer {
@@ -160,7 +160,7 @@ public class MediaEffectTexProjection extends MediaEffectGLESBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
 
-	public MediaEffectTexProjection() {
+	public MediaEffectGLTexProjection() {
 		super(new MediaEffectTexProjectionDrawer(PROJ_VERTEX_SHADER, FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}

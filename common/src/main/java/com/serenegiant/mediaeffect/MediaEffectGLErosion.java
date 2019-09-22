@@ -26,9 +26,9 @@ import com.serenegiant.glutils.es2.GLHelper;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /** Erosion(収縮)フィルタ */
-public class MediaEffectErosion extends MediaEffectGLESBase {
+public class MediaEffectGLErosion extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectErosion";
+	private static final String TAG = "MediaEffectGLErosion";
 
 	private static class MediaEffectErosionDrawer
 		extends MediaEffectDrawer.MediaEffectSingleDrawer {
@@ -261,7 +261,7 @@ public class MediaEffectErosion extends MediaEffectGLESBase {
 		}
 	}
 
-	public MediaEffectErosion() {
+	public MediaEffectGLErosion() {
 		this(1);
 	}
 
@@ -269,13 +269,13 @@ public class MediaEffectErosion extends MediaEffectGLESBase {
 	 * 膨張範囲を指定して生成
 	 * @param radius 1, 2, 3, 4
 	 */
-	public MediaEffectErosion(final int radius) {
+	public MediaEffectGLErosion(final int radius) {
 		super(new MediaEffectErosionDrawer(getFragmentShader(radius)));
 		setTexSize(256, 256);
 	}
 
 	@Override
-	public MediaEffectErosion resize(final int width, final int height) {
+	public MediaEffectGLErosion resize(final int width, final int height) {
 		super.resize(width, height);
 		setTexSize(width, height);
 		return this;
