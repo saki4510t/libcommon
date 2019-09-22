@@ -35,9 +35,8 @@ import com.serenegiant.glutils.es2.GLDrawer2D;
 import com.serenegiant.glutils.es2.GLHelper;
 
 /**
- * MediaCodecのデコーダーでデコードした動画や
- * カメラからの映像の代わりに静止画をSurfaceへ
- * 出力するためのクラス
+ * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
+ * 静止画をSurfaceへ出力するためのクラス
  */
 public class StaticTextureSource {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
