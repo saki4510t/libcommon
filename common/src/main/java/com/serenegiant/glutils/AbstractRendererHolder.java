@@ -482,8 +482,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static class BaseRendererTask extends EglTask
 		implements SurfaceTexture.OnFrameAvailableListener {
 
-		private final SparseArray<RendererTarget> mTargets
-			= new SparseArray<RendererTarget>();
+		private final SparseArray<IRendererTarget> mTargets
+			= new SparseArray<>();
 		private final AbstractRendererHolder mParent;
 		private int mVideoWidth, mVideoHeight;
 		final float[] mTexMatrix = new float[16];
@@ -663,14 +663,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		public boolean isEnabled(final int id) {
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				return target != null && target.isEnabled();
 			}
 		}
 
 		public void setEnabled(final int id, final boolean enable) {
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				if (target != null) {
 					target.setEnabled(enable);
 				}
@@ -893,7 +893,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = n - 1; i >= 0; i--) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if ((target != null) && target.canDraw()) {
 						try {
 							onDrawTarget(target, mTexId, mTexMatrix);
@@ -914,7 +914,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param texMatrix
 		 */
 		@WorkerThread
-		protected void onDrawTarget(@NonNull final RendererTarget target,
+		protected void onDrawTarget(@NonNull final IRendererTarget target,
 			final int texId, final float[] texMatrix) {
 
 			target.draw(mDrawer, texId, texMatrix);
@@ -933,11 +933,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkTarget();
 			synchronized (mTargets) {
-				RendererTarget target = mTargets.get(id);
+				IRendererTarget target = mTargets.get(id);
 				if (target == null) {
 					try {
 						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
-						setMirror(target.mMvpMatrix, mMirror);
+						setMirror(target.getMvpMatrix(), mMirror);
 						mTargets.append(id, target);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -957,7 +957,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		protected void handleRemoveSurface(final int id) {
 //			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				if (target != null) {
 					mTargets.remove(id);
 					if (target.isValid()) {
@@ -979,7 +979,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if (target != null) {
 						if (target.isValid()) {
 							target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
@@ -1002,7 +1002,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if ((target != null) && !target.isValid()) {
 						final int id = mTargets.keyAt(i);
 //						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
@@ -1022,7 +1022,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleClear(final int id, final int color) {
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				if ((target != null) && target.isValid()) {
 					target.clear(color);
 				}
@@ -1038,7 +1038,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if ((target != null) && target.isValid()) {
 						target.clear(color);
 					}
@@ -1059,9 +1059,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
 				final float[] array = (float[])mvp;
 				synchronized (mTargets) {
-					final RendererTarget target = mTargets.get(id);
+					final IRendererTarget target = mTargets.get(id);
 					if ((target != null) && target.isValid()) {
-						System.arraycopy(array, offset, target.mMvpMatrix, 0, 16);
+						System.arraycopy(array, offset, target.getMvpMatrix(), 0, 16);
 					}
 				}
 			}
@@ -1140,9 +1140,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if (target != null) {
-						setMirror(target.mMvpMatrix, mirror);
+						setMirror(target.getMvpMatrix(), mirror);
 					}
 				}
 			}
@@ -1156,9 +1156,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleRotate(final int id, final int degree) {
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				if (target != null) {
-					setRotation(target.mMvpMatrix, degree);
+					setRotation(target.getMvpMatrix(), degree);
 				}
 			}
 		}

@@ -208,8 +208,8 @@ public class StaticTextureSource {
 	private static final int REQUEST_SET_BITMAP = 7;
 
 	private static class RendererTask extends EglTask {
-		private final SparseArray<RendererTarget> mTargets
-			= new SparseArray<RendererTarget>();
+		private final SparseArray<IRendererTarget> mTargets
+			= new SparseArray<>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
@@ -406,7 +406,7 @@ public class StaticTextureSource {
 				synchronized (mTargets) {
 					final int n = mTargets.size();
 					for (int i = n - 1; i >= 0; i--) {
-						final RendererTarget target = mTargets.valueAt(i);
+						final IRendererTarget target = mTargets.valueAt(i);
 						if ((target != null) && target.canDraw()) {
 							try {
 								target.draw(mDrawer, texId, null); // target.draw(mDrawer, mTexId, mTexMatrix);
@@ -437,7 +437,7 @@ public class StaticTextureSource {
 			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkTarget();
 			synchronized (mTargets) {
-				RendererTarget target = mTargets.get(id);
+				IRendererTarget target = mTargets.get(id);
 				if (target == null) {
 					try {
 						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
@@ -460,7 +460,7 @@ public class StaticTextureSource {
 		private void handleRemoveSurface(final int id) {
 			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mTargets) {
-				final RendererTarget target = mTargets.get(id);
+				final IRendererTarget target = mTargets.get(id);
 				if (target != null) {
 					mTargets.remove(id);
 					target.release();
@@ -479,7 +479,7 @@ public class StaticTextureSource {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if (target != null) {
 						makeCurrent();
 						target.release();
@@ -499,7 +499,7 @@ public class StaticTextureSource {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget target = mTargets.valueAt(i);
+					final IRendererTarget target = mTargets.valueAt(i);
 					if ((target != null) && !target.isValid()) {
 						final int id = mTargets.keyAt(i);
 						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);

@@ -26,7 +26,7 @@ import com.serenegiant.utils.Time;
 /**
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-class RendererTarget {
+class RendererTarget implements IRendererTarget {
 
 	/**
 	 * ファクトリーメソッド
@@ -35,7 +35,7 @@ class RendererTarget {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	static RendererTarget newInstance(final EGLBase egl,
+	static IRendererTarget newInstance(final EGLBase egl,
 		final Object surface, final int maxFps) {
 
 		return (maxFps > 0)
@@ -47,7 +47,7 @@ class RendererTarget {
 	private Object mSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private EGLBase.IEglSurface mTargetSurface;
-	final float[] mMvpMatrix = new float[16];
+	private final float[] mMvpMatrix = new float[16];
 	private volatile boolean mEnable = true;
 
 	/**
@@ -64,6 +64,7 @@ class RendererTarget {
 	/**
 	 * 生成したEglSurfaceを破棄する
 	 */
+	@Override
 	public void release() {
 		if (mTargetSurface != null) {
 			mTargetSurface.release();
@@ -76,6 +77,7 @@ class RendererTarget {
 	 * Surfaceが有効かどうかを取得する
 	 * @return
 	 */
+	@Override
 	public boolean isValid() {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
@@ -84,6 +86,7 @@ class RendererTarget {
 	 * Surfaceへの描画が有効かどうかを取得する
 	 * @return
 	 */
+	@Override
 	public boolean isEnabled() {
 		return mEnable;
 	}
@@ -92,6 +95,7 @@ class RendererTarget {
 	 * Surfaceへの描画を一時的に有効/無効にする
 	 * @param enable
 	 */
+	@Override
 	public void setEnabled(final boolean enable) {
 		mEnable = enable;
 	}
@@ -100,8 +104,14 @@ class RendererTarget {
 	 * 描画可能かどうかを取得
 	 * @return
 	 */
+	@Override
 	public boolean canDraw() {
 		return mEnable;
+	}
+
+	@Override
+	public float[] getMvpMatrix() {
+		return mMvpMatrix;
 	}
 
 	/**
@@ -110,6 +120,7 @@ class RendererTarget {
 	 * @param textId
 	 * @param texMatrix
 	 */
+	@Override
 	public void draw(final IDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -126,6 +137,7 @@ class RendererTarget {
 	 * 指定した色で全面を塗りつぶす
 	 * @param color
 	 */
+	@Override
 	public void clear(final int color) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -145,6 +157,7 @@ class RendererTarget {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
+	@Override
 	public void makeCurrent() throws IllegalStateException {
 		check();
 		mTargetSurface.makeCurrent();
@@ -155,6 +168,7 @@ class RendererTarget {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
+	@Override
 	public void swap() throws IllegalStateException {
 		check();
 		mTargetSurface.swap();
