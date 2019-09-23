@@ -95,10 +95,11 @@ import com.serenegiant.utils.BuildCheck;
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
 	private static class EglSurface implements IEglSurface {
+		@NonNull
 		private final EGLBase14 mEglBase;
 		private EGLSurface mEglSurface;
 
-		private EglSurface(final EGLBase14 eglBase, final Object surface)
+		private EglSurface(@NonNull final EGLBase14 eglBase, final Object surface)
 			throws IllegalArgumentException {
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
@@ -120,7 +121,7 @@ import com.serenegiant.utils.BuildCheck;
 		 * @param width
 		 * @param height
 		 */
-		private EglSurface(final EGLBase14 eglBase,
+		private EglSurface(@NonNull final EGLBase14 eglBase,
 			final int width, final int height) {
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
@@ -131,6 +132,20 @@ import com.serenegiant.utils.BuildCheck;
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
+		}
+
+		@Override
+		public void release() {
+//			if (DEBUG) Log.v(TAG, "EglSurface:release:");
+			mEglBase.makeDefault();
+			mEglBase.destroyWindowSurface(mEglSurface);
+	        mEglSurface = EGL14.EGL_NO_SURFACE;
+		}
+
+		@Deprecated
+		@Override
+		public IContext getContext() {
+			return mEglBase.getContext();
 		}
 
 		@Override
@@ -167,12 +182,6 @@ import com.serenegiant.utils.BuildCheck;
 				mEglSurface, presentationTimeNs);
 		}
 
-		@Deprecated
-		@Override
-		public IContext getContext() {
-			return mEglBase.getContext();
-		}
-
 		@Override
 		public boolean isValid() {
 			return (mEglSurface != null)
@@ -181,13 +190,6 @@ import com.serenegiant.utils.BuildCheck;
 				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
 
-		@Override
-		public void release() {
-//			if (DEBUG) Log.v(TAG, "EglSurface:release:");
-			mEglBase.makeDefault();
-			mEglBase.destroyWindowSurface(mEglSurface);
-	        mEglSurface = EGL14.EGL_NO_SURFACE;
-		}
 	}
 
 	/**

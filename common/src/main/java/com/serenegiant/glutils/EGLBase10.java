@@ -148,6 +148,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
 	private static class EglSurface implements IEglSurface {
+		@NonNull
 		private final EGLBase10 mEglBase;
 		private EGLSurface mEglSurface;
 
@@ -156,7 +157,7 @@ import com.serenegiant.utils.BuildCheck;
 		 * @param eglBase
 		 * @param surface
 		 */
-		private EglSurface(final EGLBase10 eglBase, final Object surface)
+		private EglSurface(@NonNull final EGLBase10 eglBase, final Object surface)
 			throws IllegalArgumentException {
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
@@ -189,7 +190,9 @@ import com.serenegiant.utils.BuildCheck;
 		 * @param width
 		 * @param height
 		 */
-		private EglSurface(final EGLBase10 eglBase, final int width, final int height) {
+		private EglSurface(@NonNull final EGLBase10 eglBase,
+			final int width, final int height) {
+
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
 			if ((width <= 0) || (height <= 0)) {
@@ -197,6 +200,35 @@ import com.serenegiant.utils.BuildCheck;
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
+		}
+
+		/**
+		 * 破棄処理
+		 */
+		@Override
+		public void release() {
+//			if (DEBUG) Log.v(TAG, "EglSurface:release:");
+			mEglBase.makeDefault();
+			mEglBase.destroyWindowSurface(mEglSurface);
+	        mEglSurface = EGL10.EGL_NO_SURFACE;
+		}
+
+		@Deprecated
+		@Override
+		public IContext getContext() {
+			return mEglBase.getContext();
+		}
+
+		/**
+		 * EGLSurfaceが有効かどうかを取得
+		 * @return
+		 */
+		@Override
+		public boolean isValid() {
+			return (mEglSurface != null)
+				&& (mEglSurface != EGL10.EGL_NO_SURFACE)
+				&& (mEglBase.getSurfaceWidth(mEglSurface) > 0)
+				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
 
 		/**
@@ -235,38 +267,9 @@ import com.serenegiant.utils.BuildCheck;
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
-		@Deprecated
-		@Override
-		public IContext getContext() {
-			return mEglBase.getContext();
-		}
-
 		public void setPresentationTime(final long presentationTimeNs) {
 //			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
 // 				mEglSurface, presentationTimeNs);
-		}
-
-		/**
-		 * EGLSurfaceが有効かどうかを取得
-		 * @return
-		 */
-		@Override
-		public boolean isValid() {
-			return (mEglSurface != null)
-				&& (mEglSurface != EGL10.EGL_NO_SURFACE)
-				&& (mEglBase.getSurfaceWidth(mEglSurface) > 0)
-				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
-		}
-
-		/**
-		 * 破棄処理
-		 */
-		@Override
-		public void release() {
-//			if (DEBUG) Log.v(TAG, "EglSurface:release:");
-			mEglBase.makeDefault();
-			mEglBase.destroyWindowSurface(mEglSurface);
-	        mEglSurface = EGL10.EGL_NO_SURFACE;
 		}
 	}
 
