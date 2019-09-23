@@ -195,7 +195,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * このメソッドは指定したSurfaceが追加されるか
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通はSurface#hashCodeを使う
-	 * @param surface
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 */
 	@Override
@@ -212,7 +212,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * このメソッドは指定したSurfaceが追加されるか
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通はSurface#hashCodeを使う
-	 * @param surface
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 * @param maxFps
 	 */
@@ -533,7 +533,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * このメソッドは指定したSurfaceが追加されるか
 		 * interruptされるまでカレントスレッドをブロックする。
 		 * @param id
-		 * @param surface
+		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 */
 		public void addSurface(final int id, final Object surface)
 			throws IllegalStateException, IllegalArgumentException {
@@ -546,7 +546,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * このメソッドは指定したSurfaceが追加されるか
 		 * interruptされるまでカレントスレッドをブロックする。
 		 * @param id
-		 * @param surface
+		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 */
 		public void addSurface(final int id,
 			final Object surface, final int maxFps)
@@ -555,7 +555,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			checkFinished();
 			if (!((surface instanceof SurfaceTexture)
 				|| (surface instanceof Surface)
-				|| (surface instanceof SurfaceHolder))) {
+				|| (surface instanceof SurfaceHolder)
+				|| (surface instanceof TextureWrapper))) {
 
 				throw new IllegalArgumentException(
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
@@ -923,7 +924,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		/**
 		 * 指定したIDの分配描画先Surfaceを追加する
 		 * @param id
-		 * @param surface
+		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 * @param maxFps
 		 */
 		@WorkerThread

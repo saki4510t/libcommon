@@ -37,6 +37,11 @@ public class DumbRenderer implements IRenderer {
 	public interface RendererDelegater {
 		public void onStart(@NonNull final EGLBase eglBase);
 		public void onStop(@NonNull final EGLBase eglBase);
+		/**
+		 * 描画先のSurfaceをセット
+		 * @param eglBase
+		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+		 */
 		public void onSetSurface(@NonNull final EGLBase eglBase, @NonNull final Object surface);
 		public void onResize(@NonNull final EGLBase eglBase, final int width, final int height);
 		/**
@@ -88,7 +93,8 @@ public class DumbRenderer implements IRenderer {
 		if ((surface instanceof Surface)
 			|| (surface instanceof SurfaceHolder)
 			|| (surface instanceof SurfaceTexture)
-			|| (surface instanceof SurfaceView)) {
+			|| (surface instanceof SurfaceView)
+			|| (surface instanceof TextureWrapper)) {
 
 			synchronized (mSync) {
 				if (mRendererTask != null) {

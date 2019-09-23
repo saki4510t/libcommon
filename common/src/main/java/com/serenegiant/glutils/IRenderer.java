@@ -29,7 +29,7 @@ public interface IRenderer extends IRendererCommon {
 
 	/**
 	 * 描画先のSurfaceをセット
-	 * @param surface
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
 	public void setSurface(@NonNull final Object surface) throws IllegalArgumentException;
 

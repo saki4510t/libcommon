@@ -53,11 +53,16 @@ class RendererTarget implements IRendererTarget {
 	/**
 	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
 	 * @param egl
-	 * @param surface
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
 	private RendererTarget(final EGLBase egl, final Object surface) {
 		mSurface = surface;
-		mTargetSurface = egl.createFromSurface(surface);
+		if (surface instanceof TextureWrapper) {
+			final TextureWrapper wrapper = (TextureWrapper)surface;
+			mTargetSurface = egl.createTexOffscreen(wrapper.texId, wrapper.width, wrapper.height);
+		} else {
+			mTargetSurface = egl.createFromSurface(surface);
+		}
 		Matrix.setIdentityM(mMvpMatrix, 0);
 	}
 
@@ -195,7 +200,7 @@ class RendererTarget implements IRendererTarget {
 		/**
 		 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
 		 * @param egl
-		 * @param surface
+		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 * @param maxFps 正数
 		 */
 		private RendererTargetHasWait(final EGLBase egl,

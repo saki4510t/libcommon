@@ -91,7 +91,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * このメソッドは指定したSurfaceが追加されるか
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通は#hashCodeを使う
-	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 */
 	public void addSurface(final int id, final Object surface,
@@ -103,7 +103,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * このメソッドは指定したSurfaceが追加されるか
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id 普通は#hashCodeを使う
-	 * @param surface, should be one of Surface, SurfaceTexture or SurfaceHolder
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 * @param maxFps 0以下なら制限しない
 	 */
