@@ -167,6 +167,7 @@ import com.serenegiant.utils.BuildCheck;
 				mEglSurface, presentationTimeNs);
 		}
 
+		@Deprecated
 		@Override
 		public IContext getContext() {
 			return mEglBase.getContext();

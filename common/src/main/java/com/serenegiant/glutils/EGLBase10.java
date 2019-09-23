@@ -235,6 +235,7 @@ import com.serenegiant.utils.BuildCheck;
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
+		@Deprecated
 		@Override
 		public IContext getContext() {
 			return mEglBase.getContext();
