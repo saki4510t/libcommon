@@ -79,13 +79,7 @@ class RendererTarget {
 	public boolean isValid() {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
-	
-	private void check() throws IllegalStateException {
-		if (mTargetSurface == null) {
-			throw new IllegalStateException("already released");
-		}
-	}
-	
+
 	/**
 	 * Surfaceへの描画が有効かどうかを取得する
 	 * @return
@@ -154,6 +148,17 @@ class RendererTarget {
 	public void swap() throws IllegalStateException {
 		check();
 		mTargetSurface.swap();
+
+	}
+
+	/**
+	 * mTargetSurfaceの有効無効を確認して無効ならIllegalStateExceptionを投げる
+	 * @throws IllegalStateException
+	 */
+	private void check() throws IllegalStateException {
+		if ((mTargetSurface == null) || !mTargetSurface.isValid()) {
+			throw new IllegalStateException("already released");
+		}
 	}
 
 	private static class RendererTargetHasWait extends RendererTarget {
