@@ -209,8 +209,8 @@ public class StaticTextureSource {
 
 	private static class RendererTask extends EglTask {
 		private final Object mClientSync = new Object();
-		private final SparseArray<RendererSurfaceRec> mClients
-			= new SparseArray<RendererSurfaceRec>();
+		private final SparseArray<RendererTarget> mClients
+			= new SparseArray<RendererTarget>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
@@ -406,7 +406,7 @@ public class StaticTextureSource {
 				final int texId = mImageSource.getTexture();
 				synchronized (mClientSync) {
 					final int n = mClients.size();
-					RendererSurfaceRec client;
+					RendererTarget client;
 					for (int i = n - 1; i >= 0; i--) {
 						client = mClients.valueAt(i);
 						if ((client != null) && client.canDraw()) {
@@ -439,10 +439,10 @@ public class StaticTextureSource {
 			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
 			synchronized (mClientSync) {
-				RendererSurfaceRec client = mClients.get(id);
+				RendererTarget client = mClients.get(id);
 				if (client == null) {
 					try {
-						client = RendererSurfaceRec.newInstance(getEgl(), surface, maxFps);
+						client = RendererTarget.newInstance(getEgl(), surface, maxFps);
 						mClients.append(id, client);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -462,7 +462,7 @@ public class StaticTextureSource {
 		private void handleRemoveSurface(final int id) {
 			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mClientSync) {
-				final RendererSurfaceRec client = mClients.get(id);
+				final RendererTarget client = mClients.get(id);
 				if (client != null) {
 					mClients.remove(id);
 					client.release();
@@ -480,7 +480,7 @@ public class StaticTextureSource {
 			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 			synchronized (mClientSync) {
 				final int n = mClients.size();
-				RendererSurfaceRec client;
+				RendererTarget client;
 				for (int i = 0; i < n; i++) {
 					client = mClients.valueAt(i);
 					if (client != null) {
@@ -502,7 +502,7 @@ public class StaticTextureSource {
 			synchronized (mClientSync) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
-					final RendererSurfaceRec client = mClients.valueAt(i);
+					final RendererTarget client = mClients.valueAt(i);
 					if ((client != null) && !client.isValid()) {
 						final int id = mClients.keyAt(i);
 						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);

@@ -26,7 +26,7 @@ import com.serenegiant.utils.Time;
 /**
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-class RendererSurfaceRec {
+class RendererTarget {
 
 	/**
 	 * ファクトリーメソッド
@@ -35,12 +35,12 @@ class RendererSurfaceRec {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	static RendererSurfaceRec newInstance(final EGLBase egl,
+	static RendererTarget newInstance(final EGLBase egl,
 		final Object surface, final int maxFps) {
 
 		return (maxFps > 0)
-			? new RendererSurfaceRecHasWait(egl, surface, maxFps)
-			: new RendererSurfaceRec(egl, surface);	// no limitation of maxFps
+			? new RendererTargetHasWait(egl, surface, maxFps)
+			: new RendererTarget(egl, surface);	// no limitation of maxFps
 	}
 
 	/** 元々の分配描画用Surface */
@@ -55,7 +55,7 @@ class RendererSurfaceRec {
 	 * @param egl
 	 * @param surface
 	 */
-	private RendererSurfaceRec(final EGLBase egl, final Object surface) {
+	private RendererTarget(final EGLBase egl, final Object surface) {
 		mSurface = surface;
 		mTargetSurface = egl.createFromSurface(surface);
 		Matrix.setIdentityM(mMvpMatrix, 0);
@@ -156,7 +156,7 @@ class RendererSurfaceRec {
 		mTargetSurface.swap();
 	}
 
-	private static class RendererSurfaceRecHasWait extends RendererSurfaceRec {
+	private static class RendererTargetHasWait extends RendererTarget {
 		private long mNextDraw;
 		private final long mIntervalsNs;
 
@@ -166,7 +166,7 @@ class RendererSurfaceRec {
 		 * @param surface
 		 * @param maxFps 正数
 		 */
-		private RendererSurfaceRecHasWait(final EGLBase egl,
+		private RendererTargetHasWait(final EGLBase egl,
 			final Object surface, final int maxFps) {
 
 			super(egl, surface);

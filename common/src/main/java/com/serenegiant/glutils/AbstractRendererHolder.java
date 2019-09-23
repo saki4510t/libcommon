@@ -482,8 +482,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static class BaseRendererTask extends EglTask
 		implements SurfaceTexture.OnFrameAvailableListener {
 
-		private final SparseArray<RendererSurfaceRec> mClients
-			= new SparseArray<RendererSurfaceRec>();
+		private final SparseArray<RendererTarget> mClients
+			= new SparseArray<RendererTarget>();
 		private final AbstractRendererHolder mParent;
 		private int mVideoWidth, mVideoHeight;
 		final float[] mTexMatrix = new float[16];
@@ -663,14 +663,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		public boolean isEnabled(final int id) {
 			synchronized (mClients) {
-				final RendererSurfaceRec rec = mClients.get(id);
+				final RendererTarget rec = mClients.get(id);
 				return rec != null && rec.isEnabled();
 			}
 		}
 
 		public void setEnabled(final int id, final boolean enable) {
 			synchronized (mClients) {
-				final RendererSurfaceRec rec = mClients.get(id);
+				final RendererTarget rec = mClients.get(id);
 				if (rec != null) {
 					rec.setEnabled(enable);
 				}
@@ -892,7 +892,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		protected void handleDrawClients() {
 			synchronized (mClients) {
 				final int n = mClients.size();
-				RendererSurfaceRec client;
+				RendererTarget client;
 				for (int i = n - 1; i >= 0; i--) {
 					client = mClients.valueAt(i);
 					if ((client != null) && client.canDraw()) {
@@ -915,7 +915,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param texMatrix
 		 */
 		@WorkerThread
-		protected void onDrawClient(@NonNull final RendererSurfaceRec client,
+		protected void onDrawClient(@NonNull final RendererTarget client,
 			final int texId, final float[] texMatrix) {
 
 			client.draw(mDrawer, texId, texMatrix);
@@ -934,10 +934,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkSurface();
 			synchronized (mClients) {
-				RendererSurfaceRec client = mClients.get(id);
+				RendererTarget client = mClients.get(id);
 				if (client == null) {
 					try {
-						client = RendererSurfaceRec.newInstance(getEgl(), surface, maxFps);
+						client = RendererTarget.newInstance(getEgl(), surface, maxFps);
 						setMirror(client.mMvpMatrix, mMirror);
 						mClients.append(id, client);
 					} catch (final Exception e) {
@@ -958,7 +958,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		protected void handleRemoveSurface(final int id) {
 //			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mClients) {
-				final RendererSurfaceRec client = mClients.get(id);
+				final RendererTarget client = mClients.get(id);
 				if (client != null) {
 					mClients.remove(id);
 					if (client.isValid()) {
@@ -979,7 +979,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 			synchronized (mClients) {
 				final int n = mClients.size();
-				RendererSurfaceRec client;
+				RendererTarget client;
 				for (int i = 0; i < n; i++) {
 					client = mClients.valueAt(i);
 					if (client != null) {
@@ -1004,7 +1004,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
-					final RendererSurfaceRec client = mClients.valueAt(i);
+					final RendererTarget client = mClients.valueAt(i);
 					if ((client != null) && !client.isValid()) {
 						final int id = mClients.keyAt(i);
 //						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
@@ -1024,7 +1024,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleClear(final int id, final int color) {
 			synchronized (mClients) {
-				final RendererSurfaceRec client = mClients.get(id);
+				final RendererTarget client = mClients.get(id);
 				if ((client != null) && client.isValid()) {
 					client.clear(color);
 				}
@@ -1040,7 +1040,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
-					final RendererSurfaceRec client = mClients.valueAt(i);
+					final RendererTarget client = mClients.valueAt(i);
 					if ((client != null) && client.isValid()) {
 						client.clear(color);
 					}
@@ -1061,7 +1061,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
 				final float[] array = (float[])mvp;
 				synchronized (mClients) {
-					final RendererSurfaceRec client = mClients.get(id);
+					final RendererTarget client = mClients.get(id);
 					if ((client != null) && client.isValid()) {
 						System.arraycopy(array, offset, client.mMvpMatrix, 0, 16);
 					}
@@ -1142,7 +1142,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			synchronized (mClients) {
 				final int n = mClients.size();
 				for (int i = 0; i < n; i++) {
-					final RendererSurfaceRec client = mClients.valueAt(i);
+					final RendererTarget client = mClients.valueAt(i);
 					if (client != null) {
 						setMirror(client.mMvpMatrix, mirror);
 					}
@@ -1158,7 +1158,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleRotate(final int id, final int degree) {
 			synchronized (mClients) {
-				final RendererSurfaceRec client = mClients.get(id);
+				final RendererTarget client = mClients.get(id);
 				if (client != null) {
 					setRotation(client.mMvpMatrix, degree);
 				}
