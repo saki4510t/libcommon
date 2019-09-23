@@ -208,8 +208,7 @@ public class StaticTextureSource {
 	private static final int REQUEST_SET_BITMAP = 7;
 
 	private static class RendererTask extends EglTask {
-		private final Object mClientSync = new Object();
-		private final SparseArray<RendererTarget> mClients
+		private final SparseArray<RendererTarget> mTargets
 			= new SparseArray<RendererTarget>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
@@ -318,19 +317,19 @@ public class StaticTextureSource {
 				throw new IllegalArgumentException(
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
-			synchronized (mClientSync) {
-				if (mClients.get(id) == null) {
+			synchronized (mTargets) {
+				if (mTargets.get(id) == null) {
 					for ( ; ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
-								mClientSync.wait();
+								mTargets.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
 							break;
 						} else {
 							try {
-								mClientSync.wait(10);
+								mTargets.wait(10);
 							} catch (InterruptedException e) {
 								break;
 							}
@@ -345,19 +344,19 @@ public class StaticTextureSource {
 		 * @param id
 		 */
 		public void removeSurface(final int id) {
-			synchronized (mClientSync) {
-				if (mClients.get(id) != null) {
+			synchronized (mTargets) {
+				if (mTargets.get(id) != null) {
 					for ( ; ; ) {
 						if (offer(REQUEST_REMOVE_SURFACE, id)) {
 							try {
-								mClientSync.wait();
+								mTargets.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
 							break;
 						} else {
 							try {
-								mClientSync.wait(10);
+								mTargets.wait(10);
 							} catch (InterruptedException e) {
 								break;
 							}
@@ -380,8 +379,8 @@ public class StaticTextureSource {
 		 * @return
 		 */
 		public int getCount() {
-			synchronized (mClientSync) {
-				return mClients.size();
+			synchronized (mTargets) {
+				return mTargets.size();
 			}
 		}
 
@@ -404,19 +403,18 @@ public class StaticTextureSource {
 			// 各Surfaceへ描画する
 			if (mImageSource != null) {
 				final int texId = mImageSource.getTexture();
-				synchronized (mClientSync) {
-					final int n = mClients.size();
-					RendererTarget client;
+				synchronized (mTargets) {
+					final int n = mTargets.size();
 					for (int i = n - 1; i >= 0; i--) {
-						client = mClients.valueAt(i);
-						if ((client != null) && client.canDraw()) {
+						final RendererTarget target = mTargets.valueAt(i);
+						if ((target != null) && target.canDraw()) {
 							try {
-								client.draw(mDrawer, texId, null); // client.draw(mDrawer, mTexId, mTexMatrix);
+								target.draw(mDrawer, texId, null); // target.draw(mDrawer, mTexId, mTexMatrix);
 								GLHelper.checkGlError("handleDraw");
 							} catch (final Exception e) {
 								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
-								mClients.removeAt(i);
-								client.release();
+								mTargets.removeAt(i);
+								target.release();
 							}
 						}
 					}
@@ -437,20 +435,20 @@ public class StaticTextureSource {
 		@WorkerThread
 		private void handleAddSurface(final int id, final Object surface, final int maxFps) {
 			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
-			checkSurface();
-			synchronized (mClientSync) {
-				RendererTarget client = mClients.get(id);
-				if (client == null) {
+			checkTarget();
+			synchronized (mTargets) {
+				RendererTarget target = mTargets.get(id);
+				if (target == null) {
 					try {
-						client = RendererTarget.newInstance(getEgl(), surface, maxFps);
-						mClients.append(id, client);
+						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
+						mTargets.append(id, target);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
 					}
 				} else {
 					Log.w(TAG, "surface is already added: id=" + id);
 				}
-				mClientSync.notifyAll();
+				mTargets.notifyAll();
 			}
 		}
 
@@ -461,14 +459,14 @@ public class StaticTextureSource {
 		@WorkerThread
 		private void handleRemoveSurface(final int id) {
 			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
-			synchronized (mClientSync) {
-				final RendererTarget client = mClients.get(id);
-				if (client != null) {
-					mClients.remove(id);
-					client.release();
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				if (target != null) {
+					mTargets.remove(id);
+					target.release();
 				}
-				checkSurface();
-				mClientSync.notifyAll();
+				checkTarget();
+				mTargets.notifyAll();
 			}
 		}
 
@@ -478,17 +476,16 @@ public class StaticTextureSource {
 		@WorkerThread
 		private void handleRemoveAll() {
 			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
-			synchronized (mClientSync) {
-				final int n = mClients.size();
-				RendererTarget client;
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					client = mClients.valueAt(i);
-					if (client != null) {
+					final RendererTarget target = mTargets.valueAt(i);
+					if (target != null) {
 						makeCurrent();
-						client.release();
+						target.release();
 					}
 				}
-				mClients.clear();
+				mTargets.clear();
 			}
 			if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 		}
@@ -497,21 +494,21 @@ public class StaticTextureSource {
 		 * 分配描画先のSurfaceが有効かどうかをチェックして無効なものは削除する
 		 */
 		@WorkerThread
-		private void checkSurface() {
-			if (DEBUG) Log.v(TAG, "checkSurface");
-			synchronized (mClientSync) {
-				final int n = mClients.size();
+		private void checkTarget() {
+			if (DEBUG) Log.v(TAG, "checkTarget");
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget client = mClients.valueAt(i);
-					if ((client != null) && !client.isValid()) {
-						final int id = mClients.keyAt(i);
-						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
-						mClients.valueAt(i).release();
-						mClients.remove(id);
+					final RendererTarget target = mTargets.valueAt(i);
+					if ((target != null) && !target.isValid()) {
+						final int id = mTargets.keyAt(i);
+						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
+						mTargets.valueAt(i).release();
+						mTargets.remove(id);
 					}
 				}
 			}
-			if (DEBUG) Log.v(TAG, "checkSurface:finished");
+			if (DEBUG) Log.v(TAG, "checkTarget:finished");
 		}
 
 		/**

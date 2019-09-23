@@ -482,7 +482,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static class BaseRendererTask extends EglTask
 		implements SurfaceTexture.OnFrameAvailableListener {
 
-		private final SparseArray<RendererTarget> mClients
+		private final SparseArray<RendererTarget> mTargets
 			= new SparseArray<RendererTarget>();
 		private final AbstractRendererHolder mParent;
 		private int mVideoWidth, mVideoHeight;
@@ -560,12 +560,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				throw new IllegalArgumentException(
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
-			synchronized (mClients) {
-				if (mClients.get(id) == null) {
+			synchronized (mTargets) {
+				if (mTargets.get(id) == null) {
 					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
-								mClients.wait();
+								mTargets.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
@@ -573,7 +573,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						} else {
 							// キューに追加できなかった時は待機する
 							try {
-								mClients.wait(5);
+								mTargets.wait(5);
 							} catch (final InterruptedException e) {
 								break;
 							}
@@ -590,12 +590,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param id
 		 */
 		public void removeSurface(final int id) {
-			synchronized (mClients) {
-				if (mClients.get(id) != null) {
+			synchronized (mTargets) {
+				if (mTargets.get(id) != null) {
 					for ( ; isRunning() ; ) {
 						if (offer(REQUEST_REMOVE_SURFACE, id)) {
 							try {
-								mClients.wait();
+								mTargets.wait();
 							} catch (final InterruptedException e) {
 								// ignore
 							}
@@ -603,7 +603,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						} else {
 							// キューに追加できなかった時は待機する
 							try {
-								mClients.wait(5);
+								mTargets.wait(5);
 							} catch (final InterruptedException e) {
 								break;
 							}
@@ -619,11 +619,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * interruptされるまでカレントスレッドをブロックする。
 		 */
 		public void removeSurfaceAll() {
-			synchronized (mClients) {
+			synchronized (mTargets) {
 				for ( ; isRunning() ; ) {
 					if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
 						try {
-							mClients.wait();
+							mTargets.wait();
 						} catch (final InterruptedException e) {
 							// ignore
 						}
@@ -631,7 +631,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					} else {
 						// キューに追加できなかった時は待機する
 						try {
-							mClients.wait(5);
+							mTargets.wait(5);
 						} catch (final InterruptedException e) {
 							break;
 						}
@@ -662,17 +662,17 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		public boolean isEnabled(final int id) {
-			synchronized (mClients) {
-				final RendererTarget rec = mClients.get(id);
-				return rec != null && rec.isEnabled();
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				return target != null && target.isEnabled();
 			}
 		}
 
 		public void setEnabled(final int id, final boolean enable) {
-			synchronized (mClients) {
-				final RendererTarget rec = mClients.get(id);
-				if (rec != null) {
-					rec.setEnabled(enable);
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				if (target != null) {
+					target.setEnabled(enable);
 				}
 			}
 		}
@@ -682,8 +682,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public int getCount() {
-			synchronized (mClients) {
-				return mClients.size();
+			synchronized (mTargets) {
+				return mTargets.size();
 			}
 		}
 
@@ -866,7 +866,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				}
 				preprocess();
 				mParent.notifyCapture();
-				handleDrawClients();
+				handleDrawTargets();
 				mParent.callOnFrameAvailable();
 			}
 			// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
@@ -889,19 +889,18 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * 各Surfaceへ描画する
 		 */
 		@WorkerThread
-		protected void handleDrawClients() {
-			synchronized (mClients) {
-				final int n = mClients.size();
-				RendererTarget client;
+		protected void handleDrawTargets() {
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = n - 1; i >= 0; i--) {
-					client = mClients.valueAt(i);
-					if ((client != null) && client.canDraw()) {
+					final RendererTarget target = mTargets.valueAt(i);
+					if ((target != null) && target.canDraw()) {
 						try {
-							onDrawClient(client, mTexId, mTexMatrix);
+							onDrawTarget(target, mTexId, mTexMatrix);
 						} catch (final Exception e) {
 							// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
-							mClients.removeAt(i);
-							client.release();
+							mTargets.removeAt(i);
+							target.release();
 						}
 					}
 				}
@@ -910,15 +909,15 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 		/**
 		 * Surface1つの描画処理
-		 * @param client
+		 * @param target
 		 * @param texId
 		 * @param texMatrix
 		 */
 		@WorkerThread
-		protected void onDrawClient(@NonNull final RendererTarget client,
+		protected void onDrawTarget(@NonNull final RendererTarget target,
 			final int texId, final float[] texMatrix) {
 
-			client.draw(mDrawer, texId, texMatrix);
+			target.draw(mDrawer, texId, texMatrix);
 		}
 		
 		/**
@@ -932,21 +931,21 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			final Object surface, final int maxFps) {
 
 //			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
-			checkSurface();
-			synchronized (mClients) {
-				RendererTarget client = mClients.get(id);
-				if (client == null) {
+			checkTarget();
+			synchronized (mTargets) {
+				RendererTarget target = mTargets.get(id);
+				if (target == null) {
 					try {
-						client = RendererTarget.newInstance(getEgl(), surface, maxFps);
-						setMirror(client.mMvpMatrix, mMirror);
-						mClients.append(id, client);
+						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
+						setMirror(target.mMvpMatrix, mMirror);
+						mTargets.append(id, target);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
 					}
 				} else {
 					Log.w(TAG, "surface is already added: id=" + id);
 				}
-				mClients.notifyAll();
+				mTargets.notifyAll();
 			}
 		}
 	
@@ -957,17 +956,17 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleRemoveSurface(final int id) {
 //			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
-			synchronized (mClients) {
-				final RendererTarget client = mClients.get(id);
-				if (client != null) {
-					mClients.remove(id);
-					if (client.isValid()) {
-						client.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				if (target != null) {
+					mTargets.remove(id);
+					if (target.isValid()) {
+						target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
 					}
-					client.release();
+					target.release();
 				}
-				checkSurface();
-				mClients.notifyAll();
+				checkTarget();
+				mTargets.notifyAll();
 			}
 		}
 				
@@ -977,20 +976,19 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleRemoveAll() {
 //			if (DEBUG) Log.v(TAG, "handleRemoveAll:");
-			synchronized (mClients) {
-				final int n = mClients.size();
-				RendererTarget client;
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					client = mClients.valueAt(i);
-					if (client != null) {
-						if (client.isValid()) {
-							client.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
+					final RendererTarget target = mTargets.valueAt(i);
+					if (target != null) {
+						if (target.isValid()) {
+							target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
 						}
-						client.release();
+						target.release();
 					}
 				}
-				mClients.clear();
-				mClients.notifyAll();
+				mTargets.clear();
+				mTargets.notifyAll();
 			}
 //			if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 		}
@@ -999,21 +997,21 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * 分配描画先のSurfaceが有効かどうかをチェックして無効なものは削除する
 		 */
 		@WorkerThread
-		protected void checkSurface() {
-//			if (DEBUG) Log.v(TAG, "checkSurface");
-			synchronized (mClients) {
-				final int n = mClients.size();
+		protected void checkTarget() {
+//			if (DEBUG) Log.v(TAG, "checkTarget");
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget client = mClients.valueAt(i);
-					if ((client != null) && !client.isValid()) {
-						final int id = mClients.keyAt(i);
-//						if (DEBUG) Log.i(TAG, "checkSurface:found invalid surface:id=" + id);
-						mClients.valueAt(i).release();
-						mClients.remove(id);
+					final RendererTarget target = mTargets.valueAt(i);
+					if ((target != null) && !target.isValid()) {
+						final int id = mTargets.keyAt(i);
+//						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
+						mTargets.valueAt(i).release();
+						mTargets.remove(id);
 					}
 				}
 			}
-//			if (DEBUG) Log.v(TAG, "checkSurface:finished");
+//			if (DEBUG) Log.v(TAG, "checkTarget:finished");
 		}
 	
 		/**
@@ -1023,10 +1021,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@WorkerThread
 		protected void handleClear(final int id, final int color) {
-			synchronized (mClients) {
-				final RendererTarget client = mClients.get(id);
-				if ((client != null) && client.isValid()) {
-					client.clear(color);
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				if ((target != null) && target.isValid()) {
+					target.clear(color);
 				}
 			}
 		}
@@ -1037,12 +1035,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@WorkerThread
 		protected void handleClearAll(final int color) {
-			synchronized (mClients) {
-				final int n = mClients.size();
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget client = mClients.valueAt(i);
-					if ((client != null) && client.isValid()) {
-						client.clear(color);
+					final RendererTarget target = mTargets.valueAt(i);
+					if ((target != null) && target.isValid()) {
+						target.clear(color);
 					}
 				}
 			}
@@ -1060,10 +1058,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 			if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
 				final float[] array = (float[])mvp;
-				synchronized (mClients) {
-					final RendererTarget client = mClients.get(id);
-					if ((client != null) && client.isValid()) {
-						System.arraycopy(array, offset, client.mMvpMatrix, 0, 16);
+				synchronized (mTargets) {
+					final RendererTarget target = mTargets.get(id);
+					if ((target != null) && target.isValid()) {
+						System.arraycopy(array, offset, target.mMvpMatrix, 0, 16);
 					}
 				}
 			}
@@ -1139,12 +1137,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleMirror(final int mirror) {
 			mMirror = mirror;
-			synchronized (mClients) {
-				final int n = mClients.size();
+			synchronized (mTargets) {
+				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final RendererTarget client = mClients.valueAt(i);
-					if (client != null) {
-						setMirror(client.mMvpMatrix, mirror);
+					final RendererTarget target = mTargets.valueAt(i);
+					if (target != null) {
+						setMirror(target.mMvpMatrix, mirror);
 					}
 				}
 			}
@@ -1157,10 +1155,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@WorkerThread
 		protected void handleRotate(final int id, final int degree) {
-			synchronized (mClients) {
-				final RendererTarget client = mClients.get(id);
-				if (client != null) {
-					setRotation(client.mMvpMatrix, degree);
+			synchronized (mTargets) {
+				final RendererTarget target = mTargets.get(id);
+				if (target != null) {
+					setRotation(target.mMvpMatrix, degree);
 				}
 			}
 		}
