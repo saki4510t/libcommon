@@ -319,6 +319,16 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
+	 * 指定したテクスチャをバックバッファにしたオフスクリーンIEglSurfaceを生成する
+	 * @param texId
+	 * @return
+	 */
+	@Override
+	public IEglSurface createTexOffscreen(final int texId) {
+		throw new UnsupportedOperationException();
+	}
+
+	/**
 	 * 指定した大きさのオフスクリーンEglSurfaceを生成する
 	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
 	 * @param width PBufferオフスクリーンのサイズ(0以下はだめ)
