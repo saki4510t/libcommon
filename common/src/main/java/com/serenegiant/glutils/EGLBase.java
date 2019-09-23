@@ -182,9 +182,12 @@ public abstract class EGLBase {
 	/**
 	 * 指定したテクスチャをバックバッファにしたオフスクリーンIEglSurfaceを生成する
 	 * @param texId
+	 * @param width
+	 * @param height
 	 * @return
 	 */
-	public abstract IEglSurface createTexOffscreen(final int texId);
+	public abstract IEglSurface createTexOffscreen(final int texId,
+		final int width, final int height);
 	/**
 	 * EGLレンダリングコンテキストとスレッドの紐付けを解除する
 	 */

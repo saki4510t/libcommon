@@ -255,7 +255,9 @@ import com.serenegiant.utils.BuildCheck;
 	 * @return
 	 */
 	@Override
-	public IEglSurface createTexOffscreen(final int texId) {
+	public IEglSurface createTexOffscreen(final int texId,
+		final int width, final int height) {
+
 		return null; // FIXME 未実装
 	}
 
