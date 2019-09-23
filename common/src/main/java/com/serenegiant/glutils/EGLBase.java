@@ -159,23 +159,21 @@ public abstract class EGLBase {
 	 * @return
 	 */
 	public abstract IContext getContext();
-
 	/**
 	 * EGLコンフィグを取得する
 	 * @return
 	 */
 	public abstract IConfig getConfig();
-
 	/**
-	 * 指定したSurfaceからEglSurfaceを生成する
-	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
+	 * 指定したSurfaceからIEglSurfaceを生成する
+	 * 生成したIEglSurfaceをmakeCurrentした状態で戻る
 	 * @param nativeWindow Surface/SurfaceTexture/SurfaceHolder/SurfaceView
 	 * @return
 	 */
 	public abstract IEglSurface createFromSurface(final Object nativeWindow);
 	/**
-	 * 指定した大きさのオフスクリーンEglSurfaceを生成する
-	 * 生成したEglSurfaceをmakeCurrentした状態で戻る
+	 * 指定した大きさのオフスクリーンIEglSurfaceを生成する
+	 * 生成したIEglSurfaceをmakeCurrentした状態で戻る
 	 * @param width PBufferオフスクリーンのサイズ(0以下はだめ)
 	 * @param height
 	 * @return
