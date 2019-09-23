@@ -229,7 +229,7 @@ import com.serenegiant.utils.BuildCheck;
 	@Override
 	public IEglSurface createFromSurface(final Object nativeWindow) {
 //		if (DEBUG) Log.v(TAG, "createFromSurface:");
-		final EglSurface eglSurface = new EglSurface(this, nativeWindow);
+		final IEglSurface eglSurface = new EglSurface(this, nativeWindow);
 		eglSurface.makeCurrent();
 		return eglSurface;
 	}
@@ -244,7 +244,7 @@ import com.serenegiant.utils.BuildCheck;
 	@Override
 	public IEglSurface createOffscreen(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreen:");
-		final EglSurface eglSurface = new EglSurface(this, width, height);
+		final IEglSurface eglSurface = new EglSurface(this, width, height);
 		eglSurface.makeCurrent();
 		return eglSurface;
 	}
