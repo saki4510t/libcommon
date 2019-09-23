@@ -44,6 +44,6 @@ ext {
 	androidXRecyclerview = '1.1.0-beta04'
 	constraintLibVersion = '1.1.3'
 
-    versionCodeNum = 269
-    versionNameString = '6.7.0'
+    versionCodeNum = 270
+    versionNameString = '6.7.1'
 }
