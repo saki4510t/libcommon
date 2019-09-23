@@ -370,7 +370,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 		if (DEBUG) Log.v(TAG, "captureStill:終了");
 	}
-	
+
+	/**
+	 * レンダリングスレッド上で指定したタスクを実行する
+	 * @param task
+	 */
+	@Override
+	public void queueEvent(@NonNull final Runnable task) {
+		mRendererTask.queueEvent(task);
+	}
+
 	/**
 	 * パス文字列の拡張子を調べて静止画圧縮フォーマットを取得する。
 	 * jpeg(jpg)/png/webpのいずれでもなければIllegalArgumentExceptionを投げる

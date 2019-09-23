@@ -206,4 +206,10 @@ public interface IRendererHolder extends IRendererCommon {
 		@IntRange(from = 1L,to = 99L) final int captureCompression,
 		@Nullable final OnCapturedListener listener)
 			throws IllegalStateException;
+
+	/**
+	 * レンダリングスレッド上で指定したタスクを実行する
+	 * @param task
+	 */
+	public void queueEvent(@NonNull final Runnable task);
 }
