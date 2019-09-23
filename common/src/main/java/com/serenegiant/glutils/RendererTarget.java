@@ -95,11 +95,21 @@ class RendererTarget {
 	public void setEnabled(final boolean enable) {
 		mEnable = enable;
 	}
-	
+
+	/**
+	 * 描画可能かどうかを取得
+	 * @return
+	 */
 	public boolean canDraw() {
 		return mEnable;
 	}
 
+	/**
+	 * このRendererTargetが保持する描画先(Surface等)へIDrawer2Dを使って指定したテクスチャを描画する
+	 * @param drawer
+	 * @param textId
+	 * @param texMatrix
+	 */
 	public void draw(final IDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -161,6 +171,9 @@ class RendererTarget {
 		}
 	}
 
+	/**
+	 * フレームレート制限のための時間チェックを追加したRendererTargetクラス
+	 */
 	private static class RendererTargetHasWait extends RendererTarget {
 		private long mNextDraw;
 		private final long mIntervalsNs;
@@ -179,6 +192,11 @@ class RendererTarget {
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 		}
 
+		/**
+		 * 描画可能かどうかを取得
+		 * フレームレートを制限するため前回の描画から一定時間経過したときのみtrue
+		 * @return
+		 */
 		@Override
 		public boolean canDraw() {
 			return super.canDraw() && (Time.nanoTime() - mNextDraw > 0);
