@@ -337,18 +337,6 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
-	 * 指定したテクスチャをバックバッファにしたオフスクリーンIEglSurfaceを生成する
-	 * @param texId
-	 * @return
-	 */
-	@Override
-	public IEglSurface createTexOffscreen(final int texId,
-		final int width, final int height) {
-
-		throw new UnsupportedOperationException();
-	}
-
-	/**
 	 * EGLレンダリングコンテキストを取得する
 	 * このEGLBaseインスタンスを使って生成したEglSurfaceをmakeCurrentした状態で
 	 * eglGetCurrentContextを呼び出すのと一緒

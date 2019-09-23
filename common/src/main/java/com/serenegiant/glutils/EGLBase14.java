@@ -252,18 +252,6 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
-	 * 指定したテクスチャをバックバッファにしたオフスクリーンIEglSurfaceを生成する
-	 * @param texId
-	 * @return
-	 */
-	@Override
-	public IEglSurface createTexOffscreen(final int texId,
-		final int width, final int height) {
-
-		return null; // FIXME 未実装
-	}
-
-	/**
 	 * GLESに文字列を問い合わせる
 	 * @param what
 	 * @return
