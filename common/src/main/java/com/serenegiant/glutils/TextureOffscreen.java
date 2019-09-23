@@ -177,7 +177,7 @@ public class TextureOffscreen {
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public TextureOffscreen(final int tex_target, final int tex_unit, final int tex_id,
+	private TextureOffscreen(final int tex_target, final int tex_unit, final int tex_id,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
