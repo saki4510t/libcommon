@@ -208,6 +208,21 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param withDepthBuffer
+	 * @param isRecordable
+	 */
+	public EGLBase14(final int maxClientVersion,
+		final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
+//		if (DEBUG) Log.v(TAG, "Constructor:");
+		init(maxClientVersion, new Context(EGL14.eglGetCurrentContext()),
+			withDepthBuffer, stencilBits, isRecordable);
+	}
+
+	/**
 	 * 関連するリソースを破棄する
 	 */
 	@Override

@@ -101,6 +101,29 @@ public abstract class EGLBase {
 	}
 
 	/**
+	 * 既存のレンダリングコンテキストを共有して新しいレンダリングコンテキストを生成する
+	 * レンダリングコンテキストを存在していなければcreateFromでsharedContextに
+	 * nullを渡したのと同じで独立したレンダリングコンテキストを生成する
+	 * @param maxClientVersion
+	 * @param withDepthBuffer
+	 * @param stencilBits
+	 * @param isRecordable
+	 * @return
+	 */
+	public static EGLBase createShared(final int maxClientVersion,
+		final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
+		if (isEGL14Supported()) {
+			return new EGLBase14(maxClientVersion,
+				withDepthBuffer, stencilBits, isRecordable);
+		} else {
+			return new EGLBase10(maxClientVersion,
+				withDepthBuffer, stencilBits, isRecordable);
+		}
+	}
+
+	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static abstract class IContext {

@@ -290,6 +290,21 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param withDepthBuffer
+	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
+	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
+	 */
+	public EGLBase10(final int maxClientVersion,
+		final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
+//		if (DEBUG) Log.v(TAG, "Constructor:");
+		init(maxClientVersion, new Context(((EGL10) EGLContext.getEGL()).eglGetCurrentContext()),
+			withDepthBuffer, stencilBits, isRecordable);
+	}
+	/**
 	 * 関連するリソースを破棄する
 	 */
 	@Override
