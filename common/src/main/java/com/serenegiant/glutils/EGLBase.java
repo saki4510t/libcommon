@@ -277,6 +277,11 @@ public abstract class EGLBase {
 		}
 	}
 	/**
+	 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+	 * @return
+	 */
+	public abstract IEglSurface wrapCurrent();
+	/**
 	 * EGLレンダリングコンテキストとスレッドの紐付けを解除する
 	 */
 	public abstract void makeDefault();

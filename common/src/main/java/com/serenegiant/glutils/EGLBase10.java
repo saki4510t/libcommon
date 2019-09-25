@@ -151,6 +151,7 @@ import com.serenegiant.utils.BuildCheck;
 		@NonNull
 		private final EGLBase10 mEglBase;
 		private EGLSurface mEglSurface;
+		private boolean mOwnSurface;
 
 		/**
 		 * Surface(Surface/SurfaceTexture/SurfaceHolder)に関係付けられたEglSurface
@@ -178,6 +179,7 @@ import com.serenegiant.utils.BuildCheck;
 				|| (_surface instanceof SurfaceTexture)
 				|| (_surface instanceof SurfaceView)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
+				mOwnSurface = true;
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
 			}
@@ -200,6 +202,17 @@ import com.serenegiant.utils.BuildCheck;
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
+			mOwnSurface = true;
+		}
+
+		/**
+		 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+		 * @param eglBase
+		 */
+		private EglSurface(@NonNull final EGLBase10 eglBase) {
+			mEglBase = eglBase;
+			mEglSurface = eglBase.mEgl.eglGetCurrentSurface(EGL10.EGL_DRAW);
+			mOwnSurface = false;
 		}
 
 		/**
@@ -209,8 +222,10 @@ import com.serenegiant.utils.BuildCheck;
 		public void release() {
 //			if (DEBUG) Log.v(TAG, "EglSurface:release:");
 			mEglBase.makeDefault();
-			mEglBase.destroyWindowSurface(mEglSurface);
-	        mEglSurface = EGL10.EGL_NO_SURFACE;
+			if (mOwnSurface) {
+				mEglBase.destroyWindowSurface(mEglSurface);
+			}
+			mEglSurface = EGL10.EGL_NO_SURFACE;
 		}
 
 		@Deprecated
@@ -304,6 +319,7 @@ import com.serenegiant.utils.BuildCheck;
 		init(maxClientVersion, new Context(((EGL10) EGLContext.getEGL()).eglGetCurrentContext()),
 			withDepthBuffer, stencilBits, isRecordable);
 	}
+
 	/**
 	 * 関連するリソースを破棄する
 	 */
@@ -350,6 +366,19 @@ import com.serenegiant.utils.BuildCheck;
 		result.makeCurrent();
 		return result;
 	}
+
+	/**
+	 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+	 * @return
+	 */
+	@Override
+	public IEglSurface wrapCurrent() {
+//		if (DEBUG) Log.v(TAG, "createOffscreen:");
+		final IEglSurface result = new EglSurface(this);
+		result.makeCurrent();
+		return result;
+	}
+
 
 	/**
 	 * EGLレンダリングコンテキストを取得する

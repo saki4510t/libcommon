@@ -98,6 +98,7 @@ import com.serenegiant.utils.BuildCheck;
 		@NonNull
 		private final EGLBase14 mEglBase;
 		private EGLSurface mEglSurface;
+		private boolean mOwnSurface;
 
 		private EglSurface(@NonNull final EGLBase14 eglBase, final Object surface)
 			throws IllegalArgumentException {
@@ -109,6 +110,7 @@ import com.serenegiant.utils.BuildCheck;
 				|| (surface instanceof SurfaceTexture)
 				|| (surface instanceof SurfaceView)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
+				mOwnSurface = true;
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
 			}
@@ -132,14 +134,27 @@ import com.serenegiant.utils.BuildCheck;
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
+			mOwnSurface = true;
+		}
+
+		/**
+		 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+		 * @param eglBase
+		 */
+		private EglSurface(@NonNull final EGLBase14 eglBase) {
+			mEglBase = eglBase;
+			mEglSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+			mOwnSurface = false;
 		}
 
 		@Override
 		public void release() {
 //			if (DEBUG) Log.v(TAG, "EglSurface:release:");
 			mEglBase.makeDefault();
-			mEglBase.destroyWindowSurface(mEglSurface);
-	        mEglSurface = EGL14.EGL_NO_SURFACE;
+			if (mOwnSurface) {
+				mEglBase.destroyWindowSurface(mEglSurface);
+			}
+			mEglSurface = EGL14.EGL_NO_SURFACE;
 		}
 
 		@Deprecated
@@ -262,6 +277,18 @@ import com.serenegiant.utils.BuildCheck;
 	public IEglSurface createOffscreen(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreen:");
 		final IEglSurface result = new EglSurface(this, width, height);
+		result.makeCurrent();
+		return result;
+	}
+
+	/**
+	 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+	 * @return
+	 */
+	@Override
+	public IEglSurface wrapCurrent() {
+//		if (DEBUG) Log.v(TAG, "createOffscreen:");
+		final IEglSurface result = new EglSurface(this);
 		result.makeCurrent();
 		return result;
 	}
