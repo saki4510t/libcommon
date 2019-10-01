@@ -33,8 +33,9 @@ import android.view.ViewConfiguration;
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 
-public class ZoomAspectScaledTextureView extends AspectScaledTextureView
-	implements IRendererCommon {
+public class ZoomAspectScaledTextureView
+	extends AspectScaledTextureView implements IRendererCommon {
+
 	private boolean mHandleTouchEvent;
 	// constants
 	/**
