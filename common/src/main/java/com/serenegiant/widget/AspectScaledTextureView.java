@@ -142,6 +142,10 @@ public class AspectScaledTextureView extends TextureView
 	protected void onResize(final int width, final int height) {
 	}
 
+	public boolean hasSurface() {
+		return mHasSurface;
+	}
+
 //================================================================================
 // SurfaceTextureListener
 //================================================================================
