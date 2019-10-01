@@ -38,6 +38,9 @@ import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 
+/**
+ * FIXME 拡大縮小回転移動処理をDelegaterへ分けたい
+ */
 public class ZoomAspectScaledTextureView
 	extends AspectScaledTextureView implements IRendererCommon {
 
