@@ -18,9 +18,15 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import android.content.Context;
 import android.graphics.drawable.Drawable;
+import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.StyleRes;
 
 public class ViewHelper {
 	/**
@@ -52,5 +58,24 @@ public class ViewHelper {
 				setBackgroundAll((ViewGroup) child, dr);
 			}
 		}
+	}
+
+	/**
+	 * 指定したテーマ用のLayoutInflaterを生成する
+	 * @param context
+	 * @param inflater
+	 * @param themeRes
+	 * @return
+	 */
+	@NonNull
+	public static LayoutInflater createCustomLayoutInflater(
+		@NonNull final Context context, @NonNull final LayoutInflater inflater,
+		@StyleRes final int themeRes) {
+
+		// フラグメントにテーマを割り当てる時は元のContext(Activity)を継承して
+		// カスタムテーマを持つContextThemeWrapperを生成する
+		final Context wrappedContext = new ContextThemeWrapper(context, themeRes);
+		// ついでそのContextThemeWrapperを使ってinflaterを複製する
+		return inflater.cloneInContext(wrappedContext);
 	}
 }
