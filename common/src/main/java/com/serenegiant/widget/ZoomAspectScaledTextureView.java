@@ -33,10 +33,33 @@ import android.view.ViewConfiguration;
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
+
 public class ZoomAspectScaledTextureView
 	extends AspectScaledTextureView implements IRendererCommon {
 
-	private boolean mHandleTouchEvent;
+	public static final int TOUCH_DISABLED			= 0x00000000;
+	public static final int TOUCH_ENABLED_MOVE		= 0x00000001;
+	public static final int TOUCH_ENABLED_ZOOM		= 0x00000002;
+	public static final int TOUCH_ENABLED_ROTATE	= 0x00000004;
+	public static final int TOUCH_ENABLED_ALL
+		= TOUCH_ENABLED_MOVE | TOUCH_ENABLED_ZOOM | TOUCH_ENABLED_ROTATE;	// 0x00000007
+
+	@IntDef({
+		TOUCH_DISABLED,
+		TOUCH_ENABLED_MOVE,
+		TOUCH_ENABLED_ZOOM,
+		TOUCH_ENABLED_ROTATE,
+		TOUCH_ENABLED_ALL,})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface TouchMode {}
+
+//================================================================================
+	@TouchMode
+	private int mHandleTouchEvent;
 	// constants
 	/**
 	 * State: idle
@@ -99,6 +122,10 @@ public class ZoomAspectScaledTextureView
 	 */
 	private static final float EPS = 0.1f;
 
+//================================================================================
+	private float mManualScale = 1.0f;
+	private float mManualRotate = Float.MAX_VALUE;
+
 	/**
 	 * 拡大縮小回転移動のための射影行列のデフォルト値
 	 */
@@ -149,6 +176,10 @@ public class ZoomAspectScaledTextureView
 	 */
 	private float mPivotX, mPivotY;
 	/**
+	 * 平行移動量
+	 */
+	private float mTransX, mTransY;
+	/**
 	 * distance between touch points when start multi touch, for calculating zooming scale
 	 */
 	private float mTouchDistance;
@@ -192,9 +223,15 @@ public class ZoomAspectScaledTextureView
 
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
+		final TypedArray a
+			= context.getTheme()
+				.obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
 		try {
-			mHandleTouchEvent = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
+			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
+			mHandleTouchEvent = a.getInteger(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);
+		} catch (final UnsupportedOperationException e) {
+			final boolean b = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
+			mHandleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
 		} finally {
 			a.recycle();
 		}
@@ -204,7 +241,7 @@ public class ZoomAspectScaledTextureView
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
 
-		if (!mHandleTouchEvent) {
+		if (mHandleTouchEvent == TOUCH_DISABLED) {
 			return super.onTouchEvent(event);
 		}
 
@@ -236,7 +273,8 @@ public class ZoomAspectScaledTextureView
 			// moving with single and multi touch
 			switch (mState) {
 			case STATE_WAITING:
-				if (checkTouchMoved(event)) {
+				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
+					&& checkTouchMoved(event)) {
 					removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGING);
 					return true;
@@ -247,7 +285,8 @@ public class ZoomAspectScaledTextureView
 					return true;
 				break;
 			case STATE_CHECKING:
-				if (checkTouchMoved(event)) {
+				if (checkTouchMoved(event)
+					&& ((mHandleTouchEvent & TOUCH_ENABLED_ZOOM) == TOUCH_ENABLED_ZOOM)) {
 					startZoom(event);
 					return true;
 				}
@@ -330,7 +369,7 @@ public class ZoomAspectScaledTextureView
 		return mMirrorMode;
 	}
 	
-	public void setEnableHandleTouchEvent(final boolean enabled) {
+	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
 		mHandleTouchEvent = enabled;
 	}
 
@@ -361,6 +400,7 @@ public class ZoomAspectScaledTextureView
 		mLimitRect.inset((int)(MOVE_LIMIT_RATE * view_width), (int)(MOVE_LIMIT_RATE * view_height));
 		mLimitSegments[0] = null;
 		mImageRect.set(0, 0, tmp.width(), tmp.height());
+		mTransX = mTransY = 0.0f;
 		super.init();
 		mDefaultMatrix.set(mImageMatrix);
 	}
@@ -477,6 +517,8 @@ public class ZoomAspectScaledTextureView
 //				if (DEBUG) Log.v(TAG, String.format("processDrag:dx=%f,dy=%f", dx, dy));
 				// apply move
 				if (mImageMatrix.postTranslate(dx, dy)) {
+					mTransX += dx;
+					mTransY += dy;
 					// when image is really moved?
 					mImageMatrixChanged = true;
 					// apply to super class
@@ -518,9 +560,12 @@ public class ZoomAspectScaledTextureView
 			mPivotX = (mPrimaryX + mSecondX) / 2.f;
 			mPivotY = (mPrimaryY + mSecondY) / 2.f;
 			//
-			if (mStartCheckRotate == null)
-				mStartCheckRotate = new StartCheckRotate();
-			postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+			if ((mHandleTouchEvent & TOUCH_ENABLED_ROTATE) == TOUCH_ENABLED_ROTATE) {
+				if (mStartCheckRotate == null) {
+					mStartCheckRotate = new StartCheckRotate();
+				}
+				postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
 		}
 	}
@@ -895,4 +940,80 @@ public class ZoomAspectScaledTextureView
 	}
 
 //================================================================================
+	public void setManualScale(final float scale) {
+		setMatrix(mTransX, mTransY, scale, mManualRotate);
+	}
+
+	public float getManualScale() {
+		return mManualScale;
+	}
+
+	public float getTranslateX() {
+		return mTransX;
+	}
+
+	public float getTranslateY() {
+		return mTransY;
+	}
+
+	public void setTranslate(final float dx, final float dy) {
+		setMatrix(dx, dy, mManualScale, mManualRotate);
+	}
+
+	public void setRotate(final float degrees) {
+		setMatrix(mTransX, mTransY, mManualScale, degrees);
+	}
+
+	public float getRotate() {
+		return mManualRotate;
+	}
+
+	public void setMatrix(final float dx, final float dy, final float scale) {
+
+		setMatrix(dx, dy, scale, Float.MAX_VALUE);
+	}
+
+	public void setMatrix(final float dx, final float dy,
+		final float scale, final float degrees) {
+
+		if ((mTransX != dx) || (mTransY != dy)
+			|| (mManualScale != scale)
+			|| (mCurrentDegrees != degrees)) {
+
+			mManualScale = scale <= 0.0f ? mManualScale : scale;
+			mTransX = dx;
+			mTransY = dy;
+			mManualRotate = degrees;
+			if (degrees != Float.MAX_VALUE) {
+				while (mManualRotate > 360) {
+					mManualRotate -= 360;
+				}
+				while (mManualRotate < -360) {
+					mManualRotate += 360;
+				}
+			}
+			final float[] work = new float[9];
+			mDefaultMatrix.getValues(work);
+			final int w2 = getWidth() >> 1;
+			final int h2 = getHeight() >> 1;
+//			mImageMatrix.setScale(
+//				work[Matrix.MSCALE_X] * mManualScale,
+//				work[Matrix.MSCALE_Y] * mManualScale,
+//				w2, h2);
+			mImageMatrix.reset();
+			mImageMatrix.postTranslate(dx, dy);
+			mImageMatrix.postScale(
+				work[Matrix.MSCALE_X] * mManualScale,
+				work[Matrix.MSCALE_Y] * mManualScale,
+				w2, h2);
+			if (degrees != Float.MAX_VALUE) {
+				mImageMatrix.postRotate(mManualRotate,
+					w2, h2);
+			}
+			// when Matrix is changed
+			mImageMatrixChanged = true;
+			// apply to super class
+			setTransform(mImageMatrix);
+		}
+	}
 }
