@@ -241,6 +241,10 @@ public class ZoomAspectScaledTextureView
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
 
+		if (handleOnTouchEvent(event)) {
+			return true;	// 処理済み
+		}
+
 		if (mHandleTouchEvent == TOUCH_DISABLED) {
 			return super.onTouchEvent(event);
 		}
@@ -323,6 +327,13 @@ public class ZoomAspectScaledTextureView
 		return super.onTouchEvent(event);
 	}
 
+	protected boolean handleOnTouchEvent(final MotionEvent event) {
+		return false;
+	}
+
+	protected void onReset() {
+	}
+
 //================================================================================
 	/**
 	 * TextureViewに関連付けられたSurfaceTextureが利用可能になった時の処理
@@ -375,6 +386,7 @@ public class ZoomAspectScaledTextureView
 
 	public void reset() {
 		init();
+		onReset();
 	}
 
 //================================================================================
