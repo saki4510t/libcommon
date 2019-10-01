@@ -143,7 +143,7 @@ public class AspectScaledTextureView extends TextureView
 	}
 
 //================================================================================
-// IAspectRatioView
+// SurfaceTextureListener
 //================================================================================
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
