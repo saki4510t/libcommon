@@ -34,7 +34,6 @@ import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaReaper implements Runnable {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -121,7 +120,7 @@ public abstract class MediaReaper implements Runnable {
 
 			MediaFormat outFormat;
 	        if (ix0 >= 0) {
-	//        	Log.w(TAG, "csd may be wrong, it may be for video");
+				if (DEBUG) Log.w(TAG, "csd may be wrong, it may be for video");
 	        }
 	        // audioの時はSTART_MARKが無いので全体をコピーして渡す
 	        outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
@@ -163,6 +162,7 @@ public abstract class MediaReaper implements Runnable {
 			try {
 				mSync.wait();	// エンコーダースレッド起床待ち
 			} catch (final InterruptedException e) {
+				// ignore
 			}
 		}
 	}
