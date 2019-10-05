@@ -266,8 +266,9 @@ LOOP:	for ( ; mIsRunning ; ) {
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
                 if (!mIsEOS) {
-                	if (++count > 5)
+                	if (++count > 5) {
                 		break LOOP;		// out of while
+					}
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
 //            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
@@ -285,8 +286,9 @@ LOOP:	for ( ; mIsRunning ; ) {
 				// コーデックからの出力フォーマットを取得してnative側へ引き渡す
 				// getOutputFormatはINFO_OUTPUT_FORMAT_CHANGEDが来た後でないと呼んじゃダメ(クラッシュする)
                 final MediaFormat format = encoder.getOutputFormat(); // API >= 16
-                if (!callOnFormatChanged(format))
+                if (!callOnFormatChanged(format)) {
                 	break LOOP;
+				}
             } else if (encoderStatus >= 0) {
                 final ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
                 if (encodedData == null) {
@@ -308,8 +310,9 @@ LOOP:	for ( ; mIsRunning ; ) {
 //						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
                         final MediaFormat outFormat
                         	= createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
-                        if (!callOnFormatChanged(outFormat))
+                        if (!callOnFormatChanged(outFormat)) {
                         	break LOOP;
+						}
                     }
 					mBufferInfo.size = 0;
                 }
