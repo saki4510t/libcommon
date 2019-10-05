@@ -260,9 +260,9 @@ public abstract class MediaReaper implements Runnable {
 //    		Log.w(TAG, "drain:", e);
     		return;
     	}
-        int encoderStatus, count = 0;
+        int count = 0;
 LOOP:	for ( ; mIsRunning ; ) {
-            encoderStatus = encoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
+            final int encoderStatus = encoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
                 if (!mIsEOS) {
