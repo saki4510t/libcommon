@@ -18,21 +18,25 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
-import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
 import android.util.Log;
 
 import com.serenegiant.media.exceptions.TimeoutException;
+import com.serenegiant.utils.BuildCheck;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaReaper implements Runnable {
@@ -201,6 +205,7 @@ public abstract class MediaReaper implements Runnable {
 		return mReaperType;
 	}
 	
+	@SuppressLint("NewApi")
 	@Override
 	public void run() {
 		android.os.Process.setThreadPriority(
@@ -211,16 +216,32 @@ public abstract class MediaReaper implements Runnable {
     		mRequestDrain = 0;
 			mSync.notify();	// 起床通知
         }
-        boolean localRequestStop;
-        boolean localRequestDrain;
-    	for ( ; mIsRunning ; ) {
-        	synchronized (mSync) {
-        		localRequestStop = mRequestStop;
-        		localRequestDrain = (mRequestDrain > 0);
-        		if (localRequestDrain)
-        			mRequestDrain--;
-        	}
-        	try {
+        if (BuildCheck.isLollipop()) {
+        	drain_loop_API21();
+		} else {
+			drain_loop();
+		}
+        synchronized (mSync) {
+        	mRequestStop = true;
+            mIsRunning = false;
+        }
+	}
+
+	/**
+	 * API21未満でのdrainループ
+	 */
+	private void drain_loop() {
+		boolean localRequestStop;
+		boolean localRequestDrain;
+		for (; mIsRunning; ) {
+			synchronized (mSync) {
+				localRequestStop = mRequestStop;
+				localRequestDrain = (mRequestDrain > 0);
+				if (localRequestDrain) {
+					mRequestDrain--;
+				}
+			}
+			try {
 				if (localRequestStop) {
 					drain();
 					mIsEOS = true;
@@ -243,13 +264,53 @@ public abstract class MediaReaper implements Runnable {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-    	} // end of while
-        synchronized (mSync) {
-        	mRequestStop = true;
-            mIsRunning = false;
-        }
+		} // end of for
 	}
 
+	/**
+	 * API21以上用のdrainループ
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	private void drain_loop_API21() {
+		boolean localRequestStop;
+		boolean localRequestDrain;
+		for (; mIsRunning; ) {
+			synchronized (mSync) {
+				localRequestStop = mRequestStop;
+				localRequestDrain = (mRequestDrain > 0);
+				if (localRequestDrain) {
+					mRequestDrain--;
+				}
+			}
+			try {
+				if (localRequestStop) {
+					drain_API21();
+					mIsEOS = true;
+					release();
+					break;
+				}
+				if (localRequestDrain) {
+					drain_API21();
+				} else {
+					synchronized (mSync) {
+						try {
+							mSync.wait(50);
+						} catch (final InterruptedException e) {
+							break;
+						}
+					}
+				}
+			} catch (final IllegalStateException e) {
+				break;
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		} // end of for
+	}
+
+	/**
+	 * API21未満用エンコード結果取り出し処理
+	 */
 	private final void drain() {
 		final MediaCodec encoder = mWeakEncoder.get();
     	if (encoder == null) return;
@@ -271,7 +332,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 					}
                 }
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-//            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
+            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                 // エンコード時にはこれは来ないはず
                 encoderOutputBuffers = encoder.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
@@ -299,22 +360,13 @@ LOOP:	for ( ; mIsRunning ; ) {
 //					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
                 	// Android4.3未満をターゲットにするならここで処理しないと駄目
                     if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
-                    	// csd-0とcsd-1が同時に来ているはずなので分離してセットする
-                        final byte[] tmp = new byte[mBufferInfo.size];
-                        encodedData.position(0);
-                        encodedData.get(tmp, mBufferInfo.offset, mBufferInfo.size);
-                        encodedData.position(0);
-                        final int ix0 = MediaCodecHelper.findStartMarker(tmp, 0);
-                        final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0 + 2);
-						final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1 + 2);
-//						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-                        final MediaFormat outFormat
-                        	= createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
+						final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
                         if (!callOnFormatChanged(outFormat)) {
                         	break LOOP;
 						}
+						// もともとはBUFFER_FLAG_CODEC_CONFIGが来たら常にクリアしてたけど初回のみに変更してみた
+						mBufferInfo.size = 0;
                     }
-					mBufferInfo.size = 0;
                 }
 
                 if (mBufferInfo.size != 0) {
@@ -349,6 +401,115 @@ LOOP:	for ( ; mIsRunning ; ) {
         }	// for ( ; mIsRunning ; )
 //		if (DEBUG) Log.v(TAG, "drain:finished");
     }
+
+	/**
+	 * API21以上用エンコード結果取り出し処理
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	private final void drain_API21() {
+		final MediaCodec encoder = mWeakEncoder.get();
+    	if (encoder == null) return;
+        int count = 0;
+LOOP:	for ( ; mIsRunning ; ) {
+            final int encoderStatus = encoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
+            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
+                // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
+                if (!mIsEOS) {
+                	if (++count > 5) {
+                		break LOOP;		// out of while
+					}
+                }
+            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
+            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
+                // エンコード時にはこれは来ないはず, API21では来ないはず
+            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
+//            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
+            	// コーデックからの出力フォーマットが変更された時
+                // エンコード済みバッファの受け取る前にだけ１回来るはず。
+            	// ただし、Android4.3未満だとINFO_OUTPUT_FORMAT_CHANGEDは来ないので
+            	// 代わりにflags & MediaCodec.BUFFER_FLAG_CODEC_CONFIGの時に処理しないとだめ
+                if (mRecorderStarted) {	// ２回目が来た時はエラー
+                    throw new RuntimeException("format changed twice");
+                }
+				// コーデックからの出力フォーマットを取得してnative側へ引き渡す
+				// getOutputFormatはINFO_OUTPUT_FORMAT_CHANGEDが来た後でないと呼んじゃダメ(クラッシュする)
+                final MediaFormat format = encoder.getOutputFormat(); // API >= 16
+                if (!callOnFormatChanged(format)) {
+                	break LOOP;
+				}
+            } else if (encoderStatus >= 0) {
+                final ByteBuffer encodedData = encoder.getOutputBuffer(encoderStatus);	// API>=21
+                if (encodedData == null) {
+                	// 出力バッファインデックスが来てるのに出力バッファを取得できない・・・無いはずやねんけど
+                    throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
+                }
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+//					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
+                	// Android4.3未満をターゲットにするならここで処理しないと駄目
+                    if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
+                    	final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
+                        if (!callOnFormatChanged(outFormat)) {
+                        	break LOOP;
+						}
+						// もともとはBUFFER_FLAG_CODEC_CONFIGが来たら常にクリアしてたけど初回のみに変更してみた
+						mBufferInfo.size = 0;
+                    }
+                }
+
+                if (mBufferInfo.size != 0) {
+                	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
+            		count = 0;
+                    if (!mRecorderStarted) {
+                    	// でも出力可能になっていない時
+                    	// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
+                        throw new RuntimeException("drain:muxer hasn't started");
+                    }
+                    // ファイルに出力(presentationTimeUsを調整)
+                    try {
+	                   	mBufferInfo.presentationTimeUs
+	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
+	                   	mListener.writeSampleData(MediaReaper.this, encodedData, mBufferInfo);
+                    } catch (final TimeoutException e) {
+//						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
+						callOnError(e);
+                    } catch (final Exception e) {
+//						if (DEBUG) Log.w(TAG, e);
+						callOnError(e);
+                    }
+                }
+                // 出力済みのバッファをエンコーダーに返す
+                encoder.releaseOutputBuffer(encoderStatus, false);
+                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
+                	// ストリーム終了指示が来た時
+                	callOnStop();
+					break LOOP;
+                }
+            }
+        }	// for ( ; mIsRunning ; )
+//		if (DEBUG) Log.v(TAG, "drain:finished");
+    }
+
+	/**
+	 * Android4.3未満でBUFFER_FLAG_CODEC_CONFIGフラグがセットされたときに
+	 * csd0, csd1から出力用のMediaFormatを生成するためのヘルパーメソッド
+	 * @param info
+	 * @param encodedData
+	 * @return
+	 */
+	private MediaFormat createOutputFormat(
+		@NonNull final MediaCodec.BufferInfo info,
+		@NonNull final ByteBuffer encodedData) {
+
+		// csd-0とcsd-1が同時に来ているはずなので分離してセットする
+		final byte[] tmp = new byte[info.size];
+		encodedData.position(0);
+		encodedData.get(tmp, info.offset, info.size);
+		encodedData.position(0);
+		final int ix0 = MediaCodecHelper.findStartMarker(tmp, 0);
+		final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0 + 2);
+		final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1 + 2);
+		return createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
+	}
 
 	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
 		final int ix0, final int ix1, final int ix2);
