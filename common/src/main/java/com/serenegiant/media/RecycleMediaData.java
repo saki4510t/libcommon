@@ -30,8 +30,6 @@ import androidx.annotation.NonNull;
 public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	private final WeakReference<IMediaQueue> mWeakParent;
 
-	/*package*/int trackIx;
-	
 	public RecycleMediaData(@NonNull final IMediaQueue parent) {
 		super();
 		mWeakParent = new WeakReference<IMediaQueue>(parent);

@@ -32,6 +32,7 @@ public class MediaData {
 
 	@NonNull
 	private ByteOrder mByteOrder = ByteOrder.nativeOrder();
+	/*package*/int trackIx;
 	/*package*/ByteBuffer mBuffer;
 	/*package*/int flags;
 	/*package*/int size;
@@ -74,16 +75,17 @@ public class MediaData {
 	 */
 	public MediaData(@NonNull MediaData src) {
 		mByteOrder = src.mByteOrder;
-		set(src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+		set(src.trackIx, src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * データをセット
 	 * このオブジェクトのエンディアンは変更されないので注意
 	 * @param src
 	 */
 	public void set(@NonNull MediaData src) {
-		set(src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+		set(0, src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
 	}
 
 	/**
@@ -94,9 +96,9 @@ public class MediaData {
 	 */
 	public void set(@NonNull final ByteBuffer buffer,
 		@IntRange(from=0)final int size, final long presentationTimeUs) {
-		set(buffer, 0, size, presentationTimeUs, 0);
+		set(0, buffer, 0, size, presentationTimeUs, 0);
 	}
-	
+
 	/**
 	 * データをセット
 	 * bufferのoffsetからoffset+size分をコピーする。
@@ -108,11 +110,35 @@ public class MediaData {
 	 * @param _presentationTimeUs
 	 * @param _flags
 	 */
-	public void set(@Nullable final ByteBuffer buffer,
+	public void set(
+		@Nullable final ByteBuffer buffer,
 		@IntRange(from=0) final int _offset,
 		@IntRange(from=0)final int _size,
 		final long _presentationTimeUs, final int _flags) {
 
+		set(0, buffer, _offset, _size, _presentationTimeUs, _flags);
+	}
+
+	/**
+	 * データをセット
+	 * bufferのoffsetからoffset+size分をコピーする。
+	 * ここで指定したオフセット値は保持されず#getでバッファの内容を取得する際には
+	 * オフセットは必ず0になる
+	 * @param _trackIx
+	 * @param buffer
+	 * @param _offset
+	 * @param _size
+	 * @param _presentationTimeUs
+	 * @param _flags
+	 */
+	public void set(
+		final int _trackIx,
+		@Nullable final ByteBuffer buffer,
+		@IntRange(from=0) final int _offset,
+		@IntRange(from=0)final int _size,
+		final long _presentationTimeUs, final int _flags) {
+
+		trackIx = _trackIx;
 		presentationTimeUs = _presentationTimeUs;
 		size = _size;
 		flags = _flags;
@@ -132,9 +158,25 @@ public class MediaData {
 	 * @param info
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-	public void set(@Nullable ByteBuffer buffer,
+	public void set(
+		@Nullable ByteBuffer buffer,
 		@NonNull final MediaCodec.BufferInfo info) {
-	
+
+		set(0, buffer, info);
+	}
+
+	/**
+	 * データをセット
+	 * @param buffer
+	 * @param info
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+	public void set(
+		final int _trackIx,
+		@Nullable ByteBuffer buffer,
+		@NonNull final MediaCodec.BufferInfo info) {
+
+		trackIx = _trackIx;
 		presentationTimeUs = info.presentationTimeUs;
 		size = buffer != null ? info.size : 0;
 		flags = info.flags;
@@ -148,7 +190,8 @@ public class MediaData {
 			mBuffer.flip();
 		}
 	}
-	
+
+//--------------------------------------------------------------------------------
 	/**
 	 * 必要に応じて内部のByteBufferの容量を変更する、
 	 * 保持しているデータサイズ(sizeフィールド)は変更しない
