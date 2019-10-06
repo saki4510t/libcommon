@@ -364,9 +364,8 @@ LOOP:	for ( ; mIsRunning ; ) {
                         if (!callOnFormatChanged(outFormat)) {
                         	break LOOP;
 						}
-						// もともとはBUFFER_FLAG_CODEC_CONFIGが来たら常にクリアしてたけど初回のみに変更してみた
-						mBufferInfo.size = 0;
                     }
+					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
                 }
 
                 if (mBufferInfo.size != 0) {
@@ -451,9 +450,8 @@ LOOP:	for ( ; mIsRunning ; ) {
                         if (!callOnFormatChanged(outFormat)) {
                         	break LOOP;
 						}
-						// もともとはBUFFER_FLAG_CODEC_CONFIGが来たら常にクリアしてたけど初回のみに変更してみた
-						mBufferInfo.size = 0;
                     }
+					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
                 }
 
                 if (mBufferInfo.size != 0) {
