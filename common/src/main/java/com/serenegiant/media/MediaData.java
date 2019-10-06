@@ -32,11 +32,11 @@ public class MediaData {
 
 	@NonNull
 	private ByteOrder mByteOrder = ByteOrder.nativeOrder();
-	/*package*/int trackIx;
-	/*package*/ByteBuffer mBuffer;
-	/*package*/int flags;
-	/*package*/int size;
-	/*package*/long presentationTimeUs;
+	private int mTrackIx;
+	private ByteBuffer mBuffer;
+	private int mFlags;
+	private int mSize;
+	private long mPresentationTimeUs;
 	
 	/**
 	 * コンストラクタ
@@ -75,7 +75,7 @@ public class MediaData {
 	 */
 	public MediaData(@NonNull MediaData src) {
 		mByteOrder = src.mByteOrder;
-		set(src.trackIx, src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+		set(src.mTrackIx, src.mBuffer, 0, src.mSize, src.mPresentationTimeUs, src.mFlags);
 	}
 
 //--------------------------------------------------------------------------------
@@ -85,7 +85,7 @@ public class MediaData {
 	 * @param src
 	 */
 	public void set(@NonNull MediaData src) {
-		set(0, src.mBuffer, 0, src.size, src.presentationTimeUs, src.flags);
+		set(0, src.mBuffer, 0, src.mSize, src.mPresentationTimeUs, src.mFlags);
 	}
 
 	/**
@@ -124,29 +124,29 @@ public class MediaData {
 	 * bufferのoffsetからoffset+size分をコピーする。
 	 * ここで指定したオフセット値は保持されず#getでバッファの内容を取得する際には
 	 * オフセットは必ず0になる
-	 * @param _trackIx
+	 * @param trackIx
 	 * @param buffer
-	 * @param _offset
-	 * @param _size
-	 * @param _presentationTimeUs
-	 * @param _flags
+	 * @param offset
+	 * @param size
+	 * @param presentationTimeUs
+	 * @param flags
 	 */
 	public void set(
-		final int _trackIx,
+		final int trackIx,
 		@Nullable final ByteBuffer buffer,
-		@IntRange(from=0) final int _offset,
-		@IntRange(from=0)final int _size,
-		final long _presentationTimeUs, final int _flags) {
+		@IntRange(from=0) final int offset,
+		@IntRange(from=0)final int size,
+		final long presentationTimeUs, final int flags) {
 
-		trackIx = _trackIx;
-		presentationTimeUs = _presentationTimeUs;
-		size = _size;
-		flags = _flags;
-		resize(_size);
-		if ((buffer != null) && (_size > _offset)) {
-			buffer.position(_offset + _size);
+		mTrackIx = trackIx;
+		mPresentationTimeUs = presentationTimeUs;
+		mSize = size;
+		mFlags = flags;
+		resize(size);
+		if ((buffer != null) && (size > offset)) {
+			buffer.position(offset + size);
 			buffer.flip();
-			buffer.position(_offset);
+			buffer.position(offset);
 			mBuffer.put(buffer);
 			mBuffer.flip();
 		}
@@ -172,18 +172,18 @@ public class MediaData {
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void set(
-		final int _trackIx,
+		final int trackIx,
 		@Nullable ByteBuffer buffer,
 		@NonNull final MediaCodec.BufferInfo info) {
 
-		trackIx = _trackIx;
-		presentationTimeUs = info.presentationTimeUs;
-		size = buffer != null ? info.size : 0;
-		flags = info.flags;
+		mTrackIx = trackIx;
+		mPresentationTimeUs = info.presentationTimeUs;
+		mSize = buffer != null ? info.size : 0;
+		mFlags = info.flags;
 		final int offset = info.offset;
-		resize(size);
-		if ((buffer != null) && (size > offset)) {
-			buffer.position(offset + size);
+		resize(mSize);
+		if ((buffer != null) && (mSize > offset)) {
+			buffer.position(offset + mSize);
 			buffer.flip();
 			buffer.position(offset);
 			mBuffer.put(buffer);
@@ -211,7 +211,7 @@ public class MediaData {
 	 * データをクリア
 	 */
 	public void clear() {
-		size = flags = 0;
+		mSize = mFlags = 0;
 		mBuffer.clear();
 	}
 	
@@ -220,28 +220,46 @@ public class MediaData {
 	 * @return
 	 */
 	public int size() {
-		return size;
+		return mSize;
 	}
-	
+
+	public MediaData size(final int size) {
+		mSize = size;
+		return this;
+	}
+
+	public int trackIx() {
+		return mTrackIx;
+	}
+
+	public int flags() {
+		return mFlags;
+	}
+
 	/**
 	 * presentationTimeUsを取得
 	 * @return
 	 */
 	public long presentationTimeUs() {
-		return presentationTimeUs;
+		return mPresentationTimeUs;
 	}
-	
+
+	public MediaData presentationTimeUs(final long pts) {
+		mPresentationTimeUs = pts;
+		return this;
+	}
+
 	/**
 	 * データの内容を取得する
 	 * @param buffer
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	public void get(final byte[] buffer) throws ArrayIndexOutOfBoundsException {
-		if ((mBuffer == null) || (size <= 0)|| (buffer == null) || (buffer.length < size)) {
+		if ((mBuffer == null) || (mSize <= 0)|| (buffer == null) || (buffer.length < mSize)) {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
-		mBuffer.position(size);
+		mBuffer.position(mSize);
 		mBuffer.flip();
 		mBuffer.get(buffer);
 	}
@@ -252,11 +270,11 @@ public class MediaData {
 	 * @throws ArrayIndexOutOfBoundsException
 	 */
 	public void get(final ByteBuffer buffer) throws ArrayIndexOutOfBoundsException {
-		if ((mBuffer == null) || (size <= 0) || (buffer == null) || (buffer.remaining() < size)) {
+		if ((mBuffer == null) || (mSize <= 0) || (buffer == null) || (buffer.remaining() < mSize)) {
 			throw new ArrayIndexOutOfBoundsException("");
 		}
 		mBuffer.clear();
-		mBuffer.position(size);
+		mBuffer.position(mSize);
 		mBuffer.flip();
 		buffer.put(mBuffer);
 	}
@@ -267,7 +285,7 @@ public class MediaData {
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void get(@NonNull final MediaCodec.BufferInfo info) {
-		info.set(0, size, presentationTimeUs, flags);
+		info.set(0, mSize, mPresentationTimeUs, mFlags);
 	}
 	
 	/**
@@ -278,7 +296,7 @@ public class MediaData {
 	public ByteBuffer get() {
 		if (mBuffer != null) {
 			mBuffer.clear();
-			mBuffer.position(size);
+			mBuffer.position(mSize);
 			mBuffer.flip();
 		}
 		return mBuffer;
@@ -297,10 +315,11 @@ public class MediaData {
 	 * 内部で保持しているByteBufferのバイトオーダーを変更する
 	 * @param order
 	 */
-	public void order(@NonNull final ByteOrder order) {
+	public MediaData order(@NonNull final ByteOrder order) {
 		mByteOrder = order;
 		if (mBuffer != null) {
 			mBuffer.order(order);
 		}
+		return this;
 	}
 }

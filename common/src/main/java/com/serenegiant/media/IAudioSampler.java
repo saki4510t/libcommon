@@ -192,6 +192,7 @@ public abstract class IAudioSampler {
 				try {
 					mCallbackSync.wait();
 				} catch (InterruptedException e) {
+					// ignore
 				}
 			}
 		}
@@ -260,9 +261,9 @@ public abstract class IAudioSampler {
 	 * @param data
 	 */
 	private void callOnData(@NonNull final MediaData data) {
-		final ByteBuffer buf = data.mBuffer;
-		final int size = data.size;
-		final long pts = data.presentationTimeUs;
+		final ByteBuffer buf = data.get();
+		final int size = data.size();
+		final long pts = data.presentationTimeUs();
 		for (final SoundSamplerCallback callback: mCallbacks) {
 			try {
 				buf.clear();
@@ -321,8 +322,9 @@ public abstract class IAudioSampler {
 			result = new MediaData(mDefaultBufferSize);
 			mBufferNum++;
 		}
-		if (result != null)
-			result.size = 0;
+		if (result != null) {
+			result.clear();
+		}
 //		if (DEBUG) Log.v(TAG, "obtain:result=" + result);
 		return result;
 	}

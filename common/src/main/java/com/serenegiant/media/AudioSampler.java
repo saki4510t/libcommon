@@ -173,7 +173,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 											}
 										}
 										// try to read audio data
-										buffer = data.mBuffer;
+										buffer = data.get();
 										buffer.clear();
 										// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
 										try {
@@ -189,8 +189,9 @@ LOOP:							for ( ; mIsCapturing ;) {
 										if (readBytes > 0) {
 											// 正常に読み込めた時
 											err_count = 0;
-											data.presentationTimeUs = getInputPTSUs();
-											data.size = readBytes;
+											// FIXME ここはMediaDataのセッターで一括でセットするように変更する
+											data.presentationTimeUs(getInputPTSUs())
+												.size(readBytes);
 											buffer.position(readBytes);
 											buffer.flip();
 											// 音声データキューに追加する

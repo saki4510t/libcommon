@@ -533,7 +533,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			Log.w(TAG, "muxer is unexpectedly null");
 			return;
 		}
-		mBufferInfo.set(0, frame.size, frame.presentationTimeUs, frame.flags);
+		frame.get(mBufferInfo);
 		final boolean isKeyFrame
 			= ((mBufferInfo.flags & BUFFER_FLAG_KEY_FRAME) == BUFFER_FLAG_KEY_FRAME);
 
@@ -543,7 +543,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //			if (DEBUG) Log.d(TAG, "handleFrame:BUFFER_FLAG_KEY_FRAME");
 			// csd-0とcsd-1が同時に来ているはずなので分離してセットする
 			final byte[] tmp = new byte[mBufferInfo.size];
-			final ByteBuffer b = frame.mBuffer.duplicate();
+			final ByteBuffer b = frame.get().duplicate();
 			b.clear();
 			b.get(tmp, 0, mBufferInfo.size);
 			final int ix0 = BufferHelper.findAnnexB(tmp, 0);
@@ -572,7 +572,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			mWaitingKeyFrame = false;
 			try {
 				mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-				recorder.writeSampleData(mTrackIndex, frame.mBuffer, mBufferInfo);
+				recorder.writeSampleData(mTrackIndex, frame.get(), mBufferInfo);
 			 } catch (final TimeoutException e) {
 //				if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
 				recorder.stopRecording();
