@@ -19,6 +19,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
+
 public class StorageInfo {
 	public long totalBytes;
 	public long freeBytes;
@@ -27,7 +29,8 @@ public class StorageInfo {
 		totalBytes = total;
 		freeBytes = free;
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString() {
 		return "StorageInfo{" +

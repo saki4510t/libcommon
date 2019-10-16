@@ -753,6 +753,7 @@ public class SAFUtils {
 			final String path = UriHelper.getPath(context, dir.getUri());
 			if (path != null) {
 				// FIXME もしプライマリーストレージの場合はアクセス権無くても容量取得できるかも
+				// FIXME StorageManagerを使うようにする？
 				final File file = new File(path);
 				if (file.isDirectory() && file.canRead()) {
 					final long total = file.getTotalSpace();
