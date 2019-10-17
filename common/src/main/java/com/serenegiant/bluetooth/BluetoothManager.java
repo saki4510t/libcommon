@@ -44,6 +44,7 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -149,15 +150,12 @@ public class BluetoothManager {
 
 	/**
 	 * ペアリング済みのBluetooth機器一覧を取得する
-	 * @return Bluetoothに対応していないまたは無効ならnull
+	 * @return Bluetoothに対応していないまたは無効なら空set
 	 */
-	@Nullable
+	@NonNull
 	public static Set<BluetoothDevice> getBondedDevices() {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-		if ((adapter != null) && adapter.isEnabled()) {
-			return adapter.getBondedDevices();
-		}
-		return null;
+		return ((adapter != null) && adapter.isEnabled()) ? adapter.getBondedDevices() : Collections.emptySet();
 	}
 
 	/**
