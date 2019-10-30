@@ -178,7 +178,7 @@ import com.serenegiant.utils.BuildCheck;
 				|| (_surface instanceof SurfaceHolder)
 				|| (_surface instanceof SurfaceTexture)
 				|| (_surface instanceof SurfaceView)) {
-				mEglSurface = mEglBase.createWindowSurface(surface);
+				mEglSurface = mEglBase.createWindowSurface(_surface);
 				mOwnSurface = true;
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
