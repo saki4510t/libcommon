@@ -99,7 +99,8 @@ public final class CameraGLView extends GLSurfaceView {
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "CameraGLView:");
 		mRenderer = new CameraSurfaceRenderer(this);
-		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
+		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
+		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
 		setRenderer(mRenderer);
 	}
 
