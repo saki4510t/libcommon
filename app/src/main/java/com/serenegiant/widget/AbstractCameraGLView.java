@@ -77,6 +77,9 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	private static final int SCALE_KEEP_ASPECT = 2;
 	private static final int SCALE_CROP_CENTER = 3;
 
+	protected static final int PREVIEW_WIDTH = 1280;
+	protected static final int PREVIEW_HEIGHT = 720;
+
 	private final CameraSurfaceRenderer mRenderer;
 	private final Set<OnFrameAvailableListener> mListeners
 		= new CopyOnWriteArraySet<OnFrameAvailableListener>();
@@ -123,7 +126,7 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	public synchronized void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
 		super.onResume();
-		mRendererHolder = createRendererHolder(1280, 720, mRenderHolderCallback);
+		mRendererHolder = createRendererHolder(PREVIEW_WIDTH, PREVIEW_HEIGHT, mRenderHolderCallback);
 		if (mHasSurface) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist");
@@ -271,7 +274,7 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 			thread.start();
 			mCameraHandler = thread.getHandler();
 		}
-		mCameraHandler.startPreview(1280, 720/*width, height*/);
+		mCameraHandler.startPreview(PREVIEW_WIDTH, PREVIEW_HEIGHT);
 	}
 
 	/**
