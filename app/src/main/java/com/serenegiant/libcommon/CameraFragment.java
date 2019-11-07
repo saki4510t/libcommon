@@ -30,6 +30,7 @@ public class CameraFragment extends AbstractCameraFragment {
 	public static CameraFragment newInstance() {
 		final CameraFragment fragment = new CameraFragment();
 		final Bundle args = new Bundle();
+		args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -37,11 +38,6 @@ public class CameraFragment extends AbstractCameraFragment {
 	public CameraFragment() {
 		super();
 		// need default constructor
-	}
-
-	@Override
-	protected int getLayoutXml() {
-		return R.layout.fragment_camera;
 	}
 
 	@Override

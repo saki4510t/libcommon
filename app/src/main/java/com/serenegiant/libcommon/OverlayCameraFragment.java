@@ -22,10 +22,6 @@ package com.serenegiant.libcommon;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-
-import com.serenegiant.glutils.EffectRendererHolder;
-import com.serenegiant.widget.EffectCameraGLView;
 
 public class OverlayCameraFragment extends AbstractCameraFragment {
 	private static final boolean DEBUG = true;	// TODO set false on release
@@ -34,6 +30,7 @@ public class OverlayCameraFragment extends AbstractCameraFragment {
 	public static OverlayCameraFragment newInstance() {
 		final OverlayCameraFragment fragment = new OverlayCameraFragment();
 		final Bundle args = new Bundle();
+		args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_overlay);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -41,11 +38,6 @@ public class OverlayCameraFragment extends AbstractCameraFragment {
 	public OverlayCameraFragment() {
 		super();
 		// need default constructor
-	}
-
-	@Override
-	protected int getLayoutXml() {
-		return R.layout.fragment_camera_overlay;
 	}
 
 	@Override

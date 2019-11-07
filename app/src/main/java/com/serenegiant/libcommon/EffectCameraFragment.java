@@ -34,6 +34,7 @@ public class EffectCameraFragment extends AbstractCameraFragment {
 	public static EffectCameraFragment newInstance() {
 		final EffectCameraFragment fragment = new EffectCameraFragment();
 		final Bundle args = new Bundle();
+		args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_effect);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -41,11 +42,6 @@ public class EffectCameraFragment extends AbstractCameraFragment {
 	public EffectCameraFragment() {
 		super();
 		// need default constructor
-	}
-
-	@Override
-	protected int getLayoutXml() {
-		return R.layout.fragment_camera_effect;
 	}
 
 	@Override

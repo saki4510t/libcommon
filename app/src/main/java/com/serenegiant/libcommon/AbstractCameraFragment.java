@@ -62,7 +62,9 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	protected static final String APP_DIR_NAME = "RecordingService";
 	/** access code for secondary storage etc. */
 	protected static final int REQUEST_ACCESS_SD = 12345;
-	
+
+	protected static final String ARGS_KEY_LAYOUT_ID = "LAYOUT_ID";
+
 	/**
 	 * for camera preview display
 	 */
@@ -129,7 +131,10 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 
 //================================================================================
 	@LayoutRes
-	protected abstract int getLayoutXml();
+	protected int getLayoutXml() {
+		final Bundle args = getArguments();
+		return args != null ? args.getInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera) : R.layout.fragment_camera;
+	}
 
 	/**
 	 * method when touch record button
