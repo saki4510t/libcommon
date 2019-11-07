@@ -31,19 +31,26 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.RadialGradient;
 import android.graphics.Rect;
+import android.graphics.Shader;
 import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.serenegiant.utils.BitsHelper;
 import com.serenegiant.utils.UriHelper;
 
 public final class BitmapHelper {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-//	private static final String TAG = "BitmapHelper";
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final String TAG = BitmapHelper.class.getSimpleName();
 	/**
 	 * Bitmapをpng形式のbyte[]に変換して返す
 	 * @param bitmap
@@ -752,5 +759,96 @@ public final class BitmapHelper {
         c.drawRect(20, 20, 40, 40, p);
         return bm;
     }
+
+	/**
+	 * マスク用Bitmapを生成
+	 * @return
+	 */
+	@Nullable
+	public static Bitmap genMaskImage(
+		@IntRange(from = 0, to = 0)final int type,
+		final int width, final int height,
+		@IntRange(from = 0, to = 100) final int size,
+		@IntRange(from = 0, to = 255) final int alpha0,
+		@IntRange(from = 0, to = 255) final int alphaMax) {
+
+		if (DEBUG) Log.v(TAG, String.format("genMaskImage:(%dx%d)", width, height));
+
+		switch (type) {
+		case 0:
+		default:
+			return getMaskImage0(width, height, size, alpha0, alphaMax);
+		}
+	}
+
+	/**
+	 * 飽和計算
+	 * @param v
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	private static int sat(final int v, final int min, final int max) {
+		return v < min ? min : (v > max ? max : v);
+	}
+
+	/**
+	 * 飽和計算
+	 * @param v
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	private static int sat(final float v, final float min, final float max) {
+		return (int)(v < min ? min : (v > max ? max : v));
+	}
+
+	/**
+	 * 円形マスク用Bitmap生成処理
+	 * @param size
+	 * @param alpha0
+	 * @param alphaMax
+	 * @return
+	 */
+	@Nullable
+	public static Bitmap getMaskImage0(
+		final int width, final int height,
+		@IntRange(from = 0, to = 100) final int size,
+		@IntRange(from = 0, to = 255) final int alpha0,
+		@IntRange(from = 0, to = 255) final int alphaMax) {
+
+		if (DEBUG) Log.v(TAG, String.format("getMaskImage0:(%dx%d)", width, height));
+
+		// 透過円の半径
+		final float r = ((width > height ? height : width) * size) / 200.0f;
+		final int cx = width / 2;
+		final int cy = height / 2;
+		// 透過円描画用のオブジェクト
+		final Paint paint = new Paint();
+		paint.setDither(true);
+		final RadialGradient gradient = new RadialGradient(
+			cx, cy, r,
+			new int[] {
+				Color.argb(alphaMax, 255, 0, 0),
+				Color.argb(alphaMax, 255, 0, 0),
+				Color.argb((int)(alphaMax * 0.6f), 255, 0, 0),
+				Color.argb(alpha0, 255, 0, 0)},
+			new float[] {
+				0.00f,
+				0.60f,
+				0.80f,
+				1.00f},
+			Shader.TileMode.CLAMP);
+		paint.setShader(gradient);
+		// Bitmapをバックバッファにしてオフスクリーン描画する
+		final Bitmap offscreen = Bitmap.createBitmap(width, height,
+			Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(offscreen);
+//		// 全体のアルファ値, RadialGradientをCLAMPにしているから不要
+//		canvas.drawColor(cl0);
+		// 透過円
+		canvas.drawCircle(cx, cy, r, paint);
+		return offscreen;
+	}
 
 }
