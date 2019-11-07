@@ -23,6 +23,8 @@ import android.opengl.Matrix;
 
 import com.serenegiant.utils.Time;
 
+import androidx.annotation.NonNull;
+
 /**
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
@@ -35,8 +37,9 @@ class RendererTarget implements IRendererTarget {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	static IRendererTarget newInstance(final EGLBase egl,
-		final Object surface, final int maxFps) {
+	static IRendererTarget newInstance(
+		@NonNull final EGLBase egl,
+		@NonNull final Object surface, final int maxFps) {
 
 		return (maxFps > 0)
 			? new RendererTargetHasWait(egl, surface, maxFps)
@@ -55,7 +58,7 @@ class RendererTarget implements IRendererTarget {
 	 * @param egl
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
-	private RendererTarget(final EGLBase egl, final Object surface) {
+	private RendererTarget(@NonNull final EGLBase egl, @NonNull final Object surface) {
 		mSurface = surface;
 		if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
@@ -193,7 +196,7 @@ class RendererTarget implements IRendererTarget {
 	/**
 	 * フレームレート制限のための時間チェックを追加したRendererTargetクラス
 	 */
-	private static class RendererTargetHasWait extends RendererTarget {
+	static class RendererTargetHasWait extends RendererTarget {
 		private long mNextDraw;
 		private final long mIntervalsNs;
 
@@ -203,8 +206,9 @@ class RendererTarget implements IRendererTarget {
 		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 * @param maxFps 正数
 		 */
-		private RendererTargetHasWait(final EGLBase egl,
-			final Object surface, final int maxFps) {
+		private RendererTargetHasWait(
+			@NonNull final EGLBase egl,
+			@NonNull final Object surface, final int maxFps) {
 
 			super(egl, surface);
 			mIntervalsNs = 1000000000L / maxFps;
