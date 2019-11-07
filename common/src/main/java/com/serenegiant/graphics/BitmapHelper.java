@@ -32,7 +32,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.media.ExifInterface;
+import androidx.exifinterface.media.ExifInterface;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import androidx.annotation.NonNull;

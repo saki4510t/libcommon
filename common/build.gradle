@@ -48,6 +48,7 @@ dependencies {
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.preference:preference:${androidXPreference}"
 	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
+	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
 }
 
 def repo = new File(rootDir, "repository")
