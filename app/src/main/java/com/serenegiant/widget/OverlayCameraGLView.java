@@ -26,6 +26,7 @@ import android.util.AttributeSet;
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.OverlayRendererHolder;
 import com.serenegiant.glutils.RenderHolderCallback;
+import com.serenegiant.graphics.BitmapHelper;
 
 import androidx.annotation.NonNull;
 
@@ -54,7 +55,10 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 		super.onResume();
 		final IRendererHolder rendererHolder = getRendererHolder();
 		if (rendererHolder instanceof OverlayRendererHolder) {
-			((OverlayRendererHolder)getRendererHolder()).setOverlay(0, null);
+			((OverlayRendererHolder)getRendererHolder()).setOverlay(0,
+				BitmapHelper.getMaskImage0(
+					PREVIEW_WIDTH, PREVIEW_HEIGHT,
+					 60, 0, 100));
 		}
 	}
 
