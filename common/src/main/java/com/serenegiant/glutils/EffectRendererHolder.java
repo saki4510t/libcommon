@@ -413,6 +413,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 		 */
 		@SuppressLint("NewApi")
+		@WorkerThread
 		@Override
 		protected void internalOnStart() {
 			super.internalOnStart();
