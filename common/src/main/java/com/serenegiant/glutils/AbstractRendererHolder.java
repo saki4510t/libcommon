@@ -946,7 +946,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				IRendererTarget target = mTargets.get(id);
 				if (target == null) {
 					try {
-						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
+						target = createRendererTarget(id, getEgl(), surface, maxFps);
 						setMirror(target.getMvpMatrix(), mMirror);
 						mTargets.append(id, target);
 					} catch (final Exception e) {
@@ -958,7 +958,23 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mTargets.notifyAll();
 			}
 		}
-	
+
+		/**
+		 * IRendererTargetインスタンスを生成する
+		 * このクラスではRendererTarget.newInstanceを呼ぶだけ
+		 * @param id
+		 * @param egl
+		 * @param surface
+		 * @param maxFps
+		 * @return
+		 */
+		protected IRendererTarget createRendererTarget(final int id,
+			@NonNull final EGLBase egl,
+			final Object surface, final int maxFps) {
+
+			return RendererTarget.newInstance(getEgl(), surface, maxFps);
+		}
+
 		/**
 		 * 指定したIDの分配描画先Surfaceを破棄する
 		 * @param id

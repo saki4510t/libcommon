@@ -440,7 +440,7 @@ public class StaticTextureSource {
 				IRendererTarget target = mTargets.get(id);
 				if (target == null) {
 					try {
-						target = RendererTarget.newInstance(getEgl(), surface, maxFps);
+						target = createRendererTarget(id, getEgl(), surface, maxFps);
 						mTargets.append(id, target);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -450,6 +450,22 @@ public class StaticTextureSource {
 				}
 				mTargets.notifyAll();
 			}
+		}
+
+		/**
+		 * IRendererTargetインスタンスを生成する
+		 * このクラスではRendererTarget.newInstanceを呼ぶだけ
+		 * @param id
+		 * @param egl
+		 * @param surface
+		 * @param maxFps
+		 * @return
+		 */
+		protected IRendererTarget createRendererTarget(final int id,
+			@NonNull final EGLBase egl,
+			final Object surface, final int maxFps) {
+
+			return RendererTarget.newInstance(getEgl(), surface, maxFps);
 		}
 
 		/**
