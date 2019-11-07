@@ -16,7 +16,6 @@ import com.serenegiant.dialog.MessageDialogFragmentV4;
 import com.serenegiant.libcommon.list.DummyContent;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.PermissionCheck;
-import com.serenegiant.widget.OverlayCameraGLView;
 
 public class MainActivity extends AppCompatActivity
 	implements TitleFragment.OnListFragmentInteractionListener,
@@ -123,13 +122,12 @@ public class MainActivity extends AppCompatActivity
 			fragment = NetworkConnectionFragment.newInstance();
 			break;
 		case 1:
-			if (!checkPermissionCamera()
-				|| !checkPermissionWriteExternalStorage()
-				|| !checkPermissionAudio()) {
+			if (BuildCheck.isAndroid9()
+				&& !checkPermissionCamera()) {
 
 				return;
 			}
-			fragment = CameraFragment.newInstance();
+			fragment = UsbFragment.newInstance();
 			break;
 		case 2:
 			if (!checkPermissionCamera()
@@ -138,7 +136,7 @@ public class MainActivity extends AppCompatActivity
 
 				return;
 			}
-			fragment = EffectCameraFragment.newInstance();
+			fragment = CameraFragment.newInstance();
 			break;
 		case 3:
 			if (!checkPermissionCamera()
@@ -147,15 +145,25 @@ public class MainActivity extends AppCompatActivity
 
 				return;
 			}
-			fragment = OverlayCameraFragment.newInstance();
+			fragment = EffectCameraFragment.newInstance();
 			break;
 		case 4:
-			if (BuildCheck.isAndroid9()
-				&& !checkPermissionCamera()) {
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
 
 				return;
 			}
-			fragment = UsbFragment.newInstance();
+			fragment = MixCameraFragment.newInstance();
+			break;
+		case 5:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = OverlayCameraFragment.newInstance();
 			break;
 		default:
 			break;

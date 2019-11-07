@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<string name="item0" translatable="false">NetworkConnection</string>
-	<string name="item1" translatable="false">Camera</string>
-	<string name="item2" translatable="false">EffectCamera</string>
-	<string name="item3" translatable="false">OverlayCamera</string>
-	<string name="item4" translatable="false">UsbMonitor</string>
+	<string name="item1" translatable="false">UsbMonitor</string>
+	<string name="item2" translatable="false">Camera</string>
+	<string name="item3" translatable="false">EffectCamera</string>
+	<string name="item4" translatable="false">MixCamera</string>
+	<string name="item5" translatable="false">OverlayCamera</string>
 
 	<string-array name="list_items">
 		<item>@string/item0</item>
@@ -12,5 +13,6 @@
 		<item>@string/item2</item>
 		<item>@string/item3</item>
 		<item>@string/item4</item>
+		<item>@string/item5</item>
 	</string-array>
 </resources>
