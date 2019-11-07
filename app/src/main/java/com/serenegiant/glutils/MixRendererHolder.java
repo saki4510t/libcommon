@@ -28,6 +28,12 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	
 	private Handler mAsyncHandler;
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param callback
+	 */
 	public MixRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -36,6 +42,15 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			callback);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param callback
+	 */
 	protected MixRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
@@ -76,10 +91,33 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		return ((MyRendererTask)mRendererTask).getSurfaceTexture2();
 	}
 
+	/**
+	 * 合成時のマスク用Bitmapをセット
+	 * @param bitmap
+	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
 		((MyRendererTask)mRendererTask).setMask(bitmap);
 	}
 	
+	/**
+	 * 描画タスクを生成
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @return
+	 */
+	@NonNull
+	@Override
+	protected BaseRendererTask createRendererTask(
+		final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+
+		return new MyRendererTask(this, width, height, maxClientVersion, sharedContext, flags);
+	}
+
 	private static final int REQUEST_SET_MASK = 10;
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
@@ -99,16 +137,9 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
 			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
-	@NonNull
-	@Override
-	protected BaseRendererTask createRendererTask(
-		final int width, final int height,
-		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
-
-		return new MyRendererTask(this, width, height, maxClientVersion, sharedContext, flags);
-	}
-
+	/**
+	 * 描画タスク
+	 */
 	private final class MyRendererTask extends BaseRendererTask {
 		private final float[] mTexMatrix2 = new float[16];
 		private int mTexId2;
@@ -177,7 +208,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				mMasterTexture2 = new SurfaceTexture(mTexId2);
 				mMasterTexture2.setDefaultBufferSize(width(), height());
 				mMasterSurface2 = new Surface(mMasterTexture2);
-	//			mMasterTexture2.setOnFrameAvailableListener(mOnFrameAvailableListener);
 				if (BuildCheck.isAndroid5()) {
 					mMasterTexture2.setOnFrameAvailableListener(
 						mOnFrameAvailableListener, mAsyncHandler);

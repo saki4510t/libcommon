@@ -21,6 +21,12 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = OverlayRendererHolder.class.getSimpleName();
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param callback
+	 */
 	public OverlayRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -29,6 +35,15 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			callback);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param callback
+	 */
 	public OverlayRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
@@ -37,6 +52,15 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		super(width, height, maxClientVersion, sharedContext, flags, callback);
 	}
 
+	/**
+	 * 描画タスクを生成
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @return
+	 */
 	@NonNull
 	@Override
 	protected BaseRendererTask createRendererTask(
@@ -69,6 +93,9 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 
 	private static final int REQUEST_UPDATE_OVERLAY = 100;
 
+	/**
+	 * 描画タスク
+	 */
 	private class MyRendererTask extends BaseRendererTask {
 
 		private final Paint mPaint = new Paint();
