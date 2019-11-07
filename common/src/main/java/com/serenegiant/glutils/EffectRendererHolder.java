@@ -415,8 +415,8 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		@SuppressLint("NewApi")
 		@Override
 		protected void internalOnStart() {
-//			if (DEBUG) Log.v(TAG, "onStart:");
 			super.internalOnStart();
+//			if (DEBUG) Log.v(TAG, "internalOnStart:");
 			mParams.clear();
 			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
