@@ -16,6 +16,7 @@ import com.serenegiant.dialog.MessageDialogFragmentV4;
 import com.serenegiant.libcommon.list.DummyContent;
 import com.serenegiant.utils.BuildCheck;
 import com.serenegiant.utils.PermissionCheck;
+import com.serenegiant.widget.OverlayCameraGLView;
 
 public class MainActivity extends AppCompatActivity
 	implements TitleFragment.OnListFragmentInteractionListener,
@@ -140,6 +141,15 @@ public class MainActivity extends AppCompatActivity
 			fragment = EffectCameraFragment.newInstance();
 			break;
 		case 3:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = OverlayCameraFragment.newInstance();
+			break;
+		case 4:
 			if (BuildCheck.isAndroid9()
 				&& !checkPermissionCamera()) {
 
