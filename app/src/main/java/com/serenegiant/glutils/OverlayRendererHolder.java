@@ -1,8 +1,10 @@
 package com.serenegiant.glutils;
 
+import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.util.Log;
@@ -10,6 +12,7 @@ import android.view.Surface;
 
 import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.glutils.es2.OverlayDrawer2d;
+import com.serenegiant.utils.BuildCheck;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -210,6 +213,7 @@ if (false) {
 			target.swap();
 		}
 
+		@SuppressLint("NewApi")
 		@WorkerThread
 		private void handleUpdateOverlay(final int targetId, @NonNull final Bitmap overlay) {
 			if (DEBUG) Log.v(TAG, "handleUpdateOverlay:" + overlay);
@@ -224,7 +228,11 @@ if (false) {
 						canvas.drawColor(0x7fff0000);	// ARGB
 						final float cx = width() / 2.0f;
 						final float cy = height() / 2.0f;
-						canvas.drawOval(cx - 100, cy - 50, cx + 100, cy + 50, mPaint);
+						if (BuildCheck.isLollipop()) {
+							canvas.drawOval(cx - 100, cy - 50, cx + 100, cy + 50, mPaint);
+						} else {
+							canvas.drawOval(new RectF(cx - 100, cy - 50, cx + 100, cy + 50), mPaint);
+						}
 					}
 				} finally {
 					mOverlaySurface.unlockCanvasAndPost(canvas);
