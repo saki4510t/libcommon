@@ -41,22 +41,22 @@ public class GLDrawer2D implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
-	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
-	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-	private static final int FLOAT_SZ = Float.SIZE / 8;
+	static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
+	static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+	static final int FLOAT_SZ = Float.SIZE / 8;
 
-	private final int VERTEX_NUM;
-	private final int VERTEX_SZ;
-	private final FloatBuffer pVertex;
-	private final FloatBuffer pTexCoord;
-	private final int mTexTarget;
-	private int hProgram;
+	final int VERTEX_NUM;
+	final int VERTEX_SZ;
+	final FloatBuffer pVertex;
+	final FloatBuffer pTexCoord;
+	final int mTexTarget;
+	int hProgram;
     int maPositionLoc;
     int maTextureCoordLoc;
     int muMVPMatrixLoc;
     int muTexMatrixLoc;
     @NonNull
-	private final float[] mMvpMatrix = new float[16];
+	final float[] mMvpMatrix = new float[16];
 
 	/**
 	 * コンストラクタ
