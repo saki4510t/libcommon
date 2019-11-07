@@ -135,10 +135,25 @@ class RendererTarget implements IRendererTarget {
 			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
 			// ハングアップする機種があるのでクリアしとく
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			drawer.setMvpMatrix(mMvpMatrix, 0);
-			drawer.draw(textId, texMatrix, 0);
+			doDraw(drawer, textId, texMatrix, mMvpMatrix);
 			mTargetSurface.swap();
 		}
+	}
+
+	/**
+	 * Drawの描画処理の実体
+	 * サーフェースのmakeCurrent/swap処理は上位で実行
+	 * @param drawer
+	 * @param textId
+	 * @param texMatrix
+	 * @param mvpMatrix
+	 */
+	protected void doDraw(final IDrawer2D drawer,
+		final int textId, final float[] texMatrix,
+		final float[] mvpMatrix) {
+
+		drawer.setMvpMatrix(mvpMatrix, 0);
+		drawer.draw(textId, texMatrix, 0);
 	}
 
 	/**
