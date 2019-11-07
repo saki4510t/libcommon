@@ -87,14 +87,29 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	private int mScaleMode = SCALE_STRETCH_FIT;
 	private IRendererHolder mRendererHolder;
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
 	public AbstractCameraGLView(final Context context) {
 		this(context, null, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
 	public AbstractCameraGLView(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyle
+	 */
 	public AbstractCameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "CameraGLView:");
