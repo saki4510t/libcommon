@@ -116,14 +116,11 @@ public class AspectScaledTextureView extends TextureView
 		init();
 	}
 	
-	private SurfaceTextureListener mSurfaceTextureListener;
 	/**
 	 * @param listener
 	 */
 	@Override
 	public final void setSurfaceTextureListener(final SurfaceTextureListener listener) {
-		unregister(mSurfaceTextureListener);
-		mSurfaceTextureListener = listener;
 		register(listener);
 	}
 	
