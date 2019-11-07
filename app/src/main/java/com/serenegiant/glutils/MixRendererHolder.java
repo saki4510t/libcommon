@@ -23,7 +23,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * 2つの動画を合成して表示するためのIRendererHolder実装
  */
 public class MixRendererHolder extends AbstractRendererHolder {
-	private static final boolean DEBUG = true; // FIXME set false on production
+	private static final boolean DEBUG = false; // FIXME set false on production
 	private static final String TAG = MixRendererHolder.class.getSimpleName();
 	
 	private Handler mAsyncHandler;
@@ -31,11 +31,21 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	public MixRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, callback);
+		this(width, height,
+			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			callback);
+	}
+
+	protected MixRendererHolder(final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height, maxClientVersion, sharedContext, flags, callback);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 	}
-	
+
 	@Override
 	public synchronized void release() {
 		if (mAsyncHandler != null) {
