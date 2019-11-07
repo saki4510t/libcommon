@@ -1499,7 +1499,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 	}
 
-	private static IDrawer2D createDrawer(final boolean isGLES3) {
+	protected static IDrawer2D createDrawer(final boolean isGLES3) {
 		if (isGLES3) {
 			return new com.serenegiant.glutils.es3.GLDrawer2D(true);
 		} else {
