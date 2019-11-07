@@ -38,15 +38,15 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 	private static final String TAG = OverlayCameraGLView.class.getSimpleName();
 
 	public OverlayCameraGLView(final Context context) {
-		super(context, null, 0);
+		this(context, null, 0);
 	}
 
 	public OverlayCameraGLView(final Context context, final AttributeSet attrs) {
-		super(context, attrs, 0);
+		this(context, attrs, 0);
 	}
 
 	public OverlayCameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
-		super(context, attrs);
+		super(context, attrs, defStyle);
 	}
 
 	@Override
