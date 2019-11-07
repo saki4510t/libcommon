@@ -47,6 +47,7 @@ public class RendererHolder extends AbstractRendererHolder {
 	}
 
 	@NonNull
+	@Override
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
