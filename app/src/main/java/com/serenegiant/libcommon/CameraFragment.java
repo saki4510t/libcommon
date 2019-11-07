@@ -40,6 +40,11 @@ public class CameraFragment extends AbstractCameraFragment {
 	}
 
 	@Override
+	protected int getLayoutXml() {
+		return R.layout.fragment_camera;
+	}
+
+	@Override
 	protected boolean isRecording() {
 		// FIXME 未実装
 		return false;

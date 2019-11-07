@@ -34,11 +34,12 @@ import android.widget.TextView;
 import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.PermissionCheck;
 import com.serenegiant.utils.SAFUtils;
-import com.serenegiant.widget.CameraGLView;
+import com.serenegiant.widget.AbstractCameraGLView;
 
 import java.io.File;
 import java.io.IOException;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
 
@@ -65,7 +66,7 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	/**
 	 * for camera preview display
 	 */
-	protected CameraGLView mCameraView;
+	protected AbstractCameraGLView mCameraView;
 	/**
 	 * for scale mode display
 	 */
@@ -94,7 +95,7 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 		final LayoutInflater custom_inflater
 			= getThemedLayoutInflater(inflater, R.style.AppTheme_Camera);
 		final View rootView
-			= custom_inflater.inflate(R.layout.fragment_camera, container, false);
+			= custom_inflater.inflate(getLayoutXml(), container, false);
 		mCameraView = rootView.findViewById(R.id.cameraView);
 		mCameraView.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
 		mCameraView.setOnClickListener(mOnClickListener);
@@ -126,6 +127,9 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	}
 
 //================================================================================
+	@LayoutRes
+	protected abstract int getLayoutXml();
+
 	/**
 	 * method when touch record button
 	 */
@@ -195,8 +199,8 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 		mRecordButton.setColorFilter(0);
 	}
 		
-	private final CameraGLView.OnFrameAvailableListener
-		mOnFrameAvailableListener = new CameraGLView.OnFrameAvailableListener() {
+	private final AbstractCameraGLView.OnFrameAvailableListener
+		mOnFrameAvailableListener = new AbstractCameraGLView.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable() {
 			AbstractCameraFragment.this.onFrameAvailable();
