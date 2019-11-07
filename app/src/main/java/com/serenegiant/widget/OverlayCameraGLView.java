@@ -49,6 +49,12 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 		super(context, attrs);
 	}
 
+	@Override
+	public synchronized void onResume() {
+		super.onResume();
+		((OverlayRendererHolder)getRendererHolder()).setOverlay(0, null);
+	}
+
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(
