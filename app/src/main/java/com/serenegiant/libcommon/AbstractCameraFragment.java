@@ -99,6 +99,7 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 		mCameraView = rootView.findViewById(R.id.cameraView);
 		mCameraView.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT);
 		mCameraView.setOnClickListener(mOnClickListener);
+		mCameraView.setOnLongClickListener(mOnLongClickListener);
 		mScaleModeView = rootView.findViewById(R.id.scalemode_textview);
 		updateScaleModeText();
 		mRecordButton = rootView.findViewById(R.id.record_button);
@@ -136,22 +137,38 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
 		@Override
 		public void onClick(final View view) {
-			switch (view.getId()) {
-			case R.id.cameraView:
-				final int scale_mode = (mCameraView.getScaleMode() + 1) % 4;
-				mCameraView.setScaleMode(scale_mode);
-				updateScaleModeText();
-				break;
-			case R.id.record_button:
-				if (!isRecording()) {
-					startRecording();
-				} else {
-					stopRecording();
-				}
-				break;
-			}
+			AbstractCameraFragment.this.onClick(view);
 		}
 	};
+
+	private final View.OnLongClickListener mOnLongClickListener
+		= new View.OnLongClickListener() {
+		@Override
+		public boolean onLongClick(final View view) {
+			return AbstractCameraFragment.this.onLongClick(view);
+		}
+	};
+
+	protected void onClick(final View view) {
+		switch (view.getId()) {
+		case R.id.cameraView:
+			final int scale_mode = (mCameraView.getScaleMode() + 1) % 4;
+			mCameraView.setScaleMode(scale_mode);
+			updateScaleModeText();
+			break;
+		case R.id.record_button:
+			if (!isRecording()) {
+				startRecording();
+			} else {
+				stopRecording();
+			}
+			break;
+		}
+	}
+
+	protected boolean onLongClick(final View view) {
+		return false;
+	}
 
 	private void updateScaleModeText() {
 		final int scale_mode = mCameraView.getScaleMode();

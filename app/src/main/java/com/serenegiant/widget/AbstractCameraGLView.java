@@ -195,7 +195,11 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 			mRendererHolder.removeSurface(id);
 		}
 	}
-	
+
+	protected IRendererHolder getRendererHolder() {
+		return mRendererHolder;
+	}
+
 	@Nullable
 	private SurfaceTexture getSurfaceTexture() {
 		if (DEBUG) Log.v(TAG, "getSurfaceTexture:");

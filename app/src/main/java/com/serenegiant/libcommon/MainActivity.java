@@ -131,6 +131,15 @@ public class MainActivity extends AppCompatActivity
 			fragment = CameraFragment.newInstance();
 			break;
 		case 2:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = EffectCameraFragment.newInstance();
+			break;
+		case 3:
 			if (BuildCheck.isAndroid9()
 				&& !checkPermissionCamera()) {
 

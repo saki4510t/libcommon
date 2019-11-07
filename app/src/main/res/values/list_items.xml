@@ -2,11 +2,13 @@
 <resources>
 	<string name="item0" translatable="false">NetworkConnection</string>
 	<string name="item1" translatable="false">Camera</string>
-	<string name="item2" translatable="false">UsbMonitor</string>
+	<string name="item2" translatable="false">EffectCamera</string>
+	<string name="item3" translatable="false">UsbMonitor</string>
 
 	<string-array name="list_items">
 		<item>@string/item0</item>
 		<item>@string/item1</item>
 		<item>@string/item2</item>
+		<item>@string/item3</item>
 	</string-array>
 </resources>
