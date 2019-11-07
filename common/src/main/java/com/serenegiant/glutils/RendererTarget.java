@@ -58,7 +58,7 @@ class RendererTarget implements IRendererTarget {
 	 * @param egl
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
-	private RendererTarget(@NonNull final EGLBase egl, @NonNull final Object surface) {
+	protected RendererTarget(@NonNull final EGLBase egl, @NonNull final Object surface) {
 		mSurface = surface;
 		if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
@@ -140,7 +140,7 @@ class RendererTarget implements IRendererTarget {
 			mTargetSurface.swap();
 		}
 	}
-	
+
 	/**
 	 * 指定した色で全面を塗りつぶす
 	 * @param color
@@ -206,7 +206,7 @@ class RendererTarget implements IRendererTarget {
 		 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 		 * @param maxFps 正数
 		 */
-		private RendererTargetHasWait(
+		protected RendererTargetHasWait(
 			@NonNull final EGLBase egl,
 			@NonNull final Object surface, final int maxFps) {
 
