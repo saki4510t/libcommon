@@ -41,7 +41,7 @@ ext {
 	androidXLifecycle = '2.2.0'
 	androidXLifecycleExt = '2.1.0'
 	androidXPreference = '1.1.0'
-	androidXRecyclerview = '1.1.0-beta04'
+	androidXRecyclerview = '1.1.0-rc01'
 	androidXExif = '1.1.0-rc01'
 	constraintLibVersion = '1.1.3'
 
