@@ -431,8 +431,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 	@NonNull
-	protected abstract BaseRendererTask createRendererTask(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags);
+	protected abstract BaseRendererTask createRendererTask(
+		final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags);
 	
 //--------------------------------------------------------------------------------
 	protected void startCaptureTask() {
@@ -491,10 +493,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected static class BaseRendererTask extends EglTask
 		implements SurfaceTexture.OnFrameAvailableListener {
 
-		private final SparseArray<IRendererTarget> mTargets
-			= new SparseArray<>();
+		@NonNull
+		private final SparseArray<IRendererTarget>
+			mTargets = new SparseArray<>();
+		@NonNull
 		private final AbstractRendererHolder mParent;
 		private int mVideoWidth, mVideoHeight;
+		@NonNull
 		final float[] mTexMatrix = new float[16];
 		int mTexId;
 		private SurfaceTexture mMasterTexture;
@@ -509,7 +514,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			final EGLBase.IContext sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 	
 			super(maxClientVersion, sharedContext, flags);
 			mParent = parent;
@@ -1499,6 +1504,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 	}
 
+	@NonNull
 	protected static IDrawer2D createDrawer(final boolean isGLES3) {
 		if (isGLES3) {
 			return new com.serenegiant.glutils.es3.GLDrawer2D(true);

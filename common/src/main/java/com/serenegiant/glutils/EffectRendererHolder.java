@@ -266,6 +266,12 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES
 		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE, HEADER_OES, SAMPLER_OES);
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param callback
+	 */
 	public EffectRendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -274,8 +280,19 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			callback);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param callback
+	 */
 	public EffectRendererHolder(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext,
+		final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height,
@@ -286,7 +303,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	@Override
 	@NonNull
 	protected BaseRendererTask createRendererTask(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
 	}
@@ -370,7 +389,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			final EGLBase.IContext sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 			
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
 		}

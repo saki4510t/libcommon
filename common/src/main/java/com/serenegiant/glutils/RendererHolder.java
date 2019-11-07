@@ -37,7 +37,8 @@ public class RendererHolder extends AbstractRendererHolder {
 	}
 
 	public RendererHolder(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height,
@@ -46,8 +47,10 @@ public class RendererHolder extends AbstractRendererHolder {
 	}
 
 	@NonNull
-	protected BaseRendererTask createRendererTask(final int width, final int height,
-		final int maxClientVersion, final EGLBase.IContext sharedContext, final int flags) {
+	protected BaseRendererTask createRendererTask(
+		final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 		return new BaseRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
