@@ -1,9 +1,9 @@
 package com.serenegiant.libcommon;
 /*
+ * libcommon
+ * utility/helper classes for myself
  *
- * Copyright (c) 2016-2019 saki t_saki@serenegiant.com
- *
- * File name: PostMuxRecFragment.java
+ * Copyright (c) 2014-2019 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ package com.serenegiant.libcommon;
  *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
- *
- * All files in the folder are under this Apache License, Version 2.0.
 */
 
 import android.os.Bundle;
