@@ -81,7 +81,7 @@ public abstract class RendererTaskDelegator extends EglTaskDelegator
 	@WorkerThread
 	protected final void onStart() {
 		if (DEBUG) Log.v(TAG, "onStart:");
-//			Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
+//		Thread.currentThread().setPriority(Thread.NORM_PRIORITY + 1);
 		handleReCreateMasterSurface();
 		internalOnStart();
 		notifyRunning(true);
