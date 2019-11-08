@@ -95,7 +95,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		this(width, height,
 			3,
 			null,
-			EglTask.EGL_FLAG_RECORDABLE,
+			EglTaskDelegator.EGL_FLAG_RECORDABLE,
 			false,
 			callback);
 	}

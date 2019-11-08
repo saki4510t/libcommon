@@ -48,7 +48,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
-			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			3, null, EglTaskDelegator.EGL_FLAG_RECORDABLE,
 			false, callback);
 	}
 
@@ -65,7 +65,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
-			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			3, null, EglTaskDelegator.EGL_FLAG_RECORDABLE,
 			vSync, callback);
 	}
 

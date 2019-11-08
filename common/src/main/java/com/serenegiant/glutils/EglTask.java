@@ -27,15 +27,7 @@ public abstract class EglTask extends MessageTask {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "EglTask";
 
-	public static final int EGL_FLAG_DEPTH_BUFFER = 0x01;
-	public static final int EGL_FLAG_RECORDABLE = 0x02;
-	public static final int EGL_FLAG_STENCIL_1BIT = 0x04;
-//	public static final int EGL_FLAG_STENCIL_2BIT = 0x08;
-//	public static final int EGL_FLAG_STENCIL_4BIT = 0x10;
-	public static final int EGL_FLAG_STENCIL_8BIT = 0x20;
-
-	private EGLBase mEgl = null;
-	private EGLBase.IEglSurface mEglMasterSurface;
+	private final EglTaskDelegator mEglTaskDelegator;
 
 	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
 		this(3, sharedContext, flags);
@@ -45,7 +37,8 @@ public abstract class EglTask extends MessageTask {
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		init(flags, maxClientVersion, sharedContext);
+		mEglTaskDelegator = new EglTaskDelegator(maxClientVersion, sharedContext, flags);
+		init(0, 0, null);
 	}
 
 	/**
@@ -58,68 +51,50 @@ public abstract class EglTask extends MessageTask {
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
 
-		if ((sharedContext == null)
-			|| (sharedContext instanceof EGLBase.IContext)) {
-
-			final int stencilBits
-				= (flags & EGL_FLAG_STENCIL_1BIT) == EGL_FLAG_STENCIL_1BIT ? 1
-					: ((flags & EGL_FLAG_STENCIL_8BIT) == EGL_FLAG_STENCIL_8BIT ? 8 : 0);
-			mEgl = EGLBase.createFrom(maxClientVersion, (EGLBase.IContext)sharedContext,
-				(flags & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
-				stencilBits,
-				(flags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
-		}
-		if (mEgl == null) {
-			callOnError(new RuntimeException("failed to create EglCore"));
-			releaseSelf();
-		} else {
-			mEglMasterSurface = mEgl.createOffscreen(1, 1);
-			mEglMasterSurface.makeCurrent();
-		}
+		mEglTaskDelegator.init();
 	}
 
 	@Override
 	protected Request takeRequest() throws InterruptedException {
 		final Request result = super.takeRequest();
-		mEglMasterSurface.makeCurrent();
+		mEglTaskDelegator.makeCurrent();
 		return result;
 	}
 
 	@WorkerThread
 	@Override
 	protected void onBeforeStop() {
-		mEglMasterSurface.makeCurrent();
+		mEglTaskDelegator.makeCurrent();
 	}
 
 	@WorkerThread
 	@Override
 	protected void onRelease() {
-		mEglMasterSurface.release();
-		mEgl.release();
+		mEglTaskDelegator.release();
 	}
 
 	protected EGLBase getEgl() {
-		return mEgl;
+		return mEglTaskDelegator.getEgl();
 	}
 
 	protected EGLBase.IContext getEGLContext() {
-		return mEgl.getContext();
+		return mEglTaskDelegator.getContext();
 	}
 
 	protected EGLBase.IConfig getConfig() {
-		return mEgl.getConfig();
+		return mEglTaskDelegator.getConfig();
 	}
 
 	@Nullable
 	protected EGLBase.IContext getContext() {
-		return mEgl != null ? mEgl.getContext() : null;
+		return mEglTaskDelegator.getContext();
 	}
 
 	protected void makeCurrent() {
-		mEglMasterSurface.makeCurrent();
+		mEglTaskDelegator.makeCurrent();
 	}
 
 	protected boolean isGLES3() {
-		return (mEgl != null) && (mEgl.getGlVersion() > 2);
+		return mEglTaskDelegator.isGLES3();
 	}
 }
