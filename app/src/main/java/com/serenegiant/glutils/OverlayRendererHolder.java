@@ -11,7 +11,6 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.es2.GLHelper;
-import com.serenegiant.glutils.es2.OverlayDrawer2d;
 import com.serenegiant.utils.BuildCheck;
 
 import androidx.annotation.NonNull;
@@ -131,11 +130,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@WorkerThread
 		@Override
 		protected void internalOnStart() {
-if (false) {
 			super.internalOnStart();
-} else {
-			mDrawer = new OverlayDrawer2d(true);
-}
 			if (DEBUG) Log.v(TAG, "internalOnStart:" + mDrawer);
 			if (mDrawer instanceof IShaderDrawer2d) {
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
@@ -186,32 +181,6 @@ if (false) {
 				result = super.processRequest(request, arg1, arg2, obj);
 			}
 			return result;
-		}
-
-		/**
-		 * Surface1つの描画処理
-		 * @param target
-		 * @param texId
-		 * @param texMatrix
-		 */
-		@WorkerThread
-		@Override
-		protected void onDrawTarget(@NonNull final IRendererTarget target,
-			final int texId, final float[] texMatrix) {
-
-			// super.onDrawTargetは呼ばずに自前で処理する
-
-			target.makeCurrent();
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			mDrawer.setMvpMatrix(target.getMvpMatrix(), 0);
-			if (mDrawer instanceof OverlayDrawer2d) {
-				((OverlayDrawer2d)mDrawer).draw(
-					texId, texMatrix, 0,
-					mOverlayTexId, mTexMatrixOverlay, 0);
-			} else {
-				mDrawer.draw(texId, texMatrix, 0);
-			}
-			target.swap();
 		}
 
 		@Override
