@@ -49,6 +49,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		setOverlay(0, null);
 	}
 
 	/**
@@ -196,9 +197,12 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 				try {
 					if (overlay != null) {
 						canvas.drawBitmap(overlay, 0, 0, null);
-					} else {
-						// XXX オーバーレイ映像が設定されていないときは全面を薄赤色にする
+					} else if (DEBUG) {
+						// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
 						canvas.drawColor(0x7fff0000);	// ARGB
+					} else {
+						// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
+						canvas.drawColor(0x00000000);	// ARGB
 					}
 				} finally {
 					mOverlaySurface.unlockCanvasAndPost(canvas);
