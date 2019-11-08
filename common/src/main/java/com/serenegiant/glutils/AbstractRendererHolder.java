@@ -946,7 +946,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		protected void handleDraw() {
 			removeRequest(REQUEST_DRAW);
-			mHasNewFrame = false;
 			if ((mMasterSurface == null) || (!mMasterSurface.isValid())) {
 				Log.e(TAG, "checkMasterSurface:invalid master surface");
 				offer(REQUEST_RECREATE_MASTER_SURFACE);
@@ -955,7 +954,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if (mIsFirstFrameRendered) {
 				try {
 					makeCurrent();
-					handleUpdateTexture();
+					if (mHasNewFrame) {
+						mHasNewFrame = false;
+						handleUpdateTexture();
+					}
 				} catch (final Exception e) {
 					Log.e(TAG, "draw:thread id =" + Thread.currentThread().getId(), e);
 					offer(REQUEST_RECREATE_MASTER_SURFACE);
@@ -1295,7 +1297,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public void doFrame(final long frameTimeNanos) {
 			Choreographer.getInstance().postFrameCallbackDelayed(this, 0);
 			if (mHasNewFrame) {
-				mHasNewFrame = false;
 				offer(REQUEST_DRAW, 0, 0, null);
 			}
 		}
