@@ -21,7 +21,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 public class OverlayRendererHolder extends AbstractRendererHolder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
 	private static final String TAG = OverlayRendererHolder.class.getSimpleName();
 
 	/**
@@ -88,7 +88,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		"void main() {\n" +
 		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
 		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
-		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * 0.8), tex1.a);\n" +
+		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
 		"}\n";
 	private static final String MY_FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
@@ -101,6 +101,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	 */
 	private class MyRendererTask extends BaseRendererTask {
 
+		private final float[] mTexMatrixOverlay = new float[16];
 		private final Paint mPaint = new Paint();
 		private int mOverlayTexId;
 		private SurfaceTexture mOverlayTexture;
@@ -206,11 +207,18 @@ if (false) {
 			if (mDrawer instanceof OverlayDrawer2d) {
 				((OverlayDrawer2d)mDrawer).draw(
 					texId, texMatrix, 0,
-					mOverlayTexId, texMatrix, 0);
+					mOverlayTexId, mTexMatrixOverlay, 0);
 			} else {
 				mDrawer.draw(texId, texMatrix, 0);
 			}
 			target.swap();
+		}
+
+		@Override
+		protected void handleUpdateTexture() {
+			super.handleUpdateTexture();
+			mOverlayTexture.updateTexImage();
+			mOverlayTexture.getTransformMatrix(mTexMatrixOverlay);
 		}
 
 		@SuppressLint("NewApi")
@@ -225,7 +233,7 @@ if (false) {
 					if (overlay != null) {
 						canvas.drawBitmap(overlay, 0, 0, null);
 					} else {
-						canvas.drawColor(0x7fff0000);	// ARGB
+//						canvas.drawColor(0x7fff0000);	// ARGB
 						final float cx = width() / 2.0f;
 						final float cy = height() / 2.0f;
 						if (BuildCheck.isLollipop()) {
