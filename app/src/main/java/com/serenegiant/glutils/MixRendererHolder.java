@@ -133,7 +133,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		"    highp float alpha = texture2D(sTexture3, vTextureCoord).a;\n" +
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
 		"}\n";
-	private static final String FRAGMENT_SHADER_EXT
+	private static final String MY_FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
 			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
@@ -195,7 +195,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			super.internalOnStart();
 			if (mDrawer instanceof IShaderDrawer2d) {
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
-				drawer.updateShader(FRAGMENT_SHADER_EXT);
+				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
 				final int msTexture1 = drawer.glGetUniformLocation("sTexture");
 				final int msTexture2 = drawer.glGetUniformLocation("sTexture2");
 				final int msTexture3 = drawer.glGetUniformLocation("sTexture3");

@@ -90,7 +90,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * 0.8), tex1.a);\n" +
 		"}\n";
-	private static final String MY_FRAGMENT_SHADER
+	private static final String MY_FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
 			SAMPLER_OES, SAMPLER_OES);
 
@@ -138,7 +138,7 @@ if (false) {
 			if (DEBUG) Log.v(TAG, "internalOnStart:" + mDrawer);
 			if (mDrawer instanceof IShaderDrawer2d) {
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
-				drawer.updateShader(MY_FRAGMENT_SHADER);
+				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
 				final int sTex1 = drawer.glGetUniformLocation("sTexture");
 				GLES20.glUniform1i(sTex1, 0);
 
