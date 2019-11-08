@@ -53,7 +53,7 @@ import java.nio.ByteOrder;
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 public abstract class AbstractRendererHolder implements IRendererHolder {
-	private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = AbstractRendererHolder.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "RendererHolder";
 	private static final String CAPTURE_THREAD_NAME = "CaptureTask";
