@@ -534,7 +534,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		implements SurfaceTexture.OnFrameAvailableListener,
 			Choreographer.FrameCallback {
 
-		private final Handler mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
+		private final Handler mAsyncHandler;
 		@NonNull
 		private final SparseArray<IRendererTarget>
 			mTargets = new SparseArray<>();
@@ -566,15 +566,22 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mVSync = vSync;
 			mVideoWidth = width > 0 ? width : 640;
 			mVideoHeight = height > 0 ? height : 480;
+			if (vSync) {
+				mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
+			} else {
+				mAsyncHandler = null;
+			}
 		}
 
 		@Override
 		public void onRelease() {
-			try {
-				mAsyncHandler.removeCallbacksAndMessages(null);
-				mAsyncHandler.getLooper().quit();
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
+			if (mAsyncHandler != null) {
+				try {
+					mAsyncHandler.removeCallbacksAndMessages(null);
+					mAsyncHandler.getLooper().quit();
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
 			}
 			super.onRelease();
 		}
@@ -1286,7 +1293,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		@Override
 		public void doFrame(final long frameTimeNanos) {
-			Choreographer.getInstance().postFrameCallback(this);
+			Choreographer.getInstance().postFrameCallbackDelayed(this, 0);
 			if (mHasNewFrame) {
 				mHasNewFrame = false;
 				offer(REQUEST_DRAW, 0, 0, null);
