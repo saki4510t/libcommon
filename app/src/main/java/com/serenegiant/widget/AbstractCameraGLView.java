@@ -65,7 +65,7 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	private static final String TAG = AbstractCameraGLView.class.getSimpleName();
 
 	private static final boolean VSYNC = false;
-	private static final int TARGET_FPS_MS = 30 * 1000;
+	private static final int TARGET_FPS_MS = 60 * 1000;
 
 	public interface OnFrameAvailableListener {
 		public void onFrameAvailable();
@@ -591,13 +591,15 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 					final int n = supportedFpsRange != null ? supportedFpsRange.size() : 0;
 					int[] max_fps = null;
 					for (int i = n - 1; i >= 0; i--) {
-						max_fps = supportedFpsRange.get(i);
-						Log.i(TAG, String.format("supportedFpsRange(%d)=(%d,%d)", i, max_fps[0], max_fps[1]));
-						if ((max_fps[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= max_fps[1])) {
+						final int[] range = supportedFpsRange.get(i);
+						Log.i(TAG, String.format("supportedFpsRange(%d)=(%d,%d)", i, range[0], range[1]));
+						if ((range[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= range[1])) {
+							max_fps = range;
 							break;
 						}
 					}
 					if (max_fps == null) {
+						// 見つからなかったときは一番早いフレームレートを選択
 						max_fps = supportedFpsRange.get(supportedFpsRange.size() - 1);
 					}
 					Log.i(TAG, String.format("found fps:%d-%d", max_fps[0], max_fps[1]));
