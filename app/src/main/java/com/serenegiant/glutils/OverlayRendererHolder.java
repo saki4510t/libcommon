@@ -120,6 +120,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		private int mOverlayTexId;
 		private SurfaceTexture mOverlayTexture;
 		private Surface mOverlaySurface;
+		private volatile boolean mOverlayChanged;
 
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
@@ -200,8 +201,11 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Override
 		protected void handleUpdateTexture() {
 			super.handleUpdateTexture();
-			mOverlayTexture.updateTexImage();
-			mOverlayTexture.getTransformMatrix(mTexMatrixOverlay);
+			if (mOverlayChanged) {
+				mOverlayTexture.updateTexImage();
+				mOverlayTexture.getTransformMatrix(mTexMatrixOverlay);
+				mOverlayChanged = false;
+			}
 		}
 
 		@SuppressLint("NewApi")
@@ -229,6 +233,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 				Log.w(TAG, e);
 			}
 			GLES20.glFlush();
+			mOverlayChanged = true;
 			requestFrame();
 		}
 	}
