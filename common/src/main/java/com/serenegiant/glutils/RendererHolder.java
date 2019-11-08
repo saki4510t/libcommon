@@ -28,22 +28,72 @@ public class RendererHolder extends AbstractRendererHolder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = RendererHolder.class.getSimpleName();
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param callback
+	 */
 	public RendererHolder(final int width, final int height,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
 			3, null, EglTask.EGL_FLAG_RECORDABLE,
-			callback);
+			false, callback);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param vSync ChoreographerのFrameCallbackが呼ばれたタイミングで描画要求するかどうか、
+	 * 				falseなら入力映像が更新されたタイミングで描画要求する
+	 * @param callback
+	 */
+	public RendererHolder(final int width, final int height,
+		final boolean vSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		this(width, height,
+			3, null, EglTask.EGL_FLAG_RECORDABLE,
+			vSync, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param callback
+	 */
 	public RendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height,
-			maxClientVersion, sharedContext, flags,
-			callback);
+		this(width, height, maxClientVersion, sharedContext, flags, false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param vSync ChoreographerのFrameCallbackが呼ばれたタイミングで描画要求するかどうか、
+	 * 				falseなら入力映像が更新されたタイミングで描画要求する
+	 * @param callback
+	 */
+	protected RendererHolder(final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean vSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height, maxClientVersion, sharedContext, flags, vSync, callback);
 	}
 
 	@NonNull
@@ -51,10 +101,11 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean vSync) {
 
 		return new BaseRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, vSync);
 	}
 	
 }

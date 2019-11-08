@@ -50,8 +50,10 @@ public final class EffectCameraGLView extends AbstractCameraGLView {
 
 	@NonNull
 	@Override
-	protected IRendererHolder createRendererHolder(final int width, final int height, final RenderHolderCallback callback) {
-		return new EffectRendererHolder(width, height, callback);
+	protected IRendererHolder createRendererHolder(final int width, final int height,
+		final boolean vSync, final RenderHolderCallback callback) {
+
+		return new EffectRendererHolder(width, height, vSync, callback);
 	}
 
 	public void setEffect(final int effect) {

@@ -64,6 +64,8 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = AbstractCameraGLView.class.getSimpleName();
 
+	private static final boolean VSYNC = false;
+
 	public interface OnFrameAvailableListener {
 		public void onFrameAvailable();
 	}
@@ -124,7 +126,7 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	public synchronized void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
 		super.onResume();
-		mRendererHolder = createRendererHolder(PREVIEW_WIDTH, PREVIEW_HEIGHT, mRenderHolderCallback);
+		mRendererHolder = createRendererHolder(PREVIEW_WIDTH, PREVIEW_HEIGHT, VSYNC, mRenderHolderCallback);
 		if (mHasSurface) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist");
@@ -239,6 +241,7 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 	@NonNull
 	protected abstract IRendererHolder createRendererHolder(
 		final int width, final int height,
+		final boolean vSync,
 		final RenderHolderCallback callback);
 
 	private final RenderHolderCallback mRenderHolderCallback
