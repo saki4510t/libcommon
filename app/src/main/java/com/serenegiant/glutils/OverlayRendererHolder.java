@@ -3,15 +3,12 @@ package com.serenegiant.glutils;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.es2.GLHelper;
-import com.serenegiant.utils.BuildCheck;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -101,7 +98,6 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	private class MyRendererTask extends BaseRendererTask {
 
 		private final float[] mTexMatrixOverlay = new float[16];
-		private final Paint mPaint = new Paint();
 		private int mOverlayTexId;
 		private SurfaceTexture mOverlayTexture;
 		private Surface mOverlaySurface;
@@ -113,7 +109,6 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
 			if (DEBUG) Log.v(TAG, String.format("MyRendererTask(%dx%d)", width, height));
-			mPaint.setARGB(0xff, 0xff, 0, 0);
 		}
 
 		public void setOverlay(final int id, @Nullable final Bitmap overlay) {
@@ -202,14 +197,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 					if (overlay != null) {
 						canvas.drawBitmap(overlay, 0, 0, null);
 					} else {
-//						canvas.drawColor(0x7fff0000);	// ARGB
-						final float cx = width() / 2.0f;
-						final float cy = height() / 2.0f;
-						if (BuildCheck.isLollipop()) {
-							canvas.drawOval(cx - 100, cy - 50, cx + 100, cy + 50, mPaint);
-						} else {
-							canvas.drawOval(new RectF(cx - 100, cy - 50, cx + 100, cy + 50), mPaint);
-						}
+						// XXX オーバーレイ映像が設定されていないときは全面を薄赤色にする
+						canvas.drawColor(0x7fff0000);	// ARGB
 					}
 				} finally {
 					mOverlaySurface.unlockCanvasAndPost(canvas);
