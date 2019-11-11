@@ -74,10 +74,10 @@ public final class MixCameraGLView extends AbstractCameraGLView {
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
-		final boolean vSync, final RenderHolderCallback callback) {
+		final RenderHolderCallback callback) {
 
 
-		return new MixRendererHolder(width, height, vSync, callback);
+		return new MixRendererHolder(width, height, callback);
 	}
 
 }

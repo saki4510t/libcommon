@@ -277,24 +277,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 
 		this(width, height,
 			3, null, EglTaskDelegator.EGL_FLAG_RECORDABLE,
-			false, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param vSync ChoreographerのFrameCallbackが呼ばれたタイミングで描画要求するかどうか、
-	 * 				falseなら入力映像が更新されたタイミングで描画要求する
-	 * @param callback
-	 */
-	public EffectRendererHolder(final int width, final int height,
-		final boolean vSync,
-		@Nullable final RenderHolderCallback callback) {
-
-		this(width, height,
-			3, null, EglTaskDelegator.EGL_FLAG_RECORDABLE,
-			vSync, callback);
+			callback);
 	}
 
 	/**
@@ -304,48 +287,24 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param flags
-	 * @param callback
-	 */
-	public EffectRendererHolder(final int width, final int height,
-		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext,
-		final int flags,
-		@Nullable final RenderHolderCallback callback) {
-
-		this(width, height,
-			maxClientVersion, sharedContext, flags,
-			false, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param maxClientVersion
-	 * @param sharedContext
-	 * @param flags
-	 * @param vSync ChoreographerのFrameCallbackが呼ばれたタイミングで描画要求するかどうか、
-	 * 				falseなら入力映像が更新されたタイミングで描画要求する
 	 * @param callback
 	 */
 	protected EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
-		final boolean vSync,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, vSync, callback);
+		super(width, height, maxClientVersion, sharedContext, flags, callback);
 	}
 
 	@Override
 	@NonNull
 	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
-		final boolean vSync) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 		return new MyRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, vSync);
+			maxClientVersion, sharedContext, flags);
 	}
 
 //================================================================================
@@ -427,10 +386,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
-			final boolean vSync) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags, vSync);
+			super(parent, width, height, maxClientVersion, sharedContext, flags);
 		}
 
 		public void changeEffect(final int effect) {

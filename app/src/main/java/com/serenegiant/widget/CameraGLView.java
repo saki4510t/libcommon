@@ -50,9 +50,9 @@ public final class CameraGLView extends AbstractCameraGLView {
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
-		final boolean vSync, final RenderHolderCallback callback) {
+		final RenderHolderCallback callback) {
 
-		return new RendererHolder(width, height, vSync, callback);
+		return new RendererHolder(width, height, callback);
 	}
 
 }

@@ -31,16 +31,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
-import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Choreographer;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.BufferedOutputStream;
 import java.io.FileNotFoundException;
@@ -97,7 +94,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			3,
 			null,
 			EglTaskDelegator.EGL_FLAG_RECORDABLE,
-			false,
 			callback);
 	}
 
@@ -112,33 +108,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext,
-		final int flags,
-		@Nullable final RenderHolderCallback callback) {
-
-		this(width, height, maxClientVersion, sharedContext, flags, false, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param maxClientVersion
-	 * @param sharedContext
-	 * @param flags
-	 * @param vSync ChoreographerのFrameCallbackが呼ばれたタイミングで描画要求するかどうか、
-	 * 				falseなら入力映像が更新されたタイミングで描画要求する
-	 * @param callback
-	 */
-	protected AbstractRendererHolder(final int width, final int height,
-		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
-		final boolean vSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
 		mRendererTask = createRendererTask(width, height,
-			maxClientVersion, sharedContext, flags, vSync);
+			maxClientVersion, sharedContext, flags);
 		new Thread(mRendererTask, RENDERER_THREAD_NAME).start();
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -474,8 +449,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected abstract BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
-		final boolean vSync);
+		@Nullable final EGLBase.IContext sharedContext, final int flags);
 	
 //--------------------------------------------------------------------------------
 	protected void startCaptureTask() {
@@ -532,16 +506,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 	protected static class BaseRendererTask extends EglTask
-		implements SurfaceTexture.OnFrameAvailableListener,
-			Choreographer.FrameCallback {
+		implements SurfaceTexture.OnFrameAvailableListener {
 
-		private final Handler mAsyncHandler;
 		@NonNull
 		private final SparseArray<IRendererTarget>
 			mTargets = new SparseArray<>();
 		@NonNull
 		private final AbstractRendererHolder mParent;
-		protected final boolean mVSync;
 		private int mVideoWidth, mVideoHeight;
 		@NonNull
 		final float[] mTexMatrix = new float[16];
@@ -559,32 +530,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
-			final boolean vSync) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 	
 			super(maxClientVersion, sharedContext, flags);
 			mParent = parent;
-			mVSync = vSync;
 			mVideoWidth = width > 0 ? width : 640;
 			mVideoHeight = height > 0 ? height : 480;
-			if (vSync) {
-				mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
-			} else {
-				mAsyncHandler = null;
-			}
-		}
-
-		@Override
-		public void onRelease() {
-			if (mAsyncHandler != null) {
-				try {
-					mAsyncHandler.removeCallbacksAndMessages(null);
-					mAsyncHandler.getLooper().quit();
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
-			}
-			super.onRelease();
 		}
 
 		/**
@@ -831,15 +782,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mParent.isRunning = true;
 				mParent.mSync.notifyAll();
 			}
-			if (mVSync) {
-				if (DEBUG) Log.v(TAG, "onStart:Choreographer#postFrameCallback");
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						Choreographer.getInstance().postFrameCallback(BaseRendererTask.this);
-					}
-				});
-			}
 //			if (DEBUG) Log.v(TAG, "onStart:finished");
 		}
 		
@@ -850,14 +792,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		protected void onStop() {
 			if (DEBUG) Log.v(TAG, "onStop");
-			if (mVSync) {
-				mAsyncHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						Choreographer.getInstance().removeFrameCallback(BaseRendererTask.this);
-					}
-				});
-			}
 			synchronized (mParent.mSync) {
 				mParent.isRunning = false;
 				mParent.mSync.notifyAll();
@@ -1289,18 +1223,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 			mIsFirstFrameRendered = true;
 			mHasNewFrame = true;
-			if (!mVSync) {
-				offer(REQUEST_DRAW, 0, 0, null);
-			}
+			offer(REQUEST_DRAW, 0, 0, null);
 		}
 
-		@Override
-		public void doFrame(final long frameTimeNanos) {
-			Choreographer.getInstance().postFrameCallbackDelayed(this, 0);
-			if (mHasNewFrame) {
-				offer(REQUEST_DRAW, 0, 0, null);
-			}
-		}
 	} // BaseRendererTask
 	
 //--------------------------------------------------------------------------------

@@ -63,9 +63,9 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
-		final boolean vSync, final RenderHolderCallback callback) {
+		final RenderHolderCallback callback) {
 
 
-		return new OverlayRendererHolder(width, height, vSync, callback);
+		return new OverlayRendererHolder(width, height, callback);
 	}
 }
