@@ -34,7 +34,6 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.serenegiant.glutils.RendererTaskDelegator.REQUEST_DRAW;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**

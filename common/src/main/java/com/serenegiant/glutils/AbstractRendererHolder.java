@@ -50,7 +50,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static com.serenegiant.glutils.RendererTaskDelegator.*;
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 public abstract class AbstractRendererHolder implements IRendererHolder {
@@ -59,6 +58,18 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private static final String RENDERER_THREAD_NAME = "RendererHolder";
 	private static final String CAPTURE_THREAD_NAME = "CaptureTask";
 
+
+	static final int REQUEST_DRAW = 1;
+	static final int REQUEST_UPDATE_SIZE = 2;
+	static final int REQUEST_ADD_SURFACE = 3;
+	static final int REQUEST_REMOVE_SURFACE = 4;
+	static final int REQUEST_REMOVE_SURFACE_ALL = 12;
+	static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
+	static final int REQUEST_MIRROR = 6;
+	static final int REQUEST_ROTATE = 7;
+	static final int REQUEST_CLEAR = 8;
+	static final int REQUEST_CLEAR_ALL = 9;
+	static final int REQUEST_SET_MVP = 10;
 
 	protected final Object mSync = new Object();
 	@Nullable
