@@ -27,7 +27,7 @@ public abstract class EglTask extends MessageTask {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "EglTask";
 
-	private final EglTaskDelegator mEglTaskDelegator;
+	private final GLContext mGLContext;
 
 	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
 		this(3, sharedContext, flags);
@@ -37,7 +37,7 @@ public abstract class EglTask extends MessageTask {
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		mEglTaskDelegator = new EglTaskDelegator(maxClientVersion, sharedContext, flags);
+		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
 		init(0, 0, null);
 	}
 
@@ -51,50 +51,46 @@ public abstract class EglTask extends MessageTask {
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
 
-		mEglTaskDelegator.init();
+		mGLContext.initialize();
 	}
 
 	@Override
 	protected Request takeRequest() throws InterruptedException {
 		final Request result = super.takeRequest();
-		mEglTaskDelegator.makeCurrent();
+		mGLContext.makeDefault();
 		return result;
 	}
 
 	@WorkerThread
 	@Override
 	protected void onBeforeStop() {
-		mEglTaskDelegator.makeCurrent();
+		mGLContext.makeDefault();
 	}
 
 	@WorkerThread
 	@Override
 	protected void onRelease() {
-		mEglTaskDelegator.release();
+		mGLContext.release();
 	}
 
 	protected EGLBase getEgl() {
-		return mEglTaskDelegator.getEgl();
-	}
-
-	protected EGLBase.IContext getEGLContext() {
-		return mEglTaskDelegator.getContext();
+		return mGLContext.getEgl();
 	}
 
 	protected EGLBase.IConfig getConfig() {
-		return mEglTaskDelegator.getConfig();
+		return mGLContext.getConfig();
 	}
 
 	@Nullable
 	protected EGLBase.IContext getContext() {
-		return mEglTaskDelegator.getContext();
+		return mGLContext.getContext();
 	}
 
 	protected void makeCurrent() {
-		mEglTaskDelegator.makeCurrent();
+		mGLContext.makeDefault();
 	}
 
 	protected boolean isGLES3() {
-		return mEglTaskDelegator.isGLES3();
+		return mGLContext.isGLES3();
 	}
 }
