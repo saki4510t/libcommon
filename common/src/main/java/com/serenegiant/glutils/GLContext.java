@@ -10,6 +10,9 @@ public class GLContext implements EGLConst {
 	private static final String TAG = GLContext.class.getSimpleName();
 
 	private final Object mSync = new Object();
+	private final int mMaxClientVersion;
+	@Nullable
+	final EGLBase.IContext mSharedContext;
 	private final int mFlags;
 	@Nullable
 	private EGLBase mEgl = null;
@@ -25,24 +28,9 @@ public class GLContext implements EGLConst {
 	public GLContext(final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
+		mMaxClientVersion = maxClientVersion;
+		mSharedContext = sharedContext;
 		mFlags = flags;
-		if ((sharedContext == null)
-			|| (sharedContext instanceof EGLBase.IContext)) {
-
-			final int stencilBits
-				= (flags & EGL_FLAG_STENCIL_1BIT) == EGL_FLAG_STENCIL_1BIT ? 1
-					: ((flags & EGL_FLAG_STENCIL_8BIT) == EGL_FLAG_STENCIL_8BIT ? 8 : 0);
-			mEgl = EGLBase.createFrom(maxClientVersion, sharedContext,
-				(flags & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
-				stencilBits,
-				(flags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
-		}
-		if (mEgl != null) {
-			mEglMasterSurface = mEgl.createOffscreen(1, 1);
-			mEglMasterSurface.makeCurrent();
-		} else {
-			throw new RuntimeException("failed to create EglCore");
-		}
 	}
 
 	@Override
@@ -68,6 +56,26 @@ public class GLContext implements EGLConst {
 				mEgl.release();
 				mEgl = null;
 			}
+		}
+	}
+
+	public void initialize() {
+		if ((mSharedContext == null)
+			|| (mSharedContext instanceof EGLBase.IContext)) {
+
+			final int stencilBits
+				= (mFlags & EGL_FLAG_STENCIL_1BIT) == EGL_FLAG_STENCIL_1BIT ? 1
+					: ((mFlags & EGL_FLAG_STENCIL_8BIT) == EGL_FLAG_STENCIL_8BIT ? 8 : 0);
+			mEgl = EGLBase.createFrom(mMaxClientVersion, mSharedContext,
+				(mFlags & EGL_FLAG_DEPTH_BUFFER) == EGL_FLAG_DEPTH_BUFFER,
+				stencilBits,
+				(mFlags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
+		}
+		if (mEgl != null) {
+			mEglMasterSurface = mEgl.createOffscreen(1, 1);
+			mEglMasterSurface.makeCurrent();
+		} else {
+			throw new RuntimeException("failed to create EglCore");
 		}
 	}
 
