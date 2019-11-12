@@ -27,18 +27,8 @@ import androidx.annotation.Nullable;
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
-public abstract class EGLBase {
+public abstract class EGLBase implements EGLConst {
 	public static final Object EGL_LOCK = new Object();
-
-//--------------------------------------------------------------------------------
-// 定数
-//--------------------------------------------------------------------------------
-
-	public static final int EGL_RECORDABLE_ANDROID = 0x3142;
-	public static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
-	public static final int EGL_OPENGL_ES2_BIT = 4;
-	public static final int EGL_OPENGL_ES3_BIT_KHR = 0x0040;
-//	public static final int EGL_SWAP_BEHAVIOR_PRESERVED_BIT = 0x0400;
 
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
