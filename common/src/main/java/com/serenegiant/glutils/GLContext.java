@@ -18,6 +18,7 @@ public class GLContext implements EGLConst {
 	private EGLBase mEgl = null;
 	@Nullable
 	private EGLBase.IEglSurface mEglMasterSurface;
+	private long mGLThreadId;
 
 	/**
 	 * コンストラクタ
@@ -48,6 +49,7 @@ public class GLContext implements EGLConst {
 	 */
 	public void release() {
 		synchronized (mSync) {
+			mGLThreadId = 0;
 			if (mEglMasterSurface != null) {
 				mEglMasterSurface.release();
 				mEglMasterSurface = null;
@@ -74,6 +76,7 @@ public class GLContext implements EGLConst {
 		if (mEgl != null) {
 			mEglMasterSurface = mEgl.createOffscreen(1, 1);
 			mEglMasterSurface.makeCurrent();
+			mGLThreadId = Thread.currentThread().getId();
 		} else {
 			throw new RuntimeException("failed to create EglCore");
 		}
@@ -142,6 +145,12 @@ public class GLContext implements EGLConst {
 			} else {
 				throw new IllegalStateException();
 			}
+		}
+	}
+
+	public long getGLThreadId() {
+		synchronized (mSync) {
+			return mGLThreadId;
 		}
 	}
 
