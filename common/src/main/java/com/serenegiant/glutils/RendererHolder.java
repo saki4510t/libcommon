@@ -38,7 +38,7 @@ public class RendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
-			3, null, EglTaskDelegator.EGL_FLAG_RECORDABLE,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
 			callback);
 	}
 
