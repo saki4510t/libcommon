@@ -25,6 +25,7 @@ import androidx.annotation.WorkerThread;
  * 共有コンテキストのマスターをを保持するためだけのクラス
  * Applicationクラス等でシングルトンとして使う
  */
+@Deprecated
 public class GLMasterContext {
 	private static final String TAG = GLMasterContext.class.getSimpleName();
 
