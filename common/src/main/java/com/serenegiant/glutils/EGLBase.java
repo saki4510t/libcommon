@@ -28,8 +28,6 @@ import androidx.annotation.Nullable;
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
 public abstract class EGLBase implements EGLConst {
-	public static final Object EGL_LOCK = new Object();
-
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
 //--------------------------------------------------------------------------------
