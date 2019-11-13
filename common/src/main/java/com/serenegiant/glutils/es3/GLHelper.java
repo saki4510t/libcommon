@@ -27,6 +27,7 @@ import android.graphics.Paint;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
+import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.glutils.ShaderConst;
@@ -37,10 +38,12 @@ import com.serenegiant.utils.Stacktrace;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 /**
- * OpenGL|ES2/3用のヘルパークラス
+ * OpenGL|ES3用のヘルパークラス
  */
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public final class GLHelper {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = "GLHelper";
@@ -244,7 +247,6 @@ public final class GLHelper {
 	}
 	
 	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
 	public static int loadTextureFromResource(final Context context, final int resId, final Resources.Theme theme) {
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
@@ -330,12 +332,13 @@ public final class GLHelper {
 	public static int loadShader(@NonNull final Context context,
 		final String vss_asset, final String fss_asset) {
 
-		int program = 0;
+		int program;
 		try {
 			final String vss = AssetsHelper.loadString(context.getAssets(), vss_asset);
 			final String fss = AssetsHelper.loadString(context.getAssets(), vss_asset);
 			program = loadShader(vss, fss);
-		} catch (IOException e) {
+		} catch (final IOException e) {
+			program = 0;
 		}
 		return program;
 	}
@@ -417,21 +420,18 @@ public final class GLHelper {
 	/**
 	 * Writes GL version info to the log.
 	 */
-	@SuppressLint("InlinedApi")
 	public static void logVersionInfo() {
 		Log.i(TAG, "vendor  : " + GLES30.glGetString(GLES30.GL_VENDOR));
 		Log.i(TAG, "renderer: " + GLES30.glGetString(GLES30.GL_RENDERER));
 		Log.i(TAG, "version : " + GLES30.glGetString(GLES30.GL_VERSION));
 
-		if (BuildCheck.isAndroid4_3()) {
-			final int[] values = new int[1];
-			GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
-			final int majorVersion = values[0];
-			GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
-			final int minorVersion = values[0];
-			if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
-				Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
-			}
+		final int[] values = new int[1];
+		GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
+		final int majorVersion = values[0];
+		GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
+		final int minorVersion = values[0];
+		if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
+			Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
 		}
 	}
 }

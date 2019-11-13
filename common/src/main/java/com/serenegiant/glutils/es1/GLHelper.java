@@ -292,7 +292,7 @@ public final class GLHelper {
 		final float upX, final float upY, final float upZ) {
 
 		final float[] scratch = sScratch;
-		synchronized (scratch) {
+		synchronized (sScratch) {
 			Matrix.setLookAtM(scratch, 0, eyeX, eyeY, eyeZ, centerX, centerY, centerZ,
 			upX, upY, upZ);
 			GLES10.glMultMatrixf(scratch, 0);
@@ -367,13 +367,13 @@ public final class GLHelper {
 		final int[] view, final int viewOffset, final float[] win, final int winOffset) {
 
 		final float[] scratch = sScratch;
-		synchronized (scratch) {
+		synchronized (sScratch) {
 			final int M_OFFSET = 0; // 0..15
 			final int V_OFFSET = 16; // 16..19
 			final int V2_OFFSET = 20; // 20..23
 			Matrix.multiplyMM(scratch, M_OFFSET, project, projectOffset, model, modelOffset);
 
-			scratch[V_OFFSET + 0] = objX;
+			scratch[V_OFFSET    ] = objX;
 			scratch[V_OFFSET + 1] = objY;
 			scratch[V_OFFSET + 2] = objZ;
 			scratch[V_OFFSET + 3] = 1.0f;
@@ -389,7 +389,7 @@ public final class GLHelper {
 
 			win[winOffset] = view[viewOffset]
 				+ view[viewOffset + 2]
-				* (scratch[V2_OFFSET + 0] * rw + 1.0f)
+				* (scratch[V2_OFFSET] * rw + 1.0f)
 				* 0.5f;
 			win[winOffset + 1] =
 				view[viewOffset + 1] + view[viewOffset + 3]
@@ -432,7 +432,7 @@ public final class GLHelper {
 		final int[] view, final int viewOffset, final float[] obj, final int objOffset) {
 
 		final float[] scratch = sScratch;
-		synchronized (scratch) {
+		synchronized (sScratch) {
 			final int PM_OFFSET = 0; // 0..15
 			final int INVPM_OFFSET = 16; // 16..31
 			final int V_OFFSET = 0; // 0..3 Reuses PM_OFFSET space
@@ -442,8 +442,8 @@ public final class GLHelper {
 				return GL10.GL_FALSE;
 			}
 
-			scratch[V_OFFSET + 0] =
-				2.0f * (winX - view[viewOffset + 0]) / view[viewOffset + 2]
+			scratch[V_OFFSET    ] =
+				2.0f * (winX - view[viewOffset    ]) / view[viewOffset + 2]
 				- 1.0f;
 			scratch[V_OFFSET + 1] =
 				2.0f * (winY - view[viewOffset + 1]) / view[viewOffset + 3]

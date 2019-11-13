@@ -245,7 +245,6 @@ public final class GLHelper {
 	}
 	
 	@SuppressLint("NewApi")
-	@SuppressWarnings("deprecation")
 	public static int loadTextureFromResource(final Context context, final int resId, final Resources.Theme theme) {
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
@@ -331,12 +330,13 @@ public final class GLHelper {
 	public static int loadShader(@NonNull final Context context,
 		final String vss_asset, final String fss_asset) {
 
-		int program = 0;
+		int program;
 		try {
 			final String vss = AssetsHelper.loadString(context.getAssets(), vss_asset);
 			final String fss = AssetsHelper.loadString(context.getAssets(), vss_asset);
 			program = loadShader(vss, fss);
-		} catch (IOException e) {
+		} catch (final IOException e) {
+			program = 0;
 		}
 		return program;
 	}
