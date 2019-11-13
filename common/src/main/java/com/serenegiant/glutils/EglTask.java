@@ -29,6 +29,7 @@ public abstract class EglTask extends MessageTask {
 
 	private final GLContext mGLContext;
 
+	@Deprecated
 	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
 		this(3, sharedContext, flags);
 	}
