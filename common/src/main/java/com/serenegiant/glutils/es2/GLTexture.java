@@ -80,9 +80,9 @@ public class GLTexture implements ITexture {
 			mTexHeight = h;
 		}
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
-		mTextureId = GLHelper.initTex(mTextureTarget, filter_param);
+		mTextureId = GLHelper.initTex(texTarget, texUnit, filter_param);
 		// テクスチャのメモリ領域を確保する
-		GLES20.glTexImage2D(mTextureTarget,
+		GLES20.glTexImage2D(texTarget,
 			0,					// ミップマップレベル0(ミップマップしない)
 			GLES20.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ

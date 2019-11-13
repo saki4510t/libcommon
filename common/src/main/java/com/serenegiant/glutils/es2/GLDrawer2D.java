@@ -206,7 +206,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * @return texture ID
 	 */
 	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES20.GL_NEAREST);
+		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 	}
 
 	/**

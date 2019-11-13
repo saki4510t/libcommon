@@ -1128,7 +1128,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseMasterSurface();
 			makeCurrent();
-			mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_NEAREST);
+			mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mMasterTexture = new SurfaceTexture(mTexId);
 			mMasterSurface = new Surface(mMasterTexture);
 			if (BuildCheck.isAndroid4_1()) {

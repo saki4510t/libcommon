@@ -63,11 +63,12 @@ public final class GLHelper {
 	/**
 	 * テクスチャ名を生成, テクスチャユニットはGL_TEXTURE0, クランプ方法はGL_CLAMP_TO_EDGE
 	 * @param texTarget
+	 * @param texUnit テクスチャユニット, GL_TEXTURE0...GL_TEXTURE31
 	 * @param filter_param テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
-	public static int initTex(final int texTarget, final int filter_param) {
-		return initTex(texTarget, GLES30.GL_TEXTURE0,
+	public static int initTex(final int texTarget, final int texUnit, final int filter_param) {
+		return initTex(texTarget, texUnit,
 			filter_param, filter_param, GLES30.GL_CLAMP_TO_EDGE);
 	}
 

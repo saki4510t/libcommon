@@ -18,6 +18,7 @@ package com.serenegiant.glutils.es3;
  *  limitations under the License.
 */
 
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 
@@ -206,7 +207,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * @return texture ID
 	 */
 	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES30.GL_NEAREST);
+		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES30.GL_NEAREST);
 	}
 
 	/**
