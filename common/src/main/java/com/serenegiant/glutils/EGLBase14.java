@@ -47,7 +47,7 @@ import com.serenegiant.utils.BuildCheck;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 /*package*/ class EGLBase14 extends EGLBase {	// API >= 17
 //	private static final boolean DEBUG = false;	// TODO set false on release
-	private static final String TAG = "EGLBase14";
+	private static final String TAG = EGLBase14.class.getSimpleName();
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL14.EGL_NO_CONTEXT);
 

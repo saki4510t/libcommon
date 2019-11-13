@@ -45,7 +45,7 @@ import com.serenegiant.utils.BuildCheck;
  */
 /*package*/ class EGLBase10 extends EGLBase {
 //	private static final boolean DEBUG = false;	// FIXME set false on release
-	private static final String TAG = "EGLBase10";
+	private static final String TAG = EGLBase10.class.getSimpleName();
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
 
