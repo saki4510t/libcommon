@@ -84,6 +84,11 @@ import com.serenegiant.utils.BuildCheck;
 		private Config(final EGLConfig eglConfig) {
 			this.eglConfig = eglConfig;
 		}
+
+		@Override
+		public EGLConfig getEGLConfig() {
+			return eglConfig;
+		}
 	}
 
 	/**

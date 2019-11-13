@@ -125,6 +125,7 @@ public abstract class EGLBase implements EGLConst {
 	 * EGLコンフィグのホルダークラス
 	 */
 	public static abstract class IConfig {
+		public abstract Object getEGLConfig();
 	}
 
 	/**
