@@ -24,7 +24,6 @@ import android.graphics.Canvas;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.text.TextUtils;
 
 import com.serenegiant.glutils.ITexture;
 
