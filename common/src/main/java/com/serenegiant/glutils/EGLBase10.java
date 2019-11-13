@@ -246,6 +246,16 @@ import com.serenegiant.utils.BuildCheck;
 				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
 
+		@Override
+		public int getWidth() {
+			return mEglBase.getSurfaceWidth(mEglSurface);
+		}
+
+		@Override
+		public int getHeight() {
+			return mEglBase.getSurfaceHeight(mEglSurface);
+		}
+
 		/**
 		 * 指定したEGLSurfaceをカレントの描画Surfaceに設定する
 		 * Surface全面に描画できるようにViewportも変更するので必要であればswapの後に変更すること

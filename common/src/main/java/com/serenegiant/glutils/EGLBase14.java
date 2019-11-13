@@ -205,6 +205,16 @@ import com.serenegiant.utils.BuildCheck;
 				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
 
+		@Override
+		public int getWidth() {
+			return mEglBase.getSurfaceWidth(mEglSurface);
+		}
+
+		@Override
+		public int getHeight() {
+			return mEglBase.getSurfaceHeight(mEglSurface);
+		}
+
 	}
 
 	/**

@@ -27,18 +27,6 @@ public interface IGLSurface extends ISurface {
 	public int getTexId();
 
 	/**
-	 * 描画領域の幅を取得
-	 * @return
-	 */
-	public int getWidth();
-
-	/**
-	 * 描画領域の高さを取得
-	 * @return
-	 */
-	public int getHeight();
-
-	/**
 	 * バックバッファとして使っているテクスチャの実際の幅を取得
 	 * @return
 	 */
