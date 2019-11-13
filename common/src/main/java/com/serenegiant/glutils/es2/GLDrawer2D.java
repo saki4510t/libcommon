@@ -26,9 +26,8 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
+import com.serenegiant.glutils.IGLSurface;
 import com.serenegiant.glutils.IShaderDrawer2d;
-import com.serenegiant.glutils.ITexture;
-import com.serenegiant.glutils.GLSurface;
 
 import androidx.annotation.NonNull;
 
@@ -182,22 +181,13 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	}
 
 	/**
-	 * Textureオブジェクトを描画するためのヘルパーメソッド
-	 * Textureオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
-	 * @param texture
+	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
+	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
+	 * @param surface
 	 */
 	@Override
-	public void draw(final ITexture texture) {
-		draw(texture.getTexId(), texture.getTexMatrix(), 0);
-	}
-
-	/**
-	 * TextureOffscreenオブジェクトを描画するためのヘルパーメソッド
-	 * @param offscreen
-	 */
-	@Override
-	public void draw(final GLSurface offscreen) {
-		draw(offscreen.getTexId(), offscreen.copyTexMatrix(), 0);
+	public void draw(@NonNull final IGLSurface surface) {
+		draw(surface.getTexId(), surface.getTexMatrix(), 0);
 	}
 
 	/**

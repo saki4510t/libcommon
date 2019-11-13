@@ -19,12 +19,15 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
 import com.serenegiant.glutils.es2.GLHelper;
+
+import java.io.IOException;
 
 import androidx.annotation.NonNull;
 
@@ -417,6 +420,36 @@ public class GLSurface implements IGLSurface {
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = width / (float)mTexWidth;
 		mTexMatrix[5] = height / (float)mTexHeight;
+	}
+
+	/**
+	 * 指定したファイルから画像をテクスチャに読み込む
+	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
+	 * @param filePath
+	 */
+	@Override
+	public void loadBitmap(@NonNull final String filePath) throws IOException {
+//		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
+		final BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
+		BitmapFactory.decodeFile(filePath, options);
+		// テキスチャサイズ内に指定したイメージが収まるためのサブサンプリングを値を求める
+		final int imageWidth = options.outWidth;
+		final int imageHeight = options.outHeight;
+		int inSampleSize = 1;	// サブサンプリングサイズ
+		if ((imageHeight > mTexHeight) || (imageWidth > mTexWidth)) {
+			if (imageWidth > imageHeight) {
+				inSampleSize = (int)Math.ceil(imageHeight / (float)mTexHeight);
+			} else {
+				inSampleSize = (int)Math.ceil(imageWidth / (float)mTexWidth);
+			}
+		}
+//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),tex(%d,%d),inSampleSize=%d",
+// 			imageWidth, imageHeight, mTexWidth, mTexHeight, inSampleSize));
+		// 実際の読み込み処理
+		options.inSampleSize = inSampleSize;
+		options.inJustDecodeBounds = false;
+		loadBitmap(BitmapFactory.decodeFile(filePath, options));
 	}
 
 	/**

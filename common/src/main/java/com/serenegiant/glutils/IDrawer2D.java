@@ -26,6 +26,11 @@ public interface IDrawer2D {
 	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset);
 	public void getMvpMatrix(final float[] matrix, final int offset);
 	public void draw(final int texId, final float[] tex_matrix, final int offset);
-	public void draw(@NonNull final ITexture texture);
-	public void draw(@NonNull final IGLSurface offscreen);
+
+	/**
+	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
+	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
+	 * @param surface
+	 */
+	public void draw(@NonNull final IGLSurface surface);
 }

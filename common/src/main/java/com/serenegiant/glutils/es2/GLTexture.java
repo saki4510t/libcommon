@@ -25,14 +25,16 @@ import android.opengl.GLES20;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
-import com.serenegiant.glutils.ITexture;
+import com.serenegiant.glutils.IGLSurface;
+
+import java.io.IOException;
 
 import androidx.annotation.NonNull;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
-public class GLTexture implements ITexture {
+public class GLTexture implements IGLSurface {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
@@ -42,7 +44,7 @@ public class GLTexture implements ITexture {
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
 	/* package */int mImageWidth, mImageHeight;
-	
+
 	/**
 	 * コンストラクタ
 	 * テクスチャユニットが常時GL_TEXTURE0なので複数のテクスチャを同時に使えない
@@ -53,7 +55,7 @@ public class GLTexture implements ITexture {
 	public GLTexture(final int width, final int height, final int filter_param) {
 		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height, filter_param);
 	}
-	
+
 	/**
 	 * コンストラクタ
 	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
@@ -63,7 +65,7 @@ public class GLTexture implements ITexture {
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
 	public GLTexture(final int texTarget, final int texUnit,
-		final int width, final int height, final int filter_param) {
+					 final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		mTextureTarget = texTarget;
 		mTextureUnit = texUnit;
@@ -78,10 +80,12 @@ public class GLTexture implements ITexture {
 			mTexWidth = w;
 			mTexHeight = h;
 		}
+		mImageWidth = mTexWidth;
+		mImageHeight = mTexHeight;
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
-		mTextureId = GLHelper.initTex(texTarget, texUnit, filter_param);
+		mTextureId = GLHelper.initTex(mTextureTarget, texUnit, filter_param);
 		// テクスチャのメモリ領域を確保する
-		GLES20.glTexImage2D(texTarget,
+		GLES20.glTexImage2D(mTextureTarget,
 			0,					// ミップマップレベル0(ミップマップしない)
 			GLES20.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
@@ -112,9 +116,9 @@ public class GLTexture implements ITexture {
 	@Override
 	public void release() {
 //		if (DEBUG) Log.v(TAG, "release:");
-		if (mTextureId > 0) {
+		if (mTextureId >= 0) {
 			GLHelper.deleteTex(mTextureId);
-			mTextureId = 0;
+			mTextureId = -1;
 		}
 	}
 
@@ -138,45 +142,97 @@ public class GLTexture implements ITexture {
 		GLES20.glBindTexture(mTextureTarget, 0);
 	}
 
+	@Override
+	public boolean isValid() {
+		return mTextureId >= 0;
+	}
+
 	/**
 	 * テクスチャターゲットを取得(GL_TEXTURE_2D)
 	 * @return
 	 */
 	@Override
-	public int getTexTarget() { return mTextureTarget; }
+	public int getTexTarget() {
+		return mTextureTarget;
+	}
+
+	@Override
+	public int getTexUnit() {
+		return mTextureUnit;
+	}
+
 	/**
 	 * テクスチャ名を取得
 	 * @return
 	 */
 	@Override
-	public int getTexId() { return mTextureId; }
+	public int getTexId() {
+		return mTextureId;
+	}
+
+	@Override
+	public int getWidth() {
+		return 0;
+	}
+
+	@Override
+	public int getHeight() {
+		return 0;
+	}
+
+	/**
+	 * #copyTexMatrix()の返り値用のfloat配列
+	 */
+	private final float[] mResultMatrix = new float[16];
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * @return
+	 */
+	@Override
+	public float[] copyTexMatrix() {
+		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
+		return mResultMatrix;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * 領域チェックしていないのでoffset位置から16個以上確保しておくこと
+	 * @param matrix
+	 * @param offset
+	 */
+	@Override
+	public void copyTexMatrix(final float[] matrix, final int offset) {
+		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
+	}
+
 	/**
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
 	 */
 	@Override
-	public float[] getTexMatrix() { return mTexMatrix; }
-	/**
-	 * テクスチャ座標変換行列のコピーを取得
-	 * @param matrix 領域チェックしていないのでoffset位置から16個以上確保しておくこと
-	 * @param offset
-	 */
-	@Override
-	public void getTexMatrix(final float[] matrix, final int offset) {
-		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
+	public float[] getTexMatrix() {
+		return mTexMatrix;
 	}
+
 	/**
 	 * テクスチャ幅を取得
 	 * @return
 	 */
 	@Override
-	public int getTexWidth() { return mTexWidth; }
+	public int getTexWidth() {
+		return mTexWidth;
+	}
+
 	/**
 	 * テクスチャ高さを取得
 	 * @return
 	 */
 	@Override
-	public int getTexHeight() { return mTexHeight; }
+	public int getTexHeight() {
+		return mTexHeight;
+	}
 
 	/**
 	 * 指定したファイルから画像をテクスチャに読み込む
@@ -184,7 +240,7 @@ public class GLTexture implements ITexture {
 	 * @param filePath
 	 */
 	@Override
-	public void loadBitmap(@NonNull final String filePath) {
+	public void loadBitmap(@NonNull final String filePath) throws IOException {
 //		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する

@@ -23,7 +23,6 @@ import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
 import com.serenegiant.glutils.IGLSurface;
-import com.serenegiant.glutils.ITexture;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -121,13 +120,13 @@ public class GLDrawer2D implements IDrawer2D {
 		GLES10.glDisableClientState(GLES10.GL_VERTEX_ARRAY);
 	}
 
+	/**
+	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
+	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
+	 * @param surface
+	 */
 	@Override
-	public void draw(@NonNull final ITexture texture) {
-		draw(texture.getTexId(), texture.getTexMatrix(), 0);
-	}
-
-	@Override
-	public void draw(@NonNull final IGLSurface offscreen) {
-		draw(offscreen.getTexId(), offscreen.copyTexMatrix(), 0);
+	public void draw(@NonNull final IGLSurface surface) {
+		draw(surface.getTexId(), surface.getTexMatrix(), 0);
 	}
 }

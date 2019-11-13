@@ -25,7 +25,7 @@ import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
 
-import com.serenegiant.glutils.ITexture;
+import com.serenegiant.glutils.IGLSurface;
 
 import java.io.IOException;
 
@@ -34,7 +34,7 @@ import androidx.annotation.NonNull;
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
-public class GLTexture implements ITexture {
+public class GLTexture implements IGLSurface {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
@@ -80,17 +80,19 @@ public class GLTexture implements ITexture {
 			mTexWidth = w;
 			mTexHeight = h;
 		}
+		mImageWidth = mTexWidth;
+		mImageHeight = mTexHeight;
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
 		mTextureId = GLHelper.initTex(mTextureTarget, texUnit, filter_param);
 		// テクスチャのメモリ領域を確保する
 		GLES30.glTexImage2D(mTextureTarget,
-			0,							// ミップマップレベル0(ミップマップしない)
+			0,					// ミップマップレベル0(ミップマップしない)
 			GLES30.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
-			0,							// 境界幅
+			0,					// 境界幅
 			GLES30.GL_RGBA,				// 引き渡すデータのフォーマット
 			GLES30.GL_UNSIGNED_BYTE,	// データの型
-			null);						// ピクセルデータ無し
+			null);				// ピクセルデータ無し
 		// テクスチャ変換行列を初期化
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = width / (float)mTexWidth;
@@ -140,45 +142,98 @@ public class GLTexture implements ITexture {
 		GLES30.glBindTexture(mTextureTarget, 0);
 	}
 
+	@Override
+	public boolean isValid() {
+		return mTextureId > 0;
+	}
+
 	/**
 	 * テクスチャターゲットを取得(GL_TEXTURE_2D)
 	 * @return
 	 */
 	@Override
-	public int getTexTarget() { return mTextureTarget; }
+	public int getTexTarget() {
+		return mTextureTarget;
+	}
+
+	@Override
+	public int getTexUnit() {
+		return mTextureUnit;
+	}
+
 	/**
 	 * テクスチャ名を取得
 	 * @return
 	 */
 	@Override
-	public int getTexId() { return mTextureId; }
-	/**
-	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
-	 * @return
-	 */
-	@Override
-	public float[] getTexMatrix() { return mTexMatrix; }
-	/**
-	 * テクスチャ座標変換行列のコピーを取得
-	 * @param matrix 領域チェックしていないのでoffset位置から16個以上確保しておくこと
-	 * @param offset
-	 */
-	@Override
-	public void getTexMatrix(final float[] matrix, final int offset) {
-		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
+	public int getTexId() {
+		return mTextureId;
 	}
+
+	@Override
+	public int getWidth() {
+		return mImageWidth;
+	}
+
+	@Override
+	public int getHeight() {
+		return mImageHeight;
+	}
+
 	/**
 	 * テクスチャ幅を取得
 	 * @return
 	 */
 	@Override
-	public int getTexWidth() { return mTexWidth; }
+	public int getTexWidth() {
+		return mTexWidth;
+	}
+
 	/**
 	 * テクスチャ高さを取得
 	 * @return
 	 */
 	@Override
-	public int getTexHeight() { return mTexHeight; }
+	public int getTexHeight() {
+		return mTexHeight;
+	}
+
+
+	/**
+	 * #copyTexMatrix()の返り値用のfloat配列
+	 */
+	private final float[] mResultMatrix = new float[16];
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * @return
+	 */
+	@Override
+	public float[] copyTexMatrix() {
+		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
+		return mResultMatrix;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * 領域チェックしていないのでoffset位置から16個以上確保しておくこと
+	 * @param matrix
+	 * @param offset
+	 */
+	@Override
+	public void copyTexMatrix(final float[] matrix, final int offset) {
+		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
+	}
+
+	/**
+	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
+	 * @return
+	 */
+	@Override
+	public float[] getTexMatrix() {
+		return mTexMatrix;
+	}
 
 	/**
 	 * 指定したファイルから画像をテクスチャに読み込む

@@ -1,5 +1,11 @@
 package com.serenegiant.glutils;
 
+import android.graphics.Bitmap;
+
+import java.io.IOException;
+
+import androidx.annotation.NonNull;
+
 public interface IGLSurface extends ISurface {
 	/**
 	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
@@ -63,4 +69,18 @@ public interface IGLSurface extends ISurface {
 	 * @return
 	 */
 	public float[] getTexMatrix();
+
+	/**
+	 * 指定したファイルから画像をテクスチャに読み込む
+	 * ファイルが存在しないか読み込めなければIOExceptionを生成
+	 * @param filePath
+	 * @throws IOException
+	 */
+	public void loadBitmap(@NonNull final String filePath) throws IOException;
+
+	/**
+	 * テクスチャにビットマップを読み込む
+	 * @param bitmap
+	 */
+	public void loadBitmap(@NonNull final Bitmap bitmap);
 }

@@ -94,6 +94,7 @@ public final class GLHelper {
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_WRAP_T, wrap);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MIN_FILTER, min_filter);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, mag_filter);
+		Log.i(TAG, "initTex:texId=" + tex[0]);
 		return tex[0];
 	}
 
