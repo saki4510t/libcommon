@@ -316,6 +316,9 @@ public class GLSurface implements IGLSurface {
 		return mTexHeight;
 	}
 
+	/**
+	 * #copyTexMatrix()の返り値用のfloat配列
+	 */
 	private final float[] mResultMatrix = new float[16];
 	/**
 	 * IGLSurfaceの実装
