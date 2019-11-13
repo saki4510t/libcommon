@@ -132,8 +132,6 @@ public abstract class EGLBase implements EGLConst {
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
 	public interface IEglSurface {
-		@Deprecated
-		public IContext getContext();
 		public void release();
 		public void makeCurrent();
 		public void swap();
@@ -165,11 +163,6 @@ public abstract class EGLBase implements EGLConst {
 
 			mEglBase = eglBase;
 			mOffscreen = new TextureOffscreen(GLES20.GL_TEXTURE0, texId, width, height);
-		}
-
-		@Override
-		public IContext getContext() {
-			return mEglBase.getContext();
 		}
 
 		@Override

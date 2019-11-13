@@ -162,12 +162,6 @@ import com.serenegiant.utils.BuildCheck;
 			mEglSurface = EGL14.EGL_NO_SURFACE;
 		}
 
-		@Deprecated
-		@Override
-		public IContext getContext() {
-			return mEglBase.getContext();
-		}
-
 		@Override
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);

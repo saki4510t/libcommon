@@ -233,12 +233,6 @@ import com.serenegiant.utils.BuildCheck;
 			mEglSurface = EGL10.EGL_NO_SURFACE;
 		}
 
-		@Deprecated
-		@Override
-		public IContext getContext() {
-			return mEglBase.getContext();
-		}
-
 		/**
 		 * EGLSurfaceが有効かどうかを取得
 		 * @return
