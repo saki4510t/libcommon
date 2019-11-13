@@ -26,6 +26,8 @@ import android.util.Log;
 
 import com.serenegiant.glutils.es2.GLHelper;
 
+import androidx.annotation.NonNull;
+
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
@@ -361,7 +363,12 @@ public class GLSurface implements IGLSurface {
 		GLES20.glBindTexture(TEX_TARGET, 0);
 	}
 
-	/** 指定したテクスチャをこのオフスクリーンに割り当てる */
+	/**
+	 * 指定したテクスチャをこのオフスクリーンに割り当てる
+	 * @param texture_name
+	 * @param width
+	 * @param height
+	 */
 	public void assignTexture(final int texture_name,
 		final int width, final int height) {
 
@@ -403,8 +410,11 @@ public class GLSurface implements IGLSurface {
 		mTexMatrix[5] = height / (float)mTexHeight;
 	}
 
-	/** Bitmapからテクスチャを読み込む */
-	public void loadBitmap(final Bitmap bitmap) {
+	/**
+	 * Bitmapから画像をテクスチャに読み込む
+	 * @param bitmap
+	 */
+	public void loadBitmap(@NonNull final Bitmap bitmap) {
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
 		if ((width > mTexWidth) || (height > mTexHeight)) {
@@ -443,7 +453,11 @@ public class GLSurface implements IGLSurface {
 		return tex_name;
 	}
 	
-	/** オフスクリーン描画用のフレームバッファオブジェクトを生成する */
+	/**
+	 * オフスクリーン描画用のフレームバッファオブジェクトを生成する
+	 * @param width
+	 * @param height
+	 */
 	private final void createFrameBuffer(final int width, final int height) {
 		final int[] ids = new int[1];
 
@@ -483,7 +497,9 @@ public class GLSurface implements IGLSurface {
 
 	}
 
-	/** オフスクリーンフレームバッファを破棄 */
+	/**
+	 * オフスクリーンフレームバッファを破棄
+	 */
     private final void releaseFrameBuffer() {
         final int[] names = new int[1];
 		// デプスバッファがある時はデプスバッファを破棄
