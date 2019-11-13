@@ -144,54 +144,6 @@ public abstract class EGLBase implements EGLConst {
 		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
 	}
 
-	/**
-	 * 既存のテクスチャをバックバッファにしてオフスクリーン描画できるIEglSurfaceクラス
-	 */
-	private static class TexOffscreenWrapper implements IEglSurface {
-		@NonNull
-		private final EGLBase mEglBase;
-		private TextureOffscreen mOffscreen;
-
-		private TexOffscreenWrapper(@NonNull final EGLBase eglBase,
-			final int texId, final int width, final int height) {
-
-			mEglBase = eglBase;
-			mOffscreen = new TextureOffscreen(GLES20.GL_TEXTURE0, texId, width, height);
-		}
-
-		@Override
-		public void release() {
-			if (mOffscreen != null) {
-				mOffscreen.release();
-				mOffscreen = null;
-			}
-		}
-
-		@Override
-		public void makeCurrent() {
-			if (mOffscreen != null) {
-				mOffscreen.bind();
-			}
-		}
-
-		@Override
-		public void swap() {
-			if (mOffscreen != null) {
-				mOffscreen.unbind();
-			}
-		}
-
-		@Override
-		public void swap(final long presentationTimeNs) {
-			swap();
-		}
-
-		@Override
-		public boolean isValid() {
-			return mOffscreen != null;
-		}
-	}
-
 //--------------------------------------------------------------------------------
 // インターフェースメソッド
 //--------------------------------------------------------------------------------
@@ -237,25 +189,6 @@ public abstract class EGLBase implements EGLConst {
 	 * @return
 	 */
 	public abstract IEglSurface createOffscreen(final int width, final int height);
-	/**
-	 * 指定したテクスチャをバックバッファにしたオフスクリーンIEglSurfaceを生成する
-	 * @param texId
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	public IEglSurface createTexOffscreen(final int texId,
-		final int width, final int height) {
-
-		if (getGlVersion() >= 2) {
-			final IEglSurface result = new TexOffscreenWrapper(
-				this, texId, width, height);
-			result.makeCurrent();
-			return result;
-		} else {
-			throw new UnsupportedOperationException();
-		}
-	}
 	/**
 	 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
 	 * @return

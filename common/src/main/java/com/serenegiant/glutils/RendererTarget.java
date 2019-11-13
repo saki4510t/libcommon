@@ -62,7 +62,7 @@ class RendererTarget implements IRendererTarget {
 		mSurface = surface;
 		if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
-			mTargetSurface = egl.createTexOffscreen(wrapper.texId, wrapper.width, wrapper.height);
+			mTargetSurface = new TextureOffscreen(wrapper.texUnit, wrapper.texId, wrapper.width, wrapper.height);
 		} else {
 			mTargetSurface = egl.createFromSurface(surface);
 		}
