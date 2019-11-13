@@ -17,7 +17,7 @@ public class GLContext implements EGLConst {
 	@Nullable
 	private EGLBase mEgl = null;
 	@Nullable
-	private EGLBase.IEglSurface mEglMasterSurface;
+	private ISurface mEglMasterSurface;
 	private long mGLThreadId;
 
 	/**

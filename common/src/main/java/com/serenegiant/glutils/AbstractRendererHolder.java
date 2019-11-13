@@ -1238,7 +1238,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	private final Runnable mCaptureTask = new Runnable() {
     	private EGLBase eglBase;
-		private EGLBase.IEglSurface captureSurface;
+		private ISurface captureSurface;
 		private IDrawer2D drawer;
 		private final float[] mMvpMatrix = new float[16];
 

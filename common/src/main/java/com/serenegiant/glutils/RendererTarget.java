@@ -49,7 +49,7 @@ class RendererTarget implements IRendererTarget {
 	/** 元々の分配描画用Surface */
 	private Object mSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
-	private EGLBase.IEglSurface mTargetSurface;
+	private ISurface mTargetSurface;
 	private final float[] mMvpMatrix = new float[16];
 	private volatile boolean mEnable = true;
 

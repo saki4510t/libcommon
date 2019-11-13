@@ -129,17 +129,13 @@ public abstract class EGLBase implements EGLConst {
 	/**
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
-	public interface IEglSurface {
-		public void release();
-		public void makeCurrent();
-		public void swap();
+	public interface IEglSurface extends ISurface {
 		/**
 		 * swap with presentation time[ns]
 		 * only works well now when using EGLBase14
 		 * @param presentationTimeNs
 		 */
 		public void swap(final long presentationTimeNs);
-		public boolean isValid();
 	}
 
 	public static boolean isEGL14Supported() {
