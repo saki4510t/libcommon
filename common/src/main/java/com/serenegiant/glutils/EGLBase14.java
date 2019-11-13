@@ -551,7 +551,9 @@ import com.serenegiant.utils.BuildCheck;
 	 * @return
 	 */
 	@NonNull
-    private final EGLSurface createWindowSurface(final Object nativeWindow) {
+    private final EGLSurface createWindowSurface(final Object nativeWindow)
+    	throws IllegalArgumentException {
+
 //		if (DEBUG) Log.v(TAG, "createWindowSurface:nativeWindow=" + nativeWindow);
 
         final int[] surfaceAttribs = {
@@ -570,6 +572,8 @@ import com.serenegiant.utils.BuildCheck;
 			}
 			makeCurrent(result);
 			// 画面サイズ・フォーマットの取得
+		} catch (final IllegalArgumentException e) {
+			throw e;
 		} catch (final Exception e) {
 			Log.e(TAG, "eglCreateWindowSurface", e);
 			throw new IllegalArgumentException(e);
@@ -581,26 +585,29 @@ import com.serenegiant.utils.BuildCheck;
      * Creates an EGL surface associated with an offscreen buffer.
      */
     @NonNull
-    private final EGLSurface createOffscreenSurface(final int width, final int height) {
+    private final EGLSurface createOffscreenSurface(final int width, final int height)
+		throws IllegalArgumentException {
+
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
         final int[] surfaceAttribs = {
                 EGL14.EGL_WIDTH, width,
                 EGL14.EGL_HEIGHT, height,
                 EGL14.EGL_NONE
         };
-		EGLSurface result = EGL14.EGL_NO_SURFACE;
+		EGLSurface result;
 		try {
 			result = EGL14.eglCreatePbufferSurface(mEglDisplay,
 				mEglConfig.eglConfig, surfaceAttribs, 0);
 	        checkEglError("eglCreatePbufferSurface");
-	        if (result == null) {
-	        	result = EGL14.EGL_NO_SURFACE;
-	            throw new RuntimeException("surface was null");
+			if (result == null || result == EGL14.EGL_NO_SURFACE) {
+				final int error = EGL14.eglGetError();
+				throw new RuntimeException("createOffscreenSurface failed error=" + error);
 	        }
 		} catch (final IllegalArgumentException e) {
+			throw e;
+		} catch (final Exception e) {
 			Log.e(TAG, "createOffscreenSurface", e);
-		} catch (final RuntimeException e) {
-			Log.e(TAG, "createOffscreenSurface", e);
+			throw new IllegalArgumentException(e);
 		}
 		return result;
     }
