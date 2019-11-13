@@ -52,7 +52,8 @@ import com.serenegiant.utils.BuildCheck;
 	@NonNull
 	private Context mContext = EGL_NO_CONTEXT;
     private EGL10 mEgl = null;
-	private EGLDisplay mEglDisplay = null;
+    @NonNull
+	private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
     private Config mEglConfig = null;
     private int mGlVersion = 2;
 
@@ -155,6 +156,7 @@ import com.serenegiant.utils.BuildCheck;
 	private static class EglSurface implements IEglSurface {
 		@NonNull
 		private final EGLBase10 mEglBase;
+		@NonNull
 		private EGLSurface mEglSurface;
 		private boolean mOwnSurface;
 
@@ -239,8 +241,7 @@ import com.serenegiant.utils.BuildCheck;
 		 */
 		@Override
 		public boolean isValid() {
-			return (mEglSurface != null)
-				&& (mEglSurface != EGL10.EGL_NO_SURFACE)
+			return (mEglSurface != EGL10.EGL_NO_SURFACE)
 				&& (mEglBase.getSurfaceWidth(mEglSurface) > 0)
 				&& (mEglBase.getSurfaceHeight(mEglSurface) > 0);
 		}
@@ -332,7 +333,7 @@ import com.serenegiant.utils.BuildCheck;
    			EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT);
 //		mEgl.eglReleaseThread();	// XXX これを入れるとハングアップする機種がある
    		mEgl.eglTerminate(mEglDisplay);
-    	mEglDisplay = null;
+    	mEglDisplay = EGL10.EGL_NO_DISPLAY;
 		mEglConfig = null;
    		mEgl = null;
     }
@@ -466,7 +467,7 @@ import com.serenegiant.utils.BuildCheck;
 	        // EGLのバージョンを取得
 			final int[] version = new int[2];
 	        if (!mEgl.eglInitialize(mEglDisplay, version)) {
-	        	mEglDisplay = null;
+	        	mEglDisplay = EGL10.EGL_NO_DISPLAY;
 	            throw new RuntimeException("eglInitialize failed");
 	        }
 		}
@@ -635,6 +636,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * @param nativeWindow
 	 * @return
 	 */
+	@NonNull
     private final EGLSurface createWindowSurface(final Object nativeWindow) {
 //		if (DEBUG) Log.v(TAG, "createWindowSurface:nativeWindow=" + nativeWindow);
 
@@ -666,6 +668,7 @@ import com.serenegiant.utils.BuildCheck;
      * @param width
      * @param height
      */
+    @NonNull
     private final EGLSurface createOffscreenSurface(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
         final int[] surfaceAttribs = {
@@ -674,12 +677,13 @@ import com.serenegiant.utils.BuildCheck;
                 EGL10.EGL_NONE
         };
         mEgl.eglWaitGL();
-		EGLSurface result = null;
+		EGLSurface result = EGL10.EGL_NO_SURFACE;
 		try {
 			result = mEgl.eglCreatePbufferSurface(mEglDisplay,
 				mEglConfig.eglConfig, surfaceAttribs);
 	        checkEglError("eglCreatePbufferSurface");
 	        if (result == null) {
+				result = EGL10.EGL_NO_SURFACE;
 	            throw new RuntimeException("surface was null");
 	        }
 		} catch (final IllegalArgumentException e) {
