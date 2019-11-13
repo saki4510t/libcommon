@@ -21,15 +21,15 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.es2.GLDrawer2D;
-import com.serenegiant.glutils.TextureOffscreen;
 
 public class MediaSource implements ISource {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaSource";
 
-	protected TextureOffscreen mSourceScreen;
-	protected TextureOffscreen mOutputScreen;
+	protected GLSurface mSourceScreen;
+	protected GLSurface mOutputScreen;
 	protected int mWidth, mHeight;
 	protected int[] mSrcTexIds = new int[1];
 	protected boolean needSwap;
@@ -68,8 +68,8 @@ public class MediaSource implements ISource {
 			if ((width > 0) && (height > 0)) {
 				// FIXME フィルタ処理自体は大丈夫そうなんだけどImageProcessorの処理がおかしくなるので今は2の乗数には丸めない
 				// 代わりにImageProcessorの縦横のサイズ自体を2の乗数にする
-				mSourceScreen = new TextureOffscreen(width, height, false, false);
-				mOutputScreen = new TextureOffscreen(width, height, false, false);
+				mSourceScreen = new GLSurface(width, height, false, false);
+				mOutputScreen = new GLSurface(width, height, false, false);
 				mWidth = width;
 				mHeight = height;
 				mSrcTexIds[0] = mSourceScreen.getTexture();
@@ -83,7 +83,7 @@ public class MediaSource implements ISource {
 	public ISource apply(final IEffect effect) {
 		if (mSourceScreen != null) {
 			if (needSwap) {
-				final TextureOffscreen temp = mSourceScreen;
+				final GLSurface temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
 				mSrcTexIds[0] = mSourceScreen.getTexture();
@@ -124,7 +124,7 @@ public class MediaSource implements ISource {
 	}
 
 	@Override
-	public TextureOffscreen getOutputTexture() {
+	public GLSurface getOutputTexture() {
 		return needSwap ? mOutputScreen : mSourceScreen;
 	}
 

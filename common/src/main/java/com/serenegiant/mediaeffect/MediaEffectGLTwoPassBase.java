@@ -20,12 +20,12 @@ package com.serenegiant.mediaeffect;
 
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
 	protected final MediaEffectKernel3x3Drawer mDrawer2;
-	protected TextureOffscreen mOutputOffscreen2;
+	protected GLSurface mOutputOffscreen2;
 
 	public MediaEffectGLTwoPassBase(final int numTex,
 									final boolean isOES, final String fss) {
@@ -81,7 +81,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 			|| (height != mOutputOffscreen2.getHeight())) {
 			if (mOutputOffscreen2 != null)
 				mOutputOffscreen2.release();
-			mOutputOffscreen2 = new TextureOffscreen(width, height, false);
+			mOutputOffscreen2 = new GLSurface(width, height, false);
 		} */
 		if (mDrawer2 != null) {
 			mDrawer2.setTexSize(width, height);
@@ -104,7 +104,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (!mEnabled) return;
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = new TextureOffscreen(width, height, false);
+			mOutputOffscreen = new GLSurface(width, height, false);
 		}
 		mOutputOffscreen.bind();
 		try {
@@ -114,7 +114,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 
 		if (mOutputOffscreen2 == null) {
-			mOutputOffscreen2 = new TextureOffscreen(width, height, false);
+			mOutputOffscreen2 = new GLSurface(width, height, false);
 		}
 		// パス2
 		if ((out_tex_id != mOutputOffscreen2.getTexture())
@@ -137,13 +137,13 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
 	@Override
 	public void apply(@NonNull final int[] src_tex_ids,
-		@NonNull final TextureOffscreen output) {
+		@NonNull final GLSurface output) {
 
 
 		if (!mEnabled) return;
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = new TextureOffscreen(
+			mOutputOffscreen = new GLSurface(
 				output.getWidth(), output.getHeight(), false);
 		}
 		mOutputOffscreen.bind();
@@ -169,13 +169,13 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	@Override
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
-		final TextureOffscreen output_tex = src.getOutputTexture();
+		final GLSurface output_tex = src.getOutputTexture();
 		final int[] src_tex_ids = src.getSourceTexId();
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = new TextureOffscreen(width, height, false);
+			mOutputOffscreen = new GLSurface(width, height, false);
 		}
 		mOutputOffscreen.bind();
 		try {

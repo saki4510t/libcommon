@@ -25,7 +25,7 @@ import android.opengl.Matrix;
 import com.serenegiant.glutils.IDrawer2D;
 import com.serenegiant.glutils.IShaderDrawer2d;
 import com.serenegiant.glutils.ITexture;
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -197,7 +197,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * @param offscreen
 	 */
 	@Override
-	public void draw(final TextureOffscreen offscreen) {
+	public void draw(final GLSurface offscreen) {
 		draw(offscreen.getTexture(), offscreen.getTexMatrix(), 0);
 	}
 

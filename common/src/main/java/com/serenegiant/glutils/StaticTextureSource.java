@@ -214,7 +214,7 @@ public class StaticTextureSource {
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
 		private int mVideoWidth, mVideoHeight;
-		private TextureOffscreen mImageSource;
+		private GLSurface mImageSource;
 
 		public RendererTask(final StaticTextureSource parent,
 			final int width, final int height, final float fps) {
@@ -537,7 +537,7 @@ public class StaticTextureSource {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if (mImageSource == null) {
-				mImageSource = new TextureOffscreen(width, height, false);
+				mImageSource = new GLSurface(width, height, false);
 				GLHelper.checkGlError("handleSetBitmap");
 				mImageSource.loadBitmap(bitmap);
 			} else {

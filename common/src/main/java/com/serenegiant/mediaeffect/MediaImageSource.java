@@ -20,10 +20,10 @@ package com.serenegiant.mediaeffect;
 
 import android.graphics.Bitmap;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 public class MediaImageSource extends MediaSource {
-	private TextureOffscreen mImageOffscreen;
+	private GLSurface mImageOffscreen;
 	private boolean isReset;
 	/**
 	 * コンストラクタ
@@ -31,7 +31,7 @@ public class MediaImageSource extends MediaSource {
 	 */
 	public MediaImageSource(final Bitmap src) {
 		super(src.getWidth(), src.getHeight());
-		mImageOffscreen = new TextureOffscreen(mWidth, mHeight, false);
+		mImageOffscreen = new GLSurface(mWidth, mHeight, false);
 		setSource(src);
 	}
 
@@ -57,7 +57,7 @@ public class MediaImageSource extends MediaSource {
 				needSwap = true;
 			} else {
 				if (needSwap) {
-					final TextureOffscreen temp = mSourceScreen;
+					final GLSurface temp = mSourceScreen;
 					mSourceScreen = mOutputScreen;
 					mOutputScreen = temp;
 					mSrcTexIds[0] = mSourceScreen.getTexture();

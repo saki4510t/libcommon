@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 public interface ISource {
 	public ISource reset();
@@ -37,6 +37,6 @@ public interface ISource {
 	public int[] getSourceTexId();
 	public int getOutputTexId();
 	public float[] getTexMatrix();
-	public TextureOffscreen getOutputTexture();
+	public GLSurface getOutputTexture();
 	public void release();
 }

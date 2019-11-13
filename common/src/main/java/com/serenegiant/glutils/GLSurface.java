@@ -30,9 +30,9 @@ import com.serenegiant.glutils.es2.GLHelper;
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
  */
-public class TextureOffscreen implements ISurface {
+public class GLSurface implements ISurface {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "TextureOffscreen";
+	private static final String TAG = "GLSurface";
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
@@ -56,7 +56,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param width
 	 * @param height
 	 */
-	public TextureOffscreen(final int width, final int height) {
+	public GLSurface(final int width, final int height) {
 		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
 			width, height, false, DEFAULT_ADJUST_POWER2);
 	}
@@ -68,7 +68,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param width
 	 * @param height
 	 */
-	public TextureOffscreen(final int tex_unit,
+	public GLSurface(final int tex_unit,
 		final int width, final int height) {
 
 		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
@@ -83,7 +83,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param height dimension of offscreen(height)
 	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
 	 */
-	public TextureOffscreen(final int width, final int height,
+	public GLSurface(final int width, final int height,
 		final boolean use_depth_buffer) {
 
 		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
@@ -98,7 +98,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param height
 	 * @param use_depth_buffer
 	 */
-	public TextureOffscreen(final int tex_unit,
+	public GLSurface(final int tex_unit,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
@@ -114,7 +114,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public TextureOffscreen(final int width, final int height,
+	public GLSurface(final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
 		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
@@ -129,7 +129,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public TextureOffscreen(final int tex_unit,
+	public GLSurface(final int tex_unit,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
@@ -144,7 +144,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param width
 	 * @param height
 	 */
-	public TextureOffscreen(final int tex_unit, final int tex_id,
+	public GLSurface(final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
 		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
@@ -160,7 +160,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param height
 	 * @param use_depth_buffer
 	 */
-	public TextureOffscreen(final int tex_unit, final int tex_id,
+	public GLSurface(final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
@@ -177,7 +177,7 @@ public class TextureOffscreen implements ISurface {
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	private TextureOffscreen(final int tex_target, final int tex_unit, final int tex_id,
+	private GLSurface(final int tex_target, final int tex_unit, final int tex_id,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 

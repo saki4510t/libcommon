@@ -24,7 +24,7 @@ import android.media.effect.EffectFactory;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 public class MediaEffect implements IEffect {
 	protected final EffectContext mEffectContext;
@@ -56,7 +56,7 @@ public class MediaEffect implements IEffect {
 
 	@Override
 	public void apply(@NonNull final int [] src_tex_ids,
-		@NonNull final TextureOffscreen output) {
+		@NonNull final GLSurface output) {
 
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src_tex_ids[0],

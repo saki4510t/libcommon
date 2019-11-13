@@ -25,5 +25,5 @@ public interface IDrawer2D {
 	public void getMvpMatrix(final float[] matrix, final int offset);
 	public void draw(final int texId, final float[] tex_matrix, final int offset);
 	public void draw(final ITexture texture);
-	public void draw(final TextureOffscreen offscreen);
+	public void draw(final GLSurface offscreen);
 }

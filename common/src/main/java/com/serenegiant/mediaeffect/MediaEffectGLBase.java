@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -32,7 +32,7 @@ public class MediaEffectGLBase implements IEffect {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLBase";
 
-	protected TextureOffscreen mOutputOffscreen;
+	protected GLSurface mOutputOffscreen;
 	protected volatile boolean mEnabled = true;
 
 	protected final MediaEffectDrawer mDrawer;
@@ -123,7 +123,7 @@ public class MediaEffectGLBase implements IEffect {
 /*		if ((mOutputOffscreen == null) || (width != mOutputOffscreen.getWidth())
 			|| (height != mOutputOffscreen.getHeight())) {
 			mOutputOffscreen.release();
-			mOutputOffscreen = new TextureOffscreen(width, height, false);
+			mOutputOffscreen = new GLSurface(width, height, false);
 		} */
 		if (mDrawer != null) {
 			mDrawer.setTexSize(width, height);
@@ -156,7 +156,7 @@ public class MediaEffectGLBase implements IEffect {
 
 		if (!mEnabled) return;
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = new TextureOffscreen(width, height, false);
+			mOutputOffscreen = new GLSurface(width, height, false);
 		}
 		if ((out_tex_id != mOutputOffscreen.getTexture())
 			|| (width != mOutputOffscreen.getWidth())
@@ -173,7 +173,7 @@ public class MediaEffectGLBase implements IEffect {
 
 	@Override
 	public void apply(@NonNull final int [] src_tex_ids,
-		@NonNull final TextureOffscreen output) {
+		@NonNull final GLSurface output) {
 
 		if (!mEnabled) return;
 		output.bind();
@@ -192,7 +192,7 @@ public class MediaEffectGLBase implements IEffect {
 	@Override
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
-		final TextureOffscreen output_tex = src.getOutputTexture();
+		final GLSurface output_tex = src.getOutputTexture();
 		final int[] src_tex_ids = src.getSourceTexId();
 		output_tex.bind();
 		try {

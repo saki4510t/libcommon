@@ -20,13 +20,13 @@ package com.serenegiant.mediaeffect;
 
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.TextureOffscreen;
+import com.serenegiant.glutils.GLSurface;
 
 public interface IEffect {
 	public void apply(@NonNull final int[] src_tex_ids,
 		final int width, final int height, final int out_tex_id);
 	public void apply(@NonNull final int[] src_tex_ids,
-		@NonNull final TextureOffscreen output);
+		@NonNull final GLSurface output);
 	public void apply(ISource src);
 	public void release();
 	public IEffect resize(final int width, final int height);
