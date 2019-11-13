@@ -212,10 +212,16 @@ public class GLSurface implements IGLSurface {
 
 	/**
 	 * ISurfaceの実装
+	 * オフスクリーン描画用のレンダリングバッファに切り替える
+	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
 	 */
 	@Override
 	public void makeCurrent() {
-		bind();
+		if (DEBUG) Log.v(TAG, "makeCurrent:");
+		GLES20.glActiveTexture(TEX_UNIT);
+		GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
+		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
+		GLES20.glViewport(0, 0, mWidth, mHeight);
 	}
 
 	/**
@@ -223,7 +229,10 @@ public class GLSurface implements IGLSurface {
 	 */
 	@Override
 	public void swap() {
-		unbind();
+		if (DEBUG) Log.v(TAG, "swap:");
+		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
+		GLES20.glActiveTexture(TEX_UNIT);
+		GLES20.glBindTexture(TEX_TARGET, 0);
 	}
 
 	/**
@@ -345,22 +354,19 @@ public class GLSurface implements IGLSurface {
 	 * オフスクリーン描画用のレンダリングバッファに切り替える
 	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
 	 */
+	@Deprecated
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
-		GLES20.glActiveTexture(TEX_UNIT);
-		GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
-		GLES20.glViewport(0, 0, mWidth, mHeight);
+		makeCurrent();
 	}
 
 	/**
 	 * デフォルトのレンダリングバッファに戻す
 	 */
+	@Deprecated
 	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "unbind:");
-		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
-		GLES20.glActiveTexture(TEX_UNIT);
-		GLES20.glBindTexture(TEX_TARGET, 0);
+		swap();
 	}
 
 	/**
