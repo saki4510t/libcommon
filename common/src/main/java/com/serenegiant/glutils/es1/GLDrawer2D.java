@@ -95,7 +95,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @param offset
 	 */
 	@Override
-	public void getMvpMatrix(final float[] matrix, final int offset) {
+	public void copyMvpMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
 
