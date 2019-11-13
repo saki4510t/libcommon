@@ -197,7 +197,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 */
 	@Override
 	public void draw(final GLSurface offscreen) {
-		draw(offscreen.getTexture(), offscreen.getTexMatrix(), 0);
+		draw(offscreen.getTexId(), offscreen.copyTexMatrix(), 0);
 	}
 
 	/**

@@ -45,7 +45,7 @@ public class MediaImageSource extends MediaSource {
 	public ISource reset() {
 		super.reset();
 		isReset = true;
-		mSrcTexIds[0] = mImageOffscreen.getTexture();
+		mSrcTexIds[0] = mImageOffscreen.getTexId();
 		return this;
 	}
 
@@ -60,13 +60,13 @@ public class MediaImageSource extends MediaSource {
 					final GLSurface temp = mSourceScreen;
 					mSourceScreen = mOutputScreen;
 					mOutputScreen = temp;
-					mSrcTexIds[0] = mSourceScreen.getTexture();
+					mSrcTexIds[0] = mSourceScreen.getTexId();
 				}
 				needSwap = !needSwap;
 			}
 			effect.apply(mSrcTexIds,
 				mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(),
-				mOutputScreen.getTexture());
+				mOutputScreen.getTexId());
 		}
 		return this;
 	}

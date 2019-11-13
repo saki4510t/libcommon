@@ -126,6 +126,6 @@ public class GLDrawer2D implements IDrawer2D {
 
 	@Override
 	public void draw(final GLSurface offscreen) {
-		draw(offscreen.getTexture(), offscreen.getTexMatrix(), 0);
+		draw(offscreen.getTexId(), offscreen.copyTexMatrix(), 0);
 	}
 }

@@ -30,7 +30,7 @@ import com.serenegiant.glutils.es2.GLHelper;
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
  */
-public class GLSurface implements ISurface {
+public class GLSurface implements IGLSurface {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "GLSurface";
 
@@ -44,7 +44,7 @@ public class GLSurface implements ISurface {
 	/** テクスチャサイズ */
 	private int mTexWidth, mTexHeight;
 	/** オフスクリーンのカラーバッファに使うテクスチャ名 */
-	private int mFBOTextureName = -1;
+	private int mFBOTexId = -1;
 	/** // オフスクリーン用のバッファオブジェクト */
 	private int mDepthBufferObj = -1, mFrameBufferObj = -1;
 	/** テクスチャ座標変換行列 */
@@ -197,28 +197,148 @@ public class GLSurface implements ISurface {
 		assignTexture(tex, width, height);
 	}
 
-	/** 破棄する */
+//--------------------------------------------------------------------------------
+	/**
+	 * ISurfaceの実装
+	 * 関連するリソースを破棄する
+	 */
 	@Override
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release");
 		releaseFrameBuffer();
 	}
 
+	/**
+	 * ISurfaceの実装
+	 */
 	@Override
 	public void makeCurrent() {
 		bind();
 	}
 
+	/**
+	 * ISurfaceの実装
+	 */
 	@Override
 	public void swap() {
 		unbind();
 	}
 
+	/**
+	 * ISurfaceの実装
+	 * @return
+	 */
 	@Override
 	public boolean isValid() {
 		return mFrameBufferObj >= 0;
 	}
 
+//--------------------------------------------------------------------------------
+	/**
+	 * IGLSurfaceの実装
+	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
+	 * @return
+	 */
+	@Override
+	public int getTexTarget() {
+		return TEX_TARGET;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * バックバッファとして使っているテクスチャのテクスチャユニット(GL_TEXTURE0-GL_TEXTURE31)を取得
+	 * @return
+	 */
+	@Override
+	public int getTexUnit() {
+		return TEX_UNIT;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * オフスクリーンテクスチャ名を取得
+	 * このオフスクリーンへ書き込んだ画像をテクスチャとして使って他の描画を行う場合に使用できる
+	 * @return
+	 */
+	@Override
+	public int getTexId() {
+		return mFBOTexId;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * 描画領域の幅を取得
+	 * @return
+	 */
+	@Override
+	public int getWidth() {
+		return mWidth;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * 描画領域の高さを取得
+	 * @return
+	 */
+	@Override
+	public int getHeight() {
+		return mHeight;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * バックバッファとして使っているテクスチャの実際の幅を取得
+	 * @return
+	 */
+	@Override
+	public int getTexWidth() {
+		return mTexWidth;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * バックバッファとして使っているテクスチャの実際の高さを取得
+	 * @return
+	 */
+	@Override
+	public int getTexHeight() {
+		return mTexHeight;
+	}
+
+	private final float[] mResultMatrix = new float[16];
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * @return
+	 */
+	@Override
+	public float[] copyTexMatrix() {
+		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
+		return mResultMatrix;
+	}
+
+	/**
+	 * IGLSurfaceの実装
+	 * テクスチャ座標変換行列のコピーを取得
+	 * 領域チェックしていないのでoffset位置から16個以上確保しておくこと
+	 * @param matrix
+	 * @param offset
+	 */
+	@Override
+	public void copyTexMatrix(final float[] matrix, final int offset) {
+		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
+	}
+
+	/**
+	 * テクスチャ座標変換行列を取得(内部配列を直接返すので変更時は要注意)
+	 * @return
+	 */
+	@Override
+	public float[] getTexMatrix() {
+		return mTexMatrix;
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * オフスクリーン描画用のレンダリングバッファに切り替える
 	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
@@ -226,7 +346,7 @@ public class GLSurface implements ISurface {
 	public void bind() {
 //		if (DEBUG) Log.v(TAG, "bind:");
 		GLES20.glActiveTexture(TEX_UNIT);
-		GLES20.glBindTexture(TEX_TARGET, mFBOTextureName);
+		GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
 		GLES20.glViewport(0, 0, mWidth, mHeight);
 	}
@@ -241,42 +361,6 @@ public class GLSurface implements ISurface {
 		GLES20.glBindTexture(TEX_TARGET, 0);
 	}
 
-	private final float[] mResultMatrix = new float[16];
-	/**
-	 * get copy of texture matrix
-	 * @return
-	 */
-	public float[] getTexMatrix() {
-		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
-		return mResultMatrix;
-	}
-
-	/**
-	 * テクスチャ座標変換行列を取得(内部配列を直接返すので変更時は要注意)
-	 * @return
-	 */
-	public float[] getRawTexMatrix() {
-		return mTexMatrix;
-	}
-
-	/**
-	 * テクスチャ変換行列のコピーを返す
-	 * 領域チェックしていないのでoffset位置から16個以上確保しておくこと
-	 * @param matrix
-	 */
-	public void getTexMatrix(final float[] matrix, final int offset) {
-		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
-	}
-
-	/**
-	 * オフスクリーンテクスチャ名を取得
-	 * このオフスクリーンへ書き込んだ画像をテクスチャとして使って他の描画を行う場合に使用できる
-	 * @return
-	 */
-	public int getTexture() {
-		return mFBOTextureName;
-	}
-
 	/** 指定したテクスチャをこのオフスクリーンに割り当てる */
 	public void assignTexture(final int texture_name,
 		final int width, final int height) {
@@ -287,14 +371,14 @@ public class GLSurface implements ISurface {
 			releaseFrameBuffer();
 			createFrameBuffer(width, height);
 		}
-		mFBOTextureName = texture_name;
+		mFBOTexId = texture_name;
 		GLES20.glActiveTexture(TEX_UNIT);
 		 // フレームバッファオブジェクトをbindする
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
 		GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
 		// フレームバッファにカラーバッファ(テクスチャ)を接続する
 		GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
-			TEX_TARGET, mFBOTextureName, 0);
+			TEX_TARGET, mFBOTexId, 0);
 		GLHelper.checkGlError("glFramebufferTexture2D");
 
 		if (mHasDepthBuffer) {
@@ -330,7 +414,7 @@ public class GLSurface implements ISurface {
 			createFrameBuffer(width, height);
 		}
 		GLES20.glActiveTexture(TEX_UNIT);
-		GLES20.glBindTexture(TEX_TARGET, mFBOTextureName);
+		GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
 		GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
 		GLES20.glBindTexture(TEX_TARGET, 0);
 		// initialize texture matrix
@@ -409,10 +493,10 @@ public class GLSurface implements ISurface {
 			mDepthBufferObj = -1;
 		}
 		// オフスクリーンのカラーバッファ用のテクスチャを破棄
-		if (mFBOTextureName >= 0) {
-			names[0] = mFBOTextureName;
+		if (mFBOTexId >= 0) {
+			names[0] = mFBOTexId;
 			GLES20.glDeleteTextures(1, names, 0);
-			mFBOTextureName = -1;
+			mFBOTexId = -1;
 		}
 		// オフスクリーンのフレームバッファーオブジェクトを破棄
 		if (mFrameBufferObj >= 0) {
@@ -422,43 +506,4 @@ public class GLSurface implements ISurface {
 		}
     }
 
-	/**
-	 * get dimension(width) of this offscreen
-	 * @return
-	 */
-	public int getWidth() {
-		return mWidth;
-	}
-
-	/**
-	 * get dimension(height) of this offscreen
-	 * @return
-	 */
-	public int getHeight() {
-		return mHeight;
-	}
-
-	/**
-	 * get backing texture dimension(width) of this offscreen
-	 * @return
-	 */
-	public int getTexWidth() {
-		return mTexWidth;
-	}
-
-	/**
-	 * get backing texture dimension(height) of this offscreen
-	 * @return
-	 */
-	public int getTexHeight() {
-		return mTexHeight;
-	}
-	
-	public int getTexTarget() {
-		return TEX_TARGET;
-	}
-	
-	public int getTexUnit() {
-		return TEX_UNIT;
-	}
 }

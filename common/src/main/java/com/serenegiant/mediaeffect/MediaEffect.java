@@ -61,7 +61,7 @@ public class MediaEffect implements IEffect {
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src_tex_ids[0],
 				output.getWidth(), output.getHeight(),
-				output.getTexture());
+				output.getTexId());
 		}
 	}
 

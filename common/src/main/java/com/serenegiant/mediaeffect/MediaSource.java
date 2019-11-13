@@ -49,7 +49,7 @@ public class MediaSource implements ISource {
 	@Override
 	public ISource reset() {
 		needSwap = false;
-		mSrcTexIds[0] = mSourceScreen.getTexture();
+		mSrcTexIds[0] = mSourceScreen.getTexId();
 		return this;
 	}
 
@@ -72,7 +72,7 @@ public class MediaSource implements ISource {
 				mOutputScreen = new GLSurface(width, height, false, false);
 				mWidth = width;
 				mHeight = height;
-				mSrcTexIds[0] = mSourceScreen.getTexture();
+				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
 		}
 		needSwap = false;
@@ -86,12 +86,12 @@ public class MediaSource implements ISource {
 				final GLSurface temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
-				mSrcTexIds[0] = mSourceScreen.getTexture();
+				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
 			needSwap = !needSwap;
 //			effect.apply(mSrcTexIds,
 // 				mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(),
-// 				mOutputScreen.getTexture());
+// 				mOutputScreen.getTexId());
 			effect.apply(this); // このメソッド呼び出しは1つ上のコメントアウトしてある行と結果は等価だけど効率はいい。
 		}
 		return this;
@@ -115,12 +115,12 @@ public class MediaSource implements ISource {
 
 	@Override
 	public int getOutputTexId() {
-		return needSwap ? mOutputScreen.getTexture() : mSourceScreen.getTexture();
+		return needSwap ? mOutputScreen.getTexId() : mSourceScreen.getTexId();
 	}
 
 	@Override
 	public float[] getTexMatrix() {
-		return needSwap ? mOutputScreen.getTexMatrix() : mSourceScreen.getTexMatrix();
+		return needSwap ? mOutputScreen.copyTexMatrix() : mSourceScreen.copyTexMatrix();
 	}
 
 	@Override

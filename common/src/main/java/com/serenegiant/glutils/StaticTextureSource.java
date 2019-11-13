@@ -402,7 +402,7 @@ public class StaticTextureSource {
 			makeCurrent();
 			// 各Surfaceへ描画する
 			if (mImageSource != null) {
-				final int texId = mImageSource.getTexture();
+				final int texId = mImageSource.getTexId();
 				synchronized (mTargets) {
 					final int n = mTargets.size();
 					for (int i = n - 1; i >= 0; i--) {

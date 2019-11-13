@@ -108,7 +108,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
@@ -117,18 +117,18 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 			mOutputOffscreen2 = new GLSurface(width, height, false);
 		}
 		// パス2
-		if ((out_tex_id != mOutputOffscreen2.getTexture())
+		if ((out_tex_id != mOutputOffscreen2.getTexId())
 			|| (width != mOutputOffscreen2.getWidth())
 			|| (height != mOutputOffscreen2.getHeight())) {
 			mOutputOffscreen2.assignTexture(out_tex_id, width, height);
 		}
 		mOutputOffscreen2.bind();
-		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
+		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
-				mDrawer2.apply(ids, mOutputOffscreen2.getTexMatrix(), 0);
+				mDrawer2.apply(ids, mOutputOffscreen2.copyTexMatrix(), 0);
 			} else {
-				mDrawer.apply(ids, mOutputOffscreen2.getTexMatrix(), 0);
+				mDrawer.apply(ids, mOutputOffscreen2.copyTexMatrix(), 0);
 			}
 		} finally {
 			mOutputOffscreen2.unbind();
@@ -148,18 +148,18 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
 		// パス2
 		output.bind();
-		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
+		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
-				mDrawer2.apply(ids, output.getTexMatrix(), 0);
+				mDrawer2.apply(ids, output.copyTexMatrix(), 0);
 			} else {
-				mDrawer.apply(ids, output.getTexMatrix(), 0);
+				mDrawer.apply(ids, output.copyTexMatrix(), 0);
 			}
 		} finally {
 			output.unbind();
@@ -179,18 +179,18 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.bind();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.getTexMatrix(), 0);
+			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.unbind();
 		}
 		// パス2
 		output_tex.bind();
-		final int[] ids = new int[] { mOutputOffscreen.getTexture() };
+		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
-				mDrawer2.apply(ids, output_tex.getTexMatrix(), 0);
+				mDrawer2.apply(ids, output_tex.copyTexMatrix(), 0);
 			} else {
-				mDrawer.apply(ids, output_tex.getTexMatrix(), 0);
+				mDrawer.apply(ids, output_tex.copyTexMatrix(), 0);
 			}
 		} finally {
 			output_tex.unbind();
