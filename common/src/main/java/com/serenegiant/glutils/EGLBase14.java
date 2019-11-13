@@ -192,7 +192,7 @@ import com.serenegiant.utils.BuildCheck;
 		}
 
 		public void setPresentationTime(final long presentationTimeNs) {
-			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
+			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,	// API>=18
 				mEglSurface, presentationTimeNs);
 		}
 
@@ -297,6 +297,7 @@ import com.serenegiant.utils.BuildCheck;
 	 * @param what
 	 * @return
 	 */
+	@Override
  	public String queryString(final int what) {
 		return EGL14.eglQueryString(mEglDisplay, what);
 	}
@@ -485,7 +486,7 @@ import com.serenegiant.utils.BuildCheck;
 
     private int swap(final EGLSurface surface, final long presentationTimeNs) {
 //		if (DEBUG) Log.v(TAG, "swap:");
-		EGLExt.eglPresentationTimeANDROID(mEglDisplay, surface, presentationTimeNs);
+		EGLExt.eglPresentationTimeANDROID(mEglDisplay, surface, presentationTimeNs);	// API>=18
         if (!EGL14.eglSwapBuffers(mEglDisplay, surface)) {
         	final int err = EGL14.eglGetError();
 //        	if (DEBUG) Log.w(TAG, "swap:err=" + err);

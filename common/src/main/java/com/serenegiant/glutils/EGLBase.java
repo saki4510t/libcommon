@@ -18,10 +18,9 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.opengl.GLES20;
+import android.annotation.TargetApi;
 import android.os.Build;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -135,6 +134,7 @@ public abstract class EGLBase implements EGLConst {
 		 * only works well now when using EGLBase14
 		 * @param presentationTimeNs
 		 */
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void swap(final long presentationTimeNs);
 	}
 
