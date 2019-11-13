@@ -163,11 +163,11 @@ public class MediaEffectGLBase implements IEffect {
 			|| (height != mOutputOffscreen.getHeight())) {
 			mOutputOffscreen.assignTexture(out_tex_id, width, height);
 		}
-		mOutputOffscreen.bind();
+		mOutputOffscreen.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
-			mOutputOffscreen.unbind();
+			mOutputOffscreen.swap();
 		}
 	}
 
@@ -176,11 +176,11 @@ public class MediaEffectGLBase implements IEffect {
 		@NonNull final GLSurface output) {
 
 		if (!mEnabled) return;
-		output.bind();
+		output.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, output.copyTexMatrix(), 0);
 		} finally {
-			output.unbind();
+			output.swap();
 		}
 	}
 
@@ -194,11 +194,11 @@ public class MediaEffectGLBase implements IEffect {
 		if (!mEnabled) return;
 		final GLSurface output_tex = src.getOutputTexture();
 		final int[] src_tex_ids = src.getSourceTexId();
-		output_tex.bind();
+		output_tex.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, output_tex.copyTexMatrix(), 0);
 		} finally {
-			output_tex.unbind();
+			output_tex.swap();
 		}
 	}
 

@@ -106,11 +106,11 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (mOutputOffscreen == null) {
 			mOutputOffscreen = new GLSurface(width, height, false);
 		}
-		mOutputOffscreen.bind();
+		mOutputOffscreen.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
-			mOutputOffscreen.unbind();
+			mOutputOffscreen.swap();
 		}
 
 		if (mOutputOffscreen2 == null) {
@@ -122,7 +122,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 			|| (height != mOutputOffscreen2.getHeight())) {
 			mOutputOffscreen2.assignTexture(out_tex_id, width, height);
 		}
-		mOutputOffscreen2.bind();
+		mOutputOffscreen2.makeCurrent();
 		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
@@ -131,7 +131,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 				mDrawer.apply(ids, mOutputOffscreen2.copyTexMatrix(), 0);
 			}
 		} finally {
-			mOutputOffscreen2.unbind();
+			mOutputOffscreen2.swap();
 		}
 	}
 
@@ -146,14 +146,14 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 			mOutputOffscreen = new GLSurface(
 				output.getWidth(), output.getHeight(), false);
 		}
-		mOutputOffscreen.bind();
+		mOutputOffscreen.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
-			mOutputOffscreen.unbind();
+			mOutputOffscreen.swap();
 		}
 		// パス2
-		output.bind();
+		output.makeCurrent();
 		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
@@ -162,7 +162,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 				mDrawer.apply(ids, output.copyTexMatrix(), 0);
 			}
 		} finally {
-			output.unbind();
+			output.swap();
 		}
 	}
 	
@@ -177,14 +177,14 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (mOutputOffscreen == null) {
 			mOutputOffscreen = new GLSurface(width, height, false);
 		}
-		mOutputOffscreen.bind();
+		mOutputOffscreen.makeCurrent();
 		try {
 			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
-			mOutputOffscreen.unbind();
+			mOutputOffscreen.swap();
 		}
 		// パス2
-		output_tex.bind();
+		output_tex.makeCurrent();
 		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
 		try {
 			if (mDrawer2 != null) {
@@ -193,7 +193,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 				mDrawer.apply(ids, output_tex.copyTexMatrix(), 0);
 			}
 		} finally {
-			output_tex.unbind();
+			output_tex.swap();
 		}
 	}
 }

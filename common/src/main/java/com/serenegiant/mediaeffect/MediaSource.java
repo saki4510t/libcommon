@@ -142,12 +142,12 @@ public class MediaSource implements ISource {
 	}
 
 	public MediaSource bind() {
-		mSourceScreen.bind();
+		mSourceScreen.makeCurrent();
 		return this;
 	}
 
 	public MediaSource unbind() {
-		mSourceScreen.unbind();
+		mSourceScreen.swap();
 		reset();
 		return this;
 	}
@@ -162,13 +162,13 @@ public class MediaSource implements ISource {
 	public MediaSource setSource(final GLDrawer2D drawer,
 		final int tex_id, final float[] tex_matrix) {
 
-		mSourceScreen.bind();
+		mSourceScreen.makeCurrent();
 		try {
 			drawer.draw(tex_id, tex_matrix, 0);
 		} catch (RuntimeException e) {
 			Log.w(TAG, e);
 		} finally {
-			mSourceScreen.unbind();
+			mSourceScreen.swap();
 		}
 		reset();
 		return this;
