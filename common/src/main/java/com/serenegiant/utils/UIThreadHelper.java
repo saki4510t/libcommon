@@ -26,6 +26,10 @@ import android.util.Log;
 public final class UIThreadHelper {
 	private static final String TAG = UIThreadHelper.class.getSimpleName();
 
+	private UIThreadHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/** UI操作用のHandler */
 	private static final Handler sUIHandler = new Handler(Looper.getMainLooper());
 	/** UIスレッドの参照 */

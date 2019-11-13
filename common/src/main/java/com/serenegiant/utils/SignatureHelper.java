@@ -33,6 +33,10 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SignatureHelper {
+	private SignatureHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * apkの署名が指定したkeyと一致しているかどうかをチェック
 	 * @param context

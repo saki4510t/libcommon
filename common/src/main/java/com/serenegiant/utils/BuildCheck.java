@@ -22,6 +22,10 @@ import android.os.Build;
 
 public final class BuildCheck {
 
+	private BuildCheck() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	private static final boolean check(final int value) {
 		return (Build.VERSION.SDK_INT >= value);
 	}

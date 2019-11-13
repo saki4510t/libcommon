@@ -28,6 +28,10 @@ import android.text.TextUtils;
 import com.serenegiant.utils.BuildCheck;
 
 public class UsbUtils {
+	private UsbUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * USB機器毎の設定保存用にデバイスキー名を生成する。
 	 * ベンダーID, プロダクトID, デバイスクラス, デバイスサブクラス, デバイスプロトコルから生成

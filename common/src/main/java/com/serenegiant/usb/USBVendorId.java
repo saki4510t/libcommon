@@ -28,6 +28,10 @@ import java.util.Locale;
 public class USBVendorId {
 	private static final SparseArray<String> IDS = new SparseArray<String>();
 
+	private USBVendorId() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static String vendorName(final int vendor_id) {
 		String result = IDS.get(vendor_id);
 		if (TextUtils.isEmpty(result)) {

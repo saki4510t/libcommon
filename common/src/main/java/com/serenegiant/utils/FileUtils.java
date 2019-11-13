@@ -36,6 +36,10 @@ import android.util.Log;
 public class FileUtils {
 	private static final String TAG = FileUtils.class.getSimpleName();
 
+	private FileUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
     public static String DIR_NAME = "UsbWebCamera";
 	private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 

@@ -54,7 +54,11 @@ public class SAFUtils {
 //********************************************************************************
 // Storage Access Framework関係
 //********************************************************************************
-	
+
+	private SAFUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * ActivityまたはFragmentの#onActivityResultメソッドの処理のうち
 	 * Storage Access Framework関係の処理を行うためのdelegater

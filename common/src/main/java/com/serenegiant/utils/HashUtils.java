@@ -11,6 +11,10 @@ public class HashUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = HashUtils.class.getSimpleName();
 
+	private HashUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * 指定した方法で計算したハッシュをbyte配列として返す
 	 * @param algorithm　"SHA-1", "MD5", "SHA-256"

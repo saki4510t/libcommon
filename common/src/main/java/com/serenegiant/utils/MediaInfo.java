@@ -35,6 +35,10 @@ import android.text.TextUtils;
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public final class MediaInfo {
 
+	private MediaInfo() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static JSONObject get() throws JSONException {
 		final JSONObject result = new JSONObject();
 		try {

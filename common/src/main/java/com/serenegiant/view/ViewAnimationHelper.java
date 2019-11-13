@@ -32,6 +32,10 @@ import com.serenegiant.utils.BuildCheck;
 public class ViewAnimationHelper {
 	private static final String TAG = ViewAnimationHelper.class.getSimpleName();
 
+	private ViewAnimationHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	private static final long DEFAULT_DURATION_MS = 500L;
 
 	public static final int ANIMATION_UNKNOWN = -1;

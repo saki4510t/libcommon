@@ -32,6 +32,10 @@ import android.opengl.GLES20;
 import com.serenegiant.glutils.EGLBase;
 
 public class OpenGLInfo {
+	private OpenGLInfo() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	private static final int EGL_CLIENT_APIS                    = 0x308D;
 
 	public static JSONObject get() throws JSONException {

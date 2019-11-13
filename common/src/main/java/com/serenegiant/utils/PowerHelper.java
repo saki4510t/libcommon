@@ -36,6 +36,10 @@ import android.view.WindowManager;
 public class PowerHelper {
 	private static final String TAG = "PowerHelper";
 
+	private PowerHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	@SuppressLint({"MissingPermission", "WakelockTimeout"})
 	public static void wake(final Activity activity, final boolean disableKeyguard, final long lockDelayed) {
 		try {

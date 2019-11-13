@@ -26,6 +26,10 @@ import androidx.annotation.NonNull;
 
 public class ResourceHelper {
 
+	private ResourceHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static int get(@NonNull final Context context,
 		final String value, final int defaultValue)
 		throws Resources.NotFoundException, NumberFormatException, NullPointerException {

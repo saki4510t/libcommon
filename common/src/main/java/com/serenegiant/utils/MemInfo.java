@@ -33,6 +33,10 @@ import android.text.TextUtils;
 
 public class MemInfo {
 
+	private MemInfo() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	@SuppressLint("NewApi")
 	public static JSONObject get(final Context contex) throws JSONException {
 		final JSONObject result = new JSONObject();
@@ -71,7 +75,7 @@ public class MemInfo {
 			try {
 				final JSONObject pm_info = new JSONObject();
 				int i = 0;
-				String proc_meminfo = null;
+				String proc_meminfo;
 				final BufferedReader reader = new BufferedReader(new FileReader("/proc/meminfo"), 512);
 				do {
 					proc_meminfo = reader.readLine();

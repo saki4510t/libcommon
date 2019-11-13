@@ -39,6 +39,11 @@ import java.io.File;
 public final class UriHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = UriHelper.class.getSimpleName();
+
+	private UriHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * UriからPathへの変換処理
 	 * @param cr

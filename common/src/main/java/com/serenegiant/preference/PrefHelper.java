@@ -32,6 +32,10 @@ import java.util.Map;
  *
  */
 public class PrefHelper {
+	private PrefHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static short get(@Nullable final SharedPreferences pref,
 		final String key, final short defaultValue) {
 

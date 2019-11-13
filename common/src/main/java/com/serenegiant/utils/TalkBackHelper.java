@@ -27,6 +27,10 @@ import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
 public class TalkBackHelper {
+	private TalkBackHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * Accessibilityが有効になっているかどうかを取得
 	 * @param context

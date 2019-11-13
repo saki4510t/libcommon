@@ -1,7 +1,7 @@
 package com.serenegiant.utils;
 
 public class CRC32 {
-	private static final int crc32tab[] = { 
+	private static final int[] crc32tab = {
 		0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
 		0x076dc419, 0x706af48f, 0xe963a535, 0x9e6495a3,
 		0x0edb8832, 0x79dcb8a4, 0xe0d5e91e, 0x97d2d988,

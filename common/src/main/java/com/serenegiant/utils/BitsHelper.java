@@ -23,6 +23,10 @@ package com.serenegiant.utils;
  * @author saki
  */
 public final class BitsHelper {
+	private BitsHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * 各ビット列の立っているビット数を数える
 	 * @param v

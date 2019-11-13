@@ -25,6 +25,10 @@ import android.view.Window;
 import android.view.WindowManager;
 
 public class BrightnessHelper {
+	private BrightnessHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static void setBrightness(@NonNull final Activity activity, final float brightness) {
 		if (activity.isFinishing()) return;
 		final Window win = activity.getWindow();

@@ -29,6 +29,10 @@ import android.util.Log;
 
 public class BufferHelper {
 
+	private BufferHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	private static final char HEX[] = {
 		'0', '1', '2', '3',
 		'4', '5', '6', '7',

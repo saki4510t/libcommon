@@ -28,6 +28,10 @@ public class JSONHelper {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = JSONHelper.class.getSimpleName();
 
+	private JSONHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static long getLong(final JSONObject payload, final String key, final long defaultValue) throws JSONException {
 		long result = defaultValue;
 		if (payload.has(key)) {

@@ -28,6 +28,10 @@ import java.io.File;
  * Imported by saki on 15/11/10.
  */
 public class DiskUtils {
+	private DiskUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * キャッシュディレクトリのフルパスを取得する
 	 * 外部ストレージが使える場合は外部ストレージのキャッシュディレクトリを、そうでない場合は内部のディレクトリを使う

@@ -19,6 +19,10 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 public class Endian {
+	private Endian() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static boolean be2boolean(final byte[] bytes, final int offset) {
 		return bytes[offset] != 0;
 	}

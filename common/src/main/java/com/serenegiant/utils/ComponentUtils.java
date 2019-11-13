@@ -24,6 +24,10 @@ import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 
 public class ComponentUtils {
+	private ComponentUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static void disable(@NonNull final Context context, final Class<?> clazz) {
 		setComponentState(context, clazz, false);
 	}

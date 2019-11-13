@@ -22,6 +22,11 @@ import android.util.Log;
 
 public class Stacktrace {
 	private static final String TAG = "Stacktrace";
+
+	private Stacktrace() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static void print() {
 		final Throwable t = new Throwable();
 		final StringBuilder sb = new StringBuilder();

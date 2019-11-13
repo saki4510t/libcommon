@@ -51,6 +51,11 @@ import com.serenegiant.utils.UriHelper;
 public final class BitmapHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = BitmapHelper.class.getSimpleName();
+
+	private BitmapHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * Bitmapをpng形式のbyte[]に変換して返す
 	 * @param bitmap

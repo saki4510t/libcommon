@@ -27,6 +27,10 @@ import java.io.InputStreamReader;
 
 public class AssetsHelper {
 
+	private AssetsHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static String loadString(@NonNull final AssetManager assets, @NonNull final String name) throws IOException {
 		final StringBuffer sb = new StringBuffer();
 		final char[] buf = new char[1024];

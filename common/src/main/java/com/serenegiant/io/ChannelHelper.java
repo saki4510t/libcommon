@@ -38,7 +38,11 @@ import java.nio.charset.Charset;
  */
 public class ChannelHelper {
 	private static final Charset UTF8 = Charset.forName("UTF-8");
-	
+
+	private ChannelHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * ByteChannelからbooleanを読み込む
 	 * @param channel

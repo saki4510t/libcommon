@@ -36,6 +36,9 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 
 public final class PermissionCheck {
+	private PermissionCheck() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
 
 	public static final void dumpPermissions(@Nullable final Context context) {
     	if (context == null) return;

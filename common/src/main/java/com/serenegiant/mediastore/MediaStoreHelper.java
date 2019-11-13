@@ -49,6 +49,10 @@ public class MediaStoreHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreHelper.class.getSimpleName();
 
+	private MediaStoreHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static final int MEDIA_ALL = 0;
 	public static final int MEDIA_IMAGE = 1;
 	public static final int MEDIA_VIDEO = 2;

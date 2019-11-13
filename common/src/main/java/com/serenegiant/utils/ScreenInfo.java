@@ -31,6 +31,10 @@ import android.view.WindowManager;
 
 public class ScreenInfo {
 
+	private ScreenInfo() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public static JSONObject get(@NonNull final Activity activity) throws JSONException {

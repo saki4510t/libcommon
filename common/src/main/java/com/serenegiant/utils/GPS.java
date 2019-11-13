@@ -19,6 +19,10 @@ package com.serenegiant.utils;
 */
 
 public class GPS {
+	private GPS() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static class Datum {
 		public final double a;	// 長半径(赤道半径)[m]
 		public final double b;	// 短半径(極半径)[m]

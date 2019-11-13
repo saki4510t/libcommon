@@ -10,6 +10,10 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public class ViewUtils {
 
+	private ViewUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	@IntDef({
 		View.VISIBLE,
 		View.INVISIBLE,

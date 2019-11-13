@@ -22,6 +22,10 @@ import android.util.Log;
 
 public class LogUtils {
 
+	private LogUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static final int DEBUG_LEVEL_OFF = 0;
 	public static final int DEBUG_LEVEL_ERROR = 1;
 	public static final int DEBUG_LEVEL_WARNING = 2;

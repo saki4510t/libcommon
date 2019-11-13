@@ -45,6 +45,10 @@ public final class GLHelper {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = "GLHelper";
 
+	private GLHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * OpenGL|ESのエラーをチェックしてlogCatに出力する
 	 * @param op

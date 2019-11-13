@@ -22,6 +22,10 @@ import android.text.TextUtils;
 
 public class ObjectHelper {
 
+	private ObjectHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static boolean asBoolean(final Object val, final boolean defaultValue) {
 		if (val instanceof Boolean) {
 			return (Boolean)val;

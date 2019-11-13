@@ -23,6 +23,10 @@ import android.content.res.Resources;
 
 public class SettingsUtils {
 
+	private SettingsUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	public static int getMinimumScreenBrightnessSetting(final Context context) {
 		final Resources res = Resources.getSystem();
 		int id = res.getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android"); // API17+

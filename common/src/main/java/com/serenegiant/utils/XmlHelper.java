@@ -31,6 +31,10 @@ import java.util.List;
  * XmlPullParserのヘルパークラス
  */
 public class XmlHelper {
+	private XmlHelper() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * read as integer values with default value from xml(w/o exception throws)
 	 * resource integer id is also resolved into integer
