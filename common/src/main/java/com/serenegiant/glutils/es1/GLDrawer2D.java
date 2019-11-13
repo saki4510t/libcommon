@@ -22,12 +22,14 @@ import android.opengl.GLES10;
 import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
+import com.serenegiant.glutils.IGLSurface;
 import com.serenegiant.glutils.ITexture;
-import com.serenegiant.glutils.GLSurface;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+
+import androidx.annotation.NonNull;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -120,12 +122,12 @@ public class GLDrawer2D implements IDrawer2D {
 	}
 
 	@Override
-	public void draw(final ITexture texture) {
-		draw(texture.getTexture(), texture.getTexMatrix(), 0);
+	public void draw(@NonNull final ITexture texture) {
+		draw(texture.getTexId(), texture.getTexMatrix(), 0);
 	}
 
 	@Override
-	public void draw(final GLSurface offscreen) {
+	public void draw(@NonNull final IGLSurface offscreen) {
 		draw(offscreen.getTexId(), offscreen.copyTexMatrix(), 0);
 	}
 }

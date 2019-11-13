@@ -25,20 +25,24 @@ import java.io.IOException;
 import androidx.annotation.NonNull;
 
 public interface ITexture {
-	void release();
+	public void release();
 
-	void bind();
-	void unbind();
+	public void makeCurrent();
+	public void swap();
 
-	int getTexTarget();
-	int getTexture();
+	public int getTexTarget();
+	public int getTexId();
 
-	float[] getTexMatrix();
-	void getTexMatrix(float[] matrix, int offset);
+	/**
+	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
+	 * @return
+	 */
+	public float[] getTexMatrix();
+	public void getTexMatrix(float[] matrix, int offset);
 
-	int getTexWidth();
-	int getTexHeight();
+	public int getTexWidth();
+	public int getTexHeight();
 
-	void loadTexture(@NonNull final String filePath) throws IOException;
-	void loadTexture(@NonNull final Bitmap bitmap);
+	public void loadBitmap(@NonNull final String filePath) throws IOException;
+	public void loadBitmap(@NonNull final Bitmap bitmap);
 }

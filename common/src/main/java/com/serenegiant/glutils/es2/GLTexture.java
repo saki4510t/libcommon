@@ -122,8 +122,8 @@ public class GLTexture implements ITexture {
 	 * このインスタンスで管理しているテクスチャを有効にする(バインドする)
 	 */
 	@Override
-	public void bind() {
-//		if (DEBUG) Log.v(TAG, "bind:");
+	public void makeCurrent() {
+//		if (DEBUG) Log.v(TAG, "makeCurrent:");
 		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES20.glBindTexture(mTextureTarget, mTextureId);
 	}
@@ -132,8 +132,8 @@ public class GLTexture implements ITexture {
 	 * このインスタンスで管理しているテクスチャを無効にする(アンバインドする)
 	 */
 	@Override
-	public void unbind() {
-//		if (DEBUG) Log.v(TAG, "unbind:");
+	public void swap() {
+//		if (DEBUG) Log.v(TAG, "swap:");
 		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES20.glBindTexture(mTextureTarget, 0);
 	}
@@ -149,7 +149,7 @@ public class GLTexture implements ITexture {
 	 * @return
 	 */
 	@Override
-	public int getTexture() { return mTextureId; }
+	public int getTexId() { return mTextureId; }
 	/**
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
@@ -184,8 +184,8 @@ public class GLTexture implements ITexture {
 	 * @param filePath
 	 */
 	@Override
-	public void loadTexture(@NonNull final String filePath) {
-//		if (DEBUG) Log.v(TAG, "loadTexture:path=" + filePath);
+	public void loadBitmap(@NonNull final String filePath) {
+//		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
 		BitmapFactory.decodeFile(filePath, options);
@@ -205,7 +205,7 @@ public class GLTexture implements ITexture {
 		// 実際の読み込み処理
 		options.inSampleSize = inSampleSize;
 		options.inJustDecodeBounds = false;
-		loadTexture(BitmapFactory.decodeFile(filePath, options));
+		loadBitmap(BitmapFactory.decodeFile(filePath, options));
 	}
 	
 	/**
@@ -213,7 +213,7 @@ public class GLTexture implements ITexture {
  	 * @param bitmap
 	 */
 	@Override
-	public void loadTexture(@NonNull final Bitmap bitmap) {
+	public void loadBitmap(@NonNull final Bitmap bitmap) {
 		mImageWidth = bitmap.getWidth();	// 読み込んだイメージのサイズを取得
 		mImageHeight = bitmap.getHeight();
 		Bitmap texture = Bitmap.createBitmap(mTexWidth, mTexHeight, Bitmap.Config.ARGB_8888);
@@ -226,9 +226,9 @@ public class GLTexture implements ITexture {
 		mTexMatrix[5] = mImageHeight / (float)mTexHeight;
 //		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),scale(%f,%f)",
 // 			mImageWidth, mImageHeight, mMvpMatrix[0], mMvpMatrix[5]));
-		bind();
+		makeCurrent();
 		GLUtils.texImage2D(mTextureTarget, 0, texture, 0);
-		unbind();
+		swap();
 		texture.recycle();
 	}
 }

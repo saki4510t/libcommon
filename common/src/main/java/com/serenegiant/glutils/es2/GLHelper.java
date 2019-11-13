@@ -267,7 +267,7 @@ public final class GLHelper {
 
 		//Generate one texture pointer...
 		GLES20.glGenTextures(1, textures, 0);
-		//...and bind it to our array
+		//...and makeCurrent it to our array
 		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
 
 		//Create Nearest Filtered Texture

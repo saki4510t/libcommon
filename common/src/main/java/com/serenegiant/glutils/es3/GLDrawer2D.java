@@ -189,7 +189,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 */
 	@Override
 	public void draw(final ITexture texture) {
-		draw(texture.getTexture(), texture.getTexMatrix(), 0);
+		draw(texture.getTexId(), texture.getTexMatrix(), 0);
 	}
 
 	/**

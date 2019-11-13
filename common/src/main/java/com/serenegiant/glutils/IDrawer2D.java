@@ -18,12 +18,14 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
+
 public interface IDrawer2D {
 	public void release();
 	public float[] getMvpMatrix();
 	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset);
 	public void getMvpMatrix(final float[] matrix, final int offset);
 	public void draw(final int texId, final float[] tex_matrix, final int offset);
-	public void draw(final ITexture texture);
-	public void draw(final GLSurface offscreen);
+	public void draw(@NonNull final ITexture texture);
+	public void draw(@NonNull final IGLSurface offscreen);
 }

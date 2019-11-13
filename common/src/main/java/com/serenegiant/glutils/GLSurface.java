@@ -359,7 +359,7 @@ public class GLSurface implements IGLSurface {
 	 */
 	@Deprecated
 	public void bind() {
-//		if (DEBUG) Log.v(TAG, "bind:");
+//		if (DEBUG) Log.v(TAG, "makeCurrent:");
 		makeCurrent();
 	}
 
@@ -368,7 +368,7 @@ public class GLSurface implements IGLSurface {
 	 */
 	@Deprecated
 	public void unbind() {
-//		if (DEBUG) Log.v(TAG, "unbind:");
+//		if (DEBUG) Log.v(TAG, "swap:");
 		swap();
 	}
 
