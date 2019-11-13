@@ -32,6 +32,7 @@ import android.util.Log;
 import com.serenegiant.glutils.ShaderConst;
 import com.serenegiant.utils.AssetsHelper;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Stacktrace;
 
 import java.io.IOException;
 
@@ -53,7 +54,7 @@ public final class GLHelper {
         if (error != GLES30.GL_NO_ERROR) {
             final String msg = op + ": glError 0x" + Integer.toHexString(error);
 			Log.e(TAG, msg);
-            new Throwable(msg).printStackTrace();
+			Stacktrace.print();
 //         	if (DEBUG) {
 //	            throw new RuntimeException(msg);
 //       	}

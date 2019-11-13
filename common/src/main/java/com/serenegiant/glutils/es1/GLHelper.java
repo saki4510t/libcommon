@@ -21,6 +21,7 @@ package com.serenegiant.glutils.es1;
 import javax.microedition.khronos.opengles.GL10;
 
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Stacktrace;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -50,7 +51,7 @@ public final class GLHelper {
         if (error != GLES10.GL_NO_ERROR) {
             final String msg = op + ": glError 0x" + Integer.toHexString(error);
 			Log.e(TAG, msg);
-            new Throwable(msg).printStackTrace();
+			Stacktrace.print();
 //         	if (DEBUG) {
 //	            throw new RuntimeException(msg);
 //       	}

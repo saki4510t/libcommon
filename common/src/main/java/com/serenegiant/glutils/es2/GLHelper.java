@@ -34,6 +34,7 @@ import android.util.Log;
 import com.serenegiant.glutils.ShaderConst;
 import com.serenegiant.utils.AssetsHelper;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.Stacktrace;
 
 import java.io.IOException;
 
@@ -53,7 +54,7 @@ public final class GLHelper {
         if (error != GLES20.GL_NO_ERROR) {
             final String msg = op + ": glError 0x" + Integer.toHexString(error);
 			Log.e(TAG, msg);
-            new Throwable(msg).printStackTrace();
+			Stacktrace.print();
 //         	if (DEBUG) {
 //	            throw new RuntimeException(msg);
 //       	}
@@ -95,7 +96,7 @@ public final class GLHelper {
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, mag_filter);
 		return tex[0];
 	}
-	
+
 	/**
 	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
 	 * @param n 生成するテキスチャ名の数, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
