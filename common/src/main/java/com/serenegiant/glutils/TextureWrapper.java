@@ -6,17 +6,22 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 public class TextureWrapper implements Parcelable {
+	public final int texUnit;
 	public final int texId;
 	public final int width;
 	public final int height;
 
-	public TextureWrapper(final int texId, final int width, final int height) {
+	public TextureWrapper(final int texUnit, final int texId,
+		final int width, final int height) {
+
+		this.texUnit = texUnit;
 		this.texId = texId;
 		this.width = width;
 		this.height = height;
 	}
 
 	protected TextureWrapper(@NonNull final Parcel in) {
+		texUnit = in.readInt();
 		texId = in.readInt();
 		width = in.readInt();
 		height = in.readInt();
@@ -29,12 +34,15 @@ public class TextureWrapper implements Parcelable {
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeInt(texUnit);
 		dest.writeInt(texId);
 		dest.writeInt(width);
 		dest.writeInt(height);
 	}
 
-	public static final Creator<TextureWrapper> CREATOR = new Creator<TextureWrapper>() {
+	public static final Creator<TextureWrapper> CREATOR
+		= new Creator<TextureWrapper>() {
+
 		@Override
 		public TextureWrapper createFromParcel(Parcel in) {
 			return new TextureWrapper(in);
