@@ -24,11 +24,12 @@ import android.graphics.Canvas;
 import android.opengl.GLES10;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
-import android.text.TextUtils;
 
 import com.serenegiant.glutils.ITexture;
 
 import java.io.IOException;
+
+import androidx.annotation.NonNull;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
@@ -183,10 +184,8 @@ public class GLTexture implements ITexture {
 	 * @param filePath
 	 */
 	@Override
-	public void loadTexture(final String filePath) throws NullPointerException, IOException {
+	public void loadTexture(@NonNull final String filePath) throws IOException {
 //		if (DEBUG) Log.v(TAG, "loadTexture:path=" + filePath);
-		if (TextUtils.isEmpty(filePath))
-			throw new NullPointerException("image file path should not be a null");
 		final BitmapFactory.Options options = new BitmapFactory.Options();
 		options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
 		BitmapFactory.decodeFile(filePath, options);
@@ -211,10 +210,9 @@ public class GLTexture implements ITexture {
 	/**
 	 * ビットマップからテクスチャを読み込む
 	 * @param bitmap
-	 * @throws NullPointerException
 	 */
 	@Override
-	public void loadTexture(final Bitmap bitmap) throws NullPointerException {
+	public void loadTexture(@NonNull final Bitmap bitmap) {
 		mImageWidth = bitmap.getWidth();	// 読み込んだイメージのサイズを取得
 		mImageHeight = bitmap.getHeight();
 		Bitmap texture = Bitmap.createBitmap(mTexWidth, mTexHeight, Bitmap.Config.ARGB_8888);

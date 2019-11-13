@@ -22,6 +22,8 @@ import android.graphics.Bitmap;
 
 import java.io.IOException;
 
+import androidx.annotation.NonNull;
+
 public interface ITexture {
 	void release();
 
@@ -37,6 +39,6 @@ public interface ITexture {
 	int getTexWidth();
 	int getTexHeight();
 
-	void loadTexture(String filePath) throws NullPointerException, IOException;
-	void loadTexture(Bitmap bitmap) throws NullPointerException;
+	void loadTexture(@NonNull final String filePath) throws IOException;
+	void loadTexture(@NonNull final Bitmap bitmap);
 }
