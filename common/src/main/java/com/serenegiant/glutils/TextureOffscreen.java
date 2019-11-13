@@ -30,7 +30,7 @@ import com.serenegiant.glutils.es2.GLHelper;
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
  */
-public class TextureOffscreen {
+public class TextureOffscreen implements ISurface {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "TextureOffscreen";
 
@@ -198,9 +198,25 @@ public class TextureOffscreen {
 	}
 
 	/** 破棄する */
+	@Override
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release");
 		releaseFrameBuffer();
+	}
+
+	@Override
+	public void makeCurrent() {
+		bind();
+	}
+
+	@Override
+	public void swap() {
+		unbind();
+	}
+
+	@Override
+	public boolean isValid() {
+		return mFrameBufferObj >= 0;
 	}
 
 	/**
