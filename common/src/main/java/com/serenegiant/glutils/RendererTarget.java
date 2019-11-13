@@ -33,7 +33,7 @@ class RendererTarget implements IRendererTarget {
 	/**
 	 * ファクトリーメソッド
 	 * @param egl
-	 * @param surface
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
