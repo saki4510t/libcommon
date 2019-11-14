@@ -74,6 +74,10 @@ public abstract class EglTask extends MessageTask {
 		mGLContext.release();
 	}
 
+	protected GLContext getGLContext() {
+		return mGLContext;
+	}
+
 	protected EGLBase getEgl() {
 		return mGLContext.getEgl();
 	}
