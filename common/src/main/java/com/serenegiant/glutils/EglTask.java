@@ -86,28 +86,29 @@ public abstract class EglTask extends MessageTask {
 		mGLContext.release();
 	}
 
-	protected GLContext getGLContext() {
+//--------------------------------------------------------------------------------
+	public GLContext getGLContext() {
 		return mGLContext;
 	}
 
-	protected EGLBase getEgl() {
+	public EGLBase getEgl() {
 		return mGLContext.getEgl();
 	}
 
-	protected EGLBase.IConfig getConfig() {
+	public EGLBase.IConfig getConfig() {
 		return mGLContext.getConfig();
 	}
 
 	@Nullable
-	protected EGLBase.IContext getContext() {
+	public EGLBase.IContext getContext() {
 		return mGLContext.getContext();
 	}
 
-	protected void makeCurrent() {
+	public void makeCurrent() {
 		mGLContext.makeDefault();
 	}
 
-	protected boolean isGLES3() {
+	public boolean isGLES3() {
 		return mGLContext.isGLES3();
 	}
 }
