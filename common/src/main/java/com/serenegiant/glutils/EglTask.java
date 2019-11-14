@@ -43,6 +43,7 @@ public abstract class EglTask extends MessageTask {
 	}
 
 	/**
+	 * MessageTaskの実装
 	 * @param flags
 	 * @param maxClientVersion
 	 * @param sharedContext
@@ -55,6 +56,11 @@ public abstract class EglTask extends MessageTask {
 		mGLContext.initialize();
 	}
 
+	/**
+	 * MessageTaskの実装
+	 * @return
+	 * @throws InterruptedException
+	 */
 	@Override
 	protected Request takeRequest() throws InterruptedException {
 		final Request result = super.takeRequest();
@@ -62,12 +68,18 @@ public abstract class EglTask extends MessageTask {
 		return result;
 	}
 
+	/**
+	 * MessageTaskの実装
+	 */
 	@WorkerThread
 	@Override
 	protected void onBeforeStop() {
 		mGLContext.makeDefault();
 	}
 
+	/**
+	 * MessageTaskの実装
+	 */
 	@WorkerThread
 	@Override
 	protected void onRelease() {
