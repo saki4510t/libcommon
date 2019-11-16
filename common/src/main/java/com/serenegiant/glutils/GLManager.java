@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -47,6 +48,11 @@ public class GLManager {
 	private final Handler.Callback mCallback;
 	private boolean mInitialized;
 	private boolean mReleased;
+
+	public GLManager() {
+		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
+			null, 0, null);
+	}
 
 	/**
 	 * コンストラクタ
