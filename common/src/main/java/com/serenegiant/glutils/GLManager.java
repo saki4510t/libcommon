@@ -129,7 +129,7 @@ public class GLManager {
 
 	/**
 	 * この共有GLコンテキストがコンテキストを持つGLTaskを生成して返す
-	 * @param callback 
+	 * @param callback
 	 * @return
 	 * @throws RuntimeException
 	 */
@@ -158,6 +158,7 @@ public class GLManager {
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@NonNull
 	public synchronized GLContext getGLContext() throws IllegalStateException {
 		checkValid();
 		return mGLContext;
