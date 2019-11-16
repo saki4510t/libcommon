@@ -25,6 +25,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.glpipeline.Distributor;
 import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
@@ -46,6 +47,7 @@ public class VideoSourceCameraGLView
 	private final CameraDelegator mCameraDelegator;
 	private final GLManager mGLManager;
 	private VideoSource mVideoSource;
+	private Distributor mDistributor;
 
 	/**
 	 * コンストラクタ
@@ -97,6 +99,7 @@ public class VideoSourceCameraGLView
 		if (DEBUG) Log.v(TAG, "onResume:");
 		super.onResume();
 		mVideoSource = createVideoSource(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+		mDistributor = new Distributor(mVideoSource);
 		mCameraDelegator.onResume();
 	}
 
@@ -104,6 +107,10 @@ public class VideoSourceCameraGLView
 	public synchronized void onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:");
 		mCameraDelegator.onPause();
+		if (mDistributor != null) {
+			mDistributor.release();
+			mDistributor = null;
+		}
 		if (mVideoSource != null) {
 			mVideoSource.release();
 			mVideoSource = null;
@@ -157,7 +164,9 @@ public class VideoSourceCameraGLView
 		final boolean isRecordable) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:" + id);
-		// FIXME 未実装
+		if (mDistributor != null) {
+			mDistributor.addSurface(id, surface, isRecordable);
+		}
 	}
 
 	/**
@@ -167,7 +176,9 @@ public class VideoSourceCameraGLView
 	@Override
 	public synchronized void removeSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "removeSurface:" + id);
-		// FIXME 未実装
+		if (mDistributor != null) {
+			mDistributor.removeSurface(id);
+		}
 	}
 
 	@NonNull
