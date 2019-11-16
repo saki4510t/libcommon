@@ -444,7 +444,7 @@ public abstract class CameraDelegator {
 		}
 
 		public void startPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "CameraHandler#startPreview:");
+			if (DEBUG) Log.v(TAG, "CameraHandler#handleStartPreview:");
 			sendMessage(obtainMessage(MSG_PREVIEW_START, width, height));
 		}
 
@@ -476,10 +476,10 @@ public abstract class CameraDelegator {
 		public void handleMessage(final Message msg) {
 			switch (msg.what) {
 			case MSG_PREVIEW_START:
-				mThread.startPreview(msg.arg1, msg.arg2);
+				mThread.handleStartPreview(msg.arg1, msg.arg2);
 				break;
 			case MSG_PREVIEW_STOP:
-				mThread.stopPreview();
+				mThread.handleStopPreview();
 				synchronized (this) {
 					notifyAll();
 				}
@@ -544,8 +544,8 @@ public abstract class CameraDelegator {
 		 * @param width
 		 * @param height
 		 */
-		private final void startPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "CameraThread#startPreview:");
+		private final void handleStartPreview(final int width, final int height) {
+			if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:");
 			final CameraDelegator parent = mWeakParent.get();
 			if ((parent != null) && (mCamera == null)) {
 				final GLSurfaceView view = parent.mView;
@@ -616,13 +616,13 @@ public abstract class CameraDelegator {
 						mCamera.setPreviewTexture(st);
 					}
 				} catch (final IOException e) {
-					Log.e(TAG, "startPreview:", e);
+					Log.e(TAG, "handleStartPreview:", e);
 					if (mCamera != null) {
 						mCamera.release();
 						mCamera = null;
 					}
 				} catch (final RuntimeException e) {
-					Log.e(TAG, "startPreview:", e);
+					Log.e(TAG, "handleStartPreview:", e);
 					if (mCamera != null) {
 						mCamera.release();
 						mCamera = null;
@@ -657,8 +657,8 @@ public abstract class CameraDelegator {
 		/**
 		 * stop camera preview
 		 */
-		private void stopPreview() {
-			if (DEBUG) Log.v(TAG, "CameraThread#stopPreview:");
+		private void handleStopPreview() {
+			if (DEBUG) Log.v(TAG, "CameraThread#handleStopPreview:");
 			if (mCamera != null) {
 				mCamera.stopPreview();
 		        mCamera.release();
