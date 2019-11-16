@@ -61,6 +61,10 @@ public class GLContext implements EGLConst {
 		}
 	}
 
+	/**
+	 * 初期化を実行
+	 * GLコンテキストを生成するスレッド上で実行すること
+	 */
 	public void initialize() {
 		if ((mSharedContext == null)
 			|| (mSharedContext instanceof EGLBase.IContext)) {
@@ -148,6 +152,11 @@ public class GLContext implements EGLConst {
 		}
 	}
 
+	/**
+	 * GLコンテキストを保持しているスレッドのIDを返す
+	 * (== #initializeを実行したときのスレッドのID)
+	 * @return
+	 */
 	public long getGLThreadId() {
 		synchronized (mSync) {
 			return mGLThreadId;
