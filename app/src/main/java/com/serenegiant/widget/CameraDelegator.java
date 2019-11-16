@@ -9,8 +9,6 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
@@ -57,13 +55,16 @@ public abstract class CameraDelegator {
 	private static final int SCALE_KEEP_ASPECT = 2;
 	private static final int SCALE_CROP_CENTER = 3;
 
+	private final Object mSync = new Object();
 	private final CameraSurfaceRenderer mRenderer;
 	private final Set<OnFrameAvailableListener> mListeners
 		= new CopyOnWriteArraySet<>();
-	private CameraHandler mCameraHandler = null;
+	private Handler mCameraHandler;
 	private int mVideoWidth, mVideoHeight;
 	private int mRotation;
 	private int mScaleMode = SCALE_STRETCH_FIT;
+	private Camera mCamera;
+	private volatile boolean mResumed;
 
 	/**
 	 * コンストラクタ
@@ -79,21 +80,46 @@ public abstract class CameraDelegator {
 		holder.addCallback(new SurfaceHolder.Callback() {
 			@Override
 			public void surfaceCreated(final SurfaceHolder holder) {
+				if (DEBUG) Log.v(TAG, "surfaceCreated:");
 				// do nothing
 			}
 
 			@Override
 			public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
 				// do nothing
+				if (DEBUG) Log.v(TAG, "surfaceChanged:");
 			}
 
 			@Override
 			public void surfaceDestroyed(final SurfaceHolder holder) {
-				CameraDelegator.this.surfaceDestroyed(holder);
+				mRenderer.onSurfaceDestroyed();
 			}
 		});
 		mVideoWidth = PREVIEW_WIDTH;
 		mVideoHeight = PREVIEW_HEIGHT;
+	}
+
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			release();
+		} finally {
+			super.finalize();
+		}
+	}
+
+	/**
+	 * 関連するリソースを廃棄する
+	 */
+	public void release() {
+		synchronized (mSync) {
+			if (mCameraHandler != null) {
+				if (DEBUG) Log.v(TAG, "release:");
+				mCameraHandler.removeCallbacksAndMessages(null);
+				mCameraHandler.getLooper().quit();
+				mCameraHandler = null;
+			}
+		}
 	}
 
 	/**
@@ -101,6 +127,7 @@ public abstract class CameraDelegator {
 	 */
 	public void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
+		mResumed = true;
 		if (mRenderer.mHasSurface) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist");
@@ -114,10 +141,9 @@ public abstract class CameraDelegator {
 	 */
 	public void onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:");
-		if (mCameraHandler != null) {
-			// just request stop previewing
-			mCameraHandler.stopPreview(true);
-		}
+		mResumed = false;
+		// just request stop previewing
+		stopPreview();
 	}
 
 	public void addListener(final OnFrameAvailableListener listener) {
@@ -224,14 +250,37 @@ public abstract class CameraDelegator {
 	 */
 	public abstract void removeSurface(final int id);
 //--------------------------------------------------------------------------------
-	private synchronized void startPreview(final int width, final int height) {
+	private void startPreview(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("startPreview:(%dx%d)", width, height));
-		if (mCameraHandler == null) {
-			final CameraThread thread = new CameraThread(this);
-			thread.start();
-			mCameraHandler = thread.getHandler();
+		synchronized (mSync) {
+			if (mCameraHandler == null) {
+				mCameraHandler = HandlerThreadHandler.createHandler("CameraHandler");
+			}
+			mCameraHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					handleStartPreview(width, height);
+				}
+			});
 		}
-		mCameraHandler.startPreview(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+	}
+
+	private void stopPreview() {
+		if (DEBUG) Log.v(TAG, "stopPreview:" + mCamera);
+		synchronized (mSync) {
+			if (mCamera != null) {
+				mCamera.stopPreview();
+				if (mCameraHandler != null) {
+					mCameraHandler.post(new Runnable() {
+						@Override
+						public void run() {
+							handleStopPreview();
+							release();
+						}
+					});
+				}
+			}
+		}
 	}
 
 	@Nullable
@@ -241,24 +290,9 @@ public abstract class CameraDelegator {
 	}
 
 	/**
-	 * GLSurfaceView#surfaceDestroyedが呼ばれた時の処理
-	 * @param holder
-	 */
-	private void surfaceDestroyed(final SurfaceHolder holder) {
-		if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
-		if (mCameraHandler != null) {
-			// wait for finish previewing here
-			// otherwise camera try to display on un-exist Surface and some error will occur
-			mCameraHandler.stopPreview(true);
-		}
-		mCameraHandler = null;
-		mRenderer.onSurfaceDestroyed();
-	}
-
-	/**
 	 * GLSurfaceViewのRenderer
 	 */
-	private static final class CameraSurfaceRenderer
+	private final class CameraSurfaceRenderer
 		implements GLSurfaceView.Renderer,
 			SurfaceTexture.OnFrameAvailableListener {	// API >= 11
 
@@ -269,6 +303,7 @@ public abstract class CameraDelegator {
 		private final float[] mStMatrix = new float[16];
 		private final float[] mMvpMatrix = new float[16];
 		private boolean mHasSurface;
+		private volatile boolean requestUpdateTex = false;
 
 		public CameraSurfaceRenderer(final CameraDelegator parent) {
 			if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer:");
@@ -278,7 +313,7 @@ public abstract class CameraDelegator {
 
 		@Override
 		public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
-			if (DEBUG) Log.v(TAG, "onSurfaceCreated:");
+			if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer#onSurfaceCreated:");
 			// This renderer required OES_EGL_image_external extension
 			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
@@ -303,7 +338,7 @@ public abstract class CameraDelegator {
 
 		@Override
 		public void onSurfaceChanged(final GL10 unused, final int width, final int height) {
-			if (DEBUG) Log.v(TAG, String.format("onSurfaceChanged:(%d,%d)", width, height));
+			if (DEBUG) Log.v(TAG, String.format("CameraSurfaceRenderer#onSurfaceChanged:(%d,%d)", width, height));
 			// if at least with or height is zero, initialization of this view is still progress.
 			if ((width == 0) || (height == 0)) return;
 			updateViewport();
@@ -317,8 +352,13 @@ public abstract class CameraDelegator {
 		 * when GLSurface context is soon destroyed
 		 */
 		public void onSurfaceDestroyed() {
-			if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:");
+			if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer#onSurfaceDestroyed:");
 			mHasSurface = false;
+			release();
+		}
+
+		public void release() {
+			if (DEBUG) Log.v(TAG, "CameraSurfaceRenderer#release:");
 			if (mDrawer != null) {
 				mDrawer.deleteTex(hTex);
 				mDrawer.release();
@@ -327,6 +367,29 @@ public abstract class CameraDelegator {
 			if (mSTexture != null) {
 				mSTexture.release();
 				mSTexture = null;
+			}
+		}
+
+		/**
+		 * drawing to GLSurface
+		 * we set renderMode to GLSurfaceView.RENDERMODE_WHEN_DIRTY,
+		 * this method is only called when #requestRender is called(= when texture is required to update)
+		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
+		 */
+		@Override
+		public void onDrawFrame(final GL10 unused) {
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+			if (requestUpdateTex && (mSTexture != null)) {
+				requestUpdateTex = false;
+				// update texture(came from camera)
+				mSTexture.updateTexImage();
+				// get texture matrix
+				mSTexture.getTransformMatrix(mStMatrix);
+			}
+			// draw to preview screen
+			if (mDrawer != null) {
+				mDrawer.draw(hTex, mStMatrix, 0);
 			}
 		}
 
@@ -391,36 +454,6 @@ public abstract class CameraDelegator {
 			}
 		}
 
-		private volatile boolean requestUpdateTex = false;
-		private boolean flip = true;
-		/**
-		 * drawing to GLSurface
-		 * we set renderMode to GLSurfaceView.RENDERMODE_WHEN_DIRTY,
-		 * this method is only called when #requestRender is called(= when texture is required to update)
-		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
-		 */
-		@Override
-		public void onDrawFrame(final GL10 unused) {
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-			if (requestUpdateTex) {
-				requestUpdateTex = false;
-				// update texture(came from camera)
-				mSTexture.updateTexImage();
-				// get texture matrix
-				mSTexture.getTransformMatrix(mStMatrix);
-			}
-			// draw to preview screen
-			if (mDrawer != null) {
-				mDrawer.draw(hTex, mStMatrix, 0);
-			}
-			flip = !flip;
-			if (flip) {	// ~30fps
-				synchronized (this) {
-				}
-			}
-		}
-
 		/**
 		 * OnFrameAvailableListenerインターフェースの実装
 		 * @param st
@@ -432,286 +465,181 @@ public abstract class CameraDelegator {
 	}
 
 	/**
-	 * Handler class for asynchronous camera operation
+	 * start camera preview
+	 * @param width
+	 * @param height
 	 */
-	private static final class CameraHandler extends Handler {
-		private static final int MSG_PREVIEW_START = 1;
-		private static final int MSG_PREVIEW_STOP = 2;
-		private CameraThread mThread;
-
-		public CameraHandler(final CameraThread thread) {
-			mThread = thread;
+	private final void handleStartPreview(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:");
+		Camera camera;
+		synchronized (mSync) {
+			camera = mCamera;
 		}
-
-		public void startPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "CameraHandler#handleStartPreview:");
-			sendMessage(obtainMessage(MSG_PREVIEW_START, width, height));
-		}
-
-		/**
-		 * request to stop camera preview
-		 * @param needWait need to wait for stopping camera preview
-		 */
-		public void stopPreview(final boolean needWait) {
-			if (DEBUG) Log.v(TAG, "CameraHandler#stopPreview:");
-			synchronized (this) {
-				sendEmptyMessage(MSG_PREVIEW_STOP);
-				if (needWait) {
-					if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
-					for (; (mThread != null) && mThread.mIsRunning ; ) {
-						try {
-							wait(1000);
-						} catch (final InterruptedException e) {
-							// ignore
-						}
+		if (camera == null) {
+			// This is a sample project so just use 0 as camera ID.
+			// it is better to selecting camera is available
+			try {
+				camera = Camera.open(CAMERA_ID);
+				final Camera.Parameters params = camera.getParameters();
+				final List<String> focusModes = params.getSupportedFocusModes();
+				if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+					params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+				} else if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+					params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+				} else {
+					if (DEBUG) Log.i(TAG, "Camera does not support autofocus");
+				}
+				// let's try fastest frame rate. You will get near 60fps, but your device become hot.
+				final List<int[]> supportedFpsRange = params.getSupportedPreviewFpsRange();
+				final int n = supportedFpsRange != null ? supportedFpsRange.size() : 0;
+				int[] max_fps = null;
+				for (int i = n - 1; i >= 0; i--) {
+					final int[] range = supportedFpsRange.get(i);
+					Log.i(TAG, String.format("supportedFpsRange(%d)=(%d,%d)", i, range[0], range[1]));
+					if ((range[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= range[1])) {
+						max_fps = range;
+						break;
 					}
 				}
+				if (max_fps == null) {
+					// 見つからなかったときは一番早いフレームレートを選択
+					max_fps = supportedFpsRange.get(supportedFpsRange.size() - 1);
+				}
+				Log.i(TAG, String.format("found fps:%d-%d", max_fps[0], max_fps[1]));
+				params.setPreviewFpsRange(max_fps[0], max_fps[1]);
+				params.setRecordingHint(true);
+				// request closest supported preview size
+				final Camera.Size closestSize = getClosestSupportedSize(
+					params.getSupportedPreviewSizes(), width, height);
+				params.setPreviewSize(closestSize.width, closestSize.height);
+				// request closest picture size for an aspect ratio issue on Nexus7
+				final Camera.Size pictureSize = getClosestSupportedSize(
+					params.getSupportedPictureSizes(), width, height);
+				params.setPictureSize(pictureSize.width, pictureSize.height);
+				// rotate camera preview according to the device orientation
+				setRotation(camera, params);
+				camera.setParameters(params);
+				// get the actual preview size
+				final Camera.Size previewSize = camera.getParameters().getPreviewSize();
+				Log.i(TAG, String.format("previewSize(%d, %d)", previewSize.width, previewSize.height));
+				// adjust view size with keeping the aspect ration of camera preview.
+				// here is not a UI thread and we should request parent view to execute.
+				mView.post(new Runnable() {
+					@Override
+					public void run() {
+						setVideoSize(previewSize.width, previewSize.height);
+					}
+				});
+				// カメラ映像のプレビュー表示用SurfaceTextureを生成
+				final SurfaceTexture st = getSurfaceTexture();
+				st.setDefaultBufferSize(previewSize.width, previewSize.height);
+				if (true) {
+					// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
+					addSurface(1, st, false);
+					// カメラ映像受け取り用SurfaceTextureをセット
+					camera.setPreviewTexture(getInputSurfaceTexture());
+				} else {
+					// こっちはIRendererを経由せずに直接カメラにプレビュー表示用SurfaceTextureをセットする
+					camera.setPreviewTexture(st);
+				}
+			} catch (final IOException e) {
+				Log.e(TAG, "handleStartPreview:", e);
+				if (camera != null) {
+					camera.release();
+					camera = null;
+				}
+			} catch (final RuntimeException e) {
+				Log.e(TAG, "handleStartPreview:", e);
+				if (camera != null) {
+					camera.release();
+					camera = null;
+				}
+			}
+			if (camera != null) {
+				// start camera preview display
+				camera.startPreview();
+			}
+			synchronized (mSync) {
+				mCamera = camera;
 			}
 		}
+	}
 
-		/**
-		 * message handler for camera thread
-		 */
-		@Override
-		public void handleMessage(final Message msg) {
-			switch (msg.what) {
-			case MSG_PREVIEW_START:
-				mThread.handleStartPreview(msg.arg1, msg.arg2);
-				break;
-			case MSG_PREVIEW_STOP:
-				mThread.handleStopPreview();
-				synchronized (this) {
-					notifyAll();
-				}
-				Looper.myLooper().quit();
-				mThread = null;
-				break;
-			default:
-				throw new RuntimeException("unknown message:what=" + msg.what);
+	private static Camera.Size getClosestSupportedSize(
+		final List<Camera.Size> supportedSizes,
+		final int requestedWidth, final int requestedHeight) {
+
+		return Collections.min(supportedSizes, new Comparator<Camera.Size>() {
+
+			private int diff(final Camera.Size size) {
+				return Math.abs(requestedWidth - size.width)
+					+ Math.abs(requestedHeight - size.height);
+			}
+
+			@Override
+			public int compare(final Camera.Size lhs, final Camera.Size rhs) {
+				return diff(lhs) - diff(rhs);
+			}
+		});
+
+	}
+
+	/**
+	 * stop camera preview
+	 */
+	private void handleStopPreview() {
+		if (DEBUG) Log.v(TAG, "CameraThread#handleStopPreview:");
+		removeSurface(1);
+		synchronized (mSync) {
+			if (mCamera != null) {
+				mCamera.stopPreview();
+				mCamera.release();
+				mCamera = null;
 			}
 		}
 	}
 
 	/**
-	 * Thread for asynchronous operation of camera preview
+	 * rotate preview screen according to the device orientation
+	 * @param params
 	 */
-	private static final class CameraThread extends Thread {
-    	private final Object mReadyFence = new Object();
-    	private final WeakReference<CameraDelegator> mWeakParent;
-    	private CameraHandler mHandler;
-    	private volatile boolean mIsRunning = false;
-		private Camera mCamera;
+	@SuppressLint("NewApi")
+	private final void setRotation(@NonNull final Camera camera,
+		@NonNull final Camera.Parameters params) {
 
-    	public CameraThread(@NonNull final CameraDelegator parent) {
-			super("Camera thread");
-    		mWeakParent = new WeakReference<CameraDelegator>(parent);
-    	}
+		if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
 
-    	public CameraHandler getHandler() {
-            synchronized (mReadyFence) {
-            	try {
-            		mReadyFence.wait();
-            	} catch (final InterruptedException e) {
-            		// ignore
-                }
-            }
-            return mHandler;
-    	}
-
-    	/**
-    	 * message loop
-    	 * prepare Looper and create Handler for this thread
-    	 */
-		@Override
-		public void run() {
-            if (DEBUG) Log.d(TAG, "Camera thread start");
-            Looper.prepare();
-            synchronized (mReadyFence) {
-                mHandler = new CameraHandler(this);
-                mIsRunning = true;
-                mReadyFence.notify();
-            }
-            Looper.loop();
-            if (DEBUG) Log.d(TAG, "Camera thread finish");
-            synchronized (mReadyFence) {
-                mHandler = null;
-                mIsRunning = false;
-            }
+		final GLSurfaceView view = mView;
+		final int rotation;
+		if (BuildCheck.isAPI17()) {
+			rotation = view.getDisplay().getRotation();
+		} else {
+			final Display display = ((WindowManager)view.getContext()
+				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			rotation = display.getRotation();
 		}
-
-		/**
-		 * start camera preview
-		 * @param width
-		 * @param height
-		 */
-		private final void handleStartPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:");
-			final CameraDelegator parent = mWeakParent.get();
-			if ((parent != null) && (mCamera == null)) {
-				final GLSurfaceView view = parent.mView;
-				// This is a sample project so just use 0 as camera ID.
-				// it is better to selecting camera is available
-				try {
-					mCamera = Camera.open(CAMERA_ID);
-					final Camera.Parameters params = mCamera.getParameters();
-					final List<String> focusModes = params.getSupportedFocusModes();
-					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
-						params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-					} else if(focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-						params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-					} else {
-						if (DEBUG) Log.i(TAG, "Camera does not support autofocus");
-					}
-					// let's try fastest frame rate. You will get near 60fps, but your device become hot.
-					final List<int[]> supportedFpsRange = params.getSupportedPreviewFpsRange();
-					final int n = supportedFpsRange != null ? supportedFpsRange.size() : 0;
-					int[] max_fps = null;
-					for (int i = n - 1; i >= 0; i--) {
-						final int[] range = supportedFpsRange.get(i);
-						Log.i(TAG, String.format("supportedFpsRange(%d)=(%d,%d)", i, range[0], range[1]));
-						if ((range[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= range[1])) {
-							max_fps = range;
-							break;
-						}
-					}
-					if (max_fps == null) {
-						// 見つからなかったときは一番早いフレームレートを選択
-						max_fps = supportedFpsRange.get(supportedFpsRange.size() - 1);
-					}
-					Log.i(TAG, String.format("found fps:%d-%d", max_fps[0], max_fps[1]));
-					params.setPreviewFpsRange(max_fps[0], max_fps[1]);
-					params.setRecordingHint(true);
-					// request closest supported preview size
-					final Camera.Size closestSize = getClosestSupportedSize(
-						params.getSupportedPreviewSizes(), width, height);
-					params.setPreviewSize(closestSize.width, closestSize.height);
-					// request closest picture size for an aspect ratio issue on Nexus7
-					final Camera.Size pictureSize = getClosestSupportedSize(
-						params.getSupportedPictureSizes(), width, height);
-					params.setPictureSize(pictureSize.width, pictureSize.height);
-					// rotate camera preview according to the device orientation
-					setRotation(params);
-					mCamera.setParameters(params);
-					// get the actual preview size
-					final Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
-					Log.i(TAG, String.format("previewSize(%d, %d)", previewSize.width, previewSize.height));
-					// adjust view size with keeping the aspect ration of camera preview.
-					// here is not a UI thread and we should request parent view to execute.
-					view.post(new Runnable() {
-						@Override
-						public void run() {
-							parent.setVideoSize(previewSize.width, previewSize.height);
-						}
-					});
-					// カメラ映像のプレビュー表示用SurfaceTextureを生成
-					final SurfaceTexture st = parent.getSurfaceTexture();
-					st.setDefaultBufferSize(previewSize.width, previewSize.height);
-					if (true) {
-						// カメラ映像のプレビュー表示用SurfaceTextureをIRendererHolderへセット
-						parent.addSurface(1, st, false);
-						// カメラ映像受け取り用SurfaceTextureをセット
-						mCamera.setPreviewTexture(parent.getInputSurfaceTexture());
-					} else {
-						// こっちはIRendererを経由せずに直接カメラにプレビュー表示用SurfaceTextureをセットする
-						mCamera.setPreviewTexture(st);
-					}
-				} catch (final IOException e) {
-					Log.e(TAG, "handleStartPreview:", e);
-					if (mCamera != null) {
-						mCamera.release();
-						mCamera = null;
-					}
-				} catch (final RuntimeException e) {
-					Log.e(TAG, "handleStartPreview:", e);
-					if (mCamera != null) {
-						mCamera.release();
-						mCamera = null;
-					}
-				}
-				if (mCamera != null) {
-					// start camera preview display
-					mCamera.startPreview();
-				}
-			}
+		int degrees = 0;
+		switch (rotation) {
+			case Surface.ROTATION_0: degrees = 0; break;
+			case Surface.ROTATION_90: degrees = 90; break;
+			case Surface.ROTATION_180: degrees = 180; break;
+			case Surface.ROTATION_270: degrees = 270; break;
 		}
-
-		private static Camera.Size getClosestSupportedSize(
-			final List<Camera.Size> supportedSizes,
-			final int requestedWidth, final int requestedHeight) {
-
-			return Collections.min(supportedSizes, new Comparator<Camera.Size>() {
-
-				private int diff(final Camera.Size size) {
-					return Math.abs(requestedWidth - size.width)
-						+ Math.abs(requestedHeight - size.height);
-				}
-
-				@Override
-				public int compare(final Camera.Size lhs, final Camera.Size rhs) {
-					return diff(lhs) - diff(rhs);
-				}
-			});
-
+		// get whether the camera is front camera or back camera
+		final Camera.CameraInfo info =
+				new Camera.CameraInfo();
+			Camera.getCameraInfo(CAMERA_ID, info);
+		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {	// front camera
+			degrees = (info.orientation + degrees) % 360;
+			degrees = (360 - degrees) % 360;  // reverse
+		} else {  // back camera
+			degrees = (info.orientation - degrees + 360) % 360;
 		}
-
-		/**
-		 * stop camera preview
-		 */
-		private void handleStopPreview() {
-			if (DEBUG) Log.v(TAG, "CameraThread#handleStopPreview:");
-			if (mCamera != null) {
-				mCamera.stopPreview();
-		        mCamera.release();
-		        mCamera = null;
-			}
-			final CameraDelegator parent = mWeakParent.get();
-			if (parent == null) return;
-			parent.mCameraHandler = null;
-		}
-
-		/**
-		 * rotate preview screen according to the device orientation
-		 * @param params
-		 */
-		@SuppressLint("NewApi")
-		private final void setRotation(final Camera.Parameters params) {
-			if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
-			final CameraDelegator parent = mWeakParent.get();
-			if (parent == null) return;
-
-			final GLSurfaceView view = parent.mView;
-			final int rotation;
-			if (BuildCheck.isAPI17()) {
-				rotation = view.getDisplay().getRotation();
-			} else {
-				final Display display = ((WindowManager)view.getContext()
-					.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-				rotation = display.getRotation();
-			}
-			int degrees = 0;
-			switch (rotation) {
-				case Surface.ROTATION_0: degrees = 0; break;
-				case Surface.ROTATION_90: degrees = 90; break;
-				case Surface.ROTATION_180: degrees = 180; break;
-				case Surface.ROTATION_270: degrees = 270; break;
-			}
-			// get whether the camera is front camera or back camera
-			final Camera.CameraInfo info =
-					new Camera.CameraInfo();
-				Camera.getCameraInfo(CAMERA_ID, info);
-			if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {	// front camera
-				degrees = (info.orientation + degrees) % 360;
-				degrees = (360 - degrees) % 360;  // reverse
-			} else {  // back camera
-				degrees = (info.orientation - degrees + 360) % 360;
-			}
-			// apply rotation setting
-			mCamera.setDisplayOrientation(degrees);
-			parent.mRotation = degrees;
-			// XXX This method fails to call and camera stops working on some devices.
-//			params.setRotation(degrees);
-		}
-
+		// apply rotation setting
+		camera.setDisplayOrientation(degrees);
+		mRotation = degrees;
+		// XXX This method fails to call and camera stops working on some devices.
+//		params.setRotation(degrees);
 	}
 
 }
