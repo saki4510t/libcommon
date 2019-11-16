@@ -182,7 +182,7 @@ public class VideoSourceCameraGLView
 			}
 
 			@Override
-			public void onFrameAvailable() {
+			public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
 				if (DEBUG && ((++cnt % 100) == 0))
 					Log.v(TAG, "VideoSourceCallback#onFrameAvailable:" + cnt);
 			}
