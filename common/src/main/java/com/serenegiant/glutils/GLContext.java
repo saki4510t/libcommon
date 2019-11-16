@@ -118,6 +118,14 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
+	 * EGLBase生成時のmaxClientVersionを取得
+	 * @return
+	 */
+	public int getMaxClientVersion() {
+		return mMaxClientVersion;
+	}
+
+	/**
 	 * EGLBase生成時のflagsを取得
 	 * @return
 	 */
