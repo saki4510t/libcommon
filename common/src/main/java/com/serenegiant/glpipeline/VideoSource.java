@@ -249,6 +249,10 @@ public class VideoSource implements IPipelineSource {
 		}
 	}
 
+	/**
+	 * テクスチャを更新してonFrameAvailableコールバックメソッドを呼び出す
+	 */
+	@WorkerThread
 	protected void handleUpdateTex() {
 //		if (DEBUG) Log.v(TAG, "handleUpdateTex:");
 		if (mMasterTexture != null) {
