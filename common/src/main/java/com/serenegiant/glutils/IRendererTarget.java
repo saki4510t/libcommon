@@ -1,6 +1,6 @@
 package com.serenegiant.glutils;
 
-interface IRendererTarget {
+public interface IRendererTarget {
 	public void release();
 	public boolean isValid();
 	public boolean isEnabled();

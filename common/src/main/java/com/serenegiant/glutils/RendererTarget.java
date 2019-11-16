@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
 /**
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-class RendererTarget implements IRendererTarget {
+public class RendererTarget implements IRendererTarget {
 
 	/**
 	 * ファクトリーメソッド
@@ -37,7 +37,7 @@ class RendererTarget implements IRendererTarget {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	static IRendererTarget newInstance(
+	public static IRendererTarget newInstance(
 		@NonNull final EGLBase egl,
 		@NonNull final Object surface, final int maxFps) {
 
