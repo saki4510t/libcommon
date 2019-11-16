@@ -100,6 +100,7 @@ public abstract class CameraDelegator {
 	 * GLSurfaceView#onResumeが呼ばれたときの処理
 	 */
 	public void onResume() {
+		if (DEBUG) Log.v(TAG, "onResume:");
 		if (mRenderer.mHasSurface) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist");
@@ -112,6 +113,7 @@ public abstract class CameraDelegator {
 	 * GLSurfaceView#onPauseが呼ばれたときの処理
 	 */
 	public void onPause() {
+		if (DEBUG) Log.v(TAG, "onPause:");
 		if (mCameraHandler != null) {
 			// just request stop previewing
 			mCameraHandler.stopPreview(true);
@@ -119,12 +121,14 @@ public abstract class CameraDelegator {
 	}
 
 	public void addListener(final OnFrameAvailableListener listener) {
+		if (DEBUG) Log.v(TAG, "addListener:" + listener);
 		if (listener != null) {
 			mListeners.add(listener);
 		}
 	}
 
 	public void removeListener(final OnFrameAvailableListener listener) {
+		if (DEBUG) Log.v(TAG, "removeListener:" + listener);
 		mListeners.remove(listener);
 	}
 
@@ -143,6 +147,7 @@ public abstract class CameraDelegator {
 	 * @param mode
 	 */
 	public void setScaleMode(final int mode) {
+		if (DEBUG) Log.v(TAG, "setScaleMode:" + mode);
 		if (mScaleMode != mode) {
 			mScaleMode = mode;
 			mView.queueEvent(new Runnable() {
@@ -159,6 +164,7 @@ public abstract class CameraDelegator {
 	 * @return
 	 */
 	public int getScaleMode() {
+		if (DEBUG) Log.v(TAG, "getScaleMode:" + mScaleMode);
 		return mScaleMode;
 	}
 
@@ -169,6 +175,7 @@ public abstract class CameraDelegator {
 	 */
 	@SuppressWarnings("SuspiciousNameCombination")
 	public void setVideoSize(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height));
 		if ((mRotation % 180) == 0) {
 			mVideoWidth = width;
 			mVideoHeight = height;
@@ -200,15 +207,6 @@ public abstract class CameraDelegator {
 		return mVideoHeight;
 	}
 
-	public synchronized void startPreview(final int width, final int height) {
-		if (mCameraHandler == null) {
-			final CameraThread thread = new CameraThread(this);
-			thread.start();
-			mCameraHandler = thread.getHandler();
-		}
-		mCameraHandler.startPreview(PREVIEW_WIDTH, PREVIEW_HEIGHT);
-	}
-
 	protected abstract SurfaceTexture getInputSurfaceTexture();
 
 	/**
@@ -226,6 +224,16 @@ public abstract class CameraDelegator {
 	 */
 	public abstract void removeSurface(final int id);
 //--------------------------------------------------------------------------------
+	private synchronized void startPreview(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("startPreview:(%dx%d)", width, height));
+		if (mCameraHandler == null) {
+			final CameraThread thread = new CameraThread(this);
+			thread.start();
+			mCameraHandler = thread.getHandler();
+		}
+		mCameraHandler.startPreview(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+	}
+
 	@Nullable
 	private SurfaceTexture getSurfaceTexture() {
 		if (DEBUG) Log.v(TAG, "getSurfaceTexture:");
@@ -323,6 +331,7 @@ public abstract class CameraDelegator {
 		}
 
 		private final void updateViewport() {
+			if (DEBUG) Log.v(TAG, "updateViewport:");
 			final CameraDelegator parent = mWeakParent.get();
 			if (parent != null) {
 				final int view_width = parent.mView.getWidth();
@@ -419,9 +428,6 @@ public abstract class CameraDelegator {
 		@Override
 		public void onFrameAvailable(final SurfaceTexture st) {
 			requestUpdateTex = true;
-//			final CameraGLView parent = mWeakParent.get();
-//			if (parent != null)
-//				parent.requestRender();
 		}
 	}
 
@@ -438,6 +444,7 @@ public abstract class CameraDelegator {
 		}
 
 		public void startPreview(final int width, final int height) {
+			if (DEBUG) Log.v(TAG, "CameraHandler#startPreview:");
 			sendMessage(obtainMessage(MSG_PREVIEW_START, width, height));
 		}
 
@@ -446,6 +453,7 @@ public abstract class CameraDelegator {
 		 * @param needWait need to wait for stopping camera preview
 		 */
 		public void stopPreview(final boolean needWait) {
+			if (DEBUG) Log.v(TAG, "CameraHandler#stopPreview:");
 			synchronized (this) {
 				sendEmptyMessage(MSG_PREVIEW_STOP);
 				if (needWait) {
@@ -537,7 +545,7 @@ public abstract class CameraDelegator {
 		 * @param height
 		 */
 		private final void startPreview(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "startPreview:");
+			if (DEBUG) Log.v(TAG, "CameraThread#startPreview:");
 			final CameraDelegator parent = mWeakParent.get();
 			if ((parent != null) && (mCamera == null)) {
 				final GLSurfaceView view = parent.mView;
@@ -650,7 +658,7 @@ public abstract class CameraDelegator {
 		 * stop camera preview
 		 */
 		private void stopPreview() {
-			if (DEBUG) Log.v(TAG, "stopPreview:");
+			if (DEBUG) Log.v(TAG, "CameraThread#stopPreview:");
 			if (mCamera != null) {
 				mCamera.stopPreview();
 		        mCamera.release();
@@ -667,7 +675,7 @@ public abstract class CameraDelegator {
 		 */
 		@SuppressLint("NewApi")
 		private final void setRotation(final Camera.Parameters params) {
-			if (DEBUG) Log.v(TAG, "setRotation:");
+			if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
 			final CameraDelegator parent = mWeakParent.get();
 			if (parent == null) return;
 
