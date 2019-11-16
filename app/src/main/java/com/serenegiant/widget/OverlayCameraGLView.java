@@ -28,6 +28,8 @@ import com.serenegiant.graphics.BitmapHelper;
 
 import androidx.annotation.NonNull;
 
+import static com.serenegiant.widget.CameraDelegator.*;
+
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
@@ -64,7 +66,6 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
 		final RenderHolderCallback callback) {
-
 
 		return new OverlayRendererHolder(width, height, callback);
 	}

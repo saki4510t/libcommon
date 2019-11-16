@@ -19,24 +19,16 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.RadialGradient;
-import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.Log;
 
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.MixRendererHolder;
-import com.serenegiant.glutils.OverlayRendererHolder;
 import com.serenegiant.glutils.RenderHolderCallback;
 import com.serenegiant.graphics.BitmapHelper;
 
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+
+import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -75,7 +67,6 @@ public final class MixCameraGLView extends AbstractCameraGLView {
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
 		final RenderHolderCallback callback) {
-
 
 		return new MixRendererHolder(width, height, callback);
 	}

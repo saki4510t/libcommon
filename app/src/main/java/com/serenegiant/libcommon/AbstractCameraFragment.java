@@ -33,6 +33,7 @@ import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.PermissionCheck;
 import com.serenegiant.utils.SAFUtils;
 import com.serenegiant.widget.AbstractCameraGLView;
+import com.serenegiant.widget.CameraDelegator;
 
 import java.io.File;
 import java.io.IOException;
@@ -219,8 +220,8 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 		mRecordButton.setColorFilter(0);
 	}
 		
-	private final AbstractCameraGLView.OnFrameAvailableListener
-		mOnFrameAvailableListener = new AbstractCameraGLView.OnFrameAvailableListener() {
+	private final CameraDelegator.OnFrameAvailableListener
+		mOnFrameAvailableListener = new CameraDelegator.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable() {
 			AbstractCameraFragment.this.onFrameAvailable();
