@@ -43,7 +43,6 @@ public class OpenGLInfo {
 		try {
 	    	final EGLBase egl = EGLBase.createFrom(3, null, false, 0, false);
 	    	final EGLBase.IEglSurface dummy = egl.createOffscreen(1, 1);
-	    	dummy.makeCurrent();
 	    	try {
 		    	final IntBuffer val = IntBuffer.allocate(2);
 		    	JSONObject glinfo = new JSONObject();

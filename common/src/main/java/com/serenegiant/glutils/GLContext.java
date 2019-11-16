@@ -80,7 +80,6 @@ public class GLContext implements EGLConst {
 		}
 		if (mEgl != null) {
 			mEglMasterSurface = mEgl.createOffscreen(1, 1);
-			mEglMasterSurface.makeCurrent();
 			mGLThreadId = Thread.currentThread().getId();
 		} else {
 			throw new RuntimeException("failed to create EglCore");
