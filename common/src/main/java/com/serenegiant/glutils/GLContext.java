@@ -64,8 +64,9 @@ public class GLContext implements EGLConst {
 	/**
 	 * 初期化を実行
 	 * GLコンテキストを生成するスレッド上で実行すること
+	 * @throws RuntimeException
 	 */
-	public void initialize() {
+	public void initialize() throws RuntimeException {
 		if ((mSharedContext == null)
 			|| (mSharedContext instanceof EGLBase.IContext)) {
 
