@@ -74,7 +74,6 @@ public class VideoSource implements IPipelineSource {
 		mCallback = callback;
 		mVideoWidth = DEFAULT_WIDTH;
 		mVideoHeight = DEFAULT_HEIGHT;
-		add(callback);
 		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 

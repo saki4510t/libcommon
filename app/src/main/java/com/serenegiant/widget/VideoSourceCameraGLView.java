@@ -183,12 +183,6 @@ public class VideoSourceCameraGLView
 			}
 
 			@Override
-			public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-				if (DEBUG && ((++cnt % 100) == 0))
-					Log.v(TAG, "PipelineSourceCallback#onFrameAvailable:" + cnt);
-			}
-
-			@Override
 			public void onDestroy() {
 				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 			}

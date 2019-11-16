@@ -21,7 +21,7 @@ public interface IPipelineSource extends IPipeline {
 	/**
 	 * PipelineSourceからのコールバックリスナー
 	 */
-	public interface PipelineSourceCallback extends OnFrameAvailableListener {
+	public interface PipelineSourceCallback {
 		/**
 		 * 映像受け取り用のSurfaceが生成された
 		 * @param surface
