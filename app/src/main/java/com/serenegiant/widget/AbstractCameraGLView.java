@@ -35,7 +35,8 @@ import static com.serenegiant.widget.CameraDelegator.*;
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
-public abstract class AbstractCameraGLView extends GLSurfaceView {
+public abstract class AbstractCameraGLView
+	extends GLSurfaceView implements ICameraGLView {
 
 	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = AbstractCameraGLView.class.getSimpleName();
@@ -106,30 +107,37 @@ public abstract class AbstractCameraGLView extends GLSurfaceView {
 		super.onPause();
 	}
 
+	@Override
 	public void addListener(final CameraDelegator.OnFrameAvailableListener listener) {
 		mCameraDelegator.addListener(listener);
 	}
 	
+	@Override
 	public void removeListener(final CameraDelegator.OnFrameAvailableListener listener) {
 		mCameraDelegator.removeListener(listener);
 	}
 	
+	@Override
 	public void setScaleMode(final int mode) {
 		mCameraDelegator.setScaleMode(mode);
 	}
 
+	@Override
 	public int getScaleMode() {
 		return mCameraDelegator.getScaleMode();
 	}
 
+	@Override
 	public void setVideoSize(final int width, final int height) {
 		mCameraDelegator.setVideoSize(width, height);
 	}
 
+	@Override
 	public int getVideoWidth() {
 		return mCameraDelegator.getWidth();
 	}
 
+	@Override
 	public int getVideoHeight() {
 		return mCameraDelegator.getHeight();
 	}

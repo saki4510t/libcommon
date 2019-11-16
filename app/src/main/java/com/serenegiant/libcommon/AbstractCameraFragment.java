@@ -32,8 +32,8 @@ import android.widget.TextView;
 import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.PermissionCheck;
 import com.serenegiant.utils.SAFUtils;
-import com.serenegiant.widget.AbstractCameraGLView;
 import com.serenegiant.widget.CameraDelegator;
+import com.serenegiant.widget.ICameraGLView;
 
 import java.io.File;
 import java.io.IOException;
@@ -67,7 +67,7 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	/**
 	 * for camera preview display
 	 */
-	protected AbstractCameraGLView mCameraView;
+	protected ICameraGLView mCameraView;
 	/**
 	 * for scale mode display
 	 */
