@@ -25,6 +25,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
 
@@ -173,23 +174,23 @@ public class VideoSourceCameraGLView
 	protected VideoSource createVideoSource(
 		final int width, final int height) {
 
-		return new VideoSource(mGLManager, new VideoSource.VideoSourceCallback() {
+		return new VideoSource(mGLManager, new IPipelineSource.PipelineSourceCallback() {
 			private int cnt;
 
 			@Override
 			public void onCreate(@NonNull final Surface surface) {
-				if (DEBUG) Log.v(TAG, "VideoSourceCallback#onCreate:" + surface);
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:" + surface);
 			}
 
 			@Override
 			public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
 				if (DEBUG && ((++cnt % 100) == 0))
-					Log.v(TAG, "VideoSourceCallback#onFrameAvailable:" + cnt);
+					Log.v(TAG, "PipelineSourceCallback#onFrameAvailable:" + cnt);
 			}
 
 			@Override
 			public void onDestroy() {
-				if (DEBUG) Log.v(TAG, "VideoSourceCallback#onDestroy:");
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 			}
 		});
 	}

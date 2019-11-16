@@ -29,32 +29,6 @@ public class VideoSource implements IPipelineSource {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = VideoSource.class.getSimpleName();
 
-	public interface OnFrameAvailableListener {
-		/**
-		 * テキスチャが更新された
-		 */
-		@WorkerThread
-		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix);
-	}
-
-	/**
-	 * VideoSourceからのコールバックリスナー
-	 */
-	public interface VideoSourceCallback extends OnFrameAvailableListener {
-		/**
-		 * 映像受け取り用のSurfaceが生成された
-		 * @param surface
-		 */
-		@WorkerThread
-		public void onCreate(@NonNull final  Surface surface);
-
-		/**
-		 * 映像受け取り用のSurfaceが破棄された
-		 */
-		@WorkerThread
-		public void onDestroy();
-	}
-
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
 
@@ -71,7 +45,7 @@ public class VideoSource implements IPipelineSource {
 	private final GLContext mGLContext;
 	private final Handler mGLHandler;
 	@NonNull
-	private final VideoSourceCallback mCallback;
+	private final PipelineSourceCallback mCallback;
 
 	@NonNull
 	private final float[] mTexMatrix = new float[16];
@@ -86,7 +60,7 @@ public class VideoSource implements IPipelineSource {
 	 * @param callback
 	 */
 	public VideoSource(@NonNull final GLManager manager,
-		@NonNull final VideoSourceCallback callback) {
+		@NonNull final PipelineSourceCallback callback) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mManager = manager.createShared(new Handler.Callback() {
@@ -232,17 +206,21 @@ public class VideoSource implements IPipelineSource {
 	}
 
 	/**
+	 * IPipelineSourceの実装
 	 * OnFrameAvailableListenerを登録
 	 * @param listener
 	 */
+	@Override
 	public void add(final OnFrameAvailableListener listener) {
 		mOnFrameAvailableListeners.add(listener);
 	}
 
 	/**
+	 * IPipelineSourceの実装
 	 * OnFrameAvailableListenerを登録解除
 	 * @param listener
 	 */
+	@Override
 	public void remove(final OnFrameAvailableListener listener) {
 		mOnFrameAvailableListeners.remove(listener);
 	}
