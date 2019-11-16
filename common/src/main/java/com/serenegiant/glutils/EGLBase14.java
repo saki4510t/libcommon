@@ -218,6 +218,29 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
+	 * 現在のスレッドの既存のレンダリングコンテキストがあればそれを共有して
+	 * 新しいレンダリングコンテキストを生成する
+	 * 既存のレンダリングコンテキストが存在していなければ独立したレンダリングコンテキストを
+	 * 生成する
+	 * @param maxClientVersion
+	 * @param withDepthBuffer
+	 * @param stencilBits
+	 * @param isRecordable
+	 * @return
+	 */
+	public static EGLBase createFromCurrent(final int maxClientVersion,
+		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
+		Context context = null;
+		final EGLContext currentContext = EGL14.eglGetCurrentContext();
+		final EGLSurface currentSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+		if ((currentContext != null) && (currentSurface != null)) {
+			context = new Context(currentContext);
+		}
+		return new EGLBase14(maxClientVersion, context, withDepthBuffer, stencilBits, isRecordable);
+	}
+
+	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
 	 * @param sharedContext

@@ -111,6 +111,29 @@ public abstract class EGLBase implements EGLConst {
 	}
 
 	/**
+	 * 現在のスレッドの既存のレンダリングコンテキストがあればそれを共有して
+	 * 新しいレンダリングコンテキストを生成する
+	 * 既存のレンダリングコンテキストが存在していなければ独立したレンダリングコンテキストを
+	 * 生成する
+	 * @param maxClientVersion
+	 * @param withDepthBuffer
+	 * @param stencilBits
+	 * @param isRecordable
+	 * @return
+	 */
+	public static EGLBase createFromCurrent(final int maxClientVersion,
+		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
+		if (isEGL14Supported()) {
+			return EGLBase14.createFromCurrent(maxClientVersion,
+				withDepthBuffer, stencilBits, isRecordable);
+		} else {
+			return EGLBase10.createFromCurrent(maxClientVersion,
+				withDepthBuffer, stencilBits, isRecordable);
+		}
+	}
+
+	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static abstract class IContext {
