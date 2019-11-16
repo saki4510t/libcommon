@@ -174,19 +174,20 @@ public class VideoSourceCameraGLView
 	protected VideoSource createVideoSource(
 		final int width, final int height) {
 
-		return new VideoSource(mGLManager, new IPipelineSource.PipelineSourceCallback() {
-			private int cnt;
+		return new VideoSource(mGLManager, width, height,
+			new IPipelineSource.PipelineSourceCallback() {
 
-			@Override
-			public void onCreate(@NonNull final Surface surface) {
-				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:" + surface);
-			}
+				@Override
+				public void onCreate(@NonNull final Surface surface) {
+					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:" + surface);
+				}
 
-			@Override
-			public void onDestroy() {
-				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
+				@Override
+				public void onDestroy() {
+					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
+				}
 			}
-		});
+		);
 	}
 
 }

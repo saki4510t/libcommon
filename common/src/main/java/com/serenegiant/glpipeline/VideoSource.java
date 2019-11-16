@@ -57,12 +57,16 @@ public class VideoSource implements IPipelineSource {
 	/**
 	 * コンストラクタ
 	 * @param manager
+	 * @param width
+	 * @param height
 	 * @param callback
 	 */
 	public VideoSource(@NonNull final GLManager manager,
+		final int width, final int height,
 		@NonNull final PipelineSourceCallback callback) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+
 		mManager = manager.createShared(new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
@@ -72,8 +76,13 @@ public class VideoSource implements IPipelineSource {
 		mGLContext = mManager.getGLContext();
 		mGLHandler = mManager.getGLHandler();
 		mCallback = callback;
-		mVideoWidth = DEFAULT_WIDTH;
-		mVideoHeight = DEFAULT_HEIGHT;
+		if ((width > 0) || (height > 0)) {
+			mVideoWidth = width;
+			mVideoHeight = height;
+		} else {
+			mVideoWidth = DEFAULT_WIDTH;
+			mVideoHeight = DEFAULT_HEIGHT;
+		}
 		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 
@@ -117,7 +126,11 @@ public class VideoSource implements IPipelineSource {
 	public void resize(final int width, final int height) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "resize:");
 		checkValid();
-		mGLHandler.sendMessage(mGLHandler.obtainMessage(REQUEST_UPDATE_SIZE, width, height));
+		if ((width > 0) && (height > 0)
+			&& ((width != mVideoWidth) || (height != mVideoHeight))) {
+
+			mGLHandler.sendMessage(mGLHandler.obtainMessage(REQUEST_UPDATE_SIZE, width, height));
+		}
 	}
 
 	/**
