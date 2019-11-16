@@ -33,17 +33,23 @@ public class HandlerThreadHandler extends Handler {
 		return createHandler(TAG);
 	}
 
-	public static final HandlerThreadHandler createHandler(final String name) {
+	public static final HandlerThreadHandler createHandler(
+		final String name) {
+
 		final HandlerThread thread = new HandlerThread(name);
 		thread.start();
 		return new HandlerThreadHandler(thread.getLooper());
 	}
 
-	public static final HandlerThreadHandler createHandler(@Nullable final Callback callback) {
+	public static final HandlerThreadHandler createHandler(
+		@Nullable final Callback callback) {
+
 		return createHandler(TAG, callback);
 	}
 
-	public static final HandlerThreadHandler createHandler(final String name, @Nullable final Callback callback) {
+	public static final HandlerThreadHandler createHandler(
+		final String name, @Nullable final Callback callback) {
+
 		final HandlerThread thread = new HandlerThread(name);
 		thread.start();
 		return new HandlerThreadHandler(thread.getLooper(), callback);
@@ -56,7 +62,9 @@ public class HandlerThreadHandler extends Handler {
 		mId = thread != null ? thread.getId() : 0;
 	}
 
-	private HandlerThreadHandler(@NonNull final Looper looper, @Nullable final Callback callback) {
+	private HandlerThreadHandler(@NonNull final Looper looper,
+		@Nullable final Callback callback) {
+
 		super(looper, callback);
 		final Thread thread = looper.getThread();
 		mId = thread != null ? thread.getId() : 0;
