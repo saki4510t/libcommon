@@ -457,9 +457,9 @@ public abstract class CameraDelegator {
 			synchronized (this) {
 				sendEmptyMessage(MSG_PREVIEW_STOP);
 				if (needWait) {
+					if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
 					for (; (mThread != null) && mThread.mIsRunning ; ) {
 						try {
-							if (DEBUG) Log.d(TAG, "wait for terminating of camera thread");
 							wait(1000);
 						} catch (final InterruptedException e) {
 							// ignore
