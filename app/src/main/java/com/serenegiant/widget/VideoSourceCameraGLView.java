@@ -37,6 +37,8 @@ import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
+ * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
+ * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
  */
 public class VideoSourceCameraGLView
 	extends GLSurfaceView implements ICameraGLView {
