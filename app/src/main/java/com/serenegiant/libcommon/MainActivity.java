@@ -183,6 +183,15 @@ public class MainActivity extends AppCompatActivity
 			}
 			fragment = OverlayCameraFragment.newInstance();
 			break;
+		case 6:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = VideoSourceCameraFragment.newInstance();
+			break;
 		default:
 			break;
 		}
