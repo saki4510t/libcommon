@@ -58,7 +58,7 @@ public final class MixCameraGLView extends AbstractCameraGLView {
 			// とりあえずカメラ映像中央部に円形に映像2を合成する
 			((MixRendererHolder) rendererHolder).setMask(
 				BitmapHelper.genMaskImage(0,
-					PREVIEW_WIDTH, PREVIEW_HEIGHT,
+					DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
 					60, 0, 100));
 		}
 	}

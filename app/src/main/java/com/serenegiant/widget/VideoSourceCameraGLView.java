@@ -20,7 +20,10 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES20;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -29,6 +32,11 @@ import com.serenegiant.glpipeline.Distributor;
 import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
+import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.utils.HandlerThreadHandler;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import androidx.annotation.NonNull;
 
@@ -76,22 +84,26 @@ public class VideoSourceCameraGLView
 	 */
 	public VideoSourceCameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs);
-		if (DEBUG) Log.v(TAG, "CameraGLView:");
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mGLManager = new GLManager();
-		mCameraDelegator = new CameraDelegator(this) {
+		mCameraDelegator = new CameraDelegator(this,
+			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
+
+			@NonNull
 			@Override
 			protected SurfaceTexture getInputSurfaceTexture() {
-				return mVideoSource != null ? mVideoSource.getInputSurfaceTexture() : null;
+				if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:");
+				if (mVideoSource == null) {
+					throw new IllegalStateException();
+				}
+				return mVideoSource.getInputSurfaceTexture();
 			}
 
+			@NonNull
 			@Override
-			public void addSurface(final int id, final Object surface, final boolean isRecordable) {
-				VideoSourceCameraGLView.this.addSurface(id, surface, isRecordable);
-			}
-
-			@Override
-			public void removeSurface(final int id) {
-				VideoSourceCameraGLView.this.removeSurface(id);
+			protected ICameraRenderer createCameraRenderer(@NonNull final CameraDelegator parent) {
+				if (DEBUG) Log.v(TAG, "createCameraRenderer:");
+				return new CameraRenderer();
 			}
 		};
 	}
@@ -100,7 +112,7 @@ public class VideoSourceCameraGLView
 	public synchronized void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
 		super.onResume();
-		mVideoSource = createVideoSource(PREVIEW_WIDTH, PREVIEW_HEIGHT);
+		mVideoSource = createVideoSource(DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT);
 		mDistributor = new Distributor(mVideoSource);
 		mCameraDelegator.onResume();
 	}
@@ -203,4 +215,194 @@ public class VideoSourceCameraGLView
 		);
 	}
 
+	/**
+	 * GLSurfaceViewのRenderer
+	 */
+	private final class CameraRenderer
+		implements ICameraRenderer,
+			SurfaceTexture.OnFrameAvailableListener {	// API >= 11
+
+		private SurfaceTexture mSTexture;	// API >= 11
+		private int hTex;
+		private GLDrawer2D mDrawer;
+		private final float[] mStMatrix = new float[16];
+		private final float[] mMvpMatrix = new float[16];
+		private boolean mHasSurface;
+		private volatile boolean requestUpdateTex = false;
+
+		public CameraRenderer() {
+			if (DEBUG) Log.v(TAG, "CameraRenderer:");
+			Matrix.setIdentityM(mMvpMatrix, 0);
+		}
+
+		@Override
+		public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
+			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:");
+			// This renderer required OES_EGL_image_external extension
+			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
+//			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
+			if (!extensions.contains("OES_EGL_image_external"))
+				throw new RuntimeException("This system does not support OES_EGL_image_external.");
+			mDrawer = new GLDrawer2D(true);
+			// create texture ID
+			hTex = mDrawer.initTex();
+			// create SurfaceTexture with texture ID.
+			mSTexture = new SurfaceTexture(hTex);
+			mSTexture.setDefaultBufferSize(mCameraDelegator.getWidth(), mCameraDelegator.getHeight());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				mSTexture.setOnFrameAvailableListener(this, HandlerThreadHandler.createHandler(TAG));
+			} else {
+				mSTexture.setOnFrameAvailableListener(this);
+			}
+			// clear screen with yellow color so that you can see rendering rectangle
+			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+			mHasSurface = true;
+			// create object for preview display
+			mDrawer.setMvpMatrix(mMvpMatrix, 0);
+			addSurface(1, new Surface(mSTexture), false);
+		}
+
+		@Override
+		public void onSurfaceChanged(final GL10 unused, final int width, final int height) {
+			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)", width, height));
+			// if at least with or height is zero, initialization of this view is still progress.
+			if ((width == 0) || (height == 0)) return;
+			updateViewport();
+			mCameraDelegator.startPreview(width, height);
+		}
+
+		/**
+		 * when GLSurface context is soon destroyed
+		 */
+		@Override
+		public void onSurfaceDestroyed() {
+			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:");
+			removeSurface(1);
+			mHasSurface = false;
+			release();
+		}
+
+		@Override
+		public boolean hasSurface() {
+			return mHasSurface;
+		}
+
+		public SurfaceTexture getInputSurfaceTexture() {
+			return mSTexture;
+		}
+
+		@Override
+		public void onPreviewSizeChanged(final int width, final int height) {
+			if (mSTexture != null) {
+				mSTexture.setDefaultBufferSize(width, height);
+			}
+		}
+
+		public void release() {
+			if (DEBUG) Log.v(TAG, "CameraRenderer#release:");
+			if (mDrawer != null) {
+				mDrawer.deleteTex(hTex);
+				mDrawer.release();
+				mDrawer = null;
+			}
+			if (mSTexture != null) {
+				mSTexture.release();
+				mSTexture = null;
+			}
+		}
+
+		/**
+		 * drawing to GLSurface
+		 * we set renderMode to GLSurfaceView.RENDERMODE_WHEN_DIRTY,
+		 * this method is only called when #requestRender is called(= when texture is required to update)
+		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
+		 */
+		@Override
+		public void onDrawFrame(final GL10 unused) {
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+
+			if (requestUpdateTex && (mSTexture != null)) {
+				requestUpdateTex = false;
+				// update texture(came from camera)
+				mSTexture.updateTexImage();
+				// get texture matrix
+				mSTexture.getTransformMatrix(mStMatrix);
+			}
+			// draw to preview screen
+			if (mDrawer != null) {
+				mDrawer.draw(hTex, mStMatrix, 0);
+			}
+		}
+
+		@Override
+		public final void updateViewport() {
+			final int viewWidth = getWidth();
+			final int viewHeight = getHeight();
+			if (viewWidth == 0 || viewHeight == 0) return;
+			GLES20.glViewport(0, 0, viewWidth, viewHeight);
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			final double videoWidth = mCameraDelegator.getWidth();
+			final double videoHeight = mCameraDelegator.getHeight();
+			if (videoWidth == 0 || videoHeight == 0) return;
+			final double viewAspect = viewWidth / (double)viewHeight;
+			Log.i(TAG, String.format("view(%d,%d)%f,video(%1.0f,%1.0f)",
+				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight));
+
+			Matrix.setIdentityM(mMvpMatrix, 0);
+			final int scaleMode = mCameraDelegator.getScaleMode();
+			switch (scaleMode) {
+			case SCALE_STRETCH_FIT:
+				break;
+			case SCALE_KEEP_ASPECT_VIEWPORT:
+			{
+				final double req = videoWidth / videoHeight;
+				int x, y;
+				int width, height;
+				if (viewAspect > req) {
+					// if view is wider than camera image, calc width of drawing area based on view height
+					y = 0;
+					height = viewWidth;
+					width = (int)(req * viewHeight);
+					x = (viewWidth - width) / 2;
+				} else {
+					// if view is higher than camera image, calc height of drawing area based on view width
+					x = 0;
+					width = viewWidth;
+					height = (int)(viewWidth / req);
+					y = (viewHeight - height) / 2;
+				}
+				// set viewport to draw keeping aspect ration of camera image
+				Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height));
+				GLES20.glViewport(x, y, width, height);
+				break;
+			}
+			case SCALE_KEEP_ASPECT:
+			case SCALE_CROP_CENTER:
+			{
+				final double scale_x = viewWidth / videoWidth;
+				final double scale_y = viewHeight / videoHeight;
+				final double scale = (scaleMode == SCALE_CROP_CENTER
+					? Math.max(scale_x,  scale_y) : Math.min(scale_x, scale_y));
+				final double width = scale * videoWidth;
+				final double height = scale * videoHeight;
+				Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+					width, height, scale_x, scale_y, width / viewWidth, height / viewHeight));
+				Matrix.scaleM(mMvpMatrix, 0, (float)(width / viewWidth), (float)(height / viewHeight), 1.0f);
+				break;
+			}
+			}
+			if (mDrawer != null) {
+				mDrawer.setMvpMatrix(mMvpMatrix, 0);
+			}
+		}
+
+		/**
+		 * OnFrameAvailableListenerインターフェースの実装
+		 * @param st
+		 */
+		@Override
+		public void onFrameAvailable(final SurfaceTexture st) {
+			requestUpdateTex = true;
+		}
+	}	// CameraRenderer
 }
