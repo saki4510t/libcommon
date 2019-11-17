@@ -43,7 +43,7 @@ public class GLManager {
 	@NonNull
 	private final GLContext mGLContext;
 	@NonNull
-	private final Handler mGLHandler;
+	private final HandlerThreadHandler mGLHandler;
 	@Nullable
 	private final Handler.Callback mCallback;
 	private boolean mInitialized;
@@ -209,14 +209,43 @@ public class GLManager {
 		final long delayMs) throws IllegalStateException {
 
 		checkValid();
-		mGLHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
-			}
-		});
+		if (mGLHandler.isCurrentThread()) {
+			// すでにGLスレッド上であれば直接実行
+			Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
+		} else {
+			// 別スレッド上にいるならGLスレッド上へ投げる
+			mGLHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
+				}
+			});
+		}
 	}
 
+	/**
+	 * 未実行のChoreographer.FrameCallbackがあれば取り除く
+	 * @param callback
+	 * @throws IllegalStateException
+	 */
+	public synchronized void removeFrameCallback(
+		@NonNull final Choreographer.FrameCallback callback)
+			throws IllegalStateException {
+
+		checkValid();
+		if (mGLHandler.isCurrentThread()) {
+			// すでにGLスレッド上であれば直接実行
+			Choreographer.getInstance().removeFrameCallback(callback);
+		} else {
+			// 別スレッド上にいるならGLスレッド上へ投げる
+			mGLHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					Choreographer.getInstance().removeFrameCallback(callback);
+				}
+			});
+		}
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * GLコンテキストが破棄されていないかどうかを確認
