@@ -30,13 +30,16 @@ public abstract class CameraDelegator {
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = CameraDelegator.class.getSimpleName();
 
-	public static final int DEFAULT_PREVIEW_WIDTH = 1280;
-	public static final int DEFAULT_PREVIEW_HEIGHT = 720;
-
 	public static final int SCALE_STRETCH_FIT = 0;
 	public static final int SCALE_KEEP_ASPECT_VIEWPORT = 1;
 	public static final int SCALE_KEEP_ASPECT = 2;
 	public static final int SCALE_CROP_CENTER = 3;
+
+	public static final int DEFAULT_PREVIEW_WIDTH = 1280;
+	public static final int DEFAULT_PREVIEW_HEIGHT = 720;
+
+	private static final int TARGET_FPS_MS = 60 * 1000;
+	private static final int CAMERA_ID = 0;
 
 	public interface OnFrameAvailableListener {
 		public void onFrameAvailable();
@@ -52,9 +55,6 @@ public abstract class CameraDelegator {
 
 	@NonNull
 	private final GLSurfaceView mView;
-
-	private static final int TARGET_FPS_MS = 60 * 1000;
-	private static final int CAMERA_ID = 0;
 
 	private final Object mSync = new Object();
 	@NonNull
