@@ -24,8 +24,12 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
+/**
+ * カメラプレビュー処理の委譲クラス
+ */
 public abstract class CameraDelegator {
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = CameraDelegator.class.getSimpleName();
@@ -45,6 +49,9 @@ public abstract class CameraDelegator {
 		public void onFrameAvailable();
 	}
 
+	/**
+	 * カメラ映像をGLSurfaceViewへ描画するためのGLSurfaceView.Rendererインターフェース
+	 */
 	public interface ICameraRenderer extends GLSurfaceView.Renderer {
 		public void onSurfaceDestroyed();
 		public boolean hasSurface();
@@ -55,25 +62,31 @@ public abstract class CameraDelegator {
 
 	@NonNull
 	private final GLSurfaceView mView;
-
+	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
 	private final ICameraRenderer mRenderer;
+	@NonNull
 	private final Set<OnFrameAvailableListener> mListeners
 		= new CopyOnWriteArraySet<>();
+	@Nullable
 	private Handler mCameraHandler;
 	private int mVideoWidth, mVideoHeight;
 	private int mRotation;
 	private int mScaleMode = SCALE_STRETCH_FIT;
+	@Nullable
 	private Camera mCamera;
 	private volatile boolean mResumed;
 
 	/**
 	 * コンストラクタ
 	 * @param view
+	 * @param width
+	 * @param height
 	 */
 	public CameraDelegator(@NonNull final GLSurfaceView view,
 		final int width, final int height) {
+
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)", width, height));
 		mView = view;
 		mRenderer = createCameraRenderer(this);
@@ -157,6 +170,10 @@ public abstract class CameraDelegator {
 		stopPreview();
 	}
 
+	/**
+	 * 映像が更新されたときのコールバックリスナーを登録
+	 * @param listener
+	 */
 	public void addListener(final OnFrameAvailableListener listener) {
 		if (DEBUG) Log.v(TAG, "addListener:" + listener);
 		if (listener != null) {
@@ -164,11 +181,18 @@ public abstract class CameraDelegator {
 		}
 	}
 
+	/**
+	 * 映像が更新されたときのコールバックリスナーの登録を解除
+	 * @param listener
+	 */
 	public void removeListener(final OnFrameAvailableListener listener) {
 		if (DEBUG) Log.v(TAG, "removeListener:" + listener);
 		mListeners.remove(listener);
 	}
 
+	/**
+	 * 映像が更新されたときのコールバックを呼び出す
+	 */
 	public void callOnFrameAvailable() {
 		for (final OnFrameAvailableListener listener: mListeners) {
 			try {
@@ -244,6 +268,11 @@ public abstract class CameraDelegator {
 		return mVideoHeight;
 	}
 
+	/**
+	 * プレビュー開始
+	 * @param width
+	 * @param height
+	 */
 	public void startPreview(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("startPreview:(%dx%d)", width, height));
 		synchronized (mSync) {
@@ -259,6 +288,9 @@ public abstract class CameraDelegator {
 		}
 	}
 
+	/**
+	 * プレビュー終了
+	 */
 	public void stopPreview() {
 		if (DEBUG) Log.v(TAG, "stopPreview:" + mCamera);
 		synchronized (mSync) {
@@ -278,15 +310,25 @@ public abstract class CameraDelegator {
 	}
 
 //--------------------------------------------------------------------------------
+
+	/**
+	 * カメラ映像受け取り用のSurfaceTextureを取得
+	 * @return
+	 */
 	@NonNull
 	protected abstract SurfaceTexture getInputSurfaceTexture();
 
+	/**
+	 * カメラ映像をGLSurfaceViewへ描画するためのICameraRenderer(GLSurfaceView.Renderer)を生成
+	 * @param parent
+	 * @return
+	 */
 	@NonNull
 	protected abstract ICameraRenderer createCameraRenderer(@NonNull final CameraDelegator parent);
 
 //--------------------------------------------------------------------------------
 	/**
-	 * start camera preview
+	 * カメラプレビュー開始の実体
 	 * @param width
 	 * @param height
 	 */
@@ -380,8 +422,15 @@ public abstract class CameraDelegator {
 		}
 	}
 
+	/**
+	 * カメラが対応する解像度一覧から指定した解像度順に一番近いものを選んで返す
+	 * @param supportedSizes
+	 * @param requestedWidth
+	 * @param requestedHeight
+	 * @return
+	 */
 	private static Camera.Size getClosestSupportedSize(
-		final List<Camera.Size> supportedSizes,
+		@NonNull final List<Camera.Size> supportedSizes,
 		final int requestedWidth, final int requestedHeight) {
 
 		return Collections.min(supportedSizes, new Comparator<Camera.Size>() {
@@ -400,7 +449,7 @@ public abstract class CameraDelegator {
 	}
 
 	/**
-	 * stop camera preview
+	 * カメラプレビュー終了の実体
 	 */
 	@WorkerThread
 	private void handleStopPreview() {
@@ -415,7 +464,7 @@ public abstract class CameraDelegator {
 	}
 
 	/**
-	 * rotate preview screen according to the device orientation
+	 * 端末の画面の向きに合わせてプレビュー画面を回転させる
 	 * @param params
 	 */
 	@SuppressLint("NewApi")

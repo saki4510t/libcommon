@@ -37,11 +37,12 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
- * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
+ * カメラ映像をIRendererHolder経由で取得してプレビュー表示するためのGLSurfaceView実装
  */
 public abstract class AbstractCameraGLView
 	extends GLSurfaceView implements ICameraGLView {
@@ -49,7 +50,9 @@ public abstract class AbstractCameraGLView
 	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = AbstractCameraGLView.class.getSimpleName();
 
+	@NonNull
 	private final CameraDelegator mCameraDelegator;
+	@Nullable
 	private IRendererHolder mRendererHolder;
 
 	/**
@@ -156,6 +159,10 @@ public abstract class AbstractCameraGLView
 		return mCameraDelegator.getHeight();
 	}
 
+	/**
+	 * 子クラスからIRendererHolderへアクセスできるように
+	 * @return
+	 */
 	protected IRendererHolder getRendererHolder() {
 		return mRendererHolder;
 	}
@@ -186,11 +193,21 @@ public abstract class AbstractCameraGLView
 		}
 	}
 
+	/**
+	 * IRendererHolderを生成
+	 * @param width
+	 * @param height
+	 * @param callback
+	 * @return
+	 */
 	@NonNull
 	protected abstract IRendererHolder createRendererHolder(
 		final int width, final int height,
 		final RenderHolderCallback callback);
 
+	/**
+	 * IRendererからのコールバックリスナーを実装
+	 */
 	private final RenderHolderCallback mRenderHolderCallback
 		= new RenderHolderCallback() {
 
@@ -203,7 +220,7 @@ public abstract class AbstractCameraGLView
 		@Override
 		public void onFrameAvailable() {
 //			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onFrameAvailable:");
-			callOnFrameAvailable();
+			mCameraDelegator.callOnFrameAvailable();
 		}
 
 		@Override
@@ -211,10 +228,6 @@ public abstract class AbstractCameraGLView
 			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onDestroy:");
 		}
 	};
-
-	protected void callOnFrameAvailable() {
-		mCameraDelegator.callOnFrameAvailable();
-	}
 
 	/**
 	 * GLSurfaceViewのRenderer

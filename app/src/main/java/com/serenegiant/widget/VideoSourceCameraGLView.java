@@ -39,12 +39,13 @@ import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.widget.CameraDelegator.OnFrameAvailableListener;
 import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
- * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
+ * カメラ映像をVideoSource経由で取得してプレビュー表示するためのGLSurfaceView実装
  * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
  * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
  */
@@ -54,9 +55,13 @@ public class VideoSourceCameraGLView
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = VideoSourceCameraGLView.class.getSimpleName();
 
+	@NonNull
 	private final CameraDelegator mCameraDelegator;
+	@NonNull
 	private final GLManager mGLManager;
+	@Nullable
 	private VideoSource mVideoSource;
+	@Nullable
 	private Distributor mDistributor;
 
 	/**
@@ -195,6 +200,12 @@ public class VideoSourceCameraGLView
 		}
 	}
 
+	/**
+	 * VideoSourceインスタンスを生成
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	@NonNull
 	protected VideoSource createVideoSource(
 		final int width, final int height) {
@@ -217,6 +228,8 @@ public class VideoSourceCameraGLView
 
 	/**
 	 * GLSurfaceViewのRenderer
+	 * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
+	 * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
 	 */
 	private final class CameraRenderer
 		implements ICameraRenderer,
