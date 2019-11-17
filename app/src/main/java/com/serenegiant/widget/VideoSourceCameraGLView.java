@@ -374,7 +374,7 @@ public class VideoSourceCameraGLView
 				if (viewAspect > req) {
 					// if view is wider than camera image, calc width of drawing area based on view height
 					y = 0;
-					height = viewWidth;
+					height = viewHeight;
 					width = (int)(req * viewHeight);
 					x = (viewWidth - width) / 2;
 				} else {
