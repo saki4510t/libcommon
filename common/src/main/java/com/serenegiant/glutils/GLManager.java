@@ -134,6 +134,16 @@ public class GLManager {
 	}
 
 	/**
+	 * EGLを取得
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public EGLBase getEgl() throws IllegalStateException {
+		checkValid();
+		return mGLContext.getEgl();
+	}
+
+	/**
 	 * この共有GLコンテキストがコンテキストを持つGLTaskを生成して返す
 	 * @param callback
 	 * @return
