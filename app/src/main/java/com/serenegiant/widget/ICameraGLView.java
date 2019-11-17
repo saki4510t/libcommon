@@ -6,10 +6,14 @@ public interface ICameraGLView {
 	// View
 	public void setOnClickListener(final View.OnClickListener listener);
 	public void setOnLongClickListener(final View.OnLongClickListener listener);
+	public int getWidth();
+	public int getHeight();
+	public boolean post(final Runnable task);
 
 	// GLSurfaceView
 	public void onResume();
 	public void onPause();
+	public void queueEvent(final Runnable task);
 
 	public void setVideoSize(final int width, final int height);
 	public void addListener(final CameraDelegator.OnFrameAvailableListener listener);

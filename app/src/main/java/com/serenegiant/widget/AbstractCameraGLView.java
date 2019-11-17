@@ -27,6 +27,7 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.RenderHolderCallback;
@@ -102,6 +103,35 @@ public abstract class AbstractCameraGLView
 			}
 
 		};
+		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
+		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
+		setRenderer((CameraRenderer)mCameraDelegator.getCameraRenderer());
+		final SurfaceHolder holder = getHolder();
+		holder.addCallback(new SurfaceHolder.Callback() {
+			@Override
+			public void surfaceCreated(final SurfaceHolder holder) {
+				if (DEBUG) Log.v(TAG, "surfaceCreated:");
+				// do nothing
+			}
+
+			@Override
+			public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
+				// do nothing
+				if (DEBUG) Log.v(TAG, "surfaceChanged:");
+				queueEvent(new Runnable() {
+					@Override
+					public void run() {
+						mCameraDelegator.getCameraRenderer().updateViewport();
+					}
+				});
+			}
+
+			@Override
+			public void surfaceDestroyed(final SurfaceHolder holder) {
+				if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
+				mCameraDelegator.getCameraRenderer().onSurfaceDestroyed();
+			}
+		});
 	}
 
 	@Override
@@ -233,7 +263,7 @@ public abstract class AbstractCameraGLView
 	 * GLSurfaceViewのRenderer
 	 */
 	private final class CameraRenderer
-		implements ICameraRenderer,
+		implements ICameraRenderer, GLSurfaceView.Renderer,
 			SurfaceTexture.OnFrameAvailableListener {	// API >= 11
 
 		private SurfaceTexture mSTexture;	// API >= 11

@@ -27,13 +27,13 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
+import android.view.SurfaceHolder;
 
 import com.serenegiant.glpipeline.Distributor;
 import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.es2.GLDrawer2D;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -111,6 +111,35 @@ public class VideoSourceCameraGLView
 				return new CameraRenderer();
 			}
 		};
+		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
+		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
+		setRenderer((CameraRenderer)mCameraDelegator.getCameraRenderer());
+		final SurfaceHolder holder = getHolder();
+		holder.addCallback(new SurfaceHolder.Callback() {
+			@Override
+			public void surfaceCreated(final SurfaceHolder holder) {
+				if (DEBUG) Log.v(TAG, "surfaceCreated:");
+				// do nothing
+			}
+
+			@Override
+			public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
+				// do nothing
+				if (DEBUG) Log.v(TAG, "surfaceChanged:");
+				queueEvent(new Runnable() {
+					@Override
+					public void run() {
+						mCameraDelegator.getCameraRenderer().updateViewport();
+					}
+				});
+			}
+
+			@Override
+			public void surfaceDestroyed(final SurfaceHolder holder) {
+				if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
+				mCameraDelegator.getCameraRenderer().onSurfaceDestroyed();
+			}
+		});
 	}
 
 	@Override
@@ -231,17 +260,10 @@ public class VideoSourceCameraGLView
 	 * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
 	 * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
 	 */
-	private final class CameraRenderer
-		implements ICameraRenderer,
-			SurfaceTexture.OnFrameAvailableListener {	// API >= 11
+	private final class CameraRenderer implements ICameraRenderer, GLSurfaceView.Renderer {
 
-		private SurfaceTexture mSTexture;	// API >= 11
-		private int hTex;
 		private GLDrawer2D mDrawer;
-		private final float[] mStMatrix = new float[16];
 		private final float[] mMvpMatrix = new float[16];
-		private boolean mHasSurface;
-		private volatile boolean requestUpdateTex = false;
 
 		public CameraRenderer() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer:");
@@ -257,22 +279,10 @@ public class VideoSourceCameraGLView
 			if (!extensions.contains("OES_EGL_image_external"))
 				throw new RuntimeException("This system does not support OES_EGL_image_external.");
 			mDrawer = new GLDrawer2D(true);
-			// create texture ID
-			hTex = mDrawer.initTex();
-			// create SurfaceTexture with texture ID.
-			mSTexture = new SurfaceTexture(hTex);
-			mSTexture.setDefaultBufferSize(mCameraDelegator.getWidth(), mCameraDelegator.getHeight());
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				mSTexture.setOnFrameAvailableListener(this, HandlerThreadHandler.createHandler(TAG));
-			} else {
-				mSTexture.setOnFrameAvailableListener(this);
-			}
 			// clear screen with yellow color so that you can see rendering rectangle
 			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-			mHasSurface = true;
 			// create object for preview display
 			mDrawer.setMvpMatrix(mMvpMatrix, 0);
-			addSurface(1, new Surface(mSTexture), false);
 		}
 
 		@Override
@@ -290,37 +300,28 @@ public class VideoSourceCameraGLView
 		@Override
 		public void onSurfaceDestroyed() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:");
-			removeSurface(1);
-			mHasSurface = false;
 			release();
 		}
 
 		@Override
 		public boolean hasSurface() {
-			return mHasSurface;
+			return false;
 		}
 
+		@Override
 		public SurfaceTexture getInputSurfaceTexture() {
-			return mSTexture;
+			return null;
 		}
 
 		@Override
 		public void onPreviewSizeChanged(final int width, final int height) {
-			if (mSTexture != null) {
-				mSTexture.setDefaultBufferSize(width, height);
-			}
 		}
 
 		public void release() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#release:");
 			if (mDrawer != null) {
-				mDrawer.deleteTex(hTex);
 				mDrawer.release();
 				mDrawer = null;
-			}
-			if (mSTexture != null) {
-				mSTexture.release();
-				mSTexture = null;
 			}
 		}
 
@@ -334,16 +335,9 @@ public class VideoSourceCameraGLView
 		public void onDrawFrame(final GL10 unused) {
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 
-			if (requestUpdateTex && (mSTexture != null)) {
-				requestUpdateTex = false;
-				// update texture(came from camera)
-				mSTexture.updateTexImage();
-				// get texture matrix
-				mSTexture.getTransformMatrix(mStMatrix);
-			}
 			// draw to preview screen
-			if (mDrawer != null) {
-				mDrawer.draw(hTex, mStMatrix, 0);
+			if ((mDrawer != null) && (mVideoSource != null)) {
+				mDrawer.draw(mVideoSource.getTexId(), mVideoSource.getTexMatrix(), 0);
 			}
 		}
 
@@ -351,14 +345,20 @@ public class VideoSourceCameraGLView
 		public final void updateViewport() {
 			final int viewWidth = getWidth();
 			final int viewHeight = getHeight();
-			if (viewWidth == 0 || viewHeight == 0) return;
+			if (viewWidth == 0 || viewHeight == 0) {
+				if (DEBUG) Log.v(TAG, String.format("updateViewport:view is not ready(%dx%d)", viewWidth, viewHeight));
+				return;
+			}
 			GLES20.glViewport(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			final double videoWidth = mCameraDelegator.getWidth();
 			final double videoHeight = mCameraDelegator.getHeight();
-			if (videoWidth == 0 || videoHeight == 0) return;
+			if (videoWidth == 0 || videoHeight == 0) {
+				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)", viewWidth, viewHeight));
+				return;
+			}
 			final double viewAspect = viewWidth / (double)viewHeight;
-			Log.i(TAG, String.format("view(%d,%d)%f,video(%1.0f,%1.0f)",
+			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
 				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight));
 
 			Matrix.setIdentityM(mMvpMatrix, 0);
@@ -409,13 +409,5 @@ public class VideoSourceCameraGLView
 			}
 		}
 
-		/**
-		 * OnFrameAvailableListenerインターフェースの実装
-		 * @param st
-		 */
-		@Override
-		public void onFrameAvailable(final SurfaceTexture st) {
-			requestUpdateTex = true;
-		}
 	}	// CameraRenderer
 }
