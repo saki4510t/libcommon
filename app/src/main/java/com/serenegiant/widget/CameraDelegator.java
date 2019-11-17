@@ -433,17 +433,25 @@ public abstract class CameraDelegator {
 				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 			rotation = display.getRotation();
 		}
-		int degrees = 0;
+		int degrees;
 		switch (rotation) {
-			case Surface.ROTATION_0: degrees = 0; break;
-			case Surface.ROTATION_90: degrees = 90; break;
-			case Surface.ROTATION_180: degrees = 180; break;
-			case Surface.ROTATION_270: degrees = 270; break;
+		case Surface.ROTATION_90:
+			degrees = 90;
+			break;
+		case Surface.ROTATION_180:
+			degrees = 180;
+			break;
+		case Surface.ROTATION_270:
+			degrees = 270;
+			break;
+		case Surface.ROTATION_0:
+		default:
+			degrees = 0;
+			break;
 		}
 		// get whether the camera is front camera or back camera
-		final Camera.CameraInfo info =
-				new Camera.CameraInfo();
-			Camera.getCameraInfo(CAMERA_ID, info);
+		final Camera.CameraInfo info = new Camera.CameraInfo();
+		Camera.getCameraInfo(CAMERA_ID, info);
 		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {	// front camera
 			degrees = (info.orientation + degrees) % 360;
 			degrees = (360 - degrees) % 360;  // reverse
