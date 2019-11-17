@@ -49,6 +49,9 @@ public class GLManager {
 	private boolean mInitialized;
 	private boolean mReleased;
 
+	/**
+	 * コンストラクタ
+	 */
 	public GLManager() {
 		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
 			null, 0, null);
