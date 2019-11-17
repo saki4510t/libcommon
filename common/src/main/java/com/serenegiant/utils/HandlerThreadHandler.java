@@ -29,10 +29,19 @@ import androidx.annotation.Nullable;
 public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";
 
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @return
+	 */
 	public static final HandlerThreadHandler createHandler() {
 		return createHandler(TAG);
 	}
 
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param name
+	 * @return
+	 */
 	public static final HandlerThreadHandler createHandler(
 		final String name) {
 
@@ -41,12 +50,23 @@ public class HandlerThreadHandler extends Handler {
 		return new HandlerThreadHandler(thread.getLooper());
 	}
 
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param callback
+	 * @return
+	 */
 	public static final HandlerThreadHandler createHandler(
 		@Nullable final Callback callback) {
 
 		return createHandler(TAG, callback);
 	}
 
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param name
+	 * @param callback
+	 * @return
+	 */
 	public static final HandlerThreadHandler createHandler(
 		final String name, @Nullable final Callback callback) {
 
@@ -55,7 +75,13 @@ public class HandlerThreadHandler extends Handler {
 		return new HandlerThreadHandler(thread.getLooper(), callback);
 	}
 
+//--------------------------------------------------------------------------------
 	private final long mId;
+
+	/**
+	 * コンストラクタ
+	 * @param looper
+	 */
 	private HandlerThreadHandler(@NonNull final Looper looper) {
 		super(looper);
 		final Thread thread = looper.getThread();
