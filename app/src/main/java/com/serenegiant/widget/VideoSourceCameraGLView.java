@@ -21,22 +21,20 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Choreographer;
 import android.view.Surface;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import com.serenegiant.glpipeline.Distributor;
 import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
+import com.serenegiant.glutils.ISurface;
 import com.serenegiant.glutils.es2.GLDrawer2D;
-
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -45,12 +43,11 @@ import static com.serenegiant.widget.CameraDelegator.OnFrameAvailableListener;
 import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
- * カメラ映像をVideoSource経由で取得してプレビュー表示するためのGLSurfaceView実装
- * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
- * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
+ * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraGLView実装
+ * SurfaceViewを継承
  */
 public class VideoSourceCameraGLView
-	extends GLSurfaceView implements ICameraGLView {
+	extends SurfaceView implements ICameraGLView {
 
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = VideoSourceCameraGLView.class.getSimpleName();
@@ -59,6 +56,7 @@ public class VideoSourceCameraGLView
 	private final CameraDelegator mCameraDelegator;
 	@NonNull
 	private final GLManager mGLManager;
+	private final CameraRenderer mCameraRenderer;
 	@Nullable
 	private VideoSource mVideoSource;
 	@Nullable
@@ -91,6 +89,7 @@ public class VideoSourceCameraGLView
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mGLManager = new GLManager();
+		mCameraRenderer = new CameraRenderer();
 		mCameraDelegator = new CameraDelegator(this,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
@@ -108,18 +107,21 @@ public class VideoSourceCameraGLView
 			@Override
 			protected ICameraRenderer createCameraRenderer(@NonNull final CameraDelegator parent) {
 				if (DEBUG) Log.v(TAG, "createCameraRenderer:");
-				return new CameraRenderer();
+				return mCameraRenderer;
 			}
 		};
-		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
-		setRenderer((CameraRenderer)mCameraDelegator.getCameraRenderer());
 		final SurfaceHolder holder = getHolder();
 		holder.addCallback(new SurfaceHolder.Callback() {
 			@Override
 			public void surfaceCreated(final SurfaceHolder holder) {
 				if (DEBUG) Log.v(TAG, "surfaceCreated:");
 				// do nothing
+				queueEvent(new Runnable() {
+					@Override
+					public void run() {
+						mCameraRenderer.onSurfaceCreated(holder.getSurface());
+					}
+				});
 			}
 
 			@Override
@@ -129,7 +131,7 @@ public class VideoSourceCameraGLView
 				queueEvent(new Runnable() {
 					@Override
 					public void run() {
-						mCameraDelegator.getCameraRenderer().updateViewport();
+						mCameraRenderer.onSurfaceChanged(width, height);
 					}
 				});
 			}
@@ -137,7 +139,12 @@ public class VideoSourceCameraGLView
 			@Override
 			public void surfaceDestroyed(final SurfaceHolder holder) {
 				if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
-				mCameraDelegator.getCameraRenderer().onSurfaceDestroyed();
+				queueEvent(new Runnable() {
+					@Override
+					public void run() {
+						mCameraRenderer.onSurfaceDestroyed();
+					}
+				});
 			}
 		});
 	}
@@ -145,9 +152,7 @@ public class VideoSourceCameraGLView
 	@Override
 	public synchronized void onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:");
-		super.onResume();
 		mVideoSource = createVideoSource(DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT);
-		mDistributor = new Distributor(mVideoSource);
 		mCameraDelegator.onResume();
 	}
 
@@ -163,7 +168,11 @@ public class VideoSourceCameraGLView
 			mVideoSource.release();
 			mVideoSource = null;
 		}
-		super.onPause();
+	}
+
+	@Override
+	public void queueEvent(final Runnable task) {
+		mGLManager.getGLHandler().post(task);
 	}
 
 	@Override
@@ -212,9 +221,10 @@ public class VideoSourceCameraGLView
 		final boolean isRecordable) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:" + id);
-		if (mDistributor != null) {
-			mDistributor.addSurface(id, surface, isRecordable);
+		if (mDistributor == null) {
+			mDistributor = new Distributor(mVideoSource);
 		}
+		mDistributor.addSurface(id, surface, isRecordable);
 	}
 
 	/**
@@ -257,22 +267,22 @@ public class VideoSourceCameraGLView
 
 	/**
 	 * GLSurfaceViewのRenderer
-	 * FIXME 今のままだと カメラ⇒VideoSource⇒Distributor⇒GLSurfaceViewと映像がコピーされるので1回余分
-	 * FIXME GLSurfaceViewのレンダリングコンテキストを使ってVideoSourceを生成してVideoSourceのテクスチャをGLSurfaceViewへ直接描画したい
 	 */
-	private final class CameraRenderer implements ICameraRenderer, GLSurfaceView.Renderer {
+	private class CameraRenderer implements ICameraRenderer,
+		Choreographer.FrameCallback {
 
+		private ISurface mTarget;
 		private GLDrawer2D mDrawer;
 		private final float[] mMvpMatrix = new float[16];
+		private volatile boolean mHasSurface;
 
 		public CameraRenderer() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer:");
 			Matrix.setIdentityM(mMvpMatrix, 0);
 		}
 
-		@Override
-		public void onSurfaceCreated(final GL10 unused, final EGLConfig config) {
-			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:");
+		private void onSurfaceCreated(@NonNull final Surface surface) {
+			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:" + surface);
 			// This renderer required OES_EGL_image_external extension
 			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
@@ -280,16 +290,19 @@ public class VideoSourceCameraGLView
 				throw new RuntimeException("This system does not support OES_EGL_image_external.");
 			mDrawer = new GLDrawer2D(true);
 			// clear screen with yellow color so that you can see rendering rectangle
-			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 			// create object for preview display
 			mDrawer.setMvpMatrix(mMvpMatrix, 0);
+			mHasSurface = true;
+			mTarget = mGLManager.getEgl().createFromSurface(surface);
+			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
+			mGLManager.postFrameCallbackDelayed(this, 0);
 		}
 
-		@Override
-		public void onSurfaceChanged(final GL10 unused, final int width, final int height) {
+		private void onSurfaceChanged(final int width, final int height) {
 			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)", width, height));
 			// if at least with or height is zero, initialization of this view is still progress.
 			if ((width == 0) || (height == 0)) return;
+			mVideoSource.resize(width, height);
 			updateViewport();
 			mCameraDelegator.startPreview(width, height);
 		}
@@ -300,6 +313,12 @@ public class VideoSourceCameraGLView
 		@Override
 		public void onSurfaceDestroyed() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:");
+			mHasSurface = false;
+			if (mTarget != null) {
+				mTarget.release();
+				mTarget = null;
+			}
+			mGLManager.removeFrameCallback(this);
 			release();
 		}
 
@@ -310,11 +329,12 @@ public class VideoSourceCameraGLView
 
 		@Override
 		public SurfaceTexture getInputSurfaceTexture() {
-			return null;
+			throw new UnsupportedOperationException();
 		}
 
 		@Override
 		public void onPreviewSizeChanged(final int width, final int height) {
+			mVideoSource.resize(width, height);
 		}
 
 		public void release() {
@@ -322,22 +342,6 @@ public class VideoSourceCameraGLView
 			if (mDrawer != null) {
 				mDrawer.release();
 				mDrawer = null;
-			}
-		}
-
-		/**
-		 * drawing to GLSurface
-		 * we set renderMode to GLSurfaceView.RENDERMODE_WHEN_DIRTY,
-		 * this method is only called when #requestRender is called(= when texture is required to update)
-		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
-		 */
-		@Override
-		public void onDrawFrame(final GL10 unused) {
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-
-			// draw to preview screen
-			if ((mDrawer != null) && (mVideoSource != null)) {
-				mDrawer.draw(mVideoSource.getTexId(), mVideoSource.getTexMatrix(), 0);
 			}
 		}
 
@@ -349,6 +353,12 @@ public class VideoSourceCameraGLView
 				if (DEBUG) Log.v(TAG, String.format("updateViewport:view is not ready(%dx%d)", viewWidth, viewHeight));
 				return;
 			}
+			if (!mHasSurface || (mTarget == null)) {
+				if (DEBUG) Log.v(TAG, "updateViewport:has no surface");
+				return;
+			}
+			mTarget.makeCurrent();
+
 			GLES20.glViewport(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			final double videoWidth = mCameraDelegator.getWidth();
@@ -407,7 +417,29 @@ public class VideoSourceCameraGLView
 			if (mDrawer != null) {
 				mDrawer.setMvpMatrix(mMvpMatrix, 0);
 			}
+
+			mTarget.swap();
 		}
 
+		private int cnt;
+		/**
+		 * Choreographer.FrameCallback
+		 * @param frameTimeNanos
+		 */
+		@Override
+		public void doFrame(final long frameTimeNanos) {
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			if (mHasSurface && (mTarget != null)) {
+				if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "doFrame:" + cnt);
+				mTarget.makeCurrent();
+				// draw to preview screen
+				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+				if ((mDrawer != null) && (mVideoSource != null)) {
+					mDrawer.draw(mVideoSource.getTexId(), mVideoSource.getTexMatrix(), 0);
+				}
+				mTarget.swap();
+				Choreographer.getInstance().postFrameCallback(this);
+			}
+		}
 	}	// CameraRenderer
 }
