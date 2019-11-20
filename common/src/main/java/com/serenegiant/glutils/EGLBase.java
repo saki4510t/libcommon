@@ -229,4 +229,16 @@ public abstract class EGLBase implements EGLConst {
 	 * eglWaitNative: GPU側の描画処理が終了するまで実行をブロックする
 	 */
 	public abstract void sync();
+
+	/**
+	 * eglWaitGLを呼ぶ
+	 * コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
+	 */
+	public abstract void waitGL();
+
+	/**
+	 * eglWaitNativeを呼ぶ
+	 * GPU側の描画処理が終了するまで実行をブロックする
+	 */
+	public abstract void waitNative();
 }

@@ -391,6 +391,24 @@ import com.serenegiant.utils.BuildCheck;
 	}
 
 	/**
+	 * eglWaitGLを呼ぶ
+	 * コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
+	 */
+	@Override
+	public void waitGL() {
+		EGL14.eglWaitGL();	// GLES20.glFinish()と同様の効果
+	}
+
+	/**
+	 * eglWaitNativeを呼ぶ
+	 * GPU側の描画処理が終了するまで実行をブロックする
+	 */
+	@Override
+	public void waitNative() {
+		EGL14.eglWaitNative(EGL14.EGL_CORE_NATIVE_ENGINE);
+	}
+
+	/**
 	 * 初期化の下請け
 	 * @param maxClientVersion
 	 * @param sharedContext

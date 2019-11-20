@@ -27,6 +27,7 @@ import javax.microedition.khronos.egl.EGLSurface;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
+import android.opengl.EGL14;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
@@ -456,6 +457,24 @@ import com.serenegiant.utils.BuildCheck;
 	@Override
 	public void sync() {
 		mEgl.eglWaitGL();	// GLES20.glFinish()と同様の効果
+		mEgl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, null);
+	}
+
+	/**
+	 * eglWaitGLを呼ぶ
+	 * コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
+	 */
+	@Override
+	public void waitGL() {
+		mEgl.eglWaitGL();	// GLES20.glFinish()と同様の効果
+	}
+
+	/**
+	 * eglWaitNativeを呼ぶ
+	 * GPU側の描画処理が終了するまで実行をブロックする
+	 */
+	@Override
+	public void waitNative() {
 		mEgl.eglWaitNative(EGL10.EGL_CORE_NATIVE_ENGINE, null);
 	}
 
