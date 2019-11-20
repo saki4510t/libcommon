@@ -307,7 +307,6 @@ public class DistributorCameraGLView
 			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)", width, height));
 			// if at least with or height is zero, initialization of this view is still progress.
 			if ((width == 0) || (height == 0)) return;
-			mVideoSource.resize(width, height);
 			updateViewport();
 			mCameraDelegator.startPreview(width, height);
 		}
@@ -335,6 +334,7 @@ public class DistributorCameraGLView
 		@Override
 		public void onPreviewSizeChanged(final int width, final int height) {
 			mVideoSource.resize(width, height);
+			mDistributor.resize(width, height);
 			if (mSTexture != null) {
 				mSTexture.setDefaultBufferSize(width, height);
 			}
@@ -386,8 +386,8 @@ public class DistributorCameraGLView
 			}
 			GLES20.glViewport(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			final double videoWidth = mCameraDelegator.getWidth();
-			final double videoHeight = mCameraDelegator.getHeight();
+			final double videoWidth = mVideoSource.getWidth();
+			final double videoHeight = mVideoSource.getHeight();
 			if (videoWidth == 0 || videoHeight == 0) {
 				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)", viewWidth, viewHeight));
 				return;
