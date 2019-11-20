@@ -307,6 +307,7 @@ public class DistributorCameraGLView
 			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)", width, height));
 			// if at least with or height is zero, initialization of this view is still progress.
 			if ((width == 0) || (height == 0)) return;
+			mVideoSource.resize(width, height);
 			updateViewport();
 			mCameraDelegator.startPreview(width, height);
 		}
@@ -333,6 +334,7 @@ public class DistributorCameraGLView
 
 		@Override
 		public void onPreviewSizeChanged(final int width, final int height) {
+			mVideoSource.resize(width, height);
 			if (mSTexture != null) {
 				mSTexture.setDefaultBufferSize(width, height);
 			}
