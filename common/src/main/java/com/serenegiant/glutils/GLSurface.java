@@ -54,6 +54,7 @@ public class GLSurface implements IGLSurface {
 	private int mDepthBufferObj = -1, mFrameBufferObj = -1;
 	/** テクスチャ座標変換行列 */
 	private final float[] mTexMatrix = new float[16];
+	private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
 	/**
 	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
@@ -200,6 +201,7 @@ public class GLSurface implements IGLSurface {
 			tex = genTexture(tex_target, tex_unit, mTexWidth, mTexHeight);
 		}
 		assignTexture(tex, width, height);
+		setViewPort(0, 0, mWidth, mHeight);
 	}
 
 //--------------------------------------------------------------------------------
@@ -224,7 +226,25 @@ public class GLSurface implements IGLSurface {
 		GLES20.glActiveTexture(TEX_UNIT);
 		GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
 		GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
-		GLES20.glViewport(0, 0, mWidth, mHeight);
+		setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	}
+
+	/**
+	 * Viewportを設定
+	 * ここで設定した値は次回以降makeCurrentを呼んだときに復帰される
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	@Override
+	public void setViewPort(final int x, final int y, final int width, final int height) {
+		viewPortX = x;
+		viewPortY = y;
+		viewPortWidth = width;
+		viewPortHeight = height;
+
+		GLES20.glViewport(x, y, width, height);
 	}
 
 	/**

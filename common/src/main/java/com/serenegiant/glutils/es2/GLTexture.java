@@ -44,6 +44,7 @@ public class GLTexture implements IGLSurface {
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
 	/* package */int mImageWidth, mImageHeight;
+	private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
 	/**
 	 * コンストラクタ
@@ -97,6 +98,7 @@ public class GLTexture implements IGLSurface {
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = width / (float)mTexWidth;
 		mTexMatrix[5] = height / (float)mTexHeight;
+		setViewPort(0, 0, mImageWidth, mImageHeight);
 //		if (DEBUG) Log.v(TAG, "GLTexture:id=" + mTextureId);
 	}
 
@@ -130,6 +132,25 @@ public class GLTexture implements IGLSurface {
 //		if (DEBUG) Log.v(TAG, "makeCurrent:");
 		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES20.glBindTexture(mTextureTarget, mTextureId);
+		setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	}
+
+	/**
+	 * Viewportを設定
+	 * ここで設定した値は次回以降makeCurrentを呼んだときに復帰される
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	@Override
+	public void setViewPort(final int x, final int y, final int width, final int height) {
+		viewPortX = x;
+		viewPortY = y;
+		viewPortWidth = width;
+		viewPortHeight = height;
+
+		GLES20.glViewport(x, y, width, height);
 	}
 
 	/**

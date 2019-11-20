@@ -44,7 +44,8 @@ public class GLTexture implements IGLSurface {
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
 	/* package */int mImageWidth, mImageHeight;
-	
+	private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
+
 	/**
 	 * コンストラクタ
 	 * テクスチャユニットが常時GL_TEXTURE0なので複数のテクスチャを同時に使えない
@@ -87,17 +88,18 @@ public class GLTexture implements IGLSurface {
 		mTextureId = GLHelper.initTex(mTextureTarget, texUnit, filter_param);
 		// テクスチャのメモリ領域を確保する
 		GLES10.glTexImage2D(mTextureTarget,
-			0,							// ミップマップレベル0(ミップマップしない)
+			0,					// ミップマップレベル0(ミップマップしない)
 			GLES10.GL_RGBA,				// 内部フォーマット
 			mTexWidth, mTexHeight,		// サイズ
-			0,							// 境界幅
+			0,					// 境界幅
 			GLES10.GL_RGBA,				// 引き渡すデータのフォーマット
-			GLES10.GL_UNSIGNED_BYTE,		// データの型
-			null);						// ピクセルデータ無し
+			GLES10.GL_UNSIGNED_BYTE,	// データの型
+			null);				// ピクセルデータ無し
 		// テクスチャ変換行列を初期化
 		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = width / (float)mTexWidth;
 		mTexMatrix[5] = height / (float)mTexHeight;
+		setViewPort(0, 0, mImageWidth, mImageHeight);
 //		if (DEBUG) Log.v(TAG, "GLTexture:id=" + mTextureId);
 	}
 
@@ -128,6 +130,25 @@ public class GLTexture implements IGLSurface {
 //		if (DEBUG) Log.v(TAG, "makeCurrent:");
 		GLES10.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES10.glBindTexture(mTextureTarget, mTextureId);
+		setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	}
+
+	/**
+	 * Viewportを設定
+	 * ここで設定した値は次回以降makeCurrentを呼んだときに復帰される
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	@Override
+	public void setViewPort(final int x, final int y, final int width, final int height) {
+		viewPortX = x;
+		viewPortY = y;
+		viewPortWidth = width;
+		viewPortHeight = height;
+
+		GLES10.glViewport(x, y, width, height);
 	}
 
 	/**

@@ -106,6 +106,7 @@ import com.serenegiant.utils.BuildCheck;
 		@NonNull
 		private EGLSurface mEglSurface;
 		private boolean mOwnSurface;
+		private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
 		private EglSurface(@NonNull final EGLBase14 eglBase, final Object surface)
 			throws IllegalArgumentException {
@@ -118,6 +119,7 @@ import com.serenegiant.utils.BuildCheck;
 				|| (surface instanceof SurfaceView)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
 				mOwnSurface = true;
+				setViewPort(0, 0, getWidth(), getHeight());
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
 			}
@@ -142,6 +144,7 @@ import com.serenegiant.utils.BuildCheck;
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
 			mOwnSurface = true;
+			setViewPort(0, 0, getWidth(), getHeight());
 		}
 
 		/**
@@ -152,6 +155,7 @@ import com.serenegiant.utils.BuildCheck;
 			mEglBase = eglBase;
 			mEglSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
 			mOwnSurface = false;
+			setViewPort(0, 0, getWidth(), getHeight());
 		}
 
 		@Override
@@ -167,19 +171,31 @@ import com.serenegiant.utils.BuildCheck;
 		@Override
 		public void makeCurrent() {
 			mEglBase.makeCurrent(mEglSurface);
+			setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+		}
+
+		/**
+		 * Viewportを設定
+		 * ここで設定した値は次回以降makeCurrentを呼んだときに復帰される
+		 * @param x
+		 * @param y
+		 * @param width
+		 * @param height
+		 */
+		@Override
+		public void setViewPort(final int x, final int y, final int width, final int height) {
+			viewPortX = x;
+			viewPortY = y;
+			viewPortWidth = width;
+			viewPortHeight = height;
+
 			final int glVersion = mEglBase.getGlVersion();
 			if (glVersion >= 3) {
-				GLES30.glViewport(0, 0,
-					mEglBase.getSurfaceWidth(mEglSurface),
-					mEglBase.getSurfaceHeight(mEglSurface));
+				GLES30.glViewport(x, y, width, height);
 			} else if (mEglBase.getGlVersion() >= 2) {
-				GLES20.glViewport(0, 0,
-					mEglBase.getSurfaceWidth(mEglSurface),
-					mEglBase.getSurfaceHeight(mEglSurface));
+				GLES20.glViewport(x, y, width, height);
 			} else {
-				GLES10.glViewport(0, 0,
-					mEglBase.getSurfaceWidth(mEglSurface),
-					mEglBase.getSurfaceHeight(mEglSurface));
+				GLES10.glViewport(x, y, width, height);
 			}
 		}
 
