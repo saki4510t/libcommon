@@ -41,6 +41,10 @@ public class VideoSource implements IPipelineSource {
 		= new CopyOnWriteArraySet<>();
 	@NonNull
 	private final GLManager mManager;
+	/**
+	 * 自分用のGLManagerを保持しているかどうか
+	 */
+	private final boolean mOwnManager;
 	@NonNull
 	private final GLContext mGLContext;
 	private final Handler mGLHandler;
@@ -73,6 +77,7 @@ public class VideoSource implements IPipelineSource {
 				return VideoSource.this.handleMessage(msg);
 			}
 		});
+		mOwnManager = true;
 		mGLContext = mManager.getGLContext();
 		mGLHandler = mManager.getGLHandler();
 		mCallback = callback;
@@ -98,7 +103,9 @@ public class VideoSource implements IPipelineSource {
 				@Override
 				public void run() {
 					handleReleaseMasterSurface();
-					mManager.release();
+					if (mOwnManager) {
+						mManager.release();
+					}
 				}
 			});
 		}
@@ -269,6 +276,9 @@ public class VideoSource implements IPipelineSource {
 	@WorkerThread
 	protected void handleUpdateTex() {
 //		if (DEBUG) Log.v(TAG, "handleUpdateTex:");
+		makeDefault();
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		GLES20.glFlush();
 		if (mMasterTexture != null) {
 			mMasterTexture.updateTexImage();
 			mMasterTexture.getTransformMatrix(mTexMatrix);
@@ -293,6 +303,7 @@ public class VideoSource implements IPipelineSource {
 		makeDefault();
 		handleReleaseMasterSurface();
 		makeDefault();
+		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mMasterTexture = new SurfaceTexture(mTexId);
 		mMasterSurface = new Surface(mMasterTexture);
