@@ -161,6 +161,50 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
+	 * eglWaitGLとeglWaitNativeを呼ぶ
+	 *
+	 * eglWaitGL: コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
+	 * eglWaitNative: GPU側の描画処理が終了するまで実行をブロックする
+	 */
+	public void sync() throws IllegalStateException {
+		synchronized (mSync) {
+			if (mEgl != null) {
+				mEgl.sync();
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	/**
+	 * eglWaitGLを呼ぶ
+	 * コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
+	 */
+	public void waitGL() throws IllegalStateException {
+		synchronized (mSync) {
+			if (mEgl != null) {
+				mEgl.waitGL();
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	/**
+	 * eglWaitNativeを呼ぶ
+	 * GPU側の描画処理が終了するまで実行をブロックする
+	 */
+	public void waitNative() throws IllegalStateException {
+		synchronized (mSync) {
+			if (mEgl != null) {
+				mEgl.waitNative();
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	/**
 	 * GLコンテキストを保持しているスレッドのIDを返す
 	 * (== #initializeを実行したときのスレッドのID)
 	 * @return
