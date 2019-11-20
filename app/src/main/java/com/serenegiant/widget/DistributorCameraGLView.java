@@ -388,8 +388,8 @@ public class DistributorCameraGLView
 			}
 			GLES20.glViewport(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			final double videoWidth = mVideoSource.getWidth();
-			final double videoHeight = mVideoSource.getHeight();
+			final double videoWidth = mCameraDelegator.getWidth();
+			final double videoHeight = mCameraDelegator.getHeight();
 			if (videoWidth == 0 || videoHeight == 0) {
 				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)", viewWidth, viewHeight));
 				return;
