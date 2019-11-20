@@ -275,6 +275,7 @@ public class VideoSourceCameraGLView
 		private GLDrawer2D mDrawer;
 		private final float[] mMvpMatrix = new float[16];
 		private volatile boolean mHasSurface;
+		private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
 		public CameraRenderer() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer:");
@@ -359,6 +360,9 @@ public class VideoSourceCameraGLView
 			}
 			mTarget.makeCurrent();
 
+			viewPortX = viewPortY = 0;
+			viewPortWidth = viewWidth;
+			viewPortHeight = viewHeight;
 			GLES20.glViewport(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			final double videoWidth = mCameraDelegator.getWidth();
@@ -396,6 +400,10 @@ public class VideoSourceCameraGLView
 				}
 				// set viewport to draw keeping aspect ration of camera image
 				Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height));
+				viewPortX = x;
+				viewPortY = y;
+				viewPortWidth = width;
+				viewPortHeight = height;
 				GLES20.glViewport(x, y, width, height);
 				break;
 			}
@@ -433,6 +441,7 @@ public class VideoSourceCameraGLView
 				if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "doFrame:" + cnt);
 				mTarget.makeCurrent();
 				// draw to preview screen
+				GLES20.glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
 				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 				if ((mDrawer != null) && (mVideoSource != null)) {
 					mDrawer.draw(mVideoSource.getTexId(), mVideoSource.getTexMatrix(), 0);
