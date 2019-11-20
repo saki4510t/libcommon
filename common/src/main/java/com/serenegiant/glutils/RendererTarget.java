@@ -132,6 +132,7 @@ public class RendererTarget implements IRendererTarget {
 	public void draw(final IDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
+			mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
 			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
 			// ハングアップする機種があるのでクリアしとく
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -164,6 +165,7 @@ public class RendererTarget implements IRendererTarget {
 	public void clear(final int color) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
+			mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
 			GLES20.glClearColor(
 				((color & 0x00ff0000) >>> 16) / 255.0f,	// R
 				((color & 0x0000ff00) >>>  8) / 255.0f,	// G
