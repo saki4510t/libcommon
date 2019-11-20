@@ -178,6 +178,20 @@ public class GLManager {
 	}
 
 	/**
+	 * 同じGLコンテキスト保持しているスレッド上で実行するためのHandlerを生成して返す
+	 * #getLooper#quitすると全部終了してしまうので注意
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public synchronized Handler createGLHandler(
+		@Nullable final Handler.Callback callback) throws IllegalStateException {
+
+		if (DEBUG) Log.v(TAG, "createGLHandler:");
+		checkValid();
+		return new Handler(mGLHandler.getLooper(), callback);
+	}
+
+	/**
 	 * GLContextを取得する
 	 * @return
 	 * @throws IllegalStateException
