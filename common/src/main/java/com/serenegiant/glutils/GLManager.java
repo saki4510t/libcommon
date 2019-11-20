@@ -68,6 +68,7 @@ public class GLManager {
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final Handler.Callback callback) throws RuntimeException {
 
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mCallback = callback;
 		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
 		mGLHandler = HandlerThreadHandler.createHandler(TAG,
@@ -115,6 +116,7 @@ public class GLManager {
 	 * 再利用はできない
 	 */
 	public synchronized void release() {
+		if (DEBUG) Log.v(TAG, "release:");
 		if (!mReleased) {
 			mReleased = true;
 			mGLHandler.postAtFrontOfQueue(new Runnable() {
@@ -142,6 +144,7 @@ public class GLManager {
 	 * @throws IllegalStateException
 	 */
 	public EGLBase getEgl() throws IllegalStateException {
+		if (DEBUG) Log.v(TAG, "getEgl:");
 		checkValid();
 		return mGLContext.getEgl();
 	}
@@ -155,6 +158,7 @@ public class GLManager {
 	public synchronized GLManager createShared(
 		@Nullable final Handler.Callback callback)	throws RuntimeException {
 
+		if (DEBUG) Log.v(TAG, "createShared:");
 		checkValid();
 		return new GLManager(mGLContext.getMaxClientVersion(),
 			mGLContext.getContext(), mGLContext.getFlags(),
@@ -168,6 +172,7 @@ public class GLManager {
 	 */
 	@NonNull
 	public synchronized Handler getGLHandler() throws IllegalStateException {
+		if (DEBUG) Log.v(TAG, "getGLHandler:");
 		checkValid();
 		return mGLHandler;
 	}
@@ -190,6 +195,7 @@ public class GLManager {
 	public synchronized void runOnGLThread(final Runnable task)
 		throws IllegalStateException {
 
+		if (DEBUG) Log.v(TAG, "runOnGLThread:");
 		checkValid();
 		mGLHandler.post(task);
 	}
@@ -203,6 +209,7 @@ public class GLManager {
 	public synchronized void runOnGLThread(final Runnable task, final long delayMs)
 		throws IllegalStateException{
 
+		if (DEBUG) Log.v(TAG, "runOnGLThread:");
 		checkValid();
 		if (delayMs > 0) {
 			mGLHandler.postDelayed(task, delayMs);
@@ -221,6 +228,7 @@ public class GLManager {
 		@NonNull final Choreographer.FrameCallback callback,
 		final long delayMs) throws IllegalStateException {
 
+		if (DEBUG) Log.v(TAG, "postFrameCallbackDelayed:");
 		checkValid();
 		if (mGLHandler.isCurrentThread()) {
 			// すでにGLスレッド上であれば直接実行
@@ -245,6 +253,7 @@ public class GLManager {
 		@NonNull final Choreographer.FrameCallback callback)
 			throws IllegalStateException {
 
+		if (DEBUG) Log.v(TAG, "removeFrameCallback:");
 		checkValid();
 		if (mGLHandler.isCurrentThread()) {
 			// すでにGLスレッド上であれば直接実行
