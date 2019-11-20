@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Choreographer;
@@ -32,14 +33,15 @@ import android.view.SurfaceView;
 import com.serenegiant.glpipeline.Distributor;
 import com.serenegiant.glpipeline.IPipelineSource;
 import com.serenegiant.glpipeline.VideoSource;
+import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.ISurface;
 import com.serenegiant.glutils.es2.GLDrawer2D;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.widget.CameraDelegator.OnFrameAvailableListener;
 import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
@@ -56,7 +58,13 @@ public class VideoSourceCameraGLView
 	private final CameraDelegator mCameraDelegator;
 	@NonNull
 	private final GLManager mGLManager;
+	@NonNull
+	private final GLContext mGLContext;
+	@NonNull
+	private final Handler mGLHandler;
+	@NonNull
 	private final CameraRenderer mCameraRenderer;
+
 	@Nullable
 	private VideoSource mVideoSource;
 	@Nullable
@@ -89,6 +97,8 @@ public class VideoSourceCameraGLView
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mGLManager = new GLManager();
+		mGLContext = mGLManager.getGLContext();
+		mGLHandler = mGLManager.getGLHandler();
 		mCameraRenderer = new CameraRenderer();
 		mCameraDelegator = new CameraDelegator(this,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
@@ -172,7 +182,7 @@ public class VideoSourceCameraGLView
 
 	@Override
 	public void queueEvent(final Runnable task) {
-		mGLManager.getGLHandler().post(task);
+		mGLHandler.post(task);
 	}
 
 	@Override
@@ -266,24 +276,34 @@ public class VideoSourceCameraGLView
 	}
 
 	/**
-	 * GLSurfaceViewのRenderer
+	 * Choreographerを使ってテクスチャの描画をするかどうか
+	 * XXX Choreographerを使うと数百フレームぐらいでlibGLESv2_adreno.so内でSIGSEGV投げてクラッシュする
 	 */
-	private class CameraRenderer implements ICameraRenderer,
-		Choreographer.FrameCallback {
+	private static final boolean USE_CHOREOGRAPHER = false;
+
+	/**
+	 * ICameraRendererの実装
+	 */
+	private class CameraRenderer implements ICameraRenderer, Runnable,
+		Choreographer.FrameCallback, IPipelineSource.OnFrameAvailableListener {
 
 		private ISurface mTarget;
 		private GLDrawer2D mDrawer;
 		private final float[] mMvpMatrix = new float[16];
 		private volatile boolean mHasSurface;
-		private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
+		/**
+		 * コンストラクタ
+		 */
 		public CameraRenderer() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer:");
 			Matrix.setIdentityM(mMvpMatrix, 0);
 		}
 
+		@WorkerThread
 		private void onSurfaceCreated(@NonNull final Surface surface) {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:" + surface);
+			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
 			// This renderer required OES_EGL_image_external extension
 			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS);	// API >= 8
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
@@ -293,12 +313,17 @@ public class VideoSourceCameraGLView
 			// clear screen with yellow color so that you can see rendering rectangle
 			// create object for preview display
 			mDrawer.setMvpMatrix(mMvpMatrix, 0);
-			mHasSurface = true;
 			mTarget = mGLManager.getEgl().createFromSurface(surface);
+			mHasSurface = true;
 			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f);
-			mGLManager.postFrameCallbackDelayed(this, 0);
+			if (USE_CHOREOGRAPHER) {
+				mGLManager.postFrameCallbackDelayed(this, 3);
+			} else {
+				mVideoSource.add(this);
+			}
 		}
 
+		@WorkerThread
 		private void onSurfaceChanged(final int width, final int height) {
 			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)", width, height));
 			// if at least with or height is zero, initialization of this view is still progress.
@@ -311,15 +336,19 @@ public class VideoSourceCameraGLView
 		/**
 		 * when GLSurface context is soon destroyed
 		 */
+		@WorkerThread
 		@Override
 		public void onSurfaceDestroyed() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:");
 			mHasSurface = false;
+			mGLManager.removeFrameCallback(this);
 			if (mTarget != null) {
 				mTarget.release();
 				mTarget = null;
 			}
-			mGLManager.removeFrameCallback(this);
+			if (mVideoSource != null) {
+				mVideoSource.remove(this);
+			}
 			release();
 		}
 
@@ -359,11 +388,7 @@ public class VideoSourceCameraGLView
 				return;
 			}
 			mTarget.makeCurrent();
-
-			viewPortX = viewPortY = 0;
-			viewPortWidth = viewWidth;
-			viewPortHeight = viewHeight;
-			GLES20.glViewport(0, 0, viewWidth, viewHeight);
+			mTarget.setViewPort(0, 0, viewWidth, viewHeight);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			final double videoWidth = mCameraDelegator.getWidth();
 			final double videoHeight = mCameraDelegator.getHeight();
@@ -400,11 +425,7 @@ public class VideoSourceCameraGLView
 				}
 				// set viewport to draw keeping aspect ration of camera image
 				Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height));
-				viewPortX = x;
-				viewPortY = y;
-				viewPortWidth = width;
-				viewPortHeight = height;
-				GLES20.glViewport(x, y, width, height);
+				mTarget.setViewPort(0, 0, width, height);
 				break;
 			}
 			case SCALE_KEEP_ASPECT:
@@ -429,26 +450,67 @@ public class VideoSourceCameraGLView
 			mTarget.swap();
 		}
 
-		private int cnt;
+//		private int cnt;
+//		private int cnt2;
+
 		/**
-		 * Choreographer.FrameCallback
+		 * IPipelineSource.OnFrameAvailableListenerの実装
+		 * @param texId
+		 * @param texMatrix
+		 */
+		@Override
+		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
+//			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable::" + cnt);
+			if (!USE_CHOREOGRAPHER) {
+				mGLHandler.post(this);
+			}
+		}
+
+		/**
+		 * Choreographer.FrameCallbackの実装
 		 * @param frameTimeNanos
 		 */
 		@Override
 		public void doFrame(final long frameTimeNanos) {
+//			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "doFrame::" + cnt);
+			run();
+			Choreographer.getInstance().postFrameCallbackDelayed(this, 3);
+		}
+
+		/**
+		 * このViewが保持しているレンダリングスレッド上で描画処理を実行するためのRunnableの実装
+		 */
+		@WorkerThread
+		@Override
+		public void run() {
+			if (mHasSurface && (mVideoSource != null)) {
+				handleDraw(mVideoSource.getTexId(), mVideoSource.getTexMatrix());
+			}
+			mGLContext.makeDefault();
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			if (mHasSurface && (mTarget != null)) {
-				if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "doFrame:" + cnt);
+			GLES20.glFlush();
+		}
+
+		/**
+		 * 描画処理の実体
+		 * レンダリングスレッド上で実行
+		 * @param texId
+		 * @param texMatrix
+		 */
+		@WorkerThread
+		private void handleDraw(final int texId, @NonNull final float[] texMatrix) {
+			if (mTarget != null) {
+//				if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:" + cnt2);
 				mTarget.makeCurrent();
-				// draw to preview screen
-				GLES20.glViewport(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
 				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+				// draw to preview screen
 				if ((mDrawer != null) && (mVideoSource != null)) {
-					mDrawer.draw(mVideoSource.getTexId(), mVideoSource.getTexMatrix(), 0);
+					mDrawer.draw(texId, texMatrix, 0);
 				}
+				GLES20.glFlush();
 				mTarget.swap();
-				Choreographer.getInstance().postFrameCallback(this);
 			}
 		}
+
 	}	// CameraRenderer
 }
