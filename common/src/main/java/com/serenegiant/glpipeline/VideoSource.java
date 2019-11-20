@@ -98,7 +98,7 @@ public class VideoSource implements IPipelineSource {
 	@Override
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		if (mManager.isValid()) {
+		if (isValid()) {
 			mGLHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -147,7 +147,7 @@ public class VideoSource implements IPipelineSource {
 	 */
 	@Override
 	public boolean isValid() {
-		return mManager.isValid();
+		return mManager.isValid() && (mMasterSurface != null) && mMasterSurface.isValid();
 	}
 
 	/**
