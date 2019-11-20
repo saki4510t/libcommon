@@ -7,6 +7,7 @@
 	<string name="item4" translatable="false">MixCamera</string>
 	<string name="item5" translatable="false">OverlayCamera</string>
 	<string name="item6" translatable="false">VideoSourceCamera</string>
+	<string name="item7" translatable="false">VideoSourceDistributorCamera</string>
 
 	<string-array name="list_items">
 		<item>@string/item0</item>
@@ -16,5 +17,6 @@
 		<item>@string/item4</item>
 		<item>@string/item5</item>
 		<item>@string/item6</item>
+		<item>@string/item7</item>
 	</string-array>
 </resources>

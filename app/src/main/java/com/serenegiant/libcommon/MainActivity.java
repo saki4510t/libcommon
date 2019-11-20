@@ -192,6 +192,15 @@ public class MainActivity extends AppCompatActivity
 			}
 			fragment = VideoSourceCameraFragment.newInstance();
 			break;
+		case 7:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = DistributorFragment.newInstance();
+			break;
 		default:
 			break;
 		}
