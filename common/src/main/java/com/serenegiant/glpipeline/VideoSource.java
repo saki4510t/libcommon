@@ -47,6 +47,7 @@ public class VideoSource implements IPipelineSource {
 	private final boolean mOwnManager;
 	@NonNull
 	private final GLContext mGLContext;
+	@NonNull
 	private final Handler mGLHandler;
 	@NonNull
 	private final PipelineSourceCallback mCallback;
@@ -60,6 +61,7 @@ public class VideoSource implements IPipelineSource {
 
 	/**
 	 * コンストラクタ
+	 * 引数のGLManagerのスレッド上で動作する
 	 * @param manager
 	 * @param width
 	 * @param height
@@ -69,17 +71,42 @@ public class VideoSource implements IPipelineSource {
 		final int width, final int height,
 		@NonNull final PipelineSourceCallback callback) {
 
+		this(manager, width, height, callback, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * useSharedContext=falseなら引数のGLManagerのスレッド上で動作する
+	 * useSharedContext=trueなら共有コンテキストを使って専用スレッド上で動作する
+	 * @param manager
+	 * @param width
+	 * @param height
+	 * @param callback
+	 * @param useSharedContext 共有コンテキストを使ってマルチスレッドで処理を行うかどうか
+	 */
+	public VideoSource(@NonNull final GLManager manager,
+		final int width, final int height,
+		@NonNull final PipelineSourceCallback callback,
+		final boolean useSharedContext) {
+
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 
-		mManager = manager.createShared(new Handler.Callback() {
+		mOwnManager = useSharedContext;
+		final Handler.Callback handlerCallback
+			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
 				return VideoSource.this.handleMessage(msg);
 			}
-		});
-		mOwnManager = true;
+		};
+		if (useSharedContext) {
+			mManager = manager.createShared(handlerCallback);
+			mGLHandler = mManager.getGLHandler();
+		} else {
+			mManager = manager;
+			mGLHandler = manager.createGLHandler(handlerCallback);
+		}
 		mGLContext = mManager.getGLContext();
-		mGLHandler = mManager.getGLHandler();
 		mCallback = callback;
 		if ((width > 0) || (height > 0)) {
 			mVideoWidth = width;
