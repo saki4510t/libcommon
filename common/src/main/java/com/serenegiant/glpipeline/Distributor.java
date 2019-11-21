@@ -23,6 +23,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
+import static com.serenegiant.glutils.AbstractDistributeTask.*;
 import static com.serenegiant.glutils.IRendererCommon.*;
 
 /**
@@ -290,15 +291,6 @@ public class Distributor implements IPipeline {
 		}
 	}
 
-	private static final int REQUEST_DRAW = 1;
-	private static final int REQUEST_ADD_SURFACE = 3;
-	private static final int REQUEST_REMOVE_SURFACE = 4;
-	private static final int REQUEST_REMOVE_SURFACE_ALL = 12;
-	private static final int REQUEST_MIRROR = 6;
-	private static final int REQUEST_ROTATE = 7;
-	private static final int REQUEST_CLEAR = 8;
-	private static final int REQUEST_CLEAR_ALL = 9;
-	private static final int REQUEST_SET_MVP = 10;
 
 	protected static class BaseRendererTask extends EglTask {
 
