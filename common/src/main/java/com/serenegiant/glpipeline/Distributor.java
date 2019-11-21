@@ -43,6 +43,10 @@ public class Distributor implements IPipeline {
 	private final BaseRendererTask mRendererTask;
 	private volatile boolean isRunning;
 
+	/**
+	 * コンストラクタ
+	 * @param source
+	 */
 	public Distributor(@NonNull final IPipelineSource source) {
 		mSource = source;
 		mManager = source.getGLManager();	// XXX とりあえずはVideoSourceと同じスレッドを使う
@@ -60,6 +64,9 @@ public class Distributor implements IPipeline {
 		}
 	}
 
+	/**
+	 * 関連するリソースを廃棄する
+	 */
 	@Override
 	public void release() {
 		mRendererTask.release();
@@ -71,6 +78,12 @@ public class Distributor implements IPipeline {
 		return mManager;
 	}
 
+	/**
+	 * サイズ変更要求
+	 * @param width
+	 * @param height
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void resize(final int width, final int height)
 		throws IllegalStateException {
@@ -83,11 +96,19 @@ public class Distributor implements IPipeline {
 		return mManager.isValid();
 	}
 
+	/**
+	 * 分配描画のサイズ(幅)を取得
+	 * @return
+	 */
 	@Override
 	public int getWidth() {
 		return mWidth;
 	}
 
+	/**
+	 * 分配描画のサイズ(高さ)を取得
+	 * @return
+	 */
 	@Override
 	public int getHeight() {
 		return mHeight;
@@ -164,6 +185,12 @@ public class Distributor implements IPipeline {
 		mRendererTask.clearSurfaceAll(color);
 	}
 
+	/**
+	 * モデルビュー変換行列をセットする
+	 * @param id
+	 * @param offset
+	 * @param matrix
+	 */
 	public void setMvpMatrix(final int id,
 		final int offset, @NonNull final float[] matrix) {
 		mRendererTask.setMvpMatrix(id, offset, matrix);
@@ -220,13 +247,15 @@ public class Distributor implements IPipeline {
 		return mRendererTask.getCount();
 	}
 
+	/**
+	 * VideoSourceからのコールバックリスナーの実装
+	 */
 	private final VideoSource.OnFrameAvailableListener mOnFrameAvailableListener
 		= new VideoSource.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
 			mRendererTask.mIsFirstFrameRendered = true;
 			mRendererTask.offer(REQUEST_DRAW, 0, 0, null);
-
 		}
 	} ;
 
