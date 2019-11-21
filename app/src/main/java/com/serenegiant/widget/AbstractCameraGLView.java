@@ -355,6 +355,7 @@ public abstract class AbstractCameraGLView
 			}
 		}
 
+		private int cnt;
 		/**
 		 * drawing to GLSurface
 		 * we set renderMode to GLSurfaceView.RENDERMODE_WHEN_DIRTY,
@@ -363,8 +364,9 @@ public abstract class AbstractCameraGLView
 		 */
 		@Override
 		public void onDrawFrame(final GL10 unused) {
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onDrawFrame::" + cnt);
 
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			if (requestUpdateTex && (mSTexture != null)) {
 				requestUpdateTex = false;
 				// update texture(came from camera)
