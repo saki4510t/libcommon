@@ -31,7 +31,7 @@ import static com.serenegiant.glutils.IRendererCommon.*;
 public class Distributor implements IPipeline {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = Distributor.class.getSimpleName();
-	private static final String RENDERER_THREAD_NAME = "RendererHolder";
+	private static final String RENDERER_THREAD_NAME = "Distributor";
 
 	private IPipelineSource mSource;
 	private final GLManager mManager;
