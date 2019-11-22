@@ -451,7 +451,7 @@ public class VideoSourceCameraGLView
 		}
 
 //		private int cnt;
-//		private int cnt2;
+		private int cnt2;
 
 		/**
 		 * IPipelineSource.OnFrameAvailableListenerの実装
@@ -500,7 +500,7 @@ public class VideoSourceCameraGLView
 		@WorkerThread
 		private void handleDraw(final int texId, @NonNull final float[] texMatrix) {
 			if (mTarget != null) {
-//				if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:" + cnt2);
+				if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:" + cnt2);
 				mTarget.makeCurrent();
 				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 				// draw to preview screen
