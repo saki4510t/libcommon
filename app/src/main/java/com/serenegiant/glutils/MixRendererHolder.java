@@ -352,10 +352,14 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			try {
 				final Canvas canvas = mMaskSurface.lockCanvas(null);
 				try {
-					} else {
 					if (mask != null) {
 						canvas.drawBitmap(mask, 0, 0, null);
+					} else if (DEBUG) {
+						// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
 						canvas.drawColor(0x7fff0000);	// ARGB
+					} else {
+						// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
+						canvas.drawColor(0xff000000);	// ARGB
 					}
 				} finally {
 					mMaskSurface.unlockCanvasAndPost(canvas);
