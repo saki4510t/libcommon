@@ -188,14 +188,14 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 
 		@WorkerThread
 		@Override
-		protected Object processRequest(final int request,
+		protected Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
 
 			Object result = null;
 			if (request == REQUEST_UPDATE_OVERLAY) {
 				handleUpdateOverlay(arg1, (Bitmap)obj);
 			} else {
-				result = super.processRequest(request, arg1, arg2, obj);
+				result = super.handleRequest(request, arg1, arg2, obj);
 			}
 			return result;
 		}

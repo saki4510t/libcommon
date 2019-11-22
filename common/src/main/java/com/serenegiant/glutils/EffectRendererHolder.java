@@ -452,7 +452,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 
 		@WorkerThread
 		@Override
-		protected Object processRequest(final int request,
+		protected Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
 
 			Object result = null;
@@ -464,7 +464,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				handleSetParam(arg1, (float[])obj);
 				break;
 			default:
-				result = super.processRequest(request, arg1, arg2, obj);
+				result = super.handleRequest(request, arg1, arg2, obj);
 				break;
 			}
 			return result;

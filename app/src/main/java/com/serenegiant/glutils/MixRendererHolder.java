@@ -307,21 +307,21 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		}
 		
 		@Override
-		protected void handleDrawTargets() {
+		protected void handleDrawTargets(final int texId, @NonNull final float[] texMatrix) {
 			if (mIsFirstFrameRendered) {
-				super.handleDrawTargets();
+				super.handleDrawTargets(texId, texMatrix);
 			}
 		}
 		
 		@Override
-		protected Object processRequest(final int request,
+		protected Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
 
 			Object result = null;
 			if (request == REQUEST_SET_MASK) {
 				handleSetMask((Bitmap)obj);
 			} else {
-				result = super.processRequest(request, arg1, arg2, obj);
+				result = super.handleRequest(request, arg1, arg2, obj);
 			}
 
 			return result;
