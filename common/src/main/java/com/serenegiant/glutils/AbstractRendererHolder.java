@@ -467,9 +467,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	
 	protected void notifyCapture() {
 //		if (DEBUG) Log.v(TAG, "notifyCapture:");
-		synchronized (mCaptureTask) {
+		synchronized (mSync) {
 			// キャプチャタスクに映像が更新されたことを通知
-			mCaptureTask.notify();
+			mSync.notify();
 		}
 	}
 
