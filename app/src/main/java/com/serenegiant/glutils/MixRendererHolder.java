@@ -221,6 +221,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 				GLES20.glUniform1i(msTexture1, 0);
 
+				// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
 				mTexId2 = GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1,
 					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
@@ -237,7 +238,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId2);
 				GLES20.glUniform1i(msTexture2, 1);
-
+				// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
 				mMaskTexId = GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE2,
 					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
