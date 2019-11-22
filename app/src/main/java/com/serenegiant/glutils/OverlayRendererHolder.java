@@ -91,6 +91,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	}
 
 	public void setOverlay(final int id, @Nullable final Bitmap overlay) {
+		if (DEBUG) Log.v(TAG, "setOverlay:" + overlay);
 		((MyRendererTask)mRendererTask).setOverlay(id, overlay);
 	}
 
@@ -148,6 +149,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			super.internalOnStart();
 			if (DEBUG) Log.v(TAG, "internalOnStart:" + mDrawer);
 			if (mDrawer instanceof IShaderDrawer2d) {
+				if (DEBUG) Log.v(TAG, "internalOnStart:init overlay texture");
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
 				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
 				final int sTex1 = drawer.glGetUniformLocation("sTexture");
