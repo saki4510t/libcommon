@@ -56,9 +56,9 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 		final IRendererHolder rendererHolder = getRendererHolder();
 		if (rendererHolder instanceof OverlayRendererHolder) {
 			((OverlayRendererHolder)getRendererHolder()).setOverlay(0,
-				BitmapHelper.getMaskImage0(
+				BitmapHelper.genMaskImage(0,
 					DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
-					 60, 16, 127));
+					60, 0, 100));
 		}
 	}
 
