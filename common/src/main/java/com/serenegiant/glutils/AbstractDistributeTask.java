@@ -15,7 +15,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.IRendererCommon.*;
 
 public abstract class AbstractDistributeTask {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDistributeTask.class.getSimpleName();
 
 	protected static final int REQUEST_DRAW = 1;
@@ -54,8 +54,7 @@ public abstract class AbstractDistributeTask {
 	}
 
 	public void requestFrame() {
-		isFirstFrameRendered = true;
-		mHasNewFrame = true;
+		mHasNewFrame = isFirstFrameRendered = true;
 		offer(REQUEST_DRAW, 0, 0, null);
 	}
 

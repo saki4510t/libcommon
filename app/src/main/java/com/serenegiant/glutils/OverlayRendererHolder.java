@@ -37,7 +37,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 public class OverlayRendererHolder extends AbstractRendererHolder {
-	private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = OverlayRendererHolder.class.getSimpleName();
 
 	/**

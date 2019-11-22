@@ -298,13 +298,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		}
 		
 		@Override
-		protected void handleDrawTargets(final int texId, @NonNull final float[] texMatrix) {
-			if (mIsFirstFrameRendered) {
-				super.handleDrawTargets(texId, texMatrix);
-			}
-		}
-
-		@Override
 		protected void handleResize(final int width, final int height) {
 			super.handleResize(width, height);
 			if (DEBUG) Log.v(TAG, String.format("handleResize:(%dx%d)", width, height));
@@ -357,6 +350,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
+			requestFrame();
 			if (DEBUG) Log.v(TAG, "handleSetMask:finished");
 		}
 
@@ -375,8 +369,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //				if (DEBUG) Log.v(TAG, "onFrameAvailable:" + surfaceTexture);
-				// 前の描画要求が残っていたらクリアする
-				removeRequest(REQUEST_DRAW);
 				requestFrame();
 				if (DEBUG && (((++cnt) % 100) == 0)) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
