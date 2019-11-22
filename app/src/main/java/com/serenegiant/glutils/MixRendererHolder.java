@@ -157,7 +157,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 * OnFrameAvailable呼び出し用のHandler
 		 */
 		private Handler mAsyncHandler;
-		private volatile boolean mIsFirstFrameRendered;
 
 		public MixRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
@@ -239,7 +238,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
 				GLES20.glUniform1i(uTex3, 2);
 			}
-			mIsFirstFrameRendered = false;
 		}
 		
 		@Override
@@ -288,13 +286,11 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		@Override
 		protected void handleUpdateTexture() {
 			super.handleUpdateTexture();
-			if (mIsFirstFrameRendered) {
-				mMasterTexture2.updateTexImage();
-				mMasterTexture2.getTransformMatrix(mTexMatrix2);
+			mMasterTexture2.updateTexImage();
+			mMasterTexture2.getTransformMatrix(mTexMatrix2);
 				
-				mMaskTexture.updateTexImage();
-				mMaskTexture.getTransformMatrix(mMaskTexMatrix);
-			}
+			mMaskTexture.updateTexImage();
+			mMaskTexture.getTransformMatrix(mMaskTexMatrix);
 		}
 		
 		@Override
@@ -354,11 +350,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			if (DEBUG) Log.v(TAG, "handleSetMask:finished");
 		}
 
-		public void requestFrame() {
-			super.requestFrame();
-			mIsFirstFrameRendered = true;
-		}
-
 		private int cnt;
 		/**
 		 * SurfaceTextureでアルファブレンド用映像を受け取った際のコールバックリスナー
@@ -368,7 +359,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-//				if (DEBUG) Log.v(TAG, "onFrameAvailable:" + surfaceTexture);
 				requestFrame();
 				if (DEBUG && (((++cnt) % 100) == 0)) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);

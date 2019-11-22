@@ -28,8 +28,6 @@ import android.view.Surface;
 
 import com.serenegiant.glutils.es2.GLHelper;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -123,7 +121,6 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		private int mOverlayTexId;
 		private SurfaceTexture mOverlayTexture;
 		private Surface mOverlaySurface;
-		private AtomicInteger mOverlayChanged = new AtomicInteger(0);
 
 		public OverlayRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
@@ -209,11 +206,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Override
 		protected void handleUpdateTexture() {
 			super.handleUpdateTexture();
-			if (mOverlayChanged.getAndDecrement() > 0) {
-				if (DEBUG) Log.v(TAG, "handleUpdateTexture:update overlay texture");
-				mOverlayTexture.updateTexImage();
-				mOverlayTexture.getTransformMatrix(mTexMatrixOverlay);
-			}
+			mOverlayTexture.updateTexImage();
+			mOverlayTexture.getTransformMatrix(mTexMatrixOverlay);
 		}
 
 		@Override
@@ -250,7 +244,6 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 				Log.w(TAG, e);
 			}
 			GLES20.glFlush();
-			mOverlayChanged.incrementAndGet();
 			requestFrame();
 		}
 	}
