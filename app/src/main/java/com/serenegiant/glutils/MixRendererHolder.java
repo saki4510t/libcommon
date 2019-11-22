@@ -202,7 +202,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		}
 
 		public void setMask(@Nullable final Bitmap mask) {
-			if (DEBUG) Log.v(TAG, "setMask:");
+			if (DEBUG) Log.v(TAG, "setMask:" + mask);
 			checkFinished();
 			offer(REQUEST_SET_MASK, 0, 0, mask);
 		}
@@ -343,18 +343,18 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		/**
 		 * マスク用のBitmapをセットする
 		 * Bitmapがnullの時はα=1で全面を塗りつぶす(見えるように赤)
-		 * @param bitmap
+		 * @param mask
 		 */
-		protected void handleSetMask(@Nullable final Bitmap bitmap) {
-			if (DEBUG) Log.v(TAG, "handleSetMask:");
+		protected void handleSetMask(@Nullable final Bitmap mask) {
+			if (DEBUG) Log.v(TAG, "handleSetMask:" + mask);
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
 			try {
 				final Canvas canvas = mMaskSurface.lockCanvas(null);
 				try {
-					if (bitmap != null) {
-						canvas.drawBitmap(bitmap, 0, 0, null);
 					} else {
+					if (mask != null) {
+						canvas.drawBitmap(mask, 0, 0, null);
 						canvas.drawColor(0x7fff0000);	// ARGB
 					}
 				} finally {
