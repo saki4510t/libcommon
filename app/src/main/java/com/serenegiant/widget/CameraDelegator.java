@@ -29,7 +29,7 @@ import androidx.annotation.WorkerThread;
  * カメラプレビュー処理の委譲クラス
  */
 public abstract class CameraDelegator {
-	private static final boolean DEBUG = true; // TODO set false on release
+	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = CameraDelegator.class.getSimpleName();
 
 	public static final int SCALE_STRETCH_FIT = 0;
@@ -362,7 +362,7 @@ public abstract class CameraDelegator {
 				int[] max_fps = null;
 				for (int i = n - 1; i >= 0; i--) {
 					final int[] range = supportedFpsRange.get(i);
-					Log.i(TAG, String.format("handleStartPreview:supportedFpsRange(%d)=(%d,%d)", i, range[0], range[1]));
+					if (DEBUG) Log.v(TAG, String.format("handleStartPreview:supportedFpsRange(%d)=(%d,%d)", i, range[0], range[1]));
 					if ((range[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= range[1])) {
 						max_fps = range;
 						break;
@@ -372,7 +372,6 @@ public abstract class CameraDelegator {
 					// 見つからなかったときは一番早いフレームレートを選択
 					max_fps = supportedFpsRange.get(supportedFpsRange.size() - 1);
 				}
-				Log.i(TAG, String.format("handleStartPreview:found fps:%d-%d", max_fps[0], max_fps[1]));
 				params.setPreviewFpsRange(max_fps[0], max_fps[1]);
 				params.setRecordingHint(true);
 				// request closest supported preview size
@@ -388,7 +387,8 @@ public abstract class CameraDelegator {
 				camera.setParameters(params);
 				// get the actual preview size
 				final Camera.Size previewSize = camera.getParameters().getPreviewSize();
-				Log.i(TAG, String.format("handleStartPreview(%d, %d)", previewSize.width, previewSize.height));
+				Log.d(TAG, String.format("handleStartPreview(%d, %d),fps%d-%d",
+					previewSize.width, previewSize.height, max_fps[0], max_fps[1]));
 				// adjust view size with keeping the aspect ration of camera preview.
 				// here is not a UI thread and we should request parent view to execute.
 				mView.post(new Runnable() {
