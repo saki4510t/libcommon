@@ -13,7 +13,6 @@ import com.serenegiant.glutils.RenderHolderCallback;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.serenegiant.glutils.AbstractDistributeTask.*;
 import static com.serenegiant.glutils.IRendererCommon.*;
 
 /**
@@ -227,7 +226,7 @@ public class Distributor implements IPipeline {
 	 * 分配描画用Surface全てが更新されるので注意
 	 */
 	public void requestFrame() {
-		mRendererTask.offer(REQUEST_DRAW);
+		mRendererTask.requestFrame();
 	}
 
 	/**
@@ -245,8 +244,7 @@ public class Distributor implements IPipeline {
 		= new VideoSource.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-			mRendererTask.isFirstFrameRendered = true;
-			mRendererTask.offer(REQUEST_DRAW, 0, 0, null);
+			mRendererTask.requestFrame();
 		}
 	} ;
 
@@ -382,6 +380,11 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
+		public EGLBase.IContext getContext() {
+			return mEglTask.getContext();
+		}
+
+		@Override
 		public void makeCurrent() {
 			mEglTask.makeCurrent();
 		}
@@ -392,6 +395,11 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
+		public boolean isMasterSurfaceValid() {
+			return true;
+		}
+
+		@Override
 		public int getTexId() {
 			return mParent.mSource.getTexId();
 		}
@@ -399,6 +407,21 @@ public class Distributor implements IPipeline {
 		@Override
 		public float[] getTexMatrix() {
 			return mParent.mSource.getTexMatrix();
+		}
+
+		@Override
+		protected void handleReCreateMasterSurface() {
+
+		}
+
+		@Override
+		protected void handleReleaseMasterSurface() {
+
+		}
+
+		@Override
+		protected void handleUpdateTexture() {
+
 		}
 
 		@Override

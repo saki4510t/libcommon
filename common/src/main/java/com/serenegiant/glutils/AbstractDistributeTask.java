@@ -1,5 +1,6 @@
 package com.serenegiant.glutils;
 
+import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
@@ -17,15 +18,17 @@ public abstract class AbstractDistributeTask {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = AbstractDistributeTask.class.getSimpleName();
 
-	public static final int REQUEST_DRAW = 1;
-	public static final int REQUEST_ADD_SURFACE = 3;
-	public static final int REQUEST_REMOVE_SURFACE = 4;
-	public static final int REQUEST_REMOVE_SURFACE_ALL = 12;
-	public static final int REQUEST_MIRROR = 6;
-	public static final int REQUEST_ROTATE = 7;
-	public static final int REQUEST_CLEAR = 8;
-	public static final int REQUEST_CLEAR_ALL = 9;
-	public static final int REQUEST_SET_MVP = 10;
+	protected static final int REQUEST_DRAW = 1;
+	protected static final int REQUEST_UPDATE_SIZE = 2;
+	protected static final int REQUEST_ADD_SURFACE = 3;
+	protected static final int REQUEST_REMOVE_SURFACE = 4;
+	protected static final int REQUEST_REMOVE_SURFACE_ALL = 12;
+	protected static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
+	protected static final int REQUEST_MIRROR = 6;
+	protected static final int REQUEST_ROTATE = 7;
+	protected static final int REQUEST_CLEAR = 8;
+	protected static final int REQUEST_CLEAR_ALL = 9;
+	protected static final int REQUEST_SET_MVP = 10;
 
 	@NonNull
 	private final SparseArray<IRendererTarget>
@@ -34,7 +37,8 @@ public abstract class AbstractDistributeTask {
 	@IRendererCommon.MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
-	public volatile boolean isFirstFrameRendered;
+	private volatile boolean isFirstFrameRendered;
+	private volatile boolean mHasNewFrame;
 
 	protected IDrawer2D mDrawer;
 
@@ -47,6 +51,12 @@ public abstract class AbstractDistributeTask {
 
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+	}
+
+	public void requestFrame() {
+		isFirstFrameRendered = true;
+		mHasNewFrame = true;
+		offer(REQUEST_DRAW, 0, 0, null);
 	}
 
 	/**
@@ -227,6 +237,22 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	/**
+	 * リサイズ
+	 * @param width
+	 * @param height
+	 */
+	public void resize(final int width, final int height)
+		throws IllegalStateException {
+
+		checkFinished();
+		if ( ((width > 0) && (height > 0))
+			&& ((mVideoWidth != width) || (mVideoHeight != height)) ) {
+
+			offer(REQUEST_UPDATE_SIZE, width, height);
+		}
+	}
+
 	public void mirror(final int mirror) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
@@ -305,6 +331,9 @@ public abstract class AbstractDistributeTask {
 		case REQUEST_DRAW:
 			handleDraw();
 			break;
+		case REQUEST_UPDATE_SIZE:
+			handleResize(arg1, arg2);
+			break;
 		case REQUEST_ADD_SURFACE:
 			handleAddSurface(arg1, obj, arg2);
 			break;
@@ -313,6 +342,9 @@ public abstract class AbstractDistributeTask {
 			break;
 		case REQUEST_REMOVE_SURFACE_ALL:
 			handleRemoveAll();
+			break;
+		case REQUEST_RECREATE_MASTER_SURFACE:
+			handleReCreateMasterSurface();
 			break;
 		case REQUEST_MIRROR:
 			handleMirror(arg1);
@@ -341,9 +373,27 @@ public abstract class AbstractDistributeTask {
 	protected void handleDraw() {
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
+		if (!isMasterSurfaceValid()) {
+			Log.e(TAG, "handleDraw:invalid master surface");
+			offer(REQUEST_RECREATE_MASTER_SURFACE);
+			return;
+		}
+
 		if (isFirstFrameRendered) {
+			try {
+				makeCurrent();
+				if (mHasNewFrame) {
+					mHasNewFrame = false;
+					handleUpdateTexture();
+				}
+			} catch (final Exception e) {
+				Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
+				offer(REQUEST_RECREATE_MASTER_SURFACE);
+				return;
+			}
 			handleDrawTargets(getTexId(), getTexMatrix());
 		}
+
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 		makeCurrent();
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
@@ -388,6 +438,19 @@ public abstract class AbstractDistributeTask {
 
 //		if (DEBUG) Log.v(TAG, "onDrawTarget:");
 		target.draw(mDrawer, texId, texMatrix);
+	}
+
+	/**
+	 * 映像サイズをリサイズ
+	 * @param width
+	 * @param height
+	 */
+	@SuppressLint("NewApi")
+	@WorkerThread
+	protected void handleResize(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
+		mVideoWidth = width;
+		mVideoHeight = height;
 	}
 
 	/**
@@ -608,10 +671,28 @@ public abstract class AbstractDistributeTask {
 	public abstract void removeRequest(final int request);
 
 	public abstract EGLBase getEgl();
+	public abstract EGLBase.IContext getContext();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
+
+	public abstract boolean isMasterSurfaceValid();
 	public abstract int getTexId();
 	public abstract float[] getTexMatrix();
+	/**
+	 * マスターSurfaceを再生成する
+	 */
+	@WorkerThread
+	protected abstract void handleReCreateMasterSurface();
+	/**
+	 * マスターSurfaceを破棄する
+	 */
+	@WorkerThread
+	protected abstract void handleReleaseMasterSurface();
+	/**
+	 * テクスチャを更新
+	 */
+	@WorkerThread
+	protected abstract void handleUpdateTexture();
 
 	public abstract void notifyParent(final boolean isRunning);
 	public abstract void callOnFrameAvailable();
