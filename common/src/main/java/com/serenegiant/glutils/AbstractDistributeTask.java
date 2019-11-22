@@ -34,7 +34,7 @@ public abstract class AbstractDistributeTask {
 	@IRendererCommon.MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
-	private volatile boolean mIsFirstFrameRendered;
+	public volatile boolean isFirstFrameRendered;
 
 	protected IDrawer2D mDrawer;
 
@@ -170,24 +170,33 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 * @param color
 	 */
-	public void clearSurface(final int id, final int color) {
+	public void clearSurface(final int id, final int color)
+		throws IllegalStateException {
+
 		if (DEBUG) Log.v(TAG, "clearSurface:" + id + ",cl=" + color);
 		checkFinished();
 		offer(REQUEST_CLEAR, id, color);
 	}
 
-	public void clearSurfaceAll(final int color) {
+	public void clearSurfaceAll(final int color)
+		throws IllegalStateException {
+
 		if (DEBUG) Log.v(TAG, "clearSurfaceAll:" + color);
 		checkFinished();
 		offer(REQUEST_CLEAR_ALL, color);
 	}
 
 	public void setMvpMatrix(final int id,
-		final int offset, @NonNull final float[] matrix) {
+		final int offset, @NonNull final float[] matrix)
+			throws IllegalStateException, IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "setMvpMatrix:" + id);
 		checkFinished();
-		offer(REQUEST_SET_MVP, id, offset, matrix);
+		if (matrix.length >= offset + 16) {
+			offer(REQUEST_SET_MVP, id, offset, matrix);
+		} else {
+			throw new IllegalArgumentException("matrix is too small, should be longer than offset + 16");
+		}
 	}
 
 	public boolean isEnabled(final int id) {
@@ -218,7 +227,7 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
-	public void mirror(final int mirror) {
+	public void mirror(final int mirror) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
 		if (mMirror != mirror) {
@@ -253,29 +262,23 @@ public abstract class AbstractDistributeTask {
 //		if (DEBUG) Log.v(TAG, "handleOnStart:finished");
 	}
 
+	@WorkerThread
+	protected void internalOnStart() {
+		if (DEBUG) Log.v(TAG, "internalOnStart:");
+		mDrawer = createDrawer(isGLES3());
+	}
+
 	/**
 	 * ワーカースレッド終了時の処理(ここはまだワーカースレッド上)
 	 */
 	@WorkerThread
-	protected void handleOnStop() {
+	protected final void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "onStop");
 		notifyParent(false);
 		makeCurrent();
 		internalOnStop();
 		handleRemoveAll();
 //		if (DEBUG) Log.v(TAG, "onStop:finished");
-	}
-
-	protected boolean handleOnError(final Exception e) {
-		if (DEBUG) Log.v(TAG, "handleOnError:" + e);
-		if (DEBUG) Log.w(TAG, e);
-		return false;
-	}
-
-	@WorkerThread
-	protected void internalOnStart() {
-		if (DEBUG) Log.v(TAG, "internalOnStart:");
-		mDrawer = createDrawer(isGLES3());
 	}
 
 	@WorkerThread
@@ -288,10 +291,16 @@ public abstract class AbstractDistributeTask {
 	}
 
 	@WorkerThread
+	protected boolean handleOnError(final Exception e) {
+		if (DEBUG) Log.w(TAG, e);
+		return false;
+	}
+
+	@WorkerThread
 	protected Object handleRequest(final int request,
 		final int arg1, final int arg2, final Object obj) {
 
-		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
+//		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
 		switch (request) {
 		case REQUEST_DRAW:
 			handleDraw();
@@ -318,47 +327,40 @@ public abstract class AbstractDistributeTask {
 			handleClearAll(arg1);
 			break;
 		case REQUEST_SET_MVP:
-			handleSetMvp(arg1, arg2, obj);
+			handleSetMvp(arg1, arg2, (float[])obj);
 			break;
 		}
 		return null;
 	}
 
+//	private int drawCnt;
 	/**
 	 * 実際の描画処理
 	 */
 	@WorkerThread
 	protected void handleDraw() {
-		if (DEBUG) Log.v(TAG, "handleDraw:");
+//		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
-		if (mIsFirstFrameRendered) {
-			preprocess();
-			handleDrawTargets();
+		if (isFirstFrameRendered) {
+			handleDrawTargets(getTexId(), getTexMatrix());
 		}
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 		makeCurrent();
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-//		GLES20.glFlush();	// これなくても良さそう
-		if (mIsFirstFrameRendered) {
+		GLES20.glFlush();	// これなくても良さそう?
+		if (isFirstFrameRendered) {
 			callOnFrameAvailable();
 		}
-	}
-
-	@WorkerThread
-	protected void preprocess() {
-		if (DEBUG) Log.v(TAG, "preprocess:");
 	}
 
 	/**
 	 * 各Surfaceへ描画する
 	 */
 	@WorkerThread
-	protected void handleDrawTargets() {
-		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
+	protected void handleDrawTargets(final int texId, @NonNull final float[] texMatrix) {
+//		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
-			final int texId = getTexId();
-			final float[] texMatrix = getTexMatrix();
 			for (int i = n - 1; i >= 0; i--) {
 				final IRendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && target.canDraw()) {
@@ -382,9 +384,9 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void onDrawTarget(@NonNull final IRendererTarget target,
-		final int texId, final float[] texMatrix) {
+		final int texId, @NonNull final float[] texMatrix) {
 
-		if (DEBUG) Log.v(TAG, "onDrawTarget:");
+//		if (DEBUG) Log.v(TAG, "onDrawTarget:");
 		target.draw(mDrawer, texId, texMatrix);
 	}
 
@@ -398,7 +400,7 @@ public abstract class AbstractDistributeTask {
 	protected void handleAddSurface(final int id,
 		final Object surface, final int maxFps) {
 
-		if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
+		if (DEBUG) Log.v(TAG, "handleAddSurface:" + id);
 		checkTarget();
 		synchronized (mTargets) {
 			IRendererTarget target = mTargets.get(id);
@@ -426,9 +428,10 @@ public abstract class AbstractDistributeTask {
 	 * @param maxFps
 	 * @return
 	 */
+	@NonNull
 	protected IRendererTarget createRendererTarget(final int id,
 		@NonNull final EGLBase egl,
-		final Object surface, final int maxFps) {
+		@NonNull final Object surface, final int maxFps) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTarget:" + id);
 		return RendererTarget.newInstance(getEgl(), surface, maxFps);
@@ -475,7 +478,7 @@ public abstract class AbstractDistributeTask {
 			mTargets.clear();
 			mTargets.notifyAll();
 		}
-//		if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
+		if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 	}
 
 	/**
@@ -541,16 +544,13 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleSetMvp(final int id,
-		final int offset, final Object mvp) {
+		final int offset, @NonNull final float[] mvp) {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
-		if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
-			final float[] array = (float[])mvp;
-			synchronized (mTargets) {
-				final IRendererTarget target = mTargets.get(id);
-				if ((target != null) && target.isValid()) {
-					System.arraycopy(array, offset, target.getMvpMatrix(), 0, 16);
-				}
+		synchronized (mTargets) {
+			final IRendererTarget target = mTargets.get(id);
+			if ((target != null) && target.isValid()) {
+				System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
 			}
 		}
 	}
