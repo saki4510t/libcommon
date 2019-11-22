@@ -36,7 +36,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * ...色はuniform変数で渡す方がいいかも
  */
 public class EffectRendererHolder extends AbstractRendererHolder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = EffectRendererHolder.class.getSimpleName();
 
 	private static final int MAX_PARAM_NUM = 18;
@@ -295,6 +295,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
 	@Override
@@ -303,6 +304,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
+		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
 	}
@@ -325,6 +327,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @return
 	 */
 	public int getCurrentEffect() {
+		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + ((MyRendererTask)mRendererTask).mEffect);
 		return ((MyRendererTask)mRendererTask).mEffect;
 	}
 
@@ -389,9 +392,11 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 			
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
+			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 
 		public void changeEffect(final int effect) {
+			if (DEBUG) Log.v(TAG, "MyRendererTask#changeEffect:" + effect);
 			checkFinished();
 			if (mEffect != effect) {
 				offer(REQUEST_CHANGE_EFFECT, effect);
@@ -399,6 +404,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		}
 
 		public void setParams(final int effect, @NonNull final float[] params) {
+			if (DEBUG) Log.v(TAG, "MyRendererTask#setParams:" + effect);
 			checkFinished();
 			offer(REQUEST_SET_PARAMS, effect, 0, params);
 		}
@@ -414,7 +420,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		@Override
 		protected void internalOnStart() {
 			super.internalOnStart();
-//			if (DEBUG) Log.v(TAG, "internalOnStart:");
+			if (DEBUG) Log.v(TAG, "MyRendererTask#internalOnStart:");
 			mParams.clear();
 			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
@@ -470,6 +476,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		 */
 		@WorkerThread
 		protected void handleChangeEffect(final int effect) {
+			if (DEBUG) Log.v(TAG, "MyRendererTask#handleChangeEffect:" + effect);
 			mEffect = effect;
 			if (mDrawer instanceof IShaderDrawer2d) {
 				final IShaderDrawer2d drawer = (IShaderDrawer2d) mDrawer;
@@ -523,7 +530,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				muParamsLoc = drawer.glGetUniformLocation("uParams");
 				mCurrentParams = mParams.get(effect);
 				updateParams();
-			}
+			} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is not IShaderDrawer2d");
 		}
 		
 		/**
@@ -533,6 +540,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		 */
 		@WorkerThread
 		private void handleSetParam(final int effect, @NonNull final float[] params) {
+			if (DEBUG) Log.v(TAG, "MyRendererTask#handleSetParam:" + effect);
 			if ((effect < EFFECT_NON) || (mEffect == effect)) {
 				mCurrentParams = params;
 				mParams.put(mEffect, params);
@@ -547,12 +555,13 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		 */
 		@WorkerThread
 		private void updateParams() {
+			if (DEBUG) Log.v(TAG, "MyRendererTask#updateParams:");
 			final int n = Math.min(mCurrentParams != null
 				? mCurrentParams.length : 0, MAX_PARAM_NUM);
 			if ((muParamsLoc >= 0) && (n > 0)) {
 				if (mDrawer instanceof IShaderDrawer2d) {
 					((IShaderDrawer2d)mDrawer).glUseProgram();
-				}
+				} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is not IShaderDrawer2d");
 				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 			}
 		}

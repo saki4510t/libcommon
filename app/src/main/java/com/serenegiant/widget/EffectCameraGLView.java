@@ -20,6 +20,7 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 
 import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.IRendererHolder;
@@ -52,10 +53,12 @@ public final class EffectCameraGLView extends AbstractCameraGLView {
 	protected IRendererHolder createRendererHolder(final int width, final int height,
 		final RenderHolderCallback callback) {
 
+		if (DEBUG) Log.v(TAG, "createRendererHolder:");
 		return new EffectRendererHolder(width, height, callback);
 	}
 
 	public void setEffect(final int effect) {
+		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if ((effect >= 0) && (effect < EffectRendererHolder.EFFECT_NUM)) {
 			post(new Runnable() {
 				@Override
@@ -71,6 +74,7 @@ public final class EffectCameraGLView extends AbstractCameraGLView {
 
 	public int getEffect() {
 		final IRendererHolder rendererHolder = getRendererHolder();
+		if (DEBUG) Log.v(TAG, "getEffect:" + rendererHolder);
 		return rendererHolder instanceof EffectRendererHolder
 			? ((EffectRendererHolder) rendererHolder).getCurrentEffect() : 0;
 	}
