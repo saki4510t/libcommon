@@ -86,13 +86,13 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
-		return new MyRendererTask(this, width, height,
+		return new OverlayRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
 	}
 
 	public void setOverlay(final int id, @Nullable final Bitmap overlay) {
 		if (DEBUG) Log.v(TAG, "setOverlay:" + overlay);
-		((MyRendererTask)mRendererTask).setOverlay(id, overlay);
+		((OverlayRendererTask)mRendererTask).setOverlay(id, overlay);
 	}
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
@@ -115,7 +115,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	/**
 	 * 描画タスク
 	 */
-	private class MyRendererTask extends BaseRendererTask {
+	private class OverlayRendererTask extends BaseRendererTask {
 
 		private final float[] mTexMatrixOverlay = new float[16];
 		private int mOverlayTexId;
@@ -123,13 +123,13 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		private Surface mOverlaySurface;
 		private volatile boolean mOverlayChanged;
 
-		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
+		public OverlayRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
 			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
-			if (DEBUG) Log.v(TAG, String.format("MyRendererTask(%dx%d)", width, height));
+			if (DEBUG) Log.v(TAG, String.format("OverlayRendererTask(%dx%d)", width, height));
 		}
 
 		public void setOverlay(final int id, @Nullable final Bitmap overlay) {

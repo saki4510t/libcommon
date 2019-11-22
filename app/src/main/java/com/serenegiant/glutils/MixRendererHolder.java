@@ -81,7 +81,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @return
 	 */
 	public Surface getSurface2() {
-		return ((MyRendererTask)mRendererTask).getSurface2();
+		return ((MixRendererTask)mRendererTask).getSurface2();
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @return
 	 */
 	public SurfaceTexture getSurfaceTexture2() {
-		return ((MyRendererTask)mRendererTask).getSurfaceTexture2();
+		return ((MixRendererTask)mRendererTask).getSurfaceTexture2();
 	}
 
 	/**
@@ -97,7 +97,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @param bitmap
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
-		((MyRendererTask)mRendererTask).setMask(bitmap);
+		((MixRendererTask)mRendererTask).setMask(bitmap);
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
-		return new MyRendererTask(this, width, height,
+		return new MixRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags);
 	}
 
@@ -142,7 +142,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	/**
 	 * 描画タスク
 	 */
-	private final class MyRendererTask extends BaseRendererTask {
+	private final class MixRendererTask extends BaseRendererTask {
 		private final float[] mTexMatrix2 = new float[16];
 		private int mTexId2;
 		private SurfaceTexture mMasterTexture2;
@@ -156,14 +156,14 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		private Handler mAsyncHandler;
 		private volatile boolean mIsFirstFrameRendered;
 
-		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
+		public MixRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
 			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
 			mAsyncHandler = HandlerThreadHandler.createHandler("OnFrameAvailable");
-			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
+			if (DEBUG) Log.v(TAG, "MixRendererTask#コンストラクタ:");
 		}
 
 		/**
