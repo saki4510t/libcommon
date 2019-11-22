@@ -666,6 +666,7 @@ public abstract class AbstractDistributeTask {
 	public abstract boolean isFinished();
 	public abstract boolean offer(final int request);
 	public abstract boolean offer(final int request, final Object obj);
+	public abstract boolean offer(final int request, final int arg1);
 	public abstract boolean offer(final int request, final int arg1, final int arg2);
 	public abstract boolean offer(final int request, final int arg1, final int arg2, final Object obj);
 	public abstract void removeRequest(final int request);

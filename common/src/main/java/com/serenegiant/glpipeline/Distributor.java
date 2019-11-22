@@ -360,6 +360,11 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
+		public boolean offer(final int request, final int arg1) {
+			return mEglTask.offer(request, arg1);
+		}
+
+		@Override
 		public boolean offer(final int request, final int arg1, final int arg2) {
 			return mEglTask.offer(request, arg1, arg2);
 		}
