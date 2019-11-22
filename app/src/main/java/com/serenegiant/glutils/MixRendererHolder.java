@@ -312,7 +312,19 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				super.handleDrawTargets(texId, texMatrix);
 			}
 		}
-		
+
+		@Override
+		protected void handleResize(final int width, final int height) {
+			super.handleResize(width, height);
+			if (DEBUG) Log.v(TAG, String.format("handleResize:(%dx%d)", width, height));
+			if (mMasterTexture2 != null) {
+				mMasterTexture2.setDefaultBufferSize(width(), height());
+			}
+			if (mMaskTexture != null) {
+				mMaskTexture.setDefaultBufferSize(width(), height());
+			}
+		}
+
 		@Override
 		protected Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {

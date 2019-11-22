@@ -212,6 +212,15 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			}
 		}
 
+		@Override
+		protected void handleResize(final int width, final int height) {
+			super.handleResize(width, height);
+			if (DEBUG) Log.v(TAG, String.format("handleResize:(%dx%d)", width, height));
+			if (mOverlayTexture != null) {
+				mOverlayTexture.setDefaultBufferSize(width(), height());
+			}
+		}
+
 		@SuppressLint("NewApi")
 		@WorkerThread
 		private void handleUpdateOverlay(final int targetId, @NonNull final Bitmap overlay) {
