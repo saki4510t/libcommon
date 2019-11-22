@@ -153,6 +153,9 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		private SurfaceTexture mMaskTexture;
 		private Surface mMaskSurface;
 
+		/**
+		 * OnFrameAvailable呼び出し用のHandler
+		 */
 		private Handler mAsyncHandler;
 		private volatile boolean mIsFirstFrameRendered;
 
@@ -162,7 +165,9 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
 			super(parent, width, height, maxClientVersion, sharedContext, flags);
-			mAsyncHandler = HandlerThreadHandler.createHandler("OnFrameAvailable");
+			if (BuildCheck.isAndroid5()) {
+				mAsyncHandler = HandlerThreadHandler.createHandler("OnFrameAvailable");
+			}
 			if (DEBUG) Log.v(TAG, "MixRendererTask#コンストラクタ:");
 		}
 
@@ -196,15 +201,15 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			if (DEBUG) Log.v(TAG, "internalOnStart:");
 			super.internalOnStart();
 			if (mDrawer instanceof IShaderDrawer2d) {
+				if (DEBUG) Log.v(TAG, String.format("internalOnStart:init mix texture(%dx%d)",
+					width(), height()));
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
 				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
-				final int msTexture1 = drawer.glGetUniformLocation("sTexture");
-				final int msTexture2 = drawer.glGetUniformLocation("sTexture2");
-				final int msTexture3 = drawer.glGetUniformLocation("sTexture3");
-
-				GLES20.glUniform1i(msTexture1, 0);
+				final int uTex1 = drawer.glGetUniformLocation("sTexture");
+				GLES20.glUniform1i(uTex1, 0);
 
 				// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
+				final int uTex2 = drawer.glGetUniformLocation("sTexture2");
 				mTexId2 = GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1,
 					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
@@ -220,8 +225,10 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				}
 				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId2);
-				GLES20.glUniform1i(msTexture2, 1);
+				GLES20.glUniform1i(uTex2, 1);
+
 				// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
+				final int uTex3 = drawer.glGetUniformLocation("sTexture3");
 				mMaskTexId = GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE2,
 					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
@@ -230,7 +237,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				mMaskSurface = new Surface(mMaskTexture);
 				GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-				GLES20.glUniform1i(msTexture3, 2);
+				GLES20.glUniform1i(uTex3, 2);
 			}
 			mIsFirstFrameRendered = false;
 		}
@@ -354,8 +361,8 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		}
 
 		public void requestFrame() {
-			mIsFirstFrameRendered = true;
 			super.requestFrame();
+			mIsFirstFrameRendered = true;
 		}
 
 		private int cnt;

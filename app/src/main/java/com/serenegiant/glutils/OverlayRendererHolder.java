@@ -153,10 +153,10 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 					width(), height()));
 				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
 				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
-				final int sTex1 = drawer.glGetUniformLocation("sTexture");
-				GLES20.glUniform1i(sTex1, 0);
+				final int uTex1 = drawer.glGetUniformLocation("sTexture");
+				GLES20.glUniform1i(uTex1, 0);
 
-				final int sTex2 = drawer.glGetUniformLocation("sTexture2");
+				final int uTex2 = drawer.glGetUniformLocation("sTexture2");
 				mOverlayTexId = GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES,
 					GLES20.GL_TEXTURE1,
@@ -167,7 +167,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 				mOverlaySurface = new Surface(mOverlayTexture);
 				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-				GLES20.glUniform1i(sTex2, 1);
+				GLES20.glUniform1i(uTex2, 1);
 			}
 		}
 
