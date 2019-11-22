@@ -416,17 +416,17 @@ public class Distributor implements IPipeline {
 
 		@Override
 		protected void handleReCreateMasterSurface() {
-
+			// do nothing
 		}
 
 		@Override
 		protected void handleReleaseMasterSurface() {
-
+			// do nothing
 		}
 
 		@Override
 		protected void handleUpdateTexture() {
-
+			// do nothing
 		}
 
 		@Override
