@@ -20,6 +20,8 @@ package com.serenegiant.utils;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 public class Stacktrace {
 	private static final String TAG = "Stacktrace";
 
@@ -62,5 +64,25 @@ public class Stacktrace {
 			}
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * このメソッドの呼び出し元メソッドを呼び出したメソッドを文字列として返す
+	 * @return
+	 */
+	@NonNull
+	public static String callFrom() {
+		final Throwable t = new Throwable();
+		final StackTraceElement[] elms = t.getStackTrace();
+		int level = 0;
+		if (elms != null) {
+			for (final StackTraceElement elm: elms) {
+				if ((level > 1) && (elm != null)) {
+					return elm.toString();
+				}
+				level++;
+			}
+		}
+		return "unknown method";
 	}
 }
