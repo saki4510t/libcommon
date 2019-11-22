@@ -44,8 +44,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	private static final boolean DEBUG = false; // FIXME set false on production
 	private static final String TAG = MixRendererHolder.class.getSimpleName();
 	
-	private Handler mAsyncHandler;
-
 	/**
 	 * コンストラクタ
 	 * @param width
@@ -76,21 +74,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 		super(width, height, maxClientVersion, sharedContext, flags, callback);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
-	}
-
-	@Override
-	public synchronized void release() {
-		if (mAsyncHandler != null) {
-			try {
-				mAsyncHandler.removeCallbacksAndMessages(null);
-				mAsyncHandler.getLooper().quit();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-			mAsyncHandler = null;
-		}
-		super.release();
 	}
 
 	/**
@@ -367,13 +350,17 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			delayedDraw(1000);
 			if (DEBUG) Log.v(TAG, "handleSetMask:finished");
 		}
-	
+
+		public void requestFrame() {
+			mIsFirstFrameRendered = true;
+			super.requestFrame();
+		}
+
 		private int cnt;
 		/**
-		 * SurfaceTextureで映像を受け取った際のコールバックリスナー
+		 * SurfaceTextureでアルファブレンド用映像を受け取った際のコールバックリスナー
 		 */
 		private final SurfaceTexture.OnFrameAvailableListener
 			mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
@@ -383,36 +370,12 @@ public class MixRendererHolder extends AbstractRendererHolder {
 //				if (DEBUG) Log.v(TAG, "onFrameAvailable:" + surfaceTexture);
 				// 前の描画要求が残っていたらクリアする
 				removeRequest(REQUEST_DRAW);
-				mIsFirstFrameRendered = true;
-				offer(REQUEST_DRAW);
-				delayedDraw(60);
+				requestFrame();
 				if (DEBUG && (((++cnt) % 100) == 0)) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}
 			}
 		};
 	
-		private void delayedDraw(final long delayMs) {
-			synchronized (MixRendererHolder.this) {
-				if (mAsyncHandler != null) {
-					try {
-						mAsyncHandler.removeCallbacks(mDelayedDrawTask);
-						mAsyncHandler.postDelayed(mDelayedDrawTask, delayMs);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					}
-				}
-			}
-		}
-		
-		private final Runnable mDelayedDrawTask = new Runnable() {
-			@Override
-			public void run() {
-				removeRequest(REQUEST_DRAW);
-				mIsFirstFrameRendered = true;
-				offer(REQUEST_DRAW);
-				delayedDraw(60);
-			}
-		};
 	}
 }
