@@ -40,8 +40,13 @@ public abstract class AbstractDistributeTask {
 
 	public AbstractDistributeTask(final int width, final int height) {
 
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mVideoWidth = width > 0 ? width : 640;
 		mVideoHeight = height > 0 ? height : 480;
+	}
+
+	public void release() {
+		if (DEBUG) Log.v(TAG, "release:");
 	}
 
 	/**
@@ -68,6 +73,7 @@ public abstract class AbstractDistributeTask {
 		final Object surface, final int maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
+		if (DEBUG) Log.v(TAG, "addSurface:" + id);
 		checkFinished();
 		if (!((surface instanceof SurfaceTexture)
 			|| (surface instanceof Surface)
@@ -107,6 +113,7 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 */
 	public void removeSurface(final int id) {
+		if (DEBUG) Log.v(TAG, "removeSurface:" + id);
 		synchronized (mTargets) {
 			if (mTargets.get(id) != null) {
 				for ( ; isRunning() ; ) {
@@ -136,6 +143,7 @@ public abstract class AbstractDistributeTask {
 	 * interruptされるまでカレントスレッドをブロックする。
 	 */
 	public void removeSurfaceAll() {
+		if (DEBUG) Log.v(TAG, "removeSurfaceAll:");
 		synchronized (mTargets) {
 			for ( ; isRunning() ; ) {
 				if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
@@ -163,22 +171,27 @@ public abstract class AbstractDistributeTask {
 	 * @param color
 	 */
 	public void clearSurface(final int id, final int color) {
+		if (DEBUG) Log.v(TAG, "clearSurface:" + id + ",cl=" + color);
 		checkFinished();
 		offer(REQUEST_CLEAR, id, color);
 	}
 
 	public void clearSurfaceAll(final int color) {
+		if (DEBUG) Log.v(TAG, "clearSurfaceAll:" + color);
 		checkFinished();
 		offer(REQUEST_CLEAR_ALL, color);
 	}
 
 	public void setMvpMatrix(final int id,
 		final int offset, @NonNull final float[] matrix) {
+
+		if (DEBUG) Log.v(TAG, "setMvpMatrix:" + id);
 		checkFinished();
 		offer(REQUEST_SET_MVP, id, offset, matrix);
 	}
 
 	public boolean isEnabled(final int id) {
+		if (DEBUG) Log.v(TAG, "isEnabled:" + id);
 		synchronized (mTargets) {
 			final IRendererTarget target = mTargets.get(id);
 			return target != null && target.isEnabled();
@@ -186,6 +199,7 @@ public abstract class AbstractDistributeTask {
 	}
 
 	public void setEnabled(final int id, final boolean enable) {
+		if (DEBUG) Log.v(TAG, "setEnabled:" + id + ",enable=" + enable);
 		synchronized (mTargets) {
 			final IRendererTarget target = mTargets.get(id);
 			if (target != null) {
@@ -205,6 +219,7 @@ public abstract class AbstractDistributeTask {
 	}
 
 	public void mirror(final int mirror) {
+		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
 		if (mMirror != mirror) {
 			offer(REQUEST_MIRROR, mirror);
@@ -252,17 +267,20 @@ public abstract class AbstractDistributeTask {
 	}
 
 	protected boolean handleOnError(final Exception e) {
+		if (DEBUG) Log.v(TAG, "handleOnError:" + e);
 		if (DEBUG) Log.w(TAG, e);
 		return false;
 	}
 
 	@WorkerThread
 	protected void internalOnStart() {
+		if (DEBUG) Log.v(TAG, "internalOnStart:");
 		mDrawer = createDrawer(isGLES3());
 	}
 
 	@WorkerThread
 	protected void internalOnStop() {
+		if (DEBUG) Log.v(TAG, "internalOnStop:");
 		if (mDrawer != null) {
 			mDrawer.release();
 			mDrawer = null;
@@ -273,6 +291,7 @@ public abstract class AbstractDistributeTask {
 	protected Object handleRequest(final int request,
 		final int arg1, final int arg2, final Object obj) {
 
+		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
 		switch (request) {
 		case REQUEST_DRAW:
 			handleDraw();
@@ -305,17 +324,12 @@ public abstract class AbstractDistributeTask {
 		return null;
 	}
 
-	protected void checkFinished() throws IllegalStateException {
-		if (isFinished()) {
-			throw new IllegalStateException("already finished");
-		}
-	}
-
 	/**
 	 * 実際の描画処理
 	 */
 	@WorkerThread
 	protected void handleDraw() {
+		if (DEBUG) Log.v(TAG, "handleDraw:");
 		removeRequest(REQUEST_DRAW);
 		if (mIsFirstFrameRendered) {
 			preprocess();
@@ -332,6 +346,7 @@ public abstract class AbstractDistributeTask {
 
 	@WorkerThread
 	protected void preprocess() {
+		if (DEBUG) Log.v(TAG, "preprocess:");
 	}
 
 	/**
@@ -339,6 +354,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleDrawTargets() {
+		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			final int texId = getTexId();
@@ -368,6 +384,7 @@ public abstract class AbstractDistributeTask {
 	protected void onDrawTarget(@NonNull final IRendererTarget target,
 		final int texId, final float[] texMatrix) {
 
+		if (DEBUG) Log.v(TAG, "onDrawTarget:");
 		target.draw(mDrawer, texId, texMatrix);
 	}
 
@@ -413,6 +430,7 @@ public abstract class AbstractDistributeTask {
 		@NonNull final EGLBase egl,
 		final Object surface, final int maxFps) {
 
+		if (DEBUG) Log.v(TAG, "createRendererTarget:" + id);
 		return RendererTarget.newInstance(getEgl(), surface, maxFps);
 	}
 
@@ -465,20 +483,20 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void checkTarget() {
-//		if (DEBUG) Log.v(TAG, "checkTarget");
+		if (DEBUG) Log.v(TAG, "checkTarget:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
 				final IRendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && !target.isValid()) {
 					final int id = mTargets.keyAt(i);
-//						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
+					if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
 					mTargets.valueAt(i).release();
 					mTargets.remove(id);
 				}
 			}
 		}
-//		if (DEBUG) Log.v(TAG, "checkTarget:finished");
+		if (DEBUG) Log.v(TAG, "checkTarget:finished");
 	}
 
 	/**
@@ -488,6 +506,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleClear(final int id, final int color) {
+		if (DEBUG) Log.v(TAG, "handleClear:" + id);
 		synchronized (mTargets) {
 			final IRendererTarget target = mTargets.get(id);
 			if ((target != null) && target.isValid()) {
@@ -502,6 +521,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleClearAll(final int color) {
+		if (DEBUG) Log.v(TAG, "handleClearAll:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
@@ -523,6 +543,7 @@ public abstract class AbstractDistributeTask {
 	protected void handleSetMvp(final int id,
 		final int offset, final Object mvp) {
 
+		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
 		if ((mvp instanceof float[]) && (((float[]) mvp).length >= 16 + offset)) {
 			final float[] array = (float[])mvp;
 			synchronized (mTargets) {
@@ -540,6 +561,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleMirror(final int mirror) {
+		if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
 		mMirror = mirror;
 		synchronized (mTargets) {
 			final int n = mTargets.size();
@@ -559,6 +581,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	protected void handleRotate(final int id, final int degree) {
+		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
 		synchronized (mTargets) {
 			final IRendererTarget target = mTargets.get(id);
 			if (target != null) {
@@ -567,7 +590,15 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	protected void checkFinished() throws IllegalStateException {
+		if (isFinished()) {
+			throw new IllegalStateException("already finished");
+		}
+	}
+
 //--------------------------------------------------------------------------------
+	public abstract void start(final String tag);
+	public abstract boolean waitReady();
 	public abstract boolean isRunning();
 	public abstract boolean isFinished();
 	public abstract boolean offer(final int request);
