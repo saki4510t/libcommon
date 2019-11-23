@@ -43,6 +43,37 @@ public abstract class CameraDelegator {
 	private static final int TARGET_FPS_MS = 60 * 1000;
 	private static final int CAMERA_ID = 0;
 
+	/**
+	 * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
+	 */
+	public interface ICameraGLView {
+		// View
+		public void setOnClickListener(final View.OnClickListener listener);
+		public void setOnLongClickListener(final View.OnLongClickListener listener);
+		public int getWidth();
+		public int getHeight();
+		public boolean post(final Runnable task);
+
+		// GLSurfaceView
+		public void onResume();
+		public void onPause();
+		public void queueEvent(final Runnable task);
+
+		public void setVideoSize(final int width, final int height);
+		public void addListener(final CameraDelegator.OnFrameAvailableListener listener);
+		public void removeListener(final CameraDelegator.OnFrameAvailableListener listener);
+		public void setScaleMode(final int mode);
+		public int getScaleMode();
+		public int getVideoWidth();
+		public int getVideoHeight();
+		public void addSurface(final int id, final Object surface,
+			final boolean isRecordable);
+		public void removeSurface(final int id);
+	}
+
+	/**
+	 * 映像が更新されたときの通知用コールバックリスナー
+	 */
 	public interface OnFrameAvailableListener {
 		public void onFrameAvailable();
 	}
