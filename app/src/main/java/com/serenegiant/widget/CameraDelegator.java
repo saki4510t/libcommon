@@ -88,35 +88,6 @@ public abstract class CameraDelegator {
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)", width, height));
 		mView = view;
 		mRenderer = createCameraRenderer(this);
-//		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-//		view.setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
-//		view.setRenderer(mRenderer);
-//		final SurfaceHolder holder = view.getHolder();
-//		holder.addCallback(new SurfaceHolder.Callback() {
-//			@Override
-//			public void surfaceCreated(final SurfaceHolder holder) {
-//				if (DEBUG) Log.v(TAG, "surfaceCreated:");
-//				// do nothing
-//			}
-//
-//			@Override
-//			public void surfaceChanged(final SurfaceHolder holder, final int format, final int width, final int height) {
-//				// do nothing
-//				if (DEBUG) Log.v(TAG, "surfaceChanged:");
-//				mView.queueEvent(new Runnable() {
-//					@Override
-//					public void run() {
-//						mRenderer.updateViewport();
-//					}
-//				});
-//			}
-//
-//			@Override
-//			public void surfaceDestroyed(final SurfaceHolder holder) {
-//				if (DEBUG) Log.v(TAG, "surfaceDestroyed:");
-//				mRenderer.onSurfaceDestroyed();
-//			}
-//		});
 		mVideoWidth = width;
 		mVideoHeight = height;
 	}
