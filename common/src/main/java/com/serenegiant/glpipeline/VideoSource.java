@@ -12,6 +12,7 @@ import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.utils.ThreadUtils;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -309,6 +310,7 @@ public class VideoSource implements IPipelineSource {
 		if (mMasterTexture != null) {
 			mMasterTexture.updateTexImage();
 			mMasterTexture.getTransformMatrix(mTexMatrix);
+			ThreadUtils.NoThrowSleep(0, 0);
 			for (final OnFrameAvailableListener listener: mOnFrameAvailableListeners) {
 				try {
 					listener.onFrameAvailable(mTexId, mTexMatrix);

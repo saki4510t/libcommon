@@ -9,6 +9,8 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.serenegiant.utils.ThreadUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
@@ -384,6 +386,7 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
+					ThreadUtils.NoThrowSleep(0, 0);
 				}
 			} catch (final Exception e) {
 				Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
