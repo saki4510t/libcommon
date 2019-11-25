@@ -386,7 +386,7 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
-					ThreadUtils.NoThrowSleep(0, 0);
+					ThreadUtils.NoThrowSleep(0, 100);
 				}
 			} catch (final Exception e) {
 				Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
