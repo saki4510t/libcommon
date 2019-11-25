@@ -252,7 +252,7 @@ public class DistributorCameraGLView
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 				}
 			}
-		);
+		, true);
 	}
 
 	/**

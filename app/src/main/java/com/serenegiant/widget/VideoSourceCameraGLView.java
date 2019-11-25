@@ -272,7 +272,7 @@ public class VideoSourceCameraGLView
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 				}
 			}
-		);
+		, true);
 	}
 
 	/**
