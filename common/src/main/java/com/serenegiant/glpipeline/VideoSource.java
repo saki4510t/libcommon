@@ -310,6 +310,7 @@ public class VideoSource implements IPipelineSource {
 		if (mMasterTexture != null) {
 			mMasterTexture.updateTexImage();
 			mMasterTexture.getTransformMatrix(mTexMatrix);
+			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
 			for (final OnFrameAvailableListener listener: mOnFrameAvailableListeners) {
 				try {

@@ -386,6 +386,7 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
+					GLES20.glFlush();
 					ThreadUtils.NoThrowSleep(0, 0);
 				}
 			} catch (final Exception e) {
