@@ -275,36 +275,10 @@ public class GLContext implements EGLConst {
 	 */
 	@SuppressLint("InlinedApi")
 	public static void logVersionInfo() {
-		Log.i(TAG, "vendor  : " + GLES20.glGetString(GLES20.GL_VENDOR));
-		Log.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
-		Log.i(TAG, "version : " + GLES20.glGetString(GLES20.GL_VERSION));
-
-		if (BuildCheck.isAndroid4_3()) {
-			final int[] values = new int[1];
-			GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
-			final int majorVersion = values[0];
-			GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
-			final int minorVersion = values[0];
-			if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
-				Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
-			}
-		}
-		final String openGLESVersionString
-			= SysPropReader.read("ro.opengles.version");
-		int openGLESVersion;
-		if (!TextUtils.isEmpty(openGLESVersionString)) {
-			try {
-				openGLESVersion = Integer.parseInt(openGLESVersionString);
-			} catch (final NumberFormatException e) {
-				if (DEBUG) Log.w(TAG, e);
-				openGLESVersion = 0;
-			}
-		} else {
-			if (DEBUG) Log.v(TAG, "logVersionInfo:has no ro.opengles.version value");
-			openGLESVersion = 0;
-		}
-		Log.i(TAG, String.format("ro.opengles.version=%s(0x%08x)",
-			openGLESVersionString, openGLESVersion));
+		Log.i(TAG, "vendor:" + GLES20.glGetString(GLES20.GL_VENDOR));
+		Log.i(TAG, "renderer:" + GLES20.glGetString(GLES20.GL_RENDERER));
+		Log.i(TAG, "version:" + GLES20.glGetString(GLES20.GL_VERSION));
+		Log.i(TAG, "supported version:" + supportedGLESVersion());
 	}
 
 	/**
