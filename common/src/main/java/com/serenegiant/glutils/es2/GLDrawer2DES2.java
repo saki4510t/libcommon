@@ -223,7 +223,7 @@ public class GLDrawer2DES2 implements IShaderDrawer2d {
 	 * @param fs フラグメントシェーダー文字列
 	 */
 	@Override
-	public synchronized void updateShader(final String vs, final String fs) {
+	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
 		release();
 		hProgram = GLHelper.loadShader(vs, fs);
 		init();
@@ -236,7 +236,7 @@ public class GLDrawer2DES2 implements IShaderDrawer2d {
 	 * IShaderDrawer2dの実装
 	 * @param fs フラグメントシェーダー文字列
 	 */
-	public void updateShader(final String fs) {
+	public void updateShader(@NonNull final String fs) {
 		updateShader(VERTEX_SHADER, fs);
 	}
 
@@ -263,7 +263,7 @@ public class GLDrawer2DES2 implements IShaderDrawer2d {
 	 * @return
 	 */
 	@Override
-	public int glGetAttribLocation(final String name) {
+	public int glGetAttribLocation(@NonNull final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetAttribLocation(hProgram, name);
 	}
@@ -276,7 +276,7 @@ public class GLDrawer2DES2 implements IShaderDrawer2d {
 	 * @return
 	 */
 	@Override
-	public int glGetUniformLocation(final String name) {
+	public int glGetUniformLocation(@NonNull final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetUniformLocation(hProgram, name);
 	}
