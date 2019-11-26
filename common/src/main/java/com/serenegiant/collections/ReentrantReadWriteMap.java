@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.collections;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
