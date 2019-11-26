@@ -21,8 +21,6 @@ package com.serenegiant.glutils;
 import android.annotation.SuppressLint;
 import android.opengl.Matrix;
 
-import com.serenegiant.glutils.es2.GLDrawer2DES2;
-import com.serenegiant.glutils.es3.GLDrawer2DES3;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
@@ -34,6 +32,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
+ * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
 public abstract class GLDrawer2D implements IDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
@@ -94,7 +93,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
 	 * 				通常の2Dテキスチャを描画に使うならfalse
 	 */
-	public GLDrawer2D(final float[] vertices,
+	protected GLDrawer2D(final float[] vertices,
 		final float[] texcoord, final boolean isOES) {
 
 		VERTEX_NUM = Math.min(

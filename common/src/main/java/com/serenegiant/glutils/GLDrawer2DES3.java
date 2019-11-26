@@ -1,4 +1,4 @@
-package com.serenegiant.glutils.es3;
+package com.serenegiant.glutils;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -21,7 +21,7 @@ package com.serenegiant.glutils.es3;
 import android.opengl.GLES30;
 import android.os.Build;
 
-import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.glutils.es3.GLHelper;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -30,21 +30,12 @@ import androidx.annotation.RequiresApi;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
+ * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class GLDrawer2DES3 extends GLDrawer2D {
+	/*package*/ class GLDrawer2DES3 extends GLDrawer2D {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2DES3";
-
-	/**
-	 * コンストラクタ
-	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
-	 * 				通常の2Dテキスチャならfalse
-	 */
-	public GLDrawer2DES3(final boolean isOES) {
-		this(DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
-	}
 
 	/**
 	 * コンストラクタ
@@ -54,7 +45,7 @@ public class GLDrawer2DES3 extends GLDrawer2D {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
 	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2DES3(final float[] vertices,
+	/*package*/ GLDrawer2DES3(final float[] vertices,
 		final float[] texcoord, final boolean isOES) {
 
 		super(vertices, texcoord, isOES);
