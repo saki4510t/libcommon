@@ -18,8 +18,6 @@ package com.serenegiant.glutils.es2;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import android.opengl.GLES20;
@@ -28,6 +26,7 @@ import android.opengl.Matrix;
 import com.serenegiant.glutils.IDrawer2D;
 import com.serenegiant.glutils.IGLSurface;
 import com.serenegiant.glutils.IShaderDrawer2d;
+import com.serenegiant.utils.BufferHelper;
 
 import androidx.annotation.NonNull;
 
@@ -80,14 +79,8 @@ public class GLDrawer2D implements IShaderDrawer2d {
 		VERTEX_SZ = VERTEX_NUM * 2;
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
-		pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pVertex.put(vertices);
-		pVertex.flip();
-		pTexCoord = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
-				.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pTexCoord.put(texcoord);
-		pTexCoord.flip();
+		pVertex = BufferHelper.createFloatBuffer(vertices);
+		pTexCoord = BufferHelper.createFloatBuffer(texcoord);
 
 		if (isOES) {
 			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
