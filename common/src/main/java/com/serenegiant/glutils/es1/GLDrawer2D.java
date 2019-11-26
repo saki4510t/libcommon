@@ -32,6 +32,7 @@ import androidx.annotation.NonNull;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
+@Deprecated
 public class GLDrawer2D implements IDrawer2D {
 	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };

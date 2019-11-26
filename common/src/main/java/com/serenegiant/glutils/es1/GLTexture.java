@@ -34,6 +34,8 @@ import androidx.annotation.NonNull;
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class GLTexture implements IGLSurface {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";

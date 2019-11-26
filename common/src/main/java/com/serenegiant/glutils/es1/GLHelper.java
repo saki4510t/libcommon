@@ -38,6 +38,7 @@ import android.util.Log;
 /**
  * OpenGL|ES用のヘルパークラス
  */
+@Deprecated
 public final class GLHelper {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = "GLHelper";
