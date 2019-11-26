@@ -61,6 +61,7 @@ public class FileUtils {
     	return getCaptureFile(context, type, null, ext, saveTreeId);
     }
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	public static final File getCaptureFile(@NonNull final Context context,
 		final String type, final String prefix, final String ext, final int saveTreeId) {
 
@@ -95,6 +96,7 @@ public class FileUtils {
 		return result;
 	}
 
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@SuppressLint("NewApi")
 	public static final File getCaptureDir(@NonNull final Context context,
 		final String type, final int saveTreeId) {
@@ -141,7 +143,7 @@ public class FileUtils {
     			if (line.contains("asec")) continue;
 
     			if (line.contains("fat")) {//external card
-    				final String columns[] = line.split(" ");
+    				final String[] columns = line.split(" ");
     				if (columns != null && (columns.length > 1) && !TextUtils.isEmpty(columns[1])) {
     					externalpath = columns[1];
     					if (!externalpath.endsWith("/")) {
@@ -149,7 +151,7 @@ public class FileUtils {
     					}
     				}
     			} else if (line.contains("fuse")) {//internal storage
-    				final String columns[] = line.split(" ");
+    				final String[] columns = line.split(" ");
     				if (columns != null && columns.length > 1) {
     					internalpath = internalpath.concat("[" + columns[1] + "]");
     				}
