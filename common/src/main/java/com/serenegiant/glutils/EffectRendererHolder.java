@@ -365,7 +365,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param drawer GLDrawer2Dインスタンス
 	 */
 	protected void handleDefaultEffect(final int effect,
-		@NonNull final IShaderDrawer2d drawer) {
+		@NonNull final GLDrawer2D drawer) {
 
 		drawer.resetShader();
 	}
@@ -478,8 +478,8 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		protected void handleChangeEffect(final int effect) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#handleChangeEffect:" + effect);
 			mEffect = effect;
-			if (mDrawer instanceof IShaderDrawer2d) {
-				final IShaderDrawer2d drawer = (IShaderDrawer2d) mDrawer;
+			if (mDrawer != null) {
+				final GLDrawer2D drawer = mDrawer;
 				switch (effect) {
 				case EFFECT_NON:
 					drawer.updateShader(FRAGMENT_SHADER_SIMPLE_OES);
@@ -559,9 +559,9 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 			final int n = Math.min(mCurrentParams != null
 				? mCurrentParams.length : 0, MAX_PARAM_NUM);
 			if ((muParamsLoc >= 0) && (n > 0)) {
-				if (mDrawer instanceof IShaderDrawer2d) {
-					((IShaderDrawer2d)mDrawer).glUseProgram();
-				} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is not IShaderDrawer2d");
+				if (mDrawer != null) {
+					mDrawer.glUseProgram();
+				} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is null");
 				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 			}
 		}

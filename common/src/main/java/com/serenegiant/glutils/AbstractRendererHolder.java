@@ -810,7 +810,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private final Runnable mCaptureTask = new Runnable() {
     	private EGLBase eglBase;
 		private ISurface captureSurface;
-		private IShaderDrawer2d drawer;
+		private GLDrawer2D drawer;
 		private final float[] mMvpMatrix = new float[16];
 
     	@Override
@@ -850,7 +850,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	    	captureSurface = eglBase.createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
-			drawer = createDrawer(eglBase.getGlVersion() > 2);
+			drawer = GLDrawer2D.create(eglBase.getGlVersion() > 2, true);
 			setupCaptureDrawer(drawer);
 		}
 

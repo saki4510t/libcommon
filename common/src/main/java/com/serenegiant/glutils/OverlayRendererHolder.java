@@ -147,11 +147,11 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		protected void internalOnStart() {
 			super.internalOnStart();
 			if (DEBUG) Log.v(TAG, "internalOnStart:" + mDrawer);
-			if (mDrawer instanceof IShaderDrawer2d) {
+			if (mDrawer != null) {
 				if (DEBUG) Log.v(TAG, String.format("internalOnStart:init overlay texture(%dx%d)",
 					width(), height()));
 				if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT);
-				final IShaderDrawer2d drawer = (IShaderDrawer2d)mDrawer;
+				final GLDrawer2D drawer = mDrawer;
 				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
 				final int uTex1 = drawer.glGetUniformLocation("sTexture");
 				GLES20.glUniform1i(uTex1, 0);

@@ -35,9 +35,13 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public abstract class GLDrawer2D implements IShaderDrawer2d {
+public abstract class GLDrawer2D implements IDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
+
+	protected static final float[] DEFAULT_VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
+	protected static final float[] DEFAULT_TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+	protected static final int FLOAT_SZ = Float.SIZE / 8;
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
@@ -45,8 +49,8 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * @param isOES
 	 * @return
 	 */
-	public static GLDrawer2D create(final int glesVersion, final boolean isOES) {
-		return create(glesVersion, DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
+	public static GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+		return create(isGLES3, DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
 	}
 
 	/**
@@ -57,11 +61,11 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static GLDrawer2D create(final int glesVersion,
+	public static GLDrawer2D create(final boolean isGLES3,
 		@NonNull final float[] vertices,
 		@NonNull final float[] texcoord, final boolean isOES) {
 
-		if ((glesVersion >= 3) && (BuildCheck.isAndroid4_3())) {
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
 			return new GLDrawer2DES3(vertices, texcoord, isOES);
 		} else {
 			return new GLDrawer2DES2(vertices, texcoord, isOES);
@@ -125,7 +129,6 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * IShaderDrawer2dの実装
 	 * @return
 	 */
-	@Override
 	public boolean isOES() {
 		return mTexTarget == GL_TEXTURE_EXTERNAL_OES;
 	}
@@ -193,7 +196,6 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * GLHelper#initTexを呼び出すだけ
 	 * @return texture ID
 	 */
-	@Override
 	public abstract int initTex();
 
 	/**
@@ -201,18 +203,15 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * GLHelper.deleteTexを呼び出すだけ
 	 * @param hTex
 	 */
-	@Override
 	public abstract void deleteTex(final int hTex);
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
 	 */
-	@Override
 	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
 		release();
 		hProgram = loadShader(vs, fs);
@@ -224,7 +223,6 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	 * フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
 	 * @param fs フラグメントシェーダー文字列
 	 */
 	public void updateShader(@NonNull final String fs) {
@@ -233,9 +231,7 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
-	 * IShaderDrawer2dの実装
 	 */
-	@Override
 	public void resetShader() {
 		release();
 		if (isOES()) {
@@ -249,28 +245,22 @@ public abstract class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * アトリビュート変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
 	 * @param name
 	 * @return
 	 */
-	@Override
 	public abstract int glGetAttribLocation(@NonNull final String name);
 
 	/**
 	 * ユニフォーム変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
 	 * @param name
 	 * @return
 	 */
-	@Override
 	public abstract int glGetUniformLocation(@NonNull final String name);
 
 	/**
 	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
 	 */
-	@Override
 	public abstract void glUseProgram();
 
 	/**

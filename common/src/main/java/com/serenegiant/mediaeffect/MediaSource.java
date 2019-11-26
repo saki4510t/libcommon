@@ -21,8 +21,8 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLSurface;
-import com.serenegiant.glutils.IShaderDrawer2d;
 
 public class MediaSource implements ISource {
 	private static final boolean DEBUG = false;
@@ -159,7 +159,7 @@ public class MediaSource implements ISource {
 	 * @param tex_matrix
 	 * @return
 	 */
-	public MediaSource setSource(final IShaderDrawer2d drawer,
+	public MediaSource setSource(final GLDrawer2D drawer,
 		final int tex_id, final float[] tex_matrix) {
 
 		mSourceScreen.makeCurrent();
