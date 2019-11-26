@@ -51,19 +51,17 @@ public class GLManager {
 
 	/**
 	 * コンストラクタ
-	 * @param callback
 	 */
-	public GLManager(@Nullable final Handler.Callback callback) {
-		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
-			null, 0, callback);
+	public GLManager() {
+		this(3, null, 0, null);
 	}
 
 	/**
 	 * コンストラクタ
+	 * @param callback
 	 */
-	public GLManager() {
-		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
-			null, 0, null);
+	public GLManager(@Nullable final Handler.Callback callback) {
+		this(3, null, 0, callback);
 	}
 
 	/**
@@ -71,20 +69,18 @@ public class GLManager {
 	 * @param maxClientVersion
 	 */
 	public GLManager(final int maxClientVersion) {
-		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
-			null, 0, null);
+		this(maxClientVersion, null, 0, null);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
-	 * @param callback 
+	 * @param callback
 	 */
 	public GLManager(final int maxClientVersion,
 		@Nullable final Handler.Callback callback) {
 
-		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
-			null, 0, callback);
+		this(maxClientVersion, null, 0, callback);
 	}
 
 	/**
@@ -100,7 +96,9 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mCallback = callback;
-		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
+		mGLContext = new GLContext(
+			(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
+			sharedContext, flags);
 		mGLHandler = HandlerThreadHandler.createHandler(TAG,
 			new Handler.Callback() {
 				@Override
