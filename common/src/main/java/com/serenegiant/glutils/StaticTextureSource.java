@@ -31,7 +31,7 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
-import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLDrawer2DES2;
 import com.serenegiant.glutils.es2.GLHelper;
 
 /**
@@ -212,7 +212,7 @@ public class StaticTextureSource {
 			= new SparseArray<>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
-		private GLDrawer2D mDrawer;
+		private GLDrawer2DES2 mDrawer;
 		private int mVideoWidth, mVideoHeight;
 		private GLSurface mImageSource;
 
@@ -233,7 +233,7 @@ public class StaticTextureSource {
 		@Override
 		protected void onStart() {
 			if (DEBUG) Log.v(TAG, "onStart:");
-			mDrawer = new GLDrawer2D(false);		// GL_TEXTURE_EXTERNAL_OESを使わない
+			mDrawer = new GLDrawer2DES2(false);		// GL_TEXTURE_EXTERNAL_OESを使わない
 			synchronized (mParent.mSync) {
 				mParent.isRunning = true;
 				mParent.mSync.notifyAll();

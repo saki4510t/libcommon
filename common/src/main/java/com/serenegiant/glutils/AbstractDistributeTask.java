@@ -9,6 +9,8 @@ import android.util.SparseArray;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.serenegiant.glutils.es2.GLDrawer2DES2;
+import com.serenegiant.glutils.es3.GLDrawer2DES3;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.NonNull;
@@ -42,7 +44,7 @@ public abstract class AbstractDistributeTask {
 	private volatile boolean isFirstFrameRendered;
 	private volatile boolean mHasNewFrame;
 
-	protected IDrawer2D mDrawer;
+	protected IShaderDrawer2d mDrawer;
 
 	protected AbstractDistributeTask(final int width, final int height) {
 
@@ -748,11 +750,11 @@ public abstract class AbstractDistributeTask {
 	}
 
 	@NonNull
-	protected static IDrawer2D createDrawer(final boolean isGLES3) {
+	protected static IShaderDrawer2d createDrawer(final boolean isGLES3) {
 		if (isGLES3) {
-			return new com.serenegiant.glutils.es3.GLDrawer2D(true);
+			return new GLDrawer2DES3(true);
 		} else {
-			return new com.serenegiant.glutils.es2.GLDrawer2D(true);
+			return new GLDrawer2DES2(true);
 		}
 	}
 }

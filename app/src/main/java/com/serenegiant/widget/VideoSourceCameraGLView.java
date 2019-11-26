@@ -36,7 +36,7 @@ import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.ISurface;
-import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLDrawer2DES2;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -288,7 +288,7 @@ public class VideoSourceCameraGLView
 		Choreographer.FrameCallback, IPipelineSource.OnFrameAvailableListener {
 
 		private ISurface mTarget;
-		private GLDrawer2D mDrawer;
+		private GLDrawer2DES2 mDrawer;
 		private final float[] mMvpMatrix = new float[16];
 		private volatile boolean mHasSurface;
 
@@ -309,7 +309,7 @@ public class VideoSourceCameraGLView
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
 			if (!extensions.contains("OES_EGL_image_external"))
 				throw new RuntimeException("This system does not support OES_EGL_image_external.");
-			mDrawer = new GLDrawer2D(true);
+			mDrawer = new GLDrawer2DES2(true);
 			// clear screen with yellow color so that you can see rendering rectangle
 			// create object for preview display
 			mDrawer.setMvpMatrix(mMvpMatrix, 0);

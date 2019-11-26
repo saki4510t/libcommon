@@ -1,4 +1,4 @@
-package com.serenegiant.glutils.es2;
+package com.serenegiant.glutils.es3;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,15 +18,16 @@ package com.serenegiant.glutils.es2;
  *  limitations under the License.
 */
 
-import java.nio.FloatBuffer;
-
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.Matrix;
 
 import com.serenegiant.glutils.IDrawer2D;
 import com.serenegiant.glutils.IGLSurface;
 import com.serenegiant.glutils.IShaderDrawer2d;
 import com.serenegiant.utils.BufferHelper;
+
+import java.nio.FloatBuffer;
 
 import androidx.annotation.NonNull;
 
@@ -35,9 +36,10 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
-public class GLDrawer2D implements IShaderDrawer2d {
+public class GLDrawer2DES3 implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
-//	private static final String TAG = "GLDrawer2D";
+//	private static final String TAG = "GLDrawer2DES3";
+
 
 	final int VERTEX_NUM;
 	final int VERTEX_SZ;
@@ -55,10 +57,10 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)の描画に使う場合はtrue。
-	 * 				通常の2Dテキスチャを描画に使うならfalse
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
+	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2D(final boolean isOES) {
+	public GLDrawer2DES3(final boolean isOES) {
 		this(DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
 	}
 
@@ -67,11 +69,11 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
 	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
 	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
-	 * 				通常の2Dテキスチャを描画に使うならfalse
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
+	 * 				通常の2Dテキスチャならfalse
 	 */
-	public GLDrawer2D(final float[] vertices,
-		final float[] texcoord, final boolean isOES) {
+	public GLDrawer2DES3(final float[] vertices,
+						 final float[] texcoord, final boolean isOES) {
 
 		VERTEX_NUM = Math.min(
 			vertices != null ? vertices.length : 0,
@@ -99,7 +101,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	@Override
 	public void release() {
 		if (hProgram >= 0) {
-			GLES20.glDeleteProgram(hProgram);
+			GLES30.glDeleteProgram(hProgram);
 		}
 		hProgram = -1;
 	}
@@ -162,27 +164,27 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
-		GLES20.glUseProgram(hProgram);
+		GLES30.glUseProgram(hProgram);
 		if (tex_matrix != null) {
 			// テクスチャ変換行列が指定されている時
-			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
+			GLES30.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
 		}
 		// モデルビュー変換行列をセット
-		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-		GLES20.glBindTexture(mTexTarget, texId);
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
+		GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+		GLES30.glBindTexture(mTexTarget, texId);
 		if (true) {
 			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
-			GLES20.glVertexAttribPointer(maPositionLoc,
-				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
-			GLES20.glVertexAttribPointer(maTextureCoordLoc,
-				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-			GLES20.glEnableVertexAttribArray(maPositionLoc);
-			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+			GLES30.glVertexAttribPointer(maPositionLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
+			GLES30.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+			GLES30.glEnableVertexAttribArray(maPositionLoc);
+			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 		}
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-		GLES20.glBindTexture(mTexTarget, 0);
-        GLES20.glUseProgram(0);
+		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		GLES30.glBindTexture(mTexTarget, 0);
+        GLES30.glUseProgram(0);
 	}
 
 	/**
@@ -199,17 +201,21 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
+	 * IShaderDrawer2dの実装
 	 * @return texture ID
 	 */
+	@Override
 	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES30.GL_NEAREST);
 	}
 
 	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
+	 * IShaderDrawer2dの実装
 	 * @param hTex
 	 */
+	@Override
 	public void deleteTex(final int hTex) {
 		GLHelper.deleteTex(hTex);
 	}
@@ -236,6 +242,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * IShaderDrawer2dの実装
 	 * @param fs フラグメントシェーダー文字列
 	 */
+	@Override
 	public void updateShader(final String fs) {
 		updateShader(VERTEX_SHADER, fs);
 	}
@@ -264,8 +271,8 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 */
 	@Override
 	public int glGetAttribLocation(final String name) {
-		GLES20.glUseProgram(hProgram);
-		return GLES20.glGetAttribLocation(hProgram, name);
+		GLES30.glUseProgram(hProgram);
+		return GLES30.glGetAttribLocation(hProgram, name);
 	}
 
 	/**
@@ -277,8 +284,8 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 */
 	@Override
 	public int glGetUniformLocation(final String name) {
-		GLES20.glUseProgram(hProgram);
-		return GLES20.glGetUniformLocation(hProgram, name);
+		GLES30.glUseProgram(hProgram);
+		return GLES30.glGetUniformLocation(hProgram, name);
 	}
 
 	/**
@@ -287,7 +294,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 */
 	@Override
 	public void glUseProgram() {
-		GLES20.glUseProgram(hProgram);
+		GLES30.glUseProgram(hProgram);
 	}
 
 	/**
@@ -295,21 +302,21 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * glUseProgramが呼ばれた状態で返る
 	 */
 	private void init() {
-		GLES20.glUseProgram(hProgram);
-		maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
-		maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
-		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
-		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
+		GLES30.glUseProgram(hProgram);
+		maPositionLoc = GLES30.glGetAttribLocation(hProgram, "aPosition");
+		maTextureCoordLoc = GLES30.glGetAttribLocation(hProgram, "aTextureCoord");
+		muMVPMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uMVPMatrix");
+		muTexMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uTexMatrix");
 		//
-		GLES20.glUniformMatrix4fv(muMVPMatrixLoc,
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc,
 			1, false, mMvpMatrix, 0);
-		GLES20.glUniformMatrix4fv(muTexMatrixLoc,
+		GLES30.glUniformMatrix4fv(muTexMatrixLoc,
 			1, false, mMvpMatrix, 0);
-		GLES20.glVertexAttribPointer(maPositionLoc,
-			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
-		GLES20.glVertexAttribPointer(maTextureCoordLoc,
-			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-		GLES20.glEnableVertexAttribArray(maPositionLoc);
-		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+		GLES30.glVertexAttribPointer(maPositionLoc,
+			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
+		GLES30.glVertexAttribPointer(maTextureCoordLoc,
+			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+		GLES30.glEnableVertexAttribArray(maPositionLoc);
+		GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 	}
 }

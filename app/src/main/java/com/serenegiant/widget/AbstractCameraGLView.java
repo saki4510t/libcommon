@@ -31,7 +31,7 @@ import android.view.SurfaceHolder;
 
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.RenderHolderCallback;
-import com.serenegiant.glutils.es2.GLDrawer2D;
+import com.serenegiant.glutils.es2.GLDrawer2DES2;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -268,7 +268,7 @@ public abstract class AbstractCameraGLView
 
 		private SurfaceTexture mSTexture;	// API >= 11
 		private int hTex;
-		private GLDrawer2D mDrawer;
+		private GLDrawer2DES2 mDrawer;
 		private final float[] mStMatrix = new float[16];
 		private final float[] mMvpMatrix = new float[16];
 		private boolean mHasSurface;
@@ -287,7 +287,7 @@ public abstract class AbstractCameraGLView
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
 			if (!extensions.contains("OES_EGL_image_external"))
 				throw new RuntimeException("This system does not support OES_EGL_image_external.");
-			mDrawer = new GLDrawer2D(true);
+			mDrawer = new GLDrawer2DES2(true);
 			// create texture ID
 			hTex = mDrawer.initTex();
 			// create SurfaceTexture with texture ID.

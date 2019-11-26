@@ -810,7 +810,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private final Runnable mCaptureTask = new Runnable() {
     	private EGLBase eglBase;
 		private ISurface captureSurface;
-		private IDrawer2D drawer;
+		private IShaderDrawer2d drawer;
 		private final float[] mMvpMatrix = new float[16];
 
     	@Override
