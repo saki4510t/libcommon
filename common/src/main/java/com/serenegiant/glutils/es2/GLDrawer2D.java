@@ -175,6 +175,15 @@ public class GLDrawer2D implements IShaderDrawer2d {
 		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
 		GLES20.glBindTexture(mTexTarget, texId);
+		if (true) {
+			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
+			GLES20.glVertexAttribPointer(maPositionLoc,
+				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
+			GLES20.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+			GLES20.glEnableVertexAttribArray(maPositionLoc);
+			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+		}
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 		GLES20.glBindTexture(mTexTarget, 0);
         GLES20.glUseProgram(0);
