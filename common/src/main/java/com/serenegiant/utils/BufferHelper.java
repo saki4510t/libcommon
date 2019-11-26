@@ -40,12 +40,28 @@ public class BufferHelper {
 		'c', 'd', 'e', 'f'};
 	
 	private static final int BUF_LEN = 256;
+
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param buffer
+	 * @param offset
+	 * @param size
+	 */
 	public static final void dump(final String tag,
 		final ByteBuffer buffer, final int offset, final int size) {
 
 		dump(tag, buffer, offset, size, false);
 	}
 
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param _buffer
+	 * @param offset
+	 * @param _size
+	 * @param findAnnexB
+	 */
 	public static final void dump(final String tag,
 		final ByteBuffer _buffer, final int offset, final int _size, final boolean findAnnexB) {
 
@@ -81,6 +97,14 @@ public class BufferHelper {
 		Log.i(tag, "dump:" + sb.toString());
 	}
 
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param buffer
+	 * @param offset
+	 * @param _size
+	 * @param findAnnexB
+	 */
 	public static final void dump(final String tag,
 		final byte[] buffer, final int offset, final int _size, final boolean findAnnexB) {
 
@@ -175,7 +199,9 @@ public class BufferHelper {
 
 	private static final int SIZEOF_FLOAT = Float.SIZE / 8;
 	/**
-	 * Allocates a direct float buffer, and populates it with the float array data.
+	 * 引数のfloat配列と同じ長さのFloatBufferを生成して引数の値をセットする
+	 * @param coords
+	 * @return
 	 */
 	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
