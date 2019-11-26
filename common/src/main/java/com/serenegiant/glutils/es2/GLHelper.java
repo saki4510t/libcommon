@@ -418,25 +418,4 @@ public final class GLHelper {
 			throw new RuntimeException("Unable to locate '" + label + "' in program");
 		}
 	}
-
-	/**
-	 * Writes GL version info to the log.
-	 */
-	@SuppressLint("InlinedApi")
-	public static void logVersionInfo() {
-		Log.i(TAG, "vendor  : " + GLES20.glGetString(GLES20.GL_VENDOR));
-		Log.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
-		Log.i(TAG, "version : " + GLES20.glGetString(GLES20.GL_VERSION));
-
-		if (BuildCheck.isAndroid4_3()) {
-			final int[] values = new int[1];
-			GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
-			final int majorVersion = values[0];
-			GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
-			final int minorVersion = values[0];
-			if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
-				Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
-			}
-		}
-	}
 }

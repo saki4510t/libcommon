@@ -1,5 +1,12 @@
 package com.serenegiant.glutils;
 
+import android.annotation.SuppressLint;
+import android.opengl.GLES20;
+import android.opengl.GLES30;
+import android.util.Log;
+
+import com.serenegiant.utils.BuildCheck;
+
 import androidx.annotation.Nullable;
 
 /**
@@ -238,6 +245,27 @@ public class GLContext implements EGLConst {
 	public int getGlVersion() {
 		synchronized (mSync) {
 			return  (mEgl != null) ? mEgl.getGlVersion() : 0;
+		}
+	}
+
+	/**
+	 * Writes GL version info to the log.
+	 */
+	@SuppressLint("InlinedApi")
+	public static void logVersionInfo() {
+		Log.i(TAG, "vendor  : " + GLES20.glGetString(GLES20.GL_VENDOR));
+		Log.i(TAG, "renderer: " + GLES20.glGetString(GLES20.GL_RENDERER));
+		Log.i(TAG, "version : " + GLES20.glGetString(GLES20.GL_VERSION));
+
+		if (BuildCheck.isAndroid4_3()) {
+			final int[] values = new int[1];
+			GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
+			final int majorVersion = values[0];
+			GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
+			final int minorVersion = values[0];
+			if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
+				Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
+			}
 		}
 	}
 }

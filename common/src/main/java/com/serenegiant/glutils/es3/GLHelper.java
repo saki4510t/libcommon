@@ -421,21 +421,4 @@ public final class GLHelper {
 		}
 	}
 
-	/**
-	 * Writes GL version info to the log.
-	 */
-	public static void logVersionInfo() {
-		Log.i(TAG, "vendor  : " + GLES30.glGetString(GLES30.GL_VENDOR));
-		Log.i(TAG, "renderer: " + GLES30.glGetString(GLES30.GL_RENDERER));
-		Log.i(TAG, "version : " + GLES30.glGetString(GLES30.GL_VERSION));
-
-		final int[] values = new int[1];
-		GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
-		final int majorVersion = values[0];
-		GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
-		final int minorVersion = values[0];
-		if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
-			Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
-		}
-	}
 }
