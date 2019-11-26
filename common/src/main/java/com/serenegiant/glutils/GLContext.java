@@ -6,6 +6,7 @@ import android.opengl.GLES30;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.SysPropReader;
 
 import androidx.annotation.Nullable;
 
@@ -268,5 +269,16 @@ public class GLContext implements EGLConst {
 				Log.i(TAG, "version: " + majorVersion + "." + minorVersion);
 			}
 		}
+		final String openGLESVersionString
+			= SysPropReader.read("ro.opengles.version");
+		int openGLESVersion;
+		try {
+			openGLESVersion = Integer.parseInt(openGLESVersionString);
+		} catch (final NumberFormatException e) {
+			if (DEBUG) Log.w(TAG, e);
+			openGLESVersion = 0;
+		}
+		Log.i(TAG, String.format("ro.opengles.version=%s(0x%08x)",
+			openGLESVersionString, openGLESVersion));
 	}
 }
