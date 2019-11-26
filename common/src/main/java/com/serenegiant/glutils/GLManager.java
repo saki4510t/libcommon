@@ -51,10 +51,40 @@ public class GLManager {
 
 	/**
 	 * コンストラクタ
+	 * @param callback
+	 */
+	public GLManager(@Nullable final Handler.Callback callback) {
+		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
+			null, 0, callback);
+	}
+
+	/**
+	 * コンストラクタ
 	 */
 	public GLManager() {
 		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2,
 			null, 0, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 */
+	public GLManager(final int maxClientVersion) {
+		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
+			null, 0, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param callback 
+	 */
+	public GLManager(final int maxClientVersion,
+		@Nullable final Handler.Callback callback) {
+
+		this((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
+			null, 0, callback);
 	}
 
 	/**
