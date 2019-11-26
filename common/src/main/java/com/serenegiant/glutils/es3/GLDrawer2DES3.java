@@ -21,6 +21,7 @@ package com.serenegiant.glutils.es3;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
+import android.os.Build;
 
 import com.serenegiant.glutils.IDrawer2D;
 import com.serenegiant.glutils.IGLSurface;
@@ -30,12 +31,14 @@ import com.serenegiant.utils.BufferHelper;
 import java.nio.FloatBuffer;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class GLDrawer2DES3 implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2DES3";

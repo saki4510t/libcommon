@@ -24,16 +24,19 @@ import android.graphics.Canvas;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
+import android.os.Build;
 
 import com.serenegiant.glutils.IGLSurface;
 
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class GLTexture implements IGLSurface {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
