@@ -173,11 +173,11 @@ public class BufferHelper {
 		return -1;
 	}
 
-	private static final int SIZEOF_FLOAT = 4;
+	private static final int SIZEOF_FLOAT = Float.SIZE / 8;
 	/**
 	 * Allocates a direct float buffer, and populates it with the float array data.
 	 */
-	public static FloatBuffer createFloatBuffer(final float[] coords) {
+	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
 		final ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT);
 		bb.order(ByteOrder.nativeOrder());
