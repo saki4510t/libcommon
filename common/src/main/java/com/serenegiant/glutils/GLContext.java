@@ -21,6 +21,7 @@ package com.serenegiant.glutils;
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
@@ -290,10 +291,15 @@ public class GLContext implements EGLConst {
 		final String openGLESVersionString
 			= SysPropReader.read("ro.opengles.version");
 		int openGLESVersion;
-		try {
-			openGLESVersion = Integer.parseInt(openGLESVersionString);
-		} catch (final NumberFormatException e) {
-			if (DEBUG) Log.w(TAG, e);
+		if (!TextUtils.isEmpty(openGLESVersionString)) {
+			try {
+				openGLESVersion = Integer.parseInt(openGLESVersionString);
+			} catch (final NumberFormatException e) {
+				if (DEBUG) Log.w(TAG, e);
+				openGLESVersion = 0;
+			}
+		} else {
+			if (DEBUG) Log.v(TAG, "logVersionInfo:has no ro.opengles.version value");
 			openGLESVersion = 0;
 		}
 		Log.i(TAG, String.format("ro.opengles.version=%s(0x%08x)",
