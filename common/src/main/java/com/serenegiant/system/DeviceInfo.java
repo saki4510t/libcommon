@@ -28,9 +28,11 @@ import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
 
-import com.serenegiant.system.BuildCheck;
-
 public final class DeviceInfo {
+	private DeviceInfo() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	@SuppressLint("NewApi")
 	public static JSONObject get() throws JSONException {
 		final JSONObject result = new JSONObject();

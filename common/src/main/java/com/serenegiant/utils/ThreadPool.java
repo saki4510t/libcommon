@@ -43,6 +43,10 @@ public class ThreadPool {
 		getInstance();
 	}
 
+	private ThreadPool() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * スレッドプールが存在しなければ新たに生成する
 	 * @return

@@ -2,6 +2,10 @@ package com.serenegiant.utils;
 
 public class ThreadUtils {
 
+	private ThreadUtils() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
 	/**
 	 * InterruptedExceptionを投げずにSleepする
 	 * @param  millis
