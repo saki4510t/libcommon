@@ -179,12 +179,11 @@ public class BufferHelper {
 	 */
 	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
-		final ByteBuffer bb = ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT);
-		bb.order(ByteOrder.nativeOrder());
-		final FloatBuffer fb = bb.asFloatBuffer();
-		fb.put(coords);
-		fb.position(0);
-		return fb;
+		final FloatBuffer result
+			= ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT)
+				.order(ByteOrder.nativeOrder()).asFloatBuffer();
+		result.put(coords).flip();
+		return result;
 	}
 	
 	/**
