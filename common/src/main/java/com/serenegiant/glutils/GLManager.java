@@ -37,7 +37,7 @@ import androidx.annotation.WorkerThread;
  * GLコンテキストとそれを保持するワーカースレッドを扱うためのヘルパークラス
  */
 public class GLManager {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLManager.class.getSimpleName();
 
 	@NonNull

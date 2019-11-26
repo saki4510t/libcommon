@@ -32,7 +32,7 @@ import androidx.annotation.Nullable;
  * 現在のスレッド上にGLコンテキストを生成する
  */
 public class GLContext implements EGLConst {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLContext.class.getSimpleName();
 
 	private final Object mSync = new Object();

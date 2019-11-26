@@ -45,7 +45,7 @@ import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
  */
 public class VideoSource implements IPipelineSource {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoSource.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;

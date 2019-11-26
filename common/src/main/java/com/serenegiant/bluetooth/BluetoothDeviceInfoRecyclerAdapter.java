@@ -40,7 +40,7 @@ import java.util.List;
 public class BluetoothDeviceInfoRecyclerAdapter
 	extends RecyclerView.Adapter<BluetoothDeviceInfoRecyclerAdapter.ViewHolder> {
 
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = BluetoothDeviceInfoRecyclerAdapter.class.getSimpleName();
 
 	public interface OnItemClickListener {
