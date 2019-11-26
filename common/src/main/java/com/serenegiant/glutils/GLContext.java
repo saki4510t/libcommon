@@ -91,6 +91,7 @@ public class GLContext implements EGLConst {
 		} else {
 			throw new RuntimeException("failed to create EglCore");
 		}
+		logVersionInfo();
 	}
 
 	/**
