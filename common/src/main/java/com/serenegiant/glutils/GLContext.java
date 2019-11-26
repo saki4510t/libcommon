@@ -269,6 +269,7 @@ public class GLContext implements EGLConst {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * Writes GL version info to the log.
 	 */
@@ -304,5 +305,44 @@ public class GLContext implements EGLConst {
 		}
 		Log.i(TAG, String.format("ro.opengles.version=%s(0x%08x)",
 			openGLESVersionString, openGLESVersion));
+	}
+
+	/**
+	 * 対応するOpenGL|ESのバージョンを取得する
+	 * @return 0以下なら何らかの理由でバージョンを取得できなかった
+	 * 			それ以外は整数部: メジャーバージョン, 小数部: マイナーバージョン
+	 */
+	@SuppressLint("InlinedApi")
+	public static float supportedGLESVersion() {
+		float result = 0.0f;
+
+		if (BuildCheck.isAndroid4_3()) {
+			final int[] values = new int[1];
+			GLES30.glGetIntegerv(GLES30.GL_MAJOR_VERSION, values, 0);
+			final int majorVersion = values[0];
+			GLES30.glGetIntegerv(GLES30.GL_MINOR_VERSION, values, 0);
+			final int minorVersion = values[0];
+			if (GLES30.glGetError() == GLES30.GL_NO_ERROR) {
+				result = majorVersion + minorVersion * 0.1f;
+			}
+		}
+		if (result <= 0.0f) {
+			// バージョンを取得できなかったときは
+			// ro.opengles.versionプロパティからの読み込みを試みる
+			final String openGLESVersionString
+				= SysPropReader.read("ro.opengles.version");
+			if (!TextUtils.isEmpty(openGLESVersionString)) {
+				try {
+					final int openGLESVersion = Integer.parseInt(openGLESVersionString);
+					result = ((openGLESVersion & 0xffff0000) >> 16)
+						+ 0.1f * (openGLESVersion & 0x0000ffff);
+				} catch (final NumberFormatException e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			} else {
+				if (DEBUG) Log.v(TAG, "supportedGLESVersion:has no ro.opengles.version value");
+			}
+		}
+		return result;
 	}
 }
