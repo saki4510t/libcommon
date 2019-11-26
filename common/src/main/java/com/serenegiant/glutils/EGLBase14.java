@@ -46,7 +46,7 @@ import com.serenegiant.system.BuildCheck;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 /*package*/ class EGLBase14 extends EGLBase {	// API >= 17
-//	private static final boolean DEBUG = false;	// TODO set false on release
+	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = EGLBase14.class.getSimpleName();
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL14.EGL_NO_CONTEXT);
@@ -438,7 +438,7 @@ import com.serenegiant.system.BuildCheck;
 		@Nullable Context sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
-//		if (DEBUG) Log.v(TAG, "init:");
+		if (DEBUG) Log.v(TAG, "init:");
         if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("EGL already set up");
         }
@@ -456,9 +456,10 @@ import com.serenegiant.system.BuildCheck;
 
 		sharedContext = (sharedContext != null) ? sharedContext : EGL_NO_CONTEXT;
 
+		if (DEBUG) Log.d(TAG, "init:maxClientVersion=" + maxClientVersion);
 		EGLConfig config;
 		if (maxClientVersion >= 3) {
-			// GLES3で取得できるかどうか試してみる
+			if (DEBUG) Log.d(TAG, "init:GLES3で取得できるかどうか試してみる");
 			config = getConfig(3, withDepthBuffer, stencilBits, isRecordable);
 			if (config != null) {
 				final EGLContext context = createContext(sharedContext, config, 3);
@@ -474,6 +475,7 @@ import com.serenegiant.system.BuildCheck;
 		if ((maxClientVersion >= 2)
 			&& ((mContext == null) || (mContext.eglContext == EGL14.EGL_NO_CONTEXT))) {
 
+			if (DEBUG) Log.d(TAG, "init:GLES2を試みる");
 			config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new RuntimeException("chooseConfig failed");
@@ -516,7 +518,10 @@ import com.serenegiant.system.BuildCheck;
         final int[] values = new int[1];
         EGL14.eglQueryContext(mEglDisplay,
         	mContext.eglContext, EGL14.EGL_CONTEXT_CLIENT_VERSION, values, 0);
-        Log.d(TAG, "EGLContext created, client version " + values[0]);
+		if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {
+			Log.d(TAG, String.format("EGLContext created, client version %d(request %d) ",
+				values[0], maxClientVersion));
+		}
         makeDefault();	// makeCurrent(EGL14.EGL_NO_SURFACE);
 	}
 
@@ -568,7 +573,7 @@ import com.serenegiant.system.BuildCheck;
     private EGLContext createContext(final Context sharedContext,
     	final EGLConfig config, final int version) {
 
-//		if (DEBUG) Log.v(TAG, "createContext:");
+		if (DEBUG) Log.v(TAG, "createContext:version=" + version);
 
         final int[] attrib_list = {
         	EGL14.EGL_CONTEXT_CLIENT_VERSION, version,
@@ -702,6 +707,9 @@ import com.serenegiant.system.BuildCheck;
     private EGLConfig getConfig(final int version,
     	final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
+		if (DEBUG) Log.v(TAG, "getConfig:version=" + version
+			+ ",hasDepthBuffer=" + hasDepthBuffer + ",stencilBits=" + stencilBits
+			+ ",isRecordable=" + isRecordable);
 		int renderableType = EGL_OPENGL_ES2_BIT;
 		if (version >= 3) {
 			renderableType |= EGL_OPENGL_ES3_BIT_KHR;

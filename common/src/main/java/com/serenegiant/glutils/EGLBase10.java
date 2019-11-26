@@ -44,7 +44,7 @@ import com.serenegiant.system.BuildCheck;
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
 /*package*/ class EGLBase10 extends EGLBase {
-//	private static final boolean DEBUG = false;	// FIXME set false on release
+	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = EGLBase10.class.getSimpleName();
 
 	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
@@ -526,7 +526,7 @@ import com.serenegiant.system.BuildCheck;
 		@Nullable Context sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
-//		if (DEBUG) Log.v(TAG, "init:");
+		if (DEBUG) Log.v(TAG, "init:");
 		sharedContext = (sharedContext != null) ? sharedContext : EGL_NO_CONTEXT;
 		if (mEgl == null) {
 			mEgl = (EGL10)EGLContext.getEGL();
@@ -543,11 +543,11 @@ import com.serenegiant.system.BuildCheck;
 		}
 		EGLConfig config;
 		if (maxClientVersion >= 3) {
-			// GLES3で取得できるかどうか試してみる
+			if (DEBUG) Log.d(TAG, "init:GLES3で取得できるかどうか試してみる");
 			config = getConfig(3, withDepthBuffer, stencilBits, isRecordable);
 			if (config != null) {
 				final EGLContext context = createContext(sharedContext, config, 3);
-				if ((mEgl.eglGetError()) == EGL10.EGL_SUCCESS) {
+				if (mEgl.eglGetError() == EGL10.EGL_SUCCESS) {
 					// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
 					//Log.d(TAG, "Got GLES 3 config");
 					mEglConfig = new Config(config);
@@ -560,6 +560,7 @@ import com.serenegiant.system.BuildCheck;
 		if ((maxClientVersion >= 2)
 			&& ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT))) {
 
+			if (DEBUG) Log.d(TAG, "init:GLES2を試みる");
             config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
             if (config == null) {
                	throw new RuntimeException("chooseConfig failed");
@@ -602,7 +603,10 @@ import com.serenegiant.system.BuildCheck;
 		final int[] values = new int[1];
 		mEgl.eglQueryContext(mEglDisplay,
 			mContext.eglContext, EGL_CONTEXT_CLIENT_VERSION, values);
-		Log.d(TAG, "EGLContext created, client version " + values[0]);
+		if (mEgl.eglGetError() == EGL10.EGL_SUCCESS) {
+			Log.d(TAG, String.format("EGLContext created, client version %d(request %d) ",
+				values[0], maxClientVersion));
+		}
         makeDefault();
 	}
 
@@ -662,7 +666,7 @@ import com.serenegiant.system.BuildCheck;
     	@NonNull final Context sharedContext,
     	final EGLConfig config, final int version) {
 
-//		if (DEBUG) Log.v(TAG, "createContext:");
+		if (DEBUG) Log.v(TAG, "createContext:version=" + version);
 
         final int[] attrib_list = {
         	EGL_CONTEXT_CLIENT_VERSION, version,
@@ -795,6 +799,10 @@ import com.serenegiant.system.BuildCheck;
 
 	private final EGLConfig getConfig(final int version,
 		final boolean hasDepthBuffer, final int stencilBits, final boolean isRecordable) {
+
+		if (DEBUG) Log.v(TAG, "getConfig:version=" + version
+			+ ",hasDepthBuffer=" + hasDepthBuffer + ",stencilBits=" + stencilBits
+			+ ",isRecordable=" + isRecordable);
 
         int renderableType = EGL_OPENGL_ES2_BIT;
         if (version >= 3) {
