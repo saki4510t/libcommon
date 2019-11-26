@@ -18,44 +18,23 @@ package com.serenegiant.glutils.es3;
  *  limitations under the License.
 */
 
-import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.opengl.Matrix;
 import android.os.Build;
 
-import com.serenegiant.glutils.IDrawer2D;
-import com.serenegiant.glutils.IGLSurface;
-import com.serenegiant.glutils.IShaderDrawer2d;
-import com.serenegiant.utils.BufferHelper;
+import com.serenegiant.glutils.GLDrawer2D;
 
-import java.nio.FloatBuffer;
-
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
-import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class GLDrawer2DES3 implements IShaderDrawer2d {
+public class GLDrawer2DES3 extends GLDrawer2D {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2DES3";
-
-
-	final int VERTEX_NUM;
-	final int VERTEX_SZ;
-	final FloatBuffer pVertex;
-	final FloatBuffer pTexCoord;
-	final int mTexTarget;
-	int hProgram;
-    int maPositionLoc;
-    int maTextureCoordLoc;
-    int muMVPMatrixLoc;
-    int muTexMatrixLoc;
-    @NonNull
-	final float[] mMvpMatrix = new float[16];
 
 	/**
 	 * コンストラクタ
@@ -76,82 +55,25 @@ public class GLDrawer2DES3 implements IShaderDrawer2d {
 	 * 				通常の2Dテキスチャならfalse
 	 */
 	public GLDrawer2DES3(final float[] vertices,
-						 final float[] texcoord, final boolean isOES) {
+		final float[] texcoord, final boolean isOES) {
 
-		VERTEX_NUM = Math.min(
-			vertices != null ? vertices.length : 0,
-			texcoord != null ? texcoord.length : 0) / 2;
-		VERTEX_SZ = VERTEX_NUM * 2;
-
-		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
-		pVertex = BufferHelper.createFloatBuffer(vertices);
-		pTexCoord = BufferHelper.createFloatBuffer(texcoord);
-
-		if (isOES) {
-			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
-		} else {
-			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE);
-		}
-		// モデルビュー変換行列を初期化
-		Matrix.setIdentityM(mMvpMatrix, 0);
-		init();
+		super(vertices, texcoord, isOES);
 	}
 
 	/**
 	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * IDrawer2Dの実装
 	 */
+	@CallSuper
 	@Override
 	public void release() {
 		if (hProgram >= 0) {
 			GLES30.glDeleteProgram(hProgram);
 		}
 		hProgram = -1;
+		super.release();
 	}
 
-	/**
-	 * 外部テクスチャを使うかどうか
-	 * IShaderDrawer2dの実装
-	 * @return
-	 */
-	@Override
-	public boolean isOES() {
-		return mTexTarget == GL_TEXTURE_EXTERNAL_OES;
-	}
-
-	/**
-	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
-	 * IDrawer2Dの実装
-	 * @return
-	 */
-	@Override
-	public float[] getMvpMatrix() {
-		return mMvpMatrix;
-	}
-
-	/**
-	 * モデルビュー変換行列に行列を割り当てる
-	 * IDrawer2Dの実装
-	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
-	 * @param offset
-	 * @return
-	 */
-	@Override
-	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
-		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
-		return this;
-	}
-
-	/**
-	 * モデルビュー変換行列のコピーを取得
-	 * IDrawer2Dの実装
-	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
-	 * @param offset
-	 */
-	@Override
-	public void copyMvpMatrix(final float[] matrix, final int offset) {
-		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
-	}
 
 	/**
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
@@ -191,17 +113,6 @@ public class GLDrawer2DES3 implements IShaderDrawer2d {
 	}
 
 	/**
-	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
-	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
-	 * IDrawer2Dの実装
-	 * @param surface
-	 */
-	@Override
-	public void draw(@NonNull final IGLSurface surface) {
-		draw(surface.getTexId(), surface.getTexMatrix(), 0);
-	}
-
-	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
 	 * IShaderDrawer2dの実装
@@ -209,7 +120,7 @@ public class GLDrawer2DES3 implements IShaderDrawer2d {
 	 */
 	@Override
 	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES30.GL_NEAREST);
+		return GLHelper.initTex(mTexTarget, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
 	}
 
 	/**
@@ -223,46 +134,9 @@ public class GLDrawer2DES3 implements IShaderDrawer2d {
 		GLHelper.deleteTex(hTex);
 	}
 
-	/**
-	 * 頂点シェーダー・フラグメントシェーダーを変更する
-	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
-	 * @param vs 頂点シェーダー文字列
-	 * @param fs フラグメントシェーダー文字列
-	 */
 	@Override
-	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
-		release();
-		hProgram = GLHelper.loadShader(vs, fs);
-		init();
-	}
-
-	/**
-	 * フラグメントシェーダーを変更する
-	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 * glUseProgramが呼ばれた状態で返る
-	 * IShaderDrawer2dの実装
-	 * @param fs フラグメントシェーダー文字列
-	 */
-	@Override
-	public void updateShader(@NonNull final String fs) {
-		updateShader(VERTEX_SHADER, fs);
-	}
-
-	/**
-	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
-	 * IShaderDrawer2dの実装
-	 */
-	@Override
-	public void resetShader() {
-		release();
-		if (isOES()) {
-			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
-		} else {
-			hProgram = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE);
-		}
-		init();
+	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+		return GLHelper.loadShader(vs, fs);
 	}
 
 	/**
@@ -304,7 +178,8 @@ public class GLDrawer2DES3 implements IShaderDrawer2d {
 	 * シェーダープログラム変更時の初期化処理
 	 * glUseProgramが呼ばれた状態で返る
 	 */
-	private void init() {
+	@Override
+	protected void init() {
 		GLES30.glUseProgram(hProgram);
 		maPositionLoc = GLES30.glGetAttribLocation(hProgram, "aPosition");
 		maTextureCoordLoc = GLES30.glGetAttribLocation(hProgram, "aTextureCoord");

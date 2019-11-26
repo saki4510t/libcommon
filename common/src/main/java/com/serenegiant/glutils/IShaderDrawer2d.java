@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import androidx.annotation.NonNull;
 
+@Deprecated
 public interface IShaderDrawer2d extends IDrawer2D {
 	static final float[] DEFAULT_VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
 	static final float[] DEFAULT_TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
