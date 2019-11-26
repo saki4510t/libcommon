@@ -37,7 +37,7 @@ import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

@@ -18,7 +18,7 @@ package com.serenegiant.dialog;
  *  limitations under the License.
 */
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 import android.app.Activity;
 import android.app.AlertDialog;

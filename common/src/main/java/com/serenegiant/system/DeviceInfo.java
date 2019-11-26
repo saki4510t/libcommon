@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -27,6 +27,8 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.text.TextUtils;
+
+import com.serenegiant.system.BuildCheck;
 
 public final class DeviceInfo {
 	@SuppressLint("NewApi")

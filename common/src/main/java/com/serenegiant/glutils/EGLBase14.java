@@ -39,7 +39,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス

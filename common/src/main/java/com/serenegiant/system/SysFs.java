@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself

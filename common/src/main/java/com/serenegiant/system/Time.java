@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -43,6 +43,7 @@ public class Time {
 	}
 	
 	private Time() {
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 	
 	@SuppressLint("NewApi")

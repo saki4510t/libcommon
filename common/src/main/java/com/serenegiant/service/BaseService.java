@@ -44,7 +44,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.util.List;

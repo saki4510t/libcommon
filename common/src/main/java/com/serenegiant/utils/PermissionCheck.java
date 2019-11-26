@@ -35,6 +35,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
+
 public final class PermissionCheck {
 	private PermissionCheck() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに

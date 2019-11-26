@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -30,6 +30,8 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Debug;
 import android.text.TextUtils;
+
+import com.serenegiant.system.BuildCheck;
 
 public class MemInfo {
 

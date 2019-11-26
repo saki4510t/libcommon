@@ -34,7 +34,7 @@ import android.view.accessibility.AccessibilityNodeInfo;
 import android.widget.FrameLayout;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 /**
  * 2つの子Viewを指定した位置に自動配置するViewGroup

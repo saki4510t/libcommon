@@ -22,7 +22,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;

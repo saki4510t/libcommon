@@ -38,7 +38,7 @@ import androidx.annotation.RequiresPermission;
 
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.lang.ref.WeakReference;

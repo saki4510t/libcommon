@@ -34,8 +34,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.Time;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Time;
 
 public abstract class IAudioSampler {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること

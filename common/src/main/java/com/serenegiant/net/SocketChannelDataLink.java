@@ -22,7 +22,7 @@ import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 import java.io.IOException;
 import java.net.InetAddress;

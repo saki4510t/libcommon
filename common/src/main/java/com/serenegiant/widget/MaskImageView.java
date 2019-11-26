@@ -31,7 +31,7 @@ import android.graphics.drawable.Drawable;
 import androidx.appcompat.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 /**
  * Drawableで指定したMaskの不透過部分に対応するイメージを表示するImageView

@@ -20,8 +20,8 @@ package com.serenegiant.glutils.es1;
 
 import javax.microedition.khronos.opengles.GL10;
 
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.Stacktrace;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Stacktrace;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

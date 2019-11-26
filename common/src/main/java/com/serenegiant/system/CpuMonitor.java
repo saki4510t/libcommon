@@ -8,7 +8,7 @@
  *  be found in the AUTHORS file in the root of the source tree.
  */
 
-package com.serenegiant.utils;
+package com.serenegiant.system;
 
 import android.util.Log;
 import android.util.SparseIntArray;

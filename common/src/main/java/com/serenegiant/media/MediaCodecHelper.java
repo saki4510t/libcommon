@@ -28,8 +28,7 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.serenegiant.utils.BufferHelper;
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.MediaInfo;
+import com.serenegiant.system.BuildCheck;
 
 import java.util.ArrayList;
 import java.util.List;

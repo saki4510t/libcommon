@@ -31,7 +31,7 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.widget.Toast;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 public class BaseFragment extends Fragment {

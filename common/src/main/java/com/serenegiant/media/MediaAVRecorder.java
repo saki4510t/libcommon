@@ -28,7 +28,7 @@ import android.text.TextUtils;
 
 import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.SAFUtils;
-import com.serenegiant.utils.StorageInfo;
+import com.serenegiant.system.StorageInfo;
 import com.serenegiant.utils.UriHelper;
 
 import androidx.annotation.NonNull;

@@ -11,7 +11,7 @@ import android.view.Surface;
 import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.es2.GLHelper;
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
 import java.util.Set;

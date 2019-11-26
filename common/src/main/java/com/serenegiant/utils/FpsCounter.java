@@ -18,6 +18,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import com.serenegiant.system.Time;
+
 public class FpsCounter {
 	private int cnt, prevCnt;
 	private long startTime, prevTime;

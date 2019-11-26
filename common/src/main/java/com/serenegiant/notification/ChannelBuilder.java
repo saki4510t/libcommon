@@ -35,7 +35,7 @@ import androidx.annotation.XmlRes;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ObjectHelper;
 import com.serenegiant.utils.XmlHelper;
 

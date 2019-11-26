@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.security;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -27,6 +27,8 @@ import android.content.pm.Signature;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
+
+import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;

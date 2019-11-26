@@ -21,7 +21,7 @@ package com.serenegiant.glutils;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
-import com.serenegiant.utils.Time;
+import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
 

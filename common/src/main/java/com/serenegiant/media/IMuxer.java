@@ -30,7 +30,7 @@ import android.media.MediaMuxer;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.UriHelper;
 
 import androidx.annotation.NonNull;

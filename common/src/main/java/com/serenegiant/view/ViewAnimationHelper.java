@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.serenegiant.common.R;
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 public class ViewAnimationHelper {
 	private static final String TAG = ViewAnimationHelper.class.getSimpleName();

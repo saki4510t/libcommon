@@ -33,6 +33,8 @@ import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.StorageInfo;
+
 public class FileUtils {
 	private static final String TAG = FileUtils.class.getSimpleName();
 
@@ -181,7 +183,7 @@ public class FileUtils {
 	 */
 	@Nullable
 	public static StorageInfo getStorageInfo(final Context context,
-		@NonNull final String type, final int save_tree_id) {
+											 @NonNull final String type, final int save_tree_id) {
 	    
 		if (context != null) {
 			try {

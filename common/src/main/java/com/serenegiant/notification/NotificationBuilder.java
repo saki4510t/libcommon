@@ -37,7 +37,7 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import android.widget.RemoteViews;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

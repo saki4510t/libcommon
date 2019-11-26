@@ -30,8 +30,8 @@ import android.view.Surface;
 
 import com.serenegiant.media.exceptions.TimeoutException;
 import com.serenegiant.utils.BufferHelper;
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.Time;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Time;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;

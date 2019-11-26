@@ -38,6 +38,9 @@ import androidx.documentfile.provider.DocumentFile;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.StorageInfo;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -751,7 +754,7 @@ public class SAFUtils {
 	@SuppressLint("NewApi")
 	@Nullable
 	public static StorageInfo getStorageInfo(@NonNull final Context context,
-		@NonNull final DocumentFile dir) {
+											 @NonNull final DocumentFile dir) {
 		
 		try {
 			final String path = UriHelper.getPath(context, dir.getUri());

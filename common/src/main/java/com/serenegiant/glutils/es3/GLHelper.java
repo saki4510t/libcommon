@@ -32,8 +32,8 @@ import android.util.Log;
 
 import com.serenegiant.glutils.ShaderConst;
 import com.serenegiant.utils.AssetsHelper;
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.Stacktrace;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Stacktrace;
 
 import java.io.IOException;
 

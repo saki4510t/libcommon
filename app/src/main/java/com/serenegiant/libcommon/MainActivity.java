@@ -32,7 +32,7 @@ import android.widget.Toast;
 
 import com.serenegiant.dialog.MessageDialogFragmentV4;
 import com.serenegiant.libcommon.list.DummyContent;
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.PermissionCheck;
 
 public class MainActivity extends AppCompatActivity

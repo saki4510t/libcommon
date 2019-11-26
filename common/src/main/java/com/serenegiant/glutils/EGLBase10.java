@@ -27,7 +27,6 @@ import javax.microedition.khronos.egl.EGLSurface;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
-import android.opengl.EGL14;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
@@ -39,7 +38,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス

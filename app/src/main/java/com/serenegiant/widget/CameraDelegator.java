@@ -11,7 +11,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.WindowManager;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;

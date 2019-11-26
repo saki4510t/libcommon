@@ -21,11 +21,10 @@ package com.serenegiant.usb;
 */
 
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.text.TextUtils;
 
-import com.serenegiant.utils.BuildCheck;
+import com.serenegiant.system.BuildCheck;
 
 public class UsbUtils {
 	private UsbUtils() {

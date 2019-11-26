@@ -29,13 +29,12 @@ import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.os.SystemClock;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.utils.BuildCheck;
-import com.serenegiant.utils.Time;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Time;
 
 import java.io.File;
 import java.io.FileNotFoundException;
