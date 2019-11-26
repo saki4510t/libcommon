@@ -167,6 +167,9 @@ public abstract class EGLBase implements EGLConst {
 		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
 	}
 
+	protected EGLBase() {
+	}
+
 //--------------------------------------------------------------------------------
 // インターフェースメソッド
 //--------------------------------------------------------------------------------

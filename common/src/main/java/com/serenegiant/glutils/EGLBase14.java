@@ -267,6 +267,7 @@ import com.serenegiant.utils.BuildCheck;
 		@Nullable final Context sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
+		super();
 //		if (DEBUG) Log.v(TAG, "Constructor:");
 		init(maxClientVersion, sharedContext, withDepthBuffer, stencilBits, isRecordable);
 	}
@@ -281,6 +282,7 @@ import com.serenegiant.utils.BuildCheck;
 		final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
+		super();
 //		if (DEBUG) Log.v(TAG, "Constructor:");
 		init(maxClientVersion, new Context(EGL14.eglGetCurrentContext()),
 			withDepthBuffer, stencilBits, isRecordable);

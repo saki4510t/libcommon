@@ -44,7 +44,7 @@ public abstract class AbstractDistributeTask {
 
 	protected IDrawer2D mDrawer;
 
-	public AbstractDistributeTask(final int width, final int height) {
+	protected AbstractDistributeTask(final int width, final int height) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mVideoWidth = width > 0 ? width : 640;
