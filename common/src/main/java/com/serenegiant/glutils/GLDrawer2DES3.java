@@ -20,10 +20,10 @@ package com.serenegiant.glutils;
 
 import android.opengl.GLES30;
 import android.os.Build;
+import android.util.Log;
 
 import com.serenegiant.glutils.es3.GLHelper;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
@@ -34,9 +34,10 @@ import androidx.annotation.RequiresApi;
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	/*package*/ class GLDrawer2DES3 extends GLDrawer2D {
-//	private static final boolean DEBUG = false; // FIXME set false on release
-//	private static final String TAG = "GLDrawer2DES3";
+	private static final boolean DEBUG = false; // FIXME set false on release
+	private static final String TAG = GLDrawer2DES3.class.getSimpleName();
 
+	private int errCnt;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
@@ -50,21 +51,6 @@ import androidx.annotation.RequiresApi;
 
 		super(vertices, texcoord, isOES);
 	}
-
-	/**
-	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 * IDrawer2Dの実装
-	 */
-	@CallSuper
-	@Override
-	public void release() {
-		if (hProgram >= 0) {
-			GLES30.glDeleteProgram(hProgram);
-		}
-		hProgram = -1;
-		super.release();
-	}
-
 
 	/**
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
@@ -98,7 +84,14 @@ import androidx.annotation.RequiresApi;
 			GLES30.glEnableVertexAttribArray(maPositionLoc);
 			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 		}
-		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		if (validateProgram(hProgram)) {
+			GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		} else {
+			if (errCnt++ == 0) {
+				Log.w(TAG, "draw:invalid");
+				// FIXME シェーダーを再初期化する?
+			}
+		}
 		GLES30.glBindTexture(mTexTarget, 0);
         GLES30.glUseProgram(0);
 	}
@@ -127,7 +120,18 @@ import androidx.annotation.RequiresApi;
 
 	@Override
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+		errCnt = 0;
 		return GLHelper.loadShader(vs, fs);
+	}
+
+	/**
+	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
+	 * IDrawer2Dの実装
+	 */
+	@Override
+	protected void internalReleaseShader(final int program) {
+		errCnt = 0;
+		GLES30.glDeleteProgram(program);
 	}
 
 	/**
@@ -188,4 +192,16 @@ import androidx.annotation.RequiresApi;
 		GLES30.glEnableVertexAttribArray(maPositionLoc);
 		GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 	}
+
+	private final int[] status = new int[1];
+	@Override
+	protected boolean validateProgram(final int program) {
+		if (program >= 0) {
+			GLES30.glValidateProgram(program);
+			GLES30.glGetProgramiv(program, GLES30.GL_VALIDATE_STATUS, status, 0);
+			return status[0] == GLES30.GL_TRUE;
+		}
+		return false;
+	}
+
 }

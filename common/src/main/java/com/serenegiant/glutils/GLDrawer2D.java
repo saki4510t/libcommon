@@ -26,6 +26,7 @@ import com.serenegiant.utils.BufferHelper;
 
 import java.nio.FloatBuffer;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 import static com.serenegiant.glutils.ShaderConst.*;
@@ -108,19 +109,17 @@ public abstract class GLDrawer2D implements IDrawer2D {
 		// モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
 
-		if (isOES) {
-			updateShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
-		} else {
-			updateShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE);
-		}
+		resetShader();
 	}
 
 	/**
 	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * IDrawer2Dの実装
 	 */
+	@CallSuper
 	@Override
 	public void release() {
+		releaseShader();
 	}
 
 	/**
@@ -167,19 +166,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	}
 
 	/**
-	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
-	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する
-	 * IDrawer2Dの実装
-	 * @param texId texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される。
-	 * 					領域チェックしていないのでoffsetから16個以上確保しておくこと
-	 * @param offset
-	 */
-	@Override
-	public abstract void draw(final int texId,
-		final float[] tex_matrix, final int offset);
-
-	/**
 	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
 	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
 	 * IDrawer2Dの実装
@@ -212,12 +198,24 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param fs フラグメントシェーダー文字列
 	 */
 	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
-		release();
+		releaseShader();
 		hProgram = loadShader(vs, fs);
 		init();
 	}
 
+	/**
+	 * シェーダーを破棄
+	 */
+	protected void releaseShader() {
+		if (hProgram >= 0) {
+			internalReleaseShader(hProgram);
+		}
+		hProgram = -1;
+	}
+
 	protected abstract int loadShader(@NonNull final String vs, @NonNull final String fs);
+	protected abstract void internalReleaseShader(final int program);
+
 	/**
 	 * フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
@@ -232,7 +230,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
 	public void resetShader() {
-		release();
+		releaseShader();
 		if (isOES()) {
 			hProgram = loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SIMPLE_OES);
 		} else {
@@ -267,4 +265,11 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * glUseProgramが呼ばれた状態で返る
 	 */
 	protected abstract void init();
+
+	/**
+	 * シェーダープログラムが使用可能かどうかをチェック
+	 * @param program
+	 * @return
+	 */
+	protected abstract boolean validateProgram(final int program);
 }

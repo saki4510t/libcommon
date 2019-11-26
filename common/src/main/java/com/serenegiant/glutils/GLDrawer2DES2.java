@@ -20,10 +20,10 @@ package com.serenegiant.glutils;
 
 
 import android.opengl.GLES20;
+import android.util.Log;
 
 import com.serenegiant.glutils.es2.GLHelper;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 
 /**
@@ -31,8 +31,10 @@ import androidx.annotation.NonNull;
  * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
 /*package*/class GLDrawer2DES2 extends GLDrawer2D {
-//	private static final boolean DEBUG = false; // FIXME set false on release
-//	private static final String TAG = "GLDrawer2DES2";
+	private static final boolean DEBUG = false; // FIXME set false on release
+	private static final String TAG = GLDrawer2DES2.class.getSimpleName();
+
+	private int errCnt;
 
 	/**
 	 * コンストラクタ
@@ -46,20 +48,6 @@ import androidx.annotation.NonNull;
 		final float[] texcoord, final boolean isOES) {
 
 		super(vertices, texcoord, isOES);
-	}
-
-	/**
-	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 * IDrawer2Dの実装
-	 */
-	@CallSuper
-	@Override
-	public void release() {
-		if (hProgram >= 0) {
-			GLES20.glDeleteProgram(hProgram);
-		}
-		hProgram = -1;
-		super.release();
 	}
 
 	/**
@@ -94,7 +82,14 @@ import androidx.annotation.NonNull;
 			GLES20.glEnableVertexAttribArray(maPositionLoc);
 			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
 		}
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		if (validateProgram(hProgram)) {
+			GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		} else {
+			if (errCnt++ == 0) {
+				Log.w(TAG, "draw:invalid program");
+				// FIXME シェーダーを再初期化する?
+			}
+		}
 		GLES20.glBindTexture(mTexTarget, 0);
         GLES20.glUseProgram(0);
 	}
@@ -119,7 +114,18 @@ import androidx.annotation.NonNull;
 
 	@Override
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+		errCnt = 0;
 		return GLHelper.loadShader(vs, fs);
+	}
+
+	/**
+	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
+	 * IDrawer2Dの実装
+	 */
+	@Override
+	protected void internalReleaseShader(final int program) {
+		errCnt = 0;
+		GLES20.glDeleteProgram(program);
 	}
 
 	/**
@@ -178,5 +184,16 @@ import androidx.annotation.NonNull;
 			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
 		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+	}
+
+	private final int[] status = new int[1];
+	@Override
+	protected boolean validateProgram(final int program) {
+		if (program >= 0) {
+			GLES20.glValidateProgram(program);
+			GLES20.glGetProgramiv(program, GLES20.GL_VALIDATE_STATUS, status, 0);
+			return status[0] == GLES20.GL_TRUE;
+		}
+		return false;
 	}
 }
