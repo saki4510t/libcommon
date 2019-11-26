@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
@@ -85,6 +86,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	protected int muTexMatrixLoc;
     @NonNull
 	protected final float[] mMvpMatrix = new float[16];
+	private int errCnt;
 
 	/**
 	 * コンストラクタ
@@ -175,6 +177,42 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	public void draw(@NonNull final IGLSurface surface) {
 		draw(surface.getTexId(), surface.getTexMatrix(), 0);
 	}
+
+	@Override
+	public synchronized void draw(final int texId,
+		final float[] tex_matrix, final int offset) {
+
+//		if (DEBUG) Log.v(TAG, "draw");
+		if (hProgram < 0) return;
+		glUseProgram();
+		if (tex_matrix != null) {
+			// テクスチャ変換行列が指定されている時
+			updateTexMatrix(tex_matrix, offset);
+		}
+		// モデルビュー変換行列をセット
+		updateMvpMatrix(mMvpMatrix);
+		bindTexture(texId);
+		if (true) {
+			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
+			updateVertex();
+		}
+		if (validateProgram(hProgram)) {
+			drawArrays();
+		} else {
+			if (errCnt++ == 0) {
+				Log.w(TAG, "draw:invalid program");
+				// FIXME シェーダーを再初期化する?
+			}
+		}
+		finishDraw();
+	}
+
+	protected abstract void updateTexMatrix(final float[] tex_matrix, final int offset);
+	protected abstract void updateMvpMatrix(final float[] mvpMatrix);
+	protected abstract void bindTexture(final int texId);
+	protected abstract void updateVertex();
+	protected abstract void drawArrays();
+	protected abstract void finishDraw();
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド

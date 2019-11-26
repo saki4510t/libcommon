@@ -20,7 +20,6 @@ package com.serenegiant.glutils;
 
 import android.opengl.GLES30;
 import android.os.Build;
-import android.util.Log;
 
 import com.serenegiant.glutils.es3.GLHelper;
 
@@ -52,49 +51,43 @@ import androidx.annotation.RequiresApi;
 		super(vertices, texcoord, isOES);
 	}
 
-	/**
-	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
-	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する
-	 * IDrawer2Dの実装
-	 * @param texId texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される。
-	 * 					領域チェックしていないのでoffsetから16個以上確保しておくこと
-	 */
 	@Override
-	public synchronized void draw(final int texId,
-		final float[] tex_matrix, final int offset) {
+	protected void updateTexMatrix(final float[] texMatrix, final int offset) {
+		GLES30.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
+	}
 
-//		if (DEBUG) Log.v(TAG, "draw");
-		if (hProgram < 0) return;
-		GLES30.glUseProgram(hProgram);
-		if (tex_matrix != null) {
-			// テクスチャ変換行列が指定されている時
-			GLES30.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
-		}
-		// モデルビュー変換行列をセット
-		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
+	@Override
+	protected void updateMvpMatrix(final float[] mvpMatrix) {
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, 0);
+	}
+
+	@Override
+	protected void bindTexture(final int texId) {
 		GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
 		GLES30.glBindTexture(mTexTarget, texId);
-		if (true) {
-			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
-			GLES30.glVertexAttribPointer(maPositionLoc,
-				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
-			GLES30.glVertexAttribPointer(maTextureCoordLoc,
-				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-			GLES30.glEnableVertexAttribArray(maPositionLoc);
-			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
-		}
-		if (validateProgram(hProgram)) {
-			GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-		} else {
-			if (errCnt++ == 0) {
-				Log.w(TAG, "draw:invalid");
-				// FIXME シェーダーを再初期化する?
-			}
-		}
-		GLES30.glBindTexture(mTexTarget, 0);
-        GLES30.glUseProgram(0);
 	}
+
+	@Override
+	protected void updateVertex() {
+		GLES30.glVertexAttribPointer(maPositionLoc,
+			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
+		GLES30.glVertexAttribPointer(maTextureCoordLoc,
+			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+		GLES30.glEnableVertexAttribArray(maPositionLoc);
+		GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
+	}
+
+	@Override
+	protected void drawArrays() {
+		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+	}
+
+	@Override
+	protected void finishDraw() {
+		GLES30.glBindTexture(mTexTarget, 0);
+		GLES30.glUseProgram(0);
+	}
+
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
