@@ -29,7 +29,6 @@ import android.os.Build;
 import android.text.TextUtils;
 
 public final class DeviceInfo {
-	@SuppressWarnings("deprecation")
 	@SuppressLint("NewApi")
 	public static JSONObject get() throws JSONException {
 		final JSONObject result = new JSONObject();
@@ -141,7 +140,7 @@ public final class DeviceInfo {
 			result.put("API_LEVEL", e.getMessage());
 		}
 		try {
-			String proc_version = null;
+			String proc_version;
 			final BufferedReader reader = new BufferedReader(new FileReader("/proc/version"), 512);
 			proc_version = reader.readLine();
 			reader.close();
@@ -152,7 +151,7 @@ public final class DeviceInfo {
 
 		final JSONObject cpu_info = new JSONObject();
 		int i = 0;
-		String proc_cpuinfo = null;
+		String proc_cpuinfo;
 		try {
 			final BufferedReader reader = new BufferedReader(new FileReader("/proc/cpuinfo"), 512);
 			do {
