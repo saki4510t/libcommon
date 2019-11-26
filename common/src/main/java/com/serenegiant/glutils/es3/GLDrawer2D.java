@@ -96,6 +96,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
+	 * IDrawer2Dの実装
 	 */
 	@Override
 	public void release() {
@@ -107,14 +108,17 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * 外部テクスチャを使うかどうか
+	 * IShaderDrawer2dの実装
 	 * @return
 	 */
+	@Override
 	public boolean isOES() {
 		return mTexTarget == GL_TEXTURE_EXTERNAL_OES;
 	}
 
 	/**
 	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
+	 * IDrawer2Dの実装
 	 * @return
 	 */
 	@Override
@@ -124,6 +128,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * モデルビュー変換行列に行列を割り当てる
+	 * IDrawer2Dの実装
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 * @return
@@ -136,6 +141,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * モデルビュー変換行列のコピーを取得
+	 * IDrawer2Dの実装
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
@@ -147,6 +153,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * 指定したテクスチャを指定したテクスチャ変換行列を使って描画領域全面に描画するためのヘルパーメソッド
 	 * このクラスインスタンスのモデルビュー変換行列が設定されていればそれも適用された状態で描画する
+	 * IDrawer2Dの実装
 	 * @param texId texture ID
 	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される。
 	 * 					領域チェックしていないのでoffsetから16個以上確保しておくこと
@@ -183,6 +190,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
 	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
+	 * IDrawer2Dの実装
 	 * @param surface
 	 */
 	@Override
@@ -193,8 +201,10 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
+	 * IShaderDrawer2dの実装
 	 * @return texture ID
 	 */
+	@Override
 	public int initTex() {
 		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES30.GL_NEAREST);
 	}
@@ -202,8 +212,10 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
+	 * IShaderDrawer2dの実装
 	 * @param hTex
 	 */
+	@Override
 	public void deleteTex(final int hTex) {
 		GLHelper.deleteTex(hTex);
 	}
@@ -212,6 +224,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * 頂点シェーダー・フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る
+	 * IShaderDrawer2dの実装
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
 	 */
@@ -226,6 +239,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る
+	 * IShaderDrawer2dの実装
 	 * @param fs フラグメントシェーダー文字列
 	 */
 	@Override
@@ -235,6 +249,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
+	 * IShaderDrawer2dの実装
 	 */
 	@Override
 	public void resetShader() {
@@ -250,6 +265,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * アトリビュート変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
+	 * IShaderDrawer2dの実装
 	 * @param name
 	 * @return
 	 */
@@ -262,6 +278,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	/**
 	 * ユニフォーム変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
+	 * IShaderDrawer2dの実装
 	 * @param name
 	 * @return
 	 */
@@ -273,6 +290,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 
 	/**
 	 * glUseProgramが呼ばれた状態で返る
+	 * IShaderDrawer2dの実装
 	 */
 	@Override
 	public void glUseProgram() {

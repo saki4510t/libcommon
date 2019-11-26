@@ -23,6 +23,11 @@ public interface IShaderDrawer2d extends IDrawer2D {
 	static final float[] DEFAULT_TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
 	static final int FLOAT_SZ = Float.SIZE / 8;
 
+	/**
+	 * 外部テクスチャを使うかどうか
+	 * @return
+	 */
+	public boolean isOES();
 	public int glGetAttribLocation(final String name);
 	public int glGetUniformLocation(final String name);
 	public void glUseProgram();
@@ -30,4 +35,18 @@ public interface IShaderDrawer2d extends IDrawer2D {
 	public void resetShader();
 	public void updateShader(final String vs, final String fs);
 	public void updateShader(final String fs);
+
+	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * @return texture ID
+	 */
+	public int initTex();
+
+	/**
+	 * テクスチャ名破棄のヘルパーメソッド
+	 * GLHelper.deleteTexを呼び出すだけ
+	 * @param hTex
+	 */
+	public void deleteTex(final int hTex);
 }
