@@ -66,27 +66,27 @@ public final class GLHelper {
 
 	/**
 	 * テクスチャ名を生成, クランプ方法はGL_CLAMP_TO_EDGE
-	 * @param texTarget
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 * @param texUnit テクスチャユニット, GL_TEXTURE0...GL_TEXTURE31
-	 * @param filter_param テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
+	 * @param filterParam テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
-	public static int initTex(final int texTarget, final int texUnit, final int filter_param) {
+	public static int initTex(final int texTarget, final int texUnit, final int filterParam) {
 		return initTex(texTarget, GLES20.GL_TEXTURE0,
-			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
 
 	/**
 	 * テクスチャ名を生成(GL_TEXTURE0のみ)
-	 * @param texTarget
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 * @param texUnit テクスチャユニット, GL_TEXTURE0...GL_TEXTURE31
-	 * @param min_filter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
-	 * @param mag_filter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
-	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE
+	 * @param minFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param magFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
 	public static int initTex(final int texTarget, final int texUnit,
-		final int min_filter, final int mag_filter, final int wrap) {
+		final int minFilter, final int magFilter, final int wrap) {
 
 //		if (DEBUG) Log.v(TAG, "initTex:target=" + texTarget);
 		final int[] tex = new int[1];
@@ -95,66 +95,66 @@ public final class GLHelper {
 		GLES20.glBindTexture(texTarget, tex[0]);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_WRAP_S, wrap);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_WRAP_T, wrap);
-		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MIN_FILTER, min_filter);
-		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, mag_filter);
+		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MIN_FILTER, minFilter);
+		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, magFilter);
 		Log.d(TAG, "initTex:texId=" + tex[0]);
 		return tex[0];
 	}
 
 	/**
-	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...), クランプ方法はGL_CLAMP_TO_EDGE
 	 * @param n 生成するテキスチャ名の数, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
-	 * @param texTarget
-	 * @param filter_param
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param filterParam テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
-		final int texTarget, final int filter_param) {
+		final int texTarget, final int filterParam) {
 		
 		return initTexes(new int[n], texTarget,
-			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
 
 	/**
-	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
+	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...), クランプ方法はGL_CLAMP_TO_EDGE
 	 * @param texIds テクスチャ名配列, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
-	 * @param texTarget
-	 * @param filter_param
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param filterParam テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int filter_param) {
+		final int texTarget, final int filterParam) {
 		
 		return initTexes(texIds, texTarget,
-			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
 
 	/**
 	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
  	 * @param n 生成するテキスチャ名の数, 最大32
-	 * @param texTarget
-	 * @param min_filter
-	 * @param mag_filter
-	 * @param wrap
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param minFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param magFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
-		final int texTarget, final int min_filter, final int mag_filter, final int wrap) {
+		final int texTarget, final int minFilter, final int magFilter, final int wrap) {
 		
-		return initTexes(new int[n], texTarget, min_filter, mag_filter, wrap);
+		return initTexes(new int[n], texTarget, minFilter, magFilter, wrap);
 	}
 
 	/**
 	 * テクスチャ名配列を生成(前から順にGL_TEXTURE0, GL_TEXTURE1, ...)
 	 * @param texIds テクスチャ名配列, 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
-	 * @param texTarget
-	 * @param min_filter
-	 * @param mag_filter
-	 * @param wrap
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param minFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param magFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int min_filter, final int mag_filter, final int wrap) {
+		final int texTarget, final int minFilter, final int magFilter, final int wrap) {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
@@ -163,7 +163,7 @@ public final class GLHelper {
 			? textureUnits[0] : texIds.length;
 		for (int i = 0; i < n; i++) {
 			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
-				min_filter, mag_filter, wrap);
+				minFilter, magFilter, wrap);
 		}
 		return texIds;
 	}
@@ -171,49 +171,49 @@ public final class GLHelper {
 	/**
 	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
 	 * @param n 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
-	 * @param texTarget
-	 * @param texUnit
-	 * @param min_filter
-	 * @param mag_filter
-	 * @param wrap
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param texUnit テクスチャユニット
+	 * @param minFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param magFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
 		final int texTarget, final int texUnit,
-			final int min_filter, final int mag_filter, final int wrap) {
+			final int minFilter, final int magFilter, final int wrap) {
 
 		return initTexes(new int[n], texTarget, texUnit,
-			min_filter, mag_filter, wrap);
+			minFilter, magFilter, wrap);
 	}
 	
 	/**
-	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
+	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット), クランプ方法はGL_CLAMP_TO_EDGE
 	 * @param texIds 最大で32個(GL_MAX_TEXTURE_IMAGE_UNITS以下)
-	 * @param texTarget
-	 * @param texUnit
-	 * @param filter_param
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param texUnit テクスチャユニット
+	 * @param filterParam テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int texUnit, final int filter_param) {
+		final int texTarget, final int texUnit, final int filterParam) {
 		
 		return initTexes(texIds, texTarget, texUnit,
-			filter_param, filter_param, GLES20.GL_CLAMP_TO_EDGE);
+			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
 	
 	/**
 	 * テクスチャ名配列を生成(こっちは全部同じテクスチャユニット)
-	 * @param texIds
-	 * @param texTarget
-	 * @param texUnit
-	 * @param min_filter
-	 * @param mag_filter
-	 * @param wrap
+	 * @param texIds テクスチャ名配列
+	 * @param texTarget テクスチャのタイプ, GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param texUnit テクスチャユニット
+	 * @param minFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param magFilter テクスチャの補間方法を指定, GL_LINEARとかGL_NEAREST
+	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
 		final int texTarget, final int texUnit,
-		final int min_filter, final int mag_filter, final int wrap) {
+		final int minFilter, final int magFilter, final int wrap) {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
@@ -221,7 +221,7 @@ public final class GLHelper {
 			? textureUnits[0] : texIds.length;
 		for (int i = 0; i < n; i++) {
 			texIds[i] = GLHelper.initTex(texTarget, texUnit,
-				min_filter, mag_filter, wrap);
+				minFilter, magFilter, wrap);
 		}
 		return texIds;
 	}
