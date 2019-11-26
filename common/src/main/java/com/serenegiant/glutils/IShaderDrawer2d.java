@@ -19,6 +19,10 @@ package com.serenegiant.glutils;
 */
 
 public interface IShaderDrawer2d extends IDrawer2D {
+	static final float[] DEFAULT_VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
+	static final float[] DEFAULT_TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+	static final int FLOAT_SZ = Float.SIZE / 8;
+
 	public int glGetAttribLocation(final String name);
 	public int glGetUniformLocation(final String name);
 	public void glUseProgram();

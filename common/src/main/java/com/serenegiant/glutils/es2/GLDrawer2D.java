@@ -40,10 +40,6 @@ public class GLDrawer2D implements IShaderDrawer2d {
 //	private static final boolean DEBUG = false; // FIXME set false on release
 //	private static final String TAG = "GLDrawer2D";
 
-	static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
-	static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-	static final int FLOAT_SZ = Float.SIZE / 8;
-
 	final int VERTEX_NUM;
 	final int VERTEX_SZ;
 	final FloatBuffer pVertex;
@@ -64,7 +60,7 @@ public class GLDrawer2D implements IShaderDrawer2d {
 	 * 				通常の2Dテキスチャを描画に使うならfalse
 	 */
 	public GLDrawer2D(final boolean isOES) {
-		this(VERTICES, TEXCOORD, isOES);
+		this(DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
 	}
 
 	/**
