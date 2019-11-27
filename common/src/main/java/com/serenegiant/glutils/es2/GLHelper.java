@@ -41,8 +41,8 @@ import java.io.IOException;
  * OpenGL|ES2/3用のヘルパークラス
  */
 public final class GLHelper {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = "GLHelper";
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final String TAG = GLHelper.class.getSimpleName();
 
 	private GLHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
@@ -88,7 +88,7 @@ public final class GLHelper {
 	public static int initTex(final int texTarget, final int texUnit,
 		final int minFilter, final int magFilter, final int wrap) {
 
-//		if (DEBUG) Log.v(TAG, "initTex:target=" + texTarget);
+		if (DEBUG) Log.v(TAG, "initTex:target=" + texTarget);
 		final int[] tex = new int[1];
 		GLES20.glActiveTexture(texUnit);
 		GLES20.glGenTextures(1, tex, 0);
@@ -230,7 +230,7 @@ public final class GLHelper {
 	 * delete specific texture
 	 */
 	public static void deleteTex(final int hTex) {
-//		if (DEBUG) Log.v(TAG, "deleteTex:");
+		if (DEBUG) Log.v(TAG, "deleteTex:");
 		final int[] tex = new int[] {hTex};
 		GLES20.glDeleteTextures(1, tex, 0);
 	}
@@ -239,7 +239,7 @@ public final class GLHelper {
 	 * delete specific texture
 	 */
 	public static void deleteTex(@NonNull final int[] tex) {
-//		if (DEBUG) Log.v(TAG, "deleteTex:");
+		if (DEBUG) Log.v(TAG, "deleteTex:");
 		GLES20.glDeleteTextures(tex.length, tex, 0);
 	}
 
@@ -249,6 +249,7 @@ public final class GLHelper {
 	
 	@SuppressLint("NewApi")
 	public static int loadTextureFromResource(final Context context, final int resId, final Resources.Theme theme) {
+		if (DEBUG) Log.v(TAG, "loadTextureFromResource:");
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
 		// get a canvas to paint over the bitmap
@@ -294,6 +295,7 @@ public final class GLHelper {
 	}
 
 	public static int createTextureWithTextContent (final String text) {
+		if (DEBUG) Log.v(TAG, "createTextureWithTextContent:");
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
 		// get a canvas to paint over the bitmap
@@ -351,16 +353,18 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int loadShader(final String vss, final String fss) {
-//		if (DEBUG) Log.v(TAG, "loadShader:");
+		if (DEBUG) Log.v(TAG, "loadShader:");
 		final int[] compiled = new int[1];
 		// 頂点シェーダーをコンパイル
 		final int vs = loadShader(GLES20.GL_VERTEX_SHADER, vss);
 		if (vs == 0) {
+			Log.d(TAG, "loadShader:failed to compile vertex shader,\n" + vss);
 			return 0;
 		}
 		// フラグメントシェーダーをコンパイル
 		int fs = loadShader(GLES20.GL_FRAGMENT_SHADER, fss);
 		if (fs == 0) {
+			Log.d(TAG, "loadShader:failed to compile fragment shader,\n" + fss);
 			return 0;
 		}
 		// リンク
