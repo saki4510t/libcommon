@@ -31,7 +31,7 @@ public class MediaImageSource extends MediaSource {
 	 */
 	public MediaImageSource(final Bitmap src) {
 		super(src.getWidth(), src.getHeight());
-		mImageOffscreen = GLSurface.newInstance(mWidth, mHeight, false);
+		mImageOffscreen = GLSurface.newInstance(false, mWidth, mHeight, false);
 		setSource(src);
 	}
 

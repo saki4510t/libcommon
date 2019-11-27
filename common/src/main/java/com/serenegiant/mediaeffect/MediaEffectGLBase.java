@@ -156,7 +156,7 @@ public class MediaEffectGLBase implements IEffect {
 
 		if (!mEnabled) return;
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(width, height, false);
+			mOutputOffscreen = GLSurface.newInstance(false, width, height, false);
 		}
 		if ((out_tex_id != mOutputOffscreen.getTexId())
 			|| (width != mOutputOffscreen.getWidth())

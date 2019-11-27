@@ -104,7 +104,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (!mEnabled) return;
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(width, height, false);
+			mOutputOffscreen = GLSurface.newInstance(false, width, height, false);
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
@@ -114,7 +114,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 
 		if (mOutputOffscreen2 == null) {
-			mOutputOffscreen2 = GLSurface.newInstance(width, height, false);
+			mOutputOffscreen2 = GLSurface.newInstance(false, width, height, false);
 		}
 		// パス2
 		if ((out_tex_id != mOutputOffscreen2.getTexId())
@@ -143,7 +143,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (!mEnabled) return;
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(
+			mOutputOffscreen = GLSurface.newInstance(false,
 				output.getWidth(), output.getHeight(), false);
 		}
 		mOutputOffscreen.makeCurrent();
@@ -175,7 +175,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		final int height = src.getHeight();
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(width, height, false);
+			mOutputOffscreen = GLSurface.newInstance(false, width, height, false);
 		}
 		mOutputOffscreen.makeCurrent();
 		try {

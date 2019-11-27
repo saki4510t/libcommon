@@ -28,6 +28,8 @@ import android.opengl.Matrix;
 import android.os.Build;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
+
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
@@ -47,119 +49,188 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * テクスチャユニットはGL_TEXTURE0
+	 * @param isGLES3
 	 * @param width
 	 * @param height
 	 */
-	public static GLSurface newInstance(final int width, final int height) {
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, false, DEFAULT_ADJUST_POWER2);
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int width, final int height) {
+
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+				width, height, false, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+				width, height, false, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * テクスチャユニットはGL_TEXTURE0
+	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 */
-	public static GLSurface newInstance(final int tex_unit,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_unit,
 		final int width, final int height) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height,
-			false, DEFAULT_ADJUST_POWER2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * テクスチャユニットはGL_TEXTURE0
+	 * @param isGLES3
 	 * @param width dimension of offscreen(width)
 	 * @param height dimension of offscreen(height)
 	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
 	 */
-	public static GLSurface newInstance(final int width, final int height,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int width, final int height,
 		final boolean use_depth_buffer) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)をwrapするためのコンストラクタ
 	 * テクスチャユニットはGL_TEXTURE0
+	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 */
-	public static GLSurface newInstance(final int tex_unit,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_unit,
 		final int width, final int height, final boolean use_depth_buffer) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height,
-			use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * テクスチャユニットはGL_TEXTURE0
+	 * @param isGLES3
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public static GLSurface newInstance(final int width, final int height,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, use_depth_buffer, adjust_power2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+				width, height, use_depth_buffer, adjust_power2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+				width, height, use_depth_buffer, adjust_power2);
+		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
+	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 * @param adjust_power2
 	 */
-	public static GLSurface newInstance(final int tex_unit,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_unit,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height, use_depth_buffer, adjust_power2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+				width, height, use_depth_buffer, adjust_power2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+				width, height, use_depth_buffer, adjust_power2);
+		}
 	}
 
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド, デプスバッファなし
+	 * @param isGLES3
 	 * @param tex_id
 	 * @param tex_unit
 	 * @param width
 	 * @param height
 	 */
-	public static GLSurface newInstance(final int tex_unit, final int tex_id,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-			width, height,
-			false, DEFAULT_ADJUST_POWER2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド
+	 * @param isGLES3
 	 * @param tex_unit
 	 * @param tex_id
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
 	 */
-	public static GLSurface newInstance(final int tex_unit, final int tex_id,
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
-		return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-			width, height,
-			use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
 	}
 
 //================================================================================
