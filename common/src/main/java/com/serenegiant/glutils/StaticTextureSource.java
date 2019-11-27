@@ -36,6 +36,7 @@ import com.serenegiant.glutils.es2.GLHelper;
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
+ * FIXME GLES30対応を実装する
  */
 public class StaticTextureSource {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
