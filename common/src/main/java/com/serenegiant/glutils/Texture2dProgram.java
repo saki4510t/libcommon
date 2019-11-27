@@ -114,7 +114,7 @@ public class Texture2dProgram {
 		switch (programType) {
 			case TEXTURE_2D:
 				mTextureTarget = GLES20.GL_TEXTURE_2D;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
                 break;
 //			case TEXTURE_SOBEL:
 //				mTextureTarget = GLES20.GL_TEXTURE_2D;

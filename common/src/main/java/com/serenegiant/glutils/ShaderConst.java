@@ -159,20 +159,6 @@ public class ShaderConst {
 		"}\n";
 
 // フラグメントシェーダー
-	public static final String FRAGMENT_SHADER_SIMPLE_BASE_ES2
-		= SHADER_VERSION_ES2 +
-		"%s" +
-		"precision mediump float;\n" +
-		"uniform %s sTexture;\n" +
-		"varying highp vec2 vTextureCoord;\n" +
-		"void main() {\n" +
-		"  gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-		"}";
-	public static final String FRAGMENT_SHADER_SIMPLE_ES2
-		= String.format(FRAGMENT_SHADER_SIMPLE_BASE_ES2, HEADER_2D, SAMPLER_2D);
-	public static final String FRAGMENT_SHADER_EXT_SIMPLE_ES2
-		= String.format(FRAGMENT_SHADER_SIMPLE_BASE_ES2, HEADER_OES, SAMPLER_OES);
-
 	// Simple fragment shader for use with "normal" 2D textures.
 	private static final String FRAGMENT_SHADER_BASE_ES2
 		= SHADER_VERSION_ES2 +
@@ -183,7 +169,7 @@ public class ShaderConst {
 		"void main() {\n" +
 		"    gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
 		"}\n";
-	public static final String FRAGMENT_SHADER_2D_ES2
+	public static final String FRAGMENT_SHADER_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2, HEADER_OES, SAMPLER_OES);

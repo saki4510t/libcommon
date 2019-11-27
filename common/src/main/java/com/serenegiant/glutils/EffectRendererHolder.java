@@ -482,7 +482,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				final GLDrawer2D drawer = mDrawer;
 				switch (effect) {
 				case EFFECT_NON:
-					drawer.updateShader(FRAGMENT_SHADER_EXT_SIMPLE_ES2);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_ES2);
 					break;
 				case EFFECT_GRAY:
 					drawer.updateShader(FRAGMENT_SHADER_GRAY_OES);

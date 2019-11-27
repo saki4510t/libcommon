@@ -278,15 +278,15 @@ public abstract class GLDrawer2D implements IDrawer2D {
 		releaseShader();
 		if (isGLES3) {
 			if (isOES()) {
-				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_EXT_SIMPLE_ES3);
+				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_EXT_ES3);
 			} else {
-				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_SIMPLE_ES3);
+				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_ES3);
 			}
 		} else {
 			if (isOES()) {
-				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SIMPLE_ES2);
+				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_ES2);
 			} else {
-				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SIMPLE_ES2);
+				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 			}
 		}
 		init();

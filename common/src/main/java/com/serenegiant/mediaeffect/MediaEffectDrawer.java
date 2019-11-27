@@ -43,14 +43,14 @@ public class MediaEffectDrawer {
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
 	public static MediaEffectDrawer newInstance() {
-		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
 	public static MediaEffectDrawer newInstance(final int numTex) {
 		if (numTex <= 1) {
-			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 		} else {
-			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 		}
 	}
 
@@ -137,11 +137,11 @@ public class MediaEffectDrawer {
 	protected int hProgram;
 
 	protected MediaEffectDrawer() {
-		this(1, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+		this(1, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
 	protected MediaEffectDrawer(final int numTex) {
-		this(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
+		this(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
 	protected MediaEffectDrawer(final String fss) {
