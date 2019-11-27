@@ -167,50 +167,69 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			super.internalOnStart();
 			if (DEBUG) Log.v(TAG, "internalOnStart:" + mDrawer);
 			if (mDrawer != null) {
-				if (DEBUG) Log.v(TAG, String.format("internalOnStart:init overlay texture(%dx%d)",
-					width(), height()));
 				if (isGLES3()) {
-					if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT_ES3);
-					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
-					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
-					GLES30.glUniform1i(uTex1, 0);
-					if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
-
-					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
-					mOverlayTexId = GLHelper.initTex(
-						GL_TEXTURE_EXTERNAL_OES,
-						GLES30.GL_TEXTURE1,
-						GLES30.GL_LINEAR, GLES30.GL_LINEAR,
-						GLES30.GL_CLAMP_TO_EDGE);
-					mOverlayTexture = new SurfaceTexture(mOverlayTexId);
-					mOverlayTexture.setDefaultBufferSize(width(), height());
-					mOverlaySurface = new Surface(mOverlayTexture);
-					GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
-					GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-					GLES30.glUniform1i(uTex2, 1);
-					if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+					internalOnStartES3();
 				} else {
-					if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT_ES2);
-					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
-					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
-					GLES20.glUniform1i(uTex1, 0);
-					if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
-
-					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
-					mOverlayTexId = GLHelper.initTex(
-						GL_TEXTURE_EXTERNAL_OES,
-						GLES20.GL_TEXTURE1,
-						GLES20.GL_LINEAR, GLES20.GL_LINEAR,
-						GLES20.GL_CLAMP_TO_EDGE);
-					mOverlayTexture = new SurfaceTexture(mOverlayTexId);
-					mOverlayTexture.setDefaultBufferSize(width(), height());
-					mOverlaySurface = new Surface(mOverlayTexture);
-					GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-					GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-					GLES20.glUniform1i(uTex2, 1);
-					if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+					internalOnStartES2();
 				}
 			}
+		}
+
+		/**
+		 * internalOnStartの下請け、GLES2用
+		 */
+		@WorkerThread
+		private void internalOnStartES2() {
+			if (DEBUG) Log.v(TAG, String.format("internalOnStartES2:init overlay texture(%dx%d)",
+				width(), height()));
+			if (DEBUG) Log.v(TAG, "internalOnStartES2:shader=" + MY_FRAGMENT_SHADER_EXT_ES2);
+			mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
+			final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+			GLES20.glUniform1i(uTex1, 0);
+			if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
+
+			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+			mOverlayTexId = GLHelper.initTex(
+				GL_TEXTURE_EXTERNAL_OES,
+				GLES20.GL_TEXTURE1,
+				GLES20.GL_LINEAR, GLES20.GL_LINEAR,
+				GLES20.GL_CLAMP_TO_EDGE);
+			mOverlayTexture = new SurfaceTexture(mOverlayTexId);
+			mOverlayTexture.setDefaultBufferSize(width(), height());
+			mOverlaySurface = new Surface(mOverlayTexture);
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+			GLES20.glUniform1i(uTex2, 1);
+			if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+		}
+
+		/**
+		 * internalOnStartの下請け、GLES3用
+		 */
+		@WorkerThread
+		private void internalOnStartES3() {
+			if (DEBUG) Log.v(TAG, String.format("internalOnStartES3:init overlay texture(%dx%d)",
+				width(), height()));
+			if (DEBUG) Log.v(TAG, "internalOnStartES3:shader=" + MY_FRAGMENT_SHADER_EXT_ES3);
+
+			mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
+			final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+			GLES30.glUniform1i(uTex1, 0);
+			if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
+
+			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+			mOverlayTexId = GLHelper.initTex(
+				GL_TEXTURE_EXTERNAL_OES,
+				GLES30.GL_TEXTURE1,
+				GLES30.GL_LINEAR, GLES30.GL_LINEAR,
+				GLES30.GL_CLAMP_TO_EDGE);
+			mOverlayTexture = new SurfaceTexture(mOverlayTexId);
+			mOverlayTexture.setDefaultBufferSize(width(), height());
+			mOverlaySurface = new Surface(mOverlayTexture);
+			GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+			GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+			GLES30.glUniform1i(uTex2, 1);
+			if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
 		}
 
 		@WorkerThread
