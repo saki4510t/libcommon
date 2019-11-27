@@ -42,6 +42,125 @@ public class GLSurface implements IGLSurface {
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param width
+	 * @param height
+	 */
+	public static GLSurface newInstance(final int width, final int height) {
+		return new GLSurface(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, false, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 */
+	public static GLSurface newInstance(final int tex_unit,
+		final int width, final int height) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height,
+			false, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D)
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param width dimension of offscreen(width)
+	 * @param height dimension of offscreen(height)
+	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
+	 */
+	public static GLSurface newInstance(final int width, final int height,
+		final boolean use_depth_buffer) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	public static GLSurface newInstance(final int tex_unit,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height,
+			use_depth_buffer, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D)
+	 * テクスチャユニットはGL_TEXTURE0
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 * @param adjust_power2
+	 */
+	public static GLSurface newInstance(final int width, final int height,
+		final boolean use_depth_buffer, final boolean adjust_power2) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			width, height, use_depth_buffer, adjust_power2);
+	}
+
+	/**
+	 * コンストラクタ(GL_TEXTURE_2D)
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 * @param adjust_power2
+	 */
+	public static GLSurface newInstance(final int tex_unit,
+		final int width, final int height,
+		final boolean use_depth_buffer, final boolean adjust_power2) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			width, height, use_depth_buffer, adjust_power2);
+	}
+
+	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ, デプスバッファなし
+	 * @param tex_id
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 */
+	public static GLSurface newInstance(final int tex_unit, final int tex_id,
+		final int width, final int height) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			width, height,
+			false, DEFAULT_ADJUST_POWER2);
+	}
+
+	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * @param tex_unit
+	 * @param tex_id
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	public static GLSurface newInstance(final int tex_unit, final int tex_id,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		return new GLSurface(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			width, height,
+			use_depth_buffer, DEFAULT_ADJUST_POWER2);
+	}
+
+//================================================================================
 	private final int TEX_TARGET;
 	private final int TEX_UNIT;
 	private final boolean mHasDepthBuffer, mAdjustPower2;
@@ -56,124 +175,6 @@ public class GLSurface implements IGLSurface {
 	/** テクスチャ座標変換行列 */
 	private final float[] mTexMatrix = new float[16];
 	private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
-
-	/**
-	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param width
-	 * @param height
-	 */
-	public GLSurface(final int width, final int height) {
-		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, false, DEFAULT_ADJUST_POWER2);
-	}
-
-	/**
-	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param tex_unit
-	 * @param width
-	 * @param height
-	 */
-	public GLSurface(final int tex_unit,
-		final int width, final int height) {
-
-		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height,
-			false, DEFAULT_ADJUST_POWER2);
-	}
-
-	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param width dimension of offscreen(width)
-	 * @param height dimension of offscreen(height)
-	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
-	 */
-	public GLSurface(final int width, final int height,
-		final boolean use_depth_buffer) {
-
-		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
-	}
-
-	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param tex_unit
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 */
-	public GLSurface(final int tex_unit,
-		final int width, final int height, final boolean use_depth_buffer) {
-
-		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height,
-			use_depth_buffer, DEFAULT_ADJUST_POWER2);
-	}
-	
-	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 * @param adjust_power2
-	 */
-	public GLSurface(final int width, final int height,
-		final boolean use_depth_buffer, final boolean adjust_power2) {
-
-		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
-			width, height, use_depth_buffer, adjust_power2);
-	}
-	
-	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
-	 * @param tex_unit
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 * @param adjust_power2
-	 */
-	public GLSurface(final int tex_unit,
-		final int width, final int height,
-		final boolean use_depth_buffer, final boolean adjust_power2) {
-
-		this(GLES20.GL_TEXTURE_2D, tex_unit, -1,
-			width, height, use_depth_buffer, adjust_power2);
-	}
-
-	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ, デプスバッファなし
-	 * @param tex_id
-	 * @param tex_unit
-	 * @param width
-	 * @param height
-	 */
-	public GLSurface(final int tex_unit, final int tex_id,
-		final int width, final int height) {
-
-		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-			width, height,
-			false, DEFAULT_ADJUST_POWER2);
-	}
-
-	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
-	 * @param tex_unit
-	 * @param tex_id
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 */
-	public GLSurface(final int tex_unit, final int tex_id,
-		final int width, final int height, final boolean use_depth_buffer) {
-
-		this(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-			width, height,
-			use_depth_buffer, DEFAULT_ADJUST_POWER2);
-	}
 
 	/**
 	 * 既存のテクスチャをwrapするためのコンストラクタ
