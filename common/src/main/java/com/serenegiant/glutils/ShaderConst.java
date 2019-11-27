@@ -33,7 +33,7 @@ public class ShaderConst {
 	public static final int GL_TEXTURE_2D           = 0x0DE1;
 
 	public static final String SHADER_VERSION_ES2 = "#version 100\n";
-	public static final String SHADER_VERSION_ES3 = "#version 100\n";	// FIXME とりあえずGLES20と同じ
+	public static final String SHADER_VERSION_ES3 = "#version 300 es\n";
 
 	public static final String HEADER_2D = "";
 	public static final String SAMPLER_2D = "sampler2D";
@@ -128,6 +128,7 @@ public class ShaderConst {
 // 頂点シェーダー
 	/**
 	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
+	 * for ES2
 	 */
 	public static final String VERTEX_SHADER_ES2
 		= SHADER_VERSION_ES2 +
@@ -141,6 +142,21 @@ public class ShaderConst {
 		"    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
 		"}\n";
 
+	/**
+	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
+	 * for ES3
+	 */
+	public static final String VERTEX_SHADER_ES3
+		= SHADER_VERSION_ES3 +
+		"uniform mat4 uMVPMatrix;\n" +					// モデルビュー変換行列
+		"uniform mat4 uTexMatrix;\n" +					// テクスチャ変換行列
+		"in highp vec4 aPosition;\n" +					// 頂点座標
+		"in highp vec4 aTextureCoord;\n" +				// テクスチャ情報
+		"out highp vec2 vTextureCoord;\n" +				// フラグメントシェーダーへ引き渡すテクスチャ座標
+		"void main() {\n" +
+		"    gl_Position = uMVPMatrix * aPosition;\n" +
+		"    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
+		"}\n";
 
 // フラグメントシェーダー
 	public static final String FRAGMENT_SHADER_SIMPLE_BASE_ES2
