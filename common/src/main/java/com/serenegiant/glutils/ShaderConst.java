@@ -327,7 +327,7 @@ public class ShaderConst {
 		"    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){ \n" +
 		"        o_FragColor = vec4(0, 0, 0, 0.0);\n" +
 		"    }else{ \n" +
-		"        o_FragColor = texture2D(sTexture, vTextureCoord);\n" +
+		"        o_FragColor = texture(sTexture, vTextureCoord);\n" +
 		"    }\n" +
 		"}\n";
 	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES3
@@ -552,7 +552,7 @@ public class ShaderConst {
 		"    normCoord.x = r * cos(phi); \n" +
 		"    normCoord.y = r * sin(phi); \n" +
 		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-		"    o_FragColor = texture2D(sTexture, texCoord);\n"+
+		"    o_FragColor = texture(sTexture, texCoord);\n"+
 		"}\n";
 	public static final String FRAGMENT_SHADER_BULGE_ES3
 		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3, HEADER_2D, SAMPLER_2D);
