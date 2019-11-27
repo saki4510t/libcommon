@@ -267,47 +267,27 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			if (isGLES3()) {
 				GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
 				GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-				try {
-					final Canvas canvas = mOverlaySurface.lockCanvas(null);
-					try {
-						if (overlay != null) {
-							canvas.drawBitmap(overlay, 0, 0, null);
-						} else if (DEBUG) {
-							// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
-							canvas.drawColor(0x7fff0000);	// ARGB
-						} else {
-							// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
-							canvas.drawColor(0x00000000);	// ARGB
-						}
-					} finally {
-						mOverlaySurface.unlockCanvasAndPost(canvas);
-					}
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				GLES30.glFlush();
 			} else {
 				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
 				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+			}
+			try {
+				final Canvas canvas = mOverlaySurface.lockCanvas(null);
 				try {
-					final Canvas canvas = mOverlaySurface.lockCanvas(null);
-					try {
-						if (overlay != null) {
-							canvas.drawBitmap(overlay, 0, 0, null);
-						} else if (DEBUG) {
-							// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
-							canvas.drawColor(0x7fff0000);	// ARGB
-						} else {
-							// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
-							canvas.drawColor(0x00000000);	// ARGB
-						}
-					} finally {
-						mOverlaySurface.unlockCanvasAndPost(canvas);
+					if (overlay != null) {
+						canvas.drawBitmap(overlay, 0, 0, null);
+					} else if (DEBUG) {
+						// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
+						canvas.drawColor(0x7fff0000);	// ARGB
+					} else {
+						// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
+						canvas.drawColor(0x00000000);	// ARGB
 					}
-				} catch (final Exception e) {
-					Log.w(TAG, e);
+				} finally {
+					mOverlaySurface.unlockCanvasAndPost(canvas);
 				}
-				GLES20.glFlush();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
 			requestFrame();
 		}
