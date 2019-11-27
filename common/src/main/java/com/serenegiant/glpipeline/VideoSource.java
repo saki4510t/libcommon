@@ -21,6 +21,7 @@ package com.serenegiant.glpipeline;
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -28,7 +29,6 @@ import android.view.Surface;
 
 import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
@@ -70,6 +70,7 @@ public class VideoSource implements IPipelineSource {
 	private final Handler mGLHandler;
 	@NonNull
 	private final PipelineSourceCallback mCallback;
+	private final boolean isGLES3;
 
 	@NonNull
 	private final float[] mTexMatrix = new float[16];
@@ -126,6 +127,7 @@ public class VideoSource implements IPipelineSource {
 			mGLHandler = manager.createGLHandler(handlerCallback);
 		}
 		mGLContext = mManager.getGLContext();
+		isGLES3 = mGLContext.isGLES3();
 		mCallback = callback;
 		if ((width > 0) || (height > 0)) {
 			mVideoWidth = width;
@@ -322,6 +324,17 @@ public class VideoSource implements IPipelineSource {
 	@WorkerThread
 	protected void handleUpdateTex() {
 //		if (DEBUG) Log.v(TAG, "handleUpdateTex:");
+		if (isGLES3) {
+			handleUpdateTexES3();
+		} else {
+			handleUpdateTexES2();
+		}
+	}
+
+	/**
+	 * handleUpdateTexの下請け、ES2用
+	 */
+	protected void handleUpdateTexES2() {
 		makeDefault();
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glFlush();
@@ -330,13 +343,36 @@ public class VideoSource implements IPipelineSource {
 			mMasterTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
-			for (final OnFrameAvailableListener listener: mOnFrameAvailableListeners) {
-				try {
-					listener.onFrameAvailable(mTexId, mTexMatrix);
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-					mOnFrameAvailableListeners.remove(listener);
-				}
+			callOnFrameAvailable();
+		}
+	}
+
+	/**
+	 * handleUpdateTexの下請け、ES3用
+	 */
+	protected void handleUpdateTexES3() {
+		makeDefault();
+		GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+		GLES30.glFlush();
+		if (mMasterTexture != null) {
+			mMasterTexture.updateTexImage();
+			mMasterTexture.getTransformMatrix(mTexMatrix);
+			GLES30.glFlush();
+			ThreadUtils.NoThrowSleep(0, 0);
+			callOnFrameAvailable();
+		}
+	}
+
+	/**
+	 * handleUpdateTexの下請け
+	 */
+	private void callOnFrameAvailable() {
+		for (final OnFrameAvailableListener listener: mOnFrameAvailableListeners) {
+			try {
+				listener.onFrameAvailable(mTexId, mTexMatrix);
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+				mOnFrameAvailableListeners.remove(listener);
 			}
 		}
 	}
@@ -351,8 +387,13 @@ public class VideoSource implements IPipelineSource {
 		makeDefault();
 		handleReleaseMasterSurface();
 		makeDefault();
-		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		if (isGLES3) {
+			GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
+		} else {
+			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		}
 		mMasterTexture = new SurfaceTexture(mTexId);
 		mMasterSurface = new Surface(mMasterTexture);
 		if (BuildCheck.isAndroid4_1()) {
@@ -369,6 +410,7 @@ public class VideoSource implements IPipelineSource {
 	/**
 	 * マスターSurfaceを破棄する
 	 */
+	@SuppressLint("NewApi")
 	@WorkerThread
 	protected void handleReleaseMasterSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseMasterSurface:");
@@ -390,7 +432,11 @@ public class VideoSource implements IPipelineSource {
 			mMasterTexture = null;
 		}
 		if (mTexId != 0) {
-			GLHelper.deleteTex(mTexId);
+			if (isGLES3) {
+				com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
+			} else {
+				com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
+			}
 			mTexId = 0;
 		}
 	}
