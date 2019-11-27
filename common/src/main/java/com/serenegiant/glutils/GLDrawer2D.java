@@ -101,6 +101,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 		final float[] vertices,
 		final float[] texcoord, final boolean isOES) {
 
+		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
 		VERTEX_NUM = Math.min(
 			vertices != null ? vertices.length : 0,
