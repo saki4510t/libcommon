@@ -122,7 +122,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 	private static final int REQUEST_SET_MASK = 10;
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +

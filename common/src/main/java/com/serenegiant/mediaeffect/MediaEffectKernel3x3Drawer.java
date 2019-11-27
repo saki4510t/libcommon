@@ -52,7 +52,7 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 	private float mTexWidth;
 	private float mTexHeight;
 
-	private static final String FRAGMENT_SHADER_FILT3x3_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE + "\n" +
 		"precision highp float;\n" +
@@ -80,11 +80,11 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES, SAMPLER_OES);
 
 	public MediaEffectKernel3x3Drawer(final String fss) {
-		this(false, VERTEX_SHADER, fss);
+		this(false, VERTEX_SHADER_ES2, fss);
 	}
 
 	public MediaEffectKernel3x3Drawer(final boolean isOES, final String fss) {
-		this(isOES, VERTEX_SHADER, fss);
+		this(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
 	public MediaEffectKernel3x3Drawer(final boolean isOES, final String vss, final String fss) {

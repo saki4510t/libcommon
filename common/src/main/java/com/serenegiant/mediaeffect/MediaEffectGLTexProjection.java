@@ -131,7 +131,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 		}
 	}
 
-	public static final String PROJ_VERTEX_SHADER = SHADER_VERSION +
+	public static final String PROJ_VERTEX_SHADER = SHADER_VERSION_ES2 +
 		"uniform mat4 uMVPMatrix;\n" +		// モデルビュー変換行列
 		"uniform mat4 uTexMatrix;\n" +		// テクスチャ変換行列
 		"uniform mat3 uTexMatrix2;\n" +		// テクスチャ変換行列
@@ -146,7 +146,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 //			"vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
 		"}\n";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + MediaEffectKernel3x3Drawer.KERNEL_SIZE + "\n" +
 		"precision highp float;\n" +

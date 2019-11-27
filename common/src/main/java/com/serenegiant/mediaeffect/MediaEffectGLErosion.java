@@ -38,7 +38,7 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		private float mTexWidth;
 		private float mTexHeight;
 		public MediaEffectErosionDrawer(final String fss) {
-			super(false, VERTEX_SHADER, fss);
+			super(false, VERTEX_SHADER_ES2, fss);
 			muTexOffsetLoc = GLES20.glGetUniformLocation(getProgram(), "uTexOffset");
 			GLHelper.checkLocation(muTexOffsetLoc, "uTexOffset");
 		}

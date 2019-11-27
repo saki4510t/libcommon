@@ -162,7 +162,7 @@ public final class GLHelper {
 		final int n = texIds.length > textureUnits[0]
 			? textureUnits[0] : texIds.length;
 		for (int i = 0; i < n; i++) {
-			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
+			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS_ES2[i],
 				minFilter, magFilter, wrap);
 		}
 		return texIds;

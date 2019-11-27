@@ -33,13 +33,13 @@ public class MediaEffectColorAdjustDrawer
 	private float mColorAdjust;
 
 	public MediaEffectColorAdjustDrawer(final String fss) {
-		this(false, VERTEX_SHADER, fss);
+		this(false, VERTEX_SHADER_ES2, fss);
 	}
 
 	public MediaEffectColorAdjustDrawer(final boolean isOES,
 		final String fss) {
 
-		this(isOES, VERTEX_SHADER, fss);
+		this(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
 	public MediaEffectColorAdjustDrawer(final boolean isOES,

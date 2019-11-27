@@ -43,7 +43,7 @@ public class MediaEffectGLBase implements IEffect {
 	 * @param shader
 	 */
 	public MediaEffectGLBase(final int numTex, final String shader) {
-		this(MediaEffectDrawer.newInstance(numTex, false, VERTEX_SHADER, shader));
+		this(MediaEffectDrawer.newInstance(numTex, false, VERTEX_SHADER_ES2, shader));
 	}
 
 	/**
@@ -54,7 +54,7 @@ public class MediaEffectGLBase implements IEffect {
 	public MediaEffectGLBase(final int numTex,
 							 final boolean isOES, final String shader) {
 
-		this(MediaEffectDrawer.newInstance(numTex, isOES, VERTEX_SHADER, shader));
+		this(MediaEffectDrawer.newInstance(numTex, isOES, VERTEX_SHADER_ES2, shader));
 	}
 
 	/**

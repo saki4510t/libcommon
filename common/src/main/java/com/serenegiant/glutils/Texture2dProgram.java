@@ -91,7 +91,7 @@ public class Texture2dProgram {
     private final int[] mFlags = new int[4];
 
 	public Texture2dProgram(final int target, final String fss) {
-		this(ProgramType.TEXTURE_CUSTOM, target, VERTEX_SHADER, fss);
+		this(ProgramType.TEXTURE_CUSTOM, target, VERTEX_SHADER_ES2, fss);
 	}
 
 	public Texture2dProgram(final int target, final String vss, final String fss) {
@@ -114,87 +114,87 @@ public class Texture2dProgram {
 		switch (programType) {
 			case TEXTURE_2D:
 				mTextureTarget = GLES20.GL_TEXTURE_2D;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_2D);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
                 break;
 //			case TEXTURE_SOBEL:
 //				mTextureTarget = GLES20.GL_TEXTURE_2D;
-//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SOBEL);
+//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SOBEL_ES2);
 //				kernel = KERNEL_SOBEL_H;
 //				kernel2 = KERNEL_SOBEL_V;
 //				break;
 //			case TEXTURE_SOBEL2:
 //				mTextureTarget = GLES20.GL_TEXTURE_2D;
-//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_SOBEL);
+//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SOBEL_ES2);
 //				kernel = KERNEL_SOBEL2_H;
 //				kernel2 = KERNEL_SOBEL2_V;
 //				break;
 			case TEXTURE_FILT3x3:
 				mTextureTarget = GLES20.GL_TEXTURE_2D;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_FILT3x3);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_FILT3x3_ES2);
 				break;
 			case TEXTURE_EXT:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_ES2);
 				break;
 			case TEXTURE_EXT_BW:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_BW);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_BW_ES2);
 				break;
 			case TEXTURE_EXT_NIGHT:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_NIGHT);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_NIGHT_ES2);
 				break;
 			case TEXTURE_EXT_CHROMA_KEY:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_CHROMA_KEY);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_CHROMA_KEY_ES2);
 				break;
 			case TEXTURE_EXT_SQUEEZE:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_SQUEEZE);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SQUEEZE_ES2);
 				break;
 			case TEXTURE_EXT_TWIRL:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_TWIRL);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_TWIRL_ES2);
 				break;
 			case TEXTURE_EXT_TUNNEL:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_TUNNEL);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_TUNNEL_ES2);
 				break;
 			case TEXTURE_EXT_BULGE:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_BULGE);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_BULGE_ES2);
 				break;
 			case TEXTURE_EXT_FISHEYE:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_FISHEYE);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_FISHEYE_ES2);
 				break;
 			case TEXTURE_EXT_DENT:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_DENT);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_DENT_ES2);
 				break;
 			case TEXTURE_EXT_MIRROR:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_MIRROR);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_MIRROR_ES2);
 				break;
 			case TEXTURE_EXT_STRETCH:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_STRETCH);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_STRETCH_ES2);
 				break;
 //			case TEXTURE_EXT_SOBEL:
 //				mTextureTarget = GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
-//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_SOBEL);
+//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SOBEL_ES2);
 //				kernel = KERNEL_SOBEL_H;
 //				kernel2 = KERNEL_SOBEL_V;
 //				break;
 //			case TEXTURE_EXT_SOBEL2:
 //				mTextureTarget = GLES11Ext.GL_TEXTURE_EXTERNAL_OES;
-//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_SOBEL);
+//				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SOBEL_ES2);
 //				kernel = KERNEL_SOBEL2_H;
 //				kernel2 = KERNEL_SOBEL2_V;
 //				break;
 			case TEXTURE_EXT_FILT3x3:
 				mTextureTarget = GL_TEXTURE_EXTERNAL_OES;
-				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER, FRAGMENT_SHADER_EXT_FILT3x3);
+				mProgramHandle = GLHelper.loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_FILT3x3_ES2);
 				break;
 			case TEXTURE_CUSTOM:
 				switch (target) {
@@ -305,7 +305,7 @@ public class Texture2dProgram {
     /**
      * Configures the convolution filter values.
      * This only has an effect for programs that use the
-     * FRAGMENT_SHADER_EXT_FILT3x3 Fragment shader.
+     * FRAGMENT_SHADER_EXT_FILT3x3_ES2 Fragment shader.
      *
      * @param values Normalized filter values; must be KERNEL_SIZE3x3 elements.
      */

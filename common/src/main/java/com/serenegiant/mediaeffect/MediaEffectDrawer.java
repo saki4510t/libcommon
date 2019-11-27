@@ -43,47 +43,47 @@ public class MediaEffectDrawer {
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
 	public static MediaEffectDrawer newInstance() {
-		return new MediaEffectSingleDrawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
 	}
 
 	public static MediaEffectDrawer newInstance(final int numTex) {
 		if (numTex <= 1) {
-			return new MediaEffectSingleDrawer(false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
 		} else {
-			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
 		}
 	}
 
 	public static MediaEffectDrawer newInstance(final String fss) {
-		return new MediaEffectSingleDrawer(false, VERTEX_SHADER, fss);
+		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, fss);
 	}
 
 	public static MediaEffectDrawer newInstance(final int numTex, final String fss) {
 		if (numTex <= 1) {
-			return new MediaEffectSingleDrawer(false, VERTEX_SHADER, fss);
+			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, fss);
 		} else {
-			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER, fss);
+			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, fss);
 		}
 	}
 
 	public static MediaEffectDrawer newInstance(final boolean isOES, final String fss) {
-		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
 	public static MediaEffectDrawer newInstance(final int numTex,
 		final boolean isOES, final String fss) {
 
 		if (numTex <= 1) {
-			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 		} else {
-			return new MediaEffectDrawer(numTex, isOES, VERTEX_SHADER, fss);
+			return new MediaEffectDrawer(numTex, isOES, VERTEX_SHADER_ES2, fss);
 		}
 	}
 
 	public static MediaEffectDrawer newInstance(final boolean isOES,
 		final String vss, final String fss) {
 
-		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER, fss);
+		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
 	public static MediaEffectDrawer newInstance(final int numTex,
@@ -111,7 +111,7 @@ public class MediaEffectDrawer {
 		 * @param tex_ids texture ID
 		 */
 		protected void bindTexture(@NonNull final int[] tex_ids) {
-			GLES20.glActiveTexture(TEX_NUMBERS[0]);
+			GLES20.glActiveTexture(getTexNumbers(false)[0]);
 			if (tex_ids[0] != NO_TEXTURE) {
 				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
@@ -123,7 +123,7 @@ public class MediaEffectDrawer {
 		 * mSyncはロックされて呼び出される
 		 */
 		protected void unbindTexture() {
-			GLES20.glActiveTexture(TEX_NUMBERS[0]);
+			GLES20.glActiveTexture(getTexNumbers(false)[0]);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}
@@ -137,35 +137,35 @@ public class MediaEffectDrawer {
 	protected int hProgram;
 
 	protected MediaEffectDrawer() {
-		this(1, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		this(1, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
 	}
 
 	protected MediaEffectDrawer(final int numTex) {
-		this(numTex, false, VERTEX_SHADER, FRAGMENT_SHADER_2D);
+		this(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_2D_ES2);
 	}
 
 	protected MediaEffectDrawer(final String fss) {
-		this(1, false, VERTEX_SHADER, fss);
+		this(1, false, VERTEX_SHADER_ES2, fss);
 	}
 
 	protected MediaEffectDrawer(final int numTex, final String fss) {
-		this(numTex, false, VERTEX_SHADER, fss);
+		this(numTex, false, VERTEX_SHADER_ES2, fss);
 	}
 
 	protected MediaEffectDrawer(final boolean isOES, final String fss) {
-		this(1, isOES, VERTEX_SHADER, fss);
+		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
 	protected MediaEffectDrawer(final int numTex,
 		final boolean isOES, final String fss) {
 
-		this(numTex, isOES, VERTEX_SHADER, fss);
+		this(numTex, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
 	protected MediaEffectDrawer(final boolean isOES,
 		final String vss, final String fss) {
 
-		this(1, isOES, VERTEX_SHADER, fss);
+		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
 	protected MediaEffectDrawer(final int numTex,
@@ -299,7 +299,7 @@ public class MediaEffectDrawer {
 			? tex_ids.length : muTexLoc.length;
 		for (int i = 0; i < n; i++) {
 			if (tex_ids[i] != NO_TEXTURE) {
-				GLES20.glActiveTexture(TEX_NUMBERS[i]);
+				GLES20.glActiveTexture(getTexNumbers(false)[i]);
 				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);
 			}
@@ -331,7 +331,7 @@ public class MediaEffectDrawer {
 
 	protected void unbindTexture() {
 		for (int i = 0; i < muTexLoc.length; i++) {
-			GLES20.glActiveTexture(TEX_NUMBERS[i]);
+			GLES20.glActiveTexture(getTexNumbers(false)[i]);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}

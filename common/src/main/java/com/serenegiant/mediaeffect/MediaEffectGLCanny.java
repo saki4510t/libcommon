@@ -27,7 +27,7 @@ public class MediaEffectGLCanny extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLCanny";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
 		"precision highp float;\n" +

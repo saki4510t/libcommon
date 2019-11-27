@@ -27,7 +27,7 @@ public class MediaEffectGLExposure extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLExposure";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +

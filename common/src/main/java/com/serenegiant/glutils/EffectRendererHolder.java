@@ -90,7 +90,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * グレースケール変換のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_GRAY_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_GRAY_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -110,7 +110,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * 白黒反転したグレースケール変換のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_GRAY_REVERSE_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_GRAY_REVERSE_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -131,7 +131,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
 	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_BIN_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BIN_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -159,7 +159,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
 	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_BIN_REVERSE_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BIN_REVERSE_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -185,7 +185,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	/**
 	 * 赤と黄色を強調するためのフラグメントシェーダーのベース文字列
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -211,7 +211,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	/**
 	 * 赤と黄色と白色を強調するためのフラグメントシェーダーのベース文字列
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -240,7 +240,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * 黄色と白を強調するためのフラグメントシェーダーのベース文字列
 	 * 今はFRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASEと同じ(違うパラメータ渡せば良いだけなので)
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -482,7 +482,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 				final GLDrawer2D drawer = mDrawer;
 				switch (effect) {
 				case EFFECT_NON:
-					drawer.updateShader(FRAGMENT_SHADER_SIMPLE_OES);
+					drawer.updateShader(FRAGMENT_SHADER_SIMPLE_OES_ES2);
 					break;
 				case EFFECT_GRAY:
 					drawer.updateShader(FRAGMENT_SHADER_GRAY_OES);

@@ -95,7 +95,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		((OverlayRendererTask)mRendererTask).setOverlay(id, overlay);
 	}
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION +
+	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +
