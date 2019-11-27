@@ -47,6 +47,7 @@ public class ShaderConst {
 
 	public static final int NO_TEXTURE = -1;
 
+//--------------------------------------------------------------------------------
 	@NonNull
 	public static int[] getTexNumbers(final boolean isGLES3) {
 		return isGLES3 ? TEX_NUMBERS_ES3 : TEX_NUMBERS_ES2;
@@ -90,6 +91,7 @@ public class ShaderConst {
 		GLES30.GL_TEXTURE30, GLES30.GL_TEXTURE31,
 	};
 
+//--------------------------------------------------------------------------------
 // 関数文字列定義
 	/**
 	 * RGBをHSVに変換
@@ -126,6 +128,7 @@ public class ShaderConst {
 			"return dot(c.rgb, luminanceWeighting);\n" +
 		"}\n";
 
+//--------------------------------------------------------------------------------
 // 頂点シェーダー
 	/**
 	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
@@ -159,6 +162,7 @@ public class ShaderConst {
 		"    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
 		"}\n";
 
+//--------------------------------------------------------------------------------
 // フラグメントシェーダー
 	/**
 	 * テクスチャを単純コピーするだけのフラグメントシェーダ
@@ -197,6 +201,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	// Fragment shader that converts color to black & white with a simple transformation.
 	private static final String FRAGMENT_SHADER_BW_BASE_ES2
 		= SHADER_VERSION_ES2 +
@@ -214,6 +219,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_BW_ES2
 		= String.format(FRAGMENT_SHADER_BW_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	// Fragment shader that attempts to produce a high contrast image
 	private static final String FRAGMENT_SHADER_NIGHT_BASE_ES2
 		= SHADER_VERSION_ES2 +
@@ -231,6 +237,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_NIGHT_ES2
 		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	// Fragment shader that applies a Chroma Key effect, making green pixels transparent
 	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2
 		= SHADER_VERSION_ES2 +
@@ -252,6 +259,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES2
 		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -275,6 +283,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_SQUEEZE_ES2
 		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_TWIRL_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -298,6 +307,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_TWIRL_ES2
 		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_TUNNEL_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -321,6 +331,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES2
 		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_BULGE_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -344,6 +355,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_BULGE_ES2
 		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_DENT_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -367,6 +379,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_DENT_ES2
 		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_FISHEYE_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -390,6 +403,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_FISHEYE_ES2
 		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_STRETCH_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -412,6 +426,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES2
 		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_MIRROR_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -431,6 +446,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_MIRROR_ES2
 		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_SOBEL_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -466,6 +482,7 @@ public class ShaderConst {
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES2
 		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
 	public static final float[] KERNEL_SOBEL_H = { 1f, 0f, -1f, 2f, 0f, -2f, 1f, 0f, -1f, };	// ソーベル(1次微分)
 	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
