@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.util.Log;
 import android.view.Surface;
 
@@ -95,20 +96,38 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		((OverlayRendererTask)mRendererTask).setOverlay(id, overlay);
 	}
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +	// 入力テクスチャA
-		"uniform %s    sTexture2;\n" +	// 入力テクスチャB
+		"varying vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +	// 入力テクスチャA
+		"uniform %s sTexture2;\n" +	// 入力テクスチャB
 		"void main() {\n" +
 		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
 		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
 		"}\n";
-	private static final String MY_FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2,
-		SAMPLER_OES, SAMPLER_OES);
+	private static final String MY_FRAGMENT_SHADER_EXT_ES2
+		= String.format(FRAGMENT_SHADER_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"precision highp float;\n" +
+		"in vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +	// 入力テクスチャA
+		"uniform %s sTexture2;\n" +	// 入力テクスチャB
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    highp vec4 tex1 = texture(sTexture, vTextureCoord);\n" +
+		"    highp vec4 tex2 = texture(sTexture2, vTextureCoord);\n" +
+		"    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
+		"}\n";
+	private static final String MY_FRAGMENT_SHADER_EXT_ES3
+		= String.format(FRAGMENT_SHADER_BASE_ES3,
+			HEADER_OES_ES3, SAMPLER_OES, SAMPLER_OES);
 
 	private static final int REQUEST_UPDATE_OVERLAY = 100;
 
@@ -150,26 +169,47 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			if (mDrawer != null) {
 				if (DEBUG) Log.v(TAG, String.format("internalOnStart:init overlay texture(%dx%d)",
 					width(), height()));
-				if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT);
-				final GLDrawer2D drawer = mDrawer;
-				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
-				final int uTex1 = drawer.glGetUniformLocation("sTexture");
-				GLES20.glUniform1i(uTex1, 0);
-				if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
+				if (isGLES3()) {
+					if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT_ES3);
+					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
+					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+					GLES30.glUniform1i(uTex1, 0);
+					if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
 
-				final int uTex2 = drawer.glGetUniformLocation("sTexture2");
-				mOverlayTexId = GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES,
-					GLES20.GL_TEXTURE1,
-					GLES20.GL_LINEAR, GLES20.GL_LINEAR,
-					GLES20.GL_CLAMP_TO_EDGE);
-				mOverlayTexture = new SurfaceTexture(mOverlayTexId);
-				mOverlayTexture.setDefaultBufferSize(width(), height());
-				mOverlaySurface = new Surface(mOverlayTexture);
-				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-				GLES20.glUniform1i(uTex2, 1);
-				if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+					mOverlayTexId = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES,
+						GLES30.GL_TEXTURE1,
+						GLES30.GL_LINEAR, GLES30.GL_LINEAR,
+						GLES30.GL_CLAMP_TO_EDGE);
+					mOverlayTexture = new SurfaceTexture(mOverlayTexId);
+					mOverlayTexture.setDefaultBufferSize(width(), height());
+					mOverlaySurface = new Surface(mOverlayTexture);
+					GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+					GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+					GLES30.glUniform1i(uTex2, 1);
+					if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+				} else {
+					if (DEBUG) Log.v(TAG, "internalOnStart:shader=" + MY_FRAGMENT_SHADER_EXT_ES2);
+					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
+					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+					GLES20.glUniform1i(uTex1, 0);
+					if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
+
+					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+					mOverlayTexId = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES,
+						GLES20.GL_TEXTURE1,
+						GLES20.GL_LINEAR, GLES20.GL_LINEAR,
+						GLES20.GL_CLAMP_TO_EDGE);
+					mOverlayTexture = new SurfaceTexture(mOverlayTexId);
+					mOverlayTexture.setDefaultBufferSize(width(), height());
+					mOverlaySurface = new Surface(mOverlayTexture);
+					GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+					GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+					GLES20.glUniform1i(uTex2, 1);
+					if (DEBUG) Log.v(TAG, "internalOnStart:uTex2=" + uTex2);
+				}
 			}
 		}
 
@@ -223,27 +263,52 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@WorkerThread
 		private void handleUpdateOverlay(final int targetId, @NonNull final Bitmap overlay) {
 			if (DEBUG) Log.v(TAG, "handleUpdateOverlay:" + overlay);
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
-			try {
-				final Canvas canvas = mOverlaySurface.lockCanvas(null);
+
+			if (isGLES3()) {
+				GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+				GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
 				try {
-					if (overlay != null) {
-						canvas.drawBitmap(overlay, 0, 0, null);
-					} else if (DEBUG) {
-						// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
-						canvas.drawColor(0x7fff0000);	// ARGB
-					} else {
-						// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
-						canvas.drawColor(0x00000000);	// ARGB
+					final Canvas canvas = mOverlaySurface.lockCanvas(null);
+					try {
+						if (overlay != null) {
+							canvas.drawBitmap(overlay, 0, 0, null);
+						} else if (DEBUG) {
+							// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
+							canvas.drawColor(0x7fff0000);	// ARGB
+						} else {
+							// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
+							canvas.drawColor(0x00000000);	// ARGB
+						}
+					} finally {
+						mOverlaySurface.unlockCanvasAndPost(canvas);
 					}
-				} finally {
-					mOverlaySurface.unlockCanvasAndPost(canvas);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
 				}
-			} catch (final Exception e) {
-				Log.w(TAG, e);
+				GLES30.glFlush();
+			} else {
+				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+				try {
+					final Canvas canvas = mOverlaySurface.lockCanvas(null);
+					try {
+						if (overlay != null) {
+							canvas.drawBitmap(overlay, 0, 0, null);
+						} else if (DEBUG) {
+							// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
+							canvas.drawColor(0x7fff0000);	// ARGB
+						} else {
+							// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
+							canvas.drawColor(0x00000000);	// ARGB
+						}
+					} finally {
+						mOverlaySurface.unlockCanvasAndPost(canvas);
+					}
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
+				GLES20.glFlush();
 			}
-			GLES20.glFlush();
 			requestFrame();
 		}
 	}
