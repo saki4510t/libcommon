@@ -155,7 +155,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @return
 	 */
 	@Override
-	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
+	public GLDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
 	}

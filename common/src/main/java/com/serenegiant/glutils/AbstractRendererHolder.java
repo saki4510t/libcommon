@@ -801,7 +801,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //--------------------------------------------------------------------------------
 
-	protected void setupCaptureDrawer(final IDrawer2D drawer) {
+	protected void setupCaptureDrawer(final GLDrawer2D drawer) {
 	}
 	
 	/**

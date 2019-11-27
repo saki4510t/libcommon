@@ -129,7 +129,7 @@ public class RendererTarget implements IRendererTarget {
 	 * @param texMatrix
 	 */
 	@Override
-	public void draw(final IDrawer2D drawer, final int textId, final float[] texMatrix) {
+	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
 			mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
@@ -149,7 +149,7 @@ public class RendererTarget implements IRendererTarget {
 	 * @param texMatrix
 	 * @param mvpMatrix
 	 */
-	protected void doDraw(final IDrawer2D drawer,
+	protected void doDraw(final GLDrawer2D drawer,
 		final int textId, final float[] texMatrix,
 		final float[] mvpMatrix) {
 
@@ -243,7 +243,7 @@ public class RendererTarget implements IRendererTarget {
 		}
 
 		@Override
-		public void draw(final IDrawer2D drawer,
+		public void draw(final GLDrawer2D drawer,
 			final int textId, final float[] texMatrix) {
 
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
