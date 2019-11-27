@@ -448,6 +448,10 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+	/**
+	 * TUNNEL Effect付与のフラグメントシェーダ
+	 * for ES2
+	 */
 	public static final String FRAGMENT_SHADER_TUNNEL_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -470,6 +474,34 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES2
 		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * TUNNEL Effect付与のフラグメントシェーダ
+	 * for ES3
+	 */
+	public static final String FRAGMENT_SHADER_TUNNEL_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"precision mediump float;\n" +
+		"in vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    float r = length(normCoord); // to polar coords \n" +
+		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
+		"    if (r > 0.5) r = 0.5;\n"+ // Tunnel
+		"    normCoord.x = r * cos(phi); \n" +
+		"    normCoord.y = r * sin(phi); \n" +
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    o_FragColor = texture(sTexture, texCoord);\n"+
+		"}\n";
+	public static final String FRAGMENT_SHADER_TUNNEL_ES3
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES3
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_BULGE_BASE_ES2
