@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
@@ -122,7 +123,8 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 	private static final int REQUEST_SET_MASK = 10;
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +
@@ -135,9 +137,30 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		"    highp float alpha = texture2D(sTexture3, vTextureCoord).a;\n" +
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
 		"}\n";
-	private static final String MY_FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2,
-		SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+	private static final String MY_FRAGMENT_SHADER_EXT_ES2
+		= String.format(FRAGMENT_SHADER_BASE_ES2,
+			HEADER_OES_ES2,
+			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"precision highp float;\n" +
+		"in vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +	// 入力テクスチャA
+		"uniform %s sTexture2;\n" +	// 入力テクスチャB
+		"uniform %s sTexture3;\n" +	// マスクM
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    highp vec4 tex1 = texture(sTexture, vTextureCoord);\n" +
+		"    highp vec4 tex2 = texture(sTexture2, vTextureCoord);\n" +
+		"    highp float alpha = texture(sTexture3, vTextureCoord).a;\n" +
+		"    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
+		"}\n";
+	private static final String MY_FRAGMENT_SHADER_EXT_ES3
+		= String.format(FRAGMENT_SHADER_BASE_ES3,
+			HEADER_OES_ES3,
+			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
 	/**
 	 * 描画タスク
@@ -202,41 +225,77 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			if (mDrawer != null) {
 				if (DEBUG) Log.v(TAG, String.format("internalOnStart:init mix texture(%dx%d)",
 					width(), height()));
-				final GLDrawer2D drawer = mDrawer;
-				drawer.updateShader(MY_FRAGMENT_SHADER_EXT);
-				final int uTex1 = drawer.glGetUniformLocation("sTexture");
-				GLES20.glUniform1i(uTex1, 0);
+				if (isGLES3()) {
+					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
+					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+					GLES30.glUniform1i(uTex1, 0);
 
-				// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
-				final int uTex2 = drawer.glGetUniformLocation("sTexture2");
-				mTexId2 = GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1,
-					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
-				mMasterTexture2 = new SurfaceTexture(mTexId2);
-				mMasterTexture2.setDefaultBufferSize(width(), height());
-				mMasterSurface2 = new Surface(mMasterTexture2);
-				if (BuildCheck.isAndroid5()) {
-					mMasterTexture2.setOnFrameAvailableListener(
-						mOnFrameAvailableListener, mAsyncHandler);
+					// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
+					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+					mTexId2 = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE1,
+						GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
+					mMasterTexture2 = new SurfaceTexture(mTexId2);
+					mMasterTexture2.setDefaultBufferSize(width(), height());
+					mMasterSurface2 = new Surface(mMasterTexture2);
+					if (BuildCheck.isAndroid5()) {
+						mMasterTexture2.setOnFrameAvailableListener(
+							mOnFrameAvailableListener, mAsyncHandler);
+					} else {
+						mMasterTexture2.setOnFrameAvailableListener(
+							mOnFrameAvailableListener);
+					}
+					GLES30.glActiveTexture(GLES30.GL_TEXTURE1);
+					GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId2);
+					GLES30.glUniform1i(uTex2, 1);
+
+					// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
+					final int uTex3 = mDrawer.glGetUniformLocation("sTexture3");
+					mMaskTexId = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE2,
+						GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
+					mMaskTexture = new SurfaceTexture(mMaskTexId);
+					mMaskTexture.setDefaultBufferSize(width(), height());
+					mMaskSurface = new Surface(mMaskTexture);
+					GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
+					GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
+					GLES30.glUniform1i(uTex3, 2);
 				} else {
-					mMasterTexture2.setOnFrameAvailableListener(
-						mOnFrameAvailableListener);
-				}
-				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId2);
-				GLES20.glUniform1i(uTex2, 1);
+					mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
+					final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+					GLES20.glUniform1i(uTex1, 0);
 
-				// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
-				final int uTex3 = drawer.glGetUniformLocation("sTexture3");
-				mMaskTexId = GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE2,
-					GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
-				mMaskTexture = new SurfaceTexture(mMaskTexId);
-				mMaskTexture.setDefaultBufferSize(width(), height());
-				mMaskSurface = new Surface(mMaskTexture);
-				GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
-				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-				GLES20.glUniform1i(uTex3, 2);
+					// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
+					final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+					mTexId2 = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1,
+						GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
+					mMasterTexture2 = new SurfaceTexture(mTexId2);
+					mMasterTexture2.setDefaultBufferSize(width(), height());
+					mMasterSurface2 = new Surface(mMasterTexture2);
+					if (BuildCheck.isAndroid5()) {
+						mMasterTexture2.setOnFrameAvailableListener(
+							mOnFrameAvailableListener, mAsyncHandler);
+					} else {
+						mMasterTexture2.setOnFrameAvailableListener(
+							mOnFrameAvailableListener);
+					}
+					GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+					GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mTexId2);
+					GLES20.glUniform1i(uTex2, 1);
+
+					// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
+					final int uTex3 = mDrawer.glGetUniformLocation("sTexture3");
+					mMaskTexId = GLHelper.initTex(
+						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE2,
+						GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
+					mMaskTexture = new SurfaceTexture(mMaskTexId);
+					mMaskTexture.setDefaultBufferSize(width(), height());
+					mMaskSurface = new Surface(mMaskTexture);
+					GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+					GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
+					GLES20.glUniform1i(uTex3, 2);
+				}
 			}
 		}
 		
@@ -326,8 +385,13 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 */
 		protected void handleSetMask(@Nullable final Bitmap mask) {
 			if (DEBUG) Log.v(TAG, "handleSetMask:" + mask);
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
-			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
+			if (isGLES3()) {
+				GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
+				GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
+			} else {
+				GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
+			}
 			try {
 				final Canvas canvas = mMaskSurface.lockCanvas(null);
 				try {
