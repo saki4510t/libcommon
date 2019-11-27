@@ -54,6 +54,11 @@ public class VideoSourceCameraGLView
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = VideoSourceCameraGLView.class.getSimpleName();
 
+	/**
+	 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
+	 */
+	private static final boolean USE_SHARED_CONTEXT = true;
+
 	@NonNull
 	private final CameraDelegator mCameraDelegator;
 	@NonNull
@@ -272,7 +277,7 @@ public class VideoSourceCameraGLView
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 				}
 			}
-		, true);
+		, USE_SHARED_CONTEXT);
 	}
 
 	/**

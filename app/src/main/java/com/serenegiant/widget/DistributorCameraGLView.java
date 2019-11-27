@@ -53,6 +53,11 @@ public class DistributorCameraGLView
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = DistributorCameraGLView.class.getSimpleName();
 
+	/**
+	 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
+	 */
+	private static final boolean USE_SHARED_CONTEXT = true;
+
 	private final int mGLVersion;
 	@NonNull
 	private final CameraDelegator mCameraDelegator;
@@ -254,7 +259,7 @@ public class DistributorCameraGLView
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:");
 				}
 			}
-		, true);
+		, USE_SHARED_CONTEXT);
 	}
 
 	/**
