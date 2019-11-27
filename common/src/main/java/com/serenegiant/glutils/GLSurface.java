@@ -34,6 +34,7 @@ import androidx.annotation.NonNull;
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
+ * FIXME ES3対応にする(ES2用子クラスとES3用子クラスに分ける)
  */
 public class GLSurface implements IGLSurface {
 	private static final boolean DEBUG = false;
