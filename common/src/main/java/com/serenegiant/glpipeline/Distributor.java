@@ -26,7 +26,7 @@ import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.EGLConst;
 import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.RenderHolderCallback;
+import com.serenegiant.glutils.IRendererHolder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +46,7 @@ public class Distributor implements IPipeline {
 	private int mWidth, mHeight;
 
 	@Nullable
-	private final RenderHolderCallback mCallback;
+	private final IRendererHolder.RenderHolderCallback mCallback;
 	private final Object mSync = new Object();
 	private final BaseRendererTask mRendererTask;
 	private volatile boolean isRunning;

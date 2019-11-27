@@ -23,7 +23,6 @@ import android.util.AttributeSet;
 
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.OverlayRendererHolder;
-import com.serenegiant.glutils.RenderHolderCallback;
 import com.serenegiant.graphics.BitmapHelper;
 
 import androidx.annotation.NonNull;
@@ -65,7 +64,7 @@ public final class OverlayCameraGLView extends AbstractCameraGLView {
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
-		final RenderHolderCallback callback) {
+		final IRendererHolder.RenderHolderCallback callback) {
 
 		return new OverlayRendererHolder(width, height, callback);
 	}

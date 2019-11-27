@@ -24,7 +24,6 @@ import android.util.Log;
 
 import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.IRendererHolder;
-import com.serenegiant.glutils.RenderHolderCallback;
 
 import androidx.annotation.NonNull;
 
@@ -51,7 +50,7 @@ public final class EffectCameraGLView extends AbstractCameraGLView {
 	@NonNull
 	@Override
 	protected IRendererHolder createRendererHolder(final int width, final int height,
-		final RenderHolderCallback callback) {
+		final IRendererHolder.RenderHolderCallback callback) {
 
 		if (DEBUG) Log.v(TAG, "createRendererHolder:");
 		return new EffectRendererHolder(width, height, callback);

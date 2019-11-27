@@ -31,7 +31,6 @@ import android.view.SurfaceHolder;
 
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.IRendererHolder;
-import com.serenegiant.glutils.RenderHolderCallback;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -236,13 +235,13 @@ public abstract class AbstractCameraGLView
 	@NonNull
 	protected abstract IRendererHolder createRendererHolder(
 		final int width, final int height,
-		final RenderHolderCallback callback);
+		final IRendererHolder.RenderHolderCallback callback);
 
 	/**
 	 * IRendererからのコールバックリスナーを実装
 	 */
-	private final RenderHolderCallback mRenderHolderCallback
-		= new RenderHolderCallback() {
+	private final IRendererHolder.RenderHolderCallback mRenderHolderCallback
+		= new IRendererHolder.RenderHolderCallback() {
 
 		@Override
 		public void onCreate(final Surface surface) {

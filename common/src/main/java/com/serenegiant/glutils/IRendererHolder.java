@@ -44,6 +44,15 @@ public interface IRendererHolder extends IRendererCommon {
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface StillCaptureFormat {}
 
+	/**
+	 * IRendererHolderからのコールバックリスナー
+	 */
+	public interface RenderHolderCallback {
+		public void onCreate(Surface surface);
+		public void onFrameAvailable();
+		public void onDestroy();
+	}
+
 	public interface OnCapturedListener {
 		public void onCaptured(@NonNull final IRendererHolder rendererHolder, final boolean success);
 	}
