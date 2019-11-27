@@ -43,7 +43,7 @@ public class GLSurface implements IGLSurface {
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
 	/**
-	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width
 	 * @param height
@@ -54,7 +54,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * コンストラクタ(GL_TEXTURE_2D), デプスバッファ無し
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param tex_unit
 	 * @param width
@@ -69,7 +69,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width dimension of offscreen(width)
 	 * @param height dimension of offscreen(height)
@@ -83,7 +83,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)をwrapするためのコンストラクタ
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param tex_unit
 	 * @param width
@@ -99,7 +99,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param width
 	 * @param height
@@ -114,7 +114,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * コンストラクタ(GL_TEXTURE_2D)
+	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * @param tex_unit
 	 * @param width
 	 * @param height
@@ -130,7 +130,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ, デプスバッファなし
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド, デプスバッファなし
 	 * @param tex_id
 	 * @param tex_unit
 	 * @param width
@@ -145,7 +145,7 @@ public class GLSurface implements IGLSurface {
 	}
 
 	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのコンストラクタ
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド
 	 * @param tex_unit
 	 * @param tex_id
 	 * @param width
