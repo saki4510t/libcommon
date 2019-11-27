@@ -86,11 +86,13 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	/** 内蔵映像効果の数 */
 	public static final int EFFECT_NUM = 12;
 
+//--------------------------------------------------------------------------------
 	/**
 	 * グレースケール変換のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_GRAY_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_GRAY_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -103,14 +105,17 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(cl3, 1.0);\n" +
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_GRAY_OES
-		= String.format(FRAGMENT_SHADER_GRAY_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_EXT_GRAY_ES2
+		= String.format(FRAGMENT_SHADER_GRAY_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 白黒反転したグレースケール変換のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_GRAY_REVERSE_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_GRAY_REVERSE_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -123,15 +128,18 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(clamp(vec3(1.0, 1.0, 1.0) - cl3, 0.0, 1.0), 1.0);\n" +
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_GRAY_REVERSE_OES
-		= String.format(FRAGMENT_SHADER_GRAY_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2
+		= String.format(FRAGMENT_SHADER_GRAY_REVERSE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 2値化のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
 	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_BIN_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BIN_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -145,21 +153,26 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(cl * bin, 1.0);\n" +
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_BIN_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_ES2
+		= String.format(FRAGMENT_SHADER_BIN_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
 
-	private static final String FRAGMENT_SHADER_BIN_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2
+		= String.format(FRAGMENT_SHADER_BIN_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
 
-	private static final String FRAGMENT_SHADER_BIN_GREEN_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_GREEN_ES2
+		= String.format(FRAGMENT_SHADER_BIN_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 反転した2値化のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
 	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
 	 */
-	private static final String FRAGMENT_SHADER_BIN_REVERSE_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BIN_REVERSE_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -173,19 +186,24 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(cl * (vec3(1.0, 1.0, 1.0) - bin), 1.0);\n" +
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_BIN_REVERSE_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
 
-	private static final String FRAGMENT_SHADER_BIN_REVERSE_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
 
-	private static final String FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
+	private static final String FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 赤と黄色を強調するためのフラグメントシェーダーのベース文字列
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -205,13 +223,16 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +		// HSVをRGBに戻す
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 赤と黄色と白色を強調するためのフラグメントシェーダーのベース文字列
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -233,14 +254,17 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +		// HSVをRGBに戻す
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 黄色と白を強調するためのフラグメントシェーダーのベース文字列
 	 * 今はFRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASEと同じ(違うパラメータ渡せば良いだけなので)
 	 */
-	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE_ES2
+		= SHADER_VERSION_ES2 +
 		"%s" +
 		"precision mediump float;\n" +
 		"varying vec2 vTextureCoord;\n" +
@@ -263,9 +287,11 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +		// HSVをRGBに戻す
 	"}\n";
 
-	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
 
+//================================================================================
 	/**
 	 * コンストラクタ
 	 * @param width
@@ -485,37 +511,37 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 					drawer.updateShader(FRAGMENT_SHADER_EXT_ES2);
 					break;
 				case EFFECT_GRAY:
-					drawer.updateShader(FRAGMENT_SHADER_GRAY_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_GRAY_ES2);
 					break;
 				case EFFECT_GRAY_REVERSE:
-					drawer.updateShader(FRAGMENT_SHADER_GRAY_REVERSE_OES);
+					drawer.updateShader(FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2);
 					break;
 				case EFFECT_BIN:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_ES2);
 					break;
 				case EFFECT_BIN_YELLOW:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_YELLOW_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2);
 					break;
 				case EFFECT_BIN_GREEN:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_GREEN_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_GREEN_ES2);
 					break;
 				case EFFECT_BIN_REVERSE:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2);
 					break;
 				case EFFECT_BIN_REVERSE_YELLOW:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_YELLOW_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2);
 					break;
 				case EFFECT_BIN_REVERSE_GREEN:
-					drawer.updateShader(FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2);
 					break;
 				case EFFECT_EMPHASIZE_RED_YELLOW:
-					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2);
 					break;
 				case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
-					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2);
 					break;
 				case EFFECT_EMPHASIZE_YELLOW_WHITE:
-					drawer.updateShader(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES);
+					drawer.updateShader(FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2);
 					break;
 				default:
 					try {
