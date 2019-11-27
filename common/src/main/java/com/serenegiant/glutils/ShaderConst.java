@@ -672,6 +672,10 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+	/**
+	 * Stretch Effect付与のフラグメントシェーダ
+	 * for ES2
+	 */
 	public static final String FRAGMENT_SHADER_STRETCH_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -693,6 +697,33 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES2
 		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * Stretch Effect付与のフラグメントシェーダ
+	 * for ES3
+	 */
+	public static final String FRAGMENT_SHADER_STRETCH_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"precision mediump float;\n" +
+		"in vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"uniform vec2 uPosition;\n" +
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    vec2 texCoord = vTextureCoord.xy;\n" +
+		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
+		"    vec2 s = sign(normCoord + uPosition);\n"+
+		"    normCoord = abs(normCoord);\n"+
+		"    normCoord = 0.5 * normCoord + 0.5 * smoothstep(0.25, 0.5, normCoord) * normCoord;\n"+
+		"    normCoord = s * normCoord;\n"+
+		"    texCoord = normCoord / 2.0 + 0.5;\n"+
+		"    o_FragColor = texture(sTexture, texCoord);\n"+
+		"}\n";
+	public static final String FRAGMENT_SHADER_STRETCH_ES3
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES3
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
 	public static final String FRAGMENT_SHADER_MIRROR_BASE_ES2
