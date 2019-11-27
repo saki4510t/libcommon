@@ -34,7 +34,6 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.system.BuildCheck;
 
 import java.io.BufferedOutputStream;
@@ -677,7 +676,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseMasterSurface();
 			makeCurrent();
-			mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+			if (isGLES3()) {
+				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
+					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
+			} else {
+				mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(
+					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+			}
 			mMasterTexture = new SurfaceTexture(mTexId);
 			mMasterSurface = new Surface(mMasterTexture);
 			if (BuildCheck.isAndroid4_1()) {
@@ -690,6 +695,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		/**
 		 * マスターSurfaceを破棄する
 		 */
+		@SuppressLint("NewApi")
 		@WorkerThread
 		@Override
 		protected void handleReleaseMasterSurface() {
@@ -711,7 +717,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mMasterTexture = null;
 			}
 			if (mTexId != 0) {
-				GLHelper.deleteTex(mTexId);
+				if (isGLES3()) {
+					com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
+				} else {
+					com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
+				}
 				mTexId = 0;
 			}
 		}

@@ -21,6 +21,7 @@ package com.serenegiant.glutils;
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.opengl.Matrix;
 import android.util.Log;
 import android.util.SparseArray;
@@ -404,7 +405,11 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
-					GLES20.glFlush();
+					if (isGLES3()) {
+						GLES30.glFlush();
+					} else {
+						GLES20.glFlush();
+					}
 					ThreadUtils.NoThrowSleep(0, 0);
 				}
 			} catch (final Exception e) {
@@ -417,8 +422,13 @@ public abstract class AbstractDistributeTask {
 
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 		makeCurrent();
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-		GLES20.glFlush();	// これなくても良さそう?
+		if (isGLES3()) {
+			GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+			GLES30.glFlush();	// これなくても良さそう?
+		} else {
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			GLES20.glFlush();	// これなくても良さそう?
+		}
 		if (isFirstFrameRendered) {
 			callOnFrameAvailable();
 		}
