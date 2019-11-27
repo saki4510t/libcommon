@@ -21,6 +21,7 @@ package com.serenegiant.glutils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+@Deprecated
 public interface IDrawer2D {
 	/**
 	 * 関連するリソースを廃棄する

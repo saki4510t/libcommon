@@ -37,7 +37,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
-public abstract class GLDrawer2D implements IDrawer2D {
+public abstract class GLDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 
@@ -124,7 +124,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * IDrawer2Dの実装
 	 */
 	@CallSuper
-	@Override
 	public void release() {
 		releaseShader();
 	}
@@ -144,7 +143,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}
@@ -156,7 +154,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param offset
 	 * @return
 	 */
-	@Override
 	public GLDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
@@ -168,7 +165,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
-	@Override
 	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
@@ -179,7 +175,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * IDrawer2Dの実装
 	 * @param surface
 	 */
-	@Override
 	public void draw(@NonNull final IGLSurface surface) {
 		draw(surface.getTexId(), surface.getTexMatrix(), 0);
 	}
@@ -190,7 +185,6 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param tex_matrix
 	 * @param offset
 	 */
-	@Override
 	public synchronized void draw(final int texId,
 		@Nullable final float[] tex_matrix, final int offset) {
 
