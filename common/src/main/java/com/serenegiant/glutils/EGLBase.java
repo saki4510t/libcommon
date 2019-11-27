@@ -244,4 +244,20 @@ public abstract class EGLBase implements EGLConst {
 	 * GPU側の描画処理が終了するまで実行をブロックする
 	 */
 	public abstract void waitNative();
+
+	/**
+	 * GLES3で初期化したかどうか
+	 * @return
+	 */
+	public boolean isGLES3() {
+		return getGlVersion() >= 3;
+	}
+
+	/**
+	 * GLES2またはGLES3で初期化したかどうか
+	 * @return
+	 */
+	public boolean isGLES2() {
+		return getGlVersion() >= 2;
+	}
 }
