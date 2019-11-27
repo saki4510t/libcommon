@@ -53,6 +53,7 @@ public class DistributorCameraGLView
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = DistributorCameraGLView.class.getSimpleName();
 
+	private final int mGLVersion;
 	@NonNull
 	private final CameraDelegator mCameraDelegator;
 	@NonNull
@@ -89,7 +90,9 @@ public class DistributorCameraGLView
 	public DistributorCameraGLView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mGLManager = new GLManager();
+		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
+		mGLVersion = (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2;	// GLES20 API >= 8, GLES30 API>=18
+		mGLManager = new GLManager(mGLVersion);
 		mCameraDelegator = new CameraDelegator(this,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
@@ -111,8 +114,7 @@ public class DistributorCameraGLView
 			}
 		};
 
-		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-		setEGLContextClientVersion((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? 3 : 2);	// GLES20 API >= 8, GLES30 API>=18
+		setEGLContextClientVersion(mGLVersion);
 		setRenderer((CameraRenderer)mCameraDelegator.getCameraRenderer());
 		final SurfaceHolder holder = getHolder();
 		holder.addCallback(new SurfaceHolder.Callback() {
@@ -283,7 +285,7 @@ public class DistributorCameraGLView
 //			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
 			if (!extensions.contains("OES_EGL_image_external"))
 				throw new RuntimeException("This system does not support OES_EGL_image_external.");
-			mDrawer = GLDrawer2D.create(false, true);
+			mDrawer = GLDrawer2D.create(mGLVersion == 3, true);
 			// create texture ID
 			hTex = mDrawer.initTex();
 			// create SurfaceTexture with texture ID.
