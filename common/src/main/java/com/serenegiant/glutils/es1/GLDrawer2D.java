@@ -73,6 +73,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
@@ -85,7 +86,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @return
 	 */
 	@Override
-	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
+	public IDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
 	}
@@ -96,7 +97,7 @@ public class GLDrawer2D implements IDrawer2D {
 	 * @param offset
 	 */
 	@Override
-	public void copyMvpMatrix(final float[] matrix, final int offset) {
+	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
 

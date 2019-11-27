@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public interface IDrawer2D {
 	/**
@@ -31,6 +32,7 @@ public interface IDrawer2D {
 	 * 内部配列を直接返すので変更時は要注意
 	 * @return
 	 */
+	@NonNull
 	public float[] getMvpMatrix();
 
 	/**
@@ -39,14 +41,14 @@ public interface IDrawer2D {
 	 * @param offset
 	 * @return
 	 */
-	public IDrawer2D setMvpMatrix(final float[] matrix, final int offset);
+	public IDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset);
 
 	/**
 	 * モデルビュー変換行列のコピーを取得
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
-	public void copyMvpMatrix(final float[] matrix, final int offset);
+	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset);
 
 	/**
 	 * 描画実行
@@ -54,7 +56,7 @@ public interface IDrawer2D {
 	 * @param tex_matrix
 	 * @param offset
 	 */
-	public void draw(final int texId, final float[] tex_matrix, final int offset);
+	public void draw(final int texId, @Nullable final float[] tex_matrix, final int offset);
 
 	/**
 	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド

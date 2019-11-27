@@ -29,6 +29,7 @@ import java.nio.FloatBuffer;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -142,6 +143,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * IDrawer2Dの実装
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
@@ -155,7 +157,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @return
 	 */
 	@Override
-	public GLDrawer2D setMvpMatrix(final float[] matrix, final int offset) {
+	public GLDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
 	}
@@ -167,7 +169,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param offset
 	 */
 	@Override
-	public void copyMvpMatrix(final float[] matrix, final int offset) {
+	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
 
@@ -182,9 +184,15 @@ public abstract class GLDrawer2D implements IDrawer2D {
 		draw(surface.getTexId(), surface.getTexMatrix(), 0);
 	}
 
+	/**
+	 * 描画処理
+	 * @param texId
+	 * @param tex_matrix
+	 * @param offset
+	 */
 	@Override
 	public synchronized void draw(final int texId,
-		final float[] tex_matrix, final int offset) {
+		@Nullable final float[] tex_matrix, final int offset) {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
@@ -211,11 +219,38 @@ public abstract class GLDrawer2D implements IDrawer2D {
 		finishDraw();
 	}
 
+	/**
+	 * テクスチャ変換行列をセット
+	 * @param tex_matrix
+	 * @param offset
+	 */
 	protected abstract void updateTexMatrix(final float[] tex_matrix, final int offset);
+
+	/**
+	 * モデルビュー変換行列をセット
+	 * @param mvpMatrix
+	 */
 	protected abstract void updateMvpMatrix(final float[] mvpMatrix);
+
+	/**
+	 * てkスチャをバインド
+	 * @param texId
+	 */
 	protected abstract void bindTexture(final int texId);
+
+	/**
+	 * 頂点座標をセット
+	 */
 	protected abstract void updateVertex();
+
+	/**
+	 * 描画実行
+	 */
 	protected abstract void drawArrays();
+
+	/**
+	 * 描画の後処理
+	 */
 	protected abstract void finishDraw();
 
 	/**
