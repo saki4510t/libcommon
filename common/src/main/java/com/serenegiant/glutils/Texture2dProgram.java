@@ -30,6 +30,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * GL program and supporting functions for textured 2D shapes.
  */
+@Deprecated
 public class Texture2dProgram {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
     private static final String TAG = "Texture2dProgram";
