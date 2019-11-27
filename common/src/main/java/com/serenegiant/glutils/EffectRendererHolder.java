@@ -104,7 +104,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_GRAY_OES
-		= String.format(FRAGMENT_SHADER_GRAY_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_GRAY_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	/**
 	 * 白黒反転したグレースケール変換のためのフラグメントシェーダーのベース文字列
@@ -124,7 +124,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_GRAY_REVERSE_OES
-		= String.format(FRAGMENT_SHADER_GRAY_REVERSE_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_GRAY_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	/**
 	 * 2値化のためのフラグメントシェーダーのベース文字列
@@ -146,13 +146,13 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_BIN_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES, SAMPLER_OES, "1.0, 1.0, 1.0");
+		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
 
 	private static final String FRAGMENT_SHADER_BIN_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES, SAMPLER_OES, "1.0, 1.0, 0.0");
+		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
 
 	private static final String FRAGMENT_SHADER_BIN_GREEN_OES
-		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES, SAMPLER_OES, "0.0, 1.0, 0.0");
+		= String.format(FRAGMENT_SHADER_BIN_BASE, HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
 
 	/**
 	 * 反転した2値化のためのフラグメントシェーダーのベース文字列
@@ -174,13 +174,13 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_BIN_REVERSE_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES, SAMPLER_OES, "1.0, 1.0, 1.0");
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 1.0");
 
 	private static final String FRAGMENT_SHADER_BIN_REVERSE_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES, SAMPLER_OES, "1.0, 1.0, 0.0");
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "1.0, 1.0, 0.0");
 
 	private static final String FRAGMENT_SHADER_BIN_REVERSE_GREEN_OES
-		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES, SAMPLER_OES, "0.0, 1.0, 0.0");
+		= String.format(FRAGMENT_SHADER_BIN_REVERSE_BASE, HEADER_OES_ES2, SAMPLER_OES, "0.0, 1.0, 0.0");
 
 	/**
 	 * 赤と黄色を強調するためのフラグメントシェーダーのベース文字列
@@ -206,7 +206,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	/**
 	 * 赤と黄色と白色を強調するためのフラグメントシェーダーのベース文字列
@@ -234,7 +234,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_RED_YELLOW_WHITE_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	/**
 	 * 黄色と白を強調するためのフラグメントシェーダーのベース文字列
@@ -264,7 +264,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	"}\n";
 
 	private static final String FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_OES
-		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	/**
 	 * コンストラクタ

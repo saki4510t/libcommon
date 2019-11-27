@@ -40,7 +40,7 @@ public class MediaEffectGLPosterize extends MediaEffectGLBase {
 	private static final String FRAGMENT_SHADER
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	public MediaEffectGLPosterize() {
 		this(10.0f);

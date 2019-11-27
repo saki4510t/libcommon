@@ -107,8 +107,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
 		"}\n";
 	private static final String MY_FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
-			SAMPLER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2,
+		SAMPLER_OES, SAMPLER_OES);
 
 	private static final int REQUEST_UPDATE_OVERLAY = 100;
 

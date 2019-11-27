@@ -47,8 +47,8 @@ public class MediaEffectGLMaskedAlphaBlend extends MediaEffectGLBase {
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D,
 			SAMPLER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES,
-			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2,
+		SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
 	/**
 	 * コンストラクタ

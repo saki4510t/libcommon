@@ -77,7 +77,7 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 	private static final String FRAGMENT_SHADER_FILT3x3
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT_FILT3x3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	public MediaEffectKernel3x3Drawer(final String fss) {
 		this(false, VERTEX_SHADER_ES2, fss);
