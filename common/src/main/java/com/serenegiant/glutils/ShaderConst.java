@@ -286,7 +286,10 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
-	// Fragment shader that applies a Chroma Key effect, making green pixels transparent
+	/**
+	 * クロマキー合成用に緑を透過させるフラグメントシェーダ
+	 * for ES2
+	 */
 	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -306,6 +309,31 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES2
 		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * クロマキー合成用に緑を透過させるフラグメントシェーダ
+	 * for ES3
+	 */
+	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"precision mediump float;\n" +
+		"in vec2 vTextureCoord;\n" +
+		"uniform %s sTexture;\n" +
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    vec4 tc = texture(sTexture, vTextureCoord);\n" +
+		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
+		"    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){ \n" +
+		"        o_FragColor = vec4(0, 0, 0, 0.0);\n" +
+		"    }else{ \n" +
+		"        o_FragColor = texture2D(sTexture, vTextureCoord);\n" +
+		"    }\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES3
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES3
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
 	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES2
