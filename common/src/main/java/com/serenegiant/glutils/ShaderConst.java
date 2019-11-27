@@ -867,6 +867,10 @@ public class ShaderConst {
 	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
 	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分)
 
+	/**
+	 * カーネル関数による映像効果付与のフラグメントシェーダ
+	 * for ES2
+	 */
 	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -894,5 +898,38 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES2
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * カーネル関数による映像効果付与のフラグメントシェーダ
+	 * for ES3
+	 */
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
+		"precision highp float;\n" +
+		"in       vec2 vTextureCoord;\n" +
+		"uniform %s    sTexture;\n" +
+		"uniform float uKernel[18];\n" +
+		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
+		"uniform float uColorAdjust;\n" +
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    vec4 sum = vec4(0.0);\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];\n" +
+		"    sum += texture(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];\n" +
+		"    o_FragColor = sum + uColorAdjust;\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_FILT3x3_ES3
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES3
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 }
