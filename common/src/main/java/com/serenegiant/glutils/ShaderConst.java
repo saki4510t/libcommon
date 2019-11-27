@@ -129,7 +129,8 @@ public class ShaderConst {
 	/**
 	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
 	 */
-	public static final String VERTEX_SHADER_ES2 = SHADER_VERSION_ES2 +
+	public static final String VERTEX_SHADER_ES2
+		= SHADER_VERSION_ES2 +
 		"uniform mat4 uMVPMatrix;\n" +				// モデルビュー変換行列
 		"uniform mat4 uTexMatrix;\n" +				// テクスチャ変換行列
 		"attribute highp vec4 aPosition;\n" +		// 頂点座標
@@ -161,7 +162,6 @@ public class ShaderConst {
 		+ "  gl_FragColor = texture2D(sTexture, vTextureCoord);\n"
 		+ "}";
 
-// 頂点シェーダー
 	// Simple fragment shader for use with "normal" 2D textures.
 	private static final String FRAGMENT_SHADER_BASE_ES2
 		= SHADER_VERSION_ES2 +
