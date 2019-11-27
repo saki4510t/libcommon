@@ -774,6 +774,10 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+	/**
+	 * Sobel Effect付与のフラグメントシェーダ
+	 * for ES2
+	 */
 	public static final String FRAGMENT_SHADER_SOBEL_BASE_ES2
 		= SHADER_VERSION_ES2 +
 		"%s" +
@@ -808,6 +812,46 @@ public class ShaderConst {
 		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES2
 		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * Sobel Effect付与のフラグメントシェーダ
+	 * for ES3
+	 */
+	public static final String FRAGMENT_SHADER_SOBEL_BASE_ES3
+		= SHADER_VERSION_ES3 +
+		"%s" +
+		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
+		"precision highp float;\n" +
+		"in       vec2 vTextureCoord;\n" +
+		"uniform %s    sTexture;\n" +
+		"uniform float uKernel[18];\n" +
+		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
+		"uniform float uColorAdjust;\n" +
+		"layout(location = 0) out vec4 o_FragColor;\n" +
+		"void main() {\n" +
+		"    vec3 t0 = texture(sTexture, vTextureCoord + uTexOffset[0]).rgb;\n" +
+		"    vec3 t1 = texture(sTexture, vTextureCoord + uTexOffset[1]).rgb;\n" +
+		"    vec3 t2 = texture(sTexture, vTextureCoord + uTexOffset[2]).rgb;\n" +
+		"    vec3 t3 = texture(sTexture, vTextureCoord + uTexOffset[3]).rgb;\n" +
+		"    vec3 t4 = texture(sTexture, vTextureCoord + uTexOffset[4]).rgb;\n" +
+		"    vec3 t5 = texture(sTexture, vTextureCoord + uTexOffset[5]).rgb;\n" +
+		"    vec3 t6 = texture(sTexture, vTextureCoord + uTexOffset[6]).rgb;\n" +
+		"    vec3 t7 = texture(sTexture, vTextureCoord + uTexOffset[7]).rgb;\n" +
+		"    vec3 t8 = texture(sTexture, vTextureCoord + uTexOffset[8]).rgb;\n" +
+		"    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]\n" +
+		"              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]\n" +
+		"              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];\n" +
+//		"    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
+//		"              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
+//		"              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
+//		"    float mag = length(abs(sumH) + abs(sumV));\n" +
+		"    float mag = length(sumH);\n" +
+		"    o_FragColor = vec4(vec3(mag), 1.0);\n" +
+		"}\n";
+	public static final String FRAGMENT_SHADER_SOBEL_ES3
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES3
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
 	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
