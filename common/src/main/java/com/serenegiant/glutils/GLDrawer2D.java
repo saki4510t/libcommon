@@ -270,7 +270,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	public void resetShader() {
 		releaseShader();
 		if (isOES()) {
-			hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SIMPLE_OES_ES2);
+			hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SIMPLE_ES2);
 		} else {
 			hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SIMPLE_ES2);
 		}

@@ -170,7 +170,7 @@ public class ShaderConst {
 		"}";
 	public static final String FRAGMENT_SHADER_SIMPLE_ES2
 		= String.format(FRAGMENT_SHADER_SIMPLE_BASE_ES2, HEADER_2D, SAMPLER_2D);
-	public static final String FRAGMENT_SHADER_SIMPLE_OES_ES2
+	public static final String FRAGMENT_SHADER_EXT_SIMPLE_ES2
 		= String.format(FRAGMENT_SHADER_SIMPLE_BASE_ES2, HEADER_OES, SAMPLER_OES);
 
 	// Simple fragment shader for use with "normal" 2D textures.
