@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import androidx.annotation.NonNull;
 
+@Deprecated
 public interface IRenderer extends IRendererCommon {
 
 	/**

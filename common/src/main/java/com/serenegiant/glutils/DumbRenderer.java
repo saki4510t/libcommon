@@ -30,6 +30,7 @@ import android.view.SurfaceView;
 /**
  * OpenGL|ESでのSurfaceへの描画処理をDelegaterを介して行うためのIRenderer
  */
+@Deprecated
 public class DumbRenderer implements IRenderer {
 //	private static final boolean DEBUG = BuildConfig.DEBUG && false;
 	private static final String TAG = DumbRenderer.class.getSimpleName();
