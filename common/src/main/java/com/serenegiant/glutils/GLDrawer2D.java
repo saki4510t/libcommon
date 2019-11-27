@@ -74,6 +74,7 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	}
 
 //================================================================================
+	public final boolean isGLES3;
 	protected final int VERTEX_NUM;
 	protected final int VERTEX_SZ;
 	protected final FloatBuffer pVertex;
@@ -96,9 +97,11 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
 	 * 				通常の2Dテキスチャを描画に使うならfalse
 	 */
-	protected GLDrawer2D(final float[] vertices,
+	protected GLDrawer2D(final boolean isGLES3,
+		final float[] vertices,
 		final float[] texcoord, final boolean isOES) {
 
+		this.isGLES3 = isGLES3;
 		VERTEX_NUM = Math.min(
 			vertices != null ? vertices.length : 0,
 			texcoord != null ? texcoord.length : 0) / 2;

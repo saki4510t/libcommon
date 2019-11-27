@@ -48,7 +48,7 @@ import androidx.annotation.RequiresApi;
 	/*package*/ GLDrawer2DES3(final float[] vertices,
 		final float[] texcoord, final boolean isOES) {
 
-		super(vertices, texcoord, isOES);
+		super(true, vertices, texcoord, isOES);
 	}
 
 	@Override
