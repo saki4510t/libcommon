@@ -264,7 +264,11 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 * @param fs フラグメントシェーダー文字列
 	 */
 	public void updateShader(@NonNull final String fs) {
-		updateShader(VERTEX_SHADER_ES2, fs);
+		if (isGLES3) {
+			updateShader(VERTEX_SHADER_ES3, fs);
+		} else {
+			updateShader(VERTEX_SHADER_ES2, fs);
+		}
 	}
 
 	/**
@@ -272,10 +276,18 @@ public abstract class GLDrawer2D implements IDrawer2D {
 	 */
 	public void resetShader() {
 		releaseShader();
-		if (isOES()) {
-			hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SIMPLE_ES2);
+		if (isGLES3) {
+			if (isOES()) {
+				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_EXT_SIMPLE_ES3);
+			} else {
+				hProgram = loadShader(VERTEX_SHADER_ES3, FRAGMENT_SHADER_SIMPLE_ES3);
+			}
 		} else {
-			hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SIMPLE_ES2);
+			if (isOES()) {
+				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_EXT_SIMPLE_ES2);
+			} else {
+				hProgram = loadShader(VERTEX_SHADER_ES2, FRAGMENT_SHADER_SIMPLE_ES2);
+			}
 		}
 		init();
 	}
