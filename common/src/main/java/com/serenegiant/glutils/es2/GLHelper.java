@@ -36,6 +36,9 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.Stacktrace;
 
 import java.io.IOException;
+import java.nio.FloatBuffer;
+
+import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
  * OpenGL|ES2/3用のヘルパークラス
@@ -420,5 +423,40 @@ public final class GLHelper {
 		if (location < 0) {
 			throw new RuntimeException("Unable to locate '" + label + "' in program");
 		}
+	}
+
+	/**
+	 * バッファーオブジェクトを生成＆データをセットしてバッファー名を返す
+	 * @param target GL_ARRAY_BUFFERまたはGL_ELEMENT_ARRAY_BUFFER
+	 * @param data
+	 * @param usage GL_STATIC_DRAW, GL_STREAM_DRAW, GL_DYNAMIC_DRAW
+	 * @return
+	 */
+	public static int createBuffer(final int target, @NonNull final FloatBuffer data, final int usage) {
+		final int[] ids = new int[1];
+		GLES20.glGenBuffers(1, ids, 0);
+		checkGlError("glGenBuffers");
+		GLES20.glBindBuffer(target, ids[0]);
+		checkGlError("glBindBuffer");
+		GLES20.glBufferData(target, SIZEOF_FLOAT_BYTES * data.limit(), data, usage);
+		checkGlError("glBufferData");
+		GLES20.glBindBuffer(target, 0);
+		return ids[0];
+	}
+
+	/**
+	 * バッファーオブジェクトを破棄する
+	 * @param bufId
+	 */
+	public static void deleteBuffer(final int bufId) {
+		deleteBuffer(new int[] {bufId});
+	}
+
+	/**
+	 * バッファーオブジェクトを破棄する
+	 * @param bufIds
+	 */
+	public static void deleteBuffer(@NonNull final int[] bufIds) {
+		GLES20.glDeleteBuffers(bufIds.length, bufIds, 0);
 	}
 }
