@@ -68,7 +68,7 @@ import androidx.annotation.RequiresApi;
 	}
 
 	@Override
-	protected void updateVertex() {
+	protected void updateVertices() {
 		GLES30.glVertexAttribPointer(maPositionLoc,
 			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
 		GLES30.glVertexAttribPointer(maTextureCoordLoc,
@@ -78,7 +78,7 @@ import androidx.annotation.RequiresApi;
 	}
 
 	@Override
-	protected void drawArrays() {
+	protected void drawVertices() {
 		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 	}
 

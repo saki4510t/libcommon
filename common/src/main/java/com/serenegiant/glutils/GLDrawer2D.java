@@ -200,10 +200,10 @@ public abstract class GLDrawer2D {
 		bindTexture(texId);
 		if (true) {
 			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
-			updateVertex();
+			updateVertices();
 		}
 		if (validateProgram(hProgram)) {
-			drawArrays();
+			drawVertices();
 		} else {
 			if (errCnt++ == 0) {
 				Log.w(TAG, "draw:invalid program");
@@ -235,12 +235,12 @@ public abstract class GLDrawer2D {
 	/**
 	 * 頂点座標をセット
 	 */
-	protected abstract void updateVertex();
+	protected abstract void updateVertices();
 
 	/**
 	 * 描画実行
 	 */
-	protected abstract void drawArrays();
+	protected abstract void drawVertices();
 
 	/**
 	 * 描画の後処理

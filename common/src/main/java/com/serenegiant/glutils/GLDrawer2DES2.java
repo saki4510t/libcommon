@@ -66,7 +66,7 @@ import androidx.annotation.NonNull;
 	}
 
 	@Override
-	protected void updateVertex() {
+	protected void updateVertices() {
 		GLES20.glVertexAttribPointer(maPositionLoc,
 			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
 		GLES20.glVertexAttribPointer(maTextureCoordLoc,
@@ -76,7 +76,7 @@ import androidx.annotation.NonNull;
 	}
 
 	@Override
-	protected void drawArrays() {
+	protected void drawVertices() {
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 	}
 
