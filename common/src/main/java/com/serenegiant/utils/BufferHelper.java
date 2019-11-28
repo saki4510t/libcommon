@@ -197,7 +197,11 @@ public class BufferHelper {
 		return -1;
 	}
 
-	private static final int SIZEOF_FLOAT = Float.SIZE / 8;
+	/**
+	 * float1つのサイズ[バイト]
+	 */
+	public static final int SIZEOF_FLOAT_BYTES = Float.SIZE / 8;
+
 	/**
 	 * 引数のfloat配列と同じ長さのFloatBufferを生成して引数の値をセットする
 	 * @param coords
@@ -206,7 +210,7 @@ public class BufferHelper {
 	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
 		final FloatBuffer result
-			= ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT)
+			= ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT_BYTES)
 				.order(ByteOrder.nativeOrder()).asFloatBuffer();
 		result.put(coords).flip();
 		return result;
