@@ -85,19 +85,57 @@ public abstract class GLDrawer2D {
 	}
 
 //================================================================================
+	/**
+	 * GLES3を使うかどうか
+	 */
 	public final boolean isGLES3;
+	/**
+	 * 頂点の数
+	 */
 	protected final int VERTEX_NUM;
+	/**
+	 * 頂点配列のサイズ
+	 */
 	protected final int VERTEX_SZ;
+	/**
+	 * 頂点座標
+	 */
 	protected final FloatBuffer pVertex;
+	/**
+	 * テクスチャ座標
+	 */
 	protected final FloatBuffer pTexCoord;
+	/**
+	 * テクスチャターゲット
+	 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 */
 	protected final int mTexTarget;
+
 	protected int hProgram;
+	/**
+	 * 頂点座標のlocation
+	 */
 	protected int maPositionLoc;
+	/**
+	 * テクスチャ座標のlocation
+	 */
 	protected int maTextureCoordLoc;
+	/**
+	 * モデルビュー変換行列のlocation
+	 */
 	protected int muMVPMatrixLoc;
+	/**
+	 * テクスチャ座標変換行列のlocation
+	 */
 	protected int muTexMatrixLoc;
+	/**
+	 * モデルビュー変換行列
+	 */
     @NonNull
 	protected final float[] mMvpMatrix = new float[16];
+	/**
+	 * エラーカウンタ
+	 */
 	private int errCnt;
 
 	/**
