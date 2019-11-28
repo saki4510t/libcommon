@@ -182,12 +182,7 @@ import androidx.annotation.RequiresApi;
 			1, false, mMvpMatrix, 0);
 		GLES30.glUniformMatrix4fv(muTexMatrixLoc,
 			1, false, mMvpMatrix, 0);
-		GLES30.glVertexAttribPointer(maPositionLoc,
-			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
-		GLES30.glVertexAttribPointer(maTextureCoordLoc,
-			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-		GLES30.glEnableVertexAttribArray(maPositionLoc);
-		GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
+		updateVertices();
 	}
 
 	private final int[] status = new int[1];
