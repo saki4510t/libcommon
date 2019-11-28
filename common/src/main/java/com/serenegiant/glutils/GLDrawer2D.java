@@ -41,8 +41,18 @@ public abstract class GLDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 
-	protected static final float[] DEFAULT_VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
-	protected static final float[] DEFAULT_TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
+	protected static final float[] DEFAULT_VERTICES = {
+		1.0f, 1.0f,
+		-1.0f, 1.0f,
+		1.0f, -1.0f,
+		-1.0f, -1.0f
+	};
+	protected static final float[] DEFAULT_TEXCOORD = {
+		1.0f, 1.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 0.0f
+	};
 	protected static final int FLOAT_SZ = Float.SIZE / 8;
 
 	/**
