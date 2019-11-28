@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import android.opengl.GLES30;
 import android.os.Build;
+import android.util.Log;
 
 import com.serenegiant.glutils.es3.GLHelper;
 
@@ -35,6 +36,15 @@ import androidx.annotation.RequiresApi;
 	/*package*/ class GLDrawer2DES3 extends GLDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2DES3.class.getSimpleName();
+
+	/**
+	 * 頂点座標用バッファオブジェクト名
+	 */
+	private int mBufVertex;
+	/**
+	 * テクスチャ座標用バッファオブジェクト名
+	 */
+	private int mBufTexCoord;
 
 	/**
 	 * コンストラクタ
@@ -68,16 +78,39 @@ import androidx.annotation.RequiresApi;
 
 	@Override
 	protected void updateVertices() {
-		// 頂点座標をセット
-		pVertex.clear();
-		GLES30.glVertexAttribPointer(maPositionLoc,
-			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
-		GLES30.glEnableVertexAttribArray(maPositionLoc);
-		// テクスチャ座標をセット
-		pTexCoord.clear();
-		GLES30.glVertexAttribPointer(maTextureCoordLoc,
-			2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-		GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
+		if (USE_VBO) {
+			if (mBufVertex <= 0) {
+				pVertex.clear();
+				mBufVertex = GLHelper.createBuffer(GLES30.GL_ARRAY_BUFFER, pVertex, GLES30.GL_STATIC_DRAW);
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex," + mBufVertex);
+			}
+			if (mBufTexCoord <= 0) {
+				pTexCoord.clear();
+				mBufTexCoord = GLHelper.createBuffer(GLES30.GL_ARRAY_BUFFER, pTexCoord, GLES30.GL_STATIC_DRAW);
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord," + mBufTexCoord);
+			}
+			// 頂点座標をセット
+			GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, mBufVertex);
+			GLES30.glVertexAttribPointer(maPositionLoc,
+				2, GLES30.GL_FLOAT, false, 0, 0);
+			GLES30.glEnableVertexAttribArray(maPositionLoc);
+			// テクスチャ座標をセット
+			GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, mBufTexCoord);
+			GLES30.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES30.GL_FLOAT, false, 0, 0);
+			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
+		} else {
+			// 頂点座標をセット
+			pVertex.clear();
+			GLES30.glVertexAttribPointer(maPositionLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
+			GLES30.glEnableVertexAttribArray(maPositionLoc);
+			// テクスチャ座標をセット
+			pTexCoord.clear();
+			GLES30.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
+		}
 	}
 
 	@Override
@@ -90,7 +123,6 @@ import androidx.annotation.RequiresApi;
 		GLES30.glBindTexture(mTexTarget, 0);
 		GLES30.glUseProgram(0);
 	}
-
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
@@ -116,6 +148,7 @@ import androidx.annotation.RequiresApi;
 
 	@Override
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+		if (DEBUG) Log.v(TAG, "loadShader:");
 		return GLHelper.loadShader(vs, fs);
 	}
 
@@ -125,6 +158,16 @@ import androidx.annotation.RequiresApi;
 	 */
 	@Override
 	protected void internalReleaseShader(final int program) {
+		// バッファーオブジェクトを破棄
+		if (mBufVertex > 0) {
+			GLHelper.deleteBuffer(mBufVertex);
+			mBufVertex = 0;
+		}
+		if (mBufTexCoord > 0) {
+			GLHelper.deleteBuffer(mBufTexCoord);
+			mBufTexCoord = 0;
+		}
+		// シェーダーを破棄
 		GLES30.glDeleteProgram(program);
 	}
 
@@ -169,6 +212,7 @@ import androidx.annotation.RequiresApi;
 	 */
 	@Override
 	protected void init() {
+		if (DEBUG) Log.v(TAG, "init:");
 		GLES30.glUseProgram(hProgram);
 		maPositionLoc = GLES30.glGetAttribLocation(hProgram, "aPosition");
 		maTextureCoordLoc = GLES30.glGetAttribLocation(hProgram, "aTextureCoord");

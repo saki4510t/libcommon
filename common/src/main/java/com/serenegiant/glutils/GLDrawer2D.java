@@ -41,6 +41,11 @@ public abstract class GLDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 
+	/**
+	 * バッファオブジェクトを使って描画するかどうか
+	 */
+	protected static final boolean USE_VBO = true;
+
 	protected static final float[] DEFAULT_VERTICES = {
 		1.0f, 1.0f,		// 右上
 		-1.0f, 1.0f,	// 左上
