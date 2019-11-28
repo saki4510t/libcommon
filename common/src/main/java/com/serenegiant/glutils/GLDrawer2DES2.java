@@ -120,7 +120,6 @@ import androidx.annotation.NonNull;
 	 */
 	@Override
 	protected void internalReleaseShader(final int program) {
-		errCnt = 0;
 		GLES20.glDeleteProgram(program);
 	}
 

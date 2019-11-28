@@ -127,7 +127,6 @@ import androidx.annotation.RequiresApi;
 	 */
 	@Override
 	protected void internalReleaseShader(final int program) {
-		errCnt = 0;
 		GLES30.glDeleteProgram(program);
 	}
 
