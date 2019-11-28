@@ -33,8 +33,6 @@ import androidx.annotation.NonNull;
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2DES2.class.getSimpleName();
 
-	private int errCnt;
-
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
@@ -110,7 +108,6 @@ import androidx.annotation.NonNull;
 
 	@Override
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
-		errCnt = 0;
 		return GLHelper.loadShader(vs, fs);
 	}
 
