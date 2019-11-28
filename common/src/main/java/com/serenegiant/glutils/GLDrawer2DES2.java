@@ -67,11 +67,13 @@ import androidx.annotation.NonNull;
 
 	@Override
 	protected void updateVertices() {
+		// 頂点座標をセット
 		GLES20.glVertexAttribPointer(maPositionLoc,
 			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
+		GLES20.glEnableVertexAttribArray(maPositionLoc);
+		// テクスチャ座標をセット
 		GLES20.glVertexAttribPointer(maTextureCoordLoc,
 			2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-		GLES20.glEnableVertexAttribArray(maPositionLoc);
 		GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
 	}
 
