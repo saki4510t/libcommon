@@ -57,7 +57,7 @@ public class VideoSourceCameraGLView
 	/**
 	 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 	 */
-	private static final boolean USE_SHARED_CONTEXT = true;
+	private static final boolean USE_SHARED_CONTEXT = false;
 
 	@NonNull
 	private final CameraDelegator mCameraDelegator;
