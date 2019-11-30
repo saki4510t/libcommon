@@ -138,7 +138,7 @@ import androidx.annotation.NonNull;
 	 * @param filterParam
 	 * @return
 	 */
-	public int intTex(final int texUnit, final int filterParam) {
+	public int initTex(final int texUnit, final int filterParam) {
 		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
 	}
 

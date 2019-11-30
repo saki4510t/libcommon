@@ -143,7 +143,7 @@ import androidx.annotation.RequiresApi;
 	 * @return
 	 */
 	@Override
-	public int intTex(final int texUnit, final int filterParam) {
+	public int initTex(final int texUnit, final int filterParam) {
 		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
 	}
 

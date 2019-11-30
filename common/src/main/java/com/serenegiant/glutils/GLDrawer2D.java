@@ -314,7 +314,7 @@ public abstract class GLDrawer2D {
 	 * @param filterParam
 	 * @return
 	 */
-	public abstract int intTex(final int texUnit, final int filterParam);
+	public abstract int initTex(final int texUnit, final int filterParam);
 
 	/**
 	 * テクスチャ名破棄のヘルパーメソッド
