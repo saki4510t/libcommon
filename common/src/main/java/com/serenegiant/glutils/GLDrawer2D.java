@@ -308,6 +308,15 @@ public abstract class GLDrawer2D {
 	public abstract int initTex();
 
 	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * @param texUnit
+	 * @param filterParam
+	 * @return
+	 */
+	public abstract int intTex(final int texUnit, final int filterParam);
+
+	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
 	 * @param hTex

@@ -136,6 +136,18 @@ import androidx.annotation.RequiresApi;
 	}
 
 	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * @param texUnit
+	 * @param filterParam
+	 * @return
+	 */
+	@Override
+	public int intTex(final int texUnit, final int filterParam) {
+		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
+	}
+
+	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
 	 * IShaderDrawer2dの実装
