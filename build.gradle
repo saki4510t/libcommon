@@ -45,6 +45,6 @@ ext {
 	androidXExif = '1.1.0-rc01'
 	constraintLibVersion = '1.1.3'
 
-    versionCodeNum = 282
-    versionNameString = '7.0.1'
+    versionCodeNum = 283
+    versionNameString = '7.0.2'
 }
