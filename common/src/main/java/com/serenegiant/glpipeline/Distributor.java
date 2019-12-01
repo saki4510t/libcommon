@@ -114,6 +114,12 @@ public class Distributor implements IPipeline {
 		throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
+		if ((width > 0) && (height > 0)
+			&& ((mWidth != width) || (mHeight != height))) {
+			mWidth = width;
+			mHeight = height;
+			mRendererTask.resize(width, height);
+		}
 	}
 
 	@Override
