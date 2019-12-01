@@ -53,11 +53,28 @@ public class Distributor implements IPipeline {
 
 	/**
 	 * コンストラクタ
+	 * 共有コンテキストを使わず引数のIPipelineSourceと同じコンテキスト上で実行する
 	 * @param source
 	 */
 	public Distributor(@NonNull final IPipelineSource source) {
+		this(source, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param source
+	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
+	 */
+	public Distributor(@NonNull final IPipelineSource source,
+		final boolean useSharedContext) {
+
 		mSource = source;
-		mManager = source.getGLManager();	// XXX とりあえずはVideoSourceと同じスレッドを使う
+		final GLManager manager = source.getGLManager();
+		if (useSharedContext) {
+			mManager = manager.createShared(null);
+		} else {
+			mManager = manager;
+		}
 		mWidth = source.getWidth();
 		mHeight = source.getHeight();
 		mCallback = null;
