@@ -78,6 +78,7 @@ public class Distributor implements IPipeline {
 		mWidth = source.getWidth();
 		mHeight = source.getHeight();
 		mCallback = null;
+		// FIXME ここの処理は良くない、常時共有コンテキストを使うようになっている
 		mRendererTask = new BaseRendererTask(this, mWidth, mHeight,
 			3, mManager.getGLContext().getContext(),
 			 EGLConst.EGL_FLAG_RECORDABLE);
