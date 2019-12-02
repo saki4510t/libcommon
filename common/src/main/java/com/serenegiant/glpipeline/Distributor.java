@@ -42,7 +42,8 @@ public class Distributor implements IPipeline {
 	private static final String TAG = Distributor.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "Distributor";
 
-	private IPipelineSource mSource;
+	@NonNull
+	private final IPipelineSource mSource;
 	/**
 	 * 自分用のGLManagerを保持しているかどうか
 	 */
@@ -50,7 +51,6 @@ public class Distributor implements IPipeline {
 	@NonNull
 	private final GLManager mManager;
 
-	private int mWidth, mHeight;
 	@Nullable
 	private final IRendererHolder.RenderHolderCallback mCallback;
 	private final Object mSync = new Object();
@@ -95,11 +95,10 @@ public class Distributor implements IPipeline {
 			mManager = manager;
 			glHandler = manager.createGLHandler(handlerCallback);
 		}
-		mWidth = source.getWidth();
-		mHeight = source.getHeight();
 		mCallback = null;
-		mRendererTask = new BaseRendererTask(mManager.getGLContext(), glHandler,
-			mWidth, mHeight);
+		mRendererTask = new BaseRendererTask(
+			mManager.getGLContext(), glHandler,
+			source.getWidth(), source.getHeight());
 		source.add(mOnFrameAvailableListener);
 		mRendererTask.start(RENDERER_THREAD_NAME);
 	}
@@ -130,10 +129,7 @@ public class Distributor implements IPipeline {
 		throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
-		if ((width > 0) && (height > 0)
-			&& ((mWidth != width) || (mHeight != height))) {
-			mWidth = width;
-			mHeight = height;
+		if ((width > 0) && (height > 0)) {
 			mRendererTask.resize(width, height);
 		}
 	}
@@ -149,7 +145,7 @@ public class Distributor implements IPipeline {
 	 */
 	@Override
 	public int getWidth() {
-		return mWidth;
+		return mRendererTask.width();
 	}
 
 	/**
@@ -158,7 +154,7 @@ public class Distributor implements IPipeline {
 	 */
 	@Override
 	public int getHeight() {
-		return mHeight;
+		return mRendererTask.height();
 	}
 
 	/**
