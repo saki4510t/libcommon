@@ -286,11 +286,11 @@ public abstract class AbstractDistributeTask {
 		return mMirror;
 	}
 
-	protected int width() {
+	public int width() {
 		return mVideoWidth;
 	}
 
-	protected int height() {
+	public int height() {
 		return mVideoHeight;
 	}
 
