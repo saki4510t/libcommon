@@ -378,13 +378,6 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
-		public Object handleRequest(final int request,
-			final int arg1, final int arg2, final Object obj) {
-
-			return super.handleRequest(request, arg1, arg2, obj);
-		}
-
-		@Override
 		public void start(final String tag) {
 			mGLHandler.post(new Runnable() {
 				@Override
@@ -472,6 +465,13 @@ public class Distributor implements IPipeline {
 		@Override
 		public float[] getTexMatrix() {
 			return mSource.getTexMatrix();
+		}
+
+		@Override
+		public Object handleRequest(final int request,
+			final int arg1, final int arg2, final Object obj) {
+
+			return super.handleRequest(request, arg1, arg2, obj);
 		}
 
 		@Override
