@@ -36,6 +36,7 @@ import static com.serenegiant.glutils.IRendererCommon.*;
 
 /**
  * IPipelineSourceで更新されたテクスチャを分配描画するためのヘルパークラス
+ * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
  */
 public class Distributor implements IPipeline {
 	private static final boolean DEBUG = false;	// set false on production
