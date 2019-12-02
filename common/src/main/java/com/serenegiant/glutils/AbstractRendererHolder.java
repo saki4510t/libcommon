@@ -568,19 +568,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		@Override
-		protected void internalOnStart() {
-			super.internalOnStart();
-			handleReCreateMasterSurface();
-		}
-
-		@Override
-		protected void internalOnStop() {
-			handleReleaseMasterSurface();
-			handleRemoveAll();
-			super.internalOnStop();
-		}
-
-		@Override
 		public boolean offer(final int request) {
 			return mEglTask.offer(request);
 		}

@@ -312,6 +312,7 @@ public abstract class AbstractDistributeTask {
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
+		handleReCreateMasterSurface();
 	}
 
 	/**
@@ -330,6 +331,8 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void internalOnStop() {
 		if (DEBUG) Log.v(TAG, "internalOnStop:");
+		handleReleaseMasterSurface();
+		handleRemoveAll();
 		if (mDrawer != null) {
 			mDrawer.release();
 			mDrawer = null;
