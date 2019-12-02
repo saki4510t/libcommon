@@ -63,7 +63,7 @@ public class Distributor implements IPipeline {
 	 * @param source
 	 */
 	public Distributor(@NonNull final IPipelineSource source) {
-		this(source, false);
+		this(source, null, false);
 	}
 
 	/**
@@ -72,6 +72,7 @@ public class Distributor implements IPipeline {
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
 	public Distributor(@NonNull final IPipelineSource source,
+		@Nullable final IRendererHolder.RenderHolderCallback callback,
 		final boolean useSharedContext) {
 
 		mSource = source;
@@ -95,7 +96,7 @@ public class Distributor implements IPipeline {
 			mManager = manager;
 			glHandler = manager.createGLHandler(handlerCallback);
 		}
-		mCallback = null;
+		mCallback = callback;
 		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
 			source.getWidth(), source.getHeight());
@@ -476,12 +477,14 @@ public class Distributor implements IPipeline {
 
 		@Override
 		protected void handleReCreateMasterSurface() {
-			// do nothing
+			if (mSource.isValid()) {
+				callOnCreate(mSource.getInputSurface());
+			}
 		}
 
 		@Override
 		protected void handleReleaseMasterSurface() {
-			// do nothing
+			callOnDestroy();
 		}
 
 		@Override
