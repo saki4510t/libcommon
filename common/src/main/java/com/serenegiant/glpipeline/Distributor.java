@@ -18,13 +18,14 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.AbstractDistributeTask;
 import com.serenegiant.glutils.EGLBase;
-import com.serenegiant.glutils.EGLConst;
-import com.serenegiant.glutils.EglTask;
+import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.IRendererHolder;
 
@@ -42,9 +43,14 @@ public class Distributor implements IPipeline {
 	private static final String RENDERER_THREAD_NAME = "Distributor";
 
 	private IPipelineSource mSource;
+	/**
+	 * 自分用のGLManagerを保持しているかどうか
+	 */
+	private final boolean mOwnManager;
+	@NonNull
 	private final GLManager mManager;
-	private int mWidth, mHeight;
 
+	private int mWidth, mHeight;
 	@Nullable
 	private final IRendererHolder.RenderHolderCallback mCallback;
 	private final Object mSync = new Object();
@@ -69,25 +75,33 @@ public class Distributor implements IPipeline {
 		final boolean useSharedContext) {
 
 		mSource = source;
+		final Handler.Callback handlerCallback
+			= new Handler.Callback() {
+			@Override
+			public boolean handleMessage(@NonNull final Message msg) {
+				Distributor.this.mRendererTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
+				return true;
+			}
+		};
 		final GLManager manager = source.getGLManager();
+		mOwnManager = useSharedContext;
+		final Handler glHandler;
 		if (useSharedContext) {
-			mManager = manager.createShared(null);
+			// 共有コンテキストを使ってマルチスレッド処理を行う時
+			mManager = manager.createShared(handlerCallback);
+			glHandler = mManager.getGLHandler();
 		} else {
+			// 映像提供元のGLコンテキスト上で実行する時
 			mManager = manager;
+			glHandler = manager.createGLHandler(handlerCallback);
 		}
 		mWidth = source.getWidth();
 		mHeight = source.getHeight();
 		mCallback = null;
-		// FIXME ここの処理は良くない、常時共有コンテキストを使うようになっている
-		mRendererTask = new BaseRendererTask(this, mWidth, mHeight,
-			3, mManager.getGLContext().getContext(),
-			 EGLConst.EGL_FLAG_RECORDABLE);
+		mRendererTask = new BaseRendererTask(mManager.getGLContext(), glHandler,
+			mWidth, mHeight);
 		source.add(mOnFrameAvailableListener);
 		mRendererTask.start(RENDERER_THREAD_NAME);
-		if (!mRendererTask.waitReady()) {
-			// 初期化に失敗した時
-			throw new RuntimeException("failed to start renderer thread");
-		}
 	}
 
 	/**
@@ -322,124 +336,131 @@ public class Distributor implements IPipeline {
 		}
 	}
 
-	protected static class BaseRendererTask extends AbstractDistributeTask {
+	private class BaseRendererTask extends AbstractDistributeTask {
 		@NonNull
-		private final Distributor mParent;
+		private final GLContext mGLContext;
 		@NonNull
-		private final EglTask mEglTask;
+		private final Handler mGLHandler;
+		private final boolean isGLES3;
+
+		private volatile boolean isRunning;
 
 		/**
 		 * コンストラクタ:
-		 * @param parent
+		 * @param glContext
+		 * @param glHandler
 		 * @param width
 		 * @param height
-		 * @param maxClientVersion
-		 * @param sharedContext
-		 * @param flags
 		 */
-		public BaseRendererTask(@NonNull final Distributor parent,
-			final int width, final int height,
-			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		public BaseRendererTask(@NonNull final GLContext glContext,
+			@NonNull final Handler glHandler,
+			final int width, final int height) {
 
 			super(width, height);
-			mParent = parent;
-			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
-				@Override
-				protected void onStart() {
-					handleOnStart();
-				}
-
-				@Override
-				protected void onStop() {
-					handleOnStop();
-				}
-
-				@Override
-				protected Object processRequest(
-					final int request, final int arg1, final int arg2, final Object obj)
-						throws TaskBreak {
-
-					return handleRequest(request, arg1, arg2, obj);
-				}
-			};
+			mGLContext = glContext;
+			mGLHandler = glHandler;
+			isGLES3 = glContext.isGLES3();
+			isRunning = true;
 		}
 
 		@Override
 		public void release() {
 			if (DEBUG) Log.v(TAG, "release:");
-			mEglTask.release();
+			if (isRunning) {
+				isRunning = false;
+				mGLHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						handleOnStop();
+						if (mOwnManager && isValid()) {
+							mManager.release();
+						}
+					}
+				});
+			}
 			super.release();
 		}
 
 		@Override
+		public Object handleRequest(final int request,
+			final int arg1, final int arg2, final Object obj) {
+
+			return super.handleRequest(request, arg1, arg2, obj);
+		}
+
+		@Override
 		public void start(final String tag) {
-			new Thread(mEglTask, tag).start();
+			mGLHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					handleOnStart();
+				}
+			});
 		}
 
 		@Override
 		public boolean waitReady() {
-			return mEglTask.waitReady();
+			return true;
 		}
 
 		@Override
 		public boolean isRunning() {
-			return mEglTask.isRunning();
+			return isRunning && mManager.isValid();
 		}
 
 		@Override
 		public boolean isFinished() {
-			return mEglTask.isFinished();
+			return !isRunning();
 		}
 
 		@Override
 		public boolean offer(final int request) {
-			return mEglTask.offer(request);
+			return mGLHandler.sendEmptyMessage(request);
 		}
 
 		@Override
 		public boolean offer(final int request, final Object obj) {
-			return mEglTask.offer(request, obj);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, obj));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1) {
-			return mEglTask.offer(request, arg1);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1, final int arg2) {
-			return mEglTask.offer(request, arg1, arg2);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, arg2));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1, final int arg2, final Object obj) {
-			return mEglTask.offer(request, arg1, arg2, obj);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, arg2, obj));
 		}
 
 		@Override
 		public void removeRequest(final int request) {
-			mEglTask.removeRequest(request);
+			mGLHandler.removeMessages(request);
 		}
 
 		@Override
 		public EGLBase getEgl() {
-			return mEglTask.getEgl();
+			return mGLContext.getEgl();
 		}
 
 		@Override
 		public EGLBase.IContext getContext() {
-			return mEglTask.getContext();
+			return mGLContext.getContext();
 		}
 
 		@Override
 		public void makeCurrent() {
-			mEglTask.makeCurrent();
+			mGLContext.makeDefault();
 		}
 
 		@Override
 		public boolean isGLES3() {
-			return mEglTask.isGLES3();
+			return isGLES3;
 		}
 
 		@Override
@@ -449,12 +470,12 @@ public class Distributor implements IPipeline {
 
 		@Override
 		public int getTexId() {
-			return mParent.mSource.getTexId();
+			return mSource.getTexId();
 		}
 
 		@Override
 		public float[] getTexMatrix() {
-			return mParent.mSource.getTexMatrix();
+			return mSource.getTexMatrix();
 		}
 
 		@Override
@@ -474,15 +495,15 @@ public class Distributor implements IPipeline {
 
 		@Override
 		public void notifyParent(final boolean isRunning) {
-			synchronized (mParent) {
-				mParent.isRunning = isRunning;
-				mParent.notifyAll();
+			synchronized (Distributor.this) {
+				Distributor.this.isRunning = isRunning;
+				Distributor.this.notifyAll();
 			}
 		}
 
 		@Override
 		public void callOnFrameAvailable() {
-			mParent.callOnFrameAvailable();
+			Distributor.this.callOnFrameAvailable();
 		}
 	}
 
