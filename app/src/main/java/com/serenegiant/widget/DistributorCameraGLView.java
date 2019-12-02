@@ -46,6 +46,7 @@ import static com.serenegiant.widget.CameraDelegator.*;
 
 /**
  * カメラ映像をVideoSourceとDistributor経由で取得してプレビュー表示するためのGLSurfaceView実装
+ * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
  */
 public class DistributorCameraGLView
 	extends GLSurfaceView implements ICameraGLView {

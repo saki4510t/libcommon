@@ -99,6 +99,7 @@ public class VideoSource implements IPipelineSource {
 	 * コンストラクタ
 	 * useSharedContext=falseなら引数のGLManagerのスレッド上で動作する
 	 * useSharedContext=trueなら共有コンテキストを使って専用スレッド上で動作する
+	 * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
 	 * @param manager
 	 * @param width
 	 * @param height

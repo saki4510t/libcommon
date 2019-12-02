@@ -69,7 +69,9 @@ public class Distributor implements IPipeline {
 
 	/**
 	 * コンストラクタ
+	 * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
 	 * @param source
+	 * @param callback
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
 	public Distributor(@NonNull final IPipelineSource source,
