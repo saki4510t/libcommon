@@ -166,12 +166,11 @@ public class GLContext implements EGLConst {
 	 * @throws IllegalStateException
 	 */
 	public EGLBase.IContext getContext() throws IllegalStateException {
-		if (mEgl != null) {
-			mEgl.getContext();
-		} else {
+		final EGLBase.IContext result = mEgl != null ? mEgl.getContext() : null;
+		if (result == null) {
 			throw new IllegalStateException();
 		}
-		return mEgl != null ? mEgl.getContext() : null;
+		return result;
 	}
 
 	/**

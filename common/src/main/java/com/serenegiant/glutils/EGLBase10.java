@@ -72,7 +72,7 @@ import com.serenegiant.system.BuildCheck;
 		public long getNativeHandle() {
 			return 0L;
 		}
-		
+
 		@Override
 		public Object getEGLContext() {
 			return eglContext;
@@ -431,15 +431,27 @@ import com.serenegiant.system.BuildCheck;
 		return result;
 	}
 
+	/**
+	 * EGLレンダリングコンテキストが有効かどうか
+	 * @return
+	 */
+	@Override
+	public boolean isValidContext() {
+		return (mContext != null) && (mContext.eglContext != EGL10.EGL_NO_CONTEXT);
+	}
 
 	/**
 	 * EGLレンダリングコンテキストを取得する
 	 * このEGLBaseインスタンスを使って生成したEglSurfaceをmakeCurrentした状態で
 	 * eglGetCurrentContextを呼び出すのと一緒
 	 * @return
+	 * @throws IllegalStateException
 	 */
 	@Override
-	public Context getContext() {
+	public Context getContext() throws IllegalStateException {
+		if (!isValidContext()) {
+			throw new IllegalStateException();
+		}
 		return mContext;
 	}
 
@@ -557,8 +569,7 @@ import com.serenegiant.system.BuildCheck;
 			}
 		}
 		// GLES3で取得できなかった時はGLES2を試みる
-		if ((maxClientVersion >= 2)
-			&& ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT))) {
+		if ((maxClientVersion >= 2) && !isValidContext()) {
 
 			if (DEBUG) Log.d(TAG, "init:GLES2を試みる");
             config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
@@ -587,7 +598,7 @@ import com.serenegiant.system.BuildCheck;
 				}
 			}
         }
-        if ((mContext == null) || (mContext.eglContext == EGL10.EGL_NO_CONTEXT)) {
+        if (!isValidContext()) {
 			config = getConfig(1, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new RuntimeException("chooseConfig failed");

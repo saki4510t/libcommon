@@ -189,12 +189,18 @@ public abstract class EGLBase implements EGLConst {
 	 */
 	public abstract int getGlVersion();
 	/**
+	 * EGLレンダリングコンテキストが有効かどうか
+	 * @return
+	 */
+	public abstract boolean isValidContext();
+	/**
 	 * EGLレンダリングコンテキストを取得する
 	 * このEGLBaseインスタンスを使って生成したEglSurfaceをmakeCurrentした状態で
 	 * eglGetCurrentContextを呼び出すのと一緒
 	 * @return
+	 * @throws IllegalStateException
 	 */
-	public abstract IContext getContext();
+	public abstract IContext getContext() throws IllegalStateException;
 	/**
 	 * EGLコンフィグを取得する
 	 * @return
