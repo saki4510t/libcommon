@@ -54,7 +54,7 @@ public class Distributor implements IPipeline {
 	@Nullable
 	private final IRendererHolder.RenderHolderCallback mCallback;
 	private final Object mSync = new Object();
-	private final BaseRendererTask mRendererTask;
+	private final DistributeTask mDistributeTask;
 	private volatile boolean isRunning;
 
 	/**
@@ -79,7 +79,7 @@ public class Distributor implements IPipeline {
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				Distributor.this.mRendererTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
+				Distributor.this.mDistributeTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
 				return true;
 			}
 		};
@@ -96,11 +96,11 @@ public class Distributor implements IPipeline {
 			glHandler = manager.createGLHandler(handlerCallback);
 		}
 		mCallback = null;
-		mRendererTask = new BaseRendererTask(
+		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
 			source.getWidth(), source.getHeight());
 		source.add(mOnFrameAvailableListener);
-		mRendererTask.start(RENDERER_THREAD_NAME);
+		mDistributeTask.start(RENDERER_THREAD_NAME);
 	}
 
 	/**
@@ -108,7 +108,7 @@ public class Distributor implements IPipeline {
 	 */
 	@Override
 	public void release() {
-		mRendererTask.release();
+		mDistributeTask.release();
 		mSource.remove(mOnFrameAvailableListener);
 	}
 
@@ -130,7 +130,7 @@ public class Distributor implements IPipeline {
 
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		if ((width > 0) && (height > 0)) {
-			mRendererTask.resize(width, height);
+			mDistributeTask.resize(width, height);
 		}
 	}
 
@@ -145,7 +145,7 @@ public class Distributor implements IPipeline {
 	 */
 	@Override
 	public int getWidth() {
-		return mRendererTask.width();
+		return mDistributeTask.width();
 	}
 
 	/**
@@ -154,7 +154,7 @@ public class Distributor implements IPipeline {
 	 */
 	@Override
 	public int getHeight() {
-		return mRendererTask.height();
+		return mDistributeTask.height();
 	}
 
 	/**
@@ -170,7 +170,7 @@ public class Distributor implements IPipeline {
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		mRendererTask.addSurface(id, surface);
+		mDistributeTask.addSurface(id, surface);
 	}
 
 	/**
@@ -187,7 +187,7 @@ public class Distributor implements IPipeline {
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		mRendererTask.addSurface(id, surface, maxFps);
+		mDistributeTask.addSurface(id, surface, maxFps);
 	}
 
 	/**
@@ -198,7 +198,7 @@ public class Distributor implements IPipeline {
 	 */
 	public void removeSurface(final int id) {
 //		if (DEBUG) Log.v(TAG, "removeSurface:id=" + id);
-		mRendererTask.removeSurface(id);
+		mDistributeTask.removeSurface(id);
 	}
 
 	/**
@@ -208,7 +208,7 @@ public class Distributor implements IPipeline {
 	 */
 	public void removeSurfaceAll() {
 //		if (DEBUG) Log.v(TAG, "removeSurfaceAll:id=" + id);
-		mRendererTask.removeSurfaceAll();
+		mDistributeTask.removeSurfaceAll();
 	}
 
 	/**
@@ -217,7 +217,7 @@ public class Distributor implements IPipeline {
 	 * @param color
 	 */
 	public void clearSurface(final int id, final int color) {
-		mRendererTask.clearSurface(id, color);
+		mDistributeTask.clearSurface(id, color);
 	}
 
 	/**
@@ -225,7 +225,7 @@ public class Distributor implements IPipeline {
 	 * @param color
 	 */
 	public void clearSurfaceAll(final int color) {
-		mRendererTask.clearSurfaceAll(color);
+		mDistributeTask.clearSurfaceAll(color);
 	}
 
 	/**
@@ -236,7 +236,7 @@ public class Distributor implements IPipeline {
 	 */
 	public void setMvpMatrix(final int id,
 		final int offset, @NonNull final float[] matrix) {
-		mRendererTask.setMvpMatrix(id, offset, matrix);
+		mDistributeTask.setMvpMatrix(id, offset, matrix);
 	}
 
 	/**
@@ -244,7 +244,7 @@ public class Distributor implements IPipeline {
 	 * @param mirror
 	 */
 	public void setMirror(@MirrorMode final int mirror) {
-		mRendererTask.mirror(mirror % MIRROR_NUM);
+		mDistributeTask.mirror(mirror % MIRROR_NUM);
 	}
 
 	/**
@@ -253,7 +253,7 @@ public class Distributor implements IPipeline {
 	 */
 	@MirrorMode
 	public int getMirror() {
-		return mRendererTask.mirror();
+		return mDistributeTask.mirror();
 	}
 
 	/**
@@ -262,7 +262,7 @@ public class Distributor implements IPipeline {
 	 * @return
 	 */
 	public boolean isEnabled(final int id) {
-		return mRendererTask.isEnabled(id);
+		return mDistributeTask.isEnabled(id);
 	}
 
 	/**
@@ -271,7 +271,7 @@ public class Distributor implements IPipeline {
 	 * @param enable
 	 */
 	public void setEnabled(final int id, final boolean enable) {
-		mRendererTask.setEnabled(id, enable);
+		mDistributeTask.setEnabled(id, enable);
 	}
 
 	/**
@@ -279,7 +279,7 @@ public class Distributor implements IPipeline {
 	 * 分配描画用Surface全てが更新されるので注意
 	 */
 	public void requestFrame() {
-		mRendererTask.requestFrame();
+		mDistributeTask.requestFrame();
 	}
 
 	/**
@@ -287,7 +287,7 @@ public class Distributor implements IPipeline {
 	 * @return
 	 */
 	public int getCount() {
-		return mRendererTask.getCount();
+		return mDistributeTask.getCount();
 	}
 
 	/**
@@ -297,7 +297,7 @@ public class Distributor implements IPipeline {
 		= new VideoSource.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-			mRendererTask.requestFrame();
+			mDistributeTask.requestFrame();
 		}
 	} ;
 
@@ -332,7 +332,7 @@ public class Distributor implements IPipeline {
 		}
 	}
 
-	private class BaseRendererTask extends AbstractDistributeTask {
+	private class DistributeTask extends AbstractDistributeTask {
 		@NonNull
 		private final GLContext mGLContext;
 		@NonNull
@@ -348,7 +348,7 @@ public class Distributor implements IPipeline {
 		 * @param width
 		 * @param height
 		 */
-		public BaseRendererTask(@NonNull final GLContext glContext,
+		public DistributeTask(@NonNull final GLContext glContext,
 			@NonNull final Handler glHandler,
 			final int width, final int height) {
 
