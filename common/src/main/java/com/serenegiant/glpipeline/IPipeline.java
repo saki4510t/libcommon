@@ -20,6 +20,8 @@ package com.serenegiant.glpipeline;
 
 import com.serenegiant.glutils.GLManager;
 
+import androidx.annotation.NonNull;
+
 public interface IPipeline {
 	/**
 	 * 関係するリソースを破棄
@@ -31,6 +33,7 @@ public interface IPipeline {
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@NonNull
 	public GLManager getGLManager() throws IllegalStateException;
 
 	/**

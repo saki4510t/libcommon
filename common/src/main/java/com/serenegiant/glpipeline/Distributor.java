@@ -99,6 +99,7 @@ public class Distributor implements IPipeline {
 		mSource.remove(mOnFrameAvailableListener);
 	}
 
+	@NonNull
 	@Override
 	public GLManager getGLManager() throws IllegalStateException {
 		return mManager;
