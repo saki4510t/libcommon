@@ -241,15 +241,32 @@ public abstract class GLDrawer2D {
 	public synchronized void draw(final int texId,
 		@Nullable final float[] tex_matrix, final int offset) {
 
+		draw(texId, tex_matrix, offset, mMvpMatrix, 0);
+	}
+
+	/**
+	 * 描画処理
+	 * @param texId
+	 * @param tex_matrix
+	 * @param tex_offset
+	 * @param mvp_matrix
+	 * @param mvp_offset
+	 */
+	public synchronized void draw(final int texId,
+		@Nullable final float[] tex_matrix, final int tex_offset,
+		@Nullable final float[] mvp_matrix, final int mvp_offset) {
+
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
 		glUseProgram();
 		if (tex_matrix != null) {
 			// テクスチャ変換行列が指定されている時
-			updateTexMatrix(tex_matrix, offset);
+			updateTexMatrix(tex_matrix, tex_offset);
 		}
-		// モデルビュー変換行列をセット
-		updateMvpMatrix(mMvpMatrix);
+		if (mvp_matrix != null) {
+			// モデルビュー変換行列が指定されている時
+			updateMvpMatrix(mvp_matrix, mvp_offset);
+		}
 		bindTexture(texId);
 		if (true) {
 			// XXX 共有コンテキストを使っていると頂点配列が壊れてしまうときがあるようなので都度読み込む
@@ -277,7 +294,7 @@ public abstract class GLDrawer2D {
 	 * モデルビュー変換行列をセット
 	 * @param mvpMatrix
 	 */
-	protected abstract void updateMvpMatrix(final float[] mvpMatrix);
+	protected abstract void updateMvpMatrix(final float[] mvpMatrix, final int offset);
 
 	/**
 	 * てkスチャをバインド

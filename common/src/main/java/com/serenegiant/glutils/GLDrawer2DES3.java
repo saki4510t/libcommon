@@ -66,8 +66,8 @@ import androidx.annotation.RequiresApi;
 	}
 
 	@Override
-	protected void updateMvpMatrix(final float[] mvpMatrix) {
-		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, 0);
+	protected void updateMvpMatrix(final float[] mvpMatrix, final int offset) {
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
 	}
 
 	@Override
