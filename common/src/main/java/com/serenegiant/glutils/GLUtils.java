@@ -9,7 +9,7 @@ public class GLUtils {
 		// インスタンス化を防ぐためにデフォルトコンストラクタをprivateに
 	}
 
-	public static void setMirror(final float[] mvp, final int mirror) {
+	public static void setMirror(final float[] mvp, @MirrorMode final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL:
 			mvp[0] = Math.abs(mvp[0]);
