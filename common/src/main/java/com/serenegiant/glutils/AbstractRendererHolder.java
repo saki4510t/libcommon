@@ -892,7 +892,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
-						AbstractDistributeTask.setMirror(mMvpMatrix, mRendererTask.mirror());
+						GLUtils.setMirror(mMvpMatrix, mRendererTask.mirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
@@ -983,7 +983,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = eglBase.createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
-						AbstractDistributeTask.setMirror(mMvpMatrix, mRendererTask.mirror());
+						GLUtils.setMirror(mMvpMatrix, mRendererTask.mirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();

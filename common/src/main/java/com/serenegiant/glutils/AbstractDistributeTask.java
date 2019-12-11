@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Surface;
@@ -504,7 +503,7 @@ public abstract class AbstractDistributeTask {
 			if (target == null) {
 				try {
 					target = createRendererTarget(id, getEgl(), surface, maxFps);
-					setMirror(target.getMvpMatrix(), mMirror);
+					GLUtils.setMirror(target.getMvpMatrix(), mMirror);
 					mTargets.append(id, target);
 				} catch (final Exception e) {
 					Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -665,7 +664,7 @@ public abstract class AbstractDistributeTask {
 			for (int i = 0; i < n; i++) {
 				final IRendererTarget target = mTargets.valueAt(i);
 				if (target != null) {
-					setMirror(target.getMvpMatrix(), mirror);
+					GLUtils.setMirror(target.getMvpMatrix(), mirror);
 				}
 			}
 		}
@@ -682,7 +681,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final IRendererTarget target = mTargets.get(id);
 			if (target != null) {
-				setRotation(target.getMvpMatrix(), degree);
+				GLUtils.setRotation(target.getMvpMatrix(), degree);
 			}
 		}
 	}
@@ -732,49 +731,4 @@ public abstract class AbstractDistributeTask {
 	public abstract void notifyParent(final boolean isRunning);
 	public abstract void callOnFrameAvailable();
 
-//================================================================================
-	@WorkerThread
-	protected static void setMirror(final float[] mvp, final int mirror) {
-		switch (mirror) {
-		case MIRROR_NORMAL:
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = Math.abs(mvp[5]);
-			break;
-		case MIRROR_HORIZONTAL:
-			mvp[0] = -Math.abs(mvp[0]);	// flip left-right
-			mvp[5] = Math.abs(mvp[5]);
-			break;
-		case MIRROR_VERTICAL:
-			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = -Math.abs(mvp[5]);	// flip up-side down
-			break;
-		case MIRROR_BOTH:
-			mvp[0] = -Math.abs(mvp[0]);	// flip left-right
-			mvp[5] = -Math.abs(mvp[5]);	// flip up-side down
-			break;
-		}
-	}
-
-	/**
-	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
-	 * @param mvp
-	 * @param degrees
-	 */
-	protected static void rotate(final float[] mvp, final int degrees) {
-		if ((degrees % 180) != 0) {
-			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
-		}
-	}
-
-	/**
-	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
-	 * @param mvp
-	 * @param degrees
-	 */
-	protected static void setRotation(final float[] mvp, final int degrees) {
-		Matrix.setIdentityM(mvp, 0);
-		if ((degrees % 180) != 0) {
-			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
-		}
-	}
 }
