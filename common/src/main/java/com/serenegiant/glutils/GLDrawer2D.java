@@ -223,6 +223,30 @@ public abstract class GLDrawer2D {
 	}
 
 	/**
+	 * モデルビュー変換行列に左右・上下反転をセット
+	 * @param mirror
+	 */
+	public void setMirror(@IRendererCommon.MirrorMode final int mirror) {
+		GLUtils.setMirror(mMvpMatrix, mirror);
+	}
+
+	/**
+	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
+	 * @param degrees
+	 */
+	public void rotate(final int degrees) {
+		GLUtils.rotate(mMvpMatrix, degrees);
+	}
+
+	/**
+	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
+	 * @param degrees
+	 */
+	public void setRotation(final int degrees) {
+		GLUtils.setRotation(mMvpMatrix, degrees);
+	}
+
+	/**
 	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
 	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
 	 * IDrawer2Dの実装
