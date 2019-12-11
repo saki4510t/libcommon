@@ -9,6 +9,11 @@ public class GLUtils {
 		// インスタンス化を防ぐためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * モデルビュー変換行列に左右・上下反転をセット
+	 * @param mvp
+	 * @param mirror
+	 */
 	public static void setMirror(final float[] mvp, @MirrorMode final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL:
