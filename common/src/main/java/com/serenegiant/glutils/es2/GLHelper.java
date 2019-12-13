@@ -297,7 +297,11 @@ public final class GLHelper {
 		return textures[0];
 	}
 
-	public static int createTextureWithTextContent (final String text) {
+	public static int createTextureWithTextContent(@NonNull final String text) {
+		return createTextureWithTextContent(text, GLES20.GL_TEXTURE0);
+	}
+
+	public static int createTextureWithTextContent(@NonNull final String text, final int texUnit) {
 		if (DEBUG) Log.v(TAG, "createTextureWithTextContent:");
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
@@ -314,7 +318,7 @@ public final class GLHelper {
 		canvas.drawText(text, 16, 112, textPaint);
 
 		final int texture = initTex(GLES20.GL_TEXTURE_2D,
-			GLES20.GL_TEXTURE0, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
+			texUnit, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
 
 		// Alpha blending
 		// GLES20.glEnable(GLES20.GL_BLEND);
