@@ -18,10 +18,6 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import android.Manifest.permission;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -31,11 +27,14 @@ import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.net.Uri;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.util.Log;
 
-import com.serenegiant.system.BuildCheck;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public final class PermissionCheck {
 	private PermissionCheck() {
@@ -53,6 +52,29 @@ public final class PermissionCheck {
 		} catch (final Exception e) {
 			Log.w("", e);
 		}
+	}
+
+	/**
+	 * パーミッションを確認
+	 * @param context
+	 * @param permissionName
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static int checkSelfPermission(@Nullable final Context context, final String permissionName) {
+		if (context == null) return PackageManager.PERMISSION_DENIED;
+		int result = PackageManager.PERMISSION_DENIED;
+		try {
+			if (BuildCheck.isMarshmallow()) {
+				result = context.checkSelfPermission(permissionName);
+			} else {
+				final PackageManager pm = context.getPackageManager();
+				result = pm.checkPermission(permissionName, context.getPackageName());
+			}
+		} catch (final Exception e) {
+			Log.w("", e);
+		}
+		return result;
 	}
 
 	/**
