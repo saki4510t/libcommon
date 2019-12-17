@@ -33,7 +33,7 @@ import android.widget.Toast;
 import com.serenegiant.dialog.MessageDialogFragmentV4;
 import com.serenegiant.libcommon.list.DummyContent;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.PermissionCheck;
+import com.serenegiant.system.PermissionCheck;
 
 public class MainActivity extends AppCompatActivity
 	implements TitleFragment.OnListFragmentInteractionListener,

@@ -30,7 +30,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.PermissionCheck;
+import com.serenegiant.system.PermissionCheck;
 import com.serenegiant.utils.SAFUtils;
 import com.serenegiant.widget.CameraDelegator;
 
