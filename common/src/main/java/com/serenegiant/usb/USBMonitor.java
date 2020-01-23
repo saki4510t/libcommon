@@ -983,6 +983,14 @@ public final class USBMonitor implements Const {
 		}
 
 		/**
+		 * 対応するUSB機器がopenしていて使用可能かどうかを取得
+		 * @return
+		 */
+		public synchronized boolean isValid() {
+			return mConnection != null;
+		}
+
+		/**
 		 * クローンで複製する。
 		 * 別途openし直すのでパーミッションが既に無いと失敗する。
 		 * 複製したUsbControlBlockはUSBMonitorのリストに保持されていないので自前で破棄処理をすること
