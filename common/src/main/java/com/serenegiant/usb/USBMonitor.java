@@ -1133,13 +1133,35 @@ public final class USBMonitor implements Const {
 		 * UsbDeviceConnectionを取得
 		 * UsbControlBlockでの排他制御から切り離されてしまうので注意
 		 * @return
+		 */
+		@Nullable
+		public synchronized UsbDeviceConnection getConnection() {
+	
+			return mConnection;
+		}
+
+		/**
+		 * UsbDeviceConnectionを取得
+		 * UsbControlBlockでの排他制御から切り離されてしまうので注意
+		 * @return
 		 * @throws IllegalStateException
 		 */
-		public synchronized UsbDeviceConnection getConnection()
+		@NonNull
+		public  synchronized  UsbDeviceConnection requireConnection()
 			throws IllegalStateException {
-	
+
 			checkConnection();
 			return mConnection;
+		}
+
+		/**
+		 * Usb機器へアクセスするためのファイルディスクリプタを取得
+		 * 使用不可の場合は0を返す
+		 * @return
+		 * @throws IllegalStateException
+		 */
+		public synchronized int getFileDescriptor() {
+			return mConnection != null ? mConnection.getFileDescriptor() : 0;
 		}
 
 		/**
@@ -1147,9 +1169,21 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
-		public synchronized int getFileDescriptor() throws IllegalStateException {
+		public synchronized int requireFileDescriptor() throws IllegalStateException {
 			checkConnection();
 			return mConnection.getFileDescriptor();
+		}
+
+		/**
+		 * Usb機器のディスクリプタを取得
+		 * 使用不可の場合はnullを返す
+		 * @return
+		 * @throws IllegalStateException
+		 */
+		@Nullable
+		public synchronized byte[] getRawDescriptors() {
+			checkConnection();
+			return mConnection != null ? mConnection.getRawDescriptors() : null;
 		}
 
 		/**
@@ -1157,7 +1191,8 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
-		public synchronized byte[] getRawDescriptors() throws IllegalStateException {
+		@NonNull
+		public synchronized byte[] requireRawDescriptors() throws IllegalStateException {
 			checkConnection();
 			return mConnection.getRawDescriptors();
 		}
@@ -1270,12 +1305,23 @@ public final class USBMonitor implements Const {
 		/**
 		 * インターフェースを開く
 		 * @param intf
+		 * @throws IllegalStateException
 		 */
-		public synchronized void claimInterface(final UsbInterface intf) {
+		public synchronized void claimInterface(final UsbInterface intf)
+			throws IllegalStateException {
+
 			claimInterface(intf, true);
 		}
 
-		public synchronized void claimInterface(final UsbInterface intf, final boolean force) {
+		/**
+		 * インターフェースを開く
+		 * @param intf
+		 * @param force
+		 * @throws IllegalStateException
+		 */
+		public synchronized void claimInterface(final UsbInterface intf, final boolean force)
+			throws IllegalStateException {
+
 			checkConnection();
 			mConnection.claimInterface(intf, force);
 		}
@@ -1285,7 +1331,9 @@ public final class USBMonitor implements Const {
 		 * @param intf
 		 * @throws IllegalStateException
 		 */
-		public synchronized void releaseInterface(final UsbInterface intf) throws IllegalStateException {
+		public synchronized void releaseInterface(final UsbInterface intf)
+			throws IllegalStateException {
+
 			checkConnection();
 			final SparseArray<UsbInterface> intfs = mInterfaces.get(intf.getId());
 			if (intfs != null) {
