@@ -1422,7 +1422,8 @@ public final class USBMonitor implements Const {
 				throw new IllegalStateException("already closed");
 			}
 		}
-	}
+
+	} // end ofUsbControlBlock
 
 	@Nullable
 	private UsbDeviceState getDeviceState(@Nullable final UsbDevice device) {
