@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -42,6 +43,7 @@ import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -292,6 +294,31 @@ public final class BitmapHelper {
 		}
 		return bitmap;
 	}
+
+	/**
+	 * 指定したIDの静止画をContentResolverから読み込む
+	 * @param cr
+	 * @param id
+	 * @param requestWidth
+	 * @param requestHeight
+	 * @return
+	 * @throws IOException
+	 */
+	@Nullable
+	public static final Bitmap asBitmap(@NonNull final ContentResolver cr,
+		final long id,
+		final int requestWidth, final int requestHeight)
+			throws IOException {
+
+		Bitmap result = null;
+		final ParcelFileDescriptor pfd = cr.openFileDescriptor(
+			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id), "r");
+		if (pfd != null) {
+			result = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
+		}
+		return result;
+	}
+
 
 	/**
 	 * ファイルからビットマップを読み込んでBitmapとして返す

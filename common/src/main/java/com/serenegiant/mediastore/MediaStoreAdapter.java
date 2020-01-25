@@ -47,6 +47,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
@@ -236,7 +237,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public Bitmap getImage(final int position, final int width, final int height)
 		throws FileNotFoundException, IOException {
 
-		return MediaStoreUtils.getImage(mCr, getItemId(position), width, height);
+		return BitmapHelper.asBitmap(mCr, getItemId(position), width, height);
 	}
 	
 	/**
@@ -421,7 +422,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		Bitmap result = sThumbnailCache.get(key);
 		if (result == null) {
 			if ((requestWidth <= 0) || (requestHeight <= 0)) {
-				result = MediaStoreUtils.getImage(cr, id, requestWidth, requestHeight);
+				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
 			} else {
 				BitmapFactory.Options options = null;
 				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;

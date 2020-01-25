@@ -19,19 +19,13 @@ package com.serenegiant.mediastore;
 */
 
 import android.annotation.TargetApi;
-import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
-import android.os.ParcelFileDescriptor;
 import android.provider.MediaStore;
-import androidx.annotation.NonNull;
 
-import java.io.IOException;
+import androidx.annotation.NonNull;
 
 /**
  * MediaStoreへアクセスするためのヘルパークラス
@@ -95,70 +89,6 @@ public class MediaStoreUtils {
 //	protected static final int PROJ_INDEX_DATE_ADDED = 9;
 
 	protected static final Uri QUERY_URI = MediaStore.Files.getContentUri("external");
-
-//--------------------------------------------------------------------------------
-	protected static final Bitmap getImage(@NonNull final ContentResolver cr,
-		final long id,
-		final int requestWidth, final int requestHeight)
-			throws IOException {
-
-		Bitmap result = null;
-		final ParcelFileDescriptor pfd = cr.openFileDescriptor(
-			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id), "r");
-		if (pfd != null) {
-			try {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				// just decode to get image size
-				options.inJustDecodeBounds = true;
-				BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-				// calculate sub-sampling
-				options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-				options.inJustDecodeBounds = false;
-				result = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-			} finally {
-				pfd.close();
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * calculate maximum sub-sampling size that the image size is greater or equal to requested size
-	 * @param options
-	 * @param requestWidth
-	 * @param requestHeight
-	 * @return maximum sub-sampling size
-	 */
-	protected static final int calcSampleSize(@NonNull final BitmapFactory.Options options,
-		final int requestWidth, final int requestHeight) {
-
-		final int imageWidth = options.outWidth;
-		final int imageHeight = options.outHeight;
-		int reqWidth = requestWidth, reqHeight = requestHeight;
-		if (requestWidth <= 0) {
-			if (requestHeight > 0)
-				reqWidth = (int)(imageWidth * requestHeight / (float)imageHeight);
-			else
-				reqWidth = imageWidth;
-		}
-		if (requestHeight <= 0) {
-			if (requestWidth > 0)
-				reqHeight = (int)(imageHeight * requestWidth / (float)imageHeight);
-			else
-				reqHeight = imageHeight;
-		}
-		int inSampleSize = 1;
-		if ((imageHeight > reqHeight) || (imageWidth > reqWidth)) {
-			if (imageWidth > imageHeight) {
-				inSampleSize = Math.round(imageHeight / (float)reqHeight);	// Math.floor
-			} else {
-				inSampleSize = Math.round(imageWidth / (float)reqWidth);	// Math.floor
-			}
-		}
-/*		if (DEBUG) Log.v(TAG, String.format("calcSampleSize:image=(%d,%d),request=(%d,%d),inSampleSize=%d",
-				imageWidth, imageHeight, reqWidth, reqHeight, inSampleSize)); */
-		return inSampleSize;
-	}
 
 //--------------------------------------------------------------------------------
 	/**

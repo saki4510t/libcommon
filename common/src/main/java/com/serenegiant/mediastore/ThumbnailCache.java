@@ -26,6 +26,8 @@ import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.serenegiant.graphics.BitmapHelper;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
@@ -99,7 +101,7 @@ public class ThumbnailCache {
 		Bitmap result = sThumbnailCache.get(key);
 		if (result == null) {
 			if ((requestWidth <= 0) || (requestHeight <= 0)) {
-				result = MediaStoreUtils.getImage(cr, id, requestWidth, requestHeight);
+				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
 			} else {
 				BitmapFactory.Options options = null;
 				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
