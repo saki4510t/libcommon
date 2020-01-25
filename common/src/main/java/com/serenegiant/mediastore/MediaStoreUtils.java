@@ -21,6 +21,8 @@ package com.serenegiant.mediastore;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -459,4 +461,35 @@ public class MediaStoreUtils {
 		return inSampleSize;
 	}
 
+	/**
+	 * 静止画をMediaStoreへ登録
+	 * @param context
+	 * @param mime "image/jpeg"等
+	 * @param path 絶対パス
+	 */
+	public static Uri registerImage(@NonNull final Context context,
+		@NonNull final String mime, @NonNull final String path) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(MediaStore.Images.Media.MIME_TYPE, mime);
+		cv.put(MediaStore.MediaColumns.DATA, path);
+		return context.getContentResolver().insert(
+			MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
+	}
+
+	/**
+	 * 動画をMediaStoreへ登録
+	 * @param context
+	 * @param mime
+	 * @param path
+	 */
+	public static Uri registerVideo(@NonNull final Context context,
+		@NonNull final String mime, @NonNull final String path) {
+
+		final ContentValues cv = new ContentValues();
+		cv.put(MediaStore.Video.Media.MIME_TYPE, mime);
+		cv.put(MediaStore.MediaColumns.DATA, path);
+		return context.getContentResolver().insert(
+			MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cv);
+	}
 }
