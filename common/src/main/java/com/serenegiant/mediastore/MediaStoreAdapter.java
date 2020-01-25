@@ -20,24 +20,17 @@ package com.serenegiant.mediastore;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
-import android.annotation.SuppressLint;
-import android.app.ActivityManager;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
-import androidx.collection.LruCache;
 import androidx.cursoradapter.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -48,7 +41,6 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.utils.ThreadPool;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -60,18 +52,14 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreAdapter.class.getSimpleName();
 
-	// for thumbnail cache(in memory)
-	// rate of memory usage for cache, 'CACHE_RATE = 8' means use 1/8 of available memory for image cache
-	private static final int CACHE_RATE = 8;
-	private static LruCache<String, Bitmap> sThumbnailCache;
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
 	private final LayoutInflater mInflater;
 	private final ContentResolver mCr;
-	private final int mMemClass;
 	private final int mLayoutId;
 	private final MyAsyncQueryHandler mQueryHandler;
 	private final int mHashCode = hashCode();
+	private final ThumbnailCache mThumbnailCache;
 	private Cursor mMediaInfoCursor;
 	private String mSelection;
 	private String[] mSelectionArgs;
@@ -88,8 +76,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 	    mCr = context.getContentResolver();
 	    mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
-		mMemClass = ((ActivityManager)context.getSystemService(Context.ACTIVITY_SERVICE)).getMemoryClass();
 		mLayoutId = id_layout;
+		mThumbnailCache = new ThumbnailCache(context);
 		onContentChanged();
 	}
 
@@ -167,7 +155,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	@Override
 	protected void onContentChanged() {
-		createBitmapCache(false);
 		mQueryHandler.requery();
 	}
 
@@ -184,7 +171,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
 			// 静止画の場合のサムネイル取得
 			try {
-				result = getImageThumbnail(mCr, mHashCode,
+				result = mThumbnailCache.getImageThumbnail(mCr, mHashCode,
 					getItemId(position), mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
@@ -194,7 +181,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
 			// 動画の場合のサムネイル取得
 			try {
-				result = getVideoThumbnail(mCr, mHashCode,
+				result = mThumbnailCache.getVideoThumbnail(mCr, mHashCode,
 					getItemId(position), mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
@@ -284,7 +271,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public void setThumbnailSize(final int size) {
 		if ((mThumbnailWidth != size) || (mThumbnailHeight != size)) {
 			mThumbnailWidth = mThumbnailHeight = size;
-			createBitmapCache(true);
+			mThumbnailCache.clearThumbnailCache();
 			onContentChanged();
 		}
 	}
@@ -298,7 +285,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
-			createBitmapCache(true);
+			mThumbnailCache.clearThumbnailCache();
 			onContentChanged();
 		}
 	}
@@ -322,17 +309,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if (mMediaType != (media_type % MEDIA_TYPE_NUM)) {
 			mMediaType = media_type % MEDIA_TYPE_NUM;
 			onContentChanged();
-		}
-	}
-
-	/**
-	 * if you finish using this adapter class in your app,
-	 * you can call this method to free internal thumbnail cache
-	 */
-	public static void destroy() {
-		if (sThumbnailCache != null) {
-			sThumbnailCache.evictAll();
-			sThumbnailCache = null;
 		}
 	}
 
@@ -366,122 +342,12 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	}
 	
-	/**
-	 * create thumbnail cache
-	 */
-	@SuppressLint("NewApi")
-	private final void createBitmapCache(final boolean clear) {
-		if (clear && (sThumbnailCache != null)) {
-			clearBitmapCache(hashCode());
-		}
-		if (sThumbnailCache == null) {
-			// use 1/CACHE_RATE of available memory as memory cache
-			final int cacheSize = 1024 * 1024 * mMemClass / CACHE_RATE;	// [MB] => [bytes]
-			sThumbnailCache = new LruCache<String, Bitmap>(cacheSize) {
-				@Override
-				protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
-					// control memory usage instead of bitmap counts
-					return bitmap.getRowBytes() * bitmap.getHeight();	// [bytes]
-				}
-			};
-		}
-		ThreadPool.preStartAllCoreThreads();
-	}
-
-	private static void clearBitmapCache(final int hashCode) {
-		if (sThumbnailCache != null) {
-			if (hashCode != 0) {
-				// 指定したhashCodeのMediaStoreAdapterインスタンスのキャッシュをクリアする
-				final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
-				final String key_prefix = String.format(Locale.US, "%d_", hashCode);
-				final Set<String> keys = snapshot.keySet();
-				for (final String key : keys) {
-					if (key.startsWith(key_prefix)) {
-						// このインスタンスのキーが見つかった
-						sThumbnailCache.remove(key);
-					}
-				}
-			} else {
-				// 他のMediaStoreAdapterインスタンスのキャッシュも含めてすべてクリアする
-				sThumbnailCache.evictAll();
-			}
-			System.gc();
-		}
-	}
-
-	private static String getKey(final long hashCode, final long id) {
-		return String.format(Locale.US, "%d_%d", hashCode, id);
-	}
-
-	private static final Bitmap getImageThumbnail(final ContentResolver cr,
-		final long hashCode, final long id, final int requestWidth, final int requestHeight)
-			throws IOException {
-		
-		// try to get from internal thumbnail cache(in memory), this may be redundant
-		final String key = getKey(hashCode, id);
-		Bitmap result = sThumbnailCache.get(key);
-		if (result == null) {
-			if ((requestWidth <= 0) || (requestHeight <= 0)) {
-				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
-			} else {
-				BitmapFactory.Options options = null;
-				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
-				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
-					kind = MediaStore.Images.Thumbnails.MINI_KIND;
-				try {
-					result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, options);
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
-			}
-			if (result != null) {
-				if (DEBUG) Log.v(TAG, String.format("getImageThumbnail:id=%d(%d,%d)",
-					id, result.getWidth(), result.getHeight()));
-				// add to internal thumbnail cache(in memory)
-				sThumbnailCache.put(key, result);
-			}
-			
-		}
-		return result;
-	}
-	
-	private static final Bitmap getVideoThumbnail(final ContentResolver cr,
-		final long hashCode, final long id,
-		final int requestWidth, final int requestHeight)
-			throws FileNotFoundException, IOException {
-
-		// try to get from internal thumbnail cache(in memory), this may be redundant
-		final String key = getKey(hashCode, id);
-		Bitmap result = sThumbnailCache.get(key);
-		if (result == null) {
-			BitmapFactory.Options options = null;
-			int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
-			if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
-				kind = MediaStore.Video.Thumbnails.MINI_KIND;
-			try {
-				result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, options);
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
-			}
-			if (result != null) {
-				if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",
-					id, result.getWidth(), result.getHeight()));
-				// add to internal thumbnail cache(in memory)
-				sThumbnailCache.put(key, result);
-			} else {
-				Log.w(TAG, "failed to get video thumbnail ofr id=" + id);
-			}
-
-		}
-		return result;
-	}
-
 	private static final class ViewHolder {
 		TextView mTitleView;
 		ImageView mImageView;
 	}
 
-	private static class ThumbnailLoaderDrawable extends LoaderDrawable {
+	private class ThumbnailLoaderDrawable extends LoaderDrawable {
 		public ThumbnailLoaderDrawable(final ContentResolver cr,
 			final int width, final int height) {
 
@@ -495,11 +361,11 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 		@Override
 		protected Bitmap checkBitmapCache(final int hashCode, final long id) {
-			return sThumbnailCache.get(getKey(hashCode, id));
+			return mThumbnailCache.get(hashCode, id);
 		}
 	}
 
-	private static class ThumbnailLoader extends ImageLoader {
+	private class ThumbnailLoader extends ImageLoader {
 		public ThumbnailLoader(final ThumbnailLoaderDrawable parent) {
 			super(parent);
 		}
@@ -513,10 +379,10 @@ public class MediaStoreAdapter extends CursorAdapter {
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = getImageThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(cr, hashCode, id, requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = getVideoThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(cr, hashCode, id, requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {

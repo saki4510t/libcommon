@@ -31,8 +31,11 @@ import com.serenegiant.graphics.BitmapHelper;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.collection.LruCache;
 
 public class ThumbnailCache {
@@ -74,10 +77,55 @@ public class ThumbnailCache {
 	}
 
 	/**
+	 * 指定したhashCode/idに対応するキャッシュを取得する
+	 * 存在しなければnull
+	 * @param hashCode
+	 * @param id
+	 * @return
+	 */
+	@Nullable
+	public Bitmap get(final int hashCode, final long id) {
+		return sThumbnailCache.get(getKey(hashCode, id));
+	}
+
+	/**
+	 * 指定したキーに対応するキャッシュを取得する
+	 * 存在しなければnull
+	 * @param key
+	 * @return
+	 */
+	@Nullable
+	public Bitmap get(@NonNull final String key) {
+		return sThumbnailCache.get(key);
+	}
+
+	/**
 	 * サムネイルキャッシュをクリアする
 	 */
 	public void clearThumbnailCache() {
 		sThumbnailCache.evictAll();
+	}
+
+	/**
+	 * 指定したhasCodeに対応するキャッシュをクリアする
+	 * @param hashCode
+	 */
+	public void clearBitmapCache(final int hashCode) {
+		if (hashCode != 0) {
+			final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
+			final String key_prefix = String.format(Locale.US, "%d_", hashCode);
+			final Set<String> keys = snapshot.keySet();
+			for (final String key : keys) {
+				if (key.startsWith(key_prefix)) {
+					// このインスタンスのキーが見つかった
+					sThumbnailCache.remove(key);
+				}
+			}
+		} else {
+			// 他のMediaStoreAdapterインスタンスのキャッシュも含めてすべてクリアする
+			sThumbnailCache.evictAll();
+		}
+		System.gc();
 	}
 
 	/**
