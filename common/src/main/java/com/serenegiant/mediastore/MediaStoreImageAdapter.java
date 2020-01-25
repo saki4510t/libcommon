@@ -28,6 +28,8 @@ import android.graphics.Bitmap;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
+
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.viewpager.widget.PagerAdapter;
@@ -65,12 +67,14 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	private boolean mShowTitle;
 
-	public MediaStoreImageAdapter(final Context context, final int id_layout) {
+	public MediaStoreImageAdapter(@NonNull final Context context,
+		@LayoutRes final int id_layout) {
+
 		this(context, id_layout, true);
 	}
 
-	public MediaStoreImageAdapter(final Context context,
-		final int id_layout, final boolean needQuery) {
+	public MediaStoreImageAdapter(@NonNull final Context context,
+		@LayoutRes final int id_layout, final boolean needQuery) {
 
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = id_layout;

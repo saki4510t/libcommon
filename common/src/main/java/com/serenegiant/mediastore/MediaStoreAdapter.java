@@ -34,6 +34,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.provider.MediaStore;
+
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.collection.LruCache;
 import androidx.cursoradapter.widget.CursorAdapter;
@@ -77,7 +79,9 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private final MediaInfo info = new MediaInfo();
 
 
-	public MediaStoreAdapter(final Context context, final int id_layout) {
+	public MediaStoreAdapter(@NonNull final Context context,
+		@LayoutRes final int id_layout) {
+
 		super(context, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 	    mInflater = LayoutInflater.from(context);
 	    mCr = context.getContentResolver();
