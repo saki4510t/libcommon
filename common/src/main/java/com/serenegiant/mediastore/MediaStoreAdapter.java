@@ -49,6 +49,9 @@ import com.serenegiant.utils.ThreadPool;
 
 import static com.serenegiant.mediastore.MediaStoreHelper.*;
 
+/**
+ * MediaStoreの静止画・動画一覧を取得するためのCursorAdapter実装
+ */
 public class MediaStoreAdapter extends CursorAdapter {
 
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること

@@ -44,6 +44,9 @@ import java.io.IOException;
 
 import static com.serenegiant.mediastore.MediaStoreHelper.*;
 
+/**
+ * MediaStore内の静止画をViewPagerで表示するためのPagerAdapter実装
+ */
 public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();

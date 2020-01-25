@@ -44,6 +44,9 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.FutureTask;
 
+/**
+ * MediaStoreへアクセスするためのヘルパークラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaStoreHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
