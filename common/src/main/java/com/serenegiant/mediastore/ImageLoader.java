@@ -25,18 +25,26 @@ import com.serenegiant.utils.ThreadPool;
 
 import java.util.concurrent.FutureTask;
 
+import androidx.annotation.NonNull;
+
 /**
  * Runnable to load image asynchronously
  */
 public abstract class ImageLoader implements Runnable {
+	@NonNull
 	protected final LoaderDrawable mParent;
+	@NonNull
 	private final FutureTask<Bitmap> mTask;
 	private int mMediaType;
 	private int mHashCode;
 	private long mId;
 	private Bitmap mBitmap;
 
-    public ImageLoader(final LoaderDrawable parent) {
+	/**
+	 * コンストラクタ
+	 * @param parent
+	 */
+    public ImageLoader(@NonNull final LoaderDrawable parent) {
     	mParent = parent;
 		mTask = new FutureTask<Bitmap>(this, null);
     }
@@ -50,8 +58,8 @@ public abstract class ImageLoader implements Runnable {
 	 * @param hashCode
      * @param id
      */
-	public synchronized void startLoad(final int media_type, final int hashCode, final long id) {
-		mMediaType = media_type;
+	public synchronized void startLoad(final int mediaType, final int hashCode, final long id) {
+		mMediaType = mediaType;
 		mHashCode = hashCode;
 		mId = id;
 		mBitmap = null;
@@ -65,7 +73,20 @@ public abstract class ImageLoader implements Runnable {
 		mTask.cancel(true);
 	}
 
-	protected abstract Bitmap loadBitmap(final ContentResolver cr, final int mediaType, final int hashCode, final long id, final int requestWidth, final int requestHeight);
+	/**
+	 * 実際の読み込み処理
+	 * @param cr
+	 * @param mediaType
+	 * @param hashCode
+	 * @param id
+	 * @param requestWidth
+	 * @param requestHeight
+	 * @return
+	 */
+	protected abstract Bitmap loadBitmap(
+		@NonNull final ContentResolver cr,
+		final int mediaType, final int hashCode, final long id,
+		final int requestWidth, final int requestHeight);
 
 	@Override
 	public void run() {
@@ -78,7 +99,9 @@ public abstract class ImageLoader implements Runnable {
 			id = mId;
 		}
 		if (!mTask.isCancelled()) {
-			mBitmap = loadBitmap(mParent.getContentResolver(), mediaType, hashCode, id, mParent.getWidth(), mParent.getHeight());
+			mBitmap = loadBitmap(mParent.getContentResolver(),
+				mediaType, hashCode, id,
+				mParent.getIntrinsicWidth(), mParent.getIntrinsicHeight());
 		}
 		if (mTask.isCancelled() || (id != mId) || (mBitmap == null)) {
 			return;	// return without callback

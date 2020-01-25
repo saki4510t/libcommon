@@ -371,7 +371,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 
 		@Override
-		protected Bitmap loadBitmap(final ContentResolver cr,
+		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
 			final int mediaType, final int hashCode, final long id,
 			final int requestWidth, final int requestHeight) {
 

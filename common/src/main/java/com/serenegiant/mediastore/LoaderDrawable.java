@@ -33,6 +33,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public abstract class LoaderDrawable extends Drawable implements Runnable {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -47,7 +48,15 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
     private ImageLoader mLoader;
     private final int mWidth, mHeight;
 
-	public LoaderDrawable(final ContentResolver cr, final int width, final int height) {
+	/**
+	 * コンストラクタ
+	 * @param cr
+	 * @param width
+	 * @param height
+	 */
+	public LoaderDrawable(@NonNull final ContentResolver cr,
+		final int width, final int height) {
+
 		mContentResolver = cr;
 		mDebugPaint.setColor(Color.RED);
 		mDebugPaint.setTextSize(18);
@@ -81,16 +90,9 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
            }
 	}
 
+	@NonNull
 	public ContentResolver getContentResolver() {
 		return mContentResolver;
-	}
-
-	public int getWidth() {
-		return mWidth;
-	}
-
-	public int getHeight() {
-		return mHeight;
 	}
 
 	private void updateDrawMatrix(final Rect bounds) {
@@ -140,7 +142,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	}
 
 	@Override
-	public void setColorFilter(final ColorFilter cf) {
+	public void setColorFilter(@Nullable final ColorFilter cf) {
         mPaint.setColorFilter(cf);
         invalidateSelf();
 	}
@@ -157,7 +159,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 
 	@Override
 	public int getOpacity() {
-        Bitmap bm = mBitmap;
+        final Bitmap bm = mBitmap;
         return (bm == null || bm.hasAlpha() || mPaint.getAlpha() < 255) ?
                 PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
 	}
@@ -172,6 +174,14 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	}
 
 	protected abstract ImageLoader createThumbnailLoader();
+
+	/**
+	 * 指定したhashCode/idに対応するキャッシュを取得する
+	 * 存在しなければnull
+	 * @param hashCode
+	 * @param id
+	 * @return
+	 */
 	protected abstract Bitmap checkBitmapCache(final int hashCode, final long id);
 
 	/**
@@ -180,24 +190,26 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	 */
 	public void startLoad(final int media_type, final int hashCode, final long id) {
 
-		if (mLoader != null)
+		if (mLoader != null) {
 			mLoader.cancelLoad();
+		}
 
-		// try to get from internal thumbnail cache
+		// キャッシュから取得を試みる
 		final Bitmap newBitmap = checkBitmapCache(hashCode, id);
 		if (newBitmap == null) {
-			// only start loading if the thumbnail does not exist in internal thumbnail cache
+			// キャッシュから取得できなかったときは非同期読み込み要求する
 			mBitmap = null;
 			// re-using ThumbnailLoader will cause several problems on some devices...
 			mLoader = createThumbnailLoader();
 			mLoader.startLoad(media_type, hashCode, id);
 		} else {
+			// キャッシュから取得できたとき
 			setBitmap(newBitmap);
 		}
 		invalidateSelf();
 	}
 
-	private void setBitmap(final Bitmap bitmap) {
+	private void setBitmap(@NonNull final Bitmap bitmap) {
 		if (bitmap != mBitmap) {
 			mBitmap = bitmap;
             updateDrawMatrix(getBounds());
