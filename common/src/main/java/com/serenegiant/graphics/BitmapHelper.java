@@ -75,10 +75,12 @@ public final class BitmapHelper {
 	 * @param bytes
 	 * @return
 	 */
-	public static Bitmap asBitmap(final byte[] bytes) {
+	@Nullable
+	public static Bitmap asBitmap(@Nullable final byte[] bytes) {
 		Bitmap bitmap = null;
-		if (bytes != null)
+		if (bytes != null) {
 			bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
+		}
 		return bitmap;
 	}
 
@@ -89,7 +91,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmap(final byte[] bytes, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap asBitmap(
+		@Nullable final byte[] bytes,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (bytes != null) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -109,7 +115,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmapStrictSize(final byte[] bytes, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap asBitmapStrictSize(
+		@Nullable final byte[] bytes,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (bytes != null) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -139,6 +149,7 @@ public final class BitmapHelper {
 	 * @param filePath
 	 * @return
 	 */
+	@Nullable
 	public static Bitmap asBitmap(final String filePath) {
 		Bitmap bitmap= null;
 		if (!TextUtils.isEmpty(filePath)) {
@@ -154,7 +165,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmap(final String filePath, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap asBitmap(
+		final String filePath,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (!TextUtils.isEmpty(filePath)) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -174,7 +189,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmapStrictSize(final String filePath, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap asBitmapStrictSize(
+		final String filePath,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (!TextUtils.isEmpty(filePath)) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -205,6 +224,7 @@ public final class BitmapHelper {
 	 * @param fd
 	 * @return
 	 */
+	@Nullable
 	public static Bitmap asBitmap(final FileDescriptor fd) {
 		Bitmap bitmap= null;
 		if (fd != null && fd.valid()) {
@@ -220,7 +240,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmap(final FileDescriptor fd, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap asBitmap(
+		final FileDescriptor fd,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (fd != null && fd.valid()) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -240,7 +264,10 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap asBitmapStrictSize(final FileDescriptor fd, final int requestWidth, final int requestHeight) {
+	public static Bitmap asBitmapStrictSize(
+		final FileDescriptor fd,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap bitmap = null;
 		if (fd != null && fd.valid()) {
 			final BitmapFactory.Options options = new BitmapFactory.Options();
@@ -272,7 +299,8 @@ public final class BitmapHelper {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static Bitmap asBitmap(final ContentResolver cr, final Uri uri)
+	@Nullable
+	public static Bitmap asBitmap(@NonNull final ContentResolver cr, final Uri uri)
 		throws FileNotFoundException, IOException {
 
 		Bitmap bitmap= null;
@@ -308,8 +336,11 @@ public final class BitmapHelper {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static Bitmap asBitmap(final ContentResolver cr, final Uri uri, final int requestWidth, final int requestHeight)
-		throws FileNotFoundException, IOException {
+	@Nullable
+	public static Bitmap asBitmap(@NonNull final ContentResolver cr,
+		final Uri uri,
+		final int requestWidth, final int requestHeight)
+			throws FileNotFoundException, IOException {
 
 		Bitmap bitmap = null;
 		if (uri != null) {
@@ -359,8 +390,11 @@ public final class BitmapHelper {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static Bitmap asBitmapStrictSize(final ContentResolver cr, final Uri uri, final int requestWidth, final int requestHeight)
-		throws FileNotFoundException, IOException {
+	@Nullable
+	public static Bitmap asBitmapStrictSize(@NonNull final ContentResolver cr,
+		final Uri uri,
+		final int requestWidth, final int requestHeight)
+			throws FileNotFoundException, IOException {
 
 		Bitmap bitmap = null;
 		if (uri != null) {
@@ -422,6 +456,7 @@ public final class BitmapHelper {
 	 * @param in
 	 * @return
 	 */
+	@Nullable
 	public static Bitmap asBitmap(final InputStream in) {
 		Bitmap bitmap = null;
 		if (in != null) {
@@ -439,6 +474,7 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	@Deprecated
+	@Nullable
 	public static Bitmap asBitmap(final InputStream in, final int requestWidth, final int requestHeight) {
 		Bitmap bitmap = null;
 		if (in != null) {
@@ -462,6 +498,7 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	@Deprecated
+	@Nullable
 	public static Bitmap asBitmapStrictSize(final InputStream in, final int requestWidth, final int requestHeight) {
 		Bitmap bitmap = null;
 		if (in != null) {
@@ -490,7 +527,7 @@ public final class BitmapHelper {
 	}
 
 
-	public static int getOrientation(final ContentResolver cr, final Uri uri) {
+	public static int getOrientation(@NonNull final ContentResolver cr, @NonNull final Uri uri) {
 //		if (DEBUG) Log.v(TAG, "getOrientation:" + uri);
 
         final ExifInterface exifInterface;
@@ -537,7 +574,11 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static Bitmap scaleBitmap(final Bitmap bitmap, final int requestWidth, final int requestHeight) {
+	@Nullable
+	public static Bitmap scaleBitmap(
+		@Nullable final Bitmap bitmap,
+		final int requestWidth, final int requestHeight) {
+
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -556,7 +597,10 @@ public final class BitmapHelper {
 	 * @param rotation
 	 * @return
 	 */
-	public static Bitmap rotateBitmap(final Bitmap bitmap, final int rotation) {
+	@Nullable
+	public static Bitmap rotateBitmap(
+		@Nullable final Bitmap bitmap, final int rotation) {
+
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -577,7 +621,11 @@ public final class BitmapHelper {
 	 * @param rotation
 	 * @return
 	 */
-	public static Bitmap scaleRotateBitmap(final Bitmap bitmap, final int requestWidth, final int requestHeight, final int rotation) {
+	@Nullable
+	public static Bitmap scaleRotateBitmap(
+		@Nullable final Bitmap bitmap,
+		final int requestWidth, final int requestHeight, final int rotation) {
+
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -601,7 +649,11 @@ public final class BitmapHelper {
 	 * @param height
 	 * @return
 	 */
-	public static Bitmap extractBitmap(final Bitmap source, final int width, final int height) {
+	@Nullable
+	public static Bitmap extractBitmap(
+		@Nullable final Bitmap source,
+		final int width, final int height) {
+
 		Bitmap newBitmap = null;
 		if (source != null) {
 	        float scale;
@@ -621,10 +673,13 @@ public final class BitmapHelper {
     /**
      * Transform source Bitmap to targeted width and height.
      */
-    private static Bitmap transform(Matrix scaler,
-            final Bitmap source,
-            final int targetWidth, final int targetHeight,
-            final int options) {
+    @NonNull
+    private static Bitmap transform(
+    	Matrix scaler,
+		@NonNull final Bitmap source,
+		final int targetWidth, final int targetHeight,
+		final int options) {
+
         final boolean scaleUp = (options & OPTIONS_SCALE_UP) != 0;
         final boolean recycle = (options & OPTIONS_RECYCLE_INPUT) != 0;
 
@@ -722,7 +777,9 @@ public final class BitmapHelper {
 	 * @param requestHeight
 	 * @return
 	 */
-	public static int calcSampleSize(final BitmapFactory.Options options, final int requestWidth, final int requestHeight) {
+	public static int calcSampleSize(@NonNull final BitmapFactory.Options options,
+		final int requestWidth, final int requestHeight) {
+
 		final int imageWidth = options.outWidth;
 		final int imageHeight = options.outHeight;
 		int inSampleSize = 1;	// サブサンプリングサイズ
@@ -738,9 +795,8 @@ public final class BitmapHelper {
 		return inSampleSize;
 	}
 
-	public static Bitmap copyBitmap(final Bitmap src, Bitmap dest) {
-		if (src == null)
-			throw new NullPointerException("src bitmap should not be null.");
+	@NonNull
+	public static Bitmap copyBitmap(@NonNull final Bitmap src, Bitmap dest) {
 		if (dest == null) {
 			dest = Bitmap.createBitmap(src);
 		} else if (!src.equals(dest)) {
@@ -754,6 +810,7 @@ public final class BitmapHelper {
 	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのビットマップを生成
 	 * @return
 	 */
+	@NonNull
 	public static Bitmap makeCheckBitmap() {
         final Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.RGB_565);
         final Canvas c = new Canvas(bm);
