@@ -48,11 +48,11 @@ import java.util.concurrent.FutureTask;
  * MediaStoreへアクセスするためのヘルパークラス
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-public class MediaStoreHelper {
+public class MediaStoreUtils {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = MediaStoreHelper.class.getSimpleName();
+	private static final String TAG = MediaStoreUtils.class.getSimpleName();
 
-	private MediaStoreHelper() {
+	private MediaStoreUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
@@ -307,7 +307,7 @@ public class MediaStoreHelper {
 		protected abstract Bitmap checkBitmapCache(final int hashCode, final long id);
 
 		/**
-		 * start loading image asynchronusly
+		 * start loading image asynchronously
 		 * @param id
 		 */
 		public void startLoad(final int media_type, final int hashCode, final long id) {

@@ -42,7 +42,7 @@ import com.serenegiant.common.R;
 
 import java.io.IOException;
 
-import static com.serenegiant.mediastore.MediaStoreHelper.*;
+import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStore内の静止画をViewPagerで表示するためのPagerAdapter実装
@@ -113,16 +113,16 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			final TextView tv = holder.mTitleView = view.findViewById(R.id.title);
 			final ImageView iv = holder.mImageView = view.findViewById(R.id.thumbnail);
 			if (holder.info == null) {
-				holder.info = new MediaStoreHelper.MediaInfo();
+				holder.info = new MediaStoreUtils.MediaInfo();
 			}
 			holder.info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = iv.getDrawable();
-			if (!(drawable instanceof MediaStoreHelper.LoaderDrawable)) {
+			if (!(drawable instanceof MediaStoreUtils.LoaderDrawable)) {
 				drawable = createLoaderDrawable(mCr, holder.info);
 				iv.setImageDrawable(drawable);
 			}
-			((MediaStoreHelper.LoaderDrawable)drawable).startLoad(holder.info.mediaType, 0, holder.info.id);
+			((MediaStoreUtils.LoaderDrawable)drawable).startLoad(holder.info.mediaType, 0, holder.info.id);
 			if (tv != null) {
 				tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 				if (mShowTitle) {
@@ -229,7 +229,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		mQueryHandler.requery();
 	}
 
-	protected MediaStoreHelper.LoaderDrawable createLoaderDrawable(
+	protected MediaStoreUtils.LoaderDrawable createLoaderDrawable(
 		final ContentResolver cr, final MediaInfo info) {
 
 		return new ImageLoaderDrawable(cr, info.width, info.height);
@@ -238,7 +238,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final class ViewHolder {
 		TextView mTitleView;
 		ImageView mImageView;
-		MediaStoreHelper.MediaInfo info;
+		MediaStoreUtils.MediaInfo info;
 	}
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
@@ -299,7 +299,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 	}
 
-	private static class ImageLoaderDrawable extends MediaStoreHelper.LoaderDrawable {
+	private static class ImageLoaderDrawable extends MediaStoreUtils.LoaderDrawable {
 		public ImageLoaderDrawable(final ContentResolver cr,
 			final int width, final int height) {
 
@@ -307,7 +307,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected MediaStoreHelper.ImageLoader createThumbnailLoader() {
+		protected MediaStoreUtils.ImageLoader createThumbnailLoader() {
 			return new MyImageLoader(this);
 		}
 
@@ -317,7 +317,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 	}
 
-	private static class MyImageLoader extends MediaStoreHelper.ImageLoader {
+	private static class MyImageLoader extends MediaStoreUtils.ImageLoader {
 		public MyImageLoader(final ImageLoaderDrawable parent) {
 			super(parent);
 		}
@@ -329,7 +329,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 			Bitmap result = null;
 			try {
-				result = MediaStoreHelper.getImage(cr, id, requestWidth, requestHeight);
+				result = MediaStoreUtils.getImage(cr, id, requestWidth, requestHeight);
 				if (result != null) {
 					final int w = result.getWidth();
 					final int h = result.getHeight();

@@ -47,7 +47,7 @@ import android.widget.TextView;
 import com.serenegiant.common.R;
 import com.serenegiant.utils.ThreadPool;
 
-import static com.serenegiant.mediastore.MediaStoreHelper.*;
+import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの静止画・動画一覧を取得するためのCursorAdapter実装
@@ -229,7 +229,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public Bitmap getImage(final int position, final int width, final int height)
 		throws FileNotFoundException, IOException {
 
-		return MediaStoreHelper.getImage(mCr, getItemId(position), width, height);
+		return MediaStoreUtils.getImage(mCr, getItemId(position), width, height);
 	}
 	
 	/**
@@ -414,7 +414,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		Bitmap result = sThumbnailCache.get(key);
 		if (result == null) {
 			if ((requestWidth <= 0) || (requestHeight <= 0)) {
-				result = MediaStoreHelper.getImage(cr, id, requestWidth, requestHeight);
+				result = MediaStoreUtils.getImage(cr, id, requestWidth, requestHeight);
 			} else {
 				BitmapFactory.Options options = null;
 				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
