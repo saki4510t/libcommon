@@ -201,6 +201,9 @@ public class MainActivity extends AppCompatActivity
 			}
 			fragment = DistributorFragment.newInstance();
 			break;
+		case 8:
+			fragment = new GalleyFragment();
+			break;
 		default:
 			break;
 		}
