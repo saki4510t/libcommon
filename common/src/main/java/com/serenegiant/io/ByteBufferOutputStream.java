@@ -31,6 +31,7 @@ For more information, please refer to <http://unlicense.org/>
 
 import androidx.annotation.NonNull;
 
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.BufferOverflowException;
 import java.nio.ByteBuffer;
@@ -40,7 +41,7 @@ import java.nio.ByteBuffer;
  * {@link java.io.ByteArrayOutputStream}, just that this uses a {@code ByteBuffer} instead of a
  * {@code byte[]} as internal storage.
  */
-public class ByteBufferOutputStream extends OutputStream {
+public class ByteBufferOutputStream extends OutputStream implements IWritable {
 	
 	private ByteBuffer wrappedBuffer;
 	private final boolean autoEnlarge;
@@ -116,6 +117,11 @@ public class ByteBufferOutputStream extends OutputStream {
 	}
 	
 	@Override
+	public void write(final ByteBuffer src) throws IOException {
+		wrappedBuffer.put(src);
+	}
+
+	@Override
 	public void write(final int bty) {
 		
 		try {
@@ -149,7 +155,7 @@ public class ByteBufferOutputStream extends OutputStream {
 			}
 		}
 	}
-	
+
 	@Override
 	public void write(@NonNull final byte[] bytes, final int off, final int len) {
 		
