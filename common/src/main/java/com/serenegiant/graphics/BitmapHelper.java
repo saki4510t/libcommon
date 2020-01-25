@@ -773,8 +773,8 @@ public final class BitmapHelper {
 	/**
 	 * 指定したサイズよりも小さくならない最大のサブサンプリング数を取得
 	 * @param options
-	 * @param requestWidth
-	 * @param requestHeight
+	 * @param requestWidth　0以下でrequestHeightが指定されていればアスペクト比を保つ用にwidthを自動設定, requestHeightが設定されていなければ映像幅を使う
+	 * @param requestHeight 0以下でrequestWidthが指定されていればアスペクト比を保つ用にheightを自動設定, requestWidthが設定されていなければ映像高さを使う
 	 * @return
 	 */
 	public static int calcSampleSize(@NonNull final BitmapFactory.Options options,
@@ -782,16 +782,29 @@ public final class BitmapHelper {
 
 		final int imageWidth = options.outWidth;
 		final int imageHeight = options.outHeight;
-		int inSampleSize = 1;	// サブサンプリングサイズ
-		if ((imageHeight > requestHeight) || (imageWidth > requestWidth)) {
+		int reqWidth = requestWidth, reqHeight = requestHeight;
+		if (requestWidth <= 0) {
+			if (requestHeight > 0)
+				reqWidth = (int)(imageWidth * requestHeight / (float)imageHeight);
+			else
+				reqWidth = imageWidth;
+		}
+		if (requestHeight <= 0) {
+			if (requestWidth > 0)
+				reqHeight = (int)(imageHeight * requestWidth / (float)imageHeight);
+			else
+				reqHeight = imageHeight;
+		}
+		int inSampleSize = 1;
+		if ((imageHeight > reqHeight) || (imageWidth > reqWidth)) {
 			if (imageWidth > imageHeight) {
-				inSampleSize = (int)Math.floor(imageHeight / (float)requestHeight);
+				inSampleSize = Math.round(imageHeight / (float)reqHeight);	// Math.floor
 			} else {
-				inSampleSize = (int)Math.floor(imageWidth / (float)requestWidth);
+				inSampleSize = Math.round(imageWidth / (float)reqWidth);	// Math.floor
 			}
 		}
-/*		if (DEBUG) Log.v("BitmapHelper", String.format("calcSampleSize:image=(%d,%d),request=(%d,%d),inSampleSize=%d",
-				imageWidth, imageHeight, requestWidth, requestHeight, inSampleSize)); */
+/*		if (DEBUG) Log.v(TAG, String.format("calcSampleSize:image=(%d,%d),request=(%d,%d),inSampleSize=%d",
+				imageWidth, imageHeight, reqWidth, reqHeight, inSampleSize)); */
 		return inSampleSize;
 	}
 
