@@ -87,8 +87,11 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	@Override
 	protected void finalize() throws Throwable {
-		changeCursor(null);
-		super.finalize();
+		try {
+			changeCursor(null);
+		} finally {
+			super.finalize();
+		}
 	}
 
 	@Override

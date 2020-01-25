@@ -153,12 +153,15 @@ public class MediaStoreAdapter extends CursorAdapter {
 	
 	@Override
 	protected void finalize() throws Throwable {
-		changeCursor(null);
-		if (mMediaInfoCursor != null) {
-			mMediaInfoCursor.close();
-			mMediaInfoCursor = null;
+		try {
+			changeCursor(null);
+			if (mMediaInfoCursor != null) {
+				mMediaInfoCursor.close();
+				mMediaInfoCursor = null;
+			}
+		} finally {
+			super.finalize();
 		}
-		super.finalize();
 	}
 
 	@Override
