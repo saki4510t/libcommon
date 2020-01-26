@@ -202,9 +202,15 @@ public class MainActivity extends AppCompatActivity
 			fragment = DistributorFragment.newInstance();
 			break;
 		case 8:
+			if (!checkPermissionWriteExternalStorage()) {
+				return;
+			}
 			fragment = new GalleyFragment();
 			break;
 		case 9:
+			if (!checkPermissionWriteExternalStorage()) {
+				return;
+			}
 			fragment = new GalleyFragment2();
 			break;
 		default:
