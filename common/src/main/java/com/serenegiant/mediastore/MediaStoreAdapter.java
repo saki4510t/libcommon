@@ -81,7 +81,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		mLayoutId = id_layout;
 		mThumbnailCache = new ThumbnailCache(context);
 		ThreadPool.preStartAllCoreThreads();
-		onContentChanged();
+		refresh();
 	}
 
 	@Override
@@ -159,6 +159,10 @@ public class MediaStoreAdapter extends CursorAdapter {
 	@Override
 	protected void onContentChanged() {
 		mQueryHandler.requery();
+	}
+
+	public void refresh() {
+		onContentChanged();
 	}
 
 	/**
