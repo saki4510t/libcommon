@@ -100,6 +100,7 @@ public class MediaStoreRecyclerAdapter
 	private Cursor mCursor;
 	private String mSelection;
 	private String[] mSelectionArgs = null;
+	private String mSortOrder = null;
 	@Nullable
 	private RecyclerView mRecycleView;
 	@Nullable
@@ -273,7 +274,7 @@ public class MediaStoreRecyclerAdapter
 		if (mCursor == null) {
 			mCursor = mCr.query(
 				QUERY_URI, PROJ_MEDIA,
-				mSelection, mSelectionArgs, null);
+				mSelection, mSelectionArgs, mSortOrder);
 		}
 		if (mCursor.moveToPosition(position)) {
 			_info.loadFromCursor(mCursor);
@@ -378,7 +379,7 @@ public class MediaStoreRecyclerAdapter
 				mAdapter.mSelection = SELECTIONS[mAdapter.mMediaType % MEDIA_TYPE_NUM];
 				mAdapter.mSelectionArgs = null;
 				startQuery(0, mAdapter, QUERY_URI, PROJ_MEDIA,
-					mAdapter.mSelection, mAdapter.mSelectionArgs, null);
+					mAdapter.mSelection, mAdapter.mSelectionArgs, mAdapter.mSortOrder);
 			}
 		}
 
