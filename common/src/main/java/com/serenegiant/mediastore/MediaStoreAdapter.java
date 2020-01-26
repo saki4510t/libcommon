@@ -379,17 +379,17 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
-			final int mediaType, final int hashCode, final long id,
-			final int requestWidth, final int requestHeight) {
+									final int mediaType, final int groupId, final long id,
+									final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(cr, groupId, id, requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(cr, groupId, id, requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {

@@ -180,7 +180,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	protected abstract ImageLoader createImageLoader();
 
 	/**
-	 * 指定したhashCode/idに対応するキャッシュを取得する
+	 * 指定したgroupId/idに対応するキャッシュを取得する
 	 * 存在しなければnull
 	 * @param groupId
 	 * @param id

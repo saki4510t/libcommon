@@ -346,8 +346,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
-			final int mediaType, final int hashCode, final long id,
-			final int requestWidth, final int requestHeight) {
+									final int mediaType, final int groupId, final long id,
+									final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
