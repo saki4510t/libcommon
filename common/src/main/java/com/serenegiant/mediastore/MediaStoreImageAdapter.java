@@ -42,6 +42,7 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ThreadPool;
 
 import java.io.IOException;
 
@@ -82,6 +83,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		mLayoutId = id_layout;
 		mCr = context.getContentResolver();
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
+		ThreadPool.preStartAllCoreThreads();
 		if (needQuery) {
 			startQuery();
 		}

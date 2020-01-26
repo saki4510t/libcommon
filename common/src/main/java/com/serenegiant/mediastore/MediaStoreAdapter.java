@@ -41,6 +41,7 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ThreadPool;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -79,6 +80,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
 		mLayoutId = id_layout;
 		mThumbnailCache = new ThumbnailCache(context);
+		ThreadPool.preStartAllCoreThreads();
 		onContentChanged();
 	}
 

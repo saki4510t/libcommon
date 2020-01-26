@@ -38,6 +38,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.ThreadPool;
 
 import java.io.IOException;
 
@@ -123,6 +124,7 @@ public class MediaStoreRecyclerAdapter
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		mThumbnailCache = new ThumbnailCache(context);
 
+		ThreadPool.preStartAllCoreThreads();
 		startQuery();
 	}
 
