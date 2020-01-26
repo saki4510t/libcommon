@@ -537,8 +537,9 @@ public class MediaStoreRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
-	private void setInfo(@NonNull final ViewHolder holder,
-		final MediaInfo info) {
+	private void setInfo(
+		@NonNull final ViewHolder holder,
+		@NonNull final MediaInfo info) {
 
 //		if (DEBUG) Log.v(TAG, "setInfo:" + info);
 		holder.info = info;
