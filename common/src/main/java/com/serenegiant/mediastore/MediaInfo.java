@@ -144,8 +144,9 @@ public class MediaInfo implements Parcelable {
 	@NonNull
 	@Override
 	public String toString() {
-		return String.format("MediaInfo(title=%s,displayName=%s,mediaType=%s,mime=%s,data=%s)",
-			title, displayName, mediaType(mediaType), mime, data);
+		return String.format(Locale.US,
+			"MediaInfo(id=%d,title=%s,displayName=%s,mediaType=%s,mime=%s,data=%s)",
+			id, title, displayName, mediaType(mediaType), mime, data);
 	}
 
 	@Override
