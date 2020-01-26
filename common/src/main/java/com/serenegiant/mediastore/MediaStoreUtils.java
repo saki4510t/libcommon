@@ -45,17 +45,17 @@ public class MediaStoreUtils {
 	protected static final int MEDIA_TYPE_NUM = 3;
 
 	protected static final String[] PROJ_MEDIA = {
-		MediaStore.Files.FileColumns._ID,				// index=0 for Cursor, column number=1 in SQL statement
-		MediaStore.Files.FileColumns.TITLE,				// index=1 for Cursor, column number=2 in SQL statement
-		MediaStore.Files.FileColumns.MEDIA_TYPE,		// index=2 for Cursor, column number=2 in SQL statement
+		MediaStore.Files.FileColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
+		MediaStore.Files.FileColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
+		MediaStore.Files.FileColumns.MEDIA_TYPE,		// index=2  for Cursor, column number=3  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
-		MediaStore.Files.FileColumns.MIME_TYPE,			// index=3 for Cursor, column number=2 in SQL statement
-		MediaStore.Files.FileColumns.DATA,				// index=4 for Cursor, column number=2 in SQL statement
-		MediaStore.Files.FileColumns.DISPLAY_NAME,		// index=5 for Cursor, column number=2 in SQL statement
-		MediaStore.Files.FileColumns.WIDTH,
-		MediaStore.Files.FileColumns.HEIGHT,
-//		MediaStore.Files.FileColumns.DATE_MODIFIED,						// index=8 for Cursor, column number=2 in SQL statement
-//		MediaStore.Files.FileColumns.DATE_ADDED,						// index=9 for Cursor, column number=2 in SQL statement
+		MediaStore.Files.FileColumns.MIME_TYPE,			// index=3  for Cursor, column number=4  in SQL statement
+		MediaStore.Files.FileColumns.DATA,				// index=4  for Cursor, column number=5  in SQL statement
+		MediaStore.Files.FileColumns.DISPLAY_NAME,		// index=5  for Cursor, column number=6  in SQL statement
+		MediaStore.Files.FileColumns.WIDTH,				// index=6  for Cursor, column number=7  in SQL statement
+		MediaStore.Files.FileColumns.HEIGHT,			// index=7  for Cursor, column number=8  in SQL statement
+//		MediaStore.Files.FileColumns.DATE_MODIFIED,		// index=8  for Cursor, column number=9  in SQL statement
+//		MediaStore.Files.FileColumns.DATE_ADDED,		// index=9  for Cursor, column number=10 in SQL statement
 	};
 
 	protected static final String SELECTION_MEDIA_ALL
