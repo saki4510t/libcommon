@@ -85,7 +85,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		ThreadPool.preStartAllCoreThreads();
 		if (needQuery) {
-			startQuery();
+			refresh();
 		}
 	}
 
@@ -244,7 +244,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 //		mDataSetObservable.notifyInvalidated();
 	}
 
-	public void startQuery() {
+	public void refresh() {
 		mQueryHandler.requery();
 	}
 
@@ -303,7 +303,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		@Override
 		public void onChange(boolean selfChange) {
-			startQuery();
+			refresh();
 		}
 	}
 

@@ -125,7 +125,7 @@ public class MediaStoreRecyclerAdapter
 		mThumbnailCache = new ThumbnailCache(context);
 
 		ThreadPool.preStartAllCoreThreads();
-		startQuery();
+		refresh();
 	}
 
 	@Override
@@ -195,8 +195,8 @@ public class MediaStoreRecyclerAdapter
 //		mDataSetObservable.notifyInvalidated();
 	}
 
-	public void startQuery() {
-		if (DEBUG) Log.v(TAG, "startQuery:");
+	public void refresh() {
+		if (DEBUG) Log.v(TAG, "refresh:");
 		mQueryHandler.requery();
 	}
 
@@ -407,7 +407,7 @@ public class MediaStoreRecyclerAdapter
 
 		@Override
 		public void onChange(boolean selfChange) {
-			startQuery();
+			refresh();
 		}
 	}
 

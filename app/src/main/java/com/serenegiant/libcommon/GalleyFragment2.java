@@ -67,7 +67,7 @@ public class GalleyFragment2 extends BaseFragment {
 	protected void internalOnResume() {
 		super.internalOnResume();
 		if (mMediaStoreAdapter != null) {
-			mMediaStoreAdapter.startQuery();
+			mMediaStoreAdapter.refresh();
 		}
 	}
 
