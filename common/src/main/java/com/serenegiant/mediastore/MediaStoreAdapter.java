@@ -59,7 +59,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private final ContentResolver mCr;
 	private final int mLayoutId;
 	private final MyAsyncQueryHandler mQueryHandler;
-	private final int mHashCode = hashCode();
+	private final int mGroupId = hashCode();
 	private final ThumbnailCache mThumbnailCache;
 	private Cursor mMediaInfoCursor;
 	private String mSelection;
@@ -109,7 +109,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 			iv.setImageDrawable(drawable);
 		}
 		((LoaderDrawable)drawable).startLoad(
-			cursor.getInt(PROJ_INDEX_MEDIA_TYPE), mHashCode, cursor.getLong(PROJ_INDEX_ID));
+			cursor.getInt(PROJ_INDEX_MEDIA_TYPE), mGroupId, cursor.getLong(PROJ_INDEX_ID));
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 			if (mShowTitle) {
@@ -172,7 +172,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
 			// 静止画の場合のサムネイル取得
 			try {
-				result = mThumbnailCache.getImageThumbnail(mCr, mHashCode,
+				result = mThumbnailCache.getImageThumbnail(mCr, mGroupId,
 					getItemId(position), mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
@@ -182,7 +182,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
 			// 動画の場合のサムネイル取得
 			try {
-				result = mThumbnailCache.getVideoThumbnail(mCr, mHashCode,
+				result = mThumbnailCache.getVideoThumbnail(mCr, mGroupId,
 					getItemId(position), mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
@@ -272,7 +272,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public void setThumbnailSize(final int size) {
 		if ((mThumbnailWidth != size) || (mThumbnailHeight != size)) {
 			mThumbnailWidth = mThumbnailHeight = size;
-			mThumbnailCache.clearThumbnailCache();
+			mThumbnailCache.clear(mGroupId);
 			onContentChanged();
 		}
 	}
@@ -286,7 +286,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
-			mThumbnailCache.clearThumbnailCache();
+			mThumbnailCache.clear(mGroupId);
 			onContentChanged();
 		}
 	}
@@ -356,13 +356,13 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 
 		@Override
-		protected ImageLoader createThumbnailLoader() {
+		protected ImageLoader createImageLoader() {
 			return new ThumbnailLoader(this);
 		}
 
 		@Override
-		protected Bitmap checkBitmapCache(final int hashCode, final long id) {
-			return mThumbnailCache.get(hashCode, id);
+		protected Bitmap checkCache(final int groupId, final long id) {
+			return mThumbnailCache.get(groupId, id);
 		}
 	}
 

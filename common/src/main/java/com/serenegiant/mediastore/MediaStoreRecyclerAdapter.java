@@ -88,7 +88,7 @@ public class MediaStoreRecyclerAdapter
 	private final ContentResolver mCr;
 	private final MyAsyncQueryHandler mQueryHandler;
 	private final ThumbnailCache mThumbnailCache;
-	private final int mHashCode = hashCode();
+	private final int mGroupId = hashCode();
 	private final MediaInfo info = new MediaInfo();
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 
@@ -218,7 +218,7 @@ public class MediaStoreRecyclerAdapter
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
-			mThumbnailCache.clearThumbnailCache();
+			mThumbnailCache.clear(mGroupId);
 			onContentChanged();
 		}
 	}
@@ -491,13 +491,13 @@ public class MediaStoreRecyclerAdapter
 		}
 
 		@Override
-		protected ImageLoader createThumbnailLoader() {
+		protected ImageLoader createImageLoader() {
 			return new ThumbnailLoader(this);
 		}
 
 		@Override
-		protected Bitmap checkBitmapCache(final int hashCode, final long id) {
-			return mThumbnailCache.get(hashCode, id);
+		protected Bitmap checkCache(final int groupId, final long id) {
+			return mThumbnailCache.get(groupId, id);
 		}
 	}
 
@@ -551,7 +551,7 @@ public class MediaStoreRecyclerAdapter
 				iv.setImageDrawable(drawable);
 			}
 			((LoaderDrawable)drawable).startLoad(
-				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mHashCode, mCursor.getLong(PROJ_INDEX_ID));
+				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mGroupId, mCursor.getLong(PROJ_INDEX_ID));
 		}
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);

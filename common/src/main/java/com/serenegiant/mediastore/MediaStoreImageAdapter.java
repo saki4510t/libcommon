@@ -327,12 +327,12 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected ImageLoader createThumbnailLoader() {
+		protected ImageLoader createImageLoader() {
 			return new MyImageLoader(this);
 		}
 
 		@Override
-		protected Bitmap checkBitmapCache(final int hashCode, final long id) {
+		protected Bitmap checkCache(final int groupId, final long id) {
 			return null;
 		}
 	}

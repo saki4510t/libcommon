@@ -38,6 +38,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.collection.LruCache;
 
+/**
+ * サムネイルキャッシュ
+ * (XXX 今はインメモリキャッシュのみ)
+ */
 public class ThumbnailCache {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = ThumbnailCache.class.getSimpleName();
@@ -46,6 +50,7 @@ public class ThumbnailCache {
 	// rate of memory usage for cache, 'CACHE_RATE = 8' means use 1/8 of available memory for image cache
 	private static final int CACHE_RATE = 8;
 	private static LruCache<String, Bitmap> sThumbnailCache;
+	private static int sCacheSize;
 
 	private static void prepareThumbnailCache(@NonNull final Context context) {
 		if (sThumbnailCache == null) {
@@ -53,8 +58,8 @@ public class ThumbnailCache {
 				.getSystemService(Context.ACTIVITY_SERVICE))
 				.getMemoryClass();
 			// use 1/CACHE_RATE of available memory as memory cache
-			final int cacheSize = (1024 * 1024 * memClass) / CACHE_RATE;	// [MB] => [bytes]
-			sThumbnailCache = new LruCache<String, Bitmap>(cacheSize) {
+			sCacheSize = (1024 * 1024 * memClass) / CACHE_RATE;	// [MB] => [bytes]
+			sThumbnailCache = new LruCache<String, Bitmap>(sCacheSize) {
 				@Override
 				protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
 					// control memory usage instead of bitmap counts
@@ -62,10 +67,6 @@ public class ThumbnailCache {
 				}
 			};
 		}
-	}
-
-	private static String getKey(final long hashCode, final long id) {
-		return String.format(Locale.US, "%d_%d", hashCode, id);
 	}
 
 	/**
@@ -76,16 +77,25 @@ public class ThumbnailCache {
 		prepareThumbnailCache(context);
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			sThumbnailCache.trimToSize(sCacheSize);
+		} finally {
+			super.finalize();
+		}
+	}
+
 	/**
 	 * 指定したhashCode/idに対応するキャッシュを取得する
 	 * 存在しなければnull
-	 * @param hashCode
+	 * @param groupId
 	 * @param id
 	 * @return
 	 */
 	@Nullable
-	public Bitmap get(final int hashCode, final long id) {
-		return sThumbnailCache.get(getKey(hashCode, id));
+	public Bitmap get(final int groupId, final long id) {
+		return sThumbnailCache.get(getKey(groupId, id));
 	}
 
 	/**
@@ -102,27 +112,28 @@ public class ThumbnailCache {
 	/**
 	 * サムネイルキャッシュをクリアする
 	 */
-	public void clearThumbnailCache() {
+	public void clear() {
 		sThumbnailCache.evictAll();
 	}
 
 	/**
-	 * 指定したhasCodeに対応するキャッシュをクリアする
-	 * @param hashCode
+	 * 指定したgroupIdに対応するキャッシュをクリアする
+	 * groupId == 0ならばすべてのキャッシュをクリアする
+	 * @param groupId
 	 */
-	public void clearBitmapCache(final int hashCode) {
-		if (hashCode != 0) {
+	public void clear(final int groupId) {
+		if (groupId != 0) {
 			final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
-			final String key_prefix = String.format(Locale.US, "%d_", hashCode);
+			final String key_prefix = String.format(Locale.US, "%d_", groupId);
 			final Set<String> keys = snapshot.keySet();
 			for (final String key : keys) {
 				if (key.startsWith(key_prefix)) {
-					// このインスタンスのキーが見つかった
+					// 指定したgroupIdのキーが見つかった
 					sThumbnailCache.remove(key);
 				}
 			}
 		} else {
-			// 他のMediaStoreAdapterインスタンスのキャッシュも含めてすべてクリアする
+			// すべてクリアする
 			sThumbnailCache.evictAll();
 		}
 		System.gc();
@@ -214,4 +225,15 @@ public class ThumbnailCache {
 		}
 		return result;
 	}
+
+	/**
+	 * キャッシュエントリー用のキー文字列生成
+	 * @param groupId
+	 * @param id
+	 * @return
+	 */
+	private static String getKey(final long groupId, final long id) {
+		return String.format(Locale.US, "%d_%d", groupId, id);
+	}
+
 }

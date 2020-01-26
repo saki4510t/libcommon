@@ -75,12 +75,16 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
         final Rect bounds = getBounds();
         if (mBitmap != null) {
             canvas.save();
-            canvas.clipRect(bounds);
-            canvas.concat(mDrawMatrix);
-            canvas.rotate(mRotation, bounds.centerX(), bounds.centerY());
-            canvas.drawBitmap(mBitmap, 0, 0, mPaint);
-            canvas.restore();
+            try {
+				canvas.clipRect(bounds);
+				canvas.concat(mDrawMatrix);
+				canvas.rotate(mRotation, bounds.centerX(), bounds.centerY());
+				canvas.drawBitmap(mBitmap, 0, 0, mPaint);
+			} finally {
+				canvas.restore();
+			}
         } else {
+        	// 画像が設定されていないとき
             mPaint.setColor(0xFFCCCCCC);
             canvas.drawRect(bounds, mPaint);
         }
@@ -109,23 +113,23 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	    float scale;
 	    int dx = 0, dy = 0;
 
-	    // Calculates a matrix similar to ScaleType.CENTER_CROP
-           if (dwidth * vheight > vwidth * dheight) {
-               scale = vheight / dheight;
+		// Calculates a matrix similar to ScaleType.CENTER_CROP
+		if (dwidth * vheight > vwidth * dheight) {
+			scale = vheight / dheight;
 			dx = (int) ((vwidth - dwidth * scale) * 0.5f + 0.5f);
-           } else {
-               scale = vwidth / dwidth;
+		} else {
+			scale = vwidth / dwidth;
 			dy = (int) ((vheight - dheight * scale) * 0.5f + 0.5f);
-           }
-/*		    // Calculates a matrix similar to ScaleType.CENTER_INSIDE
-           if (dwidth <= vwidth && dheight <= vheight) {
-               scale = 1.0f;
-           } else {
-               scale = Math.min((float) vwidth / (float) dwidth,
-                       (float) vheight / (float) dheight);
-           }
-           dx = (int) ((vwidth - dwidth * scale) * 0.5f + 0.5f);
-           dy = (int) ((vheight - dheight * scale) * 0.5f + 0.5f); */
+		}
+/*		// Calculates a matrix similar to ScaleType.CENTER_INSIDE
+		if (dwidth <= vwidth && dheight <= vheight) {
+			scale = 1.0f;
+		} else {
+			scale = Math.min((float) vwidth / (float) dwidth,
+						(float) vheight / (float) dheight);
+		}
+		dx = (int) ((vwidth - dwidth * scale) * 0.5f + 0.5f);
+		dy = (int) ((vheight - dheight * scale) * 0.5f + 0.5f); */
 		mDrawMatrix.setScale(scale, scale);
 		mDrawMatrix.postTranslate(dx, dy);
 
@@ -165,7 +169,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	}
 
     /**
-     * callback to set bitmap on UI thread after asyncronus loading
+     * callback to set bitmap on UI thread after asynchronous loading
      * request call this callback in ThumbnailLoader#run at the end of asyncronus loading
      */
 	@Override
@@ -173,35 +177,35 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		setBitmap(mLoader.getBitmap());
 	}
 
-	protected abstract ImageLoader createThumbnailLoader();
+	protected abstract ImageLoader createImageLoader();
 
 	/**
 	 * 指定したhashCode/idに対応するキャッシュを取得する
 	 * 存在しなければnull
-	 * @param hashCode
+	 * @param groupId
 	 * @param id
 	 * @return
 	 */
-	protected abstract Bitmap checkBitmapCache(final int hashCode, final long id);
+	protected abstract Bitmap checkCache(final int groupId, final long id);
 
 	/**
 	 * start loading image asynchronously
 	 * @param id
 	 */
-	public void startLoad(final int media_type, final int hashCode, final long id) {
+	public void startLoad(final int media_type, final int groupId, final long id) {
 
 		if (mLoader != null) {
 			mLoader.cancelLoad();
 		}
 
 		// キャッシュから取得を試みる
-		final Bitmap newBitmap = checkBitmapCache(hashCode, id);
+		final Bitmap newBitmap = checkCache(groupId, id);
 		if (newBitmap == null) {
 			// キャッシュから取得できなかったときは非同期読み込み要求する
 			mBitmap = null;
 			// re-using ThumbnailLoader will cause several problems on some devices...
-			mLoader = createThumbnailLoader();
-			mLoader.startLoad(media_type, hashCode, id);
+			mLoader = createImageLoader();
+			mLoader.startLoad(media_type, groupId, id);
 		} else {
 			// キャッシュから取得できたとき
 			setBitmap(newBitmap);

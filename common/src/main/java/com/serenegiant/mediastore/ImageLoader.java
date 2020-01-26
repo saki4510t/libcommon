@@ -28,7 +28,7 @@ import java.util.concurrent.FutureTask;
 import androidx.annotation.NonNull;
 
 /**
- * Runnable to load image asynchronously
+ * 非同期で画像読み込みを行うためのヘルパークラス(Runnableを実装)
  */
 public abstract class ImageLoader implements Runnable {
 	@NonNull
