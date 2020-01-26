@@ -9,6 +9,7 @@
 	<string name="item6" translatable="false">VideoSourceCamera</string>
 	<string name="item7" translatable="false">VideoSourceDistributorCamera</string>
 	<string name="item8" translatable="false">Galley</string>
+	<string name="item9" translatable="false">Galley(RecyclerView)</string>
 
 	<string-array name="list_items">
 		<item>@string/item0</item>
@@ -20,5 +21,6 @@
 		<item>@string/item6</item>
 		<item>@string/item7</item>
 		<item>@string/item8</item>
+		<item>@string/item9</item>
 	</string-array>
 </resources>

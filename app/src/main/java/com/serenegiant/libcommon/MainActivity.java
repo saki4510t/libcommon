@@ -204,6 +204,9 @@ public class MainActivity extends AppCompatActivity
 		case 8:
 			fragment = new GalleyFragment();
 			break;
+		case 9:
+			fragment = new GalleyFragment2();
+			break;
 		default:
 			break;
 		}
