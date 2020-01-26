@@ -18,7 +18,9 @@ package com.serenegiant.mediastore;
  *  limitations under the License.
 */
 
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
@@ -26,6 +28,7 @@ import android.provider.MediaStore;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -114,6 +117,28 @@ public class MediaInfo implements Parcelable {
 			}
 		}
 		return this;
+	}
+
+	@Nullable
+	public Uri getUri() {
+		switch (mediaType) {
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
+			return ContentUris.withAppendedId(
+				MediaStore.Files.getContentUri("external"), id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+			return ContentUris.withAppendedId(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+			return ContentUris.withAppendedId(
+				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+			return ContentUris.withAppendedId(
+				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
+		default:
+			return null;
+		}
+
 	}
 
 	@NonNull
