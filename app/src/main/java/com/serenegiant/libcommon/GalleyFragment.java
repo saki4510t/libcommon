@@ -49,7 +49,9 @@ public class GalleyFragment extends BaseFragment {
 	}
 
 	@Override
-	public View onCreateView(@NonNull final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+	public View onCreateView(@NonNull final LayoutInflater inflater,
+		final ViewGroup container, final Bundle savedInstanceState) {
+
 		if (DEBUG) Log.v(TAG, "onCreateView:");
 		final View rootView = inflater.inflate(R.layout.fragment_galley, container, false);
 		initView(rootView);
@@ -62,14 +64,18 @@ public class GalleyFragment extends BaseFragment {
 	 */
 	private void initView(final View rootView) {
 		final GridView gridView = rootView.findViewById(R.id.media_gridview);
-		mMediaStoreAdapter = new MediaStoreAdapter(getActivity(), R.layout.grid_item_media);
+		mMediaStoreAdapter = new MediaStoreAdapter(requireContext(), R.layout.grid_item_media);
 		gridView.setAdapter(mMediaStoreAdapter);
 		gridView.setOnItemClickListener(mOnItemClickListener);
 	}
 
-	private final AdapterView.OnItemClickListener mOnItemClickListener = new AdapterView.OnItemClickListener() {
+	private final AdapterView.OnItemClickListener mOnItemClickListener
+		= new AdapterView.OnItemClickListener() {
+
 		@Override
-		public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
+		public void onItemClick(final AdapterView<?> parent,
+			final View view, final int position, final long id) {
+
 			switch (parent.getId()) {
 			case R.id.media_gridview:
 				doPlay(position, id);
