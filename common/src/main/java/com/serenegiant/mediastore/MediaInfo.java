@@ -19,6 +19,8 @@ package com.serenegiant.mediastore;
 */
 
 import android.database.Cursor;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.provider.MediaStore;
 
 import java.util.Locale;
@@ -27,7 +29,24 @@ import androidx.annotation.NonNull;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
-public class MediaInfo {
+/**
+ * MediaStoreの情報を保持するためのコンテナクラス
+ */
+public class MediaInfo implements Parcelable {
+
+	public static final Creator<MediaInfo> CREATOR = new Creator<MediaInfo>() {
+		@Override
+		public MediaInfo createFromParcel(Parcel in) {
+			return new MediaInfo(in);
+		}
+
+		@Override
+		public MediaInfo[] newArray(int size) {
+			return new MediaInfo[size];
+		}
+	};
+
+//--------------------------------------------------------------------------------
 	public long id;
 	public String data;
 	public String title;
@@ -37,7 +56,49 @@ public class MediaInfo {
 	public int width;
 	public int height;
 
-	protected MediaInfo loadFromCursor(final Cursor cursor) {
+	/**
+	 * デフォルトコンストラクタ
+	 */
+	public MediaInfo() {
+	}
+
+	/**
+	 * Parcelable用のコンストラクタ
+	 * @param in
+	 */
+	protected MediaInfo(final Parcel in) {
+		id = in.readLong();
+		data = in.readString();
+		title = in.readString();
+		mime = in.readString();
+		displayName = in.readString();
+		mediaType = in.readInt();
+		width = in.readInt();
+		height = in.readInt();
+	}
+
+	/**
+	 * Cursorから値を読み込んで初期化するコンストラクタ
+	 * @param cursor
+	 */
+	MediaInfo(final Cursor cursor) {
+		if (cursor != null) {
+			id = cursor.getLong(PROJ_INDEX_ID);
+			data = cursor.getString(PROJ_INDEX_DATA);
+			title = cursor.getString(PROJ_INDEX_TITLE);
+			mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
+			displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
+			mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
+			try {
+				width = cursor.getInt(PROJ_INDEX_WIDTH);
+				height = cursor.getInt(PROJ_INDEX_HEIGHT);
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+	}
+
+	MediaInfo loadFromCursor(final Cursor cursor) {
 		if (cursor != null) {
 			id = cursor.getLong(PROJ_INDEX_ID);
 			data = cursor.getString(PROJ_INDEX_DATA);
@@ -62,6 +123,24 @@ public class MediaInfo {
 			title, displayName, mediaType(mediaType), mime, data);
 	}
 
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeLong(id);
+		dest.writeString(data);
+		dest.writeString(title);
+		dest.writeString(mime);
+		dest.writeString(displayName);
+		dest.writeInt(mediaType);
+		dest.writeInt(width);
+		dest.writeInt(height);
+	}
+
+//--------------------------------------------------------------------------------
 	private static String mediaType(final int mediaType) {
 		switch (mediaType) {
 		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
