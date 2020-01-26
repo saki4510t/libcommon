@@ -58,11 +58,11 @@ public class MediaInfo {
 	@NonNull
 	@Override
 	public String toString() {
-		return String.format("MediaInfo(title=%s,displayName=%s, mediaType=%s,mime=%s,data=%s)",
-			title, displayName, mediaType(), mime, data);
+		return String.format("MediaInfo(title=%s,displayName=%s,mediaType=%s,mime=%s,data=%s)",
+			title, displayName, mediaType(mediaType), mime, data);
 	}
 
-	private String mediaType() {
+	private static String mediaType(final int mediaType) {
 		switch (mediaType) {
 		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
 			return "none";
