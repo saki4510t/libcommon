@@ -1,4 +1,22 @@
 package com.serenegiant.mediastore;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2019 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
 
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
@@ -32,6 +50,8 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの静止画・動画一覧をRecyclerViewで表示するためのRecyclerView.Adapter実装
+ * 実データではなくサムネイルを表示する
+ * MediaStoreAdapterのRecyclerView.Adapter版
  */
 public class MediaStoreRecyclerAdapter
 	extends RecyclerView.Adapter<MediaStoreRecyclerAdapter.ViewHolder> {
@@ -39,9 +59,26 @@ public class MediaStoreRecyclerAdapter
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreRecyclerAdapter.class.getSimpleName();
 
+	/**
+	 * MediaStoreRecyclerAdapterでアイテムを選択したときのコールバックリスナー
+	 */
 	public interface MediaStoreRecyclerAdapterListener {
+		/**
+		 * アイテムをクリックした
+		 * @param parent
+		 * @param view
+		 * @param item
+		 */
 		public void onItemClick(@NonNull RecyclerView.Adapter<?> parent,
 			@NonNull View view, @NonNull final MediaInfo item);
+
+		/**
+		 * アイテムを長押しした
+		 * @param parent
+		 * @param view
+		 * @param item
+		 * @return
+		 */
 		public boolean onItemLongClick(@NonNull RecyclerView.Adapter<?> parent,
 			@NonNull View view, @NonNull final MediaInfo item);
 	}
@@ -54,12 +91,13 @@ public class MediaStoreRecyclerAdapter
 	private final int mHashCode = hashCode();
 	private final MediaInfo info = new MediaInfo();
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
-	protected boolean mDataValid;
-	protected int mRowIDColumn;
-	protected ChangeObserver mChangeObserver;
-	protected DataSetObserver mDataSetObserver;
+
+	private boolean mDataValid;
+//	private int mRowIDColumn;
+	private ChangeObserver mChangeObserver;
+	private DataSetObserver mDataSetObserver;
 	private Cursor mCursor;
-	private String mSelection = SELECTIONS[MEDIA_IMAGE];	// 静止画のみ有効
+	private String mSelection;
 	private String[] mSelectionArgs = null;
 	@Nullable
 	private RecyclerView mRecycleView;
@@ -69,10 +107,16 @@ public class MediaStoreRecyclerAdapter
 	private int mMediaType = MEDIA_ALL;
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param itemLayout
+	 */
 	public MediaStoreRecyclerAdapter(@NonNull final Context context,
 		@LayoutRes final int itemLayout) {
 
 		super();
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = itemLayout;
 		mCr = context.getContentResolver();
@@ -94,11 +138,13 @@ public class MediaStoreRecyclerAdapter
 	@Override
 	public void onAttachedToRecyclerView(@NonNull final RecyclerView recyclerView) {
 		super.onAttachedToRecyclerView(recyclerView);
+		if (DEBUG) Log.v(TAG, "onAttachedToRecyclerView:");
 		mRecycleView = recyclerView;
 	}
 
 	@Override
 	public void onDetachedFromRecyclerView(@NonNull final RecyclerView recyclerView) {
+		if (DEBUG) Log.v(TAG, "onDetachedFromRecyclerView:");
 		mRecycleView = null;
 		super.onDetachedFromRecyclerView(recyclerView);
 	}
@@ -114,8 +160,7 @@ public class MediaStoreRecyclerAdapter
 
 	@Override
 	public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-		getMediaInfo(position, info);
-		setInfo(holder, info);
+		setInfo(holder, getMediaInfo(position, info));
 	}
 
 	@Override
@@ -127,41 +172,49 @@ public class MediaStoreRecyclerAdapter
 		}
 	}
 
+	/**
+	 * 指定したpositionにあるデータを保持したMediaInfoを取得する
+	 * @param position
+	 * @return
+	 */
+	@NonNull
 	public MediaInfo getItem(final int position) {
 		return getMediaInfo(position, null);
 	}
 
 //--------------------------------------------------------------------------------
 	public void setListener(final MediaStoreRecyclerAdapterListener listener) {
+		if (DEBUG) Log.v(TAG, "setListener:" + listener);
 		mListener = listener;
 	}
 
 	public void notifyDataSetInvalidated() {
+		if (DEBUG) Log.v(TAG, "notifyDataSetInvalidated:");
 //		mDataSetObservable.notifyInvalidated();
 	}
 
 	public void startQuery() {
+		if (DEBUG) Log.v(TAG, "startQuery:");
 		mQueryHandler.requery();
 	}
 
 	/**
-	 * set thumbnail size, if you set size to zero, the size is 96x96(MediaStore.Images.Thumbnails.MICRO_KIND)
+	 * サムネイルのサイズを設定
+	 * 0を指定したときは96x96(MediaStore.Images.Thumbnails.MICRO_KIND)になる
 	 * @param size
 	 */
 	public void setThumbnailSize(final int size) {
-		if ((mThumbnailWidth != size) || (mThumbnailHeight != size)) {
-			mThumbnailWidth = mThumbnailHeight = size;
-			mThumbnailCache.clearThumbnailCache();
-			onContentChanged();
-		}
+		setThumbnailSize(size, size);
 	}
 
 	/**
-	 * set thumbnail size, if you set both width and height to zero, the size is 96x96(MediaStore.Images.Thumbnails.MICRO_KIND)
+	 * サムネイルのサイズを設定
+	 * 0を指定したときは96x96(MediaStore.Images.Thumbnails.MICRO_KIND)になる
 	 * @param width
 	 * @param height
 	 */
 	public void setThumbnailSize(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("setThumbnailSize:(%dx%d)", width, height));
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
@@ -170,21 +223,38 @@ public class MediaStoreRecyclerAdapter
 		}
 	}
 
+	/**
+	 * タイトルを表示するかどうかを設定
+	 * @param showTitle
+	 */
 	public void setShowTitle(final boolean showTitle) {
+		if (DEBUG) Log.v(TAG, "setShowTitle:" + showTitle);
 		if (mShowTitle != showTitle) {
 			mShowTitle = showTitle;
 			onContentChanged();
 		}
 	}
 
+	/**
+	 * タイトルを表示するかどうかを取得
+	 * @return
+	 */
 	public boolean getShowTitle() {
 		return mShowTitle;
 	}
 
+	/**
+	 * 表示するメディ他の種類を取得
+	 * @return
+	 */
 	public int getMediaType() {
 		return mMediaType % MEDIA_TYPE_NUM;
 	}
 
+	/**
+	 * 表示するメディアの種類を設定
+	 * @param media_type
+	 */
 	public void setMediaType(final int media_type) {
 		if (mMediaType != (media_type % MEDIA_TYPE_NUM)) {
 			mMediaType = media_type % MEDIA_TYPE_NUM;
@@ -193,23 +263,11 @@ public class MediaStoreRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
-	public synchronized MediaInfo getMediaInfo(final int position, final MediaInfo info) {
-		final MediaInfo _info = info != null ? info : new MediaInfo();
+	@NonNull
+	private synchronized MediaInfo getMediaInfo(
+		final int position, @Nullable final MediaInfo info) {
 
-/*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
-		// but it will take more time.
-		final Cursor cursor = mCr.query(
-			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, getItemId(position)),
-			PROJ_IMAGE, mSelection, mSelectionArgs, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
-		if (cursor != null) {
-			try {
-				if (cursor.moveToFirst()) {
-					info = readMediaInfo(cursor, new MediaInfo());
-				}
-			} finally {
-				cursor.close();
-			}
-		} */
+		final MediaInfo _info = info != null ? info : new MediaInfo();
 		if (mCursor == null) {
 			mCursor = mCr.query(
 				QUERY_URI, PROJ_MEDIA,
@@ -226,40 +284,61 @@ public class MediaStoreRecyclerAdapter
 	}
 
 	protected void changeCursor(@Nullable final Cursor cursor) {
+		if (DEBUG) Log.v(TAG, "changeCursor:" + cursor);
 		final Cursor old = swapCursor(cursor);
 		if ((old != null) && !old.isClosed()) {
 			old.close();
 		}
 	}
 
+	/**
+	 * 指定したpositionを示すCursorら返す
+	 * @param position
+	 * @return
+	 */
+	@Nullable
 	protected Cursor getCursor(final int position) {
 		if (mDataValid && mCursor != null) {
 			mCursor.moveToPosition(position);
 			return mCursor;
 		} else {
 			return null;
-			}
+		}
 	}
 
+	/**
+	 * カーソルを交換
+	 * @param newCursor
+	 * @return
+	 */
 	protected Cursor swapCursor(final Cursor newCursor) {
+		if (DEBUG) Log.v(TAG, "swapCursor:" + newCursor);
 		if (newCursor == mCursor) {
 			return null;
 		}
 		Cursor oldCursor = mCursor;
 		if (oldCursor != null) {
-			if (mChangeObserver != null) oldCursor.unregisterContentObserver(mChangeObserver);
-			if (mDataSetObserver != null) oldCursor.unregisterDataSetObserver(mDataSetObserver);
+			if (mChangeObserver != null) {
+				oldCursor.unregisterContentObserver(mChangeObserver);
+			}
+			if (mDataSetObserver != null) {
+				oldCursor.unregisterDataSetObserver(mDataSetObserver);
+			}
 		}
 		mCursor = newCursor;
 		if (newCursor != null) {
-			if (mChangeObserver != null) newCursor.registerContentObserver(mChangeObserver);
-			if (mDataSetObserver != null) newCursor.registerDataSetObserver(mDataSetObserver);
-			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
+			if (mChangeObserver != null) {
+				newCursor.registerContentObserver(mChangeObserver);
+			}
+			if (mDataSetObserver != null) {
+				newCursor.registerDataSetObserver(mDataSetObserver);
+			}
+//			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
 		} else {
-			mRowIDColumn = -1;
+//			mRowIDColumn = -1;
 			mDataValid = false;
 			// notify the observers about the lack of a data set
 			notifyDataSetInvalidated();
@@ -267,17 +346,35 @@ public class MediaStoreRecyclerAdapter
 		return oldCursor;
 	}
 
+	/**
+	 * ContentResolverへ非同期で問い合わせを行うためのAsyncQueryHandler実装
+	 */
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
+		@NonNull
 		private final MediaStoreRecyclerAdapter mAdapter;
-		public MyAsyncQueryHandler(final ContentResolver cr,
-			final MediaStoreRecyclerAdapter adapter) {
+
+		/**
+		 * コンストラクタ
+		 * @param cr
+		 * @param adapter
+		 */
+		public MyAsyncQueryHandler(
+			@NonNull final ContentResolver cr,
+			@NonNull final MediaStoreRecyclerAdapter adapter) {
 
 			super(cr);
+			if (DEBUG) Log.v(TAG, "MyAsyncQueryHandler:");
 			mAdapter = adapter;
 		}
 
 		public void requery() {
 			synchronized (mAdapter) {
+				if (mAdapter.mCursor != null) {
+					mAdapter.mCursor.close();
+					mAdapter.mCursor = null;
+				}
+				mAdapter.mSelection = SELECTIONS[mAdapter.mMediaType % MEDIA_TYPE_NUM];
+				mAdapter.mSelectionArgs = null;
 				startQuery(0, mAdapter, QUERY_URI, PROJ_MEDIA,
 					mAdapter.mSelection, mAdapter.mSelectionArgs, null);
 			}
@@ -287,17 +384,18 @@ public class MediaStoreRecyclerAdapter
 		protected void onQueryComplete(final int token,
 			final Object cookie, final Cursor cursor) {
 
-//			super.onQueryComplete(token, cookie, cursor);	// this is empty method
+			super.onQueryComplete(token, cookie, cursor);	// this is empty method
+			if (DEBUG) Log.v(TAG, "MyAsyncQueryHandler#onQueryComplete:");
 			final Cursor oldCursor = mAdapter.swapCursor(cursor);
 			if ((oldCursor != null) && !oldCursor.isClosed())
 				oldCursor.close();
 		}
 
-	}
+	}	// MyAsyncQueryHandler
 
 	private class ChangeObserver extends ContentObserver {
 		public ChangeObserver() {
-			super(new Handler());
+			super(mUIHandler);
 		}
 
 		@Override
@@ -381,28 +479,10 @@ public class MediaStoreRecyclerAdapter
 	};
 
 //--------------------------------------------------------------------------------
-	private void setInfo(@NonNull final ViewHolder holder,
-		final MediaInfo info) {
 
-		holder.info = info;
-		holder.itemView.setTag(R.id.info, info);
-		if (holder.mImageView != null) {
-			Drawable drawable = holder.mImageView.getDrawable();
-			if (!(drawable instanceof LoaderDrawable)) {
-				drawable = new ThumbnailLoaderDrawable(mCr, mThumbnailWidth, mThumbnailHeight);
-				holder.mImageView.setImageDrawable(drawable);
-			}
-			((LoaderDrawable)drawable).startLoad(
-				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mHashCode, mCursor.getLong(PROJ_INDEX_ID));
-		}
-		if (holder.mTitleView != null) {
-			holder.mTitleView.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
-			if (mShowTitle) {
-				holder.mTitleView.setText(info.title);
-			}
-		}
-	}
-
+	/**
+	 * サムネイルを非同期で取得するためのDrawable
+	 */
 	private class ThumbnailLoaderDrawable extends LoaderDrawable {
 		public ThumbnailLoaderDrawable(final ContentResolver cr,
 			final int width, final int height) {
@@ -421,6 +501,9 @@ public class MediaStoreRecyclerAdapter
 		}
 	}
 
+	/**
+	 * ThumbnailLoaderDrawableのための非同期読み込みヘルパークラス
+	 */
 	private class ThumbnailLoader extends ImageLoader {
 		public ThumbnailLoader(final ThumbnailLoaderDrawable parent) {
 			super(parent);
@@ -435,10 +518,12 @@ public class MediaStoreRecyclerAdapter
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(cr,
+						hashCode, id, requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(cr, hashCode, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(cr,
+						hashCode, id, requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {
@@ -449,6 +534,33 @@ public class MediaStoreRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
+	private void setInfo(@NonNull final ViewHolder holder,
+		final MediaInfo info) {
+
+//		if (DEBUG) Log.v(TAG, "setInfo:" + info);
+		holder.info = info;
+		holder.itemView.setTag(R.id.info, info);
+		// ローカルキャッシュ
+		final ImageView iv = holder.mImageView;
+		final TextView tv = holder.mTitleView;
+
+		if (iv != null) {
+			Drawable drawable = iv.getDrawable();
+			if (!(drawable instanceof LoaderDrawable)) {
+				drawable = new ThumbnailLoaderDrawable(mCr, mThumbnailWidth, mThumbnailHeight);
+				iv.setImageDrawable(drawable);
+			}
+			((LoaderDrawable)drawable).startLoad(
+				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mHashCode, mCursor.getLong(PROJ_INDEX_ID));
+		}
+		if (tv != null) {
+			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
+			if (mShowTitle) {
+				tv.setText(info.title);
+			}
+		}
+	}
+
 	public static class ViewHolder extends RecyclerView.ViewHolder {
 		private TextView mTitleView;
 		private ImageView mImageView;

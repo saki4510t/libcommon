@@ -21,7 +21,6 @@ package com.serenegiant.libcommon;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -36,6 +35,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * 端末内の静止画・動画一覧を表示するためのFragment
  * RecyclerViewを使用
+ * FIXME レイアウトの設定がいまいちで表示がきれくない(´・ω・｀)
  */
 public class GalleyFragment2 extends BaseFragment {
 	private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
@@ -63,17 +63,30 @@ public class GalleyFragment2 extends BaseFragment {
 		return rootView;
 	}
 
+	@Override
+	protected void internalOnResume() {
+		super.internalOnResume();
+		if (mMediaStoreAdapter != null) {
+			mMediaStoreAdapter.startQuery();
+		}
+	}
+
 	/**
 	 * Viewを初期化
 	 * @param rootView
 	 */
 	private void initView(final View rootView) {
-		final RecycleViewWithEmptyView view = rootView.findViewById(R.id.media_recyclerview);
-		view.setLayoutManager(new GridLayoutManager(requireContext(), 4));
-		view.setEmptyView(rootView.findViewById(R.id.empty));
-		mMediaStoreAdapter = new MediaStoreRecyclerAdapter(requireContext(), R.layout.grid_item_media);
+		final RecycleViewWithEmptyView recyclerView
+			= rootView.findViewById(R.id.media_recyclerview);
+		recyclerView.setHasFixedSize(true);
+		recyclerView.setLayoutManager(
+			new GridLayoutManager(requireContext(), 4));
+//		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
+		recyclerView.setEmptyView(rootView.findViewById(R.id.empty));
+		mMediaStoreAdapter = new MediaStoreRecyclerAdapter(
+			requireContext(), R.layout.grid_item_media);
 		mMediaStoreAdapter.setListener(mListener);
-		view.setAdapter(mMediaStoreAdapter);
+		recyclerView.setAdapter(mMediaStoreAdapter);
 	}
 
 	private final MediaStoreRecyclerAdapter.MediaStoreRecyclerAdapterListener

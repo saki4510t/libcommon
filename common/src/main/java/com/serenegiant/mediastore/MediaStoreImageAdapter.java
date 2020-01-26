@@ -49,6 +49,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStore内の静止画をViewPagerで表示するためのPagerAdapter実装
+ * こっちはサムネイルではなくファイルからBitmapを指定サイズで読み込む
  */
 public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -59,7 +60,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private final ContentResolver mCr;
 	private final MyAsyncQueryHandler mQueryHandler;
 	protected boolean mDataValid;
-	protected int mRowIDColumn;
+//	protected int mRowIDColumn;
 	protected ChangeObserver mChangeObserver;
 	protected DataSetObserver mDataSetObserver;
 	private Cursor mCursor;
@@ -209,19 +210,27 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 		Cursor oldCursor = mCursor;
 		if (oldCursor != null) {
-			if (mChangeObserver != null) oldCursor.unregisterContentObserver(mChangeObserver);
-			if (mDataSetObserver != null) oldCursor.unregisterDataSetObserver(mDataSetObserver);
+			if (mChangeObserver != null) {
+				oldCursor.unregisterContentObserver(mChangeObserver);
+			}
+			if (mDataSetObserver != null) {
+				oldCursor.unregisterDataSetObserver(mDataSetObserver);
+			}
 		}
 		mCursor = newCursor;
 		if (newCursor != null) {
-			if (mChangeObserver != null) newCursor.registerContentObserver(mChangeObserver);
-			if (mDataSetObserver != null) newCursor.registerDataSetObserver(mDataSetObserver);
-			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
+			if (mChangeObserver != null) {
+				newCursor.registerContentObserver(mChangeObserver);
+			}
+			if (mDataSetObserver != null) {
+				newCursor.registerDataSetObserver(mDataSetObserver);
+			}
+//			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
 		} else {
-			mRowIDColumn = -1;
+//			mRowIDColumn = -1;
 			mDataValid = false;
 			// notify the observers about the lack of a data set
 			notifyDataSetInvalidated();
@@ -238,7 +247,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	protected LoaderDrawable createLoaderDrawable(
-		final ContentResolver cr, final MediaInfo info) {
+		@NonNull final ContentResolver cr, @NonNull final MediaInfo info) {
 
 		return new ImageLoaderDrawable(cr, info.width, info.height);
 	}
@@ -250,9 +259,12 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
+		@NonNull
 		private final MediaStoreImageAdapter mAdapter;
-		public MyAsyncQueryHandler(final ContentResolver cr,
-			final MediaStoreImageAdapter adapter) {
+
+		public MyAsyncQueryHandler(
+			@NonNull final ContentResolver cr,
+			@NonNull final MediaStoreImageAdapter adapter) {
 
 			super(cr);
 			mAdapter = adapter;

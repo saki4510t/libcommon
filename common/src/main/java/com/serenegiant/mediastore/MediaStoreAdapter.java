@@ -46,6 +46,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの静止画・動画一覧を取得するためのCursorAdapter実装
+ * 実データではなくサムネイルを表示する
  */
 public class MediaStoreAdapter extends CursorAdapter {
 
