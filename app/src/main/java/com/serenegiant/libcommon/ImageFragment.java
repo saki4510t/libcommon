@@ -148,7 +148,7 @@ public class ImageFragment extends BaseFragment {
 
 			Bitmap result = null;
 			try {
-				result = BitmapHelper.asBitmap(cr, id, 0, 0);
+				result = BitmapHelper.asBitmap(cr, id);
 				if (result != null) {
 					final int w = result.getWidth();
 					final int h = result.getHeight();
