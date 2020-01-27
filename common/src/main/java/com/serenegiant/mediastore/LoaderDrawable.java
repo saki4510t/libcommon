@@ -31,6 +31,7 @@ import android.graphics.Paint;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.util.DisplayMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +47,8 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	private Bitmap mBitmap;
     private int mRotation = 0;
     private ImageLoader mLoader;
-    private final int mWidth, mHeight;
+	private int mTargetDensity = DisplayMetrics.DENSITY_DEFAULT;
+    private int mBitmapWidth, mBitmapHeight;
 
 	/**
 	 * コンストラクタ
@@ -61,8 +63,8 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		mContentResolver = cr;
 		mDebugPaint.setColor(Color.RED);
 		mDebugPaint.setTextSize(18);
-		mWidth = width;
-		mHeight = height;
+		mBitmapWidth = width;
+		mBitmapHeight = height;
 	}
 
     @Override
@@ -89,10 +91,10 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
             mPaint.setColor(0xFFCCCCCC);
             canvas.drawRect(bounds, mPaint);
         }
-           if (DEBUG) {
-            canvas.drawText(Long.toString(mLoader != null ? mLoader.id() : -1),
-            	bounds.centerX(), bounds.centerY(), mDebugPaint);
-           }
+		if (DEBUG) {
+			canvas.drawText(Long.toString(mLoader != null ? mLoader.id() : -1),
+				bounds.centerX(), bounds.centerY(), mDebugPaint);
+		}
 	}
 
 	@NonNull
@@ -154,12 +156,12 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 
     @Override
     public int getIntrinsicWidth() {
-    	return mWidth;
+    	return mBitmapWidth;
     }
 
     @Override
     public int getIntrinsicHeight() {
-    	return mHeight;
+    	return mBitmapHeight;
     }
 
 	@Override
@@ -167,6 +169,50 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
         final Bitmap bm = mBitmap;
         return (bm == null || bm.hasAlpha() || mPaint.getAlpha() < 255) ?
                 PixelFormat.TRANSLUCENT : PixelFormat.OPAQUE;
+	}
+
+	/**
+	 * Set the density scale at which this drawable will be rendered. This
+	 * method assumes the drawable will be rendered at the same density as the
+	 * specified canvas.
+	 *
+	 * @param canvas The Canvas from which the density scale must be obtained.
+	 *
+	 * @see android.graphics.Bitmap#setDensity(int)
+	 * @see android.graphics.Bitmap#getDensity()
+	 */
+	public void setTargetDensity(@NonNull final  Canvas canvas) {
+		setTargetDensity(canvas.getDensity());
+	}
+
+	/**
+	 * Set the density scale at which this drawable will be rendered.
+	 *
+	 * @param metrics The DisplayMetrics indicating the density scale for this drawable.
+	 *
+	 * @see android.graphics.Bitmap#setDensity(int)
+	 * @see android.graphics.Bitmap#getDensity()
+	 */
+	public void setTargetDensity(@NonNull final DisplayMetrics metrics) {
+		setTargetDensity(metrics.densityDpi);
+	}
+
+	/**
+	 * Set the density at which this drawable will be rendered.
+	 *
+	 * @param density The density scale for this drawable.
+	 *
+	 * @see android.graphics.Bitmap#setDensity(int)
+	 * @see android.graphics.Bitmap#getDensity()
+	 */
+	public void setTargetDensity(final int density) {
+		if (mTargetDensity != density) {
+			mTargetDensity = density == 0 ? DisplayMetrics.DENSITY_DEFAULT : density;
+			if (mBitmap != null) {
+				computeBitmapSize();
+			}
+			invalidateSelf();
+		}
 	}
 
     /**
@@ -217,7 +263,17 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	private void setBitmap(@NonNull final Bitmap bitmap) {
 		if (bitmap != mBitmap) {
 			mBitmap = bitmap;
+			computeBitmapSize();
             updateDrawMatrix(getBounds());
+		}
+	}
+
+	private void computeBitmapSize() {
+		if (mBitmap != null) {
+			mBitmapWidth = mBitmap.getScaledWidth(mTargetDensity);
+			mBitmapHeight = mBitmap.getScaledHeight(mTargetDensity);
+		} else {
+			mBitmapWidth = mBitmapHeight = -1;
 		}
 	}
 }
