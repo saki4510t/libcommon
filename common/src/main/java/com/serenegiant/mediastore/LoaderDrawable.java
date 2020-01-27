@@ -105,7 +105,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		return mContentResolver;
 	}
 
-	private void updateDrawMatrix(final Rect bounds) {
+	private void updateDrawMatrix(@NonNull final Rect bounds) {
 	    if (mBitmap == null || bounds.isEmpty()) {
 	        mDrawMatrix.reset();
 	        return;
