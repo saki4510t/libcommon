@@ -353,6 +353,26 @@ public final class BitmapHelper {
 	 * 指定したIDの静止画をContentResolverから読み込む
 	 * @param cr
 	 * @param id
+	 * @return
+	 * @throws IOException
+	 */
+	@Nullable
+	public static final Bitmap asBitmap(@NonNull final ContentResolver cr,
+		final long id) throws IOException {
+
+		Bitmap result = null;
+		final Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+		final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
+		if (pfd != null) {
+			result = asBitmap(pfd.getFileDescriptor());
+		}
+		return result;
+	}
+
+	/**
+	 * 指定したIDの静止画をContentResolverから読み込む
+	 * @param cr
+	 * @param id
 	 * @param requestWidth
 	 * @param requestHeight
 	 * @return
