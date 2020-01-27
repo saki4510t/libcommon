@@ -535,6 +535,8 @@ public final class BitmapHelper {
 		@Nullable final Bitmap bitmap,
 		final int requestWidth, final int requestHeight) {
 
+		if (DEBUG) Log.v(TAG, String.format("scaleBitmap:(%dx%d)",
+			requestWidth, requestHeight));
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -543,7 +545,7 @@ public final class BitmapHelper {
 			matrix.postScale(width / (float)requestWidth, height / (float)requestHeight);
 			newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		}
-//		if (DEBUG) Log.v(TAG, "scaleBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
+		if (DEBUG) Log.v(TAG, "scaleBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
 		return newBitmap;
 	}
 
@@ -557,6 +559,7 @@ public final class BitmapHelper {
 	public static Bitmap rotateBitmap(
 		@Nullable final Bitmap bitmap, final int rotation) {
 
+		if (DEBUG) Log.v(TAG, String.format("rotateBitmap:%d", rotation));
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -565,7 +568,7 @@ public final class BitmapHelper {
 			matrix.postRotate(rotation);
 			newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		}
-//		if (DEBUG) Log.v(TAG, "rotateBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
+		if (DEBUG) Log.v(TAG, "rotateBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
 		return newBitmap;
 	}
 
@@ -582,6 +585,8 @@ public final class BitmapHelper {
 		@Nullable final Bitmap bitmap,
 		final int requestWidth, final int requestHeight, final int rotation) {
 
+		if (DEBUG) Log.v(TAG, String.format("scaleRotateBitmap:(%dx%d)/%d",
+			requestWidth, requestHeight, rotation));
 		Bitmap newBitmap = null;
 		if (bitmap != null) {
 			final int width = bitmap.getWidth();
@@ -591,7 +596,7 @@ public final class BitmapHelper {
 			matrix.postRotate(rotation);
 			newBitmap = Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
 		}
-//		if (DEBUG) Log.v(TAG, "scaleBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
+		if (DEBUG) Log.v(TAG, "scaleBitmap:bitmap=" + bitmap + " newBitmap=" + newBitmap);
 		return newBitmap;
 	}
 
@@ -759,8 +764,8 @@ public final class BitmapHelper {
 				inSampleSize = Math.round(imageWidth / (float)reqWidth);	// Math.floor
 			}
 		}
-/*		if (DEBUG) Log.v(TAG, String.format("calcSampleSize:image=(%d,%d),request=(%d,%d),inSampleSize=%d",
-				imageWidth, imageHeight, reqWidth, reqHeight, inSampleSize)); */
+		if (DEBUG) Log.v(TAG, String.format("calcSampleSize:(%dx%d)=>(%dx%d)/img(%dx%d),inSampleSize=%d",
+			requestWidth, requestHeight, reqWidth, reqHeight, imageWidth, imageHeight, inSampleSize));
 		return inSampleSize;
 	}
 
@@ -897,17 +902,24 @@ public final class BitmapHelper {
 		final int rotation = exif.getAttributeInt(
 			ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
 
+		int result;
 		switch (rotation) {
 		case ExifInterface.ORIENTATION_ROTATE_90:
-			return 90;
+			result = 90;
+			break;
 		case ExifInterface.ORIENTATION_ROTATE_180:
-			return 180;
+			result = 180;
+			break;
 		case ExifInterface.ORIENTATION_ROTATE_270:
-			return 270;
+			result = 270;
+			break;
 		case ExifInterface.ORIENTATION_UNDEFINED:
 		default:
-			return 0;
+			result = 0;
+			break;
 		}
+		if (DEBUG) Log.v(TAG, "getOrientation:" + result);
+		return result;
 	}
 
 	/**
@@ -962,6 +974,7 @@ public final class BitmapHelper {
 				cursor.close();
 			}
 		}
+		if (DEBUG) Log.v(TAG, "getOrientationFromMediaStore:" + result);
 		return result;
 	}
 
