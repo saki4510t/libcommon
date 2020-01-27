@@ -19,6 +19,7 @@ package com.serenegiant.libcommon;
 */
 
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.serenegiant.mediastore.MediaInfo;
 import com.serenegiant.mediastore.MediaStoreAdapter;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 
 /** 端末内の静止画・動画一覧を表示するためのFragment */
 public class GalleyFragment extends BaseFragment {
@@ -87,20 +89,21 @@ public class GalleyFragment extends BaseFragment {
 	private void doPlay(final int position, final long id) {
 		final MediaInfo info = mMediaStoreAdapter.getMediaInfo(position);
 		if (DEBUG) Log.v(TAG, "" + info);
-//		final Fragment fragment;
-//		switch (info.mediaType) {
-//		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-//			// 静止画を選択した時
-//			fragment = PhotoFragment.newInstance(id);
-//			break;
-//		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-//			// 動画を選択した時
-//			fragment = PlayerFragment.newInstance(info.data);
-//			break;
-//		default:
-//			fragment = null;
-//			break;
-//		}
-//		replace(fragment);
+		switch (info.mediaType) {
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+			// 静止画を選択した時
+			requireFragmentManager()
+				.beginTransaction()
+				.addToBackStack(null)
+				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+				.replace(R.id.container, ImageFragment.newInstance(info))
+				.commit();
+			break;
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+			// 動画を選択した時
+			break;
+		default:
+			break;
+		}
 	}
 }

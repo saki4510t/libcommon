@@ -29,6 +29,7 @@ import com.serenegiant.mediastore.MediaStoreRecyclerAdapter;
 import com.serenegiant.widget.RecycleViewWithEmptyView;
 
 import androidx.annotation.NonNull;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -97,6 +98,12 @@ public class GalleyFragment2 extends BaseFragment {
 			@NonNull final View view, @NonNull final MediaInfo item) {
 
 			if (DEBUG) Log.v(TAG, "onItemClick:" + item);
+			requireFragmentManager()
+				.beginTransaction()
+				.addToBackStack(null)
+				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+				.replace(R.id.container, ImageFragment.newInstance(item))
+				.commit();
 		}
 
 		@Override
