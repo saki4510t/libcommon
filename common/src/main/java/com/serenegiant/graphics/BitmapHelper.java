@@ -952,12 +952,12 @@ public final class BitmapHelper {
 //--------------------------------------------------------------------------------
 	/**
 	 * 画像の回転角度を取得
-	 * @param context
+	 * @param cr
 	 * @param imageUri
 	 * @return 0, 90, 180, 270
 	 */
 	public static int getImageRotation(
-		@NonNull final Context context, @NonNull final  Uri imageUri) {
+		@NonNull final ContentResolver cr, @NonNull final  Uri imageUri) {
 
 	    try {
 	    	// これはファイルの市によってはパーミッションが必要かも
@@ -967,7 +967,7 @@ public final class BitmapHelper {
 
 	        if (rotation == ExifInterface.ORIENTATION_UNDEFINED) {
 	        	// Exifに値がセットされていないときはMediaStoreからの取得を試みる
-	            return getRotationFromMediaStore(context, imageUri);
+	            return getRotationFromMediaStore(cr, imageUri);
 			} else {
 				switch (rotation) {
 				case ExifInterface.ORIENTATION_ROTATE_90:
@@ -987,17 +987,17 @@ public final class BitmapHelper {
 
 	/**
 	 * MediaStoreから画像の回転角度を取得
-	 * @param context
+	 * @param cr
 	 * @param imageUri
 	 * @return 0, 90, 180, 270
 	 */
 	public static int getRotationFromMediaStore(
-		@NonNull final Context context, @NonNull final  Uri imageUri) {
+		@NonNull final ContentResolver cr, @NonNull final  Uri imageUri) {
 
 	    final String[] columns = {MediaStore.Images.Media.DATA, "orientation"};
 	    int result = 0;
-	    final Cursor cursor = context.getContentResolver()
-	    	.query(imageUri, columns, null, null, null);
+	    final Cursor cursor
+	    	= cr.query(imageUri, columns, null, null, null);
 	    try {
 	    	if (cursor != null) {
 				cursor.moveToFirst();
