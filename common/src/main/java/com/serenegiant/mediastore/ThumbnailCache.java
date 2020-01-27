@@ -162,12 +162,11 @@ public class ThumbnailCache {
 			if ((requestWidth <= 0) || (requestHeight <= 0)) {
 				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
 			} else {
-				BitmapFactory.Options options = null;
 				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
 				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
 					kind = MediaStore.Images.Thumbnails.MINI_KIND;
 				try {
-					result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, options);
+					result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, null);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
 				}
@@ -210,12 +209,11 @@ public class ThumbnailCache {
 		final String key = getKey(hashCode, id);
 		Bitmap result = sThumbnailCache.get(key);
 		if (result == null) {
-			BitmapFactory.Options options = null;
 			int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
 			if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
 				kind = MediaStore.Video.Thumbnails.MINI_KIND;
 			try {
-				result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, options);
+				result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, null);
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
