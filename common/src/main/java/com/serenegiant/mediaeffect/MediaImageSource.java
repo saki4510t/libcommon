@@ -35,12 +35,23 @@ public class MediaImageSource extends MediaSource {
 		setSource(src);
 	}
 
+	/**
+	 * 映像ソース用のBitmapをセット
+	 * GLコンテキスト内で呼び出すこと
+	 * @param bitmap
+	 * @return
+	 */
 	public ISource setSource(final Bitmap bitmap) {
 		mImageOffscreen.loadBitmap(bitmap);
 		reset();
 		return this;
 	}
 
+	/**
+	 * オフスクリーンを初期状態に戻す
+	 * GLコンテキスト内で呼び出すこと
+	 * @return
+	 */
 	@Override
 	public ISource reset() {
 		super.reset();
@@ -49,6 +60,12 @@ public class MediaImageSource extends MediaSource {
 		return this;
 	}
 
+	/**
+	 * IEffectを適用する。1回呼び出す毎に入力と出力のオフスクリーン(テクスチャ)が入れ替わる
+	 * GLコンテキスト内で呼び出すこと
+	 * @param effect
+	 * @return
+	 */
 	@Override
 	public ISource apply(IEffect effect) {
 		if (mSourceScreen != null) {

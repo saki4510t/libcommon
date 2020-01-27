@@ -46,6 +46,11 @@ public class MediaSource implements ISource {
 		resize(width, height);
 	}
 
+	/**
+	 * オフスクリーンを初期状態に戻す
+	 * GLコンテキスト内で呼び出すこと
+	 * @return
+	 */
 	@Override
 	public ISource reset() {
 		needSwap = false;
@@ -53,6 +58,13 @@ public class MediaSource implements ISource {
 		return this;
 	}
 
+	/**
+	 * 映像サイズを設定
+	 * GLコンテキスト内で呼び出すこと
+	 * @param width
+	 * @param height
+	 * @return
+	 */
 	@Override
 	public ISource resize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("resize(%d,%d):", width, height));
@@ -79,6 +91,12 @@ public class MediaSource implements ISource {
 		return this;
 	}
 
+	/**
+	 * IEffectを適用する。1回呼び出す毎に入力と出力のオフスクリーン(テクスチャ)が入れ替わる
+	 * GLコンテキスト内で呼び出すこと
+	 * @param effect
+	 * @return
+	 */
 	@Override
 	public ISource apply(final IEffect effect) {
 		if (mSourceScreen != null) {
@@ -128,6 +146,10 @@ public class MediaSource implements ISource {
 		return needSwap ? mOutputScreen : mSourceScreen;
 	}
 
+	/**
+	 * 関係するリソースを破棄
+	 * GLコンテキスト内で呼び出すこと
+	 */
 	@Override
 	public void release() {
 		mSrcTexIds[0] = -1;
