@@ -50,6 +50,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 
 	/**
 	 * コンストラクタ
+	 * XXX 仮のサイズをセットしておかないとListView/GridView/RecyclerView等の描画が極端に遅くなる
 	 * @param cr
 	 * @param width
 	 * @param height
