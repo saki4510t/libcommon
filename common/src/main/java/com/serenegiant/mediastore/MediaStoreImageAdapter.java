@@ -189,6 +189,53 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		return view.equals(object);
 	}
 
+	/**
+	 * get MediaInfo at specified position
+	 * @param position
+	 * @return
+	 */
+	@NonNull
+	public MediaInfo getMediaInfo(final int position) {
+		return getMediaInfo(position, null);
+	}
+
+	/**
+	 * get MediaInfo at specified position
+	 * @param position
+	 * @param info
+	 * @return
+	 */
+	@NonNull
+	public synchronized MediaInfo getMediaInfo(
+		final int position, @Nullable final MediaInfo info) {
+
+		final MediaInfo _info = info != null ? info : new MediaInfo();
+
+/*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
+		// but it will take more time.
+		final Cursor cursor = mCr.query(
+			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, getItemId(position)),
+			PROJ_IMAGE, mSelection, mSelectionArgs, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+		if (cursor != null) {
+			try {
+				if (cursor.moveToFirst()) {
+					info = readMediaInfo(cursor, new MediaInfo());
+				}
+			} finally {
+				cursor.close();
+			}
+		} */
+		if (mCursor == null) {
+			mCursor = mCr.query(
+				QUERY_URI, PROJ_MEDIA,
+				mSelection, mSelectionArgs, null);
+		}
+		if (mCursor.moveToPosition(position)) {
+			_info.loadFromCursor(mCursor);
+		}
+		return _info;
+	}
+
 	protected void changeCursor(@Nullable final Cursor cursor) {
 		final Cursor old = swapCursor(cursor);
 		if ((old != null) && !old.isClosed()) {

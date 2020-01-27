@@ -266,6 +266,12 @@ public class MediaStoreRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * get MediaInfo at specified position
+	 * @param position
+	 * @param info
+	 * @return
+	 */
 	@NonNull
 	private synchronized MediaInfo getMediaInfo(
 		final int position, @Nullable final MediaInfo info) {

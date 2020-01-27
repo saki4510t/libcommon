@@ -31,6 +31,7 @@ import android.provider.MediaStore;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.cursoradapter.widget.CursorAdapter;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -239,11 +240,21 @@ public class MediaStoreAdapter extends CursorAdapter {
 	 * @param position
 	 * @return
 	 */
+	@NonNull
 	public MediaInfo getMediaInfo(final int position) {
 		return getMediaInfo(position, null);
 	}
 
-	public synchronized MediaInfo getMediaInfo(final int position, final MediaInfo info) {
+	/**
+	 * get MediaInfo at specified position
+	 * @param position
+	 * @param info
+	 * @return
+	 */
+	@NonNull
+	public synchronized MediaInfo getMediaInfo(
+		final int position, @Nullable final MediaInfo info) {
+
 		final MediaInfo _info = info != null ? info : new MediaInfo();
 
 /*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
