@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.provider.MediaStore;
+import android.util.Log;
 
 import java.util.Locale;
 
@@ -36,6 +37,8 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * MediaStoreの情報を保持するためのコンテナクラス
  */
 public class MediaInfo implements Parcelable {
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final String TAG = MediaInfo.class.getSimpleName();
 
 	public static final Creator<MediaInfo> CREATOR = new Creator<MediaInfo>() {
 		@Override
@@ -58,6 +61,7 @@ public class MediaInfo implements Parcelable {
 	public int mediaType;
 	public int width;
 	public int height;
+	public int orientation;
 
 	/**
 	 * デフォルトコンストラクタ
@@ -79,6 +83,7 @@ public class MediaInfo implements Parcelable {
 			mediaType = src.mediaType;
 			width = src.width;
 			height = src.height;
+			orientation = src.orientation;
 		}
 	}
 
@@ -95,6 +100,7 @@ public class MediaInfo implements Parcelable {
 		mediaType = in.readInt();
 		width = in.readInt();
 		height = in.readInt();
+		orientation = in.readInt();
 	}
 
 	/**
@@ -129,8 +135,11 @@ public class MediaInfo implements Parcelable {
 			try {
 				width = cursor.getInt(PROJ_INDEX_WIDTH);
 				height = cursor.getInt(PROJ_INDEX_HEIGHT);
+				// Android 10以降でないとORIENTATIONが無い機種が多いのでここではセットしない
+//				orientation = cursor.getInt(PROJ_INDEX_ORIENTATION);
 			} catch (final Exception e) {
 				// ignore
+				if (DEBUG) Log.w(TAG, e);
 			}
 		}
 		return this;
@@ -150,6 +159,7 @@ public class MediaInfo implements Parcelable {
 			mediaType = src.mediaType;
 			width = src.width;
 			height = src.height;
+			orientation = src.orientation;
 		}
 		return this;
 	}
@@ -180,8 +190,8 @@ public class MediaInfo implements Parcelable {
 	@Override
 	public String toString() {
 		return String.format(Locale.US,
-			"MediaInfo(id=%d,title=%s,displayName=%s,mediaType=%s,mime=%s,data=%s)",
-			id, title, displayName, mediaType(mediaType), mime, data);
+			"MediaInfo(id=%d,title=%s,displayName=%s,mediaType=%s,orientation=%d,mime=%s,data=%s)",
+			id, title, displayName, mediaType(mediaType), orientation, mime, data);
 	}
 
 	@Override
@@ -199,6 +209,7 @@ public class MediaInfo implements Parcelable {
 		dest.writeInt(mediaType);
 		dest.writeInt(width);
 		dest.writeInt(height);
+		dest.writeInt(orientation);
 	}
 
 //--------------------------------------------------------------------------------
