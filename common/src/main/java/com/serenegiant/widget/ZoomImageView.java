@@ -484,7 +484,7 @@ public class ZoomImageView extends AppCompatImageView {
 		// if there is no image, leave to super class
 		if (!hasImage()) return super.onTouchEvent(event);
 
-		if (DEBUG) Log.v(TAG, "onTouchEvent:" + event);
+		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		final int actionCode = event.getActionMasked();	// >= API8
 		
@@ -669,7 +669,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * initialization of ZoomImageView called from #init
 	 */
 	private final void init() {
-		if (DEBUG) Log.v(TAG, "init:");
+		if (DEBUG) Log.v(TAG, "init:" + mIsRestored);
 		clearCallbacks();
 		if (!mIsRestored) {
 			// Scale the image uniformly (maintain the image's aspect ratio)
@@ -789,7 +789,7 @@ public class ZoomImageView extends AppCompatImageView {
 
 		float dx = event.getX() - mPrimaryX;
 		float dy = event.getY() - mPrimaryY;
-		
+
 		// calculate the corner coordinates of image applied matrix
 		// [(left,top),(right,top),(right,bottom),(left.bottom)]
 		mTrans[0] = mTrans[6] = mImageRect.left;
