@@ -75,7 +75,7 @@ import androidx.appcompat.widget.AppCompatImageView;
 public class ZoomImageView extends AppCompatImageView {
 	
 	private static final boolean DEBUG = false;	// TODO for debugging
-	private static final String TAG = "ZoomImageView";
+	private static final String TAG = ZoomImageView.class.getSimpleName();
 	
 	// constants
 	/**
