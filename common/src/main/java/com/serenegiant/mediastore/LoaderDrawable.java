@@ -40,9 +40,12 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = LoaderDrawable.class.getSimpleName();
 
+	private static final int DEFAULT_PAINT_FLAGS =
+		Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG;
+
 	private final ContentResolver mContentResolver;
-    private final Paint mPaint = new Paint();
-    private final Paint mDebugPaint = new Paint();
+    private final Paint mPaint = new Paint(DEFAULT_PAINT_FLAGS);
+    private final Paint mDebugPaint = new Paint(DEFAULT_PAINT_FLAGS);
     private final Matrix mDrawMatrix = new Matrix();
 	private Bitmap mBitmap;
     private int mRotation = 0;
