@@ -866,6 +866,58 @@ public final class BitmapHelper {
 	}
 
 //--------------------------------------------------------------------------------
+
+	/**
+	 * 画像の回転角度を取得
+	 * @param path
+	 * @return 0, 90, 180, 270
+	 */
+	public static int getOrientation(final String path) {
+		final ExifInterface exif;
+	    try {
+	    	// これはファイルの位置によってはパーミッションが必要かも
+	        exif = new ExifInterface(path);
+		} catch (final Exception e) {	// IOException/IllegalArgumentException
+//        	if (DEBUG) Log.w(TAG, e);
+			return 0;
+		}
+		return getOrientation(exif);
+	}
+
+	/**
+	 * 画像の回転角度を取得
+	 * @param fd
+	 * @return 0, 90, 180, 270
+	 */
+	public static int getOrientation(final FileDescriptor fd) {
+		final ExifInterface exif;
+	    try {
+			// これはファイルの位置によってはパーミッションが必要かも
+	        exif = new ExifInterface(fd);
+		} catch (final Exception e) {	// IOException/IllegalArgumentException
+//        	if (DEBUG) Log.w(TAG, e);
+			return 0;
+		}
+		return getOrientation(exif);
+	}
+
+	private static int getOrientation(@NonNull final ExifInterface exif) {
+		final int rotation = exif.getAttributeInt(
+			ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+		switch (rotation) {
+		case ExifInterface.ORIENTATION_ROTATE_90:
+			return 90;
+		case ExifInterface.ORIENTATION_ROTATE_180:
+			return 180;
+		case ExifInterface.ORIENTATION_ROTATE_270:
+			return 270;
+		case ExifInterface.ORIENTATION_UNDEFINED:
+		default:
+			return 0;
+		}
+	}
+
 	/**
 	 * 画像の回転角度を取得
 	 * @param cr
@@ -877,7 +929,7 @@ public final class BitmapHelper {
 
 		final ExifInterface exif;
 	    try {
-	    	// これはファイルの市によってはパーミッションが必要かも
+			// これはファイルの位置によってはパーミッションが必要かも
 	        exif = new ExifInterface(UriHelper.getAbsolutePath(cr, imageUri));
 		} catch (final Exception e) {	// IOException/IllegalArgumentException
 //        	if (DEBUG) Log.w(TAG, e);
@@ -890,16 +942,7 @@ public final class BitmapHelper {
         	// Exifに値がセットされていないときはMediaStoreからの取得を試みる
             return getOrientationFromMediaStore(cr, imageUri);
 		} else {
-			switch (rotation) {
-			case ExifInterface.ORIENTATION_ROTATE_90:
-				return 90;
-			case ExifInterface.ORIENTATION_ROTATE_180:
-				return 180;
-			case ExifInterface.ORIENTATION_ROTATE_270:
-				return 270;
-			default:
-				return 0;
-			}
+			return getOrientation(exif);
 		}
 	}
 
