@@ -949,6 +949,7 @@ public final class BitmapHelper {
 		return offscreen;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 画像の回転角度を取得
 	 * @param context
@@ -959,6 +960,7 @@ public final class BitmapHelper {
 		@NonNull final Context context, @NonNull final  Uri imageUri) {
 
 	    try {
+	    	// これはファイルの市によってはパーミッションが必要かも
 	        final ExifInterface exif = new ExifInterface(imageUri.getPath());
 	        final int rotation = exif.getAttributeInt(
 	        	ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
@@ -994,7 +996,8 @@ public final class BitmapHelper {
 
 	    final String[] columns = {MediaStore.Images.Media.DATA, "orientation"};
 	    int result = 0;
-	    final Cursor cursor = context.getContentResolver().query(imageUri, columns, null, null, null);
+	    final Cursor cursor = context.getContentResolver()
+	    	.query(imageUri, columns, null, null, null);
 	    try {
 	    	if (cursor != null) {
 				cursor.moveToFirst();
