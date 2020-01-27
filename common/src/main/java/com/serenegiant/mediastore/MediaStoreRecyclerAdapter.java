@@ -442,6 +442,7 @@ public class MediaStoreRecyclerAdapter
 				}
 				if (mListener != null) {
 					final MediaInfo info = (MediaInfo) v.getTag(R.id.info);
+					if (DEBUG) Log.v(TAG, "onClick:info=" + info);
 					if (info != null) {
 						try {
 							mListener.onItemClick(
@@ -450,6 +451,7 @@ public class MediaStoreRecyclerAdapter
 							Log.w(TAG, e);
 						}
 					} else if (DEBUG) {
+						// ここにくるのはおかしい
 						Log.d(TAG, "MediaInfo not attached!");
 					}
 				}
@@ -475,6 +477,9 @@ public class MediaStoreRecyclerAdapter
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
+				} else if (DEBUG) {
+					// ここにくるのはおかしい
+					Log.d(TAG, "MediaInfo not attached!");
 				}
 			}
 			return false;
@@ -542,8 +547,7 @@ public class MediaStoreRecyclerAdapter
 		@NonNull final MediaInfo info) {
 
 //		if (DEBUG) Log.v(TAG, "setInfo:" + info);
-		holder.info = info;
-		holder.itemView.setTag(R.id.info, info);
+		holder.info.set(info);
 		// ローカルキャッシュ
 		final ImageView iv = holder.mImageView;
 		final TextView tv = holder.mTitleView;
@@ -568,10 +572,12 @@ public class MediaStoreRecyclerAdapter
 	public static class ViewHolder extends RecyclerView.ViewHolder {
 		private TextView mTitleView;
 		private ImageView mImageView;
-		private MediaInfo info;
+		@NonNull
+		private final MediaInfo info = new MediaInfo();
 
 		public ViewHolder(@NonNull final View v) {
 			super(v);
+			v.setTag(R.id.info, info);
 			if (v instanceof TextView) {
 				mTitleView = (TextView)v;
 				mImageView = null;
