@@ -346,15 +346,6 @@ public final class BitmapHelper {
 					bitmap = newBitmap;
 				}
 			}
-/*			final InputStream input = cr.openInputStream(uri);
-			bitmap = BitmapFactory.decodeStream(input);
-			input.close();
-			final int orientation = getOrientation(cr, uri);
-			if (orientation != 0) {
-				final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
-				bitmap.recycle();
-				bitmap = newBitmap;
-			} */
 		}
 		return bitmap;
 	}
@@ -389,24 +380,6 @@ public final class BitmapHelper {
 					bitmap = newBitmap;
 				}
 			}
-/*			InputStream input = cr.openInputStream(uri);
-			if (input != null) {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-				BitmapFactory.decodeStream(input, null, options);
-				input.close(); input = null;
-				options.inJustDecodeBounds = false;
-				options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-				input = cr.openInputStream(uri);
-				bitmap = BitmapFactory.decodeStream(input, null, options);
-				input.close();
-				final int orientation = getOrientation(cr, uri);
-				if (orientation != 0) {
-					final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
-					bitmap.recycle();
-					bitmap = newBitmap;
-				}
-			} */
 		}
 //		if (DEBUG) Log.v(TAG, "asBitmap:" + bitmap);
 		return bitmap;
@@ -451,31 +424,6 @@ public final class BitmapHelper {
 					bitmap = newBitmap;
 				}
 			}
-/*			InputStream input = cr.openInputStream(uri);
-			if (input != null) {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-				BitmapFactory.decodeStream(input, null, options);
-				// 本当はmark/resetを使えばいいんだけどmarkのreadlimitに適当に十分大きい数字を入れるしか無いので一旦閉じて再度取得する
-				// FileDescriptorを使えばファイルのサイズが取れそうだけど・・・それならdecodeFileDescriptor使うほうが良さそう？
-				input.close(); input = null;
-				// 一番近いサイズになるSamplingSizeを計算
-				final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-				// 2のベキ乗に丸める=MSBを取得
-				final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
-				options.inSampleSize = inSampleSize;
-//				options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする(API11以上)
-				options.inJustDecodeBounds = false;
-				input = cr.openInputStream(uri);
-				bitmap = BitmapFactory.decodeStream(input, null, options);
-				input.close();
-				final int orientation = getOrientation(cr, uri);
-				if ((inSampleSize != calcedSampleSize) || (orientation != 0)) {
-					Bitmap newBitmap = scaleRotateBitmap(bitmap, requestWidth, requestHeight, orientation);
-					bitmap.recycle();
-					bitmap = newBitmap;
-				}
-			} */
 		}
 		return bitmap;
 	}
