@@ -449,6 +449,7 @@ public final class BitmapHelper {
 	 * @param in
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public static Bitmap asBitmap(final InputStream in) {
 		Bitmap bitmap = null;
