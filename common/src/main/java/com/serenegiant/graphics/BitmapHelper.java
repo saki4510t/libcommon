@@ -296,6 +296,9 @@ public final class BitmapHelper {
 		return bitmap;
 	}
 
+//--------------------------------------------------------------------------------
+// ContentResolverを使うとき
+
 	/**
 	 * 指定したIDの静止画をContentResolverから読み込む
 	 * @param cr
@@ -477,6 +480,9 @@ public final class BitmapHelper {
 		return bitmap;
 	}
 
+//--------------------------------------------------------------------------------
+// InputStreamを使う場合
+
 	/**
 	 * ファイルからビットマップを読み込んでBitmapとして返す
 	 * @param in
@@ -551,6 +557,9 @@ public final class BitmapHelper {
 		}
 		return bitmap;
 	}
+
+//--------------------------------------------------------------------------------
+// Bitmapの操作メソッド
 
 	/**
 	 * 指定したサイズになるように拡大縮小したBitmapを生成して返す(Bitmap#createScaledBitmapと一緒かな?)
@@ -804,6 +813,7 @@ public final class BitmapHelper {
 		return dest;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのビットマップを生成
 	 * @return
@@ -835,28 +845,6 @@ public final class BitmapHelper {
 		if (DEBUG) Log.v(TAG, String.format("genMaskImage:(%dx%d)", width, height));
 
 		return getMaskImage0(width, height, size, alpha0, alphaMax);
-	}
-
-	/**
-	 * 飽和計算
-	 * @param v
-	 * @param min
-	 * @param max
-	 * @return
-	 */
-	private static int sat(final int v, final int min, final int max) {
-		return v < min ? min : (v > max ? max : v);
-	}
-
-	/**
-	 * 飽和計算
-	 * @param v
-	 * @param min
-	 * @param max
-	 * @return
-	 */
-	private static int sat(final float v, final float min, final float max) {
-		return (int)(v < min ? min : (v > max ? max : v));
 	}
 
 	/**
@@ -970,6 +958,30 @@ public final class BitmapHelper {
 			}
 		}
 		return result;
+	}
+
+//--------------------------------------------------------------------------------
+// その他
+	/**
+	 * 飽和計算
+	 * @param v
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	private static int sat(final int v, final int min, final int max) {
+		return v < min ? min : (v > max ? max : v);
+	}
+
+	/**
+	 * 飽和計算
+	 * @param v
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	private static int sat(final float v, final float min, final float max) {
+		return (int)(v < min ? min : (v > max ? max : v));
 	}
 
 }
