@@ -26,7 +26,6 @@ import java.io.InputStream;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
-import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -553,47 +552,6 @@ public final class BitmapHelper {
 		return bitmap;
 	}
 
-
-	public static int getOrientation(@NonNull final ContentResolver cr, @NonNull final Uri uri) {
-//		if (DEBUG) Log.v(TAG, "getOrientation:" + uri);
-
-        final ExifInterface exifInterface;
-        try {
-            exifInterface = new ExifInterface(UriHelper.getAbsolutePath(cr, uri));
-        } catch (final Exception e) {	// IOException/IllegalArgumentException
-//        	if (DEBUG) Log.w(TAG, e);
-            return 0;
-        }
-
-//		if (DEBUG) Log.v(TAG, "getOrientation:exifInterface=" + exifInterface);
-        final int exifR = exifInterface.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
-        int orientation;
-        switch (exifR) {
-            case ExifInterface.ORIENTATION_ROTATE_90:
-                orientation = 90;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_180:
-                orientation = 180;
-                break;
-            case ExifInterface.ORIENTATION_ROTATE_270:
-                orientation = 270;
-                break;
-            default:
-                orientation = 0;
-                break;
-        }
-/*		// 元画像自体を回転させるのであればExif情報も変更しないとダメ
-		if (orientation != 0) {
-            exifInterface.setAttribute(ExifInterface.TAG_ORIENTATION, "0");
-        	try {
-				exifInterface.saveAttributes();
-			} catch (IOException e) {
-			}
-        } */
-//		if (DEBUG) Log.v(TAG, "getOrientation:orientation=" + orientation);
-        return orientation;
-    }
-
 	/**
 	 * 指定したサイズになるように拡大縮小したBitmapを生成して返す(Bitmap#createScaledBitmapと一緒かな?)
 	 * @param bitmap
@@ -956,33 +914,35 @@ public final class BitmapHelper {
 	 * @param imageUri
 	 * @return 0, 90, 180, 270
 	 */
-	public static int getImageRotation(
+	public static int getOrientation(
 		@NonNull final ContentResolver cr, @NonNull final  Uri imageUri) {
 
+		final ExifInterface exif;
 	    try {
 	    	// これはファイルの市によってはパーミッションが必要かも
-	        final ExifInterface exif = new ExifInterface(imageUri.getPath());
-	        final int rotation = exif.getAttributeInt(
-	        	ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+	        exif = new ExifInterface(UriHelper.getAbsolutePath(cr, imageUri));
+		} catch (final Exception e) {	// IOException/IllegalArgumentException
+//        	if (DEBUG) Log.w(TAG, e);
+			return getOrientationFromMediaStore(cr, imageUri);
+		}
+        final int rotation = exif.getAttributeInt(
+        	ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
 
-	        if (rotation == ExifInterface.ORIENTATION_UNDEFINED) {
-	        	// Exifに値がセットされていないときはMediaStoreからの取得を試みる
-	            return getRotationFromMediaStore(cr, imageUri);
-			} else {
-				switch (rotation) {
-				case ExifInterface.ORIENTATION_ROTATE_90:
-					return 90;
-				case ExifInterface.ORIENTATION_ROTATE_180:
-					return 180;
-				case ExifInterface.ORIENTATION_ROTATE_270:
-					return 270;
-				default:
-					return 0;
-				}
+        if (rotation == ExifInterface.ORIENTATION_UNDEFINED) {
+        	// Exifに値がセットされていないときはMediaStoreからの取得を試みる
+            return getOrientationFromMediaStore(cr, imageUri);
+		} else {
+			switch (rotation) {
+			case ExifInterface.ORIENTATION_ROTATE_90:
+				return 90;
+			case ExifInterface.ORIENTATION_ROTATE_180:
+				return 180;
+			case ExifInterface.ORIENTATION_ROTATE_270:
+				return 270;
+			default:
+				return 0;
 			}
-	    } catch (final IOException e) {
-	        return 0;
-	    }
+		}
 	}
 
 	/**
@@ -991,7 +951,7 @@ public final class BitmapHelper {
 	 * @param imageUri
 	 * @return 0, 90, 180, 270
 	 */
-	public static int getRotationFromMediaStore(
+	public static int getOrientationFromMediaStore(
 		@NonNull final ContentResolver cr, @NonNull final  Uri imageUri) {
 
 	    final String[] columns = {MediaStore.Images.Media.DATA, "orientation"};
