@@ -123,9 +123,6 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			}
 			final TextView tv = holder.mTitleView = view.findViewById(R.id.title);
 			final ImageView iv = holder.mImageView = view.findViewById(R.id.thumbnail);
-			if (holder.info == null) {
-				holder.info = new MediaInfo();
-			}
 			holder.info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = iv.getDrawable();
@@ -257,7 +254,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final class ViewHolder {
 		TextView mTitleView;
 		ImageView mImageView;
-		MediaInfo info;
+		@NonNull
+		final MediaInfo info = new MediaInfo();
 	}
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
