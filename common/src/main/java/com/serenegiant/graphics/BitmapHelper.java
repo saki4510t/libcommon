@@ -330,7 +330,7 @@ public final class BitmapHelper {
 	 */
 	@Nullable
 	public static Bitmap asBitmap(@NonNull final ContentResolver cr, final Uri uri)
-		throws FileNotFoundException, IOException {
+		throws IOException {
 
 		Bitmap bitmap= null;
 		if (uri != null) {
@@ -368,8 +368,7 @@ public final class BitmapHelper {
 	@Nullable
 	public static Bitmap asBitmap(@NonNull final ContentResolver cr,
 		final Uri uri,
-		final int requestWidth, final int requestHeight)
-			throws FileNotFoundException, IOException {
+		final int requestWidth, final int requestHeight) throws IOException {
 
 		Bitmap bitmap = null;
 		if (uri != null) {
@@ -422,8 +421,7 @@ public final class BitmapHelper {
 	@Nullable
 	public static Bitmap asBitmapStrictSize(@NonNull final ContentResolver cr,
 		final Uri uri,
-		final int requestWidth, final int requestHeight)
-			throws FileNotFoundException, IOException {
+		final int requestWidth, final int requestHeight) throws IOException {
 
 		Bitmap bitmap = null;
 		if (uri != null) {
@@ -878,11 +876,7 @@ public final class BitmapHelper {
 
 		if (DEBUG) Log.v(TAG, String.format("genMaskImage:(%dx%d)", width, height));
 
-		switch (type) {
-		case 0:
-		default:
-			return getMaskImage0(width, height, size, alpha0, alphaMax);
-		}
+		return getMaskImage0(width, height, size, alpha0, alphaMax);
 	}
 
 	/**
