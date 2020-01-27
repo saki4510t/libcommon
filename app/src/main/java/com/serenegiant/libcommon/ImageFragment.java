@@ -28,7 +28,7 @@ public class ImageFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ImageFragment.class.getSimpleName();
 
-	private static final boolean USU_LOADER_DRAWABLE = true;
+	private static final boolean USU_LOADER_DRAWABLE = false;
 	private static final String ARG_MEDIA_INFO = "ARG_MEDIA_INFO";
 
 	public static ImageFragment newInstance(@NonNull final MediaInfo info) {
@@ -106,7 +106,25 @@ public class ImageFragment extends BaseFragment {
 			}
 			((LoaderDrawable)drawable).startLoad(mInfo.mediaType, 0, mInfo.id);
 		} else {
-			mImageView.setImageURI(mInfo.getUri());
+			queueEvent(new Runnable() {
+				@Override
+				public void run() {
+//					mImageView.setImageURI(mInfo.getUri());
+					try {
+						final Bitmap bitmap = BitmapHelper.asBitmap(
+							requireContext().getContentResolver(), mInfo.id);
+						runOnUiThread(new Runnable() {
+							@Override
+							public void run() {
+								mImageView.setImageBitmap(bitmap);
+							}
+						});
+					} catch (final IOException e) {
+						Log.w(TAG, e);
+						popBackStack();
+					}
+				}
+			});
 		}
 	}
 
