@@ -361,8 +361,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * @param context
 	 */
 	public ZoomImageView(final Context context) {
-		super(context);
-		// nothing to do now
+		this(context, null, 0);
 	}
 
 	/**
@@ -371,8 +370,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * @param attrs
 	 */
 	public ZoomImageView(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
-		// nothing to do now
+		this(context, attrs, 0);
 	}
 
 	/**
@@ -383,12 +381,13 @@ public class ZoomImageView extends AppCompatImageView {
 	 */
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		// nothing to do now
 	}
 
 	@Override
 	protected void onDetachedFromWindow() {
-		
+		if (DEBUG) Log.v(TAG, "onDetachedFromWindow:");
 		clearCallbacks();
 		super.onDetachedFromWindow();
 	}
@@ -426,7 +425,7 @@ public class ZoomImageView extends AppCompatImageView {
 
 	@Override
 	protected void onConfigurationChanged(final Configuration newConfig) {
-		if (DEBUG) Log.v(TAG, "onConfigurationChanged:");
+		if (DEBUG) Log.v(TAG, "onConfigurationChanged:" + newConfig);
 		
 		super.onConfigurationChanged(newConfig);
 		mIsRestored = false;
@@ -464,7 +463,8 @@ public class ZoomImageView extends AppCompatImageView {
 	}
 	
 	@Override
-	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
+	protected void onLayout(final boolean changed,
+		final int left, final int top, final int right, final int bottom) {
 		
 		super.onLayout(changed, left, top, right, bottom);
 
@@ -472,6 +472,8 @@ public class ZoomImageView extends AppCompatImageView {
 		// or no image assigned, skip initialization
 		if (getWidth() == 0 || getHeight() == 0 || !hasImage()) return;
 		
+		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
+			left, top, right, bottom));
 		mState = -1;	// reset state
 		init();
 	}
@@ -481,7 +483,9 @@ public class ZoomImageView extends AppCompatImageView {
 
 		// if there is no image, leave to super class
 		if (!hasImage()) return super.onTouchEvent(event);
-		
+
+		if (DEBUG) Log.v(TAG, "onTouchEvent:" + event);
+
 		final int actionCode = event.getActionMasked();	// >= API8
 		
 		switch (actionCode) {
@@ -584,6 +588,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * reset the zooming/rotating;
 	 */
 	public void reset() {
+		if (DEBUG) Log.v(TAG, "reset:");
 		init();
 	}
 	
@@ -664,6 +669,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * initialization of ZoomImageView called from #init
 	 */
 	private final void init() {
+		if (DEBUG) Log.v(TAG, "init:");
 		clearCallbacks();
 		if (!mIsRestored) {
 			// Scale the image uniformly (maintain the image's aspect ratio)
@@ -712,6 +718,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * remove all callbacks if they are in the message queue 
 	 */
 	private final void clearCallbacks() {
+		if (DEBUG) Log.v(TAG, "clearCallbacks:");
 		if (mWaitImageReset != null)
 			removeCallbacks(mWaitImageReset);
 		if (mStartCheckRotate != null)
@@ -724,6 +731,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * check zooming scale range
 	 */
 	private final void checkScale() {
+		if (DEBUG) Log.v(TAG, "checkScale:");
 		float scale = getMatrixScale();
 		if (scale < mMinScale) {
 			scale = mMinScale;
@@ -744,6 +752,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	private final void setState(final int state) {
+		if (DEBUG) Log.v(TAG, String.format("setState:%d→%d", mState, state));
 
 		if (mState != state) {
 			mState = state;
@@ -761,6 +770,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * @param event
 	 */
 	private final void startWaiting(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "startWaiting:");
 
 		mPrimaryId = 0;
 		mSecondaryId = -1;
@@ -870,6 +880,7 @@ public class ZoomImageView extends AppCompatImageView {
 	 * @param event
 	 */
 	private final void startCheck(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "startCheck:" + event);
 
 		if (event.getPointerCount() > 1) {
 			// primary touch
@@ -1019,7 +1030,8 @@ public class ZoomImageView extends AppCompatImageView {
 	
 	@SuppressLint("NewApi")
 	private final void callOnStartRotationListener() {
-		
+		if (DEBUG) Log.v(TAG, "callOnStartRotationListener:");
+
 		boolean result = false;
 		if (mOnStartRotationListener != null)
 		try {
