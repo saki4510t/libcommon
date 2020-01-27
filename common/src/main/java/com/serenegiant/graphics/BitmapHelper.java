@@ -26,6 +26,8 @@ import java.io.InputStream;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -951,6 +953,66 @@ public final class BitmapHelper {
 		// 透過円
 		canvas.drawCircle(cx, cy, r, paint);
 		return offscreen;
+	}
+
+	/**
+	 * 画像の回転角度を取得
+	 * @param context
+	 * @param imageUri
+	 * @return 0, 90, 180, 270
+	 */
+	public static int getImageRotation(
+		@NonNull final Context context, @NonNull final  Uri imageUri) {
+
+	    try {
+	        final ExifInterface exif = new ExifInterface(imageUri.getPath());
+	        final int rotation = exif.getAttributeInt(
+	        	ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
+
+	        if (rotation == ExifInterface.ORIENTATION_UNDEFINED) {
+	        	// Exifに値がセットされていないときはMediaStoreからの取得を試みる
+	            return getRotationFromMediaStore(context, imageUri);
+			} else {
+				switch (rotation) {
+				case ExifInterface.ORIENTATION_ROTATE_90:
+					return 90;
+				case ExifInterface.ORIENTATION_ROTATE_180:
+					return 180;
+				case ExifInterface.ORIENTATION_ROTATE_270:
+					return 270;
+				default:
+					return 0;
+				}
+			}
+	    } catch (final IOException e) {
+	        return 0;
+	    }
+	}
+
+	/**
+	 * MediaStoreから画像の回転角度を取得
+	 * @param context
+	 * @param imageUri
+	 * @return 0, 90, 180, 270
+	 */
+	public static int getRotationFromMediaStore(
+		@NonNull final Context context, @NonNull final  Uri imageUri) {
+
+	    final String[] columns = {MediaStore.Images.Media.DATA, "orientation"};
+	    int result = 0;
+	    final Cursor cursor = context.getContentResolver().query(imageUri, columns, null, null, null);
+	    try {
+	    	if (cursor != null) {
+				cursor.moveToFirst();
+				final int orientationColumnIndex = cursor.getColumnIndex(columns[1]);
+    			result = cursor.getInt(orientationColumnIndex);
+			}
+		} finally {
+			if (cursor != null) {
+				cursor.close();
+			}
+		}
+		return result;
 	}
 
 }
