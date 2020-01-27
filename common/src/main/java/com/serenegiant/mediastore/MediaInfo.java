@@ -66,6 +66,23 @@ public class MediaInfo implements Parcelable {
 	}
 
 	/**
+	 * コピーコンストラクタ
+	 * @param src
+	 */
+	public MediaInfo(@NonNull final MediaInfo src) {
+		if (src != this) {
+			id = src.id;
+			data = src.data;
+			title = src.title;
+			mime = src.mime;
+			displayName = src.displayName;
+			mediaType = src.mediaType;
+			width = src.width;
+			height = src.height;
+		}
+	}
+
+	/**
 	 * Parcelable用のコンストラクタ
 	 * @param in
 	 */
@@ -115,6 +132,24 @@ public class MediaInfo implements Parcelable {
 			} catch (final Exception e) {
 				// ignore
 			}
+		}
+		return this;
+	}
+
+	/**
+	 * セッター
+	 * @param src
+	 */
+	public MediaInfo set(@NonNull final MediaInfo src) {
+		if (src != this) {
+			id = src.id;
+			data = src.data;
+			title = src.title;
+			mime = src.mime;
+			displayName = src.displayName;
+			mediaType = src.mediaType;
+			width = src.width;
+			height = src.height;
 		}
 		return this;
 	}
