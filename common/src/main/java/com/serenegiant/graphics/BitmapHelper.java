@@ -66,9 +66,22 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	public static byte[] BitmapToByteArray(@NonNull final Bitmap bitmap) {
+		return BitmapToByteArray(bitmap, Bitmap.CompressFormat.PNG, 100);
+	}
+
+	/**
+	 * Bitmapをjpeg/png/webp形式のbyte[]に変換して返す
+	 * @param bitmap
+	 * @param format Bitmap.CompressFormat.JPEGまたはBitmap.CompressFormat.PNGまたはBitmap.CompressFormat.WEBP
+	 * @param quality JPEGのときのみ有効(0,100]
+	 * @return
+	 */
+	public static byte[] BitmapToByteArray(@NonNull final Bitmap bitmap,
+		final Bitmap.CompressFormat format, final int quality) {
+
 		final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 		byte[] bytes = null;
-        if (bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream)) {
+        if (bitmap.compress(format, quality, byteArrayOutputStream)) {
             bytes = byteArrayOutputStream.toByteArray();
         }
         return bytes;
