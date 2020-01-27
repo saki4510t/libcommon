@@ -925,6 +925,19 @@ public final class BitmapHelper {
 	/**
 	 * 画像の回転角度を取得
 	 * @param cr
+	 * @param id
+	 * @return 0, 90, 180, 270
+	 */
+	public static int getOrientation(
+		@NonNull final ContentResolver cr, final long id) {
+
+		return getOrientation(cr,
+			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id));
+	}
+
+	/**
+	 * 画像の回転角度を取得
+	 * @param cr
 	 * @param imageUri
 	 * @return 0, 90, 180, 270
 	 */
