@@ -28,6 +28,7 @@ public class ImageFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ImageFragment.class.getSimpleName();
 
+	private static final boolean USU_LOADER_DRAWABLE = true;
 	private static final String ARG_MEDIA_INFO = "ARG_MEDIA_INFO";
 
 	public static ImageFragment newInstance(@NonNull final MediaInfo info) {
@@ -96,13 +97,17 @@ public class ImageFragment extends BaseFragment {
 				if (DEBUG) Log.v(TAG, "onClick:" + v);
 			}
 		});
-		Drawable drawable = mImageView.getDrawable();
-		if (!(drawable instanceof LoaderDrawable)) {
-			drawable = new ImageLoaderDrawable(
-				requireContext().getContentResolver(), -1, -1);
-			mImageView.setImageDrawable(drawable);
+		if (USU_LOADER_DRAWABLE) {
+			Drawable drawable = mImageView.getDrawable();
+			if (!(drawable instanceof LoaderDrawable)) {
+				drawable = new ImageLoaderDrawable(
+					requireContext().getContentResolver(), -1, -1);
+				mImageView.setImageDrawable(drawable);
+			}
+			((LoaderDrawable)drawable).startLoad(mInfo.mediaType, 0, mInfo.id);
+		} else {
+			mImageView.setImageURI(mInfo.getUri());
 		}
-		((LoaderDrawable)drawable).startLoad(mInfo.mediaType, 0, mInfo.id);
 	}
 
 //--------------------------------------------------------------------------------
