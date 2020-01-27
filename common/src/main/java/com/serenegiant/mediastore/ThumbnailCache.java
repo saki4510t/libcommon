@@ -220,6 +220,13 @@ public class ThumbnailCache {
 			if (result != null) {
 				if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",
 					id, result.getWidth(), result.getHeight()));
+				// XXX 動画はExifが無いはずなのとAndroid10未満だとorientationフィールドが無い可能性が高いので実際には回転しないかも
+				final int orientation = BitmapHelper.getOrientation(cr, id);
+				if (orientation != 0) {
+					final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
+					result.recycle();
+					result = newBitmap;
+				}
 				// add to internal thumbnail cache(in memory)
 				sThumbnailCache.put(key, result);
 			} else {
