@@ -176,6 +176,12 @@ public final class BitmapHelper {
 		Bitmap bitmap= null;
 		if (!TextUtils.isEmpty(filePath)) {
 			bitmap = BitmapFactory.decodeFile(filePath);
+			final int orientation = getOrientation(filePath);
+			if (orientation != 0) {
+				final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
+				bitmap.recycle();
+				bitmap = newBitmap;
+			}
 		}
 		return bitmap;
 	}
@@ -200,6 +206,12 @@ public final class BitmapHelper {
 			options.inJustDecodeBounds = false;
 			options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
 			bitmap = BitmapFactory.decodeFile(filePath, options);
+			final int orientation = getOrientation(filePath);
+			if (orientation != 0) {
+				final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
+				bitmap.recycle();
+				bitmap = newBitmap;
+			}
 		}
 		return bitmap;
 	}
@@ -229,11 +241,13 @@ public final class BitmapHelper {
 //			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
 			options.inJustDecodeBounds = false;
 			bitmap = BitmapFactory.decodeFile(filePath, options);
+			final int orientation = getOrientation(filePath);
 			if ((inSampleSize != calcedSampleSize)
+				|| (orientation != 0)
 				|| (bitmap.getWidth() != requestWidth)
 				|| (bitmap.getHeight() != requestHeight)) {
 
-				final Bitmap newBitmap = scaleBitmap(bitmap, requestWidth, requestHeight);
+				final Bitmap newBitmap = scaleRotateBitmap(bitmap, requestWidth, requestHeight, orientation);
 				bitmap.recycle();
 				bitmap = newBitmap;
 			}
@@ -254,6 +268,12 @@ public final class BitmapHelper {
 		Bitmap bitmap= null;
 		if (fd != null && fd.valid()) {
 			bitmap = BitmapFactory.decodeFileDescriptor(fd);
+			final int orientation = getOrientation(fd);
+			if (orientation != 0) {
+				final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
+				bitmap.recycle();
+				bitmap = newBitmap;
+			}
 		}
 		return bitmap;
 	}
@@ -278,6 +298,12 @@ public final class BitmapHelper {
 			options.inJustDecodeBounds = false;
 			options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
 			bitmap = BitmapFactory.decodeFileDescriptor(fd, null, options);
+			final int orientation = getOrientation(fd);
+			if (orientation != 0) {
+				final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
+				bitmap.recycle();
+				bitmap = newBitmap;
+			}
 		}
 		return bitmap;
 	}
@@ -306,11 +332,13 @@ public final class BitmapHelper {
 //			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
 			options.inJustDecodeBounds = false;
 			bitmap = BitmapFactory.decodeFileDescriptor(fd, null, options);
+			final int orientation = getOrientation(fd);
 			if ((inSampleSize != calcedSampleSize)
+				|| (orientation != 0)
 				|| (bitmap.getWidth() != requestWidth)
 				|| (bitmap.getHeight() != requestHeight)) {
 
-				final Bitmap newBitmap = scaleBitmap(bitmap, requestWidth, requestHeight);
+				final Bitmap newBitmap = scaleRotateBitmap(bitmap, requestWidth, requestHeight, orientation);
 				bitmap.recycle();
 				bitmap = newBitmap;
 			}
@@ -337,8 +365,8 @@ public final class BitmapHelper {
 			throws IOException {
 
 		Bitmap result = null;
-		final ParcelFileDescriptor pfd = cr.openFileDescriptor(
-			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id), "r");
+		final Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+		final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 		if (pfd != null) {
 			result = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
 		}
@@ -360,13 +388,7 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				bitmap = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor());
-				final int orientation = getOrientation(cr, uri);
-				if (orientation != 0) {
-					final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
-					bitmap.recycle();
-					bitmap = newBitmap;
-				}
+				bitmap = asBitmap(pfd.getFileDescriptor());
 			}
 		}
 		return bitmap;
@@ -389,18 +411,7 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-				BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-				options.inJustDecodeBounds = false;
-				options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-				bitmap = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-				final int orientation = getOrientation(cr, uri);
-				if (orientation != 0) {
-					final Bitmap newBitmap = rotateBitmap(bitmap, orientation);
-					bitmap.recycle();
-					bitmap = newBitmap;
-				}
+				bitmap = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
 			}
 		}
 //		if (DEBUG) Log.v(TAG, "asBitmap:" + bitmap);
@@ -424,27 +435,7 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				final BitmapFactory.Options options = new BitmapFactory.Options();
-				options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-				BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-				// 一番近いサイズになるSamplingSizeを計算
-				final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-				// 2のベキ乗に丸める=MSBを取得
-				final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
-				options.inSampleSize = inSampleSize;
-//				options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする(API11以上)
-				options.inJustDecodeBounds = false;
-				bitmap = BitmapFactory.decodeFileDescriptor(pfd.getFileDescriptor(), null, options);
-				final int orientation = getOrientation(cr, uri);
-				if ((inSampleSize != calcedSampleSize)
-						|| (orientation != 0)
-						|| (bitmap.getWidth() != requestWidth)
-						|| (bitmap.getHeight() != requestHeight)) {
-
-					final Bitmap newBitmap = scaleRotateBitmap(bitmap, requestWidth, requestHeight, orientation);
-					bitmap.recycle();
-					bitmap = newBitmap;
-				}
+				bitmap = asBitmapStrictSize(pfd.getFileDescriptor(), requestWidth, requestHeight);
 			}
 		}
 		return bitmap;
