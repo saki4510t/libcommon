@@ -173,6 +173,12 @@ public class ThumbnailCache {
 				}
 			}
 			if (result != null) {
+				final int orientation = BitmapHelper.getOrientation(cr, id);
+				if (orientation != 0) {
+					final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
+					result.recycle();
+					result = newBitmap;
+				}
 				if (DEBUG) Log.v(TAG, String.format("getImageThumbnail:id=%d(%d,%d)",
 					id, result.getWidth(), result.getHeight()));
 				// add to internal thumbnail cache(in memory)
