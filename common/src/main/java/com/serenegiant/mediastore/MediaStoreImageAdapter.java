@@ -67,6 +67,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private Cursor mCursor;
 	private String mSelection = SELECTIONS[MEDIA_IMAGE];	// 静止画のみ有効
 	private String[] mSelectionArgs = null;
+	@NonNull
+	private final MediaInfo info = new MediaInfo();
 
 	private boolean mShowTitle;
 
@@ -123,18 +125,18 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			}
 			final TextView tv = holder.mTitleView = view.findViewById(R.id.title);
 			final ImageView iv = holder.mImageView = view.findViewById(R.id.thumbnail);
-			holder.info.loadFromCursor(getCursor(position));
+			info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
 			Drawable drawable = iv.getDrawable();
 			if (!(drawable instanceof LoaderDrawable)) {
-				drawable = createLoaderDrawable(mCr, holder.info);
+				drawable = createLoaderDrawable(mCr, info);
 				iv.setImageDrawable(drawable);
 			}
-			((LoaderDrawable)drawable).startLoad(holder.info.mediaType, 0, holder.info.id);
+			((LoaderDrawable)drawable).startLoad(info.mediaType, 0, info.id);
 			if (tv != null) {
 				tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 				if (mShowTitle) {
-					tv.setText(holder.info.title);
+					tv.setText(info.title);
 				}
 			}
 		}
@@ -254,8 +256,6 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final class ViewHolder {
 		TextView mTitleView;
 		ImageView mImageView;
-		@NonNull
-		final MediaInfo info = new MediaInfo();
 	}
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
