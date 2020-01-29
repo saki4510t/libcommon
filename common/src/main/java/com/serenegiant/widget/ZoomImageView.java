@@ -1,15 +1,10 @@
 package com.serenegiant.widget;
-
 /*
- * ZoomingImageView for Android:
- * Copyright(c) 2014-2020 t_saki@serenegiant.com
+ * libcommon
+ * utility/helper classes for myself
  *
- * This class extends ImageView to support zooming/draging/rotating of image with touch.
- * You can replace usual ImageView with this class.
- * 
- * File name: ZoomingImageView.java
-*/
-/*
+ * Copyright (c) 2014-2020 saki t_saki@serenegiant.com
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  *  You may obtain a copy of the License at
@@ -22,29 +17,6 @@ package com.serenegiant.widget;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
-/*
- * Usage:
- * Double touch and holds while more tha long press timeout, start rotating</br>
- * When start rotating, color reversing effect execute as a default visual effect</br>
- * You can cancel the default feedback and execute addition feedback in the callback listener</br>
- * 
- * Double touch and pinch in/out zoom the image in/out.
- * 
- * Single touch with move drags the image.
- * 
- * Single touch and hold while more than long press timeouit, reset the zooming/draging/rotaing
- * and fit the image in this view.</br>
- * You can reset zooming/moving/rotating with calling #reset programmatically
- * Limitation of this class:
- * This class internally use image matrix to zoom/drag/rotate image,
- * therefore you can not set matrix with #setImageMatrix.
- * If you set matrix, it is ignored and has no effect.
- * 
- * And the scaleType is fixed to ScaleType.MATRIX. If you set in xml or programmatically other than ScaleType.MATRIX,
- * it is ignored and has no effect.
- * 
- * This class requires API level >= 8
- */
 
 import android.annotation.SuppressLint;
 import android.content.Context;
