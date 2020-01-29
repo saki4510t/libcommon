@@ -76,8 +76,9 @@ public class ZoomImageView extends AppCompatImageView {
 	
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
-	
-	// constants
+
+//--------------------------------------------------------------------------------
+// constants
 	/**
 	 * State: idle
 	 */
@@ -150,8 +151,9 @@ public class ZoomImageView extends AppCompatImageView {
 	 * 
 	 */
 	private static final float EPS = 0.1f;
-	
-	// variables
+
+//--------------------------------------------------------------------------------
+// variables
 	/**
 	 * flag for save/restore state of this view
 	 */
@@ -253,7 +255,8 @@ public class ZoomImageView extends AppCompatImageView {
 	 * Runnable instcance to wait restoring the image color
 	 */
 	private Runnable mWaitReverseReset;
-	
+
+//--------------------------------------------------------------------------------
 	/**
 	 * callback listener called when rotation started.
 	 */
@@ -355,7 +358,8 @@ public class ZoomImageView extends AppCompatImageView {
             }
         };
     } 
-	
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Constructor for constructing in program
 	 * @param context
