@@ -38,6 +38,8 @@ import android.view.AbsSavedState;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.serenegiant.view.ViewTransformDelegater;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;

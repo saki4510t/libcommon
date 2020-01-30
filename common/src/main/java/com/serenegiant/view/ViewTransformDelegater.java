@@ -1,4 +1,4 @@
-package com.serenegiant.widget;
+package com.serenegiant.view;
 /*
  * libcommon
  * utility/helper classes for myself
