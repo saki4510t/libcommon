@@ -116,6 +116,16 @@ public abstract class ViewContentTransformer {
 	}
 
 	/**
+	 * デフォルトのトランスフォームマトリックスを設定
+	 * @param transform
+	 * @return
+	 */
+	public ViewContentTransformer setDefault(@NonNull final Matrix transform) {
+		mDefaultTransform.set(transform);
+		return this;
+	}
+
+	/**
 	 * トランスフォームマトリックスを初期状態に戻す
 	 */
 	public void reset() {
