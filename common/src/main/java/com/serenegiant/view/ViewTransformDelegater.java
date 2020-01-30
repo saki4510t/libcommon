@@ -134,14 +134,6 @@ public class ViewTransformDelegater {
 	 */
     private static final int CHECK_TIMEOUT
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
-    /**
-	 * ラジアンを度に変換するための係数(== (1.0f / Math.PI) * 180.0f;)
-	 */
-	private static final float TO_DEGREE = 57.2957795130823f;
-	/**
-	 * 振動しないようにするためのあそび
-	 */
-	private static final float EPS = 0.1f;
 
 //--------------------------------------------------------------------------------
 // variables
@@ -173,7 +165,7 @@ public class ViewTransformDelegater {
 	/**
 	 * 移動範囲制限のためのLineSegment配列
 	 */
-	private final LineSegment[] mLimitSegments = new LineSegment[4];
+	private final ViewUtils.LineSegment[] mLimitSegments = new ViewUtils.LineSegment[4];
 	/**
 	 * 表示内容の実際のサイズ
 	 */
@@ -598,7 +590,7 @@ public class ViewTransformDelegater {
 			mCurrentDegrees = 0.f;
 		}
 		mIsRestored = false;
-		mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > EPS;
+		mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
 
 		// update image size
 		// current implementation of ImageView always hold its image as a Drawable
@@ -717,30 +709,30 @@ public class ViewTransformDelegater {
 			|| mLimitRect.contains(mTransCoords[4], mTransCoords[5])
 			|| mLimitRect.contains(mTransCoords[6], mTransCoords[7])
 			// check whether at least one corner of limitRect is in the image bounds
-			|| ptInPoly(mLimitRect.left, mLimitRect.top, mTransCoords)
-			|| ptInPoly(mLimitRect.right, mLimitRect.top, mTransCoords)
-			|| ptInPoly(mLimitRect.right, mLimitRect.bottom, mTransCoords)
-			|| ptInPoly(mLimitRect.left, mLimitRect.bottom, mTransCoords);
+			|| ViewUtils.ptInPoly(mLimitRect.left, mLimitRect.top, mTransCoords)
+			|| ViewUtils.ptInPoly(mLimitRect.right, mLimitRect.top, mTransCoords)
+			|| ViewUtils.ptInPoly(mLimitRect.right, mLimitRect.bottom, mTransCoords)
+			|| ViewUtils.ptInPoly(mLimitRect.left, mLimitRect.bottom, mTransCoords);
 		if (!canMove) {
 			// when no corner is in, we need additional check whether at least
 			// one side of image bounds intersect with the limit rectangle
 			if (mLimitSegments[0] == null) {
-				mLimitSegments[0] = new LineSegment(mLimitRect.left, mLimitRect.top, mLimitRect.right, mLimitRect.top);
-				mLimitSegments[1] = new LineSegment(mLimitRect.right, mLimitRect.top, mLimitRect.right, mLimitRect.bottom);
-				mLimitSegments[2] = new LineSegment(mLimitRect.right, mLimitRect.bottom, mLimitRect.left, mLimitRect.bottom);
-				mLimitSegments[3] = new LineSegment(mLimitRect.left, mLimitRect.bottom, mLimitRect.left, mLimitRect.top);
+				mLimitSegments[0] = new ViewUtils.LineSegment(mLimitRect.left, mLimitRect.top, mLimitRect.right, mLimitRect.top);
+				mLimitSegments[1] = new ViewUtils.LineSegment(mLimitRect.right, mLimitRect.top, mLimitRect.right, mLimitRect.bottom);
+				mLimitSegments[2] = new ViewUtils.LineSegment(mLimitRect.right, mLimitRect.bottom, mLimitRect.left, mLimitRect.bottom);
+				mLimitSegments[3] = new ViewUtils.LineSegment(mLimitRect.left, mLimitRect.bottom, mLimitRect.left, mLimitRect.top);
 			}
-			final LineSegment side = new LineSegment(mTransCoords[0], mTransCoords[1], mTransCoords[2], mTransCoords[3]);
-			canMove = checkIntersect(side, mLimitSegments);
+			final ViewUtils.LineSegment side = new ViewUtils.LineSegment(mTransCoords[0], mTransCoords[1], mTransCoords[2], mTransCoords[3]);
+			canMove = ViewUtils.checkIntersect(side, mLimitSegments);
 			if (!canMove) {
 				side.set(mTransCoords[2], mTransCoords[3], mTransCoords[4], mTransCoords[5]);
-				canMove = checkIntersect(side, mLimitSegments);
+				canMove = ViewUtils.checkIntersect(side, mLimitSegments);
 				if (!canMove) {
 					side.set(mTransCoords[4], mTransCoords[5], mTransCoords[6], mTransCoords[7]);
-					canMove = checkIntersect(side, mLimitSegments);
+					canMove = ViewUtils.checkIntersect(side, mLimitSegments);
 					if (!canMove) {
 						side.set(mTransCoords[6], mTransCoords[7], mTransCoords[0], mTransCoords[1]);
-						canMove = checkIntersect(side, mLimitSegments);
+						canMove = ViewUtils.checkIntersect(side, mLimitSegments);
 					}
 				}
 			}
@@ -757,13 +749,13 @@ public class ViewTransformDelegater {
 
 				if (right < mLimitRect.left) {
 					dx = mLimitRect.left - right;
-				} else if (left + EPS > mLimitRect.right) {
-					dx = mLimitRect.right - left - EPS;
+				} else if (left + ViewUtils.EPS > mLimitRect.right) {
+					dx = mLimitRect.right - left - ViewUtils.EPS;
 				}
 				if (bottom < mLimitRect.top) {
 					dy = mLimitRect.top - bottom;
-				} else if (top + EPS > mLimitRect.bottom) {
-					dy = mLimitRect.bottom - top - EPS;
+				} else if (top + ViewUtils.EPS > mLimitRect.bottom) {
+					dy = mLimitRect.bottom - top - ViewUtils.EPS;
 				}
 			}
 			if ((dx != 0) || (dy != 0)) {
@@ -923,7 +915,7 @@ public class ViewTransformDelegater {
 			// restore the Matrix
 			restoreMatrix();
 			mCurrentDegrees = calcAngle(event);
-			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > EPS;
+			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
 			if (mIsRotating && mImageMatrix.postRotate(mCurrentDegrees, mPivotX, mPivotY)) {
 				// when Matrix is changed
 				mImageMatrixChanged = true;
@@ -972,174 +964,10 @@ public class ViewTransformDelegater {
 			final float y1 = event.getY(ix1) - event.getY(ix0);
 			//
 			final double s = (x0 * x0 + y0 * y0) * (x1 * x1 + y1 * y1);
-			final double cos = dotProduct(x0, y0, x1, y1) / Math.sqrt(s);
-			angle = TO_DEGREE * (float)Math.acos(cos) * Math.signum(crossProduct(x0, y0, x1, y1));
+			final double cos = ViewUtils.dotProduct(x0, y0, x1, y1) / Math.sqrt(s);
+			angle = ViewUtils.TO_DEGREE * (float)Math.acos(cos) * Math.signum(ViewUtils.crossProduct(x0, y0, x1, y1));
 		}
 		return angle;
-	}
-
-	private static final float dotProduct(final float x0, final float y0, final float x1, final float y1) {
-		return x0 * x1 + y0 * y1;
-	}
-
-	private static final float crossProduct(final float x0, final float y0, final float x1, final float y1) {
-		return x0 * y1 - x1 * y0;
-	}
-
-	private static final float crossProduct(final Vector v1, final Vector v2) {
-		return v1.x * v2.y - v2.x * v1.y;
-	}
-
-	private static final Vector sPtInPoly_v1 = new Vector();
-	private static final Vector sPtInPoly_v2 = new Vector();
-	/**
-	 * check whether the point is in the clockwise 2D polygon
-	 * @param x
-	 * @param y
-	 * @param poly: the array of polygon coordinates(x,y pairs)
-	 * @return
-	 */
-	private static final boolean ptInPoly(final float x, final float y, final float[] poly) {
-
-		final int n = poly.length & 0x7fffffff;
-		// minimum 3 points(3 pair of x/y coordinates) need to calculate >> length >= 6
-		if (n < 6) return false;
-		boolean result = true;
-		for (int i = 0; i < n; i += 2) {
-			sPtInPoly_v1.set(x, y).dec(poly[i], poly[i + 1]);
-			if (i + 2 < n) sPtInPoly_v2.set(poly[i + 2], poly[i + 3]);
-			else sPtInPoly_v2.set(poly[0], poly[1]);
-			sPtInPoly_v2.dec(poly[i], poly[i + 1]);
-			if (crossProduct(sPtInPoly_v1, sPtInPoly_v2) > 0) {
-				if (DEBUG) Log.v(TAG, "pt is outside of a polygon:");
-				result = false;
-				break;
-			}
-		}
-		return result;
-	}
-
-	/**
-	 * helper for intersection check etc.
-	 */
-	private static final class Vector {
-
-		public float x, y;
-
-		public Vector() {
-		}
-
-/*		public Vector(Vector src) {
-			set(src);
-		} */
-
-		public Vector(final float x, final float y) {
-			set(x, y);
-		}
-
-		public Vector set(final float x, final float y) {
-			this.x = x;
-			this.y = y;
-			return this;
-		}
-
-/*		public Vector set(final Vector other) {
-			x = other.x;
-			y = other.y;
-			return this;
-		} */
-
-/*		public Vector add(final Vector other) {
-			return new Vector(x + other.x, y + other.y);
-		} */
-
-/*		public Vector add(final float x, final float y) {
-			return new Vector(this.x + x, this.y + y);
-		} */
-
-/*		public Vector inc(final Vector other) {
-			x += other.x;
-			y += other.y;
-			return this;
-		} */
-
-/*		public Vector inc(final float x, final float y) {
-			this.x += x;
-			this.y += y;
-			return this;
-		} */
-
-		public Vector sub(final Vector other) {
-			return new Vector(x - other.x, y - other.y);
-		}
-
-/*		public Vector sub(final float x, final float y) {
-			return new Vector(this.x - x, this.y - y);
-		} */
-
-/*		public Vector dec(final Vector other) {
-			x -= other.x;
-			y -= other.y;
-			return this;
-		} */
-
-		public Vector dec(final float x, final float y) {
-			this.x -= x;
-			this.y -= y;
-			return this;
-		}
-	}
-
-	private static final class LineSegment {
-
-		public final Vector p1;
-		public final Vector p2;
-
-		public LineSegment (final float x0, final float y0, final float x1, final float y1) {
-			p1 = new Vector(x0, y0);
-			p2 = new Vector(x1, y1);
-		}
-
-		public LineSegment set(final float x0, final float y0, final float x1, final float y1) {
-			p1.set(x0, y0);
-			p2.set(x1,  y1);
-			return this;
-		}
-
-/*		@Override
-		public String toString() {
-			return String.format(Locale.US, "p1=(%f,%f),p2=(%f,%f)", p1.x, p1.y, p2.x, p2.y);
-		} */
-	}
-
-	/**
-	 * check whether line segment(seg) intersects with at least one of line segments in the array
-	 * @param seg
-	 * @param segs array of segment
-	 * @return true if line segment intersects with at least one of other line segment.
-	 */
-	private static final boolean checkIntersect(final LineSegment seg, final LineSegment[] segs) {
-
-		boolean result = false;
-		final int n = segs != null ? segs.length : 0;
-
-		final Vector a = seg.p2.sub(seg.p1);
-		Vector b, c, d;
-		for (int i= 0; i < n; i++) {
-			c = segs[i].p1.sub(seg.p1);
-			d = segs[i].p2.sub(seg.p1);
-			result = crossProduct(a, c) * crossProduct(a, d) < EPS;
-			if (result) {
-				b = segs[i].p2.sub(segs[i].p1);
-				c = seg.p1.sub(segs[i].p1);
-				d = seg.p2.sub(segs[i].p1);
-				result = crossProduct(b, c) * crossProduct(b, d) < EPS;
-				if (result) {
-					break;
-				}
-			}
-		}
-		return result;
 	}
 
 	/**
@@ -1155,17 +983,6 @@ public class ViewTransformDelegater {
 			return DEFAULT_SCALE;
 		}
 		return scale;
-	}
-
-	/**
-	 * set a value to mImageMatrix
-	 * @param index
-	 * @param value
-	 */
-	protected void setMatrixValue(final int index, final float value) {
-		updateMatrixCache();
-		mMatrixCache[index] = value;
-		mImageMatrix.setValues(mMatrixCache);
 	}
 
 	/**
