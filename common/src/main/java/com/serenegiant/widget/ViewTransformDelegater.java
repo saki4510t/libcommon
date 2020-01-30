@@ -226,7 +226,7 @@ public class ViewTransformDelegater {
 	 * 拡大縮小回転平行移動した表示内容の四隅の座標
 	 * [(left,top),(right,top),(right,bottom),(left.bottom)]
 	 */
-	private final float[] mTrans = new float[8];
+	private final float[] mTransCoords = new float[8];
 	/**
 	 * タッチ操作時のタッチID
 	 */
@@ -743,28 +743,28 @@ public class ViewTransformDelegater {
 
 		// calculate the corner coordinates of image applied matrix
 		// [(left,top),(right,top),(right,bottom),(left.bottom)]
-		mTrans[0] = mTrans[6] = mImageRect.left;
-		mTrans[1] = mTrans[3] = mImageRect.top;
-		mTrans[5] = mTrans[7] = mImageRect.bottom;
-		mTrans[2] = mTrans[4] = mImageRect.right;
-		mImageMatrix.mapPoints(mTrans);
+		mTransCoords[0] = mTransCoords[6] = mImageRect.left;
+		mTransCoords[1] = mTransCoords[3] = mImageRect.top;
+		mTransCoords[5] = mTransCoords[7] = mImageRect.bottom;
+		mTransCoords[2] = mTransCoords[4] = mImageRect.right;
+		mImageMatrix.mapPoints(mTransCoords);
 		for (int i = 0; i < 8; i += 2) {
-			mTrans[i] += dx;
-			mTrans[i+1] += dy;
+			mTransCoords[i] += dx;
+			mTransCoords[i+1] += dy;
 		}
 		// check whether the image can move
 		// if we can ignore rotating, the limit check is more easy...
 		boolean canMove
 			// check whether at lease one corner of image bounds is in the limitRect
-			 = mLimitRect.contains(mTrans[0], mTrans[1])
-			|| mLimitRect.contains(mTrans[2], mTrans[3])
-			|| mLimitRect.contains(mTrans[4], mTrans[5])
-			|| mLimitRect.contains(mTrans[6], mTrans[7])
+			 = mLimitRect.contains(mTransCoords[0], mTransCoords[1])
+			|| mLimitRect.contains(mTransCoords[2], mTransCoords[3])
+			|| mLimitRect.contains(mTransCoords[4], mTransCoords[5])
+			|| mLimitRect.contains(mTransCoords[6], mTransCoords[7])
 			// check whether at least one corner of limitRect is in the image bounds
-			|| ptInPoly(mLimitRect.left, mLimitRect.top, mTrans)
-			|| ptInPoly(mLimitRect.right, mLimitRect.top, mTrans)
-			|| ptInPoly(mLimitRect.right, mLimitRect.bottom, mTrans)
-			|| ptInPoly(mLimitRect.left, mLimitRect.bottom, mTrans);
+			|| ptInPoly(mLimitRect.left, mLimitRect.top, mTransCoords)
+			|| ptInPoly(mLimitRect.right, mLimitRect.top, mTransCoords)
+			|| ptInPoly(mLimitRect.right, mLimitRect.bottom, mTransCoords)
+			|| ptInPoly(mLimitRect.left, mLimitRect.bottom, mTransCoords);
 		if (!canMove) {
 			// when no corner is in, we need additional check whether at least
 			// one side of image bounds intersect with the limit rectangle
@@ -774,16 +774,16 @@ public class ViewTransformDelegater {
 				mLimitSegments[2] = new LineSegment(mLimitRect.right, mLimitRect.bottom, mLimitRect.left, mLimitRect.bottom);
 				mLimitSegments[3] = new LineSegment(mLimitRect.left, mLimitRect.bottom, mLimitRect.left, mLimitRect.top);
 			}
-			final LineSegment side = new LineSegment(mTrans[0], mTrans[1], mTrans[2], mTrans[3]);
+			final LineSegment side = new LineSegment(mTransCoords[0], mTransCoords[1], mTransCoords[2], mTransCoords[3]);
 			canMove = checkIntersect(side, mLimitSegments);
 			if (!canMove) {
-				side.set(mTrans[2], mTrans[3], mTrans[4], mTrans[5]);
+				side.set(mTransCoords[2], mTransCoords[3], mTransCoords[4], mTransCoords[5]);
 				canMove = checkIntersect(side, mLimitSegments);
 				if (!canMove) {
-					side.set(mTrans[4], mTrans[5], mTrans[6], mTrans[7]);
+					side.set(mTransCoords[4], mTransCoords[5], mTransCoords[6], mTransCoords[7]);
 					canMove = checkIntersect(side, mLimitSegments);
 					if (!canMove) {
-						side.set(mTrans[6], mTrans[7], mTrans[0], mTrans[1]);
+						side.set(mTransCoords[6], mTransCoords[7], mTransCoords[0], mTransCoords[1]);
 						canMove = checkIntersect(side, mLimitSegments);
 					}
 				}
@@ -794,10 +794,10 @@ public class ViewTransformDelegater {
 			// otherwise the image can not move when one side is on the border of limit rectangle.
 			// only calculate without rotation now because its calculation is to heavy when rotation applied.
 			if (!mIsRotating) {
-				final float left = Math.min(Math.min(mTrans[0], mTrans[2]), Math.min(mTrans[4], mTrans[6]));
-				final float right = Math.max(Math.max(mTrans[0], mTrans[2]), Math.max(mTrans[4], mTrans[6]));
-				final float top = Math.min(Math.min(mTrans[1], mTrans[3]), Math.min(mTrans[5], mTrans[7]));
-				final float bottom = Math.max(Math.max(mTrans[1], mTrans[3]), Math.max(mTrans[5], mTrans[7]));
+				final float left = Math.min(Math.min(mTransCoords[0], mTransCoords[2]), Math.min(mTransCoords[4], mTransCoords[6]));
+				final float right = Math.max(Math.max(mTransCoords[0], mTransCoords[2]), Math.max(mTransCoords[4], mTransCoords[6]));
+				final float top = Math.min(Math.min(mTransCoords[1], mTransCoords[3]), Math.min(mTransCoords[5], mTransCoords[7]));
+				final float bottom = Math.max(Math.max(mTransCoords[1], mTransCoords[3]), Math.max(mTransCoords[5], mTransCoords[7]));
 
 				if (right < mLimitRect.left) {
 					dx = mLimitRect.left - right;
