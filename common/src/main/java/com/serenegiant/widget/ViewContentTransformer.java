@@ -341,7 +341,16 @@ public abstract class ViewContentTransformer {
 			super.setTransform(transform);
 			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 			mTransform.set(transform);
-			// FIXME 未実装
+			// ローカルキャッシュ
+			final View targetView = mTargetView;
+			// XXX これだとView自体の大きさとかが変わってしまいそう
+			targetView.setTranslationX(getTranslateX());
+			targetView.setTranslationY(getTranslateY());
+			targetView.setPivotX(targetView.getWidth() >> 1);
+			targetView.setPivotY(targetView.getHeight() >> 1);
+			targetView.setRotation(getRotation());
+			targetView.setScaleX(getScaleX());
+			targetView.setScaleX(getScaleY());
 		}
 
 	} // DefaultTransformer
