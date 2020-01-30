@@ -284,12 +284,28 @@ public abstract class ViewContentTransformer {
 			mCurrentRotate);
 	}
 
+	/**
+	 * 現在の拡大縮小率(横方向)を取得
+	 * @return
+	 */
 	public float getScaleX() {
 		return mCurrentScaleX;
 	}
 
+	/**
+	 * 現在の拡大縮小率(縦方向)を取得
+ 	 * @return
+	 */
 	public float getScaleY() {
 		return mCurrentScaleY;
+	}
+
+	/**
+	 * 縦横の拡大縮小率のうち小さい方を取得
+	 * @return
+	 */
+	public float getScale() {
+		return Math.min(mCurrentScaleX, mCurrentScaleY);
 	}
 
 	/**
