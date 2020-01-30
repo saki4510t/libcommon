@@ -294,7 +294,7 @@ public class ViewTransformDelegater {
 		private int mState;
 		private float mMinScale;
 		private float mCurrentDegrees;
-		private float[] mMatrixCache = new float[9];
+		private final float[] mMatrixCache = new float[9];
 
         /**
          * constractor to restore state
@@ -391,7 +391,7 @@ public class ViewTransformDelegater {
 		saveState.mState = mState;
 		saveState.mMinScale = mMinScale;
 		saveState.mCurrentDegrees = mCurrentDegrees;
-		saveState.mMatrixCache = mMatrixCache;
+		System.arraycopy(mMatrixCache, 0, saveState.mMatrixCache, 0, 9);
 		return saveState;
 	}
 
