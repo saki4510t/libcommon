@@ -1,4 +1,6 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion versionCompiler
@@ -28,6 +30,10 @@ dependencies {
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.constraintlayout:constraintlayout:${constraintLibVersion}"
+
+	implementation "androidx.core:core-ktx:${androidXKtxVersion}"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
 	implementation project(':common')
 }
