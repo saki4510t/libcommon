@@ -25,6 +25,8 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 
+import java.util.Arrays;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -116,6 +118,20 @@ public abstract class ViewContentTransformer {
 			mTransform.set(transform);
 		}
 	}
+
+	/**
+	 * トランスフォームマトリックスを設定する
+	 * @param transform nullまたは要素数が9未満なら単位行列が設定される
+	 */
+	@CallSuper
+	public void setTransform(@Nullable final float[] transform) {
+		if ((transform != null) && (transform.length >= 9)) {
+			mTransform.setValues(transform);
+		} else {
+			mTransform.set(null);
+		}
+	}
+
 	/**
 	 * トランスフォームマトリックスのコピーを取得
 	 * @param transform nullなら内部で新しいMatrixを生成して返す, nullでなければコピーする
@@ -128,6 +144,23 @@ public abstract class ViewContentTransformer {
 			return transform;
 		} else {
 			return new Matrix(mTransform);
+		}
+	}
+
+	/**
+	 * トランスフォームマトリックスのコピーを取得
+	 * @param transform nullまたは要素数が9未満なら内部で新しいfloat配列を生成して返す, そうでなければコピーする
+	 * @param transform
+	 * @return
+	 */
+	public float[] getTransform(@Nullable final float[] transform) {
+		if ((transform != null) && (transform.length >= 9)) {
+			mTransform.getValues(transform);
+			return transform;
+		} else {
+			final float[] result = new float[9];
+			mTransform.getValues(result);
+			return result;
 		}
 	}
 
@@ -406,6 +439,14 @@ public abstract class ViewContentTransformer {
 			getTargetView().setTransform(transform);
 		}
 
+		@Override
+		public void setTransform(@Nullable final float[] transform) {
+			super.setTransform(transform);
+			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
+
+			getTargetView().setTransform(mTransform);
+		}
+
 		@NonNull
 		@Override
 		public Matrix getTransform(@Nullable final Matrix transform) {
@@ -443,8 +484,15 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public void setTransform(@Nullable final Matrix transform) {
-			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 			super.setTransform(transform);
+			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
+			getTargetView().setImageMatrix(mTransform);
+		}
+
+		@Override
+		public void setTransform(@Nullable final float[] transform) {
+			super.setTransform(transform);
+			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
 			getTargetView().setImageMatrix(mTransform);
 		}
 
