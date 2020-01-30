@@ -314,6 +314,10 @@ public abstract class ViewContentTransformer {
 			mCurrentRotate + degrees);
 	}
 
+	/**
+	 * 現在の回転角度[度]を取得
+	 * @return
+	 */
 	public float getRotation() {
 		return mCurrentRotate;
 	}
