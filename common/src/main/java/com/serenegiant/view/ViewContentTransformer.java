@@ -116,6 +116,20 @@ public abstract class ViewContentTransformer {
 			mTransform.set(transform);
 		}
 	}
+	/**
+	 * トランスフォームマトリックスのコピーを取得
+	 * @param transform nullなら内部で新しいMatrixを生成して返す, nullでなければコピーする
+	 * @return
+	 */
+	@NonNull
+	public Matrix getTransform(@Nullable final Matrix transform) {
+		if (transform != null) {
+			transform.set(mTransform);
+			return transform;
+		} else {
+			return new Matrix(mTransform);
+		}
+	}
 
 	/**
 	 * デフォルトのトランスフォームマトリックスを設定
@@ -135,21 +149,6 @@ public abstract class ViewContentTransformer {
 	public void reset() {
 		if (DEBUG) Log.v(TAG, "reset:");
 		setTransform(mDefaultTransform);
-	}
-
-	/**
-	 * トランスフォームマトリックスのコピーを取得
-	 * @param transform nullなら内部で新しいMatrixを生成して返す, nullでなければコピーする
-	 * @return
-	 */
-	@NonNull
-	public Matrix getTransform(@Nullable final Matrix transform) {
-		if (transform != null) {
-			transform.set(mTransform);
-			return transform;
-		} else {
-			return new Matrix(mTransform);
-		}
 	}
 
 	/**
