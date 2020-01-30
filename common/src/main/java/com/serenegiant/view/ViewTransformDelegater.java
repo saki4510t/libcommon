@@ -136,6 +136,104 @@ public class ViewTransformDelegater {
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
 
 //--------------------------------------------------------------------------------
+	/**
+	 * callback listener called when rotation started.
+	 */
+	public interface ViewTransformListener {
+		/**
+		 * this method is called when rotating starts.</br>
+		 * you will execute feedback something like sound and/or visual effects.
+		 * @param view
+		 */
+		public void onStartRotation(final ITransformView view);
+		/**
+		 * タッチ状態が変化したとき
+		 * @param view
+		 * @param newState
+		 */
+		public void onStateChanged(final ITransformView view, final int newState);
+	}
+
+	/**
+	 * Runnable to wait resetting the image
+	 */
+	private final class WaitImageReset implements Runnable {
+		@Override
+		public void run() {
+			mParent.init();
+		}
+	}
+
+	/**
+	 * Runnable to wait starting rotation
+	 */
+	private final class StartCheckRotate implements Runnable {
+		@Override
+		public void run() {
+			if (mState == STATE_CHECKING) {
+				setState(STATE_ROTATING);
+				callOnStartRotationListener();
+			}
+		}
+	}
+
+	/**
+	 * class for process to save and restore the view state
+	 */
+	public static final class SavedState extends View.BaseSavedState {
+
+		private int mState;
+		private float mMinScale;
+		private float mCurrentDegrees;
+		private final float[] mMatrixCache = new float[9];
+
+        /**
+         * constractor to restore state
+         */
+        public SavedState(final Parcel in) {
+            super(in);
+            readFromParcel(in);
+        }
+
+        /**
+         * constructor to saved state
+         */
+        public SavedState(final Parcelable superState) {
+            super(superState);
+        }
+
+        private void readFromParcel(final Parcel in) {
+            // should read as same order when writing
+            mState = in.readInt();
+            mMinScale = in.readFloat();
+            mCurrentDegrees = in.readFloat();
+            in.readFloatArray(mMatrixCache);
+        }
+
+        @Override
+        public void writeToParcel(final Parcel out, final int flags) {
+            super.writeToParcel(out, flags);
+            // should write as same order when reading
+            out.writeInt(mState);
+            out.writeFloat(mMinScale);
+            out.writeFloat(mCurrentDegrees);
+            out.writeFloatArray(mMatrixCache);
+        }
+
+        public static final Creator<SavedState> CREATOR
+        	= new Creator<SavedState>() {
+
+            public SavedState createFromParcel(final Parcel source) {
+                return new SavedState(source);
+            }
+
+            public SavedState[] newArray(final int size) {
+                return new SavedState[size];
+            }
+        };
+    }
+
+//--------------------------------------------------------------------------------
 // variables
 	/**
 	 * flag for save/restore state of this view
@@ -235,104 +333,6 @@ public class ViewTransformDelegater {
 	 * フィードバック用に表示内容の色を反転させた後にもとに戻すためのRunnable
 	 */
 	private Runnable mWaitReverseReset;
-
-//--------------------------------------------------------------------------------
-	/**
-	 * callback listener called when rotation started.
-	 */
-	public interface ViewTransformListener {
-		/**
-		 * this method is called when rotating starts.</br>
-		 * you will execute feedback something like sound and/or visual effects.
-		 * @param view
-		 */
-		public void onStartRotation(final ITransformView view);
-		/**
-		 * タッチ状態が変化したとき
-		 * @param view
-		 * @param newState
-		 */
-		public void onStateChanged(final ITransformView view, final int newState);
-	}
-
-	/**
-	 * Runnable to wait resetting the image
-	 */
-	private final class WaitImageReset implements Runnable {
-		@Override
-		public void run() {
-			mParent.init();
-		}
-	}
-
-	/**
-	 * Runnable to wait starting rotation
-	 */
-	private final class StartCheckRotate implements Runnable {
-		@Override
-		public void run() {
-			if (mState == STATE_CHECKING) {
-				setState(STATE_ROTATING);
-				callOnStartRotationListener();
-			}
-		}
-	}
-
-	/**
-	 * class for process to save and restore the view state
-	 */
-	public static final class SavedState extends View.BaseSavedState {
-
-		private int mState;
-		private float mMinScale;
-		private float mCurrentDegrees;
-		private final float[] mMatrixCache = new float[9];
-
-        /**
-         * constractor to restore state
-         */
-        public SavedState(final Parcel in) {
-            super(in);
-            readFromParcel(in);
-        }
-
-        /**
-         * constructor to saved state
-         */
-        public SavedState(final Parcelable superState) {
-            super(superState);
-        }
-
-        private void readFromParcel(final Parcel in) {
-            // should read as same order when writing
-            mState = in.readInt();
-            mMinScale = in.readFloat();
-            mCurrentDegrees = in.readFloat();
-            in.readFloatArray(mMatrixCache);
-        }
-
-        @Override
-        public void writeToParcel(final Parcel out, final int flags) {
-            super.writeToParcel(out, flags);
-            // should write as same order when reading
-            out.writeInt(mState);
-            out.writeFloat(mMinScale);
-            out.writeFloat(mCurrentDegrees);
-            out.writeFloatArray(mMatrixCache);
-        }
-
-        public static final Creator<SavedState> CREATOR
-        	= new Creator<SavedState>() {
-
-            public SavedState createFromParcel(final Parcel source) {
-                return new SavedState(source);
-            }
-
-            public SavedState[] newArray(final int size) {
-                return new SavedState[size];
-            }
-        };
-    }
 
 //--------------------------------------------------------------------------------
 	/**
