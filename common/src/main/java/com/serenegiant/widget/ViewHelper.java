@@ -28,6 +28,10 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
 
+/**
+ * Viewパッケージ内のViewUtilsを使うこと
+ */
+@Deprecated
 public class ViewHelper {
 	/**
 	 * 指定したViewGroupとその配下のViewに背景色を指定
@@ -35,6 +39,7 @@ public class ViewHelper {
 	 * @param vg
 	 * @param color
 	 */
+	@Deprecated
 	public static void setBackgroundAll(final ViewGroup vg, final int color) {
 		for (int i = 0, count = vg.getChildCount(); i < count; i++) {
 			final View child = vg.getChildAt(i);
@@ -50,6 +55,7 @@ public class ViewHelper {
 	 * @param vg
 	 * @param dr
 	 */
+	@Deprecated
 	public static void setBackgroundAll(final ViewGroup vg, final Drawable dr) {
 		for (int i = 0, count = vg.getChildCount(); i < count; i++) {
 			final View child = vg.getChildAt(i);
@@ -67,6 +73,7 @@ public class ViewHelper {
 	 * @param themeRes
 	 * @return
 	 */
+	@Deprecated
 	@NonNull
 	public static LayoutInflater createCustomLayoutInflater(
 		@NonNull final Context context, @NonNull final LayoutInflater inflater,
