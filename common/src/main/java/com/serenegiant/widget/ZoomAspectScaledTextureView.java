@@ -76,7 +76,7 @@ public class ZoomAspectScaledTextureView
 	/**
 	 * State: 平行移動中
 	*/
-	private static final int STATE_DRAGING = 2;
+	private static final int STATE_DRAGGING = 2;
 	/**
 	 * State: 拡大縮小・回転開始待ち
 	 */
@@ -201,7 +201,7 @@ public class ZoomAspectScaledTextureView
 	 */
 	private float mMinScale = DEFAULT_MIN_SCALE;
 	/**
-	 * current state, -1/STATE_NON/STATE_WATING/STATE_DRAGING/STATE_CHECKING
+	 * current state, -1/STATE_NON/STATE_WAITING/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	private int mState = -1;
@@ -267,7 +267,7 @@ public class ZoomAspectScaledTextureView
 			case STATE_WAITING:
 				removeCallbacks(mWaitImageReset);
 				// pass through
-			case STATE_DRAGING:
+			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
 					startCheck(event);
 					return true;
@@ -284,11 +284,11 @@ public class ZoomAspectScaledTextureView
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
 					removeCallbacks(mWaitImageReset);
-					setState(STATE_DRAGING);
+					setState(STATE_DRAGGING);
 					return true;
 				}
 				break;
-			case STATE_DRAGING:
+			case STATE_DRAGGING:
 				if (processDrag(event))
 					return true;
 				break;
@@ -423,7 +423,7 @@ public class ZoomAspectScaledTextureView
 
 	/**
 	 * set current state, get and save the internal Matrix int super class
-	 * @param state:	-1/STATE_NON/STATE_DRAGING/STATECHECKING
+	 * @param state:	-1/STATE_NON/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	private final void setState(final int state) {

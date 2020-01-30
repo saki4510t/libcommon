@@ -101,7 +101,7 @@ public class ViewTransformDelegater {
 	/**
 	 * State: dragging
 	*/
-	private static final int STATE_DRAGING = 2;
+	private static final int STATE_DRAGGING = 2;
 	/**
 	 * State: transition state to check starting zoom/rotation
 	 */
@@ -237,7 +237,7 @@ public class ViewTransformDelegater {
 	 */
 	private float mMinScale = DEFAULT_MIN_SCALE;
 	/**
-	 * current state, -1/STATE_NON/STATE_WATING/STATE_DRAGING/STATE_CHECKING
+	 * current state, -1/STATE_NON/STATE_WATING/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	private int mState;
@@ -441,7 +441,7 @@ public class ViewTransformDelegater {
 			switch (mState) {
 			case STATE_WAITING:
 				mParent.removeCallbacks(mWaitImageReset);
-			case STATE_DRAGING:
+			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
 					startCheck(event);
 					return true;
@@ -457,11 +457,11 @@ public class ViewTransformDelegater {
 			case STATE_WAITING:
 				if (checkTouchMoved(event)) {
 					mParent.removeCallbacks(mWaitImageReset);
-					setState(STATE_DRAGING);
+					setState(STATE_DRAGGING);
 					return true;
 				}
 				break;
-			case STATE_DRAGING:
+			case STATE_DRAGGING:
 				if (processDrag(event))
 					return true;
 				break;
@@ -637,7 +637,7 @@ public class ViewTransformDelegater {
 
 	/**
 	 * set current state, get and save the internal Matrix int super class
-	 * @param state:	-1/STATE_NON/STATE_DRAGING/STATECHECKING
+	 * @param state:	-1/STATE_NON/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	private final void setState(final int state) {
