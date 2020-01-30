@@ -25,9 +25,10 @@ import android.view.TextureView;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.serenegiant.graphics.MatrixUtils;
+
 import java.util.Arrays;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -113,25 +114,35 @@ public abstract class ViewContentTransformer {
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullなら単位行列が設定される
 	 */
-	@CallSuper
-	public void setTransform(@Nullable final Matrix transform) {
+	public final void setTransform(@Nullable final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 		if (mTransform != transform) {
 			mTransform.set(transform);
 		}
+		internalSetTransform(mTransform);
+		calcValues(mTransform);
 	}
 
 	/**
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullまたは要素数が9未満なら単位行列が設定される
 	 */
-	@CallSuper
-	public void setTransform(@Nullable final float[] transform) {
+	public final void setTransform(@Nullable final float[] transform) {
+		if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
 		if ((transform != null) && (transform.length >= 9)) {
 			mTransform.setValues(transform);
 		} else {
 			mTransform.set(null);
 		}
+		internalSetTransform(mTransform);
+		calcValues(mTransform);
 	}
+
+	/**
+	 * トランスフォームマトリックスを実際にView側へ適用する
+	 * @param transform
+	 */
+	protected abstract void internalSetTransform(@NonNull final Matrix transform);
 
 	/**
 	 * トランスフォームマトリックスのコピーを取得
@@ -401,8 +412,23 @@ public abstract class ViewContentTransformer {
 					w2, h2);
 			}
 			// apply to target view
-			setTransform(mTransform);
+			internalSetTransform(mTransform);
 		}
+		return this;
+	}
+
+	/**
+	 * Matrixからtranslate/scale/rotateの値を計算する
+	 * @param transform
+	 * @return
+	 */
+	protected ViewContentTransformer calcValues(@NonNull final Matrix transform) {
+		final float[] mat = new float[9];
+		mCurrentTransX = mat[Matrix.MTRANS_X];
+		mCurrentTransY = mat[Matrix.MTRANS_Y];
+		mCurrentScaleX = mat[Matrix.MSCALE_X];
+		mCurrentScaleY = MatrixUtils.getScale(mat);
+		mCurrentRotate = MatrixUtils.getRotate(mat);
 		return this;
 	}
 
@@ -423,25 +449,13 @@ public abstract class ViewContentTransformer {
 		public DefaultTransformer updateTransform(final boolean setAsDefault) {
 			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			// 今は何もしない
+			calcValues(mTransform);
 			return this;
 		}
 
 		@Override
-		public void setTransform(@Nullable final Matrix transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
-			mTransform.set(transform);
-			internalSetTransform();
-		}
-
-		@Override
-		public void setTransform(@Nullable final float[] transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
-			internalSetTransform();
-		}
-
-		private void internalSetTransform() {
+		protected void internalSetTransform(@Nullable final Matrix transform) {
+			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
 			// ローカルキャッシュ
 			final View targetView = mTargetView;
 			// XXX これだとView自体の大きさとかが変わってしまいそう
@@ -485,22 +499,14 @@ public abstract class ViewContentTransformer {
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
 			}
+			calcValues(mTransform);
 			return this;
 		}
 
 		@Override
-		public void setTransform(@Nullable final Matrix transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
+		protected void internalSetTransform(@Nullable final Matrix transform) {
+			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
 			getTargetView().setTransform(transform);
-		}
-
-		@Override
-		public void setTransform(@Nullable final float[] transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
-
-			getTargetView().setTransform(mTransform);
 		}
 
 		@NonNull
@@ -540,21 +546,14 @@ public abstract class ViewContentTransformer {
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
 			}
+			calcValues(mTransform);
 			return this;
 		}
 
 		@Override
-		public void setTransform(@Nullable final Matrix transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
-			getTargetView().setImageMatrix(mTransform);
-		}
-
-		@Override
-		public void setTransform(@Nullable final float[] transform) {
-			super.setTransform(transform);
-			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
-			getTargetView().setImageMatrix(mTransform);
+		protected void internalSetTransform(@Nullable final Matrix transform) {
+			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+			getTargetView().setImageMatrix(transform);
 		}
 
 	}	// ImageViewTransformer
