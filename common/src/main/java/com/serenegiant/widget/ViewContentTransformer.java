@@ -270,27 +270,26 @@ public abstract class ViewContentTransformer {
 
 	/**
 	 * トランスフォームマトリックスを設定
-	 * @param dx
-	 * @param dy
+	 * @param transX
+	 * @param transY
 	 * @param scaleX
 	 * @param scaleY
 	 * @param degrees
 	 * @return
 	 */
 	protected ViewContentTransformer setTransform(
-		final float dx, final float dy,
+		final float transX, final float transY,
 		final float scaleX, final float scaleY,
 		final float degrees) {
 
-		if ((mCurrentTransX != dx) || (mCurrentTransY != dy)
-			|| (mCurrentScaleX != scaleX)
-			|| (mCurrentScaleY != scaleY)
+		if ((mCurrentTransX != transX) || (mCurrentTransY != transY)
+			|| (mCurrentScaleX != scaleX) || (mCurrentScaleY != scaleY)
 			|| (mCurrentRotate != degrees)) {
 
 			mCurrentScaleX = scaleX;
 			mCurrentScaleY = scaleY;
-			mCurrentTransX = dx;
-			mCurrentTransY = dy;
+			mCurrentTransX = transX;
+			mCurrentTransY = transY;
 			mCurrentRotate = degrees;
 			if (degrees != Float.MAX_VALUE) {
 				while (mCurrentRotate > 360) {
@@ -304,7 +303,7 @@ public abstract class ViewContentTransformer {
 			final int w2 = mTargetView.getWidth() >> 1;
 			final int h2 = mTargetView.getHeight() >> 1;
 			mTransform.reset();
-			mTransform.postTranslate(dx, dy);
+			mTransform.postTranslate(transX, transY);
 			mTransform.postScale(
 				work[Matrix.MSCALE_X] * mCurrentScaleX,
 				work[Matrix.MSCALE_Y] * mCurrentScaleY,
