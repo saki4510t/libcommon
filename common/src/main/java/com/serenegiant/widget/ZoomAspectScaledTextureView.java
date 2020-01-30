@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
@@ -37,6 +38,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 
 /**
  * FIXME 拡大縮小回転移動処理をDelegaterへ分けたい
@@ -962,6 +964,11 @@ public class ZoomAspectScaledTextureView
 
 	public float getManualScale() {
 		return mManualScale;
+	}
+
+	public PointF getTranslate(@NonNull final PointF result) {
+		result.set(mManualScale, mTransX);
+		return result;
 	}
 
 	public float getTranslateX() {
