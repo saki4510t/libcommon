@@ -46,23 +46,8 @@ public class ViewTransformDelegater {
 	 * 拡大縮小平行移動回転可能なView用インターフェース
 	 */
 	public interface ITransformView {
-		/**
-		 * View表示内容を更新要求
-		 */
-		public void invalidate();
-		/**
-		 * UIスレッド上で遅延実行要求
-		 * @param action
-		 * @param delayMillis
-		 * @return
-		 */
-		public boolean postDelayed(Runnable action, long delayMillis);
-		/**
-		 * 待機中の遅延実行処理があれば除去する
-		 * @param action
-		 * @return
-		 */
-		public boolean removeCallbacks(final Runnable action);
+		@NonNull
+		public View getView();
 		/**
 		 * Viewのsuper#onRestoreInstanceStateを呼び出す
 		 * @param state
@@ -112,12 +97,6 @@ public class ViewTransformDelegater {
 		 * @return
 		 */
 		public RectF getBounds();
-		/**
-		 * View#getDrawingRectを呼び出してViewの描画領域の大きさを取得
-		 * @return
-		 */
-		@NonNull
-		public Rect getDrawingRect();
 		/**
 		 * Viewのsuper#getImageMatrixを呼び出す
 		 * 親Viewに設定されているトランスフォームマトリックスを取得
@@ -510,7 +489,7 @@ public class ViewTransformDelegater {
 			switch (mState) {
 			case STATE_WAITING:
 				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
-				mParent.removeCallbacks(mWaitImageReset);
+				mParent.getView().removeCallbacks(mWaitImageReset);
 			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
 					startCheck(event);
@@ -526,7 +505,7 @@ public class ViewTransformDelegater {
 			switch (mState) {
 			case STATE_WAITING:
 				if (checkTouchMoved(event)) {
-					mParent.removeCallbacks(mWaitImageReset);
+					mParent.getView().removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGGING);
 					return true;
 				}
@@ -554,8 +533,8 @@ public class ViewTransformDelegater {
 		}
 		case MotionEvent.ACTION_CANCEL:
 		case MotionEvent.ACTION_UP:
-			mParent.removeCallbacks(mWaitImageReset);
-			mParent.removeCallbacks(mStartCheckRotate);
+			mParent.getView().removeCallbacks(mWaitImageReset);
+			mParent.getView().removeCallbacks(mStartCheckRotate);
 		case MotionEvent.ACTION_POINTER_UP:
 			setState(STATE_NON);
 			break;
@@ -676,7 +655,7 @@ public class ViewTransformDelegater {
 			mImageRect.setEmpty();
 		}
 		// set limit rectangle that the image can move
-		mLimitRect.set(mParent.getDrawingRect());
+		mLimitRect.set(getDrawingRect());
 		mLimitRect.inset(MOVE_LIMIT, MOVE_LIMIT);
 		mLimitSegments[0] = null;
 	}
@@ -686,12 +665,13 @@ public class ViewTransformDelegater {
 	 */
 	public void clearPendingTasks() {
 		if (DEBUG) Log.v(TAG, "clearPendingTasks:");
+		final View parent = mParent.getView();
 		if (mWaitImageReset != null)
-			mParent.removeCallbacks(mWaitImageReset);
+			parent.removeCallbacks(mWaitImageReset);
 		if (mStartCheckRotate != null)
-			mParent.removeCallbacks(mStartCheckRotate);
+			parent.removeCallbacks(mStartCheckRotate);
 		if (mWaitReverseReset != null)
-			mParent.removeCallbacks(mWaitReverseReset);
+			parent.removeCallbacks(mWaitReverseReset);
 	}
 
 	/**
@@ -704,12 +684,12 @@ public class ViewTransformDelegater {
 			scale = mMinScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.invalidate();
+			mParent.getView().invalidate();
 		} else if (scale > mMaxScale) {
 			scale = mMaxScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.invalidate();
+			mParent.getView().invalidate();
 		}
 	}
 
@@ -748,7 +728,7 @@ public class ViewTransformDelegater {
 		mPrimaryX = mSecondX = event.getX();
 		mPrimaryY = mSecondY = event.getY();
 		if (mWaitImageReset == null) mWaitImageReset = new WaitImageReset();
-		mParent.postDelayed(mWaitImageReset, CHECK_TIMEOUT);
+		mParent.getView().postDelayed(mWaitImageReset, CHECK_TIMEOUT);
 		setState(STATE_WAITING);
 	}
 
@@ -878,7 +858,7 @@ public class ViewTransformDelegater {
 			//
 			if (mStartCheckRotate == null)
 				mStartCheckRotate = new StartCheckRotate();
-			mParent.postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+			mParent.getView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
 			setState(STATE_CHECKING); 		// start zoom/rotation check
 		}
 	}
@@ -890,7 +870,7 @@ public class ViewTransformDelegater {
 	 */
 	private final void startZoom(final MotionEvent event) {
 
-		mParent.removeCallbacks(mStartCheckRotate);
+		mParent.getView().removeCallbacks(mStartCheckRotate);
 		setState(STATE_ZOOMING);
 	}
 
@@ -1254,6 +1234,18 @@ public class ViewTransformDelegater {
 
 	public Matrix getImageMatrix() {
 		return mImageMatrix;
+	}
+
+	/**
+	 * ITransformViewの実装
+	 * View#getDrawingRectを呼び出してViewの描画領域の大きさを取得
+	 * @return
+	 */
+	@NonNull
+	private Rect getDrawingRect() {
+		final Rect r = new Rect();
+		mParent.getView().getDrawingRect(r);
+		return r;
 	}
 
 }

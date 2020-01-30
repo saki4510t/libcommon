@@ -36,6 +36,7 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.AbsSavedState;
 import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -210,6 +211,12 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 //--------------------------------------------------------------------------------
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
+	}
+
 	/**
 	 * ITransformViewの実装
 	 * Viewのsuper#onRestoreInstanceStateを呼び出す
@@ -235,19 +242,6 @@ public class ZoomImageView extends AppCompatImageView
 			result = new RectF();
 		}
 		return result;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * View#getDrawingRectを呼び出してViewの描画領域の大きさを取得
-	 * @return
-	 */
-	@NonNull
-	@Override
-	public Rect getDrawingRect() {
-		final Rect r = new Rect();
-		super.getDrawingRect(r);
-		return r;
 	}
 
 	/**
