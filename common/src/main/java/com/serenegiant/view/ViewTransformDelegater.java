@@ -977,7 +977,7 @@ public class ViewTransformDelegater {
 	 */
 	private final float getMatrixScale() {
 		updateMatrixCache();
-		final float scale = Math.min(mMatrixCache[Matrix.MSCALE_X], mMatrixCache[Matrix.MSCALE_X]);
+		final float scale = Math.min(mMatrixCache[Matrix.MSCALE_X], mMatrixCache[Matrix.MSCALE_Y]);
 		if (scale <= 0f) {	// for prevent disappearing reversing
 			if (DEBUG) Log.w(TAG, "getMatrixScale:scale<=0, set to default");
 			return DEFAULT_SCALE;
