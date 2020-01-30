@@ -323,6 +323,23 @@ public abstract class ViewContentTransformer {
 	}
 
 	/**
+	 * 指定した座標配列をトランスフォームマトリックスで変換する
+	 * @param points
+	 */
+	public void mapPoints(@NonNull final float[] points) {
+		mTransform.mapPoints(points);
+	}
+
+	/**
+	 * 指定した座標配列をトランスフォームマトリックスで変換する
+	 * @param dst 代入先の座標配列(x,y ペア)
+	 * @param src 変換元の座標配列(x,y ペア)
+	 */
+	public void mapPoints(@NonNull final float[] dst, @NonNull final float[] src) {
+		mTransform.mapPoints(dst, src);
+	}
+
+	/**
 	 * トランスフォームマトリックスを設定
 	 * @param transX
 	 * @param transY
