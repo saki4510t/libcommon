@@ -191,18 +191,6 @@ public class ZoomImageView extends AppCompatImageView
 		Log.w(TAG, "setScaleType: ignore this parameter on ZoomImageView2, fixed to ScaleType.MATRIX.");
 	}
 
-	/**
-	 * set the Matrix for image zooming/transforming</br>
-	 * this method ignore the parameter because ZoomImageView needs to set Matrix internally
-	 */
-	@Override
-	public void setImageMatrix(final Matrix matrix) {
-
-		super.setImageMatrix(mDelegater.getImageMatrix());
-		Log.w(TAG, "setScaleType: ignore this parameter on ZoomImageView2.");
-	}
-
-
 	@Override
 	public void setColorFilter(final ColorFilter cf) {
 		super.setColorFilter(cf);
@@ -211,20 +199,76 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * 最大拡大率を設定
+	 * @param maxScale
+	 */
+	public void setMaxScale(final float maxScale) {
+		mDelegater.setMaxScale(maxScale);
+	}
+
+	/**
+	 * 最小縮小率を設定
+	 * @param minScale
+	 */
+	public void setMinScale(final float minScale) {
+		mDelegater.setMinScale(minScale);
+	}
+
+	/**
+	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
+	 * @param listener
+	 */
+	public void setViewTransformListener(
+		final ViewTransformDelegater.ViewTransformListener listener) {
+		mDelegater.setOnStartRotationListener(listener);
+	}
+
+	/**
+	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
+	 * @return
+	 */
+	@Nullable
+	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
+		return mDelegater.getOnStartRotationListener();
+	}
+
+	/**
+	 * 現在の拡大縮小率を取得
+	 * @return
+	 */
+	public float getScale() {
+		return mDelegater.getScale();
+	}
+
+	/**
+	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
+	 * @param result
+	 * @return
+	 */
 	@NonNull
-	@Override
-	public View getView() {
-		return this;
+	public PointF getTranslate(@NonNull final PointF result) {
+		return mDelegater.getTranslate(result);
 	}
 
 	/**
 	 * ITransformViewの実装
-	 * Viewのsuper#onRestoreInstanceStateを呼び出す
-	 * @param state
+	 * 現在のView表示内容の回転角度を取得
 	 */
 	@Override
-	public void onRestoreInstanceStateSp(final Parcelable state) {
-		super.onRestoreInstanceState(state);
+	public float getRotation() {
+		return mDelegater.getRotation();
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * ITransformViewの実装
+	 * @return
+	 */
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
 	}
 
 	/**
@@ -250,8 +294,13 @@ public class ZoomImageView extends AppCompatImageView
 	 * @return
 	 */
 	@Override
-	public Matrix getImageMatrixSp() {
-		return super.getImageMatrix();
+	public Matrix getTransform(@Nullable final Matrix transform) {
+		if (transform != null) {
+			transform.set(getImageMatrix());
+			return transform;
+		} else {
+			return new Matrix(getImageMatrix());
+		}
 	}
 
 	/**
@@ -260,8 +309,8 @@ public class ZoomImageView extends AppCompatImageView
 	 * @param matrix
 	 */
 	@Override
-	public void setImageMatrixSp(final Matrix matrix) {
-		super.setImageMatrix(matrix);
+	public void setTransform(final Matrix matrix) {
+		setImageMatrix(matrix);
 	}
 
 	/**
@@ -289,79 +338,6 @@ public class ZoomImageView extends AppCompatImageView
 		// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
 		// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 		setFrame(getLeft(), getTop(), getRight(), getBottom());
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * 最大拡大率を設定
-	 * @param maxScale
-	 */
-	@Override
-	public void setMaxScale(final float maxScale) {
-		mDelegater.setMaxScale(maxScale);
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * 最小縮小率を設定
-	 * @param minScale
-	 */
-	@Override
-	public void setMinScale(final float minScale) {
-		mDelegater.setMinScale(minScale);
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
-	 * @param listener
-	 */
-	@Override
-	public void setViewTransformListener(
-		final ViewTransformDelegater.ViewTransformListener listener) {
-		mDelegater.setOnStartRotationListener(listener);
-	}
-	
-	/**
-	 * ITransformViewの実装
-	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
-	 * @return
-	 */
-	@Nullable
-	@Override
-	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
-		return mDelegater.getOnStartRotationListener();
-	}
-	
-	/**
-	 * ITransformViewの実装
-	 * 現在の拡大縮小率を取得
-	 * @return
-	 */
-	@Override
-	public float getScale() {
-		return mDelegater.getScale();
-	}
-	
-	/**
-	 * ITransformViewの実装
-	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
-	 * @param result
-	 * @return
-	 */
-	@NonNull
-	@Override
-	public PointF getTranslate(@NonNull final PointF result) {
-		return mDelegater.getTranslate(result);
-	}
-	
-	/**
-	 * ITransformViewの実装
-	 * 現在のView表示内容の回転角度を取得
-	 */
-	@Override
-	public float getRotation() {
-		return mDelegater.getRotation();
 	}
 
 //--------------------------------------------------------------------------------
