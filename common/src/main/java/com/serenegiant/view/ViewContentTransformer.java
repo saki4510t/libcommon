@@ -92,8 +92,7 @@ public abstract class ViewContentTransformer {
 	 */
 	protected ViewContentTransformer(@NonNull final View view) {
 		mTargetView = view;
-		updateTransform();
-		mDefaultTransform.set(mTransform);
+		updateTransform(true);
 	}
 
 	@NonNull
@@ -104,9 +103,10 @@ public abstract class ViewContentTransformer {
 	/**
 	 * ViewContentTransformerで保持しているトランスフォームマトリックスを
 	 * ターゲットViewに設定されているトランスフォームマトリックスに設定する
+	 * @param setAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
 	 * @return
 	 */
-	public abstract ViewContentTransformer updateTransform();
+	public abstract ViewContentTransformer updateTransform(final boolean setAsDefault);
 
 	/**
 	 * トランスフォームマトリックスを設定する
@@ -381,7 +381,7 @@ public abstract class ViewContentTransformer {
 		}
 
 		@Override
-		public DefaultTransformer updateTransform() {
+		public DefaultTransformer updateTransform(final boolean setAsDefault) {
 			// 今は何もしない
 			return this;
 		}
@@ -427,8 +427,11 @@ public abstract class ViewContentTransformer {
 		}
 
 		@Override
-		public TextureViewTransformer updateTransform() {
+		public TextureViewTransformer updateTransform(final boolean setAsDefault) {
 			getTargetView().getTransform(mTransform);
+			if (setAsDefault) {
+				mDefaultTransform.set(mTransform);
+			}
 			return this;
 		}
 
@@ -477,8 +480,11 @@ public abstract class ViewContentTransformer {
 		}
 
 		@Override
-		public ImageViewTransformer updateTransform() {
-			getTargetView().getImageMatrix();
+		public ImageViewTransformer updateTransform(final boolean setAsDefault) {
+			mTransform.set(getTargetView().getImageMatrix());
+			if (setAsDefault) {
+				mDefaultTransform.set(mTransform);
+			}
 			return this;
 		}
 
