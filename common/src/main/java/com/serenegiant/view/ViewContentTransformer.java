@@ -203,6 +203,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer setTranslate(final float x, final float y) {
+		if (DEBUG) Log.v(TAG, String.format("setTranslate:(%f,%f)", x, y));
 		return setTransform(x, y,
 			mCurrentScaleX, mCurrentScaleY,
 			mCurrentRotate);
@@ -215,6 +216,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer translate(final float dx, final float dy) {
+		if (DEBUG) Log.v(TAG, String.format("translate:(%f,%f)", dx, dy));
 		return setTransform(mCurrentTransX + dx, mCurrentTransY + dy,
 			mCurrentScaleX, mCurrentScaleY,
 			mCurrentRotate);
@@ -257,6 +259,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer setScale(final float scaleX, final float scaleY) {
+		if (DEBUG) Log.v(TAG, String.format("setScale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scaleX, scaleY,
 			mCurrentRotate);
@@ -268,6 +271,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer setScale(final float scale) {
+		if (DEBUG) Log.v(TAG, String.format("setScale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scale, scale,
 			mCurrentRotate);
@@ -280,6 +284,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer scale(final float scaleX, final float scaleY) {
+		if (DEBUG) Log.v(TAG, String.format("scale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scaleX, mCurrentScaleY * scaleY,
 			mCurrentRotate);
@@ -291,6 +296,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer scale(final float scale) {
+		if (DEBUG) Log.v(TAG, String.format("scale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scale, mCurrentScaleY * scale,
 			mCurrentRotate);
@@ -326,6 +332,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer setRotate(final float degrees) {
+		if (DEBUG) Log.v(TAG, String.format("setRotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
 			degrees);
@@ -337,6 +344,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	public ViewContentTransformer rotate(final float degrees) {
+		if (DEBUG) Log.v(TAG, String.format("rotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
 			mCurrentRotate + degrees);
