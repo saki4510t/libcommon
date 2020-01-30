@@ -35,6 +35,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * 拡大縮小平行移動回転可能なViewのためのdelegater
@@ -44,113 +45,178 @@ public class ViewTransformDelegater {
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewTransformDelegater.class.getSimpleName();
 
+	/**
+	 * 拡大縮小平行移動回転可能なView用インターフェース
+	 */
 	public interface ITransformView {
+		/**
+		 * View表示内容を更新要求
+		 */
 		public void invalidate();
+		/**
+		 * UIスレッド上で遅延実行要求
+		 * @param action
+		 * @param delayMillis
+		 * @return
+		 */
 		public boolean postDelayed(Runnable action, long delayMillis);
-		public void onRestoreInstanceStateSp(final Parcelable state);
+		/**
+		 * 待機中の遅延実行処理があれば除去する
+		 * @param action
+		 * @return
+		 */
 		public boolean removeCallbacks(final Runnable action);
+		/**
+		 * Viewのsuper#onRestoreInstanceStateを呼び出す
+		 * @param state
+		 */
+		public void onRestoreInstanceStateSp(final Parcelable state);
 
 		/**
-		 * set maximum zooming scale
+		 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
+		 * @param listener
+		 */
+		public void setOnStartRotationListener(
+			@Nullable final OnStartRotationListener listener);
+		/**
+		 * 現在設定されている回転処理開始時のコールバックリスナーを取得
+		 * @return
+		 */
+		@Nullable
+		public OnStartRotationListener getOnStartRotationListener();
+		/**
+		 * 最大拡大率を設定
 		 * @param maxScale
 		 */
 		public void setMaxScale(final float maxScale);
 		/**
-		 * set minimum zooming scale
+		 * 最小縮小率を設定
 		 * @param minScale
 		 */
 		public void setMinScale(final float minScale);
-		public void setOnStartRotationListener(final OnStartRotationListener listener);
-		public OnStartRotationListener getOnStartRotationListener();
 		/**
-		 * return current scale
+		 * 現在の拡大縮小率を取得
 		 * @return
 		 */
 		public float getScale();
 		/**
-		 * return current image translate values(offset)
+		 * 現在のView(の表示内容)平行移動量(オフセット)を取得
 		 * @param result
 		 * @return
 		 */
-		public PointF getTranslate(final PointF result);
+		@NonNull
+		public PointF getTranslate(@NonNull final PointF result);
 		/**
-		 * get current rotating degrees
+		 * 現在のView表示内容の回転角度を取得
 		 */
 		public float getRotation();
-
+		/**
+		 * View表示内容の大きさを取得
+		 * @return
+		 */
 		public RectF getBounds();
+		/**
+		 * View#getDrawingRectを呼び出してViewの描画領域の大きさを取得
+		 * @return
+		 */
 		@NonNull
 		public Rect getDrawingRect();
+		/**
+		 * Viewのsuper#getImageMatrixを呼び出す
+		 * 親Viewに設定されているトランスフォームマトリックスを取得
+		 * @return
+		 */
 		public Matrix getImageMatrixSp();
+		/**
+		 * Viewのsuper#setImageMatrixを呼び出す
+		 * @param matrix
+		 */
 		public void setImageMatrixSp(final Matrix matrix);
+		/**
+		 * Viewのsuper#setColorFilterを呼び出す
+		 * @param cf
+		 */
 		public void setColorFilterSp(final ColorFilter cf);
 
+		/**
+		 * View表内容の拡大縮小回転平行移動を初期化
+		 */
 		public void init();
+		/**
+		 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
+		 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる
+		 */
 		public void onInit();
-	}
+
+	} // ITransformView
 
 	// constants
 	/**
-	 * State: idle
+	 * State: ユーザー操作無し
 	 */
 	private static final int STATE_NON = 0;
 	/**
-	 * State: wait action
+	 * State: シングルタッチがあったのでユーザー操作待機中
 	 */
 	private static final int STATE_WAITING = 1;
 	/**
-	 * State: dragging
+	 * State: 平行移動処理中
 	*/
 	private static final int STATE_DRAGGING = 2;
 	/**
-	 * State: transition state to check starting zoom/rotation
+	 * State: 拡大縮小・回転操作の待機中
 	 */
 	private static final int STATE_CHECKING = 3;
 	/**
-	 * State: zooming
+	 * State: 拡大縮小処理中
 	*/
 	private static final int STATE_ZOOMING = 4;
 	/**
-	 * State: Rotating
+	 * State: 回転処理中
 	 */
 	private static final int STATE_ROTATING = 5;
 
 	/**
-	 * default value of maximum zoom scale
+	 * 最大拡大率のデフォルト値
 	*/
 	private static final float DEFAULT_MAX_SCALE = 8.f;
 	/**
-	 * default value of minimum zoom scale
+	 * 最小縮小率のデフォルト値
 	 */
 	private static final float DEFAULT_MIN_SCALE = 0.1f;
 	/**
-	 * default value without zooming
+	 * 拡大縮小率のデフォルト値
 	*/
 	private static final float DEFAULT_SCALE = 1.f;
 	/**
-	 * minimum distance between touch positions when start zooming/rotating
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔
+	 * この値より小さい場合には拡大縮小・回転処理を行わない
 	 */
 	private static final float MIN_DISTANCE = 15.f;
+	/**
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔の2乗
+	 * 処理の高速化のためにタッチ間隔の計算で平方根の処理をおこなわずに済むように
+	 */
 	private static final float MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
 	/**
-	 * limit value to prevent the image disappearing from the view when moving
+	 * 平行移動時に表示内容がView外へ出てしまうのを防ぐための制限値
 	 */
 	private static final int MOVE_LIMIT = 50;
 	/**
-     * the duration in milliseconds we will wait to start rotating(if multi touched)/reseting(if single touched)
+     * マルチタッチ時に回転処理へ遷移するまでの待機時間[ミリ秒]/シングルロングタッチでリセットするまでの待機時間[ミリ秒]
 	 */
     private static final int CHECK_TIMEOUT
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
     /**
-     * the duration in milliseconds we will wait to reset reversing the color of image
+     * 色反転後にもとに戻すまでの待機時間[ミリ秒]
      */
     private static final int REVERSING_TIMEOUT = 100;
     /**
-	 * conversion factor from radian to degree
+	 * ラジアンを度に変換するための係数(== (1.0f / Math.PI) * 180.0f;)
 	 */
-	private static final float TO_DEGREE = 57.2957795130823f;	// = (1.0f / Math.PI) * 180.0f;
+	private static final float TO_DEGREE = 57.2957795130823f;
 	/**
-	 * ColorMatrix data for reversing image
+	 * 色を反転させるための色変換行列
 	 */
 	private static final float[] REVERSE = {
 	    -1.0f,   0.0f,   0.0f,  0.0f,  255.0f,
@@ -159,7 +225,7 @@ public class ViewTransformDelegater {
 	     0.0f,   0.0f,   0.0f,  1.0f,    0.0f,
 	};
 	/**
-	 *
+	 * 振動しないようにするためのあそび
 	 */
 	private static final float EPS = 0.1f;
 
@@ -170,70 +236,75 @@ public class ViewTransformDelegater {
 	 */
 	private boolean mIsRestored;
 	/**
-	 * Matrix for zooming/moving/rotating
+	 * 表示内容のトランスフォームマトリックス
 	 */
 	protected final Matrix mImageMatrix = new Matrix();
 	/**
-	 * flag when mImageMatrix is changed(for updating Matrix cache)
+	 * mImageMatrixのキャッシュを更新する必要があるかどうか
 	 */
 	protected boolean mImageMatrixChanged;
 	/**
-	 * Matrix cache of mImageMatrix elements</br>
-	 * to reduce overhead of JINI call in the Matrix
+	 * 高速化のためにmImageMatrixの内容をfloat配列にキャッシュする
+	 * (Matrixへ直接アクセスするたびにJNI経由でのアクセスになるので)
 	 */
 	protected final float[] mMatrixCache = new float[9];
 	/**
-	 * for save the Matrix when touch operation start
+	 * タッチ操作開始時のトランスフォームマトリックスを保存
 	 */
 	private final Matrix mSavedImageMatrix = new Matrix();
 	/**
-	 * limit bounds that image can move
+	 * 移動可能範囲を指定
 	 */
 	private final RectF mLimitRect = new RectF();
 	/**
-	 * limit line segments tha image can move
+	 * 移動範囲制限のためのLineSegment配列
 	 */
 	private final LineSegment[] mLimitSegments = new LineSegment[4];
 	/**
-	 * actual size of image in ImageView(copy from ImageView#getDrawable#getBounds)
+	 * 表示内容の実際のサイズ
 	 */
 	private final RectF mImageRect = new RectF();
 	/**
-	 * scaled and moved and rotated corner coordinates of image
+	 * 拡大縮小回転平行移動した表示内容の四隅の座標
 	 * [(left,top),(right,top),(right,bottom),(left.bottom)]
 	 */
 	private final float[] mTrans = new float[8];
 	/**
-	 * touch ids for touch operations
+	 * タッチ操作時のタッチID
 	 */
 	private int mPrimaryId, mSecondaryId;
 	/**
-	 * x/y coordinates of primary touch point
+	 * 最初にタッチした座標を保持
 	 */
 	private float mPrimaryX, mPrimaryY;
 	/**
-	 * x/y coordinates of second touch for rotation
+	 * 2つめのタッチ座標を保持
 	 */
 	private float mSecondX, mSecondY;
 	/**
-	 * x/y coordinates of pivot point for zooming/rotating
+	 * 拡大縮小・回転時のピボット(中心)座標を保持
 	 */
 	private float mPivotX, mPivotY;
 	/**
-	 * distance between touch points when start multi touch, for calculating zooming scale
+	 * マルチタッチ時の最初のタッチ間隔(拡大率計算用)
 	 */
 	private float mTouchDistance;
 	/**
-	 * current rotating degree
+	 * 現在の回転角度
 	 */
 	private float mCurrentDegrees;
+	/**
+	 * 表示内容を回転しているかどうか
+	 */
 	private boolean mIsRotating;
 	/**
-	 * Maximum zoom scale
+	 * 最大拡大率
 	 */
 	private float mMaxScale = DEFAULT_MAX_SCALE;
 	/**
 	 * Minimum zoom scale, set in #init as fit the image to this view bounds
+	 * 最小縮小率
+	 * #initで初期化される
 	 */
 	private float mMinScale = DEFAULT_MIN_SCALE;
 	/**
@@ -244,6 +315,7 @@ public class ViewTransformDelegater {
 	/**
 	 * listener for visual/sound feedback on start rotating
 	 */
+	@Nullable
 	private OnStartRotationListener mOnStartRotationListener;
 	/**
 	 * ColorFilter to reverse the color of the image
@@ -251,19 +323,19 @@ public class ViewTransformDelegater {
 	 */
 	private ColorFilter mColorReverseFilter;
 	/**
-	 * backup of ColorFilter to restore after image color reversing
+	 * 色反転後にもとに戻すためのオリジナルのカラーフィルターを保持
 	 */
 	private ColorFilter mSavedColorFilter;
 	/**
-	 * Runnable instance to wait starting image reset
+	 * シングルロングタッチでリセットを開始するのを待機するためのRunnable
 	 */
 	private Runnable mWaitImageReset;
 	/**
-	 * Runnable instance to wait starting rotation
+	 * 回転処理開始待ちを行うRunnable
 	 */
 	private Runnable mStartCheckRotate;
 	/**
-	 * Runnable instcance to wait restoring the image color
+	 * フィードバック用に表示内容の色を反転させた後にもとに戻すためのRunnable
 	 */
 	private Runnable mWaitReverseReset;
 
@@ -371,13 +443,25 @@ public class ViewTransformDelegater {
     }
 
 //--------------------------------------------------------------------------------
-
+	/**
+	 * 親Viewの参照
+	 */
 	@NonNull
 	private final ITransformView mParent;
+
+	/**
+	 * コンストラクタ
+	 * @param parent
+	 */
 	public ViewTransformDelegater(@NonNull final ITransformView parent) {
 		mParent = parent;
 	}
 
+	/**
+	 * View#onRestoreInstanceStateの追加処理
+	 * Viewの状態を復帰
+	 * @param state
+	 */
 	public void onRestoreInstanceState(final Parcelable state) {
 		if (state instanceof SavedState) {
 			final SavedState saved = (SavedState)state;
@@ -390,6 +474,12 @@ public class ViewTransformDelegater {
 		}
 	}
 
+	/**
+	 * View#onSaveInstanceStateの追加処理
+	 * Viewの状態を保存
+	 * @param superState
+	 * @return
+	 */
 	public Parcelable onSaveInstanceState(final Parcelable superState) {
 		if (DEBUG) Log.v(TAG, "onSaveInstanceState:");
 
@@ -402,6 +492,10 @@ public class ViewTransformDelegater {
 		return saveState;
 	}
 
+	/**
+	 * View#onConfigurationChangedの追加処理
+	 * @param newConfig
+	 */
 	public void onConfigurationChanged(final Configuration newConfig) {
 		if (DEBUG) Log.v(TAG, "onConfigurationChanged:" + newConfig);
 
@@ -409,12 +503,23 @@ public class ViewTransformDelegater {
 		// XXX need something?
 	}
 
+	/**
+	 * ビジュアルフィードバック後にカラーフィルターを復帰させるときのために
+	 * オリジナルのカラーフィルターを保存する
+	 * @param cf
+	 */
 	public void setColorFilter(final ColorFilter cf) {
-
-		// save the ColorFilter to restore after default visual feedback on start rotating
 		mSavedColorFilter = cf;
 	}
 
+	/**
+	 * View#onLayoutの追加処理
+	 * @param changed
+	 * @param left
+	 * @param top
+	 * @param right
+	 * @param bottom
+	 */
 	public void onLayout(final boolean changed,
 		final int left, final int top, final int right, final int bottom) {
 
@@ -424,6 +529,12 @@ public class ViewTransformDelegater {
 		mParent.init();
 	}
 
+	/**
+	 * View#onTouchEventの処理
+	 * falseを返したときにはView#super.onTouchEventでデフォルトの処理をすること
+	 * @param event
+	 * @return
+	 */
 	public boolean onTouchEvent(final MotionEvent event) {
 
 		if (DEBUG) Log.v(TAG, "onTouchEvent:");
@@ -436,10 +547,10 @@ public class ViewTransformDelegater {
 			startWaiting(event);
 			return true;
 		case MotionEvent.ACTION_POINTER_DOWN:
-		{
-			// start multi touch, zooming/rotating
+		{	// マルチタッチ時の処理
 			switch (mState) {
 			case STATE_WAITING:
+				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
 				mParent.removeCallbacks(mWaitImageReset);
 			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
@@ -495,7 +606,7 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * set maximum zooming scale
+	 * 最大拡大率を設定
 	 * @param maxScale
 	 */
 	public void setMaxScale(final float maxScale) {
@@ -507,7 +618,7 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * set minimum zooming scale
+	 * 最小縮小率を設定
 	 * @param minScale
 	 */
 	public void setMinScale(final float minScale) {
@@ -519,23 +630,15 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * reset the zooming/rotating;
-	 */
-	public void reset() {
-		if (DEBUG) Log.v(TAG, "reset:");
-		init();
-	}
-
-	/**
-	 * set listener on start rotating (for visual/sound feedback)
+	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
 	 * @param listener
 	 */
-	public void setOnStartRotationListener(final OnStartRotationListener listener) {
+	public void setOnStartRotationListener(@Nullable final OnStartRotationListener listener) {
 		mOnStartRotationListener = listener;
 	}
 
 	/**
-	 * return current listener
+	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
 	 * @return
 	 */
 	public OnStartRotationListener getOnStartRotationListener() {
@@ -543,7 +646,7 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * return current scale
+	 * 現在の拡大縮小率を取得
 	 * @return
 	 */
 	public float getScale() {
@@ -551,31 +654,48 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * return current image translate values(offset)
+	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
 	 * @param result
 	 * @return
 	 */
-	public PointF getTranslate(final PointF result) {
+	@NonNull
+	public PointF getTranslate(@NonNull final PointF result) {
 		updateMatrixCache();
-		if (result != null) {
-			result.set(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
-		}
+		result.set(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
 		return result;
 	}
 
 	/**
-	 * get current rotating degrees
+	 * 現在のView表示内容の平行移動両(横方向)を取得
+	 * @return
+	 */
+	public float getTranslateX() {
+		updateMatrixCache();
+		return mMatrixCache[Matrix.MTRANS_X];
+	}
+
+	/**
+	 * 現在のView表示内容の平行移動両(上下方向)を取得
+	 * @return
+	 */
+	public float getTranslateY() {
+		updateMatrixCache();
+		return mMatrixCache[Matrix.MTRANS_Y];
+	}
+
+	/**
+	 * 現在のView表示内容の回転角度を取得
 	 */
 	public float getRotation() {
 		return mCurrentDegrees;
 	}
 
 	/**
-	 * initialization of ITransformView called from #init
+	 * View表内容の拡大縮小回転平行移動を初期化
 	 */
 	public void init() {
 		if (DEBUG) Log.v(TAG, "init:" + mIsRestored);
-		clearCallbacks();
+		clearPendingTasks();
 		if (!mIsRestored) {
 			mParent.onInit();
 			// set the initial state to idle, get and save the internal Matrix.
@@ -604,10 +724,10 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * remove all callbacks if they are in the message queue
+	 * 実行待機中のタスクがあればクリアする
 	 */
-	public void clearCallbacks() {
-		if (DEBUG) Log.v(TAG, "clearCallbacks:");
+	public void clearPendingTasks() {
+		if (DEBUG) Log.v(TAG, "clearPendingTasks:");
 		if (mWaitImageReset != null)
 			mParent.removeCallbacks(mWaitImageReset);
 		if (mStartCheckRotate != null)
@@ -617,9 +737,9 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * check zooming scale range
+	 * 拡大縮小率の範囲チェック
 	 */
-	private final void checkScale() {
+	private void checkScale() {
 		if (DEBUG) Log.v(TAG, "checkScale:");
 		float scale = getMatrixScale();
 		if (scale < mMinScale) {
@@ -636,11 +756,11 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * set current state, get and save the internal Matrix int super class
+	 * 現在のステートを設定、内部使用のトランスフォームマトリックスを保存
 	 * @param state:	-1/STATE_NON/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
-	private final void setState(final int state) {
+	private void setState(final int state) {
 		if (DEBUG) Log.v(TAG, String.format("setState:%d→%d", mState, state));
 
 		if (mState != state) {
@@ -655,10 +775,11 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * start waiting
+	 * ユーザー操作開始時の処理
+	 * 回転
 	 * @param event
 	 */
-	private final void startWaiting(final MotionEvent event) {
+	private void startWaiting(@NonNull final MotionEvent event) {
 		if (DEBUG) Log.v(TAG, "startWaiting:");
 
 		mPrimaryId = 0;
@@ -671,10 +792,10 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * move the image
+	 * 平行移動処理
 	 * @param event
 	 */
-	private final boolean processDrag(final MotionEvent event) {
+	private boolean processDrag(@NonNull final MotionEvent event) {
 
 		float dx = event.getX() - mPrimaryX;
 		float dy = event.getY() - mPrimaryY;
@@ -765,7 +886,7 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * start checking whether zooming/rotating
+	 * 拡大縮小回転操作待ちを開始
 	 * @param event
 	 */
 	private final void startCheck(final MotionEvent event) {

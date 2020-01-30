@@ -36,10 +36,11 @@ import android.view.AbsSavedState;
 import android.view.MotionEvent;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 /**
- * ImageView with zooming/dragging/rotating image with touch
+ * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends AppCompatImageView
 	implements ViewTransformDelegater.ITransformView {
@@ -50,7 +51,7 @@ public class ZoomImageView extends AppCompatImageView
 //--------------------------------------------------------------------------------
 	private final ViewTransformDelegater mDelegater;
 	/**
-	 * Constructor for constructing in program
+	 * コンストラクタ
 	 * @param context
 	 */
 	public ZoomImageView(final Context context) {
@@ -58,7 +59,7 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 	/**
-	 * Constructor for constructing from xml
+	 * コンストラクタ
 	 * @param context
 	 * @param attrs
 	 */
@@ -67,7 +68,7 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 	/**
-	 * Constructor for constructing from xml
+	 * コンストラクタ
 	 * @param context
 	 * @param attrs
 	 * @param defStyle
@@ -81,7 +82,7 @@ public class ZoomImageView extends AppCompatImageView
 	@Override
 	protected void onDetachedFromWindow() {
 		if (DEBUG) Log.v(TAG, "onDetachedFromWindow:");
-		mDelegater.clearCallbacks();
+		mDelegater.clearPendingTasks();
 		super.onDetachedFromWindow();
 	}
 
@@ -178,6 +179,7 @@ public class ZoomImageView extends AppCompatImageView
 //--------------------------------------------------------------------------------
 	/**
 	 * ITransformViewの実装
+	 * Viewのsuper#onRestoreInstanceStateを呼び出す
 	 * @param state
 	 */
 	@Override
@@ -187,6 +189,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * View表示内容の大きさを取得
 	 * @return
 	 */
 	@Override
@@ -203,6 +206,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * View#getDrawingRectを呼び出してViewの描画領域の大きさを取得
 	 * @return
 	 */
 	@NonNull
@@ -215,6 +219,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * Viewのsuper#getImageMatrixを呼び出す
 	 * @return
 	 */
 	@Override
@@ -224,6 +229,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * Viewのsuper#setImageMatrixを呼び出す
 	 * @param matrix
 	 */
 	@Override
@@ -233,6 +239,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * Viewのsuper#setColorFilterを呼び出す
 	 * @param cf
 	 */
 	@Override
@@ -242,6 +249,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * View表内容の拡大縮小回転平行移動を初期化
 	 */
 	@Override
 	public void init() {
@@ -252,24 +260,23 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
 	 */
 	@Override
 	public void onInit() {
-		// Scale the image uniformly (maintain the image's aspect ratio)
-		// so that both dimensions (width and height) of the image will be equal
-		// to or less than the corresponding dimension of the view (minus padding).
-		// The image is then centered in the view
-		// leave to super class
+		// 拡大縮小率のデフォルト値を取得するためにImageView自体にトランスフォームマトリックスを計算させる
+		// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
+		// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
+		// 　　Viewのアスペクト比と画像のアスペクト比が異なれば上下または左右のいずれかが見切れる
 		super.setScaleType(ScaleType.CENTER_INSIDE);
-		// the internal Matrix in the super class(that can get with ImageView#getImageMatrix)
-		// never updated when called setScaleType on current implementation.
-		// therefore call setFrame to update internal Matrix.
-		// but the behavior may change in the future implementation...
+		// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
+		// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 		setFrame(getLeft(), getTop(), getRight(), getBottom());
 	}
 
 	/**
 	 * ITransformViewの実装
+	 * 最大拡大率を設定
 	 * @param maxScale
 	 */
 	@Override
@@ -279,6 +286,7 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
+	 * 最小縮小率を設定
 	 * @param minScale
 	 */
 	@Override
@@ -287,7 +295,8 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 	/**
-	 * set listener on start rotating (for visual/sound feedback)
+	 * ITransformViewの実装
+	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
 	 * @param listener
 	 */
 	@Override
@@ -297,16 +306,19 @@ public class ZoomImageView extends AppCompatImageView
 	}
 	
 	/**
-	 * return current listener
+	 * ITransformViewの実装
+	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
 	 * @return
 	 */
-	@NonNull
+	@Nullable
+	@Override
 	public ViewTransformDelegater.OnStartRotationListener getOnStartRotationListener() {
 		return mDelegater.getOnStartRotationListener();
 	}
 	
 	/**
-	 * return current scale
+	 * ITransformViewの実装
+	 * 現在の拡大縮小率を取得
 	 * @return
 	 */
 	@Override
@@ -315,17 +327,20 @@ public class ZoomImageView extends AppCompatImageView
 	}
 	
 	/**
-	 * return current image translate values(offset)
+	 * ITransformViewの実装
+	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
 	 * @param result
 	 * @return
 	 */
+	@NonNull
 	@Override
-	public PointF getTranslate(final PointF result) {
+	public PointF getTranslate(@NonNull final PointF result) {
 		return mDelegater.getTranslate(result);
 	}
 	
 	/**
-	 * get current rotating degrees
+	 * ITransformViewの実装
+	 * 現在のView表示内容の回転角度を取得
 	 */
 	@Override
 	public float getRotation() {
