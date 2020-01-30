@@ -287,8 +287,8 @@ public abstract class ViewContentTransformer {
 			|| (mCurrentScaleY != scaleY)
 			|| (mCurrentRotate != degrees)) {
 
-			mCurrentScaleX = scaleX <= 0.0f ? mCurrentScaleX : scaleX;
-			mCurrentScaleY = scaleY <= 0.0f ? mCurrentScaleY : scaleY;
+			mCurrentScaleX = scaleX;
+			mCurrentScaleY = scaleY;
 			mCurrentTransX = dx;
 			mCurrentTransY = dy;
 			mCurrentRotate = degrees;
