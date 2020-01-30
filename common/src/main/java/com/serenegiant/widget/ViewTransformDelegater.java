@@ -20,9 +20,6 @@ package com.serenegiant.widget;
 
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
-import android.graphics.ColorFilter;
-import android.graphics.ColorMatrix;
-import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -73,17 +70,17 @@ public class ViewTransformDelegater {
 		public void onRestoreInstanceStateSp(final Parcelable state);
 
 		/**
-		 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
+		 * ViewTransformDelegaterからのコールバックリスナーを設定
 		 * @param listener
 		 */
-		public void setOnStartRotationListener(
-			@Nullable final OnStartRotationListener listener);
+		public void setViewTransformListener(
+			@Nullable final ViewTransformListener listener);
 		/**
-		 * 現在設定されている回転処理開始時のコールバックリスナーを取得
+		 * 現在設定されているViewTransformDelegaterからのコールバックリスナーを取得
 		 * @return
 		 */
 		@Nullable
-		public OnStartRotationListener getOnStartRotationListener();
+		public ViewTransformListener getViewTransformListener();
 		/**
 		 * 最大拡大率を設定
 		 * @param maxScale
@@ -132,11 +129,6 @@ public class ViewTransformDelegater {
 		 * @param matrix
 		 */
 		public void setImageMatrixSp(final Matrix matrix);
-		/**
-		 * Viewのsuper#setColorFilterを呼び出す
-		 * @param cf
-		 */
-		public void setColorFilterSp(final ColorFilter cf);
 
 		/**
 		 * View表内容の拡大縮小回転平行移動を初期化
@@ -154,27 +146,27 @@ public class ViewTransformDelegater {
 	/**
 	 * State: ユーザー操作無し
 	 */
-	private static final int STATE_NON = 0;
+	public static final int STATE_NON = 0;
 	/**
 	 * State: シングルタッチがあったのでユーザー操作待機中
 	 */
-	private static final int STATE_WAITING = 1;
+	public static final int STATE_WAITING = 1;
 	/**
 	 * State: 平行移動処理中
 	*/
-	private static final int STATE_DRAGGING = 2;
+	public static final int STATE_DRAGGING = 2;
 	/**
 	 * State: 拡大縮小・回転操作の待機中
 	 */
-	private static final int STATE_CHECKING = 3;
+	public static final int STATE_CHECKING = 3;
 	/**
 	 * State: 拡大縮小処理中
 	*/
-	private static final int STATE_ZOOMING = 4;
+	public static final int STATE_ZOOMING = 4;
 	/**
 	 * State: 回転処理中
 	 */
-	private static final int STATE_ROTATING = 5;
+	public static final int STATE_ROTATING = 5;
 
 	/**
 	 * 最大拡大率のデフォルト値
@@ -208,22 +200,9 @@ public class ViewTransformDelegater {
     private static final int CHECK_TIMEOUT
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
     /**
-     * 色反転後にもとに戻すまでの待機時間[ミリ秒]
-     */
-    private static final int REVERSING_TIMEOUT = 100;
-    /**
 	 * ラジアンを度に変換するための係数(== (1.0f / Math.PI) * 180.0f;)
 	 */
 	private static final float TO_DEGREE = 57.2957795130823f;
-	/**
-	 * 色を反転させるための色変換行列
-	 */
-	private static final float[] REVERSE = {
-	    -1.0f,   0.0f,   0.0f,  0.0f,  255.0f,
-	     0.0f,  -1.0f,   0.0f,  0.0f,  255.0f,
-	     0.0f,   0.0f,  -1.0f,  0.0f,  255.0f,
-	     0.0f,   0.0f,   0.0f,  1.0f,    0.0f,
-	};
 	/**
 	 * 振動しないようにするためのあそび
 	 */
@@ -316,16 +295,7 @@ public class ViewTransformDelegater {
 	 * listener for visual/sound feedback on start rotating
 	 */
 	@Nullable
-	private OnStartRotationListener mOnStartRotationListener;
-	/**
-	 * ColorFilter to reverse the color of the image
-	 * for default visual feedbak on start rotating
-	 */
-	private ColorFilter mColorReverseFilter;
-	/**
-	 * 色反転後にもとに戻すためのオリジナルのカラーフィルターを保持
-	 */
-	private ColorFilter mSavedColorFilter;
+	private ViewTransformListener mViewTransformListener;
 	/**
 	 * シングルロングタッチでリセットを開始するのを待機するためのRunnable
 	 */
@@ -343,24 +313,19 @@ public class ViewTransformDelegater {
 	/**
 	 * callback listener called when rotation started.
 	 */
-	public interface OnStartRotationListener {
+	public interface ViewTransformListener {
 		/**
 		 * this method is called when rotating starts.</br>
 		 * you will execute feedback something like sound and/or visual effects.
 		 * @param view
-		 * @return if return false, we execute a default visual effect(color reversing)
 		 */
-		public boolean onStartRotation(final ITransformView view);
-	}
-
-	/**
-	 * Runnable to wait restoring the image color
-	 */
-	private final class WaitReverseReset implements Runnable {
-		@Override
-		public void run() {
-			resetColorFilter();
-		}
+		public void onStartRotation(final ITransformView view);
+		/**
+		 * タッチ状態が変化したとき
+		 * @param view
+		 * @param newState
+		 */
+		public void onStateChanged(final ITransformView view, final int newState);
 	}
 
 	/**
@@ -455,6 +420,9 @@ public class ViewTransformDelegater {
 	 */
 	public ViewTransformDelegater(@NonNull final ITransformView parent) {
 		mParent = parent;
+		if (parent instanceof ViewTransformListener) {
+			mViewTransformListener = (ViewTransformListener)parent;
+		}
 	}
 
 	/**
@@ -501,15 +469,6 @@ public class ViewTransformDelegater {
 
 		mIsRestored = false;
 		// XXX need something?
-	}
-
-	/**
-	 * ビジュアルフィードバック後にカラーフィルターを復帰させるときのために
-	 * オリジナルのカラーフィルターを保存する
-	 * @param cf
-	 */
-	public void setColorFilter(final ColorFilter cf) {
-		mSavedColorFilter = cf;
 	}
 
 	/**
@@ -597,7 +556,6 @@ public class ViewTransformDelegater {
 		case MotionEvent.ACTION_UP:
 			mParent.removeCallbacks(mWaitImageReset);
 			mParent.removeCallbacks(mStartCheckRotate);
-			resetColorFilter();
 		case MotionEvent.ACTION_POINTER_UP:
 			setState(STATE_NON);
 			break;
@@ -633,16 +591,16 @@ public class ViewTransformDelegater {
 	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
 	 * @param listener
 	 */
-	public void setOnStartRotationListener(@Nullable final OnStartRotationListener listener) {
-		mOnStartRotationListener = listener;
+	public void setOnStartRotationListener(@Nullable final ViewTransformListener listener) {
+		mViewTransformListener = listener;
 	}
 
 	/**
 	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
 	 * @return
 	 */
-	public OnStartRotationListener getOnStartRotationListener() {
-		return mOnStartRotationListener;
+	public ViewTransformListener getOnStartRotationListener() {
+		return mViewTransformListener;
 	}
 
 	/**
@@ -770,6 +728,9 @@ public class ViewTransformDelegater {
 			if (!mImageMatrix.equals(mSavedImageMatrix)) {
 				mImageMatrix.set(mSavedImageMatrix);
 				mImageMatrixChanged = true;
+			}
+			if (mViewTransformListener != null) {
+				mViewTransformListener.onStateChanged(mParent, state);
 			}
 		}
 	}
@@ -1042,21 +1003,11 @@ public class ViewTransformDelegater {
 	private final void callOnStartRotationListener() {
 		if (DEBUG) Log.v(TAG, "callOnStartRotationListener:");
 
-		boolean result = false;
-		if (mOnStartRotationListener != null)
+		if (mViewTransformListener != null)
 		try {
-			result = mOnStartRotationListener.onStartRotation(mParent);
+			mViewTransformListener.onStartRotation(mParent);
 		} catch (Exception e) {
 			if (DEBUG) Log.w(TAG, e);
-		}
-		if (!result) {
-			if (mColorReverseFilter == null) {
-				mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
-			}
-			mParent.setColorFilterSp(mColorReverseFilter);
-			// post runnable to reset the color reversing
-			if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
-			mParent.postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
 		}
 	}
 
@@ -1253,10 +1204,6 @@ public class ViewTransformDelegater {
 			}
 		}
 		return result;
-	}
-
-	private void resetColorFilter() {
-		mParent.setColorFilterSp(mSavedColorFilter);
 	}
 
 	/**

@@ -24,6 +24,8 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
+import android.graphics.ColorMatrix;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
@@ -43,13 +45,44 @@ import androidx.appcompat.widget.AppCompatImageView;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends AppCompatImageView
-	implements ViewTransformDelegater.ITransformView {
+	implements ViewTransformDelegater.ITransformView,
+	ViewTransformDelegater.ViewTransformListener {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
 
+	/**
+	 * 色反転後にもとに戻すまでの待機時間[ミリ秒]
+	 */
+	private static final int REVERSING_TIMEOUT = 100;
+
+	/**
+	 * 色を反転させるための色変換行列
+	 */
+	private static final float[] REVERSE = {
+	    -1.0f,   0.0f,   0.0f,  0.0f,  255.0f,
+	     0.0f,  -1.0f,   0.0f,  0.0f,  255.0f,
+	     0.0f,   0.0f,  -1.0f,  0.0f,  255.0f,
+	     0.0f,   0.0f,   0.0f,  1.0f,    0.0f,
+	};
+
 //--------------------------------------------------------------------------------
 	private final ViewTransformDelegater mDelegater;
+
+	/**
+	 * ColorFilter to reverse the color of the image
+	 * for default visual feedbak on start rotating
+	 */
+	private ColorFilter mColorReverseFilter;
+	/**
+	 * 色反転後に元に戻すためのオリジナルのカラーフィルターを保持
+	 */
+	private ColorFilter mSavedColorFilter;
+	/**
+	 * 一定時間後に色反転を元に戻すためのRunnable
+	 */
+	private WaitReverseReset mWaitReverseReset;
+
 	/**
 	 * コンストラクタ
 	 * @param context
@@ -171,9 +204,9 @@ public class ZoomImageView extends AppCompatImageView
 
 	@Override
 	public void setColorFilter(final ColorFilter cf) {
-		// save the ColorFilter to restore after default visual feedback on start rotating
-		mDelegater.setColorFilter(cf);
 		super.setColorFilter(cf);
+		// save the ColorFilter to restore after default visual feedback on start rotating
+		mSavedColorFilter = cf;
 	}
 
 //--------------------------------------------------------------------------------
@@ -239,16 +272,6 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
-	 * Viewのsuper#setColorFilterを呼び出す
-	 * @param cf
-	 */
-	@Override
-	public void setColorFilterSp(final ColorFilter cf) {
-		super.setColorFilter(cf);
-	}
-
-	/**
-	 * ITransformViewの実装
 	 * View表内容の拡大縮小回転平行移動を初期化
 	 */
 	@Override
@@ -300,8 +323,8 @@ public class ZoomImageView extends AppCompatImageView
 	 * @param listener
 	 */
 	@Override
-	public void setOnStartRotationListener(
-		final ViewTransformDelegater.OnStartRotationListener listener) {
+	public void setViewTransformListener(
+		final ViewTransformDelegater.ViewTransformListener listener) {
 		mDelegater.setOnStartRotationListener(listener);
 	}
 	
@@ -312,7 +335,7 @@ public class ZoomImageView extends AppCompatImageView
 	 */
 	@Nullable
 	@Override
-	public ViewTransformDelegater.OnStartRotationListener getOnStartRotationListener() {
+	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
 		return mDelegater.getOnStartRotationListener();
 	}
 	
@@ -383,6 +406,52 @@ public class ZoomImageView extends AppCompatImageView
 	 */
 	private boolean hasImage() {
 		return getDrawable() != null;
+	}
+
+	/**
+	 * 一定時間後に色反転を元に戻すためのRunnable実装
+	 */
+	private final class WaitReverseReset implements Runnable {
+		@Override
+		public void run() {
+			resetColorFilter();
+		}
+	}
+
+	/**
+	 * オリジナルのカラーフィルターを適用
+	 */
+	private void resetColorFilter() {
+		super.setColorFilter(mSavedColorFilter);
+	}
+
+	/**
+	 * ViewTransformListenerの実装
+	 * @param view
+	 */
+	@Override
+	public void onStartRotation(final ViewTransformDelegater.ITransformView view) {
+		if (mColorReverseFilter == null) {
+			mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
+		}
+		super.setColorFilter(mColorReverseFilter);
+		// post runnable to reset the color reversing
+		if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
+		postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
+	}
+
+	/**
+	 * ViewTransformListenerの実装
+	 * @param view
+	 * @param newState
+	 */
+	@Override
+	public void onStateChanged(final ViewTransformDelegater.ITransformView view,
+		final int newState) {
+
+		if (newState == ViewTransformDelegater.STATE_NON) {
+			resetColorFilter();
+		}
 	}
 
 }
