@@ -19,6 +19,7 @@ package com.serenegiant.view;
 */
 
 import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
@@ -170,6 +171,20 @@ public abstract class ViewContentTransformer {
 		return setTransform(mCurrentTransX + dx, mCurrentTransY + dy,
 			mCurrentScaleX, mCurrentScaleY,
 			mCurrentRotate);
+	}
+
+	/**
+	 * 移動量を取得
+	 * @param tr
+	 * @return
+	 */
+	public PointF getTranslate(@Nullable final PointF tr) {
+		if (tr != null) {
+			tr.set(mCurrentTransX, mCurrentTransY);
+			return tr;
+		} else {
+			return new PointF(mCurrentTransX, mCurrentTransY);
+		}
 	}
 
 	/**
