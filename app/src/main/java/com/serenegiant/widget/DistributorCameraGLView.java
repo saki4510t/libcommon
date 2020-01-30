@@ -49,7 +49,7 @@ import static com.serenegiant.widget.CameraDelegator.*;
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
  */
 public class DistributorCameraGLView
-	extends GLSurfaceView implements ICameraGLView {
+	extends GLSurfaceView implements ICameraView {
 
 	private static final boolean DEBUG = true; // TODO set false on release
 	private static final String TAG = DistributorCameraGLView.class.getSimpleName();

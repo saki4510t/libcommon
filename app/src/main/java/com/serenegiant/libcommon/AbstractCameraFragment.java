@@ -66,7 +66,7 @@ public abstract class AbstractCameraFragment extends BaseFragment {
 	/**
 	 * for camera preview display
 	 */
-	protected CameraDelegator.ICameraGLView mCameraView;
+	protected CameraDelegator.ICameraView mCameraView;
 	/**
 	 * for scale mode display
 	 */

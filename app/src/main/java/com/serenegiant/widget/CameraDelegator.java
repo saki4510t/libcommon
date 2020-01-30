@@ -64,7 +64,7 @@ public abstract class CameraDelegator {
 	/**
 	 * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
 	 */
-	public interface ICameraGLView {
+	public interface ICameraView {
 		// View
 		public void setOnClickListener(final View.OnClickListener listener);
 		public void setOnLongClickListener(final View.OnLongClickListener listener);
@@ -108,7 +108,7 @@ public abstract class CameraDelegator {
 	}
 
 	@NonNull
-	private final ICameraGLView mView;
+	private final ICameraView mView;
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
@@ -131,7 +131,7 @@ public abstract class CameraDelegator {
 	 * @param width
 	 * @param height
 	 */
-	public CameraDelegator(@NonNull final ICameraGLView view,
+	public CameraDelegator(@NonNull final ICameraView view,
 		final int width, final int height) {
 
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)", width, height));

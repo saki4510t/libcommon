@@ -45,7 +45,7 @@ import static com.serenegiant.widget.CameraDelegator.*;
  * カメラ映像をIRendererHolder経由で取得してプレビュー表示するためのGLSurfaceView実装
  */
 public abstract class AbstractCameraGLView
-	extends GLSurfaceView implements ICameraGLView {
+	extends GLSurfaceView implements ICameraView {
 
 	private static final boolean DEBUG = false; // TODO set false on release
 	private static final String TAG = AbstractCameraGLView.class.getSimpleName();
