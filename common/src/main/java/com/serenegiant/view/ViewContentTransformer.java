@@ -500,7 +500,7 @@ public abstract class ViewContentTransformer {
 	 * ImageView用ImageViewTransformer実装
 	 */
 	protected static class ImageViewTransformer extends ViewContentTransformer {
-		private static final String TAG = TextureViewTransformer.class.getSimpleName();
+		private static final String TAG = ImageViewTransformer.class.getSimpleName();
 
 		/**
 		 * コンストラクタ
