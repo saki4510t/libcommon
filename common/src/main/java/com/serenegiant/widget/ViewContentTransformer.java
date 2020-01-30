@@ -35,6 +35,12 @@ public abstract class ViewContentTransformer {
 	private static final boolean DEBUG = true;	// TODO for debugging
 	private static final String TAG = ViewContentTransformer.class.getSimpleName();
 
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * @param view
+	 * @return
+	 */
+	@NonNull
 	public static ViewContentTransformer newInstance(@NonNull final View view) {
 		if (view instanceof TextureView) {
 			return new TextureViewTransformer((TextureView)view);
@@ -46,20 +52,12 @@ public abstract class ViewContentTransformer {
 	}
 
 //--------------------------------------------------------------------------------
-	/**
-	 * 最大拡大率
-	*/
-	private static final float DEFAULT_MAX_SCALE = 8.f;
-	/**
-	 * 最小縮小率
-	 */
-	private static final float DEFAULT_MIN_SCALE = 0.8f;
-
-	//--------------------------------------------------------------------------------
 	@NonNull
 	protected final View mTargetView;
 	/**
-	 * コンストラクタ実行時のViewから取得したトランスフォームマトリックス
+	 * デフォルトのトランスフォームマトリックス
+	 * #setDefaultで変更していなければコンストラクタ実行時に
+	 * Viewから取得したトランスフォームマトリックス
 	 */
 	@NonNull
 	protected final Matrix mDefaultTransform = new Matrix();
@@ -68,7 +66,10 @@ public abstract class ViewContentTransformer {
 	 */
 	@NonNull
 	protected final Matrix mTransform = new Matrix();
-
+	/**
+	 * Matrixアクセスのワーク用float配列
+	 */
+	private final float[] work = new float[9];
 	/**
 	 * 平行移動量
 	 */
@@ -127,6 +128,8 @@ public abstract class ViewContentTransformer {
 
 	/**
 	 * トランスフォームマトリックスを初期状態に戻す
+	 * #setDefaultで変更していなけれあコンストラクタ実行時の
+	 * ターゲットViewのトランスフォームマトリックスに戻る
 	 */
 	public void reset() {
 		if (DEBUG) Log.v(TAG, "reset:");
@@ -265,8 +268,15 @@ public abstract class ViewContentTransformer {
 		return mCurrentRotate;
 	}
 
-	private final float[] work = new float[9];
-
+	/**
+	 * トランスフォームマトリックスを設定
+	 * @param dx
+	 * @param dy
+	 * @param scaleX
+	 * @param scaleY
+	 * @param degrees
+	 * @return
+	 */
 	protected ViewContentTransformer setTransform(
 		final float dx, final float dy,
 		final float scaleX, final float scaleY,
