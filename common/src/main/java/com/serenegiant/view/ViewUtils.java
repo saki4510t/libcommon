@@ -122,8 +122,8 @@ public class ViewUtils {
 		return v1.x * v2.y - v2.x * v1.y;
 	}
 
-	private static final ThreadLocal<Vector> sPtInPoly_v1 = new ThreadLocal<>();
-	private static final ThreadLocal<Vector> sPtInPoly_v2 = new ThreadLocal<>();
+	private static final Vector sPtInPoly_v1 = new Vector();
+	private static final Vector sPtInPoly_v2 = new Vector();
 	/**
 	 * check whether the point is in the clockwise 2D polygon
 	 * @param x
@@ -131,39 +131,30 @@ public class ViewUtils {
 	 * @param poly: the array of polygon coordinates(x,y pairs)
 	 * @return
 	 */
-	public static boolean ptInPoly(final float x, final float y, @NonNull final float[] poly) {
+	public static synchronized boolean ptInPoly(final float x, final float y, final float[] poly) {
 
 		final int n = poly.length & 0x7fffffff;
 		// minimum 3 points(3 pair of x/y coordinates) need to calculate >> length >= 6
-		if (n < 6) {
-			return false;
-		}
-
+		if (n < 6) return false;
 		boolean result = true;
-		final Vector v1 = sPtInPoly_v1.get();
-		final Vector v2 = sPtInPoly_v2.get();
 		for (int i = 0; i < n; i += 2) {
-			v1.set(x, y).dec(poly[i], poly[i + 1]);
-			if (i + 2 < n) {
-				v2.set(poly[i + 2], poly[i + 3]);
-			} else {
-				v2.set(poly[0], poly[1]);
-			}
-			v2.dec(poly[i], poly[i + 1]);
-			if (crossProduct(v1, v2) > 0) {
+			sPtInPoly_v1.set(x, y).dec(poly[i], poly[i + 1]);
+			if (i + 2 < n) sPtInPoly_v2.set(poly[i + 2], poly[i + 3]);
+			else sPtInPoly_v2.set(poly[0], poly[1]);
+			sPtInPoly_v2.dec(poly[i], poly[i + 1]);
+			if (crossProduct(sPtInPoly_v1, sPtInPoly_v2) > 0) {
 				if (DEBUG) Log.v(TAG, "pt is outside of a polygon:");
 				result = false;
 				break;
 			}
 		}
-
 		return result;
 	}
 
 	/**
 	 * helper for intersection check etc.
 	 */
-	public static class Vector {
+	public static final class Vector {
 
 		public float x, y;
 
