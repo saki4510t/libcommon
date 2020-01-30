@@ -200,6 +200,43 @@ public class ZoomImageView extends AppCompatImageView
 
 //--------------------------------------------------------------------------------
 	/**
+	 * whether ImageView has image
+	 * @return true if ImageView has image, false otherwise
+	 */
+	public boolean hasImage() {
+		return getDrawable() != null;
+	}
+
+	/**
+	 * get new Bitmap image that currently displayed on this view(applied zooming/moving/rotating).
+	 * @return
+	 */
+	public Bitmap getCurrentImage() {
+		final Bitmap offscreen = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(offscreen);
+		// modified to support drawables other than BitmapDrawable
+		canvas.setMatrix(super.getImageMatrix());
+		super.getDrawable().draw(canvas);
+		return offscreen;
+	}
+
+	/**
+	 * get new partial Bitmap image from currently displayed on this view(applied zooming/moving/rotating)
+	 * @param frame: framing rectangle that you want to cut image from the view (as view coordinates)
+	 * @return
+	 */
+	public Bitmap getCurrentImage(final Rect frame) {
+		Bitmap image = getCurrentImage();
+		if ((frame != null) && !frame.isEmpty()) {
+			final Bitmap tmp = Bitmap.createBitmap(image,
+				frame.left, frame.top, frame.width(), frame.height(), null, false);
+			image.recycle();
+			image = tmp;
+		}
+		return image;
+	}
+
+	/**
 	 * 最大拡大率を設定
 	 * @param maxScale
 	 */
@@ -341,43 +378,6 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 //--------------------------------------------------------------------------------
-	/**
-	 * get new Bitmap image that currently displayed on this view(applied zooming/moving/rotating).
-	 * @return
-	 */
-	public Bitmap getCurrentImage() {
-		final Bitmap offscreen = Bitmap.createBitmap(getWidth(), getHeight(), Bitmap.Config.ARGB_8888);
-		final Canvas canvas = new Canvas(offscreen);
-		// modified to support drawables other than BitmapDrawable
-		canvas.setMatrix(super.getImageMatrix());
-		super.getDrawable().draw(canvas);
-		return offscreen;
-	}
-
-	/**
-	 * get new partial Bitmap image from currently displayed on this view(applied zooming/moving/rotating)
-	 * @param frame: framing rectangle that you want to cut image from the view (as view coordinates)
-	 * @return
-	 */
-	public Bitmap getCurrentImage(final Rect frame) {
-		Bitmap image = getCurrentImage();
-		if ((frame != null) && !frame.isEmpty()) {
-			final Bitmap tmp = Bitmap.createBitmap(image,
-				frame.left, frame.top, frame.width(), frame.height(), null, false);
-			image.recycle();
-			image = tmp;
-		}
-		return image;
-	}
-
-	/**
-	 * whether ImageView has image
-	 * @return true if ImageView has image, false otherwise
-	 */
-	private boolean hasImage() {
-		return getDrawable() != null;
-	}
-
 	/**
 	 * 一定時間後に色反転を元に戻すためのRunnable実装
 	 */
