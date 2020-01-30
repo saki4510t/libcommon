@@ -144,9 +144,12 @@ public abstract class ViewContentTransformer {
 	 */
 	@NonNull
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		final Matrix _transform = transform != null ? transform : new Matrix();
-		_transform.set(mTransform);
-		return _transform;
+		if (transform != null) {
+			transform.set(mTransform);
+			return transform;
+		} else {
+			return new Matrix(mTransform);
+		}
 	}
 
 	/**
