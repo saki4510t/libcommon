@@ -369,7 +369,7 @@ public class ViewTransformDelegater {
 		if (state instanceof SavedState) {
 			final SavedState saved = (SavedState)state;
 			mIsRestored = true;
-			System.arraycopy(saved.mMatrixCache, 0, mMatrixCache, 0, saved.mMatrixCache.length);
+			System.arraycopy(saved.mMatrixCache, 0, mMatrixCache, 0, 9);
 			mImageMatrix.setValues(mMatrixCache);
 			mState = saved.mState;
 			mMinScale = saved.mState;
