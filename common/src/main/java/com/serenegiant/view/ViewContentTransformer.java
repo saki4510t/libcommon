@@ -91,6 +91,7 @@ public abstract class ViewContentTransformer {
 	 * @param view
 	 */
 	protected ViewContentTransformer(@NonNull final View view) {
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);
 	}
@@ -415,10 +416,12 @@ public abstract class ViewContentTransformer {
 		 */
 		private DefaultTransformer(@NonNull final View view) {
 			super(view);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		}
 
 		@Override
 		public DefaultTransformer updateTransform(final boolean setAsDefault) {
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			// 今は何もしない
 			return this;
 		}
@@ -428,6 +431,17 @@ public abstract class ViewContentTransformer {
 			super.setTransform(transform);
 			if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 			mTransform.set(transform);
+			internalSetTransform();
+		}
+
+		@Override
+		public void setTransform(@Nullable final float[] transform) {
+			super.setTransform(transform);
+			if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
+			internalSetTransform();
+		}
+
+		private void internalSetTransform() {
 			// ローカルキャッシュ
 			final View targetView = mTargetView;
 			// XXX これだとView自体の大きさとかが変わってしまいそう
@@ -455,6 +469,7 @@ public abstract class ViewContentTransformer {
 		 */
 		private TextureViewTransformer(@NonNull final TextureView view) {
 			super(view);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		}
 
 		@NonNull
@@ -465,6 +480,7 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public TextureViewTransformer updateTransform(final boolean setAsDefault) {
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			getTargetView().getTransform(mTransform);
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
@@ -508,6 +524,7 @@ public abstract class ViewContentTransformer {
 		 */
 		private ImageViewTransformer(@NonNull final ImageView view) {
 			super(view);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		}
 
 		@NonNull
@@ -518,6 +535,7 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public ImageViewTransformer updateTransform(final boolean setAsDefault) {
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			mTransform.set(getTargetView().getImageMatrix());
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
