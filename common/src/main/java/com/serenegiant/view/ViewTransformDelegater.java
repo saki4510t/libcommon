@@ -74,12 +74,12 @@ public class ViewTransformDelegater {
 	// constants
 	public static final int TOUCH_DISABLED			= 0x00000000;
 	public static final int TOUCH_ENABLED_MOVE		= 0x00000001;
-	public static final int TOUCH_ENABLED_ZOOM		= 0x00000002;
-	public static final int TOUCH_ENABLED_ROTATE	= 0x00000004;
+	public static final int TOUCH_ENABLED_ZOOM		= 0x00000001 << 1;
+	public static final int TOUCH_ENABLED_ROTATE	= 0x00000001 << 2;
 	public static final int TOUCH_ENABLED_ALL
 		= TOUCH_ENABLED_MOVE | TOUCH_ENABLED_ZOOM | TOUCH_ENABLED_ROTATE;	// 0x00000007
 
-	@IntDef({
+	@IntDef(flag=true, value = {
 		TOUCH_DISABLED,
 		TOUCH_ENABLED_MOVE,
 		TOUCH_ENABLED_ZOOM,
