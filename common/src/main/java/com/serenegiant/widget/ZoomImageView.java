@@ -26,7 +26,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -325,31 +324,6 @@ public class ZoomImageView extends AppCompatImageView
 			result = new RectF();
 		}
 		return result;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * Viewのsuper#getImageMatrixを呼び出す
-	 * @return
-	 */
-	@Override
-	public Matrix getTransform(@Nullable final Matrix transform) {
-		if (transform != null) {
-			transform.set(getImageMatrix());
-			return transform;
-		} else {
-			return new Matrix(getImageMatrix());
-		}
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * Viewのsuper#setImageMatrixを呼び出す
-	 * @param matrix
-	 */
-	@Override
-	public void setTransform(final Matrix matrix) {
-		setImageMatrix(matrix);
 	}
 
 	/**

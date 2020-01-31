@@ -54,18 +54,6 @@ public class ViewTransformDelegater {
 		 */
 		public RectF getBounds();
 		/**
-		 * Viewのsuper#getImageMatrixを呼び出す
-		 * 親Viewに設定されているトランスフォームマトリックスを取得
-		 * @return
-		 */
-		public Matrix getTransform(@Nullable final Matrix transform);
-		/**
-		 * Viewのsuper#setImageMatrixを呼び出す
-		 * @param matrix
-		 */
-		public void setTransform(final Matrix matrix);
-
-		/**
 		 * View表内容の拡大縮小回転平行移動を初期化
 		 */
 		public void init();
@@ -341,6 +329,7 @@ public class ViewTransformDelegater {
 	@NonNull
 	private final ITransformView mParent;
 
+	private final ViewContentTransformer mTransformer;
 	/**
 	 * コンストラクタ
 	 * @param parent
@@ -350,6 +339,7 @@ public class ViewTransformDelegater {
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
+		mTransformer = ViewContentTransformer.newInstance(parent.getView());
 	}
 
 	/**
@@ -583,6 +573,7 @@ public class ViewTransformDelegater {
 		clearPendingTasks();
 		if (!mIsRestored) {
 			mParent.onInit();
+			mTransformer.updateTransform(true);
 			// set the initial state to idle, get and save the internal Matrix.
 			mState = -1; setState(STATE_NON);
 			// get the internally calculated zooming scale to fit the view
@@ -652,7 +643,7 @@ public class ViewTransformDelegater {
 		if (mState != state) {
 			mState = state;
 			// get and save the internal Matrix of super class
-			mParent.getTransform(mSavedImageMatrix);
+			mTransformer.getTransform(mSavedImageMatrix);
 			if (!mImageMatrix.equals(mSavedImageMatrix)) {
 				mImageMatrix.set(mSavedImageMatrix);
 				mImageMatrixChanged = true;
@@ -765,7 +756,7 @@ public class ViewTransformDelegater {
 					// when image is really moved?
 					mImageMatrixChanged = true;
 					// apply to super class
-					mParent.setTransform(mImageMatrix);
+					mTransformer.setTransform(mImageMatrix);
 				}
 			}
 		}
@@ -850,7 +841,7 @@ public class ViewTransformDelegater {
 			// when Matrix is changed
 			mImageMatrixChanged = true;
 			// apply to super class
-			mParent.setTransform(mImageMatrix);
+			mTransformer.setTransform(mImageMatrix);
 		}
 
 		return true;
@@ -920,7 +911,7 @@ public class ViewTransformDelegater {
 				// when Matrix is changed
 				mImageMatrixChanged = true;
 				// apply to super class
-				mParent.setTransform(mImageMatrix);
+				mTransformer.setTransform(mImageMatrix);
 				return true;
 			}
 		}
