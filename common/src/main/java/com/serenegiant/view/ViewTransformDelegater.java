@@ -31,6 +31,10 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -65,7 +69,29 @@ public class ViewTransformDelegater {
 
 	} // ITransformView
 
+//--------------------------------------------------------------------------------
 	// constants
+	public static final int TOUCH_DISABLED			= 0x00000000;
+	public static final int TOUCH_ENABLED_MOVE		= 0x00000001;
+	public static final int TOUCH_ENABLED_ZOOM		= 0x00000002;
+	public static final int TOUCH_ENABLED_ROTATE	= 0x00000004;
+	public static final int TOUCH_ENABLED_ALL
+		= TOUCH_ENABLED_MOVE | TOUCH_ENABLED_ZOOM | TOUCH_ENABLED_ROTATE;	// 0x00000007
+
+	@IntDef({
+		TOUCH_DISABLED,
+		TOUCH_ENABLED_MOVE,
+		TOUCH_ENABLED_ZOOM,
+		TOUCH_ENABLED_ROTATE,
+		TOUCH_ENABLED_ALL,})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface TouchMode {}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * ステートをリセットするときの一時値
+	 */
+	public static final int STATE_RESET = -1;
 	/**
 	 * State: ユーザー操作無し
 	 */
@@ -91,6 +117,18 @@ public class ViewTransformDelegater {
 	 */
 	public static final int STATE_ROTATING = 5;
 
+	@IntDef({
+		STATE_RESET,
+		STATE_NON,
+		STATE_WAITING,
+		STATE_DRAGGING,
+		STATE_CHECKING,
+		STATE_ZOOMING,
+		STATE_ROTATING})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface State {}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * 最大拡大率のデフォルト値
 	*/
@@ -303,7 +341,8 @@ public class ViewTransformDelegater {
 	 * current state, -1/STATE_NON/STATE_WATING/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
-	private int mState;
+	@State
+	private int mState = STATE_NON;
 	/**
 	 * listener for visual/sound feedback on start rotating
 	 */
@@ -401,7 +440,7 @@ public class ViewTransformDelegater {
 
 		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
 			left, top, right, bottom));
-		mState = -1;	// reset state
+		mState = STATE_RESET;	// reset state
 		mParent.init();
 	}
 
@@ -411,6 +450,7 @@ public class ViewTransformDelegater {
 	 * @param event
 	 * @return
 	 */
+	@SuppressLint("SwitchIntDef")
 	public boolean onTouchEvent(final MotionEvent event) {
 
 		if (DEBUG) Log.v(TAG, "onTouchEvent:");
@@ -575,7 +615,7 @@ public class ViewTransformDelegater {
 			mParent.onInit();
 			mTransformer.updateTransform(true);
 			// set the initial state to idle, get and save the internal Matrix.
-			mState = -1; setState(STATE_NON);
+			mState = STATE_RESET; setState(STATE_NON);
 			// get the internally calculated zooming scale to fit the view
 			mMinScale = getMatrixScale();
 			mCurrentDegrees = 0.f;
@@ -639,7 +679,7 @@ public class ViewTransformDelegater {
 	 * @param state:	-1/STATE_NON/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
-	private void setState(final int state) {
+	private void setState(@State final int state) {
 		if (DEBUG) Log.v(TAG, String.format("setState:%d→%d", mState, state));
 
 		if (mState != state) {

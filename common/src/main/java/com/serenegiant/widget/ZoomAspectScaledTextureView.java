@@ -35,10 +35,6 @@ import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.ViewUtils;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
@@ -50,28 +46,13 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
 public class ZoomAspectScaledTextureView
 	extends AspectScaledTextureView implements IRendererCommon {
 
-	public static final int TOUCH_DISABLED			= 0x00000000;
-	public static final int TOUCH_ENABLED_MOVE		= 0x00000001;
-	public static final int TOUCH_ENABLED_ZOOM		= 0x00000002;
-	public static final int TOUCH_ENABLED_ROTATE	= 0x00000004;
-	public static final int TOUCH_ENABLED_ALL
-		= TOUCH_ENABLED_MOVE | TOUCH_ENABLED_ZOOM | TOUCH_ENABLED_ROTATE;	// 0x00000007
+	private static final boolean DEBUG = false;	// TODO for debugging
+	private static final String TAG = ZoomAspectScaledTextureView.class.getSimpleName();
 
-	@IntDef({
-		TOUCH_DISABLED,
-		TOUCH_ENABLED_MOVE,
-		TOUCH_ENABLED_ZOOM,
-		TOUCH_ENABLED_ROTATE,
-		TOUCH_ENABLED_ALL,})
-	@Retention(RetentionPolicy.SOURCE)
-	public @interface TouchMode {}
-
-//================================================================================
-// constants
     private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout() * 2;
     private static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
 
-//================================================================================
+//--------------------------------------------------------------------------------
 	@TouchMode
 	private int mHandleTouchEvent;
 	private float mManualScale = 1.0f;
@@ -151,7 +132,8 @@ public class ZoomAspectScaledTextureView
 	 * current state, -1/STATE_NON/STATE_WAITING/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
-	private int mState = -1;
+	@State
+	private int mState = STATE_NON;
 	/**
 	 * Runnable instance to wait starting image reset
 	 */
@@ -344,7 +326,7 @@ public class ZoomAspectScaledTextureView
 	@Override
 	protected void init() {
 		// set the initial state to idle, get and save the internal Matrix.
-		mState = -1; setState(STATE_NON);
+		mState = STATE_RESET; setState(STATE_NON);
 		// get the internally calculated zooming scale to fit the view
 		mMinScale = DEFAULT_MIN_SCALE; // getMatrixScale();
 		mCurrentDegrees = 0.f;
@@ -373,7 +355,7 @@ public class ZoomAspectScaledTextureView
 	 * @param state:	-1/STATE_NON/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
-	private final void setState(final int state) {
+	private final void setState(@State final int state) {
 		if (mState != state) {
 			mState = state;
 			// get and save the internal Matrix of super class
