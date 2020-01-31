@@ -36,7 +36,7 @@ import androidx.annotation.Nullable;
  * Viewの表示内容の座標変換を行うためのヘルパークラス
  */
 public abstract class ViewContentTransformer {
-	private static final boolean DEBUG = true;	// TODO for debugging
+	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewContentTransformer.class.getSimpleName();
 
 	/**
