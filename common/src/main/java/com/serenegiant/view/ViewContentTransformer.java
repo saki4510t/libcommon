@@ -410,11 +410,16 @@ public abstract class ViewContentTransformer {
 			final int w2 = mTargetView.getWidth() >> 1;
 			final int h2 = mTargetView.getHeight() >> 1;
 			mTransform.reset();
+			// 回転 → 拡大縮小 → 平行移動 → デフォルト
+			// デフォルトトランスフォームマトリックスを適用
+			mTransform.postConcat(mDefaultTransform);
+			// 平行移動
 			mTransform.postTranslate(transX, transY);
+			// 拡大縮小
 			mTransform.postScale(
-				work[Matrix.MSCALE_X] * mCurrentScaleX,
-				work[Matrix.MSCALE_Y] * mCurrentScaleY,
+				scaleX, scaleY,
 				w2, h2);
+			// 回転
 			if (degrees != Float.MAX_VALUE) {
 				mTransform.postRotate(mCurrentRotate,
 					w2, h2);
