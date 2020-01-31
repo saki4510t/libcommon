@@ -32,6 +32,7 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.mediastore.ImageLoader;
 import com.serenegiant.mediastore.LoaderDrawable;
 import com.serenegiant.mediastore.MediaInfo;
+import com.serenegiant.view.ViewTransformDelegater;
 import com.serenegiant.widget.ZoomImageView;
 
 import java.io.IOException;
@@ -115,6 +116,11 @@ public class ImageFragment extends BaseFragment {
 				if (DEBUG) Log.v(TAG, "onClick:" + v);
 			}
 		});
+		mImageView.setEnableHandleTouchEvent(
+			ViewTransformDelegater.TOUCH_ENABLED_MOVE
+			| ViewTransformDelegater.TOUCH_ENABLED_ZOOM
+			| ViewTransformDelegater.TOUCH_ENABLED_ROTATE
+		);
 		if (USU_LOADER_DRAWABLE) {
 			Drawable drawable = mImageView.getDrawable();
 			if (!(drawable instanceof LoaderDrawable)) {
