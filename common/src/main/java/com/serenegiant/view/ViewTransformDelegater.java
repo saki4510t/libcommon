@@ -168,7 +168,7 @@ public class ViewTransformDelegater {
 	/**
 	 * class for process to save and restore the view state
 	 */
-	public static final class SavedState extends View.BaseSavedState {
+	public static class SavedState extends View.BaseSavedState {
 
 		private int mState;
 		private float mMinScale;
