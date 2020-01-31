@@ -238,6 +238,14 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 	/**
+	 * タッチ操作の有効無効設定
+	 * @param enabled
+	 */
+	public void setEnableHandleTouchEvent(@ViewTransformDelegater.TouchMode final int enabled) {
+		mDelegater.setEnableHandleTouchEvent(enabled);
+	}
+
+	/**
 	 * 最大拡大率を設定
 	 * @param maxScale
 	 */

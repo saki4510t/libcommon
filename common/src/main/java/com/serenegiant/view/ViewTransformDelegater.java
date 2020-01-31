@@ -26,6 +26,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.SystemClock;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -86,6 +87,10 @@ public class ViewTransformDelegater {
 		TOUCH_ENABLED_ALL,})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface TouchMode {}
+
+//--------------------------------------------------------------------------------
+	public static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout() * 2;
+	public static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
 
 //--------------------------------------------------------------------------------
 	/**
@@ -261,6 +266,11 @@ public class ViewTransformDelegater {
 
 //--------------------------------------------------------------------------------
 // variables
+	/**
+	 * タッチ操作の有効無効設定
+	 */
+	@TouchMode
+	private int mHandleTouchEvent = TOUCH_ENABLED_ALL;
 	/**
 	 * flag for save/restore state of this view
 	 */
@@ -452,8 +462,11 @@ public class ViewTransformDelegater {
 	 */
 	@SuppressLint("SwitchIntDef")
 	public boolean onTouchEvent(final MotionEvent event) {
-
 		if (DEBUG) Log.v(TAG, "onTouchEvent:");
+
+		if (mHandleTouchEvent == TOUCH_DISABLED) {
+			return false;
+		}
 
 		final int actionCode = event.getActionMasked();	// >= API8
 
@@ -468,6 +481,7 @@ public class ViewTransformDelegater {
 			case STATE_WAITING:
 				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
 				mParent.getView().removeCallbacks(mWaitImageReset);
+				// pass through
 			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
 					startCheck(event);
@@ -482,7 +496,9 @@ public class ViewTransformDelegater {
 			// moving with single and multi touch
 			switch (mState) {
 			case STATE_WAITING:
-				if (checkTouchMoved(event)) {
+				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
+					&& checkTouchMoved(event)) {
+
 					mParent.getView().removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGGING);
 					return true;
@@ -493,7 +509,9 @@ public class ViewTransformDelegater {
 					return true;
 				break;
 			case STATE_CHECKING:
-				if (checkTouchMoved(event)) {
+				if (checkTouchMoved(event)
+					&& ((mHandleTouchEvent & TOUCH_ENABLED_ZOOM) == TOUCH_ENABLED_ZOOM)) {
+
 					startZoom(event);
 					return true;
 				}
@@ -510,14 +528,28 @@ public class ViewTransformDelegater {
 			break;
 		}
 		case MotionEvent.ACTION_CANCEL:
+			// pass through
 		case MotionEvent.ACTION_UP:
 			mParent.getView().removeCallbacks(mWaitImageReset);
 			mParent.getView().removeCallbacks(mStartCheckRotate);
+			if ((actionCode == MotionEvent.ACTION_UP) && (mState == STATE_WAITING)) {
+				final long downTime = SystemClock.uptimeMillis() - event.getDownTime();
+				if (downTime > LONG_PRESS_TIMEOUT) {
+					mParent.getView().performLongClick();
+				} else if (downTime < TAP_TIMEOUT) {
+					mParent.getView().performClick();
+				}
+			}
+			// pass through
 		case MotionEvent.ACTION_POINTER_UP:
 			setState(STATE_NON);
 			break;
 		}
 		return false;
+	}
+
+	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
+		mHandleTouchEvent = enabled;
 	}
 
 	/**
@@ -837,9 +869,11 @@ public class ViewTransformDelegater {
 			mPivotX = (mPrimaryX + mSecondX) / 2.f;
 			mPivotY = (mPrimaryY + mSecondY) / 2.f;
 			//
-			if (mStartCheckRotate == null)
-				mStartCheckRotate = new StartCheckRotate();
-			mParent.getView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+			if ((mHandleTouchEvent & TOUCH_ENABLED_ROTATE) == TOUCH_ENABLED_ROTATE) {
+				if (mStartCheckRotate == null)
+					mStartCheckRotate = new StartCheckRotate();
+				mParent.getView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
 		}
 	}

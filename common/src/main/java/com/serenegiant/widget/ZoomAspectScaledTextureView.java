@@ -28,8 +28,8 @@ import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
-import android.view.ViewConfiguration;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
@@ -49,10 +49,9 @@ public class ZoomAspectScaledTextureView
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView.class.getSimpleName();
 
-    private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout() * 2;
-    private static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
-
-//--------------------------------------------------------------------------------
+	/**
+	 * タッチ操作の有効無効設定
+	 */
 	@TouchMode
 	private int mHandleTouchEvent;
 	private float mManualScale = 1.0f;
@@ -170,9 +169,10 @@ public class ZoomAspectScaledTextureView
 		}
 	}
 
-	@SuppressLint("ClickableViewAccessibility")
+	@SuppressLint({"ClickableViewAccessibility", "SwitchIntDef"})
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		if (handleOnTouchEvent(event)) {
 			return true;	// 処理済み
@@ -190,10 +190,10 @@ public class ZoomAspectScaledTextureView
 			startWaiting(event);
 			return true;
 		case MotionEvent.ACTION_POINTER_DOWN:
-		{
-			// start multi touch, zooming/rotating
+		{	// マルチタッチ時の処理
 			switch (mState) {
 			case STATE_WAITING:
+				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
 				removeCallbacks(mWaitImageReset);
 				// pass through
 			case STATE_DRAGGING:
@@ -212,6 +212,7 @@ public class ZoomAspectScaledTextureView
 			case STATE_WAITING:
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
+
 					removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGGING);
 					return true;
@@ -224,6 +225,7 @@ public class ZoomAspectScaledTextureView
 			case STATE_CHECKING:
 				if (checkTouchMoved(event)
 					&& ((mHandleTouchEvent & TOUCH_ENABLED_ZOOM) == TOUCH_ENABLED_ZOOM)) {
+
 					startZoom(event);
 					return true;
 				}
@@ -313,6 +315,10 @@ public class ZoomAspectScaledTextureView
 		return mMirrorMode;
 	}
 	
+	/**
+	 * タッチ操作の有効無効設定
+	 * @param enabled
+	 */
 	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
 		mHandleTouchEvent = enabled;
 	}
