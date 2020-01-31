@@ -430,14 +430,27 @@ public abstract class ViewContentTransformer {
 	 * @param transform
 	 * @return
 	 */
-	protected ViewContentTransformer calcValues(@NonNull final Matrix transform) {
-		final float[] mat = new float[9];
-		mCurrentTransX = mat[Matrix.MTRANS_X];
-		mCurrentTransY = mat[Matrix.MTRANS_Y];
-		mCurrentScaleX = mat[Matrix.MSCALE_X];
-		mCurrentScaleY = MatrixUtils.getScale(mat);
-		mCurrentRotate = MatrixUtils.getRotate(mat);
-		return this;
+	protected void calcValues(@NonNull final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "calcValues:" + transform);
+		mTransform.getValues(work);
+		mCurrentTransX = work[Matrix.MTRANS_X];
+		mCurrentTransY = work[Matrix.MTRANS_Y];
+		mCurrentScaleX = work[Matrix.MSCALE_X];
+		mCurrentScaleY = MatrixUtils.getScale(work);
+		mCurrentRotate = MatrixUtils.getRotate(work);
+		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
+			mCurrentTransX, mCurrentTransY,
+			mCurrentScaleX, mCurrentScaleY,
+			mCurrentRotate));
+	}
+
+	/**
+	 * translate/scale/rotateの値をデフォルト(トランスフォームマトリックスとして単位行列)
+	 */
+	protected void resetValues() {
+		mCurrentTransX = mCurrentTransY = 0.0f;
+		mCurrentScaleX = mCurrentScaleY = 1.0f;
+		mCurrentRotate = 0.0f;
 	}
 
 //--------------------------------------------------------------------------------
@@ -455,9 +468,17 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public DefaultTransformer updateTransform(final boolean setAsDefault) {
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			// 今は何もしない
-			calcValues(mTransform);
+			mTransform.reset();
+			if (setAsDefault) {
+				mDefaultTransform.set(mTransform);
+				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+				resetValues();
+			} else {
+				calcValues(mTransform);
+			}
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
 			return this;
 		}
 
@@ -502,12 +523,16 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public TextureViewTransformer updateTransform(final boolean setAsDefault) {
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			getTargetView().getTransform(mTransform);
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
+				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+				resetValues();
+			} else {
+				calcValues(mTransform);
 			}
-			calcValues(mTransform);
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
 			return this;
 		}
 
@@ -549,12 +574,16 @@ public abstract class ViewContentTransformer {
 
 		@Override
 		public ImageViewTransformer updateTransform(final boolean setAsDefault) {
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault);
 			mTransform.set(getTargetView().getImageMatrix());
 			if (setAsDefault) {
 				mDefaultTransform.set(mTransform);
+				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+				resetValues();
+			} else {
+				calcValues(mTransform);
 			}
-			calcValues(mTransform);
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
 			return this;
 		}
 
