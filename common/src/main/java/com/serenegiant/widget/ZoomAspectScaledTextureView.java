@@ -41,6 +41,8 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 
+import static com.serenegiant.view.ViewTransformDelegater.*;
+
 /**
  * FIXME 拡大縮小回転移動処理をDelegaterへ分けたい
  * FIXME ViewTransformDelegaterを使うように変更する？AspectScaledTextureViewを継承しているから難しそう
@@ -65,63 +67,13 @@ public class ZoomAspectScaledTextureView
 	public @interface TouchMode {}
 
 //================================================================================
-	@TouchMode
-	private int mHandleTouchEvent;
-	// constants
-	/**
-	 * State: idle
-	 */
-	private static final int STATE_NON = 0;
-	/**
-	 * State: 待機中
-	 */
-	private static final int STATE_WAITING = 1;
-	/**
-	 * State: 平行移動中
-	*/
-	private static final int STATE_DRAGGING = 2;
-	/**
-	 * State: 拡大縮小・回転開始待ち
-	 */
-	private static final int STATE_CHECKING = 3;
-	/**
-	 * State: 拡大縮小中
-	*/
-	private static final int STATE_ZOOMING = 4;
-	/**
-	 * State: 回転中
-	 */
-	private static final int STATE_ROTATING = 5;
-	/**
-	 * 最大拡大率
-	*/
-	private static final float DEFAULT_MAX_SCALE = 8.f;
-	/**
-	 * 最小縮小率
-	 */
-	private static final float DEFAULT_MIN_SCALE = 0.8f;
-	/**
-	 * ズーム無し時の初期拡大縮小率
-	*/
-	private static final float DEFAULT_SCALE = 1.f;
-	/**
-	 * ズーム/回転モードに入るときの最小タッチ距離
-	 */
-	private static final float MIN_DISTANCE = 15.f;
-	private static final float MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
-	/**
-	 * 移動時に画面からはみ出して見えなくなってしまうのを防ぐための閾値
-	 */
-	private static final float MOVE_LIMIT_RATE = 0.2f;	// =Viewの幅/高さのそれぞれ20%
-	/**
-     * 回転開始待ち時間(マルチタッチ時)またはリセット待機時間(シングルタッチ)、ミリ秒単位
-	 */
-    private static final int CHECK_TIMEOUT
-    	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
+// constants
     private static final int TAP_TIMEOUT = ViewConfiguration.getTapTimeout() * 2;
     private static final int LONG_PRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
 
 //================================================================================
+	@TouchMode
+	private int mHandleTouchEvent;
 	private float mManualScale = 1.0f;
 	private float mManualRotate = Float.MAX_VALUE;
 
@@ -408,7 +360,7 @@ public class ZoomAspectScaledTextureView
 		final Rect tmp = new Rect();
 		getDrawingRect(tmp);
 		mLimitRect.set(tmp);
-		mLimitRect.inset((int)(MOVE_LIMIT_RATE * view_width), (int)(MOVE_LIMIT_RATE * view_height));
+		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
 		mLimitSegments[0] = null;
 		mImageRect.set(0, 0, tmp.width(), tmp.height());
 		mTransX = mTransY = 0.0f;

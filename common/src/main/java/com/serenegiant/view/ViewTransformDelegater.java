@@ -94,33 +94,33 @@ public class ViewTransformDelegater {
 	/**
 	 * 最大拡大率のデフォルト値
 	*/
-	private static final float DEFAULT_MAX_SCALE = 8.f;
+	public static final float DEFAULT_MAX_SCALE = 8.f;
 	/**
 	 * 最小縮小率のデフォルト値
 	 */
-	private static final float DEFAULT_MIN_SCALE = 0.1f;
+	public static final float DEFAULT_MIN_SCALE = 0.1f;
 	/**
 	 * 拡大縮小率のデフォルト値
 	*/
-	private static final float DEFAULT_SCALE = 1.f;
+	public static final float DEFAULT_SCALE = 1.f;
 	/**
 	 * 拡大縮小・回転処理開始時の最小タッチ間隔
 	 * この値より小さい場合には拡大縮小・回転処理を行わない
 	 */
-	private static final float MIN_DISTANCE = 15.f;
+	public static final float MIN_DISTANCE = 15.f;
 	/**
 	 * 拡大縮小・回転処理開始時の最小タッチ間隔の2乗
 	 * 処理の高速化のためにタッチ間隔の計算で平方根の処理をおこなわずに済むように
 	 */
-	private static final float MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
+	public static final float MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
 	/**
 	 * 平行移動時に表示内容がView外へ出てしまうのを防ぐための制限値
 	 */
-	private static final int MOVE_LIMIT = 50;
+	public static final float MOVE_LIMIT_RATE = 0.2f;	// =Viewの幅/高さのそれぞれ20%
 	/**
      * マルチタッチ時に回転処理へ遷移するまでの待機時間[ミリ秒]/シングルロングタッチでリセットするまでの待機時間[ミリ秒]
 	 */
-    private static final int CHECK_TIMEOUT
+	public static final int CHECK_TIMEOUT
     	= ViewConfiguration.getTapTimeout() + ViewConfiguration.getLongPressTimeout();
 
 //--------------------------------------------------------------------------------
@@ -595,7 +595,9 @@ public class ViewTransformDelegater {
 		}
 		// set limit rectangle that the image can move
 		mLimitRect.set(getDrawingRect());
-		mLimitRect.inset(MOVE_LIMIT, MOVE_LIMIT);
+		final float view_width = mLimitRect.width();
+		final float view_height = mLimitRect.height();
+		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
 		mLimitSegments[0] = null;
 	}
 
