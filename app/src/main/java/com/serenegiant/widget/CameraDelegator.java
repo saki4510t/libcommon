@@ -78,8 +78,8 @@ public abstract class CameraDelegator {
 		public void queueEvent(final Runnable task);
 
 		public void setVideoSize(final int width, final int height);
-		public void addListener(final CameraDelegator.OnFrameAvailableListener listener);
-		public void removeListener(final CameraDelegator.OnFrameAvailableListener listener);
+		public void addListener(final OnFrameAvailableListener listener);
+		public void removeListener(final OnFrameAvailableListener listener);
 		public void setScaleMode(final int mode);
 		public int getScaleMode();
 		public int getVideoWidth();
