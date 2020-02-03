@@ -1,0 +1,64 @@
+package com.serenegiant.libcommon;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2020 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+import android.os.Bundle;
+import android.util.Log;
+
+public class CameraImageViewFragment extends AbstractCameraFragment {
+	private static final boolean DEBUG = true;	// TODO set false on release
+	private static final String TAG = CameraImageViewFragment.class.getSimpleName();
+
+	public static CameraImageViewFragment newInstance() {
+		final CameraImageViewFragment fragment = new CameraImageViewFragment();
+		final Bundle args = new Bundle();
+		args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_image_view);
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	public CameraImageViewFragment() {
+		super();
+		// need default constructor
+	}
+
+	@Override
+	protected boolean isRecording() {
+		// FIXME 未実装
+		return false;
+	}
+
+	@Override
+	protected void internalStartRecording() {
+		if (DEBUG) Log.v(TAG, "internalStartRecording:");
+		// FIXME 未実装
+	}
+
+	@Override
+	protected void internalStopRecording() {
+		if (DEBUG) Log.v(TAG, "internalStopRecording:");
+		// FIXME 未実装
+	}
+
+	@Override
+	protected void onFrameAvailable() {
+		// FIXME 未実装
+	}
+
+}

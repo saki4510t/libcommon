@@ -202,12 +202,21 @@ public class MainActivity extends AppCompatActivity
 			fragment = DistributorFragment.newInstance();
 			break;
 		case 8:
+			if (!checkPermissionCamera()
+				|| !checkPermissionWriteExternalStorage()
+				|| !checkPermissionAudio()) {
+
+				return;
+			}
+			fragment = CameraImageViewFragment.newInstance();
+			break;
+		case 9:
 			if (!checkPermissionWriteExternalStorage()) {
 				return;
 			}
 			fragment = new GalleyFragment();
 			break;
-		case 9:
+		case 10:
 			if (!checkPermissionWriteExternalStorage()) {
 				return;
 			}
