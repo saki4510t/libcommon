@@ -364,11 +364,6 @@ public class VideoSourceCameraGLView
 		}
 
 		@Override
-		public SurfaceTexture getInputSurfaceTexture() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
 		public void onPreviewSizeChanged(final int width, final int height) {
 			mVideoSource.resize(width, height);
 		}

@@ -103,7 +103,6 @@ public abstract class CameraDelegator {
 		public void onSurfaceDestroyed();
 		public boolean hasSurface();
 		public void updateViewport();
-		public SurfaceTexture getInputSurfaceTexture();
 		public void onPreviewSizeChanged(final int width, final int height);
 	}
 
