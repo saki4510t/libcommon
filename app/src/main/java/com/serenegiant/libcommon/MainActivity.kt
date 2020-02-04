@@ -187,12 +187,20 @@ class MainActivity
 				fragment = CameraImageViewFragment.newInstance()
 			}
 			9 -> {
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraTextureFragment.newInstance()
+			}
+			10 -> {
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			10 -> {
+			11 -> {
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
