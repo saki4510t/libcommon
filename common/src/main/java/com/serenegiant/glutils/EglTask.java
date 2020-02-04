@@ -29,16 +29,44 @@ public abstract class EglTask extends MessageTask {
 
 	private final GLContext mGLContext;
 
+	/**
+	 * コンストラクタ
+	 * @param sharedContext
+	 * @param flags
+	 */
 	@Deprecated
 	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
 		this(3, sharedContext, flags);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 */
 	public EglTask(final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
+		this(maxClientVersion, sharedContext, flags, 1, 1);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param masterWidth
+	 * @param masterHeight
+	 */
+	public EglTask(final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final int masterWidth, final int masterHeight) {
+
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
+		mGLContext = new GLContext(maxClientVersion,
+			sharedContext, flags,
+			masterWidth, masterHeight);
 		init(0, 0, null);
 	}
 
