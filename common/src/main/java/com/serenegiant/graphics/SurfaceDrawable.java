@@ -84,7 +84,6 @@ public class SurfaceDrawable extends Drawable {
 	private int mTexId;
 	private SurfaceTexture mMasterTexture;
 	private Surface mMasterSurface;
-	private EGLBase.IEglSurface mWorkSurface;
 	private GLDrawer2D mDrawer;
 
 	/**
@@ -104,7 +103,10 @@ public class SurfaceDrawable extends Drawable {
 		mWidth = mImageWidth = imageWidth;
 		mHeight = mImageHeight = imageHeight;
 		mCallback = callback;
-		mEglTask = new EglTask(3, null, 0) {
+		mEglTask = new EglTask(3,
+			null, 0,
+			imageWidth, imageHeight) {
+
 			@Override
 			protected void onStart() {
 				handleOnStart();
@@ -235,7 +237,6 @@ public class SurfaceDrawable extends Drawable {
 	protected final void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
-		mWorkSurface = mEglTask.getEgl().createOffscreen(mImageWidth, mImageHeight);
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
 		mDrawer.setMirror(IRendererCommon.MIRROR_VERTICAL);
 	}
@@ -250,11 +251,7 @@ public class SurfaceDrawable extends Drawable {
 			mDrawer.release();
 			mDrawer = null;
 		}
-		if (mWorkSurface != null) {
-			mWorkSurface.release();
-			mWorkSurface = null;
-		}
-		handleReleaseMasterSurface();
+		handleReleaseInputSurface();
 	}
 
 	@WorkerThread
@@ -266,7 +263,7 @@ public class SurfaceDrawable extends Drawable {
 			handleDraw();
 			break;
 		case REQUEST_RECREATE_MASTER_SURFACE:
-			handleReCreateMasterSurface();
+			handleReCreateInputSurface();
 			break;
 		default:
 			if (DEBUG) Log.v(TAG, "handleRequest:" + request);
@@ -289,18 +286,13 @@ public class SurfaceDrawable extends Drawable {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		// オフスクリーンへ描画開始
-		mWorkSurface.makeCurrent();
-		// OESテクスチャをオフスクリーンへ描画
+		// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
 		mDrawer.draw(mTexId, mTexMatrix, 0);
 		// オフスクリーンから読み取り
 		mWorkBuffer.clear();
-		GLES20.glReadPixels(0, 0, mImageWidth, mImageHeight, GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, mWorkBuffer);
-//		// オフスクリーンへ描画終了
-//		mWorkSurface.swap(Time.nanoTime());	// XXX これは不要...呼ぶとなぜかGPUのドライバー内でクラッシュするし
-		// 何も書き込まないとハングアップする端末対策
-		mEglTask.makeCurrent();
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		GLES20.glReadPixels(0, 0,
+			mImageWidth, mImageHeight,
+			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, mWorkBuffer);
 		// Bitmapへ代入
 		mWorkBuffer.clear();
 		synchronized (mBitmap) {
