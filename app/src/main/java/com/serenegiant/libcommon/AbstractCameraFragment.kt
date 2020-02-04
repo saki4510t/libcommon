@@ -1,0 +1,267 @@
+package com.serenegiant.libcommon
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2020 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+import android.app.Activity
+import android.content.Context
+import android.os.Bundle
+import android.os.Environment
+import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.View.OnLongClickListener
+import android.view.ViewGroup
+import android.widget.ImageButton
+import android.widget.TextView
+import androidx.annotation.LayoutRes
+import androidx.documentfile.provider.DocumentFile
+import com.serenegiant.system.PermissionCheck
+import com.serenegiant.utils.FileUtils
+import com.serenegiant.utils.SAFUtils
+import com.serenegiant.widget.CameraDelegator
+import com.serenegiant.widget.CameraDelegator.ICameraView
+import java.io.IOException
+
+/**
+ * 内蔵カメラへアクセスして表示するための基本クラス
+ * 録画の開始/停止の実際の処理以外を実装
+ */
+abstract class AbstractCameraFragment : BaseFragment() {
+
+	/**
+	 * for camera preview display
+	 */
+	protected var mCameraView: ICameraView? = null
+	/**
+	 * for scale mode display
+	 */
+	private var mScaleModeView: TextView? = null
+	/**
+	 * button for start/stop recording
+	 */
+	private var mRecordButton: ImageButton? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = this.javaClass.simpleName
+		FileUtils.DIR_NAME = APP_DIR_NAME
+	}
+
+	override fun onCreateView(inflater: LayoutInflater,
+		container: ViewGroup?, savedInstanceState: Bundle?): View? {
+
+		val customInflater
+			= getThemedLayoutInflater(inflater, R.style.AppTheme_Camera)
+		val rootView = customInflater.inflate(layoutXml, container, false)
+		val cameraView: View = rootView.findViewById(R.id.cameraView)
+		mCameraView = cameraView  as ICameraView
+		mCameraView!!.setOnClickListener(mOnClickListener)
+		mCameraView!!.setOnLongClickListener(mOnLongClickListener)
+		mCameraView!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
+		mScaleModeView = rootView.findViewById(R.id.scalemode_textview)
+		updateScaleModeText()
+		mRecordButton = rootView.findViewById(R.id.record_button)
+		mRecordButton!!.setOnClickListener(mOnClickListener)
+		return rootView
+	}
+
+	public override fun internalOnResume() {
+		super.internalOnResume()
+		if (DEBUG) Log.v(TAG, "internalOnResume:")
+		mCameraView!!.onResume()
+		mCameraView!!.addListener(mOnFrameAvailableListener)
+		if (!hasPermission()) {
+			popBackStack()
+		}
+	}
+
+	public override fun internalOnPause() {
+		if (DEBUG) Log.v(TAG, "internalOnPause:")
+		stopRecording()
+		mCameraView!!.removeListener(mOnFrameAvailableListener)
+		mCameraView!!.onPause()
+		super.internalOnPause()
+	}
+
+	//================================================================================
+	@get:LayoutRes
+	protected val layoutXml: Int
+		get() {
+			val args = arguments
+			return args?.getInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera)
+				?: R.layout.fragment_camera
+		}
+
+	/**
+	 * method when touch record button
+	 */
+	private val mOnClickListener = View.OnClickListener { view -> onClick(view) }
+	private val mOnLongClickListener = OnLongClickListener { view -> onLongClick(view) }
+
+	protected fun onClick(view: View) {
+		when (view.id) {
+			R.id.cameraView -> {
+				val scale_mode = (mCameraView!!.getScaleMode() + 1) % 4
+				mCameraView!!.setScaleMode(scale_mode)
+				updateScaleModeText()
+			}
+			R.id.record_button -> if (!isRecording()) {
+				startRecording()
+			} else {
+				stopRecording()
+			}
+		}
+	}
+
+	protected open fun onLongClick(view: View): Boolean {
+		return false
+	}
+
+	private fun updateScaleModeText() {
+		val scale_mode = mCameraView!!.getScaleMode()
+		mScaleModeView!!.text =
+			if (scale_mode == 0) "scale to fit"
+				else if (scale_mode == 1) "keep aspect(viewport)"
+				else if (scale_mode == 2) "keep aspect(matrix)"
+				else if (scale_mode == 3) "keep aspect(crop center)"
+				else ""
+	}
+
+	protected abstract fun isRecording(): Boolean
+
+	/**
+	 * start recording
+	 * This is a sample project and call this on UI thread to avoid being complicated
+	 * but basically this should be called on private thread because prepareing
+	 * of encoder is heavy work
+	 */
+	protected fun startRecording() {
+		if (DEBUG) Log.v(TAG, "startRecording:")
+		mRecordButton!!.setColorFilter(-0x10000) // turn red
+		try {
+			// FIXME 未実装 ちゃんとパーミッションのチェック＆要求をしないとだめ
+			internalStartRecording()
+		} catch (e: Exception) {
+			mRecordButton!!.setColorFilter(0)
+			Log.e(TAG, "startCapture:", e)
+		}
+	}
+
+	@Throws(IOException::class)
+	protected abstract fun internalStartRecording()
+
+	/**
+	 * request stop recording
+	 */
+	protected fun stopRecording() {
+		if (DEBUG) Log.v(TAG, "stopRecording:")
+		mRecordButton!!.setColorFilter(0) // return to default color
+		internalStopRecording()
+	}
+
+	protected abstract fun internalStopRecording()
+
+	protected fun clearRecordingState() {
+		mRecordButton!!.setColorFilter(0)
+	}
+
+	private val mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener
+		= object : CameraDelegator.OnFrameAvailableListener {
+
+		override fun onFrameAvailable() {
+			this@AbstractCameraFragment.onFrameAvailable()
+		}
+	}
+
+	protected abstract fun onFrameAvailable()
+
+	/**
+	 * 録画に必要なパーミッションを持っているかどうか
+	 * パーミッションの要求はしない
+	 * @return
+	 */
+	protected fun hasPermission(): Boolean {
+		val activity: Activity? = activity
+		return if ((activity == null) || activity.isFinishing) {
+			false
+		} else (SAFUtils.hasStorageAccess(activity, REQUEST_ACCESS_SD)
+			|| PermissionCheck.hasWriteExternalStorage(activity))
+			&& PermissionCheck.hasAudio(activity)
+			&& PermissionCheck.hasCamera(activity)
+	}
+
+	companion object {
+		private const val DEBUG = true // TODO set false on release
+		private val TAG = AbstractCameraFragment::class.java.simpleName
+		/**
+		 * video resolution
+		 */
+		const val VIDEO_WIDTH = 1280
+		const val VIDEO_HEIGHT = 720
+		/**
+		 * Audio recording settings
+		 */
+		const val SAMPLE_RATE = 44100
+		const val CHANNEL_COUNT = 1
+		const val APP_DIR_NAME = "RecordingService"
+		/** access code for secondary storage etc.  */
+		const val REQUEST_ACCESS_SD = 12345
+		const val ARGS_KEY_LAYOUT_ID = "LAYOUT_ID"
+
+		fun getRecordingRoot(context: Context): DocumentFile? {
+			if (DEBUG) Log.v(TAG, "getRecordingRoot:")
+			var root: DocumentFile? = null
+			if (SAFUtils.hasStorageAccess(context, REQUEST_ACCESS_SD)) {
+				try {
+					root = SAFUtils.getStorage(context, REQUEST_ACCESS_SD)
+					if ((root != null) && root.exists() && root.canWrite()) {
+						val appDir = root.findFile(APP_DIR_NAME)
+						root = appDir ?: // create app dir if it does not exist yet
+							root.createDirectory(APP_DIR_NAME) // "${document root}/Pupil Mobile"
+					} else {
+						root = null
+						Log.d(TAG, "path will be wrong, will already be removed,"
+							+ root?.uri)
+					}
+				} catch (e: IOException) {
+					root = null
+					Log.d(TAG, "path is wrong, will already be removed.", e)
+				} catch (e: IllegalStateException) {
+					root = null
+					Log.d(TAG, "path is wrong, will already be removed.", e)
+				}
+			}
+			if (root == null) {
+				// remove permission to access secondary (external) storage,
+				// because app can't access it and it will already be removed.
+				SAFUtils.releaseStorageAccessPermission(context, REQUEST_ACCESS_SD)
+			}
+			if ((root == null) && PermissionCheck.hasWriteExternalStorage(context)) {
+				// fallback to primary external storage if app has permission
+				val captureDir = FileUtils.getCaptureDir(context,
+					Environment.DIRECTORY_MOVIES, 0)
+				if ((captureDir != null) && captureDir.canWrite()) {
+					root = DocumentFile.fromFile(captureDir)
+				}
+			}
+			if (DEBUG) Log.v(TAG, "getRecordingRoot:finished,$root")
+			return root
+		}
+	}
+}
