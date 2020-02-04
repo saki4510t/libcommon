@@ -152,7 +152,7 @@ public class VideoSource implements IPipelineSource {
 			mGLHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					handleReleaseMasterSurface();
+					handleReleaseInputSurface();
 					if (mOwnManager) {
 						mManager.release();
 					}
@@ -312,7 +312,7 @@ public class VideoSource implements IPipelineSource {
 			handleResize(msg.arg1, msg.arg2);
 			return true;
 		case REQUEST_RECREATE_MASTER_SURFACE:
-			handleReCreateMasterSurface();
+			handleReCreateInputSurface();
 			mCallback.onCreate(mMasterSurface);
 			return true;
 		default:
@@ -380,14 +380,14 @@ public class VideoSource implements IPipelineSource {
 	}
 
 	/**
-	 * マスターSurfaceを再生成する
+	 * 映像入力用Surfaceを再生成する
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleReCreateMasterSurface() {
-		if (DEBUG) Log.v(TAG, "handleReCreateMasterSurface:");
+	protected void handleReCreateInputSurface() {
+		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		makeDefault();
-		handleReleaseMasterSurface();
+		handleReleaseInputSurface();
 		makeDefault();
 		if (isGLES3) {
 			GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -410,12 +410,12 @@ public class VideoSource implements IPipelineSource {
 	}
 
 	/**
-	 * マスターSurfaceを破棄する
+	 * 映像入力用Surfaceを破棄する
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleReleaseMasterSurface() {
-		if (DEBUG) Log.v(TAG, "handleReleaseMasterSurface:");
+	protected void handleReleaseInputSurface() {
+		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		if (mMasterSurface != null) {
 			mCallback.onDestroy();
 			try {
@@ -455,7 +455,7 @@ public class VideoSource implements IPipelineSource {
 		mVideoWidth = width;
 		mVideoHeight = height;
 		if ((mMasterSurface == null) || !mMasterSurface.isValid()) {
-			handleReCreateMasterSurface();
+			handleReCreateInputSurface();
 		}
 		if (BuildCheck.isAndroid4_1()) {
 			mMasterTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);

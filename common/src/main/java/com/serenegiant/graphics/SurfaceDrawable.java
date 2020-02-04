@@ -310,15 +310,15 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	/**
-	 * マスターSurfaceを再生成する
+	 * 映像入力用SurfaceTexture/Surfaceを再生成する
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleReCreateMasterSurface() {
-		if (DEBUG) Log.v(TAG, "handleReCreateMasterSurface:");
+	protected void handleReCreateInputSurface() {
+		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		synchronized (mSync) {
 			mEglTask.makeCurrent();
-			handleReleaseMasterSurface();
+			handleReleaseInputSurface();
 			mEglTask.makeCurrent();
 			if (isGLES3()) {
 				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
@@ -338,12 +338,12 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	/**
-	 * マスターSurfaceを破棄する
+	 * 映像入力用Surfaceを破棄する
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleReleaseMasterSurface() {
-		if (DEBUG) Log.v(TAG, "handleReleaseMasterSurface:");
+	protected void handleReleaseInputSurface() {
+		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		synchronized (mSync) {
 			if (mMasterSurface != null) {
 				try {
