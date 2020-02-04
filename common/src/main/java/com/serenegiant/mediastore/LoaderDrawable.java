@@ -227,6 +227,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		setBitmap(mLoader.getBitmap());
 	}
 
+	@NonNull
 	protected abstract ImageLoader createImageLoader();
 
 	/**
@@ -236,6 +237,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	 * @param id
 	 * @return
 	 */
+	@Nullable
 	protected abstract Bitmap checkCache(final int groupId, final long id);
 
 	/**
