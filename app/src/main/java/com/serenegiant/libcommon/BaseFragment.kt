@@ -23,11 +23,8 @@ import android.content.Context
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.ContextThemeWrapper
-import android.view.LayoutInflater
 import android.widget.Toast
 import androidx.annotation.StringRes
-import androidx.annotation.StyleRes
 import androidx.fragment.app.Fragment
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.HandlerThreadHandler
@@ -213,17 +210,6 @@ open class BaseFragment : Fragment() {
 				mAsyncHandler!!.removeCallbacksAndMessages(null)
 			}
 		}
-	}
-
-//================================================================================
-	protected fun getThemedLayoutInflater(
-		inflater: LayoutInflater, @StyleRes layout_style: Int): LayoutInflater {
-		if (DEBUG) Log.v(TAG, "getThemedLayoutInflater:")
-		val context: Activity? = activity
-		// create ContextThemeWrapper from the original Activity Context with the custom theme
-		val contextThemeWrapper: Context = ContextThemeWrapper(context, layout_style)
-		// clone the inflater using the ContextThemeWrapper
-		return inflater.cloneInContext(contextThemeWrapper)
 	}
 
 //================================================================================

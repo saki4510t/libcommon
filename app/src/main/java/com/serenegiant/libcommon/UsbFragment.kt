@@ -29,6 +29,7 @@ import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
+import com.serenegiant.view.ViewUtils
 
 /**
  * A simple [Fragment] subclass.
@@ -61,7 +62,8 @@ class UsbFragment : BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		val customInflater = getThemedLayoutInflater(inflater, R.style.AppTheme_Usb)
+		val customInflater
+			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
 		return customInflater.inflate(R.layout.fragment_usb, container, false)
 	}
 

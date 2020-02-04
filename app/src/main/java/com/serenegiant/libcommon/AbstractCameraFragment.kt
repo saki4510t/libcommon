@@ -34,6 +34,7 @@ import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.utils.SAFUtils
+import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.CameraDelegator
 import com.serenegiant.widget.CameraDelegator.ICameraView
 import java.io.IOException
@@ -67,7 +68,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		val customInflater
-			= getThemedLayoutInflater(inflater, R.style.AppTheme_Camera)
+			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Camera)
 		val rootView = customInflater.inflate(layoutXml, container, false)
 		val cameraView: View = rootView.findViewById(R.id.cameraView)
 		mCameraView = cameraView  as ICameraView
