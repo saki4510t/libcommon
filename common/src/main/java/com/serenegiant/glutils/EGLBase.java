@@ -27,6 +27,17 @@ import androidx.annotation.Nullable;
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
 public abstract class EGLBase implements EGLConst {
+	/**
+	 * EGLConfig選択時のピクセルフォーマット
+	 * RGBA888
+	 */
+	public static final int EGL_CONFIG_RGBA = 0;
+	/**
+	 * EGLConfig選択時のピクセルフォーマット
+	 * RGB565
+	 */
+	public static final int EGL_CONFIG_RGB565 = 1;
+
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
 //--------------------------------------------------------------------------------
