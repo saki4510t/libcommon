@@ -96,6 +96,7 @@ public class SurfaceDrawable extends Drawable {
 	 * コンストラクタ
 	 * @param imageWidth
 	 * @param imageHeight
+	 * @param callback
 	 */
 	public SurfaceDrawable(final int imageWidth, final int imageHeight,
 		@NonNull final Callback callback) {
