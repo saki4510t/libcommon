@@ -45,6 +45,7 @@ import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
  * OpenGL|ES3用のヘルパークラス
+ * FIXME EGLBase等と同じようにes2用とes3用のGLHelperを集約して抽象クラスにして下位のprivateクラスで実際の処理を実装するようにする？
  */
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 public final class GLHelper {
