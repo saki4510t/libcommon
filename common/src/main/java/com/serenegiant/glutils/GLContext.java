@@ -41,6 +41,8 @@ public class GLContext implements EGLConst {
 	@Nullable
 	final EGLBase.IContext mSharedContext;
 	private final int mFlags;
+	private final int mMasterWidth;
+	private final int mMasterHeight;
 	@Nullable
 	private EGLBase mEgl = null;
 	@Nullable
@@ -56,10 +58,28 @@ public class GLContext implements EGLConst {
 	public GLContext(final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
+		this(maxClientVersion, sharedContext, flags, 1, 1);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param width コンテキスト用のオフスクリーンの幅
+	 * @param height　 コンテキスト用のオフスクリーンの高さ
+	 */
+	public GLContext(final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final int width, final int height) {
+
 		mMaxClientVersion = maxClientVersion;
 		mSharedContext = sharedContext;
 		mFlags = flags;
+		mMasterWidth = width > 0 ? width : 1;
+		mMasterHeight = height > 0 ? height : 1;
 	}
+
 
 	@Override
 	protected void finalize() throws Throwable {
@@ -106,7 +126,7 @@ public class GLContext implements EGLConst {
 				(mFlags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
 		}
 		if (mEgl != null) {
-			mEglMasterSurface = mEgl.createOffscreen(1, 1);
+			mEglMasterSurface = mEgl.createOffscreen(mMasterWidth, mMasterHeight);
 			mGLThreadId = Thread.currentThread().getId();
 		} else {
 			throw new RuntimeException("failed to create EglCore");
