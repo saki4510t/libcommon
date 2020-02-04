@@ -500,8 +500,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@NonNull
 		final float[] mTexMatrix = new float[16];
 		private int mTexId;
-		private SurfaceTexture mMasterTexture;
-		private Surface mMasterSurface;
+		private SurfaceTexture mInputTexture;
+		private Surface mInputSurface;
 
 		/**
 		 * コンストラクタ:
@@ -619,7 +619,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		@Override
 		public boolean isMasterSurfaceValid() {
-			return (mMasterSurface != null) && (mMasterSurface.isValid());
+			return (mInputSurface != null) && (mInputSurface.isValid());
 		}
 
 		@Override
@@ -654,14 +654,14 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		/**
-		 * マスターSurfaceを再生成する
+		 * 映像入力用Surfaceを再生成する
 		 */
 		@SuppressLint("NewApi")
 		@WorkerThread
 		@Override
-		protected void handleReCreateMasterSurface() {
+		protected void handleReCreateInputSurface() {
 			makeCurrent();
-			handleReleaseMasterSurface();
+			handleReleaseInputSurface();
 			makeCurrent();
 			if (isGLES3()) {
 				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
@@ -670,38 +670,38 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			}
-			mMasterTexture = new SurfaceTexture(mTexId);
-			mMasterSurface = new Surface(mMasterTexture);
+			mInputTexture = new SurfaceTexture(mTexId);
+			mInputSurface = new Surface(mInputTexture);
 			if (BuildCheck.isAndroid4_1()) {
-				mMasterTexture.setDefaultBufferSize(width(), height());
+				mInputTexture.setDefaultBufferSize(width(), height());
 			}
-			mMasterTexture.setOnFrameAvailableListener(this);
-			mParent.callOnCreate(mMasterSurface);
+			mInputTexture.setOnFrameAvailableListener(this);
+			mParent.callOnCreate(mInputSurface);
 		}
 
 		/**
-		 * マスターSurfaceを破棄する
+		 * 映像入力用Surfaceを破棄する
 		 */
 		@SuppressLint("NewApi")
 		@WorkerThread
 		@Override
-		protected void handleReleaseMasterSurface() {
-			if (mMasterSurface != null) {
+		protected void handleReleaseInputSurface() {
+			if (mInputSurface != null) {
 				try {
-					mMasterSurface.release();
+					mInputSurface.release();
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
-				mMasterSurface = null;
+				mInputSurface = null;
 				mParent.callOnDestroy();
 			}
-			if (mMasterTexture != null) {
+			if (mInputTexture != null) {
 				try {
-					mMasterTexture.release();
+					mInputTexture.release();
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
-				mMasterTexture = null;
+				mInputTexture = null;
 			}
 			if (mTexId != 0) {
 				if (isGLES3()) {
@@ -715,8 +715,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		@Override
 		protected void handleUpdateTexture() {
-			mMasterTexture.updateTexImage();
-			mMasterTexture.getTransformMatrix(mTexMatrix);
+			mInputTexture.updateTexImage();
+			mInputTexture.getTransformMatrix(mTexMatrix);
 		}
 
 		/**
@@ -730,7 +730,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 			super.handleResize(width, height);
 			if (BuildCheck.isAndroid4_1()) {
-				mMasterTexture.setDefaultBufferSize(width, height);
+				mInputTexture.setDefaultBufferSize(width, height);
 			}
 		}
 
@@ -744,19 +744,19 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public Surface getSurface() {
-//			if (DEBUG) Log.v(TAG, "getSurface:" + mMasterSurface);
+//			if (DEBUG) Log.v(TAG, "getSurface:" + mInputSurface);
 			checkMasterSurface();
-			return mMasterSurface;
+			return mInputSurface;
 		}
 
 		/**
-		 * マスター映像受け取り用のSurfaceTextureを取得
+		 * 映像受け取り用のSurfaceTextureを取得
 		 * @return
 		 */
 		public SurfaceTexture getSurfaceTexture() {
-//		if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mMasterTexture);
+//		if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mInputTexture);
 			checkMasterSurface();
-			return mMasterTexture;
+			return mInputTexture;
 		}
 
 		/**
@@ -771,7 +771,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		public void checkMasterSurface() {
 			checkFinished();
-			if ((mMasterSurface == null) || (!mMasterSurface.isValid())) {
+			if ((mInputSurface == null) || (!mInputSurface.isValid())) {
 				Log.d(TAG, "checkMasterSurface:invalid master surface");
 				mEglTask.offerAndWait(REQUEST_RECREATE_MASTER_SURFACE, 0, 0, null);
 			}

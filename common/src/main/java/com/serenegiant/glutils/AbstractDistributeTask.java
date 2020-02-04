@@ -311,7 +311,7 @@ public abstract class AbstractDistributeTask {
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
-		handleReCreateMasterSurface();
+		handleReCreateInputSurface();
 	}
 
 	/**
@@ -330,7 +330,7 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void internalOnStop() {
 		if (DEBUG) Log.v(TAG, "internalOnStop:");
-		handleReleaseMasterSurface();
+		handleReleaseInputSurface();
 		handleRemoveAll();
 		if (mDrawer != null) {
 			mDrawer.release();
@@ -366,7 +366,7 @@ public abstract class AbstractDistributeTask {
 			handleRemoveAll();
 			break;
 		case REQUEST_RECREATE_MASTER_SURFACE:
-			handleReCreateMasterSurface();
+			handleReCreateInputSurface();
 			break;
 		case REQUEST_MIRROR:
 			handleMirror(arg1);
@@ -713,15 +713,15 @@ public abstract class AbstractDistributeTask {
 	public abstract int getTexId();
 	public abstract float[] getTexMatrix();
 	/**
-	 * マスターSurfaceを再生成する
+	 * 映像入力用Surfaceを再生成する
 	 */
 	@WorkerThread
-	protected abstract void handleReCreateMasterSurface();
+	protected abstract void handleReCreateInputSurface();
 	/**
-	 * マスターSurfaceを破棄する
+	 * 映像入力用Surfaceを破棄する
 	 */
 	@WorkerThread
-	protected abstract void handleReleaseMasterSurface();
+	protected abstract void handleReleaseInputSurface();
 	/**
 	 * テクスチャを更新
 	 */

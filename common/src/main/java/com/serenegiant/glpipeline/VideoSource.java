@@ -76,8 +76,8 @@ public class VideoSource implements IPipelineSource {
 	@NonNull
 	private final float[] mTexMatrix = new float[16];
 	private int mTexId;
-	private SurfaceTexture mMasterTexture;
-	private Surface mMasterSurface;
+	private SurfaceTexture mInputTexture;
+	private Surface mInputSurface;
 	private int mVideoWidth, mVideoHeight;
 
 	/**
@@ -197,7 +197,7 @@ public class VideoSource implements IPipelineSource {
 	 */
 	@Override
 	public boolean isValid() {
-		return mManager.isValid() && (mMasterSurface != null) && mMasterSurface.isValid();
+		return mManager.isValid() && (mInputSurface != null) && mInputSurface.isValid();
 	}
 
 	/**
@@ -229,12 +229,12 @@ public class VideoSource implements IPipelineSource {
 	@NonNull
 	@Override
 	public SurfaceTexture getInputSurfaceTexture() throws IllegalStateException {
-		if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:" + mMasterTexture);
+		if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:" + mInputTexture);
 		checkValid();
-		if (mMasterTexture == null) {
+		if (mInputTexture == null) {
 			throw new IllegalStateException("has no master surface");
 		}
-		return mMasterTexture;
+		return mInputTexture;
 	}
 
 	/**
@@ -246,12 +246,12 @@ public class VideoSource implements IPipelineSource {
 	@NonNull
 	@Override
 	public Surface getInputSurface() throws IllegalStateException {
-		if (DEBUG) Log.v(TAG, "getInputSurface:" + mMasterSurface);
+		if (DEBUG) Log.v(TAG, "getInputSurface:" + mInputSurface);
 		checkValid();
-		if (mMasterSurface == null) {
+		if (mInputSurface == null) {
 			throw new IllegalStateException("has no master surface");
 		}
-		return mMasterSurface;
+		return mInputSurface;
 	}
 
 	/**
@@ -313,7 +313,7 @@ public class VideoSource implements IPipelineSource {
 			return true;
 		case REQUEST_RECREATE_MASTER_SURFACE:
 			handleReCreateInputSurface();
-			mCallback.onCreate(mMasterSurface);
+			mCallback.onCreate(mInputSurface);
 			return true;
 		default:
 			return false;
@@ -340,9 +340,9 @@ public class VideoSource implements IPipelineSource {
 		makeDefault();
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glFlush();
-		if (mMasterTexture != null) {
-			mMasterTexture.updateTexImage();
-			mMasterTexture.getTransformMatrix(mTexMatrix);
+		if (mInputTexture != null) {
+			mInputTexture.updateTexImage();
+			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
 			callOnFrameAvailable();
@@ -356,9 +356,9 @@ public class VideoSource implements IPipelineSource {
 		makeDefault();
 		GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
 		GLES30.glFlush();
-		if (mMasterTexture != null) {
-			mMasterTexture.updateTexImage();
-			mMasterTexture.getTransformMatrix(mTexMatrix);
+		if (mInputTexture != null) {
+			mInputTexture.updateTexImage();
+			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES30.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
 			callOnFrameAvailable();
@@ -396,17 +396,17 @@ public class VideoSource implements IPipelineSource {
 			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		}
-		mMasterTexture = new SurfaceTexture(mTexId);
-		mMasterSurface = new Surface(mMasterTexture);
+		mInputTexture = new SurfaceTexture(mTexId);
+		mInputSurface = new Surface(mInputTexture);
 		if (BuildCheck.isAndroid4_1()) {
-			mMasterTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
+			mInputTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
 		}
 		if (BuildCheck.isLollipop()) {
-			mMasterTexture.setOnFrameAvailableListener(mOnFrameAvailableListener, mGLHandler);	// API>=21
+			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener, mGLHandler);	// API>=21
 		} else {
-			mMasterTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
+			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		}
-		mCallback.onCreate(mMasterSurface);
+		mCallback.onCreate(mInputSurface);
 	}
 
 	/**
@@ -416,22 +416,22 @@ public class VideoSource implements IPipelineSource {
 	@WorkerThread
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
-		if (mMasterSurface != null) {
+		if (mInputSurface != null) {
 			mCallback.onDestroy();
 			try {
-				mMasterSurface.release();
+				mInputSurface.release();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			mMasterSurface = null;
+			mInputSurface = null;
 		}
-		if (mMasterTexture != null) {
+		if (mInputTexture != null) {
 			try {
-				mMasterTexture.release();
+				mInputTexture.release();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			mMasterTexture = null;
+			mInputTexture = null;
 		}
 		if (mTexId != 0) {
 			if (isGLES3) {
@@ -454,11 +454,11 @@ public class VideoSource implements IPipelineSource {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		mVideoWidth = width;
 		mVideoHeight = height;
-		if ((mMasterSurface == null) || !mMasterSurface.isValid()) {
+		if ((mInputSurface == null) || !mInputSurface.isValid()) {
 			handleReCreateInputSurface();
 		}
 		if (BuildCheck.isAndroid4_1()) {
-			mMasterTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
+			mInputTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
 		}
 	}
 

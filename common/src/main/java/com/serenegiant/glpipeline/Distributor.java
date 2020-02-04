@@ -479,14 +479,14 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
-		protected void handleReCreateMasterSurface() {
+		protected void handleReCreateInputSurface() {
 			if (mSource.isValid()) {
 				callOnCreate(mSource.getInputSurface());
 			}
 		}
 
 		@Override
-		protected void handleReleaseMasterSurface() {
+		protected void handleReleaseInputSurface() {
 			callOnDestroy();
 		}
 

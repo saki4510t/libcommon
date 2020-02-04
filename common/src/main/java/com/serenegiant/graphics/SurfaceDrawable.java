@@ -82,8 +82,8 @@ public class SurfaceDrawable extends Drawable {
 	final float[] mTexMatrix = new float[16];
 	private final ByteBuffer mWorkBuffer;
 	private int mTexId;
-	private SurfaceTexture mMasterTexture;
-	private Surface mMasterSurface;
+	private SurfaceTexture mInputTexture;
+	private Surface mInputSurface;
 	private GLDrawer2D mDrawer;
 
 	/**
@@ -192,18 +192,18 @@ public class SurfaceDrawable extends Drawable {
 
 //--------------------------------------------------------------------------------
 	public boolean isSurfaceValid() {
-		return (mMasterSurface != null) && (mMasterSurface.isValid());
+		return (mInputSurface != null) && (mInputSurface.isValid());
 	}
 
 	public Surface getSurface() {
 		synchronized (mSync) {
-			return mMasterSurface;
+			return mInputSurface;
 		}
 	}
 
 	public SurfaceTexture getSurfaceTexture() {
 		synchronized (mSync) {
-			return mMasterTexture;
+			return mInputTexture;
 		}
 	}
 
@@ -280,8 +280,8 @@ public class SurfaceDrawable extends Drawable {
 		mEglTask.removeRequest(REQUEST_DRAW);
 		try {
 			mEglTask.makeCurrent();
-			mMasterTexture.updateTexImage();
-			mMasterTexture.getTransformMatrix(mTexMatrix);
+			mInputTexture.updateTexImage();
+			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
@@ -319,14 +319,14 @@ public class SurfaceDrawable extends Drawable {
 				mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			}
-			mMasterTexture = new SurfaceTexture(mTexId);
-			mMasterSurface = new Surface(mMasterTexture);
+			mInputTexture = new SurfaceTexture(mTexId);
+			mInputSurface = new Surface(mInputTexture);
 			if (BuildCheck.isAndroid4_1()) {
-				mMasterTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
+				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
 			}
-			mMasterTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
+			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		}
-		onCreateSurface(mMasterSurface);
+		onCreateSurface(mInputSurface);
 	}
 
 	/**
@@ -337,22 +337,22 @@ public class SurfaceDrawable extends Drawable {
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		synchronized (mSync) {
-			if (mMasterSurface != null) {
+			if (mInputSurface != null) {
 				try {
-					mMasterSurface.release();
+					mInputSurface.release();
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
-				mMasterSurface = null;
+				mInputSurface = null;
 				onDestroySurface();
 			}
-			if (mMasterTexture != null) {
+			if (mInputTexture != null) {
 				try {
-					mMasterTexture.release();
+					mInputTexture.release();
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
-				mMasterTexture = null;
+				mInputTexture = null;
 			}
 			if (mTexId != 0) {
 				if (isGLES3()) {
