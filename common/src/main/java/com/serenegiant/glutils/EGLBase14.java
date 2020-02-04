@@ -777,6 +777,7 @@ import com.serenegiant.system.BuildCheck;
 			attribList[3] = 5;
 			attribList[5] = 6;
 			attribList[7] = 5;
+			attribList[9] = 0;
 			config = internalGetConfig(attribList);
 		}
         return config;
