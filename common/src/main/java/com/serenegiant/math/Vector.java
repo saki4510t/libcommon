@@ -1117,7 +1117,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 		final Vector v1 = sub(result, p1, p0);
 		final Vector v2 = new Vector(p2).sub(p0);
-		return v1.mult(v1.dot(v2) / v1.lenSquared());
+		return v1.mult(v1.dot(v2) / v1.lenSquared()).add(p0);
 	}
 
 	@Override
