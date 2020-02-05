@@ -277,10 +277,10 @@ public class Vector implements Serializable, Cloneable {
 	 * @param v2
 	 * @return
 	 */
-	public static Vector add(@NonNull final Vector result,
+	public static Vector add(@Nullable final Vector result,
 		@NonNull final Vector v1, @NonNull final Vector v2) {
 
-		return result.set(v1).add(v2);
+		return (result != null ? result.set(v1) : new Vector(v1)).add(v2);
 	}
 
 	/**
@@ -343,10 +343,10 @@ public class Vector implements Serializable, Cloneable {
 	 * @param v2
 	 * @return
 	 */
-	public static Vector sub(@NonNull final Vector result,
+	public static Vector sub(@Nullable final Vector result,
 		@NonNull final Vector v1, @NonNull final Vector v2) {
 
-		return result.set(v1).sub(v2);
+		return (result != null ? result.set(v1) : new Vector(v1)).sub(v2);
 	}
 
 	/**
