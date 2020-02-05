@@ -19,6 +19,8 @@ package com.serenegiant.math;
 */
 
 import android.opengl.Matrix;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 import java.util.Locale;
@@ -30,7 +32,7 @@ import androidx.annotation.Size;
 /**
  * ベクトル計算用ヘルパークラス
  */
-public class Vector implements Serializable, Cloneable {
+public class Vector implements Parcelable, Serializable, Cloneable {
 	/**
 	 * serialVersionUID
 	 */
@@ -81,6 +83,16 @@ public class Vector implements Serializable, Cloneable {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	/**
+	 * Parcelable用コンストラクタ
+	 * @param in
+	 */
+	protected Vector(@NonNull final Parcel in) {
+		x = in.readFloat();
+		y = in.readFloat();
+		z = in.readFloat();
 	}
 
 	@NonNull
@@ -1116,4 +1128,29 @@ public class Vector implements Serializable, Cloneable {
 	public String toString(String fmt) {
 		return String.format(Locale.US, fmt, x, y, z);
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(@NonNull final Parcel dest, final int flags) {
+		dest.writeFloat(x);
+		dest.writeFloat(y);
+		dest.writeFloat(z);
+	}
+
+	public static final Creator<Vector> CREATOR = new Creator<Vector>() {
+		@Override
+		public Vector createFromParcel(Parcel in) {
+			return new Vector(in);
+		}
+
+		@Override
+		public Vector[] newArray(int size) {
+			return new Vector[size];
+		}
+	};
+
 }
