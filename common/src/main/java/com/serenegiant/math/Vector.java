@@ -23,6 +23,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -1117,6 +1118,25 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		final Vector v1 = sub(result, p1, p0);
 		final Vector v2 = new Vector(p2).sub(p0);
 		return v1.mult(v1.dot(v2) / v1.lenSquared());
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) return true;
+		if (!(o instanceof Vector)) return false;
+		final Vector v = (Vector) o;
+		return Float.compare(v.x, x) == 0 &&
+			Float.compare(v.y, y) == 0 &&
+			Float.compare(v.z, z) == 0;
+	}
+
+	@Override
+	public int hashCode() {
+		return hasCode(x, y, z);
+	}
+
+	private static int hasCode(final Object... objects) {
+		return Arrays.hashCode(objects);
 	}
 
 	@NonNull
