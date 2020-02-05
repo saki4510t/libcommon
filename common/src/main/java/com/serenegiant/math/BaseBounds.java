@@ -123,7 +123,7 @@ public abstract class BaseBounds implements Serializable {
 	}
 
 	public void rotate(final Vector angle) {
-		angle.set(angle.x, angle.y, angle.z);
+		this.angle.set(angle.x, angle.y, angle.z);
 	}
 
 	public void rotate(final float x, final float y, final float z) {
