@@ -23,6 +23,8 @@ import android.opengl.Matrix;
 import java.io.Serializable;
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+
 public class Vector implements Serializable, Cloneable {
 	/**
 	 * serialVersionUID
@@ -66,6 +68,7 @@ public class Vector implements Serializable, Cloneable {
 		return new Vector(v.x, v.y, v.z);
 	}
 
+	@NonNull
 	public Vector clone() throws CloneNotSupportedException {
 		final Vector result = (Vector)super.clone();
 		return result;
@@ -925,6 +928,7 @@ public class Vector implements Serializable, Cloneable {
 		return this;
 	}
 
+	@NonNull
 	@Override
 	public String toString() {
 		return String.format(Locale.US, "(%f,%f,%f)", x, y, z);
