@@ -950,64 +950,64 @@ public class Vector implements Serializable, Cloneable {
 
 	/**
 	 * この位置ベクトルと引数ベクトルが示す2点間距離を取得する
-	 * @param v
+	 * @param p
 	 * @return
 	 */
-	public float distance(@NonNull final Vector v) {
-		return distance(v.x, v.y, v.z);
+	public float distance(@NonNull final Vector p) {
+		return distance(p.x, p.y, p.z);
 	}
 
 	/**
 	 * この位置ベクトルと引数ベクトルが示す2点間距離を取得する
-	 * @param x
-	 * @param y
+	 * @param px
+	 * @param py
 	 * @return
 	 */
-	public float distance(final float x, final float y) {
-		return distance(x, y, this.z);
+	public float distance(final float px, final float py) {
+		return distance(px, py, this.z);
 	}
 
 	/**
 	 * この位置ベクトルと引数が示す座標間の距離を取得する
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param px
+	 * @param py
+	 * @param pz
 	 * @return
 	 */
-	public float distance(final float x, final float y, final float z) {
-		return (float) Math.sqrt(distSquared(x, y, z));
+	public float distance(final float px, final float py, final float pz) {
+		return (float) Math.sqrt(distSquared(px, py, pz));
 	}
 
 	/**
 	 * この位置ベクトルと引数ベクトルが示す2点間距離の2乗を取得する
-	 * @param v
+	 * @param p
 	 * @return
 	 */
-	public float distSquared(@NonNull final Vector v) {
-		return distSquared(v.x, v.y, v.z);
+	public float distSquared(@NonNull final Vector p) {
+		return distSquared(p.x, p.y, p.z);
 	}
 
 	/**
 	 * この位置ベクトルと引数が示す座標間の距離の2乗を取得する
-	 * @param x
-	 * @param y
+	 * @param px
+	 * @param py
 	 * @return
 	 */
-	public float distSquared(final float x, final float y) {
-		return distSquared(x, y, this.z);
+	public float distSquared(final float px, final float py) {
+		return distSquared(px, py, this.z);
 	}
 
 	/**
 	 * この位置ベクトルと引数が示す座標間の距離の2乗を取得する
-	 * @param x
-	 * @param y
-	 * @param z
+	 * @param px
+	 * @param py
+	 * @param pz
 	 * @return
 	 */
-	public float distSquared(final float x, final float y, final float z) {
-		final float dx = this.x - x;
-		final float dy = this.y - y;
-		final float dz = this.z - z;
+	public float distSquared(final float px, final float py, final float pz) {
+		final float dx = this.x - px;
+		final float dy = this.y - py;
+		final float dz = this.z - pz;
 		return dx * dx + dy * dy + dz * dz;
 	}
 
@@ -1033,14 +1033,14 @@ public class Vector implements Serializable, Cloneable {
 	/**
 	 * このベクトルと引数ベクトルで示す2点を通る直線の傾きを取得(2D)
 	 * result if (x != v.x) (v.y - y) / (v.x - x) elif (v.y - y) > 0 MAX_VALUE else MIN_VALUE
-	 * @param v
+	 * @param p
 	 * @return
 	 */
-	public float slope2D(@NonNull final Vector v) {
-		if (v.x != x) {
-			return (v.y - y) / (v.x - x);
+	public float slope2D(@NonNull final Vector p) {
+		if (p.x != x) {
+			return (p.y - y) / (p.x - x);
 		} else {
-			return (v.y - y) >= 0 ? Float.MAX_VALUE : Float.MIN_VALUE;
+			return (p.y - y) >= 0 ? Float.MAX_VALUE : Float.MIN_VALUE;
 		}
 	}
 
@@ -1069,29 +1069,25 @@ public class Vector implements Serializable, Cloneable {
 	}
 
 	/**
-	 * 中点を示すベクトルを取得
-	 * @param out
+	 * この位置ベクトルと引数の位置ベクトルが示す2点を結ぶ線分の中点を示す位置ベクトルを取得
+	 * @param p
 	 * @return
 	 */
-	public Vector mid(@Nullable final Vector out) {
-		if (out != null) {
-			return out.set(x / 2, y /2, z / 2);
-		} else {
-			return new Vector(x / 2, y /2, z / 2);
-		}
+	public Vector mid(@NonNull final Vector p) {
+		return mid(null, this, p);
 	}
 
 	/**
 	 * v1とv2が示す座標を結ぶ線分の中点を返す
 	 * @param result
-	 * @param v1
-	 * @param v2
+	 * @param p1
+	 * @param p2
 	 * @return
 	 */
-	public static Vector mid(@NonNull final Vector result,
-		@NonNull final Vector v1, @NonNull final Vector v2) {
+	public static Vector mid(@Nullable final Vector result,
+		@NonNull final Vector p1, @NonNull final Vector p2) {
 
-		return add(result, v1, v2).div(2.0f);
+		return add(result != null ? result : new Vector(), p1, p2).div(2.0f);
 	}
 
 	@NonNull
