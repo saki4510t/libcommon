@@ -1090,6 +1090,23 @@ public class Vector implements Serializable, Cloneable {
 		return add(result != null ? result : new Vector(), p1, p2).div(2.0f);
 	}
 
+	/**
+	 * p0, p1を通る線分に垂直でp2を通る線分の足(線分p0p1との交点座標)を求める
+	 * @param result
+	 * @param p0
+	 * @param p1
+	 * @param p2
+	 * @return
+	 */
+	public static Vector normalVector(@Nullable final Vector result,
+		@NonNull final Vector p0, @NonNull final Vector p1,
+		@NonNull final Vector p2) {
+
+		final Vector v1 = sub(result, p1, p0);
+		final Vector v2 = new Vector(p2).sub(p0);
+		return v1.mult(v1.dot(v2) / v1.lenSquared());
+	}
+
 	@NonNull
 	@Override
 	public String toString() {
