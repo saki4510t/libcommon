@@ -531,6 +531,14 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * (x,y)ベクトルの長さを取得
+	 * @return
+	 */
+	public float len2D() {
+		return (float)Math.hypot(x, y);
+	}
+
+	/**
 	 * ベクトルの長さを取得
 	 * @return
 	 */
