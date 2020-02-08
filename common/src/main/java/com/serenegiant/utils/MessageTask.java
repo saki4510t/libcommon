@@ -52,7 +52,9 @@ public abstract class MessageTask implements Runnable {
 		 * @param _arg2
 		 * @param _obj
 		 */
-		public Request(final int _request, final int _arg1, final int _arg2, final Object _obj) {
+		public Request(final int _request,
+			final int _arg1, final int _arg2, final Object _obj) {
+
 			request = _request;
 			arg1 = _arg1;
 			arg2 = _arg2;
@@ -180,7 +182,8 @@ public abstract class MessageTask implements Runnable {
 	/** 要求メッセージの処理(内部メッセージは来ない)
 	 * TaskBreakをthrowすると要求メッセージ処理ループを終了する */
 	@WorkerThread
-	protected abstract Object processRequest(final int request, final int arg1, final int arg2, final Object obj) throws TaskBreak;
+	protected abstract Object processRequest(final int request,
+		final int arg1, final int arg2, final Object obj) throws TaskBreak;
 
 	/** 要求メッセージを取り出す処理(要求メッセージがなければブロックされる) */
 	protected Request takeRequest() throws InterruptedException {
@@ -373,7 +376,9 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param obj
 	 * @return true if success offer
 	 */
-	public boolean offer(final int request, final int arg1, final int arg2, final Object obj) {
+	public boolean offer(final int request,
+		final int arg1, final int arg2, final Object obj) {
+
 		return !mFinished && mRequestQueue.offer(obtain(request, arg1, arg2, obj));
 	}
 
@@ -434,8 +439,11 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param arg1
 	 * @param arg2
 	 */
-	public boolean offerFirst(final int request, final int arg1, final int arg2, final Object obj) {
-		return !mFinished && mIsRunning && mRequestQueue.offerFirst(obtain(request, arg1, arg2, obj));
+	public boolean offerFirst(final int request,
+		final int arg1, final int arg2, final Object obj) {
+
+		return !mFinished && mIsRunning
+			&& mRequestQueue.offerFirst(obtain(request, arg1, arg2, obj));
 	}
 
 	/**
@@ -447,7 +455,9 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param obj
 	 * @return
 	 */
-	public Object offerAndWait(final int request, final int arg1, final int arg2, final Object obj) {
+	public Object offerAndWait(final int request,
+		final int arg1, final int arg2, final Object obj) {
+
 		if (!mFinished && (request > REQUEST_TASK_NON)) {
 			final Request req = obtain(REQUEST_TASK_RUN_AND_WAIT, arg1, arg2, obj);
 			if (!isOnWorkerThread()) {
@@ -467,7 +477,9 @@ LOOP:	for (; mIsRunning; ) {
 			} else {
 				// ワーカースレッド上ならここで実行する
 				try {
-					req.setResult(processRequest(req.request_for_result, req.arg1, req.arg2, req.obj));
+					req.setResult(processRequest(
+						req.request_for_result,
+						req.arg1, req.arg2, req.obj));
 				} catch (final TaskBreak e) {
 					req.setResult(null);
 				} catch (final Exception e) {
