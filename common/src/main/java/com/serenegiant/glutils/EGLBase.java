@@ -136,10 +136,10 @@ public abstract class EGLBase implements EGLConst {
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 		if (isEGL14Supported()) {
-			return EGLBase14.createFromCurrent(maxClientVersion,
+			return EGLBase14.createFromCurrentImpl(maxClientVersion,
 				withDepthBuffer, stencilBits, isRecordable);
 		} else {
-			return EGLBase10.createFromCurrent(maxClientVersion,
+			return EGLBase10.createFromCurrentImpl(maxClientVersion,
 				withDepthBuffer, stencilBits, isRecordable);
 		}
 	}

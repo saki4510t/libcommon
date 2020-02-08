@@ -77,7 +77,7 @@ import com.serenegiant.system.BuildCheck;
 		public Object getEGLContext() {
 			return eglContext;
 		}
-	}
+	} // Context
 
 	public static class Config extends IConfig {
 		public final EGLConfig eglConfig;
@@ -90,7 +90,7 @@ import com.serenegiant.system.BuildCheck;
 		public EGLConfig getEGLConfig() {
 			return eglConfig;
 		}
-	}
+	} // Config
 
 	/**
 	 * Android4.1.2だとSurfaceを使えない。
@@ -148,7 +148,7 @@ import com.serenegiant.system.BuildCheck;
 		public Rect getSurfaceFrame() {
 			return null;
 		}
-	}
+	} // MySurfaceHolder
 
 	/**
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
@@ -312,8 +312,9 @@ import com.serenegiant.system.BuildCheck;
 //			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
 // 				mEglSurface, presentationTimeNs);
 		}
-	}
+	} // EglSurface
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 現在のスレッドの既存のレンダリングコンテキストがあればそれを共有して
 	 * 新しいレンダリングコンテキストを生成する
@@ -325,7 +326,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFromCurrent(final int maxClientVersion,
+	/*package*/ static EGLBase createFromCurrentImpl(final int maxClientVersion,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 		Context context = null;
@@ -338,6 +339,7 @@ import com.serenegiant.system.BuildCheck;
 		return new EGLBase10(maxClientVersion, context, withDepthBuffer, stencilBits, isRecordable);
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
@@ -346,7 +348,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
 	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
 	 */
-	public EGLBase10(final int maxClientVersion,
+	/*package*/ EGLBase10(final int maxClientVersion,
 		@Nullable final Context sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
@@ -362,7 +364,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
 	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
 	 */
-	public EGLBase10(final int maxClientVersion,
+	/*package*/ EGLBase10(final int maxClientVersion,
 		final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
