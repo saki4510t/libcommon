@@ -370,7 +370,7 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
-		mDrawer = GLDrawer2D.create(isGLES3(), true);
+		mDrawer = GLDrawer2D.create(isOES3(), true);
 		handleReCreateInputSurface();
 	}
 
@@ -773,6 +773,7 @@ public abstract class AbstractDistributeTask {
 	public abstract void removeRequest(final int request);
 
 	public abstract EGLBase getEgl();
+	public abstract GLContext getGLContext();
 	public abstract EGLBase.IContext getContext();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();

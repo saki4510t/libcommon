@@ -255,7 +255,7 @@ public class SurfaceDrawable extends Drawable {
 	protected final void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
-		mDrawer = GLDrawer2D.create(isGLES3(), true);
+		mDrawer = GLDrawer2D.create(isOES3(), true);
 		mDrawer.setMirror(IRendererCommon.MIRROR_VERTICAL);
 	}
 

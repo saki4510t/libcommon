@@ -245,7 +245,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			if (!extensions.contains("OES_EGL_image_external")) {
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
-			mDrawer = GLDrawer2D.create(mGLContext.isGLES3, true)
+			mDrawer = GLDrawer2D.create(mGLContext.isOES3, true)
 			// clear screen with yellow color so that you can see rendering rectangle
 			// create object for preview display
 			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)

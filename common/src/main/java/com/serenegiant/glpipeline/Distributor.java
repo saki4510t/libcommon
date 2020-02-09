@@ -460,6 +460,11 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
+		public GLContext getGLContext() {
+			return mGLContext;
+		}
+
+		@Override
 		public EGLBase.IContext getContext() {
 			return mGLContext.getContext();
 		}
