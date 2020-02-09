@@ -674,7 +674,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseInputSurface();
 			makeCurrent();
-			if (isGLES3()) {
+			if (isOES3()) {
 				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
 			} else {
