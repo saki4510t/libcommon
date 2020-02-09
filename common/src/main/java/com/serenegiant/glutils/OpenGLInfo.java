@@ -46,6 +46,7 @@ public class OpenGLInfo {
 	    	final EGLBase.IEglSurface dummy = egl.createOffscreen(1, 1);
 	    	try {
 		    	final IntBuffer val = IntBuffer.allocate(2);
+		    	// GLコンテキストの情報を取得
 		    	JSONObject glinfo = new JSONObject();
 		    	try {
 		    		glinfo.put("GL_VENDOR", GLES20.glGetString(GLES20.GL_VENDOR));
@@ -134,6 +135,7 @@ public class OpenGLInfo {
 		    		glinfo.put("GL_EXTENSIONS", e.getMessage());
 		    	}
 		        result.put("GL_INFO", glinfo);
+		        // EGLの情報取得
 		    	JSONObject eglinfo = new JSONObject();
 		    	try {
 		    		eglinfo.put("EGL_VENDOR", egl.queryString(EGL10.EGL_VENDOR));
