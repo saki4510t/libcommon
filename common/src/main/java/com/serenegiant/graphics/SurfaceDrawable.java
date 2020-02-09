@@ -100,10 +100,24 @@ public class SurfaceDrawable extends Drawable {
 	public SurfaceDrawable(final int imageWidth, final int imageHeight,
 		@NonNull final Callback callback) {
 
+		this(imageWidth, imageHeight, 3, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param imageWidth
+	 * @param imageHeight
+	 * @param maxClientVersion
+	 * @param callback
+	 */
+	public SurfaceDrawable(final int imageWidth, final int imageHeight,
+		final int maxClientVersion,
+		@NonNull final Callback callback) {
+
 		mWidth = mImageWidth = imageWidth;
 		mHeight = mImageHeight = imageHeight;
 		mCallback = callback;
-		mEglTask = new EglTask(3,
+		mEglTask = new EglTask(maxClientVersion,
 			null, 0,
 			imageWidth, imageHeight) {
 
