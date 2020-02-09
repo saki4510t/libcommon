@@ -776,6 +776,7 @@ public abstract class AbstractDistributeTask {
 	public abstract EGLBase.IContext getContext();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
+	public abstract boolean isOES3();
 
 	public abstract boolean isMasterSurfaceValid();
 	public abstract int getTexId();

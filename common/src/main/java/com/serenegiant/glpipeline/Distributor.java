@@ -471,7 +471,12 @@ public class Distributor implements IPipeline {
 
 		@Override
 		public boolean isGLES3() {
-			return isGLES3;
+			return mGLContext.isGLES3();
+		}
+
+		@Override
+		public boolean isOES3() {
+			return mGLContext.isOES3();
 		}
 
 		@Override

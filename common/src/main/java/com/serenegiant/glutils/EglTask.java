@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
@@ -138,5 +139,23 @@ public abstract class EglTask extends MessageTask {
 
 	public boolean isGLES3() {
 		return mGLContext.isGLES3();
+	}
+
+	/**
+	 * 指定した文字列を含んでいるかどうかをチェック
+	 * GLコンテキストが存在するスレッド上で実行すること
+	 * @param extension
+	 * @return
+	 */
+	public boolean hasExtension(@NonNull final String extension) {
+		return mGLContext.hasExtension(extension);
+	}
+
+	/**
+	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
+	 * @return
+	 */
+	public boolean isOES3() {
+		return mGLContext.isOES3();
 	}
 }

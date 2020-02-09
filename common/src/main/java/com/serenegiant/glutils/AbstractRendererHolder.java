@@ -619,6 +619,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		@Override
+		public boolean isOES3() {
+			return mEglTask.isOES3();
+		}
+
+		@Override
 		public boolean isMasterSurfaceValid() {
 			return (mInputSurface != null) && (mInputSurface.isValid());
 		}

@@ -234,6 +234,10 @@ public class SurfaceDrawable extends Drawable {
 		return mEglTask.isGLES3();
 	}
 
+	protected boolean isOES3() {
+		return mEglTask.isOES3();
+	}
+
 	protected int getTexId() {
 		return mTexId;
 	}
