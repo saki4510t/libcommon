@@ -604,6 +604,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		@Override
+		public GLContext getGLContext() {
+			return mEglTask.getGLContext();
+		}
+
+		@Override
 		public EGLBase.IContext getContext() {
 			return mEglTask.getContext();
 		}
@@ -811,7 +816,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 静止画を非同期でキャプチャするためのRunnable
 	 */
 	private final Runnable mCaptureTask = new Runnable() {
-    	private EGLBase eglBase;
+		private GLContext mContext;
 		private ISurface captureSurface;
 		private GLDrawer2D drawer;
 		private final float[] mMvpMatrix = new float[16];
@@ -832,7 +837,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if (isRunning) {
 				init();
 				try {
-					if ((eglBase.getGlVersion() > 2) && (BuildCheck.isAndroid4_3())) {
+					if (mContext.isOES3()) {
 						captureLoopGLES3();
 					} else {
 						captureLoopGLES2();
@@ -848,12 +853,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		private final void init() {
-	    	eglBase = EGLBase.createFrom(mMaxClientVersion,
-	    		mRendererTask.getContext(), false, 0, false);
-	    	captureSurface = eglBase.createOffscreen(
+			mContext = new GLContext(mRendererTask.getGLContext());
+			mContext.initialize();
+	    	captureSurface = mContext.getEgl().createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
-			drawer = GLDrawer2D.create(eglBase.getGlVersion() > 2, true);
+			drawer = GLDrawer2D.create(mContext.isOES3(), true);
 			setupCaptureDrawer(drawer);
 		}
 
@@ -895,7 +900,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    		captureSurface.release();
 				    		captureSurface = null;
 				    	}
-				    	captureSurface = eglBase.createOffscreen(width, height);
+				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
 						GLUtils.setMirror(mMvpMatrix, mRendererTask.mirror());
@@ -986,7 +991,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    		captureSurface.release();
 				    		captureSurface = null;
 				    	}
-				    	captureSurface = eglBase.createOffscreen(width, height);
+				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
 						GLUtils.setMirror(mMvpMatrix, mRendererTask.mirror());
@@ -1049,9 +1054,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				drawer.release();
 				drawer = null;
 			}
-			if (eglBase != null) {
-				eglBase.release();
-				eglBase = null;
+			if (mContext != null) {
+				mContext.release();
+				mContext = null;
 			}
 		}
 	};	// mCaptureTask
