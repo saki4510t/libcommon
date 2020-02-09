@@ -16,6 +16,8 @@ android {
         targetSdkVersion versionTarget
         versionCode versionCodeNum
         versionName versionNameString
+
+		buildConfigField "boolean", "ENABLE_VSYNC", "${project.property("ENABLE_VSYNC")}"
     }
     buildTypes {
         release {

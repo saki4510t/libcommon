@@ -23,6 +23,7 @@ import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.glutils.MixRendererHolder
 import com.serenegiant.graphics.BitmapHelper
+import com.serenegiant.libcommon.BuildConfig
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -47,7 +48,7 @@ class MixCameraGLView @JvmOverloads constructor(
 		width: Int, height: Int,
 		callback: RenderHolderCallback?): IRendererHolder {
 
-		return MixRendererHolder(width, height, callback)
+		return MixRendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {

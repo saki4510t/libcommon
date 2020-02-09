@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.glutils.RendererHolder
+import com.serenegiant.libcommon.BuildConfig
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -34,7 +35,7 @@ class CameraGLView @JvmOverloads constructor(
 	override fun createRendererHolder(
 		width: Int, height: Int, callback: RenderHolderCallback?): IRendererHolder {
 
-		return RendererHolder(width, height, callback)
+		return RendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {
