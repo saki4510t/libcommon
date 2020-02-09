@@ -33,6 +33,7 @@ import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLManager
+import com.serenegiant.glutils.GLUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
@@ -56,7 +57,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-		mGLVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) 3 else 2 // GLES20 API >= 8, GLES30 API>=18
+		mGLVersion = GLUtils.getSupportedGLVersion()
 		setEGLContextClientVersion(mGLVersion)
 		mGLManager = GLManager(mGLVersion)
 
@@ -227,7 +228,8 @@ class DistributorCameraGLView @JvmOverloads constructor(
 			if (!extensions.contains("OES_EGL_image_external")) {
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
-			mDrawer = GLDrawer2D.create(mGLVersion == 3, true)
+			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
+			mDrawer = GLDrawer2D.create(isOES3, true)
 			// create texture ID
 			hTex = mDrawer!!.initTex()
 			// create SurfaceTexture with texture ID.

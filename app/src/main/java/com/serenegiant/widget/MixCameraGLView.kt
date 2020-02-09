@@ -48,7 +48,7 @@ class MixCameraGLView @JvmOverloads constructor(
 		width: Int, height: Int,
 		callback: RenderHolderCallback?): IRendererHolder {
 
-		return MixRendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
+		return MixRendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {

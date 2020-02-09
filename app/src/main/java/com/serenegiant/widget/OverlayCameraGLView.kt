@@ -49,7 +49,7 @@ class OverlayCameraGLView @JvmOverloads constructor(
 		width: Int, height: Int,
 		callback: RenderHolderCallback?): IRendererHolder {
 
-		return OverlayRendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
+		return OverlayRendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {

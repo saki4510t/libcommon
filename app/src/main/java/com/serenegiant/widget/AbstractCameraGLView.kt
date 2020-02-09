@@ -29,6 +29,7 @@ import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import com.serenegiant.glutils.GLDrawer2D
+import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.utils.HandlerThreadHandler
@@ -44,7 +45,8 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: GLSurfaceView(context, attrs), ICameraView {
 
-	private val mGLVersion: Int
+	protected val glVersion: Int
+
 	private val mCameraDelegator: CameraDelegator
 	/**
 	 * 子クラスからIRendererHolderへアクセスできるように
@@ -59,7 +61,7 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-		mGLVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) 3 else 2 // GLES20 API >= 8, GLES30 API>=18
+		glVersion = GLUtils.getSupportedGLVersion()
 		mCameraDelegator = object : CameraDelegator(this@AbstractCameraGLView,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
@@ -75,7 +77,7 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 			}
 		}
 		@Suppress("LeakingThis")
-		setEGLContextClientVersion(mGLVersion)
+		setEGLContextClientVersion(glVersion)
 		@Suppress("LeakingThis")
 		setRenderer(mCameraDelegator.cameraRenderer as CameraRenderer)
 		val holder = holder
@@ -231,7 +233,8 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 			if (!extensions.contains("OES_EGL_image_external")) {
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
-			mDrawer = GLDrawer2D.create(mGLVersion == 3, true)
+			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
+			mDrawer = GLDrawer2D.create(isOES3, true)
 			// create texture ID
 			hTex = mDrawer!!.initTex()
 			// create SurfaceTexture with texture ID.

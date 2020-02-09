@@ -35,10 +35,7 @@ import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipelineSource
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
-import com.serenegiant.glutils.GLContext
-import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.glutils.GLManager
-import com.serenegiant.glutils.ISurface
+import com.serenegiant.glutils.*
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
@@ -61,7 +58,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
-		mGLManager = GLManager()
+		mGLManager = GLManager(GLUtils.getSupportedGLVersion())
 		mGLContext = mGLManager.glContext
 		mGLHandler = mGLManager.glHandler
 		mCameraRenderer = CameraRenderer()

@@ -24,6 +24,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import androidx.appcompat.widget.AppCompatImageView
+import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
@@ -72,7 +73,7 @@ class CameraImageView @JvmOverloads constructor(
 		}
 
 		mDrawable = SurfaceDrawable(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT, GLUtils.getSupportedGLVersion(),
 			object : SurfaceDrawable.Callback {
 
 			override fun onCreateSurface(surface: Surface) {

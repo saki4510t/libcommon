@@ -57,7 +57,7 @@ class EffectCameraGLView @JvmOverloads constructor(
 		callback: RenderHolderCallback?): IRendererHolder {
 
 		if (DEBUG) Log.v(TAG, "createRendererHolder:")
-		return EffectRendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
+		return EffectRendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {

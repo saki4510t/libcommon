@@ -35,7 +35,7 @@ class CameraGLView @JvmOverloads constructor(
 	override fun createRendererHolder(
 		width: Int, height: Int, callback: RenderHolderCallback?): IRendererHolder {
 
-		return RendererHolder(width, height, BuildConfig.ENABLE_VSYNC, callback)
+		return RendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
 	}
 
 	companion object {
