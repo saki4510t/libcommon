@@ -27,6 +27,7 @@ import android.util.Log;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SysPropReader;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -48,6 +49,8 @@ public class GLContext implements EGLConst {
 	@Nullable
 	private ISurface mEglMasterSurface;
 	private long mGLThreadId;
+	@Nullable
+	private String mGlExtensions;
 
 	/**
 	 * コンストラクタ
@@ -298,6 +301,39 @@ public class GLContext implements EGLConst {
 		synchronized (mSync) {
 			return  (mEgl != null) ? mEgl.getGlVersion() : 0;
 		}
+	}
+
+	/**
+	 * 指定した文字列を含んでいるかどうかをチェック
+	 * GLコンテキストが存在するスレッド上で実行すること
+	 * @param extension
+	 * @return
+	 */
+	public boolean hasExtension(@NonNull final String extension) {
+		if (TextUtils.isEmpty(mGlExtensions)) {
+			if (isGLES2()) {
+				mGlExtensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
+			} else {
+				mGlExtensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); // API >= 18
+			}
+		}
+		return (mGlExtensions != null) && mGlExtensions.contains(extension);
+	}
+
+	/**
+	 * GLES2/3でGL_OES_EGL_image_externalに対応しているかどうか
+	 * @return
+	 */
+	public boolean isOES2() {
+		return isGLES2() && hasExtension("GL_OES_EGL_image_external");
+	}
+
+	/**
+	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
+	 * @return
+	 */
+	public boolean isOES3() {
+		return isGLES3() && hasExtension("GL_OES_EGL_image_external_essl3");
 	}
 
 //--------------------------------------------------------------------------------
