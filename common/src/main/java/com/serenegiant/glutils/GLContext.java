@@ -51,6 +51,16 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * コンストラクタ
+	 * 端末がサポートしている最も大きなGL|ESのバージョンを使う
+	 * 共有コンテキストなし
+	 * GLコンテキスト用のオフスクリーンサイズは1x1
+	 */
+	public GLContext() {
+		this(GLUtils.getSupportedGLVersion(), null, 0, 1, 1);
+	}
+
+	/**
+	 * コンストラクタ
 	 * @param maxClientVersion 通常は2か3
 	 * @param sharedContext 共有コンテキストの親となるIContext, nullなら自分がマスターのコンテキストとなる
 	 * @param flags
