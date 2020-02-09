@@ -47,10 +47,11 @@ public class GLUtils {
 	 */
 	public static int getSupportedGLVersion() {
 		if (sSupportedGLVersion < 1) {
+			// 一度も実行されていない時
 			final AtomicInteger result = new AtomicInteger(1);
 			final Semaphore sync = new Semaphore(0);
 			final GLContext context = new GLContext(3, null, 0);
-			// ダミースレッド上でEGL/GLコンテキストを生成して
+			// ダミースレッド上でEGL/GLコンテキストを生成してエクステンション文字列をチェックする
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
