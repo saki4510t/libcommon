@@ -356,7 +356,7 @@ public class Distributor implements IPipeline {
 			@NonNull final Handler glHandler,
 			final int width, final int height) {
 
-			super(width, height);
+			super(width, height, false);
 			mGLContext = glContext;
 			mGLHandler = glHandler;
 			isGLES3 = glContext.isGLES3();

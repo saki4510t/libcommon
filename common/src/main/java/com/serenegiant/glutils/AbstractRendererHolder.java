@@ -516,7 +516,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			final int maxClientVersion,
 			@Nullable final EGLBase.IContext sharedContext, final int flags) {
 
-			super(width, height);
+			super(width, height, false);
 			mParent = parent;
 			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
 				@Override
