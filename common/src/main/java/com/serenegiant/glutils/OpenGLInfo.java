@@ -41,6 +41,7 @@ public class OpenGLInfo {
 	public static JSONObject get() throws JSONException {
 		JSONObject result = new JSONObject();
 		try {
+			// FIXME GLContextに変える
 	    	final EGLBase egl = EGLBase.createFrom(3, null, false, 0, false);
 	    	final EGLBase.IEglSurface dummy = egl.createOffscreen(1, 1);
 	    	try {

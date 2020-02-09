@@ -219,7 +219,7 @@ public class StaticTextureSource {
 		public RendererTask(final StaticTextureSource parent,
 			final int width, final int height, final float fps) {
 
-			super(3, null, 0);
+			super(GLUtils.getSupportedGLVersion(), null, 0);
 			mParent = parent;
 			mVideoWidth = width;
 			mVideoHeight = height;

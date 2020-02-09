@@ -18,7 +18,6 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -53,7 +52,7 @@ public class GLManager {
 	 * コンストラクタ
 	 */
 	public GLManager() {
-		this(3, null, 0, null);
+		this(GLUtils.getSupportedGLVersion(), null, 0, null);
 	}
 
 	/**
@@ -61,7 +60,7 @@ public class GLManager {
 	 * @param callback
 	 */
 	public GLManager(@Nullable final Handler.Callback callback) {
-		this(3, null, 0, callback);
+		this(GLUtils.getSupportedGLVersion(), null, 0, callback);
 	}
 
 	/**
@@ -96,8 +95,7 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mCallback = callback;
-		mGLContext = new GLContext(
-			(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) ? maxClientVersion : 2,
+		mGLContext = new GLContext(maxClientVersion,
 			sharedContext, flags);
 		mGLHandler = HandlerThreadHandler.createHandler(TAG,
 			new Handler.Callback() {

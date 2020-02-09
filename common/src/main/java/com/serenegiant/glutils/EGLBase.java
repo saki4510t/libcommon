@@ -53,7 +53,7 @@ public abstract class EGLBase implements EGLConst {
 	public static EGLBase createFrom(@Nullable final IContext sharedContext,
 		final boolean withDepthBuffer, final boolean isRecordable) {
 
-		return createFrom(3, sharedContext, withDepthBuffer, 0, isRecordable);
+		return createFrom(GLUtils.getSupportedGLVersion(), sharedContext, withDepthBuffer, 0, isRecordable);
 	}
 
 	/**
@@ -68,7 +68,7 @@ public abstract class EGLBase implements EGLConst {
 	public static EGLBase createFrom(@Nullable final IContext sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
-		return createFrom(3, sharedContext,
+		return createFrom(GLUtils.getSupportedGLVersion(), sharedContext,
 			withDepthBuffer, stencilBits, isRecordable);
 	}
 
