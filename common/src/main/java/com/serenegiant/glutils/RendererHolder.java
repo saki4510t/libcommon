@@ -67,7 +67,7 @@ public class RendererHolder extends AbstractRendererHolder {
 	 * @param flags
 	 * @param callback
 	 */
-	protected RendererHolder(final int width, final int height,
+	public RendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {

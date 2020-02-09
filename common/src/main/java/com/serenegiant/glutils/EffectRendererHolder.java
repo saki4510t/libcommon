@@ -537,7 +537,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param flags
 	 * @param callback
 	 */
-	protected EffectRendererHolder(final int width, final int height,
+	public EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
@@ -556,7 +556,7 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	 * @param flags
 	 * @param callback
 	 */
-	protected EffectRendererHolder(final int width, final int height,
+	public EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		final boolean enableVSync,

@@ -85,7 +85,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @param flags
 	 * @param callback
 	 */
-	protected MixRendererHolder(final int width, final int height,
+	public MixRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
@@ -105,7 +105,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 * @param callback
 	 */
-	protected MixRendererHolder(final int width, final int height,
+	public MixRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		final boolean enableVSync,
