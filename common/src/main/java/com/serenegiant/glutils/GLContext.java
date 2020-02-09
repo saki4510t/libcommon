@@ -75,6 +75,14 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
+	 * コピーコンストラクタ
+	 * @param src
+	 */
+	public GLContext(@NonNull final GLContext src) {
+		this(src.getMaxClientVersion(), src.getContext(), src.getFlags(), 1, 1);
+	}
+
+	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
 	 * @param sharedContext
@@ -92,7 +100,6 @@ public class GLContext implements EGLConst {
 		mMasterWidth = width > 0 ? width : 1;
 		mMasterHeight = height > 0 ? height : 1;
 	}
-
 
 	@Override
 	protected void finalize() throws Throwable {
