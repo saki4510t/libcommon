@@ -55,6 +55,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected final Object mSync = new Object();
 	@Nullable
 	private final RenderHolderCallback mCallback;
+	private final int mMaxClientVersion;
 	private volatile boolean isRunning;
 
 	private OutputStream mCaptureStream;
@@ -82,6 +83,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
+		mMaxClientVersion = maxClientVersion;
 		mRendererTask = createRendererTask(width, height,
 			maxClientVersion, sharedContext, flags, enableVSync);
 		mRendererTask.start(RENDERER_THREAD_NAME);
@@ -841,7 +843,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 		private final void init() {
-	    	eglBase = EGLBase.createFrom(3,
+	    	eglBase = EGLBase.createFrom(mMaxClientVersion,
 	    		mRendererTask.getContext(), false, 0, false);
 	    	captureSurface = eglBase.createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
