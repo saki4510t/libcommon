@@ -39,7 +39,23 @@ public class RendererHolder extends AbstractRendererHolder {
 
 		this(width, height,
 			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			callback);
+			false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @param callback
+	 */
+	public RendererHolder(final int width, final int height,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		this(width, height,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			enableVSync, callback);
 	}
 
 	/**
@@ -56,7 +72,30 @@ public class RendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		this(width, height,
+			maxClientVersion, sharedContext, flags,
+			false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @param callback
+	 */
+	public RendererHolder(final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height,
+			maxClientVersion, sharedContext, flags,
+			enableVSync, callback);
 	}
 
 	@NonNull
@@ -64,10 +103,11 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVsync) {
 
 		return new BaseRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, enableVsync);
 	}
 	
 }

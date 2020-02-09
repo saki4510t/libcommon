@@ -74,7 +74,7 @@ public abstract class AbstractDistributeTask {
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param enableVSync Choreographerによるvsync同期して映像更新するかどうか
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 */
 	protected AbstractDistributeTask(final int width, final int height,
 		final boolean enableVSync) {

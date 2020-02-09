@@ -57,7 +57,23 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 		this(width, height,
 			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			callback);
+			false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @param callback
+	 */
+	public MixRendererHolder(final int width, final int height,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		this(width, height,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			enableVSync, callback);
 	}
 
 	/**
@@ -74,7 +90,28 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		this(width, height,
+			maxClientVersion, sharedContext, flags,
+			false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @param callback
+	 */
+	protected MixRendererHolder(final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height, maxClientVersion, sharedContext, flags, enableVSync, callback);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -109,6 +146,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param flags
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 * @return
 	 */
 	@NonNull
@@ -116,10 +154,11 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVSync) {
 
 		return new MixRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, enableVSync);
 	}
 
 	private static final int REQUEST_SET_MASK = 10;
@@ -182,12 +221,23 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 */
 		private Handler mAsyncHandler;
 
+		/**
+		 * コンストラクタ
+		 * @param parent
+		 * @param width
+		 * @param height
+		 * @param maxClientVersion
+		 * @param sharedContext
+		 * @param flags
+		 * @param enableVsync vsyncに同期して描画要求するかどうか
+		 */
 		public MixRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			final boolean enableVsync) {
 
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
+			super(parent, width, height, maxClientVersion, sharedContext, flags, enableVsync);
 			if (BuildCheck.isAndroid5()) {
 				mAsyncHandler = HandlerThreadHandler.createHandler("OnFrameAvailable");
 			}

@@ -64,7 +64,7 @@ public class Distributor implements IPipeline {
 	 * @param source
 	 */
 	public Distributor(@NonNull final IPipelineSource source) {
-		this(source, null, false);
+		this(source, null, false, false);
 	}
 
 	/**
@@ -77,6 +77,21 @@ public class Distributor implements IPipeline {
 	public Distributor(@NonNull final IPipelineSource source,
 		@Nullable final IRendererHolder.RenderHolderCallback callback,
 		final boolean useSharedContext) {
+
+		this(source, callback, useSharedContext, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
+	 * @param source
+	 * @param callback
+	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
+	 * @param enableVsync vsyncに同期して描画要求するかどうか
+	 */
+	public Distributor(@NonNull final IPipelineSource source,
+		@Nullable final IRendererHolder.RenderHolderCallback callback,
+		final boolean useSharedContext, final boolean enableVsync) {
 
 		mSource = source;
 		final Handler.Callback handlerCallback
@@ -102,7 +117,8 @@ public class Distributor implements IPipeline {
 		mCallback = callback;
 		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
-			source.getWidth(), source.getHeight());
+			source.getWidth(), source.getHeight(),
+			enableVsync);
 		source.add(mOnFrameAvailableListener);
 		mDistributeTask.start(RENDERER_THREAD_NAME);
 	}
@@ -351,12 +367,14 @@ public class Distributor implements IPipeline {
 		 * @param glHandler
 		 * @param width
 		 * @param height
+		 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 		 */
 		public DistributeTask(@NonNull final GLContext glContext,
 			@NonNull final Handler glHandler,
-			final int width, final int height) {
+			final int width, final int height,
+			final boolean enableVSync) {
 
-			super(width, height, false);
+			super(width, height, enableVSync);
 			mGLContext = glContext;
 			mGLHandler = glHandler;
 			isGLES3 = glContext.isGLES3();

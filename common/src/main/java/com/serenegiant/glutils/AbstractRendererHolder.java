@@ -69,35 +69,21 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param callback
-	 */
-	protected AbstractRendererHolder(final int width, final int height,
-		@Nullable final RenderHolderCallback callback) {
-		
-		this(width, height,
-			3,
-			null,
-			EGLConst.EGL_FLAG_RECORDABLE,
-			callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param flags
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 * @param callback
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
 		mRendererTask = createRendererTask(width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, enableVSync);
 		mRendererTask.start(RENDERER_THREAD_NAME);
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -429,11 +415,23 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 //--------------------------------------------------------------------------------
+
+	/**
+	 *
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param flags
+	 * @param enableVsync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @return
+	 */
 	@NonNull
 	protected abstract BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags);
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVsync);
 	
 //--------------------------------------------------------------------------------
 	protected void startCaptureTask() {
@@ -510,13 +508,15 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param maxClientVersion
 		 * @param sharedContext
 		 * @param flags
+		 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 		 */
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			final boolean enableVSync) {
 
-			super(width, height, false);
+			super(width, height, enableVSync);
 			mParent = parent;
 			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
 				@Override

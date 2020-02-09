@@ -509,7 +509,23 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 
 		this(width, height,
 			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			callback);
+			false, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
+	 * @param callback
+	 */
+	public EffectRendererHolder(final int width, final int height,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		this(width, height,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			enableVSync, callback);
 	}
 
 	/**
@@ -525,8 +541,28 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
+		this(width, height,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			false, callback);
+	}
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param enableVSync
+	 * @param flags
+	 * @param callback
+	 */
+	protected EffectRendererHolder(final int width, final int height,
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVSync,
+		@Nullable final RenderHolderCallback callback) {
+
+		super(width, height, maxClientVersion, sharedContext, flags, enableVSync, callback);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -534,11 +570,12 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 	@NonNull
 	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		final boolean enableVsync) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, enableVsync);
 	}
 
 //================================================================================
@@ -621,9 +658,10 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			final boolean enableVsync) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
+			super(parent, width, height, maxClientVersion, sharedContext, flags, enableVsync);
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 
