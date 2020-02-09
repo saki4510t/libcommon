@@ -38,17 +38,17 @@ public abstract class AbstractDistributeTask {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDistributeTask.class.getSimpleName();
 
-	protected static final int REQUEST_DRAW = 1;
-	protected static final int REQUEST_UPDATE_SIZE = 2;
-	protected static final int REQUEST_ADD_SURFACE = 3;
-	protected static final int REQUEST_REMOVE_SURFACE = 4;
-	protected static final int REQUEST_REMOVE_SURFACE_ALL = 12;
-	protected static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
-	protected static final int REQUEST_MIRROR = 6;
-	protected static final int REQUEST_ROTATE = 7;
-	protected static final int REQUEST_CLEAR = 8;
-	protected static final int REQUEST_CLEAR_ALL = 9;
-	protected static final int REQUEST_SET_MVP = 10;
+	private static final int REQUEST_DRAW = 1;
+	private static final int REQUEST_UPDATE_SIZE = 2;
+	private static final int REQUEST_ADD_SURFACE = 3;
+	private static final int REQUEST_REMOVE_SURFACE = 4;
+	private static final int REQUEST_REMOVE_SURFACE_ALL = 12;
+	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
+	private static final int REQUEST_MIRROR = 6;
+	private static final int REQUEST_ROTATE = 7;
+	private static final int REQUEST_CLEAR = 8;
+	private static final int REQUEST_CLEAR_ALL = 9;
+	private static final int REQUEST_SET_MVP = 10;
 
 	@NonNull
 	private final SparseArray<IRendererTarget>
@@ -76,6 +76,13 @@ public abstract class AbstractDistributeTask {
 	public void requestFrame() {
 		mHasNewFrame = isFirstFrameRendered = true;
 		offer(REQUEST_DRAW, 0, 0, null);
+	}
+
+	/**
+	 * 映像受け取り用のマスターサーフェースの再生成要求する
+	 */
+	public void requestRecreateMasterSurface() {
+		offer(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 
 	/**

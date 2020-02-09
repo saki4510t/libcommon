@@ -44,7 +44,6 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static com.serenegiant.glutils.AbstractDistributeTask.*;
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 public abstract class AbstractRendererHolder implements IRendererHolder {
@@ -297,7 +296,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void requestFrame() {
-		mRendererTask.offer(REQUEST_DRAW);
+		mRendererTask.requestFrame();
 	}
 
 	/**
@@ -773,7 +772,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			checkFinished();
 			if ((mInputSurface == null) || (!mInputSurface.isValid())) {
 				Log.d(TAG, "checkMasterSurface:invalid master surface");
-				mEglTask.offerAndWait(REQUEST_RECREATE_MASTER_SURFACE, 0, 0, null);
+				requestRecreateMasterSurface();
 			}
 		}
 
