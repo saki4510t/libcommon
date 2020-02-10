@@ -36,6 +36,7 @@ import android.view.Surface;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.system.BuildCheck;
 
@@ -100,7 +101,7 @@ public class SurfaceDrawable extends Drawable {
 	public SurfaceDrawable(final int imageWidth, final int imageHeight,
 		@NonNull final Callback callback) {
 
-		this(imageWidth, imageHeight, 3, callback);
+		this(imageWidth, imageHeight, GLUtils.getSupportedGLVersion(), callback);
 	}
 
 	/**
