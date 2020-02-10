@@ -123,15 +123,17 @@ class MainActivity
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:enableVSync=${BuildConfig.ENABLE_VSYNC}")
 		var fragment: Fragment? = null
 		when (item.id) {
-			0 -> fragment = NetworkConnectionFragment.newInstance()
-			1 -> {
+			0 -> {	// NetworkConnection
+				fragment = NetworkConnectionFragment.newInstance()
+			}
+			1 -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
 					return
 				}
 				fragment = UsbFragment.newInstance()
 			}
-			2 -> {
+			2 -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -139,7 +141,7 @@ class MainActivity
 				}
 				fragment = CameraFragment.newInstance()
 			}
-			3 -> {
+			3 -> {	// EffectCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -147,7 +149,7 @@ class MainActivity
 				}
 				fragment = EffectCameraFragment.newInstance()
 			}
-			4 -> {
+			4 -> {	// MixCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -155,7 +157,7 @@ class MainActivity
 				}
 				fragment = MixCameraFragment.newInstance()
 			}
-			5 -> {
+			5 -> {	// OverlayCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -163,7 +165,7 @@ class MainActivity
 				}
 				fragment = OverlayCameraFragment.newInstance()
 			}
-			6 -> {
+			6 -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -171,7 +173,7 @@ class MainActivity
 				}
 				fragment = VideoSourceCameraFragment.newInstance()
 			}
-			7 -> {
+			7 -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -179,7 +181,7 @@ class MainActivity
 				}
 				fragment = DistributorFragment.newInstance()
 			}
-			8 -> {
+			8 -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -187,7 +189,7 @@ class MainActivity
 				}
 				fragment = CameraImageViewFragment.newInstance()
 			}
-			9 -> {
+			9 -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -195,13 +197,13 @@ class MainActivity
 				}
 				fragment = CameraTextureFragment.newInstance()
 			}
-			10 -> {
+			10 -> {	// Galley
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			11 -> {
+			11 -> {	// Galley(RecyclerView)
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
