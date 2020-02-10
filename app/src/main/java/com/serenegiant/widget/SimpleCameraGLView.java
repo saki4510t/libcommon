@@ -117,10 +117,10 @@ public class SimpleCameraGLView extends GLView
 			mSurfaceTexture.setDefaultBufferSize(
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
 			mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-				private int cnt;
+//				private int cnt;
 				@Override
 				public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-					if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable:" + cnt);
+//					if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable:" + cnt);
 					mRequestUpdateTex = true;
 				}
 			});
