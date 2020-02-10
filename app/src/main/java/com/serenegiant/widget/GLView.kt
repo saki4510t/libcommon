@@ -84,6 +84,10 @@ open class GLView @JvmOverloads constructor(
 		return mGLContext.isOES3
 	}
 
+	fun getGLContext() : GLContext {
+		return mGLContext
+	}
+
  	protected fun makeDefault() {
  		if (mTarget != null) {
  			mTarget!!.makeCurrent()
@@ -94,6 +98,18 @@ open class GLView @JvmOverloads constructor(
 
 	fun queueEvent(task: Runnable) {
 		mGLHandler.post(task)
+	}
+
+	fun queueEvent(task: Runnable, delayMs: Long) {
+		if (delayMs > 0) {
+			mGLHandler.postDelayed(task, delayMs)
+		} else {
+			mGLHandler.post(task)
+		}
+	}
+
+	fun removeEvent(task: Runnable) {
+		mGLHandler.removeCallbacks(task)
 	}
 
 	private var mChoreographerCallback
@@ -148,6 +164,7 @@ open class GLView @JvmOverloads constructor(
 	@CallSuper
 	protected open fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
+		mGLHandler.removeCallbacksAndMessages(null)
 		mGLManager.removeFrameCallback(mChoreographerCallback)
 		if (mTarget != null) {
 			mTarget!!.release()
