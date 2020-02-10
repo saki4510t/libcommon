@@ -64,12 +64,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		mCameraRenderer = CameraRenderer()
 		mCameraDelegator = object : CameraDelegator(this@VideoSourceCameraGLView,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
-			override fun getInputSurfaceTexture(): SurfaceTexture {
-
-				if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-				checkNotNull(mVideoSource)
-				return mVideoSource!!.inputSurfaceTexture
-			}
 
 			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
 				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
@@ -288,11 +282,18 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		}
 
 		override fun hasSurface(): Boolean {
-			return false
+			return mVideoSource != null
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
 			mVideoSource!!.resize(width, height)
+		}
+
+		override fun getInputSurfaceTexture(): SurfaceTexture {
+
+			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
+			checkNotNull(mVideoSource)
+			return mVideoSource!!.inputSurfaceTexture
 		}
 
 		fun release() {

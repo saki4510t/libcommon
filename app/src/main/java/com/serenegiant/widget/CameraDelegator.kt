@@ -88,6 +88,11 @@ abstract class CameraDelegator(
 		fun hasSurface(): Boolean
 		fun updateViewport()
 		fun onPreviewSizeChanged(width: Int, height: Int)
+		/**
+		 * カメラ映像受け取り用のSurfaceTextureを取得
+		 * @return
+		 */
+		fun getInputSurfaceTexture(): SurfaceTexture
 	}
 
 //--------------------------------------------------------------------------------
@@ -280,12 +285,6 @@ abstract class CameraDelegator(
 
 //--------------------------------------------------------------------------------
 	/**
-	 * カメラ映像受け取り用のSurfaceTextureを取得
-	 * @return
-	 */
-	protected abstract fun getInputSurfaceTexture(): SurfaceTexture
-
-	/**
 	 * カメラ映像をGLSurfaceViewへ描画するためのICameraRenderer(GLSurfaceView.Renderer)を生成
 	 * @param parent
 	 * @return
@@ -361,7 +360,7 @@ abstract class CameraDelegator(
 						cameraRenderer.onPreviewSizeChanged(previewSize.width, previewSize.height)
 					})
 					// カメラ映像受け取り用SurfaceTextureをセット
-					val st = getInputSurfaceTexture()
+					val st = cameraRenderer.getInputSurfaceTexture()
 					st.setDefaultBufferSize(previewSize.width, previewSize.height)
 					camera!!.setPreviewTexture(st)
 				}

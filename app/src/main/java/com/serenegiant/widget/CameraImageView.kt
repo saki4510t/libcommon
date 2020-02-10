@@ -44,12 +44,6 @@ class CameraImageView @JvmOverloads constructor(
 		mCameraDelegator = object : CameraDelegator(this@CameraImageView,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
-			override fun getInputSurfaceTexture(): SurfaceTexture {
-				val st = this@CameraImageView.getInputSurfaceTexture()
-				if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:$st")
-				return st
-			}
-
 			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
 				return object : ICameraRenderer {
 					override fun onSurfaceDestroyed() {
@@ -59,6 +53,11 @@ class CameraImageView @JvmOverloads constructor(
 					override fun hasSurface(): Boolean {
 						if (DEBUG) Log.v(TAG, "hasSurface:")
 						return this@CameraImageView.hasSurface()
+					}
+
+					override fun getInputSurfaceTexture(): SurfaceTexture {
+						if (DEBUG) Log.v(TAG, "updateViewport:")
+						return this@CameraImageView.getInputSurfaceTexture()
 					}
 
 					override fun updateViewport() {

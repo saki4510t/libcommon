@@ -65,12 +65,6 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 		mCameraDelegator = object : CameraDelegator(this@AbstractCameraGLView,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
-			override fun getInputSurfaceTexture(): SurfaceTexture {
-				if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-				checkNotNull(rendererHolder)
-				return rendererHolder!!.surfaceTexture
-			}
-
 			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
 				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
 				return CameraRenderer()
@@ -209,9 +203,7 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 	 */
 	private inner class CameraRenderer : ICameraRenderer, Renderer, SurfaceTexture.OnFrameAvailableListener {
 		// API >= 11
-		var inputSurfaceTexture // API >= 11
-			: SurfaceTexture? = null
-			private set
+		private var inputSurfaceTexture: SurfaceTexture? = null // API >= 11
 		private var hTex = 0
 		private var mDrawer: GLDrawer2D? = null
 		private val mStMatrix = FloatArray(16)
@@ -282,6 +274,12 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
+		}
+
+		override fun getInputSurfaceTexture(): SurfaceTexture {
+			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
+			checkNotNull(rendererHolder)
+			return rendererHolder!!.surfaceTexture
 		}
 
 		fun release() {

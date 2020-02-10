@@ -64,12 +64,6 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		mCameraDelegator = object : CameraDelegator(this@DistributorCameraGLView,
 			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
 
-			override fun getInputSurfaceTexture(): SurfaceTexture {
-				if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-				checkNotNull(mVideoSource)
-				return mVideoSource!!.inputSurfaceTexture
-			}
-
 			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
 				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
 				return CameraRenderer()
@@ -209,8 +203,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	 */
 	private inner class CameraRenderer : ICameraRenderer, Renderer, SurfaceTexture.OnFrameAvailableListener {
 		// API >= 11
-		var inputSurfaceTexture : SurfaceTexture? = null
-			private set
+		private var inputSurfaceTexture : SurfaceTexture? = null
 		private var hTex = 0
 		private var mDrawer: GLDrawer2D? = null
 		private val mStMatrix = FloatArray(16)
@@ -279,6 +272,12 @@ class DistributorCameraGLView @JvmOverloads constructor(
 			mVideoSource?.resize(width, height)
 			mDistributor?.resize(width, height)
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
+		}
+
+		override fun getInputSurfaceTexture(): SurfaceTexture {
+			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
+			checkNotNull(mVideoSource)
+			return mVideoSource!!.inputSurfaceTexture
 		}
 
 		fun release() {
