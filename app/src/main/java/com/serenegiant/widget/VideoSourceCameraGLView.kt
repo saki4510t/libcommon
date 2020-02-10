@@ -43,6 +43,7 @@ import com.serenegiant.widget.CameraDelegator.ICameraView
  * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraGLView実装
  * SurfaceViewを継承
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
+ * FIXME GLViewを継承するように変更する
  */
 class VideoSourceCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
