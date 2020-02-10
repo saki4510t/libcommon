@@ -27,6 +27,7 @@ import android.view.Choreographer
 import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.annotation.CallSuper
+import androidx.annotation.WorkerThread
 import com.serenegiant.glutils.*
 
 /**
@@ -84,6 +85,10 @@ open class GLView @JvmOverloads constructor(
 		return mGLContext.isOES3
 	}
 
+	fun getGLManager() : GLManager {
+		return mGLManager;
+	}
+
 	fun getGLContext() : GLContext {
 		return mGLContext
 	}
@@ -129,6 +134,7 @@ open class GLView @JvmOverloads constructor(
 	 * Surfaceが生成された時
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
+	@WorkerThread
 	@CallSuper
 	protected open fun onSurfaceCreated() {
 		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
@@ -141,6 +147,7 @@ open class GLView @JvmOverloads constructor(
 	 * Surfaceのサイズが変更された
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
+	@WorkerThread
 	@CallSuper
 	protected open fun onSurfaceChanged(
 		format: Int, width: Int, height: Int) {
@@ -153,6 +160,7 @@ open class GLView @JvmOverloads constructor(
 	 * 描画イベント
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
+	@WorkerThread
 	protected open fun drawFrame() {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 	}
@@ -161,6 +169,7 @@ open class GLView @JvmOverloads constructor(
 	 * Surfaceが破棄された
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
+	@WorkerThread
 	@CallSuper
 	protected open fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
