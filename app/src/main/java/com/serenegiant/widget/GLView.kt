@@ -96,10 +96,12 @@ open class GLView @JvmOverloads constructor(
 		mGLHandler.post(task)
 	}
 
-	private var mChoreographerCallback =	object : Choreographer.FrameCallback {
+	private var mChoreographerCallback
+		= object : Choreographer.FrameCallback {
+
 		override fun doFrame(frameTimeNanos: Long) {
 			if (mHasSurface) {
-				Choreographer.getInstance().postFrameCallback(this)
+				mGLManager.postFrameCallbackDelayed(this, 0)
 				makeDefault()
 				drawFrame()
 				mTarget!!.swap()
@@ -116,7 +118,7 @@ open class GLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
 		mTarget = mGLContext.egl.createFromSurface(holder.surface)
 		mTarget!!.setViewPort(0, 0, width, height)
-		Choreographer.getInstance().postFrameCallback(mChoreographerCallback)
+		mGLManager.postFrameCallbackDelayed(mChoreographerCallback, 0)
 	}
 
 	/**
@@ -146,7 +148,7 @@ open class GLView @JvmOverloads constructor(
 	@CallSuper
 	protected open fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
-		Choreographer.getInstance().removeFrameCallback(mChoreographerCallback)
+		mGLManager.removeFrameCallback(mChoreographerCallback)
 		if (mTarget != null) {
 			mTarget!!.release()
 			mTarget = null
@@ -156,15 +158,6 @@ open class GLView @JvmOverloads constructor(
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = GLView::class.java.simpleName
-		/**
-		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
-		 */
-		private const val USE_SHARED_CONTEXT = false
-		/**
-		 * Choreographerを使ってテクスチャの描画をするかどうか
-		 * XXX Choreographerを使うと数百フレームぐらいでlibGLESv2_adreno.so内でSIGSEGV投げてクラッシュする
-		 */
-		private const val USE_CHOREOGRAPHER = false
 	}
 
 }
