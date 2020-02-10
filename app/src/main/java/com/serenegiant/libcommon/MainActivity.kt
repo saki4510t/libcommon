@@ -197,13 +197,21 @@ class MainActivity
 				}
 				fragment = CameraTextureFragment.newInstance()
 			}
-			10 -> {	// Galley
+			10 -> {	// SimpleCameraGL
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = SimpleCameraGLFragment.newInstance()
+			}
+			11 -> {	// Galley
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			11 -> {	// Galley(RecyclerView)
+			12 -> {	// Galley(RecyclerView)
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
