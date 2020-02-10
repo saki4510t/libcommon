@@ -44,10 +44,6 @@ class CameraImageView @JvmOverloads constructor(
 		mCameraDelegator = CameraDelegator(this@CameraImageView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			object : CameraDelegator.ICameraRenderer {
-				override fun onSurfaceDestroyed() {
-					if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
-				}
-
 				override fun hasSurface(): Boolean {
 					if (DEBUG) Log.v(TAG, "hasSurface:")
 					return this@CameraImageView.hasSurface()

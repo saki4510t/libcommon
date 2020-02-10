@@ -252,7 +252,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		/**
 		 * when GLSurface context is soon destroyed
 		 */
-		override fun onSurfaceDestroyed() {
+		fun onSurfaceDestroyed() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:")
 			mHasSurface = false
 			removeSurface(1)

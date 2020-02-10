@@ -262,7 +262,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		 * when GLSurface context is soon destroyed
 		 */
 		@WorkerThread
-		override fun onSurfaceDestroyed() {
+		fun onSurfaceDestroyed() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:")
 			mHasSurface = false
 			mGLManager.removeFrameCallback(this)

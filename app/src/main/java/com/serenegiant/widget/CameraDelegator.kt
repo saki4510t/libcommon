@@ -85,7 +85,6 @@ class CameraDelegator(
 	 * カメラ映像をGLSurfaceViewへ描画するためのGLSurfaceView.Rendererインターフェース
 	 */
 	interface ICameraRenderer {
-		fun onSurfaceDestroyed()
 		fun hasSurface(): Boolean
 		fun updateViewport()
 		fun onPreviewSizeChanged(width: Int, height: Int)
