@@ -120,6 +120,7 @@ class MainActivity
 
 	override fun onListFragmentInteraction(item: DummyItem) {
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:$item")
+		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:enableVSync=${BuildConfig.ENABLE_VSYNC}")
 		var fragment: Fragment? = null
 		when (item.id) {
 			0 -> fragment = NetworkConnectionFragment.newInstance()
