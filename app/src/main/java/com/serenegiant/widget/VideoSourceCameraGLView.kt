@@ -117,7 +117,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		}
 	}
 
-	override fun queueEvent(task: Runnable) {
+	private fun queueEvent(task: Runnable) {
 		mGLHandler.post(task)
 	}
 

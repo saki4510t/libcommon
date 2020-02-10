@@ -78,7 +78,7 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 
 			override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) { // do nothing
 				if (DEBUG) Log.v(TAG, "surfaceChanged:")
-				queueEvent { mCameraDelegator.cameraRenderer.updateViewport() }
+				mCameraDelegator.cameraRenderer.updateViewport()
 			}
 
 			override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -312,6 +312,10 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 		}
 
 		override fun updateViewport() {
+			queueEvent { updateViewportOnGLThread() }
+		}
+
+		fun updateViewportOnGLThread() {
 			val viewWidth = width
 			val viewHeight = height
 			if ((viewWidth == 0) || (viewHeight == 0)) {

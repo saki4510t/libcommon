@@ -59,7 +59,6 @@ class CameraDelegator(
 		// GLSurfaceView
 		fun onResume()
 		fun onPause()
-		fun queueEvent(task: Runnable)
 
 		fun setVideoSize(width: Int, height: Int)
 
@@ -223,9 +222,7 @@ class CameraDelegator(
 			if (DEBUG) Log.v(TAG, "setScaleMode:$mode")
 			if (mScaleMode != mode) {
 				mScaleMode = mode
-				mView.queueEvent(Runnable {
-					cameraRenderer.updateViewport()
-				})
+				cameraRenderer.updateViewport()
 			}
 		}
 
@@ -243,9 +240,7 @@ class CameraDelegator(
 			this.width = height
 			this.height = width
 		}
-		mView.queueEvent(Runnable {
-			cameraRenderer.updateViewport()
-		})
+		cameraRenderer.updateViewport()
 	}
 
 	/**

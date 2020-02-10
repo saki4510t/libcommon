@@ -101,10 +101,6 @@ class CameraTextureView @JvmOverloads constructor(
 		mCameraDelegator.onPause()
 	}
 
-	override fun queueEvent(task: Runnable) {
-		if (DEBUG) Log.v(TAG, "queueEvent:$task")
-	}
-
 	override fun setVideoSize(width: Int, height: Int) {
 		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height))
 		mCameraDelegator.setVideoSize(width, height)
