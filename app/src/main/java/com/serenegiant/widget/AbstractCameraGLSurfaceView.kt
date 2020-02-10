@@ -28,60 +28,57 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
-import com.serenegiant.glpipeline.Distributor
-import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
-import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.GLUtils
+import com.serenegiant.glutils.IRendererHolder
+import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
-/**
- * カメラ映像をVideoSourceとDistributor経由で取得してプレビュー表示するためのGLSurfaceView実装
- * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
+ /**
+ * カメラ映像をIRendererHolder経由で取得してプレビュー表示するためのGLSurfaceView実装
  */
-class DistributorCameraGLView @JvmOverloads constructor(
+abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: GLSurfaceView(context, attrs), ICameraView {
 
-	private val mGLVersion: Int
+	protected val glVersion: Int
+
 	private val mCameraDelegator: CameraDelegator
-	private val mGLManager: GLManager
-	private var mVideoSource: VideoSource? = null
-	private var mDistributor: Distributor? = null
+	/**
+	 * 子クラスからIRendererHolderへアクセスできるように
+	 * @return
+	 */
+	protected var rendererHolder: IRendererHolder? = null
+		get() {
+			return field
+		}
+		private set
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-		mGLVersion = GLUtils.getSupportedGLVersion()
-		setEGLContextClientVersion(mGLVersion)
-		mGLManager = GLManager(mGLVersion)
-
-		mCameraDelegator = CameraDelegator(this@DistributorCameraGLView,
+		glVersion = GLUtils.getSupportedGLVersion()
+		mCameraDelegator = CameraDelegator(this@AbstractCameraGLSurfaceView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			CameraRenderer())
+		@Suppress("LeakingThis")
+		setEGLContextClientVersion(glVersion)
+		@Suppress("LeakingThis")
 		setRenderer(mCameraDelegator.cameraRenderer as CameraRenderer)
-
 		val holder = holder
 		holder.addCallback(object : SurfaceHolder.Callback {
-
 			override fun surfaceCreated(holder: SurfaceHolder) {
 				if (DEBUG) Log.v(TAG, "surfaceCreated:")
 				// do nothing
 			}
 
-			override fun surfaceChanged(
-				holder: SurfaceHolder, format: Int,
-				width: Int, height: Int) {
-
+			override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) { // do nothing
 				if (DEBUG) Log.v(TAG, "surfaceChanged:")
-				queueEvent {
-					mCameraDelegator.cameraRenderer.updateViewport()
-				}
+				mCameraDelegator.cameraRenderer.updateViewport()
 			}
 
 			override fun surfaceDestroyed(holder: SurfaceHolder) {
@@ -95,8 +92,9 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
 		super.onResume()
-		mVideoSource = createVideoSource(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+		rendererHolder = createRendererHolder(
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			mRenderHolderCallback)
 		mCameraDelegator.onResume()
 	}
 
@@ -104,13 +102,9 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		if (mDistributor != null) {
-			mDistributor!!.release()
-			mDistributor = null
-		}
-		if (mVideoSource != null) {
-			mVideoSource!!.release()
-			mVideoSource = null
+		if (rendererHolder != null) {
+			rendererHolder!!.release()
+			rendererHolder = null
 		}
 		super.onPause()
 	}
@@ -155,10 +149,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		isRecordable: Boolean) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
-		if (mDistributor == null) {
-			mDistributor = Distributor(mVideoSource!!)
-		}
-		mDistributor!!.addSurface(id, surface, isRecordable)
+		rendererHolder?.addSurface(id, surface, isRecordable)
 	}
 
 	/**
@@ -168,29 +159,38 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:$id")
-		mDistributor?.removeSurface(id)
+		rendererHolder?.removeSurface(id)
 	}
 
 	/**
-	 * VideoSourceインスタンスを生成
+	 * IRendererHolderを生成
 	 * @param width
 	 * @param height
+	 * @param callback
 	 * @return
 	 */
-	protected fun createVideoSource(
-		width: Int, height: Int): VideoSource {
-		return VideoSource(mGLManager, width, height,
-			object : PipelineSourceCallback {
+	protected abstract fun createRendererHolder(
+		width: Int, height: Int,
+		callback: RenderHolderCallback?): IRendererHolder
 
-				override fun onCreate(surface: Surface) {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
-				}
+	/**
+	 * IRendererからのコールバックリスナーを実装
+	 */
+	private val mRenderHolderCallback: RenderHolderCallback
+		= object : RenderHolderCallback {
 
-				override fun onDestroy() {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
-				}
-			}
-			, USE_SHARED_CONTEXT)
+		override fun onCreate(surface: Surface) {
+			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onCreate:")
+		}
+
+		override fun onFrameAvailable() {
+//			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onFrameAvailable:");
+			mCameraDelegator.callOnFrameAvailable()
+		}
+
+		override fun onDestroy() {
+			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onDestroy:")
+		}
 	}
 
 	/**
@@ -198,15 +198,19 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	 */
 	private inner class CameraRenderer : ICameraRenderer, Renderer, SurfaceTexture.OnFrameAvailableListener {
 		// API >= 11
-		private var inputSurfaceTexture : SurfaceTexture? = null
+		private var inputSurfaceTexture: SurfaceTexture? = null // API >= 11
 		private var hTex = 0
 		private var mDrawer: GLDrawer2D? = null
 		private val mStMatrix = FloatArray(16)
 		private val mMvpMatrix = FloatArray(16)
 		private var mHasSurface = false
-
 		@Volatile
 		private var requestUpdateTex = false
+
+		init {
+			if (DEBUG) Log.v(TAG, "CameraRenderer:")
+			Matrix.setIdentityM(mMvpMatrix, 0)
+		}
 
 		override fun onSurfaceCreated(unused: GL10, config: EGLConfig) {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:")
@@ -264,15 +268,13 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
-			mVideoSource?.resize(width, height)
-			mDistributor?.resize(width, height)
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
 		}
 
 		override fun getInputSurfaceTexture(): SurfaceTexture {
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-			checkNotNull(mVideoSource)
-			return mVideoSource!!.inputSurfaceTexture
+			checkNotNull(rendererHolder)
+			return rendererHolder!!.surfaceTexture
 		}
 
 		fun release() {
@@ -296,7 +298,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
 		 */
 		override fun onDrawFrame(unused: GL10) {
-			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onDrawFrame::$cnt")
+			if (DEBUG && ++cnt % 100 == 0) Log.v(TAG, "onDrawFrame::$cnt")
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 			if (requestUpdateTex && (inputSurfaceTexture != null)) {
 				requestUpdateTex = false
@@ -310,6 +312,10 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		}
 
 		override fun updateViewport() {
+			queueEvent { updateViewportOnGLThread() }
+		}
+
+		fun updateViewportOnGLThread() {
 			val viewWidth = width
 			val viewHeight = height
 			if ((viewWidth == 0) || (viewHeight == 0)) {
@@ -371,7 +377,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 					Matrix.scaleM(mMvpMatrix, 0,
 						(width / viewWidth).toFloat(),
 						(height / viewHeight).toFloat(),
-						 1.0f)
+						1.0f)
 				}
 			}
 			mDrawer?.setMvpMatrix(mMvpMatrix, 0)
@@ -385,19 +391,10 @@ class DistributorCameraGLView @JvmOverloads constructor(
 			requestUpdateTex = true
 		}
 
-		init {
-			if (DEBUG) Log.v(TAG, "CameraRenderer:")
-			Matrix.setIdentityM(mMvpMatrix, 0)
-		}
 	} // CameraRenderer
 
-	companion object {
-		private const val DEBUG = true // TODO set false on release
-		private val TAG = DistributorCameraGLView::class.java.simpleName
-		/**
-		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
-		 */
-		private const val USE_SHARED_CONTEXT = false
+	 companion object {
+		private const val DEBUG = false // TODO set false on release
+		private val TAG = AbstractCameraGLSurfaceView::class.java.simpleName
 	}
-
 }

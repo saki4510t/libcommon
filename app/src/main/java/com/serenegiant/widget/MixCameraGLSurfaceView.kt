@@ -28,9 +28,9 @@ import com.serenegiant.libcommon.BuildConfig
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
-class MixCameraGLView @JvmOverloads constructor(
+class MixCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLView(context, attrs) {
+		: AbstractCameraGLSurfaceView(context, attrs) {
 
 	@Synchronized
 	override fun onResume() {
@@ -53,6 +53,6 @@ class MixCameraGLView @JvmOverloads constructor(
 
 	companion object {
 		private const val DEBUG = false // TODO set false on release
-		private val TAG = MixCameraGLView::class.java.simpleName
+		private val TAG = MixCameraGLSurfaceView::class.java.simpleName
 	}
 }

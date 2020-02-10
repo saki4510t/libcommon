@@ -29,9 +29,9 @@ import com.serenegiant.libcommon.BuildConfig
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
-class EffectCameraGLView @JvmOverloads constructor(
+class EffectCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLView(context, attrs, defStyle) {
+		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
 
 	var effect: Int
 	get() {
@@ -62,6 +62,6 @@ class EffectCameraGLView @JvmOverloads constructor(
 
 	companion object {
 		private const val DEBUG = false // TODO set false on release
-		private val TAG = EffectCameraGLView::class.java.simpleName
+		private val TAG = EffectCameraGLSurfaceView::class.java.simpleName
 	}
 }
