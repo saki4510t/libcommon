@@ -63,7 +63,7 @@ public class GLUtils {
 						result.set(1);
 					} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && context.isGLES3()) {
 						extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); 	// API >= 18
-						result.set((extensions != null) && !extensions.contains("GL_OES_EGL_image_external_essl3")
+						result.set((extensions != null) && extensions.contains("GL_OES_EGL_image_external_essl3")
 							? 3 : 2);
 					} else {
 						result.set(2);
