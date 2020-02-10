@@ -73,7 +73,9 @@ class CameraImageView @JvmOverloads constructor(
 		}
 
 		mDrawable = SurfaceDrawable(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT, GLUtils.getSupportedGLVersion(),
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH,
+			CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			GLUtils.getSupportedGLVersion(),
 			object : SurfaceDrawable.Callback {
 
 			override fun onCreateSurface(surface: Surface) {
