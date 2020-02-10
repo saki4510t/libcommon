@@ -140,14 +140,6 @@ class CameraImageView @JvmOverloads constructor(
 		return mCameraDelegator.height
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
-		if (DEBUG) Log.v(TAG, "addSurface:")
-	}
-
-	override fun removeSurface(id: Int) {
-		if (DEBUG) Log.v(TAG, "removeSurface:")
-	}
-
 	fun getInputSurfaceTexture(): SurfaceTexture {
 		return mDrawable.surfaceTexture
 	}

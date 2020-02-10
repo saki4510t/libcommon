@@ -161,7 +161,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	 * @param isRecordable
 	 */
 	@Synchronized
-	override fun addSurface(
+	fun addSurface(
 		id: Int, surface: Any,
 		isRecordable: Boolean) {
 
@@ -177,7 +177,7 @@ class DistributorCameraGLView @JvmOverloads constructor(
 	 * @param id
 	 */
 	@Synchronized
-	override fun removeSurface(id: Int) {
+	fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:$id")
 		mDistributor?.removeSurface(id)
 	}

@@ -145,14 +145,6 @@ class CameraTextureView @JvmOverloads constructor(
 		return mCameraDelegator.height
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
-		if (DEBUG) Log.v(TAG, "addSurface:")
-	}
-
-	override fun removeSurface(id: Int) {
-		if (DEBUG) Log.v(TAG, "removeSurface:")
-	}
-
 	companion object {
 		private const val DEBUG = false // set false on production
 		private val TAG = CameraTextureView::class.java.simpleName
