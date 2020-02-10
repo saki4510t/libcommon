@@ -41,35 +41,32 @@ class CameraImageView @JvmOverloads constructor(
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 
-		mCameraDelegator = object : CameraDelegator(this@CameraImageView,
-			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
+		mCameraDelegator = CameraDelegator(this@CameraImageView,
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			object : CameraDelegator.ICameraRenderer {
+				override fun onSurfaceDestroyed() {
+					if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
+				}
 
-			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
-				return object : ICameraRenderer {
-					override fun onSurfaceDestroyed() {
-						if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
-					}
+				override fun hasSurface(): Boolean {
+					if (DEBUG) Log.v(TAG, "hasSurface:")
+					return this@CameraImageView.hasSurface()
+				}
 
-					override fun hasSurface(): Boolean {
-						if (DEBUG) Log.v(TAG, "hasSurface:")
-						return this@CameraImageView.hasSurface()
-					}
+				override fun getInputSurfaceTexture(): SurfaceTexture {
+					if (DEBUG) Log.v(TAG, "updateViewport:")
+					return this@CameraImageView.getInputSurfaceTexture()
+				}
 
-					override fun getInputSurfaceTexture(): SurfaceTexture {
-						if (DEBUG) Log.v(TAG, "updateViewport:")
-						return this@CameraImageView.getInputSurfaceTexture()
-					}
+				override fun updateViewport() {
+					if (DEBUG) Log.v(TAG, "updateViewport:")
+				}
 
-					override fun updateViewport() {
-						if (DEBUG) Log.v(TAG, "updateViewport:")
-					}
-
-					override fun onPreviewSizeChanged(width: Int, height: Int) {
-						if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
-					}
+				override fun onPreviewSizeChanged(width: Int, height: Int) {
+					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
 				}
 			}
-		}
+		)
 
 		mDrawable = SurfaceDrawable(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH,

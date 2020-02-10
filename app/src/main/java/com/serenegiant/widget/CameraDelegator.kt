@@ -41,9 +41,10 @@ import java.util.concurrent.CopyOnWriteArraySet
 /**
  * カメラプレビュー処理の委譲クラス
  */
-abstract class CameraDelegator(
+class CameraDelegator(
 	view: ICameraView,
-	width: Int, height: Int) {
+	width: Int, height: Int,
+	cameraRenderer: ICameraRenderer) {
 
 	/**
 	 * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
@@ -125,7 +126,7 @@ abstract class CameraDelegator(
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)", width, height))
 		mView = view
 		@Suppress("LeakingThis")
-		cameraRenderer = createCameraRenderer(this)
+		this.cameraRenderer = cameraRenderer
 		this.width = width
 		this.height = height
 	}
@@ -282,14 +283,6 @@ abstract class CameraDelegator(
 			}
 		}
 	}
-
-//--------------------------------------------------------------------------------
-	/**
-	 * カメラ映像をGLSurfaceViewへ描画するためのICameraRenderer(GLSurfaceView.Renderer)を生成
-	 * @param parent
-	 * @return
-	 */
-	protected abstract fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer
 
 //--------------------------------------------------------------------------------
 	/**

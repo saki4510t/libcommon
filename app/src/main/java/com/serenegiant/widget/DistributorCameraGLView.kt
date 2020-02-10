@@ -61,14 +61,9 @@ class DistributorCameraGLView @JvmOverloads constructor(
 		setEGLContextClientVersion(mGLVersion)
 		mGLManager = GLManager(mGLVersion)
 
-		mCameraDelegator = object : CameraDelegator(this@DistributorCameraGLView,
-			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
-
-			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
-				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
-				return CameraRenderer()
-			}
-		}
+		mCameraDelegator = CameraDelegator(this@DistributorCameraGLView,
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			CameraRenderer())
 		setRenderer(mCameraDelegator.cameraRenderer as CameraRenderer)
 
 		val holder = holder

@@ -62,14 +62,9 @@ abstract class AbstractCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
 		glVersion = GLUtils.getSupportedGLVersion()
-		mCameraDelegator = object : CameraDelegator(this@AbstractCameraGLView,
-			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
-
-			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
-				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
-				return CameraRenderer()
-			}
-		}
+		mCameraDelegator = CameraDelegator(this@AbstractCameraGLView,
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			CameraRenderer())
 		@Suppress("LeakingThis")
 		setEGLContextClientVersion(glVersion)
 		@Suppress("LeakingThis")

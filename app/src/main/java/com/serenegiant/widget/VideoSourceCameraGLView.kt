@@ -62,14 +62,9 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		mGLContext = mGLManager.glContext
 		mGLHandler = mGLManager.glHandler
 		mCameraRenderer = CameraRenderer()
-		mCameraDelegator = object : CameraDelegator(this@VideoSourceCameraGLView,
-			DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT) {
-
-			override fun createCameraRenderer(parent: CameraDelegator): ICameraRenderer {
-				if (DEBUG) Log.v(TAG, "createCameraRenderer:")
-				return mCameraRenderer
-			}
-		}
+		mCameraDelegator = CameraDelegator(this@VideoSourceCameraGLView,
+			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+			mCameraRenderer)
 		val holder = holder
 		holder.addCallback(object : SurfaceHolder.Callback {
 
