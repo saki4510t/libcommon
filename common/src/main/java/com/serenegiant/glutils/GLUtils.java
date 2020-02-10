@@ -31,6 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static com.serenegiant.glutils.IRendererCommon.*;
 
 public class GLUtils {
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLUtils.class.getSimpleName();
 
 	private GLUtils() {
@@ -57,7 +58,7 @@ public class GLUtils {
 				public void run() {
 					context.initialize();
 					String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
-//					Log.i(TAG, "getSupportedGLVersion:" + extensions);
+					if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + extensions);
 					if ((extensions == null) || !extensions.contains("GL_OES_EGL_image_external")) {
 						result.set(1);
 					} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && context.isGLES3()) {
@@ -78,6 +79,7 @@ public class GLUtils {
 				// ignore
 			}
 		}
+		if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + sSupportedGLVersion);
 		return sSupportedGLVersion;
 	}
 
