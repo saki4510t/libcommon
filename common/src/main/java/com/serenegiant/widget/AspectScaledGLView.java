@@ -192,9 +192,10 @@ public class AspectScaledGLView extends GLView
 	 * 拡大縮小回転状態をリセット
 	 */
 	protected void init() {
-		if (DEBUG) Log.v(TAG, "init:mScaleMode=" + mScaleMode);
 		final int view_width = getWidth();
 		final int view_height = getHeight();
+		if (DEBUG) Log.v(TAG, String.format("init:(%dx%d),mScaleMode=%d",
+			view_width ,view_height, mScaleMode) );
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
@@ -211,11 +212,12 @@ public class AspectScaledGLView extends GLView
 //			final double scale = Math.min(scale_x, scale_y);	// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * video_width;
 			final double height = scale * video_height;
-//			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-//				width, height, scale_x, scale_y, width / view_width, height / view_height));
+			if (DEBUG) Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+				width, height, scale_x, scale_y, width / view_width, height / view_height));
 			mImageMatrix.postScale((float)(width / view_width), (float)(height / view_height), view_width / 2, view_height / 2);
 			break;
 		}
+		if (DEBUG) Log.v(TAG, "init:" + mImageMatrix);
 		setTransform(mImageMatrix);
 	}
 }
