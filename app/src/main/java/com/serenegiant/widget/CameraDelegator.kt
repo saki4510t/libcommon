@@ -303,6 +303,7 @@ class CameraDelegator(
 					} else {
 						if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus")
 					}
+					params.setRecordingHint(true)
 					// let's try fastest frame rate. You will get near 60fps, but your device become hot.
 					val supportedFpsRange = params.supportedPreviewFpsRange
 					val n = supportedFpsRange?.size ?: 0
@@ -321,7 +322,6 @@ class CameraDelegator(
 						max_fps = supportedFpsRange!![supportedFpsRange.size - 1]
 					}
 					params.setPreviewFpsRange(max_fps!!.get(0), max_fps.get(1))
-					params.setRecordingHint(true)
 					// request closest supported preview size
 					val closestSize = getClosestSupportedSize(
 						params.supportedPreviewSizes, width, height)
