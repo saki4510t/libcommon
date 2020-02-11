@@ -45,6 +45,41 @@ open class GLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: SurfaceView(context, attrs), ViewContentTransformer.ITransformView  {
 
+	/**
+	 * GLスレッド上での処理
+	 */
+	interface GLRenderer {
+		/**
+		 * Surfaceが生成された時
+		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
+		 */
+		@WorkerThread
+		fun onSurfaceCreated()
+		/**
+		 * Surfaceのサイズが変更された
+		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
+		 */
+		@WorkerThread
+		fun onSurfaceChanged(format: Int, width: Int, height: Int)
+		/**
+		 * トランスフォームマトリックスを適用
+		 */
+		@WorkerThread
+		fun applyTransformMatrix(transform: Matrix)
+		/**
+		 * 描画イベント
+		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
+		 */
+		@WorkerThread
+		fun drawFrame()
+		/**
+		 * Surfaceが破棄された
+		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
+		 */
+		@WorkerThread
+		fun onSurfaceDestroyed()
+	}
+
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext
 	private val mGLHandler: Handler
@@ -57,6 +92,8 @@ open class GLView @JvmOverloads constructor(
 
 	private val mMatrix = Matrix()
 	private var mMatrixChanged = false
+
+	private var mGLRenderer: GLRenderer? = null;
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -120,6 +157,15 @@ open class GLView @JvmOverloads constructor(
 	@AnyThread
 	fun getGLContext() : GLContext {
 		return mGLContext
+	}
+
+	/**
+	 * GLRendererをセット
+	 */
+	fun setRenderer(renderer: GLRenderer?) {
+		queueEvent(Runnable {
+			mGLRenderer = renderer
+		})
 	}
 
 	/**
@@ -219,11 +265,12 @@ open class GLView @JvmOverloads constructor(
 	@SuppressLint("WrongThread")
 	@WorkerThread
 	@CallSuper
-	protected open fun onSurfaceCreated() {
+	protected fun onSurfaceCreated() {
 		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
 		mTarget = mGLContext.egl.createFromSurface(holder.surface)
 		mTarget!!.setViewPort(0, 0, width, height)
 		mGLManager.postFrameCallbackDelayed(mChoreographerCallback, 0)
+		mGLRenderer?.onSurfaceCreated()
 	}
 
 	/**
@@ -232,11 +279,12 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	@CallSuper
-	protected open fun onSurfaceChanged(
+	protected fun onSurfaceChanged(
 		format: Int, width: Int, height: Int) {
 
 		if (DEBUG) Log.v(TAG, "onSurfaceChanged:(${width}x${height})")
 		mTarget!!.setViewPort(0, 0, width, height)
+		mGLRenderer?.onSurfaceChanged(format, width, height)
 	}
 
 	/**
@@ -244,8 +292,9 @@ open class GLView @JvmOverloads constructor(
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
 	@WorkerThread
-	protected open fun drawFrame() {
+	protected fun drawFrame() {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+		mGLRenderer?.drawFrame()
 	}
 
 	/**
@@ -254,8 +303,9 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	@CallSuper
-	protected open fun onSurfaceDestroyed() {
+	protected fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
+		mGLRenderer?.onSurfaceDestroyed()
 		mGLHandler.removeCallbacksAndMessages(null)
 		mGLManager.removeFrameCallback(mChoreographerCallback)
 		if (mTarget != null) {
@@ -268,7 +318,10 @@ open class GLView @JvmOverloads constructor(
 	 * トランスフォームマトリックスを適用
 	 */
 	@WorkerThread
-	protected open fun applyTransformMatrix(transform: Matrix) {
+	@CallSuper
+	protected fun applyTransformMatrix(transform: Matrix) {
+		if (DEBUG) Log.v(TAG, "applyTransformMatrix:")
+		mGLRenderer?.applyTransformMatrix(transform)
 	}
 
 	companion object {
