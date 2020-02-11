@@ -113,7 +113,7 @@ cameraLoop:
 	 * @param width
 	 * @param height
 	 */
-	protected static void chooseVideoSize(@NonNull final Camera.Parameters params,
+	public static void chooseVideoSize(@NonNull final Camera.Parameters params,
 		 final int width, final int height) {
 
 //		if (DEBUG) Log.v(TAG, "chooseVideoSize:");
