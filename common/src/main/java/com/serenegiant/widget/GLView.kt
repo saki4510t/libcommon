@@ -31,7 +31,10 @@ import android.view.SurfaceView
 import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.WorkerThread
-import com.serenegiant.glutils.*
+import com.serenegiant.glutils.GLContext
+import com.serenegiant.glutils.GLManager
+import com.serenegiant.glutils.GLUtils
+import com.serenegiant.glutils.ISurface
 import com.serenegiant.view.ViewContentTransformer
 
 /**
@@ -51,6 +54,9 @@ open class GLView @JvmOverloads constructor(
 	 * SurfaceViewのSurfaceへOpenGL|ESで描画するためのISurfaceインスタンス
 	 */
 	private var mTarget: ISurface? = null
+
+	private val mMatrix = Matrix()
+	private var mMatrixChanged = false
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -158,6 +164,32 @@ open class GLView @JvmOverloads constructor(
 	}
 
 	/**
+	 * ITransformViewの実装
+	 */
+	@AnyThread
+	override fun setTransform(transform: Matrix?) {
+		synchronized(mMatrix) {
+			mMatrix.set(transform)
+			mMatrixChanged = true
+		}
+	}
+
+	/**
+	 * ITransformViewの実装
+	 */
+	@AnyThread
+	override fun getTransform(transform: Matrix?): Matrix {
+		var result = transform
+		if (result == null) {
+			result = Matrix()
+		}
+		result.set(mMatrix)
+
+		return result
+	}
+
+//--------------------------------------------------------------------------------
+	/**
 	 * Choreographerを使ったvsync同期用描画のFrameCallback実装
 	 */
 	private var mChoreographerCallback
@@ -167,6 +199,12 @@ open class GLView @JvmOverloads constructor(
 			if (mHasSurface) {
 				mGLManager.postFrameCallbackDelayed(this, 0)
 				makeDefault()
+				synchronized(mMatrix) {
+					if (mMatrixChanged) {
+						applyTransformMatrix(mMatrix)
+						mMatrixChanged = false
+					}
+				}
 				drawFrame()
 				mTarget!!.swap()
 			}
@@ -225,12 +263,11 @@ open class GLView @JvmOverloads constructor(
 		}
 	}
 
-	override fun setTransform(transform: Matrix?) {
-		// FIXME 未実装
-	}
-
-	override fun getTransform(transform: Matrix?): Matrix {
-		// FIXME 未実装
+	/**
+	 * トランスフォームマトリックスを適用
+	 */
+	@WorkerThread
+	protected open fun applyTransformMatrix(transform: Matrix) {
 	}
 
 	companion object {
