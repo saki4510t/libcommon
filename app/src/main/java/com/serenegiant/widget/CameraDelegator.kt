@@ -20,19 +20,15 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
-import android.hardware.Camera.CameraInfo
 import android.os.Handler
 import android.util.Log
-import android.view.Surface
 import android.view.View
 import android.view.View.OnLongClickListener
-import android.view.WindowManager
 import androidx.annotation.WorkerThread
-import com.serenegiant.system.BuildCheck
+import com.serenegiant.camera.CameraConst
+import com.serenegiant.camera.CameraUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import java.io.IOException
 import java.util.*
@@ -295,7 +291,8 @@ class CameraDelegator(
 			// This is a sample project so just use 0 as camera ID.
 			// it is better to selecting camera is available
 			try {
-				camera = Camera.open(CAMERA_ID)
+				val cameraId = CameraUtils.findCamera(CameraConst.FACING_FRONT)
+				camera = Camera.open(cameraId)
 				val params = camera!!.getParameters()
 				if (params != null) {
 					val focusModes = params.supportedFocusModes
@@ -334,7 +331,7 @@ class CameraDelegator(
 						params.supportedPictureSizes, width, height)
 					params.setPictureSize(pictureSize.width, pictureSize.height)
 					// rotate camera preview according to the device orientation
-					setRotation(camera!!, params)
+					mRotation = CameraUtils.setupRotation(cameraId, mView as View, camera!!, params)
 					camera!!.setParameters(params)
 					// get the actual preview size
 					val previewSize = camera!!.getParameters().previewSize
@@ -387,48 +384,6 @@ class CameraDelegator(
 		}
 	}
 
-	/**
-	 * 端末の画面の向きに合わせてプレビュー画面を回転させる
-	 * @param params
-	 */
-	@SuppressLint("NewApi")
-	private fun setRotation(camera: Camera,
-		params: Camera.Parameters) {
-
-		if (DEBUG) Log.v(TAG, "CameraThread#setRotation:")
-		val view = mView as View
-		val rotation: Int
-		rotation = if (BuildCheck.isAPI17()) {
-			view.display.rotation
-		} else {
-			val display = (view.context
-				.getSystemService(Context.WINDOW_SERVICE) as WindowManager).defaultDisplay
-			display.rotation
-		}
-		var degrees: Int
-		degrees = when (rotation) {
-			Surface.ROTATION_90 -> 90
-			Surface.ROTATION_180 -> 180
-			Surface.ROTATION_270 -> 270
-			Surface.ROTATION_0 -> 0
-			else -> 0
-		}
-		// get whether the camera is front camera or back camera
-		val info = CameraInfo()
-		Camera.getCameraInfo(CAMERA_ID, info)
-		if (info.facing == CameraInfo.CAMERA_FACING_FRONT) { // front camera
-			degrees = (info.orientation + degrees) % 360
-			degrees = (360 - degrees) % 360 // reverse
-		} else { // back camera
-			degrees = (info.orientation - degrees + 360) % 360
-		}
-		// apply rotation setting
-		camera.setDisplayOrientation(degrees)
-		mRotation = degrees
-		// XXX This method fails to call and camera stops working on some devices.
-//		params.setRotation(degrees);
-	}
-
 	companion object {
 		private const val DEBUG = false // TODO set false on release
 		private val TAG = CameraDelegator::class.java.simpleName
@@ -439,7 +394,6 @@ class CameraDelegator(
 		const val DEFAULT_PREVIEW_WIDTH = 1280
 		const val DEFAULT_PREVIEW_HEIGHT = 720
 		private const val TARGET_FPS_MS = 60 * 1000
-		private const val CAMERA_ID = 0
 
 		/**
 		 * カメラが対応する解像度一覧から指定した解像度順に一番近いものを選んで返す
