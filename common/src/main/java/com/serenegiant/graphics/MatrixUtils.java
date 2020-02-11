@@ -107,4 +107,30 @@ public class MatrixUtils {
 		result[15] = aMatrix[Matrix.MPERSP_2];
 		return result;
 	}
+
+	/**
+	 * OpenGLの4x4(列優先)行列をandroid.graphics.Matrixの3x3行列に変換する
+	 * (アフィン変換のみ)
+	 * @param transform
+	 * @param result
+	 * @param aMatrix
+	 * @return
+	 */
+	public static Matrix toAndroidMatrix(@NonNull final float[] transform,
+		@NonNull final Matrix result,
+		@NonNull @Size(min=9) final float[] aMatrix) {
+
+		aMatrix[Matrix.MSCALE_X] = transform[ 0];
+		aMatrix[Matrix.MSKEW_Y] = transform[ 1];
+		aMatrix[Matrix.MPERSP_0] = transform[ 3];
+		aMatrix[Matrix.MSKEW_X] = transform[ 4];
+		aMatrix[Matrix.MSCALE_Y] = transform[ 5];
+		aMatrix[Matrix.MPERSP_1] = transform[ 7];
+		aMatrix[Matrix.MTRANS_X] = transform[12];
+		aMatrix[Matrix.MTRANS_Y] = transform[13];
+		aMatrix[Matrix.MPERSP_2] = transform[15];
+		result.setValues(aMatrix);
+
+		return result;
+	}
 }
