@@ -142,11 +142,7 @@ public abstract class AbstractDistributeTask {
 
 		if (DEBUG) Log.v(TAG, "addSurface:" + id);
 		checkFinished();
-		if (!((surface instanceof SurfaceTexture)
-			|| (surface instanceof Surface)
-			|| (surface instanceof SurfaceHolder)
-			|| (surface instanceof TextureWrapper))) {
-
+		if (!EGLBase.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException(
 				"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 		}

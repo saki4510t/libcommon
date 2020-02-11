@@ -26,7 +26,6 @@ import javax.microedition.khronos.egl.EGLSurface;
 
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
@@ -36,7 +35,6 @@ import android.opengl.GLES30;
 import android.util.Log;
 import android.view.Surface;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import com.serenegiant.system.BuildCheck;
 
@@ -182,10 +180,7 @@ import com.serenegiant.system.BuildCheck;
 			} else {
 				_surface = surface;
 			}
-			if ((_surface instanceof Surface)
-				|| (_surface instanceof SurfaceHolder)
-				|| (_surface instanceof SurfaceTexture)
-				|| (_surface instanceof SurfaceView)) {
+			if (isSupportedSurface(_surface)) {
 				mEglSurface = mEglBase.createWindowSurface(_surface);
 				mOwnSurface = true;
 				setViewPort(0, 0, getWidth(), getHeight());
