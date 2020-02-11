@@ -63,6 +63,29 @@ public class EffectDrawer2D {
 
 	/**
 	 * コンストラクタ
+	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
+	 * @param isOES
+	 * @return
+	 */
+	public EffectDrawer2D(final boolean isGLES3, final boolean isOES) {
+		this(GLDrawer2D.create(isGLES3, isOES), null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
+	 * @param isGLES3
+	 * @param isOES
+	 * @param effectListener
+	 * @return
+	 */
+	public EffectDrawer2D(final boolean isGLES3, final boolean isOES,
+		@Nullable EffectListener effectListener) {
+		this(GLDrawer2D.create(isGLES3, isOES), effectListener);
+	}
+
+	/**
+	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
 	 *
 	 * @param isGLES3
