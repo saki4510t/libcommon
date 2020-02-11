@@ -22,16 +22,21 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
+import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.util.Log;
 import android.view.Display;
 import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
 
+import com.serenegiant.glutils.WrappedSurfaceHolder;
 import com.serenegiant.system.BuildCheck;
 
+import java.io.IOException;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
@@ -297,6 +302,28 @@ cameraLoop:
 		// XXX This method fails to call and camera stops working on some devices.
 //		params.setRotation(degrees);
 		return degrees;
+	}
+
+	/**
+	 * Cameraにプレビュー用Surface/SurfaseTexture/SurfaceHolder/SurfaceViewをセットする
+	 * @param camera
+	 * @param surface
+	 * @throws IllegalArgumentException
+	 * @throws IOException
+	 */
+	public static void setPreviewSurface(
+		@NonNull final Camera camera,
+		@NonNull final Object surface) throws IllegalArgumentException, IOException {
+
+		if (surface instanceof SurfaceTexture) {
+			camera.setPreviewTexture((SurfaceTexture) surface);
+		} else if (surface instanceof SurfaceHolder) {
+			camera.setPreviewDisplay((SurfaceHolder)surface);
+		} else if (surface instanceof Surface) {
+			camera.setPreviewDisplay(new WrappedSurfaceHolder((Surface) surface));
+		} else if (surface instanceof SurfaceView) {
+			camera.setPreviewDisplay(((SurfaceView) surface).getHolder());
+		}
 	}
 
 	/**
