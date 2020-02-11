@@ -21,6 +21,8 @@ package com.serenegiant.graphics;
 import android.graphics.Matrix;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 public class MatrixUtils {
 	private MatrixUtils() {
@@ -67,5 +69,42 @@ public class MatrixUtils {
 		final float scaleX = mat[Matrix.MSCALE_X];
 		final float skewY = mat[Matrix.MSKEW_Y];
 		return (float) Math.sqrt(scaleX * scaleX + skewY * skewY);
+	}
+
+	/**
+	 * android.graphics.Matrixの3x3行列をOpenGLの4x4(列優先)行列に変換する
+	 * (アフィン変換のみ)
+	 * |a11 a12 a13|  |0 1 2|      |a11 a12   0 a13|   |0 4 8  12|
+	 * |a11 a12 a13|  |3 4 5|      |a21 a22   0 a23|   |1 5 9  13|
+	 * |a11 a12 a13|  |6 7 8| =>   |  0   0   1   0|   |2 6 10 14|
+	 *                             |a31 a32   0 a33|   |3 7 11 15|
+	 * @param transform
+	 * @param result
+	 * @return
+	 */
+	@NonNull
+	@Size(min=16)
+	public static float[] toGLMatrix(@NonNull final Matrix transform,
+		@NonNull @Size(min=16) final float[] result,
+		@NonNull @Size(min=9) final float[] aMatrix) {
+
+		transform.getValues(aMatrix);
+		result[ 0] = aMatrix[Matrix.MSCALE_X];
+		result[ 1] = aMatrix[Matrix.MSKEW_Y];
+		result[ 2] = 0;
+		result[ 3] = aMatrix[Matrix.MPERSP_0];
+		result[ 4] = aMatrix[Matrix.MSKEW_X];
+		result[ 5] = aMatrix[Matrix.MSCALE_Y];
+		result[ 6] = 0;
+		result[ 7] = aMatrix[Matrix.MPERSP_1];
+		result[ 8] = 0;
+		result[ 9] = 0;
+		result[10] = 1;
+		result[11] = 0;
+		result[12] = aMatrix[Matrix.MTRANS_X];
+		result[13] = aMatrix[Matrix.MTRANS_Y];
+		result[14] = 0;
+		result[15] = aMatrix[Matrix.MPERSP_2];
+		return result;
 	}
 }
