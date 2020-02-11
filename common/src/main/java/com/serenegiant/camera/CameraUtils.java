@@ -38,6 +38,7 @@ import java.util.List;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Camera API用のヘルパークラス
@@ -138,14 +139,38 @@ cameraLoop:
 				return;
 			}
 		}
-//		Log.d(TAG, String.format("try to find nearest preview size: %dx%d", width, height));
-		final double aspect = width / (double)height;
+
+		Camera.Size selectedSize = getClosestSupportedSize(
+			params.getSupportedPreviewSizes(), width, height);
+
+		// それでも見つからなければカメラの標準解像度を使用する
+		if (ppsfv != null) {
+			Log.d(TAG, String.format("use ppsfv: %dx%d", ppsfv.width, ppsfv.height));
+			params.setPreviewSize(ppsfv.width, ppsfv.height);
+			params.setPictureSize(ppsfv.width, ppsfv.height);
+		} else {
+			Log.w(TAG, String.format("Unable to set preview size to %dx%d)", width, height));
+		}
+	}
+
+	/**
+	 * 指定した解像度に近い解像度を選ぶ
+	 * @param supportedSizes
+	 * @param requestWidth
+	 * @param requestHeight
+	 * @return
+	 */
+	@Nullable
+	public static Camera.Size getClosestSupportedSize(
+		@NonNull final List<Camera.Size> supportedSizes,
+		final int requestWidth, final int requestHeight) {
+
+		final double aspect = requestWidth / (double)requestHeight;
 		double a, r, selectedDelta = Double.MAX_VALUE;
 		Camera.Size selectedSize = null;
-
 		// 幅が一致してアスペクト比が指定したサイズに近いものを探す
-		for (final Camera.Size size : params.getSupportedPreviewSizes()) {
-			if (size.width == width) {
+		for (final Camera.Size size : supportedSizes) {
+			if (size.width == requestWidth) {
 				a = size.width / (double)size.height;
 				r = Math.abs(a - aspect) / aspect;
 				if (r < selectedDelta) {
@@ -158,8 +183,8 @@ cameraLoop:
 			// それでも見つからなければ高さが同じでアスペクト比が指定したサイズに近いものを探す
 			selectedDelta = Double.MAX_VALUE;
 			selectedSize = null;
-			for (final Camera.Size size : params.getSupportedPreviewSizes()) {
-				if (size.width == width) {
+			for (final Camera.Size size : supportedSizes) {
+				if (size.width == requestWidth) {
 					a = size.width / (double) size.height;
 					r = Math.abs(a - aspect) / aspect;
 					if (r < selectedDelta) {
@@ -172,20 +197,10 @@ cameraLoop:
 		// アスペクト比の差が±5%ならそれを選択する
 		if ((selectedSize != null) && (selectedDelta < 0.05)) {
 			Log.w(TAG, String.format("Set preview size to (%dx%d) instead of (%d,%d)",
-					selectedSize.width, selectedSize.height, width, height));
-			params.setPreviewSize(selectedSize.width, selectedSize.height);
-			params.setPictureSize(selectedSize.width, selectedSize.height);
-			return;
+				selectedSize.width, selectedSize.height, requestWidth, requestHeight));
 		}
 
-		// それでも見つからなければカメラの標準解像度を使用する
-		if (ppsfv != null) {
-			Log.d(TAG, String.format("use ppsfv: %dx%d", ppsfv.width, ppsfv.height));
-			params.setPreviewSize(ppsfv.width, ppsfv.height);
-			params.setPictureSize(ppsfv.width, ppsfv.height);
-		} else {
-			Log.w(TAG, String.format("Unable to set preview size to %dx%d)", width, height));
-		}
+		return selectedSize;
 	}
 
 	/**
@@ -200,27 +215,38 @@ cameraLoop:
 		// サポートするフレームレートの一覧を取得、フレームレートの昇順にならんでいる
 		final List<int[]> fpsRanges = params.getSupportedPreviewFpsRange();
 		int[] foundFpsRange = null;
-		// カメラがサポートするfpsの内[minFps,maxFps]内の最大のものを取得する
-		for (int x = fpsRanges.size() - 1; x >= 0; x--) {
-			final int[] range = fpsRanges.get(x);
-			if ((range[0] / 1000.0f >= minFps)
-				&& (range[1] / 1000.0f <= maxFps)) {
-				foundFpsRange = range;
-				break;
-			}
-		}
-		if (foundFpsRange == null) {
+		if ((fpsRanges != null) && !fpsRanges.isEmpty()) {
+			// カメラがサポートするfpsの内[minFps,maxFps]内の最大のものを取得する
 			for (int x = fpsRanges.size() - 1; x >= 0; x--) {
 				final int[] range = fpsRanges.get(x);
-				if (range[1] / 1000.0f <= maxFps) {
+				if ((range[0] / 1000.0f >= minFps)
+					&& (range[1] / 1000.0f <= maxFps)) {
 					foundFpsRange = range;
 					break;
 				}
+			}
+			if (foundFpsRange == null) {
+				for (int x = fpsRanges.size() - 1; x >= 0; x--) {
+					final int[] range = fpsRanges.get(x);
+					if (range[1] / 1000.0f <= maxFps) {
+						foundFpsRange = range;
+						break;
+					}
+				}
+			}
+			if (foundFpsRange == null) {
+				// 見つからなかったときは一番早いフレームレートを選択
+				Log.w(TAG, String.format(
+					"chooseFps:specific fps range(%f-%f) not found," +
+				 	"use fastest one", minFps, maxFps));
 			}
 		}
 		// FPSをセット
 		if (foundFpsRange != null) {
 			params.setPreviewFpsRange(foundFpsRange[0], foundFpsRange[1]);
+			final Camera.Size sz = params.getPreviewSize();
+			Log.d(TAG, String.format("chooseFps:(%dx%d),fps=%d-%d",
+				sz.width, sz.height, foundFpsRange[0], foundFpsRange[1]));
 		}
 		return foundFpsRange != null;
 	}
