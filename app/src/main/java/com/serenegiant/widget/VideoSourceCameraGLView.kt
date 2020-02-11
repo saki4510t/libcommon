@@ -18,18 +18,14 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.SurfaceTexture
 import android.opengl.GLES20
 import android.opengl.Matrix
-import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
-import android.view.Choreographer
-import android.view.Choreographer.FrameCallback
 import android.view.Surface
-import android.view.SurfaceHolder
-import android.view.SurfaceView
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipelineSource
@@ -40,62 +36,32 @@ import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
 /**
- * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraGLView実装
- * SurfaceViewを継承
+ * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraView実装
+ * GLViewを継承
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
- * FIXME GLViewを継承するように変更する
  */
 class VideoSourceCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: SurfaceView(context, attrs), ICameraView {
+		: GLView(context, attrs), ICameraView {
 
 	private val mCameraDelegator: CameraDelegator
-	private val mGLManager: GLManager
-	private val mGLContext: GLContext
-	private val mGLHandler: Handler
 	private val mCameraRenderer: CameraRenderer
 	private var mVideoSource: VideoSource? = null
 	private var mDistributor: Distributor? = null
+	private val mMvpMatrix = FloatArray(16)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
-		mGLManager = GLManager(GLUtils.getSupportedGLVersion())
-		mGLContext = mGLManager.glContext
-		mGLHandler = mGLManager.glHandler
 		mCameraRenderer = CameraRenderer()
 		mCameraDelegator = CameraDelegator(this@VideoSourceCameraGLView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			mCameraRenderer)
-		val holder = holder
-		holder.addCallback(object : SurfaceHolder.Callback {
-
-			override fun surfaceCreated(holder: SurfaceHolder) {
-				if (DEBUG) Log.v(TAG, "surfaceCreated:")
-				// do nothing
-				queueEvent(Runnable {
-					mCameraRenderer.onSurfaceCreated(holder.surface)
-				})
-			}
-
-			override fun surfaceChanged
-				(holder: SurfaceHolder, format: Int,
-				width: Int, height: Int) {
-
-				if (DEBUG) Log.v(TAG, "surfaceChanged:")
-				queueEvent(Runnable {
-					mCameraRenderer.onSurfaceChanged(width, height)
-				 })
-			}
-
-			override fun surfaceDestroyed(holder: SurfaceHolder) {
-				if (DEBUG) Log.v(TAG, "surfaceDestroyed:")
-				queueEvent(Runnable {
-					mCameraRenderer.onSurfaceDestroyed()
-				 })
-			}
-		})
+		Matrix.setIdentityM(mMvpMatrix, 0)
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	@Synchronized
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
@@ -104,6 +70,9 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		mCameraDelegator.onResume()
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	@Synchronized
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
@@ -118,34 +87,51 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		}
 	}
 
-	private fun queueEvent(task: Runnable) {
-		mGLHandler.post(task)
-	}
-
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		mCameraDelegator.addListener(listener)
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		mCameraDelegator.removeListener(listener)
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun setScaleMode(mode: Int) {
 		mCameraDelegator.scaleMode = mode
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun getScaleMode(): Int {
 		return mCameraDelegator.scaleMode
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun setVideoSize(width: Int, height: Int) {
 		mCameraDelegator.setVideoSize(width, height)
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun getVideoWidth(): Int {
 		return mCameraDelegator.width
 	}
 
+	/**
+	 * ICameraViewの実装
+	 */
 	override fun getVideoHeight(): Int {
 		return mCameraDelegator.height
 	}
@@ -187,7 +173,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	protected fun createVideoSource(
 		width: Int, height: Int): VideoSource {
 
-		return VideoSource(mGLManager, width, height,
+		return VideoSource(getGLManager(), width, height,
 			object : PipelineSourceCallback {
 
 				override fun onCreate(surface: Surface) {
@@ -201,81 +187,71 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			, USE_SHARED_CONTEXT)
 	}
 
+	private var mDrawer: GLDrawer2D? = null
+
+	@SuppressLint("WrongThread")
+	@WorkerThread
+	override fun onSurfaceCreated() {
+		super.onSurfaceCreated()
+		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
+		mDrawer = GLDrawer2D.create(isOES3(), true)
+		mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
+		GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
+		mVideoSource?.add(mCameraRenderer)
+	}
+
+	@WorkerThread
+	override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
+		super.onSurfaceChanged(format, width, height)
+		mVideoSource!!.resize(width, height)
+		mCameraDelegator.startPreview(CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+	}
+
+	@SuppressLint("WrongThread")
+	@WorkerThread
+	override fun drawFrame() {
+		super.drawFrame()
+		if (mVideoSource != null) {
+			handleDraw(mVideoSource!!.texId, mVideoSource!!.texMatrix)
+		}
+	}
+
+	@WorkerThread
+	override fun onSurfaceDestroyed() {
+		if (mVideoSource != null) {
+			mVideoSource!!.remove(mCameraRenderer)
+		}
+		if (mDrawer != null) {
+			mDrawer!!.release()
+			mDrawer = null
+		}
+		super.onSurfaceDestroyed()
+	}
+
+	private var cnt2 = 0
+	/**
+	 * 描画処理の実体
+	 * レンダリングスレッド上で実行
+	 * @param texId
+	 * @param texMatrix
+	 */
+	@WorkerThread
+	private fun handleDraw(texId: Int, texMatrix: FloatArray) {
+		if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
+		// draw to preview screen
+		if ((mDrawer != null) && (mVideoSource != null)) {
+			mDrawer!!.draw(texId, texMatrix, 0)
+		}
+		GLES20.glFlush()
+	}
+
 	/**
 	 * ICameraRendererの実装
 	 */
+	@SuppressLint("WrongThread")
 	private inner class CameraRenderer
-		: ICameraRenderer, Runnable, FrameCallback,
+		: ICameraRenderer,
 			IPipelineSource.OnFrameAvailableListener {
-
-		private var mTarget: ISurface? = null
-		private var mDrawer: GLDrawer2D? = null
-		private val mMvpMatrix = FloatArray(16)
-		@Volatile
-		private var mHasSurface = false
-
-		/**
-		 * コンストラクタ
-		 */
-		init {
-			if (DEBUG) Log.v(TAG, "CameraRenderer:")
-			Matrix.setIdentityM(mMvpMatrix, 0)
-		}
-
-		@WorkerThread
-		fun onSurfaceCreated(surface: Surface) {
-			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceCreated:$surface")
-			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
-			// This renderer required OES_EGL_image_external extension
-			val extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS) // API >= 8
-//			if (DEBUG) Log.i(TAG, "onSurfaceCreated:Gl extensions: " + extensions);
-			if (!extensions.contains("OES_EGL_image_external")) {
-				throw RuntimeException("This system does not support OES_EGL_image_external.")
-			}
-			mDrawer = GLDrawer2D.create(mGLContext.isOES3, true)
-			// clear screen with yellow color so that you can see rendering rectangle
-			// create object for preview display
-			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-			mTarget = mGLManager.egl.createFromSurface(surface)
-			mHasSurface = true
-			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
-			if (USE_CHOREOGRAPHER) {
-				mGLManager.postFrameCallbackDelayed(this, 3)
-			} else {
-				mVideoSource?.add(this)
-			}
-		}
-
-		@WorkerThread
-		fun onSurfaceChanged(width: Int, height: Int) {
-			if (DEBUG) Log.v(TAG, String.format("CameraRenderer#onSurfaceChanged:(%d,%d)",
-				width, height))
-			// if at least with or height is zero, initialization of this view is still progress.
-			if ((width == 0) || (height == 0)) {
-				return
-			}
-			mVideoSource!!.resize(width, height)
-			updateViewport()
-			mCameraDelegator.startPreview(width, height)
-		}
-
-		/**
-		 * when GLSurface context is soon destroyed
-		 */
-		@WorkerThread
-		fun onSurfaceDestroyed() {
-			if (DEBUG) Log.v(TAG, "CameraRenderer#onSurfaceDestroyed:")
-			mHasSurface = false
-			mGLManager.removeFrameCallback(this)
-			if (mTarget != null) {
-				mTarget!!.release()
-				mTarget = null
-			}
-			if (mVideoSource != null) {
-				mVideoSource!!.remove(this)
-			}
-			release()
-		}
 
 		override fun hasSurface(): Boolean {
 			return mVideoSource != null
@@ -292,89 +268,78 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			return mVideoSource!!.inputSurfaceTexture
 		}
 
-		fun release() {
-			if (DEBUG) Log.v(TAG, "CameraRenderer#release:")
-			if (mDrawer != null) {
-				mDrawer!!.release()
-				mDrawer = null
-			}
-		}
-
 		override fun updateViewport() {
-			val viewWidth = width
-			val viewHeight = height
-			if ((viewWidth == 0) || (viewHeight == 0)) {
-				if (DEBUG) Log.v(TAG, String.format("updateViewport:view is not ready(%dx%d)",
-					viewWidth, viewHeight))
-				return
-			}
-			if (!mHasSurface || (mTarget == null)) {
-				if (DEBUG) Log.v(TAG, "updateViewport:has no surface")
-				return
-			}
-			mTarget!!.makeCurrent()
-			mTarget!!.setViewPort(0, 0, viewWidth, viewHeight)
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-			val videoWidth = mCameraDelegator.width.toDouble()
-			val videoHeight = mCameraDelegator.height.toDouble()
-			if ((videoWidth == 0.0) || (videoHeight == 0.0)) {
-				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)",
-					viewWidth, viewHeight))
-				return
-			}
-			val viewAspect = viewWidth / viewHeight.toDouble()
-			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
-				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight))
-			Matrix.setIdentityM(mMvpMatrix, 0)
-			val scaleMode = mCameraDelegator.scaleMode
-			when (scaleMode) {
-				CameraDelegator.SCALE_STRETCH_FIT -> {
-				}
-				CameraDelegator.SCALE_KEEP_ASPECT_VIEWPORT -> {
-					val req = videoWidth / videoHeight
-					val x: Int
-					val y: Int
-					val width: Int
-					val height: Int
-					if (viewAspect > req) {
-						// if view is wider than camera image, calc width of drawing area based on view height
- 						y = 0
-						height = viewHeight
-						width = (req * viewHeight).toInt()
-						x = (viewWidth - width) / 2
-					} else {
-						// if view is higher than camera image, calc height of drawing area based on view width
-						x = 0
-						width = viewWidth
-						height = (viewWidth / req).toInt()
-						y = (viewHeight - height) / 2
-					}
-					// set viewport to draw keeping aspect ration of camera image
-					Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height))
-					mTarget!!.setViewPort(0, 0, width, height)
-				}
-				CameraDelegator.SCALE_KEEP_ASPECT, CameraDelegator.SCALE_CROP_CENTER -> {
-					val scale_x = viewWidth / videoWidth
-					val scale_y = viewHeight / videoHeight
-					val scale
-						= if (scaleMode == CameraDelegator.SCALE_CROP_CENTER)
-							 Math.max(scale_x, scale_y) else Math.min(scale_x, scale_y)
-					val width = scale * videoWidth
-					val height = scale * videoHeight
-					Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-						width, height, scale_x, scale_y, width / viewWidth, height / viewHeight))
-					Matrix.scaleM(mMvpMatrix, 0,
-						(width / viewWidth).toFloat(),
-						(height / viewHeight).toFloat(),
-						 1.0f)
-				}
-			}
-			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-			mTarget!!.swap()
+//			val viewWidth = width
+//			val viewHeight = height
+//			if ((viewWidth == 0) || (viewHeight == 0)) {
+//				if (DEBUG) Log.v(TAG, String.format("updateViewport:view is not ready(%dx%d)",
+//					viewWidth, viewHeight))
+//				return
+//			}
+//			if (!mHasSurface || (mTarget == null)) {
+//				if (DEBUG) Log.v(TAG, "updateViewport:has no surface")
+//				return
+//			}
+//			mTarget!!.makeCurrent()
+//			mTarget!!.setViewPort(0, 0, viewWidth, viewHeight)
+//			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+//			val videoWidth = mCameraDelegator.width.toDouble()
+//			val videoHeight = mCameraDelegator.height.toDouble()
+//			if ((videoWidth == 0.0) || (videoHeight == 0.0)) {
+//				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)",
+//					viewWidth, viewHeight))
+//				return
+//			}
+//			val viewAspect = viewWidth / viewHeight.toDouble()
+//			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
+//				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight))
+//			Matrix.setIdentityM(mMvpMatrix, 0)
+//			val scaleMode = mCameraDelegator.scaleMode
+//			when (scaleMode) {
+//				CameraDelegator.SCALE_STRETCH_FIT -> {
+//				}
+//				CameraDelegator.SCALE_KEEP_ASPECT_VIEWPORT -> {
+//					val req = videoWidth / videoHeight
+//					val x: Int
+//					val y: Int
+//					val width: Int
+//					val height: Int
+//					if (viewAspect > req) {
+//						// if view is wider than camera image, calc width of drawing area based on view height
+// 						y = 0
+//						height = viewHeight
+//						width = (req * viewHeight).toInt()
+//						x = (viewWidth - width) / 2
+//					} else {
+//						// if view is higher than camera image, calc height of drawing area based on view width
+//						x = 0
+//						width = viewWidth
+//						height = (viewWidth / req).toInt()
+//						y = (viewHeight - height) / 2
+//					}
+//					// set viewport to draw keeping aspect ration of camera image
+//					Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height))
+//					mTarget!!.setViewPort(0, 0, width, height)
+//				}
+//				CameraDelegator.SCALE_KEEP_ASPECT, CameraDelegator.SCALE_CROP_CENTER -> {
+//					val scale_x = viewWidth / videoWidth
+//					val scale_y = viewHeight / videoHeight
+//					val scale
+//						= if (scaleMode == CameraDelegator.SCALE_CROP_CENTER)
+//							 Math.max(scale_x, scale_y) else Math.min(scale_x, scale_y)
+//					val width = scale * videoWidth
+//					val height = scale * videoHeight
+//					Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+//						width, height, scale_x, scale_y, width / viewWidth, height / viewHeight))
+//					Matrix.scaleM(mMvpMatrix, 0,
+//						(width / viewWidth).toFloat(),
+//						(height / viewHeight).toFloat(),
+//						 1.0f)
+//				}
+//			}
+//			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
+//			mTarget!!.swap()
 		}
-
-//		private var cnt;
-		private var cnt2 = 0
 
 		/**
 		 * IPipelineSource.OnFrameAvailableListenerの実装
@@ -382,70 +347,17 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		 * @param texMatrix
 		 */
 		override fun onFrameAvailable(texId: Int, texMatrix: FloatArray) {
-//			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable::" + cnt);
-			if (!USE_CHOREOGRAPHER) {
-				mGLHandler.post(this)
-			}
-		}
-
-		/**
-		 * Choreographer.FrameCallbackの実装
-		 * @param frameTimeNanos
-		 */
-		override fun doFrame(frameTimeNanos: Long) {
-//			if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "doFrame::" + cnt);
-			run()
-			Choreographer.getInstance().postFrameCallbackDelayed(this, 3)
-		}
-
-		/**
-		 * このViewが保持しているレンダリングスレッド上で描画処理を実行するためのRunnableの実装
-		 */
-		@WorkerThread
-		override fun run() {
-			if (mHasSurface && (mVideoSource != null)) {
-				handleDraw(mVideoSource!!.texId, mVideoSource!!.texMatrix)
-			}
-			mGLContext.makeDefault()
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-			GLES20.glFlush()
-		}
-
-		/**
-		 * 描画処理の実体
-		 * レンダリングスレッド上で実行
-		 * @param texId
-		 * @param texMatrix
-		 */
-		@WorkerThread
-		private fun handleDraw(texId: Int, texMatrix: FloatArray) {
-			if (mTarget != null) {
-				if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
-				mTarget!!.makeCurrent()
-				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-				// draw to preview screen
-				if ((mDrawer != null) && (mVideoSource != null)) {
-					mDrawer!!.draw(texId, texMatrix, 0)
-				}
-				GLES20.glFlush()
-				mTarget!!.swap()
-			}
 		}
 
 	} // CameraRenderer
 
 	companion object {
-		private const val DEBUG = false // TODO set false on release
+		private const val DEBUG = true // TODO set false on release
 		private val TAG = VideoSourceCameraGLView::class.java.simpleName
 		/**
 		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 		 */
 		private const val USE_SHARED_CONTEXT = false
-		/**
-		 * Choreographerを使ってテクスチャの描画をするかどうか
-		 * XXX Choreographerを使うと数百フレームぐらいでlibGLESv2_adreno.so内でSIGSEGV投げてクラッシュする
-		 */
-		private const val USE_CHOREOGRAPHER = false
 	}
 
 }
