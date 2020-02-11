@@ -40,6 +40,15 @@ public abstract class ViewContentTransformer {
 	private static final String TAG = ViewContentTransformer.class.getSimpleName();
 
 	/**
+	 * Transform可能Viewを示すインターフェース
+	 */
+	public interface ITransformView {
+		@NonNull
+		public Matrix getTransform(@Nullable Matrix transform);
+		public void setTransform(Matrix transform);
+	}
+
+	/**
 	 * インスタンス生成のためのヘルパーメソッド
 	 * @param view
 	 * @return
@@ -50,6 +59,8 @@ public abstract class ViewContentTransformer {
 			return new TextureViewTransformer((TextureView)view);
 		} else if (view instanceof ImageView) {
 			return new ImageViewTransformer((ImageView) view);
+		} else if (view instanceof ITransformView) {
+			return new ITransformViewTransformer((ITransformView)view);
 		} else {
 			return new DefaultTransformer(view);
 		}
@@ -554,6 +565,53 @@ public abstract class ViewContentTransformer {
 		}
 
 	} // TextureViewTransformer
+
+//--------------------------------------------------------------------------------
+	protected static class ITransformViewTransformer extends ViewContentTransformer {
+		private static final String TAG = TextureViewTransformer.class.getSimpleName();
+
+		/**
+		 * コンストラクタ
+		 * @param view
+		 */
+		private ITransformViewTransformer(@NonNull final ITransformView view) {
+			super((View)view);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		}
+
+		@NonNull
+		public ITransformView getTargetViewInterface() {
+			return (ITransformView)mTargetView;
+		}
+
+		@Override
+		public ITransformViewTransformer updateTransform(final boolean setAsDefault) {
+			getTargetViewInterface().getTransform(mTransform);
+			if (setAsDefault) {
+				mDefaultTransform.set(mTransform);
+				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+				resetValues();
+			} else {
+				calcValues(mTransform);
+			}
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
+			return this;
+		}
+
+		@Override
+		protected void internalSetTransform(@Nullable final Matrix transform) {
+			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+			getTargetViewInterface().setTransform(transform);
+		}
+
+		@NonNull
+		@Override
+		public Matrix getTransform(@Nullable final Matrix transform) {
+			return getTargetViewInterface().getTransform(transform);
+		}
+
+	} // ITransformViewTransformer
 
 //--------------------------------------------------------------------------------
 	/**
