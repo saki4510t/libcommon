@@ -53,6 +53,7 @@ class CameraTextureView @JvmOverloads constructor(
 
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
+					setAspectRatio(width, height)
 				}
 			}
 		)

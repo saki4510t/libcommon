@@ -86,6 +86,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 				@Override
 				public void onPreviewSizeChanged(final int width, final int height) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%dx)", width, height));
+					setAspectRatio(width, height);
 					synchronized (mSync) {
 						if (mSurfaceTexture != null) {
 							mSurfaceTexture.setDefaultBufferSize(width, height);
