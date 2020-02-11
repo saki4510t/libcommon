@@ -69,6 +69,7 @@ open class GLView @JvmOverloads constructor(
 
 				if ((width > 0) && (height > 0)) {
 					mHasSurface = true
+					mMatrixChanged = true
 					queueEvent( Runnable { onSurfaceCreated() })
 				}
 			}
