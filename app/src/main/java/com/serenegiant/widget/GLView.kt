@@ -18,6 +18,7 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLES20
 import android.os.Handler
@@ -26,14 +27,14 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.WorkerThread
 import com.serenegiant.glutils.*
 
 /**
- * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraGLView実装
+ * SurfaceViewのSurfaceへOpenGL|ESで描画するためのヘルパークラス
  * SurfaceViewを継承
- * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
  */
 open class GLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
@@ -44,6 +45,9 @@ open class GLView @JvmOverloads constructor(
 	private val mGLHandler: Handler
 	@Volatile
 	private var mHasSurface: Boolean = false
+	/**
+	 * SurfaceViewのSurfaceへOpenGL|ESで描画するためのISurfaceインスタンス
+	 */
 	private var mTarget: ISurface? = null
 
 	init {
@@ -56,7 +60,7 @@ open class GLView @JvmOverloads constructor(
 				if (DEBUG) Log.v(TAG, "surfaceCreated:")
 
 				if ((width > 0) && (height > 0)) {
-					mHasSurface = true;
+					mHasSurface = true
 					queueEvent( Runnable { onSurfaceCreated() })
 				}
 			}
@@ -71,28 +75,50 @@ open class GLView @JvmOverloads constructor(
 
 			override fun surfaceDestroyed(holder: SurfaceHolder) {
 				if (DEBUG) Log.v(TAG, "surfaceDestroyed:")
-				mHasSurface = false;
+				mHasSurface = false
 				queueEvent( Runnable { onSurfaceDestroyed() })
 			}
 		})
 	}
 
+	/**
+	 * OpenGL|ES3.xが使用可能かどうかを取得
+	 */
+	@AnyThread
 	fun isGLES3() : Boolean {
-		return mGLContext.isGLES3;
+		return mGLContext.isGLES3
 	}
 
+	/**
+	 * OpenGL|ES3.xが使用可能＆GLES3の外部テクスチャをしようかどうかどうかを取得
+	 */
+	@AnyThread
 	fun isOES3() : Boolean {
 		return mGLContext.isOES3
 	}
 
+	/**
+	 * 内部使用のGLManagerインスタンスを取得
+	 */
+	@AnyThread
 	fun getGLManager() : GLManager {
-		return mGLManager;
+		return mGLManager
 	}
 
+	/**
+	 * 内部使用のGLContextを取得
+	 */
+	@AnyThread
 	fun getGLContext() : GLContext {
 		return mGLContext
 	}
 
+	/**
+	 * デフォルトのレンダリングコンテキストへ切り返る
+	 * Surfaceが有効であればそのサーフェースへの描画コンテキスト
+	 * Surfaceが無効であればEGL/GLコンテキスト保持用のオフスクリーンへの描画コンテキストになる
+	 */
+	@WorkerThread
  	protected fun makeDefault() {
  		if (mTarget != null) {
  			mTarget!!.makeCurrent()
@@ -101,10 +127,18 @@ open class GLView @JvmOverloads constructor(
 		}
  	}
 
+	/**
+	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行要求する
+	 */
+	@AnyThread
 	fun queueEvent(task: Runnable) {
 		mGLHandler.post(task)
 	}
 
+	/**
+	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行要求する
+	 */
+	@AnyThread
 	fun queueEvent(task: Runnable, delayMs: Long) {
 		if (delayMs > 0) {
 			mGLHandler.postDelayed(task, delayMs)
@@ -113,10 +147,17 @@ open class GLView @JvmOverloads constructor(
 		}
 	}
 
+	/**
+	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行待ちしていれば実行待ちを解除する
+	 */
+	@AnyThread
 	fun removeEvent(task: Runnable) {
 		mGLHandler.removeCallbacks(task)
 	}
 
+	/**
+	 * Choreographerを使ったvsync同期用描画のFrameCallback実装
+	 */
 	private var mChoreographerCallback
 		= object : Choreographer.FrameCallback {
 
@@ -134,6 +175,7 @@ open class GLView @JvmOverloads constructor(
 	 * Surfaceが生成された時
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
+	@SuppressLint("WrongThread")
 	@WorkerThread
 	@CallSuper
 	protected open fun onSurfaceCreated() {
