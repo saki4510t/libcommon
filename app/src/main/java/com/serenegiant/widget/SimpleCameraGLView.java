@@ -1,9 +1,9 @@
 package com.serenegiant.widget;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
-import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Surface;
@@ -13,8 +13,6 @@ import com.serenegiant.graphics.MatrixUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import androidx.annotation.RequiresApi;
 
 public class SimpleCameraGLView extends AspectScaledGLView
 	implements CameraDelegator.ICameraView {
@@ -105,75 +103,78 @@ public class SimpleCameraGLView extends AspectScaledGLView
 				}
 			}
 		);
-	}
-
-//--------------------------------------------------------------------------------
-
-	@Override
-	protected void onSurfaceCreated() {
-		super.onSurfaceCreated();
-		if (DEBUG) Log.v(TAG, "onSurfaceCreated:");
-		synchronized (mSync) {
-			mDrawer = GLDrawer2D.create(isOES3(), true);
-			mTexId = mDrawer.initTex();
-			mSurfaceTexture = new SurfaceTexture(mTexId);
-			mSurfaceTexture.setDefaultBufferSize(
-				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
-			mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
-//				private int cnt;
-				@Override
-				public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-//					if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable:" + cnt);
-					mRequestUpdateTex = true;
+		setRenderer(new GLRenderer() {
+			private int cnt;
+			@Override
+			public void onSurfaceCreated() {
+				if (DEBUG) Log.v(TAG, "onSurfaceCreated:");
+				synchronized (mSync) {
+					mDrawer = GLDrawer2D.create(isOES3(), true);
+					mTexId = mDrawer.initTex();
+					mSurfaceTexture = new SurfaceTexture(mTexId);
+					mSurfaceTexture.setDefaultBufferSize(
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
+					mSurfaceTexture.setOnFrameAvailableListener(new SurfaceTexture.OnFrameAvailableListener() {
+		//				private int cnt;
+						@Override
+						public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
+		//					if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "onFrameAvailable:" + cnt);
+							mRequestUpdateTex = true;
+						}
+					});
 				}
-			});
-		}
-	}
-
-	@Override
-	protected void onSurfaceChanged(final int format, final int width, final int height) {
-		super.onSurfaceChanged(format, width, height);
-		if (DEBUG) Log.v(TAG, String.format("onSurfaceChanged:(%dx%d))", width, height));
-		mCameraDelegator.startPreview(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
-	}
-
-	private int cnt;
-	@Override
-	protected void drawFrame() {
-		super.drawFrame();
-		if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "drawFrame:" + cnt);
-		if (mRequestUpdateTex) {
-			mRequestUpdateTex = false;
-			mSurfaceTexture.updateTexImage();
-			mSurfaceTexture.getTransformMatrix(mTexMatrix);
-		}
-		mDrawer.draw(mTexId, mTexMatrix, 0);
-	}
-
-	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-	@Override
-	protected void onSurfaceDestroyed() {
-		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:");
-		synchronized (mSync) {
-			if (mSurfaceTexture != null) {
-				mSurfaceTexture.release();
-				mSurfaceTexture = null;
 			}
-			if (mTexId != 0) {
-				if (isGLES3()) {
-					com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
-				} else {
-					com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
+
+			@Override
+			public void onSurfaceChanged(final int format, final int width, final int height) {
+				if (DEBUG) Log.v(TAG, String.format("onSurfaceChanged:(%dx%d))", width, height));
+				mCameraDelegator.startPreview(
+					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
+			}
+
+			@Override
+			public void drawFrame() {
+				if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "drawFrame:" + cnt);
+				if (mRequestUpdateTex) {
+					mRequestUpdateTex = false;
+					mSurfaceTexture.updateTexImage();
+					mSurfaceTexture.getTransformMatrix(mTexMatrix);
 				}
-				mTexId = 0;
+				mDrawer.draw(mTexId, mTexMatrix, 0);
 			}
-			if (mDrawer != null) {
-				mDrawer.release();
-				mDrawer = null;
+
+			@SuppressLint("NewApi")
+			@Override
+			public void onSurfaceDestroyed() {
+				if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:");
+				synchronized (mSync) {
+					if (mSurfaceTexture != null) {
+						mSurfaceTexture.release();
+						mSurfaceTexture = null;
+					}
+					if (mTexId != 0) {
+						if (isGLES3()) {
+							com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
+						} else {
+							com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
+						}
+						mTexId = 0;
+					}
+					if (mDrawer != null) {
+						mDrawer.release();
+						mDrawer = null;
+					}
+				}
 			}
-		}
-		super.onSurfaceDestroyed();
+
+			@Override
+			public void applyTransformMatrix(@NotNull final Matrix transform) {
+				if (mDrawer != null) {
+					MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork);
+					mDrawer.setMvpMatrix(mMvpMatrix, 0);
+				}
+			}
+		});
 	}
 
 //--------------------------------------------------------------------------------
@@ -243,15 +244,6 @@ public class SimpleCameraGLView extends AspectScaledGLView
 	public int getVideoHeight() {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:");
 		return mCameraDelegator.getHeight();
-	}
-
-	@Override
-	protected void applyTransformMatrix(@NotNull final Matrix transform) {
-		super.applyTransformMatrix(transform);
-		if (mDrawer != null) {
-			MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork);
-			mDrawer.setMvpMatrix(mMvpMatrix, 0);
-		}
 	}
 
 	protected void updateViewport() {

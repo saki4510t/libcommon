@@ -31,7 +31,8 @@ import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipelineSource
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
-import com.serenegiant.glutils.*
+import com.serenegiant.glutils.GLDrawer2D
+import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
@@ -49,6 +50,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	private var mVideoSource: VideoSource? = null
 	private var mDistributor: Distributor? = null
 	private val mMvpMatrix = FloatArray(16)
+	private val mWork = FloatArray(9)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -56,6 +58,49 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		mCameraDelegator = CameraDelegator(this@VideoSourceCameraGLView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			mCameraRenderer)
+		setRenderer(object : GLRenderer {
+			@SuppressLint("WrongThread")
+			@WorkerThread
+			override fun onSurfaceCreated() {
+				if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
+				mDrawer = GLDrawer2D.create(isOES3(), true)
+				mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
+				GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
+				mVideoSource?.add(mCameraRenderer)
+			}
+
+			@WorkerThread
+			override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
+				mVideoSource!!.resize(width, height)
+				mCameraDelegator.startPreview(CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+			}
+
+			@SuppressLint("WrongThread")
+			@WorkerThread
+			override fun drawFrame() {
+				if (mVideoSource != null) {
+					handleDraw(mVideoSource!!.texId, mVideoSource!!.texMatrix)
+				}
+			}
+
+			@WorkerThread
+			override fun onSurfaceDestroyed() {
+				if (mVideoSource != null) {
+					mVideoSource!!.remove(mCameraRenderer)
+				}
+				if (mDrawer != null) {
+					mDrawer!!.release()
+					mDrawer = null
+				}
+			}
+
+			override fun applyTransformMatrix(transform: android.graphics.Matrix) {
+				if (mDrawer != null) {
+					MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork)
+					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
+				}
+			}
+		})
 		Matrix.setIdentityM(mMvpMatrix, 0)
 	}
 
@@ -188,46 +233,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	}
 
 	private var mDrawer: GLDrawer2D? = null
-
-	@SuppressLint("WrongThread")
-	@WorkerThread
-	override fun onSurfaceCreated() {
-		super.onSurfaceCreated()
-		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
-		mDrawer = GLDrawer2D.create(isOES3(), true)
-		mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-		GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
-		mVideoSource?.add(mCameraRenderer)
-	}
-
-	@WorkerThread
-	override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
-		super.onSurfaceChanged(format, width, height)
-		mVideoSource!!.resize(width, height)
-		mCameraDelegator.startPreview(CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
-	}
-
-	@SuppressLint("WrongThread")
-	@WorkerThread
-	override fun drawFrame() {
-		super.drawFrame()
-		if (mVideoSource != null) {
-			handleDraw(mVideoSource!!.texId, mVideoSource!!.texMatrix)
-		}
-	}
-
-	@WorkerThread
-	override fun onSurfaceDestroyed() {
-		if (mVideoSource != null) {
-			mVideoSource!!.remove(mCameraRenderer)
-		}
-		if (mDrawer != null) {
-			mDrawer!!.release()
-			mDrawer = null
-		}
-		super.onSurfaceDestroyed()
-	}
-
 	private var cnt2 = 0
 	/**
 	 * 描画処理の実体
