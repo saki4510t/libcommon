@@ -448,6 +448,14 @@ public class EffectDrawer2D {
 //--------------------------------------------------------------------------------
 // EffectDrawer2D固有のpublicメソッド
 	/**
+	 * 映像効果をリセット
+	 * resetShaderのシノニム
+	 */
+	public void resetEffect() {
+		resetShader();
+	}
+
+	/**
 	 * 映像効果をセット
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
