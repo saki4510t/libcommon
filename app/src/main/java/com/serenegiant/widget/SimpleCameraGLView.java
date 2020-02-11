@@ -1,6 +1,7 @@
 package com.serenegiant.widget;
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -8,13 +9,14 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.graphics.MatrixUtils;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import androidx.annotation.RequiresApi;
 
-public class SimpleCameraGLView extends GLView
+public class SimpleCameraGLView extends AspectScaledGLView
 	implements CameraDelegator.ICameraView {
 
 	private static final boolean DEBUG = true;	// set false on production
@@ -22,8 +24,9 @@ public class SimpleCameraGLView extends GLView
 
 	private final Object mSync = new Object();
 	private final CameraDelegator mCameraDelegator;
-	private final float[] mTransform = new float[16];
+	private final float[] mTexMatrix = new float[16];
 	private final float[] mMvpMatrix = new float[16];
+	private final float[] mWork = new float[9];
 
 	private GLDrawer2D mDrawer;
 	private int mTexId;
@@ -143,9 +146,9 @@ public class SimpleCameraGLView extends GLView
 		if (mRequestUpdateTex) {
 			mRequestUpdateTex = false;
 			mSurfaceTexture.updateTexImage();
-			mSurfaceTexture.getTransformMatrix(mTransform);
+			mSurfaceTexture.getTransformMatrix(mTexMatrix);
 		}
-		mDrawer.draw(mTexId, mTransform, 0);
+		mDrawer.draw(mTexId, mTexMatrix, 0);
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -227,26 +230,6 @@ public class SimpleCameraGLView extends GLView
 	 * @return
 	 */
 	@Override
-	public int getScaleMode() {
-		if (DEBUG) Log.v(TAG, "getScaleMode:");
-		return mCameraDelegator.getScaleMode();
-	}
-
-	/**
-	 * ICameraViewの実装
-	 * @param mode
-	 */
-	@Override
-	public void setScaleMode(final int mode) {
-		if (DEBUG) Log.v(TAG, "setScaleMode:" + mode);
-		mCameraDelegator.setScaleMode(mode);
-	}
-
-	/**
-	 * ICameraViewの実装
-	 * @return
-	 */
-	@Override
 	public int getVideoWidth() {
 		if (DEBUG) Log.v(TAG, "getVideoWidth:");
 		return mCameraDelegator.getWidth();
@@ -262,6 +245,15 @@ public class SimpleCameraGLView extends GLView
 		return mCameraDelegator.getHeight();
 	}
 
+	@Override
+	protected void applyTransformMatrix(@NotNull final Matrix transform) {
+		super.applyTransformMatrix(transform);
+		if (mDrawer != null) {
+			MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork);
+			mDrawer.setMvpMatrix(mMvpMatrix, 0);
+		}
+	}
+
 	protected void updateViewport() {
 //		final int viewWidth = getWidth();
 //		final int viewHeight = getHeight();
@@ -269,13 +261,6 @@ public class SimpleCameraGLView extends GLView
 //			if (DEBUG) Log.v(TAG, String.format("updateViewport:view is not ready(%dx%d)", viewWidth, viewHeight));
 //			return;
 //		}
-//		if (!mHasSurface || (mTarget == null)) {
-//			if (DEBUG) Log.v(TAG, "updateViewport:has no surface");
-//			return;
-//		}
-//		mTarget.makeCurrent();
-//		mTarget.setViewPort(0, 0, viewWidth, viewHeight);
-//		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 //		final double videoWidth = mCameraDelegator.getWidth();
 //		final double videoHeight = mCameraDelegator.getHeight();
 //		if (videoWidth == 0 || videoHeight == 0) {
@@ -286,7 +271,7 @@ public class SimpleCameraGLView extends GLView
 //		Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
 //			viewWidth, viewHeight, viewAspect, videoWidth, videoHeight));
 //
-//		Matrix.setIdentityM(mMvpMatrix, 0);
+//		android.opengl.Matrix.setIdentityM(mMvpMatrix, 0);
 //		final int scaleMode = mCameraDelegator.getScaleMode();
 //		switch (scaleMode) {
 //		case CameraDelegator.SCALE_STRETCH_FIT:
@@ -311,7 +296,7 @@ public class SimpleCameraGLView extends GLView
 //			}
 //			// set viewport to draw keeping aspect ration of camera image
 //			Log.i(TAG, String.format("updateViewport;xy(%d,%d),size(%d,%d)", x, y, width, height));
-//			mTarget.setViewPort(0, 0, width, height);
+////			mTarget.setViewPort(0, 0, width, height);
 //			break;
 //		}
 //		case CameraDelegator.SCALE_KEEP_ASPECT:
@@ -325,15 +310,10 @@ public class SimpleCameraGLView extends GLView
 //			final double height = scale * videoHeight;
 //			Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
 //				width, height, scale_x, scale_y, width / viewWidth, height / viewHeight));
-//			Matrix.scaleM(mMvpMatrix, 0, (float)(width / viewWidth), (float)(height / viewHeight), 1.0f);
+//			android.opengl.Matrix.scaleM(mMvpMatrix, 0, (float)(width / viewWidth), (float)(height / viewHeight), 1.0f);
 //			break;
 //		}
 //		}
-//		if (mDrawer != null) {
-//			mDrawer.setMvpMatrix(mMvpMatrix, 0);
-//		}
-//
-//		mTarget.swap();
 	}
 
 
