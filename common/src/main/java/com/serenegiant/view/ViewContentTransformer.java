@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.serenegiant.graphics.MatrixUtils;
+import com.serenegiant.widget.GLView;
 
 import java.util.Arrays;
 
@@ -59,6 +60,8 @@ public abstract class ViewContentTransformer {
 			return new TextureViewTransformer((TextureView)view);
 		} else if (view instanceof ImageView) {
 			return new ImageViewTransformer((ImageView) view);
+		} else if (view instanceof GLView) {
+			return new GLViewTransformer((GLView)view);
 		} else if (view instanceof ITransformView) {
 			return new ITransformViewTransformer((ITransformView)view);
 		} else {
@@ -567,6 +570,9 @@ public abstract class ViewContentTransformer {
 	} // TextureViewTransformer
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ITransformView用のViewContentTransformer実装
+	 */
 	protected static class ITransformViewTransformer extends ViewContentTransformer {
 		private static final String TAG = TextureViewTransformer.class.getSimpleName();
 
@@ -657,4 +663,55 @@ public abstract class ViewContentTransformer {
 		}
 
 	}	// ImageViewTransformer
+
+//--------------------------------------------------------------------------------
+	/**
+	 * GLView用のViewContentTransformer実装
+	 */
+	protected static class GLViewTransformer extends ViewContentTransformer {
+		private static final String TAG = GLViewTransformer.class.getSimpleName();
+
+		/**
+		 * コンストラクタ
+		 * @param view
+		 */
+		private GLViewTransformer(@NonNull final GLView view) {
+			super(view);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		}
+
+		@NonNull
+		@Override
+		public GLView getTargetView() {
+			return (GLView)mTargetView;
+		}
+
+		@Override
+		public GLViewTransformer updateTransform(final boolean setAsDefault) {
+			getTargetView().getTransform(mTransform);
+			if (setAsDefault) {
+				mDefaultTransform.set(mTransform);
+				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+				resetValues();
+			} else {
+				calcValues(mTransform);
+			}
+			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
+			return this;
+		}
+
+		@Override
+		protected void internalSetTransform(@Nullable final Matrix transform) {
+			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+			getTargetView().setTransform(transform);
+		}
+
+		@NonNull
+		@Override
+		public Matrix getTransform(@Nullable final Matrix transform) {
+			return getTargetView().getTransform(transform);
+		}
+
+	} // GLViewTransformer
 }

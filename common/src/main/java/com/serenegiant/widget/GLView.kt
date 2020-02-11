@@ -20,6 +20,7 @@ package com.serenegiant.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Matrix
 import android.opengl.GLES20
 import android.os.Handler
 import android.util.AttributeSet
@@ -31,6 +32,7 @@ import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.WorkerThread
 import com.serenegiant.glutils.*
+import com.serenegiant.view.ViewContentTransformer
 
 /**
  * SurfaceViewのSurfaceへOpenGL|ESで描画するためのヘルパークラス
@@ -38,7 +40,7 @@ import com.serenegiant.glutils.*
  */
 open class GLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: SurfaceView(context, attrs)  {
+		: SurfaceView(context, attrs), ViewContentTransformer.ITransformView  {
 
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext
@@ -221,6 +223,14 @@ open class GLView @JvmOverloads constructor(
 			mTarget!!.release()
 			mTarget = null
 		}
+	}
+
+	override fun setTransform(transform: Matrix?) {
+		// FIXME 未実装
+	}
+
+	override fun getTransform(transform: Matrix?): Matrix {
+		// FIXME 未実装
 	}
 
 	companion object {
