@@ -22,6 +22,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import com.serenegiant.glutils.EffectRendererHolder
+import com.serenegiant.glutils.GLEffect
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.libcommon.BuildConfig
@@ -42,7 +43,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 
 	set(effect) {
 		if (DEBUG) Log.v(TAG, "setEffect:$effect")
-		if ((effect >= 0) && (effect < EffectRendererHolder.EFFECT_NUM)) {
+		if ((effect >= 0) && (effect < GLEffect.EFFECT_NUM)) {
 			post {
 				val rendererHolder = rendererHolder
 				if (rendererHolder is EffectRendererHolder) {

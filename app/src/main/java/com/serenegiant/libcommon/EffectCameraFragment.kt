@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import com.serenegiant.glutils.EffectRendererHolder
+import com.serenegiant.glutils.GLEffect
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 
 class EffectCameraFragment : AbstractCameraFragment() {
@@ -47,7 +48,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 	override fun onLongClick(view: View): Boolean {
 		if (mCameraView is EffectCameraGLSurfaceView) {
 			val v = view as EffectCameraGLSurfaceView
-			v.effect = (v.effect + 1) % EffectRendererHolder.EFFECT_NUM
+			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
 			return true
 		}
 		return false
