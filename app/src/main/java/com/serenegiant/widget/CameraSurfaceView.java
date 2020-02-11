@@ -127,6 +127,7 @@ public class CameraSurfaceView extends SurfaceView {
 	private void stopPreview() {
 		if (mCamera != null) {
 			mCamera.stopPreview();
+			mCamera.release();
 			mCamera = null;
 		}
 	}
