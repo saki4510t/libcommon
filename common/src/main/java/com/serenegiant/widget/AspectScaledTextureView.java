@@ -31,6 +31,10 @@ import com.serenegiant.common.R;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+/**
+ * View/表示内容のスケーリング処理を追加したTextureView
+ * スケーリングモードがSCALE_MODE_KEEP_ASPECTのときはViewのサイズ変更を行う
+ */
 public class AspectScaledTextureView extends TextureView
 	implements TextureView.SurfaceTextureListener, IAspectRatioView, IScaledView, ITextureView {
 	
