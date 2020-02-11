@@ -49,7 +49,7 @@ class CameraImageView @JvmOverloads constructor(
 					return this@CameraImageView.hasSurface()
 				}
 
-				override fun getInputSurfaceTexture(): SurfaceTexture {
+				override fun getInputSurface(): SurfaceTexture {
 					if (DEBUG) Log.v(TAG, "updateViewport:")
 					return this@CameraImageView.getInputSurfaceTexture()
 				}

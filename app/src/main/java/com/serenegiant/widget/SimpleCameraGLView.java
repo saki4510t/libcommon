@@ -96,7 +96,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 
 				@NotNull
 				@Override
-				public SurfaceTexture getInputSurfaceTexture() {
+				public SurfaceTexture getInputSurface() {
 					if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:" + mSurfaceTexture);
 					synchronized (mSync) {
 						return mSurfaceTexture;

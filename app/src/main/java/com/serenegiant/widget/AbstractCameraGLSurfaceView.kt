@@ -271,7 +271,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
 		}
 
-		override fun getInputSurfaceTexture(): SurfaceTexture {
+		override fun getInputSurface(): SurfaceTexture {
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
 			checkNotNull(rendererHolder)
 			return rendererHolder!!.surfaceTexture

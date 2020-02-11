@@ -266,7 +266,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			mVideoSource!!.resize(width, height)
 		}
 
-		override fun getInputSurfaceTexture(): SurfaceTexture {
+		override fun getInputSurface(): SurfaceTexture {
 
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
 			checkNotNull(mVideoSource)

@@ -41,7 +41,7 @@ class CameraTextureView @JvmOverloads constructor(
 					return this@CameraTextureView.hasSurface()
 				}
 
-				override fun getInputSurfaceTexture(): SurfaceTexture {
+				override fun getInputSurface(): SurfaceTexture {
 					val st = this@CameraTextureView.surfaceTexture
 					if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:$st")
 					return st

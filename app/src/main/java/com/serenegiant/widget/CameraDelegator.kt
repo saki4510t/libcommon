@@ -20,6 +20,7 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint
 import android.graphics.SurfaceTexture
 import android.hardware.Camera
 import android.os.Handler
@@ -31,7 +32,6 @@ import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import java.io.IOException
-import java.util.*
 import java.util.concurrent.CopyOnWriteArraySet
 
 /**
@@ -84,10 +84,10 @@ class CameraDelegator(
 		fun updateViewport()
 		fun onPreviewSizeChanged(width: Int, height: Int)
 		/**
-		 * カメラ映像受け取り用のSurfaceTextureを取得
+		 * カメラ映像受け取り用のSurface/SurfaceHolder/SurfaceTexture/SurfaceViewを取得
 		 * @return
 		 */
-		fun getInputSurfaceTexture(): SurfaceTexture
+		fun getInputSurface(): Any
 	}
 
 //--------------------------------------------------------------------------------
@@ -280,6 +280,7 @@ class CameraDelegator(
 	 * @param width
 	 * @param height
 	 */
+	@SuppressLint("WrongThread")
 	@WorkerThread
 	private fun handleStartPreview(width: Int, height: Int) {
 		if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:")
@@ -291,7 +292,7 @@ class CameraDelegator(
 			// This is a sample project so just use 0 as camera ID.
 			// it is better to selecting camera is available
 			try {
-				val cameraId = CameraUtils.findCamera(CameraConst.FACING_FRONT)
+				val cameraId = CameraUtils.findCamera(CameraConst.FACING_BACK)
 				camera = Camera.open(cameraId)
 				val params = camera!!.getParameters()
 				if (params != null) {
@@ -304,49 +305,28 @@ class CameraDelegator(
 						if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus")
 					}
 					params.setRecordingHint(true)
-					// let's try fastest frame rate. You will get near 60fps, but your device become hot.
-					val supportedFpsRange = params.supportedPreviewFpsRange
-					val n = supportedFpsRange?.size ?: 0
-					var max_fps: IntArray? = null
-					for (i in n - 1 downTo 0) {
-						val range = supportedFpsRange!![i]
-						if (DEBUG) Log.v(TAG,
-							String.format("handleStartPreview:supportedFpsRange(%d)=(%d,%d)",
-								i, range[0], range[1]))
-						if ((range[0] <= TARGET_FPS_MS) && (TARGET_FPS_MS <= range[1])) {
-							max_fps = range
-							break
-						}
-					}
-					if (max_fps == null) { // 見つからなかったときは一番早いフレームレートを選択
-						max_fps = supportedFpsRange!![supportedFpsRange.size - 1]
-					}
-					params.setPreviewFpsRange(max_fps!!.get(0), max_fps.get(1))
-					// request closest supported preview size
-					val closestSize = getClosestSupportedSize(
-						params.supportedPreviewSizes, width, height)
-					params.setPreviewSize(closestSize.width, closestSize.height)
-					// request closest picture size for an aspect ratio issue on Nexus7
-					val pictureSize = getClosestSupportedSize(
-						params.supportedPictureSizes, width, height)
-					params.setPictureSize(pictureSize.width, pictureSize.height)
+					CameraUtils.chooseVideoSize(params, width, height)
+					val fps = CameraUtils.chooseFps(params, 1.0f, 120.0f)
 					// rotate camera preview according to the device orientation
 					mRotation = CameraUtils.setupRotation(cameraId, mView as View, camera!!, params)
 					camera!!.setParameters(params)
 					// get the actual preview size
 					val previewSize = camera!!.getParameters().previewSize
-					Log.d(TAG, String.format("handleStartPreview(%d, %d),fps%d-%d",
-						previewSize.width, previewSize.height, max_fps.get(0), max_fps.get(1)))
+					Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
+						previewSize.width, previewSize.height, fps?.get(0), fps?.get(1)))
 					// adjust view size with keeping the aspect ration of camera preview.
 					// here is not a UI thread and we should request parent view to execute.
 					mView.post(Runnable {
 						setVideoSize(previewSize.width, previewSize.height)
 						cameraRenderer.onPreviewSizeChanged(previewSize.width, previewSize.height)
 					})
-					// カメラ映像受け取り用SurfaceTextureをセット
-					val st = cameraRenderer.getInputSurfaceTexture()
-					st.setDefaultBufferSize(previewSize.width, previewSize.height)
-					camera!!.setPreviewTexture(st)
+					// カメラ映像受け取り用Surfaceをセット
+					val surface = cameraRenderer.getInputSurface()
+					if (surface is SurfaceTexture) {
+						surface.setDefaultBufferSize(previewSize.width, previewSize.height)
+						camera!!.setPreviewTexture(surface)
+					}
+					CameraUtils.setPreviewSurface(camera!!, surface)
 				}
 			} catch (e: IOException) {
 				Log.e(TAG, "handleStartPreview:", e)
@@ -395,27 +375,6 @@ class CameraDelegator(
 		const val DEFAULT_PREVIEW_HEIGHT = 720
 		private const val TARGET_FPS_MS = 60 * 1000
 
-		/**
-		 * カメラが対応する解像度一覧から指定した解像度順に一番近いものを選んで返す
-		 * @param supportedSizes
-		 * @param requestedWidth
-		 * @param requestedHeight
-		 * @return
-		 */
-		private fun getClosestSupportedSize(
-			supportedSizes: List<Camera.Size>,
-			requestedWidth: Int, requestedHeight: Int): Camera.Size {
-			return Collections.min(supportedSizes, object : Comparator<Camera.Size> {
-				private fun diff(size: Camera.Size): Int {
-					return (Math.abs(requestedWidth - size.width)
-						+ Math.abs(requestedHeight - size.height))
-				}
-
-				override fun compare(lhs: Camera.Size, rhs: Camera.Size): Int {
-					return diff(lhs) - diff(rhs)
-				}
-			})
-		}
 	}
 
 }
