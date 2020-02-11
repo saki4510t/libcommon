@@ -267,7 +267,7 @@ public class AspectScaledTextureView extends TextureView
 			// 何もしない
 			break;
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
-			final double video_width = mRequestedAspect * view_height;
+			final double video_width = mRequestedAspect > 0 ? mRequestedAspect * view_height : view_height;
 			final double video_height = view_height;
 			final double scale_x = view_width / video_width;
 			final double scale_y = view_height / video_height;
