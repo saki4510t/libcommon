@@ -110,12 +110,15 @@ cameraLoop:
 	/**
 	 * 指定したサイズと同じか近い解像度(±5%以内)を選択する
 	 * もし近い解像度が無ければカメラのデフォルト解像度を選択する
-	 * 結果はCamera.Parameters(mParams)へ設定
+	 * @param params
 	 * @param width
 	 * @param height
+	 * @return 見つかった解像度
+	 * @throws IllegalArgumentException 解像度を選択できなかった(起こらないはず)
 	 */
-	public static void chooseVideoSize(@NonNull final Camera.Parameters params,
-		 final int width, final int height) {
+	@NonNull
+	public static Camera.Size chooseVideoSize(@NonNull final Camera.Parameters params,
+		 final int width, final int height) throws IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "chooseVideoSize:");
 		// カメラの標準の解像度を取得する
@@ -136,10 +139,11 @@ cameraLoop:
 				Log.d(TAG, String.format("match supported preview size:%dx%d", size.width, size.height));
 				params.setPreviewSize(size.width, size.height);
 				params.setPictureSize(size.width, size.height);
-				return;
+				return size;
 			}
 		}
 
+		// 一致するのがなかったので近い解像度を選ぶ
 		Camera.Size selectedSize = getClosestSupportedSize(
 			params.getSupportedPreviewSizes(), width, height);
 
@@ -148,9 +152,10 @@ cameraLoop:
 			Log.d(TAG, String.format("use ppsfv: %dx%d", ppsfv.width, ppsfv.height));
 			params.setPreviewSize(ppsfv.width, ppsfv.height);
 			params.setPictureSize(ppsfv.width, ppsfv.height);
-		} else {
-			Log.w(TAG, String.format("Unable to set preview size to %dx%d)", width, height));
+			return ppsfv;
 		}
+		throw new IllegalArgumentException(
+			String.format("Unable to set preview size to %dx%d)", width, height));
 	}
 
 	/**
@@ -158,7 +163,7 @@ cameraLoop:
 	 * @param supportedSizes
 	 * @param requestWidth
 	 * @param requestHeight
-	 * @return
+	 * @return 選択した解像度
 	 */
 	@Nullable
 	public static Camera.Size getClosestSupportedSize(
@@ -208,9 +213,10 @@ cameraLoop:
 	 * 結果はCamera.Parameters(mParams)へ設定
 	 * @param minFps
 	 * @param maxFps
-	 * @return true: 見つかった, false: それ以外
+	 * @return 見つかったフレームレート範囲, nullなら見つからなかった
 	 */
-	public static boolean chooseFps(@NonNull final Camera.Parameters params,
+	@Nullable
+	public static int[] chooseFps(@NonNull final Camera.Parameters params,
 		final float minFps, final float maxFps) {
 		// サポートするフレームレートの一覧を取得、フレームレートの昇順にならんでいる
 		final List<int[]> fpsRanges = params.getSupportedPreviewFpsRange();
@@ -248,7 +254,7 @@ cameraLoop:
 			Log.d(TAG, String.format("chooseFps:(%dx%d),fps=%d-%d",
 				sz.width, sz.height, foundFpsRange[0], foundFpsRange[1]));
 		}
-		return foundFpsRange != null;
+		return foundFpsRange;
 	}
 
 	@SuppressLint("NewApi")
