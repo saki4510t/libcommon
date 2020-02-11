@@ -24,8 +24,6 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
@@ -34,7 +32,6 @@ import androidx.annotation.Nullable;
 import android.opengl.GLES30;
 import android.util.Log;
 import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import com.serenegiant.system.BuildCheck;
 
@@ -91,64 +88,6 @@ import com.serenegiant.system.BuildCheck;
 	} // Config
 
 	/**
-	 * Android4.1.2だとSurfaceを使えない。
-	 * SurfaceTexture/SurfaceHolderの場合は内部でSurfaceを生成して使っているにもかかわらず。
-	 * SurfaceHolderはインターフェースなのでSurfaceHolderを継承したダミークラスを生成して食わす
-	 */
-	public static class MySurfaceHolder implements SurfaceHolder {
-		private final Surface surface;
-
-		public MySurfaceHolder(final Surface surface) {
-			this.surface = surface;
-		}
-		@Override
-		public Surface getSurface() {
-			return surface;
-		}
-		// ここより下はどないでもええ
-		@Override
-		public void addCallback(final Callback callback) {
-		}
-		@Override
-		public void removeCallback(final Callback callback) {
-		}
-		@Override
-		public boolean isCreating() {
-			return false;
-		}
-		@Override
-		public void setType(final int type) {
-		}
-		@Override
-		public void setFixedSize(final int width, final int height) {
-		}
-		@Override
-		public void setSizeFromLayout() {
-		}
-		@Override
-		public void setFormat(final int format) {
-		}
-		@Override
-		public void setKeepScreenOn(final boolean screenOn) {
-		}
-		@Override
-		public Canvas lockCanvas() {
-			return null;
-		}
-		@Override
-		public Canvas lockCanvas(final Rect dirty) {
-			return null;
-		}
-		@Override
-		public void unlockCanvasAndPost(final Canvas canvas) {
-		}
-		@Override
-		public Rect getSurfaceFrame() {
-			return null;
-		}
-	} // MySurfaceHolder
-
-	/**
 	 * EGLレンダリングコンテキストに紐付ける描画オブジェクト
 	 */
 	private static class EglSurface implements IEglSurface {
@@ -176,7 +115,7 @@ import com.serenegiant.system.BuildCheck;
 				// Surfaceを生成して使っているにもかかわらず。
 				// SurfaceHolderはインターフェースなのでSurfaceHolderを
 				// 継承したダミークラスを生成して食わす
-				_surface = new MySurfaceHolder((Surface) surface);
+				_surface = new WrappedSurfaceHolder((Surface) surface);
 			} else {
 				_surface = surface;
 			}
