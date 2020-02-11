@@ -134,6 +134,16 @@ public class GLContext implements EGLConst {
 	 * @throws RuntimeException
 	 */
 	public void initialize() throws RuntimeException {
+		initialize(null);
+	}
+
+	/**
+	 * 初期化を実行
+	 * GLコンテキストを生成するスレッド上で実行すること
+	 * @param surface nullでなければコンテキスト保持用IEglSurfaceをそのsurfaceから生成する
+	 * @throws RuntimeException
+	 */
+	public void initialize(@Nullable final Object surface) throws RuntimeException {
 		if ((mSharedContext == null)
 			|| (mSharedContext instanceof EGLBase.IContext)) {
 
@@ -146,7 +156,11 @@ public class GLContext implements EGLConst {
 				(mFlags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
 		}
 		if (mEgl != null) {
-			mEglMasterSurface = mEgl.createOffscreen(mMasterWidth, mMasterHeight);
+			if (EGLBase.isSupportedSurface(surface)) {
+				mEglMasterSurface = mEgl.createFromSurface(surface);
+			} else {
+				mEglMasterSurface = mEgl.createOffscreen(mMasterWidth, mMasterHeight);
+			}
 			mGLThreadId = Thread.currentThread().getId();
 		} else {
 			throw new RuntimeException("failed to create EglCore");
