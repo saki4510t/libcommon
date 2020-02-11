@@ -452,7 +452,7 @@ public class EffectDrawer2D {
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
 	 */
-	public void changeEffect(final int effect) {
+	public void setEffect(final int effect) {
 		if (mEffect != effect) {
 			mEffect = effect;
 			boolean handled = false;
