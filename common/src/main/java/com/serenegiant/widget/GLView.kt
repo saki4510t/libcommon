@@ -169,6 +169,21 @@ open class GLView @JvmOverloads constructor(
 	}
 
 	/**
+	 * Viewportを設定
+	 * @param x
+	 * @param y
+	 * @param width
+	 * @param height
+	 */
+	fun setViewport(x: Int, y: Int, width: Int, height: Int) {
+		queueEvent(Runnable {
+			if (mTarget != null) {
+				mTarget!!.setViewPort(x, y, width, height)
+			}
+		})
+	}
+
+	/**
 	 * デフォルトのレンダリングコンテキストへ切り返る
 	 * Surfaceが有効であればそのサーフェースへの描画コンテキスト
 	 * Surfaceが無効であればEGL/GLコンテキスト保持用のオフスクリーンへの描画コンテキストになる
