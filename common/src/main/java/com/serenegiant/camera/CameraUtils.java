@@ -125,7 +125,7 @@ cameraLoop:
 	public static Camera.Size chooseVideoSize(@NonNull final Camera.Parameters params,
 		 final int width, final int height) throws IllegalArgumentException {
 
-//		if (DEBUG) Log.v(TAG, "chooseVideoSize:");
+		if (DEBUG) Log.v(TAG, String.format("chooseVideoSize:request(%dx%dx)", width, height));
 		// カメラの標準の解像度を取得する
 		final Camera.Size ppsfv = params.getPreferredPreviewSizeForVideo();
 		if (DEBUG) {

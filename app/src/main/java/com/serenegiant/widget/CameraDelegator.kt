@@ -153,7 +153,7 @@ class CameraDelegator(
 		if (cameraRenderer.hasSurface()) {
 			if (mCameraHandler == null) {
 				if (DEBUG) Log.v(TAG, "surface already exist")
-				startPreview(mView.getWidth(), mView.getHeight())
+				startPreview(width, height)
 			}
 		}
 	}
@@ -283,7 +283,7 @@ class CameraDelegator(
 	@SuppressLint("WrongThread")
 	@WorkerThread
 	private fun handleStartPreview(width: Int, height: Int) {
-		if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:")
+		if (DEBUG) Log.v(TAG, "CameraThread#handleStartPreview:(${width}x${height})")
 		var camera: Camera?
 		synchronized(mSync) {
 			camera = mCamera
@@ -299,8 +299,10 @@ class CameraDelegator(
 					val focusModes = params.supportedFocusModes
 					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
 						params.focusMode = Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO
+						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_CONTINUOUS_VIDEO")
 					} else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 						params.focusMode = Camera.Parameters.FOCUS_MODE_AUTO
+						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_AUTO")
 					} else {
 						if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus")
 					}
@@ -324,7 +326,6 @@ class CameraDelegator(
 					val surface = cameraRenderer.getInputSurface()
 					if (surface is SurfaceTexture) {
 						surface.setDefaultBufferSize(previewSize.width, previewSize.height)
-						camera!!.setPreviewTexture(surface)
 					}
 					CameraUtils.setPreviewSurface(camera!!, surface)
 				}

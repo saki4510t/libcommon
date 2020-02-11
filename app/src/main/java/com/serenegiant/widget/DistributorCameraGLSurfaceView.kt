@@ -246,7 +246,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				return
 			}
 			updateViewport()
-			mCameraDelegator.startPreview(width, height)
+			mCameraDelegator.startPreview(
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		}
 
 		/**

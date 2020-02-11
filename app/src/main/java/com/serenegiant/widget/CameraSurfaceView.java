@@ -95,13 +95,16 @@ public class CameraSurfaceView extends SurfaceView {
 					final List<String> focusModes = params.getSupportedFocusModes();
 					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
 						params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_CONTINUOUS_VIDEO");
 					} else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
 						params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_AUTO");
 					} else {
 						if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus");
 					}
 					params.setRecordingHint(true);
-					CameraUtils.chooseVideoSize(params, CameraConst.DEFAULT_WIDTH, CameraConst.DEFAULT_HEIGHT);
+					CameraUtils.chooseVideoSize(params,
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
 					final int[] fps = CameraUtils.chooseFps(params, 1.0f, 120.0f);
 					mRotation = CameraUtils.setupRotation(cameraId, this, mCamera, params);
 					mCamera.setParameters(params);

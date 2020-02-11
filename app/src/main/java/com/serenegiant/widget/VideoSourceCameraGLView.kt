@@ -72,7 +72,8 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			@WorkerThread
 			override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
 				mVideoSource!!.resize(width, height)
-				mCameraDelegator.startPreview(CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+				mCameraDelegator.startPreview(
+					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			}
 
 			@SuppressLint("WrongThread")
