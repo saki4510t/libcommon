@@ -37,6 +37,7 @@ import com.serenegiant.utils.SAFUtils
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.CameraDelegator
 import com.serenegiant.widget.CameraDelegator.ICameraView
+import com.serenegiant.widget.IScaledView
 import java.io.IOException
 
 /**
@@ -118,8 +119,13 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	protected fun onClick(view: View) {
 		when (view.id) {
 			R.id.cameraView -> {
-				val scale_mode = (mCameraView!!.getScaleMode() + 1) % 4
-				mCameraView!!.setScaleMode(scale_mode)
+				if (mCameraView is IScaledView) {
+					val scale_mode = (mCameraView!!.getScaleMode() + 1) % 3
+					mCameraView!!.setScaleMode(scale_mode)
+				} else {
+					val scale_mode = (mCameraView!!.getScaleMode() + 1) % 4
+					mCameraView!!.setScaleMode(scale_mode)
+				}
 				updateScaleModeText()
 			}
 			R.id.record_button -> if (!isRecording()) {
@@ -136,12 +142,20 @@ abstract class AbstractCameraFragment : BaseFragment() {
 
 	private fun updateScaleModeText() {
 		val scale_mode = mCameraView!!.getScaleMode()
-		mScaleModeView!!.text =
-			if (scale_mode == 0) "scale to fit"
-				else if (scale_mode == 1) "keep aspect(viewport)"
-				else if (scale_mode == 2) "keep aspect(matrix)"
-				else if (scale_mode == 3) "keep aspect(crop center)"
-				else ""
+		if (mCameraView is IScaledView) {
+			mScaleModeView!!.text =
+				if (scale_mode == 0) "keep aspect"
+					else if (scale_mode == 1) "scale to fit"
+					else if (scale_mode == 2) "keep aspect(crop center)"
+					else ""
+		} else {
+			mScaleModeView!!.text =
+				if (scale_mode == 0) "scale to fit"
+					else if (scale_mode == 1) "keep aspect(viewport)"
+					else if (scale_mode == 2) "keep aspect(matrix)"
+					else if (scale_mode == 3) "keep aspect(crop center)"
+					else ""
+		}
 	}
 
 	protected abstract fun isRecording(): Boolean
