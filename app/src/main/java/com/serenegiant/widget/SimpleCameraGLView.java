@@ -135,7 +135,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 
 			@Override
 			public void drawFrame() {
-				if (DEBUG && ((++cnt % 100) == 0)) Log.v(TAG, "drawFrame:" + cnt);
+				if (DEBUG && ((++cnt % 1800) == 0)) Log.v(TAG, "drawFrame:" + cnt);
 				if (mRequestUpdateTex) {
 					mRequestUpdateTex = false;
 					mSurfaceTexture.updateTexImage();
