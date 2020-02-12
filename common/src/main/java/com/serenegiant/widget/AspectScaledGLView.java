@@ -172,7 +172,7 @@ public class AspectScaledGLView extends GLView
 
 	@Override
 	public void setScaleMode(@ScaleMode final int scaleMode) {
-		if (DEBUG) Log.v(TAG, "setScaleMode" + scaleMode);
+		if (DEBUG) Log.v(TAG, "setScaleMode:" + scaleMode);
 		if (mScaleMode != scaleMode) {
 			mScaleMode = scaleMode;
 			requestLayout();
