@@ -116,7 +116,8 @@ public class MatrixUtils {
 	 * @param aMatrix
 	 * @return
 	 */
-	public static Matrix toAndroidMatrix(@NonNull final float[] transform,
+	public static Matrix toAndroidMatrix(
+		@NonNull @Size(min=16)final float[] transform,
 		@NonNull final Matrix result,
 		@NonNull @Size(min=9) final float[] aMatrix) {
 
