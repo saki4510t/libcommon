@@ -134,4 +134,35 @@ public class MatrixUtils {
 
 		return result;
 	}
+
+	/**
+	 * OpenGL|ESの4x4行列を列優先で文字列化
+	 * @param transform
+	 * @return
+	 */
+	public static String toGLMatrixString(
+		@NonNull @Size(min=16)final float[] transform) {
+
+		return "GLMatrix[" +
+			transform[0] + ", " +
+			transform[1] + ", " +
+			transform[2] + ", " +
+			transform[3] +
+			"][" +
+			transform[4] + ", " +
+			transform[5] + ", " +
+			transform[6] + ", " +
+			transform[7] +
+			"][" +
+			transform[8] + ", " +
+			transform[9] + ", " +
+			transform[10] + ", " +
+			transform[11] +
+			"][" +
+			transform[12] + ", " +
+			transform[13] + ", " +
+			transform[14] + ", " +
+			transform[15] +
+			']';
+	}
 }
