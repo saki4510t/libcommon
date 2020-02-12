@@ -75,8 +75,8 @@ public class MatrixUtils {
 	 * android.graphics.Matrixの3x3行列をOpenGLの4x4(列優先)行列に変換する
 	 * (アフィン変換のみ)
 	 * |a11 a12 a13|  |0 1 2|      |a11 a12   0 a13|   |0 4 8  12|
-	 * |a11 a12 a13|  |3 4 5|      |a21 a22   0 a23|   |1 5 9  13|
-	 * |a11 a12 a13|  |6 7 8| =>   |  0   0   1   0|   |2 6 10 14|
+	 * |a21 a22 a23|  |3 4 5|      |a21 a22   0 a23|   |1 5 9  13|
+	 * |a31 a32 a33|  |6 7 8| =>   |  0   0   1   0|   |2 6 10 14|
 	 *                             |a31 a32   0 a33|   |3 7 11 15|
 	 * @param transform
 	 * @param result
