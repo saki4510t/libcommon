@@ -257,8 +257,8 @@ public class AspectScaledTextureView extends TextureView
 		// (that can get ImageView#getDrawable)
 		// therefore update the image size from its Drawable
 		// set limit rectangle that the image can move
-		final int view_width = getWidth();
-		final int view_height = getHeight();
+		final int viewWidth = getWidth();
+		final int viewHeight = getHeight();
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
@@ -267,17 +267,17 @@ public class AspectScaledTextureView extends TextureView
 			// 何もしない
 			break;
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
-			final double video_width = mRequestedAspect > 0 ? mRequestedAspect * view_height : view_height;
-			final double video_height = view_height;
-			final double scale_x = view_width / video_width;
-			final double scale_y = view_height / video_height;
-			final double scale = Math.max(scale_x,  scale_y);	// SCALE_MODE_CROP
-//			final double scale = Math.min(scale_x, scale_y);	// SCALE_MODE_KEEP_ASPECT
-			final double width = scale * video_width;
-			final double height = scale * video_height;
+			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
+			final double videoHeight = viewHeight;
+			final double scaleX = viewWidth / videoWidth;
+			final double scaleY = viewHeight / videoHeight;
+			final double scale = Math.max(scaleX,  scaleY);		// SCALE_MODE_CROP
+//			final double scale = Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
+			final double width = scale * videoWidth;
+			final double height = scale * videoHeight;
 //			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-//				width, height, scale_x, scale_y, width / view_width, height / view_height));
-			mImageMatrix.postScale((float)(width / view_width), (float)(height / view_height), view_width / 2, view_height / 2);
+//				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
+			mImageMatrix.postScale((float)(width / viewWidth), (float)(height / viewHeight), viewWidth / 2, viewHeight / 2);
 			break;
 		}
 		setTransform(mImageMatrix);

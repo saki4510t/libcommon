@@ -365,16 +365,17 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 						x, y, width, height))
 					GLES20.glViewport(x, y, width, height)
 				}
-				CameraDelegator.SCALE_KEEP_ASPECT, CameraDelegator.SCALE_CROP_CENTER -> {
-					val scale_x = viewWidth / videoWidth
-					val scale_y = viewHeight / videoHeight
+				CameraDelegator.SCALE_KEEP_ASPECT,
+				CameraDelegator.SCALE_CROP_CENTER -> {
+					val scaleX = viewWidth / videoWidth
+					val scaleY = viewHeight / videoHeight
 					val scale
 						= if (scaleMode == CameraDelegator.SCALE_CROP_CENTER)
-							Math.max(scale_x, scale_y) else Math.min(scale_x, scale_y)
+							Math.max(scaleX, scaleY) else Math.min(scaleX, scaleY)
 					val width = scale * videoWidth
 					val height = scale * videoHeight
 					Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-						width, height, scale_x, scale_y, width / viewWidth, height / viewHeight))
+						width, height, scaleX, scaleY, width / viewWidth, height / viewHeight))
 					Matrix.scaleM(mMvpMatrix, 0,
 						(width / viewWidth).toFloat(),
 						(height / viewHeight).toFloat(),
