@@ -11,8 +11,8 @@ import android.view.Surface;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.graphics.MatrixUtils;
 
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class SimpleCameraGLView extends AspectScaledGLView
 	implements CameraDelegator.ICameraView {
@@ -94,7 +94,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 					}
 				}
 
-				@NotNull
+				@NonNull
 				@Override
 				public SurfaceTexture getInputSurface() {
 					if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:" + mSurfaceTexture);
@@ -169,7 +169,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 			}
 
 			@Override
-			public void applyTransformMatrix(@NotNull final Matrix transform) {
+			public void applyTransformMatrix(@NonNull final Matrix transform) {
 				if (mDrawer != null) {
 					MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork);
 					mDrawer.setMvpMatrix(mMvpMatrix, 0);
@@ -214,7 +214,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 	 * @param listener
 	 */
 	@Override
-	public void addListener(@NotNull final CameraDelegator.OnFrameAvailableListener listener) {
+	public void addListener(@NonNull final CameraDelegator.OnFrameAvailableListener listener) {
 		if (DEBUG) Log.v(TAG, "addListener:");
 	}
 
@@ -223,7 +223,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 	 * @param listener
 	 */
 	@Override
-	public void removeListener(@NotNull final CameraDelegator.OnFrameAvailableListener listener) {
+	public void removeListener(@NonNull final CameraDelegator.OnFrameAvailableListener listener) {
 		if (DEBUG) Log.v(TAG, "removeListener:");
 	}
 

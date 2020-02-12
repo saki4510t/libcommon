@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 
 import com.serenegiant.widget.CameraSurfaceView;
 
-import org.jetbrains.annotations.NotNull;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -29,7 +27,7 @@ public class CameraSurfaceFragment extends BaseFragment {
 	}
 
 	@Override
-	public void onAttach(@NotNull final Context context) {
+	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		requireActivity().setTitle(TAG);
 	}

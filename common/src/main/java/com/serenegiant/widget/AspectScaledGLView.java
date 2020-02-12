@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.serenegiant.common.R;
 
-import org.jetbrains.annotations.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * View/表示内容のスケーリング処理を追加したGLView
