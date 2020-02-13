@@ -28,8 +28,6 @@ import android.widget.ImageView;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.widget.ITransformView;
 
-import java.util.Arrays;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -135,21 +133,6 @@ public abstract class ViewContentTransformer
 	}
 
 	/**
-	 * トランスフォームマトリックスを設定する
-	 * @param transform nullまたは要素数が9未満なら単位行列が設定される
-	 */
-	public final void setTransform(@Nullable final float[] transform) {
-		if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
-		if ((transform != null) && (transform.length >= 9)) {
-			mTransform.setValues(transform);
-		} else {
-			mTransform.set(null);
-		}
-		internalSetTransform(mTransform);
-		calcValues(mTransform);
-	}
-
-	/**
 	 * トランスフォームマトリックスを実際にView側へ適用する
 	 * @param transform
 	 */
@@ -168,23 +151,6 @@ public abstract class ViewContentTransformer
 			return transform;
 		} else {
 			return new Matrix(mTransform);
-		}
-	}
-
-	/**
-	 * トランスフォームマトリックスのコピーを取得
-	 * @param transform nullまたは要素数が9未満なら内部で新しいfloat配列を生成して返す, そうでなければコピーする
-	 * @param transform
-	 * @return
-	 */
-	public float[] getTransform(@Nullable final float[] transform) {
-		if ((transform != null) && (transform.length >= 9)) {
-			mTransform.getValues(transform);
-			return transform;
-		} else {
-			final float[] result = new float[9];
-			mTransform.getValues(result);
-			return result;
 		}
 	}
 
