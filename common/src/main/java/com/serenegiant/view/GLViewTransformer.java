@@ -16,13 +16,27 @@ import androidx.annotation.Size;
 /**
  * GLViewのトランスフォーム処理用ヘルパークラス
  */
-public class GLViewTransformer {
+public class GLViewTransformer implements IContentTransformer.IGLViewTransformer {
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = GLViewTransformer.class.getSimpleName();
 
+	/**
+	 * 操作対象のGLView
+	 */
 	private final GLView mTargetView;
+	/**
+	 * トランスフォームマトリックス
+	 */
 	private final float[] mTransform = new float[16];
+	/**
+	 * デフォルトのトランスフォームマトリックス
+	 * #setDefaultで変更していなければコンストラクタ実行時に
+	 * Viewから取得したトランスフォームマトリックス
+	 */
 	private final float[] mDefaultTransform = new float[16];
+	/**
+	 * 計算用のワーク
+	 */
 	private final float[] work = new float[16];
 
 	/**
@@ -45,8 +59,13 @@ public class GLViewTransformer {
 	public GLViewTransformer(@NonNull final GLView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
+		updateTransform(true);
 	}
 
+	/**
+	 * 操作対象のGLViewを取得する
+	 * @return
+	 */
 	@NonNull
 	public GLView getTargetView() {
 		return mTargetView;
@@ -58,8 +77,10 @@ public class GLViewTransformer {
 	 * @param setAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public GLViewTransformer updateTransform(final boolean setAsDefault) {
-		getTargetView().getTransform(mTransform);
+		internalGetTransform(mTransform);
 		if (setAsDefault) {
 			System.arraycopy(mTransform, 0, mDefaultTransform, 0, 16);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
@@ -74,16 +95,13 @@ public class GLViewTransformer {
 		return this;
 	}
 
-	protected void internalSetTransform(@Nullable final float[] transform) {
-		if (DEBUG) Log.v(TAG, "internalSetTransform:" + MatrixUtils.toGLMatrixString(transform));
-		getTargetView().setTransform(transform);
-	}
-
 	/**
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullまたは要素数が16未満なら単位行列が設定される
 	 */
-	public final void setTransform(@Nullable @Size(min=16) final float[] transform) {
+	@NonNull
+	@Override
+	public final GLViewTransformer setTransform(@Nullable @Size(min=16) final float[] transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
 		if ((transform != null) && (transform.length >= 16)) {
 			System.arraycopy(transform, 0, mTransform, 0, 16);
@@ -92,6 +110,7 @@ public class GLViewTransformer {
 		}
 		internalSetTransform(mTransform);
 		calcValues(mTransform);
+		return this;
 	}
 
 	/**
@@ -100,6 +119,8 @@ public class GLViewTransformer {
 	 * @param transform
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public float[] getTransform(@Nullable final float[] transform) {
 		float[] result = transform;
 		if ((result == null) && (transform.length < 16)) {
@@ -111,9 +132,11 @@ public class GLViewTransformer {
 
 	/**
 	 * デフォルトのトランスフォームマトリックスを設定
-	 * @param transform
+	 * @param transform nullなら単位行列になる
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public GLViewTransformer setDefault(@NonNull @Size(min=16) final float[] transform) {
 		System.arraycopy(transform, 0, mDefaultTransform, 0, 16);
 		return this;
@@ -306,6 +329,32 @@ public class GLViewTransformer {
 	 */
 	public void mapPoints(@NonNull final float[] dst, @NonNull final float[] src) {
 		throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * デフォルトのトランスフォームマトリックスに
+	 * 指定したトランスフォームマトリックスをかけ合わせてから
+	 * GLViewへ適用する
+	 * @param transform
+	 */
+	protected void internalSetTransform(@Nullable final float[] transform) {
+		if (DEBUG) Log.v(TAG, "internalSetTransform:" + MatrixUtils.toGLMatrixString(transform));
+		if (transform != null) {
+			Matrix.multiplyMM(work, 0, transform, 0, mDefaultTransform, 0);
+			mTargetView.setTransform(work);
+		} else {
+			mTargetView.setTransform(mDefaultTransform);
+		}
+	}
+
+	/**
+	 * GLViewからのトランスフォームマトリックス取得処理
+	 * @param transform
+	 * @return
+	 */
+	@NonNull
+	protected float[] internalGetTransform(@Nullable final float[] transform) {
+		return mTargetView.getTransform(transform);
 	}
 
 	/**

@@ -7,15 +7,13 @@ import android.view.TextureView;
 
 import com.serenegiant.graphics.MatrixUtils;
 
-import java.util.Arrays;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
  * android.graphics.Matrixを使ったTextureViewの内容のトランスフォーム用ヘルパークラス
  */
-public class TextureViewTransformer {
+public class TextureViewTransformer implements IContentTransformer.IViewTransformer {
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = TextureViewTransformer.class.getSimpleName();
 
@@ -33,10 +31,11 @@ public class TextureViewTransformer {
 	 */
 	@NonNull
 	protected final Matrix mTransform = new Matrix();
+	private final Matrix mWork = new Matrix();
 	/**
 	 * Matrixアクセスのワーク用float配列
 	 */
-	private final float[] work = new float[9];
+	private final float[] workArray = new float[9];
 	/**
 	 * 平行移動量
 	 */
@@ -57,8 +56,13 @@ public class TextureViewTransformer {
 	public TextureViewTransformer(@NonNull final TextureView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
+		updateTransform(true);
 	}
 
+	/**
+	 * 操作対象のTextureViewを取得する
+	 * @return
+	 */
 	@NonNull
 	public TextureView getTargetView() {
 		return mTargetView;
@@ -68,28 +72,16 @@ public class TextureViewTransformer {
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullなら単位行列が設定される
 	 */
-	public final void setTransform(@Nullable final Matrix transform) {
+	@NonNull
+	@Override
+	public TextureViewTransformer setTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 		if (mTransform != transform) {
 			mTransform.set(transform);
 		}
 		internalSetTransform(mTransform);
 		calcValues(mTransform);
-	}
-
-	/**
-	 * トランスフォームマトリックスを設定する
-	 * @param transform nullまたは要素数が9未満なら単位行列が設定される
-	 */
-	public final void setTransform(@Nullable final float[] transform) {
-		if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
-		if ((transform != null) && (transform.length >= 9)) {
-			mTransform.setValues(transform);
-		} else {
-			mTransform.set(null);
-		}
-		internalSetTransform(mTransform);
-		calcValues(mTransform);
+		return this;
 	}
 
 	/**
@@ -98,37 +90,40 @@ public class TextureViewTransformer {
 	 * @return
 	 */
 	@NonNull
+	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		if (transform != null) {
-			return getTargetView().getTransform(transform);
-		} else {
-			return getTargetView().getTransform(new Matrix());
+		Matrix result = transform;
+		if (result == null) {
+			result = new Matrix();
 		}
+		result.set(mTransform);
+		return result;
 	}
 
-	/**
-	 * トランスフォームマトリックスのコピーを取得
-	 * @param transform nullまたは要素数が9未満なら内部で新しいfloat配列を生成して返す, そうでなければコピーする
-	 * @param transform
-	 * @return
-	 */
-	public float[] getTransform(@Nullable final float[] transform) {
-		if ((transform != null) && (transform.length >= 9)) {
-			mTransform.getValues(transform);
-			return transform;
+	@NonNull
+	@Override
+	public TextureViewTransformer updateTransform(final boolean setAsDefault) {
+		internalGetTransform(mTransform);
+		if (setAsDefault) {
+			mDefaultTransform.set(mTransform);
+			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+			resetValues();
 		} else {
-			final float[] result = new float[9];
-			mTransform.getValues(result);
-			return result;
+			calcValues(mTransform);
 		}
+		if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
+		return this;
 	}
 
 	/**
 	 * デフォルトのトランスフォームマトリックスを設定
-	 * @param transform
+	 * @param transform nullなら単位行列になる
 	 * @return
 	 */
-	public TextureViewTransformer setDefault(@NonNull final Matrix transform) {
+	@NonNull
+	@Override
+	public TextureViewTransformer setDefault(@Nullable final Matrix transform) {
 		mDefaultTransform.set(transform);
 		return this;
 	}
@@ -322,6 +317,33 @@ public class TextureViewTransformer {
 		mTransform.mapPoints(dst, src);
 	}
 
+//--------------------------------------------------------------------------------
+
+	/**
+	 * デフォルトのトランスフォームマトリックスに
+	 * 指定したトランスフォームマトリックスをかけ合わせてから
+	 * TextureViewへ適用する
+	 * @param transform
+	 */
+	protected void internalSetTransform(@Nullable final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+		mWork.set(mDefaultTransform);
+		if (transform != null) {
+			mWork.postConcat(mDefaultTransform);
+		}
+		mTargetView.setTransform(mWork);
+	}
+
+	/**
+	 * TextureViewからのトランスフォームマトリックス取得処理
+	 * @param transform
+	 * @return
+	 */
+	@NonNull
+	protected Matrix internalGetTransform(@Nullable final Matrix transform) {
+		return mTargetView.getTransform(transform);
+	}
+
 	/**
 	 * トランスフォームマトリックスを設定
 	 * @param transX
@@ -353,7 +375,6 @@ public class TextureViewTransformer {
 					mCurrentRotate += 360;
 				}
 			}
-			mDefaultTransform.getValues(work);
 			final int w2 = mTargetView.getWidth() >> 1;
 			final int h2 = mTargetView.getHeight() >> 1;
 			mTransform.reset();
@@ -384,12 +405,12 @@ public class TextureViewTransformer {
 	 */
 	protected void calcValues(@NonNull final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "calcValues:" + transform);
-		mTransform.getValues(work);
-		mCurrentTransX = work[Matrix.MTRANS_X];
-		mCurrentTransY = work[Matrix.MTRANS_Y];
-		mCurrentScaleX = work[Matrix.MSCALE_X];
-		mCurrentScaleY = MatrixUtils.getScale(work);
-		mCurrentRotate = MatrixUtils.getRotate(work);
+		mTransform.getValues(workArray);
+		mCurrentTransX = workArray[Matrix.MTRANS_X];
+		mCurrentTransY = workArray[Matrix.MTRANS_Y];
+		mCurrentScaleX = workArray[Matrix.MSCALE_X];
+		mCurrentScaleY = MatrixUtils.getScale(workArray);
+		mCurrentRotate = MatrixUtils.getRotate(workArray);
 		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
 			mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
@@ -403,25 +424,6 @@ public class TextureViewTransformer {
 		mCurrentTransX = mCurrentTransY = 0.0f;
 		mCurrentScaleX = mCurrentScaleY = 1.0f;
 		mCurrentRotate = 0.0f;
-	}
-
-	public TextureViewTransformer updateTransform(final boolean setAsDefault) {
-		getTargetView().getTransform(mTransform);
-		if (setAsDefault) {
-			mDefaultTransform.set(mTransform);
-			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
-			resetValues();
-		} else {
-			calcValues(mTransform);
-		}
-		if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
-		return this;
-	}
-
-	protected void internalSetTransform(@Nullable final Matrix transform) {
-		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-		getTargetView().setTransform(transform);
 	}
 
 }
