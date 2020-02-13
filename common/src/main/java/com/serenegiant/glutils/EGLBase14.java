@@ -20,7 +20,6 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
-import android.graphics.SurfaceTexture;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -35,9 +34,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.util.Log;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import com.serenegiant.system.BuildCheck;
 
