@@ -107,7 +107,7 @@ public class ViewTransformer
 	public ViewTransformer updateTransform(final boolean saveAsDefault) {
 		internalGetTransform(mTransform);
 		if (saveAsDefault) {
-			mDefaultTransform.set(mTransform);
+			setDefault(mTransform);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
 			resetValues();
 		} else {
