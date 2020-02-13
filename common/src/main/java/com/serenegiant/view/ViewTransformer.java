@@ -329,7 +329,7 @@ public class ViewTransformer
 	 */
 	protected void internalSetTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-		mWork.set(mDefaultTransform);
+		mWork.set(transform);
 		if (transform != null) {
 			mWork.postConcat(mDefaultTransform);
 		}
