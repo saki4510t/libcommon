@@ -104,9 +104,9 @@ public class ViewTransformer
 
 	@NonNull
 	@Override
-	public ViewTransformer updateTransform(final boolean setAsDefault) {
+	public ViewTransformer updateTransform(final boolean saveAsDefault) {
 		internalGetTransform(mTransform);
-		if (setAsDefault) {
+		if (saveAsDefault) {
 			mDefaultTransform.set(mTransform);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
 			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
@@ -114,7 +114,7 @@ public class ViewTransformer
 		} else {
 			calcValues(mTransform);
 		}
-		if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
+		if (DEBUG) Log.v(TAG, "updateTransform:" + saveAsDefault + "," + mTransform);
 		return this;
 	}
 

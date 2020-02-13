@@ -76,14 +76,14 @@ public class GLViewTransformer
 	/**
 	 * ViewContentTransformerで保持しているトランスフォームマトリックスを
 	 * ターゲットViewに設定されているトランスフォームマトリックスに設定する
-	 * @param setAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
+	 * @param saveAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
 	 * @return
 	 */
 	@NonNull
 	@Override
-	public GLViewTransformer updateTransform(final boolean setAsDefault) {
+	public GLViewTransformer updateTransform(final boolean saveAsDefault) {
 		internalGetTransform(mTransform);
-		if (setAsDefault) {
+		if (saveAsDefault) {
 			System.arraycopy(mTransform, 0, mDefaultTransform, 0, 16);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
 			if (DEBUG) Log.v(TAG, "updateTransform:default="
@@ -92,7 +92,7 @@ public class GLViewTransformer
 		} else {
 			calcValues(mTransform);
 		}
-		if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault
+		if (DEBUG) Log.v(TAG, "updateTransform:" + saveAsDefault
 			+ "," + MatrixUtils.toGLMatrixString(mTransform));
 		return this;
 	}
