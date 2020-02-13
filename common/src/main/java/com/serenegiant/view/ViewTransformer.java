@@ -11,12 +11,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * ITransformViewの内容のトランスフォーム用ヘルパークラス
+ * ITransformViewの表示内容のトランスフォーム用ヘルパークラス
  */
 public class ViewTransformer
 	implements IContentTransformer.IViewTransformer {
 
-	private static final boolean DEBUG = false;	// TODO for debugging
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewTransformer.class.getSimpleName();
 
 	@NonNull
