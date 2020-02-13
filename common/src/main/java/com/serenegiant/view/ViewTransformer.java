@@ -109,7 +109,6 @@ public class ViewTransformer
 		if (saveAsDefault) {
 			mDefaultTransform.set(mTransform);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
 			resetValues();
 		} else {
 			calcValues(mTransform);
@@ -126,6 +125,7 @@ public class ViewTransformer
 	@NonNull
 	@Override
 	public ViewTransformer setDefault(@Nullable final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "setDefault=" + transform);
 		mDefaultTransform.set(transform);
 		return this;
 	}
