@@ -156,7 +156,7 @@ public class GLContext implements EGLConst {
 				(mFlags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
 		}
 		if (mEgl != null) {
-			if (EGLBase.isSupportedSurface(surface)) {
+			if (GLUtils.isSupportedSurface(surface)) {
 				mEglMasterSurface = mEgl.createFromSurface(surface);
 			} else {
 				mEglMasterSurface = mEgl.createOffscreen(mMasterWidth, mMasterHeight);

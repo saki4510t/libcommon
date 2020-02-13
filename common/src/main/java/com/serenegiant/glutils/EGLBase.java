@@ -19,11 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.TargetApi;
-import android.graphics.SurfaceTexture;
 import android.os.Build;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 
 import androidx.annotation.Nullable;
 
@@ -45,20 +41,6 @@ public abstract class EGLBase implements EGLConst {
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
 //--------------------------------------------------------------------------------
-
-	/**
-	 * 対応しているSurfaceかどうかを確認
-	 * Surface/SurfaceHolder/SurfaceTexture/SurfaceViewならtrue
-	 * @param surface
-	 * @return
-	 */
-	public static boolean isSupportedSurface(@Nullable final Object surface) {
-		return ((surface instanceof Surface)
-			|| (surface instanceof SurfaceHolder)
-			|| (surface instanceof SurfaceTexture)
-			|| (surface instanceof SurfaceView));
-	}
-
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
 	 * maxClientVersion=3, ステンシルバッファなし

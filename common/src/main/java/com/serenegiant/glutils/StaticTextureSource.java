@@ -310,7 +310,7 @@ public class StaticTextureSource {
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
 			checkFinished();
-			if (!EGLBase.isSupportedSurface(surface)) {
+			if (!GLUtils.isSupportedSurface(surface)) {
 				throw new IllegalArgumentException(
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}

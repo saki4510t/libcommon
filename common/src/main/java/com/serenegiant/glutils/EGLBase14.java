@@ -109,7 +109,7 @@ import com.serenegiant.system.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
-			if (isSupportedSurface(surface)) {
+			if (GLUtils.isSupportedSurface(surface)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
 				mOwnSurface = true;
 				setViewPort(0, 0, getWidth(), getHeight());

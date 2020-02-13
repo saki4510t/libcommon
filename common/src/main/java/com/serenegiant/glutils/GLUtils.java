@@ -18,15 +18,21 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
 
@@ -39,6 +45,19 @@ public class GLUtils {
 	}
 
 	private static int sSupportedGLVersion = -1;
+
+	/**
+	 * 対応しているSurfaceかどうかを確認
+	 * Surface/SurfaceHolder/SurfaceTexture/SurfaceViewならtrue
+	 * @param surface
+	 * @return
+	 */
+	public static boolean isSupportedSurface(@Nullable final Object surface) {
+		return ((surface instanceof Surface)
+			|| (surface instanceof SurfaceHolder)
+			|| (surface instanceof SurfaceTexture)
+			|| (surface instanceof SurfaceView));
+	}
 
 	/**
 	 * 対応しているGL|ESのバージョンを取得

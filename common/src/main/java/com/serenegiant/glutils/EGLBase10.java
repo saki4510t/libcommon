@@ -119,7 +119,7 @@ import com.serenegiant.system.BuildCheck;
 			} else {
 				_surface = surface;
 			}
-			if (isSupportedSurface(_surface)) {
+			if (GLUtils.isSupportedSurface(_surface)) {
 				mEglSurface = mEglBase.createWindowSurface(_surface);
 				mOwnSurface = true;
 				setViewPort(0, 0, getWidth(), getHeight());
