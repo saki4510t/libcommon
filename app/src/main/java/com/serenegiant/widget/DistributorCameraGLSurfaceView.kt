@@ -46,7 +46,7 @@ import javax.microedition.khronos.opengles.GL10
  */
 class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: GLSurfaceView(context, attrs, defStyle), ICameraView {
+		: GLSurfaceView(context, attrs), ICameraView {
 
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
