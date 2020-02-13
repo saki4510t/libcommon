@@ -262,17 +262,18 @@ public class AspectScaledTextureView extends TextureView
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
-		case SCALE_MODE_KEEP_ASPECT:
 		case SCALE_MODE_STRETCH_TO_FIT:
 			// 何もしない
 			break;
+		case SCALE_MODE_KEEP_ASPECT:
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
 			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
 			final double videoHeight = viewHeight;
 			final double scaleX = viewWidth / videoWidth;
 			final double scaleY = viewHeight / videoHeight;
-			final double scale = Math.max(scaleX,  scaleY);		// SCALE_MODE_CROP
-//			final double scale = Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
+			final double scale = (mScaleMode == SCALE_MODE_CROP)
+				? Math.max(scaleX,  scaleY)	// SCALE_MODE_CROP
+				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * videoWidth;
 			final double height = scale * videoHeight;
 //			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",

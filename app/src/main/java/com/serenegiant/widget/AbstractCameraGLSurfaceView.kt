@@ -32,6 +32,7 @@ import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
+import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
@@ -60,7 +61,6 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
-		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
 		glVersion = GLUtils.getSupportedGLVersion()
 		mCameraDelegator = CameraDelegator(this@AbstractCameraGLSurfaceView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
@@ -334,10 +334,10 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 				return
 			}
 			val viewAspect = viewWidth / viewHeight.toDouble()
-			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
-				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight))
-			Matrix.setIdentityM(mMvpMatrix, 0)
 			val scaleMode = mCameraDelegator.scaleMode
+			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f),scaleMode=%d",
+				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight, scaleMode))
+			Matrix.setIdentityM(mMvpMatrix, 0)
 			when (scaleMode) {
 				CameraDelegator.SCALE_STRETCH_FIT -> {
 				}
@@ -382,6 +382,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 						1.0f)
 				}
 			}
+			Log.v(TAG, "updateViewport:" + MatrixUtils.toGLMatrixString(mMvpMatrix))
 			mDrawer?.setMvpMatrix(mMvpMatrix, 0)
 		}
 

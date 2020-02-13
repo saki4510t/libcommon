@@ -20,11 +20,12 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.graphics.Matrix;
+import android.opengl.Matrix;
 import android.util.AttributeSet;
 import android.util.Log;
 
 import com.serenegiant.common.R;
+import com.serenegiant.graphics.MatrixUtils;
 
 import androidx.annotation.Nullable;
 
@@ -38,7 +39,6 @@ public class AspectScaledGLView extends GLView
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = AspectScaledGLView.class.getSimpleName();
 
-	protected final Matrix mImageMatrix = new Matrix();
 	@ScaleMode
 	private int mScaleMode;
 	private double mRequestedAspect;		// initially use default window size
@@ -56,7 +56,9 @@ public class AspectScaledGLView extends GLView
 	 * @param context
 	 * @param attrs
 	 */
-	public AspectScaledGLView(@Nullable final Context context, @Nullable final AttributeSet attrs) {
+	public AspectScaledGLView(@Nullable final Context context,
+		@Nullable final AttributeSet attrs) {
+
 		this(context, attrs, 0);
 	}
 
@@ -66,10 +68,13 @@ public class AspectScaledGLView extends GLView
 	 * @param attrs
 	 * @param defStyleAttr
 	 */
-	public AspectScaledGLView(@Nullable final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
+	public AspectScaledGLView(@Nullable final Context context,
+		@Nullable final AttributeSet attrs, final int defStyleAttr) {
+
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AspectScaledGLView, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.AspectScaledGLView, defStyleAttr, 0);
 		try {
 			mRequestedAspect = a.getFloat(R.styleable.AspectScaledGLView_aspect_ratio, -1.0f);
 			mScaleMode = a.getInt(R.styleable.AspectScaledGLView_scale_mode, SCALE_MODE_KEEP_ASPECT);
@@ -97,7 +102,7 @@ public class AspectScaledGLView extends GLView
 			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
 
 			// 計算誤差が生じる可能性が有るので指定した値との差が小さければそのままにする
-			if (Math.abs(aspectDiff) > 0.01) {
+			if (Math.abs(aspectDiff) > 0.005) {
 				if (aspectDiff > 0) {
 					// 幅基準で高さを決める
 					initialHeight = (int) (initialWidth / mRequestedAspect);
@@ -118,15 +123,19 @@ public class AspectScaledGLView extends GLView
 	private int prevWidth = -1;
 	private int prevHeight = -1;
 	@Override
-	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
-		super.onLayout(changed, left, top, right, bottom);
-		if (DEBUG) Log.v(TAG, "onLayout:width=" + getWidth() + ",height=" + getHeight());
-		if (getWidth() == 0 || getHeight() == 0) return;
+	protected void onLayout(final boolean changed,
+		final int left, final int top, final int right, final int bottom) {
 
-		if (prevWidth != getWidth() || prevHeight != getHeight()) {
-			prevWidth = getWidth();
-			prevHeight = getHeight();
-			onResize(prevWidth, prevHeight);
+		super.onLayout(changed, left, top, right, bottom);
+		final int width = right - left;
+		final int height = bottom - top;
+		if (DEBUG) Log.v(TAG, String.format("onLayout:(%dx%d)", width, height));
+		if ((width == 0) || (height == 0)) return;
+
+		if ((prevWidth != width) || (prevHeight != height)) {
+			prevWidth = width;
+			prevHeight = height;
+			onResize(width, height);
 		}
 		init();
 	}
@@ -194,30 +203,33 @@ public class AspectScaledGLView extends GLView
 	protected void init() {
 		final int viewWidth = getWidth();
 		final int viewHeight = getHeight();
+		final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
+		final double videoHeight = viewHeight;
 		if (DEBUG) Log.v(TAG, String.format("init:(%dx%d),mScaleMode=%d",
 			viewWidth ,viewHeight, mScaleMode) );
 		// apply matrix
-		mImageMatrix.reset();
+		final float[] transform = new float[16];
+		Matrix.setIdentityM(transform, 0);
 		switch (mScaleMode) {
-		case SCALE_MODE_KEEP_ASPECT:	// これはViewのサイズを変更しているので何もしない
 		case SCALE_MODE_STRETCH_TO_FIT:	// これは引き伸ばすので何もしない
 			// 何もしない
 			break;
+		case SCALE_MODE_KEEP_ASPECT:
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
-			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
-			final double videoHeight = viewHeight;
 			final double scaleX = viewWidth / videoWidth;
 			final double scaleY = viewHeight / videoHeight;
-			final double scale = Math.max(scaleX,  scaleY);	// SCALE_MODE_CROP
-//			final double scale = Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
-			final double width = scale * videoWidth;
-			final double height = scale * videoHeight;
+			final double scale = (mScaleMode == SCALE_MODE_CROP)
+				? Math.max(scaleX,  scaleY)	// SCALE_MODE_CROP
+				: Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
+			final float width = (float)(scale * videoWidth);
+			final float height = (float)(scale * videoHeight);
 			if (DEBUG) Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
 				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
-			mImageMatrix.postScale((float)(width / viewWidth), (float)(height / viewHeight), viewWidth / 2, viewHeight / 2);
+			Matrix.scaleM(transform, 0,
+				width / viewWidth, height / viewHeight, 1.0f);
 			break;
 		}
-		if (DEBUG) Log.v(TAG, "init:" + mImageMatrix);
-		setTransform(mImageMatrix);
+		if (DEBUG) Log.v(TAG, "init:" + MatrixUtils.toGLMatrixString(transform));
+		setTransform(transform);
 	}
 }

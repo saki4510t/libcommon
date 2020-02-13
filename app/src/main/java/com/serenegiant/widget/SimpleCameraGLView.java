@@ -2,7 +2,6 @@ package com.serenegiant.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -13,6 +12,7 @@ import com.serenegiant.graphics.MatrixUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 public class SimpleCameraGLView extends AspectScaledGLView
 	implements CameraDelegator.ICameraView {
@@ -23,8 +23,6 @@ public class SimpleCameraGLView extends AspectScaledGLView
 	private final Object mSync = new Object();
 	private final CameraDelegator mCameraDelegator;
 	private final float[] mTexMatrix = new float[16];
-	private final float[] mMvpMatrix = new float[16];
-	private final float[] mWork = new float[9];
 
 	private GLDrawer2D mDrawer;
 	private int mTexId;
@@ -169,10 +167,11 @@ public class SimpleCameraGLView extends AspectScaledGLView
 			}
 
 			@Override
-			public void applyTransformMatrix(@NonNull final Matrix transform) {
+			public void applyTransformMatrix(@NonNull @Size(min=16) final float[] transform) {
 				if (mDrawer != null) {
-					MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork);
-					mDrawer.setMvpMatrix(mMvpMatrix, 0);
+					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
+						+ MatrixUtils.toGLMatrixString(transform));
+					mDrawer.setMvpMatrix(transform, 0);
 				}
 			}
 		});
@@ -207,6 +206,7 @@ public class SimpleCameraGLView extends AspectScaledGLView
 	public void setVideoSize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height));
 		mCameraDelegator.setVideoSize(width, height);
+		setAspectRatio(width, height);
 	}
 
 	/**

@@ -20,8 +20,8 @@ package com.serenegiant.widget
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Matrix
 import android.opengl.GLES20
+import android.opengl.Matrix
 import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
@@ -30,12 +30,12 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
+import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glutils.GLContext
 import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.ISurface
-import com.serenegiant.view.ViewContentTransformer
 
 /**
  * SurfaceViewのSurfaceへOpenGL|ESで描画するためのヘルパークラス
@@ -65,7 +65,7 @@ open class GLView @JvmOverloads constructor(
 		 * トランスフォームマトリックスを適用
 		 */
 		@WorkerThread
-		fun applyTransformMatrix(transform: Matrix)
+		fun applyTransformMatrix(@Size(min=16) transform: FloatArray)
 		/**
 		 * 描画イベント
 		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
@@ -90,16 +90,17 @@ open class GLView @JvmOverloads constructor(
 	 */
 	private var mTarget: ISurface? = null
 
-	private val mMatrix = Matrix()
+	private val mMatrix: FloatArray = FloatArray(16)
 	private var mMatrixChanged = false
 
-	private var mGLRenderer: GLRenderer? = null;
+	private var mGLRenderer: GLRenderer? = null
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
-		mGLManager = GLManager(GLUtils.getSupportedGLVersion())
+		mGLManager = GLManager()
 		mGLContext = mGLManager.glContext
 		mGLHandler = mGLManager.glHandler
+		Matrix.setIdentityM(mMatrix, 0)
 		holder.addCallback(object : SurfaceHolder.Callback {
 			override fun surfaceCreated(holder: SurfaceHolder) {
 				if (DEBUG) Log.v(TAG, "surfaceCreated:")
@@ -162,6 +163,7 @@ open class GLView @JvmOverloads constructor(
 	/**
 	 * GLRendererをセット
 	 */
+	@AnyThread
 	fun setRenderer(renderer: GLRenderer?) {
 		queueEvent(Runnable {
 			mGLRenderer = renderer
@@ -175,6 +177,7 @@ open class GLView @JvmOverloads constructor(
 	 * @param width
 	 * @param height
 	 */
+	@AnyThread
 	fun setViewport(x: Int, y: Int, width: Int, height: Int) {
 		queueEvent(Runnable {
 			if (mTarget != null) {
@@ -182,20 +185,6 @@ open class GLView @JvmOverloads constructor(
 			}
 		})
 	}
-
-	/**
-	 * デフォルトのレンダリングコンテキストへ切り返る
-	 * Surfaceが有効であればそのサーフェースへの描画コンテキスト
-	 * Surfaceが無効であればEGL/GLコンテキスト保持用のオフスクリーンへの描画コンテキストになる
-	 */
-	@WorkerThread
- 	protected fun makeDefault() {
- 		if (mTarget != null) {
- 			mTarget!!.makeCurrent()
-		} else {
-			mGLContext.makeDefault()
-		}
- 	}
 
 	/**
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行要求する
@@ -229,9 +218,13 @@ open class GLView @JvmOverloads constructor(
 	 * ITransformViewの実装
 	 */
 	@AnyThread
-	override fun setTransform(transform: Matrix?) {
+	fun setTransform(@Size(min=16) transform: FloatArray?) {
 		synchronized(mMatrix) {
-			mMatrix.set(transform)
+			if (transform != null) {
+				System.arraycopy(transform, 0, mMatrix, 0, 16)
+			} else {
+				Matrix.setIdentityM(mMatrix, 0)
+			}
 			mMatrixChanged = true
 		}
 	}
@@ -240,17 +233,33 @@ open class GLView @JvmOverloads constructor(
 	 * ITransformViewの実装
 	 */
 	@AnyThread
-	override fun getTransform(transform: Matrix?): Matrix {
+	fun getTransform(@Size(min=16) transform: FloatArray?): FloatArray {
 		var result = transform
 		if (result == null) {
-			result = Matrix()
+			result = FloatArray(16)
 		}
-		result.set(mMatrix)
+		synchronized(mMatrix) {
+			System.arraycopy(mMatrix, 0, result, 0, 16)
+		}
 
 		return result
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * デフォルトのレンダリングコンテキストへ切り返る
+	 * Surfaceが有効であればそのサーフェースへの描画コンテキスト
+	 * Surfaceが無効であればEGL/GLコンテキスト保持用のオフスクリーンへの描画コンテキストになる
+	 */
+	@WorkerThread
+ 	protected fun makeDefault() {
+ 		if (mTarget != null) {
+ 			mTarget!!.makeCurrent()
+		} else {
+			mGLContext.makeDefault()
+		}
+ 	}
+
 	/**
 	 * Choreographerを使ったvsync同期用描画のFrameCallback実装
 	 */
@@ -283,7 +292,8 @@ open class GLView @JvmOverloads constructor(
 	protected fun onSurfaceCreated() {
 		if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
 		mTarget = mGLContext.egl.createFromSurface(holder.surface)
-		mTarget!!.setViewPort(0, 0, width, height)
+		// 画面全体へ描画するためにビューポートを設定する
+		mTarget?.setViewPort(0, 0, width, height)
 		mGLManager.postFrameCallbackDelayed(mChoreographerCallback, 0)
 		mGLRenderer?.onSurfaceCreated()
 	}
@@ -298,7 +308,8 @@ open class GLView @JvmOverloads constructor(
 		format: Int, width: Int, height: Int) {
 
 		if (DEBUG) Log.v(TAG, "onSurfaceChanged:(${width}x${height})")
-		mTarget!!.setViewPort(0, 0, width, height)
+		// 画面全体へ描画するためにビューポートを設定する
+		mTarget?.setViewPort(0, 0, width, height)
 		mGLRenderer?.onSurfaceChanged(format, width, height)
 	}
 
@@ -334,7 +345,7 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	@CallSuper
-	protected fun applyTransformMatrix(transform: Matrix) {
+	protected fun applyTransformMatrix(@Size(min=16) transform: FloatArray) {
 		if (DEBUG) Log.v(TAG, "applyTransformMatrix:")
 		mGLRenderer?.applyTransformMatrix(transform)
 	}

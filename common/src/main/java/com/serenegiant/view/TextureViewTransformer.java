@@ -1,29 +1,9 @@
 package com.serenegiant.view;
-/*
- * libcommon
- * utility/helper classes for myself
- *
- * Copyright (c) 2014-2020 saki t_saki@serenegiant.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
-*/
 
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.Log;
 import android.view.TextureView;
-import android.view.View;
-import android.widget.ImageView;
 
 import com.serenegiant.graphics.MatrixUtils;
 
@@ -33,43 +13,14 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Viewの表示内容の座標変換を行うためのヘルパークラス
+ * android.graphics.Matrixを使ったTextureViewの内容のトランスフォーム用ヘルパークラス
  */
-@Deprecated
-public abstract class ViewContentTransformer {
+public class TextureViewTransformer {
 	private static final boolean DEBUG = false;	// TODO for debugging
-	private static final String TAG = ViewContentTransformer.class.getSimpleName();
+	private static final String TAG = TextureViewTransformer.class.getSimpleName();
 
-	/**
-	 * Transform可能Viewを示すインターフェース
-	 */
-	public interface ITransformView {
-		@NonNull
-		public Matrix getTransform(@Nullable Matrix transform);
-		public void setTransform(Matrix transform);
-	}
-
-	/**
-	 * インスタンス生成のためのヘルパーメソッド
-	 * @param view
-	 * @return
-	 */
 	@NonNull
-	public static ViewContentTransformer newInstance(@NonNull final View view) {
-		if (view instanceof TextureView) {
-			return new TextureViewTransformer((TextureView)view);
-		} else if (view instanceof ImageView) {
-			return new ImageViewTransformer((ImageView) view);
-		} else if (view instanceof ITransformView) {
-			return new ITransformViewTransformer((ITransformView)view);
-		} else {
-			return new DefaultTransformer(view);
-		}
-	}
-
-//--------------------------------------------------------------------------------
-	@NonNull
-	protected final View mTargetView;
+	private final TextureView mTargetView;
 	/**
 	 * デフォルトのトランスフォームマトリックス
 	 * #setDefaultで変更していなければコンストラクタ実行時に
@@ -103,24 +54,15 @@ public abstract class ViewContentTransformer {
 	 * コンストラクタ
 	 * @param view
 	 */
-	protected ViewContentTransformer(@NonNull final View view) {
+	public TextureViewTransformer(@NonNull final TextureView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
-		updateTransform(true);
 	}
 
 	@NonNull
-	public View getTargetView() {
+	public TextureView getTargetView() {
 		return mTargetView;
 	}
-
-	/**
-	 * ViewContentTransformerで保持しているトランスフォームマトリックスを
-	 * ターゲットViewに設定されているトランスフォームマトリックスに設定する
-	 * @param setAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
-	 * @return
-	 */
-	public abstract ViewContentTransformer updateTransform(final boolean setAsDefault);
 
 	/**
 	 * トランスフォームマトリックスを設定する
@@ -151,12 +93,6 @@ public abstract class ViewContentTransformer {
 	}
 
 	/**
-	 * トランスフォームマトリックスを実際にView側へ適用する
-	 * @param transform
-	 */
-	protected abstract void internalSetTransform(@NonNull final Matrix transform);
-
-	/**
 	 * トランスフォームマトリックスのコピーを取得
 	 * @param transform nullなら内部で新しいMatrixを生成して返す, nullでなければコピーする
 	 * @return
@@ -164,10 +100,9 @@ public abstract class ViewContentTransformer {
 	@NonNull
 	public Matrix getTransform(@Nullable final Matrix transform) {
 		if (transform != null) {
-			transform.set(mTransform);
-			return transform;
+			return getTargetView().getTransform(transform);
 		} else {
-			return new Matrix(mTransform);
+			return getTargetView().getTransform(new Matrix());
 		}
 	}
 
@@ -193,7 +128,7 @@ public abstract class ViewContentTransformer {
 	 * @param transform
 	 * @return
 	 */
-	public ViewContentTransformer setDefault(@NonNull final Matrix transform) {
+	public TextureViewTransformer setDefault(@NonNull final Matrix transform) {
 		mDefaultTransform.set(transform);
 		return this;
 	}
@@ -214,7 +149,7 @@ public abstract class ViewContentTransformer {
 	 * @param y
 	 * @return
 	 */
-	public ViewContentTransformer setTranslate(final float x, final float y) {
+	public TextureViewTransformer setTranslate(final float x, final float y) {
 		if (DEBUG) Log.v(TAG, String.format("setTranslate:(%f,%f)", x, y));
 		return setTransform(x, y,
 			mCurrentScaleX, mCurrentScaleY,
@@ -227,7 +162,7 @@ public abstract class ViewContentTransformer {
 	 * @param dy
 	 * @return
 	 */
-	public ViewContentTransformer translate(final float dx, final float dy) {
+	public TextureViewTransformer translate(final float dx, final float dy) {
 		if (DEBUG) Log.v(TAG, String.format("translate:(%f,%f)", dx, dy));
 		return setTransform(mCurrentTransX + dx, mCurrentTransY + dy,
 			mCurrentScaleX, mCurrentScaleY,
@@ -270,7 +205,7 @@ public abstract class ViewContentTransformer {
 	 * @param scaleY
 	 * @return
 	 */
-	public ViewContentTransformer setScale(final float scaleX, final float scaleY) {
+	public TextureViewTransformer setScale(final float scaleX, final float scaleY) {
 		if (DEBUG) Log.v(TAG, String.format("setScale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scaleX, scaleY,
@@ -282,7 +217,7 @@ public abstract class ViewContentTransformer {
 	 * @param scale
 	 * @return
 	 */
-	public ViewContentTransformer setScale(final float scale) {
+	public TextureViewTransformer setScale(final float scale) {
 		if (DEBUG) Log.v(TAG, String.format("setScale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scale, scale,
@@ -295,7 +230,7 @@ public abstract class ViewContentTransformer {
 	 * @param scaleY
 	 * @return
 	 */
-	public ViewContentTransformer scale(final float scaleX, final float scaleY) {
+	public TextureViewTransformer scale(final float scaleX, final float scaleY) {
 		if (DEBUG) Log.v(TAG, String.format("scale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scaleX, mCurrentScaleY * scaleY,
@@ -307,7 +242,7 @@ public abstract class ViewContentTransformer {
 	 * @param scale
 	 * @return
 	 */
-	public ViewContentTransformer scale(final float scale) {
+	public TextureViewTransformer scale(final float scale) {
 		if (DEBUG) Log.v(TAG, String.format("scale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scale, mCurrentScaleY * scale,
@@ -343,7 +278,7 @@ public abstract class ViewContentTransformer {
 	 * @param degrees
 	 * @return
 	 */
-	public ViewContentTransformer setRotate(final float degrees) {
+	public TextureViewTransformer setRotate(final float degrees) {
 		if (DEBUG) Log.v(TAG, String.format("setRotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
@@ -355,7 +290,7 @@ public abstract class ViewContentTransformer {
 	 * @param degrees
 	 * @return
 	 */
-	public ViewContentTransformer rotate(final float degrees) {
+	public TextureViewTransformer rotate(final float degrees) {
 		if (DEBUG) Log.v(TAG, String.format("rotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
@@ -396,7 +331,7 @@ public abstract class ViewContentTransformer {
 	 * @param degrees
 	 * @return
 	 */
-	protected ViewContentTransformer setTransform(
+	protected TextureViewTransformer setTransform(
 		final float transX, final float transY,
 		final float scaleX, final float scaleY,
 		final float degrees) {
@@ -470,196 +405,23 @@ public abstract class ViewContentTransformer {
 		mCurrentRotate = 0.0f;
 	}
 
-//--------------------------------------------------------------------------------
-	protected static class DefaultTransformer extends  ViewContentTransformer {
-		private static final String TAG = DefaultTransformer.class.getSimpleName();
-
-		/**
-		 * コンストラクタ
-		 * @param view
-		 */
-		private DefaultTransformer(@NonNull final View view) {
-			super(view);
-			if (DEBUG) Log.v(TAG, "コンストラクタ:");
+	public TextureViewTransformer updateTransform(final boolean setAsDefault) {
+		getTargetView().getTransform(mTransform);
+		if (setAsDefault) {
+			mDefaultTransform.set(mTransform);
+			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
+			resetValues();
+		} else {
+			calcValues(mTransform);
 		}
+		if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
+		return this;
+	}
 
-		@Override
-		public DefaultTransformer updateTransform(final boolean setAsDefault) {
-			// 今は何もしない
-			mTransform.reset();
-			if (setAsDefault) {
-				mDefaultTransform.set(mTransform);
-				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
-				resetValues();
-			} else {
-				calcValues(mTransform);
-			}
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
-			return this;
-		}
-
-		@Override
-		protected void internalSetTransform(@Nullable final Matrix transform) {
-			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-			// ローカルキャッシュ
-			final View targetView = mTargetView;
-			// XXX これだとView自体の大きさとかが変わってしまいそう
-			targetView.setTranslationX(getTranslateX());
-			targetView.setTranslationY(getTranslateY());
-			targetView.setPivotX(targetView.getWidth() >> 1);
-			targetView.setPivotY(targetView.getHeight() >> 1);
-			targetView.setRotation(getRotation());
-			targetView.setScaleX(getScaleX());
-			targetView.setScaleX(getScaleY());
-		}
-
-	} // DefaultTransformer
-
-//--------------------------------------------------------------------------------
-	/**
-	 * TextureView用ViewContentTransformer実装
-	 */
-	protected static class TextureViewTransformer extends ViewContentTransformer {
-		private static final String TAG = TextureViewTransformer.class.getSimpleName();
-
-		/**
-		 * コンストラクタ
-		 * @param view
-		 */
-		private TextureViewTransformer(@NonNull final TextureView view) {
-			super(view);
-			if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		}
-
-		@NonNull
-		@Override
-		public TextureView getTargetView() {
-			return (TextureView)mTargetView;
-		}
-
-		@Override
-		public TextureViewTransformer updateTransform(final boolean setAsDefault) {
-			getTargetView().getTransform(mTransform);
-			if (setAsDefault) {
-				mDefaultTransform.set(mTransform);
-				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
-				resetValues();
-			} else {
-				calcValues(mTransform);
-			}
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
-			return this;
-		}
-
-		@Override
-		protected void internalSetTransform(@Nullable final Matrix transform) {
-			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-			getTargetView().setTransform(transform);
-		}
-
-		@NonNull
-		@Override
-		public Matrix getTransform(@Nullable final Matrix transform) {
-			return getTargetView().getTransform(transform);
-		}
-
-	} // TextureViewTransformer
-
-//--------------------------------------------------------------------------------
-	/**
-	 * ITransformView用のViewContentTransformer実装
-	 */
-	protected static class ITransformViewTransformer extends ViewContentTransformer {
-		private static final String TAG = TextureViewTransformer.class.getSimpleName();
-
-		/**
-		 * コンストラクタ
-		 * @param view
-		 */
-		private ITransformViewTransformer(@NonNull final ITransformView view) {
-			super((View)view);
-			if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		}
-
-		@NonNull
-		public ITransformView getTargetViewInterface() {
-			return (ITransformView)mTargetView;
-		}
-
-		@Override
-		public ITransformViewTransformer updateTransform(final boolean setAsDefault) {
-			getTargetViewInterface().getTransform(mTransform);
-			if (setAsDefault) {
-				mDefaultTransform.set(mTransform);
-				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
-				resetValues();
-			} else {
-				calcValues(mTransform);
-			}
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
-			return this;
-		}
-
-		@Override
-		protected void internalSetTransform(@Nullable final Matrix transform) {
-			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-			getTargetViewInterface().setTransform(transform);
-		}
-
-		@NonNull
-		@Override
-		public Matrix getTransform(@Nullable final Matrix transform) {
-			return getTargetViewInterface().getTransform(transform);
-		}
-
-	} // ITransformViewTransformer
-
-//--------------------------------------------------------------------------------
-	/**
-	 * ImageView用ImageViewTransformer実装
-	 */
-	protected static class ImageViewTransformer extends ViewContentTransformer {
-		private static final String TAG = ImageViewTransformer.class.getSimpleName();
-
-		/**
-		 * コンストラクタ
-		 * @param view
-		 */
-		private ImageViewTransformer(@NonNull final ImageView view) {
-			super(view);
-			if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		}
-
-		@NonNull
-		@Override
-		public ImageView getTargetView() {
-			return (ImageView)mTargetView;
-		}
-
-		@Override
-		public ImageViewTransformer updateTransform(final boolean setAsDefault) {
-			mTransform.set(getTargetView().getImageMatrix());
-			if (setAsDefault) {
-				mDefaultTransform.set(mTransform);
-				// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-				if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
-				resetValues();
-			} else {
-				calcValues(mTransform);
-			}
-			if (DEBUG) Log.v(TAG, "updateTransform:" + setAsDefault + "," + mTransform);
-			return this;
-		}
-
-		@Override
-		protected void internalSetTransform(@Nullable final Matrix transform) {
-			if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-			getTargetView().setImageMatrix(transform);
-		}
-
-	}	// ImageViewTransformer
+	protected void internalSetTransform(@Nullable final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+		getTargetView().setTransform(transform);
+	}
 
 }

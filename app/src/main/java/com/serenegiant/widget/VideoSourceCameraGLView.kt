@@ -26,13 +26,13 @@ import android.opengl.Matrix
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
+import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipelineSource
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
@@ -95,9 +95,9 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 				}
 			}
 
-			override fun applyTransformMatrix(transform: android.graphics.Matrix) {
+			override fun applyTransformMatrix(@Size(min=16) transform: FloatArray) {
 				if (mDrawer != null) {
-					MatrixUtils.toGLMatrix(transform, mMvpMatrix, mWork)
+					System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				}
 			}
