@@ -43,7 +43,7 @@ import com.serenegiant.view.ViewContentTransformer
  */
 open class GLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: SurfaceView(context, attrs), ViewContentTransformer.ITransformView  {
+		: SurfaceView(context, attrs, defStyle) {
 
 	/**
 	 * GLスレッド上での処理

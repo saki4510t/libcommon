@@ -30,7 +30,7 @@ import com.serenegiant.libcommon.BuildConfig
  */
 class MixCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLSurfaceView(context, attrs) {
+		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
 
 	@Synchronized
 	override fun onResume() {

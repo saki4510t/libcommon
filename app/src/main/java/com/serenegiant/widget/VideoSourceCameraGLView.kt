@@ -43,7 +43,7 @@ import com.serenegiant.widget.CameraDelegator.ICameraView
  */
 class VideoSourceCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: GLView(context, attrs), ICameraView {
+		: AspectScaledGLView(context, attrs, defStyle), ICameraView {
 
 	private val mCameraDelegator: CameraDelegator
 	private val mCameraRenderer: CameraRenderer
