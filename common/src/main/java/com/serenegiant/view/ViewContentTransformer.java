@@ -161,7 +161,7 @@ public abstract class ViewContentTransformer
 	 */
 	@NonNull
 	@Override
-	public ViewContentTransformer setDefault(@NonNull final Matrix transform) {
+	public ViewContentTransformer setDefault(@Nullable final Matrix transform) {
 		mDefaultTransform.set(transform);
 		return this;
 	}
