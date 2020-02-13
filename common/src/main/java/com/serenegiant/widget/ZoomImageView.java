@@ -26,6 +26,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -48,7 +49,7 @@ import androidx.appcompat.widget.AppCompatImageView;
  */
 public class ZoomImageView extends AppCompatImageView
 	implements ViewTransformDelegater.ITransformView,
-	ViewTransformDelegater.ViewTransformListener {
+	ITransformView, ViewTransformDelegater.ViewTransformListener {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
@@ -372,6 +373,26 @@ public class ZoomImageView extends AppCompatImageView
 		// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
 		// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 		setFrame(getLeft(), getTop(), getRight(), getBottom());
+	}
+
+	/**
+	 * ITransformViewの実装
+	 * @param transform
+	 * @return
+	 */
+	@NonNull
+	@Override
+	public Matrix getTransform(@Nullable final Matrix transform) {
+		return getImageMatrix();
+	}
+
+	/**
+	 * ITransformViewの実装
+	 * @param transform
+	 */
+	@Override
+	public void setTransform(final Matrix transform) {
+		setImageMatrix(transform);
 	}
 
 //--------------------------------------------------------------------------------

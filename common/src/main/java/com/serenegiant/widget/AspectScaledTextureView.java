@@ -25,18 +25,22 @@ import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
+import android.view.View;
 
 import com.serenegiant.common.R;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import androidx.annotation.NonNull;
+
 /**
  * View/表示内容のスケーリング処理を追加したTextureView
  * スケーリングモードがSCALE_MODE_KEEP_ASPECTのときはViewのサイズ変更を行う
  */
 public class AspectScaledTextureView extends TextureView
-	implements TextureView.SurfaceTextureListener, IAspectRatioView, IScaledView, ITextureView {
+	implements TextureView.SurfaceTextureListener,
+		IAspectRatioView, IScaledView, ITextureView, ITransformView {
 	
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
@@ -284,4 +288,13 @@ public class AspectScaledTextureView extends TextureView
 		setTransform(mImageMatrix);
 	}
 
+	/**
+	 * ITransformViewの実装
+	 * @return
+	 */
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
+	}
 }

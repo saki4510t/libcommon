@@ -50,9 +50,7 @@ public class ViewTransformDelegater {
 	/**
 	 * 拡大縮小平行移動回転可能なView用インターフェース
 	 */
-	public interface ITransformView {
-		@NonNull
-		public View getView();
+	public interface ITransformView extends com.serenegiant.widget.ITransformView {
 		/**
 		 * View表示内容の大きさを取得
 		 * @return
@@ -378,7 +376,7 @@ public class ViewTransformDelegater {
 	@NonNull
 	private final ITransformView mParent;
 
-	private final ViewContentTransformer mTransformer;
+	private final IContentTransformer.IViewTransformer mTransformer;
 	/**
 	 * コンストラクタ
 	 * @param parent

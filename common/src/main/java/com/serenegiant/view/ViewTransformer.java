@@ -3,22 +3,24 @@ package com.serenegiant.view;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.Log;
-import android.view.TextureView;
 
 import com.serenegiant.graphics.MatrixUtils;
+import com.serenegiant.widget.ITransformView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * android.graphics.Matrixを使ったTextureViewの内容のトランスフォーム用ヘルパークラス
+ * ITransformViewの内容のトランスフォーム用ヘルパークラス
  */
-public class TextureViewTransformer implements IContentTransformer.IViewTransformer {
+public class ViewTransformer
+	implements IContentTransformer.IViewTransformer {
+
 	private static final boolean DEBUG = false;	// TODO for debugging
-	private static final String TAG = TextureViewTransformer.class.getSimpleName();
+	private static final String TAG = ViewTransformer.class.getSimpleName();
 
 	@NonNull
-	private final TextureView mTargetView;
+	private final ITransformView mTargetView;
 	/**
 	 * デフォルトのトランスフォームマトリックス
 	 * #setDefaultで変更していなければコンストラクタ実行時に
@@ -53,18 +55,18 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * コンストラクタ
 	 * @param view
 	 */
-	public TextureViewTransformer(@NonNull final TextureView view) {
+	public ViewTransformer(@NonNull final ITransformView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);
 	}
 
 	/**
-	 * 操作対象のTextureViewを取得する
+	 * 操作対象Viewを取得する
 	 * @return
 	 */
 	@NonNull
-	public TextureView getTargetView() {
+	public ITransformView getTargetView() {
 		return mTargetView;
 	}
 
@@ -74,7 +76,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 */
 	@NonNull
 	@Override
-	public TextureViewTransformer setTransform(@Nullable final Matrix transform) {
+	public ViewTransformer setTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 		if (mTransform != transform) {
 			mTransform.set(transform);
@@ -102,7 +104,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 
 	@NonNull
 	@Override
-	public TextureViewTransformer updateTransform(final boolean setAsDefault) {
+	public ViewTransformer updateTransform(final boolean setAsDefault) {
 		internalGetTransform(mTransform);
 		if (setAsDefault) {
 			mDefaultTransform.set(mTransform);
@@ -123,7 +125,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 */
 	@NonNull
 	@Override
-	public TextureViewTransformer setDefault(@Nullable final Matrix transform) {
+	public ViewTransformer setDefault(@Nullable final Matrix transform) {
 		mDefaultTransform.set(transform);
 		return this;
 	}
@@ -144,7 +146,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param y
 	 * @return
 	 */
-	public TextureViewTransformer setTranslate(final float x, final float y) {
+	public ViewTransformer setTranslate(final float x, final float y) {
 		if (DEBUG) Log.v(TAG, String.format("setTranslate:(%f,%f)", x, y));
 		return setTransform(x, y,
 			mCurrentScaleX, mCurrentScaleY,
@@ -157,7 +159,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param dy
 	 * @return
 	 */
-	public TextureViewTransformer translate(final float dx, final float dy) {
+	public ViewTransformer translate(final float dx, final float dy) {
 		if (DEBUG) Log.v(TAG, String.format("translate:(%f,%f)", dx, dy));
 		return setTransform(mCurrentTransX + dx, mCurrentTransY + dy,
 			mCurrentScaleX, mCurrentScaleY,
@@ -200,7 +202,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param scaleY
 	 * @return
 	 */
-	public TextureViewTransformer setScale(final float scaleX, final float scaleY) {
+	public ViewTransformer setScale(final float scaleX, final float scaleY) {
 		if (DEBUG) Log.v(TAG, String.format("setScale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scaleX, scaleY,
@@ -212,7 +214,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param scale
 	 * @return
 	 */
-	public TextureViewTransformer setScale(final float scale) {
+	public ViewTransformer setScale(final float scale) {
 		if (DEBUG) Log.v(TAG, String.format("setScale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			scale, scale,
@@ -225,7 +227,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param scaleY
 	 * @return
 	 */
-	public TextureViewTransformer scale(final float scaleX, final float scaleY) {
+	public ViewTransformer scale(final float scaleX, final float scaleY) {
 		if (DEBUG) Log.v(TAG, String.format("scale:(%f,%f)", scaleX, scaleY));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scaleX, mCurrentScaleY * scaleY,
@@ -237,7 +239,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param scale
 	 * @return
 	 */
-	public TextureViewTransformer scale(final float scale) {
+	public ViewTransformer scale(final float scale) {
 		if (DEBUG) Log.v(TAG, String.format("scale:(%f)", scale));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX * scale, mCurrentScaleY * scale,
@@ -273,7 +275,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param degrees
 	 * @return
 	 */
-	public TextureViewTransformer setRotate(final float degrees) {
+	public ViewTransformer setRotate(final float degrees) {
 		if (DEBUG) Log.v(TAG, String.format("setRotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
@@ -285,7 +287,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param degrees
 	 * @return
 	 */
-	public TextureViewTransformer rotate(final float degrees) {
+	public ViewTransformer rotate(final float degrees) {
 		if (DEBUG) Log.v(TAG, String.format("rotate:(%f)", degrees));
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
@@ -353,7 +355,7 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 	 * @param degrees
 	 * @return
 	 */
-	protected TextureViewTransformer setTransform(
+	protected ViewTransformer setTransform(
 		final float transX, final float transY,
 		final float scaleX, final float scaleY,
 		final float degrees) {
@@ -375,8 +377,8 @@ public class TextureViewTransformer implements IContentTransformer.IViewTransfor
 					mCurrentRotate += 360;
 				}
 			}
-			final int w2 = mTargetView.getWidth() >> 1;
-			final int h2 = mTargetView.getHeight() >> 1;
+			final int w2 = mTargetView.getView().getWidth() >> 1;
+			final int h2 = mTargetView.getView().getHeight() >> 1;
 			mTransform.reset();
 			// 回転 → 拡大縮小 → 平行移動 → デフォルト
 			// デフォルトトランスフォームマトリックスを適用

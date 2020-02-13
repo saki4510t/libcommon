@@ -28,13 +28,13 @@ import android.util.Log
 import android.view.Choreographer
 import android.view.SurfaceHolder
 import android.view.SurfaceView
+import android.view.View
 import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glutils.GLContext
 import com.serenegiant.glutils.GLManager
-import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.ISurface
 
 /**
@@ -43,7 +43,7 @@ import com.serenegiant.glutils.ISurface
  */
 open class GLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: SurfaceView(context, attrs, defStyle) {
+		: SurfaceView(context, attrs, defStyle), IGLTransformView {
 
 	/**
 	 * GLスレッド上での処理
@@ -218,7 +218,7 @@ open class GLView @JvmOverloads constructor(
 	 * ITransformViewの実装
 	 */
 	@AnyThread
-	fun setTransform(@Size(min=16) transform: FloatArray?) {
+	override fun setTransform(@Size(min=16) transform: FloatArray?) {
 		synchronized(mMatrix) {
 			if (transform != null) {
 				System.arraycopy(transform, 0, mMatrix, 0, 16)
@@ -233,7 +233,7 @@ open class GLView @JvmOverloads constructor(
 	 * ITransformViewの実装
 	 */
 	@AnyThread
-	fun getTransform(@Size(min=16) transform: FloatArray?): FloatArray {
+	override fun getTransform(@Size(min=16) transform: FloatArray?): FloatArray {
 		var result = transform
 		if (result == null) {
 			result = FloatArray(16)
@@ -245,6 +245,12 @@ open class GLView @JvmOverloads constructor(
 		return result
 	}
 
+	/**
+	 * ITransformViewの実装
+	 */
+	override fun getView(): View {
+		return this
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * デフォルトのレンダリングコンテキストへ切り返る

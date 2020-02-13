@@ -26,6 +26,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.serenegiant.graphics.MatrixUtils;
+import com.serenegiant.widget.ITransformView;
 
 import java.util.Arrays;
 
@@ -41,15 +42,6 @@ public abstract class ViewContentTransformer
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewContentTransformer.class.getSimpleName();
-
-	/**
-	 * Transform可能Viewを示すインターフェース
-	 */
-	public interface ITransformView {
-		@NonNull
-		public Matrix getTransform(@Nullable Matrix transform);
-		public void setTransform(Matrix transform);
-	}
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド

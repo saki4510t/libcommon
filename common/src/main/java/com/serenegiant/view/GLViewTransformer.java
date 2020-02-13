@@ -5,7 +5,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import com.serenegiant.graphics.MatrixUtils;
-import com.serenegiant.widget.GLView;
+import com.serenegiant.widget.IGLTransformView;
 
 import java.util.Arrays;
 
@@ -14,16 +14,18 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 /**
- * GLViewのトランスフォーム処理用ヘルパークラス
+ * IGLTransformViewのトランスフォーム処理用ヘルパークラス
  */
-public class GLViewTransformer implements IContentTransformer.IGLViewTransformer {
+public class GLViewTransformer
+	implements IContentTransformer.IGLViewTransformer {
+
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = GLViewTransformer.class.getSimpleName();
 
 	/**
 	 * 操作対象のGLView
 	 */
-	private final GLView mTargetView;
+	private final IGLTransformView mTargetView;
 	/**
 	 * トランスフォームマトリックス
 	 */
@@ -56,7 +58,7 @@ public class GLViewTransformer implements IContentTransformer.IGLViewTransformer
 	 * コンストラクタ
 	 * @param view
 	 */
-	public GLViewTransformer(@NonNull final GLView view) {
+	public GLViewTransformer(@NonNull final IGLTransformView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);
@@ -67,7 +69,7 @@ public class GLViewTransformer implements IContentTransformer.IGLViewTransformer
 	 * @return
 	 */
 	@NonNull
-	public GLView getTargetView() {
+	public IGLTransformView getTargetView() {
 		return mTargetView;
 	}
 
@@ -389,8 +391,8 @@ public class GLViewTransformer implements IContentTransformer.IGLViewTransformer
 				}
 			}
 
-			final int w2 = mTargetView.getWidth() >> 1;
-			final int h2 = mTargetView.getHeight() >> 1;
+			final int w2 = mTargetView.getView().getWidth() >> 1;
+			final int h2 = mTargetView.getView().getHeight() >> 1;
 			Matrix.setIdentityM(mTransform, 0);
 			// 回転 → 拡大縮小 → 平行移動 → デフォルト
 			// デフォルトトランスフォームマトリックスを適用
