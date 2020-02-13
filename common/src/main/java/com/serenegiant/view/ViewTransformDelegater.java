@@ -436,23 +436,6 @@ public class ViewTransformDelegater {
 	}
 
 	/**
-	 * View#onLayoutの追加処理
-	 * @param changed
-	 * @param left
-	 * @param top
-	 * @param right
-	 * @param bottom
-	 */
-	public void onLayout(final boolean changed,
-		final int left, final int top, final int right, final int bottom) {
-
-		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
-			left, top, right, bottom));
-		mState = STATE_RESET;	// reset state
-		mParent.init();
-	}
-
-	/**
 	 * View#onTouchEventの処理
 	 * falseを返したときにはView#super.onTouchEventでデフォルトの処理をすること
 	 * @param event
@@ -640,6 +623,7 @@ public class ViewTransformDelegater {
 	 */
 	public void init() {
 		if (DEBUG) Log.v(TAG, "init:" + mIsRestored);
+		mState = STATE_RESET;
 		clearPendingTasks();
 		if (!mIsRestored) {
 			mParent.onInit();

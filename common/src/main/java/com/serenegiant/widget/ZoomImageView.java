@@ -162,8 +162,7 @@ public class ZoomImageView extends AppCompatImageView
 		
 		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
 			left, top, right, bottom));
-		// set the scale type to ScaleType.MATRIX
-		mDelegater.onLayout(changed, left, top, right, bottom);
+		init();
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
