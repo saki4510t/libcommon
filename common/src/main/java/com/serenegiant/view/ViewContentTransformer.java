@@ -389,7 +389,7 @@ public abstract class ViewContentTransformer
 			final int w2 = mTargetView.getWidth() >> 1;
 			final int h2 = mTargetView.getHeight() >> 1;
 			mTransform.reset();
-			// 回転 → 拡大縮小 → 平行移動 → デフォルト
+			// T = 回転 x 拡大縮小 x 平行移動 x デフォルト
 			// デフォルトトランスフォームマトリックスを適用
 			mTransform.postConcat(mDefaultTransform);
 			// 平行移動
