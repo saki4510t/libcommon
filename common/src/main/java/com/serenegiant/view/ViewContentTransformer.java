@@ -36,7 +36,9 @@ import androidx.annotation.Nullable;
  * Viewの表示内容の座標変換を行うためのヘルパークラス
  */
 @Deprecated
-public abstract class ViewContentTransformer {
+public abstract class ViewContentTransformer
+	implements IContentTransformer.IViewTransformer {
+
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewContentTransformer.class.getSimpleName();
 
@@ -120,19 +122,24 @@ public abstract class ViewContentTransformer {
 	 * @param setAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public abstract ViewContentTransformer updateTransform(final boolean setAsDefault);
 
 	/**
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullなら単位行列が設定される
 	 */
-	public final void setTransform(@Nullable final Matrix transform) {
+	@NonNull
+	@Override
+	public final ViewContentTransformer setTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 		if (mTransform != transform) {
 			mTransform.set(transform);
 		}
 		internalSetTransform(mTransform);
 		calcValues(mTransform);
+		return this;
 	}
 
 	/**
@@ -162,6 +169,7 @@ public abstract class ViewContentTransformer {
 	 * @return
 	 */
 	@NonNull
+	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
 		if (transform != null) {
 			transform.set(mTransform);
@@ -193,6 +201,8 @@ public abstract class ViewContentTransformer {
 	 * @param transform
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public ViewContentTransformer setDefault(@NonNull final Matrix transform) {
 		mDefaultTransform.set(transform);
 		return this;
@@ -483,6 +493,7 @@ public abstract class ViewContentTransformer {
 			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		}
 
+		@NonNull
 		@Override
 		public DefaultTransformer updateTransform(final boolean setAsDefault) {
 			// 今は何もしない
@@ -538,6 +549,7 @@ public abstract class ViewContentTransformer {
 			return (TextureView)mTargetView;
 		}
 
+		@NonNull
 		@Override
 		public TextureViewTransformer updateTransform(final boolean setAsDefault) {
 			getTargetView().getTransform(mTransform);
@@ -588,6 +600,7 @@ public abstract class ViewContentTransformer {
 			return (ITransformView)mTargetView;
 		}
 
+		@NonNull
 		@Override
 		public ITransformViewTransformer updateTransform(final boolean setAsDefault) {
 			getTargetViewInterface().getTransform(mTransform);
@@ -639,6 +652,7 @@ public abstract class ViewContentTransformer {
 			return (ImageView)mTargetView;
 		}
 
+		@NonNull
 		@Override
 		public ImageViewTransformer updateTransform(final boolean setAsDefault) {
 			mTransform.set(getTargetView().getImageMatrix());
