@@ -420,7 +420,6 @@ public abstract class ViewContentTransformer
 					mCurrentRotate += 360;
 				}
 			}
-			mDefaultTransform.getValues(work);
 			final int w2 = mTargetView.getWidth() >> 1;
 			final int h2 = mTargetView.getHeight() >> 1;
 			mTransform.reset();
