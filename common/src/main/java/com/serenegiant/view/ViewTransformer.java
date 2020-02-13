@@ -94,12 +94,12 @@ public class ViewTransformer
 	@NonNull
 	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		Matrix result = transform;
-		if (result == null) {
-			result = new Matrix();
+		if (transform != null) {
+			transform.set(mTransform);
+			return transform;
+		} else {
+			return new Matrix(mTransform);
 		}
-		result.set(mTransform);
-		return result;
 	}
 
 	@NonNull
