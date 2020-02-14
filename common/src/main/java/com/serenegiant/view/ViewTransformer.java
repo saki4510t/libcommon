@@ -345,7 +345,11 @@ public class ViewTransformer
 	 */
 	@NonNull
 	protected Matrix internalGetTransform(@Nullable final Matrix transform) {
-		return mTargetView.getTransform(transform);
+		final Matrix result = mTargetView.getTransform(transform);
+		if ((result != transform) && (transform != null)) {
+			transform.set(result);
+		}
+		return result;
 	}
 
 	/**
