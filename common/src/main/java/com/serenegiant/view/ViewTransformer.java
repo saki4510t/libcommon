@@ -331,12 +331,8 @@ public class ViewTransformer
 	 * @param transform
 	 */
 	protected void internalSetTransform(@Nullable final Matrix transform) {
-		mWork.set(transform);
-		if (transform != null) {
-			mWork.postConcat(mDefaultTransform);
-		}
-		mTargetView.setTransform(mWork);
-		if (DEBUG) Log.v(TAG, "internalSetTransform:" + mWork);
+		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
+		mTargetView.setTransform(transform);
 	}
 
 	/**
@@ -386,10 +382,9 @@ public class ViewTransformer
 			}
 			final int w2 = mTargetView.getView().getWidth() >> 1;
 			final int h2 = mTargetView.getView().getHeight() >> 1;
-			mTransform.reset();
 			// 回転 → 拡大縮小 → 平行移動 → デフォルト
-			// デフォルトトランスフォームマトリックスを適用
-			mTransform.postConcat(mDefaultTransform);
+			// デフォルトトランスフォームマトリックスをセット
+			mTransform.set(mDefaultTransform);
 			// 平行移動
 			mTransform.postTranslate(transX, transY);
 			// 拡大縮小
