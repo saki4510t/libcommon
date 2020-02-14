@@ -626,7 +626,7 @@ public class ViewTransformDelegater {
 			mParent.onInit();
 			mTransformer.updateTransform(true);
 			// set the initial state to idle, get and save the internal Matrix.
-			mState = STATE_RESET; setState(STATE_NON);
+			setState(STATE_NON);
 			// get the internally calculated zooming scale to fit the view
 			mMinScale = getMatrixScale();
 			mCurrentDegrees = 0.f;
