@@ -353,6 +353,7 @@ public class ZoomImageView extends AppCompatImageView
 	 */
 	@Override
 	public void init() {
+		if (DEBUG) Log.v(TAG, "init:");
 		mDelegater.init();
 		super.setScaleType(ScaleType.MATRIX);
 		super.setImageMatrix(mDelegater.getImageMatrix());
@@ -364,6 +365,7 @@ public class ZoomImageView extends AppCompatImageView
 	 */
 	@Override
 	public void onInit() {
+		if (DEBUG) Log.v(TAG, "onInit:");
 		// 拡大縮小率のデフォルト値を取得するためにImageView自体にトランスフォームマトリックスを計算させる
 		// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
 		// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される

@@ -330,12 +330,12 @@ public class ViewTransformer
 	 * @param transform
 	 */
 	protected void internalSetTransform(@Nullable final Matrix transform) {
-		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
 		mWork.set(transform);
 		if (transform != null) {
 			mWork.postConcat(mDefaultTransform);
 		}
 		mTargetView.setTransform(mWork);
+		if (DEBUG) Log.v(TAG, "internalSetTransform:" + mWork);
 	}
 
 	/**
