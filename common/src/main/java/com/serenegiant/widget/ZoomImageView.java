@@ -160,8 +160,8 @@ public class ZoomImageView extends AppCompatImageView
 		// or no image assigned, skip initialization
 		if (getWidth() == 0 || getHeight() == 0 || !hasImage()) return;
 		
-		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
-			left, top, right, bottom));
+		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d),changed=",
+			left, top, right, bottom) + changed);
 		init();
 	}
 
