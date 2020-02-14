@@ -44,6 +44,12 @@ public interface IContentTransformer {
 		 */
 		@NonNull
 		public IGLViewTransformer setDefault(@Nullable @Size(min=16) final float[] transform);
+		/**
+		 * トランスフォームマトリックスを初期化する
+		 * @return
+		 */
+		@NonNull
+		public IGLViewTransformer reset();
 	}
 
 	/**
@@ -78,5 +84,11 @@ public interface IContentTransformer {
 		 */
 		@NonNull
 		public IViewTransformer setDefault(@Nullable final Matrix transform);
+		/**
+		 * トランスフォームマトリックスを初期化する
+		 * @return
+		 */
+		@NonNull
+		public IViewTransformer reset();
 	}
 }

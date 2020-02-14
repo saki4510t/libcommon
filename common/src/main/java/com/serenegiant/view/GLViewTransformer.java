@@ -149,9 +149,11 @@ public class GLViewTransformer
 	 * #setDefaultで変更していなけれあコンストラクタ実行時の
 	 * ターゲットViewのトランスフォームマトリックスに戻る
 	 */
-	public void reset() {
+	@NonNull
+	public GLViewTransformer reset() {
 		if (DEBUG) Log.v(TAG, "reset:");
 		setTransform(mDefaultTransform);
+		return this;
 	}
 
 	/**

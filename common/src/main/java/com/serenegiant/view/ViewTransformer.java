@@ -135,9 +135,11 @@ public class ViewTransformer
 	 * #setDefaultで変更していなけれあコンストラクタ実行時の
 	 * ターゲットViewのトランスフォームマトリックスに戻る
 	 */
-	public void reset() {
+	@NonNull
+	public ViewTransformer reset() {
 		if (DEBUG) Log.v(TAG, "reset:");
 		setTransform(mDefaultTransform);
+		return this;
 	}
 
 	/**

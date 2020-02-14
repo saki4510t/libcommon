@@ -171,9 +171,11 @@ public abstract class ViewContentTransformer
 	 * #setDefaultで変更していなけれあコンストラクタ実行時の
 	 * ターゲットViewのトランスフォームマトリックスに戻る
 	 */
-	public void reset() {
+	@NonNull
+	public ViewContentTransformer reset() {
 		if (DEBUG) Log.v(TAG, "reset:");
 		setTransform(mDefaultTransform);
+		return this;
 	}
 
 	/**
