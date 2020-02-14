@@ -57,10 +57,6 @@ public class ViewTransformDelegater {
 		 */
 		public RectF getBounds();
 		/**
-		 * View表内容の拡大縮小回転平行移動を初期化
-		 */
-		public void init();
-		/**
 		 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
 		 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる
 		 */
@@ -189,7 +185,7 @@ public class ViewTransformDelegater {
 	private final class WaitImageReset implements Runnable {
 		@Override
 		public void run() {
-			mParent.init();
+			mParent.getView().requestLayout();
 		}
 	}
 

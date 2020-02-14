@@ -349,18 +349,6 @@ public class ZoomImageView extends AppCompatImageView
 
 	/**
 	 * ITransformViewの実装
-	 * View表内容の拡大縮小回転平行移動を初期化
-	 */
-	@Override
-	public void init() {
-		if (DEBUG) Log.v(TAG, "init:");
-		mDelegater.init();
-		super.setScaleType(ScaleType.MATRIX);
-		super.setImageMatrix(mDelegater.getImageMatrix());
-	}
-
-	/**
-	 * ITransformViewの実装
 	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
 	 */
 	@Override
@@ -397,6 +385,16 @@ public class ZoomImageView extends AppCompatImageView
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * View表内容の拡大縮小回転平行移動を初期化
+	 */
+	private void init() {
+		if (DEBUG) Log.v(TAG, "init:");
+		mDelegater.init();
+		super.setScaleType(ScaleType.MATRIX);
+		super.setImageMatrix(mDelegater.getImageMatrix());
+	}
+
 	/**
 	 * 一定時間後に色反転を元に戻すためのRunnable実装
 	 */
