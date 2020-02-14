@@ -382,7 +382,7 @@ public class ZoomImageView extends AppCompatImageView
 	@NonNull
 	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		return getImageMatrix();
+		return super.getImageMatrix();
 	}
 
 	/**
@@ -391,7 +391,7 @@ public class ZoomImageView extends AppCompatImageView
 	 */
 	@Override
 	public void setTransform(final Matrix transform) {
-		setImageMatrix(transform);
+		super.setImageMatrix(transform);
 	}
 
 //--------------------------------------------------------------------------------
