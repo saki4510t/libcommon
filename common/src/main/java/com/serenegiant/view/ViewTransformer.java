@@ -109,6 +109,7 @@ public class ViewTransformer
 		if (saveAsDefault) {
 			setDefault(mTransform);
 			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+			if (DEBUG) Log.v(TAG, "updateTransform:default=" + mDefaultTransform);
 			resetValues();
 		} else {
 			calcValues(mTransform);
@@ -412,17 +413,17 @@ public class ViewTransformer
 	 * @return
 	 */
 	protected void calcValues(@NonNull final Matrix transform) {
-		if (DEBUG) Log.v(TAG, "calcValues:" + transform);
+//		if (DEBUG) Log.v(TAG, "calcValues:" + transform);
 		mTransform.getValues(workArray);
 		mCurrentTransX = workArray[Matrix.MTRANS_X];
 		mCurrentTransY = workArray[Matrix.MTRANS_Y];
 		mCurrentScaleX = workArray[Matrix.MSCALE_X];
 		mCurrentScaleY = MatrixUtils.getScale(workArray);
 		mCurrentRotate = MatrixUtils.getRotate(workArray);
-		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
-			mCurrentTransX, mCurrentTransY,
-			mCurrentScaleX, mCurrentScaleY,
-			mCurrentRotate));
+//		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
+//			mCurrentTransX, mCurrentTransY,
+//			mCurrentScaleX, mCurrentScaleY,
+//			mCurrentRotate));
 	}
 
 	/**
