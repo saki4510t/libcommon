@@ -382,7 +382,6 @@ public class ViewTransformDelegater {
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
-//		mTransformer = ViewContentTransformer.newInstance(parent.getView());
 		mTransformer = new ViewTransformer(parent);
 	}
 
