@@ -225,6 +225,9 @@ class MainActivity
 				}
 				fragment = GalleyFragment2()
 			}
+			14 -> {	// NumberKeyboard
+				fragment = NumberKeyboardFragment()
+			}
 			else -> {
 			}
 		}

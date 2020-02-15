@@ -14,6 +14,7 @@
 	<string name="item11" translatable="false">CameraSurface</string>
 	<string name="item12" translatable="false">Galley</string>
 	<string name="item13" translatable="false">Galley(RecyclerView)</string>
+	<string name="item14" translatable="false">NumberKeyboard</string>
 
 	<string-array name="list_items">
 		<item>@string/item0</item>
@@ -30,5 +31,6 @@
 		<item>@string/item11</item>
 		<item>@string/item12</item>
 		<item>@string/item13</item>
+		<item>@string/item14</item>
 	</string-array>
 </resources>
