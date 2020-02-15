@@ -178,9 +178,9 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 	private Keyboard.Key[] mKeys;
 
 	/**
-	 * Listener for {@link KeyboardView.OnKeyboardActionListener}.
+	 * Listener for {@link OnKeyboardActionListener}.
 	 */
-	private KeyboardView.OnKeyboardActionListener mKeyboardActionListener;
+	private OnKeyboardActionListener mKeyboardActionListener;
 
 	private int mVerticalCorrection;
 	private int mProximityThreshold;
@@ -482,16 +482,16 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 		}
 	}
 
-	public void setOnKeyboardActionListener(KeyboardView.OnKeyboardActionListener listener) {
+	public void setOnKeyboardActionListener(OnKeyboardActionListener listener) {
 		mKeyboardActionListener = listener;
 	}
 
 	/**
-	 * Returns the {@link KeyboardView.OnKeyboardActionListener} object.
+	 * Returns the {@link OnKeyboardActionListener} object.
 	 *
 	 * @return the listener attached to this keyboard
 	 */
-	protected KeyboardView.OnKeyboardActionListener getOnKeyboardActionListener() {
+	protected OnKeyboardActionListener getOnKeyboardActionListener() {
 		return mKeyboardActionListener;
 	}
 
@@ -538,7 +538,7 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 	 *
 	 * @param shifted whether or not to enable the state of the shift key
 	 * @return true if the shift key state changed, false if there was no change
-	 * @see KeyboardView#isShifted()
+	 * @see #isShifted()
 	 */
 	public boolean setShifted(boolean shifted) {
 		if (mKeyboard != null) {
@@ -556,7 +556,7 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 	 *
 	 * @return true if the shift is in a pressed state, false otherwise. If there is
 	 * no shift key on the keyboard or there is no keyboard attached, it returns false.
-	 * @see KeyboardView#setShifted(boolean)
+	 * @see #setShifted(boolean)
 	 */
 	public boolean isShifted() {
 		if (mKeyboard != null) {
@@ -603,7 +603,7 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 	}
 
 	/**
-	 * When enabled, calls to {@link KeyboardView.OnKeyboardActionListener#onKey} will include key
+	 * When enabled, calls to {@link OnKeyboardActionListener#onKey} will include key
 	 * codes for adjacent keys.  When disabled, only the primary key code will be
 	 * reported.
 	 *
@@ -1140,7 +1140,7 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 				View closeButton = mMiniKeyboardContainer.findViewById(
 					R.id.closeButton);
 				if (closeButton != null) closeButton.setOnClickListener(this);
-				mMiniKeyboard.setOnKeyboardActionListener(new KeyboardView.OnKeyboardActionListener() {
+				mMiniKeyboard.setOnKeyboardActionListener(new OnKeyboardActionListener() {
 					public void onKey(int primaryCode, int[] keyCodes) {
 						mKeyboardActionListener.onKey(primaryCode, keyCodes);
 						dismissPopupKeyboard();
@@ -1187,7 +1187,7 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 
 				mMiniKeyboardCache.put(popupKey, mMiniKeyboardContainer);
 			} else {
-				mMiniKeyboard = (KeyboardView) mMiniKeyboardContainer.findViewById(
+				mMiniKeyboard = mMiniKeyboardContainer.findViewById(
 					R.id.keyboardView);
 			}
 			getLocationInWindow(mCoordinates);

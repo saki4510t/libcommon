@@ -142,12 +142,12 @@ public class Keyboard {
 	/**
 	 * List of keys in this keyboard
 	 */
-	private List<Keyboard.Key> mKeys;
+	private List<Key> mKeys;
 
 	/**
 	 * List of modifier keys such as Shift & Alt, if any
 	 */
-	private List<Keyboard.Key> mModifierKeys;
+	private List<Key> mModifierKeys;
 
 	/**
 	 * Width of the screen available to fit the keyboard
@@ -178,19 +178,19 @@ public class Keyboard {
 	 */
 	private static float SEARCH_DISTANCE = 1.8f;
 
-	private ArrayList<Keyboard.Row> rows = new ArrayList<Keyboard.Row>();
+	private ArrayList<Row> rows = new ArrayList<Row>();
 
 	/**
 	 * Container for keys in the keyboard. All keys in a row are at the same Y-coordinate.
 	 * Some of the key size defaults can be overridden per row from what the {@link Keyboard}
 	 * defines.
 	 *
-	 * @attr ref android.R.styleable#Keyboard_keyWidth
-	 * @attr ref android.R.styleable#Keyboard_keyHeight
-	 * @attr ref android.R.styleable#Keyboard_horizontalGap
-	 * @attr ref android.R.styleable#Keyboard_verticalGap
-	 * @attr ref android.R.styleable#Keyboard_Row_rowEdgeFlags
-	 * @attr ref android.R.styleable#Keyboard_Row_keyboardMode
+	 * @attr ref styleable#Keyboard_keyWidth
+	 * @attr ref styleable#Keyboard_keyHeight
+	 * @attr ref styleable#Keyboard_horizontalGap
+	 * @attr ref styleable#Keyboard_verticalGap
+	 * @attr ref styleable#Keyboard_Row_rowEdgeFlags
+	 * @attr ref styleable#Keyboard_Row_keyboardMode
 	 */
 	public static class Row {
 		/**
@@ -210,11 +210,11 @@ public class Keyboard {
 		 */
 		public int verticalGap;
 
-		ArrayList<Keyboard.Key> mKeys = new ArrayList<Keyboard.Key>();
+		ArrayList<Key> mKeys = new ArrayList<Key>();
 
 		/**
 		 * Edge flags for this row of keys. Possible values that can be assigned are
-		 * {@link Keyboard#EDGE_TOP EDGE_TOP} and {@link Keyboard#EDGE_BOTTOM EDGE_BOTTOM}
+		 * {@link #EDGE_TOP EDGE_TOP} and {@link #EDGE_BOTTOM EDGE_BOTTOM}
 		 */
 		public int rowEdgeFlags;
 
@@ -256,20 +256,20 @@ public class Keyboard {
 	/**
 	 * Class for describing the position and characteristics of a single key in the keyboard.
 	 *
-	 * @attr ref android.R.styleable#Keyboard_keyWidth
-	 * @attr ref android.R.styleable#Keyboard_keyHeight
-	 * @attr ref android.R.styleable#Keyboard_horizontalGap
-	 * @attr ref android.R.styleable#Keyboard_Key_codes
-	 * @attr ref android.R.styleable#Keyboard_Key_keyIcon
-	 * @attr ref android.R.styleable#Keyboard_Key_keyLabel
-	 * @attr ref android.R.styleable#Keyboard_Key_iconPreview
-	 * @attr ref android.R.styleable#Keyboard_Key_isSticky
-	 * @attr ref android.R.styleable#Keyboard_Key_isRepeatable
-	 * @attr ref android.R.styleable#Keyboard_Key_isModifier
-	 * @attr ref android.R.styleable#Keyboard_Key_popupKeyboard
-	 * @attr ref android.R.styleable#Keyboard_Key_popupCharacters
-	 * @attr ref android.R.styleable#Keyboard_Key_keyOutputText
-	 * @attr ref android.R.styleable#Keyboard_Key_keyEdgeFlags
+	 * @attr ref R.styleable#Keyboard_keyWidth
+	 * @attr ref R.styleable#Keyboard_keyHeight
+	 * @attr ref R.styleable#Keyboard_horizontalGap
+	 * @attr ref R.styleable#Keyboard_Key_codes
+	 * @attr ref R.styleable#Keyboard_Key_keyIcon
+	 * @attr ref R.styleable#Keyboard_Key_keyLabel
+	 * @attr ref R.styleable#Keyboard_Key_iconPreview
+	 * @attr ref R.styleable#Keyboard_Key_isSticky
+	 * @attr ref R.styleable#Keyboard_Key_isRepeatable
+	 * @attr ref R.styleable#Keyboard_Key_isModifier
+	 * @attr ref R.styleable#Keyboard_Key_popupKeyboard
+	 * @attr ref R.styleable#Keyboard_Key_popupCharacters
+	 * @attr ref R.styleable#Keyboard_Key_keyOutputText
+	 * @attr ref R.styleable#Keyboard_Key_keyEdgeFlags
 	 */
 	public static class Key {
 		/**
@@ -335,8 +335,8 @@ public class Keyboard {
 		/**
 		 * Flags that specify the anchoring to edges of the keyboard for detecting touch events
 		 * that are just out of the boundary of the key. This is a bit mask of
-		 * {@link Keyboard#EDGE_LEFT}, {@link Keyboard#EDGE_RIGHT}, {@link Keyboard#EDGE_TOP} and
-		 * {@link Keyboard#EDGE_BOTTOM}.
+		 * {@link #EDGE_LEFT}, {@link #EDGE_RIGHT}, {@link #EDGE_TOP} and
+		 * {@link #EDGE_BOTTOM}.
 		 */
 		public int edgeFlags;
 		/**
@@ -387,7 +387,7 @@ public class Keyboard {
 		/**
 		 * Create an empty key with no attributes.
 		 */
-		public Key(Keyboard.Row parent) {
+		public Key(Row parent) {
 			keyboard = parent.parent;
 			height = parent.defaultHeight;
 			width = parent.defaultWidth;
@@ -623,8 +623,8 @@ public class Keyboard {
 		mDefaultWidth = mDisplayWidth / 10;
 		mDefaultVerticalGap = 0;
 		mDefaultHeight = mDefaultWidth;
-		mKeys = new ArrayList<Keyboard.Key>();
-		mModifierKeys = new ArrayList<Keyboard.Key>();
+		mKeys = new ArrayList<Key>();
+		mModifierKeys = new ArrayList<Key>();
 		mKeyboardMode = modeId;
 		loadKeyboard(context, context.getResources().getXml(xmlLayoutResId));
 	}
@@ -647,8 +647,8 @@ public class Keyboard {
 		mDefaultWidth = mDisplayWidth / 10;
 		mDefaultVerticalGap = 0;
 		mDefaultHeight = mDefaultWidth;
-		mKeys = new ArrayList<Keyboard.Key>();
-		mModifierKeys = new ArrayList<Keyboard.Key>();
+		mKeys = new ArrayList<Key>();
+		mModifierKeys = new ArrayList<Key>();
 		mKeyboardMode = modeId;
 		loadKeyboard(context, context.getResources().getXml(xmlLayoutResId));
 	}
@@ -676,7 +676,7 @@ public class Keyboard {
 		int column = 0;
 		mTotalWidth = 0;
 
-		Keyboard.Row row = new Keyboard.Row(this);
+		Row row = new Row(this);
 		row.defaultHeight = mDefaultHeight;
 		row.defaultWidth = mDefaultWidth;
 		row.defaultHorizontalGap = mDefaultHorizontalGap;
@@ -691,7 +691,7 @@ public class Keyboard {
 				y += mDefaultVerticalGap + mDefaultHeight;
 				column = 0;
 			}
-			final Keyboard.Key key = new Keyboard.Key(row);
+			final Key key = new Key(row);
 			key.x = x;
 			key.y = y;
 			key.label = String.valueOf(c);
@@ -711,12 +711,12 @@ public class Keyboard {
 	final void resize(int newWidth, int newHeight) {
 		int numRows = rows.size();
 		for (int rowIndex = 0; rowIndex < numRows; ++rowIndex) {
-			Keyboard.Row row = rows.get(rowIndex);
+			Row row = rows.get(rowIndex);
 			int numKeys = row.mKeys.size();
 			int totalGap = 0;
 			int totalWidth = 0;
 			for (int keyIndex = 0; keyIndex < numKeys; ++keyIndex) {
-				Keyboard.Key key = row.mKeys.get(keyIndex);
+				Key key = row.mKeys.get(keyIndex);
 				if (keyIndex > 0) {
 					totalGap += key.gap;
 				}
@@ -726,7 +726,7 @@ public class Keyboard {
 				int x = 0;
 				float scaleFactor = (float) (newWidth - totalGap) / totalWidth;
 				for (int keyIndex = 0; keyIndex < numKeys; ++keyIndex) {
-					Keyboard.Key key = row.mKeys.get(keyIndex);
+					Key key = row.mKeys.get(keyIndex);
 					key.width *= scaleFactor;
 					key.x = x;
 					x += key.width + key.gap;
@@ -739,11 +739,11 @@ public class Keyboard {
 		// also recalculate the vertical sizes/positions when we get this resize call.
 	}
 
-	public List<Keyboard.Key> getKeys() {
+	public List<Key> getKeys() {
 		return mKeys;
 	}
 
-	public List<Keyboard.Key> getModifierKeys() {
+	public List<Key> getModifierKeys() {
 		return mModifierKeys;
 	}
 
@@ -793,7 +793,7 @@ public class Keyboard {
 	}
 
 	public boolean setShifted(boolean shiftState) {
-		for (Keyboard.Key shiftKey : mShiftKeys) {
+		for (Key shiftKey : mShiftKeys) {
 			if (shiftKey != null) {
 				shiftKey.on = shiftState;
 			}
@@ -832,7 +832,7 @@ public class Keyboard {
 			for (int y = 0; y < gridHeight; y += mCellHeight) {
 				int count = 0;
 				for (int i = 0; i < mKeys.size(); i++) {
-					final Keyboard.Key key = mKeys.get(i);
+					final Key key = mKeys.get(i);
 					if (key.squaredDistanceFrom(x, y) < mProximityThreshold ||
 						key.squaredDistanceFrom(x + mCellWidth - 1, y) < mProximityThreshold ||
 						key.squaredDistanceFrom(x + mCellWidth - 1, y + mCellHeight - 1)
@@ -867,13 +867,13 @@ public class Keyboard {
 		return new int[0];
 	}
 
-	protected Keyboard.Row createRowFromXml(Resources res, XmlResourceParser parser) {
-		return new Keyboard.Row(res, this, parser);
+	protected Row createRowFromXml(Resources res, XmlResourceParser parser) {
+		return new Row(res, this, parser);
 	}
 
-	protected Keyboard.Key createKeyFromXml(Resources res, Keyboard.Row parent, int x, int y,
+	protected Key createKeyFromXml(Resources res, Row parent, int x, int y,
 																	   XmlResourceParser parser) {
-		return new Keyboard.Key(res, parent, x, y, parser);
+		return new Key(res, parent, x, y, parser);
 	}
 
 	private void loadKeyboard(Context context, XmlResourceParser parser) {
@@ -883,8 +883,8 @@ public class Keyboard {
 		int row = 0;
 		int x = 0;
 		int y = 0;
-		Keyboard.Key key = null;
-		Keyboard.Row currentRow = null;
+		Key key = null;
+		Row currentRow = null;
 		Resources res = context.getResources();
 		boolean skipRow = false;
 
