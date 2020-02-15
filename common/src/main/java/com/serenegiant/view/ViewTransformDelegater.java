@@ -633,18 +633,15 @@ public class ViewTransformDelegater {
 		mIsRestored = false;
 		mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
 
-		// update image size
-		// current implementation of ImageView always hold its image as a Drawable
-		// (that can get ImageView#getDrawable)
-		// therefore update the image size from its Drawable
-		final RectF bounds = mParent.getBounds();
-		if (bounds != null) {
-			mImageRect.set(bounds);
-		} else {
-			mImageRect.setEmpty();
-		}
 		// set limit rectangle that the image can move
 		mLimitRect.set(getDrawingRect());
+		// update image size
+		final RectF bounds = mParent.getBounds();
+		if ((bounds != null) && !bounds.isEmpty()) {
+			mImageRect.set(bounds);
+		} else {
+			mImageRect.set(mLimitRect);
+		}
 		final float view_width = mLimitRect.width();
 		final float view_height = mLimitRect.height();
 		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
