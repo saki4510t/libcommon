@@ -89,7 +89,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	
 		final ColorPickerDialogV4 dialog = newInstance(titleResId, initialColor);
 		dialog.setTargetFragment(parent, 0);
-		dialog.show(parent.getFragmentManager(), TAG);
+		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
 	}
 

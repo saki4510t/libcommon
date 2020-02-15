@@ -108,7 +108,7 @@ public abstract class DialogFragmentEx extends DialogFragment {
 		final Activity activity = getActivity();
 		if ((activity == null) || activity.isFinishing()) return;
 		try {
-			getFragmentManager().popBackStack();
+			getParentFragmentManager().popBackStack();
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}

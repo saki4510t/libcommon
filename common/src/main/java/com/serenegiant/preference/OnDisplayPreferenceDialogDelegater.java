@@ -43,7 +43,7 @@ public class OnDisplayPreferenceDialogDelegater {
 		final Preference preference) {
 
 		if (DEBUG) Log.v(TAG, "onDisplayPreferenceDialog:" + preference);
-		final androidx.fragment.app.FragmentManager fm = fragment.getFragmentManager();
+		final androidx.fragment.app.FragmentManager fm = fragment.getParentFragmentManager();
 		if (preference instanceof NumberPickerPreferenceV7) {
 			// check if dialog is already showing
 			if (fm.findFragmentByTag(DIALOG_FRAGMENT_TAG) != null) {
