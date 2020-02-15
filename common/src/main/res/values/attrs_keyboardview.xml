@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="KeyboardView">
+		<attr name="keyBackground" format="color" default="#ffb1b1b1" />
+		<attr name="verticalCorrection" format="reference|dimension" default="0dp" />
+		<attr name="keyPreviewLayout" format="reference" default="@null" />
+		<attr name="keyPreviewOffset" format="reference|dimension" default="0dp" />
+		<attr name="keyPreviewHeight" format="reference|dimension" default="24dp" />
+		<attr name="keyTextSize" format="reference|dimension" default="12sp" />
+		<attr name="keyTextColor" format="color" default="#FF000000" />
+		<attr name="labelTextSize" format="reference|dimension" default="8sp" />
+		<attr name="popupLayout" format="reference" default="0" />
+		<attr name="shadowColor" format="color" default="#00000000" />
+		<attr name="shadowRadius" format="reference|float" default="0.0" />
+	</declare-styleable>
+
+	<declare-styleable name="Keyboard">
+		<attr name="keyWidth" format="reference|dimension" default="33%p"/>
+		<attr name="keyHeight" format="reference|dimension" default="8%p"/>
+		<attr name="horizontalGap" format="reference|dimension" default="1dp"/>
+		<attr name="verticalGap" format="reference|dimension" default="1dp"/>
+	</declare-styleable>
+
+	<declare-styleable name="Keyboard_Row">
+		<attr name="rowEdgeFlags" format="reference|integer" default="0"/>
+		<attr name="keyboardMode" format="reference" default="0"/>
+	</declare-styleable>
+
+	<declare-styleable name="Keyboard_Key">
+		<attr name="codes" format="reference" default="0" />
+		<attr name="iconPreview" format="reference|color" default="0" />
+		<attr name="popupCharacters" format="string" default="" />
+		<attr name="popupKeyboard" format="reference" default="0"/>
+		<attr name="isRepeatable" format="boolean" default="false" />
+		<attr name="isModifier" format="boolean" default="false" />
+		<attr name="isSticky" format="boolean" default="false" />
+		<attr name="keyEdgeFlags" format="integer" default="0" />
+		<attr name="keyIcon" format="reference|color" default="0"/>
+		<attr name="keyLabel" format="string" default="" />
+		<attr name="keyOutputText" format="string" default="" />
+	</declare-styleable>
+</resources>

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="keyboardview_keycode_alt">alt</string>
+	<string name="keyboardview_keycode_cancel">cancel</string>
+	<string name="keyboardview_keycode_delete">del</string>
+	<string name="keyboardview_keycode_done">done</string>
+	<string name="keyboardview_keycode_mode_change">mode</string>
+	<string name="keyboardview_keycode_shift">↑</string>
+	<string name="keyboardview_keycode_enter">enter</string>
+
+</resources>

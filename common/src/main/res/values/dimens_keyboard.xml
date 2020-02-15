@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<dimen name="number_keyboard_gap_horizontal">1dp</dimen>
+	<dimen name="number_keyboard_gap_vertical">1dp</dimen>
+	<dimen name="number_keyboard_key_width">33%p</dimen>
+	<dimen name="number_keyboard_key_height">8%p</dimen>
+</resources>
