@@ -439,7 +439,7 @@ public class ViewTransformDelegater {
 	 */
 	@SuppressLint("SwitchIntDef")
 	public boolean onTouchEvent(final MotionEvent event) {
-		if (DEBUG) Log.v(TAG, "onTouchEvent:");
+//		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		if (mHandleTouchEvent == TOUCH_DISABLED) {
 			return false;

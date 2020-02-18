@@ -160,7 +160,7 @@ public class ZoomAspectScaledTextureView2
 			return super.onTouchEvent(event);
 		}
 
-		if (DEBUG) Log.v(TAG, "onTouchEvent:");
+//		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		if (mDelegater.onTouchEvent(event)) {
 			return true;
