@@ -133,21 +133,6 @@ public class ZoomAspectScaledTextureView2
 		mDelegater.onConfigurationChanged(newConfig);
 	}
 
-	@Override
-	protected void onLayout(final boolean changed,
-		final int left, final int top, final int right, final int bottom) {
-
-		super.onLayout(changed, left, top, right, bottom);
-
-		// if view size(width|height) is zero(the view size not decided yet)
-		// or no image assigned, skip initialization
-		if (getWidth() == 0 || getHeight() == 0) return;
-
-		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d),changed=",
-			left, top, right, bottom) + changed);
-		init();
-	}
-
 	@SuppressLint("ClickableViewAccessibility")
 	@Override
 	public boolean onTouchEvent(final MotionEvent event) {
@@ -244,6 +229,12 @@ public class ZoomAspectScaledTextureView2
 	}
 
 //================================================================================
+	protected void init() {
+		if (DEBUG) Log.v(TAG, "init:");
+		super.init();
+		mDelegater.init();
+	}
+
 	protected boolean handleOnTouchEvent(final MotionEvent event) {
 //		if (DEBUG) Log.v(TAG, "handleOnTouchEvent:" + event);
 		return false;
