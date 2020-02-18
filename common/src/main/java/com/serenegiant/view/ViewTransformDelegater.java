@@ -378,6 +378,7 @@ public class ViewTransformDelegater {
 	 * @param parent
 	 */
 	public ViewTransformDelegater(@NonNull final ITransformView parent) {
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mParent = parent;
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
@@ -391,6 +392,7 @@ public class ViewTransformDelegater {
 	 * @param state
 	 */
 	public void onRestoreInstanceState(final Parcelable state) {
+		if (DEBUG) Log.v(TAG, "onRestoreInstanceState:");
 		if (state instanceof SavedState) {
 			final SavedState saved = (SavedState)state;
 			mIsRestored = true;
@@ -526,6 +528,7 @@ public class ViewTransformDelegater {
 	}
 
 	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
+		if (DEBUG) Log.v(TAG, "setEnableHandleTouchEvent:" + enabled);
 		mHandleTouchEvent = enabled;
 	}
 
@@ -534,6 +537,7 @@ public class ViewTransformDelegater {
 	 * @param maxScale
 	 */
 	public void setMaxScale(final float maxScale) {
+		if (DEBUG) Log.v(TAG, "setMaxScale:" + maxScale);
 		if ((mMinScale > maxScale) || (maxScale <= 0)) return;
 		if (mMaxScale != maxScale) {
 			mMaxScale = maxScale;
@@ -546,6 +550,7 @@ public class ViewTransformDelegater {
 	 * @param minScale
 	 */
 	public void setMinScale(final float minScale) {
+		if (DEBUG) Log.v(TAG, "setMinScale:" + minScale);
 		if ((mMaxScale < minScale) || (minScale <= 0)) return;
 		if (mMinScale != minScale) {
 			mMinScale = minScale;
@@ -635,6 +640,7 @@ public class ViewTransformDelegater {
 
 		// set limit rectangle that the image can move
 		mLimitRect.set(getDrawingRect());
+		if (DEBUG) Log.v(TAG, "init:mLimitRect=" + mLimitRect);
 		// update image size
 		final RectF bounds = mParent.getBounds();
 		if ((bounds != null) && !bounds.isEmpty()) {
@@ -642,6 +648,7 @@ public class ViewTransformDelegater {
 		} else {
 			mImageRect.set(mLimitRect);
 		}
+		if (DEBUG) Log.v(TAG, "init:mImageRect=" + mImageRect);
 		final float view_width = mLimitRect.width();
 		final float view_height = mLimitRect.height();
 		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
