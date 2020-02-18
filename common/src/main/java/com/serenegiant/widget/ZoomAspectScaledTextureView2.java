@@ -84,6 +84,7 @@ public class ZoomAspectScaledTextureView2
 	 */
 	public ZoomAspectScaledTextureView2(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		final TypedArray a
 			= context.getTheme()
 				.obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
@@ -175,6 +176,7 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureAvailable(surface, width, height);
+		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)", width, height));
 		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
 	}
 
@@ -184,6 +186,7 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureSizeChanged(surface, width, height);
+		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)", width, height));
 		applyMirrorMode();
 	}
 
@@ -202,6 +205,7 @@ public class ZoomAspectScaledTextureView2
 //================================================================================
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
+		if (DEBUG) Log.v(TAG, "setMirror:" + mirror);
 		if (mMirrorMode != mirror) {
 			mMirrorMode = mirror;
 			applyMirrorMode();
@@ -216,27 +220,32 @@ public class ZoomAspectScaledTextureView2
 
 	@Override
 	public RectF getBounds() {
+		if (DEBUG) Log.v(TAG, "getBounds:");
 		// FIXME 未実装
 		return null;
 	}
 
 	@Override
 	public void onInit() {
+		if (DEBUG) Log.v(TAG, "onInit:");
 		// FIXME 未実装
 	}
 
 	@Override
 	public void onStartRotation(final ViewTransformDelegater.ITransformView view) {
+		if (DEBUG) Log.v(TAG, "onStartRotation:");
 		// FIXME 未実装
 	}
 
 	@Override
 	public void onStateChanged(final ViewTransformDelegater.ITransformView view, final int newState) {
+		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		// FIXME 未実装
 	}
 
 //================================================================================
 	protected boolean handleOnTouchEvent(final MotionEvent event) {
+//		if (DEBUG) Log.v(TAG, "handleOnTouchEvent:" + event);
 		return false;
 	}
 
@@ -244,7 +253,7 @@ public class ZoomAspectScaledTextureView2
 	 * ミラーモードをTextureViewに適用
 	 */
 	private void applyMirrorMode() {
-//		if (DEBUG) Log.v(TAG, "updateMatrix");
+		if (DEBUG) Log.v(TAG, "applyMirrorMode");
 		switch (mMirrorMode) {
 		case MIRROR_HORIZONTAL:
 			setScaleX(-1.0f);

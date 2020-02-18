@@ -155,6 +155,7 @@ public class ZoomAspectScaledTextureView
 
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		final TypedArray a
 			= context.getTheme()
 				.obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
@@ -263,10 +264,12 @@ public class ZoomAspectScaledTextureView
 	}
 
 	protected boolean handleOnTouchEvent(final MotionEvent event) {
+//		if (DEBUG) Log.v(TAG, "handleOnTouchEvent:" + event);
 		return false;
 	}
 
 	protected void onReset() {
+		if (DEBUG) Log.v(TAG, "onReset");
 	}
 
 //================================================================================
@@ -276,6 +279,7 @@ public class ZoomAspectScaledTextureView
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureAvailable(surface, width, height);
+		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)", width, height));
 		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
 	}
 
@@ -285,6 +289,7 @@ public class ZoomAspectScaledTextureView
 	@Override
 	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureSizeChanged(surface, width, height);
+		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)", width, height));
 		applyMirrorMode();
 	}
 
@@ -303,6 +308,7 @@ public class ZoomAspectScaledTextureView
 //================================================================================
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
+		if (DEBUG) Log.v(TAG, "setMirror" + mirror);
 		if (mMirrorMode != mirror) {
 			mMirrorMode = mirror;
 			applyMirrorMode();
@@ -320,6 +326,7 @@ public class ZoomAspectScaledTextureView
 	 * @param enabled
 	 */
 	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
+		if (DEBUG) Log.v(TAG, "setEnableHandleTouchEvent" + enabled);
 		mHandleTouchEvent = enabled;
 	}
 
@@ -331,6 +338,7 @@ public class ZoomAspectScaledTextureView
 //================================================================================
 	@Override
 	protected void init() {
+		if (DEBUG) Log.v(TAG, "init:");
 		// set the initial state to idle, get and save the internal Matrix.
 		mState = STATE_RESET; setState(STATE_NON);
 		// get the internally calculated zooming scale to fit the view
@@ -700,7 +708,7 @@ public class ZoomAspectScaledTextureView
 	 * ミラーモードをTextureViewに適用
 	 */
 	private void applyMirrorMode() {
-//		if (DEBUG) Log.v(TAG, "updateMatrix");
+		if (DEBUG) Log.v(TAG, "applyMirrorMode");
 		switch (mMirrorMode) {
 		case MIRROR_HORIZONTAL:
 			setScaleX(-1.0f);
@@ -790,6 +798,7 @@ public class ZoomAspectScaledTextureView
 			|| (mManualScale != scale)
 			|| (mCurrentDegrees != degrees)) {
 
+			if (DEBUG) Log.v(TAG, "setMatrix");
 			mManualScale = scale <= 0.0f ? mManualScale : scale;
 			mTransX = dx;
 			mTransY = dy;

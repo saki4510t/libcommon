@@ -51,6 +51,9 @@ public class ViewTransformer
 	 */
 	@NonNull
 	protected final Matrix mTransform = new Matrix();
+	/**
+	 * トランスフォームマトリックス計算時のワーク用Matrix
+	 */
 	private final Matrix mWork = new Matrix();
 	/**
 	 * Matrixアクセスのワーク用float配列
@@ -120,6 +123,12 @@ public class ViewTransformer
 		}
 	}
 
+	/**
+	 * Viewからトランスフォームマトリックスを取得してこのクラスで保持しているMatrixと同期させる
+	 *
+	 * @param saveAsDefault  saveAsDefault=trueならデフォルトをMatrixとして保存する
+	 * @return
+	 */
 	@NonNull
 	@Override
 	public ViewTransformer updateTransform(final boolean saveAsDefault) {
@@ -343,9 +352,8 @@ public class ViewTransformer
 //--------------------------------------------------------------------------------
 
 	/**
-	 * デフォルトのトランスフォームマトリックスに
-	 * 指定したトランスフォームマトリックスをかけ合わせてから
-	 * TextureViewへ適用する
+	 * 指定したトランスフォームマトリックスをITransformViewへ適用する
+	 * ITransformView#setTransformを呼び出す
 	 * @param transform
 	 */
 	protected void internalSetTransform(@Nullable final Matrix transform) {
@@ -354,7 +362,9 @@ public class ViewTransformer
 	}
 
 	/**
-	 * TextureViewからのトランスフォームマトリックス取得処理
+	 * ITransformViewからのトランスフォームマトリックス取得処理
+	 * ITransformView#getTransform#を呼び出す
+	 * ITransformView#getTransformが引数のMatrixを使わない場合に備えて追加処理を行う
 	 * @param transform
 	 * @return
 	 */
