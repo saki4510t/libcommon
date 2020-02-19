@@ -32,5 +32,5 @@ public interface ITransformView {
 	public View getView();
 	@NonNull
 	public Matrix getTransform(@Nullable Matrix transform);
-	public void setTransform(Matrix transform);
+	public void setTransform(@Nullable Matrix transform);
 }
