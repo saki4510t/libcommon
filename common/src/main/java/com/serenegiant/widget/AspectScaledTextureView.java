@@ -41,7 +41,7 @@ import androidx.annotation.Nullable;
  * View/表示内容のスケーリング処理を追加したTextureView
  * スケーリングモードがSCALE_MODE_KEEP_ASPECTのときはViewのサイズ変更を行う
  */
-public class AspectScaledTextureView extends TextureView
+public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
 		IAspectRatioView, IScaledView, ITextureView, ITransformView {
 	
