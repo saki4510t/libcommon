@@ -46,11 +46,31 @@ public interface IScaledView {
 	 * @param scaleMode SCALE_MODE_KEEP_ASPECT, SCALE_MODE_STRETCH, SCALE_MODE_CROP
 	 */
 	public void setScaleMode(@ScaleMode final int scaleMode);
+
+	/**
+	 * 現在の拡大縮小方法を取得
+	 * @return
+	 */
 	@ScaleMode
 	public int getScaleMode();
 
-	public void setAspectRatio(double aspectRatio);
+	/**
+	 * Viewの要求アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param aspectRatio
+	 */
+	public void setAspectRatio(final double aspectRatio);
+
+	/**
+	 * Viewの要求アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param width
+	 * @param height
+	 */
 	public void setAspectRatio(final int width, final int height);
+
+	/**
+	 * 現在の要求アスペクト比を取得
+	 * @return
+	 */
 	public double getAspectRatio();
 
 }

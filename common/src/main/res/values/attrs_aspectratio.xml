@@ -34,11 +34,8 @@
 	<attr name="handle_touch_event" format="boolean" default="true"/>
 
 <!-- =========================================================================== -->
-	<declare-styleable name="IAspectRatioView">
-		<attr name="aspect_ratio"/>
-	</declare-styleable>
-
 	<declare-styleable name="IScaledView">
+		<attr name="aspect_ratio"/>
 		<attr name="scale_mode"/>
 	</declare-styleable>
 

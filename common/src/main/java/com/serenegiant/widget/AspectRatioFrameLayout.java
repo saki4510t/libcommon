@@ -21,13 +21,10 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.serenegiant.common.R;
 import com.serenegiant.view.MeasureSpecDelegater;
-
-import static com.serenegiant.widget.IScaledView.SCALE_MODE_KEEP_ASPECT;
 
 /**
  * Created by saki on 2016/12/03.
@@ -39,19 +36,38 @@ public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 	private int mScaleMode = SCALE_MODE_KEEP_ASPECT;
 	private double mRequestedAspect = -1.0;		// initially use default window size
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
 	public AspectRatioFrameLayout(final Context context) {
 		this(context, null, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
 	public AspectRatioFrameLayout(final Context context, final AttributeSet attrs) {
 		super(context, attrs, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyleAttr
+	 */
 	public AspectRatioFrameLayout(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.IAspectRatioView, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
+			R.styleable.IScaledView, defStyleAttr, 0);
 		try {
-			mRequestedAspect = a.getFloat(R.styleable.IAspectRatioView_aspect_ratio, -1.0f);
+			mRequestedAspect = a.getFloat(
+				R.styleable.IScaledView_aspect_ratio, -1.0f);
+			mScaleMode = a.getInt(
+				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
 		} finally {
 			a.recycle();
 		}
