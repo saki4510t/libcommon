@@ -102,17 +102,17 @@ public abstract class KeyboardDelegater
 //--------------------------------------------------------------------------------
 	@Override
 	public void onPress(final int primaryCode) {
-		if (DEBUG) Log.v(TAG, "onPress:");
+		if (DEBUG) Log.v(TAG, "onPress:primaryCode=" + primaryCode);
 	}
 
 	@Override
 	public void onRelease(final int primaryCode) {
-		if (DEBUG) Log.v(TAG, "onRelease:");
+		if (DEBUG) Log.v(TAG, "onRelease:primaryCode=" + primaryCode);
 	}
 
 	@Override
 	public void onKey(final int primaryCode, final int[] keyCodes) {
-		if (DEBUG) Log.v(TAG, "onKey:");
+		if (DEBUG) Log.v(TAG, "onKey:primaryCode=" + primaryCode);
 		Editable editable = mEditText.getText();
 		int start = mEditText.getSelectionStart();
 		if (primaryCode == Keyboard.KEYCODE_DELETE) {
@@ -138,7 +138,7 @@ public abstract class KeyboardDelegater
 
 	@Override
 	public void onText(final CharSequence text) {
-		if (DEBUG) Log.v(TAG, "onText:");
+		if (DEBUG) Log.v(TAG, "onText:" + text);
 	}
 
 	@Override
