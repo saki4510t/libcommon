@@ -21,9 +21,9 @@ package com.serenegiant.view;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.util.Log;
+import android.view.View;
 
 import com.serenegiant.graphics.MatrixUtils;
-import com.serenegiant.widget.ITransformView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,13 +31,13 @@ import androidx.annotation.Nullable;
 /**
  * ITransformViewの表示内容のトランスフォーム用ヘルパークラス
  */
-public class ViewTransformer implements IViewTransformer {
+public abstract class ViewTransformer implements IViewTransformer {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewTransformer.class.getSimpleName();
 
 	@NonNull
-	private final ITransformView mTargetView;
+	private final View mTargetView;
 	/**
 	 * デフォルトのトランスフォームマトリックス
 	 * #setDefaultで変更していなければコンストラクタ実行時に
@@ -75,7 +75,7 @@ public class ViewTransformer implements IViewTransformer {
 	 * コンストラクタ
 	 * @param view
 	 */
-	public ViewTransformer(@NonNull final ITransformView view) {
+	public ViewTransformer(@NonNull final View view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);
@@ -86,7 +86,7 @@ public class ViewTransformer implements IViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	public ITransformView getTargetView() {
+	public View getTargetView() {
 		return mTargetView;
 	}
 
@@ -355,10 +355,12 @@ public class ViewTransformer implements IViewTransformer {
 	 * ITransformView#setTransformを呼び出す
 	 * @param transform
 	 */
-	protected void internalSetTransform(@Nullable final Matrix transform) {
+	private void internalSetTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-		mTargetView.setTransform(transform);
+		setTransform(mTargetView, transform);
 	}
+
+	protected abstract void setTransform(@NonNull final View view, @Nullable final Matrix transform);
 
 	/**
 	 * ITransformViewからのトランスフォームマトリックス取得処理
@@ -368,13 +370,16 @@ public class ViewTransformer implements IViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	protected Matrix internalGetTransform(@Nullable final Matrix transform) {
-		final Matrix result = mTargetView.getTransform(transform);
+	private Matrix internalGetTransform(@Nullable final Matrix transform) {
+		final Matrix result = getTransform(mTargetView, transform);
 		if ((result != transform) && (transform != null)) {
 			transform.set(result);
 		}
 		return result;
 	}
+
+	@NonNull
+	protected abstract Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform);
 
 	/**
 	 * トランスフォームマトリックスを設定
@@ -407,8 +412,8 @@ public class ViewTransformer implements IViewTransformer {
 					mCurrentRotate += 360;
 				}
 			}
-			final int w2 = mTargetView.getView().getWidth() >> 1;
-			final int h2 = mTargetView.getView().getHeight() >> 1;
+			final int w2 = mTargetView.getWidth() >> 1;
+			final int h2 = mTargetView.getHeight() >> 1;
 			// 回転 → 拡大縮小 → 平行移動 → デフォルト
 			// デフォルトトランスフォームマトリックスをセット
 			mTransform.set(mDefaultTransform);
