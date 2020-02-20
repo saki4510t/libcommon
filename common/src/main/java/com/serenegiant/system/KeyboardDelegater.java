@@ -89,7 +89,14 @@ public abstract class KeyboardDelegater
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * KEYCODE_DONEが押されたときの処理
+	 */
 	protected abstract void onOkClick();
+
+	/**
+	 * KEYCODE_CANCELが押されたときの処理
+	 */
 	protected abstract void onCancelClick();
 
 //--------------------------------------------------------------------------------
