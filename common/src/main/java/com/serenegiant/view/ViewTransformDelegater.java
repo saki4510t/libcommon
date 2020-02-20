@@ -514,9 +514,22 @@ public class ViewTransformDelegater {
 		return false;
 	}
 
+	/**
+	 * タッチ操作の有効無効設定
+	 * @param enabled
+	 */
 	public void setEnableHandleTouchEvent(@TouchMode final int enabled) {
 		if (DEBUG) Log.v(TAG, "setEnableHandleTouchEvent:" + enabled);
 		mHandleTouchEvent = enabled;
+	}
+
+	/**
+	 * タッチ操作の有効無効設定を取得
+	 * @return
+	 */
+	@TouchMode
+	public int getEnableHandleTouchEvent() {
+		return mHandleTouchEvent;
 	}
 
 	/**

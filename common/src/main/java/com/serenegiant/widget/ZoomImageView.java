@@ -257,6 +257,15 @@ public class ZoomImageView extends TransformImageView
 	}
 
 	/**
+	 * タッチ操作の有効無効設定を取得
+	 * @return
+	 */
+	@ViewTransformDelegater.TouchMode
+	public int getEnableHandleTouchEvent() {
+		return mDelegater.getEnableHandleTouchEvent();
+	}
+
+	/**
 	 * 最大拡大率を設定
 	 * @param maxScale
 	 */

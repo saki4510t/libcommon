@@ -231,6 +231,23 @@ public class ZoomAspectScaledTextureView2
 		// FIXME 未実装
 	}
 
+	/**
+	 * タッチ操作の有効無効設定
+	 * @param enabled
+	 */
+	public void setEnableHandleTouchEvent(@ViewTransformDelegater.TouchMode final int enabled) {
+		mDelegater.setEnableHandleTouchEvent(enabled);
+	}
+
+	/**
+	 * タッチ操作の有効無効設定を取得
+	 * @return
+	 */
+	@ViewTransformDelegater.TouchMode
+	public int getEnableHandleTouchEvent() {
+		return mDelegater.getEnableHandleTouchEvent();
+	}
+
 //================================================================================
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
