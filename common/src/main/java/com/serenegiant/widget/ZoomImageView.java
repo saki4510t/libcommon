@@ -48,8 +48,8 @@ import androidx.appcompat.widget.AppCompatImageView;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends AppCompatImageView
-	implements ViewTransformDelegater.ITransformView,
-	ITransformView, ViewTransformDelegater.ViewTransformListener {
+	implements ITransformView,
+		ViewTransformDelegater.ViewTransformListener {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
@@ -423,7 +423,7 @@ public class ZoomImageView extends AppCompatImageView
 	 * @param view
 	 */
 	@Override
-	public void onStartRotation(final ViewTransformDelegater.ITransformView view) {
+	public void onStartRotation(final ITransformView view) {
 		if (mColorReverseFilter == null) {
 			mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
 		}
@@ -439,7 +439,7 @@ public class ZoomImageView extends AppCompatImageView
 	 * @param newState
 	 */
 	@Override
-	public void onStateChanged(final ViewTransformDelegater.ITransformView view,
+	public void onStateChanged(final ITransformView view,
 		final int newState) {
 
 		if (newState == ViewTransformDelegater.STATE_NON) {

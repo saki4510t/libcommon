@@ -19,13 +19,15 @@ package com.serenegiant.widget;
 */
 
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * android.graphics.Matrixを使った表示内容のトランスフォーム可能なView
+ * android.graphics.Matrixを使った表示内容の
+ * 拡大縮小平行移動回転可能なView用インターフェース
  */
 public interface ITransformView {
 	@NonNull
@@ -33,4 +35,14 @@ public interface ITransformView {
 	@NonNull
 	public Matrix getTransform(@Nullable Matrix transform);
 	public void setTransform(@Nullable Matrix transform);
+	/**
+	 * View表示内容の大きさを取得
+	 * @return
+	 */
+	public RectF getBounds();
+	/**
+	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
+	 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる
+	 */
+	public void onInit();
 }

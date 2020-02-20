@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -42,8 +41,8 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
  */
 public class ZoomAspectScaledTextureView2
 	extends AspectScaledTextureView implements IRendererCommon,
-		ViewTransformDelegater.ITransformView,
-		ITransformView, ViewTransformDelegater.ViewTransformListener {
+		ITransformView,
+		ViewTransformDelegater.ViewTransformListener {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView2.class.getSimpleName();
@@ -204,26 +203,13 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
-	public RectF getBounds() {
-		if (DEBUG) Log.v(TAG, "getBounds:");
-		// FIXME 未実装
-		return null;
-	}
-
-	@Override
-	public void onInit() {
-		if (DEBUG) Log.v(TAG, "onInit:");
-		// FIXME 未実装
-	}
-
-	@Override
-	public void onStartRotation(final ViewTransformDelegater.ITransformView view) {
+	public void onStartRotation(final ITransformView view) {
 		if (DEBUG) Log.v(TAG, "onStartRotation:");
 		// FIXME 未実装
 	}
 
 	@Override
-	public void onStateChanged(final ViewTransformDelegater.ITransformView view, final int newState) {
+	public void onStateChanged(final ITransformView view, final int newState) {
 		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		// FIXME 未実装
 	}

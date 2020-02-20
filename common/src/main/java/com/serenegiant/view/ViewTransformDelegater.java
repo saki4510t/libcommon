@@ -32,6 +32,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import com.serenegiant.widget.ITransformView;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -46,23 +48,6 @@ public class ViewTransformDelegater {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewTransformDelegater.class.getSimpleName();
-
-	/**
-	 * 拡大縮小平行移動回転可能なView用インターフェース
-	 */
-	public interface ITransformView extends com.serenegiant.widget.ITransformView {
-		/**
-		 * View表示内容の大きさを取得
-		 * @return
-		 */
-		public RectF getBounds();
-		/**
-		 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
-		 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる
-		 */
-		public void onInit();
-
-	} // ITransformView
 
 //--------------------------------------------------------------------------------
 	// constants
@@ -372,7 +357,7 @@ public class ViewTransformDelegater {
 	@NonNull
 	private final ITransformView mParent;
 
-	private final IContentTransformer.IViewTransformer mTransformer;
+	private final IViewTransformer mTransformer;
 	/**
 	 * コンストラクタ
 	 * @param parent
@@ -383,7 +368,18 @@ public class ViewTransformDelegater {
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
-		mTransformer = new ViewTransformer(parent);
+		mTransformer = new ViewTransformer(parent.getView()) {
+			@Override
+			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				parent.setTransform(transform);
+			}
+
+			@NonNull
+			@Override
+			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				return parent.getTransform(transform);
+			}
+		};
 	}
 
 	/**

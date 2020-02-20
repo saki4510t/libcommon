@@ -21,6 +21,7 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -296,5 +297,23 @@ public class AspectScaledTextureView extends TextureView
 	@Override
 	public View getView() {
 		return this;
+	}
+
+	/**
+	 * ITransformViewの実装
+	 * @return
+	 */
+	@Override
+	public RectF getBounds() {
+		return null;
+	}
+
+	/**
+	 * ITransformViewの実装
+	 * @return
+	 */
+	@Override
+	public void onInit() {
+
 	}
 }
