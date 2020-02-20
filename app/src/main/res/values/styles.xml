@@ -19,4 +19,8 @@
 		<item name="windowActionBar">false</item>
 		<item name="windowNoTitle">true</item>
 	</style>
+
+	<style name="AppTheme_NumberKeyboard" parent="AppTheme">
+		<!-- Customize your theme here. -->
+	</style>
 </resources>
