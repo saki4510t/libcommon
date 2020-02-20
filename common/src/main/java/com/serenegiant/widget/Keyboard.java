@@ -51,6 +51,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.StringTokenizer;
 
@@ -254,7 +255,22 @@ public class Keyboard {
 			mode = a.getResourceId(R.styleable.Keyboard_Row_keyboardMode, 0);
 			a.recycle();
 		}
-	}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Row{" +
+				"defaultWidth=" + defaultWidth +
+				", defaultHeight=" + defaultHeight +
+				", defaultHorizontalGap=" + defaultHorizontalGap +
+				", verticalGap=" + verticalGap +
+				", mKeys=" + mKeys +
+				", rowEdgeFlags=" + rowEdgeFlags +
+				", mode=" + mode +
+				'}';
+		}
+
+	} // Row
 
 	/**
 	 * Class for describing the position and characteristics of a single key in the keyboard.
@@ -602,7 +618,33 @@ public class Keyboard {
 			}
 			return states;
 		}
-	}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Key{" +
+				"codes=" + Arrays.toString(codes) +
+				", label=" + label +
+				", icon=" + icon +
+				", iconPreview=" + iconPreview +
+				", width=" + width +
+				", height=" + height +
+				", gap=" + gap +
+				", sticky=" + sticky +
+				", x=" + x +
+				", y=" + y +
+				", pressed=" + pressed +
+				", on=" + on +
+				", text=" + text +
+				", popupCharacters=" + popupCharacters +
+				", edgeFlags=" + edgeFlags +
+				", modifier=" + modifier +
+				", keyboard=" + keyboard +
+				", popupResId=" + popupResId +
+				", repeatable=" + repeatable +
+				'}';
+		}
+	} // Key
 
 	/**
 	 * Creates a keyboard from the given xml key layout file.
