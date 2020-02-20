@@ -24,15 +24,11 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.TextureView;
 import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.view.MeasureSpecDelegater;
-
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,7 +39,7 @@ import androidx.annotation.Nullable;
  */
 public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
-		IAspectRatioView, IScaledView, ITextureView, ITransformView {
+		IAspectRatioView, IScaledView, ITransformView {
 	
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
@@ -52,7 +48,7 @@ public class AspectScaledTextureView extends TransformTextureView
 	private int mScaleMode;
 	private double mRequestedAspect;		// initially use default window size
 	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
-	private final Set<SurfaceTextureListener> mListeners = new CopyOnWriteArraySet<SurfaceTextureListener>();
+	private SurfaceTextureListener mListener;
 
 	/**
 	 * コンストラクタ
@@ -129,21 +125,9 @@ public class AspectScaledTextureView extends TransformTextureView
 	 */
 	@Override
 	public final void setSurfaceTextureListener(final SurfaceTextureListener listener) {
-		register(listener);
+		mListener = listener;
 	}
 	
-	@Override
-	public void register(final SurfaceTextureListener listener) {
-		if (listener != null) {
-			mListeners.add(listener);
-		}
-	}
-	
-	@Override
-	public void unregister(final SurfaceTextureListener listener) {
-		mListeners.remove(listener);
-	}
-
 	protected void onResize(final int width, final int height) {
 	}
 
@@ -158,51 +142,32 @@ public class AspectScaledTextureView extends TransformTextureView
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		mHasSurface = true;
 		init();
-		for (final SurfaceTextureListener listener: mListeners) {
-			try {
-				listener.onSurfaceTextureAvailable(surface, width, height);
-			} catch (final Exception e) {
-				mListeners.remove(listener);
-				Log.w(TAG, e);
-			}
+		if (mListener != null) {
+			mListener.onSurfaceTextureAvailable(surface, width, height);
 		}
 	}
 
 	@Override
 	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
-		for (final SurfaceTextureListener listener: mListeners) {
-			try {
-				listener.onSurfaceTextureSizeChanged(surface, width, height);
-			} catch (final Exception e) {
-				mListeners.remove(listener);
-				Log.w(TAG, e);
-			}
+		if (mListener != null) {
+			mListener.onSurfaceTextureSizeChanged(surface, width, height);
 		}
 	}
 
 	@Override
 	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
 		mHasSurface = false;
-		for (final SurfaceTextureListener listener: mListeners) {
-			try {
-				listener.onSurfaceTextureDestroyed(surface);
-			} catch (final Exception e) {
-				mListeners.remove(listener);
-				Log.w(TAG, e);
-			}
+		if (mListener != null) {
+			mListener.onSurfaceTextureDestroyed(surface);
 		}
 		return false;
 	}
 
+	@Deprecated
 	@Override
 	public void onSurfaceTextureUpdated(final SurfaceTexture surface) {
-		for (final SurfaceTextureListener listener: mListeners) {
-			try {
-				listener.onSurfaceTextureUpdated(surface);
-			} catch (final Exception e) {
-				mListeners.remove(listener);
-				Log.w(TAG, e);
-			}
+		if (mListener != null) {
+			mListener.onSurfaceTextureUpdated(surface);
 		}
 	}
 

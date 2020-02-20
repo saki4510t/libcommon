@@ -58,7 +58,7 @@ class CameraTextureView @JvmOverloads constructor(
 			}
 		)
 
-		register(object : SurfaceTextureListener {
+		surfaceTextureListener = object : SurfaceTextureListener {
 			override fun onSurfaceTextureAvailable(
 				surface: SurfaceTexture?, width: Int, height: Int) {
 
@@ -89,7 +89,7 @@ class CameraTextureView @JvmOverloads constructor(
 //				if (DEBUG) Log.v(TAG, "onSurfaceTextureUpdated:")
 			}
 
-		})
+		}
 	}
 
 	override fun onResume() {
