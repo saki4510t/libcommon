@@ -45,6 +45,7 @@ import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
@@ -155,6 +156,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	private Keyboard mKeyboard;
 	private int mCurrentKeyIndex = NOT_A_KEY;
 	private float mLabelTextSize;
+	private int mLabelTextColor;
 	private float mKeyTextSize;
 	private int mKeyTextColor;
 	private float mShadowRadius;
@@ -306,7 +308,9 @@ public class KeyboardView extends View implements View.OnClickListener {
 	 * @param attrs
 	 * @param defStyleAttr
 	 */
-	public KeyboardView(@NonNull final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
+	public KeyboardView(@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyleAttr) {
+
 		super(context, attrs, defStyleAttr);
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -324,20 +328,36 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:previewLayout=" + previewLayout);
 		mPreviewOffset = a.getDimensionPixelOffset(R.styleable.KeyboardView_keyPreviewOffset, 0);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewOffset=" + mPreviewOffset);
-		mPreviewHeight = a.getDimensionPixelSize(R.styleable.KeyboardView_keyPreviewHeight, 80);
+		mPreviewHeight = a.getDimensionPixelSize(R.styleable.KeyboardView_keyPreviewHeight,
+			resources.getDimensionPixelSize(R.dimen.keyboard_key_preview_height));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewHeight=" + mPreviewHeight);
 		mKeyTextSize = a.getDimension(R.styleable.KeyboardView_keyTextSize,
-			resources.getDimension(R.dimen.number_keyboard_key_text_sz));
+			resources.getDimension(R.dimen.keyboard_key_text_sz));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mKeyTextSize=" + mKeyTextSize);
-		mKeyTextColor = a.getColor(R.styleable.KeyboardView_keyTextColor, 0xFF000000);
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			mKeyTextColor = a.getColor(R.styleable.KeyboardView_keyTextColor,
+				resources.getColor(R.color.keyboard_key_text_color, null));
+			mLabelTextColor = a.getColor(R.styleable.KeyboardView_labelTextColor,
+				resources.getColor(R.color.keyboard_key_label_color, null));
+			mShadowColor = a.getColor(R.styleable.KeyboardView_shadowColor,
+				resources.getColor(R.color.keyboard_key_label_color, null));
+		} else {
+			mKeyTextColor = a.getColor(R.styleable.KeyboardView_keyTextColor,
+				resources.getColor(R.color.keyboard_key_text_color));
+			mLabelTextColor = a.getColor(R.styleable.KeyboardView_labelTextColor,
+				resources.getColor(R.color.keyboard_key_label_color));
+			mShadowColor = a.getColor(R.styleable.KeyboardView_shadowColor,
+				resources.getColor(R.color.keyboard_key_label_color));
+		}
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mKeyTextColor=%08x", mKeyTextColor));
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mLabelTextColor=%08x", mLabelTextColor));
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mShadowColor=%08x", mShadowColor));
 		mLabelTextSize = a.getDimension(R.styleable.KeyboardView_labelTextSize,
-			resources.getDimension(R.dimen.number_keyboard_label_sz));
+			resources.getDimension(R.dimen.keyboard_label_sz));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mLabelTextSize=" + mLabelTextSize);
 		mPopupLayout = a.getResourceId(R.styleable.KeyboardView_popupLayout, 0);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPopupLayout=" + mPopupLayout);
-		mShadowColor = a.getColor(R.styleable.KeyboardView_shadowColor, 0);
-		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mShadowColor=%08x", mShadowColor));
 		mShadowRadius = a.getFloat(R.styleable.KeyboardView_shadowRadius, 0f);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mShadowRadius=" + mShadowRadius);
 		a.recycle();
@@ -763,10 +783,12 @@ public class KeyboardView extends View implements View.OnClickListener {
 				// For characters, use large font. For labels like "Done", use small font.
 				if (label.length() > 1 && key.codes.length < 2) {
 					if (DEBUG) Log.v(TAG, "onBufferDraw:textSz=" + mLabelTextSize);
+					paint.setColor(mLabelTextColor);
 					paint.setTextSize(mLabelTextSize);
 					paint.setTypeface(Typeface.DEFAULT_BOLD);
 				} else {
 					if (DEBUG) Log.v(TAG, "onBufferDraw:textSz=" + mKeyTextSize);
+					paint.setColor(mKeyTextColor);
 					paint.setTextSize(mKeyTextSize);
 					paint.setTypeface(Typeface.DEFAULT);
 				}

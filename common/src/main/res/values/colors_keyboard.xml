@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="keyboard_key_text_color">#FF000000</color>
+	<color name="keyboard_key_label_color">#FF000000</color>
+	<color name="keyboard_shadow_color">#00000000</color>
+</resources>

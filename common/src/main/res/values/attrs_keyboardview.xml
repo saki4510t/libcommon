@@ -5,12 +5,13 @@
 		<attr name="verticalCorrection" format="reference|dimension" default="0dp" />
 		<attr name="keyPreviewLayout" format="reference" default="@null" />
 		<attr name="keyPreviewOffset" format="reference|dimension" default="0dp" />
-		<attr name="keyPreviewHeight" format="reference|dimension" default="24dp" />
-		<attr name="keyTextSize" format="reference|dimension" default="12sp" />
-		<attr name="keyTextColor" format="color" default="#FF000000" />
-		<attr name="labelTextSize" format="reference|dimension" default="8sp" />
+		<attr name="keyPreviewHeight" format="reference|dimension" default="@dimen/keyboard_key_preview_height" />
+		<attr name="keyTextSize" format="reference|dimension" default="@dimen/keyboard_key_text_sz" />
+		<attr name="keyTextColor" format="color" default="@color/keyboard_key_text_color" />
+		<attr name="labelTextSize" format="reference|dimension" default="@dimen/keyboard_label_sz" />
+		<attr name="labelTextColor" format="color" default="@color/keyboard_key_label_color" />
 		<attr name="popupLayout" format="reference" default="0" />
-		<attr name="shadowColor" format="color" default="#00000000" />
+		<attr name="shadowColor" format="color" default="@color/keyboard_shadow_color" />
 		<attr name="shadowRadius" format="reference|float" default="0.0" />
 	</declare-styleable>
 

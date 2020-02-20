@@ -2,14 +2,14 @@
 <Keyboard
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
-	android:horizontalGap="@dimen/number_keyboard_gap_horizontal"
-	android:verticalGap="@dimen/number_keyboard_gap_vertical"
-	android:keyWidth="@dimen/number_keyboard_key_width"
-	android:keyHeight="@dimen/number_keyboard_key_height"
-	app:horizontalGap="@dimen/number_keyboard_gap_horizontal"
-	app:verticalGap="@dimen/number_keyboard_gap_vertical"
-	app:keyWidth="@dimen/number_keyboard_key_width"
-	app:keyHeight="@dimen/number_keyboard_key_height">
+	android:horizontalGap="@dimen/keyboard_gap_horizontal"
+	android:verticalGap="@dimen/keyboard_gap_vertical"
+	android:keyWidth="@dimen/keyboard_key_width"
+	android:keyHeight="@dimen/keyboard_key_height"
+	app:horizontalGap="@dimen/keyboard_gap_horizontal"
+	app:verticalGap="@dimen/keyboard_gap_vertical"
+	app:keyWidth="@dimen/keyboard_key_width"
+	app:keyHeight="@dimen/keyboard_key_height">
 
 	<Row>
 		<Key
