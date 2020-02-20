@@ -58,7 +58,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.XmlRes;
 
 public class Keyboard {
-	private static final boolean DEBUG = true;    // set false on production
+	private static final boolean DEBUG = false;    // set false on production
 	private static final String TAG = Keyboard.class.getSimpleName();
 
 	// Keyboard XML Tags
@@ -178,7 +178,7 @@ public class Keyboard {
 	 */
 	private static float SEARCH_DISTANCE = 1.8f;
 
-	private ArrayList<Row> rows = new ArrayList<Row>();
+	private final List<Row> rows = new ArrayList<>();
 
 	/**
 	 * Container for keys in the keyboard. All keys in a row are at the same Y-coordinate.
@@ -193,6 +193,8 @@ public class Keyboard {
 	 * @attr ref styleable#Keyboard_Row_keyboardMode
 	 */
 	public static class Row {
+		private static final String TAG = Row.class.getSimpleName();
+
 		/**
 		 * Default width of a key in this row.
 		 */
@@ -210,7 +212,7 @@ public class Keyboard {
 		 */
 		public int verticalGap;
 
-		ArrayList<Key> mKeys = new ArrayList<Key>();
+		private final List<Key> mKeys = new ArrayList<>();
 
 		/**
 		 * Edge flags for this row of keys. Possible values that can be assigned are
@@ -230,6 +232,7 @@ public class Keyboard {
 		}
 
 		public Row(Resources res, @NonNull final  Keyboard parent, XmlResourceParser parser) {
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 			this.parent = parent;
 			TypedArray a = res.obtainAttributes(Xml.asAttributeSet(parser),
 				R.styleable.Keyboard);
@@ -272,6 +275,7 @@ public class Keyboard {
 	 * @attr ref R.styleable#Keyboard_Key_keyEdgeFlags
 	 */
 	public static class Key {
+		private static final String TAG = Key.class.getSimpleName();
 		/**
 		 * All the key codes (unicode or custom code) that this key could generate, zero'th
 		 * being the most important.
@@ -387,7 +391,8 @@ public class Keyboard {
 		/**
 		 * Create an empty key with no attributes.
 		 */
-		public Key(Row parent) {
+		public Key(@NonNull final Row parent) {
+//			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 			keyboard = parent.parent;
 			height = parent.defaultHeight;
 			width = parent.defaultWidth;
@@ -406,7 +411,11 @@ public class Keyboard {
 		 * @param y      the y coordinate of the top-left
 		 * @param parser the XML parser containing the attributes for this key
 		 */
-		public Key(Resources res, Keyboard.Row parent, int x, int y, XmlResourceParser parser) {
+		public Key(@NonNull final  Resources res,
+			@NonNull final  Keyboard.Row parent,
+			final int x, final int y,
+			final XmlResourceParser parser) {
+
 			this(parent);
 
 			this.x = x;
@@ -601,7 +610,7 @@ public class Keyboard {
 	 * @param context        the application or service context
 	 * @param xmlLayoutResId the resource file that contains the keyboard layout and keys.
 	 */
-	public Keyboard(Context context, int xmlLayoutResId) {
+	public Keyboard(@NonNull final  Context context, @XmlRes final int xmlLayoutResId) {
 		this(context, xmlLayoutResId, 0);
 	}
 
@@ -615,8 +624,10 @@ public class Keyboard {
 	 * @param width          sets width of keyboard
 	 * @param height         sets height of keyboard
 	 */
-	public Keyboard(Context context, @XmlRes int xmlLayoutResId, int modeId, int width,
-					int height) {
+	public Keyboard(@NonNull final  Context context,
+		@XmlRes int xmlLayoutResId, int modeId,
+		final int width, final int height) {
+
 		mDisplayWidth = width;
 		mDisplayHeight = height;
 
@@ -669,8 +680,11 @@ public class Keyboard {
 	 *                            number of keys that can fit in a row, it will be ignored. If this number is -1, the
 	 *                            keyboard will fit as many keys as possible in each row.
 	 */
-	public Keyboard(Context context, int layoutTemplateResId,
-					CharSequence characters, int columns, int horizontalPadding) {
+	public Keyboard(@NonNull final Context context,
+		int layoutTemplateResId,
+		final CharSequence characters,
+		final int columns, final int horizontalPadding) {
+
 		this(context, layoutTemplateResId);
 		int x = 0;
 		int y = 0;
@@ -709,7 +723,8 @@ public class Keyboard {
 		rows.add(row);
 	}
 
-	final void resize(int newWidth, int newHeight) {
+	final void resize(final int newWidth, final int newHeight) {
+		if (DEBUG) Log.v(TAG, "resize:");
 		int numRows = rows.size();
 		for (int rowIndex = 0; rowIndex < numRows; ++rowIndex) {
 			Row row = rows.get(rowIndex);
@@ -822,6 +837,7 @@ public class Keyboard {
 	}
 
 	private void computeNearestNeighbors() {
+		if (DEBUG) Log.v(TAG, "computeNearestNeighbors:");
 		// Round-up so we don't have any pixels outside the grid
 		mCellWidth = (getMinWidth() + GRID_WIDTH - 1) / GRID_WIDTH;
 		mCellHeight = (getHeight() + GRID_HEIGHT - 1) / GRID_HEIGHT;
@@ -857,7 +873,8 @@ public class Keyboard {
 	 * @return the array of integer indices for the nearest keys to the given point. If the given
 	 * point is out of range, then an array of size zero is returned.
 	 */
-	public int[] getNearestKeys(int x, int y) {
+	public int[] getNearestKeys(final int x, final int y) {
+		if (DEBUG) Log.v(TAG, "getNearestKeys:");
 		if (mGridNeighbors == null) computeNearestNeighbors();
 		if (x >= 0 && x < getMinWidth() && y >= 0 && y < getHeight()) {
 			int index = (y / mCellHeight) * GRID_WIDTH + (x / mCellWidth);
@@ -868,16 +885,24 @@ public class Keyboard {
 		return new int[0];
 	}
 
-	protected Row createRowFromXml(Resources res, XmlResourceParser parser) {
+	protected Row createRowFromXml(@NonNull final Resources res,
+		@NonNull final XmlResourceParser parser) {
+
+		if (DEBUG) Log.v(TAG, "createRowFromXml:");
 		return new Row(res, this, parser);
 	}
 
-	protected Key createKeyFromXml(Resources res, Row parent, int x, int y,
-																	   XmlResourceParser parser) {
+	protected Key createKeyFromXml(@NonNull final Resources res,
+		@NonNull final Row parent,
+		final int x, final int y,
+		@NonNull final XmlResourceParser parser) {
+
+		if (DEBUG) Log.v(TAG, "createKeyFromXml:");
 		return new Key(res, parent, x, y, parser);
 	}
 
 	private void loadKeyboard(Context context, XmlResourceParser parser) {
+		if (DEBUG) Log.v(TAG, "loadKeyboard:");
 		boolean inKey = false;
 		boolean inRow = false;
 		boolean leftMostKey = false;
@@ -951,6 +976,8 @@ public class Keyboard {
 
 	private void skipToEndOfRow(XmlResourceParser parser)
 		throws XmlPullParserException, IOException {
+
+		if (DEBUG) Log.v(TAG, "skipToEndOfRow:");
 		int event;
 		while ((event = parser.next()) != XmlResourceParser.END_DOCUMENT) {
 			if (event == XmlResourceParser.END_TAG
@@ -961,6 +988,8 @@ public class Keyboard {
 	}
 
 	private void parseKeyboardAttributes(Resources res, XmlResourceParser parser) {
+		if (DEBUG) Log.v(TAG, "parseKeyboardAttributes:");
+
 		TypedArray a = res.obtainAttributes(Xml.asAttributeSet(parser),
 			R.styleable.Keyboard);
 
