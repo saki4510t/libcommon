@@ -18,7 +18,7 @@ import androidx.appcompat.widget.AppCompatImageView;
  */
 public class TransformImageView extends AppCompatImageView {
 
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = TransformImageView.class.getSimpleName();
 
 	@Nullable
