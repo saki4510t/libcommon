@@ -23,7 +23,6 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
-import androidx.appcompat.widget.AppCompatImageView
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
 import com.serenegiant.widget.CameraDelegator.ICameraView
@@ -33,7 +32,7 @@ import com.serenegiant.widget.CameraDelegator.ICameraView
  */
 class CameraImageView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: AppCompatImageView(context, attrs, defStyleAttr), ICameraView {
+		: ZoomImageView(context, attrs, defStyleAttr), ICameraView {
 
 	private val mCameraDelegator: CameraDelegator
 	private val mDrawable: SurfaceDrawable
