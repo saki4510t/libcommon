@@ -70,7 +70,7 @@ import java.util.Map;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public abstract class KeyboardView extends View implements View.OnClickListener {
+public class KeyboardView extends View implements View.OnClickListener {
 	private static final boolean DEBUG = true;    // set false on production
 	private static final String TAG = KeyboardView.class.getSimpleName();
 
