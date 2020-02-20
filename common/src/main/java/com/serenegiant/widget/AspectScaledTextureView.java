@@ -29,11 +29,13 @@ import android.view.TextureView;
 import android.view.View;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.MeasureSpecDelegater;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * View/表示内容のスケーリング処理を追加したTextureView
@@ -52,20 +54,42 @@ public class AspectScaledTextureView extends TextureView
 	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
 	private final Set<SurfaceTextureListener> mListeners = new CopyOnWriteArraySet<SurfaceTextureListener>();
 
-	public AspectScaledTextureView(final Context context) {
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
+	public AspectScaledTextureView(@NonNull final Context context) {
 		this(context, null, 0);
 	}
 
-	public AspectScaledTextureView(final Context context, final AttributeSet attrs) {
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
+	public AspectScaledTextureView(@NonNull final Context context,
+		@Nullable final AttributeSet attrs) {
+
 		this(context, attrs, 0);
 	}
 
-	public AspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyleAttr
+	 */
+	public AspectScaledTextureView(@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyleAttr) {
+
 		super(context, attrs, defStyleAttr);
-		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AspectScaledTextureView, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
+			R.styleable.AspectScaledTextureView, defStyleAttr, 0);
 		try {
-			mRequestedAspect = a.getFloat(R.styleable.AspectScaledTextureView_aspect_ratio, -1.0f);
-			mScaleMode = a.getInt(R.styleable.AspectScaledTextureView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mRequestedAspect = a.getFloat(
+				R.styleable.AspectScaledTextureView_aspect_ratio, -1.0f);
+			mScaleMode = a.getInt(
+				R.styleable.AspectScaledTextureView_scale_mode, SCALE_MODE_KEEP_ASPECT);
 		} finally {
 			a.recycle();
 		}
@@ -78,35 +102,10 @@ public class AspectScaledTextureView extends TextureView
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
-// 		要求されたアスペクト比が負の時(初期生成時)は何もしない
-		if (mRequestedAspect > 0 && (mScaleMode == SCALE_MODE_KEEP_ASPECT)) {
-			int initialWidth = MeasureSpec.getSize(widthMeasureSpec);
-			int initialHeight = MeasureSpec.getSize(heightMeasureSpec);
-			final int horizPadding = getPaddingLeft() + getPaddingRight();
-			final int vertPadding = getPaddingTop() + getPaddingBottom();
-			initialWidth -= horizPadding;
-			initialHeight -= vertPadding;
-
-			final double viewAspectRatio = (double)initialWidth / initialHeight;
-			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
-
-			// 計算誤差が生じる可能性が有るので指定した値との差が小さければそのままにする
-			if (Math.abs(aspectDiff) > 0.01) {
-				if (aspectDiff > 0) {
-					// 幅基準で高さを決める
-					initialHeight = (int) (initialWidth / mRequestedAspect);
-				} else {
-					// 高さ基準で幅を決める
-					initialWidth = (int) (initialHeight * mRequestedAspect);
-				}
-				initialWidth += horizPadding;
-				initialHeight += vertPadding;
-				widthMeasureSpec = MeasureSpec.makeMeasureSpec(initialWidth, MeasureSpec.EXACTLY);
-				heightMeasureSpec = MeasureSpec.makeMeasureSpec(initialHeight, MeasureSpec.EXACTLY);
-			}
-		}
-
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
+			mRequestedAspect, mScaleMode,
+			widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
 
 	private int prevWidth = -1;

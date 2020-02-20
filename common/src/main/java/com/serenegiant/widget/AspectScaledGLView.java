@@ -26,6 +26,7 @@ import android.util.Log;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.MatrixUtils;
+import com.serenegiant.view.MeasureSpecDelegater;
 
 import androidx.annotation.Nullable;
 
@@ -89,35 +90,10 @@ public class AspectScaledGLView extends GLView
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
-		// 要求されたアスペクト比が負の時(初期生成時)は何もしない
-		if (mRequestedAspect > 0 && (mScaleMode == SCALE_MODE_KEEP_ASPECT)) {
-			int initialWidth = MeasureSpec.getSize(widthMeasureSpec);
-			int initialHeight = MeasureSpec.getSize(heightMeasureSpec);
-			final int horizPadding = getPaddingLeft() + getPaddingRight();
-			final int vertPadding = getPaddingTop() + getPaddingBottom();
-			initialWidth -= horizPadding;
-			initialHeight -= vertPadding;
-
-			final double viewAspectRatio = (double)initialWidth / initialHeight;
-			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
-
-			// 計算誤差が生じる可能性が有るので指定した値との差が小さければそのままにする
-			if (Math.abs(aspectDiff) > 0.005) {
-				if (aspectDiff > 0) {
-					// 幅基準で高さを決める
-					initialHeight = (int) (initialWidth / mRequestedAspect);
-				} else {
-					// 高さ基準で幅を決める
-					initialWidth = (int) (initialHeight * mRequestedAspect);
-				}
-				initialWidth += horizPadding;
-				initialHeight += vertPadding;
-				widthMeasureSpec = MeasureSpec.makeMeasureSpec(initialWidth, MeasureSpec.EXACTLY);
-				heightMeasureSpec = MeasureSpec.makeMeasureSpec(initialHeight, MeasureSpec.EXACTLY);
-			}
-		}
-
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
+			mRequestedAspect, mScaleMode,
+			widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
 
 	private int prevWidth = -1;

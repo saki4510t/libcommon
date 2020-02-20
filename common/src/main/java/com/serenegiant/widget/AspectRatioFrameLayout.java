@@ -21,9 +21,13 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.widget.FrameLayout;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.MeasureSpecDelegater;
+
+import static com.serenegiant.widget.IScaledView.SCALE_MODE_KEEP_ASPECT;
 
 /**
  * Created by saki on 2016/12/03.
@@ -56,35 +60,10 @@ public class AspectRatioFrameLayout extends FrameLayout implements IAspectRatioV
 	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		// 要求されたアスペクト比が負の時(初期生成時)は何もしない
-		if (mRequestedAspect > 0) {
-			int initialWidth = MeasureSpec.getSize(widthMeasureSpec);
-			int initialHeight = MeasureSpec.getSize(heightMeasureSpec);
-			final int horizPadding = getPaddingLeft() + getPaddingRight();
-			final int vertPadding = getPaddingTop() + getPaddingBottom();
-			initialWidth -= horizPadding;
-			initialHeight -= vertPadding;
-
-			final double viewAspectRatio = (double)initialWidth / initialHeight;
-			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
-
-			// 計算誤差が生じる可能性が有るので指定した値との差が小さければそのままにする
-			if (Math.abs(aspectDiff) > 0.01) {
-				if (aspectDiff > 0) {
-					// 幅基準で高さを決める
-					initialHeight = (int) (initialWidth / mRequestedAspect);
-				} else {
-					// 高さ基準で幅を決める
-					initialWidth = (int) (initialHeight * mRequestedAspect);
-				}
-				initialWidth += horizPadding;
-				initialHeight += vertPadding;
-				widthMeasureSpec = MeasureSpec.makeMeasureSpec(initialWidth, MeasureSpec.EXACTLY);
-				heightMeasureSpec = MeasureSpec.makeMeasureSpec(initialHeight, MeasureSpec.EXACTLY);
-			}
-		}
-
-	     super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
+			mRequestedAspect, SCALE_MODE_KEEP_ASPECT,
+			widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
  	}
 
 	@Override

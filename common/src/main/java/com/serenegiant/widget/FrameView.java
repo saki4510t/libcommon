@@ -120,10 +120,10 @@ public class FrameView extends View {
 //		if (DEBUG) Log.v(TAG, "mFrameWidth=" + mFrameWidth);
 	}
 
-	@Override
-	protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-	}
+//	@Override
+//	protected void onMeasure(final int widthMeasureSpec, final int heightMeasureSpec) {
+//		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+//	}
 
 	@Override
 	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
