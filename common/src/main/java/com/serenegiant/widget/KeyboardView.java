@@ -153,8 +153,8 @@ public class KeyboardView extends View implements View.OnClickListener {
 
 	private Keyboard mKeyboard;
 	private int mCurrentKeyIndex = NOT_A_KEY;
-	private int mLabelTextSize;
-	private int mKeyTextSize;
+	private float mLabelTextSize;
+	private float mKeyTextSize;
 	private int mKeyTextColor;
 	private float mShadowRadius;
 	private int mShadowColor;
@@ -309,45 +309,33 @@ public class KeyboardView extends View implements View.OnClickListener {
 		super(context, attrs, defStyleAttr);
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		TypedArray a = context.obtainStyledAttributes(
+		final TypedArray a = context.obtainStyledAttributes(
 			attrs, R.styleable.KeyboardView, defStyleAttr, 0);
 
-		LayoutInflater inflate =
-			(LayoutInflater) context
-				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		final LayoutInflater inflate = LayoutInflater.from(context);
 
-		int previewLayout = 0;
-		int keyTextSize = 0;
-
-		int n = a.getIndexCount();
-
-		for (int i = 0; i < n; i++) {
-			int attr = a.getIndex(i);
-
-			if (attr == R.styleable.KeyboardView_keyBackground) {
-				mKeyBackground = a.getDrawable(attr);
-			} else if (attr == R.styleable.KeyboardView_verticalCorrection) {
-				mVerticalCorrection = a.getDimensionPixelOffset(attr, 0);
-			} else if (attr == R.styleable.KeyboardView_keyPreviewLayout) {
-				previewLayout = a.getResourceId(attr, 0);
-			} else if (attr == R.styleable.KeyboardView_keyPreviewOffset) {
-				mPreviewOffset = a.getDimensionPixelOffset(attr, 0);
-			} else if (attr == R.styleable.KeyboardView_keyPreviewHeight) {
-				mPreviewHeight = a.getDimensionPixelSize(attr, 80);
-			} else if (attr == R.styleable.KeyboardView_keyTextSize) {
-				mKeyTextSize = a.getDimensionPixelSize(attr, 18);
-			} else if (attr == R.styleable.KeyboardView_keyTextColor) {
-				mKeyTextColor = a.getColor(attr, 0xFF000000);
-			} else if (attr == R.styleable.KeyboardView_labelTextSize) {
-				mLabelTextSize = a.getDimensionPixelSize(attr, 14);
-			} else if (attr == R.styleable.KeyboardView_popupLayout) {
-				mPopupLayout = a.getResourceId(attr, 0);
-			} else if (attr == R.styleable.KeyboardView_shadowColor) {
-				mShadowColor = a.getColor(attr, 0);
-			} else if (attr == R.styleable.KeyboardView_shadowRadius) {
-				mShadowRadius = a.getFloat(attr, 0f);
-			}
-		}
+		mKeyBackground = a.getDrawable(R.styleable.KeyboardView_keyBackground);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mKeyBackground=" + mKeyBackground);
+		mVerticalCorrection = a.getDimensionPixelOffset( R.styleable.KeyboardView_verticalCorrection, 0);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mVerticalCorrection=" + mVerticalCorrection);
+		int previewLayout = a.getResourceId(R.styleable.KeyboardView_keyPreviewLayout, 0);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:previewLayout=" + previewLayout);
+		mPreviewOffset = a.getDimensionPixelOffset(R.styleable.KeyboardView_keyPreviewOffset, 0);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewOffset=" + mPreviewOffset);
+		mPreviewHeight = a.getDimensionPixelSize(R.styleable.KeyboardView_keyPreviewHeight, 80);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewHeight=" + mPreviewHeight);
+		mKeyTextSize = a.getDimension(R.styleable.KeyboardView_keyTextSize, 18);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mKeyTextSize=" + mKeyTextSize);
+		mKeyTextColor = a.getColor(R.styleable.KeyboardView_keyTextColor, 0xFF000000);
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mKeyTextColor=%08x", mKeyTextColor));
+		mLabelTextSize = a.getDimension(R.styleable.KeyboardView_labelTextSize, 14);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mLabelTextSize=" + mLabelTextSize);
+		mPopupLayout = a.getResourceId(R.styleable.KeyboardView_popupLayout, 0);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mPopupLayout=" + mPopupLayout);
+		mShadowColor = a.getColor(R.styleable.KeyboardView_shadowColor, 0);
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mShadowColor=%08x", mShadowColor));
+		mShadowRadius = a.getFloat(R.styleable.KeyboardView_shadowRadius, 0f);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:mShadowRadius=" + mShadowRadius);
 		a.recycle();
 
 		mPreviewPopup = new PopupWindow(context);
@@ -371,7 +359,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 
 		mPaint = new Paint();
 		mPaint.setAntiAlias(true);
-		mPaint.setTextSize(keyTextSize);
+		mPaint.setTextSize(0);
 		mPaint.setTextAlign(Paint.Align.CENTER);
 		mPaint.setAlpha(255);
 
@@ -766,12 +754,15 @@ public class KeyboardView extends View implements View.OnClickListener {
 			canvas.translate(key.x + kbdPaddingLeft, key.y + kbdPaddingTop);
 			keyBackground.draw(canvas);
 
+			if (DEBUG) Log.d(TAG, "onBufferDraw:label=" + label + ",icon=" + key.icon);
 			if (label != null) {
 				// For characters, use large font. For labels like "Done", use small font.
 				if (label.length() > 1 && key.codes.length < 2) {
+					if (DEBUG) Log.v(TAG, "onBufferDraw:textSz=" + mLabelTextSize);
 					paint.setTextSize(mLabelTextSize);
 					paint.setTypeface(Typeface.DEFAULT_BOLD);
 				} else {
+					if (DEBUG) Log.v(TAG, "onBufferDraw:textSz=" + mKeyTextSize);
 					paint.setTextSize(mKeyTextSize);
 					paint.setTypeface(Typeface.DEFAULT);
 				}
