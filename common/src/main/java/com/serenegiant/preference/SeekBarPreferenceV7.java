@@ -67,7 +67,8 @@ public final class SeekBarPreferenceV7 extends Preference {
 
 	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
-		TypedArray attribs = context.obtainStyledAttributes(attrs, R.styleable.SeekBarPreference, defStyle, 0);
+		TypedArray attribs = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.SeekBarPreference, defStyle, 0);
 		mSeekbarLayoutId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_layout, R.layout.seekbar_preference);
 		mSeekbarId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_id, R.id.seekbar);
 		mLabelTvId = attribs.getResourceId(R.styleable.SeekBarPreference_seekbar_label_id, R.id.seekbar_value_label);

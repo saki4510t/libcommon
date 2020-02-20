@@ -153,7 +153,7 @@ public final class ItemPicker extends LinearLayout {
         final LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.item_picker, this, true);
 
-        TypedArray a = context.obtainStyledAttributes(
+        TypedArray a = context.getTheme().obtainStyledAttributes(
         		attrs, R.styleable.ItemPicker, defStyle, 0);
 
         final int minValue = a.getInt(R.styleable.ItemPicker_ItemPickerMinItemValue, -1);

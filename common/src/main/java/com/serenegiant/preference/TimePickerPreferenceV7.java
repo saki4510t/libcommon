@@ -58,7 +58,7 @@ public class TimePickerPreferenceV7 extends DialogPreferenceV7 {
 
 		super(context, attrs, defStyle);
 
-        final TypedArray a = context.obtainStyledAttributes(
+        final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.TimePicker, defStyle, 0);
         mDefaultValue = (long)a.getFloat(R.styleable.TimePicker_TimePickerDefaultValue, -1);
         a.recycle();

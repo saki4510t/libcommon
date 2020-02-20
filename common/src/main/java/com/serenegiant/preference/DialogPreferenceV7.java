@@ -90,8 +90,8 @@ public class DialogPreferenceV7 extends Preference
 		
 		super(context, attrs, defStyleAttr, defStyleRes);
 
-		final TypedArray a = context.obtainStyledAttributes(attrs,
-			androidx.preference.R.styleable.DialogPreference,
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, androidx.preference.R.styleable.DialogPreference,
 			defStyleAttr, defStyleRes);
 		
 		mDialogTitle = a.getString(

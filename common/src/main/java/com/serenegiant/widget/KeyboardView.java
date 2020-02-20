@@ -36,6 +36,7 @@ package com.serenegiant.widget;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -309,10 +310,11 @@ public class KeyboardView extends View implements View.OnClickListener {
 		super(context, attrs, defStyleAttr);
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		final TypedArray a = context.obtainStyledAttributes(
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.KeyboardView, defStyleAttr, 0);
 
 		final LayoutInflater inflate = LayoutInflater.from(context);
+		final Resources resources = context.getResources();
 
 		mKeyBackground = a.getDrawable(R.styleable.KeyboardView_keyBackground);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mKeyBackground=" + mKeyBackground);
@@ -324,11 +326,13 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewOffset=" + mPreviewOffset);
 		mPreviewHeight = a.getDimensionPixelSize(R.styleable.KeyboardView_keyPreviewHeight, 80);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPreviewHeight=" + mPreviewHeight);
-		mKeyTextSize = a.getDimension(R.styleable.KeyboardView_keyTextSize, 18);
+		mKeyTextSize = a.getDimension(R.styleable.KeyboardView_keyTextSize,
+			resources.getDimension(R.dimen.number_keyboard_key_text_sz));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mKeyTextSize=" + mKeyTextSize);
 		mKeyTextColor = a.getColor(R.styleable.KeyboardView_keyTextColor, 0xFF000000);
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:mKeyTextColor=%08x", mKeyTextColor));
-		mLabelTextSize = a.getDimension(R.styleable.KeyboardView_labelTextSize, 14);
+		mLabelTextSize = a.getDimension(R.styleable.KeyboardView_labelTextSize,
+			resources.getDimension(R.dimen.number_keyboard_label_sz));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mLabelTextSize=" + mLabelTextSize);
 		mPopupLayout = a.getResourceId(R.styleable.KeyboardView_popupLayout, 0);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:mPopupLayout=" + mPopupLayout);

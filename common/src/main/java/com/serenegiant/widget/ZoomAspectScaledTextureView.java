@@ -156,9 +156,8 @@ public class ZoomAspectScaledTextureView
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
-		final TypedArray a
-			= context.getTheme()
-				.obtainStyledAttributes(attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+				attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
 		try {
 			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
 			mHandleTouchEvent = a.getInteger(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);

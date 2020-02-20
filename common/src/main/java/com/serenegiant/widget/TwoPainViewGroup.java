@@ -129,7 +129,8 @@ public class TwoPainViewGroup extends FrameLayout {
 
 	public TwoPainViewGroup(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		final TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.TwoPainViewGroup, defStyleAttr, 0);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.TwoPainViewGroup, defStyleAttr, 0);
 		mOrientation = a.getInt(R.styleable.TwoPainViewGroup_orientation, HORIZONTAL);
 		mDisplayMode = a.getInt(R.styleable.TwoPainViewGroup_displayMode, MODE_SPLIT);
 		mEnableSubWindow = a.getBoolean(R.styleable.TwoPainViewGroup_enableSubWindow, true);

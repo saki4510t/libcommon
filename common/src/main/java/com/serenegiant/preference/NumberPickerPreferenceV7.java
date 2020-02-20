@@ -58,7 +58,7 @@ public class NumberPickerPreferenceV7 extends DialogPreference {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 
-		final TypedArray a = context.obtainStyledAttributes(
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.NumberPicker, defStyle, 0);
 		mDefaultValue = a.getInt(R.styleable.NumberPicker_DefaultValue, 0);
 		final int min = a.getInt(R.styleable.NumberPicker_MinValue, 0);

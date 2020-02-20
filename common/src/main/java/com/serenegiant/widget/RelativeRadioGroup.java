@@ -78,7 +78,7 @@ public class RelativeRadioGroup extends RelativeLayout {
 
         // retrieve selected radio button as requested by the user in the
         // XML layout file
-/*      TypedArray attributes = context.obtainStyledAttributes(
+/*      TypedArray attributes = context.getTheme().obtainStyledAttributes(
                 attrs, com.android.internal.R.styleable.RadioGroup, com.android.internal.R.attr.radioButtonStyle, 0);
 
         int value = attributes.getResourceId(android.R.styleable.RadioGroup_checkedButton, View.NO_ID);

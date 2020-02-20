@@ -105,7 +105,8 @@ public class FrameView extends View {
 		super(context, attrs, defStyleAttr);
 		metrics = getContext().getResources().getDisplayMetrics();
 		defaultFrameWidth = DEFAULT_FRAME_WIDTH_DP * metrics.density;
-		TypedArray attribs = context.obtainStyledAttributes(attrs, R.styleable.FrameView, defStyleAttr, 0);
+		TypedArray attribs = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.FrameView, defStyleAttr, 0);
 		mFrameType = attribs.getInt(R.styleable.FrameView_frame_type, FRAME_TYPE_NONE);
 		mFrameWidth = attribs.getDimension(R.styleable.FrameView_frame_width, defaultFrameWidth);
 		mFrameColor = attribs.getColor(R.styleable.FrameView_frame_color, 0xffb1b1b1);

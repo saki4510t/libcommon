@@ -55,7 +55,7 @@ public class RecycleViewWithEmptyView extends RecyclerView {
 		Drawable divider = null;
 		if (attrs != null) {
 			int defStyleRes = 0;
-			final TypedArray attribs = context.obtainStyledAttributes(
+			final TypedArray attribs = context.getTheme().obtainStyledAttributes(
 				attrs, R.styleable.RecycleViewWithEmptyView, defStyle, defStyleRes);
 			try {
 				if (attribs.hasValue(R.styleable.RecycleViewWithEmptyView_listDivider)) {

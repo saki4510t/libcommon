@@ -47,7 +47,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration  {
 
 	public DividerItemDecoration(final Context context) {
 		Drawable divider = null;
-		final TypedArray a = context.obtainStyledAttributes(ATTRS);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(ATTRS);
 		try {
 			divider = a.getDrawable(0);
 		} catch (final Exception e) {
