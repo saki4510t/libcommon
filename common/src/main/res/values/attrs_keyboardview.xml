@@ -27,7 +27,7 @@
 	</declare-styleable>
 
 	<declare-styleable name="Keyboard_Key">
-		<attr name="codes" format="reference" default="0" />
+		<attr name="codes" format="integer|string" default="0" />
 		<attr name="iconPreview" format="reference|color" default="0" />
 		<attr name="popupCharacters" format="string" default="" />
 		<attr name="popupKeyboard" format="reference" default="0"/>

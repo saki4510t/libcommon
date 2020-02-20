@@ -430,6 +430,7 @@ public class Keyboard {
 			this.x += gap;
 			TypedValue codesValue = new TypedValue();
 			a.getValue(R.styleable.Keyboard_Key_codes, codesValue);
+			if (DEBUG) Log.i(TAG, "Key:" + codesValue);
 			if (codesValue.type == TypedValue.TYPE_INT_DEC
 				|| codesValue.type == TypedValue.TYPE_INT_HEX) {
 				codes = new int[]{codesValue.data};
