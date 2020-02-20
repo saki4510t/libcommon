@@ -26,7 +26,6 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
-import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -39,16 +38,14 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.serenegiant.view.ViewTransformDelegater;
-import com.serenegiant.view.ViewTransformer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatImageView;
 
 /**
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
-public class ZoomImageView extends AppCompatImageView
+public class ZoomImageView extends TransformImageView
 	implements ITransformView,
 		ViewTransformDelegater.ViewTransformListener {
 
@@ -115,24 +112,7 @@ public class ZoomImageView extends AppCompatImageView
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mDelegater = new ViewTransformDelegater(this, new ViewTransformer(this) {
-			@Override
-			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				ZoomImageView.super.setImageMatrix(transform);
-			}
-
-			@NonNull
-			@Override
-			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				Matrix result = transform;
-				if (transform != null) {
-					result.set(ZoomImageView.super.getImageMatrix());
-				} else {
-					result = new Matrix(ZoomImageView.super.getImageMatrix());
-				}
-				return result;
-			}
-		});
+		mDelegater = new ViewTransformDelegater(this, getViewTransformer());
 	}
 
 	@Override
