@@ -46,7 +46,7 @@ public class ZoomAspectScaledTextureView2
 	extends TransformTextureView implements IRendererCommon,
 		TextureView.SurfaceTextureListener,
 		ViewTransformDelegater.ViewTransformListener,
-		IAspectRatioView, IScaledView {
+		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView2.class.getSimpleName();

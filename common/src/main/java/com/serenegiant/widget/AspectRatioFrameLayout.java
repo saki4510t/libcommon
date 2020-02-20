@@ -33,8 +33,10 @@ import static com.serenegiant.widget.IScaledView.SCALE_MODE_KEEP_ASPECT;
  * Created by saki on 2016/12/03.
  *
  */
-public class AspectRatioFrameLayout extends FrameLayout implements IAspectRatioView {
+public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 
+	@ScaleMode
+	private int mScaleMode = SCALE_MODE_KEEP_ASPECT;
 	private double mRequestedAspect = -1.0;		// initially use default window size
 
 	public AspectRatioFrameLayout(final Context context) {
@@ -61,10 +63,23 @@ public class AspectRatioFrameLayout extends FrameLayout implements IAspectRatioV
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
-			mRequestedAspect, SCALE_MODE_KEEP_ASPECT,
+			mRequestedAspect, mScaleMode,
 			widthMeasureSpec, heightMeasureSpec);
 		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
  	}
+
+	@Override
+	public void setScaleMode(final int scaleMode) {
+		if (mScaleMode != scaleMode) {
+			mScaleMode = scaleMode;
+			requestLayout();
+		}
+	}
+
+	@Override
+	public int getScaleMode() {
+		return mScaleMode;
+	}
 
 	@Override
 	public void setAspectRatio(final double aspectRatio) {

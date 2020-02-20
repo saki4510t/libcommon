@@ -35,7 +35,7 @@ import androidx.annotation.Nullable;
  * スケーリングモードがSCALE_MODE_KEEP_ASPECTのときはViewのサイズ変更を行う
  */
 public class AspectScaledGLView extends GLView
-	implements IAspectRatioView, IScaledView {
+	implements IScaledView {
 
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = AspectScaledGLView.class.getSimpleName();

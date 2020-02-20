@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
  */
 public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
-		IAspectRatioView, IScaledView {
+		IScaledView {
 	
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
