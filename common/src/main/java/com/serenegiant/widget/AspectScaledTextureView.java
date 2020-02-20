@@ -21,11 +21,9 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Matrix;
-import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
 import android.view.TextureView;
-import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.view.MeasureSpecDelegater;
@@ -39,7 +37,7 @@ import androidx.annotation.Nullable;
  */
 public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
-		IAspectRatioView, IScaledView, ITransformView {
+		IAspectRatioView, IScaledView {
 	
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
@@ -260,31 +258,4 @@ public class AspectScaledTextureView extends TransformTextureView
 		setTransform(mImageMatrix);
 	}
 
-	/**
-	 * ITransformViewの実装
-	 * @return
-	 */
-	@NonNull
-	@Override
-	public View getView() {
-		return this;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * @return
-	 */
-	@Override
-	public RectF getBounds() {
-		return null;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * @return
-	 */
-	@Override
-	public void onInit() {
-
-	}
 }

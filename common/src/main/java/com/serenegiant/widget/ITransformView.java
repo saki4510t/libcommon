@@ -35,7 +35,7 @@ public interface ITransformView {
 	 * View表示内容の大きさを取得
 	 * @return
 	 */
-	public RectF getBounds();
+	public RectF getContentBounds();
 	/**
 	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
 	 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる

@@ -22,16 +22,21 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.AbsSavedState;
 import android.view.MotionEvent;
+import android.view.TextureView;
+import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.ViewTransformDelegater;
+
+import androidx.annotation.NonNull;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
@@ -40,13 +45,17 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
  * FIXME まだうまく動かにゃい
  */
 public class ZoomAspectScaledTextureView2
-	extends AspectScaledTextureView implements IRendererCommon,
-		ITransformView,
-		ViewTransformDelegater.ViewTransformListener {
+	extends TransformTextureView implements IRendererCommon,
+		TextureView.SurfaceTextureListener,
+		ITransformView, ViewTransformDelegater.ViewTransformListener,
+		IAspectRatioView, IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView2.class.getSimpleName();
 
+
+	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
+	private SurfaceTextureListener mListener;
 
 	/**
 	 * タッチ操作の有効無効設定
@@ -55,6 +64,9 @@ public class ZoomAspectScaledTextureView2
 	private int mHandleTouchEvent;
 	@MirrorMode
     private int mMirrorMode = MIRROR_NORMAL;
+	@ScaleMode
+	private int mScaleMode;
+	private double mRequestedAspect;		// initially use default window size
 
 	private final ViewTransformDelegater mDelegater;
 
@@ -96,7 +108,17 @@ public class ZoomAspectScaledTextureView2
 		} finally {
 			a.recycle();
 		}
+		super.setSurfaceTextureListener(this);
 		mDelegater = new ViewTransformDelegater(this, getViewTransformer());
+	}
+
+	@Override
+	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
+		super.onLayout(changed, left, top, right, bottom);
+//		if (DEBUG) Log.v(TAG, "onLayout:width=" + getWidth() + ",height=" + getHeight());
+//		if view size(width|height) is zero(the view size not decided yet)
+		if (getWidth() == 0 || getHeight() == 0) return;
+		init();
 	}
 
 	@Override
@@ -153,39 +175,48 @@ public class ZoomAspectScaledTextureView2
 		return super.onTouchEvent(event);
 	}
 
+
+	public boolean hasSurface() {
+		return mHasSurface;
+	}
+
 //================================================================================
-	/**
-	 * TextureViewに関連付けられたSurfaceTextureが利用可能になった時の処理
-	 */
+// SurfaceTextureListener
+//================================================================================
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
-		super.onSurfaceTextureAvailable(surface, width, height);
-		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)", width, height));
+		mHasSurface = true;
 		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
+		init();
+		if (mListener != null) {
+			mListener.onSurfaceTextureAvailable(surface, width, height);
+		}
 	}
 
-	/**
-	 * SurfaceTextureのバッファーのサイズが変更された時の処理
-	 */
 	@Override
 	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
-		super.onSurfaceTextureSizeChanged(surface, width, height);
-		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)", width, height));
 		applyMirrorMode();
+		if (mListener != null) {
+			mListener.onSurfaceTextureSizeChanged(surface, width, height);
+		}
 	}
 
-//	/**
-//	 * SurfaceTextureが破棄される時の処理
-//	 * trueを返すとこれ以降描画処理は行われなくなる
-//	 * falseを返すと自分でSurfaceTexture#release()を呼び出さないとダメ
-//	 * ほとんどのアプリではtrueを返すべきである
-//	 */
-//	@Override
-//	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
-//		super.onSurfaceTextureDestroyed(surface)
-//		return true;
-//	}
+	@Override
+	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
+		mHasSurface = false;
+		if (mListener != null) {
+			mListener.onSurfaceTextureDestroyed(surface);
+		}
+		return false;
+	}
 
+	@Deprecated
+	@Override
+	public void onSurfaceTextureUpdated(final SurfaceTexture surface) {
+		if (mListener != null) {
+			mListener.onSurfaceTextureUpdated(surface);
+		}
+	}
 //================================================================================
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
@@ -234,7 +265,6 @@ public class ZoomAspectScaledTextureView2
 //================================================================================
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
-		super.init();
 		mDelegater.init();
 	}
 
@@ -269,4 +299,62 @@ public class ZoomAspectScaledTextureView2
 		}
 	}
 
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
+	}
+
+	@Override
+	public RectF getContentBounds() {
+		return null;
+	}
+
+	@Override
+	public void onInit() {
+
+	}
+
+//================================================================================
+// IAspectRatioView
+//================================================================================
+	/**
+	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 */
+	@Override
+	public void setAspectRatio(final double aspectRatio) {
+//		if (DEBUG) Log.v(TAG, "setAspectRatio");
+		if (mRequestedAspect != aspectRatio) {
+			mRequestedAspect = aspectRatio;
+			requestLayout();
+		}
+ 	}
+
+	@Override
+	public void setAspectRatio(final int width, final int height) {
+		setAspectRatio(width / (double)height);
+	}
+
+	@Override
+	public double getAspectRatio() {
+		return mRequestedAspect;
+	}
+
+//================================================================================
+// IScaledView
+//================================================================================
+
+	@Override
+	public void setScaleMode(@ScaleMode final int scale_mode) {
+		if (mScaleMode != scale_mode) {
+			mScaleMode = scale_mode;
+			requestLayout();
+		}
+	}
+
+	@ScaleMode
+	@Override
+	public int getScaleMode() {
+		return mScaleMode;
+	}
 }

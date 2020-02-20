@@ -343,7 +343,7 @@ public class ZoomImageView extends TransformImageView
 	 * @return
 	 */
 	@Override
-	public RectF getBounds() {
+	public RectF getContentBounds() {
 		final RectF result;
 		final Drawable dr = getDrawable();
 		if (dr != null) {

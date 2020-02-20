@@ -642,7 +642,7 @@ public class ViewTransformDelegater {
 		mLimitRect.set(getDrawingRect());
 		if (DEBUG) Log.v(TAG, "init:mLimitRect=" + mLimitRect);
 		// update image size
-		final RectF bounds = mParent.getBounds();
+		final RectF bounds = mParent.getContentBounds();
 		if ((bounds != null) && !bounds.isEmpty()) {
 			mImageRect.set(bounds);
 		} else {
