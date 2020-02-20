@@ -18,12 +18,11 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
-import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.view.View;
 
+
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 /**
  * android.graphics.Matrixを使った表示内容の
@@ -32,9 +31,6 @@ import androidx.annotation.Nullable;
 public interface ITransformView {
 	@NonNull
 	public View getView();
-	@NonNull
-	public Matrix getTransform(@Nullable Matrix transform);
-	public void setTransform(@Nullable Matrix transform);
 	/**
 	 * View表示内容の大きさを取得
 	 * @return

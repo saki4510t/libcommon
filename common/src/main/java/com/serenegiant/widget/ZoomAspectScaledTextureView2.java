@@ -22,16 +22,22 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.AbsSavedState;
 import android.view.MotionEvent;
+import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.ViewTransformDelegater;
+import com.serenegiant.view.ViewTransformer;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
@@ -96,7 +102,18 @@ public class ZoomAspectScaledTextureView2
 		} finally {
 			a.recycle();
 		}
-		mDelegater = new ViewTransformDelegater(this);
+		mDelegater = new ViewTransformDelegater(this, new ViewTransformer(this) {
+			@Override
+			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				ZoomAspectScaledTextureView2.super.setTransform(transform);
+			}
+
+			@NonNull
+			@Override
+			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				return ZoomAspectScaledTextureView2.super.getTransform(transform);
+			}
+		});
 	}
 
 	@Override

@@ -356,30 +356,21 @@ public class ViewTransformDelegater {
 	 */
 	@NonNull
 	private final ITransformView mParent;
-
+	@NonNull
 	private final IViewTransformer mTransformer;
 	/**
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public ViewTransformDelegater(@NonNull final ITransformView parent) {
+	public ViewTransformDelegater(@NonNull final ITransformView parent,
+		@NonNull final IViewTransformer transformer) {
+
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mParent = parent;
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
-		mTransformer = new ViewTransformer(parent.getView()) {
-			@Override
-			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				parent.setTransform(transform);
-			}
-
-			@NonNull
-			@Override
-			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				return parent.getTransform(transform);
-			}
-		};
+		mTransformer = transformer;
 	}
 
 	/**

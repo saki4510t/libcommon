@@ -39,6 +39,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.serenegiant.view.ViewTransformDelegater;
+import com.serenegiant.view.ViewTransformer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -114,7 +115,24 @@ public class ZoomImageView extends AppCompatImageView
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mDelegater = new ViewTransformDelegater(this);
+		mDelegater = new ViewTransformDelegater(this, new ViewTransformer(this) {
+			@Override
+			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				ZoomImageView.super.setImageMatrix(transform);
+			}
+
+			@NonNull
+			@Override
+			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				Matrix result = transform;
+				if (transform != null) {
+					result.set(ZoomImageView.super.getImageMatrix());
+				} else {
+					result = new Matrix(ZoomImageView.super.getImageMatrix());
+				}
+				return result;
+			}
+		});
 	}
 
 	@Override
@@ -362,32 +380,6 @@ public class ZoomImageView extends AppCompatImageView
 		// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
 		// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 		setFrame(getLeft(), getTop(), getRight(), getBottom());
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * @param transform
-	 * @return
-	 */
-	@NonNull
-	@Override
-	public Matrix getTransform(@Nullable final Matrix transform) {
-		Matrix result = transform;
-		if (result != null) {
-			result.set(super.getImageMatrix());
-		} else {
-			result = new Matrix(super.getImageMatrix());
-		}
-		return result;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * @param transform
-	 */
-	@Override
-	public void setTransform(final Matrix transform) {
-		super.setImageMatrix(transform);
 	}
 
 //--------------------------------------------------------------------------------
