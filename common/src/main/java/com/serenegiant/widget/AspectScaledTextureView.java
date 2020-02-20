@@ -126,8 +126,15 @@ public class AspectScaledTextureView extends TransformTextureView
 	@Override
 	public final void setSurfaceTextureListener(final SurfaceTextureListener listener) {
 		mListener = listener;
+		// 自分自身を登録してあるのでsuper#setSurfaceTextureListenerは呼ばない
 	}
-	
+
+	@Override
+	public SurfaceTextureListener getSurfaceTextureListener() {
+		// 自分自身を登録してあるのでsuper#getSurfaceTextureListenerは呼ばない
+		return mListener;
+	}
+
 	protected void onResize(final int width, final int height) {
 	}
 
