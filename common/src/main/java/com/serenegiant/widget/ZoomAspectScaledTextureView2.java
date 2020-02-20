@@ -36,8 +36,6 @@ import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.ViewTransformDelegater;
 
-import androidx.annotation.NonNull;
-
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
 /**
@@ -47,7 +45,7 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
 public class ZoomAspectScaledTextureView2
 	extends TransformTextureView implements IRendererCommon,
 		TextureView.SurfaceTextureListener,
-		ITransformView, ViewTransformDelegater.ViewTransformListener,
+		ViewTransformDelegater.ViewTransformListener,
 		IAspectRatioView, IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
@@ -109,7 +107,17 @@ public class ZoomAspectScaledTextureView2
 			a.recycle();
 		}
 		super.setSurfaceTextureListener(this);
-		mDelegater = new ViewTransformDelegater(this, getViewTransformer());
+		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
+			@Override
+			public RectF getContentBounds() {
+				return null;
+			}
+
+			@Override
+			public void onInit() {
+
+			}
+		};
 	}
 
 	@Override
@@ -234,13 +242,13 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
-	public void onStartRotation(final ITransformView view) {
+	public void onStartRotation(final View view) {
 		if (DEBUG) Log.v(TAG, "onStartRotation:");
 		// FIXME 未実装
 	}
 
 	@Override
-	public void onStateChanged(final ITransformView view, final int newState) {
+	public void onStateChanged(final View view, final int newState) {
 		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		// FIXME 未実装
 	}
@@ -297,22 +305,6 @@ public class ZoomAspectScaledTextureView2
 			setScaleY(1.0f);
 			break;
 		}
-	}
-
-	@NonNull
-	@Override
-	public View getView() {
-		return this;
-	}
-
-	@Override
-	public RectF getContentBounds() {
-		return null;
-	}
-
-	@Override
-	public void onInit() {
-
 	}
 
 //================================================================================

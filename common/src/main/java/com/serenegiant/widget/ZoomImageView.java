@@ -46,8 +46,7 @@ import androidx.annotation.Nullable;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends TransformImageView
-	implements ITransformView,
-		ViewTransformDelegater.ViewTransformListener {
+	implements ViewTransformDelegater.ViewTransformListener {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
@@ -112,7 +111,41 @@ public class ZoomImageView extends TransformImageView
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mDelegater = new ViewTransformDelegater(this, getViewTransformer());
+		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
+			/**
+			 * ITransformViewの実装
+			 * View表示内容の大きさを取得
+			 * @return
+			 */
+			@Override
+			public RectF getContentBounds() {
+				final RectF result;
+				final Drawable dr = getDrawable();
+				if (dr != null) {
+					result = new RectF(dr.getBounds());
+				} else {
+					result = new RectF();
+				}
+				return result;
+			}
+
+			/**
+			 * ITransformViewの実装
+			 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
+			 */
+			@Override
+			public void onInit() {
+				if (DEBUG) Log.v(TAG, "onInit:");
+				// 拡大縮小率のデフォルト値を取得するためにImageView自体にトランスフォームマトリックスを計算させる
+				// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
+				// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
+				// 　　Viewのアスペクト比と画像のアスペクト比が異なれば上下または左右のいずれかが見切れる
+				ZoomImageView.super.setScaleType(mDefaultScaleType);
+				// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
+				// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
+				setFrame(getLeft(), getTop(), getRight(), getBottom());
+			}
+		};
 	}
 
 	@Override
@@ -328,51 +361,6 @@ public class ZoomImageView extends TransformImageView
 
 //--------------------------------------------------------------------------------
 	/**
-	 * ITransformViewの実装
-	 * @return
-	 */
-	@NonNull
-	@Override
-	public View getView() {
-		return this;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * View表示内容の大きさを取得
-	 * @return
-	 */
-	@Override
-	public RectF getContentBounds() {
-		final RectF result;
-		final Drawable dr = getDrawable();
-		if (dr != null) {
-			result = new RectF(dr.getBounds());
-		} else {
-			result = new RectF();
-		}
-		return result;
-	}
-
-	/**
-	 * ITransformViewの実装
-	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
-	 */
-	@Override
-	public void onInit() {
-		if (DEBUG) Log.v(TAG, "onInit:");
-		// 拡大縮小率のデフォルト値を取得するためにImageView自体にトランスフォームマトリックスを計算させる
-		// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
-		// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
-		// 　　Viewのアスペクト比と画像のアスペクト比が異なれば上下または左右のいずれかが見切れる
-		super.setScaleType(mDefaultScaleType);
-		// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
-		// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
-		setFrame(getLeft(), getTop(), getRight(), getBottom());
-	}
-
-//--------------------------------------------------------------------------------
-	/**
 	 * View表内容の拡大縮小回転平行移動を初期化
 	 */
 	private void init() {
@@ -404,7 +392,7 @@ public class ZoomImageView extends TransformImageView
 	 * @param view
 	 */
 	@Override
-	public void onStartRotation(final ITransformView view) {
+	public void onStartRotation(final View view) {
 		if (mColorReverseFilter == null) {
 			mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
 		}
@@ -420,7 +408,7 @@ public class ZoomImageView extends TransformImageView
 	 * @param newState
 	 */
 	@Override
-	public void onStateChanged(final ITransformView view,
+	public void onStateChanged(final View view,
 		final int newState) {
 
 		if (newState == ViewTransformDelegater.STATE_NON) {

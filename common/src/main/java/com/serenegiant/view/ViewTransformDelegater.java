@@ -32,8 +32,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import com.serenegiant.widget.ITransformView;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -44,7 +42,7 @@ import androidx.annotation.Nullable;
 /**
  * 拡大縮小平行移動回転可能なViewのためのdelegater
  */
-public class ViewTransformDelegater {
+public abstract class ViewTransformDelegater {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewTransformDelegater.class.getSimpleName();
@@ -155,13 +153,13 @@ public class ViewTransformDelegater {
 		 * you will execute feedback something like sound and/or visual effects.
 		 * @param view
 		 */
-		public void onStartRotation(final ITransformView view);
+		public void onStartRotation(final View view);
 		/**
 		 * タッチ状態が変化したとき
 		 * @param view
 		 * @param newState
 		 */
-		public void onStateChanged(final ITransformView view, final int newState);
+		public void onStateChanged(final View view, final int newState);
 	}
 
 	/**
@@ -170,7 +168,7 @@ public class ViewTransformDelegater {
 	private final class WaitImageReset implements Runnable {
 		@Override
 		public void run() {
-			mParent.getView().requestLayout();
+			mParent.requestLayout();
 		}
 	}
 
@@ -355,14 +353,14 @@ public class ViewTransformDelegater {
 	 * 親Viewの参照
 	 */
 	@NonNull
-	private final ITransformView mParent;
+	private final View mParent;
 	@NonNull
 	private final IViewTransformer mTransformer;
 	/**
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public ViewTransformDelegater(@NonNull final ITransformView parent,
+	public ViewTransformDelegater(@NonNull final View parent,
 		@NonNull final IViewTransformer transformer) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -446,7 +444,7 @@ public class ViewTransformDelegater {
 			switch (mState) {
 			case STATE_WAITING:
 				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
-				mParent.getView().removeCallbacks(mWaitImageReset);
+				mParent.removeCallbacks(mWaitImageReset);
 				// pass through
 			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
@@ -465,7 +463,7 @@ public class ViewTransformDelegater {
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
 
-					mParent.getView().removeCallbacks(mWaitImageReset);
+					mParent.removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGGING);
 					return true;
 				}
@@ -496,14 +494,14 @@ public class ViewTransformDelegater {
 		case MotionEvent.ACTION_CANCEL:
 			// pass through
 		case MotionEvent.ACTION_UP:
-			mParent.getView().removeCallbacks(mWaitImageReset);
-			mParent.getView().removeCallbacks(mStartCheckRotate);
+			mParent.removeCallbacks(mWaitImageReset);
+			mParent.removeCallbacks(mStartCheckRotate);
 			if ((actionCode == MotionEvent.ACTION_UP) && (mState == STATE_WAITING)) {
 				final long downTime = SystemClock.uptimeMillis() - event.getDownTime();
 				if (downTime > LONG_PRESS_TIMEOUT) {
-					mParent.getView().performLongClick();
+					mParent.performLongClick();
 				} else if (downTime < TAP_TIMEOUT) {
-					mParent.getView().performClick();
+					mParent.performClick();
 				}
 			}
 			// pass through
@@ -627,7 +625,7 @@ public class ViewTransformDelegater {
 		mState = STATE_RESET;
 		clearPendingTasks();
 		if (!mIsRestored) {
-			mParent.onInit();
+			onInit();
 			mTransformer.updateTransform(true);
 			// set the initial state to idle, get and save the internal Matrix.
 			setState(STATE_NON);
@@ -642,7 +640,7 @@ public class ViewTransformDelegater {
 		mLimitRect.set(getDrawingRect());
 		if (DEBUG) Log.v(TAG, "init:mLimitRect=" + mLimitRect);
 		// update image size
-		final RectF bounds = mParent.getContentBounds();
+		final RectF bounds = getContentBounds();
 		if ((bounds != null) && !bounds.isEmpty()) {
 			mImageRect.set(bounds);
 		} else {
@@ -660,13 +658,12 @@ public class ViewTransformDelegater {
 	 */
 	public void clearPendingTasks() {
 		if (DEBUG) Log.v(TAG, "clearPendingTasks:");
-		final View parent = mParent.getView();
 		if (mWaitImageReset != null)
-			parent.removeCallbacks(mWaitImageReset);
+			mParent.removeCallbacks(mWaitImageReset);
 		if (mStartCheckRotate != null)
-			parent.removeCallbacks(mStartCheckRotate);
+			mParent.removeCallbacks(mStartCheckRotate);
 		if (mWaitReverseReset != null)
-			parent.removeCallbacks(mWaitReverseReset);
+			mParent.removeCallbacks(mWaitReverseReset);
 	}
 
 	/**
@@ -679,12 +676,12 @@ public class ViewTransformDelegater {
 			scale = mMinScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.getView().invalidate();
+			mParent.invalidate();
 		} else if (scale > mMaxScale) {
 			scale = mMaxScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.getView().invalidate();
+			mParent.invalidate();
 		}
 	}
 
@@ -723,7 +720,7 @@ public class ViewTransformDelegater {
 		mPrimaryX = mSecondX = event.getX();
 		mPrimaryY = mSecondY = event.getY();
 		if (mWaitImageReset == null) mWaitImageReset = new WaitImageReset();
-		mParent.getView().postDelayed(mWaitImageReset, CHECK_TIMEOUT);
+		mParent.postDelayed(mWaitImageReset, CHECK_TIMEOUT);
 		setState(STATE_WAITING);
 	}
 
@@ -854,7 +851,7 @@ public class ViewTransformDelegater {
 			if ((mHandleTouchEvent & TOUCH_ENABLED_ROTATE) == TOUCH_ENABLED_ROTATE) {
 				if (mStartCheckRotate == null)
 					mStartCheckRotate = new StartCheckRotate();
-				mParent.getView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+				mParent.postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
 			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
 		}
@@ -867,7 +864,7 @@ public class ViewTransformDelegater {
 	 */
 	private final void startZoom(final MotionEvent event) {
 
-		mParent.getView().removeCallbacks(mStartCheckRotate);
+		mParent.removeCallbacks(mStartCheckRotate);
 		setState(STATE_ZOOMING);
 	}
 
@@ -1066,8 +1063,19 @@ public class ViewTransformDelegater {
 	@NonNull
 	private Rect getDrawingRect() {
 		final Rect r = new Rect();
-		mParent.getView().getDrawingRect(r);
+		mParent.getDrawingRect(r);
 		return r;
 	}
+
+	/**
+	 * View表示内容の大きさを取得
+	 * @return
+	 */
+	protected abstract RectF getContentBounds();
+	/**
+	 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
+	 * 親Viewデフォルトの拡大縮小率にトランスフォームマトリックスを設定させる
+	 */
+	protected abstract void onInit();
 
 }
