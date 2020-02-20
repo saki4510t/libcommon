@@ -261,12 +261,12 @@ public class Keyboard {
 		public String toString() {
 			return "Row{" +
 				"defaultWidth=" + defaultWidth +
-				", defaultHeight=" + defaultHeight +
-				", defaultHorizontalGap=" + defaultHorizontalGap +
-				", verticalGap=" + verticalGap +
-				", mKeys=" + mKeys +
-				", rowEdgeFlags=" + rowEdgeFlags +
-				", mode=" + mode +
+				",defaultHeight=" + defaultHeight +
+				",defaultHorizontalGap=" + defaultHorizontalGap +
+				",verticalGap=" + verticalGap +
+				",mKeys=" + mKeys +
+				",rowEdgeFlags=" + rowEdgeFlags +
+				",mode=" + mode +
 				'}';
 		}
 
@@ -624,24 +624,24 @@ public class Keyboard {
 		public String toString() {
 			return "Key{" +
 				"codes=" + Arrays.toString(codes) +
-				", label=" + label +
-				", icon=" + icon +
-				", iconPreview=" + iconPreview +
-				", width=" + width +
-				", height=" + height +
-				", gap=" + gap +
-				", sticky=" + sticky +
-				", x=" + x +
-				", y=" + y +
-				", pressed=" + pressed +
-				", on=" + on +
-				", text=" + text +
-				", popupCharacters=" + popupCharacters +
-				", edgeFlags=" + edgeFlags +
-				", modifier=" + modifier +
-				", keyboard=" + keyboard +
-				", popupResId=" + popupResId +
-				", repeatable=" + repeatable +
+				",label=" + label +
+				",icon=" + icon +
+				",iconPreview=" + iconPreview +
+				",width=" + width +
+				",height=" + height +
+				",gap=" + gap +
+				",sticky=" + sticky +
+				",x=" + x +
+				",y=" + y +
+				",pressed=" + pressed +
+				",on=" + on +
+				",text=" + text +
+				",popupCharacters=" + popupCharacters +
+				",edgeFlags=" + edgeFlags +
+				",modifier=" + modifier +
+				",keyboard=" + keyboard +
+				",popupResId=" + popupResId +
+				",repeatable=" + repeatable +
 				'}';
 		}
 	} // Key
@@ -691,8 +691,11 @@ public class Keyboard {
 	 * @param xmlLayoutResId the resource file that contains the keyboard layout and keys.
 	 * @param modeId         keyboard mode identifier
 	 */
-	public Keyboard(Context context, @XmlRes int xmlLayoutResId, int modeId) {
-		DisplayMetrics dm = context.getResources().getDisplayMetrics();
+	@SuppressWarnings("SuspiciousNameCombination")
+	public Keyboard(@NonNull final Context context,
+		@XmlRes final int xmlLayoutResId, final int modeId) {
+
+		final DisplayMetrics dm = context.getResources().getDisplayMetrics();
 		mDisplayWidth = dm.widthPixels;
 		mDisplayHeight = dm.heightPixels;
 		//Log.v(TAG, "keyboard's display metrics:" + dm);
@@ -974,6 +977,7 @@ public class Keyboard {
 					} else if (TAG_KEY.equals(tag)) {
 						inKey = true;
 						key = createKeyFromXml(res, currentRow, x, y, parser);
+						Log.d(TAG, "loadKeyboard:key=" + key);
 						mKeys.add(key);
 						if (key.codes[0] == KEYCODE_SHIFT) {
 							// Find available shift key slot and put this shift key in it
