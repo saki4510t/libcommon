@@ -766,10 +766,10 @@ public abstract class KeyboardView extends View implements View.OnClickListener 
 				paint.setShadowLayer(mShadowRadius, 0, 0, mShadowColor);
 				// Draw the text
 				canvas.drawText(label,
-					(key.width - padding.left - padding.right) / 2
+					(key.width - padding.left - padding.right) / 2.0f
 						+ padding.left,
-					(key.height - padding.top - padding.bottom) / 2
-						+ (paint.getTextSize() - paint.descent()) / 2 + padding.top,
+					(key.height - padding.top - padding.bottom) / 2.0f
+						+ (paint.getTextSize() - paint.descent()) / 2.0f + padding.top,
 					paint);
 				// Turn off drop shadow
 				paint.setShadowLayer(0, 0, 0, 0);
