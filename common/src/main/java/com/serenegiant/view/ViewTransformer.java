@@ -31,8 +31,7 @@ import androidx.annotation.Nullable;
 /**
  * ITransformViewの表示内容のトランスフォーム用ヘルパークラス
  */
-public class ViewTransformer
-	implements IContentTransformer.IViewTransformer {
+public class ViewTransformer implements IViewTransformer {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewTransformer.class.getSimpleName();

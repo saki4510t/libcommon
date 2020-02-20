@@ -34,8 +34,7 @@ import androidx.annotation.Size;
 /**
  * IGLTransformViewのトランスフォーム処理用ヘルパークラス
  */
-public class GLViewTransformer
-	implements IContentTransformer.IGLViewTransformer {
+public class GLViewTransformer implements IGLViewTransformer {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = GLViewTransformer.class.getSimpleName();
