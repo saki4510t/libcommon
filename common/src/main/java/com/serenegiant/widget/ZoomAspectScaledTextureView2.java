@@ -63,11 +63,6 @@ public class ZoomAspectScaledTextureView2
 	private SurfaceTextureListener mListener;
 
 	/**
-	 * タッチ操作の有効無効設定
-	 */
-	@TouchMode
-	private int mHandleTouchEvent;
-	/**
 	 * ミラーモード
 	 */
 	@MirrorMode
@@ -115,6 +110,8 @@ public class ZoomAspectScaledTextureView2
 	public ZoomAspectScaledTextureView2(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		@TouchMode
+		int handleTouchEvent;
 		TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.IScaledView, defStyleAttr, 0);
 		try {
@@ -133,12 +130,12 @@ public class ZoomAspectScaledTextureView2
 			attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
 		try {
 			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
-			mHandleTouchEvent = a.getInteger(
+			handleTouchEvent = a.getInteger(
 				R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);
 		} catch (final UnsupportedOperationException e) {
 			Log.d(TAG, TAG, e);
 			final boolean b = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
-			mHandleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
+			handleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
 		} finally {
 			a.recycle();
 		}
@@ -155,6 +152,7 @@ public class ZoomAspectScaledTextureView2
 
 			}
 		};
+		mDelegater.setEnableHandleTouchEvent(handleTouchEvent);
 	}
 
 	/**
@@ -219,12 +217,6 @@ public class ZoomAspectScaledTextureView2
 		if (handleOnTouchEvent(event)) {
 			return true;	// 処理済み
 		}
-
-		if (mHandleTouchEvent == TOUCH_DISABLED) {
-			return super.onTouchEvent(event);
-		}
-
-//		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		if (mDelegater.onTouchEvent(event)) {
 			return true;
