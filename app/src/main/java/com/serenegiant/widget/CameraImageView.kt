@@ -26,7 +26,6 @@ import android.view.Surface
 import android.view.View
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
-import com.serenegiant.widget.CameraDelegator.ICameraView
 
 /**
  * SurfaceDrawableを使ってカメラ映像を表示するImageView実装

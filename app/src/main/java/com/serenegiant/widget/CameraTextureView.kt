@@ -23,7 +23,6 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import com.serenegiant.widget.CameraDelegator.ICameraView
 
 class CameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)

@@ -37,7 +37,6 @@ import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
-import com.serenegiant.widget.CameraDelegator.ICameraView
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 

@@ -37,32 +37,9 @@ import java.util.concurrent.CopyOnWriteArraySet
  * カメラプレビュー処理の委譲クラス
  */
 class CameraDelegator(
-	view: ICameraView,
+	view: View,
 	width: Int, height: Int,
 	cameraRenderer: ICameraRenderer) {
-
-	/**
-	 * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
-	 * XXX CameraDelegatorの抽象メソッドにしたほうがいいのかも？
-	 */
-	interface ICameraView {
-		fun getView(): View
-		// GLSurfaceView
-		fun onResume()
-		fun onPause()
-
-		fun setVideoSize(width: Int, height: Int)
-
-		fun addListener(listener: OnFrameAvailableListener)
-		fun removeListener(listener: OnFrameAvailableListener)
-
-		fun getScaleMode(): Int
-		fun setScaleMode(mode: Int)
-
-		fun getVideoWidth(): Int
-		fun getVideoHeight(): Int
-
-	}
 
 	/**
 	 * 映像が更新されたときの通知用コールバックリスナー
@@ -87,7 +64,7 @@ class CameraDelegator(
 
 //--------------------------------------------------------------------------------
 
-	private val mView: ICameraView
+	private val mView: View
 	private val mSync = Any()
 	val cameraRenderer: ICameraRenderer
 	private val mListeners: MutableSet<OnFrameAvailableListener> = CopyOnWriteArraySet()
@@ -305,7 +282,7 @@ class CameraDelegator(
 					CameraUtils.chooseVideoSize(params, width, height)
 					val fps = CameraUtils.chooseFps(params, 1.0f, 120.0f)
 					// rotate camera preview according to the device orientation
-					mRotation = CameraUtils.setupRotation(cameraId, mView as View, camera!!, params)
+					mRotation = CameraUtils.setupRotation(cameraId, mView, camera!!, params)
 					camera!!.setParameters(params)
 					// get the actual preview size
 					val previewSize = camera!!.getParameters().previewSize

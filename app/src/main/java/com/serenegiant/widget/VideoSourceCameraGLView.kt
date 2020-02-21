@@ -34,7 +34,6 @@ import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
-import com.serenegiant.widget.CameraDelegator.ICameraView
 
 /**
  * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraView実装

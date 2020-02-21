@@ -15,7 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 public class SimpleCameraGLView extends AspectScaledGLView
-	implements CameraDelegator.ICameraView {
+	implements ICameraView {
 
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = SimpleCameraGLView.class.getSimpleName();

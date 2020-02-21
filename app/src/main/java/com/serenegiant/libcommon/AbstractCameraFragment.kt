@@ -36,7 +36,7 @@ import com.serenegiant.utils.FileUtils
 import com.serenegiant.utils.SAFUtils
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.CameraDelegator
-import com.serenegiant.widget.CameraDelegator.ICameraView
+import com.serenegiant.widget.ICameraView
 import com.serenegiant.widget.IScaledView
 import java.io.IOException
 
