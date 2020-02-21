@@ -24,6 +24,15 @@ import androidx.annotation.WorkerThread;
 
 import com.serenegiant.utils.MessageTask;
 
+/**
+ * Looper/Handler経由での実装だと少なくともAPI22未満では
+ * Looperによる同期バリアの影響を受ける(==vsync同期してしまうので
+ * 60fpsの場合最大で16ミリ秒遅延する)のでそれを避けるために
+ * Looper/Handlerを使わずに簡易的にメッセージ処理を行うための
+ * ヘルパークラスMessageTaskへEGL/GLコンテキスト関係の
+ * 処理を追加したヘルパークラス
+ * EglTaskまたはその継承クラスをTreadへ引き渡して実行する
+ */
 public abstract class EglTask extends MessageTask {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "EglTask";
