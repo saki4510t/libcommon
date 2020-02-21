@@ -18,13 +18,17 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
+import android.os.Message;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";
@@ -33,8 +37,19 @@ public class HandlerThreadHandler extends Handler {
 	 * インスタンス生成用メルパーメソッド
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	public static final HandlerThreadHandler createHandler() {
-		return createHandler(TAG);
+		return createHandler(TAG, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド, API>=22
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	public static final HandlerThreadHandler createHandler(final boolean async) {
+		return createHandler(TAG, async);
 	}
 
 	/**
@@ -42,12 +57,26 @@ public class HandlerThreadHandler extends Handler {
 	 * @param name
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	public static final HandlerThreadHandler createHandler(
 		final String name) {
 
+		return createHandler(name, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド, API>=22
+	 * @param name
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	public static final HandlerThreadHandler createHandler(
+		final String name, final boolean async) {
+
 		final HandlerThread thread = new HandlerThread(name);
 		thread.start();
-		return new HandlerThreadHandler(thread.getLooper());
+		return new HandlerThreadHandler(thread.getLooper(), async);
 	}
 
 	/**
@@ -62,6 +91,19 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
+	 * インスタンス生成用メルパーメソッド, API>=22
+	 * @param callback
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	public static final HandlerThreadHandler createHandler(
+		@Nullable final Callback callback, final boolean async) {
+
+		return createHandler(TAG, callback, async);
+	}
+
+	/**
 	 * インスタンス生成用メルパーメソッド
 	 * @param name
 	 * @param callback
@@ -72,28 +114,73 @@ public class HandlerThreadHandler extends Handler {
 
 		final HandlerThread thread = new HandlerThread(name);
 		thread.start();
-		return new HandlerThreadHandler(thread.getLooper(), callback);
+		return new HandlerThreadHandler(thread.getLooper(), callback, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド, API>=22
+	 * @param name
+	 * @param callback
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	public static final HandlerThreadHandler createHandler(
+		final String name, @Nullable final Callback callback, final boolean async) {
+
+		final HandlerThread thread = new HandlerThread(name);
+		thread.start();
+		return new HandlerThreadHandler(thread.getLooper(), callback, async);
 	}
 
 //--------------------------------------------------------------------------------
 	private final long mId;
+	private final boolean mAsynchronous;
 
 	/**
 	 * コンストラクタ
 	 * @param looper
 	 */
-	private HandlerThreadHandler(@NonNull final Looper looper) {
+	private HandlerThreadHandler(@NonNull final Looper looper, final boolean async) {
 		super(looper);
 		final Thread thread = looper.getThread();
 		mId = thread != null ? thread.getId() : 0;
+		mAsynchronous = async;
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param looper
+	 * @param callback
+	 */
 	private HandlerThreadHandler(@NonNull final Looper looper,
-		@Nullable final Callback callback) {
+		@Nullable final Callback callback, final boolean async) {
 
 		super(looper, callback);
 		final Thread thread = looper.getThread();
 		mId = thread != null ? thread.getId() : 0;
+		mAsynchronous = async;
+	}
+
+	/**
+	 * mAsynchronous=trueでAPI>=22の場合にMessage#setAsynchronousで非同期設定フラグをつける。
+	 * 今のHandlerの実装だと#sendMessageAtTimeと#sendMessageAtFrontOfQueueから
+	 * #enqueueMessage(private)を呼び出していてその中でsetAsynchronousが呼び出されている。
+	 *
+	 * sendMessageAtFrontOfQueueもoverrideしたいけどfinalなのでoverrideできない
+	 * @param msg
+	 * @param uptimeMillis
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	@Override
+	public boolean sendMessageAtTime(@NonNull Message msg, long uptimeMillis) {
+		if (mAsynchronous
+			&& (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1)) {
+
+			msg.setAsynchronous(true);
+		}
+		return super.sendMessageAtTime(msg, uptimeMillis);
 	}
 
 	public long getId() {
