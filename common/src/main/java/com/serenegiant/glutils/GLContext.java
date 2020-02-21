@@ -121,7 +121,7 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * 関連するリソースを破棄する
-	 * コンストラクタを呼び出したスレッド上で実行すること
+	 * #initializeを呼び出したスレッド上で実行すること
 	 */
 	public void release() {
 		synchronized (mSync) {
