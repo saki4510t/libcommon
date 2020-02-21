@@ -214,8 +214,9 @@ open class GLView @JvmOverloads constructor(
 		mGLHandler.removeCallbacks(task)
 	}
 
+//--------------------------------------------------------------------------------
 	/**
-	 * ITransformViewの実装
+	 * IGLTransformViewの実装
 	 */
 	@AnyThread
 	override fun setTransform(@Size(min=16) transform: FloatArray?) {
@@ -230,7 +231,7 @@ open class GLView @JvmOverloads constructor(
 	}
 
 	/**
-	 * ITransformViewの実装
+	 * IGLTransformViewの実装
 	 */
 	@AnyThread
 	override fun getTransform(@Size(min=16) transform: FloatArray?): FloatArray {
@@ -246,8 +247,9 @@ open class GLView @JvmOverloads constructor(
 	}
 
 	/**
-	 * ITransformViewの実装
+	 * IGLTransformViewの実装
 	 */
+	@AnyThread
 	override fun getView(): View {
 		return this
 	}
