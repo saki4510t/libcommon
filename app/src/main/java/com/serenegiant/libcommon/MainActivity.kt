@@ -139,7 +139,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = CameraFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera, R.string.title_camera)
 			}
 			3 -> {	// EffectCamera
 				if (!checkPermissionCamera()
@@ -155,7 +156,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = MixCameraFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_mix, R.string.title_mix_camera)
 			}
 			5 -> {	// OverlayCamera
 				if (!checkPermissionCamera()
@@ -163,7 +165,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = OverlayCameraFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_overlay, R.string.title_overlay_camera)
 			}
 			6 -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
@@ -171,7 +174,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = VideoSourceCameraFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_video_source, R.string.title_video_source_camera)
 			}
 			7 -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
@@ -179,7 +183,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = DistributorFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_distributor, R.string.title_video_source_dist_camera)
 			}
 			8 -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
@@ -187,7 +192,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = CameraImageViewFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_image_view, R.string.title_image_view_camera)
 			}
 			9 -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
@@ -195,7 +201,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = CameraTextureFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_camera_texture_view, R.string.title_texture_view_camera)
 			}
 			10 -> {	// SimpleCameraGL
 				if (!checkPermissionCamera()
@@ -203,7 +210,8 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = SimpleCameraGLFragment.newInstance()
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_simple_camera_gl, R.string.title_simple_gl_camera)
 			}
 			11 -> {	// CameraSurface
 				if (!checkPermissionCamera()

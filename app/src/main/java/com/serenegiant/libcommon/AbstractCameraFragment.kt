@@ -30,6 +30,7 @@ import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.utils.FileUtils
@@ -61,7 +62,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
-		requireActivity().title = this.javaClass.simpleName
+		requireActivity().title = getString(titleRes)
 		FileUtils.DIR_NAME = APP_DIR_NAME
 	}
 
@@ -108,6 +109,13 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			val args = arguments
 			return args?.getInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera)
 				?: R.layout.fragment_camera
+		}
+	@get:StringRes
+	protected val titleRes: Int
+		get() {
+			val args = arguments
+			return args?.getInt(ARGS_KEY_TITLE_ID, R.string.title_camera)
+				?: R.string.title_camera
 		}
 
 	/**
@@ -238,6 +246,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		/** access code for secondary storage etc.  */
 		const val REQUEST_ACCESS_SD = 12345
 		const val ARGS_KEY_LAYOUT_ID = "LAYOUT_ID"
+		const val ARGS_KEY_TITLE_ID = "TITLE_ID"
 
 		fun getRecordingRoot(context: Context): DocumentFile? {
 			if (DEBUG) Log.v(TAG, "getRecordingRoot:")

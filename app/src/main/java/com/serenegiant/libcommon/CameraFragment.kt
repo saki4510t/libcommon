@@ -20,6 +20,8 @@ package com.serenegiant.libcommon
 
 import android.os.Bundle
 import android.util.Log
+import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 
 class CameraFragment : AbstractCameraFragment() {
 	override fun isRecording(): Boolean {
@@ -45,10 +47,11 @@ class CameraFragment : AbstractCameraFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraFragment::class.java.simpleName
 
-		fun newInstance(): CameraFragment {
+		fun newInstance(@LayoutRes layoutRes: Int, @StringRes titleRes: Int): CameraFragment {
 			val fragment = CameraFragment()
 			val args = Bundle()
-			args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera)
+			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
+			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
 			fragment.arguments = args
 			return fragment
 		}

@@ -62,6 +62,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 			val fragment = EffectCameraFragment()
 			val args = Bundle()
 			args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_effect)
+			args.putInt(ARGS_KEY_TITLE_ID, R.string.title_effect_camera)
 			fragment.arguments = args
 			return fragment
 		}
