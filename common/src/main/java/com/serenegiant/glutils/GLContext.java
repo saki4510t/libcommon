@@ -29,6 +29,8 @@ import com.serenegiant.system.SysPropReader;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+import kotlin.jvm.Transient;
 
 /**
  * 現在のスレッド上にGLコンテキストを生成する
@@ -40,15 +42,21 @@ public class GLContext implements EGLConst {
 	private final Object mSync = new Object();
 	private final int mMaxClientVersion;
 	@Nullable
-	final EGLBase.IContext mSharedContext;
+	private final EGLBase.IContext mSharedContext;
 	private final int mFlags;
+	@Size(min=1)
 	private final int mMasterWidth;
+	@Size(min=1)
 	private final int mMasterHeight;
+	@Transient
 	@Nullable
 	private EGLBase mEgl = null;
+	@Transient
 	@Nullable
 	private ISurface mEglMasterSurface;
+	@Transient
 	private long mGLThreadId;
+	@Transient
 	@Nullable
 	private String mGlExtensions;
 
@@ -78,6 +86,7 @@ public class GLContext implements EGLConst {
 	 * コピーコンストラクタ
 	 * @param src
 	 */
+	@SuppressWarnings("CopyConstructorMissesField")
 	public GLContext(@NonNull final GLContext src) {
 		this(src.getMaxClientVersion(), src.getContext(), src.getFlags(), 1, 1);
 	}
@@ -92,7 +101,7 @@ public class GLContext implements EGLConst {
 	 */
 	public GLContext(final int maxClientVersion,
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
-		final int width, final int height) {
+		@Size(min=1) final int width, @Size(min=1) final int height) {
 
 		mMaxClientVersion = maxClientVersion;
 		mSharedContext = sharedContext;
