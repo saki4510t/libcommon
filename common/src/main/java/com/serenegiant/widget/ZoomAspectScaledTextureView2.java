@@ -34,6 +34,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.ViewTransformDelegater;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
@@ -51,8 +52,14 @@ public class ZoomAspectScaledTextureView2
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView2.class.getSimpleName();
 
-
-	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
+	/**
+	 * プレビュー表示用のSurfaceTextureが存在しているかどうか
+	 */
+	private volatile boolean mHasSurface;
+	/**
+	 * SurfaceTextureListenerを自View内で使うため外部からセットされた
+	 * SurfaceTextureListenerは自前で保持＆呼び出す
+	 */
 	private SurfaceTextureListener mListener;
 
 	/**
@@ -60,11 +67,25 @@ public class ZoomAspectScaledTextureView2
 	 */
 	@TouchMode
 	private int mHandleTouchEvent;
+	/**
+	 * ミラーモード
+	 */
 	@MirrorMode
     private int mMirrorMode = MIRROR_NORMAL;
+	/**
+	 * スケールモード
+	 */
 	@ScaleMode
 	private int mScaleMode;
-	private double mRequestedAspect;		// initially use default window size
+	/**
+	 * 表示内容のアスペクト比
+	 * 0以下なら無視される
+	 */
+	private double mRequestedAspect;
+	/**
+	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
+	 */
+	private boolean mNeedResizeToKeepAspect;
 
 	private final ViewTransformDelegater mDelegater;
 
@@ -95,10 +116,16 @@ public class ZoomAspectScaledTextureView2
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
-			attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
+			attrs, R.styleable.IScaledView, defStyleAttr, 0);
 		try {
 			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
 			mHandleTouchEvent = a.getInteger(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);
+			mRequestedAspect = a.getFloat(
+				R.styleable.IScaledView_aspect_ratio, -1.0f);
+			mScaleMode = a.getInt(
+				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mNeedResizeToKeepAspect = a.getBoolean(
+				R.styleable.IScaledView_resize_to_keep_aspect, true);
 		} catch (final UnsupportedOperationException e) {
 			final boolean b = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
 			mHandleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
@@ -117,6 +144,19 @@ public class ZoomAspectScaledTextureView2
 
 			}
 		};
+	}
+
+	/**
+	 * アスペクト比を保つように大きさを決める
+	 */
+	@Override
+	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+//		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
+		final MeasureSpecDelegater.MeasureSpec spec
+			= MeasureSpecDelegater.onMeasure(this,
+				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
+				widthMeasureSpec, heightMeasureSpec);
+		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
 
 	@Override

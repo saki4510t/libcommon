@@ -42,10 +42,28 @@ public class AspectScaledTextureView extends TransformTextureView
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();
+	/**
+	 * スケールモード
+	 */
 	@ScaleMode
 	private int mScaleMode;
-	private double mRequestedAspect;		// initially use default window size
-	private volatile boolean mHasSurface;	// プレビュー表示用のSurfaceTextureが存在しているかどうか
+	/**
+	 * 表示内容のアスペクト比
+	 * 0以下なら無視される
+	 */
+	private double mRequestedAspect;
+	/**
+	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
+	 */
+	private boolean mNeedResizeToKeepAspect;
+	/**
+	 * プレビュー表示用のSurfaceTextureが存在しているかどうか
+	 */
+	private volatile boolean mHasSurface;
+	/**
+	 * SurfaceTextureListenerを自View内で使うため外部からセットされた
+	 * SurfaceTextureListenerは自前で保持＆呼び出す
+	 */
 	private SurfaceTextureListener mListener;
 
 	/**
@@ -78,12 +96,14 @@ public class AspectScaledTextureView extends TransformTextureView
 
 		super(context, attrs, defStyleAttr);
 		final TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
-			R.styleable.AspectScaledTextureView, defStyleAttr, 0);
+			R.styleable.IScaledView, defStyleAttr, 0);
 		try {
 			mRequestedAspect = a.getFloat(
-				R.styleable.AspectScaledTextureView_aspect_ratio, -1.0f);
+				R.styleable.IScaledView_aspect_ratio, -1.0f);
 			mScaleMode = a.getInt(
-				R.styleable.AspectScaledTextureView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mNeedResizeToKeepAspect = a.getBoolean(
+				R.styleable.IScaledView_resize_to_keep_aspect, true);
 		} finally {
 			a.recycle();
 		}
@@ -96,9 +116,10 @@ public class AspectScaledTextureView extends TransformTextureView
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
-		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
-			mRequestedAspect, mScaleMode,
-			widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec
+			= MeasureSpecDelegater.onMeasure(this,
+				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
+				widthMeasureSpec, heightMeasureSpec);
 		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
 

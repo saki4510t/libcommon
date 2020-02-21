@@ -28,13 +28,21 @@ import com.serenegiant.view.MeasureSpecDelegater;
 
 /**
  * Created by saki on 2016/12/03.
- *
+ * 指定したアスペクト比に合わせて外形サイズを変更させるFrameLayout
  */
 public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 
 	@ScaleMode
 	private int mScaleMode = SCALE_MODE_KEEP_ASPECT;
+	/**
+	 * 表示内容のアスペクト比
+	 * 0以下なら無視される
+	 */
 	private double mRequestedAspect = -1.0;		// initially use default window size
+	/**
+	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
+	 */
+	private boolean mNeedResizeToKeepAspect;
 
 	/**
 	 * コンストラクタ
@@ -68,6 +76,8 @@ public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 				R.styleable.IScaledView_aspect_ratio, -1.0f);
 			mScaleMode = a.getInt(
 				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mNeedResizeToKeepAspect = a.getBoolean(
+				R.styleable.IScaledView_resize_to_keep_aspect, true);
 		} finally {
 			a.recycle();
 		}
@@ -78,9 +88,10 @@ public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
-			mRequestedAspect, mScaleMode,
-			widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec
+			= MeasureSpecDelegater.onMeasure(this,
+				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
+				widthMeasureSpec, heightMeasureSpec);
 		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
  	}
 

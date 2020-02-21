@@ -20,13 +20,18 @@ public class MeasureSpecDelegater {
 	}
 
 	public static MeasureSpec onMeasure(@NonNull final View target,
-		final double requestedAspect, @IScaledView.ScaleMode final int scaleMode,
+		final double requestedAspect,
+		@IScaledView.ScaleMode final int scaleMode,
+		final boolean needResizeToKeepAspect,
 		final int widthMeasureSpec, final int heightMeasureSpec) {
 
 		final MeasureSpec result = new MeasureSpec(widthMeasureSpec, heightMeasureSpec);
 //		if (DEBUG) Log.v(TAG, "onMeasure:requestedAspect=" + requestedAspect);
 // 		要求されたアスペクト比が負の時(初期生成時)は何もしない
-		if (requestedAspect > 0 && (scaleMode == SCALE_MODE_KEEP_ASPECT)) {
+		if ((requestedAspect > 0)
+			&& (scaleMode == SCALE_MODE_KEEP_ASPECT)
+			&& needResizeToKeepAspect) {
+
 			int initialWidth = View.MeasureSpec.getSize(widthMeasureSpec);
 			int initialHeight = View.MeasureSpec.getSize(heightMeasureSpec);
 			final int horizPadding = target.getPaddingLeft() + target.getPaddingRight();

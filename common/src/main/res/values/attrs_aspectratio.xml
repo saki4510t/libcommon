@@ -33,25 +33,18 @@
 	<!-- タッチ操作による回転拡大縮小を有効にするかどうか -->
 	<attr name="handle_touch_event" format="boolean" default="true"/>
 
+	<!-- スケールモード＝キープアスペクトのときにViewサイズをアスペクト比に合わせて変更するかどうか-->
+	<attr name="resize_to_keep_aspect" format="boolean" default="true" />
+
 <!-- =========================================================================== -->
 	<declare-styleable name="IScaledView">
 		<attr name="aspect_ratio"/>
 		<attr name="scale_mode"/>
-	</declare-styleable>
-
-	<declare-styleable name="AspectScaledTextureView">
-		<attr name="aspect_ratio"/>
-		<attr name="scale_mode"/>
+		<attr name="resize_to_keep_aspect"/>
 	</declare-styleable>
 
 	<declare-styleable name="ZoomAspectScaledTextureView">
-		<attr name="aspect_ratio"/>
-		<attr name="scale_mode"/>
 		<attr name="handle_touch_event"/>
 	</declare-styleable>
 
-	<declare-styleable name="AspectScaledGLView">
-		<attr name="aspect_ratio"/>
-		<attr name="scale_mode"/>
-	</declare-styleable>
 </resources>

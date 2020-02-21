@@ -40,9 +40,20 @@ public class AspectScaledGLView extends GLView
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = AspectScaledGLView.class.getSimpleName();
 
+	/**
+	 * スケールモード
+	 */
 	@ScaleMode
 	private int mScaleMode;
-	private double mRequestedAspect;		// initially use default window size
+	/**
+	 * 表示内容のアスペクト比
+	 * 0以下なら無視される
+	 */
+	private double mRequestedAspect;
+	/**
+	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
+	 */
+	private boolean mNeedResizeToKeepAspect;
 
 	/**
 	 * コンストラクタ
@@ -75,10 +86,12 @@ public class AspectScaledGLView extends GLView
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
-			attrs, R.styleable.AspectScaledGLView, defStyleAttr, 0);
+			attrs, R.styleable.IScaledView, defStyleAttr, 0);
 		try {
-			mRequestedAspect = a.getFloat(R.styleable.AspectScaledGLView_aspect_ratio, -1.0f);
-			mScaleMode = a.getInt(R.styleable.AspectScaledGLView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mRequestedAspect = a.getFloat(R.styleable.IScaledView_aspect_ratio, -1.0f);
+			mScaleMode = a.getInt(R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+			mNeedResizeToKeepAspect = a.getBoolean(
+				R.styleable.IScaledView_resize_to_keep_aspect, true);
 		} finally {
 			a.recycle();
 		}
@@ -90,9 +103,10 @@ public class AspectScaledGLView extends GLView
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
-		final MeasureSpecDelegater.MeasureSpec spec = MeasureSpecDelegater.onMeasure(this,
-			mRequestedAspect, mScaleMode,
-			widthMeasureSpec, heightMeasureSpec);
+		final MeasureSpecDelegater.MeasureSpec spec
+			= MeasureSpecDelegater.onMeasure(this,
+				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
+				widthMeasureSpec, heightMeasureSpec);
 		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
 
