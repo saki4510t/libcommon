@@ -191,7 +191,9 @@ public abstract class ViewTransformDelegater {
 	public static class SavedState extends View.BaseSavedState {
 
 		private int mState;
+		private int mHandleTouchEvent;
 		private float mMinScale;
+		private float mMaxScale;
 		private float mCurrentDegrees;
 		private final float[] mMatrixCache = new float[9];
 
@@ -213,7 +215,9 @@ public abstract class ViewTransformDelegater {
         private void readFromParcel(final Parcel in) {
             // should read as same order when writing
             mState = in.readInt();
+			mHandleTouchEvent = in.readInt();
             mMinScale = in.readFloat();
+			mMaxScale = in.readFloat();
             mCurrentDegrees = in.readFloat();
             in.readFloatArray(mMatrixCache);
         }
@@ -223,7 +227,9 @@ public abstract class ViewTransformDelegater {
             super.writeToParcel(out, flags);
             // should write as same order when reading
             out.writeInt(mState);
+            out.writeInt(mHandleTouchEvent);
             out.writeFloat(mMinScale);
+			out.writeFloat(mMaxScale);
             out.writeFloat(mCurrentDegrees);
             out.writeFloatArray(mMatrixCache);
         }
@@ -383,8 +389,11 @@ public abstract class ViewTransformDelegater {
 			mIsRestored = true;
 			System.arraycopy(saved.mMatrixCache, 0, mMatrixCache, 0, 9);
 			mImageMatrix.setValues(mMatrixCache);
+			mImageMatrixChanged = true;
 			mState = saved.mState;
-			mMinScale = saved.mState;
+			mHandleTouchEvent = saved.mHandleTouchEvent;
+			mMinScale = saved.mMinScale;
+			mMaxScale = saved.mMaxScale;
 			mCurrentDegrees = saved.mCurrentDegrees;
 		}
 	}
@@ -401,7 +410,9 @@ public abstract class ViewTransformDelegater {
 		final SavedState saveState = new SavedState(superState);
 		updateMatrixCache();
 		saveState.mState = mState;
+		saveState.mHandleTouchEvent = mHandleTouchEvent;
 		saveState.mMinScale = mMinScale;
+		saveState.mMaxScale = mMaxScale;
 		saveState.mCurrentDegrees = mCurrentDegrees;
 		System.arraycopy(mMatrixCache, 0, saveState.mMatrixCache, 0, 9);
 		return saveState;
