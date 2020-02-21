@@ -114,11 +114,11 @@ public abstract class ViewTransformDelegater {
 	/**
 	 * 最大拡大率のデフォルト値
 	*/
-	public static final float DEFAULT_MAX_SCALE = 8.f;
+	public static final float DEFAULT_MAX_SCALE = 10.0f;
 	/**
 	 * 最小縮小率のデフォルト値
 	 */
-	public static final float DEFAULT_MIN_SCALE = 0.1f;
+	public static final float DEFAULT_MIN_SCALE = 0.05f;
 	/**
 	 * 拡大縮小率のデフォルト値
 	*/
