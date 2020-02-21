@@ -19,8 +19,10 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -53,7 +55,7 @@ public class GLContext implements EGLConst {
 	private EGLBase mEgl = null;
 	@Transient
 	@Nullable
-	private ISurface mEglMasterSurface;
+	private EGLBase.IEglSurface mEglMasterSurface;
 	@Transient
 	private long mGLThreadId;
 	@Transient
@@ -244,8 +246,38 @@ public class GLContext implements EGLConst {
 	 */
 	public void makeDefault() throws IllegalStateException {
 		synchronized (mSync) {
-			if (mEgl != null) {
+			if ((mEgl != null) && (mEglMasterSurface != null)) {
 				mEglMasterSurface.makeCurrent();
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	/**
+	 * マスターコンテキストをswap
+	 * @throws IllegalStateException
+	 */
+	public void swap() throws IllegalStateException {
+		synchronized (mSync) {
+			if ((mEgl != null) && (mEglMasterSurface != null)) {
+				mEglMasterSurface.swap();
+			} else {
+				throw new IllegalStateException();
+			}
+		}
+	}
+
+	/**
+	 * マスターコンテキストをswap
+	 * @param presentationTimeNs
+	 * @throws IllegalStateException
+	 */
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	public void swap(final long presentationTimeNs) throws IllegalStateException {
+		synchronized (mSync) {
+			if ((mEgl != null) && (mEglMasterSurface != null)) {
+				mEglMasterSurface.swap(presentationTimeNs);
 			} else {
 				throw new IllegalStateException();
 			}

@@ -24,12 +24,14 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 
+import android.annotation.TargetApi;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import android.opengl.GLES30;
+import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -237,11 +239,13 @@ import com.serenegiant.system.BuildCheck;
 			mEglBase.swap(mEglSurface);
 		}
 
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@Override
 		public void swap(final long presentationTimeNs) {
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void setPresentationTime(final long presentationTimeNs) {
 //			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
 // 				mEglSurface, presentationTimeNs);

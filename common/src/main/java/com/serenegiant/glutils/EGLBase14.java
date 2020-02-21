@@ -197,11 +197,13 @@ import com.serenegiant.system.BuildCheck;
 			mEglBase.swap(mEglSurface);
 		}
 
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@Override
 		public void swap(final long presentationTimeNs) {
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
+		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void setPresentationTime(final long presentationTimeNs) {
 			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,	// API>=18
 				mEglSurface, presentationTimeNs);
