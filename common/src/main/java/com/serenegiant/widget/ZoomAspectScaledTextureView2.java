@@ -350,7 +350,7 @@ public class ZoomAspectScaledTextureView2
 	}
 
 //================================================================================
-// IAspectRatioView
+// IScaledView
 //================================================================================
 	/**
 	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
@@ -373,10 +373,6 @@ public class ZoomAspectScaledTextureView2
 	public double getAspectRatio() {
 		return mRequestedAspect;
 	}
-
-//================================================================================
-// IScaledView
-//================================================================================
 
 	@Override
 	public void setScaleMode(@ScaleMode final int scale_mode) {
