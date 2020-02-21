@@ -19,15 +19,12 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Choreographer;
-import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.ThreadUtils;
