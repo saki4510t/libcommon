@@ -11,7 +11,6 @@ import com.serenegiant.camera.CameraConst;
 import com.serenegiant.camera.CameraUtils;
 
 import java.io.IOException;
-import java.util.List;
 
 /**
  * カメラ映像を流し込んで表示するだけのSurfaceView実装
@@ -87,36 +86,12 @@ public class CameraSurfaceView extends SurfaceView {
 
 	private void startPreview() {
 		if (mCamera == null) {
-			final int cameraId = CameraUtils.findCamera(CameraConst.FACING_BACK);
-			mCamera = Camera.open(cameraId);
-			final Camera.Parameters params = mCamera.getParameters();
-			if (params != null) {
-				try {
-					final List<String> focusModes = params.getSupportedFocusModes();
-					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
-						params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
-						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_CONTINUOUS_VIDEO");
-					} else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
-						params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-						if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_AUTO");
-					} else {
-						if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus");
-					}
-					params.setRecordingHint(true);
-					CameraUtils.chooseVideoSize(params,
-						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
-					final int[] fps = CameraUtils.chooseFps(params, 1.0f, 120.0f);
-					mRotation = CameraUtils.setupRotation(cameraId, this, mCamera, params);
-					mCamera.setParameters(params);
-					// get the actual preview size
-					final Camera.Size previewSize = mCamera.getParameters().getPreviewSize();
-					Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
-						previewSize.width, previewSize.height, fps[0], fps[1]));
-					CameraUtils.setPreviewSurface(mCamera, this);
-				} catch (final IOException e) {
-					Log.w(TAG, e);
-					mCamera = null;
-				}
+			try {
+				mCamera = CameraUtils.setupCamera(getContext(), CameraConst.FACING_BACK, CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
+				CameraUtils.setPreviewSurface(mCamera, this);
+			} catch (final IOException e) {
+				Log.w(TAG, e);
+				mCamera = null;
 			}
 			if (mCamera != null) {
 				mCamera.startPreview();

@@ -77,6 +77,46 @@ public class CameraUtils implements CameraConst {
 	public @interface PreviewFormat {}
 
 	/**
+	 * カメラを初期化する
+	 *
+	 * @param context
+	 * @param face
+	 * @param width
+	 * @param height
+	 * @return
+	 * @throws IOException
+	 */
+	public static Camera setupCamera(@NonNull final Context context,
+		 final int face, final int width, final int height) throws IOException {
+
+		final int cameraId = CameraUtils.findCamera(CameraConst.FACING_BACK);
+		final Camera camera = Camera.open(cameraId);
+		final Camera.Parameters params = camera.getParameters();
+		if (params != null) {
+			final List<String> focusModes = params.getSupportedFocusModes();
+			if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
+				params.setFocusMode(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO);
+				if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_CONTINUOUS_VIDEO");
+			} else if (focusModes.contains(Camera.Parameters.FOCUS_MODE_AUTO)) {
+				params.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+				if (DEBUG) Log.i(TAG, "handleStartPreview:FOCUS_MODE_AUTO");
+			} else {
+				if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus");
+			}
+			params.setRecordingHint(true);
+			CameraUtils.chooseVideoSize(params, width, height);
+			final int[] fps = CameraUtils.chooseFps(params, 1.0f, 120.0f);
+			CameraUtils.setupRotation(context, cameraId, camera, params);
+			camera.setParameters(params);
+			// get the actual preview size
+			final Camera.Size previewSize = camera.getParameters().getPreviewSize();
+			Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
+				previewSize.width, previewSize.height, fps[0], fps[1]));
+		}
+		return camera;
+	}
+
+	/**
 	 * 指定したfaceに対応するカメラIDを取得する
 	 * ただし指定したfaceが無い場合などには違うfaceのカメラが選択されるかもしれない
 	 * @param face
@@ -279,6 +319,43 @@ cameraLoop:
 					.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
 			rotation = display.getRotation();
 		}
+		int degrees;
+		switch (rotation) {
+		case Surface.ROTATION_90:	degrees = 90; break;
+		case Surface.ROTATION_180:	degrees = 180; break;
+		case Surface.ROTATION_270:	degrees = 270; break;
+		case Surface.ROTATION_0:
+		default:
+			degrees = 0; break;
+		}
+		// get whether the camera is front camera or back camera
+		final Camera.CameraInfo info = new Camera.CameraInfo();
+		Camera.getCameraInfo(cameraId, info);
+		if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) { // front camera
+			degrees = (info.orientation + degrees) % 360;
+			degrees = (360 - degrees) % 360; // reverse
+		} else { // back camera
+			degrees = (info.orientation - degrees + 360) % 360;
+		}
+		// apply rotation setting
+		camera.setDisplayOrientation(degrees);
+		// XXX This method fails to call and camera stops working on some devices.
+//		params.setRotation(degrees);
+		return degrees;
+	}
+
+	public static int setupRotation(
+		@NonNull Context context,
+		final int cameraId,
+		@NonNull Camera camera,
+		@NonNull final Camera.Parameters params) {
+
+		if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
+		int rotation;
+		final Display display
+			= ((WindowManager)context
+				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		rotation = display.getRotation();
 		int degrees;
 		switch (rotation) {
 		case Surface.ROTATION_90:	degrees = 90; break;
