@@ -145,14 +145,29 @@ public class ZoomAspectScaledTextureView
 	@MirrorMode
     private int mMirrorMode = MIRROR_NORMAL;
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
 	public ZoomAspectScaledTextureView(final Context context) {
 		this(context, null, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyleAttr
+	 */
 	public ZoomAspectScaledTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
