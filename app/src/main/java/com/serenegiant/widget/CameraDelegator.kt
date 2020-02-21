@@ -338,7 +338,7 @@ class CameraDelegator(
 	}
 
 	companion object {
-		private const val DEBUG = false // TODO set false on release
+		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraDelegator::class.java.simpleName
 		const val SCALE_STRETCH_FIT = 0
 		const val SCALE_KEEP_ASPECT_VIEWPORT = 1

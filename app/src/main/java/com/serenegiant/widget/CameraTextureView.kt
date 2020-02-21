@@ -142,7 +142,7 @@ class CameraTextureView @JvmOverloads constructor(
 	}
 
 	companion object {
-		private const val DEBUG = false // set false on production
+		private const val DEBUG = true // set false on production
 		private val TAG = CameraTextureView::class.java.simpleName
 	}
 }
