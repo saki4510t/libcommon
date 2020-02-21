@@ -42,7 +42,8 @@ public class GLManager {
 	@NonNull
 	private final GLContext mGLContext;
 	@NonNull
-	private final HandlerThreadHandler mGLHandler;
+	private final Handler mGLHandler;
+	private final long mHandlerThreadId;
 	@Nullable
 	private final Handler.Callback mCallback;
 	private boolean mInitialized;
@@ -105,6 +106,7 @@ public class GLManager {
 				}
 			}
 		);
+		mHandlerThreadId = mGLHandler.getLooper().getThread().getId();
 		final Semaphore sync = new Semaphore(0);
 		mGLHandler.postAtFrontOfQueue(new Runnable() {
 			@Override
@@ -270,7 +272,7 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "postFrameCallbackDelayed:");
 		checkValid();
-		if (mGLHandler.isCurrentThread()) {
+		if (isGLThread()) {
 			// すでにGLスレッド上であれば直接実行
 			Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
 		} else {
@@ -295,7 +297,7 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "removeFrameCallback:");
 		checkValid();
-		if (mGLHandler.isCurrentThread()) {
+		if (isGLThread()) {
 			// すでにGLスレッド上であれば直接実行
 			Choreographer.getInstance().removeFrameCallback(callback);
 		} else {
@@ -330,5 +332,13 @@ public class GLManager {
 			return mCallback.handleMessage(msg);
 		}
 		return false;
+	}
+
+	/**
+	 * 現在のスレッドがEGL/GLコンテキストを保持したスレッドかどうか
+ 	 * @return
+	 */
+	protected boolean isGLThread() {
+		return mHandlerThreadId == Thread.currentThread().getId();
 	}
 }
