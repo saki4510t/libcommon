@@ -87,7 +87,9 @@ public class CameraSurfaceView extends SurfaceView {
 	private void startPreview() {
 		if (mCamera == null) {
 			try {
-				mCamera = CameraUtils.setupCamera(getContext(), CameraConst.FACING_BACK, CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
+				mCamera = CameraUtils.setupCamera(getContext(),
+					CameraConst.FACING_BACK,
+					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT);
 				CameraUtils.setPreviewSurface(mCamera, this);
 			} catch (final IOException e) {
 				Log.w(TAG, e);
