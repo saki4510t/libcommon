@@ -22,6 +22,7 @@ import android.content.Context
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import com.serenegiant.widget.CameraDelegator.ICameraView
 
 class CameraTextureView @JvmOverloads constructor(
@@ -90,6 +91,10 @@ class CameraTextureView @JvmOverloads constructor(
 			}
 
 		}
+	}
+
+	override fun getView() : View {
+		return this
 	}
 
 	override fun onResume() {

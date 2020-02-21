@@ -26,7 +26,6 @@ import android.hardware.Camera
 import android.os.Handler
 import android.util.Log
 import android.view.View
-import android.view.View.OnLongClickListener
 import androidx.annotation.WorkerThread
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
@@ -44,14 +43,10 @@ class CameraDelegator(
 
 	/**
 	 * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
+	 * XXX CameraDelegatorの抽象メソッドにしたほうがいいのかも？
 	 */
 	interface ICameraView {
-		// View
-		fun setOnClickListener(listener: View.OnClickListener?)
-		fun setOnLongClickListener(listener: OnLongClickListener?)
-		fun getWidth(): Int
-		fun getHeight(): Int
-		fun post(task: Runnable): Boolean
+		fun getView(): View
 		// GLSurfaceView
 		fun onResume()
 		fun onPause()

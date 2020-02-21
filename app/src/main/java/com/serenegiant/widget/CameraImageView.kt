@@ -23,6 +23,7 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
+import android.view.View
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
 import com.serenegiant.widget.CameraDelegator.ICameraView
@@ -82,6 +83,10 @@ class CameraImageView @JvmOverloads constructor(
 		})
 		setImageDrawable(mDrawable)
 		scaleType = ScaleType.CENTER_CROP
+	}
+
+	override fun getView() : View {
+		return this
 	}
 
 	override fun onResume() {

@@ -28,6 +28,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
+import android.view.View
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.IRendererHolder
@@ -86,6 +87,10 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 				mCameraDelegator.cameraRenderer.onSurfaceDestroyed()
 			}
 		})
+	}
+
+	override fun getView() : View {
+		return this
 	}
 
 	@Synchronized

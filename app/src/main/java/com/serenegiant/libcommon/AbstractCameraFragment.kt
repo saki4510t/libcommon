@@ -73,8 +73,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val rootView = customInflater.inflate(layoutXml, container, false)
 		val cameraView: View = rootView.findViewById(R.id.cameraView)
 		mCameraView = cameraView  as ICameraView
-		mCameraView!!.setOnClickListener(mOnClickListener)
-		mCameraView!!.setOnLongClickListener(mOnLongClickListener)
+		mCameraView!!.getView().setOnClickListener(mOnClickListener)
+		mCameraView!!.getView().setOnLongClickListener(mOnLongClickListener)
 		mCameraView!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
 		mScaleModeView = rootView.findViewById(R.id.scalemode_textview)
 		updateScaleModeText()

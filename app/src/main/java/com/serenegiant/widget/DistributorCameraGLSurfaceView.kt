@@ -28,6 +28,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
+import android.view.View
 import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
@@ -89,6 +90,10 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				mCameraDelegator.cameraRenderer.onSurfaceDestroyed()
 			}
 		})
+	}
+
+	override fun getView() : View {
+		return this
 	}
 
 	@Synchronized
