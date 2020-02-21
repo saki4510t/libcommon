@@ -24,7 +24,7 @@
 	<attr name="aspect_ratio" format="float" default="-1.0" />
 
 	<!-- スケールの種類 -->
-	<attr name="scale_mode" default="scale_none" >
+	<attr name="scale_mode" default="keep_aspect" >
 		<enum name="keep_aspect" value="0" />
 		<enum name="stretch_to_fit" value="1" />
 		<enum name="crop_center" value="2" />
