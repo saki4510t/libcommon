@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -98,14 +99,20 @@ public class GLManager {
 		mCallback = callback;
 		mGLContext = new GLContext(maxClientVersion,
 			sharedContext, flags);
-		mGLHandler = HandlerThreadHandler.createHandler(TAG,
-			new Handler.Callback() {
-				@Override
-				public boolean handleMessage(@NonNull final Message msg) {
-					return GLManager.this.handleMessage(msg);
-				}
+		final Handler.Callback handlerCallback
+			= new Handler.Callback() {
+			@Override
+			public boolean handleMessage(@NonNull final Message msg) {
+				return GLManager.this.handleMessage(msg);
 			}
-		);
+		};
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
+			// API>=22ならHandlerを非同期仕様で初期化
+			mGLHandler = HandlerThreadHandler.createHandler(TAG, handlerCallback, true);
+		} else {
+			// API<22ならHandlerをLooperによる同期バリアを受ける設定で初期化
+			mGLHandler = HandlerThreadHandler.createHandler(TAG, handlerCallback);
+		}
 		mHandlerThreadId = mGLHandler.getLooper().getThread().getId();
 		final Semaphore sync = new Semaphore(0);
 		mGLHandler.postAtFrontOfQueue(new Runnable() {
