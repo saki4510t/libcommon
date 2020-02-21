@@ -162,6 +162,7 @@ public class ZoomAspectScaledTextureView
 			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
 			mHandleTouchEvent = a.getInteger(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);
 		} catch (final UnsupportedOperationException e) {
+			Log.d(TAG, TAG, e);
 			final boolean b = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
 			mHandleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
 		} finally {

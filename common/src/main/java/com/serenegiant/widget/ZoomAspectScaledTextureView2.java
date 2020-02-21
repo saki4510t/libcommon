@@ -115,7 +115,7 @@ public class ZoomAspectScaledTextureView2
 	public ZoomAspectScaledTextureView2(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		final TypedArray a = context.getTheme().obtainStyledAttributes(
+		TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.IScaledView, defStyleAttr, 0);
 		try {
 			mRequestedAspect = a.getFloat(
@@ -124,15 +124,25 @@ public class ZoomAspectScaledTextureView2
 				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
 			mNeedResizeToKeepAspect = a.getBoolean(
 				R.styleable.IScaledView_resize_to_keep_aspect, true);
+		} catch (final UnsupportedOperationException e) {
+			Log.d(TAG, TAG, e);
+		} finally {
+			a.recycle();
+		}
+		a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
+		try {
 			// getIntegerは整数じゃなければUnsupportedOperationExceptionを投げる
 			mHandleTouchEvent = a.getInteger(
 				R.styleable.ZoomAspectScaledTextureView_handle_touch_event, TOUCH_ENABLED_ALL);
 		} catch (final UnsupportedOperationException e) {
+			Log.d(TAG, TAG, e);
 			final boolean b = a.getBoolean(R.styleable.ZoomAspectScaledTextureView_handle_touch_event, true);
 			mHandleTouchEvent = b ? TOUCH_ENABLED_ALL : TOUCH_DISABLED;
 		} finally {
 			a.recycle();
 		}
+
 		super.setSurfaceTextureListener(this);
 		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
 			@Override
