@@ -61,14 +61,15 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	private static final int REQUEST_DRAW = 1;
+	private static final int REQUEST_UPDATE_SIZE = 2;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 
 	@NonNull
 	private final Object mSync = new Object();
 	/**
-	 * 画像サイズ(コンストラクタで設定)
+	 * 画像サイズ
 	 */
-	private final int mImageWidth, mImageHeight;
+	private int mImageWidth, mImageHeight;
 	@NonNull
 	private final Callback mCallback;
 	@NonNull
@@ -81,7 +82,7 @@ public class SurfaceDrawable extends Drawable {
 	private final Paint mPaint = new Paint();
 	@NonNull
 	final float[] mTexMatrix = new float[16];
-	private final ByteBuffer mWorkBuffer;
+	private ByteBuffer mWorkBuffer;
 	private int mTexId;
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
@@ -188,14 +189,7 @@ public class SurfaceDrawable extends Drawable {
 		final int right, final int bottom) {
 
 		super.setBounds(left, top, right, bottom);
-		@NonNull
-		final Rect bounds = getBounds();
-		mWidth = bounds.width();
-		mHeight = bounds.height();
-		final float scaleX = mWidth / (float)mBitmap.getWidth();
-		final float scaleY = mHeight / (float)mBitmap.getHeight();
-		mTransform.reset();
-		mTransform.postScale(scaleX, scaleY);
+		updateTransformMatrix();
 	}
 
 	@Override
@@ -225,6 +219,16 @@ public class SurfaceDrawable extends Drawable {
 		}
 	}
 
+	/**
+	 * 映像サイズを変更要求
+	 * @param width
+	 * @param height
+	 */
+	public void resize(final int width, final int height) {
+		if ((width != mImageWidth) || (height != mImageHeight)) {
+			mEglTask.offer(REQUEST_UPDATE_SIZE, width, height);
+		}
+	}
 //--------------------------------------------------------------------------------
 	protected EGLBase getEgl() {
 		return mEglTask.getEgl();
@@ -284,6 +288,9 @@ public class SurfaceDrawable extends Drawable {
 		case REQUEST_DRAW:
 			handleDraw();
 			break;
+		case REQUEST_UPDATE_SIZE:
+			handleResize(arg1, arg2);
+			break;
 		case REQUEST_RECREATE_MASTER_SURFACE:
 			handleReCreateInputSurface();
 			break;
@@ -324,6 +331,28 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	/**
+	 * 映像サイズをリサイズ
+	 * @param width
+	 * @param height
+	 */
+	@SuppressLint("NewApi")
+	@WorkerThread
+	protected void handleResize(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
+		if ((mImageWidth != width) || (mImageHeight != height)) {
+			mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
+			mWorkBuffer = ByteBuffer.allocateDirect(width * height * 4);
+			mImageWidth = width;
+			mImageHeight = height;
+			updateTransformMatrix();
+			if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
+				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
+				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
+			}
+		}
+	}
+
+	/**
 	 * 映像入力用SurfaceTexture/Surfaceを再生成する
 	 */
 	@SuppressLint("NewApi")
@@ -344,6 +373,7 @@ public class SurfaceDrawable extends Drawable {
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
 			if (BuildCheck.isAndroid4_1()) {
+				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
 				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
 			}
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
@@ -385,6 +415,17 @@ public class SurfaceDrawable extends Drawable {
 				mTexId = 0;
 			}
 		}
+	}
+
+	private void updateTransformMatrix() {
+		@NonNull
+		final Rect bounds = getBounds();
+		mWidth = bounds.width();
+		mHeight = bounds.height();
+		final float scaleX = mWidth / (float)mBitmap.getWidth();
+		final float scaleY = mHeight / (float)mBitmap.getHeight();
+		mTransform.reset();
+		mTransform.postScale(scaleX, scaleY);
 	}
 
 	private void onCreateSurface(@NonNull final Surface surface) {
