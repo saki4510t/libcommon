@@ -183,7 +183,10 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	@Override
-	public void setBounds(int left, int top, int right, int bottom) {
+	public void setBounds(
+		final int left, final int top,
+		final int right, final int bottom) {
+
 		super.setBounds(left, top, right, bottom);
 		@NonNull
 		final Rect bounds = getBounds();

@@ -18,6 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -87,6 +88,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param sharedContext
 	 */
 	@WorkerThread
+	@CallSuper
 	@Override
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
