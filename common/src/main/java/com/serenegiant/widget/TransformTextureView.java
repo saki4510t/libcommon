@@ -44,8 +44,6 @@ public class TransformTextureView extends TextureView {
 	 */
 	public TransformTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		// デフォルトのIViewTransformerを生成させる
-		getViewTransformer();
 	}
 
 	/**

@@ -51,7 +51,6 @@ public class TransformImageView extends AppCompatImageView {
 		super(context, attrs, defStyleAttr);
 		// デフォルトのIViewTransformerを生成させる
 		super.setScaleType(ScaleType.MATRIX);
-		getViewTransformer();
 	}
 
 	protected void superSetScaleType(final ScaleType scaleType) {
