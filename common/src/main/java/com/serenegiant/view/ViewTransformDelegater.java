@@ -756,6 +756,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			mImageMatrix.postScale((float)(width / viewWidth), (float)(height / viewHeight), viewWidth / 2, viewHeight / 2);
 			break;
 		}
+		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
 		setTransform(mImageMatrix);
 		setDefault(mImageMatrix);
 	}
