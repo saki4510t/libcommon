@@ -641,7 +641,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
 	 */
 	public void setAspectRatio(final double aspectRatio) {
-//		if (DEBUG) Log.v(TAG, "setAspectRatio");
+		if (DEBUG) Log.v(TAG, "setAspectRatio:" + aspectRatio);
 		if (mRequestedAspect != aspectRatio) {
 			mRequestedAspect = aspectRatio;
 			getTargetView().requestLayout();
@@ -667,11 +667,12 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 	/**
 	 * スケールモードを設定する
-	 * @param scale_mode
+	 * @param scaleMode
 	 */
-	public void setScaleMode(@ScaleMode final int scale_mode) {
-		if (mScaleMode != scale_mode) {
-			mScaleMode = scale_mode;
+	public void setScaleMode(@ScaleMode final int scaleMode) {
+		if (DEBUG) Log.v(TAG, "setScaleMode:" + scaleMode);
+		if (mScaleMode != scaleMode) {
+			mScaleMode = scaleMode;
 			getTargetView().requestLayout();
 		}
 	}
