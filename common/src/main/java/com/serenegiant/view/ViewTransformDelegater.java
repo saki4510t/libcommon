@@ -735,6 +735,10 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// set limit rectangle that the image can move
 		final int viewWidth = getViewWidth();
 		final int viewHeight = getViewHeight();
+		if (DEBUG) Log.v(TAG,
+			String.format("setupDefaultTransform:mRequestedAspect=%f,view(%dx%d),image(%fx%f)",
+				mRequestedAspect, viewWidth, viewHeight,
+				mImageRect.width(), mImageRect.height()));
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
@@ -753,8 +757,8 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * contentWidth;
 			final double height = scale * contentHeight;
-			if (DEBUG) Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
+			if (DEBUG) Log.v(TAG, String.format("setupDefaultTransform:size(%1.0f,%1.0f),scale(%f,%f)→%f,mat(%f,%f)",
+				width, height, scaleX, scaleY, scale, width / viewWidth, height / viewHeight));
 			mImageMatrix.postScale(
 				(float)(width / viewWidth), (float)(height / viewHeight),
 				 viewWidth / 2.0f, viewHeight / 2.0f);
