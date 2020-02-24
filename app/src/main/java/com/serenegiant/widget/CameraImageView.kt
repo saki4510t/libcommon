@@ -114,12 +114,8 @@ class CameraImageView @JvmOverloads constructor(
 
 	override fun setScaleMode(mode: Int) {
 		if (DEBUG) Log.v(TAG, "setScaleMode:")
+		super.setScaleMode(mode)
 		mCameraDelegator.scaleMode = mode
-	}
-
-	override fun getScaleMode(): Int {
-		if (DEBUG) Log.v(TAG, "getScaleMode:")
-		return mCameraDelegator.scaleMode
 	}
 
 	override fun getVideoWidth(): Int {
