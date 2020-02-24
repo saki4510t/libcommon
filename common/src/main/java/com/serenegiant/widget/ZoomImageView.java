@@ -156,6 +156,7 @@ public class ZoomImageView extends TransformImageView
 				} else {
 					result = new RectF();
 				}
+				if (DEBUG) Log.v(TAG, "getContentBounds:" + result);
 				return result;
 			}
 
@@ -235,8 +236,6 @@ public class ZoomImageView extends TransformImageView
 
 		// if there is no image, leave to super class
 		if (!hasImage()) return super.onTouchEvent(event);
-
-		if (DEBUG) Log.v(TAG, "onTouchEvent:");
 
 		if (mDelegater.onTouchEvent(event)) {
 			return true;
