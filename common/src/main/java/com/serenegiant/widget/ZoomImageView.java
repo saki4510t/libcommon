@@ -21,6 +21,7 @@ package com.serenegiant.widget;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
@@ -38,6 +39,7 @@ import android.view.AbsSavedState;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.serenegiant.common.R;
 import com.serenegiant.view.ViewTransformDelegater;
 
 import androidx.annotation.NonNull;
@@ -47,7 +49,8 @@ import androidx.annotation.Nullable;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends TransformImageView
-	implements ViewTransformDelegater.ViewTransformListener {
+	implements ViewTransformDelegater.ViewTransformListener,
+		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomImageView.class.getSimpleName();
@@ -112,6 +115,21 @@ public class ZoomImageView extends TransformImageView
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.IScaledView, defStyle, 0);
+		double requestedAspect = -1.0;
+		int scaleMode = SCALE_MODE_KEEP_ASPECT;
+		try {
+			requestedAspect = a.getFloat(
+				R.styleable.IScaledView_aspect_ratio, -1.0f);
+			scaleMode = a.getInt(
+				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
+		} catch (final UnsupportedOperationException e) {
+			Log.d(TAG, TAG, e);
+		} finally {
+			a.recycle();
+		}
+
 		mDelegater = new ViewTransformDelegater(this) {
 			@Override
 			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
@@ -158,6 +176,8 @@ public class ZoomImageView extends TransformImageView
 				setFrame(getLeft(), getTop(), getRight(), getBottom());
 			}
 		};
+		mDelegater.setScaleMode(scaleMode);
+		mDelegater.setAspectRatio(requestedAspect);
 		setViewTransformer(mDelegater);
 	}
 
@@ -370,6 +390,60 @@ public class ZoomImageView extends TransformImageView
 	@Override
 	public float getRotation() {
 		return mDelegater.getRotation();
+	}
+
+//--------------------------------------------------------------------------------
+// IScaledView
+	/**
+	 * IScaledViewの実装
+	 * 拡大縮小方法をセット
+	 * @param scaleMode SCALE_MODE_KEEP_ASPECT, SCALE_MODE_STRETCH, SCALE_MODE_CROP
+	 */
+	@Override
+	public void setScaleMode(@ScaleMode final int scaleMode) {
+		mDelegater.setScaleMode(scaleMode);
+	}
+
+	/**
+	 * IScaledViewの実装
+	 * 現在の拡大縮小方法を取得
+	 * @return
+	 */
+	@ScaleMode
+	@Override
+	public int getScaleMode() {
+		return mDelegater.getScaleMode();
+	}
+
+	/**
+	 * IScaledViewの実装
+	 * Viewの要求アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param aspectRatio
+	 */
+	@Override
+	public void setAspectRatio(final double aspectRatio) {
+		mDelegater.setAspectRatio(aspectRatio);
+	}
+
+	/**
+	 * IScaledViewの実装
+	 * Viewの要求アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param width
+	 * @param height
+	 */
+	@Override
+	public void setAspectRatio(final int width, final int height) {
+		mDelegater.setAspectRatio(width / (double)height);
+	}
+
+	/**
+	 * IScaledViewの実装
+	 * 現在の要求アスペクト比を取得
+	 * @return
+	 */
+	@Override
+	public double getAspectRatio() {
+		return mDelegater.getAspectRatio();
 	}
 
 //--------------------------------------------------------------------------------
