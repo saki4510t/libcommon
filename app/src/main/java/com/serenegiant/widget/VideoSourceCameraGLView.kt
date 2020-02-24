@@ -151,6 +151,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 */
 	override fun setScaleMode(mode: Int) {
 		mCameraDelegator.scaleMode = mode
+		(mCameraDelegator.cameraRenderer as CameraRenderer).updateViewport()
 	}
 
 	/**
@@ -273,7 +274,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			return mVideoSource!!.inputSurfaceTexture
 		}
 
-		override fun updateViewport() {
+		fun updateViewport() {
 //			val viewWidth = width
 //			val viewHeight = height
 //			if ((viewWidth == 0) || (viewHeight == 0)) {

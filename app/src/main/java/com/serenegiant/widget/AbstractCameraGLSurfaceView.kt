@@ -123,6 +123,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 
 	override fun setScaleMode(mode: Int) {
 		mCameraDelegator.scaleMode = mode
+		(mCameraDelegator.cameraRenderer as CameraRenderer).updateViewport()
 	}
 
 	override fun getScaleMode(): Int {
@@ -316,7 +317,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			mDrawer?.draw(hTex, mStMatrix, 0)
 		}
 
-		override fun updateViewport() {
+		fun updateViewport() {
 			queueEvent { updateViewportOnGLThread() }
 		}
 

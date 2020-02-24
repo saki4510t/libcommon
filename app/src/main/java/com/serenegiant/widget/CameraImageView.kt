@@ -53,10 +53,6 @@ class CameraImageView @JvmOverloads constructor(
 					return this@CameraImageView.getInputSurfaceTexture()
 				}
 
-				override fun updateViewport() {
-					if (DEBUG) Log.v(TAG, "updateViewport:")
-				}
-
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
 					setAspectRatio(width, height)

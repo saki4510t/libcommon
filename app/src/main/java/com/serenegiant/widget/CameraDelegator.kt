@@ -53,7 +53,6 @@ class CameraDelegator(
 	 */
 	interface ICameraRenderer {
 		fun hasSurface(): Boolean
-		fun updateViewport()
 		fun onPreviewSizeChanged(width: Int, height: Int)
 		/**
 		 * カメラ映像受け取り用のSurface/SurfaceHolder/SurfaceTexture/SurfaceViewを取得
@@ -190,7 +189,6 @@ class CameraDelegator(
 			if (DEBUG) Log.v(TAG, "setScaleMode:$mode")
 			if (mScaleMode != mode) {
 				mScaleMode = mode
-				cameraRenderer.updateViewport()
 			}
 		}
 
@@ -209,7 +207,6 @@ class CameraDelegator(
 			this.height = width
 		}
 		// FIXME 既にカメラから映像取得中ならカメラを再設定しないといけない
-		cameraRenderer.updateViewport()
 	}
 
 	/**

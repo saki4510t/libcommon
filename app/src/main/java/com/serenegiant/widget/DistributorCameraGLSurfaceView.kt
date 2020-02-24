@@ -129,6 +129,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 	override fun setScaleMode(mode: Int) {
 		mCameraDelegator.scaleMode = mode
+		(mCameraDelegator.cameraRenderer as CameraRenderer).updateViewport()
 	}
 
 	override fun getScaleMode(): Int {
@@ -314,7 +315,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			mDrawer?.draw(hTex, mStMatrix, 0)
 		}
 
-		override fun updateViewport() {
+		fun updateViewport() {
 			val viewWidth = width
 			val viewHeight = height
 			if ((viewWidth == 0) || (viewHeight == 0)) {
