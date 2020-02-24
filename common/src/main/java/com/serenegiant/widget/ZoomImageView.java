@@ -87,8 +87,6 @@ public class ZoomImageView extends TransformImageView
 	 */
 	private WaitReverseReset mWaitReverseReset;
 
-	private ScaleType mDefaultScaleType = ScaleType.CENTER_INSIDE;
-
 	/**
 	 * コンストラクタ
 	 * @param context
@@ -171,7 +169,7 @@ public class ZoomImageView extends TransformImageView
 				// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
 				// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
 				// 　　Viewのアスペクト比と画像のアスペクト比が異なれば上下または左右のいずれかが見切れる
-				superSetScaleType(mDefaultScaleType);
+				superSetScaleType(ScaleType.CENTER_INSIDE);
 				// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
 				// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 				setFrame(getLeft(), getTop(), getRight(), getBottom());
@@ -265,17 +263,6 @@ public class ZoomImageView extends TransformImageView
 	}
 
 //--------------------------------------------------------------------------------
-	/**
-	 * 最初に表示したとき・リセットしたときのデフォルトのScaleTypeを設定
-	 * 未設定ならCENTER_INSIDE
-	 * CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
-	 * CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
-	 * @param scaleType
-	 */
-	public void setDefaultScaleType(final ScaleType scaleType) {
-		mDefaultScaleType = scaleType;
-	}
-
 	/**
 	 * whether ImageView has image
 	 * @return true if ImageView has image, false otherwise
