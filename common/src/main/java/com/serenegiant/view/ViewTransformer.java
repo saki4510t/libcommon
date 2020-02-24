@@ -153,7 +153,9 @@ public abstract class ViewTransformer implements IViewTransformer {
 	@Override
 	public ViewTransformer setDefault(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setDefault=" + transform);
-		mDefaultTransform.set(transform);
+		if (mDefaultTransform != transform) {
+			mDefaultTransform.set(transform);
+		}
 		return this;
 	}
 
