@@ -152,7 +152,7 @@ public class ZoomImageView extends TransformImageView
 				// CENTER_INSIDEにすればアスペクト比を維持した状態で画像全体が表示される
 				// CENTER_CROPにすればアスペクト比を維持してView全体に映像が表示される
 				// 　　Viewのアスペクト比と画像のアスペクト比が異なれば上下または左右のいずれかが見切れる
-				ZoomImageView.super.setScaleType(mDefaultScaleType);
+				superSetScaleType(mDefaultScaleType);
 				// ImageView#setScaleTypeを呼んだだけではトランスフォームマトリックスが更新されないので
 				// ImageView#setFrameを呼んで強制的にトランスフォームマトリックスを計算させる
 				setFrame(getLeft(), getTop(), getRight(), getBottom());
