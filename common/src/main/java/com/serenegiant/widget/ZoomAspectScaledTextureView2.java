@@ -144,12 +144,13 @@ public class ZoomAspectScaledTextureView2
 		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
 			@Override
 			public RectF getContentBounds() {
+				if (DEBUG) Log.v(TAG, "getContentBounds:");
 				return null;
 			}
 
 			@Override
 			public void onInit() {
-
+				if (DEBUG) Log.v(TAG, "onInit:");
 			}
 		};
 		mDelegater.setEnableHandleTouchEvent(handleTouchEvent);
@@ -160,7 +161,7 @@ public class ZoomAspectScaledTextureView2
 	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-//		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
+		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
 		final MeasureSpecDelegater.MeasureSpec spec
 			= MeasureSpecDelegater.onMeasure(this,
 				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
@@ -171,7 +172,8 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
 		super.onLayout(changed, left, top, right, bottom);
-//		if (DEBUG) Log.v(TAG, "onLayout:width=" + getWidth() + ",height=" + getHeight());
+		if (DEBUG) Log.v(TAG, String.format("onLayout:(%d,%d)-(%d,%d)",
+			left, top, right, bottom));
 //		if view size(width|height) is zero(the view size not decided yet)
 		if (getWidth() == 0 || getHeight() == 0) return;
 		init();
