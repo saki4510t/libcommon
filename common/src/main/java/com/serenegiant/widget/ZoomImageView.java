@@ -131,13 +131,16 @@ public class ZoomImageView extends TransformImageView
 		mDelegater = new ViewTransformDelegater(this) {
 			@Override
 			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 				superSetImageMatrix(mTransform);
 			}
 
 			@NonNull
 			@Override
 			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				return superGetImageMatrix(transform);
+				final Matrix result = superGetImageMatrix(transform);
+				if (DEBUG) Log.v(TAG, "getTransform:" + result);
+				return result;
 			}
 
 			/**
