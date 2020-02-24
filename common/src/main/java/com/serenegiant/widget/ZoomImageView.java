@@ -132,7 +132,7 @@ public class ZoomImageView extends TransformImageView
 			@Override
 			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
 				if (DEBUG) Log.v(TAG, "setTransform:" + transform);
-				superSetImageMatrix(mTransform);
+				superSetImageMatrix(transform);
 			}
 
 			@NonNull
