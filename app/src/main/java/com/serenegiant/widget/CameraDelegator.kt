@@ -208,6 +208,7 @@ class CameraDelegator(
 			this.width = height
 			this.height = width
 		}
+		// FIXME 既にカメラから映像取得中ならカメラを再設定しないといけない
 		cameraRenderer.updateViewport()
 	}
 
