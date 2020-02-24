@@ -753,8 +753,8 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * contentWidth;
 			final double height = scale * contentHeight;
-//			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-//				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
+			if (DEBUG) Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
 			mImageMatrix.postScale(
 				(float)(width / viewWidth), (float)(height / viewHeight),
 				 viewWidth / 2.0f, viewHeight / 2.0f);
