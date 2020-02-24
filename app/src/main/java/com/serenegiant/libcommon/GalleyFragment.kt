@@ -18,6 +18,7 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
+import android.content.Context
 import android.os.Bundle
 import android.provider.MediaStore
 import android.util.Log
@@ -36,6 +37,12 @@ import com.serenegiant.mediastore.MediaStoreAdapter
 class GalleyFragment : BaseFragment() {
 
 	private var mMediaStoreAdapter: MediaStoreAdapter? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = getString(R.string.title_galley)
+	}
+
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 

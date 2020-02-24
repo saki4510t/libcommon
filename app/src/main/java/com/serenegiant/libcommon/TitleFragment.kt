@@ -78,6 +78,11 @@ class TitleFragment: BaseFragment() {
 		return view
 	}
 
+	override fun internalOnResume() {
+		super.internalOnResume()
+		requireActivity().title = getString(R.string.app_name)
+	}
+
 	override fun onDetach() {
 		mListener = null
 		super.onDetach()

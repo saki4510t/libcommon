@@ -1,5 +1,6 @@
 package com.serenegiant.libcommon
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -18,6 +19,11 @@ class NumberKeyboardFragment : BaseFragment() {
 	private var mInputEditText: EditText? = null
 	private var mKeyboardView: KeyboardView? = null
 	private var mDelegater: KeyboardDelegater? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = getString(R.string.title_number_keyboard)
+	}
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {

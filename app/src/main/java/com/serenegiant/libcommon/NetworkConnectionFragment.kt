@@ -1,5 +1,6 @@
 package com.serenegiant.libcommon
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -34,6 +35,11 @@ import com.serenegiant.net.ConnectivityHelper.ConnectivityCallback
 class NetworkConnectionFragment : BaseFragment() {
 
 	private var mHelper: ConnectivityHelper? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = getString(R.string.title_network_connection)
+	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)

@@ -19,6 +19,7 @@ package com.serenegiant.libcommon
 */
 
 import android.content.ContentResolver
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Rect
 import android.os.Bundle
@@ -43,6 +44,11 @@ class ImageFragment: BaseFragment() {
 	private var mInfo: MediaInfo? = null
 	private var mRootView: View? = null
 	private var mImageView: ZoomImageView? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = getString(R.string.title_galley)
+	}
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {

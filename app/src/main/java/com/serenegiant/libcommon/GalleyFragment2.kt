@@ -18,6 +18,7 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -40,6 +41,11 @@ import com.serenegiant.widget.RecycleViewWithEmptyView
 class GalleyFragment2 : BaseFragment() {
 
 	private var mMediaStoreAdapter: MediaStoreRecyclerAdapter? = null
+
+	override fun onAttach(context: Context) {
+		super.onAttach(context)
+		requireActivity().title = getString(R.string.title_galley_recycler)
+	}
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
