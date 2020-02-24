@@ -649,9 +649,9 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			mImageRect.set(mLimitRect);
 		}
 		if (DEBUG) Log.v(TAG, "init:mImageRect=" + mImageRect);
-		final float view_width = mLimitRect.width();
-		final float view_height = mLimitRect.height();
-		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
+		final float viewWidth = mLimitRect.width();
+		final float viewHeight = mLimitRect.height();
+		mLimitRect.inset((MOVE_LIMIT_RATE * viewWidth), (MOVE_LIMIT_RATE * viewHeight));
 		mLimitSegments[0] = null;
 	}
 

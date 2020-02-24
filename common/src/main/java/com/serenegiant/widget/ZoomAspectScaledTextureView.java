@@ -366,12 +366,12 @@ public class ZoomAspectScaledTextureView
 		// (that can get ImageView#getDrawable)
 		// therefore update the image size from its Drawable
 		// set limit rectangle that the image can move
-		final int view_width = getWidth();
-		final int view_height = getHeight();
+		final int viewWidth = getWidth();
+		final int viewHeight = getHeight();
 		final Rect tmp = new Rect();
 		getDrawingRect(tmp);
 		mLimitRect.set(tmp);
-		mLimitRect.inset((MOVE_LIMIT_RATE * view_width), (MOVE_LIMIT_RATE * view_height));
+		mLimitRect.inset((MOVE_LIMIT_RATE * viewWidth), (MOVE_LIMIT_RATE * viewHeight));
 		mLimitSegments[0] = null;
 		mImageRect.set(0, 0, tmp.width(), tmp.height());
 		mTransX = mTransY = 0.0f;
