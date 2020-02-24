@@ -743,6 +743,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			break;
 		case SCALE_MODE_KEEP_ASPECT:
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
+			// FIXME アスペクト比が設定されていないときはmImageRectを使う?
 			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
 			final double videoHeight = viewHeight;
 			final double scaleX = viewWidth / videoWidth;
