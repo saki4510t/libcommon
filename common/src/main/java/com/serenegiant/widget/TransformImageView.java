@@ -57,6 +57,20 @@ public class TransformImageView extends AppCompatImageView {
 		super.setScaleType(scaleType);
 	}
 
+	protected void superSetImageMatrix(@Nullable final Matrix transform) {
+		super.setImageMatrix(transform);
+	}
+
+	protected Matrix superGetImageMatrix(@Nullable final Matrix transform) {
+		Matrix result = transform;
+		if (result != null) {
+			result.set(super.getImageMatrix());
+		} else {
+			result = new Matrix(super.getImageMatrix());
+		}
+		return result;
+	}
+
 	/**
 	 * IViewTransformerをセット
 	 * @param transformer
@@ -73,25 +87,26 @@ public class TransformImageView extends AppCompatImageView {
 	@NonNull
 	public IViewTransformer getViewTransformer() {
 		if (mViewTransformer == null) {
-			mViewTransformer = new ViewTransformer(this) {
-				@Override
-				protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-					TransformImageView.super.setImageMatrix(transform);
-				}
-
-				@NonNull
-				@Override
-				protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-					Matrix result = transform;
-					if (result != null) {
-						result.set(TransformImageView.super.getImageMatrix());
-					} else {
-						result = new Matrix(TransformImageView.super.getImageMatrix());
-					}
-					return result;
-				}
-			};
+			mViewTransformer = new DefaultViewTransformer(this);
 		}
 		return mViewTransformer;
+	}
+
+//--------------------------------------------------------------------------------
+	public static class DefaultViewTransformer extends ViewTransformer {
+		public DefaultViewTransformer(@NonNull final TransformImageView view) {
+			super(view);
+		}
+
+		@Override
+		protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+			((TransformImageView)getTargetView()).superSetImageMatrix(transform);
+		}
+
+		@NonNull
+		@Override
+		protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+			return ((TransformImageView)getTargetView()).superGetImageMatrix(transform);
+		}
 	}
 }

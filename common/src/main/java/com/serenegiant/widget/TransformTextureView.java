@@ -54,6 +54,14 @@ public class TransformTextureView extends TextureView {
 		mViewTransformer = transformer;
 	}
 
+	protected void superSetTransform(@Nullable final Matrix transform) {
+		super.setTransform(transform);
+	}
+
+	protected Matrix superGetTransform(@Nullable final Matrix transform) {
+		return super.getTransform(transform);
+	}
+
 	/**
 	 * IViewTransformerを取得
 	 * 設定されていなければデフォルトのIViewTransformerを生成＆設定して返す
@@ -62,19 +70,27 @@ public class TransformTextureView extends TextureView {
 	@NonNull
 	public IViewTransformer getViewTransformer() {
 		if (mViewTransformer == null) {
-			mViewTransformer = new ViewTransformer(this) {
-				@Override
-				protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-					TransformTextureView.super.setTransform(transform);
-				}
-
-				@NonNull
-				@Override
-				protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-					return TransformTextureView.super.getTransform(transform);
-				}
-			};
+			mViewTransformer = new DefaultViewTransformer(this);
 		}
 		return mViewTransformer;
 	}
+
+//--------------------------------------------------------------------------------
+	public static class DefaultViewTransformer extends ViewTransformer {
+		public DefaultViewTransformer(@NonNull final TransformTextureView view) {
+			super(view);
+		}
+
+		@Override
+		protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+			((TransformTextureView)getTargetView()).superSetTransform(transform);
+		}
+
+		@NonNull
+		@Override
+		protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+			return ((TransformTextureView)getTargetView()).superGetTransform(transform);
+		}
+	}
+
 }
