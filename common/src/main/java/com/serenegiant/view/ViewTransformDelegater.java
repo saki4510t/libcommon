@@ -32,12 +32,16 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
+import com.serenegiant.widget.IScaledView;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import static com.serenegiant.widget.IScaledView.*;
 
 /**
  * 拡大縮小平行移動回転可能なViewのためのdelegater
@@ -249,6 +253,20 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 //--------------------------------------------------------------------------------
 // variables
+	/**
+	 * スケールモード
+	 */
+	@IScaledView.ScaleMode
+	private int mScaleMode;
+	/**
+	 * 表示内容のアスペクト比
+	 * 0以下なら無視される
+	 */
+	private double mRequestedAspect;
+	/**
+	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
+	 */
+	private boolean mNeedResizeToKeepAspect;
 	/**
 	 * タッチ操作の有効無効設定
 	 */
@@ -620,6 +638,54 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
+	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 */
+	public void setAspectRatio(final double aspectRatio) {
+//		if (DEBUG) Log.v(TAG, "setAspectRatio");
+		if (mRequestedAspect != aspectRatio) {
+			mRequestedAspect = aspectRatio;
+			getTargetView().requestLayout();
+		}
+ 	}
+
+	/**
+	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param width
+	 * @param height
+	 */
+	public void setAspectRatio(final int width, final int height) {
+		setAspectRatio(width / (double)height);
+	}
+
+	/**
+	 * 現在の要求アスペクト比を取得する
+	 * @return
+	 */
+	public double getAspectRatio() {
+		return mRequestedAspect;
+	}
+
+	/**
+	 * スケールモードを設定する
+	 * @param scale_mode
+	 */
+	public void setScaleMode(@ScaleMode final int scale_mode) {
+		if (mScaleMode != scale_mode) {
+			mScaleMode = scale_mode;
+			getTargetView().requestLayout();
+		}
+	}
+
+	/**
+	 * 現在のスケールモードを取得する
+	 * @return
+	 */
+	@ScaleMode
+	public int getScaleMode() {
+		return mScaleMode;
+	}
+
+	/**
 	 * View表内容の拡大縮小回転平行移動を初期化
 	 */
 	public void init() {
@@ -653,6 +719,45 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		final float viewHeight = mLimitRect.height();
 		mLimitRect.inset((MOVE_LIMIT_RATE * viewWidth), (MOVE_LIMIT_RATE * viewHeight));
 		mLimitSegments[0] = null;
+		setupDefaultTransform();
+	}
+
+	/**
+	 * 拡大縮小回転状態を初期化
+	 * スケールモードと要求アスペクト比に合わせてトランスフォームマトリックスを初期化する
+	 */
+	private void setupDefaultTransform() {
+		// update image size
+		// current implementation of ImageView always hold its image as a Drawable
+		// (that can get ImageView#getDrawable)
+		// therefore update the image size from its Drawable
+		// set limit rectangle that the image can move
+		final int viewWidth = getViewWidth();
+		final int viewHeight = getViewHeight();
+		// apply matrix
+		mImageMatrix.reset();
+		switch (mScaleMode) {
+		case SCALE_MODE_STRETCH_TO_FIT:
+			// 何もしない
+			break;
+		case SCALE_MODE_KEEP_ASPECT:
+		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
+			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
+			final double videoHeight = viewHeight;
+			final double scaleX = viewWidth / videoWidth;
+			final double scaleY = viewHeight / videoHeight;
+			final double scale = (mScaleMode == SCALE_MODE_CROP)
+				? Math.max(scaleX,  scaleY)	// SCALE_MODE_CROP
+				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
+			final double width = scale * videoWidth;
+			final double height = scale * videoHeight;
+//			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+//				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
+			mImageMatrix.postScale((float)(width / viewWidth), (float)(height / viewHeight), viewWidth / 2, viewHeight / 2);
+			break;
+		}
+		setTransform(mImageMatrix);
+		setDefault(mImageMatrix);
 	}
 
 	/**
@@ -1067,6 +1172,14 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		final Rect r = new Rect();
 		getTargetView().getDrawingRect(r);
 		return r;
+	}
+
+	private int getViewWidth() {
+		return getTargetView().getWidth();
+	}
+
+	private int getViewHeight() {
+		return getTargetView().getHeight();
 	}
 
 	/**
