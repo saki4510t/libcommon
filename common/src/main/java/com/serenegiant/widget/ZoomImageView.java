@@ -26,6 +26,7 @@ import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
@@ -111,7 +112,18 @@ public class ZoomImageView extends TransformImageView
 	public ZoomImageView(final Context context, final AttributeSet attrs, final int defStyle) {
 		super(context, attrs, defStyle);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
+		mDelegater = new ViewTransformDelegater(this) {
+			@Override
+			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				superSetImageMatrix(mTransform);
+			}
+
+			@NonNull
+			@Override
+			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				return superGetImageMatrix(transform);
+			}
+
 			/**
 			 * ITransformViewの実装
 			 * View表示内容の大きさを取得
@@ -146,6 +158,7 @@ public class ZoomImageView extends TransformImageView
 				setFrame(getLeft(), getTop(), getRight(), getBottom());
 			}
 		};
+		setViewTransformer(mDelegater);
 	}
 
 	@Override

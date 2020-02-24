@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.content.res.TypedArray;
+import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.SurfaceTexture;
 import android.os.Parcelable;
@@ -36,6 +37,9 @@ import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.ViewTransformDelegater;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
@@ -141,7 +145,18 @@ public class ZoomAspectScaledTextureView2
 		}
 
 		super.setSurfaceTextureListener(this);
-		mDelegater = new ViewTransformDelegater(this, getViewTransformer()) {
+		mDelegater = new ViewTransformDelegater(this) {
+			@Override
+			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				superSetTransform(transform);
+			}
+
+			@NonNull
+			@Override
+			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				return superGetTransform(transform);
+			}
+
 			@Override
 			public RectF getContentBounds() {
 				if (DEBUG) Log.v(TAG, "getContentBounds:");
@@ -154,6 +169,7 @@ public class ZoomAspectScaledTextureView2
 			}
 		};
 		mDelegater.setEnableHandleTouchEvent(handleTouchEvent);
+		setViewTransformer(mDelegater);
 	}
 
 	/**

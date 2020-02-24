@@ -42,7 +42,7 @@ import androidx.annotation.Nullable;
 /**
  * 拡大縮小平行移動回転可能なViewのためのdelegater
  */
-public abstract class ViewTransformDelegater {
+public abstract class ViewTransformDelegater extends ViewTransformer {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ViewTransformDelegater.class.getSimpleName();
@@ -168,7 +168,7 @@ public abstract class ViewTransformDelegater {
 	private final class WaitImageReset implements Runnable {
 		@Override
 		public void run() {
-			mParent.requestLayout();
+			getTargetView().requestLayout();
 		}
 	}
 
@@ -356,25 +356,15 @@ public abstract class ViewTransformDelegater {
 
 //--------------------------------------------------------------------------------
 	/**
-	 * 親Viewの参照
-	 */
-	@NonNull
-	private final View mParent;
-	@NonNull
-	private final IViewTransformer mTransformer;
-	/**
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public ViewTransformDelegater(@NonNull final View parent,
-		@NonNull final IViewTransformer transformer) {
-
+	public ViewTransformDelegater(@NonNull final View parent) {
+		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mParent = parent;
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
-		mTransformer = transformer;
 	}
 
 	/**
@@ -443,6 +433,7 @@ public abstract class ViewTransformDelegater {
 			return false;
 		}
 
+		final View view = getTargetView();
 		final int actionCode = event.getActionMasked();	// >= API8
 
 		switch (actionCode) {
@@ -455,7 +446,7 @@ public abstract class ViewTransformDelegater {
 			switch (mState) {
 			case STATE_WAITING:
 				// 最初のマルチタッチ → 拡大縮小・回転操作待機開始
-				mParent.removeCallbacks(mWaitImageReset);
+				view.removeCallbacks(mWaitImageReset);
 				// pass through
 			case STATE_DRAGGING:
 				if (event.getPointerCount() > 1) {
@@ -474,7 +465,7 @@ public abstract class ViewTransformDelegater {
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
 
-					mParent.removeCallbacks(mWaitImageReset);
+					view.removeCallbacks(mWaitImageReset);
 					setState(STATE_DRAGGING);
 					return true;
 				}
@@ -505,14 +496,14 @@ public abstract class ViewTransformDelegater {
 		case MotionEvent.ACTION_CANCEL:
 			// pass through
 		case MotionEvent.ACTION_UP:
-			mParent.removeCallbacks(mWaitImageReset);
-			mParent.removeCallbacks(mStartCheckRotate);
+			view.removeCallbacks(mWaitImageReset);
+			view.removeCallbacks(mStartCheckRotate);
 			if ((actionCode == MotionEvent.ACTION_UP) && (mState == STATE_WAITING)) {
 				final long downTime = SystemClock.uptimeMillis() - event.getDownTime();
 				if (downTime > LONG_PRESS_TIMEOUT) {
-					mParent.performLongClick();
+					view.performLongClick();
 				} else if (downTime < TAP_TIMEOUT) {
-					mParent.performClick();
+					view.performClick();
 				}
 			}
 			// pass through
@@ -637,7 +628,7 @@ public abstract class ViewTransformDelegater {
 		clearPendingTasks();
 		if (!mIsRestored) {
 			onInit();
-			mTransformer.updateTransform(true);
+			updateTransform(true);
 			// set the initial state to idle, get and save the internal Matrix.
 			setState(STATE_NON);
 			// get the internally calculated zooming scale to fit the view
@@ -669,12 +660,13 @@ public abstract class ViewTransformDelegater {
 	 */
 	public void clearPendingTasks() {
 		if (DEBUG) Log.v(TAG, "clearPendingTasks:");
+		final View view = getTargetView();
 		if (mWaitImageReset != null)
-			mParent.removeCallbacks(mWaitImageReset);
+			view.removeCallbacks(mWaitImageReset);
 		if (mStartCheckRotate != null)
-			mParent.removeCallbacks(mStartCheckRotate);
+			view.removeCallbacks(mStartCheckRotate);
 		if (mWaitReverseReset != null)
-			mParent.removeCallbacks(mWaitReverseReset);
+			view.removeCallbacks(mWaitReverseReset);
 	}
 
 	/**
@@ -687,13 +679,12 @@ public abstract class ViewTransformDelegater {
 			scale = mMinScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.invalidate();
 		} else if (scale > mMaxScale) {
 			scale = mMaxScale;
 			mImageMatrix.setScale(scale, scale);
 			mImageMatrixChanged = true;
-			mParent.invalidate();
 		}
+		getTargetView().invalidate();
 	}
 
 	/**
@@ -707,13 +698,13 @@ public abstract class ViewTransformDelegater {
 		if (mState != state) {
 			mState = state;
 			// get and save the internal Matrix of super class
-			mTransformer.getTransform(mSavedImageMatrix);
+			getTransform(mSavedImageMatrix);
 			if (!mImageMatrix.equals(mSavedImageMatrix)) {
 				mImageMatrix.set(mSavedImageMatrix);
 				mImageMatrixChanged = true;
 			}
 			if (mViewTransformListener != null) {
-				mViewTransformListener.onStateChanged(mParent, state);
+				mViewTransformListener.onStateChanged(getTargetView(), state);
 			}
 		}
 	}
@@ -731,7 +722,7 @@ public abstract class ViewTransformDelegater {
 		mPrimaryX = mSecondX = event.getX();
 		mPrimaryY = mSecondY = event.getY();
 		if (mWaitImageReset == null) mWaitImageReset = new WaitImageReset();
-		mParent.postDelayed(mWaitImageReset, CHECK_TIMEOUT);
+		getTargetView().postDelayed(mWaitImageReset, CHECK_TIMEOUT);
 		setState(STATE_WAITING);
 	}
 
@@ -820,7 +811,7 @@ public abstract class ViewTransformDelegater {
 					// when image is really moved?
 					mImageMatrixChanged = true;
 					// apply to super class
-					mTransformer.setTransform(mImageMatrix);
+					setTransform(mImageMatrix);
 				}
 			}
 		}
@@ -862,7 +853,7 @@ public abstract class ViewTransformDelegater {
 			if ((mHandleTouchEvent & TOUCH_ENABLED_ROTATE) == TOUCH_ENABLED_ROTATE) {
 				if (mStartCheckRotate == null)
 					mStartCheckRotate = new StartCheckRotate();
-				mParent.postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
+				getTargetView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
 			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
 		}
@@ -875,7 +866,7 @@ public abstract class ViewTransformDelegater {
 	 */
 	private final void startZoom(final MotionEvent event) {
 
-		mParent.removeCallbacks(mStartCheckRotate);
+		getTargetView().removeCallbacks(mStartCheckRotate);
 		setState(STATE_ZOOMING);
 	}
 
@@ -907,7 +898,7 @@ public abstract class ViewTransformDelegater {
 			// when Matrix is changed
 			mImageMatrixChanged = true;
 			// apply to super class
-			mTransformer.setTransform(mImageMatrix);
+			setTransform(mImageMatrix);
 		}
 
 		return true;
@@ -977,7 +968,7 @@ public abstract class ViewTransformDelegater {
 				// when Matrix is changed
 				mImageMatrixChanged = true;
 				// apply to super class
-				mTransformer.setTransform(mImageMatrix);
+				setTransform(mImageMatrix);
 				return true;
 			}
 		}
@@ -990,7 +981,7 @@ public abstract class ViewTransformDelegater {
 
 		if (mViewTransformListener != null)
 		try {
-			mViewTransformListener.onStartRotation(mParent);
+			mViewTransformListener.onStartRotation(getTargetView());
 		} catch (Exception e) {
 			if (DEBUG) Log.w(TAG, e);
 		}
@@ -1074,7 +1065,7 @@ public abstract class ViewTransformDelegater {
 	@NonNull
 	private Rect getDrawingRect() {
 		final Rect r = new Rect();
-		mParent.getDrawingRect(r);
+		getTargetView().getDrawingRect(r);
 		return r;
 	}
 
