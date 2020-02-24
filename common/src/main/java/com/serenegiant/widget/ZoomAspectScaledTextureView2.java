@@ -35,6 +35,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.view.IViewTransformer;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.ViewTransformDelegater;
 
@@ -44,8 +45,7 @@ import androidx.annotation.Nullable;
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
 /**
- * FIXME 未実装 ViewTransformDelegaterを使って拡大縮小回転平行移動をするTextureView
- * FIXME まだうまく動かにゃい
+ * ViewTransformDelegaterを使って拡大縮小回転平行移動をするTextureView
  */
 public class ZoomAspectScaledTextureView2
 	extends TransformTextureView implements IRendererCommon,
@@ -72,21 +72,9 @@ public class ZoomAspectScaledTextureView2
 	@MirrorMode
     private int mMirrorMode = MIRROR_NORMAL;
 	/**
-	 * スケールモード
-	 */
-	@ScaleMode
-	private int mScaleMode;
-	/**
-	 * 表示内容のアスペクト比
-	 * 0以下なら無視される
-	 */
-	private double mRequestedAspect;
-	/**
 	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
 	 */
 	private boolean mNeedResizeToKeepAspect;
-
-	private final ViewTransformDelegater mDelegater;
 
 	/**
 	 * コンストラクタ
@@ -118,10 +106,12 @@ public class ZoomAspectScaledTextureView2
 		int handleTouchEvent;
 		TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.IScaledView, defStyleAttr, 0);
+		double requestedAspect = -1.0;
+		int scaleMode = SCALE_MODE_KEEP_ASPECT;
 		try {
-			mRequestedAspect = a.getFloat(
+			requestedAspect = a.getFloat(
 				R.styleable.IScaledView_aspect_ratio, -1.0f);
-			mScaleMode = a.getInt(
+			scaleMode = a.getInt(
 				R.styleable.IScaledView_scale_mode, SCALE_MODE_KEEP_ASPECT);
 			mNeedResizeToKeepAspect = a.getBoolean(
 				R.styleable.IScaledView_resize_to_keep_aspect, true);
@@ -145,7 +135,7 @@ public class ZoomAspectScaledTextureView2
 		}
 
 		super.setSurfaceTextureListener(this);
-		mDelegater = new ViewTransformDelegater(this) {
+		ViewTransformDelegater delegater = new ViewTransformDelegater(this) {
 			@Override
 			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
 				superSetTransform(transform);
@@ -168,8 +158,10 @@ public class ZoomAspectScaledTextureView2
 				if (DEBUG) Log.v(TAG, "onInit:");
 			}
 		};
-		mDelegater.setEnableHandleTouchEvent(handleTouchEvent);
-		setViewTransformer(mDelegater);
+		delegater.setScaleMode(scaleMode);
+		delegater.setAspectRatio(requestedAspect);
+		delegater.setEnableHandleTouchEvent(handleTouchEvent);
+		setViewTransformer(delegater);
 	}
 
 	/**
@@ -177,10 +169,10 @@ public class ZoomAspectScaledTextureView2
 	 */
 	@Override
 	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + mRequestedAspect);
+		if (DEBUG) Log.v(TAG, "onMeasure:mRequestedAspect=" + getAspectRatio());
 		final MeasureSpecDelegater.MeasureSpec spec
 			= MeasureSpecDelegater.onMeasure(this,
-				mRequestedAspect, mScaleMode, mNeedResizeToKeepAspect,
+				getAspectRatio(), getScaleMode(), mNeedResizeToKeepAspect,
 				widthMeasureSpec, heightMeasureSpec);
 		super.onMeasure(spec.widthMeasureSpec, spec.heightMeasureSpec);
 	}
@@ -198,7 +190,10 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	protected void onDetachedFromWindow() {
 		if (DEBUG) Log.v(TAG, "onDetachedFromWindow:");
-		mDelegater.clearPendingTasks();
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).clearPendingTasks();
+		}
 		super.onDetachedFromWindow();
 	}
 
@@ -206,7 +201,12 @@ public class ZoomAspectScaledTextureView2
 	protected Parcelable onSaveInstanceState() {
 		if (DEBUG) Log.v(TAG, "onSaveInstanceState:");
 
-		return mDelegater.onSaveInstanceState(super.onSaveInstanceState());
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			return ((ViewTransformDelegater) transformer).onSaveInstanceState(super.onSaveInstanceState());
+		} else {
+			return super.onSaveInstanceState();
+		}
 	}
 
 	@Override
@@ -217,7 +217,10 @@ public class ZoomAspectScaledTextureView2
 		if (state instanceof AbsSavedState) {
 			super.onRestoreInstanceState(((AbsSavedState) state).getSuperState());
 		}
-		mDelegater.onRestoreInstanceState(state);
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).onRestoreInstanceState(state);
+		}
 	}
 
 	@Override
@@ -225,7 +228,10 @@ public class ZoomAspectScaledTextureView2
 		if (DEBUG) Log.v(TAG, "onConfigurationChanged:" + newConfig);
 
 		super.onConfigurationChanged(newConfig);
-		mDelegater.onConfigurationChanged(newConfig);
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).onConfigurationChanged(newConfig);
+		}
 	}
 
 	@SuppressLint("ClickableViewAccessibility")
@@ -236,7 +242,10 @@ public class ZoomAspectScaledTextureView2
 			return true;	// 処理済み
 		}
 
-		if (mDelegater.onTouchEvent(event)) {
+		final IViewTransformer transformer = getViewTransformer();
+		if ((transformer instanceof ViewTransformDelegater)
+			&& ((ViewTransformDelegater) transformer).onTouchEvent(event)) {
+
 			return true;
 		}
 
@@ -318,7 +327,10 @@ public class ZoomAspectScaledTextureView2
 	 * @param enabled
 	 */
 	public void setEnableHandleTouchEvent(@ViewTransformDelegater.TouchMode final int enabled) {
-		mDelegater.setEnableHandleTouchEvent(enabled);
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).setEnableHandleTouchEvent(enabled);
+		}
 	}
 
 	/**
@@ -327,13 +339,21 @@ public class ZoomAspectScaledTextureView2
 	 */
 	@ViewTransformDelegater.TouchMode
 	public int getEnableHandleTouchEvent() {
-		return mDelegater.getEnableHandleTouchEvent();
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			return ((ViewTransformDelegater) transformer).getEnableHandleTouchEvent();
+		} else {
+			return TOUCH_ENABLED_ALL;
+		}
 	}
 
 //================================================================================
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
-		mDelegater.init();
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).init();
+		}
 	}
 
 	protected boolean handleOnTouchEvent(final MotionEvent event) {
@@ -376,33 +396,46 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	public void setAspectRatio(final double aspectRatio) {
 //		if (DEBUG) Log.v(TAG, "setAspectRatio");
-		if (mRequestedAspect != aspectRatio) {
-			mRequestedAspect = aspectRatio;
-			requestLayout();
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).setAspectRatio(aspectRatio);
 		}
  	}
 
 	@Override
 	public void setAspectRatio(final int width, final int height) {
-		setAspectRatio(width / (double)height);
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).setAspectRatio(width / (double)height);
+		}
 	}
 
 	@Override
 	public double getAspectRatio() {
-		return mRequestedAspect;
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			return ((ViewTransformDelegater) transformer).getAspectRatio();
+		} else {
+			return -1.0;
+		}
 	}
 
 	@Override
-	public void setScaleMode(@ScaleMode final int scale_mode) {
-		if (mScaleMode != scale_mode) {
-			mScaleMode = scale_mode;
-			requestLayout();
+	public void setScaleMode(@ScaleMode final int scaleMode) {
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			((ViewTransformDelegater) transformer).setScaleMode(scaleMode);
 		}
 	}
 
 	@ScaleMode
 	@Override
 	public int getScaleMode() {
-		return mScaleMode;
+		final IViewTransformer transformer = getViewTransformer();
+		if (transformer instanceof ViewTransformDelegater) {
+			return ((ViewTransformDelegater) transformer).getScaleMode();
+		} else {
+			return SCALE_MODE_STRETCH_TO_FIT;
+		}
 	}
 }
