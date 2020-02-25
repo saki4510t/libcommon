@@ -36,6 +36,7 @@ import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
@@ -84,7 +85,7 @@ public class ZoomAspectScaledTextureView
 	/**
 	 * 表示されるViewの実際のサイズ
 	 */
-	private final RectF mImageRect = new RectF();
+	private final RectF mContentRect = new RectF();
 	/**
 	 * scaled and moved and rotated corner coordinates of image
 	 * [(left,top),(right,top),(right,bottom),(left.bottom)]
@@ -371,12 +372,24 @@ public class ZoomAspectScaledTextureView
 		final Rect tmp = new Rect();
 		getDrawingRect(tmp);
 		mLimitRect.set(tmp);
+		// update image size
+		final RectF bounds = getContentBounds();
+		if ((bounds != null) && !bounds.isEmpty()) {
+			mContentRect.set(bounds);
+		} else {
+			mContentRect.set(mLimitRect);
+		}
 		mLimitRect.inset((MOVE_LIMIT_RATE * viewWidth), (MOVE_LIMIT_RATE * viewHeight));
 		mLimitSegments[0] = null;
-		mImageRect.set(0, 0, tmp.width(), tmp.height());
 		mTransX = mTransY = 0.0f;
 		super.init();
 		mDefaultMatrix.set(mImageMatrix);
+	}
+
+	@Nullable
+	protected RectF getContentBounds() {
+		if (DEBUG) Log.v(TAG, "getContentBounds:");
+		return null;
 	}
 
 	/**
@@ -420,10 +433,10 @@ public class ZoomAspectScaledTextureView
 
 		// calculate the corner coordinates of image applied matrix
 		// [(left,top),(right,top),(right,bottom),(left.bottom)]
-		mTransCoords[0] = mTransCoords[6] = mImageRect.left;
-		mTransCoords[1] = mTransCoords[3] = mImageRect.top;
-		mTransCoords[5] = mTransCoords[7] = mImageRect.bottom;
-		mTransCoords[2] = mTransCoords[4] = mImageRect.right;
+		mTransCoords[0] = mTransCoords[6] = mContentRect.left;
+		mTransCoords[1] = mTransCoords[3] = mContentRect.top;
+		mTransCoords[5] = mTransCoords[7] = mContentRect.bottom;
+		mTransCoords[2] = mTransCoords[4] = mContentRect.right;
 		mImageMatrix.mapPoints(mTransCoords);
 		for (int i = 0; i < 8; i += 2) {
 			mTransCoords[i] += dx;
