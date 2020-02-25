@@ -304,7 +304,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	/**
 	 * 表示内容の実際のサイズ
 	 */
-	private final RectF mImageRect = new RectF();
+	private final RectF mContentRect = new RectF();
 	/**
 	 * 拡大縮小回転平行移動した表示内容の四隅の座標
 	 * [(left,top),(right,top),(right,bottom),(left.bottom)]
@@ -711,11 +711,11 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// update image size
 		final RectF bounds = getContentBounds();
 		if ((bounds != null) && !bounds.isEmpty()) {
-			mImageRect.set(bounds);
+			mContentRect.set(bounds);
 		} else {
-			mImageRect.set(mLimitRect);
+			mContentRect.set(mLimitRect);
 		}
-		if (DEBUG) Log.v(TAG, "init:mImageRect=" + mImageRect);
+		if (DEBUG) Log.v(TAG, "init:mContentRect=" + mContentRect);
 		final float viewWidth = mLimitRect.width();
 		final float viewHeight = mLimitRect.height();
 		mLimitRect.inset((MOVE_LIMIT_RATE * viewWidth), (MOVE_LIMIT_RATE * viewHeight));
@@ -738,7 +738,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		if (DEBUG) Log.v(TAG,
 			String.format("setupDefaultTransform:mRequestedAspect=%f,view(%dx%d),image(%fx%f)",
 				mRequestedAspect, viewWidth, viewHeight,
-				mImageRect.width(), mImageRect.height()));
+				mContentRect.width(), mContentRect.height()));
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
@@ -753,8 +753,8 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 				contentWidth = mRequestedAspect * viewHeight;
 				contentHeight = viewHeight;
 			} else {
-				contentWidth = mImageRect.width();
-				contentHeight = mImageRect.height();
+				contentWidth = mContentRect.width();
+				contentHeight = mContentRect.height();
 			}
 			final double scaleX = viewWidth / contentWidth;
 			final double scaleY = viewHeight / contentHeight;
@@ -857,10 +857,10 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 		// calculate the corner coordinates of image applied matrix
 		// [(left,top),(right,top),(right,bottom),(left.bottom)]
-		mTransCoords[0] = mTransCoords[6] = mImageRect.left;
-		mTransCoords[1] = mTransCoords[3] = mImageRect.top;
-		mTransCoords[5] = mTransCoords[7] = mImageRect.bottom;
-		mTransCoords[2] = mTransCoords[4] = mImageRect.right;
+		mTransCoords[0] = mTransCoords[6] = mContentRect.left;
+		mTransCoords[1] = mTransCoords[3] = mContentRect.top;
+		mTransCoords[5] = mTransCoords[7] = mContentRect.bottom;
+		mTransCoords[2] = mTransCoords[4] = mContentRect.right;
 		mImageMatrix.mapPoints(mTransCoords);
 		for (int i = 0; i < 8; i += 2) {
 			mTransCoords[i] += dx;
