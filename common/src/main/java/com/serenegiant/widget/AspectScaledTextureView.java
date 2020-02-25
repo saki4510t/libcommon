@@ -269,7 +269,9 @@ public class AspectScaledTextureView extends TransformTextureView
 			final double height = scale * videoHeight;
 //			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
 //				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
-			mImageMatrix.postScale((float)(width / viewWidth), (float)(height / viewHeight), viewWidth / 2, viewHeight / 2);
+			mImageMatrix.postScale(
+				(float)(width / viewWidth), (float)(height / viewHeight),
+				viewWidth / 2, viewHeight / 2);
 			break;
 		}
 		setTransform(mImageMatrix);
