@@ -736,7 +736,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		final int viewWidth = getViewWidth();
 		final int viewHeight = getViewHeight();
 		if (DEBUG) Log.v(TAG,
-			String.format("setupDefaultTransform:mRequestedAspect=%f,view(%dx%d),image(%fx%f)",
+			String.format("setupDefaultTransform:mRequestedAspect=%f,view(%dx%d),content(%.0fx%.0f)",
 				mRequestedAspect, viewWidth, viewHeight,
 				mContentRect.width(), mContentRect.height()));
 		// apply matrix
