@@ -258,15 +258,15 @@ public class AspectScaledTextureView extends TransformTextureView
 			break;
 		case SCALE_MODE_KEEP_ASPECT:
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
-			final double videoWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
-			final double videoHeight = viewHeight;
-			final double scaleX = viewWidth / videoWidth;
-			final double scaleY = viewHeight / videoHeight;
+			final double contentWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
+			final double contentHeight = viewHeight;
+			final double scaleX = viewWidth / contentWidth;
+			final double scaleY = viewHeight / contentHeight;
 			final double scale = (mScaleMode == SCALE_MODE_CROP)
 				? Math.max(scaleX,  scaleY)		// SCALE_MODE_CROP
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
-			final double width = scale * videoWidth;
-			final double height = scale * videoHeight;
+			final double width = scale * contentWidth;
+			final double height = scale * contentHeight;
 //			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
 //				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
 			mImageMatrix.postScale(
