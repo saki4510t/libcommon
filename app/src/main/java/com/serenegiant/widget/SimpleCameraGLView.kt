@@ -37,10 +37,6 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 					synchronized(mSync) { return mSurfaceTexture != null }
 				}
 
-				override fun updateViewport() {
-					queueEvent(Runnable { this@SimpleCameraGLView.updateViewport() })
-				}
-
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%dx)", width, height))
 					setAspectRatio(width, height)
@@ -174,7 +170,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 */
 	override fun getVideoWidth(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoWidth:")
-		return mCameraDelegator.width
+		return mCameraDelegator.previewWidth
 	}
 
 	/**
@@ -183,7 +179,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 */
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
-		return mCameraDelegator.height
+		return mCameraDelegator.previewHeight
 	}
 
 	private fun updateViewport() { //		final int viewWidth = getWidth();

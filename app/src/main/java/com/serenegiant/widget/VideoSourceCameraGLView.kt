@@ -172,14 +172,14 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 * ICameraViewの実装
 	 */
 	override fun getVideoWidth(): Int {
-		return mCameraDelegator.width
+		return mCameraDelegator.previewWidth
 	}
 
 	/**
 	 * ICameraViewの実装
 	 */
 	override fun getVideoHeight(): Int {
-		return mCameraDelegator.height
+		return mCameraDelegator.previewHeight
 	}
 
 	/**

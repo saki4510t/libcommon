@@ -135,11 +135,11 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	}
 
 	override fun getVideoWidth(): Int {
-		return mCameraDelegator.width
+		return mCameraDelegator.previewWidth
 	}
 
 	override fun getVideoHeight(): Int {
-		return mCameraDelegator.height
+		return mCameraDelegator.previewHeight
 	}
 
 	/**
@@ -232,7 +232,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			// create SurfaceTexture with texture ID.
 			inputSurfaceTexture = SurfaceTexture(hTex)
 			inputSurfaceTexture!!.setDefaultBufferSize(
-				mCameraDelegator.width, mCameraDelegator.height)
+				mCameraDelegator.requestWidth, mCameraDelegator.requestHeight)
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 				inputSurfaceTexture!!.setOnFrameAvailableListener(
 					this, HandlerThreadHandler.createHandler(TAG))
@@ -331,8 +331,8 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			}
 			GLES20.glViewport(0, 0, viewWidth, viewHeight)
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-			val videoWidth = mCameraDelegator.width.toDouble()
-			val videoHeight = mCameraDelegator.height.toDouble()
+			val videoWidth = mCameraDelegator.previewWidth.toDouble()
+			val videoHeight = mCameraDelegator.previewHeight.toDouble()
 			if ((videoWidth == 0.0) || (videoHeight == 0.0)) {
 				if (DEBUG) Log.v(TAG, String.format("updateViewport:video is not ready(%dx%d)",
 					viewWidth, viewHeight))

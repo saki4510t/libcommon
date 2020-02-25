@@ -47,10 +47,6 @@ class CameraTextureView @JvmOverloads constructor(
 					return st
 				}
 
-				override fun updateViewport() {
-					if (DEBUG) Log.v(TAG, "updateViewport:")
-				}
-
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
 					setAspectRatio(width, height)
@@ -133,12 +129,12 @@ class CameraTextureView @JvmOverloads constructor(
 
 	override fun getVideoWidth(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoWidth:")
-		return mCameraDelegator.width
+		return mCameraDelegator.previewWidth
 	}
 
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
-		return mCameraDelegator.height
+		return mCameraDelegator.previewHeight
 	}
 
 	companion object {

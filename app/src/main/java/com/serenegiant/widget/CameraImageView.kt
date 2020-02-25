@@ -116,12 +116,12 @@ class CameraImageView @JvmOverloads constructor(
 
 	override fun getVideoWidth(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoWidth:")
-		return mCameraDelegator.width
+		return mCameraDelegator.previewWidth
 	}
 
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
-		return mCameraDelegator.height
+		return mCameraDelegator.previewHeight
 	}
 
 	fun getInputSurfaceTexture(): SurfaceTexture {
