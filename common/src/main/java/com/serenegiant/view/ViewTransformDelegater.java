@@ -757,7 +757,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			final double scaleX = viewWidth / contentWidth;
 			final double scaleY = viewHeight / contentHeight;
 			final double scale = (mScaleMode == SCALE_MODE_CROP)
-				? Math.max(scaleX,  scaleY)		// SCALE_MODE_CROP
+				? Math.max(scaleX, scaleY)		// SCALE_MODE_CROP
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * contentWidth;
 			final double height = scale * contentHeight;
