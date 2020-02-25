@@ -26,15 +26,13 @@ import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.Build;
 import android.util.Log;
-import android.view.Display;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.WindowManager;
 
 import com.serenegiant.glutils.WrappedSurfaceHolder;
-import com.serenegiant.system.BuildCheck;
+import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
 import java.lang.annotation.Retention;
@@ -310,24 +308,7 @@ cameraLoop:
 		@NonNull final Camera.Parameters params) {
 
 		if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
-		int rotation;
-		if (BuildCheck.isAPI17()) {
-			rotation = view.getDisplay().getRotation();
-		} else {
-			final Display display
-				= ((WindowManager)view.getContext()
-					.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-			rotation = display.getRotation();
-		}
-		int degrees;
-		switch (rotation) {
-		case Surface.ROTATION_90:	degrees = 90; break;
-		case Surface.ROTATION_180:	degrees = 180; break;
-		case Surface.ROTATION_270:	degrees = 270; break;
-		case Surface.ROTATION_0:
-		default:
-			degrees = 0; break;
-		}
+		int degrees = ViewUtils.getRotationDegrees(view);
 		// get whether the camera is front camera or back camera
 		final Camera.CameraInfo info = new Camera.CameraInfo();
 		Camera.getCameraInfo(cameraId, info);
@@ -351,20 +332,7 @@ cameraLoop:
 		@NonNull final Camera.Parameters params) {
 
 		if (DEBUG) Log.v(TAG, "CameraThread#setRotation:");
-		int rotation;
-		final Display display
-			= ((WindowManager)context
-				.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
-		rotation = display.getRotation();
-		int degrees;
-		switch (rotation) {
-		case Surface.ROTATION_90:	degrees = 90; break;
-		case Surface.ROTATION_180:	degrees = 180; break;
-		case Surface.ROTATION_270:	degrees = 270; break;
-		case Surface.ROTATION_0:
-		default:
-			degrees = 0; break;
-		}
+		int degrees = ViewUtils.getRotationDegrees(context);
 		// get whether the camera is front camera or back camera
 		final Camera.CameraInfo info = new Camera.CameraInfo();
 		Camera.getCameraInfo(cameraId, info);
