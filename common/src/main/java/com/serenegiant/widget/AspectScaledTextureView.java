@@ -263,7 +263,7 @@ public class AspectScaledTextureView extends TransformTextureView
 			final double scaleX = viewWidth / videoWidth;
 			final double scaleY = viewHeight / videoHeight;
 			final double scale = (mScaleMode == SCALE_MODE_CROP)
-				? Math.max(scaleX,  scaleY)	// SCALE_MODE_CROP
+				? Math.max(scaleX,  scaleY)		// SCALE_MODE_CROP
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * videoWidth;
 			final double height = scale * videoHeight;
