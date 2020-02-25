@@ -55,7 +55,7 @@ class CameraImageView @JvmOverloads constructor(
 
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
-					setAspectRatio(width, height)
+					this@CameraImageView.onPreviewSizeChanged(width, height)
 				}
 			}
 		)
@@ -130,6 +130,10 @@ class CameraImageView @JvmOverloads constructor(
 
 	fun hasSurface(): Boolean {
 		return mDrawable.isSurfaceValid
+	}
+
+	fun onPreviewSizeChanged(width: Int, height: Int) {
+		setAspectRatio(width, height)
 	}
 
 	companion object {
