@@ -54,8 +54,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:text="You can change scale mode with touching screen."
-        android:textColor="#ffff0000"
-        android:visibility="gone" />
+        android:textColor="#ffff0000" />
 
     <TextView
         android:id="@+id/scalemode_textview"
@@ -64,7 +63,6 @@
         android:layout_alignParentLeft="true"
         android:layout_below="@+id/textView1"
         android:text="scale mode"
-        android:textColor="#ffff0000"
-		android:visibility="gone" />
+        android:textColor="#ffff0000" />
 
 </RelativeLayout>
