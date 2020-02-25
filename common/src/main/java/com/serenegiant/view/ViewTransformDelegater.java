@@ -721,7 +721,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			final float dy = Math.round((viewHeight - contentHeight * scale) * 0.5f);
 
 			mImageMatrix.setScale(scale, scale);
-			mImageMatrix.postTranslate(Math.round(dx), Math.round(dy));
+			mImageMatrix.postTranslate(dx, dy);
 			if (DEBUG) Log.v(TAG,
 				String.format("setupDefaultTransform:scale(%f,%f)→%f, d(%f,%f)",
 					scaleX,scaleY, scale,
