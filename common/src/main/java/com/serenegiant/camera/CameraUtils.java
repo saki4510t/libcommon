@@ -300,6 +300,14 @@ cameraLoop:
 		return foundFpsRange;
 	}
 
+	/**
+	 * 画面の回転状態に合わせてプレビュー映像の回転設定を行う
+	 * @param cameraId
+	 * @param view
+	 * @param camera
+	 * @param params
+	 * @return
+	 */
 	@SuppressLint("NewApi")
 	public static int setupRotation(
 		final int cameraId,
@@ -325,6 +333,14 @@ cameraLoop:
 		return degrees;
 	}
 
+	/**
+	 * 画面の回転状態に合わせてプレビュー映像の回転設定を行う
+	 * @param context
+	 * @param cameraId
+	 * @param camera
+	 * @param params
+	 * @return
+	 */
 	public static int setupRotation(
 		@NonNull Context context,
 		final int cameraId,
