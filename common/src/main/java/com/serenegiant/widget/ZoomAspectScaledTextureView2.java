@@ -138,13 +138,20 @@ public class ZoomAspectScaledTextureView2
 		ViewTransformDelegater delegater = new ViewTransformDelegater(this) {
 			@Override
 			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
+				if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 				superSetTransform(transform);
 			}
 
 			@NonNull
 			@Override
 			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				return superGetTransform(transform);
+				if (DEBUG) {
+					final Matrix result = superGetTransform(transform);
+					if (DEBUG) Log.v(TAG, "getTransform:" + result);
+					return result;
+				} else {
+					return superGetTransform(transform);
+				}
 			}
 
 			@Override

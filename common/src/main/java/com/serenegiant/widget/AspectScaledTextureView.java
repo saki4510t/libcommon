@@ -23,6 +23,7 @@ import android.content.res.TypedArray;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.TextureView;
 
 import com.serenegiant.common.R;
@@ -38,7 +39,8 @@ import androidx.annotation.Nullable;
 public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
 		IScaledView {
-	
+
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();
@@ -126,9 +128,11 @@ public class AspectScaledTextureView extends TransformTextureView
 	private int prevWidth = -1;
 	private int prevHeight = -1;
 	@Override
-	protected void onLayout(final boolean changed, final int left, final int top, final int right, final int bottom) {
+	protected void onLayout(final boolean changed,
+		final int left, final int top, final int right, final int bottom) {
+
 		super.onLayout(changed, left, top, right, bottom);
-//		if (DEBUG) Log.v(TAG, "onLayout:width=" + getWidth() + ",height=" + getHeight());
+		if (DEBUG) Log.v(TAG, String.format("onLayout:(%dx%d)", getWidth(), getHeight()));
 //		if view size(width|height) is zero(the view size not decided yet)
 		if (getWidth() == 0 || getHeight() == 0) return;
 		if (prevWidth != getWidth() || prevHeight != getHeight()) {
@@ -260,6 +264,12 @@ public class AspectScaledTextureView extends TransformTextureView
 		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
 			final double contentWidth = mRequestedAspect > 0 ? mRequestedAspect * viewHeight : viewHeight;
 			final double contentHeight = viewHeight;
+			if (DEBUG) Log.v(TAG,
+				String.format("init:" +
+				 	"view(%dx%d),content(%.0fx%.0f),aspect=%f",
+					viewWidth, viewHeight,
+					contentWidth, contentHeight,
+					mRequestedAspect));
 			final double scaleX = viewWidth / contentWidth;
 			final double scaleY = viewHeight / contentHeight;
 			final double scale = (mScaleMode == SCALE_MODE_CROP)
@@ -267,13 +277,17 @@ public class AspectScaledTextureView extends TransformTextureView
 				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
 			final double width = scale * contentWidth;
 			final double height = scale * contentHeight;
-//			Log.v(TAG, String.format("size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
-//				width, height, scaleX, scaleY, width / viewWidth, height / viewHeight));
+			if (DEBUG) Log.v(TAG, String.format("init:scaleMode=%d,size(%1.0f,%1.0f),scale(%f,%f)→%f,mat(%f,%f)",
+				mScaleMode,
+				width, height,
+				scaleX, scaleY, scale,
+				width / viewWidth, height / viewHeight));
 			mImageMatrix.postScale(
 				(float)(width / viewWidth), (float)(height / viewHeight),
 				viewWidth / 2, viewHeight / 2);
 			break;
 		}
+		if (DEBUG) Log.v(TAG, "init:" + mImageMatrix);
 		setTransform(mImageMatrix);
 	}
 

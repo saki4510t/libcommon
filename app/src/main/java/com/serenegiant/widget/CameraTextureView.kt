@@ -128,12 +128,12 @@ class CameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun getVideoWidth(): Int {
-		if (DEBUG) Log.v(TAG, "getVideoWidth:")
+		if (DEBUG) Log.v(TAG, "getVideoWidth:${mCameraDelegator.previewWidth}")
 		return mCameraDelegator.previewWidth
 	}
 
 	override fun getVideoHeight(): Int {
-		if (DEBUG) Log.v(TAG, "getVideoHeight:")
+		if (DEBUG) Log.v(TAG, "getVideoHeight:${mCameraDelegator.previewHeight}")
 		return mCameraDelegator.previewHeight
 	}
 

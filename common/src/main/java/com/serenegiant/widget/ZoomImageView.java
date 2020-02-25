@@ -138,9 +138,13 @@ public class ZoomImageView extends TransformImageView
 			@NonNull
 			@Override
 			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				final Matrix result = superGetImageMatrix(transform);
-				if (DEBUG) Log.v(TAG, "getTransform:" + result);
-				return result;
+				if (DEBUG) {
+					final Matrix result = superGetImageMatrix(transform);
+					if (DEBUG) Log.v(TAG, "getTransform:" + result);
+					return result;
+				} else {
+					return superGetImageMatrix(transform);
+				}
 			}
 
 			/**
