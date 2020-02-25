@@ -306,9 +306,9 @@ class CameraDelegator(
 						previewWidth = previewSize.height
 						previewHeight = previewSize.width
 					}
-					Log.d(TAG, String.format("handleStartPreview:(%dx%d)→rot(%dx%d),fps(%d-%d)",
+					Log.d(TAG, String.format("handleStartPreview:(%dx%d)→rot%d(%dx%d),fps(%d-%d)",
 						previewSize.width, previewSize.height,
-						previewWidth, previewHeight,
+						degrees, previewWidth, previewHeight,
 						fps?.get(0), fps?.get(1)))
 					// adjust view size with keeping the aspect ration of camera preview.
 					// here is not a UI thread and we should request parent view to execute.
