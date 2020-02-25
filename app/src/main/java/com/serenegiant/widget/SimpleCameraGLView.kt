@@ -145,7 +145,6 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	override fun setVideoSize(width: Int, height: Int) {
 		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height))
 		mCameraDelegator.setVideoSize(width, height)
-		setAspectRatio(width, height)
 	}
 
 	/**

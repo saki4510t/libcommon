@@ -105,7 +105,6 @@ class CameraTextureView @JvmOverloads constructor(
 	override fun setVideoSize(width: Int, height: Int) {
 		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height))
 		mCameraDelegator.setVideoSize(width, height)
-		setAspectRatio(width, height)
 	}
 
 	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
