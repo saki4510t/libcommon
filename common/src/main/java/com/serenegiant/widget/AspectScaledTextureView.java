@@ -48,7 +48,7 @@ public class AspectScaledTextureView extends TransformTextureView
 	@ScaleMode
 	private int mScaleMode;
 	/**
-	 * 表示内容のアスペクト比
+	 * 表示内容のアスペクト比 (幅 ÷ 高さ)
 	 * 0以下なら無視される
 	 */
 	private double mRequestedAspect;
