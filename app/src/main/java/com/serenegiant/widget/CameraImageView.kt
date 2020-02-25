@@ -133,6 +133,7 @@ class CameraImageView @JvmOverloads constructor(
 	}
 
 	fun onPreviewSizeChanged(width: Int, height: Int) {
+		mDrawable.setBounds(0, 0, width, height)
 		setAspectRatio(width, height)
 	}
 
