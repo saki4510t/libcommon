@@ -81,6 +81,9 @@ class CameraDelegator(
 	var height: Int
 		private set
 
+	var isPreviewing: Boolean
+		private set
+
 	private var mRotation = 0
 	private var mScaleMode = SCALE_STRETCH_FIT
 	private var mCamera: Camera? = null
@@ -94,6 +97,7 @@ class CameraDelegator(
 		this.cameraRenderer = cameraRenderer
 		this.width = width
 		this.height = height
+		isPreviewing = false
 	}
 
 	@Throws(Throwable::class)
@@ -220,6 +224,7 @@ class CameraDelegator(
 			if (mCameraHandler == null) {
 				mCameraHandler = HandlerThreadHandler.createHandler("CameraHandler")
 			}
+			isPreviewing = true
 			mCameraHandler!!.post {
 				handleStartPreview(width, height)
 			}
@@ -232,6 +237,7 @@ class CameraDelegator(
 	fun stopPreview() {
 		if (DEBUG) Log.v(TAG, "stopPreview:$mCamera")
 		synchronized(mSync) {
+			isPreviewing = false
 			if (mCamera != null) {
 				mCamera!!.stopPreview()
 				if (mCameraHandler != null) {
