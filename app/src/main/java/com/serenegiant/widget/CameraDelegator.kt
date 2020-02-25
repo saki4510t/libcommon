@@ -284,18 +284,27 @@ class CameraDelegator(
 					camera!!.setParameters(params)
 					// get the actual preview size
 					val previewSize = camera!!.getParameters().previewSize
-					Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
-						previewSize.width, previewSize.height, fps?.get(0), fps?.get(1)))
+					// 画面の回転状態に合わせてプレビューの映像サイズの縦横を入れ替える
+					if (mRotation % 180 == 0) {
+						this.width = previewSize.width
+						this.height = previewSize.height
+					} else {
+						this.width = previewSize.height
+						this.height = previewSize.width
+					}
+					Log.d(TAG, String.format("handleStartPreview:(%dx%d)→rot(%dx%d),fps(%d-%d)",
+						previewSize.width, previewSize.height,
+						this.width, this.height,
+						fps?.get(0), fps?.get(1)))
 					// adjust view size with keeping the aspect ration of camera preview.
 					// here is not a UI thread and we should request parent view to execute.
 					mView.post(Runnable {
-						setVideoSize(previewSize.width, previewSize.height)
-						cameraRenderer.onPreviewSizeChanged(previewSize.width, previewSize.height)
+						cameraRenderer.onPreviewSizeChanged(this.width, this.height)
 					})
 					// カメラ映像受け取り用Surfaceをセット
 					val surface = cameraRenderer.getInputSurface()
 					if (surface is SurfaceTexture) {
-						surface.setDefaultBufferSize(previewSize.width, previewSize.height)
+						surface.setDefaultBufferSize(this.width, this.height)
 					}
 					CameraUtils.setPreviewSurface(camera!!, surface)
 				}
