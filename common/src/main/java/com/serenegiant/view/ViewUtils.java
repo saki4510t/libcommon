@@ -18,15 +18,22 @@ package com.serenegiant.view;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
+import android.view.Display;
 import android.view.LayoutInflater;
+import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+
+import com.serenegiant.system.BuildCheck;
 
 import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -100,6 +107,93 @@ public class ViewUtils {
 		return inflater.cloneInContext(wrappedContext);
 	}
 
+//--------------------------------------------------------------------------------
+	@IntDef(value = {
+		Surface.ROTATION_0,
+		Surface.ROTATION_90,
+		Surface.ROTATION_180,
+		Surface.ROTATION_270
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Rotation {}
+
+	/**
+	 * 画面の回転状態を取得
+	 * @param view
+	 * @return Surface.ROTATION_0, Surface.ROTATION_90, Surface.ROTATION_180, Surface.ROTATION_270のいずれか
+	 */
+	@SuppressLint("NewApi")
+	@Rotation
+	public static int getRotation(@NonNull final View view) {
+		int rotation;
+		if (BuildCheck.isAPI17()) {
+			rotation = view.getDisplay().getRotation();
+		} else {
+			final Display display
+				= ((WindowManager)view.getContext()
+					.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+			rotation = display.getRotation();
+		}
+		return rotation;
+	}
+
+	/**
+	 * 画面の回転状態を取得
+	 * @param context
+	 * @return Surface.ROTATION_0, Surface.ROTATION_90, Surface.ROTATION_180, Surface.ROTATION_270のいずれか
+	 */
+	@SuppressLint("NewApi")
+	@Rotation
+	public static int getRotation(@NonNull final Context context) {
+		final Display display
+			= ((WindowManager)context
+				.getSystemService(Context.WINDOW_SERVICE))
+					.getDefaultDisplay();
+		return display.getRotation();
+	}
+
+	/**
+	 * 画面の回転状態を角度として取得
+	 * @param view
+	 * @return 0, 90, 180, 270[度]
+	 */
+	public static int getRotationDegrees(@NonNull final View view) {
+		return rotation2Degrees(getRotation(view));
+	}
+
+	/**
+	 * 画面の回転状態を角度として取得
+	 * @param context
+	 * @return 0, 90, 180, 270[度]
+	 */
+	public static int getRotationDegrees(@NonNull final Context context) {
+		return rotation2Degrees(getRotation(context));
+	}
+
+	/**
+	 * 画面の回転状態から回転角度を取得
+	 * @param rotation
+	 * @return
+	 */
+	private static int rotation2Degrees(@Rotation final int rotation) {
+		final int degrees;
+		switch (rotation) {
+		case Surface.ROTATION_90:
+			degrees = 90;
+			break;
+		case Surface.ROTATION_180:
+			degrees = 180;
+			break;
+		case Surface.ROTATION_270:
+			degrees = 270;
+			break;
+		case Surface.ROTATION_0:
+		default:
+			degrees = 0;
+			break;
+		}
+		return degrees;
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * 振動しないようにするためのあそび
