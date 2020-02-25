@@ -396,7 +396,10 @@ public class ZoomAspectScaledTextureView2
 
 	protected RectF getContentBounds() {
 		if (DEBUG) Log.v(TAG, "getContentBounds:");
-		return null;
+		final float viewHeight = getHeight();
+		return new RectF(0, 0,
+			mRequestedAspect > 0 ? (float)(mRequestedAspect * viewHeight) : getWidth(),
+			viewHeight);
 	}
 
 //================================================================================
