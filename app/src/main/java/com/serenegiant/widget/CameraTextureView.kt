@@ -19,6 +19,7 @@ package com.serenegiant.widget
 */
 
 import android.content.Context
+import android.graphics.RectF
 import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
@@ -134,6 +135,11 @@ class CameraTextureView @JvmOverloads constructor(
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
 		return mCameraDelegator.previewHeight
+	}
+
+	override fun getContentBounds(): RectF? {
+		if (DEBUG) Log.v(TAG, "getContentBounds:")
+		return RectF(0.0f, 0.0f, getVideoWidth().toFloat(), getVideoHeight().toFloat())
 	}
 
 	companion object {
