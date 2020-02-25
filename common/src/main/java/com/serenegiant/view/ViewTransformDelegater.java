@@ -259,11 +259,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	@IScaledView.ScaleMode
 	private int mScaleMode;
 	/**
-	 * 表示内容のアスペクト比 (幅 ÷ 高さ)
-	 * 0以下なら無視される
-	 */
-	private double mRequestedAspect;
-	/**
 	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
 	 */
 	private boolean mNeedResizeToKeepAspect;
@@ -638,34 +633,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
-	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
-	 */
-	public void setAspectRatio(final double aspectRatio) {
-		if (DEBUG) Log.v(TAG, "setAspectRatio:" + aspectRatio);
-		if (mRequestedAspect != aspectRatio) {
-			mRequestedAspect = aspectRatio;
-			getTargetView().requestLayout();
-		}
- 	}
-
-	/**
-	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
-	 * @param width
-	 * @param height
-	 */
-	public void setAspectRatio(final int width, final int height) {
-		setAspectRatio(width / (double)height);
-	}
-
-	/**
-	 * 現在の要求アスペクト比を取得する
-	 * @return
-	 */
-	public double getAspectRatio() {
-		return mRequestedAspect;
-	}
-
-	/**
 	 * スケールモードを設定する
 	 * @param scaleMode
 	 */
@@ -733,17 +700,14 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// set limit rectangle that the image can move
 		final int viewWidth = getViewWidth();
 		final int viewHeight = getViewHeight();
-		final double aspect = mRequestedAspect > 0
-			? mRequestedAspect
-			: mContentRect.width() / mContentRect.height();
 		final float contentWidth = mContentRect.width();
 		final float contentHeight = mContentRect.height();
 		final float scaleX = viewWidth / contentWidth;
 		final float scaleY = viewHeight / contentHeight;
 		if (DEBUG) Log.v(TAG,
-			String.format("setupDefaultTransform:mRequestedAspect=%f," +
+			String.format("setupDefaultTransform:" +
 			 	"view(%dx%d),content(%.0fx%.0f)",
-				aspect, viewWidth, viewHeight,
+				viewWidth, viewHeight,
 				mContentRect.width(), mContentRect.height()));
 
 		// apply matrix

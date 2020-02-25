@@ -159,9 +159,9 @@ public class ZoomAspectScaledTextureView2
 			}
 		};
 		delegater.setScaleMode(scaleMode);
-		delegater.setAspectRatio(requestedAspect);
 		delegater.setEnableHandleTouchEvent(handleTouchEvent);
 		setViewTransformer(delegater);
+		setAspectRatio(requestedAspect);
 	}
 
 	/**
@@ -395,34 +395,27 @@ public class ZoomAspectScaledTextureView2
 //================================================================================
 // IScaledView
 //================================================================================
+	private double mRequestedAspect = -1.0;
 	/**
 	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
 	 */
 	@Override
 	public void setAspectRatio(final double aspectRatio) {
 //		if (DEBUG) Log.v(TAG, "setAspectRatio");
-		final IViewTransformer transformer = getViewTransformer();
-		if (transformer instanceof ViewTransformDelegater) {
-			((ViewTransformDelegater) transformer).setAspectRatio(aspectRatio);
+		if (mRequestedAspect != aspectRatio) {
+			mRequestedAspect = aspectRatio;
+			requestLayout();
 		}
  	}
 
 	@Override
 	public void setAspectRatio(final int width, final int height) {
-		final IViewTransformer transformer = getViewTransformer();
-		if (transformer instanceof ViewTransformDelegater) {
-			((ViewTransformDelegater) transformer).setAspectRatio(width / (double)height);
-		}
+		setAspectRatio(width / (double)height);
 	}
 
 	@Override
 	public double getAspectRatio() {
-		final IViewTransformer transformer = getViewTransformer();
-		if (transformer instanceof ViewTransformDelegater) {
-			return ((ViewTransformDelegater) transformer).getAspectRatio();
-		} else {
-			return -1.0;
-		}
+		return mRequestedAspect;
 	}
 
 	@Override
