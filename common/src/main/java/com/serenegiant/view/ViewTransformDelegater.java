@@ -733,40 +733,42 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// set limit rectangle that the image can move
 		final int viewWidth = getViewWidth();
 		final int viewHeight = getViewHeight();
+		final double aspect = mRequestedAspect > 0
+			? mRequestedAspect
+			: mContentRect.width() / mContentRect.height();
+		final float contentWidth = mContentRect.width();
+		final float contentHeight = mContentRect.height();
+		final float scaleX = viewWidth / contentWidth;
+		final float scaleY = viewHeight / contentHeight;
 		if (DEBUG) Log.v(TAG,
-			String.format("setupDefaultTransform:mRequestedAspect=%f,view(%dx%d),content(%.0fx%.0f)",
-				mRequestedAspect, viewWidth, viewHeight,
+			String.format("setupDefaultTransform:mRequestedAspect=%f," +
+			 	"view(%dx%d),content(%.0fx%.0f)",
+				aspect, viewWidth, viewHeight,
 				mContentRect.width(), mContentRect.height()));
+
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
 		case SCALE_MODE_STRETCH_TO_FIT:
-			// 何もしない
+			mImageMatrix.setScale(scaleX, scaleY);
 			break;
 		case SCALE_MODE_KEEP_ASPECT:
-		case SCALE_MODE_CROP: // FIXME もう少し式を整理できそう
-			final double contentWidth;
-			final double contentHeight;
-			if (mRequestedAspect > 0) {
-				contentWidth = mRequestedAspect * viewHeight;
-				contentHeight = viewHeight;
-			} else {
-				contentWidth = mContentRect.width();
-				contentHeight = mContentRect.height();
-			}
-			final double scaleX = viewWidth / contentWidth;
-			final double scaleY = viewHeight / contentHeight;
-			final double scale = (mScaleMode == SCALE_MODE_CROP)
-				? Math.max(scaleX, scaleY)		// SCALE_MODE_CROP
-				: Math.min(scaleX, scaleY);		// SCALE_MODE_KEEP_ASPECT
-			final double width = scale * contentWidth;
-			final double height = scale * contentHeight;
-			if (DEBUG) Log.v(TAG, String.format("setupDefaultTransform:size(%1.0f,%1.0f),scale(%f,%f)→%f,mat(%f,%f)",
-				width, height, scaleX, scaleY, scale, width / viewWidth, height / viewHeight));
-			mImageMatrix.postScale(
-				(float)(width / viewWidth), (float)(height / viewHeight),
-				 viewWidth / 2.0f, viewHeight / 2.0f);
+		case SCALE_MODE_CROP:
+		{
+			final float scale = mScaleMode == SCALE_MODE_CROP
+				? Math.max(scaleX, scaleY)	// SCALE_MODE_CROP
+				: Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
+			final float dx = Math.round((viewWidth - contentWidth * scale) * 0.5f);
+			final float dy = Math.round((viewHeight - contentHeight * scale) * 0.5f);
+
+			mImageMatrix.setScale(scale, scale);
+			mImageMatrix.postTranslate(Math.round(dx), Math.round(dy));
+			if (DEBUG) Log.v(TAG,
+				String.format("setupDefaultTransform:scale(%f,%f)→%f, d(%f,%f)",
+					scaleX,scaleY, scale,
+					dx, dy));
 			break;
+		}
 		}
 		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
 		setTransform(mImageMatrix);
