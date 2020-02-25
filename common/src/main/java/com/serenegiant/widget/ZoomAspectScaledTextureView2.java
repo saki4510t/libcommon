@@ -150,7 +150,7 @@ public class ZoomAspectScaledTextureView2
 			@Override
 			public RectF getContentBounds() {
 				if (DEBUG) Log.v(TAG, "getContentBounds:");
-				return null;
+				return ZoomAspectScaledTextureView2.this.getContentBounds();
 			}
 
 			@Override
@@ -385,6 +385,11 @@ public class ZoomAspectScaledTextureView2
 			setScaleY(1.0f);
 			break;
 		}
+	}
+
+	protected RectF getContentBounds() {
+		if (DEBUG) Log.v(TAG, "getContentBounds:");
+		return null;
 	}
 
 //================================================================================
