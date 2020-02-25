@@ -693,11 +693,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * スケールモードと要求アスペクト比に合わせてトランスフォームマトリックスを初期化する
 	 */
 	private void setupDefaultTransform() {
-		// update image size
-		// current implementation of ImageView always hold its image as a Drawable
-		// (that can get ImageView#getDrawable)
-		// therefore update the image size from its Drawable
-		// set limit rectangle that the image can move
 		final int viewWidth = getViewWidth();
 		final int viewHeight = getViewHeight();
 		final float contentWidth = mContentRect.width();
