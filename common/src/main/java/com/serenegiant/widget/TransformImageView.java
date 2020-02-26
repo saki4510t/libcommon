@@ -91,6 +91,23 @@ public class TransformImageView extends AppCompatImageView {
 		}
 		return mViewTransformer;
 	}
+//--------------------------------------------------------------------------------
+	/**
+	 * トランスフォームマトリックス設定用のヘルパーメソッド
+	 * @param transform
+	 */
+	public void setTransform(@Nullable final Matrix transform) {
+		getViewTransformer().setTransform(transform);
+	}
+
+	/**
+	 * トランスフォームマトリックス取得用のヘルパーメソッド
+	 * @param transform
+	 * @return
+	 */
+	public Matrix getTransform(@Nullable final Matrix transform) {
+		return getViewTransformer().getTransform(transform);
+	}
 
 //--------------------------------------------------------------------------------
 	public static class DefaultViewTransformer extends ViewTransformer {
