@@ -1,8 +1,9 @@
 package com.serenegiant.widget
 /*
- * MultiDispatchTouchEvent
+ * libcommon
+ * utility/helper classes for myself
  *
- * Copyright (c) 2020 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2020 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +35,7 @@ import android.widget.RelativeLayout
  * 呼び出し処理を行うViewGroup
  * (同じタッチイベントで複数の子Viewへタッチイベント生成＆操作できる)
  */
-class MultiDispatchTouchRelativeLayout
+open class MultiDispatchTouchRelativeLayout
 	@JvmOverloads
 		constructor(context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
 			: RelativeLayout(context, attrs, defStyleAttr) {
