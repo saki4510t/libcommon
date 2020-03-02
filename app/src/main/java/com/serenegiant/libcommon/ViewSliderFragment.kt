@@ -47,15 +47,15 @@ class ViewSliderFragment : BaseFragment() {
 
 	private fun initView(rootView: View) {
 		rootView.setOnTouchListener(mOnTouchListener)
-		mViewSliderLeft = ViewSlider(rootView, R.id.slide_view_left)
+		mViewSliderLeft = ViewSlider(rootView, R.id.slide_view_left, ViewSlider.HORIZONTAL)
 		mViewSliderLeft!!.hide(0)
 		mViewSliderLeft!!.targetView.setOnTouchListener(mOnTouchListener)
 
-		mViewSliderTop = ViewSlider(rootView, R.id.slide_view_top)
+		mViewSliderTop = ViewSlider(rootView, R.id.slide_view_top, ViewSlider.VERTICAL)
 		mViewSliderTop!!.hide(0)
 		mViewSliderTop!!.targetView.setOnTouchListener(mOnTouchListener)
 
-		mViewSliderRight = ViewSlider(rootView, R.id.slide_view_right)
+		mViewSliderRight = ViewSlider(rootView, R.id.slide_view_right, ViewSlider.HORIZONTAL)
 		mViewSliderRight!!.hide(0)
 		mViewSliderRight!!.targetView.setOnTouchListener(mOnTouchListener)
 

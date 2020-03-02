@@ -7,10 +7,14 @@ import android.view.animation.Animation;
 import com.serenegiant.common.R;
 import com.serenegiant.view.animation.ResizeAnimation;
 
+import java.lang.annotation.Retention;
 import java.util.Locale;
 
 import androidx.annotation.IdRes;
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+
+import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 /**
  * Snackbar風にViewをアニメーションさせるためのヘルパークラス
@@ -20,6 +24,16 @@ import androidx.annotation.NonNull;
 public class ViewSlider {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ViewSlider.class.getSimpleName();
+
+	public static final int VERTICAL = 0;
+	public static final int HORIZONTAL = 1;
+
+	@IntDef({
+		VERTICAL,
+		HORIZONTAL
+	})
+	@Retention(SOURCE)
+	public @interface Orientation {}
 
 	private static final int DURATION_RESIZE_MS = 300;
 
@@ -37,6 +51,9 @@ public class ViewSlider {
 	private int mTargetWidth;
 	private int mTargetHeight;
 
+	@Orientation
+	private int mOrientation = VERTICAL;
+
 	/**
 	 * コンストラクタ
 	 * @param parent 親View
@@ -44,13 +61,26 @@ public class ViewSlider {
 	 * @throws IllegalArgumentException
 	 */
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId)
-		throws IllegalArgumentException{
+		throws IllegalArgumentException {
+
+		this(parent, viewId, VERTICAL);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param parent 親View
+	 * @param viewId アニメーションさせるViewのid
+	 * @throws IllegalArgumentException
+	 */
+	public ViewSlider(@NonNull final View parent, @IdRes final int viewId,
+		@Orientation final int orientation) throws IllegalArgumentException {
 
 		mParent = parent;
 		mTarget = parent.findViewById(viewId);
 		if (mTarget == null) {
 			throw new IllegalArgumentException("Target view not found");
 		}
+		mOrientation = orientation;
 		mTargetWidth = mTarget.getWidth();
 		mTargetHeight = mTarget.getHeight();
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:size(%dx%d)", mTargetWidth, mTargetHeight));
@@ -85,6 +115,23 @@ public class ViewSlider {
 	}
 
 	/**
+	 * アニメーションの方向を指定
+	 * @return
+	 */
+	@Orientation
+	public int getOrientation() {
+		return mOrientation;
+	}
+
+	/**
+	 * 現在設定されているアニメーションの方向を取得
+	 * @param orientation
+	 */
+	public void setOrientation(@Orientation final int orientation) {
+		mOrientation = orientation;
+	}
+
+	/**
 	 * ターゲットViewをスライドイン
 	 * @param autoHideDurationMs
 	 */
@@ -96,10 +143,16 @@ public class ViewSlider {
 					"show:size(%d,%d)",
 						mTarget.getWidth(), mTarget.getHeight()));
 				mTarget.clearAnimation();
-				final ResizeAnimation expandAnimation
-					= new ResizeAnimation(mTarget,
+				final ResizeAnimation expandAnimation;
+				if (mOrientation == VERTICAL) {
+					expandAnimation = new ResizeAnimation(mTarget,
 						mTargetWidth, 0,
 					mTargetWidth, mTargetHeight);
+				} else {
+					expandAnimation = new ResizeAnimation(mTarget,
+						0, mTargetHeight,
+					mTargetWidth, mTargetHeight);
+				}
 				expandAnimation.setDuration(DURATION_RESIZE_MS);
 				expandAnimation.setAnimationListener(mAnimationListener);
 				mTarget.setTag(R.id.visibility, 1);
@@ -136,10 +189,16 @@ public class ViewSlider {
 						mTarget.getWidth(), mTarget.getHeight()));
 					mTarget.clearAnimation();
 					if (durationMs > 0) {
-						final ResizeAnimation collapseAnimation
-							= new ResizeAnimation(mTarget,
+						final ResizeAnimation collapseAnimation;
+						if (mOrientation == VERTICAL) {
+							collapseAnimation = new ResizeAnimation(mTarget,
 								mTargetWidth, mTarget.getHeight(),
 								mTargetWidth, 0);
+						} else {
+							collapseAnimation = new ResizeAnimation(mTarget,
+								mTarget.getWidth(), mTargetHeight,
+								0, mTargetHeight);
+						}
 						collapseAnimation.setDuration(durationMs);
 						collapseAnimation.setAnimationListener(mAnimationListener);
 						mTarget.setTag(R.id.visibility, 0);
