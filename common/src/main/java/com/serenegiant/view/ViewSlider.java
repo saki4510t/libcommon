@@ -76,6 +76,15 @@ public class ViewSlider {
 	}
 
 	/**
+	 * ターゲットViewを取得
+	 * @return
+	 */
+	@NonNull
+	public View getTargetView() {
+		return mTarget;
+	}
+
+	/**
 	 * ターゲットViewをスライドイン
 	 * @param autoHideDurationMs
 	 */
