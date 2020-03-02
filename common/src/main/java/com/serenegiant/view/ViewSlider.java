@@ -136,6 +136,35 @@ public class ViewSlider {
 		mOrientation = orientation;
 	}
 
+	public void setTargetWidth(final int width) {
+		mTargetWidth = width;
+	}
+
+	public void setTargetHeight(final int height) {
+		mTargetHeight = height;
+	}
+
+	/**
+	 * ターゲットViewのgetVisibilityの値を返す
+	 * これがView#VISIBLEを返してもViewの幅または高さの少なくとも一方が0のときは見えないので
+	 * 見えているかどうかのチェックには#isVisibleを使うほうが良い
+	 * @return
+	 */
+	@ViewUtils.Visibility
+	public int getVisibility() {
+		return mTarget.getVisibility();
+	}
+
+	/**
+	 * ターゲットViewが見えているかどうか
+	 * Visibility==VISIBLEでViewのサイズが0でないときのみtrue
+	 * @return
+	 */
+	public boolean isVisible() {
+		return (mTarget.getVisibility() == View.VISIBLE)
+			&& (mTarget.getWidth() > 0) && (mTarget.getHeight() > 0);
+	}
+
 	/**
 	 * ターゲットViewをスライドイン
 	 * @param autoHideDurationMs
@@ -214,35 +243,6 @@ public class ViewSlider {
 				}
 			}
 		});
-	}
-
-	public void setTargetWidth(final int width) {
-		mTargetWidth = width;
-	}
-
-	public void setTargetHeight(final int height) {
-		mTargetHeight = height;
-	}
-
-	/**
-	 * ターゲットViewのgetVisibilityの値を返す
-	 * これがView#VISIBLEを返してもViewの幅または高さの少なくとも一方が0のときは見えないので
-	 * 見えているかどうかのチェックには#isVisibleを使うほうが良い
-	 * @return
-	 */
-	@ViewUtils.Visibility
-	public int getVisibility() {
-		return mTarget.getVisibility();
-	}
-
-	/**
-	 * ターゲットViewが見えているかどうか
-	 * Visibility==VISIBLEでViewのサイズが0でないときのみtrue
-	 * @return
-	 */
-	public boolean isVisible() {
-		return (mTarget.getVisibility() == View.VISIBLE)
-			&& (mTarget.getWidth() > 0) && (mTarget.getHeight() > 0);
 	}
 
 	private final View.OnLayoutChangeListener mOnLayoutChangeListener
