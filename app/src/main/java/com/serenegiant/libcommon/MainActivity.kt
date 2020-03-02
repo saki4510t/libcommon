@@ -236,6 +236,9 @@ class MainActivity
 			14 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
+			15 -> {	// ViewSlider
+				fragment = ViewSliderFragment()
+			}
 			else -> {
 			}
 		}

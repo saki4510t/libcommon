@@ -15,6 +15,7 @@
 	<string name="title_galley" translatable="false">Galley</string>
 	<string name="title_galley_recycler" translatable="false">Galley(RecyclerView)</string>
 	<string name="title_number_keyboard" translatable="false">NumberKeyboard</string>
+	<string name="title_view_slider" translatable="false">ViewSlider</string>
 
 	<string-array name="list_items">
 		<item>@string/title_network_connection</item>
@@ -32,5 +33,6 @@
 		<item>@string/title_galley</item>
 		<item>@string/title_galley_recycler</item>
 		<item>@string/title_number_keyboard</item>
+		<item>@string/title_view_slider</item>
 	</string-array>
 </resources>

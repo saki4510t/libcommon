@@ -23,4 +23,8 @@
 	<style name="AppTheme_NumberKeyboard" parent="AppTheme">
 		<!-- Customize your theme here. -->
 	</style>
+
+	<style name="AppTheme_ViewSlider" parent="AppTheme">
+		<!-- Customize your theme here. -->
+	</style>
 </resources>
