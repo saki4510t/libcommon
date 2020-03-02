@@ -199,7 +199,7 @@ public class ViewSlider {
 	 * @param autoHideDurationMs
 	 */
 	public void show(final long autoHideDurationMs) {
-		mParent.post(new Runnable() {
+		mTarget.post(new Runnable() {
 			@Override
 			public void run() {
 				if (DEBUG) Log.i(TAG, String.format(Locale.US,
@@ -220,7 +220,7 @@ public class ViewSlider {
 				expandAnimation.setAnimationListener(mAnimationListener);
 				mTarget.setTag(R.id.visibility, 1);
 				mTarget.setTag(R.id.auto_hide_duration, autoHideDurationMs);
-				mParent.postDelayed(new Runnable() {
+				mTarget.postDelayed(new Runnable() {
 					@Override
 					public void run() {
 						mTarget.setVisibility(View.VISIBLE);
@@ -243,7 +243,7 @@ public class ViewSlider {
 	 * @param durationMs 0以下ならアニメーションせずにすぐにINVISIBLEにする
 	 */
 	public void hide(final long durationMs) {
-		mParent.post(new Runnable() {
+		mTarget.post(new Runnable() {
 			@Override
 			public void run() {
 				if (mTarget.getVisibility() == View.VISIBLE) {
