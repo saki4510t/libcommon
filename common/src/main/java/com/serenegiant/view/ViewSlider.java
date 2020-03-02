@@ -119,14 +119,18 @@ public class ViewSlider {
 						String.format(Locale.US, "hide:size(%d,%d)",
 						mTarget.getWidth(), mTarget.getHeight()));
 					mTarget.clearAnimation();
-					final ResizeAnimation collapseAnimation
-						= new ResizeAnimation(mTarget,
-							mTargetWidth, mTarget.getHeight(),
-							mTargetWidth, 0);
-					collapseAnimation.setDuration(durationMs);
-					collapseAnimation.setAnimationListener(mAnimationListener);
-					mTarget.setTag(R.id.visibility, 0);
-					mTarget.startAnimation(collapseAnimation);
+					if (durationMs > 0) {
+						final ResizeAnimation collapseAnimation
+							= new ResizeAnimation(mTarget,
+								mTargetWidth, mTarget.getHeight(),
+								mTargetWidth, 0);
+						collapseAnimation.setDuration(durationMs);
+						collapseAnimation.setAnimationListener(mAnimationListener);
+						mTarget.setTag(R.id.visibility, 0);
+						mTarget.startAnimation(collapseAnimation);
+					} else {
+						mTarget.setVisibility(View.INVISIBLE);
+					}
 				}
 			}
 		});
