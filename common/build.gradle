@@ -53,6 +53,7 @@ dependencies {
 	implementation "androidx.preference:preference:${androidXPreference}"
 	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
+	implementation "com.google.android.material:material:${androidXMaterial}"
 
 	implementation "androidx.core:core-ktx:${androidXKtxVersion}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"

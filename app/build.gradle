@@ -33,6 +33,7 @@ dependencies {
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.constraintlayout:constraintlayout:${constraintLibVersion}"
+	implementation "com.google.android.material:material:${androidXMaterial}"
 
 	implementation "androidx.core:core-ktx:${androidXKtxVersion}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
