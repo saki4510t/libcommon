@@ -165,7 +165,9 @@ public class ViewSlider {
 			final int left, final int top, final int right, final int bottom,
 			final int oldLeft, final int oldTop, final int oldRight, final int oldBottom) {
 
-			if (DEBUG) Log.v(TAG, String.format("onLayoutChange:(%d,%d - %d,%d) → (%d,%d - %d,%d)",
+			if (DEBUG) Log.v(TAG, String.format(
+				"onLayoutChange:%s(%d,%d - %d,%d) → (%d,%d - %d,%d)",
+					v.getClass().getSimpleName(),
 					oldLeft, oldTop, oldRight, oldBottom,
 					left, top, right, bottom));
 			if (v == mTarget) {
