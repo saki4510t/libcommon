@@ -126,6 +126,7 @@ public class ViewSlider {
 	public void release() {
 		mTarget.clearAnimation();
 		mTarget.removeOnLayoutChangeListener(mOnLayoutChangeListener);
+		mParent.removeOnLayoutChangeListener(mOnLayoutChangeListener);
 	}
 
 	/**
