@@ -159,6 +159,7 @@ public class ViewSlider {
 	 * 見えているかどうかのチェックには#isVisibleを使うほうが良い
 	 * @return
 	 */
+	@ViewUtils.Visibility
 	public int getVisibility() {
 		return mTarget.getVisibility();
 	}
