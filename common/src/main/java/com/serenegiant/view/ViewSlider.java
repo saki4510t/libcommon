@@ -20,6 +20,8 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * Snackbar風にViewをアニメーションさせるためのヘルパークラス
  * XXX 直接の親がConstraintLayoutのときはうまく動かない
  * (アニメーション開始/終了時にConstraintLayout全体にターゲットViewが一瞬表示される)
+ * 正常にアニメーションを行うにはターゲットViewのleft, top, right, bottomのいずれかが親Viewに対して固定されている必要がある
+ * ex. RelativeLayout内でlayout_alignParentBottom="true"を指定するなど
  */
 public class ViewSlider {
 	private static final boolean DEBUG = false;	// set false on production
