@@ -22,7 +22,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
  * (アニメーション開始/終了時にConstraintLayout全体にターゲットViewが一瞬表示される)
  */
 public class ViewSlider {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewSlider.class.getSimpleName();
 
 	public static final int VERTICAL = 0;
