@@ -76,6 +76,9 @@ public class ViewSlider {
 		@Orientation final int orientation) throws IllegalArgumentException {
 
 		mParent = parent;
+		if (parent.getClass().getSimpleName().equals("ConstraintLayout")) {
+			Log.w(TAG, "If paren is ConstraintLayout, ViewSlider will not work well");
+		}
 		mTarget = parent.findViewById(viewId);
 		if (mTarget == null) {
 			throw new IllegalArgumentException("Target view not found");
