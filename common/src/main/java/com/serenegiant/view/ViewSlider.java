@@ -87,8 +87,8 @@ public class ViewSlider {
 				mTarget.clearAnimation();
 				final ResizeAnimation expandAnimation
 					= new ResizeAnimation(mTarget,
-						mParent.getWidth(), 0,
-						mParent.getWidth(), mTargetHeight);
+						mTargetWidth, 0,
+					mTargetWidth, mTargetHeight);
 				expandAnimation.setDuration(DURATION_RESIZE_MS);
 				expandAnimation.setAnimationListener(mAnimationListener);
 				mTarget.setTag(R.id.visibility, 1);
@@ -119,8 +119,8 @@ public class ViewSlider {
 					mTarget.clearAnimation();
 					final ResizeAnimation collapseAnimation
 						= new ResizeAnimation(mTarget,
-							mParent.getWidth(), mTarget.getHeight(),
-							mParent.getWidth(), 0);
+							mTargetWidth, mTarget.getHeight(),
+							mTargetWidth, 0);
 					collapseAnimation.setDuration(durationMs);
 					collapseAnimation.setAnimationListener(mAnimationListener);
 					mTarget.setTag(R.id.visibility, 0);
@@ -166,13 +166,15 @@ public class ViewSlider {
 			final int oldLeft, final int oldTop, final int oldRight, final int oldBottom) {
 
 			if (DEBUG) Log.v(TAG, String.format("onLayoutChange:(%d,%d - %d,%d) → (%d,%d - %d,%d)",
-				oldLeft, oldTop, oldRight, oldBottom,
-				left, top, right, bottom) + ",view=" + v.getClass().getSimpleName());
-			if (mTargetWidth <= 0) {
-				mTargetWidth = v.getWidth();
-			}
-			if (mTargetHeight <= 0) {
-				mTargetHeight = v.getHeight();
+					oldLeft, oldTop, oldRight, oldBottom,
+					left, top, right, bottom));
+			if (v == mTarget) {
+				if (mTargetWidth <= 0) {
+					mTargetWidth = v.getWidth();
+				}
+				if (mTargetHeight <= 0) {
+					mTargetHeight = v.getHeight();
+				}
 			}
 		}
 	};
@@ -201,7 +203,7 @@ public class ViewSlider {
 					}, duration);
 				}
 			} else {
-				mTarget.setVisibility(View.GONE);
+				mTarget.setVisibility(View.INVISIBLE);
 			}
 		}
 
