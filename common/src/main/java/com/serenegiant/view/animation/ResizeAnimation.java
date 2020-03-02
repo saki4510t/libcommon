@@ -19,6 +19,8 @@ package com.serenegiant.view.animation;
 */
 
 import androidx.annotation.NonNull;
+
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
@@ -29,12 +31,14 @@ import android.view.animation.Transformation;
  */
 
 public class ResizeAnimation extends Animation {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = ResizeAnimation.class.getSimpleName();
+
 	@NonNull
 	private final View mTargetView;
 	private final int mStartWidth, mStartHeight;
 	private final int mDiffWidth, mDiffHeight;
-	
-	
+
 	public ResizeAnimation(@NonNull final View view,
 		final int startWidth, final int startHeight,
 		final int endWidth, final int endHeight) {
@@ -44,6 +48,11 @@ public class ResizeAnimation extends Animation {
 		mStartHeight = startHeight;
 		mDiffWidth = endWidth - startWidth;
 		mDiffHeight = endHeight - startHeight;
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)→(%dx%d)",
+			startWidth, startHeight, endWidth, endHeight));
+		mTargetView.getLayoutParams().width = startWidth;
+		mTargetView.getLayoutParams().height = startHeight;
+		mTargetView.requestLayout();
 	}
 	
 	@Override
