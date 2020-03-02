@@ -37,7 +37,7 @@ public class ViewSlider {
 	@Retention(SOURCE)
 	public @interface Orientation {}
 
-	private static final int DURATION_RESIZE_MS = 300;
+	public static final int DEFAULT_DURATION_RESIZE_MS = 300;
 
 	/**
 	 * 親View
@@ -49,6 +49,8 @@ public class ViewSlider {
 	 */
 	@NonNull
 	private final View mTarget;
+
+	private final int mDurationResizeMs;
 
 	private int mTargetWidth;
 	private int mTargetHeight;
@@ -65,7 +67,7 @@ public class ViewSlider {
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId)
 		throws IllegalArgumentException {
 
-		this(parent, viewId, VERTICAL);
+		this(parent, viewId, VERTICAL, DEFAULT_DURATION_RESIZE_MS);
 	}
 
 	/**
@@ -75,7 +77,7 @@ public class ViewSlider {
 	 * @throws IllegalArgumentException
 	 */
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId,
-		@Orientation final int orientation) throws IllegalArgumentException {
+		@Orientation final int orientation, final int resizeDuration) throws IllegalArgumentException {
 
 		mParent = parent;
 		if (parent.getClass().getSimpleName().equals("ConstraintLayout")) {
@@ -85,6 +87,7 @@ public class ViewSlider {
 		if (mTarget == null) {
 			throw new IllegalArgumentException("Target view not found");
 		}
+		mDurationResizeMs = resizeDuration > 0 ? resizeDuration : DEFAULT_DURATION_RESIZE_MS;
 		mOrientation = orientation;
 		mTargetWidth = mTarget.getWidth();
 		mTargetHeight = mTarget.getHeight();
@@ -200,7 +203,7 @@ public class ViewSlider {
 						0, mTargetHeight,
 					mTargetWidth, mTargetHeight);
 				}
-				expandAnimation.setDuration(DURATION_RESIZE_MS);
+				expandAnimation.setDuration(DEFAULT_DURATION_RESIZE_MS);
 				expandAnimation.setAnimationListener(mAnimationListener);
 				mTarget.setTag(R.id.visibility, 1);
 				mTarget.setTag(R.id.auto_hide_duration, autoHideDurationMs);
@@ -219,7 +222,7 @@ public class ViewSlider {
 	 * ターゲットViewをスライドアウト
 	 */
 	public void hide() {
-		hide(DURATION_RESIZE_MS);
+		hide(DEFAULT_DURATION_RESIZE_MS);
 	}
 
 	/**
@@ -300,7 +303,7 @@ public class ViewSlider {
 					mTarget.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							hide(DURATION_RESIZE_MS);
+							hide(DEFAULT_DURATION_RESIZE_MS);
 						}
 					}, duration);
 				}
