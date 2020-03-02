@@ -64,7 +64,7 @@ class ViewSliderFragment : BaseFragment() {
 	}
 
 	private val mOnTouchListener = View.OnTouchListener { view, event ->
-		if (DEBUG) Log.v(TAG, "onTouch:${view},${event}")
+		if (DEBUG) Log.v(TAG, "onTouch:${view.javaClass.simpleName}(${view.id}),${event}")
 		if (event.actionMasked == MotionEvent.ACTION_UP) {
 			if (view == mRootView) {
 				val width = view.width
