@@ -105,6 +105,9 @@ public class ViewSlider {
 		}
 	}
 
+	/**
+	 * 破棄時の処理
+	 */
 	public void release() {
 		mTarget.clearAnimation();
 		mTarget.removeOnLayoutChangeListener(mOnLayoutChangeListener);
@@ -136,10 +139,20 @@ public class ViewSlider {
 		mOrientation = orientation;
 	}
 
+	/**
+	 * ターゲットViewのアニメーション時の最大サイズ(幅)を指定
+	 * 設定しない場合にはターゲットViewのサイズが最初に決定されたときの大きさになる
+	 * @param width
+	 */
 	public void setTargetWidth(final int width) {
 		mTargetWidth = width;
 	}
 
+	/**
+	 * ターゲットViewのアニメーション時の最大サイズ(高さ)を指定
+	 * 設定しない場合にはターゲットViewのサイズが最初に決定されたときの大きさになる
+	 * @param height
+	 */
 	public void setTargetHeight(final int height) {
 		mTargetHeight = height;
 	}
