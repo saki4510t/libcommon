@@ -138,8 +138,24 @@ public class ViewSlider {
 		mTargetHeight = height;
 	}
 
+	/**
+	 * ターゲットViewのgetVisibilityの値を返す
+	 * これがView#VISIBLEを返してもViewの幅または高さの少なくとも一方が0のときは見えないので
+	 * 見えているかどうかのチェックには#isVisibleを使うほうが良い
+	 * @return
+	 */
 	public int getVisibility() {
 		return mTarget.getVisibility();
+	}
+
+	/**
+	 * ターゲットViewが見えているかどうか
+	 * Visibility==VISIBLEでViewのサイズが0でないときのみtrue
+	 * @return
+	 */
+	public boolean isVisible() {
+		return (mTarget.getVisibility() == View.VISIBLE)
+			&& (mTarget.getWidth() > 0) && (mTarget.getHeight() > 0);
 	}
 
 	private final View.OnLayoutChangeListener mOnLayoutChangeListener

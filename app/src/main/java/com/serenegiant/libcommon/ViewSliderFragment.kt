@@ -47,7 +47,7 @@ class ViewSliderFragment : BaseFragment() {
 		mViewSlider = ViewSlider(rootView, R.id.slide_view)
 		rootView.setOnClickListener {
 			var visibility = mViewSlider!!.visibility;
-			if (visibility == View.VISIBLE) {
+			if (mViewSlider!!.isVisible) {
 				mViewSlider!!.hide(1000)
 			} else {
 				mViewSlider!!.show(300)
