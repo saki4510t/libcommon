@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 
 /**
  * Snackbar風にViewをアニメーションさせるためのヘルパークラス
+ * XXX 直接の親がConstraintLayoutのときはうまく動かない
+ * (アニメーション終了時にConstraintLayout全体にターゲットViewが表示される)
  */
 public class ViewSlider {
 	private static final boolean DEBUG = true;	// set false on production
