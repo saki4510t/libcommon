@@ -117,7 +117,14 @@ public class ViewSlider {
 
 	/**
 	 * ターゲットViewをスライドアウト
-	 * @param durationMs
+	 */
+	public void hide() {
+		hide(DURATION_RESIZE_MS);
+	}
+
+	/**
+	 * ターゲットViewをスライドアウト
+	 * @param durationMs 0以下ならアニメーションせずにすぐにINVISIBLEにする
 	 */
 	public void hide(final long durationMs) {
 		mParent.post(new Runnable() {
