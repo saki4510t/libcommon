@@ -32,7 +32,10 @@ class ViewSliderFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_ViewSlider)
-		mRootView = customInflater.inflate(R.layout.fragment_viewslider, container, false)
+		mRootView = customInflater.inflate(
+			if (USE_CONSTRAINT_LAYOUT) R.layout.fragment_viewslider_constraint
+				else R.layout.fragment_viewslider,
+			container, false)
 		initView(mRootView!!)
 		return mRootView;
 	}
@@ -113,6 +116,7 @@ class ViewSliderFragment : BaseFragment() {
 
 	companion object {
 		private const val DEBUG = true // TODO set false on release
+		private const val USE_CONSTRAINT_LAYOUT = false
 		private val TAG = ViewSliderFragment::class.java.simpleName
 	}
 }
