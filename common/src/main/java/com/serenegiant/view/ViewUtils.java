@@ -38,6 +38,7 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.StyleRes;
+import androidx.annotation.UiThread;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -56,6 +57,21 @@ public class ViewUtils {
 	})
 	@Retention(SOURCE)
 	public @interface Visibility {}
+
+	/**
+	 * Viewのリサイズ要求
+	 * @param view
+	 * @param width
+	 * @param height
+	 */
+	@UiThread
+	public static void requestResize(@NonNull final View view,
+		final int width, final int height) {
+
+		view.getLayoutParams().width = width;
+		view.getLayoutParams().height = height;
+		view.requestLayout();
+	}
 
 	/**
 	 * 指定したViewGroupとその配下のViewに背景色を指定

@@ -268,13 +268,9 @@ public class ViewSlider {
 						mTarget.startAnimation(collapseAnimation);
 					} else {
 						if (mOrientation == VERTICAL) {
-							mTarget.getLayoutParams().width = mTargetWidth;
-							mTarget.getLayoutParams().height = 0;
-							mTarget.requestLayout();
+							ViewUtils.requestResize(mTarget, mTargetWidth, 0);
 						} else {
-							mTarget.getLayoutParams().width = 0;
-							mTarget.getLayoutParams().height = mTargetHeight;
-							mTarget.requestLayout();
+							ViewUtils.requestResize(mTarget, 0, mTargetHeight);
 						}
 						mTarget.setVisibility(View.INVISIBLE);
 					}

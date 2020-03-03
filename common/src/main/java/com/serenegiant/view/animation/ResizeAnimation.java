@@ -25,6 +25,8 @@ import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
+import com.serenegiant.view.ViewUtils;
+
 /**
  * Viewのりサイズを行うAnimationクラス
  * 見た目だけじゃなくて実際のサイズも変更する
@@ -50,9 +52,7 @@ public class ResizeAnimation extends Animation {
 		mDiffHeight = endHeight - startHeight;
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)→(%dx%d)",
 			startWidth, startHeight, endWidth, endHeight));
-		mTargetView.getLayoutParams().width = startWidth;
-		mTargetView.getLayoutParams().height = startHeight;
-		mTargetView.requestLayout();
+		ViewUtils.requestResize(mTargetView, startWidth, startHeight);
 	}
 	
 	@Override
@@ -61,12 +61,9 @@ public class ResizeAnimation extends Animation {
 
 		super.applyTransformation(interpolatedTime, t);	// this is empty method now
 		
-		final int newWidth = (int)(mStartWidth + mDiffWidth * interpolatedTime);
-		final int newHeight = (int)(mStartHeight + mDiffHeight * interpolatedTime);
-		
-		mTargetView.getLayoutParams().width = newWidth;
-		mTargetView.getLayoutParams().height = newHeight;
-		mTargetView.requestLayout();
+		ViewUtils.requestResize(mTargetView,
+			(int)(mStartWidth + mDiffWidth * interpolatedTime),
+			(int)(mStartHeight + mDiffHeight * interpolatedTime));
 	}
 	
 	@Override
