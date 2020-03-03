@@ -216,7 +216,7 @@ public class ViewSlider {
 						0, mTargetHeight,
 					mTargetWidth, mTargetHeight);
 				}
-				expandAnimation.setDuration(DEFAULT_DURATION_RESIZE_MS);
+				expandAnimation.setDuration(mDurationResizeMs);
 				expandAnimation.setAnimationListener(mAnimationListener);
 				mTarget.setTag(R.id.visibility, 1);
 				mTarget.setTag(R.id.auto_hide_duration, autoHideDurationMs);
@@ -235,7 +235,7 @@ public class ViewSlider {
 	 * ターゲットViewをスライドアウト
 	 */
 	public void hide() {
-		hide(DEFAULT_DURATION_RESIZE_MS);
+		hide(mDurationResizeMs);
 	}
 
 	/**
@@ -321,7 +321,7 @@ public class ViewSlider {
 					mTarget.postDelayed(new Runnable() {
 						@Override
 						public void run() {
-							hide(DEFAULT_DURATION_RESIZE_MS);
+							hide(mDurationResizeMs);
 						}
 					}, duration);
 				}
