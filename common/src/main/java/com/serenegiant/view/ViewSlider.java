@@ -267,6 +267,15 @@ public class ViewSlider {
 						mTarget.setTag(R.id.visibility, 0);
 						mTarget.startAnimation(collapseAnimation);
 					} else {
+						if (mOrientation == VERTICAL) {
+							mTarget.getLayoutParams().width = mTargetWidth;
+							mTarget.getLayoutParams().height = 0;
+							mTarget.requestLayout();
+						} else {
+							mTarget.getLayoutParams().width = 0;
+							mTarget.getLayoutParams().height = mTargetHeight;
+							mTarget.requestLayout();
+						}
 						mTarget.setVisibility(View.INVISIBLE);
 					}
 				}
