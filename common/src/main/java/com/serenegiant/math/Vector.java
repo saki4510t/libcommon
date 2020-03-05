@@ -506,9 +506,9 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector limit(final float scalar) {
-		x = x >= scalar ? scalar : (x < -scalar ? -scalar : x);
-		y = y >= scalar ? scalar : (y < -scalar ? -scalar : y);
-		z = z >= scalar ? scalar : (z < -scalar ? -scalar : z);
+		x = x >= scalar ? scalar : (Math.max(x, -scalar));
+		y = y >= scalar ? scalar : (Math.max(y, -scalar));
+		z = z >= scalar ? scalar : (Math.max(z, -scalar));
 		while (x >= scalar) x -= scalar;
 		while (x < -scalar) x += scalar;
 		while (y >= scalar) y -= scalar;
@@ -526,9 +526,15 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector limit(final float lower, final float upper) {
-		x = x >= upper ? upper : (x < lower ? lower : x);
-		y = y >= upper ? upper : (y < lower ? lower : y);
-		z = z >= upper ? upper : (z < lower ? lower : z);
+		x = x >= upper ? upper : (Math.max(x, lower));
+		y = y >= upper ? upper : (Math.max(y, lower));
+		z = z >= upper ? upper : (Math.max(z, lower));
+		while (x >= upper) x -= upper;
+		while (x < lower) x += lower;
+		while (y >= upper) y -= upper;
+		while (y < lower) y += lower;
+		while (z >= upper) z -= upper;
+		while (z < lower) z += lower;
 		return this;
 	}
 
