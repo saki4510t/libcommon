@@ -604,7 +604,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector normalize() {
-		final float len = len();
+		final double len = Math.sqrt(x * x + y * y + z * z);
 		if (len != 0) {
 			this.x /= len;
 			this.y /= len;
