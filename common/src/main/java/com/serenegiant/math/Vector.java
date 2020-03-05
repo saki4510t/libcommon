@@ -539,6 +539,31 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * x,y,z各成分を指定した値[-scalar, +scalar]に収まるように飽和処理する
+	 * @param scalar
+	 * @return
+	 */
+	public Vector saturate(final float scalar) {
+		x = x >= scalar ? scalar : (Math.max(x, -scalar));
+		y = y >= scalar ? scalar : (Math.max(y, -scalar));
+		z = z >= scalar ? scalar : (Math.max(z, -scalar));
+		return this;
+	}
+
+	/**
+	 * x,y,z各成分を指定した値[lower, upper]に収まるように飽和処理する
+	 * @param lower
+	 * @param upper
+	 * @return
+	 */
+	public Vector saturate(final float lower, final float upper) {
+		x = x >= upper ? upper : (Math.max(x, lower));
+		y = y >= upper ? upper : (Math.max(y, lower));
+		z = z >= upper ? upper : (Math.max(z, lower));
+		return this;
+	}
+
+	/**
 	 * (x,y)ベクトルの長さを取得
 	 * @return
 	 */
