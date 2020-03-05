@@ -818,7 +818,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float getAngle(@NonNull final Vector v) {
-		final double cos = dotProduct(v) / (float) Math.sqrt(lenSquared() * v.lenSquared());
+		final double cos = dotProduct(v) / Math.sqrt(lenSquared() * v.lenSquared());
 		return (float) Math.acos(cos) * TO_DEGREE;
 	}
 
