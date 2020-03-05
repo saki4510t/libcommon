@@ -508,11 +508,11 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	public Vector limit(final float scalar) {
 		final float limit = Math.abs(scalar);
 		while (x >= limit) x -= limit;
-		while (x < -limit) x += limit;
+		while (x <= -limit) x += limit;
 		while (y >= limit) y -= limit;
-		while (y < -limit) y += limit;
+		while (y <= -limit) y += limit;
 		while (z >= limit) z -= limit;
-		while (z < -limit) z += limit;
+		while (z <= -limit) z += limit;
 		return this;
 	}
 
@@ -527,11 +527,11 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		final float min = Math.min(lower, upper);
 		final float max = Math.max(lower, upper);
 		while (x >= max) x -= max;
-		while (x < min) x -= min;
+		while (x <= min) x -= min;
 		while (y >= max) y -= max;
-		while (y < min) y -= min;
+		while (y <= min) y -= min;
 		while (z >= max) z -= max;
-		while (z < min) z -= min;
+		while (z <= min) z -= min;
 		return this;
 	}
 
