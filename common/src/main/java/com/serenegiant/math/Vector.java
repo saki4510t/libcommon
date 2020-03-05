@@ -614,6 +614,48 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * ベクトルの内積を取得(dotProduct2Dと同じ)
+	 * xy平面で標準化ベクトルv2を含む直線にベクトルv1を真っ直ぐ下ろした（正射影した）時の長さ
+	 * @param v
+	 * @return
+	 */
+	public float dot2D(@NonNull final Vector v) {
+		return x * v.x + y * v.y;
+	}
+
+	/**
+	 * ベクトルの内積を取得(dot2Dと同じ)
+	 * xy平面で標準化ベクトルv2を含む直線にベクトルv1を真っ直ぐ下ろした（正射影した）時の長さ
+	 * @param v
+	 * @return
+	 */
+	public float dotProduct2D(@NonNull final Vector v) {
+		return x * v.x + y * v.y;
+	}
+
+	/**
+	 * ベクトルの内積を取得(dotProduct2Dと同じ)
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public float dot2D(final float x, final float y, final float z) {
+		return this.x * x + this.y * y;
+	}
+
+	/**
+	 * ベクトルの内積を取得(dot2Dと同じ)
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public float dotProduct2D(final float x, final float y, final float z) {
+		return this.x * x + this.y * y;
+	}
+
+	/**
 	 * ベクトルの内積を取得(dotProductと同じ)
 	 * 標準化ベクトルv2を含む直線にベクトルv1を真っ直ぐ下ろした（正射影した）時の長さ
 	 * @param v
