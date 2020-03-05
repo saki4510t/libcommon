@@ -541,9 +541,10 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector saturate(final float scalar) {
-		x = x >= scalar ? scalar : (Math.max(x, -scalar));
-		y = y >= scalar ? scalar : (Math.max(y, -scalar));
-		z = z >= scalar ? scalar : (Math.max(z, -scalar));
+		final float limit = Math.abs(scalar);
+		x = x >= limit ? limit : (Math.max(x, -limit));
+		y = y >= limit ? limit : (Math.max(y, -limit));
+		z = z >= limit ? limit : (Math.max(z, -limit));
 		return this;
 	}
 
@@ -554,9 +555,11 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector saturate(final float lower, final float upper) {
-		x = x >= upper ? upper : (Math.max(x, lower));
-		y = y >= upper ? upper : (Math.max(y, lower));
-		z = z >= upper ? upper : (Math.max(z, lower));
+		final float min = Math.min(lower, upper);
+		final float max = Math.max(lower, upper);
+		x = x >= max ? max : (Math.max(x, min));
+		y = y >= max ? max : (Math.max(y, min));
+		z = z >= max ? max : (Math.max(z, min));
 		return this;
 	}
 
