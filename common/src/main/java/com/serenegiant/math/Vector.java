@@ -751,9 +751,12 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * ベクトルの外積を計算(3D, crossProductと同じ)
+	 * @param result nullなら新規に生成して返す
+	 * @param v1
+	 * @param v2
 	 * @return result, result = v1 cross v2
 	 */
-	public static Vector cross(@NonNull final Vector result,
+	public static Vector cross(@Nullable final Vector result,
 		@NonNull final Vector v1, @NonNull final Vector v2) {
 
 		return crossProduct(result, v1, v2);
@@ -761,19 +764,18 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * ベクトルの外積を計算(3D, crossと同じ)
-	 * @param result
+	 * @param result nullなら新規に生成して返す
 	 * @param v1
 	 * @param v2
 	 * @return result, result = v1 cross v2
 	 */
-	public static Vector crossProduct(@NonNull final Vector result,
+	public static Vector crossProduct(@Nullable final Vector result,
 		@NonNull final Vector v1, @NonNull final Vector v2) {
 
 		final float x3 = v1.y * v2.z - v1.z * v2.y;
 		final float y3 = v1.z * v2.x - v1.x * v2.z;
 		final float z3 = v1.x * v2.y - v1.y * v2.x;
-		result.x = x3; result.y = y3; result.z = z3;
-		return result;
+		return result != null ? result.set(x3, y3, z3) : new Vector(x3, y3, z3);
 	}
 
 	/**
