@@ -501,6 +501,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * x,y,z各成分を指定した値[-scalar, +scalar]に収まるように制限する
+	 * 飽和処理じゃないので注意
 	 * @param scalar
 	 * @return
 	 */
@@ -519,6 +520,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * x,y,z各成分を指定した値[lower, upper]に収まるように制限する
+	 * 飽和処理じゃないので注意
 	 * @param lower
 	 * @param upper
 	 * @return
