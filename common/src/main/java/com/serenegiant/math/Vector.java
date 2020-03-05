@@ -662,7 +662,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dot(@NonNull final Vector v) {
-		return x * v.x + y * v.y + z * v.z;
+		return dot(this, v);
 	}
 
 	/**
@@ -672,7 +672,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dotProduct(@NonNull final Vector v) {
-		return x * v.x + y * v.y + z * v.z;
+		return dot(this, v);
 	}
 
 	/**
@@ -695,6 +695,16 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	public float dotProduct(final float x, final float y, final float z) {
 		return this.x * x + this.y * y + this.z * z;
+	}
+
+	/**
+	 * ベクトルの内積を計算
+	 * @param v0
+	 * @param v1
+	 * @return
+	 */
+	public static float dot(@NonNull final Vector v0, @NonNull final Vector v1) {
+		return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
 	}
 
 	/**
