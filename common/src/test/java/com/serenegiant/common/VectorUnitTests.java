@@ -1,0 +1,282 @@
+package com.serenegiant.common;
+
+import com.serenegiant.math.Vector;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+/**
+ * com.serenegiant.Vector用のローカルユニットテストクラス
+ */
+public class VectorUnitTests {
+
+	public static final float EPS = (float)Math.pow(10., Float.MIN_EXPONENT + 2);
+
+	@Test
+	public void constructor_test() throws Exception {
+		// デフォルトコンストラクタ
+		final Vector v0 = new Vector();
+		assertEquals(0.0f, v0.x, EPS);
+		assertEquals(0.0f, v0.y, EPS);
+		assertEquals(0.0f, v0.z, EPS);
+
+		// Vector(x,y)
+		final Vector v1 = new Vector(-123, 456);
+		assertEquals(v1.x, -123, EPS);
+		assertEquals(v1.y, 456, EPS);
+		assertEquals(v1.z, 0.0f, EPS);
+
+		// Vector(x,y,z)
+		final Vector v2 = new Vector(-Float.MIN_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
+		assertEquals(-Float.MIN_VALUE, v2.x, EPS);
+		assertEquals(-Float.MAX_VALUE, v2.y, EPS);
+		assertEquals(-Float.MAX_VALUE, v2.z, EPS);
+
+		// コピーコンストラクタ
+		final Vector v3 = new Vector(v1);
+		assertEquals(v1.x, v3.x, EPS);
+		assertEquals(v1.y, v3.y, EPS);
+		assertEquals(v1.z, v3.z, EPS);
+
+		// クローン
+		final Vector v4 = v2.clone();
+		assertEquals(v2.x, v4.x, EPS);
+		assertEquals(v2.y, v4.y, EPS);
+		assertEquals(v2.z, v4.z, EPS);
+
+	}
+
+	@Test
+	public void setter_getter_test() throws Exception {
+		final Vector v0 = new Vector();
+		final Vector v1 = new Vector(-123, 456);
+
+		// #clerar
+		v0.clear(1.0f);
+		assertEquals(1.0f, v0.x, EPS);
+		assertEquals(1.0f, v0.y, EPS);
+		assertEquals(1.0f, v0.z, EPS);
+
+		// #set(x,y)
+		v0.set(2.0f, 3.0f);
+		assertEquals(2.0f, v0.x, EPS);
+		assertEquals(3.0f, v0.y, EPS);
+		assertEquals(0.0f, v0.z, EPS);
+
+		// #set(x,y,z)
+		v0.set(-Float.MIN_VALUE, -Float.MAX_VALUE, -Float.MAX_VALUE);
+		assertEquals(-Float.MIN_VALUE, v0.x, EPS);
+		assertEquals(-Float.MAX_VALUE, v0.y, EPS);
+		assertEquals(-Float.MAX_VALUE, v0.z, EPS);
+
+		// #set(src)
+		v0.set(v1);
+		assertEquals(v1.x, v0.x, EPS);
+		assertEquals(v1.y, v0.y, EPS);
+		assertEquals(v1.z, v0.z, EPS);
+
+		// #set(src,scalar)
+		v0.set(v1, 2);
+		assertEquals(v1.x * 2, v0.x, EPS);
+		assertEquals(v1.y * 2, v0.y, EPS);
+		assertEquals(v1.z * 2, v0.z, EPS);
+		// getter
+		assertEquals(v0.x, v0.x(), EPS);
+		assertEquals(v0.y, v0.y(), EPS);
+		assertEquals(v0.z, v0.z(), EPS);
+		// setter
+		v0.x(5);
+		assertEquals(5, v0.x, EPS);
+		v0.y(6);
+		assertEquals(6, v0.y, EPS);
+		v0.z(7);
+		assertEquals(7, v0.z, EPS);
+	}
+
+	@Test
+	public void arithmetic_test() throws Exception {
+		final Vector v0 = new Vector(1.0f, 2.0f, 3.0f);
+		final Vector v1 = new Vector(4.0f, 5.0f, 6.0f);
+		final Vector v2 = Vector.add(null, v0, v1);
+		assertEquals(5.0f, v2.x, EPS);
+		assertEquals(7.0f, v2.y, EPS);
+		assertEquals(9.0f, v2.z, EPS);
+		v2.add(v0, 1.0f);
+		assertEquals(6.0f, v2.x, EPS);
+		assertEquals(9.0f, v2.y, EPS);
+		assertEquals(12.0f, v2.z, EPS);
+
+		v2.sub(v0, 1.0f);
+		assertEquals(5.0f, v2.x, EPS);
+		assertEquals(7.0f, v2.y, EPS);
+		assertEquals( 9.0f, v2.z, EPS);
+
+		v2.set(v1).mult(2.0f);
+		assertEquals(v1.x * 2, v2.x, EPS);
+		assertEquals(v1.y * 2, v2.y, EPS);
+		assertEquals(v1.z * 2, v2.z, EPS);
+
+		v2.div(2.0f);
+		assertEquals(v1.x, v2.x, EPS);
+		assertEquals(v1.y, v2.y, EPS);
+		assertEquals(v1.z, v2.z, EPS);
+
+		v2.mult(v0);
+		assertEquals(v0.x * v1.x, v2.x, EPS);
+		assertEquals(v0.y * v1.y, v2.y, EPS);
+		assertEquals(v0.z * v1.z, v2.z, EPS);
+
+		v2.mod(2.0f);
+		assertEquals((v0.x * v1.x) % 2.0f, v2.x, EPS);
+		assertEquals((v0.y * v1.y) % 2.0f, v2.y, EPS);
+		assertEquals((v0.z * v1.z) % 2.0f, v2.z, EPS);
+	}
+
+	@Test
+	public void limit_test() throws Exception {
+		final Vector v0 = new Vector(90.0f, 275.0f, 365.0f);
+
+		// #limit
+		final Vector v1 = new Vector(v0).limit(180.0f);
+		assertEquals(90.0f, v1.x, EPS);
+		assertEquals(95.0f, v1.y, EPS);
+		assertEquals(5.0f, v1.z, EPS);
+
+		// limitでしきい値が0の時
+		v1.set(v0).limit(0);
+		assertEquals(0.0f, v1.x, EPS);
+		assertEquals(0.0f, v1.y, EPS);
+		assertEquals(0.0f, v1.z, EPS);
+
+		// limitでしきい値が負の時
+		v1.set(v0).limit(-180.f);
+		assertEquals(90.0f, v1.x, EPS);
+		assertEquals(95.0f, v1.y, EPS);
+		assertEquals(5.0f, v1.z, EPS);
+
+		// limitでしきい値が負の時
+		v1.set(-195, 45, 195).limit(-180);
+		assertEquals(-15.0f, v1.x, EPS);
+		assertEquals(45.0f, v1.y, EPS);
+		assertEquals(15.0f, v1.z, EPS);
+
+		// limitで上下限値指定
+		v1.set(v0).limit(-90, 90);
+		assertEquals(0.0f, v1.x, EPS);
+		assertEquals(5.0f, v1.y, EPS);
+		assertEquals(5.0f, v1.z, EPS);
+
+		// limitで上限と下限の大小が入れ替わっている時
+		v1.set(v0).limit(90, -90);
+		assertEquals(0.0f, v1.x, EPS);
+		assertEquals(5.0f, v1.y, EPS);
+		assertEquals(5.0f, v1.z, EPS);
+
+		// 正の値の制限
+		v1.set(45, 90, 195).limit(-90, 90);
+		assertEquals(45.0f, v1.x, EPS);
+		assertEquals(0.0f, v1.y, EPS);
+		assertEquals(15.0f, v1.z, EPS);
+
+		// 負の値の制限
+		v1.set(-45, -90, -195).limit(-90, 90);
+		assertEquals(-45.0f, v1.x, EPS);
+		assertEquals(0.0f, v1.y, EPS);
+		assertEquals(-15.0f, v1.z, EPS);
+
+		// limitで上下限値が同じ値の時
+		v1.set(-195, -90, 195).limit(90, 90);
+		assertEquals(90.0f, v1.x, EPS);
+		assertEquals(90.0f, v1.y, EPS);
+		assertEquals(90.0f, v1.z, EPS);
+
+		// limitで上下限値が同じ値の時
+		v1.set(-195, -90, 195).limit(-90, -90);
+		assertEquals(-90.0f, v1.x, EPS);
+		assertEquals(-90.0f, v1.y, EPS);
+		assertEquals(-90.0f, v1.z, EPS);
+
+		// #saturate
+		v1.set(v0).saturate(180.f);
+		assertEquals(90.0f, v1.x, EPS);
+		assertEquals(180.0f, v1.y, EPS);
+		assertEquals(180.0f, v1.z, EPS);
+
+		v1.set(v0).saturate(-180.f);
+		assertEquals(90.0f, v1.x, EPS);
+		assertEquals(180.0f, v1.y, EPS);
+		assertEquals(180.0f, v1.z, EPS);
+
+		v1.set(v0).saturate(0);
+		assertEquals(0.0f, v1.x, EPS);
+		assertEquals(0.0f, v1.y, EPS);
+		assertEquals(0.0f, v1.z, EPS);
+
+		// #saturate
+		v1.set(-195, 90, 195).saturate(180);
+		assertEquals(-180.0f, v1.x, EPS);
+		assertEquals(90.0f, v1.y, EPS);
+		assertEquals(180.0f, v1.z, EPS);
+
+		// #saturate
+		v1.set(-195, 90, 195).saturate(0, 180);
+		assertEquals(0.0f, v1.x, EPS);
+		assertEquals(90.0f, v1.y, EPS);
+		assertEquals(180.0f, v1.z, EPS);
+
+		// #saturate
+		v1.set(-195, 90, 195).saturate(-180, 0);
+		assertEquals(-180.0f, v1.x, EPS);
+		assertEquals(0.0f, v1.y, EPS);
+		assertEquals(0.0f, v1.z, EPS);
+	}
+
+	@Test
+	public void length_test() throws Exception {
+		final Vector v0 = new Vector(1.0f, 2.0f, 3.0f);
+		assertEquals(1.0f * 1.0f + 2.0f * 2.0f + 3.0f * 3.0f, v0.lenSquared(), EPS);
+		assertEquals(Math.hypot(1.0f, 2.0f), Math.sqrt(1.0f * 1.0f + 2.0f * 2.0f), EPS);
+		assertEquals((float)Math.hypot(1.0f, 2.0f), v0.len2D(), EPS);
+		assertEquals((float)Math.sqrt(1.0f * 1.0f + 2.0f * 2.0f), v0.len2D(), EPS);
+		assertEquals((float)Math.sqrt(1.0f * 1.0f + 2.0f * 2.0f + 3.0f * 3.0f), v0.len(), EPS);
+
+		// ベクトルを正規化
+		v0.normalize();
+		assertEquals(1.0f, v0.len(), EPS);
+	}
+
+	@Test
+	public void dot_cross_test() throws Exception {
+		// 2次元
+		final Vector v0 = new Vector(1.0f, 2.0f);
+		final Vector v1 = new Vector(4.0f, 5.0f);
+		// 内積
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dot(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dot2D(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dotProduct(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dotProduct2D(v1), EPS);
+
+		// 外積
+		assertEquals(v0.x * v1.y - v1.x * v0.y, v0.cross2D(v1), EPS);
+		assertEquals(v0.x * v1.y - v1.x * v0.y, v0.crossProduct2D(v1), EPS);
+
+		// 3次元
+		v0.set(1.0f, 2.0f, 3.0f);
+		v1.set(4.0f, 5.0f, 6.0f);
+		// 内積
+		assertEquals(v0.x * v1.x + v0.y * v1.y + v0.z * v1.z, v0.dot(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y + v0.z * v1.z, v0.dotProduct(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dot2D(v1), EPS);
+		assertEquals(v0.x * v1.x + v0.y * v1.y, v0.dotProduct2D(v1), EPS);
+		// 外積
+		assertEquals(v0.x * v1.y - v1.x * v0.y, v0.cross2D(v1), EPS);
+		assertEquals(v0.x * v1.y - v1.x * v0.y, v0.crossProduct2D(v1), EPS);
+
+		final Vector v2 = Vector.crossProduct(null, v0, v1);
+		assertEquals(v0.y * v1.z - v0.z * v1.y, v2.x, EPS);
+		assertEquals(v0.z * v1.x - v0.x * v1.z, v2.y, EPS);
+		assertEquals(v0.x * v1.y - v0.y * v1.x, v2.z, EPS);
+	}
+
+}
