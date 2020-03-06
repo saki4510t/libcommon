@@ -8,6 +8,7 @@ import static org.junit.Assert.assertEquals;
 
 /**
  * com.serenegiant.Vector用のローカルユニットテストクラス
+ * FIXME +/- INFINITYやゼロ除算等の異常系のテストは不十分
  */
 public class VectorUnitTests {
 

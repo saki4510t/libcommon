@@ -751,6 +751,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * ベクトルを正規化(長さを1にする)
+	 * #normalVectorとは違うよ
 	 * @return
 	 */
 	public Vector normalize() {
@@ -1375,6 +1376,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * p0, p1を通る線分に垂直でp2を通る線分の足(線分p0p1との交点座標)を求める
+	 * 正規化#normalizeとは違うよ
 	 * @param result
 	 * @param p0
 	 * @param p1
