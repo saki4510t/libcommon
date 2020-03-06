@@ -859,7 +859,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
-	 * ベクトルの外積を計算(2D, crossProduct2と同じ)
+	 * ベクトルの外積を計算(2D, crossProduct2Dと同じ)
 	 * v1×v2= x1*y2-x2*y1 = |v1||v2|sin(θ)
 	 * @param v
 	 * @return
@@ -869,7 +869,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
-	 * ベクトルの外積を計算(2D, cross2と同じ)
+	 * ベクトルの外積を計算(2D, cross2Dと同じ)
 	 * v1×v2= x1*y2-x2*y1 = |v1||v2|sin(θ)
 	 * @param v
 	 * @return
