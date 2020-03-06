@@ -428,4 +428,18 @@ public class VectorUnitTests {
 		assertEquals(-1, v.y, EPS);
 		assertEquals(0, v.z, EPS);
 	}
+
+	@Test
+	public void mid_test() throws Exception {
+		final Vector v0 = new Vector();
+		final Vector v1 = v0.mid(new Vector(100, 200, 300));
+		assertEquals(50, v1.x, EPS);
+		assertEquals(100, v1.y, EPS);
+		assertEquals(150, v1.z, EPS);
+		v0.set(-50, 30, 1000);
+		final Vector v2 = v0.mid(v1);
+		assertEquals((v0.x + v1.x) / 2, v2.x, EPS);
+		assertEquals((v0.y + v1.y) / 2, v2.y, EPS);
+		assertEquals((v0.z + v1.z) / 2, v2.z, EPS);
+	}
 }
