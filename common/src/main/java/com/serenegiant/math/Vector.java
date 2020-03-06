@@ -1350,9 +1350,24 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	public float slope2D(@NonNull final Vector p) {
 		if (p.x != x) {
-			return (p.y - y) / (p.x - x);
+			return (float)((p.y - (double)y) / (p.x - (double)x));
 		} else {
 			return (p.y - y) >= 0 ? Float.MAX_VALUE : Float.MIN_VALUE;
+		}
+	}
+
+	/**
+	 * このベクトルと引数ベクトルが示す2点を通る直線のy切片を取得
+	 * y軸に平行な場合はPOSITIVE_INFINITYを返す
+	 * @param p
+	 * @return
+	 */
+	public float interceptY2D(@NonNull final Vector p) {
+		if (p.x != x) {
+			final double slope = (p.y - (double)y) / (p.x - (double)x);
+			return (float)(y - slope * x);
+		} else {
+			return Float.POSITIVE_INFINITY;
 		}
 	}
 
