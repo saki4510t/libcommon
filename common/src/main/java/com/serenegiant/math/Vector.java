@@ -1097,38 +1097,38 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		return result;
 	}
 
-	/**
-	 * ベクトル配列内の各ベクトルを回転(スレッドセーフでは無い)
-	 * @param results ベクトル配列
-	 * @param angleX [度]
-	 * @param angleY [度]
-	 * @param angleZ [度]
-	 * @return results
-	 */
-	public static Vector[] rotate(@NonNull @Size(min=1) final Vector[] results,
-		final float angleX, final float angleY, final float angleZ) {
-
-		Matrix.setIdentityM(matrix, 0);
-		if (angleX != 0)
-			Matrix.rotateM(matrix, 0, angleX, 1f, 0f, 0f);
-		if (angleY != 0)
-			Matrix.rotateM(matrix, 0, angleY, 0f, 1f, 0f);
-		if (angleZ != 0)
-			Matrix.rotateM(matrix, 0, angleZ, 0f, 0f, 1f);
-		final int n = (results != null) ? results.length : 0;
-		for (int i = 0; i < n; i++) {
-			if (results[i] == null) continue;
-			inVec[0] = results[i].x;
-			inVec[1] = results[i].y;
-			inVec[2] = results[i].z;
-			inVec[3] = 1;
-			Matrix.multiplyMV(outVec, 0, matrix, 0, inVec, 0);
-			results[i].x = outVec[0];
-			results[i].y = outVec[1];
-			results[i].z = outVec[2];
-		}
-		return results;
-	}
+//	/**
+//	 * ベクトル配列内の各ベクトルを回転(スレッドセーフでは無い)
+//	 * @param results ベクトル配列
+//	 * @param angleX [度]
+//	 * @param angleY [度]
+//	 * @param angleZ [度]
+//	 * @return results
+//	 */
+//	public static Vector[] rotate(@NonNull @Size(min=1) final Vector[] results,
+//		final float angleX, final float angleY, final float angleZ) {
+//
+//		Matrix.setIdentityM(matrix, 0);
+//		if (angleX != 0)
+//			Matrix.rotateM(matrix, 0, angleX, 1f, 0f, 0f);
+//		if (angleY != 0)
+//			Matrix.rotateM(matrix, 0, angleY, 0f, 1f, 0f);
+//		if (angleZ != 0)
+//			Matrix.rotateM(matrix, 0, angleZ, 0f, 0f, 1f);
+//		final int n = (results != null) ? results.length : 0;
+//		for (int i = 0; i < n; i++) {
+//			if (results[i] == null) continue;
+//			inVec[0] = results[i].x;
+//			inVec[1] = results[i].y;
+//			inVec[2] = results[i].z;
+//			inVec[3] = 1;
+//			Matrix.multiplyMV(outVec, 0, matrix, 0, inVec, 0);
+//			results[i].x = outVec[0];
+//			results[i].y = outVec[1];
+//			results[i].z = outVec[2];
+//		}
+//		return results;
+//	}
 
 	/**
 	 * ベクトルを回転(スレッドセーフではない) v = v#rot(angle * a)
