@@ -443,4 +443,41 @@ public class VectorUnitTests {
 		assertEquals((p0.y + p1.y) / 2, v2.y, EPS);
 		assertEquals((p0.z + p1.z) / 2, v2.z, EPS);
 	}
+
+
+	@Test
+	public void normal_test() throws Exception {
+		// 2次元 (0,0)-(100,200)に垂直で(150,50)を通る垂線の足
+		final Vector p0 = new Vector();
+		final Vector p1 = new Vector(100, 200, 0);
+		final Vector p2 = new Vector(150, 50, 0);
+		final Vector p3 = Vector.normalVector(null, p0, p1, p2);
+		assertEquals(50, p3.x, EPS);
+		assertEquals(100, p3.y, EPS);
+		assertEquals(0, p3.z, EPS);
+
+		p0.set(50, 100);
+		Vector.normalVector(p3, p0, p1, p2);
+		assertEquals(50, p3.x, EPS);
+		assertEquals(100, p3.y, EPS);
+		assertEquals(0, p3.z, EPS);
+
+		// 3次元
+		p0.set(0, 0, 200);
+		p1.set(100, 200, 200);
+		p2.set(150, 50, 200);
+		Vector.normalVector(p3, p0, p1, p2);
+		assertEquals(50, p3.x, EPS);
+		assertEquals(100, p3.y, EPS);
+		assertEquals(200, p3.z, EPS);
+
+		p0.set(0, 0, 0);
+		p1.set(100, 200, 200);
+		p2.set(150, 50, 100);
+		Vector.normalVector(p3, p0, p1, p2);
+		assertEquals(50, p3.x, EPS);
+		assertEquals(100, p3.y, EPS);
+		assertEquals(100, p3.z, EPS);
+
+	}
 }
