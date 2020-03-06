@@ -1137,8 +1137,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector rotate(@NonNull final Vector angle, final float a) {
-		rotate(angle.x * a, angle.y * a, angle.z * a);
-		return this;
+		return rotate(this, angle.x * a, angle.y * a, angle.z * a);
 	}
 
 	/**
@@ -1147,7 +1146,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector rotate(@NonNull final Vector angle) {
-		return rotate(angle.x, angle.y, angle.z);
+		return rotate(this, angle.x, angle.y, angle.z);
 	}
 
 	/**
