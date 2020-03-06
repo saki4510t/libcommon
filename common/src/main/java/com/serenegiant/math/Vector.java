@@ -1445,4 +1445,11 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		}
 	};
 
+/*
+ * Note:
+ * 2D座標で線分p0p1を表すベクトルをv0、線分p0p2を表すベクトルをv1とした時に
+ * 外積v0 x v1が負ならv0に対して右側に点p2が存在
+ * 外積v0 x v1が0ならv0に対してv0またはその延長線上にp2が存在
+ * 外積v0 x v1が正ならv0に対して左側に点p2が存在する
+ */
 }
