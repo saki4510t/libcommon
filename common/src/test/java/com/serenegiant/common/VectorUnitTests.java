@@ -404,4 +404,12 @@ public class VectorUnitTests {
 		assertEquals(5, v0.x, EPS);
 		assertEquals(4, v0.y, EPS);
 	}
+
+	@Test
+	public void slope_test() throws Exception {
+		final Vector v0 = new Vector(1, 2, 0);
+		final Vector v1 = new Vector(4, 7, 0);	// should be v0.x ≠ v1.x
+		assertEquals(v0.y / v0.x, v0.slope2D(), EPS);
+		assertEquals((v0.y - v1.y) / (v0.x - v1.x), v0.slope2D(v1), EPS);
+	}
 }
