@@ -1084,12 +1084,15 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		inVec[2] = result.z;
 		inVec[3] = 1;
 		Matrix.setIdentityM(matrix, 0);
-		if (angleX != 0)
+		if (angleX != 0) {
 			Matrix.rotateM(matrix, 0, angleX, 1f, 0f, 0f);
-		if (angleY != 0)
+		}
+		if (angleY != 0) {
 			Matrix.rotateM(matrix, 0, angleY, 0f, 1f, 0f);
-		if (angleZ != 0)
+		}
+		if (angleZ != 0) {
 			Matrix.rotateM(matrix, 0, angleZ, 0f, 0f, 1f);
+		}
 		Matrix.multiplyMV(outVec, 0, matrix, 0, inVec, 0);
 		result.x = outVec[0];
 		result.y = outVec[1];
@@ -1162,12 +1165,15 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		inVec[2] = z;
 		inVec[3] = 1;
 		Matrix.setIdentityM(matrix, 0);
-		if (angleZ != 0)
+		if (angleZ != 0) {
 			Matrix.rotateM(matrix, 0, angleZ, 0f, 0f, 1f);
-		if (angleY != 0)
+		}
+		if (angleY != 0) {
 			Matrix.rotateM(matrix, 0, angleY, 0f, 1f, 0f);
-		if (angleX != 0)
+		}
+		if (angleX != 0) {
 			Matrix.rotateM(matrix, 0, angleX, 1f, 0f, 0f);
+		}
 		Matrix.multiplyMV(outVec, 0, matrix, 0, inVec, 0);
 		x = outVec[0];
 		y = outVec[1];
