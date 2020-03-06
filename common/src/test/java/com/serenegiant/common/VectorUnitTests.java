@@ -317,4 +317,64 @@ public class VectorUnitTests {
 		assertEquals((float)Math.acos(cos) * Vector.TO_DEGREE, v1.getAngle(v0), EPS);
 	}
 
+	@Test
+	public void rotate_test() throws Exception {
+		final Vector v = new Vector(100, 0, 0);
+		// rotate無し
+		assertEquals(0, v.angleXY(), EPS);
+		assertEquals(0, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 100, 0);
+		assertEquals(90, v.angleXY(), EPS);
+		assertEquals(0, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 0, 100);
+		assertEquals(0, v.angleXY(), EPS);
+		assertEquals(90, v.angleXZ(), EPS);
+		assertEquals(90, v.angleYZ(), EPS);
+
+		// rotateXY
+		v.set(100, 0, 0).rotateXY(30);
+		assertEquals(30, v.angleXY(), EPS);
+		assertEquals(0, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 100, 0).rotateXY(30);
+		assertEquals(120, v.angleXY(), EPS);
+		assertEquals(180, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 0, 100).rotateXY(30);
+		assertEquals(0, v.angleXY(), EPS);
+		assertEquals(90, v.angleXZ(), EPS);
+		assertEquals(90, v.angleYZ(), EPS);
+
+		// rotateXZ
+		v.set(100, 0, 0).rotateXZ(30);
+		assertEquals(0, v.angleXY(), EPS);
+		assertEquals(30, v.angleXZ(), EPS);
+		assertEquals(90, v.angleYZ(), EPS);
+		v.set(0, 100, 0).rotateXZ(30);
+		assertEquals(90, v.angleXY(), EPS);
+		assertEquals(0, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 0, 100).rotateXZ(30);
+		assertEquals(180, v.angleXY(), EPS);
+		assertEquals(120, v.angleXZ(), EPS);
+		assertEquals(90, v.angleYZ(), EPS);
+
+		// rotateYZ
+		v.set(100, 0, 0).rotateYZ(30);
+		assertEquals(0, v.angleXY(), EPS);
+		assertEquals(0, v.angleXZ(), EPS);
+		assertEquals(0, v.angleYZ(), EPS);
+		v.set(0, 100, 0).rotateYZ(30);
+		assertEquals(90, v.angleXY(), EPS);
+		assertEquals(90, v.angleXZ(), EPS);
+		assertEquals(30, v.angleYZ(), EPS);
+		v.set(0, 0, 100).rotateYZ(30);
+		assertEquals(270, v.angleXY(), EPS);
+		assertEquals(90, v.angleXZ(), EPS);
+		assertEquals(120, v.angleYZ(), EPS);
+
+	}
+
 }
