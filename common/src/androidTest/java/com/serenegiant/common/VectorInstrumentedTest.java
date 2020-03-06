@@ -1,10 +1,7 @@
 package com.serenegiant.common;
 
-import android.content.Context;
-
 import com.serenegiant.math.Vector;
 
-import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Test;
