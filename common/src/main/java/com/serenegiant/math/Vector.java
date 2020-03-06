@@ -814,11 +814,13 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * cos φ ＝ Za・Zb / (|Za| |Zb|)
 	 *  =(X1X2+Y1Y2+Z1Z2) / √{(X1^2 + Y1^2 + Z1^2)(X2^2 + Y2^2 + Z2^2)}
 	 *  上式のアークコサイン(cos^-1)を取ればOK。
+	 *  ※どちらかのベクトルの長さが0の場合には(ゼロ除算で)INFINITYになる
 	 * @param v
-	 * @return
+	 * @return 角度[度]
 	 */
 	public float getAngle(@NonNull final Vector v) {
-		final double cos = dotProduct(v) / Math.sqrt(lenSquared() * v.lenSquared());
+		final double cos = dot(this, v)
+			/ (Math.sqrt(lenSquared()) * Math.sqrt(v.lenSquared()));
 		return (float) Math.acos(cos) * TO_DEGREE;
 	}
 
