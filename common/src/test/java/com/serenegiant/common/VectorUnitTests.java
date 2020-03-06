@@ -377,4 +377,14 @@ public class VectorUnitTests {
 
 	}
 
+	@Test
+	public void distance_test() throws Exception {
+		final Vector v0 = new Vector(1, 2, 3);
+		final Vector v1 = new Vector(4, 5, 6);
+		final Vector v2 = new Vector(v1).sub(v0);
+		assertEquals(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z, v0.distSquared(v1), EPS);
+		assertEquals((float)Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z), v0.distance(v1), EPS);
+		assertEquals(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z, v0.distSquared(v1.x, v1.y, v1.z), EPS);
+		assertEquals((float)Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z), v0.distance(v1.x, v1.y, v1.z), EPS);
+	}
 }
