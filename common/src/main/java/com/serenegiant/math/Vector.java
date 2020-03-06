@@ -738,7 +738,25 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float len() {
-		return (float) Math.sqrt(x * x + y * y + z * z);
+		return (float) Math.sqrt(lenSquared());
+	}
+
+	/**
+	 * ベクトルの長さを変更
+	 * @param len
+	 * @return
+	 */
+	public Vector len(final float len) {
+		return mult(len / Math.sqrt(lenSquared()));
+	}
+
+	/**
+	 * ベクトルの長さを変更
+	 * @param len
+	 * @return
+	 */
+	public Vector len(final double len) {
+		return mult(len / Math.sqrt(lenSquared()));
 	}
 
 	/**
@@ -755,7 +773,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector normalize() {
-		final double len = Math.sqrt(x * x + y * y + z * z);
+		final double len = Math.sqrt(lenSquared());
 		if (len != 0) {
 			this.x /= len;
 			this.y /= len;
