@@ -39,9 +39,9 @@ import com.serenegiant.system.BuildCheck;
 /**
  * 2つの子Viewを指定した位置に自動配置するViewGroup
  */
-public class TwoPainViewGroup extends FrameLayout {
+public class TwoPanelViewGroup extends FrameLayout {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = TwoPainViewGroup.class.getSimpleName();
+	private static final String TAG = TwoPanelViewGroup.class.getSimpleName();
 
 	/**
 	 * 横分割する時
@@ -119,23 +119,23 @@ public class TwoPainViewGroup extends FrameLayout {
 	private View mChild1, mChild2;
 
 //--------------------------------------------------------------------------------
-	public TwoPainViewGroup(final Context context) {
+	public TwoPanelViewGroup(final Context context) {
 		this(context, null, 0);
 	}
 
-	public TwoPainViewGroup(final Context context, final AttributeSet attrs) {
+	public TwoPanelViewGroup(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public TwoPainViewGroup(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public TwoPanelViewGroup(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
-			attrs, R.styleable.TwoPainViewGroup, defStyleAttr, 0);
-		mOrientation = a.getInt(R.styleable.TwoPainViewGroup_orientation, HORIZONTAL);
-		mDisplayMode = a.getInt(R.styleable.TwoPainViewGroup_displayMode, MODE_SPLIT);
-		mEnableSubWindow = a.getBoolean(R.styleable.TwoPainViewGroup_enableSubWindow, true);
-		mFlipChildPos = a.getBoolean(R.styleable.TwoPainViewGroup_flipChildPos, false);
-		mSubWindowScale = a.getFloat(R.styleable.TwoPainViewGroup_subWindowScale, DEFAULT_SUB_WINDOW_SCALE);
+			attrs, R.styleable.TwoPanelViewGroup, defStyleAttr, 0);
+		mOrientation = a.getInt(R.styleable.TwoPanelViewGroup_orientation, HORIZONTAL);
+		mDisplayMode = a.getInt(R.styleable.TwoPanelViewGroup_displayMode, MODE_SPLIT);
+		mEnableSubWindow = a.getBoolean(R.styleable.TwoPanelViewGroup_enableSubWindow, true);
+		mFlipChildPos = a.getBoolean(R.styleable.TwoPanelViewGroup_flipChildPos, false);
+		mSubWindowScale = a.getFloat(R.styleable.TwoPanelViewGroup_subWindowScale, DEFAULT_SUB_WINDOW_SCALE);
 		if ((mSubWindowScale <= 0) || (mSubWindowScale >= 1.0f)) {
 			mSubWindowScale = DEFAULT_SUB_WINDOW_SCALE;
 		}
@@ -178,13 +178,13 @@ public class TwoPainViewGroup extends FrameLayout {
 	@Override
 	public void onInitializeAccessibilityEvent(final AccessibilityEvent event) {
 		super.onInitializeAccessibilityEvent(event);
-		event.setClassName(TwoPainViewGroup.class.getName());
+		event.setClassName(TwoPanelViewGroup.class.getName());
 	}
 
 	@Override
 	public void onInitializeAccessibilityNodeInfo(AccessibilityNodeInfo info) {
 		super.onInitializeAccessibilityNodeInfo(info);
-		info.setClassName(TwoPainViewGroup.class.getName());
+		info.setClassName(TwoPanelViewGroup.class.getName());
 	}
 
 //--------------------------------------------------------------------------------
