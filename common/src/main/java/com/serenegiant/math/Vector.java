@@ -747,7 +747,12 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector len(final float len) {
-		return mult(len / Math.sqrt(lenSquared()));
+		final double l = Math.sqrt(lenSquared());
+		if ((l != 0) && (len != 0)) {
+			return mult(len / l);
+		} else {
+			return clear(0);
+		}
 	}
 
 	/**
@@ -756,7 +761,12 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector len(final double len) {
-		return mult(len / Math.sqrt(lenSquared()));
+		final double l = Math.sqrt(lenSquared());
+		if ((l != 0) && (len != 0)) {
+			return mult(len / l);
+		} else {
+			return clear(0);
+		}
 	}
 
 	/**
