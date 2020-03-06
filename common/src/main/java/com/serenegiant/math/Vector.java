@@ -42,8 +42,14 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	public static final double TO_RADIAN = (Math.PI / 180.0);
 	public static final double TO_DEGREE = (180.0 / Math.PI);
 
+	/**
+	 * ゼロベクトル
+	 */
 	public static final Vector zeroVector = new Vector();
-	public static final Vector normVector = new Vector(1,1,1);
+	/**
+	 * (1,1,1)の単位方向ベクトル
+	 */
+	public static final Vector normVector = new Vector(1,1,1).normalize();
 
 	private static final float[] matrix = new float[16];
 	private static final float[] inVec = new float[4];
