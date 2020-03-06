@@ -412,4 +412,20 @@ public class VectorUnitTests {
 		assertEquals(v0.y / v0.x, v0.slope2D(), EPS);
 		assertEquals((v0.y - v1.y) / (v0.x - v1.x), v0.slope2D(v1), EPS);
 	}
+
+	@Test
+	public void sign_test() throws Exception {
+		final Vector v = new Vector(-123, 0, +456).sign();
+		assertEquals(-1, v.x, EPS);
+		assertEquals(0, v.y, EPS);
+		assertEquals(+1, v.z, EPS);
+		v.set(0, +465, -123).sign();
+		assertEquals(0, v.x, EPS);
+		assertEquals(+1, v.y, EPS);
+		assertEquals(-1, v.z, EPS);
+		v.set(+465, -123, 0).sign();
+		assertEquals(+1, v.x, EPS);
+		assertEquals(-1, v.y, EPS);
+		assertEquals(0, v.z, EPS);
+	}
 }
