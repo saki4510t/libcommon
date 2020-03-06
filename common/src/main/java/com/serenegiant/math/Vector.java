@@ -1159,6 +1159,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @param angleZ
 	 * @return
 	 */
+	@Deprecated
 	public Vector rotate_inv(final float angleX, final float angleY, final float angleZ) {
 		inVec[0] = x;
 		inVec[1] = y;
@@ -1187,6 +1188,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @param a
 	 * @return
 	 */
+	@Deprecated
 	public Vector rotate_inv(@NonNull final Vector angle, final float a) {
 		rotate_inv(angle.x * a, angle.y * a, angle.z * a);
 		return this;
@@ -1197,6 +1199,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @param angle
 	 * @return
 	 */
+	@Deprecated
 	public Vector rotate_inv(@NonNull final Vector angle) {
 		rotate_inv(angle, -1f);
 		return this;
