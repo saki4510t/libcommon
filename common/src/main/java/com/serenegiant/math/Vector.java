@@ -39,8 +39,8 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	private static final long serialVersionUID = 1620440892067002860L;
 
-	public static final float TO_RADIAN = (float)(Math.PI / 180.0f);
-	public static final float TO_DEGREE = (float)(180.0f / Math.PI);
+	public static final double TO_RADIAN = (Math.PI / 180.0);
+	public static final double TO_DEGREE = (180.0 / Math.PI);
 
 	public static final Vector zeroVector = new Vector();
 	public static final Vector normVector = new Vector(1,1,1);
@@ -249,6 +249,20 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * ベクトルを加算 v = v + (x,y,z)
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public Vector add(final double x, final double y, final double z) {
+		this.x += x;
+		this.y += y;
+		this.z += z;
+		return this;
+	}
+
+	/**
 	 * ベクトルを加算(スケール変換有り)v = v + (x,y,z)*a
 	 * @param x
 	 * @param y
@@ -257,6 +271,21 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector add(final float x, final float y, final float z, final float a) {
+		this.x += x * a;
+		this.y += y * a;
+		this.z += z * a;
+		return this;
+	}
+
+	/**
+	 * ベクトルを加算(スケール変換有り)v = v + (x,y,z)*a
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param a
+	 * @return
+	 */
+	public Vector add(final double x, final double y, final double z, final double a) {
 		this.x += x * a;
 		this.y += y * a;
 		this.z += z * a;
@@ -307,6 +336,16 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * ベクトルを減算 v = v - (x,y,0)
+	 * @param x
+	 * @param y
+	 * @return
+	 */
+	public Vector sub(final double x, final double y) {
+		return add(-x, -y, 0.0);
+	}
+
+	/**
 	 * ベクトルを減算 v = v - v'
 	 * @param v
 	 * @return
@@ -337,6 +376,17 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	}
 
 	/**
+	 * ベクトルを減算 v = v - (x,y,z)
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @return
+	 */
+	public Vector sub(final double x, final double y, final double z) {
+		return add(-x, -y, -z);
+	}
+
+	/**
 	 * ベクトルを減算(スケール変換有り)v = v - (x,y,z)*a
 	 * @param x
 	 * @param y
@@ -345,6 +395,18 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector sub(final float x, final float y, final float z, final float a) {
+		return add(-x, -y, -z, a);
+	}
+
+	/**
+	 * ベクトルを減算(スケール変換有り)v = v - (x,y,z)*a
+	 * @param x
+	 * @param y
+	 * @param z
+	 * @param a
+	 * @return
+	 */
+	public Vector sub(final double x, final double y, final double z, final double a) {
 		return add(-x, -y, -z, a);
 	}
 
@@ -390,12 +452,38 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * ベクトルの各成分にスカラ値をかけ算
+	 * v = (v.x * a, v.y * a, v.z * a)
+	 * @param scale
+	 * @return
+	 */
+	public Vector mult(final double scale) {
+		this.x *= scale;
+		this.y *= scale;
+		this.z *= scale;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分にスカラ値をかけ算
 	 * v = (v.x * xScale, v.y * yScale, v.z)
 	 * @param xScale
 	 * @param yScale
 	 * @return
 	 */
 	public Vector mult(final float xScale, final float yScale) {
+		this.x *= xScale;
+		this.y *= yScale;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分にスカラ値をかけ算
+	 * v = (v.x * xScale, v.y * yScale, v.z)
+	 * @param xScale
+	 * @param yScale
+	 * @return
+	 */
+	public Vector mult(final double xScale, final double yScale) {
 		this.x *= xScale;
 		this.y *= yScale;
 		return this;
@@ -410,6 +498,21 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector mult(final float xScale, final float yScale, final float zScale) {
+		this.x *= xScale;
+		this.y *= yScale;
+		this.z *= zScale;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分にスカラ値をかけ算
+	 * v = (v.x * xScale, v.y * yScale, v.z * zScale)
+	 * @param xScale
+	 * @param yScale
+	 * @param zScale
+	 * @return
+	 */
+	public Vector mult(final double xScale, final double yScale, final double zScale) {
 		this.x *= xScale;
 		this.y *= yScale;
 		this.z *= zScale;
@@ -444,12 +547,38 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 
 	/**
 	 * ベクトルの各成分をスカラ値で割り算
+	 * v = (v.x / a, v.y / a, v.z / a)
+	 * @param scale
+	 * @return
+	 */
+	public Vector div(final double scale) {
+		this.x /= scale;
+		this.y /= scale;
+		this.z /= scale;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分をスカラ値で割り算
 	 * v = (v.x / xDiv, v.y / yDiv, v.z)
 	 * @param xDiv
 	 * @param yDiv
 	 * @return
 	 */
 	public Vector div(final float xDiv, final float yDiv) {
+		this.x /= xDiv;
+		this.y /= yDiv;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分をスカラ値で割り算
+	 * v = (v.x / xDiv, v.y / yDiv, v.z)
+	 * @param xDiv
+	 * @param yDiv
+	 * @return
+	 */
+	public Vector div(final double xDiv, final double yDiv) {
 		this.x /= xDiv;
 		this.y /= yDiv;
 		return this;
@@ -464,6 +593,21 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector div(final float xDiv, final float yDiv, final float zDiv) {
+		this.x /= xDiv;
+		this.y /= yDiv;
+		this.z /= zDiv;
+		return this;
+	}
+
+	/**
+	 * ベクトルの各成分をスカラ値で割り算
+	 * v = (v.x / xDiv, v.y / yDiv, v.z / zDiv)
+	 * @param xDiv
+	 * @param yDiv
+	 * @param zDiv
+	 * @return
+	 */
+	public Vector div(final double xDiv, final double yDiv, final double zDiv) {
 		this.x /= xDiv;
 		this.y /= yDiv;
 		this.z /= zDiv;
@@ -782,9 +926,10 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * XY平面上でベクトルとX軸の角度を取得
 	 */
 	public float angleXY() {
-		float angle = (float) Math.atan2(y, x) * TO_DEGREE;
-		if (angle < 0)
+		float angle = (float)(Math.atan2(y, x) * TO_DEGREE);
+		if (angle < 0) {
 			angle += 360;
+		}
 		return angle;
 	}
 
@@ -792,9 +937,10 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * XZ平面上でベクトルとX軸の角度を取得
 	 */
 	public float angleXZ() {
-		float angle = (float) Math.atan2(z, x) * TO_DEGREE;
-		if (angle < 0)
+		float angle = (float)(Math.atan2(z, x) * TO_DEGREE);
+		if (angle < 0) {
 			angle += 360;
+		}
 		return angle;
 	}
 
@@ -802,7 +948,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * YZ平面上でベクトルとY軸の角度を取得
 	 */
 	public float angleYZ() {
-		float angle = (float) Math.atan2(z, y) * TO_DEGREE;
+		float angle = (float)(Math.atan2(z, y) * TO_DEGREE);
 		if (angle < 0)
 			angle += 360;
 		return angle;
@@ -821,24 +967,25 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	public float getAngle(@NonNull final Vector v) {
 		final double cos = dot(this, v)
 			/ (Math.sqrt(lenSquared()) * Math.sqrt(v.lenSquared()));
-		return (float) Math.acos(cos) * TO_DEGREE;
+		return (float) (Math.acos(cos) * TO_DEGREE);
 	}
 
 	/**
 	 * Z軸周りに(XY平面上で)ベクトルを指定した角度[度]回転させる
+	 * z値は変更しない
 	 * @param angle
 	 * @return
 	 */
 	public Vector rotateXY(final float angle) {
-		final float rad = angle * TO_RADIAN;
-		final float cos = (float) Math.cos(rad);
-		final float sin = (float) Math.sin(rad);
+		final double rad = angle * TO_RADIAN;
+		final double cos = Math.cos(rad);
+		final double sin = Math.sin(rad);
 
-		final float newX = x * cos - y * sin;
-		final float newY = x * sin + y * cos;
+		final double newX = x * cos - y * sin;
+		final double newY = x * sin + y * cos;
 
-		x = newX;
-		y = newY;
+		x = (float)newX;
+		y = (float)newY;
 
 		return this;
 	}
@@ -849,15 +996,15 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector rotateXZ(final float angle) {
-		final float rad = angle * TO_RADIAN;
-		final float cos = (float) Math.cos(rad);
-		final float sin = (float) Math.sin(rad);
+		final double rad = angle * TO_RADIAN;
+		final double cos = Math.cos(rad);
+		final double sin = Math.sin(rad);
 
-		final float newX = x * cos - z * sin;
-		final float newZ = x * sin + z * cos;
+		final double newX = x * cos - z * sin;
+		final double newZ = x * sin + z * cos;
 
-		x = newX;
-		z = newZ;
+		x = (float)newX;
+		z = (float)newZ;
 
 		return this;
 	}
@@ -868,15 +1015,15 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector rotateYZ(final float angle) {
-		final float rad = angle * TO_RADIAN;
-		final float cos = (float) Math.cos(rad);
-		final float sin = (float) Math.sin(rad);
+		final double rad = angle * TO_RADIAN;
+		final double cos = Math.cos(rad);
+		final double sin = Math.sin(rad);
 
-		final float newY = y * cos - z * sin;
-		final float newZ = y * sin + z * cos;
+		final double newY = y * cos - z * sin;
+		final double newZ = y * sin + z * cos;
 
-		y = newY;
-		z = newZ;
+		y = (float)newY;
+		z = (float)newZ;
 
 		return this;
 	}
