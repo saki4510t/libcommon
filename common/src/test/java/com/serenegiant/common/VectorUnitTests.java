@@ -11,7 +11,7 @@ import static org.junit.Assert.assertEquals;
  */
 public class VectorUnitTests {
 
-	public static final float EPS = (float)Math.pow(10., Float.MIN_EXPONENT + 2);
+	private static final float EPS = (float)Math.pow(10., Float.MIN_EXPONENT + 2);
 
 	@Test
 	public void constructor_test() throws Exception {
