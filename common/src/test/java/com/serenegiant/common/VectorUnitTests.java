@@ -387,4 +387,21 @@ public class VectorUnitTests {
 		assertEquals(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z, v0.distSquared(v1.x, v1.y, v1.z), EPS);
 		assertEquals((float)Math.sqrt(v2.x * v2.x + v2.y * v2.y + v2.z * v2.z), v0.distance(v1.x, v1.y, v1.z), EPS);
 	}
+
+	@Test
+	public void swap_test() throws Exception {
+		final Vector v0 = new Vector(1, 2, 3);
+		final Vector v1 = new Vector(4, 5, 6);
+		v0.swap(v1);
+		assertEquals(4, v0.x, EPS);
+		assertEquals(5, v0.y, EPS);
+		assertEquals(6, v0.z, EPS);
+		assertEquals(1, v1.x, EPS);
+		assertEquals(2, v1.y, EPS);
+		assertEquals(3, v1.z, EPS);
+
+		v0.swapXY();
+		assertEquals(5, v0.x, EPS);
+		assertEquals(4, v0.y, EPS);
+	}
 }
