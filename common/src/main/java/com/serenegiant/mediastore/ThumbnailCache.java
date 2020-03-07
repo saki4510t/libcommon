@@ -22,7 +22,6 @@ import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -48,24 +47,27 @@ public class ThumbnailCache {
 
 	// for thumbnail cache(in memory)
 	// rate of memory usage for cache, 'CACHE_RATE = 8' means use 1/8 of available memory for image cache
+	private static final Object sSync = new Object();
 	private static final int CACHE_RATE = 8;
 	private static LruCache<String, Bitmap> sThumbnailCache;
 	private static int sCacheSize;
 
 	private static void prepareThumbnailCache(@NonNull final Context context) {
-		if (sThumbnailCache == null) {
-			final int memClass = ((ActivityManager)context
-				.getSystemService(Context.ACTIVITY_SERVICE))
-				.getMemoryClass();
-			// use 1/CACHE_RATE of available memory as memory cache
-			sCacheSize = (1024 * 1024 * memClass) / CACHE_RATE;	// [MB] => [bytes]
-			sThumbnailCache = new LruCache<String, Bitmap>(sCacheSize) {
-				@Override
-				protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
-					// control memory usage instead of bitmap counts
-					return bitmap.getRowBytes() * bitmap.getHeight();	// [bytes]
-				}
-			};
+		synchronized (sSync) {
+			if (sThumbnailCache == null) {
+				final int memClass = ((ActivityManager)context
+					.getSystemService(Context.ACTIVITY_SERVICE))
+					.getMemoryClass();
+				// use 1/CACHE_RATE of available memory as memory cache
+				sCacheSize = (1024 * 1024 * memClass) / CACHE_RATE;	// [MB] => [bytes]
+				sThumbnailCache = new LruCache<String, Bitmap>(sCacheSize) {
+					@Override
+					protected int sizeOf(@NonNull String key, @NonNull Bitmap bitmap) {
+						// control memory usage instead of bitmap counts
+						return bitmap.getRowBytes() * bitmap.getHeight();	// [bytes]
+					}
+				};
+			}
 		}
 	}
 
@@ -80,7 +82,9 @@ public class ThumbnailCache {
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			sThumbnailCache.trimToSize(sCacheSize);
+			synchronized (sSync) {
+				sThumbnailCache.trimToSize(sCacheSize);
+			}
 		} finally {
 			super.finalize();
 		}
@@ -95,7 +99,9 @@ public class ThumbnailCache {
 	 */
 	@Nullable
 	public Bitmap get(final int groupId, final long id) {
-		return sThumbnailCache.get(getKey(groupId, id));
+		synchronized (sSync) {
+			return sThumbnailCache.get(getKey(groupId, id));
+		}
 	}
 
 	/**
@@ -106,14 +112,18 @@ public class ThumbnailCache {
 	 */
 	@Nullable
 	public Bitmap get(@NonNull final String key) {
-		return sThumbnailCache.get(key);
+		synchronized (sSync) {
+			return sThumbnailCache.get(key);
+		}
 	}
 
 	/**
 	 * サムネイルキャッシュをクリアする
 	 */
 	public void clear() {
-		sThumbnailCache.evictAll();
+		synchronized (sSync) {
+			sThumbnailCache.evictAll();
+		}
 	}
 
 	/**
@@ -122,19 +132,21 @@ public class ThumbnailCache {
 	 * @param groupId
 	 */
 	public void clear(final int groupId) {
-		if (groupId != 0) {
-			final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
-			final String key_prefix = String.format(Locale.US, "%d_", groupId);
-			final Set<String> keys = snapshot.keySet();
-			for (final String key : keys) {
-				if (key.startsWith(key_prefix)) {
-					// 指定したgroupIdのキーが見つかった
-					sThumbnailCache.remove(key);
+		synchronized (sSync) {
+			if (groupId != 0) {
+				final Map<String, Bitmap> snapshot = sThumbnailCache.snapshot();
+				final String key_prefix = String.format(Locale.US, "%d_", groupId);
+				final Set<String> keys = snapshot.keySet();
+				for (final String key : keys) {
+					if (key.startsWith(key_prefix)) {
+						// 指定したgroupIdのキーが見つかった
+						sThumbnailCache.remove(key);
+					}
 				}
+			} else {
+				// すべてクリアする
+				sThumbnailCache.evictAll();
 			}
-		} else {
-			// すべてクリアする
-			sThumbnailCache.evictAll();
 		}
 		System.gc();
 	}
@@ -157,33 +169,36 @@ public class ThumbnailCache {
 
 		// try to get from internal thumbnail cache(in memory), this may be redundant
 		final String key = getKey(hashCode, id);
-		Bitmap result = sThumbnailCache.get(key);
-		if (result == null) {
-			if ((requestWidth <= 0) || (requestHeight <= 0)) {
-				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
-			} else {
-				int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
-				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
-					kind = MediaStore.Images.Thumbnails.MINI_KIND;
-				try {
-					result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, null);
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
+		Bitmap result;
+		synchronized (sSync) {
+			result = sThumbnailCache.get(key);
+			if (result == null) {
+				if ((requestWidth <= 0) || (requestHeight <= 0)) {
+					result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
+				} else {
+					int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
+					if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
+						kind = MediaStore.Images.Thumbnails.MINI_KIND;
+					try {
+						result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, null);
+					} catch (final Exception e) {
+						if (DEBUG) Log.w(TAG, e);
+					}
 				}
-			}
-			if (result != null) {
-				final int orientation = BitmapHelper.getOrientation(cr, id);
-				if (orientation != 0) {
-					final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
-					result.recycle();
-					result = newBitmap;
+				if (result != null) {
+					final int orientation = BitmapHelper.getOrientation(cr, id);
+					if (orientation != 0) {
+						final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
+						result.recycle();
+						result = newBitmap;
+					}
+					if (DEBUG) Log.v(TAG, String.format("getImageThumbnail:id=%d(%d,%d)",
+						id, result.getWidth(), result.getHeight()));
+					// add to internal thumbnail cache(in memory)
+					sThumbnailCache.put(key, result);
 				}
-				if (DEBUG) Log.v(TAG, String.format("getImageThumbnail:id=%d(%d,%d)",
-					id, result.getWidth(), result.getHeight()));
-				// add to internal thumbnail cache(in memory)
-				sThumbnailCache.put(key, result);
-			}
 
+			}
 		}
 		return result;
 	}
@@ -207,32 +222,35 @@ public class ThumbnailCache {
 
 		// try to get from internal thumbnail cache(in memory), this may be redundant
 		final String key = getKey(hashCode, id);
-		Bitmap result = sThumbnailCache.get(key);
-		if (result == null) {
-			int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
-			if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
-				kind = MediaStore.Video.Thumbnails.MINI_KIND;
-			try {
-				result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, null);
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
-			}
-			if (result != null) {
-				if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",
-					id, result.getWidth(), result.getHeight()));
-				// XXX 動画はExifが無いはずなのとAndroid10未満だとorientationフィールドが無い可能性が高いので実際には回転しないかも
-				final int orientation = BitmapHelper.getOrientation(cr, id);
-				if (orientation != 0) {
-					final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
-					result.recycle();
-					result = newBitmap;
+		Bitmap result;
+		synchronized (sSync) {
+			result = sThumbnailCache.get(key);
+			if (result == null) {
+				int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
+				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
+					kind = MediaStore.Video.Thumbnails.MINI_KIND;
+				try {
+					result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, null);
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
 				}
-				// add to internal thumbnail cache(in memory)
-				sThumbnailCache.put(key, result);
-			} else {
-				Log.w(TAG, "failed to get video thumbnail ofr id=" + id);
-			}
+				if (result != null) {
+					if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",
+						id, result.getWidth(), result.getHeight()));
+					// XXX 動画はExifが無いはずなのとAndroid10未満だとorientationフィールドが無い可能性が高いので実際には回転しないかも
+					final int orientation = BitmapHelper.getOrientation(cr, id);
+					if (orientation != 0) {
+						final Bitmap newBitmap = BitmapHelper.rotateBitmap(result, orientation);
+						result.recycle();
+						result = newBitmap;
+					}
+					// add to internal thumbnail cache(in memory)
+					sThumbnailCache.put(key, result);
+				} else {
+					Log.w(TAG, "failed to get video thumbnail ofr id=" + id);
+				}
 
+			}
 		}
 		return result;
 	}
