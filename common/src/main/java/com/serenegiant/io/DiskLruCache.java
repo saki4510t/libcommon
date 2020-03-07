@@ -526,14 +526,15 @@ public final class DiskLruCache implements Closeable {
         // if this edit is creating the entry for the first time, every index must have a value
         if (success && !entry.readable) {
             for (int i = 0; i < valueCount; i++) {
-                if (!entry.getDirtyFile(i).exists()) {
+                final File dirtyFile = entry.getDirtyFile(i);
+                if (!dirtyFile.exists()) {
                     editor.abort();
-                    throw new IllegalStateException("edit didn't create file " + i);
+                    throw new IllegalStateException("edit didn't create file:" + dirtyFile);
                 }
             }
         }
         for (int i = 0; i < valueCount; i++) {
-            File dirty = entry.getDirtyFile(i);
+            final File dirty = entry.getDirtyFile(i);
             if (success) {
                 if (dirty.exists()) {
                     File clean = entry.getCleanFile(i);

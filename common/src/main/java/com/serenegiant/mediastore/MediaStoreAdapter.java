@@ -61,7 +61,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private final ContentResolver mCr;
 	private final int mLayoutId;
 	private final MyAsyncQueryHandler mQueryHandler;
-	private final int mGroupId = hashCode();
 	private final ThumbnailCache mThumbnailCache;
 	private Cursor mMediaInfoCursor;
 	private String mSelection;
@@ -112,7 +111,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 			iv.setImageDrawable(drawable);
 		}
 		((LoaderDrawable)drawable).startLoad(
-			cursor.getInt(PROJ_INDEX_MEDIA_TYPE), mGroupId, cursor.getLong(PROJ_INDEX_ID));
+			cursor.getInt(PROJ_INDEX_MEDIA_TYPE), cursor.getLong(PROJ_INDEX_ID));
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 			if (mShowTitle) {
@@ -179,8 +178,9 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
 			// 静止画の場合のサムネイル取得
 			try {
-				result = mThumbnailCache.getImageThumbnail(mCr, mGroupId,
-					getItemId(position), mThumbnailWidth, mThumbnailHeight);
+				result = mThumbnailCache.getImageThumbnail(
+					mCr, getItemId(position),
+					mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
 			} catch (final IOException e) {
@@ -189,8 +189,9 @@ public class MediaStoreAdapter extends CursorAdapter {
 		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
 			// 動画の場合のサムネイル取得
 			try {
-				result = mThumbnailCache.getVideoThumbnail(mCr, mGroupId,
-					getItemId(position), mThumbnailWidth, mThumbnailHeight);
+				result = mThumbnailCache.getVideoThumbnail(
+					mCr, getItemId(position),
+					mThumbnailWidth, mThumbnailHeight);
 			} catch (final FileNotFoundException e) {
 				Log.w(TAG, e);
 			} catch (final IOException e) {
@@ -289,7 +290,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public void setThumbnailSize(final int size) {
 		if ((mThumbnailWidth != size) || (mThumbnailHeight != size)) {
 			mThumbnailWidth = mThumbnailHeight = size;
-			mThumbnailCache.clear(mGroupId);
+			mThumbnailCache.clear();
 			onContentChanged();
 		}
 	}
@@ -303,7 +304,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
-			mThumbnailCache.clear(mGroupId);
+			mThumbnailCache.clear();
 			onContentChanged();
 		}
 	}
@@ -378,8 +379,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 
 		@Override
-		protected Bitmap checkCache(final int groupId, final long id) {
-			return mThumbnailCache.get(groupId, id);
+		protected Bitmap checkCache(final long id) {
+			return mThumbnailCache.get(id);
 		}
 	}
 
@@ -390,17 +391,17 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
-									final int mediaType, final int groupId, final long id,
-									final int requestWidth, final int requestHeight) {
+			final int mediaType, final long id,
+			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(cr, groupId, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(cr, id, requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(cr, groupId, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(cr, id, requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {

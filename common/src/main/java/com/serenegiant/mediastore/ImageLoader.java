@@ -36,7 +36,6 @@ public abstract class ImageLoader implements Runnable {
 	@NonNull
 	private final FutureTask<Bitmap> mTask;
 	private int mMediaType;
-	private int mGroupId;
 	private long mId;
 	private Bitmap mBitmap;
 
@@ -55,12 +54,10 @@ public abstract class ImageLoader implements Runnable {
 
     /**
 	 * start loading
-	 * @param groupId
      * @param id
      */
-	public synchronized void startLoad(final int mediaType, final int groupId, final long id) {
+	public synchronized void startLoad(final int mediaType, final long id) {
 		mMediaType = mediaType;
-		mGroupId = groupId;
 		mId = id;
 		mBitmap = null;
 		ThreadPool.queueEvent(mTask);
@@ -77,7 +74,6 @@ public abstract class ImageLoader implements Runnable {
 	 * 実際の読み込み処理
 	 * @param cr
 	 * @param mediaType
-	 * @param groupId
 	 * @param id
 	 * @param requestWidth
 	 * @param requestHeight
@@ -85,22 +81,20 @@ public abstract class ImageLoader implements Runnable {
 	 */
 	protected abstract Bitmap loadBitmap(
 		@NonNull final ContentResolver cr,
-		final int mediaType, final int groupId, final long id,
+		final int mediaType, final long id,
 		final int requestWidth, final int requestHeight);
 
 	@Override
 	public void run() {
 		int mediaType;
-		int groupId;
 		long id;
 		synchronized(this) {
 			mediaType = mMediaType;
-			groupId = mGroupId;
 			id = mId;
 		}
 		if (!mTask.isCancelled()) {
 			mBitmap = loadBitmap(mParent.getContentResolver(),
-				mediaType, groupId, id,
+				mediaType, id,
 				mParent.getIntrinsicWidth(), mParent.getIntrinsicHeight());
 		}
 		if (mTask.isCancelled() || (id != mId) || (mBitmap == null)) {

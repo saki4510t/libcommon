@@ -99,7 +99,7 @@ class ImageFragment: BaseFragment() {
 					requireContext().contentResolver, -1, -1)
 				mImageView!!.setImageDrawable(drawable)
 			}
-			(drawable as LoaderDrawable).startLoad(mInfo!!.mediaType, 0, mInfo!!.id)
+			(drawable as LoaderDrawable).startLoad(mInfo!!.mediaType, mInfo!!.id)
 		} else {
 			queueEvent(Runnable {
 //				mImageView.setImageURI(mInfo.getUri());
@@ -125,7 +125,7 @@ class ImageFragment: BaseFragment() {
 			return MyImageLoader(this)
 		}
 
-		override fun checkCache(groupId: Int, id: Long): Bitmap? {
+		override fun checkCache(id: Long): Bitmap? {
 			return null
 		}
 
@@ -138,7 +138,7 @@ class ImageFragment: BaseFragment() {
 		: ImageLoader(parent) {
 
 		override fun loadBitmap(cr: ContentResolver,
-			mediaType: Int, groupId: Int, id: Long,
+			mediaType: Int, id: Long,
 			requestWidth: Int, requestHeight: Int): Bitmap {
 
 			var result: Bitmap? = null

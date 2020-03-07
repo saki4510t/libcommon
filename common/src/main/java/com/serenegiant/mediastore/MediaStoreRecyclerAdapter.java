@@ -89,7 +89,6 @@ public class MediaStoreRecyclerAdapter
 	private final ContentResolver mCr;
 	private final MyAsyncQueryHandler mQueryHandler;
 	private final ThumbnailCache mThumbnailCache;
-	private final int mGroupId = hashCode();
 	private final MediaInfo info = new MediaInfo();
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 
@@ -221,7 +220,7 @@ public class MediaStoreRecyclerAdapter
 		if ((mThumbnailWidth != width) || (mThumbnailHeight != height)) {
 			mThumbnailWidth = width;
 			mThumbnailHeight = height;
-			mThumbnailCache.clear(mGroupId);
+			mThumbnailCache.clear();
 			onContentChanged();
 		}
 	}
@@ -510,8 +509,8 @@ public class MediaStoreRecyclerAdapter
 		}
 
 		@Override
-		protected Bitmap checkCache(final int groupId, final long id) {
-			return mThumbnailCache.get(groupId, id);
+		protected Bitmap checkCache(final long id) {
+			return mThumbnailCache.get(id);
 		}
 	}
 
@@ -525,19 +524,19 @@ public class MediaStoreRecyclerAdapter
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
-			final int mediaType, final int groupId, final long id,
+			final int mediaType, final long id,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(cr,
-						groupId, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(cr, id,
+						requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(cr,
-						groupId, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(cr, id,
+						requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {
@@ -565,7 +564,7 @@ public class MediaStoreRecyclerAdapter
 				iv.setImageDrawable(drawable);
 			}
 			((LoaderDrawable)drawable).startLoad(
-				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mGroupId, mCursor.getLong(PROJ_INDEX_ID));
+				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mCursor.getLong(PROJ_INDEX_ID));
 		}
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);

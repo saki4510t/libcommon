@@ -233,31 +233,30 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	/**
 	 * 指定したgroupId/idに対応するキャッシュを取得する
 	 * 存在しなければnull
-	 * @param groupId
 	 * @param id
 	 * @return
 	 */
 	@Nullable
-	protected abstract Bitmap checkCache(final int groupId, final long id);
+	protected abstract Bitmap checkCache(final long id);
 
 	/**
 	 * start loading image asynchronously
 	 * @param id
 	 */
-	public void startLoad(final int media_type, final int groupId, final long id) {
+	public void startLoad(final int media_type, final long id) {
 
 		if (mLoader != null) {
 			mLoader.cancelLoad();
 		}
 
 		// キャッシュから取得を試みる
-		final Bitmap newBitmap = checkCache(groupId, id);
+		final Bitmap newBitmap = checkCache(id);
 		if (newBitmap == null) {
 			// キャッシュから取得できなかったときは非同期読み込み要求する
 			mBitmap = null;
 			// re-using ThumbnailLoader will cause several problems on some devices...
 			mLoader = createImageLoader();
-			mLoader.startLoad(media_type, groupId, id);
+			mLoader.startLoad(media_type, id);
 		} else {
 			// キャッシュから取得できたとき
 			setBitmap(newBitmap);

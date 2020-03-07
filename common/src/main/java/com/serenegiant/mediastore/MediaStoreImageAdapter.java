@@ -132,7 +132,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 				drawable = createLoaderDrawable(mCr, info);
 				iv.setImageDrawable(drawable);
 			}
-			((LoaderDrawable)drawable).startLoad(info.mediaType, 0, info.id);
+			((LoaderDrawable)drawable).startLoad(info.mediaType, info.id);
 			if (tv != null) {
 				tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 				if (mShowTitle) {
@@ -379,7 +379,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected Bitmap checkCache(final int groupId, final long id) {
+		protected Bitmap checkCache(final long id) {
 			return null;
 		}
 	}
@@ -391,7 +391,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
-			final int mediaType, final int groupId, final long id,
+			final int mediaType, final long id,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
