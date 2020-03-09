@@ -333,11 +333,27 @@ public class ZoomImageView extends TransformImageView
 	}
 
 	/**
+	 * 現在の最大拡大率を取得
+	 * @return
+	 */
+	public float getMaxScale() {
+		return mDelegater.getMaxScale();
+	}
+
+	/**
 	 * 最小縮小率を設定
 	 * @param minScale
 	 */
 	public void setMinScale(final float minScale) {
 		mDelegater.setMinScale(minScale);
+	}
+
+	/**
+	 * 現在の最小縮小率を取得
+	 * @return
+	 */
+	public float getMinScale() {
+		return mDelegater.getMinScale();
 	}
 
 	/**

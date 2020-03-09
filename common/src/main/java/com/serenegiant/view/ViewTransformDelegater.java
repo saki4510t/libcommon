@@ -559,6 +559,14 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
+	 * 現在の最大拡大率を取得
+	 * @return
+	 */
+	public float getMaxScale() {
+		return mMaxScale;
+	}
+
+	/**
 	 * 最小縮小率を設定
 	 * @param minScale
 	 */
@@ -569,6 +577,14 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			mMinScale = minScale;
 			checkScale();
 		}
+	}
+
+	/**
+	 * 現在の最小縮小率を取得
+	 * @return
+	 */
+	public float getMinScale() {
+		return mMinScale;
 	}
 
 	/**
