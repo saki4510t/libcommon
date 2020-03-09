@@ -682,7 +682,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			// set the initial state to idle, get and save the internal Matrix.
 			setState(STATE_NON);
 			// get the internally calculated zooming scale to fit the view
-			mMinScale = DEFAULT_MIN_SCALE; // getMatrixScale();
+//			mMinScale = DEFAULT_MIN_SCALE; // getMatrixScale();
 			mCurrentDegrees = 0.f;
 		}
 		mIsRestored = false;
