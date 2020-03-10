@@ -999,7 +999,22 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @param v
 	 * @return 角度[度]
 	 */
+	@Deprecated
 	public float getAngle(@NonNull final Vector v) {
+		return angle(v);
+	}
+
+	/**
+	 * ベクトル間の角度を取得
+	 * ベクトル１ Za=(X1,Y1,Z1)、ベクトル２ Zb=(X2,Y2,Z2)、求める角φとすると、
+	 * cos φ ＝ Za・Zb / (|Za| |Zb|)
+	 *  =(X1X2+Y1Y2+Z1Z2) / √{(X1^2 + Y1^2 + Z1^2)(X2^2 + Y2^2 + Z2^2)}
+	 *  上式のアークコサイン(cos^-1)を取ればOK。
+	 *  ※どちらかのベクトルの長さが0の場合には(ゼロ除算で)INFINITYになる
+	 * @param v
+	 * @return 角度[度]
+	 */
+	public float angle(@NonNull final Vector v) {
 		final double cos = dot(this, v)
 			/ (Math.sqrt(lenSquared()) * Math.sqrt(v.lenSquared()));
 		return (float) (Math.acos(cos) * TO_DEGREE);
