@@ -20,6 +20,7 @@ package com.serenegiant.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
@@ -209,6 +210,24 @@ public class ViewUtils {
 			break;
 		}
 		return degrees;
+	}
+
+	@IntDef({
+		Configuration.ORIENTATION_PORTRAIT,
+		Configuration.ORIENTATION_LANDSCAPE,
+	})
+	@Retention(SOURCE)
+	public @interface Orientation {}
+
+	/**
+	 * 画面の向きを取得
+	 * Resources#getConfiguration#orientationを返すだけ
+	 * @param context
+	 * @return
+	 */
+	@Orientation
+	public static int getOrientation(@NonNull final Context context) {
+		return context.getResources().getConfiguration().orientation;
 	}
 //--------------------------------------------------------------------------------
 	/**
