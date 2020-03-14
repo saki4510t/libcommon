@@ -606,6 +606,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 	/**
 	 * 現在の拡大縮小率を取得
+	 * FIXME 一度も手動で拡大縮小移動処理を行っていないときに常に1.0fになってしまう
 	 * @return
 	 */
 	public float getScale() {
