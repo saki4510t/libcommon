@@ -331,6 +331,11 @@ public class ZoomAspectScaledTextureView2
 		// FIXME 未実装
 	}
 
+	@Override
+	public void onTransformed(@NonNull final View view, @NonNull final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "onTransformed:" + transform);
+	}
+
 	/**
 	 * タッチ操作の有効無効設定
 	 * @param enabled

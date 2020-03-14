@@ -165,6 +165,12 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		 * @param newState
 		 */
 		public void onStateChanged(@NonNull final View view, final int newState);
+		/**
+		 * トランスフォームマトリックスが変化したときの処理
+ 		 * @param view
+		 * @param transform
+		 */
+		public void onTransformed(@NonNull final View view, @NonNull final Matrix transform);
 	}
 
 	/**
@@ -379,6 +385,17 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener)parent;
 		}
+	}
+
+	@NonNull
+	@Override
+	public ViewTransformer setTransform(@Nullable final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
+		super.setTransform(transform);
+		if (mViewTransformListener != null) {
+			mViewTransformListener.onTransformed(getTargetView(), transform);
+		}
+		return this;
 	}
 
 	/**

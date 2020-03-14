@@ -21,6 +21,7 @@ package com.serenegiant.libcommon
 import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
@@ -101,6 +102,9 @@ class ImageFragment: BaseFragment() {
 				if (newState == ViewTransformDelegater.STATE_NON) {
 					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")
 				}
+			}
+			override fun onTransformed(view: View, transform: Matrix) {
+				if (DEBUG) Log.v(TAG, "onTransformed:${transform}")
 			}
 		})
 		if (USU_LOADER_DRAWABLE) {

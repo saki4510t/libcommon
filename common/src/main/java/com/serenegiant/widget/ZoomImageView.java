@@ -509,4 +509,9 @@ public class ZoomImageView extends TransformImageView
 		}
 	}
 
+	@Override
+	public void onTransformed(@NonNull final View view, @NonNull final Matrix transform) {
+		if (DEBUG) Log.v(TAG, "onTransformed:" + transform);
+	}
+
 }
