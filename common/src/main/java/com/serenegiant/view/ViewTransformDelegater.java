@@ -158,13 +158,13 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		 * @param view
 		 */
 		@Deprecated
-		public void onStartRotation(final View view);
+		public void onStartRotation(@NonNull final View view);
 		/**
 		 * タッチ状態が変化したとき
 		 * @param view
 		 * @param newState
 		 */
-		public void onStateChanged(final View view, final int newState);
+		public void onStateChanged(@NonNull final View view, final int newState);
 	}
 
 	/**

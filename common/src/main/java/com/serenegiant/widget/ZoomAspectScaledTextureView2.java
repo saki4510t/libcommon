@@ -319,14 +319,14 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
-	public void onStartRotation(final View view) {
+	public void onStartRotation(@NonNull final View view) {
 		if (DEBUG) Log.v(TAG, "onStartRotation:");
 		// これはdeprecatedなので#onStateChangedで処理する
 		// FIXME 未実装
 	}
 
 	@Override
-	public void onStateChanged(final View view, final int newState) {
+	public void onStateChanged(@NonNull final View view, final int newState) {
 		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		// FIXME 未実装
 	}

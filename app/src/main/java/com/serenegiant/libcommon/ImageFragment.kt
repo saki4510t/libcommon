@@ -93,11 +93,11 @@ class ImageFragment: BaseFragment() {
 				or ViewTransformDelegater.TOUCH_ENABLED_ROTATE
 		)
 		mImageView!!.setViewTransformListener(object: ViewTransformDelegater.ViewTransformListener {
-			override fun onStartRotation(view: View?) {
+			override fun onStartRotation(view: View) {
 				// deprecated and will remove sooon
 			}
 
-			override fun onStateChanged(view: View?, newState: Int) {
+			override fun onStateChanged(view: View, newState: Int) {
 				if (newState == ViewTransformDelegater.STATE_NON) {
 					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")
 				}
