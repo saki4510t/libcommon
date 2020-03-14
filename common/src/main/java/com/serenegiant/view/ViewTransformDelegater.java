@@ -619,10 +619,14 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	public PointF getTranslate(@NonNull final PointF result) {
+	public PointF getTranslate(@Nullable final PointF result) {
 		updateMatrixCache();
-		result.set(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
-		return result;
+		if (result != null) {
+			result.set(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
+			return result;
+		} else {
+			return new PointF(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
+		}
 	}
 
 	/**
