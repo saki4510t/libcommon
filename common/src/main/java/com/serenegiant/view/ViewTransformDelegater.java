@@ -676,15 +676,11 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	public void init() {
 		if (DEBUG) Log.v(TAG, "init:" + mIsRestored);
-		mState = STATE_RESET; setState(STATE_NON);
+		mState = STATE_RESET;
 		clearPendingTasks();
 		if (!mIsRestored) {
 			onInit();
 			updateTransform(true);
-			// set the initial state to idle, get and save the internal Matrix.
-			setState(STATE_NON);
-			// get the internally calculated zooming scale to fit the view
-//			mMinScale = DEFAULT_MIN_SCALE; // getMatrixScale();
 			mCurrentDegrees = 0.f;
 		}
 		mIsRestored = false;
@@ -704,6 +700,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		mLimitRect.inset((MOVE_LIMIT_RATE * getViewWidth()), (MOVE_LIMIT_RATE * getViewHeight()));
 		mLimitSegments[0] = null;
 		setupDefaultTransform();
+		setState(STATE_NON);
 	}
 
 	/**
