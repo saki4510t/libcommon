@@ -153,13 +153,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	public interface ViewTransformListener {
 		/**
-		 * this method is called when rotating starts.</br>
-		 * you will execute feedback something like sound and/or visual effects.
-		 * @param view
-		 */
-		@Deprecated
-		public void onStartRotation(@NonNull final View view);
-		/**
 		 * タッチ状態が変化したとき
 		 * @param view
 		 * @param newState
@@ -191,7 +184,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		public void run() {
 			if (mState == STATE_CHECKING) {
 				setState(STATE_ROTATING);
-				callOnStartRotationListener();
 			}
 		}
 	}
@@ -1089,19 +1081,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			}
 		}
 		return false;
-	}
-
-	@Deprecated
-	@SuppressLint("NewApi")
-	private final void callOnStartRotationListener() {
-		if (DEBUG) Log.v(TAG, "callOnStartRotationListener:");
-
-		if (mViewTransformListener != null)
-		try {
-			mViewTransformListener.onStartRotation(getTargetView());
-		} catch (Exception e) {
-			if (DEBUG) Log.w(TAG, e);
-		}
 	}
 
 	/**

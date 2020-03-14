@@ -479,15 +479,6 @@ public class ZoomImageView extends TransformImageView
 	/**
 	 * ViewTransformListenerの実装
 	 * @param view
-	 */
-	@Override
-	public void onStartRotation(@NonNull final View view) {
-		// これはdeprecatedなので#onStateChangedで処理する
-	}
-
-	/**
-	 * ViewTransformListenerの実装
-	 * @param view
 	 * @param newState
 	 */
 	@Override
@@ -509,6 +500,11 @@ public class ZoomImageView extends TransformImageView
 		}
 	}
 
+	/**
+	 * ViewTransformListenerの実装
+	 * @param view
+	 * @param transform
+	 */
 	@Override
 	public void onTransformed(@NonNull final View view, @NonNull final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "onTransformed:" + transform);
