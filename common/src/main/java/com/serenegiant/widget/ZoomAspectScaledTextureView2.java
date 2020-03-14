@@ -321,6 +321,7 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	public void onStartRotation(final View view) {
 		if (DEBUG) Log.v(TAG, "onStartRotation:");
+		// これはdeprecatedなので#onStateChangedで処理する
 		// FIXME 未実装
 	}
 

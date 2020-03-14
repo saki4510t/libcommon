@@ -481,13 +481,7 @@ public class ZoomImageView extends TransformImageView
 	 */
 	@Override
 	public void onStartRotation(final View view) {
-		if (mColorReverseFilter == null) {
-			mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
-		}
-		super.setColorFilter(mColorReverseFilter);
-		// post runnable to reset the color reversing
-		if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
-		postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
+		// これはdeprecatedなので#onStateChangedで処理する
 	}
 
 	/**
@@ -496,11 +490,21 @@ public class ZoomImageView extends TransformImageView
 	 * @param newState
 	 */
 	@Override
-	public void onStateChanged(final View view,
-		final int newState) {
-
-		if (newState == ViewTransformDelegater.STATE_NON) {
+	public void onStateChanged(final View view, final int newState) {
+		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
+		switch (newState) {
+		case ViewTransformDelegater.STATE_ROTATING:
+			if (mColorReverseFilter == null) {
+				mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
+			}
+			super.setColorFilter(mColorReverseFilter);
+			// post runnable to reset the color reversing
+			if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
+			postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
+			break;
+		case ViewTransformDelegater.STATE_NON:
 			resetColorFilter();
+			break;
 		}
 	}
 

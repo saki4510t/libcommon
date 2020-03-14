@@ -157,6 +157,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		 * you will execute feedback something like sound and/or visual effects.
 		 * @param view
 		 */
+		@Deprecated
 		public void onStartRotation(final View view);
 		/**
 		 * タッチ状態が変化したとき
@@ -1070,6 +1071,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		return false;
 	}
 
+	@Deprecated
 	@SuppressLint("NewApi")
 	private final void callOnStartRotationListener() {
 		if (DEBUG) Log.v(TAG, "callOnStartRotationListener:");
