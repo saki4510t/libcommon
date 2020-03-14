@@ -744,6 +744,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			break;
 		}
 		}
+		mImageMatrixChanged = true;
 		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
 		setTransform(mImageMatrix);
 		setDefault(mImageMatrix);
