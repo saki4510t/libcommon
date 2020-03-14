@@ -19,7 +19,7 @@ public class DisplayMetricsUtils {
 	 * @param dp
 	 * @return
 	 */
-	public static float dpToPixels(@NonNull final DisplayMetrics metrics, final int dp) {
+	public static float dpToPixels(@NonNull final DisplayMetrics metrics, final float dp) {
 		return dp * metrics.density;
 	}
 
@@ -29,7 +29,7 @@ public class DisplayMetricsUtils {
 	 * @param dp
 	 * @return
 	 */
-	public static int dpToPixelsInt(@NonNull final DisplayMetrics metrics, final int dp) {
+	public static int dpToPixelsInt(@NonNull final DisplayMetrics metrics, final float dp) {
 		return Math.round((dpToPixels(metrics, dp)));
 	}
 
@@ -39,7 +39,7 @@ public class DisplayMetricsUtils {
 	 * @param dp
 	 * @return
 	 */
-	public static float dpToPixels(@NonNull final Context context, final int dp) {
+	public static float dpToPixels(@NonNull final Context context, final float dp) {
 		return dpToPixels(context.getResources().getDisplayMetrics(), dp);
 	}
 
@@ -49,7 +49,7 @@ public class DisplayMetricsUtils {
 	 * @param dp
 	 * @return
 	 */
-	public static int dpToPixelsInt(@NonNull final Context context, final int dp) {
+	public static int dpToPixelsInt(@NonNull final Context context, final float dp) {
 		return dpToPixelsInt(context.getResources().getDisplayMetrics(), dp);
 	}
 
@@ -59,8 +59,8 @@ public class DisplayMetricsUtils {
 	 * @param pixels
 	 * @return
 	 */
-	public static int pixelsToDp(@NonNull final DisplayMetrics metrics, final float pixels) {
-		return Math.round(pixels / metrics.density + 0.5f);
+	public static float pixelsToDp(@NonNull final DisplayMetrics metrics, final float pixels) {
+		return pixels / metrics.density;
 	}
 
 	/**
@@ -69,7 +69,7 @@ public class DisplayMetricsUtils {
 	 * @param pixels
 	 * @return
 	 */
-	public static int pixelsToDp(@NonNull final Context context, final float pixels) {
+	public static float pixelsToDp(@NonNull final Context context, final float pixels) {
 		return pixelsToDp(context.getResources().getDisplayMetrics(), pixels);
 	}
 
@@ -80,7 +80,7 @@ public class DisplayMetricsUtils {
 	 * @param sp
 	 * @return
 	 */
-	public static float spToPixels(@NonNull final DisplayMetrics metrics, final int sp) {
+	public static float spToPixels(@NonNull final DisplayMetrics metrics, final float sp) {
 		return sp * metrics.scaledDensity;
 	}
 
@@ -90,7 +90,7 @@ public class DisplayMetricsUtils {
 	 * @param sp
 	 * @return
 	 */
-	public static int spToPixelsInt(@NonNull final DisplayMetrics metrics, final int sp) {
+	public static int spToPixelsInt(@NonNull final DisplayMetrics metrics, final float sp) {
 		return Math.round(spToPixels(metrics, sp));
 	}
 
@@ -100,7 +100,7 @@ public class DisplayMetricsUtils {
 	 * @param sp
 	 * @return
 	 */
-	public static float spToPixels(@NonNull final Context context, final int sp) {
+	public static float spToPixels(@NonNull final Context context, final float sp) {
 		return spToPixels(context.getResources().getDisplayMetrics(), sp);
 	}
 
@@ -110,7 +110,7 @@ public class DisplayMetricsUtils {
 	 * @param sp
 	 * @return
 	 */
-	public static int spToPixelsInt(@NonNull final Context context, final int sp) {
+	public static int spToPixelsInt(@NonNull final Context context, final float sp) {
 		return spToPixelsInt(context.getResources().getDisplayMetrics(), sp);
 	}
 
@@ -120,8 +120,8 @@ public class DisplayMetricsUtils {
 	 * @param pixels
 	 * @return
 	 */
-	public static int pixelsToSp(@NonNull final DisplayMetrics metrics, final float pixels) {
-		return Math.round(pixels / metrics.scaledDensity + 0.5f);
+	public static float pixelsToSp(@NonNull final DisplayMetrics metrics, final float pixels) {
+		return pixels / metrics.scaledDensity;
 	}
 
 	/**
@@ -130,7 +130,7 @@ public class DisplayMetricsUtils {
 	 * @param pixels
 	 * @return
 	 */
-	public static int pixelsToSp(@NonNull final Context context, final float pixels) {
+	public static float pixelsToSp(@NonNull final Context context, final float pixels) {
 		return pixelsToSp(context.getResources().getDisplayMetrics(), pixels);
 	}
 
