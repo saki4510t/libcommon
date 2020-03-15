@@ -30,14 +30,19 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StyleRes;
 import androidx.annotation.UiThread;
 
@@ -400,6 +405,70 @@ public class ViewUtils {
 				}
 			}
 		}
+		return result;
+	}
+
+
+//--------------------------------------------------------------------------------
+	@IdRes
+	private static final int[] ICON_IDS = {
+		R.id.thumbnail,
+		android.R.id.icon,
+		R.id.icon,
+		R.id.image,
+	};
+
+	@IdRes
+	private static final int[] TITLE_IDS = {
+		android.R.id.icon,
+		R.id.title,
+	};
+
+	/**
+	 * サムネイル・アイコン表示用にImageViewを探す
+	 * id = R.id.thumbnail, android.R.id.icon, R.id.icon, R.id.image
+	 * @param view
+	 * @return
+	 */
+	@Nullable
+	public static ImageView findIconView(@NonNull final View view) {
+		ImageView result = null;
+		if (view instanceof ImageView) {
+			result = (ImageView)view;
+		} else {
+			for (int i = 0; i < ICON_IDS.length; i++) {
+				final View v = view.findViewById(ICON_IDS[i]);
+				if (v instanceof ImageView) {
+					result = (ImageView)v;
+					break;
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * タイトル表示用にTextViewを探す
+	 * id = android.R.id.title, R.id.title
+	 * @param view
+	 * @return
+	 */
+	@Nullable
+	public static TextView findTitleView(@NonNull final View view) {
+		TextView result = null;
+		if (view instanceof TextView) {
+			result = (TextView)view;
+		} else {
+			for (int i = 0; i < TITLE_IDS.length; i++) {
+				final View v = view.findViewById(TITLE_IDS[i]);
+				if (v instanceof TextView) {
+					result = (TextView)v;
+					break;
+				}
+			}
+		}
+
 		return result;
 	}
 }

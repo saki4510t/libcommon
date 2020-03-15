@@ -43,6 +43,7 @@ import android.widget.TextView;
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
+import com.serenegiant.view.ViewUtils;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -127,18 +128,9 @@ public class MediaStoreAdapter extends CursorAdapter {
 		holder = (ViewHolder)view.getTag(R.id.mediastorephotoadapter);
 		if (holder == null) {
 			holder = new ViewHolder();
-			if (view instanceof ImageView) {
-				holder.mImageView = (ImageView)view;
-				view.setTag(R.id.mediastorephotoadapter, holder);
-			} else {
-				View v = view.findViewById(R.id.thumbnail);
-				if (v instanceof ImageView)
-					holder.mImageView = (ImageView)v;
-				v = view.findViewById(R.id.title);
-				if (v instanceof TextView)
-					holder.mTitleView = (TextView)v;
-				view.setTag(R.id.mediastorephotoadapter, holder);
-			}
+			holder.mImageView = ViewUtils.findIconView(view);
+			holder.mTitleView = ViewUtils.findTitleView(view);
+			view.setTag(R.id.mediastorephotoadapter, holder);
 		}
 		return holder;
 	}

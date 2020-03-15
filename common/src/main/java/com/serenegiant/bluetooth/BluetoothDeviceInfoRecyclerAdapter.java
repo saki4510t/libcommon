@@ -30,6 +30,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.ViewUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -174,7 +175,7 @@ public class BluetoothDeviceInfoRecyclerAdapter
 			mView = view;
 			nameTv = view.findViewById(R.id.name);
 			addressTv = view.findViewById(R.id.address);
-			icon = view.findViewById(R.id.icon);
+			icon = ViewUtils.findIconView(view);
 		}
 		
 	}

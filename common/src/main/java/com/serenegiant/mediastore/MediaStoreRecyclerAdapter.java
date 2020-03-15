@@ -39,6 +39,7 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.utils.ThreadPool;
+import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
 
@@ -583,16 +584,8 @@ public class MediaStoreRecyclerAdapter
 		public ViewHolder(@NonNull final View v) {
 			super(v);
 			v.setTag(R.id.info, info);
-			if (v instanceof TextView) {
-				mTitleView = (TextView)v;
-				mImageView = null;
-			} else if (v instanceof ImageView) {
-				mTitleView = null;
-				mImageView = (ImageView)v;
-			} else {
-				mTitleView = v.findViewById(R.id.title);
-				mImageView = v.findViewById(R.id.thumbnail);
-			}
+			mImageView = ViewUtils.findIconView(v);
+			mTitleView = ViewUtils.findTitleView(v);
 		}
 
 	}

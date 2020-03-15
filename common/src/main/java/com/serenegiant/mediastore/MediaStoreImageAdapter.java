@@ -40,9 +40,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
+import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
 
@@ -123,20 +123,20 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			if (holder == null) {
 				holder = new ViewHolder();
 			}
-			final TextView tv = holder.mTitleView = view.findViewById(R.id.title);
-			final ImageView iv = holder.mImageView = view.findViewById(R.id.thumbnail);
+			holder.mImageView = ViewUtils.findIconView(view);
+			holder.mTitleView = ViewUtils.findTitleView(view);
 			info.loadFromCursor(getCursor(position));
 			// ローカルキャッシュ
-			Drawable drawable = iv.getDrawable();
+			Drawable drawable = holder.mImageView.getDrawable();
 			if (!(drawable instanceof LoaderDrawable)) {
 				drawable = createLoaderDrawable(mCr, info);
-				iv.setImageDrawable(drawable);
+				holder.mImageView.setImageDrawable(drawable);
 			}
 			((LoaderDrawable)drawable).startLoad(info.mediaType, info.id);
-			if (tv != null) {
-				tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
+			if (holder.mTitleView != null) {
+				holder.mTitleView.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 				if (mShowTitle) {
-					tv.setText(info.title);
+					holder.mTitleView.setText(info.title);
 				}
 			}
 		}
