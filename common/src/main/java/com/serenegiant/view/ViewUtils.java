@@ -420,7 +420,7 @@ public class ViewUtils {
 
 	@IdRes
 	private static final int[] TITLE_IDS = {
-		android.R.id.icon,
+		android.R.id.title,
 		R.id.title,
 	};
 
