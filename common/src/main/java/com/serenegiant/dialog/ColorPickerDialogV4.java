@@ -55,9 +55,9 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	 * 色が変更されたときのコールバックリスナー
 	 */
 	public interface OnColorChangedListener {
-		void onColorChanged(ColorPickerDialogV4 dialog, int color);
-		void onCancel(ColorPickerDialogV4 dialog);
-		void onDismiss(ColorPickerDialogV4 dialog, int color);
+		public void onColorChanged(@NonNull final ColorPickerDialogV4 dialog, final int color);
+		public void onCancel(@NonNull final  ColorPickerDialogV4 dialog);
+		public void onDismiss(@NonNull final  ColorPickerDialogV4 dialog, final int color);
 	}
 
 	/**
