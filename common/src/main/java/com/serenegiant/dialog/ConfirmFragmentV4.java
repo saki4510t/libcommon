@@ -29,6 +29,7 @@ import android.util.Log;
 import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -42,6 +43,8 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 
 	private static final String ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE
 		= "ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE";
+	private static final String ARGS_KEY_MESSAGE_STRING
+		= "ARGS_KEY_MESSAGE_STRING";
 
 	/**
 	 * ダイアログの表示結果を受け取るためのコールバックリスナー
@@ -73,7 +76,29 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
 		final ConfirmFragmentV4 dialog
-			= newInstance(requestCode, id_title, id_message, canceledOnTouchOutside);
+			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
+		dialog.show(parent.getSupportFragmentManager(), TAG);
+		return dialog;
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * こっちはCharSequenceとしてメッセージ内容を指定
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param message
+	 * @param canceledOnTouchOutside
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmFragmentV4 showDialog(
+		@NonNull final FragmentActivity parent, final int requestCode,
+		@StringRes final int id_title, @NonNull final CharSequence message,
+		final boolean canceledOnTouchOutside) throws IllegalStateException {
+
+		final ConfirmFragmentV4 dialog
+			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
@@ -93,7 +118,30 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
 		final ConfirmFragmentV4 dialog
-			= newInstance(requestCode, id_title, id_message, canceledOnTouchOutside);
+			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
+		dialog.setTargetFragment(parent, parent.getId());
+		dialog.show(parent.getParentFragmentManager(), TAG);
+		return dialog;
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * こっちはCharSequenceとしてメッセージ内容を指定
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param message
+	 * @param canceledOnTouchOutside
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmFragmentV4 showDialog(
+		@NonNull final Fragment parent, final int requestCode,
+		@StringRes final int id_title, @NonNull final CharSequence message,
+		final boolean canceledOnTouchOutside) throws IllegalStateException {
+
+		final ConfirmFragmentV4 dialog
+			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
@@ -110,7 +158,7 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	public static ConfirmFragmentV4 newInstance(
 		final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
-		final boolean canceledOnTouchOutside) {
+		@Nullable final CharSequence message, final boolean canceledOnTouchOutside) {
 
 		final ConfirmFragmentV4 fragment = new ConfirmFragmentV4();
 		final Bundle args = new Bundle();
@@ -118,6 +166,7 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
 		args.putInt(ARGS_KEY_ID_TITLE, id_title);
 		args.putInt(ARGS_KEY_ID_MESSAGE, id_message);
+		args.putCharSequence(ARGS_KEY_MESSAGE_STRING, message);
 		args.putBoolean(ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE, canceledOnTouchOutside);
 		fragment.setArguments(args);
 		return fragment;
@@ -166,16 +215,20 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
 		final int id_title = args.getInt(ARGS_KEY_ID_TITLE);
 		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
+		final CharSequence message = args.getCharSequence(ARGS_KEY_MESSAGE_STRING);
 		final boolean canceledOnTouchOutside = args.getBoolean(ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE);
 
-		final Activity activity = requireActivity();
-		final AlertDialog dialog = new AlertDialog.Builder(activity, getTheme())
+		final AlertDialog.Builder builder = new AlertDialog.Builder(requireContext(), getTheme())
 			.setIcon(android.R.drawable.ic_dialog_alert)
 			.setTitle(id_title)
-			.setMessage(id_message)
 			.setPositiveButton(android.R.string.ok, mOnClickListener)
-			.setNegativeButton(android.R.string.cancel, mOnClickListener)
-			.create();
+			.setNegativeButton(android.R.string.cancel, mOnClickListener);
+		if (id_message != 0) {
+			builder.setMessage(id_message);
+		} else {
+			builder.setMessage(message);
+		}
+		final AlertDialog dialog = builder.create();
 		dialog.setCanceledOnTouchOutside(canceledOnTouchOutside);
 		return dialog;
 	}
