@@ -18,7 +18,6 @@ package com.serenegiant.dialog;
  *  limitations under the License.
 */
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
@@ -36,6 +35,7 @@ import androidx.fragment.app.FragmentActivity;
 
 /**
  * ユーザー確認用ダイアログ
+ * 表示要求するActivity/FragmentはConfirmDialogListenerを実装していないといけない
  */
 public class ConfirmFragmentV4 extends DialogFragmentEx {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
