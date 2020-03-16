@@ -37,10 +37,9 @@ import androidx.fragment.app.FragmentActivity;
  * ユーザー確認用ダイアログ
  * 表示要求するActivity/FragmentはConfirmDialogListenerを実装していないといけない
  */
-@Deprecated
-public class ConfirmFragmentV4 extends DialogFragmentEx {
+public class ConfirmDialogV4 extends DialogFragmentEx {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = ConfirmFragmentV4.class.getSimpleName();
+	private static final String TAG = ConfirmDialogV4.class.getSimpleName();
 
 	private static final String ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE
 		= "ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE";
@@ -58,7 +57,7 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		 * @param result DialogInterface#BUTTONxxx
 		 */
 		public void onConfirmResult(
-			@NonNull final ConfirmFragmentV4 dialog,
+			@NonNull final ConfirmDialogV4 dialog,
 			final int requestCode, final int result);
 	}
 
@@ -71,12 +70,12 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static ConfirmFragmentV4 showDialog(
+	public static ConfirmDialogV4 showDialog(
 		@NonNull final FragmentActivity parent, final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
-		final ConfirmFragmentV4 dialog
+		final ConfirmDialogV4 dialog
 			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
@@ -93,12 +92,12 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static ConfirmFragmentV4 showDialog(
+	public static ConfirmDialogV4 showDialog(
 		@NonNull final FragmentActivity parent, final int requestCode,
 		@StringRes final int id_title, @NonNull final CharSequence message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
-		final ConfirmFragmentV4 dialog
+		final ConfirmDialogV4 dialog
 			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
@@ -113,12 +112,12 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static ConfirmFragmentV4 showDialog(
+	public static ConfirmDialogV4 showDialog(
 		@NonNull final Fragment parent, final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
-		final ConfirmFragmentV4 dialog
+		final ConfirmDialogV4 dialog
 			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
@@ -136,12 +135,12 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static ConfirmFragmentV4 showDialog(
+	public static ConfirmDialogV4 showDialog(
 		@NonNull final Fragment parent, final int requestCode,
 		@StringRes final int id_title, @NonNull final CharSequence message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
-		final ConfirmFragmentV4 dialog
+		final ConfirmDialogV4 dialog
 			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
@@ -156,12 +155,12 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	 * @param id_message
 	 * @return
 	 */
-	public static ConfirmFragmentV4 newInstance(
+	public static ConfirmDialogV4 newInstance(
 		final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		@Nullable final CharSequence message, final boolean canceledOnTouchOutside) {
 
-		final ConfirmFragmentV4 fragment = new ConfirmFragmentV4();
+		final ConfirmDialogV4 fragment = new ConfirmDialogV4();
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
@@ -178,7 +177,7 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 	/**
 	 * コンストラクタ, 直接生成せずに#newInstanceを使うこと
 	 */
-	public ConfirmFragmentV4() {
+	public ConfirmDialogV4() {
 		super();
 		// デフォルトコンストラクタが必要
 	}
@@ -261,7 +260,7 @@ public class ConfirmFragmentV4 extends DialogFragmentEx {
 		final int requestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
 		try {
 			mListener.onConfirmResult(
-				ConfirmFragmentV4.this, requestCode, result);
+				ConfirmDialogV4.this, requestCode, result);
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
