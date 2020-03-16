@@ -46,6 +46,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 
 	private static final int DEFAULT_COLOR = 0xffffffff;
 	private OnColorChangedListener mListener;
+	private int mRequestCode;
 	private int mTitleResId;
 	private int mInitialColor = DEFAULT_COLOR;
 	private int mCurrentColor = DEFAULT_COLOR;
@@ -55,23 +56,31 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	 * 色が変更されたときのコールバックリスナー
 	 */
 	public interface OnColorChangedListener {
-		public void onColorChanged(@NonNull final ColorPickerDialogV4 dialog, final int color);
-		public void onCancel(@NonNull final  ColorPickerDialogV4 dialog);
-		public void onDismiss(@NonNull final  ColorPickerDialogV4 dialog, final int color);
+		public void onColorChanged(
+			@NonNull final ColorPickerDialogV4 dialog,
+			final int requestCode, final int color);
+		public void onCancel(
+			@NonNull final  ColorPickerDialogV4 dialog,
+			final int requestCode);
+		public void onDismiss(
+			@NonNull final  ColorPickerDialogV4 dialog,
+			final int requestCode, final int color);
 	}
 
 	/**
 	 * ダイアログ表示のためのヘルパーメソッド
 	 * @param parent
+	 * @param requestCode
 	 * @param titleResId
 	 * @param initialColor
 	 * @return
 	 */
 	public static ColorPickerDialogV4 show(
 		@NonNull final FragmentActivity parent,
+		final int requestCode,
 		@StringRes final int titleResId, final int initialColor) {
 
-		final ColorPickerDialogV4 dialog = newInstance(titleResId, initialColor);
+		final ColorPickerDialogV4 dialog = newInstance(requestCode, titleResId, initialColor);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
@@ -79,15 +88,17 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 	/**
 	 * ダイアログ表示のためのヘルパーメソッド
 	 * @param parent
+	 * @param requestCode
 	 * @param titleResId
 	 * @param initialColor
 	 * @return
 	 */
 	public static ColorPickerDialogV4 show(
 		@NonNull final Fragment parent,
+		final int requestCode,
 		@StringRes final int titleResId, final int initialColor) {
 	
-		final ColorPickerDialogV4 dialog = newInstance(titleResId, initialColor);
+		final ColorPickerDialogV4 dialog = newInstance(requestCode, titleResId, initialColor);
 		dialog.setTargetFragment(parent, 0);
 		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
@@ -95,15 +106,17 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 
 	/**
 	 * フラグメント生成のためのヘルパーメソッド
+	 * @param requestCode
 	 * @param titleResId
 	 * @param initialColor
 	 * @return
 	 */
 	public static ColorPickerDialogV4 newInstance(
+		final int requestCode,
 		@StringRes final int titleResId, final int initialColor) {
 	
 		final ColorPickerDialogV4 dialog = new ColorPickerDialogV4();
-		dialog.setArguments(titleResId, initialColor);
+		dialog.setArguments(requestCode, titleResId, initialColor);
 		return dialog;
 	}
 
@@ -115,11 +128,14 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		// デフォルトコンストラクタが必要
 	}
 
-	public void setArguments(@StringRes final int titleResId, final int initialColor) {
+	public void setArguments(final int requestCode,
+		@StringRes final int titleResId, final int initialColor) {
+
 		Bundle args = getArguments();
 		if (args == null) {
 			args = new Bundle();
 		}
+		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
 		args.putInt(ARGS_KEY_ID_TITLE, titleResId);
 		args.putInt(KEY_COLOR_INIT, initialColor);
 		args.remove(KEY_COLOR_CURRENT);
@@ -134,6 +150,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		// システムに破棄されたのが自動生成した時は
 		// onSaveInstanceStateで保存した値が入ったBundleオブジェクトが入っている
 		final Bundle args = requireArguments();
+		mRequestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
 		mTitleResId = args.getInt(ARGS_KEY_ID_TITLE);
 		mCurrentColor = mInitialColor = args.getInt(KEY_COLOR_INIT, DEFAULT_COLOR);
 		if (savedInstanceState != null) {
@@ -228,10 +245,10 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		if (mListener != null) {
 			if (isCanceled) {
 				if (DEBUG) Log.v(TAG, "call #onCancel:");
-				mListener.onCancel(this);
+				mListener.onCancel(this, mRequestCode);
 			} else {
 				if (DEBUG) Log.v(TAG, "call #nDismiss:");
-				mListener.onDismiss(this, mCurrentColor);
+				mListener.onDismiss(this, mRequestCode, mCurrentColor);
 			}
 		}
 	}
@@ -242,7 +259,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 			if (mCurrentColor != color) {
 				mCurrentColor = color;
 				if (mListener != null) {
-					mListener.onColorChanged(ColorPickerDialogV4.this, color);
+					mListener.onColorChanged(ColorPickerDialogV4.this, mRequestCode, color);
 				}
 			}
 		}
