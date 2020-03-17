@@ -240,19 +240,19 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 		return add(x, y, 0.0f);
 	}
 
-	/**
-	 * ベクトルを加算 v = v + (x,y,z)
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @return
-	 */
-	public Vector add(final float x, final float y, final float z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
-		return this;
-	}
+//	/**
+//	 * ベクトルを加算 v = v + (x,y,z)
+//	 * @param x
+//	 * @param y
+//	 * @param z
+//	 * @return
+//	 */
+//	public Vector add(final float x, final float y, final float z) {
+//		this.x += x;
+//		this.y += y;
+//		this.z += z;
+//		return this;
+//	}
 
 	/**
 	 * ベクトルを加算 v = v + (x,y,z)
@@ -262,26 +262,26 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector add(final double x, final double y, final double z) {
-		this.x += x;
-		this.y += y;
-		this.z += z;
+		this.x = (float)(this.x + x);
+		this.y = (float)(this.y + y);
+		this.z = (float)(this.z + z);
 		return this;
 	}
 
-	/**
-	 * ベクトルを加算(スケール変換有り)v = v + (x,y,z)*a
-	 * @param x
-	 * @param y
-	 * @param z
-	 * @param a
-	 * @return
-	 */
-	public Vector add(final float x, final float y, final float z, final float a) {
-		this.x += x * a;
-		this.y += y * a;
-		this.z += z * a;
-		return this;
-	}
+//	/**
+//	 * ベクトルを加算(スケール変換有り)v = v + (x,y,z)*a
+//	 * @param x
+//	 * @param y
+//	 * @param z
+//	 * @param a
+//	 * @return
+//	 */
+//	public Vector add(final float x, final float y, final float z, final float a) {
+//		this.x += x * a;
+//		this.y += y * a;
+//		this.z += z * a;
+//		return this;
+//	}
 
 	/**
 	 * ベクトルを加算(スケール変換有り)v = v + (x,y,z)*a
@@ -292,9 +292,9 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public Vector add(final double x, final double y, final double z, final double a) {
-		this.x += x * a;
-		this.y += y * a;
-		this.z += z * a;
+		this.x = (float)(this.x + x * a);
+		this.y = (float)(this.y + y * a);
+		this.z = (float)(this.z + z * a);
 		return this;
 	}
 
@@ -774,7 +774,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float lenSquared() {
-		return x * x + y * y + z * z;
+		return (float)(x * (double)x + y * (double)y + z * (double)z);
 	}
 
 	/**
@@ -799,7 +799,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dot2D(@NonNull final Vector v) {
-		return x * v.x + y * v.y;
+		return (float)(x * (double)v.x + y * (double)v.y);
 	}
 
 	/**
@@ -809,7 +809,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dotProduct2D(@NonNull final Vector v) {
-		return x * v.x + y * v.y;
+		return (float)(x * (double)v.x + y * (double)v.y);
 	}
 
 	/**
@@ -820,7 +820,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dot2D(final float x, final float y, final float z) {
-		return this.x * x + this.y * y;
+		return (float)(this.x * (double)x + this.y * (double)y);
 	}
 
 	/**
@@ -831,7 +831,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dotProduct2D(final float x, final float y, final float z) {
-		return this.x * x + this.y * y;
+		return (float)(this.x * (double)x + this.y * (double)y);
 	}
 
 	/**
@@ -862,7 +862,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dot(final float x, final float y, final float z) {
-		return this.x * x + this.y * y + this.z * z;
+		return (float)(this.x * (double)x + this.y * (double)y + this.z * (double)z);
 	}
 
 	/**
@@ -873,7 +873,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float dotProduct(final float x, final float y, final float z) {
-		return this.x * x + this.y * y + this.z * z;
+		return (float)(this.x * (double)x + this.y * (double)y + this.z * (double)z);
 	}
 
 	/**
@@ -883,7 +883,17 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public static float dot(@NonNull final Vector v0, @NonNull final Vector v1) {
-		return v0.x * v1.x + v0.y * v1.y + v0.z * v1.z;
+		return (float)(v0.x * (double)v1.x + v0.y * (double)v1.y + v0.z * (double)v1.z);
+	}
+
+	/**
+	 * ベクトルの内積を計算(doubleを返す)
+	 * @param v0
+	 * @param v1
+	 * @return
+	 */
+	public static double dotDouble(@NonNull final Vector v0, @NonNull final Vector v1) {
+		return v0.x * (double)v1.x + v0.y * (double)v1.y + v0.z * (double)v1.z;
 	}
 
 	/**
@@ -893,7 +903,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float cross2D(@NonNull final Vector v) {
-		return x * v.y - v.x * y;
+		return (float)((double)x * v.y - v.x * (double)y);
 	}
 
 	/**
@@ -903,7 +913,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float crossProduct2D(@NonNull final Vector v) {
-		return x * v.y - v.x * y;
+		return (float)((double)x * v.y - v.x * (double)y);
 	}
 
 	/**
@@ -951,9 +961,9 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	public static Vector crossProduct(@Nullable final Vector result,
 		@NonNull final Vector v1, @NonNull final Vector v2) {
 
-		final float x3 = v1.y * v2.z - v1.z * v2.y;
-		final float y3 = v1.z * v2.x - v1.x * v2.z;
-		final float z3 = v1.x * v2.y - v1.y * v2.x;
+		final float x3 = (float)(v1.y * (double)v2.z - v1.z * (double)v2.y);
+		final float y3 = (float)(v1.z * (double)v2.x - v1.x * (double)v2.z);
+		final float z3 = (float)(v1.x * (double)v2.y - v1.y * (double)v2.x);
 		return result != null ? result.set(x3, y3, z3) : new Vector(x3, y3, z3);
 	}
 
@@ -1015,7 +1025,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return 角度[度]
 	 */
 	public float angle(@NonNull final Vector v) {
-		final double cos = dot(this, v)
+		final double cos = dotDouble(this, v)
 			/ (Math.sqrt(lenSquared()) * Math.sqrt(v.lenSquared()));
 		return (float) (Math.acos(cos) * TO_DEGREE);
 	}
@@ -1302,7 +1312,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float distance(final float px, final float py, final float pz) {
-		return (float) Math.sqrt(distSquared(px, py, pz));
+		return (float) Math.sqrt(distSquaredDouble(px, py, pz));
 	}
 
 	/**
@@ -1332,9 +1342,24 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 * @return
 	 */
 	public float distSquared(final float px, final float py, final float pz) {
-		final float dx = this.x - px;
-		final float dy = this.y - py;
-		final float dz = this.z - pz;
+		final double dx = this.x - (double)px;
+		final double dy = this.y - (double)py;
+		final double dz = this.z - (double)pz;
+		return (float)(dx * dx + dy * dy + dz * dz);
+	}
+
+	/**
+	 * この位置ベクトルと引数が示す座標間の距離の2乗を取得する
+	 * doubleで返す
+	 * @param px
+	 * @param py
+	 * @param pz
+	 * @return
+	 */
+	public double distSquaredDouble(final float px, final float py, final float pz) {
+		final double dx = this.x - (double)px;
+		final double dy = this.y - (double)py;
+		final double dz = this.z - (double)pz;
 		return dx * dx + dy * dy + dz * dz;
 	}
 
@@ -1393,7 +1418,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	public float slope2D() {
 		if (x != 0) {
-			return y / x;
+			return (float)(y / (double)x);
 		} else {
 			return y >= 0 ? Float.MAX_VALUE : Float.MIN_VALUE;
 		}
