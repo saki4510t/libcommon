@@ -64,7 +64,7 @@ public abstract class AbstractDistributeTask {
 	private int mRotation = 0;
 	private volatile boolean isFirstFrameRendered;
 	private volatile boolean mHasNewFrame;
-
+	private volatile boolean mReleased;
 	protected GLDrawer2D mDrawer;
 
 	/**
@@ -80,6 +80,7 @@ public abstract class AbstractDistributeTask {
 		mVideoWidth = width > 0 ? width : 640;
 		mVideoHeight = height > 0 ? height : 480;
 		mEnableVSync = enableVSync;
+		mReleased = false;
 		if (enableVSync) {
 			mChoreographerHandler = HandlerThreadHandler.createHandler(TAG);
 		} else {
@@ -90,8 +91,19 @@ public abstract class AbstractDistributeTask {
 	/**
 	 * 関連するリソースを破棄する
 	 */
-	public void release() {
+	public synchronized void release() {
 		if (DEBUG) Log.v(TAG, "release:");
+		if (!mReleased) {
+			mReleased = true;
+			if (mChoreographerHandler != null) {
+				try {
+					mChoreographerHandler.removeCallbacksAndMessages(null);
+					mChoreographerHandler.getLooper().quit();
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			}
+		}
 	}
 
 	/**
@@ -332,7 +344,7 @@ public abstract class AbstractDistributeTask {
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			offer(REQUEST_DRAW, 0, 0, null);
-			if (isRunning()) {
+			if (!mReleased && isRunning()) {
 				Choreographer.getInstance().postFrameCallback(this);
 			}
 		}
