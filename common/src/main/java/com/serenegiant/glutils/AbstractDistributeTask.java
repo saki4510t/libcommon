@@ -523,6 +523,7 @@ public abstract class AbstractDistributeTask {
 					try {
 						onDrawTarget(target, texId, texMatrix);
 					} catch (final Exception e) {
+						if (DEBUG) Log.w(TAG, e);
 						// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
 						mTargets.removeAt(i);
 						target.release();
