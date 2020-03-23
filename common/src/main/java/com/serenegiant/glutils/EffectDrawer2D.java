@@ -255,11 +255,6 @@ public class EffectDrawer2D {
 
 	/**
 	 * テクスチャ変換行列をセット
-	 * @param tex_matrix
-	 * @param offset
-	 */
-	/**
-	 * テクスチャ変換行列をセット
 	 * @param texMatrix
 	 * @param offset
 	 */
