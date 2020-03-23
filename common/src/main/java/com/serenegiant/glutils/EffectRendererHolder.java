@@ -36,6 +36,7 @@ import static com.serenegiant.glutils.GLEffect.*;
  * RendererHolderにフラグメントシェーダーでのフィルター処理を追加
  * ...カラーマトリックスを掛けるほうがいいかなぁ
  * ...色はuniform変数で渡す方がいいかも
+ * FIXME EffectDrawer2Dを使うように変更する
  */
 public class EffectRendererHolder extends AbstractRendererHolder {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
