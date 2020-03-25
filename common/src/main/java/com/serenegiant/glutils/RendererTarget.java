@@ -150,7 +150,7 @@ public class RendererTarget implements IRendererTarget {
 	 * @param texMatrix
 	 * @param mvpMatrix
 	 */
-	protected void doDraw(final GLDrawer2D drawer,
+	protected static void doDraw(final GLDrawer2D drawer,
 		final int textId, final float[] texMatrix,
 		final float[] mvpMatrix) {
 
