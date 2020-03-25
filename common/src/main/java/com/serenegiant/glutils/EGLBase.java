@@ -18,9 +18,11 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -41,6 +43,48 @@ public abstract class EGLBase implements EGLConst {
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
 //--------------------------------------------------------------------------------
+	/**
+	 * EGLレンダリングコンテキストラップしてIContextを生成する
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static IContext wrapContext(@NonNull final Object context) {
+		if (context instanceof IContext) {
+			return (IContext)context;
+		} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+			&& (context instanceof android.opengl.EGLContext)) {
+
+			return EGLBase14.wrap((android.opengl.EGLContext)context);
+
+		} else if (context instanceof javax.microedition.khronos.egl.EGLContext) {
+			return EGLBase10.wrap((javax.microedition.khronos.egl.EGLContext)context);
+		} else if (context == null) {
+			return null;
+		} else {
+			throw new IllegalArgumentException("Unexpected shared context," + context);
+		}
+	}
+
+	/**
+	 * EGLConfigをラップしてIConfigを返す
+	 * @param eglConfig
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static IConfig wrapConfig(@NonNull final Object eglConfig) {
+		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+			&& (eglConfig instanceof android.opengl.EGLConfig)) {
+
+			return EGLBase14.wrap((android.opengl.EGLConfig)eglConfig);
+
+		} else if (eglConfig instanceof javax.microedition.khronos.egl.EGLConfig) {
+			return EGLBase10.wrap((javax.microedition.khronos.egl.EGLConfig)eglConfig);
+		} else {
+			throw new IllegalArgumentException("Unexpected egl config," + eglConfig);
+		}
+	}
+
 	/**
 	 * EGL生成のヘルパーメソッド, 環境に応じてEGLBase10またはEGLBase14を生成する
 	 * maxClientVersion=3, ステンシルバッファなし
@@ -95,6 +139,24 @@ public abstract class EGLBase implements EGLConst {
 				(EGLBase10.Context)sharedContext,
 				withDepthBuffer, stencilBits, isRecordable);
 		}
+	}
+
+	/**
+	 * EGL生成のヘルパーメソッド
+	 * @param maxClientVersion
+	 * @param sharedContext
+	 * @param withDepthBuffer trueなら16ビットのデプスバッファ有り, falseならデプスバッファなし
+	 * @param stencilBits 0以下ならステンシルバッファなし
+	 * @param isRecordable
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static EGLBase createFrom(final int maxClientVersion,
+		@Nullable final Object sharedContext, final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
+
+		return createFrom(maxClientVersion, wrapContext(sharedContext),
+			withDepthBuffer, stencilBits, isRecordable);
 	}
 
 	/**

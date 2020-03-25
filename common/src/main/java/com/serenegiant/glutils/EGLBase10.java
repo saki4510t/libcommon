@@ -44,17 +44,27 @@ import com.serenegiant.system.BuildCheck;
 	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = EGLBase10.class.getSimpleName();
 
-	private static final Context EGL_NO_CONTEXT = new Context(EGL10.EGL_NO_CONTEXT);
+	private static final Context EGL_NO_CONTEXT = wrap(EGL10.EGL_NO_CONTEXT);
 
-	@NonNull
-	private Context mContext = EGL_NO_CONTEXT;
-    private EGL10 mEgl = null;
-    @NonNull
-	private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
-    private Config mEglConfig = null;
-    private int mGlVersion = 2;
+	/**
+	 * EGLレンダリングコンテキストラップしてContext extends IContextを生成する
+	 * @param context
+	 * @return
+	 */
+	public static Context wrap(@NonNull final EGLContext context) {
+		return new Context(context);
+	}
 
+	/**
+	 * EGLConfigをラップしてConfig extends IConfigを返す
+	 * @param eglConfig
+	 * @return
+	 */
+	public static Config wrap(@NonNull final EGLConfig eglConfig) {
+		return new Config(eglConfig);
+	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
@@ -272,12 +282,20 @@ import com.serenegiant.system.BuildCheck;
 		final EGLContext currentContext = egl10.eglGetCurrentContext();
 		final EGLSurface currentSurface = egl10.eglGetCurrentSurface(EGL10.EGL_DRAW);
 		if ((currentContext != null) && (currentSurface != null)) {
-			context = new Context(currentContext);
+			context = wrap(currentContext);
 		}
 		return new EGLBase10(maxClientVersion, context, withDepthBuffer, stencilBits, isRecordable);
 	}
 
 //--------------------------------------------------------------------------------
+	@NonNull
+	private Context mContext = EGL_NO_CONTEXT;
+	private EGL10 mEgl = null;
+	@NonNull
+	private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
+	private Config mEglConfig = null;
+	private int mGlVersion = 2;
+
 	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
@@ -308,7 +326,7 @@ import com.serenegiant.system.BuildCheck;
 
 		super();
 //		if (DEBUG) Log.v(TAG, "Constructor:");
-		init(maxClientVersion, new Context(((EGL10) EGLContext.getEGL()).eglGetCurrentContext()),
+		init(maxClientVersion, wrap(((EGL10) EGLContext.getEGL()).eglGetCurrentContext()),
 			withDepthBuffer, stencilBits, isRecordable);
 	}
 
@@ -502,8 +520,8 @@ import com.serenegiant.system.BuildCheck;
 				if (mEgl.eglGetError() == EGL10.EGL_SUCCESS) {
 					// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
 					//Log.d(TAG, "Got GLES 3 config");
-					mEglConfig = new Config(config);
-					mContext = new Context(context);
+					mEglConfig = wrap(config);
+					mContext = wrap(context);
 					mGlVersion = 3;
 				}
 			}
@@ -520,8 +538,8 @@ import com.serenegiant.system.BuildCheck;
 				// create EGL rendering context
 				final EGLContext context = createContext(sharedContext, config, 2);
 				checkEglError("eglCreateContext");
-				mEglConfig = new Config(config);
-				mContext = new Context(context);
+				mEglConfig = wrap(config);
+				mContext = wrap(context);
 				mGlVersion = 2;
 			} catch (final Exception e) {
 				if (isRecordable) {
@@ -532,8 +550,8 @@ import com.serenegiant.system.BuildCheck;
 					// create EGL rendering context
 					final EGLContext context = createContext(sharedContext, config, 2);
 					checkEglError("eglCreateContext");
-					mEglConfig = new Config(config);
-					mContext = new Context(context);
+					mEglConfig = wrap(config);
+					mContext = wrap(context);
 					mGlVersion = 2;
 				}
 			}
@@ -546,8 +564,8 @@ import com.serenegiant.system.BuildCheck;
 			// create EGL rendering context
 			final EGLContext context = createContext(sharedContext, config, 1);
 			checkEglError("eglCreateContext");
-			mEglConfig = new Config(config);
-			mContext = new Context(context);
+			mEglConfig = wrap(config);
+			mContext = wrap(context);
 			mGlVersion = 1;
 		}
         // confirm whether the EGL rendering context is successfully created
