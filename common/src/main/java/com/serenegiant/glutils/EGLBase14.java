@@ -89,6 +89,14 @@ import com.serenegiant.system.BuildCheck;
 		public Object getEGLContext() {
 			return eglContext;
 		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Context{" +
+				"eglContext=" + eglContext +
+				'}';
+		}
 	} // Context
 
 	public static class Config extends IConfig {
@@ -101,6 +109,14 @@ import com.serenegiant.system.BuildCheck;
 		@Override
 		public EGLConfig getEGLConfig() {
 			return eglConfig;
+		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Config{" +
+				"eglConfig=" + eglConfig +
+				'}';
 		}
 	} // Config
 
@@ -115,6 +131,13 @@ import com.serenegiant.system.BuildCheck;
 		private boolean mOwnSurface;
 		private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
+		/**
+		 * Surface(Surface/SurfaceTexture/SurfaceHolder/SurfaceView)に
+		 * 関係付けられたEglSurfaceを生成するコンストラクタ
+		 * @param eglBase
+		 * @param surface
+		 * @throws IllegalArgumentException
+		 */
 		private EglSurface(@NonNull final EGLBase14 eglBase, final Object surface)
 			throws IllegalArgumentException {
 
@@ -237,6 +260,19 @@ import com.serenegiant.system.BuildCheck;
 			return mEglBase.getSurfaceHeight(mEglSurface);
 		}
 
+		@NonNull
+		@Override
+		public String toString() {
+			return "EglSurface{" +
+				"mEglBase=" + mEglBase +
+				", mEglSurface=" + mEglSurface +
+				", mOwnSurface=" + mOwnSurface +
+				", viewPortX=" + viewPortX +
+				", viewPortY=" + viewPortY +
+				", viewPortWidth=" + viewPortWidth +
+				", viewPortHeight=" + viewPortHeight +
+				'}';
+		}
 	} // EglSurface
 
 //--------------------------------------------------------------------------------
