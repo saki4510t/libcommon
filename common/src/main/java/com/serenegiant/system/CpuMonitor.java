@@ -11,7 +11,6 @@
 package com.serenegiant.system;
 
 import android.util.Log;
-import android.util.SparseIntArray;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -71,23 +70,7 @@ public final class CpuMonitor {
 	private static final String TAG = "CpuMonitor";
 	private static final int SAMPLE_SAVE_NUMBER = 10;  // Assumed to be >= 3.
 
-	private int[] percentVec = new int[SAMPLE_SAVE_NUMBER];
-	private int sum3 = 0;
-	private int sum10 = 0;
-	private long[] cpuFreq;
-	private int cpusPresent;
-	private double lastPercentFreq = -1;
-	private int cpuCurrent;
-	private int cpuAvg3;
-	private int cpuAvgAll;
-	private boolean initialized = false;
-	private String[] maxPath;
-	private String[] curPath;
-	private final ProcStat lastProcStat = new ProcStat(0L, 0L);
-	private final Map<String, Integer> mCpuTemps = new HashMap<String, Integer>();
-	private int mTempNum = 0;
-	private float tempAve = 0;
-
+//--------------------------------------------------------------------------------
 	private static final class ProcStat {
 		private long runTime;
 		private long idleTime;
@@ -107,6 +90,24 @@ public final class CpuMonitor {
 			idleTime = other.idleTime;
 		}
 	}
+
+//--------------------------------------------------------------------------------
+	private int[] percentVec = new int[SAMPLE_SAVE_NUMBER];
+	private int sum3 = 0;
+	private int sum10 = 0;
+	private long[] cpuFreq;
+	private int cpusPresent;
+	private double lastPercentFreq = -1;
+	private int cpuCurrent;
+	private int cpuAvg3;
+	private int cpuAvgAll;
+	private boolean initialized = false;
+	private String[] maxPath;
+	private String[] curPath;
+	private final ProcStat lastProcStat = new ProcStat(0L, 0L);
+	private final Map<String, Integer> mCpuTemps = new HashMap<String, Integer>();
+	private int mTempNum = 0;
+	private float tempAve = 0;
 
 	private void init() {
 		try {
