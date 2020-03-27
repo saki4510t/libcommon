@@ -187,6 +187,7 @@ public class RendererTarget implements IRendererTarget {
 	public void makeCurrent() throws IllegalStateException {
 		check();
 		mTargetSurface.makeCurrent();
+		mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
 	}
 
 	/**
