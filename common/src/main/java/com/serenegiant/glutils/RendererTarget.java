@@ -123,6 +123,16 @@ public class RendererTarget implements IRendererTarget {
 		return mMvpMatrix;
 	}
 
+	@Override
+	public int width() {
+		return mTargetSurface != null ? mTargetSurface.getWidth() : 0;
+	}
+
+	@Override
+	public int height() {
+		return mTargetSurface != null ? mTargetSurface.getHeight() : 0;
+	}
+
 	/**
 	 * このRendererTargetが保持する描画先(Surface等)へIDrawer2Dを使って指定したテクスチャを描画する
 	 * @param drawer

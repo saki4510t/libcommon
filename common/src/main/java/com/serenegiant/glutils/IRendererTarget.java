@@ -29,4 +29,6 @@ public interface IRendererTarget {
 	public void makeCurrent() throws IllegalStateException;
 	public void swap() throws IllegalStateException;
 	public float[] getMvpMatrix();
+	public int width();
+	public int height();
 }
