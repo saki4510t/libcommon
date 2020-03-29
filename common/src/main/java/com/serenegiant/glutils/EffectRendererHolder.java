@@ -38,7 +38,9 @@ import static com.serenegiant.glutils.GLEffect.*;
  * ...色はuniform変数で渡す方がいいかも
  * FIXME EffectDrawer2Dを使うように変更する
  */
-public class EffectRendererHolder extends AbstractRendererHolder {
+public class EffectRendererHolder extends AbstractRendererHolder
+	implements IEffectRendererHolder {
+
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = EffectRendererHolder.class.getSimpleName();
 
@@ -128,39 +130,47 @@ public class EffectRendererHolder extends AbstractRendererHolder {
 //================================================================================
 	
 	/**
+	 * IEffectRendererHolderの実装
 	 * 映像効果をセット
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
 	 */
+	@Override
 	public void changeEffect(final int effect) {
 		((MyRendererTask)mRendererTask).changeEffect(effect);
 	}
 	
 	/**
+	 * IEffectRendererHolderの実装
 	 * 現在の映像効果番号を取得
 	 * @return
 	 */
+	@Override
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + ((MyRendererTask)mRendererTask).mEffect);
 		return ((MyRendererTask)mRendererTask).mEffect;
 	}
 
 	/**
+	 * IEffectRendererHolderの実装
 	 * 現在選択中の映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param params
 	 */
+	@Override
 	public void setParams(@NonNull final float[] params) {
 		((MyRendererTask)mRendererTask).setParams(-1, params);
 	}
 
 	/**
+	 * IEffectRendererHolderの実装
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param effect EFFECT_NONより大きいこと
 	 * @param params
 	 * @throws IllegalArgumentException effectが範囲外ならIllegalArgumentException生成
 	 */
+	@Override
 	public void setParams(final int effect, @NonNull final float[] params)
 		throws IllegalArgumentException {
 
