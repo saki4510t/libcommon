@@ -575,9 +575,13 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * 最大拡大率を設定
 	 * @param maxScale
 	 */
-	public void setMaxScale(final float maxScale) {
+	public void setMaxScale(final float maxScale)
+		throws IllegalArgumentException {
+
 		if (DEBUG) Log.v(TAG, "setMaxScale:" + maxScale);
-		if ((mMinScale > maxScale) || (maxScale <= 0)) return;
+		if ((mMinScale > maxScale) || (maxScale <= 0)) {
+			throw new IllegalArgumentException();
+		}
 		if (mMaxScale != maxScale) {
 			mMaxScale = maxScale;
 			checkScale();
@@ -596,9 +600,13 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * 最小縮小率を設定
 	 * @param minScale
 	 */
-	public void setMinScale(final float minScale) {
+	public void setMinScale(final float minScale)
+		throws IllegalArgumentException {
+
 		if (DEBUG) Log.v(TAG, "setMinScale:" + minScale);
-		if ((mMaxScale < minScale) || (minScale <= 0)) return;
+		if ((mMaxScale < minScale) || (minScale <= 0)) {
+			throw new IllegalArgumentException();
+		}
 		if (mMinScale != minScale) {
 			mMinScale = minScale;
 			checkScale();

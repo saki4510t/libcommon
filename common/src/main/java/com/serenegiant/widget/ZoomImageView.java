@@ -328,7 +328,9 @@ public class ZoomImageView extends TransformImageView
 	 * 最大拡大率を設定
 	 * @param maxScale
 	 */
-	public void setMaxScale(final float maxScale) {
+	public void setMaxScale(final float maxScale)
+		throws IllegalArgumentException {
+
 		mDelegater.setMaxScale(maxScale);
 	}
 
@@ -344,7 +346,9 @@ public class ZoomImageView extends TransformImageView
 	 * 最小縮小率を設定
 	 * @param minScale
 	 */
-	public void setMinScale(final float minScale) {
+	public void setMinScale(final float minScale)
+		throws IllegalArgumentException {
+
 		mDelegater.setMinScale(minScale);
 	}
 
