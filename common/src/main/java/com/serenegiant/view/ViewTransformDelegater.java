@@ -538,6 +538,22 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
+	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
+	 * @param listener
+	 */
+	public void setOnStartRotationListener(@Nullable final ViewTransformListener listener) {
+		mViewTransformListener = listener;
+	}
+
+	/**
+	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
+	 * @return
+	 */
+	public ViewTransformListener getOnStartRotationListener() {
+		return mViewTransformListener;
+	}
+
+	/**
 	 * タッチ操作の有効無効設定
 	 * @param enabled
 	 */
@@ -598,19 +614,19 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
-	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
-	 * @param listener
-	 */
-	public void setOnStartRotationListener(@Nullable final ViewTransformListener listener) {
-		mViewTransformListener = listener;
-	}
-
-	/**
-	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
+	 * 拡大縮小率を相対値で設定
+	 * @param scaleRelative
 	 * @return
 	 */
-	public ViewTransformListener getOnStartRotationListener() {
-		return mViewTransformListener;
+	public ViewTransformDelegater setScaleRelative(final float scaleRelative) {
+		float scale = getScale() + scaleRelative;
+		if (scale < mMinScale) {
+			scale = mMinScale;
+		} else if (scale > mMaxScale) {
+			scale = mMaxScale;
+		}
+		setScale(scale);
+		return this;
 	}
 
 	/**

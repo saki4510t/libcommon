@@ -384,6 +384,22 @@ public class ZoomImageView extends TransformImageView
 	}
 
 	/**
+	 * 拡大縮小率を設定
+	 * @param scale
+	 */
+	public void setScale(final float scale) {
+		mDelegater.setScale(scale);
+	}
+
+	/**
+	 * 拡大縮小率を相対値で設定
+	 * @param scaleDelta
+	 */
+	public void setScaleRelative(final float scaleDelta) {
+		mDelegater.setScaleRelative(scaleDelta);
+	}
+
+	/**
 	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
 	 * @param result
 	 * @return
