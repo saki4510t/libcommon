@@ -25,16 +25,16 @@ import android.graphics.Matrix
 import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.mediastore.ImageLoader
 import com.serenegiant.mediastore.LoaderDrawable
 import com.serenegiant.mediastore.MediaInfo
+import com.serenegiant.view.MotionEventUtils
 import com.serenegiant.view.ViewTransformDelegater
 import com.serenegiant.widget.ZoomImageView
 import java.io.IOException
+import kotlin.math.sign
 
 /**
  * 静止画表示用のFragment
@@ -101,6 +101,29 @@ class ImageFragment: BaseFragment() {
 			}
 			override fun onTransformed(view: View, transform: Matrix) {
 				if (DEBUG) Log.v(TAG, "onTransformed:${transform}")
+			}
+		})
+		mImageView!!.setOnGenericMotionListener(object : View.OnGenericMotionListener {
+			override fun onGenericMotion(v: View?, event: MotionEvent?): Boolean {
+				if (MotionEventUtils.isFromSource(event!!, InputDevice.SOURCE_CLASS_POINTER)) {
+					when (event.getAction()) {
+					MotionEvent.ACTION_HOVER_MOVE -> {
+						if (DEBUG) Log.v(TAG, "onGenericMotion:ACTION_HOVER_MOVE")
+						// process the mouse hover movement...
+						return true;
+					}
+					MotionEvent.ACTION_SCROLL -> {
+						if (DEBUG) Log.v(TAG, "onGenericMotion:ACTION_SCROLL")
+						// process the scroll wheel movement...
+						val vScroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
+						if (vScroll != 0.0f) {
+							mImageView!!.setScaleRelative(1.0f + vScroll.sign / 10.0f)	// 1.1か0.9
+						}
+						return true;
+					}
+					}
+				}
+				return false;
 			}
 		})
 		if (USU_LOADER_DRAWABLE) {
