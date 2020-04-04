@@ -953,12 +953,10 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 		// restore the Matrix
 		restoreMatrix();
-		// get current zooming scale
-		final float currentScale = getScale();
 		// calculate the zooming scale from the distance between touched positions
 		final float scale = calcScale(event);
 		// calculate the applied zooming scale
-		final float tmpScale = scale * currentScale;
+		final float tmpScale = scale * getScale();
 		if (tmpScale < mMinScale) {
 			// skip if the applied scale is smaller than minimum scale
 			return false;
