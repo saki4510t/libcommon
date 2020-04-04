@@ -616,13 +616,21 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	public ViewTransformDelegater setScaleRelative(final float scaleRelative) {
 		if (DEBUG) Log.v(TAG, String.format("setScaleRelative:%f,min=%f,max=%f",
 			scaleRelative, mMinScale, mMaxScale));
-		float scale = getScale() * scaleRelative;
-		if (scale < mMinScale) {
-			scale = mMinScale;
-		} else if (scale > mMaxScale) {
-			scale = mMaxScale;
+		// restore the Matrix
+		getTransform(mImageMatrix);
+		// calculate the zooming scale from the distance between touched positions
+		// calculate the applied zooming scale
+		final float tmpScale = scaleRelative * getScale();
+		if ((tmpScale >= mMinScale) && (tmpScale <= mMaxScale)) {
+			// change scale with scale value and pivot point
+			if (mImageMatrix.postScale(scaleRelative, scaleRelative,
+				getViewWidth() / 2.0f, getViewHeight() / 2.0f)) {
+
+				// when Matrix is changed, apply to target view
+				setTransform(mImageMatrix);
+			}
 		}
-		setScale(scale);
+
 		return this;
 	}
 
