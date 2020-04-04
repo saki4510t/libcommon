@@ -278,6 +278,25 @@ public abstract class ViewTransformer implements IViewTransformer {
 	}
 
 	/**
+	 * 現在の倍率からピボット座標指定付きで拡大縮小
+	 * @param scaleX
+	 * @param scaleY
+	 * @param pivotX
+	 * @param pivotY
+	 * @return
+	 */
+	public ViewTransformer scale(
+		final float scaleX, final float scaleY,
+		final float pivotX, final float pivotY) {
+
+		mTransform.postScale(scaleX, scaleY, pivotX, pivotY);
+		// apply to target view
+		internalSetTransform(mTransform);
+		calcValues(mTransform);
+		return this;
+	}
+
+	/**
 	 * 現在の拡大縮小率(横方向)を取得
 	 * @return
 	 */
@@ -323,6 +342,23 @@ public abstract class ViewTransformer implements IViewTransformer {
 		return setTransform(mCurrentTransX, mCurrentTransY,
 			mCurrentScaleX, mCurrentScaleY,
 			mCurrentRotate + degrees);
+	}
+
+	/**
+	 * 現在の回転角度からピボット座標指定付きで回転させる
+	 * @param degrees
+	 * @param pivotX
+	 * @param pivotY
+	 * @return
+	 */
+	public ViewTransformer rotate(final float degrees,
+		final float pivotX, final float pivotY) {
+
+		mTransform.postRotate(degrees, pivotX, pivotY);
+		// apply to target view
+		internalSetTransform(mTransform);
+		calcValues(mTransform);
+		return this;
 	}
 
 	/**
@@ -449,10 +485,10 @@ public abstract class ViewTransformer implements IViewTransformer {
 		mCurrentScaleX = workArray[Matrix.MSCALE_X];
 		mCurrentScaleY = MatrixUtils.getScale(workArray);
 		mCurrentRotate = MatrixUtils.getRotate(workArray);
-//		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
-//			mCurrentTransX, mCurrentTransY,
-//			mCurrentScaleX, mCurrentScaleY,
-//			mCurrentRotate));
+		if (DEBUG) Log.v(TAG, String.format("calcValues:tr(%fx%f),scale(%f,%f),rot=%f",
+			mCurrentTransX, mCurrentTransY,
+			mCurrentScaleX, mCurrentScaleY,
+			mCurrentRotate));
 	}
 
 	/**

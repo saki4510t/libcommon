@@ -21,7 +21,6 @@ package com.serenegiant.view;
 import android.annotation.SuppressLint;
 import android.content.res.Configuration;
 import android.graphics.Matrix;
-import android.graphics.PointF;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Parcel;
@@ -275,15 +274,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	protected final Matrix mImageMatrix = new Matrix();
 	/**
-	 * mImageMatrixのキャッシュを更新する必要があるかどうか
-	 */
-	protected boolean mImageMatrixChanged;
-	/**
-	 * 高速化のためにmImageMatrixの内容をfloat配列にキャッシュする
-	 * (Matrixへ直接アクセスするたびにJNI経由でのアクセスになるので)
-	 */
-	protected final float[] mMatrixCache = new float[9];
-	/**
 	 * タッチ操作開始時のトランスフォームマトリックスを保存
 	 */
 	private final Matrix mSavedImageMatrix = new Matrix();
@@ -400,9 +390,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		if (state instanceof SavedState) {
 			final SavedState saved = (SavedState)state;
 			mIsRestored = true;
-			System.arraycopy(saved.mMatrixCache, 0, mMatrixCache, 0, 9);
-			mImageMatrix.setValues(mMatrixCache);
-			mImageMatrixChanged = true;
+			mImageMatrix.setValues(saved.mMatrixCache);
 			mState = saved.mState;
 			mHandleTouchEvent = saved.mHandleTouchEvent;
 			mMinScale = saved.mMinScale;
@@ -421,13 +409,12 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		if (DEBUG) Log.v(TAG, "onSaveInstanceState:");
 
 		final SavedState saveState = new SavedState(superState);
-		updateMatrixCache();
 		saveState.mState = mState;
 		saveState.mHandleTouchEvent = mHandleTouchEvent;
 		saveState.mMinScale = mMinScale;
 		saveState.mMaxScale = mMaxScale;
 		saveState.mCurrentDegrees = mCurrentDegrees;
-		System.arraycopy(mMatrixCache, 0, saveState.mMatrixCache, 0, 9);
+		mImageMatrix.getValues(saveState.mMatrixCache);
 		return saveState;
 	}
 
@@ -627,7 +614,9 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * @return
 	 */
 	public ViewTransformDelegater setScaleRelative(final float scaleRelative) {
-		float scale = getScale() + scaleRelative;
+		if (DEBUG) Log.v(TAG, String.format("setScaleRelative:%f,min=%f,max=%f",
+			scaleRelative, mMinScale, mMaxScale));
+		float scale = getScale() * scaleRelative;
 		if (scale < mMinScale) {
 			scale = mMinScale;
 		} else if (scale > mMaxScale) {
@@ -635,56 +624,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		}
 		setScale(scale);
 		return this;
-	}
-
-	/**
-	 * 現在の拡大縮小率を取得
-	 * FIXME 一度も手動で拡大縮小移動処理を行っていないときに常に1.0fになってしまう
-	 * @return
-	 */
-	public float getScale() {
-		return getMatrixScale();
-	}
-
-	/**
-	 * 現在のView(の表示内容)並行移動量(オフセット)を取得
-	 * @param result
-	 * @return
-	 */
-	@NonNull
-	public PointF getTranslate(@Nullable final PointF result) {
-		updateMatrixCache();
-		if (result != null) {
-			result.set(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
-			return result;
-		} else {
-			return new PointF(mMatrixCache[Matrix.MTRANS_X], mMatrixCache[Matrix.MTRANS_Y]);
-		}
-	}
-
-	/**
-	 * 現在のView表示内容の平行移動両(横方向)を取得
-	 * @return
-	 */
-	public float getTranslateX() {
-		updateMatrixCache();
-		return mMatrixCache[Matrix.MTRANS_X];
-	}
-
-	/**
-	 * 現在のView表示内容の平行移動両(上下方向)を取得
-	 * @return
-	 */
-	public float getTranslateY() {
-		updateMatrixCache();
-		return mMatrixCache[Matrix.MTRANS_Y];
-	}
-
-	/**
-	 * 現在のView表示内容の回転角度を取得
-	 */
-	public float getRotation() {
-		return mCurrentDegrees;
 	}
 
 	/**
@@ -781,7 +720,6 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			break;
 		}
 		}
-		mImageMatrixChanged = true;
 		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
 		setTransform(mImageMatrix);
 		setDefault(mImageMatrix);
@@ -806,17 +744,18 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	private void checkScale() {
 		if (DEBUG) Log.v(TAG, "checkScale:");
-		float scale = getMatrixScale();
+		float scale = getScale();
 		if (scale < mMinScale) {
 			scale = mMinScale;
+			getTransform(mImageMatrix);
 			mImageMatrix.setScale(scale, scale);
-			mImageMatrixChanged = true;
+			setTransform(mImageMatrix);
 		} else if (scale > mMaxScale) {
 			scale = mMaxScale;
+			getTransform(mImageMatrix);
 			mImageMatrix.setScale(scale, scale);
-			mImageMatrixChanged = true;
+			setTransform(mImageMatrix);
 		}
-		getTargetView().invalidate();
 	}
 
 	/**
@@ -831,10 +770,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			mState = state;
 			// get and save the internal Matrix of super class
 			getTransform(mSavedImageMatrix);
-			if (!mImageMatrix.equals(mSavedImageMatrix)) {
-				mImageMatrix.set(mSavedImageMatrix);
-				mImageMatrixChanged = true;
-			}
+			mImageMatrix.set(mSavedImageMatrix);
 			if (mViewTransformListener != null) {
 				mViewTransformListener.onStateChanged(getTargetView(), state);
 			}
@@ -940,9 +876,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 //				if (DEBUG) Log.v(TAG, String.format("processDrag:dx=%f,dy=%f", dx, dy));
 				// apply move
 				if (mImageMatrix.postTranslate(dx, dy)) {
-					// when image is really moved?
-					mImageMatrixChanged = true;
-					// apply to super class
+					// when Matrix is changed, apply to target view
 					setTransform(mImageMatrix);
 				}
 			}
@@ -1012,7 +946,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// restore the Matrix
 		restoreMatrix();
 		// get current zooming scale
-		final float currentScale = getMatrixScale();
+		final float currentScale = getScale();
 		// calculate the zooming scale from the distance between touched positions
 		final float scale = calcScale(event);
 		// calculate the applied zooming scale
@@ -1027,9 +961,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 
 		// change scale with scale value and pivot point
 		if (mImageMatrix.postScale(scale, scale, mPivotX, mPivotY)) {
-			// when Matrix is changed
-			mImageMatrixChanged = true;
-			// apply to super class
+			// when Matrix is changed, apply to target view
 			setTransform(mImageMatrix);
 		}
 
@@ -1097,9 +1029,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 			mCurrentDegrees = calcAngle(event);
 			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
 			if (mIsRotating && mImageMatrix.postRotate(mCurrentDegrees, mPivotX, mPivotY)) {
-				// when Matrix is changed
-				mImageMatrixChanged = true;
-				// apply to super class
+				// when Matrix is changed, apply to target view
 				setTransform(mImageMatrix);
 				return true;
 			}
@@ -1139,42 +1069,10 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	}
 
 	/**
-	 * get the zooming scale</br>
-	 * return minimum one of MSCALE_X and MSCALE_Y
-	 * @return return DEFAULT_SCALE when the scale is smaller than or equal to zero
-	 */
-	private final float getMatrixScale() {
-		updateMatrixCache();
-		final float scale = Math.min(mMatrixCache[Matrix.MSCALE_X], mMatrixCache[Matrix.MSCALE_Y]);
-		if (scale <= 0f) {	// for prevent disappearing reversing
-			if (DEBUG) Log.w(TAG, "getMatrixScale:scale<=0, set to default");
-			return DEFAULT_SCALE;
-		}
-		return scale;
-	}
-
-	/**
 	 * restore the Matrix to the one when state changed
 	 */
 	protected void restoreMatrix() {
 		mImageMatrix.set(mSavedImageMatrix);
-		mImageMatrixChanged = true;
-	}
-
-	/**
-	 * update the matrix caching float[]
-	 */
-	protected boolean updateMatrixCache() {
-		if (mImageMatrixChanged) {
-			mImageMatrix.getValues(mMatrixCache);
-			mImageMatrixChanged = false;
-			return true;
-		}
-		return false;
-	}
-
-	public Matrix getImageMatrix() {
-		return mImageMatrix;
 	}
 
 	/**

@@ -476,7 +476,7 @@ public class ZoomImageView extends TransformImageView
 		if (DEBUG) Log.v(TAG, "init:");
 		mDelegater.init();
 		superSetScaleType(ScaleType.MATRIX);
-		superSetImageMatrix(mDelegater.getImageMatrix());
+		superSetImageMatrix(mDelegater.getTransform(null));
 	}
 
 	/**
