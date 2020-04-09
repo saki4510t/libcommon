@@ -528,7 +528,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
 	 * @param listener
 	 */
-	public void setOnStartRotationListener(@Nullable final ViewTransformListener listener) {
+	public void setViewTransformListener(@Nullable final ViewTransformListener listener) {
 		mViewTransformListener = listener;
 	}
 
@@ -536,7 +536,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
 	 * @return
 	 */
-	public ViewTransformListener getOnStartRotationListener() {
+	public ViewTransformListener getViewTransformListener() {
 		return mViewTransformListener;
 	}
 

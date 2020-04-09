@@ -366,7 +366,7 @@ public class ZoomImageView extends TransformImageView
 	 */
 	public void setViewTransformListener(
 		final ViewTransformDelegater.ViewTransformListener listener) {
-		mDelegater.setOnStartRotationListener(listener);
+		mDelegater.setViewTransformListener(listener);
 	}
 
 	/**
@@ -375,7 +375,7 @@ public class ZoomImageView extends TransformImageView
 	 */
 	@Nullable
 	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
-		return mDelegater.getOnStartRotationListener();
+		return mDelegater.getViewTransformListener();
 	}
 
 	/**
