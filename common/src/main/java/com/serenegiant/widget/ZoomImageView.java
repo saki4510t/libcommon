@@ -87,6 +87,9 @@ public class ZoomImageView extends TransformImageView
 	 */
 	private WaitReverseReset mWaitReverseReset;
 
+	@Nullable
+	private ViewTransformDelegater.ViewTransformListener mViewTransformListener;
+
 	/**
 	 * コンストラクタ
 	 * @param context
@@ -366,7 +369,7 @@ public class ZoomImageView extends TransformImageView
 	 */
 	public void setViewTransformListener(
 		final ViewTransformDelegater.ViewTransformListener listener) {
-		mDelegater.setViewTransformListener(listener);
+		mViewTransformListener = listener;
 	}
 
 	/**
@@ -375,7 +378,7 @@ public class ZoomImageView extends TransformImageView
 	 */
 	@Nullable
 	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
-		return mDelegater.getViewTransformListener();
+		return mViewTransformListener;
 	}
 
 	/**
@@ -518,6 +521,9 @@ public class ZoomImageView extends TransformImageView
 			resetColorFilter();
 			break;
 		}
+		if (mViewTransformListener != null) {
+			mViewTransformListener.onStateChanged(view, newState);
+		}
 	}
 
 	/**
@@ -528,6 +534,9 @@ public class ZoomImageView extends TransformImageView
 	@Override
 	public void onTransformed(@NonNull final View view, @NonNull final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "onTransformed:" + transform);
+		if (mViewTransformListener != null) {
+			mViewTransformListener.onTransformed(view, transform);
+		}
 	}
 
 }
