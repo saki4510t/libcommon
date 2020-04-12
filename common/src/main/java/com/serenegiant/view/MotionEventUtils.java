@@ -1,8 +1,11 @@
 package com.serenegiant.view;
 
+import android.os.Build;
 import android.view.MotionEvent;
 
 import com.serenegiant.utils.BitsHelper;
+
+import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
@@ -15,18 +18,61 @@ public class MotionEventUtils {
 	}
 
 	public static final int BUTTON_PRIMARY
-		= MotionEvent.BUTTON_PRIMARY | MotionEvent.BUTTON_STYLUS_PRIMARY;
+		= MotionEvent.BUTTON_PRIMARY
+		| (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? MotionEvent.BUTTON_STYLUS_PRIMARY : 0);
 
 	public static final int BUTTON_SECONDARY
-		= MotionEvent.BUTTON_SECONDARY | MotionEvent.BUTTON_STYLUS_SECONDARY;
+		= MotionEvent.BUTTON_SECONDARY
+		| (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? MotionEvent.BUTTON_STYLUS_SECONDARY : 0);
 
 	/**
 	 * 指定したMotionEventのactionをACTION_XXX形式の文字列に変換する
+	 * MotionEvent#actionToStringがAPI>=19なので後方互換性のためにバックポート
 	 * @param event
 	 * @return
 	 */
 	public static String getActionString(@NonNull final MotionEvent event) {
-		return MotionEvent.actionToString(event.getActionMasked());
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+			return MotionEvent.actionToString(event.getActionMasked());
+		} else {
+			final int action = event.getActionMasked();
+			switch (action) {
+			case MotionEvent.ACTION_DOWN:
+				return "ACTION_DOWN";
+			case MotionEvent.ACTION_UP:
+				return "ACTION_UP";
+			case MotionEvent.ACTION_CANCEL:
+				return "ACTION_CANCEL";
+			case MotionEvent.ACTION_OUTSIDE:
+				return "ACTION_OUTSIDE";
+			case MotionEvent.ACTION_MOVE:
+				return "ACTION_MOVE";
+			case MotionEvent.ACTION_HOVER_MOVE:
+				return "ACTION_HOVER_MOVE";
+			case MotionEvent.ACTION_SCROLL:
+				return "ACTION_SCROLL";
+			case MotionEvent.ACTION_HOVER_ENTER:
+				return "ACTION_HOVER_ENTER";
+			case MotionEvent.ACTION_HOVER_EXIT:
+				return "ACTION_HOVER_EXIT";
+			case MotionEvent.ACTION_BUTTON_PRESS:
+				return "ACTION_BUTTON_PRESS";
+			case MotionEvent.ACTION_BUTTON_RELEASE:
+				return "ACTION_BUTTON_RELEASE";
+			}
+
+			final int index = (action & MotionEvent.ACTION_POINTER_INDEX_MASK)
+				>> MotionEvent.ACTION_POINTER_INDEX_SHIFT;
+
+			switch (action & MotionEvent.ACTION_MASK) {
+			case MotionEvent.ACTION_POINTER_DOWN:
+				return "ACTION_POINTER_DOWN(" + index + ")";
+			case MotionEvent.ACTION_POINTER_UP:
+				return "ACTION_POINTER_UP(" + index + ")";
+			default:
+				return Integer.toString(action);
+			}
+		}
 	}
 
 	// Symbolic names of all button states in bit order from least significant
@@ -169,4 +215,17 @@ public class MotionEventUtils {
 		return (event.getSource() & sourceClass) == sourceClass;
 	}
 
+	/**
+	 * MotionEventのデバッグログメッセージ用文字列を取得
+	 * @param event
+	 * @return
+	 */
+	public static String debugMotionEventString(@NonNull final MotionEvent event) {
+		final float x = event.getX();
+		final float y = event.getY();
+		return String.format(Locale.US, "%s(%f,%f):,down=%d,event=%d,src=0x%08x",
+			MotionEventUtils.getActionString(event),
+			x, y,
+			event.getDownTime(), event.getEventTime(), event.getSource());
+	}
 }
