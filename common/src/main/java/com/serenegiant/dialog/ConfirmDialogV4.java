@@ -45,6 +45,8 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		= "ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE";
 	private static final String ARGS_KEY_MESSAGE_STRING
 		= "ARGS_KEY_MESSAGE_STRING";
+	private static final String ARGS_KEY_ARGS
+		= "ARGS_KEY_ARGS";
 
 	/**
 	 * ダイアログの表示結果を受け取るためのコールバックリスナー
@@ -58,7 +60,8 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		 */
 		public void onConfirmResult(
 			@NonNull final ConfirmDialogV4 dialog,
-			final int requestCode, final int result);
+			final int requestCode, final int result,
+			@Nullable final Bundle userArgs);
 	}
 
 	/**
@@ -67,6 +70,7 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 	 * @param requestCode
 	 * @param id_title
 	 * @param id_message
+	 * @param canceledOnTouchOutside
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -75,8 +79,31 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		@StringRes final int id_title, @StringRes final int id_message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
+		return showDialog(parent, requestCode, id_title, id_message, canceledOnTouchOutside, null);
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param id_message
+	 * @param canceledOnTouchOutside
+	 * @param userArgs
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmDialogV4 showDialog(
+		@NonNull final FragmentActivity parent, final int requestCode,
+		@StringRes final int id_title, @StringRes final int id_message,
+		final boolean canceledOnTouchOutside,
+		@Nullable final Bundle userArgs) throws IllegalStateException {
+
 		final ConfirmDialogV4 dialog
-			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
+			= newInstance(requestCode,
+				id_title, id_message, null,
+				canceledOnTouchOutside,
+				userArgs);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
@@ -97,8 +124,32 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		@StringRes final int id_title, @NonNull final CharSequence message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
+		return showDialog(parent, requestCode, id_title, message, canceledOnTouchOutside, null);
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * こっちはCharSequenceとしてメッセージ内容を指定
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param message
+	 * @param canceledOnTouchOutside
+	 * @param userArgs
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmDialogV4 showDialog(
+		@NonNull final FragmentActivity parent, final int requestCode,
+		@StringRes final int id_title, @NonNull final CharSequence message,
+		final boolean canceledOnTouchOutside,
+		@Nullable final Bundle userArgs) throws IllegalStateException {
+
 		final ConfirmDialogV4 dialog
-			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
+			= newInstance(requestCode,
+				id_title, 0, message,
+				canceledOnTouchOutside,
+				userArgs);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
@@ -109,6 +160,7 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 	 * @param requestCode
 	 * @param id_title
 	 * @param id_message
+	 * @param canceledOnTouchOutside
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -117,8 +169,31 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		@StringRes final int id_title, @StringRes final int id_message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
+		return showDialog(parent, requestCode, id_title, id_message, canceledOnTouchOutside, null);
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param id_message
+	 * @param canceledOnTouchOutside
+	 * @param userArgs
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmDialogV4 showDialog(
+		@NonNull final Fragment parent, final int requestCode,
+		@StringRes final int id_title, @StringRes final int id_message,
+		final boolean canceledOnTouchOutside,
+		@Nullable final Bundle userArgs) throws IllegalStateException {
+
 		final ConfirmDialogV4 dialog
-			= newInstance(requestCode, id_title, id_message, null, canceledOnTouchOutside);
+			= newInstance(requestCode,
+				id_title, id_message, null,
+				canceledOnTouchOutside,
+				userArgs);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
@@ -140,8 +215,32 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		@StringRes final int id_title, @NonNull final CharSequence message,
 		final boolean canceledOnTouchOutside) throws IllegalStateException {
 
+		return showDialog(parent, requestCode, id_title, message, canceledOnTouchOutside, null);
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * こっちはCharSequenceとしてメッセージ内容を指定
+	 * @param parent
+	 * @param requestCode
+	 * @param id_title
+	 * @param message
+	 * @param canceledOnTouchOutside
+	 * @param userArgs
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static ConfirmDialogV4 showDialog(
+		@NonNull final Fragment parent, final int requestCode,
+		@StringRes final int id_title, @NonNull final CharSequence message,
+		final boolean canceledOnTouchOutside,
+		@Nullable final Bundle userArgs) throws IllegalStateException {
+
 		final ConfirmDialogV4 dialog
-			= newInstance(requestCode, id_title, 0, message, canceledOnTouchOutside);
+			= newInstance(requestCode,
+				id_title, 0, message,
+				canceledOnTouchOutside,
+				userArgs);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
@@ -153,12 +252,17 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 	 * @param requestCode
 	 * @param id_title
 	 * @param id_message
+	 * @param message
+	 * @param canceledOnTouchOutside
+	 * @param userArgs
 	 * @return
 	 */
 	public static ConfirmDialogV4 newInstance(
 		final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
-		@Nullable final CharSequence message, final boolean canceledOnTouchOutside) {
+		@Nullable final CharSequence message,
+		final boolean canceledOnTouchOutside,
+		@Nullable final Bundle userArgs) {
 
 		final ConfirmDialogV4 fragment = new ConfirmDialogV4();
 		final Bundle args = new Bundle();
@@ -168,6 +272,7 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		args.putInt(ARGS_KEY_ID_MESSAGE, id_message);
 		args.putCharSequence(ARGS_KEY_MESSAGE_STRING, message);
 		args.putBoolean(ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE, canceledOnTouchOutside);
+		args.putBundle(ARGS_KEY_ARGS, userArgs);
 		fragment.setArguments(args);
 		return fragment;
 	}
@@ -257,10 +362,11 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		throws IllegalStateException {
 
 		final Bundle args = requireArguments();
+		final Bundle userArgs = args.getBundle(ARGS_KEY_ARGS);
 		final int requestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
 		try {
 			mListener.onConfirmResult(
-				ConfirmDialogV4.this, requestCode, result);
+				ConfirmDialogV4.this, requestCode, result, userArgs);
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
