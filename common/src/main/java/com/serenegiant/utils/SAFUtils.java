@@ -81,7 +81,8 @@ public class SAFUtils {
 	 * @param delegater
 	 * @return true if successfully handled, false otherwise
 	 */
-	public static boolean handleOnResult(@NonNull final Context context,
+	public static boolean handleOnResult(
+		@NonNull final Context context,
 		final int requestCode, final int resultCode,
 		final Intent data, @NonNull final SAFUtils.handleOnResultDelegater delegater) {
 
@@ -108,6 +109,7 @@ public class SAFUtils {
 	
 	/**
 	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
+	 * "SDUtils-${要求コード}"を返す
 	 * @param requestCode
 	 * @return
 	 */
@@ -122,24 +124,30 @@ public class SAFUtils {
 	 * @param key
 	 * @param uri
 	 */
-	private static void saveUri(@NonNull final Context context,
+	private static void saveUri(
+		@NonNull final Context context,
 		@NonNull final String key, @NonNull final Uri uri) {
-		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
+
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
 		if (pref != null) {
 			pref.edit().putString(key, uri.toString()).apply();
 		}
 	}
 	
 	/**
-	 * 共有プレファレンスの保存しているuriを取得する
+	 * 共有プレファレンスに保存しているuriを取得する
 	 * @param context
 	 * @param key
 	 * @return
 	 */
 	@Nullable
-	private static Uri loadUri(@NonNull final Context context, @NonNull final String key) {
+	private static Uri loadUri(
+		@NonNull final Context context, @NonNull final String key) {
+
 		Uri result = null;
-		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
 			try {
 				result = Uri.parse(pref.getString(key, null));
@@ -155,8 +163,11 @@ public class SAFUtils {
 	 * @param context
 	 * @param key
 	 */
-	private static void clearUri(@NonNull final Context context, @Nullable final String key) {
-		final SharedPreferences pref = context.getSharedPreferences(context.getPackageName(), 0);
+	private static void clearUri(
+		@NonNull final Context context, @Nullable final String key) {
+
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
 		if ((pref != null) && pref.contains(key)) {
 			try {
 				pref.edit().remove(key).apply();
@@ -174,7 +185,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(@NonNull final Activity activity,
+	public static void requestOpenDocument(
+		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -190,7 +202,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(@NonNull final FragmentActivity activity,
+	public static void requestOpenDocument(
+		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -223,7 +236,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestOpenDocument(@NonNull final Fragment fragment,
+	public static void requestOpenDocument(
+		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -252,7 +266,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final Activity activity,
+	public static void requestCreateDocument(
+		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -269,7 +284,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final Activity activity,
+	public static void requestCreateDocument(
+		@NonNull final Activity activity,
 		final String mime, final String defaultName, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -285,7 +301,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final FragmentActivity activity,
+	public static void requestCreateDocument(
+		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -302,7 +319,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final FragmentActivity activity,
+	public static void requestCreateDocument(
+		@NonNull final FragmentActivity activity,
 		final String mime, final String defaultName, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -318,7 +336,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final android.app.Fragment fragment,
+	public static void requestCreateDocument(
+		@NonNull final android.app.Fragment fragment,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -335,7 +354,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final android.app.Fragment fragment,
+	public static void requestCreateDocument(
+		@NonNull final android.app.Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -351,7 +371,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final Fragment fragment,
+	public static void requestCreateDocument(
+		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -368,7 +389,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static void requestCreateDocument(@NonNull final Fragment fragment,
+	public static void requestCreateDocument(
+		@NonNull final Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
 
 		if (BuildCheck.isKitKat()) {
@@ -384,7 +406,9 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	private static Intent prepareCreateDocument(final String mime, final String defaultName) {
+	private static Intent prepareCreateDocument(
+		final String mime, final String defaultName) {
+
 		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.setType(mime);
 		if (!TextUtils.isEmpty(defaultName)) {
@@ -401,7 +425,9 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static boolean requestDeleteDocument(@NonNull final Context context, final Uri uri) {
+	public static boolean requestDeleteDocument(
+		@NonNull final Context context, final Uri uri) {
+
 		try {
 			return BuildCheck.isKitKat()
 				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
@@ -417,7 +443,8 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static boolean hasStorageAccess(@NonNull final Context context,
+	public static boolean hasStorageAccess(
+		@NonNull final Context context,
 		final int requestCode) {
 
 		boolean found = false;
@@ -446,7 +473,8 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(@NonNull final Activity activity,
+	public static Uri requestStorageAccess(
+		@NonNull final Activity activity,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
@@ -467,7 +495,8 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(@NonNull final FragmentActivity activity,
+	public static Uri requestStorageAccess(
+		@NonNull final FragmentActivity activity,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
@@ -489,7 +518,8 @@ public class SAFUtils {
 	 */
 	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(@NonNull final android.app.Fragment fragment,
+	public static Uri requestStorageAccess(
+		@NonNull final android.app.Fragment fragment,
 		final int requestCode) {
 
 		final Uri uri = getStorageUri(fragment.getActivity(), requestCode);
@@ -507,7 +537,8 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(@NonNull final Fragment fragment,
+	public static Uri requestStorageAccess(
+		@NonNull final Fragment fragment,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
@@ -530,7 +561,8 @@ public class SAFUtils {
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
-	public static Uri getStorageUri(@NonNull final Context context,
+	public static Uri getStorageUri(
+		@NonNull final Context context,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
@@ -572,7 +604,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(@NonNull final Context context,
+	public static Uri requestStorageAccessPermission(
+		@NonNull final Context context,
 		final int requestCode, final Uri treeUri) {
 
 		return requestStorageAccessPermission(context,
@@ -589,7 +622,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(@NonNull final Context context,
+	public static Uri requestStorageAccessPermission(
+		@NonNull final Context context,
 		final int requestCode, final Uri treeUri, final int flags) {
 
 		if (BuildCheck.isLollipop()) {
@@ -607,7 +641,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static void releaseStorageAccessPermission(@NonNull final Context context,
+	public static void releaseStorageAccessPermission(
+		@NonNull final Context context,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
@@ -622,6 +657,10 @@ public class SAFUtils {
 	}
 
 //================================================================================
+
+	/**
+	 * DocumentFileのフィルター処理用インターフェース
+	 */
 	public interface FileFilter {
 		public boolean accept(@NonNull final DocumentFile file);
 	}
@@ -633,7 +672,8 @@ public class SAFUtils {
 	 * @return
 	 */
 	@Nullable
-	public static DocumentFile getStorage(@NonNull final Context context,
+	public static DocumentFile getStorage(
+		@NonNull final Context context,
 		final int treeId) throws IOException {
 		
 		return getStorage(context, treeId, null);
@@ -648,7 +688,8 @@ public class SAFUtils {
 	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
 	 */
 	@Nullable
-	public static DocumentFile getStorage(@NonNull final Context context,
+	public static DocumentFile getStorage(
+		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
@@ -690,7 +731,8 @@ public class SAFUtils {
 	 * @param dirs
 	 * @return 書き込みができなければnull
 	 */
-	public static DocumentFile getStorage(@NonNull final Context context,
+	public static DocumentFile getStorage(
+		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs)
 			throws IOException {
 		
@@ -728,7 +770,8 @@ public class SAFUtils {
 	 * @throws IOException
 	 */
 	@NonNull
-	public static Collection<DocumentFile> listFiles(@NonNull final Context context,
+	public static Collection<DocumentFile> listFiles(
+		@NonNull final Context context,
 		@NonNull final DocumentFile dir,
 		@Nullable final SAFUtils.FileFilter filter) throws IOException {
 
@@ -751,10 +794,11 @@ public class SAFUtils {
 	 * @param dir
 	 * @return
 	 */
-	@SuppressLint("NewApi")
+	@SuppressLint({"NewApi", "UsableSpace"})
 	@Nullable
-	public static StorageInfo getStorageInfo(@NonNull final Context context,
-											 @NonNull final DocumentFile dir) {
+	public static StorageInfo getStorageInfo(
+		@NonNull final Context context,
+		@NonNull final DocumentFile dir) {
 		
 		try {
 			final String path = UriHelper.getPath(context, dir.getUri());
@@ -796,7 +840,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static DocumentFile getStorageFile(@NonNull final Context context,
+	public static DocumentFile getStorageFile(
+		@NonNull final Context context,
 		final int treeId, final String mime, final String name) throws IOException {
 
 		return getStorageFile(context, treeId, null, mime, name);
@@ -812,7 +857,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static DocumentFile getStorageFile(@NonNull final Context context,
+	public static DocumentFile getStorageFile(
+		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -844,7 +890,8 @@ public class SAFUtils {
 	 * @param name
 	 * @return
 	 */
-	public static DocumentFile getStorageFile(@NonNull final Context context,
+	public static DocumentFile getStorageFile(
+		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 		
@@ -874,9 +921,10 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static OutputStream getStorageOutputStream(@NonNull final Context context,
-													  final int treeId,
-													  final String mime, final String name) throws IOException {
+	public static OutputStream getStorageOutputStream(
+		@NonNull final Context context,
+		final int treeId,
+		final String mime, final String name) throws IOException {
 		
 		return getStorageOutputStream(context, treeId, null, mime, name);
 	}
@@ -892,7 +940,8 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static OutputStream getStorageOutputStream(@NonNull final Context context,
+	public static OutputStream getStorageOutputStream(
+		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -926,7 +975,8 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream getStorageOutputStream(@NonNull final Context context,
+	public static OutputStream getStorageOutputStream(
+		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -958,9 +1008,10 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static InputStream getStorageInputStream(@NonNull final Context context,
-													final int treeId,
-													final String mime, final String name) throws IOException {
+	public static InputStream getStorageInputStream(
+		@NonNull final Context context,
+		final int treeId,
+		final String mime, final String name) throws IOException {
 		
 		return getStorageInputStream(context, treeId, null, mime, name);
 	}
@@ -976,7 +1027,8 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static InputStream getStorageInputStream(@NonNull final Context context,
+	public static InputStream getStorageInputStream(
+		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -1007,7 +1059,8 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getStorageInputStream(@NonNull final Context context,
+	public static InputStream getStorageInputStream(
+		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -1037,9 +1090,10 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
-														final int treeId, @Nullable final String dirs,
-														final String mime, final String name) throws IOException {
+	public static ParcelFileDescriptor getStorageFileFD(
+		@NonNull final Context context,
+		final int treeId, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getStorage(context, treeId, dirs);
@@ -1071,7 +1125,8 @@ public class SAFUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static ParcelFileDescriptor getStorageFileFD(@NonNull final Context context,
+	public static ParcelFileDescriptor getStorageFileFD(
+		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
@@ -1102,7 +1157,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageDir(@NonNull final Context context,
+	public static File createStorageDir(
+		@NonNull final Context context,
 		final int treeId) {
 
 		if (BuildCheck.isLollipop()) {
@@ -1128,7 +1184,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(@NonNull final Context context,
+	public static File createStorageFile(
+		@NonNull final Context context,
 		final int treeId, final String mime, final String fileName) {
 
 		return createStorageFile(context, getStorageUri(context, treeId), mime, fileName);
@@ -1144,7 +1201,8 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static File createStorageFile(@NonNull final Context context,
+	public static File createStorageFile(
+		@NonNull final Context context,
 		final Uri treeUri, final String mime, final String fileName) {
 		Log.i(TAG, "createStorageFile:" + fileName);
 
@@ -1170,7 +1228,8 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(@NonNull final Context context,
+	public static int createStorageFileFD(
+		@NonNull final Context context,
 		final int treeId, final String mime, final String fileName) {
 
 		Log.i(TAG, "createStorageFileFD:" + fileName);
@@ -1186,7 +1245,8 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static int createStorageFileFD(@NonNull final Context context,
+	public static int createStorageFileFD(
+		@NonNull final Context context,
 		final Uri treeUri, final String mime, final String fileName) {
 
 		Log.i(TAG, "createStorageFileFD:" + fileName);
@@ -1215,7 +1275,8 @@ public class SAFUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static DocumentFile getDocumentFile(@NonNull Context context,
+	public static DocumentFile getDocumentFile(
+		@NonNull Context context,
 		@NonNull final DocumentFile baseDoc, @Nullable final String dirs)
 			throws IOException {
 		
@@ -1254,7 +1315,8 @@ public class SAFUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static DocumentFile getDocumentFile(@NonNull Context context,
+	public static DocumentFile getDocumentFile(
+		@NonNull Context context,
 		@NonNull final DocumentFile baseDoc, @Nullable final Uri uri)
 			throws IOException {
 		
