@@ -590,11 +590,27 @@ public final class BuildCheck {
 		return check((Build.VERSION_CODES.P));
 	}
 
+	/**
+	 * きゅぅっ API>=29
+	 * @return
+	 */
 	public static boolean isAPI29() {
 		return check((Build.VERSION_CODES.Q));
 	}
 
+	/**
+	 * きゅぅっ API>=29
+	 * @return
+	 */
 	public static boolean isQ() {
+		return check((Build.VERSION_CODES.Q));
+	}
+
+	/**
+	 * きゅぅっ API>=29
+	 * @return
+	 */
+	public static boolean isAndroid10() {
 		return check((Build.VERSION_CODES.Q));
 	}
 }
