@@ -23,4 +23,15 @@ public class ArrayUtils {
 		}
 		return false;
 	}
+
+	/**
+	 * System.arraycopyのヘルパークラス
+	 * srcの全部をdstへコピーする
+	 * @param src
+	 * @param dst
+	 * @param <T>
+	 */
+	public static <T> void copy(@NonNull final T[] src, @NonNull final T[] dst) {
+		System.arraycopy(src, 0, dst, 0, src.length);
+	}
 }
