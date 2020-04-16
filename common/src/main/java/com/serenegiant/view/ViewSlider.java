@@ -27,7 +27,13 @@ public class ViewSlider {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewSlider.class.getSimpleName();
 
+	/**
+	 * 垂直方向にアニメーション
+	 */
 	public static final int VERTICAL = 0;
+	/**
+	 * 水平方向にアニメーション
+	 */
 	public static final int HORIZONTAL = 1;
 
 	@IntDef({
@@ -37,8 +43,12 @@ public class ViewSlider {
 	@Retention(SOURCE)
 	public @interface Orientation {}
 
+	/**
+	 * スライドイン/スライドアウト時のアニメーション時間のデフォルト[ミリ秒]
+	 */
 	public static final int DEFAULT_DURATION_RESIZE_MS = 300;
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 親View
 	 */
@@ -55,8 +65,11 @@ public class ViewSlider {
 	private int mTargetWidth;
 	private int mTargetHeight;
 
+	/**
+	 * アニメーションの方向を指定
+	 */
 	@Orientation
-	private int mOrientation = VERTICAL;
+	private int mOrientation;
 
 	/**
 	 * コンストラクタ
@@ -74,6 +87,7 @@ public class ViewSlider {
 	 * コンストラクタ
 	 * @param parent 親View
 	 * @param viewId アニメーションさせるViewのid
+	 * @param orientation
 	 * @throws IllegalArgumentException
 	 */
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId,
@@ -86,6 +100,8 @@ public class ViewSlider {
 	 * コンストラクタ
 	 * @param parent 親View
 	 * @param viewId アニメーションさせるViewのid
+	 * @param orientation アニメーションの方向
+	 * @param resizeDuration
 	 * @throws IllegalArgumentException
 	 */
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId,
