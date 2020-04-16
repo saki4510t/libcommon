@@ -62,7 +62,13 @@ public class ViewSlider {
 
 	private final int mDurationResizeMs;
 
+	/**
+	 * アニメーション時の最大幅
+	 */
 	private int mTargetWidth;
+	/**
+	 * アニメーション時の最大高さ
+	 */
 	private int mTargetHeight;
 
 	/**
