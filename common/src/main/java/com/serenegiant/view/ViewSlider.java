@@ -107,11 +107,26 @@ public class ViewSlider {
 	public ViewSlider(@NonNull final View parent, @IdRes final int viewId,
 		@Orientation final int orientation, final int resizeDuration) throws IllegalArgumentException {
 
+		this(parent, parent.findViewById(viewId), orientation, resizeDuration);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param parent 親View
+	 * @param target アニメーションさせるView
+	 * @param orientation アニメーションの方向
+	 * @param resizeDuration
+	 * @throws IllegalArgumentException
+	 */
+	public ViewSlider(@NonNull final View parent, @NonNull final View target,
+		@Orientation final int orientation, final int resizeDuration) throws IllegalArgumentException {
+
 		mParent = parent;
 		if (parent.getClass().getSimpleName().equals("ConstraintLayout")) {
-			Log.w(TAG, "If parent is ConstraintLayout, ViewSlider will not work well");
+			// XXX 親ViewがConstraintLayoutだと上手く動かない
+			Log.w(TAG, "If parent is ConstraintLayout, ViewSlider will not work well.");
 		}
-		mTarget = parent.findViewById(viewId);
+		mTarget = target;
 		if (mTarget == null) {
 			throw new IllegalArgumentException("Target view not found");
 		}
@@ -122,6 +137,7 @@ public class ViewSlider {
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:size(%dx%d)", mTargetWidth, mTargetHeight));
 		mParent.addOnLayoutChangeListener(mOnLayoutChangeListener);
 		mTarget.addOnLayoutChangeListener(mOnLayoutChangeListener);
+		// XXX ViewのvisibilityがGONEだとサイズが0になってしまうのでINVISIBLEに変更する
 		if (mTarget.getVisibility() == View.GONE) {
 			mTarget.setVisibility(View.INVISIBLE);
 		}
