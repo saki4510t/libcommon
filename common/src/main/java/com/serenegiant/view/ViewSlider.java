@@ -12,6 +12,7 @@ import java.util.Locale;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -205,18 +206,32 @@ public class ViewSlider {
 	 * ターゲットViewのアニメーション時の最大サイズ(幅)を指定
 	 * 設定しない場合にはターゲットViewのサイズが最初に決定されたときの大きさになる
 	 * @param width
+	 * @throws IllegalArgumentException
 	 */
-	public void setTargetWidth(final int width) {
-		mTargetMaxWidth = width;
+	public void setTargetWidth(@IntRange(from = 0) final int width)
+		throws IllegalArgumentException {
+
+		if (width >= 0) {
+			mTargetMaxWidth = width;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
 	 * ターゲットViewのアニメーション時の最大サイズ(高さ)を指定
 	 * 設定しない場合にはターゲットViewのサイズが最初に決定されたときの大きさになる
 	 * @param height
+	 * @throws IllegalArgumentException
 	 */
-	public void setTargetHeight(final int height) {
-		mTargetMaxHeight = height;
+	public void setTargetHeight(@IntRange(from = 0) final int height)
+		throws IllegalArgumentException {
+
+		if (height >= 0) {
+			mTargetMaxHeight = height;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
@@ -230,20 +245,36 @@ public class ViewSlider {
 	 * アニメーション時の最大サイズをセットする
 	 * @param width
 	 * @param height
+	 * @throws IllegalArgumentException
 	 */
-	public void setTargetSize(final int width, final int height) {
-		mTargetMaxWidth = width;
-		mTargetMaxHeight = height;
+	public void setTargetSize(
+		@IntRange(from = 0) final int width, @IntRange(from = 0) final int height)
+			throws IllegalArgumentException {
+
+		if ((width >= 0) && (height >= 0)) {
+			mTargetMaxWidth = width;
+			mTargetMaxHeight = height;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
 	 * アニメーション時の最小サイズをセットする
 	 * @param width
 	 * @param height
+	 * @throws IllegalArgumentException
 	 */
-	public void setMinSize(final int width, final int height) {
-		mTargetMinWidth = width;
-		mTargetMinHeight = height;
+	public void setMinSize(
+		@IntRange(from = 0) final int width, @IntRange(from = 0) final int height)
+			throws IllegalArgumentException {
+
+		if ((width >= 0) && (height >= 0)) {
+			mTargetMinWidth = width;
+			mTargetMinHeight = height;
+		} else {
+			throw new IllegalArgumentException();
+		}
 	}
 
 	/**
