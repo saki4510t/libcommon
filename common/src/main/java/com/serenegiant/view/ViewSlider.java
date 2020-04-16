@@ -206,6 +206,23 @@ public class ViewSlider {
 	}
 
 	/**
+	 * アニメーション時の最大サイズを現在のターゲットViewのサイズにセットする
+	 */
+	public void resetTargetSize() {
+		setTargetSize(mTarget.getWidth(), mTarget.getHeight());
+	}
+
+	/**
+	 * アニメーション時の最大サイズをセットする
+	 * @param width
+	 * @param height
+	 */
+	public void setTargetSize(final int width, final int height) {
+		mTargetWidth = width;
+		mTargetHeight = height;
+	}
+
+	/**
 	 * ターゲットViewのgetVisibilityの値を返す
 	 * これがView#VISIBLEを返してもViewの幅または高さの少なくとも一方が0のときは見えないので
 	 * 見えているかどうかのチェックには#isVisibleを使うほうが良い
