@@ -65,12 +65,19 @@ public class ViewSlider {
 	/**
 	 * アニメーション時の最大幅
 	 */
-	private int mTargetWidth;
+	private int mTargetMaxWidth;
 	/**
 	 * アニメーション時の最大高さ
 	 */
-	private int mTargetHeight;
-
+	private int mTargetMaxHeight;
+	/**
+	 * アニメーション時の最小幅
+	 */
+	private int mTargetMinWidth;
+	/**
+	 * アニメーション時の最小高さ
+	 */
+	private int mTargetMinHeight;
 	/**
 	 * アニメーションの方向を指定
 	 */
@@ -138,9 +145,10 @@ public class ViewSlider {
 		}
 		mDurationResizeMs = resizeDuration > 0 ? resizeDuration : DEFAULT_DURATION_RESIZE_MS;
 		mOrientation = orientation;
-		mTargetWidth = mTarget.getWidth();
-		mTargetHeight = mTarget.getHeight();
-		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:size(%dx%d)", mTargetWidth, mTargetHeight));
+		mTargetMaxWidth = mTarget.getWidth();
+		mTargetMaxHeight = mTarget.getHeight();
+		mTargetMinWidth = mTargetMinHeight = 0;
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:size(%dx%d)", mTargetMaxWidth, mTargetMaxHeight));
 		mParent.addOnLayoutChangeListener(mOnLayoutChangeListener);
 		mTarget.addOnLayoutChangeListener(mOnLayoutChangeListener);
 		// XXX ViewのvisibilityがGONEだとサイズが0になってしまうのでINVISIBLEに変更する
@@ -199,7 +207,7 @@ public class ViewSlider {
 	 * @param width
 	 */
 	public void setTargetWidth(final int width) {
-		mTargetWidth = width;
+		mTargetMaxWidth = width;
 	}
 
 	/**
@@ -208,7 +216,7 @@ public class ViewSlider {
 	 * @param height
 	 */
 	public void setTargetHeight(final int height) {
-		mTargetHeight = height;
+		mTargetMaxHeight = height;
 	}
 
 	/**
@@ -224,8 +232,18 @@ public class ViewSlider {
 	 * @param height
 	 */
 	public void setTargetSize(final int width, final int height) {
-		mTargetWidth = width;
-		mTargetHeight = height;
+		mTargetMaxWidth = width;
+		mTargetMaxHeight = height;
+	}
+
+	/**
+	 * アニメーション時の最小サイズをセットする
+	 * @param width
+	 * @param height
+	 */
+	public void setMinSize(final int width, final int height) {
+		mTargetMinWidth = width;
+		mTargetMinHeight = height;
 	}
 
 	/**
@@ -264,12 +282,12 @@ public class ViewSlider {
 				final ResizeAnimation expandAnimation;
 				if (mOrientation == VERTICAL) {
 					expandAnimation = new ResizeAnimation(mTarget,
-						mTargetWidth, 0,
-					mTargetWidth, mTargetHeight);
+						mTargetMaxWidth, mTargetMinHeight,
+						mTargetMaxWidth, mTargetMaxHeight);
 				} else {
 					expandAnimation = new ResizeAnimation(mTarget,
-						0, mTargetHeight,
-					mTargetWidth, mTargetHeight);
+						mTargetMinWidth, mTargetMaxHeight,
+						mTargetMaxWidth, mTargetMaxHeight);
 				}
 				expandAnimation.setDuration(mDurationResizeMs);
 				expandAnimation.setAnimationListener(mAnimationListener);
@@ -310,12 +328,12 @@ public class ViewSlider {
 						final ResizeAnimation collapseAnimation;
 						if (mOrientation == VERTICAL) {
 							collapseAnimation = new ResizeAnimation(mTarget,
-								mTargetWidth, mTarget.getHeight(),
-								mTargetWidth, 0);
+								mTargetMaxWidth, mTarget.getHeight(),
+								mTargetMaxWidth, mTargetMinHeight);
 						} else {
 							collapseAnimation = new ResizeAnimation(mTarget,
-								mTarget.getWidth(), mTargetHeight,
-								0, mTargetHeight);
+								mTarget.getWidth(), mTargetMaxHeight,
+								mTargetMinWidth, mTargetMaxHeight);
 						}
 						collapseAnimation.setDuration(durationMs);
 						collapseAnimation.setAnimationListener(mAnimationListener);
@@ -323,9 +341,9 @@ public class ViewSlider {
 						mTarget.startAnimation(collapseAnimation);
 					} else {
 						if (mOrientation == VERTICAL) {
-							ViewUtils.requestResize(mTarget, mTargetWidth, 0);
+							ViewUtils.requestResize(mTarget, mTargetMaxWidth, mTargetMinHeight);
 						} else {
-							ViewUtils.requestResize(mTarget, 0, mTargetHeight);
+							ViewUtils.requestResize(mTarget, mTargetMinWidth, mTargetMaxHeight);
 						}
 						mTarget.setVisibility(View.INVISIBLE);
 					}
@@ -347,11 +365,11 @@ public class ViewSlider {
 					oldLeft, oldTop, oldRight, oldBottom,
 					left, top, right, bottom));
 			if (v == mTarget) {
-				if (mTargetWidth <= 0) {
-					mTargetWidth = v.getWidth();
+				if (mTargetMaxWidth <= 0) {
+					mTargetMaxWidth = v.getWidth();
 				}
-				if (mTargetHeight <= 0) {
-					mTargetHeight = v.getHeight();
+				if (mTargetMaxHeight <= 0) {
+					mTargetMaxHeight = v.getHeight();
 				}
 			}
 		}
