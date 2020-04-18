@@ -326,7 +326,7 @@ public final class USBMonitor implements Const {
 	public List<UsbDevice> getDeviceList() {
 		final List<UsbDevice> result = new ArrayList<UsbDevice>();
 		if (destroyed) return result;
-		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
+		final HashMap<String, UsbDevice> deviceList = getDeviceList(mUsbManager);
 		if (deviceList != null) {
 			if (mDeviceFilters.isEmpty()) {
 				result.addAll(deviceList.values());
@@ -385,7 +385,7 @@ public final class USBMonitor implements Const {
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 */
 	public final void dumpDevices() {
-		final HashMap<String, UsbDevice> list = mUsbManager != null ? mUsbManager.getDeviceList() : null;
+		final HashMap<String, UsbDevice> list = getDeviceList(mUsbManager);
 		if (list != null) {
 			final Set<String> keys = list.keySet();
 			if (keys != null && keys.size() > 0) {
@@ -415,7 +415,7 @@ public final class USBMonitor implements Const {
 	 */
 	public final boolean hasPermission(final UsbDevice device) {
 		return !destroyed
-			&& updateDeviceState(device, device != null && mUsbManager.hasPermission(device));
+			&& updateDeviceState(device, device != null && hasPermission(mUsbManager, device));
 	}
 
 	/**
@@ -442,7 +442,7 @@ public final class USBMonitor implements Const {
 		boolean result = false;
 		if (isRegistered()) {
 			if (device != null) {
-				if (mUsbManager.hasPermission(device)) {
+				if (hasPermission(mUsbManager, device)) {
 					// 既にパーミッションが有れば接続する
 					processPermission(device);
 				} else {
@@ -846,7 +846,7 @@ public final class USBMonitor implements Const {
 			if (BuildCheck.isMarshmallow()) {	// API >= 23
 				info.version = device.getVersion();
 			}
-			if ((manager != null) && manager.hasPermission(device)) {
+			if ((manager != null) && hasPermission(manager, device)) {
 				final UsbDeviceConnection connection = manager.openDevice(device);
 				if (connection != null) {
 					try {
@@ -1524,5 +1524,29 @@ public final class USBMonitor implements Const {
 		private boolean isOpened() {
 			return mCtrlBlock != null;
 		}
+	}
+
+	private static boolean hasPermission(final UsbManager manager, final UsbDevice device) {
+		boolean hasPermission = false;
+		if (null != manager && null != device) {
+			try {
+				hasPermission = manager.hasPermission(device);
+			} catch (Throwable e) {
+				Log.w(TAG, e);
+			}
+		}
+		return hasPermission;
+	}
+
+	private static HashMap<String, UsbDevice> getDeviceList(UsbManager usbManager) {
+		HashMap<String, UsbDevice> list = null;
+		if (null != usbManager) {
+			try {
+				list = usbManager.getDeviceList();
+			} catch (Throwable e) {
+				Log.w(TAG, e);
+			}
+		}
+		return list;
 	}
 }
