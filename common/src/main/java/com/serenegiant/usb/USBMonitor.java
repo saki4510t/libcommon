@@ -196,11 +196,7 @@ public final class USBMonitor implements Const {
 			final Context context = mWeakContext.get();
 			if (context != null) {
 				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
-				final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-				if (BuildCheck.isAndroid5()) {
-					filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
-				}
-				filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+				final IntentFilter filter = createIntentFilter();
 				context.registerReceiver(mUsbReceiver, filter);
 			} else {
 				throw new IllegalStateException("context already released");
@@ -532,45 +528,53 @@ public final class USBMonitor implements Const {
 	 * パーミッション取得・USB機器のモニター用のBroadcastReceiver
 	 */
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-
 		@Override
 		public void onReceive(final Context context, final Intent intent) {
 			if (destroyed) return;
-			final String action = intent.getAction();
-			if (ACTION_USB_PERMISSION.equals(action)) {
-				// パーミッション要求の結果が返ってきた時
-				synchronized (USBMonitor.this) {
-					final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-					if ((device != null)
-						&& (hasPermission(device)
-							|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
-						// パーミッションを取得できた時・・・デバイスとの通信の準備をする
-						processPermission(device);
-						return;
-					}
-					// パーミッションを取得できなかった時
-					processCancel(device);
-				}
-			} else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
-				// デバイスが取り付けられた時の処理・・・SC-06DはこのActionが来ない.ACTION_USB_DEVICE_DETACHEDは来る
-				// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからない
-				// Android5以降なら大丈夫そう
-				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-				processAttach(device);
-			} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
-				// デバイスが取り外された時
-				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-				if (device != null) {
-					final UsbDeviceState state = mDeviceStates.remove(device);
-					if (state != null) {
-						// デバイスとの通信をクリーンアップして閉じるためのメソッドを呼び出す
-						state.close();
-					}
-					processDettach(device);
-				}
-			}
+			USBMonitor.this.onReceive(context, intent);
 		}
 	};
+
+	/**
+	 * パーミッション取得・USB機器のモニター用のBroadcastReceiverの処理の実態
+	 * @param context
+	 * @param intent
+	 */
+	protected void onReceive(final Context context, final Intent intent) {
+		final String action = intent.getAction();
+		if (ACTION_USB_PERMISSION.equals(action)) {
+			// パーミッション要求の結果が返ってきた時
+			synchronized (USBMonitor.this) {
+				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+				if ((device != null)
+					&& (hasPermission(device)
+						|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
+					// パーミッションを取得できた時・・・デバイスとの通信の準備をする
+					processPermission(device);
+					return;
+				}
+				// パーミッションを取得できなかった時
+				processCancel(device);
+			}
+		} else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+			// デバイスが取り付けられた時の処理・・・SC-06DはこのActionが来ない.ACTION_USB_DEVICE_DETACHEDは来る
+			// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからない
+			// Android5以降なら大丈夫そう
+			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+			processAttach(device);
+		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+			// デバイスが取り外された時
+			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+			if (device != null) {
+				final UsbDeviceState state = mDeviceStates.remove(device);
+				if (state != null) {
+					// デバイスとの通信をクリーンアップして閉じるためのメソッドを呼び出す
+					state.close();
+				}
+				processDettach(device);
+			}
+		}
+	}
 
 	/**
 	 * 古い一部機種向けのポーリングで接続機器をチェックするためのRunnable
@@ -623,6 +627,19 @@ public final class USBMonitor implements Const {
 			}
 		}
 	};
+
+	/**
+	 * ブロードキャスト受信用のIntentFilterを生成する
+	 * @return
+	 */
+	protected IntentFilter createIntentFilter() {
+		final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+		if (BuildCheck.isAndroid5()) {
+			filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
+		}
+		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+		return filter;
+	}
 
 	/**
 	 * パーミッション要求結果が返ってきた時の処理
