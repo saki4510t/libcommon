@@ -43,7 +43,6 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -795,41 +794,6 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
-	 * 指定したIDのStringディスクリプタから文字列を取得する。取得できなければnull
-	 * @param connection
-	 * @param id
-	 * @param languageCount
-	 * @param languages
-	 * @return
-	 */
-	private static String getString(@NonNull final UsbDeviceConnection connection,
-		final int id, final int languageCount, final byte[] languages) {
-
-		final byte[] work = new byte[256];
-		String result = null;
-		for (int i = 1; i <= languageCount; i++) {
-			int ret = connection.controlTransfer(
-				USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
-				USB_REQ_GET_DESCRIPTOR,
-				(USB_DT_STRING << 8) | id, languages[i], work, 256, 0);
-			if ((ret > 2) && (work[0] == ret) && (work[1] == USB_DT_STRING)) {
-				// skip first two bytes(bLength & bDescriptorType), and copy the rest to the string
-				try {
-					result = new String(work, 2, ret - 2, "UTF-16LE");
-					if (!"Љ".equals(result)) {	// 変なゴミが返ってくる時がある
-						break;
-					} else {
-						result = null;
-					}
-				} catch (final UnsupportedEncodingException e) {
-					// ignore
-				}
-			}
-		}
-		return result;
-	}
-
-	/**
 	 * ベンダー名・製品名・バージョン・シリアルを取得する
 	 * @param device
 	 * @return
@@ -905,13 +869,13 @@ public final class USBMonitor implements Const {
 							}
 							if (languageCount > 0) {
 								if (TextUtils.isEmpty(info.manufacturer)) {
-									info.manufacturer = getString(connection, desc[14], languageCount, languages);
+									info.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
 								}
 								if (TextUtils.isEmpty(info.product)) {
-									info.product = getString(connection, desc[15], languageCount, languages);
+									info.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
 								}
 								if (TextUtils.isEmpty(info.serial)) {
-									info.serial = getString(connection, desc[16], languageCount, languages);
+									info.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
 								}
 							}
 						}

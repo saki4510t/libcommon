@@ -22,13 +22,53 @@ package com.serenegiant.usb;
 
 import android.annotation.SuppressLint;
 import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbDeviceConnection;
 import android.text.TextUtils;
 
 import com.serenegiant.system.BuildCheck;
 
-public class UsbUtils {
+import java.io.UnsupportedEncodingException;
+
+import androidx.annotation.NonNull;
+
+public class UsbUtils implements Const {
 	private UsbUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
+	/**
+	 * 指定したIDのStringディスクリプタから文字列を取得する。取得できなければnull
+	 * @param connection
+	 * @param id
+	 * @param languageCount
+	 * @param languages
+	 * @return
+	 */
+	public static String getString(@NonNull final UsbDeviceConnection connection,
+		final int id, final int languageCount, final byte[] languages) {
+
+		final byte[] work = new byte[256];
+		String result = null;
+		for (int i = 1; i <= languageCount; i++) {
+			int ret = connection.controlTransfer(
+				USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
+				USB_REQ_GET_DESCRIPTOR,
+				(USB_DT_STRING << 8) | id, languages[i], work, 256, 0);
+			if ((ret > 2) && (work[0] == ret) && (work[1] == USB_DT_STRING)) {
+				// skip first two bytes(bLength & bDescriptorType), and copy the rest to the string
+				try {
+					result = new String(work, 2, ret - 2, "UTF-16LE");
+					if (!"Љ".equals(result)) {	// 変なゴミが返ってくる時がある
+						break;
+					} else {
+						result = null;
+					}
+				} catch (final UnsupportedEncodingException e) {
+					// ignore
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
