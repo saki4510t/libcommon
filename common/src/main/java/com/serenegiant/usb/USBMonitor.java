@@ -49,6 +49,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -113,7 +114,7 @@ public final class USBMonitor implements Const {
 	}
 
 	/** USB機器の接続状態を保持 */
-	private  final ConcurrentHashMap<UsbDevice, UsbDeviceState>
+	private final Map<UsbDevice, UsbDeviceState>
 		mDeviceStates = new ConcurrentHashMap<>();
 
 	private final WeakReference<Context> mWeakContext;
