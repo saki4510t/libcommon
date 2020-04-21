@@ -129,6 +129,11 @@ public final class USBMonitor implements Const {
 	 */
 	private final Handler mAsyncHandler;
 	private volatile boolean destroyed;
+	/**
+	 * ポーリングで接続されているUSB機器の変化をチェックするかどうか
+	 * Android5以上ではデフォルトはfalseでregister直後を覗いてポーリングしない
+	 */
+	private boolean mEnablePolling = !BuildCheck.isAndroid5();
 
 	/**
 	 * コンストラクタ
@@ -382,6 +387,28 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
+	 * ポーリングによる接続機器のチェックを有効にするかどうか
+	 * @return
+	 */
+	public boolean isEnablePolling() {
+		return mEnablePolling;
+	}
+
+	/**
+	 * ポーリングによる接続機器のチェックを有効にするかどうかを設定
+	 * @param enable
+	 */
+	public synchronized void setEnablePolling(final boolean enable) {
+		if (mEnablePolling != enable) {
+			mEnablePolling = enable;
+			mAsyncHandler.removeCallbacks(mDeviceCheckRunnable);
+			if (enable && isRegistered()) {
+				mAsyncHandler.postDelayed(mDeviceCheckRunnable, 500);
+			}
+		}
+	}
+
+	/**
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 */
 	public final void dumpDevices() {
@@ -591,7 +618,7 @@ public final class USBMonitor implements Const {
 					});
 				}
 			}
-			if (!BuildCheck.isAndroid5()) {
+			if (mEnablePolling) {
 				mAsyncHandler.postDelayed(mDeviceCheckRunnable, 1000);	// 1秒に1回確認
 			}
 		}
