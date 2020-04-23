@@ -663,7 +663,6 @@ public final class USBMonitor implements Const {
 				@Override
 				public void run() {
 //					if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
-					final boolean createNew;
 					mOnDeviceConnectListener.onConnected(device, ctrlBlock);
 				}
 			});
