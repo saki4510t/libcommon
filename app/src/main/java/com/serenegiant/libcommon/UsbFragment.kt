@@ -118,32 +118,32 @@ class UsbFragment : BaseFragment() {
 		= object : OnDeviceConnectListener {
 
 		override fun onAttach(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device}")
 			// USB機器が接続された時
 		}
 
 		override fun onPermission(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device}")
 			// パーミッションを取得できた時
 		}
 
 		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onConnected:")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onConnected:${device}")
 			// USB機器がopenした時
 		}
 
 		override fun onDisconnect(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDisconnect:")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDisconnect:${device}")
 			// USB機器がcloseした時
 		}
 
 		override fun onDetach(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDetach:")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDetach:${device}")
 			// USB機器が取り外された時
 		}
 
 		override fun onCancel(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "onCancel:")
+			if (DEBUG) Log.v(TAG, "onCancel:${device}")
 			// パーミッションを取得できなかった時
 		}
 
