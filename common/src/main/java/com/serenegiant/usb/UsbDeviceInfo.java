@@ -49,7 +49,12 @@ public class UsbDeviceInfo implements Const {
 
 		info.device = device;
 		if (device != null) {
-			if (BuildCheck.isLollipop()) {	// API >= 21
+			if (BuildCheck.isAPI29()) {
+				// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
+				info.manufacturer = device.getManufacturerName();
+				info.product = device.getProductName();
+				info.configCounts = device.getConfigurationCount();
+			} else if (BuildCheck.isLollipop()) {	// API >= 21
 				info.manufacturer = device.getManufacturerName();
 				info.product = device.getProductName();
 				info.serial = device.getSerialNumber();
@@ -70,6 +75,10 @@ public class UsbDeviceInfo implements Const {
 							if (TextUtils.isEmpty(info.version)) {
 								info.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
 							}
+							if (BuildCheck.isAPI29()) {	// API >= 29
+								// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
+								info.serial = device.getSerialNumber();
+							}
 							if (TextUtils.isEmpty(info.serial)) {
 								info.serial = connection.getSerial();
 							}
@@ -84,7 +93,7 @@ public class UsbDeviceInfo implements Const {
 							int result = connection.controlTransfer(
 								USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
 								USB_REQ_GET_DESCRIPTOR,
-								(USB_DT_STRING << 8) | 0, 0, languages, 256, 0);
+								(USB_DT_STRING << 8)/* | 0*/, 0, languages, 256, 0);
 							if (result > 0) {
 								languageCount = (result - 2) / 2;
 							}
