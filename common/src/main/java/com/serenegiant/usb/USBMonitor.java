@@ -154,10 +154,10 @@ public final class USBMonitor implements Const {
 
 	/**
 	 * 破棄処理
-	 * 一旦destroyを呼ぶと再利用は出来ない
+	 * 一旦releaseを呼ぶと再利用は出来ない
 	 */
-	public void destroy() {
-		if (DEBUG) Log.i(TAG, "destroy:");
+	public void release() {
+		if (DEBUG) Log.i(TAG, "release:");
 		unregister();
 		if (!destroyed) {
 			destroyed = true;
@@ -173,16 +173,25 @@ public final class USBMonitor implements Const {
 						}
 					}
 				} catch (final Exception e) {
-					Log.e(TAG, "destroy:", e);
+					Log.e(TAG, "release:", e);
 				}
 			}
 			mDeviceStates.clear();
 			try {
 				mAsyncHandler.getLooper().quit();
 			} catch (final Exception e) {
-				Log.e(TAG, "destroy:", e);
+				Log.e(TAG, "release:", e);
 			}
 		}
+	}
+
+	/**
+	 * 破棄処理
+	 * 一旦destroyを呼ぶと再利用は出来ない
+	 * #releaseのシノニム
+	 */
+	public void destroy() {
+		release();
 	}
 
 	/**
