@@ -327,7 +327,7 @@ public final class DeviceFilter implements Parcelable {
 
 	/**
 	 * 指定したUsbDeviceがこのDeviceFilterにマッチするかどうかを返す
-	 * mExcludeフラグは別途#isExcludeか自前でチェックすること
+	 * isExcludeフラグは別途#isExcludeか自前でチェックすること
 	 * @param device
 	 * @return
 	 */
@@ -502,6 +502,12 @@ public final class DeviceFilter implements Parcelable {
 			&& (mProtocol == -1 || protocol == mProtocol));
 	}
 
+	/**
+	 * インターフェースクラスに一致するものがあるかどうか
+	 * フィルター用インターフェースクラス配列の長さが0なら常にtrue
+	 * @param clazz
+	 * @return true: 一致したものがある
+	 */
 	private boolean matchesIntfClass(final int clazz) {
 		if (mIntfClass.length > 0) {
 			for (int intfClass: mIntfClass) {
@@ -515,6 +521,12 @@ public final class DeviceFilter implements Parcelable {
 		}
 	}
 
+	/**
+	 * インターフェースサブクラスに一致するものがあるかどうか
+	 * フィルター用インターフェースサブクラス配列の長さが0なら常にtrue
+	 * @param subClazz
+	 * @return true: 一致したものがある
+	 */
 	private boolean matchesIntfSubClass(final int subClazz) {
 		if (mIntfSubClass.length > 0) {
 			for (int value: mIntfSubClass) {
@@ -528,6 +540,12 @@ public final class DeviceFilter implements Parcelable {
 		}
 	}
 
+	/**
+	 * インターフェースプロトコルに一致するものがあるかどうか
+	 * フィルター用インターフェースプロトコル配列の長さが0なら常にtrue
+	 * @param protocol
+	 * @return true: 一致したものがある
+	 */
 	private boolean matchesIntfProtocol(final int protocol) {
 		if (mIntfProtocol.length > 0) {
 			for (int value: mIntfProtocol) {

@@ -119,14 +119,19 @@ public class UsbDeviceInfo implements Const {
 
 //--------------------------------------------------------------------------------
 	/** 機器が対応しているUSB規格 */
+	@Nullable
 	public String usb_version;
 	/** ベンダー名 */
+	@Nullable
 	public String manufacturer;
 	/** プロダクト名 */
+	@Nullable
 	public String product;
 	/** 機器のバージョン */
+	@Nullable
 	public String version;
 	/** 機器のシリアル番号 */
+	@Nullable
 	public String serial;
 	/** コンフィギュレーションの個数 */
 	public int configCounts;
