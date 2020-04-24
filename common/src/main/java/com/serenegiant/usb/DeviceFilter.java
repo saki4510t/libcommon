@@ -146,6 +146,7 @@ public final class DeviceFilter implements Parcelable {
 					}
 					// ここから下はオリジナルには無い追加の設定
 					exclude = getAttribute(context, parser, null, "exclude", false);
+					// API>=28でclass, sub class, protocolが0になってしまうのでinterface class, interface sub class, interface protocolでチェックできるように定義を追加
 					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceClass"))) {
 						intfClass = getAttribute(context, parser, null, "interfaceClass", new int[0]);
 						if ((intfClass != null) && (intfClass.length == 0)) {
