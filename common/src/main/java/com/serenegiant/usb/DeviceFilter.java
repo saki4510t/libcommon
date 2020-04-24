@@ -577,8 +577,18 @@ public final class DeviceFilter implements Parcelable {
 		}
 	}
 
+	/**
+	 * インターフェース専用のフィルタが定義されてあって一致する場合true
+	 * @param clazz
+	 * @param subclass
+	 * @param protocol
+	 * @return
+	 */
 	private boolean interfaceMatches(final int clazz, final int subclass, final int protocol) {
-		return matchesIntfClass(clazz)
+		return (mIntfClass.length > 0)
+			&& (mIntfSubClass.length > 0)
+			&& (mIntfProtocol.length > 0)
+			&& matchesIntfClass(clazz)
 			&& matchesIntfSubClass(subclass)
 			&& matchesIntfProtocol(protocol);
 	}
