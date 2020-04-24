@@ -112,7 +112,7 @@ public final class DeviceFilter implements Parcelable {
         int eventType = parser.getEventType();
         while (eventType != XmlPullParser.END_DOCUMENT) {
         	tag = parser.getName();
-        	if (!TextUtils.isEmpty(tag) && (tag.equalsIgnoreCase("usb-device"))) {
+        	if ("usb-device".equalsIgnoreCase(tag)) {
         		if (eventType == XmlPullParser.START_TAG) {
         			hasValue = true;
 					vendorId = getAttribute(context, parser, null, "vendor-id", -1);
