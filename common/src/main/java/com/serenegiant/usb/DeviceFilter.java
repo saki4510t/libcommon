@@ -131,16 +131,20 @@ public final class DeviceFilter implements Parcelable {
         			deviceProtocol = getAttribute(context, parser, null, "protocol", -1);
         			manufacturerName = getAttribute(context, parser, null, "manufacturer-name", "");
         			if (TextUtils.isEmpty(manufacturerName)) {
+        				// オリジナルの属性名が設定されていないときは末尾の"-name"がない場合をチェック
         				manufacturerName = getAttribute(context, parser, null, "manufacture", "");
 					}
         			productName = getAttribute(context, parser, null, "product-name", "");
         			if (TextUtils.isEmpty(productName)) {
+						// オリジナルの属性名が設定されていないときは末尾の"-name"がない場合をチェック
         				productName = getAttribute(context, parser, null, "product", "");
 					}
         			serialNumber = getAttribute(context, parser, null, "serial-number", "");
         			if (TextUtils.isEmpty(serialNumber)) {
+						// オリジナルの属性名が設定されていないときは末尾の"-number"がない場合をチェック
             			serialNumber = getAttribute(context, parser, null, "serial", "");
 					}
+					// ここから下はオリジナルには無い追加の設定
 					exclude = getAttribute(context, parser, null, "exclude", false);
 					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceClass"))) {
 						intfClass = getAttribute(context, parser, null, "interfaceClass", new int[0]);
