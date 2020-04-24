@@ -318,88 +318,6 @@ public final class DeviceFilter implements Parcelable {
 	} */
 
 	/**
-	 * 指定したクラス・サブクラス・プロトコルがこのDeviceFilterとマッチするかどうかを返す
-	 * mExcludeフラグは別途#isExcludeか自前でチェックすること
-	 * @param clazz
-	 * @param subclass
-	 * @param protocol
-	 * @return
-	 */
-	private boolean matches(final int clazz, final int subclass, final int protocol) {
-		return ((mClass == -1 || clazz == mClass)
-			&& (mSubclass == -1 || subclass == mSubclass)
-			&& (mProtocol == -1 || protocol == mProtocol));
-	}
-
-	private boolean matchesIntfClass(final int clazz) {
-		if (mIntfClass.length > 0) {
-			for (int intfClass: mIntfClass) {
-				if (intfClass == clazz) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private boolean matchesIntfSubClass(final int subClazz) {
-		if (mIntfSubClass.length > 0) {
-			for (int value: mIntfSubClass) {
-				if (value == subClazz) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private boolean matchesIntfProtocol(final int protocol) {
-		if (mIntfProtocol.length > 0) {
-			for (int value: mIntfProtocol) {
-				if (value == protocol) {
-					return true;
-				}
-			}
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	private boolean interfaceMatches(final int clazz, final int subclass, final int protocol) {
-		return matchesIntfClass(clazz)
-			&& matchesIntfSubClass(subclass)
-			&& matchesIntfProtocol(protocol);
-	}
-
-	private boolean interfaceMatches(@NonNull final UsbDevice device) {
-		// if device doesn't match, check the interfaces
-		final int count = device.getInterfaceCount();
-		for (int i = 0; i < count; i++) {
-			final UsbInterface intf = device.getInterface(i);
-			if (matches(
-				intf.getInterfaceClass(),
-				intf.getInterfaceSubclass(),
-				intf.getInterfaceProtocol())) {
-
-				return true;
-			}
-			if (interfaceMatches(
-				intf.getInterfaceClass(),
-				intf.getInterfaceSubclass(),
-				intf.getInterfaceProtocol())) {
-
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * 指定したUsbDeviceがこのDeviceFilterにマッチするかどうかを返す
 	 * mExcludeフラグは別途#isExcludeか自前でチェックすること
 	 * @param device
@@ -561,7 +479,93 @@ public final class DeviceFilter implements Parcelable {
 		dest.writeByte((byte) (isExclude ? 1 : 0));
 	}
 
-	public static final Creator<DeviceFilter> CREATOR = new Creator<DeviceFilter>() {
+//--------------------------------------------------------------------------------
+	/**
+	 * 指定したクラス・サブクラス・プロトコルがこのDeviceFilterとマッチするかどうかを返す
+	 * mExcludeフラグは別途#isExcludeか自前でチェックすること
+	 * @param clazz
+	 * @param subclass
+	 * @param protocol
+	 * @return
+	 */
+	private boolean matches(final int clazz, final int subclass, final int protocol) {
+		return ((mClass == -1 || clazz == mClass)
+			&& (mSubclass == -1 || subclass == mSubclass)
+			&& (mProtocol == -1 || protocol == mProtocol));
+	}
+
+	private boolean matchesIntfClass(final int clazz) {
+		if (mIntfClass.length > 0) {
+			for (int intfClass: mIntfClass) {
+				if (intfClass == clazz) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private boolean matchesIntfSubClass(final int subClazz) {
+		if (mIntfSubClass.length > 0) {
+			for (int value: mIntfSubClass) {
+				if (value == subClazz) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private boolean matchesIntfProtocol(final int protocol) {
+		if (mIntfProtocol.length > 0) {
+			for (int value: mIntfProtocol) {
+				if (value == protocol) {
+					return true;
+				}
+			}
+			return false;
+		} else {
+			return true;
+		}
+	}
+
+	private boolean interfaceMatches(final int clazz, final int subclass, final int protocol) {
+		return matchesIntfClass(clazz)
+			&& matchesIntfSubClass(subclass)
+			&& matchesIntfProtocol(protocol);
+	}
+
+	private boolean interfaceMatches(@NonNull final UsbDevice device) {
+		// if device doesn't match, check the interfaces
+		final int count = device.getInterfaceCount();
+		for (int i = 0; i < count; i++) {
+			final UsbInterface intf = device.getInterface(i);
+			if (matches(
+				intf.getInterfaceClass(),
+				intf.getInterfaceSubclass(),
+				intf.getInterfaceProtocol())) {
+
+				return true;
+			}
+			if (interfaceMatches(
+				intf.getInterfaceClass(),
+				intf.getInterfaceSubclass(),
+				intf.getInterfaceProtocol())) {
+
+				return true;
+			}
+		}
+		return false;
+	}
+
+//--------------------------------------------------------------------------------
+	public static final Creator<DeviceFilter> CREATOR
+		= new Creator<DeviceFilter>() {
+
 		@Override
 		public DeviceFilter createFromParcel(Parcel in) {
 			return new DeviceFilter(in);
