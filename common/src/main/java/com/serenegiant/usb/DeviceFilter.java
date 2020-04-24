@@ -115,8 +115,6 @@ public final class DeviceFilter implements Parcelable {
 		mProductName = TextUtils.isEmpty(product) ? null : product;
 		mSerialNumber = TextUtils.isEmpty(serialNum) ? null : serialNum;
 		this.isExclude = isExclude;
-/*		Log.i(TAG, String.format("vendorId=0x%04x,productId=0x%04x,class=0x%02x,subclass=0x%02x,protocol=0x%02x",
-			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
 	}
 
 	public DeviceFilter(@NonNull final UsbDevice device) {
@@ -151,8 +149,6 @@ public final class DeviceFilter implements Parcelable {
 			mSerialNumber = null;
 		}
 		this.isExclude = isExclude;
-/*		Log.i(TAG, String.format("vendorId=0x%04x,productId=0x%04x,class=0x%02x,subclass=0x%02x,protocol=0x%02x",
-			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
 	}
 
 	protected DeviceFilter(final Parcel in) {
@@ -176,8 +172,9 @@ public final class DeviceFilter implements Parcelable {
 	 * @param deviceFilterXmlId
 	 * @return
 	 */
-	public static List<DeviceFilter> getDeviceFilters(@NonNull final Context context,
-													  @XmlRes final int deviceFilterXmlId) {
+	public static List<DeviceFilter> getDeviceFilters(
+		@NonNull final Context context,
+		@XmlRes final int deviceFilterXmlId) {
 
 		final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
 		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
@@ -202,7 +199,8 @@ public final class DeviceFilter implements Parcelable {
 	}
 
 	public static DeviceFilter readEntryOne(
-		@NonNull final Context context, @NonNull final XmlPullParser parser)
+		@NonNull final Context context,
+		@NonNull final XmlPullParser parser)
 			throws XmlPullParserException, IOException {
 
 		int vendorId = -1;
