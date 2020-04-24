@@ -198,6 +198,7 @@ public final class DeviceFilter implements Parcelable {
 		return Collections.unmodifiableList(deviceFilters);
 	}
 
+	@Nullable
 	public static DeviceFilter readEntryOne(
 		@NonNull final Context context,
 		@NonNull final XmlPullParser parser)
@@ -227,8 +228,8 @@ public final class DeviceFilter implements Parcelable {
         				vendorId = getAttribute(context, parser, null, "vendorId", -1);
         			}
 					if (vendorId == -1) {
-         			vendorId = getAttribute(context, parser, null, "venderId", -1);
-}
+	         			vendorId = getAttribute(context, parser, null, "venderId", -1);
+					}
     				productId = getAttribute(context, parser, null, "product-id", -1);
         			if (productId == -1) {
             			productId = getAttribute(context, parser, null, "productId", -1);
