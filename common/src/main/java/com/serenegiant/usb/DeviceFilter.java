@@ -65,14 +65,6 @@ public final class DeviceFilter implements Parcelable {
 	public final int mClass;
 	// USB device or interface subclass (or -1 for unspecified)
 	public final int mSubclass;
-	// USB interface class (or -1 for unspecified)
-	@Nullable
-	public final int[] mIntfClass;
-	// USB interface subclass (or -1 for unspecified)
-	@Nullable
-	public final int[] mIntfSubClass;
-	@Nullable
-	public final int[] mIntfProtocol;
 	// USB device protocol (or -1 for unspecified)
 	public final int mProtocol;
 	// USB device manufacturer name string (or null for unspecified)
@@ -81,6 +73,14 @@ public final class DeviceFilter implements Parcelable {
 	public final String mProductName;
 	// USB device serial number string (or null for unspecified)
 	public final String mSerialNumber;
+	// USB interface class (or -1 for unspecified)
+	@NonNull
+	public final int[] mIntfClass;
+	// USB interface subclass (or -1 for unspecified)
+	@NonNull
+	public final int[] mIntfSubClass;
+	@NonNull
+	public final int[] mIntfProtocol;
 	// set true if specific device(s) should exclude
 	public final boolean isExclude;
 
@@ -170,13 +170,13 @@ public final class DeviceFilter implements Parcelable {
 		mProductId = in.readInt();
 		mClass = in.readInt();
 		mSubclass = in.readInt();
-		mIntfClass = in.createIntArray();
-		mIntfSubClass = in.createIntArray();
-		mIntfProtocol = in.createIntArray();
 		mProtocol = in.readInt();
 		mManufacturerName = in.readString();
 		mProductName = in.readString();
 		mSerialNumber = in.readString();
+		mIntfClass = in.createIntArray();
+		mIntfSubClass = in.createIntArray();
+		mIntfProtocol = in.createIntArray();
 		isExclude = in.readByte() != 0;
 	}
 
@@ -554,13 +554,13 @@ public final class DeviceFilter implements Parcelable {
 		dest.writeInt(mProductId);
 		dest.writeInt(mClass);
 		dest.writeInt(mSubclass);
-		dest.writeIntArray(mIntfClass);
-		dest.writeIntArray(mIntfSubClass);
-		dest.writeIntArray(mIntfProtocol);
 		dest.writeInt(mProtocol);
 		dest.writeString(mManufacturerName);
 		dest.writeString(mProductName);
 		dest.writeString(mSerialNumber);
+		dest.writeIntArray(mIntfClass);
+		dest.writeIntArray(mIntfSubClass);
+		dest.writeIntArray(mIntfProtocol);
 		dest.writeByte((byte) (isExclude ? 1 : 0));
 	}
 
