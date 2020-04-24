@@ -32,7 +32,7 @@ import com.serenegiant.usb.USBMonitor.UsbControlBlock
 import com.serenegiant.view.ViewUtils
 
 /**
- * A simple [Fragment] subclass.
+ * A simple [BaseFragment] subclass.
  */
 class UsbFragment : BaseFragment() {
 
