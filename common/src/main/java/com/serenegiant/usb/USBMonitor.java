@@ -344,20 +344,37 @@ public final class USBMonitor implements Const {
 				result.addAll(deviceList.values());
 			} else {
 				for (final UsbDevice device: deviceList.values() ) {
-					for (final DeviceFilter filter: mDeviceFilters) {
-						if ((filter != null) && filter.matches(device)) {
-							// フィルタにマッチした時
-							if (!filter.isExclude) {
-								// excludeで無い時のみ追加する
-								result.add(device);
-							}
-							break;
-						}
+					if (matches(device)) {
+						result.add(device);
 					}
 				}
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * フィルターにマッチするかどうかを確認
+	 * @param device
+	 * @return
+	 */
+	private boolean matches(@NonNull final UsbDevice device) {
+		if (mDeviceFilters.isEmpty()) {
+			// フィルタが空なら常時マッチする
+			return true;
+		} else {
+			for (final DeviceFilter filter: mDeviceFilters) {
+				if ((filter != null) && filter.matches(device)) {
+					// フィルタにマッチした時
+					if (!filter.isExclude) {
+						if (DEBUG) Log.v(TAG, "matched:matched," + device + "\nfilter=" + filter);
+						return true;
+					}
+					break; // excludeにマッチしたので終了
+				}
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -668,13 +685,16 @@ public final class USBMonitor implements Const {
 	private final void processAttach(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processAttach:");
-		hasPermission(device);
-		mAsyncHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				mOnDeviceConnectListener.onAttach(device);
-			}
-		});
+		if (matches(device)) {
+			// フィルタにマッチした
+			hasPermission(device);
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mOnDeviceConnectListener.onAttach(device);
+				}
+			});
+		}
 	}
 
 	/**
@@ -684,13 +704,16 @@ public final class USBMonitor implements Const {
 	private final void processDettach(final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processDettach:");
-		updateDeviceState(device, false);
-		mAsyncHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				mOnDeviceConnectListener.onDetach(device);
-			}
-		});
+		if (matches(device)) {
+			// フィルタにマッチした
+			updateDeviceState(device, false);
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mOnDeviceConnectListener.onDetach(device);
+				}
+			});
+		}
 	}
 
 	/**
