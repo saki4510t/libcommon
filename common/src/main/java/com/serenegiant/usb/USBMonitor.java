@@ -194,6 +194,7 @@ public final class USBMonitor implements Const {
 		release();
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 接続/切断およびパーミッション要求に成功した時のブロードキャストを受信するためのブロードキャストレシーバーを登録する
 	 * @throws IllegalStateException
@@ -243,6 +244,7 @@ public final class USBMonitor implements Const {
 		return !destroyed && (mPermissionIntent != null);
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * デバイスフィルターを設定
 	 * @param filter
@@ -320,6 +322,7 @@ public final class USBMonitor implements Const {
 		mDeviceFilters.removeAll(filters);
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * return the number of connected USB devices that matched device filter
 	 * @return
@@ -440,20 +443,6 @@ public final class USBMonitor implements Const {
 	public final boolean hasPermission(final UsbDevice device) {
 		return !destroyed
 			&& updateDeviceState(device, device != null && mUsbManager.hasPermission(device));
-	}
-
-	/**
-	 * 内部で保持しているパーミッション状態を更新
-	 * @param device
-	 * @param hasPermission
-	 * @return hasPermission
-	 */
-	private boolean updateDeviceState(final UsbDevice device, final boolean hasPermission) {
-		if (DEBUG) Log.v(TAG, "updateDeviceState:");
-		if (device != null) {
-			requireDeviceState(device);
-		}
-		return hasPermission;
 	}
 
 	/**
@@ -761,6 +750,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 * @return
 	 */
+	@Deprecated
 	public static String getDeviceKeyNameWithSerial(final Context context, final UsbDevice device) {
 		final UsbDeviceInfo info = getDeviceInfo(context, device);
 		return UsbUtils.getDeviceKeyName(device, true, info.serial, info.manufacturer, info.configCounts, info.version);
@@ -772,10 +762,12 @@ public final class USBMonitor implements Const {
 	 * シリアルナンバーを取得できなければgetDeviceKeyと同じ
 	 * @return
 	 */
+	@Deprecated
 	public static int getDeviceKeyWithSerial(final Context context, final UsbDevice device) {
 		return getDeviceKeyNameWithSerial(context, device).hashCode();
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 機器情報保持のためのヘルパークラス
 	 */
@@ -831,6 +823,7 @@ public final class USBMonitor implements Const {
 		return updateDeviceInfo((UsbManager)context.getSystemService(Context.USB_SERVICE), device, new UsbDeviceInfo());
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * ベンダー名・製品名・バージョン・シリアルを取得する
 	 * @param manager
@@ -915,6 +908,7 @@ public final class USBMonitor implements Const {
 		return info;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * USB機器をopenして管理するためのクラス
 	 * 一度closeすると再利用は出来ないので、再度生成すること
@@ -924,7 +918,8 @@ public final class USBMonitor implements Const {
 		private final WeakReference<UsbDevice> mWeakDevice;
 		protected UsbDeviceConnection mConnection;
 		protected final UsbDeviceInfo mInfo;
-		private final SparseArray<SparseArray<UsbInterface>> mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
+		private final SparseArray<SparseArray<UsbInterface>>
+			mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
 
 		/**
 		 * 指定したUsbDeviceに関係づけたUsbControlBlockインスタンスを生成する
@@ -1489,6 +1484,21 @@ public final class USBMonitor implements Const {
 		}
 
 	} // end ofUsbControlBlock
+
+//--------------------------------------------------------------------------------
+	/**
+	 * 内部で保持しているパーミッション状態を更新
+	 * @param device
+	 * @param hasPermission
+	 * @return hasPermission
+	 */
+	private boolean updateDeviceState(final UsbDevice device, final boolean hasPermission) {
+		if (DEBUG) Log.v(TAG, "updateDeviceState:");
+		if (device != null) {
+			requireDeviceState(device);
+		}
+		return hasPermission;
+	}
 
 	@Nullable
 	private UsbDeviceState getDeviceState(@Nullable final UsbDevice device) {
