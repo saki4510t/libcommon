@@ -45,7 +45,7 @@ class UsbFragment : BaseFragment() {
 		if (mUSBMonitor == null) {
 			mUSBMonitor = USBMonitor(context, mOnDeviceConnectListener)
 			val filters
-				 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_exclude)
+				 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
 			mUSBMonitor!!.setDeviceFilter(filters)
 		}
 	}
