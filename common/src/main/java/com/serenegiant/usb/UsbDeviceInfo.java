@@ -47,6 +47,7 @@ public class UsbDeviceInfo implements Const {
 		final UsbDeviceInfo info = _info != null ? _info : new UsbDeviceInfo();
 		info.clear();
 
+		info.device = device;
 		if (device != null) {
 			if (BuildCheck.isLollipop()) {	// API >= 21
 				info.manufacturer = device.getManufacturerName();
@@ -118,6 +119,9 @@ public class UsbDeviceInfo implements Const {
 	}
 
 //--------------------------------------------------------------------------------
+	/** 設定してあるUsbDevice */
+	@Nullable
+	public UsbDevice device;
 	/** 機器が対応しているUSB規格 */
 	@Nullable
 	public String usb_version;
@@ -141,6 +145,7 @@ public class UsbDeviceInfo implements Const {
 	}
 
 	private void clear() {
+		device = null;
 		usb_version = manufacturer = product = version = serial = null;
 		configCounts = -1;
 	}
