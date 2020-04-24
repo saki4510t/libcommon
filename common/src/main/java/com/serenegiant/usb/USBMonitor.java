@@ -408,33 +408,6 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
-	 * 接続されているUSBの機器リストをLogCatに出力
-	 */
-	public final void dumpDevices() {
-		final HashMap<String, UsbDevice> list = mUsbManager != null ? mUsbManager.getDeviceList() : null;
-		if (list != null) {
-			final Set<String> keys = list.keySet();
-			if (keys != null && keys.size() > 0) {
-				final StringBuilder sb = new StringBuilder();
-				for (final String key: keys) {
-					final UsbDevice device = list.get(key);
-					final int num_interface = device != null ? device.getInterfaceCount() : 0;
-					sb.setLength(0);
-					for (int i = 0; i < num_interface; i++) {
-						sb.append(String.format(Locale.US, "interface%d:%s",
-							i, device.getInterface(i).toString()));
-					}
-					Log.i(TAG, "key=" + key + ":" + device + ":" + sb.toString());
-				}
-			} else {
-				Log.i(TAG, "no device");
-			}
-		} else {
-			Log.i(TAG, "no device");
-		}
-	}
-
-	/**
 	 * パーミッションが有るかどうかを問い合わせる
 	 * @param device
 	 * @return true: 指定したUsbDeviceにパーミッションがある
@@ -743,28 +716,10 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
-	 * シリアルナンバーを取得できる機器の場合にはシリアルナンバーを含めたデバイスキーを取得する
-	 * シリアルナンバーを取得できなければgetDeviceKeyNameと同じ
-	 * @param context
 	 * @param device
-	 * @return
 	 */
-	@Deprecated
-	public static String getDeviceKeyNameWithSerial(final Context context, final UsbDevice device) {
-		final UsbDeviceInfo info = UsbDeviceInfo.getDeviceInfo(context, device);
-		return UsbUtils.getDeviceKeyName(device, true,
-			info.serial, info.manufacturer, info.configCounts, info.version);
 	}
 
-	/**
-	 * シリアルナンバーを取得できる機器の場合にはシリアルナンバーを含めたデバイスキーを整数として取得
-	 * getDeviceKeyNameWithSerialで得られる文字列のhasCodeを取得
-	 * シリアルナンバーを取得できなければgetDeviceKeyと同じ
-	 * @return
-	 */
-	@Deprecated
-	public static int getDeviceKeyWithSerial(final Context context, final UsbDevice device) {
-		return getDeviceKeyNameWithSerial(context, device).hashCode();
 	}
 
 	/**
