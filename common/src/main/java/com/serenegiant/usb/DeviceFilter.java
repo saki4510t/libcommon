@@ -338,21 +338,6 @@ public final class DeviceFilter implements Parcelable {
 		if (mProductId != -1 && device.getProductId() != mProductId) {
 			return false;
 		}
-/*		if (mManufacturerName != null && device.getManufacturerName() == null)
-			return false;
-		if (mProductName != null && device.getProductName() == null)
-			return false;
-		if (mSerialNumber != null && device.getSerialNumber() == null)
-			return false;
-		if (mManufacturerName != null && device.getManufacturerName() != null
-				&& !mManufacturerName.equals(device.getManufacturerName()))
-			return false;
-		if (mProductName != null && device.getProductName() != null
-				&& !mProductName.equals(device.getProductName()))
-			return false;
-		if (mSerialNumber != null && device.getSerialNumber() != null
-				&& !mSerialNumber.equals(device.getSerialNumber()))
-			return false; */
 
 		// check device class/subclass/protocol
 		if (matches(
@@ -363,7 +348,40 @@ public final class DeviceFilter implements Parcelable {
 			return true;
 		}
 
+		// check device interface class/interface subclass/interface protocol
 		return interfaceMatches(device);
+	}
+
+	/**
+	 * 指定したUsbDeviceInfoがこのDeviceFilterにマッチするかどうかを返す
+	 * isExcludeフラグは別途#isExcludeか自前でチェックすること
+	 * @param info
+	 * @return
+	 */
+	public boolean matches(
+		@Nullable final UsbDeviceInfo info) {
+
+		if ((info == null) || (info.device == null)) {
+			return false;
+		}
+
+		if ((mManufacturerName != null) && (info.manufacturer != null)
+				&& !mManufacturerName.equals(info.manufacturer)) {
+			// マニファクチャ名が指定されていてデバイスにもマニファクチャ名が指定されているが一致しない
+			return false;
+		}
+		if ((mProductName != null) && (info.product != null)
+				&& !mProductName.equals(info.product)) {
+			// プロダクト名が指定されていてデバイスにもプロダクト名が指定されているが一致しない
+			return false;
+		}
+		if ((mSerialNumber != null) && (info.serial != null)
+				&& !mSerialNumber.equals(info.serial)) {
+			// シリアル名が指定されていてデバイスにもシリアル名が指定されているが一致しない
+			return false;
+		}
+
+		return matches(info.device);
 	}
 
 	/**
