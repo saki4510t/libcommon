@@ -188,10 +188,13 @@ public final class DeviceFilter implements Parcelable {
 	// USB device protocol (or -1 for unspecified)
 	public final int mProtocol;
 	// USB device manufacturer name string (or null for unspecified)
+	@Nullable
 	public final String mManufacturerName;
 	// USB device product name string (or null for unspecified)
+	@Nullable
 	public final String mProductName;
 	// USB device serial number string (or null for unspecified)
+	@Nullable
 	public final String mSerialNumber;
 	// USB interface class (or -1 for unspecified)
 	@NonNull
@@ -270,7 +273,7 @@ public final class DeviceFilter implements Parcelable {
 		this.isExclude = isExclude;
 	}
 
-	protected DeviceFilter(final Parcel in) {
+	protected DeviceFilter(@NonNull final Parcel in) {
 		mVendorId = in.readInt();
 		mProductId = in.readInt();
 		mClass = in.readInt();
