@@ -407,6 +407,7 @@ public final class USBMonitor implements Const {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * パーミッションが有るかどうかを問い合わせる
 	 * @param device
@@ -453,6 +454,7 @@ public final class USBMonitor implements Const {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 指定したUsbDeviceをopenする
 	 * @param device
@@ -485,18 +487,18 @@ public final class USBMonitor implements Const {
 		}
 		return false;
 	}
-	
-	/**
-	 * パーミッション取得・USB機器のモニター用のBroadcastReceiver
-	 */
-	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
-		@Override
-		public void onReceive(final Context context, final Intent intent) {
-			if (destroyed) return;
-			USBMonitor.this.onReceive(context, intent);
-		}
-	};
 
+	/**
+	 * ベンダー名・製品名・バージョン・シリアルを取得する
+	 * @param device
+	 * @return
+	 */
+	@Deprecated
+	public UsbDeviceInfo getDeviceInfo(final UsbDevice device) {
+		return UsbDeviceInfo.getDeviceInfo(mUsbManager, device, null);
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * パーミッション取得・USB機器のモニター用のBroadcastReceiverの処理の実態
 	 * @param context
@@ -537,6 +539,31 @@ public final class USBMonitor implements Const {
 			}
 		}
 	}
+
+	/**
+	 * ブロードキャスト受信用のIntentFilterを生成する
+	 * @return
+	 */
+	protected IntentFilter createIntentFilter() {
+		final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+		if (BuildCheck.isAndroid5()) {
+			filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
+		}
+		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+		return filter;
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * パーミッション取得・USB機器のモニター用のBroadcastReceiver
+	 */
+	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(final Context context, final Intent intent) {
+			if (destroyed) return;
+			USBMonitor.this.onReceive(context, intent);
+		}
+	};
 
 	/**
 	 * 古い一部機種向けのポーリングで接続機器をチェックするためのRunnable
@@ -589,19 +616,6 @@ public final class USBMonitor implements Const {
 			}
 		}
 	};
-
-	/**
-	 * ブロードキャスト受信用のIntentFilterを生成する
-	 * @return
-	 */
-	protected IntentFilter createIntentFilter() {
-		final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
-		if (BuildCheck.isAndroid5()) {
-			filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
-		}
-		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-		return filter;
-	}
 
 	/**
 	 * パーミッション要求結果が返ってきた時の処理
@@ -715,20 +729,35 @@ public final class USBMonitor implements Const {
 		});
 	}
 
+//--------------------------------------------------------------------------------
 	/**
+	 * 内部で保持しているパーミッション状態を更新
 	 * @param device
+	 * @param hasPermission
+	 * @return hasPermission
 	 */
+	private boolean updateDeviceState(final UsbDevice device, final boolean hasPermission) {
+		if (DEBUG) Log.v(TAG, "updateDeviceState:");
+		if (device != null) {
+			requireDeviceState(device);
+		}
+		return hasPermission;
 	}
 
+	@Nullable
+	private UsbDeviceState getDeviceState(@Nullable final UsbDevice device) {
+		return mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
 	}
 
-	/**
-	 * ベンダー名・製品名・バージョン・シリアルを取得する
-	 * @param device
-	 * @return
-	 */
-	public UsbDeviceInfo getDeviceInfo(final UsbDevice device) {
-		return UsbDeviceInfo.getDeviceInfo(mUsbManager, device, null);
+	@NonNull
+	private UsbDeviceState requireDeviceState(@NonNull final UsbDevice device) {
+		UsbDeviceState state = mDeviceStates.containsKey(device)
+			? mDeviceStates.get(device) : null;
+		if (state == null) {
+			state = new UsbDeviceState(device);
+			mDeviceStates.put(device, state);
+		}
+		return state;
 	}
 
 //--------------------------------------------------------------------------------
@@ -1309,36 +1338,6 @@ public final class USBMonitor implements Const {
 	} // end ofUsbControlBlock
 
 //--------------------------------------------------------------------------------
-	/**
-	 * 内部で保持しているパーミッション状態を更新
-	 * @param device
-	 * @param hasPermission
-	 * @return hasPermission
-	 */
-	private boolean updateDeviceState(final UsbDevice device, final boolean hasPermission) {
-		if (DEBUG) Log.v(TAG, "updateDeviceState:");
-		if (device != null) {
-			requireDeviceState(device);
-		}
-		return hasPermission;
-	}
-
-	@Nullable
-	private UsbDeviceState getDeviceState(@Nullable final UsbDevice device) {
-		return mDeviceStates.containsKey(device) ? mDeviceStates.get(device) : null;
-	}
-
-	@NonNull
-	private UsbDeviceState requireDeviceState(@NonNull final UsbDevice device) {
-		UsbDeviceState state = mDeviceStates.containsKey(device)
-			? mDeviceStates.get(device) : null;
-		if (state == null) {
-			state = new UsbDeviceState(device);
-			mDeviceStates.put(device, state);
-		}
-		return state;
-	}
-
 	/**
 	 * USB機器の接続状態を保持するためのクラス
 	 */
