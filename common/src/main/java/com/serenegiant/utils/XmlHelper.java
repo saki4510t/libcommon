@@ -127,10 +127,9 @@ public class XmlHelper {
 		if (!TextUtils.isEmpty(valueString)) {
 			final String[] values = valueString.split(",");
 			final List<Integer> list = new ArrayList<>();
-			final int n = values.length;
 			for (final String value: values) {
 				try {
-					list.add(ResourceHelper.get(context, parser.getAttributeValue(namespace, name), 0));
+					list.add(ResourceHelper.get(context, value.trim(), 0));
 				} catch (final Exception e) {
 					// ignore
 				}
@@ -156,10 +155,9 @@ public class XmlHelper {
 		if (!TextUtils.isEmpty(valueString)) {
 			final String[] values = valueString.split(",");
 			final List<Boolean> list = new ArrayList<>();
-			final int n = values.length;
 			for (final String value: values) {
 				try {
-					list.add(ResourceHelper.get(context, parser.getAttributeValue(namespace, name), false));
+					list.add(ResourceHelper.get(context, value.trim(), false));
 				} catch (final Exception e) {
 					// ignore
 				}
