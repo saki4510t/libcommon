@@ -58,6 +58,125 @@ public final class DeviceFilter implements Parcelable {
 
 	private static final String TAG = "DeviceFilter";
 
+	/**
+	 * 指定したxmlリソースからDeviceFilterリストを生成する
+	 * @param context
+	 * @param deviceFilterXmlId
+	 * @return
+	 */
+	public static List<DeviceFilter> getDeviceFilters(
+		@NonNull final Context context,
+		@XmlRes final int deviceFilterXmlId) {
+
+		final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
+		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
+		try {
+			int eventType = parser.getEventType();
+			while (eventType != XmlPullParser.END_DOCUMENT) {
+	            if (eventType == XmlPullParser.START_TAG) {
+					final DeviceFilter deviceFilter = readEntryOne(context, parser);
+					if (deviceFilter != null) {
+						deviceFilters.add(deviceFilter);
+					}
+	            }
+				eventType = parser.next();
+			}
+		} catch (final XmlPullParserException e) {
+			Log.d(TAG, "XmlPullParserException", e);
+		} catch (final IOException e) {
+			Log.d(TAG, "IOException", e);
+		}
+
+		return Collections.unmodifiableList(deviceFilters);
+	}
+
+	@Nullable
+	public static DeviceFilter readEntryOne(
+		@NonNull final Context context,
+		@NonNull final XmlPullParser parser)
+			throws XmlPullParserException, IOException {
+
+		int vendorId = -1;
+		int productId = -1;
+		int deviceClass = -1;
+		int deviceSubclass = -1;
+		int deviceProtocol = -1;
+		boolean exclude = false;
+		String manufacturerName = null;
+		String productName = null;
+		String serialNumber = null;
+		int[] intfClass = null, intfSubClass = null, intfProtocol = null;
+		boolean hasValue = false;
+
+		String tag;
+        int eventType = parser.getEventType();
+        while (eventType != XmlPullParser.END_DOCUMENT) {
+        	tag = parser.getName();
+        	if (!TextUtils.isEmpty(tag) && (tag.equalsIgnoreCase("usb-device"))) {
+        		if (eventType == XmlPullParser.START_TAG) {
+        			hasValue = true;
+					vendorId = getAttribute(context, parser, null, "vendor-id", -1);
+        			if (vendorId == -1) {
+        				vendorId = getAttribute(context, parser, null, "vendorId", -1);
+        			}
+					if (vendorId == -1) {
+	         			vendorId = getAttribute(context, parser, null, "venderId", -1);
+					}
+    				productId = getAttribute(context, parser, null, "product-id", -1);
+        			if (productId == -1) {
+            			productId = getAttribute(context, parser, null, "productId", -1);
+					}
+        			deviceClass = getAttribute(context, parser, null, "class", -1);
+        			deviceSubclass = getAttribute(context, parser, null, "subclass", -1);
+        			deviceProtocol = getAttribute(context, parser, null, "protocol", -1);
+        			manufacturerName = getAttribute(context, parser, null, "manufacturer-name", "");
+        			if (TextUtils.isEmpty(manufacturerName)) {
+        				manufacturerName = getAttribute(context, parser, null, "manufacture", "");
+					}
+        			productName = getAttribute(context, parser, null, "product-name", "");
+        			if (TextUtils.isEmpty(productName)) {
+        				productName = getAttribute(context, parser, null, "product", "");
+					}
+        			serialNumber = getAttribute(context, parser, null, "serial-number", "");
+        			if (TextUtils.isEmpty(serialNumber)) {
+            			serialNumber = getAttribute(context, parser, null, "serial", "");
+					}
+					exclude = getAttribute(context, parser, null, "exclude", false);
+					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceClass"))) {
+						intfClass = getAttribute(context, parser, null, "interfaceClass", new int[0]);
+						if ((intfClass != null) && (intfClass.length == 0)) {
+							intfClass = null;
+						}
+					}
+					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceSubClass"))) {
+						intfSubClass = getAttribute(context, parser, null, "interfaceSubClass", new int[0]);
+						if ((intfSubClass != null) && (intfSubClass.length == 0)) {
+							intfSubClass = null;
+						}
+					}
+					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceProtocol"))) {
+						intfProtocol = getAttribute(context, parser, null, "interfaceProtocol", new int[0]);
+						if ((intfProtocol != null) && (intfProtocol.length == 0)) {
+							intfProtocol = null;
+						}
+					}
+        		} else if (eventType == XmlPullParser.END_TAG) {
+        			if (hasValue) {
+
+	        			return new DeviceFilter(vendorId, productId,
+	        				deviceClass, deviceSubclass, deviceProtocol,
+	        				manufacturerName, productName, serialNumber,
+	        				intfClass, intfSubClass, intfProtocol,
+	        				exclude);
+        			}
+        		}
+        	}
+        	eventType = parser.next();
+        }
+        return null;
+	}
+
+//--------------------------------------------------------------------------------
 	// USB Vendor ID (or -1 for unspecified)
 	public final int mVendorId;
 	// USB Product ID (or -1 for unspecified)
@@ -164,124 +283,6 @@ public final class DeviceFilter implements Parcelable {
 		mIntfSubClass = in.createIntArray();
 		mIntfProtocol = in.createIntArray();
 		isExclude = in.readByte() != 0;
-	}
-
-	/**
-	 * 指定したxmlリソースからDeviceFilterリストを生成する
-	 * @param context
-	 * @param deviceFilterXmlId
-	 * @return
-	 */
-	public static List<DeviceFilter> getDeviceFilters(
-		@NonNull final Context context,
-		@XmlRes final int deviceFilterXmlId) {
-
-		final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
-		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
-		try {
-			int eventType = parser.getEventType();
-			while (eventType != XmlPullParser.END_DOCUMENT) {
-	            if (eventType == XmlPullParser.START_TAG) {
-					final DeviceFilter deviceFilter = readEntryOne(context, parser);
-					if (deviceFilter != null) {
-						deviceFilters.add(deviceFilter);
-					}
-	            }
-				eventType = parser.next();
-			}
-		} catch (final XmlPullParserException e) {
-			Log.d(TAG, "XmlPullParserException", e);
-		} catch (final IOException e) {
-			Log.d(TAG, "IOException", e);
-		}
-
-		return Collections.unmodifiableList(deviceFilters);
-	}
-
-	@Nullable
-	public static DeviceFilter readEntryOne(
-		@NonNull final Context context,
-		@NonNull final XmlPullParser parser)
-			throws XmlPullParserException, IOException {
-
-		int vendorId = -1;
-		int productId = -1;
-		int deviceClass = -1;
-		int deviceSubclass = -1;
-		int deviceProtocol = -1;
-		boolean exclude = false;
-		String manufacturerName = null;
-		String productName = null;
-		String serialNumber = null;
-		int[] intfClass = null, intfSubClass = null, intfProtocol = null;
-		boolean hasValue = false;
-
-		String tag;
-        int eventType = parser.getEventType();
-        while (eventType != XmlPullParser.END_DOCUMENT) {
-        	tag = parser.getName();
-        	if (!TextUtils.isEmpty(tag) && (tag.equalsIgnoreCase("usb-device"))) {
-        		if (eventType == XmlPullParser.START_TAG) {
-        			hasValue = true;
-					vendorId = getAttribute(context, parser, null, "vendor-id", -1);
-        			if (vendorId == -1) {
-        				vendorId = getAttribute(context, parser, null, "vendorId", -1);
-        			}
-					if (vendorId == -1) {
-	         			vendorId = getAttribute(context, parser, null, "venderId", -1);
-					}
-    				productId = getAttribute(context, parser, null, "product-id", -1);
-        			if (productId == -1) {
-            			productId = getAttribute(context, parser, null, "productId", -1);
-					}
-        			deviceClass = getAttribute(context, parser, null, "class", -1);
-        			deviceSubclass = getAttribute(context, parser, null, "subclass", -1);
-        			deviceProtocol = getAttribute(context, parser, null, "protocol", -1);
-        			manufacturerName = getAttribute(context, parser, null, "manufacturer-name", "");
-        			if (TextUtils.isEmpty(manufacturerName)) {
-        				manufacturerName = getAttribute(context, parser, null, "manufacture", "");
-					}
-        			productName = getAttribute(context, parser, null, "product-name", "");
-        			if (TextUtils.isEmpty(productName)) {
-        				productName = getAttribute(context, parser, null, "product", "");
-					}
-        			serialNumber = getAttribute(context, parser, null, "serial-number", "");
-        			if (TextUtils.isEmpty(serialNumber)) {
-            			serialNumber = getAttribute(context, parser, null, "serial", "");
-					}
-					exclude = getAttribute(context, parser, null, "exclude", false);
-					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceClass"))) {
-						intfClass = getAttribute(context, parser, null, "interfaceClass", new int[0]);
-						if ((intfClass != null) && (intfClass.length == 0)) {
-							intfClass = null;
-						}
-					}
-					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceSubClass"))) {
-						intfSubClass = getAttribute(context, parser, null, "interfaceSubClass", new int[0]);
-						if ((intfSubClass != null) && (intfSubClass.length == 0)) {
-							intfSubClass = null;
-						}
-					}
-					if (!TextUtils.isEmpty(parser.getAttributeValue(null, "interfaceProtocol"))) {
-						intfProtocol = getAttribute(context, parser, null, "interfaceProtocol", new int[0]);
-						if ((intfProtocol != null) && (intfProtocol.length == 0)) {
-							intfProtocol = null;
-						}
-					}
-        		} else if (eventType == XmlPullParser.END_TAG) {
-        			if (hasValue) {
-        				
-	        			return new DeviceFilter(vendorId, productId,
-	        				deviceClass, deviceSubclass, deviceProtocol,
-	        				manufacturerName, productName, serialNumber,
-	        				intfClass, intfSubClass, intfProtocol,
-	        				exclude);
-        			}
-        		}
-        	}
-        	eventType = parser.next();
-        }
-        return null;
 	}
 
 /*	public void write(XmlSerializer serializer) throws IOException {
