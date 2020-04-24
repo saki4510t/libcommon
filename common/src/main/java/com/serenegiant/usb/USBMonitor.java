@@ -365,15 +365,7 @@ public final class USBMonitor implements Const {
 	 */
 	@Nullable
 	public UsbDevice findDevice(final String name) {
-		UsbDevice result = null;
-		final List<UsbDevice> devices = getDeviceList();
-		for (final UsbDevice device: devices) {
-			if (device.getDeviceName().equals(name)) {
-				result = device;
-				break;
-			}
-		}
-		return result;
+		return UsbUtils.findDevice(getDeviceList(), name);
 	}
 
 	/**

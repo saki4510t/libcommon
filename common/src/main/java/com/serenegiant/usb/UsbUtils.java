@@ -28,8 +28,10 @@ import android.text.TextUtils;
 import com.serenegiant.system.BuildCheck;
 
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class UsbUtils implements Const {
 	private UsbUtils() {
@@ -260,6 +262,23 @@ public class UsbUtils implements Const {
 		final boolean useNewAPI, final boolean useNonce) {
 
 		return device != null ? getDeviceKeyName(device, serial, useNewAPI, useNonce).hashCode() : 0;
+	}
+
+	/**
+	 * 指定したデバイス名に対応するUsbDeviceを取得する
+	 * @param name　UsbDevice#getDeviceNameで取得できる値
+	 * @return 見つからなければnull
+	 */
+	@Nullable
+	public static UsbDevice findDevice(@NonNull final List<UsbDevice> devices, final String name) {
+		UsbDevice result = null;
+		for (final UsbDevice device: devices) {
+			if (device.getDeviceName().equals(name)) {
+				result = device;
+				break;
+			}
+		}
+		return result;
 	}
 
 }
