@@ -44,6 +44,7 @@ import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -523,14 +524,20 @@ public final class DeviceFilter implements Parcelable {
 	@NonNull
 	@Override
 	public String toString() {
-		return "DeviceFilter[mVendorId=" + mVendorId + ",mProductId="
-			+ mProductId + ",mClass=" + mClass + ",mSubclass=" + mSubclass
-			+ ",mProtocol=" + mProtocol
-			+ ",mManufacturerName=" + mManufacturerName
-			+ ",mProductName=" + mProductName
-			+ ",mSerialNumber=" + mSerialNumber
-			+ ",isExclude=" + isExclude
-			+ "]";
+		return "DeviceFilter{" +
+			"mVendorId=" + mVendorId +
+			", mProductId=" + mProductId +
+			", mClass=" + mClass +
+			", mSubclass=" + mSubclass +
+			", mProtocol=" + mProtocol +
+			", mManufacturerName='" + mManufacturerName + '\'' +
+			", mProductName='" + mProductName + '\'' +
+			", mSerialNumber='" + mSerialNumber + '\'' +
+			", mIntfClass=" + Arrays.toString(mIntfClass) +
+			", mIntfSubClass=" + Arrays.toString(mIntfSubClass) +
+			", mIntfProtocol=" + Arrays.toString(mIntfProtocol) +
+			", isExclude=" + isExclude +
+			'}';
 	}
 
 	@Override
