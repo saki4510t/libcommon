@@ -107,9 +107,9 @@ public final class DeviceFilter implements Parcelable {
 		mClass = clazz;
 		mSubclass = subclass;
 		mProtocol = protocol;
-		mIntfClass = null;
-		mIntfSubClass = null;
-		mIntfProtocol = null;
+		mIntfClass = intfClass != null ? intfClass : new int[0];
+		mIntfSubClass = intfSubClass != null ? intfSubClass : new int[0];
+		mIntfProtocol = intfProtocol != null ? intfProtocol : new int[0];
 		mManufacturerName = TextUtils.isEmpty(manufacturer) ? null : manufacturer;
 		mProductName = TextUtils.isEmpty(product) ? null : product;
 		mSerialNumber = TextUtils.isEmpty(serialNum) ? null : serialNum;
@@ -118,7 +118,7 @@ public final class DeviceFilter implements Parcelable {
 			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
 	}
 
-	public DeviceFilter(final UsbDevice device) {
+	public DeviceFilter(@NonNull final UsbDevice device) {
 		this(device, false);
 	}
 
@@ -129,27 +129,16 @@ public final class DeviceFilter implements Parcelable {
 		mClass = device.getDeviceClass();
 		mSubclass = device.getDeviceSubclass();
 		mProtocol = device.getDeviceProtocol();
-		if ((mClass == 0) && (mSubclass == 0) && (mProtocol == 0)) {
-			final int count = device.getInterfaceCount();
-			if (count > 0) {
-				mIntfClass = new int[count];
-				mIntfSubClass = new int[count];
-				mIntfProtocol = new int[count];
-				for (int i = 0; i < count; i++) {
-					final UsbInterface intf = device.getInterface(i);
-					mIntfClass[i] = intf.getInterfaceClass();
-					mIntfSubClass[i] = intf.getInterfaceSubclass();
-					mIntfProtocol[i] = intf.getInterfaceProtocol();
-				}
-			} else {
-				mIntfClass = null;
-				mIntfSubClass = null;
-				mIntfProtocol = null;
-			}
-		} else {
-			mIntfClass = null;
-			mIntfSubClass = null;
-			mIntfProtocol = null;
+		// getInterfaceCountは内部配列のlengthを返すので負にはならないはずだけど年のために下限を0にする
+		final int count = Math.max(device.getInterfaceCount(), 0);
+		mIntfClass = new int[count];
+		mIntfSubClass = new int[count];
+		mIntfProtocol = new int[count];
+		for (int i = 0; i < count; i++) {
+			final UsbInterface intf = device.getInterface(i);
+			mIntfClass[i] = intf.getInterfaceClass();
+			mIntfSubClass[i] = intf.getInterfaceSubclass();
+			mIntfProtocol[i] = intf.getInterfaceProtocol();
 		}
 		if (BuildCheck.isLollipop()) {
 			mManufacturerName = device.getManufacturerName();
@@ -342,7 +331,7 @@ public final class DeviceFilter implements Parcelable {
 	}
 
 	private boolean matchesIntfClass(final int clazz) {
-		if ((mIntfClass != null) && (mIntfClass.length > 0)) {
+		if (mIntfClass.length > 0) {
 			for (int intfClass: mIntfClass) {
 				if (intfClass == clazz) {
 					return true;
@@ -355,7 +344,7 @@ public final class DeviceFilter implements Parcelable {
 	}
 
 	private boolean matchesIntfSubClass(final int subClazz) {
-		if ((mIntfSubClass != null) && (mIntfSubClass.length > 0)) {
+		if (mIntfSubClass.length > 0) {
 			for (int value: mIntfSubClass) {
 				if (value == subClazz) {
 					return true;
@@ -368,7 +357,7 @@ public final class DeviceFilter implements Parcelable {
 	}
 
 	private boolean matchesIntfProtocol(final int protocol) {
-		if ((mIntfProtocol != null) && (mIntfProtocol.length > 0)) {
+		if (mIntfProtocol.length > 0) {
 			for (int value: mIntfProtocol) {
 				if (value == protocol) {
 					return true;
@@ -531,6 +520,7 @@ public final class DeviceFilter implements Parcelable {
 				| (mSubclass << 8) | mProtocol));
 	}
 
+	@NonNull
 	@Override
 	public String toString() {
 		return "DeviceFilter[mVendorId=" + mVendorId + ",mProductId="
