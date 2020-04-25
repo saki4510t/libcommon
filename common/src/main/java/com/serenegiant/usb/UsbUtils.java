@@ -90,7 +90,7 @@ public class UsbUtils implements Const {
 	 */
 	public static String getDeviceKeyNameWithSerial(final Context context, final UsbDevice device) {
 		final UsbDeviceInfo info = UsbDeviceInfo.getDeviceInfo(context, device);
-		return UsbUtils.getDeviceKeyName(device, true,
+		return getDeviceKeyName(device, true,
 			info.serial, info.manufacturer, info.configCounts, info.version);
 	}
 
