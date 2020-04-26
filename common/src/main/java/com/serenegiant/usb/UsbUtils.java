@@ -121,7 +121,7 @@ public class UsbUtils implements Const {
 	public static String getDeviceKeyName(
 		@NonNull final USBMonitor.UsbControlBlock ctrlBlock) {
 
-		return getDeviceKeyName(ctrlBlock.mInfo);
+		return getDeviceKeyName(ctrlBlock.getInfo());
 	}
 
 	/**
@@ -132,7 +132,7 @@ public class UsbUtils implements Const {
 	public static int getDeviceKey(
 		@NonNull final USBMonitor.UsbControlBlock ctrlBlock) {
 
-		return getDeviceKeyName(ctrlBlock.mInfo).hashCode();
+		return getDeviceKeyName(ctrlBlock).hashCode();
 	}
 
 	/**

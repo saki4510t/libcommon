@@ -793,7 +793,8 @@ public final class USBMonitor implements Const {
 		private final WeakReference<USBMonitor> mWeakMonitor;
 		@NonNull
 		private final WeakReference<UsbDevice> mWeakDevice;
-		protected final UsbDeviceInfo mInfo;
+		@NonNull
+		private final UsbDeviceInfo mInfo;
 		@NonNull
 		private final SparseArray<SparseArray<UsbInterface>>
 			mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
@@ -901,6 +902,11 @@ public final class USBMonitor implements Const {
 		@Nullable
 		public final UsbDevice getDevice() {
 			return mWeakDevice.get();
+		}
+
+		@NonNull
+		public UsbDeviceInfo getInfo() {
+			return mInfo;
 		}
 
 		/**
