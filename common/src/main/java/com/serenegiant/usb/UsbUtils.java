@@ -113,6 +113,27 @@ public class UsbUtils implements Const {
 	}
 
 	/**
+	 * デバイスキー名を取得する
+	 * @param info
+	 * @return
+	 */
+	@NonNull
+	public static String getDeviceKeyName(@NonNull final UsbDeviceInfo info) {
+		return getDeviceKeyName(info.device, true,
+			info.serial, info.manufacturer, info.configCounts, info.version);
+	}
+
+	/**
+	 * デバイスキーを取得する
+	 * @param info
+	 * @return
+	 */
+	public static int getDeviceKey(@NonNull final UsbDeviceInfo info) {
+		return getDeviceKeyName(info.device, true,
+			info.serial, info.manufacturer, info.configCounts, info.version).hashCode();
+	}
+
+	/**
 	 * USB機器毎の設定保存用にデバイスキー名を生成する。
 	 * ベンダーID, プロダクトID, デバイスクラス, デバイスサブクラス, デバイスプロトコルから生成
 	 * 同種の製品だと同じキー名になるので注意
