@@ -32,10 +32,10 @@ dependencies {
 	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
-	implementation "androidx.constraintlayout:constraintlayout:${constraintLibVersion}"
+	implementation "androidx.constraintlayout:constraintlayout:${androidXConstraint}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 
-	implementation "androidx.core:core-ktx:${androidXKtxVersion}"
+	implementation "androidx.core:core-ktx:${androidXKtx}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 

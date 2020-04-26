@@ -79,7 +79,7 @@ dependencies {
 	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 
-	implementation "androidx.core:core-ktx:${androidXKtxVersion}"
+	implementation "androidx.core:core-ktx:${androidXKtx}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
