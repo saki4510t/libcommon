@@ -819,28 +819,18 @@ public final class USBMonitor implements Const {
 			} catch (final Exception e) {
 				throw new IOException(e);
 			}
-			mInfo = UsbDeviceInfo.getDeviceInfo(monitor.mUsbManager, device, null);
 			final String name = device.getDeviceName();
-//			final String[] v = !TextUtils.isEmpty(name) ? name.split("/") : null;
-//			int busnum = 0;
-//			int devnum = 0;
-//			if (v != null) {
-//				busnum = Integer.parseInt(v[v.length-2]);
-//				devnum = Integer.parseInt(v[v.length-1]);
-//			}
-///			mBusNum = busnum;
-//			mDevNum = devnum;
 			if (mConnection != null) {
-//				if (DEBUG) {
-					final int desc = mConnection.getFileDescriptor();
-					final byte[] rawDesc = mConnection.getRawDescriptors();
-					Log.i(TAG, String.format(Locale.US,
-						"name=%s,desc=%d,rawDesc=", name, desc)
-							+ BufferHelper.toHexString(rawDesc, 0, 16));
-//				}
+				final int fd = mConnection.getFileDescriptor();
+				final byte[] rawDesc = mConnection.getRawDescriptors();
+				Log.i(TAG, String.format(Locale.US,
+					"name=%s,fd=%d,rawDesc=", name, fd)
+						+ BufferHelper.toHexString(rawDesc, 0, 16));
 			} else {
+				// 多分ここには来ない(openDeviceの時点でIOException)けど年のために
 				throw new IOException("could not connect to device " + name);
 			}
+			mInfo = UsbDeviceInfo.getDeviceInfo(monitor.mUsbManager, device, null);
 			monitor.processConnect(device, this);
 		}
 
