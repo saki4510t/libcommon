@@ -159,11 +159,11 @@ public class UsbUtils implements Const {
 	public static final String getDeviceKeyName(final UsbDevice device, final String serial, final boolean useNewAPI, final boolean usuNonce) {
 		if (device == null) return "";
 		final StringBuilder sb = new StringBuilder();
-		sb.append(device.getVendorId()).append("#");		// API >= 12
-		sb.append(device.getProductId()).append("#");		// API >= 12
-		sb.append(device.getDeviceClass()).append("#");		// API >= 12
-		sb.append(device.getDeviceSubclass()).append("#");	// API >= 12
-		sb.append(device.getDeviceProtocol());				// API >= 12
+		sb.append(device.getVendorId()).append("#")			// API >= 12
+			.append(device.getProductId()).append("#")		// API >= 12
+			.append(device.getDeviceClass()).append("#")	// API >= 12
+			.append(device.getDeviceSubclass()).append("#")	// API >= 12
+			.append(device.getDeviceProtocol());			// API >= 12
 		if (!TextUtils.isEmpty(serial)) {
 			sb.append("#").append(serial);
 		}
@@ -173,12 +173,12 @@ public class UsbUtils implements Const {
 		if (useNewAPI && BuildCheck.isAndroid5()) {
 			sb.append("#");
 			if (TextUtils.isEmpty(serial)) {
-				sb.append(device.getSerialNumber()).append("#");	// API >= 21
+				sb.append(device.getSerialNumber()).append("#");		// API >= 21
 			}
-			sb.append(device.getManufacturerName()).append("#");	// API >= 21
-			sb.append(device.getConfigurationCount()).append("#");	// API >= 21
+			sb.append(device.getManufacturerName()).append("#")			// API >= 21
+				.append(device.getConfigurationCount()).append("#");	// API >= 21
 			if (BuildCheck.isMarshmallow()) {
-				sb.append(device.getVersion()).append("#");			// API >= 23　XXX ここで末尾に付く#が余分だった...
+				sb.append(device.getVersion()).append("#");				// API >= 23　XXX ここで末尾に付く#が余分だった...
 			}
 		}
 		return sb.toString();
@@ -205,23 +205,23 @@ public class UsbUtils implements Const {
 		final String serial, final String manufactureName, final int configCount, final String deviceVersion) {
 		if (device == null) return "";
 		final StringBuilder sb = new StringBuilder();
-		sb.append(device.getVendorId());			sb.append("#");	// API >= 12
-		sb.append(device.getProductId());			sb.append("#");	// API >= 12
-		sb.append(device.getDeviceClass());			sb.append("#");	// API >= 12
-		sb.append(device.getDeviceSubclass());		sb.append("#");	// API >= 12
-		sb.append(device.getDeviceProtocol());						// API >= 12
+		sb.append(device.getVendorId()).append("#")			// API >= 12
+			.append(device.getProductId()).append("#")		// API >= 12
+			.append(device.getDeviceClass()).append("#")	// API >= 12
+			.append(device.getDeviceSubclass()).append("#")	// API >= 12
+			.append(device.getDeviceProtocol());			// API >= 12
 		if (!TextUtils.isEmpty(serial)) {
 			sb.append("#");	sb.append(serial);
 		}
 		if (useNewAPI && BuildCheck.isAndroid5()) {
 			if (!TextUtils.isEmpty(manufactureName)) {
-				sb.append("#");	sb.append(manufactureName);
+				sb.append("#").append(manufactureName);
 			}
 			if (configCount >= 0) {
-				sb.append("#");	sb.append(configCount);
+				sb.append("#").append(configCount);
 			}
 			if (!TextUtils.isEmpty(deviceVersion)) {
-				sb.append("#");	sb.append(deviceVersion);
+				sb.append("#").append(deviceVersion);
 			}
 		}
 		return sb.toString();
