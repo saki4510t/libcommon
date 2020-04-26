@@ -134,6 +134,124 @@ public class UsbUtils implements Const {
 	}
 
 	/**
+	 * デバイスキー文字列を生成
+	 * @param device
+	 * @param serial
+	 * @param manufactureName
+	 * @param configCount
+	 * @param deviceVersion
+	 * @return
+	 */
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
+		final boolean useNewAPI,
+		final String serial, final String manufactureName,
+		final int configCount, final String deviceVersion) {
+
+		if (device == null) return "";
+		final StringBuilder sb = new StringBuilder();
+		sb.append(device.getVendorId()).append("#")			// API >= 12
+			.append(device.getProductId()).append("#")		// API >= 12
+			.append(device.getDeviceClass()).append("#")	// API >= 12
+			.append(device.getDeviceSubclass()).append("#")	// API >= 12
+			.append(device.getDeviceProtocol());			// API >= 12
+		if (!TextUtils.isEmpty(serial)) {
+			sb.append("#");	sb.append(serial);
+		}
+		if (useNewAPI && BuildCheck.isAndroid5()) {
+			if (!TextUtils.isEmpty(manufactureName)) {
+				sb.append("#").append(manufactureName);
+			}
+			if (configCount >= 0) {
+				sb.append("#").append(configCount);
+			}
+			if (!TextUtils.isEmpty(deviceVersion)) {
+				sb.append("#").append(deviceVersion);
+			}
+		}
+		return sb.toString();
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * デバイスキーを整数として取得
+	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
+	 * ベンダーID, プロダクトID, デバイスクラス, デバイスサブクラス, デバイスプロトコルから生成
+	 * 同種の製品だと同じデバイスキーになるので注意
+	 * @param device nullなら0を返す
+	 * @return
+	 */
+	@Deprecated
+	public static final int getDeviceKey(@Nullable final UsbDevice device) {
+		return device != null ? getDeviceKeyName(device, null, false).hashCode() : 0;
+	}
+
+	/**
+	 * デバイスキーを整数として取得
+	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
+	 * useNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
+	 * @param device
+	 * @param useNewAPI
+	 * @return
+	 */
+	@Deprecated
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final boolean useNewAPI) {
+
+		return device != null ? getDeviceKeyName(device, null, useNewAPI).hashCode() : 0;
+	}
+
+	/**
+	 * デバイスキーを整数として取得
+	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
+	 * useNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
+	 * @param device
+	 * @param useNewAPI
+	 * @param useNonce
+	 * @return
+	 */
+	@Deprecated
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final boolean useNewAPI, final boolean useNonce) {
+
+		return device != null ? getDeviceKeyName(device, null, useNewAPI, useNonce).hashCode() : 0;
+	}
+
+	/**
+	 * デバイスキーを整数として取得
+	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
+	 * serialがnullでuseNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
+	 * @param device nullなら0を返す
+	 * @param serial UsbDeviceConnection#getSerialで取得したシリアル番号を渡す, nullでuseNewAPI=trueでAPI>=21なら内部で取得
+	 * @param useNewAPI API>=21またはAPI>=23のみで使用可能なメソッドも使用する(ただし機器によってはnullが返ってくるので有効かどうかは機器による)
+	 * @return
+	 */
+	@Deprecated
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI) {
+
+		return device != null ? getDeviceKeyName(device, serial, useNewAPI).hashCode() : 0;
+	}
+
+	/**
+	 * デバイスキーを整数として取得
+	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
+	 * 同じ機器でもつなぎ直すと違うデバイスキーになるので注意
+	 * @param device
+	 * @param serial
+	 * @param useNewAPI
+	 * @param useNonce
+	 * @return
+	 */
+	@Deprecated
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI,
+		final boolean useNonce) {
+
+		return device != null ? getDeviceKeyName(device, serial, useNewAPI, useNonce).hashCode() : 0;
+	}
+
+	/**
 	 * USB機器毎の設定保存用にデバイスキー名を生成する。
 	 * ベンダーID, プロダクトID, デバイスクラス, デバイスサブクラス, デバイスプロトコルから生成
 	 * 同種の製品だと同じキー名になるので注意
@@ -233,123 +351,6 @@ public class UsbUtils implements Const {
 //			b ? device.getConfigurationCount() : 0,
 //			b && BuildCheck.isMarshmallow() ? device.getVersion() + "#" : null
 //		);
-	}
-
-	/**
-	 * デバイスキー文字列を生成
-	 * @param device
-	 * @param serial
-	 * @param manufactureName
-	 * @param configCount
-	 * @param deviceVersion
-	 * @return
-	 */
-	@NonNull
-	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
-		final boolean useNewAPI,
-		final String serial, final String manufactureName,
-		final int configCount, final String deviceVersion) {
-
-		if (device == null) return "";
-		final StringBuilder sb = new StringBuilder();
-		sb.append(device.getVendorId()).append("#")			// API >= 12
-			.append(device.getProductId()).append("#")		// API >= 12
-			.append(device.getDeviceClass()).append("#")	// API >= 12
-			.append(device.getDeviceSubclass()).append("#")	// API >= 12
-			.append(device.getDeviceProtocol());			// API >= 12
-		if (!TextUtils.isEmpty(serial)) {
-			sb.append("#");	sb.append(serial);
-		}
-		if (useNewAPI && BuildCheck.isAndroid5()) {
-			if (!TextUtils.isEmpty(manufactureName)) {
-				sb.append("#").append(manufactureName);
-			}
-			if (configCount >= 0) {
-				sb.append("#").append(configCount);
-			}
-			if (!TextUtils.isEmpty(deviceVersion)) {
-				sb.append("#").append(deviceVersion);
-			}
-		}
-		return sb.toString();
-	}
-
-	/**
-	 * デバイスキーを整数として取得
-	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
-	 * ベンダーID, プロダクトID, デバイスクラス, デバイスサブクラス, デバイスプロトコルから生成
-	 * 同種の製品だと同じデバイスキーになるので注意
-	 * @param device nullなら0を返す
-	 * @return
-	 */
-	@Deprecated
-	public static final int getDeviceKey(@Nullable final UsbDevice device) {
-		return device != null ? getDeviceKeyName(device, null, false).hashCode() : 0;
-	}
-
-	/**
-	 * デバイスキーを整数として取得
-	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
-	 * useNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
-	 * @param device
-	 * @param useNewAPI
-	 * @return
-	 */
-	@Deprecated
-	public static final int getDeviceKey(@Nullable final UsbDevice device,
-		final boolean useNewAPI) {
-
-		return device != null ? getDeviceKeyName(device, null, useNewAPI).hashCode() : 0;
-	}
-
-	/**
-	 * デバイスキーを整数として取得
-	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
-	 * useNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
-	 * @param device
-	 * @param useNewAPI
-	 * @param useNonce
-	 * @return
-	 */
-	@Deprecated
-	public static final int getDeviceKey(@Nullable final UsbDevice device,
-		final boolean useNewAPI, final boolean useNonce) {
-
-		return device != null ? getDeviceKeyName(device, null, useNewAPI, useNonce).hashCode() : 0;
-	}
-
-	/**
-	 * デバイスキーを整数として取得
-	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
-	 * serialがnullでuseNewAPI=falseで同種の製品だと同じデバイスキーになるので注意
-	 * @param device nullなら0を返す
-	 * @param serial UsbDeviceConnection#getSerialで取得したシリアル番号を渡す, nullでuseNewAPI=trueでAPI>=21なら内部で取得
-	 * @param useNewAPI API>=21またはAPI>=23のみで使用可能なメソッドも使用する(ただし機器によってはnullが返ってくるので有効かどうかは機器による)
-	 * @return
-	 */
-	@Deprecated
-	public static final int getDeviceKey(@Nullable final UsbDevice device,
-		final String serial, final boolean useNewAPI) {
-
-		return device != null ? getDeviceKeyName(device, serial, useNewAPI).hashCode() : 0;
-	}
-
-	/**
-	 * デバイスキーを整数として取得
-	 * getDeviceKeyNameで得られる文字列のhasCodeを取得
-	 * 同じ機器でもつなぎ直すと違うデバイスキーになるので注意
-	 * @param device
-	 * @param serial
-	 * @param useNewAPI
-	 * @param useNonce
-	 * @return
-	 */
-	@Deprecated
-	public static final int getDeviceKey(@Nullable final UsbDevice device,
-		final String serial, final boolean useNewAPI,
-		final boolean useNonce) {
-
-		return device != null ? getDeviceKeyName(device, serial, useNewAPI, useNonce).hashCode() : 0;
 	}
 
 //--------------------------------------------------------------------------------
