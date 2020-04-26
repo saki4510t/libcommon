@@ -36,32 +36,32 @@ public class UsbDeviceInfo implements Const {
 	 * ベンダー名・製品名・バージョン・シリアルを取得する
 	 * @param manager
 	 * @param device
-	 * @param _info
+	 * @param out
 	 * @return
 	 */
 	@SuppressLint("NewApi")
 	public static UsbDeviceInfo getDeviceInfo(
 		@NonNull final UsbManager manager,
-		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo _info) {
+		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo out) {
 
-		final UsbDeviceInfo info = _info != null ? _info : new UsbDeviceInfo();
-		info.clear();
+		final UsbDeviceInfo result = out != null ? out : new UsbDeviceInfo();
+		result.clear();
 
-		info.device = device;
+		result.device = device;
 		if (device != null) {
 			if (BuildCheck.isAPI29()) {
 				// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
-				info.manufacturer = device.getManufacturerName();
-				info.product = device.getProductName();
-				info.configCounts = device.getConfigurationCount();
+				result.manufacturer = device.getManufacturerName();
+				result.product = device.getProductName();
+				result.configCounts = device.getConfigurationCount();
 			} else if (BuildCheck.isLollipop()) {	// API >= 21
-				info.manufacturer = device.getManufacturerName();
-				info.product = device.getProductName();
-				info.serial = device.getSerialNumber();
-				info.configCounts = device.getConfigurationCount();
+				result.manufacturer = device.getManufacturerName();
+				result.product = device.getProductName();
+				result.serial = device.getSerialNumber();
+				result.configCounts = device.getConfigurationCount();
 			}
 			if (BuildCheck.isMarshmallow()) {	// API >= 23
-				info.version = device.getVersion();
+				result.version = device.getVersion();
 			}
 			if (manager.hasPermission(device)) {
 				final UsbDeviceConnection connection = manager.openDevice(device);
@@ -69,43 +69,43 @@ public class UsbDeviceInfo implements Const {
 					try {
 						final byte[] desc = connection.getRawDescriptors();
 						if (desc != null) {
-							if (TextUtils.isEmpty(info.usb_version)) {
-								info.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
+							if (TextUtils.isEmpty(result.usb_version)) {
+								result.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
 							}
-							if (TextUtils.isEmpty(info.version)) {
-								info.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
+							if (TextUtils.isEmpty(result.version)) {
+								result.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
 							}
 							if (BuildCheck.isAPI29()) {	// API >= 29
 								// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
-								info.serial = device.getSerialNumber();
+								result.serial = device.getSerialNumber();
 							}
-							if (TextUtils.isEmpty(info.serial)) {
-								info.serial = connection.getSerial();
+							if (TextUtils.isEmpty(result.serial)) {
+								result.serial = connection.getSerial();
 							}
-							if (info.configCounts < 0) {
+							if (result.configCounts < 0) {
 								// FIXME 未実装 デバイスディスクリプタをパースせんとなりゃん
-								info.configCounts = 1;
+								result.configCounts = 1;
 							}
 
 							final byte[] languages = new byte[256];
 							int languageCount = 0;
 							// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
-							int result = connection.controlTransfer(
+							int res = connection.controlTransfer(
 								USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
 								USB_REQ_GET_DESCRIPTOR,
 								(USB_DT_STRING << 8)/* | 0*/, 0, languages, 256, 0);
-							if (result > 0) {
-								languageCount = (result - 2) / 2;
+							if (res > 0) {
+								languageCount = (res - 2) / 2;
 							}
 							if (languageCount > 0) {
-								if (TextUtils.isEmpty(info.manufacturer)) {
-									info.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
+								if (TextUtils.isEmpty(result.manufacturer)) {
+									result.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
 								}
-								if (TextUtils.isEmpty(info.product)) {
-									info.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
+								if (TextUtils.isEmpty(result.product)) {
+									result.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
 								}
-								if (TextUtils.isEmpty(info.serial)) {
-									info.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
+								if (TextUtils.isEmpty(result.serial)) {
+									result.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
 								}
 							}
 						}
@@ -114,17 +114,18 @@ public class UsbDeviceInfo implements Const {
 					}
 				}
 			}
-			if (TextUtils.isEmpty(info.manufacturer)) {
-				info.manufacturer = USBVendorId.vendorName(device.getVendorId());
+			if (TextUtils.isEmpty(result.manufacturer)) {
+				result.manufacturer = USBVendorId.vendorName(device.getVendorId());
 			}
-			if (TextUtils.isEmpty(info.manufacturer)) {
-				info.manufacturer = String.format("%04x", device.getVendorId());
+			if (TextUtils.isEmpty(result.manufacturer)) {
+				result.manufacturer = String.format("%04x", device.getVendorId());
 			}
-			if (TextUtils.isEmpty(info.product)) {
-				info.product = String.format("%04x", device.getProductId());
+			if (TextUtils.isEmpty(result.product)) {
+				result.product = String.format("%04x", device.getProductId());
 			}
 		}
-		return info;
+
+		return result;
 	}
 
 //--------------------------------------------------------------------------------
