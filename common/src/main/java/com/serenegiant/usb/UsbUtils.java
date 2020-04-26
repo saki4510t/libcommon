@@ -114,6 +114,29 @@ public class UsbUtils implements Const {
 
 	/**
 	 * デバイスキー名を取得する
+	 * @param ctrlBlock
+	 * @return
+	 */
+	@NonNull
+	public static String getDeviceKeyName(
+		@NonNull final USBMonitor.UsbControlBlock ctrlBlock) {
+
+		return getDeviceKeyName(ctrlBlock.mInfo);
+	}
+
+	/**
+	 * デバイスキーを取得する
+	 * @param ctrlBlock
+	 * @return
+	 */
+	public static int getDeviceKey(
+		@NonNull final USBMonitor.UsbControlBlock ctrlBlock) {
+
+		return getDeviceKeyName(ctrlBlock.mInfo).hashCode();
+	}
+
+	/**
+	 * デバイスキー名を取得する
 	 * @param info
 	 * @return
 	 */
