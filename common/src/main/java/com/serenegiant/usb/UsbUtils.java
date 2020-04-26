@@ -82,6 +82,7 @@ public class UsbUtils implements Const {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * シリアルナンバーを取得できる機器の場合にはシリアルナンバーを含めたデバイスキーを取得する
 	 * シリアルナンバーを取得できなければgetDeviceKeyNameと同じ
@@ -305,6 +306,7 @@ public class UsbUtils implements Const {
 		return device != null ? getDeviceKeyName(device, serial, useNewAPI, useNonce).hashCode() : 0;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 指定したデバイス名に対応するUsbDeviceを取得する
 	 * @param name　UsbDevice#getDeviceNameで取得できる値
@@ -322,6 +324,7 @@ public class UsbUtils implements Const {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * 接続されているUSBの機器リストをLogCatに出力
 	 * @param context
