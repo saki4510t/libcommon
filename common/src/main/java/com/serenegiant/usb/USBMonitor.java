@@ -925,6 +925,7 @@ public final class USBMonitor implements Const {
 		 * 抜き差ししても変わらない。ただし同種の機器なら同じ値が返る
 		 * @return
 		 */
+		@Deprecated
 		public String getDeviceKeyName() {
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get());
 		}
@@ -936,6 +937,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@Deprecated
 		public String getDeviceKeyName(final boolean useNewAPI) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI);
@@ -948,6 +950,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@Deprecated
 		public String getDeviceKeyName(final boolean useNewAPI, final boolean useNonce) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI, useNonce);
@@ -959,6 +962,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@Deprecated
 		public int getDeviceKey() throws IllegalStateException {
 			checkConnection();
 			return UsbUtils.getDeviceKey(mWeakDevice.get());
@@ -971,6 +975,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@Deprecated
 		public int getDeviceKey(final boolean useNewAPI) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKey(mWeakDevice.get(), mInfo.serial, useNewAPI);
@@ -983,6 +988,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
+		@Deprecated
 		public int getDeviceKey(final boolean useNewAPI, final boolean useNonce) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKey(mWeakDevice.get(), mInfo.serial, useNewAPI, useNonce);

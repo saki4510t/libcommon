@@ -39,6 +39,7 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+@SuppressWarnings("deprecation")
 public class UsbUtils implements Const {
 	private static final String TAG = UsbUtils.class.getSimpleName();
 
@@ -111,6 +112,7 @@ public class UsbUtils implements Const {
 	 * @param device nullなら空文字列を返す
 	 * @return
 	 */
+	@Deprecated
 	public static final String getDeviceKeyName(final UsbDevice device) {
 		return getDeviceKeyName(device, null, false);
 	}
@@ -122,6 +124,7 @@ public class UsbUtils implements Const {
 	 * @param useNewAPI
 	 * @return
 	 */
+	@Deprecated
 	public static final String getDeviceKeyName(final UsbDevice device, final boolean useNewAPI) {
 		return getDeviceKeyName(device, null, useNewAPI);
 	}
@@ -136,6 +139,7 @@ public class UsbUtils implements Const {
 	 * @param useNewAPI API>=21またはAPI>=23のみで使用可能なメソッドも使用する(ただし機器によってはnullが返ってくるので有効かどうかは機器による)
 	 * @return
 	 */
+	@Deprecated
 	public static final String getDeviceKeyName(final UsbDevice device, final String serial, final boolean useNewAPI) {
 		return getDeviceKeyName(device, serial, useNewAPI, false);
 	}
@@ -155,6 +159,7 @@ public class UsbUtils implements Const {
 	 * 					ただし機器をつなぎ直すと異なるデバイスキー名になるので注意
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static final String getDeviceKeyName(final UsbDevice device, final String serial, final boolean useNewAPI, final boolean usuNonce) {
 		if (device == null) return "";
@@ -235,6 +240,7 @@ public class UsbUtils implements Const {
 	 * @param device nullなら0を返す
 	 * @return
 	 */
+	@Deprecated
 	public static final int getDeviceKey(final UsbDevice device) {
 		return device != null ? getDeviceKeyName(device, null, false).hashCode() : 0;
 	}
@@ -247,6 +253,7 @@ public class UsbUtils implements Const {
 	 * @param useNewAPI
 	 * @return
 	 */
+	@Deprecated
 	public static final int getDeviceKey(final UsbDevice device, final boolean useNewAPI) {
 		return device != null ? getDeviceKeyName(device, null, useNewAPI).hashCode() : 0;
 	}
@@ -260,6 +267,7 @@ public class UsbUtils implements Const {
 	 * @param useNonce
 	 * @return
 	 */
+	@Deprecated
 	public static final int getDeviceKey(final UsbDevice device, final boolean useNewAPI, final boolean useNonce) {
 		return device != null ? getDeviceKeyName(device, null, useNewAPI, useNonce).hashCode() : 0;
 	}
@@ -273,6 +281,7 @@ public class UsbUtils implements Const {
 	 * @param useNewAPI API>=21またはAPI>=23のみで使用可能なメソッドも使用する(ただし機器によってはnullが返ってくるので有効かどうかは機器による)
 	 * @return
 	 */
+	@Deprecated
 	public static final int getDeviceKey(final UsbDevice device, final String serial,
 		final boolean useNewAPI) {
 
@@ -289,6 +298,7 @@ public class UsbUtils implements Const {
 	 * @param useNonce
 	 * @return
 	 */
+	@Deprecated
 	public static final int getDeviceKey(final UsbDevice device, final String serial,
 		final boolean useNewAPI, final boolean useNonce) {
 
