@@ -1016,6 +1016,7 @@ public final class USBMonitor implements Const {
 		 * シリアルナンバーを取得できなければgetDeviceKeyNameと同じ
 		 * @return
 		 */
+		@Deprecated
 		@NonNull
 		public String getDeviceKeyNameWithSerial() {
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), true,
@@ -1028,6 +1029,7 @@ public final class USBMonitor implements Const {
 		 * シリアルナンバーを取得できなければgetDeviceKeyと同じ
 		 * @return
 		 */
+		@Deprecated
 		public int getDeviceKeyWithSerial() {
 			return getDeviceKeyNameWithSerial().hashCode();
 		}
