@@ -90,7 +90,11 @@ public class UsbUtils implements Const {
 	 * @param device
 	 * @return
 	 */
-	public static String getDeviceKeyNameWithSerial(final Context context, final UsbDevice device) {
+	@NonNull
+	public static String getDeviceKeyNameWithSerial(
+		@NonNull final Context context,
+		@Nullable final UsbDevice device) {
+
 		final UsbDeviceInfo info = UsbDeviceInfo.getDeviceInfo(context, device);
 		return getDeviceKeyName(device, true,
 			info.serial, info.manufacturer, info.configCounts, info.version);
@@ -102,7 +106,9 @@ public class UsbUtils implements Const {
 	 * シリアルナンバーを取得できなければgetDeviceKeyと同じ
 	 * @return
 	 */
-	public static int getDeviceKeyWithSerial(final Context context, final UsbDevice device) {
+	public static int getDeviceKeyWithSerial(@NonNull final Context context,
+		@Nullable final UsbDevice device) {
+
 		return getDeviceKeyNameWithSerial(context, device).hashCode();
 	}
 
@@ -114,7 +120,8 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final String getDeviceKeyName(final UsbDevice device) {
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device) {
 		return getDeviceKeyName(device, null, false);
 	}
 
@@ -126,7 +133,10 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final String getDeviceKeyName(final UsbDevice device, final boolean useNewAPI) {
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
+		final boolean useNewAPI) {
+
 		return getDeviceKeyName(device, null, useNewAPI);
 	}
 	/**
@@ -141,7 +151,10 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final String getDeviceKeyName(final UsbDevice device, final String serial, final boolean useNewAPI) {
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI) {
+
 		return getDeviceKeyName(device, serial, useNewAPI, false);
 	}
 
@@ -162,7 +175,10 @@ public class UsbUtils implements Const {
 	 */
 	@Deprecated
 	@SuppressLint("NewApi")
-	public static final String getDeviceKeyName(final UsbDevice device, final String serial, final boolean useNewAPI, final boolean usuNonce) {
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI, final boolean usuNonce) {
+
 		if (device == null) return "";
 		final StringBuilder sb = new StringBuilder();
 		sb.append(device.getVendorId()).append("#")			// API >= 12
@@ -207,8 +223,12 @@ public class UsbUtils implements Const {
 	 * @param deviceVersion
 	 * @return
 	 */
-	public static final String getDeviceKeyName(final UsbDevice device, final boolean useNewAPI,
-		final String serial, final String manufactureName, final int configCount, final String deviceVersion) {
+	@NonNull
+	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
+		final boolean useNewAPI,
+		final String serial, final String manufactureName,
+		final int configCount, final String deviceVersion) {
+
 		if (device == null) return "";
 		final StringBuilder sb = new StringBuilder();
 		sb.append(device.getVendorId()).append("#")			// API >= 12
@@ -242,7 +262,7 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final int getDeviceKey(final UsbDevice device) {
+	public static final int getDeviceKey(@Nullable final UsbDevice device) {
 		return device != null ? getDeviceKeyName(device, null, false).hashCode() : 0;
 	}
 
@@ -255,7 +275,9 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final int getDeviceKey(final UsbDevice device, final boolean useNewAPI) {
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final boolean useNewAPI) {
+
 		return device != null ? getDeviceKeyName(device, null, useNewAPI).hashCode() : 0;
 	}
 
@@ -269,7 +291,9 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final int getDeviceKey(final UsbDevice device, final boolean useNewAPI, final boolean useNonce) {
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final boolean useNewAPI, final boolean useNonce) {
+
 		return device != null ? getDeviceKeyName(device, null, useNewAPI, useNonce).hashCode() : 0;
 	}
 
@@ -283,8 +307,8 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final int getDeviceKey(final UsbDevice device, final String serial,
-		final boolean useNewAPI) {
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI) {
 
 		return device != null ? getDeviceKeyName(device, serial, useNewAPI).hashCode() : 0;
 	}
@@ -300,8 +324,9 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	@Deprecated
-	public static final int getDeviceKey(final UsbDevice device, final String serial,
-		final boolean useNewAPI, final boolean useNonce) {
+	public static final int getDeviceKey(@Nullable final UsbDevice device,
+		final String serial, final boolean useNewAPI,
+		final boolean useNonce) {
 
 		return device != null ? getDeviceKeyName(device, serial, useNewAPI, useNonce).hashCode() : 0;
 	}
