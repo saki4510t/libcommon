@@ -33,7 +33,7 @@ public class UsbDeviceInfo implements Const {
 	}
 
 	/**
-	 * ベンダー名・製品名・バージョン・シリアルを取得する
+	 * USB機器情報(ベンダー名・製品名・バージョン・シリアル等)を取得する
 	 * @param manager
 	 * @param device
 	 * @param out
@@ -44,13 +44,39 @@ public class UsbDeviceInfo implements Const {
 		@NonNull final UsbManager manager,
 		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo out) {
 
+		final UsbDeviceConnection connection
+			= (device != null && manager.hasPermission(device))
+				? manager.openDevice(device) : null;
+
+		try {
+			return getDeviceInfo(connection, device, out);
+		} finally {
+			if (connection != null) {
+				connection.close();
+			}
+		}
+	}
+
+	/**
+	 * USB機器情報(ベンダー名・製品名・バージョン・シリアル等)を取得する
+	 * @param connection
+	 * @param device
+	 * @param out
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static UsbDeviceInfo getDeviceInfo(
+		@Nullable final UsbDeviceConnection connection,
+		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo out) {
+
 		final UsbDeviceInfo result = out != null ? out : new UsbDeviceInfo();
 		result.clear();
 
 		result.device = device;
 		if (device != null) {
-			if (BuildCheck.isAPI29()) {
+			if (BuildCheck.isAPI29() && (connection != null)) {
 				// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
+				// connectionがnullでないならopenできているのでパーミッションがある
 				result.manufacturer = device.getManufacturerName();
 				result.product = device.getProductName();
 				result.configCounts = device.getConfigurationCount();
@@ -63,54 +89,47 @@ public class UsbDeviceInfo implements Const {
 			if (BuildCheck.isMarshmallow()) {	// API >= 23
 				result.version = device.getVersion();
 			}
-			if (manager.hasPermission(device)) {
-				final UsbDeviceConnection connection = manager.openDevice(device);
-				if (connection != null) {
-					try {
-						final byte[] desc = connection.getRawDescriptors();
-						if (desc != null) {
-							if (TextUtils.isEmpty(result.usb_version)) {
-								result.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
-							}
-							if (TextUtils.isEmpty(result.version)) {
-								result.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
-							}
-							if (BuildCheck.isAPI29()) {	// API >= 29
-								// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
-								result.serial = device.getSerialNumber();
-							}
-							if (TextUtils.isEmpty(result.serial)) {
-								result.serial = connection.getSerial();
-							}
-							if (result.configCounts < 0) {
-								// FIXME 未実装 デバイスディスクリプタをパースせんとなりゃん
-								result.configCounts = 1;
-							}
+			if (connection != null) {
+				final byte[] desc = connection.getRawDescriptors();
+				if (desc != null) {
+					if (TextUtils.isEmpty(result.usb_version)) {
+						result.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
+					}
+					if (TextUtils.isEmpty(result.version)) {
+						result.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
+					}
+					if (BuildCheck.isAPI29()) {	// API >= 29
+						// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
+						result.serial = device.getSerialNumber();
+					}
+					if (TextUtils.isEmpty(result.serial)) {
+						result.serial = connection.getSerial();
+					}
+					if (result.configCounts < 0) {
+						// FIXME 未実装 デバイスディスクリプタをパースせんとなりゃん
+						result.configCounts = 1;
+					}
 
-							final byte[] languages = new byte[256];
-							int languageCount = 0;
-							// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
-							int res = connection.controlTransfer(
-								USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
-								USB_REQ_GET_DESCRIPTOR,
-								(USB_DT_STRING << 8)/* | 0*/, 0, languages, 256, 0);
-							if (res > 0) {
-								languageCount = (res - 2) / 2;
-							}
-							if (languageCount > 0) {
-								if (TextUtils.isEmpty(result.manufacturer)) {
-									result.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
-								}
-								if (TextUtils.isEmpty(result.product)) {
-									result.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
-								}
-								if (TextUtils.isEmpty(result.serial)) {
-									result.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
-								}
-							}
+					final byte[] languages = new byte[256];
+					int languageCount = 0;
+					// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
+					int res = connection.controlTransfer(
+						USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
+						USB_REQ_GET_DESCRIPTOR,
+						(USB_DT_STRING << 8)/* | 0*/, 0, languages, 256, 0);
+					if (res > 0) {
+						languageCount = (res - 2) / 2;
+					}
+					if (languageCount > 0) {
+						if (TextUtils.isEmpty(result.manufacturer)) {
+							result.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
 						}
-					} finally {
-						connection.close();
+						if (TextUtils.isEmpty(result.product)) {
+							result.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
+						}
+						if (TextUtils.isEmpty(result.serial)) {
+							result.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
+						}
 					}
 				}
 			}
