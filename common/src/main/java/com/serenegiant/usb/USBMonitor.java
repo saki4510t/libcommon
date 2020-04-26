@@ -789,12 +789,16 @@ public final class USBMonitor implements Const {
 	 * 一度closeすると再利用は出来ないので、再度生成すること
 	 */
 	public static final class UsbControlBlock implements Cloneable {
+		@NonNull
 		private final WeakReference<USBMonitor> mWeakMonitor;
+		@NonNull
 		private final WeakReference<UsbDevice> mWeakDevice;
-		protected UsbDeviceConnection mConnection;
 		protected final UsbDeviceInfo mInfo;
+		@NonNull
 		private final SparseArray<SparseArray<UsbInterface>>
 			mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
+		@Nullable
+		protected UsbDeviceConnection mConnection;
 
 		/**
 		 * 指定したUsbDeviceに関係づけたUsbControlBlockインスタンスを生成する
@@ -889,10 +893,12 @@ public final class USBMonitor implements Const {
 			return ctrlblock;
 		}
 
+		@Nullable
 		public USBMonitor getMonitor() {
 			return mWeakMonitor.get();
 		}
 
+		@Nullable
 		public final UsbDevice getDevice() {
 			return mWeakDevice.get();
 		}
@@ -901,8 +907,10 @@ public final class USBMonitor implements Const {
 		 * 機器名を取得
 		 * UsbDevice#mUsbDeviceを呼び出しているので
 		 * 端末内でユニークな値だけど抜き差しすれば変わる
+		 * すでに取り外されたり破棄されているときは空文字列が返る
 		 * @return
 		 */
+		@NonNull
 		public String getDeviceName() {
 			final UsbDevice device = mWeakDevice.get();
 			return device != null ? device.getDeviceName() : "";
@@ -926,6 +934,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 */
 		@Deprecated
+		@NonNull
 		public String getDeviceKeyName() {
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get());
 		}
@@ -938,6 +947,7 @@ public final class USBMonitor implements Const {
 		 * @throws IllegalStateException
 		 */
 		@Deprecated
+		@NonNull
 		public String getDeviceKeyName(final boolean useNewAPI) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI);
@@ -951,6 +961,7 @@ public final class USBMonitor implements Const {
 		 * @throws IllegalStateException
 		 */
 		@Deprecated
+		@NonNull
 		public String getDeviceKeyName(final boolean useNewAPI, final boolean useNonce) throws IllegalStateException {
 			if (useNewAPI) checkConnection();
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), mInfo.serial, useNewAPI, useNonce);
@@ -999,6 +1010,7 @@ public final class USBMonitor implements Const {
 		 * シリアルナンバーを取得できなければgetDeviceKeyNameと同じ
 		 * @return
 		 */
+		@NonNull
 		public String getDeviceKeyNameWithSerial() {
 			return UsbUtils.getDeviceKeyName(mWeakDevice.get(), true,
 				mInfo.serial, mInfo.manufacturer, mInfo.configCounts, mInfo.version);
