@@ -88,7 +88,7 @@ public class MediaStoreUtils {
 //	protected static final int PROJ_INDEX_DATE_MODIFIED = 8;
 //	protected static final int PROJ_INDEX_DATE_ADDED = 9;
 
-	protected static final Uri QUERY_URI = MediaStore.Files.getContentUri("external");
+	protected static final Uri QUERY_URI_FILES = MediaStore.Files.getContentUri("external");
 
 //--------------------------------------------------------------------------------
 	/**

@@ -446,7 +446,7 @@ public class MediaStoreRecyclerAdapter
 				}
 				mAdapter.mSelection = SELECTIONS[mAdapter.mMediaType % MEDIA_TYPE_NUM];
 				mAdapter.mSelectionArgs = null;
-				startQuery(0, mAdapter, QUERY_URI, PROJ_MEDIA,
+				startQuery(0, mAdapter, QUERY_URI_FILES, PROJ_MEDIA,
 					mAdapter.mSelection, mAdapter.mSelectionArgs, mAdapter.mSortOrder);
 			}
 		}

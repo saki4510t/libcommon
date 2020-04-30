@@ -198,7 +198,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	public int getItemPositionFromID(final long id) {
 		if (DEBUG) Log.v(TAG, "getItemPositionFromID:id=" + id);
 		int result = -1;
-		final Cursor cursor = mCr.query(QUERY_URI, PROJ_MEDIA, mSelection, mSelectionArgs, null);
+		final Cursor cursor = mCr.query(QUERY_URI_FILES, PROJ_MEDIA, mSelection, mSelectionArgs, null);
 		if (cursor != null) {
 			try {
 				if (cursor.moveToFirst()) {
@@ -376,7 +376,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		public void requery() {
 			synchronized (mAdapter) {
-				startQuery(0, mAdapter, QUERY_URI, PROJ_MEDIA,
+				startQuery(0, mAdapter, QUERY_URI_FILES, PROJ_MEDIA,
 					mAdapter.mSelection, mAdapter.mSelectionArgs, null);
 			}
 		}
