@@ -42,12 +42,12 @@ public class MediaInfo implements Parcelable {
 
 	public static final Creator<MediaInfo> CREATOR = new Creator<MediaInfo>() {
 		@Override
-		public MediaInfo createFromParcel(Parcel in) {
+		public MediaInfo createFromParcel(final Parcel in) {
 			return new MediaInfo(in);
 		}
 
 		@Override
-		public MediaInfo[] newArray(int size) {
+		public MediaInfo[] newArray(final int size) {
 			return new MediaInfo[size];
 		}
 	};
@@ -74,24 +74,22 @@ public class MediaInfo implements Parcelable {
 	 * @param src
 	 */
 	public MediaInfo(@NonNull final MediaInfo src) {
-		if (src != this) {
-			id = src.id;
-			data = src.data;
-			title = src.title;
-			mime = src.mime;
-			displayName = src.displayName;
-			mediaType = src.mediaType;
-			width = src.width;
-			height = src.height;
-			orientation = src.orientation;
-		}
+		id = src.id;
+		data = src.data;
+		title = src.title;
+		mime = src.mime;
+		displayName = src.displayName;
+		mediaType = src.mediaType;
+		width = src.width;
+		height = src.height;
+		orientation = src.orientation;
 	}
 
 	/**
 	 * Parcelable用のコンストラクタ
 	 * @param in
 	 */
-	protected MediaInfo(final Parcel in) {
+	protected MediaInfo(@NonNull final Parcel in) {
 		id = in.readLong();
 		data = in.readString();
 		title = in.readString();
@@ -107,40 +105,36 @@ public class MediaInfo implements Parcelable {
 	 * Cursorから値を読み込んで初期化するコンストラクタ
 	 * @param cursor
 	 */
-	MediaInfo(final Cursor cursor) {
-		if (cursor != null) {
-			id = cursor.getLong(PROJ_INDEX_ID);
-			data = cursor.getString(PROJ_INDEX_DATA);
-			title = cursor.getString(PROJ_INDEX_TITLE);
-			mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
-			displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
-			mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
-			try {
-				width = cursor.getInt(PROJ_INDEX_WIDTH);
-				height = cursor.getInt(PROJ_INDEX_HEIGHT);
-			} catch (final Exception e) {
-				// ignore
-			}
+	MediaInfo(@NonNull final Cursor cursor) {
+		id = cursor.getLong(PROJ_INDEX_ID);
+		data = cursor.getString(PROJ_INDEX_DATA);
+		title = cursor.getString(PROJ_INDEX_TITLE);
+		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
+		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
+		mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
+		try {
+			width = cursor.getInt(PROJ_INDEX_WIDTH);
+			height = cursor.getInt(PROJ_INDEX_HEIGHT);
+		} catch (final Exception e) {
+			// ignore
 		}
 	}
 
-	MediaInfo loadFromCursor(final Cursor cursor) {
-		if (cursor != null) {
-			id = cursor.getLong(PROJ_INDEX_ID);
-			data = cursor.getString(PROJ_INDEX_DATA);
-			title = cursor.getString(PROJ_INDEX_TITLE);
-			mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
-			displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
-			mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
-			try {
-				width = cursor.getInt(PROJ_INDEX_WIDTH);
-				height = cursor.getInt(PROJ_INDEX_HEIGHT);
-				// Android 10以降でないとORIENTATIONが無い機種が多いのでここではセットしない
+	MediaInfo loadFromCursor(@NonNull final Cursor cursor) {
+		id = cursor.getLong(PROJ_INDEX_ID);
+		data = cursor.getString(PROJ_INDEX_DATA);
+		title = cursor.getString(PROJ_INDEX_TITLE);
+		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
+		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
+		mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
+		try {
+			width = cursor.getInt(PROJ_INDEX_WIDTH);
+			height = cursor.getInt(PROJ_INDEX_HEIGHT);
+			// Android 10以降でないとORIENTATIONが無い機種が多いのでここではセットしない
 //				orientation = cursor.getInt(PROJ_INDEX_ORIENTATION);
-			} catch (final Exception e) {
-				// ignore
-				if (DEBUG) Log.w(TAG, e);
-			}
+		} catch (final Exception e) {
+			// ignore
+			if (DEBUG) Log.w(TAG, e);
 		}
 		return this;
 	}
@@ -150,17 +144,15 @@ public class MediaInfo implements Parcelable {
 	 * @param src
 	 */
 	public MediaInfo set(@NonNull final MediaInfo src) {
-		if (src != this) {
-			id = src.id;
-			data = src.data;
-			title = src.title;
-			mime = src.mime;
-			displayName = src.displayName;
-			mediaType = src.mediaType;
-			width = src.width;
-			height = src.height;
-			orientation = src.orientation;
-		}
+		id = src.id;
+		data = src.data;
+		title = src.title;
+		mime = src.mime;
+		displayName = src.displayName;
+		mediaType = src.mediaType;
+		width = src.width;
+		height = src.height;
+		orientation = src.orientation;
 		return this;
 	}
 
@@ -200,7 +192,7 @@ public class MediaInfo implements Parcelable {
 	}
 
 	@Override
-	public void writeToParcel(final Parcel dest, final int flags) {
+	public void writeToParcel(@NonNull final Parcel dest, final int flags) {
 		dest.writeLong(id);
 		dest.writeString(data);
 		dest.writeString(title);

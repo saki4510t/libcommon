@@ -504,6 +504,7 @@ public class MediaStoreRecyclerAdapter
 			super(cr, width, height);
 		}
 
+		@NonNull
 		@Override
 		protected ImageLoader createImageLoader() {
 			return new ThumbnailLoader(this);
