@@ -124,6 +124,19 @@ public class MediaStoreAdapter extends CursorAdapter {
 	}
 
 	@Override
+	protected void finalize() throws Throwable {
+		try {
+			changeCursor(null);
+			if (mMediaInfoCursor != null) {
+				mMediaInfoCursor.close();
+				mMediaInfoCursor = null;
+			}
+		} finally {
+			super.finalize();
+		}
+	}
+
+	@Override
 	public View newView(final Context context,
 		final Cursor cursor, final ViewGroup parent) {
 
@@ -131,10 +144,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final View view = mInflater.inflate(mLayoutId, parent, false);
 		getViewHolder(view);
 		return view;
-	}
-
-	protected LoaderDrawable createLoaderDrawable(@NonNull final Context context) {
-		return new ThumbnailLoaderDrawable(context, mThumbnailWidth, mThumbnailHeight);
 	}
 
 	@Override
@@ -159,6 +168,10 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 	}
 
+	protected LoaderDrawable createLoaderDrawable(@NonNull final Context context) {
+		return new ThumbnailLoaderDrawable(context, mThumbnailWidth, mThumbnailHeight);
+	}
+
 	private ViewHolder getViewHolder(final View view) {
 		ViewHolder holder;
 		// you can use View#getTag()/setTag() instead of using View#getTag(int)/setTag(int)
@@ -173,19 +186,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 		return holder;
 	}
 	
-	@Override
-	protected void finalize() throws Throwable {
-		try {
-			changeCursor(null);
-			if (mMediaInfoCursor != null) {
-				mMediaInfoCursor.close();
-				mMediaInfoCursor = null;
-			}
-		} finally {
-			super.finalize();
-		}
-	}
-
 	@Override
 	protected void onContentChanged() {
 		mQueryHandler.requery();
