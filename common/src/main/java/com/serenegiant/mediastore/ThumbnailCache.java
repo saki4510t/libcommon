@@ -313,7 +313,7 @@ public class ThumbnailCache {
 		final String key = getKey(id);
 		Bitmap result;
 		synchronized (sSync) {
-			result = sThumbnailCache.get(key);
+			result = get(key);
 			if (result == null) {
 				int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
 				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
