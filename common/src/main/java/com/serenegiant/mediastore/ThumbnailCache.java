@@ -174,6 +174,11 @@ public class ThumbnailCache {
 					}
 				} catch (final IOException e) {
 					if (DEBUG) Log.w(TAG, e);
+					try {
+						sDiskLruCache.remove(key);
+					} catch (final IOException ex) {
+						// ignore
+					}
 				} finally {
 					try {
 						if (in != null) {
@@ -243,6 +248,23 @@ public class ThumbnailCache {
 	}
 
 	/**
+	 * 指定したキーに対応するキャッシュエントリーを削除する
+	 * @param key
+	 */
+	public void remove(final String key) {
+		synchronized (sSync) {
+			sThumbnailCache.remove(key);
+			if (sDiskLruCache != null) {
+				try {
+					sDiskLruCache.remove(key);
+				} catch (final IOException e) {
+					// ignore
+				}
+			}
+		}
+	}
+
+	/**
 	 * 静止画のサムネイルを取得する
 	 * 可能であればキャッシュから取得する
 	 * @param cr
@@ -273,6 +295,7 @@ public class ThumbnailCache {
 						result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, null);
 					} catch (final Exception e) {
 						if (DEBUG) Log.w(TAG, e);
+						remove(key);
 					}
 				}
 				if (result != null) {
@@ -322,6 +345,7 @@ public class ThumbnailCache {
 					result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, null);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
+					remove(key);
 				}
 				if (result != null) {
 					if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",
