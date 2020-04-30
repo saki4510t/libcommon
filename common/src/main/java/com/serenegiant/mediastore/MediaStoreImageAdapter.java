@@ -40,6 +40,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.serenegiant.common.R;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
@@ -56,6 +57,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();
 
+	private final Context mContext;
 	private final LayoutInflater mInflater;
 	private final int mLayoutId;
 	private final ContentResolver mCr;
@@ -81,6 +83,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	public MediaStoreImageAdapter(@NonNull final Context context,
 		@LayoutRes final int id_layout, final boolean needQuery) {
 
+		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = id_layout;
 		mCr = context.getContentResolver();
@@ -129,7 +132,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			// ローカルキャッシュ
 			Drawable drawable = holder.mImageView.getDrawable();
 			if (!(drawable instanceof LoaderDrawable)) {
-				drawable = createLoaderDrawable(mCr, info);
+				drawable = createLoaderDrawable(mContext, info);
 				holder.mImageView.setImageDrawable(drawable);
 			}
 			((LoaderDrawable)drawable).startLoad(info.mediaType, info.id);
@@ -295,9 +298,9 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	protected LoaderDrawable createLoaderDrawable(
-		@NonNull final ContentResolver cr, @NonNull final MediaInfo info) {
+		@NonNull final Context context, @NonNull final MediaInfo info) {
 
-		return new ImageLoaderDrawable(cr, info.width, info.height);
+		return new ImageLoaderDrawable(context, info.width, info.height);
 	}
 
 	private static final class ViewHolder {
@@ -367,12 +370,13 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	private static class ImageLoaderDrawable extends LoaderDrawable {
-		public ImageLoaderDrawable(final ContentResolver cr,
+		public ImageLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
-			super(cr, width, height);
+			super(context, width, height);
 		}
 
+		@NonNull
 		@Override
 		protected ImageLoader createImageLoader() {
 			return new MyImageLoader(this);
@@ -408,7 +412,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 					mParent.onBoundsChange(bounds);
 				}
 			} catch (final IOException e) {
-				Log.w(TAG, e);
+				if (DEBUG) Log.w(TAG, e);
+				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}

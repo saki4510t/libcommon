@@ -85,6 +85,7 @@ public class MediaStoreRecyclerAdapter
 			@NonNull View view, @NonNull final MediaInfo item);
 	}
 
+	private final Context mContext;
 	private final LayoutInflater mInflater;
 	private final int mLayoutId;
 	private final ContentResolver mCr;
@@ -119,6 +120,7 @@ public class MediaStoreRecyclerAdapter
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = itemLayout;
 		mCr = context.getContentResolver();
@@ -498,10 +500,10 @@ public class MediaStoreRecyclerAdapter
 	 * サムネイルを非同期で取得するためのDrawable
 	 */
 	private class ThumbnailLoaderDrawable extends LoaderDrawable {
-		public ThumbnailLoaderDrawable(final ContentResolver cr,
+		public ThumbnailLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
-			super(cr, width, height);
+			super(context, width, height);
 		}
 
 		@NonNull
@@ -542,7 +544,8 @@ public class MediaStoreRecyclerAdapter
 					break;
 				}
 			} catch (final IOException e) {
-				Log.w(TAG, e);
+				if (DEBUG) Log.w(TAG, e);
+				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}
@@ -562,7 +565,7 @@ public class MediaStoreRecyclerAdapter
 		if (iv != null) {
 			Drawable drawable = iv.getDrawable();
 			if (!(drawable instanceof LoaderDrawable)) {
-				drawable = new ThumbnailLoaderDrawable(mCr, mThumbnailWidth, mThumbnailHeight);
+				drawable = new ThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
 				iv.setImageDrawable(drawable);
 			}
 			((LoaderDrawable)drawable).startLoad(

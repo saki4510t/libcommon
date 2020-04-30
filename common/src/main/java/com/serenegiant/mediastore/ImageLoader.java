@@ -20,12 +20,15 @@ package com.serenegiant.mediastore;
 
 import android.content.ContentResolver;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 
 import com.serenegiant.utils.ThreadPool;
 
 import java.util.concurrent.FutureTask;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * 非同期で画像読み込みを行うためのヘルパークラス(Runnableを実装)
@@ -83,6 +86,21 @@ public abstract class ImageLoader implements Runnable {
 		@NonNull final ContentResolver cr,
 		final int mediaType, final long id,
 		final int requestWidth, final int requestHeight);
+
+	/**
+	 * 指定したDrawableリソースからビットマップとして画像を取得する
+	 * @param drawableRes
+	 * @return
+	 */
+	@Nullable
+	protected Bitmap loadDefaultBitmap(@DrawableRes final int drawableRes) {
+		Bitmap result = null;
+		if (drawableRes != 0) {
+			result = BitmapFactory.decodeResource(
+				mParent.getContext().getResources(), drawableRes);
+		}
+		return result;
+	}
 
 	@Override
 	public void run() {

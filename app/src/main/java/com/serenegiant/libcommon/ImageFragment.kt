@@ -130,7 +130,7 @@ class ImageFragment: BaseFragment() {
 			var drawable = mImageView!!.getDrawable()
 			if (drawable !is LoaderDrawable) {
 				drawable = ImageLoaderDrawable(
-					requireContext().contentResolver, -1, -1)
+					requireContext(), -1, -1)
 				mImageView!!.setImageDrawable(drawable)
 			}
 			(drawable as LoaderDrawable).startLoad(mInfo!!.mediaType, mInfo!!.id)
@@ -152,8 +152,8 @@ class ImageFragment: BaseFragment() {
 	}
 
 //--------------------------------------------------------------------------------
-	private class ImageLoaderDrawable(cr: ContentResolver,
-		width: Int, height: Int) : LoaderDrawable(cr, width, height) {
+	private class ImageLoaderDrawable(context: Context,
+		width: Int, height: Int) : LoaderDrawable(context, width, height) {
 
 		override fun createImageLoader(): ImageLoader {
 			return MyImageLoader(this)
@@ -189,7 +189,8 @@ class ImageFragment: BaseFragment() {
 					(mParent as ImageLoaderDrawable).onBoundsChange(bounds)
 				}
 			} catch (e: IOException) {
-				Log.w(TAG, e)
+				if (DEBUG) Log.w(TAG, e)
+				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
 			}
 			return result!!
 		}

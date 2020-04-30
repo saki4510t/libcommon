@@ -58,6 +58,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
+	private final Context mContext;
 	private final LayoutInflater mInflater;
 	private final ContentResolver mCr;
 	private final int mLayoutId;
@@ -75,6 +76,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		@LayoutRes final int id_layout) {
 
 		super(context, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
+		mContext = context;
 	    mInflater = LayoutInflater.from(context);
 	    mCr = context.getContentResolver();
 	    mQueryHandler = new MyAsyncQueryHandler(mCr, this);
@@ -95,8 +97,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		return view;
 	}
 
-	protected LoaderDrawable createLoaderDrawable(final ContentResolver cr) {
-		return new ThumbnailLoaderDrawable(cr, mThumbnailWidth, mThumbnailHeight);
+	protected LoaderDrawable createLoaderDrawable(@NonNull final Context context) {
+		return new ThumbnailLoaderDrawable(context, mThumbnailWidth, mThumbnailHeight);
 	}
 
 	@Override
@@ -108,7 +110,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final TextView tv = holder.mTitleView;
 		Drawable drawable = iv.getDrawable();
 		if (!(drawable instanceof LoaderDrawable)) {
-			drawable = createLoaderDrawable(mCr);
+			drawable = createLoaderDrawable(mContext);
 			iv.setImageDrawable(drawable);
 		}
 		((LoaderDrawable)drawable).startLoad(
@@ -359,12 +361,13 @@ public class MediaStoreAdapter extends CursorAdapter {
 	}
 
 	private class ThumbnailLoaderDrawable extends LoaderDrawable {
-		public ThumbnailLoaderDrawable(final ContentResolver cr,
+		public ThumbnailLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
-			super(cr, width, height);
+			super(context, width, height);
 		}
 
+		@NonNull
 		@Override
 		protected ImageLoader createImageLoader() {
 			return new ThumbnailLoader(this);
@@ -397,7 +400,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 					break;
 				}
 			} catch (final IOException e) {
-				Log.w(TAG, e);
+				if (DEBUG) Log.w(TAG, e);
+				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}

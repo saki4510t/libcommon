@@ -277,7 +277,7 @@ public class ThumbnailCache {
 	public Bitmap getImageThumbnail(
 		@NonNull final ContentResolver cr, final long id,
 		final int requestWidth, final int requestHeight)
-			throws IOException {
+			throws FileNotFoundException, IOException {
 
 		// try to get from internal thumbnail cache(in memory), this may be redundant
 		final String key = getKey(id);
@@ -292,10 +292,13 @@ public class ThumbnailCache {
 					if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
 						kind = MediaStore.Images.Thumbnails.MINI_KIND;
 					try {
+						// XXX ContentResolverには存在するが実ファイルがすでに削除されていると
+						// XXX ここでFileNotFoundExceptionが投げられるんだけどキャッチできない
 						result = MediaStore.Images.Thumbnails.getThumbnail(cr, id, kind, null);
 					} catch (final Exception e) {
 						if (DEBUG) Log.w(TAG, e);
 						remove(key);
+						throw (e instanceof IOException) ? (IOException)e :  new IOException(e);
 					}
 				}
 				if (result != null) {
@@ -342,10 +345,13 @@ public class ThumbnailCache {
 				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
 					kind = MediaStore.Video.Thumbnails.MINI_KIND;
 				try {
+					// XXX ContentResolverには存在するが実ファイルがすでに削除されていると
+					// XXX ここでFileNotFoundExceptionが投げられるんだけどキャッチできない
 					result = MediaStore.Video.Thumbnails.getThumbnail(cr, id, kind, null);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
 					remove(key);
+					throw (e instanceof IOException) ? (IOException)e :  new IOException(e);
 				}
 				if (result != null) {
 					if (DEBUG) Log.v(TAG, String.format("getVideoThumbnail:id=%d(%d,%d)",

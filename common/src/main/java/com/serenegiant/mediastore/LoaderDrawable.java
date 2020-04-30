@@ -22,6 +22,7 @@ package com.serenegiant.mediastore;
  */
 
 import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -43,6 +44,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	private static final int DEFAULT_PAINT_FLAGS =
 		Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG;
 
+	private final Context mContext;
 	private final ContentResolver mContentResolver;
     private final Paint mPaint = new Paint(DEFAULT_PAINT_FLAGS);
     private final Paint mDebugPaint = new Paint(DEFAULT_PAINT_FLAGS);
@@ -56,14 +58,15 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	/**
 	 * コンストラクタ
 	 * XXX 仮のサイズをセットしておかないとListView/GridView/RecyclerView等の描画が極端に遅くなる
-	 * @param cr
+	 * @param context
 	 * @param width
 	 * @param height
 	 */
-	public LoaderDrawable(@NonNull final ContentResolver cr,
+	public LoaderDrawable(@NonNull final Context context,
 		final int width, final int height) {
 
-		mContentResolver = cr;
+		mContext = context;
+		mContentResolver = context.getContentResolver();
 		mDebugPaint.setColor(Color.RED);
 		mDebugPaint.setTextSize(18);
 		mBitmapWidth = width;
@@ -103,6 +106,11 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	@NonNull
 	public ContentResolver getContentResolver() {
 		return mContentResolver;
+	}
+
+	@NonNull
+	protected Context getContext() {
+		return mContext;
 	}
 
 	private void updateDrawMatrix(@NonNull final Rect bounds) {
