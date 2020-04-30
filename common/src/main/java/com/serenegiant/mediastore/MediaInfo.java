@@ -18,14 +18,17 @@ package com.serenegiant.mediastore;
  *  limitations under the License.
 */
 
+import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
+import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import java.io.IOException;
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
@@ -176,6 +179,28 @@ public class MediaInfo implements Parcelable {
 			return null;
 		}
 
+	}
+
+	/**
+	 * このMediaInfoインスタンスが保持しているデータへアクセス可能(openできる)かどうか
+	 * @param cr
+	 * @return
+	 */
+	public boolean canRead(@NonNull final ContentResolver cr) {
+		final Uri uri = getUri();
+		if (uri != null) {
+			try {
+				final ParcelFileDescriptor pfd
+					= cr.openFileDescriptor(uri, "r");
+				if (pfd != null) {
+					pfd.close();
+					return true;
+				}
+			} catch (final IOException e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
+		}
+		return false;
 	}
 
 	@NonNull
