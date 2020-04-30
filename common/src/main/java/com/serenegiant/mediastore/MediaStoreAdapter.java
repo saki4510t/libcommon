@@ -58,17 +58,24 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;
 
+	@NonNull
 	private final Context mContext;
+	@NonNull
 	private final LayoutInflater mInflater;
+	@NonNull
 	private final ContentResolver mCr;
 	private final int mLayoutId;
+	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
+	@NonNull
 	private final ThumbnailCache mThumbnailCache;
+
 	private Cursor mMediaInfoCursor;
 	private String mSelection;
 	private String[] mSelectionArgs;
 	private boolean mShowTitle = false;
 	private int mMediaType = MEDIA_ALL;
+	@NonNull
 	private final MediaInfo info = new MediaInfo();
 
 

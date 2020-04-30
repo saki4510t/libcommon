@@ -57,11 +57,16 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();
 
+	@NonNull
 	private final Context mContext;
+	@NonNull
 	private final LayoutInflater mInflater;
 	private final int mLayoutId;
+	@NonNull
 	private final ContentResolver mCr;
+	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
+
 	protected boolean mDataValid;
 //	protected int mRowIDColumn;
 	protected ChangeObserver mChangeObserver;

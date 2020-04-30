@@ -85,14 +85,21 @@ public class MediaStoreRecyclerAdapter
 			@NonNull View view, @NonNull final MediaInfo item);
 	}
 
+	@NonNull
 	private final Context mContext;
+	@NonNull
 	private final LayoutInflater mInflater;
 	private final int mLayoutId;
+	@NonNull
 	private final ContentResolver mCr;
+	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
+	@NonNull
 	private final ThumbnailCache mThumbnailCache;
-	private final MediaInfo info = new MediaInfo();
+	@NonNull
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
+	@NonNull
+	private final MediaInfo info = new MediaInfo();
 
 	private boolean mDataValid;
 //	private int mRowIDColumn;
@@ -345,6 +352,7 @@ public class MediaStoreRecyclerAdapter
 				newCursor.registerDataSetObserver(mDataSetObserver);
 			}
 //			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
+			//
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
