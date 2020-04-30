@@ -107,6 +107,7 @@ public class MediaStoreRecyclerAdapter
 	 */
 	@NonNull
 	private final List<Integer> mValues = new ArrayList<>();
+	private boolean mNeedValidate;
 
 	private boolean mDataValid;
 	private ChangeObserver mChangeObserver;
@@ -152,6 +153,7 @@ public class MediaStoreRecyclerAdapter
 		mCr = context.getContentResolver();
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		mThumbnailCache = new ThumbnailCache(context);
+		mNeedValidate = true;
 
 		if (refreshNow) {
 			refresh();
@@ -213,6 +215,17 @@ public class MediaStoreRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * 読み込みできないデータをオミットするかどうか
+	 * 次回のrefresh呼び出しから有効
+	 * @param needValidate
+	 */
+	public void setValidateItems(final boolean needValidate) {
+		if (mNeedValidate != needValidate) {
+			mNeedValidate = needValidate;
+		}
+	}
+
 	public void setListener(final MediaStoreRecyclerAdapterListener listener) {
 		if (DEBUG) Log.v(TAG, "setListener:" + listener);
 		mListener = listener;
@@ -383,7 +396,7 @@ public class MediaStoreRecyclerAdapter
 					int pos = 0;
 					while (newCursor.moveToNext()) {
 						info.loadFromCursor(newCursor);
-						if (info.canRead(mCr)) {
+						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
 						}
 						pos++;

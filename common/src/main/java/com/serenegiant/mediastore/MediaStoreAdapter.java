@@ -86,6 +86,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	 */
 	@NonNull
 	private final List<Integer> mValues = new ArrayList<>();
+	private boolean mNeedValidate;
 
 	/**
 	 * コンストラクタ
@@ -116,6 +117,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
 		mLayoutId = id_layout;
 		mThumbnailCache = new ThumbnailCache(context);
+		mNeedValidate = true;
 		if (refreshNow) {
 			refresh();
 		}
@@ -241,6 +243,17 @@ public class MediaStoreAdapter extends CursorAdapter {
 			Log.w(TAG, "failed to getItem(" + info.title + ") at position=" + position);
 		}
 		return result;
+	}
+
+	/**
+	 * 読み込みできないデータをオミットするかどうか
+	 * 次回のrefresh呼び出しから有効
+	 * @param needValidate
+	 */
+	public void setValidateItems(final boolean needValidate) {
+		if (mNeedValidate != needValidate) {
+			mNeedValidate = needValidate;
+		}
 	}
 
 	public int getPositionFromId(final long id) {
@@ -385,7 +398,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 					int pos = 0;
 					while (newCursor.moveToNext()) {
 						info.loadFromCursor(newCursor);
-						if (info.canRead(mCr)) {
+						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
 						}
 						pos++;

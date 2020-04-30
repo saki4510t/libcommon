@@ -82,6 +82,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	 */
 	@NonNull
 	private final List<Integer> mValues = new ArrayList<>();
+	private boolean mNeedValidate;
 
 	private boolean mShowTitle;
 
@@ -111,6 +112,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		mLayoutId = id_layout;
 		mCr = context.getContentResolver();
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
+		mNeedValidate = true;
 		if (refreshNow) {
 			refresh();
 		}
@@ -180,6 +182,17 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	public int getItemPosition(@NonNull final Object object) {
 		// FIXME ここはobject=ViewからMediaInfo#idを取得してpositionを検索し直さないとだめかも
 		return super.getItemPosition(object);
+	}
+
+	/**
+	 * 読み込みできないデータをオミットするかどうか
+	 * 次回のrefresh呼び出しから有効
+	 * @param needValidate
+	 */
+	public void setValidateItems(final boolean needValidate) {
+		if (mNeedValidate != needValidate) {
+			mNeedValidate = needValidate;
+		}
 	}
 
 	public int getItemPositionFromID(final long id) {
@@ -308,7 +321,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 					int pos = 0;
 					while (newCursor.moveToNext()) {
 						info.loadFromCursor(newCursor);
-						if (info.canRead(mCr)) {
+						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
 						}
 						pos++;
