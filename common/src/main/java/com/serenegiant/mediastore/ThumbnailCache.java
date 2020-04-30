@@ -154,8 +154,10 @@ public class ThumbnailCache {
 	public Bitmap get(@NonNull final String key) {
 		Bitmap result;
 		synchronized (sSync) {
+			// メモリーキャッシュから取得を試みる
 			result = sThumbnailCache.get(key);
 			if ((result == null) && (sDiskLruCache != null)) {
+				// メモリーキャッシュにないときはディスクキャッシュから取得を試みる
 				InputStream in = null;
 				try {
 					final DiskLruCache.Snapshot snapshot = sDiskLruCache.get(key);
