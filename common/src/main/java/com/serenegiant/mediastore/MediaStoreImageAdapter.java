@@ -85,22 +85,33 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	private boolean mShowTitle;
 
+	/**
+	 * コンストラクタ
+	 * すぐにデータ取得要求する
+	 * @param context
+	 * @param id_layout
+	 */
 	public MediaStoreImageAdapter(@NonNull final Context context,
 		@LayoutRes final int id_layout) {
 
 		this(context, id_layout, true);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param id_layout
+	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
+	 */
 	public MediaStoreImageAdapter(@NonNull final Context context,
-		@LayoutRes final int id_layout, final boolean needQuery) {
+		@LayoutRes final int id_layout, final boolean refreshNow) {
 
 		mContext = context;
 		mInflater = LayoutInflater.from(context);
 		mLayoutId = id_layout;
 		mCr = context.getContentResolver();
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
-		ThreadPool.preStartAllCoreThreads();
-		if (needQuery) {
+		if (refreshNow) {
 			refresh();
 		}
 	}
@@ -323,6 +334,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	}
 
 	public void refresh() {
+		ThreadPool.preStartAllCoreThreads();
 		mQueryHandler.requery();
 	}
 

@@ -125,11 +125,24 @@ public class MediaStoreRecyclerAdapter
 
 	/**
 	 * コンストラクタ
+	 * すぐにデータ取得要求する
 	 * @param context
 	 * @param itemLayout
 	 */
 	public MediaStoreRecyclerAdapter(@NonNull final Context context,
 		@LayoutRes final int itemLayout) {
+
+		this(context, itemLayout, true);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param itemLayout
+	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
+	 */
+	public MediaStoreRecyclerAdapter(@NonNull final Context context,
+		@LayoutRes final int itemLayout, final boolean refreshNow) {
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -140,8 +153,9 @@ public class MediaStoreRecyclerAdapter
 		mQueryHandler = new MyAsyncQueryHandler(mCr, this);
 		mThumbnailCache = new ThumbnailCache(context);
 
-		ThreadPool.preStartAllCoreThreads();
-		refresh();
+		if (refreshNow) {
+			refresh();
+		}
 	}
 
 	@Override
@@ -211,6 +225,7 @@ public class MediaStoreRecyclerAdapter
 
 	public void refresh() {
 		if (DEBUG) Log.v(TAG, "refresh:");
+		ThreadPool.preStartAllCoreThreads();
 		mQueryHandler.requery();
 	}
 

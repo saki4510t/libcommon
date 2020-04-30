@@ -87,9 +87,26 @@ public class MediaStoreAdapter extends CursorAdapter {
 	@NonNull
 	private final List<Integer> mValues = new ArrayList<>();
 
-
+	/**
+	 * コンストラクタ
+	 * すぐにデータ取得要求する
+	 * @param context
+	 * @param id_layout
+	 */
 	public MediaStoreAdapter(@NonNull final Context context,
 		@LayoutRes final int id_layout) {
+
+		this(context, id_layout, true);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param id_layout
+	 * @param refreshNow true: すぐにデータ取得要求する, false: refreshを呼ぶまでデータ取得しない
+	 */
+	public MediaStoreAdapter(@NonNull final Context context,
+		@LayoutRes final int id_layout, final boolean refreshNow) {
 
 		super(context, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 		mContext = context;
@@ -99,8 +116,9 @@ public class MediaStoreAdapter extends CursorAdapter {
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
 		mLayoutId = id_layout;
 		mThumbnailCache = new ThumbnailCache(context);
-		ThreadPool.preStartAllCoreThreads();
-		refresh();
+		if (refreshNow) {
+			refresh();
+		}
 	}
 
 	@Override
@@ -172,6 +190,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	}
 
 	public void refresh() {
+		ThreadPool.preStartAllCoreThreads();
 		onContentChanged();
 	}
 
