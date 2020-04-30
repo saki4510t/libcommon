@@ -18,6 +18,7 @@ package com.serenegiant.mediastore;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentValues;
 import android.content.Context;
@@ -88,7 +89,23 @@ public class MediaStoreUtils {
 //	protected static final int PROJ_INDEX_DATE_MODIFIED = 8;
 //	protected static final int PROJ_INDEX_DATE_ADDED = 9;
 
-	protected static final Uri QUERY_URI_FILES = MediaStore.Files.getContentUri("external");
+	@SuppressLint("InlinedApi")
+	protected static final Uri QUERY_URI_FILES
+		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+			? MediaStore.Files.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+			: MediaStore.Files.getContentUri("external");
+
+	@SuppressLint("InlinedApi")
+	protected static final Uri QUERY_URI_IMAGES
+		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+			? MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+			: MediaStore.Images.Media.getContentUri("external");
+
+	@SuppressLint("InlinedApi")
+	protected static final Uri QUERY_URI_
+		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+			? MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+			: MediaStore.Video.Media.getContentUri("external");
 
 //--------------------------------------------------------------------------------
 	/**
