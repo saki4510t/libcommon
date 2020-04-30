@@ -46,6 +46,8 @@ import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
@@ -68,7 +70,6 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private final MyAsyncQueryHandler mQueryHandler;
 
 	protected boolean mDataValid;
-//	protected int mRowIDColumn;
 	protected ChangeObserver mChangeObserver;
 	protected DataSetObserver mDataSetObserver;
 	private Cursor mCursor;
@@ -76,6 +77,11 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	private String[] mSelectionArgs = null;
 	@NonNull
 	private final MediaInfo info = new MediaInfo();
+	/**
+	 * 読み込み可能なレコードの位置を保持するList
+	 */
+	@NonNull
+	private final List<Integer> mValues = new ArrayList<>();
 
 	private boolean mShowTitle;
 
@@ -110,10 +116,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 	@Override
 	public int getCount() {
-		if (mDataValid && mCursor != null) {
-			return mCursor.getCount();
-		} else {
-			return 0;
+		synchronized (mValues) {
+			return mValues.size();
 		}
 	}
 
@@ -218,6 +222,10 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		final int position, @Nullable final MediaInfo info) {
 
 		final MediaInfo _info = info != null ? info : new MediaInfo();
+		final int pos;
+		synchronized (mValues) {
+			pos = mValues.get(position);
+		}
 
 /*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
 		// but it will take more time.
@@ -234,11 +242,12 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			}
 		} */
 		if (mCursor == null) {
-			mCursor = mCr.query(
-				QUERY_URI, PROJ_MEDIA,
-				mSelection, mSelectionArgs, null);
+			throw new IllegalStateException("Cursor is not ready!");
+//			mCursor = mCr.query(
+//				QUERY_URI, PROJ_MEDIA,
+//				mSelection, mSelectionArgs, null);
 		}
-		if (mCursor.moveToPosition(position)) {
+		if (mCursor.moveToPosition(pos)) {
 			_info.loadFromCursor(mCursor);
 		}
 		return _info;
@@ -260,7 +269,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
   		}
 	}
 
-	protected Cursor swapCursor(final Cursor newCursor) {
+	@Nullable
+	protected Cursor swapCursor(@Nullable final Cursor newCursor) {
 		if (newCursor == mCursor) {
 			return null;
 		}
@@ -281,12 +291,26 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 			if (mDataSetObserver != null) {
 				newCursor.registerDataSetObserver(mDataSetObserver);
 			}
-//			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
+			synchronized (mValues) {
+				mValues.clear();
+				if (newCursor.moveToFirst()) {
+					int pos = 0;
+					while (newCursor.moveToNext()) {
+						info.loadFromCursor(newCursor);
+						if (info.canRead(mCr)) {
+							mValues.add(pos);
+						}
+						pos++;
+					}
+				}
+			}
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
 		} else {
-//			mRowIDColumn = -1;
+			synchronized (mValues) {
+				mValues.clear();
+			}
 			mDataValid = false;
 			// notify the observers about the lack of a data set
 			notifyDataSetInvalidated();

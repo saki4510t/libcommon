@@ -45,11 +45,15 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの静止画・動画一覧を取得するためのCursorAdapter実装
  * 実データではなくサムネイルを表示する
+ * XXX CursorAdapterの代わりにArrayAdapterから継承したほうがいいかも
  */
 public class MediaStoreAdapter extends CursorAdapter {
 
@@ -77,6 +81,11 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private int mMediaType = MEDIA_ALL;
 	@NonNull
 	private final MediaInfo info = new MediaInfo();
+	/**
+	 * 読み込み可能なレコードの位置を保持するList
+	 */
+	@NonNull
+	private final List<Integer> mValues = new ArrayList<>();
 
 
 	public MediaStoreAdapter(@NonNull final Context context,
@@ -164,6 +173,16 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 	public void refresh() {
 		onContentChanged();
+	}
+
+	/**
+	 * @see android.widget.ListAdapter#getCount()
+	 */
+	@Override
+	public int getCount() {
+		synchronized (mValues) {
+			return mValues.size();
+		}
 	}
 
 	/**
@@ -258,6 +277,10 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final int position, @Nullable final MediaInfo info) {
 
 		final MediaInfo _info = info != null ? info : new MediaInfo();
+		final int pos;
+		synchronized (mValues) {
+			pos = mValues.get(position);
+		}
 
 /*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
 		// but it will take more time.
@@ -274,11 +297,12 @@ public class MediaStoreAdapter extends CursorAdapter {
 			}
 		} */
 		if (mMediaInfoCursor == null) {
-			mMediaInfoCursor = mCr.query(
-				QUERY_URI, PROJ_MEDIA,
-				mSelection, mSelectionArgs, null);
+			throw new IllegalStateException("Cursor is not ready!");
+//			mMediaInfoCursor = mCr.query(
+//				QUERY_URI, PROJ_MEDIA,
+//				mSelection, mSelectionArgs, null);
 		}
-		if (mMediaInfoCursor.moveToPosition(position)) {
+		if (mMediaInfoCursor.moveToPosition(pos)) {
 			_info.loadFromCursor(mMediaInfoCursor);
 		}
 		return _info;
@@ -330,6 +354,31 @@ public class MediaStoreAdapter extends CursorAdapter {
 			mMediaType = media_type % MEDIA_TYPE_NUM;
 			onContentChanged();
 		}
+	}
+
+	@Nullable
+	@Override
+ 	public Cursor swapCursor(@Nullable final Cursor newCursor) {
+ 		if (newCursor != null) {
+			synchronized (mValues) {
+				mValues.clear();
+				if (newCursor.moveToFirst()) {
+					int pos = 0;
+					while (newCursor.moveToNext()) {
+						info.loadFromCursor(newCursor);
+						if (info.canRead(mCr)) {
+							mValues.add(pos);
+						}
+						pos++;
+					}
+				}
+			}
+		} else {
+			synchronized (mValues) {
+				mValues.clear();
+			}
+		}
+		return super.swapCursor(newCursor);
 	}
 
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {

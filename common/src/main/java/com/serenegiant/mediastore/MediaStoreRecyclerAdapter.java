@@ -42,6 +42,8 @@ import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -100,9 +102,13 @@ public class MediaStoreRecyclerAdapter
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	@NonNull
 	private final MediaInfo info = new MediaInfo();
+	/**
+	 * 読み込み可能なレコードの位置を保持するList
+	 */
+	@NonNull
+	private final List<Integer> mValues = new ArrayList<>();
 
 	private boolean mDataValid;
-//	private int mRowIDColumn;
 	private ChangeObserver mChangeObserver;
 	private DataSetObserver mDataSetObserver;
 	private Cursor mCursor;
@@ -177,10 +183,8 @@ public class MediaStoreRecyclerAdapter
 
 	@Override
 	public int getItemCount() {
-		if (mDataValid && mCursor != null) {
-			return mCursor.getCount();
-		} else {
-			return 0;
+		synchronized (mValues) {
+			return mValues.size();
 		}
 	}
 
@@ -286,12 +290,17 @@ public class MediaStoreRecyclerAdapter
 		final int position, @Nullable final MediaInfo info) {
 
 		final MediaInfo _info = info != null ? info : new MediaInfo();
-		if (mCursor == null) {
-			mCursor = mCr.query(
-				QUERY_URI, PROJ_MEDIA,
-				mSelection, mSelectionArgs, mSortOrder);
+		final int pos;
+		synchronized (mValues) {
+			pos = mValues.get(position);
 		}
-		if (mCursor.moveToPosition(position)) {
+		if (mCursor == null) {
+			throw new IllegalStateException("Cursor is not ready!");
+//			mCursor = mCr.query(
+//				QUERY_URI, PROJ_MEDIA,
+//				mSelection, mSelectionArgs, mSortOrder);
+		}
+		if (mCursor.moveToPosition(pos)) {
 			_info.loadFromCursor(mCursor);
 		}
 		return _info;
@@ -329,7 +338,8 @@ public class MediaStoreRecyclerAdapter
 	 * @param newCursor
 	 * @return
 	 */
-	protected Cursor swapCursor(final Cursor newCursor) {
+	@Nullable
+	protected Cursor swapCursor(@Nullable final Cursor newCursor) {
 		if (DEBUG) Log.v(TAG, "swapCursor:" + newCursor);
 		if (newCursor == mCursor) {
 			return null;
@@ -351,15 +361,29 @@ public class MediaStoreRecyclerAdapter
 			if (mDataSetObserver != null) {
 				newCursor.registerDataSetObserver(mDataSetObserver);
 			}
-//			mRowIDColumn = newCursor.getColumnIndexOrThrow("_id");
-			//
+
+			synchronized (mValues) {
+				mValues.clear();
+				if (newCursor.moveToFirst()) {
+					int pos = 0;
+					while (newCursor.moveToNext()) {
+						info.loadFromCursor(newCursor);
+						if (info.canRead(mCr)) {
+							mValues.add(pos);
+						}
+						pos++;
+					}
+				}
+			}
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
 		} else {
-//			mRowIDColumn = -1;
 			mDataValid = false;
 			// notify the observers about the lack of a data set
+			synchronized (mValues) {
+				mValues.clear();
+			}
 			notifyDataSetInvalidated();
 		}
 		return oldCursor;
