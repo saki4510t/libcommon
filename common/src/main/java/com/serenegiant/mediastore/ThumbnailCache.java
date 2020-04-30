@@ -37,8 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,7 +44,6 @@ import androidx.collection.LruCache;
 
 /**
  * サムネイルキャッシュ
- * FIXME groupIdは無視...groupIdは削除するかも
  */
 public class ThumbnailCache {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -102,7 +99,7 @@ public class ThumbnailCache {
 
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	private static File getDiskCacheDir(@NonNull final Context context) throws IOException {
-		File cacheDir = null;
+		File cacheDir;
 		cacheDir = context.getExternalCacheDir();
 		cacheDir.mkdirs();
 		if ((cacheDir == null) || !cacheDir.canWrite()) {
@@ -139,7 +136,6 @@ public class ThumbnailCache {
 	/**
 	 * 指定したhashCode/idに対応するキャッシュを取得する
 	 * 存在しなければnull
-	 * @param groupId
 	 * @param id
 	 * @return
 	 */
