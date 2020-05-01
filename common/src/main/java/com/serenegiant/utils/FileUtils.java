@@ -332,4 +332,20 @@ public class FileUtils {
 		}
 		return path;	// == null or empty string
 	}
+
+	/**
+	 * 指定した名前から拡張子(ピリオドを含まない)を切り出す
+	 * @param path
+	 * @return
+	 */
+	@NonNull
+	public static String getExt(@NonNull final String path) {
+		if (!TextUtils.isEmpty(path)) {
+			final int ix = path.lastIndexOf(".");
+			if (ix > 0) {
+				return path.substring(ix + 1);
+			}
+		}
+		return "";
+	}
 }
