@@ -25,6 +25,7 @@ import com.serenegiant.media.IMuxer;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaReaper;
 import com.serenegiant.media.VideoConfig;
+import com.serenegiant.mediastore.MediaStoreOutputStream;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.UriHelper;
@@ -57,7 +58,7 @@ public class RecordingService extends BaseService {
 	/**
 	 * MediaStoreOutputStreamを使って出力するかどうか
 	 */
-	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = false;
+	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = true;
 
 	private static final int NOTIFICATION = R.string.notification_service;
 	private static final long TIMEOUT_MS = 10;
@@ -831,7 +832,10 @@ public class RecordingService extends BaseService {
 		if (BuildCheck.isOreo()) {
 			if (USE_MEDIASTORE_OUTPUT_STREAM) {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
-				throw new UnsupportedOperationException("Not implemented yet.");
+				// FIXME 今はファイル名しか使えてない, getExternalFilesDir下のvideoフォルダ内に保存されるけど元のDocumentFileで指定した位置に空ファイルができる
+				muxer = new MediaMuxerWrapper(
+					new MediaStoreOutputStream(this, "video/mp4", output.getName()),
+					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
 				muxer = new MediaMuxerWrapper(getContentResolver()

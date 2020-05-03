@@ -19,7 +19,9 @@ package com.serenegiant.media;
 */
 
 import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
 import android.annotation.TargetApi;
@@ -28,8 +30,11 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Build;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import android.util.Log;
+
+import com.serenegiant.mediastore.MediaStoreOutputStream;
 
 /**
  * MediaMuxerをIMuxerインターフェースでラップ
@@ -38,23 +43,62 @@ import android.util.Log;
 public class MediaMuxerWrapper implements IMuxer {
 	private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
 
+	@NonNull
 	private final MediaMuxer mMuxer;
+	@Nullable
+	private final OutputStream mOutput;
 	private volatile boolean mIsStarted;
 	private boolean mReleased;
 
-	public MediaMuxerWrapper(final String output_path, final int format)
+	/**
+	 * 出力先をファイルパス文字列で指定するコンストラクタ
+	 * @param outputPath
+	 * @param format
+	 * @throws IOException
+	 */
+	public MediaMuxerWrapper(final String outputPath, final int format)
 		throws IOException {
 
-		mMuxer = new MediaMuxer(output_path, format);
+		mMuxer = new MediaMuxer(outputPath, format);
+		mOutput = null;
 	}
 
+	/**
+	 * 出力先をFileDescriptorで指定するコンストラクタ
+	 * @param fd
+	 * @param format
+	 * @throws IOException
+	 */
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public MediaMuxerWrapper(final FileDescriptor fd, final int format)
 		throws IOException {
 
 		mMuxer = new MediaMuxer(fd, format);
+		mOutput = null;
 	}
-	
+
+	/**
+	 * 出力先をOutputStreamで指定するコンストラクタ
+	 * @param output FileOutputStreamまたはMediaStoreOutputStreamのみ使用可能
+	 * @param format
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	public MediaMuxerWrapper(@NonNull final OutputStream output, final int format) {
+		try {
+			if (output instanceof FileOutputStream) {
+				mMuxer = new MediaMuxer(((FileOutputStream) output).getFD(), format);
+				mOutput = output;
+			} else if (output instanceof MediaStoreOutputStream) {
+				mMuxer = new MediaMuxer(((MediaStoreOutputStream) output).getFd(), format);
+				mOutput = output;
+			} else {
+				throw new IllegalArgumentException("Unsupported output stream," + output);
+			}
+		} catch (final IOException e) {
+			throw new IllegalArgumentException(e);
+		}
+	}
+
 	@Override
 	public int addTrack(@NonNull final MediaFormat format) {
 		return mMuxer.addTrack(format);
@@ -90,6 +134,13 @@ public class MediaMuxerWrapper implements IMuxer {
 			mReleased = true;
 			try {
 				mMuxer.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+			try {
+				if (mOutput != null) {
+					mOutput.close();
+				}
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
