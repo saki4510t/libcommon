@@ -106,19 +106,19 @@ public class MediaStoreUtils {
 	public static final Uri QUERY_URI_IMAGES
 		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 			? MediaStore.Images.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-			: MediaStore.Images.Media.getContentUri("external");
+			: MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
 
 	@SuppressLint("InlinedApi")
 	public static final Uri QUERY_URI_VIDEO
 		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 			? MediaStore.Video.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-			: MediaStore.Video.Media.getContentUri("external");
+			: MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
 
 	@SuppressLint("InlinedApi")
 	public static final Uri QUERY_URI_AUDIO
 		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 			? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
-			: MediaStore.Audio.Media.getContentUri("external");
+			: MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
 
 //--------------------------------------------------------------------------------
 	/**
