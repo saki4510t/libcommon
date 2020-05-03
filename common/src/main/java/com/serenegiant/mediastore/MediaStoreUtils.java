@@ -181,6 +181,7 @@ public class MediaStoreUtils {
 			queryUri = MediaStoreUtils.QUERY_URI_IMAGES;
 		} else if (_mimeType.startsWith("video/")
 			|| ext.equalsIgnoreCase("mp4")
+			|| ext.equalsIgnoreCase("3gp")
 			|| ext.equalsIgnoreCase("h264")
 			|| ext.equalsIgnoreCase("mjpeg")) {
 
