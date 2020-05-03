@@ -178,7 +178,7 @@ public class MediaStoreUtils {
 			}
 			cv.put(MediaStore.Images.Media.DISPLAY_NAME, nameWithExt);
 			cv.put(MediaStore.Images.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_IMAGES;
+			queryUri = QUERY_URI_IMAGES;
 		} else if (_mimeType.startsWith("video/")
 			|| ext.equalsIgnoreCase("mp4")
 			|| ext.equalsIgnoreCase("3gp")
@@ -191,7 +191,7 @@ public class MediaStoreUtils {
 			}
 			cv.put(MediaStore.Video.Media.DISPLAY_NAME, nameWithExt);
 			cv.put(MediaStore.Video.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_VIDEO;
+			queryUri = QUERY_URI_VIDEO;
 		} else if (_mimeType.startsWith("audio/")
 			|| ext.equalsIgnoreCase("m4a")) {
 
@@ -201,12 +201,12 @@ public class MediaStoreUtils {
 			}
 			cv.put(MediaStore.Audio.Media.DISPLAY_NAME, nameWithExt);
 			cv.put(MediaStore.Audio.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_AUDIO;
+			queryUri = QUERY_URI_AUDIO;
 		} else if (_mimeType.startsWith("*/")) {
 			// ファイル
 			cv.put(MediaStore.Files.FileColumns.DISPLAY_NAME, nameWithExt);
 			cv.put(MediaStore.Files.FileColumns.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_FILES;
+			queryUri = QUERY_URI_FILES;
 		} else {
 			throw new IllegalArgumentException("unknown mimeType/file type,"
 				+ mimeType + ",name=" + nameWithExt);
