@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.libcommon.R;
+import com.serenegiant.libcommon.RecordingHelper;
 import com.serenegiant.media.AbstractAudioEncoder;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.IAudioSampler;
@@ -45,6 +46,13 @@ import static com.serenegiant.media.MediaCodecHelper.MIME_VIDEO_AVC;
 import static com.serenegiant.media.MediaCodecHelper.selectAudioEncoder;
 import static com.serenegiant.media.MediaCodecHelper.selectVideoEncoder;
 
+/**
+ * MP4として録音録画するためのService実装
+ * 録画中にアプリが終了したときにMP4ファイルへ最後まで出力できずに
+ * 再生できない録画ファイルになってしまう場合があるので、
+ * 対策としてServiceとして実装してアプリのライフサイクルと
+ * MP4ファイル出力を切り離すためにServiceとして実装する
+ */
 public class RecordingService extends BaseService {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = RecordingService.class.getSimpleName();
@@ -82,11 +90,15 @@ public class RecordingService extends BaseService {
 	}
 
 //--------------------------------------------------------------------------------
+	@NonNull
 	private final Set<StateChangeListener> mListeners
 		= new CopyOnWriteArraySet<StateChangeListener>();
+	@NonNull
 	private final IBinder mBinder = new LocalBinder();
 
+	@Nullable
 	private VideoConfig mVideoConfig;
+	@Nullable
 	private Intent mIntent;
 	private int mState = STATE_UNINITIALIZED;
 	private boolean mIsBind;
@@ -97,19 +109,28 @@ public class RecordingService extends BaseService {
 	private int mWidth, mHeight;
 	private int mFrameRate;
 	private float mBpp;
+	@Nullable
 	private MediaFormat mVideoFormat;
+	@Nullable
 	private MediaCodec mVideoEncoder;
+	@Nullable
 	private Surface mInputSurface;
+	@Nullable
 	private MediaReaper.VideoReaper mVideoReaper;
 	// 音声関係
 	private volatile boolean mUseAudio;
+	@Nullable
 	private IAudioSampler mAudioSampler;
 	private boolean mIsOwnAudioSampler;
 	private int mSampleRate, mChannelCount;
+	@Nullable
 	private MediaFormat mAudioFormat;
+	@Nullable
 	private MediaCodec mAudioEncoder;
+	@Nullable
 	private MediaReaper.AudioReaper mAudioReaper;
 
+	@Nullable
 	private IMuxer mMuxer;
 	private int mVideoTrackIx = -1;
 	private int mAudioTrackIx = -1;
@@ -208,6 +229,10 @@ public class RecordingService extends BaseService {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ステート変更時のコールバックリスナーを登録する
+	 * @param listener
+	 */
 	void addListener(@Nullable final StateChangeListener listener) {
 		if (DEBUG) Log.v(TAG, "addListener:" + listener);
 		if (listener != null) {
@@ -215,6 +240,10 @@ public class RecordingService extends BaseService {
 		}
 	}
 
+	/**
+	 * ステート変更時のコールバックリスナーを登録解除する
+	 * @param listener
+	 */
 	void removeListener(@Nullable final StateChangeListener listener) {
 		if (DEBUG) Log.v(TAG, "removeListener:" + listener);
 		mListeners.remove(listener);
@@ -371,7 +400,7 @@ public class RecordingService extends BaseService {
 		if (DEBUG) Log.v(TAG, "start:");
 		synchronized (mSync) {
 			if ((!mUseVideo || (mVideoFormat != null)) && (!mUseAudio || (mAudioFormat != null))) {
-				if (checkFreeSpace(this, 0)) {
+				if (checkFreeSpace(this, RecordingHelper.REQUEST_ACCESS_SD)) {
 					internalStart(outputDir, name, mVideoFormat, mAudioFormat);
 				} else {
 					throw new IOException();
@@ -632,7 +661,7 @@ public class RecordingService extends BaseService {
 	 * @throws IOException
 	 * @throws UnsupportedEncodingException
 	 */
-	protected void createEncoderAPI16(final int width, final int height,
+	private void createEncoderAPI16(final int width, final int height,
 		final int frameRate, final float bpp) throws IOException {
 
 		throw new UnsupportedEncodingException("Not implement now for less than API18");
@@ -647,7 +676,7 @@ public class RecordingService extends BaseService {
 	 * @throws IOException
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
-	protected void createEncoderAPI18(final int width, final int height,
+	private void createEncoderAPI18(final int width, final int height,
 		final int frameRate, final float bpp) throws IOException {
 
 		if (DEBUG) Log.v(TAG, "createEncoder:video");
@@ -720,7 +749,7 @@ public class RecordingService extends BaseService {
      * System.nanoTime()を1000で割ってマイクロ秒にしただけ(切り捨て)
 	 * @return
 	 */
-    protected long getInputPTSUs() {
+    private long getInputPTSUs() {
 		long result = System.nanoTime() / 1000L;
 		if (result <= prevInputPTSUs) {
 			result = prevInputPTSUs + 9643;
@@ -995,7 +1024,7 @@ public class RecordingService extends BaseService {
 	 * @param size
 	 * @param presentationTimeUs
 	 */
-	protected void encodeAudio(
+	private void encodeAudio(
 		@NonNull final ByteBuffer buffer, final int size,
 		final long presentationTimeUs) {
 
@@ -1108,7 +1137,7 @@ public class RecordingService extends BaseService {
 	 * 指定したMediaCodecエンコーダーへEOSを送る(音声エンコーダー用)
 	 * @param encoder
 	 */
-	private void signalEndOfInputStream(@NonNull final MediaCodec encoder) {
+	protected void signalEndOfInputStream(@NonNull final MediaCodec encoder) {
 		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + encoder);
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である

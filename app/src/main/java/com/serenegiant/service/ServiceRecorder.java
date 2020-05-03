@@ -22,6 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
+/**
+ * RecordingServiceへアクセスをカプセル化するためのヘルパークラス
+ */
 public class ServiceRecorder {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ServiceRecorder.class.getSimpleName();
@@ -31,6 +34,9 @@ public class ServiceRecorder {
 	public static final int STATE_BIND = 2;
 	public static final int STATE_UNBINDING = 3;
 
+	/**
+	 * 常態が変化したときのコールバックリスナー
+	 */
 	public interface Callback {
 		/**
 		 * 録画サービスと接続した
@@ -56,12 +62,16 @@ public class ServiceRecorder {
 	}
 
 //--------------------------------------------------------------------------------
+	@NonNull
 	private final WeakReference<Context> mWeakContext;
+	@NonNull
 	private final Callback mCallback;
+	@NonNull
 	protected final Object mServiceSync = new Object();
 
 	private volatile boolean mReleased = false;
 	private int mState = STATE_UNINITIALIZED;
+	@Nullable
 	private RecordingService mService;
 
 	/**
@@ -104,8 +114,8 @@ public class ServiceRecorder {
 	 */
 	public void release() {
 		if (!mReleased) {
-			if (DEBUG) Log.v(TAG, "release:");
 			mReleased = true;
+			if (DEBUG) Log.v(TAG, "release:");
 			internalRelease();
 		}
 	}
@@ -271,25 +281,18 @@ public class ServiceRecorder {
 
 //--------------------------------------------------------------------------------
 	@NonNull
-	protected Intent createServiceIntent(@NonNull Context context) {
+	private Intent createServiceIntent(@NonNull Context context) {
 		return new Intent(RecordingService.class.getName())
 			.setPackage(context.getPackageName());
 	}
 
+	/**
+	 * #releaseの実態
+	 */
 	private void internalRelease() {
 		mCallback.onDisconnected();
 		stop();
 		doUnBindService();
-	}
-
-	/**
-	 * Contextを取得する。
-	 *
-	 * @return
-	 */
-	@Nullable
-	private Context getContext() {
-		return mWeakContext.get();
 	}
 
 	/**
@@ -382,7 +385,7 @@ public class ServiceRecorder {
 	 *
 	 * @throws IllegalStateException
 	 */
-	protected void checkReleased() throws IllegalStateException {
+	private void checkReleased() throws IllegalStateException {
 		if (mReleased) {
 			throw new IllegalStateException("already released");
 		}
@@ -454,7 +457,7 @@ public class ServiceRecorder {
 	 * @param service
 	 * @param state
 	 */
-	protected void onStateChanged(
+	private void onStateChanged(
 		@NonNull final RecordingService service, final int state) {
 
 		switch (state) {

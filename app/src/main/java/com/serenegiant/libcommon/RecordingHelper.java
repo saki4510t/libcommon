@@ -21,8 +21,8 @@ public class RecordingHelper {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = RecordingHelper.class.getSimpleName();
 
+	public static final int REQUEST_ACCESS_SD = 34567;
 	/*package*/ static String PREF_NAME = "com.serenegiant.libcommon";
-	/*package*/ static final int REQUEST_ACCESS_SD = 34567;
 	/*package*/ static final String APP_DIR = "libcommon";
 
 	/**
