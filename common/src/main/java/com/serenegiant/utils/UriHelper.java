@@ -65,8 +65,9 @@ public final class UriHelper {
 				final Cursor cursor = cr.query(uri, columns, null, null, null);
 				if (cursor != null)
 				try {
-					if (cursor.moveToFirst())
-					path = cursor.getString(0);
+					if (cursor.moveToFirst()) {
+						path = cursor.getString(0);
+					}
 				} finally {
 					cursor.close();
 				}
@@ -101,7 +102,7 @@ public final class UriHelper {
 		try {
 			for (final String valid : STANDARD_DIRECTORIES) {
 				if (valid.equals(dir)) {
-						return true;
+					return true;
 				}
 			}
 		} catch (final Exception e) {
@@ -201,7 +202,7 @@ public final class UriHelper {
 				// DownloadsProvider
 	            final String id = DocumentsContract.getDocumentId(uri);
 	            final Uri contentUri = ContentUris.withAppendedId(
-	                    Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+	                    Uri.parse("content://downloads/public_downloads"), Long.parseLong(id));
 
 	            return getDataColumn(context, contentUri, null, null);
 	        } else if (isMediaDocument(uri)) {
