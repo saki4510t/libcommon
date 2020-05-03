@@ -1,15 +1,9 @@
 package com.serenegiant.mediastore;
 
 import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
-import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
-import android.text.TextUtils;
-
-import com.serenegiant.utils.FileUtils;
 
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
@@ -30,8 +24,6 @@ public class MediaStoreOutputStream extends OutputStream {
 //--------------------------------------------------------------------------------
 	@NonNull
 	private final ContentResolver mCr;
-	@NonNull
-	private final ContentValues mValues = new ContentValues();
 	@NonNull
 	private final Uri mUri;
 	@NonNull
@@ -66,63 +58,7 @@ public class MediaStoreOutputStream extends OutputStream {
 			throws FileNotFoundException {
 
 		mCr = context.getContentResolver();
-		@NonNull
-		String _mimeType = mimeType != null ? mimeType.toLowerCase() : "";
-		@NonNull
-		final String ext = FileUtils.getExt(nameWithExt).toLowerCase();
-
-		final Uri queryUri;
-		if (_mimeType.startsWith("image/")
-			|| ext.equalsIgnoreCase("png")
-			|| ext.equalsIgnoreCase("jpg")
-			|| ext.equalsIgnoreCase("jpeg")
-			|| ext.equalsIgnoreCase("webp")) {
-
-			// 静止画
-			if (TextUtils.isEmpty(_mimeType)) {
-				_mimeType = "image/" + (TextUtils.isEmpty(ext) ? "*" : ext);
-			}
-			mValues.put(MediaStore.Images.Media.DISPLAY_NAME, nameWithExt);
-			mValues.put(MediaStore.Images.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_IMAGES;
-		} else if (_mimeType.startsWith("video/")
-			|| ext.equalsIgnoreCase("mp4")
-			|| ext.equalsIgnoreCase("h264")
-			|| ext.equalsIgnoreCase("mjpeg")) {
-
-			// 動画
-			if (TextUtils.isEmpty(_mimeType)) {
-				_mimeType = "video/" + (TextUtils.isEmpty(ext) ? "*" : ext);
-			}
-			mValues.put(MediaStore.Video.Media.DISPLAY_NAME, nameWithExt);
-			mValues.put(MediaStore.Video.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_VIDEO;
-		} else if (_mimeType.startsWith("audio/")
-			|| ext.equalsIgnoreCase("m4a")) {
-
-			// 音声
-			if (TextUtils.isEmpty(_mimeType)) {
-				_mimeType = "audio/" + (TextUtils.isEmpty(ext) ? "*" : ext);
-			}
-			mValues.put(MediaStore.Audio.Media.DISPLAY_NAME, nameWithExt);
-			mValues.put(MediaStore.Audio.Media.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_AUDIO;
-		} else if (_mimeType.startsWith("*/")) {
-			// ファイル
-			mValues.put(MediaStore.Files.FileColumns.DISPLAY_NAME, nameWithExt);
-			mValues.put(MediaStore.Files.FileColumns.MIME_TYPE, _mimeType);
-			queryUri = MediaStoreUtils.QUERY_URI_FILES;
-		} else {
-			throw new IllegalArgumentException("unknown mimeType/file type," + mimeType + ",name=" + nameWithExt);
-		}
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-			if (!TextUtils.isEmpty(relativePath)) {
-				mValues.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
-			}
-			mValues.put(MediaStore.MediaColumns.IS_PENDING, 1);
-		}
-		mUri = mCr.insert(queryUri, mValues);
+		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt);
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "w");
 		mOut = new FileOutputStream(pfd.getFileDescriptor());
 	}
@@ -253,11 +189,7 @@ public class MediaStoreOutputStream extends OutputStream {
 		try {
 			mOut.close();
 		} finally {
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-				mValues.clear();
-				mValues.put(MediaStore.MediaColumns.IS_PENDING, 0);
-				mCr.update(mUri, mValues, null, null);
-			}
+			MediaStoreUtils.updateContentUri(mCr, mUri);
 		}
 	}
 
