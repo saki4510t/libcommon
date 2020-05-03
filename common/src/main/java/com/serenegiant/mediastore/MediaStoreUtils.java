@@ -20,13 +20,20 @@ package com.serenegiant.mediastore;
 
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.text.TextUtils;
+
+import com.serenegiant.utils.FileUtils;
+
+import java.io.FileNotFoundException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * MediaStoreへアクセスするためのヘルパークラス
@@ -115,11 +122,140 @@ public class MediaStoreUtils {
 
 //--------------------------------------------------------------------------------
 	/**
+	 * 静止画・動画等をMediaStoreへ登録してアクセスするためのUriを返す
+	 * ContentResolver.openFileDescriptorを使ってアクセスする
+	 * Android10以降の場合は
+	 * @param context
+	 * @param mimeType
+	 * @param relativePath
+	 * @param nameWithExt
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static Uri getContentUri(
+		@NonNull final Context context,
+		@Nullable final String mimeType,
+		@Nullable final String relativePath,
+		@NonNull final String nameWithExt) {
+
+		return getContentUri(context.getContentResolver(),
+			mimeType, relativePath, nameWithExt);
+	}
+
+	/**
+	 * 静止画・動画等をMediaStoreへ登録してアクセスするためのUriを返す
+	 * ContentResolver.openFileDescriptorを使ってアクセスする
+	 * Android10以降の場合は
+	 * @param cr
+	 * @param mimeType
+	 * @param relativePath
+	 * @param nameWithExt
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	public static Uri getContentUri(
+		@NonNull final ContentResolver cr,
+		@Nullable final String mimeType,
+		@Nullable final String relativePath,
+		@NonNull final String nameWithExt) {
+
+		final ContentValues cv = new ContentValues();
+		@NonNull
+		String _mimeType = mimeType != null ? mimeType.toLowerCase() : "";
+		@NonNull
+		final String ext = FileUtils.getExt(nameWithExt).toLowerCase();
+
+		final Uri queryUri;
+		if (_mimeType.startsWith("image/")
+			|| ext.equalsIgnoreCase("png")
+			|| ext.equalsIgnoreCase("jpg")
+			|| ext.equalsIgnoreCase("jpeg")
+			|| ext.equalsIgnoreCase("webp")) {
+
+			// 静止画
+			if (TextUtils.isEmpty(_mimeType)) {
+				_mimeType = "image/" + (TextUtils.isEmpty(ext) ? "*" : ext);
+			}
+			cv.put(MediaStore.Images.Media.DISPLAY_NAME, nameWithExt);
+			cv.put(MediaStore.Images.Media.MIME_TYPE, _mimeType);
+			queryUri = MediaStoreUtils.QUERY_URI_IMAGES;
+		} else if (_mimeType.startsWith("video/")
+			|| ext.equalsIgnoreCase("mp4")
+			|| ext.equalsIgnoreCase("h264")
+			|| ext.equalsIgnoreCase("mjpeg")) {
+
+			// 動画
+			if (TextUtils.isEmpty(_mimeType)) {
+				_mimeType = "video/" + (TextUtils.isEmpty(ext) ? "*" : ext);
+			}
+			cv.put(MediaStore.Video.Media.DISPLAY_NAME, nameWithExt);
+			cv.put(MediaStore.Video.Media.MIME_TYPE, _mimeType);
+			queryUri = MediaStoreUtils.QUERY_URI_VIDEO;
+		} else if (_mimeType.startsWith("audio/")
+			|| ext.equalsIgnoreCase("m4a")) {
+
+			// 音声
+			if (TextUtils.isEmpty(_mimeType)) {
+				_mimeType = "audio/" + (TextUtils.isEmpty(ext) ? "*" : ext);
+			}
+			cv.put(MediaStore.Audio.Media.DISPLAY_NAME, nameWithExt);
+			cv.put(MediaStore.Audio.Media.MIME_TYPE, _mimeType);
+			queryUri = MediaStoreUtils.QUERY_URI_AUDIO;
+		} else if (_mimeType.startsWith("*/")) {
+			// ファイル
+			cv.put(MediaStore.Files.FileColumns.DISPLAY_NAME, nameWithExt);
+			cv.put(MediaStore.Files.FileColumns.MIME_TYPE, _mimeType);
+			queryUri = MediaStoreUtils.QUERY_URI_FILES;
+		} else {
+			throw new IllegalArgumentException("unknown mimeType/file type,"
+				+ mimeType + ",name=" + nameWithExt);
+		}
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			if (!TextUtils.isEmpty(relativePath)) {
+				cv.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
+			}
+			cv.put(MediaStore.MediaColumns.IS_PENDING, 1);
+		}
+
+		return cr.insert(queryUri, cv);
+	}
+
+	/**
+	 * Android10以降のときに指定したuriに対してIS_PENDING=0でContextResolver#updateを呼び出す
+	 * Android10未満の場合には何もしない
+	 * @param context
+	 * @param uri
+	 */
+	public static void updateContentUri(
+		@NonNull final Context context, @NonNull final Uri uri) {
+
+		updateContentUri(context.getContentResolver(), uri);
+	}
+
+	/**
+	 * Android10以降のときに指定したuriに対してIS_PENDING=0でContextResolver#updateを呼び出す
+	 * Android10未満の場合には何もしない
+	 * @param cr
+	 * @param uri
+	 */
+	public static void updateContentUri(
+		@NonNull final ContentResolver cr, @NonNull final Uri uri) {
+
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			final ContentValues cv = new ContentValues();
+			cv.put(MediaStore.MediaColumns.IS_PENDING, 0);
+			cr.update(uri, cv, null, null);
+		}
+	}
+
+	/**
 	 * 静止画をMediaStoreへ登録
 	 * @param context
 	 * @param mime "image/jpeg"等
 	 * @param path 絶対パス
 	 */
+	@Deprecated
 	public static Uri registerImage(@NonNull final Context context,
 		@NonNull final String mime, @NonNull final String path) {
 
@@ -136,6 +272,7 @@ public class MediaStoreUtils {
 	 * @param mime
 	 * @param path
 	 */
+	@Deprecated
 	public static Uri registerVideo(@NonNull final Context context,
 		@NonNull final String mime, @NonNull final String path) {
 
