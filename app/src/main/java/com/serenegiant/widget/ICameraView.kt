@@ -21,4 +21,7 @@ interface ICameraView {
 
 	fun getVideoWidth(): Int
 	fun getVideoHeight(): Int
+
+	fun addSurface(id: Int, surface: Any, isRecordable: Boolean)
+	fun removeSurface(id: Int)
 }

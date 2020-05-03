@@ -242,50 +242,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		 */
 		const val SAMPLE_RATE = 44100
 		const val CHANNEL_COUNT = 1
-		const val APP_DIR_NAME = "RecordingService"
+		const val APP_DIR_NAME = "libcommon"
 		/** access code for secondary storage etc.  */
 		const val REQUEST_ACCESS_SD = 12345
 		const val ARGS_KEY_LAYOUT_ID = "LAYOUT_ID"
 		const val ARGS_KEY_TITLE_ID = "TITLE_ID"
-
-		fun getRecordingRoot(context: Context): DocumentFile? {
-			if (DEBUG) Log.v(TAG, "getRecordingRoot:")
-			var root: DocumentFile? = null
-			if (SAFUtils.hasStorageAccess(context, REQUEST_ACCESS_SD)) {
-				try {
-					root = SAFUtils.getStorage(context, REQUEST_ACCESS_SD)
-					if ((root != null) && root.exists() && root.canWrite()) {
-						val appDir = root.findFile(APP_DIR_NAME)
-						root = appDir ?: // create app dir if it does not exist yet
-							root.createDirectory(APP_DIR_NAME) // "${document root}/Pupil Mobile"
-					} else {
-						root = null
-						Log.d(TAG, "path will be wrong, will already be removed,"
-							+ root?.uri)
-					}
-				} catch (e: IOException) {
-					root = null
-					Log.d(TAG, "path is wrong, will already be removed.", e)
-				} catch (e: IllegalStateException) {
-					root = null
-					Log.d(TAG, "path is wrong, will already be removed.", e)
-				}
-			}
-			if (root == null) {
-				// remove permission to access secondary (external) storage,
-				// because app can't access it and it will already be removed.
-				SAFUtils.releaseStorageAccessPermission(context, REQUEST_ACCESS_SD)
-			}
-			if ((root == null) && PermissionCheck.hasWriteExternalStorage(context)) {
-				// fallback to primary external storage if app has permission
-				val captureDir = FileUtils.getCaptureDir(context,
-					Environment.DIRECTORY_MOVIES, 0)
-				if ((captureDir != null) && captureDir.canWrite()) {
-					root = DocumentFile.fromFile(captureDir)
-				}
-			}
-			if (DEBUG) Log.v(TAG, "getRecordingRoot:finished,$root")
-			return root
-		}
 	}
 }

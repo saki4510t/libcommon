@@ -24,6 +24,7 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import java.lang.UnsupportedOperationException
 
 class CameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
@@ -135,6 +136,14 @@ class CameraTextureView @JvmOverloads constructor(
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:${mCameraDelegator.previewHeight}")
 		return mCameraDelegator.previewHeight
+	}
+
+	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+		throw UnsupportedOperationException()
+	}
+
+	override fun removeSurface(id: Int) {
+		throw UnsupportedOperationException()
 	}
 
 	override fun getContentBounds(): RectF? {

@@ -189,7 +189,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 * @param isRecordable
 	 */
 	@Synchronized
-	fun addSurface(
+	override fun addSurface(
 		id: Int, surface: Any,
 		isRecordable: Boolean) {
 
@@ -205,7 +205,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 * @param id
 	 */
 	@Synchronized
-	fun removeSurface(id: Int) {
+	override fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:$id")
 		mDistributor?.removeSurface(id)
 	}

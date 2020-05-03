@@ -30,6 +30,16 @@
 				<category android:name="android.intent.category.LAUNCHER"/>
 			</intent-filter>
 		</activity>
+
+		<service
+			android:name="com.serenegiant.service.RecordingService"
+			android:exported="false"
+			android:enabled="true" >
+			<intent-filter>
+				<action android:name="com.serenegiant.service.RecordingService" />
+			</intent-filter>
+		</service>
+
 	</application>
 
 </manifest>

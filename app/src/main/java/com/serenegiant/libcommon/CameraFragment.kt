@@ -18,29 +18,114 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
+import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import androidx.annotation.LayoutRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
+import com.serenegiant.service.ServiceRecorder
+import com.serenegiant.utils.FileUtils
+import java.io.IOException
 
 class CameraFragment : AbstractCameraFragment() {
+	private var mRecorder: ServiceRecorder? = null
+
 	override fun isRecording(): Boolean {
-		// FIXME 未実装
-		return false
+		return mRecorder != null
 	}
 
 	override fun internalStartRecording() {
-		if (DEBUG) Log.v(TAG, "internalStartRecording:")
-		// FIXME 未実装
+		if (DEBUG) Log.v(TAG, "internalStartRecording:mRecorder=$mRecorder")
+		if (mRecorder == null) {
+			if (DEBUG) Log.v(TAG, "internalStartRecording:get PostMuxRecorder")
+			mRecorder = ServiceRecorder(requireContext(), mCallback)
+		} else {
+			Log.w(TAG, "internalStartRecording:recorder is not null, already start recording?")
+		}
 	}
 
 	override fun internalStopRecording() {
-		if (DEBUG) Log.v(TAG, "internalStopRecording:")
-		// FIXME 未実装
+		if (DEBUG) Log.v(TAG, "internalStopRecording:mRecorder=$mRecorder")
+		if (mRecorder != null) {
+			mRecorder!!.release()
+			mRecorder = null
+		}
 	}
 
 	override fun onFrameAvailable() {
-		// FIXME 未実装
+		if (mRecorder != null) {
+			mRecorder!!.frameAvailableSoon()
+		}
+	}
+
+	private var mRecordingSurfaceId = 0
+	private val mCallback = object: ServiceRecorder.Callback {
+		override fun onConnected() {
+			if (DEBUG) Log.v(TAG, "onConnected:")
+			if (mRecordingSurfaceId != 0) {
+				mCameraView!!.removeSurface(mRecordingSurfaceId)
+				mRecordingSurfaceId = 0
+			}
+			if (mRecorder != null) {
+				try {
+					mRecorder!!.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, 30, 0.25f)
+					mRecorder!!.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
+					mRecorder!!.prepare()
+				} catch (e: Exception) {
+					Log.w(TAG, e)
+					stopRecording() // 非同期で呼ばないとデッドロックするかも
+				}
+			}
+		}
+
+		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+		override fun onPrepared() {
+			if (DEBUG) Log.v(TAG, "onPrepared:")
+			if (mRecorder != null) {
+				try {
+					val surface = mRecorder!!.inputSurface // API>=18
+					if (surface != null) {
+						mRecordingSurfaceId = surface.hashCode()
+						mCameraView!!.addSurface(mRecordingSurfaceId, surface, true)
+					} else {
+						Log.w(TAG, "surface is null")
+						stopRecording() // 非同期で呼ばないとデッドロックするかも
+					}
+				} catch (e: Exception) {
+					Log.w(TAG, e)
+					stopRecording() // 非同期で呼ばないとデッドロックするかも
+				}
+			}
+		}
+
+		override fun onReady() {
+			if (DEBUG) Log.v(TAG, "onReady:")
+			if (mRecorder != null) {
+				try {
+					val dir = RecordingHelper.getRecordingRoot(
+						requireContext(), Environment.DIRECTORY_MOVIES)
+					if (dir != null) {
+						mRecorder!!.start(dir, FileUtils.getDateTimeString())
+					} else {
+						throw IOException()
+					}
+				} catch (e: Exception) {
+					Log.w(TAG, e)
+					stopRecording() // 非同期で呼ばないとデッドロックするかも
+				}
+			}
+		}
+
+		override fun onDisconnected() {
+			if (DEBUG) Log.v(TAG, "onDisconnected:")
+			if (mRecordingSurfaceId != 0) {
+				mCameraView!!.removeSurface(mRecordingSurfaceId)
+				mRecordingSurfaceId = 0
+			}
+			stopRecording()
+		}
 	}
 
 	companion object {

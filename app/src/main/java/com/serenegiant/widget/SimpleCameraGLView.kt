@@ -10,6 +10,7 @@ import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.es3.GLHelper
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
+import java.lang.UnsupportedOperationException
 
 class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	attrs: AttributeSet? = null, defStyle: Int = 0)
@@ -179,6 +180,14 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
 		return mCameraDelegator.previewHeight
+	}
+
+	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+		throw UnsupportedOperationException()
+	}
+
+	override fun removeSurface(id: Int) {
+		throw UnsupportedOperationException()
 	}
 
 	private fun updateViewport() { //		final int viewWidth = getWidth();

@@ -26,6 +26,7 @@ import android.view.Surface
 import android.view.View
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
+import java.lang.UnsupportedOperationException
 
 /**
  * SurfaceDrawableを使ってカメラ映像を表示するImageView実装
@@ -122,6 +123,14 @@ class CameraImageView @JvmOverloads constructor(
 	override fun getVideoHeight(): Int {
 		if (DEBUG) Log.v(TAG, "getVideoHeight:")
 		return mCameraDelegator.previewHeight
+	}
+
+	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+		throw UnsupportedOperationException()
+	}
+
+	override fun removeSurface(id: Int) {
+		throw UnsupportedOperationException()
 	}
 
 	fun getInputSurfaceTexture(): SurfaceTexture {
