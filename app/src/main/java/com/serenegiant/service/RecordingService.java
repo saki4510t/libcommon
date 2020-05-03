@@ -58,7 +58,7 @@ public class RecordingService extends BaseService {
 	/**
 	 * MediaStoreOutputStreamを使って出力するかどうか(isAndroid8以降のみ有効)
 	 */
-	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = true;
+	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = false;
 
 	private static final int NOTIFICATION = R.string.notification_service;
 	private static final long TIMEOUT_MS = 10;
