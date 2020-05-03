@@ -41,10 +41,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
-import static com.serenegiant.media.MediaCodecHelper.MIME_AUDIO_AAC;
-import static com.serenegiant.media.MediaCodecHelper.MIME_VIDEO_AVC;
-import static com.serenegiant.media.MediaCodecHelper.selectAudioEncoder;
-import static com.serenegiant.media.MediaCodecHelper.selectVideoEncoder;
+import static com.serenegiant.media.MediaCodecHelper.*;
 
 /**
  * MP4として録音録画するためのService実装
