@@ -158,10 +158,10 @@ public final class CursorHelper {
 						break;
 					case Cursor.FIELD_TYPE_NULL:
 						sb.append(columnNames[i]).append("=").append("NULL");
-						continue;
+						break;
 					default:
 						sb.append(columnNames[i]).append("=").append("UNKNOWN");
-						continue;
+						break;
 					}
 					sb.append(", ");
 				}
