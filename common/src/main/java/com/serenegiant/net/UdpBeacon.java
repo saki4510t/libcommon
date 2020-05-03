@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
-import java.nio.charset.Charset;
 import java.util.Locale;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -46,7 +45,6 @@ public class UdpBeacon {
 	private static final byte BEACON_VERSION = 0x01;
 	public static final int BEACON_SIZE = 23;
 	private static final long DEFAULT_BEACON_SEND_INTERVALS_MS = 3000;
-	private static final Charset CHARSET = Charset.forName("UTF-8");
 	/** ソケットのタイムアウト[ミリ秒] */
 	private static final int SO_TIMEOUT_MS = 2000;
 

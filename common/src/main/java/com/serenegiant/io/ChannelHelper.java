@@ -18,6 +18,8 @@ package com.serenegiant.io;
  *  limitations under the License.
 */
 
+import com.serenegiant.nio.CharsetsUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -31,14 +33,11 @@ import java.nio.IntBuffer;
 import java.nio.LongBuffer;
 import java.nio.ShortBuffer;
 import java.nio.channels.ByteChannel;
-import java.nio.charset.Charset;
 
 /**
  * 全部ネットワークバイトオーダー = ビッグエンディアンやからな
  */
 public class ChannelHelper {
-	private static final Charset UTF8 = Charset.forName("UTF-8");
-
 	private ChannelHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
@@ -291,7 +290,7 @@ public class ChannelHelper {
 		final ByteBuffer b = ByteBuffer.wrap(buf);
 		final int readBytes = channel.read(b);
 		if (readBytes != bytes) throw new IOException();
-		return new String(buf, UTF8);
+		return new String(buf, CharsetsUtils.UTF8);
 	}
 	
 	/**
@@ -785,7 +784,7 @@ public class ChannelHelper {
 	public static void write(@NonNull final ByteChannel channel,
 		@NonNull final String value) throws IOException {
 		
-		final byte[] buf = value.getBytes(UTF8);
+		final byte[] buf = value.getBytes(CharsetsUtils.UTF8);
 		write(channel, buf.length);
 		channel.write(ByteBuffer.wrap(buf));
 	}

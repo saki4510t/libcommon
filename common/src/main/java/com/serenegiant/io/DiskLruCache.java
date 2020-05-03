@@ -14,6 +14,8 @@ package com.serenegiant.io;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.serenegiant.nio.CharsetsUtils;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -33,7 +35,6 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.lang.reflect.Array;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
@@ -44,6 +45,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
 /**
  ******************************************************************************
  * Taken from the JB source code, can be found in:
@@ -104,7 +106,6 @@ public final class DiskLruCache implements Closeable {
     private static final String DIRTY = "DIRTY";
     private static final String REMOVE = "REMOVE";
     private static final String READ = "READ";
-    private static final Charset UTF_8 = Charset.forName("UTF-8");
     private static final int IO_BUFFER_SIZE = 8 * 1024;
     /*
      * This cache uses a journal file named "journal". A typical journal file
@@ -660,7 +661,7 @@ public final class DiskLruCache implements Closeable {
         }
     }
     private static String inputStreamToString(InputStream in) throws IOException {
-        return readFully(new InputStreamReader(in, UTF_8));
+        return readFully(new InputStreamReader(in, CharsetsUtils.UTF8));
     }
     /**
      * A snapshot of the values for an entry.
@@ -753,7 +754,7 @@ public final class DiskLruCache implements Closeable {
         public void set(int index, String value) throws IOException {
             Writer writer = null;
             try {
-                writer = new OutputStreamWriter(newOutputStream(index), UTF_8);
+                writer = new OutputStreamWriter(newOutputStream(index), CharsetsUtils.UTF8);
                 writer.write(value);
             } finally {
                 closeQuietly(writer);
