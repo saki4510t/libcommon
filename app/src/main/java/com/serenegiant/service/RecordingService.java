@@ -54,6 +54,11 @@ public class RecordingService extends BaseService {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = RecordingService.class.getSimpleName();
 
+	/**
+	 * MediaStoreOutputStreamを使って出力するかどうか
+	 */
+	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = false;
+
 	private static final int NOTIFICATION = R.string.notification_service;
 	private static final long TIMEOUT_MS = 10;
 	private static final long TIMEOUT_USEC = TIMEOUT_MS * 1000L;	// 10ミリ秒
@@ -824,10 +829,17 @@ public class RecordingService extends BaseService {
 		final DocumentFile output = outputDir.createFile("*/*", name + ".mp4");
 		IMuxer muxer = null;
 		if (BuildCheck.isOreo()) {
-			muxer = new MediaMuxerWrapper(getContentResolver()
-				.openFileDescriptor(output.getUri(), "rw").getFileDescriptor(),
-				MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+			if (USE_MEDIASTORE_OUTPUT_STREAM) {
+				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
+				throw new UnsupportedOperationException("Not implemented yet.");
+			} else {
+				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
+				muxer = new MediaMuxerWrapper(getContentResolver()
+					.openFileDescriptor(output.getUri(), "rw").getFileDescriptor(),
+					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+			}
 		} else {
+			if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using File");
 			final String path = UriHelper.getPath(this, output.getUri());
 			final File f = new File(UriHelper.getPath(this, output.getUri()));
 			if (/*!f.exists() &&*/ f.canWrite()) {
