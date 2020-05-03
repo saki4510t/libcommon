@@ -79,24 +79,30 @@ public class MediaMuxerWrapper implements IMuxer {
 
 	/**
 	 * 出力先をOutputStreamで指定するコンストラクタ
-	 * @param output FileOutputStreamまたはMediaStoreOutputStreamのみ使用可能
+	 * @param output
 	 * @param format
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.O)
-	public MediaMuxerWrapper(@NonNull final OutputStream output, final int format) {
-		try {
-			if (output instanceof FileOutputStream) {
-				mMuxer = new MediaMuxer(((FileOutputStream) output).getFD(), format);
-				mOutput = output;
-			} else if (output instanceof MediaStoreOutputStream) {
-				mMuxer = new MediaMuxer(((MediaStoreOutputStream) output).getFd(), format);
-				mOutput = output;
-			} else {
-				throw new IllegalArgumentException("Unsupported output stream," + output);
-			}
-		} catch (final IOException e) {
-			throw new IllegalArgumentException(e);
-		}
+	public MediaMuxerWrapper(
+		@NonNull final FileOutputStream output,
+		final int format)
+			throws IOException {
+
+		this(output.getFD(), format);
+	}
+
+	/**
+	 * 出力先をOutputStreamで指定するコンストラクタ
+	 * @param output
+	 * @param format
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.O)
+	public MediaMuxerWrapper(
+		@NonNull final MediaStoreOutputStream output,
+		final int format)
+			throws IOException {
+
+		this(output.getFd(), format);
 	}
 
 	@Override
