@@ -201,6 +201,9 @@ public class MediaStoreOutputStream extends OutputStream {
 	public void write(@NonNull final byte[] b, final int off, final int len)
 		throws IOException {
 
+		if (closed && len > 0) {
+			throw new IOException("Stream Closed");
+		}
 		mOut.write(b, off, len);
 	}
 
@@ -226,6 +229,9 @@ public class MediaStoreOutputStream extends OutputStream {
 		mOut.flush();
 	}
 
+	private final Object closeLock = new Object();
+	private volatile boolean closed = false;
+
 	/**
 	 * Closes this output stream and releases any system resources
 	 * associated with this stream. The general contract of <code>close</code>
@@ -237,6 +243,13 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public void close() throws IOException {
+		synchronized (closeLock) {
+			if (closed) {
+				return;
+			}
+			closed = true;
+		}
+
 		try {
 			mOut.close();
 		} finally {
