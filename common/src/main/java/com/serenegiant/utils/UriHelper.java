@@ -39,6 +39,9 @@ import com.serenegiant.system.BuildCheck;
 import java.io.File;
 import java.util.ArrayList;
 
+/**
+ * Android10以降の対象範囲別外部ストレージのUriは正常に動作しないかも
+ */
 public final class UriHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = UriHelper.class.getSimpleName();
