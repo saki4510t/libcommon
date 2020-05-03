@@ -613,7 +613,9 @@ public abstract class BaseService extends LifecycleService {
 	}
 
 	/**
-	 * 通知領域からアクティビティを起動するためのインテントを生成する
+	 * サービスノティフィケーションを選択した時に実行されるPendingIntentの生成
+	 * 普通はMainActivityを起動させる。
+	 * デフォルトはnullを返すだけでノティフィケーションを選択しても何も実行されない。
 	 * @return
 	 */
 	protected abstract PendingIntent contextIntent();
