@@ -23,11 +23,14 @@ import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.serenegiant.db.CursorHelper;
 import com.serenegiant.utils.FileUtils;
 
 import java.io.FileNotFoundException;
@@ -167,6 +170,10 @@ public class MediaStoreUtils {
 		@NonNull
 		final String ext = FileUtils.getExt(nameWithExt).toLowerCase();
 
+		if (DEBUG) Log.v(TAG, "getContentUri:" +
+		 	"mimeType=" + _mimeType + ",nameWithExt=" + nameWithExt
+		 	+ ",ext=" + ext + ",dataPath=" + dataPath);
+
 		final Uri queryUri;
 		if (_mimeType.startsWith("*/") && (dataPath != null)) {
 			// ファイル, ファイルのときはDATAでパスを指定しないと例外生成してしまう
@@ -214,6 +221,11 @@ public class MediaStoreUtils {
 				+ mimeType + ",name=" + nameWithExt);
 		}
 
+		if (dataPath != null) {
+			cv.put(MediaStore.Images.Media.DATA, dataPath);
+		}
+		cv.put(MediaStore.MediaColumns.TITLE, FileUtils.removeFileExtension(nameWithExt));
+
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			if (!TextUtils.isEmpty(relativePath)) {
 				cv.put(MediaStore.MediaColumns.RELATIVE_PATH, relativePath);
@@ -221,7 +233,23 @@ public class MediaStoreUtils {
 			cv.put(MediaStore.MediaColumns.IS_PENDING, 1);
 		}
 
-		return cr.insert(queryUri, cv);
+		if (DEBUG) Log.v(TAG, "getContentUri:cv=" + cv);
+		if (DEBUG) Log.v(TAG, "getContentUri:queryUri=" + queryUri);
+
+		final Uri result = cr.insert(queryUri, cv);
+		if (DEBUG) {
+			cr.update(result, cv, null, null);
+			if (DEBUG) Log.v(TAG, "getContentUri:result=" + result);
+			final Cursor cursor = cr.query(result, null, null, null, null);
+			if (cursor != null) {
+				try {
+					CursorHelper.dumpCursor(cursor);
+				} finally {
+					cursor.close();
+				}
+			}
+		}
+		return result;
 	}
 
 	/**
