@@ -44,7 +44,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	}
 
 	/**
-	 *
+	 * コンストラクタ
 	 * @param context
 	 * @param mimeType
 	 * @param relativePath
@@ -52,14 +52,36 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @throws FileNotFoundException
 	 */
 	public MediaStoreOutputStream(@NonNull final Context context,
-	  @Nullable final String mimeType,
-	  @Nullable final String relativePath,
-	  @NonNull final String nameWithExt)
+		@Nullable final String mimeType,
+		@Nullable final String relativePath,
+		@NonNull final String nameWithExt)
 			throws FileNotFoundException {
 
 		mCr = context.getContentResolver();
-		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt);
+		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, null);
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "w");
+		mOut = new FileOutputStream(pfd.getFileDescriptor());
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param mimeType
+	 * @param relativePath
+	 * @param nameWithExt
+	 * @param dataPath
+	 * @throws FileNotFoundException
+	 */
+	public MediaStoreOutputStream(@NonNull final Context context,
+		@Nullable final String mimeType,
+		@Nullable final String relativePath,
+		@NonNull final String nameWithExt,
+		@Nullable final String dataPath)
+			throws FileNotFoundException {
+
+		mCr = context.getContentResolver();
+		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, dataPath);
+		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
 		mOut = new FileOutputStream(pfd.getFileDescriptor());
 	}
 
