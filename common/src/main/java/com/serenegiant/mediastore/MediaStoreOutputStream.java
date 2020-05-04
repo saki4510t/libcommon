@@ -5,6 +5,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 
+import com.serenegiant.utils.UriHelper;
+
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -27,7 +29,9 @@ public class MediaStoreOutputStream extends OutputStream {
 	@NonNull
 	private final Uri mUri;
 	@NonNull
-	private final FileOutputStream mOut;
+	private final FileOutputStream mOutputStream;
+	@Nullable
+	private final String mOutputPath;
 
 	/**
 	 * コンストラクタ
@@ -60,7 +64,8 @@ public class MediaStoreOutputStream extends OutputStream {
 		mCr = context.getContentResolver();
 		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, null);
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "w");
-		mOut = new FileOutputStream(pfd.getFileDescriptor());
+		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+		mOutputPath = UriHelper.getPath(context, mUri);
 	}
 
 	/**
@@ -82,7 +87,8 @@ public class MediaStoreOutputStream extends OutputStream {
 		mCr = context.getContentResolver();
 		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, dataPath);
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
-		mOut = new FileOutputStream(pfd.getFileDescriptor());
+		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+		mOutputPath = UriHelper.getPath(context, mUri);
 	}
 
 	@NonNull
@@ -90,9 +96,14 @@ public class MediaStoreOutputStream extends OutputStream {
 		return mUri;
 	}
 
+	@Nullable
+	public String getOutputPath() {
+		return mOutputPath;
+	}
+
 	@NonNull
 	public FileDescriptor getFd() throws IOException {
-		return mOut.getFD();
+		return mOutputStream.getFD();
 	}
 
 	/**
@@ -111,7 +122,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 *                     output stream has been closed.
 	 */
 	public void write(final int b) throws IOException {
-		mOut.write(b);
+		mOutputStream.write(b);
 	}
 
 	/**
@@ -125,7 +136,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
 	public void write(@NonNull byte[] b) throws IOException {
-		mOut.write(b, 0, b.length);
+		mOutputStream.write(b, 0, b.length);
 	}
 
 	/**
@@ -162,7 +173,7 @@ public class MediaStoreOutputStream extends OutputStream {
 		if (closed && len > 0) {
 			throw new IOException("Stream Closed");
 		}
-		mOut.write(b, off, len);
+		mOutputStream.write(b, off, len);
 	}
 
 	/**
@@ -184,7 +195,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @throws IOException if an I/O error occurs.
 	 */
 	public void flush() throws IOException {
-		mOut.flush();
+		mOutputStream.flush();
 	}
 
 	private final Object closeLock = new Object();
@@ -209,7 +220,7 @@ public class MediaStoreOutputStream extends OutputStream {
 		}
 
 		try {
-			mOut.close();
+			mOutputStream.close();
 		} finally {
 			MediaStoreUtils.updateContentUri(mCr, mUri);
 		}
