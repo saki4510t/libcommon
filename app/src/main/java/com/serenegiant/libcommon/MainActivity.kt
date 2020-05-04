@@ -20,10 +20,13 @@ package com.serenegiant.libcommon
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -34,6 +37,7 @@ import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
+import com.serenegiant.utils.SAFUtils
 
 class MainActivity
 	: AppCompatActivity(),
@@ -123,17 +127,21 @@ class MainActivity
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:enableVSync=${BuildConfig.ENABLE_VSYNC}")
 		var fragment: Fragment? = null
 		when (item.id) {
-			0 -> {	// NetworkConnection
+			0 -> {	// SAF
+				SAFUtils.releaseStorageAccessPermission(this, RecordingHelper.REQUEST_ACCESS_SD)
+				SAFUtils.requestStorageAccess(this, RecordingHelper.REQUEST_ACCESS_SD)
+			}
+			1 -> {	// NetworkConnection
 				fragment = NetworkConnectionFragment.newInstance()
 			}
-			1 -> {	// UsbMonitor
+			2 -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
 					return
 				}
 				fragment = UsbFragment.newInstance()
 			}
-			2 -> {	// Camera
+			3 -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -142,7 +150,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera)
 			}
-			3 -> {	// EffectCamera
+			4 -> {	// EffectCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -150,7 +158,7 @@ class MainActivity
 				}
 				fragment = EffectCameraFragment.newInstance()
 			}
-			4 -> {	// MixCamera
+			5 -> {	// MixCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -159,7 +167,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_mix, R.string.title_mix_camera)
 			}
-			5 -> {	// OverlayCamera
+			6 -> {	// OverlayCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -168,7 +176,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_overlay, R.string.title_overlay_camera)
 			}
-			6 -> {	// VideoSourceCamera
+			7 -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -177,7 +185,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_video_source, R.string.title_video_source_camera)
 			}
-			7 -> {	// VideoSourceDistributionCamera
+			8 -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -186,7 +194,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_distributor, R.string.title_video_source_dist_camera)
 			}
-			8 -> {	// ImageViewCamera
+			9 -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -195,7 +203,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_image_view, R.string.title_image_view_camera)
 			}
-			9 -> {	// TextureViewCamera
+			10 -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -204,7 +212,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_texture_view, R.string.title_texture_view_camera)
 			}
-			10 -> {	// SimpleCameraGL
+			11 -> {	// SimpleCameraGL
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -213,7 +221,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_camera_gl, R.string.title_simple_gl_camera)
 			}
-			11 -> {	// CameraSurface
+			12 -> {	// CameraSurface
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -221,22 +229,22 @@ class MainActivity
 				}
 				fragment = CameraSurfaceFragment()
 			}
-			12 -> {	// Galley
+			13 -> {	// Galley
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			13 -> {	// Galley(RecyclerView)
+			14 -> {	// Galley(RecyclerView)
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			14 -> {	// NumberKeyboard
+			15 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			15 -> {	// ViewSlider
+			16 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
 			else -> {
@@ -250,7 +258,26 @@ class MainActivity
 				.commit()
 		}
 	}
-	//================================================================================
+
+//================================================================================
+	@Override
+	@CallSuper
+	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+		if (!SAFUtils.handleOnResult(this, requestCode, resultCode, data, object : SAFUtils.handleOnResultDelegater {
+				override fun onResult(requestCode: Int, uri: Uri?, data: Intent?): Boolean {
+					if (DEBUG) Log.v(TAG, "onResult:");
+					SAFUtils.requestStorageAccessPermission(this@MainActivity, requestCode, uri)
+					return true
+				}
+
+				override fun onFailed(requestCode: Int, data: Intent?) {
+					if (DEBUG) Log.v(TAG, "onFailed:");
+				}
+			})) {
+			super.onActivityResult(requestCode, resultCode, data)
+		}
+	}
+
 	/**
 	 * callback listener from MessageDialogFragment
 	 *
