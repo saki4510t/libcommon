@@ -397,6 +397,7 @@ public class MediaStoreRecyclerAdapter
 					int pos = 0;
 					while (newCursor.moveToNext()) {
 						info.loadFromCursor(newCursor);
+						if (DEBUG) Log.v(TAG, "swapCursor:" + info);
 						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
 						} else {
