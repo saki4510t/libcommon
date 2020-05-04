@@ -136,10 +136,11 @@ public class MediaStoreUtils {
 		@NonNull final Context context,
 		@Nullable final String mimeType,
 		@Nullable final String relativePath,
-		@NonNull final String nameWithExt) {
+		@NonNull final String nameWithExt,
+		@Nullable final String dataPath) {
 
 		return getContentUri(context.getContentResolver(),
-			mimeType, relativePath, nameWithExt);
+			mimeType, relativePath, nameWithExt, dataPath);
 	}
 
 	/**
@@ -157,7 +158,8 @@ public class MediaStoreUtils {
 		@NonNull final ContentResolver cr,
 		@Nullable final String mimeType,
 		@Nullable final String relativePath,
-		@NonNull final String nameWithExt) {
+		@NonNull final String nameWithExt,
+		@Nullable final String dataPath) {
 
 		final ContentValues cv = new ContentValues();
 		@NonNull
@@ -166,7 +168,12 @@ public class MediaStoreUtils {
 		final String ext = FileUtils.getExt(nameWithExt).toLowerCase();
 
 		final Uri queryUri;
-		if (_mimeType.startsWith("image/")
+		if (_mimeType.startsWith("*/") && (dataPath != null)) {
+			// ファイル, ファイルのときはDATAでパスを指定しないと例外生成してしまう
+			cv.put(MediaStore.Files.FileColumns.DISPLAY_NAME, nameWithExt);
+			cv.put(MediaStore.Files.FileColumns.MIME_TYPE, _mimeType);
+			queryUri = QUERY_URI_FILES;
+		} else if (_mimeType.startsWith("image/")
 			|| ext.equalsIgnoreCase("png")
 			|| ext.equalsIgnoreCase("jpg")
 			|| ext.equalsIgnoreCase("jpeg")
@@ -202,11 +209,6 @@ public class MediaStoreUtils {
 			cv.put(MediaStore.Audio.Media.DISPLAY_NAME, nameWithExt);
 			cv.put(MediaStore.Audio.Media.MIME_TYPE, _mimeType);
 			queryUri = QUERY_URI_AUDIO;
-		} else if (_mimeType.startsWith("*/")) {
-			// ファイル
-			cv.put(MediaStore.Files.FileColumns.DISPLAY_NAME, nameWithExt);
-			cv.put(MediaStore.Files.FileColumns.MIME_TYPE, _mimeType);
-			queryUri = QUERY_URI_FILES;
 		} else {
 			throw new IllegalArgumentException("unknown mimeType/file type,"
 				+ mimeType + ",name=" + nameWithExt);
