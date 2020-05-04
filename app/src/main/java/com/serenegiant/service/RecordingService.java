@@ -12,6 +12,7 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.os.Binder;
 import android.os.Build;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.view.Surface;
@@ -832,9 +833,9 @@ public class RecordingService extends BaseService {
 		if (BuildCheck.isOreo()) {
 			if (USE_MEDIASTORE_OUTPUT_STREAM) {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
-				// FIXME 今はファイル名しか使えてない, getExternalFilesDir下のvideoフォルダ内に保存されるけど元のDocumentFileで指定した位置に空ファイルができる
 				muxer = new MediaMuxerWrapper(
-					new MediaStoreOutputStream(this, "video/mp4", output.getName()),
+//					new MediaStoreOutputStream(this, "*/mp4", null, output.getName(), UriHelper.getPath(this, output.getUri())),
+					new MediaStoreOutputStream(this, "video/mp4", Environment.DIRECTORY_MOVIES + "/" + RecordingHelper.APP_DIR, output.getName()),
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
