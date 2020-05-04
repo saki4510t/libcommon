@@ -52,13 +52,20 @@ class GalleyFragment : BaseFragment() {
 		return rootView
 	}
 
+	override fun internalOnResume() {
+		super.internalOnResume()
+		if (mMediaStoreAdapter != null) {
+			mMediaStoreAdapter!!.refresh()
+		}
+	}
+
 	/**
 	 * Viewを初期化
 	 * @param rootView
 	 */
 	private fun initView(rootView: View) {
 		val gridView = rootView.findViewById<GridView>(R.id.media_gridview)
-		mMediaStoreAdapter = MediaStoreAdapter(requireContext(), R.layout.grid_item_media)
+		mMediaStoreAdapter = MediaStoreAdapter(requireContext(), R.layout.grid_item_media, false)
 		gridView.adapter = mMediaStoreAdapter
 		gridView.onItemClickListener = mOnItemClickListener
 	}
