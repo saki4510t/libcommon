@@ -46,7 +46,7 @@ public class MediaMuxerWrapper implements IMuxer {
 	@NonNull
 	private final MediaMuxer mMuxer;
 	@Nullable
-	private final OutputStream mOutput;
+	private final OutputStream mOutputStream;
 	private volatile boolean mIsStarted;
 	private boolean mReleased;
 
@@ -60,7 +60,7 @@ public class MediaMuxerWrapper implements IMuxer {
 		throws IOException {
 
 		mMuxer = new MediaMuxer(outputPath, format);
-		mOutput = null;
+		mOutputStream = null;
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class MediaMuxerWrapper implements IMuxer {
 		throws IOException {
 
 		mMuxer = new MediaMuxer(fd, format);
-		mOutput = null;
+		mOutputStream = null;
 	}
 
 	/**
@@ -89,7 +89,7 @@ public class MediaMuxerWrapper implements IMuxer {
 			throws IOException {
 
 		mMuxer = new MediaMuxer(output.getFD(), format);
-		mOutput = output;
+		mOutputStream = output;
 	}
 
 	/**
@@ -104,7 +104,7 @@ public class MediaMuxerWrapper implements IMuxer {
 			throws IOException {
 
 		mMuxer = new MediaMuxer(output.getFd(), format);
-		mOutput = output;
+		mOutputStream = output;
 	}
 
 	@Override
@@ -146,8 +146,8 @@ public class MediaMuxerWrapper implements IMuxer {
 				Log.w(TAG, e);
 			}
 			try {
-				if (mOutput != null) {
-					mOutput.close();
+				if (mOutputStream != null) {
+					mOutputStream.close();
 				}
 			} catch (final Exception e) {
 				Log.w(TAG, e);
