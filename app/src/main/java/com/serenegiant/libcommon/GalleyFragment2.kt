@@ -74,7 +74,7 @@ class GalleyFragment2 : BaseFragment() {
 //		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
 		recyclerView.setEmptyView(rootView.findViewById(R.id.empty))
 		mMediaStoreAdapter = MediaStoreRecyclerAdapter(
-			requireContext(), R.layout.grid_item_media)
+			requireContext(), R.layout.grid_item_media, false)
 		mMediaStoreAdapter!!.setListener(mListener)
 		recyclerView.adapter = mMediaStoreAdapter
 	}
