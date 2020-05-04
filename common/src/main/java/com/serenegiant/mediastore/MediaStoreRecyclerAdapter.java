@@ -390,6 +390,7 @@ public class MediaStoreRecyclerAdapter
 				newCursor.registerDataSetObserver(mDataSetObserver);
 			}
 
+			final List<MediaInfo> removes = new ArrayList<>();
 			synchronized (mValues) {
 				mValues.clear();
 				if (newCursor.moveToFirst()) {
@@ -398,6 +399,8 @@ public class MediaStoreRecyclerAdapter
 						info.loadFromCursor(newCursor);
 						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
+						} else {
+							removes.add(new MediaInfo(info));
 						}
 						pos++;
 					}
@@ -406,6 +409,19 @@ public class MediaStoreRecyclerAdapter
 			mDataValid = true;
 			// notify the observers about the new cursor
 			notifyDataSetChanged();
+			if (false) {
+				// 読み込めないのがあれば削除を試みる
+				if (!removes.isEmpty()) {
+					for (final MediaInfo item: removes) {
+						try {
+							if(DEBUG) Log.v(TAG, "try to delete " + info);
+							mCr.delete(item.getUri(), null, null);
+						} catch (final Exception e) {
+							Log.w(TAG, "failed to delete " + item, e);
+						}
+					}
+				}
+			}
 		} else {
 			mDataValid = false;
 			// notify the observers about the lack of a data set
