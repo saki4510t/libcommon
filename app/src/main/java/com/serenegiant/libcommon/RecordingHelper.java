@@ -22,8 +22,8 @@ public class RecordingHelper {
 	private static final String TAG = RecordingHelper.class.getSimpleName();
 
 	public static final int REQUEST_ACCESS_SD = 34567;
+	public static final String APP_DIR = "libcommon";
 	/*package*/ static String PREF_NAME = "com.serenegiant.libcommon";
-	/*package*/ static final String APP_DIR = "libcommon";
 
 	/**
 	 * キャプチャ用のディレクトリを取得、取得できなければnull
