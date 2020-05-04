@@ -238,7 +238,6 @@ public class MediaStoreUtils {
 
 		final Uri result = cr.insert(queryUri, cv);
 		if (DEBUG) {
-			cr.update(result, cv, null, null);
 			if (DEBUG) Log.v(TAG, "getContentUri:result=" + result);
 			final Cursor cursor = cr.query(result, null, null, null, null);
 			if (cursor != null) {
