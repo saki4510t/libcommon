@@ -273,6 +273,7 @@ public class MediaStoreUtils {
 	public static void updateContentUri(
 		@NonNull final ContentResolver cr, @NonNull final Uri uri) {
 
+		if (DEBUG) Log.v(TAG, "updateContentUri:" + uri);
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			final ContentValues cv = new ContentValues();
 			cv.put(MediaStore.MediaColumns.IS_PENDING, 0);
@@ -290,6 +291,7 @@ public class MediaStoreUtils {
 	public static Uri registerImage(@NonNull final Context context,
 		@NonNull final String mime, @NonNull final String path) {
 
+		if (DEBUG) Log.v(TAG, "registerImage:" + path);
 		final ContentValues cv = new ContentValues();
 		cv.put(MediaStore.Images.Media.MIME_TYPE, mime);
 		cv.put(MediaStore.MediaColumns.DATA, path);
@@ -307,6 +309,7 @@ public class MediaStoreUtils {
 	public static Uri registerVideo(@NonNull final Context context,
 		@NonNull final String mime, @NonNull final String path) {
 
+		if (DEBUG) Log.v(TAG, "registerVideo:" + path);
 		final ContentValues cv = new ContentValues();
 		cv.put(MediaStore.Video.Media.MIME_TYPE, mime);
 		cv.put(MediaStore.MediaColumns.DATA, path);
