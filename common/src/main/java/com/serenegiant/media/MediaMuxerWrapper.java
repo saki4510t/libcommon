@@ -88,7 +88,8 @@ public class MediaMuxerWrapper implements IMuxer {
 		final int format)
 			throws IOException {
 
-		this(output.getFD(), format);
+		mMuxer = new MediaMuxer(output.getFD(), format);
+		mOutput = output;
 	}
 
 	/**
@@ -102,7 +103,8 @@ public class MediaMuxerWrapper implements IMuxer {
 		final int format)
 			throws IOException {
 
-		this(output.getFd(), format);
+		mMuxer = new MediaMuxer(output.getFd(), format);
+		mOutput = output;
 	}
 
 	@Override
