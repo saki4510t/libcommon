@@ -26,7 +26,7 @@ import androidx.documentfile.provider.DocumentFile;
  * RecordingServiceへアクセスをカプセル化するためのヘルパークラス
  */
 public class ServiceRecorder {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ServiceRecorder.class.getSimpleName();
 
 	public static final int STATE_UNINITIALIZED = 0;

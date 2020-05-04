@@ -35,7 +35,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * このクラス自体はGLDrawer2Dの継承クラスではない
  */
 public class EffectDrawer2D {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectDrawer2D.class.getSimpleName();
 
 	/**

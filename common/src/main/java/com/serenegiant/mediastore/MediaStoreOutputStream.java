@@ -20,7 +20,7 @@ import androidx.annotation.Nullable;
  * MediaStoreへ保存するためのOutputStream実装
  */
 public class MediaStoreOutputStream extends OutputStream {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaStoreOutputStream.class.getSimpleName();
 
 //--------------------------------------------------------------------------------

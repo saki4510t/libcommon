@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
 public class AspectScaledGLView extends GLView
 	implements IScaledView {
 
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AspectScaledGLView.class.getSimpleName();
 
 	/**

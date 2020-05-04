@@ -74,7 +74,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class KeyboardView extends View implements View.OnClickListener {
-	private static final boolean DEBUG = true;    // set false on production
+	private static final boolean DEBUG = false;    // set false on production
 	private static final String TAG = KeyboardView.class.getSimpleName();
 
 	private static final int NOT_A_KEY = -1;

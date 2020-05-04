@@ -56,7 +56,7 @@ import static com.serenegiant.media.MediaCodecHelper.*;
  * MP4ファイル出力を切り離すためにServiceとして実装する
  */
 public class RecordingService extends BaseService {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = RecordingService.class.getSimpleName();
 
 	/**

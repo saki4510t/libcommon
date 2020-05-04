@@ -19,7 +19,7 @@ import androidx.annotation.XmlRes;
 public abstract class KeyboardDelegater
 	implements KeyboardView.OnKeyboardActionListener {
 
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = KeyboardDelegater.class.getSimpleName();
 
 	@NonNull
