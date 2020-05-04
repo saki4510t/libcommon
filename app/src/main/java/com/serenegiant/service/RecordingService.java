@@ -10,10 +10,13 @@ import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
 import android.os.Environment;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
@@ -72,6 +75,7 @@ public class RecordingService extends BaseService {
 	public static final int STATE_PREPARED = 2;
 	public static final int STATE_READY = 3;
 	public static final int STATE_RECORDING = 4;
+	public static final int STATE_SCAN_FILE = 6;
 	public static final int STATE_RELEASING = 9;
 
 	/**
@@ -229,7 +233,11 @@ public class RecordingService extends BaseService {
 	 * @return true: サービスの自己終了しない
 	 */
 	public boolean isRunning() {
-		return isRecording();
+		synchronized (mSync) {
+			final int state = getState();
+			return isRecording()
+				|| (state == STATE_SCAN_FILE);
+		}
 	}
 
 //--------------------------------------------------------------------------------
@@ -767,15 +775,21 @@ public class RecordingService extends BaseService {
 	 */
 	protected void releaseEncoder() {
 		if (DEBUG) Log.v(TAG, "releaseEncoder:");
-		if (mVideoReaper != null) {
-			mVideoReaper.release();
+		final MediaReaper.VideoReaper videoReaper;
+		final MediaReaper.AudioReaper audioReaper;
+		synchronized (mSync) {
+			videoReaper = mVideoReaper;
 			mVideoReaper = null;
+			audioReaper = mAudioReaper;
+			mAudioReaper = null;
+		}
+		if (videoReaper != null) {
+			videoReaper.release();
 		}
 		mVideoEncoder = null;
 		mInputSurface = null;
-		if (mAudioReaper != null) {
-			mAudioReaper.release();
-			mAudioReaper = null;
+		if (audioReaper != null) {
+			audioReaper.release();
 		}
 		mAudioEncoder = null;
 		releaseOwnAudioSampler();
@@ -872,24 +886,80 @@ public class RecordingService extends BaseService {
 	 */
 	protected void internalStop() {
 		if (DEBUG) Log.v(TAG, "internalStop:");
-		if (mMuxer != null) {
-			final IMuxer muxer = mMuxer;
-			mMuxer = null;
+		final IMuxer muxer = mMuxer;
+		mMuxer = null;
+		boolean scanFile = false;
+		if (muxer != null) {
 			try {
+				if (DEBUG) Log.v(TAG, "internalStop:stop muxer," + muxer);
 				muxer.stop();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
+			final String outputPath;
+			if (muxer instanceof MediaMuxerWrapper) {
+				outputPath = ((MediaMuxerWrapper) muxer).getOutputPath();
+			} else {
+				outputPath = null;
+			}
 			try {
+				if (DEBUG) Log.v(TAG, "internalStop:release muxer");
 				muxer.release();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
+			if (!TextUtils.isEmpty(outputPath)) {
+				try {
+					final File out = new File(outputPath);
+					if (out.exists() && out.canRead()) {
+						if (DEBUG) Log.v(TAG, "internalStop:scanFile " + outputPath);
+						setState(STATE_SCAN_FILE);
+						runOnUiThread(mScanFileTimeoutTask, 5000);
+						try {
+							MediaScannerConnection.scanFile(this.getApplicationContext(),
+								new String[] {outputPath},
+								new String[] {"video/mp4"},
+								new MediaScannerConnection.OnScanCompletedListener() {
+									@Override
+									public void onScanCompleted(final String path, final Uri uri) {
+										if (DEBUG) Log.v(TAG, "onScanCompleted:");
+										RecordingService.this.onScanCompleted(null);
+									}
+								});
+						} catch (final Exception e) {
+							onScanCompleted(e);
+						}
+					}
+				} catch (final Exception e) {
+					onScanCompleted(e);
+				}
+			}
 		}
 		if (getState() == STATE_RECORDING) {
 			setState(STATE_INITIALIZED);
-			// FIXME MediaStoreへの登録処理をする?
 		}
+	}
+
+	/**
+	 * 何らかの理由でMediaScannerConnectionから#onScanCompletedが
+	 * 呼ばれなかったときにステートをリセットするためのRunnable
+	 */
+	private final Runnable mScanFileTimeoutTask = new Runnable() {
+		@Override
+		public void run() {
+			onScanCompleted(new RuntimeException("scanFile timeout"));
+		}
+	};
+
+	private void onScanCompleted(@Nullable final Throwable t) {
+		removeFromUiThread(mScanFileTimeoutTask);
+		if (t != null) {
+			Log.w(TAG, t);
+		}
+		if (getState() == STATE_SCAN_FILE) {
+			setState(STATE_INITIALIZED);
+		}
+		checkStopSelf();
 	}
 
 	/**
@@ -947,7 +1017,7 @@ public class RecordingService extends BaseService {
 				if (DEBUG) Log.v(TAG, "onWriteSampleData:unexpected reaper type");
 				break;
 			}
-		} else {
+		} else if (isRecording() && !isDestroyed()) {
 			if (DEBUG) Log.v(TAG, "onWriteSampleData:muxer is not set yet, " +
 				"state=" + getState() + ",reaperType=" + reaper.reaperType());
 		}
@@ -1049,7 +1119,7 @@ public class RecordingService extends BaseService {
 			reaper = mAudioReaper;
 			encoder = mAudioEncoder;
    		}
-		if (!isRunning() || (reaper == null) || (encoder == null)) {
+		if (!isRecording() || (reaper == null) || (encoder == null)) {
 			if (DEBUG) Log.d(TAG,
 				"encodeAudio:isRunning=" + isRunning()
 				+ ",reaper=" + reaper + ",encoder=" + encoder);
@@ -1082,7 +1152,7 @@ public class RecordingService extends BaseService {
 			encodeV21(encoder, buffer, length, presentationTimeUs);
 		} else {
 			final ByteBuffer[] inputBuffers = encoder.getInputBuffers();
-			for ( ; isRunning() && !mIsEos ;) {
+			for ( ; isRecording() && !mIsEos ;) {
 				final int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
 				if (inputBufferIndex >= 0) {
 					final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
@@ -1120,7 +1190,7 @@ public class RecordingService extends BaseService {
 	private void encodeV21(@NonNull final MediaCodec encoder,
 		@Nullable final ByteBuffer buffer, final int length, final long presentationTimeUs) {
 
-		for ( ; isRunning() && !mIsEos ;) {
+		for ( ; isRecording() && !mIsEos ;) {
 			final int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
 			if (inputBufferIndex >= 0) {
 				final ByteBuffer inputBuffer = encoder.getInputBuffer(inputBufferIndex);
