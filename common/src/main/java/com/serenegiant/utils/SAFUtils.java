@@ -671,6 +671,7 @@ public class SAFUtils {
 	 * @param treeId
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public static DocumentFile getStorage(
 		@NonNull final Context context,
@@ -773,7 +774,7 @@ public class SAFUtils {
 	public static Collection<DocumentFile> listFiles(
 		@NonNull final Context context,
 		@NonNull final DocumentFile dir,
-		@Nullable final SAFUtils.FileFilter filter) throws IOException {
+		@Nullable final FileFilter filter) throws IOException {
 
 		final Collection<DocumentFile> result = new ArrayList<DocumentFile>();
 		if (dir.isDirectory()) {
@@ -838,6 +839,7 @@ public class SAFUtils {
 	 * @param name
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static DocumentFile getStorageFile(
@@ -920,6 +922,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static OutputStream getStorageOutputStream(
 		@NonNull final Context context,
@@ -1007,6 +1010,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static InputStream getStorageInputStream(
 		@NonNull final Context context,
@@ -1182,6 +1186,7 @@ public class SAFUtils {
 	 * @param fileName
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static File createStorageFile(
