@@ -51,12 +51,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Storage Access Framework/DocumentFile関係のヘルパークラス
+ */
 public class SAFUtils {
 	private static final String TAG = SAFUtils.class.getSimpleName();
-
-//********************************************************************************
-// Storage Access Framework関係
-//********************************************************************************
 
 	private SAFUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
