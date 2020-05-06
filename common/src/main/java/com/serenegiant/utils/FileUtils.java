@@ -45,9 +45,12 @@ public class FileUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
-    public static String DIR_NAME = "UsbWebCamera";
-	private static final SimpleDateFormat mDateTimeFormat = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
+    public static String DIR_NAME;
 
+	/**
+	 * デフォルトの保存先ディレクトリ名を取得
+	 * @return
+	 */
 	@NonNull
 	public static String getDirName() {
 		return TextUtils.isEmpty(DIR_NAME)
@@ -55,18 +58,31 @@ public class FileUtils {
 	}
 	
     /**
-     * キャプチャ用のファイル名を生成
+	 * キャプチャ用のFileインスタンスを生成
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
      * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
      * @param ext .mp4 .png または .jpeg
      * @return 書き込み出来なければnullを返す
      */
+	@Nullable
     public static final File getCaptureFile(@NonNull final Context context,
     	final String type, final String ext, final int saveTreeId) {
 
     	return getCaptureFile(context, type, null, ext, saveTreeId);
     }
 
+	/**
+	 * キャプチャ用のFileインスタンスを生成
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
+	 * @param context
+	 * @param type
+	 * @param prefix
+	 * @param ext
+	 * @param saveTreeId
+	 * @return
+	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@Nullable
 	public static final File getCaptureFile(@NonNull final Context context,
 		final String type, final String prefix, final String ext, final int saveTreeId) {
 
@@ -110,8 +126,17 @@ public class FileUtils {
 		return result;
 	}
 
+	/**
+	 * キャプチャ用のディレクトリを示すFileインスタンスを取得する
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
+	 * @param context
+	 * @param type
+	 * @param saveTreeId
+	 * @return
+	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@SuppressLint("NewApi")
+	@Nullable
 	public static final File getCaptureDir(@NonNull final Context context,
 		final String type, final int saveTreeId) {
 
@@ -140,16 +165,24 @@ public class FileUtils {
         }
 		return null;
     }
+
+	private static final SimpleDateFormat sDateTimeFormat
+		= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
+
     /**
      * 現在の日時を表す文字列を取得する
      * @return
      */
     public static final String getDateTimeString() {
     	final GregorianCalendar now = new GregorianCalendar();
-    	return mDateTimeFormat.format(now.getTime());
+    	return sDateTimeFormat.format(now.getTime());
     }
 
-
+	/**
+	 * 外部ストレージ名の取得を試みる
+	 * @return
+	 */
+	@Nullable
 	public static String getExternalMounts() {
     	String externalpath = null;
     	String internalpath = "";
@@ -188,6 +221,7 @@ public class FileUtils {
     	return externalpath;
     }
 
+//--------------------------------------------------------------------------------
 	// 外部ストレージの空き容量の制限(1分に10MBとみなす。実際は7〜8MB)
     public static float FREE_RATIO = 0.03f;					// 空き領域が3%より大きいならOK
     public static float FREE_SIZE_OFFSET = 20 * 1024 * 1024;
@@ -199,18 +233,18 @@ public class FileUtils {
 	 * ストレージの情報を取得
 	 * @param context
 	 * @param type
-	 * @param save_tree_id
+	 * @param saveRreeId
 	 * @return アクセスできなければnull
 	 */
 	@Nullable
 	public static StorageInfo getStorageInfo(final Context context,
-											 @NonNull final String type, final int save_tree_id) {
+		@NonNull final String type, final int saveRreeId) {
 	    
 		if (context != null) {
 			try {
 				// 外部保存領域が書き込み可能な場合
 				// 外部ストレージへのパーミッションがないとnullが返ってくる
-				final File dir = getCaptureDir(context, type, save_tree_id);
+				final File dir = getCaptureDir(context, type, saveRreeId);
 //					Log.i(TAG, "checkFreeSpace:dir=" + dir);
 				if (dir != null) {
 					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
@@ -319,6 +353,7 @@ public class FileUtils {
 		return 0;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * ファイル名末尾の拡張子を取り除く
 	 * @param path
