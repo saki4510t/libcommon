@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import com.serenegiant.glutils.GLEffect
+import com.serenegiant.media.CaptureUtils
 import com.serenegiant.service.ServiceRecorder
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
@@ -105,8 +106,8 @@ class EffectCameraFragment : AbstractCameraFragment() {
 			if (DEBUG) Log.v(TAG, "onReady:")
 			if (mRecorder != null) {
 				try {
-					val dir = RecordingHelper.getRecordingRoot(
-						requireContext(), Environment.DIRECTORY_MOVIES)
+					val dir = CaptureUtils.getRecordingRoot(
+						requireContext(), Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
 					if (dir != null) {
 						mRecorder!!.start(dir, FileUtils.getDateTimeString())
 					} else {

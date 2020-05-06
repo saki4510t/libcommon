@@ -20,8 +20,8 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.libcommon.Const;
 import com.serenegiant.libcommon.R;
-import com.serenegiant.libcommon.RecordingHelper;
 import com.serenegiant.media.AbstractAudioEncoder;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.IAudioSampler;
@@ -412,7 +412,7 @@ public class RecordingService extends BaseService {
 		if (DEBUG) Log.v(TAG, "start:");
 		synchronized (mSync) {
 			if ((!mUseVideo || (mVideoFormat != null)) && (!mUseAudio || (mAudioFormat != null))) {
-				if (checkFreeSpace(this, RecordingHelper.REQUEST_ACCESS_SD)) {
+				if (checkFreeSpace(this, Const.REQUEST_ACCESS_SD)) {
 					internalStart(outputDir, name, mVideoFormat, mAudioFormat);
 				} else {
 					throw new IOException();
@@ -849,7 +849,7 @@ public class RecordingService extends BaseService {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
 				muxer = new MediaMuxerWrapper(
 //					new MediaStoreOutputStream(this, "*/mp4", null, output.getName(), UriHelper.getPath(this, output.getUri())),
-					new MediaStoreOutputStream(this, "video/mp4", Environment.DIRECTORY_MOVIES + "/" + RecordingHelper.APP_DIR, output.getName()),
+					new MediaStoreOutputStream(this, "video/mp4", Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR, output.getName()),
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
