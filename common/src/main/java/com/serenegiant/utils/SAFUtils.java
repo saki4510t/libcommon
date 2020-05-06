@@ -46,7 +46,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
@@ -508,12 +507,12 @@ public class SAFUtils {
 	 * @throws IOException
 	 */
 	@NonNull
-	public static Collection<DocumentFile> listFiles(
+	public static List<DocumentFile> listFiles(
 		@NonNull final Context context,
 		@NonNull final DocumentFile dir,
 		@Nullable final FileFilter filter) throws IOException {
 
-		final Collection<DocumentFile> result = new ArrayList<DocumentFile>();
+		final List<DocumentFile> result = new ArrayList<DocumentFile>();
 		if (dir.isDirectory()) {
 			final DocumentFile[] files = dir.listFiles();
 			for (final DocumentFile file: files) {
