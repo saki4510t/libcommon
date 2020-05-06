@@ -588,10 +588,9 @@ public class MediaMoviePlayer {
 	 * @return first video track index, -1 if not found
 	 */
 	@SuppressLint("NewApi")
-	protected int internal_prepare_video(final Object source) {
+	protected int internal_prepare_video(final Object source) throws IOException {
 		int trackindex = -1;
 		mVideoMediaExtractor = new MediaExtractor();
-		try {
 		if (source instanceof String) {
 			mVideoMediaExtractor.setDataSource((String)source);
 		} else if (source instanceof AssetFileDescriptor) {
@@ -615,8 +614,6 @@ public class MediaMoviePlayer {
 			if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
 				mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
 		}
-		} catch (final IOException e) {
-		}
 		return trackindex;
 	}
 
@@ -625,10 +622,9 @@ public class MediaMoviePlayer {
 	 * @return first audio track index, -1 if not found
 	 */
 	@SuppressLint("NewApi")
-	protected int internal_prepare_audio(final Object source) {
+	protected int internal_prepare_audio(final Object source) throws IOException {
 		int trackindex = -1;
 		mAudioMediaExtractor = new MediaExtractor();
-		try {
 		if (source instanceof String) {
 			mAudioMediaExtractor.setDataSource((String)source);
 		} else if (source instanceof AssetFileDescriptor) {
@@ -670,8 +666,6 @@ public class MediaMoviePlayer {
 				mAudioTrack.release();
 				mAudioTrack = null;
 			}
-		}
-		} catch (final IOException e) {
 		}
 		return trackindex;
 	}
