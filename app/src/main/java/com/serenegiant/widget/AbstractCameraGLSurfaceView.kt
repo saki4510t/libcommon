@@ -304,7 +304,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 		 * if you don't set RENDERMODE_WHEN_DIRTY, this method is called at maximum 60fps
 		 */
 		override fun onDrawFrame(unused: GL10) {
-			if (DEBUG && ++cnt % 100 == 0) Log.v(TAG, "onDrawFrame::$cnt")
+			if (DEBUG && ++cnt % 1000 == 0) Log.v(TAG, "onDrawFrame::$cnt")
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
 			if (requestUpdateTex && (inputSurfaceTexture != null)) {
 				requestUpdateTex = false
