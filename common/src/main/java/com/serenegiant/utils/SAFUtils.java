@@ -696,9 +696,48 @@ public class SAFUtils {
 		final int treeId,
 		final String mime, final String name) throws IOException {
 		
-		return getStorageOutputStream(context, treeId, null, mime, name);
+		return getOutputStream(context, treeId, null, mime, name);
 	}
-	
+
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param treeId
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@Deprecated
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static OutputStream getStorageOutputStream(
+		@NonNull final Context context,
+		final int treeId, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getOutputStream(context, treeId, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param parent
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@Deprecated
+	public static OutputStream getStorageOutputStream(
+		@NonNull final Context context,
+		@NonNull final DocumentFile parent, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getOutputStream(context, parent, dirs, mime, name);
+	}
+
 	/**
 	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
 	 * @param context
@@ -710,7 +749,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static OutputStream getStorageOutputStream(
+	public static OutputStream getOutputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
@@ -718,18 +757,7 @@ public class SAFUtils {
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
-				final DocumentFile file = tree.findFile(name);
-				if (file != null) {
-					if (file.isFile()) {
-						return context.getContentResolver().openOutputStream(
-							file.getUri());
-					} else {
-						throw new IOException("directory with same name already exists");
-					}
-				} else {
-					return context.getContentResolver().openOutputStream(
-						tree.createFile(mime, name).getUri());
-				}
+				return getOutputStream(context, tree, null, mime, name);
 			}
 		}
 		throw new FileNotFoundException();
@@ -745,7 +773,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static OutputStream getStorageOutputStream(
+	public static OutputStream getOutputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
@@ -785,7 +813,7 @@ public class SAFUtils {
 		final int treeId,
 		final String mime, final String name) throws IOException {
 		
-		return getStorageInputStream(context, treeId, null, mime, name);
+		return getInputStream(context, treeId, null, mime, name);
 	}
 	
 	/**
@@ -798,8 +826,47 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static InputStream getStorageInputStream(
+		@NonNull final Context context,
+		final int treeId, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getInputStream(context, treeId, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下に出力用ファイルを生成してOutputStreamとして返す
+	 * @param context
+	 * @param parent
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@Deprecated
+	public static InputStream getStorageInputStream(
+		@NonNull final Context context,
+		@NonNull final DocumentFile parent, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getInputStream(context, parent, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下の入力用ファイルをInputStreamとして返す
+	 * @param context
+	 * @param treeId
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static InputStream getInputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
@@ -807,15 +874,7 @@ public class SAFUtils {
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
-				final DocumentFile file = tree.findFile(name);
-				if (file != null) {
-					if (file.isFile()) {
-						return context.getContentResolver().openInputStream(
-							file.getUri());
-					} else {
-						throw new IOException("directory with same name already exists");
-					}
-				}
+				return getInputStream(context, tree, null, mime, name);
 			}
 		}
 		throw new FileNotFoundException();
@@ -831,7 +890,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	public static InputStream getStorageInputStream(
+	public static InputStream getInputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
