@@ -18,7 +18,6 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -28,7 +27,6 @@ import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import android.os.StatFs;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -38,7 +36,6 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.StorageInfo;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -117,6 +114,7 @@ public class SAFUtils {
 	 * @param context
 	 * @param requestCode
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
 	public static boolean hasStorageAccess(
@@ -132,8 +130,10 @@ public class SAFUtils {
 	 * @param activity
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
+	@Nullable
 	public static Uri requestStorageAccess(
 		@NonNull final Activity activity,
 		final int requestCode) {
@@ -147,8 +147,10 @@ public class SAFUtils {
 	 * @param activity
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
+	@Nullable
 	public static Uri requestStorageAccess(
 		@NonNull final FragmentActivity activity,
 		final int requestCode) {
@@ -161,8 +163,10 @@ public class SAFUtils {
 	 * @param fragment
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
+	@Nullable
 	public static Uri requestStorageAccess(
 		@NonNull final android.app.Fragment fragment,
 		final int requestCode) {
@@ -181,7 +185,10 @@ public class SAFUtils {
 	 * @param fragment
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
+	@Deprecated
+	@Nullable
 	public static Uri requestStorageAccess(
 		@NonNull final Fragment fragment,
 		final int requestCode) {
@@ -195,6 +202,7 @@ public class SAFUtils {
 	 * @param context
 	 * @param treeUri
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
 	@Nullable
@@ -213,6 +221,7 @@ public class SAFUtils {
 	 * @param treeUri
 	 * @param flags
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
 	@Deprecated
 	@Nullable
@@ -229,6 +238,7 @@ public class SAFUtils {
 	 * @param context
 	 * @param requestCode
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
 	public static boolean hasPermission(
 		@NonNull final Context context,
@@ -249,6 +259,8 @@ public class SAFUtils {
 					}
 				}
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
 		return found;
 	}
@@ -258,7 +270,9 @@ public class SAFUtils {
 	 * @param activity
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
+	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Activity activity,
 		final int requestCode) {
@@ -270,8 +284,9 @@ public class SAFUtils {
 				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);
 			}
 			return uri;
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 
 	/**
@@ -279,7 +294,9 @@ public class SAFUtils {
 	 * @param activity
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
 	 */
+	@Nullable
 	public static Uri requestPermission(
 		@NonNull final FragmentActivity activity,
 		final int requestCode) {
@@ -291,8 +308,9 @@ public class SAFUtils {
 				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);
 			}
 			return uri;
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 
 	/**
@@ -300,21 +318,25 @@ public class SAFUtils {
 	 * @param fragment
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @throws UnsupportedOperationException
+	 * @throws IllegalStateException
 	 */
+	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Fragment fragment,
 		final int requestCode) {
 
 		if (BuildCheck.isLollipop()) {
-			final Activity activity = fragment.getActivity();
-			final Uri uri = activity != null ? getStorageUri(activity, requestCode) : null;
+			@NonNull
+			final Uri uri = getStorageUri(fragment.requireContext(), requestCode);
 			if (uri == null) {
 				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
 				fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);
 			}
 			return uri;
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 
 //--------------------------------------------------------------------------------
@@ -323,11 +345,12 @@ public class SAFUtils {
 	 * @param context
 	 * @param treeUri
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
-	@Nullable
+	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
-		final int requestCode, final Uri treeUri) {
+		final int requestCode, @NonNull final Uri treeUri) {
 
 		return takePersistableUriPermission(context,
 			requestCode, treeUri,
@@ -340,18 +363,19 @@ public class SAFUtils {
 	 * @param treeUri
 	 * @param flags
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
-	@Nullable
+	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
-		final int requestCode, final Uri treeUri, final int flags) {
+		final int requestCode, @NonNull final Uri treeUri, final int flags) {
 
 		if (BuildCheck.isLollipop()) {
 			context.getContentResolver().takePersistableUriPermission(treeUri, flags);
 			saveUri(context, getKey(requestCode), treeUri);
 			return treeUri;
 		} else {
-			return null;
+			throw new UnsupportedOperationException("should be API>=21");
 		}
 	}
 	
@@ -359,6 +383,7 @@ public class SAFUtils {
 	 * 恒常的にアクセスできるように取得したパーミッションを開放する
 	 * @param context
 	 * @param requestCode
+	 * @throws UnsupportedOperationException
 	 */
 	public static void releaseStorageAccessPermission(
 		@NonNull final Context context,
@@ -372,6 +397,8 @@ public class SAFUtils {
 					Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 				clearUri(context, key);
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
 	}
 
@@ -381,9 +408,12 @@ public class SAFUtils {
 	 * @param context
 	 * @param treeId
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static DocumentFile getStorage(
 		@NonNull final Context context,
 		final int treeId) throws IOException {
@@ -398,9 +428,12 @@ public class SAFUtils {
 	 * @param treeId
 	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
 	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static DocumentFile getStorage(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs) throws IOException {
@@ -413,9 +446,11 @@ public class SAFUtils {
 	 * そのディレクトリを示すDocumentFileオブジェクトを返す
 	 * @param parent
 	 * @param dirs
-	 * @return 書き込みができなければnull
+	 * @return
+	 * @throws IOException
 	 */
 	@Deprecated
+	@NonNull
 	public static DocumentFile getStorage(
 		@NonNull final DocumentFile parent, @Nullable final String dirs)
 			throws IOException {
@@ -430,8 +465,11 @@ public class SAFUtils {
 	 * @param treeId
 	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
 	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
-	@Nullable
+	@NonNull
 	public static DocumentFile getDir(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs) throws IOException {
@@ -440,9 +478,12 @@ public class SAFUtils {
 			final Uri treeUri = getStorageUri(context, treeId);
 			if (treeUri != null) {
 				return getDir(DocumentFile.fromTreeUri(context, treeUri), dirs);
+			} else {
+				throw new FileNotFoundException("specific dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 	
 	/**
@@ -450,8 +491,10 @@ public class SAFUtils {
 	 * そのディレクトリを示すDocumentFileオブジェクトを返す
 	 * @param parent
 	 * @param dirs
-	 * @return 書き込みができなければnull
+	 * @return
+	 * @throws IOException
 	 */
+	@NonNull
 	public static DocumentFile getDir(
 		@NonNull final DocumentFile parent, @Nullable final String dirs)
 			throws IOException {
@@ -494,7 +537,6 @@ public class SAFUtils {
 	 * @param dir
 	 * @param filter nullなら存在するファイルを全て追加
 	 * @return
-	 * @throws IOException
 	 */
 	@NonNull
 	public static List<DocumentFile> listFiles(
@@ -521,9 +563,11 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static DocumentFile getStorageFile(
 		@NonNull final Context context,
 		final int treeId, final String mime, final String name) throws IOException {
@@ -538,9 +582,11 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static DocumentFile getStorageFile(
 		@NonNull final Context context,
 		final int treeId,
@@ -559,8 +605,10 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws IOException
 	 */
 	@Deprecated
+	@NonNull
 	public static DocumentFile getStorageFile(
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
@@ -575,8 +623,10 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws IOException
 	 */
-	@Nullable
+	@NonNull
 	public static DocumentFile getFile(
 		@NonNull final Context context,
 		final int treeId,
@@ -588,9 +638,12 @@ public class SAFUtils {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				return getFile(tree, null, mime, name);
+			} else {
+				throw new IOException("specific dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 	
 	/**
@@ -601,7 +654,9 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws IOException
 	 */
+	@NonNull
 	public static DocumentFile getFile(
 		@NonNull final DocumentFile parent,
 		@Nullable final String dirs,
@@ -609,19 +664,16 @@ public class SAFUtils {
 		@NonNull final String name) throws IOException {
 		
 		final DocumentFile tree = getDir(parent, dirs);
-		if (tree != null) {
-			final DocumentFile file = tree.findFile(name);
-			if (file != null) {
-				if (file.isFile()) {
-					return file;
-				} else {
-					throw new IOException("directory with same name already exists");
-				}
+		final DocumentFile file = tree.findFile(name);
+		if (file != null) {
+			if (file.isFile()) {
+				return file;
 			} else {
-				return tree.createFile(mime, name);
+				throw new IOException("directory with same name already exists");
 			}
+		} else {
+			return tree.createFile(mime, name);
 		}
-		return null;
 	}
 
 //--------------------------------------------------------------------------------
@@ -635,6 +687,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static OutputStream getStorageOutputStream(
 		@NonNull final Context context,
 		final int treeId,
@@ -654,6 +707,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static OutputStream getStorageOutputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -673,6 +727,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static OutputStream getStorageOutputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
@@ -691,6 +746,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@NonNull
 	public static OutputStream getOutputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -700,9 +756,12 @@ public class SAFUtils {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				return getOutputStream(context, tree, null, mime, name);
+			} else {
+				throw new FileNotFoundException("specific dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		throw new FileNotFoundException();
 	}
 
 	/**
@@ -715,27 +774,25 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@NonNull
 	public static OutputStream getOutputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
 		final DocumentFile tree = getDir(parent, dirs);
-		if (tree != null) {
-			final DocumentFile file = tree.findFile(name);
-			if (file != null) {
-				if (file.isFile()) {
-					return context.getContentResolver().openOutputStream(
-						file.getUri());
-				} else {
-					throw new IOException("directory with same name already exists");
-				}
-			} else {
+		final DocumentFile file = tree.findFile(name);
+		if (file != null) {
+			if (file.isFile()) {
 				return context.getContentResolver().openOutputStream(
-					tree.createFile(mime, name).getUri());
+					file.getUri());
+			} else {
+				throw new IOException("directory with same name already exists");
 			}
+		} else {
+			return context.getContentResolver().openOutputStream(
+				tree.createFile(mime, name).getUri());
 		}
-		throw new FileNotFoundException();
 	}
 
 //--------------------------------------------------------------------------------
@@ -749,6 +806,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static InputStream getStorageInputStream(
 		@NonNull final Context context,
 		final int treeId,
@@ -768,6 +826,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static InputStream getStorageInputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -787,6 +846,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 */
 	@Deprecated
+	@NonNull
 	public static InputStream getStorageInputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
@@ -804,7 +864,9 @@ public class SAFUtils {
 	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
+	@NonNull
 	public static InputStream getInputStream(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -814,9 +876,12 @@ public class SAFUtils {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				return getInputStream(context, tree, null, mime, name);
+			} else {
+				throw new FileNotFoundException("specifc dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		throw new FileNotFoundException();
 	}
 	
 	/**
@@ -828,25 +893,26 @@ public class SAFUtils {
 	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
+	@NonNull
 	public static InputStream getInputStream(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
 		final DocumentFile tree = getDir(parent, dirs);
-		if (tree != null) {
-			final DocumentFile file = tree.findFile(name);
-			if (file != null) {
-				if (file.isFile()) {
-					return context.getContentResolver().openInputStream(
-						file.getUri());
-				} else {
-					throw new IOException("directory with same name already exists");
-				}
+		final DocumentFile file = tree.findFile(name);
+		if (file != null) {
+			if (file.isFile()) {
+				return context.getContentResolver().openInputStream(
+					file.getUri());
+			} else {
+				throw new IOException("directory with same name already exists");
 			}
+		} else {
+			throw new FileNotFoundException("specific file not found");
 		}
-		throw new FileNotFoundException();
 	}
 
 //--------------------------------------------------------------------------------
@@ -861,6 +927,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public static ParcelFileDescriptor getStorageFileFD(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -880,6 +947,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public static ParcelFileDescriptor getStorageFileFD(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
@@ -896,9 +964,11 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws UnsupportedOperationException
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
@@ -919,9 +989,12 @@ public class SAFUtils {
 					return context.getContentResolver().openFileDescriptor(
 						tree.createFile(mime, name).getUri(), "rw");
 				}
+			} else {
+				throw new FileNotFoundException("specific dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		throw new FileNotFoundException();
 	}
 	
 	/**
@@ -935,27 +1008,25 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
 		final DocumentFile tree = getDir(parent, dirs);
-		if (tree != null) {
-			final DocumentFile file = tree.findFile(name);
-			if (file != null) {
-				if (file.isFile()) {
-					return context.getContentResolver().openFileDescriptor(
-						file.getUri(), "rw");
-				} else {
-					throw new IOException("directory with same name already exists");
-				}
-			} else {
+		final DocumentFile file = tree.findFile(name);
+		if (file != null) {
+			if (file.isFile()) {
 				return context.getContentResolver().openFileDescriptor(
-					tree.createFile(mime, name).getUri(), "rw");
+					file.getUri(), "rw");
+			} else {
+				throw new IOException("directory with same name already exists");
 			}
+		} else {
+			return context.getContentResolver().openFileDescriptor(
+				tree.createFile(mime, name).getUri(), "rw");
 		}
-		throw new FileNotFoundException();
 	}
 
 //--------------------------------------------------------------------------------
@@ -964,12 +1035,14 @@ public class SAFUtils {
 	 * @param context
 	 * @param treeId
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static File createStorageDir(
-		@NonNull final Context context,
-		final int treeId) {
+		@NonNull final Context context, final int treeId)
+		throws FileNotFoundException, UnsupportedOperationException {
 
 		if (BuildCheck.isLollipop()) {
 			final Uri treeUri = getStorageUri(context, treeId);
@@ -978,10 +1051,15 @@ public class SAFUtils {
 				final String path = UriHelper.getPath(context, saveTree.getUri());
 				if (!TextUtils.isEmpty(path)) {
 					return new File(path);
+				} else {
+					throw new FileNotFoundException("specific file not found");
 				}
+			} else {
+				throw new FileNotFoundException("specific dir not found");
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 
 	/**
@@ -991,12 +1069,16 @@ public class SAFUtils {
 	 * @param mime
 	 * @param fileName
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static File createStorageFile(
 		@NonNull final Context context,
-		final int treeId, final String mime, final String fileName) {
+		final int treeId, final String mime, final String fileName)
+			throws IOException {
 
 		//noinspection deprecation
 		return createStorageFile(context, getStorageUri(context, treeId), mime, fileName);
@@ -1009,12 +1091,16 @@ public class SAFUtils {
 	 * @param mime
 	 * @param fileName
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
-	@Nullable
+	@NonNull
 	public static File createStorageFile(
 		@NonNull final Context context,
-		final Uri treeUri, final String mime, final String fileName) {
+		final Uri treeUri, final String mime, final String fileName)
+			throws IOException {
 
 		if (DEBUG) Log.v(TAG, "createStorageFile:" + fileName);
 
@@ -1027,8 +1113,10 @@ public class SAFUtils {
 					return new File(path);
 				}
 			}
+			throw new FileNotFoundException();
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return null;
 	}
 
 	/**
@@ -1038,11 +1126,15 @@ public class SAFUtils {
 	 * @param mime
 	 * @param fileName
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
 	public static int createStorageFileFD(
 		@NonNull final Context context,
-		final int treeId, final String mime, final String fileName) {
+		final int treeId, final String mime, final String fileName)
+			throws IOException {
 
 		if (DEBUG) Log.v(TAG, "createStorageFileFD:" + fileName);
 		//noinspection deprecation
@@ -1056,11 +1148,15 @@ public class SAFUtils {
 	 * @param mime
 	 * @param fileName
 	 * @return
+	 * @throws UnsupportedOperationException
+	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@Deprecated
 	public static int createStorageFileFD(
 		@NonNull final Context context,
-		final Uri treeUri, final String mime, final String fileName) {
+		final Uri treeUri, final String mime, final String fileName)
+			throws IOException, UnsupportedOperationException {
 
 		if (DEBUG) Log.v(TAG, "createStorageFileFD:" + fileName);
 		if (BuildCheck.isLollipop()) {
@@ -1075,8 +1171,10 @@ public class SAFUtils {
 					Log.w(TAG, e);
 				}
 			}
+			throw new FileNotFoundException();
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return 0;
 	}
 
 //--------------------------------------------------------------------------------
@@ -1091,6 +1189,7 @@ public class SAFUtils {
 	 * @throws IOException
 	 */
 	@Deprecated
+	@NonNull
 	public static DocumentFile getDocumentFile(
 		@NonNull Context context,
 		@NonNull final DocumentFile baseDoc, @Nullable final String dirs)
@@ -1129,26 +1228,26 @@ public class SAFUtils {
 	 * @param baseDoc
 	 * @param uri
 	 * @return
+	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
 	@Deprecated
+	@NonNull
 	public static DocumentFile getDocumentFile(
 		@NonNull Context context,
-		@NonNull final DocumentFile baseDoc, @Nullable final Uri uri)
+		@NonNull final DocumentFile baseDoc, @NonNull final Uri uri)
 			throws IOException {
 		
-		if (uri != null) {
-			final String basePathString = UriHelper.getPath(context, baseDoc.getUri());
-			final String uriString = UriHelper.getPath(context, uri);
-			if (!TextUtils.isEmpty(basePathString)
-				&& !TextUtils.isEmpty(uriString)
-				&& uriString.startsWith(basePathString)) {
-				
-				return getDir(baseDoc,
-					uriString.substring(basePathString.length()));
-			}
+		final String basePathString = UriHelper.getPath(context, baseDoc.getUri());
+		final String uriString = UriHelper.getPath(context, uri);
+		if (!TextUtils.isEmpty(basePathString)
+			&& !TextUtils.isEmpty(uriString)
+			&& uriString.startsWith(basePathString)) {
+
+			return getDir(baseDoc,
+				uriString.substring(basePathString.length()));
 		}
-		return null;
+		throw new FileNotFoundException();
 	}
 
 //--------------------------------------------------------------------------------
@@ -1227,11 +1326,12 @@ public class SAFUtils {
 	 * @param context
 	 * @param requestCode
 	 * @return
+	 * @throws UnsupportedOperationException
 	 */
 	@Nullable
 	private static Uri getStorageUri(
 		@NonNull final Context context,
-		final int requestCode) {
+		final int requestCode) throws UnsupportedOperationException {
 
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = loadUri(context, getKey(requestCode));
@@ -1251,6 +1351,8 @@ public class SAFUtils {
 					return uri;
 				}
 			}
+		} else {
+			throw new UnsupportedOperationException("should be API>=21");
 		}
 		return null;
 	}
