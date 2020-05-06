@@ -296,6 +296,53 @@ public class ServiceRecorder {
 	}
 
 	/**
+	 * Releaseされたかどうかをチェックして、
+	 * ReleaseされていればIllegalStateExceptionを投げる
+	 *
+	 * @throws IllegalStateException
+	 */
+	private void checkReleased() throws IllegalStateException {
+		if (mReleased) {
+			throw new IllegalStateException("already released");
+		}
+	}
+
+	/**
+	 * 録画サービスとの接続状態取得用のリスナーの実装
+	 */
+	private final ServiceConnection mServiceConnection = new ServiceConnection() {
+		@Override
+		public void onServiceConnected(final ComponentName name, final IBinder service) {
+			if (DEBUG) Log.v(TAG, "onServiceConnected:name=" + name);
+			synchronized (mServiceSync) {
+				if (mState == STATE_BINDING) {
+					mState = STATE_BIND;
+				}
+				mService = ((RecordingService.LocalBinder)service).getService();
+				mServiceSync.notifyAll();
+				if (mService != null) {
+					mService.addListener(mStateChangeListener);
+				}
+			}
+			mCallback.onConnected();
+		}
+
+		@Override
+		public void onServiceDisconnected(final ComponentName name) {
+			if (DEBUG) Log.v(TAG, "onServiceDisconnected:name=" + name);
+			mCallback.onDisconnected();
+			synchronized (mServiceSync) {
+				if (mService != null) {
+					mService.removeListener(mStateChangeListener);
+				}
+				mState = STATE_UNINITIALIZED;
+				mService = null;
+				mServiceSync.notifyAll();
+			}
+		}
+	};
+
+	/**
 	 * Bind client to camera connection service
 	 */
 	private void doBindService() {
@@ -377,65 +424,6 @@ public class ServiceRecorder {
 		synchronized (mServiceSync) {
 			return mService;
 		}
-	}
-
-	/**
-	 * Releaseされたかどうかをチェックして、
-	 * ReleaseされていればIllegalStateExceptionを投げる
-	 *
-	 * @throws IllegalStateException
-	 */
-	private void checkReleased() throws IllegalStateException {
-		if (mReleased) {
-			throw new IllegalStateException("already released");
-		}
-	}
-
-	/**
-	 * 録画サービスとの接続状態取得用のリスナーの実装
-	 */
-	private final ServiceConnection mServiceConnection = new ServiceConnection() {
-		@Override
-		public void onServiceConnected(final ComponentName name, final IBinder service) {
-			if (DEBUG) Log.v(TAG, "onServiceConnected:name=" + name);
-			synchronized (mServiceSync) {
-				if (mState == STATE_BINDING) {
-					mState = STATE_BIND;
-				}
-				mService = getService(service);
-				mServiceSync.notifyAll();
-				if (mService != null) {
-					mService.addListener(mStateChangeListener);
-				}
-			}
-			mCallback.onConnected();
-		}
-
-		@Override
-		public void onServiceDisconnected(final ComponentName name) {
-			if (DEBUG) Log.v(TAG, "onServiceDisconnected:name=" + name);
-			mCallback.onDisconnected();
-			synchronized (mServiceSync) {
-				if (mService != null) {
-					mService.removeListener(mStateChangeListener);
-				}
-				mState = STATE_UNINITIALIZED;
-				mService = null;
-				mServiceSync.notifyAll();
-			}
-		}
-	};
-
-	/**
-	 * 録画サービスと接続した際にIBinderからRecordingService
-	 * (またはその継承クラス)を取得するためのメソッド
-	 *
-	 * @param service
-	 * @return
-	 */
-	@NonNull
-	private RecordingService getService(final IBinder service) {
-		return ((RecordingService.LocalBinder)service).getService();
 	}
 
 	/**
