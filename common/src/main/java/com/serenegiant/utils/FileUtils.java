@@ -191,18 +191,18 @@ public class FileUtils {
 	 * ストレージの情報を取得
 	 * @param context
 	 * @param type
-	 * @param saveRreeId
+	 * @param saveTreeId
 	 * @return アクセスできなければnull
 	 */
 	@Nullable
 	public static StorageInfo getStorageInfo(final Context context,
-		@NonNull final String type, final int saveRreeId) {
+		@NonNull final String type, final int saveTreeId) {
 	    
 		if (context != null) {
 			try {
 				// 外部保存領域が書き込み可能な場合
 				// 外部ストレージへのパーミッションがないとnullが返ってくる
-				final File dir = getCaptureDir(context, type, saveRreeId);
+				final File dir = getCaptureDir(context, type, saveTreeId);
 //					Log.i(TAG, "checkFreeSpace:dir=" + dir);
 				if (dir != null) {
 					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
