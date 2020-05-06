@@ -223,7 +223,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val activity: Activity? = activity
 		return if ((activity == null) || activity.isFinishing) {
 			false
-		} else (SAFUtils.hasStorageAccess(activity, REQUEST_ACCESS_SD)
+		} else (SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)
 			|| PermissionCheck.hasWriteExternalStorage(activity))
 			&& PermissionCheck.hasAudio(activity)
 			&& PermissionCheck.hasCamera(activity)

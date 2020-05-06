@@ -231,7 +231,7 @@ public class MediaAVRecorder extends Recorder {
 		if (TextUtils.isEmpty(ext)) {
 			ext = ".mp4";
 		}
-		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 			mOutputPath = FileUtils.getCaptureFile(context,
 				Environment.DIRECTORY_MOVIES, prefix, ext, saveTreeId).toString();
 			final String file_name = (TextUtils.isEmpty(prefix)
@@ -269,7 +269,7 @@ public class MediaAVRecorder extends Recorder {
 
 		super(context, callback, config, factory);
 		mSaveTreeId = saveTreeId;
-		if ((saveTreeId > 0) && SAFUtils.hasStorageAccess(context, saveTreeId)) {
+		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 			DocumentFile tree = SAFUtils.getStorageFile(context,
 				saveTreeId, dirs, "*/*", fileName);
 			if (tree != null) {

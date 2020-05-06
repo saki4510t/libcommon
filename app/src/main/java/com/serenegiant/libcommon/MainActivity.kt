@@ -266,7 +266,7 @@ class MainActivity
 		if (!SAFUtils.handleOnResult(this, requestCode, resultCode, data, object : SAFUtils.handleOnResultDelegater {
 				override fun onResult(requestCode: Int, uri: Uri?, data: Intent?): Boolean {
 					if (DEBUG) Log.v(TAG, "onResult:");
-					SAFUtils.requestStorageAccessPermission(this@MainActivity, requestCode, uri)
+					SAFUtils.takePersistableUriPermission(this@MainActivity, requestCode, uri)
 					return true
 				}
 

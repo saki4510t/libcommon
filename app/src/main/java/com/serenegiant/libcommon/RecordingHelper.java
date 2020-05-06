@@ -38,7 +38,7 @@ public class RecordingHelper {
 		DocumentFile root = null;
 		final SharedPreferences pref
 			= context.getSharedPreferences(PREF_NAME, 0);
-		if (SAFUtils.hasStorageAccess(context, REQUEST_ACCESS_SD)) {
+		if (SAFUtils.hasPermission(context, REQUEST_ACCESS_SD)) {
 			try {
 				root = SAFUtils.getStorage(context, REQUEST_ACCESS_SD, FileUtils.DIR_NAME);
 				if ((root == null) || !root.exists() || !root.canWrite()) {

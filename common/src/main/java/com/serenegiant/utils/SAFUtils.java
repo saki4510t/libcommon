@@ -105,74 +105,124 @@ public class SAFUtils {
 		return false;
 	}
 	
+//--------------------------------------------------------------------------------
 	/**
-	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
-	 * "SDUtils-${要求コード}"を返す
+	 * requestCodeに対応するUriへアクセス可能かどうか
+	 * deprecatedなので#requestPermissionを代わりに使う
+	 * @param context
 	 * @param requestCode
 	 * @return
 	 */
-	@NonNull
-	private static String getKey(final int requestCode) {
-		return String.format(Locale.US, "SDUtils-%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
-	}
-	
-	/**
-	 * uriを共有プレファレンスに保存する
-	 * @param context
-	 * @param key
-	 * @param uri
-	 */
-	private static void saveUri(
+	@Deprecated
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	public static boolean hasStorageAccess(
 		@NonNull final Context context,
-		@NonNull final String key, @NonNull final Uri uri) {
+		final int requestCode) {
 
-		final SharedPreferences pref
-			= context.getSharedPreferences(context.getPackageName(), 0);
-		if (pref != null) {
-			pref.edit().putString(key, uri.toString()).apply();
-		}
+		return hasPermission(context, requestCode);
 	}
-	
+
 	/**
-	 * 共有プレファレンスに保存しているuriを取得する
+	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * deprecatedなので#requestPermissionを代わりに使う
+	 * @param activity
+	 * @param requestCode
+	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 */
+	@Deprecated
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccess(
+		@NonNull final Activity activity,
+		final int requestCode) {
+
+		return requestPermission(activity, requestCode);
+	}
+
+	/**
+	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * deprecatedなので#requestPermissionを代わりに使う
+	 * @param activity
+	 * @param requestCode
+	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 */
+	@Deprecated
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccess(
+		@NonNull final FragmentActivity activity,
+		final int requestCode) {
+
+		return requestPermission(activity, requestCode);
+	}
+
+	/**
+	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * @param fragment
+	 * @param requestCode
+	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 */
+	@Deprecated
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccess(
+		@NonNull final android.app.Fragment fragment,
+		final int requestCode) {
+
+		final Uri uri = getStorageUri(fragment.getActivity(), requestCode);
+		if (uri == null) {
+			// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
+			fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);
+		}
+		return uri;
+	}
+
+	/**
+	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * deprecatedなので#requestPermissionを代わりに使う
+	 * @param fragment
+	 * @param requestCode
+	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccess(
+		@NonNull final Fragment fragment,
+		final int requestCode) {
+
+		return requestPermission(fragment, requestCode);
+	}
+
+	/**
+	 * 恒常的にアクセスできるようにパーミッションを要求する
+	 * deprecatedなので#takePersistableUriPermissionを代わりに使う
 	 * @param context
-	 * @param key
+	 * @param treeUri
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
-	private static Uri loadUri(
-		@NonNull final Context context, @NonNull final String key) {
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccessPermission(
+		@NonNull final Context context,
+		final int requestCode, final Uri treeUri) {
 
-		Uri result = null;
-		final SharedPreferences pref
-			= context.getSharedPreferences(context.getPackageName(), 0);
-		if ((pref != null) && pref.contains(key)) {
-			try {
-				result = Uri.parse(pref.getString(key, null));
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
-		return result;
+		return takePersistableUriPermission(context, requestCode, treeUri,
+			Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 	}
-	
-	/**
-	 * 共有プレファレンスに保存しているuriを消去する
-	 * @param context
-	 * @param key
-	 */
-	private static void clearUri(
-		@NonNull final Context context, @Nullable final String key) {
 
-		final SharedPreferences pref
-			= context.getSharedPreferences(context.getPackageName(), 0);
-		if ((pref != null) && pref.contains(key)) {
-			try {
-				pref.edit().remove(key).apply();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
+	/**
+	 * 恒常的にアクセスできるようにパーミッションを要求する
+	 * deprecatedなので#takePersistableUriPermissionを代わりに使う
+	 * @param context
+	 * @param treeUri
+	 * @param flags
+	 * @return
+	 */
+	@Deprecated
+	@Nullable
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static Uri requestStorageAccessPermission(
+		@NonNull final Context context,
+		final int requestCode, final Uri treeUri, final int flags) {
+
+		return takePersistableUriPermission(context, requestCode, treeUri, flags);
 	}
 
 //--------------------------------------------------------------------------------
@@ -183,7 +233,7 @@ public class SAFUtils {
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
-	public static boolean hasStorageAccess(
+	public static boolean hasPermission(
 		@NonNull final Context context,
 		final int requestCode) {
 
@@ -213,7 +263,7 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(
+	public static Uri requestPermission(
 		@NonNull final Activity activity,
 		final int requestCode) {
 
@@ -235,7 +285,7 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(
+	public static Uri requestPermission(
 		@NonNull final FragmentActivity activity,
 		final int requestCode) {
 
@@ -256,28 +306,8 @@ public class SAFUtils {
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 */
-	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(
-		@NonNull final android.app.Fragment fragment,
-		final int requestCode) {
-
-		final Uri uri = getStorageUri(fragment.getActivity(), requestCode);
-		if (uri == null) {
-			// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-			fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);
-		}
-		return uri;
-	}
-
-	/**
-	 * requestCodeに対応するUriへのアクセス要求を行う
-	 * @param fragment
-	 * @param requestCode
-	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
-	 */
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccess(
+	public static Uri requestPermission(
 		@NonNull final Fragment fragment,
 		final int requestCode) {
 
@@ -293,49 +323,7 @@ public class SAFUtils {
 		return null;
 	}
 
-	/**
-	 * requestCodeに対応するUriが存在していて恒常的パーミッションがあればそれを返す, なければnullを返す
-	 * @param context
-	 * @param requestCode
-	 * @return
-	 */
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	@Nullable
-	public static Uri getStorageUri(
-		@NonNull final Context context,
-		final int requestCode) {
-
-		if (BuildCheck.isLollipop()) {
-			final Uri uri = loadUri(context, getKey(requestCode));
-			if (uri != null) {
-				boolean found = false;
-				// 恒常的に保持しているUriパーミッションの一覧を取得する
-				final List<UriPermission> list
-					= context.getContentResolver().getPersistedUriPermissions();
-				for (final UriPermission item: list) {
-					if (item.getUri().equals(uri)) {
-						// requestCodeに対応するUriへのパーミッションを恒常的に保持していた時
-						found = true;
-						break;
-					}
-				}
-				if (found) {
-					return uri;
-				}
-			}
-		}
-		return null;
-	}
-
-	/**
-	 * requestStorageAccessの下請け
-	 * @return
-	 */
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private static Intent prepareStorageAccessPermission() {
-		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
-	}
-
+//--------------------------------------------------------------------------------
 	/**
 	 * 恒常的にアクセスできるようにパーミッションを要求する
 	 * @param context
@@ -344,11 +332,11 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(
+	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
 		final int requestCode, final Uri treeUri) {
 
-		return requestStorageAccessPermission(context,
+		return takePersistableUriPermission(context,
 			requestCode, treeUri,
 			Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 	}
@@ -362,7 +350,7 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static Uri requestStorageAccessPermission(
+	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
 		final int requestCode, final Uri treeUri, final int flags) {
 
@@ -1083,5 +1071,119 @@ public class SAFUtils {
 			}
 		}
 		return null;
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
+	 * "SDUtils-${要求コード}"を返す
+	 * @param requestCode
+	 * @return
+	 */
+	@NonNull
+	private static String getKey(final int requestCode) {
+		return String.format(Locale.US, "SDUtils-%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
+	}
+
+	/**
+	 * uriを共有プレファレンスに保存する
+	 * @param context
+	 * @param key
+	 * @param uri
+	 */
+	private static void saveUri(
+		@NonNull final Context context,
+		@NonNull final String key, @NonNull final Uri uri) {
+
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
+		if (pref != null) {
+			pref.edit().putString(key, uri.toString()).apply();
+		}
+	}
+
+	/**
+	 * 共有プレファレンスに保存しているuriを取得する
+	 * @param context
+	 * @param key
+	 * @return
+	 */
+	@Nullable
+	private static Uri loadUri(
+		@NonNull final Context context, @NonNull final String key) {
+
+		Uri result = null;
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				result = Uri.parse(pref.getString(key, null));
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 共有プレファレンスに保存しているuriを消去する
+	 * @param context
+	 * @param key
+	 */
+	private static void clearUri(
+		@NonNull final Context context, @Nullable final String key) {
+
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
+		if ((pref != null) && pref.contains(key)) {
+			try {
+				pref.edit().remove(key).apply();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
+		}
+	}
+
+	/**
+	 * requestCodeに対応するUriが存在していて恒常的パーミッションがあればそれを返す, なければnullを返す
+	 * @param context
+	 * @param requestCode
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	private static Uri getStorageUri(
+		@NonNull final Context context,
+		final int requestCode) {
+
+		if (BuildCheck.isLollipop()) {
+			final Uri uri = loadUri(context, getKey(requestCode));
+			if (uri != null) {
+				boolean found = false;
+				// 恒常的に保持しているUriパーミッションの一覧を取得する
+				final List<UriPermission> list
+					= context.getContentResolver().getPersistedUriPermissions();
+				for (final UriPermission item: list) {
+					if (item.getUri().equals(uri)) {
+						// requestCodeに対応するUriへのパーミッションを恒常的に保持していた時
+						found = true;
+						break;
+					}
+				}
+				if (found) {
+					return uri;
+				}
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * requestStorageAccessの下請け
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	private static Intent prepareStorageAccessPermission() {
+		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 	}
 }
