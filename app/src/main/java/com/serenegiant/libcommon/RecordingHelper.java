@@ -40,7 +40,7 @@ public class RecordingHelper {
 			= context.getSharedPreferences(PREF_NAME, 0);
 		if (SAFUtils.hasPermission(context, REQUEST_ACCESS_SD)) {
 			try {
-				root = SAFUtils.getStorage(context, REQUEST_ACCESS_SD, FileUtils.DIR_NAME);
+				root = SAFUtils.getDir(context, REQUEST_ACCESS_SD, FileUtils.DIR_NAME);
 				if ((root == null) || !root.exists() || !root.canWrite()) {
 					Log.d(TAG, "path will be wrong, will already be removed,"
 						+ (root != null ? root.getUri() : null));

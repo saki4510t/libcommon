@@ -397,7 +397,7 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int treeId) throws IOException {
 		
-		return getStorage(context, treeId, null);
+		return getDir(context, treeId, null);
 	}
 	
 	/**
@@ -408,8 +408,40 @@ public class SAFUtils {
 	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
 	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
 	 */
+	@Deprecated
 	@Nullable
 	public static DocumentFile getStorage(
+		@NonNull final Context context,
+		final int treeId, @Nullable final String dirs) throws IOException {
+
+		return getDir(context, treeId, dirs);
+	}
+
+	/**
+	 * 指定したDocumentFileが書き込み可能であればその下にディレクトリを生成して
+	 * そのディレクトリを示すDocumentFileオブジェクトを返す
+	 * @param parent
+	 * @param dirs
+	 * @return 書き込みができなければnull
+	 */
+	@Deprecated
+	public static DocumentFile getStorage(
+		@NonNull final DocumentFile parent, @Nullable final String dirs)
+			throws IOException {
+
+		return getDir(parent, dirs);
+	}
+
+	/**
+	 * 指定したidに対応するUriが存在して書き込み可能であればその下にディレクトリを生成して
+	 * そのディレクトリを示すDocumentFileオブジェクトを返す
+	 * @param context
+	 * @param treeId
+	 * @param dirs スラッシュ(`/`)で区切られたパス文字列
+	 * @return 一番下のディレクトリに対応するDocumentFile, Uriが存在しないときや書き込めない時はnull
+	 */
+	@Nullable
+	public static DocumentFile getDir(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs) throws IOException {
 
@@ -417,28 +449,7 @@ public class SAFUtils {
 			final Uri treeUri = getStorageUri(context, treeId);
 			if (treeUri != null) {
 				DocumentFile tree = DocumentFile.fromTreeUri(context, treeUri);
-				if (!TextUtils.isEmpty(dirs)) {
-					final String[] dir = dirs.split("/");
-					for (final String d: dir) {
-						if (!TextUtils.isEmpty(d)) {
-							final DocumentFile t = tree.findFile(d);
-							if ((t != null) && t.isDirectory()) {
-								// 既に存在している時は何もしない
-								tree = t;
-							} else if (t == null) {
-								if (tree.canWrite()) {
-									// 存在しないときはディレクトリを生成
-									tree = tree.createDirectory(d);
-								} else {
-									throw new IOException("can't create directory");
-								}
-							} else {
-								throw new IOException("can't create directory, file with same name already exists");
-							}
-						}
-					}
-				}
-				return tree;
+				return getDir(tree, dirs);
 			}
 		}
 		return null;
@@ -447,13 +458,11 @@ public class SAFUtils {
 	/**
 	 * 指定したDocumentFileが書き込み可能であればその下にディレクトリを生成して
 	 * そのディレクトリを示すDocumentFileオブジェクトを返す
-	 * @param context
 	 * @param parent
 	 * @param dirs
 	 * @return 書き込みができなければnull
 	 */
-	public static DocumentFile getStorage(
-		@NonNull final Context context,
+	public static DocumentFile getDir(
 		@NonNull final DocumentFile parent, @Nullable final String dirs)
 			throws IOException {
 		
@@ -595,7 +604,7 @@ public class SAFUtils {
 		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
-			final DocumentFile tree = getStorage(context, treeId, dirs);
+			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				final DocumentFile file = tree.findFile(name);
 				if (file != null) {
@@ -627,7 +636,7 @@ public class SAFUtils {
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 		
-		final DocumentFile tree = getStorage(context, parent, dirs);
+		final DocumentFile tree = getDir(parent, dirs);
 		if (tree != null) {
 			final DocumentFile file = tree.findFile(name);
 			if (file != null) {
@@ -680,7 +689,7 @@ public class SAFUtils {
 		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
-			final DocumentFile tree = getStorage(context, treeId, dirs);
+			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				final DocumentFile file = tree.findFile(name);
 				if (file != null) {
@@ -714,7 +723,7 @@ public class SAFUtils {
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
-		final DocumentFile tree = getStorage(context, parent, dirs);
+		final DocumentFile tree = getDir(parent, dirs);
 		if (tree != null) {
 			final DocumentFile file = tree.findFile(name);
 			if (file != null) {
@@ -769,7 +778,7 @@ public class SAFUtils {
 		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
-			final DocumentFile tree = getStorage(context, treeId, dirs);
+			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				final DocumentFile file = tree.findFile(name);
 				if (file != null) {
@@ -800,7 +809,7 @@ public class SAFUtils {
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
-		final DocumentFile tree = getStorage(context, parent, dirs);
+		final DocumentFile tree = getDir(parent, dirs);
 		if (tree != null) {
 			final DocumentFile file = tree.findFile(name);
 			if (file != null) {
@@ -833,7 +842,7 @@ public class SAFUtils {
 		final String mime, final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
-			final DocumentFile tree = getStorage(context, treeId, dirs);
+			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
 				final DocumentFile file = tree.findFile(name);
 				if (file != null) {
@@ -867,7 +876,7 @@ public class SAFUtils {
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
 
-		final DocumentFile tree = getStorage(context, parent, dirs);
+		final DocumentFile tree = getDir(parent, dirs);
 		if (tree != null) {
 			final DocumentFile file = tree.findFile(name);
 			if (file != null) {
