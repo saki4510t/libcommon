@@ -227,7 +227,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 */
 	@NonNull
 	public VideoConfig setCaptureFps(final int fps) {
-		mCaptureFps = fps > FPS_MAX ? FPS_MAX : (fps < FPS_MIN ? FPS_MIN : fps);
+		mCaptureFps = fps > FPS_MAX ? FPS_MAX : Math.max(fps, FPS_MIN);
 
 		return this;
 	}
@@ -237,7 +237,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 * @return
 	 */
 	public int captureFps() {
-		return mCaptureFps > FPS_MAX ? FPS_MAX : (mCaptureFps < FPS_MIN ? FPS_MIN : mCaptureFps);
+		return mCaptureFps > FPS_MAX ? FPS_MAX : Math.max(mCaptureFps, FPS_MIN);
 	}
 
 	/**
