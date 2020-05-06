@@ -25,7 +25,7 @@ import android.util.Log
 import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
-import com.serenegiant.media.CaptureUtils
+import com.serenegiant.media.MediaFileUtils
 import com.serenegiant.service.ServiceRecorder
 import com.serenegiant.utils.FileUtils
 import java.io.IOException
@@ -105,7 +105,7 @@ class CameraFragment : AbstractCameraFragment() {
 			if (DEBUG) Log.v(TAG, "onReady:")
 			if (mRecorder != null) {
 				try {
-					val dir = CaptureUtils.getRecordingRoot(
+					val dir = MediaFileUtils.getRecordingRoot(
 						requireContext(), Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
 					if (dir != null) {
 						mRecorder!!.start(dir, FileUtils.getDateTimeString())
