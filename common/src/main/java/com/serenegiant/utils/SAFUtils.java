@@ -920,9 +920,49 @@ public class SAFUtils {
 	 * @param name
 	 * @return
 	 * @throws FileNotFoundException
+	 * @throws IOException
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static ParcelFileDescriptor getStorageFileFD(
+		@NonNull final Context context,
+		final int treeId, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getFd(context, treeId, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したDocumentFileの示すディレクトリが存在していれば入出力用のファイルディスクリプタを返す
+	 * @param context
+	 * @param parent
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public static ParcelFileDescriptor getStorageFileFD(
+		@NonNull final Context context,
+		@NonNull final DocumentFile parent, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getFd(context, parent, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したUriが存在する時にその下に入力用ファイルを生成して入出力用のファイルディスクリプタを返す
+	 * @param context
+	 * @param treeId
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
 		final int treeId, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
@@ -955,9 +995,10 @@ public class SAFUtils {
 	 * @param mime
 	 * @param name
 	 * @return
+	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public static ParcelFileDescriptor getStorageFileFD(
+	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
 		@NonNull final DocumentFile parent, @Nullable final String dirs,
 		final String mime, final String name) throws IOException {
