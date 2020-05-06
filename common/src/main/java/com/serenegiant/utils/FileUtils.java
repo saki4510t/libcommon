@@ -20,6 +20,7 @@ package com.serenegiant.utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
@@ -30,6 +31,8 @@ import android.content.Context;
 import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -72,7 +75,16 @@ public class FileUtils {
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
 		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 //			result = SAFUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
-			result = SAFUtils.createStorageDir(context, saveTreeId);
+//			result = SAFUtils.createStorageDir(context, saveTreeId);
+			try {
+				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);
+				final String pathString = UriHelper.getPath(context, dir.getUri());
+				if (!TextUtils.isEmpty(pathString)) {
+					result = new File(pathString);
+				}
+			} catch (final IOException e) {
+				Log.w(TAG, e);
+			}
 			if ((result == null) || !result.canWrite()) {
 				Log.w(TAG, "なんでか書き込めん");
 				result = null;
@@ -106,7 +118,16 @@ public class FileUtils {
 //		Log.i(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
 		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
-			result = SAFUtils.createStorageDir(context, saveTreeId);
+//			result = SAFUtils.createStorageDir(context, saveTreeId);
+			try {
+				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);
+				final String pathString = UriHelper.getPath(context, dir.getUri());
+				if (!TextUtils.isEmpty(pathString)) {
+					result = new File(pathString);
+				}
+			} catch (final IOException e) {
+				Log.w(TAG, e);
+			}
 //			Log.i(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
 		final File dir = result != null

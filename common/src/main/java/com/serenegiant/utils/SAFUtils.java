@@ -1028,6 +1028,7 @@ public class SAFUtils {
 	 * @param treeId
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static File createStorageDir(
@@ -1062,6 +1063,7 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int treeId, final String mime, final String fileName) {
 
+		//noinspection deprecation
 		return createStorageFile(context, getStorageUri(context, treeId), mime, fileName);
 	}
 
@@ -1073,6 +1075,7 @@ public class SAFUtils {
 	 * @param fileName
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static File createStorageFile(
@@ -1101,12 +1104,14 @@ public class SAFUtils {
 	 * @param fileName
 	 * @return
 	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static int createStorageFileFD(
 		@NonNull final Context context,
 		final int treeId, final String mime, final String fileName) {
 
 		Log.i(TAG, "createStorageFileFD:" + fileName);
+		//noinspection deprecation
 		return createStorageFileFD(context, getStorageUri(context, treeId), mime, fileName);
 	}
 
@@ -1118,6 +1123,7 @@ public class SAFUtils {
 	 * @param fileName
 	 * @return
 	 */
+	@Deprecated
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	public static int createStorageFileFD(
 		@NonNull final Context context,

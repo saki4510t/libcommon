@@ -237,7 +237,8 @@ public class MediaAVRecorder extends Recorder {
 			final String file_name = (TextUtils.isEmpty(prefix)
 				? FileUtils.getDateTimeString()
 				: prefix + FileUtils.getDateTimeString()) + ext;
-			final int fd = SAFUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
+//			final int fd = SAFUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
+			final int fd = SAFUtils.getFd(context, saveTreeId, null, "*/*", file_name).getFd();
 			setupMuxer(fd);
 		} else {
 			try {
