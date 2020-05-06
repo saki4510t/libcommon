@@ -447,8 +447,7 @@ public class SAFUtils {
 		if (BuildCheck.isLollipop()) {
 			final Uri treeUri = getStorageUri(context, treeId);
 			if (treeUri != null) {
-				DocumentFile tree = DocumentFile.fromTreeUri(context, treeUri);
-				return getDir(tree, dirs);
+				return getDir(DocumentFile.fromTreeUri(context, treeUri), dirs);
 			}
 		}
 		return null;
@@ -500,7 +499,6 @@ public class SAFUtils {
 
 	/**
 	 * 指定したディレクトリ配下に存在するファイルの一覧を取得
-	 * @param context
 	 * @param dir
 	 * @param filter nullなら存在するファイルを全て追加
 	 * @return
@@ -508,9 +506,8 @@ public class SAFUtils {
 	 */
 	@NonNull
 	public static List<DocumentFile> listFiles(
-		@NonNull final Context context,
 		@NonNull final DocumentFile dir,
-		@Nullable final FileFilter filter) throws IOException {
+		@Nullable final FileFilter filter) {
 
 		final List<DocumentFile> result = new ArrayList<DocumentFile>();
 		if (dir.isDirectory()) {
@@ -584,7 +581,45 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int treeId, final String mime, final String name) throws IOException {
 
-		return getStorageFile(context, treeId, null, mime, name);
+		return getFile(context, treeId, null, mime, name);
+	}
+
+	/**
+	 * 指定したUriが存在する時に対応するファイルを参照するためのDocumentFileオブジェクトを生成する
+	 * @param context
+	 * @param treeId
+	 * @param mime
+	 * @param name
+	 * @return
+	 */
+	@Deprecated
+	@Nullable
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public static DocumentFile getStorageFile(
+		@NonNull final Context context,
+		final int treeId,
+		@Nullable final String dirs,
+		@NonNull final String mime,
+		@NonNull final String name) throws IOException {
+
+		return getFile(context, treeId, dirs, mime, name);
+	}
+
+	/**
+	 * 指定したDocumentFileの下にファイルを生成する
+	 * dirsがnullまたは空文字列ならDocumentFile#createFileを呼ぶのと同じ
+	 * @param parent
+	 * @param dirs
+	 * @param mime
+	 * @param name
+	 * @return
+	 */
+	@Deprecated
+	public static DocumentFile getStorageFile(
+		@NonNull final DocumentFile parent, @Nullable final String dirs,
+		final String mime, final String name) throws IOException {
+
+		return getFile(parent, dirs, mime, name);
 	}
 
 	/**
@@ -597,24 +632,17 @@ public class SAFUtils {
 	 */
 	@Nullable
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	public static DocumentFile getStorageFile(
+	public static DocumentFile getFile(
 		@NonNull final Context context,
-		final int treeId, @Nullable final String dirs,
-		final String mime, final String name) throws IOException {
+		final int treeId,
+		@Nullable final String dirs,
+		@NonNull final String mime,
+		@NonNull final String name) throws IOException {
 
 		if (BuildCheck.isLollipop()) {
 			final DocumentFile tree = getDir(context, treeId, dirs);
 			if (tree != null) {
-				final DocumentFile file = tree.findFile(name);
-				if (file != null) {
-					if (file.isFile()) {
-						return file;
-					} else {
-						throw new IOException("directory with same name already exists");
-					}
-				} else {
-					return tree.createFile(mime, name);
-				}
+				return getFile(tree, null, mime, name);
 			}
 		}
 		return null;
@@ -623,17 +651,17 @@ public class SAFUtils {
 	/**
 	 * 指定したDocumentFileの下にファイルを生成する
 	 * dirsがnullまたは空文字列ならDocumentFile#createFileを呼ぶのと同じ
-	 * @param context
 	 * @param parent
 	 * @param dirs
 	 * @param mime
 	 * @param name
 	 * @return
 	 */
-	public static DocumentFile getStorageFile(
-		@NonNull final Context context,
-		@NonNull final DocumentFile parent, @Nullable final String dirs,
-		final String mime, final String name) throws IOException {
+	public static DocumentFile getFile(
+		@NonNull final DocumentFile parent,
+		@Nullable final String dirs,
+		@NonNull final String mime,
+		@NonNull final String name) throws IOException {
 		
 		final DocumentFile tree = getDir(parent, dirs);
 		if (tree != null) {

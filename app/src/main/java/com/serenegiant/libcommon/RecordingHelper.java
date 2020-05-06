@@ -122,7 +122,7 @@ public class RecordingHelper {
 		@Nullable final String mime,
 		@NonNull final String fileNameWithExt) throws IOException {
 
-		DocumentFile result = SAFUtils.getStorageFile(context, root, dirs, mime, fileNameWithExt);
+		DocumentFile result = SAFUtils.getFile(root, dirs, mime, fileNameWithExt);
 		if (result == null) {
 			throw new IOException("has no permission or can't write to storage" +
 				"(storage will be full?) or something files already exist");

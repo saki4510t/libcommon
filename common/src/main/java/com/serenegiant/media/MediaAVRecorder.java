@@ -270,7 +270,7 @@ public class MediaAVRecorder extends Recorder {
 		super(context, callback, config, factory);
 		mSaveTreeId = saveTreeId;
 		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
-			DocumentFile tree = SAFUtils.getStorageFile(context,
+			DocumentFile tree = SAFUtils.getFile(context,
 				saveTreeId, dirs, "*/*", fileName);
 			if (tree != null) {
 				mOutputPath = UriHelper.getPath(context, tree.getUri());
