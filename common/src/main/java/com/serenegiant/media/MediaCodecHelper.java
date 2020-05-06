@@ -33,14 +33,12 @@ import com.serenegiant.system.BuildCheck;
 import java.util.ArrayList;
 import java.util.List;
 
-@SuppressWarnings("deprecation")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaCodecHelper {
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();
 
 	public static final String MIME_VIDEO_AVC = "video/avc";		// h.264
 	public static final String MIME_AUDIO_AAC = "audio/mp4a-latm";	// AAC
-	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
 		= BuildCheck.isLollipop() ? MediaCodec.BUFFER_FLAG_KEY_FRAME : MediaCodec.BUFFER_FLAG_SYNC_FRAME;

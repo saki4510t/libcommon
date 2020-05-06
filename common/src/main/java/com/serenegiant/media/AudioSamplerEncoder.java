@@ -137,6 +137,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 						try {
 							wait(50);
 						} catch (final InterruptedException e) {
+							break;
 						}
 					}
 		    	}

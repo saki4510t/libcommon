@@ -45,7 +45,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AbstractFakeEncoder.class.getSimpleName();
 
-	@SuppressWarnings("deprecation")
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
 		= BuildCheck.isLollipop()

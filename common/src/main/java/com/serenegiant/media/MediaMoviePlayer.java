@@ -41,7 +41,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-@SuppressWarnings("deprecation")
 @SuppressLint("InlinedApi")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaMoviePlayer {
@@ -69,6 +68,7 @@ public class MediaMoviePlayer {
     			if (!mIsRunning)
     				mSync.wait();
 			} catch (final InterruptedException e) {
+				// ignore
 			}
     	}
     }
@@ -181,6 +181,7 @@ public class MediaMoviePlayer {
 	        	try {
 	    			mSync.wait(50);
 	    		} catch (final InterruptedException e) {
+	    			// ignore
 	    		}
     		}
     	}
@@ -265,8 +266,6 @@ public class MediaMoviePlayer {
 	private ByteBuffer[] mVideoInputBuffers;
 	private ByteBuffer[] mVideoOutputBuffers;
 	private long mVideoStartTime;
-	@SuppressWarnings("unused")
-	private long previousVideoPresentationTimeUs = -1;
 	private volatile int mVideoTrackIndex;
 	private boolean mVideoInputDone;
 	private boolean mVideoOutputDone;
@@ -282,8 +281,6 @@ public class MediaMoviePlayer {
 	private ByteBuffer[] mAudioInputBuffers;
 	private ByteBuffer[] mAudioOutputBuffers;
 	private long mAudioStartTime;
-	@SuppressWarnings("unused")
-	private long previousAudioPresentationTimeUs = -1;
 	private volatile int mAudioTrackIndex;
 	private boolean mAudioInputDone;
 	private boolean mAudioOutputDone;
@@ -595,29 +592,29 @@ public class MediaMoviePlayer {
 		int trackindex = -1;
 		mVideoMediaExtractor = new MediaExtractor();
 		try {
-			if (source instanceof String) {
-				mVideoMediaExtractor.setDataSource((String)source);
-			} else if (source instanceof AssetFileDescriptor) {
-				if (BuildCheck.isAndroid7()) {
-					mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
-				} else {
-					mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
-				}
+		if (source instanceof String) {
+			mVideoMediaExtractor.setDataSource((String)source);
+		} else if (source instanceof AssetFileDescriptor) {
+			if (BuildCheck.isAndroid7()) {
+				mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
 			} else {
-				// ここには来ないけど
-				throw new IllegalArgumentException("unknown source type:source=" + source);
+				mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
 			}
-			trackindex = selectTrack(mVideoMediaExtractor, "video/");
-			if (trackindex >= 0) {
-				mVideoMediaExtractor.selectTrack(trackindex);
-		        final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackindex);
-	        	mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
-	        	mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-	        	mDuration = format.getLong(MediaFormat.KEY_DURATION);
+		} else {
+			// ここには来ないけど
+			throw new IllegalArgumentException("unknown source type:source=" + source);
+		}
+		trackindex = selectTrack(mVideoMediaExtractor, "video/");
+		if (trackindex >= 0) {
+			mVideoMediaExtractor.selectTrack(trackindex);
+			final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackindex);
+			mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
+			mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
+			mDuration = format.getLong(MediaFormat.KEY_DURATION);
 
-				if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
-					mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
-			}
+			if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
+				mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
+		}
 		} catch (final IOException e) {
 		}
 		return trackindex;
@@ -632,48 +629,48 @@ public class MediaMoviePlayer {
 		int trackindex = -1;
 		mAudioMediaExtractor = new MediaExtractor();
 		try {
-			if (source instanceof String) {
-				mAudioMediaExtractor.setDataSource((String)source);
-			} else if (source instanceof AssetFileDescriptor) {
-				if (BuildCheck.isAndroid7()) {
-					mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
-				} else {
-					mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
-				}
+		if (source instanceof String) {
+			mAudioMediaExtractor.setDataSource((String)source);
+		} else if (source instanceof AssetFileDescriptor) {
+			if (BuildCheck.isAndroid7()) {
+				mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
 			} else {
-				// ここには来ないけど
-				throw new IllegalArgumentException("unknown source type:source=" + source);
+				mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
 			}
-			trackindex = selectTrack(mAudioMediaExtractor, "audio/");
-			if (trackindex >= 0) {
-				mAudioMediaExtractor.selectTrack(trackindex);
-		        final MediaFormat format = mAudioMediaExtractor.getTrackFormat(trackindex);
-		        mAudioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-		        mAudioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
-		        final int min_buf_size = AudioTrack.getMinBufferSize(mAudioSampleRate,
-		        	(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
-		        	AudioFormat.ENCODING_PCM_16BIT);
-		        final int max_input_size = format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
-		        mAudioInputBufSize =  min_buf_size > 0 ? min_buf_size * 4 : max_input_size;
-		        if (mAudioInputBufSize > max_input_size) mAudioInputBufSize = max_input_size;
-		        final int frameSizeInBytes = mAudioChannels * 2;
-		        mAudioInputBufSize = (mAudioInputBufSize / frameSizeInBytes) * frameSizeInBytes;
-		        if (DEBUG) Log.v(TAG, String.format("getMinBufferSize=%d,max_input_size=%d,mAudioInputBufSize=%d",min_buf_size, max_input_size, mAudioInputBufSize));
-		        //
-		        mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-		        	mAudioSampleRate,
-		        	(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
-		        	AudioFormat.ENCODING_PCM_16BIT,
-		        	mAudioInputBufSize,
-		        	AudioTrack.MODE_STREAM);
-		        try {
-		        	mAudioTrack.play();
-		        } catch (final Exception e) {
-		        	Log.e(TAG, "failed to start audio track playing", e);
-		    		mAudioTrack.release();
-		        	mAudioTrack = null;
-		        }
+		} else {
+			// ここには来ないけど
+			throw new IllegalArgumentException("unknown source type:source=" + source);
+		}
+		trackindex = selectTrack(mAudioMediaExtractor, "audio/");
+		if (trackindex >= 0) {
+			mAudioMediaExtractor.selectTrack(trackindex);
+			final MediaFormat format = mAudioMediaExtractor.getTrackFormat(trackindex);
+			mAudioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+			mAudioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+			final int min_buf_size = AudioTrack.getMinBufferSize(mAudioSampleRate,
+				(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+				AudioFormat.ENCODING_PCM_16BIT);
+			final int max_input_size = format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
+			mAudioInputBufSize =  min_buf_size > 0 ? min_buf_size * 4 : max_input_size;
+			if (mAudioInputBufSize > max_input_size) mAudioInputBufSize = max_input_size;
+			final int frameSizeInBytes = mAudioChannels * 2;
+			mAudioInputBufSize = (mAudioInputBufSize / frameSizeInBytes) * frameSizeInBytes;
+			if (DEBUG) Log.v(TAG, String.format("getMinBufferSize=%d,max_input_size=%d,mAudioInputBufSize=%d",min_buf_size, max_input_size, mAudioInputBufSize));
+			//
+			mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
+				mAudioSampleRate,
+				(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+				AudioFormat.ENCODING_PCM_16BIT,
+				mAudioInputBufSize,
+				AudioTrack.MODE_STREAM);
+			try {
+				mAudioTrack.play();
+			} catch (final Exception e) {
+				Log.e(TAG, "failed to start audio track playing", e);
+				mAudioTrack.release();
+				mAudioTrack = null;
 			}
+		}
 		} catch (final IOException e) {
 		}
 		return trackindex;
@@ -715,7 +712,6 @@ public class MediaMoviePlayer {
         if (mRequestTime > 0) {
         	handleSeek(mRequestTime);
         }
-        previousVideoPresentationTimeUs = previousAudioPresentationTimeUs = -1;
 		mVideoInputDone = mVideoOutputDone = true;
 		Thread videoThread = null, audioThread = null;
 		if (mVideoTrackIndex >= 0) {
@@ -820,6 +816,7 @@ public class MediaMoviePlayer {
 			try {
 				mSync.wait();
 			} catch (final InterruptedException e) {
+				// ignore
 			}
 		}
         if (mVideoInputDone && mVideoOutputDone && mAudioInputDone && mAudioOutputDone) {
@@ -1026,6 +1023,7 @@ public class MediaMoviePlayer {
 					try {
 						sync.wait(t / 1000, (int)((t % 1000) * 1000));
 					} catch (final InterruptedException e) {
+						break;
 					}
 					if ((mState == REQ_STOP) || (mState == REQ_QUIT))
 						break;

@@ -81,6 +81,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		try {
 			result = mPool.poll(20, TimeUnit.MILLISECONDS);
 		} catch (final InterruptedException e) {
+			// ignore
 		}
 		if ((result == null) && (mBufferNum < MAX_POOL_SIZE) ) {
 			result = new MediaData(mBufferSize);
