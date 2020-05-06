@@ -263,8 +263,9 @@ class MainActivity
 	@Override
 	@CallSuper
 	override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-		if (!SAFUtils.handleOnResult(this, requestCode, resultCode, data, object : SAFUtils.handleOnResultDelegater {
-				override fun onResult(requestCode: Int, uri: Uri?, data: Intent?): Boolean {
+		if (!SAFUtils.handleOnResult(this, requestCode, resultCode, data,
+			object : SAFUtils.handleOnResultDelegater {
+				override fun onResult(requestCode: Int, uri: Uri, data: Intent): Boolean {
 					if (DEBUG) Log.v(TAG, "onResult:");
 					SAFUtils.takePersistableUriPermission(this@MainActivity, requestCode, uri)
 					return true

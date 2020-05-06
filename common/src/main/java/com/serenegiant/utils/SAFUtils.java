@@ -51,6 +51,7 @@ import java.util.Locale;
 
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
+ * XXX systemパッケージに移動するかも
  */
 public class SAFUtils {
 	private static final String TAG = SAFUtils.class.getSimpleName();
@@ -64,8 +65,10 @@ public class SAFUtils {
 	 * Storage Access Framework関係の処理を行うためのdelegater
 	 */
 	public interface handleOnResultDelegater {
-		public boolean onResult(final int requestCode, final Uri uri, final Intent data);
-		public void onFailed(final int requestCode, final Intent data);
+		public boolean onResult(final int requestCode,
+			@NonNull final Uri uri, @NonNull final Intent data);
+
+		public void onFailed(final int requestCode, @Nullable final Intent data);
 	}
 	
 	/**
@@ -81,7 +84,8 @@ public class SAFUtils {
 	public static boolean handleOnResult(
 		@NonNull final Context context,
 		final int requestCode, final int resultCode,
-		final Intent data, @NonNull final SAFUtils.handleOnResultDelegater delegater) {
+		@Nullable final Intent data,
+		@NonNull final SAFUtils.handleOnResultDelegater delegater) {
 
 		if (data != null) {
 			if (resultCode == Activity.RESULT_OK) {
