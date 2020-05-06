@@ -21,9 +21,9 @@ package com.serenegiant.libcommon
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Surface
 import android.view.View
 import android.view.View.OnLongClickListener
 import android.view.ViewGroup
@@ -31,7 +31,6 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
-import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.utils.SAFUtils
@@ -165,6 +164,33 @@ abstract class AbstractCameraFragment : BaseFragment() {
 					else ""
 		}
 	}
+
+	protected open fun addSurface(surface: Surface?) {
+		val id = surface?.hashCode() ?: 0
+		if (DEBUG) Log.d(TAG, "addSurface:id=$id")
+		synchronized(mSync) {
+			if (mCameraView != null) {
+				mCameraView!!.addSurface(id, surface!!, true)
+			}
+		}
+		if (DEBUG) Log.v(TAG, "addSurface:finished")
+	}
+
+	/**
+	 * request remove Surface
+	 * @param surface // id usually use Surface#hashCode
+	 */
+	open fun removeSurface(surface: Surface?) {
+		val id = surface?.hashCode() ?: 0
+		if (DEBUG) Log.d(TAG, "removeSurface:id=$id")
+		synchronized(mSync) {
+			if (mCameraView != null) {
+				mCameraView!!.removeSurface(id)
+			}
+		}
+		if (DEBUG) Log.v(TAG, "removeSurface:finished")
+	}
+
 
 	protected abstract fun isRecording(): Boolean
 
