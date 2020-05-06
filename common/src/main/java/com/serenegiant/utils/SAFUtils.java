@@ -55,6 +55,7 @@ import java.util.Locale;
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFUtils {
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = SAFUtils.class.getSimpleName();
 
 	private SAFUtils() {
@@ -1058,7 +1059,8 @@ public class SAFUtils {
 	public static File createStorageFile(
 		@NonNull final Context context,
 		final Uri treeUri, final String mime, final String fileName) {
-		Log.i(TAG, "createStorageFile:" + fileName);
+
+		if (DEBUG) Log.v(TAG, "createStorageFile:" + fileName);
 
 		if (BuildCheck.isLollipop()) {
 			if ((treeUri != null) && !TextUtils.isEmpty(fileName)) {
@@ -1086,7 +1088,7 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int treeId, final String mime, final String fileName) {
 
-		Log.i(TAG, "createStorageFileFD:" + fileName);
+		if (DEBUG) Log.v(TAG, "createStorageFileFD:" + fileName);
 		//noinspection deprecation
 		return createStorageFileFD(context, getStorageUri(context, treeId), mime, fileName);
 	}
@@ -1104,7 +1106,7 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final Uri treeUri, final String mime, final String fileName) {
 
-		Log.i(TAG, "createStorageFileFD:" + fileName);
+		if (DEBUG) Log.v(TAG, "createStorageFileFD:" + fileName);
 		if (BuildCheck.isLollipop()) {
 			if ((treeUri != null) && !TextUtils.isEmpty(fileName)) {
 				final DocumentFile saveTree = DocumentFile.fromTreeUri(context, treeUri);
