@@ -56,8 +56,10 @@ public class FileUtils {
 	/**
 	 * キャプチャ用のFileインスタンスを生成
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
+	 * @param context
 	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
-	 * @param ext .mp4 .png または .jpeg
+	 * @param ext 拡張子, .mp4 .png または .jpeg/.jpeg, .webp等
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return 書き込み出来なければnullを返す
 	 */
 	@Nullable
@@ -71,10 +73,10 @@ public class FileUtils {
 	 * キャプチャ用のFileインスタンスを生成
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
 	 * @param context
-	 * @param type
+	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
 	 * @param prefix
-	 * @param ext
-	 * @param saveTreeId
+	 * @param ext 拡張子, .mp4 .png または .jpeg/.jpeg, .webp等
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
@@ -127,7 +129,7 @@ public class FileUtils {
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
 	 * @param context
 	 * @param type
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
 	@SuppressWarnings("ResultOfMethodCallIgnored")
@@ -138,7 +140,7 @@ public class FileUtils {
 
 //		Log.i(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
-		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
+		if ((saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 //			result = SAFUtils.createStorageDir(context, saveTreeId);
 			try {
 				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);
@@ -183,30 +185,36 @@ public class FileUtils {
     public static float FREE_SIZE_MINUTE = 40 * 1024 * 1024;	// 1分当たりの動画容量(5Mbpsで38MBぐらいなので)
 	public static long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
 	
-    /**
-     * プライマリー外部ストレージの空き容量のチェック
-     * プライマリー外部ストレージの空き容量がFREE_RATIO(5%)以上かつFREE_SIZE(20MB)以上ならtrueを返す
-     * @return 使用可能であればtrue
-     */
+	/**
+	 * プライマリー外部ストレージの空き容量のチェック
+  * プライマリー外部ストレージの空き容量がFREE_RATIO(5%)以上かつFREE_SIZE(20MB)以上ならtrueを返す
+	 * @param context
+	 * @param max_duration
+	 * @param startTime
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
+	 * @return 使用可能であればtrue
+	 */
     public static final boolean checkFreeSpace(final Context context,
-    	final long max_duration, final long start_time, final int save_tree_id) {
+    	final long max_duration, final long startTime, final int saveTreeId) {
 //		Log.i(TAG, "checkFreeSpace:save_tree_id=" + save_tree_id + ", context=" + context);
     	if (context == null) return false;
     	return checkFreeSpace(context, FREE_RATIO,
     		max_duration > 0	// 最大録画時間が設定されている時
-        	? (max_duration - (System.currentTimeMillis() - start_time)) / 60000.f
+        	? (max_duration - (System.currentTimeMillis() - startTime)) / 60000.f
         		* FREE_SIZE_MINUTE + FREE_SIZE_OFFSET
-        	: FREE_SIZE, save_tree_id);
+        	: FREE_SIZE, saveTreeId);
     }
 
-    /**
-     * プライマリー外部ストレージの空き容量のチェック
-     * @param ratio 空き容量の割合(0-1]
-     * @param minFree 最小空き容量[バイト]
-     * @return 使用可能であればtrue
-     */
+	/**
+	 * プライマリー外部ストレージの空き容量のチェック
+	 * @param context
+	 * @param ratio 空き容量の割合(0-1]
+	 * @param minFree 最小空き容量[バイト]
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
+	 * @return 使用可能であればtrue
+	 */
     public static final boolean checkFreeSpace(final Context context,
-    	final float ratio, final float minFree, final int save_tree_id) {
+    	final float ratio, final float minFree, final int saveTreeId) {
 
 //    	if (DEBUG) Log.v(TAG, String.format("checkFreeSpace:ratio=%f,min=%f", ratio, minFree));
 //		Log.i(TAG, "checkFreeSpace:context=" + context + ", save_tree_id=" + save_tree_id);
@@ -219,7 +227,7 @@ public class FileUtils {
 //				!Environment.MEDIA_MOUNTED_READ_ONLY.equals(state)) {
             	// 外部保存領域が書き込み可能な場合
 				// 外部ストレージへのパーミッションがないとnullが返ってくる
-				final File dir = getCaptureDir(context, Environment.DIRECTORY_DCIM, save_tree_id);
+				final File dir = getCaptureDir(context, Environment.DIRECTORY_DCIM, saveTreeId);
 //				Log.i(TAG, "checkFreeSpace:dir=" + dir);
 				if (dir != null) {
 					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
@@ -241,15 +249,15 @@ public class FileUtils {
 	 * 使用可能な空き容量を取得
 	 * @param context
 	 * @param type Environment.DIRECTORY_DCIM等
-	 * @param save_tree_id
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
 	public static final long getAvailableFreeSpace(final Context context,
-		final String type, final int save_tree_id) {
+		final String type, final int saveTreeId) {
 
 		long result = 0;
 		if (context != null) {
-			final File dir = getCaptureDir(context, type, save_tree_id);
+			final File dir = getCaptureDir(context, type, saveTreeId);
 			if (dir != null) {
 				result = dir.canWrite() ? dir.getUsableSpace() : 0;
 			}
@@ -261,14 +269,14 @@ public class FileUtils {
 	 * 使用可能な空き容量の割合を取得
 	 * @param context
 	 * @param type Environment.DIRECTORY_DCIM等
-	 * @param save_tree_id
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
 	public static final float getFreeRatio(final Context context,
-		final String type, final int save_tree_id) {
+		final String type, final int saveTreeId) {
 
 		if (context != null) {
-			final File dir = getCaptureDir(context, type, save_tree_id);
+			final File dir = getCaptureDir(context, type, saveTreeId);
 			if (dir != null) {
 				final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
 				if (dir.getTotalSpace() > 0) {
