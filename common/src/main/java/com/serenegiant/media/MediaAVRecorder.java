@@ -40,7 +40,7 @@ public class MediaAVRecorder extends Recorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaAVRecorder.class.getSimpleName();
 
-	protected final int mSaveTreeId;	// SDカードへの出力を試みるかどうか
+	protected final int mSaveTreeId;	// 0以外: SFAを使った出力を行うかどうか
 
 	protected String mOutputPath;
 	protected DocumentFile mOutputFile;
@@ -51,7 +51,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param context
 	 * @param callback
 	 * @param ext 出力ファイルの拡張子
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @throws IOException
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
@@ -66,7 +66,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param context
 	 * @param callback
 	 * @param ext 出力ファイルの拡張子
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param factory
 	 * @throws IOException
 	 */
@@ -84,7 +84,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param callback
 	 * @param prefix
 	 * @param _ext
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @throws IOException
 	 */
 	public MediaAVRecorder(@NonNull final Context context,
@@ -101,7 +101,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param callback
 	 * @param prefix
 	 * @param _ext
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param factory
 	 * @throws IOException
 	 */
@@ -117,7 +117,7 @@ public class MediaAVRecorder extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
 	 * @param fileName
 	 * @throws IOException
@@ -134,7 +134,7 @@ public class MediaAVRecorder extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
 	 * @param fileName
 	 * @param factory
@@ -215,7 +215,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param callback
 	 * @param prefix
 	 * @param _ext
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param factory
 	 * @throws IOException
 	 */
@@ -231,7 +231,7 @@ public class MediaAVRecorder extends Recorder {
 		if (TextUtils.isEmpty(ext)) {
 			ext = ".mp4";
 		}
-		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
+		if ((saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 			mOutputPath = FileUtils.getCaptureFile(context,
 				Environment.DIRECTORY_MOVIES, prefix, ext, saveTreeId).toString();
 			final String file_name = (TextUtils.isEmpty(prefix)
@@ -256,7 +256,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param context
 	 * @param callback
 	 * @param config
-	 * @param saveTreeId
+	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param dirs savedTreeIdが示すディレクトリからの相対ディレクトリパス, nullならsavedTreeIdが示すディレクトリ
 	 * @param fileName
 	 * @param factory
