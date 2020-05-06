@@ -1,17 +1,22 @@
 package com.serenegiant.system;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.os.StatFs;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.utils.FileUtils;
+import com.serenegiant.utils.UriHelper;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 
 public class StorageUtils {
 	private StorageUtils() {
@@ -88,5 +93,46 @@ public class StorageUtils {
 			}
 		}
 	    return null;
+	/**
+	 * 全容量と空き容量を返す
+	 * @param context
+	 * @param dir
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressLint({"NewApi", "UsableSpace"})
+	@NonNull
+	public static StorageInfo getStorageInfo(
+		@NonNull final Context context,
+		@NonNull final DocumentFile dir) throws IOException {
+
+		try {
+			final String path = UriHelper.getPath(context, dir.getUri());
+			if (path != null) {
+				// FIXME もしプライマリーストレージの場合はアクセス権無くても容量取得できるかも
+				// FIXME StorageManagerを使うようにする？
+				final File file = new File(path);
+				if (file.isDirectory() && file.canRead()) {
+					final long total = file.getTotalSpace();
+					long free = file.getFreeSpace();
+					if (free < file.getUsableSpace()) {
+						free = file.getUsableSpace();
+					}
+					return new StorageInfo(total, free);
+				}
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+		if (BuildCheck.isJellyBeanMR2()) {
+			try {
+				final String path = UriHelper.getPath(context, dir.getUri());
+				final StatFs fs = new StatFs(path);
+				return new StorageInfo(fs.getTotalBytes(), fs.getAvailableBytes());
+			} catch (final Exception e) {
+				// ignore
+			}
+		}
+		throw new IOException();
 	}
 }
