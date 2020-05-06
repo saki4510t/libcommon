@@ -68,31 +68,33 @@ public class StorageUtils {
 
 	/**
 	 * ストレージの情報を取得
-	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する?
 	 * @param context
 	 * @param type
 	 * @param saveTreeId
-	 * @return アクセスできなければnull
+	 * @return
+	 * @throws IOException
 	 */
-	@Nullable
-	public static StorageInfo getStorageInfo(final Context context,
-											 @NonNull final String type, final int saveTreeId) {
+	@SuppressLint({"UsableSpace"})
+	@NonNull
+	public static StorageInfo getStorageInfo(
+		@NonNull final Context context,
+		@NonNull final String type, final int saveTreeId) throws IOException {
 
-		if (context != null) {
-			try {
-				// 外部保存領域が書き込み可能な場合
-				// 外部ストレージへのパーミッションがないとnullが返ってくる
-				final File dir = FileUtils.getCaptureDir(context, type, saveTreeId);
+		try {
+			// 外部保存領域が書き込み可能な場合
+			// 外部ストレージへのパーミッションがないとnullが返ってくる
+			final File dir = FileUtils.getCaptureDir(context, type, saveTreeId);
 //					Log.i(TAG, "checkFreeSpace:dir=" + dir);
-				if (dir != null) {
-					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
-					return new StorageInfo(dir.getTotalSpace(), (long)freeSpace);
-				}
-			} catch (final Exception e) {
-				Log.w("getStorageInfo:", e);
+			if (dir != null) {
+				final long freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0L;
+				return new StorageInfo(dir.getTotalSpace(), freeSpace);
 			}
+		} catch (final Exception e) {
+			Log.w("getStorageInfo:", e);
 		}
-	    return null;
+		throw new IOException();
+	}
+
 	/**
 	 * 全容量と空き容量を返す
 	 * @param context

@@ -25,7 +25,9 @@ import android.content.Context;
 import android.os.Environment;
 import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
+import android.util.Log;
 
+import com.serenegiant.system.StorageUtils;
 import com.serenegiant.utils.FileUtils;
 import com.serenegiant.utils.SAFUtils;
 import com.serenegiant.system.StorageInfo;
@@ -369,11 +371,16 @@ public class MediaAVRecorder extends Recorder {
 	@Override
 	protected boolean check() {
 		final Context context = requireContext();
-		final StorageInfo info = mOutputFile != null
-			? SAFUtils.getStorageInfo(context, mOutputFile) : null;
-		if ((info != null) && (info.totalBytes != 0)) {
-			return ((info.freeBytes/ (float)info.totalBytes) < FileUtils.FREE_RATIO)
-				|| (info.freeBytes < FileUtils.FREE_SIZE);
+		final StorageInfo info;
+		try {
+			info = mOutputFile != null
+				? StorageUtils.getStorageInfo(context, mOutputFile) : null;
+			if ((info != null) && (info.totalBytes != 0)) {
+				return ((info.freeBytes/ (float)info.totalBytes) < FileUtils.FREE_RATIO)
+					|| (info.freeBytes < FileUtils.FREE_SIZE);
+			}
+		} catch (final IOException e) {
+			Log.w(TAG, e);
 		}
 		return (context == null)
 			|| ((mOutputFile == null)
