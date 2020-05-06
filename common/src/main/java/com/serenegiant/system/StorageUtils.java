@@ -1,10 +1,16 @@
 package com.serenegiant.system;
 
+import android.content.Context;
 import android.text.TextUtils;
+import android.util.Log;
+
+import com.serenegiant.utils.FileUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.InputStreamReader;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class StorageUtils {
@@ -54,4 +60,33 @@ public class StorageUtils {
 //		Log.i(TAG, "Path of internal memory: " + internalpath);
     	return externalpath;
     }
+
+	/**
+	 * ストレージの情報を取得
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する?
+	 * @param context
+	 * @param type
+	 * @param saveTreeId
+	 * @return アクセスできなければnull
+	 */
+	@Nullable
+	public static StorageInfo getStorageInfo(final Context context,
+											 @NonNull final String type, final int saveTreeId) {
+
+		if (context != null) {
+			try {
+				// 外部保存領域が書き込み可能な場合
+				// 外部ストレージへのパーミッションがないとnullが返ってくる
+				final File dir = FileUtils.getCaptureDir(context, type, saveTreeId);
+//					Log.i(TAG, "checkFreeSpace:dir=" + dir);
+				if (dir != null) {
+					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
+					return new StorageInfo(dir.getTotalSpace(), (long)freeSpace);
+				}
+			} catch (final Exception e) {
+				Log.w("getStorageInfo:", e);
+			}
+		}
+	    return null;
+	}
 }

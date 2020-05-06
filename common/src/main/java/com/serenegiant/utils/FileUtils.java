@@ -18,10 +18,8 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Locale;
@@ -35,8 +33,6 @@ import androidx.documentfile.provider.DocumentFile;
 
 import android.text.TextUtils;
 import android.util.Log;
-
-import com.serenegiant.system.StorageInfo;
 
 public class FileUtils {
 	private static final String TAG = FileUtils.class.getSimpleName();
@@ -57,13 +53,13 @@ public class FileUtils {
 			? "Serenegiant" : DIR_NAME;
 	}
 	
-    /**
+	/**
 	 * キャプチャ用のFileインスタンスを生成
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
-     * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
-     * @param ext .mp4 .png または .jpeg
-     * @return 書き込み出来なければnullを返す
-     */
+	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
+	 * @param ext .mp4 .png または .jpeg
+	 * @return 書き込み出来なければnullを返す
+	 */
 	@Nullable
     public static final File getCaptureFile(@NonNull final Context context,
     	final String type, final String ext, final int saveTreeId) {
@@ -186,34 +182,6 @@ public class FileUtils {
     public static float FREE_SIZE = 300 * 1024 * 1024;		// 空き領域が300MB以上ならOK
     public static float FREE_SIZE_MINUTE = 40 * 1024 * 1024;	// 1分当たりの動画容量(5Mbpsで38MBぐらいなので)
 	public static long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)
-	
-	/**
-	 * ストレージの情報を取得
-	 * @param context
-	 * @param type
-	 * @param saveTreeId
-	 * @return アクセスできなければnull
-	 */
-	@Nullable
-	public static StorageInfo getStorageInfo(final Context context,
-		@NonNull final String type, final int saveTreeId) {
-	    
-		if (context != null) {
-			try {
-				// 外部保存領域が書き込み可能な場合
-				// 外部ストレージへのパーミッションがないとnullが返ってくる
-				final File dir = getCaptureDir(context, type, saveTreeId);
-//					Log.i(TAG, "checkFreeSpace:dir=" + dir);
-				if (dir != null) {
-					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
-					return new StorageInfo(dir.getTotalSpace(), (long)freeSpace);
-				}
-			} catch (final Exception e) {
-				Log.w("getStorageInfo:", e);
-			}
-		}
-	    return null;
-	}
 	
     /**
      * プライマリー外部ストレージの空き容量のチェック
