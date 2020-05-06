@@ -28,12 +28,13 @@ object RecordingHelper {
 	@Synchronized
 	fun getSAFRecordingRoot(
 		context: Context): DocumentFile? {
+
 		var root: DocumentFile? = null
 		val pref = context.getSharedPreferences(PREF_NAME, 0)
 		if (SAFUtils.hasPermission(context, REQUEST_ACCESS_SD)) {
 			try {
 				root = SAFUtils.getDir(context, REQUEST_ACCESS_SD, FileUtils.DIR_NAME)
-				if (root == null || !root.exists() || !root.canWrite()) {
+				if (!root.exists() || !root.canWrite()) {
 					Log.d(TAG, "path will be wrong, will already be removed,"
 						+ root?.uri)
 					root = null
@@ -47,7 +48,7 @@ object RecordingHelper {
 			}
 		}
 		if (root == null) {
-			if (DEBUG) Log.d(TAG, "getRecordingRoot:保存先を取得できなかったので念のためにセカンダリーストレージアクセスのパーミッションも落としておく")
+			if (DEBUG) Log.d(TAG, "getSAFRecordingRoot:保存先を取得できなかったので念のためにセカンダリーストレージアクセスのパーミッションも落としておく")
 			SAFUtils.releaseStorageAccessPermission(context, REQUEST_ACCESS_SD)
 		}
 		return root
