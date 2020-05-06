@@ -21,6 +21,7 @@ import androidx.fragment.app.FragmentActivity;
  * Storage Access Framework/DocumentFile関係のヘルパークラス
  * KITKAT以降で個別のファイル毎にパーミッション要求する場合をSAFUtilsより分離
  */
+@TargetApi(Build.VERSION_CODES.KITKAT)
 public class SAFSingleFileUtils {
 
 	private SAFSingleFileUtils() {
@@ -34,7 +35,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestOpenDocument(
 		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
@@ -51,7 +51,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestOpenDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
@@ -69,7 +68,6 @@ public class SAFSingleFileUtils {
 	 * @param requestCode
 	 */
 	@Deprecated
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestOpenDocument(@NonNull final android.app.Fragment fragment,
 		final String mime, final int requestCode) {
 
@@ -85,7 +83,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestOpenDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
@@ -101,7 +98,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private static Intent prepareOpenDocumentIntent(@NonNull final String mime) {
 		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
 		intent.setType(mime);
@@ -115,7 +111,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
@@ -133,7 +128,6 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final Activity activity,
 		final String mime, final String defaultName, final int requestCode) {
@@ -150,7 +144,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
@@ -168,7 +161,6 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final String defaultName, final int requestCode) {
@@ -185,7 +177,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final android.app.Fragment fragment,
 		final String mime, final int requestCode) {
@@ -203,7 +194,6 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final android.app.Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
@@ -220,7 +210,6 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
@@ -238,7 +227,6 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void requestCreateDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
@@ -255,7 +243,6 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	private static Intent prepareCreateDocument(
 		final String mime, final String defaultName) {
 
@@ -274,7 +261,6 @@ public class SAFSingleFileUtils {
 	 * @param uri
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static boolean requestDeleteDocument(
 		@NonNull final Context context, final Uri uri) {
 
