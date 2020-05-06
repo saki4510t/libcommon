@@ -1150,12 +1150,14 @@ public class SAFUtils {
 	/**
 	 * 指定したDocumentFileが指し示すフォルダの下に指定した相対パスのディレクトリ階層を生成する
 	 * フォルダが存在していない時に書き込み可能でなければIOExceptionを投げる
+	 * deprecated #getDirを使うこと
 	 * @param context
 	 * @param baseDoc
 	 * @param dirs
 	 * @return
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static DocumentFile getDocumentFile(
 		@NonNull Context context,
 		@NonNull final DocumentFile baseDoc, @Nullable final String dirs)
@@ -1196,6 +1198,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws IOException
 	 */
+	@Deprecated
 	public static DocumentFile getDocumentFile(
 		@NonNull Context context,
 		@NonNull final DocumentFile baseDoc, @Nullable final Uri uri)
@@ -1208,7 +1211,7 @@ public class SAFUtils {
 				&& !TextUtils.isEmpty(uriString)
 				&& uriString.startsWith(basePathString)) {
 				
-				return getDocumentFile(context, baseDoc,
+				return getDir(baseDoc,
 					uriString.substring(basePathString.length()));
 			}
 		}
