@@ -41,6 +41,11 @@ public class GLContext implements EGLConst {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLContext.class.getSimpleName();
 
+	/**
+	 * initializeで最初の1回だけlogVersionInfoを呼ぶようにするためのフラグ
+	 */
+	private static boolean isOutputVersionInfo = false;
+
 	private final Object mSync = new Object();
 	private final int mMaxClientVersion;
 	@Nullable
@@ -176,7 +181,10 @@ public class GLContext implements EGLConst {
 		} else {
 			throw new RuntimeException("failed to create EglCore");
 		}
-		logVersionInfo();
+		if (!isOutputVersionInfo) {
+			isOutputVersionInfo = true;
+			logVersionInfo();
+		}
 	}
 
 	/**
