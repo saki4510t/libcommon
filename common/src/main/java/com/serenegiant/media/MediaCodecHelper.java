@@ -373,24 +373,24 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 //================================================================================
 	@Deprecated
 	public static final int getCodecCount() {
-		return MediaInfo.getCodecCount();
+		return MediaCodecUtils.getCodecCount();
 	}
 
 	@Deprecated
 	public static final List<MediaCodecInfo> getCodecs() {
-		return MediaInfo.getCodecs();
+		return MediaCodecUtils.getCodecs();
 	}
 
 	@Deprecated
 	public static final MediaCodecInfo getCodecInfoAt(final int ix) {
-		return MediaInfo.getCodecInfoAt(ix);
+		return MediaCodecUtils.getCodecInfoAt(ix);
 	}
 
 	@Deprecated
 	public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(
 		final MediaCodecInfo codecInfo, final String mimeType) {
 
-		return MediaInfo.getCodecCapabilities(codecInfo, mimeType);
+		return MediaCodecUtils.getCodecCapabilities(codecInfo, mimeType);
 	}
 
 	/**

@@ -42,10 +42,10 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
 @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
-public final class MediaInfo {
-	private static final String TAG = MediaInfo.class.getSimpleName();
+public final class MediaCodecUtils {
+	private static final String TAG = MediaCodecUtils.class.getSimpleName();
 
-	private MediaInfo() {
+	private MediaCodecUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
