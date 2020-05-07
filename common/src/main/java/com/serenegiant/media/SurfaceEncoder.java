@@ -33,7 +33,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 	protected Surface mInputSurface;
 
     public SurfaceEncoder(final IRecorder recorder, final EncoderListener listener) {
-		super(MediaCodecHelper.MIME_VIDEO_AVC, recorder, listener);
+		super(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener);
     }
 
     /**
@@ -56,7 +56,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         mIsCapturing = true;
         mIsEOS = false;
 
-        final MediaCodecInfo codecInfo = MediaCodecHelper.selectVideoEncoder(MediaCodecHelper.MIME_VIDEO_AVC);
+        final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
         if (codecInfo == null) {
 //			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_AVC);
             return true;
@@ -69,7 +69,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         	= ((mWidth >= 1000) || (mHeight >= 1000));
 //			&& checkProfileLevel(VIDEO_MIME_TYPE, codecInfo);	// SC-06DでCodecInfo#getCapabilitiesForTypeが返ってこない/凄い時間がかかるのでコメントアウト
 
-        final MediaFormat format = MediaFormat.createVideoFormat(MediaCodecHelper.MIME_VIDEO_AVC, mWidth, mHeight);
+        final MediaFormat format = MediaFormat.createVideoFormat(MediaCodecUtils.MIME_VIDEO_AVC, mWidth, mHeight);
 
         // MediaCodecに適用するパラメータを設定する。誤った設定をするとMediaCodec#configureが
         // 復帰不可能な例外を生成する
@@ -84,7 +84,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
         // エンコーダーへの入力に使うSurfaceを取得する
-        mMediaCodec = MediaCodec.createEncoderByType(MediaCodecHelper.MIME_VIDEO_AVC);
+        mMediaCodec = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC);
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mInputSurface = mMediaCodec.createInputSurface();	// API >= 18
         mMediaCodec.start();

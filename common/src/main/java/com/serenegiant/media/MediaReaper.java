@@ -503,9 +503,9 @@ LOOP:	for ( ; mIsRunning ; ) {
 		encodedData.position(0);
 		encodedData.get(tmp, info.offset, info.size);
 		encodedData.position(0);
-		final int ix0 = MediaCodecHelper.findStartMarker(tmp, 0);
-		final int ix1 = MediaCodecHelper.findStartMarker(tmp, ix0 + 2);
-		final int ix2 = MediaCodecHelper.findStartMarker(tmp, ix1 + 2);
+		final int ix0 = MediaCodecUtils.findStartMarker(tmp, 0);
+		final int ix1 = MediaCodecUtils.findStartMarker(tmp, ix0 + 2);
+		final int ix2 = MediaCodecUtils.findStartMarker(tmp, ix1 + 2);
 		return createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
 	}
 

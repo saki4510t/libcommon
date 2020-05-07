@@ -34,11 +34,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FIXME MediaInfoへ集約するので今後はMediaInfoを使うこと
+ * XXX MediaCodecUtilsへ集約したので今後はMediaCodecUtilsを使うこと
  */
 @Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaCodecHelper {
+	@SuppressWarnings("deprecation")
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();
 
 	@Deprecated
@@ -62,6 +63,7 @@ public class MediaCodecHelper {
 	@Deprecated
 	@Nullable
 	public static MediaCodecInfo selectVideoCodec(final String mimeType) {
+		//noinspection deprecation
 		return selectVideoEncoder(mimeType);
 	}
 
@@ -74,8 +76,10 @@ public class MediaCodecHelper {
 	@Nullable
 	public static MediaCodecInfo selectVideoEncoder(final String mimeType) {
 		// コーデックの一覧を取得
+		//noinspection deprecation
 		final int numCodecs = getCodecCount();
 		for (int i = 0; i < numCodecs; i++) {
+			//noinspection deprecation
 			final MediaCodecInfo codecInfo = getCodecInfoAt(i);
 
 			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
@@ -110,6 +114,7 @@ public class MediaCodecHelper {
 			for (int j = 0; j < n; j++) {
 				if (types[j].equalsIgnoreCase(mimeType)) {
 //                	if (DEBUG) Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME=" + types[j]);
+					//noinspection deprecation
 					format = selectColorFormat(codecInfo, mimeType);
 					if (format > 0) {
 						return codecInfo;
@@ -130,8 +135,10 @@ public class MediaCodecHelper {
 	public static List<MediaCodecInfo> getVideoEncoderInfos(final String mimeType) {
 		final List<MediaCodecInfo> result = new ArrayList<>();
 		// コーデックの一覧を取得
+		//noinspection deprecation
 		final int numCodecs = getCodecCount();
 		for (int i = 0; i < numCodecs; i++) {
+			//noinspection deprecation
 			final MediaCodecInfo codecInfo = getCodecInfoAt(i);
 
 			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
@@ -165,6 +172,7 @@ public class MediaCodecHelper {
 			for (int j = 0; j < n; j++) {
 				if (types[j].equalsIgnoreCase(mimeType)) {
 //                	if (DEBUG) Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME=" + types[j]);
+					//noinspection deprecation
 					format = selectColorFormat(codecInfo, mimeType);
 					if (format > 0) {
 						result.add(codecInfo);
@@ -181,6 +189,7 @@ public class MediaCodecHelper {
 	@Deprecated
 	public static int[] recognizedFormats;
 	static {
+		//noinspection deprecation
 		recognizedFormats = new int[] {
 			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
 			MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
@@ -195,8 +204,10 @@ public class MediaCodecHelper {
 	 */
 	@Deprecated
     public static final boolean isRecognizedVideoFormat(final int colorFormat) {
+		//noinspection deprecation
     	final int n = recognizedFormats != null ? recognizedFormats.length : 0;
     	for (int i = 0; i < n; i++) {
+			//noinspection deprecation
     		if (recognizedFormats[i] == colorFormat) {
     			return true;
     		}
@@ -212,12 +223,14 @@ public class MediaCodecHelper {
 	@Deprecated
 	public static final int selectColorFormat(final MediaCodecInfo codecInfo, final String mimeType) {
 		int result = 0;
+		//noinspection deprecation
 		final MediaCodecInfo.CodecCapabilities capabilities = getCodecCapabilities(codecInfo, mimeType);
 		final int[] colorFormats = capabilities.colorFormats;
 		final int n = colorFormats.length;
 		int colorFormat;
 		for (int i = 0; i < n; i++) {
 			colorFormat = colorFormats[i];
+			//noinspection deprecation
 			if (isRecognizedVideoFormat(colorFormat)) {
 				result = colorFormat;
 				break;	// if (!DEBUG) break;
@@ -231,6 +244,7 @@ public class MediaCodecHelper {
 	 */
 	@Deprecated
 	public static final void dumpVideoCodecEncoders() {
+		//noinspection deprecation
 		dumpEncoders();
 	}
 
@@ -240,8 +254,10 @@ public class MediaCodecHelper {
 	@Deprecated
 	public static final void dumpEncoders() {
     	// コーデックの一覧を取得
+		//noinspection deprecation
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
+			//noinspection deprecation
         	final MediaCodecInfo codecInfo = getCodecInfoAt(i);	// API >= 16
 
             if (!codecInfo.isEncoder()) {	// エンコーダーでない(デコーダー)はとばす
@@ -252,6 +268,7 @@ public class MediaCodecHelper {
             for (int j = 0; j < types.length; j++) {
             	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
             	// カラーフォーマットを出力する
+				//noinspection deprecation
             	selectColorFormat(codecInfo, types[j]);
             }
         }
@@ -263,8 +280,10 @@ public class MediaCodecHelper {
 	@Deprecated
 	public static final void dumpDecoders() {
     	// コーデックの一覧を取得
+		//noinspection deprecation
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
+			//noinspection deprecation
         	final MediaCodecInfo codecInfo = getCodecInfoAt(i);	// API >= 16
 
             if (codecInfo.isEncoder()) {	// エンコーダーはとばす
@@ -275,6 +294,7 @@ public class MediaCodecHelper {
             for (int j = 0; j < types.length; j++) {
             	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
             	// カラーフォーマットを出力する
+				//noinspection deprecation
             	selectColorFormat(codecInfo, types[j]);
             }
         }
@@ -309,6 +329,7 @@ public class MediaCodecHelper {
 	@Deprecated
 	@Nullable
 	public static final MediaCodecInfo selectAudioCodec(final String mimeType) {
+		//noinspection deprecation
 		return selectAudioEncoder(mimeType);
 	}
 	
@@ -325,9 +346,11 @@ public class MediaCodecHelper {
 
  		MediaCodecInfo result = null;
  		// コーデックの一覧を取得
+		//noinspection deprecation
 		final int numCodecs = getCodecCount();
 LOOP:	for (int i = 0; i < numCodecs; i++) {
-     	final MediaCodecInfo codecInfo = getCodecInfoAt(i);
+			//noinspection deprecation
+	     	final MediaCodecInfo codecInfo = getCodecInfoAt(i);
 			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
 				continue;
 			}
@@ -354,8 +377,10 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		final List<MediaCodecInfo> result = new ArrayList<>();
 		
 		// コーデックの一覧を取得
+		//noinspection deprecation
 		final int numCodecs = getCodecCount();
 LOOP:	for (int i = 0; i < numCodecs; i++) {
+			//noinspection deprecation
 			final MediaCodecInfo codecInfo = getCodecInfoAt(i);
 			if (!codecInfo.isEncoder()) {	// エンコーダーでない(=デコーダー)はスキップする
 				continue;
@@ -405,6 +430,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 
 		if (info != null) {
 			if (mimeType.equalsIgnoreCase("video/avc")) {
+				//noinspection deprecation
 				final MediaCodecInfo.CodecCapabilities caps = getCodecCapabilities(info, mimeType);
 				final MediaCodecInfo.CodecProfileLevel[] profileLevel = caps.profileLevels;
 				for (int j = 0; j < profileLevel.length; j++) {
@@ -592,6 +618,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 */
 	@Deprecated
 	public static final int findStartMarker(@NonNull final byte[] array, final int offset) {
+		//noinspection deprecation
 		return BufferHelper.byteComp(array, offset, START_MARKER, START_MARKER.length);
 	}
 }

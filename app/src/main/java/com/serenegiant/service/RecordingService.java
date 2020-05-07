@@ -46,7 +46,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 
-import static com.serenegiant.media.MediaCodecHelper.*;
+import static com.serenegiant.media.MediaCodecUtils.*;
 
 /**
  * MP4として録音録画するためのService実装
