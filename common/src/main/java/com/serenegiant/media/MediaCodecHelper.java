@@ -33,6 +33,9 @@ import com.serenegiant.system.BuildCheck;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * MediaInfoへ集約する
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaCodecHelper {
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();

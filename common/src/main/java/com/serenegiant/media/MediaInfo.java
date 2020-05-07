@@ -39,6 +39,12 @@ public final class MediaInfo {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+//--------------------------------------------------------------------------------
+	/**
+	 * 映像＆音声コーデックの情報をJSONObjectとして取得する
+	 * @return
+	 * @throws JSONException
+	 */
 	public static JSONObject get() throws JSONException {
 		final JSONObject result = new JSONObject();
 		try {
@@ -54,6 +60,11 @@ public final class MediaInfo {
 		return result;
 	}
 
+	/**
+	 * 映像コーデックの情報をJSONObjectとして取得する
+	 * @return
+	 * @throws JSONException
+	 */
 	private static final JSONObject getVideo() throws JSONException{
 		final JSONObject result = new JSONObject();
     	// コーデックの一覧を取得
@@ -110,6 +121,11 @@ public final class MediaInfo {
 		return result;
 	}
 
+	/**
+	 * 音声コーデックの情報をJSONObjectとして取得する
+	 * @return
+	 * @throws JSONException
+	 */
 	private static final JSONObject getAudio() throws JSONException {
 		final JSONObject result = new JSONObject();
     	// コーデックの一覧を取得
@@ -246,6 +262,12 @@ public final class MediaInfo {
     	}
     }
 
+	/**
+	 * プロファイルレベルを文字列化する
+	 * @param mimeType
+	 * @param profileLevel
+	 * @return
+	 */
     public static String getProfileLevelString(final String mimeType, final MediaCodecInfo.CodecProfileLevel profileLevel) {
     	String result;
     	if (!TextUtils.isEmpty(mimeType)) {
@@ -467,9 +489,13 @@ public final class MediaInfo {
     	return result;
     }
 
+//--------------------------------------------------------------------------------
     // 静的にキャッシュするようにした
     private static final List<MediaCodecInfo> sCodecList = new ArrayList<MediaCodecInfo>();
 
+	/**
+	 * コーデックの情報を更新する
+	 */
     @SuppressWarnings("deprecation")
 	private static final void updateCodecs() {
     	if (sCodecList.size() == 0) {
@@ -481,25 +507,46 @@ public final class MediaInfo {
     	}
     }
 
+	/**
+	 * コーデックの数を取得する
+	 * @return
+	 */
     public static final int getCodecCount() {
     	updateCodecs();
     	return sCodecList.size();
     }
 
+	/**
+	 * コーデック情報一覧を取得する
+	 * @return
+	 */
     public static final List<MediaCodecInfo> getCodecs() {
     	updateCodecs();
     	return sCodecList;
     }
 
+	/**
+	 * 指定したインデックスに対応するコーデック情報を取得する
+	 * @param ix
+	 * @return
+	 */
     public static final MediaCodecInfo getCodecInfoAt(final int ix) {
     	updateCodecs();
     	return sCodecList.get(ix);
     }
 
-    // getCapabilitiesForTypeがすごく遅い機種があるので静的にキャッシュする
+	/**
+	 * getCapabilitiesForTypeがすごく遅い機種があるので静的にキャッシュする
+	 */
     private static final HashMap<String, HashMap<MediaCodecInfo, MediaCodecInfo.CodecCapabilities>>
 		sCapabilities = new HashMap<String, HashMap<MediaCodecInfo, MediaCodecInfo.CodecCapabilities>>();
 
+	/**
+	 * CodecCapabilitiesを取得
+	 * @param codecInfo
+	 * @param mimeType
+	 * @return
+	 */
     public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(final MediaCodecInfo codecInfo, final String mimeType) {
 		HashMap<MediaCodecInfo, MediaCodecInfo.CodecCapabilities> caps = sCapabilities.get(mimeType);
 		if (caps == null) {
