@@ -34,117 +34,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * MediaInfoへ集約する
+ * FIXME MediaInfoへ集約するので今後はMediaInfoを使うこと
  */
+@Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaCodecHelper {
 	private static final String TAG = MediaCodecHelper.class.getSimpleName();
 
+	@Deprecated
 	public static final String MIME_VIDEO_AVC = "video/avc";		// h.264
+	@Deprecated
 	public static final String MIME_AUDIO_AAC = "audio/mp4a-latm";	// AAC
+	@Deprecated
 	@SuppressLint("InlinedApi")
 	public static final int BUFFER_FLAG_KEY_FRAME
 		= BuildCheck.isLollipop() ? MediaCodec.BUFFER_FLAG_KEY_FRAME : MediaCodec.BUFFER_FLAG_SYNC_FRAME;
 	/** codec specific dataのスタートマーカー = AnnexBのスタートマーカーと同じ */
+	@Deprecated
 	public static final byte[] START_MARKER = BufferHelper.ANNEXB_START_MARK;
 
-	/**
-	 * 非圧縮image/videoで使用可能なカラーフォーマット
-     * from OMX_IVCommon.h
-	 * MediaCodecInfo.CodecCapabilities.COLOR_FormatXXXに一部のものは定義されている
-     *  Unused                 : Placeholder value when format is N/A
-     *  Monochrome             : black and white
-     *  8bitRGB332             : Red 7:5, Green 4:2, Blue 1:0
-     *  12bitRGB444            : Red 11:8, Green 7:4, Blue 3:0
-     *  16bitARGB4444          : Alpha 15:12, Red 11:8, Green 7:4, Blue 3:0
-     *  16bitARGB1555          : Alpha 15, Red 14:10, Green 9:5, Blue 4:0
-     *  16bitRGB565            : Red 15:11, Green 10:5, Blue 4:0
-     *  16bitBGR565            : Blue 15:11, Green 10:5, Red 4:0
-     *  18bitRGB666            : Red 17:12, Green 11:6, Blue 5:0
-     *  18bitARGB1665          : Alpha 17, Red 16:11, Green 10:5, Blue 4:0
-     *  19bitARGB1666          : Alpha 18, Red 17:12, Green 11:6, Blue 5:0
-     *  24bitRGB888            : Red 24:16, Green 15:8, Blue 7:0
-     *  24bitBGR888            : Blue 24:16, Green 15:8, Red 7:0
-     *  24bitARGB1887          : Alpha 23, Red 22:15, Green 14:7, Blue 6:0
-     *  25bitARGB1888          : Alpha 24, Red 23:16, Green 15:8, Blue 7:0
-     *  32bitBGRA8888          : Blue 31:24, Green 23:16, Red 15:8, Alpha 7:0
-     *  32bitARGB8888          : Alpha 31:24, Red 23:16, Green 15:8, Blue 7:0
-     *  YUV411Planar           : U,Y are subsampled by a factor of 4 horizontally
-     *  YUV411PackedPlanar     : packed per payload in planar slices
-     *  YUV420Planar           : Three arrays Y,U,V.
-     *  YUV420PackedPlanar     : packed per payload in planar slices
-     *  YUV420SemiPlanar       : Two arrays, one is all Y, the other is U and V
-     *  YUV422Planar           : Three arrays Y,U,V.
-     *  YUV422PackedPlanar     : packed per payload in planar slices
-     *  YUV422SemiPlanar       : Two arrays, one is all Y, the other is U and V
-     *  YCbYCr                 : Organized as 16bit YUYV (i.e. YCbYCr)
-     *  YCrYCb                 : Organized as 16bit YVYU (i.e. YCrYCb)
-     *  CbYCrY                 : Organized as 16bit UYVY (i.e. CbYCrY)
-     *  CrYCbY                 : Organized as 16bit VYUY (i.e. CrYCbY)
-     *  YUV444Interleaved      : Each pixel contains equal parts YUV
-     *  RawBayer8bit           : SMIA camera output format
-     *  RawBayer10bit          : SMIA camera output format
-     *  RawBayer8bitcompressed : SMIA camera output format
-     */
-//	public static final int OMX_COLOR_FORMATTYPE = 0;
-	public static final int OMX_COLOR_FormatUnused = 0;
-	public static final int OMX_COLOR_FormatMonochrome = 1;
-	public static final int OMX_COLOR_Format8bitRGB332 = 2;
-	public static final int OMX_COLOR_Format12bitRGB444 = 3;
-	public static final int OMX_COLOR_Format16bitARGB4444 = 4;
-	public static final int OMX_COLOR_Format16bitARGB1555 = 5;
-	public static final int OMX_COLOR_Format16bitRGB565 = 6;
-	public static final int OMX_COLOR_Format16bitBGR565 = 7;
-	public static final int OMX_COLOR_Format18bitRGB666 = 8;
-	public static final int OMX_COLOR_Format18bitARGB1665 = 9;
-	public static final int OMX_COLOR_Format19bitARGB1666 = 10;
-	public static final int OMX_COLOR_Format24bitRGB888 = 11;
-	public static final int OMX_COLOR_Format24bitBGR888 = 12;
-	public static final int OMX_COLOR_Format24bitARGB1887 = 13;
-	public static final int OMX_COLOR_Format25bitARGB1888 = 14;
-	public static final int OMX_COLOR_Format32bitBGRA8888 = 15;
-	public static final int OMX_COLOR_Format32bitARGB8888 = 16;
-	public static final int OMX_COLOR_FormatYUV411Planar = 17;
-	public static final int OMX_COLOR_FormatYUV411PackedPlanar = 18;
-	public static final int OMX_COLOR_FormatYUV420Planar = 19;
-	public static final int OMX_COLOR_FormatYUV420PackedPlanar = 20;
-	public static final int OMX_COLOR_FormatYUV420SemiPlanar = 21;
-	public static final int OMX_COLOR_FormatYUV422Planar = 22;
-	public static final int OMX_COLOR_FormatYUV422PackedPlanar = 23;
-	public static final int OMX_COLOR_FormatYUV422SemiPlanar = 24;
-	public static final int OMX_COLOR_FormatYCbYCr = 25;
-	public static final int OMX_COLOR_FormatYCrYCb = 26;
-	public static final int OMX_COLOR_FormatCbYCrY = 27;
-	public static final int OMX_COLOR_FormatCrYCbY = 28;
-	public static final int OMX_COLOR_FormatYUV444Interleaved = 29;
-	public static final int OMX_COLOR_FormatRawBayer8bit = 30;
-	public static final int OMX_COLOR_FormatRawBayer10bit = 31;
-	public static final int OMX_COLOR_FormatRawBayer8bitcompressed = 32;
-	public static final int OMX_COLOR_FormatL2 = 33;
-	public static final int OMX_COLOR_FormatL4 = 34;
-	public static final int OMX_COLOR_FormatL8 = 35;
-	public static final int OMX_COLOR_FormatL16 = 36;
-	public static final int OMX_COLOR_FormatL24 = 37;
-	public static final int OMX_COLOR_FormatL32 = 38;
-	public static final int OMX_COLOR_FormatYUV420PackedSemiPlanar = 39;
-	public static final int OMX_COLOR_FormatYUV422PackedSemiPlanar = 40;
-	public static final int OMX_COLOR_Format18BitBGR666 = 41;
-	public static final int OMX_COLOR_Format24BitARGB6666 = 42;
-	public static final int OMX_COLOR_Format24BitABGR6666 = 43;
-	public static final int OMX_COLOR_FormatKhronosExtensions = 0x6F000000; //< Reserved region for introducing Khronos Standard Extensions
-	public static final int OMX_COLOR_FormatVendorStartUnused = 0x7F000000; //< Reserved region for introducing Vendor Extensions
-	// Reserved android opaque colorformat. Tells the encoder that
-	// the actual colorformat will be relayed by the Gralloc Buffers.
-	// FIXME: In the process of reserving some enum values for
-	// Android-specific OMX IL colorformats. Change this enum to
-	// an acceptable range once that is done.
-	public static final int OMX_COLOR_FormatAndroidOpaque = 0x7F000789;
-	public static final int OMX_TI_COLOR_FormatYUV420PackedSemiPlanar = 0x7F000100;
-	public static final int OMX_QCOM_COLOR_FormatYVU420SemiPlanar = 0x7FA30C00;
-	public static final int OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka = 0x7FA30C03;
-	public static final int OMX_SEC_COLOR_FormatNV12Tiled = 0x7FC00002;
-	public static final int OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m = 0x7FA30C04;
-	public static final int OMX_COLOR_FormatMax = 0x7FFFFFFF;
 
 	/**
 	 * 指定したMIMEに一致する最初の動画エンコード用コーデックを選択する
@@ -162,6 +70,7 @@ public class MediaCodecHelper {
 	 * もし使用可能なのがなければnullを返す
 	 * @param mimeType
 	 */
+	@Deprecated
 	@Nullable
 	public static MediaCodecInfo selectVideoEncoder(final String mimeType) {
 		// コーデックの一覧を取得
@@ -216,6 +125,7 @@ public class MediaCodecHelper {
 	 * @param mimeType
 	 * @return
 	 */
+	@Deprecated
 	@NonNull
 	public static List<MediaCodecInfo> getVideoEncoderInfos(final String mimeType) {
 		final List<MediaCodecInfo> result = new ArrayList<>();
@@ -268,6 +178,7 @@ public class MediaCodecHelper {
 	/**
 	 * 使用可能なカラーフォーマットを設定
 	 */
+	@Deprecated
 	public static int[] recognizedFormats;
 	static {
 		recognizedFormats = new int[] {
@@ -282,6 +193,7 @@ public class MediaCodecHelper {
 	 * @param colorFormat
 	 * @return
 	 */
+	@Deprecated
     public static final boolean isRecognizedVideoFormat(final int colorFormat) {
     	final int n = recognizedFormats != null ? recognizedFormats.length : 0;
     	for (int i = 0; i < n; i++) {
@@ -297,6 +209,7 @@ public class MediaCodecHelper {
 	 * 使用可能なカラーフォーマットはrecognizedFormatsに設定する(Encoderで設定しているのはYUV420PlanarかYUV420SemiPlanar)
 	 * 使用可能なものが無ければ0を返す
 	 */
+	@Deprecated
 	public static final int selectColorFormat(final MediaCodecInfo codecInfo, final String mimeType) {
 		int result = 0;
 		final MediaCodecInfo.CodecCapabilities capabilities = getCodecCapabilities(codecInfo, mimeType);
@@ -324,6 +237,7 @@ public class MediaCodecHelper {
 	/**
 	 * エンコード用コーデックの一覧をログに出力する
 	 */
+	@Deprecated
 	public static final void dumpEncoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
@@ -346,6 +260,7 @@ public class MediaCodecHelper {
 	/**
 	 * デコード用コーデックの一覧をログに出力する
 	 */
+	@Deprecated
 	public static final void dumpDecoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
@@ -369,6 +284,7 @@ public class MediaCodecHelper {
      * Returns true if the specified color format is semi-planar YUV.  Throws an exception
      * if the color format is not recognized (e.g. not YUV).
      */
+	@Deprecated
     public static final boolean isSemiPlanarYUV(final int colorFormat) {
         switch (colorFormat) {
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
@@ -402,6 +318,7 @@ public class MediaCodecHelper {
 	 * @param mimeType
 	 * @return
 	 */
+	@Deprecated
 	@Nullable
 	public static final MediaCodecInfo selectAudioEncoder(final String mimeType) {
 //    	if (DEBUG) Log.v(TAG, "selectAudioCodec:");
@@ -431,6 +348,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param mimeType
 	 * @return
 	 */
+	@Deprecated
 	@NonNull
 	public static List<MediaCodecInfo> getAudioEncoderInfos(final String mimeType) {
 		final List<MediaCodecInfo> result = new ArrayList<>();
@@ -453,18 +371,22 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		return result;
 	}
 //================================================================================
+	@Deprecated
 	public static final int getCodecCount() {
 		return MediaInfo.getCodecCount();
 	}
 
+	@Deprecated
 	public static final List<MediaCodecInfo> getCodecs() {
 		return MediaInfo.getCodecs();
 	}
 
+	@Deprecated
 	public static final MediaCodecInfo getCodecInfoAt(final int ix) {
 		return MediaInfo.getCodecInfoAt(ix);
 	}
 
+	@Deprecated
 	public static MediaCodecInfo.CodecCapabilities getCodecCapabilities(
 		final MediaCodecInfo codecInfo, final String mimeType) {
 
@@ -477,6 +399,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param info
 	 * @return
 	 */
+	@Deprecated
 	public static boolean checkProfileLevel(final String mimeType,
 		final MediaCodecInfo info) {
 
@@ -499,6 +422,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param profileLevel
 	 * @return
 	 */
+	@Deprecated
 	public static String getProfileLevelString(final String mimeType,
 		final MediaCodecInfo.CodecProfileLevel profileLevel) {
 
@@ -666,6 +590,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param offset
 	 * @return
 	 */
+	@Deprecated
 	public static final int findStartMarker(@NonNull final byte[] array, final int offset) {
 		return BufferHelper.byteComp(array, offset, START_MARKER, START_MARKER.length);
 	}
