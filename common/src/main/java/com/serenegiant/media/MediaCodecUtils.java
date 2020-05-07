@@ -571,6 +571,8 @@ public final class MediaCodecUtils {
 		    		result = "AACObjectHE_PS"; break;
 		    	case MediaCodecInfo.CodecProfileLevel.AACObjectELD:			// 39;
 		    		result = "AACObjectELD"; break;
+				case MediaCodecInfo.CodecProfileLevel.AACObjectXHE:			// 42, xHE-AAC (includes USAC)
+					result = "AACObjectXHE"; break;
 		    	default:
 		    		result = "profile:unknown " + profileLevel.profile; break;
 		    	}
@@ -595,6 +597,135 @@ public final class MediaCodecUtils {
 		    	default:
 		    		result = result + ".unknown level" + profileLevel.level; break;
 		    	}
+			} else if (mimeType.equalsIgnoreCase("video/vp9")) {
+				switch (profileLevel.profile) {
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile0:			// 0x01, VP9 Profile 0 4:2:0 8-bit
+					result = "VP9Profile0"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile1:			// 0x02, VP9 Profile 1 4:2:2 8-bit
+					result = "VP9Profile1"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile2:			// 0x04, VP9 Profile 2 4:2:0 10-bit
+					result = "VP9Profile2"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile3:			// 0x08, VP9 Profile 3 4:2:2 10-bit
+					result = "VP9Profile3"; break;
+    			// HDR profiles also support passing HDR metadata
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR:		// 0x1000, VP9 Profile 2 4:2:0 10-bit HDR
+					result = "VP9Profile2HDR"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR:		// 0x2000, VP9 Profile 3 4:2:2 10-bit HDR
+					result = "VP9Profile3HDR"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR10Plus:	// 0x4000, VP9 Profile 2 4:2:0 10-bit HDR10Plus
+					result = "VP9Profile2HDR10Plus"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR10Plus:	// 0x8000, VP9 Profile 3 4:2:2 10-bit HDR10Plus
+					result = "VP9Profile3HDR10Plus"; break;
+				default:
+					result = "unknown profile " + profileLevel.profile;
+					break;
+				}
+				switch (profileLevel.level) {
+				case MediaCodecInfo.CodecProfileLevel.VP9Level1:			// 0x1
+					result = result + ".VP9Level1"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level11:			// 0x2
+					result = result + ".VP9Level11"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level2:			// 0x4
+					result = result + ".VP9Level2"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level21:			// 0x8
+					result = result + ".VP9Level21"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level3:			// 0x10
+					result = result + ".VP9Level3"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level31:			// 0x20
+					result = result + ".VP9Level31"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level4:			// 0x40
+					result = result + ".VP9Level4"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level41:			// 0x80
+					result = result + ".VP9Level41"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level5:			// 0x100
+					result = result + ".VP9Level5"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level51:			// 0x200
+					result = result + ".VP9Level51"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level52:			// 0x400
+					result = result + ".VP9Level52"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level6:			// 0x800
+					result = result + ".VP9Level6"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level61:			// 0x1000
+					result = result + ".VP9Level61"; break;
+				case MediaCodecInfo.CodecProfileLevel.VP9Level62:			// 0x2000
+					result = result + ".VP9Level62"; break;
+				default:
+					result = result + ".unknown level" + profileLevel.level;
+					break;
+				}
+			} else if (mimeType.equalsIgnoreCase("video/hevc")) {
+				switch (profileLevel.profile) {
+				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain:		// 0x01
+					result = "HEVCProfileMain"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10:	// 0x02
+					result = "HEVCProfileMain10"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMainStill:	// 0x04
+					result = "HEVCProfileMainStill"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10:	// 0x1000
+					result = "HEVCProfileMain10HDR10"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10Plus:	// 0x2000
+					result = "HEVCProfileMain10HDR10Plus"; break;
+				default:
+					result = "unknown profile " + profileLevel.profile;
+					break;
+				}
+				switch (profileLevel.level) {
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel1:	// 0x1
+					result = result + ".HEVCMainTierLevel1"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel1:	// 0x2
+					result = result + ".HEVCHighTierLevel1"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel2:	// 0x4
+					result = result + ".HEVCMainTierLevel2"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel2:	// 0x8
+					result = result + ".HEVCHighTierLevel2"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel21:	// 0x10
+					result = result + ".HEVCMainTierLevel21"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel21:	// 0x20
+					result = result + ".HEVCHighTierLevel21"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel3:	// 0x40
+					result = result + ".HEVCMainTierLevel3"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel3:	// 0x80
+					result = result + ".HEVCHighTierLevel3"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel31:	// 0x100
+					result = result + ".HEVCMainTierLevel31"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel31:	// 0x200
+					result = result + ".HEVCHighTierLevel31"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel4:	// 0x400
+					result = result + ".HEVCMainTierLevel4"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel4:	// 0x800
+					result = result + ".HEVCHighTierLevel4"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel41:	// 0x1000
+					result = result + ".HEVCMainTierLevel41"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel41:	// 0x2000
+					result = result + ".HEVCHighTierLevel41"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel5:	// 0x4000
+					result = result + ".HEVCMainTierLevel5"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel5:	// 0x8000
+					result = result + ".HEVCHighTierLevel5"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel51:	// 0x10000
+					result = result + ".HEVCMainTierLevel51"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel51:	// 0x20000
+					result = result + ".HEVCHighTierLevel51"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel52:	// 0x40000
+					result = result + ".HEVCMainTierLevel52"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel52:	// 0x80000
+					result = result + ".HEVCHighTierLevel52"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel6:	// 0x100000
+					result = result + ".HEVCMainTierLevel6"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel6:	// 0x200000
+					result = result + ".HEVCHighTierLevel6"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel61:	// 0x400000
+					result = result + ".HEVCMainTierLevel61"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel61:	// 0x800000
+					result = result + ".HEVCHighTierLevel61"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel62:	// 0x1000000
+					result = result + ".HEVCMainTierLevel62"; break;
+				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel62:	// 0x2000000
+					result = result + ".HEVCHighTierLevel62"; break;
+				default:
+					result = result + ".unknown level" + profileLevel.level;
+					break;
+				}
 	    	} else {
 	    		result = "unknown profile " + profileLevel.profile;
 	    	}
