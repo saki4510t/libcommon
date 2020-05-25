@@ -1251,6 +1251,8 @@ public class SAFUtils {
 	}
 
 //--------------------------------------------------------------------------------
+	private static final String KEY_PREFIX = "SDUtils-";
+
 	/**
 	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
 	 * "SDUtils-${要求コード}"を返す
@@ -1259,7 +1261,7 @@ public class SAFUtils {
 	 */
 	@NonNull
 	private static String getKey(final int requestCode) {
-		return String.format(Locale.US, "SDUtils-%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
+		return String.format(Locale.US, KEY_PREFIX + "%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
 	}
 
 	/**
