@@ -19,8 +19,6 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -61,7 +59,6 @@ public abstract class CustomRecyclerViewAdapter<T>
 	private LayoutInflater mLayoutInflater;
 	private RecyclerView mRecycleView;
 	private CustomRecyclerViewListener<T> mCustomRecycleViewListener;
-	private Handler mUIHandler = new Handler(Looper.getMainLooper());
 
     public CustomRecyclerViewAdapter(@LayoutRes final int itemViewLayoutId,
 									 @NonNull final List<T> items) {
@@ -172,7 +169,7 @@ public abstract class CustomRecyclerViewAdapter<T>
 			if (mRecycleView != null) {
 				if (v instanceof Checkable) {	// visual feedback
 					((Checkable)v).setChecked(true);
-					mUIHandler.postDelayed(new Runnable() {
+					v.postDelayed(new Runnable() {
 						@Override
 						public void run() {
 							((Checkable)v).setChecked(false);
