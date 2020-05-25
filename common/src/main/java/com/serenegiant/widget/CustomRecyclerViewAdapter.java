@@ -61,11 +61,11 @@ public abstract class CustomRecyclerViewAdapter<T>
 	private CustomRecyclerViewListener<T> mCustomRecycleViewListener;
 	private Handler mUIHandler = new Handler(Looper.getMainLooper());
 
-    public CustomRecyclerViewAdapter(@LayoutRes final int layout_id,
-									 @NonNull final List<T> devices) {
+    public CustomRecyclerViewAdapter(@LayoutRes final int itemViewLayoutId,
+									 @NonNull final List<T> items) {
 
-		mItemViewId = layout_id;
-		mItems = devices;
+		mItemViewId = itemViewLayoutId;
+		mItems = items;
 		synchronized (mItems) {
 			registerDataSetObserver(mItems);
 		}
