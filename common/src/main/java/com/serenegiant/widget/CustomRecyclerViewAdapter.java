@@ -54,8 +54,10 @@ public abstract class CustomRecyclerViewAdapter<T>
 		public boolean onItemLongClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
 	}
 
-	private @LayoutRes final int mItemViewId;
-	private @NonNull final List<T> mItems;
+	@LayoutRes
+	private final int mItemViewId;
+	@NonNull
+	private final List<T> mItems;
 	private LayoutInflater mLayoutInflater;
 	private RecyclerView mRecycleView;
 	private CustomRecyclerViewListener<T> mCustomRecycleViewListener;
@@ -124,7 +126,8 @@ public abstract class CustomRecyclerViewAdapter<T>
 		mCustomRecycleViewListener = listener;
 	}
 
-	public @Nullable RecyclerView getParent() {
+	@Nullable
+	public RecyclerView getParent() {
 		return mRecycleView;
 	}
 
@@ -159,9 +162,9 @@ public abstract class CustomRecyclerViewAdapter<T>
 		return mLayoutInflater;
 	}
 
-	protected abstract void registerDataSetObserver(final List<T> items);
+	protected abstract void registerDataSetObserver(@NonNull final List<T> items);
 
-	protected abstract void unregisterDataSetObserver(final List<T> items);
+	protected abstract void unregisterDataSetObserver(@NonNull final List<T> items);
 
 	protected final View.OnClickListener mOnClickListener = new View.OnClickListener() {
 		@Override
