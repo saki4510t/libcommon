@@ -31,7 +31,7 @@ import com.serenegiant.libcommon.ImageFragment.Companion.newInstance
 import com.serenegiant.mediastore.MediaInfo
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapter
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapter.MediaStoreRecyclerAdapterListener
-import com.serenegiant.widget.RecycleViewWithEmptyView
+import com.serenegiant.widget.RecyclerViewWithEmptyView
 
 /**
  * 端末内の静止画・動画一覧を表示するためのFragment
@@ -68,7 +68,7 @@ class GalleyFragment2 : BaseFragment() {
 	 * @param rootView
 	 */
 	private fun initView(rootView: View) {
-		val recyclerView: RecycleViewWithEmptyView = rootView.findViewById(R.id.media_recyclerview)
+		val recyclerView: RecyclerViewWithEmptyView = rootView.findViewById(R.id.media_recyclerview)
 		recyclerView.setHasFixedSize(true)
 		recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)
 //		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));

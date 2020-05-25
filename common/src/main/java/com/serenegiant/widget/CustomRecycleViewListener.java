@@ -21,6 +21,11 @@ package com.serenegiant.widget;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
+/**
+ * CustomRecyclerViewAdapterCustomRecyclerViewListenerを使うこと
+ * @param <T>
+ */
+@Deprecated
 public interface CustomRecycleViewListener<T> {
 	public void onItemClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
 	public boolean onItemLongClick(RecyclerView.Adapter<?> parent, View view, int position, T item);

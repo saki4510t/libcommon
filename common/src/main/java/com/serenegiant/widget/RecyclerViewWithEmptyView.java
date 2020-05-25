@@ -22,39 +22,38 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 
 import com.serenegiant.common.R;
 
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
  * 表示内容が空のときに代わりに指定したViewを表示する機能を追加したRecyclerView実装
- * RecyclerViewWithEmptyViewを使うこと
  */
-@Deprecated
-public class RecycleViewWithEmptyView extends RecyclerView {
+public class RecyclerViewWithEmptyView extends RecyclerView {
 	private static final boolean DEBUG = false;	// FIXME set false on production
-	private static final String TAG = RecycleViewWithEmptyView.class.getSimpleName();
+	private static final String TAG = RecyclerViewWithEmptyView.class.getSimpleName();
 
    	@Nullable private View mEmptyView;
 
-	public RecycleViewWithEmptyView(final Context context) {
+	public RecyclerViewWithEmptyView(final Context context) {
 		this(context, null, 0);
 	}
 
-	public RecycleViewWithEmptyView(final Context context,
-									@Nullable final AttributeSet attrs) {
+	public RecyclerViewWithEmptyView(final Context context,
+									 @Nullable final AttributeSet attrs) {
 
 		this(context, attrs, 0);
 	}
 
 	@SuppressLint("WrongConstant")
-	public RecycleViewWithEmptyView(final Context context,
-		@Nullable final AttributeSet attrs, final int defStyle) {
+	public RecyclerViewWithEmptyView(final Context context,
+									 @Nullable final AttributeSet attrs, final int defStyle) {
 
 		super(context, attrs, defStyle);
 		Drawable divider = null;

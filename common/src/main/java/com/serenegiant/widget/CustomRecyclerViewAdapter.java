@@ -21,10 +21,6 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
-import androidx.annotation.LayoutRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.recyclerview.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -38,27 +34,35 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.RecyclerView;
+
 /**
- * アイテムのクリック・ロングクリックイベントのコールバック処理を追加したRecyclerView.Adapter実装
- * CustomRecyclerViewAdapterを使うこと
+ * アイテムのクリック・ロングクリックイベントのコールバック処理等を追加したRecyclerView.Adapter実装
  * @param <T>
  */
-@Deprecated
-public abstract class CustomRecycleViewAdapter<T>
-	extends RecyclerView.Adapter<CustomRecycleViewAdapter.ViewHolder<T>> {
+public abstract class CustomRecyclerViewAdapter<T>
+	extends RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder<T>> {
 
 	private static final boolean DEBUG = false;	// FIXME set false when production
-	private static final String TAG = CustomRecycleViewAdapter.class.getSimpleName();
+	private static final String TAG = CustomRecyclerViewAdapter.class.getSimpleName();
+
+	public interface CustomRecyclerViewListener<T> {
+		public void onItemClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
+		public boolean onItemLongClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
+	}
 
 	private @LayoutRes final int mItemViewId;
 	private @NonNull final List<T> mItems;
 	private LayoutInflater mLayoutInflater;
 	private RecyclerView mRecycleView;
-	private CustomRecycleViewListener<T> mCustomRecycleViewListener;
+	private CustomRecyclerViewListener<T> mCustomRecycleViewListener;
 	private Handler mUIHandler = new Handler(Looper.getMainLooper());
 
-    public CustomRecycleViewAdapter(@LayoutRes final int layout_id,
-    	@NonNull final List<T> devices) {
+    public CustomRecyclerViewAdapter(@LayoutRes final int layout_id,
+									 @NonNull final List<T> devices) {
 
 		mItemViewId = layout_id;
 		mItems = devices;
@@ -116,7 +120,7 @@ public abstract class CustomRecycleViewAdapter<T>
 		return (position >= 0) && (position < mItems.size()) ? mItems.get(position) : null;
 	}
 
-	public void setOnItemClickListener(final CustomRecycleViewListener<T> listener) {
+	public void setOnItemClickListener(final CustomRecyclerViewListener<T> listener) {
 		mCustomRecycleViewListener = listener;
 	}
 
@@ -178,7 +182,7 @@ public abstract class CustomRecycleViewAdapter<T>
 						try {
 							final T item = getItem(pos);
 							mCustomRecycleViewListener.onItemClick(
-								CustomRecycleViewAdapter.this, v, pos, item);
+								CustomRecyclerViewAdapter.this, v, pos, item);
 							return;
 						} catch (final Exception e) {
 							Log.w(TAG, e);
@@ -188,7 +192,7 @@ public abstract class CustomRecycleViewAdapter<T>
 						final int position = mRecycleView.getChildAdapterPosition(v);
 						final T item = getItem(position);
 						mCustomRecycleViewListener.onItemClick(
-							CustomRecycleViewAdapter.this, v, position, item);
+							CustomRecyclerViewAdapter.this, v, position, item);
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
@@ -208,7 +212,7 @@ public abstract class CustomRecycleViewAdapter<T>
 						final int position = mRecycleView.getChildAdapterPosition(v);
 						final T item = getItem(position);
 						return mCustomRecycleViewListener.onItemLongClick(
-							CustomRecycleViewAdapter.this, v, position, item);
+							CustomRecyclerViewAdapter.this, v, position, item);
 					}
 				} catch (final Exception e) {
 					Log.w(TAG, e);

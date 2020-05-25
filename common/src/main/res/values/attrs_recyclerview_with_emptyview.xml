@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<attr name="listDivider" format="color|reference" value="@null" />
+
+	<declare-styleable name="RecycleViewWithEmptyView">
+		<attr name="listDivider" />
+	</declare-styleable>
+
+	<declare-styleable name="RecyclerViewWithEmptyView">
+		<attr name="listDivider" />
+	</declare-styleable>
+</resources>

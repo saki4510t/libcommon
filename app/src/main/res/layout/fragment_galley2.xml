@@ -4,7 +4,7 @@
 	android:layout_width="match_parent"
 	android:layout_height="match_parent">
 
-	<com.serenegiant.widget.RecycleViewWithEmptyView
+	<com.serenegiant.widget.RecyclerViewWithEmptyView
 		android:id="@+id/media_recyclerview"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
