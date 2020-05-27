@@ -6,10 +6,12 @@ apply plugin: 'kotlin-android-extensions'
 android {
     compileSdkVersion versionCompiler
    	buildToolsVersion versionBuildTool
+
    	compileOptions {
    		sourceCompatibility javaSourceCompatibility
    		targetCompatibility javaTargetCompatibility
    	}
+
     defaultConfig {
         applicationId "com.serenegiant.libcommon"
         minSdkVersion 16
@@ -19,6 +21,7 @@ android {
 
 		buildConfigField "boolean", "ENABLE_VSYNC", "${project.property("ENABLE_VSYNC")}"
     }
+
     buildTypes {
         release {
             minifyEnabled false
