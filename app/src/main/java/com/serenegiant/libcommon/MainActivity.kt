@@ -128,8 +128,7 @@ class MainActivity
 		var fragment: Fragment? = null
 		when (item.id) {
 			0 -> {	// SAF
-				SAFUtils.releaseStorageAccessPermission(this, Const.REQUEST_ACCESS_SD)
-				SAFUtils.requestStorageAccess(this, Const.REQUEST_ACCESS_SD)
+				fragment = SAFUtilsFragment()
 			}
 			1 -> {	// NetworkConnection
 				fragment = NetworkConnectionFragment.newInstance()

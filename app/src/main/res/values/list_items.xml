@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="title_request_saf_permission" translatable="false">Request SAF permission</string>
+	<string name="title_request_saf_permission" translatable="false">SAFUtils</string>
 	<string name="title_network_connection" translatable="false">NetworkConnection</string>
 	<string name="title_usB_monitor" translatable="false">UsbMonitor</string>
 	<string name="title_camera" translatable="false">Camera</string>
