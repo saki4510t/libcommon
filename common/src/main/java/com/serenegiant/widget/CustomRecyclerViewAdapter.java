@@ -135,10 +135,28 @@ public abstract class CustomRecyclerViewAdapter<T>
 		}
 	}
 
+	/**
+	 * 指定したコレクションを全て追加する
+	 * @param collection
+	 */
 	public void addAll(final Collection<? extends T> collection) {
 //		EXECUTOR.prestartAllCoreThreads();
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
+			mItems.addAll(collection);
+			registerDataSetObserver(mItems);
+		}
+	}
+
+	/**
+	 * 指定したコレクションで置き換える
+	 * @param collection
+	 */
+	public void replaceAll(final Collection<? extends T> collection) {
+//		EXECUTOR.prestartAllCoreThreads();
+		synchronized (mItems) {
+			unregisterDataSetObserver(mItems);
+			mItems.clear();
 			mItems.addAll(collection);
 			registerDataSetObserver(mItems);
 		}
