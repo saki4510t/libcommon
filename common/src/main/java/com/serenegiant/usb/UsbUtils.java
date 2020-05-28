@@ -29,6 +29,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
@@ -400,7 +401,7 @@ public class UsbUtils implements Const {
 	 * @param context
 	 */
 	public static void dumpDevices(@NonNull final Context context) {
-		final UsbManager usbManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
+		final UsbManager usbManager = ContextUtils.requireSystemService(context, UsbManager.class);
 		final HashMap<String, UsbDevice> list = usbManager.getDeviceList();
 		if ((list != null) && !list.isEmpty()) {
 			final Set<String> keys = list.keySet();

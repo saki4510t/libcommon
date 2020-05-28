@@ -8,6 +8,7 @@ import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
 
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,7 +29,7 @@ public class UsbDeviceInfo implements Const {
 		@NonNull final Context context, @Nullable final UsbDevice device) {
 
 		return getDeviceInfo(
-			(UsbManager)context.getSystemService(Context.USB_SERVICE),
+			ContextUtils.requireSystemService(context, UsbManager.class),
 			device, new UsbDeviceInfo());
 	}
 

@@ -35,6 +35,7 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -165,8 +166,8 @@ public class ViewUtils {
 			rotation = view.getDisplay().getRotation();
 		} else {
 			final Display display
-				= ((WindowManager)view.getContext()
-					.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+				= ContextUtils.requireSystemService(view.getContext(), WindowManager.class)
+					.getDefaultDisplay();
 			rotation = display.getRotation();
 		}
 		return rotation;
@@ -181,9 +182,8 @@ public class ViewUtils {
 	@Rotation
 	public static int getRotation(@NonNull final Context context) {
 		final Display display
-			= ((WindowManager)context
-				.getSystemService(Context.WINDOW_SERVICE))
-					.getDefaultDisplay();
+			= ContextUtils.requireSystemService(context, WindowManager.class)
+				.getDefaultDisplay();
 		return display.getRotation();
 	}
 

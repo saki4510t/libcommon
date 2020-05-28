@@ -22,8 +22,8 @@ import android.app.Activity;
 import android.app.admin.DeviceAdminReceiver;
 import android.app.admin.DevicePolicyManager;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
+
 import androidx.annotation.NonNull;
 
 public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
@@ -47,7 +47,7 @@ public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 	 */
 	private static boolean checkScreenLock(@NonNull final Activity activity, final boolean finish) {
 		final ComponentName cn = new ComponentName(activity, DeviceAdminReceiverLock.class);
-		final DevicePolicyManager dpm = (DevicePolicyManager)activity.getSystemService(Context.DEVICE_POLICY_SERVICE);
+		final DevicePolicyManager dpm = ContextUtils.requireSystemService(activity, DevicePolicyManager.class);
 		if (dpm.isAdminActive(cn)){
 			// デバイス管理者が有効ならスクリーンをロック
 			dpm.lockNow();

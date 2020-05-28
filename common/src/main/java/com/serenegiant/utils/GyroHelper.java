@@ -57,7 +57,7 @@ public class GyroHelper {
 	public GyroHelper(@NonNull final Context context) {
 		mWeakContext = new WeakReference<Context>(context);
 		synchronized (mSync) {
-			mSensorManager = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
+			mSensorManager = ContextUtils.requireSystemService(context, SensorManager.class);
 		}
 	}
 

@@ -28,6 +28,7 @@ import android.util.Log;
 import com.serenegiant.common.BuildConfig;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.io.DiskLruCache;
+import com.serenegiant.utils.ContextUtils;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -65,8 +66,8 @@ public class ThumbnailCache {
 		synchronized (sSync) {
 			if (sThumbnailCache == null) {
 				if (DEBUG) Log.v(TAG, "prepareThumbnailCache:");
-				final int memClass = ((ActivityManager)context
-					.getSystemService(Context.ACTIVITY_SERVICE))
+				final int memClass =
+					ContextUtils.requireSystemService(context, ActivityManager.class)
 					.getMemoryClass();
 				// use 1/CACHE_RATE of available memory as memory cache
 				sCacheSize = (1024 * 1024 * memClass) / CACHE_RATE;	// [MB] => [bytes]

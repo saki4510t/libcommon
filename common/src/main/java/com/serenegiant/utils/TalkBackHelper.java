@@ -37,8 +37,8 @@ public class TalkBackHelper {
 	 * @return
 	 */
 	public static boolean isEnabled(@NonNull final Context context) {
-		final AccessibilityManager manager = (AccessibilityManager) context
-			.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		final AccessibilityManager manager
+			= ContextUtils.requireSystemService(context, AccessibilityManager.class);
 		return manager.isEnabled();
 	}
 
@@ -52,8 +52,8 @@ public class TalkBackHelper {
 		@Nullable final CharSequence text) throws IllegalStateException {
 
 		if (TextUtils.isEmpty(text) || (context == null)) return;
-		final AccessibilityManager manager = (AccessibilityManager) context
-			.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		final AccessibilityManager manager
+			= ContextUtils.requireSystemService(context, AccessibilityManager.class);
 		if ((manager != null) && manager.isEnabled()) {
 			final AccessibilityEvent event = AccessibilityEvent.obtain();
 			if (event != null) {
@@ -80,8 +80,8 @@ public class TalkBackHelper {
 		@Nullable final CharSequence[] text) throws IllegalStateException {
 
 		if ((text == null) || (text.length == 0) || (context == null)) return;
-		final AccessibilityManager manager = (AccessibilityManager) context
-			.getSystemService(Context.ACCESSIBILITY_SERVICE);
+		final AccessibilityManager manager
+			= ContextUtils.requireSystemService(context, AccessibilityManager.class);
 		if ((manager != null) && manager.isEnabled()) {
 			final AccessibilityEvent event = AccessibilityEvent.obtain();
 			if (event != null) {

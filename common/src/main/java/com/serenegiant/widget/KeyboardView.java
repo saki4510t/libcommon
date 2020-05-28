@@ -64,6 +64,7 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.ContextUtils;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -394,8 +395,9 @@ public class KeyboardView extends View implements View.OnClickListener {
 		mSwipeThreshold = (int) (500 * getResources().getDisplayMetrics().density);
 		mDisambiguateSwipe = getResources().getBoolean(R.bool.config_swipeDisambiguation);
 
-		mAccessibilityManager = (AccessibilityManager)context.getSystemService(Context.ACCESSIBILITY_SERVICE);
-//		mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+		mAccessibilityManager
+			= ContextUtils.requireSystemService(context, AccessibilityManager.class);
+//		mAudioManager = ContextUtils.requireSystemService(context, AudioManager.class);
 
 		resetMultiTap();
 	}

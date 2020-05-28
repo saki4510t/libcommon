@@ -45,6 +45,7 @@ import android.util.Log;
 
 import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.util.List;
@@ -237,7 +238,7 @@ public abstract class BaseService extends LifecycleService {
 			@NonNull final Context context) {
 	
 			final NotificationManager manager
-				= (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+				= ContextUtils.requireSystemService(context, NotificationManager.class);
 			if (manager.getNotificationChannel(channelId) == null) {
 				final NotificationChannel channel
 					= new NotificationChannel(channelId, channelTitle, importance);
@@ -289,7 +290,7 @@ public abstract class BaseService extends LifecycleService {
 			
 			if (!TextUtils.isEmpty(groupId)) {
 				final NotificationManager manager
-					= (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);
+					= ContextUtils.requireSystemService(context, NotificationManager.class);
 				final List<NotificationChannelGroup> groups
 					= manager.getNotificationChannelGroups();
 	
@@ -506,7 +507,7 @@ public abstract class BaseService extends LifecycleService {
 		@NonNull final NotificationFactory factory) {
 	
 		final NotificationManager manager
-			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			= ContextUtils.requireSystemService(this, NotificationManager.class);
 		final Notification notification = factory.createNotification(this, content, title);
 		if (factory.isForegroundService()) {
 			startForeground(notificationId, notification);
@@ -560,7 +561,7 @@ public abstract class BaseService extends LifecycleService {
 		@Nullable final String channelId) {
 
 		final NotificationManager manager
-			= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+			= ContextUtils.requireSystemService(this, NotificationManager.class);
 		manager.cancel(notificationId);
 		releaseNotificationChannel(channelId);
 	}
@@ -585,7 +586,7 @@ public abstract class BaseService extends LifecycleService {
 	protected void releaseNotificationChannel(@Nullable final String channelId) {
 		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
 			final NotificationManager manager
-				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+				= ContextUtils.requireSystemService(this, NotificationManager.class);
 			try {
 				manager.deleteNotificationChannel(channelId);
 			} catch (final Exception e) {
@@ -603,7 +604,7 @@ public abstract class BaseService extends LifecycleService {
 
 		if (!TextUtils.isEmpty(groupId) && BuildCheck.isOreo()) {
 			final NotificationManager manager
-				= (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+				= ContextUtils.requireSystemService(this, NotificationManager.class);
 			try {
 				manager.deleteNotificationChannelGroup(groupId);
 			} catch (final Exception e) {

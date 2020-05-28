@@ -25,13 +25,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.os.Debug;
 import android.text.TextUtils;
 
-import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 
 public class MemInfo {
 
@@ -45,7 +44,8 @@ public class MemInfo {
 		try {
 			try {
 				final ActivityManager.MemoryInfo mem_info = new ActivityManager.MemoryInfo();
-				final ActivityManager am = ((ActivityManager)contex.getSystemService(Activity.ACTIVITY_SERVICE));
+				final ActivityManager am
+					= ContextUtils.requireSystemService(contex, ActivityManager.class);
 				am.getMemoryInfo(mem_info);
 				final JSONObject am_info = new JSONObject();
 				am_info.put("availMem", mem_info.availMem);

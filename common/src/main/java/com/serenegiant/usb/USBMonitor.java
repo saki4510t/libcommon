@@ -39,6 +39,7 @@ import android.util.SparseArray;
 
 import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;
@@ -148,7 +149,7 @@ public final class USBMonitor implements Const {
 
 		if (DEBUG) Log.v(TAG, "USBMonitor:コンストラクタ");
 		mWeakContext = new WeakReference<Context>(context);
-		mUsbManager = (UsbManager)context.getSystemService(Context.USB_SERVICE);
+		mUsbManager = ContextUtils.requireSystemService(context, UsbManager.class);
 		mOnDeviceConnectListener = listener;
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		destroyed = false;

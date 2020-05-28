@@ -1,12 +1,12 @@
 package com.serenegiant.system;
 
-import android.content.Context;
 import android.text.Editable;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
+import com.serenegiant.utils.ContextUtils;
 import com.serenegiant.widget.Keyboard;
 import com.serenegiant.widget.KeyboardView;
 
@@ -83,8 +83,7 @@ public abstract class KeyboardDelegater
 			if (DEBUG) Log.w(TAG, e);
 		}
 		final InputMethodManager imm
-			= (InputMethodManager) mEditText.getContext()
-				.getSystemService(Context.INPUT_METHOD_SERVICE);
+			= ContextUtils.requireSystemService(mEditText.getContext(), InputMethodManager.class);
 		imm.hideSoftInputFromWindow(mEditText.getWindowToken(), 0);
 	}
 

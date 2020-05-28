@@ -32,6 +32,8 @@ import android.net.wifi.p2p.WifiP2pManager;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
+import com.serenegiant.utils.ContextUtils;
+
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -96,7 +98,7 @@ public class WiFiP2pHelper {
 	 */
 	private WiFiP2pHelper(@NonNull final Context context) {
 		mWeakContext = new WeakReference<Context>(context);
-		mWifiP2pManager = (WifiP2pManager) context.getSystemService(Context.WIFI_P2P_SERVICE);
+		mWifiP2pManager = ContextUtils.requireSystemService(context, WifiP2pManager.class);
 	}
 	
 	/**
