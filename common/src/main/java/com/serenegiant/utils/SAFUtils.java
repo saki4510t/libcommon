@@ -234,6 +234,7 @@ public class SAFUtils {
 
 	/**
 	 * 恒常的にアクセスできるように取得したパーミッションを開放する
+	 * deprecatedなので#releasePersistableUriPermissionを代わりに使う
 	 * @param context
 	 * @param requestCode
 	 * @throws UnsupportedOperationException
