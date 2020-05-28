@@ -27,7 +27,10 @@ public abstract class SAFUtilsViewModel extends BaseObservable
 	public void setRequestCode(final int value) {
 		if (DEBUG) Log.v(TAG, "setRequestCode:" + value);
 		if (mRequestCode != value) {
-			mRequestCode = value;
+			if ((value & 0xffff) == value) {
+				// Fragmentからのリクエストコードは下位16ビットしか使えないので制限
+				mRequestCode = value;
+			}
 			// Notify observers of a new value.
 			notifyPropertyChanged(BR.requestCode);
 		}
@@ -51,7 +54,12 @@ public abstract class SAFUtilsViewModel extends BaseObservable
 	 * @param value
 	 */
 	public void setRequestCodeString(final String value) {
-		setRequestCode(parseIntWithoutException(value, mRequestCode));
+		final int v = parseIntWithoutException(value, mRequestCode);
+		if (v != mRequestCode) {
+			setRequestCode(parseIntWithoutException(value, mRequestCode));
+			// Notify observers of a new value.
+			notifyPropertyChanged(BR.requestCodeString);
+		}
 	}
 
 	/**
@@ -66,7 +74,7 @@ public abstract class SAFUtilsViewModel extends BaseObservable
 			try {
 				result = Integer.parseInt(value);
 			} catch (final NumberFormatException e) {
-				Log.d(TAG, "setRequestCodeString:", e);
+				if (DEBUG) Log.d(TAG, "setRequestCodeString:", e);
 			}
 		}
 		return result;
