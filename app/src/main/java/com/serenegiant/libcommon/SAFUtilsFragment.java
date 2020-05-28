@@ -67,7 +67,31 @@ public class SAFUtilsFragment extends BaseFragment {
 	public void onActivityResult(final int requestCode,
 		final int resultCode, @Nullable final Intent data) {
 
-		super.onActivityResult(requestCode, resultCode, data);
+		if (DEBUG) Log.v(TAG, "onActivityResult:requestCode=" + requestCode);
+		if (mLastRequestCode == requestCode) {
+			mLastRequestCode = 0;
+			SAFUtils.handleOnResult(requireContext(),
+				requestCode, resultCode, data, new SAFUtils.handleOnResultDelegater() {
+
+				@Override
+				public boolean onResult(final int requestCode,
+					@NonNull final Uri uri, @NonNull final Intent data) {
+
+					if (DEBUG) Log.v(TAG, "onResult:call takePersistableUriPermission," + data);
+					SAFUtils.takePersistableUriPermission(requireContext(), requestCode, uri);
+					return true;
+				}
+
+				@Override
+				public void onFailed(final int requestCode,
+					@Nullable final Intent data) {
+
+					if (DEBUG) Log.v(TAG, "onFailed:" + data);
+				}
+			});
+		} else {
+			super.onActivityResult(requestCode, resultCode, data);
+		}
 	}
 
 	private void initView() {
@@ -86,6 +110,8 @@ public class SAFUtilsFragment extends BaseFragment {
 			if (v.getId() == R.id.add_btn) {
 				final int requestCode = mViewModel.getRequestCode();
 				if ((requestCode != 0) && ((requestCode & 0xffff) == requestCode)) {
+					if (DEBUG) Log.v(TAG, "onClick:request SAF permission,requestCode=" + requestCode);
+					mLastRequestCode = requestCode;
 					SAFUtils.releaseStorageAccessPermission(requireContext(), requestCode);
 					SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
 				} else {
