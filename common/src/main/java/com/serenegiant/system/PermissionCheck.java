@@ -31,6 +31,7 @@ import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -225,7 +226,7 @@ public final class PermissionCheck {
 	@NonNull
 	public static List<String> missingPermissions(
 		@NonNull final Context context,
-		@NonNull final List<String> expectations)
+		@NonNull final Collection<String> expectations)
 			throws IllegalArgumentException, PackageManager.NameNotFoundException {
 
 		final PackageManager pm = context.getPackageManager();
