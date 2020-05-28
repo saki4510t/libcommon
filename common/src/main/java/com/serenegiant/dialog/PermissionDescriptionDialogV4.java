@@ -18,39 +18,36 @@ package com.serenegiant.dialog;
  *  limitations under the License.
 */
 
-import com.serenegiant.system.BuildCheck;
-
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
+
+import com.serenegiant.system.BuildCheck;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import android.util.Log;
 
 /**
  * パーミッション要求前に説明を表示するためのDialogFragment実装
- * deprecatedなので代わりにPermissionDescriptionDialogV4を使うこと
  */
-@SuppressWarnings("deprecation")
-@Deprecated
-public class MessageDialogFragmentV4 extends DialogFragmentEx {
+public class PermissionDescriptionDialogV4 extends DialogFragmentEx {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
-	private static final String TAG = MessageDialogFragmentV4.class.getSimpleName();
+	private static final String TAG = PermissionDescriptionDialogV4.class.getSimpleName();
 
 	private static final String ARGS_KEY_PERMISSIONS = "permissions";
-	
+
 	/**
 	 * ダイアログの表示結果を受け取るためのコールバックリスナー
 	 */
-	@Deprecated
-	public static interface MessageDialogListener {
-		public void onMessageDialogResult(
-			@NonNull final MessageDialogFragmentV4 dialog, final int requestCode,
+	public static interface DialogResultListener {
+		public void onDialogResult(
+			@NonNull final PermissionDescriptionDialogV4 dialog, final int requestCode,
 			@NonNull final String[] permissions, final boolean result);
 	}
 
@@ -64,17 +61,17 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static MessageDialogFragmentV4 showDialog(
+	public static PermissionDescriptionDialogV4 showDialog(
 		@NonNull final FragmentActivity parent, final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		@NonNull final String[] permissions) throws IllegalStateException {
 
-		final MessageDialogFragmentV4 dialog
+		final PermissionDescriptionDialogV4 dialog
 			= newInstance(requestCode, id_title, id_message, permissions);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
-	
+
 	/**
 	 * ダイアログ表示のためのヘルパーメソッド
 	 * @param parent
@@ -85,12 +82,12 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public static MessageDialogFragmentV4 showDialog(
+	public static PermissionDescriptionDialogV4 showDialog(
 		@NonNull final Fragment parent, final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		@NonNull final String[] permissions) throws IllegalStateException {
 
-		final MessageDialogFragmentV4 dialog
+		final PermissionDescriptionDialogV4 dialog
 			= newInstance(requestCode, id_title, id_message, permissions);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.requireFragmentManager(), TAG);
@@ -106,12 +103,12 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	 * @param permissions
 	 * @return
 	 */
-	public static MessageDialogFragmentV4 newInstance(
+	public static PermissionDescriptionDialogV4 newInstance(
 		final int requestCode,
 		@StringRes final int id_title, @StringRes final int id_message,
 		@NonNull final String[] permissions) {
 
-		final MessageDialogFragmentV4 fragment = new MessageDialogFragmentV4();
+		final PermissionDescriptionDialogV4 fragment = new PermissionDescriptionDialogV4();
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
@@ -122,12 +119,12 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 		return fragment;
 	}
 
-	private MessageDialogListener mDialogListener;
+	private DialogResultListener mDialogListener;
 
 	/**
 	 * コンストラクタ, 直接生成せずに#newInstanceを使うこと
 	 */
-	public MessageDialogFragmentV4() {
+	public PermissionDescriptionDialogV4() {
 		super();
 		// デフォルトコンストラクタが必要
 	}
@@ -136,20 +133,20 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 	public void onAttach(@NonNull final Context context) {
 		super.onAttach(context);
 		// コールバックインターフェースを取得
-		if (context instanceof MessageDialogListener) {
-			mDialogListener = (MessageDialogListener)context;
+		if (context instanceof DialogResultListener) {
+			mDialogListener = (DialogResultListener)context;
 		}
 		if (mDialogListener == null) {
 			final Fragment fragment = getTargetFragment();
-			if (fragment instanceof MessageDialogListener) {
-				mDialogListener = (MessageDialogListener)fragment;
+			if (fragment instanceof DialogResultListener) {
+				mDialogListener = (DialogResultListener)fragment;
 			}
 		}
 		if (mDialogListener == null) {
 			if (BuildCheck.isAndroid4_2()) {
 				final Fragment target = getParentFragment();
-				if (target instanceof MessageDialogListener) {
-					mDialogListener = (MessageDialogListener)target;
+				if (target instanceof DialogResultListener) {
+					mDialogListener = (DialogResultListener)target;
 				}
 			}
 		}
@@ -209,8 +206,8 @@ public class MessageDialogFragmentV4 extends DialogFragmentEx {
 		final int requestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
 		final String[] permissions = args.getStringArray(ARGS_KEY_PERMISSIONS);
 		try {
-			mDialogListener.onMessageDialogResult(
-				MessageDialogFragmentV4.this,
+			mDialogListener.onDialogResult(
+				PermissionDescriptionDialogV4.this,
 				requestCode, permissions, result);
 		} catch (final Exception e) {
 			Log.w(TAG, e);

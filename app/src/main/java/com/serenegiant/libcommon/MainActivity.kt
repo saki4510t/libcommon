@@ -20,28 +20,24 @@ package com.serenegiant.libcommon
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
-import androidx.annotation.CallSuper
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.serenegiant.dialog.MessageDialogFragmentV4
-import com.serenegiant.dialog.MessageDialogFragmentV4.MessageDialogListener
+import com.serenegiant.dialog.PermissionDescriptionDialogV4
+import com.serenegiant.dialog.PermissionDescriptionDialogV4.DialogResultListener
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
 import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
-import com.serenegiant.utils.SAFUtils
 
 class MainActivity
 	: AppCompatActivity(),
-		OnListFragmentInteractionListener, MessageDialogListener {
+		OnListFragmentInteractionListener, DialogResultListener {
 
 	private var mIsResumed = false
 
@@ -277,8 +273,8 @@ class MainActivity
 	 * @param result
 	 */
 	@SuppressLint("NewApi")
-	override fun onMessageDialogResult(
-		dialog: MessageDialogFragmentV4, requestCode: Int,
+	override fun onDialogResult(
+		dialog: PermissionDescriptionDialogV4, requestCode: Int,
 		permissions: Array<String>, result: Boolean) {
 		if (result) { // メッセージダイアログでOKを押された時はパーミッション要求する
 			if (BuildCheck.isMarshmallow()) {
@@ -351,7 +347,7 @@ class MainActivity
 	 */
 	protected fun checkPermissionWriteExternalStorage(): Boolean {
 		if (!PermissionCheck.hasWriteExternalStorage(this)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_EXT_STORAGE,
@@ -369,7 +365,7 @@ class MainActivity
 	 */
 	protected fun checkPermissionAudio(): Boolean {
 		if (!PermissionCheck.hasAudio(this)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_AUDIO_RECORDING,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_AUDIO,
@@ -387,7 +383,7 @@ class MainActivity
 	 */
 	protected fun checkPermissionCamera(): Boolean {
 		if (!PermissionCheck.hasCamera(this)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_CAMERA,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_CAMERA,
@@ -405,7 +401,7 @@ class MainActivity
 	 */
 	protected fun checkPermissionNetwork(): Boolean {
 		if (!PermissionCheck.hasNetwork(this)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_NETWORK,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_NETWORK,
@@ -422,7 +418,7 @@ class MainActivity
 	 */
 	protected fun checkPermissionLocation(): Boolean {
 		if (!PermissionCheck.hasAccessLocation(this)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_LOCATION,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_LOCATION,
@@ -442,7 +438,7 @@ class MainActivity
 	protected fun checkPermissionHardwareId(): Boolean {
 		if (!PermissionCheck.hasPermission(this,
 				Manifest.permission.READ_PHONE_STATE)) {
-			MessageDialogFragmentV4.showDialog(this,
+			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_HARDWARE_ID,
 				R.string.permission_title,
 				ID_PERMISSION_REQUEST_HARDWARE_ID,
