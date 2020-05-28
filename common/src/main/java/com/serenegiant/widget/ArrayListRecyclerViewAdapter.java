@@ -41,13 +41,13 @@ import androidx.recyclerview.widget.RecyclerView;
  * アイテムのクリック・ロングクリックイベントのコールバック処理等を追加したRecyclerView.Adapter実装
  * @param <T>
  */
-public abstract class CustomRecyclerViewAdapter<T>
-	extends RecyclerView.Adapter<CustomRecyclerViewAdapter.ViewHolder<T>> {
+public abstract class ArrayListRecyclerViewAdapter<T>
+	extends RecyclerView.Adapter<ArrayListRecyclerViewAdapter.ViewHolder<T>> {
 
 	private static final boolean DEBUG = false;	// FIXME set false when production
-	private static final String TAG = CustomRecyclerViewAdapter.class.getSimpleName();
+	private static final String TAG = ArrayListRecyclerViewAdapter.class.getSimpleName();
 
-	public interface CustomRecyclerViewListener<T> {
+	public interface ArrayListRecyclerViewListener<T> {
 		public void onItemClick(
 			@NonNull final RecyclerView.Adapter<?> parent,
 			@NonNull final View view,
@@ -64,10 +64,11 @@ public abstract class CustomRecyclerViewAdapter<T>
 	private final List<T> mItems;
 	private LayoutInflater mLayoutInflater;
 	private RecyclerView mRecycleView;
-	private CustomRecyclerViewListener<T> mCustomRecycleViewListener;
+	private ArrayListRecyclerViewListener<T> mCustomRecycleViewListener;
 
-    public CustomRecyclerViewAdapter(@LayoutRes final int itemViewLayoutId,
-									 @NonNull final List<T> items) {
+    public ArrayListRecyclerViewAdapter(
+    	@LayoutRes final int itemViewLayoutId,
+		@NonNull final List<T> items) {
 
 		mItemViewId = itemViewLayoutId;
 		mItems = items;
@@ -129,7 +130,7 @@ public abstract class CustomRecyclerViewAdapter<T>
 		}
 	}
 
-	public void setOnItemClickListener(final CustomRecyclerViewListener<T> listener) {
+	public void setOnItemClickListener(final ArrayListRecyclerViewListener<T> listener) {
 		mCustomRecycleViewListener = listener;
 	}
 
@@ -209,7 +210,7 @@ public abstract class CustomRecyclerViewAdapter<T>
 						try {
 							final T item = getItem(pos);
 							mCustomRecycleViewListener.onItemClick(
-								CustomRecyclerViewAdapter.this, v, pos, item);
+								ArrayListRecyclerViewAdapter.this, v, pos, item);
 							return;
 						} catch (final Exception e) {
 							Log.w(TAG, e);
@@ -219,7 +220,7 @@ public abstract class CustomRecyclerViewAdapter<T>
 						final int position = mRecycleView.getChildAdapterPosition(v);
 						final T item = getItem(position);
 						mCustomRecycleViewListener.onItemClick(
-							CustomRecyclerViewAdapter.this, v, position, item);
+							ArrayListRecyclerViewAdapter.this, v, position, item);
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
@@ -239,7 +240,7 @@ public abstract class CustomRecyclerViewAdapter<T>
 						final int position = mRecycleView.getChildAdapterPosition(v);
 						final T item = getItem(position);
 						return mCustomRecycleViewListener.onItemLongClick(
-							CustomRecyclerViewAdapter.this, v, position, item);
+							ArrayListRecyclerViewAdapter.this, v, position, item);
 					}
 				} catch (final Exception e) {
 					Log.w(TAG, e);

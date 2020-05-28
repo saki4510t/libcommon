@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 /**
  * 文字列リストを表示するためのCustomRecyclerViewAdapter実装
  */
-public class StringsRecyclerViewAdapter extends CustomRecyclerViewAdapter<String> {
+public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<String> {
 	private static final boolean DEBUG = false;	// FIXME set false when production
 	private static final String TAG = StringsRecyclerViewAdapter.class.getSimpleName();
 
