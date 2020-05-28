@@ -1,6 +1,7 @@
 package com.serenegiant.libcommon;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,16 +12,23 @@ import android.widget.Toast;
 import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding;
 import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel;
 import com.serenegiant.utils.SAFUtils;
+import com.serenegiant.widget.StringsRecyclerViewAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 public class SAFUtilsFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = SAFUtilsFragment.class.getSimpleName();
 
 	private FragmentSafutilsBinding mBinding;
+	private StringsRecyclerViewAdapter mAdapter;
 	private int mLastRequestCode;
 
 	public SAFUtilsFragment() {
@@ -63,7 +71,11 @@ public class SAFUtilsFragment extends BaseFragment {
 	}
 
 	private void initView() {
-		// FIXME 未実装
+		mAdapter = new StringsRecyclerViewAdapter(
+			R.layout.list_item_title, new ArrayList<String>());
+		mBinding.list.setLayoutManager(new LinearLayoutManager(requireContext()));
+		mBinding.list.setEmptyView(mBinding.empty);
+		mBinding.list.setAdapter(mAdapter);
 	}
 
 	private final SAFUtilsViewModel mViewModel
@@ -86,5 +98,14 @@ public class SAFUtilsFragment extends BaseFragment {
 	};
 
 	private void updateSAFPermissions() {
+		if (DEBUG) Log.v(TAG, "updateSAFPermissions:");
+		@NonNull
+		final Map<Integer, Uri> map = SAFUtils.getStorageUriAll(requireContext());
+		final List<String> list = new ArrayList<>();
+		for (final Map.Entry<Integer, Uri> entry: map.entrySet()) {
+			list.add(entry.getKey() + "@" + entry.getValue().toString());
+		}
+		mAdapter.replaceAll(list);
+		mAdapter.notifyDataSetChanged();
 	}
 }

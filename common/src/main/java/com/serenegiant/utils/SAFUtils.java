@@ -43,8 +43,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
@@ -1251,6 +1253,37 @@ public class SAFUtils {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * パーミッションを保持しているリクエストコードとUriのペアを保持するMapを取得する
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static Map<Integer, Uri> getStorageUriAll(@NonNull final Context context) {
+		final Map<Integer, Uri> result = new HashMap<>();
+		final SharedPreferences pref
+			= context.getSharedPreferences(context.getPackageName(), 0);
+		final Map<String, ?> values = pref.getAll();
+		for (final String key: values.keySet()) {
+			if (key.startsWith(KEY_PREFIX)) {
+				final Object value = values.get(key);
+				if (value instanceof String) {
+					try {
+						final int requestCode = Integer.parseInt(key.substring(KEY_PREFIX.length()));
+						final Uri uri = Uri.parse((String)value);
+						result.put(requestCode, uri);
+					} catch (final NumberFormatException e) {
+						Log.d(TAG, "getStorageUriAll:unexpected key format," + key + ",value=" + value);
+					}
+				} else {
+					Log.d(TAG, "getStorageUriAll:unexpected key-value pair,key=" + key + ",value=" + value);
+				}
+			}
+		}
+		return result;
+	}
+
+
 	private static final String KEY_PREFIX = "SDUtils-";
 
 	/**
