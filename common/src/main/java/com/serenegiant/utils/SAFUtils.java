@@ -232,6 +232,20 @@ public class SAFUtils {
 		return takePersistableUriPermission(context, requestCode, treeUri, flags);
 	}
 
+	/**
+	 * 恒常的にアクセスできるように取得したパーミッションを開放する
+	 * @param context
+	 * @param requestCode
+	 * @throws UnsupportedOperationException
+	 */
+	@Deprecated
+	public static void releaseStorageAccessPermission(
+		@NonNull final Context context,
+		final int requestCode) {
+
+		releasePersistableUriPermission(context, requestCode);
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * requestCodeに対応するUriへアクセス可能かどうか
@@ -385,10 +399,9 @@ public class SAFUtils {
 	 * @param requestCode
 	 * @throws UnsupportedOperationException
 	 */
-	public static void releaseStorageAccessPermission(
+	public static void releasePersistableUriPermission(
 		@NonNull final Context context,
 		final int requestCode) {
-
 		if (BuildCheck.isLollipop()) {
 			final String key = getKey(requestCode);
 			final Uri uri = loadUri(context, key);

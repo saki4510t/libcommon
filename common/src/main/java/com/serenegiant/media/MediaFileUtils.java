@@ -68,7 +68,7 @@ public class MediaFileUtils {
 		}
 		if (root == null) {
 			if (DEBUG) Log.d(TAG, "getSAFRecordingRoot:保存先を取得できなかったので念のためにセカンダリーストレージアクセスのパーミッションも落としておく");
-			SAFUtils.releaseStorageAccessPermission(context, saveTreeId);
+			SAFUtils.releasePersistableUriPermission(context, saveTreeId);
 		}
 		return root;
 	}

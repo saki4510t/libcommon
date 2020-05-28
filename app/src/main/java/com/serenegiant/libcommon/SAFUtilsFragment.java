@@ -126,7 +126,7 @@ public class SAFUtilsFragment extends BaseFragment {
 								Toast.makeText(requireContext(),
 									"release permission,requestCode=" + requestCode,
 									Toast.LENGTH_SHORT).show();
-								SAFUtils.releaseStorageAccessPermission(requireContext(), requestCode);
+								SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
 								updateSAFPermissions();
 								return true;
 							}
@@ -153,7 +153,7 @@ public class SAFUtilsFragment extends BaseFragment {
 				if ((requestCode != 0) && ((requestCode & 0xffff) == requestCode)) {
 					if (DEBUG) Log.v(TAG, "onClick:request SAF permission,requestCode=" + requestCode);
 					mLastRequestCode = requestCode;
-					SAFUtils.releaseStorageAccessPermission(requireContext(), requestCode);
+					SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
 					SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
 				} else {
 					Toast.makeText(requireContext(),
