@@ -88,15 +88,13 @@ public class SAFUtils {
 		@Nullable final Intent data,
 		@NonNull final SAFUtils.handleOnResultDelegater delegater) {
 
-		if (data != null) {
-			if (resultCode == Activity.RESULT_OK) {
-				final Uri uri = data.getData();
-				if (uri != null) {
-					try {
-						return delegater.onResult(requestCode, uri, data);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					}
+		if ((data != null) && (resultCode == Activity.RESULT_OK)) {
+			final Uri uri = data.getData();
+			if (uri != null) {
+				try {
+					return delegater.onResult(requestCode, uri, data);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
 				}
 			}
 		}
