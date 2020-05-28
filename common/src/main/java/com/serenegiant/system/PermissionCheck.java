@@ -205,12 +205,13 @@ public final class PermissionCheck {
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
 	 */
-	    return missingPermissions(context, new ArrayList<String>(Arrays.asList(expectations)));
+	@NonNull
 	public static List<String> missingPermissions(
 		@NonNull final Context context,
 		@NonNull final String[] expectations)
 			throws IllegalArgumentException, PackageManager.NameNotFoundException {
 
+	    return missingPermissions(context, Arrays.asList(expectations));
 	}
 
 	/**
@@ -221,6 +222,7 @@ public final class PermissionCheck {
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
 	 */
+	@NonNull
 	public static List<String> missingPermissions(
 		@NonNull final Context context,
 		@NonNull final List<String> expectations)
@@ -229,12 +231,13 @@ public final class PermissionCheck {
 		final PackageManager pm = context.getPackageManager();
 		final PackageInfo pi = pm.getPackageInfo(
 			context.getPackageName(), PackageManager.GET_PERMISSIONS);
+		final List<String> result = new ArrayList<>(expectations);
 		final String[] info = pi.requestedPermissions;
 		if (info != null) {
 			for (String i : info) {
-				expectations.remove(i);
+				result.remove(i);
 			}
 		}
-		return expectations;
+		return result;
 	}
 }
