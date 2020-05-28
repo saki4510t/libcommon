@@ -393,8 +393,12 @@ public class SAFUtils {
 			final String key = getKey(requestCode);
 			final Uri uri = loadUri(context, key);
 			if (uri != null) {
-				context.getContentResolver().releasePersistableUriPermission(uri,
-					Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+				try {
+					context.getContentResolver().releasePersistableUriPermission(uri,
+						Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+				} catch (final SecurityException e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
 				clearUri(context, key);
 			}
 		} else {
