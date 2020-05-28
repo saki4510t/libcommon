@@ -48,8 +48,14 @@ public abstract class CustomRecyclerViewAdapter<T>
 	private static final String TAG = CustomRecyclerViewAdapter.class.getSimpleName();
 
 	public interface CustomRecyclerViewListener<T> {
-		public void onItemClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
-		public boolean onItemLongClick(RecyclerView.Adapter<?> parent, View view, int position, T item);
+		public void onItemClick(
+			@NonNull final RecyclerView.Adapter<?> parent,
+			@NonNull final View view,
+			final int position, @Nullable final T item);
+		public boolean onItemLongClick(
+			@NonNull final RecyclerView.Adapter<?> parent,
+			@NonNull final View view,
+			final int position, @Nullable final T item);
 	}
 
 	@LayoutRes
