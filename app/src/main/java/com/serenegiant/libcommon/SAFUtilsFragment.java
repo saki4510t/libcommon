@@ -28,6 +28,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+/**
+ * SAFUtilクラスのテスト用Fragment
+ */
 public class SAFUtilsFragment extends BaseFragment
 	implements ConfirmDialogV4.ConfirmDialogListener {
 
@@ -38,6 +41,9 @@ public class SAFUtilsFragment extends BaseFragment
 	private StringsRecyclerViewAdapter mAdapter;
 	private int mLastRequestCode;
 
+	/**
+	 * デフォルトコンストラクタ
+	 */
 	public SAFUtilsFragment() {
 		super();
 		// デフォルトコンストラクタが必要
@@ -70,6 +76,12 @@ public class SAFUtilsFragment extends BaseFragment
 		super.internalOnPause();
 	}
 
+	/**
+	 * パーミッション要求結果の処理
+	 * @param requestCode
+	 * @param resultCode
+	 * @param data
+	 */
 	@Override
 	public void onActivityResult(final int requestCode,
 		final int resultCode, @Nullable final Intent data) {
@@ -101,17 +113,29 @@ public class SAFUtilsFragment extends BaseFragment
 		}
 	}
 
-
+	/**
+	 * 指定したリクエストコードに対するパーミッションをすでに保持しているときに
+	 * 再設定するかどうかの問い合わせに対するユーザーレスポンスの処理
+	 * @param dialog
+	 * @param requestCode
+	 * @param result DialogInterface#BUTTONxxx
+	 * @param userArgs
+	 */
 	@Override
 	public void onConfirmResult(
 		@NonNull final ConfirmDialogV4 dialog,
 		final int requestCode, final int result, @Nullable final Bundle userArgs) {
 
 		if (result == DialogInterface.BUTTON_POSITIVE) {
+			// ユーザーがOKを押したときの処理, パーミッションを要求する
 			requestPermission(requestCode);
 		}
 	}
 
+//--------------------------------------------------------------------------------
+	/**
+	 * 表示を初期化
+	 */
 	private void initView() {
 		mAdapter = new StringsRecyclerViewAdapter(
 			R.layout.list_item_title, new ArrayList<String>());
@@ -158,6 +182,9 @@ public class SAFUtilsFragment extends BaseFragment
 		mBinding.list.setAdapter(mAdapter);
 	}
 
+	/**
+	 * 表示内容の処理用ViewModelオブジェクト
+	 */
 	private final SAFUtilsViewModel mViewModel
 		= new SAFUtilsViewModel() {
 		@Override
@@ -184,12 +211,19 @@ public class SAFUtilsFragment extends BaseFragment
 		}
 	};
 
+	/**
+	 * 指定したリクエストコードに対するパーミッションを要求
+	 * @param requestCode
+	 */
 	private void requestPermission(final int requestCode) {
 		mLastRequestCode = requestCode;
 		SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
 		SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
 	}
 
+	/**
+	 * 保持しているパーミッション一覧表示を更新
+	 */
 	private void updateSAFPermissions() {
 		if (DEBUG) Log.v(TAG, "updateSAFPermissions:");
 		@NonNull
