@@ -1,5 +1,6 @@
 package com.serenegiant.libcommon;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.serenegiant.dialog.ConfirmDialogV4;
 import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding;
 import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel;
 import com.serenegiant.utils.SAFUtils;
@@ -26,7 +28,9 @@ import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class SAFUtilsFragment extends BaseFragment {
+public class SAFUtilsFragment extends BaseFragment
+	implements ConfirmDialogV4.ConfirmDialogListener {
+
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = SAFUtilsFragment.class.getSimpleName();
 
@@ -97,6 +101,17 @@ public class SAFUtilsFragment extends BaseFragment {
 		}
 	}
 
+
+	@Override
+	public void onConfirmResult(
+		@NonNull final ConfirmDialogV4 dialog,
+		final int requestCode, final int result, @Nullable final Bundle userArgs) {
+
+		if (result == DialogInterface.BUTTON_POSITIVE) {
+			requestPermission(requestCode);
+		}
+	}
+
 	private void initView() {
 		mAdapter = new StringsRecyclerViewAdapter(
 			R.layout.list_item_title, new ArrayList<String>());
@@ -152,9 +167,14 @@ public class SAFUtilsFragment extends BaseFragment {
 				final int requestCode = mViewModel.getRequestCode();
 				if ((requestCode != 0) && ((requestCode & 0xffff) == requestCode)) {
 					if (DEBUG) Log.v(TAG, "onClick:request SAF permission,requestCode=" + requestCode);
-					mLastRequestCode = requestCode;
-					SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
-					SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
+					if (!SAFUtils.hasPermission(requireContext(), requestCode)) {
+						requestPermission(requestCode);
+					} else {
+						ConfirmDialogV4.showDialog(SAFUtilsFragment.this,
+							requestCode, R.string.title_request_saf_permission,
+								"Already has permission for requestCode(" + requestCode + ")",
+								true);
+					}
 				} else {
 					Toast.makeText(requireContext(),
 					"Fragmentからは下位16ビットしかリクエストコードとして使えない," + requestCode,
@@ -163,6 +183,12 @@ public class SAFUtilsFragment extends BaseFragment {
 			}
 		}
 	};
+
+	private void requestPermission(final int requestCode) {
+		mLastRequestCode = requestCode;
+		SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
+		SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
+	}
 
 	private void updateSAFPermissions() {
 		if (DEBUG) Log.v(TAG, "updateSAFPermissions:");
