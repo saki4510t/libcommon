@@ -35,6 +35,7 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 
 public final class PermissionCheck {
 	private PermissionCheck() {
@@ -66,7 +67,7 @@ public final class PermissionCheck {
 		int result = PackageManager.PERMISSION_DENIED;
 		try {
 			if (BuildCheck.isMarshmallow()) {
-				result = context.checkSelfPermission(permissionName);
+				result = ContextCompat.checkSelfPermission(context, permissionName);
 			} else {
 				final PackageManager pm = context.getPackageManager();
 				result = pm.checkPermission(permissionName, context.getPackageName());
@@ -90,7 +91,7 @@ public final class PermissionCheck {
 		try {
 			final int check;
 			if (BuildCheck.isMarshmallow()) {
-				check = context.checkSelfPermission(permissionName);
+				check = ContextCompat.checkSelfPermission(context, permissionName);
 			} else {
 				final PackageManager pm = context.getPackageManager();
 				check = pm.checkPermission(permissionName, context.getPackageName());
