@@ -121,8 +121,12 @@ public abstract class CustomRecyclerViewAdapter<T>
         return mItems.size();
     }
 
-	public T getItem(final int position) {
-		return (position >= 0) && (position < mItems.size()) ? mItems.get(position) : null;
+	public T getItem(final int position) throws IndexOutOfBoundsException {
+		if ((position >= 0) && (position < mItems.size())) {
+			return mItems.get(position);
+		} else {
+			throw new IndexOutOfBoundsException();
+		}
 	}
 
 	public void setOnItemClickListener(final CustomRecyclerViewListener<T> listener) {
