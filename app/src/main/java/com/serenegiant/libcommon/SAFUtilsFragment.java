@@ -6,12 +6,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding;
+import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel;
+import com.serenegiant.utils.SAFUtils;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.databinding.DataBindingUtil;
 
 public class SAFUtilsFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = SAFUtilsFragment.class.getSimpleName();
+
+	private FragmentSafutilsBinding mBinding;
 
 	public SAFUtilsFragment() {
 		super();
@@ -25,9 +32,11 @@ public class SAFUtilsFragment extends BaseFragment {
 		@Nullable final Bundle savedInstanceState) {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:");
-		final View rootView = inflater.inflate(R.layout.fragment_safutils, container, false);
-		initView(rootView);
-		return rootView;
+		mBinding = DataBindingUtil.inflate(inflater,
+			R.layout.fragment_safutils, container, false);
+		mBinding.setViewModel(mViewModel);
+		initView();
+		return mBinding.getRoot();
 	}
 
 	@Override
@@ -42,9 +51,20 @@ public class SAFUtilsFragment extends BaseFragment {
 		super.internalOnPause();
 	}
 
-	private void initView(final View rootView) {
+	private void initView() {
 		// FIXME 未実装
-//		SAFUtils.releaseStorageAccessPermission(this, Const.REQUEST_ACCESS_SD)
-//		SAFUtils.requestStorageAccess(this, Const.REQUEST_ACCESS_SD)
 	}
+
+	private final SAFUtilsViewModel mViewModel
+		= new SAFUtilsViewModel() {
+		@Override
+		public void onClick(final View v) {
+			if (DEBUG) Log.v(TAG, "onClick:" + v);
+			if (v.getId() == R.id.add_btn) {
+				final int requestCode = mViewModel.getRequestCode();
+				SAFUtils.releaseStorageAccessPermission(requireContext(), requestCode);
+				SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
+			}
+		}
+	};
 }
