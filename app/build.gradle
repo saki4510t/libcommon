@@ -45,7 +45,7 @@ dependencies {
 
 	implementation "androidx.core:core-ktx:${androidXKtx}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
 
 	implementation project(':common')
 }
