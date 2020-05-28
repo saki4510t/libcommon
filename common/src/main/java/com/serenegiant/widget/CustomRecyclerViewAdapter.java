@@ -139,7 +139,6 @@ public abstract class CustomRecyclerViewAdapter<T>
 //		EXECUTOR.prestartAllCoreThreads();
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
-			mItems.clear();
 			mItems.addAll(collection);
 			registerDataSetObserver(mItems);
 		}
