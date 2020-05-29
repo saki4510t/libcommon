@@ -28,6 +28,7 @@ import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.nio.CharsetsUtils;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ContextUtils;
 
@@ -68,15 +69,11 @@ public class UsbUtils implements Const {
 				(USB_DT_STRING << 8) | id, languages[i], work, 256, 0);
 			if ((ret > 2) && (work[0] == ret) && (work[1] == USB_DT_STRING)) {
 				// skip first two bytes(bLength & bDescriptorType), and copy the rest to the string
-				try {
-					result = new String(work, 2, ret - 2, "UTF-16LE");
-					if (!"Љ".equals(result)) {	// 変なゴミが返ってくる時がある
-						break;
-					} else {
-						result = null;
-					}
-				} catch (final UnsupportedEncodingException e) {
-					// ignore
+				result = new String(work, 2, ret - 2, CharsetsUtils.UTF16LE/*"UTF-16LE"*/);
+				if (!"Љ".equals(result)) {	// 変なゴミが返ってくる時がある
+					break;
+				} else {
+					result = null;
 				}
 			}
 		}
