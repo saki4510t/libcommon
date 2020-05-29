@@ -105,16 +105,25 @@ public class MediaInfo implements Parcelable {
 	}
 
 	/**
-	 * Cursorから値を読み込んで初期化するコンストラクタ
+	 * MediaStore.Filesのクエリ結果のCursorから値を読み込んで初期化するコンストラクタ
 	 * @param cursor
 	 */
 	MediaInfo(@NonNull final Cursor cursor) {
+		this(cursor, cursor.getInt(PROJ_INDEX_MEDIA_TYPE));
+	}
+
+	/**
+	 * MediaStore.ImagesまたはMediaStore.Videoのクエリ結果のCursorから
+	 * 値を読み込んで初期化するコンストラクタ
+	 * @param cursor
+	 */
+	MediaInfo(@NonNull final Cursor cursor, final int mediaType) {
 		id = cursor.getLong(PROJ_INDEX_ID);
 		data = cursor.getString(PROJ_INDEX_DATA);
 		title = cursor.getString(PROJ_INDEX_TITLE);
 		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
 		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
-		mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
+		this.mediaType = mediaType;
 		try {
 			width = cursor.getInt(PROJ_INDEX_WIDTH);
 			height = cursor.getInt(PROJ_INDEX_HEIGHT);
@@ -123,13 +132,28 @@ public class MediaInfo implements Parcelable {
 		}
 	}
 
+	/**
+	 * MediaStore.Filesのクエリ結果のCursorからの読み込み用
+	 * @param cursor
+	 * @return
+	 */
 	MediaInfo loadFromCursor(@NonNull final Cursor cursor) {
+		return loadFromCursor(cursor, cursor.getInt(PROJ_INDEX_MEDIA_TYPE));
+	}
+
+	/**
+	 * MediaStore.ImagesまたはMediaStore.Videoのクエリ結果のCursorからの読み込み用
+	 * @param cursor
+	 * @param mediaType
+	 * @return
+	 */
+	MediaInfo loadFromCursor(@NonNull final Cursor cursor, final int mediaType) {
 		id = cursor.getLong(PROJ_INDEX_ID);
 		data = cursor.getString(PROJ_INDEX_DATA);
 		title = cursor.getString(PROJ_INDEX_TITLE);
 		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
 		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
-		mediaType = cursor.getInt(PROJ_INDEX_MEDIA_TYPE);
+		this.mediaType = mediaType;
 		try {
 			width = cursor.getInt(PROJ_INDEX_WIDTH);
 			height = cursor.getInt(PROJ_INDEX_HEIGHT);
