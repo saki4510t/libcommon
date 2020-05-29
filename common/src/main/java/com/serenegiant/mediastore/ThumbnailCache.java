@@ -45,6 +45,7 @@ import androidx.collection.LruCache;
 
 /**
  * サムネイルキャッシュ
+ * メモリーキャッシュとディスクキャッシュの2段構成
  */
 public class ThumbnailCache {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
