@@ -58,13 +58,13 @@ public class MediaStoreUtils {
 	protected static final String[] PROJ_MEDIA = {
 		MediaStore.MediaColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
 		MediaStore.MediaColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
-		MediaStore.Files.FileColumns.MEDIA_TYPE,	// index=2  for Cursor, column number=3  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
 		MediaStore.MediaColumns.MIME_TYPE,			// index=3  for Cursor, column number=4  in SQL statement
 		MediaStore.MediaColumns.DATA,				// index=4  for Cursor, column number=5  in SQL statement
 		MediaStore.MediaColumns.DISPLAY_NAME,		// index=5  for Cursor, column number=6  in SQL statement
 		MediaStore.MediaColumns.WIDTH,				// index=6  for Cursor, column number=7  in SQL statement
 		MediaStore.MediaColumns.HEIGHT,				// index=7  for Cursor, column number=8  in SQL statement
+		MediaStore.Files.FileColumns.MEDIA_TYPE,	// index=2  for Cursor, column number=3  in SQL statement
 //		MediaStore.MediaColumns.DATE_MODIFIED,		// index=8  for Cursor, column number=9  in SQL statement
 //		MediaStore.MediaColumns.DATE_ADDED,			// index=9  for Cursor, column number=10 in SQL statement
 	};
@@ -72,7 +72,6 @@ public class MediaStoreUtils {
 	protected static final String[] PROJ_MEDIA_IMAGE = {
 		MediaStore.MediaColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
 		MediaStore.MediaColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
-		MediaStore.Files.FileColumns.MEDIA_TYPE,	// index=2  for Cursor, column number=3  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
 		MediaStore.MediaColumns.MIME_TYPE,			// index=3  for Cursor, column number=4  in SQL statement
 		MediaStore.MediaColumns.DATA,				// index=4  for Cursor, column number=5  in SQL statement
@@ -86,7 +85,6 @@ public class MediaStoreUtils {
 	protected static final String[] PROJ_MEDIA_VIDEO = {
 		MediaStore.MediaColumns._ID,				// index=0  for Cursor, column number=1  in SQL statement
 		MediaStore.MediaColumns.TITLE,				// index=1  for Cursor, column number=2  in SQL statement
-		MediaStore.Files.FileColumns.MEDIA_TYPE,	// index=2  for Cursor, column number=3  in SQL statement
 		// MEDIA_TYPE_NONE, MEDIA_TYPE_IMAGE, MEDIA_TYPE_AUDIO, MEDIA_TYPE_VIDEO, MEDIA_TYPE_PLAYLIST
 		MediaStore.MediaColumns.MIME_TYPE,			// index=3  for Cursor, column number=4  in SQL statement
 		MediaStore.MediaColumns.DATA,				// index=4  for Cursor, column number=5  in SQL statement
@@ -118,12 +116,12 @@ public class MediaStoreUtils {
 	// these values should be fit to PROJ_MEDIA
 	protected static final int PROJ_INDEX_ID = 0;
 	protected static final int PROJ_INDEX_TITLE = 1;
-	protected static final int PROJ_INDEX_MEDIA_TYPE = 2;
-	protected static final int PROJ_INDEX_MIME_TYPE = 3;
-	protected static final int PROJ_INDEX_DATA = 4;
-	protected static final int PROJ_INDEX_DISPLAY_NAME = 5;
-	protected static final int PROJ_INDEX_WIDTH = 6;
-	protected static final int PROJ_INDEX_HEIGHT = 7;
+	protected static final int PROJ_INDEX_MIME_TYPE = 2;
+	protected static final int PROJ_INDEX_DATA = 3;
+	protected static final int PROJ_INDEX_DISPLAY_NAME = 4;
+	protected static final int PROJ_INDEX_WIDTH = 5;
+	protected static final int PROJ_INDEX_HEIGHT = 6;
+	protected static final int PROJ_INDEX_MEDIA_TYPE = 7;
 //	protected static final int PROJ_INDEX_DATE_MODIFIED = 8;
 //	protected static final int PROJ_INDEX_DATE_ADDED = 9;
 
