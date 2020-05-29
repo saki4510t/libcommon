@@ -376,7 +376,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		public void requery() {
 			synchronized (mAdapter) {
-				startQuery(0, mAdapter, QUERY_URI_FILES, PROJ_MEDIA,
+				startQuery(0, mAdapter, QUERY_URI_IMAGES, PROJ_MEDIA_IMAGE,
 					mAdapter.mSelection, mAdapter.mSelectionArgs, null);
 			}
 		}
