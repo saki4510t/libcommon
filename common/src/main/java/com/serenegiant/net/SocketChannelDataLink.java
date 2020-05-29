@@ -260,7 +260,7 @@ public class SocketChannelDataLink extends AbstractChannelDataLink {
 		@SuppressLint("NewApi")
 		private synchronized void init() throws IOException {
 			if (DEBUG) Log.v(TAG, "ServerTask#init:");
-			final String addr = NetworkHelper.getLocalIPv4Address();
+			final String addr = NetworkUtils.getLocalIPv4Address();
 			final SocketAddress address = new InetSocketAddress(addr, mPort);
 			mServerChannel = ServerSocketChannel.open();
 			if (BuildCheck.isNougat()) {

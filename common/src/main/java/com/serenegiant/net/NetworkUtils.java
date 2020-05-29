@@ -28,12 +28,8 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 
-/**
- * 代わりにNetworkUtilsを使うこと
- */
-@Deprecated
-public class NetworkHelper {
-	private static final String TAG = NetworkHelper.class.getSimpleName();
+public class NetworkUtils {
+	private static final String TAG = NetworkUtils.class.getSimpleName();
 
 	public static String getLocalIPv4Address() {
 		try {
