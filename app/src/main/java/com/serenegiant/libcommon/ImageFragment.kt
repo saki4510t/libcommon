@@ -171,13 +171,13 @@ class ImageFragment: BaseFragment() {
 	private class MyImageLoader(parent: ImageLoaderDrawable)
 		: ImageLoader(parent) {
 
-		override fun loadBitmap(cr: ContentResolver,
+		override fun loadBitmap(context: Context,
 			mediaType: Int, id: Long,
 			requestWidth: Int, requestHeight: Int): Bitmap {
 
 			var result: Bitmap? = null
 			try {
-				result = BitmapHelper.asBitmap(cr, id)
+				result = BitmapHelper.asBitmap(context.contentResolver, id)
 				if (result != null) {
 					val w = result.width
 					val h = result.height
@@ -190,7 +190,7 @@ class ImageFragment: BaseFragment() {
 				}
 			} catch (e: IOException) {
 				if (DEBUG) Log.w(TAG, e)
-				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result!!
 		}

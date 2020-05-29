@@ -448,13 +448,15 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 		}
 
 		@Override
-		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
+		protected Bitmap loadBitmap(@NonNull final Context context,
 			final int mediaType, final long id,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
-				result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
+				result = BitmapHelper.asBitmap(
+					context.getContentResolver(), id,
+					requestWidth, requestHeight);
 				if (result != null) {
 					final int w = result.getWidth();
 					final int h = result.getHeight();
@@ -467,7 +469,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 				}
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
-				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}

@@ -21,7 +21,6 @@ package com.serenegiant.mediastore;
  * limitations under the License.
  */
 
-import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -45,7 +44,6 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		Paint.FILTER_BITMAP_FLAG | Paint.DITHER_FLAG;
 
 	private final Context mContext;
-	private final ContentResolver mContentResolver;
     private final Paint mPaint = new Paint(DEFAULT_PAINT_FLAGS);
     private final Paint mDebugPaint = new Paint(DEFAULT_PAINT_FLAGS);
     private final Matrix mDrawMatrix = new Matrix();
@@ -66,7 +64,6 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 		final int width, final int height) {
 
 		mContext = context;
-		mContentResolver = context.getContentResolver();
 		mDebugPaint.setColor(Color.RED);
 		mDebugPaint.setTextSize(18);
 		mBitmapWidth = width;
@@ -101,11 +98,6 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 			canvas.drawText(Long.toString(mLoader != null ? mLoader.id() : -1),
 				bounds.centerX(), bounds.centerY(), mDebugPaint);
 		}
-	}
-
-	@NonNull
-	public ContentResolver getContentResolver() {
-		return mContentResolver;
 	}
 
 	@NonNull

@@ -18,7 +18,7 @@ package com.serenegiant.mediastore;
  *  limitations under the License.
 */
 
-import android.content.ContentResolver;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
@@ -75,7 +75,7 @@ public abstract class ImageLoader implements Runnable {
 
 	/**
 	 * 実際の読み込み処理
-	 * @param cr
+	 * @param context
 	 * @param mediaType
 	 * @param id
 	 * @param requestWidth
@@ -83,7 +83,7 @@ public abstract class ImageLoader implements Runnable {
 	 * @return
 	 */
 	protected abstract Bitmap loadBitmap(
-		@NonNull final ContentResolver cr,
+		@NonNull final Context context,
 		final int mediaType, final long id,
 		final int requestWidth, final int requestHeight);
 
@@ -93,11 +93,13 @@ public abstract class ImageLoader implements Runnable {
 	 * @return
 	 */
 	@Nullable
-	protected Bitmap loadDefaultBitmap(@DrawableRes final int drawableRes) {
+	protected Bitmap loadDefaultBitmap(
+		@NonNull final Context context,
+		@DrawableRes final int drawableRes) {
 		Bitmap result = null;
 		if (drawableRes != 0) {
 			result = BitmapFactory.decodeResource(
-				mParent.getContext().getResources(), drawableRes);
+				context.getResources(), drawableRes);
 		}
 		return result;
 	}
@@ -111,7 +113,7 @@ public abstract class ImageLoader implements Runnable {
 			id = mId;
 		}
 		if (!mTask.isCancelled()) {
-			mBitmap = loadBitmap(mParent.getContentResolver(),
+			mBitmap = loadBitmap(mParent.getContext(),
 				mediaType, id,
 				mParent.getIntrinsicWidth(), mParent.getIntrinsicHeight());
 		}

@@ -473,7 +473,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 
 		@Override
-		protected Bitmap loadBitmap(@NonNull final ContentResolver cr,
+		protected Bitmap loadBitmap(@NonNull final Context context,
 			final int mediaType, final long id,
 			final int requestWidth, final int requestHeight) {
 
@@ -481,15 +481,19 @@ public class MediaStoreAdapter extends CursorAdapter {
 			try {
 				switch (mediaType) {
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(cr, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getImageThumbnail(
+						context.getContentResolver(), id,
+						requestWidth, requestHeight);
 					break;
 				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(cr, id, requestWidth, requestHeight);
+					result = mThumbnailCache.getVideoThumbnail(
+						context.getContentResolver(), id,
+						requestWidth, requestHeight);
 					break;
 				}
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
-				result = loadDefaultBitmap(R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}
