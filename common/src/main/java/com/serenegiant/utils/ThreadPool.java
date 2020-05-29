@@ -66,7 +66,7 @@ public class ThreadPool {
 	 * @return
 	 */
 	public static synchronized boolean isShutdown() {
-		return EXECUTOR != null && EXECUTOR.isShutdown();
+		return EXECUTOR == null || EXECUTOR.isShutdown();
 	}
 
 	/**
