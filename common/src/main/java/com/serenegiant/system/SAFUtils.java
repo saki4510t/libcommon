@@ -260,25 +260,30 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int requestCode) {
 
-		boolean found = false;
 		if (BuildCheck.isLollipop()) {
 			final Uri uri = loadUri(context, getKey(requestCode));
 			if (uri != null) {
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
 				final List<UriPermission> list
 					= context.getContentResolver().getPersistedUriPermissions();
-				for (final UriPermission item: list) {
-					if (item.getUri().equals(uri)) {
-						// requestCodeに対応するUriへのパーミッションを恒常的に保持していた時
-						found = true;
-						break;
-					}
-				}
+				return hasPermission(list, uri);
 			}
 		} else {
 			throw new UnsupportedOperationException("should be API>=21");
 		}
-		return found;
+		return false;
+	}
+
+	public static boolean hasPermission(
+		@NonNull final List<UriPermission> persistedUriPermissions,
+		@NonNull final Uri uri) {
+
+		for (final UriPermission item: persistedUriPermissions) {
+			if (item.getUri().equals(uri)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -1282,14 +1287,16 @@ public class SAFUtils {
 			= context.getSharedPreferences(context.getPackageName(), 0);
 		final Map<String, ?> values = pref.getAll();
 		final List<String> removes = new ArrayList<>();
+		final List<UriPermission> list
+			= context.getContentResolver().getPersistedUriPermissions();
 		for (final String key: values.keySet()) {
 			if (key.startsWith(KEY_PREFIX)) {
 				final Object value = values.get(key);
 				if (value instanceof String) {
 					try {
 						final int requestCode = Integer.parseInt(key.substring(KEY_PREFIX.length()));
-						if (hasPermission(context, requestCode)) {
-							final Uri uri = Uri.parse((String)value);
+						final Uri uri = Uri.parse((String)value);
+						if (hasPermission(list, uri)) {
 							result.put(requestCode, uri);
 						} else {
 							removes.add(key);
