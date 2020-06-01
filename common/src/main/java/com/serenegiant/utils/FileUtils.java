@@ -34,6 +34,8 @@ import androidx.documentfile.provider.DocumentFile;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.SAFUtils;
+
 public class FileUtils {
 	private static final String TAG = FileUtils.class.getSimpleName();
 

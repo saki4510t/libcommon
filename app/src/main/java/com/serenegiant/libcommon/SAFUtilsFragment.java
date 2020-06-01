@@ -14,7 +14,7 @@ import android.widget.Toast;
 import com.serenegiant.dialog.ConfirmDialogV4;
 import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding;
 import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel;
-import com.serenegiant.utils.SAFUtils;
+import com.serenegiant.system.SAFUtils;
 import com.serenegiant.widget.ArrayListRecyclerViewAdapter;
 import com.serenegiant.widget.StringsRecyclerViewAdapter;
 

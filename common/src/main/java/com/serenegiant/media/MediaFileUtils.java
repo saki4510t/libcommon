@@ -22,8 +22,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.serenegiant.system.PermissionCheck;
+import com.serenegiant.system.SAFUtils;
 import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.SAFUtils;
 
 import java.io.File;
 import java.io.IOException;

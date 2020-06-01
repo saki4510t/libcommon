@@ -32,8 +32,8 @@ import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.serenegiant.system.PermissionCheck
+import com.serenegiant.system.SAFUtils
 import com.serenegiant.utils.FileUtils
-import com.serenegiant.utils.SAFUtils
 import com.serenegiant.view.ViewUtils
 import com.serenegiant.widget.CameraDelegator
 import com.serenegiant.widget.ICameraView

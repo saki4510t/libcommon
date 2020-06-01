@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -27,15 +27,10 @@ import android.content.UriPermission;
 import android.net.Uri;
 import android.os.Build;
 import android.os.ParcelFileDescriptor;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
-import androidx.documentfile.provider.DocumentFile;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.UriHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -48,11 +43,16 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
- * systemパッケージに移動したのでそちらを使うこと
+ * XXX systemパッケージに移動するかも
  */
-@Deprecated
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFUtils {
 	private static final boolean DEBUG = false; // set false on production
@@ -68,11 +68,11 @@ public class SAFUtils {
 	 */
 	public interface handleOnResultDelegater {
 		public boolean onResult(final int requestCode,
-			@NonNull final Uri uri, @NonNull final Intent data);
+								@NonNull final Uri uri, @NonNull final Intent data);
 
 		public void onFailed(final int requestCode, @Nullable final Intent data);
 	}
-	
+
 	/**
 	 * ActivityまたはFragmentの#onActivityResultメソッドの処理をdelegaterで
 	 * 処理するためのヘルパーメソッド
