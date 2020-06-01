@@ -247,7 +247,7 @@ public final class CursorHelper {
 					}
 					sb.append(", ");
 				}
-				Log.v("CursorHelper#dumpCursor:", sb.toString());
+				Log.v(TAG, "dumpCursor:" + sb.toString());
 				row++;
 			} while (cursor.moveToNext());
 		}
