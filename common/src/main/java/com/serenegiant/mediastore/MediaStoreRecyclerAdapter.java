@@ -163,7 +163,7 @@ public class MediaStoreRecyclerAdapter
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			changeCursor(null);
+			releaseCursor();
 		} finally {
 			super.finalize();
 		}
@@ -338,9 +338,9 @@ public class MediaStoreRecyclerAdapter
 		mQueryHandler.requery();
 	}
 
-	protected void changeCursor(@Nullable final Cursor cursor) {
-		if (DEBUG) Log.v(TAG, "changeCursor:" + cursor);
-		final Cursor old = swapCursor(cursor);
+	protected void releaseCursor() {
+		if (DEBUG) Log.v(TAG, "releaseCursor:");
+		final Cursor old = swapCursor(null);
 		if ((old != null) && !old.isClosed()) {
 			old.close();
 		}
