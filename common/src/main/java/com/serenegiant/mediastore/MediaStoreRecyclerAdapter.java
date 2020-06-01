@@ -395,7 +395,7 @@ public class MediaStoreRecyclerAdapter
 				mValues.clear();
 				if (newCursor.moveToFirst()) {
 					int pos = 0;
-					while (newCursor.moveToNext()) {
+					do {
 						info.loadFromCursor(newCursor);
 						if (DEBUG) Log.v(TAG, "swapCursor:" + info);
 						if (!mNeedValidate || info.canRead(mCr)) {
@@ -404,7 +404,7 @@ public class MediaStoreRecyclerAdapter
 							removes.add(new MediaInfo(info));
 						}
 						pos++;
-					}
+					} while (newCursor.moveToNext());
 				}
 			}
 			mDataValid = true;

@@ -396,13 +396,13 @@ public class MediaStoreAdapter extends CursorAdapter {
 				mValues.clear();
 				if (newCursor.moveToFirst()) {
 					int pos = 0;
-					while (newCursor.moveToNext()) {
+					do {
 						info.loadFromCursor(newCursor);
 						if (!mNeedValidate || info.canRead(mCr)) {
 							mValues.add(pos);
 						}
 						pos++;
-					}
+					} while (newCursor.moveToNext());
 				}
 			}
 		} else {
