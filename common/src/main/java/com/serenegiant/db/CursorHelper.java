@@ -22,14 +22,15 @@ import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public final class CursorHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = CursorHelper.class.getSimpleName();
-	
-	public static String getString(@Nullable final Cursor cursor,
-		final String columnName, final String defaultValue) {
+
+	public static String get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, @Nullable final String defaultValue) {
 
 		String result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -41,9 +42,9 @@ public final class CursorHelper {
 		}
 		return result;
 	}
-	
-	public static CharSequence getCharSequence(@Nullable final Cursor cursor,
-		final String columnName, final CharSequence defaultValue) {
+
+	public static CharSequence get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, @Nullable final CharSequence defaultValue) {
 
 		CharSequence result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -55,16 +56,16 @@ public final class CursorHelper {
 		}
 		return result;
 	}
-	
-	public static String getString(@Nullable final Cursor cursor,
-		final String columnName, final CharSequence defaultValue) {
 
-		final CharSequence result = getCharSequence(cursor, columnName, defaultValue);
+	public static String getString(@Nullable final Cursor cursor,
+		@NonNull final String columnName, @Nullable final CharSequence defaultValue) {
+
+		final CharSequence result = get(cursor, columnName, defaultValue);
 		return result != null ? result.toString() : null;
 	}
-	
-	public static int getInt(final Cursor cursor,
-		final String columnName, final int defaultValue) {
+
+	public static int get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final int defaultValue) {
 
 		int result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -77,8 +78,8 @@ public final class CursorHelper {
 		return result;
 	}
 	
-	public static short getShort(@Nullable final Cursor cursor,
-		final String columnName, final short defaultValue) {
+	public static short get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final short defaultValue) {
 
 		short result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -91,8 +92,8 @@ public final class CursorHelper {
 		return result;
 	}
 	
-	public static long getLong(@Nullable final Cursor cursor,
-		final String columnName, final long defaultValue) {
+	public static long get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final long defaultValue) {
 
 		long result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -105,8 +106,8 @@ public final class CursorHelper {
 		return result;
 	}
 	
-	public static float getFloat(@Nullable final Cursor cursor,
-		final String columnName, final float defaultValue) {
+	public static float get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final float defaultValue) {
 
 		float result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -119,8 +120,8 @@ public final class CursorHelper {
 		return result;
 	}
 	
-	public static double getDouble(@Nullable final Cursor cursor,
-		final String columnName, final double defaultValue) {
+	public static double get(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final double defaultValue) {
 
 		double result = defaultValue;
 		if ((cursor != null) && !cursor.isClosed()) {
@@ -132,7 +133,58 @@ public final class CursorHelper {
 		}
 		return result;
 	}
-	
+
+//--------------------------------------------------------------------------------
+	@Deprecated
+	public static String getString(@Nullable final Cursor cursor,
+		@NonNull final String columnName, @Nullable final String defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static CharSequence getCharSequence(@Nullable final Cursor cursor,
+		@NonNull final String columnName, @Nullable final CharSequence defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static int getInt(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final int defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static short getShort(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final short defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static long getLong(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final long defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static float getFloat(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final float defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+	@Deprecated
+	public static double getDouble(@Nullable final Cursor cursor,
+		@NonNull final String columnName, final double defaultValue) {
+
+		return get(cursor, columnName, defaultValue);
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * カラム名"_id"から値を読み取り指定したidと一致するpositionを探す。見つからなければ-1を返す
 	 *
