@@ -20,6 +20,7 @@ public class MergeCursor extends AbstractCursor {
 	@NonNull
 	private final ArrayList<Cursor> mCursors;
 	private Cursor mCursor; // updated in onMove
+	private int mIndex;
 	private DataSetObserver mObserver;
 
 	/**
@@ -51,13 +52,17 @@ public class MergeCursor extends AbstractCursor {
 		synchronized (mCursors) {
 			/* Find the right cursor */
 			mCursor = null;
+			mIndex = -1;
 			int cursorStartPos = 0;
+			int index = -1;
 			for (final Cursor cursor: mCursors) {
+				index++;
 				if (cursor == null) {
 					continue;
 				}
 				if (newPosition < (cursorStartPos + cursor.getCount())) {
 					mCursor = cursor;
+					mIndex = index;
 					break;
 				}
 
@@ -236,6 +241,28 @@ public class MergeCursor extends AbstractCursor {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * 現在の選択されているCursorのインデックスを返す
+	 * Cursorが選択されていなければ-1
+	 * @return
+	 */
+	public int getCurrentIndex() {
+		synchronized (mCursors) {
+			return mIndex;
+		}
+	}
+
+	/**
+	 * 現在選択されているCursorを取得する
+	 * 選択されていなければnullを返す
+	 * @return
+	 */
+	@Nullable
+	public Cursor getCurrentCursor() {
+		synchronized (mCursors) {
+			return mCursor;
+		}
+	}
 
 	/**
 	 * 保持しているCursorの数を取得
