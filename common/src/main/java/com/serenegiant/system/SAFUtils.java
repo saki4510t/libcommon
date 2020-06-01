@@ -1281,20 +1281,30 @@ public class SAFUtils {
 		final SharedPreferences pref
 			= context.getSharedPreferences(context.getPackageName(), 0);
 		final Map<String, ?> values = pref.getAll();
+		final List<String> removes = new ArrayList<>();
 		for (final String key: values.keySet()) {
 			if (key.startsWith(KEY_PREFIX)) {
 				final Object value = values.get(key);
 				if (value instanceof String) {
 					try {
 						final int requestCode = Integer.parseInt(key.substring(KEY_PREFIX.length()));
-						final Uri uri = Uri.parse((String)value);
-						result.put(requestCode, uri);
+						if (hasPermission(context, requestCode)) {
+							final Uri uri = Uri.parse((String)value);
+							result.put(requestCode, uri);
+						} else {
+							removes.add(key);
+						}
 					} catch (final NumberFormatException e) {
 						Log.d(TAG, "getStorageUriAll:unexpected key format," + key + ",value=" + value);
 					}
 				} else {
 					Log.d(TAG, "getStorageUriAll:unexpected key-value pair,key=" + key + ",value=" + value);
 				}
+			}
+		}
+		if (!removes.isEmpty()) {
+			for (final String key: removes) {
+				clearUri(context, key);
 			}
 		}
 		return result;
@@ -1411,6 +1421,7 @@ public class SAFUtils {
 
 	/**
 	 * requestStorageAccessの下請け
+	 * ドキュメントツリーへのアクセスのためのIntentを返す
 	 * @return
 	 */
 	private static Intent prepareStorageAccessPermission() {
