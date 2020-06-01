@@ -452,8 +452,8 @@ public class ViewUtils {
 		if (view instanceof ImageView) {
 			result = (ImageView)view;
 		} else {
-			for (int i = 0; i < ICON_IDS.length; i++) {
-				final View v = view.findViewById(ICON_IDS[i]);
+			for (final int id: ICON_IDS) {
+				final View v = view.findViewById(id);
 				if (v instanceof ImageView) {
 					result = (ImageView)v;
 					break;
@@ -476,8 +476,8 @@ public class ViewUtils {
 		if (view instanceof TextView) {
 			result = (TextView)view;
 		} else {
-			for (int i = 0; i < TITLE_IDS.length; i++) {
-				final View v = view.findViewById(TITLE_IDS[i]);
+			for (final int id: TITLE_IDS) {
+				final View v = view.findViewById(id);
 				if (v instanceof TextView) {
 					result = (TextView)v;
 					break;
