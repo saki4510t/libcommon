@@ -194,7 +194,7 @@ public final class CursorHelper {
 	 */
 	public static int findPositionFromId(@Nullable final Cursor cursor, final long requestID) {
 		int savedPosition, position = -1;
-		if (cursor != null) {
+		if ((cursor != null) && !cursor.isClosed()) {
 			savedPosition = cursor.getPosition();
 			try {
 				if (cursor.moveToFirst()) {
@@ -216,7 +216,7 @@ public final class CursorHelper {
 	
 	@SuppressLint("NewApi")
 	public static void dumpCursor(@Nullable final Cursor cursor) {
-		if ((cursor != null) && cursor.moveToFirst()) {
+		if ((cursor != null) && !cursor.isClosed() && cursor.moveToFirst()) {
 			int n, row = 0;
 			final StringBuilder sb = new StringBuilder();
 			String[] columnNames;
