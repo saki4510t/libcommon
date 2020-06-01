@@ -433,8 +433,11 @@ public class ViewUtils {
 
 	@IdRes
 	private static final int[] TITLE_IDS = {
-		android.R.id.title,
 		R.id.title,
+		R.id.content,
+		android.R.id.title,
+		android.R.id.text1,
+		android.R.id.text2,
 	};
 
 	/**
