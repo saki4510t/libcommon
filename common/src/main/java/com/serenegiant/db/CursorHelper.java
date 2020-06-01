@@ -217,11 +217,10 @@ public final class CursorHelper {
 	@SuppressLint("NewApi")
 	public static void dumpCursor(@Nullable final Cursor cursor) {
 		if ((cursor != null) && !cursor.isClosed() && cursor.moveToFirst()) {
-			int n, row = 0;
 			final StringBuilder sb = new StringBuilder();
-			String[] columnNames;
-			n = cursor.getColumnCount();
-			columnNames = cursor.getColumnNames();
+			final int n = cursor.getColumnCount();
+			final String[] columnNames = cursor.getColumnNames();
+			int row = 0;
 			do {
 				sb.setLength(0);
 				sb.append("row=").append(row).append(", ");
