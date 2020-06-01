@@ -14,7 +14,7 @@ import androidx.annotation.Nullable;
  * ArrayListで複数のCursorを保持して1つのCursorとして扱うためのオレオレMergeCursor実装
  */
 public class MergeCursor extends AbstractCursor {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MergeCursor.class.getSimpleName();
 
 	@NonNull
