@@ -528,19 +528,26 @@ public class SAFUtils {
 			final String[] dir = dirs.split("/");
 			for (final String d: dir) {
 				if (!TextUtils.isEmpty(d)) {
-					final DocumentFile t = tree.findFile(d);
-					if ((t != null) && t.isDirectory()) {
-						// 既に存在している時は何もしない
-						tree = t;
-					} else if (t == null) {
-						if (tree.canWrite()) {
-							// 存在しないときはディレクトリを生成
-							tree = tree.createDirectory(d);
-						} else {
-							throw new IOException("can't create directory");
+					if ("..".equals(d)) {
+						tree = tree.getParentFile();
+						if (tree == null) {
+							throw new IOException("failed to get parent directory");
 						}
-					} else {
-						throw new IOException("can't create directory, file with same name already exists");
+					} else if (!".".equals(d)) {
+						final DocumentFile t = tree.findFile(d);
+						if ((t != null) && t.isDirectory()) {
+							// 既に存在している時は何もしない
+							tree = t;
+						} else if (t == null) {
+							if (tree.canWrite()) {
+								// 存在しないときはディレクトリを生成
+								tree = tree.createDirectory(d);
+							} else {
+								throw new IOException("can't create directory");
+							}
+						} else {
+							throw new IOException("can't create directory, file with same name already exists");
+						}
 					}
 				}
 			}
