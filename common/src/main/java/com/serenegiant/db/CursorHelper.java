@@ -252,5 +252,53 @@ public final class CursorHelper {
 			} while (cursor.moveToNext());
 		}
 	}
-	
+
+	/**
+	 * 指定したCursorの現在のレコードを文字列に変換
+	 * @param cursor
+	 */
+	public static String toString(@Nullable final Cursor cursor) {
+		if (cursor == null) {
+			return "{null}";
+		} else if (cursor.isClosed()) {
+			return "{closed}";
+		} else if (cursor.isBeforeFirst()) {
+			return "{before first}";
+		} else if (cursor.isAfterLast()) {
+			return "{after last}";
+		} else {
+			final StringBuilder sb = new StringBuilder();
+			final int n = cursor.getColumnCount();
+			final String[] columnNames = cursor.getColumnNames();
+			sb.append("{");
+			for (int i = 0; i < n; i++) {
+				switch (cursor.getType(i)) {
+				case Cursor.FIELD_TYPE_FLOAT:
+					sb.append(columnNames[i]).append("=").append(cursor.getDouble(i));
+					break;
+				case Cursor.FIELD_TYPE_INTEGER:
+					sb.append(columnNames[i]).append("=").append(cursor.getLong(i));
+					break;
+				case Cursor.FIELD_TYPE_STRING:
+					sb.append(columnNames[i]).append("=").append(cursor.getString(i));
+					break;
+				case Cursor.FIELD_TYPE_BLOB:
+					sb.append(columnNames[i]).append("=").append("BLOB");
+					break;
+				case Cursor.FIELD_TYPE_NULL:
+					sb.append(columnNames[i]).append("=").append("NULL");
+					break;
+				default:
+					sb.append(columnNames[i]).append("=").append("UNKNOWN");
+					break;
+				}
+				if (i < n-1) {
+					sb.append(",");
+				}
+			}
+			sb.append("}");
+			return sb.toString();
+		}
+	}
+
 }
