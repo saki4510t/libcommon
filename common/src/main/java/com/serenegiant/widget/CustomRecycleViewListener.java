@@ -22,7 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
 
 /**
- * CustomRecyclerViewAdapterCustomRecyclerViewListenerを使うこと
+ * ArrayListRecyclerViewAdapter.ArrayListRecyclerViewListenerを使うこと
  * @param <T>
  */
 @Deprecated

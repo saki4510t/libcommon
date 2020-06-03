@@ -40,7 +40,7 @@ import java.util.List;
 
 /**
  * アイテムのクリック・ロングクリックイベントのコールバック処理を追加したRecyclerView.Adapter実装
- * CustomRecyclerViewAdapterを使うこと
+ * ArrayListRecyclerViewAdapterを使うこと
  * @param <T>
  */
 @Deprecated
