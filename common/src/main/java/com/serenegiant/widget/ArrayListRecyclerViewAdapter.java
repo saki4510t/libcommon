@@ -151,7 +151,6 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 	 * @param collection
 	 */
 	public void addAll(final Collection<? extends T> collection) {
-//		EXECUTOR.prestartAllCoreThreads();
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
 			mItems.addAll(collection);
@@ -164,7 +163,6 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 	 * @param collection
 	 */
 	public void replaceAll(final Collection<? extends T> collection) {
-//		EXECUTOR.prestartAllCoreThreads();
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
 			mItems.clear();
@@ -174,7 +172,6 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 	}
 
 	public void sort(final Comparator<? super T> comparator) {
-//		EXECUTOR.prestartAllCoreThreads();
 		synchronized (mItems) {
 			Collections.sort(mItems, comparator);
 		}
