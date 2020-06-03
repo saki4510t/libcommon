@@ -30,9 +30,6 @@ import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.utils.UriHelper;
-
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -66,10 +63,12 @@ public class SAFUtils {
 	 * Storage Access Framework関係の処理を行うためのdelegater
 	 */
 	public interface handleOnResultDelegater {
-		public boolean onResult(final int requestCode,
-								@NonNull final Uri uri, @NonNull final Intent data);
+		public boolean onResult(
+			final int requestCode,
+			@NonNull final Uri uri, @NonNull final Intent data);
 
-		public void onFailed(final int requestCode, @Nullable final Intent data);
+		public void onFailed(
+			final int requestCode, @Nullable final Intent data);
 	}
 
 	/**
