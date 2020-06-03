@@ -312,7 +312,7 @@ public class DocumentTreeRecyclerAdapter
 						}
 					} else if (DEBUG) {
 						// ここにくるのはおかしい
-						Log.d(TAG, "MediaInfo not attached!");
+						Log.d(TAG, "FileInfo not attached!");
 					}
 				}
 			} else {
@@ -339,7 +339,7 @@ public class DocumentTreeRecyclerAdapter
 					}
 				} else if (DEBUG) {
 					// ここにくるのはおかしい
-					Log.d(TAG, "MediaInfo not attached!");
+					Log.d(TAG, "FileInfo not attached!");
 				}
 			}
 			return false;
