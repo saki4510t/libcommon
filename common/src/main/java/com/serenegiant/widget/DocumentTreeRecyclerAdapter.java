@@ -435,7 +435,9 @@ public class DocumentTreeRecyclerAdapter
 	} // FileInfo
 
 //--------------------------------------------------------------------------------
-	public static class ViewHolder extends RecyclerView.ViewHolder {
+	public static class ViewHolder extends RecyclerView.ViewHolder
+		implements Dividable {
+
 		private TextView mTitleTv;
 
 		public ViewHolder(final View view) {
@@ -466,6 +468,7 @@ public class DocumentTreeRecyclerAdapter
 			itemView.setEnabled(enable);
 		}
 
+		@Override
 		public void hasDivider(final boolean hasDivider) {
 			if (itemView instanceof Dividable) {
 				((Dividable) itemView).hasDivider(hasDivider);
@@ -474,6 +477,7 @@ public class DocumentTreeRecyclerAdapter
 			}
 		}
 
+		@Override
 		public boolean hasDivider() {
 			if (itemView instanceof Dividable) {
 				return ((Dividable) itemView).hasDivider();
