@@ -126,17 +126,22 @@ class MainActivity
 			0 -> {	// SAF
 				fragment = SAFUtilsFragment()
 			}
-			1 -> {	// NetworkConnection
+			1 -> {	// SAFContentProvider
+				if (BuildCheck.isLollipop()) {
+					fragment = SAFFilerFragment()
+				}
+			}
+			2 -> {	// NetworkConnection
 				fragment = NetworkConnectionFragment.newInstance()
 			}
-			2 -> {	// UsbMonitor
+			3 -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
 					return
 				}
 				fragment = UsbFragment.newInstance()
 			}
-			3 -> {	// Camera
+			4 -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -145,7 +150,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera)
 			}
-			4 -> {	// Camera
+			5 -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -154,7 +159,7 @@ class MainActivity
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera_rec)
 			}
-			5 -> {	// EffectCamera
+			6 -> {	// EffectCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -162,7 +167,7 @@ class MainActivity
 				}
 				fragment = EffectCameraFragment.newInstance()
 			}
-			6 -> {	// MixCamera
+			7 -> {	// MixCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -171,7 +176,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_mix, R.string.title_mix_camera)
 			}
-			7 -> {	// OverlayCamera
+			8 -> {	// OverlayCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -180,7 +185,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_overlay, R.string.title_overlay_camera)
 			}
-			8 -> {	// VideoSourceCamera
+			9 -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -189,7 +194,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_video_source, R.string.title_video_source_camera)
 			}
-			9 -> {	// VideoSourceDistributionCamera
+			10 -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -198,7 +203,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_distributor, R.string.title_video_source_dist_camera)
 			}
-			10 -> {	// ImageViewCamera
+			11 -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -207,7 +212,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_image_view, R.string.title_image_view_camera)
 			}
-			11 -> {	// TextureViewCamera
+			12 -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -216,7 +221,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_texture_view, R.string.title_texture_view_camera)
 			}
-			12 -> {	// SimpleCameraGL
+			13 -> {	// SimpleCameraGL
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -225,7 +230,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_camera_gl, R.string.title_simple_gl_camera)
 			}
-			13 -> {	// CameraSurface
+			14 -> {	// CameraSurface
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -233,22 +238,22 @@ class MainActivity
 				}
 				fragment = CameraSurfaceFragment()
 			}
-			14 -> {	// Galley
+			15 -> {	// Galley
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			15 -> {	// Galley(RecyclerView)
+			16 -> {	// Galley(RecyclerView)
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			16 -> {	// NumberKeyboard
+			17 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			17 -> {	// ViewSlider
+			18 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
 			else -> {
