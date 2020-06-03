@@ -441,6 +441,9 @@ public class DocumentTreeRecyclerAdapter
 		public ViewHolder(final View view) {
 			super(view);
 			mTitleTv = ViewUtils.findTitleView(view);
+			if (mTitleTv == null) {
+				throw new IllegalArgumentException("TextView not found");
+			}
 		}
 
 		@SuppressLint("SetTextI18n")
