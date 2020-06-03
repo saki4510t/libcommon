@@ -51,7 +51,6 @@ import androidx.fragment.app.FragmentActivity;
 
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
- * XXX systemパッケージに移動するかも
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFUtils {
