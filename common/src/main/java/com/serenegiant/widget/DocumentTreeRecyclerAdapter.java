@@ -19,8 +19,10 @@ package com.serenegiant.widget;
 */
 
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -53,14 +55,18 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * DocumentFileで指定したディレクトリ以下を一覧表示するためのRecyclerView.Adapter実装
  */
+@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class DocumentTreeRecyclerAdapter
 	extends RecyclerView.Adapter<DocumentTreeRecyclerAdapter.ViewHolder> {
 
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = DocumentTreeRecyclerAdapter.class.getSimpleName();
 
 	private static final long DELAY_MILLIS = 100L;
 
+	/**
+	 * リストの項目をクリック・ロングクリックしたときのコールバックリスナー
+	 */
 	public interface DocumentTreeRecyclerAdapterListener {
 		public void onItemClick(@NonNull RecyclerView.Adapter<?> parent,
 			@NonNull View view, @NonNull final DocumentFile item);
@@ -69,32 +75,54 @@ public class DocumentTreeRecyclerAdapter
 	}
 
 //--------------------------------------------------------------------------------
+@NonNull
 	private final Object mSync = new Object();
 	@NonNull
 	private final Context mContext;
 	private final int mLayoutRes;
+	@NonNull
 	private final DocumentFile mRoot;
+	@NonNull
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
+	/**
+	 * 現在のディレクトリ内のファイルリスト
+	 */
+	@NonNull
+	private final List<FileInfo> mItems = new ArrayList<>();
+	/**
+	 * ディレクトリ切替時の作業用FileInfoリスト
+	 */
+	@NonNull
+	private final List<FileInfo> mWork = new ArrayList<>();
 
+	@Nullable
 	private LayoutInflater mLayoutInflater;
+	/**
+	 * 親となるRecyclerView
+	 * onAttachedToRecyclerViewが呼ばれてからonDetachedFromRecyclerViewが
+	 * 呼ばれるまではNonNull
+	 */
 	@Nullable
 	private RecyclerView mRecycleView;
+	/**
+	 * リスト項目をクリック・ロングクリックしたときの用コールバックリスナー
+	 */
+	@Nullable
 	private DocumentTreeRecyclerAdapterListener mListener;
-
-	private final List<FileInfo> mItems = new ArrayList<>(); // ファイル情報リスト
-	private final List<FileInfo> mWork = new ArrayList<>(); // ファイル情報リスト
 
 	@Nullable
 	private Handler mAsyncHandler;
 
+	@Nullable
 	private DocumentFile mCurrentDir;
+	@Nullable
 	private String[] mExtFilter = null;							// 拡張子選択フィルター文字列, '.'なしの拡張子のみの配列
-	private String mExts;
 
 	/**
 	 * コンストラクタ
 	 * @param context
 	 * @param layoutResId
+	 * @param root ディレクトリを示すDocumentFile
 	 */
 	public DocumentTreeRecyclerAdapter(
 		@NonNull final Context context,
@@ -102,6 +130,9 @@ public class DocumentTreeRecyclerAdapter
 		@NonNull final DocumentFile root) {
 
 		super();
+		if (root == null || !root.isDirectory()) {
+			throw new IllegalArgumentException("root should be a directory!");
+		}
 		mContext = context;
 		mLayoutRes = layoutResId;
 		mRoot = root;
@@ -152,18 +183,36 @@ public class DocumentTreeRecyclerAdapter
 		return mItems.size();
 	}
 
-	public DocumentFile getItem(final int position) {
+	/**
+	 * 指定した位置に対応するDocumentFileを取得
+	 * @param position
+	 * @return
+	 * @throws IndexOutOfBoundsException
+	 */
+	public DocumentFile getItem(final int position)
+		throws IndexOutOfBoundsException {
+
 		return getFileInfo(position).getFile();
 	}
 
-	public void setListener(final DocumentTreeRecyclerAdapterListener listener) {
+	/**
+	 * リスト項目をクリック・ロングクリックしたときの用コールバックリスナーを登録
+	 * @param listener
+	 */
+	public void setListener(@Nullable final DocumentTreeRecyclerAdapterListener listener) {
 		if (DEBUG) Log.v(TAG, "setListener:" + listener);
 		mListener = listener;
 	}
 
+	/**
+	 * 指定したディレクトリへ切り替え
+	 * コンストラクタのroot引数で指定したディレクトリorその下位ディレクトリを指定すること
+	 * @param newDir
+	 * @throws IOException
+	 */
 	public void changeDir(@NonNull final DocumentFile newDir) throws IOException {
 		if (DEBUG) Log.v(TAG, "changeDir:newDir=" + newDir.getUri());
-		if (newDir.isDirectory() && newDir.canRead()) {
+		if (newDir.isDirectory()) {
 			internalChangeDir(newDir);
 			notifyDataSetChanged();
 		} else {
@@ -173,21 +222,25 @@ public class DocumentTreeRecyclerAdapter
 	}
 
 	/**
-	 * set extension filter
+	 * 拡張子でフィルタリング
+	 * セミコロンまたは空白で区切った拡張子文字列(.無し)
 	 * @param extString should separate with semicolon or space
 	 */
-	public void setExtFilter(final String extString) {
+	public void setExtFilter(@Nullable final String extString) {
 		if (!TextUtils.isEmpty(extString)) {
 			final Pattern p = Pattern.compile("[;\\s]+");	// セミコロンor空白で区切る
 			mExtFilter = p.split(extString.toLowerCase(Locale.getDefault()));
+		} else {
+			mExtFilter = null;
 		}
 	}
 
 //--------------------------------------------------------------------------------
 	/**
-	 * release all resources
+	 * 関係するリソースを破棄する
+	 * 再利用はできない
 	 */
-	public void release() {
+	private void release() {
 		synchronized (mItems) {
 			mItems.clear();
 		}
@@ -206,10 +259,16 @@ public class DocumentTreeRecyclerAdapter
 	}
 
 	@NonNull
-	private FileInfo getFileInfo(final int position) {
+	private FileInfo getFileInfo(final int position)
+			throws IndexOutOfBoundsException {
+
 		return mItems.get(position);
 	}
 
+	/**
+	 * ディレクトリ切り替え実行
+	 * @param newDir
+	 */
 	private void internalChangeDir(@NonNull final DocumentFile newDir) {
 		if (DEBUG) Log.v(TAG, "internalChangeDir:" + newDir);
 		synchronized (mSync) {
@@ -221,6 +280,9 @@ public class DocumentTreeRecyclerAdapter
 		}
 	}
 
+	/**
+	 * 非同期でディレクトリ切り替えを行うためのRunnable実装
+	 */
 	private class ChangeDirTask implements Runnable {
 		private final DocumentFile newDir;
 		public ChangeDirTask(@NonNull final DocumentFile newDir) {
@@ -347,14 +409,21 @@ public class DocumentTreeRecyclerAdapter
 	};
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ファイル情報を保持するためのDocumentFileのラッパークラス
+	 */
 	private static class FileInfo implements Comparable<FileInfo>  {
 		private final Locale mLocale = Locale.getDefault();
 		@NonNull
-		private DocumentFile mFile;			// ファイルオブジェクト
-		private boolean mIsUpNavigation;
+		private final DocumentFile mFile;			// ファイルオブジェクト
+		private final boolean mIsUpNavigation;
 		private boolean isSelected = false;	// 選択状態
 
-		// コンストラクタ
+		/**
+		 * コンストラクタ
+		 * @param file
+		 * @param upNavigation　親ディレクトリへ戻るための仮想ファイルかどうか
+		 */
 		public FileInfo(
 			@NonNull final DocumentFile file,
 			final boolean upNavigation) {
@@ -363,44 +432,84 @@ public class DocumentTreeRecyclerAdapter
 			mIsUpNavigation = upNavigation;
 		}
 
+		/**
+		 * 保持しているDocumentFileを取得
+		 * @return
+		 */
 		@NonNull
 		public DocumentFile getFile() {
 			return mFile;
 		}
 
+		/**
+		 * 保持しているDocumentFileのuriを取得
+		 * 保持しているDocumentFileの#getUriを呼び出す
+		 * @return
+		 */
 		@NonNull
 		public Uri getUri() {
 			return mFile.getUri();
 		}
 
+		/**
+		 * 保持しているDocumentFileの表示名を取得
+		 * @return
+		 */
 		@NonNull
 		public String getName() {
 			final String name = mFile.getName();
 			return mIsUpNavigation ? ".." : (TextUtils.isEmpty(name) ? "" : name);
 		}
 
-		public boolean isSelected() {
-			return isSelected;
-		}
-
-		public void select(final boolean select) {
-			isSelected = select;
-		}
-
+		/**
+		 * ディレクトリかどうかを取得
+		 * 保持しているDocumentFileの#isDirectoryを呼び出す
+		 * @return
+		 */
 		public boolean isDirectory() {
 			return mFile.isDirectory();
 		}
 
+		/**
+		 * 読み込み可能かどうかを取得
+		 * 保持しているDocumentFileの#canReadを呼び出す
+		 * @return
+		 */
 		public boolean canRead() {
 			return mFile.canRead();
 		}
 
+		/**
+		 * 書き込み可能かどうかを取得
+		 * 保持しているDocumentFileの#canWriteを呼び出す
+		 * @return
+		 */
 		public boolean canWrite() {
 			return mFile.canWrite();
 		}
 
+		/**
+		 * 親ディレクトリへ戻るための仮想ファイルかどうかを取得
+		 * @return
+		 */
 		public boolean isUpNavigation() {
 			return mIsUpNavigation;
+		}
+
+		/**
+		 * ファイルを選択中かどうかを取得
+		 * @return
+		 */
+		public boolean isSelected() {
+			return isSelected;
+		}
+
+		/**
+		 * ファイルを選択中かどうかをセット
+		 * @param select
+		 */
+		public void select(final boolean select) {
+			isSelected = select;
 		}
 
 		/**
