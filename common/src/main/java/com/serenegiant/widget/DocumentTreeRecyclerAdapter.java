@@ -418,7 +418,7 @@ public class DocumentTreeRecyclerAdapter
 
 			// ファイル同士、ディレクトリ同士の場合は、ファイル名（ディレクトリ名）の大文字小文字区別しない辞書順
 			return mFile.getName().toLowerCase(mLocale).compareTo(
-				other.getFile().getName().toLowerCase(mLocale)
+				other.getName().toLowerCase(mLocale)
 			);
 		}
 
