@@ -163,14 +163,14 @@ public class DocumentTreeRecyclerAdapter
 
 	@NonNull
 	@Override
-	public ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
+	public final ViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, final int viewType) {
 		if (mLayoutInflater == null) {
 			mLayoutInflater = LayoutInflater.from(mContext);
 		}
 		final View view = mLayoutInflater.inflate(mLayoutRes, parent, false);
 		view.setOnClickListener(mOnClickListener);
 		view.setOnLongClickListener(mOnLongClickListener);
-		return new ViewHolder(view);
+		return onCreateViewHolder(view);
 	}
 
 	@Override
@@ -240,7 +240,7 @@ public class DocumentTreeRecyclerAdapter
 	 * 関係するリソースを破棄する
 	 * 再利用はできない
 	 */
-	private void release() {
+	protected void release() {
 		synchronized (mItems) {
 			mItems.clear();
 		}
@@ -258,8 +258,17 @@ public class DocumentTreeRecyclerAdapter
 		}
 	}
 
+	/**
+	 * itemViewからViewHolderを生成する
+	 * @param itemView
+	 * @return
+	 */
+	protected ViewHolder onCreateViewHolder(final View itemView) {
+		return new ViewHolder(itemView);
+	}
+
 	@NonNull
-	private FileInfo getFileInfo(final int position)
+	protected FileInfo getFileInfo(final int position)
 			throws IndexOutOfBoundsException {
 
 		return mItems.get(position);
@@ -412,7 +421,7 @@ public class DocumentTreeRecyclerAdapter
 	/**
 	 * ファイル情報を保持するためのDocumentFileのラッパークラス
 	 */
-	private static class FileInfo implements Comparable<FileInfo>  {
+	protected static class FileInfo implements Comparable<FileInfo>  {
 		private final Locale mLocale = Locale.getDefault();
 		@NonNull
 		private final DocumentFile mFile;			// ファイルオブジェクト
@@ -549,7 +558,8 @@ public class DocumentTreeRecyclerAdapter
 	public static class ViewHolder extends RecyclerView.ViewHolder
 		implements Dividable {
 
-		private TextView mTitleTv;
+		/*package*/ TextView mTitleTv;
+		private FileInfo mItem;
 
 		public ViewHolder(final View view) {
 			super(view);
@@ -564,6 +574,7 @@ public class DocumentTreeRecyclerAdapter
 			final int position,
 			final FileInfo item) {
 
+			mItem = item;
 			itemView.setTag(R.id.position, position);
 			if (mTitleTv != null) {
 				if (item.isDirectory() && !item.isUpNavigation()) {
@@ -573,6 +584,11 @@ public class DocumentTreeRecyclerAdapter
 					mTitleTv.setText(item.getName());
 				}
 			}
+		}
+
+		@Nullable
+		public FileInfo getItem() {
+			return mItem;
 		}
 
 		public void setEnable(final boolean enable) {
