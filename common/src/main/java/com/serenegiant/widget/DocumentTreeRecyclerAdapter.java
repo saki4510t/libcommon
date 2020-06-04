@@ -373,8 +373,10 @@ public class DocumentTreeRecyclerAdapter
 			return mFile.getUri();
 		}
 
+		@NonNull
 		public String getName() {
-			return mIsUpNavigation ? ".." : mFile.getName();
+			final String name = mFile.getName();
+			return mIsUpNavigation ? ".." : (TextUtils.isEmpty(name) ? "" : name);
 		}
 
 		public boolean isSelected() {
