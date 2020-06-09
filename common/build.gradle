@@ -71,6 +71,7 @@ dependencies {
 //	androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.2.0'
 //	androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
 
+	implementation "androidx.core:core:${androidXCore}"
 	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
