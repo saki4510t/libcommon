@@ -184,15 +184,6 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	@Override
-	public void setBounds(
-		final int left, final int top,
-		final int right, final int bottom) {
-
-		super.setBounds(left, top, right, bottom);
-		updateTransformMatrix();
-	}
-
-	@Override
 	public int getIntrinsicWidth() {
 		return mWidth;
 	}
@@ -230,6 +221,12 @@ public class SurfaceDrawable extends Drawable {
 		}
 	}
 //--------------------------------------------------------------------------------
+	@Override
+	protected void onBoundsChange(final Rect bounds) {
+		super.onBoundsChange(bounds);
+		updateTransformMatrix();
+	}
+
 	protected EGLBase getEgl() {
 		return mEglTask.getEgl();
 	}
