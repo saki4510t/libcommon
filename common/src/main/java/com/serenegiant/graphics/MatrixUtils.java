@@ -19,9 +19,14 @@ package com.serenegiant.graphics;
 */
 
 import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.RectF;
+import android.widget.ImageView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 public class MatrixUtils {
@@ -165,4 +170,162 @@ public class MatrixUtils {
 			transform[15] +
 			']';
 	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * ImageView.ScaleTypeと同じ
+	 */
+	public enum ScaleType {
+		MATRIX(0),
+		FIT_XY(1),
+		FIT_START(2),
+		FIT_CENTER(3),
+		FIT_END(4),
+		CENTER(5),
+		CENTER_CROP(6),
+		CENTER_INSIDE(7);
+
+		ScaleType(final int id) {
+			this.id = id;
+		}
+
+		final int id;
+	}
+
+	private static Map<ImageView.ScaleType, ScaleType> sScaleTypeMap = new HashMap<>();
+	static {
+		sScaleTypeMap.put(ImageView.ScaleType.MATRIX, ScaleType.MATRIX);
+		sScaleTypeMap.put(ImageView.ScaleType.FIT_XY, ScaleType.FIT_XY);
+		sScaleTypeMap.put(ImageView.ScaleType.FIT_START, ScaleType.FIT_START);
+		sScaleTypeMap.put(ImageView.ScaleType.FIT_CENTER, ScaleType.FIT_CENTER);
+		sScaleTypeMap.put(ImageView.ScaleType.FIT_END, ScaleType.FIT_END);
+		sScaleTypeMap.put(ImageView.ScaleType.CENTER, ScaleType.CENTER);
+		sScaleTypeMap.put(ImageView.ScaleType.CENTER_CROP, ScaleType.CENTER_CROP);
+		sScaleTypeMap.put(ImageView.ScaleType.CENTER_INSIDE, ScaleType.CENTER_INSIDE);
+	}
+
+	/**
+	 * MatrixUtils.ScaleTypeからImageView.ScaleTypeへ変換
+	 * @param scaleType
+	 * @return
+	 */
+	@NonNull
+	public static ImageView.ScaleType toImageViewScaleType(@NonNull final ScaleType scaleType) {
+		for (final  Map.Entry<ImageView.ScaleType, ScaleType> entry: sScaleTypeMap.entrySet()) {
+			if (entry.getValue() == scaleType) {
+				return entry.getKey();
+			}
+		}
+		return ImageView.ScaleType.CENTER_CROP;
+	}
+
+	/**
+	 * ImageView.ScaleTypeからMatrixUtils.ScaleTypeへ変換
+	 * @param scaleType
+	 * @return
+	 */
+	@NonNull
+	public static ScaleType fromImageViewScaleType(@NonNull final ImageView.ScaleType scaleType) {
+		if (sScaleTypeMap.containsKey(scaleType)) {
+			return sScaleTypeMap.get(scaleType);
+		} else {
+			return ScaleType.CENTER_CROP;
+		}
+	}
+
+	/**
+	 * 指定したスケーリング方法で描画用のMatrixを設定する
+	 * @param scaleType
+	 * @param bounds
+	 * @param drawMatrix
+	 * @param dwidth
+	 * @param dheight
+	 */
+	public static void updateDrawMatrix(
+		@NonNull final ImageView.ScaleType scaleType,
+		@NonNull final Matrix drawMatrix,
+		@NonNull final Rect bounds,
+		final float dwidth, final float dheight) {
+
+		updateDrawMatrix(fromImageViewScaleType(scaleType),
+			drawMatrix,
+			bounds.width(), bounds.height(),
+			dwidth, dheight);
+	}
+
+	/**
+	 * 指定したスケーリング方法で描画用のMatrixを設定する
+	 * @param scaleType
+	 * @param drawMatrix
+	 * @param vwidth
+	 * @param vheight
+	 * @param dwidth
+	 * @param dheight
+	 */
+	public static void updateDrawMatrix(
+		@NonNull final ScaleType scaleType,
+		@NonNull final Matrix drawMatrix,
+		final float vwidth, final float vheight,
+		final float dwidth, final float dheight) {
+
+	    if ((dwidth <= 0) || (dheight <= 0) || (vwidth <= 0) || (vheight <= 0)) {
+			drawMatrix.reset();
+	        return;
+	    }
+
+		if (scaleType == ScaleType.CENTER_CROP) {
+			final float scale;
+			float dx = 0, dy = 0;
+
+			if (dwidth * vheight > vwidth * dheight) {
+				scale = vheight / dheight;
+				dx = (vwidth - dwidth * scale) * 0.5f;
+			} else {
+				scale = vwidth / dwidth;
+				dy = (vheight - dheight * scale) * 0.5f;
+			}
+
+			drawMatrix.setScale(scale, scale);
+			drawMatrix.postTranslate(Math.round(dx), Math.round(dy));
+		} else if (scaleType == ScaleType.CENTER_INSIDE) {
+			final float scale;
+			if (dwidth <= vwidth && dheight <= vheight) {
+				scale = 1.0f;
+			} else {
+				scale = Math.min(vwidth / dwidth, vheight / dheight);
+			}
+
+			final float dx = Math.round((vwidth - dwidth * scale) * 0.5f);
+			final float dy = Math.round((vheight - dheight * scale) * 0.5f);
+
+			drawMatrix.setScale(scale, scale);
+			drawMatrix.postTranslate(dx, dy);
+		} else if (scaleType == ScaleType.CENTER) {
+			drawMatrix.setTranslate(
+				Math.round((vwidth - dwidth) * 0.5f),
+				Math.round((vheight - dheight) * 0.5f));
+		} else {
+			final RectF dstBounds = new RectF(0, 0, vwidth, vheight);
+			final RectF srcBounds = new RectF(0, 0, dwidth, dheight);
+			switch (scaleType) {
+			case FIT_XY:
+				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.FILL);
+				break;
+			case FIT_START:
+				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.START);
+				break;
+			case FIT_CENTER:
+				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.CENTER);
+				break;
+			case FIT_END:
+				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.END);
+				break;
+			case MATRIX:
+			default:
+				// do nothing
+				break;
+			}
+		}
+	}
+
 }
