@@ -267,6 +267,31 @@ public class ThumbnailCache {
 	}
 
 	/**
+	 * MediaInfoで指定したコンテンツのサムネイルを取得する
+	 * 現在は静止画と動画のみに対応
+	 * @param cr
+	 * @param info
+	 * @param requestWidth
+	 * @param requestHeight
+	 * @return
+	 * @throws FileNotFoundException
+	 * @throws IOException
+	 */
+	public Bitmap getThumbnail(
+		@NonNull final ContentResolver cr,
+		@NonNull final MediaInfo info,
+		final int requestWidth, final int requestHeight)
+			throws FileNotFoundException, IOException {
+
+		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
+			return getImageThumbnail(cr, info.id, requestWidth, requestHeight);
+		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+			return getVideoThumbnail(cr, info.id, requestWidth, requestHeight);
+		}
+		throw new UnsupportedOperationException("unexpected mediaType");
+	}
+
+	/**
 	 * 静止画のサムネイルを取得する
 	 * 可能であればキャッシュから取得する
 	 * @param cr
