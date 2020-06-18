@@ -65,13 +65,36 @@ public class ThumbnailCache {
 	 */
 	private static final int CACHE_RATE = 8;
 	private static LruCache<String, Bitmap> sThumbnailCache;
+	private static int sMaxDiskCacheBytes = DISK_CACHE_SIZE;
 	private static DiskLruCache sDiskLruCache;
 	private static int sCacheSize;
 
-	private static void prepareThumbnailCache(@NonNull final Context context) {
+	/**
+	 * 初期化が必要であればサムネイルキャッシュを初期化する
+	 * @param context
+	 * @param maxDiskCacheBytes
+	 */
+	private static void prepareThumbnailCache(
+		@NonNull final Context context,
+		final int maxDiskCacheBytes) {
+
 		synchronized (sSync) {
-			if (sThumbnailCache == null) {
+			if ((sThumbnailCache == null) || (sMaxDiskCacheBytes != maxDiskCacheBytes)) {
 				if (DEBUG) Log.v(TAG, "prepareThumbnailCache:");
+				sMaxDiskCacheBytes = maxDiskCacheBytes;
+				if (sMaxDiskCacheBytes <= 0) {
+					sMaxDiskCacheBytes = DISK_CACHE_SIZE;
+				}
+				if (sThumbnailCache != null) {
+					sThumbnailCache.evictAll();
+				}
+				if ((sDiskLruCache != null) && !sDiskLruCache.isClosed()) {
+					try {
+						sDiskLruCache.close();
+					} catch (final IOException e) {
+						if (DEBUG) Log.w(TAG, e);
+					}
+				}
 				final int memClass =
 					ContextUtils.requireSystemService(context, ActivityManager.class)
 					.getMemoryClass();
@@ -95,7 +118,7 @@ public class ThumbnailCache {
 					}
 					if (DEBUG) Log.v(TAG, "prepareThumbnailCache:dir=" + cacheDir);
 					sDiskLruCache = DiskLruCache.open(cacheDir,
-						BuildConfig.VERSION_CODE, 1, DISK_CACHE_SIZE);
+						BuildConfig.VERSION_CODE, 1, sMaxDiskCacheBytes);
 				} catch (final IOException e) {
 					sDiskLruCache = null;
 					Log.w(TAG, e);
@@ -124,10 +147,20 @@ public class ThumbnailCache {
 
 	/**
 	 * コンストラクタ
+	 * ディスクキャッシュの最大サイズはデフォルト(現在は10MB)
 	 * @param context
 	 */
 	public ThumbnailCache(@NonNull final Context context) {
-		prepareThumbnailCache(context);
+		prepareThumbnailCache(context, DISK_CACHE_SIZE);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param maxDiskCacheBytes
+	 */
+	public ThumbnailCache(@NonNull final Context context, final int maxDiskCacheBytes) {
+		prepareThumbnailCache(context, maxDiskCacheBytes);
 	}
 
 	@Override
