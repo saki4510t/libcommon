@@ -27,7 +27,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.provider.MediaStore;
 
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -180,45 +179,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public void refresh() {
 		ThreadPool.preStartAllCoreThreads();
 		onContentChanged();
-	}
-
-	/**
-	 * return thumbnail image at specific position.
-	 * this method is synchronously executed and may take time
-	 * @return null if the position value is out of range etc. 
-	 */
-	@Override
-	public Bitmap getItem(final int position) {
-		Bitmap result = null;
-
-		getMediaInfo(position, info);
-		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
-			// 静止画の場合のサムネイル取得
-			try {
-				result = mThumbnailCache.getImageThumbnail(
-					mCr, getItemId(position),
-					mThumbnailWidth, mThumbnailHeight);
-			} catch (final FileNotFoundException e) {
-				Log.w(TAG, e);
-			} catch (final IOException e) {
-				Log.w(TAG, e);
-			}
-		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
-			// 動画の場合のサムネイル取得
-			try {
-				result = mThumbnailCache.getVideoThumbnail(
-					mCr, getItemId(position),
-					mThumbnailWidth, mThumbnailHeight);
-			} catch (final FileNotFoundException e) {
-				Log.w(TAG, e);
-			} catch (final IOException e) {
-				Log.w(TAG, e);
-			}
-		}
-		if (DEBUG && (result == null)) {
-			Log.w(TAG, "failed to getItem(" + info.title + ") at position=" + position);
-		}
-		return result;
 	}
 
 	/**
