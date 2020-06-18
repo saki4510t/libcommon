@@ -20,21 +20,14 @@ package com.serenegiant.mediastore;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.os.Build;
 
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 
 import java.util.concurrent.FutureTask;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.drawable.DrawableCompat;
 
 /**
  * 非同期で画像読み込みを行うためのヘルパークラス(Runnableを実装)
@@ -103,26 +96,7 @@ public abstract class ImageLoader implements Runnable {
 		@NonNull final Context context,
 		@DrawableRes final int drawableRes) {
 
-		Bitmap result = null;
-		if (drawableRes != 0) {
-			Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
-			if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-				drawable = (DrawableCompat.wrap(drawable)).mutate();
-			}
-			if (drawable instanceof BitmapDrawable) {
-				result = ((BitmapDrawable)drawable).getBitmap();
-			} else {
-				result = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-					drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
-				final Canvas canvas = new Canvas(result);
-				drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-				drawable.draw(canvas);
-			}
-		}
-		if (result == null) {
-			throw new IllegalArgumentException("failed to load from resource," + drawableRes);
-		}
-		return result;
+		return BitmapHelper.fromDrawable(context, drawableRes);
 	}
 
 	@Override
