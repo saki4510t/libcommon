@@ -30,7 +30,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.libcommon.ImageFragment.Companion.newInstance
 import com.serenegiant.mediastore.MediaInfo
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapter
-import com.serenegiant.mediastore.MediaStoreRecyclerAdapter.MediaStoreRecyclerAdapterListener
+import com.serenegiant.mediastore.MediaStoreRecyclerAdapterListener
 import com.serenegiant.widget.RecyclerViewWithEmptyView
 
 /**

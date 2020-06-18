@@ -63,30 +63,6 @@ public class MediaStoreRecyclerAdapter
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreRecyclerAdapter.class.getSimpleName();
 
-	/**
-	 * MediaStoreRecyclerAdapterでアイテムを選択したときのコールバックリスナー
-	 */
-	public interface MediaStoreRecyclerAdapterListener {
-		/**
-		 * アイテムをクリックした
-		 * @param parent
-		 * @param view
-		 * @param item
-		 */
-		public void onItemClick(@NonNull RecyclerView.Adapter<?> parent,
-			@NonNull View view, @NonNull final MediaInfo item);
-
-		/**
-		 * アイテムを長押しした
-		 * @param parent
-		 * @param view
-		 * @param item
-		 * @return
-		 */
-		public boolean onItemLongClick(@NonNull RecyclerView.Adapter<?> parent,
-			@NonNull View view, @NonNull final MediaInfo item);
-	}
-
 	@NonNull
 	private final Context mContext;
 	@NonNull
