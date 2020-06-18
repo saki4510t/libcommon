@@ -422,6 +422,7 @@ public final class DiskLruCache implements Closeable {
         journalFileTmp.renameTo(journalFile);
         journalWriter = new BufferedWriter(new FileWriter(journalFile, true), IO_BUFFER_SIZE);
     }
+
     private static void deleteIfExists(File file) throws IOException {
 //        try {
 //            Libcore.os.remove(file.getPath());
@@ -434,6 +435,28 @@ public final class DiskLruCache implements Closeable {
             throw new IOException();
         }
     }
+
+    /**
+     * 指定したキーに対応するエントリーが存在しているかどうかを取得
+     * @param key
+     * @return
+     */
+    public boolean contains(final String key) {
+        checkNotClosed();
+        validateKey(key);
+        Entry entry = lruEntries.get(key);
+        if ((entry == null) || !entry.readable) {
+            return false;
+        }
+        for (int i = 0; i < valueCount; i++) {
+            final File f= entry.getCleanFile(i);
+            if (!f.exists() || !f.canRead()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Returns a snapshot of the entry named {@code key}, or null if it doesn't
      * exist is not currently readable. If a value is returned, it is moved to
