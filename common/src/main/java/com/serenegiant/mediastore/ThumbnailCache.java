@@ -22,8 +22,10 @@ import android.app.ActivityManager;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.util.Size;
 
 import com.serenegiant.common.BuildConfig;
 import com.serenegiant.graphics.BitmapHelper;
@@ -277,18 +279,33 @@ public class ThumbnailCache {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public Bitmap getThumbnail(
 		@NonNull final ContentResolver cr,
 		@NonNull final MediaInfo info,
 		final int requestWidth, final int requestHeight)
 			throws FileNotFoundException, IOException {
 
-		if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
-			return getImageThumbnail(cr, info.id, requestWidth, requestHeight);
-		} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
-			return getVideoThumbnail(cr, info.id, requestWidth, requestHeight);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			return cr.loadThumbnail(info.getUri(), new Size(requestWidth, requestHeight), null);
+		} else {
+			final Bitmap result;
+			if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE) {
+				if ((requestWidth <= 0) || (requestHeight <= 0)) {
+					result = BitmapHelper.asBitmap(cr, info.getUri(), requestWidth, requestHeight);
+				} else {
+					result = getImageThumbnail(cr, info.id, requestWidth, requestHeight);
+				}
+			} else if (info.mediaType == MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO) {
+				result = getVideoThumbnail(cr, info.id, requestWidth, requestHeight);
+			} else {
+				throw new UnsupportedOperationException("unexpected mediaType");
+			}
+			if (result == null) {
+				throw new IOException("failed to load thumbnail," + info);
+			}
+			return result;
 		}
-		throw new UnsupportedOperationException("unexpected mediaType");
 	}
 
 	/**
