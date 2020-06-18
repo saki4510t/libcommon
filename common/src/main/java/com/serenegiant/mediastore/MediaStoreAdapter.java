@@ -45,15 +45,11 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの静止画・動画一覧を取得するためのCursorAdapter実装
  * 実データではなくサムネイルを表示する
- * XXX CursorAdapterの代わりにArrayAdapterから継承したほうがいいかも
  */
 public class MediaStoreAdapter extends CursorAdapter {
 
@@ -74,18 +70,12 @@ public class MediaStoreAdapter extends CursorAdapter {
 	@NonNull
 	private final ThumbnailCache mThumbnailCache;
 
-	private Cursor mMediaInfoCursor;
 	private String mSelection;
 	private String[] mSelectionArgs;
 	private boolean mShowTitle = false;
 	private int mMediaType = MEDIA_ALL;
 	@NonNull
 	private final MediaInfo info = new MediaInfo();
-	/**
-	 * 読み込み可能なレコードの位置を保持するList
-	 */
-	@NonNull
-	private final List<Integer> mValues = new ArrayList<>();
 	private boolean mNeedValidate;
 
 	/**
@@ -127,10 +117,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 	protected void finalize() throws Throwable {
 		try {
 			changeCursor(null);
-			if (mMediaInfoCursor != null) {
-				mMediaInfoCursor.close();
-				mMediaInfoCursor = null;
-			}
 		} finally {
 			super.finalize();
 		}
@@ -154,12 +140,12 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final ImageView iv = holder.mImageView;
 		final TextView tv = holder.mTitleView;
 		Drawable drawable = iv.getDrawable();
-		if (!(drawable instanceof LoaderDrawable)) {
+		if (!(drawable instanceof ThumbnailLoaderDrawable)) {
 			drawable = createLoaderDrawable(mContext);
 			iv.setImageDrawable(drawable);
 		}
 		info.loadFromCursor(cursor);
-		((LoaderDrawable)drawable).startLoad(info);
+		((ThumbnailLoaderDrawable)drawable).startLoad(info);
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 			if (mShowTitle) {
@@ -168,8 +154,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 	}
 
-	protected LoaderDrawable createLoaderDrawable(@NonNull final Context context) {
-		return new ThumbnailLoaderDrawable(context, mThumbnailWidth, mThumbnailHeight);
+	protected ThumbnailLoaderDrawable createLoaderDrawable(@NonNull final Context context) {
+		return new MyThumbnailLoaderDrawable(context, mThumbnailWidth, mThumbnailHeight);
 	}
 
 	private ViewHolder getViewHolder(final View view) {
@@ -194,16 +180,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public void refresh() {
 		ThreadPool.preStartAllCoreThreads();
 		onContentChanged();
-	}
-
-	/**
-	 * @see android.widget.ListAdapter#getCount()
-	 */
-	@Override
-	public int getCount() {
-		synchronized (mValues) {
-			return mValues.size();
-		}
 	}
 
 	/**
@@ -309,33 +285,11 @@ public class MediaStoreAdapter extends CursorAdapter {
 		final int position, @Nullable final MediaInfo info) {
 
 		final MediaInfo _info = info != null ? info : new MediaInfo();
-		final int pos;
-		synchronized (mValues) {
-			pos = mValues.get(position);
-		}
-
-/*		// if you don't need to frequently call this method, temporary query may be better to reduce memory usage.
-		// but it will take more time.
-		final Cursor cursor = mCr.query(
-			ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, getItemId(position)),
-			PROJ_IMAGE, mSelection, mSelectionArgs, MediaStore.Images.Media.DEFAULT_SORT_ORDER);
+		final Cursor cursor = (Cursor)super.getItem(position);
 		if (cursor != null) {
-			try {
-				if (cursor.moveToFirst()) {
-					info = readMediaInfo(cursor, new MediaInfo());
-				}
-			} finally {
-				cursor.close();
-			}
-		} */
-		if (mMediaInfoCursor == null) {
+			_info.loadFromCursor(cursor);
+		} else {
 			throw new IllegalStateException("Cursor is not ready!");
-//			mMediaInfoCursor = mCr.query(
-//				QUERY_URI, PROJ_MEDIA,
-//				mSelection, mSelectionArgs, null);
-		}
-		if (mMediaInfoCursor.moveToPosition(pos)) {
-			_info.loadFromCursor(mMediaInfoCursor);
 		}
 		return _info;
 	}
@@ -388,31 +342,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 	}
 
-	@Nullable
-	@Override
- 	public Cursor swapCursor(@Nullable final Cursor newCursor) {
- 		if (newCursor != null) {
-			synchronized (mValues) {
-				mValues.clear();
-				if (newCursor.moveToFirst()) {
-					int pos = 0;
-					do {
-						info.loadFromCursor(newCursor);
-						if (!mNeedValidate || info.canRead(mCr)) {
-							mValues.add(pos);
-						}
-						pos++;
-					} while (newCursor.moveToNext());
-				}
-			}
-		} else {
-			synchronized (mValues) {
-				mValues.clear();
-			}
-		}
-		return super.swapCursor(newCursor);
-	}
-
 	private static final class MyAsyncQueryHandler extends AsyncQueryHandler {
 		private final MediaStoreAdapter mAdapter;
 		public MyAsyncQueryHandler(final ContentResolver cr, final MediaStoreAdapter adapter) {
@@ -422,10 +351,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		
 		public void requery() {
 			synchronized (mAdapter) {
-				if (mAdapter.mMediaInfoCursor != null) {
-					mAdapter.mMediaInfoCursor.close();
-					mAdapter.mMediaInfoCursor = null;
-				}
+				mAdapter.changeCursor(null);
 				mAdapter.mSelection = SELECTIONS[mAdapter.mMediaType % MEDIA_TYPE_NUM];
 				mAdapter.mSelectionArgs = null;
 				startQuery(0, mAdapter, QUERY_URI_FILES, PROJ_MEDIA,
@@ -448,8 +374,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 		ImageView mImageView;
 	}
 
-	private class ThumbnailLoaderDrawable extends LoaderDrawable {
-		public ThumbnailLoaderDrawable(@NonNull final Context context,
+	private class MyThumbnailLoaderDrawable extends ThumbnailLoaderDrawable {
+		public MyThumbnailLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
 			super(context, width, height);
@@ -457,8 +383,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 		@NonNull
 		@Override
-		protected ImageLoader createImageLoader() {
-			return new ThumbnailLoader(this);
+		protected ThumbnailLoader createLoader() {
+			return new MyThumbnailLoader(this);
 		}
 
 		@Override
@@ -467,13 +393,14 @@ public class MediaStoreAdapter extends CursorAdapter {
 		}
 	}
 
-	private class ThumbnailLoader extends ImageLoader {
-		public ThumbnailLoader(final ThumbnailLoaderDrawable parent) {
+	private class MyThumbnailLoader extends ThumbnailLoader {
+		public MyThumbnailLoader(final MyThumbnailLoaderDrawable parent) {
 			super(parent);
 		}
 
+		@NonNull
 		@Override
-		protected Bitmap loadBitmap(@NonNull final Context context,
+		protected Bitmap loadThumbnail(@NonNull final Context context,
 			@NonNull final MediaInfo info,
 			final int requestWidth, final int requestHeight) {
 
@@ -486,7 +413,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 				if (DEBUG) Log.w(TAG, e);
 			}
 			if (result == null) {
-				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}
