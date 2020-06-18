@@ -26,6 +26,7 @@ import java.io.InputStream;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
+import android.content.Context;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -36,8 +37,15 @@ import android.graphics.Paint;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.Shader;
+
+import androidx.annotation.DrawableRes;
+import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.exifinterface.media.ExifInterface;
+
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.ParcelFileDescriptor;
 
 import androidx.annotation.IntRange;
@@ -538,6 +546,57 @@ public final class BitmapHelper {
 			}
 		}
 		return bitmap;
+	}
+
+	/**
+	 * DrawableをBitmapへ変換する
+	 * @param drawable
+	 * @return
+	 * @throws IllegalArgumentException
+	 */
+	@NonNull
+	public static Bitmap fromDrawable(
+		@NonNull final Drawable drawable,
+		final int width, final int height) {
+
+		Bitmap result;
+		Drawable _drawable = drawable;
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			_drawable = (DrawableCompat.wrap(_drawable)).mutate();
+		}
+		_drawable.setBounds(0, 0, width, height);
+		result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		final Canvas canvas = new Canvas(result);
+		_drawable.draw(canvas);
+		return result;
+	}
+
+	/**
+	 * 指定したDrawableリソースからビットマップとして画像を取得する
+	 * @param drawableRes
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap fromDrawable(
+		@NonNull final Context context,
+		@DrawableRes final int drawableRes) {
+
+		Bitmap result = null;
+		if (drawableRes != 0) {
+			final Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
+			if ((drawable.getIntrinsicWidth() <= 0) || (drawable.getIntrinsicHeight() <= 0)) {
+				// ColorDrawable等でサイズ指定されていないときは
+				// intrinsicWidth/intrinsicHeightが0なのでエラーにならないように
+				// 適当な値を入れておく
+				drawable.setBounds(0, 0, 72, 72);
+			}
+			result = fromDrawable(drawable,
+				drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight());
+		}
+		if (result == null) {
+			throw new IllegalArgumentException("failed to load from resource " + drawableRes);
+		}
+		return result;
 	}
 
 //--------------------------------------------------------------------------------
