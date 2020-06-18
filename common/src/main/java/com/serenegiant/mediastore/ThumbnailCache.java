@@ -242,9 +242,14 @@ public class ThumbnailCache {
 	 * 指定したidに対応するサムネイルを指定したBitmapで更新する
 	 * @param id
 	 * @param thumbnail
+	 * @param shouldOverride
 	 */
-	public void put(final long id, @NonNull final Bitmap thumbnail) {
-		put(getKey(id), thumbnail);
+	public void put(
+		final long id,
+		@NonNull final Bitmap thumbnail,
+		final boolean shouldOverride) {
+
+		put(getKey(id), thumbnail, shouldOverride);
 	}
 
 	/**
