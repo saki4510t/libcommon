@@ -167,9 +167,7 @@ public class ThumbnailCache {
 	@Override
 	protected void finalize() throws Throwable {
 		try {
-			synchronized (sSync) {
-				sThumbnailCache.trimToSize(sCacheSize);
-			}
+			trim();
 		} finally {
 			super.finalize();
 		}
