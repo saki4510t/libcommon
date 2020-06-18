@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
@@ -207,6 +208,7 @@ public class MediaStoreCursorRecyclerAdapter
 
 	public void refresh() {
 		if (DEBUG) Log.v(TAG, "refresh:");
+		ThreadPool.preStartAllCoreThreads();
 		mQueryHandler.requery();
 	}
 
