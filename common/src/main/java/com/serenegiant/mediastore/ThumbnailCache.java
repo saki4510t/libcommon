@@ -66,6 +66,7 @@ public class ThumbnailCache {
 	private static final int CACHE_RATE = 8;
 	private static LruCache<String, Bitmap> sThumbnailCache;
 	private static int sMaxDiskCacheBytes = DISK_CACHE_SIZE;
+	@Nullable
 	private static DiskLruCache sDiskLruCache;
 	private static int sCacheSize;
 
@@ -304,10 +305,12 @@ public class ThumbnailCache {
 	public void trim() {
 		synchronized (sSync) {
 			sThumbnailCache.trimToSize(sCacheSize);
-			try {
-				sDiskLruCache.flush();
-			} catch (final IOException e) {
-				if (DEBUG) Log.w(TAG, e);
+			if (sDiskLruCache != null) {
+				try {
+					sDiskLruCache.flush();
+				} catch (final IOException e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
 			}
 		}
 	}
