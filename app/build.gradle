@@ -20,6 +20,8 @@ android {
         versionName versionNameString
 
 		buildConfigField "boolean", "ENABLE_VSYNC", "${project.property("ENABLE_VSYNC")}"
+
+		vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
