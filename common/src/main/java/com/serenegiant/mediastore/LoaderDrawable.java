@@ -111,6 +111,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	        return;
 	    }
 
+		// FIXME mRotationDegreeを考慮して計算しないといけない
 	    final float dwidth = mBitmap.getWidth();
 	    final float dheight = mBitmap.getHeight();
 	    final int vwidth = bounds.width();
