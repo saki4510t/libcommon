@@ -54,7 +54,7 @@ public class ThumbnailCache {
 	private static final String TAG = ThumbnailCache.class.getSimpleName();
 
 	private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB
-	private static final String DISK_CACHE_SUBDIR = "thumbnails";
+	private static final String DISK_CACHE_SUBDIR = ".thumbnailCache";
 	private static final int DISK_CACHE_INDEX = 0;
 
 	// for thumbnail cache(in memory)
@@ -114,7 +114,8 @@ public class ThumbnailCache {
 		if ((cacheDir == null) || !cacheDir.canWrite()) {
 			throw new IOException("can't write cache dir");
 		}
-		if (DEBUG) Log.v(TAG, "getDiskCacheDir:" + cacheDir);
+		cacheDir = new File(cacheDir, DISK_CACHE_SUBDIR);
+		cacheDir.mkdirs();
 		return cacheDir;
 	}
 
