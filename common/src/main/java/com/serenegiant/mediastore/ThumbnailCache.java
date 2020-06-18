@@ -435,7 +435,7 @@ public class ThumbnailCache {
 					// add to internal thumbnail cache(in memory)
 					put(key, result);
 				} else {
-					throw new IOException("failed to get thumbnail,id=" + id);
+					throw new IOException("failed to get thumbnail,key=" + key + "/id=" + id);
 				}
 			}
 		}
@@ -491,7 +491,7 @@ public class ThumbnailCache {
 					// add to internal thumbnail cache(in memory)
 					put(key, result);
 				} else {
-					throw new IOException("failed to get thumbnail,id=" + id);
+					throw new IOException("failed to get thumbnail,key=" + key + "/id=" + id);
 				}
 			}
 		}
