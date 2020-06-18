@@ -257,6 +257,7 @@ public class ThumbnailCache {
 	 * @param key
 	 * @param bitmap
 	 */
+	@Deprecated
 	public void put(@NonNull final String key, @NonNull final Bitmap bitmap) {
 		put(key, bitmap, false);
 	}
@@ -444,7 +445,7 @@ public class ThumbnailCache {
 					if (DEBUG) Log.v(TAG, String.format("getImageThumbnail:id=%d(%d,%d)",
 						id, result.getWidth(), result.getHeight()));
 					// add to internal thumbnail cache(in memory)
-					put(key, result);
+					put(key, result, false);
 				} else {
 					throw new IOException("failed to get thumbnail,key=" + key + "/id=" + id);
 				}
@@ -500,7 +501,7 @@ public class ThumbnailCache {
 						result = newBitmap;
 					}
 					// add to internal thumbnail cache(in memory)
-					put(key, result);
+					put(key, result, false);
 				} else {
 					throw new IOException("failed to get thumbnail,key=" + key + "/id=" + id);
 				}
