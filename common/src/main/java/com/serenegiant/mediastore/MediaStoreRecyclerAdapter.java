@@ -603,9 +603,13 @@ public class MediaStoreRecyclerAdapter
 						context.getContentResolver(), id,
 						requestWidth, requestHeight);
 					break;
+				default:
+					break;
 				}
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
+			}
+			if (result == null) {
 				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
