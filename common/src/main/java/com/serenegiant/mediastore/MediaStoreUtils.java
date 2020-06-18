@@ -21,6 +21,7 @@ package com.serenegiant.mediastore;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -340,5 +341,27 @@ public class MediaStoreUtils {
 		cv.put(MediaStore.MediaColumns.DATA, path);
 		return context.getContentResolver().insert(
 			MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cv);
+	}
+
+	@Nullable
+	public static Uri getUri(final int mediaType, final long id) {
+		switch (mediaType) {
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
+			return ContentUris.withAppendedId(
+				MediaStore.Files.getContentUri("external"), id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+			return ContentUris.withAppendedId(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+			return ContentUris.withAppendedId(
+				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+			return ContentUris.withAppendedId(
+				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
+		default:
+			return null;
+		}
+
 	}
 }
