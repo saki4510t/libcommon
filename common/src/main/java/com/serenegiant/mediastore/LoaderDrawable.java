@@ -48,7 +48,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
     private final Paint mDebugPaint = new Paint(DEFAULT_PAINT_FLAGS);
     private final Matrix mDrawMatrix = new Matrix();
 	private Bitmap mBitmap;
-    private int mRotation = 0;
+    private int mRotationDegree = 0;
     private ImageLoader mLoader;
 	private int mTargetDensity = DisplayMetrics.DENSITY_DEFAULT;
     private int mBitmapWidth, mBitmapHeight;
@@ -84,7 +84,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
             try {
 				canvas.clipRect(bounds);
 				canvas.concat(mDrawMatrix);
-				canvas.rotate(mRotation, bounds.centerX(), bounds.centerY());
+				canvas.rotate(mRotationDegree, bounds.centerX(), bounds.centerY());
 				canvas.drawBitmap(mBitmap, 0, 0, mPaint);
 			} finally {
 				canvas.restore();
@@ -216,6 +216,17 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 			}
 			invalidateSelf();
 		}
+	}
+
+	public void setRotation(final int rotationDegree) {
+		if (mRotationDegree != rotationDegree) {
+			mRotationDegree = rotationDegree;
+			invalidateSelf();
+		}
+	}
+
+	public int getRotation() {
+		return mRotationDegree;
 	}
 
     /**
