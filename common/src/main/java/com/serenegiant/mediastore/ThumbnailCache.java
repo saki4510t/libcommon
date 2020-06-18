@@ -312,12 +312,19 @@ public class ThumbnailCache {
 	}
 
 	/**
-	 * メモリーキャッシュをクリアする
+	 * キャッシュをクリアする
 	 */
 	public void clear() {
 		if (DEBUG) Log.v(TAG, "clear:");
 		synchronized (sSync) {
 			sThumbnailCache.evictAll();
+			if (sDiskLruCache != null) {
+				try {
+					sDiskLruCache.delete();
+				} catch (final IOException e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			}
 		}
 	}
 
