@@ -291,8 +291,9 @@ public class ThumbnailCache {
 					result = BitmapHelper.asBitmap(cr, id, requestWidth, requestHeight);
 				} else {
 					int kind = MediaStore.Images.Thumbnails.MICRO_KIND;
-					if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
+					if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128)) {
 						kind = MediaStore.Images.Thumbnails.MINI_KIND;
+					}
 					try {
 						// XXX ContentResolverには存在するが実ファイルがすでに削除されていると
 						// XXX ここでFileNotFoundExceptionが投げられるんだけどキャッチできない
@@ -344,8 +345,9 @@ public class ThumbnailCache {
 			result = get(key);
 			if (result == null) {
 				int kind = MediaStore.Video.Thumbnails.MICRO_KIND;
-				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128))
+				if ((requestWidth > 96) || (requestHeight > 96) || (requestWidth * requestHeight > 128 * 128)) {
 					kind = MediaStore.Video.Thumbnails.MINI_KIND;
+				}
 				try {
 					// XXX ContentResolverには存在するが実ファイルがすでに削除されていると
 					// XXX ここでFileNotFoundExceptionが投げられるんだけどキャッチできない
