@@ -196,13 +196,14 @@ public class ThumbnailCache {
 		synchronized (sSync) {
 			// メモリーキャッシュから取得を試みる
 			result = sThumbnailCache.get(key);
+			if (DEBUG && (result != null)) Log.v(TAG, "get:memory cache hit!");
 			if ((result == null) && (sDiskLruCache != null)) {
 				// メモリーキャッシュにないときはディスクキャッシュから取得を試みる
 				InputStream in = null;
 				try {
 					final DiskLruCache.Snapshot snapshot = sDiskLruCache.get(key);
 					if (snapshot != null) {
-//						if (DEBUG) Log.v(TAG, "get:disk cache hit!");
+						if (DEBUG) Log.v(TAG, "get:disk cache hit!");
 						in = snapshot.getInputStream(DISK_CACHE_INDEX);
 						if (in != null) {
 							final FileDescriptor fd = ((FileInputStream) in).getFD();
@@ -308,6 +309,7 @@ public class ThumbnailCache {
 	 * メモリーキャッシュをクリアする
 	 */
 	public void clear() {
+		if (DEBUG) Log.v(TAG, "clear:");
 		synchronized (sSync) {
 			sThumbnailCache.evictAll();
 		}
@@ -317,6 +319,7 @@ public class ThumbnailCache {
 	 * メモリーキャッシュの過剰分を破棄する
 	 */
 	public void trim() {
+		if (DEBUG) Log.v(TAG, "trim:");
 		synchronized (sSync) {
 			sThumbnailCache.trimToSize(sCacheSize);
 			if (sDiskLruCache != null) {
@@ -334,6 +337,7 @@ public class ThumbnailCache {
 	 * @param key
 	 */
 	public void remove(final String key) {
+		if (DEBUG) Log.v(TAG, "remove:key=" + key);
 		synchronized (sSync) {
 			sThumbnailCache.remove(key);
 			if (sDiskLruCache != null) {
