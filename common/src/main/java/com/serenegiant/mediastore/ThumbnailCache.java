@@ -57,9 +57,12 @@ public class ThumbnailCache {
 	private static final String DISK_CACHE_SUBDIR = ".thumbnailCache";
 	private static final int DISK_CACHE_INDEX = 0;
 
-	// for thumbnail cache(in memory)
-	// rate of memory usage for cache, 'CACHE_RATE = 8' means use 1/8 of available memory for image cache
 	private static final Object sSync = new Object();
+	/**
+	 * for thumbnail cache(in memory)
+	 * rate of memory usage for cache, 'CACHE_RATE = 8' means
+	 * use 1/8 of available memory for image cache
+	 */
 	private static final int CACHE_RATE = 8;
 	private static LruCache<String, Bitmap> sThumbnailCache;
 	private static DiskLruCache sDiskLruCache;
