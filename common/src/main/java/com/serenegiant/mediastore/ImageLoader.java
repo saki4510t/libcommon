@@ -98,7 +98,7 @@ public abstract class ImageLoader implements Runnable {
 	 * @param drawableRes
 	 * @return
 	 */
-	@Nullable
+	@NonNull
 	protected Bitmap loadDefaultBitmap(
 		@NonNull final Context context,
 		@DrawableRes final int drawableRes) {
