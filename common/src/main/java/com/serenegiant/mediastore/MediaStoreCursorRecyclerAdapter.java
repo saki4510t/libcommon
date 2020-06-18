@@ -574,7 +574,7 @@ public class MediaStoreCursorRecyclerAdapter
 
 		if (iv != null) {
 			Drawable drawable = iv.getDrawable();
-			if (!(drawable instanceof LoaderDrawable)) {
+			if (!(drawable instanceof ThumbnailLoaderDrawable)) {
 				drawable = new MyThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
 				iv.setImageDrawable(drawable);
 			}
