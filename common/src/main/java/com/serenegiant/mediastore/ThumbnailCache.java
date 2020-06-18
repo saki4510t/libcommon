@@ -266,6 +266,20 @@ public class ThumbnailCache {
 	}
 
 	/**
+	 * メモリーキャッシュの過剰分を破棄する
+	 */
+	public void trim() {
+		synchronized (sSync) {
+			sThumbnailCache.trimToSize(sCacheSize);
+			try {
+				sDiskLruCache.flush();
+			} catch (final IOException e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
+		}
+	}
+
+	/**
 	 * 指定したキーに対応するキャッシュエントリーを削除する
 	 * @param key
 	 */
