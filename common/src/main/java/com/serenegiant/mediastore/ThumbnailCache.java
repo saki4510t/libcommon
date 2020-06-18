@@ -276,6 +276,7 @@ public class ThumbnailCache {
 	 * @return
 	 * @throws IOException
 	 */
+	@NonNull
 	public Bitmap getImageThumbnail(
 		@NonNull final ContentResolver cr, final long id,
 		final int requestWidth, final int requestHeight)
@@ -315,8 +316,9 @@ public class ThumbnailCache {
 						id, result.getWidth(), result.getHeight()));
 					// add to internal thumbnail cache(in memory)
 					put(key, result);
+				} else {
+					throw new IOException("failed to get thumbnail,id=" + id);
 				}
-
 			}
 		}
 		return result;
@@ -333,6 +335,7 @@ public class ThumbnailCache {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@NonNull
 	public Bitmap getVideoThumbnail(
 		@NonNull final ContentResolver cr, final long id,
 		final int requestWidth, final int requestHeight)
@@ -370,9 +373,8 @@ public class ThumbnailCache {
 					// add to internal thumbnail cache(in memory)
 					put(key, result);
 				} else {
-					Log.w(TAG, "failed to get video thumbnail ofr id=" + id);
+					throw new IOException("failed to get thumbnail,id=" + id);
 				}
-
 			}
 		}
 		return result;
