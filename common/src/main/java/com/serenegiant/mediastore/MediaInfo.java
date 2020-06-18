@@ -185,24 +185,7 @@ public class MediaInfo implements Parcelable {
 
 	@Nullable
 	public Uri getUri() {
-		switch (mediaType) {
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
-			return ContentUris.withAppendedId(
-				MediaStore.Files.getContentUri("external"), id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-			return ContentUris.withAppendedId(
-				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-			return ContentUris.withAppendedId(
-				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-			return ContentUris.withAppendedId(
-				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
-		default:
-			return null;
-		}
-
+		return MediaStoreUtils.getUri(mediaType, id);
 	}
 
 	/**
