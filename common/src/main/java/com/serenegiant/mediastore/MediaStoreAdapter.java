@@ -61,8 +61,6 @@ public class MediaStoreAdapter extends CursorAdapter {
 	private final Context mContext;
 	@NonNull
 	private final LayoutInflater mInflater;
-	@NonNull
-	private final ContentResolver mCr;
 	private final int mLayoutId;
 	@NonNull
 	private final MyAsyncQueryHandler mQueryHandler;
@@ -101,8 +99,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 		super(context, null, CursorAdapter.FLAG_REGISTER_CONTENT_OBSERVER);
 		mContext = context;
 	    mInflater = LayoutInflater.from(context);
-	    mCr = context.getContentResolver();
-	    mQueryHandler = new MyAsyncQueryHandler(mCr, this);
+	    mQueryHandler = new MyAsyncQueryHandler(context.getContentResolver(), this);
 		// getMemoryClass return the available memory amounts for app as mega bytes(API >= 5)
 		mLayoutId = id_layout;
 		mThumbnailCache = new ThumbnailCache(context);
@@ -221,7 +218,7 @@ public class MediaStoreAdapter extends CursorAdapter {
 	public Bitmap getImage(final int position, final int width, final int height)
 		throws FileNotFoundException, IOException {
 
-		return BitmapHelper.asBitmap(mCr, getItemId(position), width, height);
+		return BitmapHelper.asBitmap(mContext.getContentResolver(), getItemId(position), width, height);
 	}
 	
 	/**
