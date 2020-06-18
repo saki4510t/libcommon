@@ -11,44 +11,34 @@ public class CharsetsUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * Eight-bit UCS Transformation Format
+	 */
 	public static final Charset UTF8;
-	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			UTF8  = StandardCharsets.UTF_8;
-		} else {
-			UTF8 = Charset.forName("UTF-8");
-		}
-	}
-
+	/**
+	 * Sixteen-bit UCS Transformation Format, byte order identified by an
+	 * optional byte-order mark
+	 */
 	public static final Charset UTF16;
-	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			UTF16  = StandardCharsets.UTF_16;
-		} else {
-			UTF16 = Charset.forName("UTF-16");
-		}
-	}
-
 	/**
 	 * Sixteen-bit UCS Transformation Format, big-endian byte order
 	 */
 	public static final Charset UTF16BE;
-	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			UTF16BE  = StandardCharsets.UTF_16BE;
-		} else {
-			UTF16BE = Charset.forName("UTF-16BE");
-		}
-	}
-
 	/**
 	 * Sixteen-bit UCS Transformation Format, little-endian byte order
 	 */
 	public static final Charset UTF16LE;
+
 	static {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			UTF16LE  = StandardCharsets.UTF_16LE;
+			UTF8 = StandardCharsets.UTF_8;
+			UTF16 = StandardCharsets.UTF_16;
+			UTF16BE = StandardCharsets.UTF_16BE;
+			UTF16LE = StandardCharsets.UTF_16LE;
 		} else {
+			UTF8 = Charset.forName("UTF-8");
+			UTF16 = Charset.forName("UTF-16");
+			UTF16BE = Charset.forName("UTF-16BE");
 			UTF16LE = Charset.forName("UTF-16LE");
 		}
 	}
