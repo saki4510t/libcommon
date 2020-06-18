@@ -314,22 +314,22 @@ public class MediaStoreRecyclerAdapter
 	 * @return
 	 */
 	@NonNull
-	private synchronized MediaInfo getMediaInfo(
+	private MediaInfo getMediaInfo(
 		final int position, @Nullable final MediaInfo info) {
 
 		final MediaInfo _info = info != null ? info : new MediaInfo();
 		final int pos;
 		synchronized (mValues) {
 			pos = mValues.get(position);
-		}
-		if (mCursor == null) {
-			throw new IllegalStateException("Cursor is not ready!");
-//			mCursor = mCr.query(
-//				QUERY_URI, PROJ_MEDIA,
-//				mSelection, mSelectionArgs, mSortOrder);
-		}
-		if (mCursor.moveToPosition(pos)) {
-			_info.loadFromCursor(mCursor);
+			if (mCursor == null) {
+				throw new IllegalStateException("Cursor is not ready!");
+//				mCursor = mCr.query(
+//					QUERY_URI, PROJ_MEDIA,
+//					mSelection, mSelectionArgs, mSortOrder);
+			}
+			if (mCursor.moveToPosition(pos)) {
+				_info.loadFromCursor(mCursor);
+			}
 		}
 		return _info;
 	}
@@ -369,10 +369,13 @@ public class MediaStoreRecyclerAdapter
 	@Nullable
 	protected Cursor swapCursor(@Nullable final Cursor newCursor) {
 		if (DEBUG) Log.v(TAG, "swapCursor:" + newCursor);
-		if (newCursor == mCursor) {
-			return null;
+		Cursor oldCursor;
+		synchronized (mValues) {
+			if (newCursor == mCursor) {
+				return null;
+			}
+			oldCursor = mCursor;
 		}
-		Cursor oldCursor = mCursor;
 		if (oldCursor != null) {
 			if (mChangeObserver != null) {
 				oldCursor.unregisterContentObserver(mChangeObserver);
@@ -381,7 +384,6 @@ public class MediaStoreRecyclerAdapter
 				oldCursor.unregisterDataSetObserver(mDataSetObserver);
 			}
 		}
-		mCursor = newCursor;
 		if (newCursor != null) {
 			if (mChangeObserver != null) {
 				newCursor.registerContentObserver(mChangeObserver);
@@ -391,21 +393,24 @@ public class MediaStoreRecyclerAdapter
 			}
 
 			final List<MediaInfo> removes = new ArrayList<>();
+			final List<Integer> adds = new ArrayList<>();
+			if (newCursor.moveToFirst()) {
+				int pos = 0;
+				do {
+					info.loadFromCursor(newCursor);
+					if (DEBUG) Log.v(TAG, "swapCursor:" + info);
+					if (!mNeedValidate || info.canRead(mCr)) {
+						adds.add(pos);
+					} else {
+						removes.add(new MediaInfo(info));
+					}
+					pos++;
+				} while (newCursor.moveToNext());
+			}
 			synchronized (mValues) {
 				mValues.clear();
-				if (newCursor.moveToFirst()) {
-					int pos = 0;
-					do {
-						info.loadFromCursor(newCursor);
-						if (DEBUG) Log.v(TAG, "swapCursor:" + info);
-						if (!mNeedValidate || info.canRead(mCr)) {
-							mValues.add(pos);
-						} else {
-							removes.add(new MediaInfo(info));
-						}
-						pos++;
-					} while (newCursor.moveToNext());
-				}
+				mValues.addAll(adds);
+				mCursor = newCursor;
 			}
 			mDataValid = true;
 			// notify the observers about the new cursor
@@ -428,6 +433,7 @@ public class MediaStoreRecyclerAdapter
 			// notify the observers about the lack of a data set
 			synchronized (mValues) {
 				mValues.clear();
+				mCursor = null;
 			}
 			notifyDataSetInvalidated();
 		}
@@ -456,7 +462,7 @@ public class MediaStoreRecyclerAdapter
 		}
 
 		public void requery() {
-			synchronized (mAdapter) {
+			synchronized (mAdapter.mValues) {
 				if (mAdapter.mCursor != null) {
 					mAdapter.mCursor.close();
 					mAdapter.mCursor = null;
