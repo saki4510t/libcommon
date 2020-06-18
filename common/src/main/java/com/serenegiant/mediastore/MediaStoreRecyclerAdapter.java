@@ -557,8 +557,8 @@ public class MediaStoreRecyclerAdapter
 	/**
 	 * サムネイルを非同期で取得するためのDrawable
 	 */
-	private class ThumbnailLoaderDrawable extends LoaderDrawable {
-		public ThumbnailLoaderDrawable(@NonNull final Context context,
+	private class MyThumbnailLoaderDrawable extends ThumbnailLoaderDrawable {
+		public MyThumbnailLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
 			super(context, width, height);
@@ -566,8 +566,8 @@ public class MediaStoreRecyclerAdapter
 
 		@NonNull
 		@Override
-		protected ImageLoader createImageLoader() {
-			return new ThumbnailLoader(this);
+		protected ThumbnailLoader createLoader() {
+			return new MyThumbnailLoader(this);
 		}
 
 		@Override
@@ -579,13 +579,14 @@ public class MediaStoreRecyclerAdapter
 	/**
 	 * ThumbnailLoaderDrawableのための非同期読み込みヘルパークラス
 	 */
-	private class ThumbnailLoader extends ImageLoader {
-		public ThumbnailLoader(final ThumbnailLoaderDrawable parent) {
+	private class MyThumbnailLoader extends ThumbnailLoader {
+		public MyThumbnailLoader(final MyThumbnailLoaderDrawable parent) {
 			super(parent);
 		}
 
+		@NonNull
 		@Override
-		protected Bitmap loadBitmap(@NonNull final Context context,
+		protected Bitmap loadThumbnail(@NonNull final Context context,
 			@NonNull final MediaInfo info,
 			final int requestWidth, final int requestHeight) {
 
@@ -599,7 +600,7 @@ public class MediaStoreRecyclerAdapter
 				if (DEBUG) Log.w(TAG, e);
 			}
 			if (result == null) {
-				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}
@@ -618,11 +619,11 @@ public class MediaStoreRecyclerAdapter
 
 		if (iv != null) {
 			Drawable drawable = iv.getDrawable();
-			if (!(drawable instanceof LoaderDrawable)) {
-				drawable = new ThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
+			if (!(drawable instanceof ThumbnailLoaderDrawable)) {
+				drawable = new MyThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
 				iv.setImageDrawable(drawable);
 			}
-			((LoaderDrawable)drawable).startLoad(info);
+			((ThumbnailLoaderDrawable)drawable).startLoad(info);
 		}
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
