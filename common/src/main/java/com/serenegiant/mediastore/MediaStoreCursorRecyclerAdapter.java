@@ -554,9 +554,7 @@ public class MediaStoreCursorRecyclerAdapter
 			if (result == null) {
 				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);
 				if (DEBUG) Log.v(TAG, "loadThumbnail:put default image into thumbnail cache,result=" + result);
-				if (result != null) {
-					mThumbnailCache.put(info.id, result, true);
-				}
+				mThumbnailCache.put(info.id, result, true);
 			}
 			return result;
 		}
