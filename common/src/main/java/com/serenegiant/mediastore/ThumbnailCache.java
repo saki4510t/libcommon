@@ -248,9 +248,8 @@ public class ThumbnailCache {
 				// ディスクキャッシュへの追加処理
 				OutputStream out = null;
 				try {
-					DiskLruCache.Snapshot snapshot = sDiskLruCache.get(key);
-					if (snapshot == null) {
-						// ディスクキャッシュにエントリーが存在していない
+					if (!sDiskLruCache.contains(key) || shouldOverride) {
+						// ディスクキャッシュに保存する時
 						final DiskLruCache.Editor editor = sDiskLruCache.edit(key);
 						if (editor != null) {
 							out = editor.newOutputStream(DISK_CACHE_INDEX);
@@ -259,9 +258,6 @@ public class ThumbnailCache {
 							editor.commit();
 							out.close();
 						}
-					} else {
-						// ディスクキャッシュに既にエントリーが存在している
-						snapshot.getInputStream(DISK_CACHE_INDEX).close();
 					}
 				} catch (final IOException e) {
 					if (DEBUG) Log.w(TAG, e);
