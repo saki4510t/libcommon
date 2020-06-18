@@ -19,7 +19,6 @@ package com.serenegiant.mediastore;
 */
 
 import android.content.ContentResolver;
-import android.content.ContentUris;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Parcel;
@@ -224,6 +223,38 @@ public class MediaInfo implements Parcelable {
 			", height=" + height +
 			", orientation=" + orientation +
 			'}';
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o) return true;
+		if (!(o instanceof MediaInfo)) return false;
+
+		final MediaInfo mediaInfo = (MediaInfo) o;
+
+		if (id != mediaInfo.id) return false;
+		if (mediaType != mediaInfo.mediaType) return false;
+		if (width != mediaInfo.width) return false;
+		if (height != mediaInfo.height) return false;
+		if (orientation != mediaInfo.orientation) return false;
+		if (data != null ? !data.equals(mediaInfo.data) : mediaInfo.data != null) return false;
+		if (title != null ? !title.equals(mediaInfo.title) : mediaInfo.title != null) return false;
+		if (mime != null ? !mime.equals(mediaInfo.mime) : mediaInfo.mime != null) return false;
+		return displayName != null ? displayName.equals(mediaInfo.displayName) : mediaInfo.displayName == null;
+	}
+
+	@Override
+	public int hashCode() {
+		int result = (int) (id ^ (id >>> 32));
+		result = 31 * result + (data != null ? data.hashCode() : 0);
+		result = 31 * result + (title != null ? title.hashCode() : 0);
+		result = 31 * result + (mime != null ? mime.hashCode() : 0);
+		result = 31 * result + (displayName != null ? displayName.hashCode() : 0);
+		result = 31 * result + mediaType;
+		result = 31 * result + width;
+		result = 31 * result + height;
+		result = 31 * result + orientation;
+		return result;
 	}
 
 	@Override
