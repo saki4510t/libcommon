@@ -236,14 +236,40 @@ public class ThumbnailCache {
 	}
 
 	/**
+	 * 指定したidに対応するサムネイルを指定したBitmapで更新する
+	 * @param id
+	 * @param thumbnail
+	 */
+	public void put(final long id, @NonNull final Bitmap thumbnail) {
+		put(getKey(id), thumbnail);
+	}
+
+	/**
 	 * 指定したキーに対応するビットマップをキャッシュに追加する
 	 * @param key
 	 * @param bitmap
 	 */
 	public void put(@NonNull final String key, @NonNull final Bitmap bitmap) {
+		put(key, bitmap, false);
+	}
+
+	/**
+	 * 指定したキーに対応するビットマップをキャッシュに追加する
+	 * @param key
+	 * @param bitmap
+	 * @param shouldOverride
+	 */
+	public void put(
+		@NonNull final String key,
+		@NonNull final Bitmap bitmap,
+		final boolean shouldOverride) {
+
 		if (DEBUG) Log.v(TAG, "put:key=" + key);
 		synchronized (sSync) {
-			sThumbnailCache.put(key, bitmap);
+			final Bitmap cached = sThumbnailCache.get(key);
+			if ((cached == null) || shouldOverride) {
+				sThumbnailCache.put(key, bitmap);
+			}
 			if (sDiskLruCache != null) {
 				// ディスクキャッシュへの追加処理
 				OutputStream out = null;
@@ -275,16 +301,6 @@ public class ThumbnailCache {
 			}
 		}
 	}
-
-	/**
-	 * 指定したidに対応するサムネイルを指定したBitmapで更新する
-	 * @param id
-	 * @param thumbnail
-	 */
-	public void put(final long id, @NonNull final Bitmap thumbnail) {
-		put(getKey(id), thumbnail);
-	}
-
 
 	/**
 	 * メモリーキャッシュをクリアする
