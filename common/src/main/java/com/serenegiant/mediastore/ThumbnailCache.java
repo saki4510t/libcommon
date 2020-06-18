@@ -228,6 +228,10 @@ public class ThumbnailCache {
 						// ignore
 					}
 				}
+				if (result != null) {
+					// メモリーキャッシュに追加する
+					sThumbnailCache.put(key, result);
+				}
 			}
 		}
 		return result;
