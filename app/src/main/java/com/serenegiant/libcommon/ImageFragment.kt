@@ -18,7 +18,6 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
-import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Matrix
@@ -133,7 +132,7 @@ class ImageFragment: BaseFragment() {
 					requireContext(), -1, -1)
 				mImageView!!.setImageDrawable(drawable)
 			}
-			(drawable as LoaderDrawable).startLoad(mInfo!!.mediaType, mInfo!!.id)
+			(drawable as LoaderDrawable).startLoad(mInfo!!)
 		} else {
 			queueEvent(Runnable {
 //				mImageView.setImageURI(mInfo.getUri());
@@ -172,12 +171,12 @@ class ImageFragment: BaseFragment() {
 		: ImageLoader(parent) {
 
 		override fun loadBitmap(context: Context,
-			mediaType: Int, id: Long,
+			info: MediaInfo,
 			requestWidth: Int, requestHeight: Int): Bitmap {
 
 			var result: Bitmap? = null
 			try {
-				result = BitmapHelper.asBitmap(context.contentResolver, id)
+				result = BitmapHelper.asBitmap(context.contentResolver, info.id)
 				if (result != null) {
 					val w = result.width
 					val h = result.height

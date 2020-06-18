@@ -157,7 +157,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 				drawable = createLoaderDrawable(mContext, info);
 				holder.mImageView.setImageDrawable(drawable);
 			}
-			((LoaderDrawable)drawable).startLoad(info.mediaType, info.id);
+			((LoaderDrawable)drawable).startLoad(info);
 			if (holder.mTitleView != null) {
 				holder.mTitleView.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 				if (mShowTitle) {
@@ -449,13 +449,13 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final Context context,
-			final int mediaType, final long id,
+			@NonNull final MediaInfo info,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
 				result = BitmapHelper.asBitmap(
-					context.getContentResolver(), id,
+					context.getContentResolver(), info.id,
 					requestWidth, requestHeight);
 				if (result != null) {
 					final int w = result.getWidth();
@@ -469,6 +469,8 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 				}
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
+			}
+			if (result == null) {
 				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;

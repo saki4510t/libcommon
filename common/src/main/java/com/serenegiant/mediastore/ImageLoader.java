@@ -37,8 +37,7 @@ public abstract class ImageLoader implements Runnable {
 	protected final LoaderDrawable mParent;
 	@NonNull
 	private final FutureTask<Bitmap> mTask;
-	private int mMediaType;
-	private long mId;
+	private final MediaInfo mInfo = new MediaInfo();
 	private Bitmap mBitmap;
 
 	/**
@@ -51,16 +50,15 @@ public abstract class ImageLoader implements Runnable {
     }
 
 	public long id() {
-		return mId;
+		return mInfo.id;
 	}
 
     /**
 	 * start loading
-     * @param id
+     * @param info
      */
-	public synchronized void startLoad(final int mediaType, final long id) {
-		mMediaType = mediaType;
-		mId = id;
+	public synchronized void startLoad(@NonNull final MediaInfo info) {
+		mInfo.set(info);
 		mBitmap = null;
 		ThreadPool.queueEvent(mTask);
 	}
@@ -75,15 +73,14 @@ public abstract class ImageLoader implements Runnable {
 	/**
 	 * 実際の読み込み処理
 	 * @param context
-	 * @param mediaType
-	 * @param id
+	 * @param info
 	 * @param requestWidth
 	 * @param requestHeight
 	 * @return
 	 */
 	protected abstract Bitmap loadBitmap(
 		@NonNull final Context context,
-		final int mediaType, final long id,
+		@NonNull final MediaInfo info,
 		final int requestWidth, final int requestHeight);
 
 	/**
@@ -101,18 +98,16 @@ public abstract class ImageLoader implements Runnable {
 
 	@Override
 	public void run() {
-		int mediaType;
-		long id;
+		final MediaInfo info;
 		synchronized(this) {
-			mediaType = mMediaType;
-			id = mId;
+			info = new MediaInfo(mInfo);
 		}
 		if (!mTask.isCancelled()) {
 			mBitmap = loadBitmap(mParent.getContext(),
-				mediaType, id,
+				info,
 				mParent.getIntrinsicWidth(), mParent.getIntrinsicHeight());
 		}
-		if (mTask.isCancelled() || (id != mId) || (mBitmap == null)) {
+		if (mTask.isCancelled() || !info.equals(mInfo) || (mBitmap == null)) {
 			return;	// return without callback
 		}
 		// set callback

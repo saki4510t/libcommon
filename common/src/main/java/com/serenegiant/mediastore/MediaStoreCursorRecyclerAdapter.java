@@ -549,7 +549,6 @@ public class MediaStoreCursorRecyclerAdapter
 					requestWidth, requestHeight);
 			} catch (final IOException e) {
 				if (DEBUG) Log.d(TAG, "loadThumbnail:", e);
-				result = null;
 			}
 			if (result == null) {
 				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);

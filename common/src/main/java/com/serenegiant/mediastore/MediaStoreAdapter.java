@@ -158,8 +158,8 @@ public class MediaStoreAdapter extends CursorAdapter {
 			drawable = createLoaderDrawable(mContext);
 			iv.setImageDrawable(drawable);
 		}
-		((LoaderDrawable)drawable).startLoad(
-			cursor.getInt(PROJ_INDEX_MEDIA_TYPE), cursor.getLong(PROJ_INDEX_ID));
+		info.loadFromCursor(cursor);
+		((LoaderDrawable)drawable).startLoad(info);
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
 			if (mShowTitle) {
@@ -474,25 +474,18 @@ public class MediaStoreAdapter extends CursorAdapter {
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final Context context,
-			final int mediaType, final long id,
+			@NonNull final MediaInfo info,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
-				switch (mediaType) {
-				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(
-						context.getContentResolver(), id,
-						requestWidth, requestHeight);
-					break;
-				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(
-						context.getContentResolver(), id,
-						requestWidth, requestHeight);
-					break;
-				}
+				result = mThumbnailCache.getThumbnail(
+					context.getContentResolver(), info,
+					requestWidth, requestHeight);
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
+			}
+			if (result == null) {
 				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;

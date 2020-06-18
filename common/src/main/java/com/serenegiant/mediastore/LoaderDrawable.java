@@ -253,22 +253,22 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 
 	/**
 	 * start loading image asynchronously
-	 * @param id
+	 * @param info
 	 */
-	public void startLoad(final int media_type, final long id) {
+	public void startLoad(@NonNull final MediaInfo info) {
 
 		if (mLoader != null) {
 			mLoader.cancelLoad();
 		}
 
 		// キャッシュから取得を試みる
-		final Bitmap newBitmap = checkCache(id);
+		final Bitmap newBitmap = checkCache(info.id);
 		if (newBitmap == null) {
 			// キャッシュから取得できなかったときは非同期読み込み要求する
 			mBitmap = null;
 			// re-using ThumbnailLoader will cause several problems on some devices...
 			mLoader = createImageLoader();
-			mLoader.startLoad(media_type, id);
+			mLoader.startLoad(info);
 		} else {
 			// キャッシュから取得できたとき
 			setBitmap(newBitmap);

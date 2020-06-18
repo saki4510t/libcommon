@@ -28,7 +28,6 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
-import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -587,25 +586,15 @@ public class MediaStoreRecyclerAdapter
 
 		@Override
 		protected Bitmap loadBitmap(@NonNull final Context context,
-			final int mediaType, final long id,
+			@NonNull final MediaInfo info,
 			final int requestWidth, final int requestHeight) {
 
 			Bitmap result = null;
 			try {
-				switch (mediaType) {
-				case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-					result = mThumbnailCache.getImageThumbnail(
-						context.getContentResolver(), id,
-						requestWidth, requestHeight);
-					break;
-				case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-					result = mThumbnailCache.getVideoThumbnail(
-						context.getContentResolver(), id,
-						requestWidth, requestHeight);
-					break;
-				default:
-					break;
-				}
+				result = mThumbnailCache.getThumbnail(
+					context.getContentResolver(),
+					info,
+					requestWidth, requestHeight);
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
@@ -633,8 +622,7 @@ public class MediaStoreRecyclerAdapter
 				drawable = new ThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
 				iv.setImageDrawable(drawable);
 			}
-			((LoaderDrawable)drawable).startLoad(
-				mCursor.getInt(PROJ_INDEX_MEDIA_TYPE), mCursor.getLong(PROJ_INDEX_ID));
+			((LoaderDrawable)drawable).startLoad(info);
 		}
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
