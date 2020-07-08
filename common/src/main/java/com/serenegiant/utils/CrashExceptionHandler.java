@@ -88,7 +88,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * キャッチされなかった例外発生時に各種情報をJSONでテキストファイルに書き出す
 	 */
 	@Override
-	public void uncaughtException(final Thread thread, final Throwable throwable) {
+	public void uncaughtException(@NonNull final Thread thread, final @NonNull Throwable throwable) {
 		final Context context = mWeakContext.get();
 		if (context != null) {
 			PrintWriter writer = null;
