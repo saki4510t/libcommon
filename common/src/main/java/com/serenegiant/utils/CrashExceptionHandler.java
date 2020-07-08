@@ -126,7 +126,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private JSONObject getBuildInfo() throws JSONException {
+	private static JSONObject getBuildInfo() throws JSONException {
 		final JSONObject buildJson = new JSONObject();
 		buildJson.put("BRAND", Build.BRAND);	// キャリア、メーカー名など
 		buildJson.put("MODEL", Build.MODEL);	// ユーザーに表示するモデル名
@@ -161,7 +161,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private JSONObject getExceptionInfo(final Throwable throwable) throws JSONException {
+	private static JSONObject getExceptionInfo(final Throwable throwable) throws JSONException {
 		final JSONObject exceptionJson = new JSONObject();
 		exceptionJson.put("name", throwable.getClass().getName());
 		exceptionJson.put("cause", throwable.getCause());
