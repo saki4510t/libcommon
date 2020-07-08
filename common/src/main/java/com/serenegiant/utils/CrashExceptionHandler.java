@@ -30,7 +30,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -42,8 +47,51 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	/* package */static final String LOG_NAME = "crashrepo.txt";
 	/* package */static final String MAIL_TO = "t_saki@serenegiant.com";
 
+	private static final int REQUEST_RESTART_ACTIVITY = 2039;
+
 	public static void registerCrashHandler(@NonNull final Context app_context) {
 		Thread.setDefaultUncaughtExceptionHandler(new CrashExceptionHandler(app_context));
+	}
+
+	/**
+	 * アプリがクラッシュした際に指定したPendingIntentを実行するように設定
+	 * @param context
+	 * @param restartIntent
+	 */
+	public static void setAutoRestart(@NonNull final Context context,
+		@NonNull final PendingIntent restartIntent,
+		final long delayMs) {
+
+		final Thread.UncaughtExceptionHandler original = Thread.getDefaultUncaughtExceptionHandler();
+		final Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+			@Override
+			public void uncaughtException(@NonNull final Thread thread, @NonNull final Throwable throwable) {
+				try {
+					final AlarmManager am = ContextUtils.requireSystemService(context, AlarmManager.class);
+					am.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + delayMs, restartIntent);
+				} finally {
+					original.uncaughtException(thread, throwable);
+				}
+			}
+		};
+		Thread.setDefaultUncaughtExceptionHandler(handler);
+	}
+
+	/**
+	 * アプリがクラッシュしたときに指定したActivityを起動するように設定
+	 * @param context
+	 * @param activityClass
+	 */
+	public static void setAutoRestart(@NonNull final Context context,
+		@NonNull final Class<? extends Activity> activityClass,
+		final long delayMs) {
+
+		final PendingIntent intent = PendingIntent.getActivity(
+			context.getApplicationContext(),
+			REQUEST_RESTART_ACTIVITY,
+			Intent.makeMainActivity(new ComponentName(context, activityClass)),
+			PendingIntent.FLAG_CANCEL_CURRENT);
+		setAutoRestart(context, intent, delayMs);
 	}
 
 /*	public static final void sendReport(final Context context) {
