@@ -26,6 +26,7 @@ import android.content.Intent;
 
 import androidx.annotation.NonNull;
 
+@Deprecated
 public class DeviceAdminReceiverLock extends DeviceAdminReceiver {
 
 	public static final String EXTRA_REQUEST_FINISH = "EXTRA_REQUEST_FINISH";
