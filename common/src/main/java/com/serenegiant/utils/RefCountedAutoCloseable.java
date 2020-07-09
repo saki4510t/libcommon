@@ -82,5 +82,5 @@ public class RefCountedAutoCloseable<T extends AutoCloseable> implements AutoClo
 				}
 			}
 		}
-}
+	}
 }
