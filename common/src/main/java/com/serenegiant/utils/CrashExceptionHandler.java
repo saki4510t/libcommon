@@ -122,17 +122,10 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	} */
 
 	private final WeakReference<Context> mWeakContext;
-	private final WeakReference<PackageInfo> mWeakPackageInfo;
 	private final UncaughtExceptionHandler mHandler;
 
 	private CrashExceptionHandler(@NonNull final Context context) {
 		mWeakContext = new WeakReference<Context>(context);
-		try {
-			mWeakPackageInfo = new WeakReference<PackageInfo>(
-				context.getPackageManager().getPackageInfo(context.getPackageName(), 0));
-		} catch (final NameNotFoundException e) {
-			throw new RuntimeException(e);
-		}
 		mHandler = Thread.getDefaultUncaughtExceptionHandler();
 	}
 
@@ -149,7 +142,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 				writer = new PrintWriter(outputStream);
 				final JSONObject json = new JSONObject();
 				json.put("Build", getBuildInfo());
-				json.put("PackageInfo", getPackageInfo(mWeakPackageInfo.get()));
+				json.put("PackageInfo", getPackageInfo(context));
 				json.put("Exception", getExceptionInfo(throwable));
 				json.put("SharedPreferences", getPreferencesInfo(context));
 				writer.print(json.toString());
@@ -196,12 +189,17 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static JSONObject getPackageInfo(@NonNull final PackageInfo info) throws JSONException {
+	private static JSONObject getPackageInfo(@NonNull final Context context) throws JSONException {
+
 		final JSONObject packageInfoJson = new JSONObject();
-		if (info != null) {
+		try {
+			final PackageInfo info = context.getPackageManager()
+				.getPackageInfo(context.getPackageName(), 0);
 			packageInfoJson.put("packageName", info.packageName);
 			packageInfoJson.put("versionCode", info.versionCode);
 			packageInfoJson.put("versionName", info.versionName);
+		} catch (final NameNotFoundException e) {
+			packageInfoJson.put("error", e);
 		}
 		return packageInfoJson;
 	}
