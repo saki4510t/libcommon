@@ -133,13 +133,16 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * キャッチされなかった例外発生時に各種情報をJSONでテキストファイルに書き出す
 	 */
 	@Override
-	public void uncaughtException(@NonNull final Thread thread, final @NonNull Throwable throwable) {
+	public void uncaughtException(
+		@NonNull final Thread thread, final @NonNull Throwable throwable) {
+
 		final Context context = mWeakContext.get();
 		if (context != null) {
 			PrintWriter writer = null;
 			try {
-				final FileOutputStream outputStream = context.openFileOutput(LOG_NAME, Context.MODE_PRIVATE);
-				writer = new PrintWriter(outputStream);
+				final FileOutputStream out
+					= context.openFileOutput(LOG_NAME, Context.MODE_PRIVATE);
+				writer = new PrintWriter(out);
 				final JSONObject json = new JSONObject();
 				json.put("Build", getBuildInfo());
 				json.put("PackageInfo", getPackageInfo(context));
@@ -177,7 +180,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 		buildJson.put("BRAND", Build.BRAND);	// キャリア、メーカー名など
 		buildJson.put("MODEL", Build.MODEL);	// ユーザーに表示するモデル名
 		buildJson.put("DEVICE", Build.DEVICE);	// デバイス名
-		buildJson.put("MANUFACTURER", Build.MANUFACTURER);			// 製造者名
+		buildJson.put("MANUFACTURER", Build.MANUFACTURER);		// 製造者名
 		buildJson.put("VERSION.SDK_INT", Build.VERSION.SDK_INT);	// フレームワークのバージョン情報
 		buildJson.put("VERSION.RELEASE", Build.VERSION.RELEASE);	// ユーザーに表示するバージョン番号
 		return buildJson;
@@ -189,7 +192,8 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static JSONObject getPackageInfo(@NonNull final Context context) throws JSONException {
+	private static JSONObject getPackageInfo(@NonNull final Context context)
+		throws JSONException {
 
 		final JSONObject packageInfoJson = new JSONObject();
 		try {
@@ -211,7 +215,9 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static JSONObject getExceptionInfo(final Throwable throwable) throws JSONException {
+	private static JSONObject getExceptionInfo(final Throwable throwable)
+		throws JSONException {
+
 		final JSONObject exceptionJson = new JSONObject();
 		exceptionJson.put("name", throwable.getClass().getName());
 		exceptionJson.put("cause", throwable.getCause());
@@ -231,8 +237,12 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static JSONObject getPreferencesInfo(@NonNull final Context context) throws JSONException {
-		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+	private static JSONObject getPreferencesInfo(@NonNull final Context context)
+		throws JSONException {
+
+		final SharedPreferences preferences
+			= PreferenceManager.getDefaultSharedPreferences(context);
+
 		final JSONObject preferencesJson = new JSONObject();
 		final Map<String, ?> map = preferences.getAll();
 		for (final Entry<String, ?> entry : map.entrySet()) {
