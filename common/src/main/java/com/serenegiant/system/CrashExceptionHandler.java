@@ -64,6 +64,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @param context
 	 * @param restartIntent
 	 */
+	@Deprecated
 	public static void setAutoRestart(@NonNull final Context context,
 		@NonNull final PendingIntent restartIntent,
 		final long delayMs) {
@@ -88,6 +89,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @param context
 	 * @param activityClass
 	 */
+	@Deprecated
 	public static void setAutoRestart(@NonNull final Context context,
 		@NonNull final Class<? extends Activity> activityClass,
 		final long delayMs) {
