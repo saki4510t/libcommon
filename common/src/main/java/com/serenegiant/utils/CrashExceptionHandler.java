@@ -41,9 +41,13 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
 public final class CrashExceptionHandler implements UncaughtExceptionHandler {
+	private static final String TAG = CrashExceptionHandler.class.getSimpleName();
+
 	/* package */static final String LOG_NAME = "crashrepo.txt";
 	/* package */static final String MAIL_TO = "t_saki@serenegiant.com";
 
@@ -145,9 +149,9 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 				writer = new PrintWriter(outputStream);
 				final JSONObject json = new JSONObject();
 				json.put("Build", getBuildInfo());
-				json.put("PackageInfo", getPackageInfo());
+				json.put("PackageInfo", getPackageInfo(mWeakPackageInfo.get()));
 				json.put("Exception", getExceptionInfo(throwable));
-				json.put("SharedPreferences", getPreferencesInfo());
+				json.put("SharedPreferences", getPreferencesInfo(context));
 				writer.print(json.toString());
 				writer.flush();
 			} catch (final FileNotFoundException e) {
@@ -161,10 +165,11 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 			}
 		}
 		try {
-			if (mHandler != null)
+			if (mHandler != null) {
 				mHandler.uncaughtException(thread, throwable);
+			}
 		} catch (final Exception e) {
-			// ignore
+			Log.w(TAG, e);
 		}
 	}
 
@@ -191,8 +196,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private JSONObject getPackageInfo() throws JSONException {
-		final PackageInfo info = mWeakPackageInfo.get();
+	private static JSONObject getPackageInfo(@NonNull final PackageInfo info) throws JSONException {
 		final JSONObject packageInfoJson = new JSONObject();
 		if (info != null) {
 			packageInfoJson.put("packageName", info.packageName);
@@ -229,8 +233,8 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @return
 	 * @throws JSONException
 	 */
-	private JSONObject getPreferencesInfo() throws JSONException {
-		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(mWeakContext.get());
+	private static JSONObject getPreferencesInfo(@NonNull final Context context) throws JSONException {
+		final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		final JSONObject preferencesJson = new JSONObject();
 		final Map<String, ?> map = preferences.getAll();
 		for (final Entry<String, ?> entry : map.entrySet()) {
