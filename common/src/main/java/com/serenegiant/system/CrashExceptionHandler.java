@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,18 +18,6 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.PrintWriter;
-import java.lang.Thread.UncaughtExceptionHandler;
-import java.lang.ref.WeakReference;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -42,6 +30,21 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.os.Build;
 import android.preference.PreferenceManager;
 import android.util.Log;
+
+import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.utils.LogUtils;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
+import java.lang.Thread.UncaughtExceptionHandler;
+import java.lang.ref.WeakReference;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import androidx.annotation.NonNull;
 
@@ -66,8 +69,8 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 		@NonNull final PendingIntent restartIntent,
 		final long delayMs) {
 
-		final Thread.UncaughtExceptionHandler original = Thread.getDefaultUncaughtExceptionHandler();
-		final Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
+		final UncaughtExceptionHandler original = Thread.getDefaultUncaughtExceptionHandler();
+		final UncaughtExceptionHandler handler = new UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(@NonNull final Thread thread, @NonNull final Throwable throwable) {
 				try {
