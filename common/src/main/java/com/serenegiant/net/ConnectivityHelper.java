@@ -39,7 +39,7 @@ import androidx.annotation.RequiresPermission;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.lang.ref.WeakReference;

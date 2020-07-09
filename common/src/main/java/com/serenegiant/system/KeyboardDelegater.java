@@ -6,7 +6,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.serenegiant.utils.ContextUtils;
 import com.serenegiant.widget.Keyboard;
 import com.serenegiant.widget.KeyboardView;
 

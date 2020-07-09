@@ -37,9 +37,9 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.io.IOException;

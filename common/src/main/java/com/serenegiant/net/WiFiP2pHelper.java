@@ -32,7 +32,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.system.ContextUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;

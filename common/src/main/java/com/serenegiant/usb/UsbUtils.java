@@ -30,9 +30,8 @@ import android.util.Log;
 
 import com.serenegiant.nio.CharsetsUtils;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.system.ContextUtils;
 
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;

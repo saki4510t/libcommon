@@ -34,8 +34,8 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.ComponentUtils;
-import com.serenegiant.utils.ContextUtils;
 
 /**
  * ネットワークの接続状態が変更された時のブロードキャストを処理するためのBroadcastReceiver

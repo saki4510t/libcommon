@@ -35,7 +35,7 @@ import android.widget.TextView;
 
 import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.system.ContextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

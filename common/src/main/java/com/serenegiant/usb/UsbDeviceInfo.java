@@ -8,7 +8,7 @@ import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.ContextUtils;
+import com.serenegiant.system.ContextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

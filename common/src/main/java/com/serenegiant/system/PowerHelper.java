@@ -25,8 +25,6 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.WindowManager;
 
-import com.serenegiant.utils.ContextUtils;
-
 /**
  * スリープ状態から画面ON出来るようにするためのヘルパークラス
  * 実際に使うにはAndroidManifest.xmlに

@@ -26,6 +26,8 @@ import android.text.TextUtils;
 import android.view.accessibility.AccessibilityEvent;
 import android.view.accessibility.AccessibilityManager;
 
+import com.serenegiant.system.ContextUtils;
+
 public class TalkBackHelper {
 	private TalkBackHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに

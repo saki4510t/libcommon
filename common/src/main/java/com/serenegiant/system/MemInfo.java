@@ -30,8 +30,6 @@ import android.content.Context;
 import android.os.Debug;
 import android.text.TextUtils;
 
-import com.serenegiant.utils.ContextUtils;
-
 public class MemInfo {
 
 	private MemInfo() {
