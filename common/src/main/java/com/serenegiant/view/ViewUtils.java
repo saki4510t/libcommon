@@ -448,20 +448,21 @@ public class ViewUtils {
 	 */
 	@Nullable
 	public static ImageView findIconView(@NonNull final View view) {
-		ImageView result = null;
-		if (view instanceof ImageView) {
-			result = (ImageView)view;
-		} else {
-			for (final int id: ICON_IDS) {
-				final View v = view.findViewById(id);
-				if (v instanceof ImageView) {
-					result = (ImageView)v;
-					break;
-				}
-			}
-		}
+		return findView(view, ICON_IDS, ImageView.class);
+	}
 
-		return result;
+	/**
+	 * サムネイル・アイコン表示用にImageViewを探す
+	 * @param view
+	 * @param ids
+	 * @return
+	 */
+	@Nullable
+	public static ImageView findIconView(
+		@NonNull final View view,
+		@NonNull @IdRes final int[] ids) {
+
+		return findView(view, ids, ImageView.class);
 	}
 
 	/**
@@ -472,14 +473,38 @@ public class ViewUtils {
 	 */
 	@Nullable
 	public static TextView findTitleView(@NonNull final View view) {
-		TextView result = null;
-		if (view instanceof TextView) {
-			result = (TextView)view;
+		return findView(view, TITLE_IDS, TextView.class);
+	}
+
+	/**
+	 * タイトル表示用にTextViewを探す
+	 * @param view
+	 * @param ids
+	 * @return
+	 */
+	@Nullable
+	public static TextView findTitleView(
+		@NonNull final View view,
+		@NonNull @IdRes final int[] ids) {
+
+		return findView(view, ids, TextView.class);
+	}
+
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static <T extends View> T findView(
+		@NonNull final View view,
+		@NonNull @IdRes final int[] ids,
+		@NonNull final Class<T> clazz) {
+
+		T result = null;
+		if (clazz.isInstance(view)) {
+			result = (T) view;
 		} else {
-			for (final int id: TITLE_IDS) {
+			for (final int id: ids) {
 				final View v = view.findViewById(id);
-				if (v instanceof TextView) {
-					result = (TextView)v;
+				if (clazz.isInstance(v)) {
+					result = (T)v;
 					break;
 				}
 			}
