@@ -30,12 +30,12 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 	}
 
 	@Override
-	protected void registerDataSetObserver(@NonNull final List items) {
+	protected void registerDataSetObserver(@NonNull final List<String> items) {
 
 	}
 
 	@Override
-	protected void unregisterDataSetObserver(@NonNull final List items) {
+	protected void unregisterDataSetObserver(@NonNull final List<String> items) {
 
 	}
 
