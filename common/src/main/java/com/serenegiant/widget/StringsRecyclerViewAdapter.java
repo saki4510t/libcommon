@@ -1,9 +1,8 @@
 package com.serenegiant.widget;
 
-import android.view.View;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
+import com.serenegiant.view.ViewUtils;
 
 import java.util.List;
 
@@ -39,35 +38,13 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 
 	}
 
-	/**
-	 * 文字列表示用のTextViewのidとして対応しているid一覧
-	 */
-	private static final int[] TV_ID_LIST = new int[] {
-		R.id.title,
-		R.id.content,
-		android.R.id.title,
-		android.R.id.text1,
-		android.R.id.text2,
-	};
-
 	@Override
 	public void onBindViewHolder(
 		@NonNull final ViewHolder<String> holder,
 		final int position) {
 
 		holder.mItem = getItem(position);
-		TextView tv = null;
-		if (holder.mView instanceof TextView) {
-			tv = (TextView)holder.mView;
-		} else {
-			for (final int id: TV_ID_LIST) {
-				final View v = holder.mView.findViewById(id);
-				if (v instanceof TextView) {
-					tv = (TextView)v;
-					break;
-				}
-			}
-		}
+		final TextView tv = ViewUtils.findTitleView(holder.mView);
 		if (tv != null) {
 			tv.setText(holder.mItem);
 		} else {
