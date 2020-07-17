@@ -144,6 +144,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			unregisterDataSetObserver(mItems);
 			mItems.clear();
 		}
+		notifyDataSetChanged();
 	}
 
 	/**
@@ -151,10 +152,16 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 	 * @param collection
 	 */
 	public void addAll(final Collection<? extends T> collection) {
+		final int n, m;
 		synchronized (mItems) {
+			n = mItems.size() - 1;
 			unregisterDataSetObserver(mItems);
 			mItems.addAll(collection);
+			m = mItems.size() - 1;
 			registerDataSetObserver(mItems);
+		}
+		if (m > n) {
+			notifyItemRangeChanged(n, m - n);
 		}
 	}
 
@@ -169,12 +176,14 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			mItems.addAll(collection);
 			registerDataSetObserver(mItems);
 		}
+		notifyDataSetChanged();
 	}
 
 	public void sort(final Comparator<? super T> comparator) {
 		synchronized (mItems) {
 			Collections.sort(mItems, comparator);
 		}
+		notifyDataSetChanged();
 	}
 
 	protected LayoutInflater getLayoutInflater(final Context context) {
