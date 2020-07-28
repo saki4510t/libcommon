@@ -18,6 +18,7 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
@@ -26,6 +27,7 @@ import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.view.View;
 
 import com.serenegiant.common.R;
@@ -174,65 +176,6 @@ public class ProgressView extends View {
 	};
 
 	/**
-	 * Push object to the top of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_TOP = 0x30;
-	/**
-	 * Push object to the bottom of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_BOTTOM = 0x50;
-	/**
-	 * Push object to the left of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_LEFT = 0x03;
-	/**
-	 * Push object to the right of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_RIGHT = 0x05;
-	/**
-	 * Place object in the vertical center of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_CENTER_VERTICAL = 0x10;
-	/**
-	 * Grow the vertical size of the object if needed so it completely fills its container.
-	 */
-	protected static final int GRAVITY_FILL_VERTICAL = 0x70;
-	/**
-	 * Place object in the horizontal center of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_CENTER_HORIZONTAL = 0x01;
-	/**
-	 * Grow the horizontal size of the object if needed so it completely fills its container.
-	 */
-	protected static final int GRAVITY_FILL_HORIZONTAL = 0x07;
-	/**
-	 * Place the object in the center of its container in both the vertical and horizontal axis, not changing its size.
-	 */
-	protected static final int GRAVITY_CENTER = 0x11;
-	/**
-	 * Grow the horizontal and vertical size of the object if needed so it completely fills its container.
-	 */
-	protected static final int GRAVITY_FILL = 0x77;
-	/**
-	 * Additional option that can be set to have the top and/or bottom edges of the child clipped to its container's bounds.
-	 * The clip will be based on the vertical gravity: a top gravity will clip the bottom edge, a bottom gravity will clip the top edge, and neither will clip both edges.
-	 */
-	protected static final int GRAVITY_CLIP_VERTICAL = 0x80;
-	/**
-	 * Additional option that can be set to have the left and/or right edges of the child clipped to its container's bounds.
-	 * The clip will be based on the horizontal gravity: a left gravity will clip the right edge, a right gravity will clip the left edge, and neither will clip both edges.
-	 */
-	protected static final int GRAVITY_CLIP_HORIZONTAL = 0x08;
-	/**
-	 * Push object to the beginning of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_START = 0x00800003;
-	/**
-	 * Push object to the end of its container, not changing its size.
-	 */
-	protected static final int GRAVITY_END = 0x00800005;
-
-	/**
 	 * プログレスの回転方向を指定
 	 * @param rotation 0:
 	 */
@@ -283,6 +226,7 @@ public class ProgressView extends View {
 	 * Progress表示用のDrawableを設定
 	 * @param drawable
 	 */
+	@SuppressLint("RtlHardcoded")
 	protected void refreshDrawable(@Nullable final Drawable drawable) {
 		final int level;
 		synchronized (mSync) {
@@ -292,7 +236,7 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mColor);
 		}
-		int gravity = GRAVITY_FILL_VERTICAL | GRAVITY_LEFT;
+		int gravity = Gravity.FILL_VERTICAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
 		while (mRotation < 0) {
 			mRotation += 360;
@@ -300,15 +244,15 @@ public class ProgressView extends View {
 		mRotation %= 360;
 		switch (mRotation) {
 		case 90:
-			gravity = GRAVITY_FILL_HORIZONTAL | GRAVITY_BOTTOM;
+			gravity = Gravity.FILL_HORIZONTAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		case 180:
-			gravity = GRAVITY_FILL_VERTICAL | GRAVITY_RIGHT;
+			gravity = Gravity.FILL_VERTICAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
 		case 270:
-			gravity = GRAVITY_FILL_HORIZONTAL | GRAVITY_TOP;
+			gravity = Gravity.FILL_HORIZONTAL |  Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		default:
