@@ -22,6 +22,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
+import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ColorDrawable;
@@ -38,9 +39,10 @@ import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+import androidx.core.graphics.drawable.DrawableCompat;
 
 public class ProgressView extends View {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();
 
 	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
@@ -116,10 +118,8 @@ public class ProgressView extends View {
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.ProgressView, defStyleAttr, 0);
 		mDrawable = a.getDrawable(R.styleable.ProgressView_android_drawable);
-		if (mDrawable == null) {
-			mProgressColor = a.getColor(R.styleable.ProgressView_android_color, mProgressColor);
-		}
-		mDirectionDegrees = a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees);
+		mProgressColor = a.getColor(R.styleable.ProgressView_android_color, mProgressColor);
+		mDirectionDegrees = checkDirection(a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees));
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
 		mMax = a.getInt(R.styleable.ProgressView_android_min, mMax);
 		if (mMin == mMax) {
@@ -201,7 +201,7 @@ public class ProgressView extends View {
 	 * @param directionDegrees 0:
 	 */
 	public void setDirection(@Direction int directionDegrees) {
-		directionDegrees = ((directionDegrees / 90) * 90) % 360;
+		directionDegrees = checkDirection(((directionDegrees / 90) * 90) % 360);
 		if (mDirectionDegrees != directionDegrees) {
 			mDirectionDegrees = directionDegrees;
 			resize();
@@ -267,11 +267,10 @@ public class ProgressView extends View {
 		mDrawable = drawable;
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mProgressColor);
+		} else {
+			DrawableCompat.setTint(mDrawable, mProgressColor);
+			DrawableCompat.setTintMode(mDrawable, PorterDuff.Mode.SRC_IN);
 		}
-		while (mDirectionDegrees < 0) {
-			mDirectionDegrees += 360;
-		}
-		mDirectionDegrees %= 360;
 		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
 		switch (mDirectionDegrees) {
@@ -305,5 +304,13 @@ public class ProgressView extends View {
 		mClipDrawable.setBounds(outRect);
 		mClipDrawable.setLevel(level);
 		postInvalidate();
+	}
+
+	private static int checkDirection(int directionDegrees) {
+		while (directionDegrees < 0) {
+			directionDegrees += 360;
+		}
+		directionDegrees %= 360;
+		return directionDegrees;
 	}
 }
