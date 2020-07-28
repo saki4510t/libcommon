@@ -78,7 +78,7 @@ public class ProgressView extends View {
 	/**
 	 * Drawableを指定しない時に使うprogress表示色
 	 */
-	private int mColor = 0xffff0000;
+	private int mProgressColor = 0xffff0000;
 	/**
 	 * progressを表示するDrawable
 	 */
@@ -117,7 +117,7 @@ public class ProgressView extends View {
 			attrs, R.styleable.ProgressView, defStyleAttr, 0);
 		mDrawable = a.getDrawable(R.styleable.ProgressView_android_drawable);
 		if (mDrawable == null) {
-			mColor = a.getColor(R.styleable.ProgressView_android_color, mColor);
+			mProgressColor = a.getColor(R.styleable.ProgressView_android_color, mProgressColor);
 		}
 		mDirectionDegrees = a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees);
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
@@ -222,8 +222,8 @@ public class ProgressView extends View {
 	 * @param color
 	 */
 	public void setColor(final int color) {
-		if (mColor != color) {
-			mColor = color;
+		if (mProgressColor != color) {
+			mProgressColor = color;
 			refreshDrawable(null);
 		}
 	}
@@ -266,7 +266,7 @@ public class ProgressView extends View {
 		}
 		mDrawable = drawable;
 		if (mDrawable == null) {
-			mDrawable = new ColorDrawable(mColor);
+			mDrawable = new ColorDrawable(mProgressColor);
 		}
 		while (mDirectionDegrees < 0) {
 			mDirectionDegrees += 360;
