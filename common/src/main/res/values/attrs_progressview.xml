@@ -13,9 +13,9 @@
 	</attr>
 
 	<declare-styleable name="ProgressView">
-		<!-- プログレス表示用のDrawable、android:colorより優先 -->
+		<!-- プログレス表示用のDrawable -->
 		<attr name="android:drawable" />
-		<!-- プログレス表示用の色、android:drawableが指定されている場合には無視される -->
+		<!-- プログレス表示用の色、android:drawableが指定されている場合はtint色として使う -->
 		<attr name="android:color" />
 		<attr name="direction" />
 		<attr name="android:min" />
