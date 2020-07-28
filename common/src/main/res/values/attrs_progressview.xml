@@ -16,9 +16,17 @@
 		<enum name="top_to_bottom" value="270" />
 	</attr>
 
+	<attr name="drawableCompat" format="reference" />
+	<attr name="backgroundCompat" format="reference" />
+	<attr name="backgroundTintCompat" format="color" />
+
 	<declare-styleable name="ProgressView">
+		<!-- 背景用のDrawable -->
+		<attr name="backgroundCompat" />
+		<!-- 背景用Drawableのtint指定 -->
+		<attr name="backgroundTintCompat" />
 		<!-- プログレス表示用のDrawable -->
-		<attr name="android:drawable" />
+		<attr name="drawableCompat" />
 		<!-- プログレス表示用の色、android:drawableが指定されている場合はtint色として使う -->
 		<attr name="android:color" />
 		<!--

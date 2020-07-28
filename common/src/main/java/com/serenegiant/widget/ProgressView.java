@@ -41,6 +41,8 @@ import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
@@ -49,8 +51,14 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
  */
 @SuppressWarnings("DeprecatedIsStillUsed")
 public class ProgressView extends View {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();
+
+	static {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+			AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+		}
+	}
 
 	@Deprecated
 	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
@@ -128,7 +136,20 @@ public class ProgressView extends View {
 		super(context, attrs, defStyleAttr);
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.ProgressView, defStyleAttr, 0);
-		mDrawable = a.getDrawable(R.styleable.ProgressView_android_drawable);
+		final int drawableId = a.getResourceId(R.styleable.ProgressView_drawableCompat, 0);
+		if (drawableId != 0) {
+			mDrawable = DrawableCompat.wrap(ContextCompat.getDrawable(context, drawableId));
+		}
+		final int bkDrawableId = a.getResourceId(R.styleable.ProgressView_backgroundCompat, 0);
+		if (bkDrawableId != 0) {
+			final Drawable bk = DrawableCompat.wrap(ContextCompat.getDrawable(context, bkDrawableId));
+			final int bkTintColor = a.getColor(R.styleable.ProgressView_backgroundTintCompat, 0);
+			if (bkTintColor != 0) {
+				DrawableCompat.setTint(bk, bkTintColor);
+				DrawableCompat.setTintMode(bk, PorterDuff.Mode.SRC_IN);
+			}
+			setBackground(bk);
+		}
 		mProgressColor = a.getColor(R.styleable.ProgressView_android_color, mProgressColor);
 		mDirectionDegrees = checkDirection(a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees));
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
@@ -277,17 +298,19 @@ public class ProgressView extends View {
 		synchronized (mSync) {
 			level = (int)(mProgress * mScale) + mMin;
 		}
-		mDrawable = drawable;
+		mDrawable = drawable != null ? DrawableCompat.wrap(drawable) : null;
+		if (DEBUG) Log.v(TAG, "refreshDrawable:drawable=" + mDrawable);
 		if (mDrawable == null) {
 			setLayerType(View.LAYER_TYPE_HARDWARE, null);
 			mDrawable = new ColorDrawable(mProgressColor);
 		} else {
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				if ((mDrawable instanceof VectorDrawableCompat)
-					|| (mDrawable instanceof VectorDrawable)) {
+				if (mDrawable instanceof VectorDrawable) {
 
 					setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 				}
+			} else if (mDrawable instanceof VectorDrawableCompat) {
+				setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 			}
 			DrawableCompat.setTint(mDrawable, mProgressColor);
 			DrawableCompat.setTintMode(mDrawable, PorterDuff.Mode.SRC_IN);
