@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="ProgressView">
+		<!-- プログレス表示用のDrawable、android:colorより優先 -->
+		<attr name="android:drawable" />
+		<!-- プログレス表示用の色、android:drawableが指定されている場合には無視される -->
+		<attr name="android:color" />
+		<attr name="android:rotation" />
+		<attr name="android:min" />
+		<attr name="android:max" />
+		<attr name="android:progress" />
+	</declare-styleable>
+</resources>

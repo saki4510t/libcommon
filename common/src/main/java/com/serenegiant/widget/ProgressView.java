@@ -19,6 +19,7 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
 import android.graphics.drawable.ClipDrawable;
@@ -26,6 +27,8 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
+
+import com.serenegiant.common.R;
 
 import androidx.annotation.Nullable;
 
@@ -85,6 +88,25 @@ public class ProgressView extends View {
 	 */
 	public ProgressView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.ProgressView, defStyleAttr, 0);
+		mDrawable = a.getDrawable(R.styleable.ProgressView_android_drawable);
+		if (mDrawable == null) {
+			mColor = a.getColor(R.styleable.ProgressView_android_color, mColor);
+		}
+		mRotation = a.getInt(R.styleable.ProgressView_android_rotation, mRotation);
+		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
+		mMax = a.getInt(R.styleable.ProgressView_android_min, mMax);
+		if (mMin == mMax) {
+			throw new IllegalArgumentException("min and max should be different");
+		}
+		if (mMin > mMax) {
+			final int w = mMin;
+			mMin = mMax;
+			mMax = w;
+		}
+		mProgress = a.getInt(R.styleable.ProgressView_android_progress, mProgress);
+		a.recycle();
 	}
 
 	@Override
