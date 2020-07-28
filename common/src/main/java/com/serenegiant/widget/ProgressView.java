@@ -65,7 +65,7 @@ public class ProgressView extends View {
 	 * @param context
 	 */
 	public ProgressView(final Context context) {
-		super(context);
+		this(context, null, 0);
 	}
 
 	/**
@@ -74,7 +74,7 @@ public class ProgressView extends View {
 	 * @param attrs
 	 */
 	public ProgressView(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+		this(context, attrs, 0);
 	}
 
 	/**
