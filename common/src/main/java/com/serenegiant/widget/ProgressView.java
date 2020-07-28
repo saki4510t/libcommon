@@ -33,15 +33,33 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 
 public class ProgressView extends View {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();
+
+	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
+	public static final int DIRECTION_RIGHT_TO_LEFT = 180;
+	public static final int DIRECTION_BOTTOM_TO_TOP = 90;
+	public static final int DIRECTION_TOP_TO_BOTTOM = 270;
+
+	@IntDef({
+		DIRECTION_LEFT_TO_RIGHT,
+		DIRECTION_RIGHT_TO_LEFT,
+		DIRECTION_BOTTOM_TO_TOP,
+		DIRECTION_TOP_TO_BOTTOM})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Direction {}
 
 	private final Object mSync = new Object();
 
-	private int mRotation = 90;
+	@Direction
+	private int mDirectionDegrees = DIRECTION_BOTTOM_TO_TOP;
 	/**
 	 * progressの最小・最大値
 	 * それぞれの値でサチュレーション計算する
@@ -101,7 +119,7 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mColor = a.getColor(R.styleable.ProgressView_android_color, mColor);
 		}
-		mRotation = (int)a.getFloat(R.styleable.ProgressView_android_rotation, mRotation);
+		mDirectionDegrees = a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees);
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
 		mMax = a.getInt(R.styleable.ProgressView_android_min, mMax);
 		if (mMin == mMax) {
@@ -179,15 +197,23 @@ public class ProgressView extends View {
 	};
 
 	/**
-	 * プログレスの回転方向を指定
-	 * @param rotation 0:
+	 * プログレスの進行方向を指定
+	 * @param directionDegrees 0:
 	 */
-	public void setRotation(int rotation) {
-		rotation = ((rotation / 90) * 90) % 360;
-		if (mRotation != rotation) {
-			mRotation = rotation;
+	public void setDirection(@Direction int directionDegrees) {
+		directionDegrees = ((directionDegrees / 90) * 90) % 360;
+		if (mDirectionDegrees != directionDegrees) {
+			mDirectionDegrees = directionDegrees;
 			resize();
 		}
+	}
+
+	/**
+	 * プログレスの進行方向を取得
+	 * @return
+	 */
+	public int getDirection() {
+		return mDirectionDegrees;
 	}
 
 	/**
@@ -242,33 +268,33 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mColor);
 		}
-		while (mRotation < 0) {
-			mRotation += 360;
+		while (mDirectionDegrees < 0) {
+			mDirectionDegrees += 360;
 		}
-		mRotation %= 360;
+		mDirectionDegrees %= 360;
 		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
-		switch (mRotation) {
-		case 0:		// 右をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT,rotation=" + mRotation + ",level=" + level);
+		switch (mDirectionDegrees) {
+		case DIRECTION_LEFT_TO_RIGHT:		// 右をクリップ
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT,rotation=" + mDirectionDegrees + ",level=" + level);
 			break;
-		case 90:	// 上をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP,rotation=" + mRotation + ",level=" + level);
+		case DIRECTION_BOTTOM_TO_TOP:	// 上をクリップ
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP,rotation=" + mDirectionDegrees + ",level=" + level);
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
-		case 180:	// 左をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT,rotation=" + mRotation + ",level=" + level);
+		case DIRECTION_RIGHT_TO_LEFT:	// 左をクリップ
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT,rotation=" + mDirectionDegrees + ",level=" + level);
 			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
-		case 270:	// 下をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM,rotation=" + mRotation + ",level=" + level);
+		case DIRECTION_TOP_TO_BOTTOM:	// 下をクリップ
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM,rotation=" + mDirectionDegrees + ",level=" + level);
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		default:
-			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected,rotation=" + mRotation + ",level=" + level);
+			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected,rotation=" + mDirectionDegrees + ",level=" + level);
 			break;
 		}
 		// プログレス表示用のClipDrawableを生成
