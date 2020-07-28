@@ -57,16 +57,12 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
 
-	<!--
-		Android5(API21)未満だとカスタムViewへレイアウトxml上から
-		VectorDrawableを割り当てることができない
-	-->
 	<com.serenegiant.widget.ProgressView
 		android:id="@+id/progressView5"
 		android:layout_width="64dp"
 		android:layout_height="100dp"
-		app:backgroundCompat="@drawable/ic_baseline_battery_std_24"
-		app:backgroundTintCompat="@color/AQUA"
+		android:background="@drawable/ic_baseline_battery_std_24"
+		android:backgroundTint="@color/AQUA"
 		app:drawableCompat="@drawable/ic_baseline_battery_std_24"
 		android:color="@color/GREEN"
 		android:progress="35"
@@ -75,7 +71,6 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
-
 
 	<com.serenegiant.widget.ProgressView
 		android:id="@+id/progressView6"
