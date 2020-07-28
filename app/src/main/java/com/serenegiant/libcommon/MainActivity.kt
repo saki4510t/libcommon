@@ -256,6 +256,9 @@ class MainActivity
 			18 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
+			19 -> {	// ProgressView
+				fragment = ProgressFragment()
+			}
 			else -> {
 			}
 		}

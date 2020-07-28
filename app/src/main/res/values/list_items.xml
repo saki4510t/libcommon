@@ -19,6 +19,7 @@
 	<string name="title_galley_recycler" translatable="false">Galley(RecyclerView)</string>
 	<string name="title_number_keyboard" translatable="false">NumberKeyboard</string>
 	<string name="title_view_slider" translatable="false">ViewSlider</string>
+	<string name="title_progress_view" translatable="false">ProgressView</string>
 
 	<string-array name="list_items">
 		<item>@string/title_request_saf_permission</item>
@@ -40,5 +41,6 @@
 		<item>@string/title_galley_recycler</item>
 		<item>@string/title_number_keyboard</item>
 		<item>@string/title_view_slider</item>
+		<item>@string/title_progress_view</item>
 	</string-array>
 </resources>

@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent">
+
+	<com.serenegiant.widget.ProgressView
+		android:id="@+id/progressView1"
+		android:layout_width="48dp"
+		android:layout_height="200dp"
+		android:background="@color/GRAY"
+		android:progress="25"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintHorizontal_bias="0.33"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+
+	<com.serenegiant.widget.ProgressView
+		android:id="@+id/progressView2"
+		android:layout_width="200dp"
+		android:layout_height="48dp"
+		android:background="@color/GRAY"
+		android:progress="75"
+		app:direction="left_to_right"
+		app:layout_constraintBottom_toTopOf="@+id/progressView1"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toTopOf="parent" />
+
+	<com.serenegiant.widget.ProgressView
+		android:id="@+id/progressView3"
+		android:layout_width="200dp"
+		android:layout_height="48dp"
+		android:background="@color/GRAY"
+		app:direction="right_to_left"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toStartOf="parent"
+		app:layout_constraintTop_toBottomOf="@+id/progressView1" />
+
+	<com.serenegiant.widget.ProgressView
+		android:id="@+id/progressView4"
+		android:layout_width="48dp"
+		android:layout_height="200dp"
+		android:background="@color/GRAY"
+		android:progress="25"
+		app:direction="top_to_bottom"
+		app:layout_constraintBottom_toBottomOf="parent"
+		app:layout_constraintEnd_toEndOf="parent"
+		app:layout_constraintStart_toEndOf="@+id/progressView1"
+		app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
