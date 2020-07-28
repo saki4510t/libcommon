@@ -41,15 +41,23 @@ import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
 
+/**
+ * 進捗表示用のView
+ */
+@SuppressWarnings("DeprecatedIsStillUsed")
 public class ProgressView extends View {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();
 
+	@Deprecated
 	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
+	@Deprecated
 	public static final int DIRECTION_RIGHT_TO_LEFT = 180;
 	public static final int DIRECTION_BOTTOM_TO_TOP = 90;
+	@Deprecated
 	public static final int DIRECTION_TOP_TO_BOTTOM = 270;
 
+	@SuppressWarnings("deprecation")
 	@IntDef({
 		DIRECTION_LEFT_TO_RIGHT,
 		DIRECTION_RIGHT_TO_LEFT,
@@ -200,6 +208,7 @@ public class ProgressView extends View {
 	 * プログレスの進行方向を指定
 	 * @param directionDegrees 0:
 	 */
+	@Deprecated
 	public void setDirection(@Direction int directionDegrees) {
 		directionDegrees = checkDirection(((directionDegrees / 90) * 90) % 360);
 		if (mDirectionDegrees != directionDegrees) {
@@ -258,6 +267,7 @@ public class ProgressView extends View {
 	 * Progress表示用のDrawableを設定
 	 * @param drawable
 	 */
+	@SuppressWarnings("deprecation")
 	@SuppressLint("RtlHardcoded")
 	protected void refreshDrawable(@Nullable final Drawable drawable) {
 		final int level;

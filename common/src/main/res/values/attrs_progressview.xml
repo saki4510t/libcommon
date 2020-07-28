@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- プログレスの進行方向 -->
+	<!--
+		プログレスの進行方向, direction属性はdeprecated
+		背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
+		デフォルトのbottom_to_topにしてandroid:rotationで回転させる
+	-->
 	<attr name="direction" default="bottom_to_top" >
 		<!-- 左から右へ -->
 		<enum name="left_to_right" value="0" />
@@ -17,6 +21,11 @@
 		<attr name="android:drawable" />
 		<!-- プログレス表示用の色、android:drawableが指定されている場合はtint色として使う -->
 		<attr name="android:color" />
+		<!--
+			プログレスの進行方向, direction属性はdeprecated
+			背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
+			デフォルトのbottom_to_topにしてandroid:rotationで回転させる
+		-->
 		<attr name="direction" />
 		<attr name="android:min" />
 		<attr name="android:max" />
