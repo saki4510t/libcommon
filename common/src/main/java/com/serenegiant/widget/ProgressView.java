@@ -246,31 +246,29 @@ public class ProgressView extends View {
 			mRotation += 360;
 		}
 		mRotation %= 360;
-		if (DEBUG) Log.v(TAG, "refreshDrawable:rotation=" + mRotation + ",level=" + level);
-
 		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
 		switch (mRotation) {
 		case 0:		// 右をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT");
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT,rotation=" + mRotation + ",level=" + level);
 			break;
 		case 90:	// 上をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP");
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP,rotation=" + mRotation + ",level=" + level);
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		case 180:	// 左をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT");
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT,rotation=" + mRotation + ",level=" + level);
 			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
 		case 270:	// 下をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM");
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM,rotation=" + mRotation + ",level=" + level);
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		default:
-			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected rotation," + mRotation);
+			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected,rotation=" + mRotation + ",level=" + level);
 			break;
 		}
 		// プログレス表示用のClipDrawableを生成
