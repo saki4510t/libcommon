@@ -222,6 +222,9 @@ public class ProgressView extends View {
 		refreshDrawable(mDrawable);
 	}
 
+	private static final int CLIP_HORIZONTAL = 0x08;
+	private static final int CLIP_VERTICAL = 0x80;
+
 	/**
 	 * Progress表示用のDrawableを設定
 	 * @param drawable
@@ -236,7 +239,7 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mColor);
 		}
-		int gravity = Gravity.FILL_VERTICAL | Gravity.LEFT;
+		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
 		while (mRotation < 0) {
 			mRotation += 360;
@@ -244,15 +247,15 @@ public class ProgressView extends View {
 		mRotation %= 360;
 		switch (mRotation) {
 		case 90:
-			gravity = Gravity.FILL_HORIZONTAL | Gravity.BOTTOM;
+			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		case 180:
-			gravity = Gravity.FILL_VERTICAL | Gravity.RIGHT;
+			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
 		case 270:
-			gravity = Gravity.FILL_HORIZONTAL |  Gravity.TOP;
+			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		default:
