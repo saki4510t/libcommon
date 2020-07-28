@@ -27,6 +27,7 @@ import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 
@@ -35,6 +36,8 @@ import com.serenegiant.common.R;
 import androidx.annotation.Nullable;
 
 public class ProgressView extends View {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = ProgressView.class.getSimpleName();
 
 	private final Object mSync = new Object();
 
@@ -239,26 +242,34 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mColor);
 		}
-		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
-		int orientation = ClipDrawable.HORIZONTAL;
 		while (mRotation < 0) {
 			mRotation += 360;
 		}
 		mRotation %= 360;
+		if (DEBUG) Log.v(TAG, "refreshDrawable:rotation=" + mRotation + ",level=" + level);
+
+		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
+		int orientation = ClipDrawable.HORIZONTAL;
 		switch (mRotation) {
+		case 0:
+			break;
 		case 90:
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP");
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		case 180:
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT");
 			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
 		case 270:
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM");
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		default:
+			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected rotation," + mRotation);
 			break;
 		}
 		// プログレス表示用のClipDrawableを生成
