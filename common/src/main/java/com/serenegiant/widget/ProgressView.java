@@ -251,19 +251,20 @@ public class ProgressView extends View {
 		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
 		switch (mRotation) {
-		case 0:
+		case 0:		// 右をクリップ
+			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT");
 			break;
-		case 90:
+		case 90:	// 上をクリップ
 			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP");
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
 			orientation = ClipDrawable.VERTICAL;
 			break;
-		case 180:
+		case 180:	// 左をクリップ
 			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT");
 			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
 			orientation = ClipDrawable.HORIZONTAL;
 			break;
-		case 270:
+		case 270:	// 下をクリップ
 			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM");
 			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
 			orientation = ClipDrawable.VERTICAL;
