@@ -96,7 +96,7 @@ public class ProgressView extends View {
 		if (mDrawable == null) {
 			mColor = a.getColor(R.styleable.ProgressView_android_color, mColor);
 		}
-		mRotation = a.getInt(R.styleable.ProgressView_android_rotation, mRotation);
+		mRotation = (int)a.getFloat(R.styleable.ProgressView_android_rotation, mRotation);
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
 		mMax = a.getInt(R.styleable.ProgressView_android_min, mMax);
 		if (mMin == mMax) {
@@ -294,6 +294,10 @@ public class ProgressView extends View {
 		}
 		int gravity = GRAVITY_FILL_VERTICAL | GRAVITY_LEFT;
 		int orientation = ClipDrawable.HORIZONTAL;
+		while (mRotation < 0) {
+			mRotation += 360;
+		}
+		mRotation %= 360;
 		switch (mRotation) {
 		case 90:
 			gravity = GRAVITY_FILL_HORIZONTAL | GRAVITY_BOTTOM;
@@ -306,6 +310,8 @@ public class ProgressView extends View {
 		case 270:
 			gravity = GRAVITY_FILL_HORIZONTAL | GRAVITY_TOP;
 			orientation = ClipDrawable.VERTICAL;
+			break;
+		default:
 			break;
 		}
 		// プログレス表示用のClipDrawableを生成
