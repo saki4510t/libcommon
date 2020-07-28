@@ -27,6 +27,8 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 
+import androidx.annotation.Nullable;
+
 public class ProgressView extends View {
 
 	private int mRotation = 90;
@@ -58,14 +60,29 @@ public class ProgressView extends View {
 	 */
 	private ClipDrawable mClipDrawable;
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
 	public ProgressView(final Context context) {
 		super(context);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
 	public ProgressView(final Context context, final AttributeSet attrs) {
 		super(context, attrs);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyleAttr
+	 */
 	public ProgressView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 	}
@@ -82,6 +99,11 @@ public class ProgressView extends View {
 		resize();
 	}
 
+	/**
+	 * 最大・最小値をセット
+	 * @param min
+	 * @param max
+	 */
 	public void setMinMax(final int min, final int max) {
 		if (((mMin != min) || (mMax != max)) && (min != max)) {
 			mMin = Math.min(min, max);
@@ -100,12 +122,15 @@ public class ProgressView extends View {
 			mProgress = progress;
 			// 前はpostInvalidateを呼び出せばUIスレッド以外でも更新できたと思ったんだけど
 			// UIスレッドじゃないと更新できない機種/Androidのバージョンがあるのかも
-			removeCallbacks(mUpdateProgressTask);
-			post(mUpdateProgressTask);
+			removeCallbacks(mUpdateProgressOnUITask);
+			post(mUpdateProgressOnUITask);
 		}
 	}
 
-	private final Runnable mUpdateProgressTask = new Runnable() {
+	/**
+	 * progressをUIスレッド上で更新するためのRunnable実装
+	 */
+	private final Runnable mUpdateProgressOnUITask = new Runnable() {
 		@Override
 		public void run() {
 			if (mClipDrawable != null)  {
@@ -212,6 +237,9 @@ public class ProgressView extends View {
 		}
 	}
 
+	/**
+	 * Viewのサイズ変更時の処理
+	 */
 	protected void resize() {
 		final float progress = mProgress * mScale + mMin;
 		mScale = 10000.0f / (mMax - mMin);
@@ -219,7 +247,11 @@ public class ProgressView extends View {
 		refreshDrawable(mDrawable);
 	}
 
-	protected void refreshDrawable(final Drawable drawable) {
+	/**
+	 * Progress表示用のDrawableを設定
+	 * @param drawable
+	 */
+	protected void refreshDrawable(@Nullable final Drawable drawable) {
 		mDrawable = drawable;
 		if (mDrawable == null) {
 			mDrawable = new ColorDrawable(mColor);
@@ -240,9 +272,11 @@ public class ProgressView extends View {
 			orientation = ClipDrawable.VERTICAL;
 			break;
 		}
+		// プログレス表示用のClipDrawableを生成
 		mClipDrawable = new ClipDrawable(mDrawable, gravity, orientation);
 		final Rect outRect = new Rect();
 		getDrawingRect(outRect);
+		// XXX パディングを差し引いた方がいい？
 		mClipDrawable.setBounds(outRect);
 		mClipDrawable.setLevel((int)(mProgress * mScale) + mMin);
 		postInvalidate();
