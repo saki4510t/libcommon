@@ -27,6 +27,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.ClipDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.VectorDrawable;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.Gravity;
@@ -40,6 +42,7 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 import androidx.annotation.Nullable;
 import androidx.core.graphics.drawable.DrawableCompat;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 /**
  * 進捗表示用のView
@@ -268,7 +271,7 @@ public class ProgressView extends View {
 	 * @param drawable
 	 */
 	@SuppressWarnings("deprecation")
-	@SuppressLint("RtlHardcoded")
+	@SuppressLint({"RtlHardcoded"})
 	protected void refreshDrawable(@Nullable final Drawable drawable) {
 		final int level;
 		synchronized (mSync) {
@@ -276,8 +279,16 @@ public class ProgressView extends View {
 		}
 		mDrawable = drawable;
 		if (mDrawable == null) {
+			setLayerType(View.LAYER_TYPE_HARDWARE, null);
 			mDrawable = new ColorDrawable(mProgressColor);
 		} else {
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+				if ((mDrawable instanceof VectorDrawableCompat)
+					|| (mDrawable instanceof VectorDrawable)) {
+
+					setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+				}
+			}
 			DrawableCompat.setTint(mDrawable, mProgressColor);
 			DrawableCompat.setTintMode(mDrawable, PorterDuff.Mode.SRC_IN);
 		}
