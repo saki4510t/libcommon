@@ -57,10 +57,6 @@
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
 
-	<!--
-		Android5(API21)未満だとカスタムViewへレイアウトxml上から
-		VectorDrawableを割り当てることができない
-	-->
 	<com.serenegiant.widget.ProgressView
 		android:id="@+id/progressView5"
 		android:layout_width="64dp"
@@ -75,7 +71,6 @@
 		app:layout_constraintEnd_toEndOf="parent"
 		app:layout_constraintStart_toStartOf="parent"
 		app:layout_constraintTop_toTopOf="parent" />
-
 
 	<com.serenegiant.widget.ProgressView
 		android:id="@+id/progressView6"
