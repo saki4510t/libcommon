@@ -31,6 +31,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.SAFUtils
 import com.serenegiant.utils.FileUtils
@@ -249,7 +250,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val activity: Activity? = activity
 		return if ((activity == null) || activity.isFinishing) {
 			false
-		} else (SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)
+		} else (!BuildCheck.isAPI21()
+			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)
 			|| PermissionCheck.hasWriteExternalStorage(activity))
 			&& PermissionCheck.hasAudio(activity)
 			&& PermissionCheck.hasCamera(activity)
