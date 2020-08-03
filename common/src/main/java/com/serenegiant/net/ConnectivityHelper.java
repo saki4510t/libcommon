@@ -210,13 +210,7 @@ public class ConnectivityHelper {
 	private ConnectivityManager requireConnectivityManager()
 		throws IllegalStateException {
 		
-		final Context context = requireContext();
-		final ConnectivityManager connManager
-			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
-		if (connManager == null) {
-			throw new IllegalStateException("failed to get ConnectivityManager");
-		}
-		return connManager;
+		return ContextUtils.requireSystemService(requireContext(), ConnectivityManager.class);
 	}
 
 //--------------------------------------------------------------------------------
