@@ -126,6 +126,19 @@ public class PrefHelper {
 		return result;
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T get(@Nullable final SharedPreferences pref,
+		final String key, final T defaultValue) {
+
+		final Class<?> clazz = defaultValue.getClass();
+		final Object result = getObject(pref, key, defaultValue);
+		if (clazz.isInstance(result)) {
+			return (T)result;
+		} else {
+			return defaultValue;
+		}
+	}
+
 	public static final Object getObject(@Nullable final SharedPreferences pref,
 		final String key) {
 
