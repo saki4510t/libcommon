@@ -32,29 +32,6 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	private static final String TAG = EncryptedSharedPreferences.class.getSimpleName();
 
 	/**
-	 * 暗号化・復号時のエラーを通知するためのException実装
-	 */
-	public static class ObfuscatorException extends Exception {
-		private static final long serialVersionUID = -437726590003072651L;
-
-		public ObfuscatorException() {
-		}
-
-		public ObfuscatorException(final String message) {
-			super(message);
-		}
-
-		public ObfuscatorException(final String message, final Throwable cause) {
-			super(message, cause);
-		}
-
-		public ObfuscatorException(final Throwable cause) {
-			super(cause);
-		}
-
-	}
-
-	/**
 	 * 暗号化・復号化インターフェース
 	 */
 	public interface Obfuscator {
