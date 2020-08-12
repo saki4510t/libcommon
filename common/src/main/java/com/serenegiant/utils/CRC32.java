@@ -18,6 +18,9 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+/**
+ * XXX 何のために作ったか忘れたけどこのCRC32の結果はjava.util.zip.CRC32と違うので注意!
+ */
 public class CRC32 {
 	private static final int[] crc32tab = {
 		0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
