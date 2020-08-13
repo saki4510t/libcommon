@@ -284,11 +284,11 @@ public class KeyStoreUtils {
 
 	@NonNull
 	private static String base64Encode(@NonNull final byte[] bytes) {
-		return new String(Base64.encode(bytes, Base64.DEFAULT), CharsetsUtils.UTF8);
+		return new String(Base64.encode(bytes, Base64.NO_WRAP), CharsetsUtils.UTF8);
 	}
 
 	@NonNull
 	private static byte[] base64decode(@NonNull final String encoded) {
-		return Base64.decode(encoded, Base64.DEFAULT);
+		return Base64.decode(encoded, Base64.NO_WRAP);
 	}
 }

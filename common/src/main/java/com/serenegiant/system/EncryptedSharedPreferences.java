@@ -299,7 +299,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 					Base64.encode(
 						mEncryptor.doFinal(
 							(header + key + value).getBytes(CharsetsUtils.UTF8)),
-						Base64.DEFAULT),
+						Base64.NO_WRAP),
 					CharsetsUtils.UTF8);
 			} catch (final GeneralSecurityException e) {
 				throw new RuntimeException("Invalid environment", e);
@@ -316,7 +316,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 				return null;
 			}
 			try {
-				final String result = new String(mDecryptor.doFinal(Base64.decode(encrypted, Base64.DEFAULT)), CharsetsUtils.UTF8);
+				final String result = new String(mDecryptor.doFinal(Base64.decode(encrypted, Base64.NO_WRAP)), CharsetsUtils.UTF8);
 				final int headerIndex = result.indexOf(header+key);
 				if (headerIndex != 0) {
 					throw new ObfuscatorException("Header not found (invalid data or key)" + (DEBUG ? (":" + encrypted) : ""));
@@ -608,12 +608,12 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 
 		@NonNull
 		private static String base64Encode(@NonNull final byte[] bytes) {
-			return new String(Base64.encode(bytes, Base64.DEFAULT), CharsetsUtils.UTF8);
+			return new String(Base64.encode(bytes, Base64.NO_WRAP), CharsetsUtils.UTF8);
 		}
 
 		@NonNull
 		private static byte[] base64decode(@NonNull final String encoded) {
-			return Base64.decode(encoded, Base64.DEFAULT);
+			return Base64.decode(encoded, Base64.NO_WRAP);
 		}
 	}
 }
