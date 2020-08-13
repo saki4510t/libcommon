@@ -60,7 +60,10 @@ public class KeyStoreUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
-	public static void deleteKey(@NonNull final Context context, @Nullable final String name) {
+	public static void deleteKey(
+		@NonNull final Context context,
+		@Nullable final String name) {
+
 		final String alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
 		try {
 			final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
@@ -75,8 +78,10 @@ public class KeyStoreUtils {
 	}
 
 	@Nullable
-	public static String encrypt(@NonNull final Context context,
-		@NonNull final String name, @Nullable final String value) {
+	public static String encrypt(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@Nullable final String value) {
 
 		if (TextUtils.isEmpty(value)) {
 			return null;
@@ -90,9 +95,10 @@ public class KeyStoreUtils {
 	}
 
 	@Nullable
-	public static String decrypt(@NonNull final Context context,
-		@NonNull final String name, @Nullable final String encrypted)
-			throws ObfuscatorException {
+	public static String decrypt(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@Nullable final String encrypted) throws ObfuscatorException {
 
 		if (TextUtils.isEmpty(encrypted)) {
 			return null;
@@ -112,7 +118,11 @@ public class KeyStoreUtils {
 	 * @param value
 	 * @return
 	 */
-	private static String encryptRSA(@NonNull final Context context, @NonNull final String name, @NonNull final String value) {
+	private static String encryptRSA(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@NonNull final String value) {
+
 		try {
 			final KeyStore.Entry entry = getKey(context, name);
 			final PublicKey publicKey = ((KeyStore.PrivateKeyEntry) entry).getCertificate().getPublicKey();
@@ -134,9 +144,10 @@ public class KeyStoreUtils {
 	 * @return
 	 * @throws ObfuscatorException
 	 */
-	private static String decryptRSA(@NonNull final Context context,
-		@NonNull final String name, @NonNull final String encrypted)
-			throws ObfuscatorException {
+	private static String decryptRSA(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@NonNull final String encrypted) throws ObfuscatorException {
 
 		try {
 			final KeyStore.Entry entry = getKey(context, name);
@@ -159,8 +170,10 @@ public class KeyStoreUtils {
 	 * @return
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.M)
-	private static String encryptAES(@NonNull final Context context,
-		@NonNull final String name, @NonNull final String value) {
+	private static String encryptAES(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@NonNull final String value) {
 
 		if (DEBUG) Log.v(TAG, "encryptAES:" + value);
 		try {
@@ -186,9 +199,10 @@ public class KeyStoreUtils {
 	 * @throws ObfuscatorException
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.M)
-	private static String decryptAES(@NonNull final Context context,
-		@NonNull final String name, @NonNull final String encrypted)
-			throws ObfuscatorException {
+	private static String decryptAES(
+		@NonNull final Context context,
+		@Nullable final String name,
+		@NonNull final String encrypted) throws ObfuscatorException {
 
 		final String[] split = encrypted.split("\\|");
 		if (split.length < 2) {
@@ -222,8 +236,9 @@ public class KeyStoreUtils {
 	 * @throws IOException
 	 */
 	@Nullable
-	private static KeyStore.Entry getKey(@NonNull final Context context, @Nullable final String name)
-		throws GeneralSecurityException, IOException {
+	private static KeyStore.Entry getKey(
+		@NonNull final Context context,
+		@Nullable final String name) throws GeneralSecurityException, IOException {
 
 		final String alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
 		final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
@@ -245,8 +260,9 @@ public class KeyStoreUtils {
 		return keyStore.getEntry(alias, null);
 	}
 
-	private static void createKey(@NonNull final Context context, @NonNull final String alias)
-		throws GeneralSecurityException {
+	private static void createKey(
+		@NonNull final Context context,
+		@NonNull final String alias) throws GeneralSecurityException {
 
 		final Calendar start = Calendar.getInstance(Locale.ENGLISH);
 		final Calendar end = Calendar.getInstance(Locale.ENGLISH);
@@ -260,8 +276,8 @@ public class KeyStoreUtils {
 				.setCertificateSerialNumber(BigInteger.ONE)
 				.setBlockModes(KeyProperties.BLOCK_MODE_CBC)
 				.setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-//					.setKeyValidityStart(start.getTime())
-//					.setKeyValidityEnd(end.getTime())
+//				.setKeyValidityStart(start.getTime())
+//				.setKeyValidityEnd(end.getTime())
 				.build();
 			final KeyGenerator kg
 				= KeyGenerator.getInstance(KeyProperties.KEY_ALGORITHM_AES, KEY_STORE_TYPE);
