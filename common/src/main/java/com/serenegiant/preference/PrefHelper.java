@@ -23,9 +23,11 @@ import android.content.SharedPreferences;
 
 import com.serenegiant.utils.ObjectHelper;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by saki on 2016/11/05.
@@ -156,4 +158,42 @@ public class PrefHelper {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
+	/**
+	 * 共有プレファレンスの中身をコピー
+	 * @param src
+	 * @param dst
+	 */
+	@SuppressWarnings("unchecked")
+	public static void copy(
+		@NonNull final SharedPreferences src,
+		@NonNull final SharedPreferences dst) {
+
+		final Map<String, ?> values = src.getAll();
+		if ((values != null) && !values.isEmpty()) {
+			final SharedPreferences.Editor editor = dst.edit();
+			try {
+				for (final Map.Entry<String, ?> entry: values.entrySet()) {
+					final String key = entry.getKey();
+					final Object value = entry.getValue();
+					if (value instanceof String) {
+						editor.putString(key, (String)value);
+					} else if (value instanceof Set) {
+						// SharedPreferencesに入るSetはSet<String>のみ
+						editor.putStringSet(key, (Set<String>)value);
+					} else if (value instanceof Integer) {
+						editor.putInt(key, (int)value);
+					} else if (value instanceof Long) {
+						editor.putLong(key, (long)value);
+					} else if (value instanceof Float) {
+						editor.putFloat(key, (Float)value);
+					} else if (value instanceof Boolean) {
+						editor.putBoolean(key, (Boolean)value);
+					}
+				}
+			} finally {
+				editor.apply();
+			}
+		}
+	}
 }
