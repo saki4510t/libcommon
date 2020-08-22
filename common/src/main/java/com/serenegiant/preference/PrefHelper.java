@@ -20,6 +20,7 @@ package com.serenegiant.preference;
 */
 
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.serenegiant.utils.ObjectHelper;
 
@@ -194,6 +195,25 @@ public class PrefHelper {
 			} finally {
 				editor.apply();
 			}
+		}
+	}
+
+	/**
+	 * 共有プレファレンスのkey-valueペアをLog.dでlogCatへ出力
+	 * @param tag
+	 * @param preferences
+	 */
+	public static void dump(
+		@NonNull final String tag,
+		@NonNull final SharedPreferences preferences) {
+
+		final Map<String, ?> values = preferences.getAll();
+		if ((values != null) && !values.isEmpty()) {
+			for (final Map.Entry<String, ?> entry: values.entrySet()) {
+				Log.d(tag, "dump:" + entry.getKey() + "=" + entry.getValue());
+			}
+		} else {
+			Log.d(tag, "dump:empty");
 		}
 	}
 }
