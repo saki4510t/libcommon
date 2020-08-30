@@ -22,7 +22,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.text.TextUtils;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -131,7 +130,7 @@ public class SysFs {
 		try {
 			final byte[] buf = new byte[512];
 			final MyByteArrayOutputStream out = new MyByteArrayOutputStream(1024);
-			final InputStream in = new BufferedInputStream(new FileInputStream(getPath(name)));
+			final InputStream in = new FileInputStream(getPath(name));
 			try {
 				int available = in.available();
 				for (; available > 0; ) {
