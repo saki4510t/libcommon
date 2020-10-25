@@ -250,7 +250,24 @@ public class EffectDrawer2D {
 		@Nullable final float[] texMatrix, final int texOffset,
 		@Nullable final float[] mvpMatrix, final int mvpOffset) {
 
-		mDrawer.draw(texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
+		mDrawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
+	}
+
+	/**
+	 * 描画処理
+	 * @param texUnit
+	 * @param texId
+	 * @param texMatrix
+	 * @param texOffset
+	 * @param mvpMatrix
+	 * @param mvpOffset
+	 */
+	public synchronized void draw(
+		final int texUnit, final int texId,
+		@Nullable final float[] texMatrix, final int texOffset,
+		@Nullable final float[] mvpMatrix, final int mvpOffset) {
+
+		mDrawer.draw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
 	}
 
 	/**
@@ -271,11 +288,20 @@ public class EffectDrawer2D {
 	}
 
 	/**
-	 * てkスチャをバインド
+	 * テクスチャをバインド
 	 * @param texId
 	 */
 	protected void bindTexture(final int texId) {
-		mDrawer.bindTexture(texId);
+		mDrawer.bindTexture(GLES20.GL_TEXTURE0, texId);
+	}
+
+	/**
+	 * テクスチャをバインド
+	 * @param texUnit
+	 * @param texId
+	 */
+	protected void bindTexture(final int texUnit, final int texId) {
+		mDrawer.bindTexture(texUnit, texId);
 	}
 
 	/**

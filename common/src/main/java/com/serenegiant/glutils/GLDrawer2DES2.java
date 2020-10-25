@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 
 import android.opengl.GLES20;
+import android.opengl.GLES30;
 import android.util.Log;
 
 import com.serenegiant.glutils.es2.GLHelper;
@@ -68,9 +69,10 @@ import androidx.annotation.NonNull;
 	}
 
 	@Override
-	protected void bindTexture(final int texId) {
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+	protected void bindTexture(final int texUnit, final int texId) {
+		GLES20.glActiveTexture(texUnit);
 		GLES20.glBindTexture(mTexTarget, texId);
+		GLES30.glUniform1i(muTextureLoc, gLTextureUnit2Index(texUnit));
 	}
 
 	@Override
@@ -221,6 +223,7 @@ import androidx.annotation.NonNull;
 		GLES20.glUseProgram(hProgram);
 		maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
 		maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
+		muTextureLoc = GLES20.glGetAttribLocation(hProgram, "sTexture");
 		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
 		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
 		//

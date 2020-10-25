@@ -19,6 +19,7 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -89,6 +90,11 @@ public abstract class GLDrawer2D {
 		}
 	}
 
+	protected static int gLTextureUnit2Index(final int glTextureUnit) {
+		return (glTextureUnit >= GLES20.GL_TEXTURE0) && (glTextureUnit <= GLES20.GL_TEXTURE31)
+			? glTextureUnit - GLES20.GL_TEXTURE0 : 0;
+	}
+
 //================================================================================
 	/**
 	 * GLES3を使うかどうか
@@ -125,6 +131,10 @@ public abstract class GLDrawer2D {
 	 * テクスチャ座標のlocation
 	 */
 	protected int maTextureCoordLoc;
+	/**
+	 * 使用するテクスチャユニットのlocation
+	 */
+	protected int muTextureLoc;
 	/**
 	 * モデルビュー変換行列のlocation
 	 */
@@ -253,7 +263,7 @@ public abstract class GLDrawer2D {
 	 * @param surface
 	 */
 	public void draw(@NonNull final IGLSurface surface) {
-		draw(surface.getTexId(), surface.getTexMatrix(), 0);
+		draw(surface.getTexUnit(), surface.getTexId(), surface.getTexMatrix(), 0, mMvpMatrix, 0);
 	}
 
 	/**
@@ -262,21 +272,38 @@ public abstract class GLDrawer2D {
 	 * @param tex_matrix
 	 * @param offset
 	 */
-	public synchronized void draw(final int texId,
+	public synchronized void draw(
+		final int texId,
 		@Nullable final float[] tex_matrix, final int offset) {
 
-		draw(texId, tex_matrix, offset, mMvpMatrix, 0);
+		draw(GLES20.GL_TEXTURE0, texId, tex_matrix, offset, mMvpMatrix, 0);
 	}
 
 	/**
 	 * 描画処理
+	 * @param texUnit
+	 * @param texId
+	 * @param tex_matrix
+	 * @param offset
+	 */
+	public synchronized void draw(
+		final int texUnit, final int texId,
+		@Nullable final float[] tex_matrix, final int offset) {
+
+		draw(texUnit, texId, tex_matrix, offset, mMvpMatrix, 0);
+	}
+
+	/**
+	 * 描画処理
+	 * @param texUnit
 	 * @param texId
 	 * @param tex_matrix
 	 * @param tex_offset
 	 * @param mvp_matrix
 	 * @param mvp_offset
 	 */
-	public synchronized void draw(final int texId,
+	public synchronized void draw(
+		final int texUnit, final int texId,
 		@Nullable final float[] tex_matrix, final int tex_offset,
 		@Nullable final float[] mvp_matrix, final int mvp_offset) {
 
@@ -291,7 +318,7 @@ public abstract class GLDrawer2D {
 			// モデルビュー変換行列が指定されている時
 			updateMvpMatrix(mvp_matrix, mvp_offset);
 		}
-		bindTexture(texId);
+		bindTexture(texUnit, texId);
 		if (validateProgram(hProgram)) {
 			drawVertices();
 			errCnt = 0;
@@ -319,10 +346,11 @@ public abstract class GLDrawer2D {
 	protected abstract void updateMvpMatrix(final float[] mvpMatrix, final int offset);
 
 	/**
-	 * てkスチャをバインド
+	 * テクスチャをバインド
+	 * @param texUnit
 	 * @param texId
 	 */
-	protected abstract void bindTexture(final int texId);
+	protected abstract void bindTexture(final int texUnit, final int texId);
 
 	/**
 	 * 頂点座標をセット

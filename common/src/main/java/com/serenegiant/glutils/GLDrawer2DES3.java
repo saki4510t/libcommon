@@ -71,9 +71,10 @@ import androidx.annotation.RequiresApi;
 	}
 
 	@Override
-	protected void bindTexture(final int texId) {
-		GLES30.glActiveTexture(GLES30.GL_TEXTURE0);
+	protected void bindTexture(final int texUnit, final int texId) {
+		GLES30.glActiveTexture(texUnit);
 		GLES30.glBindTexture(mTexTarget, texId);
+		GLES30.glUniform1i(muTextureLoc, gLTextureUnit2Index(texUnit));
 	}
 
 	@Override
@@ -228,6 +229,7 @@ import androidx.annotation.RequiresApi;
 		GLES30.glUseProgram(hProgram);
 		maPositionLoc = GLES30.glGetAttribLocation(hProgram, "aPosition");
 		maTextureCoordLoc = GLES30.glGetAttribLocation(hProgram, "aTextureCoord");
+		muTextureLoc = GLES30.glGetAttribLocation(hProgram, "sTexture");
 		muMVPMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uMVPMatrix");
 		muTexMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uTexMatrix");
 		//
