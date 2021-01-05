@@ -126,6 +126,19 @@ public class ViewUtils {
 
 	/**
 	 * 指定したテーマ用のLayoutInflaterを生成する
+	 * @param inflater
+	 * @param themeRes
+	 * @return
+	 */
+	public static LayoutInflater createCustomLayoutInflater(
+		@NonNull final LayoutInflater inflater,
+		@StyleRes final int themeRes) {
+
+		return createCustomLayoutInflater(inflater.getContext(), inflater, themeRes);
+	}
+
+	/**
+	 * 指定したテーマ用のLayoutInflaterを生成する
 	 * @param context
 	 * @param inflater
 	 * @param themeRes
