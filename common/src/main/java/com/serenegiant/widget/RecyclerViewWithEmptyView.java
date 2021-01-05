@@ -28,6 +28,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -41,19 +42,37 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 
    	@Nullable private View mEmptyView;
 
-	public RecyclerViewWithEmptyView(final Context context) {
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
+	public RecyclerViewWithEmptyView(
+		@NonNull final Context context) {
 		this(context, null, 0);
 	}
 
-	public RecyclerViewWithEmptyView(final Context context,
-									 @Nullable final AttributeSet attrs) {
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 */
+	public RecyclerViewWithEmptyView(
+		@NonNull final Context context,
+		@Nullable final AttributeSet attrs) {
 
 		this(context, attrs, 0);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param attrs
+	 * @param defStyle
+	 */
 	@SuppressLint("WrongConstant")
-	public RecyclerViewWithEmptyView(final Context context,
-									 @Nullable final AttributeSet attrs, final int defStyle) {
+	public RecyclerViewWithEmptyView(
+		@NonNull final Context context,
+		@Nullable final AttributeSet attrs, final int defStyle) {
 
 		super(context, attrs, defStyle);
 		Drawable divider = null;
