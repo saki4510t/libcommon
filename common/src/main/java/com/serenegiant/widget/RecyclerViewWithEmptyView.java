@@ -27,7 +27,9 @@ import android.util.Log;
 import android.view.View;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.ViewUtils;
 
+import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -40,6 +42,8 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = RecyclerViewWithEmptyView.class.getSimpleName();
 
+	@IdRes
+	private int mEmptyViewId;
    	@Nullable private View mEmptyView;
 
 	/**
@@ -87,6 +91,11 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
+			try {
+				mEmptyViewId  = attribs.getResourceId(R.styleable.RecyclerViewWithEmptyView_emptyView, View.NO_ID);
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
 			attribs.recycle();
 		}
 		if (DEBUG) Log.v(TAG, "divider=" + divider);
@@ -117,6 +126,15 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 		updateEmptyView();
 	}
 
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
+		// empty viewを探す
+		final int[] ids = new int[] {mEmptyViewId, R.id.empty, android.R.id.empty};
+		final View emptyView = ViewUtils.findViewInParent(this, ids, View.class);
+		setEmptyView(emptyView);
+	}
+
 	public void setEmptyView(final View empty_view) {
 		if (mEmptyView != empty_view) {
 			mEmptyView = empty_view;
@@ -126,14 +144,17 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 
 	protected void updateEmptyView() {
 		if (mEmptyView != null) {
-			final Adapter adapter = getAdapter();
-			post(new Runnable() {
-				@Override
-				public void run() {
-					mEmptyView.setVisibility((adapter == null) || (adapter.getItemCount() == 0)
-						? VISIBLE : GONE);
-				}
-			});
+			if (!isInEditMode()) {
+				// ASのレイアウトエディタで編集中ではないときのみ
+				final Adapter adapter = getAdapter();
+				post(new Runnable() {
+					@Override
+					public void run() {
+						mEmptyView.setVisibility((adapter == null) || (adapter.getItemCount() == 0)
+							? VISIBLE : GONE);
+					}
+				});
+			}
 		}
 	}
 

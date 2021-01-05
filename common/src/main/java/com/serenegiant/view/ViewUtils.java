@@ -29,6 +29,7 @@ import android.view.LayoutInflater;
 import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -503,6 +504,14 @@ public class ViewUtils {
 		return findView(view, ids, TextView.class);
 	}
 
+	/**
+	 * 指定したViewから指定したidで指定した型のViewを探す
+	 * @param view
+	 * @param ids
+	 * @param clazz
+	 * @param <T>
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	@Nullable
 	public static <T extends View> T findView(
@@ -525,4 +534,45 @@ public class ViewUtils {
 
 		return result;
 	}
+
+	/**
+	 * Viewまたは親Viewから指定したidで指定した型のViewを探す
+	 * @param view
+	 * @param ids
+	 * @param clazz
+	 * @param <T>
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	@Nullable
+	public static <T extends View> T findViewInParent(
+		@NonNull final View view,
+		@NonNull @IdRes final int[] ids,
+		@NonNull final Class<T> clazz) {
+
+		T result = null;
+LOOP:	for (final int id: ids) {
+			if (id == View.NO_ID) continue;;
+			final View v = view.findViewById(id);
+			if (clazz.isInstance(v)) {
+				result = (T)v;
+				break LOOP;
+			}
+			if (result == null) {
+				ViewParent parent = view.getParent();
+				for (; (parent != null) && (result == null); parent = parent.getParent()) {
+					if (parent instanceof View) {
+						final View vv = ((View)parent).findViewById(id);
+						if (clazz.isInstance(vv)) {
+							result = (T)vv;
+							break LOOP;
+						}
+					}
+				}
+			}
+		}
+
+		return result;
+	}
+
 }

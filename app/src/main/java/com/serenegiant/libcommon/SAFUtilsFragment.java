@@ -178,7 +178,6 @@ public class SAFUtilsFragment extends BaseFragment
 			}
 		});
 		mBinding.list.setLayoutManager(new LinearLayoutManager(requireContext()));
-		mBinding.list.setEmptyView(mBinding.empty);
 		mBinding.list.setAdapter(mAdapter);
 	}
 
