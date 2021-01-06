@@ -45,6 +45,7 @@ public abstract class ThumbnailLoader implements Runnable {
 	private final FutureTask<Bitmap> mTask;
 	@NonNull
 	private final MediaInfo mInfo = new MediaInfo();
+	@Nullable
 	private Bitmap mBitmap;
 
 	/**
@@ -60,12 +61,13 @@ public abstract class ThumbnailLoader implements Runnable {
 		return mInfo.id;
 	}
 
+	@Nullable
 	public Uri getUri() {
 		return mInfo.getUri();
 	}
 
     /**
-	 * start loading
+	 * 読み込み開始する
 	 * @param info
      */
 	public synchronized void startLoad(@NonNull final MediaInfo info) {
@@ -75,7 +77,7 @@ public abstract class ThumbnailLoader implements Runnable {
 	}
 
 	/**
-	 * cancel loading
+	 * 読み込み中断要求する
 	 */
 	public void cancelLoad() {
 		mTask.cancel(true);
@@ -95,19 +97,6 @@ public abstract class ThumbnailLoader implements Runnable {
 		@NonNull final MediaInfo info,
 		final int requestWidth, final int requestHeight);
 
-	/**
-	 * 指定したDrawableリソースからビットマップとして画像を取得する
-	 * @param drawableRes
-	 * @return
-	 */
-	@NonNull
-	protected Bitmap loadDefaultThumbnail(
-		@NonNull final Context context,
-		@DrawableRes final int drawableRes) {
-
-		return BitmapHelper.fromDrawable(context, drawableRes);
-	}
-
 	@Override
 	public void run() {
 		final MediaInfo info;
@@ -121,13 +110,15 @@ public abstract class ThumbnailLoader implements Runnable {
 		if (mTask.isCancelled() || !info.equals(mInfo)) {
 			return;	// return without callback
 		}
-		if (mBitmap == null) {
-			mBitmap = loadDefaultThumbnail(mParent.getContext(), R.drawable.ic_error_outline_red_24dp);
-		}
 		// set callback
 		mParent.scheduleSelf(mParent, 0);
 	}
 
+	/**
+	 * 読み込んだサムネイルを取得する
+	 * @return
+	 */
+	@Nullable
 	public Bitmap getBitmap() {
 		return mBitmap;
 	}
