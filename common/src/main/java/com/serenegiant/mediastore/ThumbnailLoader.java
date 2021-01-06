@@ -30,6 +30,7 @@ import java.util.concurrent.FutureTask;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * 非同期で画像読み込みを行うためのヘルパークラス(Runnableを実装)
@@ -88,7 +89,7 @@ public abstract class ThumbnailLoader implements Runnable {
 	 * @param requestHeight
 	 * @return
 	 */
-	@NonNull
+	@Nullable
 	protected abstract Bitmap loadThumbnail(
 		@NonNull final Context context,
 		@NonNull final MediaInfo info,

@@ -584,7 +584,7 @@ public class MediaStoreRecyclerAdapter
 			super(parent);
 		}
 
-		@NonNull
+		@Nullable
 		@Override
 		protected Bitmap loadThumbnail(@NonNull final Context context,
 			@NonNull final MediaInfo info,
@@ -598,9 +598,6 @@ public class MediaStoreRecyclerAdapter
 					requestWidth, requestHeight);
 			} catch (final IOException e) {
 				if (DEBUG) Log.w(TAG, e);
-			}
-			if (result == null) {
-				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);
 			}
 			return result;
 		}

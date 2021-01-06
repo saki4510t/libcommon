@@ -537,7 +537,7 @@ public class MediaStoreCursorRecyclerAdapter
 			super(parent);
 		}
 
-		@NonNull
+		@Nullable
 		@Override
 		protected Bitmap loadThumbnail(@NonNull final Context context,
 			@NonNull final MediaInfo info,
@@ -551,11 +551,6 @@ public class MediaStoreCursorRecyclerAdapter
 					requestWidth, requestHeight);
 			} catch (final IOException e) {
 				if (DEBUG) Log.d(TAG, "loadThumbnail:", e);
-			}
-			if (result == null) {
-				result = loadDefaultThumbnail(context, R.drawable.ic_error_outline_red_24dp);
-				if (DEBUG) Log.v(TAG, "loadThumbnail:put default image into thumbnail cache,result=" + result);
-				mThumbnailCache.put(info.id, result, true);
 			}
 			return result;
 		}
