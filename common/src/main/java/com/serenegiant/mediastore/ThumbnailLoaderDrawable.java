@@ -33,8 +33,6 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 
-import com.serenegiant.common.R;
-import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
 
 import androidx.annotation.NonNull;

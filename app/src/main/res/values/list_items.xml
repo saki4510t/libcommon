@@ -16,6 +16,7 @@
 	<string name="title_simple_gl_camera" translatable="false">SimpleCameraGL</string>
 	<string name="title_camera_surface" translatable="false">CameraSurface</string>
 	<string name="title_galley" translatable="false">Galley</string>
+	<string name="title_galley_recycler_cursor" translatable="false">Galley(RecyclerView,Cursor)</string>
 	<string name="title_galley_recycler" translatable="false">Galley(RecyclerView)</string>
 	<string name="title_number_keyboard" translatable="false">NumberKeyboard</string>
 	<string name="title_view_slider" translatable="false">ViewSlider</string>
@@ -38,6 +39,7 @@
 		<item>@string/title_simple_gl_camera</item>
 		<item>@string/title_camera_surface</item>
 		<item>@string/title_galley</item>
+		<item>@string/title_galley_recycler_cursor</item>
 		<item>@string/title_galley_recycler</item>
 		<item>@string/title_number_keyboard</item>
 		<item>@string/title_view_slider</item>

@@ -244,19 +244,25 @@ class MainActivity
 				}
 				fragment = GalleyFragment()
 			}
-			16 -> {	// Galley(RecyclerView)
+			16 -> {	// Galley(RecyclerView,Cursor)
 				if (!checkPermissionWriteExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			17 -> {	// NumberKeyboard
+			17 -> {	// Galley(RecyclerView)
+				if (!checkPermissionWriteExternalStorage()) {
+					return
+				}
+				fragment = GalleyFragment3()
+			}
+			18 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			18 -> {	// ViewSlider
+			19 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
-			19 -> {	// ProgressView
+			20 -> {	// ProgressView
 				fragment = ProgressFragment()
 			}
 			else -> {

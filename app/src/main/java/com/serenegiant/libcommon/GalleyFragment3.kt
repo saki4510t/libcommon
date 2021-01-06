@@ -29,7 +29,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.libcommon.ImageFragment.Companion.newInstance
 import com.serenegiant.mediastore.MediaInfo
-import com.serenegiant.mediastore.MediaStoreCursorRecyclerAdapter
+import com.serenegiant.mediastore.MediaStoreRecyclerAdapter
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapterListener
 import com.serenegiant.widget.RecyclerViewWithEmptyView
 
@@ -38,9 +38,9 @@ import com.serenegiant.widget.RecyclerViewWithEmptyView
  * RecyclerViewを使用
  * FIXME レイアウトの設定がいまいちで表示がきれくない(´・ω・｀)
  */
-class GalleyFragment2 : BaseFragment() {
+class GalleyFragment3 : BaseFragment() {
 
-	private var mMediaStoreAdapter: MediaStoreCursorRecyclerAdapter? = null
+	private var mMediaStoreAdapter: MediaStoreRecyclerAdapter? = null
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -72,7 +72,7 @@ class GalleyFragment2 : BaseFragment() {
 		recyclerView.setHasFixedSize(true)
 		recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)
 //		recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-		mMediaStoreAdapter = MediaStoreCursorRecyclerAdapter(
+		mMediaStoreAdapter = MediaStoreRecyclerAdapter(
 			requireContext(), R.layout.grid_item_media, false)
 		mMediaStoreAdapter!!.setListener(mListener)
 		recyclerView.adapter = mMediaStoreAdapter
@@ -102,10 +102,10 @@ class GalleyFragment2 : BaseFragment() {
 
 	companion object {
 		private const val DEBUG = true // FIXME 実働時はfalseにすること
-		private val TAG = GalleyFragment2::class.java.simpleName
+		private val TAG = GalleyFragment3::class.java.simpleName
 
-		fun newInstance(): GalleyFragment2 {
-			return GalleyFragment2()
+		fun newInstance(): GalleyFragment3 {
+			return GalleyFragment3()
 		}
 	}
 }
