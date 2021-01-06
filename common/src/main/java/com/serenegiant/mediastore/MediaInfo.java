@@ -21,6 +21,7 @@ package com.serenegiant.mediastore;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
@@ -207,6 +208,35 @@ public class MediaInfo implements Parcelable {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * エラーチェック
+	 * @param cr
+	 * @throws IOException
+	 */
+	public void checkError(@NonNull final ContentResolver cr) throws IOException {
+		final Uri uri = getUri();
+		if (uri != null) {
+			final ParcelFileDescriptor pfd
+				= cr.openFileDescriptor(uri, "r");
+			if (pfd != null) {
+				try {
+					if (pfd.getFd() == 0) {
+						throw new IOException("Failed to get fd");
+					}
+					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+						pfd.checkError();
+					}
+				} finally {
+					pfd.close();
+				}
+			} else {
+				throw new IOException("Failed to open uri");
+			}
+		} else {
+			throw new IOException("Wrong uri");
+		}
 	}
 
 	@NonNull
