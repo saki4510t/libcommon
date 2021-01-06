@@ -33,6 +33,8 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.DisplayMetrics;
 
+import com.serenegiant.common.R;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
 
 import androidx.annotation.NonNull;
@@ -255,7 +257,7 @@ public abstract class ThumbnailLoaderDrawable extends Drawable implements Runnab
 		invalidateSelf();
 	}
 
-	private void setBitmap(@NonNull final Bitmap bitmap) {
+	protected void setBitmap(@Nullable final Bitmap bitmap) {
 		if (bitmap != mBitmap) {
 			mBitmap = bitmap;
 			computeBitmapSize();

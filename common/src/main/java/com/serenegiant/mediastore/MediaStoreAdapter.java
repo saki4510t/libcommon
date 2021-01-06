@@ -348,6 +348,15 @@ public class MediaStoreAdapter extends CursorAdapter {
 		protected Bitmap checkCache(final long id) {
 			return mThumbnailCache.get(id);
 		}
+
+		@Override
+		protected void setBitmap(@Nullable final Bitmap bitmap) {
+			Bitmap _bitmap = bitmap;
+			if (_bitmap == null) {
+				_bitmap = BitmapHelper.fromDrawable(getContext(), R.drawable.ic_error_outline_red_24dp);
+			}
+			super.setBitmap(_bitmap);
+		}
 	}
 
 	private class MyThumbnailLoader extends ThumbnailLoader {

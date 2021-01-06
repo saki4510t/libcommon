@@ -37,6 +37,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.view.ViewUtils;
 
@@ -573,6 +574,15 @@ public class MediaStoreRecyclerAdapter
 		@Override
 		protected Bitmap checkCache(final long id) {
 			return mThumbnailCache.get(id);
+		}
+
+		@Override
+		protected void setBitmap(@Nullable final Bitmap bitmap) {
+			Bitmap _bitmap = bitmap;
+			if (_bitmap == null) {
+				_bitmap = BitmapHelper.fromDrawable(getContext(), R.drawable.ic_error_outline_red_24dp);
+			}
+			super.setBitmap(_bitmap);
 		}
 	}
 
