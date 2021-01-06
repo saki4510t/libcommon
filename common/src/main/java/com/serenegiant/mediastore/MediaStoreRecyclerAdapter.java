@@ -56,6 +56,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * MediaStoreの静止画・動画一覧をRecyclerViewで表示するためのRecyclerView.Adapter実装
  * 実データではなくサムネイルを表示する
  * MediaStoreAdapterのRecyclerView.Adapter版
+ * XXX サムネイルを取得できなかった項目は表示されなくなる
  */
 public class MediaStoreRecyclerAdapter
 	extends RecyclerView.Adapter<MediaStoreRecyclerAdapter.ViewHolder> {
@@ -170,7 +171,7 @@ public class MediaStoreRecyclerAdapter
 
 	@Override
 	public void onBindViewHolder(@NonNull final ViewHolder holder, final int position) {
-		setInfo(holder, getMediaInfo(position, info));
+		setInfo(holder, position, getMediaInfo(position, info));
 	}
 
 	@Override
@@ -559,10 +560,17 @@ public class MediaStoreRecyclerAdapter
 	 * サムネイルを非同期で取得するためのDrawable
 	 */
 	private class MyThumbnailLoaderDrawable extends ThumbnailLoaderDrawable {
+		private int mPosition;
+
 		public MyThumbnailLoaderDrawable(@NonNull final Context context,
 			final int width, final int height) {
 
 			super(context, width, height);
+		}
+
+		public void startLoad(@NonNull final MediaInfo info, final int position) {
+			mPosition = position;
+			super.startLoad(info);
 		}
 
 		@NonNull
@@ -581,6 +589,10 @@ public class MediaStoreRecyclerAdapter
 			Bitmap _bitmap = bitmap;
 			if (_bitmap == null) {
 				_bitmap = BitmapHelper.fromDrawable(getContext(), R.drawable.ic_error_outline_red_24dp);
+				synchronized (mValues) {
+					mValues.remove(mPosition);
+					notifyDataSetChanged();
+				}
 			}
 			super.setBitmap(_bitmap);
 		}
@@ -616,6 +628,7 @@ public class MediaStoreRecyclerAdapter
 //--------------------------------------------------------------------------------
 	private void setInfo(
 		@NonNull final ViewHolder holder,
+		final int position,
 		@NonNull final MediaInfo info) {
 
 //		if (DEBUG) Log.v(TAG, "setInfo:" + info);
@@ -626,11 +639,11 @@ public class MediaStoreRecyclerAdapter
 
 		if (iv != null) {
 			Drawable drawable = iv.getDrawable();
-			if (!(drawable instanceof ThumbnailLoaderDrawable)) {
+			if (!(drawable instanceof MyThumbnailLoaderDrawable)) {
 				drawable = new MyThumbnailLoaderDrawable(mContext, mThumbnailWidth, mThumbnailHeight);
 				iv.setImageDrawable(drawable);
 			}
-			((ThumbnailLoaderDrawable)drawable).startLoad(info);
+			((MyThumbnailLoaderDrawable)drawable).startLoad(info, position);
 		}
 		if (tv != null) {
 			tv.setVisibility(mShowTitle ? View.VISIBLE : View.GONE);
