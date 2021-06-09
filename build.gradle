@@ -34,7 +34,7 @@ ext {
 	javaSourceCompatibility = JavaVersion.VERSION_1_8
 	javaTargetCompatibility = JavaVersion.VERSION_1_8
 
-	versionBuildTool = "29.0.3"
+//	versionBuildTool = "30.0.2"
 	versionCompiler = 29
 	versionTarget = 28
 
