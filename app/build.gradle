@@ -19,6 +19,11 @@ android {
         versionCode versionCodeNum
         versionName versionNameString
 
+		// AGP 4.1.0以降でrootプロジェクト以外のBuildConfigにVERSION_CODEとVERSION_NAMEが
+		// 含まれなくなってしまったのでワークアラウンドを追加
+		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
+		buildConfigField 'String', 'VERSION_NAME', "\"${rootProject.versionNameString}\""
+
 		buildConfigField "boolean", "ENABLE_VSYNC", "${project.property("ENABLE_VSYNC")}"
 
 		vectorDrawables.useSupportLibrary = true
@@ -36,6 +41,7 @@ android {
 //	}
 	buildFeatures {
 		dataBinding = true
+		buildConfig = true
 	}
 }
 

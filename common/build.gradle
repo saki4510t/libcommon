@@ -36,6 +36,11 @@ android {
         targetSdkVersion versionTarget
         versionCode versionCodeNum
         versionName versionNameString
+		// AGP 4.1.0以降でrootプロジェクト以外のBuildConfigにVERSION_CODEとVERSION_NAMEが
+		// 含まれなくなってしまったのでワークアラウンドを追加
+		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
+		buildConfigField 'String', 'VERSION_NAME', "\"${rootProject.versionNameString}\""
+
         buildConfigField "String", "STL_NAME", "\"${project.property("STL_NAME")}\""
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -48,6 +53,9 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+	buildFeatures {
+	    buildConfig = true
+	}
 }
 
 dependencies {
