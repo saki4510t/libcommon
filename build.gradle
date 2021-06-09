@@ -55,6 +55,6 @@ ext {
 	androidXKtx = '1.5.0'
 	androidXKtxLifecycle = '2.3.1'
 
-    versionCodeNum = 336
-    versionNameString = '7.13.4'
+    versionCodeNum = 337
+    versionNameString = '7.14.0'
 }
