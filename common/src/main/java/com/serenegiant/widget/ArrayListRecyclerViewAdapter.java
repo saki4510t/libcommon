@@ -122,6 +122,15 @@ public abstract class ArrayListRecyclerViewAdapter<T>
         return mItems.size();
     }
 
+	/**
+	 * 内部で保持している要素一覧を取得する
+	 * 返り値のList<T>はunmodifiableListなので変更できない
+	 * @return
+	 */
+	public List<T> getItems() {
+		return Collections.unmodifiableList(mItems);
+	}
+
 	public T getItem(final int position) throws IndexOutOfBoundsException {
 		if ((position >= 0) && (position < mItems.size())) {
 			return mItems.get(position);
