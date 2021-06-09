@@ -40,20 +40,20 @@ ext {
 
 	// variable that can be referenced to keep support libs consistent
 	supportLibVersion = '1.0.0'
-	androidXVersion = '1.2.0'
-	androidXCore = '1.3.1'
+	androidXVersion = '1.3.0'
+	androidXCore = '1.5.0'
 	androidXLegacyV4 = '1.0.0'
-	androidXExif = '1.2.0'
+	androidXExif = '1.3.2'
 	androidXLifecycle = '2.2.0'
 	androidXLifecycleExt = '2.2.0'
 	androidXMultiDex = '2.0.1'
-	androidXMaterial = '1.1.0-rc02'
-	androidXRecyclerview = '1.1.0-beta05'
+	androidXMaterial = '1.4.0-beta01'
+	androidXRecyclerview = '1.2.1'
 	androidXPreference = '1.1.1'
-	androidXConstraint = '1.1.3'
+	androidXConstraint = '2.0.4'
 	androidXLeanback = '1.0.0'
-	androidXKtx = '1.3.1'
-	androidXKtxLifecycle = '2.2.0'
+	androidXKtx = '1.5.0'
+	androidXKtxLifecycle = '2.3.1'
 
     versionCodeNum = 336
     versionNameString = '7.13.4'
