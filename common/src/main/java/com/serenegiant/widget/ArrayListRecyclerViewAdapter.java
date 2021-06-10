@@ -248,7 +248,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 		= new View.OnLongClickListener() {
 		@Override
 		public boolean onLongClick(final View v) {
-			if (DEBUG) Log.v(TAG, "onClick:" + v);
+			if (DEBUG) Log.v(TAG, "onLongClick:" + v);
 			if (mRecycleView != null) {
 				try {
 					if (mCustomRecycleViewListener != null) {
