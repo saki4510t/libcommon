@@ -176,7 +176,21 @@ public class SAFUtilsFragment extends BaseFragment
 				}
 				return false;
 			}
-		});
+
+				@Override
+				public void onItemSelected(
+					@NonNull final RecyclerView.Adapter<?> parent,
+					@NonNull final View view, final int position,
+					@Nullable final String item) {
+
+					if (DEBUG) Log.v(TAG, "onItemSelected:position=" + position + ",item=" + item);
+				}
+
+				@Override
+				public void onNothingSelected(@NonNull final RecyclerView.Adapter<?> parent) {
+					if (DEBUG) Log.v(TAG, "onNothingSelected:");
+				}
+			});
 		mBinding.list.setLayoutManager(new LinearLayoutManager(requireContext()));
 		mBinding.list.setAdapter(mAdapter);
 	}
