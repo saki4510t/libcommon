@@ -220,12 +220,13 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 					}, 100);
 				}
 				if (mCustomRecycleViewListener != null) {
-					final Integer pos = (Integer)v.getTag(R.id.position);
-					if (pos != null) {
+					final Object pos = v.getTag(R.id.position);
+					if (pos instanceof Integer) {
 						try {
-							final T item = getItem(pos);
+							final int position = (Integer)pos;
+							final T item = getItem(position);
 							mCustomRecycleViewListener.onItemClick(
-								ArrayListRecyclerViewAdapter.this, v, pos, item);
+								ArrayListRecyclerViewAdapter.this, v, position, item);
 							return;
 						} catch (final Exception e) {
 							Log.w(TAG, e);
@@ -252,10 +253,18 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			if (mRecycleView != null) {
 				try {
 					if (mCustomRecycleViewListener != null) {
-						final int position = mRecycleView.getChildAdapterPosition(v);
-						final T item = getItem(position);
-						return mCustomRecycleViewListener.onItemLongClick(
-							ArrayListRecyclerViewAdapter.this, v, position, item);
+						final Object pos = v.getTag(R.id.position);
+						if (pos instanceof Integer) {
+							final int position = (Integer)pos;
+							final T item = getItem(position);
+							return mCustomRecycleViewListener.onItemLongClick(
+								ArrayListRecyclerViewAdapter.this, v, position, item);
+						} else {
+							final int position = mRecycleView.getChildAdapterPosition(v);
+							final T item = getItem(position);
+							return mCustomRecycleViewListener.onItemLongClick(
+								ArrayListRecyclerViewAdapter.this, v, position, item);
+						}
 					}
 				} catch (final Exception e) {
 					Log.w(TAG, e);
