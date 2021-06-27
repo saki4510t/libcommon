@@ -613,4 +613,29 @@ public final class BuildCheck {
 	public static boolean isAndroid10() {
 		return check((Build.VERSION_CODES.Q));
 	}
+
+	/**
+	 * あぁーる API>=30
+	 * @return
+	 */
+	public static boolean isAPI30() {
+		return check((Build.VERSION_CODES.R));
+	}
+
+	/**
+	 * あぁーる API>=30
+	 * @return
+	 */
+	public static boolean isAndroidR() {
+		return check((Build.VERSION_CODES.R));
+	}
+
+	/**
+	 * あぁーる API>=30
+	 * @return
+	 */
+	public static boolean isAndroid11() {
+		return check((Build.VERSION_CODES.R));
+	}
+
 }
