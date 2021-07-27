@@ -58,7 +58,7 @@ class CameraTextureView @JvmOverloads constructor(
 
 		surfaceTextureListener = object : SurfaceTextureListener {
 			override fun onSurfaceTextureAvailable(
-				surface: SurfaceTexture?, width: Int, height: Int) {
+				surface: SurfaceTexture, width: Int, height: Int) {
 
 				if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)",
 					width, height))
@@ -67,7 +67,7 @@ class CameraTextureView @JvmOverloads constructor(
 			}
 
 			override fun onSurfaceTextureSizeChanged(
-				surface: SurfaceTexture?,
+				surface: SurfaceTexture,
 				width: Int, height: Int) {
 
 				if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)",
@@ -75,14 +75,14 @@ class CameraTextureView @JvmOverloads constructor(
 			}
 
 			override fun onSurfaceTextureDestroyed(
-				surface: SurfaceTexture?): Boolean {
+				surface: SurfaceTexture): Boolean {
 
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureDestroyed:")
 				return true
 			}
 
 			override fun onSurfaceTextureUpdated(
-				surface: SurfaceTexture?) {
+				surface: SurfaceTexture) {
 
 //				if (DEBUG) Log.v(TAG, "onSurfaceTextureUpdated:")
 			}
