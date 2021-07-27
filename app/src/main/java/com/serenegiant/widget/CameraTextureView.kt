@@ -24,6 +24,7 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 
 class CameraTextureView @JvmOverloads constructor(
@@ -46,6 +47,9 @@ class CameraTextureView @JvmOverloads constructor(
 				override fun getInputSurface(): SurfaceTexture {
 					val st = this@CameraTextureView.surfaceTexture
 					if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:$st")
+					if (st == null) {
+						throw IllegalStateException()
+					}
 					return st
 				}
 
