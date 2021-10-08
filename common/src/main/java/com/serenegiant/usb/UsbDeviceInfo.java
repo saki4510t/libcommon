@@ -29,6 +29,7 @@ public class UsbDeviceInfo implements Const {
 	 * @param device
 	 * @return
 	 */
+	@NonNull
 	public static UsbDeviceInfo getDeviceInfo(
 		@NonNull final Context context, @Nullable final UsbDevice device) {
 
@@ -46,6 +47,7 @@ public class UsbDeviceInfo implements Const {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@NonNull
 	public static UsbDeviceInfo getDeviceInfo(
 		@NonNull final UsbManager manager,
 		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo out) {
@@ -71,10 +73,12 @@ public class UsbDeviceInfo implements Const {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@NonNull
 	public static UsbDeviceInfo getDeviceInfo(
 		@Nullable final UsbDeviceConnection connection,
 		@Nullable final UsbDevice device, @Nullable final UsbDeviceInfo out) {
 
+		@NonNull
 		final UsbDeviceInfo result = out != null ? out : new UsbDeviceInfo();
 		result.clear();
 
