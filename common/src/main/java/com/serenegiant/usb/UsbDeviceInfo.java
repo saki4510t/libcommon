@@ -6,6 +6,7 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
+import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.ContextUtils;
@@ -105,7 +106,11 @@ public class UsbDeviceInfo implements Const {
 					}
 					if (BuildCheck.isAPI29()) {	// API >= 29
 						// API>=29でターゲットAPI>=29ならパーミッションがないとシリアル番号を読み込めない
-						result.serial = device.getSerialNumber();
+						try {
+							result.serial = device.getSerialNumber();
+						} catch (final Exception e) {
+							if (DEBUG) Log.w(TAG, e);
+						}
 					}
 					if (TextUtils.isEmpty(result.serial)) {
 						result.serial = connection.getSerial();
