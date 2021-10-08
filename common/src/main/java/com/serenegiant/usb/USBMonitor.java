@@ -665,7 +665,7 @@ public final class USBMonitor implements Const {
 	 * 端末からUSB機器が取り外されたときの処理
 	 * @param device
 	 */
-	private final void processDettach(final UsbDevice device) {
+	private final void processDettach(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processDettach:");
 		if (matches(device)) {
