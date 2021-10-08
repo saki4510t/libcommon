@@ -17,10 +17,13 @@ import androidx.annotation.Nullable;
  * 機器情報保持のためのヘルパークラス
  */
 public class UsbDeviceInfo implements Const {
+	private static final boolean DEBUG = false;
+	private static final String TAG = UsbDeviceInfo.class.getSimpleName();
 
 	/**
 	 * ベンダー名・製品名・バージョン・シリアルを取得する
-	 * #updateDeviceInfo(final UsbManager, final UsbDevice, final UsbDeviceInfo)のヘルパーメソッド
+	 * 新しいUsbDeviceInfoを生成して返す
+	 * #getDeviceInfo(final UsbManager, final UsbDevice, final UsbDeviceInfo)のラッパーメソッド
 	 * @param context
 	 * @param device
 	 * @return
@@ -35,9 +38,10 @@ public class UsbDeviceInfo implements Const {
 
 	/**
 	 * USB機器情報(ベンダー名・製品名・バージョン・シリアル等)を取得する
+	 * #getDeviceInfo(final UsbDeviceConnection, final UsbDevice, final UsbDeviceInfo)のラッパーメソッド
 	 * @param manager
 	 * @param device
-	 * @param out
+	 * @param out outがnullでなければoutへセットする、outがnullならば新しく生成して返す
 	 * @return
 	 */
 	@SuppressLint("NewApi")
@@ -62,7 +66,7 @@ public class UsbDeviceInfo implements Const {
 	 * USB機器情報(ベンダー名・製品名・バージョン・シリアル等)を取得する
 	 * @param connection
 	 * @param device
-	 * @param out
+	 * @param out	outがnullでなければoutへセットする、outがnullならば新しく生成して返す
 	 * @return
 	 */
 	@SuppressLint("NewApi")
@@ -170,10 +174,16 @@ public class UsbDeviceInfo implements Const {
 	/** コンフィギュレーションの個数 */
 	public int configCounts;
 
+	/**
+	 * コンストラクタ
+	 */
 	public UsbDeviceInfo() {
 		configCounts = -1;
 	}
 
+	/**
+	 * 保持している情報をクリアする
+	 */
 	private void clear() {
 		device = null;
 		usb_version = manufacturer = product = version = serial = null;
