@@ -179,7 +179,6 @@ public final class USBMonitor implements Const {
 					Log.e(TAG, "release:", e);
 				}
 			}
-			mCtrlBlocks.clear();
 			try {
 				mAsyncHandler.getLooper().quit();
 			} catch (final Exception e) {
