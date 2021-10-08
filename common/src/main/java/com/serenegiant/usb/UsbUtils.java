@@ -87,14 +87,13 @@ public class UsbUtils implements Const {
 	 * @param device
 	 * @return
 	 */
+	@Deprecated
 	@NonNull
 	public static String getDeviceKeyNameWithSerial(
 		@NonNull final Context context,
 		@Nullable final UsbDevice device) {
 
-		final UsbDeviceInfo info = UsbDeviceInfo.getDeviceInfo(context, device);
-		return getDeviceKeyName(device, true,
-			info.serial, info.manufacturer, info.configCounts, info.version);
+		return getDeviceKeyName(UsbDeviceInfo.getDeviceInfo(context, device));
 	}
 
 	/**
@@ -103,6 +102,7 @@ public class UsbUtils implements Const {
 	 * シリアルナンバーを取得できなければgetDeviceKeyと同じ
 	 * @return
 	 */
+	@Deprecated
 	public static int getDeviceKeyWithSerial(@NonNull final Context context,
 		@Nullable final UsbDevice device) {
 
@@ -139,8 +139,29 @@ public class UsbUtils implements Const {
 	 */
 	@NonNull
 	public static String getDeviceKeyName(@NonNull final UsbDeviceInfo info) {
-		return getDeviceKeyName(info.device, true,
-			info.serial, info.manufacturer, info.configCounts, info.version);
+		final UsbDevice device = info.device;
+		if (device == null) return "";
+		final StringBuilder sb = new StringBuilder();
+		sb.append(device.getVendorId()).append("#")			// API >= 12
+			.append(device.getProductId()).append("#")		// API >= 12
+			.append(device.getDeviceClass()).append("#")	// API >= 12
+			.append(device.getDeviceSubclass()).append("#")	// API >= 12
+			.append(device.getDeviceProtocol());			// API >= 12
+		if (!TextUtils.isEmpty(info.serial)) {
+			sb.append("#");	sb.append(info.serial);
+		}
+		if (BuildCheck.isAndroid5()) {
+			if (!TextUtils.isEmpty(info.manufacturer)) {
+				sb.append("#").append(info.manufacturer);
+			}
+			if (info.configCounts >= 0) {
+				sb.append("#").append(info.configCounts);
+			}
+			if (!TextUtils.isEmpty(info.version)) {
+				sb.append("#").append(info.version);
+			}
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -149,8 +170,7 @@ public class UsbUtils implements Const {
 	 * @return
 	 */
 	public static int getDeviceKey(@NonNull final UsbDeviceInfo info) {
-		return getDeviceKeyName(info.device, true,
-			info.serial, info.manufacturer, info.configCounts, info.version).hashCode();
+		return getDeviceKeyName(info).hashCode();
 	}
 
 	/**
@@ -162,6 +182,7 @@ public class UsbUtils implements Const {
 	 * @param deviceVersion
 	 * @return
 	 */
+	@Deprecated
 	@NonNull
 	public static final String getDeviceKeyName(@Nullable final UsbDevice device,
 		final boolean useNewAPI,
