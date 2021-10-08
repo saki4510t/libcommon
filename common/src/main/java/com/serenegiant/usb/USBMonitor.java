@@ -670,6 +670,8 @@ public final class USBMonitor implements Const {
 		if (DEBUG) Log.v(TAG, "processDettach:");
 		if (matches(device)) {
 			// フィルタにマッチした
+			// 切断されずに取り外されるときのために取り外されたUsbDeviceに関係するUsbControlBlockをすべて削除する
+			removeAll(device);
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
@@ -716,6 +718,35 @@ public final class USBMonitor implements Const {
 		});
 	}
 
+	/**
+	 * 指定したUsbDeviceに関係するUsbControlBlockの一覧を取得する
+	 * @param device
+	 * @return
+	 */
+	private List<UsbControlBlock> findCtrlBlocks(@NonNull final UsbDevice device) {
+		final List<UsbControlBlock> result = new ArrayList<>();
+		synchronized (mCtrlBlocks) {
+			for (final UsbControlBlock ctrlBlock: mCtrlBlocks) {
+				if (ctrlBlock.getDevice().equals(device)) {
+					result.add(ctrlBlock);
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * 指定したUsbDeviceに関係するUsbControlBlockをすべてmCtrlBlocksから削除する
+	 * @param device
+	 */
+	private void removeAll(@NonNull final UsbDevice device) {
+		final List<UsbControlBlock> list = findCtrlBlocks(device);
+		for (final UsbControlBlock ctrlBlock: list) {
+			synchronized (mCtrlBlocks) {
+				mCtrlBlocks.remove(ctrlBlock);
+			}
+		}
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * USB機器をopenして管理するためのクラス
