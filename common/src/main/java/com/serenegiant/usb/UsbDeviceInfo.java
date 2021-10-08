@@ -5,6 +5,8 @@ import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -17,7 +19,7 @@ import androidx.annotation.Nullable;
 /**
  * 機器情報保持のためのヘルパークラス
  */
-public class UsbDeviceInfo implements Const {
+public class UsbDeviceInfo implements Const, Parcelable {
 	private static final boolean DEBUG = false;
 	private static final String TAG = UsbDeviceInfo.class.getSimpleName();
 
@@ -191,6 +193,20 @@ public class UsbDeviceInfo implements Const {
 	}
 
 	/**
+	 * Parcelable用のコンストラクタ
+	 * @param in
+	 */
+	public UsbDeviceInfo(@NonNull final Parcel in) {
+		device = in.readParcelable(UsbDevice.class.getClassLoader());
+		usb_version = in.readString();
+		manufacturer = in.readString();
+		product = in.readString();
+		version = in.readString();
+		serial = in.readString();
+		configCounts = in.readInt();
+	}
+
+	/**
 	 * 保持している情報をクリアする
 	 */
 	private void clear() {
@@ -211,4 +227,32 @@ public class UsbDeviceInfo implements Const {
 			serial != null ? serial : "",
 			configCounts >= 0 ? Integer.toString(configCounts) : "");
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeParcelable(device, flags);
+		dest.writeString(usb_version);
+		dest.writeString(manufacturer);
+		dest.writeString(product);
+		dest.writeString(version);
+		dest.writeString(serial);
+		dest.writeInt(configCounts);
+	}
+
+	public static final Creator<UsbDeviceInfo> CREATOR = new Creator<UsbDeviceInfo>() {
+		@Override
+		public UsbDeviceInfo createFromParcel(@NonNull final Parcel in) {
+			return new UsbDeviceInfo(in);
+		}
+
+		@Override
+		public UsbDeviceInfo[] newArray(final int size) {
+			return new UsbDeviceInfo[size];
+		}
+	};
 }
