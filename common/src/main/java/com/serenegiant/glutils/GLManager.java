@@ -106,14 +106,16 @@ public class GLManager {
 				return GLManager.this.handleMessage(msg);
 			}
 		};
+		final HandlerThreadHandler handler;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 			// API>=22ならHandlerを非同期仕様で初期化
-			mGLHandler = HandlerThreadHandler.createHandler(TAG, handlerCallback, true);
+			handler = HandlerThreadHandler.createHandler(TAG, handlerCallback, true);
 		} else {
 			// API<22ならHandlerをLooperによる同期バリアを受ける設定で初期化
-			mGLHandler = HandlerThreadHandler.createHandler(TAG, handlerCallback);
+			handler = HandlerThreadHandler.createHandler(TAG, handlerCallback);
 		}
-		mHandlerThreadId = mGLHandler.getLooper().getThread().getId();
+		mGLHandler = handler;
+		mHandlerThreadId = handler.getId();
 		final Semaphore sync = new Semaphore(0);
 		mGLHandler.postAtFrontOfQueue(new Runnable() {
 			@Override
