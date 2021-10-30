@@ -81,16 +81,15 @@ dependencies {
 //	androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.2.0'
 //	androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
 
-	implementation "androidx.core:core:${androidXCore}"
+	implementation "androidx.core:core-ktx:${androidXCore}"
 	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
-	implementation "androidx.preference:preference:${androidXPreference}"
+	implementation "androidx.preference:preference-ktx:${androidXPreference}"
 	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 
-	implementation "androidx.core:core-ktx:${androidXKtx}"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
 	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
