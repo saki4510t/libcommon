@@ -240,6 +240,9 @@ public final class USBMonitor implements Const {
 			}
 			mPermissionIntent = null;
 		}
+		synchronized (mAttachedDevices) {
+			mAttachedDevices.clear();
+		}
 	}
 
 	public synchronized boolean isRegistered() {
