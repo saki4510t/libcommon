@@ -638,4 +638,27 @@ public final class BuildCheck {
 		return check((Build.VERSION_CODES.R));
 	}
 
+	/**
+	 * えすどす API>=31
+	 * @return
+	 */
+	public static boolean isAPI3１() {
+		return check((Build.VERSION_CODES.S));
+	}
+
+	/**
+	 * えすどす API>=31
+	 * @return
+	 */
+	public static boolean isAndroidS() {
+		return check((Build.VERSION_CODES.S));
+	}
+
+	/**
+	 * えすどす API>=31
+	 * @return
+	 */
+	public static boolean isAndroid12() {
+		return check((Build.VERSION_CODES.S));
+	}
 }

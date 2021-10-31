@@ -35,7 +35,7 @@ ext {
 	javaTargetCompatibility = JavaVersion.VERSION_1_8
 
 //	versionBuildTool = "30.0.2"
-	versionCompiler = 30
+	versionCompiler = 31
 	versionTarget = 28
 
 	// variable that can be referenced to keep support libs consistent
