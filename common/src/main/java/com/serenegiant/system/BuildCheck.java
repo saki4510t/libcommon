@@ -642,8 +642,8 @@ public final class BuildCheck {
 	 * えすどす API>=31
 	 * @return
 	 */
-	public static boolean isAPI3１() {
-		return check((Build.VERSION_CODES.S));
+	public static boolean isAPI31() {
+		return check((31));
 	}
 
 	/**
@@ -651,7 +651,7 @@ public final class BuildCheck {
 	 * @return
 	 */
 	public static boolean isAndroidS() {
-		return check((Build.VERSION_CODES.S));
+		return check((31));
 	}
 
 	/**
@@ -659,6 +659,6 @@ public final class BuildCheck {
 	 * @return
 	 */
 	public static boolean isAndroid12() {
-		return check((Build.VERSION_CODES.S));
+		return check(31);
 	}
 }

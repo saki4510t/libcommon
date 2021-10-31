@@ -35,13 +35,13 @@ ext {
 	javaTargetCompatibility = JavaVersion.VERSION_1_8
 
 //	versionBuildTool = "30.0.2"
-	versionCompiler = 31
+	versionCompiler = 30	// 31にするとコンソールからビルドできなくなるので30にままにする
 	versionTarget = 28
 
 	// variable that can be referenced to keep support libs consistent
 	supportLibVersion = '1.0.0'
 	androidXVersion = '1.3.1'
-	androidXCore = '1.7.0'
+	androidXCore = '1.6.0'	// これを1.7.0にするとcompileSdkVersion=31が必須になるがコンソールからビルドできなくなるので1.6.0にままにする
 	androidXLegacyV4 = '1.0.0'
 	androidXExif = '1.3.3'
 	androidXLifecycle = '2.2.0'
@@ -52,7 +52,7 @@ ext {
 	androidXPreference = '1.1.1'
 	androidXConstraint = '2.0.4'
 	androidXLeanback = '1.0.0'
-	androidXKtx = '1.7.0'
+	androidXKtx = '1.6.0'	// これを1.7.0にするとcompileSdkVersion=31が必須になるがコンソールからビルドできなくなるので1.6.0にままにする
 	androidXKtxLifecycle = '2.3.1'
 
     versionCodeNum = 340
