@@ -372,8 +372,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "Constructor:");
 		}
 
-		@SuppressLint("MissingPermission")
-		@TargetApi(Build.VERSION_CODES.M)
+		@SuppressLint({"MissingPermission", "NewApi"})
 		@Override
 		public void onNetworkActive() {
 			if (DEBUG) Log.v(TAG, "onNetworkActive:");
@@ -383,6 +382,9 @@ public class ConnectivityHelper {
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
+			} else {
+				// API>=21, API<23の処理
+				updateActiveNetwork(requireConnectivityManager().getActiveNetworkInfo());	// API>=21
 			}
 		}
 	}
