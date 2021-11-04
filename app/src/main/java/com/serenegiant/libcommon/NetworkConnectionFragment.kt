@@ -79,7 +79,7 @@ class NetworkConnectionFragment : BaseFragment() {
 	private val mConnectivityCallback: ConnectivityCallback
 		= object : ConnectivityCallback {
 
-		override fun onNetworkChanged(activeNetworkType: Int) {
+		override fun onNetworkChanged(activeNetworkType: Int, prevNetworkType: Int) {
 			if (DEBUG) Log.v(TAG, "onNetworkChanged:"
 				+ ConnectivityHelper.getNetworkTypeString(activeNetworkType))
 		}

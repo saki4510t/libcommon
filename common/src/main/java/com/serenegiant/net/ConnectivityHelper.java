@@ -59,7 +59,7 @@ public class ConnectivityHelper {
 		/**
 		 * @param activeNetworkType
 		 */
-		public void onNetworkChanged(final int activeNetworkType);
+		public void onNetworkChanged(final int activeNetworkType, final int prevNetworkType);
 		public void onError(final Throwable t);
 	}
 
@@ -81,6 +81,11 @@ public class ConnectivityHelper {
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
 		= "android.net.conn.CONNECTIVITY_CHANGE";
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 */
 	public ConnectivityHelper(@NonNull final Context context,
 		@NonNull final ConnectivityCallback callback) {
 
@@ -245,13 +250,13 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
-	private void callOnNetworkChanged(final int activeNetworkType) {
+	private void callOnNetworkChanged(final int activeNetworkType, final int prevNetworkType) {
 
 		synchronized (mSync) {
 			if (mAsyncHandler != null) {
 				mAsyncHandler.post(() -> {
 					try {
-						mCallback.onNetworkChanged(activeNetworkType);
+						mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
 					} catch (final Exception e) {
 						callOnError(e);
 					}
@@ -330,13 +335,17 @@ public class ConnectivityHelper {
 		}
 		updateActiveNetwork(activeNetworkType);
 	}
-	
+
+	/**
+	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * @param activeNetworkType
+	 */
 	private void updateActiveNetwork(final int activeNetworkType) {
 		synchronized (mSync) {
 			if (mActiveNetworkType != activeNetworkType) {
 				final int prev = mActiveNetworkType;
 				mActiveNetworkType = activeNetworkType;
-				callOnNetworkChanged(activeNetworkType);
+				callOnNetworkChanged(activeNetworkType, prev);
 			}
 		}
 	}
