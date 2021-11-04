@@ -344,19 +344,15 @@ public class ConnectivityHelper {
 			final ConnectivityManager manager = requireConnectivityManager();
 			@Nullable
 			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
-			@Nullable
-			final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-
 			int activeNetworkType = NETWORK_TYPE_NON;
-			if ((capabilities != null) && (info != null)) {
-				if (isWifiNetworkReachable(capabilities, info)) {
+			if (capabilities != null) {
+				if (isWifiNetworkReachable(manager, network, capabilities)) {
 					activeNetworkType = NETWORK_TYPE_WIFI;
-				} else if (isMobileNetworkReachable(capabilities, info)) {
+				} else if (isMobileNetworkReachable(manager, network, capabilities)) {
 					activeNetworkType = NETWORK_TYPE_MOBILE;
-				} else if (isBluetoothNetworkReachable(capabilities, info)) {
+				} else if (isBluetoothNetworkReachable(manager, network, capabilities)) {
 					activeNetworkType = NETWORK_TYPE_BLUETOOTH;
-				} else if (isNetworkReachable(capabilities, info)) {
+				} else if (isNetworkReachable(manager, network, capabilities)) {
 					activeNetworkType = NETWORK_TYPE_ETHERNET;
 				}
 			}
@@ -558,21 +554,18 @@ public class ConnectivityHelper {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				@Nullable
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				return (capabilities != null) && (info != null)
-					&& isWifiNetworkReachable(capabilities, info);
+				return (capabilities != null)
+					&& isWifiNetworkReachable(manager, network, capabilities);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
 					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
 					if ((capabilities != null) && (info != null)
-						&& isWifiNetworkReachable(capabilities, info)) {
+						&& isWifiNetworkReachable(manager, network, capabilities)) {
 
 						return true;
 					}
@@ -608,20 +601,18 @@ public class ConnectivityHelper {
 			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				return (capabilities != null) && (info != null)
-					&& isMobileNetworkReachable(capabilities, info);
+				return (capabilities != null)
+					&& isMobileNetworkReachable(manager, network, capabilities);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
 					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
 					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
 					if ((capabilities != null) && (info != null)
-						&& isMobileNetworkReachable(capabilities, info)) {
+						&& isMobileNetworkReachable(manager, network, capabilities)) {
 
 						return true;
 					}
@@ -656,16 +647,15 @@ public class ConnectivityHelper {
 			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
-				return (capabilities != null) && (info != null)
-					&& isNetworkReachable(capabilities, info);
+				return (capabilities != null)
+					&& isNetworkReachable(manager, network, capabilities);
 			} else {
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
 					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 					if ((capabilities != null) && (info != null)
-						&& isNetworkReachable(capabilities, info)) {
+						&& isNetworkReachable(manager, network, capabilities)) {
 						return true;
 					}
 				}
@@ -680,15 +670,17 @@ public class ConnectivityHelper {
 //--------------------------------------------------------------------------------
 	/**
 	 * Wi-Fiでネットワーク接続しているかどうかを取得
+	 * @param manager
+	 * @param network
 	 * @param capabilities
-	 * @param info
 	 * @return
 	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isWifiNetworkReachable(
-		@NonNull final NetworkCapabilities capabilities,
-		@NonNull final NetworkInfo info) {
+		@NonNull final ConnectivityManager manager,
+		@NonNull final Network network,
+		@NonNull final NetworkCapabilities capabilities) {
 
 		final boolean isWiFi;
 		if (BuildCheck.isAPI26()) {
@@ -699,20 +691,22 @@ public class ConnectivityHelper {
 			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
 				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
 		}
-		return isWiFi && isNetworkReachable(capabilities, info);
+		return isWiFi && isNetworkReachable(manager, network, capabilities);
 	}
 
 	/**
 	 * モバイルネットワーク接続しているかどうかを取得
+	 * @param manager
+	 * @param network
 	 * @param capabilities
-	 * @param info
 	 * @return
 	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isMobileNetworkReachable(
-		@NonNull final NetworkCapabilities capabilities,
-		@NonNull final NetworkInfo info) {
+		@NonNull final ConnectivityManager manager,
+		@NonNull final Network network,
+		@NonNull final NetworkCapabilities capabilities) {
 
 		final boolean isMobile;
 		if (BuildCheck.isAPI27()) {
@@ -721,40 +715,47 @@ public class ConnectivityHelper {
 		} else {
 			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);// API>=21
 		}
-		return isMobile && isNetworkReachable(capabilities, info);
+		return isMobile && isNetworkReachable(manager, network, capabilities);
 	}
 
 	/**
 	 * Bluetoothを使ったネットワーク接続をしているかどうかを取得
+	 * @param manager
+	 * @param network
 	 * @param capabilities
-	 * @param info
 	 * @return
 	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isBluetoothNetworkReachable(
-		@NonNull final NetworkCapabilities capabilities,
-		@NonNull final NetworkInfo info) {
+		@NonNull final ConnectivityManager manager,
+		@NonNull final Network network,
+		@NonNull final NetworkCapabilities capabilities) {
 
 		return
 			capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)// API>=21
-				&& isNetworkReachable(capabilities, info);
+				&& isNetworkReachable(manager, network, capabilities);
 	}
 
 	/**
 	 * ネットワーク接続しているかどうかを取得
+	 * @param manager
+	 * @param network
 	 * @param capabilities
-	 * @param info
 	 * @return
 	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isNetworkReachable(
-		@NonNull final NetworkCapabilities capabilities,
-		@NonNull final NetworkInfo info) {
+		@NonNull final ConnectivityManager manager,
+		@NonNull final Network network,
+		@NonNull final NetworkCapabilities capabilities) {
 
+		@SuppressLint("MissingPermission")
+		@Nullable
+		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:capabilities=" + capabilities);
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:info=" + info);
-		final NetworkInfo.DetailedState state = info.getDetailedState();
+		final NetworkInfo.DetailedState state = info != null ? info.getDetailedState() : NetworkInfo.DetailedState.FAILED;
 		final boolean isConnectedOrConnecting
 			= (state == NetworkInfo.DetailedState.CONNECTED)
 				|| (state == NetworkInfo.DetailedState.CONNECTING);
