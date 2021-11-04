@@ -95,6 +95,7 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @param callback
 	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public ConnectivityHelper(@NonNull final Context context,
 		@NonNull final ConnectivityCallback callback) {
 
@@ -269,6 +270,7 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "init:");
 		final ConnectivityManager manager = requireConnectivityManager();
 		if (BuildCheck.isAPI21()) {
+			// API21以上の場合
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
 			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 			mNetworkCallback = new MyNetworkCallback();
@@ -286,6 +288,7 @@ public class ConnectivityHelper {
 					mNetworkCallback);	// API>=21
 			}
 		} else {
+			// API21未満の場合
 			mNetworkChangedReceiver = new NetworkChangedReceiver(this);
 			final IntentFilter intentFilter = new IntentFilter();
 			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
@@ -550,6 +553,7 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 		if (BuildCheck.isAPI21()) {
+			// API21以上の場合
 			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				@Nullable
@@ -572,6 +576,7 @@ public class ConnectivityHelper {
 				}
 			}
 		} else {
+			// API21未満の場合
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 				final int type = activeNetworkInfo.getType();
@@ -598,6 +603,7 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 		if (BuildCheck.isAPI21()) {
+			// API21以上の場合
 			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
@@ -619,6 +625,7 @@ public class ConnectivityHelper {
 				}
 			}
 		} else {
+			// API21未満の場合
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 				final int type = activeNetworkInfo.getType();
@@ -643,7 +650,7 @@ public class ConnectivityHelper {
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 
 		if (BuildCheck.isAPI21()) {
-			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
+			// API21以上の場合
 			if (BuildCheck.isAPI23()) {
 				final Network network = manager.getActiveNetwork();	// API>=23
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
@@ -662,6 +669,7 @@ public class ConnectivityHelper {
 			}
 			return false;
 		} else {
+			// API21未満の場合
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			return (activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting());
 		}
@@ -670,12 +678,14 @@ public class ConnectivityHelper {
 //--------------------------------------------------------------------------------
 	/**
 	 * Wi-Fiでネットワーク接続しているかどうかを取得
+	 * API>=21
 	 * @param manager
 	 * @param network
 	 * @param capabilities
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isWifiNetworkReachable(
 		@NonNull final ConnectivityManager manager,
@@ -696,12 +706,14 @@ public class ConnectivityHelper {
 
 	/**
 	 * モバイルネットワーク接続しているかどうかを取得
+	 * API>=21
 	 * @param manager
 	 * @param network
 	 * @param capabilities
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isMobileNetworkReachable(
 		@NonNull final ConnectivityManager manager,
@@ -720,11 +732,13 @@ public class ConnectivityHelper {
 
 	/**
 	 * Bluetoothを使ったネットワーク接続をしているかどうかを取得
+	 * API>=21
 	 * @param manager
 	 * @param network
 	 * @param capabilities
 	 * @return
 	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isBluetoothNetworkReachable(
 		@NonNull final ConnectivityManager manager,
@@ -738,12 +752,14 @@ public class ConnectivityHelper {
 
 	/**
 	 * ネットワーク接続しているかどうかを取得
+	 * API>=21
 	 * @param manager
 	 * @param network
 	 * @param capabilities
 	 * @return
 	 */
 	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isNetworkReachable(
 		@NonNull final ConnectivityManager manager,
