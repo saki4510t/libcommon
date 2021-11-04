@@ -30,6 +30,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+/**
+ * ワーカースレッド上で処理を行うためのHandler実装
+ * インスタンス化のためのヘルパーメソッド$createHandler内でHandlerThreadを生成＆スタートする
+ */
 public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";
 
