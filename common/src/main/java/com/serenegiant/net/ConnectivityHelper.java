@@ -63,10 +63,13 @@ public class ConnectivityHelper {
 		public void onError(final Throwable t);
 	}
 
+	@NonNull
 	private final Object mSync = new Object();
+	@NonNull
 	private final WeakReference<Context> mWeakContext;
 	@NonNull
 	private final ConnectivityCallback mCallback;
+	@NonNull
 	private final Handler mUIHandler;
 	private Handler mAsyncHandler;
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
