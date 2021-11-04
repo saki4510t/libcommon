@@ -126,7 +126,7 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "release:");
 		mIsReleased = true;
 		updateActiveNetwork(NETWORK_TYPE_NON);
-		final Context context = getContext();
+		final Context context = mWeakContext.get();
 		if (context != null) {
 			if (BuildCheck.isAPI21()) {
 				final ConnectivityManager manager = requireConnectivityManager();
@@ -167,47 +167,79 @@ public class ConnectivityHelper {
 			}
 		}
 	}
-	
+
+	/**
+	 * このConnectivityManagerが破棄されていなくて利用可能かどうかを取得
+	 * @return
+	 */
 	public boolean isValid() {
 		try {
 			requireConnectivityManager();
-			return true;
+			return !mIsReleased;
 		} catch (final IllegalStateException e) {
 			if (DEBUG) Log.w(TAG, e);
 		}
 		return false;
 	}
-	
-	public int getActiveNetworkType() {
+
+	/**
+	 * ネットワーク接続の種類を取得
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public int getActiveNetworkType() throws IllegalStateException {
 		synchronized (mSync) {
+			if (mIsReleased) {
+				throw new IllegalStateException("already released!");
+			}
 			return mActiveNetworkType;
 		}
 	}
 
-	public boolean isNetworkReachable() {
+	/**
+	 * ネットワーク接続しているかどうかを取得
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public boolean isNetworkReachable() throws IllegalStateException {
 		return getActiveNetworkType() != NETWORK_TYPE_NON;
 	}
 
-	public boolean isWifiNetworkReachable() {
+	/**
+	 * Wi-Fi経由でネットワーク接続しているかどうかを取得
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public boolean isWifiNetworkReachable() throws IllegalStateException {
 		final int active = getActiveNetworkType();
 		return (active == NETWORK_TYPE_WIFI)
 			|| (active == NETWORK_TYPE_ETHERNET);
 	}
 
-	public boolean isMobileNetworkReachable() {
+	/**
+	 * モバイルデータ回線でネットワーク接続しているかどうかを取得
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public boolean isMobileNetworkReachable() throws IllegalStateException {
 		return getActiveNetworkType() == NETWORK_TYPE_MOBILE;
 	}
 
-	public boolean isBluetoothNetworkReachable() {
+	/**
+	 * Bluetooth経由でネットワーク接続しているかどうかを取得
+	 * @return
+	 */
+	public boolean isBluetoothNetworkReachable() throws IllegalStateException  {
 		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
 	}
 
 //--------------------------------------------------------------------------------
-	@Nullable
-	private Context getContext() {
-		return mWeakContext.get();
-	}
-
+	/**
+	 * Contextを取得
+	 * 取得できなければIllegalStateExceptionを投げる
+	 * @return
+	 * @throws IllegalStateException
+	 */
 	@NonNull
 	private Context requireContext() throws IllegalStateException {
 		final Context context = mWeakContext.get();
@@ -216,7 +248,13 @@ public class ConnectivityHelper {
 		}
 		return context;
 	}
-	
+
+	/**
+	 * ConnectivityManagerを取得
+	 * 取得できなければIllegalStateExceptionを投げる
+	 * @return
+	 * @throws IllegalStateException
+	 */
 	@NonNull
 	private ConnectivityManager requireConnectivityManager()
 		throws IllegalStateException {
