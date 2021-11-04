@@ -475,16 +475,6 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "onReceive:" + intent);
 			final String action = intent != null ? intent.getAction() : null;
 			if (ACTION_GLOBAL_CONNECTIVITY_CHANGE.equals(action)) {
-				onReceiveGlobal(context, intent);
-			}
-		}
-
-		/**
-		 * システムグローバルブロードキャスト受信時の処理
-		 * @param context
-		 * @param intent
-		 */
-		private void onReceiveGlobal(final Context context, final Intent intent) {
 			final ConnectivityManager manager
 				= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 
