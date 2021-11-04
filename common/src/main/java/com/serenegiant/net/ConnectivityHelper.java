@@ -76,7 +76,12 @@ public class ConnectivityHelper {
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
 	private ConnectivityManager.NetworkCallback mNetworkCallback;	// API>=21
+	/**
+	 * API21未満でブロードキャストレシーバーでネットワークの状態変化を受け取る時のBroadcastReceiverインスタンス, API<21
+	 */
+	@Nullable
 	private BroadcastReceiver mNetworkChangedReceiver;
 	private int mActiveNetworkType = NETWORK_TYPE_NON;
 	private volatile boolean mIsReleased = false;
@@ -289,6 +294,7 @@ public class ConnectivityHelper {
 //--------------------------------------------------------------------------------
 	/**
 	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * API>=21での処理用
 	 * @param network
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
@@ -302,7 +308,7 @@ public class ConnectivityHelper {
 			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
 			// FIXME API>=29でNetworkInfoがdeprecatedなので対策を追加する
 			@Nullable
-			final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21
+			final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 
 			int activeNetworkType = NETWORK_TYPE_NON;
 			if ((capabilities != null) && (info != null)) {
@@ -324,6 +330,7 @@ public class ConnectivityHelper {
 
 	/**
 	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * API21未満でブロードキャストレシーバーでネットワークの状態変化を受け取る時の処理用
 	 * @param activeNetworkInfo
 	 */
 	private void updateActiveNetwork(@Nullable final NetworkInfo activeNetworkInfo) {
@@ -459,13 +466,20 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * API21未満でブロードキャストレシーバーを使ってネットワーク状態の変化を受け取るときのBroadcastReceiver実装
+	 */
 	@SuppressLint("MissingPermission")
-	@SuppressWarnings("deprecation")
 	private static class NetworkChangedReceiver extends BroadcastReceiver {
 		private static final String TAG = NetworkChangedReceiver.class.getSimpleName();
 
 		@NonNull
 		private final ConnectivityHelper mParent;
+
+		/**
+		 * コンストラクタ
+		 * @param parent
+		 */
 		public NetworkChangedReceiver(@NonNull final ConnectivityHelper parent) {
 			mParent = parent;
 		}
@@ -475,12 +489,14 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "onReceive:" + intent);
 			final String action = intent != null ? intent.getAction() : null;
 			if (ACTION_GLOBAL_CONNECTIVITY_CHANGE.equals(action)) {
-			final ConnectivityManager manager
-				= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+				final ConnectivityManager manager
+					= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 
-			// コールバックリスナーを呼び出す
-			mParent.updateActiveNetwork(manager.getActiveNetworkInfo());
+				// コールバックリスナーを呼び出す
+				mParent.updateActiveNetwork(manager.getActiveNetworkInfo());
+			}
 		}
+
 	}
 
 //================================================================================
