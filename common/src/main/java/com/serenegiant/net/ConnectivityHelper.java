@@ -71,7 +71,8 @@ public class ConnectivityHelper {
 	private final ConnectivityCallback mCallback;
 	@NonNull
 	private final Handler mUIHandler;
-	private Handler mAsyncHandler;
+	@NonNull
+	private final Handler mAsyncHandler;
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -153,14 +154,11 @@ public class ConnectivityHelper {
 		}
 		synchronized (mSync) {
 			mUIHandler.removeCallbacksAndMessages(null);
-			if (mAsyncHandler != null) {
-				try {
-					mAsyncHandler.removeCallbacksAndMessages(null);
-					mAsyncHandler.getLooper().quit();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				mAsyncHandler = null;
+			try {
+				mAsyncHandler.removeCallbacksAndMessages(null);
+				mAsyncHandler.getLooper().quit();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
 		}
 	}
@@ -253,40 +251,46 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
-	private void callOnNetworkChanged(final int activeNetworkType, final int prevNetworkType) {
+	/**
+	 * ConnectivityCallbackのコールバックメソッド呼び出しのためのヘルパーメソッド
+	 * @param activeNetworkType
+	 * @param prevNetworkType
+	 */
+	private void callOnNetworkChanged(
+		final int activeNetworkType, final int prevNetworkType) {
 
 		synchronized (mSync) {
-			if (mAsyncHandler != null) {
-				mAsyncHandler.post(() -> {
-					try {
-						mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
-					} catch (final Exception e) {
-						callOnError(e);
-					}
-				});
-			} else {
-				Log.w(TAG, "already released?");
-			}
+			mAsyncHandler.post(() -> {
+				try {
+					mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
+				} catch (final Exception e) {
+					callOnError(e);
+				}
+			});
 		}
 	}
 
+	/**
+	 * ConnectivityCallbackのコールバックメソッド呼び出しのためのヘルパーメソッド
+	 * @param t
+	 */
 	private void callOnError(final Throwable t) {
 		synchronized (mSync) {
-			if (mAsyncHandler != null) {
-				mAsyncHandler.post(() -> {
-					try {
-						mCallback.onError(t);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					}
-				});
-			} else {
-				Log.w(TAG, "already released?");
-			}
+			mAsyncHandler.post(() -> {
+				try {
+					mCallback.onError(t);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				}
+			});
 		}
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * @param network
+	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void updateActiveNetwork(@Nullable final Network network) {
@@ -318,6 +322,10 @@ public class ConnectivityHelper {
 		}
 	}
 
+	/**
+	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * @param activeNetworkInfo
+	 */
 	private void updateActiveNetwork(@Nullable final NetworkInfo activeNetworkInfo) {
 		final int type = (activeNetworkInfo != null)
 			&& (activeNetworkInfo.isConnectedOrConnecting())
@@ -487,7 +495,7 @@ public class ConnectivityHelper {
 // ここ以下はポーリングでネットワーク状態をチェックするためのスタティックメソッド
 //================================================================================
 	/**
-	 * WiFiネットワークが使用可能かどうかを返す
+	 * Wi-Fiでネットワーク接続しているかどうかを取得
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
 	 * @param context
 	 * @return
@@ -538,7 +546,7 @@ public class ConnectivityHelper {
 	}
 
 	/**
-	 * モバイルネットワークが使用可能かどうかを返す
+	 * モバイルネットワーク接続しているかどうかを取得
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
 	 * @param context
 	 * @return
@@ -586,6 +594,8 @@ public class ConnectivityHelper {
 	/**
 	 * ネットワークが使用可能かどうかをチェック
 	 * このメソッドはブロードキャストレシーバーの登録の有無と関係なく使用可
+	 * @param context
+	 * @return
 	 */
 	@Deprecated
 	@SuppressLint("NewApi")
@@ -622,6 +632,12 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * Wi-Fiでネットワーク接続しているかどうかを取得
+	 * @param capabilities
+	 * @param info
+	 * @return
+	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isWifiNetworkReachable(
@@ -639,7 +655,13 @@ public class ConnectivityHelper {
 		}
 		return isWiFi && isNetworkReachable(capabilities, info);
 	}
-	
+
+	/**
+	 * モバイルネットワーク接続しているかどうかを取得
+	 * @param capabilities
+	 * @param info
+	 * @return
+	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isMobileNetworkReachable(
@@ -656,6 +678,12 @@ public class ConnectivityHelper {
 		return isMobile && isNetworkReachable(capabilities, info);
 	}
 
+	/**
+	 * Bluetoothを使ったネットワーク接続をしているかどうかを取得
+	 * @param capabilities
+	 * @param info
+	 * @return
+	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isBluetoothNetworkReachable(
 		@NonNull final NetworkCapabilities capabilities,
@@ -666,6 +694,12 @@ public class ConnectivityHelper {
 				&& isNetworkReachable(capabilities, info);
 	}
 
+	/**
+	 * ネットワーク接続しているかどうかを取得
+	 * @param capabilities
+	 * @param info
+	 * @return
+	 */
 	@SuppressLint("NewApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isNetworkReachable(
@@ -697,6 +731,11 @@ public class ConnectivityHelper {
 		return isConnectedOrConnecting && hasCapability;
 	}
 
+	/**
+	 * 指定した数値に対応するネットワークの種類を示す文字列を取得する
+	 * @param networkType
+	 * @return
+	 */
 	public static String getNetworkTypeString(final int networkType) {
 		switch (networkType) {
 		case NETWORK_TYPE_NON:
