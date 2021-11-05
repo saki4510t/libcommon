@@ -874,7 +874,6 @@ public class ConnectivityHelper {
 		@NonNull final Network network,
 		@NonNull final NetworkCapabilities capabilities) {
 
-		@SuppressLint("MissingPermission")
 		@Nullable
 		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:capabilities=" + capabilities);
