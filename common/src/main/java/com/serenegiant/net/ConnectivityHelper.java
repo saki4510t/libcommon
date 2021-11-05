@@ -592,7 +592,6 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @return
 	 */
-	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isWifiNetworkReachable(@NonNull final Context context) {
@@ -642,7 +641,6 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @return
 	 */
-	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isMobileNetworkReachable(@NonNull final Context context) {
@@ -688,7 +686,6 @@ public class ConnectivityHelper {
 	 * @param context
 	 * @return
 	 */
-	@Deprecated
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isNetworkReachable(@NonNull final Context context) {
