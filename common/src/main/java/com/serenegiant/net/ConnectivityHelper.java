@@ -32,6 +32,8 @@ import android.net.NetworkInfo;
 import android.net.NetworkRequest;
 import android.os.Build;
 import android.os.Handler;
+
+import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
@@ -67,7 +69,9 @@ public class ConnectivityHelper {
 		/**
 		 * @param activeNetworkType
 		 */
+		@AnyThread
 		public void onNetworkChanged(final int activeNetworkType, final int prevNetworkType);
+		@AnyThread
 		public void onError(final Throwable t);
 	}
 
@@ -147,7 +151,7 @@ public class ConnectivityHelper {
 			@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 			@Override
 			public void run() {
-				init();
+				initAsync();
 			}
 		});
 	}
@@ -276,6 +280,26 @@ public class ConnectivityHelper {
 		return getActiveNetworkType() == NETWORK_TYPE_BLUETOOTH;
 	}
 
+	/**
+	 * ネットワークの接続状態を確認してコールバックを呼び出す
+	 * @throws IllegalStateException
+	 */
+	public void refresh() throws IllegalStateException {
+		synchronized (mSync) {
+			if (mIsReleased) {
+				throw new IllegalStateException("already released!");
+			}
+			mActiveNetworkType = NETWORK_TYPE_NON;
+			mUIHandler.post(new Runnable() {
+				@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+				@Override
+				public void run() {
+					refreshAsync();
+				}
+			});
+		}
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * Contextを取得
@@ -306,10 +330,13 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ネットワーク接続状態取得用のコールバック等のセットアップ処理
+	 */
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	private void init() {
-		if (DEBUG) Log.v(TAG, "init:");
+	private void initAsync() {
+		if (DEBUG) Log.v(TAG, "initAsync:");
 		final ConnectivityManager manager = requireConnectivityManager();
 		if (BuildCheck.isAPI21()) {
 			// API21以上の場合
@@ -318,13 +345,16 @@ public class ConnectivityHelper {
 			mNetworkCallback = new MyNetworkCallback();
 			// ACCESS_NETWORK_STATEパーミッションが必要
 			if (BuildCheck.isAPI23()) {
-				updateActiveNetwork(manager.getActiveNetwork(), null);	// API>=23
+				// API>=23
+				// ネットワーク接続状態取得用コールバックを登録
 				if (BuildCheck.isAPI24()) {
 					manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
 				} else if (BuildCheck.isAPI26()) {
 					manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
 				}
 			} else {
+				// API>=21, API<23
+				// ネットワーク接続状態取得用コールバックを登録
 				manager.registerNetworkCallback(
 					new NetworkRequest.Builder().build(),
 					mNetworkCallback);	// API>=21
@@ -336,8 +366,40 @@ public class ConnectivityHelper {
 			intentFilter.addAction(ACTION_GLOBAL_CONNECTIVITY_CHANGE);
 			requireContext().registerReceiver(mNetworkChangedReceiver, intentFilter);
 		}
+		// 初期状態をコールバックで通知
+		refreshAsync();
 	}
 
+	/**
+	 * refreshの非同期実行部分
+	 * 現在のアクティブなネットワーク接続を取得してコールバックする
+	 */
+	@SuppressLint("NewApi")
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	private void refreshAsync() {
+		if (DEBUG) Log.v(TAG, "refreshAsync:");
+		final ConnectivityManager manager = requireConnectivityManager();
+
+		if (BuildCheck.isAPI23()) {
+			// API>=23
+			updateActiveNetwork(manager.getActiveNetwork(), null);	// API>=23
+		} else if (BuildCheck.isAPI21()) {
+			// API21以上の場合
+			// API>=21, API<23
+			final Network[] allNetworks = manager.getAllNetworks();			// API>=21
+			for (final Network network: allNetworks) {
+				@Nullable
+				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				if (capabilities != null) {
+					updateActiveNetwork(network, capabilities);
+					return;	// 最初に見つかったのもを使う?
+				}
+			}
+		} else {
+			// API21未満
+			updateActiveNetwork(manager.getActiveNetworkInfo());
+		}
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * ConnectivityCallbackのコールバックメソッド呼び出しのためのヘルパーメソッド
@@ -601,6 +663,7 @@ public class ConnectivityHelper {
 		if (BuildCheck.isAPI21()) {
 			// API21以上の場合
 			if (BuildCheck.isAPI23()) {
+				// API>=23
 				final Network network = manager.getActiveNetwork();	// API>=23
 				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
@@ -608,6 +671,7 @@ public class ConnectivityHelper {
 				return (capabilities != null)
 					&& isWifiNetworkReachable(manager, network, capabilities);
 			} else {
+				// API>=21, API<23
 				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 				for (final Network network: allNetworks) {
 					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
