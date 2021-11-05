@@ -318,7 +318,7 @@ public class ConnectivityHelper {
 			mNetworkCallback = new MyNetworkCallback();
 			// ACCESS_NETWORK_STATEパーミッションが必要
 			if (BuildCheck.isAPI23()) {
-				updateActiveNetwork(manager.getActiveNetwork());	// API>=23
+				updateActiveNetwork(manager.getActiveNetwork(), null);	// API>=23
 				if (BuildCheck.isAPI24()) {
 					manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
 				} else if (BuildCheck.isAPI26()) {
@@ -379,16 +379,21 @@ public class ConnectivityHelper {
 	 * ネットワークの接続状態を更新して必要であればコールバックする
 	 * API>=21での処理用
 	 * @param network
+	 * @param caps
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
-	private void updateActiveNetwork(@Nullable final Network network) {
+	private void updateActiveNetwork(
+		@Nullable final Network network,
+		@Nullable final NetworkCapabilities caps) {
+
 		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
 
 		if (network != null) {
 			final ConnectivityManager manager = requireConnectivityManager();
 			@Nullable
-			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+			final NetworkCapabilities capabilities = caps != null
+				? caps : manager.getNetworkCapabilities(network);	// API>=21
 			int activeNetworkType = NETWORK_TYPE_NON;
 			if (capabilities != null) {
 				if (isWifiNetworkReachable(manager, network, capabilities)) {
@@ -464,7 +469,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG, "onNetworkActive:");
 			if (BuildCheck.isAPI23()) {
 				try {
-					updateActiveNetwork(requireConnectivityManager().getActiveNetwork());	// API>=23
+					updateActiveNetwork(requireConnectivityManager().getActiveNetwork(), null);	// API>=23
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
@@ -491,7 +496,7 @@ public class ConnectivityHelper {
 			super.onAvailable(network);
 			// ネットワークの準備ができた時
 			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
-			updateActiveNetwork(network);
+			updateActiveNetwork(network, null);
 		}
 		
 		@SuppressLint("MissingPermission")
@@ -504,7 +509,7 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG,
 			String.format("onCapabilitiesChanged:Network(%s)", network)
 				+ networkCapabilities);
-			updateActiveNetwork(network);
+			updateActiveNetwork(network, networkCapabilities);
 		}
 		
 		@Override
@@ -531,7 +536,7 @@ public class ConnectivityHelper {
 			super.onLost(network);
 			// 接続を失った時
 			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s)", network));
-			updateActiveNetwork(network);
+			updateActiveNetwork(network, null);
 		}
 		
 		@Override
