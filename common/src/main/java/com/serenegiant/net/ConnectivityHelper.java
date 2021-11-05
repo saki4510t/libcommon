@@ -384,7 +384,6 @@ public class ConnectivityHelper {
 			// API>=23
 			updateActiveNetwork(manager.getActiveNetwork(), null);	// API>=23
 		} else if (BuildCheck.isAPI21()) {
-			// API21以上の場合
 			// API>=21, API<23
 			final Network[] allNetworks = manager.getAllNetworks();			// API>=21
 			for (final Network network: allNetworks) {
@@ -660,33 +659,30 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:");
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
-		if (BuildCheck.isAPI21()) {
-			// API21以上の場合
-			if (BuildCheck.isAPI23()) {
-				// API>=23
-				final Network network = manager.getActiveNetwork();	// API>=23
-				@Nullable
+		if (BuildCheck.isAPI23()) {
+			// API>=23
+			final Network network = manager.getActiveNetwork();	// API>=23
+			@Nullable
+			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+			return (capabilities != null)
+				&& isWifiNetworkReachable(manager, network, capabilities);
+		} else if (BuildCheck.isAPI21()) {
+			// API>=21
+			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+			for (final Network network: allNetworks) {
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				return (capabilities != null)
-					&& isWifiNetworkReachable(manager, network, capabilities);
-			} else {
-				// API>=21, API<23
-				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
-				for (final Network network: allNetworks) {
-					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-					if ((capabilities != null) && (info != null)
-						&& isWifiNetworkReachable(manager, network, capabilities)) {
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+				if ((capabilities != null) && (info != null)
+					&& isWifiNetworkReachable(manager, network, capabilities)) {
 
-						return true;
-					}
+					return true;
 				}
 			}
 		} else {
-			// API21未満の場合
+			// API<21
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 				final int type = activeNetworkInfo.getType();
@@ -711,30 +707,29 @@ public class ConnectivityHelper {
 		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:");
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
-		if (BuildCheck.isAPI21()) {
-			// API21以上の場合
-			if (BuildCheck.isAPI23()) {
-				final Network network = manager.getActiveNetwork();	// API>=23
+		if (BuildCheck.isAPI23()) {
+			// API>=23
+			final Network network = manager.getActiveNetwork();	// API>=23
+			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
+			return (capabilities != null)
+				&& isMobileNetworkReachable(manager, network, capabilities);
+		} else if (BuildCheck.isAPI21()) {
+			// API>=21
+			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+			for (final Network network: allNetworks) {
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				return (capabilities != null)
-					&& isMobileNetworkReachable(manager, network, capabilities);
-			} else {
-				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
-				for (final Network network: allNetworks) {
-					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-					if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-					if ((capabilities != null) && (info != null)
-						&& isMobileNetworkReachable(manager, network, capabilities)) {
+				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
+				if ((capabilities != null) && (info != null)
+					&& isMobileNetworkReachable(manager, network, capabilities)) {
 
-						return true;
-					}
+					return true;
 				}
 			}
 		} else {
-			// API21未満の場合
+			// API<21
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			if ((activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting())) {
 				final int type = activeNetworkInfo.getType();
@@ -757,30 +752,29 @@ public class ConnectivityHelper {
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 
-		if (BuildCheck.isAPI21()) {
-			// API21以上の場合
-			if (BuildCheck.isAPI23()) {
-				final Network network = manager.getActiveNetwork();	// API>=23
+		if (BuildCheck.isAPI23()) {
+			// API>23
+			final Network network = manager.getActiveNetwork();	// API>=23
+			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
+			return (capabilities != null)
+				&& isNetworkReachable(manager, network, capabilities);
+		} if (BuildCheck.isAPI21()) {
+			// API>=21
+			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
+			for (final Network network: allNetworks) {
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				return (capabilities != null)
-					&& isNetworkReachable(manager, network, capabilities);
-			} else {
-				final Network[] allNetworks = manager.getAllNetworks();	// API>=21
-				for (final Network network: allNetworks) {
-					final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-					final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-					if ((capabilities != null) && (info != null)
-						&& isNetworkReachable(manager, network, capabilities)) {
-						return true;
-					}
+				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
+				if ((capabilities != null) && (info != null)
+					&& isNetworkReachable(manager, network, capabilities)) {
+					return true;
 				}
 			}
-			return false;
 		} else {
-			// API21未満の場合
+			// API<21
 			final NetworkInfo activeNetworkInfo = manager.getActiveNetworkInfo();
 			return (activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting());
 		}
+		return false;
 	}
 
 //--------------------------------------------------------------------------------
@@ -884,14 +878,17 @@ public class ConnectivityHelper {
 				|| (state == NetworkInfo.DetailedState.CONNECTING);
 		final boolean hasCapability;
 		if (BuildCheck.isAPI28()) {
+			// API>=28
 			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
 				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)			// API>=23
 				&& (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)	// API>=28
 					|| capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));	// API>=28
 		} else if (BuildCheck.isAPI23()) {
+			// API>=23
 			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
 				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);		// API>=23
 		} else {
+			// API>=21
 			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);// API>=21
 		}
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:isConnectedOrConnecting="
