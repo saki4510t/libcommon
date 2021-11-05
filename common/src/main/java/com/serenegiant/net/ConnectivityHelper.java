@@ -45,6 +45,11 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import java.lang.ref.WeakReference;
 import java.util.Locale;
 
+/**
+ * ネットワークの接続状態変化を取得するためのヘルパークラス
+ * NetworkChangedReceiverの代替(ただし直接の互換性は無い)
+ * ACCESS_NETWORK_STATEパーミッションが必要
+ */
 public class ConnectivityHelper {
 	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
@@ -55,6 +60,9 @@ public class ConnectivityHelper {
 	public static final int NETWORK_TYPE_BLUETOOTH = 1 << 7;
 	public static final int NETWORK_TYPE_ETHERNET = 1 << 9;
 
+	/**
+	 * ネットワークの接続状態変化を通知するためのコールバックリスナー
+	 */
 	public interface ConnectivityCallback {
 		/**
 		 * @param activeNetworkType
@@ -63,18 +71,40 @@ public class ConnectivityHelper {
 		public void onError(final Throwable t);
 	}
 
+	/**
+	 * 排他制御用オブジェクト
+	 */
 	@NonNull
 	private final Object mSync = new Object();
+	/**
+	 * Contextの弱酸賞を保持
+	 */
 	@NonNull
 	private final WeakReference<Context> mWeakContext;
+	/**
+	 * ネットワークの接続状態変化を通知するためのコールバックリスナーインスタンス
+	 */
 	@NonNull
 	private final ConnectivityCallback mCallback;
+	/**
+	 * UI/メインスレッド上で処理を行うためのHandlerインスタンス
+	 */
 	@NonNull
 	private final Handler mUIHandler;
+	/**
+	 * ワーカースレッド上で処理を行うためのHandlerインスタンス
+	 */
 	@NonNull
 	private final Handler mAsyncHandler;
+	/**
+	 * API>=21でシステムのデフォルトのネットワーク接続がアクティブになったときの通知を受け取るためのOnNetworkActiveListenerインスタンス
+	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
+	/**
+	 * API>=21でネットワークの状態変更を受け取るためのNetworkCallbackインスタンス
+	 */
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	private ConnectivityManager.NetworkCallback mNetworkCallback;	// API>=21
@@ -83,10 +113,19 @@ public class ConnectivityHelper {
 	 */
 	@Nullable
 	private BroadcastReceiver mNetworkChangedReceiver;
+	/**
+	 * 現在のアクティブになっているネットワーク接続の種類
+	 */
 	private int mActiveNetworkType = NETWORK_TYPE_NON;
+	/**
+	 * このConnectivityHelperインスタンスが破棄されたかどうか
+	 */
 	private volatile boolean mIsReleased = false;
 
-	/** システムグローバルブロードキャスト用のインテントフィルター文字列 */
+	/**
+	 * システムグローバルブロードキャスト用のインテントフィルター文字列
+	 * API21未満用
+	 */
 	private static final String ACTION_GLOBAL_CONNECTIVITY_CHANGE
 		= "android.net.conn.CONNECTIVITY_CHANGE";
 
@@ -121,7 +160,10 @@ public class ConnectivityHelper {
 			super.finalize();
 		}
 	}
-	
+
+	/**
+	 * 関係するリソース等を破棄する、再利用はできない
+	 */
 	@SuppressLint("NewApi")
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
