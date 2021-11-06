@@ -67,12 +67,7 @@ public final class PermissionCheck {
 		if (context == null) return PackageManager.PERMISSION_DENIED;
 		int result = PackageManager.PERMISSION_DENIED;
 		try {
-			if (BuildCheck.isMarshmallow()) {
-				result = ContextCompat.checkSelfPermission(context, permissionName);
-			} else {
-				final PackageManager pm = context.getPackageManager();
-				result = pm.checkPermission(permissionName, context.getPackageName());
-			}
+			result = ContextCompat.checkSelfPermission(context, permissionName);
 		} catch (final Exception e) {
 			Log.w("", e);
 		}
@@ -90,20 +85,7 @@ public final class PermissionCheck {
     	if (context == null) return false;
 		boolean result = false;
 		try {
-			final int check;
-			if (BuildCheck.isMarshmallow()) {
-				check = ContextCompat.checkSelfPermission(context, permissionName);
-			} else {
-				final PackageManager pm = context.getPackageManager();
-				check = pm.checkPermission(permissionName, context.getPackageName());
-			}
-			switch (check) {
-			case PackageManager.PERMISSION_DENIED:
-				break;
-			case PackageManager.PERMISSION_GRANTED:
-				result = true;
-				break;
-			}
+			result = ContextCompat.checkSelfPermission(context, permissionName) == PackageManager.PERMISSION_GRANTED;
 		} catch (final Exception e) {
 			Log.w("", e);
 		}
