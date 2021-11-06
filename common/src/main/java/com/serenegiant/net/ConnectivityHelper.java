@@ -43,6 +43,7 @@ import android.util.Log;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.Locale;
@@ -175,8 +176,10 @@ public class ConnectivityHelper {
 		updateActiveNetwork(NETWORK_TYPE_NON);
 		final Context context = mWeakContext.get();
 		if (context != null) {
+			mWeakContext.clear();
 			if (BuildCheck.isAPI21()) {
-				final ConnectivityManager manager = requireConnectivityManager();
+				final ConnectivityManager manager
+					= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 				if (mOnNetworkActiveListener != null) {
 					try {
 						manager
@@ -343,15 +346,11 @@ public class ConnectivityHelper {
 			mOnNetworkActiveListener = new MyOnNetworkActiveListener();
 			manager.addDefaultNetworkActiveListener(mOnNetworkActiveListener);	// API>=21
 			mNetworkCallback = new MyNetworkCallback();
-			// ACCESS_NETWORK_STATEパーミッションが必要
-			if (BuildCheck.isAPI23()) {
-				// API>=23
-				// ネットワーク接続状態取得用コールバックを登録
-				if (BuildCheck.isAPI24()) {
-					manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
-				} else if (BuildCheck.isAPI26()) {
-					manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
-				}
+			// ネットワーク接続状態取得用コールバックを登録
+			if (BuildCheck.isAPI26()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback, mAsyncHandler); // API>=26
+			} else if (BuildCheck.isAPI24()) {
+				manager.registerDefaultNetworkCallback(mNetworkCallback);	// API>=24
 			} else {
 				// API>=21, API<23
 				// ネットワーク接続状態取得用コールバックを登録
@@ -382,18 +381,23 @@ public class ConnectivityHelper {
 
 		if (BuildCheck.isAPI23()) {
 			// API>=23
-			updateActiveNetwork(manager.getActiveNetwork(), null);	// API>=23
+			final Network network = manager.getActiveNetwork();
+			updateActiveNetwork(network, null, null);	// API>=23
 		} else if (BuildCheck.isAPI21()) {
 			// API>=21, API<23
+			@NonNull
 			final Network[] allNetworks = manager.getAllNetworks();			// API>=21
 			for (final Network network: allNetworks) {
 				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				if (capabilities != null) {
-					updateActiveNetwork(network, capabilities);
-					return;	// 最初に見つかったのもを使う?
+				final LinkProperties linkProperties = manager.getLinkProperties(network);	// API>=21
+				if ((capabilities != null) && (linkProperties != null)) {
+					manager.getLinkProperties(network);
+					updateActiveNetwork(network, capabilities, linkProperties);
+					return;	// 最初に見つかったものを使う?
 				}
 			}
+			updateActiveNetwork(NETWORK_TYPE_NON);
 		} else {
 			// API21未満
 			updateActiveNetwork(manager.getActiveNetworkInfo());
@@ -409,13 +413,15 @@ public class ConnectivityHelper {
 		final int activeNetworkType, final int prevNetworkType) {
 
 		synchronized (mSync) {
-			mAsyncHandler.post(() -> {
-				try {
-					mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
-				} catch (final Exception e) {
-					callOnError(e);
-				}
-			});
+			if (!HandlerUtils.isTerminated(mAsyncHandler)) {
+				mAsyncHandler.post(() -> {
+					try {
+						mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
+					} catch (final Exception e) {
+						callOnError(e);
+					}
+				});
+			} else if (DEBUG) Log.w(TAG, "callOnNetworkChanged:mAsyncHandler already terminated,");
 		}
 	}
 
@@ -425,13 +431,15 @@ public class ConnectivityHelper {
 	 */
 	private void callOnError(final Throwable t) {
 		synchronized (mSync) {
-			mAsyncHandler.post(() -> {
-				try {
-					mCallback.onError(t);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-			});
+			if (!HandlerUtils.isTerminated(mAsyncHandler)) {
+				mAsyncHandler.post(() -> {
+					try {
+						mCallback.onError(t);
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
+				});
+			} else if (DEBUG) Log.w(TAG, "callOnNetworkChanged:mAsyncHandler already terminated,");
 		}
 	}
 
@@ -446,7 +454,8 @@ public class ConnectivityHelper {
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private void updateActiveNetwork(
 		@Nullable final Network network,
-		@Nullable final NetworkCapabilities caps) {
+		@Nullable final NetworkCapabilities caps,
+		@Nullable final LinkProperties props) {
 
 		if (DEBUG) Log.v(TAG, "updateActiveNetwork:" + network);
 
@@ -455,15 +464,18 @@ public class ConnectivityHelper {
 			@Nullable
 			final NetworkCapabilities capabilities = caps != null
 				? caps : manager.getNetworkCapabilities(network);	// API>=21
+			@Nullable
+			final LinkProperties properties = props != null
+				? props : manager.getLinkProperties(network);	// API>=21
 			int activeNetworkType = NETWORK_TYPE_NON;
-			if (capabilities != null) {
-				if (isWifiNetworkReachable(manager, network, capabilities)) {
+			if ((capabilities != null) && (properties != null)) {
+				if (isWifiNetworkReachable(manager, network, capabilities, properties)) {
 					activeNetworkType = NETWORK_TYPE_WIFI;
-				} else if (isMobileNetworkReachable(manager, network, capabilities)) {
+				} else if (isMobileNetworkReachable(manager, network, capabilities, properties)) {
 					activeNetworkType = NETWORK_TYPE_MOBILE;
-				} else if (isBluetoothNetworkReachable(manager, network, capabilities)) {
+				} else if (isBluetoothNetworkReachable(manager, network, capabilities, properties)) {
 					activeNetworkType = NETWORK_TYPE_BLUETOOTH;
-				} else if (isNetworkReachable(manager, network, capabilities)) {
+				} else if (isNetworkReachable(manager, network, capabilities, properties)) {
 					activeNetworkType = NETWORK_TYPE_ETHERNET;
 				}
 			}
@@ -500,7 +512,7 @@ public class ConnectivityHelper {
 	}
 
 	/**
-	 * ネットワークの接続状態を更新して必要であればコールバックする
+	 * ネットワークの接続状態を更新して変更があればコールバックする
 	 * @param activeNetworkType
 	 */
 	private void updateActiveNetwork(final int activeNetworkType) {
@@ -528,15 +540,15 @@ public class ConnectivityHelper {
 		@Override
 		public void onNetworkActive() {
 			if (DEBUG) Log.v(TAG, "onNetworkActive:");
-			if (BuildCheck.isAPI23()) {
-				try {
-					updateActiveNetwork(requireConnectivityManager().getActiveNetwork(), null);	// API>=23
-				} catch (final Exception e) {
-					Log.w(TAG, e);
+			try {
+				if (BuildCheck.isAPI23()) {
+					updateActiveNetwork(requireConnectivityManager().getActiveNetwork(), null, null);	// API>=23
+				} else {
+					// API>=21, API<23の処理
+					updateActiveNetwork(requireConnectivityManager().getActiveNetworkInfo());	// API>=21
 				}
-			} else {
-				// API>=21, API<23の処理
-				updateActiveNetwork(requireConnectivityManager().getActiveNetworkInfo());	// API>=21
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
 		}
 	}
@@ -557,7 +569,7 @@ public class ConnectivityHelper {
 			super.onAvailable(network);
 			// ネットワークの準備ができた時
 			if (DEBUG) Log.v(TAG, String.format("onAvailable:Network(%s)", network));
-			updateActiveNetwork(network, null);
+			updateActiveNetwork(network, null, null);
 		}
 		
 		@SuppressLint("MissingPermission")
@@ -570,9 +582,10 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG,
 			String.format("onCapabilitiesChanged:Network(%s)", network)
 				+ networkCapabilities);
-			updateActiveNetwork(network, networkCapabilities);
+			updateActiveNetwork(network, networkCapabilities, null);
 		}
 		
+		@SuppressLint("MissingPermission")
 		@Override
 		public void onLinkPropertiesChanged(@NonNull final Network network,
 			@NonNull final LinkProperties linkProperties) {
@@ -582,13 +595,16 @@ public class ConnectivityHelper {
 			if (DEBUG) Log.v(TAG,
 				String.format("onLinkPropertiesChanged:Network(%s),", network)
 				+ linkProperties);
+			updateActiveNetwork(network, null, linkProperties);
 		}
 
+		@SuppressLint("MissingPermission")
 		@Override
 		public void onLosing(@NonNull final Network network, final int maxMsToLive) {
 			super.onLosing(network, maxMsToLive);
 			// 接続を失いそうな時
 			if (DEBUG) Log.v(TAG, String.format("onLosing:Network(%s)", network));
+			updateActiveNetwork(network, null, null);
 		}
 		
 		@SuppressLint("MissingPermission")
@@ -597,7 +613,7 @@ public class ConnectivityHelper {
 			super.onLost(network);
 			// 接続を失った時
 			if (DEBUG) Log.v(TAG, String.format("onLost:Network(%s)", network));
-			updateActiveNetwork(network, null);
+			updateActiveNetwork(network, null, null);
 		}
 		
 		@Override
@@ -656,27 +672,30 @@ public class ConnectivityHelper {
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isWifiNetworkReachable(@NonNull final Context context) {
-		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:");
+//		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:");
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 		if (BuildCheck.isAPI23()) {
 			// API>=23
+			@Nullable
 			final Network network = manager.getActiveNetwork();	// API>=23
 			@Nullable
 			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-			return (capabilities != null)
-				&& isWifiNetworkReachable(manager, network, capabilities);
+			@Nullable
+			final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+			return (capabilities != null) && (properties != null)
+				&& isWifiNetworkReachable(manager, network, capabilities, properties);
 		} else if (BuildCheck.isAPI21()) {
 			// API>=21
+			@NonNull
 			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 			for (final Network network: allNetworks) {
+				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				if ((capabilities != null) && (info != null)
-					&& isWifiNetworkReachable(manager, network, capabilities)) {
+				@Nullable
+				final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+				if ((capabilities != null) && (properties != null)
+					&& isWifiNetworkReachable(manager, network, capabilities, properties)) {
 
 					return true;
 				}
@@ -704,26 +723,30 @@ public class ConnectivityHelper {
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isMobileNetworkReachable(@NonNull final Context context) {
-		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:");
+//		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:");
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 		if (BuildCheck.isAPI23()) {
 			// API>=23
+			@Nullable
 			final Network network = manager.getActiveNetwork();	// API>=23
+			@Nullable
 			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-			return (capabilities != null)
-				&& isMobileNetworkReachable(manager, network, capabilities);
+			@Nullable
+			final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+			return (capabilities != null) && (properties != null)
+				&& isMobileNetworkReachable(manager, network, capabilities, properties);
 		} else if (BuildCheck.isAPI21()) {
 			// API>=21
+			@NonNull
 			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 			for (final Network network: allNetworks) {
+				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:capabilities=" + capabilities);
-				if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:info=" + info);
-				if ((capabilities != null) && (info != null)
-					&& isMobileNetworkReachable(manager, network, capabilities)) {
+				@Nullable
+				final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+				if ((capabilities != null) && (properties != null)
+					&& isMobileNetworkReachable(manager, network, capabilities, properties)) {
 
 					return true;
 				}
@@ -748,24 +771,31 @@ public class ConnectivityHelper {
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
 	public static boolean isNetworkReachable(@NonNull final Context context) {
-		if (DEBUG) Log.v(TAG, "isNetworkReachable:");
+//		if (DEBUG) Log.v(TAG, "isNetworkReachable:");
 		final ConnectivityManager manager
 			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
 
 		if (BuildCheck.isAPI23()) {
 			// API>23
+			@Nullable
 			final Network network = manager.getActiveNetwork();	// API>=23
+			@Nullable
 			final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-			return (capabilities != null)
-				&& isNetworkReachable(manager, network, capabilities);
+			@Nullable
+			final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+			return (capabilities != null) && (properties != null)
+				&& isNetworkReachable(manager, network, capabilities, properties);
 		} if (BuildCheck.isAPI21()) {
 			// API>=21
+			@NonNull
 			final Network[] allNetworks = manager.getAllNetworks();	// API>=21
 			for (final Network network: allNetworks) {
+				@Nullable
 				final NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);	// API>=21
-				final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
-				if ((capabilities != null) && (info != null)
-					&& isNetworkReachable(manager, network, capabilities)) {
+				@Nullable
+				final LinkProperties properties = manager.getLinkProperties(network);	// API>=21
+				if ((capabilities != null) && (properties != null)
+					&& isNetworkReachable(manager, network, capabilities, properties)) {
 					return true;
 				}
 			}
@@ -792,7 +822,8 @@ public class ConnectivityHelper {
 	private static boolean isWifiNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
-		@NonNull final NetworkCapabilities capabilities) {
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final LinkProperties linkProperties) {
 
 		final boolean isWiFi;
 		if (BuildCheck.isAPI26()) {
@@ -803,7 +834,7 @@ public class ConnectivityHelper {
 			isWiFi = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)		// API>=21
 				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET);	// API>=21
 		}
-		return isWiFi && isNetworkReachable(manager, network, capabilities);
+		return isWiFi && isNetworkReachable(manager, network, capabilities, linkProperties);
 	}
 
 	/**
@@ -820,16 +851,17 @@ public class ConnectivityHelper {
 	private static boolean isMobileNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
-		@NonNull final NetworkCapabilities capabilities) {
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final LinkProperties linkProperties) {
 
 		final boolean isMobile;
 		if (BuildCheck.isAPI27()) {
 			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)// API>=21
-				|| capabilities.hasTransport(NetworkCapabilities.	TRANSPORT_LOWPAN);	// API>=27
+				|| capabilities.hasTransport(NetworkCapabilities.TRANSPORT_LOWPAN);	// API>=27
 		} else {
 			isMobile = capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR);// API>=21
 		}
-		return isMobile && isNetworkReachable(manager, network, capabilities);
+		return isMobile && isNetworkReachable(manager, network, capabilities, linkProperties);
 	}
 
 	/**
@@ -845,11 +877,12 @@ public class ConnectivityHelper {
 	private static boolean isBluetoothNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
-		@NonNull final NetworkCapabilities capabilities) {
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final LinkProperties linkProperties) {
 
 		return
 			capabilities.hasTransport(NetworkCapabilities.TRANSPORT_BLUETOOTH)// API>=21
-				&& isNetworkReachable(manager, network, capabilities);
+				&& isNetworkReachable(manager, network, capabilities, linkProperties);
 	}
 
 	/**
@@ -866,36 +899,50 @@ public class ConnectivityHelper {
 	private static boolean isNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
-		@NonNull final NetworkCapabilities capabilities) {
+		@NonNull final NetworkCapabilities capabilities,
+		@NonNull final LinkProperties linkProperties) {
 
-		@Nullable
-		final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:capabilities=" + capabilities);
-		if (DEBUG) Log.v(TAG, "isNetworkReachable:info=" + info);
-		final NetworkInfo.DetailedState state = info != null ? info.getDetailedState() : NetworkInfo.DetailedState.FAILED;
-		final boolean isConnectedOrConnecting
-			= (state == NetworkInfo.DetailedState.CONNECTED)
-				|| (state == NetworkInfo.DetailedState.CONNECTING);
+		if (DEBUG) Log.v(TAG, "isNetworkReachable:linkProperties=" + linkProperties);
+		boolean hasLinkAddress = !linkProperties.getLinkAddresses().isEmpty();
 		final boolean hasCapability;
-		if (BuildCheck.isAPI28()) {
-			// API>=28
-			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
+		if (BuildCheck.isAPI29()) {
+			hasCapability = hasLinkAddress
+				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)			// API>=21
 				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)			// API>=23
 				&& (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)	// API>=28
 					|| capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));	// API>=28
-		} else if (BuildCheck.isAPI23()) {
-			// API>=23
-			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)	// API>=21
-				&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);		// API>=23
 		} else {
 			// API>=21
-			hasCapability = capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);// API>=21
+			@Nullable
+			final NetworkInfo info = manager.getNetworkInfo(network);	// API>=21, API<29
+			if (DEBUG) Log.v(TAG, "isNetworkReachable:info=" + info);
+			hasLinkAddress = hasLinkAddress && info.isConnectedOrConnecting();
+			if (BuildCheck.isAPI28()) {
+				// API>=28
+				hasCapability = hasLinkAddress
+					&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)			// API>=21
+					&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED)			// API>=23
+					&& (capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)	// API>=28
+						|| capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));	// API>=28
+			} else if (BuildCheck.isAPI23()) {
+				// API>=23
+				hasCapability = hasLinkAddress
+					&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)			// API>=21
+					&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED);		// API>=23
+			} else {
+				// API>=21
+				hasCapability = hasLinkAddress
+					&& capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);			// API>=21
+			}
 		}
-		if (DEBUG) Log.v(TAG, "isNetworkReachable:isConnectedOrConnecting="
-			+ isConnectedOrConnecting + ",hasCapability=" + hasCapability
-			+ ",NOT_SUSPENDED=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
-			+ ",FOREGROUND=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));
-		return isConnectedOrConnecting && hasCapability;
+		if (DEBUG) {
+			Log.v(TAG, "isNetworkReachable:hasCapability=" + hasCapability
+				+ ",hasLinkAddress=" + hasLinkAddress
+				+ ",NOT_SUSPENDED=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_SUSPENDED)
+				+ ",FOREGROUND=" + capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_FOREGROUND));
+		}
+		return hasCapability;
 	}
 
 	/**
