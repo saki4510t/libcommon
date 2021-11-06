@@ -120,13 +120,22 @@ public final class PermissionCheck {
     }
 
     /**
-     * ネットワークへのアクセスパーミッションがあるかどうかを確認
+     * ネットワークへのアクセスパーミッション(INTERNET)があるかどうかを確認
      * @param context
      * @return ネットワークへのアクセスパーミッションがあればtrue
      */
     public static boolean hasNetwork(@Nullable final Context context) {
     	return hasPermission(context, permission.INTERNET);
     }
+
+	/**
+	 * ネットワーク接続状態へのアクセスパーミッション(ACCESS_NETWORK_STATE)があるかどうかを確認
+	 * @param context
+	 * @return ネットワーク接続状態へのアクセスパーミッションがあればtrue
+	 */
+	public static boolean hasNetworkState(@Nullable final Context context) {
+		return hasPermission(context, permission.ACCESS_NETWORK_STATE);
+	}
 
     /**
      * 外部ストレージへの書き込みパーミッションがあるかどうかを確認
