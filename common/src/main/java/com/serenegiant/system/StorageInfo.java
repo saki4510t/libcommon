@@ -19,15 +19,26 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import androidx.annotation.NonNull;
 
-public class StorageInfo {
+/**
+ * StorageUtilsで取得するストレージ情報のホルダークラス
+ */
+public class StorageInfo implements Parcelable {
 	public long totalBytes;
 	public long freeBytes;
 	
 	public StorageInfo(final long total, final long free) {
 		totalBytes = total;
 		freeBytes = free;
+	}
+
+	protected StorageInfo(@NonNull final Parcel in) {
+		totalBytes = in.readLong();
+		freeBytes = in.readLong();
 	}
 
 	@NonNull
@@ -38,4 +49,27 @@ public class StorageInfo {
 			", freeBytes=" + freeBytes +
 			'}';
 	}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeLong(totalBytes);
+		dest.writeLong(freeBytes);
+	}
+
+	public static final Creator<StorageInfo> CREATOR = new Creator<StorageInfo>() {
+		@Override
+		public StorageInfo createFromParcel(@NonNull final Parcel in) {
+			return new StorageInfo(in);
+		}
+
+		@Override
+		public StorageInfo[] newArray(final int size) {
+			return new StorageInfo[size];
+		}
+	};
 }
