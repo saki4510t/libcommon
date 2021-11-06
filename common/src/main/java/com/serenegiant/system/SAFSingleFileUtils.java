@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -9,8 +9,6 @@ import android.os.Build;
 import android.provider.DocumentsContract;
 import android.text.TextUtils;
 
-import com.serenegiant.system.BuildCheck;
-
 import java.io.FileNotFoundException;
 
 import androidx.annotation.NonNull;
@@ -20,9 +18,7 @@ import androidx.fragment.app.FragmentActivity;
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
  * KITKAT以降で個別のファイル毎にパーミッション要求する場合をSAFUtilsより分離
- * systemパッケージ下のSAFSingleFileUtilsを使うこと
  */
-@Deprecated
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class SAFSingleFileUtils {
 
