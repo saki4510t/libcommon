@@ -594,8 +594,8 @@ public class MediaStoreCursorRecyclerAdapter
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
-		private TextView mTitleView;
-		private ImageView mImageView;
+		private final TextView mTitleView;
+		private final ImageView mImageView;
 		@NonNull
 		private final MediaInfo info = new MediaInfo();
 
