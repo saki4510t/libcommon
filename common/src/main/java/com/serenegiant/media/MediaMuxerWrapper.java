@@ -113,6 +113,15 @@ public class MediaMuxerWrapper implements IMuxer {
 		mOutputPath = output.getOutputPath();
 	}
 
+	@Override
+	protected void finalize() throws Throwable {
+		try {
+			release();
+		} finally {
+			super.finalize();
+		}
+	}
+
 	@Nullable
 	public String getOutputPath() {
 		return mOutputPath;
