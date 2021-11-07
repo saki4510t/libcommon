@@ -15,6 +15,7 @@ import java.io.OutputStream;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * MediaStoreへ保存するためのOutputStream実装
@@ -86,6 +87,22 @@ public class MediaStoreOutputStream extends OutputStream {
 
 		mCr = context.getContentResolver();
 		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, dataPath);
+		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
+		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
+		mOutputPath = UriHelper.getPath(context, mUri);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param output
+	 * @throws FileNotFoundException
+	 */
+	public MediaStoreOutputStream(@NonNull final Context context,
+		@NonNull DocumentFile output) throws FileNotFoundException {
+
+		mCr = context.getContentResolver();
+		mUri = output.getUri();
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
 		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
 		mOutputPath = UriHelper.getPath(context, mUri);
