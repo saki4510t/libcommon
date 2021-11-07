@@ -247,12 +247,13 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 * @return
 	 */
 	protected fun hasPermission(): Boolean {
+		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
 		val activity: Activity? = activity
 		return if ((activity == null) || activity.isFinishing) {
 			false
 		} else (!BuildCheck.isAPI21()
 			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)
-			|| PermissionCheck.hasWriteExternalStorage(activity))
+			|| (BuildCheck.isAPI28() || PermissionCheck.hasWriteExternalStorage(activity)))
 			&& PermissionCheck.hasAudio(activity)
 			&& PermissionCheck.hasCamera(activity)
 	}

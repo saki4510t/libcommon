@@ -56,7 +56,7 @@ class TitleFragment: BaseFragment() {
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		if (arguments != null) {
-			mColumnCount = arguments!!.getInt(ARG_COLUMN_COUNT)
+			mColumnCount = requireArguments().getInt(ARG_COLUMN_COUNT)
 		}
 	}
 

@@ -401,19 +401,18 @@ public class RecordingService extends BaseService {
 
 	/**
 	 * 録画開始
-	 * @param outputDir 出力ディレクトリ
-	 * @param name 出力ファイル名(拡張子なし)
+	 * @param output 出力ファイル
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
-	void start(@NonNull final DocumentFile outputDir, @NonNull final String name)
+	void start(@NonNull final DocumentFile output)
 		throws IllegalStateException, IOException {
 
 		if (DEBUG) Log.v(TAG, "start:");
 		synchronized (mSync) {
 			if ((!mUseVideo || (mVideoFormat != null)) && (!mUseAudio || (mAudioFormat != null))) {
 				if (checkFreeSpace(this, Const.REQUEST_ACCESS_SD)) {
-					internalStart(outputDir, name, mVideoFormat, mAudioFormat);
+					internalStart(output, mVideoFormat, mAudioFormat);
 				} else {
 					throw new IOException();
 				}
@@ -828,28 +827,30 @@ public class RecordingService extends BaseService {
 
 	/**
 	 * #startの実態, mSyncをロックして呼ばれる
-	 * @param outputDir 出力ディレクトリ
-	 * @param name 出力ファイル名(拡張子なし)
+	 * @param output 出力ファイル
 	 * @param videoFormat
 	 * @param audioFormat
 	 * @throws IOException
 	 */
 	@SuppressLint("NewApi")
 	protected void internalStart(
-		@NonNull final DocumentFile outputDir,
-		@NonNull final String name,
+		@NonNull final DocumentFile output,
 		@Nullable final MediaFormat videoFormat,
 		@Nullable final MediaFormat audioFormat) throws IOException {
 
 		if (DEBUG) Log.v(TAG, "internalStart:");
-		final DocumentFile output = outputDir.createFile("*/*", name + ".mp4");
 		IMuxer muxer = null;
-		if (BuildCheck.isOreo()) {
+		if (BuildCheck.isAPI29()) {
+			// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使って出力終了時にIS_PENDINGの更新を自動でする
+			if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
+			muxer = new MediaMuxerWrapper(
+				new MediaStoreOutputStream(this, output),
+				MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+		} else if (BuildCheck.isAPI26()) {
 			if (USE_MEDIASTORE_OUTPUT_STREAM) {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
 				muxer = new MediaMuxerWrapper(
-//					new MediaStoreOutputStream(this, "*/mp4", null, output.getName(), UriHelper.getPath(this, output.getUri())),
-					new MediaStoreOutputStream(this, "video/mp4", Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR, output.getName()),
+					new MediaStoreOutputStream(this, output),
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
 				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
@@ -866,7 +867,7 @@ public class RecordingService extends BaseService {
 				muxer = new MediaMuxerWrapper(path,
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
-				Log.w(TAG, "cant't write to the file, try to use VideoMuxer instead");
+				Log.w(TAG, "can't write to the file," + output);
 			}
 		}
 		if (muxer == null) {
@@ -969,8 +970,9 @@ public class RecordingService extends BaseService {
 	 * @return
 	 */
 	protected boolean checkFreeSpace(final Context context, final int accessId) {
-		return FileUtils.checkFreeSpace(context,
-			requireConfig().maxDuration(), System.currentTimeMillis(), accessId);
+		return BuildCheck.isAPI29()	// API29以降は対象範囲別ストレージなので容量のチェックができない
+			|| FileUtils.checkFreeSpace(context,
+				requireConfig().maxDuration(), System.currentTimeMillis(), accessId);
 	}
 
 	/**

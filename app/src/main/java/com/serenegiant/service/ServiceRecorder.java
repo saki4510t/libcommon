@@ -208,19 +208,18 @@ public class ServiceRecorder {
 
 	/**
 	 * 録画開始
-	 * @param outputDir 出力ディレクトリ
-	 * @param name 出力ファイル名(拡張子なし)
+	 * @param output 出力ファイル
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
-	public void start(@NonNull final DocumentFile outputDir, @NonNull final String name)
+	public void start(@NonNull final DocumentFile output)
 		throws IllegalStateException, IOException {
 
-		if (DEBUG) Log.v(TAG, "start:outputDir=" + outputDir);
+		if (DEBUG) Log.v(TAG, "start:output=" + output);
 		checkReleased();
 		final RecordingService service = getService();
 		if (service != null) {
-			service.start(outputDir, name);
+			service.start(output);
 		} else {
 			throw new IllegalStateException("start:service is not ready");
 		}

@@ -18,15 +18,19 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
+import android.content.Context
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
+import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.media.MediaFileUtils
+import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.service.ServiceRecorder
+import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 import java.io.IOException
@@ -105,11 +109,23 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		override fun onReady() {
 			if (DEBUG) Log.v(TAG, "onReady:")
 			if (mRecorder != null) {
+				val context: Context = requireContext()
 				try {
-					val dir = MediaFileUtils.getRecordingRoot(
-						requireContext(), Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
-					if (dir != null) {
-						mRecorder!!.start(dir, FileUtils.getDateTimeString())
+					val output: DocumentFile?
+					= if (BuildCheck.isAPI29()) {
+						// API29以降は対象範囲別ストレージ
+						DocumentFile.fromSingleUri(context,
+							MediaStoreUtils.getContentUri(
+								context, "video/mp4",
+								null,
+								FileUtils.getDateTimeString() + ".mp4", null))
+					} else {
+						val dir = MediaFileUtils.getRecordingRoot(
+							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
+						dir!!.createFile("*/*", FileUtils.getDateTimeString() + ".mp4")
+					}
+					if (output != null) {
+						mRecorder!!.start(output)
 					} else {
 						throw IOException()
 					}

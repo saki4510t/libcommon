@@ -360,7 +360,8 @@ class MainActivity
 	 * @return true already have permission to access external storage
 	 */
 	protected fun checkPermissionWriteExternalStorage(): Boolean {
-		if (!PermissionCheck.hasWriteExternalStorage(this)) {
+		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
+		if (!BuildCheck.isAPI29() && !PermissionCheck.hasWriteExternalStorage(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE,
 				R.string.permission_title,
