@@ -37,6 +37,7 @@ import com.serenegiant.widget.RecyclerViewWithEmptyView
  * 端末内の静止画・動画一覧を表示するためのFragment
  * RecyclerViewを使用
  * FIXME レイアウトの設定がいまいちで表示がきれくない(´・ω・｀)
+ * XXX サムネイルを取得できない壊れたファイル等があっても正常に動作するが対象ファイル数が多いと表示されるまでに時間がかかる
  */
 class GalleyFragment3 : BaseFragment() {
 
