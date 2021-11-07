@@ -141,6 +141,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 *                     an <code>IOException</code> may be thrown if the
 	 *                     output stream has been closed.
 	 */
+	@Override
 	public void write(final int b) throws IOException {
 		mOutputStream.write(b);
 	}
@@ -155,6 +156,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @throws IOException if an I/O error occurs.
 	 * @see java.io.OutputStream#write(byte[], int, int)
 	 */
+	@Override
 	public void write(@NonNull byte[] b) throws IOException {
 		mOutputStream.write(b, 0, b.length);
 	}
@@ -187,6 +189,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 *                     an <code>IOException</code> is thrown if the output
 	 *                     stream is closed.
 	 */
+	@Override
 	public void write(@NonNull final byte[] b, final int off, final int len)
 		throws IOException {
 
@@ -214,6 +217,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 *
 	 * @throws IOException if an I/O error occurs.
 	 */
+	@Override
 	public void flush() throws IOException {
 		mOutputStream.flush();
 	}
@@ -231,6 +235,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 *
 	 * @throws IOException if an I/O error occurs.
 	 */
+	@Override
 	public void close() throws IOException {
 		synchronized (closeLock) {
 			if (closed) {
