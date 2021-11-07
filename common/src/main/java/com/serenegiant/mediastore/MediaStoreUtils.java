@@ -154,11 +154,12 @@ public class MediaStoreUtils {
 	/**
 	 * 静止画・動画等をMediaStoreへ登録してアクセスするためのUriを返す
 	 * ContentResolver.openFileDescriptorを使ってアクセスする
-	 * Android10以降の場合は
+	 * Android10以降の場合はIS_PENDING=1をセットするので後で#updateContentUri呼び出しが必要
 	 * @param context
 	 * @param mimeType
 	 * @param relativePath
 	 * @param nameWithExt
+	 * @param dataPath
 	 * @return
 	 * @throws FileNotFoundException
 	 */
@@ -176,11 +177,12 @@ public class MediaStoreUtils {
 	/**
 	 * 静止画・動画等をMediaStoreへ登録してアクセスするためのUriを返す
 	 * ContentResolver.openFileDescriptorを使ってアクセスする
-	 * Android10以降の場合は
+	 * Android10以降の場合はIS_PENDING=1をセットするので後で#updateContentUri呼び出しが必要
 	 * @param cr
 	 * @param mimeType
 	 * @param relativePath
 	 * @param nameWithExt
+	 * @param dataPath
 	 * @return
 	 * @throws FileNotFoundException
 	 */
@@ -263,7 +265,7 @@ public class MediaStoreUtils {
 		if (DEBUG) Log.v(TAG, "getContentUri:cv=" + cv);
 		if (DEBUG) Log.v(TAG, "getContentUri:queryUri=" + queryUri);
 
-		final Uri result = cr.insert(queryUri, cv);
+		final Uri result = cr.insert(queryUri, cv);	// これはIllegalArgumentExceptionを投げることがある
 		if (DEBUG) {
 			Log.v(TAG, "getContentUri:result=" + result);
 			final Cursor cursor = cr.query(result, null, null, null, null);
