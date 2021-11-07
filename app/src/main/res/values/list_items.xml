@@ -15,9 +15,9 @@
 	<string name="title_texture_view_camera" translatable="false">TextureViewCamera</string>
 	<string name="title_simple_gl_camera" translatable="false">SimpleCameraGL</string>
 	<string name="title_camera_surface" translatable="false">CameraSurface</string>
-	<string name="title_galley" translatable="false">Galley</string>
-	<string name="title_galley_recycler_cursor" translatable="false">Galley(RecyclerView,Cursor)</string>
-	<string name="title_galley_recycler" translatable="false">Galley(RecyclerView)</string>
+	<string name="title_galley" translatable="false">Galley(MediaStoreAdapter)</string>
+	<string name="title_galley_recycler_cursor" translatable="false">Galley(MediaStoreCursorRecyclerAdapter)</string>
+	<string name="title_galley_recycler" translatable="false">Galley(MediaStoreRecyclerAdapter)</string>
 	<string name="title_number_keyboard" translatable="false">NumberKeyboard</string>
 	<string name="title_view_slider" translatable="false">ViewSlider</string>
 	<string name="title_progress_view" translatable="false">ProgressView</string>
