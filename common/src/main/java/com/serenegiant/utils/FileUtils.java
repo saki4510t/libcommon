@@ -340,4 +340,34 @@ public class FileUtils {
 		}
 		return "";
 	}
+
+	/**
+	 * 指定したディレクトリ・ファイルを再帰的に削除する
+	 * @param path
+	 */
+	public static void deleteAll(@NonNull final File path) throws IOException {
+		if (path.isDirectory()) {
+			// pathがディレクトリの時...再帰的に削除する
+			@Nullable
+			final File[] files = path.listFiles();
+			if (files == null) {
+				// ここには来ないはずだけど
+				throw new IllegalArgumentException("not a directory:" + path);
+			} else if (files.length > 0) {
+				for (final File file : files) {
+					// 再帰的に削除する
+					deleteAll(file);
+				}
+			}
+			if (!path.delete()) {
+				throw new IOException("failed to delete directory:" + path);
+			}
+		} else {
+			// pathがファイルの時
+			if (!path.delete()) {
+				throw new IOException("failed to delete file:" + path);
+			}
+		}
+	}
+
 }
