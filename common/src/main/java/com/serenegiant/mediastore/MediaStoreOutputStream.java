@@ -41,6 +41,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @param nameWithExt
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	public MediaStoreOutputStream(@NonNull final Context context,
 		@Nullable final String mimeType,
 		@NonNull final String nameWithExt)
@@ -56,6 +57,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @param nameWithExt
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	public MediaStoreOutputStream(@NonNull final Context context,
 		@Nullable final String mimeType,
 		@Nullable final String relativePath,
@@ -78,6 +80,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @param dataPath
 	 * @throws FileNotFoundException
 	 */
+	@Deprecated
 	public MediaStoreOutputStream(@NonNull final Context context,
 		@Nullable final String mimeType,
 		@Nullable final String relativePath,
