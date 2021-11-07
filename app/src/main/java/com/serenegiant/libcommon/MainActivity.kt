@@ -239,19 +239,19 @@ class MainActivity
 				fragment = CameraSurfaceFragment()
 			}
 			15 -> {	// Galley
-				if (!checkPermissionWriteExternalStorage()) {
+				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
 			16 -> {	// Galley(RecyclerView,Cursor)
-				if (!checkPermissionWriteExternalStorage()) {
+				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
 			17 -> {	// Galley(RecyclerView)
-				if (!checkPermissionWriteExternalStorage()) {
+				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment3()
@@ -365,8 +365,28 @@ class MainActivity
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE,
 				R.string.permission_title,
-				ID_PERMISSION_REQUEST_EXT_STORAGE,
+				ID_PERMISSION_REQUEST_WRITE_EXT_STORAGE,
 				arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE))
+			return false
+		}
+		return true
+	}
+
+	/**
+	 * check permission to read external storage
+	 * and request to show detail dialog to request permission
+	 *
+	 * @return true already have permission to access external storage
+	 */
+	protected fun checkPermissionReadExternalStorage(): Boolean {
+		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
+		if (!PermissionCheck.hasWriteExternalStorage(this)
+			&& !PermissionCheck.hasReadExternalStorage(this)) {
+			PermissionDescriptionDialogV4.showDialog(this,
+				REQUEST_PERMISSION_READ_EXTERNAL_STORAGE,
+				R.string.permission_title,
+				ID_PERMISSION_REQUEST_READ_EXT_STORAGE,
+				arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
 			return false
 		}
 		return true
@@ -528,7 +548,9 @@ class MainActivity
 		private const val ID_PERMISSION_REASON_NETWORK = R.string.permission_network_reason
 		private const val ID_PERMISSION_REQUEST_NETWORK = R.string.permission_network_request
 		private const val ID_PERMISSION_REASON_EXT_STORAGE = R.string.permission_ext_storage_reason
-		private const val ID_PERMISSION_REQUEST_EXT_STORAGE = R.string.permission_ext_storage_request
+		private const val ID_PERMISSION_REQUEST_WRITE_EXT_STORAGE = R.string.permission_ext_storage_request
+		private const val ID_PERMISSION_REASON_READ_EXT_STORAGE = R.string.permission_read_ext_storage_reason
+		private const val ID_PERMISSION_REQUEST_READ_EXT_STORAGE = R.string.permission_read_ext_storage_request
 		private const val ID_PERMISSION_REASON_CAMERA = R.string.permission_camera_reason
 		private const val ID_PERMISSION_REQUEST_CAMERA = R.string.permission_camera_request
 		private const val ID_PERMISSION_REQUEST_HARDWARE_ID = R.string.permission_hardware_id_request
@@ -536,6 +558,8 @@ class MainActivity
 		private const val ID_PERMISSION_REQUEST_LOCATION = R.string.permission_location_request
 		/** request code for WRITE_EXTERNAL_STORAGE permission  */
 		private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 0x12345
+		/** request code for READ_EXTERNAL_STORAGE permission  */
+		private const val REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 0x12346
 		/** request code for RECORD_AUDIO permission  */
 		private const val REQUEST_PERMISSION_AUDIO_RECORDING = 0x234567
 		/** request code for CAMERA permission  */

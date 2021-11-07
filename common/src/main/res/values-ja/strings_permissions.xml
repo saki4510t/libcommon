@@ -12,6 +12,11 @@
 	<string name="permission_ext_storage_reason">静止画・動画を保存するには外部ストレージへの書き込み許可が必要です。</string>
 	<string name="permission_ext_storage_request">静止画・動画を保存するには外部ストレージへの書き込み許可が必要です。</string>
 	<string name="permission_ext_storage_finish">外部ストレージへの書き込みパーミッションがありません。\n終了します。</string>
+	<!-- 外部ストレージの読み込みパーミッション READ_EXTERNAL_STORAGE -->
+	<string name="permission_read_ext_storage">外部ストレージの読み込み許可がありません。静止画・動画等を読み込めません。</string>
+	<string name="permission_read_ext_storage_reason">静止画・動画等を読み込むには外部ストレージの読み込み許可が必要です。</string>
+	<string name="permission_read_ext_storage_request">静止画・動画等を読み込むには外部ストレージの読み込み許可が必要です。</string>
+	<string name="permission_read_ext_storage_finish">外部ストレージの読み込みパーミッションがありません。\n終了します。</string>
 	<!-- ネットワークアクセスのパーミッション INTERNET -->
 	<string name="permission_network">ネットワークへのアクセス許可がありません。</string>
 	<string name="permission_network_reason">ストリーミングを行うにははネットワークへのアクセス許可が必要です。</string>

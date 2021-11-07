@@ -12,6 +12,11 @@
 	<string name="permission_ext_storage_reason">Permission of writing external storage is necessary for movie/still image capturing.</string>
 	<string name="permission_ext_storage_request">Permission of writing external storage is necessary for movie/still image capturing.</string>
 	<string name="permission_ext_storage_finish">No writing external storage permission. \nApp will finish soon</string>
+	<!-- 外部ストレージの読み込みパーミッション READ_EXTERNAL_STORAGE -->
+	<string name="permission_read_ext_storage">No permission of reading external storage. \nMovie/still image displaying are disabled.</string>
+	<string name="permission_read_ext_storage_reason">Permission of reading external storage is necessary for movie/still image displaying.</string>
+	<string name="permission_read_ext_storage_request">Permission of reading external storage is necessary for movie/still image displaying.</string>
+	<string name="permission_read_ext_storage_finish">No reading external storage permission. \nApp will finish soon</string>
 	<!-- ネットワークアクセスのパーミッション INTERNET -->
 	<string name="permission_network">No network access permission.</string>
 	<string name="permission_network_reason">Network access permission is necessary for streaming.</string>
