@@ -60,7 +60,7 @@ public class RecordingService extends BaseService {
 	private static final String TAG = RecordingService.class.getSimpleName();
 
 	/**
-	 * MediaStoreOutputStreamを使って出力するかどうか(isAndroid8以降のみ有効)
+	 * MediaStoreOutputStreamを使って出力するかどうか(Android8以降のみ有効)
 	 */
 	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = false;
 
