@@ -57,7 +57,9 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * 実データではなくサムネイルを表示する
  * MediaStoreAdapterのRecyclerView.Adapter版
  * XXX サムネイルを取得できなかった項目は表示されなくなる
+ * XXX サムネイルを取得できない壊れたファイル等があっても正常に動作するが対象ファイル数が多いと表示されるまでに時間がかかるのでdeprecatedにする
  */
+@Deprecated
 public class MediaStoreRecyclerAdapter
 	extends RecyclerView.Adapter<MediaStoreRecyclerAdapter.ViewHolder> {
 
@@ -654,8 +656,8 @@ public class MediaStoreRecyclerAdapter
 	}
 
 	public static class ViewHolder extends RecyclerView.ViewHolder {
-		private TextView mTitleView;
-		private ImageView mImageView;
+		private final TextView mTitleView;
+		private final ImageView mImageView;
 		@NonNull
 		private final MediaInfo info = new MediaInfo();
 
