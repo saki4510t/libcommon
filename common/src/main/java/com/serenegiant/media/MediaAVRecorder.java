@@ -187,6 +187,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param outputPath
 	 * @throws IOException
 	 */
+	@Deprecated
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@NonNull final String outputPath) throws IOException {
@@ -202,6 +203,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param outputPath
 	 * @throws IOException
 	 */
+	@Deprecated
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final IMuxer.IMuxerFactory factory,
@@ -331,6 +333,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param outputPath
 	 * @throws IOException
 	 */
+	@Deprecated
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final VideoConfig config,
