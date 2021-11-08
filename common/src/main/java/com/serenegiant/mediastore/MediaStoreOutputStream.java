@@ -248,7 +248,9 @@ public class MediaStoreOutputStream extends OutputStream {
 		try {
 			mOutputStream.close();
 		} finally {
-			MediaStoreUtils.updateContentUri(mCr, mUri);
+			if (UriHelper.isContentUri(mUri)) {
+				MediaStoreUtils.updateContentUri(mCr, mUri);
+			}
 		}
 	}
 
