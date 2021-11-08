@@ -19,7 +19,6 @@ package com.serenegiant.utils;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -121,7 +120,6 @@ public final class UriHelper {
 	 */
 	@SuppressLint("NewApi")
 	@Nullable
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static String getPath(@NonNull final Context context, final Uri uri) {
 		if (DEBUG) Log.i(TAG, "getPath:uri=" + uri);
 
@@ -228,13 +226,13 @@ public final class UriHelper {
 				}
 	        }
 		} else if (uri != null) {
-	    	if ("content".equalsIgnoreCase(uri.getScheme())) {
+	    	if (isContentUri(uri)) {
 				// MediaStore (and general)
 				if (isGooglePhotosUri(uri)) {
 					return uri.getLastPathSegment();
 				}
 				return getDataColumn(context, uri, null, null);
-			} else if ("file".equalsIgnoreCase(uri.getScheme())) {
+			} else if (isFileUri(uri)) {
 				// File
 				return uri.getPath();
 			}
