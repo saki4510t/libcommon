@@ -102,6 +102,7 @@ public class MediaFileUtils {
 				// こっちの場合は既にディレクトリ名としてFileUtils.DIR_NAMEが付加されてくるはずなのでここでは追加しない
 			}
 		}
+		if (DEBUG) Log.v(TAG, "getRecordingRoot:root=" + root);
 		return root;
 	}
 

@@ -126,6 +126,7 @@ class CameraFragment : AbstractCameraFragment() {
 						MediaFileUtils.getRecordingFile(
 							context, Const.REQUEST_ACCESS_SD, "video/mp4", Environment.DIRECTORY_MOVIES, ".mp4")
 					}
+					if (DEBUG) Log.v(TAG, "onReady:output=$output")
 					if (output != null) {
 						mRecorder!!.start(output)
 					} else {

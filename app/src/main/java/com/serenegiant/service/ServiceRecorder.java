@@ -215,7 +215,7 @@ public class ServiceRecorder {
 	public void start(@NonNull final DocumentFile output)
 		throws IllegalStateException, IOException {
 
-		if (DEBUG) Log.v(TAG, "start:output=" + output);
+		if (DEBUG) Log.v(TAG, "start:output=" + output + ",uri=" + output.getUri());
 		checkReleased();
 		final RecordingService service = getService();
 		if (service != null) {

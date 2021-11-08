@@ -37,6 +37,7 @@ import android.util.Log;
 import com.serenegiant.system.SAFUtils;
 
 public class FileUtils {
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = FileUtils.class.getSimpleName();
 
 	private FileUtils() {
@@ -86,10 +87,12 @@ public class FileUtils {
 	public static final File getCaptureFile(@NonNull final Context context,
 		final String type, final String prefix, final String ext, final int saveTreeId) {
 
-	// 保存先のファイル名を生成
+		if (DEBUG) Log.v(TAG, "getCaptureFile:");
+		// 保存先のファイル名を生成
 		File result = null;
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
 		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
+			if (DEBUG) Log.v(TAG, "getCaptureFile:SAFでアクセスする");
 //			result = SAFUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
 //			result = SAFUtils.createStorageDir(context, saveTreeId);
 			try {
@@ -110,7 +113,7 @@ public class FileUtils {
 			}
 		}
 		if (result == null) {
-			// プライマリ外部ストレージへフォールバックする(WRITE_EXTERNAL_STORAGEがないと失敗する)
+			if (DEBUG) Log.v(TAG, "プライマリ外部ストレージへフォールバックする(WRITE_EXTERNAL_STORAGEがないと失敗する)");
 			final File dir = getCaptureDir(context, type, 0);
 			if (dir != null) {
 				dir.mkdirs();
@@ -122,7 +125,7 @@ public class FileUtils {
 		if (result != null) {
 			result = new File(result, file_name);
 		}
-//		Log.i(TAG, "getCaptureFile:result=" + result);
+		if (DEBUG) Log.v(TAG, "getCaptureFile:result=" + result);
 		return result;
 	}
 
@@ -140,7 +143,7 @@ public class FileUtils {
 	public static final File getCaptureDir(@NonNull final Context context,
 		final String type, final int saveTreeId) {
 
-//		Log.i(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
+		if (DEBUG) Log.v(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
 		if ((saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
 //			result = SAFUtils.createStorageDir(context, saveTreeId);
@@ -153,13 +156,13 @@ public class FileUtils {
 			} catch (final IOException e) {
 				Log.w(TAG, e);
 			}
-//			Log.i(TAG, "getCaptureDir:createStorageDir=" + result);
+			if (DEBUG) Log.v(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
 		final File dir = result != null
 			? new File(result, getDirName())
 			: new File(Environment.getExternalStoragePublicDirectory(type), getDirName());
 		dir.mkdirs();	// Nexus5だとパスが全部存在しないと値がちゃんと返ってこないのでパスを生成
-//		Log.i(TAG, "getCaptureDir:" + result);
+		if (DEBUG) Log.v(TAG, "getCaptureDir:" + result);
         if (dir.canWrite()) {
         	return dir;
         }
