@@ -157,7 +157,7 @@ public class MediaStoreUtils {
 	 * Android10以降の場合はIS_PENDING=1をセットするので後で#updateContentUri呼び出しが必要
 	 * @param context
 	 * @param mimeType
-	 * @param relativePath
+	 * @param relativePath ["DCIM", "Movies", "Pictures"]から始まる相対パスまたはnull
 	 * @param nameWithExt
 	 * @param dataPath
 	 * @return
@@ -180,7 +180,7 @@ public class MediaStoreUtils {
 	 * Android10以降の場合はIS_PENDING=1をセットするので後で#updateContentUri呼び出しが必要
 	 * @param cr
 	 * @param mimeType
-	 * @param relativePath
+	 * @param relativePath ["DCIM", "Movies", "Pictures"]から始まる相対パスまたはnull
 	 * @param nameWithExt
 	 * @param dataPath
 	 * @return
