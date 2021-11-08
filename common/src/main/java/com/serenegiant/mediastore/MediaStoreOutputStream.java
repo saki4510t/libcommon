@@ -41,6 +41,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	 * @param nameWithExt
 	 * @throws FileNotFoundException
 	 */
+	@SuppressWarnings("deprecation")
 	@Deprecated
 	public MediaStoreOutputStream(@NonNull final Context context,
 		@Nullable final String mimeType,
