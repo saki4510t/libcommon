@@ -115,7 +115,7 @@ public class MediaFileUtils {
 	 * @return
 	 * @throws IOException
 	 */
-	public static DocumentFile getRecordingFile(
+	public static synchronized DocumentFile getRecordingFile(
 		@NonNull final Context context,
 		final int saveTreeId,
 		@NonNull final String type, @Nullable final String mime,
@@ -123,7 +123,7 @@ public class MediaFileUtils {
 
 		final DocumentFile root = getRecordingRoot(context, type, saveTreeId);
 		if (root != null) {
-			return getRecordingFile(root, null,
+			return SAFUtils.getFile(root, null,
 				mime, FileUtils.getDateTimeString() + ext);
 		} else {
 			throw new IOException("Failed to get recording root dir");
@@ -140,6 +140,7 @@ public class MediaFileUtils {
 	 * @return
 	 * @throws IOException
 	 */
+	@Deprecated
 	@NonNull
 	public static synchronized DocumentFile getRecordingFile(
 		@NonNull final DocumentFile root, @Nullable final String dirs,
