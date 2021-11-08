@@ -1,5 +1,6 @@
 package com.serenegiant.libcommon
 
+import android.content.Context
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -9,6 +10,9 @@ import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
+import com.serenegiant.mediastore.MediaStoreUtils
+import com.serenegiant.system.BuildCheck
+import com.serenegiant.utils.FileUtils
 import java.io.IOException
 
 /**
@@ -31,8 +35,20 @@ class CameraRecFragment : AbstractCameraFragment() {
 	@Throws(IOException::class)
 	override fun internalStartRecording() {
 		if (DEBUG) Log.v(TAG, "internalStartRecording:")
-		val outputFile = MediaFileUtils.getRecordingFile(
-			requireContext(), Const.REQUEST_ACCESS_SD, Environment.DIRECTORY_MOVIES, "video/*", ".mp4")
+		val context: Context = requireContext()
+		val outputFile: DocumentFile?
+		= if (BuildCheck.isAPI29()) {
+			// API29以降は対象範囲別ストレージ
+			DocumentFile.fromSingleUri(context,
+				MediaStoreUtils.getContentUri(
+					context, "video/mp4",
+					Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
+					FileUtils.getDateTimeString() + ".mp4", null))
+		} else {
+			val dir = MediaFileUtils.getRecordingRoot(
+				context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
+			dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
+		}
 		if (outputFile != null) {
 			startEncoder(outputFile, 2, CHANNEL_COUNT, false)
 		} else {
