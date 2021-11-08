@@ -95,7 +95,7 @@ public final class UriHelper {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			list.add(Environment.DIRECTORY_DOCUMENTS);	// API>=19
 		}
-		 STANDARD_DIRECTORIES = list.toArray(new String[0]);
+		STANDARD_DIRECTORIES = list.toArray(new String[0]);
 	}
 
 	public static boolean isStandardDirectory(final @NonNull String dir) {
