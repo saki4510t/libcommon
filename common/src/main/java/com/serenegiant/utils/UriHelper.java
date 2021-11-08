@@ -304,5 +304,35 @@ public final class UriHelper {
 		return "com.google.android.apps.photos.content".equals(uri.getAuthority());
 	}
 
+	/**
+	 * 指定したUriがコンテントuriかどうかを取得
+	 * (schemeが"content"かどうかをチェックするだけ)
+	 * @param uri
+	 * @return
+	 */
+	public static boolean isContentUri(@Nullable Uri uri) {
+		return (uri != null) && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme());
+	}
+
+	/**
+	 * 指定したUriがファイルuriかどうかを取得
+	 * (schemeが"file"かどうかをチェックするだけ)
+	 * @param uri
+	 * @return
+	 */
+	public static boolean isFileUri(@Nullable Uri uri) {
+		return (uri != null) && ContentResolver.SCHEME_FILE.equals(uri.getScheme());
+	}
+
+	/**
+	 * 指定したUriがリソースuriかどうかを取得
+	 * (schemeが"file"かどうかをチェックするだけ)
+	 * @param uri
+	 * @return
+	 */
+	public static boolean isResourceUri(@Nullable Uri uri) {
+		return (uri != null) && ContentResolver.SCHEME_ANDROID_RESOURCE.equals(uri.getScheme());
+	}
+
 }
 
