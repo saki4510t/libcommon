@@ -114,11 +114,10 @@ class EffectCameraFragment : AbstractCameraFragment() {
 					val output: DocumentFile?
 					= if (BuildCheck.isAPI29()) {
 						// API29以降は対象範囲別ストレージ
-						DocumentFile.fromSingleUri(context,
-							MediaStoreUtils.getContentUri(
-								context, "video/mp4",
-								null,
-								FileUtils.getDateTimeString() + ".mp4", null))
+						MediaStoreUtils.getContentDocument(
+							context, "video/mp4",
+							null,
+							FileUtils.getDateTimeString() + ".mp4", null)
 					} else {
 						val dir = MediaFileUtils.getRecordingRoot(
 							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)

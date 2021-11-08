@@ -113,11 +113,11 @@ class CameraFragment : AbstractCameraFragment() {
 					val output: DocumentFile?
 					= if (BuildCheck.isAPI29()) {
 						// API29以降は対象範囲別ストレージ
-						DocumentFile.fromSingleUri(context,
-							MediaStoreUtils.getContentUri(
-								context, "video/mp4",
-								Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
-								FileUtils.getDateTimeString() + ".mp4", null))
+						// DocumentFile.fromSingleUrはAPI>=19
+						MediaStoreUtils.getContentDocument(
+							context, "video/mp4",
+							Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
+							FileUtils.getDateTimeString() + ".mp4", null)
 					} else {
 						// ここの#getRecordingRoot呼び出しと#getRecordingFile呼び出しは等価
 //						val dir = MediaFileUtils.getRecordingRoot(
