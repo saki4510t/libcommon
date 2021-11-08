@@ -45,9 +45,12 @@ class CameraRecFragment : AbstractCameraFragment() {
 					Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
 					FileUtils.getDateTimeString() + ".mp4", null))
 		} else {
-			val dir = MediaFileUtils.getRecordingRoot(
-				context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
-			dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
+			// ここの#getRecordingRoot呼び出しと#getRecordingFile呼び出しは等価
+//			val dir = MediaFileUtils.getRecordingRoot(
+//				context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
+//			dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
+			MediaFileUtils.getRecordingFile(
+				context, Const.REQUEST_ACCESS_SD, "video/mp4", Environment.DIRECTORY_MOVIES, ".mp4")
 		}
 		if (outputFile != null) {
 			startEncoder(outputFile, 2, CHANNEL_COUNT, false)

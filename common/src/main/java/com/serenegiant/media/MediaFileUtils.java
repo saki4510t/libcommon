@@ -107,6 +107,7 @@ public class MediaFileUtils {
 
 	/**
 	 * 静止画/動画保存用のDocumentFileを取得
+	 * FIXME typeにDIRECTORY_MOVIESを指定しても反映されずDIRECTORY_DCIMで返ってきてしまう？
 	 * @param context
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param mime
