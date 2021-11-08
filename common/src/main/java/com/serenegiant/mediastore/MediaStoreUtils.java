@@ -38,6 +38,7 @@ import java.io.FileNotFoundException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * MediaStoreへアクセスするためのヘルパークラス
@@ -149,6 +150,31 @@ public class MediaStoreUtils {
 		= (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
 			? MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
 			: MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+
+//--------------------------------------------------------------------------------
+	/**
+	 * 静止画・動画等をMediaStoreへ登録してアクセスするためのUriをDocumentFileでラップして返す
+	 * ContentResolver.openFileDescriptorを使ってアクセスする
+	 * Android10以降の場合はIS_PENDING=1をセットするので後で#updateContentUri呼び出しが必要
+	 * @param context
+	 * @param mimeType
+	 * @param relativePath
+	 * @param nameWithExt
+	 * @param dataPath
+	 * @return
+	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
+	public static DocumentFile getContentDocument(
+		@NonNull final Context context,
+		@Nullable final String mimeType,
+		@Nullable final String relativePath,
+		@NonNull final String nameWithExt,
+		@Nullable final String dataPath) {
+
+		// DocumentFile.fromSingleUriはAPI>=19
+		return DocumentFile.fromSingleUri(context,
+			getContentUri(context, mimeType, relativePath, nameWithExt, dataPath));
+	}
 
 //--------------------------------------------------------------------------------
 	/**
