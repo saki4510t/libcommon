@@ -130,7 +130,7 @@ public class FileUtils {
 	 * キャプチャ用のディレクトリを示すFileインスタンスを取得する
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
 	 * @param context
-	 * @param type
+	 * @param type　SAFではなく外部ストレージへ保存する場合のディレクトリタイプ, Environment.DIRECTORY_MOVIES / DIRECTORY_DCIM
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
