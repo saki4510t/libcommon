@@ -44,7 +44,7 @@ class CameraFragment : AbstractCameraFragment() {
 	override fun internalStartRecording() {
 		if (DEBUG) Log.v(TAG, "internalStartRecording:mRecorder=$mRecorder")
 		if (mRecorder == null) {
-			if (DEBUG) Log.v(TAG, "internalStartRecording:get PostMuxRecorder")
+			if (DEBUG) Log.v(TAG, "internalStartRecording:get ServiceRecorder")
 			mRecorder = ServiceRecorder(requireContext(), mCallback)
 		} else {
 			Log.w(TAG, "internalStartRecording:recorder is not null, already start recording?")
