@@ -116,12 +116,12 @@ class CameraFragment : AbstractCameraFragment() {
 						DocumentFile.fromSingleUri(context,
 							MediaStoreUtils.getContentUri(
 								context, "video/mp4",
-								null,
+								Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
 								FileUtils.getDateTimeString() + ".mp4", null))
 					} else {
 						val dir = MediaFileUtils.getRecordingRoot(
 							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
-						dir!!.createFile("*/*", FileUtils.getDateTimeString() + ".mp4")
+						dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
 					}
 					if (output != null) {
 						mRecorder!!.start(output)
