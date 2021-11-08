@@ -30,7 +30,7 @@ public class MediaStoreOutputStream extends OutputStream {
 	@NonNull
 	private final Uri mUri;
 	@NonNull
-	private final FileOutputStream mOutputStream;
+	private final FileOutputStream mOutputStream;	// XXX BufferedOutputStreamでラップしたいけどgetFDを使うにはFileOutputStreamでないとだめ
 	@Nullable
 	private final String mOutputPath;
 
