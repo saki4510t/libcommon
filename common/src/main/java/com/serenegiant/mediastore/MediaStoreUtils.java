@@ -305,7 +305,13 @@ public class MediaStoreUtils {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			final ContentValues cv = new ContentValues();
 			cv.put(MediaStore.MediaColumns.IS_PENDING, 0);
-			cr.update(uri, cv, null, null);
+			try {
+				// 引き渡されたUriがIS_PENDING=1で生成されていないときは
+				// UnsupportedOperationExceptionが投げられる
+				cr.update(uri, cv, null, null);
+			} catch (final Exception e) {
+				Log.d(TAG, "updateContentUri:", e);
+			}
 		}
 	}
 
