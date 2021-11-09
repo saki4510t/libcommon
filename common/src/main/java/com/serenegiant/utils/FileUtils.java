@@ -452,6 +452,16 @@ public class FileUtils {
 	}
 
 	/**
+	 * 拡張子を含むかどうかを取得
+	 * @param path
+	 * @return
+	 */
+	public static boolean hasExt(@NonNull final String path) {
+		final String ext = getExt(path);
+		return !TextUtils.isEmpty(ext);
+	}
+
+	/**
 	 * 指定したディレクトリ・ファイルを再帰的に削除する
 	 * @param path
 	 */
