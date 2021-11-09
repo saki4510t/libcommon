@@ -235,6 +235,7 @@ public class FileUtils {
 				final File dir = getCaptureDir(context, Environment.DIRECTORY_DCIM, saveTreeId);
 //				Log.i(TAG, "checkFreeSpace:dir=" + dir);
 				if (dir != null) {
+					@SuppressLint("UsableSpace")
 					final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
 					if (dir.getTotalSpace() > 0) {
 						result = (freeSpace / dir.getTotalSpace() > ratio) || (freeSpace > minFree);
@@ -257,6 +258,7 @@ public class FileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
+	@SuppressLint("UsableSpace")
 	public static final long getAvailableFreeSpace(final Context context,
 		final String type, final int saveTreeId) {
 
@@ -283,6 +285,7 @@ public class FileUtils {
 		if (context != null) {
 			final File dir = getCaptureDir(context, type, saveTreeId);
 			if (dir != null) {
+				@SuppressLint("UsableSpace")
 				final float freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0;
 				if (dir.getTotalSpace() > 0) {
 					return freeSpace / dir.getTotalSpace();
