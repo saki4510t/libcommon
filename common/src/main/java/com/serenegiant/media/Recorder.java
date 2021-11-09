@@ -519,6 +519,7 @@ public abstract class Recorder implements IRecorder {
 	    private final EosThread mThread;
 
 	    private EosHandler(final EosThread thread) {
+			super();
 	    	mThread = thread;
 	    }
 
