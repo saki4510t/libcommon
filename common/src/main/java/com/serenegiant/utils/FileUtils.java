@@ -158,6 +158,9 @@ public class FileUtils {
 			}
 			if (DEBUG) Log.v(TAG, "getCaptureDir:createStorageDir=" + result);
 		}
+		if (!UriHelper.isStandardDirectory(type)) {
+			throw new IllegalArgumentException(type + " is not a standard directory name!");
+		}
 		final File dir = result != null
 			? new File(result, getDirName())
 			: new File(Environment.getExternalStoragePublicDirectory(type), getDirName());
