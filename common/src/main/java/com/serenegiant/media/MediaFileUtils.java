@@ -21,6 +21,7 @@ package com.serenegiant.media;
 import android.content.Context;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.PermissionCheck;
 import com.serenegiant.system.SAFUtils;
 import com.serenegiant.utils.FileUtils;
@@ -53,22 +54,24 @@ public class MediaFileUtils {
 		final int saveTreeId) {
 
 		DocumentFile root = null;
-		if (SAFUtils.hasPermission(context, saveTreeId)) {
-			try {
-				root = SAFUtils.getDir(context, saveTreeId, FileUtils.DIR_NAME);
-				if (!root.exists() || !root.canWrite()) {
-					Log.d(TAG, "path will be wrong, will already be removed,"
-						+ (root != null ? root.getUri() : null));
+		if (BuildCheck.isAPI21()) {
+			if (SAFUtils.hasPermission(context, saveTreeId)) {
+				try {
+					root = SAFUtils.getDir(context, saveTreeId, FileUtils.DIR_NAME);
+					if (!root.exists() || !root.canWrite()) {
+						Log.d(TAG, "path will be wrong, will already be removed,"
+							+ (root != null ? root.getUri() : null));
+						root = null;
+					}
+				} catch (final IOException | IllegalStateException e) {
 					root = null;
+					Log.d(TAG, "path is wrong, will already be removed.", e);
 				}
-			} catch (final IOException | IllegalStateException e) {
-				root = null;
-				Log.d(TAG, "path is wrong, will already be removed.", e);
 			}
-		}
-		if (root == null) {
-			if (DEBUG) Log.d(TAG, "getSAFRecordingRoot:保存先を取得できなかったので念のためにセカンダリーストレージアクセスのパーミッションも落としておく");
-			SAFUtils.releasePersistableUriPermission(context, saveTreeId);
+			if (root == null) {
+				if (DEBUG) Log.d(TAG, "getSAFRecordingRoot:保存先を取得できなかったので念のためにセカンダリーストレージアクセスのパーミッションも落としておく");
+				SAFUtils.releasePersistableUriPermission(context, saveTreeId);
+			}
 		}
 		return root;
 	}

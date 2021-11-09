@@ -24,6 +24,7 @@ import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SAFUtils;
 
 import java.io.File;
@@ -101,6 +102,7 @@ public class FileUtils {
 	 */
 	@Deprecated
 	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@SuppressLint("NewApi")
 	@Nullable
 	public static final File getCaptureFile(@NonNull final Context context,
 		final String type, final String prefix, final String ext, final int saveTreeId) {
@@ -109,12 +111,12 @@ public class FileUtils {
 		// 保存先のファイル名を生成
 		File result = null;
 		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
-		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
+		if (BuildCheck.isAPI21() &&
+			(saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {	// API>=19
+
 			if (DEBUG) Log.v(TAG, "getCaptureFile:SAFでアクセスする");
-//			result = SAFUtils.createStorageFile(context, saveTreeId, "*/*", file_name);
-//			result = SAFUtils.createStorageDir(context, saveTreeId);
 			try {
-				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);
+				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);	// API>=19
 				final String pathString = UriHelper.getPath(context, dir.getUri());
 				if (!TextUtils.isEmpty(pathString)) {
 					result = new File(pathString);
@@ -202,10 +204,11 @@ public class FileUtils {
 
 		if (DEBUG) Log.v(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
-		if ((saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
-//			result = SAFUtils.createStorageDir(context, saveTreeId);
+		if (BuildCheck.isAPI21()
+			&& (saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {	// API>=19
+
 			try {
-				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);
+				final DocumentFile dir = SAFUtils.getDir(context, saveTreeId, null);	// API>=19
 				final String pathString = UriHelper.getPath(context, dir.getUri());
 				if (!TextUtils.isEmpty(pathString)) {
 					result = new File(pathString);
