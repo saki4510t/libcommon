@@ -140,6 +140,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param intent
 	 */
 	protected void sendLocalBroadcast(final Intent intent) {
+		if (DEBUG) Log.v(TAG, "sendLocalBroadcast:" + intent);
 		synchronized (mSync) {
 			if (mLocalBroadcastManager != null) {
 				mLocalBroadcastManager.sendBroadcast(intent);
@@ -154,7 +155,8 @@ public abstract class BaseService extends LifecycleService {
 	 * XXX 単独クラスにするかも
 	 */
 	public static abstract class NotificationFactory {
-	
+		private static final String TAG = NotificationFactory.class.getSimpleName();
+
 		protected final String channelId;
 		protected final String channelTitle;
 		protected final int importance;
@@ -191,7 +193,8 @@ public abstract class BaseService extends LifecycleService {
 			final int importance,
 			@Nullable final String groupId, @Nullable final String groupName,
 			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
-			
+
+			if (DEBUG) Log.v(TAG, "コンストラクタ");
 			this.channelId = channelId;
 			this.channelTitle = TextUtils.isEmpty(channelTitle) ? channelId : channelTitle;
 			this.importance = importance;
@@ -212,6 +215,7 @@ public abstract class BaseService extends LifecycleService {
 		protected Notification createNotification(final Context context,
 			@NonNull final CharSequence title, @NonNull final CharSequence content) {
 
+			if (DEBUG) Log.v(TAG, "createNotification:");
 			if (BuildCheck.isOreo()) {
 				createNotificationChannel(context);
 			}
@@ -219,6 +223,7 @@ public abstract class BaseService extends LifecycleService {
 			final NotificationCompat.Builder builder
 				= createNotificationBuilder(context, title, content);
 			
+			if (DEBUG) Log.v(TAG, "createNotification:build");
 			return builder.build();
 		}
 		
@@ -241,6 +246,7 @@ public abstract class BaseService extends LifecycleService {
 		protected void createNotificationChannel(
 			@NonNull final Context context) {
 	
+			if (DEBUG) Log.v(TAG, "createNotificationChannel:");
 			final NotificationManager manager
 				= ContextUtils.requireSystemService(context, NotificationManager.class);
 			if (manager.getNotificationChannel(channelId) == null) {
@@ -269,6 +275,7 @@ public abstract class BaseService extends LifecycleService {
 		protected NotificationChannel setupNotificationChannel(
 			@NonNull final NotificationChannel channel) {
 			
+			if (DEBUG) Log.v(TAG, "setupNotificationChannel:");
 			return channel;
 		}
 		
@@ -293,6 +300,7 @@ public abstract class BaseService extends LifecycleService {
 			@NonNull final Context context,
 			@Nullable final String groupId, @Nullable final String groupName) {
 			
+			if (DEBUG) Log.v(TAG, "createNotificationChannelGroup:groupId=" + groupId);
 			if (!TextUtils.isEmpty(groupId)) {
 				final NotificationManager manager
 					= ContextUtils.requireSystemService(context, NotificationManager.class);
@@ -336,7 +344,8 @@ public abstract class BaseService extends LifecycleService {
 		protected NotificationCompat.Builder createNotificationBuilder(
 			@NonNull final Context context,
 			@NonNull final CharSequence title, @NonNull final CharSequence content) {
-	
+
+			if (DEBUG) Log.v(TAG, "createNotificationBuilder:");
 			final NotificationCompat.Builder builder
 				= new NotificationCompat.Builder(context, channelId)
 				.setContentTitle(title)
@@ -489,14 +498,15 @@ public abstract class BaseService extends LifecycleService {
 				groupId, groupName, smallIconId, largeIconId) {
 
 				@Override
-					protected boolean isForegroundService() {
-						return isForegroundService;
-					}
-					
-					@Override
-					protected PendingIntent createContentIntent() {
-						return intent;
-					}
+				protected boolean isForegroundService() {
+					if (DEBUG) Log.v(TAG, "showNotification:isForegroundService=" + isForegroundService);
+					return isForegroundService;
+				}
+
+				@Override
+				protected PendingIntent createContentIntent() {
+					return intent;
+				}
 			}
 		);
 	}
@@ -512,12 +522,14 @@ public abstract class BaseService extends LifecycleService {
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		@NonNull final NotificationFactory factory) {
 	
+		if (DEBUG) Log.v(TAG, "showNotification:");
 		final NotificationManager manager
 			= ContextUtils.requireSystemService(this, NotificationManager.class);
 		final Notification notification = factory.createNotification(this, content, title);
 		if (factory.isForegroundService()) {
 			startForeground(notificationId, notification);
 		}
+		if (DEBUG) Log.v(TAG, "showNotification:notify");
 		manager.notify(notificationId, notification);
 	}
 
@@ -552,6 +564,7 @@ public abstract class BaseService extends LifecycleService {
 	protected void releaseNotification(final int notificationId,
 		@NonNull final String channelId) {
 
+		if (DEBUG) Log.v(TAG, "releaseNotification:");
 		stopForeground(true);
 		cancelNotification(notificationId, channelId);
 	}
@@ -566,6 +579,7 @@ public abstract class BaseService extends LifecycleService {
 	protected void cancelNotification(final int notificationId,
 		@Nullable final String channelId) {
 
+		if (DEBUG) Log.v(TAG, "cancelNotification:");
 		final NotificationManager manager
 			= ContextUtils.requireSystemService(this, NotificationManager.class);
 		manager.cancel(notificationId);
@@ -590,6 +604,7 @@ public abstract class BaseService extends LifecycleService {
 	 */
 	@SuppressLint("NewApi")
 	protected void releaseNotificationChannel(@Nullable final String channelId) {
+		if (DEBUG) Log.v(TAG, "releaseNotificationChannel:");
 		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
 			final NotificationManager manager
 				= ContextUtils.requireSystemService(this, NotificationManager.class);
