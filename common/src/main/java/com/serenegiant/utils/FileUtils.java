@@ -462,6 +462,17 @@ public class FileUtils {
 	}
 
 	/**
+	 * pathがファイルの場合は拡張子を含まないファイル名文字列を取得
+	 * pathがディレクトリの場合はディレクトリ名返す
+	 * @param path
+	 * @return
+	 */
+	public static String getDisplayName(@NonNull final String path) {
+		final File file = new File(path);
+		return removeFileExtension(file.getName());
+	}
+
+	/**
 	 * 指定したディレクトリ・ファイルを再帰的に削除する
 	 * @param path
 	 */
