@@ -18,15 +18,16 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import java.io.File;
 import java.io.IOException;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Environment;
-import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SAFUtils;
 import com.serenegiant.system.StorageUtils;
 import com.serenegiant.utils.FileUtils;
@@ -188,6 +189,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @throws IOException
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@NonNull final String outputPath) throws IOException {
@@ -204,6 +206,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @throws IOException
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final IMuxer.IMuxerFactory factory,
@@ -235,23 +238,28 @@ public class MediaAVRecorder extends Recorder {
 		if (TextUtils.isEmpty(ext)) {
 			ext = ".mp4";
 		}
-		if ((saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
-			mOutputPath = FileUtils.getCaptureFile(context,
-				Environment.DIRECTORY_MOVIES, prefix, ext, saveTreeId).toString();
-			final String file_name = (TextUtils.isEmpty(prefix)
-				? FileUtils.getDateTimeString()
-				: prefix + FileUtils.getDateTimeString()) + ext;
-//			final int fd = SAFUtils.createStorageFileFD(context, saveTreeId, "*/*", file_name);
-			final int fd = SAFUtils.getFd(context, saveTreeId, null, "*/*", file_name).getFd();
-			setupMuxer(fd);
+		final String fileName = (TextUtils.isEmpty(prefix)
+			? FileUtils.getDateTimeString()
+			: prefix + FileUtils.getDateTimeString()) + ext;
+		if (BuildCheck.isAPI21()
+			&& (saveTreeId != 0) && SAFUtils.hasPermission(context, saveTreeId)) {
+			// SAFが使えるのはAPI>=21
+			final DocumentFile output = SAFUtils.getFile(
+				context, saveTreeId, null, "video/*", fileName);
+			setupMuxer(context, output);
 		} else {
 			try {
 				mOutputPath = FileUtils.getCaptureFile(context,
-					Environment.DIRECTORY_MOVIES, prefix, ext, 0).toString();
+					Environment.DIRECTORY_MOVIES, prefix, ext).toString();
+				if (mOutputPath == null) {
+					throw new IOException("This app has no permission of writing external storage");
+				}
 			} catch (final Exception e) {
 				throw new IOException("This app has no permission of writing external storage");
 			}
-			setupMuxer(mOutputPath);
+//			setupMuxer(mOutputPath);
+			final DocumentFile output = DocumentFile.fromFile(new File(mOutputPath));
+			setupMuxer(context, output);
 		}
 	}
 
@@ -275,27 +283,28 @@ public class MediaAVRecorder extends Recorder {
 		super(context, callback, config, factory);
 		mSaveTreeId = saveTreeId;
 		if ((saveTreeId > 0) && SAFUtils.hasPermission(context, saveTreeId)) {
-			DocumentFile tree = SAFUtils.getFile(context,
+			DocumentFile output = SAFUtils.getFile(context,
 				saveTreeId, dirs, "*/*", fileName);
-			if (tree != null) {
-				mOutputPath = UriHelper.getPath(context, tree.getUri());
-				final ParcelFileDescriptor pfd
-					= context.getContentResolver().openFileDescriptor(
-						tree.getUri(), "rw");
-				try {
-					if (pfd != null) {
-						setupMuxer(pfd.getFd());
-						return;
-					} else {
-						// ここには来ないはずだけど
-						throw new IOException("could not create ParcelFileDescriptor");
-					}
-				} catch (final Exception e) {
-					if (pfd != null) {
-						pfd.close();
-					}
-					throw e;
-				}
+			if (output != null) {
+				mOutputPath = UriHelper.getPath(context, output.getUri());
+				setupMuxer(context, output);
+//				final ParcelFileDescriptor pfd
+//					= context.getContentResolver().openFileDescriptor(
+//						output.getUri(), "rw");
+//				try {
+//					if (pfd != null) {
+//						setupMuxer(pfd.getFd());
+//						return;
+//					} else {
+//						// ここには来ないはずだけど
+//						throw new IOException("could not create ParcelFileDescriptor");
+//					}
+//				} catch (final Exception e) {
+//					if (pfd != null) {
+//						pfd.close();
+//					}
+//					throw e;
+//				}
 			}
 		}
 		// フォールバックはしない
@@ -334,6 +343,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @throws IOException
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final VideoConfig config,
@@ -346,7 +356,7 @@ public class MediaAVRecorder extends Recorder {
 		if (TextUtils.isEmpty(outputPath)) {
 			try {
 				mOutputPath = FileUtils.getCaptureFile(context,
-					Environment.DIRECTORY_MOVIES, null, ".mp4", 0).toString();
+					Environment.DIRECTORY_MOVIES, null, ".mp4").toString();
 			} catch (final Exception e) {
 				throw new IOException("This app has no permission of writing external storage");
 			}
@@ -355,6 +365,7 @@ public class MediaAVRecorder extends Recorder {
 	}
 
 //--------------------------------------------------------------------------------
+	@Deprecated
 	@Nullable
 	@Override
 	public String getOutputPath() {
@@ -391,10 +402,14 @@ public class MediaAVRecorder extends Recorder {
 					getConfig().maxDuration(), mStartTime, mSaveTreeId));
 	}
 
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	protected void setupMuxer(final int fd) throws IOException {
 		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), fd));
 	}
 
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	protected void setupMuxer(@NonNull final String output) throws IOException {
 		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), output));
 	}

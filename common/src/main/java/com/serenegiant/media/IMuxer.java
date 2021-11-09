@@ -27,9 +27,11 @@ import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
+import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.serenegiant.mediastore.MediaStoreOutputStream;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.UriHelper;
 
@@ -50,19 +52,27 @@ public interface IMuxer {
 	public void release();
 	public boolean isStarted();
 
+	/**
+	 * IMuxer生成処理を移譲するためのファクトリーインターフェース
+	 */
 	public interface IMuxerFactory {
-		public IMuxer createMuxer(final boolean useMediaMuxer, final String output_oath) throws IOException;
+		@Deprecated
+		public IMuxer createMuxer(final boolean useMediaMuxer, final String outputPath) throws IOException;
+		@Deprecated
 		public IMuxer createMuxer(final boolean useMediaMuxer, final int fd) throws IOException;
 		public IMuxer createMuxer(@NonNull final Context context, final boolean useMediaMuxer,
 			@NonNull final DocumentFile file) throws IOException;
 	}
 
+	/**
+	 * デフォルトのIMuxerFactory実装
+	 */
 	public static class DefaultFactory implements IMuxerFactory {
 		@SuppressLint("InlinedApi")
-		public IMuxer createMuxer(final boolean useMediaMuxer, final String output_oath) throws IOException {
+		public IMuxer createMuxer(final boolean useMediaMuxer, final String outputPath) throws IOException {
 			IMuxer result;
-			if (useMediaMuxer) {
-				result = new MediaMuxerWrapper(output_oath,
+			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
+				result = new MediaMuxerWrapper(outputPath,
 					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			} else {
 				throw new IOException("Unsupported muxer type");
@@ -74,13 +84,17 @@ public interface IMuxer {
 		@SuppressLint("NewApi")
 		public IMuxer createMuxer(final boolean useMediaMuxer, final int fd) throws IOException {
 			IMuxer result;
-			if (useMediaMuxer) {
-				if (BuildCheck.isOreo()) {
+			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
+				if (BuildCheck.isAPI29()) {
+					// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使いたいところだけど
+					// fdからMediaMuxerWrapperは生成できない
+					throw new UnsupportedOperationException("createMuxer from fd does not support on API29 and later devices");
+				} else if (BuildCheck.isAPI26()) {
 					final ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(fd);
 					result = new MediaMuxerWrapper(pfd.getFileDescriptor(),
 						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 				} else {
-					throw new RuntimeException("createMuxer from fd does not support now");
+					throw new UnsupportedOperationException("createMuxer from fd does not support on API<26");
 				}
 			} else {
 				throw new IOException("Unsupported muxer type");
@@ -94,21 +108,27 @@ public interface IMuxer {
 			final boolean useMediaMuxer,
 			@NonNull final DocumentFile file) throws IOException {
 
+			final Uri uri = file.getUri();
 			IMuxer result = null;
-			if (useMediaMuxer) {
-				if (BuildCheck.isOreo()) {
+			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
+				if (BuildCheck.isAPI29() && UriHelper.isContentUri(uri)) {
+					// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使って出力終了時にIS_PENDINGの更新を自動でする
+					result = new MediaMuxerWrapper(
+						new MediaStoreOutputStream(context, file),
+						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
+				} else if (BuildCheck.isAPI26()) {
 					result = new MediaMuxerWrapper(context.getContentResolver()
-						.openFileDescriptor(file.getUri(), "rw").getFileDescriptor(),
+						.openFileDescriptor(uri, "rw").getFileDescriptor(),
 						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 				} else {
-					final String path = UriHelper.getPath(context, file.getUri());
-					final File f = new File(UriHelper.getPath(context, file.getUri()));
+					final String path = UriHelper.getPath(context, uri);
+					final File f = new File(path);
 					if (/*!f.exists() &&*/ f.canWrite()) {
 						// 書き込めるファイルパスを取得できればそれを使う
 						result = new MediaMuxerWrapper(path,
 							MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 					} else {
-						Log.w("IMuxer", "cant't write to the file, try to use VideoMuxer instead");
+						Log.w("IMuxer", "can't write to the file, try to use VideoMuxer instead");
 					}
 				}
 			}
