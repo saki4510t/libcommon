@@ -124,7 +124,7 @@ class CameraFragment : AbstractCameraFragment() {
 //							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
 //						dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
 						MediaFileUtils.getRecordingFile(
-							context, Const.REQUEST_ACCESS_SD, "video/mp4", Environment.DIRECTORY_MOVIES, ".mp4")
+							context, Const.REQUEST_ACCESS_SD, Environment.DIRECTORY_MOVIES, "video/mp4", ".mp4")
 					}
 					if (DEBUG) Log.v(TAG, "onReady:output=$output")
 					if (output != null) {
