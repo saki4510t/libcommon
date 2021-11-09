@@ -123,6 +123,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
 						dir!!.createFile("*/*", FileUtils.getDateTimeString() + ".mp4")
 					}
+					if (DEBUG) Log.v(TAG, "onReady:output=$output," + output?.uri)
 					if (output != null) {
 						mRecorder!!.start(output)
 					} else {

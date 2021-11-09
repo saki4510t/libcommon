@@ -54,6 +54,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			MediaFileUtils.getRecordingFile(
 				context, Const.REQUEST_ACCESS_SD, Environment.DIRECTORY_MOVIES, "video/mp4",".mp4")
 		}
+		if (DEBUG) Log.v(TAG, "internalStartRecording:output=$outputFile," + outputFile?.uri)
 		if (outputFile != null) {
 			startEncoder(outputFile, 2, CHANNEL_COUNT, false)
 		} else {
