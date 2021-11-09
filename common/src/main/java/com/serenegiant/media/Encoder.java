@@ -29,6 +29,7 @@ public interface Encoder {
 	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
 	public abstract void frameAvailableSoon();
 	public abstract boolean isCapturing();
+	@Deprecated
 	public abstract String getOutputPath();
 	@Deprecated
 	public abstract boolean isAudio();

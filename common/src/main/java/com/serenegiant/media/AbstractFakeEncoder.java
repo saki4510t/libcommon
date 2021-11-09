@@ -202,6 +202,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * 出力ファイルのパスを返す
 	 * @return
 	 */
+	@Deprecated
 	@Override
 	public String getOutputPath() {
 		return mRecorder != null ? mRecorder.getOutputPath() : null;
