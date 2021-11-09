@@ -91,6 +91,12 @@ public class KeyboardView extends View implements View.OnClickListener {
 	private static final int DELAY_AFTER_PREVIEW = 70;
 	private static final int DEBOUNCE_TIME = 70;
 
+	private static final int REPEAT_INTERVAL = 50; // ~20 keys per second
+	private static final int REPEAT_START_DELAY = 400;
+	private static final int LONGPRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
+
+	private static final int MAX_NEARBY_KEYS = 12;
+
 	/**
 	 * Listener for virtual keyboard events.
 	 */
@@ -156,30 +162,30 @@ public class KeyboardView extends View implements View.OnClickListener {
 
 	private Keyboard mKeyboard;
 	private int mCurrentKeyIndex = NOT_A_KEY;
-	private float mLabelTextSize;
-	private int mLabelTextColor;
-	private float mKeyTextSize;
-	private int mKeyTextColor;
-	private float mShadowRadius;
-	private int mShadowColor;
+	private final float mLabelTextSize;
+	private final int mLabelTextColor;
+	private final float mKeyTextSize;
+	private final int mKeyTextColor;
+	private final float mShadowRadius;
+	private final int mShadowColor;
 	private float mBackgroundDimAmount;
 
 	private TextView mPreviewText;
-	private PopupWindow mPreviewPopup;
+	private final PopupWindow mPreviewPopup;
 	private int mPreviewTextSizeLarge;
-	private int mPreviewOffset;
-	private int mPreviewHeight;
+	private final int mPreviewOffset;
+	private final int mPreviewHeight;
 	// Working variable
 	private final int[] mCoordinates = new int[2];
 
-	private PopupWindow mPopupKeyboard;
+	private final PopupWindow mPopupKeyboard;
 	private View mMiniKeyboardContainer;
 	private KeyboardView mMiniKeyboard;
 	private boolean mMiniKeyboardOnScreen;
 	private View mPopupParent;
 	private int mMiniKeyboardOffsetX;
 	private int mMiniKeyboardOffsetY;
-	private Map<Keyboard.Key, View> mMiniKeyboardCache;
+	private final Map<Keyboard.Key, View> mMiniKeyboardCache;
 	private Keyboard.Key[] mKeys;
 
 	/**
@@ -187,7 +193,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	 */
 	private OnKeyboardActionListener mKeyboardActionListener;
 
-	private int mVerticalCorrection;
+	private final int mVerticalCorrection;
 	private int mProximityThreshold;
 
 	private boolean mPreviewCentered = false;
@@ -218,28 +224,23 @@ public class KeyboardView extends View implements View.OnClickListener {
 	private final int[] mKeyIndices = new int[12];
 	private GestureDetector mGestureDetector;
 	private int mRepeatKeyIndex = NOT_A_KEY;
-	private int mPopupLayout;
+	private final int mPopupLayout;
 	private boolean mAbortKey;
 	private Keyboard.Key mInvalidatedKey;
 	@NonNull
 	private final Rect mClipRegion = new Rect(0, 0, 0, 0);
 	private boolean mPossiblePoly;
 	private final SwipeTracker mSwipeTracker = new SwipeTracker();
-	private int mSwipeThreshold;
-	private boolean mDisambiguateSwipe;
+	private final int mSwipeThreshold;
+	private final boolean mDisambiguateSwipe;
 
 	// Variables for dealing with multiple pointers
 	private int mOldPointerCount = 1;
 	private float mOldPointerX;
 	private float mOldPointerY;
 
-	private Drawable mKeyBackground;
+	private final Drawable mKeyBackground;
 
-	private static final int REPEAT_INTERVAL = 50; // ~20 keys per second
-	private static final int REPEAT_START_DELAY = 400;
-	private static final int LONGPRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
-
-	private static int MAX_NEARBY_KEYS = 12;
 	private final int[] mDistances = new int[MAX_NEARBY_KEYS];
 
 	// For multi-tap
@@ -258,7 +259,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	/**
 	 * The dirty region in the keyboard bitmap
 	 */
-	private Rect mDirtyRect = new Rect();
+	private final Rect mDirtyRect = new Rect();
 	/**
 	 * The keyboard bitmap for faster updates
 	 */
@@ -274,7 +275,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	/**
 	 * The accessibility manager for accessibility support
 	 */
-	private AccessibilityManager mAccessibilityManager;
+	private final AccessibilityManager mAccessibilityManager;
 //	/**
 //	 * The audio manager for accessibility support
 //	 */
