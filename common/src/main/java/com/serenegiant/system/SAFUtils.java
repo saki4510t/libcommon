@@ -44,6 +44,7 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -51,7 +52,6 @@ import androidx.fragment.app.FragmentActivity;
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFUtils {
 	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = SAFUtils.class.getSimpleName();
@@ -116,6 +116,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public static boolean hasPermission(
 		@NonNull final Context context,
 		final int requestCode) {
@@ -134,6 +135,7 @@ public class SAFUtils {
 		return false;
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public static boolean hasPermission(
 		@NonNull final List<UriPermission> persistedUriPermissions,
 		@NonNull final Uri uri) {
@@ -153,6 +155,7 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Activity activity,
@@ -177,6 +180,7 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final FragmentActivity activity,
@@ -202,6 +206,7 @@ public class SAFUtils {
 	 * @throws UnsupportedOperationException
 	 * @throws IllegalStateException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Fragment fragment,
@@ -246,6 +251,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
@@ -266,6 +272,7 @@ public class SAFUtils {
 	 * @param requestCode
 	 * @throws UnsupportedOperationException
 	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void releasePersistableUriPermission(
 		@NonNull final Context context,
 		final int requestCode) {
@@ -298,6 +305,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static DocumentFile getDir(
 		@NonNull final Context context,
@@ -402,6 +410,7 @@ public class SAFUtils {
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static DocumentFile getFile(
 		@NonNull final Context context,
@@ -464,6 +473,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static OutputStream getOutputStream(
 		@NonNull final Context context,
@@ -525,6 +535,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static InputStream getInputStream(
 		@NonNull final Context context,
@@ -587,6 +598,7 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
@@ -654,6 +666,7 @@ public class SAFUtils {
 	 * @param context
 	 * @return
 	 */
+	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static Map<Integer, Uri> getStorageUriAll(@NonNull final Context context) {
 		final Map<Integer, Uri> result = new HashMap<>();
@@ -771,6 +784,7 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@Nullable
 	private static Uri getStorageUri(
 		@NonNull final Context context,
@@ -805,6 +819,7 @@ public class SAFUtils {
 	 * ドキュメントツリーへのアクセスのためのIntentを返す
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	private static Intent prepareStorageAccessPermission() {
 		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
 	}
