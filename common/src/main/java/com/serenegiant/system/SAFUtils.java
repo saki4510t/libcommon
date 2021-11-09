@@ -30,6 +30,8 @@ import android.os.ParcelFileDescriptor;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.utils.FileUtils;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -438,6 +440,7 @@ public class SAFUtils {
 		@NonNull final String name) throws IOException {
 		
 		final DocumentFile tree = getDir(parent, dirs);
+		if (DEBUG) Log.v(TAG, "getFile:parent=" + parent.getUri() + ",tree=" + tree.getUri() + ",name=" + name);
 		final DocumentFile file = tree.findFile(name);
 		if (file != null) {
 			if (file.isFile()) {
@@ -446,7 +449,7 @@ public class SAFUtils {
 				throw new IOException("directory with same name already exists");
 			}
 		} else {
-			return tree.createFile(mime, name);
+			return createFile(tree, mime, name);
 		}
 	}
 
@@ -506,7 +509,7 @@ public class SAFUtils {
 			}
 		} else {
 			return context.getContentResolver().openOutputStream(
-				tree.createFile(mime, name).getUri());
+				createFile(tree, mime, name).getUri());
 		}
 	}
 
@@ -603,7 +606,7 @@ public class SAFUtils {
 					}
 				} else {
 					return context.getContentResolver().openFileDescriptor(
-						tree.createFile(mime, name).getUri(), "rw");
+						createFile(tree, mime, name).getUri(), "rw");
 				}
 			} else {
 				throw new FileNotFoundException("specific dir not found");
@@ -641,7 +644,7 @@ public class SAFUtils {
 			}
 		} else {
 			return context.getContentResolver().openFileDescriptor(
-				tree.createFile(mime, name).getUri(), "rw");
+				createFile(tree, mime, name).getUri(), "rw");
 		}
 	}
 
@@ -804,5 +807,33 @@ public class SAFUtils {
 	 */
 	private static Intent prepareStorageAccessPermission() {
 		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+	}
+
+	/**
+	 * DocumentFileから指定したmime/nameを持つDocumentFileを生成する
+	 * nameに拡張子が指定されている場合にはmimeのサブタイプを拡張子に置き換えて、
+	 * nameから拡張子を除いたものをdisplayNameとしてDocumentFileを生成する
+	 * @param tree
+	 * @param mime
+	 * @param name
+	 * @return
+	 */
+	private static DocumentFile createFile(
+		@NonNull final DocumentFile tree,
+		@NonNull final String mime, @NonNull final String name) {
+
+		// XXX mimeがvideo/mp4の様にサブタイプまで指定されている場合にnameが拡張子だとmimeに応じた拡張子が付加されて拡張子が二重になってしまうので対策
+		if (DEBUG) Log.v(TAG, "createFile:mine=" + mime + ",name=" + name);
+		final String ext = FileUtils.getExt(name);
+		if (TextUtils.isEmpty(ext)) {
+			// 拡張子がなければそのままDocumentFile#createFileを呼び出す
+			return tree.createFile(mime, name);
+		} else {
+			if (DEBUG) Log.v(TAG, "createFile:拡張子が指定されているのでmimeのサブタイプとして拡張子を使う,"
+				+ "ext=" + ext + ",displayName=" + FileUtils.removeFileExtension(name));
+			// 拡張子付きの場合はmimeのサブタイプを拡張子に置き換えて拡張子を除いた名前でDocumentFile#createFileを呼び出す
+			final String[] types = mime.split("/");
+			return tree.createFile(types[0] + "/" + ext, FileUtils.removeFileExtension(name));
+		}
 	}
 }
