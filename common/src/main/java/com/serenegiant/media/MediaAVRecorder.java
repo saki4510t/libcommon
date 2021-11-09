@@ -57,6 +57,8 @@ public class MediaAVRecorder extends Recorder {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final String ext, final int saveTreeId) throws IOException {
@@ -73,6 +75,8 @@ public class MediaAVRecorder extends Recorder {
 	 * @param factory
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final IMuxer.IMuxerFactory factory,
@@ -90,6 +94,8 @@ public class MediaAVRecorder extends Recorder {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final String prefix, final String _ext, final int saveTreeId)
@@ -108,6 +114,8 @@ public class MediaAVRecorder extends Recorder {
 	 * @param factory
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final IMuxer.IMuxerFactory factory,
@@ -125,6 +133,8 @@ public class MediaAVRecorder extends Recorder {
 	 * @param fileName
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName)
@@ -143,42 +153,14 @@ public class MediaAVRecorder extends Recorder {
 	 * @param factory
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final IMuxer.IMuxerFactory factory,
 		final int saveTreeId, @Nullable final String dirs, @NonNull final String fileName) throws IOException {
 
 		this(context, callback, null, factory, saveTreeId, dirs, fileName);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param callback
-	 * @param output
-	 * @throws IOException
-	 */
-	public MediaAVRecorder(@NonNull final Context context,
-		@Nullable final RecorderCallback callback,
-		@NonNull final DocumentFile output) throws IOException {
-		
-		this(context, callback, null, null, output);
-	}
-	
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param callback
-	 * @param output
-	 * @param factory
-	 * @throws IOException
-	 */
-	public MediaAVRecorder(@NonNull final Context context,
-		@Nullable final RecorderCallback callback,
-		@Nullable final IMuxer.IMuxerFactory factory,
-		@NonNull final DocumentFile output) throws IOException {
-
-		this(context, callback, null, factory, output);
 	}
 
 	/**
@@ -226,6 +208,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param factory
 	 * @throws IOException
 	 */
+	@Deprecated
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final VideoConfig config,
@@ -274,6 +257,7 @@ public class MediaAVRecorder extends Recorder {
 	 * @param factory
 	 * @throws IOException
 	 */
+	@Deprecated
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final VideoConfig config,
@@ -317,28 +301,6 @@ public class MediaAVRecorder extends Recorder {
 	 * @param callback
 	 * @param config
 	 * @param factory
-	 * @param output
-	 * @throws IOException
-	 */
-	public MediaAVRecorder(@NonNull final Context context,
-		@Nullable final RecorderCallback callback,
-		@Nullable final VideoConfig config,
-		@Nullable final IMuxer.IMuxerFactory factory,
-		@NonNull final DocumentFile output) throws IOException {
-
-		super(context, callback, config, factory);
-		mSaveTreeId = 0;
-		mOutputFile = output;
-		mOutputPath = UriHelper.getPath(context, output.getUri());
-		setupMuxer(context, output);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param callback
-	 * @param config
-	 * @param factory
 	 * @param outputPath
 	 * @throws IOException
 	 */
@@ -362,6 +324,59 @@ public class MediaAVRecorder extends Recorder {
 			}
 		}
 		setupMuxer(mOutputPath);
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param output
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		@NonNull final DocumentFile output) throws IOException {
+
+		this(context, callback, null, null, output);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param output
+	 * @param factory
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@NonNull final DocumentFile output) throws IOException {
+
+		this(context, callback, null, factory, output);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param config
+	 * @param factory
+	 * @param output
+	 * @throws IOException
+	 */
+	public MediaAVRecorder(@NonNull final Context context,
+		@Nullable final RecorderCallback callback,
+		@Nullable final VideoConfig config,
+		@Nullable final IMuxer.IMuxerFactory factory,
+		@NonNull final DocumentFile output) throws IOException {
+
+		super(context, callback, config, factory);
+		mSaveTreeId = 0;
+		mOutputFile = output;
+		mOutputPath = UriHelper.getPath(context, output.getUri());
+		setupMuxer(context, output);
 	}
 
 //--------------------------------------------------------------------------------
