@@ -74,6 +74,8 @@ public class StorageUtils {
 	 * @return
 	 * @throws IOException
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	@SuppressLint({"UsableSpace"})
 	@NonNull
 	public static StorageInfo getStorageInfo(
@@ -84,6 +86,34 @@ public class StorageUtils {
 			// 外部保存領域が書き込み可能な場合
 			// 外部ストレージへのパーミッションがないとnullが返ってくる
 			final File dir = FileUtils.getCaptureDir(context, type, saveTreeId);
+//					Log.i(TAG, "checkFreeSpace:dir=" + dir);
+			if (dir != null) {
+				final long freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0L;
+				return new StorageInfo(dir.getTotalSpace(), freeSpace);
+			}
+		} catch (final Exception e) {
+			Log.w("getStorageInfo:", e);
+		}
+		throw new IOException();
+	}
+
+	/**
+	 * ストレージの情報を取得
+	 * @param context
+	 * @param type
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressLint({"UsableSpace"})
+	@NonNull
+	public static StorageInfo getStorageInfo(
+		@NonNull final Context context,
+		@NonNull final String type) throws IOException {
+
+		try {
+			// 外部保存領域が書き込み可能な場合
+			// 外部ストレージへのパーミッションがないとnullが返ってくる
+			final File dir = FileUtils.getCaptureDir(context, type);
 //					Log.i(TAG, "checkFreeSpace:dir=" + dir);
 			if (dir != null) {
 				final long freeSpace = dir.canWrite() ? dir.getUsableSpace() : 0L;

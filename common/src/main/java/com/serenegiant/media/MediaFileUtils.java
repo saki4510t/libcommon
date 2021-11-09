@@ -90,25 +90,25 @@ public class MediaFileUtils {
 		@NonNull final String type,
 		final int saveTreeId) {
 
+		if (DEBUG) Log.v(TAG, "getRecordingRoot:type=" + type);
 		// SAF経由での録画用ディレクトリ取得を試みる
 		DocumentFile root = getSAFRecordingRoot(context, saveTreeId);
 		if ((root == null) && PermissionCheck.hasWriteExternalStorage(context)) {
 			// SAF経由で録画用ディレクトリを取得できなかったが外部ストレージのアクセスパーミッションがある時
 			if (DEBUG) Log.d(TAG, "getRecordingRoot:アプリが外部ストレージへのアクセスパーミッションを保持していればパスの取得を試みる");
 			final File captureDir
-				= FileUtils.getCaptureDir(context, type, 0);
+				= FileUtils.getCaptureDir(context, type);
 			if ((captureDir != null) && captureDir.canWrite()) {
 				root = DocumentFile.fromFile(captureDir);
 				// こっちの場合は既にディレクトリ名としてFileUtils.DIR_NAMEが付加されてくるはずなのでここでは追加しない
 			}
 		}
-		if (DEBUG) Log.v(TAG, "getRecordingRoot:root=" + root);
+		if (DEBUG) Log.v(TAG, "getRecordingRoot:root=" + root + ",uri=" + (root != null ? root.getUri() : ""));
 		return root;
 	}
 
 	/**
 	 * 静止画/動画保存用のDocumentFileを取得
-	 * FIXME typeにDIRECTORY_MOVIESを指定しても反映されずDIRECTORY_DCIMで返ってきてしまう？
 	 * @param context
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @param mime

@@ -18,23 +18,23 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.os.Environment;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.serenegiant.system.SAFUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 
-import android.annotation.SuppressLint;
-import android.content.Context;
-import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
-
-import android.text.TextUtils;
-import android.util.Log;
-
-import com.serenegiant.system.SAFUtils;
 
 public class FileUtils {
 	private static final boolean DEBUG = false;	// set false on production
@@ -65,6 +65,8 @@ public class FileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return 書き込み出来なければnullを返す
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	@Nullable
     public static final File getCaptureFile(@NonNull final Context context,
     	final String type, final String ext, final int saveTreeId) {
@@ -77,11 +79,27 @@ public class FileUtils {
 	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
 	 * @param context
 	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
+	 * @param ext 拡張子, .mp4 .png または .jpeg/.jpeg, .webp等
+	 * @return 書き込み出来なければnullを返す
+	 */
+	@Nullable
+    public static final File getCaptureFile(@NonNull final Context context,
+    	final String type, final String ext) {
+
+    	return getCaptureFile(context, type, null, ext);
+    }
+
+	/**
+	 * キャプチャ用のFileインスタンスを生成
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
+	 * @param context
+	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
 	 * @param prefix
 	 * @param ext 拡張子, .mp4 .png または .jpeg/.jpeg, .webp等
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
+	@Deprecated
 	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@Nullable
 	public static final File getCaptureFile(@NonNull final Context context,
@@ -114,12 +132,45 @@ public class FileUtils {
 		}
 		if (result == null) {
 			if (DEBUG) Log.v(TAG, "プライマリ外部ストレージへフォールバックする(WRITE_EXTERNAL_STORAGEがないと失敗する)");
-			final File dir = getCaptureDir(context, type, 0);
+			final File dir = getCaptureDir(context, type);
 			if (dir != null) {
 				dir.mkdirs();
 				if (dir.canWrite()) {
 					result = dir;
 				}
+			}
+		}
+		if (result != null) {
+			result = new File(result, file_name);
+		}
+		if (DEBUG) Log.v(TAG, "getCaptureFile:result=" + result);
+		return result;
+	}
+
+	/**
+	 * キャプチャ用のFileインスタンスを生成
+	 * FIXME アクセスできないときはnullを返す代わりにIOExceptionを投げるように変更する
+	 * @param context
+	 * @param type Environment.DIRECTORY_MOVIES / Environment.DIRECTORY_DCIM
+	 * @param prefix
+	 * @param ext 拡張子, .mp4 .png または .jpeg/.jpeg, .webp等
+	 * @return
+	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@Nullable
+	public static final File getCaptureFile(@NonNull final Context context,
+		final String type, final String prefix, final String ext) {
+
+		if (DEBUG) Log.v(TAG, "getCaptureFile:");
+		// 保存先のファイル名を生成
+		File result = null;
+		final String file_name = (TextUtils.isEmpty(prefix) ? getDateTimeString() : prefix + getDateTimeString()) + ext;
+		if (DEBUG) Log.v(TAG, "プライマリ外部ストレージへフォールバックする(WRITE_EXTERNAL_STORAGEがないと失敗する)");
+		final File dir = getCaptureDir(context, type);
+		if (dir != null) {
+			dir.mkdirs();
+			if (dir.canWrite()) {
+				result = dir;
 			}
 		}
 		if (result != null) {
@@ -142,11 +193,12 @@ public class FileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
-	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@Deprecated
 	@SuppressLint("NewApi")
+	@SuppressWarnings("ResultOfMethodCallIgnored")
 	@Nullable
 	public static final File getCaptureDir(@NonNull final Context context,
-		final String type, final int saveTreeId) {
+		@NonNull final String type, final int saveTreeId) {
 
 		if (DEBUG) Log.v(TAG, "getCaptureDir:saveTreeId=" + saveTreeId + ", context=" + context);
 		File result = null;
@@ -177,6 +229,41 @@ public class FileUtils {
 		return null;
     }
 
+	/**
+	 * 外部ストレージ上の保存ディレクトリを取得する
+	 * 実際にアクセスするには外部ストレージアクセスのパーミッションが必要
+	 * @param context
+	 * @param type 外部ストレージのディレクトリタイプ,
+	 * 	Environment.DIRECTORY_MUSIC, .DIRECTORY_PODCASTS,
+	 *	.DIRECTORY_RINGTONES, .DIRECTORY_ALARMS,
+	 *	.DIRECTORY_NOTIFICATIONS}, .DIRECTORY_PICTURES,
+	 *	.DIRECTORY_MOVIES}, .DIRECTORY_DOWNLOADS,
+	 *	.DIRECTORY_DCIM, .DIRECTORY_DOCUMENTS
+	 * @return
+	 */
+	@SuppressWarnings("ResultOfMethodCallIgnored")
+	@Nullable
+	public static File getCaptureDir(@NonNull final Context context, @NonNull final String type) {
+		if (DEBUG) Log.v(TAG, "getCaptureDir:type=" + type);
+		if (!UriHelper.isStandardDirectory(type)) {
+			throw new IllegalArgumentException(type + " is not a standard directory name!");
+		}
+		final String dirName = getDirName();
+		File dir = Environment.getExternalStoragePublicDirectory(type);	// API>=8
+		if (dir.canWrite()) {
+			dir.mkdirs();
+		}
+		if (!TextUtils.isEmpty(dirName)) {
+			final boolean canWrite = dir.canWrite();
+			dir = new File(dir, dirName);
+			if (canWrite) {
+				dir.mkdirs();
+			}
+		}
+		if (DEBUG) Log.v(TAG, "getCaptureDir:" + dir);
+       	return dir;
+	}
+
 	private static final SimpleDateFormat sDateTimeFormat
 		= new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.US);
 
@@ -200,13 +287,15 @@ public class FileUtils {
 	
 	/**
 	 * プライマリー外部ストレージの空き容量のチェック
-  * プライマリー外部ストレージの空き容量がFREE_RATIO(5%)以上かつFREE_SIZE(20MB)以上ならtrueを返す
+	 * プライマリー外部ストレージの空き容量がFREE_RATIO(5%)以上かつFREE_SIZE(20MB)以上ならtrueを返す
 	 * @param context
 	 * @param max_duration
 	 * @param startTime
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return 使用可能であればtrue
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
     public static final boolean checkFreeSpace(final Context context,
     	final long max_duration, final long startTime, final int saveTreeId) {
 //		Log.i(TAG, "checkFreeSpace:save_tree_id=" + save_tree_id + ", context=" + context);
@@ -220,12 +309,15 @@ public class FileUtils {
 
 	/**
 	 * プライマリー外部ストレージの空き容量のチェック
+	 * Deprecated StorageUtils/StorageInfoを使う
 	 * @param context
 	 * @param ratio 空き容量の割合(0-1]
 	 * @param minFree 最小空き容量[バイト]
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return 使用可能であればtrue
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
     public static final boolean checkFreeSpace(final Context context,
     	final float ratio, final float minFree, final int saveTreeId) {
 
@@ -266,7 +358,9 @@ public class FileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("UsableSpace")
+	@SuppressWarnings("deprecation")
 	public static final long getAvailableFreeSpace(final Context context,
 		final String type, final int saveTreeId) {
 
@@ -287,6 +381,8 @@ public class FileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	public static final float getFreeRatio(final Context context,
 		final String type, final int saveTreeId) {
 
