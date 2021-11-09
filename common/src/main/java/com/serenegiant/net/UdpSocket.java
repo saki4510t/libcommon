@@ -37,8 +37,7 @@ import java.util.Enumeration;
 public class UdpSocket {
 	private DatagramChannel channel;
 	private final InetSocketAddress broadcast;
-	private SocketAddress sender;
-	private String localAddress;
+	private final String localAddress;
 	private String remoteAddress;
 	private int remotePort;
 
@@ -260,7 +259,7 @@ public class UdpSocket {
 			throw new IllegalStateException("already released");
 		}
 		final int read = buffer.remaining();
-		sender = channel.receive(buffer);
+		final SocketAddress sender = channel.receive(buffer);
 		if (sender == null) {
 			return -1;
 		}

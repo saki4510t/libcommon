@@ -21,7 +21,6 @@ package com.serenegiant.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 
-import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -34,6 +33,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.TypedArrayUtils;
 
 import java.util.Locale;
 

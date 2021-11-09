@@ -143,12 +143,12 @@ public class Keyboard {
 	/**
 	 * List of keys in this keyboard
 	 */
-	private List<Key> mKeys;
+	private final List<Key> mKeys;
 
 	/**
 	 * List of modifier keys such as Shift & Alt, if any
 	 */
-	private List<Key> mModifierKeys;
+	private final List<Key> mModifierKeys;
 
 	/**
 	 * Width of the screen available to fit the keyboard

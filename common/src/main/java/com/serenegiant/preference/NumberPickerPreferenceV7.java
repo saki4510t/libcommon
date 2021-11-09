@@ -24,12 +24,12 @@ import android.util.AttributeSet;
 import android.util.Log;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.TypedArrayUtils;
 
 import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.DialogPreference;
 
 public class NumberPickerPreferenceV7 extends DialogPreference {

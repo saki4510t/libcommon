@@ -569,7 +569,7 @@ public abstract class Recorder implements IRecorder {
 
 		@SuppressWarnings("ConstantConditions")
 		@Override
-		public final void handleMessage(final Message msg) {
+		public final void handleMessage(@NonNull final Message msg) {
 			final Recorder recorder = mThread.mWeakRecorder.get();
 			if (recorder == null) {
 //				Log.w(TAG, "unexpectedly recorder is null");

@@ -144,7 +144,7 @@ public abstract class MediaReaper implements Runnable {
 	/**
 	 * エンコード用バッファ
 	 */
-	private MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
+	private final MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
 	private volatile boolean mIsRunning;
 	private volatile boolean mRecorderStarted;
 	private boolean mRequestStop;

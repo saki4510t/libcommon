@@ -34,7 +34,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
-import androidx.core.content.res.TypedArrayUtils;
+import androidx.core.content.ContextCompat;
 import androidx.preference.Preference;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -45,6 +45,7 @@ import android.view.WindowManager;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.TypedArrayUtils;
 
 public class DialogPreferenceV7 extends Preference
 	implements DialogInterface.OnClickListener, DialogInterface.OnDismissListener {
@@ -190,7 +191,7 @@ public class DialogPreferenceV7 extends Preference
 	 * @param dialogIconRes The icon, as a resource ID.
 	 */
 	public void setDialogIcon(@DrawableRes final int dialogIconRes) {
-		mDialogIcon = getContext().getResources().getDrawable(dialogIconRes);
+		mDialogIcon = ContextCompat.getDrawable(getContext(), dialogIconRes);
 	}
 	
 	/**
@@ -492,7 +493,7 @@ public class DialogPreferenceV7 extends Preference
 		public SavedState(Parcel source) {
 			super(source);
 			isDialogShowing = source.readInt() == 1;
-			dialogBundle = source.readBundle();
+			dialogBundle = source.readBundle(getClass().getClassLoader());
 		}
 		
 		@Override

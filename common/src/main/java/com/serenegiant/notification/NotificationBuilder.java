@@ -229,6 +229,8 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @return
 	 */
 	@SuppressLint("InlinedApi")
+	@NonNull
+	@Override
 	public Notification build() {
 		if (mChannelBuilder.getImportance() == NotificationManager.IMPORTANCE_NONE) {
 			// importanceが設定されていないときでmPriorityがセットされていればそれに従う
@@ -246,7 +248,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_HIGH);
 				break;
 			case NotificationCompat.PRIORITY_MAX:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_HIGH);
+				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_MAX);
 				break;
 			default:
 				// ChannelBuilder側の設定に従う==IMPORTANCE_DEFAULT
@@ -313,7 +315,8 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	public ChannelBuilder getChannelBuilder() {
 		return mChannelBuilder;
 	}
-	
+
+	@NonNull
 	@Override
 	public NotificationBuilder setChannelId(@NonNull final String channelId) {
 		super.setChannelId(channelId);
@@ -474,6 +477,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param intent
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public NotificationBuilder setContentIntent(final PendingIntent intent) {
 		super.setContentIntent(mContentIntent);
@@ -502,6 +506,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param intent
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public NotificationBuilder setDeleteIntent(final PendingIntent intent) {
 		super.setDeleteIntent(intent);
@@ -526,85 +531,99 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	protected PendingIntent createDeleteIntent() {
 		return mDeleteIntent;
 	}
-	
+
+	@NonNull
 	@Override
 	public NotificationBuilder setWhen(final long when) {
 		super.setWhen(when);
 		return this;
 	}
-	
+
+	@NonNull
 	@Override
 	public NotificationBuilder setShowWhen(final boolean show) {
 		super.setShowWhen(show);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setUsesChronometer(final boolean b) {
 		super.setUsesChronometer(b);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setSmallIcon(final int icon) {
 		super.setSmallIcon(icon);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setSmallIcon(final int icon, final int level) {
 		super.setSmallIcon(icon, level);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setContentTitle(final CharSequence title) {
 		super.setContentTitle(title);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setContentText(final CharSequence text) {
 		super.setContentText(text);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setSubText(final CharSequence text) {
 		super.setSubText(text);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setRemoteInputHistory(final CharSequence[] text) {
 		super.setRemoteInputHistory(text);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setNumber(final int number) {
 		super.setNumber(number);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setContentInfo(final CharSequence info) {
 		super.setContentInfo(info);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setProgress(final int max, final int progress, final boolean indeterminate) {
 		super.setProgress(max, progress, indeterminate);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setContent(final RemoteViews views) {
 		super.setContent(views);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setFullScreenIntent(final PendingIntent intent,
 		final boolean highPriority) {
@@ -628,18 +647,21 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return mFullScreenIntent;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setTicker(final CharSequence tickerText) {
 		super.setTicker(tickerText);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setTicker(final CharSequence tickerText, final RemoteViews views) {
 		super.setTicker(tickerText, views);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setLargeIcon(final Bitmap icon) {
 		super.setLargeIcon(icon);
@@ -656,6 +678,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setSound(final Uri sound) {
 		super.setSound(sound);
@@ -664,6 +687,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	}
 	
 	@SuppressLint("NewApi")
+	@NonNull
 	@Override
 	public NotificationBuilder setSound(final Uri sound, final int streamType) {
 		super.setSound(sound, streamType);
@@ -677,6 +701,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setVibrate(final long[] pattern) {
 		super.setVibrate(pattern);
@@ -684,6 +709,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setLights(final int argb, final int onMs, final int offMs) {
 		super.setLights(argb, onMs, offMs);
@@ -691,48 +717,56 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setOngoing(final boolean ongoing) {
 		super.setOngoing(ongoing);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setColorized(final boolean colorize) {
 		super.setColorized(colorize);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setOnlyAlertOnce(final boolean onlyAlertOnce) {
 		super.setOnlyAlertOnce(onlyAlertOnce);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setAutoCancel(final boolean autoCancel) {
 		super.setAutoCancel(autoCancel);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setLocalOnly(final boolean b) {
 		super.setLocalOnly(b);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setCategory(final String category) {
 		super.setCategory(category);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setDefaults(final int defaults) {
 		super.setDefaults(defaults);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setPriority(final int pri) {
 		super.setPriority(pri);
@@ -740,6 +774,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder addPerson(final String uri) {
 		super.addPerson(uri);
@@ -752,6 +787,7 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param groupKey
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public NotificationBuilder setGroup(final String groupKey) {
 		super.setGroup(groupKey);
@@ -764,42 +800,49 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param isGroupSummary
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public NotificationBuilder setGroupSummary(final boolean isGroupSummary) {
 		super.setGroupSummary(isGroupSummary);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setSortKey(final String sortKey) {
 		super.setSortKey(sortKey);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder addExtras(final Bundle extras) {
 		super.addExtras(extras);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setExtras(final Bundle extras) {
 		super.setExtras(extras);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder addAction(final int icon, final CharSequence title, final PendingIntent intent) {
 		super.addAction(icon, title, intent);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder addAction(final NotificationCompat.Action action) {
 		super.addAction(action);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setStyle(final NotificationCompat.Style style) {
 		super.setStyle(style);
@@ -811,12 +854,14 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param argb
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public NotificationBuilder setColor(final int argb) {
 		super.setColor(argb);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setVisibility(final int visibility) {
 		super.setVisibility(visibility);
@@ -824,56 +869,65 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setPublicVersion(final Notification n) {
 		super.setPublicVersion(n);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setCustomContentView(final RemoteViews contentView) {
 		super.setCustomContentView(contentView);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setCustomBigContentView(final RemoteViews contentView) {
 		super.setCustomBigContentView(contentView);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setCustomHeadsUpContentView(final RemoteViews contentView) {
 		super.setCustomHeadsUpContentView(contentView);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setTimeoutAfter(final long durationMs) {
 		super.setTimeoutAfter(durationMs);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setShortcutId(final String shortcutId) {
 		super.setShortcutId(shortcutId);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setBadgeIconType(@BadgeIconType  final int icon) {
 		super.setBadgeIconType(icon);
 		return this;
 	}
 	
+	@NonNull
 	@Override
 	public NotificationBuilder setGroupAlertBehavior(final int groupAlertBehavior) {
 		super.setGroupAlertBehavior(groupAlertBehavior);
 		return this;
 	}
 	
+	@NonNull
 	@Override
-	public NotificationBuilder extend(final NotificationCompat.Extender extender) {
+	public NotificationBuilder extend(@NonNull final NotificationCompat.Extender extender) {
 		super.extend(extender);
 		return this;
 	}

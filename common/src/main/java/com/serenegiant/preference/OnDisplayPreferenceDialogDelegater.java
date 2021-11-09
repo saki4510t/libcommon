@@ -65,6 +65,7 @@ public class OnDisplayPreferenceDialogDelegater {
 	 * @param preference
 	 * @return true: 処理済み, false: 未処理
 	 */
+	@Deprecated
 	public static boolean onDisplayPreferenceDialog(
 		@NonNull final PreferenceFragment fragment,
 		final Preference preference) {

@@ -92,7 +92,7 @@ public final class CpuMonitor {
 	}
 
 //--------------------------------------------------------------------------------
-	private int[] percentVec = new int[SAMPLE_SAVE_NUMBER];
+	private final int[] percentVec = new int[SAMPLE_SAVE_NUMBER];
 	private int sum3 = 0;
 	private int sum10 = 0;
 	private long[] cpuFreq;
@@ -333,8 +333,8 @@ public final class CpuMonitor {
 	 * of /proc/stat.
 	 */
 	private ProcStat readIdleAndRunTime() {
-		long runTime = 0;
-		long idleTime = 0;
+		long runTime;
+		long idleTime;
 		try {
 			final FileReader fin = new FileReader("/proc/stat");
 			try {

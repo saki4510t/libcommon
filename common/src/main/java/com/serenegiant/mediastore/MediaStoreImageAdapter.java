@@ -73,7 +73,7 @@ public class MediaStoreImageAdapter extends PagerAdapter {
 	protected ChangeObserver mChangeObserver;
 	protected DataSetObserver mDataSetObserver;
 	private Cursor mCursor;
-	private String mSelection = SELECTIONS[MEDIA_IMAGE];	// 静止画のみ有効
+	private final String mSelection = SELECTIONS[MEDIA_IMAGE];	// 静止画のみ有効
 	private String[] mSelectionArgs = null;
 	@NonNull
 	private final MediaInfo info = new MediaInfo();

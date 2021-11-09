@@ -327,11 +327,11 @@ public class ChannelBuilder {
 	@NonNull
 	private final Context mContext;
 	@NonNull
-	private String channelId = DEFAULT_CHANNEL_ID;
+	private String channelId;
 	@Nullable
 	private CharSequence name;
 	@Importance
-	private int importance = NotificationManager.IMPORTANCE_NONE;
+	private int importance;
 	@NotificationVisibility
 	private int lockscreenVisibility = Notification.VISIBILITY_PRIVATE;
 	private boolean bypassDnd = false;
@@ -407,7 +407,8 @@ public class ChannelBuilder {
 		this.groupId = groupId;
 		this.groupName = groupName;
 	}
-	
+
+	@NonNull
 	@Override
 	public String toString() {
 		return "ChannelBuilder{" +

@@ -126,4 +126,12 @@ public class AspectRatioFrameLayout extends FrameLayout implements IScaledView {
 		return mRequestedAspect;
 	}
 
+	@Override
+	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
+		if (mNeedResizeToKeepAspect != keepAspect) {
+			mNeedResizeToKeepAspect = keepAspect;
+			requestLayout();
+		}
+	}
+
 }

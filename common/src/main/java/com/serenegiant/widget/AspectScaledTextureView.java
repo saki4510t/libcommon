@@ -169,7 +169,7 @@ public class AspectScaledTextureView extends TransformTextureView
 // SurfaceTextureListener
 //================================================================================
 	@Override
-	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureAvailable(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		mHasSurface = true;
 		init();
 		if (mListener != null) {
@@ -178,14 +178,14 @@ public class AspectScaledTextureView extends TransformTextureView
 	}
 
 	@Override
-	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureSizeChanged(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		if (mListener != null) {
 			mListener.onSurfaceTextureSizeChanged(surface, width, height);
 		}
 	}
 
 	@Override
-	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
+	public boolean onSurfaceTextureDestroyed(@NonNull final SurfaceTexture surface) {
 		mHasSurface = false;
 		if (mListener != null) {
 			mListener.onSurfaceTextureDestroyed(surface);
@@ -195,7 +195,7 @@ public class AspectScaledTextureView extends TransformTextureView
 
 	@Deprecated
 	@Override
-	public void onSurfaceTextureUpdated(final SurfaceTexture surface) {
+	public void onSurfaceTextureUpdated(@NonNull final SurfaceTexture surface) {
 		if (mListener != null) {
 			mListener.onSurfaceTextureUpdated(surface);
 		}
@@ -238,6 +238,14 @@ public class AspectScaledTextureView extends TransformTextureView
 	@Override
 	public int getScaleMode() {
 		return mScaleMode;
+	}
+
+	@Override
+	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
+		if (mNeedResizeToKeepAspect != keepAspect) {
+			mNeedResizeToKeepAspect = keepAspect;
+			requestLayout();
+		}
 	}
 
 //================================================================================
@@ -284,7 +292,7 @@ public class AspectScaledTextureView extends TransformTextureView
 				width / viewWidth, height / viewHeight));
 			mImageMatrix.postScale(
 				(float)(width / viewWidth), (float)(height / viewHeight),
-				viewWidth / 2, viewHeight / 2);
+				viewWidth / 2.0f, viewHeight / 2.0f);
 			break;
 		}
 		if (DEBUG) Log.v(TAG, "init:" + mImageMatrix);

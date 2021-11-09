@@ -475,8 +475,8 @@ public final class ItemPicker extends LinearLayout {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9'
     };
 
-    private ItemPickerButton mIncrementButton;
-    private ItemPickerButton mDecrementButton;
+    private final ItemPickerButton mIncrementButton;
+    private final ItemPickerButton mDecrementButton;
 
     private class NumberPickerInputFilter implements InputFilter {
         @Override
@@ -489,7 +489,7 @@ public final class ItemPicker extends LinearLayout {
             final String result = String.valueOf(dest.subSequence(0, dstart))
                     + filtered
                     + dest.subSequence(dend, dest.length());
-            final String str = String.valueOf(result).toLowerCase(Locale.US);
+            final String str = result.toLowerCase(Locale.US);
             for (String val : mDisplayedValues) {
                 val = val.toLowerCase(Locale.US);
                 if (val.startsWith(str)) {

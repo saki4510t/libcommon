@@ -429,6 +429,14 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
+	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
+		if (mNeedResizeToKeepAspect != keepAspect) {
+			mNeedResizeToKeepAspect = keepAspect;
+			requestLayout();
+		}
+	}
+
+	@Override
 	public void setScaleMode(@ScaleMode final int scaleMode) {
 		final IViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {

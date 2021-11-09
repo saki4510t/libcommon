@@ -29,8 +29,6 @@ import android.util.DisplayMetrics;
 import android.view.Display;
 import android.view.WindowManager;
 
-import com.serenegiant.system.BuildCheck;
-
 public class ScreenInfo {
 
 	private ScreenInfo() {

@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
  */
 public class ContextUtils {
 	private ContextUtils() {
-		// インスタンス化をエラーにするためにデフォルトコンストラクタをｐrivateに
+		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
 	/**

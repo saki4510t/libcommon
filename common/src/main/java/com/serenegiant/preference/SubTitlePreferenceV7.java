@@ -29,13 +29,13 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.TypedArrayUtils;
 import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.StringRes;
 import androidx.annotation.UiThread;
-import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 

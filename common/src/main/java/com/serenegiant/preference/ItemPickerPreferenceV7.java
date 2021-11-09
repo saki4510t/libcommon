@@ -21,7 +21,6 @@ package com.serenegiant.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 
-import androidx.core.content.res.TypedArrayUtils;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
@@ -31,6 +30,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
 import com.serenegiant.common.R;
+import com.serenegiant.utils.TypedArrayUtils;
 import com.serenegiant.widget.ItemPicker;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 

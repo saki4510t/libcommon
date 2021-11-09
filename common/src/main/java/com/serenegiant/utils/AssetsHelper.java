@@ -32,7 +32,7 @@ public class AssetsHelper {
 	}
 
 	public static String loadString(@NonNull final AssetManager assets, @NonNull final String name) throws IOException {
-		final StringBuffer sb = new StringBuffer();
+		final StringBuilder sb = new StringBuilder();
 		final char[] buf = new char[1024];
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(assets.open(name)));
 		int r = reader.read(buf);

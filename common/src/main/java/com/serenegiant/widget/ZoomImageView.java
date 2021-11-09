@@ -471,6 +471,11 @@ public class ZoomImageView extends TransformImageView
 		return mDelegater.getScaleMode();
 	}
 
+	@Override
+	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
+		mDelegater.setKeepAspect(keepAspect);
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * View表内容の拡大縮小回転平行移動を初期化

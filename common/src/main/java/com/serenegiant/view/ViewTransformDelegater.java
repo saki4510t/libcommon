@@ -655,6 +655,13 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		return mScaleMode;
 	}
 
+	public void setKeepAspect(final boolean keepAspect) {
+		if (mNeedResizeToKeepAspect != keepAspect) {
+			mNeedResizeToKeepAspect = keepAspect;
+			getTargetView().requestLayout();
+		}
+	}
+
 	/**
 	 * View表内容の拡大縮小回転平行移動を初期化
 	 */

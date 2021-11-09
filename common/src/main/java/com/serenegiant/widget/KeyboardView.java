@@ -215,7 +215,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	private int mDownKey = NOT_A_KEY;
 	private long mLastKeyTime;
 	private long mCurrentKeyTime;
-	private int[] mKeyIndices = new int[12];
+	private final int[] mKeyIndices = new int[12];
 	private GestureDetector mGestureDetector;
 	private int mRepeatKeyIndex = NOT_A_KEY;
 	private int mPopupLayout;
@@ -224,7 +224,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	@NonNull
 	private final Rect mClipRegion = new Rect(0, 0, 0, 0);
 	private boolean mPossiblePoly;
-	private SwipeTracker mSwipeTracker = new SwipeTracker();
+	private final SwipeTracker mSwipeTracker = new SwipeTracker();
 	private int mSwipeThreshold;
 	private boolean mDisambiguateSwipe;
 
@@ -240,7 +240,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	private static final int LONGPRESS_TIMEOUT = ViewConfiguration.getLongPressTimeout();
 
 	private static int MAX_NEARBY_KEYS = 12;
-	private int[] mDistances = new int[MAX_NEARBY_KEYS];
+	private final int[] mDistances = new int[MAX_NEARBY_KEYS];
 
 	// For multi-tap
 	private int mLastSentIndex;
@@ -833,7 +833,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 			paint.setColor(0xFF0000FF);
 			canvas.drawCircle(mLastX, mLastY, 3, paint);
 			paint.setColor(0xFF00FF00);
-			canvas.drawCircle((mStartX + mLastX) / 2, (mStartY + mLastY) / 2, 2, paint);
+			canvas.drawCircle((mStartX + mLastX) / 2.0f, (mStartY + mLastY) / 2.0f, 2, paint);
 		}
 		mCanvas.restore();
 		mDrawPending = false;
@@ -927,7 +927,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (mInMultiTap) {
 			// Multi-tap
 			mPreviewLabel.setLength(0);
-			mPreviewLabel.append((char) key.codes[mTapCount < 0 ? 0 : mTapCount]);
+			mPreviewLabel.append((char) key.codes[Math.max(mTapCount, 0)]);
 			return adjustCase(mPreviewLabel);
 		} else {
 			return adjustCase(key.label);
@@ -1230,7 +1230,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 			popupY = popupY - mMiniKeyboardContainer.getMeasuredHeight();
 			final int x = popupX + mMiniKeyboardContainer.getPaddingRight() + mCoordinates[0];
 			final int y = popupY + mMiniKeyboardContainer.getPaddingBottom() + mCoordinates[1];
-			mMiniKeyboard.setPopupOffset(x < 0 ? 0 : x, y);
+			mMiniKeyboard.setPopupOffset(Math.max(x, 0), y);
 			mMiniKeyboard.setShifted(isShifted());
 			mPopupKeyboard.setContentView(mMiniKeyboardContainer);
 			mPopupKeyboard.setWidth(mMiniKeyboardContainer.getMeasuredWidth());

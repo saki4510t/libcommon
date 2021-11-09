@@ -50,7 +50,7 @@ public abstract class Pool<T> {
 	 */
 	public Pool(final int initNum, final int maxNumInPool, final int limitNum) {
 		mInitNum = initNum;
-		mMaxNumInPool = maxNumInPool < limitNum ? maxNumInPool : limitNum;
+		mMaxNumInPool = Math.min(maxNumInPool, limitNum);
 		mLimitNum = limitNum;
 		init();
 	}

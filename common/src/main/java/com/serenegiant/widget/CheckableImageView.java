@@ -20,7 +20,6 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.widget.Checkable;
 
 import androidx.appcompat.widget.AppCompatImageView;
 

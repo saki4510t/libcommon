@@ -151,6 +151,8 @@ public class UdpBeacon {
 			}
 		}
 
+		@NonNull
+		@Override
 		public String toString() {
 			return String.format(Locale.US, "Beacon(%s,port=%d,extra=%d)", uuid.toString(), listenPort, extraBytes);
 		}

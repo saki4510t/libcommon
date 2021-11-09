@@ -22,13 +22,10 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
 
-import com.serenegiant.common.R;
-import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ThreadPool;
 
 import java.util.concurrent.FutureTask;
 
-import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

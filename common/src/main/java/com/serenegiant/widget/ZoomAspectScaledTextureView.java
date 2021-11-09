@@ -293,7 +293,7 @@ public class ZoomAspectScaledTextureView
 	 * TextureViewに関連付けられたSurfaceTextureが利用可能になった時の処理
 	 */
 	@Override
-	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureAvailable(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureAvailable(surface, width, height);
 		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)", width, height));
 		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
@@ -303,7 +303,7 @@ public class ZoomAspectScaledTextureView
 	 * SurfaceTextureのバッファーのサイズが変更された時の処理
 	 */
 	@Override
-	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureSizeChanged(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		super.onSurfaceTextureSizeChanged(surface, width, height);
 		if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)", width, height));
 		applyMirrorMode();

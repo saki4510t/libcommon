@@ -180,6 +180,13 @@ public class AspectScaledGLView extends GLView
 		return mScaleMode;
 	}
 
+	@Override
+	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
+		if (mNeedResizeToKeepAspect != keepAspect) {
+			mNeedResizeToKeepAspect = keepAspect;
+			requestLayout();
+		}
+	}
 //================================================================================
 // 実際の実装
 //================================================================================

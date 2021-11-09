@@ -73,4 +73,5 @@ public interface IScaledView {
 	 */
 	public double getAspectRatio();
 
+	public void setNeedResizeToKeepAspect(final boolean keepAspect);
 }

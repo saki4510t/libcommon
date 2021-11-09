@@ -377,7 +377,6 @@ public abstract class AbstractEncoder implements Encoder {
 			if (!mIsCapturing || mRequestStop) return;
 			if (mMediaCodec == null) return;
 		}
-        @SuppressWarnings("deprecation")
 		final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
         while (mIsCapturing) {
 	        final int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
@@ -413,7 +412,6 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * エンコードしたデータをmuxerへ書き込む
      */
-	@SuppressWarnings("deprecation")
 	private final void drain() {
 //    	if (DEBUG) Log.v(TAG, "drain:encoder=" + this);
     	if (mMediaCodec == null) return;

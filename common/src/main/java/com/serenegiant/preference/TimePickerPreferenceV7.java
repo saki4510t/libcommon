@@ -22,7 +22,6 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.content.res.TypedArrayUtils;
 
 import android.text.format.DateFormat;
 import android.util.AttributeSet;
@@ -30,7 +29,7 @@ import android.view.View;
 import android.widget.TimePicker;
 
 import com.serenegiant.common.R;
-import com.serenegiant.preference.DialogPreferenceV7;
+import com.serenegiant.utils.TypedArrayUtils;
 
 import java.util.Calendar;
 import java.util.Date;

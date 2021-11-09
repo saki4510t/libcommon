@@ -49,7 +49,6 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 /**
  * 進捗表示用のView
  */
-@SuppressWarnings("DeprecatedIsStillUsed")
 public class ProgressView extends View {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();

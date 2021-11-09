@@ -89,6 +89,7 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @param context
 	 * @param activityClass
 	 */
+	@SuppressWarnings("deprecation")
 	@Deprecated
 	public static void setAutoRestart(@NonNull final Context context,
 		@NonNull final Class<? extends Activity> activityClass,

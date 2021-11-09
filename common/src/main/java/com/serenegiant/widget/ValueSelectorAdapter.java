@@ -18,6 +18,7 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
@@ -124,7 +125,8 @@ public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.Valu
 		return position;
 	}
 
-	private View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+	private final View.OnTouchListener mOnTouchListener = new View.OnTouchListener() {
+		@SuppressLint("ClickableViewAccessibility")
 		@Override
 		public boolean onTouch(final View v, final MotionEvent event) {
 			if (mListener != null) {

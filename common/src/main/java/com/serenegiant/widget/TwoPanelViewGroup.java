@@ -424,13 +424,12 @@ public class TwoPanelViewGroup extends FrameLayout {
 
 	private void onMeasureSplit(final int maxWidth, final int maxHeight, final int widthMeasureSpec, final int heightMeasureSpec) {
 //		if (DEBUG) Log.v(TAG, "onMeasureSplit:");
-		switch (mOrientation) {
-		case VERTICAL:	// 縦分割
+		if (mOrientation == VERTICAL) {
+			// 縦分割
 			onMeasureVertical(maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
-			break;
-		default:		// 横分割
+		} else {
+			// 横分割
 			onMeasureHorizontal(maxWidth, maxHeight, widthMeasureSpec, heightMeasureSpec);
-			break;
 		}
 	}
 
@@ -561,11 +560,11 @@ public class TwoPanelViewGroup extends FrameLayout {
 
 	private void onLayoutSplit(final boolean changed, final int left, final int top, final int right, final int bottom) {
 //		if (DEBUG) Log.v(TAG, "onLayoutSplit:");
-		switch(mOrientation) {
-		case VERTICAL:	// 縦分割
+		if (mOrientation == VERTICAL) {
+			// 縦分割
 			onLayoutVertical(changed, left, top, right, bottom);
-			break;
-		default:		// 横分割
+		} else {
+			// 横分割
 			onLayoutHorizontal(changed, left, top, right, bottom);
 		}
 	}
@@ -584,12 +583,9 @@ public class TwoPanelViewGroup extends FrameLayout {
 			final int _right = ch1.getRight();
 			final int w = ch2.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
 			final int h = ch2.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
-			switch (mOrientation) {
-			case VERTICAL:
+			if (mOrientation == VERTICAL) {
 				callChildLayout(ch2, changed, _right - w, _bottom - h, _right, _bottom);
-				break;
-//			case HORIZONTAL:
-			default:
+			} else {
 				callChildLayout(ch2, changed, _right - w, _bottom - h, _right, _bottom);
 			}
 		}
@@ -610,14 +606,10 @@ public class TwoPanelViewGroup extends FrameLayout {
 			final int _bottom = ch2.getBottom();
 			final int w = ch1.getMeasuredWidth(); // int)((right - left) * mSubWindowScale);
 			final int h = ch1.getMeasuredHeight(); // int)((bottom - top) * mSubWindowScale);
-			switch (mOrientation) {
-			case VERTICAL:
+			if (mOrientation == VERTICAL) {
 				callChildLayout(ch1, changed, _right - w, _top, _right, _top + h);
-				break;
-//			case HORIZONTAL:
-			default:
+			} else {
 				callChildLayout(ch1, changed, _left, _bottom - h, _left + w, _bottom);
-				break;
 			}
 		}
 	}
@@ -669,7 +661,7 @@ public class TwoPanelViewGroup extends FrameLayout {
 	 * @param right
 	 * @param bottom
 	 */
-	@SuppressLint("NewApi")
+	@SuppressLint({"NewApi", "RtlHardcoded"})
 	private void callChildLayout(final View child, final boolean changed, final int left, final int top, final int right, final int bottom) {
 		final LayoutParams lp = (LayoutParams) child.getLayoutParams();
 

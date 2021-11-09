@@ -18,9 +18,11 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.content.Context;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 
 import androidx.annotation.ArrayRes;
 import androidx.annotation.NonNull;
@@ -263,6 +265,19 @@ public class TypedArrayUtils {
 			a.recycle();
 		}
 		return result;
+	}
+
+	/**
+	 * @return The resource ID value in the {@code context} specified by {@code attr}. If it does
+	 * not exist, {@code fallbackAttr}.
+	 */
+	public static int getAttr(@NonNull final Context context, final int attr, final int fallbackAttr) {
+		final TypedValue value = new TypedValue();
+		context.getTheme().resolveAttribute(attr, value, true);
+		if (value.resourceId != 0) {
+			return attr;
+		}
+		return fallbackAttr;
 	}
 
 }

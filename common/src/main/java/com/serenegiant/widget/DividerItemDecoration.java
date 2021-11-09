@@ -25,6 +25,7 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import android.view.View;
@@ -58,7 +59,7 @@ public class DividerItemDecoration extends RecyclerView.ItemDecoration  {
 	}
 
 	public DividerItemDecoration(final Context context, @DrawableRes final int divider) {
-		init(context.getResources().getDrawable(divider));
+		init(ContextCompat.getDrawable(context, divider));
 	}
 
 	public DividerItemDecoration(final Context context, final Drawable divider) {

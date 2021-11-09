@@ -28,6 +28,7 @@ import android.widget.NumberPicker;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceDialogFragment;
 
+@Deprecated
 public class NumberPickerPreferenceFragment extends PreferenceDialogFragment {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = NumberPickerPreferenceFragment.class.getSimpleName();

@@ -252,7 +252,7 @@ public class BufferHelper {
 		final int offset, final int len) {
 
 		final int n = (bytes != null) ? bytes.length : 0;
-		final int m = n > offset + len ? offset + len : n;
+		final int m = Math.min(n, offset + len);
 		final StringBuilder sb = new StringBuilder(n * 2 + 2);
 		for (int i = offset; i < m; i++) {
 			final byte b = bytes[i];

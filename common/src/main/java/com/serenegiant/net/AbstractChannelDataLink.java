@@ -195,6 +195,7 @@ public abstract class AbstractChannelDataLink {
 						mSenderHandler.sendEmptyMessage(REQ_RELEASE);
 					}
 				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
 				}
 			}
 		}
