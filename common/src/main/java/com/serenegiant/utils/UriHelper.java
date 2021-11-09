@@ -94,6 +94,9 @@ public final class UriHelper {
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 			list.add(Environment.DIRECTORY_DOCUMENTS);	// API>=19
 		}
+		 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			 list.add(Environment.DIRECTORY_AUDIOBOOKS);	// API>=29
+		 }
 		STANDARD_DIRECTORIES = list.toArray(new String[0]);
 	}
 
