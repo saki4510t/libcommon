@@ -17,6 +17,9 @@ import java.io.IOException
 
 /**
  * MediaAVRecorderを使ったカメラ映像の録画テスト用Fragment
+ * このテストFragmentではアプリ内で直接録画しているがCameraFragmentや
+ * EffectCameraFragmentの様に録画処理部分はサービスとして実行するように
+ * した方がアプリ終了時に再生できない動画ファイルができてしまうのを防止できる。
  */
 class CameraRecFragment : AbstractCameraFragment() {
 
