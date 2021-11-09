@@ -20,7 +20,6 @@
 package com.serenegiant.service;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
@@ -37,6 +36,7 @@ import android.os.Looper;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
@@ -237,7 +237,7 @@ public abstract class BaseService extends LifecycleService {
 		 * @param context
 		 * @return
 		 */
-		@TargetApi(Build.VERSION_CODES.O)
+		@RequiresApi(Build.VERSION_CODES.O)
 		protected void createNotificationChannel(
 			@NonNull final Context context) {
 	
@@ -264,6 +264,7 @@ public abstract class BaseService extends LifecycleService {
 		 * @param channel
 		 * @return
 		 */
+		@RequiresApi(Build.VERSION_CODES.O)
 		@NonNull
 		protected NotificationChannel setupNotificationChannel(
 			@NonNull final NotificationChannel channel) {
@@ -287,7 +288,7 @@ public abstract class BaseService extends LifecycleService {
 		 * @param groupName
 		 * @return
 		 */
-		@TargetApi(Build.VERSION_CODES.O)
+		@RequiresApi(Build.VERSION_CODES.O)
 		protected void createNotificationChannelGroup(
 			@NonNull final Context context,
 			@Nullable final String groupId, @Nullable final String groupName) {
@@ -323,6 +324,7 @@ public abstract class BaseService extends LifecycleService {
 		 * @param group
 		 * @return
 		 */
+		@RequiresApi(Build.VERSION_CODES.O)
 		@NonNull
 		protected NotificationChannelGroup setupNotificationChannelGroup(
 			@NonNull final NotificationChannelGroup group) {
@@ -605,7 +607,6 @@ public abstract class BaseService extends LifecycleService {
 	 */
 	@SuppressLint("NewApi")
 	protected void releaseNotificationGroup(@NonNull final String groupId) {
-
 		if (!TextUtils.isEmpty(groupId) && BuildCheck.isOreo()) {
 			final NotificationManager manager
 				= ContextUtils.requireSystemService(this, NotificationManager.class);
