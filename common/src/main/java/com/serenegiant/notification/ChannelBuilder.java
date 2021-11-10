@@ -19,7 +19,6 @@
 package com.serenegiant.notification;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationChannelGroup;
@@ -31,7 +30,10 @@ import android.os.Build;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.XmlRes;
+import androidx.core.app.NotificationManagerCompat;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -69,30 +71,27 @@ public class ChannelBuilder {
 	 * しかたなく自前で再定義
 	 */
 	@IntDef({
-		NotificationManager.IMPORTANCE_UNSPECIFIED,
-		NotificationManager.IMPORTANCE_NONE,
-		NotificationManager.IMPORTANCE_MIN,
-		NotificationManager.IMPORTANCE_LOW,
-		NotificationManager.IMPORTANCE_DEFAULT,
-		NotificationManager.IMPORTANCE_HIGH,
-		NotificationManager.IMPORTANCE_MAX})	// API>=24
+		NotificationManagerCompat.IMPORTANCE_UNSPECIFIED,
+		NotificationManagerCompat.IMPORTANCE_NONE,
+		NotificationManagerCompat.IMPORTANCE_MIN,
+		NotificationManagerCompat.IMPORTANCE_LOW,
+		NotificationManagerCompat.IMPORTANCE_DEFAULT,
+		NotificationManagerCompat.IMPORTANCE_HIGH,
+		NotificationManagerCompat.IMPORTANCE_MAX})	// API>=24
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Importance {}
 	
 	public static final Set<Integer> IMPORTANCE = new HashSet<Integer>();
 	static {
 		Collections.addAll(IMPORTANCE,
-			NotificationManager.IMPORTANCE_UNSPECIFIED,
-			NotificationManager.IMPORTANCE_NONE,
-			NotificationManager.IMPORTANCE_MIN,
-			NotificationManager.IMPORTANCE_LOW,
-			NotificationManager.IMPORTANCE_DEFAULT,
-			NotificationManager.IMPORTANCE_HIGH);
-		if (BuildCheck.isAPI24()) {
-			Collections.addAll(IMPORTANCE,
-				NotificationManager.IMPORTANCE_MAX	// API>=24
-			);
-		}
+			NotificationManagerCompat.IMPORTANCE_UNSPECIFIED,
+			NotificationManagerCompat.IMPORTANCE_NONE,
+			NotificationManagerCompat.IMPORTANCE_MIN,
+			NotificationManagerCompat.IMPORTANCE_LOW,
+			NotificationManagerCompat.IMPORTANCE_DEFAULT,
+			NotificationManagerCompat.IMPORTANCE_HIGH,
+			NotificationManagerCompat.IMPORTANCE_MAX	// API>=24
+		);
 	}
 
 	/**
@@ -126,9 +125,9 @@ public class ChannelBuilder {
 		@NonNull final String channelId) {
 		
 		if (DEBUG) Log.v(TAG, "getBuilder:" + channelId);
-		final NotificationManager manager
-			= ContextUtils.requireSystemService(context, NotificationManager.class);
-		final NotificationChannel channel = manager.getNotificationChannel(channelId);
+		final NotificationChannel channel
+			= NotificationManagerCompat.from(context)
+				.getNotificationChannel(channelId);
 		if (channel != null) {
 			// 既にNotificationChannelが存在する場合はその設定を取得して生成
 			final ChannelBuilder builder = new ChannelBuilder(context,
@@ -148,7 +147,7 @@ public class ChannelBuilder {
 		} else {
 			// 存在しない場合は新規に生成
 			return new ChannelBuilder(context,
-				channelId, null, NotificationManager.IMPORTANCE_NONE);
+				channelId, null, NotificationManagerCompat.IMPORTANCE_NONE);
 		}
 	}
 	
@@ -366,7 +365,7 @@ public class ChannelBuilder {
 		this(context,
 			DEFAULT_CHANNEL_ID,
 			DEFAULT_CHANNEL_ID,
-			NotificationManager.IMPORTANCE_NONE,
+			NotificationManagerCompat.IMPORTANCE_NONE,
 			null, null);
 	}
 	
@@ -493,12 +492,14 @@ public class ChannelBuilder {
 	
 	/**
 	 * チャネルの重要度をセット
-	 * NotificationManager.IMPORTANCE_UNSPECIFIED,
-	 * NotificationManager.IMPORTANCE_NONE,
-	 * NotificationManager.IMPORTANCE_MIN,
-	 * NotificationManager.IMPORTANCE_LOW,
-	 * NotificationManager.IMPORTANCE_DEFAULT,
-	 * NotificationManager.IMPORTANCE_HIGHのいずれか
+	 * NotificationManagerCompat.IMPORTANCE_UNSPECIFIED,
+	 * NotificationManagerCompat.IMPORTANCE_NONE,
+	 * NotificationManagerCompat.IMPORTANCE_MIN,
+	 * NotificationManagerCompat.IMPORTANCE_LOW,
+	 * NotificationManagerCompat.IMPORTANCE_DEFAULT,
+	 * NotificationManagerCompat.IMPORTANCE_HIGH
+	 * NotificationManagerCompat.IMPORTANCE_MAX
+	 * のいずれか
 	 * @param importance
 	 * @return
 	 */
@@ -509,12 +510,14 @@ public class ChannelBuilder {
 	
 	/**
 	 * チャネルの重要度を取得
-	 * @return NotificationManager.IMPORTANCE_UNSPECIFIED,
-	 * 			NotificationManager.IMPORTANCE_NONE,
-	 * 			NotificationManager.IMPORTANCE_MIN,
-	 * 			NotificationManager.IMPORTANCE_LOW,
-	 * 			NotificationManager.IMPORTANCE_DEFAULT,
-	 * 			NotificationManager.IMPORTANCE_HIGHのいずれか
+	 * @return NotificationManagerCompat.IMPORTANCE_UNSPECIFIED,
+	 * 			NotificationManagerCompat.IMPORTANCE_NONE,
+	 * 			NotificationManagerCompat.IMPORTANCE_MIN,
+	 * 			NotificationManagerCompat.IMPORTANCE_LOW,
+	 * 			NotificationManNotificationManagerCompatTANCE_DEFAULT,
+	 * 			NotificationManageNotificationManagerCompatCE_HIGH
+	 * 			NotificationManagerCompat.IMPORTANCE_MAX
+	 * 			のいずれか
 	 */
 	@Importance
 	public int getImportance() {
@@ -769,7 +772,7 @@ public class ChannelBuilder {
 	 * 		-> (setupNotificationChannel)
 	 * @param context
 	 */
-	@TargetApi(Build.VERSION_CODES.O)
+	@RequiresApi(Build.VERSION_CODES.O)
 	@Nullable
 	protected NotificationChannel createNotificationChannel(@NonNull final Context context) {
 
@@ -777,8 +780,8 @@ public class ChannelBuilder {
 			= ContextUtils.requireSystemService(context, NotificationManager.class);
 		NotificationChannel channel = manager.getNotificationChannel(channelId);
 		if (createIfExists || (channel == null)) {
-			if (importance == NotificationManager.IMPORTANCE_NONE) {
-				importance = NotificationManager.IMPORTANCE_DEFAULT;
+			if (importance == NotificationManagerCompat.IMPORTANCE_NONE) {
+				importance = NotificationManagerCompat.IMPORTANCE_DEFAULT;
 			}
 			if (channel == null) {
 				channel = new NotificationChannel(channelId, name, importance);
@@ -834,7 +837,7 @@ public class ChannelBuilder {
 	 * @param groupName
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.O)
+	@RequiresApi(Build.VERSION_CODES.O)
 	protected void createNotificationChannelGroup(
 		@NonNull final Context context,
 		@Nullable final String groupId, @Nullable final String groupName) {
