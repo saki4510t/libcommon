@@ -47,6 +47,7 @@ import java.lang.annotation.RetentionPolicy;
  * Notification生成/表示用のヘルパークラス
  * NotificationCompat#Builderを継承してNotificationChannel関係の設定メソッドと
  * 通知発行用のヘルパークラスを追加
+ * FIXME APIレベルが低い時にクラシュする(例えばAPI19とか)
  */
 public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	private static final boolean DEBUG = false; // set false on production
