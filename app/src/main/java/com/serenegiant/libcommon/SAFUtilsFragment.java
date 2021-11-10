@@ -3,6 +3,7 @@ package com.serenegiant.libcommon;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -24,6 +25,7 @@ import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,6 +33,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * SAFUtilクラスのテスト用Fragment
  */
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFUtilsFragment extends BaseFragment
 	implements ConfirmDialogV4.ConfirmDialogListener {
 

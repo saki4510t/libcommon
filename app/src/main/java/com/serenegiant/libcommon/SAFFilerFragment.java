@@ -33,6 +33,7 @@ import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.databinding.DataBindingUtil;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.documentfile.provider.SAFRootTreeDocumentFile;
@@ -42,7 +43,7 @@ import androidx.recyclerview.widget.RecyclerView;
 /**
  * DocumentTreeRecyclerAdapterとSAFRootTreeDocumentFileのテスト用Fragment
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFFilerFragment extends BaseFragment {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = SAFFilerFragment.class.getSimpleName();

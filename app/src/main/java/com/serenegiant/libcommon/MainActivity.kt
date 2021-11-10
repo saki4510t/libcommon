@@ -118,17 +118,24 @@ class MainActivity
 		super.onBackPressed()
 	}
 
+	@SuppressLint("NewApi")
 	override fun onListFragmentInteraction(item: DummyItem) {
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:$item")
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:enableVSync=${BuildConfig.ENABLE_VSYNC}")
 		var fragment: Fragment? = null
 		when (item.id) {
 			0 -> {	// SAF
-				fragment = SAFUtilsFragment()
+				if (BuildCheck.isLollipop()) {
+					fragment = SAFUtilsFragment()
+				} else {
+					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
+				}
 			}
 			1 -> {	// SAFContentProvider
 				if (BuildCheck.isLollipop()) {
 					fragment = SAFFilerFragment()
+				} else {
+					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
 				}
 			}
 			2 -> {	// NetworkConnection
