@@ -18,6 +18,7 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
@@ -246,13 +247,14 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 * パーミッションの要求はしない
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	protected fun hasPermission(): Boolean {
 		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
 		val activity: Activity? = activity
 		return if ((activity == null) || activity.isFinishing) {
 			false
 		} else (!BuildCheck.isAPI21()
-			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)
+			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)	// API>=19
 			|| (BuildCheck.isAPI28() || PermissionCheck.hasWriteExternalStorage(activity)))
 			&& PermissionCheck.hasAudio(activity)
 			&& PermissionCheck.hasCamera(activity)
