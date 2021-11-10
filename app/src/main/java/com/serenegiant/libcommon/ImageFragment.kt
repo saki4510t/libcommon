@@ -134,12 +134,12 @@ class ImageFragment: BaseFragment() {
 			}
 			(drawable as LoaderDrawable).startLoad(mInfo!!)
 		} else {
-			queueEvent(Runnable {
+			queueEvent({
 //				mImageView.setImageURI(mInfo.getUri());
 				try {
 					val bitmap = BitmapHelper.asBitmap(
 						requireContext().contentResolver, mInfo!!.id)
-					runOnUiThread (Runnable {
+					runOnUiThread ({
 						mImageView!!.setImageBitmap(bitmap)
 					})
 				} catch (e: IOException) {

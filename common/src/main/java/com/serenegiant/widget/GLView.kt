@@ -108,7 +108,7 @@ open class GLView @JvmOverloads constructor(
 				if ((width > 0) && (height > 0)) {
 					mHasSurface = true
 					mMatrixChanged = true
-					queueEvent( Runnable { onSurfaceCreated() })
+					queueEvent { onSurfaceCreated() }
 				}
 			}
 
@@ -117,13 +117,13 @@ open class GLView @JvmOverloads constructor(
 				width: Int, height: Int) {
 
 				if (DEBUG) Log.v(TAG, "surfaceChanged:(${width}x${height})")
-				queueEvent(Runnable { onSurfaceChanged(format, width, height) })
+				queueEvent { onSurfaceChanged(format, width, height) }
 			}
 
 			override fun surfaceDestroyed(holder: SurfaceHolder) {
 				if (DEBUG) Log.v(TAG, "surfaceDestroyed:")
 				mHasSurface = false
-				queueEvent( Runnable { onSurfaceDestroyed() })
+				queueEvent { onSurfaceDestroyed() }
 			}
 		})
 	}
@@ -165,9 +165,9 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@AnyThread
 	fun setRenderer(renderer: GLRenderer?) {
-		queueEvent(Runnable {
+		queueEvent {
 			mGLRenderer = renderer
-		})
+		}
 	}
 
 	/**
@@ -179,11 +179,11 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@AnyThread
 	fun setViewport(x: Int, y: Int, width: Int, height: Int) {
-		queueEvent(Runnable {
+		queueEvent {
 			if (mTarget != null) {
 				mTarget!!.setViewPort(x, y, width, height)
 			}
-		})
+		}
 	}
 
 	/**

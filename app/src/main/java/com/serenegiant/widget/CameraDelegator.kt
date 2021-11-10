@@ -312,9 +312,9 @@ class CameraDelegator(
 						fps?.get(0), fps?.get(1)))
 					// adjust view size with keeping the aspect ration of camera preview.
 					// here is not a UI thread and we should request parent view to execute.
-					mView.post(Runnable {
+					mView.post {
 						cameraRenderer.onPreviewSizeChanged(previewWidth, previewHeight)
-					})
+					}
 					// カメラ映像受け取り用Surfaceをセット
 					val surface = cameraRenderer.getInputSurface()
 					if (surface is SurfaceTexture) {

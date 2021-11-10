@@ -206,7 +206,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			val _recorder = mRecorder
 			mRecorder = null
 			try {
-				queueEvent(Runnable {
+				queueEvent({
 					if (_recorder != null) {
 						try {
 							_recorder.release()

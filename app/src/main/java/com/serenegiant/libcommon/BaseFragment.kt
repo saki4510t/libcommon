@@ -214,7 +214,7 @@ open class BaseFragment : Fragment() {
 	 * @param args
 	 */
 	protected fun showToast(duration: Int, msg: String?, vararg args: Any?) {
-		runOnUiThread(Runnable {
+		runOnUiThread({
 			try {
 				if (mToast != null) {
 					mToast!!.cancel()
@@ -233,7 +233,7 @@ open class BaseFragment : Fragment() {
 	 * @param msg
 	 */
 	protected fun showToast(duration: Int, @StringRes msg: Int, vararg args: Any?) {
-		runOnUiThread(Runnable {
+		runOnUiThread({
 			try {
 				if (mToast != null) {
 					mToast!!.cancel()
