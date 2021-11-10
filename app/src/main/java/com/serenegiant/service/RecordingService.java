@@ -65,6 +65,9 @@ public class RecordingService extends BaseService {
 	private static final boolean USE_MEDIASTORE_OUTPUT_STREAM = false;
 
 	private static final int NOTIFICATION = R.string.notification_service;
+	@DrawableRes
+	private static final int NOTIFICATION_ICON_ID = BuildCheck.isAPI21()
+		? R.drawable.ic_recording_service : R.mipmap.ic_launcher;
 	private static final long TIMEOUT_MS = 10;
 	private static final long TIMEOUT_USEC = TIMEOUT_MS * 1000L;	// 10ミリ秒
 
@@ -176,17 +179,9 @@ public class RecordingService extends BaseService {
 		if (DEBUG) Log.v(TAG, "onBind:intent=" + intent);
 		if (intent != null) {
 			// XXX API21未満はVectorDrawableを通知領域のスモールアイコンにできない
-			@DrawableRes
-			final int smallIconId;
-			if (BuildCheck.isAPI21()) {
-				smallIconId = R.drawable.ic_recording_service;
-			} else {
-				// API21未満のときはとりあえずアプリのアイコンにしておく
-				smallIconId = R.mipmap.ic_launcher;
-			}
 			showNotification(NOTIFICATION,
 				getString(R.string.notification_service),
-				smallIconId, R.drawable.ic_recording_service,
+				NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
 				getString(R.string.notification_service),
 				getString(R.string.app_name),
 				contextIntent());
@@ -591,7 +586,7 @@ public class RecordingService extends BaseService {
 						public void run() {
 							releaseNotification(NOTIFICATION,
 								getString(R.string.notification_service),
-								R.drawable.ic_recording_service, R.drawable.ic_recording_service,
+								NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
 								getString(R.string.notification_service),
 								getString(R.string.app_name));
 							stopSelf();
