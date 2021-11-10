@@ -89,7 +89,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 					mVideoSource!!.remove(mCameraRenderer)
 				}
 				if (mDrawer != null) {
-					mDrawer!!.release()
+//					mDrawer!!.release()	// GT-N7100で動作がおかしくなる
 					mDrawer = null
 				}
 			}

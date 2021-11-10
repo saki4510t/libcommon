@@ -287,7 +287,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			if (DEBUG) Log.v(TAG, "CameraRenderer#release:")
 			if (mDrawer != null) {
 				mDrawer!!.deleteTex(hTex)
-				mDrawer!!.release()
+//				mDrawer!!.release()	// GT-N7100で動作がおかしくなる
 				mDrawer = null
 			}
 			if (inputSurfaceTexture != null) {
