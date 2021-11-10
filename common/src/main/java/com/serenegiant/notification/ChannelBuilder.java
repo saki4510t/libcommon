@@ -74,7 +74,8 @@ public class ChannelBuilder {
 		NotificationManager.IMPORTANCE_MIN,
 		NotificationManager.IMPORTANCE_LOW,
 		NotificationManager.IMPORTANCE_DEFAULT,
-		NotificationManager.IMPORTANCE_HIGH})
+		NotificationManager.IMPORTANCE_HIGH,
+		NotificationManager.IMPORTANCE_MAX})	// API>=24
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Importance {}
 	
@@ -87,6 +88,11 @@ public class ChannelBuilder {
 			NotificationManager.IMPORTANCE_LOW,
 			NotificationManager.IMPORTANCE_DEFAULT,
 			NotificationManager.IMPORTANCE_HIGH);
+		if (BuildCheck.isAPI24()) {
+			Collections.addAll(IMPORTANCE,
+				NotificationManager.IMPORTANCE_MAX	// API>=24
+			);
+		}
 	}
 
 	/**
