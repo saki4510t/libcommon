@@ -124,7 +124,7 @@ public class NotificationFactory {
 				// ContextCompat.getDrawableはVectorDrawableを読み込もうとすると例外生成する
 				drawable = ContextCompat.getDrawable(context, smallIconId);
 			} catch (final Exception e) {
-//					if (DEBUG) Log.d(TAG, "createNotificationBuilder:failed to load small icon, try load as VectorDrawableCompat", e);
+//				if (DEBUG) Log.d(TAG, "createNotificationBuilder:failed to load small icon, try load as VectorDrawableCompat", e);
 				drawable = VectorDrawableCompat.create(context.getResources(), smallIconId, null);
 			}
 //				if (DEBUG) Log.v(TAG, "createNotificationBuilder:smallIcon=" + drawable);
