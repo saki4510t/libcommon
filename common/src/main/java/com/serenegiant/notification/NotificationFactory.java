@@ -280,14 +280,19 @@ public class NotificationFactory {
 
 	@SuppressLint("InlinedApi")
 	@NonNull
-	protected NotificationCompat.Builder createNotificationBuilder(
+	protected NotificationBuilder createNotificationBuilder(
 		@NonNull final Context context,
 		@NonNull final CharSequence title, @NonNull final CharSequence content) {
 
 		if (DEBUG) Log.v(TAG, "createNotificationBuilder:");
-		final NotificationCompat.Builder builder
-			= new NotificationCompat.Builder(context, channelId)
-			.setContentTitle(title)
+		final NotificationBuilder builder
+			= new NotificationBuilder(context, channelId, smallIconId) {
+			@Override
+			protected PendingIntent createContentIntent() {
+				return NotificationFactory.this.createContentIntent();
+			}
+		};
+		builder.setContentTitle(title)
 			.setContentText(content)
 			.setSmallIcon(smallIconId)  // the status icon
 			.setStyle(new NotificationCompat.BigTextStyle()
