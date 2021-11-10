@@ -30,6 +30,8 @@ import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 
@@ -66,6 +68,8 @@ public class SurfaceDrawable extends Drawable {
 
 	@NonNull
 	private final Object mSync = new Object();
+	@NonNull
+	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	/**
 	 * 画像サイズ
 	 */
@@ -324,8 +328,20 @@ public class SurfaceDrawable extends Drawable {
 		synchronized (mBitmap) {
 			mBitmap.copyPixelsFromBuffer(mWorkBuffer);
 		}
-		invalidateSelf();
+		mUIHandler.removeCallbacks(mInvalidateSelfOnUITask);
+		mUIHandler.post(mInvalidateSelfOnUITask);
 	}
+
+	/**
+	 * invalidateSelfをUIスレッド上で実行しないと例外を投げる端末があるので
+	 * UI/メインスレッド上でinvalidateSelfを呼ぶためのRunnable実装
+	 */
+	private final Runnable mInvalidateSelfOnUITask = new Runnable() {
+		@Override
+		public void run() {
+			invalidateSelf();	// UIスレッド上でないと例外を投げる端末がある
+		}
+	};
 
 	/**
 	 * 映像サイズをリサイズ
