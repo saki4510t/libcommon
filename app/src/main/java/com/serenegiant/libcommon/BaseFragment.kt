@@ -164,13 +164,6 @@ open class BaseFragment : Fragment() {
 	 * helper method to run specific Runnable on worker thread
 	 * if same Runnable is waiting to execute, it will removed.
 	 * @param task
-	 * @param delay
-	 * @throws IllegalStateException
-	 */
-	/**
-	 * helper method to run specific Runnable on worker thread
-	 * if same Runnable is waiting to execute, it will removed.
-	 * @param task
 	 */
 	@Throws(IllegalStateException::class)
 	protected fun queueEvent(task: Runnable?, delay: Long = 0) {
