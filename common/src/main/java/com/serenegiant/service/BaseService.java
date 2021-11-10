@@ -30,6 +30,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
@@ -38,8 +39,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
+import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -157,44 +161,73 @@ public abstract class BaseService extends LifecycleService {
 	public static abstract class NotificationFactory {
 		private static final String TAG = NotificationFactory.class.getSimpleName();
 
+		protected final Context context;
 		protected final String channelId;
 		protected final String channelTitle;
 		protected final int importance;
 		protected final String groupId;
 		protected final String groupName;
 		@DrawableRes
-		protected final int smallIconId;
+		protected final int smallIconId;	// API21未満ではVectorDrawableを指定してはだめ
 		@DrawableRes
 		protected final int largeIconId;
-		
+
+		/**
+		 * コンストラクタ
+		 * @param channelId
+		 * @param channelTitle
+		 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
+		 */
 		@SuppressLint("InlinedApi")
 		public NotificationFactory(
+			@NonNull final Context context,
 			@NonNull final String channelId, @Nullable final String channelTitle,
 			@DrawableRes final int smallIconId) {
 	
-			this(channelId, channelId,
+			this(context, channelId, channelId,
 				BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
 				null, null, smallIconId, R.drawable.ic_notification);
 		}
 
+		/**
+		 * コンストラクタ
+		 * @param channelId
+		 * @param channelTitle
+		 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
+		 * @param largeIconId
+		 */
 		@SuppressLint("InlinedApi")
 		public NotificationFactory(
+			@NonNull final Context context,
 			@NonNull final String channelId, @Nullable final String channelTitle,
 			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
 
-			this(channelId, channelId,
+			this(context, channelId, channelId,
 				BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
 				null, null, smallIconId, largeIconId);
 		}
 
+		/**
+		 * コンストラクタ
+		 * @param channelId
+		 * @param channelTitle
+		 * @param importance
+		 * @param groupId
+		 * @param groupName
+		 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
+		 * @param largeIconId
+		 */
 		public NotificationFactory(
+			@NonNull final Context context,
 			@NonNull final String channelId,
 			@Nullable final String channelTitle,
 			final int importance,
 			@Nullable final String groupId, @Nullable final String groupName,
-			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
+			@DrawableRes final int smallIconId, @DrawableRes final int largeIconId)
+				throws IllegalArgumentException {
 
 			if (DEBUG) Log.v(TAG, "コンストラクタ");
+			this.context = context;
 			this.channelId = channelId;
 			this.channelTitle = TextUtils.isEmpty(channelTitle) ? channelId : channelTitle;
 			this.importance = importance;
@@ -202,6 +235,25 @@ public abstract class BaseService extends LifecycleService {
 			this.groupName = TextUtils.isEmpty(groupName) ? groupId : groupName;
 			this.smallIconId = smallIconId;
 			this.largeIconId = largeIconId;
+			if (!BuildCheck.isAPI21()) {
+				// API21未満だとVectorDrawableをsmall iconに割り当てれないのでチェックを追加
+				// Builder#setSmallIconをする前にチェックしてAPI21未満&vector drawableの時には
+				// #setSmallIconを呼ばなくてもサービス自体は動作はできるけど通知アイコンをセットしないと
+				// 通知領域に表示されない＆API21未満でvector drawableを通知アイコンにセットするのは
+				// プログラム上のバグなのでNotificationFactoryのコンストラクタで例外生成する
+				Drawable drawable;
+				try {
+					// ContextCompat.getDrawableはVectorDrawableを読み込もうとすると例外生成する
+					drawable = ContextCompat.getDrawable(context, smallIconId);
+				} catch (final Exception e) {
+//					if (DEBUG) Log.d(TAG, "createNotificationBuilder:failed to load small icon, try load as VectorDrawableCompat", e);
+					drawable = VectorDrawableCompat.create(context.getResources(), smallIconId, null);
+				}
+//				if (DEBUG) Log.v(TAG, "createNotificationBuilder:smallIcon=" + drawable);
+				if (drawable instanceof VectorDrawableCompat) {
+					throw new IllegalArgumentException("Can't use vector drawable as small icon before API21!");
+				}
+			}
 		}
 		
 		/**
@@ -386,7 +438,7 @@ public abstract class BaseService extends LifecycleService {
 
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
-	 * @param smallIconId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
 	 * @param intent
@@ -405,7 +457,7 @@ public abstract class BaseService extends LifecycleService {
 
 	/**
 	 * 通知領域に指定したメッセージを表示する。
-	 * @param smallIconId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
 	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
@@ -427,7 +479,7 @@ public abstract class BaseService extends LifecycleService {
 	/**
 	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
 	 * @param notificationId
-	 * @param smallIconId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
 	 * @param intent
@@ -451,7 +503,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param notificationId
 	 * @param groupId
 	 * @param groupName
-	 * @param smallIconId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
 	 * @param intent
@@ -477,7 +529,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param channelId
 	 * @param groupId
 	 * @param groupName
-	 * @param smallIconId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param largeIconId
 	 * @param title
 	 * @param content
@@ -494,7 +546,7 @@ public abstract class BaseService extends LifecycleService {
 		final PendingIntent intent) {
 
 		showNotification(notificationId, title, content,
-			new NotificationFactory(channelId, channelId, 0,
+			new NotificationFactory(this, channelId, channelId, 0,
 				groupId, groupName, smallIconId, largeIconId) {
 
 				@Override
@@ -545,6 +597,12 @@ public abstract class BaseService extends LifecycleService {
 	
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
+	 * @param notificationId
+	 * @param channelId
+	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
+	 * @param largeIconId
+	 * @param title
+	 * @param content
 	 */
 	@SuppressLint("NewApi")
 	protected void releaseNotification(final int notificationId,

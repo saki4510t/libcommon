@@ -14,7 +14,6 @@ import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
-import android.os.Environment;
 import android.os.IBinder;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,6 +40,7 @@ import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -175,9 +175,18 @@ public class RecordingService extends BaseService {
 		super.onBind(intent);
 		if (DEBUG) Log.v(TAG, "onBind:intent=" + intent);
 		if (intent != null) {
+			// XXX API21未満はVectorDrawableを通知領域のスモールアイコンにできない
+			@DrawableRes
+			final int smallIconId;
+			if (BuildCheck.isAPI21()) {
+				smallIconId = R.drawable.ic_recording_service;
+			} else {
+				// API21未満のときはとりあえずアプリのアイコンにしておく
+				smallIconId = R.mipmap.ic_launcher;
+			}
 			showNotification(NOTIFICATION,
 				getString(R.string.notification_service),
-				R.drawable.ic_recording_service, R.drawable.ic_recording_service,
+				smallIconId, R.drawable.ic_recording_service,
 				getString(R.string.notification_service),
 				getString(R.string.app_name),
 				contextIntent());
