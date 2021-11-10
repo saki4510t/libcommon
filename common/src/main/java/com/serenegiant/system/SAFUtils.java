@@ -121,16 +121,16 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int requestCode) {
 
-		if (BuildCheck.isLollipop()) {
+		if (BuildCheck.isKitKat()) {
 			final Uri uri = loadUri(context, getKey(requestCode));
 			if (uri != null) {
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
 				final List<UriPermission> list
-					= context.getContentResolver().getPersistedUriPermissions();
+					= context.getContentResolver().getPersistedUriPermissions();	// API>=19
 				return hasPermission(list, uri);
 			}
 		} else {
-			throw new UnsupportedOperationException("should be API>=21");
+			throw new UnsupportedOperationException("should be API>=19");
 		}
 		return false;
 	}
@@ -141,7 +141,7 @@ public class SAFUtils {
 		@NonNull final Uri uri) {
 
 		for (final UriPermission item: persistedUriPermissions) {
-			if (item.getUri().equals(uri)) {
+			if (item.getUri().equals(uri)) {	// UriPermission#getUri API>=19
 				return true;
 			}
 		}
@@ -165,7 +165,7 @@ public class SAFUtils {
 			final Uri uri = getStorageUri(activity, requestCode);
 			if (uri == null) {
 				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);
+				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
 			}
 			return uri;
 		} else {
@@ -190,7 +190,7 @@ public class SAFUtils {
 			final Uri uri = getStorageUri(activity, requestCode);
 			if (uri == null) {
 				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);
+				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
 			}
 			return uri;
 		} else {
@@ -217,7 +217,7 @@ public class SAFUtils {
 			final Uri uri = getStorageUri(fragment.requireContext(), requestCode);
 			if (uri == null) {
 				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);
+				fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
 			}
 			return uri;
 		} else {
@@ -262,7 +262,7 @@ public class SAFUtils {
 			saveUri(context, getKey(requestCode), treeUri);
 			return treeUri;
 		} else {
-			throw new UnsupportedOperationException("should be API>=21");
+			throw new UnsupportedOperationException("should be API>=19");
 		}
 	}
 	
@@ -276,12 +276,12 @@ public class SAFUtils {
 	public static void releasePersistableUriPermission(
 		@NonNull final Context context,
 		final int requestCode) {
-		if (BuildCheck.isLollipop()) {
+		if (BuildCheck.isKitKat()) {
 			final String key = getKey(requestCode);
 			final Uri uri = loadUri(context, key);
 			if (uri != null) {
 				try {
-					context.getContentResolver().releasePersistableUriPermission(uri,
+					context.getContentResolver().releasePersistableUriPermission(uri,	// API>=19
 						Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 				} catch (final SecurityException e) {
 					if (DEBUG) Log.w(TAG, e);
@@ -289,7 +289,7 @@ public class SAFUtils {
 				clearUri(context, key);
 			}
 		} else {
-			throw new UnsupportedOperationException("should be API>=21");
+			throw new UnsupportedOperationException("should be API>=19");
 		}
 	}
 
@@ -790,15 +790,15 @@ public class SAFUtils {
 		@NonNull final Context context,
 		final int requestCode) throws UnsupportedOperationException {
 
-		if (BuildCheck.isLollipop()) {
+		if (BuildCheck.isKitKat()) {
 			final Uri uri = loadUri(context, getKey(requestCode));
 			if (uri != null) {
 				boolean found = false;
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
 				final List<UriPermission> list
-					= context.getContentResolver().getPersistedUriPermissions();
+					= context.getContentResolver().getPersistedUriPermissions();	// API>=19
 				for (final UriPermission item: list) {
-					if (item.getUri().equals(uri)) {
+					if (item.getUri().equals(uri)) {	// API>=19
 						// requestCodeに対応するUriへのパーミッションを恒常的に保持していた時
 						found = true;
 						break;
@@ -821,7 +821,7 @@ public class SAFUtils {
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	private static Intent prepareStorageAccessPermission() {
-		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);
+		return new Intent(Intent.ACTION_OPEN_DOCUMENT_TREE);	// API>=21
 	}
 
 	/**
