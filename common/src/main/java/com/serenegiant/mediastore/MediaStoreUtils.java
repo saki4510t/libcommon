@@ -32,7 +32,9 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.db.CursorHelper;
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.FileUtils;
+import com.serenegiant.utils.UriHelper;
 
 import java.io.FileNotFoundException;
 
@@ -306,6 +308,21 @@ public class MediaStoreUtils {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
+	/**
+	 * Android10以降のときに指定したDocumentFileでラップしたuriに対してIS_PENDING=0でContextResolver#updateを呼び出す
+	 * Android10未満の場合には何もしない
+	 * @param context
+	 * @param file
+	 */
+	public static void updateContentUri(
+		@NonNull final Context context, @NonNull final DocumentFile file) {
+
+		if (!file.isDirectory() && BuildCheck.isAPI29()) {
+			updateContentUri(context.getContentResolver(), file.getUri());
+		}
+	}
+
 	/**
 	 * Android10以降のときに指定したuriに対してIS_PENDING=0でContextResolver#updateを呼び出す
 	 * Android10未満の場合には何もしない
@@ -324,11 +341,12 @@ public class MediaStoreUtils {
 	 * @param cr
 	 * @param uri
 	 */
+	@SuppressLint("InlinedApi")
 	public static void updateContentUri(
 		@NonNull final ContentResolver cr, @NonNull final Uri uri) {
 
 		if (DEBUG) Log.v(TAG, "updateContentUri:" + uri);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+		if (BuildCheck.isAPI29() && UriHelper.isContentUri(uri)) {
 			final ContentValues cv = new ContentValues();
 			cv.put(MediaStore.MediaColumns.IS_PENDING, 0);
 			try {
@@ -341,6 +359,30 @@ public class MediaStoreUtils {
 		}
 	}
 
+//--------------------------------------------------------------------------------
+	@Nullable
+	public static Uri getUri(final int mediaType, final long id) {
+		switch (mediaType) {
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
+			return ContentUris.withAppendedId(
+				MediaStore.Files.getContentUri("external"), id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
+			return ContentUris.withAppendedId(
+				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
+			return ContentUris.withAppendedId(
+				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
+			return ContentUris.withAppendedId(
+				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
+		default:
+			return null;
+		}
+
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * 静止画をMediaStoreへ登録
 	 * @param context
@@ -375,27 +417,5 @@ public class MediaStoreUtils {
 		cv.put(MediaStore.MediaColumns.DATA, path);
 		return context.getContentResolver().insert(
 			MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cv);
-	}
-
-	@Nullable
-	public static Uri getUri(final int mediaType, final long id) {
-		switch (mediaType) {
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
-			return ContentUris.withAppendedId(
-				MediaStore.Files.getContentUri("external"), id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-			return ContentUris.withAppendedId(
-				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-			return ContentUris.withAppendedId(
-				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-			return ContentUris.withAppendedId(
-				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
-		default:
-			return null;
-		}
-
 	}
 }
