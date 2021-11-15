@@ -30,6 +30,8 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.documentfile.provider.DocumentFile;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -316,12 +318,34 @@ public final class UriHelper {
 	}
 
 	/**
+	 * 指定したDocumentFileがコンテントuriをラップしたものかどうかを取得
+	 * (schemeが"content"かどうかをチェックするだけ)
+	 * @param file
+	 * @return
+	 */
+	public static boolean isContentUri(@Nullable DocumentFile file) {
+		final Uri uri = file != null ? file.getUri() : null;
+		return (uri != null) && ContentResolver.SCHEME_CONTENT.equals(uri.getScheme());
+	}
+
+	/**
 	 * 指定したUriがファイルuriかどうかを取得
 	 * (schemeが"file"かどうかをチェックするだけ)
 	 * @param uri
 	 * @return
 	 */
 	public static boolean isFileUri(@Nullable Uri uri) {
+		return (uri != null) && ContentResolver.SCHEME_FILE.equals(uri.getScheme());
+	}
+
+	/**
+	 * 指定したDocumentFileがファイルuriをラップしたものかかどうかを取得
+	 * (schemeが"file"かどうかをチェックするだけ)
+	 * @param file
+	 * @return
+	 */
+	public static boolean isFileUri(@Nullable DocumentFile file) {
+		final Uri uri = file != null ? file.getUri() : null;
 		return (uri != null) && ContentResolver.SCHEME_FILE.equals(uri.getScheme());
 	}
 
