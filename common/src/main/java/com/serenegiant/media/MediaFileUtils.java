@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
@@ -48,6 +49,7 @@ public class MediaFileUtils {
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	@Nullable
 	public static synchronized DocumentFile getSAFRecordingRoot(
 		@NonNull final Context context,
