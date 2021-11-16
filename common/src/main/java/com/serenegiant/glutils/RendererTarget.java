@@ -228,6 +228,7 @@ public class RendererTarget implements IRendererTarget {
 	static class RendererTargetHasWait extends RendererTarget {
 		private long mNextDraw;
 		private final long mIntervalsNs;
+		private final long mIntervalsDeltaNs;
 
 		/**
 		 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
@@ -241,6 +242,7 @@ public class RendererTarget implements IRendererTarget {
 
 			super(egl, surface);
 			mIntervalsNs = Math.round(1000000000.0 / maxFps);
+			mIntervalsDeltaNs = -Math.round(mIntervalsNs * 0.03);	// 3%ならショートしても良いことにする
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 		}
 
@@ -251,7 +253,7 @@ public class RendererTarget implements IRendererTarget {
 		 */
 		@Override
 		public boolean canDraw() {
-			return super.canDraw() && (Time.nanoTime() - mNextDraw > 0);
+			return super.canDraw() && (Time.nanoTime() - mNextDraw > mIntervalsDeltaNs);
 		}
 
 		@Override
