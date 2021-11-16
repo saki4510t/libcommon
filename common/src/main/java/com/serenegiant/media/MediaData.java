@@ -144,6 +144,7 @@ public class MediaData {
 		mFlags = flags;
 		resize(size);
 		if ((buffer != null) && (size > offset)) {
+			buffer.clear();	// limit==positionになってる変なByteBufferが来る端末があるのでclearする
 			buffer.position(offset + size);
 			buffer.flip();
 			buffer.position(offset);
@@ -183,6 +184,7 @@ public class MediaData {
 		final int offset = info.offset;
 		resize(mSize);
 		if ((buffer != null) && (mSize > offset)) {
+			buffer.clear();	// limit==positionになってる変なByteBufferが来る端末があるのでclearする
 			buffer.position(offset + mSize);
 			buffer.flip();
 			buffer.position(offset);
