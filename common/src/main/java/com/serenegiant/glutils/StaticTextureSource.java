@@ -20,7 +20,6 @@
 package com.serenegiant.glutils;
 
 import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,8 +27,6 @@ import androidx.annotation.WorkerThread;
 
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Surface;
-import android.view.SurfaceHolder;
 
 import com.serenegiant.glutils.es2.GLHelper;
 
@@ -307,6 +304,7 @@ public class StaticTextureSource {
 		 * 分配描画用のSurfaceを追加
 		 * @param id
 		 * @param surface
+		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
 			checkFinished();
@@ -428,6 +426,7 @@ public class StaticTextureSource {
 		 * 指定したIDの分配描画先Surfaceを追加する
 		 * @param id
 		 * @param surface
+		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 */
 		@WorkerThread
 		private void handleAddSurface(final int id, final Object surface, final int maxFps) {
@@ -455,14 +454,14 @@ public class StaticTextureSource {
 		 * @param id
 		 * @param egl
 		 * @param surface
-		 * @param maxFps
+		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 * @return
 		 */
 		protected IRendererTarget createRendererTarget(final int id,
 			@NonNull final EGLBase egl,
-			final Object surface, final int maxFps) {
+			final Object surface, final float maxFps) {
 
-			return RendererTarget.newInstance(getEgl(), surface, maxFps);
+			return RendererTarget.newInstance(getEgl(), surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
 		}
 
 		/**

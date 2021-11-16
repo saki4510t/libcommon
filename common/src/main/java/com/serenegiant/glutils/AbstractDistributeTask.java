@@ -144,6 +144,7 @@ public abstract class AbstractDistributeTask {
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
 	public void addSurface(final int id,
 		final Object surface, final int maxFps)
@@ -564,7 +565,7 @@ public abstract class AbstractDistributeTask {
 	 * 指定したIDの分配描画先Surfaceを追加する
 	 * @param id
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
-	 * @param maxFps
+	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
 	@WorkerThread
 	protected void handleAddSurface(final int id,
@@ -595,16 +596,16 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 * @param egl
 	 * @param surface
-	 * @param maxFps
+	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 * @return
 	 */
 	@NonNull
 	protected IRendererTarget createRendererTarget(final int id,
 		@NonNull final EGLBase egl,
-		@NonNull final Object surface, final int maxFps) {
+		@NonNull final Object surface, final float maxFps) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTarget:" + id);
-		return RendererTarget.newInstance(getEgl(), surface, maxFps);
+		return RendererTarget.newInstance(getEgl(), surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
 	}
 
 	/**

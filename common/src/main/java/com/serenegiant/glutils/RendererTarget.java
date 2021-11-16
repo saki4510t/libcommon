@@ -39,7 +39,7 @@ public class RendererTarget implements IRendererTarget {
 	 */
 	public static IRendererTarget newInstance(
 		@NonNull final EGLBase egl,
-		@NonNull final Object surface, final int maxFps) {
+		@NonNull final Object surface, final float maxFps) {
 
 		return (maxFps > 0)
 			? new RendererTargetHasWait(egl, surface, maxFps)
@@ -237,10 +237,10 @@ public class RendererTarget implements IRendererTarget {
 		 */
 		protected RendererTargetHasWait(
 			@NonNull final EGLBase egl,
-			@NonNull final Object surface, final int maxFps) {
+			@NonNull final Object surface, final float maxFps) {
 
 			super(egl, surface);
-			mIntervalsNs = 1000000000L / maxFps;
+			mIntervalsNs = Math.round(1000000000.0 / maxFps);
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 		}
 
