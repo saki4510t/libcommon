@@ -114,6 +114,29 @@ public final class PermissionCheck {
 		return result.toArray(new String[0]);
 	}
 
+	/**
+	 * 指定した複数のパーミッションを確認してすべてを保持している場合のみtrueを返す
+	 * @param context
+	 * @param permissions
+	 * @return
+	 */
+	public static boolean hasPermissionAll(
+		@Nullable final Context context,
+		@NonNull final String[] permissions) {
+
+		boolean result = true;
+		if (context != null) {
+			for (final String permission: permissions) {
+				if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
+					// 1つでもパーミッションがなければfalse
+					result = false;
+					break;
+				}
+			}
+		}
+		return result;
+	}
+
     /**
      * 録音のミッションがあるかどうかを確認
      * @param context
