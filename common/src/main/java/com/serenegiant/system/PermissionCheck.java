@@ -49,7 +49,7 @@ public final class PermissionCheck {
 			final PackageManager pm = context.getPackageManager();
 			final List<PermissionGroupInfo> list = pm.getAllPermissionGroups(PackageManager.GET_META_DATA);
 			for (final PermissionGroupInfo info : list) {
-				Log.d("PermissionCheck", info.name);
+				Log.d("PermissionCheck", info.name + "=" + info);
 			}
 		} catch (final Exception e) {
 			Log.w("", e);
