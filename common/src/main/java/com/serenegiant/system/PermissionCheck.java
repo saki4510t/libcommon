@@ -92,6 +92,28 @@ public final class PermissionCheck {
     	return result;
     }
 
+	/**
+	 * 指定した複数のパーミッションを確認して保持しているパーミッション配列を返す
+	 * @param context
+	 * @param permissions
+	 * @return
+	 */
+	@NonNull
+	public static String[] hasPermission(
+		@Nullable final Context context,
+		@NonNull final String[] permissions) {
+
+		final ArrayList<String> result = new ArrayList<>();
+		if (context != null) {
+			for (final String permission: permissions) {
+				if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
+					result.add(permission);
+				}
+			}
+		}
+		return result.toArray(new String[0]);
+	}
+
     /**
      * 録音のミッションがあるかどうかを確認
      * @param context
