@@ -1,5 +1,9 @@
 package com.serenegiant.utils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import androidx.annotation.NonNull;
 
 public class ArrayUtils {
@@ -108,5 +112,17 @@ public class ArrayUtils {
 	 */
 	public static <T> void copy(@NonNull final T[] src, @NonNull final T[] dst) {
 		System.arraycopy(src, 0, dst, 0, src.length);
+	}
+
+	/**
+	 * 配列をArrayListに変換する
+	 * Arrays.asListは実際にはArrayListだけど返り値はListで単純にキャストできないので
+	 * ArrayListのコンストラクタへ引き渡してArrayListとして返す
+	 * @param array
+	 * @param <T>
+	 * @return
+	 */
+	public static <T> ArrayList<T> asList(@NonNull final T[] array) {
+		return new ArrayList<>(Arrays.asList(array));
 	}
 }
