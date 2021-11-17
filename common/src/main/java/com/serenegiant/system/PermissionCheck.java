@@ -39,6 +39,9 @@ import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
 public final class PermissionCheck {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = PermissionCheck.class.getSimpleName();
+
 	private PermissionCheck() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
@@ -54,6 +57,23 @@ public final class PermissionCheck {
 		} catch (final Exception e) {
 			Log.w("", e);
 		}
+	}
+
+	/**
+	 * アプリのAndroidManifest.xmlで要求しているパーミッション一覧を取得する
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static String[] requestedPermissions(@NonNull final Context context) {
+		PackageInfo info = null;
+		try {
+			info = context.getPackageManager().getPackageInfo(context.getPackageName(), PackageManager.GET_PERMISSIONS);
+		} catch (final PackageManager.NameNotFoundException e) {
+			if (DEBUG) Log.w(TAG, e);
+		}
+		return (info != null) && (info.requestedPermissions != null)
+			? info.requestedPermissions : new String[0];
 	}
 
 	/**
@@ -133,6 +153,19 @@ public final class PermissionCheck {
 					break;
 				}
 			}
+		}
+		return result;
+	}
+
+	/**
+	 * アプリのAndroidManifest.xmlで要求しているすべてのパーミッションを保持している場合のみtrueを返す
+	 * @param context
+	 * @return
+	 */
+	public static boolean hasPermissionAll(@Nullable final Context context) {
+		boolean result = false;
+		if (context != null) {
+			result = hasPermissionAll(context, requestedPermissions(context));
 		}
 		return result;
 	}
