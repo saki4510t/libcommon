@@ -19,7 +19,6 @@ package com.serenegiant.system;
 */
 
 import android.Manifest.permission;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
@@ -52,10 +51,10 @@ public final class PermissionCheck {
 			final PackageManager pm = context.getPackageManager();
 			final List<PermissionGroupInfo> list = pm.getAllPermissionGroups(PackageManager.GET_META_DATA);
 			for (final PermissionGroupInfo info : list) {
-				Log.d("PermissionCheck", info.name + "=" + info);
+				Log.d(TAG, "dumpPermissions:" + info.name + "=" + info);
 			}
 		} catch (final Exception e) {
-			Log.w("", e);
+			if (DEBUG) Log.w(TAG, e);
 		}
 	}
 
@@ -82,14 +81,13 @@ public final class PermissionCheck {
 	 * @param permissionName
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static int checkSelfPermission(@Nullable final Context context, final String permissionName) {
 		if (context == null) return PackageManager.PERMISSION_DENIED;
 		int result = PackageManager.PERMISSION_DENIED;
 		try {
 			result = ContextCompat.checkSelfPermission(context, permissionName);
 		} catch (final Exception e) {
-			Log.w("", e);
+			if (DEBUG) Log.w(TAG, e);
 		}
 		return result;
 	}
@@ -100,14 +98,13 @@ public final class PermissionCheck {
 	 * @param permissionName
 	 * @return 指定したパーミッションがあればtrue
 	 */
-	@SuppressLint("NewApi")
 	public static boolean hasPermission(@Nullable final Context context, final String permissionName) {
     	if (context == null) return false;
 		boolean result = false;
 		try {
 			result = ContextCompat.checkSelfPermission(context, permissionName) == PackageManager.PERMISSION_GRANTED;
 		} catch (final Exception e) {
-			Log.w("", e);
+			if (DEBUG) Log.w(TAG, e);
 		}
     	return result;
     }
@@ -211,12 +208,8 @@ public final class PermissionCheck {
      * @param context
      * @return 外部ストレージへの読み込みパーミッションがあればtrue
      */
-    @SuppressLint("InlinedApi")
 	public static boolean hasReadExternalStorage(@Nullable final Context context) {
-    	if (BuildCheck.isAndroid4())
-    		return hasPermission(context, permission.READ_EXTERNAL_STORAGE);
-    	else
-    		return hasPermission(context, permission.WRITE_EXTERNAL_STORAGE);
+   		return hasPermission(context, permission.WRITE_EXTERNAL_STORAGE);
     }
 
 	/**
