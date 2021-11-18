@@ -85,10 +85,10 @@ class MainActivity
 		super.onStop()
 	}
 
-	protected fun internalOnResume() {
+	private fun internalOnResume() {
 	}
 
-	protected fun internalOnPause() {
+	private fun internalOnPause() {
 		clearToast()
 	}
 
@@ -337,7 +337,7 @@ class MainActivity
 	 * @param permission
 	 * @param result
 	 */
-	protected fun checkPermissionResult(equestCode: Int,
+	private fun checkPermissionResult(equestCode: Int,
 		permission: String?, result: Boolean) {
 
 		// パーミッションがないときにはメッセージを表示する
@@ -366,7 +366,7 @@ class MainActivity
 	 *
 	 * @return true already have permission to access external storage
 	 */
-	protected fun checkPermissionWriteExternalStorage(): Boolean {
+	private fun checkPermissionWriteExternalStorage(): Boolean {
 		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
 		if (!BuildCheck.isAPI29() && !PermissionCheck.hasWriteExternalStorage(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
@@ -385,7 +385,7 @@ class MainActivity
 	 *
 	 * @return true already have permission to access external storage
 	 */
-	protected fun checkPermissionReadExternalStorage(): Boolean {
+	private fun checkPermissionReadExternalStorage(): Boolean {
 		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
 		if (!PermissionCheck.hasWriteExternalStorage(this)
 			&& !PermissionCheck.hasReadExternalStorage(this)) {
@@ -405,7 +405,7 @@ class MainActivity
 	 *
 	 * @return true already have permission to record audio
 	 */
-	protected fun checkPermissionAudio(): Boolean {
+	private fun checkPermissionAudio(): Boolean {
 		if (!PermissionCheck.hasAudio(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_AUDIO_RECORDING,
@@ -423,7 +423,7 @@ class MainActivity
 	 *
 	 * @return true already have permission to access internal camera
 	 */
-	protected fun checkPermissionCamera(): Boolean {
+	private fun checkPermissionCamera(): Boolean {
 		if (!PermissionCheck.hasCamera(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_CAMERA,
@@ -441,7 +441,7 @@ class MainActivity
 	 *
 	 * @return true already have permission to access network
 	 */
-	protected fun checkPermissionNetwork(): Boolean {
+	private fun checkPermissionNetwork(): Boolean {
 		if (!PermissionCheck.hasNetwork(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_NETWORK,
@@ -458,7 +458,7 @@ class MainActivity
 	 * and request to show detail dialog to request permission
 	 * @return true already have permission to access gps
 	 */
-	protected fun checkPermissionLocation(): Boolean {
+	private fun checkPermissionLocation(): Boolean {
 		if (!PermissionCheck.hasAccessLocation(this)) {
 			PermissionDescriptionDialogV4.showDialog(this,
 				REQUEST_PERMISSION_LOCATION,
@@ -477,7 +477,7 @@ class MainActivity
 	 *
 	 * @return true already have permission of READ_PHONE_STATE
 	 */
-	protected fun checkPermissionHardwareId(): Boolean {
+	private fun checkPermissionHardwareId(): Boolean {
 		if (!PermissionCheck.hasPermission(this,
 				Manifest.permission.READ_PHONE_STATE)) {
 			PermissionDescriptionDialogV4.showDialog(this,
