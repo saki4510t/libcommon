@@ -470,25 +470,6 @@ class MainActivity
 		return true
 	}
 
-	/**
-	 * check permission to of READ_PHONE_STATE
-	 * and request to show detail dialog to request permission
-	 * This permission is necessarily to get hardware ID on device like IMEI.
-	 *
-	 * @return true already have permission of READ_PHONE_STATE
-	 */
-	private fun checkPermissionHardwareId(): Boolean {
-		if (!PermissionCheck.hasPermission(this,
-				Manifest.permission.READ_PHONE_STATE)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_HARDWARE_ID,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_HARDWARE_ID,
-				arrayOf(Manifest.permission.READ_PHONE_STATE))
-			return false
-		}
-		return true
-	}
 
 	//================================================================================
 	private var mToast: Toast? = null
