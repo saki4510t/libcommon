@@ -45,7 +45,7 @@ public class PermissionDescriptionDialogV4 extends DialogFragmentEx {
 	/**
 	 * ダイアログの表示結果を受け取るためのコールバックリスナー
 	 */
-	public static interface DialogResultListener {
+	public interface DialogResultListener {
 		public void onDialogResult(
 			@NonNull final PermissionDescriptionDialogV4 dialog, final int requestCode,
 			@NonNull final String[] permissions, final boolean result);
