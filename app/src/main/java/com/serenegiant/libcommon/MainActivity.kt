@@ -283,6 +283,9 @@ class MainActivity
 			20 -> {	// ProgressView
 				fragment = ProgressFragment()
 			}
+			21 -> {	// PermissionUtils
+				fragment = PermissionFragment.newInstance()
+			}
 			else -> {
 			}
 		}
