@@ -106,9 +106,9 @@ class MainActivity
 		val fm = supportFragmentManager
 		val fragment = fm.findFragmentById(R.id.container)
 		if (fragment is BaseFragment) {
-			val child_fm = fragment.getChildFragmentManager()
-			if (child_fm.backStackEntryCount > 0) { // HomeFragmentの子Fragmentがバックスタックに有る時はそれをpopBackする
-				child_fm.popBackStack()
+			val childFm = fragment.getChildFragmentManager()
+			if (childFm.backStackEntryCount > 0) { // HomeFragmentの子Fragmentがバックスタックに有る時はそれをpopBackする
+				childFm.popBackStack()
 				return
 			}
 			if (fragment.onBackPressed()) {
