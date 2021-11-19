@@ -21,7 +21,6 @@ package com.serenegiant.usb;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -54,6 +53,7 @@ import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 /**
  * FIXME USB機器のモニター機能とパーミッション要求/open/close等を分割する
@@ -1125,7 +1125,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public synchronized int bulkTransfer(final UsbEndpoint endpoint,
 			final byte[] buffer, final int offset, final int length, final int timeout)
 				throws IllegalStateException {
@@ -1164,7 +1164,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 * @throws IllegalStateException
 		 */
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public synchronized int controlTransfer(final int requestType, final int request,
 			final int value, final int index,
 			final byte[] buffer, final int offset, final int length, final int timeout)
