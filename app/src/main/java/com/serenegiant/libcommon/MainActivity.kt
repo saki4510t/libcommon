@@ -20,30 +20,38 @@ package com.serenegiant.libcommon
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import com.serenegiant.dialog.PermissionDescriptionDialogV4
-import com.serenegiant.dialog.PermissionDescriptionDialogV4.DialogResultListener
+import com.serenegiant.dialog.RationalDialogV4
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
 import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
+import com.serenegiant.system.PermissionUtils
+import com.serenegiant.system.PermissionUtils.PermissionCallback
+import java.util.*
 
 class MainActivity
 	: AppCompatActivity(),
-		OnListFragmentInteractionListener, DialogResultListener {
+		OnListFragmentInteractionListener,
+		RationalDialogV4.DialogResultListener {
 
+	private var mPermissions: PermissionUtils? = null
 	private var mIsResumed = false
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
+		// パーミッション要求の準備
+		mPermissions = PermissionUtils(this, mCallback)
+			.prepare(this,
+				arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+						Manifest.permission.ACCESS_COARSE_LOCATION))
 		DummyContent.createItems(this, R.array.list_items)
 		if (savedInstanceState == null) {
 			supportFragmentManager
@@ -139,6 +147,9 @@ class MainActivity
 				}
 			}
 			2 -> {	// NetworkConnection
+				if (!checkPermissionNetwork()) {
+					return;
+				}
 				fragment = NetworkConnectionFragment.newInstance()
 			}
 			3 -> {	// UsbMonitor
@@ -286,46 +297,29 @@ class MainActivity
 
 //================================================================================
 	/**
-	 * callback listener from MessageDialogFragment
+	 * callback listener from RationalDialogV4
 	 *
 	 * @param dialog
-	 * @param requestCode
 	 * @param permissions
 	 * @param result
 	 */
 	@SuppressLint("NewApi")
 	override fun onDialogResult(
-		dialog: PermissionDescriptionDialogV4, requestCode: Int,
+		dialog: RationalDialogV4,
 		permissions: Array<String>, result: Boolean) {
+		if (DEBUG) Log.v(TAG, "onDialogResult:result=${result}," + permissions.contentToString())
 		if (result) { // メッセージダイアログでOKを押された時はパーミッション要求する
 			if (BuildCheck.isMarshmallow()) {
-				requestPermissions(permissions, requestCode)
-				return
+				if (mPermissions != null) {
+					mPermissions!!.requestPermission(permissions, false)
+					return
+				}
 			}
 		}
 		// メッセージダイアログでキャンセルされた時とAndroid6でない時は自前でチェックして#checkPermissionResultを呼び出す
 		for (permission in permissions) {
-			checkPermissionResult(requestCode, permission,
+			checkPermissionResult(permission,
 				PermissionCheck.hasPermission(this, permission))
-		}
-	}
-
-	/**
-	 * override this method to handle result of permission request
-	 * actual handling of requesting permission is delegated on #checkPermissionResult
-	 *
-	 * @param requestCode
-	 * @param permissions
-	 * @param grantResults
-	 */
-	override fun onRequestPermissionsResult(requestCode: Int,
-		permissions: Array<String>, grantResults: IntArray) {
-
-		super.onRequestPermissionsResult(requestCode, permissions, grantResults) // 何もしてないけど一応呼んどく
-		val n = Math.min(permissions.size, grantResults.size)
-		for (i in 0 until n) {
-			checkPermissionResult(requestCode, permissions[i],
-				grantResults[i] == PackageManager.PERMISSION_GRANTED)
 		}
 	}
 
@@ -333,11 +327,10 @@ class MainActivity
 	 * actual handling of requesting permission
 	 * this method just show Toast if permission request failed
 	 *
-	 * @param requestCode
 	 * @param permission
 	 * @param result
 	 */
-	private fun checkPermissionResult(equestCode: Int,
+	private fun checkPermissionResult(
 		permission: String?, result: Boolean) {
 
 		// パーミッションがないときにはメッセージを表示する
@@ -368,15 +361,9 @@ class MainActivity
 	 */
 	private fun checkPermissionWriteExternalStorage(): Boolean {
 		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
-		if (!BuildCheck.isAPI29() && !PermissionCheck.hasWriteExternalStorage(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_WRITE_EXT_STORAGE,
-				arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE))
-			return false
-		}
-		return true
+		return (BuildCheck.isAPI29()
+			|| (mPermissions != null
+				&& mPermissions!!.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, true)))
 	}
 
 	/**
@@ -387,16 +374,9 @@ class MainActivity
 	 */
 	private fun checkPermissionReadExternalStorage(): Boolean {
 		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
-		if (!PermissionCheck.hasWriteExternalStorage(this)
-			&& !PermissionCheck.hasReadExternalStorage(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_READ_EXTERNAL_STORAGE,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_READ_EXT_STORAGE,
-				arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE))
-			return false
-		}
-		return true
+		return PermissionCheck.hasWriteExternalStorage(this)
+			|| (mPermissions != null
+				&& mPermissions!!.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, true))
 	}
 
 	/**
@@ -406,15 +386,8 @@ class MainActivity
 	 * @return true already have permission to record audio
 	 */
 	private fun checkPermissionAudio(): Boolean {
-		if (!PermissionCheck.hasAudio(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_AUDIO_RECORDING,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_AUDIO,
-				arrayOf(Manifest.permission.RECORD_AUDIO))
-			return false
-		}
-		return true
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.RECORD_AUDIO, true)
 	}
 
 	/**
@@ -424,15 +397,8 @@ class MainActivity
 	 * @return true already have permission to access internal camera
 	 */
 	private fun checkPermissionCamera(): Boolean {
-		if (!PermissionCheck.hasCamera(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_CAMERA,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_CAMERA,
-				arrayOf(Manifest.permission.CAMERA))
-			return false
-		}
-		return true
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.CAMERA, true)
 	}
 
 	/**
@@ -442,15 +408,8 @@ class MainActivity
 	 * @return true already have permission to access network
 	 */
 	private fun checkPermissionNetwork(): Boolean {
-		if (!PermissionCheck.hasNetwork(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_NETWORK,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_NETWORK,
-				arrayOf(Manifest.permission.INTERNET))
-			return false
-		}
-		return true
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.INTERNET, true)
 	}
 
 	/**
@@ -459,17 +418,78 @@ class MainActivity
 	 * @return true already have permission to access gps
 	 */
 	private fun checkPermissionLocation(): Boolean {
-		if (!PermissionCheck.hasAccessLocation(this)) {
-			PermissionDescriptionDialogV4.showDialog(this,
-				REQUEST_PERMISSION_LOCATION,
-				R.string.permission_title,
-				ID_PERMISSION_REQUEST_LOCATION,
-				arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
-			return false
-		}
-		return true
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(LOCATION_PERMISSIONS, true)
 	}
 
+	/**
+	 * PermissionUtilsからのコールバックリスナー実装
+	 */
+	private val mCallback: PermissionCallback = object : PermissionCallback {
+		override fun onPermissionShowRational(permission: String) {
+			if (DEBUG) Log.v(TAG, "onPermissionShowRational:$permission")
+			// パーミッション要求理由の表示が必要な時
+			val dialog: RationalDialogV4? =
+				RationalDialogV4.showDialog(this@MainActivity, permission)
+			if (dialog == null) {
+				if (DEBUG) Log.v(TAG, "onPermissionShowRational:" +
+					"デフォルトのダイアログ表示ができなかったので自前で表示しないといけない," + permission)
+				if (Manifest.permission.INTERNET == permission) {
+					RationalDialogV4.showDialog(this@MainActivity,
+						R.string.permission_title,
+						R.string.permission_network_request,
+						arrayOf(Manifest.permission.INTERNET))
+				} else if ((Manifest.permission.ACCESS_FINE_LOCATION == permission)
+					|| (Manifest.permission.ACCESS_COARSE_LOCATION == permission)) {
+					RationalDialogV4.showDialog(this@MainActivity,
+						R.string.permission_title,
+						R.string.permission_location_request,
+						LOCATION_PERMISSIONS)
+				}
+			}
+		}
+
+		override fun onPermissionShowRational(permissions: Array<out String>) {
+			if (DEBUG) Log.v(TAG, "onPermissionShowRational:" + permissions.contentToString())
+			// 複数パーミッションの一括要求時はデフォルトのダイアログ表示がないので自前で実装する
+			if (LOCATION_PERMISSIONS.contentEquals(permissions)) {
+				RationalDialogV4.showDialog(this@MainActivity,
+					R.string.permission_title,
+					R.string.permission_location_request,
+					LOCATION_PERMISSIONS)
+			}
+		}
+
+		override fun onPermissionDenied(permission: String) {
+			if (DEBUG) Log.v(TAG, "onPermissionDenied:$permission")
+			// ユーザーがパーミッション要求を拒否したときの処理
+		}
+
+		override fun onPermission(permission: String) {
+			if (DEBUG) Log.v(TAG, "onPermission:$permission")
+			// ユーザーがパーミッション要求を承認したときの処理
+		}
+
+		override fun onPermissionNeverAskAgain(permission: String) {
+			if (DEBUG) Log.v(TAG, "onPermissionNeverAskAgain:$permission")
+			// 端末のアプリ設定画面を開くためのボタンを配置した画面へ遷移させる
+			supportFragmentManager
+				.beginTransaction()
+				.addToBackStack(null)
+				.replace(R.id.container, SettingsLinkFragment.newInstance())
+				.commit()
+		}
+
+		override fun onPermissionNeverAskAgain(permissions: Array<out String>) {
+			if (DEBUG) Log.v(TAG, "onPermissionNeverAskAgain:" + permissions.contentToString())
+			// 端末のアプリ設定画面を開くためのボタンを配置した画面へ遷移させる
+			supportFragmentManager
+				.beginTransaction()
+				.addToBackStack(null)
+				.replace(R.id.container, SettingsLinkFragment.newInstance())
+				.commit()
+		}
+	}
 
 	//================================================================================
 	private var mToast: Toast? = null
@@ -531,32 +551,8 @@ class MainActivity
 	companion object {
 		private const val DEBUG = true // set false on production
 		private val TAG = MainActivity::class.java.simpleName
-		private const val ID_PERMISSION_REASON_AUDIO = R.string.permission_audio_recording_reason
-		private const val ID_PERMISSION_REQUEST_AUDIO = R.string.permission_audio_recording_request
-		private const val ID_PERMISSION_REASON_NETWORK = R.string.permission_network_reason
-		private const val ID_PERMISSION_REQUEST_NETWORK = R.string.permission_network_request
-		private const val ID_PERMISSION_REASON_EXT_STORAGE = R.string.permission_ext_storage_reason
-		private const val ID_PERMISSION_REQUEST_WRITE_EXT_STORAGE = R.string.permission_ext_storage_request
-		private const val ID_PERMISSION_REASON_READ_EXT_STORAGE = R.string.permission_read_ext_storage_reason
-		private const val ID_PERMISSION_REQUEST_READ_EXT_STORAGE = R.string.permission_read_ext_storage_request
-		private const val ID_PERMISSION_REASON_CAMERA = R.string.permission_camera_reason
-		private const val ID_PERMISSION_REQUEST_CAMERA = R.string.permission_camera_request
-		private const val ID_PERMISSION_REQUEST_HARDWARE_ID = R.string.permission_hardware_id_request
-		private const val ID_PERMISSION_REASON_LOCATION = R.string.permission_location_reason
-		private const val ID_PERMISSION_REQUEST_LOCATION = R.string.permission_location_request
-		/** request code for WRITE_EXTERNAL_STORAGE permission  */
-		private const val REQUEST_PERMISSION_WRITE_EXTERNAL_STORAGE = 0x12345
-		/** request code for READ_EXTERNAL_STORAGE permission  */
-		private const val REQUEST_PERMISSION_READ_EXTERNAL_STORAGE = 0x12346
-		/** request code for RECORD_AUDIO permission  */
-		private const val REQUEST_PERMISSION_AUDIO_RECORDING = 0x234567
-		/** request code for CAMERA permission  */
-		private const val REQUEST_PERMISSION_CAMERA = 0x345678
-		/** request code for INTERNET permission  */
-		private const val REQUEST_PERMISSION_NETWORK = 0x456789
-		/** request code for READ_PHONE_STATE permission  */
-		private const val REQUEST_PERMISSION_HARDWARE_ID = 0x567890
-		/** request code for ACCESS_FINE_LOCATION permission  */
-		private const val REQUEST_PERMISSION_LOCATION = 0x678901
+		private val LOCATION_PERMISSIONS
+			= arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
+					  Manifest.permission.ACCESS_COARSE_LOCATION)
 	}
 }
