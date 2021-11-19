@@ -479,7 +479,7 @@ class MainActivity
 	 * @param msg
 	 * @param args
 	 */
-	protected fun showToast(duration: Int, msg: String?, vararg args: Any?) {
+	private fun showToast(duration: Int, msg: String?, vararg args: Any?) {
 		runOnUiThread {
 			try {
 				if (mToast != null) {
@@ -498,7 +498,7 @@ class MainActivity
 	 * Toastでメッセージを表示
 	 * @param msg
 	 */
-	protected fun showToast(duration: Int, @StringRes msg: Int, vararg args: Any?) {
+	private fun showToast(duration: Int, @StringRes msg: Int, vararg args: Any?) {
 		runOnUiThread {
 			try {
 				if (mToast != null) {
@@ -517,7 +517,7 @@ class MainActivity
 	/**
 	 * Toastが表示されていればキャンセルする
 	 */
-	protected fun clearToast() {
+	private fun clearToast() {
 		try {
 			if (mToast != null) {
 				mToast!!.cancel()
