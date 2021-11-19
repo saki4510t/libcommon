@@ -141,19 +141,19 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	/**
 	 * ダイアログ表示のためのヘルパーメソッド
 	 * @param parent
-	 * @param id_title
-	 * @param id_message
+	 * @param titleRes
+	 * @param messageRes
 	 * @param permissions
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	public static RationalDialogV4 showDialog(
 		@NonNull final FragmentActivity parent,
-		@StringRes final int id_title, @StringRes final int id_message,
+		@StringRes final int titleRes, @StringRes final int messageRes,
 		@NonNull final String[] permissions) throws IllegalStateException {
 
 		final RationalDialogV4 dialog
-			= newInstance(id_title, id_message, permissions);
+			= newInstance(titleRes, messageRes, permissions);
 		dialog.show(parent.getSupportFragmentManager(), TAG);
 		return dialog;
 	}
@@ -161,19 +161,19 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	/**
 	 * ダイアログ表示のためのヘルパーメソッド
 	 * @param parent
-	 * @param id_title
-	 * @param id_message
+	 * @param titleRes
+	 * @param messageRes
 	 * @param permissions
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	public static RationalDialogV4 showDialog(
 		@NonNull final Fragment parent,
-		@StringRes final int id_title, @StringRes final int id_message,
+		@StringRes final int titleRes, @StringRes final int messageRes,
 		@NonNull final String[] permissions) throws IllegalStateException {
 
 		final RationalDialogV4 dialog
-			= newInstance(id_title, id_message, permissions);
+			= newInstance(titleRes, messageRes, permissions);
 		dialog.setTargetFragment(parent, parent.getId());
 		dialog.show(parent.getParentFragmentManager(), TAG);
 		return dialog;
