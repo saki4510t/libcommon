@@ -786,7 +786,7 @@ public class SAFUtils {
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@Nullable
-	private static Uri getStorageUri(
+	/*package*/static Uri getStorageUri(
 		@NonNull final Context context,
 		final int requestCode) throws UnsupportedOperationException {
 
