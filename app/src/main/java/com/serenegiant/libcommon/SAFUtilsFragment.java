@@ -1,7 +1,7 @@
 package com.serenegiant.libcommon;
 
+import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +15,7 @@ import android.widget.Toast;
 import com.serenegiant.dialog.ConfirmDialogV4;
 import com.serenegiant.libcommon.databinding.FragmentSafutilsBinding;
 import com.serenegiant.libcommon.viewmodel.SAFUtilsViewModel;
+import com.serenegiant.system.SAFPermission;
 import com.serenegiant.system.SAFUtils;
 import com.serenegiant.widget.ArrayListRecyclerViewAdapter;
 import com.serenegiant.widget.StringsRecyclerViewAdapter;
@@ -42,7 +43,7 @@ public class SAFUtilsFragment extends BaseFragment
 
 	private FragmentSafutilsBinding mBinding;
 	private StringsRecyclerViewAdapter mAdapter;
-	private int mLastRequestCode;
+	private SAFPermission mSAFPermission;
 
 	/**
 	 * デフォルトコンストラクタ
@@ -50,6 +51,13 @@ public class SAFUtilsFragment extends BaseFragment
 	public SAFUtilsFragment() {
 		super();
 		// デフォルトコンストラクタが必要
+	}
+
+	@Override
+	public void onAttach(@NonNull final Context context) {
+		super.onAttach(context);
+		// XXX Fragmentの場合SAFPermissionを#onAttachまたは#onCreateで初期化しないといけない
+		mSAFPermission = new SAFPermission(this, SAFPermission.DEFAULT_CALLBACK);
 	}
 
 	@Nullable
@@ -77,43 +85,6 @@ public class SAFUtilsFragment extends BaseFragment
 	protected void internalOnPause() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:");
 		super.internalOnPause();
-	}
-
-	/**
-	 * パーミッション要求結果の処理
-	 * @param requestCode
-	 * @param resultCode
-	 * @param data
-	 */
-	@Override
-	public void onActivityResult(final int requestCode,
-		final int resultCode, @Nullable final Intent data) {
-
-		if (DEBUG) Log.v(TAG, "onActivityResult:requestCode=" + requestCode);
-		if (mLastRequestCode == requestCode) {
-			mLastRequestCode = 0;
-			SAFUtils.handleOnResult(requireContext(),
-				requestCode, resultCode, data, new SAFUtils.handleOnResultDelegater() {
-
-				@Override
-				public boolean onResult(final int requestCode,
-					@NonNull final Uri uri, @NonNull final Intent data) {
-
-					if (DEBUG) Log.v(TAG, "onResult:call takePersistableUriPermission," + data);
-					SAFUtils.takePersistableUriPermission(requireContext(), requestCode, uri);
-					return true;
-				}
-
-				@Override
-				public void onFailed(final int requestCode,
-					@Nullable final Intent data) {
-
-					if (DEBUG) Log.v(TAG, "onFailed:" + data);
-				}
-			});
-		} else {
-			super.onActivityResult(requestCode, resultCode, data);
-		}
 	}
 
 	/**
@@ -232,9 +203,8 @@ public class SAFUtilsFragment extends BaseFragment
 	 * @param requestCode
 	 */
 	private void requestPermission(final int requestCode) {
-		mLastRequestCode = requestCode;
 		SAFUtils.releasePersistableUriPermission(requireContext(), requestCode);
-		SAFUtils.requestPermission(SAFUtilsFragment.this, requestCode);
+		mSAFPermission.requestPermission(requestCode);
 	}
 
 	/**
