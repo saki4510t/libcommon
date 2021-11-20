@@ -114,19 +114,19 @@ public class SAFUtils {
 	
 //--------------------------------------------------------------------------------
 	/**
-	 * requestCodeに対応するUriへアクセス可能かどうか
+	 * 指定したドキュメントツリーIDに対応するUriへアクセス可能かどうかを取得
 	 * @param context
-	 * @param requestCode
+	 * @param treeId
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public static boolean hasPermission(
 		@NonNull final Context context,
-		final int requestCode) {
+		final int treeId) {
 
 		if (BuildCheck.isKitKat()) {
-			final Uri uri = loadUri(context, getKey(requestCode));
+			final Uri uri = loadUri(context, getKey(treeId));
 			if (uri != null) {
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
 				final List<UriPermission> list
@@ -153,10 +153,10 @@ public class SAFUtils {
 	}
 
 	/**
-	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
 	 * @param activity
-	 * @param requestCode
-	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @param treeId
+	 * @return ドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 * @deprecated SAFPermissionクラスを使うこと
 	 */
@@ -165,13 +165,13 @@ public class SAFUtils {
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Activity activity,
-		final int requestCode) {
+		final int treeId) {
 
 		if (BuildCheck.isLollipop()) {
-			final Uri uri = getStorageUri(activity, requestCode);
+			final Uri uri = getStorageUri(activity, treeId);
 			if (uri == null) {
-				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
+				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
+				activity.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
 			}
 			return uri;
 		} else {
@@ -180,10 +180,10 @@ public class SAFUtils {
 	}
 
 	/**
-	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
 	 * @param activity
-	 * @param requestCode
-	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @param treeId
+	 * @return 指定したドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 * @deprecated SAFPermissionクラスを使うこと
 	 */
@@ -193,13 +193,13 @@ public class SAFUtils {
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final FragmentActivity activity,
-		final int requestCode) {
+		final int treeId) {
 
 		if (BuildCheck.isLollipop()) {
-			final Uri uri = getStorageUri(activity, requestCode);
+			final Uri uri = getStorageUri(activity, treeId);
 			if (uri == null) {
-				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
+				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
+				activity.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
 			}
 			return uri;
 		} else {
@@ -208,10 +208,10 @@ public class SAFUtils {
 	}
 
 	/**
-	 * requestCodeに対応するUriへのアクセス要求を行う
+	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
 	 * @param fragment
-	 * @param requestCode
-	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
+	 * @param treeId
+	 * @return 指定したドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 * @throws IllegalStateException
 	 * @deprecated SAFPermissionクラスを使うこと
@@ -222,14 +222,14 @@ public class SAFUtils {
 	@Nullable
 	public static Uri requestPermission(
 		@NonNull final Fragment fragment,
-		final int requestCode) {
+		final int treeId) {
 
 		if (BuildCheck.isLollipop()) {
 			@NonNull
-			final Uri uri = getStorageUri(fragment.requireContext(), requestCode);
+			final Uri uri = getStorageUri(fragment.requireContext(), treeId);
 			if (uri == null) {
-				// requestCodeに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				fragment.startActivityForResult(prepareStorageAccessPermission(), requestCode);	// API>=21
+				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
+				fragment.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
 			}
 			return uri;
 		} else {
@@ -248,10 +248,10 @@ public class SAFUtils {
 	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
-		final int requestCode, @NonNull final Uri treeUri) {
+		final int treeId, @NonNull final Uri treeUri) {
 
 		return takePersistableUriPermission(context,
-			requestCode, treeUri,
+			treeId, treeUri,
 			Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
 	}
 	
@@ -267,11 +267,11 @@ public class SAFUtils {
 	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
-		final int requestCode, @NonNull final Uri treeUri, final int flags) {
+		final int treeId, @NonNull final Uri treeUri, final int flags) {
 
 		if (BuildCheck.isLollipop()) {
 			context.getContentResolver().takePersistableUriPermission(treeUri, flags);
-			saveUri(context, getKey(requestCode), treeUri);
+			saveUri(context, getKey(treeId), treeUri);
 			return treeUri;
 		} else {
 			throw new UnsupportedOperationException("should be API>=19");
@@ -281,15 +281,15 @@ public class SAFUtils {
 	/**
 	 * 恒常的にアクセスできるように取得したパーミッションを開放する
 	 * @param context
-	 * @param requestCode
+	 * @param treeId
 	 * @throws UnsupportedOperationException
 	 */
 	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void releasePersistableUriPermission(
 		@NonNull final Context context,
-		final int requestCode) {
+		final int treeId) {
 		if (BuildCheck.isKitKat()) {
-			final String key = getKey(requestCode);
+			final String key = getKey(treeId);
 			final Uri uri = loadUri(context, key);
 			if (uri != null) {
 				try {
@@ -693,10 +693,10 @@ public class SAFUtils {
 				final Object value = values.get(key);
 				if (value instanceof String) {
 					try {
-						final int requestCode = Integer.parseInt(key.substring(KEY_PREFIX.length()));
+						final int treeId = Integer.parseInt(key.substring(KEY_PREFIX.length()));
 						final Uri uri = Uri.parse((String)value);
 						if (hasPermission(list, uri)) {
-							result.put(requestCode, uri);
+							result.put(treeId, uri);
 						} else {
 							removes.add(key);
 						}
@@ -720,14 +720,14 @@ public class SAFUtils {
 	private static final String KEY_PREFIX = "SDUtils-";
 
 	/**
-	 * uriを保存する際に使用する共有プレファレンスのキー名を要求コードから生成する
+	 * uriを保存する際に使用する共有プレファレンスのキー名をドキュメントツリーIDから生成する
 	 * "SDUtils-${要求コード}"を返す
-	 * @param requestCode
+	 * @param treeId
 	 * @return
 	 */
 	@NonNull
-	private static String getKey(final int requestCode) {
-		return String.format(Locale.US, KEY_PREFIX + "%d", requestCode);	// XXX ここは互換性維持のためにSDUtilsの名を残す
+	private static String getKey(final int treeId) {
+		return String.format(Locale.US, KEY_PREFIX + "%d", treeId);	// XXX ここは互換性維持のためにSDUtilsの名を残す
 	}
 
 	/**
@@ -790,9 +790,9 @@ public class SAFUtils {
 	}
 
 	/**
-	 * requestCodeに対応するUriが存在していて恒常的パーミッションがあればそれを返す, なければnullを返す
+	 * 指定したドキュメントツリーIDに対応するUriが存在していて恒常的パーミッションがあればそれを返す, なければnullを返す
 	 * @param context
-	 * @param requestCode
+	 * @param treeId
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
@@ -800,10 +800,10 @@ public class SAFUtils {
 	@Nullable
 	/*package*/static Uri getStorageUri(
 		@NonNull final Context context,
-		final int requestCode) throws UnsupportedOperationException {
+		final int treeId) throws UnsupportedOperationException {
 
 		if (BuildCheck.isKitKat()) {
-			final Uri uri = loadUri(context, getKey(requestCode));
+			final Uri uri = loadUri(context, getKey(treeId));
 			if (uri != null) {
 				boolean found = false;
 				// 恒常的に保持しているUriパーミッションの一覧を取得する
@@ -811,7 +811,7 @@ public class SAFUtils {
 					= context.getContentResolver().getPersistedUriPermissions();	// API>=19
 				for (final UriPermission item: list) {
 					if (item.getUri().equals(uri)) {	// API>=19
-						// requestCodeに対応するUriへのパーミッションを恒常的に保持していた時
+						// 指定したドキュメントツリーIDに対応するUriへのパーミッションを恒常的に保持していた時
 						found = true;
 						break;
 					}
