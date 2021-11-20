@@ -63,7 +63,9 @@ public class SAFUtils {
 	/**
 	 * ActivityまたはFragmentの#onActivityResultメソッドの処理のうち
 	 * Storage Access Framework関係の処理を行うためのdelegater
+	 * @deprecated SAFPermissionを使うこと
 	 */
+	@Deprecated
 	public interface handleOnResultDelegater {
 		public boolean onResult(
 			final int requestCode,
@@ -83,11 +85,13 @@ public class SAFUtils {
 	 * @param delegater
 	 * @return true if successfully handled, false otherwise
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
 	public static boolean handleOnResult(
 		@NonNull final Context context,
 		final int requestCode, final int resultCode,
 		@Nullable final Intent data,
-		@NonNull final SAFUtils.handleOnResultDelegater delegater) {
+		@NonNull final handleOnResultDelegater delegater) {
 
 		if ((data != null) && (resultCode == Activity.RESULT_OK)) {
 			final Uri uri = data.getData();
@@ -154,7 +158,9 @@ public class SAFUtils {
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
+	 * @deprecated SAFPermissionクラスを使うこと
 	 */
+	@Deprecated
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
@@ -179,7 +185,10 @@ public class SAFUtils {
 	 * @param requestCode
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
+	 * @deprecated SAFPermissionクラスを使うこと
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
@@ -205,7 +214,10 @@ public class SAFUtils {
 	 * @return 既にrequestCodeに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
 	 * @throws UnsupportedOperationException
 	 * @throws IllegalStateException
+	 * @deprecated SAFPermissionクラスを使うこと
 	 */
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Uri requestPermission(
