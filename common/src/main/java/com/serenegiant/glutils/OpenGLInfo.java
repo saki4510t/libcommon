@@ -29,8 +29,11 @@ import org.json.JSONObject;
 
 import android.opengl.GLES20;
 
-import com.serenegiant.glutils.EGLBase;
+import androidx.annotation.NonNull;
 
+/**
+ * OpenGL|ESとEGLの情報取得用ヘルパークラス
+ */
 public class OpenGLInfo {
 	private OpenGLInfo() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
@@ -38,6 +41,11 @@ public class OpenGLInfo {
 
 	private static final int EGL_CLIENT_APIS                    = 0x308D;
 
+	/**
+	 * 現在のスレッド上にGLコンテキストを生成してアクセスするのですでにGLコンテキストが存在するスレッド上で実行するときは注意
+	 * @return
+	 * @throws JSONException
+	 */
 	public static JSONObject get() throws JSONException {
 		JSONObject result = new JSONObject();
 		try {
@@ -173,7 +181,7 @@ public class OpenGLInfo {
      * Formats the extensions string, which is a space-separated list, into a series of indented
      * values followed by newlines.  The list is sorted.
      */
-    private static final JSONObject formatExtensions(String ext) throws JSONException {
+    private static final JSONObject formatExtensions(@NonNull final String ext) throws JSONException {
     	JSONObject result = new JSONObject();
         final String[] values = ext.split(" ");
         Arrays.sort(values);

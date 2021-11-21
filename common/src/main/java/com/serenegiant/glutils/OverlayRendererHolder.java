@@ -35,6 +35,10 @@ import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
+/**
+ * ビットマップで指定したオーバーレイ画像を重ねて表示するAbstractRendererHolder実装
+ * ビットマップのアルファ値に応じてアルファブレンドされる
+ */
 public class OverlayRendererHolder extends AbstractRendererHolder {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = OverlayRendererHolder.class.getSimpleName();
@@ -172,7 +176,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	/**
 	 * 描画タスク
 	 */
-	private class OverlayRendererTask extends BaseRendererTask {
+	private static final class OverlayRendererTask extends BaseRendererTask {
 
 		private final float[] mTexMatrixOverlay = new float[16];
 		private int mOverlayTexId;

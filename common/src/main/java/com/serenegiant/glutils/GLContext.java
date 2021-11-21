@@ -46,6 +46,7 @@ public class GLContext implements EGLConst {
 	 */
 	private static boolean isOutputVersionInfo = false;
 
+	@NonNull
 	private final Object mSync = new Object();
 	private final int mMaxClientVersion;
 	@Nullable

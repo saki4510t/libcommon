@@ -41,6 +41,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 /**
  * Created by saki on 2018/02/14.
  * 2つの動画を合成して表示するためのIRendererHolder実装
+ * 映像1の上にマスク画像のアルファ値でくり抜いた映像に2を合成する
  */
 public class MixRendererHolder extends AbstractRendererHolder {
 	private static final boolean DEBUG = false; // FIXME set false on production
@@ -133,6 +134,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 	/**
 	 * 合成時のマスク用Bitmapをセット
+	 * このビットマップのアルファ値を映像入力2のマスクとして使う
 	 * @param bitmap
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {

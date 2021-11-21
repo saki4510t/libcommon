@@ -20,6 +20,9 @@ package com.serenegiant.glutils;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
+/**
+ * OpenGL|ESを使った映像効果付与のためのシェーダーを定義する定数クラス
+ */
 public class GLEffect {
 	private GLEffect() {
 		// インスタンス化を防ぐためにデフォルトコンストラクタをprivateに

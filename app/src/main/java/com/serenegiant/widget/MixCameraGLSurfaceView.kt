@@ -27,6 +27,7 @@ import com.serenegiant.libcommon.BuildConfig
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
+ * FIXME 本来はカメラ映像に映像2の入力が丸く合成されて表示されるが、今は映像2入力が無いので黒い丸が合成表示される
  */
 class MixCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
