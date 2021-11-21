@@ -25,6 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ArrayUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -40,7 +41,9 @@ public class SQLiteBlobHelper {
 	 * @param offset
 	 * @param num
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static byte[] floatArrayToByteArray(
 		@NonNull final float[] array, final int offset, final int num) {
 		
@@ -68,7 +71,9 @@ public class SQLiteBlobHelper {
 	 *
 	 * @param bytes
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	@Nullable
 	public static float[] byteArrayToFloatArray(
 		@Nullable final byte[] bytes) {
@@ -100,7 +105,9 @@ public class SQLiteBlobHelper {
 	 * @param offset
 	 * @param num
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static byte[] doubleArrayToByteArray(
 		@NonNull final double[] array, final int offset, final int num) {
 		
@@ -128,7 +135,9 @@ public class SQLiteBlobHelper {
 	 *
 	 * @param bytes
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	@Nullable
 	public static double[] byteArrayToDoubleArray(
 		@Nullable final byte[] bytes) {
@@ -160,7 +169,9 @@ public class SQLiteBlobHelper {
 	 * @param offset
 	 * @param num
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static byte[] intArrayToByteArray(
 		@NonNull final int[] array, final int offset, final int num) {
 		
@@ -188,7 +199,9 @@ public class SQLiteBlobHelper {
 	 *
 	 * @param bytes
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	@Nullable
 	public static int[] byteArrayToIntArray(
 		@Nullable final byte[] bytes) {
@@ -220,7 +233,9 @@ public class SQLiteBlobHelper {
 	 * @param offset
 	 * @param num
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static byte[] shortArrayToByteArray(
 		@NonNull final short[] array, final int offset, final int num) {
 		
@@ -248,7 +263,9 @@ public class SQLiteBlobHelper {
 	 *
 	 * @param bytes
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	@Nullable
 	public static short[] byteArrayToShortArray(
 		@Nullable final byte[] bytes) {
@@ -280,7 +297,9 @@ public class SQLiteBlobHelper {
 	 * @param offset
 	 * @param num
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static byte[] longArrayToByteArray(
 		@NonNull final long[] array, final int offset, final int num) {
 
@@ -308,7 +327,9 @@ public class SQLiteBlobHelper {
 	 *
 	 * @param bytes
 	 * @return
+	 * @deprecated ArrayUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	@Nullable
 	public static long[] byteArrayToLongArray(
 		@Nullable final byte[] bytes) {
@@ -343,7 +364,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobFloatArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final float[] array) {
 
-		stat.bindBlob(index, floatArrayToByteArray(array, 0, array.length));
+		stat.bindBlob(index, ArrayUtils.floatArrayToByteArray(array, 0, array.length));
 	}
 	
 	/**
@@ -358,7 +379,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobFloatArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final float[] array, final int offset, final int num) {
 
-		stat.bindBlob(index, floatArrayToByteArray(array, offset, num));
+		stat.bindBlob(index, ArrayUtils.floatArrayToByteArray(array, offset, num));
 	}
 	
 	/**
@@ -371,7 +392,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobDoubleArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final double[] array) {
 
-		stat.bindBlob(index, doubleArrayToByteArray(array, 0, array.length));
+		stat.bindBlob(index, ArrayUtils.doubleArrayToByteArray(array, 0, array.length));
 	}
 	
 	/**
@@ -386,7 +407,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobDoubleArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final double[] array, final int offset, final int num) {
 
-		stat.bindBlob(index, doubleArrayToByteArray(array, offset, num));
+		stat.bindBlob(index, ArrayUtils.doubleArrayToByteArray(array, offset, num));
 	}
 	
 	/**
@@ -399,7 +420,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobIntArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final int[] array) {
 
-		stat.bindBlob(index, intArrayToByteArray(array, 0, array.length));
+		stat.bindBlob(index, ArrayUtils.intArrayToByteArray(array, 0, array.length));
 	}
 	
 	/**
@@ -412,7 +433,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobIntArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final int[] array, final int offset, final int num) {
 
-		stat.bindBlob(index, intArrayToByteArray(array, offset, num));
+		stat.bindBlob(index, ArrayUtils.intArrayToByteArray(array, offset, num));
 	}
 	
 	/**
@@ -425,7 +446,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobShortArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final short[] array) {
 
-		stat.bindBlob(index, shortArrayToByteArray(array, 0, array.length));
+		stat.bindBlob(index, ArrayUtils.shortArrayToByteArray(array, 0, array.length));
 	}
 	
 	/**
@@ -440,7 +461,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobShortArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final short[] array, final int offset, final int num) {
 
-		stat.bindBlob(index, shortArrayToByteArray(array, offset, num));
+		stat.bindBlob(index, ArrayUtils.shortArrayToByteArray(array, offset, num));
 	}
 	
 	/**
@@ -453,7 +474,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobLongArray(@NonNull final SQLiteStatement stat,
 		final int index, @NonNull final long[] array) {
 
-		stat.bindBlob(index, longArrayToByteArray(array, 0, array.length));
+		stat.bindBlob(index, ArrayUtils.longArrayToByteArray(array, 0, array.length));
 	}
 	
 	/**
@@ -468,7 +489,7 @@ public class SQLiteBlobHelper {
 	public static void bindBlobLongArray(@NonNull final SQLiteStatement stat,
 		final int index, final long[] array, final int offset, final int num) {
 
-		stat.bindBlob(index, longArrayToByteArray(array, offset, num));
+		stat.bindBlob(index, ArrayUtils.longArrayToByteArray(array, offset, num));
 	}
 	
 	/**
@@ -494,7 +515,7 @@ public class SQLiteBlobHelper {
 	public static float[] getBlobFloatArray(@NonNull final Cursor cursor,
 		final int columnIndex) {
 
-		return byteArrayToFloatArray(cursor.getBlob(columnIndex));
+		return ArrayUtils.byteArrayToFloatArray(cursor.getBlob(columnIndex));
 	}
 	
 	/**
@@ -509,7 +530,7 @@ public class SQLiteBlobHelper {
 	public static float[] getBlobFloatArray(@NonNull final Cursor cursor,
 		final String columnName, @Nullable final float[] defaultValue) {
 
-		float[] result = byteArrayToFloatArray(getBlob(cursor, columnName, null));
+		float[] result = ArrayUtils.byteArrayToFloatArray(getBlob(cursor, columnName, null));
 		if (result == null) result = defaultValue;
 		return result;
 	}
@@ -524,7 +545,7 @@ public class SQLiteBlobHelper {
 	public static double[] getBlobDoubleArray(@NonNull final Cursor cursor,
 		final int columnIndex) {
 
-		return byteArrayToDoubleArray(cursor.getBlob(columnIndex));
+		return ArrayUtils.byteArrayToDoubleArray(cursor.getBlob(columnIndex));
 	}
 	
 	/**
@@ -539,7 +560,7 @@ public class SQLiteBlobHelper {
 	public static double[] getBlobDoubleArray(@NonNull final Cursor cursor,
 		final String columnName, @Nullable final double[] defaultValue) {
 
-		double[] result = byteArrayToDoubleArray(getBlob(cursor, columnName, null));
+		double[] result = ArrayUtils.byteArrayToDoubleArray(getBlob(cursor, columnName, null));
 		if (result == null) result = defaultValue;
 		return result;
 	}
@@ -575,7 +596,7 @@ public class SQLiteBlobHelper {
 	public static int[] getBlobIntArray(@NonNull final Cursor cursor,
 		final int columnIndex) {
 
-		return byteArrayToIntArray(cursor.getBlob(columnIndex));
+		return ArrayUtils.byteArrayToIntArray(cursor.getBlob(columnIndex));
 	}
 	
 	/**
@@ -590,7 +611,7 @@ public class SQLiteBlobHelper {
 	public static int[] getBlobIntArray(@NonNull final Cursor cursor,
 		final String columnName, @Nullable final int[] defaultValue) {
 
-		int[] result = byteArrayToIntArray(getBlob(cursor, columnName, null));
+		int[] result = ArrayUtils.byteArrayToIntArray(getBlob(cursor, columnName, null));
 		if (result == null) result = defaultValue;
 		return result;
 	}
@@ -605,7 +626,7 @@ public class SQLiteBlobHelper {
 	public static short[] getBlobShortArray(@NonNull final Cursor cursor,
 		final int columnIndex) {
 
-		return byteArrayToShortArray(cursor.getBlob(columnIndex));
+		return ArrayUtils.byteArrayToShortArray(cursor.getBlob(columnIndex));
 	}
 	
 	/**
@@ -620,7 +641,7 @@ public class SQLiteBlobHelper {
 	public static short[] getBlobShortArray(@NonNull final Cursor cursor,
 		final String columnName, @Nullable final short[] defaultValue) {
 
-		short[] result = byteArrayToShortArray(getBlob(cursor, columnName, null));
+		short[] result = ArrayUtils.byteArrayToShortArray(getBlob(cursor, columnName, null));
 		if (result == null) result = defaultValue;
 		return result;
 	}
@@ -635,7 +656,7 @@ public class SQLiteBlobHelper {
 	public static long[] getBlobLongArray(@NonNull final Cursor cursor,
 		final int columnIndex) {
 
-		return byteArrayToLongArray(cursor.getBlob(columnIndex));
+		return ArrayUtils.byteArrayToLongArray(cursor.getBlob(columnIndex));
 	}
 	
 	/**
@@ -650,7 +671,7 @@ public class SQLiteBlobHelper {
 	public static long[] getBlobLongArray(@NonNull final Cursor cursor,
 		final String columnName, @Nullable final long[] defaultValue) {
 
-		long[] result = byteArrayToLongArray(getBlob(cursor, columnName, null));
+		long[] result = ArrayUtils.byteArrayToLongArray(getBlob(cursor, columnName, null));
 		if (result == null) result = defaultValue;
 		return result;
 	}
