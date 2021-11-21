@@ -1,8 +1,8 @@
 package com.serenegiant.bluetooth;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
@@ -11,7 +11,12 @@ import android.util.Log;
 import java.util.Collections;
 import java.util.Set;
 
+import androidx.activity.ComponentActivity;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
+import androidx.fragment.app.Fragment;
 
 /**
  * Created by saki on 16/08/30.
@@ -20,11 +25,72 @@ import androidx.annotation.NonNull;
  *	<uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
  * のパーミッションが必要
  */
-@SuppressLint("MissingPermission")
 public class BluetoothUtils {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = BluetoothUtils.class.getSimpleName();
 
+	public interface BluetoothEnableCallback {
+		public void onChanged(final boolean enabled);
+	}
+
+	@NonNull
+	private final ActivityResultLauncher<Intent> mLauncher;
+
+	/**
+	 * コンストラクタ
+	 * @param activity
+	 * @param callback
+	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	public BluetoothUtils(
+		@NonNull final ComponentActivity activity,
+		@NonNull final BluetoothEnableCallback callback) {
+
+		mLauncher = activity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+			result -> {
+				callback.onChanged(isEnabled());
+			});
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param fragment
+	 * @param callback
+	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	public BluetoothUtils(
+		@NonNull final Fragment fragment,
+		@NonNull final BluetoothEnableCallback callback) {
+
+		mLauncher = fragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+			result -> {
+				callback.onChanged(isEnabled());
+			});
+	}
+
+	/**
+	 * Bluetoothが無効の場合に有効にするように要求する
+	 * @return true: Bluetoothが有効, false: Bluetoothが無効
+	 */
+	public boolean requestEnable() {
+		if (isAvailable() && !isEnabled()) {
+			mLauncher.launch(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
+		}
+		return isEnabled();
+	}
+
+	private static final String ACTION_REQUEST_DISABLE = "android.bluetooth.adapter.action.REQUEST_DISABLE";
+	/**
+	 * Bluetoothが有効な場合に無効にするように要求する
+	 * hideなので動かない端末があるかも？
+	 * @return true: Bluetoothが有効, false: Bluetoothが無効
+	 */
+	public boolean requestDisable() {
+		if (isEnabled()) {
+			mLauncher.launch(new Intent(ACTION_REQUEST_DISABLE));
+		}
+		return isEnabled();
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * 端末がBluetoothに対応しているかどうかを確認
@@ -45,10 +111,11 @@ public class BluetoothUtils {
 	 * パーミッションがなければfalse
 	 * @return true Bluetoothが有効
 	 */
+	@SuppressLint("MissingPermission")
 	public static boolean isEnabled() {
 		try {
 			final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
-			return adapter != null && adapter.isEnabled();
+			return adapter != null && adapter.isEnabled();	// #isEnabledはBLUETOOTHパーミッションがないとSecurityExceptionを投げる
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
@@ -59,6 +126,7 @@ public class BluetoothUtils {
 	 * ペアリング済みのBluetooth機器一覧を取得する
 	 * @return Bluetoothに対応していないまたは無効なら空set
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	@NonNull
 	public static Set<BluetoothDevice> getBondedDevices() {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -73,6 +141,7 @@ public class BluetoothUtils {
 	 * @return 既に探索可能であればtrue
 	 * @throws IllegalStateException
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	public static boolean requestDiscoverable(@NonNull final Activity activity, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {
@@ -94,6 +163,7 @@ public class BluetoothUtils {
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	public static boolean requestDiscoverable(@NonNull final Fragment fragment, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {
@@ -121,6 +191,7 @@ public class BluetoothUtils {
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
 	 * @deprecated #registerForActivityResult/#ActivityResultLauncherを使うように変更したのでそっちを使うこと
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	@Deprecated
 	public static boolean requestBluetoothEnable(@NonNull final Activity activity, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -142,8 +213,9 @@ public class BluetoothUtils {
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
 	 * @deprecated #registerForActivityResult/#ActivityResultLauncherを使うように変更したのでそっちを使うこと
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	@Deprecated
-	public static boolean requestBluetoothEnable(@NonNull final Fragment fragment, final int requestCode) throws SecurityException {
+	public static boolean requestBluetoothEnable(@NonNull final android.app.Fragment fragment, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
 			final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -163,8 +235,9 @@ public class BluetoothUtils {
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
 	 * @deprecated #registerForActivityResult/#ActivityResultLauncherを使うように変更したのでそっちを使うこと
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	@Deprecated
-	public static boolean requestBluetoothEnable(@NonNull final androidx.fragment.app.Fragment fragment, final int requestCode) throws SecurityException {
+	public static boolean requestBluetoothEnable(@NonNull final Fragment fragment, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
 			final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
