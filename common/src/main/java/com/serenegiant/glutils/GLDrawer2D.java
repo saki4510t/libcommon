@@ -23,7 +23,6 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
 import java.nio.FloatBuffer;
@@ -83,7 +82,7 @@ public abstract class GLDrawer2D {
 		@NonNull final float[] vertices,
 		@NonNull final float[] texcoord, final boolean isOES) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLDrawer2DES3(vertices, texcoord, isOES);
 		} else {
 			return new GLDrawer2DES2(vertices, texcoord, isOES);
