@@ -23,6 +23,7 @@ import java.util.regex.Pattern;
 import android.net.Uri;
 
 /**
+* uriのセグメントの穿頭にある正負符号を数字として扱えるように修正したUriMatcher実装
 Utility class to aid in matching URIs in content providers with sign(+ or -) support of number matching.
 
 <p>To use this class, build up a tree of <code>UriMatcher</code> objects.

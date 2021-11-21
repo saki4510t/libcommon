@@ -30,6 +30,10 @@ import java.util.ListIterator;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * 読み込みロックと書き込みロックを個別に制御できるようにするためのList実装
+ * @param <V>
+ */
 public class ReentrantReadWriteList<V> implements List<V> {
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
 	private final Lock mReadLock = mSensorLock.readLock();

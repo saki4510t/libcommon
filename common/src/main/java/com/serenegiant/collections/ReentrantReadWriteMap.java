@@ -30,6 +30,12 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+
+/**
+ * 読み込みロックと書き込みロックを個別に制御できるようにするためのMap実装
+ * @param <K>
+ * @param <V>
+ */
 public class ReentrantReadWriteMap<K, V> {
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
 	private final Lock mReadLock = mSensorLock.readLock();

@@ -25,9 +25,16 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * Cursorから例外生成なし＆デフォルト値付きで値を取得するためのヘルパークラス
+ */
 public final class CursorHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = CursorHelper.class.getSimpleName();
+
+	private CursorHelper() {
+		// インスタンス化をエラーとするためデフォルトコンストラクタをprivateに
+	}
 
 	public static String get(@Nullable final Cursor cursor,
 		@NonNull final String columnName, @Nullable final String defaultValue) {
