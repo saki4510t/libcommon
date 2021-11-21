@@ -65,7 +65,7 @@ public class GLUtils {
 	 * API>=21でGL_OES_EGL_image_external_essl3に対応していれば3, そうでなければ2を返す
 	 * @return
 	 */
-	public static int getSupportedGLVersion() {
+	public static synchronized int getSupportedGLVersion() {
 		if (sSupportedGLVersion < 1) {
 			// 一度も実行されていない時
 			final AtomicInteger result = new AtomicInteger(1);
@@ -75,20 +75,25 @@ public class GLUtils {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					context.initialize();
-					String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
-					if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + extensions);
-					if ((extensions == null) || !extensions.contains("GL_OES_EGL_image_external")) {
-						result.set(1);
-					} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && context.isGLES3()) {
-						extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); 	// API >= 18
-						result.set((extensions != null) && extensions.contains("GL_OES_EGL_image_external_essl3")
-							? 3 : 2);
-					} else {
-						result.set(2);
+					try {
+						context.initialize();
+						String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
+						if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + extensions);
+						if ((extensions == null) || !extensions.contains("GL_OES_EGL_image_external")) {
+							result.set(1);
+						} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && context.isGLES3()) {
+							extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); 	// API >= 18
+							result.set((extensions != null) && extensions.contains("GL_OES_EGL_image_external_essl3")
+								? 3 : 2);
+						} else {
+							result.set(2);
+						}
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					} finally {
+						context.release();
+						sync.release();
 					}
-					context.release();
-					sync.release();
 				}
 			}).start();
 			try {
