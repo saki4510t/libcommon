@@ -5,6 +5,9 @@ import java.util.Arrays;
 
 import androidx.annotation.NonNull;
 
+/**
+ * 配列用のヘルパークラス
+ */
 public class ArrayUtils {
 	private ArrayUtils() {
 		// インスタンス化をエラーにするためにコンストラクタをprivateに

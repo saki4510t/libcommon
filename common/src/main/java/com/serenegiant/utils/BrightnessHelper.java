@@ -24,11 +24,19 @@ import androidx.annotation.NonNull;
 import android.view.Window;
 import android.view.WindowManager;
 
+/**
+ * 画面輝度設定のためのヘルパークラス
+ */
 public class BrightnessHelper {
 	private BrightnessHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * 画面輝度をセット
+	 * @param activity
+	 * @param brightness
+	 */
 	public static void setBrightness(@NonNull final Activity activity, final float brightness) {
 		if (activity.isFinishing()) return;
 		final Window win = activity.getWindow();
@@ -44,6 +52,11 @@ public class BrightnessHelper {
 		win.setAttributes(lp);
 	}
 
+	/**
+	 * 現在の画面輝度設定を取得
+	 * @param activity
+	 * @return
+	 */
 	public float getBrightness(@NonNull final Activity activity) {
 		final WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
 		return lp.screenBrightness;

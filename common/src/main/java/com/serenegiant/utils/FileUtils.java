@@ -37,6 +37,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
+/**
+ * ファイル操作・アクセス用のヘルパークラス
+ */
 public class FileUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = FileUtils.class.getSimpleName();

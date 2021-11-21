@@ -5,6 +5,12 @@ import android.os.Build;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
+import androidx.annotation.NonNull;
+
+/**
+ * StandardCharsetsを使えと言われて変更するとAPI<19で「実行時に」クラッシュしてしまうので
+ * APIレベルに関係なく定数を使えるようにするためのヘルパークラス
+ */
 @SuppressWarnings("CharsetObjectCanBeUsed")
 public class CharsetsUtils {
 	private CharsetsUtils() {
@@ -14,19 +20,23 @@ public class CharsetsUtils {
 	/**
 	 * Eight-bit UCS Transformation Format
 	 */
+	@NonNull
 	public static final Charset UTF8;
 	/**
 	 * Sixteen-bit UCS Transformation Format, byte order identified by an
 	 * optional byte-order mark
 	 */
+	@NonNull
 	public static final Charset UTF16;
 	/**
 	 * Sixteen-bit UCS Transformation Format, big-endian byte order
 	 */
+	@NonNull
 	public static final Charset UTF16BE;
 	/**
 	 * Sixteen-bit UCS Transformation Format, little-endian byte order
 	 */
+	@NonNull
 	public static final Charset UTF16LE;
 
 	static {

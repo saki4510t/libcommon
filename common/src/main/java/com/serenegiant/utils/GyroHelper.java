@@ -24,6 +24,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.util.Log;
 import android.view.Surface;
 
@@ -33,6 +35,9 @@ import java.lang.ref.WeakReference;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * ジャイロセンセーからのデータ取得・計算用ヘルパークラス
+ */
 public class GyroHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = GyroHelper.class.getSimpleName();
@@ -44,18 +49,30 @@ public class GyroHelper {
 		Sensor.TYPE_GYROSCOPE,
 	};
 
+	@NonNull
 	private final Object mSync = new Object();
+	@NonNull
 	private final WeakReference<Context> mWeakContext;
 	private SensorManager mSensorManager;
 	private boolean mRegistered;
 	private int mRotation;									// 画面の向き
+	@NonNull
 	private final Object mSensorSync = new Object();		// センサー値同期用
+	@NonNull
 	private final float[] mMagnetValues = new float[3];		// 磁気[μT]
+	@NonNull
 	private final float[] mGravityValues = new float[3];	// 重力[m/s^2]
+	@NonNull
 	private final float[] mAzimuthValues = new float[3];	// 方位[-180,+180][度]
+	@NonNull
 	private final float[] mAccelValues = new float[3];		// 加速度[m/s^2]
+	@NonNull
 	private final float[] mGyroValues = new float[3];		// ジャイロ[radian/s]
 
+	/**
+	 * コンストラクタ
+	 * @param context
+	 */
 	public GyroHelper(@NonNull final Context context) {
 		mWeakContext = new WeakReference<Context>(context);
 		synchronized (mSync) {
@@ -129,24 +146,24 @@ public class GyroHelper {
 	 * @return
 	 */
 	public float getAzimuth() {
-		return mAzimuthValues[0];
-	}
+			return mAzimuthValues[0];
+		}
 
 	/**
 	 * 左右への傾きを取得, XXX 前後と左右が入れ替わってるかも
 	 * @return
 	 */
 	public float getPan() {
-		return mAzimuthValues[1];
-	}
+			return mAzimuthValues[1];
+		}
 
 	/**
 	 * 前後の傾きを取得, XXX 前後と左右が入れ替わってるかも
 	 * @return
 	 */
 	public float getTilt() {
-		return mAzimuthValues[2];
-	}
+			return mAzimuthValues[2];
+		}
 
 	private final SensorEventListener mSensorEventListener = new SensorEventListener() {
 		/**
@@ -161,8 +178,16 @@ public class GyroHelper {
 			values[2] = alpha * values[2] + (1 - alpha) * new_values[2];
 		}
 
+		@NonNull
 		private final float[] outR = new float[16];
+		@NonNull
 		private final float[] outR2 = new float[16];
+
+		/**
+		 * 画面の回転状態を計算
+		 * @param rotateMatrix
+		 * @param result
+		 */
 		private void getOrientation(final float[] rotateMatrix, final float[] result) {
 
 			switch (mRotation) {
@@ -188,7 +213,9 @@ public class GyroHelper {
 		}
 
 		private static final float TO_DEGREE = (float)(180 / Math.PI);
+		@NonNull
 		private final float[] mRotateMatrix = new float[16];			// 回転行列
+		@NonNull
 		private final float[] mInclinationMatrix = new float[16];    	// 傾斜行列
 
 		/**
@@ -243,7 +270,8 @@ public class GyroHelper {
 		 * @param accuracy
 		 */
 		@Override
-		public void onAccuracyChanged(final Sensor sensor, int accuracy) {
+		public void onAccuracyChanged(final Sensor sensor, final int accuracy) {
+			if (DEBUG) Log.v(TAG, "onAccuracyChanged:" + sensor + ",accuracy=" + accuracy);
 		}
 	};
 

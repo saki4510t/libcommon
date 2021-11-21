@@ -23,15 +23,28 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import androidx.annotation.NonNull;
 
+/**
+ * サービスやコンテントプロバイダー等の有効無効を設定するためのヘルパークラス
+ */
 public class ComponentUtils {
 	private ComponentUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * 指定したコンポーネントを無効にする
+	 * @param context
+	 * @param clazz
+	 */
 	public static void disable(@NonNull final Context context, final Class<?> clazz) {
 		setComponentState(context, clazz, false);
 	}
 
+	/**
+	 * 指定したコンポーネントを有効にする
+	 * @param context
+	 * @param clazz
+	 */
 	public static void enable(@NonNull final Context context, final Class<?> clazz) {
 		setComponentState(context, clazz, true);
 	}

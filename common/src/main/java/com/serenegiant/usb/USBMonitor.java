@@ -115,12 +115,17 @@ public final class USBMonitor implements Const {
 	/**
 	 * OpenしているUsbControlBlock一覧
 	 */
+	@NonNull
 	private final List<UsbControlBlock> mCtrlBlocks = new ArrayList<>();
+	@NonNull
 	private final WeakReference<Context> mWeakContext;
+	@NonNull
 	private final UsbManager mUsbManager;
 	@NonNull
 	private final OnDeviceConnectListener mOnDeviceConnectListener;
+	@Nullable
 	private PendingIntent mPermissionIntent = null;
+	@NonNull
 	private final List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
 	/**
 	 * 現在接続されている機器一覧

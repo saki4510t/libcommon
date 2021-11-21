@@ -20,12 +20,21 @@ package com.serenegiant.utils;
 
 import android.text.TextUtils;
 
+/**
+ * Objectからの型変換を行うためのヘルパークラス
+ */
 public class ObjectHelper {
 
 	private ObjectHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * booleanへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static boolean asBoolean(final Object val, final boolean defaultValue) {
 		if (val instanceof Boolean) {
 			return (Boolean)val;
@@ -78,6 +87,12 @@ public class ObjectHelper {
 		return defaultValue;
 	}
 
+	/**
+	 * byteへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static byte asByte(final Object val, final byte defaultValue) {
 		if (val instanceof Boolean) {
 			return (Boolean)val ? (byte)1 : (byte)0;
@@ -130,6 +145,12 @@ public class ObjectHelper {
 		return defaultValue;
 	}
 
+	/**
+	 * shortへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static short asShort(final Object val, final short defaultValue) {
 		if (val instanceof Boolean) {
 			return (Boolean)val ? (short)1 : (short)0;
@@ -182,6 +203,12 @@ public class ObjectHelper {
 		return defaultValue;
 	}
 
+	/**
+	 * intへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static int asInt(final Object val, final int defaultValue) {
 		if (val instanceof Boolean) {
 			return ((Boolean)val) ? 1 : 0;
@@ -233,7 +260,13 @@ public class ObjectHelper {
 		}
 		return defaultValue;
 	}
-	
+
+	/**
+	 * longへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static long asLong(final Object val, final long defaultValue) {
 		if (val instanceof Boolean) {
 			return ((Boolean)val) ? 1 : 0;
@@ -280,6 +313,12 @@ public class ObjectHelper {
 		return defaultValue;
 	}
 
+	/**
+	 * floatへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static float asFloat(final Object val, final float defaultValue) {
 		if (val instanceof Boolean) {
 			return ((Boolean)val) ? 1 : 0;
@@ -326,6 +365,12 @@ public class ObjectHelper {
 		return defaultValue;
 	}
 
+	/**
+	 * doubleへ変換
+	 * @param val
+	 * @param defaultValue
+	 * @return
+	 */
 	public static double asDouble(final Object val, final double defaultValue) {
 		if (val instanceof Boolean) {
 			return ((Boolean)val) ? 1 : 0;

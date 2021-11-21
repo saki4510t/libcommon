@@ -25,12 +25,16 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+/**
+ * AssetManager用のヘルパークラス
+ */
 public class AssetsHelper {
 
 	private AssetsHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	@NonNull
 	public static String loadString(@NonNull final AssetManager assets, @NonNull final String name) throws IOException {
 		final StringBuilder sb = new StringBuilder();
 		final char[] buf = new char[1024];

@@ -31,8 +31,10 @@ public final class UIThreadHelper {
 	}
 
 	/** UI操作用のHandler */
+	@NonNull
 	private static final Handler sUIHandler = new Handler(Looper.getMainLooper());
 	/** UIスレッドの参照 */
+	@NonNull
 	private static final Thread sUiThread = sUIHandler.getLooper().getThread();
 
 	/**

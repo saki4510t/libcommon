@@ -27,6 +27,9 @@ import androidx.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
+/**
+ * Buffer/配列用のヘルパークラス
+ */
 public class BufferHelper {
 
 	private BufferHelper() {

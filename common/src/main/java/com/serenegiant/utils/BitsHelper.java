@@ -32,7 +32,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int countBits(byte v) {
+	public static int countBits(final byte v) {
 		int count = (v & 0x55) + ((v >>> 1) & 0x55);
 	    count = (count & 0x33) + ((count >>> 2) & 0x33);
 	    return (count & 0x0f) + ((count >>> 4) & 0x0f);
@@ -42,7 +42,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int countBits(short v) {
+	public static int countBits(final short v) {
 		int count = (v & 0x5555) + ((v >>> 1) & 0x5555);
 	    count = (count & 0x3333) + ((count >>> 2) & 0x3333);
 	    count = (count & 0x0f0f) + ((count >>> 4) & 0x0f0f);
@@ -54,7 +54,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int countBits(int v) {
+	public static int countBits(final int v) {
 		int count = (v & 0x55555555) + ((v >>> 1) & 0x55555555);
 		count = (count & 0x33333333) + ((count >>> 2) & 0x33333333);
 		count = (count & 0x0f0f0f0f) + ((count >>> 4) & 0x0f0f0f0f);
@@ -67,7 +67,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int countBits(long v) {
+	public static int countBits(final long v) {
 		long count = (v & 0x5555555555555555L) + ((v >>> 1) & 0x5555555555555555L);
 	    count = (count & 0x3333333333333333L) + ((count >>> 2) & 0x3333333333333333L);
 	    count = (count & 0x0f0f0f0f0f0f0f0fL) + ((count >>> 4) & 0x0f0f0f0f0f0f0f0fL);
@@ -202,7 +202,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int squareBits(byte v) {
+	public static int squareBits(final byte v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -212,7 +212,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int squareBits(short v) {
+	public static int squareBits(final short v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -222,7 +222,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int squareBits(int v) {
+	public static int squareBits(final int v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}
@@ -232,7 +232,7 @@ public final class BitsHelper {
 	 * @param v
 	 * @return
 	 */
-	public static int squareBits(long v) {
+	public static int squareBits(final long v) {
 		if (v == 0) return 0;
 		return 1 << (MSB(v - 1) + 1);
 	}

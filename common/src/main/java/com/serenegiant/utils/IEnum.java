@@ -23,7 +23,14 @@ import android.text.TextUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Enum用ヘルパークラス
+ */
 public class IEnum {
+
+	private IEnum() {
+		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
+	}
 
 	public interface EnumInterface {
 		public int id();

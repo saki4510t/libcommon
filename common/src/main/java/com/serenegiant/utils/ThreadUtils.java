@@ -18,6 +18,9 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+/**
+ * スレッド用のヘルパークラス
+ */
 public class ThreadUtils {
 
 	private ThreadUtils() {

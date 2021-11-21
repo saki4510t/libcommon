@@ -60,6 +60,11 @@ public class KeyStoreUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * 指定したキーに対応する値をKeyStoreから削除
+	 * @param context
+	 * @param name
+	 */
 	public static void deleteKey(
 		@NonNull final Context context,
 		@Nullable final String name) {
@@ -77,6 +82,13 @@ public class KeyStoreUtils {
 		}
 	}
 
+	/**
+	 * 指定したキーに対応する値を暗号化してKeyStoreへ保存
+	 * @param context
+	 * @param name
+	 * @param value
+	 * @return
+	 */
 	@Nullable
 	public static String encrypt(
 		@NonNull final Context context,
@@ -94,6 +106,14 @@ public class KeyStoreUtils {
 		}
 	}
 
+	/**
+	 * 指定したキーに対応する値を読み取って復号して返す
+	 * @param context
+	 * @param name
+	 * @param encrypted
+	 * @return
+	 * @throws ObfuscatorException
+	 */
 	@Nullable
 	public static String decrypt(
 		@NonNull final Context context,
@@ -260,6 +280,12 @@ public class KeyStoreUtils {
 		return keyStore.getEntry(alias, null);
 	}
 
+	/**
+	 * キー生成のためのヘルパーメソッド
+	 * @param context
+	 * @param alias
+	 * @throws GeneralSecurityException
+	 */
 	private static void createKey(
 		@NonNull final Context context,
 		@NonNull final String alias) throws GeneralSecurityException {
@@ -270,6 +296,7 @@ public class KeyStoreUtils {
 		final X500Principal principal = new X500Principal(
 			"CN=" + alias + " O=" + context.getPackageName());
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			// API>=23のとき
 			final KeyGenParameterSpec spec = new KeyGenParameterSpec.Builder(
 				alias, KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
 				.setCertificateSubject(principal)
@@ -284,6 +311,7 @@ public class KeyStoreUtils {
 			kg.init(spec);
 			kg.generateKey();
 		} else {
+			// API>=18&API<23のとき
 			final KeyPairGenerator kpg
 				= KeyPairGenerator.getInstance(ALGORITHM_RSA, KEY_STORE_TYPE);
 			final KeyPairGeneratorSpec spec = new KeyPairGeneratorSpec.Builder(context)

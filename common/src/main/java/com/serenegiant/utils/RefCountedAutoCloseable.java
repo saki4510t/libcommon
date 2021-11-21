@@ -28,6 +28,10 @@ import android.annotation.TargetApi;
 import android.os.Build;
 import androidx.annotation.NonNull;
 
+/**
+ * 参照数をカウントして参照がなくなるまで実際のclose処理実行を遅らせるAutoCloseable実装
+ * @param <T>
+ */
 @TargetApi(Build.VERSION_CODES.KITKAT)
 public class RefCountedAutoCloseable<T extends AutoCloseable> implements AutoCloseable {
 	private T mObject;

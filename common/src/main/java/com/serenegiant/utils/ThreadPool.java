@@ -30,6 +30,9 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 
+/**
+ * PausableThreadPoolExecutorをラップしたスレッドプール実装
+ */
 public class ThreadPool {
 
 	// for thread pool

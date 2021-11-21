@@ -29,6 +29,7 @@ import java.util.List;
 
 /**
  * XmlPullParserのヘルパークラス
+ * 例外生成なし＆デフォルト値付きで値を取得できるようにする
  */
 public class XmlHelper {
 	private XmlHelper() {

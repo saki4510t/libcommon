@@ -20,6 +20,12 @@ package com.serenegiant.utils;
 
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+/**
+ * デバッグログ出力を実行時に切り替えれるようにするためのヘルパークラス
+ */
 public class LogUtils {
 
 	private LogUtils() {
@@ -33,10 +39,11 @@ public class LogUtils {
 	public static final int DEBUG_LEVEL_DEBUG = 4;
 	public static final int DEBUG_LEVEL_VERBOSE = 5;
 
+	@NonNull
 	private static String TAG = LogUtils.class.getSimpleName();
 	private static int LOG_LEVEL = DEBUG_LEVEL_OFF;
 
-	public void tag(final String tag) {
+	public void tag(@Nullable final String tag) {
 		if (tag != null) {
 			TAG = tag;
 		} else {

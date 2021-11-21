@@ -48,7 +48,6 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	 * @param out outがnullでなければoutへセットする、outがnullならば新しく生成して返す
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	@NonNull
 	public static UsbDeviceInfo getDeviceInfo(
 		@NonNull final UsbManager manager,

@@ -18,11 +18,19 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
+
+/**
+ * ロケーション情報用ヘルパークラス
+ */
 public class GPS {
 	private GPS() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * 各測地系による変換定数を保持するためのホルダークラス
+	 */
 	public static class Datum {
 		public final double a;	// 長半径(赤道半径)[m]
 		public final double b;	// 短半径(極半径)[m]
@@ -30,13 +38,20 @@ public class GPS {
 		public final double e2;
 		public final double ae2;
 
+		/**
+		 * コンストラクタ
+		 * @param a 長半径(赤道半径)[m]
+		 * @param b 短半径(極半径)[m]
+		 * @param ellipticity
+		 * @param inverse
+		 */
 		public Datum(final double a, final double b, final double ellipticity, final boolean inverse) {
 			this.a = a;
 			this.b = b;
 			this.inv_ellipticity = inverse ? ellipticity : 1 / ellipticity;
 			final double a2 = a * a;
 			e2 = (a2 - b * b) / a2;
-			ae2 = a * (1-e2);
+			ae2 = a * (1 - e2);
 		}
 	}
 
@@ -63,7 +78,7 @@ public class GPS {
 	 * @param altitude2 地点2高度[m](未使用)
 	 * @return
 	 */
-	public static double distance(final Datum datum,
+	public static double distance(@NonNull final Datum datum,
 		final double latitude_degree1, final double longitude_degree1, final double altitude1,
 		final double latitude_degree2, final double longitude_degree2, final double altitude2) {
 

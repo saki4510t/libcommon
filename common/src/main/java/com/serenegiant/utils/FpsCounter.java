@@ -20,6 +20,9 @@ package com.serenegiant.utils;
 
 import com.serenegiant.system.Time;
 
+/**
+ * フレームレート測定用ヘルパークラス
+ */
 public class FpsCounter {
 	private int cnt, prevCnt;
 	private long startTime, prevTime;

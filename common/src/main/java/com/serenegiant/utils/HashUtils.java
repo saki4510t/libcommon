@@ -25,6 +25,9 @@ import java.security.MessageDigest;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * MessageDigestを使ったハッシュ計算用ヘルパークラス
+ */
 public class HashUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = HashUtils.class.getSimpleName();

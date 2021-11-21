@@ -25,8 +25,14 @@ import java.util.List;
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+
+/**
+ * オブジェクトを再利用してオブジェクトの生成を抑制するためのプールオブジェクト
+ * @param <T>
+ */
 public abstract class Pool<T> {
 
+	@NonNull
 	private final List<T> mPool = new ArrayList<T>();
 	private final int mInitNum;
 	private final int mMaxNumInPool;

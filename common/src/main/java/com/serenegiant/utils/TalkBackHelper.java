@@ -18,6 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -28,6 +29,9 @@ import android.view.accessibility.AccessibilityManager;
 
 import com.serenegiant.system.ContextUtils;
 
+/**
+ * AccessibilityManagerを使ってトークバックを行うためのヘルパークラス
+ */
 public class TalkBackHelper {
 	private TalkBackHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
@@ -50,6 +54,7 @@ public class TalkBackHelper {
 	 * @param text
 	 * @throws IllegalStateException
 	 */
+	@SuppressLint("WrongConstant")
 	public static void announceText(@NonNull final Context context,
 		@Nullable final CharSequence text) throws IllegalStateException {
 
@@ -78,6 +83,7 @@ public class TalkBackHelper {
 	 * @param text
 	 * @throws IllegalStateException
 	 */
+	@SuppressLint("WrongConstant")
 	public static void announceText(@NonNull final Context context,
 		@Nullable final CharSequence[] text) throws IllegalStateException {
 

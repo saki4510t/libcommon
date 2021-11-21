@@ -18,17 +18,25 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+/**
+ * 読み込みロックと書き込みロックを個別に制御できるようにするためのReentrantReadWriteLockのラッパークラス
+ * @param <T>
+ */
 public class ReentrantReadWriteReference<T> {
+	@NonNull
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
+	@NonNull
 	private final Lock mReadLock = mSensorLock.readLock();
+	@NonNull
 	private final Lock mWriteLock = mSensorLock.writeLock();
-
+	@Nullable
 	private T mRef;
 	
 	/**

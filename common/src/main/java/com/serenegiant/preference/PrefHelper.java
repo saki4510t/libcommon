@@ -32,7 +32,7 @@ import java.util.Set;
 
 /**
  * Created by saki on 2016/11/05.
- *
+ * 例外生成なし＆デフォルト値付きで値を取得するためのヘルパークラス
  */
 public class PrefHelper {
 	private PrefHelper() {

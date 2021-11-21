@@ -24,6 +24,9 @@ import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 
+/**
+ * デフォルト値付きでリソース値を取得するためのヘルパークラス
+ */
 public class ResourceHelper {
 
 	private ResourceHelper() {

@@ -64,11 +64,14 @@ public final class DeviceFilter implements Parcelable {
 	 * @param deviceFilterXmlId
 	 * @return
 	 */
+	@NonNull
 	public static List<DeviceFilter> getDeviceFilters(
 		@NonNull final Context context,
 		@XmlRes final int deviceFilterXmlId) {
 
+		@NonNull
 		final XmlPullParser parser = context.getResources().getXml(deviceFilterXmlId);
+		@NonNull
 		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
 		try {
 			int eventType = parser.getEventType();

@@ -24,6 +24,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * JSONから例外生成なし＆デフォルト値付きて値取得するためのヘルパークラス
+ */
 public class JSONHelper {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = JSONHelper.class.getSimpleName();

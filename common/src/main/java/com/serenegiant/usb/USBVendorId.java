@@ -25,6 +25,8 @@ import android.util.SparseArray;
 
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
+
 public class USBVendorId {
 	private static final SparseArray<String> IDS = new SparseArray<String>();
 
@@ -32,6 +34,7 @@ public class USBVendorId {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	@NonNull
 	public static String vendorName(final int vendor_id) {
 		String result = IDS.get(vendor_id);
 		if (TextUtils.isEmpty(result)) {

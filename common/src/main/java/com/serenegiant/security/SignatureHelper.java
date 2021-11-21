@@ -34,6 +34,9 @@ import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * apk署名検証用のヘルパークラス
+ */
 public class SignatureHelper {
 	private SignatureHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
