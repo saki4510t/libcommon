@@ -1,7 +1,6 @@
 package com.serenegiant.collections;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
+import android.os.Build;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,6 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.collection.ArraySet;
 
 /*
  * libcommon
@@ -36,7 +39,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @param <K>
  * @param <V>
  */
-public class ReentrantReadWriteMap<K, V> {
+public class ReentrantReadWriteMap<K, V> implements Map<K, V> {
 	@NonNull
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
 	@NonNull
@@ -47,11 +50,19 @@ public class ReentrantReadWriteMap<K, V> {
 	@NonNull
 	private final Map<K, V> mMap = new HashMap<K, V>();
 
+	/**
+	 * デフォルトコンストラクタ
+	 */
+	public ReentrantReadWriteMap() {
+		// 今は特に何もしない
+	}
+
 	@Nullable
-	public V get(@NonNull final K key) {
+	@Override
+	public V get(final Object key) {
 		mReadLock.lock();
 		try {
-			return mMap.containsKey(key) ? mMap.get(key) : null;
+			return getLocked(key, null);
 		} finally {
 			mReadLock.unlock();
 		}
@@ -61,7 +72,7 @@ public class ReentrantReadWriteMap<K, V> {
 	public V tryGet(@NonNull final K key) {
 		if (mReadLock.tryLock()) {
 			try {
-				return mMap.containsKey(key) ? mMap.get(key) : null;
+				return getLocked(key, null);
 			} finally {
 				mReadLock.unlock();
 			}
@@ -75,6 +86,7 @@ public class ReentrantReadWriteMap<K, V> {
 	 * @param value
 	 * @return the previous value associated with key or null if no value mapped.
 	 */
+	@Override
 	public V put(@NonNull final K key, @NonNull final V value) {
 		V prev;
 		mWriteLock.lock();
@@ -94,11 +106,12 @@ public class ReentrantReadWriteMap<K, V> {
 	 * @param value
 	 * @return
 	 */
+	@Override
 	public V putIfAbsent(final K key, final V value) {
 		V v;
 		mWriteLock.lock();
 		try {
-			v = mMap.get(key);
+			v = getLocked(key, null);
 			if (v == null) {
 				 v = mMap.put(key, value);
 			}
@@ -108,6 +121,7 @@ public class ReentrantReadWriteMap<K, V> {
 		return v;
 	}
 
+	@Override
 	public void putAll(@NonNull final Map<? extends K, ? extends V> map) {
 		mWriteLock.lock();
 		try {
@@ -117,7 +131,8 @@ public class ReentrantReadWriteMap<K, V> {
 		}
 	}
 
-	public V remove(@NonNull final K key) {
+	@Override
+	public V remove(final Object key) {
 		mWriteLock.lock();
 		try {
 			return mMap.remove(key);
@@ -132,21 +147,29 @@ public class ReentrantReadWriteMap<K, V> {
 	 * @param value
 	 * @return specific removed value or null if no mapping existed
 	 */
-	public V remove(@NonNull final K key, final V value) {
-		V v = null;
+	@Override
+	public boolean remove(final Object key, final Object value) {
 		mWriteLock.lock();
 		try {
-			if (mMap.containsKey(key) && isEquals(mMap.get(key), value)) {
-				v = mMap.remove(key);
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+				return mMap.remove(key, value);
+			} else {
+				// ここの実装はAPI>=24のMap#remove(Object,Object)と基本的には同じ
+				final Object curValue = getLocked(key, null);
+				if (!isEquals(curValue, value) ||
+					((curValue == null) && !containsKeyLocked(key))) {
+					return false;
+				}
+				mMap.remove(key);
+				return true;
 			}
 		} finally {
 			mWriteLock.unlock();
 		}
-		return v;
 	}
 
 	public Collection<V> removeAll() {
-		final Collection<V> result = new ArrayList<V>();
+		final Collection<V> result = new ArrayList<>();
 		mWriteLock.lock();
 		try {
 			result.addAll(mMap.values());
@@ -157,6 +180,7 @@ public class ReentrantReadWriteMap<K, V> {
 		return result;
 	}
 
+	@Override
 	public void clear() {
 		mWriteLock.lock();
 		try {
@@ -166,6 +190,7 @@ public class ReentrantReadWriteMap<K, V> {
 		}
 	}
 
+	@Override
 	public int size() {
 		mReadLock.lock();
 		try {
@@ -175,15 +200,17 @@ public class ReentrantReadWriteMap<K, V> {
 		}
 	}
 
-	public boolean containsKey(final K key) {
+	@Override
+	public boolean containsKey(final Object key) {
 		mReadLock.lock();
 		try {
-			return mMap.containsKey(key);
+			return containsKeyLocked(key);
 		} finally {
 			mReadLock.unlock();
 		}
 	}
 
+	@Override
 	public boolean containsValue(final Object value) {
 		mReadLock.lock();
 		try {
@@ -193,15 +220,17 @@ public class ReentrantReadWriteMap<K, V> {
 		}
 	}
 
-	public V getOrDefault(final K key, @Nullable final V defaultValue) {
+	@Override
+	public V getOrDefault(final Object key, @Nullable final V defaultValue) {
 		mReadLock.lock();
 		try {
-			return mMap.containsKey(key) ? mMap.get(key) : defaultValue;
+			return getLocked(key, defaultValue);
 		} finally {
 			mReadLock.unlock();
 		}
 	}
 
+	@Override
 	public boolean isEmpty() {
 		mReadLock.lock();
 		try {
@@ -209,6 +238,19 @@ public class ReentrantReadWriteMap<K, V> {
 		} finally {
 			mReadLock.unlock();
 		}
+	}
+
+	@NonNull
+	@Override
+	public Set<K> keySet() {
+		final Set<K> result = new ArraySet<>();
+		mReadLock.lock();
+		try {
+			result.addAll(mMap.keySet());
+		} finally {
+			mReadLock.unlock();
+		}
+		return result;
 	}
 
 	/**
@@ -232,6 +274,7 @@ public class ReentrantReadWriteMap<K, V> {
 	 * @return
 	 */
 	@NonNull
+	@Override
 	public Collection<V> values() {
 		final Collection<V> result = new ArrayList<V>();
 		mReadLock.lock();
@@ -250,6 +293,7 @@ public class ReentrantReadWriteMap<K, V> {
 	 * @return
 	 */
 	@NonNull
+	@Override
 	public Set<Map.Entry<K, V>> entrySet() {
 		final Set<Map.Entry<K, V>> result = new HashSet<>();
 		mReadLock.lock();
@@ -260,8 +304,18 @@ public class ReentrantReadWriteMap<K, V> {
 		}
 		return result;
 	}
+
 //================================================================================
+	private V getLocked(final Object key, final V defaultValue) {
+		return mMap.containsKey(key) ? mMap.get(key) : defaultValue;
+	}
+
+	private boolean containsKeyLocked(final Object key) {
+		return mMap.containsKey(key);
+	}
+
 	private static final boolean isEquals(final Object a, final Object b) {
+		// API>=19のObjects.equalsと同じ実装, このライブラリはAPI>=16なのでObjects.equalsは使えない
 		return (a == b) || (a != null && a.equals(b));
 	}
 
