@@ -51,7 +51,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @param context
 	 * @return
 	 */
-	public static Context wrap(@NonNull final EGLContext context) {
+	/*package*/ static Context wrap(@NonNull final EGLContext context) {
 		return new Context(context);
 	}
 
@@ -60,7 +60,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @param eglConfig
 	 * @return
 	 */
-	public static Config wrap(@NonNull final EGLConfig eglConfig) {
+	/*package*/ static Config wrap(@NonNull final EGLConfig eglConfig) {
 		return new Config(eglConfig);
 	}
 
