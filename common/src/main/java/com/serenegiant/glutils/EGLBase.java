@@ -124,6 +124,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @param isRecordable
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	public static EGLBase createFrom(final int maxClientVersion,
 		@Nullable final IContext sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
@@ -169,6 +170,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @param isRecordable
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	public static EGLBase createShared(final int maxClientVersion,
 		final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
@@ -193,6 +195,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @param isRecordable
 	 * @return
 	 */
+	@SuppressLint("NewApi")
 	public static EGLBase createFromCurrent(final int maxClientVersion,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 

@@ -19,7 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.opengl.EGL14;
 import android.opengl.EGLConfig;
 import android.opengl.EGLContext;
@@ -32,6 +31,7 @@ import android.opengl.GLES30;
 import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import android.util.Log;
 
@@ -40,7 +40,7 @@ import com.serenegiant.system.BuildCheck;
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 /*package*/ class EGLBase14 extends EGLBase {	// API >= 17
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = EGLBase14.class.getSimpleName();
@@ -231,13 +231,13 @@ import com.serenegiant.system.BuildCheck;
 			mEglBase.swap(mEglSurface);
 		}
 
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@Override
 		public void swap(final long presentationTimeNs) {
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void setPresentationTime(final long presentationTimeNs) {
 			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,	// API>=18
 				mEglSurface, presentationTimeNs);
@@ -624,7 +624,8 @@ import com.serenegiant.system.BuildCheck;
         return EGL14.EGL_SUCCESS;
     }
 
-    private int swap(final EGLSurface surface, final long presentationTimeNs) {
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+	private int swap(final EGLSurface surface, final long presentationTimeNs) {
 //		if (DEBUG) Log.v(TAG, "swap:");
 		EGLExt.eglPresentationTimeANDROID(mEglDisplay, surface, presentationTimeNs);	// API>=18
         if (!EGL14.eglSwapBuffers(mEglDisplay, surface)) {
