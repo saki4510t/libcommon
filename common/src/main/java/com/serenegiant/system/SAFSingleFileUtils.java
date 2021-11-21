@@ -24,8 +24,55 @@ public class SAFSingleFileUtils {
 
 	private SAFSingleFileUtils() {
 		// インスタンス化をエラーにするためにデフォルトオンストラクタをprivateに
+	/**
+	 * ファイル読み込み用のUriを要求するヘルパーメソッド
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param mime
+	 * @return
+	 */
+	private static Intent prepareOpenDocumentIntent(@NonNull final String mime) {
+		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.setType(mime);
+		return intent;
 	}
 
+	/**
+	 * ファイル保存用のUriを要求するヘルパーメソッド
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param mime
+	 * @param defaultName
+	 * @return
+	 */
+	private static Intent prepareCreateDocument(
+		final String mime, final String defaultName) {
+
+		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+		intent.setType(mime);
+		if (!TextUtils.isEmpty(defaultName)) {
+			intent.putExtra(Intent.EXTRA_TITLE, defaultName);
+		}
+		return intent;
+	}
+
+	/**
+	 * ファイル削除要求
+	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
+	 * @param context
+	 * @param uri
+	 * @return
+	 */
+	public static boolean requestDeleteDocument(
+		@NonNull final Context context, final Uri uri) {
+
+		try {
+			return BuildCheck.isKitKat()
+				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
+		} catch (final FileNotFoundException e) {
+			return false;
+		}
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * ファイル読み込み用のUriを要求
 	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
@@ -91,18 +138,6 @@ public class SAFSingleFileUtils {
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareOpenDocumentIntent(mime), requestCode);
 		}
-	}
-
-	/**
-	 * ファイル読み込み用のUriを要求するヘルパーメソッド
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param mime
-	 * @return
-	 */
-	private static Intent prepareOpenDocumentIntent(@NonNull final String mime) {
-		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		intent.setType(mime);
-		return intent;
 	}
 
 	/**
@@ -242,42 +277,6 @@ public class SAFSingleFileUtils {
 
 		if (BuildCheck.isKitKat()) {
 			fragment.startActivityForResult(prepareCreateDocument(mime, defaultName), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求するヘルパーメソッド
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param mime
-	 * @param defaultName
-	 * @return
-	 */
-	private static Intent prepareCreateDocument(
-		final String mime, final String defaultName) {
-
-		final Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-		intent.setType(mime);
-		if (!TextUtils.isEmpty(defaultName)) {
-			intent.putExtra(Intent.EXTRA_TITLE, defaultName);
-		}
-		return intent;
-	}
-
-	/**
-	 * ファイル削除要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param context
-	 * @param uri
-	 * @return
-	 */
-	public static boolean requestDeleteDocument(
-		@NonNull final Context context, final Uri uri) {
-
-		try {
-			return BuildCheck.isKitKat()
-				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
-		} catch (final FileNotFoundException e) {
-			return false;
 		}
 	}
 
