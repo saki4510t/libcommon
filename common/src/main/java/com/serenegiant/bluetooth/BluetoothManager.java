@@ -65,7 +65,9 @@ public class BluetoothManager {
 	/**
 	 * 端末がBluetoothに対応しているかどうかを確認
 	 * @return true Bluetoothに対応している
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean isAvailable() {
 		try {
 			final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -80,7 +82,9 @@ public class BluetoothManager {
 	 * 端末がBluetoothに対応していてBluetoothが有効になっているかどうかを確認
 	 * パーミッションがなければfalse
 	 * @return true Bluetoothが有効
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean isEnabled() {
 		try {
 			final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -100,7 +104,9 @@ public class BluetoothManager {
 	 * @param requestCode
 	 * @return true Bluetoothに対応していて既に有効になっている
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean requestBluetoothEnable(@NonNull final Activity activity, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
@@ -119,7 +125,9 @@ public class BluetoothManager {
 	 * @param requestCode
 	 * @return true Bluetoothに対応していて既に有効になっている
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean requestBluetoothEnable(@NonNull final Fragment fragment, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
@@ -138,7 +146,9 @@ public class BluetoothManager {
 	 * @param requestCode
 	 * @return true Bluetoothに対応していて既に有効になっている
 	 * @throws SecurityException パーミッションがなければSecurityExceptionが投げられる
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean requestBluetoothEnable(@NonNull final androidx.fragment.app.Fragment fragment, final int requestCode) throws SecurityException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter != null) && !adapter.isEnabled()) {
@@ -151,7 +161,9 @@ public class BluetoothManager {
 	/**
 	 * ペアリング済みのBluetooth機器一覧を取得する
 	 * @return Bluetoothに対応していないまたは無効なら空set
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	@NonNull
 	public static Set<BluetoothDevice> getBondedDevices() {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -165,7 +177,9 @@ public class BluetoothManager {
 	 * @param duration 探索可能時間[秒]
 	 * @return 既に探索可能であればtrue
 	 * @throws IllegalStateException
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean requestDiscoverable(@NonNull final Activity activity, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {
@@ -186,7 +200,9 @@ public class BluetoothManager {
 	 * @param duration 0以下ならデフォルトの探索可能時間で120秒、 最大300秒まで設定できる
 	 * @return
 	 * @throws IllegalStateException
+	 * @deprecated BluetoothUtilsへ移動
 	 */
+	@Deprecated
 	public static boolean requestDiscoverable(@NonNull final Fragment fragment, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {
