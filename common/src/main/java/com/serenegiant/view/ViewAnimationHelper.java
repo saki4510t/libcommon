@@ -182,21 +182,25 @@ public class ViewAnimationHelper {
 		}, 100);
 	}
 
+	private static final int ANIMATION_EVENT_START = 0;
+	private static final int ANIMATION_EVENT_END = 1;
+	private static final int ANIMATION_EVENT_CANCEL = 2;
+
 	/**
 	 * アニメーション用コールバックリスナー
 	 */
 	private static final Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
 		@Override
 		public void onAnimationStart(final Animator animator) {
-			onAnimation(animator, 0);
+			onAnimation(animator, ANIMATION_EVENT_START);
 		}
 		@Override
 		public void onAnimationEnd(final Animator animator) {
-			onAnimation(animator, 1);
+			onAnimation(animator, ANIMATION_EVENT_END);
 		}
 		@Override
 		public void onAnimationCancel(final Animator animator) {
-			onAnimation(animator, 2);
+			onAnimation(animator, ANIMATION_EVENT_CANCEL);
 		}
 		@Override
 		public void onAnimationRepeat(final Animator animation) {
@@ -222,13 +226,13 @@ public class ViewAnimationHelper {
 					public void run() {
 						try {
 							switch (event) {
-							case 0:
+							case ANIMATION_EVENT_START:
 								listener.onAnimationStart(anim, target, animType);
 								break;
-							case 1:
+							case ANIMATION_EVENT_END:
 								listener.onAnimationEnd(anim, target, animType);
 								break;
-							case 2:
+							case ANIMATION_EVENT_CANCEL:
 								listener.onAnimationCancel(anim, target, animType);
 								break;
 							}
