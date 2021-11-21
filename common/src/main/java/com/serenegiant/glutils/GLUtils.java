@@ -80,8 +80,10 @@ public class GLUtils {
 						String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
 						if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + extensions);
 						if ((extensions == null) || !extensions.contains("GL_OES_EGL_image_external")) {
+							// GL_OES_EGL_image_externalが存在していない
 							result.set(1);
 						} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) && context.isGLES3()) {
+							// API>=21でGLContextがGLES3で初期化できた時はGL_OES_EGL_image_external_essl3をチェックする
 							extensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); 	// API >= 18
 							result.set((extensions != null) && extensions.contains("GL_OES_EGL_image_external_essl3")
 								? 3 : 2);
