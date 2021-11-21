@@ -146,25 +146,120 @@ public class GyroHelper {
 	 * @return
 	 */
 	public float getAzimuth() {
+		synchronized (mSensorSync) {
 			return mAzimuthValues[0];
 		}
+	}
 
 	/**
 	 * 左右への傾きを取得, XXX 前後と左右が入れ替わってるかも
 	 * @return
 	 */
 	public float getPan() {
+		synchronized (mSensorSync) {
 			return mAzimuthValues[1];
 		}
+	}
 
 	/**
 	 * 前後の傾きを取得, XXX 前後と左右が入れ替わってるかも
 	 * @return
 	 */
 	public float getTilt() {
+		synchronized (mSensorSync) {
 			return mAzimuthValues[2];
 		}
+	}
 
+	/**
+	 * X軸加速度を取得
+	 * @return
+	 */
+	public float getAccelX() {
+		synchronized (mSensorSync) {
+			return mAccelValues[0];
+		}
+	}
+
+	/**
+	 * Y軸加速度を取得
+	 * @return
+	 */
+	public float getAccelY() {
+		synchronized (mSensorSync) {
+			return mAccelValues[1];
+		}
+	}
+
+	/**
+	 * Z軸加速度を取得
+	 * @return
+	 */
+	public float getAccelZ() {
+		synchronized (mSensorSync) {
+			return mAccelValues[2];
+		}
+	}
+
+	/**
+	 * 加速度のコピーを取得
+	 * @param out
+	 * @return
+	 */
+	public float[] getAccel(@Nullable final float[] out) {
+		final float[] _out = (out != null) && (out.length > 3) ? out : new float[3];
+		synchronized (mSensorSync) {
+			System.arraycopy(mAccelValues, 0, _out, 0, 3);
+		}
+		return _out;
+	}
+
+	/**
+	 * X軸加速度を取得
+	 * @return
+	 */
+	public float getGyroX() {
+		synchronized (mSensorSync) {
+			return mGyroValues[0];
+		}
+	}
+
+	/**
+	 * Y軸加速度を取得
+	 * @return
+	 */
+	public float getGyroY() {
+		synchronized (mSensorSync) {
+			return mGyroValues[1];
+		}
+	}
+
+	/**
+	 * Z軸加速度を取得
+	 * @return
+	 */
+	public float getGyroZ() {
+		synchronized (mSensorSync) {
+			return mGyroValues[2];
+		}
+	}
+
+	/**
+	 * 加速度のコピーを取得
+	 * @param out
+	 * @return
+	 */
+	public float[] getGyro(@Nullable final float[] out) {
+		final float[] _out = (out != null) && (out.length > 3) ? out : new float[3];
+		synchronized (mSensorSync) {
+			System.arraycopy(mGyroValues, 0, _out, 0, 3);
+		}
+		return _out;
+	}
+
+	/**
+	 * センサー値を取得するためのSensorEventListener実装
+	 */
 	private final SensorEventListener mSensorEventListener = new SensorEventListener() {
 		/**
 		 * ハイパスフィルターを通して値をセットする
