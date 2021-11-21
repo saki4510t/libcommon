@@ -126,9 +126,9 @@ import com.serenegiant.system.BuildCheck;
 	private static class EglSurface implements IEglSurface {
 		@NonNull
 		private final EGLBase14 mEglBase;
+		private final boolean mOwnSurface;
 		@NonNull
 		private EGLSurface mEglSurface;
-		private boolean mOwnSurface;
 		private int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
 
 		/**
