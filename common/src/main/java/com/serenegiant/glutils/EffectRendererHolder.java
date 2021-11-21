@@ -89,7 +89,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		@Nullable final EGLBase.IContext sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 		this(width, height,
-			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			maxClientVersion, null, EGLConst.EGL_FLAG_RECORDABLE,
 			false, callback);
 	}
 
