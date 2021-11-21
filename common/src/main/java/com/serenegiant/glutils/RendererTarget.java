@@ -28,7 +28,7 @@ import androidx.annotation.NonNull;
 /**
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-public class RendererTarget implements IRendererTarget {
+public class RendererTarget {
 
 	/**
 	 * ファクトリーメソッド
@@ -37,7 +37,7 @@ public class RendererTarget implements IRendererTarget {
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
-	public static IRendererTarget newInstance(
+	public static RendererTarget newInstance(
 		@NonNull final EGLBase egl,
 		@NonNull final Object surface, final float maxFps) {
 
@@ -73,7 +73,6 @@ public class RendererTarget implements IRendererTarget {
 	/**
 	 * 生成したEglSurfaceを破棄する
 	 */
-	@Override
 	public void release() {
 		if (mTargetSurface != null) {
 			mTargetSurface.release();
@@ -86,7 +85,6 @@ public class RendererTarget implements IRendererTarget {
 	 * Surfaceが有効かどうかを取得する
 	 * @return
 	 */
-	@Override
 	public boolean isValid() {
 		return (mTargetSurface != null) && mTargetSurface.isValid();
 	}
@@ -95,7 +93,6 @@ public class RendererTarget implements IRendererTarget {
 	 * Surfaceへの描画が有効かどうかを取得する
 	 * @return
 	 */
-	@Override
 	public boolean isEnabled() {
 		return mEnable;
 	}
@@ -104,7 +101,6 @@ public class RendererTarget implements IRendererTarget {
 	 * Surfaceへの描画を一時的に有効/無効にする
 	 * @param enable
 	 */
-	@Override
 	public void setEnabled(final boolean enable) {
 		mEnable = enable;
 	}
@@ -113,22 +109,18 @@ public class RendererTarget implements IRendererTarget {
 	 * 描画可能かどうかを取得
 	 * @return
 	 */
-	@Override
 	public boolean canDraw() {
 		return mEnable;
 	}
 
-	@Override
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}
 
-	@Override
 	public int width() {
 		return mTargetSurface != null ? mTargetSurface.getWidth() : 0;
 	}
 
-	@Override
 	public int height() {
 		return mTargetSurface != null ? mTargetSurface.getHeight() : 0;
 	}
@@ -139,7 +131,6 @@ public class RendererTarget implements IRendererTarget {
 	 * @param textId
 	 * @param texMatrix
 	 */
-	@Override
 	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -172,7 +163,6 @@ public class RendererTarget implements IRendererTarget {
 	 * 指定した色で全面を塗りつぶす
 	 * @param color
 	 */
-	@Override
 	public void clear(final int color) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -193,7 +183,6 @@ public class RendererTarget implements IRendererTarget {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
-	@Override
 	public void makeCurrent() throws IllegalStateException {
 		check();
 		mTargetSurface.makeCurrent();
@@ -205,7 +194,6 @@ public class RendererTarget implements IRendererTarget {
 	 * #makeCurrentでレンダリングコンテキストを切り替えてから
 	 * 描画後#swapを呼ぶ
 	 */
-	@Override
 	public void swap() throws IllegalStateException {
 		check();
 		mTargetSurface.swap();

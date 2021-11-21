@@ -51,7 +51,7 @@ public abstract class AbstractDistributeTask {
 	private static final int REQUEST_SET_MVP = 10;
 
 	@NonNull
-	private final SparseArray<IRendererTarget>
+	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
 	private int mVideoWidth, mVideoHeight;
 	/**
@@ -275,7 +275,7 @@ public abstract class AbstractDistributeTask {
 	public boolean isEnabled(final int id) {
 		if (DEBUG) Log.v(TAG, "isEnabled:" + id);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			return target != null && target.isEnabled();
 		}
 	}
@@ -283,7 +283,7 @@ public abstract class AbstractDistributeTask {
 	public void setEnabled(final int id, final boolean enable) {
 		if (DEBUG) Log.v(TAG, "setEnabled:" + id + ",enable=" + enable);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			if (target != null) {
 				target.setEnabled(enable);
 			}
@@ -519,7 +519,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = n - 1; i >= 0; i--) {
-				final IRendererTarget target = mTargets.valueAt(i);
+				final RendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && target.canDraw()) {
 					try {
 						onDrawTarget(target, texId, texMatrix);
@@ -541,7 +541,7 @@ public abstract class AbstractDistributeTask {
 	 * @param texMatrix
 	 */
 	@WorkerThread
-	protected void onDrawTarget(@NonNull final IRendererTarget target,
+	protected void onDrawTarget(@NonNull final RendererTarget target,
 		final int texId, @NonNull final float[] texMatrix) {
 
 //		if (DEBUG) Log.v(TAG, "onDrawTarget:");
@@ -574,7 +574,7 @@ public abstract class AbstractDistributeTask {
 		if (DEBUG) Log.v(TAG, "handleAddSurface:" + id);
 		checkTarget();
 		synchronized (mTargets) {
-			IRendererTarget target = mTargets.get(id);
+			RendererTarget target = mTargets.get(id);
 			if (target == null) {
 				try {
 					target = createRendererTarget(id, getEgl(), surface, maxFps);
@@ -600,7 +600,7 @@ public abstract class AbstractDistributeTask {
 	 * @return
 	 */
 	@NonNull
-	protected IRendererTarget createRendererTarget(final int id,
+	protected RendererTarget createRendererTarget(final int id,
 		@NonNull final EGLBase egl,
 		@NonNull final Object surface, final float maxFps) {
 
@@ -616,7 +616,7 @@ public abstract class AbstractDistributeTask {
 	protected void handleRemoveSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			if (target != null) {
 				mTargets.remove(id);
 				if (target.isValid()) {
@@ -638,7 +638,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
-				final IRendererTarget target = mTargets.valueAt(i);
+				final RendererTarget target = mTargets.valueAt(i);
 				if (target != null) {
 					if (target.isValid()) {
 						target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
@@ -661,7 +661,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
-				final IRendererTarget target = mTargets.valueAt(i);
+				final RendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && !target.isValid()) {
 					final int id = mTargets.keyAt(i);
 					if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
@@ -682,7 +682,7 @@ public abstract class AbstractDistributeTask {
 	protected void handleClear(final int id, final int color) {
 		if (DEBUG) Log.v(TAG, "handleClear:" + id);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			if ((target != null) && target.isValid()) {
 				target.clear(color);
 			}
@@ -699,7 +699,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
-				final IRendererTarget target = mTargets.valueAt(i);
+				final RendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && target.isValid()) {
 					target.clear(color);
 				}
@@ -719,7 +719,7 @@ public abstract class AbstractDistributeTask {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			if ((target != null) && target.isValid()) {
 				System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
 			}
@@ -737,7 +737,7 @@ public abstract class AbstractDistributeTask {
 		synchronized (mTargets) {
 			final int n = mTargets.size();
 			for (int i = 0; i < n; i++) {
-				final IRendererTarget target = mTargets.valueAt(i);
+				final RendererTarget target = mTargets.valueAt(i);
 				if (target != null) {
 					GLUtils.setMirror(target.getMvpMatrix(), mirror);
 				}
@@ -754,7 +754,7 @@ public abstract class AbstractDistributeTask {
 	protected void handleRotate(final int id, final int degree) {
 		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
 		synchronized (mTargets) {
-			final IRendererTarget target = mTargets.get(id);
+			final RendererTarget target = mTargets.get(id);
 			if (target != null) {
 				GLUtils.setRotation(target.getMvpMatrix(), degree);
 			}

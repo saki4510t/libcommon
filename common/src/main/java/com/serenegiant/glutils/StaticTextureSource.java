@@ -205,7 +205,7 @@ public class StaticTextureSource {
 	private static final int REQUEST_SET_BITMAP = 7;
 
 	private static class RendererTask extends EglTask {
-		private final SparseArray<IRendererTarget> mTargets
+		private final SparseArray<RendererTarget> mTargets
 			= new SparseArray<>();
 		private final StaticTextureSource mParent;
 		private final long mIntervalsNs;
@@ -401,7 +401,7 @@ public class StaticTextureSource {
 				synchronized (mTargets) {
 					final int n = mTargets.size();
 					for (int i = n - 1; i >= 0; i--) {
-						final IRendererTarget target = mTargets.valueAt(i);
+						final RendererTarget target = mTargets.valueAt(i);
 						if ((target != null) && target.canDraw()) {
 							try {
 								target.draw(mDrawer, texId, null); // target.draw(mDrawer, mTexId, mTexMatrix);
@@ -433,7 +433,7 @@ public class StaticTextureSource {
 			if (DEBUG) Log.v(TAG, "handleAddSurface:id=" + id);
 			checkTarget();
 			synchronized (mTargets) {
-				IRendererTarget target = mTargets.get(id);
+				RendererTarget target = mTargets.get(id);
 				if (target == null) {
 					try {
 						target = createRendererTarget(id, getEgl(), surface, maxFps);
@@ -457,7 +457,7 @@ public class StaticTextureSource {
 		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 * @return
 		 */
-		protected IRendererTarget createRendererTarget(final int id,
+		protected RendererTarget createRendererTarget(final int id,
 			@NonNull final EGLBase egl,
 			final Object surface, final float maxFps) {
 
@@ -472,7 +472,7 @@ public class StaticTextureSource {
 		private void handleRemoveSurface(final int id) {
 			if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 			synchronized (mTargets) {
-				final IRendererTarget target = mTargets.get(id);
+				final RendererTarget target = mTargets.get(id);
 				if (target != null) {
 					mTargets.remove(id);
 					target.release();
@@ -491,7 +491,7 @@ public class StaticTextureSource {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final IRendererTarget target = mTargets.valueAt(i);
+					final RendererTarget target = mTargets.valueAt(i);
 					if (target != null) {
 						makeCurrent();
 						target.release();
@@ -511,7 +511,7 @@ public class StaticTextureSource {
 			synchronized (mTargets) {
 				final int n = mTargets.size();
 				for (int i = 0; i < n; i++) {
-					final IRendererTarget target = mTargets.valueAt(i);
+					final RendererTarget target = mTargets.valueAt(i);
 					if ((target != null) && !target.isValid()) {
 						final int id = mTargets.keyAt(i);
 						if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
@@ -548,7 +548,7 @@ public class StaticTextureSource {
 	/**
 	 * 一定時間おきに描画要求を送るためのRunnable
 	 */
-	private Runnable mOnFrameTask = new Runnable() {
+	private final Runnable mOnFrameTask = new Runnable() {
 		@Override
 		public void run() {
 			final long ms = mRendererTask.mIntervalsNs / 1000000L;
