@@ -35,10 +35,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  * @param <V>
  */
 public class ReentrantReadWriteList<V> implements List<V> {
+	@NonNull
 	private final ReentrantReadWriteLock mSensorLock = new ReentrantReadWriteLock();
+	@NonNull
 	private final Lock mReadLock = mSensorLock.readLock();
+	@NonNull
 	private final Lock mWriteLock = mSensorLock.writeLock();
 	/** hold key/value pairs */
+	@NonNull
 	private final List<V> mList = new ArrayList<V>();
 	
 	/**
