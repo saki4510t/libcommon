@@ -64,7 +64,9 @@ public abstract class AbstractChannelDataLink {
 	private static final int TYPE_FLOAT_ARRAY = 40;
 	private static final int TYPE_DOUBLE_ARRAY = 41;
 
+	@NonNull
 	private final Set<AbstractClient> mClients = new CopyOnWriteArraySet<AbstractClient>();
+	@NonNull
 	private final Set<Callback> mCallbacks = new CopyOnWriteArraySet<Callback>();
 
 	/**
@@ -78,7 +80,7 @@ public abstract class AbstractChannelDataLink {
 	 * コンストラクタ
 	 * @param callback
 	 */
-	public AbstractChannelDataLink(final Callback callback) {
+	public AbstractChannelDataLink(@NonNull final Callback callback) {
 		this();
 		add(callback);
 	}
@@ -107,7 +109,7 @@ public abstract class AbstractChannelDataLink {
 	 * データ受信時のコールバックを登録
 	 * @param callback
 	 */
-	public void add(final Callback callback) {
+	public void add(@NonNull final Callback callback) {
 		if (DEBUG) Log.v(TAG, "add:callback=" + callback);
 		if (callback != null) {
 			mCallbacks.add(callback);
@@ -118,16 +120,18 @@ public abstract class AbstractChannelDataLink {
 	 * データ受信時のコールバックを登録解除
 	 * @param callback
 	 */
-	public void remove(final Callback callback) {
+	public void remove(@NonNull final Callback callback) {
 		if (DEBUG) Log.v(TAG, "remove:callback=" + callback);
-		mCallbacks.remove(callback);
+		if (callback != null) {
+			mCallbacks.remove(callback);
+		}
 	}
 	
 	/**
 	 * 受信用のクライアントを追加
 	 * @param client
 	 */
-	protected void add(final AbstractClient client) {
+	protected void add(@NonNull final AbstractClient client) {
 		if (DEBUG) Log.v(TAG, "add:client=" + client);
 		if (client != null) {
 			mClients.add(client);
@@ -138,15 +142,17 @@ public abstract class AbstractChannelDataLink {
 	 * 受信用のクライアントを登録解除
 	 * @param client
 	 */
-	public void remove(final AbstractClient client) {
+	public void remove(@NonNull final AbstractClient client) {
 		if (DEBUG) Log.v(TAG, "remove:client=" + client);
-		mClients.remove(client);
+		if (client != null) {
+			mClients.remove(client);
+		}
 	}
 
 	/**
 	 * 受信スレッドの実行部
 	 */
-	public static abstract class AbstractClient implements Runnable, Handler.Callback {
+	protected static abstract class AbstractClient implements Runnable, Handler.Callback {
 		private final WeakReference<AbstractChannelDataLink> mWeakParent;
 		protected ByteChannel mChannel;
 		private volatile boolean mIsRunning = true;

@@ -77,11 +77,18 @@ public class UdpBeacon {
 	private static class Beacon {
 		public static final String BEACON_IDENTITY = "SAKI";
 
+		@NonNull
 		private final UUID uuid;
 		private final int listenPort;
 		private final int extraBytes;
+		@Nullable
 		private final ByteBuffer extras;
-		public Beacon(final ByteBuffer buffer) {
+
+		/**
+		 * コンストラクタ
+		 * @param buffer
+		 */
+		public Beacon(@NonNull final ByteBuffer buffer) {
 			uuid = new UUID(buffer.getLong(), buffer.getLong());
 			final int port = buffer.getShort();
 			listenPort = port < 0 ? (0xffff) & port : port;
@@ -101,11 +108,22 @@ public class UdpBeacon {
 			}
 		}
 
-		public Beacon(final UUID uuid, final int port) {
+		/**
+		 * コンストラクタ
+		 * @param uuid
+		 * @param port
+		 */
+		public Beacon(@NonNull final UUID uuid, final int port) {
 			this(uuid, port, 0);
 		}
 
-		public Beacon(final UUID uuid, final int port, final int extras) {
+		/**
+		 * コンストラクタ
+		 * @param uuid
+		 * @param port
+		 * @param extras
+		 */
+		public Beacon(@NonNull final UUID uuid, final int port, final int extras) {
 			this.uuid = uuid;
 			listenPort = port;
 			extraBytes = extras & 0xff;
@@ -116,6 +134,7 @@ public class UdpBeacon {
 			}
 		}
 
+		@NonNull
 		public byte[] asBytes() {
 			final byte[] bytes = new byte[BEACON_SIZE + (extraBytes > 0 ? extraBytes + 1 : 0)];
 			final ByteBuffer buffer = ByteBuffer.wrap(bytes);
@@ -134,16 +153,17 @@ public class UdpBeacon {
 			return bytes;
 		}
 
+		@Nullable
 		public ByteBuffer extra() {
 			return extras;
 		}
 
-		public void extra(final byte[] extra) {
+		public void extra(@NonNull final byte[] extra) {
 			extra(ByteBuffer.wrap(extra));
 		}
 
-		public void extra(final ByteBuffer extra) {
-			final int n = extra != null ? extra.remaining() : -1;
+		public void extra(@NonNull final ByteBuffer extra) {
+			final int n = extra.remaining();
 			if ((extraBytes > 0) && (extraBytes <= n)) {
 				extras.clear();
 				extras.put(extra);
@@ -158,10 +178,15 @@ public class UdpBeacon {
 		}
 	}
 
+	@NonNull
 	private final Object mSync = new Object();
-	private final CopyOnWriteArraySet<UdpBeaconCallback> mCallbacks = new CopyOnWriteArraySet<UdpBeaconCallback>();
+	@NonNull
+	private final CopyOnWriteArraySet<UdpBeaconCallback> mCallbacks
+		= new CopyOnWriteArraySet<UdpBeaconCallback>();
 	private Handler mAsyncHandler;
+	@NonNull
 	private final UUID uuid;
+	@NonNull
 	private final byte[] beaconBytes;
 	private final long mBeaconIntervalsMs;
 	private final long mRcvMinIntervalsMs;
@@ -570,8 +595,8 @@ public class UdpBeacon {
 							|| buffer.get() != BEACON_VERSION) {
 							continue;
 						}
-						final Beacon remote_beacon = new Beacon(buffer);
-						if (!uuid.equals(remote_beacon.uuid)) {
+						final Beacon remoteBeacon = new Beacon(buffer);
+						if (!uuid.equals(remoteBeacon.uuid)) {
 							// 自分のuuidと違う時
 							final String remoteAddr = socket.remote();
 							final int remotePort = socket.remotePort();
@@ -582,7 +607,7 @@ public class UdpBeacon {
 									public void run() {
 										for (final UdpBeaconCallback callback: mCallbacks) {
 											try {
-												callback.onReceiveBeacon(remote_beacon.uuid, remoteAddr, remotePort);
+												callback.onReceiveBeacon(remoteBeacon.uuid, remoteAddr, remotePort);
 											} catch (final Exception e) {
 												mCallbacks.remove(callback);
 												Log.w(TAG, e);
@@ -611,7 +636,7 @@ public class UdpBeacon {
 	/**
 	 * UDPでビーコンをブロードキャストする
 	 */
-	private void sendBeacon(final UdpSocket socket) {
+	private void sendBeacon(@NonNull final UdpSocket socket) {
 //		if (DEBUG) Log.v(TAG, "sendBeacon");
 		try {
 			socket.broadcast(beaconBytes);

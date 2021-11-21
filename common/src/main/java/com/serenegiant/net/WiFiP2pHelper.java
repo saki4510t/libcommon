@@ -31,6 +31,7 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 import android.util.Log;
@@ -84,13 +85,19 @@ public class WiFiP2pHelper {
 	}
 	
 	/** コールバックリスナー */
+	@NonNull
 	private final Set<WiFiP2pListener> mListeners = new CopyOnWriteArraySet<WiFiP2pListener>();
 	/** 周囲に存在するWiFi Direct対応機器リスト */
+	@NonNull
 	private final List<WifiP2pDevice> mAvailableDevices = new ArrayList<WifiP2pDevice>();
 	/** Context */
+	@NonNull
 	private final WeakReference<Context> mWeakContext;
+	@NonNull
 	private final WifiP2pManager mWifiP2pManager;
+	@Nullable
 	private WifiP2pManager.Channel mChannel;
+	@Nullable
 	private WiFiDirectBroadcastReceiver mReceiver;
 	/** WiFi Directが有効かどうか */
 	private boolean mIsWifiP2pEnabled;

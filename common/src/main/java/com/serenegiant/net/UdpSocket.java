@@ -31,12 +31,17 @@ import java.nio.channels.DatagramChannel;
 import java.util.Collections;
 import java.util.Enumeration;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * UDP経由での送受信を行うためのヘルパークラス
  */
 public class UdpSocket {
 	private DatagramChannel channel;
+	@NonNull
 	private final InetSocketAddress broadcast;
+	@NonNull
 	private final String localAddress;
 	private String remoteAddress;
 	private int remotePort;
@@ -204,6 +209,7 @@ public class UdpSocket {
 	 * 自分のアドレス文字列を取得
 	 * @return
 	 */
+	@NonNull
 	public String local() {
 		return localAddress;
 	}
@@ -212,6 +218,7 @@ public class UdpSocket {
 	 * 最後に受け取ったメッセージのアドレス文字列を取得
 	 * @return
 	 */
+	@Nullable
 	public String remote() {
 		return remoteAddress;
 	}
@@ -230,7 +237,7 @@ public class UdpSocket {
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 */
-	public void broadcast(final ByteBuffer buffer) throws IOException, IllegalStateException {
+	public void broadcast(@NonNull final ByteBuffer buffer) throws IOException, IllegalStateException {
 		if (channel == null) {
 			throw new IllegalStateException("already released");
 		}
@@ -243,7 +250,7 @@ public class UdpSocket {
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 */
-	public void broadcast(final byte[] bytes) throws IOException, IllegalStateException {
+	public void broadcast(@NonNull final byte[] bytes) throws IOException, IllegalStateException {
 		broadcast(ByteBuffer.wrap(bytes));
 	}
 
@@ -254,7 +261,7 @@ public class UdpSocket {
 	 * @throws IOException
 	 * @throws IllegalStateException
 	 */
-	public int receive(final ByteBuffer buffer) throws IOException, IllegalStateException {
+	public int receive(@NonNull final ByteBuffer buffer) throws IOException, IllegalStateException {
 		if (channel == null) {
 			throw new IllegalStateException("already released");
 		}

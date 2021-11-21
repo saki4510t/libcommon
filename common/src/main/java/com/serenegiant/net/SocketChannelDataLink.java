@@ -35,6 +35,9 @@ import java.nio.channels.ByteChannel;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 
+/**
+ * ServerSocketChannel/SocketChannelを使ったAbstractChannelDataLink実装
+ */
 public class SocketChannelDataLink extends AbstractChannelDataLink {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = SocketChannelDataLink.class.getSimpleName();
@@ -63,7 +66,13 @@ public class SocketChannelDataLink extends AbstractChannelDataLink {
 		stop();
 		super.release();
 	}
-				
+
+	/**
+	 * 指定したアドレスへ接続する, ポートはDEFAULT_SERVER_PORTを使う
+	 * @param addr
+	 * @return
+	 * @throws IOException
+	 */
 	public Client connectTo(final String addr) throws IOException {
 		return connectTo(addr, DEFAULT_SERVER_PORT);
 	}
