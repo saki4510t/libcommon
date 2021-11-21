@@ -54,7 +54,7 @@ public class RendererTarget {
 	private volatile boolean mEnable = true;
 
 	/**
-	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprivate
+	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprotected
 	 * @param egl
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
