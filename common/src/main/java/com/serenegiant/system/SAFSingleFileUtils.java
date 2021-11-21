@@ -33,6 +33,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestOpenDocument(
 		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
@@ -49,6 +50,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestOpenDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
@@ -81,6 +83,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestOpenDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
@@ -109,6 +112,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final Activity activity,
 		final String mime, final int requestCode) {
@@ -126,6 +130,7 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final Activity activity,
 		final String mime, final String defaultName, final int requestCode) {
@@ -142,6 +147,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final int requestCode) {
@@ -159,6 +165,7 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final FragmentActivity activity,
 		final String mime, final String defaultName, final int requestCode) {
@@ -175,6 +182,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final android.app.Fragment fragment,
 		final String mime, final int requestCode) {
@@ -192,6 +200,7 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final android.app.Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
@@ -208,6 +217,7 @@ public class SAFSingleFileUtils {
 	 * @param mime
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final int requestCode) {
@@ -225,6 +235,7 @@ public class SAFSingleFileUtils {
 	 * @param defaultName
 	 * @param requestCode
 	 */
+	@Deprecated
 	public static void requestCreateDocument(
 		@NonNull final Fragment fragment,
 		final String mime, final String defaultName, final int requestCode) {
