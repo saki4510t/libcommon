@@ -23,12 +23,9 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.util.Log;
-
-import com.serenegiant.system.BuildCheck;
 
 import java.io.IOException;
 
@@ -38,7 +35,6 @@ import androidx.annotation.RequiresApi;
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
- * FIXME ES3対応にする(ES2用子クラスとES3用子クラスに分ける)
  */
 public abstract class GLSurface implements IGLSurface {
 	private static final boolean DEBUG = false;
@@ -57,7 +53,7 @@ public abstract class GLSurface implements IGLSurface {
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int width, final int height) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
 				width, height, false, DEFAULT_ADJUST_POWER2);
 		} else {
@@ -79,7 +75,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int tex_unit,
 		final int width, final int height) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
@@ -103,7 +99,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height,
 		final boolean use_depth_buffer) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
 				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		} else {
@@ -126,7 +122,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int tex_unit,
 		final int width, final int height, final boolean use_depth_buffer) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
 				width, height,
 				use_depth_buffer, DEFAULT_ADJUST_POWER2);
@@ -151,7 +147,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
 				width, height, use_depth_buffer, adjust_power2);
 		} else {
@@ -175,7 +171,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
 				width, height, use_depth_buffer, adjust_power2);
 		} else {
@@ -197,7 +193,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
@@ -222,7 +218,7 @@ public abstract class GLSurface implements IGLSurface {
 		final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
-		if (isGLES3 && BuildCheck.isAndroid4_3()) {
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
 			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
 				width, height,
 				use_depth_buffer, DEFAULT_ADJUST_POWER2);
@@ -624,7 +620,7 @@ public abstract class GLSurface implements IGLSurface {
 			}
 			GLES20.glActiveTexture(TEX_UNIT);
 			GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
-			GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
+			android.opengl.GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
 			GLES20.glBindTexture(TEX_TARGET, 0);
 			// initialize texture matrix
 			Matrix.setIdentityM(mTexMatrix, 0);
@@ -857,7 +853,7 @@ public abstract class GLSurface implements IGLSurface {
 			}
 			GLES30.glActiveTexture(TEX_UNIT);
 			GLES30.glBindTexture(TEX_TARGET, mFBOTexId);
-			GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
+			android.opengl.GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
 			GLES30.glBindTexture(TEX_TARGET, 0);
 			// initialize texture matrix
 			Matrix.setIdentityM(mTexMatrix, 0);
