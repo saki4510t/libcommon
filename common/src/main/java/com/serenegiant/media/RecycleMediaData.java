@@ -55,6 +55,18 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	/**
 	 * コンストラクタ
 	 * @param parent 親となるIRecycleParentオブジェクト
+	 * @param order データ保持用の内部バッファのエンディアン
+	 */
+	public RecycleMediaData(@NonNull final IRecycleParent<RecycleMediaData> parent,
+		@NonNull final ByteOrder order) {
+
+		super(order);
+		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(parent);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param parent 親となるIRecycleParentオブジェクト
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 * @param order データ保持用の内部バッファのエンディアン
 	 */

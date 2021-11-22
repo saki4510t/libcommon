@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import com.serenegiant.utils.Pool;
 
+import java.nio.ByteOrder;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -48,7 +49,26 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 		public RecycleMediaData create(@NonNull final IRecycleParent<RecycleMediaData> parent,
 			@Nullable final Object... args) {
 
-			return new RecycleMediaData(parent);
+			int sz = 0;
+			ByteOrder order = null;
+			if ((args != null) && args.length > 0) {
+				for (final Object arg: args) {
+					if (arg instanceof Integer) {
+						sz = (int)arg;
+					} else if (arg instanceof ByteOrder) {
+						order = (ByteOrder)arg;
+					}
+				}
+			}
+			if ((sz > 0) && (order != null)) {
+				return new RecycleMediaData(parent, sz, order);
+			} else if (sz > 0) {
+				return new RecycleMediaData(parent, sz);
+			} else if (order != null) {
+				return new RecycleMediaData(parent, order);
+			} else {
+				return new RecycleMediaData(parent);
+			}
 		}
 	}
 
