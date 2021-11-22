@@ -30,12 +30,13 @@ import androidx.annotation.Nullable;
  * IMediaQueueのオンメモリー実装
  * LinkedBlockingQueueを使用
  */
-
 public class MemMediaQueue implements IMediaQueue {
-
+	@NonNull
 	private final LinkedBlockingQueue<IRecycleBuffer> mQueue
 		= new LinkedBlockingQueue<IRecycleBuffer>();
+	@NonNull
 	private final IRecycleBuffer.Factory mFactory;
+	@NonNull
 	private final Pool<IRecycleBuffer> mPool;
 	
 	/**
@@ -43,10 +44,10 @@ public class MemMediaQueue implements IMediaQueue {
 	 */
 	public static class DefaultFactory implements IRecycleBuffer.Factory {
 		@Override
-		public IRecycleBuffer create(@NonNull final Object parent,
-			@Nullable final Object... objects) {
+		public IRecycleBuffer create(@NonNull final IRecycleParent parent,
+			@Nullable final Object... args) {
 
-			return new RecycleMediaData((MemMediaQueue)parent);
+			return new RecycleMediaData(parent);
 		}
 	}
 	

@@ -18,22 +18,14 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 /**
- * 再利用可能バッファインターフェース
+ * IRecycleBufferの親となるオブジェクトが最低限実装すべきメソッドをしめすインターフェース
  */
-public interface IRecycleBuffer {
+public interface IRecycleParent {
 	/**
-	 * このオブジェクトをプールへ戻す
-	 * 対応していなければUnsupportedOperationExceptionを投げる。
-	 * 対応していないオブジェクトは自前でプールオブジェクトへ返さないといけない
+	 * バッファを再利用可能にする
+	 * @param buffer
+	 * @return
 	 */
-	public void recycle();
-	
-	public interface Factory {
-		public IRecycleBuffer create(
-			@NonNull final IRecycleParent parent, @Nullable final Object... args);
-	}
+	public boolean recycle(final IRecycleBuffer buffer);
 }

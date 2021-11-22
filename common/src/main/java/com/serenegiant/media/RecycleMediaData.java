@@ -28,35 +28,35 @@ import androidx.annotation.NonNull;
  * IRecycleBufferを実装したMediaData
  */
 public class RecycleMediaData extends MediaData implements IRecycleBuffer {
-	private final WeakReference<IMediaQueue> mWeakParent;
+	private final WeakReference<IRecycleParent> mWeakParent;
 
-	public RecycleMediaData(@NonNull final IMediaQueue parent) {
+	public RecycleMediaData(@NonNull final IRecycleParent parent) {
 		super();
-		mWeakParent = new WeakReference<IMediaQueue>(parent);
+		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
 	
-	public RecycleMediaData(@NonNull final IMediaQueue parent,
+	public RecycleMediaData(@NonNull final IRecycleParent parent,
 		@IntRange(from = 1L) final int size) {
 
 		super(size);
-		mWeakParent = new WeakReference<IMediaQueue>(parent);
+		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
 
-	public RecycleMediaData(@NonNull final IMediaQueue parent,
+	public RecycleMediaData(@NonNull final IRecycleParent parent,
 		final int size, @NonNull final ByteOrder order) {
 
 		super(size, order);
-		mWeakParent = new WeakReference<IMediaQueue>(parent);
+		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
 
 	public RecycleMediaData(@NonNull final RecycleMediaData src) {
 		super(src);
-		mWeakParent = new WeakReference<IMediaQueue>(src.mWeakParent.get());
+		mWeakParent = new WeakReference<IRecycleParent>(src.mWeakParent.get());
 	}
 
 	@Override
 	public void recycle() {
-		final IMediaQueue parent = mWeakParent.get();
+		final IRecycleParent parent = mWeakParent.get();
 		if (parent != null) {
 			parent.recycle(this);
 		}

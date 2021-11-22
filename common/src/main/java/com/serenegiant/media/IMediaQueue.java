@@ -25,7 +25,7 @@ import androidx.annotation.Nullable;
 /**
  * バッファリング用のFIFOバッファインターフェース
  */
-public interface IMediaQueue {
+public interface IMediaQueue extends IRecycleParent {
 	/**
 	 * キューをクリア
 	 */
@@ -75,11 +75,4 @@ public interface IMediaQueue {
 	 * キュー内の個数を取得
 	 */
 	public int count();
-	
-	/**
-	 * バッファを再利用可能にする
-	 * @param buffer
-	 * @return
-	 */
-	public boolean recycle(final IRecycleBuffer buffer);
 }
