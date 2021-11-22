@@ -30,12 +30,15 @@ import java.nio.ByteOrder;
 
 public class MediaData {
 
+	private static final int DEFAULT_BUFFER_SIZE = 1024;
+
 	@NonNull
 	private ByteOrder mByteOrder = ByteOrder.nativeOrder();
 	private int mTrackIx;
+	@Nullable
 	private ByteBuffer mBuffer;
 	private int mFlags;
-	private int mSize;
+	private int mSize = DEFAULT_BUFFER_SIZE;
 	private long mPresentationTimeUs;
 	
 	/**
@@ -48,6 +51,7 @@ public class MediaData {
 
 	/**
 	 * コンストラクタ
+	 * 内部バッファは未生成(使用時に生成)
 	 * @param order データ保持用の内部バッファのエンディアン
 	 */
 	public MediaData(@NonNull final ByteOrder order) {
@@ -218,7 +222,9 @@ public class MediaData {
 	 */
 	public void clear() {
 		mSize = mFlags = 0;
-		mBuffer.clear();
+		if (mBuffer != null) {
+			mBuffer.clear();
+		}
 	}
 	
 	/**
@@ -299,13 +305,35 @@ public class MediaData {
 	 * FIXME ByteBuffer#asReadOnlyBufferを返すように修正する
  	 * @return
 	 */
+	@NonNull
 	public ByteBuffer get() {
 		if (mBuffer != null) {
 			mBuffer.clear();
 			mBuffer.position(mSize);
 			mBuffer.flip();
+		} else {
+			resize(mSize > 0 ? mSize : DEFAULT_BUFFER_SIZE);
 		}
 		return mBuffer;
+	}
+
+	/**
+	 * 内部で保持しているByteBufferを返す
+	 * @param size
+	 * @return
+	 */
+	@NonNull
+	public ByteBuffer get(final int size) {
+		resize(size);
+		return get();
+	}
+
+	/**
+	 * 内部バッファの容量を取得
+	 * @return
+	 */
+	public int capacity() {
+		return mBuffer != null ? mBuffer.capacity() : 0;
 	}
 
 	/**
