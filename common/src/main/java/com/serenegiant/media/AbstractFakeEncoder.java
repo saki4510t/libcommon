@@ -120,10 +120,12 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	private final int MAX_POOL_SZ;
 	/**
 	 * フレームプール
+	 * FIXME MemMediaQueueかPoolを使うように変更する
 	 */
 	private final List<MediaData> mPool = new ArrayList<MediaData>();
 	/**
 	 * フレームキュー
+	 * FIXME MemMediaQueueかPoolを使うように変更する
 	 */
 	private final LinkedBlockingQueue<MediaData> mFrameQueue;
 	/**
