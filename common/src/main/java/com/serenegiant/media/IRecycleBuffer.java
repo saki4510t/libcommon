@@ -31,8 +31,18 @@ public interface IRecycleBuffer {
 	 * 対応していないオブジェクトは自前でプールオブジェクトへ返さないといけない
 	 */
 	public void recycle();
-	
+
+	/**
+	 * IRecycleBuffer生成用ファクトリーインターフェース
+	 */
 	public interface Factory {
+		/**
+		 * IRecycleBufferオブジェクトを生成する
+		 * @param parent
+		 * @param args IRecycleBufferの生成に必要なオプション引数, 省略可
+		 * @return
+		 */
+		@NonNull
 		public IRecycleBuffer create(
 			@NonNull final IRecycleParent parent, @Nullable final Object... args);
 	}

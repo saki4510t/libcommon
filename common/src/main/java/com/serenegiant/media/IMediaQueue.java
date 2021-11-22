@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -35,6 +36,7 @@ public interface IMediaQueue extends IRecycleParent {
 	 * バッファプールからIRecycleBufferを取得
 	 * @return
 	 */
+	@Nullable
 	public IRecycleBuffer obtain(@Nullable final Object... args);
 
 	/**
@@ -42,10 +44,11 @@ public interface IMediaQueue extends IRecycleParent {
 	 * @param buffer
 	 * @return
 	 */
-	public boolean queueFrame(final IRecycleBuffer buffer);
+	public boolean queueFrame(@NonNull final IRecycleBuffer buffer);
 	
 	/**
 	 * キューの先頭を取得
+	 * キューが空の時はnullを返す
 	 * @return
 	 */
 	@Nullable

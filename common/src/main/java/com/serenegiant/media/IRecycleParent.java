@@ -18,6 +18,8 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import androidx.annotation.NonNull;
+
 /**
  * IRecycleBufferの親となるオブジェクトが最低限実装すべきメソッドをしめすインターフェース
  */
@@ -25,7 +27,7 @@ public interface IRecycleParent {
 	/**
 	 * バッファを再利用可能にする
 	 * @param buffer
-	 * @return
+	 * @return true:リサイクルできたとき, false:リサイクルできなかった時(プールがの最大保持数を超えた時など)
 	 */
-	public boolean recycle(final IRecycleBuffer buffer);
+	public boolean recycle(@NonNull final IRecycleBuffer buffer);
 }

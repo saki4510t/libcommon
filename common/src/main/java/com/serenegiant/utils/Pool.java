@@ -43,9 +43,10 @@ public abstract class Pool<T> {
 	 * コンストラクタ
 	 * @param initNum
 	 * @param maxNumInPool プール内に保持できる最大数==最大生成数
+	 * @param args initを呼ぶ際のオプション引数, Tの生成に必要な値を渡す, 省略可
 	 */
-	public Pool(final int initNum, final int maxNumInPool) {
-		this(initNum, maxNumInPool, maxNumInPool);
+	public Pool(final int initNum, final int maxNumInPool, @Nullable final Object... args) {
+		this(initNum, maxNumInPool, maxNumInPool, args);
 	}
 	
 	/**
@@ -53,22 +54,25 @@ public abstract class Pool<T> {
 	 * @param initNum プール内のオブジェクトの初期数
 	 * @param maxNumInPool プール内に保持できる最大数
 	 * @param limitNum 最大生成数
+	 * @param args initを呼ぶ際のオプション引数, Tの生成に必要な値を渡す, 省略可
 	 */
-	public Pool(final int initNum, final int maxNumInPool, final int limitNum) {
+	public Pool(final int initNum, final int maxNumInPool, final int limitNum, @Nullable final Object... args) {
 		mInitNum = initNum;
 		mMaxNumInPool = Math.min(maxNumInPool, limitNum);
 		mLimitNum = limitNum;
-		init();
+		init(args);
 	}
 	
 	/**
 	 * プール内のオブジェクトを破棄して新たに初期数まで確保する
+	 * @param args オプション引数, Tの生成に必要な値を渡す, #createObjectへ引き渡される, 省略可
 	 */
-	public void init() {
-		clear();
-		for (int i = 0; (i < mInitNum) && (i < mMaxNumInPool); i++) {
-			final T obj = createObject();
-			if (obj != null) {
+	public void init(@Nullable final Object... args) {
+		synchronized (mPool) {
+			mPool.clear();
+			mCreatedObjects = 0;
+			for (int i = 0; (i < mInitNum) && (i < mMaxNumInPool); i++) {
+				final T obj = createObject(args);
 				mPool.add(obj);
 				mCreatedObjects++;
 			}
@@ -77,7 +81,7 @@ public abstract class Pool<T> {
 
 	/**
 	 * プールからオブジェクトTを取得する。もしプールが空で最大生成数を超えている場合にはnullを返す
-	 * @param args
+	 * @param args オプション引数, Tの生成に必要な値を渡す, #createObjectへ引き渡される, 省略可
 	 * @return
 	 */
 	@Nullable
@@ -89,9 +93,7 @@ public abstract class Pool<T> {
 			}
 			if ((result == null) && (mCreatedObjects < mLimitNum)) {
 				result = createObject(args);
-				if (result != null) {
-					mCreatedObjects++;
-				}
+				mCreatedObjects++;
 			}
 		}
 		return result;
@@ -99,22 +101,24 @@ public abstract class Pool<T> {
 	
 	/**
 	 * オブジェクトTを生成する
-	 * @param args
+	 * @param args オプション引数, Tの生成に必要な値を渡す, 省略可
 	 * @return
 	 */
-	@Nullable
+	@NonNull
 	protected abstract T createObject(@Nullable final Object... args);
 	
 	/**
 	 * 使用済みオブジェクトをプールに返却する
 	 * @param obj
+	 * @return true: プールに返却できた, false: プールに返却できなかった(最大保持数より多くなってしまった)
 	 */
-	public void recycle(@NonNull final T obj) {
+	public boolean recycle(@NonNull final T obj) {
 		synchronized (mPool) {
 			if (mPool.size() < mMaxNumInPool) {
-				mPool.add(obj);
+				return mPool.add(obj);
 			} else {
 				mCreatedObjects--;
+				return false;
 			}
 		}
 	}

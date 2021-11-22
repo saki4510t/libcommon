@@ -43,6 +43,7 @@ public class MemMediaQueue implements IMediaQueue {
 	 * MemMediaQueue用のデフォルトファクトリークラス
 	 */
 	public static class DefaultFactory implements IRecycleBuffer.Factory {
+		@NonNull
 		@Override
 		public IRecycleBuffer create(@NonNull final IRecycleParent parent,
 			@Nullable final Object... args) {
@@ -50,27 +51,29 @@ public class MemMediaQueue implements IMediaQueue {
 			return new RecycleMediaData(parent);
 		}
 	}
-	
+
+	/**
+	 * コンストラクタ
+	 * DefaultFactoryをファクトリーとして使う
+ 	 * @param initNum
+	 * @param maxNumInPool
+	 */
 	public MemMediaQueue(final int initNum, final int maxNumInPool) {
-
-		mFactory = new DefaultFactory();
-		mPool = new Pool<IRecycleBuffer>(initNum, maxNumInPool) {
-			@Nullable
-			@Override
-			protected IRecycleBuffer createObject(
-				@Nullable final Object... args) {
-
-				return mFactory.create(MemMediaQueue.this, args);
-			}
-		};
+		this(initNum, maxNumInPool, null);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param initNum
+	 * @param maxNumInPool
+	 * @param factory
+	 */
 	public MemMediaQueue(final int initNum, final int maxNumInPool,
-		@NonNull final IRecycleBuffer.Factory factory) {
+		@Nullable final IRecycleBuffer.Factory factory) {
 
-		mFactory = factory;
+		mFactory = factory != null ? factory : new DefaultFactory();
 		mPool = new Pool<IRecycleBuffer>(initNum, maxNumInPool) {
-			@Nullable
+			@NonNull
 			@Override
 			protected IRecycleBuffer createObject(
 				@Nullable final Object... args) {
@@ -92,7 +95,7 @@ public class MemMediaQueue implements IMediaQueue {
 	}
 	
 	@Override
-	public boolean queueFrame(final IRecycleBuffer buffer) {
+	public boolean queueFrame(@NonNull final IRecycleBuffer buffer) {
 		return mQueue.offer(buffer);
 	}
 	
@@ -123,8 +126,7 @@ public class MemMediaQueue implements IMediaQueue {
 	
 	@Override
 	public boolean recycle(@NonNull final IRecycleBuffer buffer) {
-		mPool.recycle(buffer);
-		return true;
+		return mPool.recycle(buffer);
 	}
 
 }
