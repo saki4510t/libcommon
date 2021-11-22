@@ -8,6 +8,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.databinding.DataBindingUtil;
+import androidx.fragment.app.Fragment;
 
 import android.provider.Settings;
 import android.view.LayoutInflater;
@@ -20,7 +21,7 @@ import com.serenegiant.libcommon.databinding.FragmentSettingsLinkBinding;
  * ユーザーがアプリに権限付与をしなかったために機能を実行できない時に
  * 端末のアプリ設定画面への繊維ボタンを表示するFragment
  */
-public class SettingsLinkFragment extends BaseFragment {
+public class SettingsLinkFragment extends Fragment {
 
 	private FragmentSettingsLinkBinding mBinding;
 
