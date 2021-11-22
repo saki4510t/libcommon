@@ -38,6 +38,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
+/**
+ * Encoderを使って録音録画するためのヘルパー用Recorder実装
+ */
 @SuppressLint("NewApi")
 public class MediaAVRecorder extends Recorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること

@@ -31,6 +31,9 @@ import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.NonNull;
 
+/**
+ * 映像をMediaCodecでエンコードするためのクラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractVideoEncoder extends AbstractEncoder
 	implements IVideoEncoder {

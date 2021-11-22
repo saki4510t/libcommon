@@ -33,6 +33,9 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * 録音録画用ヘルパークラスの基本部分
+ */
 public abstract class Recorder implements IRecorder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = Recorder.class.getSimpleName();
@@ -490,13 +493,11 @@ public abstract class Recorder implements IRecorder {
 
 	protected void callOnError(final Exception e) {
 //		if (DEBUG) Log.v(TAG, "callOnError:");
-		if (!mReleased) {
-			if (mCallback != null) {
-				try {
-					mCallback.onError(e);
-				} catch (final Exception e1) {
-					Log.e(TAG, "onError:", e);
-				}
+		if (!mReleased && (mCallback != null)) {
+			try {
+				mCallback.onError(e);
+			} catch (final Exception e1) {
+				Log.e(TAG, "onError:", e);
 			}
 		}
 	}

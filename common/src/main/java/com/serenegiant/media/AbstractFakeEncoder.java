@@ -39,6 +39,9 @@ import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * すでにエンコード済みのデータを受け取ってMediaCodecでエンコードしたように扱えるようにするためのヘルパークラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public abstract class AbstractFakeEncoder implements Encoder {
 

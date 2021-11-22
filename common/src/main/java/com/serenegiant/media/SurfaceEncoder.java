@@ -25,6 +25,9 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.view.Surface;
 
+/**
+ * 映像をSurfaceで受け取ってMediaCodecでエンコードするクラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
