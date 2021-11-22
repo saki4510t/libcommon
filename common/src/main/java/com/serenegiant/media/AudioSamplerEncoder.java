@@ -23,6 +23,8 @@ import java.nio.ByteOrder;
 
 import android.media.MediaRecorder;
 
+import androidx.annotation.NonNull;
+
 /**
  * AudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
  */
@@ -86,7 +88,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		= new AudioSampler.SoundSamplerCallback() {
 
 		@Override
-		public void onData(final ByteBuffer buffer, final int size, final long presentationTimeUs) {
+		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
     		synchronized (mSync) {
     			// 既に終了しているか終了指示が出てれば何もしない
         		if (!mIsCapturing || mRequestStop || mIsEOS) return;

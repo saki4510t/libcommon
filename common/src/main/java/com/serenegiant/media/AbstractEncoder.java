@@ -35,6 +35,10 @@ import androidx.annotation.NonNull;
 
 import static com.serenegiant.utils.BufferHelper.*;
 
+/**
+ * MediaCodecを使ったエンコーダーの基本クラス
+ * FIXME MediaReaperを使うように変更する
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractEncoder implements Encoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること

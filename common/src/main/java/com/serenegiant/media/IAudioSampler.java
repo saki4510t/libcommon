@@ -117,7 +117,7 @@ public abstract class IAudioSampler {
 		 * @param size
 		 * @param presentationTimeUs
 		 */
-		public void onData(ByteBuffer buffer, int size, long presentationTimeUs);
+		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs);
 		/**
 		 * エラーが起こった時の処理(今は未使用)
 		 * @param e

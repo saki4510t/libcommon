@@ -38,6 +38,9 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+/**
+ * MediaCodecのエンコーダーからエンコード済みデータを非同期で引き出してmuxer等へ引き渡すためのヘルパークラス
+ */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaReaper implements Runnable {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
@@ -54,6 +57,9 @@ public abstract class MediaReaper implements Runnable {
 
 	public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
 
+	/**
+	 * MediaReaperからのイベント通知用コールバックリスーなー
+	 */
 	public interface ReaperListener {
 		public void writeSampleData(@NonNull final MediaReaper reaper,
 			final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
@@ -63,6 +69,9 @@ public abstract class MediaReaper implements Runnable {
 		public void onError(@NonNull final MediaReaper reaper, final Exception e);
 	}
 
+	/**
+	 * 映像エンコーダー用MediaReaper実装(h.264/AVC)
+	 */
 	public static class VideoReaper extends MediaReaper {
 		public static final String MIME_AVC = "video/avc";
 		private final int mWidth;
@@ -77,7 +86,8 @@ public abstract class MediaReaper implements Runnable {
 		}
 
 		@Override
-		protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+		protected MediaFormat createOutputFormat(
+			@NonNull final byte[] csd, final int size,
 			final int ix0, final int ix1, final int ix2) {
 			
 			if (DEBUG) Log.v(TAG, "VideoReaper#createOutputFormat");
@@ -104,6 +114,9 @@ public abstract class MediaReaper implements Runnable {
 		}
 	}
 
+	/**
+	 * 音声エンコーダー用MediaReaper実装(mp4a)
+	 */
 	public static class AudioReaper extends MediaReaper {
 		private static final String MIME_TYPE = "audio/mp4a-latm";
 		
@@ -119,7 +132,8 @@ public abstract class MediaReaper implements Runnable {
 		}
 		
 		@Override
-		protected MediaFormat createOutputFormat(final byte[] csd, final int size,
+		protected MediaFormat createOutputFormat(
+			@NonNull final byte[] csd, final int size,
 			final int ix0, final int ix1, final int ix2) {
 
 			MediaFormat outFormat;
@@ -135,15 +149,19 @@ public abstract class MediaReaper implements Runnable {
 	        return outFormat;
 		}
 	}
-	
+
+	@NonNull
 	private final Object mSync = new Object();
+	@NonNull
 	private final WeakReference<MediaCodec> mWeakEncoder;
+	@NonNull
 	private final ReaperListener mListener;
 	@ReaperType
 	private final int mReaperType;
 	/**
 	 * エンコード用バッファ
 	 */
+	@NonNull
 	private final MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
 	private volatile boolean mIsRunning;
 	private volatile boolean mRecorderStarted;
@@ -509,7 +527,8 @@ LOOP:	for ( ; mIsRunning ; ) {
 		return createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
 	}
 
-	protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
+	protected abstract MediaFormat createOutputFormat(
+		@NonNull final byte[] csd, final int size,
 		final int ix0, final int ix1, final int ix2);
 
 	private boolean callOnFormatChanged(final MediaFormat format) {

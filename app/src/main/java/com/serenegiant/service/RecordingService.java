@@ -1097,7 +1097,7 @@ public class RecordingService extends BaseService {
 		= new AudioSampler.SoundSamplerCallback() {
 
 		@Override
-		public void onData(final ByteBuffer buffer, final int size, final long presentationTimeUs) {
+		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
 			encodeAudio(buffer, size, presentationTimeUs);
 		}
 
