@@ -334,8 +334,9 @@ cameraLoop:
 			if (DEBUG) Log.w(TAG, e);
 		}
 		// ここまで見つからなければMediaCodec用の最大解像度を使う・・・1080p以下に制限した方が良いかもしれない
-		if (selectedSize == null)
+		if (selectedSize == null) {
 			selectedSize = ppsfv;
+		}
 		Log.d(TAG, "chooseOptimalSize:select(" + selectedSize + ")");
 		return selectedSize;
 	}

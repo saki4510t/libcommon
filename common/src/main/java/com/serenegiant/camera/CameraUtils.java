@@ -87,7 +87,7 @@ public class CameraUtils implements CameraConst {
 	public static Camera setupCamera(@NonNull final Context context,
 		 final int face, final int width, final int height) throws IOException {
 
-		final int cameraId = CameraUtils.findCamera(CameraConst.FACING_BACK);
+		final int cameraId = findCamera(CameraConst.FACING_BACK);
 		final Camera camera = Camera.open(cameraId);
 		final Camera.Parameters params = camera.getParameters();
 		if (params != null) {
@@ -102,9 +102,9 @@ public class CameraUtils implements CameraConst {
 				if (DEBUG) Log.i(TAG, "handleStartPreview:Camera does not support autofocus");
 			}
 			params.setRecordingHint(true);
-			CameraUtils.chooseVideoSize(params, width, height);
-			final int[] fps = CameraUtils.chooseFps(params, 1.0f, 120.0f);
-			CameraUtils.setupRotation(context, cameraId, camera, params);
+			chooseVideoSize(params, width, height);
+			final int[] fps = chooseFps(params, 1.0f, 120.0f);
+			setupRotation(context, cameraId, camera, params);
 			camera.setParameters(params);
 			// get the actual preview size
 			final Camera.Size previewSize = camera.getParameters().getPreviewSize();
@@ -366,7 +366,8 @@ cameraLoop:
 	}
 
 	/**
-	 * Cameraにプレビュー用Surface/SurfaseTexture/SurfaceHolder/SurfaceViewをセットする
+	 * Cameraにプレビュー用Surface/SurfaceTexture/SurfaceHolder/SurfaceViewをセットする
+	 * SurfaceはWrappedSurfaceHolderでラップして引き渡す
 	 * @param camera
 	 * @param surface
 	 * @throws IllegalArgumentException
@@ -384,15 +385,51 @@ cameraLoop:
 			camera.setPreviewDisplay(new WrappedSurfaceHolder((Surface) surface));
 		} else if (surface instanceof SurfaceView) {
 			camera.setPreviewDisplay(((SurfaceView) surface).getHolder());
+		} else {
+			throw new IllegalArgumentException("Unknown surface type," + surface);
 		}
 	}
 
 	/**
-	 * 対応する映像フォーマットをlogCatへ出力する
+	 * 対応する静止画フォーマットをlogCatへ出力する
 	 * @param params
 	 */
 	public static void dumpSupportedPictureFormats(@NonNull final Camera.Parameters params) {
 		final List<Integer> formats = params.getSupportedPictureFormats();
+		for (final int format: formats) {
+			switch (format) {
+			case ImageFormat.DEPTH16:			Log.i(TAG, "supported: DEPTH16"); break;
+			case ImageFormat.DEPTH_POINT_CLOUD:	Log.i(TAG, "supported: DEPTH_POINT_CLOUD"); break;
+			case ImageFormat.FLEX_RGBA_8888:	Log.i(TAG, "supported: FLEX_RGBA_8888"); break;
+			case ImageFormat.FLEX_RGB_888:		Log.i(TAG, "supported: FLEX_RGB_888"); break;
+			case ImageFormat.JPEG:				Log.i(TAG, "supported: JPEG"); break;
+			case ImageFormat.NV16:				Log.i(TAG, "supported: NV16"); break;
+			case ImageFormat.NV21:				Log.i(TAG, "supported: NV21"); break;
+			case ImageFormat.PRIVATE:			Log.i(TAG, "supported: PRIVATE"); break;
+			case ImageFormat.RAW10:				Log.i(TAG, "supported: RAW10"); break;
+			case ImageFormat.RAW12:				Log.i(TAG, "supported: RAW12"); break;
+			case ImageFormat.RAW_PRIVATE:		Log.i(TAG, "supported: RAW_PRIVATE"); break;
+			case ImageFormat.RAW_SENSOR:		Log.i(TAG, "supported: RAW_SENSOR"); break;
+			case ImageFormat.RGB_565:			Log.i(TAG, "supported: RGB_565"); break;
+			case ImageFormat.UNKNOWN:			Log.i(TAG, "supported: UNKNOWN"); break;
+			case ImageFormat.YUV_420_888:		Log.i(TAG, "supported: YUV_420_888"); break;
+			case ImageFormat.YUV_422_888:		Log.i(TAG, "supported: YUV_422_888"); break;
+			case ImageFormat.YUV_444_888:		Log.i(TAG, "supported: YUV_444_888"); break;
+			case ImageFormat.YUY2:				Log.i(TAG, "supported: YUY2"); break;
+			case ImageFormat.YV12:				Log.i(TAG, "supported: YV12"); break;
+			default:
+				Log.i(TAG, String.format("supported: unknown, %08x", format));
+				break;
+			}
+		}
+	}
+
+	/**
+	 * 対応しているプレビュー映像フォーマットをlogCatへ出力する
+	 * @param params
+	 */
+	public static void dumpSupportedPreviewFormats(@NonNull final Camera.Parameters params) {
+		final List<Integer> formats = params.getSupportedPreviewFormats();
 		for (final int format: formats) {
 			switch (format) {
 			case ImageFormat.DEPTH16:			Log.i(TAG, "supported: DEPTH16"); break;

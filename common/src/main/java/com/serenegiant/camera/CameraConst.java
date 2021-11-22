@@ -97,6 +97,7 @@ public interface CameraConst {
 			id = String.format(Locale.US, "FACE_%d", face);
 		}
 
+		@NonNull
 		@Override
 		public String toString() {
 			return String.format(Locale.US,
