@@ -20,7 +20,6 @@ package com.serenegiant.media;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.media.AudioFormat;
@@ -35,8 +34,8 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AudioEncoderBuffered.class.getSimpleName();
 
-	private final int MAX_POOL_SIZE = 100;
-	private final int MAX_QUEUE_SIZE = 100;
+	private static final int MAX_POOL_SIZE = 100;
+	private static final int MAX_QUEUE_SIZE = 100;
 
 	private AudioThread mAudioThread = null;
 	private DequeueThread mDequeueThread = null;
@@ -44,8 +43,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	 * キューに入れる音声データのバッファサイズ
 	 */
 	protected int mBufferSize = SAMPLES_PER_FRAME;
-	protected final LinkedBlockingQueue<MediaData> mPool = new LinkedBlockingQueue<MediaData>(MAX_POOL_SIZE);
-	protected final LinkedBlockingQueue<MediaData> mAudioQueue = new LinkedBlockingQueue<MediaData>(MAX_QUEUE_SIZE);
+	private final MemMediaQueue mAudioQueue;
 
 	public AudioEncoderBuffered(final IRecorder recorder, final EncoderListener listener,
 								final int audio_source, final int audio_channels) {
@@ -54,6 +52,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		if (audio_source < MediaRecorder.AudioSource.DEFAULT
 			|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
 			throw new IllegalArgumentException("invalid audio source:" + audio_source);
+		mAudioQueue = new MemMediaQueue(MAX_POOL_SIZE, MAX_POOL_SIZE, MAX_QUEUE_SIZE);
 	}
 
 	@Override
@@ -75,26 +74,8 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		super.stop();
 	}
 
-	private int mBufferNum = 0;
-	private MediaData obtain() {
-		MediaData result = null;
-		try {
-			result = mPool.poll(20, TimeUnit.MILLISECONDS);
-		} catch (final InterruptedException e) {
-			// ignore
-		}
-		if ((result == null) && (mBufferNum < MAX_POOL_SIZE) ) {
-			result = new MediaData(mBufferSize);
-			mBufferNum++;
-		}
-		if (result != null) {
-			result.clear();
-		}
-		return result;
-	}
-
-	protected void recycle(final MediaData data) {
-		mPool.offer(data);
+	private RecycleMediaData obtain() {
+		return mAudioQueue.obtain(mBufferSize);
 	}
 
 	/**
@@ -128,7 +109,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		                ByteBuffer buffer;
 		                audioRecord.startRecording();
 		                try {
-		                	MediaData data;
+		                	RecycleMediaData data;
 		                	for ( ; ; ) {
 		                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
 		                		data = obtain();
@@ -148,11 +129,11 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 										.size(readBytes);
 									buffer.position(readBytes);
 									buffer.flip();
-									mAudioQueue.offer(data);
+									mAudioQueue.queueFrame(data);
 									continue;
 								} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
 									err_count = 0;
-									recycle(data);
+									data.recycle();
 									continue;
 								} else if (readBytes == AudioRecord.ERROR) {
 									if (err_count == 0) {
@@ -168,7 +149,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 									}
 								} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
 									Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
-									recycle(data);
+									data.recycle();
 									// FIXME AudioRecordを再生成しないといけない
 									break;
 								} else if (readBytes < 0) {
@@ -177,7 +158,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 									}
 								}
 								err_count++;
-								recycle(data);
+								data.recycle();
 				    			if (err_count > 10) {
 				    				break;
 								}
@@ -208,7 +189,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 
     	@Override
     	public final void run() {
-			MediaData data;
+			RecycleMediaData data;
 			int frame_count = 0;
     		for (; ;) {
         		synchronized (mSync) {
@@ -225,7 +206,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
     					frameAvailableSoon();
     					frame_count++;
     				}
-    				recycle(data);
+					data.recycle();
     			}
     		} // for
 			if (frame_count == 0) {
