@@ -30,23 +30,23 @@ import androidx.annotation.Nullable;
  * IMediaQueueのオンメモリー実装
  * LinkedBlockingQueueを使用
  */
-public class MemMediaQueue implements IMediaQueue {
+public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	@NonNull
-	private final LinkedBlockingQueue<IRecycleBuffer> mQueue
-		= new LinkedBlockingQueue<IRecycleBuffer>();
+	private final LinkedBlockingQueue<RecycleMediaData> mQueue
+		= new LinkedBlockingQueue<RecycleMediaData>();
 	@NonNull
-	private final IRecycleBuffer.Factory mFactory;
+	private final IRecycleBuffer.Factory<RecycleMediaData> mFactory;
 	@NonNull
-	private final Pool<IRecycleBuffer> mPool;
+	private final Pool<RecycleMediaData> mPool;
 	
 	/**
 	 * MemMediaQueue用のデフォルトファクトリークラス
 	 *　RecycleMediaDataを生成する
 	 */
-	public static class DefaultFactory implements IRecycleBuffer.Factory {
+	public static class DefaultFactory implements IRecycleBuffer.Factory<RecycleMediaData> {
 		@NonNull
 		@Override
-		public IRecycleBuffer create(@NonNull final IRecycleParent parent,
+		public RecycleMediaData create(@NonNull final IRecycleParent<RecycleMediaData> parent,
 			@Nullable final Object... args) {
 
 			return new RecycleMediaData(parent);
@@ -70,20 +70,25 @@ public class MemMediaQueue implements IMediaQueue {
 	 * @param factory
 	 */
 	public MemMediaQueue(final int initNum, final int maxNumInPool,
-		@Nullable final IRecycleBuffer.Factory factory) {
+		@Nullable final IRecycleBuffer.Factory<RecycleMediaData> factory) {
 
 		mFactory = factory != null ? factory : new DefaultFactory();
-		mPool = new Pool<IRecycleBuffer>(initNum, maxNumInPool) {
+		mPool = new Pool<RecycleMediaData>(initNum, maxNumInPool) {
 			@NonNull
 			@Override
-			protected IRecycleBuffer createObject(
+			protected RecycleMediaData createObject(
 				@Nullable final Object... args) {
 
 				return mFactory.create(MemMediaQueue.this, args);
 			}
 		};
 	}
-	
+
+	public void init(@Nullable final Object... args) {
+		clear();
+		mPool.init(args);
+	}
+
 	@Override
 	public void clear() {
 		mQueue.clear();
@@ -91,30 +96,30 @@ public class MemMediaQueue implements IMediaQueue {
 	}
 	
 	@Override
-	public IRecycleBuffer obtain(@Nullable final Object... args) {
+	public RecycleMediaData obtain(@Nullable final Object... args) {
 		return mPool.obtain(args);
 	}
 	
 	@Override
-	public boolean queueFrame(@NonNull final IRecycleBuffer buffer) {
+	public boolean queueFrame(@NonNull final RecycleMediaData buffer) {
 		return mQueue.offer(buffer);
 	}
 	
 	@Override
 	@Nullable
-	public IRecycleBuffer peek() {
+	public RecycleMediaData peek() {
 		return mQueue.peek();
 	}
 	
 	@Override
 	@Nullable
-	public IRecycleBuffer poll() {
+	public RecycleMediaData poll() {
 		return mQueue.poll();
 	}
 	
 	@Override
 	@Nullable
-	public IRecycleBuffer poll(final long timeout, final TimeUnit unit)
+	public RecycleMediaData poll(final long timeout, final TimeUnit unit)
 		throws InterruptedException {
 
 		return mQueue.poll(timeout, unit);
@@ -126,7 +131,7 @@ public class MemMediaQueue implements IMediaQueue {
 	}
 	
 	@Override
-	public boolean recycle(@NonNull final IRecycleBuffer buffer) {
+	public boolean recycle(@NonNull final RecycleMediaData buffer) {
 		return mPool.recycle(buffer);
 	}
 

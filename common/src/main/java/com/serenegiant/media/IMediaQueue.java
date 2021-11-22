@@ -26,7 +26,13 @@ import androidx.annotation.Nullable;
 /**
  * バッファリング用のFIFOバッファインターフェース
  */
-public interface IMediaQueue extends IRecycleParent {
+public interface IMediaQueue<T extends IRecycleBuffer> extends IRecycleParent<T> {
+	/**
+	 * キューを初期化
+	 * @param args
+	 */
+	public void init(@Nullable final Object... args);
+
 	/**
 	 * キューをクリア
 	 */
@@ -37,14 +43,14 @@ public interface IMediaQueue extends IRecycleParent {
 	 * @return
 	 */
 	@Nullable
-	public IRecycleBuffer obtain(@Nullable final Object... args);
+	public T obtain(@Nullable final Object... args);
 
 	/**
 	 * キューに追加
 	 * @param buffer
 	 * @return
 	 */
-	public boolean queueFrame(@NonNull final IRecycleBuffer buffer);
+	public boolean queueFrame(@NonNull final T buffer);
 	
 	/**
 	 * キューの先頭を取得
@@ -52,7 +58,7 @@ public interface IMediaQueue extends IRecycleParent {
 	 * @return
 	 */
 	@Nullable
-	public IRecycleBuffer peek();
+	public T peek();
 	
 	/**
 	 * キューの先頭を除去して返す
@@ -60,7 +66,7 @@ public interface IMediaQueue extends IRecycleParent {
 	 * @return
 	 */
 	@Nullable
-	public IRecycleBuffer poll();
+	public T poll();
 	
 	/**
 	 * キューの先頭を除去して返す
@@ -71,7 +77,7 @@ public interface IMediaQueue extends IRecycleParent {
 	 * @throws InterruptedException
 	 */
 	@Nullable
-	public IRecycleBuffer poll(final long timeout, final TimeUnit unit)
+	public T poll(final long timeout, final TimeUnit unit)
 		throws InterruptedException;
 
 	/**

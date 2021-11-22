@@ -23,11 +23,11 @@ import androidx.annotation.NonNull;
 /**
  * IRecycleBufferの親となるオブジェクトが最低限実装すべきメソッドをしめすインターフェース
  */
-public interface IRecycleParent {
+public interface IRecycleParent<T extends IRecycleBuffer> {
 	/**
 	 * バッファを再利用可能にする
 	 * @param buffer
 	 * @return true:リサイクルできたとき, false:リサイクルできなかった時(プールがの最大保持数を超えた時など)
 	 */
-	public boolean recycle(@NonNull final IRecycleBuffer buffer);
+	public boolean recycle(@NonNull final T buffer);
 }

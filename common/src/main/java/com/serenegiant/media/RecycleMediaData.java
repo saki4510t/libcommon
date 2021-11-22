@@ -29,15 +29,15 @@ import androidx.annotation.NonNull;
  */
 public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	@NonNull
-	private final WeakReference<IRecycleParent> mWeakParent;
+	private final WeakReference<IRecycleParent<RecycleMediaData>> mWeakParent;
 
 	/**
 	 * コンストラクタ
 	 * @param parent 親となるIRecycleParentオブジェクト
 	 */
-	public RecycleMediaData(@NonNull final IRecycleParent parent) {
+	public RecycleMediaData(@NonNull final IRecycleParent<RecycleMediaData> parent) {
 		super();
-		mWeakParent = new WeakReference<IRecycleParent>(parent);
+		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(parent);
 	}
 
 	/**
@@ -45,11 +45,11 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	 * @param parent 親となるIRecycleParentオブジェクト
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 */
-	public RecycleMediaData(@NonNull final IRecycleParent parent,
+	public RecycleMediaData(@NonNull final IRecycleParent<RecycleMediaData> parent,
 		@IntRange(from = 1L) final int size) {
 
 		super(size);
-		mWeakParent = new WeakReference<IRecycleParent>(parent);
+		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(parent);
 	}
 
 	/**
@@ -58,11 +58,11 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 * @param order データ保持用の内部バッファのエンディアン
 	 */
-	public RecycleMediaData(@NonNull final IRecycleParent parent,
+	public RecycleMediaData(@NonNull final IRecycleParent<RecycleMediaData> parent,
 		final int size, @NonNull final ByteOrder order) {
 
 		super(size, order);
-		mWeakParent = new WeakReference<IRecycleParent>(parent);
+		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(parent);
 	}
 
 	/**
@@ -71,12 +71,12 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	 */
 	public RecycleMediaData(@NonNull final RecycleMediaData src) {
 		super(src);
-		mWeakParent = new WeakReference<IRecycleParent>(src.mWeakParent.get());
+		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(src.mWeakParent.get());
 	}
 
 	@Override
 	public void recycle() {
-		final IRecycleParent parent = mWeakParent.get();
+		final IRecycleParent<RecycleMediaData> parent = mWeakParent.get();
 		if (parent != null) {
 			parent.recycle(this);
 		}

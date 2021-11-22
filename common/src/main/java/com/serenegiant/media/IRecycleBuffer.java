@@ -35,7 +35,7 @@ public interface IRecycleBuffer {
 	/**
 	 * IRecycleBuffer生成用ファクトリーインターフェース
 	 */
-	public interface Factory {
+	public interface Factory<T extends IRecycleBuffer> {
 		/**
 		 * IRecycleBufferオブジェクトを生成する
 		 * @param parent
@@ -43,7 +43,7 @@ public interface IRecycleBuffer {
 		 * @return
 		 */
 		@NonNull
-		public IRecycleBuffer create(
-			@NonNull final IRecycleParent parent, @Nullable final Object... args);
+		public T create(
+			@NonNull final IRecycleParent<T> parent, @Nullable final Object... args);
 	}
 }
