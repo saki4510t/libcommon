@@ -140,8 +140,11 @@ public abstract class IAudioSampler {
 
 	// コールバック用
 	private CallbackThread mCallbackThread;
+	@NonNull
 	private final Object mCallbackSync = new Object();
-	private final Set<SoundSamplerCallback> mCallbacks = new CopyOnWriteArraySet<SoundSamplerCallback>();
+	@NonNull
+	private final Set<SoundSamplerCallback> mCallbacks
+		= new CopyOnWriteArraySet<SoundSamplerCallback>();
 	protected volatile boolean mIsCapturing;
 
 	public IAudioSampler() {
@@ -214,7 +217,7 @@ public abstract class IAudioSampler {
 	 */
 	public void removeCallback(final SoundSamplerCallback callback) {
 		if (callback != null) {
-			for (; mCallbacks.remove(callback); );
+			mCallbacks.remove(callback);
 		}
 	}
 
@@ -260,6 +263,7 @@ public abstract class IAudioSampler {
 	 * @param data
 	 */
 	private void callOnData(@NonNull final MediaData data) {
+		@NonNull
 		final ByteBuffer buf = data.get();
 		final int size = data.size();
 		final long pts = data.presentationTimeUs();
