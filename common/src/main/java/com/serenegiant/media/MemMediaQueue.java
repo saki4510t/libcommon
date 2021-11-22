@@ -32,8 +32,7 @@ import androidx.annotation.Nullable;
  */
 public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	@NonNull
-	private final LinkedBlockingQueue<RecycleMediaData> mQueue
-		= new LinkedBlockingQueue<RecycleMediaData>();
+	private final LinkedBlockingQueue<RecycleMediaData> mQueue;
 	@NonNull
 	private final IRecycleBuffer.Factory<RecycleMediaData> mFactory;
 	@NonNull
@@ -60,18 +59,31 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	 * @param maxNumInPool
 	 */
 	public MemMediaQueue(final int initNum, final int maxNumInPool) {
-		this(initNum, maxNumInPool, null);
+		this(initNum, maxNumInPool, maxNumInPool, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * DefaultFactoryをファクトリーとして使う
+ 	 * @param initNum
+	 * @param maxNumInPool
+	 * @param maxQueueSz
+	 */
+	public MemMediaQueue(final int initNum, final int maxNumInPool, final int maxQueueSz) {
+		this(initNum, maxNumInPool, maxQueueSz, null);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param initNum
 	 * @param maxNumInPool
+	 * @param maxQueueSz
 	 * @param factory
 	 */
-	public MemMediaQueue(final int initNum, final int maxNumInPool,
+	public MemMediaQueue(final int initNum, final int maxNumInPool, final int maxQueueSz,
 		@Nullable final IRecycleBuffer.Factory<RecycleMediaData> factory) {
 
+		mQueue = new LinkedBlockingQueue<RecycleMediaData>(maxQueueSz);
 		mFactory = factory != null ? factory : new DefaultFactory();
 		mPool = new Pool<RecycleMediaData>(initNum, maxNumInPool) {
 			@NonNull
@@ -94,12 +106,23 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 		mQueue.clear();
 		mPool.clear();
 	}
-	
+
+	/**
+	 * プールからデータ保持用オブジェクトを取得する
+	 * @param args
+	 * @return
+	 */
+	@Nullable
 	@Override
 	public RecycleMediaData obtain(@Nullable final Object... args) {
 		return mPool.obtain(args);
 	}
-	
+
+	/**
+	 * キューにデータを追加する
+	 * @param buffer
+	 * @return true: 正常にキューに追加できた
+	 */
 	@Override
 	public boolean queueFrame(@NonNull final RecycleMediaData buffer) {
 		return mQueue.offer(buffer);
