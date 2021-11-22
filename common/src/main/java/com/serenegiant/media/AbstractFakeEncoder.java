@@ -34,9 +34,6 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.Time;
 
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -115,19 +112,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	private final int FRAME_SZ;
 	/**
-	 * プールサイズ
-	 */
-	private final int MAX_POOL_SZ;
-	/**
-	 * フレームプール
-	 * FIXME MemMediaQueueかPoolを使うように変更する
-	 */
-	private final List<MediaData> mPool = new ArrayList<MediaData>();
-	/**
 	 * フレームキュー
-	 * FIXME MemMediaQueueかPoolを使うように変更する
 	 */
-	private final LinkedBlockingQueue<MediaData> mFrameQueue;
+	private final MemMediaQueue mFrameQueue;
 	/**
 	 * フレーム情報(ワーク用)
 	 */
@@ -176,10 +163,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		
 		MIME_TYPE = mimeType;
 		FRAME_SZ = frameSz;
-		MAX_POOL_SZ = maxPoolSz;
 		mRecorder = recorder;
 		mListener = listener;
-		mFrameQueue = new LinkedBlockingQueue<MediaData>(maxQueueSz);
+		mFrameQueue = new MemMediaQueue(Math.min(maxPoolSz, 2), maxPoolSz, maxQueueSz);
 		
 		recorder.addEncoder(this);
 	}
@@ -207,6 +193,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * 出力ファイルのパスを返す
 	 * @return
 	 */
+	@SuppressWarnings("deprecation")
 	@Deprecated
 	@Override
 	public String getOutputPath() {
@@ -242,7 +229,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
     	// ・・・らしいので空バッファを送る。
-    	final MediaData frame = obtain(0);
+    	final RecycleMediaData frame = obtain(0);
     	frame.set(null, 0, 0, getInputPTSUs(), MediaCodec.BUFFER_FLAG_END_OF_STREAM);
     	offer(frame);
 	}
@@ -278,7 +265,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			throw new IllegalStateException();
 		}
 		if (mRequestStop) return false;
-		final MediaData frame = obtain(size);
+		final RecycleMediaData frame = obtain(size);
 		frame.set(buffer, offset, size, presentationTimeUs, flags);
 		return offer(frame);
 	}
@@ -293,7 +280,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @throws Exception
 	 */
 	@Override
-	public void prepare() throws Exception {
+	public void prepare() {
 //		if (DEBUG) Log.v(TAG, "prepare:");
 		mTrackIndex = -1;
 		mRecorderStarted = false;
@@ -394,13 +381,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	protected void initPool() {
 //		if (DEBUG) Log.v(TAG, "initPool:");
-		mFrameQueue.clear();
-		synchronized (mPool) {
-			mPool.clear();
-			for (int i = 0; i < MAX_POOL_SZ; i++) {
-				mPool.add(new MediaData(FRAME_SZ));
-			}
-		}
+		mFrameQueue.init(FRAME_SZ);
 	}
 	
 	/**
@@ -408,56 +389,24 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 */
 	protected void clearFrames() {
 //		if (DEBUG) Log.v(TAG, "clearFrames:");
-		synchronized (mPool) {
-			mPool.clear();
-		}
 		mFrameQueue.clear();
-		cnt = 0;
 	}
-	
-	/**
-	 * 生成したフレームの数
-	 */
-	private int cnt = 0;
 	
 	/**
 	 * フレームプールからフレームを取得する
 	 * @param newSize
 	 * @return
 	 */
-	protected MediaData obtain(final int newSize) {
-		MediaData result;
-		synchronized (mPool) {
-			if (mPool.isEmpty()) {
-				cnt++;
-//				if (DEBUG) Log.v(TAG, "obtain:create new FrameData, total=" + cnt);
-				result = new MediaData(FRAME_SZ);
-			} else {
-				result = mPool.remove(mPool.size() - 1);
-				result.resize(newSize);
-			}
-		}
-		return result;
+	protected RecycleMediaData obtain(final int newSize) {
+		return mFrameQueue.obtain(newSize);
 	}
 	
 	/**
 	 * フレームキューにフレームデータを追加する
 	 * @param frame
 	 */
-	protected boolean offer(@NonNull final MediaData frame) {
-		boolean result = mFrameQueue.offer(frame);
-		if (!result) {
-//			if (DEBUG) Log.w(TAG, "offer:先頭を破棄する");
-		    final MediaData head = mFrameQueue.poll();
-			result = mFrameQueue.offer(frame);
-//			if (!result) {
-//				if (DEBUG) Log.w(TAG, "offer:frame dropped");
-//			}
-			if (head != null) {
-				recycle(head);
-			}
-		}
-		return result;
+	protected boolean offer(@NonNull final RecycleMediaData frame) {
+		return mFrameQueue.queueFrame(frame);
 	}
 	
 	/**
@@ -466,9 +415,9 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param waitTimeMs 最大待ち時間[ミリ秒]
 	 * @return
 	 */
-	protected MediaData waitFrame(final long waitTimeMs) {
+	protected RecycleMediaData waitFrame(final long waitTimeMs) {
 //		if (DEBUG) Log.v(TAG, "waitFrame:");
-		MediaData result = null;
+		RecycleMediaData result = null;
 		try {
 			result = mFrameQueue.poll(waitTimeMs, TimeUnit.MILLISECONDS);
 		} catch (final InterruptedException e) {
@@ -478,21 +427,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		return result;
 	}
 	
-	/**
-	 * フレームプールにフレームを戻す
-	 * @param frame
-	 */
-	protected void recycle(@NonNull final MediaData frame) {
-//		if (DEBUG) Log.v(TAG, "recycle:");
-		synchronized (mPool) {
-			if (mPool.size() < MAX_POOL_SZ) {
-				mPool.add(frame);
-			} else {
-//				if (DEBUG) Log.v(TAG, "recycle:フレームプールがいっぱいで戻せなかった");
-				cnt--;
-			}
-		}
-	}
 //================================================================================
 	/**
 	 * フレーム処理ループの実体
@@ -506,14 +440,14 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				mSync.notify();
 			}
 			for ( ; mIsCapturing ; ) {
-				final MediaData frame = waitFrame(MAX_WAIT_FRAME_MS);
+				final RecycleMediaData frame = waitFrame(MAX_WAIT_FRAME_MS);
 				if (frame != null) {
 					try {
 						if (mIsCapturing) {
 							handleFrame(frame);
 						}
 					} finally {
-						recycle(frame);
+						frame.recycle();
 					}
 				}
 			} // end of while
