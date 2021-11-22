@@ -150,7 +150,7 @@ RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
 							ByteBuffer buffer;
 							audioRecord.startRecording();
 							try {
-								MediaData data;
+								RecycleMediaData data;
 LOOP:							for ( ; mIsCapturing ;) {
 									data = obtain();
 									if (data != null) {
@@ -163,7 +163,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 												Log.e(TAG, "not a recording state," + recordingState);
 											}
 											err_count++;
-											recycle(data);
+											data.recycle();
 											if (err_count > 20) {
 												retry--;
 												break LOOP;
@@ -182,7 +182,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 											Log.e(TAG, "AudioRecord#read failed:" + e);
 											err_count++;
 											retry--;
-											recycle(data);
+											data.recycle();
 											callOnError(e);
 											break LOOP;
 										}
@@ -199,7 +199,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 											continue;
 										} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
 											err_count = 0;
-											recycle(data);
+											data.recycle();
 											continue;
 										} else if (readBytes == AudioRecord.ERROR) {
 											if (err_count == 0) {
@@ -217,7 +217,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 											Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
 											err_count++;
 											retry--;
-											recycle(data);
+											data.recycle();
 											break LOOP;
 										} else if (readBytes < 0) {
 											if (err_count == 0) {
@@ -225,7 +225,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 											}
 										}
 										err_count++;
-										recycle(data);
+										data.recycle();
 									} // end of if (data != null)
 									if (err_count > 10) {
 										retry--;

@@ -23,7 +23,6 @@ import java.lang.annotation.RetentionPolicy;
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
 import android.annotation.SuppressLint;
@@ -68,9 +67,9 @@ public abstract class IAudioSampler {
 		};
 
 		switch (source) {
-		case 1:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動
 		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
 		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
+		case 1:
 		default:AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動(UACのopenに失敗した時など)
 		}
 		AudioRecord audioRecord = null;
@@ -129,16 +128,15 @@ public abstract class IAudioSampler {
 	/**
 	 * バッファリング用に生成する音声データレコードの最大生成する
 	 */
-	private final int MAX_POOL_SIZE = 200;
+	private static final int MAX_POOL_SIZE = 200;
 	/**
 	 * 音声データキューに存在できる最大音声データレコード数
 	 * 25フレーム/秒のはずなので最大で約4秒分
 	 */
-	private final int MAX_QUEUE_SIZE = 200;
+	private static final int MAX_QUEUE_SIZE = 200;
 
 	// 音声データキュー用
-	private final LinkedBlockingQueue<MediaData> mPool = new LinkedBlockingQueue<MediaData>(MAX_POOL_SIZE);
-	private final LinkedBlockingQueue<MediaData> mAudioQueue = new LinkedBlockingQueue<MediaData>(MAX_QUEUE_SIZE);
+	private final MemMediaQueue mAudioQueue;
 
 	// コールバック用
 	private CallbackThread mCallbackThread;
@@ -147,6 +145,7 @@ public abstract class IAudioSampler {
 	protected volatile boolean mIsCapturing;
 
 	public IAudioSampler() {
+		mAudioQueue = new MemMediaQueue(MAX_POOL_SIZE, MAX_POOL_SIZE, MAX_QUEUE_SIZE);
 	}
 
 	/**
@@ -295,59 +294,25 @@ public abstract class IAudioSampler {
 	protected int mDefaultBufferSize = 1024;
 	protected void init_pool(final int default_buffer_size) {
 		mDefaultBufferSize = default_buffer_size;
-		mAudioQueue.clear();
-		mPool.clear();
-		for (int i = 0; i < 8; i++) {
-			mPool.add(new MediaData(default_buffer_size));
-		}
+		mAudioQueue.init(default_buffer_size);
 	}
 
-	/**
-	 * このクラスで生成した音声データバッファの数
-	 */
-	private int mBufferNum = 0;
 	/**
 	 * 音声データバッファをプールから取得する。
 	 * プールがからの場合には最大MAX_POOL_SIZE個までは新規生成する
 	 * @return
 	 */
-	protected MediaData obtain() {
+	protected RecycleMediaData obtain() {
 //		if (DEBUG) Log.v(TAG, "obtain:" + mPool.size() + ",mBufferNum=" + mBufferNum);
-		MediaData result = null;
-		if (!mPool.isEmpty()) {
-			// プールに空バッファが有る時
-			result = mPool.poll();
-		} else if (mBufferNum < MAX_POOL_SIZE) {
-//			if (DEBUG) Log.i(TAG, "create MediaData");
-			result = new MediaData(mDefaultBufferSize);
-			mBufferNum++;
-		}
-		if (result != null) {
-			result.clear();
-		}
-//		if (DEBUG) Log.v(TAG, "obtain:result=" + result);
-		return result;
+		return mAudioQueue.obtain(mDefaultBufferSize);
 	}
 
-	/**
-	 * 使用済みの音声データバッファを再利用するためにプールに戻す
-	 * @param data
-	 */
-	protected void recycle(@NonNull final MediaData data) {
-//		if (DEBUG) Log.v(TAG, "recycle:" + mPool.size());
-		if (!mPool.offer(data)) {
-			// ここには来ないはず
-//			if (DEBUG) Log.i(TAG, "pool is full");
-			mBufferNum--;
-		}
-	}
-
-	protected boolean addMediaData(@NonNull final MediaData data) {
+	protected boolean addMediaData(@NonNull final RecycleMediaData data) {
 //		if (DEBUG) Log.v(TAG, "addMediaData:" + mAudioQueue.size());
-		return mAudioQueue.offer(data);
+		return mAudioQueue.queueFrame(data);
 	}
 
-	protected MediaData pollMediaData(final long timeout_msec) throws InterruptedException {
+	protected RecycleMediaData pollMediaData(final long timeout_msec) throws InterruptedException {
 		return mAudioQueue.poll(timeout_msec, TimeUnit.MILLISECONDS);
 	}
 
@@ -382,7 +347,7 @@ public abstract class IAudioSampler {
     	public final void run() {
 //    		if (DEBUG) Log.i(TAG, "CallbackThread:start");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			MediaData data;
+			RecycleMediaData data;
     		for (; mIsCapturing ;) {
     			try {
 					data = pollMediaData(100);
@@ -392,7 +357,7 @@ public abstract class IAudioSampler {
     			if (data != null) {
     				callOnData(data);
     				// 使用済みのバッファをプールに戻して再利用する
-    				recycle(data);
+    				data.recycle();
     			}
     		} // for (; mIsCapturing ;)
     		synchronized (mCallbackSync) {
