@@ -40,12 +40,15 @@ public class MediaData {
 	
 	/**
 	 * コンストラクタ
+	 * orderはByteOrder.nativeOrderになる
+	 * 内部バッファは未生成(使用時に生成)
 	 */
 	public MediaData() {
 	}
 
 	/**
 	 * コンストラクタ
+	 * @param order データ保持用の内部バッファのエンディアン
 	 */
 	public MediaData(@NonNull final ByteOrder order) {
 		mByteOrder = order;
@@ -53,6 +56,7 @@ public class MediaData {
 
 	/**
 	 * コンストラクタ
+	 * orderはByteOrder.nativeOrderになる
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
 	 */
 	public MediaData(@IntRange(from=0)final int size) {
@@ -62,7 +66,7 @@ public class MediaData {
 	/**
 	 * コンストラクタ
 	 * @param size データ保持用の内部バッファのデフォルトサイズ
-	 * @param order
+	 * @param order データ保持用の内部バッファのエンディアン
 	 */
 	public MediaData(@IntRange(from=0)final int size, @NonNull final ByteOrder order) {
 		mByteOrder = order;

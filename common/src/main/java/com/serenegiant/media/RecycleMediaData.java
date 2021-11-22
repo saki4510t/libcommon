@@ -28,13 +28,23 @@ import androidx.annotation.NonNull;
  * IRecycleBufferを実装したMediaData
  */
 public class RecycleMediaData extends MediaData implements IRecycleBuffer {
+	@NonNull
 	private final WeakReference<IRecycleParent> mWeakParent;
 
+	/**
+	 * コンストラクタ
+	 * @param parent 親となるIRecycleParentオブジェクト
+	 */
 	public RecycleMediaData(@NonNull final IRecycleParent parent) {
 		super();
 		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
-	
+
+	/**
+	 * コンストラクタ
+	 * @param parent 親となるIRecycleParentオブジェクト
+	 * @param size データ保持用の内部バッファのデフォルトサイズ
+	 */
 	public RecycleMediaData(@NonNull final IRecycleParent parent,
 		@IntRange(from = 1L) final int size) {
 
@@ -42,6 +52,12 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param parent 親となるIRecycleParentオブジェクト
+	 * @param size データ保持用の内部バッファのデフォルトサイズ
+	 * @param order データ保持用の内部バッファのエンディアン
+	 */
 	public RecycleMediaData(@NonNull final IRecycleParent parent,
 		final int size, @NonNull final ByteOrder order) {
 
@@ -49,6 +65,10 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 		mWeakParent = new WeakReference<IRecycleParent>(parent);
 	}
 
+	/**
+	 * コピーコンストラクタ
+	 * @param src
+	 */
 	public RecycleMediaData(@NonNull final RecycleMediaData src) {
 		super(src);
 		mWeakParent = new WeakReference<IRecycleParent>(src.mWeakParent.get());

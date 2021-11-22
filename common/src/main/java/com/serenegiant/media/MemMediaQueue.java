@@ -41,6 +41,7 @@ public class MemMediaQueue implements IMediaQueue {
 	
 	/**
 	 * MemMediaQueue用のデフォルトファクトリークラス
+	 *　RecycleMediaDataを生成する
 	 */
 	public static class DefaultFactory implements IRecycleBuffer.Factory {
 		@NonNull
