@@ -139,9 +139,11 @@ public abstract class AbstractEncoder implements Encoder {
     @Override
 	protected void finalize() throws Throwable {
 //    	if (DEBUG) Log.v(TAG, "finalize:");
-    	mRecorder = null;
-    	release();
-        super.finalize();
+		try {
+			release();
+		} finally {
+			super.finalize();
+		}
 	}
 
 	@Override
@@ -311,6 +313,7 @@ public abstract class AbstractEncoder implements Encoder {
 	@Override
 	public  void release() {
 //		if (DEBUG) Log.d(TAG, "release:");
+		mRecorder = null;
 		if (mIsCapturing) {
 			try {
 				mListener.onStopEncode(this);
