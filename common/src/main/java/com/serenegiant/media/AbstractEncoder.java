@@ -32,6 +32,7 @@ import com.serenegiant.media.exceptions.TimeoutException;
 import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static com.serenegiant.utils.BufferHelper.*;
 
@@ -70,31 +71,37 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * エンコーダーの本体MediaCodecインスタンス
      */
+    @Nullable
     protected MediaCodec mMediaCodec;				// API >= 16(Android4.1.2)
     /**
      * エンコード用バッファ情報
      */
-    private MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
+    @NonNull
+    private final MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
 
     /**
      * Recorderオブジェクトへの参照
      */
+    @Nullable
     private IRecorder mRecorder;
     /**
      * フラグの排他制御用
      */
+    @NonNull
     protected final Object mSync = new Object();
     /**
      * エンコーダーイベントコールバックリスナー
      */
+    @NonNull
     private final EncoderListener mListener;
     /**
      * MIME
      */
+    @NonNull
     protected final String MIME_TYPE;
 
 //********************************************************************************
-    public AbstractEncoder(final String mime_type,
+    public AbstractEncoder(@NonNull final String mime_type,
     	@NonNull final IRecorder recorder,
     	@NonNull final EncoderListener listener) {
 
@@ -349,7 +356,6 @@ public abstract class AbstractEncoder implements Encoder {
 		} catch (final Exception e) {
 //			Log.e(TAG, "destroy:", e);
 		}
-        mBufferInfo = null;
 		mRecorder = null;
 	}
 
