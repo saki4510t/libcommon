@@ -249,7 +249,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			if (DEBUG) Log.v(TAG, "mEncoderListener#onDestroy:finished")
 		}
 
-		override fun onError(e: Exception) {
+		override fun onError(e: Throwable) {
 			Log.w(TAG, e)
 			val recorder = mRecorder
 			mRecorder = null

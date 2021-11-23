@@ -367,7 +367,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * エラー発生時に呼び出す
 	 * @param e
 	 */
-	protected void callOnError(final Exception e) {
+	protected void callOnError(@NonNull final Throwable e) {
 		try {
 			mListener.onError(e);
 		} catch (final Exception e2) {

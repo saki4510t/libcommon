@@ -20,6 +20,9 @@ package com.serenegiant.media;
 
 import android.view.Surface;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public interface EncoderListener {
 	/**
 	 * エンコード開始
@@ -28,19 +31,20 @@ public interface EncoderListener {
 	 * @param captureFormat
 	 * @param mayFail
 	 */
-	public void onStartEncode(Encoder encoder, Surface source, int captureFormat, boolean mayFail);
+	public void onStartEncode(@NonNull final Encoder encoder,
+		@Nullable final Surface source, final int captureFormat, final boolean mayFail);
 	/**
 	 * エンコード終了
 	 * @param encoder
 	 */
-	public void onStopEncode(Encoder encoder);
+	public void onStopEncode(@NonNull final Encoder encoder);
 	/**
 	 * Encoderが破棄された時のコールバック
 	  */
-	public void onDestroy(Encoder encoder);
+	public void onDestroy(@NonNull final Encoder encoder);
 	/**
 	 * エラーが発生した時のコールバック
 	 * @param e
 	 */
-	public void onError(Exception e);
+	public void onError(@NonNull final Throwable e);
 }
