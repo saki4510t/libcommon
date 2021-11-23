@@ -924,6 +924,7 @@ public class MediaMoviePlayer {
 	 */
 	protected boolean internal_write_video(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
 //		if (DEBUG) Log.v(TAG, "internal_write_video");
+		// 映像の場合はSurfaceへ出力しているので特にここですることはない
 		return false;
 	}
 
