@@ -717,8 +717,8 @@ public class MediaMoviePlayer {
 			if (codec != null) {
 		        mVideoMediaCodec = codec;
 		        mVideoBufferInfo = new MediaCodec.BufferInfo();
-		        mVideoInputBuffers = codec.getInputBuffers();
-		        mVideoOutputBuffers = codec.getOutputBuffers();
+		        mVideoInputBuffers = codec.getInputBuffers();	// API>=16, deprecated API21
+		        mVideoOutputBuffers = codec.getOutputBuffers();	// API>=16, deprecated API21
 			}
 			mVideoInputDone = mVideoOutputDone = false;
 			videoThread = new Thread(mVideoTask, "VideoTask");
@@ -729,8 +729,8 @@ public class MediaMoviePlayer {
 			if (codec != null) {
 		        mAudioMediaCodec = codec;
 		        mAudioBufferInfo = new MediaCodec.BufferInfo();
-		        mAudioInputBuffers = codec.getInputBuffers();
-		        mAudioOutputBuffers = codec.getOutputBuffers();
+		        mAudioInputBuffers = codec.getInputBuffers();	// API>=16, deprecated API21
+		        mAudioOutputBuffers = codec.getOutputBuffers();	// API>=16, deprecated API21
 			}
 			mAudioInputDone = mAudioOutputDone = false;
 	        audioThread = new Thread(mAudioTask, "AudioTask");
