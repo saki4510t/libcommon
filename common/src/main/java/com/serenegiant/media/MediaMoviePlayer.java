@@ -781,8 +781,9 @@ public class MediaMoviePlayer {
 		    	//
 		        final ByteBuffer[] buffers = codec.getOutputBuffers();
 		        int sz = buffers[0].capacity();
-		        if (sz <= 0)
+		        if (sz <= 0) {
 		        	sz = mAudioInputBufSize;
+				}
 		        if (DEBUG) Log.v(TAG, "AudioOutputBufSize:" + sz);
 		        mAudioOutTempBuf = new byte[sz];
 			} catch (final IOException e) {
