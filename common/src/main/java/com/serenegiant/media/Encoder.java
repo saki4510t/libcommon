@@ -21,16 +21,16 @@ package com.serenegiant.media;
 import java.nio.ByteBuffer;
 
 public interface Encoder {
-	public abstract void prepare()  throws Exception;
-	public abstract void start();;
-	public abstract void stop();
-	public abstract void release();
-	public abstract void signalEndOfInputStream();
-	public abstract void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
-	public abstract void frameAvailableSoon();
-	public abstract boolean isCapturing();
+	public void prepare()  throws Exception;
+	public void start();;
+	public void stop();
+	public void release();
+	public void signalEndOfInputStream();
+	public void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
+	public void frameAvailableSoon();
+	public boolean isCapturing();
 	@Deprecated
-	public abstract String getOutputPath();
+	public String getOutputPath();
 	@Deprecated
-	public abstract boolean isAudio();
+	public boolean isAudio();
 }
