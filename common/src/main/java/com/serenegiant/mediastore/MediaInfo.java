@@ -248,7 +248,7 @@ public class MediaInfo implements Parcelable {
 			", title='" + title + '\'' +
 			", mime='" + mime + '\'' +
 			", displayName='" + displayName + '\'' +
-			", mediaType=" + mediaType +
+			", mediaType=" + mediaType + "(" + mediaType(mediaType) + ")" +
 			", width=" + width +
 			", height=" + height +
 			", orientation=" + orientation +
