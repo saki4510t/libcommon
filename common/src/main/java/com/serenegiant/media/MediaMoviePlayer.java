@@ -41,6 +41,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+/**
+ * 動画再生用のヘルパークラス
+ * FIXME API>=21と未満で処理を分けるようにする
+ */
 @SuppressLint("InlinedApi")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaMoviePlayer {
