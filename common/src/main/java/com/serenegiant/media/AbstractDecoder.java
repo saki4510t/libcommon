@@ -201,18 +201,19 @@ public abstract class AbstractDecoder implements Decoder {
 	}
 
 	/**
-  * request to seek to specifc timed frame<br>
-  * if the frame is not a key frame, frame image will be broken
-  * @param newTimeUs seek to new time[usec]
-  */
- public final void seek(final long newTimeUs) {
- 	if (DEBUG) Log.v(TAG, "seek");
- 	synchronized (mSync) {
-		mRequestSeek = true;
- 		mRequestTimeUs = newTimeUs;
- 		mSync.notifyAll();
- 	}
- }
+	 * request to seek to specifc timed frame<br>
+	 * if the frame is not a key frame, frame image will be broken
+	 *
+	 * @param newTimeUs seek to new time[usec]
+	 */
+	public final void seek(final long newTimeUs) {
+		if (DEBUG) Log.v(TAG, "seek");
+		synchronized (mSync) {
+			mRequestSeek = true;
+			mRequestTimeUs = newTimeUs;
+			mSync.notifyAll();
+		}
+	}
 
 	/**
 	 * called every frame before time adjusting
