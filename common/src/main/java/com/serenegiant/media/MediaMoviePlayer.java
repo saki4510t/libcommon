@@ -47,7 +47,9 @@ import androidx.annotation.NonNull;
 /**
  * 動画再生用のヘルパークラス
  * FIXME API>=21と未満で処理を分けるようにする
+ * @deprecated MediaPlayを使うこと
  */
+@Deprecated
 @SuppressLint("InlinedApi")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaMoviePlayer {

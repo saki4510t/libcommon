@@ -26,7 +26,7 @@ import android.view.*
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.Toast
 import com.serenegiant.media.IFrameCallback
-import com.serenegiant.media.MediaMoviePlayer
+import com.serenegiant.media.MediaPlayer
 import com.serenegiant.mediastore.MediaInfo
 import java.io.FileNotFoundException
 
@@ -36,7 +36,7 @@ import java.io.FileNotFoundException
 class VideoPlaybackFragment : BaseFragment() {
 	//--------------------------------------------------------------------------------
 	private var mInfo: MediaInfo? = null
-	private var mPlayer: MediaMoviePlayer? = null
+	private var mPlayer: MediaPlayer? = null
 
 	override fun onCreateView(
 		inflater: LayoutInflater,
@@ -88,7 +88,7 @@ class VideoPlaybackFragment : BaseFragment() {
 			width: Int, height: Int) {
 			if (DEBUG) Log.v(TAG, "onSurfaceTextureAvailable:$surface")
 			if (mPlayer == null) {
-				mPlayer = MediaMoviePlayer(Surface(surface), object : IFrameCallback {
+				mPlayer = MediaPlayer(Surface(surface), object : IFrameCallback {
 					override fun onPrepared() {
 						if (DEBUG) Log.v(TAG, "onPrepared:")
 						if (mPlayer != null) {
@@ -108,8 +108,7 @@ class VideoPlaybackFragment : BaseFragment() {
 				try {
 					val fd = requireContext()
 						.contentResolver
-						.openFileDescriptor(mInfo!!.uri!!, "r")
-							?.getFileDescriptor()
+						.openAssetFileDescriptor(mInfo!!.uri!!, "r")
 					if (fd != null) {
 						mPlayer!!.prepare(fd)
 					}
