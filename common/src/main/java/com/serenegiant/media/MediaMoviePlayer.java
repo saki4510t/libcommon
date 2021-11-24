@@ -63,8 +63,9 @@ public class MediaMoviePlayer {
 			throws NullPointerException {
 
     	if (DEBUG) Log.v(TAG, "Constructor:");
-    	if ((outputSurface == null) || (callback == null))
+    	if ((outputSurface == null) || (callback == null)) {
     		throw new NullPointerException("outputSurface and callback should not be null");
+		}
 
 		mOutputSurface = outputSurface;
 		mCallback = callback;
