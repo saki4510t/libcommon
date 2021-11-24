@@ -20,6 +20,7 @@ package com.serenegiant.libcommon
 
 import android.content.Context
 import android.os.Bundle
+import android.provider.MediaStore
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -27,7 +28,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentTransaction
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.serenegiant.libcommon.ImageFragment.Companion.newInstance
 import com.serenegiant.mediastore.MediaInfo
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapter
 import com.serenegiant.mediastore.MediaStoreRecyclerAdapterListener
@@ -85,12 +85,7 @@ class GalleyFragment3 : BaseFragment() {
 		override fun onItemClick(parent: RecyclerView.Adapter<*>,
 		view: View, item: MediaInfo) {
 			if (DEBUG) Log.v(TAG, "onItemClick:$item")
-			parentFragmentManager
-				.beginTransaction()
-				.addToBackStack(null)
-				.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-				.replace(R.id.container, newInstance(item))
-				.commit()
+			doPlay(item)
 		}
 
 		override fun onItemLongClick(parent: RecyclerView.Adapter<*>,
@@ -98,6 +93,29 @@ class GalleyFragment3 : BaseFragment() {
 
 			if (DEBUG) Log.v(TAG, "onItemLongClick:$item")
 			return false
+		}
+	}
+
+	private fun doPlay(info: MediaInfo) {
+		if (DEBUG) Log.v(TAG, "doPlay:${info}")
+		when (info.mediaType) {
+			MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->  // 静止画を選択した時
+				parentFragmentManager
+					.beginTransaction()
+					.addToBackStack(null)
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+					.replace(R.id.container, ImageFragment.newInstance(info))
+					.commit()
+			MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> {
+				parentFragmentManager
+					.beginTransaction()
+					.addToBackStack(null)
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+					.replace(R.id.container, VideoPlaybackFragment.newInstance(info))
+					.commit()
+			}
+			else -> {
+			}
 		}
 	}
 

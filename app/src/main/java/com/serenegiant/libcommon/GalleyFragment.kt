@@ -28,7 +28,6 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
 import androidx.fragment.app.FragmentTransaction
-import com.serenegiant.libcommon.ImageFragment.Companion.newInstance
 import com.serenegiant.mediastore.MediaStoreAdapter
 
 /**
@@ -71,13 +70,13 @@ class GalleyFragment : BaseFragment() {
 	}
 
 	private val mOnItemClickListener = AdapterView.OnItemClickListener {
-		parent, view, position, id ->
+			parent, _, position, _ ->
 			when (parent.id) {
-				R.id.media_gridview -> doPlay(position, id)
+				R.id.media_gridview -> doPlay(position)
 			}
 	}
 
-	private fun doPlay(position: Int, id: Long) {
+	private fun doPlay(position: Int) {
 		val info = mMediaStoreAdapter!!.getMediaInfo(position)
 		if (DEBUG) Log.v(TAG, "" + info)
 		when (info.mediaType) {
@@ -86,9 +85,15 @@ class GalleyFragment : BaseFragment() {
 					.beginTransaction()
 					.addToBackStack(null)
 					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
-					.replace(R.id.container, newInstance(info))
+					.replace(R.id.container, ImageFragment.newInstance(info))
 					.commit()
 			MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> {
+				parentFragmentManager
+					.beginTransaction()
+					.addToBackStack(null)
+					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+					.replace(R.id.container, VideoPlaybackFragment.newInstance(info))
+					.commit()
 			}
 			else -> {
 			}
