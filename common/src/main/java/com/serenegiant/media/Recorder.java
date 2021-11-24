@@ -303,13 +303,15 @@ public abstract class Recorder implements IRecorder {
 			}
 		}
 		if (encoder instanceof IAudioEncoder) {
-			if (mAudioEncoder != null)
+			if (mAudioEncoder != null) {
 				throw new IllegalArgumentException("Audio encoder already added.");
+			}
 			mAudioEncoder = encoder;
 		}
 		if (encoder instanceof IVideoEncoder) {
-			if (mVideoEncoder != null)
+			if (mVideoEncoder != null) {
 				throw new IllegalArgumentException("Video encoder already added.");
+			}
 			mVideoEncoder = encoder;
 		}
 		mEncoderCount = (mVideoEncoder != null ? 1 : 0) + (mAudioEncoder != null ? 1 : 0);
@@ -327,7 +329,7 @@ public abstract class Recorder implements IRecorder {
 			mVideoEncoder = null;
 			mVideoStarted = false;
 		}
-		if (encoder instanceof AudioEncoder) {
+		if (encoder instanceof IAudioEncoder) {
 			mAudioEncoder = null;
 			mAudioStarted = false;
 		}
