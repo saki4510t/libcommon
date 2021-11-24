@@ -461,7 +461,7 @@ public class MediaMoviePlayer {
 	 * @throws IOException
 	 */
 	private final boolean processStop(final int req) throws InterruptedException, IOException {
-		boolean local_isRunning = true;
+		boolean isRunning = true;
 		switch (req) {
 		case REQ_PREPARE:
 			handlePrepare(mSource);
@@ -471,7 +471,7 @@ public class MediaMoviePlayer {
 		case REQ_RESUME:
 			throw new IllegalStateException("invalid state:" + mState);
 		case REQ_QUIT:
-			local_isRunning = false;
+			isRunning = false;
 			break;
 //		case REQ_SEEK:
 //		case REQ_STOP:
@@ -482,9 +482,9 @@ public class MediaMoviePlayer {
 			break;
 		}
 		synchronized (mSync) {
-			local_isRunning &= mIsRunning;
+			isRunning &= mIsRunning;
 		}
-		return local_isRunning;
+		return isRunning;
 	}
 
 	/**
@@ -493,7 +493,7 @@ public class MediaMoviePlayer {
 	 * @throws InterruptedException
 	 */
 	private final boolean processPrepared(final int req) throws InterruptedException {
-		boolean local_isRunning = true;
+		boolean isRunning = true;
 		switch (req) {
 		case REQ_START:
 			handleStart();
@@ -505,7 +505,7 @@ public class MediaMoviePlayer {
 			handleStop();
 			break;
 		case REQ_QUIT:
-			local_isRunning = false;
+			isRunning = false;
 			break;
 //		case REQ_PREPARE:
 //		case REQ_SEEK:
@@ -516,9 +516,9 @@ public class MediaMoviePlayer {
 			break;
 		} // end of switch (req)
 		synchronized (mSync) {
-			local_isRunning &= mIsRunning;
+			isRunning &= mIsRunning;
 		}
-		return local_isRunning;
+		return isRunning;
 	}
 
 	/**
@@ -526,7 +526,7 @@ public class MediaMoviePlayer {
 	 * @return
 	 */
 	private final boolean processPlaying(final int req) {
-		boolean local_isRunning = true;
+		boolean isRunning = true;
 		switch (req) {
 		case REQ_PREPARE:
 		case REQ_START:
@@ -542,16 +542,16 @@ public class MediaMoviePlayer {
 			handlePause();
 			break;
 		case REQ_QUIT:
-			local_isRunning = false;
+			isRunning = false;
 			break;
 		default:
 			handleLoop(mCallback);
 			break;
 		} // end of switch (req)
 		synchronized (mSync) {
-			local_isRunning &= mIsRunning;
+			isRunning &= mIsRunning;
 		}
-		return local_isRunning;
+		return isRunning;
 	}
 
 	/**
@@ -560,7 +560,7 @@ public class MediaMoviePlayer {
 	 * @throws InterruptedException
 	 */
 	private final boolean processPaused(final int req) throws InterruptedException {
-		boolean local_isRunning = true;
+		boolean isRunning = true;
 		switch (req) {
 		case REQ_PREPARE:
 		case REQ_START:
@@ -575,7 +575,7 @@ public class MediaMoviePlayer {
 			handleResume();
 			break;
 		case REQ_QUIT:
-			local_isRunning = false;
+			isRunning = false;
 			break;
 //		case REQ_PAUSE:
 		default:
@@ -585,9 +585,9 @@ public class MediaMoviePlayer {
 			break;
 		} // end of switch (req)
 		synchronized (mSync) {
-			local_isRunning &= mIsRunning;
+			isRunning &= mIsRunning;
 		}
-		return local_isRunning;
+		return isRunning;
 	}
 
 //--------------------------------------------------------------------------------
