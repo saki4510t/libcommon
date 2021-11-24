@@ -82,7 +82,7 @@ class GalleyFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "" + info)
 		when (info.mediaType) {
 			MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->  // 静止画を選択した時
-				requireFragmentManager()
+				parentFragmentManager
 					.beginTransaction()
 					.addToBackStack(null)
 					.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
