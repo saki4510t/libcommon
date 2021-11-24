@@ -22,9 +22,7 @@ import android.annotation.SuppressLint;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaMetadataRetriever;
 import android.os.Build;
-import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
@@ -62,11 +60,6 @@ public abstract class VideoDecoder extends AbstractDecoder {
 
 //--------------------------------------------------------------------------------
 	private final Surface mOutputSurface;
-	private int mVideoWidth, mVideoHeight;
-	private long mDuration;
-	private int mBitrate;
-	private float mFrameRate;
-	private int mRotation;
 
 	/**
 	 * コンストラクタ
@@ -81,75 +74,8 @@ public abstract class VideoDecoder extends AbstractDecoder {
 		mOutputSurface = outputSurface;
 	}
 
-	public final int getWidth() {
-		return mVideoWidth;
-	}
-
-	public final int getHeight() {
-		return mVideoHeight;
-	}
-
-	public final int getBitRate() {
-		return mBitrate;
-	}
-
-	public final float getFramerate() {
-		return mFrameRate;
-	}
-
-	/**
-	 * @return 0, 90, 180, 270
-	 */
-	public final int getRotation() {
-		return mRotation;
-	}
-
-	/**
-	 * get duration time as micro seconds
-	 *
-	 * @return
-	 */
-	public final long getDurationUs() {
-		return mDuration;
-	}
-
-	@Override
-	protected void updateInfo(@NonNull final MediaMetadataRetriever metaData) {
-		mVideoWidth = mVideoHeight = mRotation = mBitrate = 0;
-		mDuration = 0;
-		mFrameRate = 0;
-		String value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
-		if (!TextUtils.isEmpty(value)) {
-			mVideoWidth = Integer.parseInt(value);
-		}
-		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
-		if (!TextUtils.isEmpty(value)) {
-			mVideoHeight = Integer.parseInt(value);
-		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);	// API>=17
-			if (!TextUtils.isEmpty(value)) {
-				mRotation = Integer.parseInt(value);
-			}
-		}
-		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
-		if (!TextUtils.isEmpty(value)) {
-			mBitrate = Integer.parseInt(value);
-		}
-		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
-		if (!TextUtils.isEmpty(value)) {
-			mDuration = Long.parseLong(value) * 1000;
-		}
-	}
-
 	@Override
 	protected void internalPrepare(final int trackIndex, @NonNull final MediaFormat format) {
-		mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
-		mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
-		mDuration = format.getLong(MediaFormat.KEY_DURATION);
-
-		if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
-			mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
 	}
 
 	@Override

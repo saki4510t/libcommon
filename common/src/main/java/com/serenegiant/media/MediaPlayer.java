@@ -21,10 +21,15 @@ package com.serenegiant.media;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.res.AssetFileDescriptor;
+import android.media.MediaMetadataRetriever;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
@@ -45,6 +50,14 @@ public class MediaPlayer {
 	@NonNull
 	private final IFrameCallback mCallback;
 	private final boolean mAudioEnabled;
+	@NonNull
+	private final MediaMetadataRetriever mMetadata
+		= new MediaMetadataRetriever();	// API>=10
+	private int mVideoWidth, mVideoHeight;
+	private long mDuration;
+	private int mBitrate;
+	private float mFrameRate;
+	private int mRotation;
 
 	/**
 	 * コンストラクタ
@@ -93,44 +106,37 @@ public class MediaPlayer {
 		}
 	}
 
-    public int getWidth() {
-        return mVideoDecoder != null ? mVideoDecoder.getWidth() : 0;
-    }
+	public final int getWidth() {
+		return mVideoWidth;
+	}
 
-    public int getHeight() {
-		return mVideoDecoder != null ? mVideoDecoder.getHeight() : 0;
-    }
+	public final int getHeight() {
+		return mVideoHeight;
+	}
 
-    public int getBitRate() {
-		return mVideoDecoder != null ? mVideoDecoder.getBitRate() : 0;
-    }
+	public final int getBitRate() {
+		return mBitrate;
+	}
 
-    public float getFramerate() {
-		return mVideoDecoder != null ? mVideoDecoder.getFramerate() : 0;
-    }
+	public final float getFramerate() {
+		return mFrameRate;
+	}
 
-    /**
-     * @return 0, 90, 180, 270
-     */
-    public int getRotation() {
-		return mVideoDecoder != null ? mVideoDecoder.getRotation() : 0;
-    }
+	/**
+	 * @return 0, 90, 180, 270
+	 */
+	public final int getRotation() {
+		return mRotation;
+	}
 
-    /**
-     * get duration time as micro seconds
-     * @return
-     */
-    public long getDurationUs() {
-		return mVideoDecoder != null ? mVideoDecoder.getDurationUs() : 0;
-    }
-
-    /**
-     * get audio sampling rate[Hz]
-     * @return
-     */
-    public int getSampleRate() {
-		return mAudioDecoder != null ? mAudioDecoder.getSampleRate() : 0;
-    }
+	/**
+	 * get duration time as micro seconds
+	 *
+	 * @return
+	 */
+	public final long getDurationUs() {
+		return mDuration;
+	}
 
     public boolean hasAudio() {
     	return mAudioEnabled && (mAudioDecoder != null);
@@ -283,6 +289,11 @@ public class MediaPlayer {
     		mSync.notifyAll();
     	}
     }
+
+	@Nullable
+	public String extractMetadata(final int key) {
+		return mMetadata.extractMetadata(key);
+	}
 
 //================================================================================
     private static final int TIMEOUT_USEC = 10000;	// 10msec
@@ -533,6 +544,23 @@ public class MediaPlayer {
 				throw new RuntimeException("invalid state:" + mState);
 			}
 		}
+		if (source instanceof String) {
+			final String srcString = (String)source;
+			final File src = new File(srcString);
+			if (TextUtils.isEmpty(srcString) || !src.canRead()) {
+				throw new FileNotFoundException("Unable to read " + source);
+			}
+			mMetadata.setDataSource((String)source);	// API>=10
+		} else if (source instanceof AssetFileDescriptor) {
+			final FileDescriptor fd = ((AssetFileDescriptor)source).getFileDescriptor();
+			mMetadata.setDataSource(fd);
+		} else if (source instanceof FileDescriptor) {
+			mMetadata.setDataSource((FileDescriptor)source);	// API>=10
+		} else {
+			// ここには来ないけど
+			throw new IllegalArgumentException("unknown source type:source=" + source);
+		}
+		updateInfo(mMetadata);
 		if ((mOutputSurface != null) && mVideoDecoder == null) {
 			mVideoDecoder = VideoDecoder.createDecoder(mOutputSurface, mListener);
 			mVideoDecoder.prepare(source);
@@ -545,6 +573,8 @@ public class MediaPlayer {
 			mState = STATE_PREPARED;
 		}
 		mCallback.onPrepared();
+		if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
+			mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
 	}
 
 	/**
@@ -554,8 +584,9 @@ public class MediaPlayer {
 	private void handleStart() {
     	if (DEBUG) Log.v(TAG, "handleStart:");
 		synchronized (mSync) {
-			if (mState != STATE_PREPARED)
+			if (mState != STATE_PREPARED) {
 				throw new RuntimeException("invalid state:" + mState);
+			}
 			mState = STATE_PLAYING;
 		}
         if (mRequestTime > 0) {
@@ -638,6 +669,34 @@ public class MediaPlayer {
 	private void handleResume() {
     	if (DEBUG) Log.v(TAG, "handleResume:");
     	// FIXME unimplemented yet
+	}
+
+	private void updateInfo(@NonNull final MediaMetadataRetriever metaData) {
+		mVideoWidth = mVideoHeight = mRotation = mBitrate = 0;
+		mDuration = 0;
+		mFrameRate = 0;
+		String value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH);
+		if (!TextUtils.isEmpty(value)) {
+			mVideoWidth = Integer.parseInt(value);
+		}
+		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT);
+		if (!TextUtils.isEmpty(value)) {
+			mVideoHeight = Integer.parseInt(value);
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);	// API>=17
+			if (!TextUtils.isEmpty(value)) {
+				mRotation = Integer.parseInt(value);
+			}
+		}
+		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
+		if (!TextUtils.isEmpty(value)) {
+			mBitrate = Integer.parseInt(value);
+		}
+		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION);
+		if (!TextUtils.isEmpty(value)) {
+			mDuration = Long.parseLong(value) * 1000;
+		}
 	}
 
 	private final DecoderListener mListener = new DecoderListener() {

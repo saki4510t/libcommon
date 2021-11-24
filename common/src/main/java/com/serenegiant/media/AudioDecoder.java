@@ -25,7 +25,6 @@ import android.media.AudioTrack;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.util.Log;
 
@@ -57,8 +56,6 @@ public abstract class AudioDecoder extends AbstractDecoder {
 	}
 
 //--------------------------------------------------------------------------------
-	private int mAudioChannels;
-	private int mAudioSampleRate;
 	private boolean mHasAudio;
 	@Nullable
 	protected AudioTrack mAudioTrack;
@@ -74,46 +71,24 @@ public abstract class AudioDecoder extends AbstractDecoder {
 		super("audio/", listener);
 	}
 
-	/**
-	 * get audio channel counts
-	 *
-	 * @return
-	 */
-	public final int getAudioChannels() {
-		return mAudioChannels;
-	}
-
-	/**
-	 * get audio sampling rate[Hz]
-	 *
-	 * @return
-	 */
-	public final int getSampleRate() {
-		return mAudioSampleRate;
-	}
-
-	@Override
-	protected void updateInfo(@NonNull final MediaMetadataRetriever metaData) {
-	}
-
 	@Override
 	protected void internalPrepare(final int trackIndex, @NonNull final MediaFormat format) {
-		mAudioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
-		mAudioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
-		final int min_buf_size = AudioTrack.getMinBufferSize(mAudioSampleRate,
-			(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+		final int audioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
+		final int audioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
+		final int min_buf_size = AudioTrack.getMinBufferSize(audioSampleRate,
+			(audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
 			AudioFormat.ENCODING_PCM_16BIT);
 		final int max_input_size = format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE);
 		mAudioInputBufSize =  min_buf_size > 0 ? min_buf_size * 4 : max_input_size;
 		if (mAudioInputBufSize > max_input_size) mAudioInputBufSize = max_input_size;
-		final int frameSizeInBytes = mAudioChannels * 2;
+		final int frameSizeInBytes = audioChannels * 2;
 		mAudioInputBufSize = (mAudioInputBufSize / frameSizeInBytes) * frameSizeInBytes;
 		if (DEBUG) Log.v(TAG, String.format("getMinBufferSize=%d,max_input_size=%d,mAudioInputBufSize=%d",
 			min_buf_size, max_input_size, mAudioInputBufSize));
 		//
 		mAudioTrack = new AudioTrack(AudioManager.STREAM_MUSIC,
-			mAudioSampleRate,
-			(mAudioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
+			audioSampleRate,
+			(audioChannels == 1 ? AudioFormat.CHANNEL_OUT_MONO : AudioFormat.CHANNEL_OUT_STEREO),
 			AudioFormat.ENCODING_PCM_16BIT,
 			mAudioInputBufSize,
 			AudioTrack.MODE_STREAM);

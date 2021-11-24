@@ -23,7 +23,6 @@ import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
-import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
@@ -58,8 +57,6 @@ public abstract class AbstractDecoder implements Decoder {
 	protected final MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
 	@NonNull
 	private final MediaExtractor mExtractor;
-	@NonNull
-	private final MediaMetadataRetriever mMetadata = new MediaMetadataRetriever();	// API>=10
 	@Nullable
 	private MediaCodec mDecoder;
 	private long mStartTimeNs;
@@ -120,24 +117,20 @@ public abstract class AbstractDecoder implements Decoder {
 			if (TextUtils.isEmpty(srcString) || !src.canRead()) {
 				throw new FileNotFoundException("Unable to read " + source);
 			}
-			mMetadata.setDataSource((String)source);	// API>=10
 			mExtractor.setDataSource((String)source);	// API>=16
 		} else if (source instanceof AssetFileDescriptor) {
 			final FileDescriptor fd = ((AssetFileDescriptor)source).getFileDescriptor();
-			mMetadata.setDataSource(fd);
 			if (BuildCheck.isAndroid7()) {
 				mExtractor.setDataSource((AssetFileDescriptor)source);	// API>=24
 			} else {
 				mExtractor.setDataSource(fd);			// API>=16
 			}
 		} else if (source instanceof FileDescriptor) {
-			mMetadata.setDataSource((FileDescriptor)source);	// API>=10
 			mExtractor.setDataSource((FileDescriptor)source);	// API>=16
 		} else {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
 		}
-		updateInfo(mMetadata);
 		mTrackIndex = findTrack(mExtractor, mMimeType);
 		if (mTrackIndex >= 0) {
 			mExtractor.selectTrack(mTrackIndex);
@@ -148,12 +141,6 @@ public abstract class AbstractDecoder implements Decoder {
 		}
 		return mTrackIndex;
 	}
-
-	/**
-	 * 動画ファイルの情報を取得する
-	 * @param metaData
-	 */
-	protected abstract void updateInfo(@NonNull final MediaMetadataRetriever metaData);
 
 	/**
 	 * デコードの準備処理
