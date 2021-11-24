@@ -1083,8 +1083,8 @@ public class RecordingService extends BaseService {
 		}
 
 		@Override
-		public void onError(@NonNull final MediaReaper reaper, final Exception e) {
-			RecordingService.this.onError(e);
+		public void onError(@NonNull final MediaReaper reaper, final Throwable t) {
+			RecordingService.this.onError(t);
 		}
 	};
 

@@ -84,9 +84,9 @@ public abstract class MediaReaper implements Runnable {
 		/**
 		 * エラーが発生した
 		 * @param reaper
-		 * @param e
+		 * @param t
 		 */
-		public void onError(@NonNull final MediaReaper reaper, final Exception e);
+		public void onError(@NonNull final MediaReaper reaper, final Throwable t);
 	}
 
 	/**
@@ -576,9 +576,9 @@ LOOP:	for ( ; mIsRunning ; ) {
 		}
 	}
 
-	private void callOnError(final Exception e) {
+	private void callOnError(final Throwable t) {
 		try {
-			mListener.onError(this, e);
+			mListener.onError(this, t);
 		} catch (final Exception e1) {
 			Log.w(TAG, e1);
 		}
