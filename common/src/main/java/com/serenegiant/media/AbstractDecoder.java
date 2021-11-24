@@ -37,7 +37,7 @@ import androidx.annotation.RequiresApi;
  */
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractDecoder implements Decoder {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDecoder.class.getSimpleName();
 
     public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒

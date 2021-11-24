@@ -37,7 +37,7 @@ import androidx.annotation.RequiresApi;
 
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class VideoDecoder extends AbstractDecoder {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoDecoder.class.getSimpleName();
 
 	/**

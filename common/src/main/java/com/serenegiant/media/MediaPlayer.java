@@ -45,7 +45,7 @@ import androidx.annotation.WorkerThread;
 @SuppressLint("InlinedApi")
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaPlayer {
-    private static final boolean DEBUG = true;	// FIXME 実働時はfalseにすること
+    private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
     private static final String TAG = MediaPlayer.class.getSimpleName();
 
 	@Nullable
