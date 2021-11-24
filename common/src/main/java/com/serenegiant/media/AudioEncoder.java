@@ -28,6 +28,8 @@ import android.media.MediaRecorder;
 import android.os.Build;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 /**
  * AudioRecordから音声データを取得してMediaCodecエンコーダーでエンコードするためのクラス
  */
@@ -38,10 +40,19 @@ public class AudioEncoder extends AbstractAudioEncoder {
 
     private AudioThread mAudioThread = null;
 
-	public AudioEncoder(final IRecorder recorder, final EncoderListener listener,
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audio_source
+	 * @param audio_channels
+	 */
+	public AudioEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener,
 		final int audio_source, final int audio_channels) {
 
-		super(recorder, listener, audio_source, audio_channels);
+		super(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (audio_source < MediaRecorder.AudioSource.DEFAULT
 			|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)

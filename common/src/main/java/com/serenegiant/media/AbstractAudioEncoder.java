@@ -28,8 +28,10 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.os.Build;
 
+import androidx.annotation.NonNull;
+
 /**
- * 音声データをMediaCodecでエンコードするためのクラス
+ * 音声データをMediaCodecを使ってAACエンコードするための基本クラス
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractAudioEncoder extends AbstractEncoder
@@ -47,12 +49,34 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	protected int mSampleRate;
     protected int mBitRate;
 
-	public AbstractAudioEncoder(final IRecorder recorder, final EncoderListener listener,
-								final int audio_source, final int audio_channels) {
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audio_source
+	 * @param audio_channels
+	 */
+	@Deprecated
+	public AbstractAudioEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener,
+		final int audio_source, final int audio_channels) {
+
 		this(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 	}
 
-	public AbstractAudioEncoder(final IRecorder recorder, final EncoderListener listener,
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audio_source
+	 * @param audio_channels
+	 * @param sample_rate
+	 * @param bit_rate
+	 */
+	public AbstractAudioEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener,
 		final int audio_source, final int audio_channels, final int sample_rate, final int bit_rate) {
 
 		super(MediaCodecUtils.MIME_AUDIO_AAC, recorder, listener);
@@ -104,9 +128,9 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 		final int ix0, final int ix1, final int ix2) {
 		
 		MediaFormat outFormat;
-        if (ix0 >= 0) {
+//		if (ix0 >= 0) {
 //        	Log.w(TAG, "csd may be wrong, it may be for video");
-        }
+//		}
         // audioの時はSTART_MARKが無いので全体をコピーして渡す
         outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
         // encodedDataをそのまま渡しても再生できないファイルが出来上がるので一旦コピーしないと駄目

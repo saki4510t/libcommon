@@ -27,6 +27,8 @@ import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 /**
  *　FIFOキューによるバッファリング付きのAudioEncoder
  */
@@ -42,12 +44,16 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	/**
 	 * キューに入れる音声データのバッファサイズ
 	 */
-	protected int mBufferSize = SAMPLES_PER_FRAME;
+	protected final int mBufferSize = SAMPLES_PER_FRAME;
+	@NonNull
 	private final MemMediaQueue mAudioQueue;
 
-	public AudioEncoderBuffered(final IRecorder recorder, final EncoderListener listener,
-								final int audio_source, final int audio_channels) {
-		super(recorder, listener, audio_source, audio_channels);
+	public AudioEncoderBuffered(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener,
+		final int audio_source, final int audio_channels) {
+
+		super(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (audio_source < MediaRecorder.AudioSource.DEFAULT
 			|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
@@ -72,10 +78,6 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		mAudioThread = null;
 		mDequeueThread = null;
 		super.stop();
-	}
-
-	private RecycleMediaData obtain() {
-		return mAudioQueue.obtain(mBufferSize);
 	}
 
 	/**
@@ -128,7 +130,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 										continue;
 									}
 								}
-		                		data = obtain();
+		                		data = mAudioQueue.obtain(mBufferSize);
 		                		buffer = data.get();
 		                		buffer.clear();
 		                		try {

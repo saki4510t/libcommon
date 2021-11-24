@@ -24,6 +24,7 @@ import java.nio.ByteOrder;
 import android.media.MediaRecorder;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * AudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
@@ -32,12 +33,27 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AudioSamplerEncoder";
 
-	private final boolean mSamplerCreated;
+	/**
+	 * このオブジェクト内でAudioSamplerを生成したかどうか
+	 */
+	private final boolean mOwnSampler;
+	@NonNull
 	private final IAudioSampler mSampler;
 	private int frame_count = 0;
 
-	public AudioSamplerEncoder(final IRecorder recorder, final EncoderListener listener,
-							   final int audio_source, IAudioSampler sampler) {
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audio_source
+	 * @param sampler
+	 */
+	public AudioSamplerEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener listener,
+		final int audio_source,
+		@Nullable IAudioSampler sampler) {
+
 		super(recorder, listener, audio_source,
 			sampler != null ? sampler.getChannels() : 1,
 			sampler != null ? sampler.getSamplingFrequency() : DEFAULT_SAMPLE_RATE,
@@ -50,9 +66,9 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 				throw new IllegalArgumentException("invalid audio source:" + audio_source);
 			sampler = new AudioSampler(audio_source, 1,
 				DEFAULT_SAMPLE_RATE, SAMPLES_PER_FRAME, FRAMES_PER_BUFFER);
-			mSamplerCreated = true;
+			mOwnSampler = true;
 		} else {
-			mSamplerCreated = false;
+			mOwnSampler = false;
 		}
 		mSampler = sampler;
 	}
@@ -61,23 +77,26 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	public void start() {
 		super.start();
 		mSampler.addCallback(mSoundSamplerCallback);
-		if (mSamplerCreated)
+		if (mOwnSampler) {
 			mSampler.start();
+		}
 		new Thread(mAudioTask, "AudioTask").start();
 	}
 
 	@Override
 	public void stop() {
 		mSampler.removeCallback(mSoundSamplerCallback);
-		if (mSamplerCreated)
+		if (mOwnSampler) {
 			mSampler.stop();
+		}
 		super.stop();
 	}
 
 	@Override
 	public void release() {
-		if (mSamplerCreated)
+		if (mOwnSampler) {
 			mSampler.release();
+		}
 		super.release();
 	}
 
