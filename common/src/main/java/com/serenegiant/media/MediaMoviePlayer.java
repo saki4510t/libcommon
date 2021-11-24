@@ -360,35 +360,35 @@ public class MediaMoviePlayer {
 	private final Runnable mMoviePlayerTask = new Runnable() {
 		@Override
 		public final void run() {
-			boolean local_isRunning = false;
-			int local_req;
+			boolean isRunning = false;
+			int localReq;
 			try {
 		    	synchronized (mSync) {
-					local_isRunning = mIsRunning = true;
+					isRunning = mIsRunning = true;
 					mState = STATE_STOP;
 					mRequest = REQ_NON;
 					mRequestTime = -1;
 		    		mSync.notifyAll();
 		    	}
-				for ( ; local_isRunning ; ) {
+				for ( ; isRunning ; ) {
 					try {
 						synchronized (mSync) {
-							local_isRunning = mIsRunning;
-							local_req = mRequest;
+							isRunning = mIsRunning;
+							localReq = mRequest;
 							mRequest = REQ_NON;
 						}
 						switch (mState) {
 						case STATE_STOP:
-							local_isRunning = processStop(local_req);
+							isRunning = processStop(localReq);
 							break;
 						case STATE_PREPARED:
-							local_isRunning = processPrepared(local_req);
+							isRunning = processPrepared(localReq);
 							break;
 						case STATE_PLAYING:
-							local_isRunning = processPlaying(local_req);
+							isRunning = processPlaying(localReq);
 							break;
 						case STATE_PAUSED:
-							local_isRunning = processPaused(local_req);
+							isRunning = processPaused(localReq);
 							break;
 						}
 					} catch (final InterruptedException e) {
@@ -397,9 +397,9 @@ public class MediaMoviePlayer {
 						Log.e(TAG, "MoviePlayerTask:", e);
 						break;
 					}
-				} // for (;local_isRunning;)
+				} // for (;isRunning;)
 			} finally {
-				if (DEBUG) Log.v(TAG, "player task finished:local_isRunning=" + local_isRunning);
+				if (DEBUG) Log.v(TAG, "player task finished:isRunning=" + isRunning);
 				handleStop();
 			}
 		}
@@ -634,10 +634,11 @@ public class MediaMoviePlayer {
 		}
 		updateMovieInfo();
 		// preparation for video playback
-		mVideoTrackIndex = internal_prepare_video(source);
+		mVideoTrackIndex = internalPrepareVideo(source);
 		// preparation for audio playback
-		if (mAudioEnabled)
-			mAudioTrackIndex = internal_prepare_audio(source);
+		if (mAudioEnabled) {
+			mAudioTrackIndex = internalPrepareAudio(source);
+		}
 		mHasAudio = mAudioTrackIndex >= 0;
 		if ((mVideoTrackIndex < 0) && (mAudioTrackIndex < 0)) {
 			throw new RuntimeException("No video and audio track found in " + source);
@@ -653,7 +654,7 @@ public class MediaMoviePlayer {
 	 * @return first video track index, -1 if not found
 	 */
 	@SuppressLint("NewApi")
-	protected int internal_prepare_video(final Object source) throws IOException {
+	protected int internalPrepareVideo(final Object source) throws IOException {
 		mVideoMediaExtractor = new MediaExtractor();
 		if (source instanceof String) {
 			mVideoMediaExtractor.setDataSource((String)source);
@@ -688,7 +689,7 @@ public class MediaMoviePlayer {
 	 * @return first audio track index, -1 if not found
 	 */
 	@SuppressLint("NewApi")
-	protected int internal_prepare_audio(final Object source) throws IOException {
+	protected int internalPrepareAudio(final Object source) throws IOException {
 		mAudioMediaExtractor = new MediaExtractor();
 		if (source instanceof String) {
 			mAudioMediaExtractor.setDataSource((String)source);
@@ -776,7 +777,7 @@ public class MediaMoviePlayer {
 		mVideoInputDone = mVideoOutputDone = true;
 		Thread videoThread = null, audioThread = null;
 		if (mVideoTrackIndex >= 0) {
-			final MediaCodec codec = internal_start_video(mVideoMediaExtractor, mVideoTrackIndex);
+			final MediaCodec codec = internalStartVideo(mVideoMediaExtractor, mVideoTrackIndex);
 			if (codec != null) {
 		        mVideoMediaCodec = codec;
 		        mVideoBufferInfo = new MediaCodec.BufferInfo();
@@ -788,7 +789,7 @@ public class MediaMoviePlayer {
 		}
 		mAudioInputDone = mAudioOutputDone = true;
 		if (mAudioTrackIndex >= 0) {
-			final MediaCodec codec = internal_start_audio(mAudioMediaExtractor, mAudioTrackIndex);
+			final MediaCodec codec = internalStartAudio(mAudioMediaExtractor, mAudioTrackIndex);
 			if (codec != null) {
 		        mAudioMediaCodec = codec;
 		        mAudioBufferInfo = new MediaCodec.BufferInfo();
@@ -807,8 +808,8 @@ public class MediaMoviePlayer {
 	 * @param trackIndex
 	 * @return
 	 */
-	protected MediaCodec internal_start_video(final MediaExtractor media_extractor, final int trackIndex) {
-		if (DEBUG) Log.v(TAG, "internal_start_video:");
+	protected MediaCodec internalStartVideo(final MediaExtractor media_extractor, final int trackIndex) {
+		if (DEBUG) Log.v(TAG, "internalStartVideo:");
 		MediaCodec codec = null;
 		if (trackIndex >= 0) {
 	        final MediaFormat format = media_extractor.getTrackFormat(trackIndex);
@@ -817,7 +818,7 @@ public class MediaMoviePlayer {
 				codec = MediaCodec.createDecoderByType(mime);
 				codec.configure(format, mOutputSurface, null, 0);
 		        codec.start();
-				if (DEBUG) Log.v(TAG, "internal_start_video:codec started");
+				if (DEBUG) Log.v(TAG, "internalStartVideo:codec started");
 			} catch (final IOException e) {
 				Log.w(TAG, e);
 			}
@@ -830,8 +831,8 @@ public class MediaMoviePlayer {
 	 * @param trackIndex
 	 * @return
 	 */
-	protected MediaCodec internal_start_audio(final MediaExtractor media_extractor, final int trackIndex) {
-		if (DEBUG) Log.v(TAG, "internal_start_audio:");
+	protected MediaCodec internalStartAudio(final MediaExtractor media_extractor, final int trackIndex) {
+		if (DEBUG) Log.v(TAG, "internalStartAudio:");
 		MediaCodec codec = null;
 		if (trackIndex >= 0) {
 	        final MediaFormat format = media_extractor.getTrackFormat(trackIndex);
@@ -840,7 +841,7 @@ public class MediaMoviePlayer {
 				codec = MediaCodec.createDecoderByType(mime);
 				codec.configure(format, null, null, 0);
 		        codec.start();
-		    	if (DEBUG) Log.v(TAG, "internal_start_audio:codec started");
+		    	if (DEBUG) Log.v(TAG, "internalStartAudio:codec started");
 		    	//
 		        final ByteBuffer[] buffers = codec.getOutputBuffers();
 		        int sz = buffers[0].capacity();
@@ -895,8 +896,8 @@ public class MediaMoviePlayer {
 	 * @param presentationTimeUs
 	 * @param isAudio
 	 */
-	protected boolean internal_process_input(final MediaCodec codec, final MediaExtractor extractor, final ByteBuffer[] inputBuffers, final long presentationTimeUs, final boolean isAudio) {
-//		if (DEBUG) Log.v(TAG, "internal_process_input:presentationTimeUs=" + presentationTimeUs);
+	protected boolean internalProcessInput(final MediaCodec codec, final MediaExtractor extractor, final ByteBuffer[] inputBuffers, final long presentationTimeUs, final boolean isAudio) {
+//		if (DEBUG) Log.v(TAG, "internalProcessInput:presentationTimeUs=" + presentationTimeUs);
 		boolean result = true;
 		while (mIsRunning) {
             final int inputBufIndex = codec.dequeueInputBuffer(TIMEOUT_USEC);
@@ -920,7 +921,7 @@ public class MediaMoviePlayer {
     		presentationTimeUs += previousVideoPresentationTimeUs - presentationTimeUs; // + EPS;
     	}
     	previousVideoPresentationTimeUs = presentationTimeUs; */
-        final boolean b = internal_process_input(mVideoMediaCodec, mVideoMediaExtractor, mVideoInputBuffers,
+        final boolean b = internalProcessInput(mVideoMediaCodec, mVideoMediaExtractor, mVideoInputBuffers,
         		presentationTimeUs, false);
         if (!b) {
         	if (DEBUG) Log.i(TAG, "video track input reached EOS");
@@ -943,7 +944,7 @@ public class MediaMoviePlayer {
 	 * @param frameCallback
 	 */
 	private final void handleOutputVideo(final IFrameCallback frameCallback) {
-//    	if (DEBUG) Log.v(TAG, "handleDrainVideo:");
+//    	if (DEBUG) Log.v(TAG, "handleOutputVideo:");
 		while (mIsRunning && !mVideoOutputDone) {
 			final int decoderStatus = mVideoMediaCodec.dequeueOutputBuffer(mVideoBufferInfo, TIMEOUT_USEC);
 			if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -961,7 +962,7 @@ public class MediaMoviePlayer {
 				boolean doRender = false;
 				if (mVideoBufferInfo.size > 0) {
 					doRender = (mVideoBufferInfo.size != 0)
-						&& !internal_write_video(mVideoOutputBuffers[decoderStatus],
+						&& !internalWriteVideo(mVideoOutputBuffers[decoderStatus],
 							0, mVideoBufferInfo.size, mVideoBufferInfo.presentationTimeUs);
 					if (doRender) {
 						if (!frameCallback.onFrameAvailable(mVideoBufferInfo.presentationTimeUs))
@@ -986,8 +987,8 @@ public class MediaMoviePlayer {
 	 * @param size
 	 * @param presentationTimeUs
 	 */
-	protected boolean internal_write_video(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
-//		if (DEBUG) Log.v(TAG, "internal_write_video");
+	protected boolean internalWriteVideo(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
+//		if (DEBUG) Log.v(TAG, "internalWriteVideo");
 		// 映像の場合はSurfaceへ出力しているので特にここですることはない
 		return false;
 	}
@@ -998,7 +999,7 @@ public class MediaMoviePlayer {
     		presentationTimeUs += previousAudioPresentationTimeUs - presentationTimeUs; //  + EPS;
     	}
     	previousAudioPresentationTimeUs = presentationTimeUs; */
-        final boolean b = internal_process_input(mAudioMediaCodec, mAudioMediaExtractor, mAudioInputBuffers,
+        final boolean b = internalProcessInput(mAudioMediaCodec, mAudioMediaExtractor, mAudioInputBuffers,
         		presentationTimeUs, true);
         if (!b) {
         	if (DEBUG) Log.i(TAG, "audio track input reached EOS");
@@ -1019,7 +1020,7 @@ public class MediaMoviePlayer {
 	}
 
 	private final void handleOutputAudio(final IFrameCallback frameCallback) {
-//		if (DEBUG) Log.v(TAG, "handleDrainAudio:");
+//		if (DEBUG) Log.v(TAG, "handleOutputAudio:");
 		while (mIsRunning && !mAudioOutputDone) {
 			final int decoderStatus = mAudioMediaCodec.dequeueOutputBuffer(mAudioBufferInfo, TIMEOUT_USEC);
 			if (decoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
@@ -1035,7 +1036,7 @@ public class MediaMoviePlayer {
 					"unexpected result from audio decoder.dequeueOutputBuffer: " + decoderStatus);
 			} else { // decoderStatus >= 0
 				if (mAudioBufferInfo.size > 0) {
-					internal_write_audio(mAudioOutputBuffers[decoderStatus],
+					internalWriteAudio(mAudioOutputBuffers[decoderStatus],
 						0, mAudioBufferInfo.size, mAudioBufferInfo.presentationTimeUs);
 					if (!frameCallback.onFrameAvailable(mAudioBufferInfo.presentationTimeUs))
 						mAudioStartTime = adjustPresentationTime(mAudioSync, mAudioStartTime, mAudioBufferInfo.presentationTimeUs);
@@ -1059,8 +1060,8 @@ public class MediaMoviePlayer {
 	 * @param presentationTimeUs
 	 * @return ignored
 	 */
-	protected boolean internal_write_audio(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
-//		if (DEBUG) Log.d(TAG, "internal_write_audio");
+	protected boolean internalWriteAudio(final ByteBuffer buffer, final int offset, final int size, final long presentationTimeUs) {
+//		if (DEBUG) Log.d(TAG, "internalWriteAudio");
         if (mAudioOutTempBuf.length < size) {
         	mAudioOutTempBuf = new byte[size];
         }
@@ -1102,11 +1103,11 @@ public class MediaMoviePlayer {
 	private final void handleStop() {
     	if (DEBUG) Log.v(TAG, "handleStop:");
     	synchronized (mVideoTask) {
-    		internal_stop_video();
+    		internalStopVideo();
     		mVideoTrackIndex = -1;
     	}
     	synchronized (mAudioTask) {
-    		internal_stop_audio();
+    		internalStopAudio();
     		mAudioTrackIndex = -1;
     	}
     	if (mVideoMediaCodec != null) {
@@ -1141,12 +1142,12 @@ public class MediaMoviePlayer {
 		mCallback.onFinished();
 	}
 
-	protected void internal_stop_video() {
-		if (DEBUG) Log.v(TAG, "internal_stop_video:");
+	protected void internalStopVideo() {
+		if (DEBUG) Log.v(TAG, "internalStopVideo:");
 	}
 
-	protected void internal_stop_audio() {
-		if (DEBUG) Log.v(TAG, "internal_stop_audio:");
+	protected void internalStopAudio() {
+		if (DEBUG) Log.v(TAG, "internalStopAudio:");
     	if (mAudioTrack != null) {
     		if (mAudioTrack.getState() != AudioTrack.STATE_UNINITIALIZED)
     			mAudioTrack.stop();
