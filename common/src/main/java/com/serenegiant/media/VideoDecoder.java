@@ -95,50 +95,6 @@ public abstract class VideoDecoder extends AbstractDecoder {
 		return codec;
 	}
 
-	private static final long VSYNC2 = 33330000;		// 33.33ミリ秒, approx. 2 frames @ 60fps
-	/*
-	 * API21以降で使用可能なMediaCodec#releaseOutputBuffer(int,long)は再生したいシステム時刻から
-	 * vsync x 2早く(通常の60fpsディスプレーであれば約33ミリ秒早く)#releaseOutputBufferを呼び出すと
-	 * 最適なパフォーマンスと品質が得られるらしいのでptsを調整する。
-	 * #releaseOutputBufferを呼ぶときのptsがシステム時刻と大きく離れている時は無視されて、一番早く表示可能な
-	 * タイミング表示される、この場合にはフレームがドロップすることはないらしい。
-	 * でも#releaseOutputBuffer(int,long)へ調整したptsを渡すだけではだめで自前でウエイトを入れないとだめっぽい
-	 */
-	private long mOffsetPtsNs = -1L;
-	private long mOffsetSysTimeNs = -1L;
-	/**
-	 * 最初のフレームのpresentationTimeUsとシステム時間を保存しておいて
-	 * 現在のフレームのpresentationTimeUsと現在時刻から描画予定時刻を計算して、
-	 * そのフレームの描画予定時刻-VSYNC2まで待機する
-	 * @param presentationTimeUs
-	 * @return
-	 */
-	protected long adjustPresentationTime(final long presentationTimeUs) {
-		final long presentationTimeNs = presentationTimeUs * 1000L;
-		if (mOffsetSysTimeNs <= 0) {
-			// 初回
-			mOffsetSysTimeNs = System.nanoTime();
-			mOffsetPtsNs = mOffsetSysTimeNs - presentationTimeNs;
-		} else {
-			// 2回目以降
-			// 現在のptsから最初のptsを引いたのが再生位置、そこから最初のシステム時間と現在システム時間の差を引いたのが待ち時間
-			final long base = (mOffsetPtsNs + presentationTimeNs) - VSYNC2;
-			for (long t = base - System.nanoTime();
-				isRunning() && (t > 0); t = base - System.nanoTime()) {
-
-				if (t > 20000000) t = 20000000;	// 20ミリ以上なら10ミリ秒にする
-				synchronized (mSync) {
-					try {
-						mSync.wait(t / 1000000, (int)(t % 1000000));
-					} catch (final InterruptedException e) {
-						// ignore
-					}
-				}
-			}
-		}
-		return System.nanoTime() + VSYNC2;
-	}
-
 //--------------------------------------------------------------------------------
 	private static class VideoDecoderAPI16 extends VideoDecoder {
 		private static final String TAG = VideoDecoderAPI16.class.getSimpleName();
