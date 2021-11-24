@@ -71,14 +71,22 @@ public class MediaMoviePlayer {
 		mAudioEnabled = audio_enable;
 		new Thread(mMoviePlayerTask, TAG).start();
     	synchronized (mSync) {
+    		// ステート処理スレッド起床待ち
     		try {
-    			if (!mIsRunning)
+    			if (!mIsRunning) {
     				mSync.wait();
+				}
 			} catch (final InterruptedException e) {
 				// ignore
 			}
     	}
     }
+
+	public final void setLoop(final boolean loopEnabled) {
+		synchronized (mSync) {
+			mLoopEnabled = loopEnabled;
+		}
+	}
 
     public final int getWidth() {
         return mVideoWidth;
