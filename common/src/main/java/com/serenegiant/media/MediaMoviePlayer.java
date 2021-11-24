@@ -636,7 +636,6 @@ public class MediaMoviePlayer {
 	 */
 	@SuppressLint("NewApi")
 	protected int internal_prepare_video(final Object source) throws IOException {
-		int trackindex = -1;
 		mVideoMediaExtractor = new MediaExtractor();
 		if (source instanceof String) {
 			mVideoMediaExtractor.setDataSource((String)source);
@@ -652,10 +651,10 @@ public class MediaMoviePlayer {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
 		}
-		trackindex = selectTrack(mVideoMediaExtractor, "video/");
-		if (trackindex >= 0) {
-			mVideoMediaExtractor.selectTrack(trackindex);
-			final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackindex);
+		final int trackIndex = selectTrack(mVideoMediaExtractor, "video/");
+		if (trackIndex >= 0) {
+			mVideoMediaExtractor.selectTrack(trackIndex);
+			final MediaFormat format = mVideoMediaExtractor.getTrackFormat(trackIndex);
 			mVideoWidth = format.getInteger(MediaFormat.KEY_WIDTH);
 			mVideoHeight = format.getInteger(MediaFormat.KEY_HEIGHT);
 			mDuration = format.getLong(MediaFormat.KEY_DURATION);
@@ -663,7 +662,7 @@ public class MediaMoviePlayer {
 			if (DEBUG) Log.v(TAG, String.format("format:size(%d,%d),duration=%d,bps=%d,framerate=%f,rotation=%d",
 				mVideoWidth, mVideoHeight, mDuration, mBitrate, mFrameRate, mRotation));
 		}
-		return trackindex;
+		return trackIndex;
 	}
 
 	/**
@@ -672,7 +671,6 @@ public class MediaMoviePlayer {
 	 */
 	@SuppressLint("NewApi")
 	protected int internal_prepare_audio(final Object source) throws IOException {
-		int trackindex = -1;
 		mAudioMediaExtractor = new MediaExtractor();
 		if (source instanceof String) {
 			mAudioMediaExtractor.setDataSource((String)source);
@@ -688,10 +686,10 @@ public class MediaMoviePlayer {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
 		}
-		trackindex = selectTrack(mAudioMediaExtractor, "audio/");
-		if (trackindex >= 0) {
-			mAudioMediaExtractor.selectTrack(trackindex);
-			final MediaFormat format = mAudioMediaExtractor.getTrackFormat(trackindex);
+		final int trackIndex = selectTrack(mAudioMediaExtractor, "audio/");
+		if (trackIndex >= 0) {
+			mAudioMediaExtractor.selectTrack(trackIndex);
+			final MediaFormat format = mAudioMediaExtractor.getTrackFormat(trackIndex);
 			mAudioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
 			mAudioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
 			final int min_buf_size = AudioTrack.getMinBufferSize(mAudioSampleRate,
@@ -718,7 +716,7 @@ public class MediaMoviePlayer {
 				mAudioTrack = null;
 			}
 		}
-		return trackindex;
+		return trackIndex;
 	}
 
 	protected void updateMovieInfo() {
