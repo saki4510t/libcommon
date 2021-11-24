@@ -216,7 +216,7 @@ public class MediaMoviePlayer {
     }
 
     /**
-     * release releated resources
+     * release related resources
      */
     public final void release() {
     	if (DEBUG) Log.v(TAG, "release:");
