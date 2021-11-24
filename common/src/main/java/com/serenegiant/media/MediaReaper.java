@@ -37,6 +37,7 @@ import java.nio.ByteOrder;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.annotation.WorkerThread;
 
 /**
  * MediaCodecのエンコーダーからエンコード済みデータを非同期で引き出してmuxer等へ引き渡すためのヘルパークラス
@@ -55,7 +56,10 @@ public abstract class MediaReaper implements Runnable {
 	@Retention(RetentionPolicy.SOURCE)
 	@interface ReaperType {}
 
-	public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
+	/**
+	 * dequeueOutputBufferの最大待ち時間[ミリ秒]
+	 */
+	private static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
 
 	/**
 	 * MediaReaperからのイベント通知用コールバックリスーなー
@@ -67,6 +71,7 @@ public abstract class MediaReaper implements Runnable {
 		 * @param byteBuf
 		 * @param bufferInfo
 		 */
+		@WorkerThread
 		public void writeSampleData(@NonNull final MediaReaper reaper,
 			@NonNull final ByteBuffer byteBuf, @NonNull final MediaCodec.BufferInfo bufferInfo);
 		/**
@@ -74,18 +79,21 @@ public abstract class MediaReaper implements Runnable {
 		 * @param reaper
 		 * @param format
 		 */
+		@WorkerThread
 		public void onOutputFormatChanged(@NonNull final MediaReaper reaper,
 			@NonNull final MediaFormat format);
 		/**
 		 * 出力処理が終了した
 		 * @param reaper
 		 */
+		@WorkerThread
 		public void onStop(@NonNull final MediaReaper reaper);
 		/**
 		 * エラーが発生した
 		 * @param reaper
 		 * @param t
 		 */
+		@WorkerThread
 		public void onError(@NonNull final MediaReaper reaper, final Throwable t);
 	}
 
@@ -108,6 +116,7 @@ public abstract class MediaReaper implements Runnable {
 			mHeight = height;
 		}
 
+		@WorkerThread
 		@Override
 		protected MediaFormat createOutputFormat(
 			@NonNull final byte[] csd, final int size,
@@ -156,11 +165,13 @@ public abstract class MediaReaper implements Runnable {
 			mChannelCount = channelCount;
 		}
 		
+		@WorkerThread
 		@Override
 		protected MediaFormat createOutputFormat(
 			@NonNull final byte[] csd, final int size,
 			final int ix0, final int ix1, final int ix2) {
 
+			if (DEBUG) Log.v(TAG, "AudioReaper#createOutputFormat");
 			MediaFormat outFormat;
 	        if (ix0 >= 0) {
 				if (DEBUG) Log.w(TAG, "csd may be wrong, it may be for video");
@@ -175,6 +186,7 @@ public abstract class MediaReaper implements Runnable {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
@@ -219,14 +231,6 @@ public abstract class MediaReaper implements Runnable {
 		if (DEBUG) Log.v(TAG, "release:");
 		if (mIsRunning && !mRequestStop) {
 			mRequestStop = true;
-//			final MediaCodec encoder = mWeakEncoder.get();
-//			if (encoder != null) {
-//				try {
-//					encoder.release();
-//				} catch (final Exception e) {
-//					Log.w(TAG, e);
-//				}
-//			}
 		}
 		synchronized (mSync) {
 			mSync.notifyAll();
@@ -274,10 +278,11 @@ public abstract class MediaReaper implements Runnable {
 	/**
 	 * API21未満でのdrainループ
 	 */
+	@WorkerThread
 	private void drainLoop() {
 		boolean localRequestStop;
 		boolean localRequestDrain;
-		for (; mIsRunning; ) {
+		while (mIsRunning) {
 			synchronized (mSync) {
 				localRequestStop = mRequestStop;
 				localRequestDrain = (mRequestDrain > 0);
@@ -315,10 +320,11 @@ public abstract class MediaReaper implements Runnable {
 	 * API21以上用のdrainループ
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	@WorkerThread
 	private void drainLoopAPI21() {
 		boolean localRequestStop;
 		boolean localRequestDrain;
-		for (; mIsRunning; ) {
+		while (mIsRunning) {
 			synchronized (mSync) {
 				localRequestStop = mRequestStop;
 				localRequestDrain = (mRequestDrain > 0);
@@ -355,6 +361,7 @@ public abstract class MediaReaper implements Runnable {
 	/**
 	 * API21未満用エンコード結果取り出し処理
 	 */
+	@WorkerThread
 	private final void drain() {
 		final MediaCodec encoder = mWeakEncoder.get();
     	if (encoder == null) return;
@@ -366,7 +373,7 @@ public abstract class MediaReaper implements Runnable {
     		return;
     	}
         int count = 0;
-LOOP:	for ( ; mIsRunning ; ) {
+LOOP:	while (mIsRunning) {
             final int encoderStatus = encoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
@@ -391,7 +398,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 				// コーデックからの出力フォーマットを取得してnative側へ引き渡す
 				// getOutputFormatはINFO_OUTPUT_FORMAT_CHANGEDが来た後でないと呼んじゃダメ(クラッシュする)
                 final MediaFormat format = encoder.getOutputFormat(); // API >= 16
-                if (!callOnFormatChanged(format)) {
+                if (callOnFormatChanged(format)) {
                 	break LOOP;
 				}
             } else if (encoderStatus >= 0) {
@@ -405,7 +412,7 @@ LOOP:	for ( ; mIsRunning ; ) {
                 	// Android4.3未満をターゲットにするならここで処理しないと駄目
                     if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
 						final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
-                        if (!callOnFormatChanged(outFormat)) {
+                        if (callOnFormatChanged(outFormat)) {
                         	break LOOP;
 						}
                     }
@@ -441,7 +448,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 					break LOOP;
                 }
             }
-        }	// for ( ; mIsRunning ; )
+        }	// while (mIsRunning)
 //		if (DEBUG) Log.v(TAG, "drain:finished");
     }
 
@@ -449,11 +456,12 @@ LOOP:	for ( ; mIsRunning ; ) {
 	 * API21以上用エンコード結果取り出し処理
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	@WorkerThread
 	private final void drainAPI21() {
 		final MediaCodec encoder = mWeakEncoder.get();
     	if (encoder == null) return;
         int count = 0;
-LOOP:	for ( ; mIsRunning ; ) {
+LOOP:	while (mIsRunning) {
             final int encoderStatus = encoder.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
             if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
                 // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
@@ -477,7 +485,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 				// コーデックからの出力フォーマットを取得してnative側へ引き渡す
 				// getOutputFormatはINFO_OUTPUT_FORMAT_CHANGEDが来た後でないと呼んじゃダメ(クラッシュする)
                 final MediaFormat format = encoder.getOutputFormat(); // API >= 16
-                if (!callOnFormatChanged(format)) {
+                if (callOnFormatChanged(format)) {
                 	break LOOP;
 				}
             } else if (encoderStatus >= 0) {
@@ -491,7 +499,7 @@ LOOP:	for ( ; mIsRunning ; ) {
                 	// Android4.3未満をターゲットにするならここで処理しないと駄目
                     if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
                     	final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
-                        if (!callOnFormatChanged(outFormat)) {
+                        if (callOnFormatChanged(outFormat)) {
                         	break LOOP;
 						}
                     }
@@ -527,7 +535,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 					break LOOP;
                 }
             }
-        }	// for ( ; mIsRunning ; )
+        }	// while (mIsRunning)
 //		if (DEBUG) Log.v(TAG, "drain:finished");
     }
 
@@ -538,6 +546,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 	 * @param encodedData
 	 * @return
 	 */
+	@WorkerThread
 	private MediaFormat createOutputFormat(
 		@NonNull final MediaCodec.BufferInfo info,
 		@NonNull final ByteBuffer encodedData) {
@@ -553,21 +562,29 @@ LOOP:	for ( ; mIsRunning ; ) {
 		return createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
 	}
 
+	@WorkerThread
 	protected abstract MediaFormat createOutputFormat(
 		@NonNull final byte[] csd, final int size,
 		final int ix0, final int ix1, final int ix2);
 
+	/**
+	 * onOutputFormatChangedコールバックメソッドを呼び出す
+	 * @param format
+	 * @return true: エラー発生した
+	 */
+	@WorkerThread
 	private boolean callOnFormatChanged(final MediaFormat format) {
 		try {
 			mListener.onOutputFormatChanged(this, format);
 			mRecorderStarted = true;
-			return true;
+			return false;
 		} catch (final Exception e) {
 			callOnError(e);
 		}
-		return false;
+		return true;
 	}
 
+	@WorkerThread
 	private void callOnStop() {
 		try {
 			mListener.onStop(this);
@@ -576,6 +593,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 		}
 	}
 
+	@WorkerThread
 	private void callOnError(final Throwable t) {
 		try {
 			mListener.onError(this, t);
