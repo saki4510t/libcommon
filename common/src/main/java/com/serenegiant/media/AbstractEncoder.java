@@ -249,69 +249,69 @@ public abstract class AbstractEncoder implements Encoder {
 			// #startが呼ばれるまで待機
 			for ( ; !mIsCapturing && !localRequestStop ; ) {
 				synchronized (mSync) {
-				try {
-					mSync.wait(10);
-				} catch (final InterruptedException e) {
-					break;
-				}
-				localRequestStop = mRequestStop;
-				mRequestDrain = 0;
-			}
-		}
-		// エンコード済みデータの処理ループ
-		for ( ; ; ) {
-			synchronized (mSync) {
-				localRequestStop = mRequestStop;
-				localRequestDrain = (mRequestDrain > 0);
-				if (localRequestDrain)
-					mRequestDrain--;
-			}
-			if (localRequestStop) {
-				try {
-					drain();
-				} catch (final Exception e) {
-					// ignore
-				}
-				try {
-					signalEndOfInputStream();
-				} catch (final Exception e) {
-					// ignore
-				}
-				try {
-					drain();
-				} catch (final Exception e) {
-					// ignore
-				}
-				release();
-				break;
-			}
-			if (localRequestDrain) {
-				try {
-					drain();
-				} catch (final Exception e) {
-					if (!mRequestStop) {
-						callOnError(e);
-					}
-					mRequestStop = true;
-				}
-			} else {
-				synchronized (mSync) {
 					try {
-						mSync.wait(30);
+						mSync.wait(10);
 					} catch (final InterruptedException e) {
 						break;
 					}
+					localRequestStop = mRequestStop;
+					mRequestDrain = 0;
 				}
 			}
-		} // end of for
-		// 終了
-		synchronized (mSync) {
-			mRequestStop = true;
-			mIsCapturing = false;
-			mSync.notifyAll();
+			// エンコード済みデータの処理ループ
+			for ( ; ; ) {
+				synchronized (mSync) {
+					localRequestStop = mRequestStop;
+					localRequestDrain = (mRequestDrain > 0);
+					if (localRequestDrain)
+						mRequestDrain--;
+				}
+				if (localRequestStop) {
+					try {
+						drain();
+					} catch (final Exception e) {
+						// ignore
+					}
+					try {
+						signalEndOfInputStream();
+					} catch (final Exception e) {
+						// ignore
+					}
+					try {
+						drain();
+					} catch (final Exception e) {
+						// ignore
+					}
+					release();
+					break;
+				}
+				if (localRequestDrain) {
+					try {
+						drain();
+					} catch (final Exception e) {
+						if (!mRequestStop) {
+							callOnError(e);
+						}
+						mRequestStop = true;
+					}
+				} else {
+					synchronized (mSync) {
+						try {
+							mSync.wait(30);
+						} catch (final InterruptedException e) {
+							break;
+						}
+					}
+				}
+			} // end of for
+			// 終了
+			synchronized (mSync) {
+				mRequestStop = true;
+				mIsCapturing = false;
+				mSync.notifyAll();
+			}
 		}
-	}
-};
+	};
 
 //********************************************************************************
 	/**
