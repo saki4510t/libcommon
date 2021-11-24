@@ -309,6 +309,10 @@ public class MediaMoviePlayer {
 	private long mDuration;
 	private int mRequest;
 	private long mRequestTime;
+	/**
+	 * ループ再生が有効かどうか
+	 */
+	private volatile boolean mLoopEnabled;
     // for video playback
 	private final Object mVideoSync = new Object();
 	private final Surface mOutputSurface;
@@ -873,6 +877,7 @@ public class MediaMoviePlayer {
 		}
         if (mVideoInputDone && mVideoOutputDone && mAudioInputDone && mAudioOutputDone) {
             if (DEBUG) Log.d(TAG, "Reached EOS, looping check");
+            // FIXME 未実装 ループ再生のチェック
         	handleStop();
         }
 	}
