@@ -1042,7 +1042,7 @@ public class RecordingService extends BaseService {
 
 		@Override
 		public void writeSampleData(@NonNull final MediaReaper reaper,
-			final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+			@NonNull final ByteBuffer byteBuf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
 
 //			if (DEBUG) Log.v(TAG, "writeSampleData:");
 			try {

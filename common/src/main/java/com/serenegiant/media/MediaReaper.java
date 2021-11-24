@@ -61,11 +61,31 @@ public abstract class MediaReaper implements Runnable {
 	 * MediaReaperからのイベント通知用コールバックリスーなー
 	 */
 	public interface ReaperListener {
+		/**
+		 * エンコード済みのデータが準備できた
+		 * @param reaper
+		 * @param byteBuf
+		 * @param bufferInfo
+		 */
 		public void writeSampleData(@NonNull final MediaReaper reaper,
-			final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+			@NonNull final ByteBuffer byteBuf, @NonNull final MediaCodec.BufferInfo bufferInfo);
+		/**
+		 * 出力フォーマットが変更された
+		 * @param reaper
+		 * @param format
+		 */
 		public void onOutputFormatChanged(@NonNull final MediaReaper reaper,
 			@NonNull final MediaFormat format);
+		/**
+		 * 出力処理が終了した
+		 * @param reaper
+		 */
 		public void onStop(@NonNull final MediaReaper reaper);
+		/**
+		 * エラーが発生した
+		 * @param reaper
+		 * @param e
+		 */
 		public void onError(@NonNull final MediaReaper reaper, final Exception e);
 	}
 
@@ -73,10 +93,13 @@ public abstract class MediaReaper implements Runnable {
 	 * 映像エンコーダー用MediaReaper実装(h.264/AVC)
 	 */
 	public static class VideoReaper extends MediaReaper {
-		public static final String MIME_AVC = "video/avc";
+		private static final String MIME_AVC = "video/avc";
 		private final int mWidth;
 		private final int mHeight;
-		public VideoReaper(final MediaCodec encoder, @NonNull final ReaperListener listener,
+
+		public VideoReaper(
+			@NonNull final MediaCodec encoder,
+			@NonNull final ReaperListener listener,
 			final int width, final int height) {
 			
 			super(REAPER_VIDEO, encoder, listener);
@@ -123,7 +146,9 @@ public abstract class MediaReaper implements Runnable {
 		private final int mSampleRate;
 		private final int mChannelCount;
 		
-		public AudioReaper(final MediaCodec encoder, @NonNull final ReaperListener listener,
+		public AudioReaper(
+			@NonNull final MediaCodec encoder,
+			@NonNull final ReaperListener listener,
 			final int sampleRate, final int channelCount) {
 
 			super(REAPER_AUDIO, encoder, listener);
@@ -171,7 +196,8 @@ public abstract class MediaReaper implements Runnable {
 
 
 	public MediaReaper(@ReaperType final int reaperType,
-		final MediaCodec encoder, @NonNull final ReaperListener listener) {
+		@NonNull final MediaCodec encoder,
+		@NonNull final ReaperListener listener) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mWeakEncoder = new WeakReference<MediaCodec>(encoder);
@@ -235,9 +261,9 @@ public abstract class MediaReaper implements Runnable {
 			mSync.notify();	// 起床通知
         }
         if (BuildCheck.isLollipop()) {
-        	drain_loop_API21();
+        	drainLoopAPI21();
 		} else {
-			drain_loop();
+			drainLoop();
 		}
         synchronized (mSync) {
         	mRequestStop = true;
@@ -248,7 +274,7 @@ public abstract class MediaReaper implements Runnable {
 	/**
 	 * API21未満でのdrainループ
 	 */
-	private void drain_loop() {
+	private void drainLoop() {
 		boolean localRequestStop;
 		boolean localRequestDrain;
 		for (; mIsRunning; ) {
@@ -289,7 +315,7 @@ public abstract class MediaReaper implements Runnable {
 	 * API21以上用のdrainループ
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	private void drain_loop_API21() {
+	private void drainLoopAPI21() {
 		boolean localRequestStop;
 		boolean localRequestDrain;
 		for (; mIsRunning; ) {
@@ -302,13 +328,13 @@ public abstract class MediaReaper implements Runnable {
 			}
 			try {
 				if (localRequestStop) {
-					drain_API21();
+					drainAPI21();
 					mIsEOS = true;
 					release();
 					break;
 				}
 				if (localRequestDrain) {
-					drain_API21();
+					drainAPI21();
 				} else {
 					synchronized (mSync) {
 						try {
@@ -423,7 +449,7 @@ LOOP:	for ( ; mIsRunning ; ) {
 	 * API21以上用エンコード結果取り出し処理
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	private final void drain_API21() {
+	private final void drainAPI21() {
 		final MediaCodec encoder = mWeakEncoder.get();
     	if (encoder == null) return;
         int count = 0;
