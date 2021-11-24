@@ -804,15 +804,15 @@ public class MediaMoviePlayer {
 	}
 
 	/**
-	 * @param media_extractor
+	 * @param extractor
 	 * @param trackIndex
 	 * @return
 	 */
-	protected MediaCodec internalStartVideo(final MediaExtractor media_extractor, final int trackIndex) {
+	protected MediaCodec internalStartVideo(final MediaExtractor extractor, final int trackIndex) {
 		if (DEBUG) Log.v(TAG, "internalStartVideo:");
 		MediaCodec codec = null;
 		if (trackIndex >= 0) {
-	        final MediaFormat format = media_extractor.getTrackFormat(trackIndex);
+	        final MediaFormat format = extractor.getTrackFormat(trackIndex);
 	        final String mime = format.getString(MediaFormat.KEY_MIME);
 			try {
 				codec = MediaCodec.createDecoderByType(mime);
@@ -827,15 +827,15 @@ public class MediaMoviePlayer {
 	}
 
 	/**
-	 * @param media_extractor
+	 * @param extractor
 	 * @param trackIndex
 	 * @return
 	 */
-	protected MediaCodec internalStartAudio(final MediaExtractor media_extractor, final int trackIndex) {
+	protected MediaCodec internalStartAudio(final MediaExtractor extractor, final int trackIndex) {
 		if (DEBUG) Log.v(TAG, "internalStartAudio:");
 		MediaCodec codec = null;
 		if (trackIndex >= 0) {
-	        final MediaFormat format = media_extractor.getTrackFormat(trackIndex);
+	        final MediaFormat format = extractor.getTrackFormat(trackIndex);
 	        final String mime = format.getString(MediaFormat.KEY_MIME);
 			try {
 				codec = MediaCodec.createDecoderByType(mime);
