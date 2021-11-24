@@ -108,6 +108,22 @@ public class AudioEncoder extends AbstractAudioEncoder {
 		                	final int sizeInBytes = AbstractAudioEncoder.SAMPLES_PER_FRAME * mChannelCount;
 		                	for ( ; ;) {
 		                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
+								// check recording state
+								final int recordingState = audioRecord.getRecordingState();
+								if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
+									if (err_count == 0) {
+										Log.e(TAG, "not a recording state," + recordingState);
+									}
+									err_count++;
+									if (err_count > 20) {
+										break;
+									} else {
+										synchronized (mSync) {
+											mSync.wait(100);
+										}
+										continue;
+									}
+								}
 		                		buf.clear();
 		                		try {
 		                			readBytes = audioRecord.read(buf, sizeInBytes);
