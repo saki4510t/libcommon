@@ -184,7 +184,7 @@ public abstract class MediaReaper implements Runnable {
 	@ReaperType
 	private final int mReaperType;
 	/**
-	 * エンコード用バッファ
+	 * エンコード用バッファ情報
 	 */
 	@NonNull
 	private final MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
