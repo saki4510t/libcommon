@@ -633,9 +633,9 @@ public class MediaMoviePlayer {
 			mAudioMediaExtractor.setDataSource((String)source);
 		} else if (source instanceof AssetFileDescriptor) {
 			if (BuildCheck.isAndroid7()) {
-				mVideoMediaExtractor.setDataSource((AssetFileDescriptor)source);
+				mAudioMediaExtractor.setDataSource((AssetFileDescriptor)source);
 			} else {
-				mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
+				mAudioMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
 			}
 		} else {
 			// ここには来ないけど
