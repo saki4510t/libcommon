@@ -55,6 +55,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * 実データではなくサムネイルを表示する
  * MediaStoreRecyclerAdapterでは読み込めないファイルをオミットするためにインデックスを
  * List<Integer>で保持しているがこれはCursorを直接使う
+ * ファイル数が多いときはこれが一番滑らかに表示される
  */
 public class MediaStoreCursorRecyclerAdapter
 	extends RecyclerView.Adapter<MediaStoreCursorRecyclerAdapter.ViewHolder> {
