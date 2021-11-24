@@ -82,6 +82,11 @@ public class MediaMoviePlayer {
     	}
     }
 
+	/**
+	 * ループ再生を有効にするかどうかを設定
+	 * FIXME ループ再生機能自体は未実装
+	 * @param loopEnabled
+	 */
 	public final void setLoop(final boolean loopEnabled) {
 		synchronized (mSync) {
 			mLoopEnabled = loopEnabled;
