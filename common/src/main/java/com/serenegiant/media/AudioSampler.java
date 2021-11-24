@@ -24,6 +24,9 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 /**
  * AudioRecordを使って音声データを取得し、登録したコールバックへ分配するためのクラス
  * 同じ音声入力ソースに対して複数のAudioRecordを生成するとエラーになるのでシングルトン的にアクセス出来るようにするため
@@ -32,6 +35,9 @@ public class AudioSampler extends IAudioSampler {
 //	private static final boolean DEBUG = false;
 	private static final String TAG = AudioSampler.class.getSimpleName();
 
+	@NonNull
+	private final Object mSync = new Object();
+	@Nullable
 	private AudioThread mAudioThread;
     private final int AUDIO_SOURCE;
     private final int SAMPLING_RATE, CHANNEL_COUNT;
@@ -69,11 +75,13 @@ public class AudioSampler extends IAudioSampler {
 	public synchronized void start() {
 //		if (DEBUG) Log.v(TAG, "start:mIsCapturing=" + mIsCapturing);
 		super.start();
-		if (mAudioThread == null) {
-			init_pool(SAMPLES_PER_FRAME);
-			// 内蔵マイクからの音声取り込みスレッド生成＆実行
-	        mAudioThread = new AudioThread();
-			mAudioThread.start();
+		synchronized (mSync) {
+			if (mAudioThread == null) {
+				init_pool(SAMPLES_PER_FRAME);
+				// 内蔵マイクからの音声取り込みスレッド生成＆実行
+				mAudioThread = new AudioThread();
+				mAudioThread.start();
+			}
 		}
 	}
 
@@ -83,8 +91,11 @@ public class AudioSampler extends IAudioSampler {
 	@Override
 	public synchronized void stop() {
 //		if (DEBUG) Log.v(TAG, "stop:mIsCapturing=" + mIsCapturing);
-		mIsCapturing = false;
-		mAudioThread = null;
+		synchronized (mSync) {
+			mIsCapturing = false;
+			mAudioThread = null;
+			mSync.notify();
+		}
 		super.stop();
 	}
 
@@ -156,9 +167,7 @@ LOOP:							for ( ; mIsCapturing ;) {
 									if (data != null) {
 										// check recording state
 										final int recordingState = audioRecord.getRecordingState();
-										if (recordingState
-											!= AudioRecord.RECORDSTATE_RECORDING) {
-
+										if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
 											if (err_count == 0) {
 												Log.e(TAG, "not a recording state," + recordingState);
 											}
@@ -168,7 +177,9 @@ LOOP:							for ( ; mIsCapturing ;) {
 												retry--;
 												break LOOP;
 											} else {
-												Thread.sleep(100);
+												synchronized (mSync) {
+													mSync.wait(100);
+												}
 												continue;
 											}
 										}
@@ -246,10 +257,12 @@ LOOP:							for ( ; mIsCapturing ;) {
 					if (mIsCapturing && (err_count > 0) && (retry > 0)) {
 						// キャプチャリング中でエラーからのリカバリー処理が必要なときは0.5秒待機
 						for (int i = 0; mIsCapturing && (i < 5); i++) {
-							try {
-								Thread.sleep(100);
-							} catch (final InterruptedException e) {
-								break RETRY_LOOP;
+							synchronized (mSync) {
+								try {
+									mSync.wait(100);
+								} catch (final InterruptedException e) {
+									break RETRY_LOOP;
+								}
 							}
 						}
 					}
