@@ -161,7 +161,7 @@ public abstract class AbstractDecoder implements Decoder {
 				mDecoder = createDecoder(mTrackIndex, format);
 				mInputDone = mOutputDone = mRequestSeek = false;
 				mIsRunning = true;
-				final Thread decoderThread = new Thread(createOutputTask(), TAG + "-" + this.hashCode());
+				final Thread decoderThread = new Thread(createOutputTask(mTrackIndex), TAG + "-" + this.hashCode());
 				synchronized (mSync) {
 					decoderThread.start();
 					try {
@@ -191,7 +191,7 @@ public abstract class AbstractDecoder implements Decoder {
 	 * 出力用スレッドの実行部を生成
 	 * @return
 	 */
-	protected abstract DecodeTask createOutputTask();
+	protected abstract DecodeTask createOutputTask(final int trackIndex);
 
 	public void stop() {
 		mIsRunning = false;
@@ -227,6 +227,12 @@ public abstract class AbstractDecoder implements Decoder {
 	 * デコードスレッドの実行部の基本クラス
 	 */
 	protected abstract class DecodeTask implements Runnable {
+		protected final int trackIndex;
+
+		protected DecodeTask(final int trackIndex) {
+			this.trackIndex = trackIndex;
+		}
+
 		@Override
 		public void run() {
 			if (DEBUG) Log.v(TAG, "DecodeTask:start");
@@ -248,7 +254,7 @@ public abstract class AbstractDecoder implements Decoder {
 						handleSeek(requestTimeUs);
 					}
 			        if (!mInputDone) {
-						handleInput(mExtractor, mTrackIndex, mDecoder);
+						handleInput(mExtractor, mDecoder);
 			        }
 			        if (!mOutputDone) {
 						handleOutput(mDecoder);
@@ -282,7 +288,7 @@ public abstract class AbstractDecoder implements Decoder {
 		 * @param decoder
 		 */
 		protected abstract void handleInput(
-			@NonNull final MediaExtractor extractor, final int targetTrackIndex,
+			@NonNull final MediaExtractor extractor,
 			@NonNull final MediaCodec decoder);
 
 		/**
@@ -299,7 +305,6 @@ public abstract class AbstractDecoder implements Decoder {
 		 */
 		protected void handleInputAPI16(
 			@NonNull final MediaExtractor extractor,
-			final int targetTrackIndex,
 			@NonNull final MediaCodec decoder,
 			@NonNull final ByteBuffer[] inputBuffers) {
 
@@ -350,7 +355,6 @@ public abstract class AbstractDecoder implements Decoder {
 		@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 		protected void handleInputAPI21(
 			@NonNull final MediaExtractor extractor,
-			final int targetTrackIndex,
 			@NonNull final MediaCodec decoder) {
 			boolean b = true;
 			while (isRunning()) {

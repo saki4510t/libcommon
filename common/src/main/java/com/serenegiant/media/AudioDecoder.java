@@ -152,14 +152,14 @@ public abstract class AudioDecoder extends AbstractDecoder {
 		}
 
 		@Override
-		protected DecodeTask createOutputTask() {
-			return new DecodeTask() {
+		protected DecodeTask createOutputTask(final int trackIndex) {
+			return new DecodeTask(trackIndex) {
 				@Override
 				protected void handleInput(
-					@NonNull final MediaExtractor extractor, final int targetTrackIndex,
+					@NonNull final MediaExtractor extractor,
 					@NonNull final MediaCodec decoder) {
 
-					handleInputAPI16(extractor, targetTrackIndex, decoder, mInputBuffers);
+					handleInputAPI16(extractor, decoder, mInputBuffers);
 				}
 
 				@Override
@@ -226,14 +226,14 @@ public abstract class AudioDecoder extends AbstractDecoder {
 		}
 
 		@Override
-		protected DecodeTask createOutputTask() {
-			return new DecodeTask() {
+		protected DecodeTask createOutputTask(final int trackIndex) {
+			return new DecodeTask(trackIndex) {
 				@Override
 				protected void handleInput(
-					@NonNull final MediaExtractor extractor, final int targetTrackIndex,
+					@NonNull final MediaExtractor extractor,
 					@NonNull final MediaCodec decoder) {
 
-					handleInputAPI21(extractor, targetTrackIndex, decoder);
+					handleInputAPI21(extractor, decoder);
 				}
 
 				@Override
