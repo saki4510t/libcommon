@@ -19,19 +19,12 @@ package com.serenegiant.media;
 */
 
 import android.annotation.SuppressLint;
-import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec;
 import android.media.MediaExtractor;
 import android.media.MediaFormat;
 import android.os.Build;
-import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.system.BuildCheck;
-
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -55,17 +48,14 @@ public abstract class AbstractDecoder implements Decoder {
 	private final String mMimeType;
 	@NonNull
 	protected final MediaCodec.BufferInfo mBufferInfo = new MediaCodec.BufferInfo();
-	@NonNull
-	private final MediaExtractor mExtractor;
 	@Nullable
-	private MediaCodec mDecoder;
+	private MediaFormat mFormat;
+	@Nullable
+	protected MediaCodec mDecoder;
 	private long mStartTimeNs;
 	private volatile int mTrackIndex;
 	private volatile boolean mIsRunning;
-	protected boolean mInputDone;
 	protected boolean mOutputDone;
-	protected boolean mRequestSeek;
-	protected long mRequestTimeUs;
 
 	/**
 	 * コンストラクタ
@@ -76,7 +66,6 @@ public abstract class AbstractDecoder implements Decoder {
 		@NonNull final String mimeType,
 		@NonNull final DecoderListener listener) {
 		mMimeType = mimeType;
-		mExtractor = new MediaExtractor();
     }
 
 	@Override
@@ -104,38 +93,18 @@ public abstract class AbstractDecoder implements Decoder {
 
 	/**
 	 * デコードの準備
-	 * @param source String, AssetFileDescriptor, FileDescriptorのいずれか
+	 * @param extractor String, AssetFileDescriptor, FileDescriptorのいずれか
 	 * XXX 映像と音声の両方に同じFileDescriptorを渡すと途中でMPEG4Extractor: Video is malformedとlogCatへ出力されて再生が止まってしまうことがある
 	 * @return トラックインデックス
 	 * @throws IOException
 	 */
 	@SuppressLint("NewApi")
-	public int prepare(@NonNull final Object source) throws IOException, IllegalArgumentException {
-		if (source instanceof String) {
-			final String srcString = (String)source;
-			final File src = new File(srcString);
-			if (TextUtils.isEmpty(srcString) || !src.canRead()) {
-				throw new FileNotFoundException("Unable to read " + source);
-			}
-			mExtractor.setDataSource((String)source);	// API>=16
-		} else if (source instanceof AssetFileDescriptor) {
-			final FileDescriptor fd = ((AssetFileDescriptor)source).getFileDescriptor();
-			if (BuildCheck.isAndroid7()) {
-				mExtractor.setDataSource((AssetFileDescriptor)source);	// API>=24
-			} else {
-				mExtractor.setDataSource(fd);			// API>=16
-			}
-		} else if (source instanceof FileDescriptor) {
-			mExtractor.setDataSource((FileDescriptor)source);	// API>=16
-		} else {
-			// ここには来ないけど
-			throw new IllegalArgumentException("unknown source type:source=" + source);
-		}
-		mTrackIndex = findTrack(mExtractor, mMimeType);
+	public int prepare(@NonNull final MediaExtractor extractor) throws IllegalArgumentException {
+		mTrackIndex = findTrack(extractor, mMimeType);
 		if (mTrackIndex >= 0) {
-			mExtractor.selectTrack(mTrackIndex);
-			final MediaFormat format = mExtractor.getTrackFormat(mTrackIndex);
-			internalPrepare(mTrackIndex, format);
+			extractor.selectTrack(mTrackIndex);
+			mFormat = extractor.getTrackFormat(mTrackIndex);
+			internalPrepare(mTrackIndex, mFormat);
 		} else {
 			throw new IllegalArgumentException("Track not found for " + mMimeType);
 		}
@@ -155,17 +124,16 @@ public abstract class AbstractDecoder implements Decoder {
 	public void start() {
 		if (DEBUG) Log.v(TAG, "start:trackIx=" + mTrackIndex);
 		if (mTrackIndex >= 0) {
-	        final MediaFormat format = mExtractor.getTrackFormat(mTrackIndex);
-	        final String mime = format.getString(MediaFormat.KEY_MIME);
+	        final String mime = mFormat.getString(MediaFormat.KEY_MIME);
 			try {
-				mDecoder = createDecoder(mTrackIndex, format);
-				mInputDone = mOutputDone = mRequestSeek = false;
+				mDecoder = createDecoder(mTrackIndex, mFormat);
+				mOutputDone = false;
 				mIsRunning = true;
-				final Thread decoderThread = new Thread(createOutputTask(mTrackIndex), TAG + "-" + this.hashCode());
+				final Thread outputThread = new Thread(createOutputTask(mTrackIndex), TAG + "-" + this.hashCode());
 				synchronized (mSync) {
-					decoderThread.start();
+					outputThread.start();
 					try {
-						// 出力スレッドの開始町
+						// 出力スレッドの開始待ち
 						mSync.wait(1000);
 					} catch (final InterruptedException e) {
 						if (DEBUG) Log.w(TAG, e);
@@ -191,7 +159,9 @@ public abstract class AbstractDecoder implements Decoder {
 	 * 出力用スレッドの実行部を生成
 	 * @return
 	 */
-	protected abstract DecodeTask createOutputTask(final int trackIndex);
+	protected abstract OutputTask createOutputTask(final int trackIndex);
+
+	public abstract void decode(@NonNull final MediaExtractor extractor);
 
 	public void stop() {
 		mIsRunning = false;
@@ -200,18 +170,74 @@ public abstract class AbstractDecoder implements Decoder {
 		}
 	}
 
-	/**
-	 * request to seek to specifc timed frame<br>
-	 * if the frame is not a key frame, frame image will be broken
-	 *
-	 * @param newTimeUs seek to new time[usec]
-	 */
-	public final void seek(final long newTimeUs) {
-		if (DEBUG) Log.v(TAG, "seek");
+	public void signalEndOfStream() {
+		if (DEBUG) Log.i(TAG, "signalEndOfStream:");
+		while (isRunning()) {
+			final int inputBufIndex = mDecoder.dequeueInputBuffer(TIMEOUT_USEC);
+			if (inputBufIndex >= 0) {
+				mDecoder.queueInputBuffer(inputBufIndex, 0, 0, 0L,
+					MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+				if (DEBUG) Log.v(TAG, "signalEndOfStream:sent input EOS:" + mDecoder);
+				break;
+			}
+		}
 		synchronized (mSync) {
-			mRequestSeek = true;
-			mRequestTimeUs = newTimeUs;
 			mSync.notifyAll();
+		}
+	}
+
+	/**
+	 * MediaCodecのデコーダーへの入力処理, API>=16&API<21用
+	 * @param extractor
+	 * @param decoder
+	 */
+	protected void decodeAPI16(
+		@NonNull final MediaExtractor extractor,
+		@NonNull final MediaCodec decoder,
+		final ByteBuffer[] inputBuffers) {
+
+		while (isRunning()) {
+			final int inputBufIndex = decoder.dequeueInputBuffer(TIMEOUT_USEC);
+			if (inputBufIndex >= 0) {
+				final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
+				if (size > 0) {
+					final long presentationTimeUs = extractor.getSampleTime();
+					decoder.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
+				} else {
+					// 念のためにsize<=0ならEOSを送る
+					mDecoder.queueInputBuffer(inputBufIndex, 0, 0, 0L,
+						MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+				}
+				break;
+			}
+		}
+	}
+
+	/**
+	 * MediaCodecのデコーダーへの入力処理, API>=21用
+	 * @param extractor
+	 * @param decoder
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+	protected void decodeAPI21(
+		@NonNull final MediaExtractor extractor,
+		@NonNull final MediaCodec decoder) {
+
+		while (isRunning()) {
+			final int inputBufIndex = decoder.dequeueInputBuffer(TIMEOUT_USEC);
+			if (inputBufIndex >= 0) {
+				final ByteBuffer in = decoder.getInputBuffer(inputBufIndex);
+				final int size = extractor.readSampleData(in, 0);
+				if (size > 0) {
+					final long presentationTimeUs = extractor.getSampleTime();
+					decoder.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
+				} else {
+					// 念のためにsize<=0ならEOSを送る
+					mDecoder.queueInputBuffer(inputBufIndex, 0, 0, 0L,
+						MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+				}
+				break;
+			}
 		}
 	}
 
@@ -226,10 +252,10 @@ public abstract class AbstractDecoder implements Decoder {
 	/**
 	 * デコードスレッドの実行部の基本クラス
 	 */
-	protected abstract class DecodeTask implements Runnable {
+	protected abstract class OutputTask implements Runnable {
 		protected final int trackIndex;
 
-		protected DecodeTask(final int trackIndex) {
+		protected OutputTask(final int trackIndex) {
 			this.trackIndex = trackIndex;
 		}
 
@@ -238,24 +264,10 @@ public abstract class AbstractDecoder implements Decoder {
 			if (DEBUG) Log.v(TAG, "DecodeTask:start");
 			synchronized (mSync) {
 				// 出力スレッドが起床したことを通知
-				mExtractor.advance();
 				mSync.notify();
 			}
-			while ( mIsRunning && !mInputDone && !mOutputDone ) {
+			while ( mIsRunning && !mOutputDone ) {
 				try {
-					final boolean requestSeek;
-					final long requestTimeUs;
-					synchronized (mSync) {
-						requestTimeUs = mRequestTimeUs;
-						requestSeek = mRequestSeek;
-						mRequestSeek = false;
-					}
-					if (requestSeek) {
-						handleSeek(requestTimeUs);
-					}
-			        if (!mInputDone) {
-						handleInput(mExtractor, mDecoder);
-			        }
 			        if (!mOutputDone) {
 						handleOutput(mDecoder);
 			        }
@@ -266,136 +278,16 @@ public abstract class AbstractDecoder implements Decoder {
 			} // end of while
 			if (DEBUG) Log.v(TAG, "DecodeTask:finished");
 			synchronized (mSync) {
-				mInputDone = mOutputDone = true;
+				mOutputDone = true;
 				mSync.notifyAll();
 			}
 		}
-
-		/**
-		 * 再生位置の変更処理
-		 * @param requestTimeUs
-		 */
-		protected void handleSeek(final long requestTimeUs) {
-			if (mTrackIndex >= 0) {
-				mExtractor.seekTo(requestTimeUs, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
-				mExtractor.advance();
-			}
-		}
-
-		/**
-		 * デコーダーへの入力処理
-		 * @param extractor
-		 * @param decoder
-		 */
-		protected abstract void handleInput(
-			@NonNull final MediaExtractor extractor,
-			@NonNull final MediaCodec decoder);
 
 		/**
 		 * デコーダーからの出力を受け取る処理
 		 * @param decoder
 		 */
 		protected abstract void handleOutput(@NonNull final MediaCodec decoder);
-
-		/**
-		 * 音声用と映像用の映像入力処理は同じなのでヘルパーメソッドを作っておく, API>=16&API<21用
-		 * @param extractor
-		 * @param decoder
-		 * @param inputBuffers
-		 */
-		protected void handleInputAPI16(
-			@NonNull final MediaExtractor extractor,
-			@NonNull final MediaCodec decoder,
-			@NonNull final ByteBuffer[] inputBuffers) {
-
-			boolean b = true;
-			while (isRunning()) {
-				final int trackIx = extractor.getSampleTrackIndex();
-				final long presentationTimeUs = extractor.getSampleTime();	// return -1 if no data is available
-				if ((presentationTimeUs > 0) && (targetTrackIndex == trackIx)) {
-					final int inputBufIndex = decoder.dequeueInputBuffer(0);
-					if (inputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
-						break;
-					} else if (inputBufIndex >= 0) {
-						final int size = extractor.readSampleData(inputBuffers[inputBufIndex], 0);
-						if (size > 0) {
-							decoder.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
-						}
-						b = extractor.advance();    // return false if no data is available
-						break;
-					}
-				} else {
-					b = extractor.advance();    // return false if no data is available
-					break;
-				}
-			}
-			if (!b) {
-				if (DEBUG) Log.i(TAG, "input reached EOS");
-				while (isRunning()) {
-					final int inputBufIndex = decoder.dequeueInputBuffer(TIMEOUT_USEC);
-					if (inputBufIndex >= 0) {
-						decoder.queueInputBuffer(inputBufIndex, 0, 0, 0L,
-							MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-						if (DEBUG) Log.v(TAG, "sent input EOS:" + decoder);
-						break;
-					}
-				}
-				synchronized (mSync) {
-					mInputDone = true;
-					mSync.notifyAll();
-				}
-			}
-		}
-
-		/**
-		 * 音声用と映像用の映像入力処理は同じなのでヘルパーメソッドを作っておく, API>=21用
-		 * @param extractor
-		 * @param decoder
-		 */
-		@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-		protected void handleInputAPI21(
-			@NonNull final MediaExtractor extractor,
-			@NonNull final MediaCodec decoder) {
-			boolean b = true;
-			while (isRunning()) {
-				final int trackIx = extractor.getSampleTrackIndex();
-				final long presentationTimeUs = extractor.getSampleTime();	// return -1 if no data is available
-				if ((presentationTimeUs > 0) && (targetTrackIndex == trackIx)) {
-					final int inputBufIndex = decoder.dequeueInputBuffer(0);
-					if (inputBufIndex == MediaCodec.INFO_TRY_AGAIN_LATER) {
-						break;
-					} else if (inputBufIndex >= 0) {
-						final ByteBuffer in = decoder.getInputBuffer(inputBufIndex);
-						in.clear();
-						final int size = extractor.readSampleData(in, 0);
-						if (size > 0) {
-							decoder.queueInputBuffer(inputBufIndex, 0, size, presentationTimeUs, 0);
-						}
-						b = extractor.advance();    // return false if no data is available
-						break;
-					}
-				} else {
-					b = extractor.advance();    // return false if no data is available
-					break;
-				}
-			}
-			if (!b) {
-				if (DEBUG) Log.i(TAG, "input reached EOS");
-				while (isRunning()) {
-					final int inputBufIndex = decoder.dequeueInputBuffer(TIMEOUT_USEC);
-					if (inputBufIndex >= 0) {
-						decoder.queueInputBuffer(inputBufIndex, 0, 0, 0L,
-							MediaCodec.BUFFER_FLAG_END_OF_STREAM);
-						if (DEBUG) Log.v(TAG, "sent input EOS:" + decoder);
-						break;
-					}
-				}
-				synchronized (mSync) {
-					mInputDone = true;
-					mSync.notifyAll();
-				}
-			}
-		}
 
 		/*
 		 * API21以降で使用可能なMediaCodec#releaseOutputBuffer(int,long)は再生したいシステム時刻から

@@ -21,11 +21,14 @@ package com.serenegiant.media;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.res.AssetFileDescriptor;
+import android.media.MediaExtractor;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
+
+import com.serenegiant.system.BuildCheck;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -82,6 +85,7 @@ public class MediaPlayer {
 		mOutputSurface = outputSurface;
 		mCallback = callback;
 		mAudioEnabled = audioEnabled;
+		mExtractor = new MediaExtractor();
 		new Thread(mMoviePlayerTask, TAG).start();
     	synchronized (mSync) {
     		// ステート処理スレッド起床待ち
@@ -327,6 +331,8 @@ public class MediaPlayer {
 	private Object mSource;
 	private int mRequest;
 	private long mRequestTime;
+	@NonNull
+	private final MediaExtractor mExtractor;
 	/**
 	 * ループ再生が有効かどうか
 	 */
@@ -334,9 +340,11 @@ public class MediaPlayer {
     // for video playback
     @Nullable
     private VideoDecoder mVideoDecoder;
+    private int mVideoTrackIndex;
 	// for audio playback
 	@Nullable
 	private AudioDecoder mAudioDecoder;
+	private int mAudioTrackIndex;
 
 //--------------------------------------------------------------------------------
 	/**
@@ -551,11 +559,18 @@ public class MediaPlayer {
 				throw new FileNotFoundException("Unable to read " + source);
 			}
 			mMetadata.setDataSource((String)source);	// API>=10
+			mExtractor.setDataSource((String)source);	// API>=16
 		} else if (source instanceof AssetFileDescriptor) {
 			final FileDescriptor fd = ((AssetFileDescriptor)source).getFileDescriptor();
-			mMetadata.setDataSource(fd);
+			mMetadata.setDataSource(fd);				// API>=10
+			if (BuildCheck.isAndroid7()) {
+				mExtractor.setDataSource((AssetFileDescriptor)source);	// API>=24
+			} else {
+				mExtractor.setDataSource(fd);			// API>=16
+			}
 		} else if (source instanceof FileDescriptor) {
 			mMetadata.setDataSource((FileDescriptor)source);	// API>=10
+			mExtractor.setDataSource((FileDescriptor)source);	// API>=16
 		} else {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
@@ -563,11 +578,15 @@ public class MediaPlayer {
 		updateInfo(mMetadata);
 		if ((mOutputSurface != null) && mVideoDecoder == null) {
 			mVideoDecoder = VideoDecoder.createDecoder(mOutputSurface, mListener);
-			mVideoDecoder.prepare(source);
+			mVideoTrackIndex = mVideoDecoder.prepare(mExtractor);
+		} else {
+			mVideoTrackIndex = -100;
 		}
 		if (mAudioEnabled && (mAudioDecoder == null)) {
 			mAudioDecoder = AudioDecoder.createDecoder(mListener);
-			mAudioDecoder.prepare(source);
+			mAudioTrackIndex = mAudioDecoder.prepare(mExtractor);
+		} else {
+			mAudioTrackIndex = -100;
 		}
 		synchronized (mSync) {
 			mState = STATE_PREPARED;
@@ -609,11 +628,9 @@ public class MediaPlayer {
         if (DEBUG) Log.d(TAG, "handleSeek");
 		if (newTimeUs < 0) return;
 
-		if (mVideoDecoder != null) {
-			mVideoDecoder.seek(newTimeUs);
-		}
-		if (mAudioDecoder != null) {
-			mAudioDecoder.seek(newTimeUs);
+		if (mExtractor != null) {
+			mExtractor.seekTo(newTimeUs, MediaExtractor.SEEK_TO_CLOSEST_SYNC);
+			mExtractor.advance();
 		}
         mRequestTime = -1;
 	}
@@ -621,19 +638,31 @@ public class MediaPlayer {
 	@WorkerThread
 	private void handleLoop(final IFrameCallback frameCallback) {
 //		if (DEBUG) Log.d(TAG, "handleLoop");
-
-		synchronized (mSync) {
-			try {
-				mSync.wait();
-			} catch (final InterruptedException e) {
-				// ignore
+		if (mExtractor != null) {
+			final int trackIndex = mExtractor.getSampleTrackIndex();
+			if (trackIndex == mVideoTrackIndex) {
+				mVideoDecoder.decode(mExtractor);
+			} else if (trackIndex == mAudioTrackIndex) {
+				mAudioDecoder.decode(mExtractor);
+			}
+			if (!mExtractor.advance()) {
+				if (DEBUG) Log.d(TAG, "Reached EOS, looping check");
+				// ループ再生のチェック
+				if (mLoopEnabled) {
+					// 先頭へ戻す
+					handleSeek(0);
+				} else {
+					// データが無くなった時
+					if (mVideoDecoder != null) {
+						mVideoDecoder.signalEndOfStream();
+					}
+					if (mAudioDecoder != null) {
+						mAudioDecoder.signalEndOfStream();
+					}
+					handleStop();
+				}
 			}
 		}
-        if (false) {
-            if (DEBUG) Log.d(TAG, "Reached EOS, looping check");
-            // FIXME 未実装 ループ再生のチェック
-        	handleStop();
-        }
 	}
 
 	@WorkerThread

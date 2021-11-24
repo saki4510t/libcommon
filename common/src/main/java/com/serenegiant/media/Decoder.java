@@ -18,20 +18,19 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.io.IOException;
+import android.media.MediaExtractor;
 
 import androidx.annotation.NonNull;
 
 public interface Decoder {
 	/**
 	 * デコードの準備
-	 * @param source String, AssetFileDescriptor, FileDescriptorのいずれか
+	 * @param extractor
 	 * @return トラックインデックス
 	 * @throws Exception
 	 */
-	public int prepare(@NonNull final Object source)  throws IOException, IllegalArgumentException;
+	public int prepare(@NonNull final MediaExtractor extractor)  throws IllegalArgumentException;
 	public void start();;
 	public void stop();
-	public void seek(final long newTime);
 	public void release();
 }

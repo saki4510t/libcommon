@@ -125,17 +125,15 @@ public abstract class VideoDecoder extends AbstractDecoder {
 		}
 
 		@Override
-		protected DecodeTask createOutputTask(final int trackIndex) {
-			return new DecodeTask(trackIndex) {
+		public void decode(@NonNull final MediaExtractor extractor) {
+			if (mDecoder != null) {
+				decodeAPI16(extractor, mDecoder, mInputBuffers);
+			}
+		}
 
-				@Override
-				protected void handleInput(
-					@NonNull final MediaExtractor extractor,
-					@NonNull final MediaCodec decoder) {
-
-					handleInputAPI16(extractor, decoder, mInputBuffers);
-				}
-
+		@Override
+		protected OutputTask createOutputTask(final int trackIndex) {
+			return new OutputTask(trackIndex) {
 				@Override
 				protected void handleOutput(@NonNull final MediaCodec decoder) {
 					while (isRunning() && !mOutputDone) {
@@ -170,7 +168,6 @@ public abstract class VideoDecoder extends AbstractDecoder {
 				}
 			};
 		}
-
 	}
 
 	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
@@ -189,16 +186,15 @@ public abstract class VideoDecoder extends AbstractDecoder {
 		}
 
 		@Override
-		protected DecodeTask createOutputTask(final int trackIndex) {
-			return new DecodeTask(trackIndex) {
-				@Override
-				protected void handleInput(
-					@NonNull final MediaExtractor extractor,
-					@NonNull final MediaCodec decoder) {
+		public void decode(@NonNull final MediaExtractor extractor) {
+			if (mDecoder != null) {
+				decodeAPI21(extractor, mDecoder);
+			}
+		}
 
-					handleInputAPI21(extractor, decoder);
-				}
-
+		@Override
+		protected OutputTask createOutputTask(final int trackIndex) {
+			return new OutputTask(trackIndex) {
 				@Override
 				protected void handleOutput(@NonNull final MediaCodec decoder) {
 					while (isRunning() && !mOutputDone) {
