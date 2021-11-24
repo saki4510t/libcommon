@@ -48,6 +48,31 @@ public class MediaPlayer {
     private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
     private static final String TAG = MediaPlayer.class.getSimpleName();
 
+	private static final int TIMEOUT_USEC = 10000;	// 10msec
+
+	/*
+	 * STATE_STOP => [prepare] => STATE_PREPARED [start]
+	 * 	=> STATE_PLAYING => [seek] => STATE_PLAYING
+	 * 		=> [pause] => STATE_PAUSED => [resume] => STATE_PLAYING
+	 * 		=> [stop] => STATE_STOP
+	 */
+	private static final int STATE_STOP = 0;
+	private static final int STATE_PREPARED = 1;
+	private static final int STATE_PLAYING = 2;
+	private static final int STATE_PAUSED = 3;
+
+	// request code
+	private static final int REQ_NON = 0;
+	private static final int REQ_PREPARE = 1;
+	private static final int REQ_START = 2;
+	private static final int REQ_SEEK = 3;
+	private static final int REQ_STOP = 4;
+	private static final int REQ_PAUSE = 5;
+	private static final int REQ_RESUME = 6;
+	private static final int REQ_QUIT = 9;
+
+	@NonNull
+	private final Object mSync = new Object();
 	@Nullable
 	private final Surface mOutputSurface;
 	@NonNull
@@ -61,6 +86,26 @@ public class MediaPlayer {
 	private int mBitrate;
 	private float mFrameRate;
 	private int mRotation;
+	private volatile boolean mIsRunning;
+	private int mState;
+	@Nullable
+	private Object mSource;
+	private int mRequest;
+	private long mRequestTime;
+	@NonNull
+	private final MediaExtractor mExtractor;
+	/**
+	 * ループ再生が有効かどうか
+	 */
+	private volatile boolean mLoopEnabled;
+	// for video playback
+	@Nullable
+	private VideoDecoder mVideoDecoder;
+	private int mVideoTrackIndex;
+	// for audio playback
+	@Nullable
+	private AudioDecoder mAudioDecoder;
+	private int mAudioTrackIndex;
 
 	/**
 	 * コンストラクタ
@@ -300,55 +345,8 @@ public class MediaPlayer {
 	}
 
 //================================================================================
-    private static final int TIMEOUT_USEC = 10000;	// 10msec
-
-    /*
-     * STATE_STOP => [prepare] => STATE_PREPARED [start]
-     * 	=> STATE_PLAYING => [seek] => STATE_PLAYING
-     * 		=> [pause] => STATE_PAUSED => [resume] => STATE_PLAYING
-     * 		=> [stop] => STATE_STOP
-     */
-    private static final int STATE_STOP = 0;
-    private static final int STATE_PREPARED = 1;
-    private static final int STATE_PLAYING = 2;
-    private static final int STATE_PAUSED = 3;
-
-    // request code
-    private static final int REQ_NON = 0;
-    private static final int REQ_PREPARE = 1;
-    private static final int REQ_START = 2;
-    private static final int REQ_SEEK = 3;
-    private static final int REQ_STOP = 4;
-    private static final int REQ_PAUSE = 5;
-    private static final int REQ_RESUME = 6;
-    private static final int REQ_QUIT = 9;
-
-	@NonNull
-	private final Object mSync = new Object();
-	private volatile boolean mIsRunning;
-	private int mState;
-	@Nullable
-	private Object mSource;
-	private int mRequest;
-	private long mRequestTime;
-	@NonNull
-	private final MediaExtractor mExtractor;
 	/**
-	 * ループ再生が有効かどうか
-	 */
-	private volatile boolean mLoopEnabled;
-    // for video playback
-    @Nullable
-    private VideoDecoder mVideoDecoder;
-    private int mVideoTrackIndex;
-	// for audio playback
-	@Nullable
-	private AudioDecoder mAudioDecoder;
-	private int mAudioTrackIndex;
-
-//--------------------------------------------------------------------------------
-	/**
-	 * playback control task
+	 * 動画再生コントロールとMediaCodecへのデータ入力用Runnable実装
 	 */
 	private final Runnable mMoviePlayerTask = new Runnable() {
 		@WorkerThread

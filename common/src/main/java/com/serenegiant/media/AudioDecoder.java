@@ -36,6 +36,9 @@ import java.nio.ByteBuffer;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+/**
+ * 音声デコード用のMediaCodecラッパー
+ */
 public abstract class AudioDecoder extends AbstractDecoder {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AudioDecoder.class.getSimpleName();

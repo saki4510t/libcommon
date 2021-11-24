@@ -46,7 +46,7 @@ import androidx.annotation.NonNull;
 
 /**
  * 動画再生用のヘルパークラス
- * FIXME API>=21と未満で処理を分けるようにする
+ * API>=21と未満で処理を分けるようにする
  * @deprecated MediaPlayを使うこと
  */
 @Deprecated

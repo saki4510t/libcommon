@@ -34,6 +34,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
+/**
+ * 静止画・動画等をDocumentFileを使って保存するときのヘルパークラス
+ */
 public class MediaFileUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaFileUtils.class.getSimpleName();
@@ -45,6 +48,7 @@ public class MediaFileUtils {
 	/**
 	 * キャプチャ用のディレクトリを取得、取得できなければnull
 	 * こっちはSAF経由でアクセス可能な場合のみ指定場所を示すDocumentFileを返す
+	 * API21未満では常にnullを返す。
 	 * @param context
 	 * @param saveTreeId 0: SAFを使わない, それ以外: SAFのツリーIDとみなして処理を試みる
 	 * @return

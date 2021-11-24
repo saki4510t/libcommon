@@ -35,6 +35,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+/**
+ * 動画のデコード用MediaCodecのラッパークラス
+ */
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class VideoDecoder extends AbstractDecoder {
 	private static final boolean DEBUG = false;	// set false on production
