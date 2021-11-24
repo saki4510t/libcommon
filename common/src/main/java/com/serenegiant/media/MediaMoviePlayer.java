@@ -285,10 +285,10 @@ public class MediaMoviePlayer {
     private static final int TIMEOUT_USEC = 10000;	// 10msec
 
     /*
-     * STATE_CLOSED => [preapre] => STATE_PREPARED [start]
+     * STATE_STOP => [prepare] => STATE_PREPARED [start]
      * 	=> STATE_PLAYING => [seek] => STATE_PLAYING
      * 		=> [pause] => STATE_PAUSED => [resume] => STATE_PLAYING
-     * 		=> [stop] => STATE_CLOSED
+     * 		=> [stop] => STATE_STOP
      */
     private static final int STATE_STOP = 0;
     private static final int STATE_PREPARED = 1;
