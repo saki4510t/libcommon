@@ -37,9 +37,12 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.Time;
 
 import java.io.File;
+import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import androidx.annotation.NonNull;
 
 /**
  * 動画再生用のヘルパークラス
@@ -124,7 +127,7 @@ public class MediaMoviePlayer {
      * request to prepare movie playing
      * @param src
      */
-    public final void prepare(final String src) {
+    public final void prepare(@NonNull final String src) {
     	if (DEBUG) Log.v(TAG, "prepare:");
     	synchronized (mSync) {
     		mSource = src;
@@ -137,7 +140,20 @@ public class MediaMoviePlayer {
 	 * request to prepare movie playing
 	 * @param src
 	 */
-	public final void prepare(final AssetFileDescriptor src) {
+	public final void prepare(@NonNull final AssetFileDescriptor src) {
+		if (DEBUG) Log.v(TAG, "prepare:");
+		synchronized (mSync) {
+			mSource = src;
+			mRequest = REQ_PREPARE;
+			mSync.notifyAll();
+		}
+	}
+
+	/**
+	 * request to prepare movie playing
+	 * @param src
+	 */
+	public final void prepare(@NonNull final FileDescriptor src) {
 		if (DEBUG) Log.v(TAG, "prepare:");
 		synchronized (mSync) {
 			mSource = src;
@@ -568,6 +584,9 @@ public class MediaMoviePlayer {
 		} else if (source instanceof AssetFileDescriptor) {
 			mMetadata = new MediaMetadataRetriever();
 			mMetadata.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
+		} else if (source instanceof FileDescriptor) {
+			mMetadata = new MediaMetadataRetriever();
+			mMetadata.setDataSource((FileDescriptor)source);
 		} else {
 			throw new IllegalArgumentException("unknown source type:source=" + source);
 		}
@@ -603,6 +622,8 @@ public class MediaMoviePlayer {
 			} else {
 				mVideoMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
 			}
+		} else if (source instanceof FileDescriptor) {
+			mVideoMediaExtractor.setDataSource((FileDescriptor)source);
 		} else {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
@@ -637,6 +658,8 @@ public class MediaMoviePlayer {
 			} else {
 				mAudioMediaExtractor.setDataSource(((AssetFileDescriptor)source).getFileDescriptor());
 			}
+		} else if (source instanceof FileDescriptor) {
+			mAudioMediaExtractor.setDataSource((FileDescriptor)source);
 		} else {
 			// ここには来ないけど
 			throw new IllegalArgumentException("unknown source type:source=" + source);
