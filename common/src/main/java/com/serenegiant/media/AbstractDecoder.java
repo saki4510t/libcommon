@@ -393,6 +393,14 @@ public abstract class AbstractDecoder implements Decoder {
 			}
 		}
 
+		/*
+		 * API21以降で使用可能なMediaCodec#releaseOutputBuffer(int,long)は再生したいシステム時刻から
+		 * vsync x 2早く(通常の60fpsディスプレーであれば約33ミリ秒早く)#releaseOutputBufferを呼び出すと
+		 * 最適なパフォーマンスと品質が得られるらしいのでptsを調整する。
+		 * #releaseOutputBufferを呼ぶときのptsがシステム時刻と大きく離れている時は無視されて、一番早く表示可能な
+		 * タイミング表示される、この場合にはフレームがドロップすることはないらしい。
+		 * でも#releaseOutputBuffer(int,long)へ調整したptsを渡すだけではだめで自前でウエイトを入れないとだめっぽい
+		 */
 		private static final long VSYNC2 = 33330000;		// 33.33ミリ秒, approx. 2 frames @ 60fps
 		private long mOffsetPtsNs = -1L;
 		private long mOffsetSysTimeNs = -1L;
