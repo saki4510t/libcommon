@@ -123,6 +123,26 @@ public class MediaMoviePlayer {
     	return mHasAudio;
     }
 
+	/**
+	 * get currently playing or not
+	 * @return
+	 */
+	public final boolean isPlaying() {
+		synchronized (mSync) {
+			return mState == STATE_PLAYING;
+		}
+	}
+
+	/**
+	 * get currently pausing or not
+	 * @return
+	 */
+	public final boolean isPaused() {
+		synchronized (mSync) {
+			return mState == STATE_PAUSED;
+		}
+	}
+
     /**
      * request to prepare movie playing
      * @param src
@@ -209,25 +229,29 @@ public class MediaMoviePlayer {
 
     /**
      * request pause playing<br>
-     * this function is un-implemented yet
+     * this function is not implemented yet
      */
     public final void pause() {
     	if (DEBUG) Log.v(TAG, "pause:");
     	synchronized (mSync) {
-    		mRequest = REQ_PAUSE;
-    		mSync.notifyAll();
+			if (mState == STATE_PLAYING) {
+				mRequest = REQ_PAUSE;
+				mSync.notifyAll();
+			}
     	}
     }
 
     /**
      * request resume from pausing<br>
-     * this function is un-implemented yet
+     * this function is not implemented yet
      */
     public final void resume() {
     	if (DEBUG) Log.v(TAG, "resume:");
     	synchronized (mSync) {
-    		mRequest = REQ_RESUME;
-    		mSync.notifyAll();
+			if (mState == STATE_PAUSED) {
+				mRequest = REQ_RESUME;
+				mSync.notifyAll();
+			}
     	}
     }
 
