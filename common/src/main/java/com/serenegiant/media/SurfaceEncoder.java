@@ -25,6 +25,8 @@ import android.media.MediaFormat;
 import android.os.Build;
 import android.view.Surface;
 
+import androidx.annotation.NonNull;
+
 /**
  * 映像をSurfaceで受け取ってMediaCodecでエンコードするクラス
  */
@@ -53,11 +55,11 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 	}
 
 	@Override
-	protected boolean internalPrepare() throws Exception {
+	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
         mTrackIndex = -1;
-        mRecorderStarted = false;
+//        mRecorderStarted = false;
         mIsCapturing = true;
-        mIsEOS = false;
+//        mIsEOS = false;
 
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
         if (codecInfo == null) {
@@ -91,7 +93,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mInputSurface = mMediaCodec.createInputSurface();	// API >= 18
         mMediaCodec.start();
-
+		mReaper = new MediaReaper.VideoReaper(mMediaCodec, listener, mWidth, mHeight);
 		return mayFail;
 	}
 
@@ -108,9 +110,10 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
     @Override
 	public void signalEndOfInputStream() {
 //		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + this);
-        mIsEOS = true;
-        if (mMediaCodec != null)
+//		mIsEOS = true;
+        if (mMediaCodec != null) {
         	mMediaCodec.signalEndOfInputStream();	// API >= 18
+		}
 	}
 
 }

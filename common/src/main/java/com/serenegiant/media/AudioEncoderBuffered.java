@@ -113,7 +113,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		                try {
 		                	RecycleMediaData data;
 		                	for ( ; ; ) {
-		                		if (!mIsCapturing || mRequestStop || mIsEOS) break;
+		                		if (!mIsCapturing || mRequestStop) break;
 								// check recording state
 								final int recordingState = audioRecord.getRecordingState();
 								if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
@@ -211,7 +211,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 			int frame_count = 0;
     		for (; ;) {
         		synchronized (mSync) {
-            		if (!mIsCapturing || mRequestStop || mIsEOS) break;
+            		if (!mIsCapturing || mRequestStop) break;
             	}
     			try {
 					data = mAudioQueue.poll(30, TimeUnit.MILLISECONDS);

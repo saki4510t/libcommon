@@ -18,9 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.MediaCodec;
@@ -88,10 +85,9 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	}
 
 	@Override
-	protected boolean internalPrepare() throws Exception {
+	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 //		if (DEBUG) Log.v(TAG, "internalPrepare:");
         mTrackIndex = -1;
-        mRecorderStarted = mIsEOS = false;
 
 // 音声を取り込んでAACにエンコードするためのMediaCodecの準備
         final MediaCodecInfo audioCodecInfo = MediaCodecUtils.selectAudioEncoder(MIME_TYPE);
@@ -114,6 +110,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 		mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
         mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
         mMediaCodec.start();
+        mReaper = new MediaReaper.AudioReaper(mMediaCodec, listener, mSampleRate, mChannelCount);
 //		if (DEBUG) Log.i(TAG, "internalPrepare:finished");
 		return false;
 	}
@@ -121,24 +118,6 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	@Override
 	public final boolean isAudio() {
 		return true;
-	}
-
-	@Override
-	protected MediaFormat createOutputFormat(final byte[] csd, final int size,
-		final int ix0, final int ix1, final int ix2) {
-		
-		MediaFormat outFormat;
-//		if (ix0 >= 0) {
-//        	Log.w(TAG, "csd may be wrong, it may be for video");
-//		}
-        // audioの時はSTART_MARKが無いので全体をコピーして渡す
-        outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
-        // encodedDataをそのまま渡しても再生できないファイルが出来上がるので一旦コピーしないと駄目
-        final ByteBuffer csd0 = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
-        csd0.put(csd, 0, size);
-        csd0.flip();
-        outFormat.setByteBuffer("csd-0", csd0);
-        return outFormat;
 	}
 
 }

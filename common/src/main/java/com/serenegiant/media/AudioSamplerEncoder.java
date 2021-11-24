@@ -110,7 +110,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
     		synchronized (mSync) {
     			// 既に終了しているか終了指示が出てれば何もしない
-        		if (!mIsCapturing || mRequestStop || mIsEOS) return;
+        		if (!mIsCapturing || mRequestStop) return;
     		}
 			if (size > 0) {
 				// 音声データを受け取った時はエンコーダーへ書き込む
@@ -136,7 +136,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		public void run() {
 			for (; ;) {
         		synchronized (mSync) {
-            		if (!mIsCapturing || mRequestStop || mIsEOS) break;
+            		if (!mIsCapturing || mRequestStop) break;
             		try {
 						mSync.wait();
 					} catch (final InterruptedException e) {

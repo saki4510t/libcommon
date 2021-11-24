@@ -18,8 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
@@ -28,26 +26,38 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.media.exceptions.TimeoutException;
 import com.serenegiant.system.Time;
+
+import java.nio.ByteBuffer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.serenegiant.utils.BufferHelper.*;
-
 /**
  * MediaCodecを使ったエンコーダーの基本クラス
- * FIXME MediaReaperを使うように変更する
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractEncoder implements Encoder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractEncoder.class.getSimpleName();
 
     public static final int TIMEOUT_USEC = 10000;	// 10ミリ秒
 
-    private volatile int mRequestDrain;
+	/**
+	 * フラグの排他制御用
+	 */
+	@NonNull
+	protected final Object mSync = new Object();
+	/**
+	 * エンコーダーイベントコールバックリスナー
+	 */
+	@NonNull
+	private final EncoderListener mListener;
+	/**
+	 * MIME
+	 */
+	@NonNull
+	protected final String MIME_TYPE;
     /**
      * エンコード実行中フラグ
      */
@@ -57,14 +67,6 @@ public abstract class AbstractEncoder implements Encoder {
      */
     protected volatile boolean mRequestStop;
     /**
-     * ファイルへの出力中フラグ
-     */
-    protected volatile boolean mRecorderStarted;
-    /**
-     * 終了フラグ
-     */
-    protected volatile boolean mIsEOS;
-    /**
      * トラックインデックス
      */
     protected int mTrackIndex;
@@ -73,32 +75,14 @@ public abstract class AbstractEncoder implements Encoder {
      */
     @Nullable
     protected MediaCodec mMediaCodec;				// API >= 16(Android4.1.2)
-    /**
-     * エンコード用バッファ情報
-     */
-    @NonNull
-    private final MediaCodec.BufferInfo mBufferInfo;		// API >= 16(Android4.1.2)
+	@Nullable
+	protected MediaReaper mReaper;
 
     /**
      * Recorderオブジェクトへの参照
      */
     @Nullable
     private IRecorder mRecorder;
-    /**
-     * フラグの排他制御用
-     */
-    @NonNull
-    protected final Object mSync = new Object();
-    /**
-     * エンコーダーイベントコールバックリスナー
-     */
-    @NonNull
-    private final EncoderListener mListener;
-    /**
-     * MIME
-     */
-    @NonNull
-    protected final String MIME_TYPE;
 
 //********************************************************************************
     public AbstractEncoder(@NonNull final String mime_type,
@@ -111,8 +95,6 @@ public abstract class AbstractEncoder implements Encoder {
     	mRecorder = recorder;
     	mListener = listener;
 		recorder.addEncoder(this);
-        // 効率化のために先に生成しておく(drain内で毎回生成するとGCの影響が大きくなる)
-        mBufferInfo = new MediaCodec.BufferInfo();
     }
 
     /**
@@ -155,7 +137,7 @@ public abstract class AbstractEncoder implements Encoder {
 
 	@Override
 	public final void prepare() throws Exception {
-		final boolean mayFail = internalPrepare();
+		final boolean mayFail = internalPrepare(mReaperListener);
 		final Surface surface = (this instanceof ISurfaceEncoder) ?
 			((ISurfaceEncoder)this).getInputSurface() : null;
 		try {
@@ -163,18 +145,16 @@ public abstract class AbstractEncoder implements Encoder {
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
-		synchronized (mSync) {
-			// エンコーダースレッドを生成
-			new Thread(mDrainTask, getClass().getSimpleName()).start();
-			try {
-				mSync.wait(1000);	// エンコーダースレッド起床待ち
-			} catch (final InterruptedException e) {
-				// ignore
-			}
-		}
 	}
-	
-	protected abstract boolean internalPrepare() throws Exception;
+
+	/**
+	 * MediaCodecのエンコーダーとMediaReaperを初期化する
+	 * @param listener
+	 * @return
+	 * @throws Exception
+	 */
+	protected abstract boolean internalPrepare(
+		@NonNull final MediaReaper.ReaperListener listener) throws Exception;
 
 	/**
 	 * エラー発生時に呼び出す
@@ -197,7 +177,6 @@ public abstract class AbstractEncoder implements Encoder {
 		synchronized (mSync) {
 			mIsCapturing = true;
 			mRequestStop = false;
-			mRequestDrain = 0;
 		}
 	}
     /**
@@ -205,9 +184,9 @@ public abstract class AbstractEncoder implements Encoder {
      */
 	@Override
 	public  void stop() {
-//    	if (DEBUG) Log.v(TAG, "stop");
+    	if (DEBUG) Log.v(TAG, "stop");
     	synchronized (mSync) {
-            if (/*!mIsCapturing ||*/ mRequestStop) {
+            if (mRequestStop) {
                 return;
             }
 	        // 終了要求
@@ -228,133 +207,93 @@ public abstract class AbstractEncoder implements Encoder {
             if (!mIsCapturing || mRequestStop) {
                 return;
             }
-            mRequestDrain++;
+			if (mReaper != null) {
+				mReaper.frameAvailableSoon();
+			}
             mSync.notifyAll();
         }
     }
 
-//********************************************************************************
-	private final Runnable mDrainTask = new Runnable() {
-		// ドレインスレッドの実体
+//--------------------------------------------------------------------------------
+	private final MediaReaper.ReaperListener mReaperListener
+		= new MediaReaper.ReaperListener() {
 		@Override
-		public void run() {
-			android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_DISPLAY); // THREAD_PRIORITY_URGENT_AUDIO
-			synchronized (mSync) {
-				mRequestStop = false;
-				mRequestDrain = 0;
-				mSync.notify();	// スレッド起床通知
+		public void writeSampleData(
+			@NonNull final MediaReaper reaper,
+			@NonNull final ByteBuffer byteBuf,
+			@NonNull final MediaCodec.BufferInfo bufferInfo) {
+
+//			if (DEBUG) Log.v(TAG, "writeSampleData:");
+			if (mIsCapturing && !mRequestStop && (mRecorder != null)) {
+				mRecorder.writeSampleData(mTrackIndex, byteBuf, bufferInfo);
 			}
-			boolean localRequestStop = false;
-			boolean localRequestDrain;
-			// #startが呼ばれるまで待機
-			for ( ; !mIsCapturing && !localRequestStop ; ) {
-				synchronized (mSync) {
-					try {
-						mSync.wait(10);
-					} catch (final InterruptedException e) {
-						break;
-					}
-					localRequestStop = mRequestStop;
-					mRequestDrain = 0;
-				}
+		}
+
+		@Override
+		public void onOutputFormatChanged(
+			@NonNull final MediaReaper reaper,
+			@NonNull final MediaFormat format) {
+
+			if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
+			if (mIsCapturing && !mRequestStop && (mRecorder != null)) {
+				startRecorder(mRecorder, format);
 			}
-			// エンコード済みデータの処理ループ
-			for ( ; ; ) {
-				synchronized (mSync) {
-					localRequestStop = mRequestStop;
-					localRequestDrain = (mRequestDrain > 0);
-					if (localRequestDrain)
-						mRequestDrain--;
-				}
-				if (localRequestStop) {
-					try {
-						drain();
-					} catch (final Exception e) {
-						// ignore
-					}
-					try {
-						signalEndOfInputStream();
-					} catch (final Exception e) {
-						// ignore
-					}
-					try {
-						drain();
-					} catch (final Exception e) {
-						// ignore
-					}
-					release();
-					break;
-				}
-				if (localRequestDrain) {
-					try {
-						drain();
-					} catch (final Exception e) {
-						if (!mRequestStop) {
-							callOnError(e);
-						}
-						mRequestStop = true;
-					}
-				} else {
-					synchronized (mSync) {
-						try {
-							mSync.wait(30);
-						} catch (final InterruptedException e) {
-							break;
-						}
-					}
-				}
-			} // end of for
-			// 終了
-			synchronized (mSync) {
-				mRequestStop = true;
-				mIsCapturing = false;
-				mSync.notifyAll();
-			}
+		}
+
+		@Override
+		public void onStop(@NonNull final MediaReaper reaper) {
+			if (DEBUG) Log.v(TAG, "onStop:");
+			// FIXME エンコーダー破棄したほうがいい？
+			mRequestStop = true;
+		}
+
+		@Override
+		public void onError(@NonNull final MediaReaper reaper, final Throwable t) {
+			if (DEBUG) Log.w(TAG, t);
 		}
 	};
 
-//********************************************************************************
 	/**
 	 * 子クラスでOverrideした時でもEncoder#releaseを呼び出すこと
 	 */
 	@Override
 	public  void release() {
-//		if (DEBUG) Log.d(TAG, "release:");
+		if (DEBUG) Log.d(TAG, "release:");
 		mRecorder = null;
 		if (mIsCapturing) {
 			try {
 				mListener.onStopEncode(this);
 			} catch (final Exception e) {
-//				Log.e(TAG, "failed onStopped", e);
+				if (DEBUG) Log.w(TAG, "release: failed onStopped", e);
 			}
 		}
 		mIsCapturing = false;
         if (mMediaCodec != null) {
 			try {
-//				if (DEBUG) Log.v(TAG, "call MediaCodec#stop");
+				if (DEBUG) Log.v(TAG, "release: call MediaCodec#stop");
 	            mMediaCodec.stop();
 	            mMediaCodec.release();
 	            mMediaCodec = null;
 			} catch (final Exception e) {
-//				Log.e(TAG, "failed releasing MediaCodec", e);
+				if (DEBUG) Log.w(TAG, "release: failed releasing MediaCodec", e);
 			}
         }
-        if (mRecorderStarted) {
-        	mRecorderStarted = false;
-        	if (mRecorder != null) {
-       			try {
-//    				if (DEBUG) Log.v(TAG, "call MuxerWrapper#stop");
-       				mRecorder.stop(this);
-    			} catch (final Exception e) {
-//    				Log.e(TAG, "failed stopping muxer", e);
-    			}
-//				mRecorder = null;
-        	}
-        }
+		if (mReaper != null) {
+			mReaper.release();
+			mReaper = null;
+		}
+		if (mRecorder != null) {
+			try {
+   				if (DEBUG) Log.v(TAG, "release: call Recorder#stop");
+				mRecorder.stop(this);
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, "release: failed stopping Recorder", e);
+			}
+		}
 		try {
 			mListener.onDestroy(this);
 		} catch (final Exception e) {
-//			Log.e(TAG, "destroy:", e);
+			if (DEBUG) Log.e(TAG, "release: onDestroy failed", e);
 		}
 		mRecorder = null;
 	}
@@ -405,7 +344,7 @@ public abstract class AbstractEncoder implements Encoder {
 //	            if (DEBUG) Log.v(TAG, "encode:queueInputBuffer");
 	            if (length <= 0) {
 	            	// エンコード要求サイズが0の時はEOSを送信
-	            	mIsEOS = true;
+//	            	mIsEOS = true;
 //	            	if (DEBUG) Log.i(TAG, "send BUFFER_FLAG_END_OF_STREAM");
 	            	mMediaCodec.queueInputBuffer(inputBufferIndex, 0, 0,
 	            		presentationTimeUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
@@ -422,151 +361,36 @@ public abstract class AbstractEncoder implements Encoder {
         }
     }
 
-    /**
-     * エンコードしたデータをmuxerへ書き込む
-     */
-	private final void drain() {
-//    	if (DEBUG) Log.v(TAG, "drain:encoder=" + this);
-    	if (mMediaCodec == null) return;
-    	ByteBuffer[] encoderOutputBuffers;
-    	try {
-    		encoderOutputBuffers = mMediaCodec.getOutputBuffers();
-    	} catch (final IllegalStateException e) {
-//    		Log.w(TAG, "drain:", e);
-    		return;
-    	}
-        int encoderStatus, count = 0;
-        final IRecorder recorder = mRecorder;
-        if (recorder == null) {
-//        	throw new NullPointerException("muxer is unexpectedly null");
-//        	Log.w(TAG, "muxer is unexpectedly null");
-        	return;
-        }
-LOOP:	while (mIsCapturing) {
-            encoderStatus = mMediaCodec.dequeueOutputBuffer(mBufferInfo, TIMEOUT_USEC);	// wait for max TIMEOUT_USEC(=10msec)
-            if (encoderStatus == MediaCodec.INFO_TRY_AGAIN_LATER) {
-                // 出力するデータが無い時は最大でTIMEOUT_USEC x 5 = 50msec経過するかEOSが来るまでループする
-                if (!mIsEOS) {
-                	if (++count > 5)
-                		break LOOP;		// out of while
-                }
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
-//            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
-                // エンコード時にはこれは来ないはず
-                encoderOutputBuffers = mMediaCodec.getOutputBuffers();
-            } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
-//            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
-            	// コーデックからの出力フォーマットが変更された時
-                // エンコード済みバッファの受け取る前にだけ１回来るはず。
-            	// ただし、Android4.3未満だとINFO_OUTPUT_FORMAT_CHANGEDは来ないので
-            	// 代わりにflags & MediaCodec.BUFFER_FLAG_CODEC_CONFIGの時に処理しないとだめ
-                if (mRecorderStarted) {	// ２回目が来た時はエラー
-                    throw new RuntimeException("format changed twice");
-                }
-				// コーデックからの出力フォーマットを取得してnative側へ引き渡す
-				// getOutputFormatはINFO_OUTPUT_FORMAT_CHANGEDが来た後でないと呼んじゃダメ(クラッシュする)
-                final MediaFormat format = mMediaCodec.getOutputFormat(); // API >= 16
-                if (!startRecorder(recorder, format))
-                	break LOOP;
-            } else if (encoderStatus < 0) {
-            	// 想定外の結果が返って来た時は無視する
-//            	if (DEBUG) Log.w(TAG, "drain:unexpected result from encoder#dequeueOutputBuffer: " + encoderStatus);
-            } else {
-                final ByteBuffer encodedData = encoderOutputBuffers[encoderStatus];
-                if (encodedData == null) {
-                	// 出力バッファインデックスが来てるのに出力バッファを取得できない・・・無いはずやねんけど
-                    throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
-                }
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-//					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
-                	// Android4.3未満をターゲットにするならここで処理しないと駄目
-                    if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
-                    	// csd-0とcsd-1が同時に来ているはずなので分離してセットする
-                        final byte[] tmp = new byte[mBufferInfo.size];
-                        encodedData.position(0);
-                        encodedData.get(tmp, mBufferInfo.offset, mBufferInfo.size);
-                        encodedData.position(0);
-                        final int ix0 = byteComp(tmp, 0, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
-                        final int ix1 = byteComp(tmp, ix0 + 2, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
-						final int ix2 = byteComp(tmp, ix1 + 2, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
-//						if (DEBUG) Log.i(TAG, "ix0=" + ix0 + ",ix1=" + ix1);
-                        final MediaFormat outFormat = createOutputFormat(tmp, mBufferInfo.size, ix0, ix1, ix2);
-                        if (!startRecorder(recorder, outFormat))
-                        	break LOOP;
-                    }
-					mBufferInfo.size = 0;
-                }
-
-                if (mBufferInfo.size != 0) {
-                	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
-            		count = 0;
-                    if (!mRecorderStarted) {
-                    	// でも出力可能になっていない時
-                    	// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
-                        throw new RuntimeException("drain:muxer hasn't started");
-                    }
-                    // ファイルに出力(presentationTimeUsを調整)
-                    try {
-	                   	mBufferInfo.presentationTimeUs = getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-	                   	recorder.writeSampleData(mTrackIndex, encodedData, mBufferInfo);
-//						prevOutputPTSUs = mBufferInfo.presentationTimeUs;
-                    } catch (final TimeoutException e) {
-//						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
-                    	recorder.stopRecording();
-                    } catch (final Exception e) {
-//						if (DEBUG) Log.w(TAG, e);
-                    	recorder.stopRecording();
-                    }
-                }
-                // 出力済みのバッファをエンコーダーに返す
-                mMediaCodec.releaseOutputBuffer(encoderStatus, false);
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
-                	// ストリーム終了指示が来た時
-//					if (!mIsEOS) {
-//						if (DEBUG) Log.w(TAG, "drain:reached end of stream unexpectedly");
-//					} else {
-//						if (DEBUG) Log.d(TAG, "drain:end of stream reached");
-//					}
-                	stopRecorder(recorder);
-					break LOOP;      // out of while
-                }
-            }
-        }	// while (mIsCapturing)
-//		if (DEBUG) Log.v(TAG, "drain:finished");
-    }
-
-    protected abstract MediaFormat createOutputFormat(final byte[] csd, final int size,
-    	final int ix0, final int ix1, final int ix2);
-
 	/**
 	 * コーデックからの出力フォーマットを取得してnative側へ引き渡してRecorderをスタートさせる
 	 */
-	protected boolean startRecorder(final IRecorder recorder, final MediaFormat outFormat) {
-//		if (DEBUG) Log.i(TAG, "startMuxer:outFormat=" + outFormat + ",state=" + recorder.getState());
+	protected boolean startRecorder(@NonNull final IRecorder recorder, @NonNull final MediaFormat outFormat) {
+		if (DEBUG) Log.i(TAG, "startRecorder:outFormat=" + outFormat + ",state=" + recorder.getState());
 		if (recorder.getState() != IRecorder.STATE_STARTING) {
 			for (int i = 0; i < 10; i++) {
 				if (recorder.getState() == IRecorder.STATE_STARTING) {
 					break;
 				}
-//				Log.v(TAG, "sleep");
-				try {
-					Thread.sleep(10);
-				} catch (final InterruptedException e) {
-					break;
+				if (DEBUG) Log.v(TAG, "startRecorder:wait");
+				synchronized (mSync) {
+					try {
+						mSync.wait(10);
+					} catch (final InterruptedException e) {
+						break;
+					}
 				}
 			}
 		}
 		if (recorder.getState() == IRecorder.STATE_STARTING) {
 			mTrackIndex = recorder.addTrack(this, outFormat);
 			if (mTrackIndex >= 0) {
-				mRecorderStarted = true;
 				if (!recorder.start(this)) {
 					// startは全てのエンコーダーがstartを呼ぶまで返ってこない
 					// falseを返した時はmuxerをスタート出来てない。何らかの異常
-	//	       		Log.e(TAG, "failed to start muxer mTrackIndex=" + mTrackIndex);
+		       		Log.w(TAG, "startRecorder: failed to start recorder mTrackIndex=" + mTrackIndex);
 				}
 			} else {
-	//			Log.e(TAG, "failed to addTrack: mTrackIndex=" + mTrackIndex);
+				if (DEBUG) Log.w(TAG, "startRecorder: failed to addTrack: mTrackIndex=" + mTrackIndex);
 				recorder.removeEncoder(this);
 			}
 		}
@@ -574,14 +398,8 @@ LOOP:	while (mIsCapturing) {
 	}
 
 	protected void stopRecorder(final IRecorder recorder) {
-   		mRecorderStarted = mIsCapturing = false;
+   		mIsCapturing = false;
 	}
-
-    /**
-     * 前回Recorderに書き込んだ際のpresentationTimeUs
-     */
-	private long prevOutputPTSUs = -1;
-//	private long firstOutputPTSUs = -1;
 
 	/**
 	 * 前回MediaCodecへのエンコード時に使ったpresentationTimeUs
@@ -605,22 +423,6 @@ LOOP:	while (mIsCapturing) {
 		}
 		prevInputPTSUs = result;
 		return result;
-    }
-
-    /**
-     * Muxerの今回の書き込み用のpresentationTimeUs値を取得
-     * @return
-     */
-    protected long getNextOutputPTSUs(long presentationTimeUs) {
-//		long result = Time.nanoTime() / 1000L;
-		// 以前の書き込みよりも値が小さくなるとエラーになるのでオフセットをかける
-/*		if (result < prevOutputPTSUs)
-			result = (prevOutputPTSUs - result) + result; */
-		if (presentationTimeUs <= prevOutputPTSUs) {
-			presentationTimeUs = prevOutputPTSUs + 9643;
-		}
-		prevOutputPTSUs = presentationTimeUs;
-		return presentationTimeUs;
     }
 
 }

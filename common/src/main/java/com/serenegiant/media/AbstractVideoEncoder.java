@@ -18,14 +18,11 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
 import android.annotation.TargetApi;
 import android.media.MediaCodec;
-import android.media.MediaFormat;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 
@@ -38,8 +35,8 @@ import androidx.annotation.NonNull;
 public abstract class AbstractVideoEncoder extends AbstractEncoder
 	implements IVideoEncoder {
 
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "AbstractVideoEncoder";
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = AbstractVideoEncoder.class.getSimpleName();
 
 	protected int mWidth, mHeight;
     protected int mBitRate = -1;
@@ -98,32 +95,8 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
             bitrate.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, targetBitrate);
             mMediaCodec.setParameters(bitrate);
         } else if (!supportsAdaptiveStreaming) {
-//			Log.w(TAG, "Ignoring adjustVideoBitrate call. This functionality is only available on Android API 19+");
+			Log.w(TAG, "adjustBitrate: Ignoring adjustVideoBitrate call. This functionality is only available on Android API 19+");
         }
     }
-
-	@Override
-	protected MediaFormat createOutputFormat(final byte[] csd, final int size,
-		final int ix0, final int ix1, final int ix2) {
-		
-		final MediaFormat outFormat;
-        if (ix0 >= 0) {
-            outFormat = MediaFormat.createVideoFormat(MIME_TYPE, mWidth, mHeight);
-        	final ByteBuffer csd0 = ByteBuffer.allocateDirect(ix1 - ix0).order(ByteOrder.nativeOrder());
-        	csd0.put(csd, ix0, ix1 - ix0);
-        	csd0.flip();
-            outFormat.setByteBuffer("csd-0", csd0);
-            if (ix1 > ix0) {
-				final int sz = (ix2 > ix1) ? (ix2 - ix1) : (size - ix1);
-            	final ByteBuffer csd1 = ByteBuffer.allocateDirect(size - ix1 + ix0).order(ByteOrder.nativeOrder());
-            	csd1.put(csd, ix1, size - ix1 + ix0);
-            	csd1.flip();
-                outFormat.setByteBuffer("csd-1", csd1);
-            }
-        } else {
-        	throw new RuntimeException("unexpected csd data came.");
-        }
-        return outFormat;
-	}
 
 }
