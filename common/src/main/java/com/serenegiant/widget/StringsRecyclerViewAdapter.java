@@ -10,7 +10,7 @@ import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 
 /**
- * 文字列リストを表示するためのCustomRecyclerViewAdapter実装
+ * 文字列リストを表示するためのArrayListRecyclerViewAdapter実装
  */
 public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<String> {
 	private static final boolean DEBUG = false;	// FIXME set false when production

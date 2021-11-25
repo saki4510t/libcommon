@@ -8,7 +8,14 @@ import androidx.annotation.NonNull;
 
 import static com.serenegiant.widget.IScaledView.SCALE_MODE_KEEP_ASPECT;
 
+/**
+ * View#onMeasure呼び出し時にViewのサイズを調整するためのヘルパーメソッド
+ */
 public class MeasureSpecDelegater {
+	private MeasureSpecDelegater() {
+		// インスタンス化をエラーとするためのデフォルトコンストラクタをprivateにする
+	}
+
 	public static class MeasureSpec {
 		public int widthMeasureSpec;
 		public int heightMeasureSpec;

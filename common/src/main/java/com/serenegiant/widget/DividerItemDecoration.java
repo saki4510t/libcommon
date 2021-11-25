@@ -32,6 +32,9 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 
+/**
+ * RecyclerViewで要素感の区切りを表示するためのRecyclerView.ItemDecoration実装
+ */
 public class DividerItemDecoration extends RecyclerView.ItemDecoration  {
 //	private static final boolean DEBUG = false;	// FIXME set false on production
 //	private static final String TAG = DividerItemDecoration.class.getSimpleName();

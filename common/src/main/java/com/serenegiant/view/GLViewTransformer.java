@@ -33,6 +33,7 @@ import androidx.annotation.Size;
 
 /**
  * IGLTransformViewのトランスフォーム処理用ヘルパークラス
+ * OpenGL|ESのモデルビュー変換行列を操作してトランスフォームを実行する
  */
 public class GLViewTransformer implements IGLViewTransformer {
 
@@ -40,7 +41,7 @@ public class GLViewTransformer implements IGLViewTransformer {
 	private static final String TAG = GLViewTransformer.class.getSimpleName();
 
 	/**
-	 * 操作対象のGLView
+	 * 操作対象のGLView(とその継承クラス)
 	 */
 	private final IGLTransformView mTargetView;
 	/**

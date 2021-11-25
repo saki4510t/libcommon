@@ -101,11 +101,16 @@ public class ProgressView extends View {
 	private int mProgressColor = 0xffff0000;
 	/**
 	 * progressを表示するDrawable
+	 * これ自体は直接は描画処理に使われずmClipDrawableを生成する際に使用される
+	 * nullableだけど通常はnullにならない(refreshDrawableでセットされる)
 	 */
+	@Nullable
 	private Drawable mDrawable;
 	/**
 	 * progressに応じてmDrawableをクリップするためのClipDrawable
+	 * nullableだけど通常はnullにならない(refreshDrawableでセットされる)
 	 */
+	@Nullable
 	private ClipDrawable mClipDrawable;
 
 	/**
@@ -168,7 +173,9 @@ public class ProgressView extends View {
 	@Override
 	protected void onDraw(final Canvas canvas) {
 		super.onDraw(canvas);
-		mClipDrawable.draw(canvas);
+		if (mClipDrawable != null) {
+			mClipDrawable.draw(canvas);
+		}
 	}
 
 	@Override
