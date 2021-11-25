@@ -308,7 +308,6 @@ public class MediaAVRecorder extends Recorder {
 	 * @throws IOException
 	 */
 	@Deprecated
-	@SuppressWarnings("deprecation")
 	public MediaAVRecorder(@NonNull final Context context,
 		@Nullable final RecorderCallback callback,
 		@Nullable final VideoConfig config,
@@ -326,7 +325,8 @@ public class MediaAVRecorder extends Recorder {
 				throw new IOException("This app has no permission of writing external storage");
 			}
 		}
-		setupMuxer(mOutputPath);
+		// DocumentFileでラップして渡す
+		setupMuxer(context, DocumentFile.fromFile(new File(mOutputPath)));
 	}
 
 //--------------------------------------------------------------------------------
@@ -400,6 +400,7 @@ public class MediaAVRecorder extends Recorder {
 	 * ディスクの空き容量をチェックして足りなければtrueを返す
 	 * @return true: 空き容量が足りない
 	 */
+	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean check() {
 		final Context context = requireContext();
@@ -421,15 +422,16 @@ public class MediaAVRecorder extends Recorder {
 	}
 
 	@Deprecated
-	@SuppressWarnings("deprecation")
 	protected void setupMuxer(final int fd) throws IOException {
-		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), fd));
+		throw new IOException("Failed to create muxer");
+//		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), fd));
 	}
 
 	@Deprecated
 	@SuppressWarnings("deprecation")
 	protected void setupMuxer(@NonNull final String output) throws IOException {
-		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), output));
+		throw new IOException("Failed to create muxer");
+//		setMuxer(getMuxerFactory().createMuxer(getConfig().useMediaMuxer(), output));
 	}
 
 	protected void setupMuxer(
