@@ -43,6 +43,11 @@ class VideoPlaybackFragment : BaseFragment() {
 		container: ViewGroup?,
 		savedInstanceState: Bundle?): View? {
 
+		return inflater.inflate(R.layout.fragment_video_playback, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
 		var args = savedInstanceState
 		if (args == null) {
 			args = arguments
@@ -50,9 +55,7 @@ class VideoPlaybackFragment : BaseFragment() {
 		if (args != null) {
 			mInfo = args.getParcelable(ARG_MEDIA_INFO)
 		}
-		val rootView = inflater.inflate(R.layout.fragment_video_playback, container, false)
-		initView(rootView)
-		return rootView
+		initView(view)
 	}
 
 	override fun internalOnResume() {

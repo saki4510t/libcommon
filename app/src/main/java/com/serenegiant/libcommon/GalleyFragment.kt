@@ -46,9 +46,13 @@ class GalleyFragment : BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		val rootView = inflater.inflate(R.layout.fragment_galley, container, false)
-		initView(rootView)
-		return rootView
+		return inflater.inflate(R.layout.fragment_galley, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onViewCreated:")
+		initView(view)
 	}
 
 	override fun internalOnResume() {

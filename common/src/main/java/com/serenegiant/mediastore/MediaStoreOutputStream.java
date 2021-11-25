@@ -117,6 +117,7 @@ public class MediaStoreOutputStream extends OutputStream {
 		return mUri;
 	}
 
+	@Deprecated
 	@Nullable
 	public String getOutputPath() {
 		return mOutputPath;

@@ -72,17 +72,21 @@ abstract class AbstractCameraFragment : BaseFragment() {
 
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Camera)
-		val rootView = customInflater.inflate(layoutXml, container, false)
-		val cameraView: View = rootView.findViewById(R.id.cameraView)
+		return customInflater.inflate(layoutXml, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onViewCreated:")
+		val cameraView: View = view.findViewById(R.id.cameraView)
 		mCameraView = cameraView  as ICameraView
 		mCameraView!!.getView().setOnClickListener(mOnClickListener)
 		mCameraView!!.getView().setOnLongClickListener(mOnLongClickListener)
 		mCameraView!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
-		mScaleModeView = rootView.findViewById(R.id.scalemode_textview)
+		mScaleModeView = view.findViewById(R.id.scalemode_textview)
 		updateScaleModeText()
-		mRecordButton = rootView.findViewById(R.id.record_button)
+		mRecordButton = view.findViewById(R.id.record_button)
 		mRecordButton!!.setOnClickListener(mOnClickListener)
-		return rootView
 	}
 
 	public override fun internalOnResume() {

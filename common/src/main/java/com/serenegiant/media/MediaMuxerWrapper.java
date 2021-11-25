@@ -122,6 +122,7 @@ public class MediaMuxerWrapper implements IMuxer {
 		}
 	}
 
+	@Deprecated
 	@Nullable
 	public String getOutputPath() {
 		return mOutputPath;

@@ -18,7 +18,6 @@ package com.serenegiant.libcommon;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -68,8 +67,14 @@ public class SAFFilerFragment extends BaseFragment {
 		if (DEBUG) Log.v(TAG, "onCreateView:");
 		mBinding = DataBindingUtil.inflate(inflater,
 			R.layout.fragment_saf_filer, container, false);
-		initView();
 		return mBinding.getRoot();
+	}
+
+	@Override
+	public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		if (DEBUG) Log.v(TAG, "onViewCreated:");
+		initView();
 	}
 
 	@Override

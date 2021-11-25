@@ -10,17 +10,19 @@ import com.serenegiant.widget.ProgressView
 
 class ProgressFragment : BaseFragment() {
 
-	private var mRootView: View? = null
-	private var mProgress1: ProgressView? = null;
-	private var mProgress2: ProgressView? = null;
+	private var mProgress1: ProgressView? = null
+	private var mProgress2: ProgressView? = null
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		mRootView = inflater.inflate(R.layout.fragment_progress_view, container, false)
-		initView(mRootView!!)
-		return mRootView
+		return inflater.inflate(R.layout.fragment_progress_view, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		initView(view)
 	}
 
 	override fun onAttach(context: Context) {

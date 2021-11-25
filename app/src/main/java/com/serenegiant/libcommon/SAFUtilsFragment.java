@@ -69,9 +69,15 @@ public class SAFUtilsFragment extends BaseFragment
 		if (DEBUG) Log.v(TAG, "onCreateView:");
 		mBinding = DataBindingUtil.inflate(inflater,
 			R.layout.fragment_safutils, container, false);
+		return mBinding.getRoot();
+	}
+
+	@Override
+	public void onViewCreated(@NonNull final View view, @Nullable final Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+		if (DEBUG) Log.v(TAG, "onViewCreated:");
 		mBinding.setViewModel(mViewModel);
 		initView();
-		return mBinding.getRoot();
 	}
 
 	@Override

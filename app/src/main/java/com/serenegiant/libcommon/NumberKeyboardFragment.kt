@@ -31,9 +31,13 @@ class NumberKeyboardFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_NumberKeyboard)
-		val rootView = customInflater.inflate(R.layout.fragment_numberkeyboard, container, false)
-		initView(rootView)
-		return rootView;
+		return customInflater.inflate(R.layout.fragment_numberkeyboard, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onViewCreated:")
+		initView(view)
 	}
 
 	override fun internalOnResume() {

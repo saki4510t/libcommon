@@ -32,12 +32,15 @@ class ViewSliderFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_ViewSlider)
-		mRootView = customInflater.inflate(
+		return customInflater.inflate(
 			if (USE_CONSTRAINT_LAYOUT) R.layout.fragment_viewslider_constraint
 				else R.layout.fragment_viewslider,
 			container, false)
-		initView(mRootView!!)
-		return mRootView;
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		initView(view)
 	}
 
 	override fun internalOnResume() {
@@ -49,6 +52,7 @@ class ViewSliderFragment : BaseFragment() {
 	}
 
 	private fun initView(rootView: View) {
+		mRootView = rootView
 		rootView.setOnTouchListener(mOnTouchListener)
 		mViewSliderLeft = ViewSlider(rootView, R.id.slide_view_left, ViewSlider.HORIZONTAL)
 		mViewSliderLeft!!.hide(0)
@@ -70,6 +74,7 @@ class ViewSliderFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onTouch:${view.javaClass.simpleName}(${view.id}),${event}")
 		if (event.actionMasked == MotionEvent.ACTION_UP) {
 			if (view == mRootView) {
+				view.performClick()
 				val width = view.width
 				val height = view.height
 				val left = width / 4;
@@ -102,12 +107,16 @@ class ViewSliderFragment : BaseFragment() {
 					}
 				}
 			} else if (view == mViewSliderLeft!!.targetView) {
+				view.performClick()
 				mViewSliderLeft!!.hide()
 			} else if (view == mViewSliderTop!!.targetView) {
+				view.performClick()
 				mViewSliderTop!!.hide()
 			} else if (view == mViewSliderRight!!.targetView) {
+				view.performClick()
 				mViewSliderRight!!.hide()
 			} else if (view == mViewSliderBottom!!.targetView) {
+				view.performClick()
 				mViewSliderBottom!!.hide()
 			}
 		}

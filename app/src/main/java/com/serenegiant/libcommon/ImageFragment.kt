@@ -42,7 +42,6 @@ import kotlin.math.sign
 class ImageFragment: BaseFragment() {
 
 	private var mInfo: MediaInfo? = null
-	private var mRootView: View? = null
 	private var mImageView: ZoomImageView? = null
 
 	override fun onAttach(context: Context) {
@@ -54,6 +53,12 @@ class ImageFragment: BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
+		return inflater.inflate(R.layout.fragment_image, container, false)
+	}
+
+	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+		super.onViewCreated(view, savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onViewCreated:")
 		var args = savedInstanceState
 		if (args == null) {
 			args = arguments
@@ -61,9 +66,7 @@ class ImageFragment: BaseFragment() {
 		if (args != null) {
 			mInfo = args.getParcelable(ARG_MEDIA_INFO)
 		}
-		mRootView = inflater.inflate(R.layout.fragment_image, container, false)
-		initView(mRootView!!)
-		return mRootView
+		initView(view)
 	}
 
 	override fun onSaveInstanceState(outState: Bundle) {
