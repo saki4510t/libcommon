@@ -192,7 +192,7 @@ public class MatrixUtils {
 		final int id;
 	}
 
-	private static Map<ImageView.ScaleType, ScaleType> sScaleTypeMap = new HashMap<>();
+	private static final Map<ImageView.ScaleType, ScaleType> sScaleTypeMap = new HashMap<>();
 	static {
 		sScaleTypeMap.put(ImageView.ScaleType.MATRIX, ScaleType.MATRIX);
 		sScaleTypeMap.put(ImageView.ScaleType.FIT_XY, ScaleType.FIT_XY);
