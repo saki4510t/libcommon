@@ -34,6 +34,7 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
 import java.io.BufferedOutputStream;
@@ -201,7 +202,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param id 普通はSurface#hashCodeを使う
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
-	 * @param maxFps
+	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
 	@Override
 	public void addSurface(final int id,
@@ -210,6 +211,28 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
 		mRendererTask.addSurface(id, surface, maxFps);
+	}
+
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 * @param id 普通はSurface#hashCodeを使う
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param isRecordable
+	 * @param maxFps
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	@Override
+	public void addSurface(final int id, final Object surface,
+		final boolean isRecordable, @Nullable final Fraction maxFps)
+			throws IllegalStateException, IllegalArgumentException {
+
+//		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
+		final float _maxFps = maxFps != null ? maxFps.asFloat() : 0.0f;
+		final int v = _maxFps <= 0.0f ? 0 : (int)(_maxFps * 1000);
+		mRendererTask.addSurface(id, surface, v);
 	}
 
 	/**
