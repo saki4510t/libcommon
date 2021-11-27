@@ -23,7 +23,9 @@ import android.util.Log;
 import com.serenegiant.collections.ReentrantReadWriteList;
 
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.Semaphore;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
@@ -42,6 +44,16 @@ public abstract class MessageTask implements Runnable {
 	public static class TaskBreak extends RuntimeException {
 	}
 
+	private interface MessageCallback {
+		/**
+		 * Requestが実行されたときのコールバック
+		 * @param req
+		 * @param result
+		 */
+		@WorkerThread
+		public void onResult(@NonNull final Request req, final Object result);
+	}
+
 	protected static final class Request {
 		int request;
 		int arg1;
@@ -49,6 +61,7 @@ public abstract class MessageTask implements Runnable {
 		Object obj;
 		int request_for_result;
 		Object result;
+		MessageCallback callback;
 
 		private Request() {
 			request = request_for_result = REQUEST_TASK_NON;
@@ -70,10 +83,14 @@ public abstract class MessageTask implements Runnable {
 			request_for_result = REQUEST_TASK_NON;
 		}
 
-		public void setResult(final Object result) {
+		public void setResult(@Nullable final Object result) {
 			synchronized (this) {
 				this.result = result;
 				request = request_for_result = REQUEST_TASK_NON;
+				if (callback != null) {
+					callback.onResult(this, result);
+				}
+				callback = null;
 				notifyAll();
 			}
 		}
@@ -200,13 +217,13 @@ public abstract class MessageTask implements Runnable {
 
 	public boolean waitReady() {
 		synchronized (mSync) {
-			for ( ; !mIsRunning && !mFinished ; ) {
+			while (!mIsRunning && !mFinished) {
 				try {
 					mSync.wait(500);
 				} catch (final InterruptedException e) {
 					break;
 				}
-			}
+			} // end of while
 			return mIsRunning;
 		}
 	}
@@ -266,7 +283,7 @@ public abstract class MessageTask implements Runnable {
 				}
 			}
 		}
-LOOP:	for (; mIsRunning; ) {
+LOOP:	while (mIsRunning) {
 			try {
 				request = takeRequest();
 				switch (request.request) {
@@ -313,7 +330,7 @@ LOOP:	for (; mIsRunning; ) {
 			} catch (final InterruptedException e) {
 				break;
 			}
-		}
+		} // end of while
 		final boolean interrupted = Thread.interrupted();
 		synchronized (mSync) {
 			mWorkerThread = null;
@@ -342,7 +359,7 @@ LOOP:	for (; mIsRunning; ) {
 	/**
 	 * エラー処理。onErrorを呼び出す。
 	 * trueを返すと要求メッセージ処理ループを終了する
-	 * @param e
+	 * @param t
 	 * @return
 	 */
 	protected boolean callOnError(final Throwable t) {
@@ -470,16 +487,21 @@ LOOP:	for (; mIsRunning; ) {
 			final Request req = obtain(REQUEST_TASK_RUN_AND_WAIT, arg1, arg2, obj);
 			if (!isOnWorkerThread()) {
 				// ワーカースレッド上でなければワーカースレッド上での実行要求＆結果を待機する
-				synchronized (req) {
-					req.request_for_result = request;
-					req.result = null;
-					mRequestQueue.offer(req);
-					for (; mIsRunning && (req.request_for_result != REQUEST_TASK_NON); ) {
-						try {
-							req.wait(100);
-						} catch (final InterruptedException e) {
-							break;
-						}
+				final Semaphore sync = new Semaphore(0);
+				req.request_for_result = request;
+				req.result = null;
+				req.callback = new MessageCallback() {
+					@Override
+					public void onResult(@NonNull final Request req, final Object result) {
+						sync.release();
+					}
+				};
+				mRequestQueue.offer(req);
+				while (mIsRunning && (req.request_for_result != REQUEST_TASK_NON)) {
+					try {
+						sync.acquire(100);
+					} catch (final InterruptedException e) {
+						break;
 					}
 				}
 			} else {
@@ -563,7 +585,7 @@ LOOP:	for (; mIsRunning; ) {
 						if (interrupt && (mWorkerThread != null)) {
 							mWorkerThread.interrupt();
 						}
-						for ( ; !mFinished ; ) {
+						while (!mFinished) {
 							try {
 								mSync.wait(300);
 							} catch (final InterruptedException e) {
