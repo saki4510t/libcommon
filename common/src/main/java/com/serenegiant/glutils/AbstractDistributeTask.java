@@ -20,7 +20,6 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
@@ -158,7 +157,7 @@ public abstract class AbstractDistributeTask {
 		}
 		synchronized (mTargets) {
 			if (mTargets.get(id) == null) {
-				for ( ; isRunning() ; ) {
+				while (isRunning()) {
 					if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 						try {
 							mTargets.wait();
@@ -189,7 +188,7 @@ public abstract class AbstractDistributeTask {
 		if (DEBUG) Log.v(TAG, "removeSurface:" + id);
 		synchronized (mTargets) {
 			if (mTargets.get(id) != null) {
-				for ( ; isRunning() ; ) {
+				while (isRunning()) {
 					if (offer(REQUEST_REMOVE_SURFACE, id)) {
 						try {
 							mTargets.wait();
@@ -218,7 +217,7 @@ public abstract class AbstractDistributeTask {
 	public void removeSurfaceAll() {
 		if (DEBUG) Log.v(TAG, "removeSurfaceAll:");
 		synchronized (mTargets) {
-			for ( ; isRunning() ; ) {
+			while (isRunning()) {
 				if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
 					try {
 						mTargets.wait();
@@ -481,11 +480,12 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
-					if (isGLES3()) {
-						GLES30.glFlush();
-					} else {
+					// GLES30の#glFlushはGLES20から継承しているだけなので条件分岐をコメントに変更
+//					if (isGLES3()) {
+//						GLES30.glFlush();
+//					} else {
 						GLES20.glFlush();
-					}
+//					}
 					ThreadUtils.NoThrowSleep(0, 0);
 				}
 			} catch (final Exception e) {
@@ -498,13 +498,14 @@ public abstract class AbstractDistributeTask {
 
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 		makeCurrent();
-		if (isGLES3()) {
-			GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
-			GLES30.glFlush();	// これなくても良さそう?
-		} else {
+		// GLES30の#glClearと#glFlushはGLES20から継承しているだけなので条件分岐をコメントに変更
+//		if (isGLES3()) {
+//			GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
+//			GLES30.glFlush();	// これなくても良さそう?
+//		} else {
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			GLES20.glFlush();	// これなくても良さそう?
-		}
+//		}
 		if (isFirstFrameRendered) {
 			callOnFrameAvailable();
 		}
