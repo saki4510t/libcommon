@@ -477,6 +477,8 @@ LOOP:	while (mIsRunning) {
 	/**
 	 * offer request to run on worker thread and wait for result
 	 * caller thread is blocked until the request finished running on worker thread
+	 * 呼び出し元がMessageTaskのワーカースレッド上の場合にはデッドロックを避けるために直ちに要求が実行される。
+	 * このためワーカースレッド上に実行待ちの要求が存在する場合にはそれよりも先に実行されることになるので注意。
 	 * @param request
 	 * @param arg1
 	 * @param arg2
