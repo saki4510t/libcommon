@@ -382,11 +382,12 @@ public class GLContext implements EGLConst {
 	 */
 	public boolean hasExtension(@NonNull final String extension) {
 		if (TextUtils.isEmpty(mGlExtensions)) {
-			if (isGLES2()) {
+			// GLES30#glGetStringはGLES20の継承メソッドなので条件分岐をコメントに変更
+//			if (isGLES2()) {
 				mGlExtensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
-			} else {
-				mGlExtensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); // API >= 18
-			}
+//			} else {
+//				mGlExtensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); // API >= 18
+//			}
 		}
 		return (mGlExtensions != null) && mGlExtensions.contains(extension);
 	}
