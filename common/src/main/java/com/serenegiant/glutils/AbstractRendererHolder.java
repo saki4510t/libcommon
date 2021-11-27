@@ -47,6 +47,9 @@ import java.nio.ByteOrder;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
+/**
+ * 分配描画インターフェースの共通部分を実装する抽象クラス
+ */
 public abstract class AbstractRendererHolder implements IRendererHolder {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = AbstractRendererHolder.class.getSimpleName();
@@ -56,7 +59,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected final Object mSync = new Object();
 	@Nullable
 	private final RenderHolderCallback mCallback;
-	private final int mMaxClientVersion;
 	private volatile boolean isRunning;
 
 	private OutputStream mCaptureStream;
@@ -65,6 +67,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@IntRange(from = 1L,to = 99L)
 	private int mCaptureCompression = DEFAULT_CAPTURE_COMPRESSION;
 	private OnCapturedListener mOnCapturedListener;
+	@NonNull
 	protected final BaseRendererTask mRendererTask;
 
 	/**
@@ -84,7 +87,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
-		mMaxClientVersion = maxClientVersion;
 		mRendererTask = createRendererTask(width, height,
 			maxClientVersion, sharedContext, flags, enableVSync);
 		mRendererTask.start(RENDERER_THREAD_NAME);
@@ -119,6 +121,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@Nullable
 	public EGLBase.IContext getContext() {
 		return mRendererTask.getContext();
+	}
+
+	public int getGlVersion() {
+		return mRendererTask.getGlVersion();
 	}
 
 	/**
@@ -634,6 +640,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		public EGLBase.IContext getContext() {
 			return mEglTask.getContext();
+		}
+
+		@Override
+		public int getGlVersion() {
+			return mEglTask.getGlVersion();
 		}
 
 		@Override

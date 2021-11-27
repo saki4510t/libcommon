@@ -470,13 +470,18 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
+		public int getGlVersion() {
+			return mGLContext.getGlVersion();
+		}
+
+		@Override
 		public void makeCurrent() {
 			mGLContext.makeDefault();
 		}
 
 		@Override
 		public boolean isGLES3() {
-			return mGLContext.isGLES3();
+			return isGLES3;
 		}
 
 		@Override

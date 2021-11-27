@@ -148,6 +148,18 @@ public abstract class EglTask extends MessageTask {
 		mGLContext.makeDefault();
 	}
 
+	/**
+	 * GLコンテキストのバージョンを取得
+	 * @return GLコンテキストが無効なら0が返る, 有効なら0, 1, 2, 3のいずれか(API>=16なので1が返ることはないはずだけど)
+	 */
+	public int getGlVersion() {
+		return mGLContext.getGlVersion();
+	}
+
+	/**
+	 * GLコンテキストでOpenGL|ES3に対応しているかどうかを取得
+	 * @return
+	 */
 	public boolean isGLES3() {
 		return mGLContext.isGLES3();
 	}

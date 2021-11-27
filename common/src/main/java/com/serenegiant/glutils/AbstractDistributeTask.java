@@ -783,6 +783,7 @@ public abstract class AbstractDistributeTask {
 	public abstract EGLBase getEgl();
 	public abstract GLContext getGLContext();
 	public abstract EGLBase.IContext getContext();
+	public abstract int getGlVersion();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
 	public abstract boolean isOES3();

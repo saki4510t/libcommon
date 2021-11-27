@@ -366,7 +366,7 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * GLコンテキストのバージョンを取得
-	 * @return
+	 * @return GLコンテキストが無効なら0が返る, 有効なら0, 1, 2, 3のいずれか(API>=16なので1が返ることはないはずだけど)
 	 */
 	public int getGlVersion() {
 		synchronized (mSync) {
