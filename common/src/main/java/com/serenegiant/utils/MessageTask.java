@@ -387,6 +387,9 @@ LOOP:	while (mIsRunning) {
 			req.arg1 = arg1;
 			req.arg2 = arg2;
 			req.obj = obj;
+			req.request_for_result = REQUEST_TASK_NON;
+			req.result = null;
+			req.callback = null;
 		} else {
 			req = new Request(request, arg1, arg2, obj);
 		}
