@@ -264,7 +264,7 @@ public class StaticTextureSource {
 		}
 
 		@Override
-		protected boolean onError(final Exception e) {
+		protected boolean onError(final Throwable e) {
 			if (DEBUG) Log.w(TAG, e);
 			return false;
 		}

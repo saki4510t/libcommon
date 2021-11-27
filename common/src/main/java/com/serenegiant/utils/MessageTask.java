@@ -182,7 +182,7 @@ public abstract class MessageTask implements Runnable {
 	 * デフフォルトはtrueを返しメッセージ処理ループを終了する
 	 * @return trueを返すとメッセージ処理ループを終了する
 	 */
-	protected boolean onError(final Exception e) {
+	protected boolean onError(final Throwable e) {
 //		if (DEBUG) Log.w(TAG, e);
 		return true;
 	}
@@ -345,9 +345,9 @@ LOOP:	for (; mIsRunning; ) {
 	 * @param e
 	 * @return
 	 */
-	protected boolean callOnError(final Exception e) {
+	protected boolean callOnError(final Throwable t) {
 		try {
-			return onError(e);
+			return onError(t);
 		} catch (final Exception e2) {
 //			if (DEBUG) Log.e(TAG, "exception occurred in callOnError", e);
 		}
