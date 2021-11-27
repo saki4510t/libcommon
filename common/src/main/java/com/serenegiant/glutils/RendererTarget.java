@@ -26,6 +26,7 @@ import com.serenegiant.system.Time;
 import androidx.annotation.NonNull;
 
 /**
+ * Surface等の描画先のオブジェクトと関係する設定を保持するためのホルダークラス
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
 public class RendererTarget {
@@ -113,6 +114,12 @@ public class RendererTarget {
 		return mEnable;
 	}
 
+	/**
+	 * 内部で使うモデルビュー変換行列を取得
+	 * コピーではないので変更時は注意
+	 * @return
+	 */
+	@NonNull
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}
@@ -244,6 +251,12 @@ public class RendererTarget {
 			return super.canDraw() && (Time.nanoTime() - mNextDraw > mIntervalsDeltaNs);
 		}
 
+		/**
+		 * このRendererTargetが保持する描画先(Surface等)へIDrawer2Dを使って指定したテクスチャを描画する
+		 * @param drawer
+		 * @param textId
+		 * @param texMatrix
+		 */
 		@Override
 		public void draw(final GLDrawer2D drawer,
 			final int textId, final float[] texMatrix) {
