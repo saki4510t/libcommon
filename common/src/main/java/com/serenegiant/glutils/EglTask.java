@@ -38,6 +38,7 @@ public abstract class EglTask extends MessageTask {
 //	private static final boolean DEBUG = false;
 //	private static final String TAG = "EglTask";
 
+	@NonNull
 	private final GLContext mGLContext;
 
 	/**
