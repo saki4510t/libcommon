@@ -457,7 +457,7 @@ public class StaticTextureSource {
 		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 * @return
 		 */
-		protected RendererTarget createRendererTarget(final int id,
+		private RendererTarget createRendererTarget(final int id,
 			@NonNull final EGLBase egl,
 			final Object surface, final float maxFps) {
 
