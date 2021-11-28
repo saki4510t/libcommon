@@ -24,6 +24,7 @@ import com.serenegiant.collections.ReentrantReadWriteList;
 
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -493,11 +494,13 @@ LOOP:	while (mIsRunning) {
 			if (!isOnWorkerThread()) {
 				// ワーカースレッド上でなければワーカースレッド上での実行要求＆結果を待機する
 				final Semaphore sync = new Semaphore(0);
+				final AtomicReference<Object> ret = new AtomicReference<>();
 				req.request_for_result = request;
 				req.result = null;
 				req.callback = new MessageCallback() {
 					@Override
 					public void onResult(@NonNull final Request req, final Object result) {
+						ret.set(result);
 						sync.release();
 					}
 				};
@@ -509,6 +512,7 @@ LOOP:	while (mIsRunning) {
 						break;
 					}
 				}
+				return ret.get();
 			} else {
 				// ワーカースレッド上ならここで実行する
 				try {
