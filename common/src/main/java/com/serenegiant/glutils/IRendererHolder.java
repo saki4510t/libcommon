@@ -120,6 +120,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
+	@Deprecated
 	public void addSurface(final int id, final Object surface,
 		final boolean isRecordable, final int maxFps)
 			throws IllegalStateException, IllegalArgumentException;

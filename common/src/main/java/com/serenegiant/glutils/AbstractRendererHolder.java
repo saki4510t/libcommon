@@ -212,6 +212,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param isRecordable
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
 	@Override
 	public void addSurface(final int id,
 		final Object surface, final boolean isRecordable, final int maxFps)
@@ -238,9 +240,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		final float _maxFps = maxFps != null ? maxFps.asFloat() : 0.0f;
-		final int v = _maxFps <= 0.0f ? 0 : (int)(_maxFps * 1000);
-		mRendererTask.addSurface(id, surface, v);
+		mRendererTask.addSurface(id, surface, maxFps);
 	}
 
 	/**

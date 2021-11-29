@@ -28,6 +28,7 @@ import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.IRendererHolder;
+import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -200,10 +201,29 @@ public class Distributor implements IPipeline {
 	 * @param id 普通はSurface#hashCodeを使う
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
+	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
+	public void addSurface(final int id,
+		final Object surface, final boolean isRecordable, final int maxFps)
+			throws IllegalStateException, IllegalArgumentException {
+
+//		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
+		mDistributeTask.addSurface(id, surface, maxFps);
+	}
+
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 * @param id 普通はSurface#hashCodeを使う
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param isRecordable
 	 * @param maxFps
 	 */
 	public void addSurface(final int id,
-		final Object surface, final boolean isRecordable, final int maxFps)
+		final Object surface, final boolean isRecordable, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);

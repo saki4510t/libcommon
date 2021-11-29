@@ -25,11 +25,13 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.Choreographer;
 
+import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
@@ -145,7 +147,7 @@ public abstract class AbstractDistributeTask {
 	public void addSurface(final int id, final Object surface)
 		throws IllegalStateException, IllegalArgumentException {
 
-		addSurface(id, surface, -1);
+		addSurface(id, surface, null);
 	}
 
 	/**
@@ -156,6 +158,7 @@ public abstract class AbstractDistributeTask {
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
+	@Deprecated
 	@AnyThread
 	public void addSurface(final int id,
 		final Object surface, final int maxFps)
@@ -172,8 +175,52 @@ public abstract class AbstractDistributeTask {
 			target = mTargets.get(id);
 		}
 		if (target == null) {
+			final TargetSurface _surface = new TargetSurface(id, surface, maxFps);
 			while (isRunning() && !isFinished()) {
-				if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
+				if (offer(REQUEST_ADD_SURFACE, _surface)) {
+					// 追加時は待機しなくて良さそう
+					break;
+				} else {
+					// タスク実行中ならofferに失敗しないのでここにはこないはず
+					synchronized (mSync) {
+						try {
+							mSync.wait(5);
+						} catch (final InterruptedException e) {
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * 分配描画用のSurfaceを追加
+	 * このメソッドは指定したSurfaceが追加されるか
+	 * interruptされるまでカレントスレッドをブロックする。
+	 * @param id
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param maxFps nullまたはasFloatが0以下なら未指定, それ以外なら最大フレームレート
+	 */
+	@AnyThread
+	public void addSurface(final int id,
+		final Object surface, @Nullable final Fraction maxFps)
+			throws IllegalStateException, IllegalArgumentException {
+
+		if (DEBUG) Log.v(TAG, "addSurface:" + id);
+		checkFinished();
+		if (!GLUtils.isSupportedSurface(surface)) {
+			throw new IllegalArgumentException(
+				"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
+		}
+		RendererTarget target;
+		synchronized (mTargets) {
+			target = mTargets.get(id);
+		}
+		if (target == null) {
+			final TargetSurface _surface = new TargetSurface(id, surface, maxFps);
+			while (isRunning() && !isFinished()) {
+				if (offer(REQUEST_ADD_SURFACE, _surface)) {
 					// 追加時は待機しなくて良さそう
 					break;
 				} else {
@@ -471,7 +518,9 @@ public abstract class AbstractDistributeTask {
 			handleResize(arg1, arg2);
 			break;
 		case REQUEST_ADD_SURFACE:
-			handleAddSurface(arg1, obj, arg2);
+			if (obj instanceof TargetSurface) {
+				handleAddSurface((TargetSurface)obj);
+			}
 			break;
 		case REQUEST_REMOVE_SURFACE:
 			handleRemoveSurface(arg1);
@@ -609,29 +658,26 @@ public abstract class AbstractDistributeTask {
 
 	/**
 	 * 指定したIDの分配描画先Surfaceを追加する
-	 * @param id
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
-	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 * @param ts
 	 */
 	@WorkerThread
-	protected void handleAddSurface(final int id,
-		final Object surface, final int maxFps) {
+	protected void handleAddSurface(@NonNull final TargetSurface ts) {
 
-		if (DEBUG) Log.v(TAG, "handleAddSurface:" + id);
+		if (DEBUG) Log.v(TAG, "handleAddSurface:" + ts.id);
 		checkTarget();
-		RendererTarget target = mTargets.get(id);
+		RendererTarget target = mTargets.get(ts.id);
 		if (target == null) {
 			try {
-				target = createRendererTarget(id, getEgl(), surface, maxFps);
+				target = createRendererTarget(ts.id, getEgl(), ts.surface, ts.maxFps);
 				GLUtils.setMirror(target.getMvpMatrix(), mMirror);
 				synchronized (mTargets) {
-					mTargets.append(id, target);
+					mTargets.append(ts.id, target);
 				}
 			} catch (final Exception e) {
-				Log.w(TAG, "invalid surface: surface=" + surface, e);
+				Log.w(TAG, "invalid surface: surface=" + ts, e);
 			}
 		} else {
-			Log.w(TAG, "surface is already added: id=" + id);
+			Log.w(TAG, "surface is already added: id=" + ts.id);
 		}
 		synchronized (mSync) {
 			mSync.notify();
@@ -651,10 +697,10 @@ public abstract class AbstractDistributeTask {
 	@NonNull
 	protected RendererTarget createRendererTarget(final int id,
 		@NonNull final EGLBase egl,
-		@NonNull final Object surface, final float maxFps) {
+		@NonNull final Object surface, @Nullable final Fraction maxFps) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTarget:" + id);
-		return RendererTarget.newInstance(getEgl(), surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
+		return RendererTarget.newInstance(getEgl(), surface, maxFps != null ? maxFps.asFloat() : -1.0f);
 	}
 
 	/**
@@ -808,6 +854,47 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	/**
+	 * 描画先Surfaceとその設定のホルダークラス
+	 */
+	private static class TargetSurface {
+		private final int id;
+		@NonNull
+		private final Object surface;
+		@Nullable
+		private final Fraction maxFps;
+
+		private TargetSurface(final int id, @NonNull final Object surface, final int maxFps) {
+			this(id, surface, makeFraction(maxFps));
+		}
+
+		private TargetSurface(final int id, @NonNull final Object surface, @Nullable final Fraction maxFps) {
+			this.id = id;
+			this.surface = surface;
+			this.maxFps = maxFps;
+		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "TargetSurface{" +
+				"id=" + id +
+				", surface=" + surface +
+				", maxFps=" + maxFps +
+				'}';
+		}
+
+		@Nullable
+		private static Fraction makeFraction(final int v) {
+			if (v < 0) {
+				return null;
+			} else if (v > 1000) {
+				return new Fraction(v, 1000);
+			} else {
+				return new Fraction(v, 1);
+			}
+		}
+	}
 //--------------------------------------------------------------------------------
 	public abstract void start(final String tag);
 	public abstract boolean waitReady();
