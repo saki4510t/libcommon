@@ -294,6 +294,7 @@ public abstract class AbstractDistributeTask {
 	 * 分配描画用のSurfaceの数を取得
 	 * @return
 	 */
+	@Deprecated
 	public int getCount() {
 		synchronized (mTargets) {
 			return mTargets.size();
