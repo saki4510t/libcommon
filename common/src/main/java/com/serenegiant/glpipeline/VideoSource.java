@@ -341,7 +341,9 @@ public class VideoSource implements IPipelineSource {
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glFlush();
 		if (mInputTexture != null) {
+			// Surfaceで受け取った映像をテクスチャへ転送
 			mInputTexture.updateTexImage();
+			// テクスチャ変換行列を更新
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
@@ -357,7 +359,9 @@ public class VideoSource implements IPipelineSource {
 		GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
 		GLES30.glFlush();
 		if (mInputTexture != null) {
+			// Surfaceで受け取った映像をテクスチャへ転送
 			mInputTexture.updateTexImage();
+			// テクスチャ変換行列を更新
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES30.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);

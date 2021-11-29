@@ -52,10 +52,11 @@ public class Distributor implements IPipeline {
 	private final boolean mOwnManager;
 	@NonNull
 	private final GLManager mManager;
-
 	@Nullable
 	private final IRendererHolder.RenderHolderCallback mCallback;
+	@NonNull
 	private final Object mSync = new Object();
+	@NonNull
 	private final DistributeTask mDistributeTask;
 	private volatile boolean isRunning;
 
