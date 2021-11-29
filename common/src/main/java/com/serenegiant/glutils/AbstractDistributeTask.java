@@ -159,11 +159,12 @@ public abstract class AbstractDistributeTask {
 			if (mTargets.get(id) == null) {
 				while (isRunning()) {
 					if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
-						try {
-							mTargets.wait();
-						} catch (final InterruptedException e) {
-							// ignore
-						}
+						// 追加時は待機しなくて良さそう
+//						try {
+//							mTargets.wait();
+//						} catch (final InterruptedException e) {
+//							// ignore
+//						}
 						break;
 					} else {
 						// キューに追加できなかった時は待機する
