@@ -32,6 +32,7 @@ import com.serenegiant.system.SysPropReader;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
+import androidx.annotation.WorkerThread;
 import kotlin.jvm.Transient;
 
 /**
@@ -96,7 +97,7 @@ public class GLContext implements EGLConst {
 	 */
 	@SuppressWarnings("CopyConstructorMissesField")
 	public GLContext(@NonNull final GLContext src) {
-		this(src.getMaxClientVersion(), src.getContext(), src.getFlags(), 1, 1);
+		this(src.getMaxClientVersion(), src.getContext(), src.getFlags(), src.mMasterWidth, src.mMasterHeight);
 	}
 
 	/**
@@ -120,6 +121,8 @@ public class GLContext implements EGLConst {
 
 	@Override
 	protected void finalize() throws Throwable {
+		// #finalizeから#releaseが呼ばれるよりも前に#releaseを呼び出しておかないとGLESのエラーがログに出力される
+		if (DEBUG && (mGLThreadId != 0)) throw new IllegalStateException("Not released!");
 		try {
 			release();
 		} finally {
@@ -131,6 +134,7 @@ public class GLContext implements EGLConst {
 	 * 関連するリソースを破棄する
 	 * #initializeを呼び出したスレッド上で実行すること
 	 */
+	@WorkerThread
 	public void release() {
 		synchronized (mSync) {
 			mGLThreadId = 0;
@@ -148,9 +152,10 @@ public class GLContext implements EGLConst {
 	/**
 	 * 初期化を実行
 	 * GLコンテキストを生成するスレッド上で実行すること
-	 * @throws RuntimeException
+	 * @throws IllegalArgumentException
 	 */
-	public void initialize() throws RuntimeException {
+	@WorkerThread
+	public void initialize() throws IllegalArgumentException {
 		initialize(null);
 	}
 
@@ -158,9 +163,10 @@ public class GLContext implements EGLConst {
 	 * 初期化を実行
 	 * GLコンテキストを生成するスレッド上で実行すること
 	 * @param surface nullでなければコンテキスト保持用IEglSurfaceをそのsurfaceから生成する
-	 * @throws RuntimeException
+	 * @throws IllegalArgumentException
 	 */
-	public void initialize(@Nullable final Object surface) throws RuntimeException {
+	@WorkerThread
+	public void initialize(@Nullable final Object surface) throws IllegalArgumentException {
 		if ((mSharedContext == null)
 			|| (mSharedContext instanceof EGLBase.IContext)) {
 
@@ -180,9 +186,10 @@ public class GLContext implements EGLConst {
 			}
 			mGLThreadId = Thread.currentThread().getId();
 		} else {
-			throw new RuntimeException("failed to create EglCore");
+			throw new IllegalArgumentException("failed to create EGLBase");
 		}
 		if (!isOutputVersionInfo) {
+			// 初回だけログにOpenGL|ESの情報を出力する
 			isOutputVersionInfo = true;
 			logVersionInfo();
 		}
@@ -255,6 +262,7 @@ public class GLContext implements EGLConst {
 	 * マスターコンテキストを選択
 	 * @throws IllegalStateException
 	 */
+	@WorkerThread
 	public void makeDefault() throws IllegalStateException {
 		synchronized (mSync) {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
@@ -269,6 +277,7 @@ public class GLContext implements EGLConst {
 	 * マスターコンテキストをswap
 	 * @throws IllegalStateException
 	 */
+	@WorkerThread
 	public void swap() throws IllegalStateException {
 		synchronized (mSync) {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
@@ -285,6 +294,7 @@ public class GLContext implements EGLConst {
 	 * @throws IllegalStateException
 	 */
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	@WorkerThread
 	public void swap(final long presentationTimeNs) throws IllegalStateException {
 		synchronized (mSync) {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
@@ -301,6 +311,7 @@ public class GLContext implements EGLConst {
 	 * eglWaitGL: コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
 	 * eglWaitNative: GPU側の描画処理が終了するまで実行をブロックする
 	 */
+	@WorkerThread
 	public void sync() throws IllegalStateException {
 		synchronized (mSync) {
 			if (mEgl != null) {
@@ -315,6 +326,7 @@ public class GLContext implements EGLConst {
 	 * eglWaitGLを呼ぶ
 	 * コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
 	 */
+	@WorkerThread
 	public void waitGL() throws IllegalStateException {
 		synchronized (mSync) {
 			if (mEgl != null) {
@@ -329,6 +341,7 @@ public class GLContext implements EGLConst {
 	 * eglWaitNativeを呼ぶ
 	 * GPU側の描画処理が終了するまで実行をブロックする
 	 */
+	@WorkerThread
 	public void waitNative() throws IllegalStateException {
 		synchronized (mSync) {
 			if (mEgl != null) {
@@ -382,6 +395,7 @@ public class GLContext implements EGLConst {
 	 * @param extension
 	 * @return
 	 */
+	@WorkerThread
 	public boolean hasExtension(@NonNull final String extension) {
 		if (TextUtils.isEmpty(mGlExtensions)) {
 			// GLES30#glGetStringはGLES20の継承メソッドなので条件分岐をコメントに変更
@@ -415,6 +429,7 @@ public class GLContext implements EGLConst {
 	 * Writes GL version info to the log.
 	 */
 	@SuppressLint("InlinedApi")
+	@WorkerThread
 	public static void logVersionInfo() {
 		Log.i(TAG, "vendor:" + GLES20.glGetString(GLES20.GL_VENDOR));
 		Log.i(TAG, "renderer:" + GLES20.glGetString(GLES20.GL_RENDERER));
@@ -428,6 +443,7 @@ public class GLContext implements EGLConst {
 	 * 			それ以外は整数部: メジャーバージョン, 小数部: マイナーバージョン
 	 */
 	@SuppressLint("InlinedApi")
+	@WorkerThread
 	public static float supportedGLESVersion() {
 		float result = 0.0f;
 

@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
+ * 基本的には直接生成せずににGLContextまたはGLManagerを使うこと
  */
 public abstract class EGLBase implements EGLConst {
 	/**
@@ -49,7 +50,8 @@ public abstract class EGLBase implements EGLConst {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static IContext<?> wrapContext(@NonNull final Object context) {
+	@Nullable
+	public static IContext<?> wrapContext(@Nullable final Object context) {
 		if (context instanceof IContext) {
 			return (IContext<?>)context;
 		} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
@@ -77,7 +79,6 @@ public abstract class EGLBase implements EGLConst {
 			&& (eglConfig instanceof android.opengl.EGLConfig)) {
 
 			return EGLBase14.wrap((android.opengl.EGLConfig)eglConfig);
-
 		} else if (eglConfig instanceof javax.microedition.khronos.egl.EGLConfig) {
 			return EGLBase10.wrap((javax.microedition.khronos.egl.EGLConfig)eglConfig);
 		} else {
