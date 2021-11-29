@@ -56,11 +56,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private static final String RENDERER_THREAD_NAME = "RendererHolder";
 	private static final String CAPTURE_THREAD_NAME = "CaptureTask";
 
-	protected final Object mSync = new Object();
+	@NonNull
+	private final Object mSync = new Object();
 	@Nullable
 	private final RenderHolderCallback mCallback;
 	private volatile boolean isRunning;
 
+	@Nullable
 	private OutputStream mCaptureStream;
 	@StillCaptureFormat
 	private int mCaptureFormat;
