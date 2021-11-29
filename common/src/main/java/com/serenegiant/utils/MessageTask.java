@@ -115,6 +115,20 @@ public abstract class MessageTask implements Runnable {
 					&& (obj == ((Request) o).obj)
 				: super.equals(o);
 		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Request{" +
+				"request=" + request +
+				", arg1=" + arg1 +
+				", arg2=" + arg2 +
+				", obj=" + obj +
+				", request_for_result=" + request_for_result +
+				", result=" + result +
+				", callback=" + callback +
+				'}';
+		}
 	}
 
 	// minus values and zero are reserved for internal use
