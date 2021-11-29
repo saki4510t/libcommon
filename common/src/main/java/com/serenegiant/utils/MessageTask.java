@@ -39,12 +39,18 @@ import androidx.annotation.WorkerThread;
  * MessageTaskまたはその継承クラスをTreadへ引き渡して実行する
  */
 public abstract class MessageTask implements Runnable {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MessageTask.class.getSimpleName();
 
+	/**
+	 * 中断指示を表すためのRuntimeException実装
+	 */
 	public static class TaskBreak extends RuntimeException {
 	}
 
+	/**
+	 * offerAndWait呼び出し処理用のコールバックインターフェース
+	 */
 	private interface MessageCallback {
 		/**
 		 * Requestが実行されたときのコールバック
@@ -55,6 +61,9 @@ public abstract class MessageTask implements Runnable {
 		public void onResult(@NonNull final Request req, final Object result);
 	}
 
+	/**
+	 * 実行要求ホルダー
+	 */
 	protected static final class Request {
 		int request;
 		int arg1;
@@ -115,10 +124,13 @@ public abstract class MessageTask implements Runnable {
 	protected static final int REQUEST_TASK_START = -8;
 	protected static final int REQUEST_TASK_QUIT = -9;
 
+	@NonNull
 	private final Object mSync = new Object();
 	/** プール/キューのサイズ, -1なら無制限 */
 	private final int mMaxRequest;
+	@NonNull
 	private final ReentrantReadWriteList<Request> mRequestPool;
+	@NonNull
 	private final LinkedBlockingDeque<Request> mRequestQueue;
 	private volatile boolean mIsRunning, mFinished;
 	private Thread mWorkerThread;
@@ -293,12 +305,16 @@ LOOP:	while (mIsRunning) {
 				case REQUEST_TASK_QUIT:
 					break LOOP;
 				case REQUEST_TASK_RUN:
-					if (request.obj instanceof Runnable)
-					try {
-						((Runnable)request.obj).run();
-					} catch (final Exception e) {
-						if (callOnError(e))
-							break LOOP;
+					if (request.obj instanceof Runnable) {
+						try {
+							((Runnable)request.obj).run();
+						} catch (final Exception e) {
+							if (callOnError(e))
+								break LOOP;
+						}
+					} else {
+						if (DEBUG) Log.w(TAG, "Unknown task");
+						// ここにくることはないはず
 					}
 					break;
 				case REQUEST_TASK_RUN_AND_WAIT:
