@@ -28,6 +28,7 @@ import android.view.Choreographer;
 import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.ThreadUtils;
 
+import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
@@ -49,6 +50,13 @@ public abstract class AbstractDistributeTask {
 	private static final int REQUEST_CLEAR_ALL = 9;
 	private static final int REQUEST_SET_MVP = 10;
 
+	@NonNull
+	private final Object mSync = new Object();
+	/**
+	 * 描画先のRendererTargetを保持するSparseArrayインスタンス
+	 * add/removeを除いて描画スレッド上からしか読み書きしないので
+	 * 基本的には排他制御は不要(add/remove処理時のみ排他制御する)
+	 */
 	@NonNull
 	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
@@ -108,6 +116,7 @@ public abstract class AbstractDistributeTask {
 	/**
 	 * 描画要求する
 	 */
+	@AnyThread
 	public void requestFrame() {
 		mHasNewFrame = isFirstFrameRendered = true;
 		if (!mEnableVSync) {
@@ -120,6 +129,7 @@ public abstract class AbstractDistributeTask {
 	/**
 	 * 映像受け取り用のマスターサーフェースの再生成要求する
 	 */
+	@AnyThread
 	public void requestRecreateMasterSurface() {
 		offer(REQUEST_RECREATE_MASTER_SURFACE);
 	}
@@ -131,6 +141,7 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 */
+	@AnyThread
 	public void addSurface(final int id, final Object surface)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -145,6 +156,7 @@ public abstract class AbstractDistributeTask {
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 */
+	@AnyThread
 	public void addSurface(final int id,
 		final Object surface, final int maxFps)
 			throws IllegalStateException, IllegalArgumentException {
@@ -155,21 +167,20 @@ public abstract class AbstractDistributeTask {
 			throw new IllegalArgumentException(
 				"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 		}
+		RendererTarget target;
 		synchronized (mTargets) {
-			if (mTargets.get(id) == null) {
-				while (isRunning()) {
-					if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
-						// 追加時は待機しなくて良さそう
-//						try {
-//							mTargets.wait();
-//						} catch (final InterruptedException e) {
-//							// ignore
-//						}
-						break;
-					} else {
-						// キューに追加できなかった時は待機する
+			target = mTargets.get(id);
+		}
+		if (target == null) {
+			while (isRunning() && !isFinished()) {
+				if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
+					// 追加時は待機しなくて良さそう
+					break;
+				} else {
+					// タスク実行中ならofferに失敗しないのでここにはこないはず
+					synchronized (mSync) {
 						try {
-							mTargets.wait(5);
+							mSync.wait(5);
 						} catch (final InterruptedException e) {
 							break;
 						}
@@ -185,25 +196,24 @@ public abstract class AbstractDistributeTask {
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id
 	 */
+	@AnyThread
 	public void removeSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "removeSurface:" + id);
-		synchronized (mTargets) {
-			if (mTargets.get(id) != null) {
-				while (isRunning()) {
-					if (offer(REQUEST_REMOVE_SURFACE, id)) {
-						try {
-							mTargets.wait();
-						} catch (final InterruptedException e) {
-							// ignore
-						}
+		while (isRunning()) {
+			synchronized (mSync) {
+				if (offer(REQUEST_REMOVE_SURFACE, id)) {
+					try {
+						mSync.wait();
+					} catch (final InterruptedException e) {
+						// ignore
+					}
+					break;
+				} else {
+					// タスク実行中ならofferに失敗しないのでここにはこないはず
+					try {
+						mSync.wait(5);
+					} catch (final InterruptedException e) {
 						break;
-					} else {
-						// キューに追加できなかった時は待機する
-						try {
-							mTargets.wait(5);
-						} catch (final InterruptedException e) {
-							break;
-						}
 					}
 				}
 			}
@@ -215,21 +225,22 @@ public abstract class AbstractDistributeTask {
 	 * このメソッドはSurfaceが削除されるか
 	 * interruptされるまでカレントスレッドをブロックする。
 	 */
+	@AnyThread
 	public void removeSurfaceAll() {
 		if (DEBUG) Log.v(TAG, "removeSurfaceAll:");
-		synchronized (mTargets) {
-			while (isRunning()) {
+		while (isRunning() && !isFinished()) {
+			synchronized (mSync) {
 				if (offer(REQUEST_REMOVE_SURFACE_ALL)) {
 					try {
-						mTargets.wait();
+						mSync.wait();
 					} catch (final InterruptedException e) {
 						// ignore
 					}
 					break;
 				} else {
-					// キューに追加できなかった時は待機する
+					// タスク実行中ならofferに失敗しないのでここにはこないはず
 					try {
-						mTargets.wait(5);
+						mSync.wait(5);
 					} catch (final InterruptedException e) {
 						break;
 					}
@@ -243,6 +254,7 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 * @param color
 	 */
+	@AnyThread
 	public void clearSurface(final int id, final int color)
 		throws IllegalStateException {
 
@@ -251,6 +263,12 @@ public abstract class AbstractDistributeTask {
 		offer(REQUEST_CLEAR, id, color);
 	}
 
+	/**
+	 * すべての分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param color
+	 * @throws IllegalStateException
+	 */
+	@AnyThread
 	public void clearSurfaceAll(final int color)
 		throws IllegalStateException {
 
@@ -259,6 +277,7 @@ public abstract class AbstractDistributeTask {
 		offer(REQUEST_CLEAR_ALL, color);
 	}
 
+	@AnyThread
 	public void setMvpMatrix(final int id,
 		final int offset, @NonNull final float[] matrix)
 			throws IllegalStateException, IllegalArgumentException {
@@ -272,6 +291,7 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	@AnyThread
 	public boolean isEnabled(final int id) {
 		if (DEBUG) Log.v(TAG, "isEnabled:" + id);
 		synchronized (mTargets) {
@@ -280,6 +300,7 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	@AnyThread
 	public void setEnabled(final int id, final boolean enable) {
 		if (DEBUG) Log.v(TAG, "setEnabled:" + id + ",enable=" + enable);
 		synchronized (mTargets) {
@@ -295,6 +316,7 @@ public abstract class AbstractDistributeTask {
 	 * @return
 	 */
 	@Deprecated
+	@AnyThread
 	public int getCount() {
 		synchronized (mTargets) {
 			return mTargets.size();
@@ -306,6 +328,7 @@ public abstract class AbstractDistributeTask {
 	 * @param width
 	 * @param height
 	 */
+	@AnyThread
 	public void resize(final int width, final int height)
 		throws IllegalStateException {
 
@@ -317,6 +340,7 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	@AnyThread
 	public void mirror(final int mirror) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
@@ -330,12 +354,27 @@ public abstract class AbstractDistributeTask {
 		return mMirror;
 	}
 
+	@AnyThread
 	public int width() {
 		return mVideoWidth;
 	}
 
+	@AnyThread
 	public int height() {
 		return mVideoHeight;
+	}
+
+	public void rotation(final int degree) {
+		if (DEBUG) Log.v(TAG, "mirror:" + degree);
+		checkFinished();
+		if (mRotation != degree) {
+			offer(REQUEST_ROTATE, degree);
+		}
+	}
+
+	@AnyThread
+	public int rotation() {
+		return mRotation;
 	}
 
 	/**
@@ -519,20 +558,21 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void handleDrawTargets(final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
-		synchronized (mTargets) {
-			final int n = mTargets.size();
-			for (int i = n - 1; i >= 0; i--) {
-				final RendererTarget target = mTargets.valueAt(i);
-				if ((target != null) && target.canDraw()) {
-					try {
+		final int n = mTargets.size();
+		for (int i = n - 1; i >= 0; i--) {
+			final RendererTarget target = mTargets.valueAt(i);
+			if ((target != null) && target.canDraw()) {
+				try {
 //						onDrawTarget(target, texId, texMatrix);
-						target.draw(mDrawer, texId, texMatrix);
-					} catch (final Exception e) {
-						if (DEBUG) Log.w(TAG, e);
-						// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
+					target.draw(mDrawer, texId, texMatrix);
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+					// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
+					synchronized (mTargets) {
+						// removeSurface/removeSurfaceAllを別スレッドが参照する可能性があるので排他制御する
 						mTargets.removeAt(i);
-						target.release();
 					}
+					target.release();
 				}
 			}
 		}
@@ -579,20 +619,22 @@ public abstract class AbstractDistributeTask {
 
 		if (DEBUG) Log.v(TAG, "handleAddSurface:" + id);
 		checkTarget();
-		synchronized (mTargets) {
-			RendererTarget target = mTargets.get(id);
-			if (target == null) {
-				try {
-					target = createRendererTarget(id, getEgl(), surface, maxFps);
-					GLUtils.setMirror(target.getMvpMatrix(), mMirror);
+		RendererTarget target = mTargets.get(id);
+		if (target == null) {
+			try {
+				target = createRendererTarget(id, getEgl(), surface, maxFps);
+				GLUtils.setMirror(target.getMvpMatrix(), mMirror);
+				synchronized (mTargets) {
 					mTargets.append(id, target);
-				} catch (final Exception e) {
-					Log.w(TAG, "invalid surface: surface=" + surface, e);
 				}
-			} else {
-				Log.w(TAG, "surface is already added: id=" + id);
+			} catch (final Exception e) {
+				Log.w(TAG, "invalid surface: surface=" + surface, e);
 			}
-			mTargets.notify();
+		} else {
+			Log.w(TAG, "surface is already added: id=" + id);
+		}
+		synchronized (mSync) {
+			mSync.notify();
 		}
 	}
 
@@ -605,6 +647,7 @@ public abstract class AbstractDistributeTask {
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 	 * @return
 	 */
+	@WorkerThread
 	@NonNull
 	protected RendererTarget createRendererTarget(final int id,
 		@NonNull final EGLBase egl,
@@ -621,17 +664,17 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void handleRemoveSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
-		synchronized (mTargets) {
-			final RendererTarget target = mTargets.get(id);
-			if (target != null) {
-				mTargets.remove(id);
-				if (target.isValid()) {
-					target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
-				}
-				target.release();
+		final RendererTarget target = mTargets.get(id);
+		if (target != null) {
+			mTargets.remove(id);
+			if (target.isValid()) {
+				target.clear(0);	// XXX 黒で塗りつぶし, 色指定できるようにする?
 			}
-			checkTarget();
-			mTargets.notify();
+			target.release();
+		}
+		checkTarget();
+		synchronized (mSync) {
+			mSync.notify();
 		}
 	}
 
@@ -643,6 +686,7 @@ public abstract class AbstractDistributeTask {
 		if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
+			Log.i(TAG, "handleRemoveAll:n=" + n);
 			for (int i = 0; i < n; i++) {
 				final RendererTarget target = mTargets.valueAt(i);
 				if (target != null) {
@@ -653,7 +697,9 @@ public abstract class AbstractDistributeTask {
 				}
 			}
 			mTargets.clear();
-			mTargets.notify();
+		}
+		synchronized (mSync) {
+			mSync.notify();
 		}
 		if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 	}
@@ -664,16 +710,14 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void checkTarget() {
 		if (DEBUG) Log.v(TAG, "checkTarget:");
-		synchronized (mTargets) {
-			final int n = mTargets.size();
-			for (int i = 0; i < n; i++) {
-				final RendererTarget target = mTargets.valueAt(i);
-				if ((target != null) && !target.isValid()) {
-					final int id = mTargets.keyAt(i);
-					if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
-					mTargets.valueAt(i).release();
-					mTargets.remove(id);
-				}
+		final int n = mTargets.size();
+		for (int i = 0; i < n; i++) {
+			final RendererTarget target = mTargets.valueAt(i);
+			if ((target != null) && !target.isValid()) {
+				final int id = mTargets.keyAt(i);
+				if (DEBUG) Log.i(TAG, "checkTarget:found invalid surface:id=" + id);
+				mTargets.remove(id);
+				target.release();
 			}
 		}
 		if (DEBUG) Log.v(TAG, "checkTarget:finished");
@@ -687,11 +731,9 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void handleClear(final int id, final int color) {
 		if (DEBUG) Log.v(TAG, "handleClear:" + id);
-		synchronized (mTargets) {
-			final RendererTarget target = mTargets.get(id);
-			if ((target != null) && target.isValid()) {
-				target.clear(color);
-			}
+		final RendererTarget target = mTargets.get(id);
+		if ((target != null) && target.isValid()) {
+			target.clear(color);
 		}
 	}
 
@@ -702,13 +744,11 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void handleClearAll(final int color) {
 		if (DEBUG) Log.v(TAG, "handleClearAll:");
-		synchronized (mTargets) {
-			final int n = mTargets.size();
-			for (int i = 0; i < n; i++) {
-				final RendererTarget target = mTargets.valueAt(i);
-				if ((target != null) && target.isValid()) {
-					target.clear(color);
-				}
+		final int n = mTargets.size();
+		for (int i = 0; i < n; i++) {
+			final RendererTarget target = mTargets.valueAt(i);
+			if ((target != null) && target.isValid()) {
+				target.clear(color);
 			}
 		}
 	}
@@ -724,11 +764,9 @@ public abstract class AbstractDistributeTask {
 		final int offset, @NonNull final float[] mvp) {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
-		synchronized (mTargets) {
-			final RendererTarget target = mTargets.get(id);
-			if ((target != null) && target.isValid()) {
-				System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
-			}
+		final RendererTarget target = mTargets.get(id);
+		if ((target != null) && target.isValid()) {
+			System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
 		}
 	}
 
@@ -740,13 +778,11 @@ public abstract class AbstractDistributeTask {
 	protected void handleMirror(final int mirror) {
 		if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
 		mMirror = mirror;
-		synchronized (mTargets) {
-			final int n = mTargets.size();
-			for (int i = 0; i < n; i++) {
-				final RendererTarget target = mTargets.valueAt(i);
-				if (target != null) {
-					GLUtils.setMirror(target.getMvpMatrix(), mirror);
-				}
+		final int n = mTargets.size();
+		for (int i = 0; i < n; i++) {
+			final RendererTarget target = mTargets.valueAt(i);
+			if (target != null) {
+				GLUtils.setMirror(target.getMvpMatrix(), mirror);
 			}
 		}
 	}
@@ -759,11 +795,10 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void handleRotate(final int id, final int degree) {
 		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
-		synchronized (mTargets) {
-			final RendererTarget target = mTargets.get(id);
-			if (target != null) {
-				GLUtils.setRotation(target.getMvpMatrix(), degree);
-			}
+		mRotation = degree;
+		final RendererTarget target = mTargets.get(id);
+		if (target != null) {
+			GLUtils.setRotation(target.getMvpMatrix(), degree);
 		}
 	}
 
