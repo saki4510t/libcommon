@@ -455,18 +455,21 @@ public class Distributor implements IPipeline {
 			mGLHandler.removeMessages(request);
 		}
 
+		@NonNull
 		@Override
 		public EGLBase getEgl() {
 			return mGLContext.getEgl();
 		}
 
+		@NonNull
 		@Override
 		public GLContext getGLContext() {
 			return mGLContext;
 		}
 
+		@NonNull
 		@Override
-		public EGLBase.IContext getContext() {
+		public EGLBase.IContext<?> getContext() {
 			return mGLContext.getContext();
 		}
 

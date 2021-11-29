@@ -44,6 +44,7 @@ import com.serenegiant.system.BuildCheck;
 	private static final boolean DEBUG = false;	// FIXME set false on release
 	private static final String TAG = EGLBase10.class.getSimpleName();
 
+	@NonNull
 	private static final Context EGL_NO_CONTEXT = wrap(EGL10.EGL_NO_CONTEXT);
 
 	/**
@@ -68,11 +69,10 @@ import com.serenegiant.system.BuildCheck;
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
-	public static class Context extends IContext {
-		public final EGLContext eglContext;
+	/*package*/static class Context extends IContext<EGLContext> {
 
 		private Context(final EGLContext context) {
-			eglContext = context;
+			super(context);
 		}
 		
 		@Override
@@ -80,38 +80,11 @@ import com.serenegiant.system.BuildCheck;
 			return 0L;
 		}
 
-		@Override
-		public Object getEGLContext() {
-			return eglContext;
-		}
-
-		@NonNull
-		@Override
-		public String toString() {
-			return "Context{" +
-				"eglContext=" + eglContext +
-				'}';
-		}
 	} // Context
 
-	public static class Config extends IConfig {
-		public final EGLConfig eglConfig;
-
-		private Config(final EGLConfig eglConfig) {
-			this.eglConfig = eglConfig;
-		}
-
-		@Override
-		public EGLConfig getEGLConfig() {
-			return eglConfig;
-		}
-
-		@NonNull
-		@Override
-		public String toString() {
-			return "Config{" +
-				"eglConfig=" + eglConfig +
-				'}';
+	/*package*/static class Config extends IConfig<EGLConfig> {
+		private Config(@NonNull final EGLConfig eglConfig) {
+			super((eglConfig));
 		}
 	} // Config
 
@@ -334,10 +307,12 @@ import com.serenegiant.system.BuildCheck;
 	 * @param withDepthBuffer
 	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
 	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
+	 * @throws IllegalArgumentException
 	 */
 	/*package*/ EGLBase10(final int maxClientVersion,
 		@Nullable final Context sharedContext, final boolean withDepthBuffer,
-		final int stencilBits, final boolean isRecordable) {
+		final int stencilBits, final boolean isRecordable)
+			throws IllegalArgumentException {
 
 		super();
 //		if (DEBUG) Log.v(TAG, "Constructor:");
@@ -350,10 +325,12 @@ import com.serenegiant.system.BuildCheck;
 	 * @param withDepthBuffer
 	 * @param isRecordable true MediaCodec等の録画用Surfaceを使用する場合に、
 	 * 						EGL_RECORDABLE_ANDROIDフラグ付きでコンフィグする
+	 * @throws IllegalArgumentException
 	 */
 	/*package*/ EGLBase10(final int maxClientVersion,
 		final boolean withDepthBuffer,
-		final int stencilBits, final boolean isRecordable) {
+		final int stencilBits, final boolean isRecordable)
+			throws IllegalArgumentException {
 
 		super();
 //		if (DEBUG) Log.v(TAG, "Constructor:");
@@ -436,6 +413,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@NonNull
 	@Override
 	public Context getContext() throws IllegalStateException {
 		if (!isValidContext()) {
@@ -448,8 +426,12 @@ import com.serenegiant.system.BuildCheck;
 	 * EGLコンフィグを取得する
 	 * @return
 	 */
+	@NonNull
 	@Override
-	public Config getConfig() {
+	public Config getConfig() throws IllegalStateException {
+		if (!isValidContext()) {
+			throw new IllegalStateException();
+		}
 		return mEglConfig;
 	}
 
@@ -522,10 +504,12 @@ import com.serenegiant.system.BuildCheck;
 	 * @param withDepthBuffer
 	 * @param stencilBits
 	 * @param isRecordable
+	 * @throws IllegalArgumentException
 	 */
 	private final void init(final int maxClientVersion,
 		@Nullable Context sharedContext,
-		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable)
+			throws IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "init:");
 		sharedContext = (sharedContext != null) ? sharedContext : EGL_NO_CONTEXT;
@@ -533,13 +517,13 @@ import com.serenegiant.system.BuildCheck;
 			mEgl = (EGL10)EGLContext.getEGL();
 	        mEglDisplay = mEgl.eglGetDisplay(EGL10.EGL_DEFAULT_DISPLAY);
 	        if (mEglDisplay == EGL10.EGL_NO_DISPLAY) {
-	            throw new RuntimeException("eglGetDisplay failed");
+	            throw new IllegalArgumentException("eglGetDisplay failed");
 	        }
 	        // EGLのバージョンを取得
 			final int[] version = new int[2];
 	        if (!mEgl.eglInitialize(mEglDisplay, version)) {
 	        	mEglDisplay = EGL10.EGL_NO_DISPLAY;
-	            throw new RuntimeException("eglInitialize failed");
+	            throw new IllegalArgumentException("eglInitialize failed");
 	        }
 		}
 		EGLConfig config;
@@ -563,7 +547,7 @@ import com.serenegiant.system.BuildCheck;
 			if (DEBUG) Log.d(TAG, "init:GLES2を試みる");
             config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
             if (config == null) {
-               	throw new RuntimeException("chooseConfig failed");
+               	throw new IllegalArgumentException("chooseConfig failed");
             }
             try {
 				// create EGL rendering context
@@ -576,7 +560,7 @@ import com.serenegiant.system.BuildCheck;
 				if (isRecordable) {
 					config = getConfig(2, withDepthBuffer, stencilBits, false);
 					if (config == null) {
-						throw new RuntimeException("chooseConfig failed");
+						throw new IllegalArgumentException("chooseConfig failed");
 					}
 					// create EGL rendering context
 					final EGLContext context = createContext(sharedContext, config, 2);
@@ -584,13 +568,15 @@ import com.serenegiant.system.BuildCheck;
 					mEglConfig = wrap(config);
 					mContext = wrap(context);
 					mGlVersion = 2;
+				} else {
+					throw e;
 				}
 			}
         }
         if (!isValidContext()) {
 			config = getConfig(1, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
-				throw new RuntimeException("chooseConfig failed");
+				throw new IllegalArgumentException("chooseConfig failed");
 			}
 			// create EGL rendering context
 			final EGLContext context = createContext(sharedContext, config, 1);

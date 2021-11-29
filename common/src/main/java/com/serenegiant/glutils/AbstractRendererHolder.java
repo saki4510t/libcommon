@@ -84,7 +84,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -121,7 +121,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 	@Nullable
-	public EGLBase.IContext getContext() {
+	public EGLBase.IContext<?> getContext() {
 		return mRendererTask.getContext();
 	}
 
@@ -465,7 +465,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected abstract BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVsync);
 	
 //--------------------------------------------------------------------------------
@@ -548,7 +548,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 			final boolean enableVSync) {
 
 			super(width, height, enableVSync);
@@ -631,18 +631,21 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			mEglTask.removeRequest(request);
 		}
 
+		@NonNull
 		@Override
 		public EGLBase getEgl() {
 			return mEglTask.getEgl();
 		}
 
+		@NonNull
 		@Override
 		public GLContext getGLContext() {
 			return mEglTask.getGLContext();
 		}
 
+		@NonNull
 		@Override
-		public EGLBase.IContext getContext() {
+		public EGLBase.IContext<?> getContext() {
 			return mEglTask.getContext();
 		}
 

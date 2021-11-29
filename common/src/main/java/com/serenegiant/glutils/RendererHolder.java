@@ -69,7 +69,7 @@ public class RendererHolder extends AbstractRendererHolder {
 	 */
 	public RendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
@@ -89,7 +89,7 @@ public class RendererHolder extends AbstractRendererHolder {
 	 */
 	public RendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -103,7 +103,7 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVsync) {
 
 		return new BaseRendererTask(this, width, height,

@@ -88,7 +88,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 */
 	public MixRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
@@ -108,7 +108,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 */
 	public MixRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -156,7 +156,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync) {
 
 		return new MixRendererTask(this, width, height,
@@ -236,7 +236,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		public MixRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 			final boolean enableVsync) {
 
 			super(parent, width, height, maxClientVersion, sharedContext, flags, enableVsync);

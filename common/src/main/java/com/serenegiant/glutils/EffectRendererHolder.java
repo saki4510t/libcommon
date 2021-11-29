@@ -86,7 +86,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 */
 	public EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 		this(width, height,
 			maxClientVersion, null, EGLConst.EGL_FLAG_RECORDABLE,
@@ -105,7 +105,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 */
 	public EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -117,7 +117,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	@NonNull
 	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVsync) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
@@ -213,7 +213,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 			final boolean enableVsync) {
 			
 			super(parent, width, height, maxClientVersion, sharedContext, flags, enableVsync);

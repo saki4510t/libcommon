@@ -50,7 +50,7 @@ public class GLContext implements EGLConst {
 	private final Object mSync = new Object();
 	private final int mMaxClientVersion;
 	@Nullable
-	private final EGLBase.IContext mSharedContext;
+	private final EGLBase.IContext<?> mSharedContext;
 	private final int mFlags;
 	@Size(min=1)
 	private final int mMasterWidth;
@@ -85,7 +85,7 @@ public class GLContext implements EGLConst {
 	 * @param flags
 	 */
 	public GLContext(final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		this(maxClientVersion, sharedContext, flags, 1, 1);
 	}
@@ -108,7 +108,7 @@ public class GLContext implements EGLConst {
 	 * @param height　 コンテキスト用のオフスクリーンの高さ
 	 */
 	public GLContext(final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Size(min=1) final int width, @Size(min=1) final int height) {
 
 		mMaxClientVersion = maxClientVersion;
@@ -193,6 +193,7 @@ public class GLContext implements EGLConst {
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@NonNull
 	public EGLBase getEgl() throws IllegalStateException {
 		synchronized (mSync) {
 			if (mEgl != null) {
@@ -208,7 +209,7 @@ public class GLContext implements EGLConst {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public EGLBase.IConfig getConfig() throws IllegalStateException {
+	public EGLBase.IConfig<?> getConfig() throws IllegalStateException {
 		synchronized (mSync) {
 			if (mEgl != null) {
 				return mEgl.getConfig();
@@ -239,9 +240,10 @@ public class GLContext implements EGLConst {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public EGLBase.IContext getContext() throws IllegalStateException {
+	@NonNull
+	public EGLBase.IContext<?> getContext() throws IllegalStateException {
 		synchronized (mSync) {
-			final EGLBase.IContext result = mEgl != null ? mEgl.getContext() : null;
+			final EGLBase.IContext<?> result = mEgl != null ? mEgl.getContext() : null;
 			if (result == null) {
 				throw new IllegalStateException();
 			}

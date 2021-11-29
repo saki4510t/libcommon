@@ -49,9 +49,9 @@ public abstract class EGLBase implements EGLConst {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static IContext wrapContext(@NonNull final Object context) {
+	public static IContext<?> wrapContext(@NonNull final Object context) {
 		if (context instanceof IContext) {
-			return (IContext)context;
+			return (IContext<?>)context;
 		} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 			&& (context instanceof android.opengl.EGLContext)) {
 
@@ -72,7 +72,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static IConfig wrapConfig(@NonNull final Object eglConfig) {
+	public static IConfig<?> wrapConfig(@NonNull final Object eglConfig) {
 		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
 			&& (eglConfig instanceof android.opengl.EGLConfig)) {
 
@@ -93,7 +93,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(@Nullable final IContext sharedContext,
+	public static EGLBase createFrom(@Nullable final IContext<?> sharedContext,
 		final boolean withDepthBuffer, final boolean isRecordable) {
 
 		return createFrom(GLUtils.getSupportedGLVersion(), sharedContext, withDepthBuffer, 0, isRecordable);
@@ -108,7 +108,7 @@ public abstract class EGLBase implements EGLConst {
 	 * @param isRecordable
 	 * @return
 	 */
-	public static EGLBase createFrom(@Nullable final IContext sharedContext,
+	public static EGLBase createFrom(@Nullable final IContext<?> sharedContext,
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 		return createFrom(GLUtils.getSupportedGLVersion(), sharedContext,
@@ -126,7 +126,7 @@ public abstract class EGLBase implements EGLConst {
 	 */
 	@SuppressLint("NewApi")
 	public static EGLBase createFrom(final int maxClientVersion,
-		@Nullable final IContext sharedContext, final boolean withDepthBuffer,
+		@Nullable final IContext<?> sharedContext, final boolean withDepthBuffer,
 		final int stencilBits, final boolean isRecordable) {
 
 		if (isEGL14Supported() && ((sharedContext == null)
@@ -211,16 +211,51 @@ public abstract class EGLBase implements EGLConst {
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
-	public static abstract class IContext {
+	public static abstract class IContext<T> {
+		@NonNull
+		public final T eglContext;
+
+		protected IContext(@NonNull final T eglContext) {
+			this.eglContext = eglContext;
+		}
+
+		public T getEGLContext() {
+			return eglContext;
+		}
+
 		public abstract long getNativeHandle();
-		public abstract Object getEGLContext();
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Context{" +
+				"eglContext=" + eglContext +
+				'}';
+		}
 	}
 
 	/**
 	 * EGLコンフィグのホルダークラス
 	 */
-	public static abstract class IConfig {
-		public abstract Object getEGLConfig();
+	public static abstract class IConfig<T> {
+		@NonNull
+		public final T eglConfig;
+		protected IConfig(@NonNull final T eglConfig) {
+			this.eglConfig = eglConfig;
+		}
+
+		@NonNull
+		public T getEGLConfig() {
+			return eglConfig;
+		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "Config{" +
+				"eglConfig=" + eglConfig +
+				'}';
+		}
 	}
 
 	/**
@@ -275,12 +310,14 @@ public abstract class EGLBase implements EGLConst {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public abstract IContext getContext() throws IllegalStateException;
+	@NonNull
+	public abstract IContext<?> getContext() throws IllegalStateException;
 	/**
 	 * EGLコンフィグを取得する
 	 * @return
 	 */
-	public abstract IConfig getConfig();
+	@NonNull
+	public abstract IConfig<?> getConfig();
 	/**
 	 * 指定したSurfaceからIEglSurfaceを生成する
 	 * 生成したIEglSurfaceをmakeCurrentした状態で戻る

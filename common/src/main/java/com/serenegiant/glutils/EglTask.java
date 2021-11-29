@@ -47,7 +47,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param flags
 	 */
 	@Deprecated
-	public EglTask(@Nullable final EGLBase.IContext sharedContext, final int flags) {
+	public EglTask(@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 		this(GLUtils.getSupportedGLVersion(), sharedContext, flags);
 	}
 
@@ -58,7 +58,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param flags
 	 */
 	public EglTask(final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		this(maxClientVersion, sharedContext, flags, 1, 1);
 	}
@@ -72,7 +72,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param masterHeight
 	 */
 	public EglTask(final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final int masterWidth, final int masterHeight) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
@@ -128,20 +128,23 @@ public abstract class EglTask extends MessageTask {
 	}
 
 //--------------------------------------------------------------------------------
+	@NonNull
 	public GLContext getGLContext() {
 		return mGLContext;
 	}
 
+	@NonNull
 	public EGLBase getEgl() {
 		return mGLContext.getEgl();
 	}
 
-	public EGLBase.IConfig getConfig() {
+	@NonNull
+	public EGLBase.IConfig<?> getConfig() {
 		return mGLContext.getConfig();
 	}
 
-	@Nullable
-	public EGLBase.IContext getContext() {
+	@NonNull
+	public EGLBase.IContext<?> getContext() {
 		return mGLContext.getContext();
 	}
 

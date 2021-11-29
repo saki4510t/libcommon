@@ -70,7 +70,7 @@ public interface IRendererHolder extends IRendererCommon {
 	public void release();
 
 	@Nullable
-	public EGLBase.IContext getContext();
+	public EGLBase.IContext<?> getContext();
 
 	/**
 	 * マスター用の映像を受け取るためのSurfaceを取得

@@ -92,7 +92,7 @@ public class GLManager {
 	 * @param callback
 	 */
 	public GLManager(final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final Handler.Callback callback) throws RuntimeException {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");

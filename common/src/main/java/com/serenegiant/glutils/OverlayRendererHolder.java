@@ -84,7 +84,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	 */
 	public OverlayRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
@@ -104,7 +104,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	 */
 	public OverlayRendererHolder(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
@@ -126,7 +126,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext sharedContext, final int flags,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		final boolean enableVsync) {
 
 		return new OverlayRendererTask(this, width, height,
@@ -196,7 +196,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		public OverlayRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext sharedContext, final int flags,
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 			final boolean enableVSync) {
 
 			super(parent, width, height,

@@ -70,11 +70,9 @@ import com.serenegiant.system.BuildCheck;
 	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
-	public static class Context extends IContext {
-		public final EGLContext eglContext;
-
+	/*package*/static class Context extends IContext<EGLContext> {
 		private Context(final EGLContext context) {
-			eglContext = context;
+			super(context);
 		}
 		
 		@Override
@@ -85,38 +83,11 @@ import com.serenegiant.system.BuildCheck;
 					? eglContext.getNativeHandle() : eglContext.getHandle()) : 0L;
 		}
 
-		@Override
-		public Object getEGLContext() {
-			return eglContext;
-		}
-
-		@NonNull
-		@Override
-		public String toString() {
-			return "Context{" +
-				"eglContext=" + eglContext +
-				'}';
-		}
 	} // Context
 
-	public static class Config extends IConfig {
-		public final EGLConfig eglConfig;
-
-		private Config(final EGLConfig eglConfig) {
-			this.eglConfig = eglConfig;
-		}
-
-		@Override
-		public EGLConfig getEGLConfig() {
-			return eglConfig;
-		}
-
-		@NonNull
-		@Override
-		public String toString() {
-			return "Config{" +
-				"eglConfig=" + eglConfig +
-				'}';
+	private static class Config extends IConfig<EGLConfig> {
+		private Config(@NonNull final EGLConfig eglConfig) {
+			super(eglConfig);
 		}
 	} // Config
 
@@ -432,6 +403,7 @@ import com.serenegiant.system.BuildCheck;
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@NonNull
 	@Override
 	public Context getContext() throws IllegalStateException {
 		if (!isValidContext()) {
@@ -444,8 +416,12 @@ import com.serenegiant.system.BuildCheck;
 	 * EGLコンフィグを取得する
 	 * @return
 	 */
+	@NonNull
 	@Override
 	public Config getConfig() {
+		if (!isValidContext()) {
+			throw new IllegalStateException();
+		}
 		return mEglConfig;
 	}
 

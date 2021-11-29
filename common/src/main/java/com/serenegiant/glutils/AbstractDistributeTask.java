@@ -820,9 +820,12 @@ public abstract class AbstractDistributeTask {
 	public abstract boolean offer(final int request, final int arg1, final int arg2, final Object obj);
 	public abstract void removeRequest(final int request);
 
+	@NonNull
 	public abstract EGLBase getEgl();
+	@NonNull
 	public abstract GLContext getGLContext();
-	public abstract EGLBase.IContext getContext();
+	@NonNull
+	public abstract EGLBase.IContext<?> getContext();
 	public abstract int getGlVersion();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
