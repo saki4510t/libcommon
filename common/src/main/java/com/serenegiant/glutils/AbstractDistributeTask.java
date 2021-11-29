@@ -588,7 +588,7 @@ public abstract class AbstractDistributeTask {
 			} else {
 				Log.w(TAG, "surface is already added: id=" + id);
 			}
-			mTargets.notifyAll();
+			mTargets.notify();
 		}
 	}
 
@@ -627,7 +627,7 @@ public abstract class AbstractDistributeTask {
 				target.release();
 			}
 			checkTarget();
-			mTargets.notifyAll();
+			mTargets.notify();
 		}
 	}
 
@@ -649,7 +649,7 @@ public abstract class AbstractDistributeTask {
 				}
 			}
 			mTargets.clear();
-			mTargets.notifyAll();
+			mTargets.notify();
 		}
 		if (DEBUG) Log.v(TAG, "handleRemoveAll:finished");
 	}
