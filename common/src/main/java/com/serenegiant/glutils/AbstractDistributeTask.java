@@ -524,7 +524,8 @@ public abstract class AbstractDistributeTask {
 				final RendererTarget target = mTargets.valueAt(i);
 				if ((target != null) && target.canDraw()) {
 					try {
-						onDrawTarget(target, texId, texMatrix);
+//						onDrawTarget(target, texId, texMatrix);
+						target.draw(mDrawer, texId, texMatrix);
 					} catch (final Exception e) {
 						if (DEBUG) Log.w(TAG, e);
 						// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
@@ -541,7 +542,9 @@ public abstract class AbstractDistributeTask {
 	 * @param target
 	 * @param texId
 	 * @param texMatrix
+	 * @deprecated this medthod never called now
 	 */
+	@Deprecated
 	@WorkerThread
 	protected void onDrawTarget(@NonNull final RendererTarget target,
 		final int texId, @NonNull final float[] texMatrix) {
