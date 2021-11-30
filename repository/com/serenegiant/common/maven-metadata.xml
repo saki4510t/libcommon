@@ -3,7 +3,7 @@
   <groupId>com.serenegiant</groupId>
   <artifactId>common</artifactId>
   <versioning>
-    <release>7.20.1</release>
+    <release>7.21.0</release>
     <versions>
       <version>1.17.0</version>
       <version>1.17.1</version>
@@ -185,7 +185,8 @@
       <version>7.19.0</version>
       <version>7.20.0</version>
       <version>7.20.1</version>
+      <version>7.21.0</version>
     </versions>
-    <lastUpdated>20211126142635</lastUpdated>
+    <lastUpdated>20211130083937</lastUpdated>
   </versioning>
 </metadata>
