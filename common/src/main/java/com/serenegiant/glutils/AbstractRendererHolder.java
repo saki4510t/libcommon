@@ -79,18 +79,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param flags
-	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 * @param callback
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
 		mRendererTask = createRendererTask(width, height,
-			maxClientVersion, sharedContext, flags, enableVSync);
+			maxClientVersion, sharedContext, flags);
 		mRendererTask.start(RENDERER_THREAD_NAME);
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -458,15 +456,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param maxClientVersion
 	 * @param sharedContext
 	 * @param flags
-	 * @param enableVsync Choreographerを使ってvsync同期して映像更新するかどうか
 	 * @return
 	 */
 	@NonNull
 	protected abstract BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final boolean enableVsync);
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags);
 	
 //--------------------------------------------------------------------------------
 	protected void startCaptureTask() {
@@ -543,15 +539,13 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param maxClientVersion
 		 * @param sharedContext
 		 * @param flags
-		 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 		 */
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-			final boolean enableVSync) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
-			super(width, height, enableVSync);
+			super(width, height);
 			mParent = parent;
 			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
 				@Override

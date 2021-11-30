@@ -20,13 +20,11 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
-import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.Choreographer;
 
 import com.serenegiant.math.Fraction;
-import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.AnyThread;
@@ -63,11 +61,6 @@ public abstract class AbstractDistributeTask {
 	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
 	private int mVideoWidth, mVideoHeight;
-	/**
-	 * Choreographerによるvsync同期して映像更新するかどうか
-	 */
-	private final boolean mEnableVSync;
-	private final Handler mChoreographerHandler;
 	@IRendererCommon.MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
@@ -80,21 +73,13 @@ public abstract class AbstractDistributeTask {
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
 	 */
-	protected AbstractDistributeTask(final int width, final int height,
-		final boolean enableVSync) {
+	protected AbstractDistributeTask(final int width, final int height) {
 
-		if (DEBUG) Log.v(TAG, "コンストラクタ:enableVSync=" + enableVSync);
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mVideoWidth = width > 0 ? width : 640;
 		mVideoHeight = height > 0 ? height : 480;
-		mEnableVSync = enableVSync;
 		mReleased = false;
-		if (enableVSync) {
-			mChoreographerHandler = HandlerThreadHandler.createHandler(TAG);
-		} else {
-			mChoreographerHandler = null;
-		}
 	}
 
 	/**
@@ -104,14 +89,6 @@ public abstract class AbstractDistributeTask {
 		if (DEBUG) Log.v(TAG, "release:");
 		if (!mReleased) {
 			mReleased = true;
-			if (mChoreographerHandler != null) {
-				try {
-					mChoreographerHandler.removeCallbacksAndMessages(null);
-					mChoreographerHandler.getLooper().quit();
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
-			}
 		}
 	}
 
@@ -121,11 +98,9 @@ public abstract class AbstractDistributeTask {
 	@AnyThread
 	public void requestFrame() {
 		mHasNewFrame = isFirstFrameRendered = true;
-		if (!mEnableVSync) {
-			// vsync同期しないときはここで描画要求する
-			// vsync動悸するときはChoreographer.FrameCallbackから描画要求する
-			offer(REQUEST_DRAW, 0, 0, null);
-		}
+		// vsync同期しないときはここで描画要求する
+		// vsync動悸するときはChoreographer.FrameCallbackから描画要求する
+		offer(REQUEST_DRAW, 0, 0, null);
 	}
 
 	/**
@@ -449,14 +424,6 @@ public abstract class AbstractDistributeTask {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		internalOnStart();
 		notifyParent(true);
-		if ((mEnableVSync) && (mChoreographerHandler != null)) {
-			mChoreographerHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					Choreographer.getInstance().postFrameCallback(mFrameCallback);
-				}
-			});
-		}
 //		if (DEBUG) Log.v(TAG, "handleOnStart:finished");
 	}
 
@@ -473,14 +440,6 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected final void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "onStop");
-		if ((mEnableVSync) && (mChoreographerHandler != null)) {
-			mChoreographerHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					Choreographer.getInstance().removeFrameCallback(mFrameCallback);
-				}
-			});
-		}
 		notifyParent(false);
 		makeCurrent();
 		internalOnStop();

@@ -35,27 +35,12 @@ public class RendererHolder extends AbstractRendererHolder {
 	 * @param callback
 	 */
 	public RendererHolder(final int width, final int height,
-		@Nullable final RenderHolderCallback callback) {
-
-		this(width, height,
-			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			false, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
-	 * @param callback
-	 */
-	public RendererHolder(final int width, final int height,
 		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
 			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			enableVSync, callback);
+			callback);
 	}
 
 	/**
@@ -70,32 +55,10 @@ public class RendererHolder extends AbstractRendererHolder {
 	public RendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		@Nullable final RenderHolderCallback callback) {
-
-		this(width, height,
-			maxClientVersion, sharedContext, flags,
-			false, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param maxClientVersion
-	 * @param sharedContext
-	 * @param flags
-	 * @param enableVSync Choreographerを使ってvsync同期して映像更新するかどうか
-	 * @param callback
-	 */
-	public RendererHolder(final int width, final int height,
-		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height,
-			maxClientVersion, sharedContext, flags,
-			enableVSync, callback);
+			maxClientVersion, sharedContext, flags, callback);
 	}
 
 	@NonNull
@@ -103,11 +66,10 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final boolean enableVsync) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		return new BaseRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, enableVsync);
+			maxClientVersion, sharedContext, flags);
 	}
 	
 }

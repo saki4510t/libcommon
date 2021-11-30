@@ -25,7 +25,6 @@ import com.serenegiant.glutils.EffectRendererHolder
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
-import com.serenegiant.libcommon.BuildConfig
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -58,7 +57,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 		callback: RenderHolderCallback?): IRendererHolder {
 
 		if (DEBUG) Log.v(TAG, "createRendererHolder:")
-		return EffectRendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
+		return EffectRendererHolder(width, height, glVersion, null, 0, callback)
 	}
 
 	companion object {

@@ -24,7 +24,6 @@ import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.glutils.OverlayRendererHolder
 import com.serenegiant.graphics.BitmapHelper
-import com.serenegiant.libcommon.BuildConfig
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -49,7 +48,7 @@ class OverlayCameraGLSurfaceView @JvmOverloads constructor(
 		width: Int, height: Int,
 		callback: RenderHolderCallback?): IRendererHolder {
 
-		return OverlayRendererHolder(width, height, glVersion, null, 0, BuildConfig.ENABLE_VSYNC, callback)
+		return OverlayRendererHolder(width, height, glVersion, null, 0, callback)
 	}
 
 	companion object {
