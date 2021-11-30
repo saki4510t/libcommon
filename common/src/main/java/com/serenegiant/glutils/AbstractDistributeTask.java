@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
-import android.view.Choreographer;
 
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;
@@ -388,20 +387,6 @@ public abstract class AbstractDistributeTask {
 	public int rotation() {
 		return mRotation;
 	}
-
-	/**
-	 * vsyncに同期して描画要求を行うためのChoreographer.FrameCallback実装
-	 */
-	private final Choreographer.FrameCallback mFrameCallback
-		= new Choreographer.FrameCallback() {
-		@Override
-		public void doFrame(final long frameTimeNanos) {
-			offer(REQUEST_DRAW, 0, 0, null);
-			if (!mReleased && isRunning()) {
-				Choreographer.getInstance().postFrameCallback(this);
-			}
-		}
-	};
 
 //--------------------------------------------------------------------------------
 // ワーカースレッド上での処理
