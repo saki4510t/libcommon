@@ -18,7 +18,6 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.opengl.GLES20
 import android.opengl.Matrix
@@ -294,7 +293,6 @@ open class GLView @JvmOverloads constructor(
 	 * Surfaceが生成された時
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
-	@SuppressLint("WrongThread")
 	@WorkerThread
 	@CallSuper
 	protected fun onSurfaceCreated() {
