@@ -316,7 +316,6 @@ public class VideoSource implements IPipelineSource {
 			return true;
 		case REQUEST_RECREATE_MASTER_SURFACE:
 			handleReCreateInputSurface();
-			mCallback.onCreate(mInputSurface);
 			return true;
 		default:
 			return false;
