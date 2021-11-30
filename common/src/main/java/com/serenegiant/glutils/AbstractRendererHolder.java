@@ -317,17 +317,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 	/**
-	 * 追加されている分配描画用のSurfaceの数を取得
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	@Override
-	public int getCount() {
-		return mRendererTask.getCount();
-	}
-
-	/**
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path

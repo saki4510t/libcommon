@@ -198,13 +198,6 @@ public interface IRendererHolder extends IRendererCommon {
 	public void requestFrame();
 
 	/**
-	 * 追加されている分配描画用のSurfaceの数を取得
-	 * @return
-	 */
-	@Deprecated
-	public int getCount();
-
-	/**
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path

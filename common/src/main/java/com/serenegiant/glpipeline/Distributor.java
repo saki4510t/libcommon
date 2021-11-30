@@ -303,15 +303,6 @@ public class Distributor implements IPipeline {
 		mDistributeTask.setEnabled(id, enable);
 	}
 
-	/**
-	 * 追加されている分配描画用のSurfaceの数を取得
-	 * @return
-	 */
-	@Deprecated
-	public int getCount() {
-		return mDistributeTask.getCount();
-	}
-
 //--------------------------------------------------------------------------------
 	private class DistributeTask extends AbstractDistributeTask {
 		@NonNull

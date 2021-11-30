@@ -336,18 +336,6 @@ public abstract class AbstractDistributeTask {
 	}
 
 	/**
-	 * 分配描画用のSurfaceの数を取得
-	 * @return
-	 */
-	@Deprecated
-	@AnyThread
-	public int getCount() {
-		synchronized (mTargets) {
-			return mTargets.size();
-		}
-	}
-
-	/**
 	 * リサイズ
 	 * @param width
 	 * @param height
