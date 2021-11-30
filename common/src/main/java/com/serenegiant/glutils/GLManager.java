@@ -178,6 +178,14 @@ public class GLManager {
 	}
 
 	/**
+	 * GLコンテキストがGL|ES3に対応しているかどうかを取得
+	 * @return
+	 */
+	public boolean isisGLES3() {
+		return mGLContext.isGLES3();
+	}
+
+	/**
 	 * EGLを取得
 	 * @return
 	 * @throws IllegalStateException
