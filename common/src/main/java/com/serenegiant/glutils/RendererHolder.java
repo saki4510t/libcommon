@@ -35,7 +35,6 @@ public class RendererHolder extends AbstractRendererHolder {
 	 * @param callback
 	 */
 	public RendererHolder(final int width, final int height,
-		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,

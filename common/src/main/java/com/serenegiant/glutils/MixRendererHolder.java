@@ -54,7 +54,6 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * @param callback
 	 */
 	public MixRendererHolder(final int width, final int height,
-		final boolean enableVSync,
 		@Nullable final RenderHolderCallback callback) {
 
 		this(width, height,
