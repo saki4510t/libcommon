@@ -256,34 +256,43 @@ class MainActivity
 				}
 				fragment = CameraSurfaceFragment()
 			}
-			15 -> {	// Galley
+			15 -> {	// SimpleVideoSourceCameraGLView
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraFragment.newInstance(
+					R.layout.fragment_simple_video_source_camera, R.string.title_simple_camera_source)
+			}
+			16 -> {	// Galley
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			16 -> {	// Galley(RecyclerView,Cursor)
+			17 -> {	// Galley(RecyclerView,Cursor)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			17 -> {	// Galley(RecyclerView)
+			18 -> {	// Galley(RecyclerView)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment3()
 			}
-			18 -> {	// NumberKeyboard
+			19 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			19 -> {	// ViewSlider
+			20 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
-			20 -> {	// ProgressView
+			21 -> {	// ProgressView
 				fragment = ProgressFragment()
 			}
-			21 -> {	// PermissionUtils
+			22 -> {	// PermissionUtils
 				fragment = PermissionFragment.newInstance()
 			}
 			else -> {
