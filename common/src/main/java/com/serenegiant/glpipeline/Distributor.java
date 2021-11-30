@@ -473,9 +473,9 @@ public class Distributor implements IPipeline {
 		}
 
 		@Override
-		public Object handleRequest(final int request,
+		protected Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
-
+			// これはGLManagerから取得したワーカースレッド用Handlerのメッセージコールバックから呼び出せるようにoverride
 			return super.handleRequest(request, arg1, arg2, obj);
 		}
 
