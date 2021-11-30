@@ -417,13 +417,8 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 */
 		protected void handleSetMask(@Nullable final Bitmap mask) {
 			if (DEBUG) Log.v(TAG, "handleSetMask:" + mask);
-			if (isGLES3()) {
-				GLES30.glActiveTexture(GLES30.GL_TEXTURE2);
-				GLES30.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-			} else {
-				GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
-				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-			}
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
+			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
 			try {
 				final Canvas canvas = mMaskSurface.lockCanvas(null);
 				try {

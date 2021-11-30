@@ -360,11 +360,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 				if (mDrawer != null) {
 					mDrawer.glUseProgram();
 				} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is null");
-				if (isGLES3()) {
-					GLES30.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
-				} else {
-					GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
-				}
+				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 			}
 		}
 

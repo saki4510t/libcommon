@@ -535,10 +535,8 @@ public class StaticTextureSource {
 			if (mImageSource == null) {
 				mImageSource = GLSurface.newInstance(false, width, height, false);
 				GLHelper.checkGlError("handleSetBitmap");
-				mImageSource.loadBitmap(bitmap);
-			} else {
-				mImageSource.loadBitmap(bitmap);
 			}
+			mImageSource.loadBitmap(bitmap);
 			mVideoWidth = width;
 			mVideoHeight = height;
 		}

@@ -352,11 +352,10 @@ public class VideoSource implements IPipelineSource {
 		makeDefault();
 		handleReleaseInputSurface();
 		makeDefault();
+		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		if (mGLContext.isOES3()) {
-			GLES30.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
 		} else {
-			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		}
 		mInputTexture = new SurfaceTexture(mTexId);

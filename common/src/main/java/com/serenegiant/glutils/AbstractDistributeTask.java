@@ -504,12 +504,7 @@ public abstract class AbstractDistributeTask {
 				if (mHasNewFrame) {
 					mHasNewFrame = false;
 					handleUpdateTexture();
-					// GLES30の#glFlushはGLES20から継承しているだけなので条件分岐をコメントに変更
-//					if (isGLES3()) {
-//						GLES30.glFlush();
-//					} else {
-						GLES20.glFlush();
-//					}
+					GLES20.glFlush();
 					ThreadUtils.NoThrowSleep(0, 0);
 				}
 			} catch (final Exception e) {
@@ -522,14 +517,8 @@ public abstract class AbstractDistributeTask {
 
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
 		makeCurrent();
-		// GLES30の#glClearと#glFlushはGLES20から継承しているだけなので条件分岐をコメントに変更
-//		if (isGLES3()) {
-//			GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
-//			GLES30.glFlush();	// これなくても良さそう?
-//		} else {
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			GLES20.glFlush();	// これなくても良さそう?
-//		}
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+		GLES20.glFlush();	// これなくても良さそう?
 		if (mIsFirstFrameRendered) {
 			callOnFrameAvailable();
 		}
@@ -546,7 +535,6 @@ public abstract class AbstractDistributeTask {
 			final RendererTarget target = mTargets.valueAt(i);
 			if ((target != null) && target.canDraw()) {
 				try {
-//						onDrawTarget(target, texId, texMatrix);
 					target.draw(mDrawer, texId, texMatrix);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
@@ -559,22 +547,6 @@ public abstract class AbstractDistributeTask {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Surface1つの描画処理
-	 * @param target
-	 * @param texId
-	 * @param texMatrix
-	 * @deprecated this medthod never called now
-	 */
-	@Deprecated
-	@WorkerThread
-	protected void onDrawTarget(@NonNull final RendererTarget target,
-		final int texId, @NonNull final float[] texMatrix) {
-
-//		if (DEBUG) Log.v(TAG, "onDrawTarget:");
-		target.draw(mDrawer, texId, texMatrix);
 	}
 
 	/**
