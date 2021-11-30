@@ -248,7 +248,12 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "runOnGLThread:");
 		checkValid();
-		mGLHandler.post(task);
+		if (isGLThread()) {
+			// GLスレッド上で呼ばれたときはそのまま実行する
+			task.run();
+		} else {
+			mGLHandler.post(task);
+		}
 	}
 
 	/**
@@ -264,6 +269,9 @@ public class GLManager {
 		checkValid();
 		if (delayMs > 0) {
 			mGLHandler.postDelayed(task, delayMs);
+		} else if (isGLThread()) {
+			// GLスレッド上で呼ばれたときはそのまま実行する
+			task.run();
 		} else {
 			mGLHandler.post(task);
 		}
