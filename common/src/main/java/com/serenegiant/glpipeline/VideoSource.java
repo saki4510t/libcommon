@@ -326,17 +326,6 @@ public class VideoSource implements IPipelineSource {
 	@WorkerThread
 	protected void handleUpdateTex() {
 //		if (DEBUG) Log.v(TAG, "handleUpdateTex:");
-		if (isGLES3) {
-			handleUpdateTexES3();
-		} else {
-			handleUpdateTexES2();
-		}
-	}
-
-	/**
-	 * handleUpdateTexの下請け、ES2用
-	 */
-	protected void handleUpdateTexES2() {
 		makeDefault();
 		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 		GLES20.glFlush();
@@ -346,24 +335,6 @@ public class VideoSource implements IPipelineSource {
 			// テクスチャ変換行列を更新
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
-			ThreadUtils.NoThrowSleep(0, 0);
-			callOnFrameAvailable();
-		}
-	}
-
-	/**
-	 * handleUpdateTexの下請け、ES3用
-	 */
-	protected void handleUpdateTexES3() {
-		makeDefault();
-		GLES30.glClear(GLES30.GL_COLOR_BUFFER_BIT);
-		GLES30.glFlush();
-		if (mInputTexture != null) {
-			// Surfaceで受け取った映像をテクスチャへ転送
-			mInputTexture.updateTexImage();
-			// テクスチャ変換行列を更新
-			mInputTexture.getTransformMatrix(mTexMatrix);
-			GLES30.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
 			callOnFrameAvailable();
 		}
