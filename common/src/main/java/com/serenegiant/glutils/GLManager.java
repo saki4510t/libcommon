@@ -52,6 +52,7 @@ public class GLManager {
 
 	/**
 	 * コンストラクタ
+	 * maxClientVersionは端末が対応しているGL|ESバージョンの一番大きいものを使う
 	 */
 	public GLManager() {
 		this(GLUtils.getSupportedGLVersion(), null, 0, null);
@@ -59,6 +60,7 @@ public class GLManager {
 
 	/**
 	 * コンストラクタ
+	 * maxClientVersionは端末が対応しているGL|ESバージョンの一番大きいものを使う
 	 * @param callback
 	 */
 	public GLManager(@Nullable final Handler.Callback callback) {
@@ -76,7 +78,7 @@ public class GLManager {
 	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
-	 * @param callback
+	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
 	 */
 	public GLManager(final int maxClientVersion,
 		@Nullable final Handler.Callback callback) {
@@ -87,9 +89,9 @@ public class GLManager {
 	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
-	 * @param sharedContext
-	 * @param flags
-	 * @param callback
+	 * @param sharedContext 共有コンテキストを使わない場合はnull
+	 * @param flags GLContext生成時のフラグ
+	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
 	 */
 	public GLManager(final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
@@ -97,8 +99,7 @@ public class GLManager {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mCallback = callback;
-		mGLContext = new GLContext(maxClientVersion,
-			sharedContext, flags);
+		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
 			@Override
@@ -129,6 +130,7 @@ public class GLManager {
 				sync.release();
 			}
 		});
+		// ワーカースレッドの初期化待ち
 		try {
 			sync.tryAcquire(3000, TimeUnit.MILLISECONDS);
 		} catch (final InterruptedException e) {
@@ -187,7 +189,7 @@ public class GLManager {
 	}
 
 	/**
-	 * この共有GLコンテキストがコンテキストを持つGLTaskを生成して返す
+	 * このGLManagerとGLコンテキストを共有する新しいGLManagerを生成して返す
 	 * @param callback
 	 * @return
 	 * @throws RuntimeException
@@ -204,6 +206,7 @@ public class GLManager {
 
 	/**
 	 * GLコンテキストを保持しているスレッド上での実行用のHandlerを返す
+	 * こちらは内部で使っているHandlerをそのまま返す
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -216,6 +219,7 @@ public class GLManager {
 
 	/**
 	 * 同じGLコンテキスト保持しているスレッド上で実行するためのHandlerを生成して返す
+	 * こちらは内部で使っているHandlerと同じLooperを使う新しいHandlerを生成して返す
 	 * #getLooper#quitすると全部終了してしまうので注意
 	 * @return
 	 * @throws IllegalStateException
