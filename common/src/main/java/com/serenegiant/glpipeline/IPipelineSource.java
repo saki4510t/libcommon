@@ -26,17 +26,6 @@ import androidx.annotation.WorkerThread;
 
 public interface IPipelineSource extends IPipeline {
 	/**
-	 * テクスチャが更新されたときの通知用コールバックリスナー
-	 */
-	public interface OnFrameAvailableListener {
-		/**
-		 * テキスチャが更新された
-		 */
-		@WorkerThread
-		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix);
-	}
-
-	/**
 	 * PipelineSourceからのコールバックリスナー
 	 */
 	public interface PipelineSourceCallback {
@@ -82,16 +71,4 @@ public interface IPipelineSource extends IPipeline {
 	 * @return
 	 */
 	public float[] getTexMatrix();
-
-	/**
-	 * OnFrameAvailableListenerを登録
-	 * @param listener
-	 */
-	public void add(final OnFrameAvailableListener listener);
-
-	/**
-	 * OnFrameAvailableListenerを登録解除
-	 * @param listener
-	 */
-	public void remove(final OnFrameAvailableListener listener);
 }

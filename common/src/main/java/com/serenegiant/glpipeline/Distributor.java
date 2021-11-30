@@ -18,20 +18,20 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Surface;
 
 import com.serenegiant.glutils.AbstractDistributeTask;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.GLContext;
 import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
 
@@ -52,8 +52,6 @@ public class Distributor implements IPipeline {
 	private final boolean mOwnManager;
 	@NonNull
 	private final GLManager mManager;
-	@Nullable
-	private final IRendererHolder.RenderHolderCallback mCallback;
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
@@ -66,18 +64,16 @@ public class Distributor implements IPipeline {
 	 * @param source
 	 */
 	public Distributor(@NonNull final IPipelineSource source) {
-		this(source, null, false);
+		this(source, false);
 	}
 
 	/**
 	 * コンストラクタ
 	 * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
 	 * @param source
-	 * @param callback
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
 	public Distributor(@NonNull final IPipelineSource source,
-		@Nullable final IRendererHolder.RenderHolderCallback callback,
 		final boolean useSharedContext) {
 
 		mSource = source;
@@ -85,7 +81,7 @@ public class Distributor implements IPipeline {
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				Distributor.this.mDistributeTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
+				mDistributeTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
 				return true;
 			}
 		};
@@ -101,11 +97,9 @@ public class Distributor implements IPipeline {
 			mManager = manager;
 			glHandler = manager.createGLHandler(handlerCallback);
 		}
-		mCallback = callback;
 		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
 			source.getWidth(), source.getHeight());
-		source.add(mOnFrameAvailableListener);
 		mDistributeTask.start(RENDERER_THREAD_NAME);
 	}
 
@@ -115,7 +109,6 @@ public class Distributor implements IPipeline {
 	@Override
 	public void release() {
 		mDistributeTask.release();
-		mSource.remove(mOnFrameAvailableListener);
 	}
 
 	@NonNull
@@ -161,6 +154,17 @@ public class Distributor implements IPipeline {
 	@Override
 	public int getHeight() {
 		return mDistributeTask.height();
+	}
+
+	@Override
+	public void setPipeline(@Nullable final IPipeline pipeline) {
+		throw new UnsupportedOperationException("Distributor does not support #setPipeline, use #addSurface instead.");
+	}
+
+	@WorkerThread
+	@Override
+	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
+		mDistributeTask.requestFrame(texId, texMatrix);
 	}
 
 	/**
@@ -300,14 +304,6 @@ public class Distributor implements IPipeline {
 	}
 
 	/**
-	 * 強制的に現在の最新のフレームを描画要求する
-	 * 分配描画用Surface全てが更新されるので注意
-	 */
-	public void requestFrame() {
-		mDistributeTask.requestFrame();
-	}
-
-	/**
 	 * 追加されている分配描画用のSurfaceの数を取得
 	 * @return
 	 */
@@ -316,48 +312,7 @@ public class Distributor implements IPipeline {
 		return mDistributeTask.getCount();
 	}
 
-	/**
-	 * VideoSourceからのコールバックリスナーの実装
-	 */
-	private final VideoSource.OnFrameAvailableListener mOnFrameAvailableListener
-		= new VideoSource.OnFrameAvailableListener() {
-		@Override
-		public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-			mDistributeTask.requestFrame();
-		}
-	} ;
-
 //--------------------------------------------------------------------------------
-	protected void callOnCreate(Surface surface) {
-		if (mCallback != null) {
-			try {
-				mCallback.onCreate(surface);
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
-	}
-
-	protected void callOnFrameAvailable() {
-		if (mCallback != null) {
-			try {
-				mCallback.onFrameAvailable();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
-	}
-
-	protected void callOnDestroy() {
-		if (mCallback != null) {
-			try {
-				mCallback.onDestroy();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
-	}
-
 	private class DistributeTask extends AbstractDistributeTask {
 		@NonNull
 		private final GLContext mGLContext;
@@ -511,6 +466,21 @@ public class Distributor implements IPipeline {
 			return mSource.getTexMatrix();
 		}
 
+		@WorkerThread
+		@Override
+		public void requestFrame(final int texId, @NonNull final float[] texMatrix) {
+			if (mOwnManager || !isFirstFrameRendered()) {
+				// 共有コンテキストを使う時は常にsuper#requestFrameを呼ぶ(別スレッドでの描画なので)
+				// 最初のフレームはフラグ更新のためにsuper#requestFrameを呼ぶ
+				super.requestFrame(texId, texMatrix);
+			} else {
+				// 2フレーム目以降は高速化のために描画前の処理をスキップして直接#handleDrawTargetsを呼ぶ
+				super.handleDrawTargets(texId, texMatrix);
+				makeCurrent();
+				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			}
+		}
+
 		@Override
 		public Object handleRequest(final int request,
 			final int arg1, final int arg2, final Object obj) {
@@ -520,14 +490,10 @@ public class Distributor implements IPipeline {
 
 		@Override
 		protected void handleReCreateInputSurface() {
-			if (mSource.isValid()) {
-				callOnCreate(mSource.getInputSurface());
-			}
 		}
 
 		@Override
 		protected void handleReleaseInputSurface() {
-			callOnDestroy();
 		}
 
 		@Override
@@ -545,7 +511,6 @@ public class Distributor implements IPipeline {
 
 		@Override
 		public void callOnFrameAvailable() {
-			Distributor.this.callOnFrameAvailable();
 		}
 	}
 

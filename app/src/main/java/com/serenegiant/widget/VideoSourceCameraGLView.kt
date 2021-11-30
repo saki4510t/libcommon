@@ -29,7 +29,6 @@ import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.Distributor
-import com.serenegiant.glpipeline.IPipelineSource
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
@@ -65,7 +64,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 				mDrawer = GLDrawer2D.create(isOES3(), true)
 				mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
-				mVideoSource?.add(mCameraRenderer)
 			}
 
 			@WorkerThread
@@ -85,9 +83,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 			@WorkerThread
 			override fun onSurfaceDestroyed() {
-				if (mVideoSource != null) {
-					mVideoSource!!.remove(mCameraRenderer)
-				}
 				if (mDrawer != null) {
 //					mDrawer!!.release()	// GT-N7100で動作がおかしくなる
 					mDrawer = null
@@ -122,6 +117,9 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
+		if (mVideoSource != null) {
+			mVideoSource!!.setPipeline(null)
+		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
 			mDistributor = null
@@ -196,6 +194,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mVideoSource!!)
+			mVideoSource!!.setPipeline(mDistributor!!)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable)
 	}
@@ -256,8 +255,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 */
 	@SuppressLint("WrongThread")
 	private inner class CameraRenderer
-		: ICameraRenderer,
-			IPipelineSource.OnFrameAvailableListener {
+		: ICameraRenderer {
 
 		override fun hasSurface(): Boolean {
 			return mVideoSource != null
@@ -345,14 +343,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 //			}
 //			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 //			mTarget!!.swap()
-		}
-
-		/**
-		 * IPipelineSource.OnFrameAvailableListenerの実装
-		 * @param texId
-		 * @param texMatrix
-		 */
-		override fun onFrameAvailable(texId: Int, texMatrix: FloatArray) {
 		}
 
 	} // CameraRenderer

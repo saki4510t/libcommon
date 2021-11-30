@@ -21,6 +21,8 @@ package com.serenegiant.glpipeline;
 import com.serenegiant.glutils.GLManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 public interface IPipeline {
 	/**
@@ -61,4 +63,13 @@ public interface IPipeline {
 	 * @return
 	 */
 	public int getHeight();
+
+	/**
+	 * 次に呼び出すIPipleineインスタンスをセットする
+	 * @param pipeline
+	 */
+	public void setPipeline(@Nullable final IPipeline pipeline);
+
+	@WorkerThread
+	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix);
 }

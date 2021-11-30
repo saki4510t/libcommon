@@ -297,8 +297,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		private void handleUpdateOverlay(final int targetId, @NonNull final Bitmap overlay) {
 			if (DEBUG) Log.v(TAG, "handleUpdateOverlay:" + overlay);
 
-				GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-				GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
+			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
+			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mOverlayTexId);
 			try {
 				final Canvas canvas = mOverlaySurface.lockCanvas(null);
 				try {
@@ -317,7 +317,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			requestFrame();
+			requestFrame(getTexId(), getTexMatrix());
 		}
 	}
 

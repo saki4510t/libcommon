@@ -64,7 +64,7 @@ public abstract class AbstractDistributeTask {
 	@IRendererCommon.MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
-	private volatile boolean isFirstFrameRendered;
+	private volatile boolean mIsFirstFrameRendered;
 	private volatile boolean mHasNewFrame;
 	private volatile boolean mReleased;
 	protected GLDrawer2D mDrawer;
@@ -92,15 +92,17 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
+	public boolean isFirstFrameRendered() {
+		return mIsFirstFrameRendered;
+	}
+
 	/**
 	 * 描画要求する
 	 */
 	@AnyThread
-	public void requestFrame() {
-		mHasNewFrame = isFirstFrameRendered = true;
-		// vsync同期しないときはここで描画要求する
-		// vsync動悸するときはChoreographer.FrameCallbackから描画要求する
-		offer(REQUEST_DRAW, 0, 0, null);
+	public void requestFrame(final int texId, @NonNull final float[] texMatrix) {
+		mHasNewFrame = mIsFirstFrameRendered = true;
+		offer(REQUEST_DRAW, texId, 0, texMatrix);
 	}
 
 	/**
@@ -471,7 +473,7 @@ public abstract class AbstractDistributeTask {
 //		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
 		switch (request) {
 		case REQUEST_DRAW:
-			handleDraw();
+			handleDraw(arg1, (float[])obj);
 			break;
 		case REQUEST_UPDATE_SIZE:
 			handleResize(arg1, arg2);
@@ -514,7 +516,7 @@ public abstract class AbstractDistributeTask {
 	 * 実際の描画処理
 	 */
 	@WorkerThread
-	protected void handleDraw() {
+	protected void handleDraw(final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
 		if (!isMasterSurfaceValid()) {
@@ -523,7 +525,7 @@ public abstract class AbstractDistributeTask {
 			return;
 		}
 
-		if (isFirstFrameRendered) {
+		if (mIsFirstFrameRendered) {
 			try {
 				makeCurrent();
 				if (mHasNewFrame) {
@@ -542,7 +544,7 @@ public abstract class AbstractDistributeTask {
 				offer(REQUEST_RECREATE_MASTER_SURFACE);
 				return;
 			}
-			handleDrawTargets(getTexId(), getTexMatrix());
+			handleDrawTargets(texId, texMatrix);
 		}
 
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
@@ -555,7 +557,7 @@ public abstract class AbstractDistributeTask {
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			GLES20.glFlush();	// これなくても良さそう?
 //		}
-		if (isFirstFrameRendered) {
+		if (mIsFirstFrameRendered) {
 			callOnFrameAvailable();
 		}
 	}

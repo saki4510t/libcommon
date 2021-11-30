@@ -32,10 +32,8 @@ import com.serenegiant.glutils.GLManager;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
@@ -57,8 +55,7 @@ public class VideoSource implements IPipelineSource {
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 3;
 
 	@NonNull
-	private final Set<OnFrameAvailableListener> mOnFrameAvailableListeners
-		= new CopyOnWriteArraySet<>();
+	private final Object mSync = new Object();
 	@NonNull
 	private final GLManager mManager;
 	/**
@@ -79,6 +76,9 @@ public class VideoSource implements IPipelineSource {
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
 	private int mVideoWidth, mVideoHeight;
+
+	@Nullable
+	private IPipeline mPipeline;
 
 	/**
 	 * コンストラクタ
@@ -220,6 +220,28 @@ public class VideoSource implements IPipelineSource {
 		return mVideoHeight;
 	}
 
+	@Override
+	public void setPipeline(@Nullable final IPipeline pipeline) {
+		synchronized (mSync) {
+			mPipeline = pipeline;
+		}
+		if (pipeline != null) {
+			pipeline.resize(getWidth(), getHeight());
+		}
+	}
+
+	@WorkerThread
+	@Override
+	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
+		final IPipeline pipeline;
+		synchronized (mSync) {
+			pipeline = mPipeline;
+		}
+		if (pipeline != null) {
+			pipeline.onFrameAvailable(texId, texMatrix);
+		}
+	}
+
 	/**
 	 * IPipelineSourceの実装
 	 * 映像入力用のSurfaceTextureを取得
@@ -274,25 +296,6 @@ public class VideoSource implements IPipelineSource {
 		return mTexMatrix;
 	}
 
-	/**
-	 * IPipelineSourceの実装
-	 * OnFrameAvailableListenerを登録
-	 * @param listener
-	 */
-	@Override
-	public void add(final OnFrameAvailableListener listener) {
-		mOnFrameAvailableListeners.add(listener);
-	}
-
-	/**
-	 * IPipelineSourceの実装
-	 * OnFrameAvailableListenerを登録解除
-	 * @param listener
-	 */
-	@Override
-	public void remove(final OnFrameAvailableListener listener) {
-		mOnFrameAvailableListeners.remove(listener);
-	}
 //--------------------------------------------------------------------------------
 	protected void checkValid() throws IllegalStateException {
 		if (!mManager.isValid()) {
@@ -336,21 +339,7 @@ public class VideoSource implements IPipelineSource {
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
-			callOnFrameAvailable();
-		}
-	}
-
-	/**
-	 * handleUpdateTexの下請け
-	 */
-	private void callOnFrameAvailable() {
-		for (final OnFrameAvailableListener listener: mOnFrameAvailableListeners) {
-			try {
-				listener.onFrameAvailable(mTexId, mTexMatrix);
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
-				mOnFrameAvailableListeners.remove(listener);
-			}
+			onFrameAvailable(mTexId, mTexMatrix);
 		}
 	}
 
@@ -434,6 +423,11 @@ public class VideoSource implements IPipelineSource {
 		}
 		if (BuildCheck.isAndroid4_1()) {
 			mInputTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
+		}
+		synchronized (mSync) {
+			if (mPipeline != null) {
+				mPipeline.resize(width, height);
+			}
 		}
 	}
 

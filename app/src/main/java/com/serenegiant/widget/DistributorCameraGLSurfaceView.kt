@@ -108,6 +108,9 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
+		if (mVideoSource != null) {
+			mVideoSource!!.setPipeline(null)
+		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
 			mDistributor = null
@@ -162,6 +165,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mVideoSource!!)
+			mVideoSource!!.setPipeline(mDistributor)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable)
 	}

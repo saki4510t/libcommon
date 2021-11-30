@@ -313,7 +313,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void requestFrame() {
-		mRendererTask.requestFrame();
+		mRendererTask.requestFrame(mRendererTask.mTexId, mRendererTask.mTexMatrix);
 	}
 
 	/**
@@ -837,7 +837,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@Override
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-			requestFrame();
+			requestFrame(mTexId, mTexMatrix);
 		}
 
 	}	// BaseRendererTask
