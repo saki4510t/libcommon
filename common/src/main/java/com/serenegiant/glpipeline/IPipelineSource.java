@@ -21,6 +21,8 @@ package com.serenegiant.glpipeline;
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
+import com.serenegiant.glutils.GLManager;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
@@ -42,6 +44,14 @@ public interface IPipelineSource extends IPipeline {
 		@WorkerThread
 		public void onDestroy();
 	}
+
+	/**
+	 * GLManagerを取得する
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	@NonNull
+	public GLManager getGLManager() throws IllegalStateException;
 
 	/**
 	 * 映像入力用のSurfaceTextureを取得

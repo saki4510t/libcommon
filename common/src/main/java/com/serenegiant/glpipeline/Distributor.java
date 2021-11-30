@@ -112,7 +112,6 @@ public class Distributor implements IPipeline {
 	}
 
 	@NonNull
-	@Override
 	public GLManager getGLManager() throws IllegalStateException {
 		return mManager;
 	}

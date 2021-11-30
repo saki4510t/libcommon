@@ -18,8 +18,6 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
-import com.serenegiant.glutils.GLManager;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -29,14 +27,6 @@ public interface IPipeline {
 	 * 関係するリソースを破棄
 	 */
 	public void release();
-
-	/**
-	 * GLManagerを取得する
-	 * @return
-	 * @throws IllegalStateException
-	 */
-	@NonNull
-	public GLManager getGLManager() throws IllegalStateException;
 
 	/**
 	 * リサイズ要求
