@@ -65,7 +65,7 @@ public interface IPipeline {
 	public int getHeight();
 
 	/**
-	 * 次に呼び出すIPipleineインスタンスをセットする
+	 * 次に呼び出すIPipelineインスタンスをセットする
 	 * @param pipeline
 	 */
 	public void setPipeline(@Nullable final IPipeline pipeline);
