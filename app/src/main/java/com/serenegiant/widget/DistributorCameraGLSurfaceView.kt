@@ -180,13 +180,17 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		mDistributor?.removeSurface(id)
 	}
 
+	override fun isRecordingSupported(): Boolean {
+		return true
+	}
+
 	/**
 	 * VideoSourceインスタンスを生成
 	 * @param width
 	 * @param height
 	 * @return
 	 */
-	protected fun createVideoSource(
+	private fun createVideoSource(
 		width: Int, height: Int): VideoSource {
 		return VideoSource(mGLManager, width, height,
 			object : PipelineSourceCallback {

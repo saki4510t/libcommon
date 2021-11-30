@@ -190,6 +190,10 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 		throw UnsupportedOperationException()
 	}
 
+	override fun isRecordingSupported(): Boolean {
+		return false
+	}
+
 	private fun updateViewport() { //		final int viewWidth = getWidth();
 //		final int viewHeight = getHeight();
 //		if (viewWidth == 0 || viewHeight == 0) {

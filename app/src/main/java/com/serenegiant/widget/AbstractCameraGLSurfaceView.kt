@@ -167,6 +167,10 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 		rendererHolder?.removeSurface(id)
 	}
 
+	override fun isRecordingSupported(): Boolean {
+		return true
+	}
+
 	/**
 	 * IRendererHolderを生成
 	 * @param width

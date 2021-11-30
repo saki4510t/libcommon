@@ -24,4 +24,6 @@ interface ICameraView {
 
 	fun addSurface(id: Int, surface: Any, isRecordable: Boolean)
 	fun removeSurface(id: Int)
+
+	fun isRecordingSupported(): Boolean
 }

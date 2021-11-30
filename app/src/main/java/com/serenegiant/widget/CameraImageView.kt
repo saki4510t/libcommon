@@ -133,6 +133,10 @@ class CameraImageView @JvmOverloads constructor(
 		throw UnsupportedOperationException()
 	}
 
+	override fun isRecordingSupported(): Boolean {
+		return false
+	}
+
 	fun getInputSurfaceTexture(): SurfaceTexture {
 		return mDrawable.surfaceTexture
 	}
