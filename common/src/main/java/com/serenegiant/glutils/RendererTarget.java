@@ -24,6 +24,7 @@ import android.opengl.Matrix;
 import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Surface等の描画先のオブジェクトと関係する設定を保持するためのホルダークラス
@@ -88,7 +89,12 @@ public class RendererTarget {
 		mTargetSurface = null;
 		mSurface = null;
 	}
-	
+
+	@Nullable
+	public Object getSurface() {
+		return mSurface;
+	}
+
 	/**
 	 * Surfaceが有効かどうかを取得する
 	 * @return
