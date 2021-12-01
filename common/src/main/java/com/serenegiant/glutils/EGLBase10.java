@@ -170,7 +170,7 @@ import com.serenegiant.system.BuildCheck;
 //			if (DEBUG) Log.v(TAG, "EglSurface:release:");
 			mEglBase.makeDefault();
 			if (mOwnSurface) {
-				mEglBase.destroyWindowSurface(mEglSurface);
+				mEglBase.destroySurface(mEglSurface);
 			}
 			mEglSurface = EGL10.EGL_NO_SURFACE;
 		}
@@ -765,7 +765,7 @@ import com.serenegiant.system.BuildCheck;
 	 * オフスクリーンサーフェースを破棄
 	 * @param surface
 	 */
-	private final void destroyWindowSurface(EGLSurface surface) {
+	private final void destroySurface(EGLSurface surface) {
 //		if (DEBUG) Log.v(TAG, "destroySurface:");
 
         if (surface != EGL10.EGL_NO_SURFACE) {

@@ -161,7 +161,7 @@ import com.serenegiant.system.BuildCheck;
 //			if (DEBUG) Log.v(TAG, "EglSurface:release:");
 			mEglBase.makeDefault();
 			if (mOwnSurface) {
-				mEglBase.destroyWindowSurface(mEglSurface);
+				mEglBase.destroySurface(mEglSurface);
 			}
 			mEglSurface = EGL14.EGL_NO_SURFACE;
 		}
@@ -728,7 +728,7 @@ import com.serenegiant.system.BuildCheck;
 		return result;
     }
 
-	private void destroyWindowSurface(EGLSurface surface) {
+	private void destroySurface(EGLSurface surface) {
 //		if (DEBUG) Log.v(TAG, "destroySurface:");
 
         if (surface != EGL14.EGL_NO_SURFACE) {
