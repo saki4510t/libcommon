@@ -84,7 +84,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					mDrawer = GLDrawer2D.create(manager.isisGLES3(), true);
+					mDrawer = GLDrawer2D.create(manager.isGLES3(), true);
 					if (surface != null) {
 						mRendererTarget = RendererTarget.newInstance(
 							manager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
@@ -192,7 +192,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 					if (isOES != mDrawer.isOES()) {
 						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 						mDrawer.release();
-						mDrawer = GLDrawer2D.create(mManager.isisGLES3(), isOES);
+						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
 					}
 					mRendererTarget.draw(mDrawer, texId, texMatrix);
 					if (DEBUG && (++cnt % 100) == 0) {

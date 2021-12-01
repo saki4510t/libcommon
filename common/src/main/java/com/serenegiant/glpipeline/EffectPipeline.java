@@ -96,7 +96,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					mDrawer = new EffectDrawer2D(manager.isisGLES3(), true, mEffectListener);
+					mDrawer = new EffectDrawer2D(manager.isGLES3(), true, mEffectListener);
 					createTarget(surface, maxFps);
 				}
 			}
@@ -203,7 +203,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 					if (isOES != mDrawer.isOES()) {
 						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 						mDrawer.release();
-						mDrawer = new EffectDrawer2D(mManager.isisGLES3(), isOES, mEffectListener);
+						mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
 					}
 					mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
 				}
@@ -312,7 +312,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 					mEffectOnly = false;
 				} else {
 					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					work = GLSurface.newInstance(mManager.isisGLES3(), getWidth(), getHeight());
+					work = GLSurface.newInstance(mManager.isGLES3(), getWidth(), getHeight());
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = true;
