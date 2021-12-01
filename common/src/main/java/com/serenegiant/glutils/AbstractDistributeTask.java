@@ -530,6 +530,10 @@ public abstract class AbstractDistributeTask {
 	protected void handleDrawTargets(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		final int n = mTargets.size();
+		if (isOES != mDrawer.isOES()) {
+			mDrawer.release();
+			mDrawer = GLDrawer2D.create(isOES3(), isOES);
+		}
 		for (int i = n - 1; i >= 0; i--) {
 			final RendererTarget target = mTargets.valueAt(i);
 			if ((target != null) && target.canDraw()) {
