@@ -436,7 +436,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			requestFrame(getTexId(), getTexMatrix());
+			requestFrame(true, getTexId(), getTexMatrix());
 			if (DEBUG) Log.v(TAG, "handleSetMask:finished");
 		}
 
@@ -449,7 +449,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-				requestFrame(getTexId(), getTexMatrix());
+				requestFrame(true, getTexId(), getTexMatrix());
 				if (DEBUG && (((++cnt) % 100) == 0)) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}

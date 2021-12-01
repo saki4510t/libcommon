@@ -317,7 +317,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
-			requestFrame(getTexId(), getTexMatrix());
+			requestFrame(true, getTexId(), getTexMatrix());
 		}
 	}
 

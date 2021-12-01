@@ -232,13 +232,13 @@ public class VideoSource implements IPipelineSource {
 
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 		}
 		if (pipeline != null) {
-			pipeline.onFrameAvailable(texId, texMatrix);
+			pipeline.onFrameAvailable(isOES, texId, texMatrix);
 		}
 	}
 
@@ -338,7 +338,7 @@ public class VideoSource implements IPipelineSource {
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
-			onFrameAvailable(mTexId, mTexMatrix);
+			onFrameAvailable(true, mTexId, mTexMatrix);
 		}
 	}
 

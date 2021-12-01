@@ -99,9 +99,9 @@ public abstract class AbstractDistributeTask {
 	 * 描画要求する
 	 */
 	@AnyThread
-	public void requestFrame(final int texId, @NonNull final float[] texMatrix) {
+	public void requestFrame(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		mHasNewFrame = mIsFirstFrameRendered = true;
-		offer(REQUEST_DRAW, texId, 0, texMatrix);
+		offer(REQUEST_DRAW, texId, isOES ? 1 : 0, texMatrix);
 	}
 
 	/**
@@ -446,7 +446,7 @@ public abstract class AbstractDistributeTask {
 //		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
 		switch (request) {
 		case REQUEST_DRAW:
-			handleDraw(arg1, (float[])obj);
+			handleDraw(arg2 != 0, arg1, (float[])obj);
 			break;
 		case REQUEST_UPDATE_SIZE:
 			handleResize(arg1, arg2);
@@ -484,12 +484,11 @@ public abstract class AbstractDistributeTask {
 		return null;
 	}
 
-//	private int drawCnt;
 	/**
 	 * 実際の描画処理
 	 */
 	@WorkerThread
-	protected void handleDraw(final int texId, @NonNull final float[] texMatrix) {
+	protected void handleDraw(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
 		if (!isMasterSurfaceValid()) {
@@ -512,7 +511,7 @@ public abstract class AbstractDistributeTask {
 				offer(REQUEST_RECREATE_MASTER_SURFACE);
 				return;
 			}
-			handleDrawTargets(texId, texMatrix);
+			handleDrawTargets(isOES, texId, texMatrix);
 		}
 
 		// Egl保持用のSurfaceへ描画しないとデッドロックする端末対策
@@ -528,7 +527,7 @@ public abstract class AbstractDistributeTask {
 	 * 各Surfaceへ描画する
 	 */
 	@WorkerThread
-	protected void handleDrawTargets(final int texId, @NonNull final float[] texMatrix) {
+	protected void handleDrawTargets(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		final int n = mTargets.size();
 		for (int i = n - 1; i >= 0; i--) {

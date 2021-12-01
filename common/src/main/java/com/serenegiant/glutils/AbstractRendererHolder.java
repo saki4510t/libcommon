@@ -313,7 +313,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void requestFrame() {
-		mRendererTask.requestFrame(mRendererTask.mTexId, mRendererTask.mTexMatrix);
+		mRendererTask.requestFrame(true, mRendererTask.mTexId, mRendererTask.mTexMatrix);
 	}
 
 	/**
@@ -682,9 +682,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		@Override
 		protected void handleDrawTargets(
+			final boolean isOES,
 			final int texId, @NonNull final float[] texMatrix) {
 
-			super.handleDrawTargets(texId, texMatrix);
+			super.handleDrawTargets(isOES, texId, texMatrix);
 			mParent.notifyCapture();
 		}
 
@@ -826,7 +827,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 */
 		@Override
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-			requestFrame(mTexId, mTexMatrix);
+			requestFrame(true, mTexId, mTexMatrix);
 		}
 
 	}	// BaseRendererTask

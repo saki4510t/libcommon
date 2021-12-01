@@ -163,8 +163,8 @@ public class Distributor implements IPipeline {
 
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-		mDistributeTask.requestFrame(texId, texMatrix);
+	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+		mDistributeTask.requestFrame(isOES, texId, texMatrix);
 	}
 
 	/**
@@ -459,14 +459,14 @@ public class Distributor implements IPipeline {
 
 		@WorkerThread
 		@Override
-		public void requestFrame(final int texId, @NonNull final float[] texMatrix) {
+		public void requestFrame(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 			if (mOwnManager || !isFirstFrameRendered()) {
 				// 共有コンテキストを使う時は常にsuper#requestFrameを呼ぶ(別スレッドでの描画なので)
 				// 最初のフレームはフラグ更新のためにsuper#requestFrameを呼ぶ
-				super.requestFrame(texId, texMatrix);
+				super.requestFrame(isOES, texId, texMatrix);
 			} else {
 				// 2フレーム目以降は高速化のために描画前の処理をスキップして直接#handleDrawTargetsを呼ぶ
-				super.handleDrawTargets(texId, texMatrix);
+				super.handleDrawTargets(isOES, texId, texMatrix);
 				makeCurrent();
 				GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			}

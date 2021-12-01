@@ -61,5 +61,5 @@ public interface IPipeline {
 	public void setPipeline(@Nullable final IPipeline pipeline);
 
 	@WorkerThread
-	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix);
+	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
 }

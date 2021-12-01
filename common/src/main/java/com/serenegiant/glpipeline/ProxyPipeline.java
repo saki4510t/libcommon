@@ -75,13 +75,13 @@ public class ProxyPipeline implements IPipeline {
 	}
 
 	@Override
-	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 		}
 		if (pipeline != null) {
-			pipeline.onFrameAvailable(texId, texMatrix);
+			pipeline.onFrameAvailable(isOES, texId, texMatrix);
 		}
 	}
 

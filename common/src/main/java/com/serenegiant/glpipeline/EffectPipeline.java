@@ -44,7 +44,13 @@ public class EffectPipeline extends ProxyPipeline {
 	@Nullable
 	private EffectDrawer2D mDrawer;
 	@Nullable
+	private EffectDrawer2D mDrawerOES;
+	@Nullable
 	private RendererTarget mRendererTarget;
+	/**
+	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
+	 */
+	private boolean mEffectOnly;
 
 	/**
 	 * コンストラクタ
@@ -82,17 +88,16 @@ public class EffectPipeline extends ProxyPipeline {
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					mDrawer = new EffectDrawer2D(manager.isisGLES3(), true,
-						new EffectDrawer2D.EffectListener() {
+					final EffectDrawer2D.EffectListener listener
+						= new EffectDrawer2D.EffectListener() {
 							@Override
 							public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 								return EffectPipeline.this.onChangeEffect(effect, drawer);
 							}
-						});
-					if (surface != null) {
-						mRendererTarget = RendererTarget.newInstance(
-							manager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					}
+						};
+					mDrawer = new EffectDrawer2D(manager.isisGLES3(), false, listener);
+					mDrawerOES = new EffectDrawer2D(manager.isisGLES3(), true, listener);
+					createTarget(surface, maxFps);
 				}
 			}
 		});
@@ -110,6 +115,10 @@ public class EffectPipeline extends ProxyPipeline {
 						if (mDrawer != null) {
 							mDrawer.release();
 							mDrawer = null;
+						}
+						if (mDrawerOES != null) {
+							mDrawerOES.release();
+							mDrawerOES = null;
 						}
 						if (mRendererTarget != null) {
 							mRendererTarget.release();
@@ -157,18 +166,7 @@ public class EffectPipeline extends ProxyPipeline {
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
-					if (mRendererTarget != surface) {
-						if (mRendererTarget != null) {
-							mRendererTarget.release();
-							mRendererTarget = null;
-						}
-						if (GLUtils.isSupportedSurface(surface)) {
-							mRendererTarget = RendererTarget.newInstance(
-								mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-						}
-					}
-				}
+				createTarget(surface, maxFps);
 			}
 		});
 	}
@@ -181,17 +179,27 @@ public class EffectPipeline extends ProxyPipeline {
 	private int cnt;
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final int texId, @NonNull final float[] texMatrix) {
-		super.onFrameAvailable(texId, texMatrix);
+	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		if (!mReleased) {
 			synchronized (mSync) {
 				if ((mRendererTarget != null)
 					&& mRendererTarget.isEnabled()
 					&& mRendererTarget.isValid()) {
-					mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
+					if (isOES) {
+						mRendererTarget.draw(mDrawerOES.getDrawer(), texId, texMatrix);
+					} else {
+						mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
+					}
 					if (DEBUG && (++cnt % 100) == 0) {
 						Log.v(TAG, "onFrameAvailable:" + cnt);
 					}
+				}
+				if (mEffectOnly) {
+					// FIXME 映像効果付与したテクスチャを次へ渡す
+					super.onFrameAvailable(isOES, texId, texMatrix);
+				} else {
+					// こっちはオリジナルのテクスチャを渡す
+					super.onFrameAvailable(isOES, texId, texMatrix);
 				}
 			}
 		}
@@ -235,6 +243,9 @@ public class EffectPipeline extends ProxyPipeline {
 						if (mDrawer != null) {
 							mDrawer.setEffect(effect);
 						}
+						if (mDrawerOES != null) {
+							mDrawerOES.setEffect(effect);
+						}
 					}
 				}
 			});
@@ -245,9 +256,29 @@ public class EffectPipeline extends ProxyPipeline {
 
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
-		return mDrawer.getCurrentEffect();
+		synchronized (mSync) {
+			return mDrawer != null ? mDrawer.getCurrentEffect() : 0;
+		}
 	}
 //--------------------------------------------------------------------------------
+	private void createTarget(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		synchronized (mSync) {
+			if (mRendererTarget != surface) {
+				if (mRendererTarget != null) {
+					mRendererTarget.release();
+					mRendererTarget = null;
+				}
+				if (GLUtils.isSupportedSurface(surface)) {
+					mRendererTarget = RendererTarget.newInstance(
+						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+					mEffectOnly = false;
+				} else {
+					mEffectOnly = true;
+				}
+			}
+		}
+	}
+
 	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 		return false;
 	}
