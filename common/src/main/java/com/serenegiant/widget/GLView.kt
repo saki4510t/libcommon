@@ -284,7 +284,7 @@ open class GLView @JvmOverloads constructor(
 					}
 				}
 				drawFrame()
-				mTarget!!.swap()
+				mTarget?.swap()
 			}
 		}
 	}
@@ -325,8 +325,10 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	protected fun drawFrame() {
-		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-		mGLRenderer?.drawFrame()
+		if (mHasSurface) {
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+			mGLRenderer?.drawFrame()
+		}
 	}
 
 	/**
@@ -337,9 +339,9 @@ open class GLView @JvmOverloads constructor(
 	@CallSuper
 	protected fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
-		mGLRenderer?.onSurfaceDestroyed()
-		mGLHandler.removeCallbacksAndMessages(null)
 		mGLManager.removeFrameCallback(mChoreographerCallback)
+		mGLHandler.removeCallbacksAndMessages(null)
+		mGLRenderer?.onSurfaceDestroyed()
 		if (mTarget != null) {
 			mTarget!!.release()
 			mTarget = null
