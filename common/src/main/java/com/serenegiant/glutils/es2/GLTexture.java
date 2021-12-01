@@ -31,6 +31,8 @@ import java.io.IOException;
 
 import androidx.annotation.NonNull;
 
+import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
+
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
@@ -166,6 +168,15 @@ public class GLTexture implements IGLSurface {
 	@Override
 	public boolean isValid() {
 		return mTextureId >= 0;
+	}
+
+	/**
+	 * テクスチャが外部テクスチャかどうかを取得
+	 * @return
+	 */
+	@Override
+	public boolean isOES() {
+		return mTextureTarget == GL_TEXTURE_EXTERNAL_OES;
 	}
 
 	/**

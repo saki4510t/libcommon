@@ -26,6 +26,11 @@ import androidx.annotation.NonNull;
 
 public interface IGLSurface extends ISurface {
 	/**
+	 * テクスチャが外部テクスチャかどうかを取得
+	 * @return
+	 */
+	public boolean isOES();
+	/**
 	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
 	 * @return
 	 */

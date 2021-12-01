@@ -32,6 +32,8 @@ import java.io.IOException;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 
+import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
+
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
@@ -326,6 +328,11 @@ public abstract class GLSurface implements IGLSurface {
 	}
 
 //--------------------------------------------------------------------------------
+	@Override
+	public boolean isOES() {
+		return TEX_TARGET == GL_TEXTURE_EXTERNAL_OES;
+	}
+
 	/**
 	 * IGLSurfaceの実装
 	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
