@@ -46,8 +46,6 @@ public class SurfacePipeline extends ProxyPipeline {
 	@Nullable
 	private GLDrawer2D mDrawer;
 	@Nullable
-	private GLDrawer2D mDrawerOES;
-	@Nullable
 	private RendererTarget mRendererTarget;
 
 	/**
@@ -87,7 +85,6 @@ public class SurfacePipeline extends ProxyPipeline {
 			public void run() {
 				synchronized (mSync) {
 					mDrawer = GLDrawer2D.create(manager.isisGLES3(), true);
-					mDrawerOES = GLDrawer2D.create(manager.isisGLES3(), false);
 					if (surface != null) {
 						mRendererTarget = RendererTarget.newInstance(
 							manager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
@@ -109,10 +106,6 @@ public class SurfacePipeline extends ProxyPipeline {
 						if (mDrawer != null) {
 							mDrawer.release();
 							mDrawer = null;
-						}
-						if (mDrawerOES != null) {
-							mDrawerOES.release();
-							mDrawerOES = null;
 						}
 						if (mRendererTarget != null) {
 							mRendererTarget.release();
@@ -191,11 +184,12 @@ public class SurfacePipeline extends ProxyPipeline {
 				if ((mRendererTarget != null)
 					&& mRendererTarget.isEnabled()
 					&& mRendererTarget.isValid()) {
-					if (isOES) {
-						mRendererTarget.draw(mDrawerOES, texId, texMatrix);
-					} else {
-						mRendererTarget.draw(mDrawer, texId, texMatrix);
+					if (isOES != mDrawer.isOES()) {
+						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+						mDrawer.release();
+						mDrawer = GLDrawer2D.create(mManager.isisGLES3(), isOES);
 					}
+					mRendererTarget.draw(mDrawer, texId, texMatrix);
 					if (DEBUG && (++cnt % 100) == 0) {
 						Log.v(TAG, "onFrameAvailable:" + cnt);
 					}

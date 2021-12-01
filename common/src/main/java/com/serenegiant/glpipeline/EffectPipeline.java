@@ -44,8 +44,6 @@ public class EffectPipeline extends ProxyPipeline {
 	@Nullable
 	private EffectDrawer2D mDrawer;
 	@Nullable
-	private EffectDrawer2D mDrawerOES;
-	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
 	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
@@ -88,15 +86,7 @@ public class EffectPipeline extends ProxyPipeline {
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					final EffectDrawer2D.EffectListener listener
-						= new EffectDrawer2D.EffectListener() {
-							@Override
-							public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
-								return EffectPipeline.this.onChangeEffect(effect, drawer);
-							}
-						};
-					mDrawer = new EffectDrawer2D(manager.isisGLES3(), false, listener);
-					mDrawerOES = new EffectDrawer2D(manager.isisGLES3(), true, listener);
+					mDrawer = new EffectDrawer2D(manager.isisGLES3(), true, mEffectListener);
 					createTarget(surface, maxFps);
 				}
 			}
@@ -115,10 +105,6 @@ public class EffectPipeline extends ProxyPipeline {
 						if (mDrawer != null) {
 							mDrawer.release();
 							mDrawer = null;
-						}
-						if (mDrawerOES != null) {
-							mDrawerOES.release();
-							mDrawerOES = null;
 						}
 						if (mRendererTarget != null) {
 							mRendererTarget.release();
@@ -185,11 +171,12 @@ public class EffectPipeline extends ProxyPipeline {
 				if ((mRendererTarget != null)
 					&& mRendererTarget.isEnabled()
 					&& mRendererTarget.isValid()) {
-					if (isOES) {
-						mRendererTarget.draw(mDrawerOES.getDrawer(), texId, texMatrix);
-					} else {
-						mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
+					if (isOES != mDrawer.isOES()) {
+						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+						mDrawer.release();
+						mDrawer = new EffectDrawer2D(mManager.isisGLES3(), isOES, mEffectListener);
 					}
+					mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
 					if (DEBUG && (++cnt % 100) == 0) {
 						Log.v(TAG, "onFrameAvailable:" + cnt);
 					}
@@ -243,9 +230,6 @@ public class EffectPipeline extends ProxyPipeline {
 						if (mDrawer != null) {
 							mDrawer.setEffect(effect);
 						}
-						if (mDrawerOES != null) {
-							mDrawerOES.setEffect(effect);
-						}
 					}
 				}
 			});
@@ -261,6 +245,14 @@ public class EffectPipeline extends ProxyPipeline {
 		}
 	}
 //--------------------------------------------------------------------------------
+	final EffectDrawer2D.EffectListener mEffectListener
+		= new EffectDrawer2D.EffectListener() {
+			@Override
+			public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+				return EffectPipeline.this.onChangeEffect(effect, drawer);
+			}
+		};
+
 	private void createTarget(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		synchronized (mSync) {
 			if (mRendererTarget != surface) {
