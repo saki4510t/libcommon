@@ -16,6 +16,7 @@
 	<string name="title_simple_gl_camera" translatable="false">SimpleCameraGL</string>
 	<string name="title_camera_surface" translatable="false">CameraSurface</string>
 	<string name="title_simple_camera_source" translatable="false">SimpleVideoSourceCamera</string>
+	<string name="title_dummy_camera_source" translatable="false">DummyCameraSource</string>
 	<string name="title_galley" translatable="false">Galley(MediaStoreAdapter)</string>
 	<string name="title_galley_recycler_cursor" translatable="false">Galley(MediaStoreCursorRecyclerAdapter)</string>
 	<string name="title_galley_recycler" translatable="false">Galley(MediaStoreRecyclerAdapter)</string>
@@ -41,6 +42,7 @@
 		<item>@string/title_simple_gl_camera</item>
 		<item>@string/title_camera_surface</item>
 		<item>@string/title_simple_camera_source</item>
+		<item>@string/title_dummy_camera_source</item>
 		<item>@string/title_galley</item>
 		<item>@string/title_galley_recycler_cursor</item>
 		<item>@string/title_galley_recycler</item>
