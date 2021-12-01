@@ -33,6 +33,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 public class EffectPipeline extends ProxyPipeline {
+public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
@@ -128,12 +129,14 @@ public class EffectPipeline extends ProxyPipeline {
 	}
 
 	/**
+	 * ISurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
+	@Override
 	public void setSurface(@Nullable final Object surface)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -141,6 +144,7 @@ public class EffectPipeline extends ProxyPipeline {
 	}
 
 	/**
+	 * ISurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
@@ -148,6 +152,7 @@ public class EffectPipeline extends ProxyPipeline {
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
+	@Override
 	public void setSurface(
 		@Nullable final Object surface,
 		@Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException {
