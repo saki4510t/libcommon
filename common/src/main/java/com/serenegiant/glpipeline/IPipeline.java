@@ -60,6 +60,13 @@ public interface IPipeline {
 	 */
 	public void setPipeline(@Nullable final IPipeline pipeline);
 
+	/**
+	 * 次に呼び出すIPipelineインスタンス取得する
+	 * @return
+	 */
+	@Nullable
+	public IPipeline getPipeline();
+
 	@WorkerThread
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
 }

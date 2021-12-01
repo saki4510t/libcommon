@@ -74,6 +74,13 @@ public class ProxyPipeline implements IPipeline {
 		}
 	}
 
+	@Nullable
+	public IPipeline getPipeline() {
+		synchronized (mSync) {
+			return mPipeline;
+		}
+	}
+
 	@Override
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		final IPipeline pipeline;

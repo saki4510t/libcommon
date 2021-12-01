@@ -158,7 +158,12 @@ public class Distributor implements IPipeline {
 
 	@Override
 	public void setPipeline(@Nullable final IPipeline pipeline) {
-		throw new UnsupportedOperationException("Distributor does not support #setPipeline, use #addSurface instead.");
+		throw new UnsupportedOperationException("Distributor does not support #setPipeline/#getPipeline, use #addSurface/#removeSurface instead.");
+	}
+
+	@Nullable
+	public IPipeline getPipeline() {
+		throw new UnsupportedOperationException("Distributor does not support #setPipeline/#getPipeline, use #addSurface/#removeSurface instead.");
 	}
 
 	@WorkerThread

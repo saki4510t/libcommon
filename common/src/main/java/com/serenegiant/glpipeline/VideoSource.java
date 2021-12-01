@@ -230,6 +230,17 @@ public class VideoSource implements IPipelineSource {
 		}
 	}
 
+	/**
+	 * 次に呼び出すIPipelineインスタンス取得する
+	 * @return
+	 */
+	@Nullable
+	public IPipeline getPipeline() {
+		synchronized (mSync) {
+			return mPipeline;
+		}
+	}
+
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
