@@ -154,15 +154,15 @@ public class SurfacePipeline extends ProxyPipeline {
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					if (mRendererTarget != surface) {
-						if (mRendererTarget != null) {
-							mRendererTarget.release();
-							mRendererTarget = null;
-						}
-						if (GLUtils.isSupportedSurface(surface)) {
-							mRendererTarget = RendererTarget.newInstance(
-								mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-						}
+					if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+						// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+						mRendererTarget.release();
+						mRendererTarget = null;
+					}
+					if ((mRendererTarget == null)
+						&& GLUtils.isSupportedSurface(surface)) {
+						mRendererTarget = RendererTarget.newInstance(
+							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					}
 				}
 			}
