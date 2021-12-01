@@ -229,6 +229,32 @@ public abstract class GLSurface implements IGLSurface {
 		}
 	}
 
+	/**
+	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
+	 * @param isGLES3
+	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param tex_unit
+	 * @param tex_id
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	@SuppressLint("NewApi")
+	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_target, final int tex_unit, final int tex_id,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
+			return new GLSurfaceES3(tex_target, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(tex_target, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
+	}
+
 //================================================================================
 	protected final boolean isGLES3;
 	protected final int TEX_TARGET;
