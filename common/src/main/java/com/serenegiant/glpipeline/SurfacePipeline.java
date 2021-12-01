@@ -175,6 +175,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 
 	@Override
 	public boolean isValid() {
+		// super#isValidはProxyPipelineなので常にtrueを返す
 		return !mReleased && mManager.isValid();
 	}
 

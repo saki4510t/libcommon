@@ -18,6 +18,8 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -25,11 +27,40 @@ import androidx.annotation.Nullable;
  * IPipelineのインターフェースメソッドの中継をするだけのIPipeline実装
  */
 public class ProxyPipeline implements IPipeline {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = ProxyPipeline.class.getSimpleName();
+
+	private static final int DEFAULT_WIDTH = 640;
+	private static final int DEFAULT_HEIGHT = 480;
+
 	@NonNull
 	private final Object mSync = new Object();
 	private int mWidth, mHeight;
 	@Nullable
 	private IPipeline mPipeline;
+
+	/**
+	 * デフォルトコンストラクタ
+	 */
+	public ProxyPipeline() {
+		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 */
+	protected ProxyPipeline(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		if ((width > 0) || (height > 0)) {
+			mWidth = width;
+			mHeight = height;
+		} else {
+			mWidth = DEFAULT_WIDTH;
+			mHeight = DEFAULT_HEIGHT;
+		}
+	}
 
 	@Override
 	public void release() {
@@ -40,10 +71,7 @@ public class ProxyPipeline implements IPipeline {
 	public void resize(final int width, final int height) throws IllegalStateException {
 		mWidth = width;
 		mHeight = height;
-		final IPipeline pipeline;
-		synchronized (mSync) {
-			pipeline = mPipeline;
-		}
+		final IPipeline pipeline = getPipeline();
 		if (pipeline != null) {
 			pipeline.resize(width, height);
 		}

@@ -33,7 +33,6 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
@@ -43,12 +42,9 @@ import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
  * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
  */
-public class VideoSource implements IPipelineSource {
+public class VideoSource extends ProxyPipeline implements IPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoSource.class.getSimpleName();
-
-	private static final int DEFAULT_WIDTH = 640;
-	private static final int DEFAULT_HEIGHT = 480;
 
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
 	private static final int REQUEST_UPDATE_SIZE = 2;
@@ -75,10 +71,6 @@ public class VideoSource implements IPipelineSource {
 	private int mTexId;
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
-	private int mVideoWidth, mVideoHeight;
-
-	@Nullable
-	private IPipeline mPipeline;
 
 	/**
 	 * コンストラクタ
@@ -111,8 +103,8 @@ public class VideoSource implements IPipelineSource {
 		@NonNull final PipelineSourceCallback callback,
 		final boolean useSharedContext) {
 
+		super(width, height);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-
 		mOwnManager = useSharedContext;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
@@ -131,13 +123,6 @@ public class VideoSource implements IPipelineSource {
 		mGLContext = mManager.getGLContext();
 		isGLES3 = mGLContext.isGLES3();
 		mCallback = callback;
-		if ((width > 0) || (height > 0)) {
-			mVideoWidth = width;
-			mVideoHeight = height;
-		} else {
-			mVideoWidth = DEFAULT_WIDTH;
-			mVideoHeight = DEFAULT_HEIGHT;
-		}
 		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 
@@ -183,9 +168,10 @@ public class VideoSource implements IPipelineSource {
 	public void resize(final int width, final int height) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "resize:");
 		checkValid();
-		if ((width > 0) && (height > 0)
-			&& ((width != mVideoWidth) || (height != mVideoHeight))) {
-
+		final boolean updateSize = ((width > 0) && (height > 0)
+			&& ((width != getWidth()) || (height != getHeight())));
+		super.resize(width, height);
+		if (updateSize) {
 			mGLHandler.sendMessage(mGLHandler.obtainMessage(REQUEST_UPDATE_SIZE, width, height));
 		}
 	}
@@ -197,60 +183,8 @@ public class VideoSource implements IPipelineSource {
 	 */
 	@Override
 	public boolean isValid() {
+		// super#isValidはProxyPipelineなので常にtrueを返す
 		return mManager.isValid() && (mInputSurface != null) && mInputSurface.isValid();
-	}
-
-	/**
-	 * IPipelineの実装
-	 * 映像幅を取得
-	 * @return
-	 */
-	@Override
-	public int getWidth() {
-		return mVideoWidth;
-	}
-
-	/**
-	 * IPipelineの実装
-	 * 映像高さを取得
-	 * @return
-	 */
-	@Override
-	public int getHeight() {
-		return mVideoHeight;
-	}
-
-	@Override
-	public void setPipeline(@Nullable final IPipeline pipeline) {
-		synchronized (mSync) {
-			mPipeline = pipeline;
-		}
-		if (pipeline != null) {
-			pipeline.resize(getWidth(), getHeight());
-		}
-	}
-
-	/**
-	 * 次に呼び出すIPipelineインスタンス取得する
-	 * @return
-	 */
-	@Nullable
-	public IPipeline getPipeline() {
-		synchronized (mSync) {
-			return mPipeline;
-		}
-	}
-
-	@WorkerThread
-	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-		final IPipeline pipeline;
-		synchronized (mSync) {
-			pipeline = mPipeline;
-		}
-		if (pipeline != null) {
-			pipeline.onFrameAvailable(isOES, texId, texMatrix);
-		}
 	}
 
 	/**
@@ -372,7 +306,7 @@ public class VideoSource implements IPipelineSource {
 		mInputTexture = new SurfaceTexture(mTexId);
 		mInputSurface = new Surface(mInputTexture);
 		if (BuildCheck.isAndroid4_1()) {
-			mInputTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
+			mInputTexture.setDefaultBufferSize(getWidth(), getHeight());
 		}
 		if (BuildCheck.isLollipop()) {
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener, mGLHandler);	// API>=21
@@ -425,18 +359,11 @@ public class VideoSource implements IPipelineSource {
 	@WorkerThread
 	protected void handleResize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
-		mVideoWidth = width;
-		mVideoHeight = height;
 		if ((mInputSurface == null) || !mInputSurface.isValid()) {
 			handleReCreateInputSurface();
 		}
 		if (BuildCheck.isAndroid4_1()) {
-			mInputTexture.setDefaultBufferSize(mVideoWidth, mVideoHeight);
-		}
-		synchronized (mSync) {
-			if (mPipeline != null) {
-				mPipeline.resize(width, height);
-			}
+			mInputTexture.setDefaultBufferSize(width, height);
 		}
 	}
 
