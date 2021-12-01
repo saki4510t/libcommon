@@ -23,22 +23,42 @@ import android.os.Parcelable;
 
 import androidx.annotation.NonNull;
 
+/**
+ * OpenGL|ESのテキスチャ情報のホルダークラス
+ */
 public class TextureWrapper implements Parcelable {
+	public final int texTarget;
 	public final int texUnit;
 	public final int texId;
 	public final int width;
 	public final int height;
 
-	public TextureWrapper(final int texUnit, final int texId,
+	/**
+	 * コンストラクタ
+	 * @param texTarget
+	 * @param texUnit
+	 * @param texId
+	 * @param width
+	 * @param height
+	 */
+	public TextureWrapper(
+		final int texTarget,
+		final int texUnit, final int texId,
 		final int width, final int height) {
 
+		this.texTarget = texTarget;
 		this.texUnit = texUnit;
 		this.texId = texId;
 		this.width = width;
 		this.height = height;
 	}
 
+	/**
+	 * Parcelable実装用のコンストラクタ
+	 * @param in
+	 */
 	protected TextureWrapper(@NonNull final Parcel in) {
+		texTarget = in.readInt();
 		texUnit = in.readInt();
 		texId = in.readInt();
 		width = in.readInt();
@@ -52,6 +72,7 @@ public class TextureWrapper implements Parcelable {
 
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
+		dest.writeInt(texTarget);
 		dest.writeInt(texUnit);
 		dest.writeInt(texId);
 		dest.writeInt(width);
