@@ -23,6 +23,7 @@ import android.util.Log;
 import com.serenegiant.glutils.EffectDrawer2D;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLManager;
+import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -49,6 +50,10 @@ public class EffectPipeline extends ProxyPipeline {
 	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
 	 */
 	private boolean mEffectOnly;
+	/**
+	 * 映像効果付与してそのまま次のIPipelineへ送る場合のワーク用GLSurface
+	 */
+	private GLSurface work;
 
 	/**
 	 * コンストラクタ
@@ -83,6 +88,7 @@ public class EffectPipeline extends ProxyPipeline {
 		}
 		mManager = manager;
 		manager.runOnGLThread(new Runnable() {
+			@WorkerThread
 			@Override
 			public void run() {
 				synchronized (mSync) {
@@ -109,6 +115,10 @@ public class EffectPipeline extends ProxyPipeline {
 						if (mRendererTarget != null) {
 							mRendererTarget.release();
 							mRendererTarget = null;
+						}
+						if (work != null) {
+							work.release();
+							work = null;
 						}
 					}
 				}
@@ -150,6 +160,7 @@ public class EffectPipeline extends ProxyPipeline {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager.runOnGLThread(new Runnable() {
+			@WorkerThread
 			@Override
 			public void run() {
 				createTarget(surface, maxFps);
@@ -177,14 +188,17 @@ public class EffectPipeline extends ProxyPipeline {
 						mDrawer = new EffectDrawer2D(mManager.isisGLES3(), isOES, mEffectListener);
 					}
 					mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
+				}
+				if (mEffectOnly && (work != null)) {
+					if (DEBUG && (++cnt % 100) == 0) {
+						Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
+					}
+					// 映像効果付与したテクスチャを次へ渡す
+					super.onFrameAvailable(work.isOES(), work.getTexId(), work.getTexMatrix());
+				} else {
 					if (DEBUG && (++cnt % 100) == 0) {
 						Log.v(TAG, "onFrameAvailable:" + cnt);
 					}
-				}
-				if (mEffectOnly) {
-					// FIXME 映像効果付与したテクスチャを次へ渡す
-					super.onFrameAvailable(isOES, texId, texMatrix);
-				} else {
 					// こっちはオリジナルのテクスチャを渡す
 					super.onFrameAvailable(isOES, texId, texMatrix);
 				}
@@ -200,6 +214,7 @@ public class EffectPipeline extends ProxyPipeline {
 	public void resetEffect() throws IllegalStateException {
 		if (isValid()) {
 			mManager.runOnGLThread(new Runnable() {
+				@WorkerThread
 				@Override
 				public void run() {
 					synchronized (mSync) {
@@ -223,6 +238,7 @@ public class EffectPipeline extends ProxyPipeline {
 		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if (isValid()) {
 			mManager.runOnGLThread(new Runnable() {
+				@WorkerThread
 				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
@@ -247,30 +263,47 @@ public class EffectPipeline extends ProxyPipeline {
 //--------------------------------------------------------------------------------
 	final EffectDrawer2D.EffectListener mEffectListener
 		= new EffectDrawer2D.EffectListener() {
+			@WorkerThread
 			@Override
 			public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 				return EffectPipeline.this.onChangeEffect(effect, drawer);
 			}
 		};
 
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
 	private void createTarget(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
 		synchronized (mSync) {
-			if (mRendererTarget != surface) {
+			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
 				if (mRendererTarget != null) {
 					mRendererTarget.release();
 					mRendererTarget = null;
+				}
+				if (work != null) {
+					work.release();
+					work = null;
 				}
 				if (GLUtils.isSupportedSurface(surface)) {
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = false;
 				} else {
+					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+					work = GLSurface.newInstance(mManager.isisGLES3(), getWidth(), getHeight());
+					mRendererTarget = RendererTarget.newInstance(
+						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = true;
 				}
 			}
 		}
 	}
 
+	@WorkerThread
 	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 		return false;
 	}

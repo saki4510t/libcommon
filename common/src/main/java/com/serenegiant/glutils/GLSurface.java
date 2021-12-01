@@ -233,6 +233,7 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
+	 * FIXME tex_targetにGL_TEXTURE_EXTERNAL_OESを指定するとassignTextureでフレームバッファーをセットするときにクラッシュする
 	 * @param isGLES3
 	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 * @param tex_unit
