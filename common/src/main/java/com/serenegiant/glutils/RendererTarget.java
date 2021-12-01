@@ -34,7 +34,7 @@ public class RendererTarget {
 	/**
 	 * ファクトリーメソッド
 	 * @param egl
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 0以下なら最大描画フレームレート制限なし, あまり正確じゃない
 	 * @return
 	 */
@@ -49,6 +49,7 @@ public class RendererTarget {
 
 	/** 元々の分配描画用Surface */
 	private Object mSurface;
+	private final boolean mOwnSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private ISurface mTargetSurface;
 	private final float[] mMvpMatrix = new float[16];
@@ -57,28 +58,33 @@ public class RendererTarget {
 	/**
 	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprotected
 	 * @param egl
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 */
 	protected RendererTarget(@NonNull final EGLBase egl, @NonNull final Object surface) {
 		mSurface = surface;
-		if (surface instanceof TextureWrapper) {
+		if (surface instanceof ISurface) {	// IGLSurfaceはISurfaceの子なのでここに含む
+			mTargetSurface = (ISurface)surface;
+			mOwnSurface = false;
+		} else if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
 			mTargetSurface = GLSurface.newInstance(egl.isGLES3(),
 				wrapper.texUnit, wrapper.texId, wrapper.width, wrapper.height);
+			mOwnSurface = true;
 		} else {
 			mTargetSurface = egl.createFromSurface(surface);
+			mOwnSurface = true;
 		}
 		Matrix.setIdentityM(mMvpMatrix, 0);
 	}
 
 	/**
-	 * 生成したEglSurfaceを破棄する
+	 * 生成したEglSurface等を破棄する
 	 */
 	public void release() {
-		if (mTargetSurface != null) {
+		if (mOwnSurface && (mTargetSurface != null)) {
 			mTargetSurface.release();
-			mTargetSurface = null;
 		}
+		mTargetSurface = null;
 		mSurface = null;
 	}
 	
