@@ -19,7 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -56,15 +55,19 @@ public class EffectDrawer2D {
 	private final GLDrawer2D mDrawer;
 	@Nullable
 	private final EffectListener mEffectListener;
+	@NonNull
 	private final SparseArray<float[]> mParams = new SparseArray<float[]>();
 	private int muParamsLoc;
+	@Nullable
 	private float[] mCurrentParams;
 	private int mEffect;
 
 	/**
 	 * コンストラクタ
 	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-	 * @param isOES
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * @param isGLES3	GL|ES3を使って描画するかどうか
+	 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
 	 * @return
 	 */
 	public EffectDrawer2D(final boolean isGLES3, final boolean isOES) {
@@ -74,8 +77,9 @@ public class EffectDrawer2D {
 	/**
 	 * コンストラクタ
 	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-	 * @param isGLES3
-	 * @param isOES
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * @param isGLES3	GL|ES3を使って描画するかどうか
+	 * @param isOES    外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
 	 * @param effectListener
 	 * @return
 	 */
@@ -86,12 +90,11 @@ public class EffectDrawer2D {
 
 	/**
 	 * コンストラクタ
-	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 *
-	 * @param isGLES3
-	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-	 * @param isOES    外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * @param isGLES3	GL|ES3を使って描画するかどうか
+	 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
+	 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
 	 */
 	public EffectDrawer2D(final boolean isGLES3,
 		final float[] vertices, final float[] texcoord,
@@ -102,12 +105,11 @@ public class EffectDrawer2D {
 
 	/**
 	 * コンストラクタ
-	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 *
-	 * @param isGLES3
-	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-	 * @param isOES    外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * @param isGLES3	GL|ES3を使って描画するかどうか
+	 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
+	 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
 	 * @param effectListener
 	 */
 	public EffectDrawer2D(final boolean isGLES3,
@@ -121,6 +123,7 @@ public class EffectDrawer2D {
 	/**
 	 * コンストラクタ
 	 * 既に生成済みのGLDrawer2Dインスタンスを使う時
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param drawer
 	 */
 	public EffectDrawer2D(@NonNull final GLDrawer2D drawer) {
@@ -130,6 +133,7 @@ public class EffectDrawer2D {
 	/**
 	 * コンストラクタ
 	 * 既に生成済みのGLDrawer2Dインスタンスを使う時
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param drawer
 	 * @param effectListener
 	 */
@@ -145,7 +149,6 @@ public class EffectDrawer2D {
 
 	/**
 	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 * IDrawer2Dの実装
 	 */
 	@CallSuper
 	public void release() {
@@ -154,11 +157,19 @@ public class EffectDrawer2D {
 
 	/**
 	 * 外部テクスチャを使うかどうか
-	 * IShaderDrawer2dの実装
 	 * @return
 	 */
 	public boolean isOES() {
 		return mDrawer.isOES();
+	}
+
+	/**
+	 * 内部で保持しているGLDrawer2Dインスタンスを返す
+	 * @return
+	 */
+	@NonNull
+	public GLDrawer2D getDrawer() {
+		return mDrawer;
 	}
 
 	/**
@@ -219,7 +230,7 @@ public class EffectDrawer2D {
 	/**
 	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
 	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
-	 * IDrawer2Dの実装
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param surface
 	 */
 	public void draw(@NonNull final IGLSurface surface) {
@@ -228,6 +239,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 描画処理
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texId
 	 * @param texMatrix
 	 * @param offset
@@ -240,6 +252,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 描画処理
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texId
 	 * @param texMatrix
 	 * @param texOffset
@@ -255,6 +268,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 描画処理
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texUnit
 	 * @param texId
 	 * @param texMatrix
@@ -272,6 +286,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * テクスチャ変換行列をセット
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texMatrix
 	 * @param offset
 	 */
@@ -281,6 +296,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * モデルビュー変換行列をセット
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param mvpMatrix
 	 */
 	protected void updateMvpMatrix(final float[] mvpMatrix, final int offset) {
@@ -289,6 +305,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * テクスチャをバインド
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texId
 	 */
 	protected void bindTexture(final int texId) {
@@ -297,6 +314,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * テクスチャをバインド
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texUnit
 	 * @param texId
 	 */
@@ -306,6 +324,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 頂点座標をセット
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	protected void updateVertices() {
 		mDrawer.updateVertices();
@@ -313,6 +332,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 描画実行
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	protected void drawVertices() {
 		mDrawer.drawVertices();
@@ -320,6 +340,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 描画の後処理
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	protected void finishDraw() {
 		mDrawer.finishDraw();
@@ -328,6 +349,7 @@ public class EffectDrawer2D {
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @return texture ID
 	 */
 	public int initTex() {
@@ -337,6 +359,7 @@ public class EffectDrawer2D {
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param texUnit
 	 * @param filterParam
 	 * @return
@@ -348,6 +371,7 @@ public class EffectDrawer2D {
 	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param hTex
 	 */
 	public void deleteTex(final int hTex) {
@@ -356,7 +380,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーを変更する
-	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * glUseProgramが呼ばれた状態で返る
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
@@ -382,7 +406,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * フラグメントシェーダーを変更する
-	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * glUseProgramが呼ばれた状態で返る
 	 * @param fs フラグメントシェーダー文字列
 	 */
@@ -425,6 +449,7 @@ public class EffectDrawer2D {
 	/**
 	 * アトリビュート変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param name
 	 * @return
 	 */
@@ -444,6 +469,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * glUseProgramが呼ばれた状態で返る
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	public void glUseProgram() {
 		mDrawer.glUseProgram();
@@ -452,6 +478,7 @@ public class EffectDrawer2D {
 	/**
 	 * シェーダープログラム変更時の初期化処理
 	 * glUseProgramが呼ばれた状態で返る
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	protected void init() {
 		mDrawer.init();
@@ -459,6 +486,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * シェーダープログラムが使用可能かどうかをチェック
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param program
 	 * @return
 	 */
@@ -471,6 +499,7 @@ public class EffectDrawer2D {
 	/**
 	 * 映像効果をリセット
 	 * resetShaderのシノニム
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	public void resetEffect() {
 		resetShader();
@@ -478,6 +507,7 @@ public class EffectDrawer2D {
 
 	/**
 	 * 映像効果をセット
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
 	 */
@@ -563,6 +593,7 @@ public class EffectDrawer2D {
 	/**
 	 * 現在選択中の映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param params
 	 */
 	public void setParams(@NonNull final float[] params) {
@@ -572,6 +603,7 @@ public class EffectDrawer2D {
 	/**
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param effect EFFECT_NONより大きいこと
 	 * @param params
 	 * @throws IllegalArgumentException effectが範囲外ならIllegalArgumentException生成
@@ -596,11 +628,8 @@ public class EffectDrawer2D {
 			if (mDrawer != null) {
 				mDrawer.glUseProgram();
 			} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is null");
-			if (mDrawer.isGLES3) {
-				GLES30.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
-			} else {
-				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
-			}
+			// GLES30#glUniform1fvはGLES20の継承メソッドなのでGLES20のを使う
+			GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 		}
 	}
 
