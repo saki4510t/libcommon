@@ -68,7 +68,8 @@ public class RendererTarget {
 		} else if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
 			mTargetSurface = GLSurface.newInstance(egl.isGLES3(),
-				wrapper.texUnit, wrapper.texId, wrapper.width, wrapper.height);
+				wrapper.texTarget,
+				wrapper.texUnit, wrapper.texId, wrapper.width, wrapper.height, false);
 			mOwnSurface = true;
 		} else {
 			mTargetSurface = egl.createFromSurface(surface);
