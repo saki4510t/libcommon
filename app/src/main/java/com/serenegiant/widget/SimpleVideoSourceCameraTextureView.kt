@@ -84,13 +84,14 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				when (mPipeline) {
 					null -> {
 						mPipeline = createPipeline(surface)
-						mVideoSource!!.setPipeline(mPipeline)
+						mVideoSource!!.pipeline = mPipeline
 					}
-					is SurfacePipeline -> {
-						(mPipeline as SurfacePipeline).setSurface(surface, null)
-					}
-					is EffectPipeline -> {
-						(mPipeline as EffectPipeline).setSurface(surface, null)
+					is ISurfacePipeline -> {
+						if (USE_EFFECT_PLUS_SURFACE) {
+							(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
+						} else {
+							(mPipeline as ISurfacePipeline).setSurface(surface, null)
+						}
 					}
 				}
 				mVideoSource!!.resize(width, height)
@@ -142,7 +143,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
 		if (mVideoSource != null) {
-			mVideoSource!!.setPipeline(null)
+			mVideoSource!!.pipeline = null
 		}
 		if (mPipeline != null) {
 			mPipeline!!.release()
@@ -192,24 +193,26 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		when (mPipeline) {
 			null -> {
 				mPipeline = createPipeline(surface)
-				mVideoSource!!.setPipeline(mPipeline)
+				mVideoSource!!.pipeline = mPipeline
 			}
-			is SurfacePipeline -> {
-				(mPipeline as SurfacePipeline).setSurface(surface, null)
-			}
-			is EffectPipeline -> {
-				(mPipeline as EffectPipeline).setSurface(surface, null)
+			is ISurfacePipeline -> {
+				if (USE_EFFECT_PLUS_SURFACE) {
+					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
+				} else {
+					(mPipeline as ISurfacePipeline).setSurface(surface, null)
+				}
 			}
 		}
 	}
 
 	override fun removeSurface(id: Int) {
 		when (mPipeline) {
-			is SurfacePipeline -> {
-				(mPipeline as SurfacePipeline).setSurface(surfaceTexture, null)
-			}
-			is EffectPipeline -> {
-				(mPipeline as EffectPipeline).setSurface(surfaceTexture, null)
+			is ISurfacePipeline -> {
+				if (USE_EFFECT_PLUS_SURFACE) {
+					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
+				} else {
+					(mPipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
+				}
 			}
 		}
 	}
@@ -275,10 +278,19 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * @param surface
 	 */
 	private fun createPipeline(surface: Any?): IPipeline {
-		return if (USE_EFFECT_PIPELINE) {
-			EffectPipeline(mGLManager, surface, null)
-		} else {
-			SurfacePipeline(mGLManager, surface, null)
+		if (DEBUG) Log.v(TAG, "createPipeline:${surface}")
+		return when {
+			USE_EFFECT_PLUS_SURFACE -> {
+				val effect = EffectPipeline(mGLManager)
+				effect.pipeline = SurfacePipeline(mGLManager, surface, null)
+				effect
+			}
+			USE_EFFECT_PIPELINE -> {
+				EffectPipeline(mGLManager, surface, null)
+			}
+			else -> {
+				SurfacePipeline(mGLManager, surface, null)
+			}
 		}
 	}
 
@@ -291,9 +303,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		private const val USE_SHARED_CONTEXT = false
 
 		/**
-		 * EffectPipelineを使うかどうか
+		 * EffectPipelineを使うかどうか(USE_EFFECT_PLUS_SURFACEの方が優先される)
 		 */
 		private const val USE_EFFECT_PIPELINE = true
 
+		/**
+		 * EffectPipelineを使って映像効果付与したあとにSurfacePipelineで描画するかどうか
+ 		 */
+		private const val USE_EFFECT_PLUS_SURFACE = true
 	}
 }

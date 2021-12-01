@@ -32,7 +32,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
-public class EffectPipeline extends ProxyPipeline {
+/**
+ * OpenGL|ESのシェーダーを使って映像効果付与をするIPipeline実装
+ * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のIPipelineへ送る
+ */
 public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
@@ -50,7 +53,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	/**
 	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
 	 */
-	private boolean mEffectOnly;
+	private volatile boolean mEffectOnly;
 	/**
 	 * 映像効果付与してそのまま次のIPipelineへ送る場合のワーク用GLSurface
 	 */
@@ -176,6 +179,15 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	@Override
 	public boolean isValid() {
 		return !mReleased && mManager.isValid();
+	}
+
+	/**
+	 * 映像効果付与をSurfaceへせずに次のIPipelineへ送るだけかどうか
+	 * コンストラクタまたはsetSurfaceで描画先のsurfaceにnullを指定するとtrue
+	 * @return
+	 */
+	public boolean isEffectOnly() {
+		return mEffectOnly;
 	}
 
 	private int cnt;
