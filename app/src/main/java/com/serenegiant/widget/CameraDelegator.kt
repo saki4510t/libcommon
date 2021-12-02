@@ -278,7 +278,7 @@ class CameraDelegator(
 			try {
 				val cameraId = CameraUtils.findCamera(CameraConst.FACING_BACK)
 				camera = Camera.open(cameraId)
-				val params = camera!!.getParameters()
+				val params = camera!!.parameters
 				if (params != null) {
 					val focusModes = params.supportedFocusModes
 					if (focusModes.contains(Camera.Parameters.FOCUS_MODE_CONTINUOUS_VIDEO)) {
@@ -295,9 +295,9 @@ class CameraDelegator(
 					val fps = CameraUtils.chooseFps(params, 1.0f, 120.0f)
 					// rotate camera preview according to the device orientation
 					val degrees = CameraUtils.setupRotation(cameraId, mView, camera!!, params)
-					camera!!.setParameters(params)
+					camera!!.parameters = params
 					// get the actual preview size
-					val previewSize = camera!!.getParameters().previewSize
+					val previewSize = camera!!.parameters.previewSize
 					// 画面の回転状態に合わせてプレビューの映像サイズの縦横を入れ替える
 					if (degrees % 180 == 0) {
 						previewWidth = previewSize.width

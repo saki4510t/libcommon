@@ -154,7 +154,7 @@ class CameraTextureView @JvmOverloads constructor(
 		return false
 	}
 
-	override fun getContentBounds(): RectF? {
+	override fun getContentBounds(): RectF {
 		if (DEBUG) Log.v(TAG, "getContentBounds:")
 		return RectF(0.0f, 0.0f, getVideoWidth().toFloat(), getVideoHeight().toFloat())
 	}

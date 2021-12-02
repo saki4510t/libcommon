@@ -109,7 +109,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
 		if (mVideoSource != null) {
-			mVideoSource!!.setPipeline(null)
+			mVideoSource!!.pipeline = null
 		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
@@ -165,7 +165,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mVideoSource!!)
-			mVideoSource!!.setPipeline(mDistributor)
+			mVideoSource!!.pipeline = mDistributor
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable)
 	}
@@ -344,8 +344,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
 				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight))
 			Matrix.setIdentityM(mMvpMatrix, 0)
-			val scaleMode = mCameraDelegator.scaleMode
-			when (scaleMode) {
+			when (val scaleMode = mCameraDelegator.scaleMode) {
 				CameraDelegator.SCALE_STRETCH_FIT -> {
 				}
 				CameraDelegator.SCALE_KEEP_ASPECT_VIEWPORT -> {
@@ -378,7 +377,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 					val scaleY = viewHeight / videoHeight
 					val scale
 						= if (scaleMode == CameraDelegator.SCALE_CROP_CENTER)
-							Math.max(scaleX, scaleY) else Math.min(scaleX, scaleY)
+							scaleX.coerceAtLeast(scaleY) else scaleX.coerceAtMost(scaleY)
 					val width = scale * videoWidth
 					val height = scale * videoHeight
 					Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",

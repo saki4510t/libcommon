@@ -90,46 +90,45 @@ class ImageFragment: BaseFragment() {
 		mImageView!!.setOnClickListener {
 			v -> if (DEBUG) Log.v(TAG, "onClick:$v")
 		}
-		mImageView!!.setEnableHandleTouchEvent(
-			ViewTransformDelegater.TOUCH_ENABLED_MOVE
-				or ViewTransformDelegater.TOUCH_ENABLED_ZOOM
-				or ViewTransformDelegater.TOUCH_ENABLED_ROTATE
-		)
-		mImageView!!.setViewTransformListener(object: ViewTransformDelegater.ViewTransformListener {
+		mImageView!!.enableHandleTouchEvent = (ViewTransformDelegater.TOUCH_ENABLED_MOVE
+			or ViewTransformDelegater.TOUCH_ENABLED_ZOOM
+			or ViewTransformDelegater.TOUCH_ENABLED_ROTATE)
+		mImageView!!.viewTransformListener = object: ViewTransformDelegater.ViewTransformListener {
 			override fun onStateChanged(view: View, newState: Int) {
 				if (newState == ViewTransformDelegater.STATE_NON) {
 					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")
 				}
 			}
+
 			override fun onTransformed(view: View, transform: Matrix) {
 				if (DEBUG) Log.v(TAG, "onTransformed:${transform}")
 			}
-		})
+		}
 		mImageView!!.setOnGenericMotionListener(object : View.OnGenericMotionListener {
 			override fun onGenericMotion(v: View?, event: MotionEvent?): Boolean {
 				if (MotionEventUtils.isFromSource(event!!, InputDevice.SOURCE_CLASS_POINTER)) {
-					when (event.getAction()) {
+					when (event.action) {
 					MotionEvent.ACTION_HOVER_MOVE -> {
 						if (DEBUG) Log.v(TAG, "onGenericMotion:ACTION_HOVER_MOVE")
 						// process the mouse hover movement...
-						return true;
+						return true
 					}
 					MotionEvent.ACTION_SCROLL -> {
 						if (DEBUG) Log.v(TAG, "onGenericMotion:ACTION_SCROLL")
 						// process the scroll wheel movement...
-						val vScroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
+						val vScroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL)
 						if (vScroll != 0.0f) {
 							mImageView!!.setScaleRelative(1.0f + vScroll.sign / 10.0f)	// 1.1か0.9
 						}
-						return true;
+						return true
 					}
 					}
 				}
-				return false;
+				return false
 			}
 		})
 		if (USU_LOADER_DRAWABLE) {
-			var drawable = mImageView!!.getDrawable()
+			var drawable = mImageView!!.drawable
 			if (drawable !is LoaderDrawable) {
 				drawable = ImageLoaderDrawable(
 					requireContext(), -1, -1)
@@ -177,7 +176,7 @@ class ImageFragment: BaseFragment() {
 			info: MediaInfo,
 			requestWidth: Int, requestHeight: Int): Bitmap {
 
-			var result: Bitmap? = null
+			var result: Bitmap?
 			try {
 				result = BitmapHelper.asBitmap(context.contentResolver, info.id)
 				if (result != null) {
@@ -192,7 +191,7 @@ class ImageFragment: BaseFragment() {
 				}
 			} catch (e: IOException) {
 				if (DEBUG) Log.w(TAG, e)
-				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp);
+				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp)
 			}
 			return result!!
 		}

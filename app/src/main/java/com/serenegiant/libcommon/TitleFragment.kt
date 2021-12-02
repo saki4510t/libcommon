@@ -71,13 +71,12 @@ class TitleFragment: BaseFragment() {
 		// Set the adapter
 		if (view is RecyclerView) {
 			val context = view.getContext()
-			val recyclerView = view
 			if (mColumnCount <= 1) {
-				recyclerView.layoutManager = LinearLayoutManager(context)
+				view.layoutManager = LinearLayoutManager(context)
 			} else {
-				recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
+				view.layoutManager = GridLayoutManager(context, mColumnCount)
 			}
-			recyclerView.adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener)
+			view.adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener)
 		}
 	}
 

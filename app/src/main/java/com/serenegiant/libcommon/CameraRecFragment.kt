@@ -137,7 +137,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 	 * @throws IOException
 	 */
 	@Throws(IOException::class)
-	protected fun createRecorder(outputFile: DocumentFile,
+	private fun createRecorder(outputFile: DocumentFile,
 								 audio_source: Int, audio_channels: Int,
 								 align16: Boolean): Recorder {
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputFile.uri)
@@ -200,16 +200,16 @@ class CameraRecFragment : AbstractCameraFragment() {
 			if (DEBUG) Log.v(TAG, "mRecorderCallback#onStarted:$recorder")
 		}
 
-		override fun onStopped(recorder: IRecorder) {
-			if (DEBUG) Log.v(TAG, "mRecorderCallback#onStopped:$recorder")
+		override fun onStopped(unused: IRecorder) {
+			if (DEBUG) Log.v(TAG, "mRecorderCallback#onStopped:$unused")
 			stopEncoder()
-			val _recorder = mRecorder
+			val recorder = mRecorder
 			mRecorder = null
 			try {
 				queueEvent({
-					if (_recorder != null) {
+					if (recorder != null) {
 						try {
-							_recorder.release()
+							recorder.release()
 						} catch (e: Exception) {
 							Log.w(TAG, e)
 						}

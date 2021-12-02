@@ -54,9 +54,6 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	 * @return
 	 */
 	protected var rendererHolder: IRendererHolder? = null
-		get() {
-			return field
-		}
 		private set
 
 	init {

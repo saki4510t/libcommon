@@ -220,8 +220,8 @@ open class BaseFragment : Fragment() {
 					mToast!!.cancel()
 					mToast = null
 				}
-				val _msg = String.format(msg!!, *args)
-				mToast = Toast.makeText(activity, _msg, duration)
+				val test = String.format(msg!!, *args)
+				mToast = Toast.makeText(activity, test, duration)
 				mToast!!.show()
 			} catch (e: Exception) { // ignore
 			}
@@ -239,8 +239,8 @@ open class BaseFragment : Fragment() {
 					mToast!!.cancel()
 					mToast = null
 				}
-				val _msg = args.let { getString(msg, it) }
-				mToast = Toast.makeText(activity, _msg, duration)
+				val text = args.let { getString(msg, it) }
+				mToast = Toast.makeText(activity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) { // ignore
 			}

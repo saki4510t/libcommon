@@ -37,7 +37,7 @@ class OverlayCameraGLSurfaceView @JvmOverloads constructor(
 		super.onResume()
 		val rendererHolder = rendererHolder
 		if (rendererHolder is OverlayRendererHolder) {
-			(rendererHolder as OverlayRendererHolder).setOverlay(0,
+			rendererHolder.setOverlay(0,
 				BitmapHelper.genMaskImage(0,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 					60, 0, 100))

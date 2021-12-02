@@ -148,7 +148,7 @@ class MainActivity
 			}
 			2 -> {	// NetworkConnection
 				if (!checkPermissionNetwork()) {
-					return;
+					return
 				}
 				fragment = NetworkConnectionFragment.newInstance()
 			}
@@ -527,8 +527,8 @@ class MainActivity
 					mToast!!.cancel()
 					mToast = null
 				}
-				val _msg = if (args != null) String.format(msg!!, *args) else msg!!
-				mToast = Toast.makeText(this@MainActivity, _msg, duration)
+				val text = if (args != null) String.format(msg!!, *args) else msg!!
+				mToast = Toast.makeText(this@MainActivity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) { // ignore
 			}
@@ -546,8 +546,8 @@ class MainActivity
 					mToast!!.cancel()
 					mToast = null
 				}
-				val _msg = args?.let { getString(msg, it) } ?: getString(msg)
-				mToast = Toast.makeText(this@MainActivity, _msg, duration)
+				val text = args?.let { getString(msg, it) } ?: getString(msg)
+				mToast = Toast.makeText(this@MainActivity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) {
 				if (DEBUG) Log.d(TAG, "clearToast", e)

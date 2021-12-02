@@ -43,14 +43,6 @@ class ViewSliderFragment : BaseFragment() {
 		initView(view)
 	}
 
-	override fun internalOnResume() {
-		super.internalOnResume()
-	}
-
-	override fun internalOnPause() {
-		super.internalOnPause()
-	}
-
 	private fun initView(rootView: View) {
 		mRootView = rootView
 		rootView.setOnTouchListener(mOnTouchListener)
@@ -77,7 +69,7 @@ class ViewSliderFragment : BaseFragment() {
 				view.performClick()
 				val width = view.width
 				val height = view.height
-				val left = width / 4;
+				val left = width / 4
 				val top = height / 4
 				val right = width * 3 / 4
 				val bottom = height * 3 / 4

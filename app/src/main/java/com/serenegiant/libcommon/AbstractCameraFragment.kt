@@ -158,17 +158,21 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val scale_mode = mCameraView!!.getScaleMode()
 		if (mCameraView is IScaledView) {
 			mScaleModeView!!.text =
-				if (scale_mode == 0) "keep aspect"
-					else if (scale_mode == 1) "scale to fit"
-					else if (scale_mode == 2) "keep aspect(crop center)"
-					else ""
+				when (scale_mode) {
+					0 -> "keep aspect"
+					1 -> "scale to fit"
+					2 -> "keep aspect(crop center)"
+					else -> ""
+				}
 		} else {
 			mScaleModeView!!.text =
-				if (scale_mode == 0) "scale to fit"
-					else if (scale_mode == 1) "keep aspect(viewport)"
-					else if (scale_mode == 2) "keep aspect(matrix)"
-					else if (scale_mode == 3) "keep aspect(crop center)"
-					else ""
+				when (scale_mode) {
+					0 -> "scale to fit"
+					1 -> "keep aspect(viewport)"
+					2 -> "keep aspect(matrix)"
+					3 -> "keep aspect(crop center)"
+					else -> ""
+				}
 		}
 	}
 
@@ -207,7 +211,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 * but basically this should be called on private thread because prepareing
 	 * of encoder is heavy work
 	 */
-	protected fun startRecording() {
+	private fun startRecording() {
 		if (DEBUG) Log.v(TAG, "startRecording:")
 		mRecordButton!!.setColorFilter(-0x10000) // turn red
 		try {

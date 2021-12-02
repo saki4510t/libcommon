@@ -48,7 +48,6 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	private var mVideoSource: VideoSource? = null
 	private var mDistributor: Distributor? = null
 	private val mMvpMatrix = FloatArray(16)
-	private val mWork = FloatArray(9)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -118,7 +117,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
 		if (mVideoSource != null) {
-			mVideoSource!!.setPipeline(null)
+			mVideoSource!!.pipeline = null
 		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
@@ -194,7 +193,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mVideoSource!!)
-			mVideoSource!!.setPipeline(mDistributor!!)
+			mVideoSource!!.pipeline = mDistributor!!
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable)
 	}
