@@ -22,6 +22,8 @@ import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.serenegiant.math.Fraction;
+
 import androidx.annotation.NonNull;
 
 /**
@@ -241,6 +243,14 @@ public class VideoConfig implements Parcelable, Cloneable {
 	}
 
 	/**
+	 * エンコード時のFPSをFractionとして取得
+	 * @return
+	 */
+	public Fraction getCaptureFps() {
+		return new Fraction(captureFps(), 1);
+	}
+
+	/**
 	 * I-Frameの間隔[秒]@30fpsをセット
 	 * @param iFrameIntervalSecs
 	 * @return
@@ -259,6 +269,14 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 */
 	public int iFrameIntervals() {
 		return (int)mIframeIntervalsS;
+	}
+
+	/**
+	 * I-Frameの間隔[秒]@30fpsを取得
+	 * @return
+	 */
+	public Fraction getIFrameIntervals() {
+		return new Fraction(mIframeIntervalsS);
 	}
 
 	/**
