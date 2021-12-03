@@ -31,13 +31,14 @@ import com.serenegiant.glutils.GLContext
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.glutils.GLManager
 import com.serenegiant.view.ViewTransformDelegater
+import java.lang.IllegalStateException
 
 /**
  * VideoSourceを使ってカメラ映像を受け取りSurfacePipelineで描画処理を行うZoomAspectScaledTextureView/ICameraView実装
  */
 class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: ZoomAspectScaledTextureView(context, attrs, defStyleAttr), ICameraView {
+		: ZoomAspectScaledTextureView(context, attrs, defStyleAttr), ICameraView, IPipelineView {
 
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext
@@ -219,6 +220,20 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun isRecordingSupported(): Boolean {
 		return false
+	}
+
+	/**
+	 * IPipelineViewの実装
+	 */
+	override fun addPipeline(pipeline: IPipeline)  {
+		if (mVideoSource != null) {
+			val last = IPipeline.findLast(mVideoSource!!)
+			if (last != null) {
+				last.pipeline = pipeline
+			}
+		} else {
+			throw IllegalStateException()
+		}
 	}
 
 	fun isEffectSupported(): Boolean {

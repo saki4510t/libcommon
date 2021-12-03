@@ -29,10 +29,12 @@ import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.Distributor
+import com.serenegiant.glpipeline.IPipeline
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
+import java.lang.IllegalStateException
 
 /**
  * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraView実装
@@ -41,7 +43,7 @@ import com.serenegiant.widget.CameraDelegator.ICameraRenderer
  */
 class VideoSourceCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AspectScaledGLView(context, attrs, defStyle), ICameraView {
+		: AspectScaledGLView(context, attrs, defStyle), ICameraView, IPipelineView {
 
 	private val mCameraDelegator: CameraDelegator
 	private val mCameraRenderer: CameraRenderer
@@ -210,6 +212,20 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 	override fun isRecordingSupported(): Boolean {
 		return true
+	}
+
+	/**
+	 * IPipelineViewの実装
+	 */
+	override fun addPipeline(pipeline: IPipeline)  {
+		if (mVideoSource != null) {
+			val last = IPipeline.findLast(mVideoSource!!)
+			if (last != null) {
+				last.pipeline = pipeline
+			}
+		} else {
+			throw IllegalStateException()
+		}
 	}
 
 	/**

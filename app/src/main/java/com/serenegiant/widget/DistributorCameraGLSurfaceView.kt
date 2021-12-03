@@ -30,6 +30,7 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
 import com.serenegiant.glpipeline.Distributor
+import com.serenegiant.glpipeline.IPipeline
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
@@ -37,6 +38,7 @@ import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
+import java.lang.IllegalStateException
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
@@ -46,7 +48,7 @@ import javax.microedition.khronos.opengles.GL10
  */
 class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: GLSurfaceView(context, attrs), ICameraView {
+		: GLSurfaceView(context, attrs), ICameraView, IPipelineView {
 
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
@@ -182,6 +184,20 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 	override fun isRecordingSupported(): Boolean {
 		return true
+	}
+
+	/**
+	 * IPipelineViewの実装
+	 */
+	override fun addPipeline(pipeline: IPipeline)  {
+		if (mVideoSource != null) {
+			val last = IPipeline.findLast(mVideoSource!!)
+			if (last != null) {
+				last.pipeline = pipeline
+			}
+		} else {
+			throw IllegalStateException()
+		}
 	}
 
 	/**
