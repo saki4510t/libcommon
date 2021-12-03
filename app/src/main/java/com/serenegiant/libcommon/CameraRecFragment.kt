@@ -281,7 +281,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 
 	companion object {
 		private const val DEBUG = true // TODO set false on release
-		private val TAG = CameraFragment::class.java.simpleName
+		private val TAG = CameraRecFragment::class.java.simpleName
 
 		fun newInstance(@LayoutRes layoutRes: Int, @StringRes titleRes: Int): CameraRecFragment {
 			val fragment = CameraRecFragment()
