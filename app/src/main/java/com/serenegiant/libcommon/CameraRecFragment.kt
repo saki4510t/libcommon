@@ -5,14 +5,18 @@ import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.Surface
+import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
+import com.serenegiant.glutils.GLEffect
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
+import com.serenegiant.widget.EffectCameraGLSurfaceView
+import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
 import java.io.IOException
 
 /**
@@ -30,6 +34,22 @@ class CameraRecFragment : AbstractCameraFragment() {
 	private var mVideoEncoder: IVideoEncoder? = null
 	@Volatile
 	private var mAudioEncoder: IAudioEncoder? = null
+
+	override fun onLongClick(view: View): Boolean {
+		if (DEBUG) Log.v(TAG, "onLongClick:${view}")
+		if (mCameraView is EffectCameraGLSurfaceView) {
+			val v = view as EffectCameraGLSurfaceView
+			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+			return true
+		} else if (mCameraView is SimpleVideoSourceCameraTextureView) {
+			val v = view as SimpleVideoSourceCameraTextureView
+			if (v.isEffectSupported()) {
+				v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+				return true
+			}
+		}
+		return false
+	}
 
 	override fun isRecording(): Boolean {
 		return mRecorder != null
