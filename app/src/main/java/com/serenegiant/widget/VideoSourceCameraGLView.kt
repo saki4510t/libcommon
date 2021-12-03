@@ -228,6 +228,8 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		}
 	}
 
+	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
+
 	/**
 	 * VideoSourceインスタンスを生成
 	 * @param width

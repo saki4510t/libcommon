@@ -224,6 +224,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	/**
 	 * IPipelineViewの実装
+	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: IPipeline)  {
 		if (mVideoSource != null) {
@@ -234,6 +235,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		} else {
 			throw IllegalStateException()
 		}
+	}
+
+	/**
+	 * IPipelineViewの実装
+	 */
+	override fun getGLManager(): GLManager {
+		return mGLManager
 	}
 
 	fun isEffectSupported(): Boolean {

@@ -200,6 +200,8 @@ class DummyCameraGLView @JvmOverloads constructor(
 		mDistributor!!.addSurface(id, surface, isRecordable)
 	}
 
+	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
+
 	/**
 	 * プレビュー表示用Surfaceを除去
 	 * @param id
@@ -227,6 +229,8 @@ class DummyCameraGLView @JvmOverloads constructor(
 			throw IllegalStateException()
 		}
 	}
+
+	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	/**
 	 * VideoSourceインスタンスを生成
