@@ -69,4 +69,20 @@ public interface IPipeline {
 
 	@WorkerThread
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
+
+	/**
+	 * 指定したIPipelineの一番うしろにつながっているIPipelineを取得する。
+	 * 後ろにつながっているIPipelineがなければ引数のIPipelineを返す
+	 * @param pipeline
+	 * @return
+	 */
+	public static IPipeline findLast(@NonNull final IPipeline pipeline) {
+		final IPipeline next = pipeline.getPipeline();
+		if (next == null) {
+			return pipeline;
+		} else {
+			// 再帰的に呼び出す
+			return findLast(next);
+		}
+	}
 }
