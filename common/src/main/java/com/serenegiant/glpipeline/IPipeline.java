@@ -55,6 +55,20 @@ public interface IPipeline {
 	public int getHeight();
 
 	/**
+	 * 呼び出し元のIPipelineインスタンスを設定する
+	 * @param parent
+	 */
+	public void setParent(@Nullable final IPipeline parent);
+
+	/**
+	 * 呼び出しh元のIPipelineインスタンスを取得する
+	 * nullなら最上位(たぶんIPipelineSource)またはパイプラインに未接続
+	 * @return
+	 */
+	@Nullable
+	public IPipeline getParent();
+
+	/**
 	 * 次に呼び出すIPipelineインスタンスをセットする
 	 * @param pipeline
 	 */
@@ -66,6 +80,12 @@ public interface IPipeline {
 	 */
 	@Nullable
 	public IPipeline getPipeline();
+
+	/**
+	 * パイプラインチェーンから自分自身を取り除く
+	 * 自分が最上位だとすべてのパイプラインが開放される
+	 */
+	public void remove();
 
 	@WorkerThread
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
@@ -85,4 +105,5 @@ public interface IPipeline {
 		}
 		return parent;
 	}
+
 }

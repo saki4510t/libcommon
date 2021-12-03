@@ -144,6 +144,7 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 				}
 			});
 		}
+		super.release();
 	}
 
 	/**

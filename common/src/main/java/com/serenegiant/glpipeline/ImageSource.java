@@ -63,6 +63,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	 * @param fps
 	 */
 	public ImageSource(@NonNull final GLManager manager, @Nullable final Bitmap bitmap, final Fraction fps) {
+		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
 		mManager = manager;
 		if (bitmap != null) {

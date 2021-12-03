@@ -20,6 +20,7 @@ package com.serenegiant.glpipeline;
 
 import android.util.Log;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -36,6 +37,8 @@ public class ProxyPipeline implements IPipeline {
 	@NonNull
 	private final Object mSync = new Object();
 	private int mWidth, mHeight;
+	@Nullable
+	private IPipeline mParent;
 	@Nullable
 	private IPipeline mPipeline;
 
@@ -71,11 +74,13 @@ public class ProxyPipeline implements IPipeline {
 		}
 	}
 
+	@CallSuper
 	@Override
 	public void release() {
 		// do nothing
 	}
 
+	@CallSuper
 	@Override
 	public void resize(final int width, final int height) throws IllegalStateException {
 		mWidth = width;
@@ -101,12 +106,32 @@ public class ProxyPipeline implements IPipeline {
 		return mHeight;
 	}
 
+	/**
+	 * 呼び出し元のIPipelineインスタンスを設定する
+	 * @param parent
+	 */
+	@CallSuper
+	public void setParent(@Nullable final IPipeline parent) {
+		synchronized (mSync) {
+			mParent = parent;
+		}
+	}
+	@Nullable
+	@Override
+	public IPipeline getParent() {
+		synchronized (mSync) {
+			return mParent;
+		}
+	}
+
+	@CallSuper
 	@Override
 	public void setPipeline(@Nullable final IPipeline pipeline) {
 		synchronized (mSync) {
 			mPipeline = pipeline;
 		}
 		if (pipeline != null) {
+			pipeline.setParent(this);
 			pipeline.resize(mWidth, mHeight);
 		}
 	}
@@ -118,6 +143,19 @@ public class ProxyPipeline implements IPipeline {
 		}
 	}
 
+	@CallSuper
+	@Override
+	public void remove() {
+		synchronized (mSync) {
+			if (mParent != null) {
+				mParent.setPipeline(mPipeline);
+			}
+			mParent = null;
+			mPipeline = null;
+		}
+	}
+
+	@CallSuper
 	@Override
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		final IPipeline pipeline;
