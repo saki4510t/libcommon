@@ -40,7 +40,7 @@ import static com.serenegiant.glutils.IRendererCommon.*;
  * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
  * 分配描画が必要ない場合または分配先が少ない場合はSurfacePipelineの方が負荷が少ないかもしれない
  */
-public class Distributor implements IPipeline {
+public class Distributor extends ProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = Distributor.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "Distributor";
@@ -77,6 +77,7 @@ public class Distributor implements IPipeline {
 	public Distributor(@NonNull final IPipelineSource source,
 		final boolean useSharedContext) {
 
+		super();
 		mSource = source;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
@@ -110,6 +111,7 @@ public class Distributor implements IPipeline {
 	@Override
 	public void release() {
 		mDistributeTask.release();
+		super.release();
 	}
 
 	@NonNull
@@ -127,6 +129,7 @@ public class Distributor implements IPipeline {
 	public void resize(final int width, final int height)
 		throws IllegalStateException {
 
+		super.resize(width, height);
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		if ((width > 0) && (height > 0)) {
 			mDistributeTask.resize(width, height);
@@ -135,40 +138,14 @@ public class Distributor implements IPipeline {
 
 	@Override
 	public boolean isValid() {
-		return mManager.isValid();
-	}
-
-	/**
-	 * 分配描画のサイズ(幅)を取得
-	 * @return
-	 */
-	@Override
-	public int getWidth() {
-		return mDistributeTask.width();
-	}
-
-	/**
-	 * 分配描画のサイズ(高さ)を取得
-	 * @return
-	 */
-	@Override
-	public int getHeight() {
-		return mDistributeTask.height();
-	}
-
-	@Override
-	public void setPipeline(@Nullable final IPipeline pipeline) {
-		throw new UnsupportedOperationException("Distributor does not support #setPipeline/#getPipeline, use #addSurface/#removeSurface instead.");
-	}
-
-	@Nullable
-	public IPipeline getPipeline() {
-		throw new UnsupportedOperationException("Distributor does not support #setPipeline/#getPipeline, use #addSurface/#removeSurface instead.");
+		// 継承元のProxyPipelineは常にtrueを返す
+		return mDistributeTask.isRunning();
 	}
 
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+		super.onFrameAvailable(isOES, texId, texMatrix);
 		mDistributeTask.requestFrame(isOES, texId, texMatrix);
 	}
 
