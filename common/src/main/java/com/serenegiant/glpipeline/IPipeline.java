@@ -77,12 +77,12 @@ public interface IPipeline {
 	 * @return
 	 */
 	public static IPipeline findLast(@NonNull final IPipeline pipeline) {
-		final IPipeline next = pipeline.getPipeline();
-		if (next == null) {
-			return pipeline;
-		} else {
-			// 再帰的に呼び出す
-			return findLast(next);
+		IPipeline parent = pipeline;
+		IPipeline next = parent.getPipeline();
+		while (next != null) {
+			parent = next;
+			next = parent.getPipeline();
 		}
+		return parent;
 	}
 }
