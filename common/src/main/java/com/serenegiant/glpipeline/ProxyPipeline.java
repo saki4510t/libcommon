@@ -63,6 +63,15 @@ public class ProxyPipeline implements IPipeline {
 	}
 
 	@Override
+	protected void finalize() throws Throwable {
+		try {
+			release();
+		} finally {
+			super.finalize();
+		}
+	}
+
+	@Override
 	public void release() {
 		// do nothing
 	}
