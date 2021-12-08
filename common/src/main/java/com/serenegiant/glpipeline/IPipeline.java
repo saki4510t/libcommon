@@ -106,4 +106,22 @@ public interface IPipeline {
 		return parent;
 	}
 
+	/**
+	 * 指定したIPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
+	 * @param root
+	 * @return
+	 */
+	public static String pipelineString(@NonNull final IPipeline root) {
+		final StringBuilder sb = new StringBuilder("[");
+		IPipeline pipeline = root;
+		while (pipeline != null) {
+			if (pipeline != root) {
+				sb.append(',');
+			}
+			sb.append(pipeline);
+			pipeline = pipeline.getPipeline();
+		}
+		sb.append("]");
+		return sb.toString();
+	}
 }
