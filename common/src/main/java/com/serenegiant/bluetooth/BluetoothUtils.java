@@ -35,6 +35,7 @@ public class BluetoothUtils {
 
 	@NonNull
 	private final ActivityResultLauncher<Intent> mLauncher;
+	private boolean requestBluetooth;
 
 	/**
 	 * コンストラクタ
@@ -48,6 +49,7 @@ public class BluetoothUtils {
 
 		mLauncher = activity.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
 			result -> {
+				requestBluetooth = false;
 				callback.onChanged(isEnabled());
 			});
 	}
@@ -64,6 +66,7 @@ public class BluetoothUtils {
 
 		mLauncher = fragment.registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
 			result -> {
+				requestBluetooth = false;
 				callback.onChanged(isEnabled());
 			});
 	}
@@ -73,7 +76,8 @@ public class BluetoothUtils {
 	 * @return true: Bluetoothが有効, false: Bluetoothが無効
 	 */
 	public boolean requestEnable() {
-		if (isAvailable() && !isEnabled()) {
+		if (isAvailable() && !isEnabled() && !requestBluetooth) {
+			requestBluetooth = true;
 			mLauncher.launch(new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE));
 		}
 		return isEnabled();
@@ -87,6 +91,7 @@ public class BluetoothUtils {
 	 */
 	public boolean requestDisable() {
 		if (isEnabled()) {
+			requestBluetooth = true;
 			mLauncher.launch(new Intent(ACTION_REQUEST_DISABLE));
 		}
 		return isEnabled();
