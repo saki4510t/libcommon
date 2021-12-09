@@ -24,6 +24,8 @@ import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -281,5 +283,55 @@ public class BufferHelper {
 			sb.append(HEX[0x0f & b]);
 		}
 		return sb.toString();
+	}
+
+	/**
+	 * 指定したbyte配列が指定したサイズ以上になるようにする
+	 * 引数のbyte配列がnullまたは指定したサイズよりも小さい場合には新しいbyte配列を生成して返す
+	 * @param buffer
+	 * @param newSize
+	 * @return
+	 */
+	@NonNull
+	public static byte[] resize(@Nullable final byte[] buffer, final int newSize) {
+		byte[] result = buffer;
+		if ((result == null) || (result.length < newSize)) {
+			result = new byte[newSize];
+		}
+		return result;
+	}
+
+	/**
+	 * 指定したByteBufferが指定したサイズ以上になるようにする
+	 * 引数のByteBufferがnullまたは指定したサイズよりも小さい場合には新しいByteBufferを生成して返す
+	 * @param buffer
+	 * @param newSize
+	 * @return
+	 */
+	@NonNull
+	public static ByteBuffer resize(@Nullable final ByteBuffer buffer, final int newSize) {
+		ByteBuffer result = buffer;
+		if ((result == null) || (result.capacity() < newSize)) {
+			result = ByteBuffer.allocate(newSize);
+		}
+		result.clear();
+		return result;
+	}
+
+	/**
+	 * 指定したByteBufferが指定したサイズ以上になるようにする
+	 * 引数のByteBufferがnullまたは指定したサイズよりも小さい場合には新しいダイレクトByteBufferを生成して返す
+	 * @param buffer
+	 * @param newSize
+	 * @return
+	 */
+	@NonNull
+	public static ByteBuffer resizeDirect(@Nullable final ByteBuffer buffer, final int newSize) {
+		ByteBuffer result = buffer;
+		if ((result == null) || (result.capacity() < newSize)) {
+			result = ByteBuffer.allocateDirect(newSize).order(ByteOrder.nativeOrder());
+		}
+		result.clear();
+		return result;
 	}
 }
