@@ -160,7 +160,50 @@ public class MediaData {
 			mBuffer.flip();
 		}
 	}
-	
+
+	/**
+	 * データをセット(byte配列からコピー)
+	 * @param buffer
+	 * @param presentationTimeUs
+	 */
+	public void set(
+		@Nullable final byte[] buffer,
+		final long presentationTimeUs) {
+
+		set(0, buffer, 0, buffer != null ? buffer.length : 0, presentationTimeUs, 0);
+	}
+
+	/**
+	 * データをセット(byte配列からコピー)
+	 * bufferのoffsetからoffset+size分をコピーする。
+	 * ここで指定したオフセット値は保持されず#getでバッファの内容を取得する際には
+	 * オフセットは必ず0になる
+	 * @param trackIx
+	 * @param buffer
+	 * @param offset
+	 * @param size
+	 * @param presentationTimeUs
+	 * @param flags
+	 */
+	public void set(
+		final int trackIx,
+		@Nullable final byte[] buffer,
+		@IntRange(from=0) final int offset,
+		@IntRange(from=0)final int size,
+		final long presentationTimeUs, final int flags) {
+
+		final int _size = Math.min(buffer != null ? buffer.length : 0, size);
+		mTrackIx = trackIx;
+		mPresentationTimeUs = presentationTimeUs;
+		mSize = _size;
+		mFlags = flags;
+		resize(_size);
+		if ((buffer != null) && (_size > offset)) {
+			mBuffer.put(buffer, offset, _size);
+			mBuffer.flip();
+		}
+	}
+
 	/**
 	 * データをセット
 	 * @param buffer
