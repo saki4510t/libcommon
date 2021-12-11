@@ -132,8 +132,15 @@ public class OrientationSeekbar extends AppCompatSeekBar {
 			isHorizontal ? getMeasuredHeight() : getMeasuredWidth());
 	}
 
+	/**
+	 * 一般的にはonDrawをoverrideすべきなんだけど、onDrawをoverrideしただけだと
+	 * canvasへ回転＆平行移動がthumbを手動で操作したときに表示される薄い丸へ適用されない
+	 * (canvasを回転していないのと同じところ=Viewの外側に表示されてしまう)ので
+	 * draw自体をoverrideしてcanvasへ回転と平行移動を適用してからsuper.drawｗ呼び出す
+	 * @param canvas
+	 */
 	@Override
-	protected void onDraw(final Canvas canvas) {
+	public void draw(final Canvas canvas) {
 		final boolean isHorizontal = mOrientation == HORIZONTAL;
 		final float w = isHorizontal ? getWidth() : getHeight();
 		final float h = isHorizontal ? getHeight() : getWidth();
@@ -155,7 +162,7 @@ public class OrientationSeekbar extends AppCompatSeekBar {
 			mDebugPaint.setColor(0x3f00ff00);
 			canvas.drawRect(0, 0, w, h, mDebugPaint);
 		}
-		super.onDraw(canvas);
+		super.draw(canvas);
 	}
 
 	private int lastProgress = 0;
