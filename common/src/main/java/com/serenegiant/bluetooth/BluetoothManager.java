@@ -18,6 +18,7 @@ package com.serenegiant.bluetooth;
  *  limitations under the License.
 */
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Fragment;
@@ -33,6 +34,8 @@ import android.os.Build;
 import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
+
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -307,6 +310,7 @@ public class BluetoothManager {
 	 * @param secureProfileUUID 接続に使用するプロトコル(プロファイル)を識別するためのUUID。セキュア接続用。Android同士でつなぐなら任意で可。PC等のBluetoothシリアル通信を行うならUUID_SPPを使う
 	 * @param callback
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	public BluetoothManager(@NonNull final Context context, final String name,
 		@NonNull final UUID secureProfileUUID,
 		@NonNull final BluetoothManagerCallback callback) {
@@ -322,6 +326,7 @@ public class BluetoothManager {
 	 * @param inSecureProfileUUID 接続に使用するプロトコル(プロファイル)を識別するためのUUID。インセキュア接続用。Android同士でつなぐなら任意で可。PC等のBluetoothシリアル通信を行うならUUID_SPPを使う nullならsecureProfileUUIDを使う
 	 * @param callback
 	 */
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	public BluetoothManager(@NonNull final Context context, final String name,
 		@NonNull final UUID secureProfileUUID,
 		@Nullable final UUID inSecureProfileUUID,

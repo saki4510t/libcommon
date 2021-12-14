@@ -18,11 +18,15 @@ package com.serenegiant.bluetooth;
  *  limitations under the License.
 */
 
+import android.Manifest;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresPermission;
 
 /**
  * Created by saki on 16/08/31.
@@ -51,6 +55,7 @@ public class BluetoothDeviceInfo implements Parcelable {
 	 */
 	public final int bondState;
 
+	@RequiresPermission(Manifest.permission.BLUETOOTH)
 	/*package*/BluetoothDeviceInfo(final BluetoothDevice device) {
 		name = device.getName();
 		address =  device.getAddress();
@@ -95,6 +100,7 @@ public class BluetoothDeviceInfo implements Parcelable {
 		parcel.writeInt(bondState);
 	}
 
+	@NonNull
 	@Override
 	public String toString() {
 		return String.format("BluetoothDeviceInfo(%s/%s)", name, address);
