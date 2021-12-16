@@ -263,7 +263,22 @@ public final class PermissionCheck {
 	/**
 	 * AndroidManifest.xmlに設定されているはずのパーミッションをチェックする
 	 * @param context
-	 * @param expectations
+	 * @return 空リストなら全てのパーミッションが入っていた,
+	 * @throws IllegalArgumentException
+	 * @throws PackageManager.NameNotFoundException
+	 */
+	@NonNull
+	public static List<String> missingPermissions(
+		@NonNull final Context context)
+			throws IllegalArgumentException, PackageManager.NameNotFoundException {
+
+	    return missingPermissions(context, requestedPermissions(context));
+	}
+
+	/**
+	 * AndroidManifest.xmlに設定されているはずのパーミッションをチェックする
+	 * @param context
+	 * @param expectations 確認するパーミッション文字列配列
 	 * @return 空リストなら全てのパーミッションが入っていた,
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
@@ -280,7 +295,7 @@ public final class PermissionCheck {
 	/**
 	 * AndroidManifest.xmlに設定されているはずのパーミッションをチェックする
 	 * @param context
-	 * @param expectations
+	 * @param expectations 確認するパーミッション文字列配列
 	 * @return 空リストなら全てのパーミッションが入っていた,
 	 * @throws IllegalArgumentException
 	 * @throws PackageManager.NameNotFoundException
@@ -295,10 +310,12 @@ public final class PermissionCheck {
 		final PackageInfo pi = pm.getPackageInfo(
 			context.getPackageName(), PackageManager.GET_PERMISSIONS);
 		final List<String> result = new ArrayList<>(expectations);
-		final String[] info = pi.requestedPermissions;
-		if (info != null) {
-			for (String i : info) {
-				result.remove(i);
+		final String[] permissions = pi.requestedPermissions;
+		if ((permissions != null) && (permissions.length > 0)) {
+			for (String permission : permissions) {
+				if (hasPermission(context, permission)) {
+					result.remove(permission);
+				}
 			}
 		}
 		return result;
