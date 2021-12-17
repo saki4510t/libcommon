@@ -25,15 +25,12 @@ import android.opengl.GLES20
 import android.opengl.Matrix
 import android.util.AttributeSet
 import android.util.Log
-import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipeline
-import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.ImageSource
-import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.R
@@ -222,38 +219,17 @@ class DummyCameraGLView @JvmOverloads constructor(
 	override fun addPipeline(pipeline: IPipeline)  {
 		if (mImageSource != null) {
 			val last = IPipeline.findLast(mImageSource!!)
+			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			if (last != null) {
 				last.pipeline = pipeline
 			}
+			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mImageSource!!))
 		} else {
 			throw IllegalStateException()
 		}
 	}
 
 	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
-
-	/**
-	 * VideoSourceインスタンスを生成
-	 * @param width
-	 * @param height
-	 * @return
-	 */
-	private fun createVideoSource(
-		width: Int, height: Int): VideoSource {
-
-		return VideoSource(getGLManager(), width, height,
-			object : PipelineSourceCallback {
-
-				override fun onCreate(surface: Surface) {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
-				}
-
-				override fun onDestroy() {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
-				}
-			}
-			, USE_SHARED_CONTEXT)
-	}
 
 	private var mDrawer: GLDrawer2D? = null
 	private var cnt2 = 0
