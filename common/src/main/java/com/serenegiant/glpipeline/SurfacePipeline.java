@@ -26,6 +26,7 @@ import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.math.Fraction;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -99,21 +100,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 		if (DEBUG) Log.v(TAG, "release:");
 		if (!mReleased) {
 			mReleased = true;
-			mManager.runOnGLThread(new Runnable() {
-				@Override
-				public void run() {
-					synchronized (mSync) {
-						if (mDrawer != null) {
-							mDrawer.release();
-							mDrawer = null;
-						}
-						if (mRendererTarget != null) {
-							mRendererTarget.release();
-							mRendererTarget = null;
-						}
-					}
-				}
-			});
+			releaseTarget();
 		}
 		super.release();
 	}
@@ -179,6 +166,13 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 		return !mReleased && mManager.isValid();
 	}
 
+	@CallSuper
+	@Override
+	public void remove() {
+		releaseTarget();
+		super.remove();
+	}
+
 	private int cnt;
 	@WorkerThread
 	@Override
@@ -189,9 +183,11 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 				if ((mRendererTarget != null)
 					&& mRendererTarget.isEnabled()
 					&& mRendererTarget.isValid()) {
-					if (isOES != mDrawer.isOES()) {
+					if ((mDrawer == null) || isOES != mDrawer.isOES()) {
 						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-						mDrawer.release();
+						if (mDrawer != null) {
+							mDrawer.release();
+						}
 						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
 					}
 					mRendererTarget.draw(mDrawer, texId, texMatrix);
@@ -199,6 +195,31 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 						Log.v(TAG, "onFrameAvailable:" + cnt);
 					}
 				}
+			}
+		}
+	}
+
+	private void releaseTarget() {
+		if (DEBUG) Log.v(TAG, "releaseTarget:");
+		if (mManager.isValid()) {
+			try {
+				mManager.runOnGLThread(new Runnable() {
+					@Override
+					public void run() {
+						synchronized (mSync) {
+							if (mDrawer != null) {
+								mDrawer.release();
+								mDrawer = null;
+							}
+							if (mRendererTarget != null) {
+								mRendererTarget.release();
+								mRendererTarget = null;
+							}
+						}
+					}
+				});
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
 			}
 		}
 	}
