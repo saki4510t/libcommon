@@ -107,6 +107,22 @@ public interface IPipeline {
 	}
 
 	/**
+	 * 指定したIPipelineの一番前につながっているIPipeline(通常はIPipelineSourceのはず)を取得する。
+	 * 前につながっているIPipelineがなければ引数のIPipelineを返す
+	 * @param pipeline
+	 * @return
+	 */
+	public static IPipeline findFirst(@NonNull final IPipeline pipeline) {
+		IPipeline current = pipeline;
+		IPipeline parent = current.getParent();
+		while (parent != null) {
+			current = parent;
+			parent = current.getParent();
+		}
+		return current;
+	}
+
+	/**
 	 * 指定したIPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
 	 * @param root
 	 * @return
