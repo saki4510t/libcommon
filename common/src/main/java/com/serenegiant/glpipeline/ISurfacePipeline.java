@@ -20,6 +20,7 @@ package com.serenegiant.glpipeline;
 
 import com.serenegiant.math.Fraction;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -62,4 +63,24 @@ public interface ISurfacePipeline extends IPipeline {
 	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
 	 */
 	public int getId();
+
+	/**
+	 * 指定したIPipelineが含まれるパイプラインチェーンから指定したidを持つSurfacePipelineを探す
+	 * @param pipeline
+	 * @param id
+	 * @return 見つかればSurfacePipeline, 見つからなければnull
+	 */
+	@Nullable
+	public static ISurfacePipeline findById(@NonNull final IPipeline pipeline, final int id) {
+		@NonNull
+		IPipeline p = IPipeline.findFirst(pipeline);
+		while (p != null) {
+			if ((p instanceof ISurfacePipeline)
+				&& ((ISurfacePipeline)p).getId() == id) {
+				return (ISurfacePipeline)p;
+			}
+			p = p.getPipeline();
+		}
+		return null;
+	}
 }
