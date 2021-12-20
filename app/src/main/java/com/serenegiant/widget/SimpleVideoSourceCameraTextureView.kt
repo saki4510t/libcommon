@@ -45,7 +45,6 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	private val mGLHandler: Handler
 	private val mCameraDelegator: CameraDelegator
 	private var mVideoSource: VideoSource? = null
-	private var mPipeline: IPipeline? = null
 	var pipelineMode = IPipelineView.PREVIEW_ONLY
 
 	init {
@@ -83,22 +82,26 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 				if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)",
 					width, height))
-				when (mPipeline) {
-					null -> {
-						mPipeline = createPipeline(surface)
-						mVideoSource!!.pipeline = mPipeline
-					}
-					is ISurfacePipeline -> {
-						if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
-							(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
-						} else {
-							(mPipeline as ISurfacePipeline).setSurface(surface, null)
+				val source = mVideoSource
+				if (source != null) {
+					when (val last = IPipeline.findLast(source)) {
+						mVideoSource -> {
+							source.pipeline = createPipeline(surface)
+						}
+						is ISurfacePipeline -> {
+							if (last.hasSurface()) {
+								last.pipeline = SurfacePipeline(mGLManager, surface, null)
+							} else {
+								last.setSurface(surface, null)
+							}
 						}
 					}
+					source.resize(width, height)
+					mCameraDelegator.startPreview(
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+				} else {
+					throw IllegalStateException("already releasded?")
 				}
-				mVideoSource!!.resize(width, height)
-				mCameraDelegator.startPreview(
-					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			}
 
 			override fun onSurfaceTextureSizeChanged(
@@ -113,10 +116,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				surface: SurfaceTexture): Boolean {
 
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureDestroyed:")
-				if (mPipeline is SurfacePipeline) {
-					(mPipeline as SurfacePipeline).setSurface(null)
-				} else if (mPipeline is EffectPipeline) {
-					(mPipeline as EffectPipeline).setSurface(null)
+				val source = mVideoSource
+				if (source != null) {
+					val pipeline = ISurfacePipeline.findById(source, surface.hashCode())
+					if (pipeline != null) {
+						pipeline.remove()
+						pipeline.release()
+					}
 				}
 				return true
 			}
@@ -131,12 +137,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun onDetachedFromWindow() {
-		val pipeline = mPipeline
-		if (pipeline != null) {
-			pipeline.remove()
-			pipeline.release()
-		}
 		val source = mVideoSource
+		mVideoSource = null
 		source?.release()
 		mGLManager.release()
 		super.onDetachedFromWindow()
@@ -156,17 +158,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		if (mVideoSource != null) {
-			mVideoSource!!.pipeline = null
-		}
-		if (mPipeline != null) {
-			mPipeline!!.release()
-			mPipeline = null
-		}
-		if (mVideoSource != null) {
-			mVideoSource!!.release()
-			mVideoSource = null
-		}
+		val source = mVideoSource
+		mVideoSource = null
+		source?.release()
 	}
 
 	override fun setVideoSize(width: Int, height: Int) {
@@ -206,32 +200,32 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
-		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface},pipeline=${mPipeline}")
-		when (mPipeline) {
-			null -> {
-				mPipeline = createPipeline(surface)
-				mVideoSource!!.pipeline = mPipeline
-			}
-			is ISurfacePipeline -> {
-				if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
-					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
-				} else {
-					(mPipeline as ISurfacePipeline).setSurface(surface, null)
+		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
+		val source = mVideoSource
+		if (source != null) {
+			when (val last = IPipeline.findLast(source)) {
+				mVideoSource -> {
+					source.pipeline = createPipeline(surface)
+				}
+				is ISurfacePipeline -> {
+					if (last.hasSurface()) {
+						last.pipeline = SurfacePipeline(mGLManager, surface, null)
+					} else {
+						last.setSurface(surface, null)
+					}
 				}
 			}
+		} else {
+			throw IllegalStateException("already released?")
 		}
 	}
 
 	override fun removeSurface(id: Int) {
-		if (DEBUG) Log.v(TAG, "removeSurface:id=${id},pipeline=${mPipeline}")
-		when (mPipeline) {
-			is ISurfacePipeline -> {
-				if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
-					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
-				} else {
-					(mPipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
-				}
-			}
+		if (DEBUG) Log.v(TAG, "removeSurface:id=${id}")
+		val found = ISurfacePipeline.findById(mVideoSource!!, id)
+		if (found != null) {
+			found.remove()
+			found.release()
 		}
 	}
 
@@ -269,18 +263,24 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	var effect: Int
 	get() {
-		val pipeline = mPipeline
-		if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
-		return if (pipeline is EffectPipeline) pipeline.currentEffect else 0
+		val source = mVideoSource
+		return if (source != null) {
+			val pipeline = EffectPipeline.find(source)
+			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
+			pipeline?.currentEffect ?: 0
+		} else {
+			0
+		}
 	}
 
 	set(effect) {
 		if (DEBUG) Log.v(TAG, "setEffect:$effect")
 		if ((effect >= 0) && (effect < GLEffect.EFFECT_NUM)) {
 			post {
-				val pipeline = mPipeline
-				if (pipeline is EffectPipeline) {
-					pipeline.setEffect(effect)
+				val source = mVideoSource
+				if (source != null) {
+					val pipeline = EffectPipeline.find(source)
+					pipeline?.setEffect(effect)
 				}
 			}
 		}
