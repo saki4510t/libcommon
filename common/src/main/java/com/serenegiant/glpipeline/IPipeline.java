@@ -96,6 +96,7 @@ public interface IPipeline {
 	 * @param pipeline
 	 * @return
 	 */
+	@NonNull
 	public static IPipeline findLast(@NonNull final IPipeline pipeline) {
 		IPipeline parent = pipeline;
 		IPipeline next = parent.getPipeline();
@@ -112,6 +113,7 @@ public interface IPipeline {
 	 * @param pipeline
 	 * @return
 	 */
+	@NonNull
 	public static IPipeline findFirst(@NonNull final IPipeline pipeline) {
 		IPipeline current = pipeline;
 		IPipeline parent = current.getParent();
@@ -127,6 +129,7 @@ public interface IPipeline {
 	 * @param root
 	 * @return
 	 */
+	@NonNull
 	public static String pipelineString(@NonNull final IPipeline root) {
 		final StringBuilder sb = new StringBuilder("[");
 		IPipeline pipeline = root;
