@@ -344,8 +344,10 @@ open class GLView @JvmOverloads constructor(
 	@CallSuper
 	protected fun onSurfaceDestroyed() {
 		if (DEBUG) Log.v(TAG, "onSurfaceDestroyed:")
-		mGLManager.removeFrameCallback(mChoreographerCallback)
-		mGLHandler.removeCallbacksAndMessages(null)
+		if (mGLManager.isValid) {
+			mGLManager.removeFrameCallback(mChoreographerCallback)
+			mGLHandler.removeCallbacksAndMessages(null)
+		}
 		mGLRenderer?.onSurfaceDestroyed()
 		if (mTarget != null) {
 			mTarget!!.release()
