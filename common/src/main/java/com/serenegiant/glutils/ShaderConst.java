@@ -48,12 +48,13 @@ public class ShaderConst {
 	public static final int NO_TEXTURE = -1;
 
 //--------------------------------------------------------------------------------
+	@Deprecated
 	@NonNull
 	public static int[] getTexNumbers(final boolean isGLES3) {
-		return isGLES3 ? TEX_NUMBERS_ES3 : TEX_NUMBERS_ES2;
+		return isGLES3 ? TEX_NUMBERS : TEX_NUMBERS;
 	}
 
-	public static final int[] TEX_NUMBERS_ES2 = {
+	public static final int[] TEX_NUMBERS = {
 		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,
 		GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
 		GLES20.GL_TEXTURE4, GLES20.GL_TEXTURE5,
@@ -72,6 +73,10 @@ public class ShaderConst {
 		GLES20.GL_TEXTURE30, GLES20.GL_TEXTURE31,
 	};
 
+	/**
+	 * ここの定数は実際にはGLES20の継承定数なのでGLES20の値を使うようにする
+	 */
+	@Deprecated
 	public static final int[] TEX_NUMBERS_ES3 = {
 		GLES30.GL_TEXTURE0, GLES30.GL_TEXTURE1,
 		GLES30.GL_TEXTURE2, GLES30.GL_TEXTURE3,

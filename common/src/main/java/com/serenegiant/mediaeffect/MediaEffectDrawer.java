@@ -111,7 +111,7 @@ public class MediaEffectDrawer {
 		 * @param tex_ids texture ID
 		 */
 		protected void bindTexture(@NonNull final int[] tex_ids) {
-			GLES20.glActiveTexture(getTexNumbers(false)[0]);
+			GLES20.glActiveTexture(TEX_NUMBERS[0]);
 			if (tex_ids[0] != NO_TEXTURE) {
 				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
@@ -123,7 +123,7 @@ public class MediaEffectDrawer {
 		 * mSyncはロックされて呼び出される
 		 */
 		protected void unbindTexture() {
-			GLES20.glActiveTexture(getTexNumbers(false)[0]);
+			GLES20.glActiveTexture(TEX_NUMBERS[0]);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}
@@ -299,7 +299,7 @@ public class MediaEffectDrawer {
 			? tex_ids.length : muTexLoc.length;
 		for (int i = 0; i < n; i++) {
 			if (tex_ids[i] != NO_TEXTURE) {
-				GLES20.glActiveTexture(getTexNumbers(false)[i]);
+				GLES20.glActiveTexture(TEX_NUMBERS[i]);
 				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);
 			}
@@ -331,7 +331,7 @@ public class MediaEffectDrawer {
 
 	protected void unbindTexture() {
 		for (int i = 0; i < muTexLoc.length; i++) {
-			GLES20.glActiveTexture(getTexNumbers(false)[i]);
+			GLES20.glActiveTexture(TEX_NUMBERS[i]);
 			GLES20.glBindTexture(mTexTarget, 0);
 		}
 	}
