@@ -35,6 +35,7 @@ import com.serenegiant.service.ServiceRecorder
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
+import com.serenegiant.widget.IPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
 import java.io.IOException
 
@@ -173,11 +174,15 @@ class CameraFragment : AbstractCameraFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraFragment::class.java.simpleName
 
-		fun newInstance(@LayoutRes layoutRes: Int, @StringRes titleRes: Int): CameraFragment {
+		fun newInstance(
+			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
+			pipelineMode: Int = IPipelineView.PREVIEW_ONLY): CameraFragment {
+
 			val fragment = CameraFragment()
 			val args = Bundle()
 			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
 			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
+			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
 			fragment.arguments = args
 			return fragment
 		}

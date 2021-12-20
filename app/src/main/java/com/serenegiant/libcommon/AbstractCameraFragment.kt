@@ -37,9 +37,7 @@ import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.SAFUtils
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.view.ViewUtils
-import com.serenegiant.widget.CameraDelegator
-import com.serenegiant.widget.ICameraView
-import com.serenegiant.widget.IScaledView
+import com.serenegiant.widget.*
 import java.io.IOException
 
 /**
@@ -88,6 +86,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		mRecordButton = view.findViewById(R.id.record_button)
 		mRecordButton!!.setOnClickListener(mOnClickListener)
 		mRecordButton!!.visibility = if (isRecordingSupported()) View.VISIBLE else View.GONE
+		if (mCameraView is SimpleVideoSourceCameraTextureView) {
+			val v = mCameraView as SimpleVideoSourceCameraTextureView
+			v.pipelineMode = pipelineMode
+		}
 	}
 
 	public override fun internalOnResume() {
@@ -126,6 +128,12 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			val args = arguments
 			return args?.getInt(ARGS_KEY_TITLE_ID, R.string.title_camera)
 				?: R.string.title_camera
+		}
+	private val pipelineMode: Int
+		get() {
+			val args = arguments
+			return args?.getInt(ARGS_KEY_PIPELINE_MODE, IPipelineView.PREVIEW_ONLY)
+				?: IPipelineView.PREVIEW_ONLY
 		}
 
 	/**
@@ -291,5 +299,6 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		const val REQUEST_ACCESS_SD = 12345
 		const val ARGS_KEY_LAYOUT_ID = "LAYOUT_ID"
 		const val ARGS_KEY_TITLE_ID = "TITLE_ID"
+		const val ARGS_KEY_PIPELINE_MODE = "PIPELINE_MODE"
 	}
 }

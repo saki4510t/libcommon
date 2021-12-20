@@ -34,6 +34,7 @@ import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
+import com.serenegiant.widget.IPipelineView
 import java.util.*
 
 class MainActivity
@@ -184,7 +185,9 @@ class MainActivity
 					return
 				}
 				fragment = CameraRecFragment.newInstance(
-					R.layout.fragment_simple_video_source_camera, R.string.title_camera_rec_pipeline)
+					R.layout.fragment_simple_video_source_camera, R.string.title_camera_rec_pipeline,
+					IPipelineView.EFFECT_PLUS_SURFACE
+				)
 			}
 			7 -> {	// EffectCamera
 				if (!checkPermissionCamera()

@@ -46,6 +46,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	private val mCameraDelegator: CameraDelegator
 	private var mVideoSource: VideoSource? = null
 	private var mPipeline: IPipeline? = null
+	var pipelineMode = IPipelineView.PREVIEW_ONLY
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -88,7 +89,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						mVideoSource!!.pipeline = mPipeline
 					}
 					is ISurfacePipeline -> {
-						if (USE_EFFECT_PLUS_SURFACE) {
+						if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
 							(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
 						} else {
 							(mPipeline as ISurfacePipeline).setSurface(surface, null)
@@ -198,7 +199,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				mVideoSource!!.pipeline = mPipeline
 			}
 			is ISurfacePipeline -> {
-				if (USE_EFFECT_PLUS_SURFACE) {
+				if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
 					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surface, null)
 				} else {
 					(mPipeline as ISurfacePipeline).setSurface(surface, null)
@@ -211,7 +212,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},pipeline=${mPipeline}")
 		when (mPipeline) {
 			is ISurfacePipeline -> {
-				if (USE_EFFECT_PLUS_SURFACE) {
+				if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
 					(mPipeline!!.pipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
 				} else {
 					(mPipeline as ISurfacePipeline).setSurface(surfaceTexture, null)
@@ -249,7 +250,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	fun isEffectSupported(): Boolean {
-		return USE_EFFECT_PIPELINE
+		return (pipelineMode == IPipelineView.EFFECT_ONLY)
+			|| (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE)
 	}
 
 	var effect: Int
@@ -306,14 +308,14 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 */
 	private fun createPipeline(surface: Any?): IPipeline {
 		if (DEBUG) Log.v(TAG, "createPipeline:${surface}")
-		return when {
-			USE_EFFECT_PLUS_SURFACE -> {
+		return when (pipelineMode) {
+			IPipelineView.EFFECT_PLUS_SURFACE -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
 				val effect = EffectPipeline(mGLManager)
 				effect.pipeline = SurfacePipeline(mGLManager, surface, null)
 				effect
 			}
-			USE_EFFECT_PIPELINE -> {
+			IPipelineView.EFFECT_ONLY -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline")
 				EffectPipeline(mGLManager, surface, null)
 			}
@@ -331,15 +333,5 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 		 */
 		private const val USE_SHARED_CONTEXT = false
-
-		/**
-		 * EffectPipelineを使うかどうか(USE_EFFECT_PLUS_SURFACEの方が優先される)
-		 */
-		private const val USE_EFFECT_PIPELINE = true
-
-		/**
-		 * EffectPipelineを使って映像効果付与したあとにSurfacePipelineで描画するかどうか
- 		 */
-		private const val USE_EFFECT_PLUS_SURFACE = true
 	}
 }

@@ -33,6 +33,7 @@ import com.serenegiant.service.ServiceRecorder
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
+import com.serenegiant.widget.IPipelineView
 import java.io.IOException
 
 class EffectCameraFragment : AbstractCameraFragment() {
@@ -159,11 +160,12 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = EffectCameraFragment::class.java.simpleName
 
-		fun newInstance(): EffectCameraFragment {
+		fun newInstance(pipelineMode: Int = IPipelineView.EFFECT_ONLY): EffectCameraFragment {
 			val fragment = EffectCameraFragment()
 			val args = Bundle()
 			args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_effect)
 			args.putInt(ARGS_KEY_TITLE_ID, R.string.title_effect_camera)
+			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
 			fragment.arguments = args
 			return fragment
 		}

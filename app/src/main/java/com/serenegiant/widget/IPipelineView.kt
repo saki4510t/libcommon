@@ -18,4 +18,11 @@ interface IPipelineView {
 	 * IPipeline/IPipelineSourceの処理に使うGLManagerインスタンスを取得する
 	 */
 	fun getGLManager(): GLManager
+
+	companion object {
+		const val PREVIEW_ONLY = 0
+		const val EFFECT_ONLY = 1
+		const val EFFECT_PLUS_SURFACE = 2
+	}
+
 }

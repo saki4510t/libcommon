@@ -309,11 +309,15 @@ class CameraRecFragment : AbstractCameraFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraRecFragment::class.java.simpleName
 
-		fun newInstance(@LayoutRes layoutRes: Int, @StringRes titleRes: Int): CameraRecFragment {
+		fun newInstance(
+			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
+			pipelineMode: Int = IPipelineView.PREVIEW_ONLY): CameraRecFragment {
+
 			val fragment = CameraRecFragment()
 			val args = Bundle()
 			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
 			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
+			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
 			fragment.arguments = args
 			return fragment
 		}
