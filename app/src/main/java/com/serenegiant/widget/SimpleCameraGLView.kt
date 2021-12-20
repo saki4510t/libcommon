@@ -85,6 +85,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 					mSurfaceTexture!!.getTransformMatrix(mTexMatrix)
 				}
 				mDrawer!!.draw(mTexId, mTexMatrix, 0)
+				mCameraDelegator.callOnFrameAvailable()
 			}
 
 			@SuppressLint("NewApi")
@@ -154,6 +155,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 */
 	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
+		mCameraDelegator.addListener(listener)
 	}
 
 	/**
@@ -162,6 +164,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 */
 	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
+		mCameraDelegator.removeListener(listener)
 	}
 
 	/**

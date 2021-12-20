@@ -176,10 +176,12 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
+		mCameraDelegator.addListener(listener)
 	}
 
 	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
+		mCameraDelegator.removeListener(listener)
 	}
 
 	override fun setScaleMode(mode: Int) {

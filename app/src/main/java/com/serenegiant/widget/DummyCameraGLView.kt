@@ -45,6 +45,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: AspectScaledGLView(context, attrs, defStyle), ICameraView, IPipelineView {
 
+	private var mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener? = null
 	private var mImageSource: ImageSource? = null
 	private var mDistributor: Distributor? = null
 	private val mMvpMatrix = FloatArray(16)
@@ -131,12 +132,14 @@ class DummyCameraGLView @JvmOverloads constructor(
 	 * ICameraViewの実装
 	 */
 	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+		mOnFrameAvailableListener = listener
 	}
 
 	/**
 	 * ICameraViewの実装
 	 */
 	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+		mOnFrameAvailableListener = null
 	}
 
 	/**
@@ -220,9 +223,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		if (mImageSource != null) {
 			val last = IPipeline.findLast(mImageSource!!)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
-			if (last != null) {
-				last.pipeline = pipeline
-			}
+			last.pipeline = pipeline
 			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mImageSource!!))
 		} else {
 			throw IllegalStateException()
@@ -247,6 +248,8 @@ class DummyCameraGLView @JvmOverloads constructor(
 			mDrawer!!.draw(texId, texMatrix, 0)
 			GLES20.glFlush()
 		}
+		val listener = mOnFrameAvailableListener
+		listener?.onFrameAvailable()
 	}
 
 	companion object {

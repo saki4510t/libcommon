@@ -271,6 +271,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			mDrawer!!.draw(texId, texMatrix, 0)
 		}
 		GLES20.glFlush()
+		mCameraDelegator.callOnFrameAvailable()
 	}
 
 	/**
