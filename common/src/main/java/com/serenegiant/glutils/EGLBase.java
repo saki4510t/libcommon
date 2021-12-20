@@ -165,12 +165,14 @@ public abstract class EGLBase implements EGLConst {
 	 * 既存のレンダリングコンテキストを共有して新しいレンダリングコンテキストを生成する
 	 * レンダリングコンテキストを存在していなければcreateFromでsharedContextに
 	 * nullを渡したのと同じで独立したレンダリングコンテキストを生成する
+	 * XXX 処理としてはcreateFromCurrentとほぼ同じだけどcreateFromCurrentは描画先のeglSurfaceもチェックする
 	 * @param maxClientVersion
 	 * @param withDepthBuffer
 	 * @param stencilBits
 	 * @param isRecordable
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static EGLBase createShared(final int maxClientVersion,
 		final boolean withDepthBuffer,
@@ -190,6 +192,7 @@ public abstract class EGLBase implements EGLConst {
 	 * 新しいレンダリングコンテキストを生成する
 	 * 既存のレンダリングコンテキストが存在していなければ独立したレンダリングコンテキストを
 	 * 生成する
+	 * XXX 処理としてはcreateSharedとほぼ同じだけどcreateFromCurrentは描画先のeglSurfaceもチェックする
 	 * @param maxClientVersion
 	 * @param withDepthBuffer
 	 * @param stencilBits
@@ -198,7 +201,8 @@ public abstract class EGLBase implements EGLConst {
 	 */
 	@SuppressLint("NewApi")
 	public static EGLBase createFromCurrent(final int maxClientVersion,
-		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
+		final boolean withDepthBuffer,
+		final int stencilBits, final boolean isRecordable) {
 
 		if (isEGL14Supported()) {
 			return EGLBase14.createFromCurrentImpl(maxClientVersion,
