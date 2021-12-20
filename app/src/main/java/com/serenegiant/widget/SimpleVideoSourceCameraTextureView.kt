@@ -83,23 +83,12 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureAvailable:(${width}x${height})")
 				val source = mVideoSource
 				if (source != null) {
-					when (val last = IPipeline.findLast(source)) {
-						mVideoSource -> {
-							source.pipeline = createPipeline(surface)
-						}
-						is ISurfacePipeline -> {
-							if (last.hasSurface()) {
-								last.pipeline = SurfacePipeline(mGLManager, surface, null)
-							} else {
-								last.setSurface(surface, null)
-							}
-						}
-					}
+					addSurface(surface.hashCode(), surface, false)
 					source.resize(width, height)
 					mCameraDelegator.startPreview(
 						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 				} else {
-					throw IllegalStateException("already releasded?")
+					throw IllegalStateException("already released?")
 				}
 			}
 
