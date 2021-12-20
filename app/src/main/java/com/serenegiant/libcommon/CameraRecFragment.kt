@@ -139,10 +139,11 @@ class CameraRecFragment : AbstractCameraFragment() {
 	}
 
 	private fun stopEncoder() {
-		if (DEBUG) Log.v(TAG, "stopEncoder:")
-		if (mEncoderSurface != null) {
-			removeSurface(mEncoderSurface)
-			mEncoderSurface = null
+		if (DEBUG) Log.v(TAG, "stopEncoder:surface=${mEncoderSurface}")
+		val surface = mEncoderSurface
+		mEncoderSurface = null
+		if (surface != null) {
+			removeSurface(surface)
 		}
 		if (mVideoEncoder is IPipeline) {
 			if (DEBUG) Log.v(TAG, "stopEncoder:remove Encoder from pipeline chains,${mVideoEncoder}")
@@ -151,10 +152,9 @@ class CameraRecFragment : AbstractCameraFragment() {
 		}
 		mVideoEncoder = null
 		mAudioEncoder = null
-		if (mAudioSampler != null) {
-			mAudioSampler!!.release()
-			mAudioSampler = null
-		}
+		val sampler = mAudioSampler
+		mAudioSampler = null
+		sampler?.release()
 		if (DEBUG) Log.v(TAG, "stopEncoder:finished")
 	}
 
