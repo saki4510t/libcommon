@@ -130,6 +130,18 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		}
 	}
 
+	override fun onDetachedFromWindow() {
+		val pipeline = mPipeline
+		if (pipeline != null) {
+			pipeline.remove()
+			pipeline.release()
+		}
+		val source = mVideoSource
+		source?.release()
+		mGLManager.release()
+		super.onDetachedFromWindow()
+	}
+
 	override fun getView() : View {
 		return this
 	}

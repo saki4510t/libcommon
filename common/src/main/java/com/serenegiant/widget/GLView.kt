@@ -127,6 +127,11 @@ open class GLView @JvmOverloads constructor(
 		})
 	}
 
+	override fun onDetachedFromWindow() {
+		mGLManager.release()
+		super.onDetachedFromWindow()
+	}
+
 	/**
 	 * OpenGL|ES3.xが使用可能かどうかを取得
 	 */

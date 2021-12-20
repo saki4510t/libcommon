@@ -93,6 +93,11 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		})
 	}
 
+	override fun onDetachedFromWindow() {
+		mGLManager.release()
+		super.onDetachedFromWindow()
+	}
+
 	override fun getView() : View {
 		return this
 	}
