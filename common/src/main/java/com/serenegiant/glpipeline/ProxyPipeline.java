@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
  * IPipelineのインターフェースメソッドの中継をするだけのIPipeline実装
  */
 public class ProxyPipeline implements IPipeline {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = ProxyPipeline.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;
@@ -77,10 +77,12 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void release() {
+		if (DEBUG) Log.v(TAG, "release:" + this);
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 			mPipeline = null;
+			mParent = null;
 		}
 		if (pipeline != null) {
 			pipeline.release();
@@ -119,6 +121,7 @@ public class ProxyPipeline implements IPipeline {
 	 */
 	@CallSuper
 	public void setParent(@Nullable final IPipeline parent) {
+		if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
 		synchronized (mSync) {
 			mParent = parent;
 		}
@@ -134,6 +137,7 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void setPipeline(@Nullable final IPipeline pipeline) {
+		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
 		synchronized (mSync) {
 			mPipeline = pipeline;
 		}
@@ -153,6 +157,7 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void remove() {
+		if (DEBUG) Log.v(TAG, "remove:" + this);
 		synchronized (mSync) {
 			if (mParent != null) {
 				mParent.setPipeline(mPipeline);

@@ -91,12 +91,14 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	public void release() {
 		if (!mReleased) {
 			mReleased = true;
+			if (DEBUG) Log.v(TAG, "release:");
 			releaseTarget();
 		}
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 			mPipeline = null;
+			mParent = null;
 		}
 		if (pipeline != null) {
 			pipeline.release();
@@ -130,6 +132,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 
 	@Override
 	public void setParent(@Nullable final IPipeline parent) {
+		if (DEBUG) Log.v(TAG, "setParent:" + parent);
 		synchronized (mSync) {
 			mParent = parent;
 		}
@@ -149,6 +152,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	 */
 	@Override
 	public void setPipeline(@Nullable final IPipeline pipeline) {
+		if (DEBUG) Log.v(TAG, "setPipeline:" + pipeline);
 		synchronized (mSync) {
 			mPipeline = pipeline;
 		}
@@ -171,6 +175,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 
 	@Override
 	public void remove() {
+		if (DEBUG) Log.v(TAG, "remove:");
 		synchronized (mSync) {
 			if (mParent != null) {
 				mParent.setPipeline(mPipeline);

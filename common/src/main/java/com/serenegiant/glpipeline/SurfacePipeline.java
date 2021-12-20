@@ -169,6 +169,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 	@CallSuper
 	@Override
 	public void remove() {
+		if (DEBUG) Log.v(TAG, "remove:");
 		releaseTarget();
 		super.remove();
 	}
