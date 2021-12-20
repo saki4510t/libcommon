@@ -188,6 +188,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 						if (mDrawer != null) {
 							mDrawer.release();
 						}
+						if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
 					}
 					mRendererTarget.draw(mDrawer, texId, texMatrix);
