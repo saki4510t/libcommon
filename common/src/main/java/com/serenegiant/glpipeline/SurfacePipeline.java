@@ -186,6 +186,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 	 * セットされているSurface識別用のidを取得
 	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
 	 */
+	@Override
 	public int getId() {
 		synchronized (mSync) {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;

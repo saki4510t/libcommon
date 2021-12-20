@@ -56,4 +56,10 @@ public interface ISurfacePipeline extends IPipeline {
 	 * @return
 	 */
 	public boolean hasSurface();
+
+	/**
+	 * セットされているSurface識別用のidを取得
+	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
+	 */
+	public int getId();
 }

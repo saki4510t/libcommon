@@ -168,6 +168,17 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 		}
 	}
 
+	/**
+	 * セットされているSurface識別用のidを取得
+	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
+	 */
+	@Override
+	public int getId() {
+		synchronized (mSync) {
+			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		}
+	}
+
 	@Override
 	public boolean isValid() {
 		// super#isValidはProxyPipelineなので常にtrueを返す
