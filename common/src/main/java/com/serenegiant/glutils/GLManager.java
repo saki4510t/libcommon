@@ -87,6 +87,20 @@ public class GLManager {
 	}
 
 	/**
+	 * 他のGLManagerの共有コンテキストを保持するGLManagerを生成するためのコンストラクタ
+	 * @param manager
+	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
+	 */
+	public GLManager(@NonNull final GLManager manager,
+		@Nullable final Handler.Callback callback) {
+
+		this(manager.getGLContext().getMaxClientVersion(),
+			manager.getGLContext().getContext(),
+			manager.getGLContext().getFlags(),
+			callback);
+	}
+
+	/**
 	 * コンストラクタ
 	 * @param maxClientVersion
 	 * @param sharedContext 共有コンテキストを使わない場合はnull
