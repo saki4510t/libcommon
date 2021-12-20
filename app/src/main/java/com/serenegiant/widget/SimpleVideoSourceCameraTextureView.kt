@@ -69,7 +69,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				}
 
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
-					if (DEBUG) Log.v(TAG, String.format("onPreviewSizeChanged:(%dx%d)", width, height))
+					if (DEBUG) Log.v(TAG, "onPreviewSizeChanged:(${width}x${height})")
 					mVideoSource!!.resize(width, height)
 					setAspectRatio(width, height)
 				}
@@ -80,8 +80,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			override fun onSurfaceTextureAvailable(
 				surface: SurfaceTexture, width: Int, height: Int) {
 
-				if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureAvailable:(%dx%d)",
-					width, height))
+				if (DEBUG) Log.v(TAG, "onSurfaceTextureAvailable:(${width}x${height})")
 				val source = mVideoSource
 				if (source != null) {
 					when (val last = IPipeline.findLast(source)) {
@@ -108,8 +107,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				surface: SurfaceTexture,
 				width: Int, height: Int) {
 
-				if (DEBUG) Log.v(TAG, String.format("onSurfaceTextureSizeChanged:(%dx%d)",
-					width, height))
+				if (DEBUG) Log.v(TAG, "onSurfaceTextureSizeChanged:(${width}x${height})")
 			}
 
 			override fun onSurfaceTextureDestroyed(
@@ -164,7 +162,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun setVideoSize(width: Int, height: Int) {
-		if (DEBUG) Log.v(TAG, String.format("setVideoSize:(%dx%d)", width, height))
+		if (DEBUG) Log.v(TAG, "setVideoSize:(${width}x${height})")
 		mCameraDelegator.setVideoSize(width, height)
 	}
 
