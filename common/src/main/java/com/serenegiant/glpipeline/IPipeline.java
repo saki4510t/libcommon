@@ -18,11 +18,15 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 public interface IPipeline {
+	static final String TAG = IPipeline.class.getSimpleName();
+
 	/**
 	 * 関係するリソースを破棄
 	 */
@@ -142,5 +146,26 @@ public interface IPipeline {
 		}
 		sb.append("]");
 		return sb.toString();
+	}
+
+	/**
+	 * パイプラインチェーンが正しく繋がっているかどうかを検証
+	 * @param root
+	 * @return
+	 */
+	public static boolean validatePipelineChain(@NonNull final IPipeline root) {
+		boolean result = true;
+		IPipeline pipeline = root;
+		while (pipeline != null) {
+			final IPipeline next = pipeline.getPipeline();
+			if ((next != null) && (next.getParent() != pipeline)) {
+				Log.v(TAG, "validatePipelineChain:found wrong chain" + pipeline
+					+ "=>" + next + (next != null ? "(" + next.getParent() + ")" : ""));
+				next.setParent(pipeline);
+				result = false;
+			}
+			pipeline = next;
+		}
+		return result;
 	}
 }
