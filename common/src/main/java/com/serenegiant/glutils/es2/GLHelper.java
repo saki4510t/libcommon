@@ -162,8 +162,7 @@ public final class GLHelper {
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
 		Log.v(TAG, "GL_MAX_TEXTURE_IMAGE_UNITS=" + textureUnits[0]);
-		final int n = texIds.length > textureUnits[0]
-			? textureUnits[0] : texIds.length;
+		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
 			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
 				minFilter, magFilter, wrap);
@@ -220,8 +219,7 @@ public final class GLHelper {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
-		final int n = texIds.length > textureUnits[0]
-			? textureUnits[0] : texIds.length;
+		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
 			texIds[i] = GLHelper.initTex(texTarget, texUnit,
 				minFilter, magFilter, wrap);
