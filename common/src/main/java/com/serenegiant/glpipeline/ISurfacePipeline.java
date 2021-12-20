@@ -28,6 +28,7 @@ import androidx.annotation.Nullable;
 public interface ISurfacePipeline extends IPipeline {
 	/**
 	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
+	 * すでにsurfaceがセットされている時に#setSurfaceで違うsurfaceをセットすると古いsurfaceは破棄される
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @throws IllegalStateException
@@ -38,6 +39,7 @@ public interface ISurfacePipeline extends IPipeline {
 
 	/**
 	 * 描画先のsurfaceをセットする
+	 * すでにsurfaceがセットされている時に#setSurfaceで違うsurfaceをセットすると古いsurfaceは破棄される
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
@@ -47,4 +49,11 @@ public interface ISurfacePipeline extends IPipeline {
 	public void setSurface(
 		@Nullable final Object surface,
 		@Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException;
+
+	/**
+	 * すでにsurfaceがセットされているかどうか
+	 * surfaceがセットされている時に#setSurfaceで違うsurfaceをセットすると古いsurfaceは破棄される
+	 * @return
+	 */
+	public boolean hasSurface();
 }

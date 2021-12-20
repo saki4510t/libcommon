@@ -162,6 +162,13 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	}
 
 	@Override
+	public boolean hasSurface() {
+		synchronized (mSync) {
+			return mRendererTarget != null;
+		}
+	}
+
+	@Override
 	public boolean isValid() {
 		// super#isValidはProxyPipelineなので常にtrueを返す
 		return !mReleased && mManager.isValid();
