@@ -159,7 +159,10 @@ public class RendererTarget {
 	 * @param textId
 	 * @param texMatrix
 	 */
-	public void draw(final GLDrawer2D drawer, final int texUnit, final int textId, final float[] texMatrix) {
+	public void draw(@NonNull final GLDrawer2D drawer,
+		final int texUnit, final int textId,
+		@Nullable final float[] texMatrix) {
+
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
 			mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
@@ -179,9 +182,9 @@ public class RendererTarget {
 	 * @param texMatrix
 	 * @param mvpMatrix
 	 */
-	protected static void doDraw(final GLDrawer2D drawer,
+	protected static void doDraw(@NonNull final GLDrawer2D drawer,
 		final int texUnit, final int textId,
-		final float[] texMatrix, final float[] mvpMatrix) {
+		@Nullable final float[] texMatrix, @NonNull final float[] mvpMatrix) {
 
 		drawer.setMvpMatrix(mvpMatrix, 0);
 		drawer.draw(texUnit, textId, texMatrix, 0);
@@ -279,7 +282,7 @@ public class RendererTarget {
 		 * @param texMatrix
 		 */
 		@Override
-		public void draw(final GLDrawer2D drawer,
+		public void draw(@NonNull final GLDrawer2D drawer,
 			final int texUnit, final int textId,
 			final float[] texMatrix) {
 
