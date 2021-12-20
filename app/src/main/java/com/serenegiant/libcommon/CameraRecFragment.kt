@@ -104,7 +104,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 
 	override fun isRecordingSupported(): Boolean {
 		return super.isRecordingSupported()
-			|| (ENABLE_PIPELINE_RECORD && (mCameraView is IPipelineView))
+			|| (enablePipelineEncode && (mCameraView is IPipelineView))
 	}
 
 //--------------------------------------------------------------------------------
@@ -177,7 +177,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 		val recorder = MediaAVRecorder(
 			requireContext(), mRecorderCallback, outputFile)
 		// create encoder for video recording
-		mVideoEncoder = if (ENABLE_PIPELINE_RECORD && (mCameraView is IPipelineView)) {
+		mVideoEncoder = if (enablePipelineEncode && (mCameraView is IPipelineView)) {
 			if (DEBUG) Log.v(TAG, "createRecorder:create EncoderPipeline")
 			val view = mCameraView as IPipelineView
 			val pipeline = EncodePipeline(view.getGLManager(), recorder, mEncoderListener) // API>=18
@@ -311,17 +311,17 @@ class CameraRecFragment : AbstractCameraFragment() {
 
 		fun newInstance(
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
-			pipelineMode: Int = IPipelineView.PREVIEW_ONLY): CameraRecFragment {
+			pipelineMode: Int = IPipelineView.PREVIEW_ONLY,
+			enablePipelineEncode: Boolean = false): CameraRecFragment {
 
 			val fragment = CameraRecFragment()
 			val args = Bundle()
 			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
 			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
 			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
+			args.putBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, enablePipelineEncode)
 			fragment.arguments = args
 			return fragment
 		}
-
-		private const val ENABLE_PIPELINE_RECORD = true
 	}
 }

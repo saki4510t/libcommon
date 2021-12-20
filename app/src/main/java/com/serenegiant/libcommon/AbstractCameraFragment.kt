@@ -135,6 +135,12 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			return args?.getInt(ARGS_KEY_PIPELINE_MODE, IPipelineView.PREVIEW_ONLY)
 				?: IPipelineView.PREVIEW_ONLY
 		}
+	protected val enablePipelineEncode: Boolean
+		get() {
+			val args = arguments
+			return args?.getBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, false)
+				?: false
+		}
 
 	/**
 	 * method when touch record button
@@ -300,5 +306,6 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		const val ARGS_KEY_LAYOUT_ID = "LAYOUT_ID"
 		const val ARGS_KEY_TITLE_ID = "TITLE_ID"
 		const val ARGS_KEY_PIPELINE_MODE = "PIPELINE_MODE"
+		const val ARGS_KEY_ENABLE_PIPELINE_RECORD = "ENABLE_PIPELINE_RECORD"
 	}
 }

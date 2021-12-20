@@ -186,7 +186,8 @@ class MainActivity
 				}
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_simple_video_source_camera, R.string.title_camera_rec_pipeline,
-					IPipelineView.EFFECT_PLUS_SURFACE
+					IPipelineView.EFFECT_PLUS_SURFACE,
+					true
 				)
 			}
 			7 -> {	// EffectCamera
