@@ -189,6 +189,9 @@ public abstract class AbstractEncoder implements Encoder {
             if (mRequestStop) {
                 return;
             }
+			if (mReaper != null) {
+				mReaper.frameAvailableSoon();
+			}
 	        // 終了要求
             mRequestStop = true;	// 新規のフレームを受けないようにする
             mSync.notifyAll();
