@@ -46,7 +46,7 @@ import androidx.annotation.WorkerThread;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = EncodePipeline.class.getSimpleName();
 
 	@NonNull
@@ -204,6 +204,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 						if (mDrawer != null) {
 							mDrawer.release();
 						}
+						if (DEBUG) Log.v(TAG, "onFrameAvailable:create drawer");
 						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
 					}
 					mRendererTarget.draw(mDrawer, texId, texMatrix);
@@ -243,26 +244,37 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	}
 
 	private void releaseTarget() {
-		if (DEBUG) Log.v(TAG, "releaseTarget:");
-		if (mManager.isValid()) {
-			try {
-				mManager.runOnGLThread(new Runnable() {
-					@Override
-					public void run() {
-						synchronized (mSync) {
-							if (mDrawer != null) {
-								mDrawer.release();
-								mDrawer = null;
+		final GLDrawer2D drawer;
+		final RendererTarget target;
+		synchronized (mSync) {
+			drawer = mDrawer;
+			mDrawer = null;
+			target = mRendererTarget;
+			mRendererTarget = null;
+		}
+		if ((drawer != null) || (target != null)) {
+			if (DEBUG) Log.v(TAG, "releaseTarget:");
+			if (mManager.isValid()) {
+				try {
+					mManager.runOnGLThread(new Runnable() {
+						@WorkerThread
+						@Override
+						public void run() {
+							if (drawer != null) {
+								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+								drawer.release();
 							}
-							if (mRendererTarget != null) {
-								mRendererTarget.release();
-								mRendererTarget = null;
+							if (target != null) {
+								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+								target.release();
 							}
 						}
-					}
-				});
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
+					});
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			} else if (DEBUG) {
+				Log.w(TAG, "releaseTarget:unexpectedly GLManager is already released!");
 			}
 		}
 	}

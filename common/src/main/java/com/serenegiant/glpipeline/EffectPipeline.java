@@ -58,6 +58,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	/**
 	 * 映像効果付与してそのまま次のIPipelineへ送る場合のワーク用GLSurface
 	 */
+	@Nullable
 	private GLSurface work;
 
 	/**
@@ -314,30 +315,43 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	}
 
 	private void releaseTarget() {
-		if (DEBUG) Log.v(TAG, "releaseTarget:");
-		if (mManager.isValid()) {
-			try {
-				mManager.runOnGLThread(new Runnable() {
-					@Override
-					public void run() {
-						synchronized (mSync) {
-							if (mDrawer != null) {
-								mDrawer.release();
-								mDrawer = null;
+		final EffectDrawer2D drawer;
+		final RendererTarget target;
+		final GLSurface w;
+		synchronized (mSync) {
+			drawer = mDrawer;
+			mDrawer = null;
+			target = mRendererTarget;
+			mRendererTarget = null;
+			w = work;
+			work = null;
+		}
+		if ((drawer != null) || (target != null)) {
+			if (DEBUG) Log.v(TAG, "releaseTarget:");
+			if (mManager.isValid()) {
+				try {
+					mManager.runOnGLThread(new Runnable() {
+						@WorkerThread
+						@Override
+						public void run() {
+							if (drawer != null) {
+								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+								drawer.release();
 							}
-							if (mRendererTarget != null) {
-								mRendererTarget.release();
-								mRendererTarget = null;
+							if (target != null) {
+								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+								target.release();
 							}
-							if (work != null) {
-								work.release();
-								work = null;
+							if (w != null) {
+								w.release();
 							}
 						}
-					}
-				});
-			} catch (final Exception e) {
-				if (DEBUG) Log.w(TAG, e);
+					});
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			} else if (DEBUG) {
+				Log.w(TAG, "releaseTarget:unexpectedly GLManager is already released!");
 			}
 		}
 	}
