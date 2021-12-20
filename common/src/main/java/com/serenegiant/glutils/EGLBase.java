@@ -214,6 +214,19 @@ public abstract class EGLBase implements EGLConst {
 	}
 
 	/**
+	 * 現在のスレッド上にレンダリングコンテキストが存在しているかどうかを取得
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static boolean hasGLThread() {
+		if (isEGL14Supported()) {
+			return EGLBase14.hasGLThreadImpl();
+		} else {
+			return EGLBase10.hasGLThreadImpl();
+		}
+	}
+
+	/**
 	 * EGLレンダリングコンテキストのホルダークラス
 	 */
 	public static abstract class IContext<T> {

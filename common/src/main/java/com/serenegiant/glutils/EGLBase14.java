@@ -270,6 +270,16 @@ import com.serenegiant.system.BuildCheck;
 		return new EGLBase14(maxClientVersion, context, withDepthBuffer, stencilBits, isRecordable);
 	}
 
+	/**
+	 * 現在のスレッド上にレンダリングコンテキストが存在しているかどうかを取得
+	 * @return
+	 */
+	/*package*/ static boolean hasGLThreadImpl() {
+		final EGLContext currentContext = EGL14.eglGetCurrentContext();
+		final EGLSurface currentSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+		return (currentContext != null) && (currentSurface != null);
+	}
+
 //--------------------------------------------------------------------------------
 	@NonNull
 	private Context mContext = EGL_NO_CONTEXT;
