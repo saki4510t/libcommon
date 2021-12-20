@@ -191,6 +191,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface},pipeline=${mPipeline}")
 		when (mPipeline) {
 			null -> {
 				mPipeline = createPipeline(surface)
@@ -207,6 +208,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun removeSurface(id: Int) {
+		if (DEBUG) Log.v(TAG, "addSurface:id=${id},pipeline=${mPipeline}")
 		when (mPipeline) {
 			is ISurfacePipeline -> {
 				if (USE_EFFECT_PLUS_SURFACE) {
@@ -229,9 +231,11 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	override fun addPipeline(pipeline: IPipeline)  {
 		if (mVideoSource != null) {
 			val last = IPipeline.findLast(mVideoSource!!)
+			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			if (last != null) {
 				last.pipeline = pipeline
 			}
+			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mVideoSource!!))
 		} else {
 			throw IllegalStateException()
 		}
@@ -304,14 +308,17 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "createPipeline:${surface}")
 		return when {
 			USE_EFFECT_PLUS_SURFACE -> {
+				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
 				val effect = EffectPipeline(mGLManager)
 				effect.pipeline = SurfacePipeline(mGLManager, surface, null)
 				effect
 			}
 			USE_EFFECT_PIPELINE -> {
+				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline")
 				EffectPipeline(mGLManager, surface, null)
 			}
 			else -> {
+				if (DEBUG) Log.v(TAG, "createPipeline:create SurfacePipeline")
 				SurfacePipeline(mGLManager, surface, null)
 			}
 		}

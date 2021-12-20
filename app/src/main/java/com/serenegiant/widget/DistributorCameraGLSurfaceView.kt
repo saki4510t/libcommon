@@ -193,9 +193,11 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	override fun addPipeline(pipeline: IPipeline)  {
 		if (mVideoSource != null) {
 			val last = IPipeline.findLast(mVideoSource!!)
+			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			if (last != null) {
 				last.pipeline = pipeline
 			}
+			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mVideoSource!!));
 		} else {
 			throw IllegalStateException()
 		}

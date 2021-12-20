@@ -87,7 +87,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		updateScaleModeText()
 		mRecordButton = view.findViewById(R.id.record_button)
 		mRecordButton!!.setOnClickListener(mOnClickListener)
-		mRecordButton!!.visibility = if (mCameraView!!.isRecordingSupported()) View.VISIBLE else View.GONE
+		mRecordButton!!.visibility = if (isRecordingSupported()) View.VISIBLE else View.GONE
 	}
 
 	public override fun internalOnResume() {
@@ -109,6 +109,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	}
 
 	//================================================================================
+	protected open fun isRecordingSupported(): Boolean {
+		return mCameraView != null && mCameraView!!.isRecordingSupported()
+	}
+
 	@get:LayoutRes
 	protected val layoutXml: Int
 		get() {

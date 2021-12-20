@@ -9,6 +9,8 @@ import android.view.View
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
+import com.serenegiant.glpipeline.EncodePipeline
+import com.serenegiant.glpipeline.IPipeline
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
@@ -16,6 +18,7 @@ import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
+import com.serenegiant.widget.IPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
 import java.io.IOException
 
@@ -99,6 +102,11 @@ class CameraRecFragment : AbstractCameraFragment() {
 		}
 	}
 
+	override fun isRecordingSupported(): Boolean {
+		return super.isRecordingSupported()
+			|| (ENABLE_PIPELINE_RECORD && (mCameraView is IPipelineView))
+	}
+
 //--------------------------------------------------------------------------------
 	//--------------------------------------------------------------------------------
 	/**
@@ -138,6 +146,11 @@ class CameraRecFragment : AbstractCameraFragment() {
 			removeSurface(mEncoderSurface)
 			mEncoderSurface = null
 		}
+		if (mVideoEncoder is IPipeline) {
+			if (DEBUG) Log.v(TAG, "stopEncoder:remove Encoder from pipeline chains,${mVideoEncoder}")
+			val pipeline = mVideoEncoder as IPipeline
+			pipeline.remove()
+		}
 		mVideoEncoder = null
 		mAudioEncoder = null
 		if (mAudioSampler != null) {
@@ -164,10 +177,20 @@ class CameraRecFragment : AbstractCameraFragment() {
 		val recorder = MediaAVRecorder(
 			requireContext(), mRecorderCallback, outputFile)
 		// create encoder for video recording
-		if (DEBUG) Log.v(TAG, "create SurfaceEncoder")
-		mVideoEncoder = SurfaceEncoder(recorder, mEncoderListener) // API>=18
+		mVideoEncoder = if (ENABLE_PIPELINE_RECORD && (mCameraView is IPipelineView)) {
+			if (DEBUG) Log.v(TAG, "createRecorder:create EncoderPipeline")
+			val view = mCameraView as IPipelineView
+			val pipeline = EncodePipeline(view.getGLManager(), recorder, mEncoderListener) // API>=18
+			view.addPipeline(pipeline)
+			pipeline
+		} else {
+			if (DEBUG) Log.v(TAG, "createRecorder:create SurfaceEncoder")
+			SurfaceEncoder(recorder, mEncoderListener) // API>=18
+		}
 		mVideoEncoder!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
-		(mVideoEncoder as SurfaceEncoder).setVideoConfig(-1, 30, 10)
+		if (mVideoEncoder is AbstractVideoEncoder) {
+			(mVideoEncoder as AbstractVideoEncoder).setVideoConfig(-1, 30, 10)
+		}
 		if (audio_source >= 0) {
 			mAudioSampler = AudioSampler(audio_source,
 				audio_channels, SAMPLE_RATE,
@@ -200,6 +223,9 @@ class CameraRecFragment : AbstractCameraFragment() {
 							}
 						}
 					}
+				} else if (encoder is EncodePipeline) {
+					if (DEBUG) Log.v(TAG, "use EncodePipeline")
+					mEncoderSurface = null
 				} else if (encoder is IVideoEncoder) {
 					mEncoderSurface = null
 					throw RuntimeException("unknown video encoder $encoder")
@@ -291,5 +317,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			fragment.arguments = args
 			return fragment
 		}
+
+		private const val ENABLE_PIPELINE_RECORD = true
 	}
 }
