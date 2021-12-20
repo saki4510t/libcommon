@@ -152,11 +152,11 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		when (view.id) {
 			R.id.cameraView -> {
 				if (mCameraView is IScaledView) {
-					val scale_mode = (mCameraView!!.getScaleMode() + 1) % 3
-					mCameraView!!.setScaleMode(scale_mode)
+					val scaleMode = (mCameraView!!.getScaleMode() + 1) % 3
+					mCameraView!!.setScaleMode(scaleMode)
 				} else {
-					val scale_mode = (mCameraView!!.getScaleMode() + 1) % 4
-					mCameraView!!.setScaleMode(scale_mode)
+					val scaleMode = (mCameraView!!.getScaleMode() + 1) % 4
+					mCameraView!!.setScaleMode(scaleMode)
 				}
 				updateScaleModeText()
 			}
@@ -173,10 +173,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	}
 
 	private fun updateScaleModeText() {
-		val scale_mode = mCameraView!!.getScaleMode()
+		val scaleMode = mCameraView!!.getScaleMode()
 		if (mCameraView is IScaledView) {
 			mScaleModeView!!.text =
-				when (scale_mode) {
+				when (scaleMode) {
 					0 -> "keep aspect"
 					1 -> "scale to fit"
 					2 -> "keep aspect(crop center)"
@@ -184,7 +184,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 				}
 		} else {
 			mScaleModeView!!.text =
-				when (scale_mode) {
+				when (scaleMode) {
 					0 -> "scale to fit"
 					1 -> "keep aspect(viewport)"
 					2 -> "keep aspect(matrix)"

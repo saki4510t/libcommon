@@ -112,20 +112,20 @@ class CameraRecFragment : AbstractCameraFragment() {
 	/**
 	 * create IRecorder instance for recording and prepare, start
 	 * @param outputFile
-	 * @param audio_source
-	 * @param audio_channels
+	 * @param audioSource
+	 * @param audioChannels
 	 * @param align16
 	 */
 	@Throws(IOException::class)
 	private fun startEncoder(outputFile: DocumentFile,
-		audio_source: Int, audio_channels: Int, align16: Boolean) {
+		audioSource: Int, audioChannels: Int, align16: Boolean) {
 
 		var recorder = mRecorder
 		if (DEBUG) Log.d(TAG, "startEncoder:recorder=$recorder")
 		if (recorder == null) {
 			try {
 				recorder = createRecorder(outputFile,
-					audio_source, audio_channels, align16)
+					audioSource, audioChannels, align16)
 				recorder.prepare()
 				recorder.startRecording()
 				mRecorder = recorder
