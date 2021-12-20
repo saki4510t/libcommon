@@ -77,7 +77,14 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void release() {
-		// do nothing
+		final IPipeline pipeline;
+		synchronized (mSync) {
+			pipeline = mPipeline;
+			mPipeline = null;
+		}
+		if (pipeline != null) {
+			pipeline.release();
+		}
 	}
 
 	@CallSuper

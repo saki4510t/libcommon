@@ -93,6 +93,14 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 			mReleased = true;
 			releaseTarget();
 		}
+		final IPipeline pipeline;
+		synchronized (mSync) {
+			pipeline = mPipeline;
+			mPipeline = null;
+		}
+		if (pipeline != null) {
+			pipeline.release();
+		}
 		super.release();
 	}
 
