@@ -280,6 +280,17 @@ import com.serenegiant.system.BuildCheck;
 		return (currentContext != null) && (currentSurface != null);
 	}
 
+	@Nullable
+	/*package*/ static IContext<?> wrapCurrentContextImpl() {
+		final EGLContext currentContext = EGL14.eglGetCurrentContext();
+		final EGLSurface currentSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+		if ((currentContext != null) && (currentSurface != null)) {
+			return wrapContext(currentContext);
+		} else {
+			return null;
+		}
+	}
+
 //--------------------------------------------------------------------------------
 	@NonNull
 	private Context mContext = EGL_NO_CONTEXT;

@@ -44,6 +44,22 @@ public abstract class EGLBase implements EGLConst {
 //--------------------------------------------------------------------------------
 // ヘルパーメソッド
 //--------------------------------------------------------------------------------
+
+	/**
+	 * 現在のスレッドにすでにレンダリングコンテキストが存在していればIContext<?>としてラップして返す
+	 * レンダリングコンテキストが存在していなければnullを返す
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	@Nullable
+	public static IContext<?> wrapCurrentContext() {
+		if (isEGL14Supported()) {
+			return EGLBase14.wrapCurrentContextImpl();
+		} else {
+			return EGLBase10.wrapCurrentContextImpl();
+		}
+	}
+
 	/**
 	 * EGLレンダリングコンテキストラップしてIContextを生成する
 	 * @param context
