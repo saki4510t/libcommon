@@ -162,7 +162,7 @@ public class GLContext implements EGLConst {
 	/**
 	 * 初期化を実行
 	 * GLコンテキストを生成するスレッド上で実行すること
-	 * @param surface nullでなければコンテキスト保持用IEglSurfaceをそのsurfaceから生成する
+	 * @param surface nullでなければコンテキスト保持用IEglSurfaceをそのsurfaceから生成する, nullの場合はダミーのオフスクリーンを生成する
 	 * @throws IllegalArgumentException
 	 */
 	@WorkerThread
