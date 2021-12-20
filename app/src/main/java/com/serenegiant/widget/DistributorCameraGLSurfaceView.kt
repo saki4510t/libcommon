@@ -33,6 +33,7 @@ import com.serenegiant.glpipeline.Distributor
 import com.serenegiant.glpipeline.IPipeline
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
+import com.serenegiant.glutils.EGLBase
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.GLUtils
@@ -52,7 +53,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
-	private val mGLManager: GLManager
+	private lateinit var mGLManager: GLManager
 	private var mVideoSource: VideoSource? = null
 	private var mDistributor: Distributor? = null
 
@@ -61,7 +62,6 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
 		mGLVersion = GLUtils.getSupportedGLVersion()
 		setEGLContextClientVersion(mGLVersion)
-		mGLManager = GLManager(mGLVersion)
 
 		mCameraDelegator = CameraDelegator(this@DistributorCameraGLSurfaceView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
@@ -106,8 +106,6 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
 		super.onResume()
-		mVideoSource = createVideoSource(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		mCameraDelegator.onResume()
 	}
 
@@ -258,6 +256,9 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			if (!extensions.contains("OES_EGL_image_external")) {
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
+			mGLManager = GLManager(mGLVersion, EGLBase.wrapCurrentContext(), 0, null)
+			mVideoSource = createVideoSource(
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)
 			// create texture ID
