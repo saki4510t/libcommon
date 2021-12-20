@@ -96,6 +96,14 @@ public class RendererTarget {
 	}
 
 	/**
+	 * Surface識別用のidを取得
+	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
+	 */
+	public int getId() {
+		return mSurface != null ? mSurface.hashCode() : 0;
+	}
+
+	/**
 	 * Surfaceが有効かどうかを取得する
 	 * @return
 	 */
