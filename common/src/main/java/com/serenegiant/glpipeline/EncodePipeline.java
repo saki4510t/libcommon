@@ -224,8 +224,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		}
 		if (!mReleased && !mRequestStop) {
 			if ((target != null)
-				&& target.isEnabled()
-				&& target.isValid()) {
+				&& target.canDraw()) {
 				target.draw(drawer, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);

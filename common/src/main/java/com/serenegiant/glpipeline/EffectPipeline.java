@@ -203,8 +203,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 				target = mRendererTarget;
 			}
 			if ((target != null)
-				&& target.isEnabled()
-				&& target.isValid()) {
+				&& target.canDraw()) {
 				target.draw(drawer.getDrawer(), texId, texMatrix);
 			}
 			if (mEffectOnly && (work != null)) {
