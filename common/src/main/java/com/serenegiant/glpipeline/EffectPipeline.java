@@ -34,6 +34,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
+import static com.serenegiant.glutils.GLEffect.EFFECT_NON;
+
 /**
  * OpenGL|ESのシェーダーを使って映像効果付与をするIPipeline実装
  * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のIPipelineへ送る
@@ -69,6 +71,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private volatile boolean mReleased;
 	@Nullable
 	private EffectDrawer2D mDrawer;
+	private int mEffect = EFFECT_NON;
 	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
@@ -216,8 +219,8 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	@CallSuper
 	@Override
 	public void remove() {
-		releaseTarget();
 		super.remove();
+		releaseTarget();
 	}
 
 	private int cnt;
@@ -235,7 +238,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 					if (mDrawer != null) {
 						mDrawer.release();
 					}
+					if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 					mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
+					mDrawer.setEffect(mEffect);
 				}
 				drawer = mDrawer;
 				target = mRendererTarget;
@@ -274,6 +279,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 					synchronized (mSync) {
 						if (mDrawer != null) {
 							mDrawer.resetEffect();
+							mEffect = mDrawer.getCurrentEffect();
 						}
 					}
 				}
@@ -299,6 +305,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 					synchronized (mSync) {
 						if (mDrawer != null) {
 							mDrawer.setEffect(effect);
+							mEffect = mDrawer.getCurrentEffect();
 						}
 					}
 				}
@@ -311,7 +318,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
 		synchronized (mSync) {
-			return mDrawer != null ? mDrawer.getCurrentEffect() : 0;
+			return mDrawer != null ? mDrawer.getCurrentEffect() : EFFECT_NON;
 		}
 	}
 //--------------------------------------------------------------------------------
