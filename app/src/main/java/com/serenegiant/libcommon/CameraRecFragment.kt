@@ -180,7 +180,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			requireContext(), mRecorderCallback, outputFile)
 		// create encoder for video recording
 		mVideoEncoder = if (enablePipelineEncode && (mCameraView is IPipelineView)) {
-			if (DEBUG) Log.v(TAG, "createRecorder:create EncoderPipeline")
+			if (DEBUG) Log.v(TAG, "createRecorder:create EncodePipeline")
 			val view = mCameraView as IPipelineView
 			val pipeline = EncodePipeline(view.getGLManager(), recorder, mEncoderListener) // API>=18
 			view.addPipeline(pipeline)
