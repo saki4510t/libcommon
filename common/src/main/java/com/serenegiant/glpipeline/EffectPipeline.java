@@ -265,6 +265,33 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 		}
 	}
 
+	@Override
+	public void refresh() {
+		super.refresh();
+		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
+		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
+		if (isValid()) {
+			mManager.runOnGLThread(new Runnable() {
+				@WorkerThread
+				@Override
+				public void run() {
+					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
+					EffectDrawer2D drawer;
+					synchronized (mSync) {
+						drawer = mDrawer;
+						if (drawer != null) {
+							mEffect = drawer.getCurrentEffect();
+						}
+						mDrawer = null;
+					}
+					if (drawer != null) {
+						drawer.release();
+					}
+				}
+			});
+		}
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * 映像効果をリセット

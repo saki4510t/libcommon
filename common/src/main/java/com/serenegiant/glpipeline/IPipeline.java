@@ -95,6 +95,12 @@ public interface IPipeline {
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
 
 	/**
+	 * パイプラインチェーンからパイプラインが削除されたので更新要求する
+	 * #removeで先頭のパイプラインを取得してチェーン中のパイプライン全てに対して順に呼び出される
+	 */
+	public void refresh();
+
+	/**
 	 * 指定したIPipelineの一番うしろにつながっているIPipelineを取得する。
 	 * 後ろにつながっているIPipelineがなければ引数のIPipelineを返す
 	 * @param pipeline

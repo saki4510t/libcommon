@@ -177,12 +177,18 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	@Override
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:");
+		IPipeline parent;
 		synchronized (mSync) {
+			parent = mParent;
 			if (mParent != null) {
 				mParent.setPipeline(mPipeline);
 			}
 			mParent = null;
 			mPipeline = null;
+		}
+		if (parent != null) {
+			parent = IPipeline.findFirst(parent);
+			parent.refresh();
 		}
 		releaseTarget();
 	}
@@ -233,6 +239,17 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 			}
 		}
 		frameAvailableSoon();
+	}
+
+	@Override
+	public void refresh() {
+		final IPipeline pipeline;
+		synchronized (mSync) {
+			pipeline = mPipeline;
+		}
+		if (pipeline != null) {
+			pipeline.refresh();
+		}
 	}
 
 	/**
