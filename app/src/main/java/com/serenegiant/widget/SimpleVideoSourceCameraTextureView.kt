@@ -209,7 +209,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun removeSurface(id: Int) {
-		if (DEBUG) Log.v(TAG, "addSurface:id=${id},pipeline=${mPipeline}")
+		if (DEBUG) Log.v(TAG, "removeSurface:id=${id},pipeline=${mPipeline}")
 		when (mPipeline) {
 			is ISurfacePipeline -> {
 				if (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE) {
