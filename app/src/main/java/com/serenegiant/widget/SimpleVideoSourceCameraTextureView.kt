@@ -306,7 +306,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * @param surface
 	 */
 	private fun createPipeline(surface: Any?): IPipeline {
-		if (DEBUG) Log.v(TAG, "createPipeline:${surface}")
+		if (DEBUG) Log.v(TAG, "createPipeline:surface=${surface}")
 		return when (pipelineMode) {
 			IPipelineView.EFFECT_PLUS_SURFACE -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
