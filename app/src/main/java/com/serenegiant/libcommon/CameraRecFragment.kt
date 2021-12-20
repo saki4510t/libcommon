@@ -89,17 +89,15 @@ class CameraRecFragment : AbstractCameraFragment() {
 	override fun internalStopRecording() {
 		if (DEBUG) Log.v(TAG, "internalStopRecording:")
 		stopEncoder()
-		if (mRecorder != null) {
-			mRecorder!!.stopRecording()
-			// you should not wait and should not clear mRecorder here
-		}
+		val recorder = mRecorder
+		recorder?.stopRecording()
+		// you should not wait and should not clear mRecorder here
 		if (DEBUG) Log.v(TAG, "internalStopRecording:finished")
 	}
 
 	override fun onFrameAvailable() {
-		if (mRecorder != null) {
-			mRecorder!!.frameAvailableSoon()
-		}
+		val recorder = mRecorder
+		recorder?.frameAvailableSoon()
 	}
 
 	override fun isRecordingSupported(): Boolean {

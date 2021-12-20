@@ -55,16 +55,14 @@ class EffectCameraFragment : AbstractCameraFragment() {
 
 	override fun internalStopRecording() {
 		if (DEBUG) Log.v(TAG, "internalStopRecording:mRecorder=$mRecorder")
-		if (mRecorder != null) {
-			mRecorder!!.release()
-			mRecorder = null
-		}
+		val recorder = mRecorder
+		mRecorder = null
+		recorder?.release()
 	}
 
 	override fun onFrameAvailable() {
-		if (mRecorder != null) {
-			mRecorder!!.frameAvailableSoon()
-		}
+		val recorder = mRecorder
+		recorder?.frameAvailableSoon()
 	}
 
 	private var mRecordingSurfaceId = 0
@@ -75,11 +73,12 @@ class EffectCameraFragment : AbstractCameraFragment() {
 				mCameraView!!.removeSurface(mRecordingSurfaceId)
 				mRecordingSurfaceId = 0
 			}
-			if (mRecorder != null) {
+			val recorder = mRecorder
+			if (recorder != null) {
 				try {
-					mRecorder!!.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, 30, 0.25f)
-					mRecorder!!.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
-					mRecorder!!.prepare()
+					recorder.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, 30, 0.25f)
+					recorder.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
+					recorder.prepare()
 				} catch (e: Exception) {
 					Log.w(TAG, e)
 					stopRecording() // 非同期で呼ばないとデッドロックするかも
@@ -90,9 +89,10 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		override fun onPrepared() {
 			if (DEBUG) Log.v(TAG, "onPrepared:")
-			if (mRecorder != null) {
+			val recorder = mRecorder
+			if (recorder != null) {
 				try {
-					val surface = mRecorder!!.inputSurface // API>=18
+					val surface = recorder.inputSurface // API>=18
 					if (surface != null) {
 						mRecordingSurfaceId = surface.hashCode()
 						mCameraView!!.addSurface(mRecordingSurfaceId, surface, true)
@@ -109,7 +109,8 @@ class EffectCameraFragment : AbstractCameraFragment() {
 
 		override fun onReady() {
 			if (DEBUG) Log.v(TAG, "onReady:")
-			if (mRecorder != null) {
+			val recorder = mRecorder
+			if (recorder != null) {
 				val context: Context = requireContext()
 				try {
 					val output: DocumentFile?
@@ -126,7 +127,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 					}
 					if (DEBUG) Log.v(TAG, "onReady:output=$output," + output?.uri)
 					if (output != null) {
-						mRecorder!!.start(output)
+						recorder.start(output)
 					} else {
 						throw IOException()
 					}
