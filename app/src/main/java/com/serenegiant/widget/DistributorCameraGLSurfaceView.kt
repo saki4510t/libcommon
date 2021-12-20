@@ -171,7 +171,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = Distributor(mVideoSource!!)
+			mDistributor = Distributor(mVideoSource!!.glManager)
 			mVideoSource!!.pipeline = mDistributor
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable)

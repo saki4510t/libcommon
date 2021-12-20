@@ -45,8 +45,6 @@ public class Distributor extends ProxyPipeline {
 	private static final String TAG = Distributor.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "Distributor";
 
-	@NonNull
-	private final IPipelineSource mSource;
 	/**
 	 * 自分用のGLManagerを保持しているかどうか
 	 */
@@ -62,23 +60,21 @@ public class Distributor extends ProxyPipeline {
 	/**
 	 * コンストラクタ
 	 * 共有コンテキストを使わず引数のIPipelineSourceと同じコンテキスト上で実行する
-	 * @param source
+	 * @param manager
 	 */
-	public Distributor(@NonNull final IPipelineSource source) {
-		this(source, false);
+	public Distributor(@NonNull final GLManager manager) {
+		this(manager, false);
 	}
 
 	/**
 	 * コンストラクタ
 	 * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
-	 * @param source
+	 * @param manager
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
-	public Distributor(@NonNull final IPipelineSource source,
-		final boolean useSharedContext) {
+	public Distributor(@NonNull final GLManager manager, final boolean useSharedContext) {
 
 		super();
-		mSource = source;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
 			@Override
@@ -87,7 +83,6 @@ public class Distributor extends ProxyPipeline {
 				return true;
 			}
 		};
-		final GLManager manager = source.getGLManager();
 		mOwnManager = useSharedContext;
 		final Handler glHandler;
 		if (useSharedContext) {
@@ -101,7 +96,7 @@ public class Distributor extends ProxyPipeline {
 		}
 		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
-			source.getWidth(), source.getHeight());
+			getWidth(), getHeight());
 		mDistributeTask.start(RENDERER_THREAD_NAME);
 	}
 
