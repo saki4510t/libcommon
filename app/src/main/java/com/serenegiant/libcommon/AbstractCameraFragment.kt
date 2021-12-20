@@ -97,7 +97,11 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnResume:")
 		mCameraView!!.onResume()
 		mCameraView!!.addListener(mOnFrameAvailableListener)
-		if (!hasPermission()) {
+		// カメラパーミッションが無いか、
+		// 録画に対応していててストレージアクセス/録音のパーミッションが無いなら
+		// 終了して前画面へ戻る
+		if (!PermissionCheck.hasCamera(activity)
+			|| (isRecordingSupported() && !hasPermission())) {
 			popBackStack()
 		}
 	}
@@ -233,8 +237,12 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "startRecording:")
 		mRecordButton!!.setColorFilter(-0x10000) // turn red
 		try {
-			// FIXME 未実装 ちゃんとパーミッションのチェック＆要求をしないとだめ
-			internalStartRecording()
+			if (hasPermission()) {
+				internalStartRecording()
+			} else {
+				mRecordButton!!.setColorFilter(0)
+				Log.e(TAG, "startCapture:has something missing permission(s)")
+			}
 		} catch (e: Exception) {
 			mRecordButton!!.setColorFilter(0)
 			Log.e(TAG, "startCapture:", e)
