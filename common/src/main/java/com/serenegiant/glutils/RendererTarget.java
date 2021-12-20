@@ -132,7 +132,7 @@ public class RendererTarget {
 	 * @return
 	 */
 	public boolean canDraw() {
-		return mEnable;
+		return mEnable && (mTargetSurface != null) && mTargetSurface.isValid();
 	}
 
 	/**
