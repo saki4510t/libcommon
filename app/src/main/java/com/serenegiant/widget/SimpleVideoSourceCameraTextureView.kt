@@ -230,13 +230,12 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: IPipeline)  {
-		if (mVideoSource != null) {
-			val last = IPipeline.findLast(mVideoSource!!)
+		val source = mVideoSource
+		if (source != null) {
+			val last = IPipeline.findLast(source)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
-			if (last != null) {
-				last.pipeline = pipeline
-			}
-			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mVideoSource!!))
+			last.pipeline = pipeline
+			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(source))
 		} else {
 			throw IllegalStateException()
 		}
