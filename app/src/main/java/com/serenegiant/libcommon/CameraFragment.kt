@@ -39,6 +39,9 @@ import com.serenegiant.widget.IPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
 import java.io.IOException
 
+/**
+ * RecordingServiceを使った録画対応カメラ画面Fragment
+ */
 class CameraFragment : AbstractCameraFragment() {
 	private var mRecorder: ServiceRecorder? = null
 
