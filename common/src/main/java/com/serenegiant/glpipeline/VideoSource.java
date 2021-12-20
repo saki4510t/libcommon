@@ -323,8 +323,8 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	protected void handleReleaseInputSurface() {
-		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		if (mInputSurface != null) {
+			if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 			mCallback.onDestroy();
 			try {
 				mInputSurface.release();
