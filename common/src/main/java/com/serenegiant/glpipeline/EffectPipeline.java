@@ -187,32 +187,38 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	@Override
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		if (!mReleased) {
+			@NonNull
+			final EffectDrawer2D drawer;
+			@Nullable
+			final RendererTarget target;
 			synchronized (mSync) {
-				if ((mRendererTarget != null)
-					&& mRendererTarget.isEnabled()
-					&& mRendererTarget.isValid()) {
-					if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-						if (mDrawer != null) {
-							mDrawer.release();
-						}
-						mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
+				if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
+					// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+					if (mDrawer != null) {
+						mDrawer.release();
 					}
-					mRendererTarget.draw(mDrawer.getDrawer(), texId, texMatrix);
+					mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
 				}
-				if (mEffectOnly && (work != null)) {
-					if (DEBUG && (++cnt % 100) == 0) {
-						Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
-					}
-					// 映像効果付与したテクスチャを次へ渡す
-					super.onFrameAvailable(work.isOES(), work.getTexId(), work.getTexMatrix());
-				} else {
-					if (DEBUG && (++cnt % 100) == 0) {
-						Log.v(TAG, "onFrameAvailable:" + cnt);
-					}
-					// こっちはオリジナルのテクスチャを渡す
-					super.onFrameAvailable(isOES, texId, texMatrix);
+				drawer = mDrawer;
+				target = mRendererTarget;
+			}
+			if ((target != null)
+				&& target.isEnabled()
+				&& target.isValid()) {
+				target.draw(drawer.getDrawer(), texId, texMatrix);
+			}
+			if (mEffectOnly && (work != null)) {
+				if (DEBUG && (++cnt % 100) == 0) {
+					Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
 				}
+				// 映像効果付与したテクスチャを次へ渡す
+				super.onFrameAvailable(work.isOES(), work.getTexId(), work.getTexMatrix());
+			} else {
+				if (DEBUG && (++cnt % 100) == 0) {
+					Log.v(TAG, "onFrameAvailable:" + cnt);
+				}
+				// こっちはオリジナルのテクスチャを渡す
+				super.onFrameAvailable(isOES, texId, texMatrix);
 			}
 		}
 	}

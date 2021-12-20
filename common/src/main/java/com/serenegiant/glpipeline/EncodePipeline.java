@@ -194,31 +194,36 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		final boolean isOES,
 		final int texId, @NonNull final float[] texMatrix) {
 
+		@Nullable
 		final IPipeline pipeline;
+		@NonNull
+		final GLDrawer2D drawer;
+		@Nullable
+		final RendererTarget target;
 		synchronized (mSync) {
 			pipeline = mPipeline;
+			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
+				// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				if (mDrawer != null) {
+					mDrawer.release();
+				}
+				if (DEBUG) Log.v(TAG, "onFrameAvailable:create drawer");
+				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+			}
+			drawer = mDrawer;
+			target = mRendererTarget;
 		}
 		if (pipeline != null) {
 			// 次のIPipelineへつなぐ
 			pipeline.onFrameAvailable(isOES, texId, texMatrix);
 		}
 		if (!mReleased && !mRequestStop) {
-			synchronized (mSync) {
-				if ((mRendererTarget != null)
-					&& mRendererTarget.isEnabled()
-					&& mRendererTarget.isValid()) {
-					if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-						if (mDrawer != null) {
-							mDrawer.release();
-						}
-						if (DEBUG) Log.v(TAG, "onFrameAvailable:create drawer");
-						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
-					}
-					mRendererTarget.draw(mDrawer, texId, texMatrix);
-					if (DEBUG && (++cnt % 100) == 0) {
-						Log.v(TAG, "onFrameAvailable:" + cnt);
-					}
+			if ((target != null)
+				&& target.isEnabled()
+				&& target.isValid()) {
+				target.draw(drawer, texId, texMatrix);
+				if (DEBUG && (++cnt % 100) == 0) {
+					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}
 			}
 		}

@@ -189,27 +189,34 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		super.onFrameAvailable(isOES, texId, texMatrix);
 		if (!mReleased) {
+			@NonNull
+			final GLDrawer2D drawer;
+			@Nullable
+			final RendererTarget target;
 			synchronized (mSync) {
-				if ((mRendererTarget != null)
-					&& mRendererTarget.isEnabled()
-					&& mRendererTarget.isValid()) {
-					if ((mDrawer == null) || isOES != mDrawer.isOES()) {
-						// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-						if (mDrawer != null) {
-							mDrawer.release();
-						}
-						if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-						mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
+					// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+					if (mDrawer != null) {
+						mDrawer.release();
 					}
-					mRendererTarget.draw(mDrawer, texId, texMatrix);
-					if (DEBUG && (++cnt % 100) == 0) {
-						Log.v(TAG, "onFrameAvailable:" + cnt);
-					}
+					if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
+					mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+				}
+				drawer = mDrawer;
+				target = mRendererTarget;
+			}
+			if ((target != null)
+				&& target.isEnabled()
+				&& target.isValid()) {
+				target.draw(drawer, texId, texMatrix);
+				if (DEBUG && (++cnt % 100) == 0) {
+					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}
 			}
 		}
 	}
 
+	@WorkerThread
 	private void releaseTarget() {
 		final GLDrawer2D drawer;
 		final RendererTarget target;
