@@ -828,8 +828,6 @@ public abstract class AbstractDistributeTask {
 	public abstract boolean isOES3();
 
 	public abstract boolean isMasterSurfaceValid();
-	public abstract int getTexId();
-	public abstract float[] getTexMatrix();
 	/**
 	 * 映像入力用Surfaceを再生成する
 	 */

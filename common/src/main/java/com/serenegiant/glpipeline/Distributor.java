@@ -429,16 +429,6 @@ public class Distributor extends ProxyPipeline {
 			return true;
 		}
 
-		@Override
-		public int getTexId() {
-			return mSource.getTexId();
-		}
-
-		@Override
-		public float[] getTexMatrix() {
-			return mSource.getTexMatrix();
-		}
-
 		@WorkerThread
 		@Override
 		public void requestFrame(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {

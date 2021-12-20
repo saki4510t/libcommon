@@ -657,12 +657,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			return (mInputSurface != null) && (mInputSurface.isValid());
 		}
 
-		@Override
 		public int getTexId() {
 			return mTexId;
 		}
 
-		@Override
 		public float[] getTexMatrix() {
 			return mTexMatrix;
 		}
