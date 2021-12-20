@@ -930,7 +930,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
-						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
+						drawer.draw(GLES20.GL_TEXTURE0, mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
 				        buf.clear();
 				        GLES20.glReadPixels(0, 0, width, height,
@@ -1021,7 +1021,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
-						drawer.draw(mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
+						drawer.draw(GLES20.GL_TEXTURE0, mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
 						captureSurface.swap();
 				        buf.clear();
 						// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する

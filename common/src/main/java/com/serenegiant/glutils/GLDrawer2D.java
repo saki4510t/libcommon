@@ -267,10 +267,12 @@ public abstract class GLDrawer2D {
 
 	/**
 	 * 描画処理
+	 * テクスチャユニットはGL_TEXTURE0
 	 * @param texId
 	 * @param tex_matrix
 	 * @param offset
 	 */
+	@Deprecated
 	public synchronized void draw(
 		final int texId,
 		@Nullable final float[] tex_matrix, final int offset) {

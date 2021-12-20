@@ -18,6 +18,7 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.glutils.GLDrawer2D;
@@ -208,7 +209,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 			}
 			if ((target != null)
 				&& target.canDraw()) {
-				target.draw(drawer, texId, texMatrix);
+				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}

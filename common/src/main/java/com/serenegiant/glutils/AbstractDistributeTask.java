@@ -538,7 +538,7 @@ public abstract class AbstractDistributeTask {
 			final RendererTarget target = mTargets.valueAt(i);
 			if ((target != null) && target.canDraw()) {
 				try {
-					target.draw(mDrawer, texId, texMatrix);
+					target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
 					// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった

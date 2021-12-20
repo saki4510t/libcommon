@@ -244,10 +244,11 @@ public class EffectDrawer2D {
 	 * @param texMatrix
 	 * @param offset
 	 */
+	@Deprecated
 	public synchronized void draw(final int texId,
 		@Nullable final float[] texMatrix, final int offset) {
 
-		mDrawer.draw(texId, texMatrix, offset);
+		mDrawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, offset);
 	}
 
 	/**

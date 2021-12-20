@@ -317,7 +317,7 @@ public class SurfaceDrawable extends Drawable {
 			return;
 		}
 		// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
-		mDrawer.draw(mTexId, mTexMatrix, 0);
+		mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
 		// オフスクリーンから読み取り
 		mWorkBuffer.clear();
 		GLES20.glReadPixels(0, 0,

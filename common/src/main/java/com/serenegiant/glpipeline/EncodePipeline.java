@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
+import android.opengl.GLES20;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
@@ -225,7 +226,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		if (!mReleased && !mRequestStop) {
 			if ((target != null)
 				&& target.canDraw()) {
-				target.draw(drawer, texId, texMatrix);
+				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
 				}

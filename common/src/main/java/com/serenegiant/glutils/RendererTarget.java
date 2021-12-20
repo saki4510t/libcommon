@@ -159,14 +159,14 @@ public class RendererTarget {
 	 * @param textId
 	 * @param texMatrix
 	 */
-	public void draw(final GLDrawer2D drawer, final int textId, final float[] texMatrix) {
+	public void draw(final GLDrawer2D drawer, final int texUnit, final int textId, final float[] texMatrix) {
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
 			mTargetSurface.setViewPort(0, 0, mTargetSurface.getWidth(), mTargetSurface.getHeight());
 			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
 			// ハングアップする機種があるのでクリアしとく
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			doDraw(drawer, textId, texMatrix, mMvpMatrix);
+			doDraw(drawer, texUnit, textId, texMatrix, mMvpMatrix);
 			mTargetSurface.swap();
 		}
 	}
@@ -180,11 +180,11 @@ public class RendererTarget {
 	 * @param mvpMatrix
 	 */
 	protected static void doDraw(final GLDrawer2D drawer,
-		final int textId, final float[] texMatrix,
-		final float[] mvpMatrix) {
+		final int texUnit, final int textId,
+		final float[] texMatrix, final float[] mvpMatrix) {
 
 		drawer.setMvpMatrix(mvpMatrix, 0);
-		drawer.draw(textId, texMatrix, 0);
+		drawer.draw(texUnit, textId, texMatrix, 0);
 	}
 
 	/**
@@ -280,10 +280,11 @@ public class RendererTarget {
 		 */
 		@Override
 		public void draw(final GLDrawer2D drawer,
-			final int textId, final float[] texMatrix) {
+			final int texUnit, final int textId,
+			final float[] texMatrix) {
 
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
-			super.draw(drawer, textId, texMatrix);
+			super.draw(drawer, texUnit, textId, texMatrix);
 		}
 	}
 

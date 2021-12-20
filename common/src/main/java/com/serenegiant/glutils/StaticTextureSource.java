@@ -404,7 +404,7 @@ public class StaticTextureSource {
 						final RendererTarget target = mTargets.valueAt(i);
 						if ((target != null) && target.canDraw()) {
 							try {
-								target.draw(mDrawer, texId, null); // target.draw(mDrawer, mTexId, mTexMatrix);
+								target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, null); // target.draw(mDrawer, GLES20.GL_TEXTURE0, mTexId, mTexMatrix);
 								GLHelper.checkGlError("handleDraw");
 							} catch (final Exception e) {
 								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった

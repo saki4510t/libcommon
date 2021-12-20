@@ -18,6 +18,7 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.glutils.EffectDrawer2D;
@@ -204,7 +205,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 			}
 			if ((target != null)
 				&& target.canDraw()) {
-				target.draw(drawer.getDrawer(), texId, texMatrix);
+				target.draw(drawer.getDrawer(), GLES20.GL_TEXTURE0, texId, texMatrix);
 			}
 			if (mEffectOnly && (work != null)) {
 				if (DEBUG && (++cnt % 100) == 0) {

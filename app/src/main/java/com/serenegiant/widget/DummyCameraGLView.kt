@@ -245,7 +245,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
 		// draw to preview screen
 		if (mHasSurface && (mDrawer != null)) {
-			mDrawer!!.draw(texId, texMatrix, 0)
+			mDrawer!!.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0)
 			GLES20.glFlush()
 		}
 		val listener = mOnFrameAvailableListener

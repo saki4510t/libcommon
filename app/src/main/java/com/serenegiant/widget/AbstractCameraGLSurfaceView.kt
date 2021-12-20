@@ -315,7 +315,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 				inputSurfaceTexture!!.getTransformMatrix(mStMatrix)
 			}
 			// draw to preview screen
-			mDrawer?.draw(hTex, mStMatrix, 0)
+			mDrawer?.draw(GLES20.GL_TEXTURE0, hTex, mStMatrix, 0)
 		}
 
 		fun updateViewport() {

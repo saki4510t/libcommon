@@ -19,6 +19,8 @@ package com.serenegiant.mediaeffect;
 */
 
 import androidx.annotation.NonNull;
+
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.glutils.GLDrawer2D;
@@ -186,7 +188,7 @@ public class MediaSource implements ISource {
 
 		mSourceScreen.makeCurrent();
 		try {
-			drawer.draw(tex_id, tex_matrix, 0);
+			drawer.draw(GLES20.GL_TEXTURE0, tex_id, tex_matrix, 0);
 		} catch (RuntimeException e) {
 			Log.w(TAG, e);
 		} finally {

@@ -3,6 +3,7 @@ package com.serenegiant.widget
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.SurfaceTexture
+import android.opengl.GLES20
 import android.util.AttributeSet
 import android.util.Log
 import androidx.annotation.Size
@@ -84,7 +85,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 					mSurfaceTexture!!.updateTexImage()
 					mSurfaceTexture!!.getTransformMatrix(mTexMatrix)
 				}
-				mDrawer!!.draw(mTexId, mTexMatrix, 0)
+				mDrawer!!.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0)
 				mCameraDelegator.callOnFrameAvailable()
 			}
 
