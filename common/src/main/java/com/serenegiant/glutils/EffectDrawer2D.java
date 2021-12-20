@@ -306,8 +306,10 @@ public class EffectDrawer2D {
 	/**
 	 * テクスチャをバインド
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * テクスチャユニットはGL_TEXTURE0
 	 * @param texId
 	 */
+	@Deprecated
 	protected void bindTexture(final int texId) {
 		mDrawer.bindTexture(GLES20.GL_TEXTURE0, texId);
 	}
