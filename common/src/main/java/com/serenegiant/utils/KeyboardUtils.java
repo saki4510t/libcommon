@@ -1,3 +1,4 @@
+package com.serenegiant.utils;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -16,8 +17,6 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
-
-package com.serenegiant.utils;
 
 import android.app.Activity;
 import android.view.View;
