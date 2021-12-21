@@ -193,6 +193,23 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			when (val last = IPipeline.findLast(source)) {
 				mVideoSource -> {
 					source.pipeline = createPipeline(surface)
+					if (SUPPORT_RECORDING) {
+						// 通常の録画(#addSurfaceでエンコーダーへの映像入力用surfaceを受け取る)場合は
+						// 毎フレームCameraDelegator#callOnFrameAvailableを呼び出さないといけないので
+						// OnFramePipelineを追加する
+						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
+						val p = IPipeline.findLast(source)
+						p.pipeline = OnFramePipeline(object :
+							OnFramePipeline.OnFrameAvailableListener {
+							var cnt: Int = 0
+							override fun onFrameAvailable() {
+								if (DEBUG && ((++cnt) % 100 == 0)) {
+									Log.v(TAG, "onFrameAvailable:${cnt}")
+								}
+								mCameraDelegator.callOnFrameAvailable()
+							}
+						})
+					}
 				}
 				is ISurfacePipeline -> {
 					if (last.hasSurface()) {
@@ -200,6 +217,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					} else {
 						last.setSurface(surface, null)
 					}
+				}
+				else -> {
+					last.pipeline = SurfacePipeline(mGLManager, surface, null)
 				}
 			}
 		} else {
@@ -217,7 +237,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun isRecordingSupported(): Boolean {
-		return false
+		// XXX ここでtrueを返すなら録画中にCameraDelegatorのOnFrameAvailableListener#onFrameAvailableが呼び出されるようにしないといけない
+		return SUPPORT_RECORDING
 	}
 
 	/**
@@ -333,5 +354,6 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 		 */
 		private const val USE_SHARED_CONTEXT = false
+		private const val SUPPORT_RECORDING = true
 	}
 }
