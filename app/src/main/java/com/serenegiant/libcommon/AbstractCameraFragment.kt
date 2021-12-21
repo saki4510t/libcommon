@@ -89,6 +89,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (mCameraView is SimpleVideoSourceCameraTextureView) {
 			val v = mCameraView as SimpleVideoSourceCameraTextureView
 			v.pipelineMode = pipelineMode
+			v.enableFaceDetect = enableFaceDetect
 		}
 	}
 
@@ -143,6 +144,12 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		get() {
 			val args = arguments
 			return args?.getBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, false)
+				?: false
+		}
+	protected val enableFaceDetect: Boolean
+		get() {
+			val args = arguments
+			return args?.getBoolean(ARGS_KEY_ENABLE_FACE_DETECT, false)
 				?: false
 		}
 
@@ -315,5 +322,6 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		const val ARGS_KEY_TITLE_ID = "TITLE_ID"
 		const val ARGS_KEY_PIPELINE_MODE = "PIPELINE_MODE"
 		const val ARGS_KEY_ENABLE_PIPELINE_RECORD = "ENABLE_PIPELINE_RECORD"
+		const val ARGS_KEY_ENABLE_FACE_DETECT = "ENABLE_FACE_DETECT"
 	}
 }

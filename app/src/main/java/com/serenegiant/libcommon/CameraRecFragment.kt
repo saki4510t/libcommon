@@ -332,7 +332,8 @@ class CameraRecFragment : AbstractCameraFragment() {
 		fun newInstance(
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
 			pipelineMode: Int = IPipelineView.PREVIEW_ONLY,
-			enablePipelineEncode: Boolean = false): CameraRecFragment {
+			enablePipelineEncode: Boolean = false,
+			enableFaceDetect: Boolean = false): CameraRecFragment {
 
 			val fragment = CameraRecFragment()
 			val args = Bundle()
@@ -340,6 +341,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
 			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
 			args.putBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, enablePipelineEncode)
+			args.putBoolean(ARGS_KEY_ENABLE_FACE_DETECT, enableFaceDetect)
 			fragment.arguments = args
 			return fragment
 		}

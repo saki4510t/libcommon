@@ -7,6 +7,7 @@
 	<string name="title_camera" translatable="false">Camera</string>
 	<string name="title_camera_rec" translatable="false">Camera(MediaAVRecorder)</string>
 	<string name="title_camera_rec_pipeline" translatable="false">Camera(MediaAVRecorder+EncoderPipeline)</string>
+	<string name="title_camera_face_detect" translatable="false">Camera(FaceDetectPipeline)</string>
 	<string name="title_effect_camera" translatable="false">EffectCamera</string>
 	<string name="title_mix_camera" translatable="false">MixCamera</string>
 	<string name="title_overlay_camera" translatable="false">OverlayCamera</string>
@@ -34,6 +35,7 @@
 		<item>@string/title_camera</item>
 		<item>@string/title_camera_rec</item>
 		<item>@string/title_camera_rec_pipeline</item>
+		<item>@string/title_camera_face_detect</item>
 		<item>@string/title_effect_camera</item>
 		<item>@string/title_mix_camera</item>
 		<item>@string/title_overlay_camera</item>

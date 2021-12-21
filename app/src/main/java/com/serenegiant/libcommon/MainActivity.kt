@@ -190,7 +190,20 @@ class MainActivity
 					true // trueならEncoderPipelineを使った録画, falseならSurfaceEncoderを使った録画
 				)
 			}
-			7 -> {	// EffectCamera
+			7 -> {	// Camera(FaceDetectPipeline)
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraRecFragment.newInstance(
+					R.layout.fragment_simple_video_source_camera, R.string.title_camera_face_detect,
+					IPipelineView.PREVIEW_ONLY,
+					enablePipelineEncode = false,
+					enableFaceDetect = true
+				)
+			}
+			8 -> {	// EffectCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -198,7 +211,7 @@ class MainActivity
 				}
 				fragment = EffectCameraFragment.newInstance()
 			}
-			8 -> {	// MixCamera
+			9 -> {	// MixCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -207,7 +220,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_mix, R.string.title_mix_camera)
 			}
-			9 -> {	// OverlayCamera
+			10 -> {	// OverlayCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -216,7 +229,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_overlay, R.string.title_overlay_camera)
 			}
-			10 -> {	// VideoSourceCamera
+			11 -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -225,7 +238,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_video_source, R.string.title_video_source_camera)
 			}
-			11 -> {	// VideoSourceDistributionCamera
+			12 -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -234,7 +247,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_distributor, R.string.title_video_source_dist_camera)
 			}
-			12 -> {	// ImageViewCamera
+			13 -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -243,7 +256,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_image_view, R.string.title_image_view_camera)
 			}
-			13 -> {	// TextureViewCamera
+			14 -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -252,7 +265,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_texture_view, R.string.title_texture_view_camera)
 			}
-			14 -> {	// SimpleCameraGL
+			15 -> {	// SimpleCameraGL
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -261,7 +274,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_camera_gl, R.string.title_simple_gl_camera)
 			}
-			15 -> {	// CameraSurface
+			16 -> {	// CameraSurface
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -269,7 +282,7 @@ class MainActivity
 				}
 				fragment = CameraSurfaceFragment()
 			}
-			16 -> {	// SimpleVideoSourceCameraGLView
+			17 -> {	// SimpleVideoSourceCameraGLView
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -278,7 +291,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_video_source_camera, R.string.title_simple_camera_source)
 			}
-			17 -> {	// DummyCameraGLView
+			18 -> {	// DummyCameraGLView
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -287,34 +300,34 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_dummy_source, R.string.title_dummy_camera_source)
 			}
-			18 -> {	// Galley
+			19 -> {	// Galley
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			19 -> {	// Galley(RecyclerView,Cursor)
+			20 -> {	// Galley(RecyclerView,Cursor)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			20 -> {	// Galley(RecyclerView)
+			21 -> {	// Galley(RecyclerView)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment3()
 			}
-			21 -> {	// NumberKeyboard
+			22 -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			22 -> {	// ViewSlider
+			23 -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
-			23 -> {	// ProgressView
+			24 -> {	// ProgressView
 				fragment = ProgressFragment()
 			}
-			24 -> {	// PermissionUtils
+			25 -> {	// PermissionUtils
 				fragment = PermissionFragment.newInstance()
 			}
 			else -> {

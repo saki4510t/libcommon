@@ -19,8 +19,10 @@ package com.serenegiant.widget
 */
 
 import android.content.Context
+import android.graphics.PointF
 import android.graphics.RectF
 import android.graphics.SurfaceTexture
+import android.media.FaceDetector
 import android.os.Handler
 import android.util.AttributeSet
 import android.util.Log
@@ -30,8 +32,8 @@ import com.serenegiant.glpipeline.*
 import com.serenegiant.glutils.GLContext
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.glutils.GLManager
+import com.serenegiant.math.Fraction
 import com.serenegiant.view.ViewTransformDelegater
-import java.lang.IllegalStateException
 
 /**
  * VideoSourceを使ってカメラ映像を受け取りSurfacePipelineで描画処理を行うZoomAspectScaledTextureView/ICameraView実装
@@ -46,6 +48,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	private val mCameraDelegator: CameraDelegator
 	private var mVideoSource: VideoSource? = null
 	var pipelineMode = IPipelineView.PREVIEW_ONLY
+	var enableFaceDetect = false
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -209,6 +212,58 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 								mCameraDelegator.callOnFrameAvailable()
 							}
 						})
+					}
+					if (enableFaceDetect) {
+						if (DEBUG) Log.v(TAG, "addSurface:create FaceDetectPipeline")
+						val p = IPipeline.findLast(source)
+						p.pipeline = FaceDetectPipeline(mGLManager, Fraction.FIVE, 1
+						) { /*bitmap,*/ num, faces, width, height ->
+							if (DEBUG) {
+								Log.v(TAG, "onDetected:n=${num}")
+								for (i in 0 until num) {
+									val face: FaceDetector.Face = faces[i]
+									val point = PointF()
+									face.getMidPoint(point)
+									Log.v(TAG, "onDetected:Confidence=" + face.confidence())
+									Log.v(TAG, "onDetected:MidPoint.X=" + point.x)
+									Log.v(TAG, "onDetected:MidPoint.Y=" + point.y)
+									Log.v(TAG, "onDetected:EyesDistance=" + face.eyesDistance())
+								}
+							}
+//							val context: Context = context
+//							val outputFile: DocumentFile = if (BuildCheck.isAPI29()) {
+//								// API29以降は対象範囲別ストレージ
+//								MediaStoreUtils.getContentDocument(
+//									context, "image/jpeg",
+//									Environment.DIRECTORY_DCIM + "/" + Const.APP_DIR,
+//									FileUtils.getDateTimeString() + ".jpg", null
+//								)
+//							} else {
+//								MediaFileUtils.getRecordingFile(
+//									context,
+//									Const.REQUEST_ACCESS_SD,
+//									Environment.DIRECTORY_DCIM,
+//									"image/jpeg",
+//									".jpg"
+//								)
+//							}
+//							var bos: BufferedOutputStream? = null
+//							try {
+//								bos = BufferedOutputStream (context.contentResolver.openOutputStream(outputFile.uri))
+//								bitmap.compress(Bitmap.CompressFormat.JPEG, 90, bos)
+//								MediaStoreUtils.updateContentUri(context, outputFile.uri)
+//							} catch (e: FileNotFoundException) {
+//								Log.w(TAG, e);
+//							} finally {
+//								if (bos != null) {
+//									try {
+//										bos.close();
+//									} catch (e: IOException) {
+//										Log.w(TAG, e);
+//									}
+//								}
+//							}
+						}
 					}
 				}
 				is ISurfacePipeline -> {
