@@ -51,6 +51,6 @@ ext {
 	androidXKtx = '1.6.0'	// これを1.7.0にするとcompileSdkVersion=31が必須になるがコンソールからビルドできなくなるので1.6.0にままにする
 	androidXKtxLifecycle = '2.3.1'
 
-    versionCodeNum = 349
-    versionNameString = '7.21.2'
+    versionCodeNum = 350
+    versionNameString = '7.22.0'
 }
