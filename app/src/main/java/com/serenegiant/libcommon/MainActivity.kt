@@ -133,34 +133,34 @@ class MainActivity
 		if (DEBUG) Log.v(TAG, "onListFragmentInteraction:enableVSync=${BuildConfig.ENABLE_VSYNC}")
 		var fragment: Fragment? = null
 		when (item.id) {
-			0 -> {	// SAF
+			R.string.title_request_saf_permission -> {	// SAF
 				if (BuildCheck.isLollipop()) {
 					fragment = SAFUtilsFragment()
 				} else {
 					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
 				}
 			}
-			1 -> {	// SAFContentProvider
+			R.string.title_saf_filer -> {	// SAFContentProvider
 				if (BuildCheck.isLollipop()) {
 					fragment = SAFFilerFragment()
 				} else {
 					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
 				}
 			}
-			2 -> {	// NetworkConnection
+			R.string.title_network_connection -> {	// NetworkConnection
 				if (!checkPermissionNetwork()) {
 					return
 				}
 				fragment = NetworkConnectionFragment.newInstance()
 			}
-			3 -> {	// UsbMonitor
+			R.string.title_usB_monitor -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
 					return
 				}
 				fragment = UsbFragment.newInstance()
 			}
-			4 -> {	// Camera
+			R.string.title_camera -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -169,7 +169,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera)
 			}
-			5 -> {	// Camera(MediaAVRecorder)
+			R.string.title_camera_rec -> {	// Camera(MediaAVRecorder)
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -178,7 +178,7 @@ class MainActivity
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera_rec)
 			}
-			6 -> {	// Camera(MediaAVRecorder+EncoderPipeline)
+			R.string.title_camera_rec_pipeline -> {	// Camera(MediaAVRecorder+EncoderPipeline)
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -190,7 +190,7 @@ class MainActivity
 					true // trueならEncoderPipelineを使った録画, falseならSurfaceEncoderを使った録画
 				)
 			}
-			7 -> {	// Camera(FaceDetectPipeline)
+			R.string.title_camera_face_detect -> {	// Camera(FaceDetectPipeline)
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -203,7 +203,7 @@ class MainActivity
 					enableFaceDetect = true
 				)
 			}
-			8 -> {	// EffectCamera
+			R.string.title_effect_camera -> {	// EffectCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -211,7 +211,7 @@ class MainActivity
 				}
 				fragment = EffectCameraFragment.newInstance()
 			}
-			9 -> {	// MixCamera
+			R.string.title_mix_camera -> {	// MixCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -220,7 +220,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_mix, R.string.title_mix_camera)
 			}
-			10 -> {	// OverlayCamera
+			R.string.title_overlay_camera -> {	// OverlayCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -229,7 +229,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_overlay, R.string.title_overlay_camera)
 			}
-			11 -> {	// VideoSourceCamera
+			R.string.title_video_source_camera -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -238,7 +238,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_video_source, R.string.title_video_source_camera)
 			}
-			12 -> {	// VideoSourceDistributionCamera
+			R.string.title_video_source_dist_camera -> {	// VideoSourceDistributionCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -247,7 +247,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_distributor, R.string.title_video_source_dist_camera)
 			}
-			13 -> {	// ImageViewCamera
+			R.string.title_image_view_camera -> {	// ImageViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -256,7 +256,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_image_view, R.string.title_image_view_camera)
 			}
-			14 -> {	// TextureViewCamera
+			R.string.title_texture_view_camera -> {	// TextureViewCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -265,7 +265,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_texture_view, R.string.title_texture_view_camera)
 			}
-			15 -> {	// SimpleCameraGL
+			R.string.title_simple_gl_camera -> {	// SimpleCameraGL
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -274,7 +274,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_camera_gl, R.string.title_simple_gl_camera)
 			}
-			16 -> {	// CameraSurface
+			R.string.title_camera_surface -> {	// CameraSurface
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -282,7 +282,7 @@ class MainActivity
 				}
 				fragment = CameraSurfaceFragment()
 			}
-			17 -> {	// SimpleVideoSourceCameraGLView
+			R.string.title_simple_camera_source -> {	// SimpleVideoSourceCameraGLView
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -291,7 +291,7 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_simple_video_source_camera, R.string.title_simple_camera_source)
 			}
-			18 -> {	// DummyCameraGLView
+			R.string.title_dummy_camera_source -> {	// DummyCameraGLView
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
 					|| !checkPermissionAudio()) {
@@ -300,34 +300,34 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_dummy_source, R.string.title_dummy_camera_source)
 			}
-			19 -> {	// Galley
+			R.string.title_galley -> {	// Galley
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment()
 			}
-			20 -> {	// Galley(RecyclerView,Cursor)
+			R.string.title_galley_recycler_cursor -> {	// Galley(RecyclerView,Cursor)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment2()
 			}
-			21 -> {	// Galley(RecyclerView)
+			R.string.title_galley_recycler -> {	// Galley(RecyclerView)
 				if (!checkPermissionReadExternalStorage()) {
 					return
 				}
 				fragment = GalleyFragment3()
 			}
-			22 -> {	// NumberKeyboard
+			R.string.title_number_keyboard -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
-			23 -> {	// ViewSlider
+			R.string.title_view_slider -> {	// ViewSlider
 				fragment = ViewSliderFragment()
 			}
-			24 -> {	// ProgressView
+			R.string.title_progress_view -> {	// ProgressView
 				fragment = ProgressFragment()
 			}
-			25 -> {	// PermissionUtils
+			R.string.title_permissions -> {	// PermissionUtils
 				fragment = PermissionFragment.newInstance()
 			}
 			else -> {

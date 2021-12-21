@@ -21,7 +21,7 @@
 	<string name="title_dummy_camera_source" translatable="false">DummyCameraSource</string>
 	<string name="title_galley" translatable="false">Galley(MediaStoreAdapter)</string>
 	<string name="title_galley_recycler_cursor" translatable="false">Galley(MediaStoreCursorRecyclerAdapter)</string>
-	<string name="title_galley_recycler" translatable="false">Galley(MediaStoreRecyclerAdapter)</string>
+	<string name="title_galley_recycler" translatable="false">Galley(MediaStoreRecyclerAdapter,sometimes slow!!)</string>
 	<string name="title_number_keyboard" translatable="false">NumberKeyboard</string>
 	<string name="title_view_slider" translatable="false">ViewSlider</string>
 	<string name="title_progress_view" translatable="false">ProgressView</string>

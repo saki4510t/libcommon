@@ -19,8 +19,10 @@ package com.serenegiant.libcommon.list
 */
 
 import android.content.Context
+import android.content.res.TypedArray
 import androidx.annotation.ArrayRes
 import java.util.*
+
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -36,15 +38,25 @@ object DummyContent {
 	val ITEMS: MutableList<DummyItem> = ArrayList()
 
 	fun createItems(context: Context, @ArrayRes idItems: Int) {
+		// 文字列配列リソースから文字列配列を取得する
 		val items = context.resources.getStringArray(idItems)
+		// 文字列配列リソースから文字列リソース配列を取得する
+		val array: TypedArray = context.resources.obtainTypedArray(idItems)
+		val resourceIds = IntArray(array.length())
+		try {
+			for (i in resourceIds.indices) {
+				resourceIds[i] = array.getResourceId(i, 0)
+			}
+		} finally {
+			array.recycle()
+		}
 		ITEMS.clear()
-		var i = 0
-		for (item in items) {
-			addItem(DummyItem(i++, item, null))
+		for ((i, item) in items.withIndex()) {
+			addItem(DummyItem(resourceIds[i], item, null))
 		}
 	}
 
-	fun addItem(item: DummyItem) {
+	private fun addItem(item: DummyItem) {
 		ITEMS.add(item)
 	}
 
