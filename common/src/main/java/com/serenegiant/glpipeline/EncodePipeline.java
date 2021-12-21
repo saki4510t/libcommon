@@ -47,7 +47,7 @@ import androidx.annotation.WorkerThread;
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EncodePipeline.class.getSimpleName();
 
 	@NonNull

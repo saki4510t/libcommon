@@ -36,7 +36,7 @@ import androidx.annotation.WorkerThread;
  * テクスチャが更新されたときにSurfaceへ転送するIPipeline実装
  */
 public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfacePipeline.class.getSimpleName();
 
 	@NonNull

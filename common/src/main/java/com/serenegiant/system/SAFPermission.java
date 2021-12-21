@@ -27,7 +27,7 @@ import androidx.fragment.app.Fragment;
  */
 @TargetApi(21)
 public class SAFPermission {
-	private static final boolean DEBUG = true; // set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = SAFPermission.class.getSimpleName();
 
 	/**

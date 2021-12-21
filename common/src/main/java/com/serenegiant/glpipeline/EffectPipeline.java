@@ -41,7 +41,7 @@ import static com.serenegiant.glutils.GLEffect.EFFECT_NON;
  * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のIPipelineへ送る
  */
 public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
 	/**

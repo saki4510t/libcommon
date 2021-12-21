@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
  * IPipelineのインターフェースメソッドの中継をするだけのIPipeline実装
  */
 public class ProxyPipeline implements IPipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProxyPipeline.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;

@@ -366,7 +366,7 @@ open class GLView @JvmOverloads constructor(
 	}
 
 	companion object {
-		private const val DEBUG = true // TODO set false on release
+		private const val DEBUG = false // TODO set false on release
 		private val TAG = GLView::class.java.simpleName
 	}
 
