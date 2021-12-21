@@ -29,8 +29,8 @@ import com.serenegiant.graphics.BitmapHelper
  * FIXME 本来はカメラ映像に映像2の入力が丸く合成されて表示されるが、今は映像2入力が無いので黒い丸が合成表示される
  */
 class MixCameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
+	context: Context?, attrs: AttributeSet? = null)
+		: AbstractCameraGLSurfaceView(context, attrs) {
 
 	@Synchronized
 	override fun onResume() {

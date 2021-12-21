@@ -28,8 +28,8 @@ import com.serenegiant.glutils.RendererHolder
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
 class CameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
+	context: Context?, attrs: AttributeSet? = null)
+		: AbstractCameraGLSurfaceView(context, attrs) {
 
 	override fun createRendererHolder(
 		width: Int, height: Int, callback: RenderHolderCallback?): IRendererHolder {

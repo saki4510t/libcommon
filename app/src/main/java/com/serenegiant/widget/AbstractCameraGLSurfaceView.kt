@@ -43,7 +43,7 @@ import javax.microedition.khronos.opengles.GL10
  * カメラ映像をIRendererHolder経由で取得してプレビュー表示するためのGLSurfaceView実装
  */
 abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
+	 context: Context?, attrs: AttributeSet? = null)
 		: GLSurfaceView(context, attrs), ICameraView {
 
 	protected val glVersion: Int

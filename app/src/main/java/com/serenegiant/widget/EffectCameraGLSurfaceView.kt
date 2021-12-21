@@ -30,8 +30,8 @@ import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
 class EffectCameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
+	context: Context?, attrs: AttributeSet? = null)
+		: AbstractCameraGLSurfaceView(context, attrs) {
 
 	var effect: Int
 	get() {

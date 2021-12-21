@@ -29,8 +29,8 @@ import com.serenegiant.graphics.BitmapHelper
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
  */
 class OverlayCameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AbstractCameraGLSurfaceView(context, attrs, defStyle) {
+	context: Context?, attrs: AttributeSet? = null)
+		: AbstractCameraGLSurfaceView(context, attrs) {
 
 	@Synchronized
 	override fun onResume() {
