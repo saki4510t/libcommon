@@ -20,7 +20,6 @@ package com.serenegiant.glutils;
 
 import android.os.Build;
 import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 import android.view.Choreographer;
 
@@ -31,7 +30,6 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.WorkerThread;
 
 /**
  * GLコンテキストとそれを保持するワーカースレッドを扱うためのヘルパークラス
@@ -45,8 +43,6 @@ public class GLManager {
 	@NonNull
 	private final Handler mGLHandler;
 	private final long mHandlerThreadId;
-	@Nullable
-	private final Handler.Callback mCallback;
 	private boolean mInitialized;
 	private boolean mReleased;
 
@@ -112,22 +108,14 @@ public class GLManager {
 		@Nullable final Handler.Callback callback) throws RuntimeException {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mCallback = callback;
 		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
-		final Handler.Callback handlerCallback
-			= new Handler.Callback() {
-			@Override
-			public boolean handleMessage(@NonNull final Message msg) {
-				return GLManager.this.handleMessage(msg);
-			}
-		};
 		final HandlerThreadHandler handler;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 			// API>=22ならHandlerを非同期仕様で初期化
-			handler = HandlerThreadHandler.createHandler(TAG, handlerCallback, true);
+			handler = HandlerThreadHandler.createHandler(TAG, callback, true);
 		} else {
 			// API<22ならHandlerをLooperによる同期バリアを受ける設定で初期化
-			handler = HandlerThreadHandler.createHandler(TAG, handlerCallback);
+			handler = HandlerThreadHandler.createHandler(TAG, callback);
 		}
 		mGLHandler = handler;
 		mHandlerThreadId = handler.getId();
@@ -362,19 +350,6 @@ public class GLManager {
 		if (!isValid()) {
 			throw new IllegalStateException("already released");
 		}
-	}
-
-	/**
-	 * GLスレッド上での処理の実体
-	 * @param msg
-	 * @return
-	 */
-	@WorkerThread
-	protected boolean handleMessage(@NonNull final Message msg) {
-		if (mCallback != null) {
-			return mCallback.handleMessage(msg);
-		}
-		return false;
 	}
 
 	/**
