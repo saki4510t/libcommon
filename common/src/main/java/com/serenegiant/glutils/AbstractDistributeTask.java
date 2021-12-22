@@ -488,7 +488,7 @@ public abstract class AbstractDistributeTask {
 	 * 実際の描画処理
 	 */
 	@WorkerThread
-	protected void handleDraw(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	private void handleDraw(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
 		if (!isMasterSurfaceValid()) {
@@ -570,14 +570,14 @@ public abstract class AbstractDistributeTask {
 	 * @param ts
 	 */
 	@WorkerThread
-	protected void handleAddSurface(@NonNull final TargetSurface ts) {
+	private void handleAddSurface(@NonNull final TargetSurface ts) {
 
 		if (DEBUG) Log.v(TAG, "handleAddSurface:" + ts.id);
 		checkTarget();
 		RendererTarget target = mTargets.get(ts.id);
 		if (target == null) {
 			try {
-				target = createRendererTarget(ts.id, getEgl(), ts.surface, ts.maxFps);
+				target = createRendererTarget(getEgl(), ts.id, ts.surface, ts.maxFps);
 				GLUtils.setMirror(target.getMvpMatrix(), mMirror);
 				synchronized (mTargets) {
 					mTargets.append(ts.id, target);
@@ -596,20 +596,21 @@ public abstract class AbstractDistributeTask {
 	/**
 	 * IRendererTargetインスタンスを生成する
 	 * このクラスではRendererTarget.newInstanceを呼ぶだけ
-	 * @param id
 	 * @param egl
+	 * @param id
 	 * @param surface
-	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 * @param maxFps 最大フレームレート, nullまたは0以下なら未指定
 	 * @return
 	 */
 	@WorkerThread
 	@NonNull
-	protected RendererTarget createRendererTarget(final int id,
+	private RendererTarget createRendererTarget(
 		@NonNull final EGLBase egl,
+		final int id,
 		@NonNull final Object surface, @Nullable final Fraction maxFps) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTarget:" + id);
-		return RendererTarget.newInstance(getEgl(), surface, maxFps != null ? maxFps.asFloat() : -1.0f);
+		return RendererTarget.newInstance(egl, surface, maxFps != null ? maxFps.asFloat() : -1.0f);
 	}
 
 	/**
@@ -617,7 +618,7 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 */
 	@WorkerThread
-	protected void handleRemoveSurface(final int id) {
+	private void handleRemoveSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "handleRemoveSurface:id=" + id);
 		final RendererTarget target = mTargets.get(id);
 		if (target != null) {
@@ -637,7 +638,7 @@ public abstract class AbstractDistributeTask {
 	 * 念の為に分配描画先のSurfaceを全て破棄する
 	 */
 	@WorkerThread
-	protected void handleRemoveAll() {
+	private void handleRemoveAll() {
 		if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
@@ -663,7 +664,7 @@ public abstract class AbstractDistributeTask {
 	 * 分配描画先のSurfaceが有効かどうかをチェックして無効なものは削除する
 	 */
 	@WorkerThread
-	protected void checkTarget() {
+	private void checkTarget() {
 		if (DEBUG) Log.v(TAG, "checkTarget:");
 		final int n = mTargets.size();
 		for (int i = 0; i < n; i++) {
@@ -684,7 +685,7 @@ public abstract class AbstractDistributeTask {
 	 * @param color
 	 */
 	@WorkerThread
-	protected void handleClear(final int id, final int color) {
+	private void handleClear(final int id, final int color) {
 		if (DEBUG) Log.v(TAG, "handleClear:" + id);
 		final RendererTarget target = mTargets.get(id);
 		if ((target != null) && target.isValid()) {
@@ -697,7 +698,7 @@ public abstract class AbstractDistributeTask {
 	 * @param color
 	 */
 	@WorkerThread
-	protected void handleClearAll(final int color) {
+	private void handleClearAll(final int color) {
 		if (DEBUG) Log.v(TAG, "handleClearAll:");
 		final int n = mTargets.size();
 		for (int i = 0; i < n; i++) {
@@ -715,7 +716,7 @@ public abstract class AbstractDistributeTask {
 	 * @param mvp
 	 */
 	@WorkerThread
-	protected void handleSetMvp(final int id,
+	private void handleSetMvp(final int id,
 		final int offset, @NonNull final float[] mvp) {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
@@ -730,7 +731,7 @@ public abstract class AbstractDistributeTask {
 	 * @param mirror
 	 */
 	@WorkerThread
-	protected void handleMirror(final int mirror) {
+	private void handleMirror(final int mirror) {
 		if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
 		mMirror = mirror;
 		final int n = mTargets.size();
@@ -748,7 +749,7 @@ public abstract class AbstractDistributeTask {
 	 * @param degree
 	 */
 	@WorkerThread
-	protected void handleRotate(final int id, final int degree) {
+	private void handleRotate(final int id, final int degree) {
 		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
 		mRotation = degree;
 		final RendererTarget target = mTargets.get(id);
