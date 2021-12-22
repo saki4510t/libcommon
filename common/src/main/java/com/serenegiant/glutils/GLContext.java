@@ -37,6 +37,10 @@ import kotlin.jvm.Transient;
 
 /**
  * 現在のスレッド上にGLコンテキストを生成する
+ * コンストラクタはメイン/UIスレッドを含めた任意のスレッド上で実行可能
+ * #initializeを呼び出したスレッド上にOpenGL|ESのレンダリングコンテキストが紐付けられる
+ * すでにOpenGL|ESのレンダリングスレッドが紐付けられたスレッド上で#initializeを呼び出したときの
+ * 挙動は不明
  */
 public class GLContext implements EGLConst {
 	private static final boolean DEBUG = false;	// set false on production
@@ -47,24 +51,61 @@ public class GLContext implements EGLConst {
 	 */
 	private static boolean isOutputVersionInfo = false;
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
 	private final Object mSync = new Object();
+	/**
+	 * 初期化に使用可能なGL|ESのバージョン
+	 * 1,2,3のいずれか
+	 */
 	private final int mMaxClientVersion;
+	/**
+	 * 初期化に使用する共有コンテキスト
+	 * nullなら他スレッド上のレンダリングコンテキストとは独立したレンダリングコンテキストを生成する
+	 * (独立していてもSurfaceTexture等を介してやり取りすること自体は可能)
+	 */
 	@Nullable
 	private final EGLBase.IContext<?> mSharedContext;
+	/**
+	 * 初期化に使用するフラグ
+	 */
 	private final int mFlags;
+	/**
+	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
+	 * そのためのオフクリーンのサイズ(横)
+	 */
 	@Size(min=1)
 	private final int mMasterWidth;
+	/**
+	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
+	 * そのためのオフクリーンのサイズ(縦)
+	 */
 	@Size(min=1)
 	private final int mMasterHeight;
+	/**
+	 * EGLアクセスオブジェクト
+	 */
 	@Transient
 	@Nullable
 	private EGLBase mEgl = null;
+	/**
+	 * レンダリングコンテキストを有効にするのに必要な描画surface
+	 * #initializeで指定したSurface/SurfaceHolder/SurfaceTexture/SurfaceViewの
+	 * windows surfaceから生成したもの、またはオフスクリーン
+	 */
 	@Transient
 	@Nullable
 	private EGLBase.IEglSurface mEglMasterSurface;
+	/**
+	 * レンダリングコンテキストを紐付けたスレッドのID
+	 */
 	@Transient
 	private long mGLThreadId;
+	/**
+	 * GL|ESのエクステンション文字列のキャッシュ用
+	 */
 	@Transient
 	@Nullable
 	private String mGlExtensions;
@@ -193,10 +234,12 @@ public class GLContext implements EGLConst {
 			isOutputVersionInfo = true;
 			logVersionInfo();
 		}
+		// extension文字列をキャッシュを試みるため1回呼んでおく
+		isOES3Supported();
 	}
 
 	/**
-	 * EGLBaseを取得
+	 * EGLBase(EGLコンテキスト操作用オブジェクト)を取得
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -243,7 +286,7 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
-	 * IContextを取得
+	 * IContext(EGLレンダリングコンテキストのラッパー)を取得
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -307,6 +350,7 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * eglWaitGLとeglWaitNativeを呼ぶ
+	 * 基本的には使わないはず
 	 *
 	 * eglWaitGL: コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
 	 * eglWaitNative: GPU側の描画処理が終了するまで実行をブロックする
@@ -340,6 +384,7 @@ public class GLContext implements EGLConst {
 	/**
 	 * eglWaitNativeを呼ぶ
 	 * GPU側の描画処理が終了するまで実行をブロックする
+	 * 基本的には使わないはず
 	 */
 	@WorkerThread
 	public void waitNative() throws IllegalStateException {
@@ -398,29 +443,47 @@ public class GLContext implements EGLConst {
 	@WorkerThread
 	public boolean hasExtension(@NonNull final String extension) {
 		if (TextUtils.isEmpty(mGlExtensions)) {
-			// GLES30#glGetStringはGLES20の継承メソッドなので条件分岐をコメントに変更
-//			if (isGLES2()) {
-				mGlExtensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
-//			} else {
-//				mGlExtensions = GLES30.glGetString(GLES30.GL_EXTENSIONS); // API >= 18
-//			}
+			// GLES30#glGetStringはGLES20の継承メソッドなので条件分岐不要
+			mGlExtensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
 		}
 		return (mGlExtensions != null) && mGlExtensions.contains(extension);
 	}
 
 	/**
 	 * GLES2/3でGL_OES_EGL_image_externalに対応しているかどうか
+	 * isOES2Supportedのシノニム
+	 * @return
+	 * @deprecated isOES2Supportedを使うこと
+	 */
+	@Deprecated
+	public boolean isOES2() {
+		return isOES2Supported();
+	}
+
+	/**
+	 * GLES2/3でGL_OES_EGL_image_externalに対応しているかどうか
 	 * @return
 	 */
-	public boolean isOES2() {
+	public boolean isOES2Supported() {
 		return isGLES2() && hasExtension("GL_OES_EGL_image_external");
+	}
+
+	/**
+	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
+	 * isOES3Supportedのシノニム
+	 * @return
+	 * @deprecated isOES3Supportedを使うこと
+	 */
+	@Deprecated
+	public boolean isOES3() {
+		return isOES3Supported();
 	}
 
 	/**
 	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
 	 * @return
 	 */
-	public boolean isOES3() {
+	public boolean isOES3Supported() {
 		return isGLES3() && hasExtension("GL_OES_EGL_image_external_essl3");
 	}
 
