@@ -435,6 +435,7 @@ public class GLContext implements EGLConst {
 		Log.i(TAG, "renderer:" + GLES20.glGetString(GLES20.GL_RENDERER));
 		Log.i(TAG, "version:" + GLES20.glGetString(GLES20.GL_VERSION));
 		Log.i(TAG, "supported version:" + supportedGLESVersion());
+		Log.i(TAG, "extensions:" + GLES20.glGetString(GLES20.GL_EXTENSIONS));
 	}
 
 	/**
