@@ -48,7 +48,7 @@ import javax.microedition.khronos.opengles.GL10
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
  */
 class DistributorCameraGLSurfaceView @JvmOverloads constructor(
-	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
+	context: Context?, attrs: AttributeSet? = null)
 		: GLSurfaceView(context, attrs), ICameraView, IPipelineView {
 
 	private val mGLVersion: Int
