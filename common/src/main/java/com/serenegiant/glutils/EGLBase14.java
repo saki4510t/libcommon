@@ -27,24 +27,27 @@ import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.os.Build;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
-
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 
+import androidx.annotation.IntRange;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
+ * 直接インスタンス生成せずにEGLBaseのヘルパーメソッドを使うこと
+ * XXX EGLBaseの中かinternalsパッケージに移動するかも
  */
 @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 /*package*/ class EGLBase14 extends EGLBase {	// API >= 17
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = EGLBase14.class.getSimpleName();
 
+	@NonNull
 	private static final Context EGL_NO_CONTEXT = wrap(EGL14.EGL_NO_CONTEXT);
 
 	/**
@@ -97,6 +100,7 @@ import com.serenegiant.system.BuildCheck;
 	private static class EglSurface implements IEglSurface {
 		@NonNull
 		private final EGLBase14 mEglBase;
+		private final int mGLVersion;
 		private final boolean mOwnSurface;
 		@NonNull
 		private EGLSurface mEglSurface;
@@ -114,6 +118,7 @@ import com.serenegiant.system.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
+			mGLVersion = eglBase.getGlVersion();
 			if (GLUtils.isSupportedSurface(surface)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
 				mOwnSurface = true;
@@ -135,6 +140,7 @@ import com.serenegiant.system.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
+			mGLVersion = eglBase.getGlVersion();
 			if ((width <= 0) || (height <= 0)) {
 				// width/heightの少なくとも一方が0以下なら最小サイズで1x1のオフスクリーンを生成する
 				mEglSurface = mEglBase.createOffscreenSurface(1, 1);
@@ -150,8 +156,18 @@ import com.serenegiant.system.BuildCheck;
 		 * @param eglBase
 		 */
 		private EglSurface(@NonNull final EGLBase14 eglBase) {
+			this(eglBase, EGL14.EGL_DRAW);
+		}
+
+		/**
+		 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+		 * @param eglBase
+		 * @param readDraw EGL14.EGL_DRAWまたはEGL14.EGL_READ
+		 */
+		private EglSurface(@NonNull final EGLBase14 eglBase, final int readDraw) {
 			mEglBase = eglBase;
-			mEglSurface = EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW);
+			mGLVersion = eglBase.getGlVersion();
+			mEglSurface = EGL14.eglGetCurrentSurface(readDraw);
 			mOwnSurface = false;
 			setViewPort(0, 0, getWidth(), getHeight());
 		}
@@ -187,10 +203,7 @@ import com.serenegiant.system.BuildCheck;
 			viewPortWidth = width;
 			viewPortHeight = height;
 
-			final int glVersion = mEglBase.getGlVersion();
-			if (glVersion >= 3) {
-				GLES30.glViewport(x, y, width, height);
-			} else if (mEglBase.getGlVersion() >= 2) {
+			if (mGLVersion >= 2) {	// GLES30のglViewportはGLES20の継承メソッドなので分けなくていい
 				GLES20.glViewport(x, y, width, height);
 			} else {
 				GLES10.glViewport(x, y, width, height);
@@ -205,7 +218,7 @@ import com.serenegiant.system.BuildCheck;
 		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@Override
 		public void swap(final long presentationTimeNs) {
-			mEglBase.swap(mEglSurface, presentationTimeNs);
+			mEglBase.swap(mEglSurface, presentationTimeNs);	// API>=18
 		}
 
 		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
@@ -296,7 +309,8 @@ import com.serenegiant.system.BuildCheck;
 	private Context mContext = EGL_NO_CONTEXT;
 	@NonNull
 	private EGLDisplay mEglDisplay = EGL14.EGL_NO_DISPLAY;
-	   private Config mEglConfig = null;
+	@Nullable
+	private Config mEglConfig = null;
 	private int mGlVersion = 2;
 
 	private EGLContext mDefaultContext = EGL14.EGL_NO_CONTEXT;
@@ -414,7 +428,8 @@ import com.serenegiant.system.BuildCheck;
 	 */
 	@Override
 	public boolean isValidContext() {
-		return (mContext != null) && (mContext.eglContext != EGL14.EGL_NO_CONTEXT);
+		// mContextはNonNullなのでnullチェック不要
+		return mContext.eglContext != EGL14.EGL_NO_CONTEXT;
 	}
 
 	/**
@@ -565,6 +580,7 @@ import com.serenegiant.system.BuildCheck;
 			}
         }
         if (!isValidContext()) {
+			if (DEBUG) Log.d(TAG, "init:GLES1を試みる");
 			config = getConfig(1, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new RuntimeException("chooseConfig failed");
@@ -650,13 +666,15 @@ import com.serenegiant.system.BuildCheck;
 
     private void destroyContext() {
 //		if (DEBUG) Log.v(TAG, "destroyContext:");
-
-        if (!EGL14.eglDestroyContext(mEglDisplay, mContext.eglContext)) {
-            Log.e("destroyContext", "display:" + mEglDisplay
-            	+ " context: " + mContext.eglContext);
-            Log.e(TAG, "eglDestroyContext:" + EGL14.eglGetError());
-        }
-        mContext = EGL_NO_CONTEXT;
+		final EGLContext ctx = mContext.eglContext;
+		mContext = EGL_NO_CONTEXT;
+		if (ctx != EGL14.EGL_NO_CONTEXT) {
+			if (!EGL14.eglDestroyContext(mEglDisplay, ctx)) {
+				Log.e("destroyContext", "display:" + mEglDisplay
+					+ " context: " + ctx);
+				Log.e(TAG, "eglDestroyContext:" + EGL14.eglGetError());
+			}
+		}
         if (mDefaultContext != EGL14.EGL_NO_CONTEXT) {
 	        if (!EGL14.eglDestroyContext(mEglDisplay, mDefaultContext)) {
 	            Log.e("destroyContext", "display:" + mEglDisplay
@@ -667,6 +685,7 @@ import com.serenegiant.system.BuildCheck;
         }
     }
 
+	@NonNull
 	private final int[] mSurfaceDimension = new int[2];
 	private final int getSurfaceWidth(final EGLSurface surface) {
 		final boolean ret = EGL14.eglQuerySurface(mEglDisplay,
@@ -722,14 +741,14 @@ import com.serenegiant.system.BuildCheck;
      * Creates an EGL surface associated with an offscreen buffer.
      */
     @NonNull
-    private final EGLSurface createOffscreenSurface(final int width, final int height)
+    private final EGLSurface createOffscreenSurface(@IntRange(from=1) final int width, @IntRange(from=1) final int height)
 		throws IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
         final int[] surfaceAttribs = {
-                EGL14.EGL_WIDTH, width,
-                EGL14.EGL_HEIGHT, height,
-                EGL14.EGL_NONE
+			EGL14.EGL_WIDTH, width,
+			EGL14.EGL_HEIGHT, height,
+			EGL14.EGL_NONE
         };
 		EGLSurface result;
 		try {

@@ -27,10 +27,10 @@ import javax.microedition.khronos.egl.EGLSurface;
 import android.annotation.TargetApi;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import android.opengl.GLES30;
 import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
@@ -39,6 +39,8 @@ import com.serenegiant.system.BuildCheck;
 
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
+ * 直接インスタンス生成せずにEGLBaseのヘルパーメソッドを使うこと
+ * XXX EGLBaseの中かinternalsパッケージに移動するかも
  */
 /*package*/ class EGLBase10 extends EGLBase {
 	private static final boolean DEBUG = false;	// FIXME set false on release
@@ -94,6 +96,7 @@ import com.serenegiant.system.BuildCheck;
 	private static class EglSurface implements IEglSurface {
 		@NonNull
 		private final EGLBase10 mEglBase;
+		private final int mGLVersion;
 		private final boolean mOwnSurface;
 		@NonNull
 		private EGLSurface mEglSurface;
@@ -110,6 +113,7 @@ import com.serenegiant.system.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
+			mGLVersion = eglBase.getGlVersion();
 			final Object _surface;
 			if ((surface instanceof Surface) && !BuildCheck.isAndroid4_2()) {
 				// Android4.1.2だとSurfaceを使えない。
@@ -142,7 +146,9 @@ import com.serenegiant.system.BuildCheck;
 
 //			if (DEBUG) Log.v(TAG, "EglSurface:");
 			mEglBase = eglBase;
+			mGLVersion = eglBase.getGlVersion();
 			if ((width <= 0) || (height <= 0)) {
+				// width/heightの少なくとも一方が0以下なら最小サイズで1x1のオフスクリーンを生成する
 				mEglSurface = mEglBase.createOffscreenSurface(1, 1);
 			} else {
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
@@ -156,8 +162,18 @@ import com.serenegiant.system.BuildCheck;
 		 * @param eglBase
 		 */
 		private EglSurface(@NonNull final EGLBase10 eglBase) {
+			this(eglBase, EGL10.EGL_DRAW);
+		}
+
+		/**
+		 * eglGetCurrentSurfaceで取得したEGLSurfaceをラップする
+		 * @param eglBase
+		 * @param readDraw EGL10.EGL_DRAWまたはEGL10.EGL_READ
+		 */
+		private EglSurface(@NonNull final EGLBase10 eglBase, final int readDraw) {
 			mEglBase = eglBase;
-			mEglSurface = eglBase.mEgl.eglGetCurrentSurface(EGL10.EGL_DRAW);
+			mGLVersion = eglBase.getGlVersion();
+			mEglSurface = eglBase.mEgl.eglGetCurrentSurface(readDraw);
 			mOwnSurface = false;
 			setViewPort(0, 0, getWidth(), getHeight());
 		}
@@ -221,10 +237,7 @@ import com.serenegiant.system.BuildCheck;
 			viewPortWidth = width;
 			viewPortHeight = height;
 
-			final int glVersion = mEglBase.getGlVersion();
-			if (glVersion >= 3) {
-				GLES30.glViewport(x, y, width, height);
-			} else if (mEglBase.getGlVersion() >= 2) {
+			if (mGLVersion >= 2) {	// GLES30のglViewportはGLES20の継承メソッドなので分けなくていい
 				GLES20.glViewport(x, y, width, height);
 			} else {
 				GLES10.glViewport(x, y, width, height);
@@ -316,9 +329,11 @@ import com.serenegiant.system.BuildCheck;
 //--------------------------------------------------------------------------------
 	@NonNull
 	private Context mContext = EGL_NO_CONTEXT;
+	@Nullable
 	private EGL10 mEgl = null;
 	@NonNull
 	private EGLDisplay mEglDisplay = EGL10.EGL_NO_DISPLAY;
+	@Nullable
 	private Config mEglConfig = null;
 	private int mGlVersion = 2;
 
@@ -425,7 +440,8 @@ import com.serenegiant.system.BuildCheck;
 	 */
 	@Override
 	public boolean isValidContext() {
-		return (mContext != null) && (mContext.eglContext != EGL10.EGL_NO_CONTEXT);
+		// mContextはNonNullなのでnullチェック不要
+		return mContext.eglContext != EGL10.EGL_NO_CONTEXT;
 	}
 
 	/**
@@ -596,6 +612,7 @@ import com.serenegiant.system.BuildCheck;
 			}
         }
         if (!isValidContext()) {
+			if (DEBUG) Log.d(TAG, "init:GLES1を試みる");
 			config = getConfig(1, withDepthBuffer, stencilBits, isRecordable);
 			if (config == null) {
 				throw new IllegalArgumentException("chooseConfig failed");
@@ -636,7 +653,7 @@ import com.serenegiant.system.BuildCheck;
         }
         // attach EGL rendering context to specific EGL window surface
         if (!mEgl.eglMakeCurrent(mEglDisplay, surface, surface, mContext.eglContext)) {
-			Log.w("TAG", "eglMakeCurrent" + mEgl.eglGetError());
+			Log.w(TAG, "eglMakeCurrent" + mEgl.eglGetError());
 			return false;
         }
         return true;
@@ -688,13 +705,15 @@ import com.serenegiant.system.BuildCheck;
 
     private final void destroyContext() {
 //		if (DEBUG) Log.v(TAG, "destroyContext:");
-
-        if (!mEgl.eglDestroyContext(mEglDisplay, mContext.eglContext)) {
-            Log.e("destroyContext", "display:" + mEglDisplay
-            	+ " context: " + mContext.eglContext);
-            Log.e(TAG, "eglDestroyContext:" + mEgl.eglGetError());
-        }
-        mContext = EGL_NO_CONTEXT;
+		final EGLContext ctx = mContext.eglContext;
+		mContext = EGL_NO_CONTEXT;
+		if (ctx != EGL10.EGL_NO_CONTEXT) {
+			if (!mEgl.eglDestroyContext(mEglDisplay, ctx)) {
+				Log.e("destroyContext", "display:" + mEglDisplay
+					+ " context: " + ctx);
+				Log.e(TAG, "eglDestroyContext:" + mEgl.eglGetError());
+			}
+		}
     }
 
 	private final int getSurfaceWidth(final EGLSurface surface) {
@@ -755,14 +774,14 @@ import com.serenegiant.system.BuildCheck;
      * @param height
      */
     @NonNull
-    private final EGLSurface createOffscreenSurface(final int width, final int height)
+    private final EGLSurface createOffscreenSurface(@IntRange(from=1) final int width, @IntRange(from=1) final int height)
 		throws IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "createOffscreenSurface:");
         final int[] surfaceAttribs = {
-                EGL10.EGL_WIDTH, width,
-                EGL10.EGL_HEIGHT, height,
-                EGL10.EGL_NONE
+			EGL10.EGL_WIDTH, width,
+			EGL10.EGL_HEIGHT, height,
+			EGL10.EGL_NONE
         };
         mEgl.eglWaitGL();
 		EGLSurface result;
@@ -819,10 +838,10 @@ import com.serenegiant.system.BuildCheck;
 //		final int swapBehavior = dirtyRegions ? EGL_SWAP_BEHAVIOR_PRESERVED_BIT : 0;
         final int[] attribList = {
         	EGL10.EGL_RENDERABLE_TYPE, renderableType,
-			EGL10.EGL_RED_SIZE, 8,
-			EGL10.EGL_GREEN_SIZE, 8,
-        	EGL10.EGL_BLUE_SIZE, 8,
-        	EGL10.EGL_ALPHA_SIZE, 8,
+			EGL10.EGL_RED_SIZE, 8,	// index=3
+			EGL10.EGL_GREEN_SIZE, 8,// index=5
+        	EGL10.EGL_BLUE_SIZE, 8,	// index=7
+        	EGL10.EGL_ALPHA_SIZE, 8,// index=9
 //        	EGL10.EGL_SURFACE_TYPE, EGL10.EGL_WINDOW_BIT | swapBehavior,
         	EGL10.EGL_NONE, EGL10.EGL_NONE,	//EGL10.EGL_STENCIL_SIZE, 8,
 			// this flag need to recording of MediaCodec
