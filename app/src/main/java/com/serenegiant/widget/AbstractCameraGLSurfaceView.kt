@@ -227,25 +227,27 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
-			mDrawer = GLDrawer2D.create(isOES3, true)
+			val drawer = GLDrawer2D.create(isOES3, true)
+			mDrawer = drawer
 			// create texture ID
-			hTex = mDrawer!!.initTex()
+			hTex = drawer.initTex()
 			// create SurfaceTexture with texture ID.
-			inputSurfaceTexture = SurfaceTexture(hTex)
-			inputSurfaceTexture!!.setDefaultBufferSize(
+			val st = SurfaceTexture(hTex)
+			inputSurfaceTexture = st
+			st.setDefaultBufferSize(
 				mCameraDelegator.requestWidth, mCameraDelegator.requestHeight)
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-				inputSurfaceTexture!!.setOnFrameAvailableListener(
+				st.setOnFrameAvailableListener(
 					this, HandlerThreadHandler.createHandler(TAG))
 			} else {
-				inputSurfaceTexture!!.setOnFrameAvailableListener(this)
+				st.setOnFrameAvailableListener(this)
 			}
 			// clear screen with yellow color so that you can see rendering rectangle
 			GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
 			mHasSurface = true
 			// create object for preview display
-			mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-			addSurface(1, Surface(inputSurfaceTexture), false)
+			drawer.setMvpMatrix(mMvpMatrix, 0)
+			addSurface(1, Surface(st), false)
 		}
 
 		override fun onSurfaceChanged(unused: GL10, width: Int, height: Int) {
@@ -286,15 +288,13 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 
 		fun release() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#release:")
-			if (mDrawer != null) {
-				mDrawer!!.deleteTex(hTex)
-//				mDrawer!!.release()	// GT-N7100で動作がおかしくなる
-				mDrawer = null
-			}
-			if (inputSurfaceTexture != null) {
-				inputSurfaceTexture!!.release()
-				inputSurfaceTexture = null
-			}
+			val drawer = mDrawer
+			mDrawer = null
+			drawer?.deleteTex(hTex)
+//			drawer?.release()	// GT-N7100で動作がおかしくなる
+			val st = inputSurfaceTexture
+			inputSurfaceTexture = null
+			st?.release()
 		}
 
 		private var cnt = 0
@@ -307,12 +307,13 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 		override fun onDrawFrame(unused: GL10) {
 			if (DEBUG && ++cnt % 1000 == 0) Log.v(TAG, "onDrawFrame::$cnt")
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-			if (requestUpdateTex && (inputSurfaceTexture != null)) {
+			val st = inputSurfaceTexture
+			if (requestUpdateTex && (st != null)) {
 				requestUpdateTex = false
 				// update texture(came from camera)
-				inputSurfaceTexture!!.updateTexImage()
+				st.updateTexImage()
 				// get texture matrix
-				inputSurfaceTexture!!.getTransformMatrix(mStMatrix)
+				st.getTransformMatrix(mStMatrix)
 			}
 			// draw to preview screen
 			mDrawer?.draw(GLES20.GL_TEXTURE0, hTex, mStMatrix, 0)
