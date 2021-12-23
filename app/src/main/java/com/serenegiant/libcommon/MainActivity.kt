@@ -30,6 +30,7 @@ import com.serenegiant.dialog.RationalDialogV4
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
 import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
+import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.PermissionUtils
@@ -55,6 +56,8 @@ class MainActivity
 						Manifest.permission.ACCESS_COARSE_LOCATION))
 		DummyContent.createItems(this, R.array.list_items)
 		if (savedInstanceState == null) {
+			// IRecorderで使う最大録画時間を無制限(-1)にする
+			VideoConfig.DEFAULT_CONFIG.setMaxDuration(-1)
 			supportFragmentManager
 				.beginTransaction()
 				.replace(R.id.container, TitleFragment.newInstance(1))
