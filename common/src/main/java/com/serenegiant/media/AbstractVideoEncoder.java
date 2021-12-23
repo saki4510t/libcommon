@@ -66,6 +66,7 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
 		mBitRate = getConfig().getBitrate(width, height);
     }
 
+	@Override
 	public void setVideoConfig(final int bitRate, final int frameRate, final int iFrameIntervals) {
 		mBitRate = bitRate;
 		mFramerate = frameRate;

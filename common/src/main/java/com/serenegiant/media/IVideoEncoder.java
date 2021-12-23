@@ -27,4 +27,5 @@ public interface IVideoEncoder extends Encoder {
 		throws IllegalArgumentException, IllegalStateException;
 	public int getWidth();
 	public int getHeight();
+	public void setVideoConfig(final int bitRate, final int frameRate, final int iFrameIntervals);
 }

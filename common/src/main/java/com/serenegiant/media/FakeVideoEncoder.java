@@ -177,7 +177,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		mWidth = width;
 		mHeight = height;
 	}
-	
+
 	@Override
 	public int getWidth() {
 		return mWidth;
@@ -186,5 +186,10 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	@Override
 	public int getHeight() {
 		return mHeight;
+	}
+
+	@Override
+	public void setVideoConfig(final int bitRate, final int frameRate, final int iFrameIntervals) {
+		// ignore
 	}
 }
