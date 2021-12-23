@@ -1,6 +1,8 @@
-apply plugin: 'com.android.application'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+	id 'com.android.application'
+	id 'kotlin-android'
+	id 'kotlin-kapt'
+}
 
 android {
     compileSdkVersion versionCompiler
@@ -26,6 +28,7 @@ android {
 		buildConfigField "boolean", "ENABLE_VSYNC", "${project.property("ENABLE_VSYNC")}"
 
 		vectorDrawables.useSupportLibrary = true
+		multiDexEnabled true
     }
 
     buildTypes {
@@ -35,9 +38,8 @@ android {
         }
     }
 
-//	dataBinding {
-//		enabled = true
-//	}
+	kotlinOptions.jvmTarget = "1.8"
+
 	buildFeatures {
 		dataBinding = true
 		buildConfig = true
@@ -46,17 +48,25 @@ android {
 
 dependencies {
 	implementation fileTree(dir: 'libs', include: ['*.jar'])
-	implementation "androidx.core:core:${androidXCore}"
+	//noinspection GradleDependency
+	implementation "androidx.core:core-ktx:${androidXCore}"
 	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
+	//noinspection GradleDependency
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 	implementation "androidx.constraintlayout:constraintlayout:${androidXConstraint}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
+	implementation "androidx.multidex:multidex:${androidXMultiDex}"
 
-	implementation "androidx.core:core-ktx:${androidXKtx}"
-	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${kotlin_version}"
+	//noinspection GradleDependency
+	implementation "androidx.fragment:fragment-ktx:${androidXFragmentKtx}"
+	//noinspection GradleDependency
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXLifecycleKtx}"
+	//noinspection GradleDependency
+	implementation "androidx.lifecycle:lifecycle-livedata-ktx:${androidXLifecycleKtx}"
+	//noinspection GradleDependency
+	kapt "androidx.lifecycle:lifecycle-common-java8:${androidXLifecycleKtx}"
 
 	implementation project(':common')
 }

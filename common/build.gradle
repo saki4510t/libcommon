@@ -46,15 +46,19 @@ android {
 
 		vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
 	buildFeatures {
 	    buildConfig = true
 	}
+
+	kotlinOptions.jvmTarget = "1.8"
 }
 
 dependencies {
@@ -81,8 +85,10 @@ dependencies {
 //	androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.2.0'
 //	androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
 
+	//noinspection GradleDependency
 	implementation "androidx.core:core-ktx:${androidXCore}"
 	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
+	//noinspection GradleDependency
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.preference:preference-ktx:${androidXPreference}"
@@ -90,8 +96,10 @@ dependencies {
 	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 
-	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXKtxLifecycle}"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+	//noinspection GradleDependency
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXLifecycleKtx}"
+	//noinspection GradleDependency
+	kapt "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 }
 
 repositories {
