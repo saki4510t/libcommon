@@ -115,6 +115,7 @@ public abstract class AbstractEncoder implements Encoder {
      * 出力ファイルのパスを返す
      * @return
      */
+	@SuppressWarnings("deprecation")
     @Deprecated
     @Override
 	public String getOutputPath() {

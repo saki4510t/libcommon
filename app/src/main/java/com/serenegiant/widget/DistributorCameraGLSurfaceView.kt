@@ -262,7 +262,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)
 			// create texture ID
-			hTex = mDrawer!!.initTex()
+			hTex = mDrawer!!.initTex(GLES20.GL_TEXTURE0)
 			// create SurfaceTexture with texture ID.
 			inputSurfaceTexture = SurfaceTexture(hTex)
 			inputSurfaceTexture!!.setDefaultBufferSize(

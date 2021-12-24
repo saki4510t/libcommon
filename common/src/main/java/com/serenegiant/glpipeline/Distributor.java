@@ -168,15 +168,16 @@ public class Distributor extends ProxyPipeline {
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
 	 */
-	@SuppressWarnings("deprecation")
 	@Deprecated
 	public void addSurface(final int id,
 		final Object surface, final boolean isRecordable, final int maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		mDistributeTask.addSurface(id, surface, maxFps);
+		mDistributeTask.addSurface(id, surface,
+			maxFps <= 0 ? null :(maxFps > 1000 ? new Fraction(maxFps, 1000) : new Fraction(maxFps)));
 	}
 
 	/**

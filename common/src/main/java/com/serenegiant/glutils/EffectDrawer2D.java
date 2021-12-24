@@ -243,6 +243,7 @@ public class EffectDrawer2D {
 	 * @param texId
 	 * @param texMatrix
 	 * @param offset
+	 * @deprecated texUnitを明的に指定する#drawを使うこと
 	 */
 	@Deprecated
 	public synchronized void draw(final int texId,
@@ -259,7 +260,9 @@ public class EffectDrawer2D {
 	 * @param texOffset
 	 * @param mvpMatrix
 	 * @param mvpOffset
+	 * @deprecated texUnitを明的に指定する#drawを使うこと
 	 */
+	@Deprecated
 	public synchronized void draw(final int texId,
 		@Nullable final float[] texMatrix, final int texOffset,
 		@Nullable final float[] mvpMatrix, final int mvpOffset) {
@@ -309,6 +312,7 @@ public class EffectDrawer2D {
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * テクスチャユニットはGL_TEXTURE0
 	 * @param texId
+	 * @deprecated texUnitを明示的に指定するbindTextureを使うこと
 	 */
 	@Deprecated
 	protected void bindTexture(final int texId) {
@@ -354,9 +358,22 @@ public class EffectDrawer2D {
 	 * GLHelper#initTexを呼び出すだけ
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @return texture ID
+	 * @deprecated texUnitを明的に指定する#drawを使うこと
 	 */
+	@Deprecated
 	public int initTex() {
-		return mDrawer.initTex();
+		return mDrawer.initTex(GLES20.GL_TEXTURE0);
+	}
+
+	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * GLコンテキストを保持したスレッド上で呼び出すこと
+	 * @param texUnit
+	 * @return
+	 */
+	public int initTex(final int texUnit) {
+		return mDrawer.initTex(texUnit);
 	}
 
 	/**

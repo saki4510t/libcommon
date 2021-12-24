@@ -193,7 +193,6 @@ public class AspectScaledTextureView extends TransformTextureView
 		return false;
 	}
 
-	@Deprecated
 	@Override
 	public void onSurfaceTextureUpdated(@NonNull final SurfaceTexture surface) {
 		if (mListener != null) {

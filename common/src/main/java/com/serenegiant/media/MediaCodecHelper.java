@@ -35,6 +35,7 @@ import java.util.List;
 
 /**
  * XXX MediaCodecUtilsへ集約したので今後はMediaCodecUtilsを使うこと
+ * @deprecated MediaCodecUtilsを使うこと
  */
 @Deprecated
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN)

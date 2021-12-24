@@ -30,6 +30,7 @@ import java.util.Collections;
 
 /**
  * 代わりにNetworkUtilsを使うこと
+ * @deprecated NetworkUtilsを使うこと
  */
 @Deprecated
 public class NetworkHelper {

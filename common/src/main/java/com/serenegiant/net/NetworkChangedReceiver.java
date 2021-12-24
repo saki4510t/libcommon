@@ -44,6 +44,7 @@ import com.serenegiant.utils.ComponentUtils;
  * これのためだけにsupport library v4が要るにゃぁ
  * 削除予定なので代わりにConnectivityHelperを使うこと
  */
+@SuppressWarnings("deprecation")
 @Deprecated
 @SuppressLint("MissingPermission")
 public class NetworkChangedReceiver extends BroadcastReceiver {
@@ -140,11 +141,21 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 			final int isConnectedOrConnecting, final int isConnected, final int activeNetworkMask);
 	}
 
+	/**
+	 * NetworkChangedReceiverを有効にする
+	 * @param context
+	 * @deprecated ComponentUtils.enableを直接使うこと
+	 */
 	@Deprecated
 	public static void enable(final Context context) {
 		ComponentUtils.enable(context, NetworkChangedReceiver.class);
 	}
 
+	/**
+	 * NetworkChangedReceiverを無効にする
+	 * @param context
+	 * @deprecated ComponentUtils.disableを直接使うこと
+	 */
 	@Deprecated
 	public static void disable(final Context context) {
 		ComponentUtils.disable(context, NetworkChangedReceiver.class);
@@ -287,7 +298,7 @@ public class NetworkChangedReceiver extends BroadcastReceiver {
 
 	/** コールバックリスナー */
 	@Nullable
-	private OnNetworkChangedListener mListener;
+	private final OnNetworkChangedListener mListener;
 
 	/**
 	 * デフォルトコンストラクタ

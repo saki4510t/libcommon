@@ -52,6 +52,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	/**
 	 * DEFAULT_CONFIGを引き継いだ新しいVideoConfigオブジェクトを生成
 	 * @return
+	 * @deprecated デフォルトコンストラクタを使うこと
 	 */
 	@Deprecated
 	public static VideoConfig createDefault() {

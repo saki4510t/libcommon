@@ -209,8 +209,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
 	 */
-	@SuppressWarnings("deprecation")
 	@Deprecated
 	@Override
 	public void addSurface(final int id,
@@ -218,7 +218,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			throws IllegalStateException, IllegalArgumentException {
 
 //		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		mRendererTask.addSurface(id, surface, maxFps);
+		mRendererTask.addSurface(id, surface,
+			maxFps <= 0 ? null :(maxFps > 1000 ? new Fraction(maxFps, 1000) : new Fraction(maxFps)));
 	}
 
 	/**

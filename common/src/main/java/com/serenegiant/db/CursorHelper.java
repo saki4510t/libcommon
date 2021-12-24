@@ -207,7 +207,7 @@ public final class CursorHelper {
 				if (cursor.moveToFirst()) {
 					long rowId;
 					do {
-						rowId = CursorHelper.getLong(cursor, "_id", 0);
+						rowId = CursorHelper.get(cursor, "_id", 0L);
 						if (rowId == requestID) {
 							position = cursor.getPosition();
 							break;

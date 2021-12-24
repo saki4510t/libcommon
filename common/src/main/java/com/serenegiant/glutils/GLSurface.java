@@ -445,6 +445,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * オフスクリーン描画用のレンダリングバッファに切り替える
 	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
+	 * @deprecated #makeCurrentを使うこと
 	 */
 	@Deprecated
 	public void bind() {
@@ -454,6 +455,7 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * デフォルトのレンダリングバッファに戻す
+	 * @deprecated #swapを使うこと
 	 */
 	@Deprecated
 	public void unbind() {

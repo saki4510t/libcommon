@@ -230,7 +230,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			val drawer = GLDrawer2D.create(isOES3, true)
 			mDrawer = drawer
 			// create texture ID
-			hTex = drawer.initTex()
+			hTex = drawer.initTex(GLES20.GL_TEXTURE0)
 			// create SurfaceTexture with texture ID.
 			val st = SurfaceTexture(hTex)
 			inputSurfaceTexture = st

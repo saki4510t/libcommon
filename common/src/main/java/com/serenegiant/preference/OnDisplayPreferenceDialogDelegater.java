@@ -64,7 +64,9 @@ public class OnDisplayPreferenceDialogDelegater {
 	 * @param fragment
 	 * @param preference
 	 * @return true: 処理済み, false: 未処理
+	 * @deprecated PreferenceFragmentがdeprecatedなのでPreferenceFragmentCompatを使うこと
 	 */
+	@SuppressWarnings("deprecation")
 	@Deprecated
 	public static boolean onDisplayPreferenceDialog(
 		@NonNull final PreferenceFragment fragment,

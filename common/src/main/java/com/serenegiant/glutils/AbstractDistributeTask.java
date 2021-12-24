@@ -133,6 +133,7 @@ public abstract class AbstractDistributeTask {
 	 * @param id
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
+	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
 	 */
 	@Deprecated
 	@AnyThread

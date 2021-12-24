@@ -151,7 +151,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		protected void onStart() {
 			if (DEBUG) Log.d(TAG, "DrawTask#onStart:");
 			mDrawer = GLDrawer2D.create(isGLES3(), true);
-			mTexId = mDrawer.initTex();
+			mTexId = mDrawer.initTex(GLES20.GL_TEXTURE0);
 			mSourceTexture = new SurfaceTexture(mTexId);
 			mSourceTexture.setDefaultBufferSize(mWidth, mHeight);    // これを入れないと映像が取れない
 			mSourceSurface = new Surface(mSourceTexture);

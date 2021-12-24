@@ -28,6 +28,11 @@ import android.widget.NumberPicker;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceDialogFragment;
 
+/**
+ * 数字選択用PreferenceDialogFragment実装
+ * @deprecated NumberPickerPreferenceFragmentCompatを使うこと
+ */
+@SuppressWarnings("deprecation")
 @Deprecated
 public class NumberPickerPreferenceFragment extends PreferenceDialogFragment {
 	private static final boolean DEBUG = false;	// set false on production

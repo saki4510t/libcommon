@@ -58,6 +58,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * MediaStoreAdapterのRecyclerView.Adapter版
  * XXX サムネイルを取得できなかった項目は表示されなくなる
  * XXX サムネイルを取得できない壊れたファイル等があっても正常に動作するが対象ファイル数が多いと表示されるまでに時間がかかるのでdeprecatedにする
+ * @deprecated MediaStoreCursorRecyclerAdapterを使うこと
  */
 @SuppressWarnings("deprecation")
 @Deprecated

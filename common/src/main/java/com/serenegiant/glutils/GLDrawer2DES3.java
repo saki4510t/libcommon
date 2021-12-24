@@ -130,10 +130,24 @@ import androidx.annotation.RequiresApi;
 	 * GLHelper#initTexを呼び出すだけ
 	 * IShaderDrawer2dの実装
 	 * @return texture ID
+	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
 	 */
+	@Deprecated
 	@Override
 	public int initTex() {
 		return GLHelper.initTex(mTexTarget, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
+	}
+
+	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * IShaderDrawer2dの実装
+	 * @param texUnit
+	 * @return texture ID
+	 */
+	@Override
+	public int initTex(final int texUnit) {
+		return GLHelper.initTex(mTexTarget, texUnit, GLES30.GL_NEAREST);
 	}
 
 	/**

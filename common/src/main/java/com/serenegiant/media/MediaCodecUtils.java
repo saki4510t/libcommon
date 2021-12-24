@@ -1039,6 +1039,7 @@ public final class MediaCodecUtils {
 	 * 指定したMIMEに一致する最初の音声エンコード用コーデックを選択する
 	 * @param mimeType
 	 * @return
+	 * @deprecated selectAudioEncoderを使うこと
 	 */
 	@Deprecated
 	@Nullable

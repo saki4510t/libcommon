@@ -51,6 +51,7 @@ import java.util.Map;
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
  * systemパッケージに移動したのでそちらを使うこと
+ * @deprecated systemパッケージ内のSAFUtilsを使うこと
  */
 @Deprecated
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)

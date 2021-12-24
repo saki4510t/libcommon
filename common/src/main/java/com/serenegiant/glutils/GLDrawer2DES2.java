@@ -127,7 +127,9 @@ import androidx.annotation.NonNull;
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
 	 * @return texture ID
+	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
 	 */
+	@Deprecated
 	@Override
 	public int initTex() {
 		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
@@ -137,9 +139,21 @@ import androidx.annotation.NonNull;
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
 	 * @param texUnit
+	 * @return texture ID
+	 */
+	@Override
+	public int initTex(final int texUnit) {
+		return GLHelper.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
+	}
+
+	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * @param texUnit
 	 * @param filterParam
 	 * @return
 	 */
+	@Override
 	public int initTex(final int texUnit, final int filterParam) {
 		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
 	}

@@ -47,7 +47,7 @@ import androidx.annotation.NonNull;
 /**
  * 動画再生用のヘルパークラス
  * API>=21と未満で処理を分けるようにする
- * @deprecated MediaPlayを使うこと
+ * @deprecated MediaPlayerを使うこと
  */
 @Deprecated
 @SuppressLint("InlinedApi")

@@ -1008,6 +1008,7 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 *  ※どちらかのベクトルの長さが0の場合には(ゼロ除算で)INFINITYになる
 	 * @param v
 	 * @return 角度[度]
+	 * @deprecated #angleを使うこと
 	 */
 	@Deprecated
 	public float getAngle(@NonNull final Vector v) {

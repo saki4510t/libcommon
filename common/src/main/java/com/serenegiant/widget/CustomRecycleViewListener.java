@@ -24,6 +24,7 @@ import android.view.View;
 /**
  * ArrayListRecyclerViewAdapter.ArrayListRecyclerViewListenerを使うこと
  * @param <T>
+ * @deprecated ArrayListRecyclerViewAdapter.ArrayListRecyclerViewListenerを使うこと
  */
 @Deprecated
 public interface CustomRecycleViewListener<T> {

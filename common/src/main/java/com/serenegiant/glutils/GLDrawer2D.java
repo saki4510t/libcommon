@@ -271,6 +271,7 @@ public abstract class GLDrawer2D {
 	 * @param texId
 	 * @param tex_matrix
 	 * @param offset
+	 * @deprecated texUnitを明示的に指定する#drawを使うこと
 	 */
 	@Deprecated
 	public synchronized void draw(
@@ -372,8 +373,18 @@ public abstract class GLDrawer2D {
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
 	 * @return texture ID
+	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
 	 */
+	@Deprecated
 	public abstract int initTex();
+
+	/**
+	 * テクスチャ名生成のヘルパーメソッド
+	 * GLHelper#initTexを呼び出すだけ
+	 * @param texUnit
+	 * @return texture ID
+	 */
+	public abstract int initTex(final int texUnit);
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド

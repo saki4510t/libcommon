@@ -59,6 +59,11 @@ public class ProgressView extends View {
 		}
 	}
 
+	/*
+	 * XXX	背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
+	 * 		#setDirectionを使わずに(デフォルトのDIRECTION_BOTTOM_TO_TOP)にして
+	 * 		android:rotationで回転させること
+	 */
 	@Deprecated
 	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
 	@Deprecated
@@ -237,6 +242,8 @@ public class ProgressView extends View {
 	/**
 	 * プログレスの進行方向を指定
 	 * @param directionDegrees 0:
+	 * @deprecated 背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
+	 * 		#setDirectionを使わずに(デフォルトのDIRECTION_BOTTOM_TO_TOP)にしてandroid:rotationで回転させること
 	 */
 	@Deprecated
 	public void setDirection(@Direction int directionDegrees) {

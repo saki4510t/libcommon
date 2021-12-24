@@ -34,6 +34,7 @@ import com.serenegiant.common.R;
 /**
  * 表示内容が空のときに代わりに指定したViewを表示する機能を追加したRecyclerView実装
  * RecyclerViewWithEmptyViewを使うこと
+ * @deprecated RecyclerViewWithEmptyViewを使うこと
  */
 @Deprecated
 public class RecycleViewWithEmptyView extends RecyclerView {

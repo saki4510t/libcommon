@@ -102,6 +102,7 @@ public class MediaMuxerWrapper implements IMuxer {
 	 * @param output
 	 * @param format
 	 */
+	@SuppressWarnings("deprecation")
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public MediaMuxerWrapper(
 		@NonNull final MediaStoreOutputStream output,

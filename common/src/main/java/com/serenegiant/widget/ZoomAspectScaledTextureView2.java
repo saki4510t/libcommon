@@ -269,7 +269,7 @@ public class ZoomAspectScaledTextureView2
 // SurfaceTextureListener
 //================================================================================
 	@Override
-	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureAvailable(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		mHasSurface = true;
 		setMirror(MIRROR_NORMAL);	// デフォルトだから適用しなくていいけど
 		init();
@@ -279,7 +279,7 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
-	public void onSurfaceTextureSizeChanged(final SurfaceTexture surface, final int width, final int height) {
+	public void onSurfaceTextureSizeChanged(@NonNull final SurfaceTexture surface, final int width, final int height) {
 		applyMirrorMode();
 		if (mListener != null) {
 			mListener.onSurfaceTextureSizeChanged(surface, width, height);
@@ -287,7 +287,7 @@ public class ZoomAspectScaledTextureView2
 	}
 
 	@Override
-	public boolean onSurfaceTextureDestroyed(final SurfaceTexture surface) {
+	public boolean onSurfaceTextureDestroyed(@NonNull final SurfaceTexture surface) {
 		mHasSurface = false;
 		if (mListener != null) {
 			mListener.onSurfaceTextureDestroyed(surface);
@@ -295,9 +295,8 @@ public class ZoomAspectScaledTextureView2
 		return false;
 	}
 
-	@Deprecated
 	@Override
-	public void onSurfaceTextureUpdated(final SurfaceTexture surface) {
+	public void onSurfaceTextureUpdated(@NonNull final SurfaceTexture surface) {
 		if (mListener != null) {
 			mListener.onSurfaceTextureUpdated(surface);
 		}

@@ -84,6 +84,7 @@ public class SAFUtils {
 	 * @param data
 	 * @param delegater
 	 * @return true if successfully handled, false otherwise
+	 * @deprecated SAFPermissionを使うこと
 	 */
 	@SuppressWarnings("deprecation")
 	@Deprecated

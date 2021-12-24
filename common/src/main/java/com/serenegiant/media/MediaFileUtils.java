@@ -150,6 +150,7 @@ public class MediaFileUtils {
 	 * @param fileNameWithExt
 	 * @return
 	 * @throws IOException
+	 * @deprecated SAFUtils.getFileを使うこと
 	 */
 	@Deprecated
 	@NonNull
