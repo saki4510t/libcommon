@@ -38,6 +38,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.libcommon.Const;
+import com.serenegiant.libcommon.MainActivity;
 import com.serenegiant.libcommon.R;
 import com.serenegiant.media.AbstractAudioEncoder;
 import com.serenegiant.media.AudioSampler;
@@ -519,7 +520,8 @@ public class RecordingService extends BaseService {
 	 */
 	@Override
 	protected PendingIntent contextIntent() {
-		return null;
+		return PendingIntent.getActivity(this, 0,
+			new Intent(this, MainActivity.class), 0);
 	}
 
 //--------------------------------------------------------------------------------
