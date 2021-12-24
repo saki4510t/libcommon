@@ -149,7 +149,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 
 		@Override
 		protected void onStart() {
-			if (DEBUG) Log.d(TAG, "DrawTask#onStart:");
+			if (DEBUG) Log.d(TAG, String.format("DrawTask#onStart:(%dx%d)", mWidth, mHeight));
 			mDrawer = GLDrawer2D.create(isGLES3(), true);
 			mTexId = mDrawer.initTex(GLES20.GL_TEXTURE0);
 			mSourceTexture = new SurfaceTexture(mTexId);
