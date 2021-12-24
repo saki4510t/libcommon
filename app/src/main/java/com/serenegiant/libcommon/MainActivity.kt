@@ -333,6 +333,13 @@ class MainActivity
 			R.string.title_permissions -> {	// PermissionUtils
 				fragment = PermissionFragment.newInstance()
 			}
+			R.string.title_screen_capture -> {	// ScreenCapture
+				if (!checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = ScreenCaptureFragment.newInstance()
+			}
 			else -> {
 			}
 		}

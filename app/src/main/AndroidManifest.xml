@@ -45,6 +45,14 @@
 			</intent-filter>
 		</service>
 
+		<service
+			android:name="com.serenegiant.service.ScreenRecorderService"
+			android:exported="false"
+			android:enabled="true" >
+			<intent-filter>
+				<action android:name="com.serenegiant.service.ScreenRecorderService" />
+			</intent-filter>
+		</service>
 	</application>
 
 </manifest>

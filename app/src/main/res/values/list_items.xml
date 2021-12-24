@@ -26,6 +26,7 @@
 	<string name="title_view_slider" translatable="false">ViewSlider</string>
 	<string name="title_progress_view" translatable="false">ProgressView</string>
 	<string name="title_permissions" translatable="false">Permissions</string>
+	<string name="title_screen_capture" translatable="false">ScreenCapture</string>
 
 	<string-array name="list_items">
 		<item>@string/title_request_saf_permission</item>
@@ -54,5 +55,6 @@
 		<item>@string/title_view_slider</item>
 		<item>@string/title_progress_view</item>
 		<item>@string/title_permissions</item>
+		<item>@string/title_screen_capture</item>
 	</string-array>
 </resources>
