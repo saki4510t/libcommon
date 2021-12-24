@@ -46,7 +46,7 @@ import androidx.fragment.app.Fragment;
  */
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class ScreenCaptureUtils {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ScreenCaptureUtils.class.getSimpleName();
 
 	public interface ScreenCaptureCallback {

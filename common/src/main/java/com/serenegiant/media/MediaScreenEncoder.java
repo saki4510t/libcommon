@@ -27,7 +27,7 @@ import androidx.annotation.Nullable;
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class MediaScreenEncoder extends AbstractVideoEncoder {
-	private static final boolean DEBUG = true;    // set false on production
+	private static final boolean DEBUG = false;    // set false on production
 	private static final String TAG = MediaScreenEncoder.class.getSimpleName();
 
 	// parameters for recording
