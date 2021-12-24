@@ -140,33 +140,33 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		private int mTexId;
 		private SurfaceTexture mSourceTexture;
 		private Surface mSourceSurface;
-    	private EGLBase.IEglSurface mEncoderSurface;
-    	private GLDrawer2D mDrawer;
-    	private final float[] mTexMatrix = new float[16];
+		private EGLBase.IEglSurface mEncoderSurface;
+		private GLDrawer2D mDrawer;
+		private final float[] mTexMatrix = new float[16];
 
-    	public DrawTask(@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
-    		super(sharedContext, flags);
-    	}
+		public DrawTask(@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			super(sharedContext, flags);
+		}
 
 		@Override
 		protected void onStart() {
-		    if (DEBUG) Log.d(TAG,"onStart:");
+			if (DEBUG) Log.d(TAG, "onStart:");
 			mDrawer = GLDrawer2D.create(isGLES3(), true);
 			mTexId = mDrawer.initTex();
 			mSourceTexture = new SurfaceTexture(mTexId);
-			mSourceTexture.setDefaultBufferSize(mWidth, mHeight);	// これを入れないと映像が取れない
+			mSourceTexture.setDefaultBufferSize(mWidth, mHeight);    // これを入れないと映像が取れない
 			mSourceSurface = new Surface(mSourceTexture);
 			mSourceTexture.setOnFrameAvailableListener(mOnFrameAvailableListener, mHandler);
 			mEncoderSurface = getEgl().createFromSurface(mInputSurface);
 
-	    	if (DEBUG) Log.d(TAG,"onStart:setup VirtualDisplay");
-			intervals = (long)(1000f / mFramerate);
-		    display = mMediaProjection.createVirtualDisplay(
-		    	"Capturing Display",
-		    	mWidth, mHeight, mDensity,
-		    	DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
-		    	mSourceSurface, mCallback, mHandler);
-			if (DEBUG) Log.v(TAG,  "onStart:screen capture loop:display=" + display);
+			if (DEBUG) Log.d(TAG, "onStart:setup VirtualDisplay");
+			intervals = (long) (1000f / mFramerate);
+			display = mMediaProjection.createVirtualDisplay(
+				"Capturing Display",
+				mWidth, mHeight, mDensity,
+				DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
+				mSourceSurface, mCallback, mHandler);
+			if (DEBUG) Log.v(TAG, "onStart:screen capture loop:display=" + display);
 			// 録画タスクを起床
 			queueEvent(mDrawTask);
 		}
@@ -192,16 +192,16 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			}
 			makeCurrent();
 			if (display != null) {
-				if (DEBUG) Log.v(TAG,  "onStop:release VirtualDisplay");
+				if (DEBUG) Log.v(TAG, "onStop:release VirtualDisplay");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 					display.release();
 				}
 			}
-			if (DEBUG) Log.v(TAG,  "onStop:tear down MediaProjection");
-		    if (mMediaProjection != null) {
-	            mMediaProjection.stop();
-	            mMediaProjection = null;
-	        }
+			if (DEBUG) Log.v(TAG, "onStop:tear down MediaProjection");
+			if (mMediaProjection != null) {
+				mMediaProjection.stop();
+				mMediaProjection = null;
+			}
 		}
 
 		@Override
@@ -255,8 +255,8 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 					// SurfaceTextureで受け取った画像をMediaCodecの入力用Surfaceへ描画する
 					mEncoderSurface.makeCurrent();
 					mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
-			    	mEncoderSurface.swap();
-			    	// EGL保持用のオフスクリーンに描画しないとハングアップする機種の為のworkaround
+					mEncoderSurface.swap();
+					// EGL保持用のオフスクリーンに描画しないとハングアップする機種の為のworkaround
 					makeCurrent();
 					GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 					GLES20.glFlush();
@@ -275,36 +275,36 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	 * MediaProjection#createVirtualDisplayへ引き渡すVirtualDisplay.Callbackコールバックオブジェクト
 	 */
 	private final VirtualDisplay.Callback mCallback = new VirtualDisplay.Callback() {
-        /**
-         * Called when the virtual display video projection has been
-         * paused by the system or when the surface has been detached
-         * by the application by calling setSurface(null).
-         * The surface will not receive any more buffers while paused.
-         */
-         @Override
+		/**
+		 * Called when the virtual display video projection has been
+		 * paused by the system or when the surface has been detached
+		 * by the application by calling setSurface(null).
+		 * The surface will not receive any more buffers while paused.
+		 */
+		@Override
 		public void onPaused() {
- 			if (DEBUG) Log.v(TAG,  "VirtualDisplay.Callback#onPaused:");
-         }
+			if (DEBUG) Log.v(TAG, "VirtualDisplay.Callback#onPaused:");
+		}
 
-        /**
-         * Called when the virtual display video projection has been
-         * resumed after having been paused.
-         */
-         @Override
+		/**
+		 * Called when the virtual display video projection has been
+		 * resumed after having been paused.
+		 */
+		@Override
 		public void onResumed() {
- 			if (DEBUG) Log.v(TAG,  "VirtualDisplay.Callback#onResumed:");
-         }
+			if (DEBUG) Log.v(TAG, "VirtualDisplay.Callback#onResumed:");
+		}
 
-        /**
-         * Called when the virtual display video projection has been
-         * stopped by the system.  It will no longer receive frames
-         * and it will never be resumed.  It is still the responsibility
-         * of the application to release() the virtual display.
-         */
-        @Override
+		/**
+		 * Called when the virtual display video projection has been
+		 * stopped by the system.  It will no longer receive frames
+		 * and it will never be resumed.  It is still the responsibility
+		 * of the application to release() the virtual display.
+		 */
+		@Override
 		public void onStopped() {
-			if (DEBUG) Log.v(TAG,  "VirtualDisplay.Callback#onStopped:");
+			if (DEBUG) Log.v(TAG, "VirtualDisplay.Callback#onStopped:");
 			mRequestStop = true;
-        }
+		}
 	};
 }
