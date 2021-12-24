@@ -218,20 +218,23 @@ public class ScreenRecorderService extends BaseService {
 				    final DisplayMetrics metrics = getResources().getDisplayMetrics();
 					int width = metrics.widthPixels;
 					int height = metrics.heightPixels;
-					if (width > height) {
-						// 横長
-						final float scale_x = width / 1920f;
-						final float scale_y = height / 1080f;
-						final float scale = Math.max(scale_x,  scale_y);
-						width = (int)(width / scale);
-						height = (int)(height / scale);
-					} else {
-						// 縦長
-						final float scale_x = width / 1080f;
-						final float scale_y = height / 1920f;
-						final float scale = Math.max(scale_x,  scale_y);
-						width = (int)(width / scale);
-						height = (int)(height / scale);
+					if (!BuildCheck.isAndroid7()) {
+						// targetSDK=24/Android7以降は1/2以外にリサイズすると録画映像が歪んでしまうのでスキップする
+						if (width > height) {
+							// 横長
+							final float scale_x = width / 1920f;
+							final float scale_y = height / 1080f;
+							final float scale = Math.max(scale_x,  scale_y);
+							width = (int)(width / scale);
+							height = (int)(height / scale);
+						} else {
+							// 縦長
+							final float scale_x = width / 1080f;
+							final float scale_y = height / 1920f;
+							final float scale = Math.max(scale_x,  scale_y);
+							width = (int)(width / scale);
+							height = (int)(height / scale);
+						}
 					}
 					if (DEBUG) Log.v(TAG, String.format("startRecording:(%d,%d)(%d,%d)", metrics.widthPixels, metrics.heightPixels, width, height));
 					try {
