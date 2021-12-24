@@ -414,9 +414,15 @@ public class Distributor extends ProxyPipeline {
 			return isGLES3;
 		}
 
+		@Deprecated
 		@Override
 		public boolean isOES3() {
-			return mGLContext.isOES3();
+			return mGLContext.isOES3Supported();
+		}
+
+		@Override
+		public boolean isOES3Supported() {
+			return mGLContext.isOES3Supported();
 		}
 
 		@Override

@@ -78,7 +78,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 			override fun onSurfaceCreated() {
 				if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
 				synchronized(mSync) {
-					mDrawer = GLDrawer2D.create(isOES3(), true)
+					mDrawer = GLDrawer2D.create(isOES3Supported(), true)
 					mTexId = mDrawer!!.initTex()
 					mSurfaceTexture = SurfaceTexture(mTexId)
 					mSurfaceTexture!!.setDefaultBufferSize(

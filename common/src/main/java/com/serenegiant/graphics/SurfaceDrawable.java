@@ -235,7 +235,7 @@ public class SurfaceDrawable extends Drawable {
 		return mEglTask.getEgl();
 	}
 
-	protected EGLBase.IContext getContext() {
+	protected EGLBase.IContext<?> getContext() {
 		return mEglTask.getContext();
 	}
 
@@ -243,8 +243,13 @@ public class SurfaceDrawable extends Drawable {
 		return mEglTask.isGLES3();
 	}
 
+	@Deprecated
 	protected boolean isOES3() {
-		return mEglTask.isOES3();
+		return mEglTask.isOES3Supported();
+	}
+
+	protected boolean isOES3Supported() {
+		return mEglTask.isOES3Supported();
 	}
 
 	protected int getTexId() {
@@ -264,7 +269,7 @@ public class SurfaceDrawable extends Drawable {
 	protected final void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
-		mDrawer = GLDrawer2D.create(isOES3(), true);
+		mDrawer = GLDrawer2D.create(isOES3Supported(), true);
 		mDrawer.setMirror(IRendererCommon.MIRROR_VERTICAL);
 	}
 
@@ -376,7 +381,7 @@ public class SurfaceDrawable extends Drawable {
 			mEglTask.makeCurrent();
 			handleReleaseInputSurface();
 			mEglTask.makeCurrent();
-			if (isOES3()) {
+			if (isOES3Supported()) {
 				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
 			} else {

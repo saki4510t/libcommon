@@ -59,7 +59,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 			@WorkerThread
 			override fun onSurfaceCreated() {
 				if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
-				mDrawer = GLDrawer2D.create(isOES3(), false)
+				mDrawer = GLDrawer2D.create(isOES3Supported(), false)
 				mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
 				mHasSurface = true

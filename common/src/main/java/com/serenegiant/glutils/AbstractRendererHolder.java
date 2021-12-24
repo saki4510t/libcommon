@@ -647,9 +647,15 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			return mEglTask.isGLES3();
 		}
 
+		@Deprecated
 		@Override
 		public boolean isOES3() {
-			return mEglTask.isOES3();
+			return mEglTask.isOES3Supported();
+		}
+
+		@Override
+		public boolean isOES3Supported() {
+			return mEglTask.isOES3Supported();
 		}
 
 		@Override
@@ -697,7 +703,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseInputSurface();
 			makeCurrent();
-			if (isOES3()) {
+			if (isOES3Supported()) {
 				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
 					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
 			} else {
@@ -860,7 +866,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			if (isRunning) {
 				init();
 				try {
-					if (mContext.isOES3()) {
+					if (mContext.isOES3Supported()) {
 						captureLoopGLES3();
 					} else {
 						captureLoopGLES2();
@@ -881,7 +887,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	    	captureSurface = mContext.getEgl().createOffscreen(
 	    		mRendererTask.width(), mRendererTask.height());
 			Matrix.setIdentityM(mMvpMatrix, 0);
-			drawer = GLDrawer2D.create(mContext.isOES3(), true);
+			drawer = GLDrawer2D.create(mContext.isOES3Supported(), true);
 			setupCaptureDrawer(drawer);
 		}
 

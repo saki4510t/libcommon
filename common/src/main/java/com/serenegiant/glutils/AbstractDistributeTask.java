@@ -405,7 +405,7 @@ public abstract class AbstractDistributeTask {
 	@WorkerThread
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
-		mDrawer = GLDrawer2D.create(isOES3(), true);
+		mDrawer = GLDrawer2D.create(isOES3Supported(), true);
 		handleReCreateInputSurface();
 	}
 
@@ -532,7 +532,7 @@ public abstract class AbstractDistributeTask {
 		final int n = mTargets.size();
 		if (isOES != mDrawer.isOES()) {
 			mDrawer.release();
-			mDrawer = GLDrawer2D.create(isOES3(), isOES);
+			mDrawer = GLDrawer2D.create(isOES3Supported(), isOES);
 		}
 		for (int i = n - 1; i >= 0; i--) {
 			final RendererTarget target = mTargets.valueAt(i);
@@ -826,7 +826,9 @@ public abstract class AbstractDistributeTask {
 	public abstract int getGlVersion();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
+	@Deprecated
 	public abstract boolean isOES3();
+	public abstract boolean isOES3Supported();
 
 	public abstract boolean isMasterSurfaceValid();
 	/**

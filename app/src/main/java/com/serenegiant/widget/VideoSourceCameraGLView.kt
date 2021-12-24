@@ -62,7 +62,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			@WorkerThread
 			override fun onSurfaceCreated() {
 				if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
-				mDrawer = GLDrawer2D.create(isOES3(), true)
+				mDrawer = GLDrawer2D.create(isOES3Supported(), true)
 				mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				GLES20.glClearColor(1.0f, 1.0f, 0.0f, 1.0f)
 			}

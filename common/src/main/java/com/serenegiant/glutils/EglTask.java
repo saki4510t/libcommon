@@ -181,7 +181,12 @@ public abstract class EglTask extends MessageTask {
 	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
 	 * @return
 	 */
+	@Deprecated
 	public boolean isOES3() {
-		return mGLContext.isOES3();
+		return mGLContext.isOES3Supported();
+	}
+
+	public boolean isOES3Supported() {
+		return mGLContext.isOES3Supported();
 	}
 }
