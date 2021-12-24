@@ -17,7 +17,6 @@ import android.view.Surface;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
-import com.serenegiant.system.Stacktrace;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import androidx.annotation.NonNull;
@@ -91,7 +90,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		mInputSurface = mMediaCodec.createInputSurface();    // API >= 18
 		mMediaCodec.start();
 		mReaper = new MediaReaper.VideoReaper(mMediaCodec, listener, mWidth, mHeight);
-		new Thread(mScreenCaptureTask, "ScreenCaptureThread").start();
+		new Thread(mDrawTask, DrawTask.class.getSimpleName()).start();
 		return false;
 	}
 
@@ -114,7 +113,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	@Override
 	public void stop() {
 		if (DEBUG) Log.d(TAG, "stop:");
-		Stacktrace.print();
+		mDrawTask.release();
 		super.stop();
 	}
 
@@ -127,14 +126,14 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	}
 
 	private volatile boolean requestDraw;
-	private final DrawTask mScreenCaptureTask = new DrawTask(null, 0);
+	@NonNull
+	private final DrawTask mDrawTask = new DrawTask(null, 0);
 
 	/**
 	 * MediaProjectionのVirtualDisplayから受け取った映像を
 	 * MediaCodecの映像エンコーダーの入力Surfaceへ転送するためのEglTask実装
 	 */
 	private final class DrawTask extends EglTask {
-		private final String TAG = DrawTask.class.getSimpleName();
 		private VirtualDisplay display;
 		private long intervals;
 		private int mTexId;
@@ -150,7 +149,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 
 		@Override
 		protected void onStart() {
-			if (DEBUG) Log.d(TAG, "onStart:");
+			if (DEBUG) Log.d(TAG, "DrawTask#onStart:");
 			mDrawer = GLDrawer2D.create(isGLES3(), true);
 			mTexId = mDrawer.initTex();
 			mSourceTexture = new SurfaceTexture(mTexId);
@@ -159,21 +158,21 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			mSourceTexture.setOnFrameAvailableListener(mOnFrameAvailableListener, mHandler);
 			mEncoderSurface = getEgl().createFromSurface(mInputSurface);
 
-			if (DEBUG) Log.d(TAG, "onStart:setup VirtualDisplay");
+			if (DEBUG) Log.d(TAG, "DrawTask#onStart:setup VirtualDisplay");
 			intervals = (long) (1000f / mFramerate);
 			display = mMediaProjection.createVirtualDisplay(
 				"Capturing Display",
 				mWidth, mHeight, mDensity,
 				DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR,
 				mSourceSurface, mCallback, mHandler);
-			if (DEBUG) Log.v(TAG, "onStart:screen capture loop:display=" + display);
+			if (DEBUG) Log.v(TAG, "DrawTask#onStart:screen capture loop:display=" + display);
 			// 録画タスクを起床
 			queueEvent(mDrawTask);
 		}
 
 		@Override
 		protected void onStop() {
-			if (DEBUG) Log.v(TAG, "onStop:");
+			if (DEBUG) Log.v(TAG, "DrawTask#onStop:");
 			if (mDrawer != null) {
 				mDrawer.release();
 				mDrawer = null;
@@ -192,12 +191,12 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			}
 			makeCurrent();
 			if (display != null) {
-				if (DEBUG) Log.v(TAG, "onStop:release VirtualDisplay");
+				if (DEBUG) Log.v(TAG, "DrawTask#onStop:release VirtualDisplay");
 				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 					display.release();
 				}
 			}
-			if (DEBUG) Log.v(TAG, "onStop:tear down MediaProjection");
+			if (DEBUG) Log.v(TAG, "DrawTask#onStop:tear down MediaProjection");
 			if (mMediaProjection != null) {
 				mMediaProjection.stop();
 				mMediaProjection = null;
@@ -206,7 +205,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 
 		@Override
 		protected boolean onError(final Throwable e) {
-			if (DEBUG) Log.w(TAG, "mScreenCaptureTask:", e);
+			if (DEBUG) Log.w(TAG, "DrawTask.onError:", e);
 			return false;
 		}
 
@@ -220,7 +219,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			= new SurfaceTexture.OnFrameAvailableListener() {
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
-//				if (DEBUG) Log.v(TAG, "onFrameAvailable:mIsRecording=" + mIsRecording);
+//				if (DEBUG) Log.v(TAG, "DrawTask#onFrameAvailable:mIsRecording=" + mIsRecording);
 				if (mIsCapturing) {
 					synchronized (mSync) {
 						requestDraw = true;
@@ -233,7 +232,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		private final Runnable mDrawTask = new Runnable() {
 			@Override
 			public void run() {
-//				if (DEBUG) Log.v(TAG, "draw:");
+//				if (DEBUG) Log.v(TAG, "DrawTask#draw:");
 				boolean localRequestDraw;
 				synchronized (mSync) {
 					localRequestDraw = requestDraw;
@@ -265,7 +264,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 				} else {
 					releaseSelf();
 				}
-//				if (DEBUG) Log.v(TAG, "draw:finished");
+//				if (DEBUG) Log.v(TAG, "DrawTask#draw:finished");
 			}
 		};
 
