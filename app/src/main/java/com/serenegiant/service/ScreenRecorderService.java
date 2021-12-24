@@ -54,7 +54,6 @@ import com.serenegiant.media.MediaScreenEncoder;
 import com.serenegiant.media.VideoConfig;
 import com.serenegiant.mediastore.MediaStoreUtils;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.Stacktrace;
 import com.serenegiant.utils.FileUtils;
 
 import java.io.IOException;
@@ -410,7 +409,6 @@ public class ScreenRecorderService extends BaseService {
 		public void onDestroy(@NonNull final Encoder encoder) {
 			if (DEBUG) Log.v(TAG, "EncoderListener#onDestroy:"
 				+ encoder + ",mRecorder=" + mRecorder);
-			Stacktrace.print();
 		}
 
 		@Override
