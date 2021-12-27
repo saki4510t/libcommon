@@ -153,12 +153,15 @@ public abstract class AbstractChannelDataLink {
 	 * 受信スレッドの実行部
 	 */
 	protected static abstract class AbstractClient implements Runnable, Handler.Callback {
+		@NonNull
 		private final WeakReference<AbstractChannelDataLink> mWeakParent;
+		@Nullable
 		protected ByteChannel mChannel;
 		private volatile boolean mIsRunning = true;
 		private volatile boolean mIsInit;
 		/** 送信データをワーカースレッド上で処理するためのHandler */
-		private Handler mSenderHandler;
+		@NonNull
+		private final Handler mSenderHandler;
 		
 		public AbstractClient(@NonNull final AbstractChannelDataLink parent,
 			@Nullable final ByteChannel channel) {
@@ -193,16 +196,14 @@ public abstract class AbstractChannelDataLink {
 		 */
 		public synchronized void release(final long delay) {
 			if (DEBUG) Log.v(TAG, "Client#release");
-			if (mSenderHandler != null) {
-				try {
-					if (delay > 0) {
-						mSenderHandler.sendEmptyMessageDelayed(REQ_RELEASE, delay);
-					} else {
-						mSenderHandler.sendEmptyMessage(REQ_RELEASE);
-					}
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
+			try {
+				if (delay > 0) {
+					mSenderHandler.sendEmptyMessageDelayed(REQ_RELEASE, delay);
+				} else {
+					mSenderHandler.sendEmptyMessage(REQ_RELEASE);
 				}
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
 			}
 		}
 		
@@ -244,13 +245,10 @@ public abstract class AbstractChannelDataLink {
 				}
 			}
 			synchronized (this) {
-				if (mSenderHandler != null) {
-					try {
-						mSenderHandler.getLooper().quit();
-					} catch (final Exception e) {
-						// ignore
-					}
-					mSenderHandler = null;
+				try {
+					mSenderHandler.getLooper().quit();
+				} catch (final Exception e) {
+					// ignore
 				}
 			}
 			if (DEBUG) Log.v(TAG, "Client#internalRelease:finished");
@@ -423,7 +421,7 @@ public abstract class AbstractChannelDataLink {
 		 */
 		private synchronized void send(final int type, @Nullable final Object msg) throws IOException {
 			if (DEBUG) Log.v(TAG, "Client#send:");
-			if ((mSenderHandler == null) || !mIsRunning || !mIsInit) throw new IOException();
+			if (!mIsRunning || !mIsInit) throw new IOException();
 			mSenderHandler.sendMessage(mSenderHandler.obtainMessage(type, msg));
 		}
 		
@@ -588,7 +586,7 @@ public abstract class AbstractChannelDataLink {
 		}
 		
 		@Override
-		public synchronized boolean handleMessage(final Message msg) {
+		public synchronized boolean handleMessage(@NonNull final Message msg) {
 			if (!mIsRunning || (mChannel == null)) return false;
 			if (DEBUG) Log.v(TAG, "handleMessage:msg=" + msg);
 			try {
