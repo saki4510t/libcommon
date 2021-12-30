@@ -731,6 +731,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 * @return
 	 */
+	@NonNull
 	private List<UsbControlBlock> findCtrlBlocks(@NonNull final UsbDevice device) {
 		final List<UsbControlBlock> result = new ArrayList<>();
 		synchronized (mCtrlBlocks) {
@@ -744,21 +745,27 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
-	 * 指定したUsbDeviceに関係するUsbControlBlockをすべてmCtrlBlocksから削除する
+	 * 指定したUsbDeviceに関係するUsbControlBlockをすべてmCtrlBlocksから削除してcloseする
 	 * @param device
 	 */
 	private void removeAll(@NonNull final UsbDevice device) {
+		@NonNull
 		final List<UsbControlBlock> list = findCtrlBlocks(device);
+		synchronized (mCtrlBlocks) {
+			mCtrlBlocks.removeAll(list);
+		}
 		for (final UsbControlBlock ctrlBlock: list) {
-			synchronized (mCtrlBlocks) {
-				mCtrlBlocks.remove(ctrlBlock);
-			}
+			ctrlBlock.close();
 		}
 	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * USB機器をopenして管理するためのクラス
 	 * 一度closeすると再利用は出来ないので、再度生成すること
+	 * UsbMonitor内に参照一覧を保持しているので明示的にcloseを呼び出すまではopenしたまま維持される
+	 * (UsbControlBlockを生成してファイルディスクリプタを取得してネイティブ側へ引き渡したときに
+	 * 勝手にcloseされてしまわないようにするため)
 	 */
 	public static final class UsbControlBlock implements Cloneable {
 		@NonNull
@@ -808,6 +815,7 @@ public final class USBMonitor implements Const {
 
 		/**
 		 * コピーコンストラクタ
+		 * 単純コピー(参照を共有)ではなく同じUsbDeviceへアクセスするための別のUsbDeviceConnection/UsbDeviceInfoを生成する
 		 * @param src
 		 * @throws IllegalStateException
 		 */
