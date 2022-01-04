@@ -19,7 +19,6 @@ package com.serenegiant.media;
 */
 
 import android.content.Context;
-import android.util.Log;
 
 import java.io.IOException;
 
@@ -79,7 +78,9 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 		final long splitSize) throws IOException {
 
 		super(context, callback, config, factory);
-		setupMuxer(context, queue, outputDir, splitSize);
+		setMuxer(new MediaSplitMuxerV2(context,
+			outputDir, getConfig(), getMuxerFactory(),
+			queue, splitSize));
 	}
 
 	@Override
@@ -100,15 +101,4 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 		return null;
 	}
 
-	private void setupMuxer(
-		@NonNull final Context context,
-		@Nullable final IMediaQueue<RecycleMediaData> queue,
-		@Nullable final DocumentFile output,
-		final long splitSize)  throws IOException {
-
-		if (DEBUG) Log.v(TAG, "setupMuxer");
-		setMuxer(new MediaSplitMuxerV2(context,
-			output, getConfig(), getMuxerFactory(),
-			queue, splitSize));
-	}
 }

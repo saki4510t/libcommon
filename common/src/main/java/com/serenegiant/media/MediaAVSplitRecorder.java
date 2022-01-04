@@ -94,7 +94,8 @@ public class MediaAVSplitRecorder extends Recorder {
 		super(context, callback, config, factory);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mOutputDir = DocumentFile.fromFile(new File(outputDir));
-		setupMuxer(context, queue, outputDir, name, splitSize);
+		setMuxer(new MediaSplitMuxer(context, getConfig(), getMuxerFactory(),
+			queue, outputDir, name, splitSize));
 	}
 
 	/**
@@ -140,7 +141,8 @@ public class MediaAVSplitRecorder extends Recorder {
 		super(context, callback, config, factory);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mOutputDir = outputDir;
-		setupMuxer(context, queue, outputDir, name, splitSize);
+		setMuxer(new MediaSplitMuxer(context, getConfig(), getMuxerFactory(),
+			queue, outputDir, name, splitSize));
 	}
 	
 	/**
@@ -196,30 +198,5 @@ public class MediaAVSplitRecorder extends Recorder {
 	 */
 	public DocumentFile getOutputDir() {
 		return mOutputDir;
-	}
-	
-	protected void setupMuxer(
-		@NonNull final Context context,
-		@Nullable final IMediaQueue<RecycleMediaData> queue,
-		@NonNull final DocumentFile output,
-		@NonNull final String name,
-		final long splitSize)  throws IOException {
-		
-		if (DEBUG) Log.v(TAG, "setupMuxer");
-		setMuxer(new MediaSplitMuxer(context, getConfig(), getMuxerFactory(),
-			queue, output, name, splitSize));
-	}
-
-	@Deprecated
-	protected void setupMuxer(
-		@NonNull final Context context,
-		@Nullable final IMediaQueue<RecycleMediaData> queue,
-		@NonNull final String outputPath,
-		@NonNull final String name,
-		final long splitSize)  throws IOException {
-		
-		if (DEBUG) Log.v(TAG, "setupMuxer");
-		setMuxer(new MediaSplitMuxer(context, getConfig(), getMuxerFactory(),
-			queue, outputPath, name, splitSize));
 	}
 }
