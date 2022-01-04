@@ -26,6 +26,7 @@ import java.nio.ByteBuffer;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 import android.view.Surface;
@@ -149,6 +150,8 @@ public interface IRecorder {
 	public boolean start(final Encoder encoder);
 	public void stop(final Encoder encoder);
 	public int addTrack(final Encoder encoder, final MediaFormat format);
-	public void writeSampleData(final int trackIndex,
-		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo);
+	public void writeSampleData(
+		final int trackIndex,
+		@NonNull final ByteBuffer byteBuf,
+		@NonNull final MediaCodec.BufferInfo bufferInfo);
 }

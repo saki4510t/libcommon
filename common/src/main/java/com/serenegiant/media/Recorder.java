@@ -446,8 +446,10 @@ public abstract class Recorder implements IRecorder {
 	 * @param bufferInfo
 	 */
 	@Override
-	public void writeSampleData(final int trackIndex,
-		final ByteBuffer byteBuf, final MediaCodec.BufferInfo bufferInfo) {
+	public void writeSampleData(
+		final int trackIndex,
+		@NonNull final ByteBuffer byteBuf,
+		@NonNull final MediaCodec.BufferInfo bufferInfo) {
 
 		try {
 			if (!mReleased && (mStartedCount > 0)) {
