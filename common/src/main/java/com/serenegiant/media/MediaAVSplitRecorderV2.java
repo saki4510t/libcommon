@@ -39,7 +39,10 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
-	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
+	 * @param outputDir 出力先ディレクトリを示すDocumentFile
+	 * 					API>=29の場合はSAFのツリードキュメントかnullでないとだめ
+	 * 					nullを指定した場合はFileUtils.getCaptureDir(API>=29の場合は対象範囲別ストレージを使ってEnvironment.DIRECTORY_MOVIES)の下に
+	 * 					MediaAVSplitRecorderV2生成時刻文字列をフォルダ名として追加した上で各セグメント毎の録画ファイルが生成される
 	 * @param splitSize
 	 * @throws IOException
 	 */
@@ -58,7 +61,10 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 	 * @param callback
 	 * @param config
 	 * @param factory
-	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
+	 * @param outputDir 出力先ディレクトリを示すDocumentFile
+	 * 					API>=29の場合はSAFのツリードキュメントかnullでないとだめ
+	 * 					nullを指定した場合はFileUtils.getCaptureDir(API>=29の場合は対象範囲別ストレージを使ってEnvironment.DIRECTORY_MOVIES)の下に
+	 * 					MediaAVSplitRecorderV2生成時刻文字列をフォルダ名として追加した上で各セグメント毎の録画ファイルが生成される
 	 * @param queue
 	 * @param splitSize
 	 * @throws IOException

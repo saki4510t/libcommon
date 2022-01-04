@@ -189,6 +189,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 			MediaAVSplitRecorder(
 				requireContext(), mRecorderCallback, outputDir, FileUtils.getDateTimeString(), MAX_FILE_SIZE)
 		} else {
+			// outputDirをnullにするとMediaAVSplitRecorderV2生成時の時刻文字列をフォルダ名としてその中に各セグメント毎のファイルが生成される
 			MediaAVSplitRecorderV2(
 				requireContext(), mRecorderCallback, outputDir, MAX_FILE_SIZE)
 		}
