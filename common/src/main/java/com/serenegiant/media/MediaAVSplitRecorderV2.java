@@ -39,6 +39,23 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 	 * コンストラクタ
 	 * @param context
 	 * @param callback
+	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
+	 * @param splitSize
+	 * @throws IOException
+	 */
+	public MediaAVSplitRecorderV2(
+		@NonNull final Context context,
+		final RecorderCallback callback,
+		@Nullable final DocumentFile outputDir,
+		final long splitSize) throws IOException {
+
+		this(context, callback, null, null, null, outputDir, splitSize);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
 	 * @param config
 	 * @param factory
 	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
