@@ -181,6 +181,15 @@ class MainActivity
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera_rec)
 			}
+			R.string.title_camera_rec_split -> {	// Camera(MediaAVSplitRecorder/MediaAVSplitRecorderV2)
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraSplitRecFragment.newInstance(
+					R.layout.fragment_camera, R.string.title_camera_rec_split)
+			}
 			R.string.title_camera_rec_pipeline -> {	// Camera(MediaAVRecorder+EncoderPipeline)
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
