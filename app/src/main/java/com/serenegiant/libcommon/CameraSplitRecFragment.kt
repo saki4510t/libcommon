@@ -191,7 +191,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		} else {
 			// outputDirをnullにするとMediaAVSplitRecorderV2生成時の時刻文字列をフォルダ名としてその中に各セグメント毎のファイルが生成される
 			MediaAVSplitRecorderV2(
-				requireContext(), mRecorderCallback, outputDir, MAX_FILE_SIZE)
+				requireContext(), mRecorderCallback, null, MAX_FILE_SIZE)
 		}
 		// create encoder for video recording
 		mVideoEncoder = if (enablePipelineEncode && (mCameraView is IPipelineView)) {
