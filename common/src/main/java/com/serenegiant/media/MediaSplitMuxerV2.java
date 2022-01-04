@@ -118,7 +118,7 @@ public class MediaSplitMuxerV2 implements IMuxer {
 	/**
 	 * コンストラクタ
 	 * @param context
-	 * @param outputDir
+	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
 	 * @param config
 	 * @param factory
 	 * @param queue バッファリング用IMediaQueue

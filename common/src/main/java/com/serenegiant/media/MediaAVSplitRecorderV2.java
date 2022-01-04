@@ -41,7 +41,7 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 	 * @param callback
 	 * @param config
 	 * @param factory
-	 * @param outputDir
+	 * @param outputDir 出力先ディレクトリを示すDocumentFile, API>=29の場合はSAFのツリードキュメントかnullでないとだめ
 	 * @param queue
 	 * @param splitSize
 	 * @throws IOException
