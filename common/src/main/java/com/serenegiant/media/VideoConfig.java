@@ -164,6 +164,14 @@ public class VideoConfig implements Parcelable, Cloneable {
 	}
 
 	/**
+	 * このVideoConfigインスタンスの値をDEFAULT_CONFIGの値に戻す
+	 * @return
+	 */
+	public VideoConfig reset() {
+		return set(DEFAULT_CONFIG);
+	}
+
+	/**
 	 * 最大録画時間[ミリ秒], 負数=制限なし
 	 * @return
 	 */
