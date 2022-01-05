@@ -76,7 +76,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 			val recorder = mRecorder
 			if (recorder != null) {
 				try {
-					recorder.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, 30, 0.25f)
+					recorder.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS, 0.25f)
 					recorder.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
 					recorder.prepare()
 				} catch (e: Exception) {

@@ -310,6 +310,11 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		 */
 		const val VIDEO_WIDTH = 1280
 		const val VIDEO_HEIGHT = 720
+
+		/**
+		 * video frame rate
+		 */
+		const val VIDEO_FPS = 30
 		/**
 		 * Audio recording settings
 		 */

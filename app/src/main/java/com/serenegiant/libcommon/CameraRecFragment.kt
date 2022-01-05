@@ -208,7 +208,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			SurfaceEncoder(recorder, mEncoderListener) // API>=18
 		}
 		mVideoEncoder!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
-		mVideoEncoder!!.setVideoConfig(-1, 30, 10)
+		mVideoEncoder!!.setVideoConfig(-1, VIDEO_FPS, 10)
 		if (audio_source >= 0) {
 			mAudioSampler = AudioSampler(audio_source,
 				audio_channels, SAMPLE_RATE,
