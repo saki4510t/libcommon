@@ -190,6 +190,15 @@ class MainActivity
 				fragment = CameraSplitRecFragment.newInstance(
 					R.layout.fragment_camera, R.string.title_camera_rec_split)
 			}
+			R.string.title_camera_rec_timelapse -> {	// Camera(MediaAVTimelapseRecorder)
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraTimelapseRecFragment.newInstance(
+					R.layout.fragment_camera, R.string.title_camera_rec_timelapse)
+			}
 			R.string.title_camera_rec_pipeline -> {	// Camera(MediaAVRecorder+EncoderPipeline)
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
