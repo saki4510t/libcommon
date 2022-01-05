@@ -120,8 +120,8 @@ public class MediaAVTimelapseRecorder extends Recorder {
 		mOutputPath = UriHelper.getPath(context, output.getUri());
 		@NonNull
 		final VideoConfig _config = getConfig();
-		if (_config.getCaptureFps().asFloat() >= 0) {
-			mFrameIntervalsUs = (long)(1000000L / _config.getCaptureFps().asFloat());
+		if (_config.getCaptureFps().asDouble() >= 0) {
+			mFrameIntervalsUs = Math.round(1000000L / _config.getCaptureFps().asDouble());
 		}
 		if (mFrameIntervalsUs < 0) {
 			mFrameIntervalsUs = DEFAULT_FRAME_INTERVALS_US;
