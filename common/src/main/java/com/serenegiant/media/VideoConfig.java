@@ -45,7 +45,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 
 	public static final VideoConfig DEFAULT_CONFIG = new VideoConfig(
 		0.25f, 10, 10 * 30.0f,
-		15, 30 * 1000L,
+		30, 30 * 1000L/*30秒*/,
 		(Build.VERSION.SDK_INT >= 18), (Build.VERSION.SDK_INT >= 18)
 	);
 
