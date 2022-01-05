@@ -33,6 +33,7 @@ import com.serenegiant.glpipeline.IPipeline
 import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLDrawer2D
+import com.serenegiant.math.Fraction
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import java.lang.IllegalStateException
 
@@ -190,14 +191,15 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun addSurface(
 		id: Int, surface: Any,
-		isRecordable: Boolean) {
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mVideoSource!!.glManager)
 			mVideoSource!!.pipeline = mDistributor!!
 		}
-		mDistributor!!.addSurface(id, surface, isRecordable)
+		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
 
 	/**

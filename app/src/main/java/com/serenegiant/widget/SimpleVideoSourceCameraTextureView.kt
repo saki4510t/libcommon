@@ -189,13 +189,17 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		return mCameraDelegator.previewHeight
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+	override fun addSurface(
+		id: Int, surface: Any,
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
+
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
 		val source = mVideoSource
 		if (source != null) {
 			when (val last = IPipeline.findLast(source)) {
 				mVideoSource -> {
-					source.pipeline = createPipeline(surface)
+					source.pipeline = createPipeline(surface, maxFps)
 					if (SUPPORT_RECORDING) {
 						// 通常の録画(#addSurfaceでエンコーダーへの映像入力用surfaceを受け取る)場合は
 						// 毎フレームCameraDelegator#callOnFrameAvailableを呼び出さないといけないので
@@ -268,13 +272,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				}
 				is ISurfacePipeline -> {
 					if (last.hasSurface()) {
-						last.pipeline = SurfacePipeline(mGLManager, surface, null)
+						last.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
 					} else {
 						last.setSurface(surface, null)
 					}
 				}
 				else -> {
-					last.pipeline = SurfacePipeline(mGLManager, surface, null)
+					last.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
 				}
 			}
 		} else {
@@ -382,22 +386,22 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * IPipelineインスタンスを生成
 	 * @param surface
 	 */
-	private fun createPipeline(surface: Any?): IPipeline {
+	private fun createPipeline(surface: Any?, maxFps: Fraction?): IPipeline {
 		if (DEBUG) Log.v(TAG, "createPipeline:surface=${surface}")
 		return when (pipelineMode) {
 			IPipelineView.EFFECT_PLUS_SURFACE -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
 				val effect = EffectPipeline(mGLManager)
-				effect.pipeline = SurfacePipeline(mGLManager, surface, null)
+				effect.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
 				effect
 			}
 			IPipelineView.EFFECT_ONLY -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline")
-				EffectPipeline(mGLManager, surface, null)
+				EffectPipeline(mGLManager, surface, maxFps)
 			}
 			else -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create SurfacePipeline")
-				SurfacePipeline(mGLManager, surface, null)
+				SurfacePipeline(mGLManager, surface, maxFps)
 			}
 		}
 	}

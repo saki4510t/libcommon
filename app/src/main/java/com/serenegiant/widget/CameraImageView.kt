@@ -26,6 +26,7 @@ import android.view.Surface
 import android.view.View
 import com.serenegiant.glutils.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
+import com.serenegiant.math.Fraction
 import java.lang.UnsupportedOperationException
 
 /**
@@ -127,7 +128,11 @@ class CameraImageView @JvmOverloads constructor(
 		return mCameraDelegator.previewHeight
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+	override fun addSurface(
+		id: Int, surface: Any,
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
+
 		throw UnsupportedOperationException()
 	}
 

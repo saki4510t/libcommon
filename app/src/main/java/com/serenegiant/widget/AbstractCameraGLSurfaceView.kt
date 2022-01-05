@@ -34,6 +34,7 @@ import com.serenegiant.glutils.GLUtils
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.graphics.MatrixUtils
+import com.serenegiant.math.Fraction
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import javax.microedition.khronos.egl.EGLConfig
@@ -148,10 +149,11 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	@Synchronized
 	override fun addSurface(
 		id: Int, surface: Any,
-		isRecordable: Boolean) {
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
-		rendererHolder?.addSurface(id, surface, isRecordable)
+		rendererHolder?.addSurface(id, surface, isRecordable, maxFps)
 	}
 
 	/**

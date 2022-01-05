@@ -34,6 +34,7 @@ import com.serenegiant.glpipeline.ImageSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.R
+import com.serenegiant.math.Fraction
 import java.lang.IllegalStateException
 
 /**
@@ -190,14 +191,15 @@ class DummyCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun addSurface(
 		id: Int, surface: Any,
-		isRecordable: Boolean) {
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = Distributor(mImageSource!!.glManager)
 			mImageSource!!.pipeline = mDistributor!!
 		}
-		mDistributor!!.addSurface(id, surface, isRecordable)
+		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
 
 	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要

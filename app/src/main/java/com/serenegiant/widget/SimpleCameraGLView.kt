@@ -28,6 +28,7 @@ import androidx.annotation.Size
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.es3.GLHelper
 import com.serenegiant.graphics.MatrixUtils
+import com.serenegiant.math.Fraction
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import java.lang.UnsupportedOperationException
 
@@ -204,7 +205,10 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 		return mCameraDelegator.previewHeight
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+	override fun addSurface(
+		id: Int, surface: Any,
+		isRecordable: Boolean, maxFps: Fraction?) {
+
 		throw UnsupportedOperationException()
 	}
 

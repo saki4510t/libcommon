@@ -24,6 +24,7 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import com.serenegiant.math.Fraction
 import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 
@@ -145,7 +146,11 @@ class CameraTextureView @JvmOverloads constructor(
 		return mCameraDelegator.previewHeight
 	}
 
-	override fun addSurface(id: Int, surface: Any, isRecordable: Boolean) {
+	override fun addSurface(
+		id: Int, surface: Any,
+		isRecordable: Boolean,
+		maxFps: Fraction?) {
+
 		throw UnsupportedOperationException()
 	}
 

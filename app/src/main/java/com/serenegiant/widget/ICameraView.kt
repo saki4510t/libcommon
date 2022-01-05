@@ -19,6 +19,7 @@ package com.serenegiant.widget
 */
 
 import android.view.View
+import com.serenegiant.math.Fraction
 
 /**
  * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
@@ -40,7 +41,7 @@ interface ICameraView {
 	fun getVideoWidth(): Int
 	fun getVideoHeight(): Int
 
-	fun addSurface(id: Int, surface: Any, isRecordable: Boolean)
+	fun addSurface(id: Int, surface: Any, isRecordable: Boolean, maxFps: Fraction? = null)
 	fun removeSurface(id: Int)
 
 	fun isRecordingSupported(): Boolean

@@ -32,6 +32,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import com.serenegiant.math.Fraction
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.SAFUtils
@@ -205,12 +206,12 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		}
 	}
 
-	protected open fun addSurface(surface: Surface?) {
+	protected open fun addSurface(surface: Surface?, maxFps: Fraction? = null) {
 		val id = surface?.hashCode() ?: 0
 		if (DEBUG) Log.d(TAG, "addSurface:id=$id")
 		synchronized(mSync) {
 			if (mCameraView != null) {
-				mCameraView!!.addSurface(id, surface!!, true)
+				mCameraView!!.addSurface(id, surface!!, true, maxFps)
 			}
 		}
 		if (DEBUG) Log.v(TAG, "addSurface:finished")
