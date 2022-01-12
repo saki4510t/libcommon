@@ -19,7 +19,11 @@ package com.serenegiant.utils;
 */
 
 import android.app.Activity;
+import android.graphics.Rect;
+import android.os.Build;
+import android.util.TypedValue;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.inputmethod.InputMethodManager;
 
 import com.serenegiant.system.ContextUtils;
@@ -30,6 +34,16 @@ import androidx.annotation.NonNull;
  * ソフトウエアキーボードの表示状態等を操作するためのヘルパークラス
  */
 public class KeyboardUtils {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = KeyboardUtils.class.getSimpleName();
+
+	/**
+	 * キーボードの表示/非表示イベントリスナー
+	 */
+	public interface OnKeyboardVisibilityChangedListener {
+		public void onKeyboardVisibilityChanged(final boolean visible);
+	}
+
 	private KeyboardUtils() {
 		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateにする
 	}
@@ -57,5 +71,42 @@ public class KeyboardUtils {
 	        view = new View(activity);
 	    }
 	    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+	}
+
+	/**
+	 * 指定したViewへキーボードの表示/非表示イベントリスナーをセットする
+	 * https://stackoverflow.com/questions/4312319/how-to-capture-the-virtual-keyboard-show-hide-event-in-android
+	 * @param view
+	 * @param listener
+	 * @return view
+	 */
+	public static View setOnKeyboardVisibilityChangedListener(
+		@NonNull final View view,
+		@NonNull final OnKeyboardVisibilityChangedListener listener) {
+
+		view.getViewTreeObserver().addOnGlobalLayoutListener(
+			new ViewTreeObserver.OnGlobalLayoutListener() {
+				private boolean alreadyOpen;
+				private final int defaultKeyboardHeightDP = 100;
+				private final int EstimatedKeyboardDP = defaultKeyboardHeightDP + (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP ? 48 : 0);
+				private final Rect rect = new Rect();
+
+				@Override
+				public void onGlobalLayout() {
+					final int estimatedKeyboardHeight
+						= (int) TypedValue.applyDimension(
+							TypedValue.COMPLEX_UNIT_DIP, EstimatedKeyboardDP,
+							view.getResources().getDisplayMetrics());
+					view.getWindowVisibleDisplayFrame(rect);
+					final int heightDiff = view.getRootView().getHeight() - (rect.bottom - rect.top);
+					final boolean isShown = heightDiff >= estimatedKeyboardHeight;
+
+					if (isShown != alreadyOpen) {
+						alreadyOpen = isShown;
+						listener.onKeyboardVisibilityChanged(isShown);
+					}
+				}
+			});
+		return view;
 	}
 }
