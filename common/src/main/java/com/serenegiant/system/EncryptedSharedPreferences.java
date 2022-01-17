@@ -353,6 +353,12 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 			mDecryptor.init(Cipher.DECRYPT_MODE, secret, new IvParameterSpec(iv));
 		}
 
+		/**
+		 * Obfuscatorの実装
+		 * @param key
+		 * @param value
+		 * @return
+		 */
 		@Nullable
 		@Override
 		public String encrypt(@NonNull final String key, @Nullable final String value) {
@@ -372,6 +378,13 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 			}
 		}
 
+		/**
+		 * Obfuscatorの実装
+		 * @param key
+		 * @param encrypted
+		 * @return
+		 * @throws ObfuscatorException
+		 */
 		@Nullable
 		@Override
 		public String decrypt(
@@ -407,13 +420,18 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static class KeyStoreObfuscator implements Obfuscator {
 
+		/**
+		 * KeyStoreから指定したエントリーを削除する
+		 * @param context
+		 * @param name KeyStoreObfuscatorの生成に使うのと同じ文字列、またはnull/空文字列
+		 */
 		public static void deleteKey(@NonNull final Context context, @Nullable final String name) {
+			@NonNull
 			final String alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
 			try {
 				final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
 				keyStore.load(null);
-				boolean containsAlias = keyStore.containsAlias(alias);
-				if (containsAlias) {
+				if (keyStore.containsAlias(alias)) {
 					keyStore.deleteEntry(alias);
 				}
 			} catch (final GeneralSecurityException | IOException e) {
@@ -443,11 +461,14 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 		 * コンストラクタ
 		 * API>=23の場合にはAES, API<23の場合はRSAで暗号化・復号する
 		 * @param context
-		 * @param name
+		 * @param name keyStoreのエリアス名生成に使う文字列, 共有プレファレンス名等
+		 * 			   この値にパッケージ名をプレフィックスるしたものをエリアス名とする
 		 * @throws GeneralSecurityException
 		 */
-		public KeyStoreObfuscator(@NonNull final Context context, final String name)
-			throws GeneralSecurityException {
+		public KeyStoreObfuscator(
+			@NonNull final Context context,
+			@Nullable final String name)
+				throws GeneralSecurityException {
 
 			mContext = context;
 			alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
@@ -461,6 +482,12 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 			}
 		}
 
+		/**
+		 * Obfuscatorの実装
+		 * @param key
+		 * @param value
+		 * @return
+		 */
 		@Nullable
 		@Override
 		public String encrypt(@NonNull final String key, @Nullable final String value) {
@@ -475,6 +502,13 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 			}
 		}
 
+		/**
+		 * Obfuscatorの実装
+		 * @param key
+		 * @param encrypted
+		 * @return
+		 * @throws ObfuscatorException
+		 */
 		@Nullable
 		@Override
 		public String decrypt(
