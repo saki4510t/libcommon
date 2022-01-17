@@ -286,17 +286,65 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	public static class AESObfuscator implements Obfuscator {
 		private static final String KEYGEN_ALGORITHM = "PBEWITHSHAAND256BITAES-CBC-BC";
 		private static final String CIPHER_ALGORITHM = "AES/CBC/PKCS5Padding";
-		private static final String header = "com.serenegiant.AESObfuscator-1|";
+		private static final String DEFAULT_HEADER = "com.serenegiant.AESObfuscator-1|";
 
+		@NonNull
+		private final String header;
+		@NonNull
 		private final Cipher mEncryptor;
+		@NonNull
 		private final Cipher mDecryptor;
 
+		/**
+		 * コンストラクタ
+		 * headerはDEFAULT_HEADER(="com.serenegiant.AESObfuscator-1|")
+		 * @param password
+		 * @param salt
+		 * @param iv
+		 * @throws GeneralSecurityException
+		 */
 		public AESObfuscator(
 			@Nullable final char[] password,
 			@NonNull final byte[] salt, @NonNull final byte[] iv) throws GeneralSecurityException {
 
+			this(null, password, salt, 1024, 256, iv);
+		}
+
+		/**
+		 * コンストラクタ
+		 * @param header
+		 * @param password
+		 * @param salt
+		 * @param iv
+		 * @throws GeneralSecurityException
+		 */
+		public AESObfuscator(
+			@Nullable final String header,
+			@Nullable final char[] password,
+			@NonNull final byte[] salt, @NonNull final byte[] iv) throws GeneralSecurityException {
+
+			this(header, password, salt, 1024, 256, iv);
+		}
+
+		/**
+		 * コンストラクタ
+		 * @param header nullまたは空文字列ならDEFAULT_HEADER(="com.serenegiant.AESObfuscator-1|")
+		 * @param password
+		 * @param salt
+		 * @param iv
+		 * @param iterationCount
+		 * @param keyLength
+		 * @throws GeneralSecurityException
+		 */
+		public AESObfuscator(
+			@Nullable final String header,
+			@Nullable final char[] password,
+			@NonNull final byte[] salt, final int iterationCount, final int keyLength,
+			@NonNull final byte[] iv) throws GeneralSecurityException {
+
+			this.header = TextUtils.isEmpty(header) ? DEFAULT_HEADER : header;
 			final SecretKeyFactory factory = SecretKeyFactory.getInstance(KEYGEN_ALGORITHM);
-			final KeySpec keySpec = new PBEKeySpec(password, salt, 1024, 256);
+			final KeySpec keySpec = new PBEKeySpec(password, salt, iterationCount, keyLength);
 			final SecretKey tmp = factory.generateSecret(keySpec);
 			final SecretKey secret = new SecretKeySpec(tmp.getEncoded(), "AES");
 			mEncryptor = Cipher.getInstance(CIPHER_ALGORITHM);
