@@ -134,6 +134,33 @@ public class UsbUtils implements Const {
 
 	/**
 	 * デバイスキー名を取得する
+	 * @param context
+	 * @param device
+	 * @return
+	 */
+	@NonNull
+	public static String getDeviceKeyName(
+		@NonNull final Context context,
+		@Nullable final UsbDevice device) {
+
+		return getDeviceKeyName(UsbDeviceInfo.getDeviceInfo(context, device));
+	}
+
+	/**
+	 * デバイスキーを取得する
+	 * @param context
+	 * @param device
+	 * @return
+	 */
+	public static int getDeviceKey(
+		@NonNull final Context context,
+		@Nullable final UsbDevice device) {
+
+		return getDeviceKeyName(UsbDeviceInfo.getDeviceInfo(context, device)).hashCode();
+	}
+
+	/**
+	 * デバイスキー名を取得する
 	 * @param info
 	 * @return
 	 */
