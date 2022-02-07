@@ -47,10 +47,8 @@ import com.serenegiant.media.IMuxer;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaReaper;
 import com.serenegiant.media.VideoConfig;
-import com.serenegiant.mediastore.MediaStoreOutputStream;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.UriHelper;
 
 import java.io.File;
 import java.io.IOException;
@@ -863,37 +861,8 @@ public class RecordingService extends BaseService {
 		@Nullable final MediaFormat audioFormat) throws IOException {
 
 		if (DEBUG) Log.v(TAG, "internalStart:");
-		IMuxer muxer = null;
-		if (BuildCheck.isAPI29()) {
-			// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使って出力終了時にIS_PENDINGの更新を自動でする
-			if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
-			muxer = new MediaMuxerWrapper(
-				new MediaStoreOutputStream(this, output),
-				MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-		} else if (BuildCheck.isAPI26()) {
-			if (USE_MEDIASTORE_OUTPUT_STREAM) {
-				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using MediaStoreOutputStream");
-				muxer = new MediaMuxerWrapper(
-					new MediaStoreOutputStream(this, output),
-					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			} else {
-				if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using ContentResolver");
-				muxer = new MediaMuxerWrapper(getContentResolver()
-					.openFileDescriptor(output.getUri(), "rw").getFileDescriptor(),
-					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			}
-		} else {
-			if (DEBUG) Log.v(TAG, "internalStart:create MediaMuxerWrapper using File");
-			final String path = UriHelper.getPath(this, output.getUri());
-			final File f = new File(UriHelper.getPath(this, output.getUri()));
-			if (/*!f.exists() &&*/ f.canWrite()) {
-				// 書き込めるファイルパスを取得できればそれを使う
-				muxer = new MediaMuxerWrapper(path,
-					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			} else {
-				Log.w(TAG, "can't write to the file," + output);
-			}
-		}
+		MediaMuxerWrapper.USE_MEDIASTORE_OUTPUT_STREAM = USE_MEDIASTORE_OUTPUT_STREAM;
+		final IMuxer muxer = MediaMuxerWrapper.newInstance(this, output, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 		if (muxer == null) {
 			throw new IllegalArgumentException();
 		}

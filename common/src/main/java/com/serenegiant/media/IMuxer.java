@@ -18,7 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
@@ -29,11 +28,8 @@ import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
-import android.util.Log;
 
-import com.serenegiant.mediastore.MediaStoreOutputStream;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.UriHelper;
 
 import androidx.annotation.NonNull;
 import androidx.documentfile.provider.DocumentFile;
@@ -111,26 +107,7 @@ public interface IMuxer {
 			final Uri uri = file.getUri();
 			IMuxer result = null;
 			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
-				if (BuildCheck.isAPI29() && UriHelper.isContentUri(uri)) {
-					// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使って出力終了時にIS_PENDINGの更新を自動でする
-					result = new MediaMuxerWrapper(
-						new MediaStoreOutputStream(context, file),
-						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-				} else if (BuildCheck.isAPI26()) {
-					result = new MediaMuxerWrapper(context.getContentResolver()
-						.openFileDescriptor(uri, "rw").getFileDescriptor(),
-						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-				} else {
-					final String path = UriHelper.getPath(context, uri);
-					final File f = new File(path);
-					if (/*!f.exists() &&*/ f.canWrite()) {
-						// 書き込めるファイルパスを取得できればそれを使う
-						result = new MediaMuxerWrapper(path,
-							MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-					} else {
-						Log.w("IMuxer", "can't write to the file, try to use VideoMuxer instead");
-					}
-				}
+				result = MediaMuxerWrapper.newInstance(context, file, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			}
 			if (result == null) {
 				throw new IOException("Unsupported muxer type");

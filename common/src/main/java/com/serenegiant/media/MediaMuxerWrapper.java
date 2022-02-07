@@ -18,23 +18,30 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.media.MediaCodec.BufferInfo;
+import android.media.MediaFormat;
+import android.media.MediaMuxer;
+import android.net.Uri;
+import android.os.Build;
+import android.util.Log;
+
+import com.serenegiant.mediastore.MediaStoreOutputStream;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.UriHelper;
+
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
 
-import android.annotation.TargetApi;
-import android.media.MediaCodec.BufferInfo;
-import android.media.MediaFormat;
-import android.media.MediaMuxer;
-import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import android.util.Log;
-
-import com.serenegiant.mediastore.MediaStoreOutputStream;
+import androidx.documentfile.provider.DocumentFile;
 
 /**
  * MediaMuxerをIMuxerインターフェースでラップ
@@ -42,6 +49,50 @@ import com.serenegiant.mediastore.MediaStoreOutputStream;
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerWrapper implements IMuxer {
 	private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
+
+	/**
+	 * API26以上29未満の時にMediaStoreOutputStreamを使うかどうか
+	 * API29以上でDocumentFileがcontent uriを示している場合は
+	 * この設定に関係なく常にMediaStoreOutputStreamを使う
+	 * デフォルトはtrue
+	 */
+	public static boolean USE_MEDIASTORE_OUTPUT_STREAM = true;
+
+	/**
+	 * インスタンス生成用ヘルパーメソッド
+	 * MediaMuxerWrapperの個別のコンストラクタ呼び出しを自前で実装する代わりに
+	 * APIレベルの応じて自動的にコンストラクタを選択する
+	 * @param context
+	 * @param output
+	 * @param format
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("NewAPI")
+	@Nullable
+	public static MediaMuxerWrapper newInstance(
+		@NonNull final Context context,
+		@NonNull final DocumentFile output,
+		final int format) throws IOException {
+
+		final Uri uri = output.getUri();
+		if (BuildCheck.isAPI29() && UriHelper.isContentUri(uri)) {
+			return new MediaMuxerWrapper(new MediaStoreOutputStream(context, output), format);
+		} else if (BuildCheck.isAPI26()) {
+			if (USE_MEDIASTORE_OUTPUT_STREAM) {
+				return new MediaMuxerWrapper(new MediaStoreOutputStream(context, output), format);
+			} else {
+				return new MediaMuxerWrapper(context.getContentResolver().openFileDescriptor(uri, "rw").getFileDescriptor(), format);
+			}
+		} else {
+			final String path = UriHelper.getPath(context, uri);
+			final File f = new File(path);
+			if (f.canWrite()) {
+				return new MediaMuxerWrapper(path, format);
+			}
+		}
+		return null;
+	}
 
 	@NonNull
 	private final MediaMuxer mMuxer;
