@@ -25,6 +25,8 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.view.WindowManager;
 
+import androidx.annotation.NonNull;
+
 /**
  * スリープ状態から画面ON出来るようにするためのヘルパークラス
  * 実際に使うにはAndroidManifest.xmlに
@@ -39,8 +41,29 @@ public class PowerHelper {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
-	@SuppressLint({"MissingPermission", "WakelockTimeout"})
+	/**
+	 * スリープを解除して画面をONにする
+	 * @param activity
+	 * @param disableKeyguard これは無視される
+	 * @param lockDelayed
+	 */
 	public static void wake(final Activity activity, final boolean disableKeyguard, final long lockDelayed) {
+		wake(activity, true, true, lockDelayed);
+	}
+
+	/**
+	 * スリープを解除して画面をONにする
+	 * @param activity
+	 * @param disableKeyguard
+	 * @param keepScreenOn
+	 * @param lockDelayed
+	 */
+	@SuppressLint({"MissingPermission", "WakelockTimeout"})
+	public static void wake(
+		@NonNull final Activity activity,
+		final boolean disableKeyguard, final boolean keepScreenOn,
+		final long lockDelayed) {
+
 		try {
 			// スリープ状態から起床(android.permission.WAKE_LOCKが必要)
 			final PowerManager.WakeLock wakelock
@@ -55,18 +78,32 @@ public class PowerHelper {
 			}
 			// キーガードを解除(android.permission.DISABLE_KEYGUARDが必要)
 			try {
-				final KeyguardManager keyguard = ContextUtils.requireSystemService(activity, KeyguardManager.class);
-				final KeyguardManager.KeyguardLock keylock = keyguard.newKeyguardLock(TAG);
-				keylock.disableKeyguard();
+				if (disableKeyguard) {
+					// キーガードを解除(android.permission.DISABLE_KEYGUARDが必要)
+					activity.getWindow().addFlags(
+						WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+						| WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+						| (keepScreenOn ? WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON : 0));
+				} else if (keepScreenOn) {
+					// 画面がOFFにならないようにする
+					activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+				}
 			} finally {
 				wakelock.release();
 			}
-			// 画面がOFFにならないようにする
-			activity.getWindow().addFlags(
-				WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED | WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
 	}
 
+	/**
+	 * wakeでスリープ解除・画面ONしたのをスリープできるようにする
+	 * @param activity
+	 */
+	public static void releaseWakeup(@NonNull final Activity activity) {
+		activity.getWindow().clearFlags(
+			WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+			| WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+			| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	}
 }
