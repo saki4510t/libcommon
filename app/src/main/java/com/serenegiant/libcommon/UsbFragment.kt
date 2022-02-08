@@ -120,16 +120,22 @@ class UsbFragment : BaseFragment() {
 		override fun onAttach(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device.deviceName}")
 			// USB機器が接続された時
+			mUSBMonitor?.requestPermission(device)
 		}
 
 		override fun onPermission(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${device.deviceName}")
-			// パーミッションを取得できた時
+			// パーミッションを取得できた時, openする
+			val ctrlBlock = mUSBMonitor?.openDevice(device)
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${ctrlBlock}")
 		}
 
 		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName},${ctrlBlock}")
-			// USB機器がopenした時
+			// USB機器がopenした時,1秒後にcloseする
+			queueEvent({
+				ctrlBlock.close()
+			}, 1000)
 		}
 
 		override fun onDisconnect(device: UsbDevice) {
