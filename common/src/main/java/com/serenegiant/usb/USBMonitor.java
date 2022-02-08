@@ -36,6 +36,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.app.PendingIntentCompat;
 import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.system.BuildCheck;
@@ -217,7 +218,7 @@ public final class USBMonitor implements Const {
 				if (BuildCheck.isAPI31()) {
 					// FLAG_MUTABLE指定必須
 					// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
-					flags |= PendingIntent.FLAG_MUTABLE;
+					flags |= PendingIntentCompat.FLAG_MUTABLE;
 				}
 				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
 				final IntentFilter filter = createIntentFilter();
