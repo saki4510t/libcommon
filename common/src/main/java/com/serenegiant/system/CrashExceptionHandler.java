@@ -18,6 +18,7 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -89,17 +90,22 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 	 * @param context
 	 * @param activityClass
 	 */
+	@SuppressLint("InlinedApi")
 	@SuppressWarnings("deprecation")
 	@Deprecated
 	public static void setAutoRestart(@NonNull final Context context,
 		@NonNull final Class<? extends Activity> activityClass,
 		final long delayMs) {
 
+		int flags = PendingIntent.FLAG_CANCEL_CURRENT;
+		if (BuildCheck.isAPI31()) {
+			flags |= PendingIntent.FLAG_IMMUTABLE;
+		}
 		final PendingIntent intent = PendingIntent.getActivity(
 			context.getApplicationContext(),
 			REQUEST_RESTART_ACTIVITY,
 			Intent.makeMainActivity(new ComponentName(context, activityClass)),
-			PendingIntent.FLAG_CANCEL_CURRENT);
+			flags);
 		setAutoRestart(context, intent, delayMs);
 	}
 

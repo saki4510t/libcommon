@@ -516,10 +516,15 @@ public class RecordingService extends BaseService {
 	 * デフォルトはnullを返すだけでノティフィケーションを選択しても何も実行されない。
 	 * @return
 	 */
+	@SuppressLint("InlinedApi")
 	@Override
 	protected PendingIntent contextIntent() {
+		int flags = 0;
+		if (BuildCheck.isAPI31()) {
+			flags |= PendingIntent.FLAG_IMMUTABLE;
+		}
 		return PendingIntent.getActivity(this, 0,
-			new Intent(this, MainActivity.class), 0);
+			new Intent(this, MainActivity.class), flags);
 	}
 
 //--------------------------------------------------------------------------------

@@ -206,13 +206,18 @@ public final class USBMonitor implements Const {
 	 * 接続/切断およびパーミッション要求に成功した時のブロードキャストを受信するためのブロードキャストレシーバーを登録する
 	 * @throws IllegalStateException
 	 */
+	@SuppressLint("InlinedApi")
 	public synchronized void register() throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		if (mPermissionIntent == null) {
 			if (DEBUG) Log.i(TAG, "register:");
 			final Context context = mWeakContext.get();
 			if (context != null) {
-				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0);
+				int flags = 0;
+				if (BuildCheck.isAPI31()) {
+					flags |= PendingIntent.FLAG_IMMUTABLE;
+				}
+				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
 				final IntentFilter filter = createIntentFilter();
 				context.registerReceiver(mUsbReceiver, filter);
 			} else {

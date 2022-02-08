@@ -22,6 +22,7 @@ package com.serenegiant.service;
  * All files in the folder are under this Apache License, Version 2.0.
 */
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.PendingIntent;
@@ -170,10 +171,15 @@ public class ScreenRecorderService extends BaseService {
 	 * BaseServiceの抽象メソッドの実装
 	 * @return
 	 */
+	@SuppressLint("InlinedApi")
 	@Override
 	protected PendingIntent contextIntent() {
+		int flags = 0;
+		if (BuildCheck.isAPI31()) {
+			flags |= PendingIntent.FLAG_IMMUTABLE;
+		}
 		return PendingIntent.getActivity(this, 0,
-			new Intent(this, MainActivity.class), 0);
+			new Intent(this, MainActivity.class), flags);
 	}
 
 //--------------------------------------------------------------------------------
