@@ -103,13 +103,13 @@ public final class USBMonitor implements Const {
 		 * キャンセルまたはユーザーからパーミッションを得られなかった時
 		 * @param device
 		 */
-		public void onCancel(final UsbDevice device);
+		public void onCancel(@NonNull final UsbDevice device);
 		/**
 		 * パーミッション要求時等で非同期実行中にエラーになった時
 		 * @param device
 		 * @param t
 		 */
-		public void onError(final UsbDevice device, final Throwable t);
+		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t);
 	}
 
 	/**
@@ -457,8 +457,11 @@ public final class USBMonitor implements Const {
 	 * パーミッションを要求する
 	 * @param device
 	 * @return パーミッション要求が失敗したらtrueを返す
+	 * @throws IllegalStateException
 	 */
-	public synchronized boolean requestPermission(final UsbDevice device) {
+	public synchronized boolean requestPermission(@Nullable final UsbDevice device)
+		throws IllegalStateException {
+
 		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
 		boolean result = false;
 		if (isRegistered()) {
@@ -479,12 +482,11 @@ public final class USBMonitor implements Const {
 					}
 				}
 			} else {
-				processCancel(device);
+				callOnError(device, new UsbPermissionException("device is null"));
 				result = true;
 			}
 		} else {
-			processCancel(device);
-			result = true;
+			throw new IllegalStateException("USBMonitor not registered or already destroyed");
 		}
 		return result;
 	}
@@ -522,22 +524,32 @@ public final class USBMonitor implements Const {
 						|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
 					// パーミッションを取得できた時・・・デバイスとの通信の準備をする
 					processPermission(device);
-					return;
+				} else if (device != null) {
+					// パーミッションを取得できなかった時
+					processCancel(device);
+				} else {
+					// パーミッションを取得できなかった時,
+					// OS側がおかしいかAPI>=31でPendingIntentにFLAG_MUTABLEを指定していないとき
+					callOnError(device, new UsbPermissionException("device is null"));
 				}
-				// パーミッションを取得できなかった時
-				processCancel(device);
 			}
 		} else if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
 			// デバイスが取り付けられた時の処理・・・SC-06DはこのActionが来ない.ACTION_USB_DEVICE_DETACHEDは来る
 			// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからない
 			// Android5以降なら大丈夫そう
 			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-			processAttach(device);
+			if (device != null) {
+				processAttach(device);
+			} else {
+				callOnError(device, new USBAttachException("device is null"));
+			}
 		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 			// デバイスが取り外された時
 			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 			if (device != null) {
 				processDettach(device);
+			} else {
+				callOnError(device, new USBDetachException("device is null"));
 			}
 		}
 	}
@@ -646,7 +658,7 @@ public final class USBMonitor implements Const {
 	 * ユーザーキャンセル等でパーミッションを取得できなかったときの処理
 	 * @param device
 	 */
-	private final void processCancel(final UsbDevice device) {
+	private final void processCancel(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processCancel:");
 		mAsyncHandler.post(new Runnable() {
@@ -661,7 +673,7 @@ public final class USBMonitor implements Const {
 	 * 端末にUSB機器が接続されたときの処理
 	 * @param device
 	 */
-	private final void processAttach(final UsbDevice device) {
+	private final void processAttach(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processAttach:");
 		if (matches(device)) {
@@ -721,7 +733,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 * @param t
 	 */
-	private void callOnError(@NonNull final UsbDevice device,
+	private void callOnError(@Nullable final UsbDevice device,
 		@NonNull final Throwable t) {
 
 		if (DEBUG) Log.v(TAG, "callOnError:");
@@ -793,7 +805,7 @@ public final class USBMonitor implements Const {
 		 * @param monitor
 		 * @param device
 		 */
-		private UsbControlBlock(final USBMonitor monitor, final UsbDevice device)
+		private UsbControlBlock(@NonNull final USBMonitor monitor, @NonNull final UsbDevice device)
 			throws IOException {
 
 //			if (DEBUG) Log.v(TAG, "UsbControlBlock:device=" + device);

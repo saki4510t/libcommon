@@ -153,7 +153,7 @@ class UsbFragment : BaseFragment() {
 			// パーミッションを取得できなかった時
 		}
 
-		override fun onError(usbDevice: UsbDevice, throwable: Throwable) {
+		override fun onError(usbDevice: UsbDevice?, throwable: Throwable) {
 			Log.w(TAG, throwable)
 		}
 	}
