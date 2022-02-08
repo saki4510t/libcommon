@@ -215,7 +215,9 @@ public final class USBMonitor implements Const {
 			if (context != null) {
 				int flags = 0;
 				if (BuildCheck.isAPI31()) {
-					flags |= PendingIntent.FLAG_IMMUTABLE;
+					// FLAG_MUTABLE指定必須
+					// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
+					flags |= PendingIntent.FLAG_MUTABLE;
 				}
 				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
 				final IntentFilter filter = createIntentFilter();
