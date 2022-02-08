@@ -123,7 +123,7 @@ class UsbFragment : BaseFragment() {
 		}
 
 		override fun onPermission(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${device}")
 			// パーミッションを取得できた時
 		}
 
