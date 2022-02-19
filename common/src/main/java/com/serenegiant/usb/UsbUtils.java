@@ -24,6 +24,7 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -77,6 +78,56 @@ public class UsbUtils implements Const {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * 指定したUsbDeviceが指定したクラス・サブクラス・プロトコルに対応しているかどうかを取得
+	 * @param device
+	 * @param clazz 負数ならワイルドカード
+	 * @param subClass 負数ならワイルドカード
+	 * @param protocol 負数ならワイルドカード
+	 * @return
+	 */
+	public static boolean isSupported(@NonNull final UsbDevice device,
+		final int clazz, final int subClass, final int protocol) {
+
+		// デバイスクラス・デバイスサブクラス・デバイスプロトコルが一致するかどうかをチェック
+		if (((clazz < 0) || (clazz == device.getDeviceClass()))
+			&& ((subClass < 0) || (subClass == device.getDeviceSubclass()))
+			&& ((protocol < 0) || (protocol == device.getDeviceProtocol()))) {
+			return true;
+		}
+		// インターフェースクラス・インターフェースサブクラス・インターフェースプロトコルが一致するかどうかをチェック
+		final int n = device.getInterfaceCount();
+		for (int i = 0; i < n; i++) {
+			final UsbInterface intf = device.getInterface(i);
+			if (((clazz < 0) || (clazz == intf.getInterfaceClass()))
+				&& ((subClass < 0) || (subClass == intf.getInterfaceSubclass()))
+				&& ((protocol < 0) || (protocol == intf.getInterfaceProtocol()))) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * UVC機器かどうかを取得
+	 * @param device
+	 * @return
+	 */
+	public static boolean isUVC(@NonNull final UsbDevice device) {
+		return isSupported(device, 14, 1, -1)	// UVC Video control interface
+			|| isSupported(device, 14, 2, -1);	// UVC Video stream interface
+	}
+
+	/**
+	 * UAC機器かどうかを取得
+	 * @param device
+	 * @return
+	 */
+	public static boolean isUAC(@NonNull final UsbDevice device) {
+		return isSupported(device, 1, 1, -1)		// UAC Audio control interface
+			|| isSupported(device, 1, 2, -1);	// UAC Audio stream interface
 	}
 
 //--------------------------------------------------------------------------------
