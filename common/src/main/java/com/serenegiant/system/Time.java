@@ -33,7 +33,11 @@ public class Time {
 	public static long nanoTime() {
 		return sTime.timeNs();
 	}
-	
+
+	public static long milliTime() {
+		return sTime.timeMs();
+	}
+
 	public static void reset() {
 		if (!prohibitElapsedRealtimeNanos && BuildCheck.isJellyBeanMr1()) {
 			sTime = new TimeJellyBeanMr1();
@@ -45,7 +49,11 @@ public class Time {
 	private Time() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
-	
+
+	private long timeMs() {
+		return timeNs() / 1000000L;
+	}
+
 	@SuppressLint("NewApi")
 	private static class TimeJellyBeanMr1 extends Time {
 		public long timeNs() {
