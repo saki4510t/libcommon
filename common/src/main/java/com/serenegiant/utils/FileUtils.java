@@ -282,6 +282,19 @@ public class FileUtils {
     	return sDateTimeFormat.format(now.getTime());
     }
 
+	private static final SimpleDateFormat sTimeFormat
+		= new SimpleDateFormat("HH-mm-ss", Locale.US);
+
+	/**
+	 * 現在の時刻を表す文字列を取得する
+	 *
+	 * @return
+	 */
+	public static final String getTimeString() {
+		final GregorianCalendar now = new GregorianCalendar();
+		return sTimeFormat.format(now.getTime());
+	}
+
 
 //--------------------------------------------------------------------------------
 	// 外部ストレージの空き容量の制限(1分に10MBとみなす。実際は7〜8MB)
