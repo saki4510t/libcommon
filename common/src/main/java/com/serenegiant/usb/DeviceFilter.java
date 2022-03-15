@@ -215,6 +215,17 @@ public final class DeviceFilter implements Parcelable {
 	// set true if specific device(s) should exclude
 	public final boolean isExclude;
 
+	/**
+	 * コンストラクタ
+	 * @param vid
+	 * @param pid
+	 * @param clasz
+	 * @param subclass
+	 * @param protocol
+	 * @param manufacturer
+	 * @param product
+	 * @param serialNum
+	 */
 	public DeviceFilter(final int vid, final int pid,
 		final int clasz, final int subclass, final int protocol,
 		final String manufacturer, final String product, final String serialNum) {
@@ -225,6 +236,21 @@ public final class DeviceFilter implements Parcelable {
 			false);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param vid
+	 * @param pid
+	 * @param clazz
+	 * @param subclass
+	 * @param protocol
+	 * @param manufacturer
+	 * @param product
+	 * @param serialNum
+	 * @param intfClass
+	 * @param intfSubClass
+	 * @param intfProtocol
+	 * @param isExclude
+	 */
 	public DeviceFilter(final int vid, final int pid,
 		final int clazz, final int subclass, final int protocol,
 		final String manufacturer, final String product, final String serialNum,
@@ -247,10 +273,19 @@ public final class DeviceFilter implements Parcelable {
 		this.isExclude = isExclude;
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param device
+	 */
 	public DeviceFilter(@NonNull final UsbDevice device) {
 		this(device, false);
 	}
 
+	/**
+	 * コンストラクタ
+	 * @param device
+	 * @param isExclude
+	 */
 	@SuppressLint("NewApi")
 	public DeviceFilter(@NonNull final UsbDevice device, final boolean isExclude) {
 		mVendorId = device.getVendorId();
@@ -281,6 +316,10 @@ public final class DeviceFilter implements Parcelable {
 		this.isExclude = isExclude;
 	}
 
+	/**
+	 * コンストラクタ、Parcelable実装用
+	 * @param in
+	 */
 	protected DeviceFilter(@NonNull final Parcel in) {
 		mVendorId = in.readInt();
 		mProductId = in.readInt();
