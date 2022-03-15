@@ -217,6 +217,37 @@ public final class DeviceFilter implements Parcelable {
 
 	/**
 	 * コンストラクタ
+	 * clasz, subclass, protocolはすべて-1(ワイルドカード)
+	 * @param vid
+	 * @param pid
+	 */
+	public DeviceFilter(final int vid, final int pid) {
+
+		this(vid, pid, -1, -1, -1,
+			null, null, null,
+			null, null, null,
+			false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param vid
+	 * @param pid
+	 * @param clasz
+	 * @param subclass
+	 * @param protocol
+	 */
+	public DeviceFilter(final int vid, final int pid,
+		final int clasz, final int subclass, final int protocol) {
+
+		this(vid, pid, clasz, subclass, protocol,
+			null, null, null,
+			null, null, null,
+			false);
+	}
+
+	/**
+	 * コンストラクタ
 	 * @param vid
 	 * @param pid
 	 * @param clasz
