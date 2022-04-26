@@ -31,6 +31,7 @@ import com.google.android.material.tabs.TabLayout;
 
 import java.util.Locale;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
@@ -38,23 +39,35 @@ import androidx.core.view.ViewCompat;
 /**
  * 選択中のタブを中央に表示＆左右フリックとタブへのタッチで
  * 選択中のタブを切り替えることができるTabLayout
+ * レイアウトxmlでタブ(のView)を追加する場合は、
+ * com.google.android.material.tabs.TabItemにしないとだめ
+ * ・それ以外のView等を直接追加すると正常に動作しない
+ * ・TabItemは単なるプレースホルダー用の特別なViewで実際にはTabLayout$TabViewが追加される
+ * 正しく設定している場合はTabLayout直下に1つだけViewGroup(TabLayout$SlidingTabIndicator)が
+ * 存在しその中にタブ表示用のViewが0個以上入っている
  */
 public class CenteredTabLayout extends TabLayout {
 	private static final boolean DEBUG = false;	// XXX set false on production
 	private static final String TAG = CenteredTabLayout.class.getSimpleName();
 
+	/**
+	 * 左右フリック・タッチ操作用のGestureDetector
+	 */
 	private final GestureDetectorCompat mGestureDetector;
+	/**
+	 * Tabの選択変更・スクロールをロックするかどうかのフラグ
+	 */
 	private boolean mIsLocked = false;
 
-	public CenteredTabLayout(final Context context) {
+	public CenteredTabLayout(@NonNull final Context context) {
 		this(context, null, 0);
 	}
 
-	public CenteredTabLayout(final Context context, final AttributeSet attrs) {
+	public CenteredTabLayout(@NonNull final Context context, @Nullable final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public CenteredTabLayout(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public CenteredTabLayout(@NonNull final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		super.setTabMode(TabLayout.MODE_SCROLLABLE);	// MODE_FIXEDだと中央に表示や手動選択できない
 		mGestureDetector = new GestureDetectorCompat(context,
@@ -97,13 +110,18 @@ public class CenteredTabLayout extends TabLayout {
 	}
 
 	@Override
-	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+	protected void onLayout(final boolean changed,
+		final int left, final int top, final int right, final int bottom) {
+
 		super.onLayout(changed, left, top, right, bottom);
 
 		// TabLayoutはHorizontalScrollViewの子クラスなのでスクロール領域用のViewGroupを１つ含んでいる
 		// スクロール領域用のViewGroupを取得
-		final ViewGroup children = ((ViewGroup) getChildAt(0));
-		if (getTabMode() == TabLayout.MODE_SCROLLABLE) {
+		// レイアウトxmlで直接Viewを追加
+		final View ch = getChildAt(0);
+		final ViewGroup children = (ch instanceof ViewGroup) ? ((ViewGroup) ch) : null;	// TabLayout$SlidingTabIndicatorのはず
+		final int numTabs = (children != null) ? children.getChildCount() : 0;
+		if ((getTabMode() == TabLayout.MODE_SCROLLABLE) && (numTabs > 0)) {
 			// 選択中のタブが中央に表示されるようにパディングを調整する
 			// width=match_parent(左右一番端っこのタブを選択したときでもパディング設定できるだけの十分な幅)が必要
 			// タブを選択したときには中央に表示されるけど、手動でスクロールしたときに選択状態が変わらないまま横にスクロールしてしまう
@@ -111,7 +129,7 @@ public class CenteredTabLayout extends TabLayout {
 			// 先頭のタブViewを取得
 			final View firstTab = children.getChildAt(0);
 			// 最後のタブViewを取得
-			final View lastTab = children.getChildAt(children.getChildCount() - 1);
+			final View lastTab = children.getChildAt(numTabs - 1);
 			// パディングを調整
 			ViewCompat.setPaddingRelative(children,
 				(getWidth() / 2) - (firstTab.getWidth() / 2),
@@ -178,6 +196,7 @@ public class CenteredTabLayout extends TabLayout {
 
 	@Override
 	public void setTabMode(final int mode) {
+		// TabLayout.MODE_SCROLLABLE以外は受け付けないようにUnsupportedOperationExceptionを投げる
 		throw new UnsupportedOperationException("CenteredTabLayout does not support #setTabMode.");
 	}
 }
