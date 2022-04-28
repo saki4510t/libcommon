@@ -138,7 +138,7 @@ class MainActivity
 		when (item.id) {
 			R.string.title_request_saf_permission -> {	// SAF
 				if (BuildCheck.isLollipop()) {
-					fragment = SAFUtilsFragment()
+					fragment = SAFUtilsFragment.newInstance()
 				} else {
 					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
 				}
