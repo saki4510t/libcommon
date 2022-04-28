@@ -1,6 +1,8 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins {
+	id 'com.android.library'
+	id 'kotlin-android'
+	id 'kotlin-kapt'
+}
 
 /*
  * libcommon
@@ -110,25 +112,39 @@ repositories {
 
 def repo = new File(rootDir, "repository")
 
-apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
-uploadArchives {
-	repositories {
-		mavenDeployer {
-            repository url: "file://${repo.absolutePath}"
-            pom.version = versionNameString
-            pom.groupId = 'com.serenegiant'
-            pom.artifactId = 'common'
-			pom.project {
-				inceptionYear '2014'
-				licenses {
-					license {
-						name 'The Apache Software License, Version 2.0'
-						url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-						distribution 'repo'
+afterEvaluate {
+	publishing {
+		repositories {
+			maven {
+				url = "file://${repo.absolutePath}"
+			}
+		}
+		publications {
+			release(MavenPublication) {
+				groupId = 'com.serenegiant'
+				artifactId = 'common'
+				version = versionNameString
+				from components.release
+				pom {
+					inceptionYear = '2014'
+					licenses {
+						license {
+							name = 'The Apache Software License, Version 2.0'
+							url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution = 'repo'
+						}
+					}
+					developers {
+						developer {
+							id = 'saki4510t'
+							name = 't_saki'
+							email = 't_saki@serenegiant.com'
+						}
 					}
 				}
 			}
-        }
-    }
+		}
+	}
 }
