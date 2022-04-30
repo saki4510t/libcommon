@@ -20,7 +20,6 @@ package com.serenegiant.system;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.KeyguardManager;
 import android.os.PowerManager;
 import android.util.Log;
 import android.view.WindowManager;
