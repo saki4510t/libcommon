@@ -56,12 +56,18 @@ import java.util.Locale;
 public class ConnectivityHelper {
 	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
-	
+
+	/**
+	 * ConnectivityCallback#onNetworkChangedはネットワーク状態が変化したときにしか呼ばれないので
+	 * 初回コールバックが必ず呼び出されるようにするための初期状態
+	 */
+	private static final int NETWORK_TYPE_UNKNOWN = -1;
+
 	public static final int NETWORK_TYPE_NON = 0;
-	public static final int NETWORK_TYPE_MOBILE = 1;
-	public static final int NETWORK_TYPE_WIFI = 1 << 1;
-	public static final int NETWORK_TYPE_BLUETOOTH = 1 << 7;
-	public static final int NETWORK_TYPE_ETHERNET = 1 << 9;
+	public static final int NETWORK_TYPE_MOBILE = 1 << ConnectivityManager.TYPE_MOBILE; // 1 << 0;
+	public static final int NETWORK_TYPE_WIFI = 1 << ConnectivityManager.TYPE_WIFI; // 1 << 1;
+	public static final int NETWORK_TYPE_BLUETOOTH = 1 << ConnectivityManager.TYPE_BLUETOOTH; // 1 << 7;
+	public static final int NETWORK_TYPE_ETHERNET = 1 << ConnectivityManager.TYPE_ETHERNET; // 1 << 9;
 
 	/**
 	 * ネットワークの接続状態変化を通知するためのコールバックリスナー
@@ -121,7 +127,7 @@ public class ConnectivityHelper {
 	/**
 	 * 現在のアクティブになっているネットワーク接続の種類
 	 */
-	private int mActiveNetworkType = NETWORK_TYPE_NON;
+	private int mActiveNetworkType = NETWORK_TYPE_UNKNOWN;
 	/**
 	 * このConnectivityHelperインスタンスが破棄されたかどうか
 	 */
