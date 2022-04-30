@@ -1,5 +1,8 @@
 package com.serenegiant.usb;
 
+/**
+ * USB機器パーミッション要求時にエラー発生したときの例外
+ */
 public class UsbPermissionException extends USBException {
 	private static final long serialVersionUID = -8430122770852248672L;
 
