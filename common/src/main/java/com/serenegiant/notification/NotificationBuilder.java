@@ -20,7 +20,6 @@ package com.serenegiant.notification;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
@@ -232,23 +231,23 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	@NonNull
 	@Override
 	public Notification build() {
-		if (mChannelBuilder.getImportance() == NotificationManager.IMPORTANCE_NONE) {
+		if (mChannelBuilder.getImportance() == NotificationManagerCompat.IMPORTANCE_NONE) {
 			// importanceが設定されていないときでmPriorityがセットされていればそれに従う
 			switch (mPriority) {
 			case NotificationCompat.PRIORITY_MIN:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_MIN);
+				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_MIN);
 				break;
 			case NotificationCompat.PRIORITY_LOW:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_LOW);
+				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_LOW);
 				break;
 			case NotificationCompat.PRIORITY_DEFAULT:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_DEFAULT);
+				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_DEFAULT);
 				break;
 			case NotificationCompat.PRIORITY_HIGH:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_HIGH);
+				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_HIGH);
 				break;
 			case NotificationCompat.PRIORITY_MAX:
-				mChannelBuilder.setImportance(NotificationManager.IMPORTANCE_MAX);
+				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_MAX);
 				break;
 			default:
 				// ChannelBuilder側の設定に従う==IMPORTANCE_DEFAULT
