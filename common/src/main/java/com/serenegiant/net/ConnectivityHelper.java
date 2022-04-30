@@ -79,7 +79,7 @@ public class ConnectivityHelper {
 		@AnyThread
 		public void onNetworkChanged(final int activeNetworkType, final int prevNetworkType);
 		@AnyThread
-		public void onError(final Throwable t);
+		public void onError(@NonNull final Throwable t);
 	}
 
 	/**
@@ -435,7 +435,7 @@ public class ConnectivityHelper {
 	 * ConnectivityCallbackのコールバックメソッド呼び出しのためのヘルパーメソッド
 	 * @param t
 	 */
-	private void callOnError(final Throwable t) {
+	private void callOnError(@NonNull final Throwable t) {
 		synchronized (mSync) {
 			if (!HandlerUtils.isTerminated(mAsyncHandler)) {
 				mAsyncHandler.post(() -> {
