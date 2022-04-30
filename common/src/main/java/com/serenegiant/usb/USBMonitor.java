@@ -542,7 +542,7 @@ public final class USBMonitor implements Const {
 			if (device != null) {
 				processAttach(device);
 			} else {
-				callOnError(device, new USBAttachException("device is null"));
+				callOnError(device, new UsbAttachException("device is null"));
 			}
 		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 			// デバイスが取り外された時
@@ -550,7 +550,7 @@ public final class USBMonitor implements Const {
 			if (device != null) {
 				processDettach(device);
 			} else {
-				callOnError(device, new USBDetachException("device is null"));
+				callOnError(device, new UsbDetachException("device is null"));
 			}
 		}
 	}

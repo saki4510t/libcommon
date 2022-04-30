@@ -5,21 +5,21 @@ import java.io.IOException;
 /**
  * USB関係の例外
  */
-public class USBException extends IOException {
+public class UsbException extends IOException {
 	private static final long serialVersionUID = 9211466216423287742L;
 
-	public USBException() {
+	public UsbException() {
 	}
 
-	public USBException(final String message) {
+	public UsbException(final String message) {
 		super(message);
 	}
 
-	public USBException(final String message, final Throwable cause) {
+	public UsbException(final String message, final Throwable cause) {
 		super(message, cause);
 	}
 
-	public USBException(final Throwable cause) {
+	public UsbException(final Throwable cause) {
 		super(cause);
 	}
 }

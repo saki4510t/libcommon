@@ -27,10 +27,10 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 
-public class USBVendorId {
+public class UsbVendorId {
 	private static final SparseArray<String> IDS = new SparseArray<String>();
 
-	private USBVendorId() {
+	private UsbVendorId() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 

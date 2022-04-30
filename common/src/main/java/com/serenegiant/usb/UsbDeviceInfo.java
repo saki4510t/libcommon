@@ -168,7 +168,7 @@ public class UsbDeviceInfo implements Const, Parcelable {
 				}
 			}
 			if (TextUtils.isEmpty(result.manufacturer)) {
-				result.manufacturer = USBVendorId.vendorName(device.getVendorId());
+				result.manufacturer = UsbVendorId.vendorName(device.getVendorId());
 			}
 			if (TextUtils.isEmpty(result.manufacturer)) {
 				result.manufacturer = String.format("%04x", device.getVendorId());
