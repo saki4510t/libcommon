@@ -82,6 +82,12 @@ class NetworkConnectionFragment : BaseFragment() {
 		override fun onNetworkChanged(activeNetworkType: Int, prevNetworkType: Int) {
 			if (DEBUG) Log.v(TAG, "onNetworkChanged:"
 				+ ConnectivityHelper.getNetworkTypeString(activeNetworkType))
+			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:"
+				+ ConnectivityHelper.isWifiNetworkReachable(requireContext()))
+			if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:"
+				+ ConnectivityHelper.isMobileNetworkReachable(requireContext()))
+			if (DEBUG) Log.v(TAG, "isNetworkReachable:"
+				+ ConnectivityHelper.isNetworkReachable(requireContext()))
 		}
 
 		override fun onError(t: Throwable) {
