@@ -3,7 +3,7 @@ package com.serenegiant.common;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.serenegiant.system.EncryptedSharedPreferences;
+import com.serenegiant.preference.EncryptedSharedPreferences;
 
 import org.junit.After;
 import org.junit.Before;
@@ -39,7 +39,7 @@ public class EncryptedSharedPreferencesTest {
 		16, 74, 71, -80, 32, 101, -47, 72, 117, -14, 0, -29, 70, 65, -12, 74
 	};
 
-	private static double EPS_FLOAT = Float.MIN_NORMAL;
+	private static final double EPS_FLOAT = Float.MIN_NORMAL;
 
 	@Before
 	public void prepare() {

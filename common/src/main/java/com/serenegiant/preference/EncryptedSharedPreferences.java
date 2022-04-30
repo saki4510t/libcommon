@@ -1,4 +1,4 @@
-package com.serenegiant.system;
+package com.serenegiant.preference;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -64,9 +64,7 @@ import androidx.annotation.RequiresApi;
 
 /**
  * SharedPreferencesをラップしてデータを自動的に暗号化・復号するためのSharedPreferences実装
- * @deprecated preferenceパッケージ下のEncryptedSharedPreferencesを使うこと
  */
-@Deprecated
 public class EncryptedSharedPreferences implements SharedPreferences {
 	private static final boolean DEBUG = false;
 	private static final String TAG = EncryptedSharedPreferences.class.getSimpleName();
