@@ -661,4 +661,28 @@ public final class BuildCheck {
 	public static boolean isAndroid12() {
 		return check(31);
 	}
+
+	/**
+	 * てぃらみっす API>=32
+	 * @return
+	 */
+	public static boolean isAndroidT() {
+		return check(32);
+	}
+
+	/**
+	 * てぃらみっす API>=32
+	 * @return
+	 */
+	public static boolean isAndroid13() {
+		return check(32);
+	}
+
+	/**
+	 * てぃらみっす API>=32
+	 * @return
+	 */
+	public static boolean isAPI32() {
+		return check(32);
+	}
 }
