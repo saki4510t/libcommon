@@ -45,7 +45,6 @@ import com.serenegiant.utils.HandlerThreadHandler;
 
 /**
  * サービスに各種ユーティリティーメソッドを追加
- * FIXME NotificationCompat.Builderを直接使う代わりにNotificationBuilderを使うように変更する
  */
 public abstract class BaseService extends LifecycleService {
 	private static final boolean DEBUG = false;	// FIXME set false on production
