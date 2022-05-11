@@ -177,6 +177,7 @@ public interface IPipeline {
 
 	/**
 	 * パイプラインチェーンが正しく繋がっているかどうかを検証
+	 * ProxyPipelineの継承クラスの場合はIPipeline#removeを呼び出したときに自動的に呼び出される
 	 * @param root
 	 * @return
 	 */

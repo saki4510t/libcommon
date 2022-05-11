@@ -158,6 +158,7 @@ public class ProxyPipeline implements IPipeline {
 	@Override
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:" + this);
+		final IPipeline first = IPipeline.findFirst(this);
 		IPipeline parent;
 		synchronized (mSync) {
 			parent = mParent;
@@ -167,8 +168,8 @@ public class ProxyPipeline implements IPipeline {
 			mParent = null;
 			mPipeline = null;
 		}
-		if (parent != null) {
-			parent = IPipeline.findFirst(parent);
+		if (first != this) {
+			IPipeline.validatePipelineChain(first);
 			parent.refresh();
 		}
 	}
