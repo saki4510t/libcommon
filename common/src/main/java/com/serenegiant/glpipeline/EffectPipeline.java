@@ -52,7 +52,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	 */
 	@Nullable
 	public static EffectPipeline find(@NonNull final IPipeline pipeline) {
+		// パイプラインチェーンの先頭を取得
 		IPipeline p = IPipeline.findFirst(pipeline);
+		// EffectPipelineが見つかるまで順番にたどる
 		while (p != null) {
 			if (p instanceof EffectPipeline) {
 				return (EffectPipeline)p;
