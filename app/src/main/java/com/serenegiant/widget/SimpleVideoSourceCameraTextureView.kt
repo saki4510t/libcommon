@@ -332,7 +332,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	get() {
 		val source = mVideoSource
 		return if (source != null) {
-			val pipeline = EffectPipeline.find(source)
+			val pipeline = IPipeline.find(source, EffectPipeline::class.java)
 			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
 			pipeline?.currentEffect ?: 0
 		} else {
@@ -346,7 +346,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			post {
 				val source = mVideoSource
 				if (source != null) {
-					val pipeline = EffectPipeline.find(source)
+					val pipeline = IPipeline.find(source, EffectPipeline::class.java)
 					pipeline?.setEffect(effect)
 				}
 			}

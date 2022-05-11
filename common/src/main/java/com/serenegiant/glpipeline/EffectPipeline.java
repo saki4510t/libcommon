@@ -49,7 +49,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	 * 複数存在する場合は最初に見つかったものを返す
 	 * @param pipeline
 	 * @return
+	 * @deprecated IPipeline#find(pipeline, clazz)を使う
 	 */
+	@Deprecated
 	@Nullable
 	public static EffectPipeline find(@NonNull final IPipeline pipeline) {
 		// パイプラインチェーンの先頭を取得
