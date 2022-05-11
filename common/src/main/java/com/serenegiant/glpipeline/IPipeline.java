@@ -135,6 +135,27 @@ public interface IPipeline {
 	}
 
 	/**
+	 * パイプラインチェーンに含まれる指定したIPipelineオブジェクトを取得する
+	 * 複数存在する場合は最初に見つかったものを返す
+	 * @param pipeline
+	 * @param clazz IPipelineを実装したクラスのClassオブジェクト
+	 * @return 見つからなければnull
+	 */
+	@Nullable
+	public static <T extends IPipeline> T find(@NonNull final IPipeline pipeline, @NonNull final Class<T> clazz) {
+		// パイプラインチェーンの先頭を取得
+		IPipeline p = findFirst(pipeline);
+		// 指定したクラスが見つかるまで順番にたどる
+		while (p != null) {
+			if (p.getClass() == clazz) {
+				return clazz.cast(p);
+			}
+			p = p.getPipeline();
+		}
+		return null;
+	}
+
+	/**
 	 * 指定したIPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
 	 * @param root
 	 * @return
