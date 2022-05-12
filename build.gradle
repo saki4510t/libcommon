@@ -53,6 +53,6 @@ ext {
 	androidXLifecycleKtx = '2.3.1'
 	androidXFragmentKtx = '1.3.1'	// 1.4.0にするとcompileSdkVersion=30以下でビルドできなくなる
 
-    versionCodeNum = 364
-    versionNameString = '7.27.4'
+    versionCodeNum = 365
+    versionNameString = '7.28.0'
 }
