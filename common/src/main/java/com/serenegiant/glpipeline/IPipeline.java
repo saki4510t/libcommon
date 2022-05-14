@@ -24,6 +24,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
+/**
+ * 映像受け取り・映像効果付与・プレビュー表示等を動的に組み合わせて逐次処理するためのインターフェース定義
+ */
 public interface IPipeline {
 	static final String TAG = IPipeline.class.getSimpleName();
 
@@ -91,6 +94,12 @@ public interface IPipeline {
 	 */
 	public void remove();
 
+	/**
+	 * 新しく映像を受け取ったときの処理
+	 * @param isOES
+	 * @param texId
+	 * @param texMatrix
+	 */
 	@WorkerThread
 	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
 

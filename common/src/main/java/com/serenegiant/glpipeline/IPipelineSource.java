@@ -26,6 +26,9 @@ import com.serenegiant.glutils.GLManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.WorkerThread;
 
+/**
+ * 映像ソースとなるIPipelineインターフェース
+ */
 public interface IPipelineSource extends IPipeline {
 	/**
 	 * PipelineSourceからのコールバックリスナー
@@ -55,6 +58,8 @@ public interface IPipelineSource extends IPipeline {
 
 	/**
 	 * 映像入力用のSurfaceTextureを取得
+	 * PipelineSourceCallback#onCreateが呼び出されてから
+	 * PipelineSourceCallback#onDestroyが呼び出されるまでの間有効
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -63,6 +68,8 @@ public interface IPipelineSource extends IPipeline {
 
 	/**
 	 * 映像入力用のSurfaceを取得
+	 * PipelineSourceCallback#onCreateが呼び出されてから
+	 * PipelineSourceCallback#onDestroyが呼び出されるまでの間有効
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -74,7 +81,6 @@ public interface IPipelineSource extends IPipeline {
 	 * @return
 	 */
 	public int getTexId();
-
 
 	/**
 	 * テクスチャ変換行列を取得

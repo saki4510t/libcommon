@@ -25,7 +25,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * IPipelineのインターフェースメソッドの中継をするだけのIPipeline実装
+ * IPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのIPipeline実装
  */
 public class ProxyPipeline implements IPipeline {
 	private static final boolean DEBUG = false;	// set false on production

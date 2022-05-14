@@ -80,6 +80,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private RendererTarget mRendererTarget;
 	/**
 	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
+	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
 	 */
 	private volatile boolean mEffectOnly;
 	/**
@@ -187,6 +188,11 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 		});
 	}
 
+	/**
+	 * 描画先のSurfaceをセットしているかどうか
+	 * #isEffectOnlyの符号反転したのものと実質的には同じ
+	 * @return
+	 */
 	@Override
 	public boolean hasSurface() {
 		synchronized (mSync) {
