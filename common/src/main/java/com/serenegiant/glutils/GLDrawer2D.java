@@ -64,18 +64,51 @@ public abstract class GLDrawer2D {
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
 	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
+	 * @param isGLES3
 	 * @param isOES
 	 * @return
 	 */
 	public static GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD);
+		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, null, null);
 	}
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
+	 * @param isGLES3
+	 * @param isOES
+	 * @param fs
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static GLDrawer2D create(
+		final boolean isGLES3, final boolean isOES,
+		@Nullable final String fs) {
+
+		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, null, fs);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * @param isGLES3
+	 * @param isOES
+	 * @param vs
+	 * @param fs
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static GLDrawer2D create(
+		final boolean isGLES3, final boolean isOES,
+		@Nullable final String vs, @Nullable final String fs) {
+
+		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, vs, fs);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * @param isGLES3
+	 * @param isOES
 	 * @param vertices
 	 * @param texcoord
-	 * @param isOES
 	 * @return
 	 */
 	@SuppressLint("NewApi")
@@ -84,11 +117,25 @@ public abstract class GLDrawer2D {
 		@NonNull final float[] vertices,
 		@NonNull final float[] texcoord) {
 
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLDrawer2DES3(isOES, vertices, texcoord, null, null);
-		} else {
-			return new GLDrawer2DES2(isOES, vertices, texcoord, null, null);
-		}
+		return create(isGLES3, isOES, vertices, texcoord, null, null);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * @param isGLES3
+	 * @param isOES
+	 * @param vertices
+	 * @param texcoord
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static GLDrawer2D create(
+		final boolean isGLES3, final boolean isOES,
+		@NonNull final float[] vertices,
+		@NonNull final float[] texcoord,
+		@Nullable final String fs) {
+
+		return create(isGLES3, isOES, vertices, texcoord, null, fs);
 	}
 
 	/**
