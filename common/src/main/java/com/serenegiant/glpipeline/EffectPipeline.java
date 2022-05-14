@@ -125,10 +125,8 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 			@WorkerThread
 			@Override
 			public void run() {
-				synchronized (mSync) {
-					mDrawer = new EffectDrawer2D(manager.isGLES3(), true, mEffectListener);
-					createTarget(surface, maxFps);
-				}
+				mDrawer = new EffectDrawer2D(manager.isGLES3(), true, mEffectListener);
+				createTarget(surface, maxFps);
 			}
 		});
 	}
@@ -242,17 +240,17 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 			final EffectDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
-			synchronized (mSync) {
-				if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-					// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-					if (mDrawer != null) {
-						mDrawer.release();
-					}
-					if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-					mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
-					mDrawer.setEffect(mEffect);
+			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
+				// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				if (mDrawer != null) {
+					mDrawer.release();
 				}
-				drawer = mDrawer;
+				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
+				mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
+				mDrawer.setEffect(mEffect);
+			}
+			drawer = mDrawer;
+			synchronized (mSync) {
 				target = mRendererTarget;
 			}
 			if ((target != null)
@@ -286,15 +284,12 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					EffectDrawer2D drawer;
-					synchronized (mSync) {
-						drawer = mDrawer;
-						if (drawer != null) {
+					EffectDrawer2D drawer = mDrawer;
+					mDrawer = null;
+					if (drawer != null) {
+						synchronized (mSync) {
 							mEffect = drawer.getCurrentEffect();
 						}
-						mDrawer = null;
-					}
-					if (drawer != null) {
 						drawer.release();
 					}
 				}
@@ -313,9 +308,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 				@WorkerThread
 				@Override
 				public void run() {
-					synchronized (mSync) {
-						if (mDrawer != null) {
-							mDrawer.resetEffect();
+					if (mDrawer != null) {
+						mDrawer.resetEffect();
+						synchronized (mSync) {
 							mEffect = mDrawer.getCurrentEffect();
 						}
 					}
@@ -339,9 +334,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
-					synchronized (mSync) {
-						if (mDrawer != null) {
-							mDrawer.setEffect(effect);
+					if (mDrawer != null) {
+						mDrawer.setEffect(effect);
+						synchronized (mSync) {
 							mEffect = mDrawer.getCurrentEffect();
 						}
 					}
@@ -355,7 +350,7 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
 		synchronized (mSync) {
-			return mDrawer != null ? mDrawer.getCurrentEffect() : EFFECT_NON;
+			return mEffect;
 		}
 	}
 //--------------------------------------------------------------------------------
@@ -402,12 +397,11 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	}
 
 	private void releaseTarget() {
-		final EffectDrawer2D drawer;
+		final EffectDrawer2D drawer = mDrawer;
 		final RendererTarget target;
 		final GLSurface w;
+		mDrawer = null;
 		synchronized (mSync) {
-			drawer = mDrawer;
-			mDrawer = null;
 			target = mRendererTarget;
 			mRendererTarget = null;
 			w = work;
