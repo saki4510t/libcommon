@@ -99,8 +99,9 @@ public class GLUtils {
 				}
 			}).start();
 			try {
-				sync.tryAcquire(500, TimeUnit.MILLISECONDS);
-				sSupportedGLVersion = result.get();
+				if (sync.tryAcquire(500, TimeUnit.MILLISECONDS)) {
+					sSupportedGLVersion = result.get();
+				}
 			} catch (final InterruptedException e) {
 				// ignore
 			}
