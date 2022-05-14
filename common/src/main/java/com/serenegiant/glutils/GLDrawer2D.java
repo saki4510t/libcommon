@@ -68,7 +68,7 @@ public abstract class GLDrawer2D {
 	 * @return
 	 */
 	public static GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-		return create(isGLES3, DEFAULT_VERTICES, DEFAULT_TEXCOORD, isOES);
+		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD);
 	}
 
 	/**
@@ -79,14 +79,36 @@ public abstract class GLDrawer2D {
 	 * @return
 	 */
 	@SuppressLint("NewApi")
-	public static GLDrawer2D create(final boolean isGLES3,
+	public static GLDrawer2D create(
+		final boolean isGLES3, final boolean isOES,
 		@NonNull final float[] vertices,
-		@NonNull final float[] texcoord, final boolean isOES) {
+		@NonNull final float[] texcoord) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLDrawer2DES3(isOES, vertices, texcoord);
+			return new GLDrawer2DES3(isOES, vertices, texcoord, null, null);
 		} else {
-			return new GLDrawer2DES2(isOES, vertices, texcoord);
+			return new GLDrawer2DES2(isOES, vertices, texcoord, null, null);
+		}
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * @param vertices
+	 * @param texcoord
+	 * @param isOES
+	 * @return
+	 */
+	@SuppressLint("NewApi")
+	public static GLDrawer2D create(
+		final boolean isGLES3, final boolean isOES,
+		@NonNull final float[] vertices,
+		@NonNull final float[] texcoord,
+		@Nullable final String vs, @Nullable final String fs) {
+
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
+			return new GLDrawer2DES3(isOES, vertices, texcoord, vs, fs);
+		} else {
+			return new GLDrawer2DES2(isOES, vertices, texcoord, vs, fs);
 		}
 	}
 
@@ -166,7 +188,8 @@ public abstract class GLDrawer2D {
 	protected GLDrawer2D(
 		final boolean isGLES3, final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord) {
+		@NonNull @Size(min=8) final float[] texcoord,
+		@NonNull final String vs, @NonNull final String fs) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
@@ -180,7 +203,7 @@ public abstract class GLDrawer2D {
 		// モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
 
-		resetShader();
+		updateShader(vs, fs);
 	}
 
 	/**

@@ -20,13 +20,17 @@ package com.serenegiant.glutils;
 
 import android.opengl.GLES30;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.glutils.es3.GLHelper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.Size;
+
+import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
@@ -57,9 +61,13 @@ import androidx.annotation.Size;
 	/*package*/ GLDrawer2DES3(
 		final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord) {
+		@NonNull @Size(min=8) final float[] texcoord,
+		@Nullable final String vs, @Nullable final String fs) {
 
-		super(true, isOES, vertices, texcoord);
+		super(true, isOES,
+			vertices, texcoord,
+			TextUtils.isEmpty(vs) ? VERTEX_SHADER_ES3 : vs,
+			TextUtils.isEmpty(fs) ? (isOES ? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_ES3) : fs);
 	}
 
 	@Override

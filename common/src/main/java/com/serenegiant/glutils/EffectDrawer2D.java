@@ -101,7 +101,7 @@ public class EffectDrawer2D {
 		final float[] vertices, final float[] texcoord,
 		final boolean isOES) {
 
-		this(GLDrawer2D.create(isGLES3, vertices, texcoord, isOES), null);
+		this(GLDrawer2D.create(isGLES3, isOES, vertices, texcoord), null);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class EffectDrawer2D {
 		final boolean isOES,
 		@Nullable EffectListener effectListener) {
 
-		this(GLDrawer2D.create(isGLES3, vertices, texcoord, isOES), effectListener);
+		this(GLDrawer2D.create(isGLES3, isOES, vertices, texcoord), effectListener);
 	}
 
 	/**
