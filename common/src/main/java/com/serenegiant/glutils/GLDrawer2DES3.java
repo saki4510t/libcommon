@@ -54,8 +54,9 @@ import androidx.annotation.Size;
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
 	 * 				通常の2Dテキスチャならfalse
 	 */
-	/*package*/ GLDrawer2DES3(final float[] vertices,
-		final float[] texcoord, final boolean isOES) {
+	/*package*/ GLDrawer2DES3(
+		@NonNull @Size(min=8) final float[] vertices,
+		@NonNull @Size(min=8) final float[] texcoord, final boolean isOES) {
 
 		super(true, vertices, texcoord, isOES);
 	}

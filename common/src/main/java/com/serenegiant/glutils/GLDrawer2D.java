@@ -163,14 +163,12 @@ public abstract class GLDrawer2D {
 	 * 				通常の2Dテキスチャを描画に使うならfalse
 	 */
 	protected GLDrawer2D(final boolean isGLES3,
-		final float[] vertices,
-		final float[] texcoord, final boolean isOES) {
+		@NonNull @Size(min=8) final float[] vertices,
+		@NonNull @Size(min=8) final float[] texcoord, final boolean isOES) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
-		VERTEX_NUM = Math.min(
-			vertices != null ? vertices.length : 0,
-			texcoord != null ? texcoord.length : 0) / 2;
+		VERTEX_NUM = Math.min(vertices.length, texcoord.length) / 2;
 		VERTEX_SZ = VERTEX_NUM * 2;
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
