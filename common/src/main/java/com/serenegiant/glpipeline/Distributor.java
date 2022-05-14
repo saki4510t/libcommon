@@ -31,6 +31,7 @@ import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
@@ -137,7 +138,10 @@ public class Distributor extends ProxyPipeline {
 
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		super.onFrameAvailable(isOES, texId, texMatrix);
 		mDistributeTask.requestFrame(isOES, texId, texMatrix);
 	}

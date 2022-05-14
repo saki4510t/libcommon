@@ -25,6 +25,7 @@ import android.util.SparseArray;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import static com.serenegiant.glutils.GLEffect.*;
 import static com.serenegiant.glutils.ShaderConst.*;
@@ -189,7 +190,7 @@ public class EffectDrawer2D {
 	 * @param offset
 	 * @return
 	 */
-	public GLDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset) {
+	public GLDrawer2D setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		return mDrawer;
 	}
 
@@ -199,7 +200,7 @@ public class EffectDrawer2D {
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
-	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset) {
+	public void copyMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		mDrawer.copyMvpMatrix(matrix, offset);
 	}
 

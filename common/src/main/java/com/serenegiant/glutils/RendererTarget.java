@@ -25,6 +25,7 @@ import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 /**
  * Surface等の描画先のオブジェクトと関係する設定を保持するためのホルダークラス
@@ -53,6 +54,8 @@ public class RendererTarget {
 	private final boolean mOwnSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private ISurface mTargetSurface;
+	@Size(min=16)
+	@NonNull
 	private final float[] mMvpMatrix = new float[16];
 	private volatile boolean mEnable = true;
 
@@ -140,6 +143,7 @@ public class RendererTarget {
 	 * コピーではないので変更時は注意
 	 * @return
 	 */
+	@Size(min=16)
 	@NonNull
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
@@ -284,7 +288,7 @@ public class RendererTarget {
 		@Override
 		public void draw(@NonNull final GLDrawer2D drawer,
 			final int texUnit, final int textId,
-			final float[] texMatrix) {
+			@Nullable final float[] texMatrix) {
 
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 			super.draw(drawer, texUnit, textId, texMatrix);

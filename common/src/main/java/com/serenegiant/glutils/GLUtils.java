@@ -32,7 +32,9 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
 
@@ -115,7 +117,7 @@ public class GLUtils {
 	 * @param mvp
 	 * @param mirror
 	 */
-	public static void setMirror(final float[] mvp, @MirrorMode final int mirror) {
+	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @MirrorMode final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL:
 			mvp[0] = Math.abs(mvp[0]);
@@ -141,7 +143,7 @@ public class GLUtils {
 	 * @param mvp
 	 * @param degrees
 	 */
-	public static void rotate(final float[] mvp, final int degrees) {
+	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
 		if ((degrees % 180) != 0) {
 			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 		}
@@ -152,7 +154,7 @@ public class GLUtils {
 	 * @param mvp
 	 * @param degrees
 	 */
-	public static void setRotation(final float[] mvp, final int degrees) {
+	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
 		Matrix.setIdentityM(mvp, 0);
 		if ((degrees % 180) != 0) {
 			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);

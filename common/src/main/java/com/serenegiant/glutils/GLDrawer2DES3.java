@@ -26,7 +26,7 @@ import com.serenegiant.glutils.es3.GLHelper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
-
+import androidx.annotation.Size;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
@@ -61,12 +61,12 @@ import androidx.annotation.RequiresApi;
 	}
 
 	@Override
-	protected void updateTexMatrix(final float[] texMatrix, final int offset) {
+	protected void updateTexMatrix(@NonNull @Size(min=16) final float[] texMatrix, final int offset) {
 		GLES30.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
 	}
 
 	@Override
-	protected void updateMvpMatrix(final float[] mvpMatrix, final int offset) {
+	protected void updateMvpMatrix(@NonNull @Size(min=16) final float[] mvpMatrix, final int offset) {
 		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
 	}
 

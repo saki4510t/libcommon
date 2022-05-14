@@ -32,6 +32,7 @@ import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
@@ -141,6 +142,8 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	 * @return
 	 * @throws IllegalStateException
 	 */
+	@Size(min=16)
+	@NonNull
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {
 		synchronized (mSync) {
@@ -160,7 +163,10 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	private int cnt;
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		synchronized (mSync) {
 			// 映像ソースが準備できていなければスキップする
 			if (mReleased || mImageSource == null) return;

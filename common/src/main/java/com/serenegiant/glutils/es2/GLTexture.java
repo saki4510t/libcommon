@@ -30,6 +30,7 @@ import com.serenegiant.glutils.IGLSurface;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
@@ -43,6 +44,8 @@ public class GLTexture implements IGLSurface {
 	/* package */final int mTextureTarget;
 	/* package */final int mTextureUnit ;
 	/* package */int mTextureId;
+	@Size(min=16)
+	@NonNull
 	/* package */final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	/* package */int mTexWidth, mTexHeight;
 	/* package */int mImageWidth, mImageHeight;
@@ -215,12 +218,16 @@ public class GLTexture implements IGLSurface {
 	/**
 	 * #copyTexMatrix()の返り値用のfloat配列
 	 */
+	@Size(min=16)
+	@NonNull
 	private final float[] mResultMatrix = new float[16];
 	/**
 	 * IGLSurfaceの実装
 	 * テクスチャ座標変換行列のコピーを取得
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	@Override
 	public float[] copyTexMatrix() {
 		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
@@ -235,7 +242,7 @@ public class GLTexture implements IGLSurface {
 	 * @param offset
 	 */
 	@Override
-	public void copyTexMatrix(final float[] matrix, final int offset) {
+	public void copyTexMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
 	}
 
@@ -243,6 +250,8 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	@Override
 	public float[] getTexMatrix() {
 		return mTexMatrix;

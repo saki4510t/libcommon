@@ -32,6 +32,7 @@ import com.serenegiant.math.Fraction;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.GLEffect.EFFECT_NON;
@@ -234,7 +235,10 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private int cnt;
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		if (!mReleased) {
 			@NonNull
 			final EffectDrawer2D drawer;

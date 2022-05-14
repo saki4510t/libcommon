@@ -1,4 +1,7 @@
 package com.serenegiant.glpipeline
+
+import androidx.annotation.Size
+
 /*
  * libcommon
  * utility/helper classes for myself
@@ -30,7 +33,10 @@ class OnFramePipeline(private val mListener: OnFrameAvailableListener)
 		fun onFrameAvailable()
 	}
 
-	override fun onFrameAvailable(isOES: Boolean, texId: Int, texMatrix: FloatArray) {
+	override fun onFrameAvailable(
+		isOES: Boolean, texId: Int,
+		@Size(min = 16) texMatrix: FloatArray) {
+
 		super.onFrameAvailable(isOES, texId, texMatrix)
 		mListener.onFrameAvailable()
 	}

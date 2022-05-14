@@ -37,6 +37,7 @@ import java.nio.ByteOrder;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
@@ -186,7 +187,10 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	private int cnt;
 	@WorkerThread
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		super.onFrameAvailable(isOES, texId, texMatrix);
 		if (!mReleased) {
 			final int width;

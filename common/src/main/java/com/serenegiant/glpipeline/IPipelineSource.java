@@ -24,6 +24,7 @@ import android.view.Surface;
 import com.serenegiant.glutils.GLManager;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
@@ -86,5 +87,7 @@ public interface IPipelineSource extends IPipeline {
 	 * テクスチャ変換行列を取得
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	public float[] getTexMatrix();
 }

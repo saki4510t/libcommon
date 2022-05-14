@@ -28,7 +28,9 @@ import com.serenegiant.common.R;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.view.MeasureSpecDelegater;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 /**
  * View/表示内容のスケーリング処理を追加したGLView
@@ -201,6 +203,8 @@ public class AspectScaledGLView extends GLView
 		if (DEBUG) Log.v(TAG, String.format("init:(%dx%d),mScaleMode=%d",
 			viewWidth ,viewHeight, mScaleMode) );
 		// apply matrix
+		@Size(min=16)
+		@NonNull
 		final float[] transform = new float[16];
 		Matrix.setIdentityM(transform, 0);
 		switch (mScaleMode) {

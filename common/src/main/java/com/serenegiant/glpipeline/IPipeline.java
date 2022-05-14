@@ -22,6 +22,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
@@ -101,7 +102,9 @@ public interface IPipeline {
 	 * @param texMatrix
 	 */
 	@WorkerThread
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix);
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix);
 
 	/**
 	 * パイプラインチェーンからパイプラインが削除されたので更新要求する

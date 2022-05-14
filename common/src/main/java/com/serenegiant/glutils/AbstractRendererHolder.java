@@ -29,6 +29,7 @@ import android.os.Build;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import android.util.Log;
@@ -284,7 +285,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 	public void setMvpMatrix(final int id,
-		final int offset, @NonNull final float[] matrix) {
+		final int offset, @NonNull @Size(min=16) final float[] matrix) {
 		mRendererTask.setMvpMatrix(id, offset, matrix);
 	}
 
@@ -515,6 +516,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private final AbstractRendererHolder mParent;
 		@NonNull
 		private final EglTask mEglTask;
+		@Size(min=16)
 		@NonNull
 		final float[] mTexMatrix = new float[16];
 		private int mTexId;
@@ -688,7 +690,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		protected void handleDrawTargets(
 			final boolean isOES,
-			final int texId, @NonNull final float[] texMatrix) {
+			final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 			super.handleDrawTargets(isOES, texId, texMatrix);
 			mParent.notifyCapture();
@@ -849,6 +851,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private GLContext mContext;
 		private ISurface captureSurface;
 		private GLDrawer2D drawer;
+		@Size(min=16)
+		@NonNull
 		private final float[] mMvpMatrix = new float[16];
 
     	@Override

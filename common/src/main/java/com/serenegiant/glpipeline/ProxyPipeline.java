@@ -23,6 +23,7 @@ import android.util.Log;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 /**
  * IPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのIPipeline実装
@@ -176,7 +177,10 @@ public class ProxyPipeline implements IPipeline {
 
 	@CallSuper
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void onFrameAvailable(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;

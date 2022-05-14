@@ -40,6 +40,7 @@ import com.serenegiant.media.MediaReaper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
@@ -203,8 +204,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
-		final boolean isOES,
-		final int texId, @NonNull final float[] texMatrix) {
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		@Nullable
 		final IPipeline pipeline;

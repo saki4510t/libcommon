@@ -33,6 +33,7 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
@@ -66,6 +67,7 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 	private final PipelineSourceCallback mCallback;
 	private final boolean isGLES3;
 
+	@Size(min=16)
 	@NonNull
 	private final float[] mTexMatrix = new float[16];
 	private int mTexId;
@@ -237,6 +239,8 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 	 * テクスチャ変換行列を取得
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	@Override
 	public float[] getTexMatrix() {
 		return mTexMatrix;

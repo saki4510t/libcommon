@@ -23,6 +23,8 @@ import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+
 import android.view.Surface;
 
 import com.serenegiant.math.Fraction;
@@ -177,7 +179,7 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param matrix offset以降に16要素以上
 	 */
 	public void setMvpMatrix(final int id,
-		final int offset, @NonNull final float[] matrix);
+		final int offset, @NonNull @Size(min=16) final float[] matrix);
 
 	/**
 	 * 分配描画用のSurfaceへの描画が有効かどうかを取得

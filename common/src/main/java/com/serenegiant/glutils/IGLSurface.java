@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Size;
 
 public interface IGLSurface extends ISurface {
 	/**
@@ -65,6 +66,8 @@ public interface IGLSurface extends ISurface {
 	 * テクスチャ座標変換行列のコピーを取得
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	public float[] copyTexMatrix();
 
 	/**
@@ -73,12 +76,14 @@ public interface IGLSurface extends ISurface {
 	 * @param matrix
 	 * @param offset
 	 */
-	public void copyTexMatrix(final float[] matrix, final int offset);
+	public void copyTexMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset);
 
 	/**
 	 * テクスチャ座標変換行列を取得(内部配列を直接返すので変更時は要注意)
 	 * @return
 	 */
+	@Size(min=16)
+	@NonNull
 	public float[] getTexMatrix();
 
 	/**

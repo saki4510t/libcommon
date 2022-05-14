@@ -50,7 +50,7 @@ public class MatrixUtils {
 	 * @param mat
 	 * @return 回転角度[degree]
 	 */
-	public static float getRotate(@NonNull final float[] mat) {
+	public static float getRotate(@NonNull @Size(min=9) final float[] mat) {
 		return Math.round(Math.atan2(mat[Matrix.MSKEW_X], mat[Matrix.MSCALE_X]) * (180 / Math.PI));
 	}
 
@@ -70,7 +70,7 @@ public class MatrixUtils {
 	 * @param mat
 	 * @return
 	 */
-	public static float getScale(@NonNull final float[] mat) {
+	public static float getScale(@NonNull @Size(min=9) final float[] mat) {
 		final float scaleX = mat[Matrix.MSCALE_X];
 		final float skewY = mat[Matrix.MSKEW_Y];
 		return (float) Math.sqrt(scaleX * scaleX + skewY * skewY);
@@ -146,7 +146,7 @@ public class MatrixUtils {
 	 * @return
 	 */
 	public static String toGLMatrixString(
-		@NonNull @Size(min=16)final float[] transform) {
+		@NonNull @Size(min=16) final float[] transform) {
 
 		return "GLMatrix[" +
 			transform[0] + ", " +

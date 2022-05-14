@@ -46,6 +46,7 @@ import java.nio.ByteBuffer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
@@ -84,6 +85,7 @@ public class SurfaceDrawable extends Drawable {
 	private final Matrix mTransform = new Matrix();
 	@NonNull
 	private final Paint mPaint = new Paint();
+	@Size(min=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
 	private ByteBuffer mWorkBuffer;
@@ -256,6 +258,8 @@ public class SurfaceDrawable extends Drawable {
 		return mTexId;
 	}
 
+	@Size(min=16)
+	@NonNull
 	protected float[] getTexMatrix() {
 		return mTexMatrix;
 	}

@@ -272,27 +272,33 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	/**
 	 * 表示内容のトランスフォームマトリックス
 	 */
+	@NonNull
 	protected final Matrix mImageMatrix = new Matrix();
 	/**
 	 * タッチ操作開始時のトランスフォームマトリックスを保存
 	 */
+	@NonNull
 	private final Matrix mSavedImageMatrix = new Matrix();
 	/**
 	 * 移動可能範囲を指定
 	 */
+	@NonNull
 	private final RectF mLimitRect = new RectF();
 	/**
 	 * 移動範囲制限のためのLineSegment配列
 	 */
+	@NonNull
 	private final ViewUtils.LineSegment[] mLimitSegments = new ViewUtils.LineSegment[4];
 	/**
 	 * 表示内容の実際のサイズ
 	 */
+	@NonNull
 	private final RectF mContentRect = new RectF();
 	/**
 	 * 拡大縮小回転平行移動した表示内容の四隅の座標
 	 * [(left,top),(right,top),(right,bottom),(left.bottom)]
 	 */
+	@NonNull
 	private final float[] mTransCoords = new float[8];
 	/**
 	 * タッチ操作時のタッチID

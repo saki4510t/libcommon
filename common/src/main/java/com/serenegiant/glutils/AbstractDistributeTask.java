@@ -29,6 +29,7 @@ import com.serenegiant.utils.ThreadUtils;
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.IRendererCommon.*;
@@ -99,7 +100,10 @@ public abstract class AbstractDistributeTask {
 	 * 描画要求する
 	 */
 	@AnyThread
-	public void requestFrame(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	public void requestFrame(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 		mHasNewFrame = mIsFirstFrameRendered = true;
 		offer(REQUEST_DRAW, texId, isOES ? 1 : 0, texMatrix);
 	}
@@ -303,7 +307,7 @@ public abstract class AbstractDistributeTask {
 
 	@AnyThread
 	public void setMvpMatrix(final int id,
-		final int offset, @NonNull final float[] matrix)
+		final int offset, @NonNull @Size(min=16) final float[] matrix)
 			throws IllegalStateException, IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "setMvpMatrix:" + id);
@@ -489,7 +493,10 @@ public abstract class AbstractDistributeTask {
 	 * 実際の描画処理
 	 */
 	@WorkerThread
-	private void handleDraw(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	private void handleDraw(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
 		if (!isMasterSurfaceValid()) {
@@ -528,7 +535,10 @@ public abstract class AbstractDistributeTask {
 	 * 各Surfaceへ描画する
 	 */
 	@WorkerThread
-	protected void handleDrawTargets(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	protected void handleDrawTargets(
+		final boolean isOES, final int texId,
+		@NonNull @Size(min=16) final float[] texMatrix) {
+
 //		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		final int n = mTargets.size();
 		if (isOES != mDrawer.isOES()) {
@@ -718,7 +728,7 @@ public abstract class AbstractDistributeTask {
 	 */
 	@WorkerThread
 	private void handleSetMvp(final int id,
-		final int offset, @NonNull final float[] mvp) {
+		final int offset, @NonNull @Size(min=16) final float[] mvp) {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
 		final RendererTarget target = mTargets.get(id);

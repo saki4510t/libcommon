@@ -31,6 +31,7 @@ import com.serenegiant.glutils.es2.GLHelper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.glutils.ShaderConst.*;
@@ -139,7 +140,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	 * 描画タスク
 	 */
 	private static final class OverlayRendererTask extends BaseRendererTask {
-
+		@Size(min=16)
+		@NonNull
 		private final float[] mTexMatrixOverlay = new float[16];
 		private int mOverlayTexId;
 		private SurfaceTexture mOverlayTexture;

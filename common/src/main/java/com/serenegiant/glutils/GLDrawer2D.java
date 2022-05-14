@@ -30,6 +30,7 @@ import java.nio.FloatBuffer;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import static com.serenegiant.glutils.ShaderConst.*;
 
@@ -145,6 +146,7 @@ public abstract class GLDrawer2D {
 	/**
 	 * モデルビュー変換行列
 	 */
+	@Size(min=16)
     @NonNull
 	protected final float[] mMvpMatrix = new float[16];
 	/**
@@ -204,6 +206,7 @@ public abstract class GLDrawer2D {
 	 * IDrawer2Dの実装
 	 * @return
 	 */
+	@Size(min=16)
 	@NonNull
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
@@ -216,7 +219,7 @@ public abstract class GLDrawer2D {
 	 * @param offset
 	 * @return
 	 */
-	public GLDrawer2D setMvpMatrix(@NonNull final float[] matrix, final int offset) {
+	public GLDrawer2D setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
 		return this;
 	}
@@ -227,7 +230,7 @@ public abstract class GLDrawer2D {
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
-	public void copyMvpMatrix(@NonNull final float[] matrix, final int offset) {
+	public void copyMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
 	}
 
@@ -339,13 +342,13 @@ public abstract class GLDrawer2D {
 	 * @param tex_matrix
 	 * @param offset
 	 */
-	protected abstract void updateTexMatrix(final float[] tex_matrix, final int offset);
+	protected abstract void updateTexMatrix(@NonNull @Size(min=16) final float[] tex_matrix, final int offset);
 
 	/**
 	 * モデルビュー変換行列をセット
 	 * @param mvpMatrix
 	 */
-	protected abstract void updateMvpMatrix(final float[] mvpMatrix, final int offset);
+	protected abstract void updateMvpMatrix(@NonNull @Size(min=16)  final float[] mvpMatrix, final int offset);
 
 	/**
 	 * テクスチャをバインド
