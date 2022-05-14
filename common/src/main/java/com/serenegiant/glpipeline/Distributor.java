@@ -52,8 +52,6 @@ public class Distributor extends ProxyPipeline {
 	@NonNull
 	private final GLManager mManager;
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final DistributeTask mDistributeTask;
 	private volatile boolean isRunning;
 
