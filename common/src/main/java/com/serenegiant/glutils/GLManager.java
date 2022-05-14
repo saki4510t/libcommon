@@ -134,7 +134,10 @@ public class GLManager {
 		});
 		// ワーカースレッドの初期化待ち
 		try {
-			sync.tryAcquire(3000, TimeUnit.MILLISECONDS);
+			if (!sync.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
+				// タイムアウトしたとき
+				mInitialized = false;
+			}
 		} catch (final InterruptedException e) {
 			// do nothing
 		}
