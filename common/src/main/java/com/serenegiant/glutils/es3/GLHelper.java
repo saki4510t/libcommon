@@ -32,7 +32,6 @@ import android.util.Log;
 
 import com.serenegiant.glutils.ShaderConst;
 import com.serenegiant.utils.AssetsHelper;
-import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.Stacktrace;
 
 import java.io.IOException;
@@ -40,6 +39,7 @@ import java.nio.FloatBuffer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.core.content.res.ResourcesCompat;
 
 import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
@@ -263,12 +263,7 @@ public final class GLHelper {
 
 		// get a background image from resources
 		// note the image format must match the bitmap format
-		final Drawable background;
-		if (BuildCheck.isAndroid5()) {
-			background = context.getResources().getDrawable(resId, theme);
-		} else {
-			background = context.getResources().getDrawable(resId);
-		}
+		final Drawable background = ResourcesCompat.getDrawable(context.getResources(), resId, theme);
 		background.setBounds(0, 0, 256, 256);
 		background.draw(canvas); // draw the background to our bitmap
 
