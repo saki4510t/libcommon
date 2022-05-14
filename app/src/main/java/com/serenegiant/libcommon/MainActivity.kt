@@ -36,7 +36,6 @@ import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
 import com.serenegiant.widget.IPipelineView
-import java.util.*
 
 class MainActivity
 	: AppCompatActivity(),
