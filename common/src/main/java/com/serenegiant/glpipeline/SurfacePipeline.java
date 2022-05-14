@@ -151,8 +151,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 						mRendererTarget.release();
 						mRendererTarget = null;
 					}
-					if ((mRendererTarget == null)
-						&& GLUtils.isSupportedSurface(surface)) {
+					if ((mRendererTarget == null) && (surface != null)) {
 						mRendererTarget = RendererTarget.newInstance(
 							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					}
