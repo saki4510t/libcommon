@@ -48,16 +48,17 @@ import androidx.annotation.Size;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
 	 * 				通常の2Dテキスチャを描画に使うならfalse
+	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
 	 */
 	/*package*/ GLDrawer2DES2(
+		final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord, final boolean isOES) {
+		@NonNull @Size(min=8) final float[] texcoord) {
 
-		super(false, vertices, texcoord, isOES);
+		super(false, isOES, vertices, texcoord);
 	}
 
 	@Override

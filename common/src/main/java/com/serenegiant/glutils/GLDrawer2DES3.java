@@ -55,10 +55,11 @@ import androidx.annotation.Size;
 	 * 				通常の2Dテキスチャならfalse
 	 */
 	/*package*/ GLDrawer2DES3(
+		final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord, final boolean isOES) {
+		@NonNull @Size(min=8) final float[] texcoord) {
 
-		super(true, vertices, texcoord, isOES);
+		super(true, isOES, vertices, texcoord);
 	}
 
 	@Override

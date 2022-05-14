@@ -84,9 +84,9 @@ public abstract class GLDrawer2D {
 		@NonNull final float[] texcoord, final boolean isOES) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLDrawer2DES3(vertices, texcoord, isOES);
+			return new GLDrawer2DES3(isOES, vertices, texcoord);
 		} else {
-			return new GLDrawer2DES2(vertices, texcoord, isOES);
+			return new GLDrawer2DES2(isOES, vertices, texcoord);
 		}
 	}
 
@@ -157,14 +157,16 @@ public abstract class GLDrawer2D {
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
+	 * @param isGLES3 GL|ES3かどうか
 	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
 	 * 				通常の2Dテキスチャを描画に使うならfalse
+	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
 	 */
-	protected GLDrawer2D(final boolean isGLES3,
+	protected GLDrawer2D(
+		final boolean isGLES3, final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord, final boolean isOES) {
+		@NonNull @Size(min=8) final float[] texcoord) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
