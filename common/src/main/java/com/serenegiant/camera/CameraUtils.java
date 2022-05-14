@@ -52,25 +52,31 @@ public class CameraUtils implements CameraConst {
 
 	@TargetApi(Build.VERSION_CODES.N)
 	@IntDef({
-		ImageFormat.DEPTH16,
-		ImageFormat.DEPTH_POINT_CLOUD,
-		ImageFormat.FLEX_RGBA_8888,
-		ImageFormat.FLEX_RGB_888,
-		ImageFormat.JPEG,
+		ImageFormat.UNKNOWN,
+		ImageFormat.RGB_565,
+		ImageFormat.YV12,
+//		ImageFormat.Y8,	// API>=29
+//		ImageFormat.Y16,	// ImageFormatに定義はあるしhideでもないけどエラーになる
 		ImageFormat.NV16,
 		ImageFormat.NV21,
-		ImageFormat.PRIVATE,
-		ImageFormat.RAW10,
-		ImageFormat.RAW12,
-		ImageFormat.RAW_PRIVATE,
-		ImageFormat.RAW_SENSOR,
-		ImageFormat.RGB_565,
-		ImageFormat.UNKNOWN,
+		ImageFormat.YUY2,
+		ImageFormat.JPEG,
+//		ImageFormat.DEPTH_JPEG,	// API>=29
 		ImageFormat.YUV_420_888,
 		ImageFormat.YUV_422_888,
 		ImageFormat.YUV_444_888,
-		ImageFormat.YUY2,
-		ImageFormat.YV12,})
+		ImageFormat.FLEX_RGB_888,
+		ImageFormat.FLEX_RGBA_8888,
+		ImageFormat.RAW_SENSOR,
+		ImageFormat.RAW_PRIVATE,
+		ImageFormat.RAW10,
+		ImageFormat.RAW12,
+		ImageFormat.DEPTH16,
+		ImageFormat.DEPTH_POINT_CLOUD,
+//		ImageFormat.RAW_DEPTH,	// ImageFormatに定義はあるしhideでもないけどエラーになる
+		ImageFormat.PRIVATE,
+//		ImageFormat.HEIC,	// API>=29
+	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface PreviewFormat {}
 
