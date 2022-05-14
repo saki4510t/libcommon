@@ -419,19 +419,6 @@ public abstract class GLDrawer2D {
 	}
 
 	/**
-	 * シェーダーを破棄
-	 */
-	protected void releaseShader() {
-		if (hProgram >= 0) {
-			internalReleaseShader(hProgram);
-		}
-		hProgram = -1;
-	}
-
-	protected abstract int loadShader(@NonNull final String vs, @NonNull final String fs);
-	protected abstract void internalReleaseShader(final int program);
-
-	/**
 	 * フラグメントシェーダーを変更する
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
 	 * glUseProgramが呼ばれた状態で返る
@@ -455,6 +442,19 @@ public abstract class GLDrawer2D {
 		}
 		init();
 	}
+
+	/**
+	 * シェーダーを破棄
+	 */
+	protected void releaseShader() {
+		if (hProgram >= 0) {
+			internalReleaseShader(hProgram);
+		}
+		hProgram = -1;
+	}
+
+	protected abstract int loadShader(@NonNull final String vs, @NonNull final String fs);
+	protected abstract void internalReleaseShader(final int program);
 
 	/**
 	 * アトリビュート変数のロケーションを取得
