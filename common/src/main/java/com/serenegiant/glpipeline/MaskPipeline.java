@@ -299,6 +299,8 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	/**
 	 * 合成時のマスク用Bitmapをセット
 	 * このビットマップのアルファ値を映像入力2のマスクとして使う
+	 * マスクのアルファ値が0なら完全透過
+	 * アルファ場大きくなるにつれて元映像が表示されなくなりマスク映像が濃く表示される
 	 * @param bitmap
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
