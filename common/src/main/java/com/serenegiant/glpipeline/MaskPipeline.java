@@ -19,18 +19,15 @@ package com.serenegiant.glpipeline;
 */
 
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.util.Log;
-import android.view.Surface;
 
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.RendererTarget;
-import com.serenegiant.glutils.es2.GLHelper;
+import com.serenegiant.glutils.GLTexture;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.CallSuper;
@@ -70,15 +67,8 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private GLSurface work;
 	@Nullable
 	private Bitmap mMaskBitmap;
-	// XXX ここはGLSurfaceを使った方が良いかも？
-	@Size(min=16)
-	@NonNull
-	private final float[] mTexMatrixMask = new float[16];
-	private int mMaskTexId = NO_TEXTURE;
 	@Nullable
-	private SurfaceTexture mMaskTexture;
-	@Nullable
-	private Surface mMaskSurface;
+	private GLTexture mMaskTexture;
 
 	/**
 	 * コンストラクタ
@@ -127,6 +117,9 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:");
 		if (isValid()) {
+			synchronized (mSync) {
+				mMaskBitmap = null;
+			}
 			releaseAll();
 		}
 		super.internalRelease();
@@ -249,6 +242,10 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 		}
 		if ((target != null)
 			&& target.canDraw()) {
+			if (mMaskTexture != null) {
+				mMaskTexture.bindTexture();
+				mMaskTexture.makeCurrent();
+			}
 			target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 		}
 		if (mMaskOnly && (work != null)) {
@@ -294,9 +291,7 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			@Override
 			public void run() {
 				if (DEBUG) Log.v(TAG, "resize#run:");
-				if (mMaskTexture != null) {
-					mMaskTexture.setDefaultBufferSize(width, height);
-				}
+				releaseMaskOnGL();
 			}
 		});
 	}
@@ -390,7 +385,7 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 
 	@WorkerThread
 	private static GLDrawer2D createDrawerOnGL(final boolean isGLES3, final boolean isOES) {
-		if (DEBUG) Log.v(TAG, "createDrawerOnGL:");
+		if (DEBUG) Log.v(TAG, "createDrawerOnGL:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		return GLDrawer2D.create(isGLES3, isOES,
 			isOES ? (isGLES3 ? MY_FRAGMENT_SHADER_EXT_ES3 : MY_FRAGMENT_SHADER_EXT_ES2)
 			: (isGLES3 ? MY_FRAGMENT_SHADER_ES3 : MY_FRAGMENT_SHADER_ES2));
@@ -410,40 +405,13 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private void createMaskTextureOnGL(@NonNull final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:");
 		if (mMaskTexture == null) {
-			if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:create texture for mask");
+//			mMaskTexture = GLSurface.newInstance(mManager.isGLES3(), GLES20.GL_TEXTURE1, getWidth(), getHeight());
+			mMaskTexture = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE1, getWidth(), getHeight());
+			if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:loadBitmap");
+			mMaskTexture.loadBitmap(bitmap);
+			mMaskTexture.bindTexture();
 			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
-			mMaskTexId = GLHelper.initTex(
-				GL_TEXTURE_EXTERNAL_OES,
-				GLES20.GL_TEXTURE1,
-				GLES20.GL_LINEAR, GLES20.GL_LINEAR,
-				GLES20.GL_CLAMP_TO_EDGE);
-			mMaskTexture = new SurfaceTexture(mMaskTexId);
-			mMaskTexture.setDefaultBufferSize(getWidth(), getHeight());
-			mMaskSurface = new Surface(mMaskTexture);
-			GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-			GLES20.glUniform1i(uTex2, 1);
-		}
-		if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:write mask bitmap to mask texture");
-		GLES20.glActiveTexture(GLES20.GL_TEXTURE1);
-		GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);
-		try {
-			final Canvas canvas = mMaskSurface.lockCanvas(null);
-			try {
-				if (bitmap != null) {
-					canvas.drawBitmap(bitmap, 0, 0, null);
-				} else if (DEBUG) {
-					// DEBUGフラグtrueでオーバーレイ映像が設定されていないときは全面を薄赤色にする
-					canvas.drawColor(0x7fff0000);	// ARGB
-				} else {
-					// DEBUGフラグfalseでオーバーレイ映像が設定されていなければ全面透過
-					canvas.drawColor(0x00000000);	// ARGB
-				}
-			} finally {
-				mMaskSurface.unlockCanvasAndPost(canvas);
-			}
-		} catch (final Exception e) {
-			Log.w(TAG, e);
+			GLES20.glUniform1i(uTex2, GLUtils.gLTextureUnit2Index(GLES20.GL_TEXTURE1));
 		}
 	}
 
@@ -454,12 +422,12 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			mMaskTexture.release();
 			mMaskTexture = null;
 		}
-		mMaskSurface = null;
-		if (mMaskTexId >= 0) {
-			GLHelper.deleteTex(mMaskTexId);
-			mMaskTexId = NO_TEXTURE;
-		}
 	}
+
+	/*
+	 * XXX パイプラインの前から来る映像がOESの場合でもマスク映像は常にGL_TEXTURE_2Dなので
+	 *     sTexture2のサンプラーは常にSAMPLER_2D(=sampler2D)にしないといけないので注意
+	 */
 
 	private static final String FRAGMENT_SHADER_BASE_ES2
 		= SHADER_VERSION_ES2 +
@@ -478,7 +446,7 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			HEADER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			HEADER_OES_ES2, SAMPLER_OES, SAMPLER_OES);
+			HEADER_OES_ES2, SAMPLER_OES, SAMPLER_2D);
 
 	private static final String FRAGMENT_SHADER_BASE_ES3
 		= SHADER_VERSION_ES3 +
@@ -499,6 +467,6 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			HEADER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			HEADER_OES_ES3, SAMPLER_OES, SAMPLER_OES);
+			HEADER_OES_ES3, SAMPLER_OES, SAMPLER_2D);
 
 }
