@@ -21,7 +21,6 @@ package com.serenegiant.glutils.es3;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
@@ -65,7 +64,19 @@ public class GLTexture implements IGLSurface {
 	public GLTexture(final int width, final int height, final int filter_param) {
 		this(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, width, height, filter_param);
 	}
-	
+
+	/**
+	 * コンストラクタ
+	 * filter_paramはGLES30.GL_LINEAR
+	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 */
+	public GLTexture(final int texTarget, final int texUnit, final int width, final int height) {
+		this(texTarget, texUnit, width, height, GLES30.GL_LINEAR);
+	}
+
 	/**
 	 * コンストラクタ
 	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
@@ -74,8 +85,9 @@ public class GLTexture implements IGLSurface {
 	 * @param height テクスチャサイズ
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
-	public GLTexture(final int texTarget, final int texUnit,
-					 final int width, final int height, final int filter_param) {
+	public GLTexture(
+		final int texTarget, final int texUnit,
+		final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		mTextureTarget = texTarget;
 		mTextureUnit = texUnit;

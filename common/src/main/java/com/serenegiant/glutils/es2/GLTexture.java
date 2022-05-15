@@ -64,14 +64,27 @@ public class GLTexture implements IGLSurface {
 
 	/**
 	 * コンストラクタ
+	 * filter_paramはGLES30.GL_LINEAR
+	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 */
+	public GLTexture(final int texTarget, final int texUnit, final int width, final int height) {
+		this(texTarget, texUnit, width, height, GLES20.GL_LINEAR);
+	}
+
+	/**
+	 * コンストラクタ
 	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
 	 * @param texUnit
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
-	public GLTexture(final int texTarget, final int texUnit,
-					 final int width, final int height, final int filter_param) {
+	public GLTexture(
+		final int texTarget, final int texUnit,
+		final int width, final int height, final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		mTextureTarget = texTarget;
 		mTextureUnit = texUnit;
