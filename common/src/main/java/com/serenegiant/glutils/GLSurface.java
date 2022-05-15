@@ -452,6 +452,11 @@ public abstract class GLSurface implements IGLSurface {
 
 //--------------------------------------------------------------------------------
 	/**
+	 * 内部で保持しているテクスチャをバインドする
+	 */
+	public abstract void bindTexture();
+
+	/**
 	 * オフスクリーン描画用のレンダリングバッファに切り替える
 	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
 	 * @deprecated #makeCurrentを使うこと
@@ -556,6 +561,12 @@ public abstract class GLSurface implements IGLSurface {
 				tex_target, tex_unit, tex_id,
 				width, height,
 				use_depth_buffer, adjust_power2);
+		}
+
+		@Override
+		public void bindTexture() {
+			GLES20.glActiveTexture(TEX_UNIT);
+			GLES20.glBindTexture(TEX_TARGET, mFBOTexId);
 		}
 
 		/**
@@ -790,6 +801,12 @@ public abstract class GLSurface implements IGLSurface {
 				tex_target, tex_unit, tex_id,
 				width, height,
 				use_depth_buffer, adjust_power2);
+		}
+
+		@Override
+		public void bindTexture() {
+			GLES30.glActiveTexture(TEX_UNIT);
+			GLES30.glBindTexture(TEX_TARGET, mFBOTexId);
 		}
 
 		/**
