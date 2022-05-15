@@ -44,6 +44,8 @@ public class GLTexture implements IGLSurface {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 //	private static final String TAG = "GLTexture";
 
+	private static final boolean DEFAULT_ADJUST_POWER2 = false;
+
 	/* package */final int mTextureTarget;
 	/* package */final int mTextureUnit ;
 	/* package */int mTextureId;
@@ -62,7 +64,7 @@ public class GLTexture implements IGLSurface {
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
 	public GLTexture(final int width, final int height, final int filter_param) {
-		this(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, width, height, filter_param);
+		this(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, width, height, DEFAULT_ADJUST_POWER2, filter_param);
 	}
 
 	/**
@@ -74,7 +76,7 @@ public class GLTexture implements IGLSurface {
 	 * @param height テクスチャサイズ
 	 */
 	public GLTexture(final int texTarget, final int texUnit, final int width, final int height) {
-		this(texTarget, texUnit, width, height, GLES30.GL_LINEAR);
+		this(texTarget, texUnit, width, height, DEFAULT_ADJUST_POWER2, GLES30.GL_LINEAR);
 	}
 
 	/**
@@ -88,22 +90,42 @@ public class GLTexture implements IGLSurface {
 	public GLTexture(
 		final int texTarget, final int texUnit,
 		final int width, final int height, final int filter_param) {
+		this(texTarget, texUnit, width, height, DEFAULT_ADJUST_POWER2, filter_param);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 * @param adjust_power2 テクスチャサイズを2の乗数にするかどうか
+	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
+	 */
+	public GLTexture(
+		final int texTarget, final int texUnit,
+		final int width, final int height,
+		final boolean adjust_power2,
+		final int filter_param) {
 //		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		mTextureTarget = texTarget;
 		mTextureUnit = texUnit;
-		// テクスチャに使うビットマップは縦横サイズが2の乗数でないとダメ。
-		// 更に、ミップマップするなら正方形でないとダメ
-		// 指定したwidth/heightと同じか大きい2の乗数にする
-		int w = 32;
-		for (; w < width; w <<= 1);
-		int h = 32;
-		for (; h < height; h <<= 1);
-		if (mTexWidth != w || mTexHeight != h) {
-			mTexWidth = w;
-			mTexHeight = h;
+		if (adjust_power2) {
+			// テクスチャのサイズは2の乗数にするとき
+			int w = 1;
+			for (; w < width; w <<= 1) ;
+			int h = 1;
+			for (; h < height; h <<= 1) ;
+			if (mTexWidth != w || mTexHeight != h) {
+				mTexWidth = w;
+				mTexHeight = h;
+			}
+		} else {
+			mTexWidth = width;
+			mTexHeight = height;
 		}
-		mImageWidth = mTexWidth;
-		mImageHeight = mTexHeight;
+		mImageWidth = width;
+		mImageHeight = height;
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
 		mTextureId = GLHelper.initTex(mTextureTarget, texUnit, filter_param);
 		// テクスチャのメモリ領域を確保する
