@@ -131,6 +131,7 @@ public class GLTexture implements IGLSurface {
 
 	/**
 	 * このインスタンスで管理しているテクスチャを有効にする(バインドする)
+	 * ビューポートの設定も行う
 	 */
 	@Override
 	public void makeCurrent() {
@@ -138,6 +139,15 @@ public class GLTexture implements IGLSurface {
 		GLES20.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES20.glBindTexture(mTextureTarget, mTextureId);
 		setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	}
+
+	/**
+	 * テクスチャをバインドする
+	 * (ビューポートの設定はしない)
+	 */
+	public void bindTexture() {
+		GLES20.glActiveTexture(mTextureUnit);
+		GLES20.glBindTexture(mTextureTarget, mTextureId);
 	}
 
 	/**

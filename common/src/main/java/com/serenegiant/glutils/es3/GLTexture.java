@@ -21,6 +21,7 @@ package com.serenegiant.glutils.es3;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.GLUtils;
 import android.opengl.Matrix;
@@ -141,6 +142,15 @@ public class GLTexture implements IGLSurface {
 		GLES30.glActiveTexture(mTextureUnit);	// テクスチャユニットを選択
 		GLES30.glBindTexture(mTextureTarget, mTextureId);
 		setViewPort(viewPortX, viewPortY, viewPortWidth, viewPortHeight);
+	}
+
+	/**
+	 * テクスチャをバインドする
+	 * (ビューポートの設定はしない)
+	 */
+	public void bindTexture() {
+		GLES30.glActiveTexture(mTextureUnit);
+		GLES30.glBindTexture(mTextureTarget, mTextureId);
 	}
 
 	/**
