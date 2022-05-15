@@ -13,6 +13,7 @@
 	<string name="title_effect_camera" translatable="false">EffectCamera</string>
 	<string name="title_mix_camera" translatable="false">MixCamera</string>
 	<string name="title_overlay_camera" translatable="false">OverlayCamera</string>
+	<string name="title_mask_camera" translatable="false">MaskCamera</string>
 	<string name="title_video_source_camera" translatable="false">VideoSourceCamera</string>
 	<string name="title_video_source_dist_camera" translatable="false">VideoSourceDistributorCamera</string>
 	<string name="title_image_view_camera" translatable="false">ImageViewCamera</string>
@@ -44,6 +45,7 @@
 		<item>@string/title_effect_camera</item>
 		<item>@string/title_mix_camera</item>
 		<item>@string/title_overlay_camera</item>
+		<item>@string/title_mask_camera</item>
 		<item>@string/title_video_source_camera</item>
 		<item>@string/title_video_source_dist_camera</item>
 		<item>@string/title_image_view_camera</item>
