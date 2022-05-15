@@ -297,8 +297,6 @@ public abstract class GLSurface implements IGLSurface {
 		this.isGLES3 = isGLES3;
 		TEX_TARGET = tex_target;
 		TEX_UNIT = tex_unit;
-		mWidth = width;
-		mHeight = height;
 		mHasDepthBuffer = use_depth_buffer;
 		mAdjustPower2 = adjust_power2;
 
@@ -623,8 +621,6 @@ public abstract class GLSurface implements IGLSurface {
 			final int width, final int height) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
-				mWidth = width;
-				mHeight = height;
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
@@ -669,8 +665,6 @@ public abstract class GLSurface implements IGLSurface {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if ((width > mTexWidth) || (height > mTexHeight)) {
-				mWidth = width;
-				mHeight = height;
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
@@ -707,7 +701,8 @@ public abstract class GLSurface implements IGLSurface {
 				mTexWidth = width;
 				mTexHeight = height;
 			}
-
+			mWidth = width;
+			mHeight = height;
 			if (mHasDepthBuffer) {
 				// デプスバッファが必要な場合は、レンダーバッファオブジェクトを生成・初期化する
 				GLES20.glGenRenderbuffers(1, ids, 0);
@@ -862,8 +857,6 @@ public abstract class GLSurface implements IGLSurface {
 			final int width, final int height) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
-				mWidth = width;
-				mHeight = height;
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
@@ -908,8 +901,6 @@ public abstract class GLSurface implements IGLSurface {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if ((width > mTexWidth) || (height > mTexHeight)) {
-				mWidth = width;
-				mHeight = height;
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
@@ -946,6 +937,8 @@ public abstract class GLSurface implements IGLSurface {
 				mTexWidth = width;
 				mTexHeight = height;
 			}
+			mWidth = width;
+			mHeight = height;
 
 			if (mHasDepthBuffer) {
 				// デプスバッファが必要な場合は、レンダーバッファオブジェクトを生成・初期化する
