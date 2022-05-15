@@ -244,7 +244,6 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			&& target.canDraw()) {
 			if (mMaskTexture != null) {
 				mMaskTexture.bindTexture();
-				mMaskTexture.makeCurrent();
 			}
 			target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 		}
@@ -406,15 +405,20 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	@WorkerThread
 	private void createMaskTextureOnGL(@NonNull final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:");
-		if (mMaskTexture == null) {
-//			mMaskTexture = GLSurface.newInstance(mManager.isGLES3(), GLES20.GL_TEXTURE1, getWidth(), getHeight());
-			mMaskTexture = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE1, getWidth(), getHeight());
-			if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:loadBitmap");
-			mMaskTexture.loadBitmap(bitmap);
+		final int width = bitmap.getWidth();
+		final int height = bitmap.getHeight();
+		if ((mMaskTexture == null)
+			|| (mMaskTexture.getWidth() != width)
+			|| (mMaskTexture.getHeight() != height)) {
+			// 最初またはマスクのサイズが変更されたときはGLTextureを生成する
+			releaseMaskOnGL();
+			mMaskTexture = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE1, width, height);
 			mMaskTexture.bindTexture();
 			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
 			GLES20.glUniform1i(uTex2, GLUtils.gLTextureUnit2Index(GLES20.GL_TEXTURE1));
 		}
+		if (DEBUG) Log.v(TAG, "createMaskTextureOnGL:loadBitmap");
+		mMaskTexture.loadBitmap(bitmap);
 	}
 
 	@WorkerThread
