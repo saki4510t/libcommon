@@ -106,13 +106,14 @@ public class GLTexture implements IGLSurface {
 		final int width, final int height,
 		final boolean adjust_power2,
 		final int filter_param) {
-//		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
+
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		TEX_TARGET = texTarget;
 		TEX_UNIT = texUnit;
 		FILTER_PARAM = filter_param;
 		ADJUST_POWER2 = adjust_power2;
 		createTexture(width, height);
-//		if (DEBUG) Log.v(TAG, "GLTexture:id=" + mTextureId);
+		if (DEBUG) Log.v(TAG, "GLTexture:id=" + mTextureId);
 	}
 
 	@Override
@@ -130,7 +131,7 @@ public class GLTexture implements IGLSurface {
 	 */
 	@Override
 	public void release() {
-//		if (DEBUG) Log.v(TAG, "release:");
+		if (DEBUG) Log.v(TAG, "release:");
 		releaseTexture();
 	}
 
@@ -329,8 +330,6 @@ public class GLTexture implements IGLSurface {
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
 		if ((width > mTexWidth) || (height > mTexHeight)) {
-			mWidth = width;
-			mHeight = height;
 			releaseTexture();
 			createTexture(width, height);
 		}
