@@ -84,9 +84,9 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 		if (pipeline == null) {
 			val manager = GLManager()
 			pipeline = MaskPipeline(manager)
-//			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
-//				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-//				60, 0, 100))
+			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+				60, 127, 255))
 			source = VideoSource(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				object : IPipelineSource.PipelineSourceCallback {
