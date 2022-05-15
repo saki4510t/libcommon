@@ -387,7 +387,7 @@ public final class BitmapHelper {
 	 * @throws IOException
 	 */
 	@Nullable
-	public static final Bitmap asBitmap(@NonNull final ContentResolver cr,
+	public static Bitmap asBitmap(@NonNull final ContentResolver cr,
 		final long id,
 		final int requestWidth, final int requestHeight)
 			throws IOException {
@@ -913,7 +913,7 @@ public final class BitmapHelper {
 		if (DEBUG) Log.v(TAG, String.format("getMaskImage0:(%dx%d)", width, height));
 
 		// 透過円の半径
-		final float r = ((width > height ? height : width) * size) / 200.0f;
+		final float r = (Math.min(width, height) * size) / 200.0f;
 		final int cx = width / 2;
 		final int cy = height / 2;
 		// 透過円描画用のオブジェクト
@@ -1083,7 +1083,7 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	private static int sat(final int v, final int min, final int max) {
-		return v < min ? min : (v > max ? max : v);
+		return v < min ? min : Math.min(v, max);
 	}
 
 	/**
@@ -1094,7 +1094,7 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	private static int sat(final float v, final float min, final float max) {
-		return (int)(v < min ? min : (v > max ? max : v));
+		return (int)(v < min ? min : Math.min(v, max));
 	}
 
 }
