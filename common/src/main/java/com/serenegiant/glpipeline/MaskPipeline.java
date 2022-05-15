@@ -69,6 +69,10 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 	private Bitmap mMaskBitmap;
 	@Nullable
 	private GLTexture mMaskTexture;
+	/**
+	 * マスク用GLTexture更新要求
+	 */
+	private volatile boolean mRequestUpdateMask;
 
 	/**
 	 * コンストラクタ
@@ -237,8 +241,13 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 			target = mRendererTarget;
 			bitmap = mMaskBitmap;
 		}
-		if ((bitmap != null) && (mMaskTexture == null)) {
-			createMaskTextureOnGL(bitmap);
+		if (mRequestUpdateMask) {
+			mRequestUpdateMask = false;
+			if (bitmap != null) {
+				createMaskTextureOnGL(bitmap);
+			} else {
+				releaseMaskOnGL();
+			}
 		}
 		if ((target != null)
 			&& target.canDraw()) {
@@ -306,15 +315,7 @@ public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
 		if (DEBUG) Log.v(TAG, "setMask:");
 		synchronized (mSync) {
 			mMaskBitmap = bitmap;
-		}
-		if (bitmap == null) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					releaseMaskOnGL();
-				}
-			});
+			mRequestUpdateMask = true;
 		}
 	}
 
