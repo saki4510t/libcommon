@@ -19,6 +19,7 @@ package com.serenegiant.widget
 */
 
 import android.content.Context
+import android.graphics.Color
 import android.hardware.Camera
 import android.util.AttributeSet
 import android.util.Log
@@ -88,7 +89,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 			pipeline = MaskPipeline(manager)
 			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-				60, 127, 255))
+				60, Color.BLUE,127, 255))
 			val sem = Semaphore(1)
 			source = VideoSource(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,

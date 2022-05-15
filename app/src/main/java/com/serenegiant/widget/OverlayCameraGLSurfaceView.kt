@@ -19,6 +19,7 @@ package com.serenegiant.widget
 */
 
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
@@ -40,7 +41,7 @@ class OverlayCameraGLSurfaceView @JvmOverloads constructor(
 			rendererHolder.setOverlay(0,
 				BitmapHelper.genMaskImage(0,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-					60, 0, 100))
+					60, Color.RED, 0, 100))
 		}
 	}
 

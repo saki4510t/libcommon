@@ -885,17 +885,21 @@ public final class BitmapHelper {
 		@IntRange(from = 0, to = 0)final int type,
 		final int width, final int height,
 		@IntRange(from = 0, to = 100) final int size,
+		final int color,
 		@IntRange(from = 0, to = 255) final int alpha0,
 		@IntRange(from = 0, to = 255) final int alphaMax) {
 
 		if (DEBUG) Log.v(TAG, String.format("genMaskImage:(%dx%d)", width, height));
 
-		return getMaskImage0(width, height, size, alpha0, alphaMax);
+		return getMaskImage0(width, height, size, color, alpha0, alphaMax);
 	}
 
 	/**
 	 * 円形マスク用Bitmap生成処理
+	 * @param width
+	 * @param height
 	 * @param size
+	 * @param color
 	 * @param alpha0
 	 * @param alphaMax
 	 * @return
@@ -904,6 +908,7 @@ public final class BitmapHelper {
 	public static Bitmap getMaskImage0(
 		final int width, final int height,
 		@IntRange(from = 0, to = 100) final int size,
+		final int color,
 		@IntRange(from = 0, to = 255) final int alpha0,
 		@IntRange(from = 0, to = 255) final int alphaMax) {
 
@@ -916,13 +921,16 @@ public final class BitmapHelper {
 		// 透過円描画用のオブジェクト
 		final Paint paint = new Paint();
 		paint.setDither(true);
+		final int rr = Color.red(color);
+		final int bb = Color.blue(color);
+		final int gg = Color.green(color);
 		final RadialGradient gradient = new RadialGradient(
 			cx, cy, r,
 			new int[] {
-				Color.argb(alphaMax, 255, 0, 0),
-				Color.argb(alphaMax, 255, 0, 0),
-				Color.argb((int)(alphaMax * 0.6f), 255, 0, 0),
-				Color.argb(alpha0, 255, 0, 0)},
+				Color.argb(alphaMax, rr, gg, bb),
+				Color.argb(alphaMax, rr, gg, bb),
+				Color.argb((int)(alphaMax * 0.6f), rr, gg, bb),
+				Color.argb(alpha0, rr, gg, bb)},
 			new float[] {
 				0.00f,
 				0.60f,

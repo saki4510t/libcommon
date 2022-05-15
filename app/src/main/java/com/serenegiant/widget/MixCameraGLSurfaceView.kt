@@ -18,6 +18,7 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 import android.content.Context
+import android.graphics.Color
 import android.util.AttributeSet
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
@@ -40,7 +41,7 @@ class MixCameraGLSurfaceView @JvmOverloads constructor(
 			rendererHolder.setMask(
 				BitmapHelper.genMaskImage(0,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-					60, 0, 100))
+					60, Color.RED,0, 100))
 		}
 	}
 
