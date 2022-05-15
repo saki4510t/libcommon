@@ -365,7 +365,7 @@ public final class BitmapHelper {
 	 * @throws IOException
 	 */
 	@Nullable
-	public static final Bitmap asBitmap(@NonNull final ContentResolver cr,
+	public static Bitmap asBitmap(@NonNull final ContentResolver cr,
 		final long id) throws IOException {
 
 		Bitmap result = null;
@@ -766,21 +766,17 @@ public final class BitmapHelper {
         final float bitmapAspect = bitmapWidthF / bitmapHeightF;
         final float viewAspect   = (float) targetWidth / targetHeight;
 
+		final float scale;
         if (bitmapAspect > viewAspect) {
-            final float scale = targetHeight / bitmapHeightF;
+			scale = targetHeight / bitmapHeightF;
+            } else {
+			scale = targetWidth / bitmapWidthF;
+            }
             if (scale < .9F || scale > 1F) {
                 scaler.setScale(scale, scale);
             } else {
                 scaler = null;
             }
-        } else {
-            final float scale = targetWidth / bitmapWidthF;
-            if (scale < .9F || scale > 1F) {
-                scaler.setScale(scale, scale);
-            } else {
-                scaler = null;
-            }
-        }
 
         Bitmap b1;
         if (scaler != null) {
