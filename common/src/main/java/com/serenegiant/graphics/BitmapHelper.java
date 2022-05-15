@@ -32,6 +32,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.RadialGradient;
@@ -767,16 +768,16 @@ public final class BitmapHelper {
         final float viewAspect   = (float) targetWidth / targetHeight;
 
 		final float scale;
-        if (bitmapAspect > viewAspect) {
+		if (bitmapAspect > viewAspect) {
 			scale = targetHeight / bitmapHeightF;
-            } else {
+		} else {
 			scale = targetWidth / bitmapWidthF;
-            }
-            if (scale < .9F || scale > 1F) {
-                scaler.setScale(scale, scale);
-            } else {
-                scaler = null;
-            }
+		}
+		if (scale < .9F || scale > 1F) {
+			scaler.setScale(scale, scale);
+		} else {
+			scaler = null;
+		}
 
         Bitmap b1;
         if (scaler != null) {
@@ -940,6 +941,32 @@ public final class BitmapHelper {
 		return offscreen;
 	}
 
+	/**
+	 * アルファ値だけを反転(a'=1-a)させる色変換行列
+	 * 元のRGBAの値は[0,255]
+	 * RGBA' = RGBA x MAT
+	 */
+	private static final float[] COLOR_MATRIX_INVERT_ALPHA = {
+		1.0f, 0.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, -1.0f, 255.0f,
+	};
+
+	/**
+	 * 指定したBitmapのアルファ値を反転(a'=1-a)させたBitmapを生成する
+	 * @param src
+	 * @return
+	 */
+	public static Bitmap invertAlpha(@NonNull final Bitmap src) {
+		final Bitmap offscreen = Bitmap.createBitmap(
+			src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+		final Paint paint = new Paint();
+		paint.setColorFilter(new ColorMatrixColorFilter(COLOR_MATRIX_INVERT_ALPHA));
+		final Canvas canvas = new Canvas(offscreen);
+		canvas.drawBitmap(src, 0, 0, paint);
+		return offscreen;
+	}
 //--------------------------------------------------------------------------------
 
 	/**
