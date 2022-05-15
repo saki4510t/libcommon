@@ -33,6 +33,8 @@ import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLManager
 import com.serenegiant.graphics.BitmapHelper
 import java.io.IOException
+import java.util.concurrent.Semaphore
+import java.util.concurrent.TimeUnit
 
 /**
  * カメラ映像にマスク処理をして表示するだけのSurfaceView実装
@@ -87,18 +89,21 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				60, 127, 255))
+			val sem = Semaphore(1)
 			source = VideoSource(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				object : IPipelineSource.PipelineSourceCallback {
 
 					override fun onCreate(surface: Surface) {
 						if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
+						sem.release()
 					}
 
 					override fun onDestroy() {
 						if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
 					}
 				})
+			sem.tryAcquire(1000, TimeUnit.MILLISECONDS)
 			source!!.pipeline = pipeline
 		}
 	}
