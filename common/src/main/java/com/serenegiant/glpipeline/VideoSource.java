@@ -133,8 +133,8 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 	 * 関連するリソースを廃棄する
 	 */
 	@Override
-	public void release() {
-		if (DEBUG) Log.v(TAG, "release:");
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:");
 		if (isValid()) {
 			mGLHandler.post(new Runnable() {
 				@Override
@@ -146,7 +146,7 @@ public class VideoSource extends ProxyPipeline implements IPipelineSource {
 				}
 			});
 		}
-		super.release();
+		super.internalRelease();
 	}
 
 	/**

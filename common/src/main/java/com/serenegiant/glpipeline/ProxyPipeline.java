@@ -76,11 +76,18 @@ public class ProxyPipeline implements IPipeline {
 		}
 	}
 
-	@CallSuper
 	@Override
-	public void release() {
+	public final void release() {
+		if (!mReleased) {
+			mReleased = true;
+			internalRelease();
+		}
+	}
+
+	@CallSuper
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:" + this);
 		mReleased = true;
-		if (DEBUG) Log.v(TAG, "release:" + this);
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
@@ -124,7 +131,7 @@ public class ProxyPipeline implements IPipeline {
 	 */
 	public boolean isActive() {
 		synchronized (mSync) {
-			return !mReleased && (mParent != null) || (mPipeline != null);
+			return !mReleased && (mPipeline != null) && (mParent != null);
 		}
 	}
 

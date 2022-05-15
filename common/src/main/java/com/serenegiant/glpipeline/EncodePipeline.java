@@ -38,6 +38,7 @@ import com.serenegiant.media.IRecorder;
 import com.serenegiant.media.MediaCodecUtils;
 import com.serenegiant.media.MediaReaper;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -90,12 +91,20 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	}
 
 	@Override
-	public void release() {
+	public final void release() {
 		if (!mReleased) {
 			mReleased = true;
 			if (DEBUG) Log.v(TAG, "release:");
-			releaseTarget();
+			internalRelease();
 		}
+		super.release();
+	}
+
+	@CallSuper
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:");
+		mReleased = true;
+		releaseTarget();
 		final IPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
@@ -105,7 +114,6 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		if (pipeline != null) {
 			pipeline.release();
 		}
-		super.release();
 	}
 
 	/**

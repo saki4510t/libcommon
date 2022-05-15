@@ -113,7 +113,6 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	@NonNull
 	private final HandlerThreadHandler mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 
-	private volatile boolean mReleased;
 	/**
 	 * 受け取ったテキスチャをオフスクリーンへ転送するためのGLDrawer2D
 	 */
@@ -167,21 +166,19 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	}
 
 	@Override
-	public void release() {
-		if (DEBUG) Log.v(TAG, "release:");
-		if (!mReleased) {
-			mReleased = true;
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:");
+		if (isValid()) {
 			releaseTarget();
 			mAsyncHandler.removeCallbacksAndMessages(null);
 			mAsyncHandler.quit();
 		}
-		super.release();
+		super.internalRelease();
 	}
 
 	@Override
 	public boolean isValid() {
-		// super#isValidはProxyPipelineなので常にtrueを返す
-		return !mReleased && mManager.isValid();
+		return super.isValid() && mManager.isValid();
 	}
 
 	private int cnt;
@@ -192,7 +189,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		super.onFrameAvailable(isOES, texId, texMatrix);
-		if (!mReleased) {
+		if (isActive()) {
 			final int width;
 			final int height;
 			@NonNull
@@ -218,9 +215,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				}
 				target = mRendererTarget;
 			}
-			if (!mReleased
-				&& (target != null)
-				&& target.canDraw()) {
+			if ((target != null) && target.canDraw()) {
 				// API1からあるFaceDetectorはBitmapからしか検出できないのでテキスチャをオフスクリーンへ描画して
 				// それを読み取ってBitmapに変換して検出処理を行う
 				// オフスクリーンへ描画

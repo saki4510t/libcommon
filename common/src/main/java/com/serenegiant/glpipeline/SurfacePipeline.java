@@ -45,7 +45,6 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 	@NonNull
 	private final GLManager mManager;
 
-	private volatile boolean mReleased;
 	@Nullable
 	private GLDrawer2D mDrawer;
 	@Nullable
@@ -98,13 +97,12 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 	}
 
 	@Override
-	public void release() {
-		if (DEBUG) Log.v(TAG, "release:");
-		if (!mReleased) {
-			mReleased = true;
+	protected void internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:");
+		if (isValid()) {
 			releaseTarget();
 		}
-		super.release();
+		super.internalRelease();
 	}
 
 	/**
@@ -170,8 +168,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 
 	@Override
 	public boolean isValid() {
-		// super#isValidはProxyPipelineなので常にtrueを返す
-		return !mReleased && mManager.isValid();
+		return super.isValid() && mManager.isValid();
 	}
 
 	@CallSuper
@@ -201,7 +198,7 @@ public class SurfacePipeline extends ProxyPipeline implements ISurfacePipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		super.onFrameAvailable(isOES, texId, texMatrix);
-		if (!mReleased) {
+		if (isValid()) {
 			@NonNull
 			final GLDrawer2D drawer;
 			@Nullable

@@ -103,9 +103,11 @@ public class Distributor extends ProxyPipeline {
 	 * 関連するリソースを廃棄する
 	 */
 	@Override
-	public void release() {
-		mDistributeTask.release();
-		super.release();
+	protected void internalRelease() {
+		if (isValid()) {
+			mDistributeTask.release();
+		}
+		super.internalRelease();
 	}
 
 	@NonNull
@@ -132,8 +134,7 @@ public class Distributor extends ProxyPipeline {
 
 	@Override
 	public boolean isValid() {
-		// 継承元のProxyPipelineは常にtrueを返す
-		return mDistributeTask.isRunning();
+		return super.isValid() && mDistributeTask.isRunning();
 	}
 
 	@WorkerThread

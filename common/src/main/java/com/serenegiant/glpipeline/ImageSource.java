@@ -52,7 +52,6 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	private final Object mSync = new Object();
 	@NonNull
 	private final GLManager mManager;
-	private volatile boolean mReleased;
 	@Nullable
 	private GLSurface mImageSource;
 	private volatile long mFrameIntervalNs;
@@ -79,9 +78,8 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	}
 
 	@Override
-	public void release() {
-		if (!mReleased) {
-			mReleased = true;
+	protected void internalRelease() {
+		if (isValid()) {
 			mManager.runOnGLThread(new Runnable() {
 				@Override
 				public void run() {
@@ -89,7 +87,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 				}
 			});
 		}
-		super.release();
+		super.internalRelease();
 	}
 
 	@NonNull
@@ -129,7 +127,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	@Override
 	public int getTexId() throws IllegalStateException {
 		synchronized (mSync) {
-			if (mReleased || mImageSource == null) {
+			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource != null ? mImageSource.getTexId() : 0;
@@ -147,7 +145,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {
 		synchronized (mSync) {
-			if (mReleased || mImageSource == null) {
+			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource.getTexMatrix();
@@ -156,8 +154,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 
 	@Override
 	public boolean isValid() {
-		// super#isValidはProxyPipelineなので常にtrueを返す
-		return !mReleased && mManager.isValid();
+		return super.isValid() && mManager.isValid();
 	}
 
 	private int cnt;
@@ -169,7 +166,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 
 		synchronized (mSync) {
 			// 映像ソースが準備できていなければスキップする
-			if (mReleased || mImageSource == null) return;
+			if (!isValid() || (mImageSource == null)) return;
 		}
 		if (DEBUG && (++cnt % 100) == 0) {
 			Log.v(TAG, "onFrameAvailable:" + cnt);
@@ -241,7 +238,7 @@ public class ImageSource extends ProxyPipeline implements IPipelineSource {
 		@WorkerThread
 		@Override
 		public void doFrame(final long frameTimeNanos) {
-			if (!mReleased) {
+			if (isValid()) {
 				final long delayMs = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
 				prevFrameTimeNs = frameTimeNanos;
 				if (delayMs <= 0) {
