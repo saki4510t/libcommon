@@ -83,7 +83,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	protected void bindTexture(final int texUnit, final int texId) {
 		GLES20.glActiveTexture(texUnit);
 		GLES20.glBindTexture(mTexTarget, texId);
-		GLES30.glUniform1i(muTextureLoc, gLTextureUnit2Index(texUnit));
+		GLES30.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
 	}
 
 	@Override

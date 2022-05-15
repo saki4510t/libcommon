@@ -160,4 +160,9 @@ public class GLUtils {
 			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 		}
 	}
+
+	public static int gLTextureUnit2Index(final int glTextureUnit) {
+		return (glTextureUnit >= GLES20.GL_TEXTURE0) && (glTextureUnit <= GLES20.GL_TEXTURE31)
+			? glTextureUnit - GLES20.GL_TEXTURE0 : 0;
+	}
 }

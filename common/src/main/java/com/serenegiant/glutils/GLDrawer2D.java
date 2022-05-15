@@ -159,11 +159,6 @@ public abstract class GLDrawer2D {
 		}
 	}
 
-	protected static int gLTextureUnit2Index(final int glTextureUnit) {
-		return (glTextureUnit >= GLES20.GL_TEXTURE0) && (glTextureUnit <= GLES20.GL_TEXTURE31)
-			? glTextureUnit - GLES20.GL_TEXTURE0 : 0;
-	}
-
 //================================================================================
 	/**
 	 * GLES3を使うかどうか
