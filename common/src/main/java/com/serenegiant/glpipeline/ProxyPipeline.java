@@ -42,6 +42,7 @@ public class ProxyPipeline implements IPipeline {
 	private IPipeline mParent;
 	@Nullable
 	private IPipeline mPipeline;
+	private volatile boolean mReleased = false;
 
 	/**
 	 * デフォルトコンストラクタ
@@ -78,6 +79,7 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void release() {
+		mReleased = true;
 		if (DEBUG) Log.v(TAG, "release:" + this);
 		final IPipeline pipeline;
 		synchronized (mSync) {
@@ -93,17 +95,37 @@ public class ProxyPipeline implements IPipeline {
 	@CallSuper
 	@Override
 	public void resize(final int width, final int height) throws IllegalStateException {
-		mWidth = width;
-		mHeight = height;
-		final IPipeline pipeline = getPipeline();
-		if (pipeline != null) {
-			pipeline.resize(width, height);
+		if (!mReleased) {
+			mWidth = width;
+			mHeight = height;
+			final IPipeline pipeline = getPipeline();
+			if (pipeline != null) {
+				pipeline.resize(width, height);
+			}
+		} else {
+			throw new IllegalStateException("already released!");
 		}
 	}
 
+	/**
+	 * IPipelineの実装
+	 * オブジェクトが有効かどうかを取得
+	 * @return
+	 */
 	@Override
 	public boolean isValid() {
-		return true;
+		return !mReleased;
+	}
+
+	/**
+	 * IPipelineの実装
+	 * パイプラインチェーンに組み込まれているかどうかを取得
+	 * @return
+	 */
+	public boolean isActive() {
+		synchronized (mSync) {
+			return !mReleased && (mParent != null) || (mPipeline != null);
+		}
 	}
 
 	@Override
@@ -122,9 +144,13 @@ public class ProxyPipeline implements IPipeline {
 	 */
 	@CallSuper
 	public void setParent(@Nullable final IPipeline parent) {
-		if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
-		synchronized (mSync) {
-			mParent = parent;
+		if (!mReleased) {
+			if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
+			synchronized (mSync) {
+				mParent = parent;
+			}
+		} else {
+			throw new IllegalStateException("already released!");
 		}
 	}
 	@Nullable
@@ -139,12 +165,16 @@ public class ProxyPipeline implements IPipeline {
 	@Override
 	public void setPipeline(@Nullable final IPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
-		synchronized (mSync) {
-			mPipeline = pipeline;
-		}
-		if (pipeline != null) {
-			pipeline.setParent(this);
-			pipeline.resize(mWidth, mHeight);
+		if (!mReleased) {
+			synchronized (mSync) {
+				mPipeline = pipeline;
+			}
+			if (pipeline != null) {
+				pipeline.setParent(this);
+				pipeline.resize(mWidth, mHeight);
+			}
+		} else {
+			throw new IllegalStateException("already released!");
 		}
 	}
 
@@ -181,23 +211,27 @@ public class ProxyPipeline implements IPipeline {
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
-		final IPipeline pipeline;
-		synchronized (mSync) {
-			pipeline = mPipeline;
-		}
-		if (pipeline != null) {
-			pipeline.onFrameAvailable(isOES, texId, texMatrix);
+		if (!mReleased) {
+			final IPipeline pipeline;
+			synchronized (mSync) {
+				pipeline = mPipeline;
+			}
+			if (pipeline != null) {
+				pipeline.onFrameAvailable(isOES, texId, texMatrix);
+			}
 		}
 	}
 
 	@Override
 	public void refresh() {
-		final IPipeline pipeline;
-		synchronized (mSync) {
-			pipeline = mPipeline;
-		}
-		if (pipeline != null) {
-			pipeline.refresh();
+		if (!mReleased) {
+			final IPipeline pipeline;
+			synchronized (mSync) {
+				pipeline = mPipeline;
+			}
+			if (pipeline != null) {
+				pipeline.refresh();
+			}
 		}
 	}
 }

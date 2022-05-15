@@ -132,6 +132,18 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		return !mReleased && mManager.isValid();
 	}
 
+	/**
+	 * IPipelineの実装
+	 * パイプラインチェーンに組み込まれているかどうかを取得
+	 * @return
+	 */
+	@Override
+	public boolean isActive() {
+		synchronized (mSync) {
+			return !mReleased && (mParent != null) || (mPipeline != null);
+		}
+	}
+
 	@Override
 	public void setParent(@Nullable final IPipeline parent) {
 		if (DEBUG) Log.v(TAG, "setParent:" + parent);

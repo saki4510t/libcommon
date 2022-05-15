@@ -51,6 +51,12 @@ public interface IPipeline {
 	public boolean isValid();
 
 	/**
+	 * パイプラインチェーンに組み込まれているかどうかを取得
+	 * @return
+	 */
+	public boolean isActive();
+
+	/**
 	 * 映像幅を取得
 	 * @return
 	 */
