@@ -175,6 +175,19 @@ public interface GLPipeline {
 	}
 
 	/**
+	 * パイプラインチェーンの最後に指定したGLPipelineを追加する
+	 * @param chain
+	 * @param pipeline
+	 * @return パイプラインチェーンの一番最後のGLPipeline(=追加したGLPipeline)を返す
+	 */
+	@NonNull
+	public static GLPipeline append(@NonNull final GLPipeline chain, @NonNull final GLPipeline pipeline) {
+		final GLPipeline last = findLast(chain);
+		last.setPipeline(pipeline);
+		return pipeline;
+	}
+
+	/**
 	 * 指定したGLPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
 	 * @param root
 	 * @return
