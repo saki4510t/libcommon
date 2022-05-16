@@ -90,7 +90,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 			pipeline!!.setMask(BitmapHelper.genMaskImage(0,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				60, Color.BLUE,127, 255))
-			val sem = Semaphore(1)
+			val sem = Semaphore(0)
 			source = VideoSource(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				object : GLPipelineSource.PipelineSourceCallback {
