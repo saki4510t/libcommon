@@ -191,6 +191,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param width
 	 * @param height
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int tex_unit, final int tex_id,
@@ -216,6 +217,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param height
 	 * @param use_depth_buffer
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int tex_unit, final int tex_id,
@@ -243,8 +245,85 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param height
 	 * @param use_depth_buffer
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
+		final int tex_target, final int tex_unit, final int tex_id,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
+			return new GLSurfaceES3(tex_target, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(tex_target, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
+	}
+
+	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド, デプスバッファなし
+	 * @param isGLES3
+	 * @param tex_id
+	 * @param tex_unit
+	 * @param width
+	 * @param height
+	 */
+	@SuppressLint("NewApi")
+	public static GLSurface wrap(final boolean isGLES3,
+		final int tex_unit, final int tex_id,
+		final int width, final int height) {
+
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				false, DEFAULT_ADJUST_POWER2);
+		}
+	}
+
+	/**
+	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド
+	 * @param isGLES3
+	 * @param tex_unit
+	 * @param tex_id
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	@SuppressLint("NewApi")
+	public static GLSurface wrap(final boolean isGLES3,
+		final int tex_unit, final int tex_id,
+		final int width, final int height, final boolean use_depth_buffer) {
+
+		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		} else {
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+				width, height,
+				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+		}
+	}
+
+	/**
+	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
+	 * FIXME tex_targetにGL_TEXTURE_EXTERNAL_OESを指定するとassignTextureでフレームバッファーをセットするときにクラッシュする
+	 * @param isGLES3
+	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param tex_unit
+	 * @param tex_id
+	 * @param width
+	 * @param height
+	 * @param use_depth_buffer
+	 */
+	@SuppressLint("NewApi")
+	public static GLSurface wrap(final boolean isGLES3,
 		final int tex_target, final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
