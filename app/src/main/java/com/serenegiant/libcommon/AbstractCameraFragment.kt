@@ -138,8 +138,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	private val pipelineMode: Int
 		get() {
 			val args = arguments
-			return args?.getInt(ARGS_KEY_PIPELINE_MODE, IPipelineView.PREVIEW_ONLY)
-				?: IPipelineView.PREVIEW_ONLY
+			return args?.getInt(ARGS_KEY_PIPELINE_MODE, GLPipelineView.PREVIEW_ONLY)
+				?: GLPipelineView.PREVIEW_ONLY
 		}
 	protected val enablePipelineEncode: Boolean
 		get() {

@@ -44,7 +44,7 @@ import java.lang.IllegalStateException
  */
 class DummyCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
-		: AspectScaledGLView(context, attrs, defStyle), ICameraView, IPipelineView {
+		: AspectScaledGLView(context, attrs, defStyle), ICameraView, GLPipelineView {
 
 	private var mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener? = null
 	private var mImageSource: ImageSource? = null

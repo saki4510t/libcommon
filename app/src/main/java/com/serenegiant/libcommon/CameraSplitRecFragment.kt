@@ -35,7 +35,7 @@ import com.serenegiant.media.IRecorder.RecorderCallback
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
-import com.serenegiant.widget.IPipelineView
+import com.serenegiant.widget.GLPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
 import java.io.IOException
 
@@ -110,7 +110,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 
 	override fun isRecordingSupported(): Boolean {
 		return super.isRecordingSupported()
-			|| (enablePipelineEncode && (mCameraView is IPipelineView))
+			|| (enablePipelineEncode && (mCameraView is GLPipelineView))
 	}
 
 //--------------------------------------------------------------------------------
@@ -194,9 +194,9 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 				requireContext(), mRecorderCallback, null, MAX_FILE_SIZE)
 		}
 		// create encoder for video recording
-		mVideoEncoder = if (enablePipelineEncode && (mCameraView is IPipelineView)) {
+		mVideoEncoder = if (enablePipelineEncode && (mCameraView is GLPipelineView)) {
 			if (DEBUG) Log.v(TAG, "createRecorder:create EncodePipeline")
-			val view = mCameraView as IPipelineView
+			val view = mCameraView as GLPipelineView
 			val pipeline = EncodePipeline(view.getGLManager(), recorder, mEncoderListener) // API>=18
 			view.addPipeline(pipeline)
 			pipeline
@@ -339,7 +339,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 
 		fun newInstance(
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
-			pipelineMode: Int = IPipelineView.PREVIEW_ONLY,
+			pipelineMode: Int = GLPipelineView.PREVIEW_ONLY,
 			enablePipelineEncode: Boolean = false,
 			enableFaceDetect: Boolean = false): CameraSplitRecFragment {
 

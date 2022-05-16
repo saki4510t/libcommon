@@ -40,14 +40,14 @@ import com.serenegiant.view.ViewTransformDelegater
  */
 class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: ZoomAspectScaledTextureView(context, attrs, defStyleAttr), ICameraView, IPipelineView {
+		: ZoomAspectScaledTextureView(context, attrs, defStyleAttr), ICameraView, GLPipelineView {
 
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext
 	private val mGLHandler: Handler
 	private val mCameraDelegator: CameraDelegator
 	private var mVideoSource: VideoSource? = null
-	var pipelineMode = IPipelineView.PREVIEW_ONLY
+	var pipelineMode = GLPipelineView.PREVIEW_ONLY
 	var enableFaceDetect = false
 
 	init {
@@ -324,8 +324,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	fun isEffectSupported(): Boolean {
-		return (pipelineMode == IPipelineView.EFFECT_ONLY)
-			|| (pipelineMode == IPipelineView.EFFECT_PLUS_SURFACE)
+		return (pipelineMode == GLPipelineView.EFFECT_ONLY)
+			|| (pipelineMode == GLPipelineView.EFFECT_PLUS_SURFACE)
 	}
 
 	var effect: Int
@@ -389,13 +389,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	private fun createPipeline(surface: Any?, maxFps: Fraction?): GLPipeline {
 		if (DEBUG) Log.v(TAG, "createPipeline:surface=${surface}")
 		return when (pipelineMode) {
-			IPipelineView.EFFECT_PLUS_SURFACE -> {
+			GLPipelineView.EFFECT_PLUS_SURFACE -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
 				val effect = EffectPipeline(mGLManager)
 				effect.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
 				effect
 			}
-			IPipelineView.EFFECT_ONLY -> {
+			GLPipelineView.EFFECT_ONLY -> {
 				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline")
 				EffectPipeline(mGLManager, surface, maxFps)
 			}

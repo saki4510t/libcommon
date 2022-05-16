@@ -35,7 +35,7 @@ import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
-import com.serenegiant.widget.IPipelineView
+import com.serenegiant.widget.GLPipelineView
 
 class MainActivity
 	: AppCompatActivity(),
@@ -206,7 +206,7 @@ class MainActivity
 				}
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_simple_video_source_camera, R.string.title_camera_rec_pipeline,
-					IPipelineView.EFFECT_PLUS_SURFACE,
+					GLPipelineView.EFFECT_PLUS_SURFACE,
 					true // trueならEncoderPipelineを使った録画, falseならSurfaceEncoderを使った録画
 				)
 			}
@@ -218,7 +218,7 @@ class MainActivity
 				}
 				fragment = CameraRecFragment.newInstance(
 					R.layout.fragment_simple_video_source_camera, R.string.title_camera_face_detect,
-					IPipelineView.PREVIEW_ONLY,
+					GLPipelineView.PREVIEW_ONLY,
 					enablePipelineEncode = false,
 					enableFaceDetect = true
 				)
