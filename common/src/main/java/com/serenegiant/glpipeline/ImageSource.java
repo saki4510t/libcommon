@@ -60,9 +60,11 @@ public class ImageSource extends ProxyPipeline implements GLPipelineSource {
 	 * コンストラクタ
 	 * @param manager
 	 * @param bitmap nullのときは後で#setSourceを呼び出さないと#onFrameAvailableが呼び出されない
-	 * @param fps
+	 * @param fps nullの時は30fps相当
 	 */
-	public ImageSource(@NonNull final GLManager manager, @Nullable final Bitmap bitmap, final Fraction fps) {
+	public ImageSource(
+		@NonNull final GLManager manager,
+		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
 		mManager = manager;
