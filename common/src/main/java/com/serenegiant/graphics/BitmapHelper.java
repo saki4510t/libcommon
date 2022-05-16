@@ -877,6 +877,35 @@ public final class BitmapHelper {
     }
 
 	/**
+	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのビットマップを生成
+	 * @param width  生成するビットマップの幅
+	 * @param height 生成するビットマップの宝
+	 * @param step_width 単位パターンの幅
+	 * @param step_height 単位パターンの高さ
+	 * @param config 生成するビットマップのタイプ
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap makeCheckBitmap(
+		final int width, final int height,
+		final int step_width, final int step_height,
+		@NonNull final Bitmap.Config config) {
+
+        final Bitmap bm = Bitmap.createBitmap(width, height, config);
+        final Canvas c = new Canvas(bm);
+        c.drawColor(Color.WHITE);
+        final Paint p = new Paint();
+        p.setColor(Color.LTGRAY);
+        for (int x = 0; x < width; x += step_width * 2) {
+        	for (int y = 0; y < height; y += step_height * 2) {
+				c.drawRect(x, y, step_width, step_height, p);
+				c.drawRect(x + step_width, y + step_height, step_width, step_height, p);
+			}
+		}
+        return bm;
+    }
+
+	/**
 	 * マスク用Bitmapを生成
 	 * @return
 	 */
