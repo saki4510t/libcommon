@@ -182,10 +182,11 @@ public class GLUtils {
 		@Nullable final ByteBuffer buffer,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 
+		final int sz = width * height * 4;
 		ByteBuffer buf = buffer;
-		if ((buf == null) || (buf.capacity() < width * height * 4)) {
+		if ((buf == null) || (buf.capacity() < sz)) {
 			if (DEBUG) Log.v(TAG, "glReadPixels:allocate direct bytebuffer");
-			buf = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
+			buf = ByteBuffer.allocateDirect(sz).order(ByteOrder.LITTLE_ENDIAN);
 		}
 		if ((buf.order() != ByteOrder.LITTLE_ENDIAN)) {
 			buf.order(ByteOrder.LITTLE_ENDIAN);
@@ -194,6 +195,8 @@ public class GLUtils {
 		// XXX GL|ES3の時はPBOとglMapBufferRange/glUnmapBufferを使うようにする?
 		GLES20.glReadPixels(0, 0, width, height,
 			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+		if (DEBUG) GLHelper.checkGlError("glReadPixels");
+		buf.position(sz);
 		buf.flip();
 
 		return buf;
