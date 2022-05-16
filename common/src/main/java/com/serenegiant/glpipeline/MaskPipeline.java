@@ -42,7 +42,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * OpenGL|ESのシェーダーを使って映像にマスク処理するIPipeline実装
  * 描画先のsurfaceにnullを指定するとマスク処理したテクスチャを次のIPipelineへ送る
  */
-public class MaskPipeline extends ProxyPipeline implements ISurfacePipeline {
+public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = MaskPipeline.class.getSimpleName();
 

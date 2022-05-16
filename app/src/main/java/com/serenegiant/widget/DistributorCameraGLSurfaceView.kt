@@ -30,8 +30,8 @@ import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
 import com.serenegiant.glpipeline.Distributor
-import com.serenegiant.glpipeline.IPipeline
-import com.serenegiant.glpipeline.IPipelineSource.PipelineSourceCallback
+import com.serenegiant.glpipeline.GLPipeline
+import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.EGLBase
 import com.serenegiant.glutils.GLDrawer2D
@@ -195,12 +195,12 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	 * IPipelineViewの実装
 	 * @param pipeline
 	 */
-	override fun addPipeline(pipeline: IPipeline)  {
+	override fun addPipeline(pipeline: GLPipeline)  {
 		if (mVideoSource != null) {
-			val last = IPipeline.findLast(mVideoSource!!)
+			val last = GLPipeline.findLast(mVideoSource!!)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mVideoSource!!))
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mVideoSource!!))
 		} else {
 			throw IllegalStateException()
 		}

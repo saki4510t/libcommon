@@ -18,7 +18,7 @@ package com.serenegiant.widget
  *  limitations under the License.
 */
 
-import com.serenegiant.glpipeline.IPipeline
+import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glutils.GLManager
 
 /**
@@ -30,7 +30,7 @@ interface IPipelineView {
 	 * (削除するときはIPipeline#removeを使うこと)
 	 * @param pipeline
 	 */
-	fun addPipeline(pipeline: IPipeline)
+	fun addPipeline(pipeline: GLPipeline)
 
 	/**
 	 * IPipeline/IPipelineSourceの処理に使うGLManagerインスタンスを取得する

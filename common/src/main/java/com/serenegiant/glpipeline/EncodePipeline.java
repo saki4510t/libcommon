@@ -48,7 +48,7 @@ import androidx.annotation.WorkerThread;
  * MediaCodecの映像エンコーダーでエンコードするためのIPipeline/AbstractVideoEncoder実装
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
+public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EncodePipeline.class.getSimpleName();
 
@@ -57,9 +57,9 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
-	private IPipeline mParent;
+	private GLPipeline mParent;
 	@Nullable
-	private IPipeline mPipeline;
+	private GLPipeline mPipeline;
 	private volatile boolean mReleased;
 
 	@Nullable
@@ -105,7 +105,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		if (DEBUG) Log.v(TAG, "internalRelease:");
 		mReleased = true;
 		releaseTarget();
-		final IPipeline pipeline;
+		final GLPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 			mPipeline = null;
@@ -125,7 +125,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	@Override
 	public void resize(final int width, final int height) throws IllegalStateException {
 		setVideoSize(width, height);
-		final IPipeline pipeline = getPipeline();
+		final GLPipeline pipeline = getPipeline();
 		if (pipeline != null) {
 			pipeline.resize(width, height);
 		}
@@ -153,7 +153,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	}
 
 	@Override
-	public void setParent(@Nullable final IPipeline parent) {
+	public void setParent(@Nullable final GLPipeline parent) {
 		if (DEBUG) Log.v(TAG, "setParent:" + parent);
 		synchronized (mSync) {
 			mParent = parent;
@@ -162,7 +162,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 
 	@Nullable
 	@Override
-	public IPipeline getParent() {
+	public GLPipeline getParent() {
 		synchronized (mSync) {
 			return mParent;
 		}
@@ -173,7 +173,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	 * @param pipeline
 	 */
 	@Override
-	public void setPipeline(@Nullable final IPipeline pipeline) {
+	public void setPipeline(@Nullable final GLPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + pipeline);
 		synchronized (mSync) {
 			mPipeline = pipeline;
@@ -189,7 +189,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	 * @return
 	 */
 	@Nullable
-	public IPipeline getPipeline() {
+	public GLPipeline getPipeline() {
 		synchronized (mSync) {
 			return mPipeline;
 		}
@@ -198,7 +198,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 	@Override
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:");
-		IPipeline parent;
+		GLPipeline parent;
 		synchronized (mSync) {
 			parent = mParent;
 			if (mParent != null) {
@@ -208,7 +208,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 			mPipeline = null;
 		}
 		if (parent != null) {
-			parent = IPipeline.findFirst(parent);
+			parent = GLPipeline.findFirst(parent);
 			parent.refresh();
 		}
 		releaseTarget();
@@ -228,7 +228,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		@Nullable
-		final IPipeline pipeline;
+		final GLPipeline pipeline;
 		@NonNull
 		final GLDrawer2D drawer;
 		@Nullable
@@ -264,7 +264,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements IPipeline {
 
 	@Override
 	public void refresh() {
-		final IPipeline pipeline;
+		final GLPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 		}

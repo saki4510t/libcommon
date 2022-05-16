@@ -30,7 +30,7 @@ import androidx.annotation.WorkerThread;
 /**
  * 映像ソースとなるIPipelineインターフェース
  */
-public interface IPipelineSource extends IPipeline {
+public interface GLPipelineSource extends GLPipeline {
 	/**
 	 * PipelineSourceからのコールバックリスナー
 	 */

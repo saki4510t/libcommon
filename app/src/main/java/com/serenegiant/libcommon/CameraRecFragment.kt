@@ -28,7 +28,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.glpipeline.EncodePipeline
-import com.serenegiant.glpipeline.IPipeline
+import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glutils.GLEffect
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
@@ -163,14 +163,14 @@ class CameraRecFragment : AbstractCameraFragment() {
 		if (surface != null) {
 			removeSurface(surface)
 		}
-		if (mVideoEncoder is IPipeline) {
+		if (mVideoEncoder is GLPipeline) {
 			if (DEBUG) Log.v(TAG, "stopEncoder:remove Encoder from pipeline chains,${mVideoEncoder}")
-			val pipeline = mVideoEncoder as IPipeline
-			val first = IPipeline.findFirst(pipeline)
-			if (DEBUG) Log.v(TAG, "stopEncoder:before=${IPipeline.pipelineString(first)}")
+			val pipeline = mVideoEncoder as GLPipeline
+			val first = GLPipeline.findFirst(pipeline)
+			if (DEBUG) Log.v(TAG, "stopEncoder:before=${GLPipeline.pipelineString(first)}")
 			pipeline.remove()
 //			IPipeline.validatePipelineChain(first)
-			if (DEBUG) Log.v(TAG, "stopEncoder:after=${IPipeline.pipelineString(first)}")
+			if (DEBUG) Log.v(TAG, "stopEncoder:after=${GLPipeline.pipelineString(first)}")
 		}
 		mVideoEncoder = null
 		mAudioEncoder = null

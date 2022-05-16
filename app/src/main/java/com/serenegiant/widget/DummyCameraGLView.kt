@@ -29,7 +29,7 @@ import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import com.serenegiant.glpipeline.Distributor
-import com.serenegiant.glpipeline.IPipeline
+import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ImageSource
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
@@ -221,12 +221,12 @@ class DummyCameraGLView @JvmOverloads constructor(
 	/**
 	 * IPipelineViewの実装
 	 */
-	override fun addPipeline(pipeline: IPipeline)  {
+	override fun addPipeline(pipeline: GLPipeline)  {
 		if (mImageSource != null) {
-			val last = IPipeline.findLast(mImageSource!!)
+			val last = GLPipeline.findLast(mImageSource!!)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(mImageSource!!))
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mImageSource!!))
 		} else {
 			throw IllegalStateException()
 		}

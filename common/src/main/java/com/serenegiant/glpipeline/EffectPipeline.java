@@ -41,7 +41,7 @@ import static com.serenegiant.glutils.GLEffect.EFFECT_NON;
  * OpenGL|ESのシェーダーを使って映像効果付与をするIPipeline実装
  * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のIPipelineへ送る
  */
-public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
+public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
@@ -54,9 +54,9 @@ public class EffectPipeline extends ProxyPipeline implements ISurfacePipeline {
 	 */
 	@Deprecated
 	@Nullable
-	public static EffectPipeline find(@NonNull final IPipeline pipeline) {
+	public static EffectPipeline find(@NonNull final GLPipeline pipeline) {
 		// パイプラインチェーンの先頭を取得
-		IPipeline p = IPipeline.findFirst(pipeline);
+		GLPipeline p = GLPipeline.findFirst(pipeline);
 		// EffectPipelineが見つかるまで順番にたどる
 		while (p != null) {
 			if (p instanceof EffectPipeline) {

@@ -73,8 +73,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	 */
 	@Deprecated
 	@Nullable
-	public static FaceDetectPipeline find(@NonNull final IPipeline pipeline) {
-		IPipeline p = IPipeline.findFirst(pipeline);
+	public static FaceDetectPipeline find(@NonNull final GLPipeline pipeline) {
+		GLPipeline p = GLPipeline.findFirst(pipeline);
 		while (p != null) {
 			if (p instanceof FaceDetectPipeline) {
 				return (FaceDetectPipeline)p;

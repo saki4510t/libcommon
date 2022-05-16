@@ -38,7 +38,7 @@ import androidx.annotation.WorkerThread;
 /**
  * 静止画(Bitmap)を映像ソースとするためのIPipelineSource実装
  */
-public class ImageSource extends ProxyPipeline implements IPipelineSource {
+public class ImageSource extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ImageSource.class.getSimpleName();
 

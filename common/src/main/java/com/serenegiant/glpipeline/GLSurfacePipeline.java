@@ -26,7 +26,7 @@ import androidx.annotation.Nullable;
 /**
  * Surfaceへの描画が可能なIPipelineインターフェース
  */
-public interface ISurfacePipeline extends IPipeline {
+public interface GLSurfacePipeline extends GLPipeline {
 	/**
 	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
 	 * すでにsurfaceがセットされている時に#setSurfaceで違うsurfaceをセットすると古いsurfaceは破棄される
@@ -71,13 +71,13 @@ public interface ISurfacePipeline extends IPipeline {
 	 * @return 見つかればSurfacePipeline, 見つからなければnull
 	 */
 	@Nullable
-	public static ISurfacePipeline findById(@NonNull final IPipeline pipeline, final int id) {
+	public static GLSurfacePipeline findById(@NonNull final GLPipeline pipeline, final int id) {
 		@NonNull
-		IPipeline p = IPipeline.findFirst(pipeline);
+		GLPipeline p = GLPipeline.findFirst(pipeline);
 		while (p != null) {
-			if ((p instanceof ISurfacePipeline)
-				&& ((ISurfacePipeline)p).getId() == id) {
-				return (ISurfacePipeline)p;
+			if ((p instanceof GLSurfacePipeline)
+				&& ((GLSurfacePipeline)p).getId() == id) {
+				return (GLSurfacePipeline)p;
 			}
 			p = p.getPipeline();
 		}

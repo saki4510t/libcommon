@@ -108,7 +108,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureDestroyed:")
 				val source = mVideoSource
 				if (source != null) {
-					val pipeline = ISurfacePipeline.findById(source, surface.hashCode())
+					val pipeline = GLSurfacePipeline.findById(source, surface.hashCode())
 					if (pipeline != null) {
 						pipeline.remove()
 						pipeline.release()
@@ -197,7 +197,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
 		val source = mVideoSource
 		if (source != null) {
-			when (val last = IPipeline.findLast(source)) {
+			when (val last = GLPipeline.findLast(source)) {
 				mVideoSource -> {
 					source.pipeline = createPipeline(surface, maxFps)
 					if (SUPPORT_RECORDING) {
@@ -205,7 +205,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						// 毎フレームCameraDelegator#callOnFrameAvailableを呼び出さないといけないので
 						// OnFramePipelineを追加する
 						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
-						val p = IPipeline.findLast(source)
+						val p = GLPipeline.findLast(source)
 						p.pipeline = OnFramePipeline(object :
 							OnFramePipeline.OnFrameAvailableListener {
 							var cnt: Int = 0
@@ -219,7 +219,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					}
 					if (enableFaceDetect) {
 						if (DEBUG) Log.v(TAG, "addSurface:create FaceDetectPipeline")
-						val p = IPipeline.findLast(source)
+						val p = GLPipeline.findLast(source)
 						p.pipeline = FaceDetectPipeline(mGLManager, Fraction.FIVE, 1
 						) { /*bitmap,*/ num, faces, width, height ->
 							if (DEBUG) {
@@ -270,7 +270,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						}
 					}
 				}
-				is ISurfacePipeline -> {
+				is GLSurfacePipeline -> {
 					if (last.hasSurface()) {
 						last.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
 					} else {
@@ -288,7 +288,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:id=${id}")
-		val found = ISurfacePipeline.findById(mVideoSource!!, id)
+		val found = GLSurfacePipeline.findById(mVideoSource!!, id)
 		if (found != null) {
 			found.remove()
 			found.release()
@@ -304,13 +304,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * IPipelineViewの実装
 	 * @param pipeline
 	 */
-	override fun addPipeline(pipeline: IPipeline)  {
+	override fun addPipeline(pipeline: GLPipeline)  {
 		val source = mVideoSource
 		if (source != null) {
-			val last = IPipeline.findLast(source)
+			val last = GLPipeline.findLast(source)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + IPipeline.pipelineString(source))
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
 		} else {
 			throw IllegalStateException()
 		}
@@ -332,7 +332,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	get() {
 		val source = mVideoSource
 		return if (source != null) {
-			val pipeline = IPipeline.find(source, EffectPipeline::class.java)
+			val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
 			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
 			pipeline?.currentEffect ?: 0
 		} else {
@@ -346,7 +346,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			post {
 				val source = mVideoSource
 				if (source != null) {
-					val pipeline = IPipeline.find(source, EffectPipeline::class.java)
+					val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
 					pipeline?.setEffect(effect)
 				}
 			}
@@ -369,7 +369,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		width: Int, height: Int): VideoSource {
 
 		return VideoSource(mGLManager, width, height,
-			object : IPipelineSource.PipelineSourceCallback {
+			object : GLPipelineSource.PipelineSourceCallback {
 
 				override fun onCreate(surface: Surface) {
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
@@ -386,7 +386,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * IPipelineインスタンスを生成
 	 * @param surface
 	 */
-	private fun createPipeline(surface: Any?, maxFps: Fraction?): IPipeline {
+	private fun createPipeline(surface: Any?, maxFps: Fraction?): GLPipeline {
 		if (DEBUG) Log.v(TAG, "createPipeline:surface=${surface}")
 		return when (pipelineMode) {
 			IPipelineView.EFFECT_PLUS_SURFACE -> {

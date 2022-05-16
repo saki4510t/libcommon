@@ -28,7 +28,7 @@ import android.view.SurfaceHolder
 import android.view.SurfaceView
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
-import com.serenegiant.glpipeline.IPipelineSource
+import com.serenegiant.glpipeline.GLPipelineSource
 import com.serenegiant.glpipeline.MaskPipeline
 import com.serenegiant.glpipeline.VideoSource
 import com.serenegiant.glutils.GLManager
@@ -93,7 +93,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 			val sem = Semaphore(1)
 			source = VideoSource(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-				object : IPipelineSource.PipelineSourceCallback {
+				object : GLPipelineSource.PipelineSourceCallback {
 
 					override fun onCreate(surface: Surface) {
 						if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")

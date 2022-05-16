@@ -28,7 +28,7 @@ import androidx.annotation.Size;
 /**
  * IPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのIPipeline実装
  */
-public class ProxyPipeline implements IPipeline {
+public class ProxyPipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProxyPipeline.class.getSimpleName();
 
@@ -39,9 +39,9 @@ public class ProxyPipeline implements IPipeline {
 	private final Object mSync = new Object();
 	private int mWidth, mHeight;
 	@Nullable
-	private IPipeline mParent;
+	private GLPipeline mParent;
 	@Nullable
-	private IPipeline mPipeline;
+	private GLPipeline mPipeline;
 	private volatile boolean mReleased = false;
 
 	/**
@@ -88,7 +88,7 @@ public class ProxyPipeline implements IPipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:" + this);
 		mReleased = true;
-		final IPipeline pipeline;
+		final GLPipeline pipeline;
 		synchronized (mSync) {
 			pipeline = mPipeline;
 			mPipeline = null;
@@ -105,7 +105,7 @@ public class ProxyPipeline implements IPipeline {
 		if (!mReleased) {
 			mWidth = width;
 			mHeight = height;
-			final IPipeline pipeline = getPipeline();
+			final GLPipeline pipeline = getPipeline();
 			if (pipeline != null) {
 				pipeline.resize(width, height);
 			}
@@ -150,7 +150,7 @@ public class ProxyPipeline implements IPipeline {
 	 * @param parent
 	 */
 	@CallSuper
-	public void setParent(@Nullable final IPipeline parent) {
+	public void setParent(@Nullable final GLPipeline parent) {
 		if (!mReleased) {
 			if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
 			synchronized (mSync) {
@@ -162,7 +162,7 @@ public class ProxyPipeline implements IPipeline {
 	}
 	@Nullable
 	@Override
-	public IPipeline getParent() {
+	public GLPipeline getParent() {
 		synchronized (mSync) {
 			return mParent;
 		}
@@ -170,7 +170,7 @@ public class ProxyPipeline implements IPipeline {
 
 	@CallSuper
 	@Override
-	public void setPipeline(@Nullable final IPipeline pipeline) {
+	public void setPipeline(@Nullable final GLPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
 		if (!mReleased) {
 			synchronized (mSync) {
@@ -186,7 +186,7 @@ public class ProxyPipeline implements IPipeline {
 	}
 
 	@Nullable
-	public IPipeline getPipeline() {
+	public GLPipeline getPipeline() {
 		synchronized (mSync) {
 			return mPipeline;
 		}
@@ -196,8 +196,8 @@ public class ProxyPipeline implements IPipeline {
 	@Override
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:" + this);
-		final IPipeline first = IPipeline.findFirst(this);
-		IPipeline parent;
+		final GLPipeline first = GLPipeline.findFirst(this);
+		GLPipeline parent;
 		synchronized (mSync) {
 			parent = mParent;
 			if (mParent != null) {
@@ -207,7 +207,7 @@ public class ProxyPipeline implements IPipeline {
 			mPipeline = null;
 		}
 		if (first != this) {
-			IPipeline.validatePipelineChain(first);
+			GLPipeline.validatePipelineChain(first);
 			parent.refresh();
 		}
 	}
@@ -219,7 +219,7 @@ public class ProxyPipeline implements IPipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if (!mReleased) {
-			final IPipeline pipeline;
+			final GLPipeline pipeline;
 			synchronized (mSync) {
 				pipeline = mPipeline;
 			}
@@ -232,7 +232,7 @@ public class ProxyPipeline implements IPipeline {
 	@Override
 	public void refresh() {
 		if (!mReleased) {
-			final IPipeline pipeline;
+			final GLPipeline pipeline;
 			synchronized (mSync) {
 				pipeline = mPipeline;
 			}

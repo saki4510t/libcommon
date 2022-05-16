@@ -28,8 +28,8 @@ import androidx.annotation.WorkerThread;
 /**
  * 映像受け取り・映像効果付与・プレビュー表示等を動的に組み合わせて逐次処理するためのインターフェース定義
  */
-public interface IPipeline {
-	static final String TAG = IPipeline.class.getSimpleName();
+public interface GLPipeline {
+	static final String TAG = GLPipeline.class.getSimpleName();
 
 	/**
 	 * 関係するリソースを破棄
@@ -72,7 +72,7 @@ public interface IPipeline {
 	 * 呼び出し元のIPipelineインスタンスを設定する
 	 * @param parent
 	 */
-	public void setParent(@Nullable final IPipeline parent);
+	public void setParent(@Nullable final GLPipeline parent);
 
 	/**
 	 * 呼び出しh元のIPipelineインスタンスを取得する
@@ -80,20 +80,20 @@ public interface IPipeline {
 	 * @return
 	 */
 	@Nullable
-	public IPipeline getParent();
+	public GLPipeline getParent();
 
 	/**
 	 * 次に呼び出すIPipelineインスタンスをセットする
 	 * @param pipeline
 	 */
-	public void setPipeline(@Nullable final IPipeline pipeline);
+	public void setPipeline(@Nullable final GLPipeline pipeline);
 
 	/**
 	 * 次に呼び出すIPipelineインスタンス取得する
 	 * @return
 	 */
 	@Nullable
-	public IPipeline getPipeline();
+	public GLPipeline getPipeline();
 
 	/**
 	 * パイプラインチェーンから自分自身を取り除く
@@ -125,9 +125,9 @@ public interface IPipeline {
 	 * @return
 	 */
 	@NonNull
-	public static IPipeline findLast(@NonNull final IPipeline pipeline) {
-		IPipeline parent = pipeline;
-		IPipeline next = parent.getPipeline();
+	public static GLPipeline findLast(@NonNull final GLPipeline pipeline) {
+		GLPipeline parent = pipeline;
+		GLPipeline next = parent.getPipeline();
 		while (next != null) {
 			parent = next;
 			next = parent.getPipeline();
@@ -142,9 +142,9 @@ public interface IPipeline {
 	 * @return
 	 */
 	@NonNull
-	public static IPipeline findFirst(@NonNull final IPipeline pipeline) {
-		IPipeline current = pipeline;
-		IPipeline parent = current.getParent();
+	public static GLPipeline findFirst(@NonNull final GLPipeline pipeline) {
+		GLPipeline current = pipeline;
+		GLPipeline parent = current.getParent();
 		while (parent != null) {
 			current = parent;
 			parent = current.getParent();
@@ -160,9 +160,9 @@ public interface IPipeline {
 	 * @return 見つからなければnull
 	 */
 	@Nullable
-	public static <T extends IPipeline> T find(@NonNull final IPipeline pipeline, @NonNull final Class<T> clazz) {
+	public static <T extends GLPipeline> T find(@NonNull final GLPipeline pipeline, @NonNull final Class<T> clazz) {
 		// パイプラインチェーンの先頭を取得
-		IPipeline p = findFirst(pipeline);
+		GLPipeline p = findFirst(pipeline);
 		// 指定したクラスが見つかるまで順番にたどる
 		while (p != null) {
 			if (p.getClass() == clazz) {
@@ -179,9 +179,9 @@ public interface IPipeline {
 	 * @return
 	 */
 	@NonNull
-	public static String pipelineString(@NonNull final IPipeline root) {
+	public static String pipelineString(@NonNull final GLPipeline root) {
 		final StringBuilder sb = new StringBuilder("[");
-		IPipeline pipeline = root;
+		GLPipeline pipeline = root;
 		while (pipeline != null) {
 			if (pipeline != root) {
 				sb.append(',');
@@ -199,11 +199,11 @@ public interface IPipeline {
 	 * @param root
 	 * @return
 	 */
-	public static boolean validatePipelineChain(@NonNull final IPipeline root) {
+	public static boolean validatePipelineChain(@NonNull final GLPipeline root) {
 		boolean result = true;
-		IPipeline pipeline = root;
+		GLPipeline pipeline = root;
 		while (pipeline != null) {
-			final IPipeline next = pipeline.getPipeline();
+			final GLPipeline next = pipeline.getPipeline();
 			if ((next != null) && (next.getParent() != pipeline)) {
 				Log.v(TAG, "validatePipelineChain:found wrong chain" + pipeline
 					+ "=>" + next + (next != null ? "(" + next.getParent() + ")" : ""));

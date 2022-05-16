@@ -43,7 +43,7 @@ import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
  * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
  */
-public class VideoSource extends ProxyPipeline implements IPipelineSource {
+public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoSource.class.getSimpleName();
 
