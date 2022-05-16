@@ -188,6 +188,28 @@ public interface GLPipeline {
 	}
 
 	/**
+	 * targetで指定したGLPipelineにpipelineで指定したGLPipelineをつなげる
+	 * GLPipeline#setPipelineと違ってtargetに既にパイプラインガセットされているときはつなぎ替える
+	 * @param target
+	 * @param pipeline
+	 * @return 追加したGLPipeline
+	 */
+	@NonNull
+	public static GLPipeline insert(@NonNull final GLPipeline target, @NonNull final GLPipeline pipeline) {
+		final GLPipeline p = target.getPipeline();
+		if (p == null) {
+			// targetの後ろにパイプラインが存在していないときは#setPipeline
+			target.setPipeline(pipeline);
+		} else if (p != pipeline) {
+			// targetに自分以外のパイプラインがセットされているとき
+			target.setPipeline(pipeline);
+			// pipelineの後ろに繋がっているかもしれないので再帰呼び出しする
+			return insert(pipeline, p);
+		}
+		return pipeline;
+	}
+
+	/**
 	 * 指定したGLPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
 	 * @param root
 	 * @return
