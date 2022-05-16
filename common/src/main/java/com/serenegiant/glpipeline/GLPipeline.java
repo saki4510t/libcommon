@@ -202,9 +202,10 @@ public interface GLPipeline {
 			target.setPipeline(pipeline);
 		} else if (p != pipeline) {
 			// targetに自分以外のパイプラインがセットされているとき
+			// 挿入するパイプライン(チェーン)の一番後ろにtargetの後ろのパイプライン(チェーン)を繋ぐ
+			final GLPipeline last = findLast(pipeline);
 			target.setPipeline(pipeline);
-			// pipelineの後ろに繋がっているかもしれないので再帰呼び出しする
-			return insert(pipeline, p);
+			last.setPipeline(p);
 		}
 		return pipeline;
 	}
