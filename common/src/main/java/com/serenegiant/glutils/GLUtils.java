@@ -184,6 +184,7 @@ public class GLUtils {
 
 		ByteBuffer buf = buffer;
 		if ((buf == null) || (buf.capacity() < width * height * 4)) {
+			if (DEBUG) Log.v(TAG, "glReadPixels:allocate direct bytebuffer");
 			buf = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
 		}
 		if ((buf.order() != ByteOrder.LITTLE_ENDIAN)) {
