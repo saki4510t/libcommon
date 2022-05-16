@@ -183,8 +183,7 @@ public class GLUtils {
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 
 		ByteBuffer buf = buffer;
-		if ((buf == null) || (buf.capacity() < width * height * 8)) {
-
+		if ((buf == null) || (buf.capacity() < width * height * 4)) {
 			buf = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
 		}
 		if ((buf.order() != ByteOrder.LITTLE_ENDIAN)) {
