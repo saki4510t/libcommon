@@ -285,6 +285,11 @@ public class Distributor extends ProxyPipeline {
 	}
 
 //--------------------------------------------------------------------------------
+
+	/**
+	 * 分配描画処理の実体
+	 * AbstractDistributeTaskから継承せずに自前実装にかえるかも?
+	 */
 	private class DistributeTask extends AbstractDistributeTask {
 		@NonNull
 		private final GLContext mGLContext;
