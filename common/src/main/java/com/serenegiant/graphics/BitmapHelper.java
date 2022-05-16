@@ -968,7 +968,7 @@ public final class BitmapHelper {
 	 */
 	public static Bitmap invertAlpha(@NonNull final Bitmap src) {
 		final Bitmap offscreen = Bitmap.createBitmap(
-			src.getWidth(), src.getHeight(), Bitmap.Config.ARGB_8888);
+			src.getWidth(), src.getHeight(), src.getConfig());
 		final Paint paint = new Paint();
 		paint.setColorFilter(new ColorMatrixColorFilter(COLOR_MATRIX_INVERT_ALPHA));
 		final Canvas canvas = new Canvas(offscreen);
