@@ -29,7 +29,7 @@ import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
-import com.serenegiant.glpipeline.Distributor
+import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
@@ -56,7 +56,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	private val mCameraDelegator: CameraDelegator
 	private lateinit var mGLManager: GLManager
 	private var mVideoSource: VideoSource? = null
-	private var mDistributor: Distributor? = null
+	private var mDistributor: SurfaceDistributePipeline? = null
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
@@ -171,7 +171,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = Distributor(mVideoSource!!.glManager)
+			mDistributor = SurfaceDistributePipeline(mVideoSource!!.glManager)
 			mVideoSource!!.pipeline = mDistributor
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)

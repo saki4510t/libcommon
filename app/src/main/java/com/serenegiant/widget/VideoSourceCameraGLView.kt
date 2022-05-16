@@ -28,7 +28,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
-import com.serenegiant.glpipeline.Distributor
+import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSource
@@ -49,7 +49,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	private val mCameraDelegator: CameraDelegator
 	private val mCameraRenderer: CameraRenderer
 	private var mVideoSource: VideoSource? = null
-	private var mDistributor: Distributor? = null
+	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 
 	init {
@@ -196,7 +196,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = Distributor(mVideoSource!!.glManager)
+			mDistributor = SurfaceDistributePipeline(mVideoSource!!.glManager)
 			mVideoSource!!.pipeline = mDistributor!!
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)

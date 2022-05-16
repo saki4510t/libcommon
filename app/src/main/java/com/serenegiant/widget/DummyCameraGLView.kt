@@ -28,7 +28,7 @@ import android.util.Log
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
-import com.serenegiant.glpipeline.Distributor
+import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ImageSource
 import com.serenegiant.glutils.GLDrawer2D
@@ -48,7 +48,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 
 	private var mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener? = null
 	private var mImageSource: ImageSource? = null
-	private var mDistributor: Distributor? = null
+	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 	@Volatile
 	private var mHasSurface = false
@@ -196,7 +196,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = Distributor(mImageSource!!.glManager)
+			mDistributor = SurfaceDistributePipeline(mImageSource!!.glManager)
 			mImageSource!!.pipeline = mDistributor!!
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)

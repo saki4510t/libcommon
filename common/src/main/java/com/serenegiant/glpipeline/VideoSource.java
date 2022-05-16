@@ -41,7 +41,7 @@ import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 /**
  * 映像をSurface/SurfaceTextureとして受け取って
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
- * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
+ * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  */
 public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production

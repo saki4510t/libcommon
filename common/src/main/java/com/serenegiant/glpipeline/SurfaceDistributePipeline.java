@@ -37,14 +37,14 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.IRendererCommon.*;
 
 /**
- * GLPipelineSourceで更新されたテクスチャを分配描画するためのヘルパークラス
- * useSharedContext=falseでVideoSource + Distributor ≒ IRendererHolder/RendererHolder
+ * GLPipelineSourceで更新されたテクスチャをSurfaceへ分配描画するためのヘルパークラス
+ * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  * 分配描画が必要ない場合または分配先が少ない場合はSurfacePipelineの方が負荷が少ないかもしれない
  */
-public class Distributor extends ProxyPipeline {
+public class SurfaceDistributePipeline extends ProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = Distributor.class.getSimpleName();
-	private static final String RENDERER_THREAD_NAME = "Distributor";
+	private static final String TAG = SurfaceDistributePipeline.class.getSimpleName();
+	private static final String RENDERER_THREAD_NAME = "SurfaceDistributePipeline";
 
 	/**
 	 * 自分用のGLManagerを保持しているかどうか
@@ -61,7 +61,7 @@ public class Distributor extends ProxyPipeline {
 	 * 共有コンテキストを使わず引数のGLPipelineSourceと同じコンテキスト上で実行する
 	 * @param manager
 	 */
-	public Distributor(@NonNull final GLManager manager) {
+	public SurfaceDistributePipeline(@NonNull final GLManager manager) {
 		this(manager, false);
 	}
 
@@ -71,7 +71,7 @@ public class Distributor extends ProxyPipeline {
 	 * @param manager
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
-	public Distributor(@NonNull final GLManager manager, final boolean useSharedContext) {
+	public SurfaceDistributePipeline(@NonNull final GLManager manager, final boolean useSharedContext) {
 
 		super();
 		final Handler.Callback handlerCallback
@@ -476,9 +476,9 @@ public class Distributor extends ProxyPipeline {
 
 		@Override
 		public void notifyParent(final boolean isRunning) {
-			synchronized (Distributor.this) {
-				Distributor.this.isRunning = isRunning;
-				Distributor.this.notifyAll();
+			synchronized (SurfaceDistributePipeline.this) {
+				SurfaceDistributePipeline.this.isRunning = isRunning;
+				SurfaceDistributePipeline.this.notifyAll();
 			}
 		}
 
