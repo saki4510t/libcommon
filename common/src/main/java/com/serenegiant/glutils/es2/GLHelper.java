@@ -76,7 +76,7 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int initTex(final int texTarget, final int texUnit, final int filterParam) {
-		return initTex(texTarget, GLES20.GL_TEXTURE0,
+		return initTex(texTarget, texUnit,
 			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
 
