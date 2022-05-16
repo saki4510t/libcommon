@@ -29,7 +29,6 @@ import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
@@ -38,6 +37,7 @@ import android.view.Surface;
 import com.serenegiant.glutils.EGLBase;
 import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.glutils.GLHelper;
 import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.system.BuildCheck;
@@ -385,13 +385,8 @@ public class SurfaceDrawable extends Drawable {
 			mEglTask.makeCurrent();
 			handleReleaseInputSurface();
 			mEglTask.makeCurrent();
-			if (isOES3Supported()) {
-				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
-			} else {
-				mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-			}
+			mTexId = GLHelper.initTex(
+				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
 			if (BuildCheck.isAndroid4_1()) {
@@ -429,11 +424,7 @@ public class SurfaceDrawable extends Drawable {
 				mInputTexture = null;
 			}
 			if (mTexId != 0) {
-				if (isGLES3()) {
-					com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
-				} else {
-					com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
-				}
+				GLHelper.deleteTex(mTexId);
 				mTexId = 0;
 			}
 		}

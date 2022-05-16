@@ -28,8 +28,6 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.serenegiant.glutils.es2.GLHelper;
-
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス

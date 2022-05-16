@@ -28,7 +28,6 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.es2.GLHelper;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 

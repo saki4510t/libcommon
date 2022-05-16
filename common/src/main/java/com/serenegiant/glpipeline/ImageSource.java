@@ -27,7 +27,7 @@ import android.view.Surface;
 
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
-import com.serenegiant.glutils.es2.GLHelper;
+import com.serenegiant.glutils.GLHelper;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;

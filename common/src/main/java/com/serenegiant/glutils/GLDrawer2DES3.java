@@ -23,8 +23,6 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.glutils.es3.GLHelper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;

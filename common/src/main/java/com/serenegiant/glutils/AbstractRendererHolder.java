@@ -706,13 +706,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseInputSurface();
 			makeCurrent();
-			if (isOES3Supported()) {
-				mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
-			} else {
-				mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(
-					GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-			}
+			mTexId = GLHelper.initTex(
+				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
 			if (BuildCheck.isAndroid4_1()) {
@@ -747,11 +742,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				mInputTexture = null;
 			}
 			if (mTexId != 0) {
-				if (isGLES3()) {
-					com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
-				} else {
-					com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
-				}
+				GLHelper.deleteTex(mTexId);
 				mTexId = 0;
 			}
 		}

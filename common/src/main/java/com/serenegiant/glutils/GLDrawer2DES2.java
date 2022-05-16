@@ -24,8 +24,6 @@ import android.opengl.GLES30;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.serenegiant.glutils.es2.GLHelper;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;

@@ -628,17 +628,17 @@ public abstract class GLSurface implements IGLSurface {
 			GLES20.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
 			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
-			com.serenegiant.glutils.es2.GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
+			GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
 			// フレームバッファにカラーバッファ(テクスチャ)を接続する
 			GLES20.glFramebufferTexture2D(GLES20.GL_FRAMEBUFFER, GLES20.GL_COLOR_ATTACHMENT0,
 				TEX_TARGET, mFBOTexId, 0);
-			com.serenegiant.glutils.es2.GLHelper.checkGlError("glFramebufferTexture2D");
+			GLHelper.checkGlError("glFramebufferTexture2D");
 
 			if (mHasDepthBuffer) {
 				// フレームバッファにデプスバッファを接続する
 				GLES20.glFramebufferRenderbuffer(GLES20.GL_FRAMEBUFFER,
 					GLES20.GL_DEPTH_ATTACHMENT, GLES20.GL_RENDERBUFFER, mDepthBufferObj);
-				com.serenegiant.glutils.es2.GLHelper.checkGlError("glFramebufferRenderbuffer");
+				GLHelper.checkGlError("glFramebufferRenderbuffer");
 			}
 
 			// 正常に終了したかどうかを確認する
@@ -714,10 +714,10 @@ public abstract class GLSurface implements IGLSurface {
 			}
 			// フレームバッファオブジェクトを生成してbindする
 			GLES20.glGenFramebuffers(1, ids, 0);
-			com.serenegiant.glutils.es2.GLHelper.checkGlError("glGenFramebuffers");
+			GLHelper.checkGlError("glGenFramebuffers");
 			mFrameBufferObj = ids[0];
 			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
-			com.serenegiant.glutils.es2.GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
+			GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
 
 			// デフォルトのフレームバッファに戻す
 			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
@@ -761,12 +761,12 @@ public abstract class GLSurface implements IGLSurface {
 		protected int genTexture(final int tex_target, final int tex_unit,
 			final int tex_width, final int tex_height) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = com.serenegiant.glutils.es2.GLHelper.initTex(tex_target, tex_unit,
+			final int tex_name = GLHelper.initTex(tex_target, tex_unit,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
 			GLES20.glTexImage2D(tex_target, 0, GLES20.GL_RGBA, tex_width, tex_height, 0,
 				GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
-			com.serenegiant.glutils.es2.GLHelper.checkGlError("glTexImage2D");
+			GLHelper.checkGlError("glTexImage2D");
 			return tex_name;
 		}
 	}	// GLSurfaceGLES2
@@ -864,17 +864,17 @@ public abstract class GLSurface implements IGLSurface {
 			GLES30.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
 			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFrameBufferObj);
-			com.serenegiant.glutils.es3.GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
+			GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
 			// フレームバッファにカラーバッファ(テクスチャ)を接続する
 			GLES30.glFramebufferTexture2D(GLES30.GL_FRAMEBUFFER, GLES30.GL_COLOR_ATTACHMENT0,
 				TEX_TARGET, mFBOTexId, 0);
-			com.serenegiant.glutils.es3.GLHelper.checkGlError("glFramebufferTexture2D");
+			GLHelper.checkGlError("glFramebufferTexture2D");
 
 			if (mHasDepthBuffer) {
 				// フレームバッファにデプスバッファを接続する
 				GLES30.glFramebufferRenderbuffer(GLES30.GL_FRAMEBUFFER,
 					GLES30.GL_DEPTH_ATTACHMENT, GLES30.GL_RENDERBUFFER, mDepthBufferObj);
-				com.serenegiant.glutils.es3.GLHelper.checkGlError("glFramebufferRenderbuffer");
+				GLHelper.checkGlError("glFramebufferRenderbuffer");
 			}
 
 			// 正常に終了したかどうかを確認する
@@ -951,10 +951,10 @@ public abstract class GLSurface implements IGLSurface {
 			}
 			// フレームバッファオブジェクトを生成してbindする
 			GLES30.glGenFramebuffers(1, ids, 0);
-			com.serenegiant.glutils.es3.GLHelper.checkGlError("glGenFramebuffers");
+			GLHelper.checkGlError("glGenFramebuffers");
 			mFrameBufferObj = ids[0];
 			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFrameBufferObj);
-			com.serenegiant.glutils.es3.GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
+			GLHelper.checkGlError("glBindFramebuffer " + mFrameBufferObj);
 
 			// デフォルトのフレームバッファに戻す
 			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
@@ -998,12 +998,12 @@ public abstract class GLSurface implements IGLSurface {
 		protected int genTexture(final int tex_target, final int tex_unit,
 			final int tex_width, final int tex_height) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = com.serenegiant.glutils.es3.GLHelper.initTex(tex_target, tex_unit,
+			final int tex_name = GLHelper.initTex(tex_target, tex_unit,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
 			GLES30.glTexImage2D(tex_target, 0, GLES30.GL_RGBA, tex_width, tex_height, 0,
 				GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null);
-			com.serenegiant.glutils.es3.GLHelper.checkGlError("glTexImage2D");
+			GLHelper.checkGlError("glTexImage2D");
 			return tex_name;
 		}
 	}	// GLSurfaceGLES3

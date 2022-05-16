@@ -43,7 +43,9 @@ import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
  * OpenGL|ES2/3用のヘルパークラス
+ * @deprecated glutils直下のGLHelperを使うこと
  */
+@Deprecated
 public final class GLHelper {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = GLHelper.class.getSimpleName();
@@ -165,7 +167,7 @@ public final class GLHelper {
 		Log.v(TAG, "GL_MAX_TEXTURE_IMAGE_UNITS=" + textureUnits[0]);
 		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
-			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
+			texIds[i] = initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
 				minFilter, magFilter, wrap);
 		}
 		return texIds;
@@ -222,7 +224,7 @@ public final class GLHelper {
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
 		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
-			texIds[i] = GLHelper.initTex(texTarget, texUnit,
+			texIds[i] = initTex(texTarget, texUnit,
 				minFilter, magFilter, wrap);
 		}
 		return texIds;

@@ -21,13 +21,13 @@ package com.serenegiant.glpipeline;
 import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLContext;
+import com.serenegiant.glutils.GLHelper;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
@@ -303,11 +303,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 		handleReleaseInputSurface();
 		makeDefault();
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		if (mGLContext.isOES3Supported()) {
-			mTexId = com.serenegiant.glutils.es3.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE0, GLES30.GL_NEAREST);
-		} else {
-			mTexId = com.serenegiant.glutils.es2.GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-		}
+		mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mInputTexture = new SurfaceTexture(mTexId);
 		mInputSurface = new Surface(mInputTexture);
 		if (BuildCheck.isAndroid4_1()) {
@@ -346,11 +342,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 			mInputTexture = null;
 		}
 		if (mTexId != 0) {
-			if (isGLES3) {
-				com.serenegiant.glutils.es3.GLHelper.deleteTex(mTexId);
-			} else {
-				com.serenegiant.glutils.es2.GLHelper.deleteTex(mTexId);
-			}
+			GLHelper.deleteTex(mTexId);
 			mTexId = 0;
 		}
 	}

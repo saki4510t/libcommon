@@ -25,8 +25,6 @@ import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.glutils.es2.GLHelper;
-
 import java.io.IOException;
 
 import androidx.annotation.NonNull;
