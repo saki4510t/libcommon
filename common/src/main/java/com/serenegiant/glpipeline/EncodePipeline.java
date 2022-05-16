@@ -201,7 +201,11 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		GLPipeline parent;
 		synchronized (mSync) {
 			parent = mParent;
-			if (mParent != null) {
+			if (mParent instanceof DistributePipeline) {
+				// 親がDistributePipelineの時は自分を取り除くだけ
+				((DistributePipeline) mParent).removePipeline(this);
+			} else if (mParent != null) {
+				// その他のGLPipelineの時は下流を繋ぐ
 				mParent.setPipeline(mPipeline);
 			}
 			mParent = null;

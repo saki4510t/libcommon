@@ -20,17 +20,22 @@ package com.serenegiant.glpipeline;
 
 import android.util.Log;
 
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 /**
- * GLPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのGLPipeline実装
+ * 複数のGLPipelineへテクスチャを分配するGLPipeline実装
+ * SurfaceDistributePipelineはSurfaceへ分配描画するのに対し
+ * DistributePipelineは下流のGLPipeline#onFrameAvailableを呼び出すだけ
  */
-public class ProxyPipeline implements GLPipeline {
+public class DistributePipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = ProxyPipeline.class.getSimpleName();
+	private static final String TAG = DistributePipeline.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
@@ -40,14 +45,15 @@ public class ProxyPipeline implements GLPipeline {
 	private int mWidth, mHeight;
 	@Nullable
 	private GLPipeline mParent;
-	@Nullable
-	private GLPipeline mPipeline;
+	@NonNull
+	private final Set<GLPipeline> mPipelines
+		= new CopyOnWriteArraySet<GLPipeline>();
 	private volatile boolean mReleased = false;
 
 	/**
 	 * デフォルトコンストラクタ
 	 */
-	public ProxyPipeline() {
+	public DistributePipeline() {
 		this(DEFAULT_WIDTH, DEFAULT_HEIGHT);
 	}
 
@@ -56,7 +62,7 @@ public class ProxyPipeline implements GLPipeline {
 	 * @param width
 	 * @param height
 	 */
-	protected ProxyPipeline(final int width, final int height) {
+	protected DistributePipeline(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if ((width > 0) || (height > 0)) {
 			mWidth = width;
@@ -88,15 +94,13 @@ public class ProxyPipeline implements GLPipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:" + this);
 		mReleased = true;
-		final GLPipeline pipeline;
 		synchronized (mSync) {
-			pipeline = mPipeline;
-			mPipeline = null;
 			mParent = null;
 		}
-		if (pipeline != null) {
+		for (final GLPipeline pipeline: mPipelines) {
 			pipeline.release();
 		}
+		mPipelines.clear();
 	}
 
 	@CallSuper
@@ -105,8 +109,7 @@ public class ProxyPipeline implements GLPipeline {
 		if (!mReleased) {
 			mWidth = width;
 			mHeight = height;
-			final GLPipeline pipeline = getPipeline();
-			if (pipeline != null) {
+			for (final GLPipeline pipeline: mPipelines) {
 				pipeline.resize(width, height);
 			}
 		} else {
@@ -131,7 +134,7 @@ public class ProxyPipeline implements GLPipeline {
 	 */
 	public boolean isActive() {
 		synchronized (mSync) {
-			return !mReleased && (mPipeline != null) && (mParent != null);
+			return !mReleased && !mPipelines.isEmpty() && (mParent != null);
 		}
 	}
 
@@ -160,6 +163,7 @@ public class ProxyPipeline implements GLPipeline {
 			throw new IllegalStateException("already released!");
 		}
 	}
+
 	@Nullable
 	@Override
 	public GLPipeline getParent() {
@@ -169,17 +173,45 @@ public class ProxyPipeline implements GLPipeline {
 	}
 
 	@CallSuper
+	public void addPipeline(@NonNull final GLPipeline pipeline) {
+		if (!mReleased) {
+			mPipelines.add(pipeline);
+			pipeline.setParent(this);
+			pipeline.resize(mWidth, mHeight);
+		} else {
+			throw new IllegalStateException("already released!");
+		}
+	}
+
+	@CallSuper
+	public void removePipeline(@NonNull final GLPipeline pipeline) {
+		if (!mReleased) {
+			mPipelines.remove(pipeline);
+			pipeline.setParent(null);
+		} else {
+			throw new IllegalStateException("already released!");
+		}
+	}
+
+	/**
+	 * 下流のGLPipelineを追加する
+	 * 通常のGLPipelineと異なり
+	 * ・2回以上呼び出した場合も置換ではなく追加となる
+	 * ・nullを渡すとIllegalArgumentExceptionを投げる
+	 * #addPipeline/#removePipelineを使う方が良い
+	 * @param pipeline
+	 */
+	@CallSuper
 	@Override
 	public void setPipeline(@Nullable final GLPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
+		if (pipeline == null) {
+			throw new IllegalArgumentException("DistributePipeline#setPipeline can't accept null!");
+		}
 		if (!mReleased) {
-			synchronized (mSync) {
-				mPipeline = pipeline;
-			}
-			if (pipeline != null) {
-				pipeline.setParent(this);
-				pipeline.resize(mWidth, mHeight);
-			}
+			mPipelines.add(pipeline);
+			pipeline.setParent(this);
+			pipeline.resize(mWidth, mHeight);
 		} else {
 			throw new IllegalStateException("already released!");
 		}
@@ -187,11 +219,17 @@ public class ProxyPipeline implements GLPipeline {
 
 	@Nullable
 	public GLPipeline getPipeline() {
-		synchronized (mSync) {
-			return mPipeline;
+		// 最初に見つかった物またはnullを返す
+		for (final GLPipeline pipeline: mPipelines) {
+			return pipeline;
 		}
+		return null;
 	}
 
+	/**
+	 * 他のGLPipelineと違って自分の下流に複数のGLPipelineが存在している可能性があるので
+	 * 下流が1つでないければ自動的にはつなぎ替えることはできない
+	 */
 	@CallSuper
 	@Override
 	public void remove() {
@@ -200,15 +238,16 @@ public class ProxyPipeline implements GLPipeline {
 		GLPipeline parent;
 		synchronized (mSync) {
 			parent = mParent;
-			if (mParent instanceof DistributePipeline) {
-				// 親がDistributePipelineの時は自分を取り除くだけ
-				((DistributePipeline) mParent).removePipeline(this);
-			} else if (mParent != null) {
-				// その他のGLPipelineの時は下流を繋ぐ
-				mParent.setPipeline(mPipeline);
+			if (mParent != null) {
+				if (mPipelines.size() == 1) {
+					// 下流が1つだけならつなぎ替える
+					mParent.setPipeline(getPipeline());
+				} else {
+					mParent.setPipeline(null);
+					Log.d(TAG, "#remove can't rebuild pipeline chain!");
+				}
 			}
 			mParent = null;
-			mPipeline = null;
 		}
 		if (first != this) {
 			GLPipeline.validatePipelineChain(first);
@@ -223,12 +262,10 @@ public class ProxyPipeline implements GLPipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if (!mReleased) {
-			final GLPipeline pipeline;
-			synchronized (mSync) {
-				pipeline = mPipeline;
-			}
-			if (pipeline != null) {
-				pipeline.onFrameAvailable(isOES, texId, texMatrix);
+			for (final GLPipeline pipeline: mPipelines) {
+				if (pipeline != null) {
+					pipeline.onFrameAvailable(isOES, texId, texMatrix);
+				}
 			}
 		}
 	}
@@ -236,11 +273,7 @@ public class ProxyPipeline implements GLPipeline {
 	@Override
 	public void refresh() {
 		if (!mReleased) {
-			final GLPipeline pipeline;
-			synchronized (mSync) {
-				pipeline = mPipeline;
-			}
-			if (pipeline != null) {
+			for (final GLPipeline pipeline: mPipelines) {
 				pipeline.refresh();
 			}
 		}
