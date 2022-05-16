@@ -65,7 +65,6 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	private final Handler mGLHandler;
 	@NonNull
 	private final PipelineSourceCallback mCallback;
-	private final boolean isGLES3;
 
 	@Size(min=16)
 	@NonNull
@@ -123,7 +122,6 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 			mGLHandler = manager.createGLHandler(handlerCallback);
 		}
 		mGLContext = mManager.getGLContext();
-		isGLES3 = mGLContext.isGLES3();
 		mCallback = callback;
 		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
 	}
