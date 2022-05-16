@@ -192,7 +192,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
@@ -207,7 +207,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 */
 	override fun getGLManager(): GLManager {
 		return mGLManager

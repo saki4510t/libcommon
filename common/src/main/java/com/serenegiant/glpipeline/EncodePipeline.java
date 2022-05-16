@@ -45,7 +45,7 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * MediaCodecの映像エンコーダーでエンコードするためのIPipeline/AbstractVideoEncoder実装
+ * MediaCodecの映像エンコーダーでエンコードするためのGLPipeline/AbstractVideoEncoder実装
  */
 @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
@@ -117,7 +117,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * @param width
 	 * @param height
 	 * @throws IllegalStateException
@@ -132,7 +132,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * @return
 	 */
 	@Override
@@ -141,7 +141,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * パイプラインチェーンに組み込まれているかどうかを取得
 	 * @return
 	 */
@@ -169,7 +169,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * @param pipeline
 	 */
 	@Override
@@ -185,7 +185,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * @return
 	 */
 	@Nullable
@@ -216,7 +216,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 
 	private int cnt;
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
@@ -236,7 +236,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		synchronized (mSync) {
 			pipeline = mPipeline;
 			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-				// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
 					mDrawer.release();
 				}
@@ -247,7 +247,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			target = mRendererTarget;
 		}
 		if (pipeline != null) {
-			// 次のIPipelineへつなぐ
+			// 次のGLPipelineへつなぐ
 			pipeline.onFrameAvailable(isOES, texId, texMatrix);
 		}
 		if (!mReleased && !mRequestStop) {

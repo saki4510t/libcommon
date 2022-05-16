@@ -301,7 +301,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
@@ -317,7 +317,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 */
 	override fun getGLManager(): GLManager {
 		return mGLManager
@@ -383,7 +383,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineインスタンスを生成
+	 * GLPipelineインスタンスを生成
 	 * @param surface
 	 */
 	private fun createPipeline(surface: Any?, maxFps: Fraction?): GLPipeline {

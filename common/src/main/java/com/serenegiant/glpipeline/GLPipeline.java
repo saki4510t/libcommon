@@ -69,27 +69,28 @@ public interface GLPipeline {
 	public int getHeight();
 
 	/**
-	 * 呼び出し元のIPipelineインスタンスを設定する
+	 * 呼び出し元のGLPipelineインスタンスを設定する
 	 * @param parent
 	 */
 	public void setParent(@Nullable final GLPipeline parent);
 
 	/**
-	 * 呼び出しh元のIPipelineインスタンスを取得する
-	 * nullなら最上位(たぶんIPipelineSource)またはパイプラインに未接続
+	 * 呼び出しh元のGLPipelineインスタンスを取得する
+	 * nullなら最上位(たぶんGLPipelineSource)またはパイプラインに未接続
 	 * @return
 	 */
 	@Nullable
 	public GLPipeline getParent();
 
 	/**
-	 * 次に呼び出すIPipelineインスタンスをセットする
+	 * 次に呼び出すGLPipelineインスタンスをセットする
+	 * 既にパイプラインがセットされている場合は置き換える
 	 * @param pipeline
 	 */
 	public void setPipeline(@Nullable final GLPipeline pipeline);
 
 	/**
-	 * 次に呼び出すIPipelineインスタンス取得する
+	 * 次に呼び出すGLPipelineインスタンス取得する
 	 * @return
 	 */
 	@Nullable
@@ -119,8 +120,8 @@ public interface GLPipeline {
 	public void refresh();
 
 	/**
-	 * 指定したIPipelineの一番うしろにつながっているIPipelineを取得する。
-	 * 後ろにつながっているIPipelineがなければ引数のIPipelineを返す
+	 * 指定したGLPipelineの一番うしろにつながっているGLPipelineを取得する。
+	 * 後ろにつながっているGLPipelineがなければ引数のGLPipelineを返す
 	 * @param pipeline
 	 * @return
 	 */
@@ -136,8 +137,8 @@ public interface GLPipeline {
 	}
 
 	/**
-	 * 指定したIPipelineの一番前につながっているIPipeline(通常はIPipelineSourceのはず)を取得する。
-	 * 前につながっているIPipelineがなければ引数のIPipelineを返す
+	 * 指定したGLPipelineの一番前につながっているGLPipeline(通常はGLPipelineSourceのはず)を取得する。
+	 * 前につながっているGLPipelineがなければ引数のGLPipelineを返す
 	 * @param pipeline
 	 * @return
 	 */
@@ -153,10 +154,10 @@ public interface GLPipeline {
 	}
 
 	/**
-	 * パイプラインチェーンに含まれる指定したIPipelineオブジェクトを取得する
+	 * パイプラインチェーンに含まれる指定したGLPipelineオブジェクトを取得する
 	 * 複数存在する場合は最初に見つかったものを返す
 	 * @param pipeline
-	 * @param clazz IPipelineを実装したクラスのClassオブジェクト
+	 * @param clazz GLPipelineを実装したクラスのClassオブジェクト
 	 * @return 見つからなければnull
 	 */
 	@Nullable
@@ -174,7 +175,7 @@ public interface GLPipeline {
 	}
 
 	/**
-	 * 指定したIPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
+	 * 指定したGLPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
 	 * @param root
 	 * @return
 	 */
@@ -195,7 +196,7 @@ public interface GLPipeline {
 
 	/**
 	 * パイプラインチェーンが正しく繋がっているかどうかを検証
-	 * ProxyPipelineの継承クラスの場合はIPipeline#removeを呼び出したときに自動的に呼び出される
+	 * ProxyPipelineの継承クラスの場合はGLPipeline#removeを呼び出したときに自動的に呼び出される
 	 * @param root
 	 * @return
 	 */

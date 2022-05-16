@@ -217,7 +217,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
 		if (mVideoSource != null) {
@@ -230,7 +230,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		}
 	}
 
-	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
+	// GLPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	/**
 	 * VideoSourceインスタンスを生成

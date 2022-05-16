@@ -127,7 +127,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * 関連するリソースを廃棄する
 	 */
 	@Override
@@ -148,7 +148,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * GLManagerを取得する
 	 * @return
 	 */
@@ -160,7 +160,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * リサイズ要求
 	 * @param width
 	 * @param height
@@ -178,7 +178,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * VideoSourceオブジェクトが有効かどうかを取得
 	 * @return
 	 */
@@ -189,7 +189,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineSourceの実装
+	 * GLPipelineSourceの実装
 	 * 映像入力用のSurfaceTextureを取得
 	 * @return
 	 * @throws IllegalStateException
@@ -206,7 +206,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineSourceの実装
+	 * GLPipelineSourceの実装
 	 * 映像入力用のSurfaceを取得
 	 * @return
 	 * @throws IllegalStateException
@@ -223,7 +223,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineSourceの実装
+	 * GLPipelineSourceの実装
 	 * テクスチャ名を取得
 	 * @return
 	 */
@@ -233,7 +233,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	}
 
 	/**
-	 * IPipelineSourceの実装
+	 * GLPipelineSourceの実装
 	 * テクスチャ変換行列を取得
 	 * @return
 	 */

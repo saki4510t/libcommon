@@ -24,7 +24,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
- * Surfaceへの描画が可能なIPipelineインターフェース
+ * Surfaceへの描画が可能なGLPipelineインターフェース
  */
 public interface GLSurfacePipeline extends GLPipeline {
 	/**
@@ -65,7 +65,7 @@ public interface GLSurfacePipeline extends GLPipeline {
 	public int getId();
 
 	/**
-	 * 指定したIPipelineが含まれるパイプラインチェーンから指定したidを持つSurfacePipelineを探す
+	 * 指定したGLPipelineが含まれるパイプラインチェーンから指定したidを持つSurfacePipelineを探す
 	 * @param pipeline
 	 * @param id
 	 * @return 見つかればSurfacePipeline, 見つからなければnull

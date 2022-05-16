@@ -36,7 +36,7 @@ import java.lang.annotation.RetentionPolicy;
 
 /**
  * 分配描画インターフェース
- * FIXME IPipeline/IPipelienSourceを使うIRendererHolder実装を作る
+ * FIXME GLPipeline/IPipelienSourceを使うIRendererHolder実装を作る
  */
 public interface IRendererHolder extends IRendererCommon {
 	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;

@@ -202,7 +202,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
 
-	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
+	// GLPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	/**
 	 * プレビュー表示用Surfaceを除去
@@ -219,7 +219,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 	}
 
 	/**
-	 * IPipelineViewの実装
+	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
 		if (mImageSource != null) {
@@ -232,7 +232,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		}
 	}
 
-	// IPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
+	// GLPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	private var mDrawer: GLDrawer2D? = null
 	private var cnt2 = 0

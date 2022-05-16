@@ -22,18 +22,18 @@ import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glutils.GLManager
 
 /**
- * IPipelineSource/IPipelineで描画処理分配処理を行うViewの共通メソッドを定義するインターフェース
+ * GLPipelineSource/GLPipelineで描画処理分配処理を行うViewの共通メソッドを定義するインターフェース
  */
 interface GLPipelineView {
 	/**
-	 * 指定したIPipelineオブジェクトをパイプラインチェーンに追加
-	 * (削除するときはIPipeline#removeを使うこと)
+	 * 指定したGLPipelineオブジェクトをパイプラインチェーンに追加
+	 * (削除するときはGLPipeline#removeを使うこと)
 	 * @param pipeline
 	 */
 	fun addPipeline(pipeline: GLPipeline)
 
 	/**
-	 * IPipeline/IPipelineSourceの処理に使うGLManagerインスタンスを取得する
+	 * GLPipeline/GLPipelineSourceの処理に使うGLManagerインスタンスを取得する
 	 */
 	fun getGLManager(): GLManager
 

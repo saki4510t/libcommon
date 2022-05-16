@@ -34,7 +34,7 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * テクスチャが更新されたときにSurfaceへ転送するIPipeline実装
+ * テクスチャが更新されたときにSurfaceへ転送するGLPipeline実装
  */
 public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
@@ -205,7 +205,7 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 			final RendererTarget target;
 			synchronized (mSync) {
 				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
-					// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 					if (mDrawer != null) {
 						mDrawer.release();
 					}

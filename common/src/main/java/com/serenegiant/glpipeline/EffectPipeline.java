@@ -38,8 +38,8 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.GLEffect.EFFECT_NON;
 
 /**
- * OpenGL|ESのシェーダーを使って映像効果付与をするIPipeline実装
- * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のIPipelineへ送る
+ * OpenGL|ESのシェーダーを使って映像効果付与をするGLPipeline実装
+ * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のGLPipelineへ送る
  */
 public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
@@ -50,7 +50,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * 複数存在する場合は最初に見つかったものを返す
 	 * @param pipeline
 	 * @return
-	 * @deprecated IPipeline#find(pipeline, clazz)を使う
+	 * @deprecated GLPipeline#find(pipeline, clazz)を使う
 	 */
 	@Deprecated
 	@Nullable
@@ -79,12 +79,12 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
-	 * 映像効果付与してそのまま次のIPipelineへ送るかSurfaceへ描画するか
+	 * 映像効果付与してそのまま次のGLPipelineへ送るかSurfaceへ描画するか
 	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
 	 */
 	private volatile boolean mEffectOnly;
 	/**
-	 * 映像効果付与してそのまま次のIPipelineへ送る場合のワーク用GLSurface
+	 * 映像効果付与してそのまま次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
 	private GLSurface work;
@@ -214,7 +214,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	}
 
 	/**
-	 * 映像効果付与をSurfaceへせずに次のIPipelineへ送るだけかどうか
+	 * 映像効果付与をSurfaceへせずに次のGLPipelineへ送るだけかどうか
 	 * コンストラクタまたはsetSurfaceで描画先のsurfaceにnullを指定するとtrue
 	 * @return
 	 */
@@ -242,7 +242,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			@Nullable
 			final RendererTarget target;
 			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-				// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
 					mDrawer.release();
 				}

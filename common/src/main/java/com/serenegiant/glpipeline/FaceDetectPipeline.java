@@ -41,7 +41,7 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * 顔検出をしてコールバックするIPipeline実装
+ * 顔検出をしてコールバックするGLPipeline実装
  */
 public class FaceDetectPipeline extends ProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
@@ -69,7 +69,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	 * パイプラインチェーンに含まれるEffectPipelineを取得する
 	 * 複数存在する場合は最初に見つかったものを返す
 	 * @param pipeline
-	 * @deprecated IPipeline#find(pipeline, clazz)を使う
+	 * @deprecated GLPipeline#find(pipeline, clazz)を使う
 	 */
 	@Deprecated
 	@Nullable
@@ -200,7 +200,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				width = getWidth();
 				height = getHeight();
 				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
-					// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 					if (mDrawer != null) {
 						mDrawer.release();
 					}

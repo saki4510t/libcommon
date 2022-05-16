@@ -28,7 +28,7 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * 映像ソースとなるIPipelineインターフェース
+ * 映像ソースとなるGLPipelineインターフェース
  */
 public interface GLPipelineSource extends GLPipeline {
 	/**

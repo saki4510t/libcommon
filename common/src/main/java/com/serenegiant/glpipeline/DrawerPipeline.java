@@ -35,8 +35,8 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * 任意のGLDrawer2D(とその継承クラス)を使って描画するIPipeline実装
- * 描画先のsurfaceにnullを指定すると描画後のテクスチャを次のIPipelineへ送る
+ * 任意のGLDrawer2D(とその継承クラス)を使って描画するGLPipeline実装
+ * 描画先のsurfaceにnullを指定すると描画後のテクスチャを次のGLPipelineへ送る
  */
 public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = true;	// set false on production
@@ -99,12 +99,12 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
-	 * 描画処理した後のテクスチャを次のIPipelineへ送るかSurfaceへ描画するか
+	 * 描画処理した後のテクスチャを次のGLPipelineへ送るかSurfaceへ描画するか
 	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
 	 */
 	private volatile boolean mDrawOnly;
 	/**
-	 * 描画処理した結果を次のIPipelineへ送る場合のワーク用GLSurface
+	 * 描画処理した結果を次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
 	private GLSurface offscreenSurface;
@@ -237,7 +237,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	}
 
 	/**
-	 * 描画処理した後のテクスチャを次のIPipelineへ送るかSurfaceへ描画するか
+	 * 描画処理した後のテクスチャを次のGLPipelineへ送るかSurfaceへ描画するか
 	 * コンストラクタまたはsetSurfaceで描画先のsurfaceにnullを指定するとtrue
 	 * @return
 	 */
@@ -265,7 +265,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-			// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			if (mDrawer != null) {
 				mCallback.releaseDrawer(mManager, mDrawer);
 			}

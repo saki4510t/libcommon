@@ -39,8 +39,8 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.ShaderConst.*;
 
 /**
- * OpenGL|ESのシェーダーを使って映像にマスク処理するIPipeline実装
- * 描画先のsurfaceにnullを指定するとマスク処理したテクスチャを次のIPipelineへ送る
+ * OpenGL|ESのシェーダーを使って映像にマスク処理するGLPipeline実装
+ * 描画先のsurfaceにnullを指定するとマスク処理したテクスチャを次のGLPipelineへ送る
  */
 public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = true;	// set false on production
@@ -56,12 +56,12 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
-	 * マスク処理してそのまま次のIPipelineへ送るかSurfaceへ描画するか
+	 * マスク処理してそのまま次のGLPipelineへ送るかSurfaceへ描画するか
 	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
 	 */
 	private volatile boolean mMaskOnly;
 	/**
-	 * 映像効果付与してそのまま次のIPipelineへ送る場合のワーク用GLSurface
+	 * 映像効果付与してそのまま次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
 	private GLSurface work;
@@ -203,7 +203,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	}
 
 	/**
-	 * マスク処理をせずに次のIPipelineへ送るだけかどうか
+	 * マスク処理をせずに次のGLPipelineへ送るだけかどうか
 	 * コンストラクタまたはsetSurfaceで描画先のsurfaceにnullを指定するとtrue
 	 * @return
 	 */
@@ -226,7 +226,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
-			// 初回またはIPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			releaseDrawerOnGL();
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = createDrawerOnGL( mManager.isGLES3(), isOES);

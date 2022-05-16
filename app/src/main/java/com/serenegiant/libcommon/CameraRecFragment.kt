@@ -169,7 +169,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 			val first = GLPipeline.findFirst(pipeline)
 			if (DEBUG) Log.v(TAG, "stopEncoder:before=${GLPipeline.pipelineString(first)}")
 			pipeline.remove()
-//			IPipeline.validatePipelineChain(first)
+//			GLPipeline.validatePipelineChain(first)
 			if (DEBUG) Log.v(TAG, "stopEncoder:after=${GLPipeline.pipelineString(first)}")
 		}
 		mVideoEncoder = null

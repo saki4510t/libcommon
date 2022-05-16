@@ -26,7 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 /**
- * IPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのIPipeline実装
+ * GLPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのGLPipeline実装
  */
 public class ProxyPipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
@@ -115,7 +115,7 @@ public class ProxyPipeline implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * オブジェクトが有効かどうかを取得
 	 * @return
 	 */
@@ -125,7 +125,7 @@ public class ProxyPipeline implements GLPipeline {
 	}
 
 	/**
-	 * IPipelineの実装
+	 * GLPipelineの実装
 	 * パイプラインチェーンに組み込まれているかどうかを取得
 	 * @return
 	 */
@@ -146,7 +146,7 @@ public class ProxyPipeline implements GLPipeline {
 	}
 
 	/**
-	 * 呼び出し元のIPipelineインスタンスを設定する
+	 * 呼び出し元のGLPipelineインスタンスを設定する
 	 * @param parent
 	 */
 	@CallSuper
