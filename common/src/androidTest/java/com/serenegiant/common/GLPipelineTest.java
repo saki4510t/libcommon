@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSource;
 import com.serenegiant.glpipeline.ProxyPipeline;
@@ -268,6 +269,81 @@ public class GLPipelineTest {
 //			dump(b);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void distributePipeline() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = new GLManager();
+		final DistributePipeline distributor = new DistributePipeline();
+		final ImageSource source = new ImageSource(manager, original, null);
+		source.setPipeline(distributor);
+
+		final Semaphore sem1 = new Semaphore(0);
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline1 = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt1.incrementAndGet() >= 30) {
+					this.remove();
+					if (sem1.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE0, texId, WIDTH, HEIGHT);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer1, WIDTH, HEIGHT);
+						sem1.release();
+					}
+				}
+			}
+		};
+		distributor.addPipeline(pipeline1);
+
+		final Semaphore sem2 = new Semaphore(0);
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline2 = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt2.incrementAndGet() >= 30) {
+					this.remove();
+					if (sem2.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE0, texId, WIDTH, HEIGHT);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer2, WIDTH, HEIGHT);
+						sem2.release();
+					}
+				}
+			}
+		};
+		distributor.addPipeline(pipeline2);
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem1.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem2.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result1 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result1.copyPixelsFromBuffer(buffer1);
+//			dump(result1);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitMapEquals(original, result1));
+
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result2 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result2.copyPixelsFromBuffer(buffer2);
+//			dump(result2);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitMapEquals(original, result2));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
