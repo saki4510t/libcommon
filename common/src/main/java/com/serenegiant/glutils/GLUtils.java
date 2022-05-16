@@ -28,10 +28,13 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -165,4 +168,35 @@ public class GLUtils {
 		return (glTextureUnit >= GLES20.GL_TEXTURE0) && (glTextureUnit <= GLES20.GL_TEXTURE31)
 			? glTextureUnit - GLES20.GL_TEXTURE0 : 0;
 	}
+
+	/**
+	 * GLES20.glReadPixelsのヘルパーメソッド
+	 * RGBA8888として読み取る(=1ピクセル4バイト)
+	 * orderをLITTLE_ENDIANにセットするのでBitmap#copyPixelsFromBufferへ直接引き渡すことができる
+	 * @param buffer nullまたはサイズが小さいかまたはでないときは新規生成する
+	 * @param width
+	 * @param height
+	 * @return 読み取ったピクセルデータの入ったByteBuffer, orderはLITTLE_ENDIAN
+	 */
+	public static ByteBuffer glReadPixels(
+		@Nullable final ByteBuffer buffer,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
+
+		ByteBuffer buf = buffer;
+		if ((buf == null) || (buf.capacity() < width * height * 8)) {
+
+			buf = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
+		}
+		if ((buf.order() != ByteOrder.LITTLE_ENDIAN)) {
+			buf.order(ByteOrder.LITTLE_ENDIAN);
+		}
+		buf.clear();
+		// XXX GL|ES3の時はPBOとglMapBufferRange/glUnmapBufferを使うようにする?
+		GLES20.glReadPixels(0, 0, width, height,
+			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
+		buf.flip();
+
+		return buf;
+	}
+
 }
