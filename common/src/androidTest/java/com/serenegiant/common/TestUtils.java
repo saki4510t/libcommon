@@ -23,9 +23,11 @@ public class TestUtils {
 		if ((a.getWidth() == b.getWidth())
 			&& (a.getHeight() == b.getHeight()
 			&& (a.getConfig() == b.getConfig()))) {
+			final int w = a.getWidth();
+			final int h = a.getHeight();
 			result = true;
-LOOP:		for (int y = a.getHeight() - 1; y >= 0; y--) {
-				for (int x = a.getWidth() - 1; x >= 0; x--) {
+LOOP:		for (int y = 0; y < h; y++) {
+				for (int x = 0; x < w; x++) {
 					if (!a.getColor(x, y).equals(b.getColor(x, y))) {
 						Log.w(TAG, String.format("ピクセルが違う@(%dx%d),a=0x%08x,b=0x%08x",
 							x, y, a.getColor(x, y).toArgb(), b.getColor(x, y).toArgb()));
@@ -41,4 +43,23 @@ LOOP:		for (int y = a.getHeight() - 1; y >= 0; y--) {
 		return result;
 	}
 
+	/**
+	 * 指定したビットマップのピクセルのうち0以外を16進文字列としてlogCatへ出力する
+	 * @param bitmap
+	 */
+	public static void dump(@NonNull final Bitmap bitmap) {
+		final StringBuilder sb = new StringBuilder();
+		final int w = bitmap.getWidth();
+		final int h = bitmap.getHeight();
+		Log.i(TAG, String.format("dump:(%dx%d)", w, h));
+		for (int y = 0; y < h; y++) {
+			for (int x = 0; x < w; x++) {
+				final int cl = bitmap.getColor(x, y).toArgb();
+				if (cl != 0) {
+					sb.append(String.format("%08x", cl));
+				}
+			}
+		}
+		Log.i(TAG, "dump:" + sb.toString());
+	}
 }
