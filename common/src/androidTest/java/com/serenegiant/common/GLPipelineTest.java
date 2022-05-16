@@ -20,10 +20,15 @@ package com.serenegiant.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.glpipeline.GLPipeline;
+import com.serenegiant.glpipeline.ImageSource;
 import com.serenegiant.glpipeline.ProxyPipeline;
+import com.serenegiant.glutils.GLManager;
+import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -31,6 +36,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
@@ -41,15 +50,18 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import static com.serenegiant.common.TestUtils.*;
+
 @RunWith(AndroidJUnit4.class)
 public class GLPipelineTest {
 	private static final String TAG = GLPipelineTest.class.getSimpleName();
 
-	private Bitmap checkerBitmap;
+	private static final int WIDTH = 100;
+	private static final int HEIGHT = 100;
+
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
-		checkerBitmap = BitmapHelper.makeCheckBitmap();
 	}
 
 	@After
@@ -203,6 +215,62 @@ public class GLPipelineTest {
 		assertEquals(LOOP_NUM * 3, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
 		assertEquals(LOOP_NUM * 2, cnt3.get());
+	}
+
+	@Test
+	public void imageSource() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = new GLManager();
+		final ImageSource source = new ImageSource(manager, original, null);
+		Throwable ex = null;
+		try {
+			source.getInputSurface();
+		} catch (final Exception e) {
+			ex = e;
+		}
+		assertTrue(ex instanceof UnsupportedOperationException);
+		try {
+			source.getInputSurfaceTexture();
+		} catch (final Exception e) {
+			ex = e;
+		}
+		assertTrue(ex instanceof UnsupportedOperationException);
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE0, texId, WIDTH, HEIGHT);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+		source.setPipeline(pipeline);
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
 	}
 
 	/**
