@@ -24,5 +24,5 @@ public interface GLConst {
 	/**
 	 * 無効なテクスチャ名/テクスチャID
 	 */
-	public static final int NO_TEXTURE = -1;
+	public static final int GL_NO_TEXTURE = -1;
 }

@@ -112,7 +112,7 @@ public class MediaEffectDrawer {
 		 */
 		protected void bindTexture(@NonNull final int[] tex_ids) {
 			GLES20.glActiveTexture(TEX_NUMBERS[0]);
-			if (tex_ids[0] != NO_TEXTURE) {
+			if (tex_ids[0] != GL_NO_TEXTURE) {
 				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
 			}
@@ -298,7 +298,7 @@ public class MediaEffectDrawer {
 		final int n = tex_ids.length < muTexLoc.length
 			? tex_ids.length : muTexLoc.length;
 		for (int i = 0; i < n; i++) {
-			if (tex_ids[i] != NO_TEXTURE) {
+			if (tex_ids[i] != GL_NO_TEXTURE) {
 				GLES20.glActiveTexture(TEX_NUMBERS[i]);
 				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);

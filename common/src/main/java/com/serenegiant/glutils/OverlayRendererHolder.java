@@ -257,7 +257,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			mOverlaySurface = null;
 			if (mOverlayTexId >= 0) {
 				GLHelper.deleteTex(mOverlayTexId);
-				mOverlayTexId = NO_TEXTURE;
+				mOverlayTexId = GL_NO_TEXTURE;
 			}
 			super.internalOnStop();
 		}

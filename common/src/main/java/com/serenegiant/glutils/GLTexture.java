@@ -30,8 +30,6 @@ import java.io.IOException;
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
-import static com.serenegiant.glutils.ShaderConst.*;
-
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
@@ -383,7 +381,7 @@ public class GLTexture implements IGLSurface {
 	private void releaseTexture() {
 		if (mTextureId >= 0) {
 			GLHelper.deleteTex(mTextureId);
-			mTextureId = NO_TEXTURE;
+			mTextureId = GL_NO_TEXTURE;
 		}
 	}
 
