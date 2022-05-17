@@ -22,6 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -53,16 +54,53 @@ public class BitmapHelperTest {
 	}
 
 	/**
-	 * パイプラインの接続・切断・検索が正常に動作するかどうかを確認
+	 * BitmapHelper#invertAlphaのテスト
 	 */
 	@Test
-	public void invert() {
+	public void invertAlpha() {
 		final Bitmap b0 = BitmapHelper.genMaskImage(
 			0, 200, 200,60,
 			Color.RED,0, 100);
 		final Bitmap inverted = BitmapHelper.invertAlpha(b0);
 		// 2回アルファ値を反転させると元と一致するはず
 		assertTrue(bitMapEquals(b0, BitmapHelper.invertAlpha(inverted)));
+	}
+
+	/**
+	 * BitmapHelper#applyMirrorのテスト
+	 */
+	@Test
+	public void applyMirror() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			200, 200,15, 18,
+			Bitmap.Config.ARGB_8888);
+
+		final Bitmap normal = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_NORMAL);
+		assertTrue(bitMapEquals(original, normal));
+
+		// 左右反転
+		final Bitmap flipHorizontal = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_HORIZONTAL);
+		assertFalse(bitMapEquals(original, flipHorizontal));
+		// 2回左右反転させると元と一致するはず
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipHorizontal, IRendererCommon.MIRROR_HORIZONTAL)));
+
+		// 上下反転
+		final Bitmap flipVertical = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_VERTICAL);
+		assertFalse(bitMapEquals(original, flipVertical));
+		// 2回上下反転させると元と一致するはず
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipVertical, IRendererCommon.MIRROR_VERTICAL)));
+
+		// 上下左右反転
+		final Bitmap flipBoth = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_BOTH);
+		assertFalse(bitMapEquals(original, flipBoth));
+		// 2回上下反転させると元と一致するはず
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipBoth, IRendererCommon.MIRROR_BOTH)));
+
+		// 上下左右反転を左右反転して上下反転
+		assertTrue(bitMapEquals(original,
+			BitmapHelper.applyMirror(
+				BitmapHelper.applyMirror(flipBoth, IRendererCommon.MIRROR_HORIZONTAL),
+				IRendererCommon.MIRROR_VERTICAL)));
 	}
 
 }
