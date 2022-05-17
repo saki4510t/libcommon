@@ -31,7 +31,7 @@ import androidx.annotation.Size;
  * Surface等の描画先のオブジェクトと関係する設定を保持するためのホルダークラス
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-public class RendererTarget {
+public class RendererTarget implements IRendererCommon {
 
 	/**
 	 * ファクトリーメソッド
@@ -58,6 +58,8 @@ public class RendererTarget {
 	@NonNull
 	private final float[] mMvpMatrix = new float[16];
 	private volatile boolean mEnable = true;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ, ファクトリーメソッドの使用を強制するためprotected
@@ -147,6 +149,24 @@ public class RendererTarget {
 	@NonNull
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
+	}
+
+	/**
+	 * モデルビュー変換行列に左右・上下反転をセット
+	 * @param mirror
+	 */
+	public void setMirror(@IRendererCommon.MirrorMode final int mirror) {
+		@MirrorMode
+		final int _mirror = mirror % IRendererCommon.MIRROR_NUM;
+		if (_mirror != mMirror) {
+			mMirror = _mirror;
+			GLUtils.setMirror(mMvpMatrix, _mirror);
+		}
+	}
+
+	@Override
+	public int getMirror() {
+		return mMirror;
 	}
 
 	public int width() {
