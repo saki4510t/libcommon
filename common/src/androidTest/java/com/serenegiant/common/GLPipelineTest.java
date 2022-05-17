@@ -20,7 +20,6 @@ package com.serenegiant.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
@@ -35,6 +34,7 @@ import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -359,7 +359,7 @@ public class GLPipelineTest {
 	public void surfacePipeline_videoSourcePipeline() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-		dump(original);
+//		dump(original);
 
 		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
 
@@ -416,15 +416,11 @@ public class GLPipelineTest {
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
-			dump(result);
+//			dump(result);
 			// 上下反転しているので元のビットマップと異なる
 			assertFalse(bitMapEquals(original, result));
-			// 上下反転
-			final Matrix m = new Matrix();
-			m.preScale(1, -1);
-			final Bitmap flippedBitmap = Bitmap.createBitmap(result, 0, 0, WIDTH, HEIGHT, m, true);
-			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitMapEquals(original, flippedBitmap));
+			// 上下反転させれば元のビットマップと同じはず
+			assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(result, IRendererCommon.MIRROR_VERTICAL)));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
