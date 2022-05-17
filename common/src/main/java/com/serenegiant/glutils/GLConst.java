@@ -29,4 +29,8 @@ public interface GLConst {
 	 * 無効なバッファ名/バッファID
 	 */
 	public static final int GL_NO_BUFFER = -1;
+	/**
+	 * 無効なシェーダープログラム名/シェーダープログラムID
+	 */
+	public  static final int GL_NO_PROGRAM = -1;
 }
