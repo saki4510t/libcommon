@@ -57,6 +57,7 @@ import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.utils.BitsHelper;
 import com.serenegiant.utils.UriHelper;
 
@@ -857,6 +858,38 @@ public final class BitmapHelper {
 			canvas.setBitmap(src);
 		}
 		return dest;
+	}
+
+	/**
+	 * ビットマップにミラー設定を適用
+	 * @param bitmap
+	 * @param mirror
+	 * @return
+	 */
+	public static Bitmap applyMirror(
+		@NonNull final Bitmap bitmap,
+		@IRendererCommon.MirrorMode final int mirror) {
+
+		final int _mirror = mirror % IRendererCommon.MIRROR_NUM;
+		if (_mirror == IRendererCommon.MIRROR_NORMAL) {
+			return bitmap;
+		} else {
+			final Matrix m = new Matrix();
+			switch (_mirror) {
+			case IRendererCommon.MIRROR_HORIZONTAL:
+				m.preScale(-1, 1);
+				break;
+			case IRendererCommon.MIRROR_VERTICAL:
+				m.preScale(1, -1);
+				break;
+			case IRendererCommon.MIRROR_BOTH:
+				m.preScale(-1, -1);
+				break;
+			default:
+				break;
+			}
+			return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
+		}
 	}
 
 //--------------------------------------------------------------------------------
