@@ -55,7 +55,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 import static org.junit.Assert.*;
 
 import static com.serenegiant.common.TestUtils.*;
-import static com.serenegiant.glutils.ShaderConst.*;
 
 @RunWith(AndroidJUnit4.class)
 public class GLPipelineTest {
