@@ -25,7 +25,7 @@ import java.io.IOException;
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
 
-public interface IGLSurface extends ISurface {
+public interface IGLSurface extends ISurface, GLConst {
 	/**
 	 * テクスチャが外部テクスチャかどうかを取得
 	 * @return

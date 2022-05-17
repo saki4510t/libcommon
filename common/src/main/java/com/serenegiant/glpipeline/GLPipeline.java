@@ -20,6 +20,8 @@ package com.serenegiant.glpipeline;
 
 import android.util.Log;
 
+import com.serenegiant.glutils.GLConst;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -28,7 +30,7 @@ import androidx.annotation.WorkerThread;
 /**
  * 映像受け取り・映像効果付与・プレビュー表示等を動的に組み合わせて逐次処理するためのインターフェース定義
  */
-public interface GLPipeline {
+public interface GLPipeline extends GLConst {
 	static final String TAG = GLPipeline.class.getSimpleName();
 
 	/**

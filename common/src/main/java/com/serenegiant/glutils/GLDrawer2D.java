@@ -38,7 +38,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
-public abstract class GLDrawer2D {
+public abstract class GLDrawer2D implements GLConst {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 

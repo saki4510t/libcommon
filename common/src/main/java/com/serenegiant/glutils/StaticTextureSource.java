@@ -28,14 +28,12 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_2D;
-
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
  * FIXME GLES30対応を実装する
  */
-public class StaticTextureSource {
+public class StaticTextureSource implements GLConst {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = StaticTextureSource.class.getSimpleName();
 

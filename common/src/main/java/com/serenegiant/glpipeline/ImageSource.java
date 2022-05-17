@@ -36,8 +36,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_2D;
-
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
  */
