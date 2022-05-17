@@ -28,10 +28,7 @@ import androidx.annotation.NonNull;
  * フラグメントシェーダーとかの文字列定数達を集める
  * FIXME これはまだGLES20のみなのでGLES30用のを作る
  */
-public class ShaderConst {
-	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;
-	public static final int GL_TEXTURE_2D           = 0x0DE1;
-
+public class ShaderConst implements GLConst {
 	public static final String SHADER_VERSION_ES2 = "#version 100\n";
 	public static final String SHADER_VERSION_ES3 = "#version 300 es\n";
 
@@ -44,8 +41,6 @@ public class ShaderConst {
 
 	public static final int KERNEL_SIZE3x3 = 9;
 	public static final int KERNEL_SIZE5x5 = 25;
-
-	public static final int NO_TEXTURE = -1;
 
 //--------------------------------------------------------------------------------
 	@Deprecated
