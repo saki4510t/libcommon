@@ -28,6 +28,8 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
+import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_2D;
+
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
@@ -209,7 +211,7 @@ public class StaticTextureSource {
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
 		private int mVideoWidth, mVideoHeight;
-		private GLSurface mImageSource;
+		private GLTexture mImageSource;
 
 		public RendererTask(final StaticTextureSource parent,
 			final int width, final int height, final float fps) {
@@ -531,7 +533,7 @@ public class StaticTextureSource {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if (mImageSource == null) {
-				mImageSource = GLSurface.newInstance(false, width, height, false);
+				mImageSource = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height);
 				GLHelper.checkGlError("handleSetBitmap");
 			}
 			mImageSource.loadBitmap(bitmap);

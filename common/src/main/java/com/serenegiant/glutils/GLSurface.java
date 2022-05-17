@@ -38,6 +38,7 @@ import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
+ * テクスチャへのオフスクリーン描画しないのであればGLTextureを使う方が良い
  */
 public abstract class GLSurface implements IGLSurface {
 	private static final boolean DEBUG = false;

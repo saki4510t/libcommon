@@ -20,20 +20,23 @@ package com.serenegiant.glpipeline;
 
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.glutils.GLTexture;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
+
+import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_2D;
 
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
@@ -53,7 +56,7 @@ public class ImageSource extends ProxyPipeline implements GLPipelineSource {
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
-	private GLSurface mImageSource;
+	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
 
 	/**
@@ -219,7 +222,7 @@ public class ImageSource extends ProxyPipeline implements GLPipelineSource {
 		synchronized (mSync) {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
-				mImageSource = GLSurface.newInstance(mManager.isGLES3(), width, height);
+				mImageSource = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height);
 				GLHelper.checkGlError("createImageSource");
 			}
 			mImageSource.loadBitmap(bitmap);
