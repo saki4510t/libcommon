@@ -21,5 +21,8 @@ package com.serenegiant.glutils;
 public interface GLConst {
 	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;
 	public static final int GL_TEXTURE_2D           = 0x0DE1;
+	/**
+	 * 無効なテクスチャ名/テクスチャID
+	 */
 	public static final int NO_TEXTURE = -1;
 }
