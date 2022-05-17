@@ -184,6 +184,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * テクスチャターゲット
 	 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 */
+	@TexTarget
 	protected final int mTexTarget;
 
 	protected int hProgram;
@@ -357,7 +358,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param offset
 	 */
 	public synchronized void draw(
-		final int texUnit, final int texId,
+		@TexUnit final int texUnit, final int texId,
 		@Nullable final float[] tex_matrix, final int offset) {
 
 		draw(texUnit, texId, tex_matrix, offset, mMvpMatrix, 0);
@@ -373,7 +374,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param mvp_offset
 	 */
 	public synchronized void draw(
-		final int texUnit, final int texId,
+		@TexUnit final int texUnit, final int texId,
 		@Nullable final float[] tex_matrix, final int tex_offset,
 		@Nullable final float[] mvp_matrix, final int mvp_offset) {
 
@@ -420,7 +421,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param texUnit
 	 * @param texId
 	 */
-	protected abstract void bindTexture(final int texUnit, final int texId);
+	protected abstract void bindTexture(@TexUnit final int texUnit, final int texId);
 
 	/**
 	 * 頂点座標をセット
@@ -444,7 +445,9 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
 	 */
 	@Deprecated
-	public abstract int initTex();
+	public int initTex() {
+		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+	}
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
@@ -452,7 +455,9 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param texUnit
 	 * @return texture ID
 	 */
-	public abstract int initTex(final int texUnit);
+	public int initTex(final int texUnit) {
+		return GLHelper.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
+	}
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
@@ -461,14 +466,18 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param filterParam
 	 * @return
 	 */
-	public abstract int initTex(final int texUnit, final int filterParam);
+	public int initTex(@TexUnit final int texUnit, final int filterParam) {
+		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
+	}
 
 	/**
 	 * テクスチャ名破棄のヘルパーメソッド
 	 * GLHelper.deleteTexを呼び出すだけ
 	 * @param hTex
 	 */
-	public abstract void deleteTex(final int hTex);
+	public void deleteTex(final int hTex) {
+		GLHelper.deleteTex(hTex);
+	}
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーを変更する
@@ -518,7 +527,11 @@ public abstract class GLDrawer2D implements GLConst {
 		hProgram = GL_NO_PROGRAM;
 	}
 
-	protected abstract int loadShader(@NonNull final String vs, @NonNull final String fs);
+	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+		if (DEBUG) Log.v(TAG, "loadShader:");
+		return GLHelper.loadShader(vs, fs);
+	}
+
 	protected abstract void internalReleaseShader(final int program);
 
 	/**

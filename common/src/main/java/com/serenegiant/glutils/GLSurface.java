@@ -74,7 +74,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_unit,
+		@TexUnit final int tex_unit,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -121,7 +121,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_unit,
+		@TexUnit final int tex_unit,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -169,7 +169,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_unit,
+		@TexUnit final int tex_unit,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
@@ -193,7 +193,7 @@ public abstract class GLSurface implements IGLSurface {
 	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_unit, final int tex_id,
+		@TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -219,7 +219,7 @@ public abstract class GLSurface implements IGLSurface {
 	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_unit, final int tex_id,
+		@TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -247,7 +247,7 @@ public abstract class GLSurface implements IGLSurface {
 	@Deprecated
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		final int tex_target, final int tex_unit, final int tex_id,
+		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -271,7 +271,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		final int tex_unit, final int tex_id,
+		@TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -296,7 +296,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		final int tex_unit, final int tex_id,
+		@TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -323,7 +323,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		final int tex_target, final int tex_unit, final int tex_id,
+		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
@@ -339,7 +339,9 @@ public abstract class GLSurface implements IGLSurface {
 
 //================================================================================
 	protected final boolean isGLES3;
+	@TexTarget
 	protected final int TEX_TARGET;
+	@TexUnit
 	protected final int TEX_UNIT;
 	protected final boolean mHasDepthBuffer, mAdjustPower2;
 	protected boolean mWrappedTexture;
@@ -368,7 +370,7 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	@SuppressLint("NewApi")
 	private GLSurface(final boolean isGLES3,
-		final int tex_target, final int tex_unit, final int tex_id,
+		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
@@ -627,7 +629,7 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param adjust_power2
 		 */
 		private GLSurfaceES2(
-			final int tex_target, final int tex_unit, final int tex_id,
+			@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
 			final int width, final int height,
 			final boolean use_depth_buffer, final boolean adjust_power2) {
 
@@ -868,7 +870,7 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param adjust_power2
 		 */
 		private GLSurfaceES3(
-			final int tex_target, final int tex_unit, final int tex_id,
+			@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
 			final int width, final int height,
 			final boolean use_depth_buffer, final boolean adjust_power2) {
 

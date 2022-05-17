@@ -43,7 +43,7 @@ import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 /**
  * OpenGL|ES2/3用のヘルパークラス
  */
-public final class GLHelper {
+public final class GLHelper implements GLConst {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = GLHelper.class.getSimpleName();
 
@@ -61,9 +61,9 @@ public final class GLHelper {
             final String msg = op + ": glError 0x" + Integer.toHexString(error);
 			Log.e(TAG, msg);
 			Stacktrace.print();
-//         	if (DEBUG) {
-//	            throw new RuntimeException(msg);
-//       	}
+         	if (DEBUG) {
+	            throw new RuntimeException(msg);
+	       	}
         }
     }
 
@@ -74,7 +74,10 @@ public final class GLHelper {
 	 * @param filterParam テクスチャの補完方法を指定, min/mag共に同じ値になる, GL_LINEARとかGL_NEAREST
 	 * @return
 	 */
-	public static int initTex(final int texTarget, final int texUnit, final int filterParam) {
+	public static int initTex(
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
+		@MinMagFilter final int filterParam) {
+
 		return initTex(texTarget, texUnit,
 			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
 	}
@@ -88,8 +91,10 @@ public final class GLHelper {
 	 * @param wrap テクスチャのクランプ方法, GL_CLAMP_TO_EDGE等
 	 * @return
 	 */
-	public static int initTex(final int texTarget, final int texUnit,
-		final int minFilter, final int magFilter, final int wrap) {
+	public static int initTex(
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
+		@MinMagFilter final int minFilter, @MinMagFilter final int magFilter,
+		@Wrap final int wrap) {
 
 		if (DEBUG) Log.v(TAG, "initTex:target=" + texTarget);
 		final int[] tex = new int[1];
@@ -112,7 +117,7 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
-		final int texTarget, final int filterParam) {
+		@TexTarget final int texTarget, @MinMagFilter final int filterParam) {
 		
 		return initTexes(new int[n], texTarget,
 			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
@@ -126,7 +131,7 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int filterParam) {
+		@TexTarget final int texTarget, @MinMagFilter final int filterParam) {
 		
 		return initTexes(texIds, texTarget,
 			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
@@ -142,7 +147,9 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
-		final int texTarget, final int minFilter, final int magFilter, final int wrap) {
+		@TexTarget final int texTarget,
+		@MinMagFilter final int minFilter, @MinMagFilter final int magFilter,
+		@Wrap final int wrap) {
 		
 		return initTexes(new int[n], texTarget, minFilter, magFilter, wrap);
 	}
@@ -157,14 +164,16 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int minFilter, final int magFilter, final int wrap) {
+		@TexTarget final int texTarget,
+		@MinMagFilter final int minFilter, @MinMagFilter final int magFilter,
+		@Wrap final int wrap) {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
 		Log.v(TAG, "GL_MAX_TEXTURE_IMAGE_UNITS=" + textureUnits[0]);
 		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
-			texIds[i] = GLHelper.initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
+			texIds[i] = initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
 				minFilter, magFilter, wrap);
 		}
 		return texIds;
@@ -181,8 +190,9 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(final int n,
-		final int texTarget, final int texUnit,
-			final int minFilter, final int magFilter, final int wrap) {
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
+		@MinMagFilter final int minFilter, @MinMagFilter final int magFilter,
+		@Wrap final int wrap) {
 
 		return initTexes(new int[n], texTarget, texUnit,
 			minFilter, magFilter, wrap);
@@ -197,7 +207,8 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int texUnit, final int filterParam) {
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
+		@MinMagFilter final int filterParam) {
 		
 		return initTexes(texIds, texTarget, texUnit,
 			filterParam, filterParam, GLES20.GL_CLAMP_TO_EDGE);
@@ -214,14 +225,15 @@ public final class GLHelper {
 	 * @return
 	 */
 	public static int[] initTexes(@NonNull final int[] texIds,
-		final int texTarget, final int texUnit,
-		final int minFilter, final int magFilter, final int wrap) {
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
+		@MinMagFilter final int minFilter, @MinMagFilter final int magFilter,
+		@Wrap final int wrap) {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
 		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
-			texIds[i] = GLHelper.initTex(texTarget, texUnit,
+			texIds[i] = initTex(texTarget, texUnit,
 				minFilter, magFilter, wrap);
 		}
 		return texIds;
@@ -294,7 +306,9 @@ public final class GLHelper {
 		return createTextureWithTextContent(text, GLES20.GL_TEXTURE0);
 	}
 
-	public static int createTextureWithTextContent(@NonNull final String text, final int texUnit) {
+	public static int createTextureWithTextContent(
+		@NonNull final String text, @TexUnit final int texUnit) {
+
 		if (DEBUG) Log.v(TAG, "createTextureWithTextContent:");
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);

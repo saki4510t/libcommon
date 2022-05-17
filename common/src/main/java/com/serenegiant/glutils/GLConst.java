@@ -43,6 +43,11 @@ public interface GLConst {
 	 */
 	public  static final int GL_NO_PROGRAM = -1;
 
+// OpenGL|ES関係の定数は全て整数で型チェックができないので間違えて違う引数に
+// してしまうことがあるので、アノテーションでチェックできるように、
+// テクスチャターゲット、テクスチャユニット、補間方法、エッジのラップ/クランプ処理の
+// 定数用アノテーションを定義
+
 	@IntDef({
 		GL_TEXTURE_EXTERNAL_OES,
 		GLES11Ext.GL_TEXTURE_EXTERNAL_OES,
@@ -89,4 +94,24 @@ public interface GLConst {
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface TexUnit {}
+
+	@IntDef({
+		GLES20.GL_LINEAR,
+		GLES20.GL_NEAREST,
+		GLES30.GL_LINEAR,
+		GLES30.GL_NEAREST,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface MinMagFilter {}
+
+	@IntDef({
+		GLES20.GL_REPEAT,
+		GLES20.GL_MIRRORED_REPEAT,
+		GLES20.GL_CLAMP_TO_EDGE,
+		GLES30.GL_REPEAT,
+		GLES30.GL_MIRRORED_REPEAT,
+		GLES30.GL_CLAMP_TO_EDGE,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface Wrap {}
 }

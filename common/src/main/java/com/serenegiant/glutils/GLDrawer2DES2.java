@@ -78,7 +78,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	}
 
 	@Override
-	protected void bindTexture(final int texUnit, final int texId) {
+	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
 		GLES20.glActiveTexture(texUnit);
 		GLES20.glBindTexture(mTexTarget, texId);
 		GLES30.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
@@ -130,56 +130,6 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	protected void finishDraw() {
 		GLES20.glBindTexture(mTexTarget, 0);
         GLES20.glUseProgram(0);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * @return texture ID
-	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
-	 */
-	@Deprecated
-	@Override
-	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * @param texUnit
-	 * @return texture ID
-	 */
-	@Override
-	public int initTex(final int texUnit) {
-		return GLHelper.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * @param texUnit
-	 * @param filterParam
-	 * @return
-	 */
-	@Override
-	public int initTex(final int texUnit, final int filterParam) {
-		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
-	}
-
-	/**
-	 * テクスチャ名破棄のヘルパーメソッド
-	 * GLHelper.deleteTexを呼び出すだけ
-	 * @param hTex
-	 */
-	public void deleteTex(final int hTex) {
-		GLHelper.deleteTex(hTex);
-	}
-
-	@Override
-	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
-		if (DEBUG) Log.v(TAG, "loadShader:");
-		return GLHelper.loadShader(vs, fs);
 	}
 
 	/**

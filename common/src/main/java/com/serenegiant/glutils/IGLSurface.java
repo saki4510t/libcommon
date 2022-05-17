@@ -35,12 +35,14 @@ public interface IGLSurface extends ISurface, GLConst {
 	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
 	 * @return
 	 */
+	@TexTarget
 	public int getTexTarget();
 
 	/**
 	 * バックバッファとして使っているテクスチャのテクスチャユニット(GL_TEXTURE0-GL_TEXTURE31)を取得
 	 * @return
 	 */
+	@TexUnit
 	public int getTexUnit();
 
 	/**
