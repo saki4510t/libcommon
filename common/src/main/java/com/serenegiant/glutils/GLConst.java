@@ -41,7 +41,7 @@ public interface GLConst {
 	/**
 	 * 無効なシェーダープログラム名/シェーダープログラムID
 	 */
-	public  static final int GL_NO_PROGRAM = -1;
+	public static final int GL_NO_PROGRAM = -1;
 
 // OpenGL|ES関係の定数は全て整数で型チェックができないので間違えて違う引数に
 // してしまうことがあるので、アノテーションでチェックできるように、
