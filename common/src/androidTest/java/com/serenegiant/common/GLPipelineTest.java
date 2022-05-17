@@ -229,6 +229,9 @@ public class GLPipelineTest {
 
 		final GLManager manager = new GLManager();
 		final ImageSource source = new ImageSource(manager, original, null);
+		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
+		// #getInputSurfaceと#getInputSurfaceTextureはUnsupportedOperationExceptionを
+		// 返すことを検証
 		Throwable ex = null;
 		try {
 			source.getInputSurface();
