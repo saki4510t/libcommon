@@ -163,8 +163,12 @@ public class GLViewTransformer implements IGLViewTransformer {
 	 */
 	@NonNull
 	@Override
-	public GLViewTransformer setDefault(@NonNull @Size(min=16) final float[] transform) {
-		System.arraycopy(transform, 0, mDefaultTransform, 0, 16);
+	public GLViewTransformer setDefault(@Nullable @Size(min=16) final float[] transform) {
+		if ((transform == null) || (transform.length < 16)) {
+			Matrix.setIdentityM(mDefaultTransform, 0);
+		} else {
+			System.arraycopy(transform, 0, mDefaultTransform, 0, 16);
+		}
 		return this;
 	}
 
