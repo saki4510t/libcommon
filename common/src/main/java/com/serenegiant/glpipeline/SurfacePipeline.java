@@ -85,7 +85,6 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 			@Override
 			public void run() {
 				synchronized (mSync) {
-					mDrawer = GLDrawer2D.create(manager.isGLES3(), true);
 					if (surface != null) {
 						mRendererTarget = RendererTarget.newInstance(
 							manager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);

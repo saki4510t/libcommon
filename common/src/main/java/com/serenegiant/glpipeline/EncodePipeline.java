@@ -80,14 +80,6 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 
 		super(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener);
 		mManager = manager;
-		manager.runOnGLThread(new Runnable() {
-			@Override
-			public void run() {
-				synchronized (mSync) {
-					mDrawer = GLDrawer2D.create(manager.isGLES3(), true);
-				}
-			}
-		});
 	}
 
 	@Override

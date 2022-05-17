@@ -124,7 +124,6 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			@WorkerThread
 			@Override
 			public void run() {
-				mDrawer = new EffectDrawer2D(manager.isGLES3(), true, mEffectListener);
 				createTarget(surface, maxFps);
 			}
 		});

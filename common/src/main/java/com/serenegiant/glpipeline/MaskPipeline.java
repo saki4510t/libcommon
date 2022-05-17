@@ -111,7 +111,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			@Override
 			public void run() {
 				final boolean isGLES3 = manager.isGLES3();
-				mDrawer = createDrawerOnGL( mManager.isGLES3(), true);
 				createTargetOnGL(surface, maxFps);
 			}
 		});
