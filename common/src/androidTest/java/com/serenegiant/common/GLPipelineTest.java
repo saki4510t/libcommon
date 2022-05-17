@@ -20,13 +20,18 @@ package com.serenegiant.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.util.Log;
+import android.view.Surface;
 
 import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.GLPipeline;
+import com.serenegiant.glpipeline.GLPipelineSource;
 import com.serenegiant.glpipeline.ImageSource;
 import com.serenegiant.glpipeline.ProxyPipeline;
+import com.serenegiant.glpipeline.SurfacePipeline;
+import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
@@ -52,6 +57,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import static com.serenegiant.common.TestUtils.*;
+import static com.serenegiant.glutils.ShaderConst.*;
 
 @RunWith(AndroidJUnit4.class)
 public class GLPipelineTest {
@@ -344,6 +350,81 @@ public class GLPipelineTest {
 //			dump(result2);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitMapEquals(original, result2));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Test
+	public void surfacePipeline_videoSourcePipeline() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+		dump(original);
+
+		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+
+		final GLManager manager = new GLManager();
+		final ImageSource source = new ImageSource(manager, original, null);
+
+		final SurfacePipeline surfacePipeline = new SurfacePipeline(manager);
+		source.setPipeline(surfacePipeline);
+
+		final VideoSource videoSource = new VideoSource(manager, WIDTH, HEIGHT,
+			new GLPipelineSource.PipelineSourceCallback() {
+				@Override
+				public void onCreate(@NonNull final Surface surface) {
+					surfacePipeline.setSurface(surface);
+				}
+
+				@Override
+				public void onDestroy() {
+					surfacePipeline.setSurface(null);
+				}
+			});
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはVideoSourceからのテクスチャなのでisOES=trueのはず
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, texId,
+							WIDTH, HEIGHT, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+		videoSource.setPipeline(pipeline);
+
+		// SurfacePipelineとVideoSourceの間はSurfaceを経由したやりとりだけでGLPipelineとして接続しているわけではない
+		assertTrue(validatePipelineOrder(source, source, surfacePipeline));
+		assertTrue(validatePipelineOrder(videoSource, videoSource, pipeline));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+			dump(result);
+			// 上下反転しているので元のビットマップと異なる
+			assertFalse(bitMapEquals(original, result));
+			// 上下反転
+			final Matrix m = new Matrix();
+			m.preScale(1, -1);
+			final Bitmap flippedBitmap = Bitmap.createBitmap(result, 0, 0, WIDTH, HEIGHT, m, true);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitMapEquals(original, flippedBitmap));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
