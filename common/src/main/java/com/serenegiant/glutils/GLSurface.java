@@ -342,6 +342,7 @@ public abstract class GLSurface implements IGLSurface {
 	protected final int TEX_TARGET;
 	protected final int TEX_UNIT;
 	protected final boolean mHasDepthBuffer, mAdjustPower2;
+	protected boolean mWrappedTexture;
 	/** 描画領域サイズ */
 	protected int mWidth, mHeight;
 	/** テクスチャサイズ */
@@ -384,6 +385,8 @@ public abstract class GLSurface implements IGLSurface {
 			tex = genTexture(tex_target, tex_unit, mTexWidth, mTexHeight);
 		}
 		assignTexture(tex, width, height);
+		// assignTexture内で強制的にmWrappedTexture=trueになるので正しい値に上書き
+		mWrappedTexture = tex_id > GL_NO_TEXTURE;
 		setViewPort(0, 0, mWidth, mHeight);
 	}
 
@@ -697,6 +700,10 @@ public abstract class GLSurface implements IGLSurface {
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
+			if (!mWrappedTexture && (mFBOTexId > GL_NO_TEXTURE)) {
+				GLHelper.deleteTex(mFBOTexId);
+			}
+			mWrappedTexture = true;
 			mFBOTexId = texture_name;
 			GLES20.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
@@ -810,9 +817,8 @@ public abstract class GLSurface implements IGLSurface {
 				mDepthBufferObj = GL_NO_BUFFER;
 			}
 			// オフスクリーンのカラーバッファ用のテクスチャを破棄
-			if (mFBOTexId > GL_NO_TEXTURE) {
-				names[0] = mFBOTexId;
-				GLES20.glDeleteTextures(1, names, 0);
+			if (!mWrappedTexture && (mFBOTexId > GL_NO_TEXTURE)) {
+				GLHelper.deleteTex(mFBOTexId);
 				mFBOTexId = GL_NO_TEXTURE;
 			}
 			// オフスクリーンのフレームバッファーオブジェクトを破棄
@@ -840,6 +846,7 @@ public abstract class GLSurface implements IGLSurface {
 			GLES20.glTexImage2D(tex_target, 0, GLES20.GL_RGBA, tex_width, tex_height, 0,
 				GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 			GLHelper.checkGlError("glTexImage2D");
+			mWrappedTexture = false;
 			return tex_name;
 		}
 	}	// GLSurfaceGLES2
@@ -933,6 +940,10 @@ public abstract class GLSurface implements IGLSurface {
 				releaseFrameBuffer();
 				createFrameBuffer(width, height);
 			}
+			if (!mWrappedTexture && (mFBOTexId > GL_NO_TEXTURE)) {
+				GLHelper.deleteTex(mFBOTexId);
+			}
+			mWrappedTexture = true;
 			mFBOTexId = texture_name;
 			GLES30.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
@@ -1047,9 +1058,8 @@ public abstract class GLSurface implements IGLSurface {
 				mDepthBufferObj = GL_NO_BUFFER;
 			}
 			// オフスクリーンのカラーバッファ用のテクスチャを破棄
-			if (mFBOTexId > GL_NO_TEXTURE) {
-				names[0] = mFBOTexId;
-				GLES30.glDeleteTextures(1, names, 0);
+			if (!mWrappedTexture && (mFBOTexId > GL_NO_TEXTURE)) {
+				GLHelper.deleteTex(mFBOTexId);
 				mFBOTexId = GL_NO_TEXTURE;
 			}
 			// オフスクリーンのフレームバッファーオブジェクトを破棄
@@ -1077,6 +1087,7 @@ public abstract class GLSurface implements IGLSurface {
 			GLES30.glTexImage2D(tex_target, 0, GLES30.GL_RGBA, tex_width, tex_height, 0,
 				GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null);
 			GLHelper.checkGlError("glTexImage2D");
+			mWrappedTexture = false;
 			return tex_name;
 		}
 	}	// GLSurfaceGLES3
