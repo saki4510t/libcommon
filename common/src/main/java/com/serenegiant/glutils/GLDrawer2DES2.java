@@ -41,11 +41,11 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	/**
 	 * 頂点座標用バッファオブジェクト名
 	 */
-	private int mBufVertex;
+	private int mBufVertex = GL_NO_BUFFER;
 	/**
 	 * テクスチャ座標用バッファオブジェクト名
 	 */
-	private int mBufTexCoord;
+	private int mBufTexCoord = GL_NO_BUFFER;
 
 	/**
 	 * コンストラクタ
@@ -87,12 +87,12 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	@Override
 	protected void updateVertices() {
 		if (USE_VBO) {
-			if (mBufVertex <= 0) {
+			if (mBufVertex <= GL_NO_BUFFER) {
 				pVertex.clear();
 				mBufVertex = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pVertex, GLES20.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex," + mBufVertex);
 			}
-			if (mBufTexCoord <= 0) {
+			if (mBufTexCoord <= GL_NO_BUFFER) {
 				pTexCoord.clear();
 				mBufTexCoord = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pTexCoord, GLES20.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord," + mBufTexCoord);
@@ -139,13 +139,13 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	@Override
 	protected void internalReleaseShader(final int program) {
 		// バッファーオブジェクトを破棄
-		if (mBufVertex > 0) {
+		if (mBufVertex > GL_NO_BUFFER) {
 			GLHelper.deleteBuffer(mBufVertex);
-			mBufVertex = 0;
+			mBufVertex = GL_NO_BUFFER;
 		}
-		if (mBufTexCoord > 0) {
+		if (mBufTexCoord > GL_NO_BUFFER) {
 			GLHelper.deleteBuffer(mBufTexCoord);
-			mBufTexCoord = 0;
+			mBufTexCoord = GL_NO_BUFFER;
 		}
 		// シェーダーを破棄
 		GLES20.glDeleteProgram(program);
