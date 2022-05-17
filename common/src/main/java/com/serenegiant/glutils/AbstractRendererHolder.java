@@ -280,10 +280,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 分配描画用のSurfaceを指定した色で塗りつぶす
 	 * @param color
 	 */
+	@Override
 	public void clearSurfaceAll(final int color) {
 		mRendererTask.clearSurfaceAll(color);
 	}
 
+	@Override
 	public void setMvpMatrix(final int id,
 		final int offset, @NonNull @Size(min=16) final float[] matrix) {
 		mRendererTask.setMvpMatrix(id, offset, matrix);
