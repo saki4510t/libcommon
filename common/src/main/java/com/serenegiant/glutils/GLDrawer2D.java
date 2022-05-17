@@ -512,10 +512,10 @@ public abstract class GLDrawer2D implements GLConst {
 	 * シェーダーを破棄
 	 */
 	protected void releaseShader() {
-		if (hProgram >= 0) {
+		if (hProgram > GL_NO_PROGRAM) {
 			internalReleaseShader(hProgram);
 		}
-		hProgram = -1;
+		hProgram = GL_NO_PROGRAM;
 	}
 
 	protected abstract int loadShader(@NonNull final String vs, @NonNull final String fs);

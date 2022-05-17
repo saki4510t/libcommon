@@ -33,8 +33,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.annotation.Size;
 
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
-
 /**
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
@@ -58,10 +56,10 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, false, DEFAULT_ADJUST_POWER2);
 		}
 	}
@@ -80,11 +78,11 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		}
@@ -104,10 +102,10 @@ public abstract class GLSurface implements IGLSurface {
 		final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
@@ -127,11 +125,11 @@ public abstract class GLSurface implements IGLSurface {
 		final int width, final int height, final boolean use_depth_buffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		}
@@ -152,10 +150,10 @@ public abstract class GLSurface implements IGLSurface {
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, adjust_power2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, adjust_power2);
 		}
 	}
@@ -176,10 +174,10 @@ public abstract class GLSurface implements IGLSurface {
 		final boolean use_depth_buffer, final boolean adjust_power2) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, adjust_power2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, -1,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, adjust_power2);
 		}
 	}
@@ -349,9 +347,9 @@ public abstract class GLSurface implements IGLSurface {
 	/** テクスチャサイズ */
 	protected int mTexWidth, mTexHeight;
 	/** オフスクリーンのカラーバッファに使うテクスチャ名 */
-	protected int mFBOTexId = -1;
+	protected int mFBOTexId = GL_NO_TEXTURE;
 	/** // オフスクリーン用のバッファオブジェクト */
-	protected int mDepthBufferObj = -1, mFrameBufferObj = -1;
+	protected int mDepthBufferObj = GL_NO_BUFFER, mFrameBufferObj = GL_NO_BUFFER;
 	/** テクスチャ座標変換行列 */
 	@Size(min=16)
 	@NonNull
@@ -806,22 +804,22 @@ public abstract class GLSurface implements IGLSurface {
 		protected void releaseFrameBuffer() {
 			final int[] names = new int[1];
 			// デプスバッファがある時はデプスバッファを破棄
-			if (mDepthBufferObj >= 0) {
+			if (mDepthBufferObj > GL_NO_BUFFER) {
 				names[0] = mDepthBufferObj;
 				GLES20.glDeleteRenderbuffers(1, names, 0);
-				mDepthBufferObj = -1;
+				mDepthBufferObj = GL_NO_BUFFER;
 			}
 			// オフスクリーンのカラーバッファ用のテクスチャを破棄
-			if (mFBOTexId >= 0) {
+			if (mFBOTexId > GL_NO_TEXTURE) {
 				names[0] = mFBOTexId;
 				GLES20.glDeleteTextures(1, names, 0);
-				mFBOTexId = -1;
+				mFBOTexId = GL_NO_TEXTURE;
 			}
 			// オフスクリーンのフレームバッファーオブジェクトを破棄
-			if (mFrameBufferObj >= 0) {
+			if (mFrameBufferObj > GL_NO_BUFFER) {
 				names[0] = mFrameBufferObj;
 				GLES20.glDeleteFramebuffers(1, names, 0);
-				mFrameBufferObj = -1;
+				mFrameBufferObj = GL_NO_BUFFER;
 			}
 		}
 
@@ -1043,22 +1041,22 @@ public abstract class GLSurface implements IGLSurface {
 		protected void releaseFrameBuffer() {
 			final int[] names = new int[1];
 			// デプスバッファがある時はデプスバッファを破棄
-			if (mDepthBufferObj >= 0) {
+			if (mDepthBufferObj > GL_NO_BUFFER) {
 				names[0] = mDepthBufferObj;
 				GLES30.glDeleteRenderbuffers(1, names, 0);
-				mDepthBufferObj = -1;
+				mDepthBufferObj = GL_NO_BUFFER;
 			}
 			// オフスクリーンのカラーバッファ用のテクスチャを破棄
-			if (mFBOTexId >= 0) {
+			if (mFBOTexId > GL_NO_TEXTURE) {
 				names[0] = mFBOTexId;
 				GLES30.glDeleteTextures(1, names, 0);
-				mFBOTexId = -1;
+				mFBOTexId = GL_NO_TEXTURE;
 			}
 			// オフスクリーンのフレームバッファーオブジェクトを破棄
-			if (mFrameBufferObj >= 0) {
+			if (mFrameBufferObj > GL_NO_BUFFER) {
 				names[0] = mFrameBufferObj;
 				GLES30.glDeleteFramebuffers(1, names, 0);
-				mFrameBufferObj = -1;
+				mFrameBufferObj = GL_NO_BUFFER;
 			}
 		}
 

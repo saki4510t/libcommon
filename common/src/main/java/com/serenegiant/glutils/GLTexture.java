@@ -43,7 +43,7 @@ public class GLTexture implements IGLSurface {
 	private final int TEX_UNIT;
 	private final int FILTER_PARAM;
 	private final boolean ADJUST_POWER2;
-	private int mTextureId;
+	private int mTextureId = GL_NO_TEXTURE;
 	@Size(min=16)
 	@NonNull
 	private final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
@@ -182,7 +182,7 @@ public class GLTexture implements IGLSurface {
 
 	@Override
 	public boolean isValid() {
-		return mTextureId >= 0;
+		return mTextureId > GL_NO_TEXTURE;
 	}
 
 	/**
@@ -379,7 +379,7 @@ public class GLTexture implements IGLSurface {
 	}
 
 	private void releaseTexture() {
-		if (mTextureId >= 0) {
+		if (mTextureId > GL_NO_TEXTURE) {
 			GLHelper.deleteTex(mTextureId);
 			mTextureId = GL_NO_TEXTURE;
 		}
