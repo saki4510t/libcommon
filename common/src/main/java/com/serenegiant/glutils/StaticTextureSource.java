@@ -531,7 +531,7 @@ public class StaticTextureSource implements GLConst {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if (mImageSource == null) {
-				mImageSource = new GLTexture(GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height);
+				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
 				GLHelper.checkGlError("handleSetBitmap");
 			}
 			mImageSource.loadBitmap(bitmap);
