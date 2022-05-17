@@ -25,7 +25,6 @@ import static com.serenegiant.math.Fraction.*;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * com.serenegiant.math.Fraction用のローカルユニットテストクラス

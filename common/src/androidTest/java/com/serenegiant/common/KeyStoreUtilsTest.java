@@ -19,26 +19,19 @@ package com.serenegiant.common;
 */
 
 import android.content.Context;
-import android.content.SharedPreferences;
 
 import com.serenegiant.security.KeyStoreUtils;
 import com.serenegiant.security.ObfuscatorException;
-import com.serenegiant.system.EncryptedSharedPreferences;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.security.GeneralSecurityException;
-
-import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * KeyStoreUtils用のインスツルメンテーションテスト用クラス

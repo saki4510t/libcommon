@@ -22,7 +22,7 @@ import com.serenegiant.math.Vector;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 
 /**
  * com.serenegiant.Vector用のローカルユニットテストクラス
