@@ -3,6 +3,9 @@ package com.serenegiant.common;
 import android.graphics.Bitmap;
 import android.util.Log;
 
+import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.graphics.BitmapHelper;
+
 import androidx.annotation.NonNull;
 
 public class TestUtils {
@@ -61,5 +64,14 @@ LOOP:		for (int y = 0; y < h; y++) {
 			}
 		}
 		Log.i(TAG, "dump:" + sb.toString());
+	}
+
+	/**
+	 * ビットマップを上下反転
+	 * @param bitmap
+	 * @return
+	 */
+	public static Bitmap flipVertical(@NonNull final Bitmap bitmap) {
+		return BitmapHelper.applyMirror(bitmap, IRendererCommon.MIRROR_VERTICAL);
 	}
 }
