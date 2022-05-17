@@ -434,12 +434,12 @@ public class GLTexture implements IGLSurface {
 				GLES20.GL_RGBA,				// 引き渡すデータのフォーマット
 				GLES20.GL_UNSIGNED_BYTE,	// データの型
 				null);				// ピクセルデータ無し
-			// テクスチャ変換行列を初期化
-			Matrix.setIdentityM(mTexMatrix, 0);
 		} else {
 			mWidth = mTexWidth = width;
 			mHeight = mTexHeight = height;
 		}
+		// テクスチャ変換行列を初期化
+		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = mWidth / (float)mTexWidth;
 		mTexMatrix[5] = mHeight / (float)mTexHeight;
 		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),scale(%f,%f)",
