@@ -414,10 +414,16 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
+//--------------------------------------------------------------------------------
+//			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
+//			assertTrue(bitMapEquals(original, result));
+//--------------------------------------------------------------------------------
+			// GLDrawer2Dのテクスチャ座標配列で上下反転させているときはこっち
 			// 上下反転しているので元のビットマップと異なる
 			assertFalse(bitMapEquals(original, result));
 			// 上下反転させれば元のビットマップと同じはず
 			assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(result, IRendererCommon.MIRROR_VERTICAL)));
+//--------------------------------------------------------------------------------
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
