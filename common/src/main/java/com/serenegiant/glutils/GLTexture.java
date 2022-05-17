@@ -39,11 +39,106 @@ public class GLTexture implements IGLSurface {
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * テクスチャターゲットはGL_TEXTURE_2D
+	 * テクスチャユニットはGL_TEXTURE0固定なので複数同時には使用できない
+	 * filter_paramはGLES30.GL_LINEAR
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 */
+	public static GLTexture newInstance(final int width, final int height) {
+		return new GLTexture(
+			GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
+			width, height, DEFAULT_ADJUST_POWER2,
+			GLES20.GL_LINEAR);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * テクスチャターゲットはGL_TEXTURE_2D
+	 * filter_paramはGLES30.GL_LINEAR
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 */
+	public static GLTexture newInstance(
+		@TexUnit final int texUnit,
+		final int width, final int height) {
+
+		return new GLTexture(
+			GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			width, height, DEFAULT_ADJUST_POWER2,
+			GLES20.GL_LINEAR);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * テクスチャターゲットはGL_TEXTURE_2D
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
+	 */
+	public static GLTexture newInstance(
+		@TexUnit final int texUnit,
+		final int width, final int height, final int filter_param) {
+
+		return new GLTexture(
+			GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			width, height, DEFAULT_ADJUST_POWER2,
+			filter_param);
+	}
+
+	/**
+	 * インスタンス生成のためのヘルパーメソッド
+	 * テクスチャターゲットはGL_TEXTURE_2D
+	 * @param texUnit
+	 * @param width テクスチャサイズ
+	 * @param height テクスチャサイズ
+	 * @param adjust_power2 テクスチャサイズを2の乗数にするかどうか
+	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
+	 */
+	public static GLTexture newInstance(
+		@TexUnit final int texUnit,
+		final int width, final int height,
+		final boolean adjust_power2,
+		@MinMagFilter final int filter_param) {
+		return new GLTexture(
+			GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			width, height, adjust_power2,
+			filter_param);
+	}
+
+	/**
+	 * 既存テクスチャのラップ用ヘルパーメソッド
+	 * @param texTarget
+	 * @param texUnit
+	 * @param texId
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static GLTexture wrap(
+		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
+		final int width, final int height) {
+
+		return new GLTexture(
+			texTarget, texUnit, texId,
+			width, height, false,
+			GLES20.GL_LINEAR);
+	}
+
+//--------------------------------------------------------------------------------
+	@TexTarget
 	private final int TEX_TARGET;
+	@TexUnit
 	private final int TEX_UNIT;
+	@MinMagFilter
 	private final int FILTER_PARAM;
 	private final boolean ADJUST_POWER2;
-	private int mTextureId = GL_NO_TEXTURE;
+	private final boolean mWrappedTexture;
+	private int mTextureId;
 	@Size(min=16)
 	@NonNull
 	private final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
@@ -53,61 +148,27 @@ public class GLTexture implements IGLSurface {
 
 	/**
 	 * コンストラクタ
-	 * テクスチャユニットが常時GL_TEXTURE0なので複数のテクスチャを同時に使えない
-	 * @param width テクスチャサイズ
-	 * @param height テクスチャサイズ
-	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
-	 */
-	public GLTexture(final int width, final int height, final int filter_param) {
-		this(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, width, height, DEFAULT_ADJUST_POWER2, filter_param);
-	}
-
-	/**
-	 * コンストラクタ
-	 * filter_paramはGLES30.GL_LINEAR
-	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
+	 * @param texTarget 既存のテクスチャをラップするとき以外GL_TEXTURE_EXTERNAL_OESはだめ
 	 * @param texUnit
-	 * @param width テクスチャサイズ
-	 * @param height テクスチャサイズ
-	 */
-	public GLTexture(final int texTarget, final int texUnit, final int width, final int height) {
-		this(texTarget, texUnit, width, height, DEFAULT_ADJUST_POWER2, GLES20.GL_LINEAR);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
-	 * @param texUnit
-	 * @param width テクスチャサイズ
-	 * @param height テクスチャサイズ
-	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
-	 */
-	public GLTexture(
-		final int texTarget, final int texUnit,
-		final int width, final int height, final int filter_param) {
-		this(texTarget, texUnit, width, height, DEFAULT_ADJUST_POWER2, filter_param);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param texTarget GL_TEXTURE_EXTERNAL_OESはだめ
-	 * @param texUnit
+	 * @param texId
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
 	 * @param adjust_power2 テクスチャサイズを2の乗数にするかどうか
 	 * @param filter_param	テクスチャの補間方法を指定 GL_LINEARとかGL_NEAREST
 	 */
-	public GLTexture(
-		final int texTarget, final int texUnit,
+	protected GLTexture(
+		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 		final int width, final int height,
 		final boolean adjust_power2,
-		final int filter_param) {
+		@MinMagFilter final int filter_param) {
 
 		if (DEBUG) Log.v(TAG, String.format("コンストラクタ(%d,%d)", width, height));
 		TEX_TARGET = texTarget;
 		TEX_UNIT = texUnit;
+		mWrappedTexture = texId > GL_NO_TEXTURE;
+		mTextureId = texId;
 		FILTER_PARAM = filter_param;
-		ADJUST_POWER2 = adjust_power2;
+		ADJUST_POWER2 = adjust_power2 && (texId <= GL_NO_TEXTURE);
 		createTexture(width, height);
 		if (DEBUG) Log.v(TAG, "GLTexture:id=" + mTextureId);
 	}
@@ -198,11 +259,13 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャターゲットを取得(GL_TEXTURE_2D)
 	 * @return
 	 */
+	@TexTarget
 	@Override
 	public int getTexTarget() {
 		return TEX_TARGET;
 	}
 
+	@TexUnit
 	@Override
 	public int getTexUnit() {
 		return TEX_UNIT;
@@ -326,7 +389,8 @@ public class GLTexture implements IGLSurface {
 	public void loadBitmap(@NonNull final Bitmap bitmap) {
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
-		if ((width > mTexWidth) || (height > mTexHeight)) {
+		if (!mWrappedTexture && (width > mTexWidth) || (height > mTexHeight)) {
+			// 自前でテクスチャ生成＆テクスチャサイズが大きくなったとき
 			releaseTexture();
 			createTexture(width, height);
 		}
@@ -343,34 +407,39 @@ public class GLTexture implements IGLSurface {
 
 	private void createTexture(final int width, final int height) {
 //		if (DEBUG) Log.v(TAG, String.format("texSize(%d,%d)", mTexWidth, mTexHeight));
-		if (ADJUST_POWER2) {
-			// テクスチャのサイズは2の乗数にするとき
-			int w = 1;
-			for (; w < width; w <<= 1) ;
-			int h = 1;
-			for (; h < height; h <<= 1) ;
-			if (mTexWidth != w || mTexHeight != h) {
-				mTexWidth = w;
-				mTexHeight = h;
+		if (mTextureId <= GL_NO_TEXTURE) {
+			if (ADJUST_POWER2) {
+				// テクスチャのサイズは2の乗数にするとき
+				int w = 1;
+				for (; w < width; w <<= 1) ;
+				int h = 1;
+				for (; h < height; h <<= 1) ;
+				if (mTexWidth != w || mTexHeight != h) {
+					mTexWidth = w;
+					mTexHeight = h;
+				}
+			} else {
+				mTexWidth = width;
+				mTexHeight = height;
 			}
+			mWidth = width;
+			mHeight = height;
+			mTextureId = GLHelper.initTex(TEX_TARGET, TEX_UNIT, FILTER_PARAM);
+			// テクスチャのメモリ領域を確保する
+			GLES20.glTexImage2D(TEX_TARGET,
+				0,					// ミップマップレベル0(ミップマップしない)
+				GLES20.GL_RGBA,				// 内部フォーマット
+				mTexWidth, mTexHeight,		// サイズ
+				0,					// 境界幅
+				GLES20.GL_RGBA,				// 引き渡すデータのフォーマット
+				GLES20.GL_UNSIGNED_BYTE,	// データの型
+				null);				// ピクセルデータ無し
+			// テクスチャ変換行列を初期化
+			Matrix.setIdentityM(mTexMatrix, 0);
 		} else {
-			mTexWidth = width;
-			mTexHeight = height;
+			mWidth = mTexWidth = width;
+			mHeight = mTexHeight = height;
 		}
-		mWidth = width;
-		mHeight = height;
-		mTextureId = GLHelper.initTex(TEX_TARGET, TEX_UNIT, FILTER_PARAM);
-		// テクスチャのメモリ領域を確保する
-		GLES20.glTexImage2D(TEX_TARGET,
-			0,					// ミップマップレベル0(ミップマップしない)
-			GLES20.GL_RGBA,				// 内部フォーマット
-			mTexWidth, mTexHeight,		// サイズ
-			0,					// 境界幅
-			GLES20.GL_RGBA,				// 引き渡すデータのフォーマット
-			GLES20.GL_UNSIGNED_BYTE,	// データの型
-			null);				// ピクセルデータ無し
-		// テクスチャ変換行列を初期化
-		Matrix.setIdentityM(mTexMatrix, 0);
 		mTexMatrix[0] = mWidth / (float)mTexWidth;
 		mTexMatrix[5] = mHeight / (float)mTexHeight;
 		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),scale(%f,%f)",
@@ -379,7 +448,7 @@ public class GLTexture implements IGLSurface {
 	}
 
 	private void releaseTexture() {
-		if (mTextureId > GL_NO_TEXTURE) {
+		if (!mWrappedTexture && (mTextureId > GL_NO_TEXTURE)) {
 			GLHelper.deleteTex(mTextureId);
 			mTextureId = GL_NO_TEXTURE;
 		}
