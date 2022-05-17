@@ -27,7 +27,6 @@ import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.math.Fraction;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -169,14 +168,6 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 	@Override
 	public boolean isValid() {
 		return super.isValid() && mManager.isValid();
-	}
-
-	@CallSuper
-	@Override
-	public void remove() {
-		if (DEBUG) Log.v(TAG, "remove:");
-		super.remove();
-		releaseTarget();
 	}
 
 	/**

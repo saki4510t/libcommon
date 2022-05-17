@@ -29,7 +29,6 @@ import com.serenegiant.glutils.GLUtils;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.math.Fraction;
 
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -220,13 +219,6 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public boolean isEffectOnly() {
 		return mEffectOnly;
-	}
-
-	@CallSuper
-	@Override
-	public void remove() {
-		super.remove();
-		releaseTarget();
 	}
 
 	private int cnt;

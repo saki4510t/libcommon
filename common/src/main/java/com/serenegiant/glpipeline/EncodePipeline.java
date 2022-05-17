@@ -215,7 +215,6 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			parent = GLPipeline.findFirst(parent);
 			parent.refresh();
 		}
-		releaseTarget();
 	}
 
 	private int cnt;

@@ -250,13 +250,6 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		super.setParent(parent);
 	}
 
-	@CallSuper
-	@Override
-	public void remove() {
-		super.remove();
-		releaseAll();
-	}
-
 	private int cnt;
 	@WorkerThread
 	@Override

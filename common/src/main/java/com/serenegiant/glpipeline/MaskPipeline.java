@@ -211,13 +211,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		return mMaskOnly;
 	}
 
-	@CallSuper
-	@Override
-	public void remove() {
-		super.remove();
-		releaseAll();
-	}
-
 	private int cnt;
 	@WorkerThread
 	@Override
