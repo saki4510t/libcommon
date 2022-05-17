@@ -568,6 +568,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
 	 * @param filePath
 	 */
+	@Deprecated
 	@Override
 	public void loadBitmap(@NonNull final String filePath) throws IOException {
 //		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
@@ -592,12 +593,6 @@ public abstract class GLSurface implements IGLSurface {
 		options.inJustDecodeBounds = false;
 		loadBitmap(BitmapFactory.decodeFile(filePath, options));
 	}
-
-	/**
-	 * Bitmapから画像をテクスチャに読み込む
-	 * @param bitmap
-	 */
-	public abstract void loadBitmap(@NonNull final Bitmap bitmap);
 
 	/**
 	 * オフスクリーン描画用のフレームバッファオブジェクトを生成する

@@ -92,6 +92,7 @@ public interface IGLSurface extends ISurface {
 	 * @param filePath
 	 * @throws IOException
 	 */
+	@Deprecated
 	public void loadBitmap(@NonNull final String filePath) throws IOException;
 
 	/**

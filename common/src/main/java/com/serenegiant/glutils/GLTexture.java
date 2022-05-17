@@ -294,6 +294,7 @@ public class GLTexture implements IGLSurface {
 	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
 	 * @param filePath
 	 */
+	@Deprecated
 	@Override
 	public void loadBitmap(@NonNull final String filePath) throws IOException {
 //		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
