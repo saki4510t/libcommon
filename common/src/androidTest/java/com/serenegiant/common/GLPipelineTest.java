@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glpipeline.DistributePipeline;
+import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSource;
 import com.serenegiant.glpipeline.ImageSource;
@@ -34,7 +35,6 @@ import com.serenegiant.glpipeline.VideoSource;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
-import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -428,16 +428,188 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-//--------------------------------------------------------------------------------
-//			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
-//			assertTrue(bitMapEquals(original, result));
-//--------------------------------------------------------------------------------
-			// GLDrawer2Dのテクスチャ座標配列で上下反転させているときはこっち
-			// 上下反転しているので元のビットマップと異なる
-			assertFalse(bitMapEquals(original, result));
-			// 上下反転させれば元のビットマップと同じはず
-			assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(result, IRendererCommon.MIRROR_VERTICAL)));
-//--------------------------------------------------------------------------------
+			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
+			assertTrue(bitMapEquals(original, flipVertical(result)));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * EffectPipelineが動作するかどうかを検証
+	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 */
+	@Test
+	public void effectPipeline1() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+
+		final GLManager manager = new GLManager();
+		final ImageSource source = new ImageSource(manager, original, null);
+
+		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							GL_TEXTURE_2D, GLES20.GL_TEXTURE0, texId,
+							WIDTH, HEIGHT, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+
+		source.setPipeline(effectPipeline1);
+		effectPipeline1.setPipeline(pipeline);
+
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, pipeline));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
+	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 */
+	@Test
+	public void effectPipeline2() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+
+		final GLManager manager = new GLManager();
+		final ImageSource source = new ImageSource(manager, original, null);
+
+		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
+		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							GL_TEXTURE_2D, GLES20.GL_TEXTURE0, texId,
+							WIDTH, HEIGHT, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+
+		source.setPipeline(effectPipeline1);
+		effectPipeline1.setPipeline(effectPipeline2);
+		effectPipeline2.setPipeline(pipeline);
+
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, pipeline));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
+	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 */
+	@Test
+	public void effectPipeline3() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+
+		final GLManager manager = new GLManager();
+		final ImageSource source = new ImageSource(manager, original, null);
+
+		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
+		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
+		final EffectPipeline effectPipeline3 = new EffectPipeline(manager);
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							GL_TEXTURE_2D, GLES20.GL_TEXTURE0, texId,
+							WIDTH, HEIGHT, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+
+		source.setPipeline(effectPipeline1);
+		effectPipeline1.setPipeline(effectPipeline2);
+		effectPipeline2.setPipeline(effectPipeline3);
+		effectPipeline3.setPipeline(pipeline);
+
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, effectPipeline3, pipeline));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitMapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

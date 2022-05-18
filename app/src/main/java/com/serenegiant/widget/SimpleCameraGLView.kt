@@ -27,6 +27,7 @@ import android.util.Log
 import androidx.annotation.Size
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLHelper
+import com.serenegiant.glutils.IRendererCommon
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
@@ -132,6 +133,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
 						+ MatrixUtils.toGLMatrixString(transform))
 					mDrawer!!.setMvpMatrix(transform, 0)
+					mDrawer!!.setMirror(IRendererCommon.MIRROR_VERTICAL)
 				}
 			}
 		})

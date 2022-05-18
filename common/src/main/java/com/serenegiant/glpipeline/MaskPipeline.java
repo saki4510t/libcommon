@@ -26,6 +26,7 @@ import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.glutils.GLTexture;
 import com.serenegiant.math.Fraction;
@@ -372,6 +373,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mMaskOnly = true;
+				}
+				if (mRendererTarget != null) {
+					mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
 				}
 			}
 		}

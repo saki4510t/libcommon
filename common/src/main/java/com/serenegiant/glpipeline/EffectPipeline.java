@@ -26,6 +26,7 @@ import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.glutils.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -384,6 +385,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = true;
 				}
+				mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
 			}
 		}
 	}

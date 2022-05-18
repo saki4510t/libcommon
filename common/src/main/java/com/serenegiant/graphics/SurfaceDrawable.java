@@ -39,7 +39,6 @@ import com.serenegiant.glutils.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLHelper;
 import com.serenegiant.glutils.GLUtils;
-import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
@@ -274,7 +273,6 @@ public class SurfaceDrawable extends Drawable {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
 		mDrawer = GLDrawer2D.create(isOES3Supported(), true);
-		mDrawer.setMirror(IRendererCommon.MIRROR_VERTICAL);
 	}
 
 	/**
