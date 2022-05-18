@@ -124,7 +124,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			@WorkerThread
 			@Override
 			public void run() {
-				createTarget(surface, maxFps);
+				createTargetOnGL(surface, maxFps);
 			}
 		});
 	}
@@ -178,7 +178,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			@WorkerThread
 			@Override
 			public void run() {
-				createTarget(surface, maxFps);
+				createTargetOnGL(surface, maxFps);
 			}
 		});
 	}
@@ -361,7 +361,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * @param maxFps
 	 */
 	@WorkerThread
-	private void createTarget(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
 		synchronized (mSync) {
 			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
