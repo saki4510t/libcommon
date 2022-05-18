@@ -28,6 +28,8 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.math.Fraction;
+
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
@@ -45,8 +47,9 @@ public class StaticTextureSource implements GLConst {
 	 * フレームレート指定付きコンストラクタ
 	 * @param fps
 	 */
+	@Deprecated
 	public StaticTextureSource(final float fps) {
-		this(null, fps);
+		this(null, new Fraction(fps));
 	}
 
 	/**
@@ -54,7 +57,7 @@ public class StaticTextureSource implements GLConst {
 	 * @param bitmap
 	 */
 	public StaticTextureSource(@Nullable final Bitmap bitmap) {
-		this(bitmap, 10.0f);
+		this(bitmap, new Fraction(10));
 	}
 
 	/**
@@ -62,7 +65,25 @@ public class StaticTextureSource implements GLConst {
 	 * @param bitmap
 	 * @param fps
 	 */
+	@Deprecated
 	public StaticTextureSource(@Nullable final Bitmap bitmap, final float fps) {
+		this(bitmap, new Fraction(fps));
+	}
+
+	/**
+	 * フレームレート指定付きコンストラクタ
+	 * @param fps nullなら10fps
+	 */
+	public StaticTextureSource(@Nullable final Fraction fps) {
+		this(null, fps);
+	}
+
+	/**
+	 * ソースの静止画とフレームレートを指定可能なコンストラクタ
+	 * @param bitmap
+	 * @param fps nullなら10fps
+	 */
+	public StaticTextureSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		final int width = bitmap != null ? bitmap.getWidth() : 1;
 		final int height = bitmap != null ? bitmap.getHeight() : 1;
 		mRendererTask = new RendererTask(this, width, height, fps);
@@ -212,13 +233,14 @@ public class StaticTextureSource implements GLConst {
 		private GLTexture mImageSource;
 
 		public RendererTask(final StaticTextureSource parent,
-			final int width, final int height, final float fps) {
+			final int width, final int height, @Nullable final Fraction fps) {
 
 			super(GLUtils.getSupportedGLVersion(), null, 0);
 			mParent = parent;
 			mVideoWidth = width;
 			mVideoHeight = height;
-			mIntervalsNs = fps <= 0 ? 100000000L : (long)(1000000000L / fps);
+			final float _fps = fps != null ? fps.asFloat() : 0.0f;
+			mIntervalsNs = _fps <= 0 ? 100000000L : (long)(1000000000L / _fps);
 		}
 
 		/**
