@@ -437,7 +437,7 @@ public class GLPipelineTest {
 
 	/**
 	 * EffectPipelineが動作するかどうかを検証
-	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
 	 */
 	@Test
 	public void effectPipeline1() {
@@ -495,7 +495,7 @@ public class GLPipelineTest {
 
 	/**
 	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
-	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
 	 */
 	@Test
 	public void effectPipeline2() {
@@ -555,7 +555,7 @@ public class GLPipelineTest {
 
 	/**
 	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
-	 * (FIXME 個別の映像効果付与が想定同かどうかは未検証)
+	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
 	 */
 	@Test
 	public void effectPipeline3() {
