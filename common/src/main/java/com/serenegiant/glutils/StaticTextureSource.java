@@ -459,7 +459,7 @@ public class StaticTextureSource implements GLConst {
 			@NonNull final EGLBase egl,
 			final Object surface, final float maxFps) {
 
-			return RendererTarget.newInstance(getEgl(), surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
+			return RendererTarget.newInstance(egl, surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
 		}
 
 		/**
