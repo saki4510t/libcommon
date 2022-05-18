@@ -84,12 +84,7 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 		manager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
-					if (surface != null) {
-						mRendererTarget = RendererTarget.newInstance(
-							manager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					}
-				}
+				createTargetOnGL(surface, maxFps);
 			}
 		});
 	}
@@ -142,17 +137,7 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
-					if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-						// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-						mRendererTarget.release();
-						mRendererTarget = null;
-					}
-					if ((mRendererTarget == null) && (surface != null)) {
-						mRendererTarget = RendererTarget.newInstance(
-							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					}
-				}
+				createTargetOnGL(surface, maxFps);
 			}
 		});
 	}
@@ -236,6 +221,29 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 					}
 				}
 			});
+		}
+	}
+
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
+	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		synchronized (mSync) {
+			synchronized (mSync) {
+				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+					mRendererTarget.release();
+					mRendererTarget = null;
+				}
+				if ((mRendererTarget == null) && (surface != null)) {
+					mRendererTarget = RendererTarget.newInstance(
+						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				}
+			}
 		}
 	}
 
