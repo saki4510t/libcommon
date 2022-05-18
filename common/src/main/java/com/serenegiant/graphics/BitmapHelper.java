@@ -1166,6 +1166,27 @@ public final class BitmapHelper {
 		return result;
 	}
 
+	/**
+	 * ビットマップの1ピクセル当たりのバイト数を取得する
+	 * @param config
+	 * @return
+	 */
+	public static int getPixelBytes(@NonNull final Bitmap.Config config) {
+		switch (config) {
+		case ALPHA_8:
+			return 1;
+		case RGB_565:
+		case ARGB_4444:
+			return 2;
+		case ARGB_8888:
+			return 4;
+		case RGBA_F16:
+			return 8;
+		default:
+			throw new IllegalArgumentException("Unexpected config type" + config);
+		}
+	}
+
 //--------------------------------------------------------------------------------
 // その他
 	/**
