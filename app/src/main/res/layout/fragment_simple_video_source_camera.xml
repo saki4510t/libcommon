@@ -34,15 +34,15 @@
 		android:layout_centerInParent="true" />
 
 	<ImageButton
-     android:id="@+id/record_button"
-     android:layout_width="64dp"
-     android:layout_height="64dp"
-     android:layout_alignParentBottom="true"
-     android:layout_centerHorizontal="true"
-     android:layout_marginBottom="20dp"
-     android:background="@null"
-     android:scaleType="fitXY"
-     android:src="@android:drawable/ic_menu_camera" />
+		 android:id="@+id/record_button"
+		 android:layout_width="64dp"
+		 android:layout_height="64dp"
+		 android:layout_alignParentBottom="true"
+		 android:layout_centerHorizontal="true"
+		 android:layout_marginBottom="20dp"
+		 android:background="@null"
+		 android:scaleType="fitXY"
+		 android:src="@android:drawable/ic_menu_camera" />
 
     <TextView
         android:id="@+id/textView1"
