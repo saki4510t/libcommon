@@ -221,6 +221,9 @@ public class GLPipelineTest {
 		assertEquals(LOOP_NUM * 2, cnt3.get());
 	}
 
+	/**
+	 * ImageSourceパイプラインが正常に映像ソースとして動作するかどうかを検証
+	 */
 	@Test
 	public void imageSource() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -280,6 +283,9 @@ public class GLPipelineTest {
 		}
 	}
 
+	/**
+	 * DistributePipelineで複数のGLPipelineへの分配処理が動作するかどうかを検証
+	 */
 	@Test
 	public void distributePipeline() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -355,6 +361,11 @@ public class GLPipelineTest {
 		}
 	}
 
+	/**
+	 * ImageSourceからの映像をSurfacePipelineでSurfaceへ転送
+	 * SurfacePipelineをカメラ等の映像限とみなしてVideoSourceで映像ソースとして
+	 * 供給できるかどうかを検証
+	 */
 	@Test
 	public void surfacePipeline_videoSourcePipeline() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -432,6 +443,7 @@ public class GLPipelineTest {
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * パイプラインチェーン内の順番を検証する
 	 * @param head
