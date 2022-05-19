@@ -446,7 +446,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -504,7 +504,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -564,7 +564,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline → EffectPipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
