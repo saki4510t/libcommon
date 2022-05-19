@@ -159,6 +159,10 @@ public abstract class EglTask extends MessageTask {
 		mGLContext.makeDefault();
 	}
 
+	public void swap() {
+		mGLContext.swap();
+	}
+
 	/**
 	 * GLコンテキストのバージョンを取得
 	 * @return GLコンテキストが無効なら0が返る, 有効なら0, 1, 2, 3のいずれか(API>=16なので1が返ることはないはずだけど)
