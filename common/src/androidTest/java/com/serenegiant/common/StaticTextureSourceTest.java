@@ -95,7 +95,7 @@ public class StaticTextureSourceTest {
 
 		final Surface surface = reader.getSurface();
 		assertNotNull(surface);
-		source.addSurface(surface.hashCode(), reader.getSurface(), false);
+		source.addSurface(surface.hashCode(), surface, false);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
