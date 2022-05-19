@@ -36,9 +36,9 @@ import androidx.annotation.WorkerThread;
 /**
  * テクスチャが更新されたときにSurfaceへ転送するGLPipeline実装
  */
-public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline {
+public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = SurfacePipeline.class.getSimpleName();
+	private static final String TAG = SurfaceRendererPipeline.class.getSimpleName();
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -57,7 +57,7 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public SurfacePipeline(@NonNull final GLManager manager)
+	public SurfaceRendererPipeline(@NonNull final GLManager manager)
 			throws IllegalStateException, IllegalArgumentException {
 		this(manager, null, null);
 	}
@@ -71,7 +71,7 @@ public class SurfacePipeline extends ProxyPipeline implements GLSurfacePipeline 
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public SurfacePipeline(
+	public SurfaceRendererPipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {

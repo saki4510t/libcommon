@@ -31,7 +31,7 @@ import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
-import com.serenegiant.glpipeline.SurfacePipeline;
+import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glpipeline.VideoSourcePipeline;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
@@ -373,12 +373,12 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfaceRendererPipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final SurfacePipeline surfacePipeline = new SurfacePipeline(manager);
+		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
 		source.setPipeline(surfacePipeline);
 
 		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,

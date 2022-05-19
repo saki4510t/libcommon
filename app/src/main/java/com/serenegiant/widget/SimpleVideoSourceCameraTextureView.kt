@@ -272,13 +272,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				}
 				is GLSurfacePipeline -> {
 					if (last.hasSurface()) {
-						last.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
+						last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 					} else {
 						last.setSurface(surface, null)
 					}
 				}
 				else -> {
-					last.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
+					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				}
 			}
 		} else {
@@ -392,9 +392,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "createPipeline:surface=${surface}")
 		return when (pipelineMode) {
 			GLPipelineView.EFFECT_PLUS_SURFACE -> {
-				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfacePipeline")
+				if (DEBUG) Log.v(TAG, "createPipeline:create EffectPipeline & SurfaceRendererPipeline")
 				val effect = EffectPipeline(mGLManager)
-				effect.pipeline = SurfacePipeline(mGLManager, surface, maxFps)
+				effect.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				effect
 			}
 			GLPipelineView.EFFECT_ONLY -> {
@@ -402,8 +402,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				EffectPipeline(mGLManager, surface, maxFps)
 			}
 			else -> {
-				if (DEBUG) Log.v(TAG, "createPipeline:create SurfacePipeline")
-				SurfacePipeline(mGLManager, surface, maxFps)
+				if (DEBUG) Log.v(TAG, "createPipeline:create SurfaceRendererPipeline")
+				SurfaceRendererPipeline(mGLManager, surface, maxFps)
 			}
 		}
 	}
