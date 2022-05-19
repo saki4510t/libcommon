@@ -156,8 +156,8 @@ public class GLContext implements EGLConst {
 		mMaxClientVersion = maxClientVersion;
 		mSharedContext = sharedContext;
 		mFlags = flags;
-		mMasterWidth = width > 0 ? width : 1;
-		mMasterHeight = height > 0 ? height : 1;
+		mMasterWidth = Math.max(width, 1);
+		mMasterHeight = Math.max(height, 1);
 	}
 
 	@Override
