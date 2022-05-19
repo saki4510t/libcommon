@@ -22,22 +22,22 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import androidx.core.content.ContextCompat
+import com.serenegiant.glutils.GLManager
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.glutils.MixRendererHolder
-import com.serenegiant.glutils.StaticTextureSource
+import com.serenegiant.glutils.ImageTextureSource
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.R
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
- * FIXME 本来はカメラ映像に映像2の入力が丸く合成されて表示されるが、今は映像2入力が無いので黒い丸が合成表示される
  */
 class MixCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null)
 		: AbstractCameraGLSurfaceView(context, attrs) {
 
-	private var imageSource: StaticTextureSource? = null
+	private var imageSource: ImageTextureSource? = null
 
 	@Synchronized
 	override fun onResume() {
@@ -46,14 +46,14 @@ class MixCameraGLSurfaceView @JvmOverloads constructor(
 		if (rendererHolder is MixRendererHolder) { // とりあえずカメラ映像中央部に円形に映像2を合成する
 			val dr: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_launcher)
 			val image = if (dr != null) BitmapHelper.fromDrawable(dr, 640, 480) else null
-			imageSource = StaticTextureSource(image)
+			imageSource = ImageTextureSource(GLManager(), image, null)
 			rendererHolder.setMask(
 				BitmapHelper.genMaskImage(0,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 					60, Color.RED,0, 100))
 			val surface = rendererHolder.surface2
 			if (surface != null) {
-				imageSource!!.addSurface(surface.hashCode(), surface, false)
+				imageSource!!.setSurface(surface)
 			}
 		}
 	}
