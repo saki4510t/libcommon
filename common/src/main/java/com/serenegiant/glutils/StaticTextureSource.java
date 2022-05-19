@@ -327,6 +327,7 @@ public class StaticTextureSource implements GLConst {
 		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
+			if (DEBUG) Log.v(TAG, "RendererTask#addSurface:id=" + id + ",surface=" + surface);
 			checkFinished();
 			if (!GLUtils.isSupportedSurface(surface)) {
 				throw new IllegalArgumentException(
@@ -335,15 +336,18 @@ public class StaticTextureSource implements GLConst {
 			synchronized (mTargets) {
 				if (mTargets.get(id) == null) {
 					for ( ; ; ) {
+					if (DEBUG) Log.v(TAG, "RendererTask#addSurface:wait for");
 						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
 							try {
 								mTargets.wait();
+							if (DEBUG) Log.v(TAG, "RendererTask#addSurface:mTargets.wait");
 							} catch (final InterruptedException e) {
 								// ignore
 							}
 							break;
 						} else {
 							try {
+							if (DEBUG) Log.v(TAG, "RendererTask#addSurface:mTargets.wait");
 								mTargets.wait(10);
 							} catch (InterruptedException e) {
 								break;
@@ -352,6 +356,7 @@ public class StaticTextureSource implements GLConst {
 					}
 				}
 			}
+			if (DEBUG) Log.v(TAG, "RendererTask#addSurface:finished");
 		}
 
 		/**
@@ -466,6 +471,7 @@ public class StaticTextureSource implements GLConst {
 				}
 				mTargets.notifyAll();
 			}
+			if (DEBUG) Log.v(TAG, "handleAddSurface:finished");
 		}
 
 		/**
@@ -480,7 +486,7 @@ public class StaticTextureSource implements GLConst {
 		private RendererTarget createRendererTarget(final int id,
 			@NonNull final EGLBase egl,
 			final Object surface, final float maxFps) {
-
+			if (DEBUG) Log.v(TAG, "createRendererTarget:");
 			return RendererTarget.newInstance(egl, surface, maxFps > 1000 ? maxFps / 1000.0f : maxFps);
 		}
 
