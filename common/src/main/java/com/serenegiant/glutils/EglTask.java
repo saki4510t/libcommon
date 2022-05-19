@@ -35,8 +35,8 @@ import com.serenegiant.utils.MessageTask;
  * EglTaskまたはその継承クラスをTreadへ引き渡して実行する
  */
 public abstract class EglTask extends MessageTask {
-//	private static final boolean DEBUG = false;
-//	private static final String TAG = "EglTask";
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = EglTask.class.getSimpleName();
 
 	@NonNull
 	private final GLContext mGLContext;
@@ -75,9 +75,17 @@ public abstract class EglTask extends MessageTask {
 		final int masterWidth, final int masterHeight) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
-		mGLContext = new GLContext(maxClientVersion,
+		this(new GLContext(maxClientVersion,
 			sharedContext, flags,
-			masterWidth, masterHeight);
+			masterWidth, masterHeight));
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param glContext
+	 */
+	public EglTask(@NonNull final GLContext glContext) {
+		mGLContext = glContext;
 		init(0, 0, null);
 	}
 
