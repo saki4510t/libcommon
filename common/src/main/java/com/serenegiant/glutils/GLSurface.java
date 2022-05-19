@@ -189,6 +189,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param tex_unit
 	 * @param width
 	 * @param height
+	 * @deprecated #newInstanceの代わりに#wrapを使うこと
 	 */
 	@Deprecated
 	@SuppressLint("NewApi")
@@ -215,6 +216,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
+	 * @deprecated #newInstanceの代わりに#wrapを使うこと
 	 */
 	@Deprecated
 	@SuppressLint("NewApi")
@@ -235,7 +237,11 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
-	 * FIXME tex_targetにGL_TEXTURE_EXTERNAL_OESを指定するとassignTextureでフレームバッファーをセットするときにクラッシュする
+	 * XXX SurfaceTextureへ割り当てたGL_TEXTURE_EXTERNAL_OESのテクスチャは
+	 *     少なくとも1回はSurfaceTexture#updateTexImageを呼び出すまでは
+	 *     メモリー割り当てされておらず実際のテクスチャとしてアクセスできない。
+	 *     SurfaceTexture#updateTexImageを呼ぶ前にGLSurfaceでラップすると
+	 *     assignTextureでフレームバッファーをセットするときにクラッシュするので注意
 	 * @param isGLES3
 	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 * @param tex_unit
@@ -243,6 +249,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param width
 	 * @param height
 	 * @param use_depth_buffer
+	 * @deprecated #newInstanceの代わりに#wrapを使うこと
 	 */
 	@Deprecated
 	@SuppressLint("NewApi")
@@ -312,7 +319,11 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
-	 * FIXME tex_targetにGL_TEXTURE_EXTERNAL_OESを指定するとassignTextureでフレームバッファーをセットするときにクラッシュする
+	 * XXX SurfaceTextureへ割り当てたGL_TEXTURE_EXTERNAL_OESのテクスチャは
+	 *     少なくとも1回はSurfaceTexture#updateTexImageを呼び出すまでは
+	 *     メモリー割り当てされておらず実際のテクスチャとしてアクセスできない。
+	 *     SurfaceTexture#updateTexImageを呼ぶ前にGLSurfaceでラップすると
+	 *     assignTextureでフレームバッファーをセットするときにクラッシュするので注意
 	 * @param isGLES3
 	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 * @param tex_unit
