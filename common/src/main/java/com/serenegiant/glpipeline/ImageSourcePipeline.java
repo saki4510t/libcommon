@@ -21,7 +21,6 @@ package com.serenegiant.glpipeline;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 import android.util.Log;
 import android.view.Choreographer;
 import android.view.Surface;
@@ -42,12 +41,6 @@ import androidx.annotation.WorkerThread;
 public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
-
-	@NonNull
-	private static final float[] sIdentityMatrix= new float[16];
-	static {
-		Matrix.setIdentityM(sIdentityMatrix, 0);
-	}
 
 	@NonNull
 	private final Object mSync = new Object();
