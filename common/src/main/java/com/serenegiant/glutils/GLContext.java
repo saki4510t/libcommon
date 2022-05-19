@@ -29,9 +29,9 @@ import android.util.Log;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SysPropReader;
 
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 import kotlin.jvm.Transient;
 
@@ -76,13 +76,13 @@ public class GLContext implements EGLConst {
 	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
 	 * そのためのオフクリーンのサイズ(横)
 	 */
-	@Size(min=1)
+	@IntRange(from=1)
 	private final int mMasterWidth;
 	/**
 	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
 	 * そのためのオフクリーンのサイズ(縦)
 	 */
-	@Size(min=1)
+	@IntRange(from=1)
 	private final int mMasterHeight;
 	/**
 	 * EGLアクセスオブジェクト
@@ -151,7 +151,7 @@ public class GLContext implements EGLConst {
 	 */
 	public GLContext(final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		@Size(min=1) final int width, @Size(min=1) final int height) {
+		final int width, final int height) {
 
 		mMaxClientVersion = maxClientVersion;
 		mSharedContext = sharedContext;
