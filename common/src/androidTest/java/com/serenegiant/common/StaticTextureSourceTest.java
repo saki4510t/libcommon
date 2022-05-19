@@ -69,12 +69,11 @@ public class StaticTextureSourceTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
-
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
-		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
 		reader.setOnImageAvailableListener(new SurfaceReader.OnImageAvailableListener() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onImageAvailable(@NonNull final SurfaceReader reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();

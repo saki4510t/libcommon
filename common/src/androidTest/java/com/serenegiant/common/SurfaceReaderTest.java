@@ -70,10 +70,10 @@ public class SurfaceReaderTest {
 //		dump(bitmap);
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
-		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
 		reader.setOnImageAvailableListener(new SurfaceReader.OnImageAvailableListener() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onImageAvailable(@NonNull final SurfaceReader reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();

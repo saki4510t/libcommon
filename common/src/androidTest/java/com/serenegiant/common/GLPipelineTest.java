@@ -250,9 +250,9 @@ public class GLPipelineTest {
 		assertTrue(ex instanceof UnsupportedOperationException);
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
@@ -298,13 +298,13 @@ public class GLPipelineTest {
 		source.setPipeline(distributor);
 
 		final Semaphore sem1 = new Semaphore(0);
-		final AtomicInteger cnt1 = new AtomicInteger();
 		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline1 = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
-				if (cnt1.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() >= 30) {
 					this.remove();
 					if (sem1.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
@@ -319,13 +319,13 @@ public class GLPipelineTest {
 		distributor.addPipeline(pipeline1);
 
 		final Semaphore sem2 = new Semaphore(0);
-		final AtomicInteger cnt2 = new AtomicInteger();
 		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline2 = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
-				if (cnt2.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() >= 30) {
 					this.remove();
 					if (sem2.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
@@ -394,9 +394,9 @@ public class GLPipelineTest {
 			});
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
@@ -453,9 +453,9 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
@@ -512,9 +512,9 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
@@ -573,9 +573,9 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline3 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
 		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isOES, texId, texMatrix);
