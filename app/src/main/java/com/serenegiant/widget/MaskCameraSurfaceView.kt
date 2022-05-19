@@ -30,7 +30,7 @@ import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
 import com.serenegiant.glpipeline.GLPipelineSource
 import com.serenegiant.glpipeline.MaskPipeline
-import com.serenegiant.glpipeline.VideoSource
+import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.glutils.GLManager
 import com.serenegiant.graphics.BitmapHelper
 import java.io.IOException
@@ -45,7 +45,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 		attrs: AttributeSet? = null, defStyleAttr: Int = 0)
 		: SurfaceView(context, attrs, defStyleAttr) {
 
-	private var source: VideoSource? = null
+	private var source: VideoSourcePipeline? = null
 	private var pipeline: MaskPipeline? = null
 	private var mHasSurface = false
 	private var mCamera: Camera? = null
@@ -91,7 +91,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				60, Color.BLUE,127, 255))
 			val sem = Semaphore(0)
-			source = VideoSource(manager,
+			source = VideoSourcePipeline(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 				object : GLPipelineSource.PipelineSourceCallback {
 

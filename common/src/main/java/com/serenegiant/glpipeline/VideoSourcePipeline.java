@@ -41,9 +41,9 @@ import androidx.annotation.WorkerThread;
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
  * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  */
-public class VideoSource extends ProxyPipeline implements GLPipelineSource {
+public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = VideoSource.class.getSimpleName();
+	private static final String TAG = VideoSourcePipeline.class.getSimpleName();
 
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
 	private static final int REQUEST_UPDATE_SIZE = 2;
@@ -79,9 +79,9 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	 * @param height
 	 * @param callback
 	 */
-	public VideoSource(@NonNull final GLManager manager,
-		final int width, final int height,
-		@NonNull final PipelineSourceCallback callback) {
+	public VideoSourcePipeline(@NonNull final GLManager manager,
+							   final int width, final int height,
+							   @NonNull final PipelineSourceCallback callback) {
 
 		this(manager, width, height, callback, false);
 	}
@@ -97,10 +97,10 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 	 * @param callback
 	 * @param useSharedContext 共有コンテキストを使ってマルチスレッドで処理を行うかどうか
 	 */
-	public VideoSource(@NonNull final GLManager manager,
-		final int width, final int height,
-		@NonNull final PipelineSourceCallback callback,
-		final boolean useSharedContext) {
+	public VideoSourcePipeline(@NonNull final GLManager manager,
+							   final int width, final int height,
+							   @NonNull final PipelineSourceCallback callback,
+							   final boolean useSharedContext) {
 
 		super(width, height);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -109,7 +109,7 @@ public class VideoSource extends ProxyPipeline implements GLPipelineSource {
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				return VideoSource.this.handleMessage(msg);
+				return VideoSourcePipeline.this.handleMessage(msg);
 			}
 		};
 		if (useSharedContext) {

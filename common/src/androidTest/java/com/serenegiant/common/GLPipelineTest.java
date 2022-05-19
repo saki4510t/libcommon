@@ -31,7 +31,7 @@ import com.serenegiant.glpipeline.GLPipelineSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfacePipeline;
-import com.serenegiant.glpipeline.VideoSource;
+import com.serenegiant.glpipeline.VideoSourcePipeline;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.GLSurface;
 import com.serenegiant.glutils.GLUtils;
@@ -372,7 +372,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -380,7 +380,7 @@ public class GLPipelineTest {
 		final SurfacePipeline surfacePipeline = new SurfacePipeline(manager);
 		source.setPipeline(surfacePipeline);
 
-		final VideoSource videoSource = new VideoSource(manager, WIDTH, HEIGHT,
+		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,
 			new GLPipelineSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
@@ -415,11 +415,11 @@ public class GLPipelineTest {
 				}
 			}
 		};
-		videoSource.setPipeline(pipeline);
+		videoSourcePipeline.setPipeline(pipeline);
 
 		// SurfacePipelineとVideoSourceの間はSurfaceを経由したやりとりだけでGLPipelineとして接続しているわけではない
 		assertTrue(validatePipelineOrder(source, source, surfacePipeline));
-		assertTrue(validatePipelineOrder(videoSource, videoSource, pipeline));
+		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, pipeline));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -445,7 +445,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -503,7 +503,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -563,7 +563,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);

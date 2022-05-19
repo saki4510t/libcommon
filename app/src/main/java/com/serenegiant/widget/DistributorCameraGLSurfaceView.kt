@@ -32,7 +32,7 @@ import android.view.View
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
-import com.serenegiant.glpipeline.VideoSource
+import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.glutils.EGLBase
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.glutils.GLManager
@@ -55,7 +55,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
 	private lateinit var mGLManager: GLManager
-	private var mVideoSource: VideoSource? = null
+	private var mVideoSourcePipeline: VideoSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 
 	init {
@@ -114,16 +114,16 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		if (mVideoSource != null) {
-			mVideoSource!!.pipeline = null
+		if (mVideoSourcePipeline != null) {
+			mVideoSourcePipeline!!.pipeline = null
 		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
 			mDistributor = null
 		}
-		if (mVideoSource != null) {
-			mVideoSource!!.release()
-			mVideoSource = null
+		if (mVideoSourcePipeline != null) {
+			mVideoSourcePipeline!!.release()
+			mVideoSourcePipeline = null
 		}
 		super.onPause()
 	}
@@ -171,8 +171,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mVideoSource!!.glManager)
-			mVideoSource!!.pipeline = mDistributor
+			mDistributor = SurfaceDistributePipeline(mVideoSourcePipeline!!.glManager)
+			mVideoSourcePipeline!!.pipeline = mDistributor
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -196,11 +196,11 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		if (mVideoSource != null) {
-			val last = GLPipeline.findLast(mVideoSource!!)
+		if (mVideoSourcePipeline != null) {
+			val last = GLPipeline.findLast(mVideoSourcePipeline!!)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mVideoSource!!))
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mVideoSourcePipeline!!))
 		} else {
 			throw IllegalStateException()
 		}
@@ -220,8 +220,10 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	 * @return
 	 */
 	private fun createVideoSource(
-		width: Int, height: Int): VideoSource {
-		return VideoSource(mGLManager, width, height,
+		width: Int, height: Int): VideoSourcePipeline {
+		return VideoSourcePipeline(mGLManager,
+			width,
+			height,
 			object : PipelineSourceCallback {
 
 				override fun onCreate(surface: Surface) {
@@ -231,8 +233,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				override fun onDestroy() {
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
 				}
-			}
-			, USE_SHARED_CONTEXT)
+			},
+			USE_SHARED_CONTEXT)
 	}
 
 	/**
@@ -259,7 +261,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
 			mGLManager = GLManager(mGLVersion, EGLBase.wrapCurrentContext(), 0, null)
-			mVideoSource = createVideoSource(
+			mVideoSourcePipeline = createVideoSource(
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)
@@ -310,15 +312,15 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
-			mVideoSource?.resize(width, height)
+			mVideoSourcePipeline?.resize(width, height)
 			mDistributor?.resize(width, height)
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
 		}
 
 		override fun getInputSurface(): SurfaceTexture {
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-			checkNotNull(mVideoSource)
-			return mVideoSource!!.inputSurfaceTexture
+			checkNotNull(mVideoSourcePipeline)
+			return mVideoSourcePipeline!!.inputSurfaceTexture
 		}
 
 		fun release() {
