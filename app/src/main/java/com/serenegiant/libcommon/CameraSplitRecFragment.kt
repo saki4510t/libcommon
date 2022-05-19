@@ -185,14 +185,8 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		audio_source: Int, audio_channels: Int,
 		align16: Boolean): Recorder {
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputDir?.uri)
-		val recorder = if (USE_DEPRECATED && (outputDir != null) && !BuildCheck.isAPI29()) {
-			MediaAVSplitRecorder(
-				requireContext(), mRecorderCallback, outputDir, FileUtils.getDateTimeString(), MAX_FILE_SIZE)
-		} else {
-			// outputDirをnullにするとMediaAVSplitRecorderV2生成時の時刻文字列をフォルダ名としてその中に各セグメント毎のファイルが生成される
-			MediaAVSplitRecorderV2(
-				requireContext(), mRecorderCallback, null, MAX_FILE_SIZE)
-		}
+		val recorder = MediaAVSplitRecorderV2(
+			requireContext(), mRecorderCallback, null, MAX_FILE_SIZE)
 		// create encoder for video recording
 		mVideoEncoder = if (enablePipelineEncode && (mCameraView is GLPipelineView)) {
 			if (DEBUG) Log.v(TAG, "createRecorder:create EncodePipeline")
@@ -324,13 +318,6 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraSplitRecFragment::class.java.simpleName
-
-		/**
-		 * deprecatedのMediaAVSplitRecorderを使うか
-		 * 新しいMediaAVSplitRecorderV2を使うかを設定
-		 * trueならdeprecatedのMediaAVSplitRecorderを使う
-		 */
-		private const val USE_DEPRECATED = false
 
 		/**
 		 * 分割録画する際のおおよそのファイルサイズ

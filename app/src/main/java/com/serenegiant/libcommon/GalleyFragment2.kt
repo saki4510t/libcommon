@@ -45,7 +45,7 @@ class GalleyFragment2 : BaseFragment() {
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
-		requireActivity().title = getString(R.string.title_galley_recycler)
+		requireActivity().title = getString(R.string.title_galley_recycler_cursor)
 	}
 
 	override fun onCreateView(inflater: LayoutInflater,

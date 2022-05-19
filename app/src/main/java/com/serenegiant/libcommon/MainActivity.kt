@@ -340,12 +340,6 @@ class MainActivity
 				}
 				fragment = GalleyFragment2()
 			}
-			R.string.title_galley_recycler -> {	// Galley(RecyclerView)
-				if (!checkPermissionReadExternalStorage()) {
-					return
-				}
-				fragment = GalleyFragment3()
-			}
 			R.string.title_number_keyboard -> {	// NumberKeyboard
 				fragment = NumberKeyboardFragment()
 			}
