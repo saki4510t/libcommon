@@ -136,7 +136,8 @@ public class SurfaceReader {
 					throws TaskBreak {
 				if (DEBUG) Log.v(TAG, "processRequest:");
 				final Object result =  handleRequest(request, arg1, arg2, obj);
-				if (request == REQUEST_RECREATE_MASTER_SURFACE) {
+				if ((request == REQUEST_RECREATE_MASTER_SURFACE)
+					&& (sem.availablePermits() == 0)) {
 					sem.release();
 				}
 				return result;
