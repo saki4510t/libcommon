@@ -22,7 +22,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
+import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.RendererHolder;
+import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.glutils.SurfaceReader;
 import com.serenegiant.graphics.BitmapHelper;
@@ -65,7 +67,7 @@ public class RendererHolderTest {
 	}
 
 	@Test
-	public void rendererHolder() {
+	public void rendererHolder_staticTextureSource() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -121,5 +123,64 @@ public class RendererHolderTest {
 			e.printStackTrace();
 		}
 		source.removeSurface(surface.hashCode());
+	}
+
+	@Test
+	public void rendererHolder_mageTextureSource() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		// 映像受け取り用にSurfaceReaderを生成
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new SurfaceReader.OnImageAvailableListener() {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onImageAvailable(@NonNull final SurfaceReader reader) {
+				final Bitmap bitmap = reader.acquireLatestImage();
+				if (bitmap != null) {
+					try {
+						if (cnt.incrementAndGet() >= 5) {
+							if (sem.availablePermits() == 0) {
+								result.set(Bitmap.createBitmap(bitmap));
+								sem.release();
+							}
+						}
+					} finally {
+						reader.recycle(bitmap);
+					}
+				}
+			}
+		}, HandlerThreadHandler.createHandler());
+
+		final Surface readerSurface = reader.getSurface();
+		assertNotNull(readerSurface);
+
+		// 映像ソースとしてImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(new GLManager(), original, new Fraction(30));
+
+		// テストするRendererHolderを生成
+		final RendererHolder rendererHolder = new RendererHolder(WIDTH, HEIGHT, null);
+		final Surface surface = rendererHolder.getSurface();
+		assertNotNull(surface);
+		// ImageTextureSource →　RendererHolder　→ SurfaceReaderと繋ぐ
+		source.setSurface(surface);
+		rendererHolder.addSurface(readerSurface.hashCode(), readerSurface, false);
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
+			assertTrue(bitMapEquals(original, flipVertical(b)));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+		source.setSurface(null);
 	}
 }
