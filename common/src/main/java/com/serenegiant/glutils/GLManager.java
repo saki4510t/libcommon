@@ -51,7 +51,10 @@ public class GLManager {
 	 * maxClientVersionは端末が対応しているGL|ESバージョンの一番大きいものを使う
 	 */
 	public GLManager() {
-		this(GLUtils.getSupportedGLVersion(), null, 0, null);
+		this(GLUtils.getSupportedGLVersion(),
+			 null, 0,
+			  null, 0,0,
+			  null);
 	}
 
 	/**
@@ -60,7 +63,10 @@ public class GLManager {
 	 * @param callback
 	 */
 	public GLManager(@Nullable final Handler.Callback callback) {
-		this(GLUtils.getSupportedGLVersion(), null, 0, callback);
+		this(GLUtils.getSupportedGLVersion(),
+			null, 0,
+			null, 0, 0,
+			callback);
 	}
 
 	/**
@@ -68,7 +74,9 @@ public class GLManager {
 	 * @param maxClientVersion
 	 */
 	public GLManager(final int maxClientVersion) {
-		this(maxClientVersion, null, 0, null);
+		this(maxClientVersion, null, 0,
+			null, 0, 0,
+			null);
 	}
 
 	/**
@@ -79,7 +87,7 @@ public class GLManager {
 	public GLManager(final int maxClientVersion,
 		@Nullable final Handler.Callback callback) {
 
-		this(maxClientVersion, null, 0, callback);
+		this(maxClientVersion, null, 0, null, 0, 0, callback);
 	}
 
 	/**
@@ -93,6 +101,7 @@ public class GLManager {
 		this(manager.getGLContext().getMaxClientVersion(),
 			manager.getGLContext().getContext(),
 			manager.getGLContext().getFlags(),
+			null, 0, 0,
 			callback);
 	}
 
@@ -105,10 +114,33 @@ public class GLManager {
 	 */
 	public GLManager(final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		@Nullable final Handler.Callback callback) throws RuntimeException {
+		@Nullable final Handler.Callback callback)
+			throws IllegalArgumentException, IllegalStateException {
+		this(maxClientVersion, sharedContext, flags, null, 0, 0, callback);
+	}
+	/**
+	 * コンストラクタ
+	 * @param maxClientVersion
+	 * @param sharedContext 共有コンテキストを使わない場合はnull
+	 * @param flags GLContext生成時のフラグ
+	 * @param masterSurface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param masterWidth GLコンテキスト保持用のEglSurfaceのサイズ(幅)、0以下の場合は1になる
+	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
+	 * @param masterHeight GLコンテキスト保持用のEglSurfaceのサイズ(高さ)、0以下の場合は1になる
+	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
+	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
+	 */
+	public GLManager(final int maxClientVersion,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@Nullable final Object masterSurface, final int masterWidth, final int masterHeight,
+		@Nullable final Handler.Callback callback)
+			throws IllegalArgumentException, IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
+		if ((masterSurface != null) && !GLUtils.isSupportedSurface(masterSurface)) {
+			throw new IllegalArgumentException("wrong type of masterSurface");
+		}
+		mGLContext = new GLContext(maxClientVersion, sharedContext, flags, masterWidth, masterHeight);
 		final HandlerThreadHandler handler;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 			// API>=22ならHandlerを非同期仕様で初期化
@@ -124,7 +156,7 @@ public class GLManager {
 			@Override
 			public void run() {
 				try {
-					mGLContext.initialize();
+					mGLContext.initialize(masterSurface);
 					mInitialized = true;
 				} catch (final Exception e) {
 					Log.w(TAG, e);
@@ -142,7 +174,7 @@ public class GLManager {
 			// do nothing
 		}
 		if (!mInitialized) {
-			throw new RuntimeException("Failed to initialize GL context");
+			throw new IllegalStateException("Failed to initialize GL context");
 		}
 	}
 
@@ -214,6 +246,7 @@ public class GLManager {
 		checkValid();
 		return new GLManager(mGLContext.getMaxClientVersion(),
 			mGLContext.getContext(), mGLContext.getFlags(),
+			null, 0, 0,
 			callback);
 	}
 
