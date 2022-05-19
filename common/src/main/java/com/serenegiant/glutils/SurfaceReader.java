@@ -89,7 +89,11 @@ public class SurfaceReader {
 	private int mTexId;
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
-	private GLDrawer2D mDrawer;
+	/**
+	 * SurfaceTextureへ割り当てたテクスチャをバックバッファとしてラップして
+	 * 読み取り可能にするためのGLSurface
+	 */
+	private GLSurface mReadSurface;
 	private boolean mIsReaderValid = false;
 	private volatile boolean mAllBitmapAcquired = false;
 
@@ -116,10 +120,9 @@ public class SurfaceReader {
 			}
 		};
 		final Semaphore sem = new Semaphore(0);
-		mEglTask = new EglTask(GLUtils.getSupportedGLVersion(),
-			null, 0,
-			width, height) {
-
+		// GLDrawer2Dでマスターサーフェースへ描画しなくなったのでEglTask内で保持する
+		// マスターサーフェースは最小サイズ(1x1)でOK
+		mEglTask = new EglTask(GLUtils.getSupportedGLVersion(), null, 0) {
 			@Override
 			protected void onStart() {
 				handleOnStart();
@@ -328,8 +331,6 @@ public class SurfaceReader {
 	@WorkerThread
 	protected final void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
-		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
-		mDrawer = GLDrawer2D.create( mEglTask.isOES3Supported(), true);
 	}
 
 	/**
@@ -338,10 +339,6 @@ public class SurfaceReader {
 	@WorkerThread
 	protected final void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
-		if (mDrawer != null) {
-			mDrawer.release();
-			mDrawer = null;
-		}
 		handleReleaseInputSurface();
 	}
 
@@ -371,6 +368,9 @@ public class SurfaceReader {
 		mEglTask.removeRequest(REQUEST_DRAW);
 		try {
 			mEglTask.makeCurrent();
+			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
+			GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
+			mEglTask.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
@@ -380,8 +380,19 @@ public class SurfaceReader {
 		final Bitmap bitmap = obtainBitmap();
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
-			// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
-			mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
+//			// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
+			if (mReadSurface == null) {
+				try {
+					// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
+					mReadSurface = GLSurface.wrap(mEglTask.isGLES3(),
+						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1, mTexId,
+						mWidth, mHeight, false);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+					return;
+				}
+			}
+			mReadSurface.makeCurrent();
 			// オフスクリーンから読み取り
 			mWorkBuffer.clear();
 			GLUtils.glReadPixels(mWorkBuffer, mWidth, mHeight);
@@ -431,8 +442,9 @@ public class SurfaceReader {
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
+			// XXX この時点ではSurfaceTextureへ渡したテクスチャへメモリーが割り当てられておらずGLSurfaceを生成できない。
+			//     少なくとも1回はSurfaceTexture#updateTexImageが呼ばれた後でGLSurfaceでラップする
 			if (BuildCheck.isAndroid4_1()) {
-				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
 				mInputTexture.setDefaultBufferSize(mWidth, mHeight);
 			}
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
@@ -447,6 +459,10 @@ public class SurfaceReader {
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		synchronized (mSync) {
+			if (mReadSurface != null) {
+				mReadSurface.release();
+				mReadSurface = null;
+			}
 			if (mInputSurface != null) {
 				try {
 					mInputSurface.release();
