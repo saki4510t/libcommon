@@ -25,6 +25,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glpipeline.DistributePipeline;
+import com.serenegiant.glpipeline.DrawerPipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSource;
@@ -601,6 +602,63 @@ public class GLPipelineTest {
 		effectPipeline3.setPipeline(pipeline);
 
 		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, effectPipeline3, pipeline));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * DrawerPipelineが動作するかどうかを検証
+	 */
+	@Test
+	public void drawerPipeline() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		// ImageSourcePipeline - DrawerPipeline → ProxyPipeline → テクスチャ読み取り
+
+		final GLManager manager = new GLManager();
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+
+		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+
+		final Semaphore sem = new Semaphore(0);
+		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ProxyPipeline pipeline = new ProxyPipeline() {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() >= 30) {
+					source.setPipeline(null);
+					if (sem.availablePermits() == 0) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							GL_TEXTURE_2D, GLES20.GL_TEXTURE0, texId,
+							WIDTH, HEIGHT, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+						sem.release();
+					}
+				}
+			}
+		};
+
+		source.setPipeline(drawerPipeline);
+		drawerPipeline.setPipeline(pipeline);
+
+		assertTrue(validatePipelineOrder(source, source, drawerPipeline, pipeline));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
