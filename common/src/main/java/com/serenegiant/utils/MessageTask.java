@@ -281,6 +281,8 @@ public abstract class MessageTask implements Runnable {
 		mIsRunning = true;
 		mFinished = false;
 		try {
+			// #initが呼ばれて最初のリクエストがくるのを待機する
+			// #initで送るのはREQUEST_TASK_STARTだけどそれ以外でも問題ない
 			request = mRequestQueue.take();
 		} catch (final InterruptedException e) {
 			mIsRunning = false;
