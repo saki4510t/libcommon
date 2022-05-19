@@ -33,6 +33,8 @@ import com.serenegiant.math.Fraction;
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
+ * ImageTextureSourceと違って複数のsurfaceへ分配描画する
+ * 出力先Surfaceが1つだけならImageTextureSourceの方が効率的
  * FIXME GLES30対応を実装する
  */
 public class StaticTextureSource implements GLConst {
