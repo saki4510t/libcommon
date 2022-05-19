@@ -41,7 +41,6 @@ public class StaticTextureSource implements GLConst {
 
 	private final Object mSync = new Object();
 	private RendererTask mRendererTask;
-	private volatile boolean isRunning;
 
 	/**
 	 * フレームレート指定付きコンストラクタ
@@ -100,7 +99,9 @@ public class StaticTextureSource implements GLConst {
 	 * @return
 	 */
 	public boolean isRunning() {
-		return isRunning;
+		synchronized (mSync) {
+			return (mRendererTask != null) && mRendererTask.isRunning();
+		}
 	}
 
 	/**
@@ -108,16 +109,14 @@ public class StaticTextureSource implements GLConst {
 	 */
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		isRunning = false;
+		final RendererTask task;
 		synchronized (mSync) {
-			mSync.notifyAll();
-		}
-		if (mRendererTask != null) {
-			mRendererTask.release();
-		}
-		synchronized (mSync) {
+			task = mRendererTask;
 			mRendererTask = null;
 			mSync.notifyAll();
+		}
+		if (task != null) {
+			task.release();
 		}
 		if (DEBUG) Log.v(TAG, "release:finished");
 	}
@@ -130,11 +129,7 @@ public class StaticTextureSource implements GLConst {
 	 */
 	public void addSurface(final int id, final Object surface,
 		final boolean isRecordable) {
-
-		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		synchronized (mSync) {
-			mRendererTask.addSurface(id, surface);
-		}
+		addSurface(id, surface, isRecordable, -1);
 	}
 
 	/**
@@ -148,8 +143,12 @@ public class StaticTextureSource implements GLConst {
 		final boolean isRecordable, final int maxFps) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
+		final RendererTask task;
 		synchronized (mSync) {
-			mRendererTask.addSurface(id, surface, maxFps);
+			task = mRendererTask;
+		}
+		if (task != null) {
+			task.addSurface(id, surface, maxFps);
 		}
 	}
 
@@ -159,8 +158,12 @@ public class StaticTextureSource implements GLConst {
 	 */
 	public void removeSurface(final int id) {
 		if (DEBUG) Log.v(TAG, "removeSurface:id=" + id);
+		final RendererTask task;
 		synchronized (mSync) {
-			mRendererTask.removeSurface(id);
+			task = mRendererTask;
+		}
+		if (task != null) {
+			task.removeSurface(id);
 		}
 	}
 
@@ -169,10 +172,13 @@ public class StaticTextureSource implements GLConst {
 	 * 分配描画用Surface全てが更新されるので注意
 	 */
 	public void requestFrame() {
+		final RendererTask task;
 		synchronized (mSync) {
-			mRendererTask.removeRequest(REQUEST_DRAW);
-			mRendererTask.offer(REQUEST_DRAW);
-			mSync.notify();
+			task = mRendererTask;
+		}
+		if (task != null) {
+			task.removeRequest(REQUEST_DRAW);
+			task.offer(REQUEST_DRAW);
 		}
 	}
 
@@ -192,8 +198,12 @@ public class StaticTextureSource implements GLConst {
 	public void setBitmap(final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "setBitmap:bitmap=" + bitmap);
 		if (bitmap != null) {
+			final RendererTask task;
 			synchronized (mSync) {
-				mRendererTask.setBitmap(bitmap);
+				task = mRendererTask;
+			}
+			if (task != null) {
+				task.setBitmap(bitmap);
 			}
 		}
 	}
@@ -243,6 +253,13 @@ public class StaticTextureSource implements GLConst {
 			mIntervalsNs = _fps <= 0 ? 100000000L : (long)(1000000000L / _fps);
 		}
 
+		/** 初期化処理 */
+		@WorkerThread
+		protected void onInit(final int arg1, final int arg2, final Object obj) {
+			super.onInit(arg1, arg2, obj);
+			if (DEBUG) Log.v(TAG, "onInit:");
+		}
+
 		/**
 		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 		 */
@@ -251,10 +268,6 @@ public class StaticTextureSource implements GLConst {
 		protected void onStart() {
 			if (DEBUG) Log.v(TAG, "onStart:");
 			mDrawer = GLDrawer2D.create(false, false);		// GL_TEXTURE_EXTERNAL_OESを使わない
-			synchronized (mParent.mSync) {
-				mParent.isRunning = true;
-				mParent.mSync.notifyAll();
-			}
 			new Thread(mParent.mOnFrameTask, TAG).start();
 			if (DEBUG) Log.v(TAG, "onStart:finished");
 		}
@@ -266,10 +279,6 @@ public class StaticTextureSource implements GLConst {
 		@Override
 		protected void onStop() {
 			if (DEBUG) Log.v(TAG, "onStop");
-			synchronized (mParent.mSync) {
-				mParent.isRunning = false;
-				mParent.mSync.notifyAll();
-			}
 			makeCurrent();
 			if (mDrawer != null) {
 				mDrawer.release();
@@ -315,15 +324,6 @@ public class StaticTextureSource implements GLConst {
 		 * 分配描画用のSurfaceを追加
 		 * @param id
 		 * @param surface
-		 */
-		public void addSurface(final int id, final Object surface) {
-			addSurface(id, surface, -1);
-		}
-
-		/**
-		 * 分配描画用のSurfaceを追加
-		 * @param id
-		 * @param surface
 		 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
 		 */
 		public void addSurface(final int id, final Object surface, final int maxFps) {
@@ -334,24 +334,22 @@ public class StaticTextureSource implements GLConst {
 					"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 			}
 			synchronized (mTargets) {
-				if (mTargets.get(id) == null) {
-					for ( ; ; ) {
+				while (mTargets.get(id) == null) {
 					if (DEBUG) Log.v(TAG, "RendererTask#addSurface:wait for");
-						if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
-							try {
-								mTargets.wait();
+					if (offer(REQUEST_ADD_SURFACE, id, maxFps, surface)) {
+						try {
 							if (DEBUG) Log.v(TAG, "RendererTask#addSurface:mTargets.wait");
-							} catch (final InterruptedException e) {
-								// ignore
-							}
+							mTargets.wait(1000);
+						} catch (final InterruptedException e) {
 							break;
-						} else {
-							try {
+						}
+						break;
+					} else {
+						try {
 							if (DEBUG) Log.v(TAG, "RendererTask#addSurface:mTargets.wait");
-								mTargets.wait(10);
-							} catch (InterruptedException e) {
-								break;
-							}
+							mTargets.wait(10);
+						} catch (InterruptedException e) {
+							break;
 						}
 					}
 				}
@@ -577,19 +575,19 @@ public class StaticTextureSource implements GLConst {
 		public void run() {
 			final long ms = mRendererTask.mIntervalsNs / 1000000L;
 			final int ns = (int)(mRendererTask.mIntervalsNs % 1000000L);
-			for (; isRunning; ) {
-				if (mRendererTask == null) break;
-				synchronized (mSync) {
-					try {
+			while (isRunning()) {
+				try {
+					final RendererTask task;
+					synchronized (mSync) {
 						mSync.wait(ms, ns);
-						if (mRendererTask.mImageSource != null) {
-							mRendererTask.removeRequest(REQUEST_DRAW);
-							mRendererTask.offer(REQUEST_DRAW);
-							mSync.notify();
-						}
-					} catch (Exception e) {
-						Log.w(TAG, e);
+						task = mRendererTask;
 					}
+					if (task != null && task.mImageSource != null) {
+						task.removeRequest(REQUEST_DRAW);
+						task.offer(REQUEST_DRAW);
+					}
+				} catch (Exception e) {
+					Log.w(TAG, e);
 				}
 			}
 		}
