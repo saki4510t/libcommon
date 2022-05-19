@@ -30,7 +30,7 @@ import androidx.annotation.WorkerThread
 import androidx.core.content.ContextCompat
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.ImageSource
+import com.serenegiant.glpipeline.ImageSourcePipeline
 import com.serenegiant.glutils.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.R
@@ -47,7 +47,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 		: AspectScaledGLView(context, attrs, defStyle), ICameraView, GLPipelineView {
 
 	private var mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener? = null
-	private var mImageSource: ImageSource? = null
+	private var mImageSourcePipeline: ImageSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 	@Volatile
@@ -68,14 +68,14 @@ class DummyCameraGLView @JvmOverloads constructor(
 
 			@WorkerThread
 			override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
-				mImageSource!!.resize(width, height)
+				mImageSourcePipeline!!.resize(width, height)
 			}
 
 			@SuppressLint("WrongThread")
 			@WorkerThread
 			override fun drawFrame() {
-				if (mHasSurface && (mImageSource != null) && mImageSource!!.isValid) {
-					handleDraw(mImageSource!!.texId, mImageSource!!.texMatrix)
+				if (mHasSurface && (mImageSourcePipeline != null) && mImageSourcePipeline!!.isValid) {
+					handleDraw(mImageSourcePipeline!!.texId, mImageSourcePipeline!!.texMatrix)
 				}
 			}
 
@@ -106,8 +106,12 @@ class DummyCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onResume:")
 		val dr: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_launcher)
 		val image = if (dr != null) BitmapHelper.fromDrawable(dr, 640, 480) else null
-		mImageSource =
-			ImageSource(getGLManager(), image, null)
+		mImageSourcePipeline =
+			ImageSourcePipeline(
+				getGLManager(),
+				image,
+				null
+			)
 	}
 
 	/**
@@ -116,16 +120,16 @@ class DummyCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
-		if (mImageSource != null) {
-			mImageSource!!.pipeline = null
+		if (mImageSourcePipeline != null) {
+			mImageSourcePipeline!!.pipeline = null
 		}
 		if (mDistributor != null) {
 			mDistributor!!.release()
 			mDistributor = null
 		}
-		if (mImageSource != null) {
-			mImageSource!!.release()
-			mImageSource = null
+		if (mImageSourcePipeline != null) {
+			mImageSourcePipeline!!.release()
+			mImageSourcePipeline = null
 		}
 	}
 
@@ -161,10 +165,10 @@ class DummyCameraGLView @JvmOverloads constructor(
 	 * ICameraViewの実装
 	 */
 	override fun setVideoSize(width: Int, height: Int) {
-		if (mImageSource != null) {
+		if (mImageSourcePipeline != null) {
 			val dr: Drawable? = ContextCompat.getDrawable(context, R.mipmap.ic_launcher)
 			val image = if (dr != null) BitmapHelper.fromDrawable(dr, width, height) else null
-			mImageSource!!.setSource(image, null)
+			mImageSourcePipeline!!.setSource(image, null)
 		}
 	}
 
@@ -172,14 +176,14 @@ class DummyCameraGLView @JvmOverloads constructor(
 	 * ICameraViewの実装
 	 */
 	override fun getVideoWidth(): Int {
-		return mImageSource!!.width
+		return mImageSourcePipeline!!.width
 	}
 
 	/**
 	 * ICameraViewの実装
 	 */
 	override fun getVideoHeight(): Int {
-		return mImageSource!!.height
+		return mImageSourcePipeline!!.height
 	}
 
 	/**
@@ -196,8 +200,8 @@ class DummyCameraGLView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mImageSource!!.glManager)
-			mImageSource!!.pipeline = mDistributor!!
+			mDistributor = SurfaceDistributePipeline(mImageSourcePipeline!!.glManager)
+			mImageSourcePipeline!!.pipeline = mDistributor!!
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -222,11 +226,11 @@ class DummyCameraGLView @JvmOverloads constructor(
 	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		if (mImageSource != null) {
-			val last = GLPipeline.findLast(mImageSource!!)
+		if (mImageSourcePipeline != null) {
+			val last = GLPipeline.findLast(mImageSourcePipeline!!)
 			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
 			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mImageSource!!))
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mImageSourcePipeline!!))
 		} else {
 			throw IllegalStateException()
 		}

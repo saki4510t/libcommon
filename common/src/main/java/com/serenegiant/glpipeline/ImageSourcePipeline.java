@@ -39,9 +39,9 @@ import androidx.annotation.WorkerThread;
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
  */
-public class ImageSource extends ProxyPipeline implements GLPipelineSource {
+public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = ImageSource.class.getSimpleName();
+	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
 
 	@NonNull
 	private static final float[] sIdentityMatrix= new float[16];
@@ -63,7 +63,7 @@ public class ImageSource extends ProxyPipeline implements GLPipelineSource {
 	 * @param bitmap nullのときは後で#setSourceを呼び出さないと#onFrameAvailableが呼び出されない
 	 * @param fps nullの時は30fps相当
 	 */
-	public ImageSource(
+	public ImageSourcePipeline(
 		@NonNull final GLManager manager,
 		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		super();

@@ -28,7 +28,7 @@ import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSource;
-import com.serenegiant.glpipeline.ImageSource;
+import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfacePipeline;
 import com.serenegiant.glpipeline.VideoSource;
@@ -231,7 +231,7 @@ public class GLPipelineTest {
 //		dump(bitmap);
 
 		final GLManager manager = new GLManager();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
 		// #getInputSurfaceと#getInputSurfaceTextureはUnsupportedOperationExceptionを
 		// 返すことを検証
@@ -294,7 +294,7 @@ public class GLPipelineTest {
 
 		final GLManager manager = new GLManager();
 		final DistributePipeline distributor = new DistributePipeline();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		source.setPipeline(distributor);
 
 		final Semaphore sem1 = new Semaphore(0);
@@ -372,10 +372,10 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final SurfacePipeline surfacePipeline = new SurfacePipeline(manager);
 		source.setPipeline(surfacePipeline);
@@ -445,10 +445,10 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
 
@@ -503,10 +503,10 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
 		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
@@ -563,10 +563,10 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSource - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
+		// ImageSourcePipeline - SurfacePipeline → (Surface) → VideoSource - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
-		final ImageSource source = new ImageSource(manager, original, null);
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
 		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
