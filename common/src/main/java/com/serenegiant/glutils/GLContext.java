@@ -451,32 +451,10 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * GLES2/3でGL_OES_EGL_image_externalに対応しているかどうか
-	 * isOES2Supportedのシノニム
-	 * @return
-	 * @deprecated isOES2Supportedを使うこと
-	 */
-	@Deprecated
-	public boolean isOES2() {
-		return isOES2Supported();
-	}
-
-	/**
-	 * GLES2/3でGL_OES_EGL_image_externalに対応しているかどうか
 	 * @return
 	 */
 	public boolean isOES2Supported() {
 		return isGLES2() && hasExtension("GL_OES_EGL_image_external");
-	}
-
-	/**
-	 * GLES3でGL_OES_EGL_image_external_essl3に対応しているかどうか
-	 * isOES3Supportedのシノニム
-	 * @return
-	 * @deprecated isOES3Supportedを使うこと
-	 */
-	@Deprecated
-	public boolean isOES3() {
-		return isOES3Supported();
 	}
 
 	/**

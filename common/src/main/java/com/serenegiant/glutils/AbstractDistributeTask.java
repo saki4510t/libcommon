@@ -136,51 +136,6 @@ public abstract class AbstractDistributeTask {
 	 * interruptされるまでカレントスレッドをブロックする。
 	 * @param id
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
-	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
-	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
-	 */
-	@Deprecated
-	@AnyThread
-	public void addSurface(final int id,
-		final Object surface, final int maxFps)
-			throws IllegalStateException, IllegalArgumentException {
-
-		if (DEBUG) Log.v(TAG, "addSurface:" + id);
-		checkFinished();
-		if (!GLUtils.isSupportedSurface(surface)) {
-			throw new IllegalArgumentException(
-				"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
-		}
-		RendererTarget target;
-		synchronized (mTargets) {
-			target = mTargets.get(id);
-		}
-		if (target == null) {
-			final TargetSurface _surface = new TargetSurface(id, surface, maxFps);
-			while (isRunning() && !isFinished()) {
-				if (offer(REQUEST_ADD_SURFACE, _surface)) {
-					// 追加時は待機しなくて良さそう
-					break;
-				} else {
-					// タスク実行中ならofferに失敗しないのでここにはこないはず
-					synchronized (mSync) {
-						try {
-							mSync.wait(5);
-						} catch (final InterruptedException e) {
-							break;
-						}
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * 分配描画用のSurfaceを追加
-	 * このメソッドは指定したSurfaceが追加されるか
-	 * interruptされるまでカレントスレッドをブロックする。
-	 * @param id
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param maxFps nullまたはasFloatが0以下なら未指定, それ以外なら最大フレームレート
 	 */
 	@AnyThread
@@ -837,8 +792,6 @@ public abstract class AbstractDistributeTask {
 	public abstract int getGlVersion();
 	public abstract void makeCurrent();
 	public abstract boolean isGLES3();
-	@Deprecated
-	public abstract boolean isOES3();
 	public abstract boolean isOES3Supported();
 
 	public abstract boolean isMasterSurfaceValid();

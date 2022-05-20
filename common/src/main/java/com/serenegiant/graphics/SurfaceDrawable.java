@@ -244,11 +244,6 @@ public class SurfaceDrawable extends Drawable {
 		return mEglTask.isGLES3();
 	}
 
-	@Deprecated
-	protected boolean isOES3() {
-		return mEglTask.isOES3Supported();
-	}
-
 	protected boolean isOES3Supported() {
 		return mEglTask.isOES3Supported();
 	}

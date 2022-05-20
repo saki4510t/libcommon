@@ -142,56 +142,6 @@ public final class CursorHelper {
 	}
 
 //--------------------------------------------------------------------------------
-	@Deprecated
-	public static String getString(@Nullable final Cursor cursor,
-		@NonNull final String columnName, @Nullable final String defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static CharSequence getCharSequence(@Nullable final Cursor cursor,
-		@NonNull final String columnName, @Nullable final CharSequence defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static int getInt(@Nullable final Cursor cursor,
-		@NonNull final String columnName, final int defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static short getShort(@Nullable final Cursor cursor,
-		@NonNull final String columnName, final short defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static long getLong(@Nullable final Cursor cursor,
-		@NonNull final String columnName, final long defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static float getFloat(@Nullable final Cursor cursor,
-		@NonNull final String columnName, final float defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-	@Deprecated
-	public static double getDouble(@Nullable final Cursor cursor,
-		@NonNull final String columnName, final double defaultValue) {
-
-		return get(cursor, columnName, defaultValue);
-	}
-
-//--------------------------------------------------------------------------------
 	/**
 	 * カラム名"_id"から値を読み取り指定したidと一致するpositionを探す。見つからなければ-1を返す
 	 *
@@ -254,7 +204,7 @@ public final class CursorHelper {
 					}
 					sb.append(", ");
 				}
-				Log.v(TAG, "dumpCursor:" + sb.toString());
+				Log.v(TAG, "dumpCursor:" + sb);
 				row++;
 			} while (cursor.moveToNext());
 		}

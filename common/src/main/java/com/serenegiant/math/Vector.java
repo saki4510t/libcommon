@@ -1010,22 +1010,6 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 *  ※どちらかのベクトルの長さが0の場合には(ゼロ除算で)INFINITYになる
 	 * @param v
 	 * @return 角度[度]
-	 * @deprecated #angleを使うこと
-	 */
-	@Deprecated
-	public float getAngle(@NonNull final Vector v) {
-		return angle(v);
-	}
-
-	/**
-	 * ベクトル間の角度を取得
-	 * ベクトル１ Za=(X1,Y1,Z1)、ベクトル２ Zb=(X2,Y2,Z2)、求める角φとすると、
-	 * cos φ ＝ Za・Zb / (|Za| |Zb|)
-	 *  =(X1X2+Y1Y2+Z1Z2) / √{(X1^2 + Y1^2 + Z1^2)(X2^2 + Y2^2 + Z2^2)}
-	 *  上式のアークコサイン(cos^-1)を取ればOK。
-	 *  ※どちらかのベクトルの長さが0の場合には(ゼロ除算で)INFINITYになる
-	 * @param v
-	 * @return 角度[度]
 	 */
 	public float angle(@NonNull final Vector v) {
 		final double cos = dotDouble(this, v)
@@ -1207,59 +1191,6 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	public Vector rotate(@NonNull final Vector angle) {
 		return rotate(this, angle.x, angle.y, angle.z);
-	}
-
-	/**
-	 * 逆回転(スレッドセーフではない)
-	 * @param angleX
-	 * @param angleY
-	 * @param angleZ
-	 * @return
-	 */
-	@Deprecated
-	public Vector rotate_inv(final float angleX, final float angleY, final float angleZ) {
-		inVec[0] = x;
-		inVec[1] = y;
-		inVec[2] = z;
-		inVec[3] = 1;
-		Matrix.setIdentityM(matrix, 0);
-		if (angleZ != 0) {
-			Matrix.rotateM(matrix, 0, angleZ, 0f, 0f, 1f);
-		}
-		if (angleY != 0) {
-			Matrix.rotateM(matrix, 0, angleY, 0f, 1f, 0f);
-		}
-		if (angleX != 0) {
-			Matrix.rotateM(matrix, 0, angleX, 1f, 0f, 0f);
-		}
-		Matrix.multiplyMV(outVec, 0, matrix, 0, inVec, 0);
-		x = outVec[0];
-		y = outVec[1];
-		z = outVec[2];
-		return this;
-	}
-
-	/**
-	 * 逆回転(スレッドセーフではない)
-	 * @param angle
-	 * @param a
-	 * @return
-	 */
-	@Deprecated
-	public Vector rotate_inv(@NonNull final Vector angle, final float a) {
-		rotate_inv(angle.x * a, angle.y * a, angle.z * a);
-		return this;
-	}
-
-	/**
-	 * 逆回転(スレッドセーフではない)
-	 * @param angle
-	 * @return
-	 */
-	@Deprecated
-	public Vector rotate_inv(@NonNull final Vector angle) {
-		rotate_inv(angle, -1f);
-		return this;
 	}
 
 	/**

@@ -20,14 +20,11 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
 import android.os.Build;
 import android.util.Log;
-
-import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -179,92 +176,6 @@ public abstract class GLSurface implements IGLSurface {
 		} else {
 			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height, use_depth_buffer, adjust_power2);
-		}
-	}
-
-	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド, デプスバッファなし
-	 * @param isGLES3
-	 * @param tex_id
-	 * @param tex_unit
-	 * @param width
-	 * @param height
-	 * @deprecated #newInstanceの代わりに#wrapを使うこと
-	 */
-	@Deprecated
-	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
-		@TexUnit final int tex_unit, final int tex_id,
-		final int width, final int height) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
-				width, height,
-				false, DEFAULT_ADJUST_POWER2);
-		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-				width, height,
-				false, DEFAULT_ADJUST_POWER2);
-		}
-	}
-
-	/**
-	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド
-	 * @param isGLES3
-	 * @param tex_unit
-	 * @param tex_id
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 * @deprecated #newInstanceの代わりに#wrapを使うこと
-	 */
-	@Deprecated
-	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
-		@TexUnit final int tex_unit, final int tex_id,
-		final int width, final int height, final boolean use_depth_buffer) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
-				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
-		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
-				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
-		}
-	}
-
-	/**
-	 * 既存のテクスチャをwrapするためのインスタンス生成のヘルパーメソッド
-	 * XXX SurfaceTextureへ割り当てたGL_TEXTURE_EXTERNAL_OESのテクスチャは
-	 *     少なくとも1回はSurfaceTexture#updateTexImageを呼び出すまでは
-	 *     メモリー割り当てされておらず実際のテクスチャとしてアクセスできない。
-	 *     SurfaceTexture#updateTexImageを呼ぶ前にGLSurfaceでラップすると
-	 *     assignTextureでフレームバッファーをセットするときにクラッシュするので注意
-	 * @param isGLES3
-	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
-	 * @param tex_unit
-	 * @param tex_id
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 * @deprecated #newInstanceの代わりに#wrapを使うこと
-	 */
-	@Deprecated
-	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
-		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
-		final int width, final int height, final boolean use_depth_buffer) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(tex_target, tex_unit, tex_id,
-				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
-		} else {
-			return new GLSurfaceES2(tex_target, tex_unit, tex_id,
-				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
 
@@ -549,27 +460,6 @@ public abstract class GLSurface implements IGLSurface {
 	public abstract void bindTexture();
 
 	/**
-	 * オフスクリーン描画用のレンダリングバッファに切り替える
-	 * Viewportも変更になるので必要であればunbind後にViewportの設定をすること
-	 * @deprecated #makeCurrentを使うこと
-	 */
-	@Deprecated
-	public void bind() {
-//		if (DEBUG) Log.v(TAG, "makeCurrent:");
-		makeCurrent();
-	}
-
-	/**
-	 * デフォルトのレンダリングバッファに戻す
-	 * @deprecated #swapを使うこと
-	 */
-	@Deprecated
-	public void unbind() {
-//		if (DEBUG) Log.v(TAG, "swap:");
-		swap();
-	}
-
-	/**
 	 * 指定したテクスチャをこのオフスクリーンに割り当てる
 	 * @param texture_name
 	 * @param width
@@ -577,37 +467,6 @@ public abstract class GLSurface implements IGLSurface {
 	 */
 	public abstract void assignTexture(final int texture_name,
 		final int width, final int height);
-
-	/**
-	 * 指定したファイルから画像をテクスチャに読み込む
-	 * ファイルが存在しないか読み込めなければIOException/NullPointerExceptionを生成
-	 * @param filePath
-	 */
-	@Deprecated
-	@Override
-	public void loadBitmap(@NonNull final String filePath) throws IOException {
-//		if (DEBUG) Log.v(TAG, "loadBitmap:path=" + filePath);
-		final BitmapFactory.Options options = new BitmapFactory.Options();
-		options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-		BitmapFactory.decodeFile(filePath, options);
-		// テキスチャサイズ内に指定したイメージが収まるためのサブサンプリングを値を求める
-		final int imageWidth = options.outWidth;
-		final int imageHeight = options.outHeight;
-		int inSampleSize = 1;	// サブサンプリングサイズ
-		if ((imageHeight > mTexHeight) || (imageWidth > mTexWidth)) {
-			if (imageWidth > imageHeight) {
-				inSampleSize = (int)Math.ceil(imageHeight / (float)mTexHeight);
-			} else {
-				inSampleSize = (int)Math.ceil(imageWidth / (float)mTexWidth);
-			}
-		}
-//		if (DEBUG) Log.v(TAG, String.format("image(%d,%d),tex(%d,%d),inSampleSize=%d",
-// 			imageWidth, imageHeight, mTexWidth, mTexHeight, inSampleSize));
-		// 実際の読み込み処理
-		options.inSampleSize = inSampleSize;
-		options.inJustDecodeBounds = false;
-		loadBitmap(BitmapFactory.decodeFile(filePath, options));
-	}
 
 	/**
 	 * オフスクリーン描画用のフレームバッファオブジェクトを生成する

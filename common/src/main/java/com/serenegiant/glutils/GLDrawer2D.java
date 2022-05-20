@@ -343,22 +343,6 @@ public abstract class GLDrawer2D implements GLConst {
 
 	/**
 	 * 描画処理
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param texId
-	 * @param tex_matrix
-	 * @param offset
-	 * @deprecated texUnitを明示的に指定する#drawを使うこと
-	 */
-	@Deprecated
-	public synchronized void draw(
-		final int texId,
-		@Nullable final float[] tex_matrix, final int offset) {
-
-		draw(GLES20.GL_TEXTURE0, texId, tex_matrix, offset, mMvpMatrix, 0);
-	}
-
-	/**
-	 * 描画処理
 	 * @param texUnit
 	 * @param texId
 	 * @param tex_matrix
@@ -448,21 +432,10 @@ public abstract class GLDrawer2D implements GLConst {
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
 	 * GLHelper#initTexを呼び出すだけ
-	 * @return texture ID
-	 * @deprecated texUnitを明示的に指定する#initTexを使うこと
-	 */
-	@Deprecated
-	public int initTex() {
-		return GLHelper.initTex(mTexTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
 	 * @param texUnit
 	 * @return texture ID
 	 */
-	public int initTex(final int texUnit) {
+	public int initTex(@TexUnit final int texUnit) {
 		return GLHelper.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
 	}
 

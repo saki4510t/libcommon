@@ -19,7 +19,6 @@ package com.serenegiant.system;
 */
 
 import android.annotation.TargetApi;
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -46,8 +45,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
@@ -60,59 +57,6 @@ public class SAFUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
-	/**
-	 * ActivityまたはFragmentの#onActivityResultメソッドの処理のうち
-	 * Storage Access Framework関係の処理を行うためのdelegater
-	 * @deprecated SAFPermissionを使うこと
-	 */
-	@Deprecated
-	public interface handleOnResultDelegater {
-		public boolean onResult(
-			final int requestCode,
-			@NonNull final Uri uri, @NonNull final Intent data);
-
-		public void onFailed(
-			final int requestCode, @Nullable final Intent data);
-	}
-
-	/**
-	 * ActivityまたはFragmentの#onActivityResultメソッドの処理をdelegaterで
-	 * 処理するためのヘルパーメソッド
-	 * @param context
-	 * @param requestCode
-	 * @param resultCode
-	 * @param data
-	 * @param delegater
-	 * @return true if successfully handled, false otherwise
-	 * @deprecated SAFPermissionを使うこと
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static boolean handleOnResult(
-		@NonNull final Context context,
-		final int requestCode, final int resultCode,
-		@Nullable final Intent data,
-		@NonNull final handleOnResultDelegater delegater) {
-
-		if ((data != null) && (resultCode == Activity.RESULT_OK)) {
-			final Uri uri = data.getData();
-			if (uri != null) {
-				try {
-					return delegater.onResult(requestCode, uri, data);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-			}
-		}
-		try {
-			clearUri(context, getKey(requestCode));
-			delegater.onFailed(requestCode, data);
-		} catch (final Exception e) {
-			Log.w(TAG, e);
-		}
-		return false;
-	}
-	
 //--------------------------------------------------------------------------------
 	/**
 	 * 指定したドキュメントツリーIDに対応するUriへアクセス可能かどうかを取得
@@ -151,91 +95,6 @@ public class SAFUtils {
 			}
 		}
 		return false;
-	}
-
-	/**
-	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
-	 * @param activity
-	 * @param treeId
-	 * @return ドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
-	 * @throws UnsupportedOperationException
-	 * @deprecated SAFPermissionクラスを使うこと
-	 */
-	@Deprecated
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	@Nullable
-	public static Uri requestPermission(
-		@NonNull final Activity activity,
-		final int treeId) {
-
-		if (BuildCheck.isLollipop()) {
-			final Uri uri = getStorageUri(activity, treeId);
-			if (uri == null) {
-				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
-			}
-			return uri;
-		} else {
-			throw new UnsupportedOperationException("should be API>=21");
-		}
-	}
-
-	/**
-	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
-	 * @param activity
-	 * @param treeId
-	 * @return 指定したドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
-	 * @throws UnsupportedOperationException
-	 * @deprecated SAFPermissionクラスを使うこと
-	 */
-	@Deprecated
-	@SuppressWarnings("deprecation")
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	@Nullable
-	public static Uri requestPermission(
-		@NonNull final FragmentActivity activity,
-		final int treeId) {
-
-		if (BuildCheck.isLollipop()) {
-			final Uri uri = getStorageUri(activity, treeId);
-			if (uri == null) {
-				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				activity.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
-			}
-			return uri;
-		} else {
-			throw new UnsupportedOperationException("should be API>=21");
-		}
-	}
-
-	/**
-	 * 指定したドキュメントツリーIDに対応するUriへのアクセス要求を行う
-	 * @param fragment
-	 * @param treeId
-	 * @return 指定したドキュメントツリーIDに対応するUriが存在していればそれを返す, 存在していなければパーミッション要求をしてnullを返す
-	 * @throws UnsupportedOperationException
-	 * @throws IllegalStateException
-	 * @deprecated SAFPermissionクラスを使うこと
-	 */
-	@Deprecated
-	@SuppressWarnings("deprecation")
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-	@Nullable
-	public static Uri requestPermission(
-		@NonNull final Fragment fragment,
-		final int treeId) {
-
-		if (BuildCheck.isLollipop()) {
-			@NonNull
-			final Uri uri = getStorageUri(fragment.requireContext(), treeId);
-			if (uri == null) {
-				// 指定したドキュメントツリーIDに対応するUriへのパーミッションを保持していない時は要求してnullを返す
-				fragment.startActivityForResult(prepareStorageAccessPermission(), treeId);	// API>=21
-			}
-			return uri;
-		} else {
-			throw new UnsupportedOperationException("should be API>=21");
-		}
 	}
 
 //--------------------------------------------------------------------------------

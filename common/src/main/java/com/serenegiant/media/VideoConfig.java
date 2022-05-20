@@ -50,16 +50,6 @@ public class VideoConfig implements Parcelable, Cloneable {
 	);
 
 	/**
-	 * DEFAULT_CONFIGを引き継いだ新しいVideoConfigオブジェクトを生成
-	 * @return
-	 * @deprecated デフォルトコンストラクタを使うこと
-	 */
-	@Deprecated
-	public static VideoConfig createDefault() {
-		return new VideoConfig(DEFAULT_CONFIG);
-	}
-
-	/**
 	 * BPP(Bits Per Pixel)
 	 * (0.050/0.075/0.100/0.125/0.150/0.175/0.200/0.225/0.25)
 	 */

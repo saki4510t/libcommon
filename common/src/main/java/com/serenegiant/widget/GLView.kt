@@ -140,15 +140,6 @@ open class GLView @JvmOverloads constructor(
 		return mGLContext.isGLES3
 	}
 
-	/**
-	 * OpenGL|ES3.xが使用可能＆GLES3の外部テクスチャを使用可能かどうかどうかを取得
-	 */
-	@Deprecated("Use isOES3Supported")
-	@AnyThread
-	fun isOES3() : Boolean {
-		return mGLContext.isOES3Supported
-	}
-
 	@AnyThread
 	fun isOES3Supported() : Boolean {
 		return mGLContext.isOES3Supported

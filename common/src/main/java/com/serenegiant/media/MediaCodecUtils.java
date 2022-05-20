@@ -30,18 +30,15 @@ import android.annotation.SuppressLint;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
-@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
 public final class MediaCodecUtils {
 	private static final String TAG = MediaCodecUtils.class.getSimpleName();
 
@@ -1035,18 +1032,6 @@ public final class MediaCodecUtils {
     }
 
 //================================================================================
-	/**
-	 * 指定したMIMEに一致する最初の音声エンコード用コーデックを選択する
-	 * @param mimeType
-	 * @return
-	 * @deprecated selectAudioEncoderを使うこと
-	 */
-	@Deprecated
-	@Nullable
-	public static final MediaCodecInfo selectAudioCodec(final String mimeType) {
-		return selectAudioEncoder(mimeType);
-	}
-
 	/**
 	 * 指定したMIMEに一致する最初の音声エンコード用コーデックを選択する
 	 * 対応するものがなければnullを返す

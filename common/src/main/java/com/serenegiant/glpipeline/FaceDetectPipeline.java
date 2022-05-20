@@ -65,25 +65,6 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			final int width, final int height);
 	}
 
-	/**
-	 * パイプラインチェーンに含まれるEffectPipelineを取得する
-	 * 複数存在する場合は最初に見つかったものを返す
-	 * @param pipeline
-	 * @deprecated GLPipeline#find(pipeline, clazz)を使う
-	 */
-	@Deprecated
-	@Nullable
-	public static FaceDetectPipeline find(@NonNull final GLPipeline pipeline) {
-		GLPipeline p = GLPipeline.findFirst(pipeline);
-		while (p != null) {
-			if (p instanceof FaceDetectPipeline) {
-				return (FaceDetectPipeline)p;
-			}
-			p = p.getPipeline();
-		}
-		return null;
-	}
-
 //--------------------------------------------------------------------------------
 	@NonNull
 	private final Object mSync = new Object();

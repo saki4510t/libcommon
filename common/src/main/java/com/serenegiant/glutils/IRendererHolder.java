@@ -119,23 +119,6 @@ public interface IRendererHolder extends IRendererCommon {
 	 * @param id 普通は#hashCodeを使う
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
-	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
-	 * @throws IllegalStateException
-	 * @throws IllegalArgumentException
-	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
-	 */
-	@Deprecated
-	public void addSurface(final int id, final Object surface,
-		final boolean isRecordable, final int maxFps)
-			throws IllegalStateException, IllegalArgumentException;
-
-	/**
-	 * 分配描画用のSurfaceを追加
-	 * このメソッドは指定したSurfaceが追加されるか
-	 * interruptされるまでカレントスレッドをブロックする。
-	 * @param id 普通は#hashCodeを使う
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
-	 * @param isRecordable
 	 * @param maxFps nullまたは0以下なら制限しない
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException

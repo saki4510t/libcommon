@@ -141,25 +141,4 @@ public class MediaFileUtils {
 		}
 	}
 
-	/**
-	 * 静止画/動画保存用のDocumentFileを取得
-	 * SAFUtils.getFileのシノニム
-	 * @param root
-	 * @param dirs
-	 * @param mime
-	 * @param fileNameWithExt
-	 * @return
-	 * @throws IOException
-	 * @deprecated SAFUtils.getFileを使うこと
-	 */
-	@Deprecated
-	@NonNull
-	public static synchronized DocumentFile getRecordingFile(
-		@NonNull final DocumentFile root, @Nullable final String dirs,
-		@Nullable final String mime,
-		@NonNull final String fileNameWithExt) throws IOException {
-
-		return SAFUtils.getFile(root, dirs, mime, fileNameWithExt);
-	}
-
 }

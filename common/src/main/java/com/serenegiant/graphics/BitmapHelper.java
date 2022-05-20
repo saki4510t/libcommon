@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileDescriptor;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 
 import android.content.ContentResolver;
 import android.content.ContentUris;
@@ -472,87 +471,88 @@ public final class BitmapHelper {
 	}
 
 //--------------------------------------------------------------------------------
-// InputStreamを使う場合
+// XXX InputStreamを使う場合 資料のためにコメントとして残す
 
-	/**
-	 * ファイルからビットマップを読み込んでBitmapとして返す
-	 * @param in
-	 * @return
-	 * @deprecated BitmapFactory.decodeStreamを使う
-	 */
-	@Deprecated
-	@Nullable
-	public static Bitmap asBitmap(final InputStream in) {
-		Bitmap bitmap = null;
-		if (in != null) {
-			bitmap = BitmapFactory.decodeStream(in);
-		}
-		return bitmap;
-	}
-
-	/**
-	 * ファイルからビットマップを読み込んで指定した幅・高さに最も近い大きさのBitmapとして返す
-	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
-	 * @param in
-	 * @param requestWidth
-	 * @param requestHeight
-	 * @return
-	 */
-	@Deprecated
-	@Nullable
-	public static Bitmap asBitmap(final InputStream in, final int requestWidth, final int requestHeight) {
+//	/**
+//	 * ファイルからビットマップを読み込んでBitmapとして返す
+//	 * @param in
+//	 * @return
+//	 * @deprecated BitmapFactory.decodeStreamを使う
+//	 */
+//	@Deprecated
+//	@Nullable
+//	public static Bitmap asBitmap(final InputStream in) {
 //		Bitmap bitmap = null;
 //		if (in != null) {
-//			final BitmapFactory.Options options = new BitmapFactory.Options();
-//			final Rect outPadding = new Rect();
-//			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-//			BitmapFactory.decodeStream(in, outPadding, options);
-//			options.inJustDecodeBounds = false;
-//			options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-//			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
+//			bitmap = BitmapFactory.decodeStream(in);
 //		}
 //		return bitmap;
-		throw new UnsupportedOperationException("This never work well and made unsupported");
-	}
+//	}
 
-	/**
-	 * ファイルからビットマップデータを読み込んで指定した幅・高さのBitmapとして返す
-	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
-	 * @param in
-	 * @param requestWidth
-	 * @param requestHeight
-	 * @return
-	 */
-	@Deprecated
-	@Nullable
-	public static Bitmap asBitmapStrictSize(final InputStream in, final int requestWidth, final int requestHeight) {
-//		Bitmap bitmap = null;
-//		if (in != null) {
-//			final BitmapFactory.Options options = new BitmapFactory.Options();
-//			final Rect outPadding = new Rect();
-//			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-//			BitmapFactory.decodeStream(in, outPadding, options);
-//			// 一番近いサイズになるSamplingSizeを計算
-//			final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-//			// 2のベキ乗に丸める=MSBを取得
-//			final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
-//			options.inSampleSize = inSampleSize;
-////			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
-//			options.inJustDecodeBounds = false;
-//			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
-//			if ((inSampleSize != calcedSampleSize)
-//				|| (bitmap.getWidth() != requestWidth)
-//				|| (bitmap.getHeight() != requestHeight)) {
-//
-//				final Bitmap newBitmap = scaleBitmap(bitmap, requestWidth, requestHeight);
-//				bitmap.recycle();
-//				bitmap = newBitmap;
-//			}
-//		}
-//		return bitmap;
-		throw new UnsupportedOperationException("This never work well and made unsupported");
-	}
+//	/**
+//	 * ファイルからビットマップを読み込んで指定した幅・高さに最も近い大きさのBitmapとして返す
+//	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
+//	 * @param in
+//	 * @param requestWidth
+//	 * @param requestHeight
+//	 * @return
+//	 */
+//	@Deprecated
+//	@Nullable
+//	public static Bitmap asBitmap(final InputStream in, final int requestWidth, final int requestHeight) {
+////		Bitmap bitmap = null;
+////		if (in != null) {
+////			final BitmapFactory.Options options = new BitmapFactory.Options();
+////			final Rect outPadding = new Rect();
+////			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
+////			BitmapFactory.decodeStream(in, outPadding, options);
+////			options.inJustDecodeBounds = false;
+////			options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
+////			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
+////		}
+////		return bitmap;
+//		throw new UnsupportedOperationException("This never work well and made unsupported");
+//	}
 
+//	/**
+//	 * ファイルからビットマップデータを読み込んで指定した幅・高さのBitmapとして返す
+//	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
+//	 * @param in
+//	 * @param requestWidth
+//	 * @param requestHeight
+//	 * @return
+//	 */
+//	@Deprecated
+//	@Nullable
+//	public static Bitmap asBitmapStrictSize(final InputStream in, final int requestWidth, final int requestHeight) {
+////		Bitmap bitmap = null;
+////		if (in != null) {
+////			final BitmapFactory.Options options = new BitmapFactory.Options();
+////			final Rect outPadding = new Rect();
+////			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
+////			BitmapFactory.decodeStream(in, outPadding, options);
+////			// 一番近いサイズになるSamplingSizeを計算
+////			final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
+////			// 2のベキ乗に丸める=MSBを取得
+////			final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
+////			options.inSampleSize = inSampleSize;
+//////			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
+////			options.inJustDecodeBounds = false;
+////			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
+////			if ((inSampleSize != calcedSampleSize)
+////				|| (bitmap.getWidth() != requestWidth)
+////				|| (bitmap.getHeight() != requestHeight)) {
+////
+////				final Bitmap newBitmap = scaleBitmap(bitmap, requestWidth, requestHeight);
+////				bitmap.recycle();
+////				bitmap = newBitmap;
+////			}
+////		}
+////		return bitmap;
+//		throw new UnsupportedOperationException("This never work well and made unsupported");
+//	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * DrawableをBitmapへ変換する
 	 * @param drawable

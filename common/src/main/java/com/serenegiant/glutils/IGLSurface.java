@@ -89,15 +89,6 @@ public interface IGLSurface extends ISurface, GLConst {
 	public float[] getTexMatrix();
 
 	/**
-	 * 指定したファイルから画像をテクスチャに読み込む
-	 * ファイルが存在しないか読み込めなければIOExceptionを生成
-	 * @param filePath
-	 * @throws IOException
-	 */
-	@Deprecated
-	public void loadBitmap(@NonNull final String filePath) throws IOException;
-
-	/**
 	 * テクスチャにビットマップを読み込む
 	 * @param bitmap
 	 */

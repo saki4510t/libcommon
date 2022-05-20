@@ -19,7 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 
 import androidx.annotation.NonNull;
 
@@ -43,12 +42,6 @@ public class ShaderConst implements GLConst {
 	public static final int KERNEL_SIZE5x5 = 25;
 
 //--------------------------------------------------------------------------------
-	@Deprecated
-	@NonNull
-	public static int[] getTexNumbers(final boolean isGLES3) {
-		return isGLES3 ? TEX_NUMBERS : TEX_NUMBERS;
-	}
-
 	public static final int[] TEX_NUMBERS = {
 		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,
 		GLES20.GL_TEXTURE2, GLES20.GL_TEXTURE3,
@@ -66,29 +59,6 @@ public class ShaderConst implements GLConst {
 		GLES20.GL_TEXTURE26, GLES20.GL_TEXTURE27,
 		GLES20.GL_TEXTURE28, GLES20.GL_TEXTURE29,
 		GLES20.GL_TEXTURE30, GLES20.GL_TEXTURE31,
-	};
-
-	/**
-	 * ここの定数は実際にはGLES20の継承定数なのでGLES20の値を使うようにする
-	 */
-	@Deprecated
-	public static final int[] TEX_NUMBERS_ES3 = {
-		GLES30.GL_TEXTURE0, GLES30.GL_TEXTURE1,
-		GLES30.GL_TEXTURE2, GLES30.GL_TEXTURE3,
-		GLES30.GL_TEXTURE4, GLES30.GL_TEXTURE5,
-		GLES30.GL_TEXTURE6, GLES30.GL_TEXTURE7,
-		GLES30.GL_TEXTURE8, GLES30.GL_TEXTURE9,
-		GLES30.GL_TEXTURE10, GLES30.GL_TEXTURE11,
-		GLES30.GL_TEXTURE12, GLES30.GL_TEXTURE13,
-		GLES30.GL_TEXTURE14, GLES30.GL_TEXTURE15,
-		GLES30.GL_TEXTURE16, GLES30.GL_TEXTURE17,
-		GLES30.GL_TEXTURE18, GLES30.GL_TEXTURE19,
-		GLES30.GL_TEXTURE20, GLES30.GL_TEXTURE21,
-		GLES30.GL_TEXTURE22, GLES30.GL_TEXTURE23,
-		GLES30.GL_TEXTURE24, GLES30.GL_TEXTURE25,
-		GLES30.GL_TEXTURE26, GLES30.GL_TEXTURE27,
-		GLES30.GL_TEXTURE28, GLES30.GL_TEXTURE29,
-		GLES30.GL_TEXTURE30, GLES30.GL_TEXTURE31,
 	};
 
 //--------------------------------------------------------------------------------

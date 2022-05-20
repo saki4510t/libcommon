@@ -45,30 +45,11 @@ public class StaticTextureSource implements GLConst {
 	private RendererTask mRendererTask;
 
 	/**
-	 * フレームレート指定付きコンストラクタ
-	 * @param fps
-	 */
-	@Deprecated
-	public StaticTextureSource(final float fps) {
-		this(null, new Fraction(fps));
-	}
-
-	/**
 	 * ソースの静止画を指定したコンストラクタ, フレームレートは10fps固定
 	 * @param bitmap
 	 */
 	public StaticTextureSource(@Nullable final Bitmap bitmap) {
 		this(bitmap, new Fraction(10));
-	}
-
-	/**
-	 * ソースの静止画とフレームレートを指定可能なコンストラクタ
-	 * @param bitmap
-	 * @param fps
-	 */
-	@Deprecated
-	public StaticTextureSource(@Nullable final Bitmap bitmap, final float fps) {
-		this(bitmap, new Fraction(fps));
 	}
 
 	/**

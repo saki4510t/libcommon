@@ -209,27 +209,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param id 普通はSurface#hashCodeを使う
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
 	 * @param isRecordable
-	 * @param maxFps 0以下なら未指定, 1000未満ならその値、1000以上なら1000.0fで割ったものを最大フレームレートとする
-	 * @deprecated FractionとしてmaxFpsを指定する#addSurfaceを使うこと
-	 */
-	@Deprecated
-	@Override
-	public void addSurface(final int id,
-		final Object surface, final boolean isRecordable, final int maxFps)
-			throws IllegalStateException, IllegalArgumentException {
-
-//		if (DEBUG) Log.v(TAG, "addSurface:id=" + id + ",surface=" + surface);
-		mRendererTask.addSurface(id, surface,
-			maxFps <= 0 ? null :(maxFps > 1000 ? new Fraction(maxFps, 1000) : new Fraction(maxFps)));
-	}
-
-	/**
-	 * 分配描画用のSurfaceを追加
-	 * このメソッドは指定したSurfaceが追加されるか
-	 * interruptされるまでカレントスレッドをブロックする。
-	 * @param id 普通はSurface#hashCodeを使う
-	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
-	 * @param isRecordable
 	 * @param maxFps
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -650,12 +629,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		public boolean isGLES3() {
 			return mEglTask.isGLES3();
-		}
-
-		@Deprecated
-		@Override
-		public boolean isOES3() {
-			return mEglTask.isOES3Supported();
 		}
 
 		@Override

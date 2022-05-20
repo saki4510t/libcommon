@@ -45,29 +45,6 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
-	/**
-	 * パイプラインチェーンに含まれるEffectPipelineを取得する
-	 * 複数存在する場合は最初に見つかったものを返す
-	 * @param pipeline
-	 * @return
-	 * @deprecated GLPipeline#find(pipeline, clazz)を使う
-	 */
-	@Deprecated
-	@Nullable
-	public static EffectPipeline find(@NonNull final GLPipeline pipeline) {
-		// パイプラインチェーンの先頭を取得
-		GLPipeline p = GLPipeline.findFirst(pipeline);
-		// EffectPipelineが見つかるまで順番にたどる
-		while (p != null) {
-			if (p instanceof EffectPipeline) {
-				return (EffectPipeline)p;
-			}
-			p = p.getPipeline();
-		}
-		return null;
-	}
-
-//--------------------------------------------------------------------------------
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull

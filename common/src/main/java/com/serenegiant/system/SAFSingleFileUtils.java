@@ -38,9 +38,7 @@ import androidx.activity.result.contract.ActivityResultContract;
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 
 /**
  * Storage Access Framework/DocumentFile関係のヘルパークラス
@@ -61,7 +59,6 @@ public class SAFSingleFileUtils {
 	 * @param activity
 	 * @param callback
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public SAFSingleFileUtils(
 		@NonNull final ComponentActivity activity,
 		@NonNull final SAFPermission.SAFCallback callback) {
@@ -75,7 +72,6 @@ public class SAFSingleFileUtils {
 	 * @param fragment
 	 * @param callback
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public SAFSingleFileUtils(
 		@NonNull final Fragment fragment,
 		@NonNull final SAFPermission.SAFCallback callback) {
@@ -246,232 +242,6 @@ public class SAFSingleFileUtils {
 				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
 		} catch (final FileNotFoundException e) {
 			return false;
-		}
-	}
-
-//--------------------------------------------------------------------------------
-	/**
-	 * ファイル読み込み用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestOpenDocument(
-		@NonNull final Activity activity,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareOpenDocumentIntent(requestCode, mimeType), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル読み込み用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestOpenDocument(
-		@NonNull final FragmentActivity activity,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareOpenDocumentIntent(requestCode, mimeType), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル読み込み用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param fragment
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestOpenDocument(@NonNull final android.app.Fragment fragment,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareOpenDocumentIntent(requestCode, mimeType), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル読み込み用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param fragment
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestOpenDocument(
-		@NonNull final Fragment fragment,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareOpenDocumentIntent(requestCode, mimeType), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final Activity activity,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareCreateDocument(requestCode, mimeType, null), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param defaultName
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final Activity activity,
-		@NonNull final String mimeType, final String defaultName, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareCreateDocument(requestCode, mimeType, defaultName), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final FragmentActivity activity,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareCreateDocument(requestCode, mimeType, null), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param activity
-	 * @param mimeType
-	 * @param defaultName
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final FragmentActivity activity,
-		@NonNull final String mimeType, final String defaultName, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			activity.startActivityForResult(prepareCreateDocument(requestCode, mimeType, defaultName), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param fragment
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final android.app.Fragment fragment,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareCreateDocument(requestCode, mimeType, null), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param fragment
-	 * @param mimeType
-	 * @param defaultName
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final android.app.Fragment fragment,
-		@NonNull final String mimeType, final String defaultName, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareCreateDocument(requestCode, mimeType, defaultName), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
-	 * @param fragment
-	 * @param mimeType
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final Fragment fragment,
-		@NonNull final String mimeType, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareCreateDocument(requestCode, mimeType, null), requestCode);
-		}
-	}
-
-	/**
-	 * ファイル保存用のUriを要求
-	 * KITKAT以降で個別のファイル毎にパーミッション要求する場合
- 	 * @param fragment
-	 * @param mimeType
-	 * @param defaultName
-	 * @param requestCode
-	 * @throws IllegalArgumentException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public static void requestCreateDocument(
-		@NonNull final Fragment fragment,
-		@NonNull final String mimeType, final String defaultName, final int requestCode) throws IllegalArgumentException {
-
-		if (BuildCheck.isKitKat()) {
-			fragment.startActivityForResult(prepareCreateDocument(requestCode, mimeType, defaultName), requestCode);
 		}
 	}
 

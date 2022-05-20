@@ -33,7 +33,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -497,137 +496,140 @@ public class PermissionUtils {
 	}
 
 //--------------------------------------------------------------------------------
-	/**
-	 * パーミッションを要求する
-	 * 結果はコールバックで受け取る。
-	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
-	 * XXX このメソッドはFragmentの#onAttachまたは#onCreateで呼び出さないといけない(でないとクラッシュする)
-	 * @param fragment
-	 * @param permission
-	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
-	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
-	 * @param callback
-	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
-	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
-	 */
-	@Deprecated
-	public static boolean requestPermission(
-		@NonNull final Fragment fragment,
-		@NonNull final String permission,
-		final boolean canShowRational,
-		@NonNull final PermissionCallback callback) {
+// XXX staticメソッドとして実装した場合の参考としてコメントにして残す
+//     Fragmentの#onAttachまたは#onCreateまたはActivity#onCreateで呼び出さないとクラッシュするので
+//     使い勝手が悪いのとアプリ固有の追加処理を実装できない
+//	/**
+//	 * パーミッションを要求する
+//	 * 結果はコールバックで受け取る。
+//	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
+//	 * XXX このメソッドはFragmentの#onAttachまたは#onCreateで呼び出さないといけない(でないとクラッシュする)
+//	 * @param fragment
+//	 * @param permission
+//	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
+//	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
+//	 * @param callback
+//	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
+//	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
+//	 */
+//	@Deprecated
+//	public static boolean requestPermission(
+//		@NonNull final Fragment fragment,
+//		@NonNull final String permission,
+//		final boolean canShowRational,
+//		@NonNull final PermissionCallback callback) {
+//
+//		if (DEBUG) Log.v(TAG, "requestPermission:" + permission);
+//		final Context context = fragment.requireContext();
+//		final boolean hasPermission = PermissionCheck.hasPermission(context, permission);
+//		if (hasPermission) {
+//			if (DEBUG) Log.v(TAG, "requestPermission:already has permission," + permission);
+//			// すでにパーミッションを保持している場合...コールバックを呼ばない
+//			setNeverAskAgain(context, permission, false);
+//			return true;
+//		} else if (canShowRational && fragment.shouldShowRequestPermissionRationale(permission)) {
+//			if (DEBUG) Log.v(TAG, "requestPermission:shouldShowRequestPermissionRationale," + permission);
+//			// ここにくるのは1度拒否されて「今後表示しない」が選択されていない場合
+//			// パーミッションが必要な理由の説明が必要な時
+//			callback.onPermissionShowRational(permission);
+//		} else {
+//			// ここにくるのは
+//			// ・一度も拒否されていない場合(まだパーミッションダイアログを出していない)
+//			// ・一度拒否されて「次回から表示しない」が選択された場合
+//			if (!isNeverAskAgain(context, permission)) {
+//				// 直接パーミッションを要求する
+//				// Fragment#registerForActivityResultはonAttacheまたはonCreateで呼び出さないといけない
+//				final ActivityResultLauncher<String> launcher
+//					= fragment.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+//						isGranted -> {
+//							if (isGranted) {
+//								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
+//								// ユーザーがパーミッションを許可した場合
+//								setNeverAskAgain(context, permission, false);
+//								callback.onPermission(permission);
+//							} else {
+//								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
+//								// ユーザーがパーミッションを許可しなかった場合
+//								if (!fragment.shouldShowRequestPermissionRationale(permission)) {
+//									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
+//									setNeverAskAgain(context, permission, true);
+//								}
+//								callback.onPermissionDenied(permission);
+//							}
+//						});
+//				launcher.launch(permission);
+//			} else {
+//				if (DEBUG) Log.v(TAG, "requestPermission:don't ask again," + permission);
+//				// ユーザーがパーミッション要求を拒否して次回から表示しないを選択している時
+//				callback.onPermissionNeverAskAgain(permission);
+//			}
+//		}
+//		return hasPermission;
+//	}
 
-		if (DEBUG) Log.v(TAG, "requestPermission:" + permission);
-		final Context context = fragment.requireContext();
-		final boolean hasPermission = PermissionCheck.hasPermission(context, permission);
-		if (hasPermission) {
-			if (DEBUG) Log.v(TAG, "requestPermission:already has permission," + permission);
-			// すでにパーミッションを保持している場合...コールバックを呼ばない
-			setNeverAskAgain(context, permission, false);
-			return true;
-		} else if (canShowRational && fragment.shouldShowRequestPermissionRationale(permission)) {
-			if (DEBUG) Log.v(TAG, "requestPermission:shouldShowRequestPermissionRationale," + permission);
-			// ここにくるのは1度拒否されて「今後表示しない」が選択されていない場合
-			// パーミッションが必要な理由の説明が必要な時
-			callback.onPermissionShowRational(permission);
-		} else {
-			// ここにくるのは
-			// ・一度も拒否されていない場合(まだパーミッションダイアログを出していない)
-			// ・一度拒否されて「次回から表示しない」が選択された場合
-			if (!isNeverAskAgain(context, permission)) {
-				// 直接パーミッションを要求する
-				// Fragment#registerForActivityResultはonAttacheまたはonCreateで呼び出さないといけない
-				final ActivityResultLauncher<String> launcher
-					= fragment.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
-						isGranted -> {
-							if (isGranted) {
-								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
-								// ユーザーがパーミッションを許可した場合
-								setNeverAskAgain(context, permission, false);
-								callback.onPermission(permission);
-							} else {
-								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
-								// ユーザーがパーミッションを許可しなかった場合
-								if (!fragment.shouldShowRequestPermissionRationale(permission)) {
-									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
-									setNeverAskAgain(context, permission, true);
-								}
-								callback.onPermissionDenied(permission);
-							}
-						});
-				launcher.launch(permission);
-			} else {
-				if (DEBUG) Log.v(TAG, "requestPermission:don't ask again," + permission);
-				// ユーザーがパーミッション要求を拒否して次回から表示しないを選択している時
-				callback.onPermissionNeverAskAgain(permission);
-			}
-		}
-		return hasPermission;
-	}
-
-	/**
-	 * パーミッションを要求する
-	 * 結果はコールバックで受け取る。
-	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
-	 * XXX このメソッドはActivityのonCreateで呼び出さないといけない(でないとクラッシュする)
-	 * @param activity
-	 * @param permission
-	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
-	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
-	 * @param callback
-	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
-	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
-	 */
-	@Deprecated
-	public static boolean requestPermission(
-		@NonNull final AppCompatActivity activity,
-		@NonNull final String permission,
-		final boolean canShowRational,
-		@NonNull final PermissionCallback callback) {
-
-		if (DEBUG) Log.v(TAG, "requestPermission:" + permission);
-		final boolean hasPermission = PermissionCheck.hasPermission(activity, permission);
-		if (hasPermission) {
-			if (DEBUG) Log.v(TAG, "requestPermission:already has permission," + permission);
-			// すでにパーミッションを保持している場合...コールバックを呼ばない
-			setNeverAskAgain(activity, permission, false);
-			return true;
-		} else if (canShowRational && ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-			if (DEBUG) Log.v(TAG, "requestPermission:shouldShowRequestPermissionRationale," + permission);
-			// ここにくるのは1度拒否されて「今後表示しない」が選択されていない場合
-			// パーミッションが必要な理由の説明が必要な時
-			callback.onPermissionShowRational(permission);
-		} else {
-			// ここにくるのは
-			// ・一度も拒否されていない場合(まだパーミッションダイアログを出していない)
-			// ・一度拒否されて「次回から表示しない」が選択された場合
-			if (!isNeverAskAgain(activity, permission)) {
-				// 直接パーミッションを要求する
-				final ActivityResultLauncher<String> launcher
-					= activity.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
-						isGranted -> {
-							if (isGranted) {
-								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
-								// ユーザーがパーミッションを許可した場合
-								setNeverAskAgain(activity, permission, false);
-								callback.onPermission(permission);
-							} else {
-								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
-								// ユーザーがパーミッションを許可しなかった場合
-								if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが次回から表示市内を選択した時
-									setNeverAskAgain(activity, permission, true);
-								}
-								callback.onPermissionDenied(permission);
-							}
-						});
-				launcher.launch(permission);
-			} else {
-				if (DEBUG) Log.v(TAG, "requestPermission:don't ask again," + permission);
-				// ユーザーがパーミッション要求を拒否して次回から表示しないを選択している時
-				callback.onPermissionNeverAskAgain(permission);
-			}
-		}
-		return hasPermission;
-	}
+//	/**
+//	 * パーミッションを要求する
+//	 * 結果はコールバックで受け取る。
+//	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
+//	 * XXX このメソッドはActivityのonCreateで呼び出さないといけない(でないとクラッシュする)
+//	 * @param activity
+//	 * @param permission
+//	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
+//	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
+//	 * @param callback
+//	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
+//	 * @deprecated 動作確認のためだけに作ったので通常は使わないこと
+//	 */
+//	@Deprecated
+//	public static boolean requestPermission(
+//		@NonNull final AppCompatActivity activity,
+//		@NonNull final String permission,
+//		final boolean canShowRational,
+//		@NonNull final PermissionCallback callback) {
+//
+//		if (DEBUG) Log.v(TAG, "requestPermission:" + permission);
+//		final boolean hasPermission = PermissionCheck.hasPermission(activity, permission);
+//		if (hasPermission) {
+//			if (DEBUG) Log.v(TAG, "requestPermission:already has permission," + permission);
+//			// すでにパーミッションを保持している場合...コールバックを呼ばない
+//			setNeverAskAgain(activity, permission, false);
+//			return true;
+//		} else if (canShowRational && ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+//			if (DEBUG) Log.v(TAG, "requestPermission:shouldShowRequestPermissionRationale," + permission);
+//			// ここにくるのは1度拒否されて「今後表示しない」が選択されていない場合
+//			// パーミッションが必要な理由の説明が必要な時
+//			callback.onPermissionShowRational(permission);
+//		} else {
+//			// ここにくるのは
+//			// ・一度も拒否されていない場合(まだパーミッションダイアログを出していない)
+//			// ・一度拒否されて「次回から表示しない」が選択された場合
+//			if (!isNeverAskAgain(activity, permission)) {
+//				// 直接パーミッションを要求する
+//				final ActivityResultLauncher<String> launcher
+//					= activity.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
+//						isGranted -> {
+//							if (isGranted) {
+//								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
+//								// ユーザーがパーミッションを許可した場合
+//								setNeverAskAgain(activity, permission, false);
+//								callback.onPermission(permission);
+//							} else {
+//								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
+//								// ユーザーがパーミッションを許可しなかった場合
+//								if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+//									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが次回から表示市内を選択した時
+//									setNeverAskAgain(activity, permission, true);
+//								}
+//								callback.onPermissionDenied(permission);
+//							}
+//						});
+//				launcher.launch(permission);
+//			} else {
+//				if (DEBUG) Log.v(TAG, "requestPermission:don't ask again," + permission);
+//				// ユーザーがパーミッション要求を拒否して次回から表示しないを選択している時
+//				callback.onPermissionNeverAskAgain(permission);
+//			}
+//		}
+//		return hasPermission;
+//	}
 }
