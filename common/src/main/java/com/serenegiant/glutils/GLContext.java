@@ -29,7 +29,6 @@ import android.util.Log;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SysPropReader;
 
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -73,18 +72,6 @@ public class GLContext implements EGLConst {
 	 */
 	private final int mFlags;
 	/**
-	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
-	 * そのためのオフクリーンのサイズ(横)
-	 */
-	@IntRange(from=1)
-	private final int mMasterWidth;
-	/**
-	 * Androidの場合はレンダリングコンテキストには最低でも1つ描画surfaceが必要なので
-	 * そのためのオフクリーンのサイズ(縦)
-	 */
-	@IntRange(from=1)
-	private final int mMasterHeight;
-	/**
 	 * EGLアクセスオブジェクト
 	 */
 	@Transient
@@ -117,19 +104,7 @@ public class GLContext implements EGLConst {
 	 * GLコンテキスト用のオフスクリーンサイズは1x1
 	 */
 	public GLContext() {
-		this(GLUtils.getSupportedGLVersion(), null, 0, 1, 1);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param maxClientVersion 通常は2か3
-	 * @param sharedContext 共有コンテキストの親となるIContext, nullなら自分がマスターのコンテキストとなる
-	 * @param flags
-	 */
-	public GLContext(final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
-
-		this(maxClientVersion, sharedContext, flags, 1, 1);
+		this(GLUtils.getSupportedGLVersion(), null, 0);
 	}
 
 	/**
@@ -138,26 +113,21 @@ public class GLContext implements EGLConst {
 	 */
 	@SuppressWarnings("CopyConstructorMissesField")
 	public GLContext(@NonNull final GLContext src) {
-		this(src.getMaxClientVersion(), src.getContext(), src.getFlags(), src.mMasterWidth, src.mMasterHeight);
+		this(src.getMaxClientVersion(), src.getContext(), src.getFlags());
 	}
 
 	/**
 	 * コンストラクタ
-	 * @param maxClientVersion
+	 * @param maxClientVersion 通常は2か3
 	 * @param sharedContext
 	 * @param flags
-	 * @param width コンテキスト用のオフスクリーンの幅
-	 * @param height　 コンテキスト用のオフスクリーンの高さ
 	 */
 	public GLContext(final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final int width, final int height) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		mMaxClientVersion = maxClientVersion;
 		mSharedContext = sharedContext;
 		mFlags = flags;
-		mMasterWidth = Math.max(width, 1);
-		mMasterHeight = Math.max(height, 1);
 	}
 
 	@Override
@@ -197,19 +167,27 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void initialize() throws IllegalArgumentException {
-		initialize(null);
+		initialize(null, 1, 1);
 	}
 
 	/**
 	 * 初期化を実行
 	 * GLコンテキストを生成するスレッド上で実行すること
+	 * widthとheightがどちらも0以下で再初期化の場合は以前のマスターサーフェースのサイズを使う
 	 * @param surface nullでなければコンテキスト保持用IEglSurfaceをそのsurfaceから生成する, nullの場合はダミーのオフスクリーンを生成する
+	 * @param width オフスクリーンの幅 1未満の場合は1
+	 * @param height オフスクリーン高さ  1未満の場合は1
+	 * @param height オフスクリーン高さ  1未満の場合は1
 	 * @throws IllegalArgumentException
 	 */
 	@WorkerThread
-	public void initialize(@Nullable final Object surface) throws IllegalArgumentException {
-		if ((mSharedContext == null)
-			|| (mSharedContext instanceof EGLBase.IContext)) {
+	public void initialize(
+		@Nullable final Object surface, final int width, final int height)
+			throws IllegalArgumentException {
+
+		if ((mEgl == null)
+			&& ((mSharedContext == null)
+				|| (mSharedContext instanceof EGLBase.IContext))) {
 
 			final int stencilBits
 				= (mFlags & EGL_FLAG_STENCIL_1BIT) == EGL_FLAG_STENCIL_1BIT ? 1
@@ -220,10 +198,21 @@ public class GLContext implements EGLConst {
 				(mFlags & EGL_FLAG_RECORDABLE) == EGL_FLAG_RECORDABLE);
 		}
 		if (mEgl != null) {
+			mGlExtensions = null;
+			int masterWidth = Math.max(width, 1);
+			int masterHeight = Math.max(height, 1);
+			if ((width <= 0) && (height <= 0) && (mEglMasterSurface != null)) {
+				masterWidth = Math.max(masterWidth, mEglMasterSurface.getWidth());
+				masterHeight = Math.max(masterHeight, mEglMasterSurface.getHeight());
+			}
+			if (mEglMasterSurface != null) {
+				mEglMasterSurface.release();
+				mEglMasterSurface = null;
+			}
 			if (GLUtils.isSupportedSurface(surface)) {
 				mEglMasterSurface = mEgl.createFromSurface(surface);
 			} else {
-				mEglMasterSurface = mEgl.createOffscreen(mMasterWidth, mMasterHeight);
+				mEglMasterSurface = mEgl.createOffscreen(masterWidth, masterHeight);
 			}
 			mGLThreadId = Thread.currentThread().getId();
 		} else {
@@ -283,6 +272,28 @@ public class GLContext implements EGLConst {
 	 */
 	public int getFlags() {
 		return mFlags;
+	}
+
+	/**
+	 * マスターサーフェースの幅を取得
+	 * マスターサーフェースが存在していればその高さ、存在していなければ1
+	 * @return
+	 */
+	public int getMasterWidth() {
+		synchronized (mSync) {
+			return mEglMasterSurface != null ? mEglMasterSurface.getWidth() : 1;
+		}
+	}
+
+	/**
+	 * マスターサーフェースの高さを取得
+	 * マスターサーフェースが存在していればその高さ、存在していなければ1
+	 * @return
+	 */
+	public int getMasterHeight() {
+		synchronized (mSync) {
+			return mEglMasterSurface != null ? mEglMasterSurface.getHeight() : 1;
+		}
 	}
 
 	/**

@@ -38,6 +38,8 @@ public abstract class EglTask extends MessageTask {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EglTask.class.getSimpleName();
 
+	private final int mMasterWidth;
+	private final int mMasterHeight;
 	@NonNull
 	private final GLContext mGLContext;
 
@@ -76,16 +78,20 @@ public abstract class EglTask extends MessageTask {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
 		this(new GLContext(maxClientVersion,
-			sharedContext, flags,
-			masterWidth, masterHeight));
+			sharedContext, flags), masterWidth, masterHeight);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param glContext
 	 */
-	public EglTask(@NonNull final GLContext glContext) {
+	public EglTask(
+		@NonNull final GLContext glContext,
+		final int masterWidth, final int masterHeight) {
+
 		mGLContext = glContext;
+		mMasterWidth = Math.max(masterWidth, 1);
+		mMasterHeight = Math.max(masterHeight, 1);
 		init(0, 0, null);
 	}
 
@@ -101,7 +107,7 @@ public abstract class EglTask extends MessageTask {
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
 
-		mGLContext.initialize();
+		mGLContext.initialize(null, mMasterWidth, mMasterHeight);
 	}
 
 	/**

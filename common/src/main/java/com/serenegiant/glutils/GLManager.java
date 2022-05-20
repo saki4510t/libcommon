@@ -140,7 +140,7 @@ public class GLManager {
 		if ((masterSurface != null) && !GLUtils.isSupportedSurface(masterSurface)) {
 			throw new IllegalArgumentException("wrong type of masterSurface");
 		}
-		mGLContext = new GLContext(maxClientVersion, sharedContext, flags, masterWidth, masterHeight);
+		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
 		final HandlerThreadHandler handler;
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
 			// API>=22ならHandlerを非同期仕様で初期化
@@ -156,7 +156,7 @@ public class GLManager {
 			@Override
 			public void run() {
 				try {
-					mGLContext.initialize(masterSurface);
+					mGLContext.initialize(masterSurface, masterWidth, masterHeight);
 					mInitialized = true;
 				} catch (final Exception e) {
 					Log.w(TAG, e);
@@ -207,6 +207,48 @@ public class GLManager {
 	}
 
 	/**
+	 * GLコンテキストを再初期化する
+	 * @param masterSurface
+	 * @param masterWidth
+	 * @param masterHeight
+	 */
+	public void reInitialize(
+		@Nullable final Object masterSurface,
+		final int masterWidth, final int masterHeight) {
+
+		if (mInitialized) {
+			mInitialized = false;
+			final Semaphore sync = new Semaphore(0);
+			mGLHandler.postAtFrontOfQueue(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						mGLContext.initialize(masterSurface, masterWidth, masterHeight);
+						mInitialized = true;
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					}
+					sync.release();
+				}
+			});
+			// ワーカースレッドの初期化待ち
+			try {
+				if (!sync.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
+					// タイムアウトしたとき
+					mInitialized = false;
+				}
+			} catch (final InterruptedException e) {
+				// do nothing
+			}
+			if (!mInitialized) {
+				throw new IllegalStateException("Failed to initialize GL context");
+			}
+		} else {
+			throw new IllegalStateException("Not initialized!");
+		}
+	}
+
+	/**
 	 * GLコンテキストが有効かどうか
 	 * @return
 	 */
@@ -223,6 +265,14 @@ public class GLManager {
 	}
 
 	/**
+	 * 現在のスレッドがEGL/GLコンテキストを保持したスレッドかどうか
+ 	 * @return
+	 */
+	public boolean isGLThread() {
+		return mHandlerThreadId == Thread.currentThread().getId();
+	}
+
+	/**
 	 * EGLを取得
 	 * @return
 	 * @throws IllegalStateException
@@ -231,6 +281,24 @@ public class GLManager {
 		if (DEBUG) Log.v(TAG, "getEgl:");
 		checkValid();
 		return mGLContext.getEgl();
+	}
+
+	/**
+	 * マスターサーフェースの幅を取得
+	 * GLコンテキストが初期化されていなければ0
+	 * @return
+	 */
+	public int getMasterWidth() {
+		return mGLContext.getMasterWidth();
+	}
+
+	/**
+	 * マスターサーフェースの高さを取得
+	 * GLコンテキストが初期化されていなければ0
+	 * @return
+	 */
+	public int getMasterHeight() {
+		return mGLContext.getMasterHeight();
 	}
 
 	/**
@@ -388,11 +456,4 @@ public class GLManager {
 		}
 	}
 
-	/**
-	 * 現在のスレッドがEGL/GLコンテキストを保持したスレッドかどうか
- 	 * @return
-	 */
-	protected boolean isGLThread() {
-		return mHandlerThreadId == Thread.currentThread().getId();
-	}
 }
