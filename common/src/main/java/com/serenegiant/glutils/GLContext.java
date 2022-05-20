@@ -409,6 +409,16 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
+	 * GLコンテキストを保持しているスレッド上かどうかを取得
+	 * @return
+	 */
+	public boolean inGLThread() {
+		synchronized (mSync) {
+			return mGLThreadId == Thread.currentThread().getId();
+		}
+	}
+
+	/**
 	 * GLES2以上で初期化されているかどうか
 	 * @return
 	 */
@@ -465,6 +475,16 @@ public class GLContext implements EGLConst {
 		return isGLES3() && hasExtension("GL_OES_EGL_image_external_essl3");
 	}
 
+	/**
+	 * GLスレッド上で実行されているかどうかをチェックしてGLスレッド上で無ければ
+	 * IllegalThreadStateExceptionを投げる
+	 * @throws IllegalStateException
+	 */
+	private void checkGLThread() throws IllegalStateException {
+		if (!inGLThread()) {
+			throw new IllegalThreadStateException("Not a GL thread");
+		}
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * Writes GL version info to the log.
