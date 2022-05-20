@@ -79,9 +79,10 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @param height
 	 * @param callback
 	 */
-	public VideoSourcePipeline(@NonNull final GLManager manager,
-							   final int width, final int height,
-							   @NonNull final PipelineSourceCallback callback) {
+	public VideoSourcePipeline(
+		@NonNull final GLManager manager,
+		final int width, final int height,
+		@NonNull final PipelineSourceCallback callback) {
 
 		this(manager, width, height, callback, false);
 	}
@@ -97,10 +98,11 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @param callback
 	 * @param useSharedContext 共有コンテキストを使ってマルチスレッドで処理を行うかどうか
 	 */
-	public VideoSourcePipeline(@NonNull final GLManager manager,
-							   final int width, final int height,
-							   @NonNull final PipelineSourceCallback callback,
-							   final boolean useSharedContext) {
+	public VideoSourcePipeline(
+		@NonNull final GLManager manager,
+		final int width, final int height,
+		@NonNull final PipelineSourceCallback callback,
+		final boolean useSharedContext) {
 
 		super(width, height);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
