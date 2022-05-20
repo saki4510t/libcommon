@@ -215,6 +215,7 @@ public class GLContext implements EGLConst {
 				mEglMasterSurface = mEgl.createOffscreen(masterWidth, masterHeight);
 			}
 			mGLThreadId = Thread.currentThread().getId();
+			makeDefault();
 		} else {
 			throw new IllegalArgumentException("failed to create EGLBase");
 		}
