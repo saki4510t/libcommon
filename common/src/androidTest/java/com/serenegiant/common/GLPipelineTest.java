@@ -272,7 +272,7 @@ public class GLPipelineTest {
 		source.setPipeline(pipeline);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
@@ -342,8 +342,8 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem1.tryAcquire(1100, TimeUnit.MILLISECONDS));
-			assertTrue(sem2.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem1.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem2.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result1 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result1.copyPixelsFromBuffer(buffer1);
@@ -424,7 +424,7 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
@@ -483,7 +483,7 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
@@ -543,7 +543,7 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
@@ -605,7 +605,7 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
@@ -662,7 +662,7 @@ public class GLPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);

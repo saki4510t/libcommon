@@ -104,7 +104,7 @@ public class ImageTextureSourceTest {
 		source.setSurface(surface);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1100, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
