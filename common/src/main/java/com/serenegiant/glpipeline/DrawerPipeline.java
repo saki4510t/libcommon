@@ -165,7 +165,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	}
 
 	/**
-	 * ISurfacePipelineの実装
+	 * GLSurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
@@ -180,7 +180,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	}
 
 	/**
-	 * ISurfacePipelineの実装
+	 * GLSurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView

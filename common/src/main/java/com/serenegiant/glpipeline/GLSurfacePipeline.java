@@ -65,10 +65,10 @@ public interface GLSurfacePipeline extends GLPipeline {
 	public int getId();
 
 	/**
-	 * 指定したGLPipelineが含まれるパイプラインチェーンから指定したidを持つSurfacePipelineを探す
+	 * 指定したGLPipelineが含まれるパイプラインチェーンから指定したidを持つGLSurfacePipelineを探す
 	 * @param pipeline
 	 * @param id
-	 * @return 見つかればSurfacePipeline, 見つからなければnull
+	 * @return 見つかればGLSurfacePipeline, 見つからなければnull
 	 */
 	@Nullable
 	public static GLSurfacePipeline findById(@NonNull final GLPipeline pipeline, final int id) {
