@@ -358,6 +358,24 @@ public class GLManager {
 	}
 
 	/**
+	 * GLContext#makeDefaultを呼び出すためのヘルパーメソッド
+	 * @throws IllegalStateException
+	 */
+	public void makeDefault() throws IllegalStateException {
+		checkValid();
+		mGLContext.makeDefault();
+	}
+
+	/**
+	 * GLContext#makeDefaultを呼び出すためのヘルパーメソッド
+	 * @throws IllegalStateException
+	 */
+	public void swap() throws IllegalStateException {
+		checkValid();
+		mGLContext.swap();
+	}
+
+	/**
 	 * GLコンテキストを保持しているスレッド上での実行要求
 	 * @param task
 	 */
