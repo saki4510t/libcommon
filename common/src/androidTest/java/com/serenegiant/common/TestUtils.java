@@ -94,7 +94,7 @@ LOOP:		for (int y = 0; y < h; y++) {
 					if (canvas != null) {
 						try {
 							canvas.drawBitmap(bitmap, 0, 0, null);
-							Thread.sleep(10);
+							Thread.sleep(30);
 						} catch (InterruptedException e) {
 							e.printStackTrace();
 						} finally {
