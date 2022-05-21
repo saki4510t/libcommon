@@ -26,11 +26,12 @@ import static com.serenegiant.glutils.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス
  * @param <T>
  */
-public abstract class GLSurfaceReader<T> {
+public class GLSurfaceReader<T> {
 	private static final boolean DEBUG = false;
 	private static final String TAG = GLSurfaceReader.class.getSimpleName();
 
-	private static final int REQUEST_DRAW = 1;
+	private static final int REQUEST_UPDATE_TEXTURE = 1;
+	private static final int REQUEST_UPDATE_SIZE = 2;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 
 	/**
@@ -41,13 +42,83 @@ public abstract class GLSurfaceReader<T> {
 		public void onImageAvailable(@NonNull final GLSurfaceReader<T> reader);
 	}
 
+	/**
+	 * Surfaceを経由してテクスチャとして受け取った映像を処理するためのインターフェース
+	 * WorkerThreadアノテーションの付いているインターフェースメソッドは全てGLコンテキストを
+	 * 保持したスレッド上で実行される
+	 * @param <T>
+	 */
+	public interface ImageHandler<T> {
+		@WorkerThread
+		public void onInitialize(@NonNull final GLSurfaceReader<T> reader);
+		/**
+		 * 関係するリソースを破棄する
+		 */
+		@WorkerThread
+		public void onRelease();
+		/**
+		 * 映像入力用Surfaceが生成されたときの処理
+		 */
+		@WorkerThread
+		public void onCreateInputSurface(@NonNull final GLSurfaceReader<T> reader);
+		/**
+		 * 映像入力用Surfaceが破棄されるときの処理
+		 */
+		@WorkerThread
+		public void onReleaseInputSurface(@NonNull final GLSurfaceReader<T> reader);
+		/**
+		 * 映像サイズ変更要求が来たときの処理
+		 * @param width
+		 * @param height
+		 */
+		@WorkerThread
+		public void onResize(final int width, final int height);
+		/**
+		 * 映像をテクスチャとして受け取ったときの処理
+		 * @param reader
+		 * @param texId
+		 * @param texMatrix
+		 */
+		@WorkerThread
+		public boolean onFrameAvailable(
+			@NonNull final GLSurfaceReader<T> reader,
+			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
+
+		/**
+		 * 最新の映像を取得する。最新以外の古い映像は全てrecycleされる。
+		 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
+		 * 映像が準備できていなければnullを返す
+		 * null以外が返ったときは#recycleで返却して再利用可能にすること
+		 * @return
+		 * @throws IllegalStateException
+		 */
+		@Nullable
+		public T onAcquireLatestImage() throws IllegalStateException;
+		/**
+		 * 次の映像を取得する
+		 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
+		 * 映像がが準備できていなければnullを返す
+		 * null以外が返ったときは#recycleで返却して再利用可能にすること
+		 * @return
+		 * @throws IllegalStateException
+		 */
+		@Nullable
+		public T onAcquireNextImage() throws IllegalStateException;
+		/**
+		 * 使った映像を返却して再利用可能にする
+		 * @param image
+		 */
+		public void onRecycle(@NonNull T image);
+	}
+
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
 	private final Object mReleaseLock = new Object();
-	private final int mWidth;
-	private final int mHeight;
-	private final int mMaxImages;
+	private int mWidth;
+	private int mHeight;
+	@NonNull
+	private final ImageHandler<T> mImageHandler;
 	private volatile boolean mReleased = false;
 	private boolean mIsReaderValid = false;
 	@NonNull
@@ -56,6 +127,8 @@ public abstract class GLSurfaceReader<T> {
 	private OnImageAvailableListener<T> mListener;
 	@Nullable
 	private Handler mListenerHandler;
+
+	// 映像受け取り用テクスチャ/SurfaceTexture/Surface関係
 	@Size(min=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
@@ -63,13 +136,19 @@ public abstract class GLSurfaceReader<T> {
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
 
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param imageHandler
+	 */
 	public GLSurfaceReader(
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
-		@IntRange(from=2) final int maxImages) {
+		@NonNull final ImageHandler<T> imageHandler) {
 
 		mWidth = width;
 		mHeight = height;
-		mMaxImages = maxImages;
+		mImageHandler = imageHandler;
 		final Semaphore sem = new Semaphore(0);
 		// GLDrawer2Dでマスターサーフェースへ描画しなくなったのでEglTask内で保持する
 		// マスターサーフェースは最小サイズ(1x1)でOK
@@ -89,7 +168,7 @@ public abstract class GLSurfaceReader<T> {
 				final int arg1, final int arg2, final Object obj)
 					throws TaskBreak {
 				if (DEBUG) Log.v(TAG, "processRequest:");
-				final Object result =  handleRequest(request, arg1, arg2, obj);
+				final Object result = handleRequest(request, arg1, arg2, obj);
 				if ((request == REQUEST_RECREATE_MASTER_SURFACE)
 					&& (sem.availablePermits() == 0)) {
 					sem.release();
@@ -102,6 +181,7 @@ public abstract class GLSurfaceReader<T> {
 			// 初期化に失敗した時
 			throw new RuntimeException("failed to start renderer thread");
 		}
+		// 映像受け取り用のテクスチャ/SurfaceTexture/Surfaceを生成
 		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
 		try {
 			final Surface surface;
@@ -145,14 +225,18 @@ public abstract class GLSurfaceReader<T> {
 		}
 	}
 
-	protected abstract void internalRelease();
+	protected void internalRelease() {
+		// do nothing now
+	}
 
 	/**
 	 * 映像サイズ(幅)を取得
 	 * @return
 	 */
 	public int getWidth() {
-		return mWidth;
+		synchronized (mSync) {
+			return mWidth;
+		}
 	}
 
 	/**
@@ -160,20 +244,14 @@ public abstract class GLSurfaceReader<T> {
 	 * @return
 	 */
 	public int getHeight() {
-		return mHeight;
-	}
-
-	/**
-	 * 同時に取得できる最大の映像の数を取得
-	 * @return
-	 */
-	public int getMaxImages() {
-		return mMaxImages;
+		synchronized (mSync) {
+			return mHeight;
+		}
 	}
 
 	/**
 	 * 映像受け取り用のSurfaceを取得
-	 * 既に破棄されているなどしてsurfaceが取得できないときはIllegalStateExceptionを投げる
+	 * 既に破棄されているなどしてSurfaceが取得できないときはIllegalStateExceptionを投げる
 	 *
 	 * @return
 	 * @throws IllegalStateException
@@ -185,6 +263,23 @@ public abstract class GLSurfaceReader<T> {
 				throw new IllegalStateException("surface not ready, already released?");
 			}
 			return mInputSurface;
+		}
+	}
+
+	/**
+	 * 映像受け取り用のSurfaceTextureを取得
+	 * 既に破棄されているなどしてSurfaceTextureが取得できないときはIllegalStateExceptionを投げる
+	 *
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	@NonNull
+	public SurfaceTexture getSurfaceTexture() throws IllegalStateException {
+		synchronized (mSync) {
+			if (mInputTexture == null) {
+				throw new IllegalStateException("surface not ready, already released?");
+			}
+			return mInputTexture;
 		}
 	}
 
@@ -229,7 +324,9 @@ public abstract class GLSurfaceReader<T> {
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	public abstract T acquireLatestImage() throws IllegalStateException;
+	public T acquireLatestImage() throws IllegalStateException {
+		return mImageHandler.onAcquireLatestImage();
+	}
 
 	/**
 	 * 次の映像を取得する
@@ -240,13 +337,27 @@ public abstract class GLSurfaceReader<T> {
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	public abstract T acquireNextImage() throws IllegalStateException;
+	public T acquireNextImage() throws IllegalStateException {
+		return mImageHandler.onAcquireNextImage();
+	}
 
 	/**
 	 * 使った映像を返却して再利用可能にする
 	 * @param image
 	 */
-	public abstract void recycle(T image);
+	public void recycle(@NonNull T image) {
+		mImageHandler.onRecycle(image);
+	}
+
+	public void resize(@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
+		final int _width = Math.max(width, 1);
+		final int _height = Math.max(height, 1);
+		synchronized (mSync) {
+			if ((mWidth != _width) || (mHeight != _height)) {
+				mEglTask.offer(REQUEST_UPDATE_SIZE, _width, _height);
+			}
+		}
+	}
 
 //--------------------------------------------------------------------------------
 // ワーカースレッド上での処理
@@ -256,6 +367,7 @@ public abstract class GLSurfaceReader<T> {
 	@WorkerThread
 	private void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
+		mImageHandler.onInitialize(this);
 	}
 
 	/**
@@ -265,6 +377,7 @@ public abstract class GLSurfaceReader<T> {
 	private void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
 		handleReleaseInputSurface();
+		mImageHandler.onRelease();
 	}
 
 	@WorkerThread
@@ -272,8 +385,11 @@ public abstract class GLSurfaceReader<T> {
 		final int arg1, final int arg2, final Object obj) {
 
 		switch (request) {
-		case REQUEST_DRAW:
-			handleDraw();
+		case REQUEST_UPDATE_TEXTURE:
+			handleUpdateTexImage();
+			break;
+		case REQUEST_UPDATE_SIZE:
+			handleResize(arg1, arg2);
 			break;
 		case REQUEST_RECREATE_MASTER_SURFACE:
 			handleReCreateInputSurface();
@@ -285,11 +401,14 @@ public abstract class GLSurfaceReader<T> {
 		return null;
 	}
 
+	/**
+	 *
+	 */
 	private int drawCnt;
 	@WorkerThread
-	private void handleDraw() {
+	private void handleUpdateTexImage() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
-		mEglTask.removeRequest(REQUEST_DRAW);
+		mEglTask.removeRequest(REQUEST_UPDATE_TEXTURE);
 		try {
 			mEglTask.makeCurrent();
 			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
@@ -301,32 +420,30 @@ public abstract class GLSurfaceReader<T> {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		onFrameAvailable(mTexId, mTexMatrix);
+		if (mImageHandler.onFrameAvailable(this, mTexId, mTexMatrix)) {
+			callOnFrameAvailable();
+		}
 	}
 
-	protected abstract void onFrameAvailable(final int texId, @Size(min=16) @NonNull final float[] texMatrix);
-
-	protected void callOnFrameAvailable() {
+	/**
+	 * マスター映像サイズをリサイズ
+	 * @param width
+	 * @param height
+	 */
+	@SuppressLint("NewApi")
+	@WorkerThread
+	@CallSuper
+	private void handleResize(final int width, final int height) {
+		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		synchronized (mSync) {
-			if (mListenerHandler != null) {
-				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
-				mListenerHandler.post(mOnImageAvailableTask);
-			} else if (DEBUG) {
-				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
-			}
+			mWidth = width;
+			mHeight = height;
 		}
+		if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
+			mInputTexture.setDefaultBufferSize(width, height);
+		}
+		mImageHandler.onResize(width, height);
 	}
-
-	private final Runnable mOnImageAvailableTask = new Runnable() {
-		@Override
-		public void run() {
-			synchronized (mSync) {
-				if (mListener != null) {
-					mListener.onImageAvailable(GLSurfaceReader.this);
-				}
-			}
-		}
-	};
 
 	/**
 	 * 映像入力用SurfaceTexture/Surfaceを再生成する
@@ -334,7 +451,7 @@ public abstract class GLSurfaceReader<T> {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	@CallSuper
-	protected void handleReCreateInputSurface() {
+	private void handleReCreateInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		synchronized (mSync) {
 			mEglTask.makeCurrent();
@@ -349,6 +466,7 @@ public abstract class GLSurfaceReader<T> {
 			if (BuildCheck.isAndroid4_1()) {
 				mInputTexture.setDefaultBufferSize(mWidth, mHeight);
 			}
+			mImageHandler.onCreateInputSurface(this);
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		}
 	}
@@ -359,8 +477,9 @@ public abstract class GLSurfaceReader<T> {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	@CallSuper
-	protected void handleReleaseInputSurface() {
+	private void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
+		mImageHandler.onReleaseInputSurface(this);
 		synchronized (mSync) {
 			if (mInputSurface != null) {
 				try {
@@ -385,12 +504,43 @@ public abstract class GLSurfaceReader<T> {
 		}
 	}
 
+	/**
+	 * OnImageAvailableListener#onImageAvailableを呼び出す
+	 */
+	private void callOnFrameAvailable() {
+		synchronized (mSync) {
+			if (mListenerHandler != null) {
+				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
+				mListenerHandler.post(mOnImageAvailableTask);
+			} else if (DEBUG) {
+				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
+			}
+		}
+	}
+
+	/**
+	 * OnImageAvailableListener#onImageAvailableを呼び出すためのRunnable実装
+	 */
+	private final Runnable mOnImageAvailableTask = new Runnable() {
+		@Override
+		public void run() {
+			synchronized (mSync) {
+				if (mListener != null) {
+					mListener.onImageAvailable(GLSurfaceReader.this);
+				}
+			}
+		}
+	};
+
+	/**
+	 * 映像受け取り用のSurfaceTextureの映像が更新されたときのコールバックリスナー実装
+	 */
 	private final SurfaceTexture.OnFrameAvailableListener
 		mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
 		@Override
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //			if (DEBUG) Log.v(TAG, "onFrameAvailable:");
-			mEglTask.offer(REQUEST_DRAW);
+			mEglTask.offer(REQUEST_UPDATE_TEXTURE);
 		}
 	};
 }

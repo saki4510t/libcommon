@@ -23,7 +23,7 @@ import android.graphics.Bitmap;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLSurfaceImageReader;
+import com.serenegiant.glutils.GLSurfaceReaderHandler;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.GLSurfaceReader;
 import com.serenegiant.graphics.BitmapHelper;
@@ -77,7 +77,8 @@ public class ImageTextureSourceTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLSurfaceImageReader reader = new GLSurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		final GLSurfaceReader<Bitmap> reader = new GLSurfaceReader<Bitmap>(WIDTH, HEIGHT,
+			new GLSurfaceReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
 		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override

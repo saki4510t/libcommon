@@ -22,8 +22,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLSurfaceImageReader;
 import com.serenegiant.glutils.GLSurfaceReader;
+import com.serenegiant.glutils.GLSurfaceReaderHandler;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
 
@@ -69,7 +69,8 @@ public class GLSurfaceReaderTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLSurfaceImageReader reader = new GLSurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		final GLSurfaceReader<Bitmap> reader = new GLSurfaceReader<Bitmap>(WIDTH, HEIGHT,
+			new GLSurfaceReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
 		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
