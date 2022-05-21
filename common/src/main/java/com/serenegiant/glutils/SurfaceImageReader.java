@@ -49,12 +49,12 @@ import static com.serenegiant.glutils.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * Surface/SurfaceTextureに描画された内容をビットマップとして取得するためのヘルパークラス
  * ImageReaderをイメージして似た使い方ができるようにしてみた
  */
-public class SurfaceReader {
+public class SurfaceImageReader {
 	private static final boolean DEBUG = false;
-	private static final String TAG = SurfaceReader.class.getSimpleName();
+	private static final String TAG = SurfaceImageReader.class.getSimpleName();
 
 	public interface OnImageAvailableListener {
-		public void onImageAvailable(@NonNull final SurfaceReader reader);
+		public void onImageAvailable(@NonNull final SurfaceImageReader reader);
 	}
 
 	private static final int REQUEST_DRAW = 1;
@@ -104,7 +104,7 @@ public class SurfaceReader {
 	 * @param config 取得するビットマップのConfig
 	 * @param maxImages 同時に取得できるビットマップの最大数
 	 */
-	public SurfaceReader(
+	public SurfaceImageReader(
 		@IntRange(from = 1) final int width, @IntRange(from = 1) final int height,
 		@NonNull final Bitmap.Config config, final int maxImages) {
 
@@ -421,7 +421,7 @@ public class SurfaceReader {
 		public void run() {
 			synchronized (mSync) {
 				if (mListener != null) {
-					mListener.onImageAvailable(SurfaceReader.this);
+					mListener.onImageAvailable(SurfaceImageReader.this);
 				}
 			}
 		}

@@ -26,7 +26,7 @@ import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
-import com.serenegiant.glutils.SurfaceReader;
+import com.serenegiant.glutils.SurfaceImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -75,11 +75,11 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new SurfaceReader.OnImageAvailableListener() {
+		final SurfaceImageReader reader = new SurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new SurfaceImageReader.OnImageAvailableListener() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final SurfaceReader reader) {
+			public void onImageAvailable(@NonNull final SurfaceImageReader reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
@@ -134,11 +134,11 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final SurfaceReader reader = new SurfaceReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new SurfaceReader.OnImageAvailableListener() {
+		final SurfaceImageReader reader = new SurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new SurfaceImageReader.OnImageAvailableListener() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final SurfaceReader reader) {
+			public void onImageAvailable(@NonNull final SurfaceImageReader reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
