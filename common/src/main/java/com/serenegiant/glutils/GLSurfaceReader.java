@@ -5,6 +5,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
@@ -114,15 +115,19 @@ public class GLSurfaceReader<T> {
 	@NonNull
 	private final Object mSync = new Object();
 	@NonNull
-	private final Object mReleaseLock = new Object();
+	private final GLManager mManager;
+	/**
+	 * 自分用のGLManagerを保持しているかどうか
+	 */
+	private final boolean mOwnManager;
+	@NonNull
+	private final Handler mGLHandler;
 	private int mWidth;
 	private int mHeight;
 	@NonNull
 	private final ImageHandler<T> mImageHandler;
 	private volatile boolean mReleased = false;
 	private boolean mIsReaderValid = false;
-	@NonNull
-	private final EglTask mEglTask;
 	@Nullable
 	private OnImageAvailableListener<T> mListener;
 	@Nullable
@@ -146,43 +151,64 @@ public class GLSurfaceReader<T> {
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@NonNull final ImageHandler<T> imageHandler) {
 
+		this(new GLManager(), false, width, height, imageHandler);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param imageHandler
+	 */
+	public GLSurfaceReader(
+		@NonNull final GLManager manager, final boolean useSharedContext,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		@NonNull final ImageHandler<T> imageHandler) {
+
+		mOwnManager = useSharedContext;
+		final Handler.Callback handlerCallback
+			= new Handler.Callback() {
+			@Override
+			public boolean handleMessage(@NonNull final Message msg) {
+				return GLSurfaceReader.this.handleMessage(msg);
+			}
+		};
+		if (useSharedContext) {
+			mManager = manager.createShared(handlerCallback);
+			mGLHandler = mManager.getGLHandler();
+		} else {
+			mManager = manager;
+			mGLHandler = manager.createGLHandler(handlerCallback);
+		}
 		mWidth = width;
 		mHeight = height;
 		mImageHandler = imageHandler;
 		final Semaphore sem = new Semaphore(0);
-		// GLDrawer2Dでマスターサーフェースへ描画しなくなったのでEglTask内で保持する
-		// マスターサーフェースは最小サイズ(1x1)でOK
-		mEglTask = new EglTask(GLUtils.getSupportedGLVersion(), null, 0) {
+		mGLHandler.post(new Runnable() {
 			@Override
-			protected void onStart() {
+			public void run() {
 				handleOnStart();
+				sem.release();
 			}
-
-			@Override
-			protected void onStop() {
-				handleOnStop();
+		});
+		// 初期化待ち
+		try {
+			if (!sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
+				throw new RuntimeException("failed to init");
 			}
-
-			@Override
-			protected Object processRequest(final int request,
-				final int arg1, final int arg2, final Object obj)
-					throws TaskBreak {
-				if (DEBUG) Log.v(TAG, "processRequest:");
-				final Object result = handleRequest(request, arg1, arg2, obj);
-				if ((request == REQUEST_RECREATE_MASTER_SURFACE)
-					&& (sem.availablePermits() == 0)) {
-					sem.release();
-				}
-				return result;
-			}
-		};
-		new Thread(mEglTask, TAG).start();
-		if (!mEglTask.waitReady()) {
-			// 初期化に失敗した時
-			throw new RuntimeException("failed to start renderer thread");
+		} catch (final InterruptedException e) {
+			throw new RuntimeException("failed to init", e);
 		}
 		// 映像受け取り用のテクスチャ/SurfaceTexture/Surfaceを生成
-		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
+//		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
+		sem.release(sem.availablePermits());
+		mGLHandler.post(new Runnable() {
+			@Override
+			public void run() {
+				handleReCreateInputSurface();
+				sem.release();
+			}
+		});
 		try {
 			final Surface surface;
 			synchronized (mSync) {
@@ -195,7 +221,7 @@ public class GLSurfaceReader<T> {
 					throw new RuntimeException("failed to create surface");
 				}
 			}
-		} catch (InterruptedException e) {
+		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
@@ -217,16 +243,31 @@ public class GLSurfaceReader<T> {
 			if (DEBUG) Log.v(TAG, "release:");
 			mReleased = true;
 			setOnImageAvailableListener(null, null);
-			synchronized (mReleaseLock) {
-				mEglTask.release();
-				mIsReaderValid = false;
-			}
+			mIsReaderValid = false;
 			internalRelease();
 		}
 	}
 
 	protected void internalRelease() {
-		// do nothing now
+		if (mManager.isValid()) {
+			mGLHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					handleOnStop();
+					if (mOwnManager) {
+						mManager.release();
+					}
+				}
+			});
+		}
+	}
+
+	/**
+	 * GLSurfaceReaderが破棄されておらず利用可能かどうかを取得
+	 * @return
+	 */
+	public boolean isValid() {
+		return !mReleased && mIsReaderValid && mManager.isValid();
 	}
 
 	/**
@@ -312,7 +353,7 @@ public class GLSurfaceReader<T> {
 	}
 
 	protected boolean isGLES3() {
-		return mEglTask.isGLES3();
+		return mManager.isGLES3();
 	}
 
 	/**
@@ -354,7 +395,7 @@ public class GLSurfaceReader<T> {
 		final int _height = Math.max(height, 1);
 		synchronized (mSync) {
 			if ((mWidth != _width) || (mHeight != _height)) {
-				mEglTask.offer(REQUEST_UPDATE_SIZE, _width, _height);
+				mGLHandler.sendMessage(mGLHandler.obtainMessage(REQUEST_UPDATE_SIZE, _width, _height));
 			}
 		}
 	}
@@ -381,24 +422,22 @@ public class GLSurfaceReader<T> {
 	}
 
 	@WorkerThread
-	private Object handleRequest(final int request,
-		final int arg1, final int arg2, final Object obj) {
-
-		switch (request) {
+	protected boolean handleMessage(@NonNull final Message msg) {
+		switch (msg.what) {
 		case REQUEST_UPDATE_TEXTURE:
 			handleUpdateTexImage();
-			break;
+			return true;
 		case REQUEST_UPDATE_SIZE:
-			handleResize(arg1, arg2);
-			break;
+			handleResize(msg.arg1, msg.arg2);
+			return true;
 		case REQUEST_RECREATE_MASTER_SURFACE:
 			handleReCreateInputSurface();
-			break;
+			return true;
 		default:
-			if (DEBUG) Log.v(TAG, "handleRequest:" + request);
+			if (DEBUG) Log.v(TAG, "handleRequest:" + msg);
 			break;
 		}
-		return null;
+		return false;
 	}
 
 	/**
@@ -408,12 +447,11 @@ public class GLSurfaceReader<T> {
 	@WorkerThread
 	private void handleUpdateTexImage() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
-		mEglTask.removeRequest(REQUEST_UPDATE_TEXTURE);
 		try {
-			mEglTask.makeCurrent();
+			mManager.makeDefault();
 			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
 			GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-			mEglTask.swap();
+			mManager.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
@@ -454,9 +492,9 @@ public class GLSurfaceReader<T> {
 	private void handleReCreateInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		synchronized (mSync) {
-			mEglTask.makeCurrent();
+			mManager.makeDefault();
 			handleReleaseInputSurface();
-			mEglTask.makeCurrent();
+			mManager.makeDefault();
 			mTexId = GLHelper.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
@@ -540,7 +578,7 @@ public class GLSurfaceReader<T> {
 		@Override
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //			if (DEBUG) Log.v(TAG, "onFrameAvailable:");
-			mEglTask.offer(REQUEST_UPDATE_TEXTURE);
+			mGLHandler.sendEmptyMessage(REQUEST_UPDATE_TEXTURE);
 		}
 	};
 }
