@@ -1,7 +1,10 @@
 package com.serenegiant.common;
 
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Rect;
 import android.util.Log;
+import android.view.Surface;
 
 import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.graphics.BitmapHelper;
@@ -63,7 +66,7 @@ LOOP:		for (int y = 0; y < h; y++) {
 				}
 			}
 		}
-		Log.i(TAG, "dump:" + sb.toString());
+		Log.i(TAG, "dump:" + sb);
 	}
 
 	/**
@@ -73,5 +76,33 @@ LOOP:		for (int y = 0; y < h; y++) {
 	 */
 	public static Bitmap flipVertical(@NonNull final Bitmap bitmap) {
 		return BitmapHelper.applyMirror(bitmap, IRendererCommon.MIRROR_VERTICAL);
+	}
+
+	/**
+	 * 非同期で指定したSurfaceへCanvasを使って指定した枚数指定したBitmapを書き込む
+	 * @param bitmap
+	 * @param surface
+	 * @param num_images
+	 */
+	public static void inputImagesAsync(@NonNull final Bitmap bitmap, @NonNull final Surface surface, final int num_images) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				final Rect inOutDirty = new Rect();
+				for (int i = 0; i < num_images; i++) {
+					final Canvas canvas = surface.lockCanvas(inOutDirty);
+					if (canvas != null) {
+						try {
+							canvas.drawBitmap(bitmap, 0, 0, null);
+							Thread.sleep(10);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} finally {
+							surface.unlockCanvasAndPost(canvas);
+						}
+					}
+				}
+			}
+		}).start();
 	}
 }

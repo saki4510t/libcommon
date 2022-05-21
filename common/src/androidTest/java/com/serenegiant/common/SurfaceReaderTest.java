@@ -20,8 +20,6 @@ package com.serenegiant.common;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Rect;
 import android.view.Surface;
 
 import com.serenegiant.glutils.SurfaceImageReader;
@@ -42,9 +40,8 @@ import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import static com.serenegiant.common.TestUtils.bitMapEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static com.serenegiant.common.TestUtils.*;
+import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class SurfaceReaderTest {
@@ -94,25 +91,9 @@ public class SurfaceReaderTest {
 
 		final Surface surface = reader.getSurface();
 		assertNotNull(surface);
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				final Rect inOutDirty = new Rect();
-				for (int i = 0; i < 10; i++) {
-					final Canvas canvas = surface.lockCanvas(inOutDirty);
-					if (canvas != null) {
-						try {
-							canvas.drawBitmap(original, 0, 0, null);
-							Thread.sleep(10);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} finally {
-							surface.unlockCanvasAndPost(canvas);
-						}
-					}
-				}
-			}
-		}).start();
+
+		inputImagesAsync(original, surface, 10);
+
 		try {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
 			final Bitmap b = result.get();
