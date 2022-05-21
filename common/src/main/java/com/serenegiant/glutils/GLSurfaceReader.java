@@ -1,26 +1,6 @@
 package com.serenegiant.glutils;
-/*
- * libcommon
- * utility/helper classes for myself
- *
- * Copyright (c) 2014-2022 saki t_saki@serenegiant.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- *  You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software
- *  distributed under the License is distributed on an "AS IS" BASIS,
- *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- *  See the License for the specific language governing permissions and
- *  limitations under the License.
-*/
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
-import android.graphics.Paint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.os.Handler;
@@ -28,15 +8,12 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.utils.Pool;
 
-import java.nio.ByteBuffer;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -46,19 +23,23 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.glutils.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * Surface/SurfaceTextureに描画された内容をビットマップとして取得するためのヘルパークラス
- * ImageReaderをイメージして似た使い方ができるようにしてみた
+ * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス
+ * @param <T>
  */
-public class SurfaceImageReader {
+public abstract class GLSurfaceReader<T> {
 	private static final boolean DEBUG = false;
-	private static final String TAG = SurfaceImageReader.class.getSimpleName();
-
-	public interface OnImageAvailableListener {
-		public void onImageAvailable(@NonNull final SurfaceImageReader reader);
-	}
+	private static final String TAG = GLSurfaceReader.class.getSimpleName();
 
 	private static final int REQUEST_DRAW = 1;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
+
+	/**
+	 * 映像を取得可能になったときに呼ばれるコールバックリスナー
+	 * @param <T>
+	 */
+	public interface OnImageAvailableListener<T> {
+		public void onImageAvailable(@NonNull final GLSurfaceReader<T> reader);
+	}
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -66,59 +47,29 @@ public class SurfaceImageReader {
 	private final Object mReleaseLock = new Object();
 	private final int mWidth;
 	private final int mHeight;
-	@NonNull
-	private final Bitmap.Config mConfig;
 	private final int mMaxImages;
-	@NonNull
-	private final Pool<Bitmap> mPool;
-	@NonNull
-	private final LinkedBlockingDeque<Bitmap> mQueue = new LinkedBlockingDeque<>();
+	private volatile boolean mReleased = false;
+	private boolean mIsReaderValid = false;
 	@NonNull
 	private final EglTask mEglTask;
 	@Nullable
-	private OnImageAvailableListener mListener;
+	private OnImageAvailableListener<T> mListener;
 	@Nullable
 	private Handler mListenerHandler;
-	@NonNull
-	private final Paint mPaint = new Paint();
 	@Size(min=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
-	@NonNull
-	private final ByteBuffer mWorkBuffer;
 	private int mTexId;
 	private SurfaceTexture mInputTexture;
 	private Surface mInputSurface;
-	/**
-	 * SurfaceTextureへ割り当てたテクスチャをバックバッファとしてラップして
-	 * 読み取り可能にするためのGLSurface
-	 */
-	private GLSurface mReadSurface;
-	private boolean mIsReaderValid = false;
-	private volatile boolean mAllBitmapAcquired = false;
 
-	/**
-	 * コンストラクタ
-	 * @param width
-	 * @param height
-	 * @param config 取得するビットマップのConfig
-	 * @param maxImages 同時に取得できるビットマップの最大数
-	 */
-	public SurfaceImageReader(
-		@IntRange(from = 1) final int width, @IntRange(from = 1) final int height,
-		@NonNull final Bitmap.Config config, final int maxImages) {
+	public GLSurfaceReader(
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		@IntRange(from=2) final int maxImages) {
 
 		mWidth = width;
 		mHeight = height;
-		mConfig = config;
 		mMaxImages = maxImages;
-		mPool = new Pool<Bitmap>(1, mMaxImages) {
-			@NonNull
-			@Override
-			protected Bitmap createObject(@Nullable final Object... args) {
-				return Bitmap.createBitmap(width, height, config);
-			}
-		};
 		final Semaphore sem = new Semaphore(0);
 		// GLDrawer2Dでマスターサーフェースへ描画しなくなったのでEglTask内で保持する
 		// マスターサーフェースは最小サイズ(1x1)でOK
@@ -146,7 +97,6 @@ public class SurfaceImageReader {
 				return result;
 			}
 		};
-		mWorkBuffer = ByteBuffer.allocateDirect(width * height * BitmapHelper.getPixelBytes(config));
 		new Thread(mEglTask, TAG).start();
 		if (!mEglTask.waitReady()) {
 			// 初期化に失敗した時
@@ -182,18 +132,20 @@ public class SurfaceImageReader {
 	/**
 	 * 関係するリソースを破棄する、再利用はできない
 	 */
-	public void release() {
-		if (DEBUG) Log.v(TAG, "release:");
-		setOnImageAvailableListener(null, null);
-		synchronized (mReleaseLock) {
-			mEglTask.release();
-			mIsReaderValid = false;
+	public final void release() {
+		if (!mReleased) {
+			if (DEBUG) Log.v(TAG, "release:");
+			mReleased = true;
+			setOnImageAvailableListener(null, null);
+			synchronized (mReleaseLock) {
+				mEglTask.release();
+				mIsReaderValid = false;
+			}
+			internalRelease();
 		}
-		synchronized (mQueue) {
-			mQueue.clear();
-		}
-		mPool.clear();
 	}
+
+	protected abstract void internalRelease();
 
 	/**
 	 * 映像サイズ(幅)を取得
@@ -212,16 +164,7 @@ public class SurfaceImageReader {
 	}
 
 	/**
-	 * 取得するBitmapのConfigを取得
-	 * @return
-	 */
-	@NonNull
-	public Bitmap.Config getConfig() {
-		return mConfig;
-	}
-
-	/**
-	 * 同時に取得できる最大のビットマップの数を取得
+	 * 同時に取得できる最大の映像の数を取得
 	 * @return
 	 */
 	public int getMaxImages() {
@@ -252,7 +195,7 @@ public class SurfaceImageReader {
 	 * @throws IllegalArgumentException
 	 */
 	public void setOnImageAvailableListener(
-		@Nullable final OnImageAvailableListener listener,
+		@Nullable final OnImageAvailableListener<T> listener,
 		@Nullable final Handler handler) throws IllegalArgumentException {
 
 		synchronized (mSync) {
@@ -273,55 +216,37 @@ public class SurfaceImageReader {
 		}
 	}
 
-	/**
-	 * Bitmapを再利用可能にする
-	 * @param bitmap
-	 */
-	public void recycle(@NonNull final Bitmap bitmap) {
-		mAllBitmapAcquired = false;
-		mPool.recycle(bitmap);
+	protected boolean isGLES3() {
+		return mEglTask.isGLES3();
 	}
 
 	/**
-	 * 最新のビットマップを取得する
-	 * コンストラクタで指定した同時取得可能な最大のビットマップ数を超えて取得しようとするとIllegalStateExceptionを投げる
-	 * ビットマップが準備できていなければnullを返す
-	 * null以外が返ったときは#recycleでビットマップを返却して再利用可能にすること
+	 * 最新の映像を取得する。最新以外の古い映像は全てrecycleされる。
+	 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
+	 * 映像が準備できていなければnullを返す
+	 * null以外が返ったときは#recycleで返却して再利用可能にすること
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	public Bitmap acquireLatestImage() throws IllegalStateException {
-		synchronized (mQueue) {
-			final Bitmap result = mQueue.pollLast();
-			while (!mQueue.isEmpty()) {
-				recycle(mQueue.pollFirst());
-			}
-			if (mAllBitmapAcquired && (result == null)) {
-				throw new IllegalStateException("all bitmap is acquired!");
-			}
-			return result;
-		}
-	}
+	public abstract T acquireLatestImage() throws IllegalStateException;
 
 	/**
-	 * 次のビットマップを取得する
-	 * コンストラクタで指定した同時取得可能な最大のビットマップ数を超えて取得しようとするとIllegalStateExceptionを投げる
-	 * ビットマップが準備できていなければnullを返す
-	 * null以外が返ったときは#recycleでビットマップを返却して再利用可能にすること
+	 * 次の映像を取得する
+	 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
+	 * 映像がが準備できていなければnullを返す
+	 * null以外が返ったときは#recycleで返却して再利用可能にすること
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	public Bitmap acquireNextImage() throws IllegalStateException {
-		synchronized (mQueue) {
-			final Bitmap result = mQueue.pollFirst();
-			if (mAllBitmapAcquired && (result == null)) {
-				throw new IllegalStateException("all bitmap is acquired!");
-			}
-			return result;
-		}
-	}
+	public abstract T acquireNextImage() throws IllegalStateException;
+
+	/**
+	 * 使った映像を返却して再利用可能にする
+	 * @param image
+	 */
+	public abstract void recycle(T image);
 
 //--------------------------------------------------------------------------------
 // ワーカースレッド上での処理
@@ -329,7 +254,7 @@ public class SurfaceImageReader {
 	 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 	 */
 	@WorkerThread
-	protected final void handleOnStart() {
+	private void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 	}
 
@@ -337,13 +262,13 @@ public class SurfaceImageReader {
 	 * ワーカースレッド終了時の処理(ここはまだワーカースレッド上)
 	 */
 	@WorkerThread
-	protected final void handleOnStop() {
+	private void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
 		handleReleaseInputSurface();
 	}
 
 	@WorkerThread
-	protected Object handleRequest(final int request,
+	private Object handleRequest(final int request,
 		final int arg1, final int arg2, final Object obj) {
 
 		switch (request) {
@@ -361,9 +286,8 @@ public class SurfaceImageReader {
 	}
 
 	private int drawCnt;
-
 	@WorkerThread
-	protected void handleDraw() {
+	private void handleDraw() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		mEglTask.removeRequest(REQUEST_DRAW);
 		try {
@@ -377,42 +301,19 @@ public class SurfaceImageReader {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		final Bitmap bitmap = obtainBitmap();
-		if (bitmap != null) {
-			mAllBitmapAcquired = false;
-//			// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
-			if (mReadSurface == null) {
-				try {
-					// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-					mReadSurface = GLSurface.wrap(mEglTask.isGLES3(),
-						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1, mTexId,
-						mWidth, mHeight, false);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-					return;
-				}
+		onFrameAvailable(mTexId, mTexMatrix);
+	}
+
+	protected abstract void onFrameAvailable(final int texId, @Size(min=16) @NonNull final float[] texMatrix);
+
+	protected void callOnFrameAvailable() {
+		synchronized (mSync) {
+			if (mListenerHandler != null) {
+				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
+				mListenerHandler.post(mOnImageAvailableTask);
+			} else if (DEBUG) {
+				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
 			}
-			mReadSurface.makeCurrent();
-			// オフスクリーンから読み取り
-			mWorkBuffer.clear();
-			GLUtils.glReadPixels(mWorkBuffer, mWidth, mHeight);
-			// Bitmapへ代入
-			mWorkBuffer.clear();
-			bitmap.copyPixelsFromBuffer(mWorkBuffer);
-			synchronized (mQueue) {
-				mQueue.addLast(bitmap);
-			}
-			synchronized (mSync) {
-				if (mListenerHandler != null) {
-					mListenerHandler.removeCallbacks(mOnImageAvailableTask);
-					mListenerHandler.post(mOnImageAvailableTask);
-				} else if (DEBUG) {
-					Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
-				}
-			}
-		} else {
-			mAllBitmapAcquired = true;
-			if (DEBUG) Log.w(TAG, "handleDraw: failed to obtain bitmap from pool!");
 		}
 	}
 
@@ -421,7 +322,7 @@ public class SurfaceImageReader {
 		public void run() {
 			synchronized (mSync) {
 				if (mListener != null) {
-					mListener.onImageAvailable(SurfaceImageReader.this);
+					mListener.onImageAvailable(GLSurfaceReader.this);
 				}
 			}
 		}
@@ -432,6 +333,7 @@ public class SurfaceImageReader {
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
+	@CallSuper
 	protected void handleReCreateInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		synchronized (mSync) {
@@ -456,13 +358,10 @@ public class SurfaceImageReader {
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
+	@CallSuper
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		synchronized (mSync) {
-			if (mReadSurface != null) {
-				mReadSurface.release();
-				mReadSurface = null;
-			}
 			if (mInputSurface != null) {
 				try {
 					mInputSurface.release();
@@ -484,18 +383,6 @@ public class SurfaceImageReader {
 				mTexId = 0;
 			}
 		}
-	}
-
-	@Nullable
-	private Bitmap obtainBitmap() {
-		Bitmap result = mPool.obtain();
-		if (result == null) {
-			// フレームプールが空の時はキューの一番古い物を取得する
-			synchronized (mQueue) {
-				result = mQueue.pollFirst();
-			}
-		}
-		return result;
 	}
 
 	private final SurfaceTexture.OnFrameAvailableListener

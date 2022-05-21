@@ -22,8 +22,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
+import com.serenegiant.glutils.GLSurfaceImageReader;
+import com.serenegiant.glutils.GLSurfaceReader;
 import com.serenegiant.glutils.StaticTextureSource;
-import com.serenegiant.glutils.SurfaceImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -71,11 +72,11 @@ public class StaticTextureSourceTest {
 		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final SurfaceImageReader reader = new SurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new SurfaceImageReader.OnImageAvailableListener() {
+		final GLSurfaceImageReader reader = new GLSurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final SurfaceImageReader reader) {
+			public void onImageAvailable(@NonNull final GLSurfaceReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {

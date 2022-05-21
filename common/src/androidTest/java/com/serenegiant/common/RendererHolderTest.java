@@ -23,10 +23,11 @@ import android.graphics.Bitmap;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLManager;
+import com.serenegiant.glutils.GLSurfaceImageReader;
+import com.serenegiant.glutils.GLSurfaceReader;
 import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
-import com.serenegiant.glutils.SurfaceImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -51,7 +52,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class RendererHolderTest {
 
-	private static final String TAG = SurfaceReaderTest.class.getSimpleName();
+	private static final String TAG = GLSurfaceReaderTest.class.getSimpleName();
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
@@ -75,11 +76,11 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final SurfaceImageReader reader = new SurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new SurfaceImageReader.OnImageAvailableListener() {
+		final GLSurfaceImageReader reader = new GLSurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final SurfaceImageReader reader) {
+			public void onImageAvailable(@NonNull final GLSurfaceReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
@@ -134,11 +135,11 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final SurfaceImageReader reader = new SurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new SurfaceImageReader.OnImageAvailableListener() {
+		final GLSurfaceImageReader reader = new GLSurfaceImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final SurfaceImageReader reader) {
+			public void onImageAvailable(@NonNull final GLSurfaceReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
