@@ -147,7 +147,20 @@ public abstract class Pool<T> {
 			}
 		}
 	}
-		
+
+	/**
+	 * 使用済みオブジェクトを破棄する。
+	 * オブジェクトが再利用できなくなったときなどに生成済みオブジェクト数を減らす
+ 	 * @param obj
+	 */
+	public void release(@NonNull final T obj) {
+		synchronized (mPool) {
+			if (mCreatedObjects > 0) {
+				mCreatedObjects--;
+			}
+		}
+	}
+
 	/**
 	 * プールを空にする
 	 */

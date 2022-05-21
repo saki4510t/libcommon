@@ -244,7 +244,14 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	@Override
 	public void onRecycle(@NonNull final Bitmap image) {
 		mAllBitmapAcquired = false;
-		mPool.recycle(image);
+		// Bitmap#recycleが呼ばれてしまっていると再利用できないのでプールに戻せない。
+		// そのままだとプールが空になってしまうのでプールへ廃棄したことを通知する
+		// (プールの生成済みオブジェクト数を減らして新しいBitmapをアロケーションできるようにする)
+		if (!image.isRecycled()) {
+			mPool.recycle(image);
+		} else {
+			mPool.release(image);
+		}
 	}
 
 //--------------------------------------------------------------------------------
