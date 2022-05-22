@@ -40,9 +40,9 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 /**
  * GLImageReaderを使ってBitmapとして映像を受け取るためのGLImageReader.ImageHandler実装
  */
-public class GLImageReaderHandler implements GLImageReader.ImageHandler<Bitmap> {
+public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLImageReaderHandler.class.getSimpleName();
+	private static final String TAG = GLTexToBitmapHandler.class.getSimpleName();
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -79,7 +79,7 @@ public class GLImageReaderHandler implements GLImageReader.ImageHandler<Bitmap> 
 	 * @param config
 	 * @param maxImages
 	 */
-	public GLImageReaderHandler(
+	public GLTexToBitmapHandler(
 		final int width, final int height,
 		@NonNull final Bitmap.Config config, final int maxImages) {
 

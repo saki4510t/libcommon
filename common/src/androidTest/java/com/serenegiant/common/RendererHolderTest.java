@@ -24,7 +24,7 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLImageReader;
-import com.serenegiant.glutils.GLImageReaderHandler;
+import com.serenegiant.glutils.GLTexToBitmapHandler;
 import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
@@ -77,7 +77,7 @@ public class RendererHolderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLImageReader<Bitmap> reader = new GLImageReader<Bitmap>(WIDTH, HEIGHT,
-			new GLImageReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
+			new GLTexToBitmapHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
 		reader.setOnImageAvailableListener(new GLImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -137,7 +137,7 @@ public class RendererHolderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLImageReader<Bitmap> reader = new GLImageReader<Bitmap>(WIDTH, HEIGHT,
-			new GLImageReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
+			new GLTexToBitmapHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
 		reader.setOnImageAvailableListener(new GLImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
