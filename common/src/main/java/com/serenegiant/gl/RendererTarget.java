@@ -76,8 +76,8 @@ public class RendererTarget implements IRendererCommon {
 		} else if (surface instanceof TextureWrapper) {
 			final TextureWrapper wrapper = (TextureWrapper)surface;
 			mTargetSurface = GLSurface.wrap(egl.isGLES3(),
-				wrapper.texTarget,
-				wrapper.texUnit, wrapper.texId, wrapper.width, wrapper.height, false);
+				wrapper.texTarget, wrapper.texUnit, wrapper.texId,
+				wrapper.width, wrapper.height, false);
 			mOwnSurface = true;
 		} else {
 			mTargetSurface = egl.createFromSurface(surface);
