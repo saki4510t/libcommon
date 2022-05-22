@@ -22,8 +22,8 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLSurfaceReader;
-import com.serenegiant.glutils.GLSurfaceReaderHandler;
+import com.serenegiant.glutils.GLImageReader;
+import com.serenegiant.glutils.GLImageReaderHandler;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
 
@@ -45,8 +45,8 @@ import static com.serenegiant.common.TestUtils.*;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class GLSurfaceReaderTest {
-	private static final String TAG = GLSurfaceReaderTest.class.getSimpleName();
+public class GLImageReaderTest {
+	private static final String TAG = GLImageReaderTest.class.getSimpleName();
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
@@ -69,12 +69,12 @@ public class GLSurfaceReaderTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLSurfaceReader<Bitmap> reader = new GLSurfaceReader<Bitmap>(WIDTH, HEIGHT,
-			new GLSurfaceReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
-		reader.setOnImageAvailableListener(new GLSurfaceReader.OnImageAvailableListener<Bitmap>() {
+		final GLImageReader<Bitmap> reader = new GLImageReader<Bitmap>(WIDTH, HEIGHT,
+			new GLImageReaderHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
+		reader.setOnImageAvailableListener(new GLImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final GLSurfaceReader<Bitmap> reader) {
+			public void onImageAvailable(@NonNull final GLImageReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {

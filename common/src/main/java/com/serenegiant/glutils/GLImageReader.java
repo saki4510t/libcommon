@@ -47,9 +47,9 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス
  * @param <T>
  */
-public class GLSurfaceReader<T> {
+public class GLImageReader<T> {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLSurfaceReader.class.getSimpleName();
+	private static final String TAG = GLImageReader.class.getSimpleName();
 
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
 	private static final int REQUEST_UPDATE_SIZE = 2;
@@ -60,7 +60,7 @@ public class GLSurfaceReader<T> {
 	 * @param <T>
 	 */
 	public interface OnImageAvailableListener<T> {
-		public void onImageAvailable(@NonNull final GLSurfaceReader<T> reader);
+		public void onImageAvailable(@NonNull final GLImageReader<T> reader);
 	}
 
 	/**
@@ -71,7 +71,7 @@ public class GLSurfaceReader<T> {
 	 */
 	public interface ImageHandler<T> {
 		@WorkerThread
-		public void onInitialize(@NonNull final GLSurfaceReader<T> reader);
+		public void onInitialize(@NonNull final GLImageReader<T> reader);
 		/**
 		 * 関係するリソースを破棄する
 		 */
@@ -81,12 +81,12 @@ public class GLSurfaceReader<T> {
 		 * 映像入力用Surfaceが生成されたときの処理
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final GLSurfaceReader<T> reader);
+		public void onCreateInputSurface(@NonNull final GLImageReader<T> reader);
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final GLSurfaceReader<T> reader);
+		public void onReleaseInputSurface(@NonNull final GLImageReader<T> reader);
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
@@ -102,7 +102,7 @@ public class GLSurfaceReader<T> {
 		 */
 		@WorkerThread
 		public boolean onFrameAvailable(
-			@NonNull final GLSurfaceReader<T> reader,
+			@NonNull final GLImageReader<T> reader,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 
 		/**
@@ -167,7 +167,7 @@ public class GLSurfaceReader<T> {
 	 * @param height
 	 * @param imageHandler
 	 */
-	public GLSurfaceReader(
+	public GLImageReader(
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@NonNull final ImageHandler<T> imageHandler) {
 
@@ -180,7 +180,7 @@ public class GLSurfaceReader<T> {
 	 * @param height
 	 * @param imageHandler
 	 */
-	public GLSurfaceReader(
+	public GLImageReader(
 		@NonNull final GLManager manager, final boolean useSharedContext,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@NonNull final ImageHandler<T> imageHandler) {
@@ -190,7 +190,7 @@ public class GLSurfaceReader<T> {
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				return GLSurfaceReader.this.handleMessage(msg);
+				return GLImageReader.this.handleMessage(msg);
 			}
 		};
 		if (useSharedContext) {
@@ -584,7 +584,7 @@ public class GLSurfaceReader<T> {
 		public void run() {
 			synchronized (mSync) {
 				if (mListener != null) {
-					mListener.onImageAvailable(GLSurfaceReader.this);
+					mListener.onImageAvailable(GLImageReader.this);
 				}
 			}
 		}

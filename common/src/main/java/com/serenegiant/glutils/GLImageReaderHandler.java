@@ -40,9 +40,9 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 /**
  * GLSurfaceReaderを使ってBitmapとして映像を受け取るためのGLSurfaceReader.ImageHandler実装
  */
-public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitmap> {
+public class GLImageReaderHandler implements GLImageReader.ImageHandler<Bitmap> {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLSurfaceReaderHandler.class.getSimpleName();
+	private static final String TAG = GLImageReaderHandler.class.getSimpleName();
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -79,7 +79,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	 * @param config
 	 * @param maxImages
 	 */
-	public GLSurfaceReaderHandler(
+	public GLImageReaderHandler(
 		final int width, final int height,
 		@NonNull final Bitmap.Config config, final int maxImages) {
 
@@ -100,18 +100,18 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onInitialize(@NonNull final GLSurfaceReader<Bitmap> reader) {
+	public void onInitialize(@NonNull final GLImageReader<Bitmap> reader) {
 		if (DEBUG) Log.v(TAG, "onInitialize:");
 		// do nothing now
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 */
 	@WorkerThread
 	@Override
@@ -125,23 +125,23 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onCreateInputSurface(@NonNull final GLSurfaceReader<Bitmap> reader) {
+	public void onCreateInputSurface(@NonNull final GLImageReader<Bitmap> reader) {
 		if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 		// do nothing now
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onReleaseInputSurface(@NonNull final GLSurfaceReader<Bitmap> reader) {
+	public void onReleaseInputSurface(@NonNull final GLImageReader<Bitmap> reader) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
 		if (mReadSurface != null) {
@@ -151,7 +151,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param width
 	 * @param height
 	 */
@@ -166,7 +166,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param reader
 	 * @param texId
 	 * @param texMatrix
@@ -174,7 +174,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	@WorkerThread
 	@Override
 	public boolean onFrameAvailable(
-		@NonNull final GLSurfaceReader<Bitmap> reader,
+		@NonNull final GLImageReader<Bitmap> reader,
 		final int texId, @NonNull final float[] texMatrix) {
 
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
@@ -221,7 +221,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -241,7 +241,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
@@ -258,7 +258,7 @@ public class GLSurfaceReaderHandler implements GLSurfaceReader.ImageHandler<Bitm
 	}
 
 	/**
-	 * GLSurfaceReader.ImageHandler<Bitmap>の実装
+	 * GLImageReader.ImageHandler<Bitmap>の実装
 	 * @param image
 	 */
 	@Override
