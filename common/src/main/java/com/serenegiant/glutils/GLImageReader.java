@@ -283,7 +283,7 @@ public class GLImageReader<T> {
 	}
 
 	/**
-	 * GLSurfaceReaderが破棄されておらず利用可能かどうかを取得
+	 * GLImageReaderが破棄されておらず利用可能かどうかを取得
 	 * @return
 	 */
 	public boolean isValid() {

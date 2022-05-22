@@ -38,7 +38,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * GLSurfaceReaderを使ってBitmapとして映像を受け取るためのGLSurfaceReader.ImageHandler実装
+ * GLImageReaderを使ってBitmapとして映像を受け取るためのGLImageReader.ImageHandler実装
  */
 public class GLImageReaderHandler implements GLImageReader.ImageHandler<Bitmap> {
 	private static final boolean DEBUG = false;
