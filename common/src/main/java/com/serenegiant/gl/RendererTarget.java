@@ -79,9 +79,11 @@ public class RendererTarget implements IRendererCommon {
 				wrapper.texTarget, wrapper.texUnit, wrapper.texId,
 				wrapper.width, wrapper.height, false);
 			mOwnSurface = true;
-		} else {
+		} else if (GLUtils.isSupportedSurface(surface)) {
 			mTargetSurface = egl.createFromSurface(surface);
 			mOwnSurface = true;
+		} else {
+			throw new IllegalArgumentException("Unsupported surface," + surface);
 		}
 		Matrix.setIdentityM(mMvpMatrix, 0);
 	}
