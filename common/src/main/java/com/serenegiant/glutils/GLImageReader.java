@@ -99,6 +99,7 @@ public class GLImageReader<T> {
 		 * @param reader
 		 * @param texId
 		 * @param texMatrix
+		 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
 		 */
 		@WorkerThread
 		public boolean onFrameAvailable(
