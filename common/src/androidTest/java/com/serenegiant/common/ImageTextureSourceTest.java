@@ -23,8 +23,9 @@ import android.graphics.Bitmap;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glutils.GLImageReader;
-import com.serenegiant.glutils.GLTexToBitmapHandler;
+import com.serenegiant.glutils.GLImageReceiver;
+import com.serenegiant.glutils.GLBitmapImageReader;
+import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
@@ -77,12 +78,12 @@ public class ImageTextureSourceTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLImageReader<Bitmap> reader = new GLImageReader<Bitmap>(WIDTH, HEIGHT,
-			new GLTexToBitmapHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
-		reader.setOnImageAvailableListener(new GLImageReader.OnImageAvailableListener<Bitmap>() {
+		final GLBitmapImageReader reader
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final GLImageReader<Bitmap> reader) {
+			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
@@ -99,7 +100,9 @@ public class ImageTextureSourceTest {
 				}
 			}
 		}, HandlerThreadHandler.createHandler());
-		final Surface surface = reader.getSurface();
+
+		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
 		// 映像受け取り用Surfaceをセット

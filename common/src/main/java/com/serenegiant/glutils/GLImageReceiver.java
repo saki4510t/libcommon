@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.os.Handler;
-import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
@@ -37,7 +36,6 @@ import java.util.concurrent.TimeUnit;
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
@@ -45,33 +43,23 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス
- * @param <T>
  */
-public class GLImageReader<T> {
+public class GLImageReceiver {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLImageReader.class.getSimpleName();
+	private static final String TAG = GLImageReceiver.class.getSimpleName();
 
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
 	private static final int REQUEST_UPDATE_SIZE = 2;
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 
 	/**
-	 * 映像を取得可能になったときに呼ばれるコールバックリスナー
-	 * @param <T>
-	 */
-	public interface OnImageAvailableListener<T> {
-		public void onImageAvailable(@NonNull final GLImageReader<T> reader);
-	}
-
-	/**
 	 * Surfaceを経由してテクスチャとして受け取った映像を処理するためのインターフェース
 	 * WorkerThreadアノテーションの付いているインターフェースメソッドは全てGLコンテキストを
 	 * 保持したスレッド上で実行される
-	 * @param <T>
 	 */
-	public interface ImageHandler<T> {
+	public interface Callback {
 		@WorkerThread
-		public void onInitialize(@NonNull final GLImageReader<T> reader);
+		public void onInitialize(@NonNull final GLImageReceiver reader);
 		/**
 		 * 関係するリソースを破棄する
 		 */
@@ -81,12 +69,12 @@ public class GLImageReader<T> {
 		 * 映像入力用Surfaceが生成されたときの処理
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final GLImageReader<T> reader);
+		public void onCreateInputSurface(@NonNull final GLImageReceiver reader);
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final GLImageReader<T> reader);
+		public void onReleaseInputSurface(@NonNull final GLImageReceiver reader);
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
@@ -102,35 +90,9 @@ public class GLImageReader<T> {
 		 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
 		 */
 		@WorkerThread
-		public boolean onFrameAvailable(
-			@NonNull final GLImageReader<T> reader,
+		public void onFrameAvailable(
+			@NonNull final GLImageReceiver reader,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
-
-		/**
-		 * 最新の映像を取得する。最新以外の古い映像は全てrecycleされる。
-		 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
-		 * 映像が準備できていなければnullを返す
-		 * null以外が返ったときは#recycleで返却して再利用可能にすること
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@Nullable
-		public T onAcquireLatestImage() throws IllegalStateException;
-		/**
-		 * 次の映像を取得する
-		 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
-		 * 映像がが準備できていなければnullを返す
-		 * null以外が返ったときは#recycleで返却して再利用可能にすること
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@Nullable
-		public T onAcquireNextImage() throws IllegalStateException;
-		/**
-		 * 使った映像を返却して再利用可能にする
-		 * @param image
-		 */
-		public void onRecycle(@NonNull T image);
 	}
 
 	@NonNull
@@ -146,13 +108,9 @@ public class GLImageReader<T> {
 	private int mWidth;
 	private int mHeight;
 	@NonNull
-	private final ImageHandler<T> mImageHandler;
+	private final Callback mCallback;
 	private volatile boolean mReleased = false;
 	private boolean mIsReaderValid = false;
-	@Nullable
-	private OnImageAvailableListener<T> mListener;
-	@Nullable
-	private Handler mListenerHandler;
 
 	// 映像受け取り用テクスチャ/SurfaceTexture/Surface関係
 	@Size(min=16)
@@ -166,32 +124,32 @@ public class GLImageReader<T> {
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param imageHandler
+	 * @param callback
 	 */
-	public GLImageReader(
+	public GLImageReceiver(
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
-		@NonNull final ImageHandler<T> imageHandler) {
+		@NonNull final Callback callback) {
 
-		this(new GLManager(), false, width, height, imageHandler);
+		this(new GLManager(), false, width, height, callback);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param imageHandler
+	 * @param callback
 	 */
-	public GLImageReader(
+	public GLImageReceiver(
 		@NonNull final GLManager manager, final boolean useSharedContext,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
-		@NonNull final ImageHandler<T> imageHandler) {
+		@NonNull final Callback callback) {
 
 		mOwnManager = useSharedContext;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				return GLImageReader.this.handleMessage(msg);
+				return GLImageReceiver.this.handleMessage(msg);
 			}
 		};
 		if (useSharedContext) {
@@ -203,7 +161,7 @@ public class GLImageReader<T> {
 		}
 		mWidth = width;
 		mHeight = height;
-		mImageHandler = imageHandler;
+		mCallback = callback;
 		final Semaphore sem = new Semaphore(0);
 		mGLHandler.post(new Runnable() {
 			@Override
@@ -263,7 +221,6 @@ public class GLImageReader<T> {
 		if (!mReleased) {
 			if (DEBUG) Log.v(TAG, "release:");
 			mReleased = true;
-			setOnImageAvailableListener(null, null);
 			mIsReaderValid = false;
 			internalRelease();
 		}
@@ -353,70 +310,8 @@ public class GLImageReader<T> {
 		}
 	}
 
-	/**
-	 * 読み取った映像データの準備ができたときのコールバックリスナーを登録
-	 * @param listener
-	 * @param handler
-	 * @throws IllegalArgumentException
-	 */
-	public void setOnImageAvailableListener(
-		@Nullable final OnImageAvailableListener<T> listener,
-		@Nullable final Handler handler) throws IllegalArgumentException {
-
-		synchronized (mSync) {
-			if (listener != null) {
-				Looper looper = handler != null ? handler.getLooper() : Looper.myLooper();
-				if (looper == null) {
-					throw new IllegalArgumentException(
-						"handler is null but the current thread is not a looper");
-				}
-				if (mListenerHandler == null || mListenerHandler.getLooper() != looper) {
-					mListenerHandler = new Handler(looper);
-				}
-				mListener = listener;
-			} else {
-				mListener = null;
-				mListenerHandler = null;
-			}
-		}
-	}
-
 	protected boolean isGLES3() {
 		return mManager.isGLES3();
-	}
-
-	/**
-	 * 最新の映像を取得する。最新以外の古い映像は全てrecycleされる。
-	 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
-	 * 映像が準備できていなければnullを返す
-	 * null以外が返ったときは#recycleで返却して再利用可能にすること
-	 * @return
-	 * @throws IllegalStateException
-	 */
-	@Nullable
-	public T acquireLatestImage() throws IllegalStateException {
-		return mImageHandler.onAcquireLatestImage();
-	}
-
-	/**
-	 * 次の映像を取得する
-	 * コンストラクタで指定した同時取得可能な最大の映像数を超えて取得しようとするとIllegalStateExceptionを投げる
-	 * 映像がが準備できていなければnullを返す
-	 * null以外が返ったときは#recycleで返却して再利用可能にすること
-	 * @return
-	 * @throws IllegalStateException
-	 */
-	@Nullable
-	public T acquireNextImage() throws IllegalStateException {
-		return mImageHandler.onAcquireNextImage();
-	}
-
-	/**
-	 * 使った映像を返却して再利用可能にする
-	 * @param image
-	 */
-	public void recycle(@NonNull T image) {
-		mImageHandler.onRecycle(image);
 	}
 
 	public void resize(@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
@@ -437,7 +332,7 @@ public class GLImageReader<T> {
 	@WorkerThread
 	private void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
-		mImageHandler.onInitialize(this);
+		mCallback.onInitialize(this);
 	}
 
 	/**
@@ -447,7 +342,7 @@ public class GLImageReader<T> {
 	private void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
 		handleReleaseInputSurface();
-		mImageHandler.onRelease();
+		mCallback.onRelease();
 	}
 
 	@WorkerThread
@@ -487,9 +382,7 @@ public class GLImageReader<T> {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		if (mImageHandler.onFrameAvailable(this, mTexId, mTexMatrix)) {
-			callOnFrameAvailable();
-		}
+		mCallback.onFrameAvailable(this, mTexId, mTexMatrix);
 	}
 
 	/**
@@ -509,7 +402,7 @@ public class GLImageReader<T> {
 		if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
 			mInputTexture.setDefaultBufferSize(width, height);
 		}
-		mImageHandler.onResize(width, height);
+		mCallback.onResize(width, height);
 	}
 
 	/**
@@ -533,7 +426,7 @@ public class GLImageReader<T> {
 			if (BuildCheck.isAndroid4_1()) {
 				mInputTexture.setDefaultBufferSize(mWidth, mHeight);
 			}
-			mImageHandler.onCreateInputSurface(this);
+			mCallback.onCreateInputSurface(this);
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		}
 	}
@@ -546,7 +439,7 @@ public class GLImageReader<T> {
 	@CallSuper
 	private void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
-		mImageHandler.onReleaseInputSurface(this);
+		mCallback.onReleaseInputSurface(this);
 		synchronized (mSync) {
 			if (mInputSurface != null) {
 				try {
@@ -570,34 +463,6 @@ public class GLImageReader<T> {
 			}
 		}
 	}
-
-	/**
-	 * OnImageAvailableListener#onImageAvailableを呼び出す
-	 */
-	private void callOnFrameAvailable() {
-		synchronized (mSync) {
-			if (mListenerHandler != null) {
-				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
-				mListenerHandler.post(mOnImageAvailableTask);
-			} else if (DEBUG) {
-				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
-			}
-		}
-	}
-
-	/**
-	 * OnImageAvailableListener#onImageAvailableを呼び出すためのRunnable実装
-	 */
-	private final Runnable mOnImageAvailableTask = new Runnable() {
-		@Override
-		public void run() {
-			synchronized (mSync) {
-				if (mListener != null) {
-					mListener.onImageAvailable(GLImageReader.this);
-				}
-			}
-		}
-	};
 
 	/**
 	 * 映像受け取り用のSurfaceTextureの映像が更新されたときのコールバックリスナー実装

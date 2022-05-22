@@ -21,6 +21,8 @@ package com.serenegiant.glutils;
 import android.graphics.Bitmap;
 import android.graphics.Paint;
 import android.opengl.GLES20;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 
 import com.serenegiant.gl.GLSurface;
@@ -38,11 +40,11 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * GLImageReaderを使ってBitmapとして映像を受け取るためのGLImageReader.ImageHandler実装
+ * GLImageReceiverrを使ってBitmapとして映像を受け取るためのGLImageReader<Bitmap></>実装
  */
-public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> {
+public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver.Callback {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLTexToBitmapHandler.class.getSimpleName();
+	private static final String TAG = GLBitmapImageReader.class.getSimpleName();
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -69,6 +71,11 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	 */
 	private GLSurface mReadSurface;
 	private volatile boolean mAllBitmapAcquired = false;
+
+	@Nullable
+	private OnImageAvailableListener<Bitmap> mListener;
+	@Nullable
+	private Handler mListenerHandler;
 	private int mWidth;
 	private int mHeight;
 
@@ -79,7 +86,7 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	 * @param config
 	 * @param maxImages
 	 */
-	public GLTexToBitmapHandler(
+	public GLBitmapImageReader(
 		final int width, final int height,
 		@NonNull final Bitmap.Config config, final int maxImages) {
 
@@ -100,23 +107,24 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onInitialize(@NonNull final GLImageReader<Bitmap> reader) {
+	public void onInitialize(@NonNull final GLImageReceiver reader) {
 		if (DEBUG) Log.v(TAG, "onInitialize:");
 		// do nothing now
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 */
 	@WorkerThread
 	@Override
 	public void onRelease() {
 		if (DEBUG) Log.v(TAG, "release:");
+		setOnImageAvailableListener(null, null);
 		synchronized (mQueue) {
 			mQueue.clear();
 		}
@@ -125,23 +133,23 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onCreateInputSurface(@NonNull final GLImageReader<Bitmap> reader) {
+	public void onCreateInputSurface(@NonNull final GLImageReceiver reader) {
 		if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 		// do nothing now
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param reader
 	 */
 	@WorkerThread
 	@Override
-	public void onReleaseInputSurface(@NonNull final GLImageReader<Bitmap> reader) {
+	public void onReleaseInputSurface(@NonNull final GLImageReceiver reader) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
 		if (mReadSurface != null) {
@@ -151,7 +159,7 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param width
 	 * @param height
 	 */
@@ -166,7 +174,7 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param reader
 	 * @param texId
 	 * @param texMatrix
@@ -174,8 +182,8 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	 */
 	@WorkerThread
 	@Override
-	public boolean onFrameAvailable(
-		@NonNull final GLImageReader<Bitmap> reader,
+	public void onFrameAvailable(
+		@NonNull final GLImageReceiver reader,
 		final int texId, @NonNull final float[] texMatrix) {
 
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
@@ -201,7 +209,7 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 						width, height, false);
 				} catch (final Exception e) {
 					Log.w(TAG, e);
-					return false;
+					return;
 				}
 			}
 			mReadSurface.makeCurrent();
@@ -218,21 +226,48 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 			mAllBitmapAcquired = true;
 			if (DEBUG) Log.w(TAG, "handleDraw: failed to obtain bitmap from pool!");
 		}
-		return true;
+		callOnFrameAvailable();
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * 読み取った映像データの準備ができたときのコールバックリスナーを登録
+	 * @param listener
+	 * @param handler
+	 * @throws IllegalArgumentException
+	 */
+	public void setOnImageAvailableListener(
+		@Nullable final OnImageAvailableListener<Bitmap> listener,
+		@Nullable final Handler handler) throws IllegalArgumentException {
+
+		synchronized (mSync) {
+			if (listener != null) {
+				Looper looper = handler != null ? handler.getLooper() : Looper.myLooper();
+				if (looper == null) {
+					throw new IllegalArgumentException(
+						"handler is null but the current thread is not a looper");
+				}
+				if (mListenerHandler == null || mListenerHandler.getLooper() != looper) {
+					mListenerHandler = new Handler(looper);
+				}
+				mListener = listener;
+			} else {
+				mListener = null;
+				mListenerHandler = null;
+			}
+		}
+	}
+
+	/**
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	@Override
-	public Bitmap onAcquireLatestImage() throws IllegalStateException {
+	public Bitmap acquireLatestImage() throws IllegalStateException {
 		synchronized (mQueue) {
 			final Bitmap result = mQueue.pollLast();
 			while (!mQueue.isEmpty()) {
-				onRecycle(mQueue.pollFirst());
+				recycle(mQueue.pollFirst());
 			}
 			if (mAllBitmapAcquired && (result == null)) {
 				throw new IllegalStateException("all bitmap is acquired!");
@@ -242,13 +277,12 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
-	@Override
-	public Bitmap onAcquireNextImage() throws IllegalStateException {
+	public Bitmap acquireNextImage() throws IllegalStateException {
 		synchronized (mQueue) {
 			final Bitmap result = mQueue.pollFirst();
 			if (mAllBitmapAcquired && (result == null)) {
@@ -259,11 +293,10 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 	}
 
 	/**
-	 * GLImageReader.ImageHandler<Bitmap>の実装
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param image
 	 */
-	@Override
-	public void onRecycle(@NonNull final Bitmap image) {
+	public void recycle(@NonNull final Bitmap image) {
 		mAllBitmapAcquired = false;
 		// Bitmap#recycleが呼ばれてしまっていると再利用できないのでプールに戻せない。
 		// そのままだとプールが空になってしまうのでプールへ廃棄したことを通知する
@@ -308,4 +341,32 @@ public class GLTexToBitmapHandler implements GLImageReader.ImageHandler<Bitmap> 
 		}
 		return result;
 	}
+
+	/**
+	 * OnImageAvailableListener#onImageAvailableを呼び出す
+	 */
+	private void callOnFrameAvailable() {
+		synchronized (mSync) {
+			if (mListenerHandler != null) {
+				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
+				mListenerHandler.post(mOnImageAvailableTask);
+			} else if (DEBUG) {
+				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
+			}
+		}
+	}
+
+	/**
+	 * OnImageAvailableListener#onImageAvailableを呼び出すためのRunnable実装
+	 */
+	private final Runnable mOnImageAvailableTask = new Runnable() {
+		@Override
+		public void run() {
+			synchronized (mSync) {
+				if (mListener != null) {
+					mListener.onImageAvailable(GLBitmapImageReader.this);
+				}
+			}
+		}
+	};
 }

@@ -22,8 +22,9 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLImageReader;
-import com.serenegiant.glutils.GLTexToBitmapHandler;
+import com.serenegiant.glutils.GLImageReceiver;
+import com.serenegiant.glutils.GLBitmapImageReader;
+import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
 
@@ -45,8 +46,8 @@ import static com.serenegiant.common.TestUtils.*;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class GLImageReaderTest {
-	private static final String TAG = GLImageReaderTest.class.getSimpleName();
+public class GLImageReceiverTest {
+	private static final String TAG = GLImageReceiverTest.class.getSimpleName();
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
@@ -69,12 +70,12 @@ public class GLImageReaderTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLImageReader<Bitmap> reader = new GLImageReader<Bitmap>(WIDTH, HEIGHT,
-			new GLTexToBitmapHandler(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2));
-		reader.setOnImageAvailableListener(new GLImageReader.OnImageAvailableListener<Bitmap>() {
+		final GLBitmapImageReader reader
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onImageAvailable(@NonNull final GLImageReader<Bitmap> reader) {
+			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
@@ -91,7 +92,8 @@ public class GLImageReaderTest {
 			}
 		}, HandlerThreadHandler.createHandler());
 
-		final Surface surface = reader.getSurface();
+		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
 		inputImagesAsync(original, surface, 10);
