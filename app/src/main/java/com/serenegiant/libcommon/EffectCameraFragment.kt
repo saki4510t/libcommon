@@ -26,7 +26,7 @@ import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
-import com.serenegiant.glutils.GLEffect
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.media.MediaFileUtils
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.service.ServiceRecorder

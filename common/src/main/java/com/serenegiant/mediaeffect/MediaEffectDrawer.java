@@ -22,14 +22,14 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.gl.GLHelper;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
 import java.util.Locale;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 public class MediaEffectDrawer {
 

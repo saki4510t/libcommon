@@ -37,6 +37,11 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
+import com.serenegiant.gl.GLContext;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.ISurface;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
@@ -48,7 +53,7 @@ import java.io.OutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
+import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * 分配描画インターフェースの共通部分を実装する抽象クラス

@@ -34,9 +34,9 @@ import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSourcePipeline
-import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.glutils.GLManager
-import com.serenegiant.glutils.GLUtils
+import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.gl.GLManager
+import com.serenegiant.gl.GLUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
@@ -260,7 +260,12 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			if (!extensions.contains("OES_EGL_image_external")) {
 				throw RuntimeException("This system does not support OES_EGL_image_external.")
 			}
-			mGLManager = GLManager(mGLVersion, EGLBase.wrapCurrentContext(), 0, null)
+			mGLManager = GLManager(
+				mGLVersion,
+				EGLBase.wrapCurrentContext(),
+				0,
+				null
+			)
 			mVideoSourcePipeline = createVideoSource(
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")

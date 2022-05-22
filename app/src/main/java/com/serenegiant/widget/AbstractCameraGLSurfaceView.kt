@@ -29,8 +29,8 @@ import android.util.Log
 import android.view.Surface
 import android.view.SurfaceHolder
 import android.view.View
-import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.glutils.GLUtils
+import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.gl.GLUtils
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.graphics.MatrixUtils

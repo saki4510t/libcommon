@@ -22,13 +22,13 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLDrawer2D;
-import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLSurface;
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IRendererCommon;
-import com.serenegiant.glutils.RendererTarget;
-import com.serenegiant.glutils.GLTexture;
+import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.gl.GLTexture;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.CallSuper;
@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * OpenGL|ESのシェーダーを使って映像にマスク処理するGLPipeline実装

@@ -29,13 +29,14 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLHelper;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * ビットマップで指定したオーバーレイ画像を重ねて表示するAbstractRendererHolder実装

@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.util.Log;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /** 露出調整, -10〜+10, 0だと無調整 */
 public class MediaEffectGLExposure extends MediaEffectGLBase {

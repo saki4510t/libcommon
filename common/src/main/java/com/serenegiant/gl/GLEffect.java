@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,7 +18,7 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * OpenGL|ESを使った映像効果付与のためのシェーダーを定義する定数クラス

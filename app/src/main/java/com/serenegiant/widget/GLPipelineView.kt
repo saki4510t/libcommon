@@ -19,7 +19,7 @@ package com.serenegiant.widget
 */
 
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glutils.GLManager
+import com.serenegiant.gl.GLManager
 
 /**
  * GLPipelineSource/GLPipelineで描画処理分配処理を行うViewの共通メソッドを定義するインターフェース

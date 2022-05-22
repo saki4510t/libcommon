@@ -29,9 +29,9 @@ import android.util.Log
 import android.view.Surface
 import android.view.View
 import com.serenegiant.glpipeline.*
-import com.serenegiant.glutils.GLContext
-import com.serenegiant.glutils.GLEffect
-import com.serenegiant.glutils.GLManager
+import com.serenegiant.gl.GLContext
+import com.serenegiant.gl.GLEffect
+import com.serenegiant.gl.GLManager
 import com.serenegiant.math.Fraction
 import com.serenegiant.view.ViewTransformDelegater
 

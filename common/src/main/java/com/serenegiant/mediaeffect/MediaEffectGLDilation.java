@@ -21,9 +21,9 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.GLHelper;
+import com.serenegiant.gl.GLHelper;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /** Dilation(膨張)フィルタ */
 public class MediaEffectGLDilation extends MediaEffectGLBase {

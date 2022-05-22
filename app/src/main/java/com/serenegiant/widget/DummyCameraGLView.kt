@@ -31,7 +31,7 @@ import androidx.core.content.ContextCompat
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ImageSourcePipeline
-import com.serenegiant.glutils.GLDrawer2D
+import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.libcommon.R
 import com.serenegiant.math.Fraction

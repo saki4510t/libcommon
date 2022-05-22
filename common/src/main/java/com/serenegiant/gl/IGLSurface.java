@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -19,8 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.Bitmap;
-
-import java.io.IOException;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;

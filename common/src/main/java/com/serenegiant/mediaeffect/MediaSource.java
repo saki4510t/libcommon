@@ -23,8 +23,8 @@ import androidx.annotation.NonNull;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLDrawer2D;
-import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLSurface;
 
 public class MediaSource implements ISource {
 	private static final boolean DEBUG = false;

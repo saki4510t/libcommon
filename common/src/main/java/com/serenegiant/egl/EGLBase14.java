@@ -30,7 +30,7 @@ import android.opengl.GLES20;
 import android.os.Build;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.IntRange;

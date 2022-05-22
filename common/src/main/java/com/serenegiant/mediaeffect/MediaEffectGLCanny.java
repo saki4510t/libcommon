@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.util.Log;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /** Cannyエッジ検出フィルタ */
 public class MediaEffectGLCanny extends MediaEffectGLBase {

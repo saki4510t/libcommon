@@ -31,7 +31,7 @@ import com.serenegiant.camera.CameraUtils
 import com.serenegiant.glpipeline.GLPipelineSource
 import com.serenegiant.glpipeline.MaskPipeline
 import com.serenegiant.glpipeline.VideoSourcePipeline
-import com.serenegiant.glutils.GLManager
+import com.serenegiant.gl.GLManager
 import com.serenegiant.graphics.BitmapHelper
 import java.io.IOException
 import java.util.concurrent.Semaphore

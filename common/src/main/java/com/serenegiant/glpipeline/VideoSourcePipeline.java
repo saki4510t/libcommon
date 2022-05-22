@@ -26,9 +26,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLContext;
-import com.serenegiant.glutils.GLHelper;
-import com.serenegiant.glutils.GLManager;
+import com.serenegiant.gl.GLContext;
+import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 

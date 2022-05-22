@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.graphics.Bitmap;
 
-import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.gl.GLSurface;
 
 public class MediaImageSource extends MediaSource {
 	private GLSurface mImageOffscreen;

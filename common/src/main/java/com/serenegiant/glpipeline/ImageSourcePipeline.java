@@ -25,9 +25,9 @@ import android.util.Log;
 import android.view.Choreographer;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLHelper;
-import com.serenegiant.glutils.GLTexture;
+import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLTexture;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;

@@ -25,8 +25,8 @@ import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLUtils;
-import com.serenegiant.glutils.WrappedSurfaceHolder;
+import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.WrappedSurfaceHolder;
 import com.serenegiant.system.BuildCheck;
 
 import javax.microedition.khronos.egl.EGL10;

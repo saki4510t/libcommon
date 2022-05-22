@@ -20,7 +20,7 @@ package com.serenegiant.glpipeline;
 
 import android.util.Log;
 
-import com.serenegiant.glutils.GLConst;
+import com.serenegiant.gl.GLConst;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

@@ -25,8 +25,8 @@ import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.AbstractDistributeTask;
-import com.serenegiant.glutils.GLContext;
-import com.serenegiant.glutils.GLManager;
+import com.serenegiant.gl.GLContext;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;

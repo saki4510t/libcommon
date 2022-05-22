@@ -24,7 +24,7 @@ import android.media.effect.EffectFactory;
 import androidx.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.gl.GLSurface;
 
 public class MediaEffect implements IEffect {
 	protected final EffectContext mEffectContext;

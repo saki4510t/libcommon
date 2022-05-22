@@ -21,9 +21,9 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.gl.GLSurface;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * OpenGL|ES2のフラグメントシェーダーで映像効果を与える時の基本クラス

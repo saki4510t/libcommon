@@ -18,7 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * テクスチャAとテクスチャBとマスク用テクスチャMを用いて

@@ -21,7 +21,7 @@ package com.serenegiant.common;
 import android.content.Context;
 import android.opengl.GLES20;
 
-import com.serenegiant.glutils.GLManager;
+import com.serenegiant.gl.GLManager;
 
 import org.junit.After;
 import org.junit.Before;

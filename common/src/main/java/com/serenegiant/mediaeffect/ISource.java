@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import androidx.annotation.NonNull;
 
-import com.serenegiant.glutils.GLSurface;
+import com.serenegiant.gl.GLSurface;
 
 public interface ISource {
 	/**

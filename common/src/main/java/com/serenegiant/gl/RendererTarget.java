@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -22,6 +22,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import com.serenegiant.egl.EGLBase;
+import com.serenegiant.glutils.IRendererCommon;
 import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;

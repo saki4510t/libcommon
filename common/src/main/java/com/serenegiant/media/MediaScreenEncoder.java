@@ -16,7 +16,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
-import com.serenegiant.glutils.GLDrawer2D;
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import androidx.annotation.NonNull;

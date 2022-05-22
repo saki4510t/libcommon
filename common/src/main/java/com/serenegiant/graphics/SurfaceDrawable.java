@@ -36,9 +36,9 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
-import com.serenegiant.glutils.GLDrawer2D;
-import com.serenegiant.glutils.GLHelper;
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
@@ -48,7 +48,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
+import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surface/SurfaceTexture経由で受け取った映像を表示するDrawable

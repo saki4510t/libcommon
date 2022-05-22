@@ -25,8 +25,8 @@ import android.opengl.GLES20
 import android.util.AttributeSet
 import android.util.Log
 import androidx.annotation.Size
-import com.serenegiant.glutils.GLDrawer2D
-import com.serenegiant.glutils.GLHelper
+import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.gl.GLHelper
 import com.serenegiant.glutils.IRendererCommon
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction

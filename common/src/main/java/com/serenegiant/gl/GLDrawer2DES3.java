@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,25 +18,26 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-
-import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.Size;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
-/*package*/class GLDrawer2DES2 extends GLDrawer2D {
+@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+	/*package*/ class GLDrawer2DES3 extends GLDrawer2D {
 	private static final boolean DEBUG = false; // FIXME set false on release
-	private static final String TAG = GLDrawer2DES2.class.getSimpleName();
+	private static final String TAG = GLDrawer2DES3.class.getSimpleName();
 
 	/**
 	 * 頂点座標用バッファオブジェクト名
@@ -50,37 +51,37 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
-	 * 				通常の2Dテキスチャを描画に使うならfalse
 	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
 	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を使う場合はtrue。
+	 * 				通常の2Dテキスチャならfalse
 	 */
-	/*package*/ GLDrawer2DES2(
+	/*package*/ GLDrawer2DES3(
 		final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
 		@NonNull @Size(min=8) final float[] texcoord,
 		@Nullable final String vs, @Nullable final String fs) {
 
-		super(false, isOES,
+		super(true, isOES,
 			vertices, texcoord,
-			TextUtils.isEmpty(vs) ? VERTEX_SHADER_ES2 : vs,
-			TextUtils.isEmpty(fs) ? (isOES ? FRAGMENT_SHADER_EXT_ES2 : FRAGMENT_SHADER_ES2) : fs);
+			TextUtils.isEmpty(vs) ? VERTEX_SHADER_ES3 : vs,
+			TextUtils.isEmpty(fs) ? (isOES ? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_ES3) : fs);
 	}
 
 	@Override
 	protected void updateTexMatrix(@NonNull @Size(min=16) final float[] texMatrix, final int offset) {
-		GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
+		GLES30.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
 	}
 
 	@Override
 	protected void updateMvpMatrix(@NonNull @Size(min=16) final float[] mvpMatrix, final int offset) {
-		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
 	}
 
 	@Override
 	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
-		GLES20.glActiveTexture(texUnit);
-		GLES20.glBindTexture(mTexTarget, texId);
+		GLES30.glActiveTexture(texUnit);
+		GLES30.glBindTexture(mTexTarget, texId);
 		GLES30.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
 	}
 
@@ -89,47 +90,47 @@ import static com.serenegiant.glutils.ShaderConst.*;
 		if (USE_VBO) {
 			if (mBufVertex <= GL_NO_BUFFER) {
 				pVertex.clear();
-				mBufVertex = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pVertex, GLES20.GL_STATIC_DRAW);
+				mBufVertex = GLHelper.createBuffer(GLES30.GL_ARRAY_BUFFER, pVertex, GLES30.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex," + mBufVertex);
 			}
 			if (mBufTexCoord <= GL_NO_BUFFER) {
 				pTexCoord.clear();
-				mBufTexCoord = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pTexCoord, GLES20.GL_STATIC_DRAW);
+				mBufTexCoord = GLHelper.createBuffer(GLES30.GL_ARRAY_BUFFER, pTexCoord, GLES30.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord," + mBufTexCoord);
 			}
 			// 頂点座標をセット
-			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mBufVertex);
-			GLES20.glVertexAttribPointer(maPositionLoc,
-				2, GLES20.GL_FLOAT, false, 0, 0);
-			GLES20.glEnableVertexAttribArray(maPositionLoc);
+			GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, mBufVertex);
+			GLES30.glVertexAttribPointer(maPositionLoc,
+				2, GLES30.GL_FLOAT, false, 0, 0);
+			GLES30.glEnableVertexAttribArray(maPositionLoc);
 			// テクスチャ座標をセット
-			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mBufTexCoord);
-			GLES20.glVertexAttribPointer(maTextureCoordLoc,
-				2, GLES20.GL_FLOAT, false, 0, 0);
-			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+			GLES30.glBindBuffer(GLES30.GL_ARRAY_BUFFER, mBufTexCoord);
+			GLES30.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES30.GL_FLOAT, false, 0, 0);
+			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 		} else {
 			// 頂点座標をセット
 			pVertex.clear();
-			GLES20.glVertexAttribPointer(maPositionLoc,
-				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
-			GLES20.glEnableVertexAttribArray(maPositionLoc);
+			GLES30.glVertexAttribPointer(maPositionLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pVertex);
+			GLES30.glEnableVertexAttribArray(maPositionLoc);
 			// テクスチャ座標をセット
 			pTexCoord.clear();
-			GLES20.glVertexAttribPointer(maTextureCoordLoc,
-				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
-			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+			GLES30.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES30.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+			GLES30.glEnableVertexAttribArray(maTextureCoordLoc);
 		}
 	}
 
 	@Override
 	protected void drawVertices() {
-		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+		GLES30.glDrawArrays(GLES30.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
 	}
 
 	@Override
 	protected void finishDraw() {
-		GLES20.glBindTexture(mTexTarget, 0);
-        GLES20.glUseProgram(0);
+		GLES30.glBindTexture(mTexTarget, 0);
+		GLES30.glUseProgram(0);
 	}
 
 	/**
@@ -148,7 +149,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 			mBufTexCoord = GL_NO_BUFFER;
 		}
 		// シェーダーを破棄
-		GLES20.glDeleteProgram(program);
+		GLES30.glDeleteProgram(program);
 	}
 
 	/**
@@ -160,8 +161,8 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	 */
 	@Override
 	public int glGetAttribLocation(@NonNull final String name) {
-		GLES20.glUseProgram(hProgram);
-		return GLES20.glGetAttribLocation(hProgram, name);
+		GLES30.glUseProgram(hProgram);
+		return GLES30.glGetAttribLocation(hProgram, name);
 	}
 
 	/**
@@ -173,8 +174,8 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	 */
 	@Override
 	public int glGetUniformLocation(@NonNull final String name) {
-		GLES20.glUseProgram(hProgram);
-		return GLES20.glGetUniformLocation(hProgram, name);
+		GLES30.glUseProgram(hProgram);
+		return GLES30.glGetUniformLocation(hProgram, name);
 	}
 
 	/**
@@ -183,7 +184,7 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	 */
 	@Override
 	public void glUseProgram() {
-		GLES20.glUseProgram(hProgram);
+		GLES30.glUseProgram(hProgram);
 	}
 
 	/**
@@ -193,16 +194,16 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	@Override
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
-		GLES20.glUseProgram(hProgram);
-		maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
-		maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
-		muTextureLoc = GLES20.glGetAttribLocation(hProgram, "sTexture");
-		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
-		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
+		GLES30.glUseProgram(hProgram);
+		maPositionLoc = GLES30.glGetAttribLocation(hProgram, "aPosition");
+		maTextureCoordLoc = GLES30.glGetAttribLocation(hProgram, "aTextureCoord");
+		muTextureLoc = GLES30.glGetAttribLocation(hProgram, "sTexture");
+		muMVPMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uMVPMatrix");
+		muTexMatrixLoc = GLES30.glGetUniformLocation(hProgram, "uTexMatrix");
 		//
-		GLES20.glUniformMatrix4fv(muMVPMatrixLoc,
+		GLES30.glUniformMatrix4fv(muMVPMatrixLoc,
 			1, false, mMvpMatrix, 0);
-		GLES20.glUniformMatrix4fv(muTexMatrixLoc,
+		GLES30.glUniformMatrix4fv(muTexMatrixLoc,
 			1, false, mMvpMatrix, 0);
 		updateVertices();
 	}
@@ -211,10 +212,11 @@ import static com.serenegiant.glutils.ShaderConst.*;
 	@Override
 	protected boolean validateProgram(final int program) {
 		if (program >= 0) {
-			GLES20.glValidateProgram(program);
-			GLES20.glGetProgramiv(program, GLES20.GL_VALIDATE_STATUS, status, 0);
-			return status[0] == GLES20.GL_TRUE;
+			GLES30.glValidateProgram(program);
+			GLES30.glGetProgramiv(program, GLES30.GL_VALIDATE_STATUS, status, 0);
+			return status[0] == GLES30.GL_TRUE;
 		}
 		return false;
 	}
+
 }

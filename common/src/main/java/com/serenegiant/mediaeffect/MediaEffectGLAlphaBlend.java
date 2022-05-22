@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * 2枚のテクスチャをアルファブレンディング, mix[0.0, 1.0]

@@ -27,6 +27,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
 
 import java.util.concurrent.Semaphore;
@@ -39,7 +41,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.GLConst.GL_TEXTURE_EXTERNAL_OES;
+import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス

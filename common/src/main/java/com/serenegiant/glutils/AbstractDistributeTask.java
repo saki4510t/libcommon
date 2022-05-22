@@ -24,6 +24,10 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.serenegiant.egl.EGLBase;
+import com.serenegiant.gl.GLContext;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;
 

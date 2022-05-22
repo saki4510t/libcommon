@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -19,8 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.opengl.GLES20;
-
-import androidx.annotation.NonNull;
 
 /**
  * Created by saki on 16/08/26.

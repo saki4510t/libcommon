@@ -32,7 +32,7 @@ import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSourcePipeline
-import com.serenegiant.glutils.GLDrawer2D
+import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.glutils.IRendererCommon
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction

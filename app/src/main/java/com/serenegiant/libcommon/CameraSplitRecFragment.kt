@@ -29,11 +29,10 @@ import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.glpipeline.EncodePipeline
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glutils.GLEffect
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 import com.serenegiant.widget.GLPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView

@@ -21,11 +21,11 @@ package com.serenegiant.glpipeline;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.glutils.GLDrawer2D;
-import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IRendererCommon;
-import com.serenegiant.glutils.RendererTarget;
+import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;

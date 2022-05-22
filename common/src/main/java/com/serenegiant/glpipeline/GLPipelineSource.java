@@ -21,7 +21,7 @@ package com.serenegiant.glpipeline;
 import android.graphics.SurfaceTexture;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLManager;
+import com.serenegiant.gl.GLManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;

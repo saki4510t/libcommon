@@ -22,7 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLManager;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLSurfaceReaderHandler;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.GLSurfaceReader;

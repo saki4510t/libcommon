@@ -22,8 +22,8 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
 
-import com.serenegiant.glutils.GLUtils;
-import com.serenegiant.glutils.ISurface;
+import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.ISurface;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

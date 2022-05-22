@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -22,13 +22,15 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.glutils.IRendererCommon;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
-import static com.serenegiant.glutils.GLEffect.*;
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.GLEffect.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * GLDrawerの継承クラスを使って映像効果を付与するためのヘルパークラス

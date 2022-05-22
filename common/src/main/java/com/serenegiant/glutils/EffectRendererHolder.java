@@ -29,9 +29,10 @@ import android.util.SparseArray;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLDrawer2D;
 
-import static com.serenegiant.glutils.ShaderConst.*;
-import static com.serenegiant.glutils.GLEffect.*;
+import static com.serenegiant.gl.ShaderConst.*;
+import static com.serenegiant.gl.GLEffect.*;
 
 /**
  * GL_TEXTURE_EXTERNAL_OESテクスチャを受け取ってSurfaceへ分配描画するクラス

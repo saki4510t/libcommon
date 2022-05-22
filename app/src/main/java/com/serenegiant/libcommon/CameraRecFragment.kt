@@ -29,7 +29,7 @@ import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.glpipeline.EncodePipeline
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glutils.GLEffect
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.media.*
 import com.serenegiant.media.IRecorder.RecorderCallback
 import com.serenegiant.mediastore.MediaStoreUtils

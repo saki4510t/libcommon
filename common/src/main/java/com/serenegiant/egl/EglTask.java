@@ -18,8 +18,8 @@ package com.serenegiant.egl;
  *  limitations under the License.
 */
 
-import com.serenegiant.glutils.GLContext;
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLContext;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.utils.MessageTask;
 
 import androidx.annotation.CallSuper;

@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.util.Log;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /** 色抽出フィルタ */
 public class MediaEffectGLExtraction extends MediaEffectGLBase {

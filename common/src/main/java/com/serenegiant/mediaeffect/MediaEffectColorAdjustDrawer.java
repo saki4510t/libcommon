@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ

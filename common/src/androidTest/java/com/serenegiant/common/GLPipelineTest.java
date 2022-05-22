@@ -33,9 +33,9 @@ import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glpipeline.VideoSourcePipeline;
-import com.serenegiant.glutils.GLManager;
-import com.serenegiant.glutils.GLSurface;
-import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;

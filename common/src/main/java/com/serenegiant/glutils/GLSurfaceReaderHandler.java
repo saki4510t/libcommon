@@ -23,6 +23,8 @@ import android.graphics.Paint;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
 
@@ -33,7 +35,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.GLConst.GL_TEXTURE_EXTERNAL_OES;
+import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * GLSurfaceReaderを使ってBitmapとして映像を受け取るためのGLSurfaceReader.ImageHandler実装

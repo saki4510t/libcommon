@@ -18,7 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import static com.serenegiant.glutils.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.*;
 
 /** 明るさ調整([-1.0f,+1.0f], RGB各成分に単純加算), 0だと無調整 */
 public class MediaEffectGLBrightness extends MediaEffectGLBase {

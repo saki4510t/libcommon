@@ -31,7 +31,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
-import com.serenegiant.glutils.WrappedSurfaceHolder;
+import com.serenegiant.gl.WrappedSurfaceHolder;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;

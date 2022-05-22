@@ -32,9 +32,9 @@ import androidx.annotation.AnyThread
 import androidx.annotation.CallSuper
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
-import com.serenegiant.glutils.GLContext
-import com.serenegiant.glutils.GLManager
-import com.serenegiant.glutils.ISurface
+import com.serenegiant.gl.GLContext
+import com.serenegiant.gl.GLManager
+import com.serenegiant.gl.ISurface
 
 /**
  * SurfaceViewのSurfaceへOpenGL|ESで描画するためのヘルパークラス

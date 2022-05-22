@@ -22,7 +22,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import com.serenegiant.glutils.EffectRendererHolder
-import com.serenegiant.glutils.GLEffect
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 
