@@ -23,6 +23,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Choreographer;
 
+import com.serenegiant.egl.EGLBase;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import java.util.concurrent.Semaphore;

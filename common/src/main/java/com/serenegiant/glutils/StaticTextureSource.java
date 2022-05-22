@@ -28,6 +28,8 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EglTask;
 import com.serenegiant.math.Fraction;
 
 /**

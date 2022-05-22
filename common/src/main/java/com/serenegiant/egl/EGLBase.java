@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.egl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -21,6 +21,9 @@ package com.serenegiant.glutils;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.os.Build;
+
+import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.glutils.ISurface;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

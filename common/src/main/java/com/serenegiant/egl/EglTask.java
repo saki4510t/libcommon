@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.egl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,12 +18,14 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import com.serenegiant.glutils.GLContext;
+import com.serenegiant.glutils.GLUtils;
+import com.serenegiant.utils.MessageTask;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
-
-import com.serenegiant.utils.MessageTask;
 
 /**
  * Looper/Handler経由での実装だと少なくともAPI22未満では
@@ -59,7 +61,7 @@ public abstract class EglTask extends MessageTask {
 	 * @param flags
 	 */
 	public EglTask(final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+				   @Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		this(maxClientVersion, sharedContext, flags, 1, 1);
 	}
@@ -73,8 +75,8 @@ public abstract class EglTask extends MessageTask {
 	 * @param masterHeight
 	 */
 	public EglTask(final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		final int masterWidth, final int masterHeight) {
+				   @Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+				   final int masterWidth, final int masterHeight) {
 
 //		if (DEBUG) Log.i(TAG, "shared_context=" + shared_context);
 		this(new GLContext(maxClientVersion,

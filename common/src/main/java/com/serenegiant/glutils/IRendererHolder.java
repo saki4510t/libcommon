@@ -27,6 +27,7 @@ import androidx.annotation.Size;
 
 import android.view.Surface;
 
+import com.serenegiant.egl.EGLBase;
 import com.serenegiant.math.Fraction;
 
 import java.io.FileNotFoundException;

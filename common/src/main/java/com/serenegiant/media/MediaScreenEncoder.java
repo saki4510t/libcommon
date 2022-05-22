@@ -14,8 +14,8 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.EGLBase;
-import com.serenegiant.glutils.EglTask;
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EglTask;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.utils.HandlerThreadHandler;
 

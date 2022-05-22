@@ -24,7 +24,7 @@ import android.media.FaceDetector;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.glutils.EGLBase;
+import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.GLDrawer2D;
 import com.serenegiant.glutils.GLManager;
 import com.serenegiant.glutils.RendererTarget;

@@ -29,6 +29,8 @@ import org.json.JSONObject;
 
 import android.opengl.GLES20;
 
+import com.serenegiant.egl.EGLBase;
+
 import androidx.annotation.NonNull;
 
 /**

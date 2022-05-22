@@ -18,6 +18,9 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EGLConst;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 

@@ -26,6 +26,8 @@ import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EGLConst;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SysPropReader;
 

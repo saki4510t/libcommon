@@ -27,6 +27,9 @@ import android.opengl.GLES30;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EGLConst;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;

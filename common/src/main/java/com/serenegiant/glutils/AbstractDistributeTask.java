@@ -23,6 +23,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
 
+import com.serenegiant.egl.EGLBase;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;
 

@@ -35,6 +35,8 @@ import androidx.annotation.WorkerThread;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.egl.EGLBase;
+import com.serenegiant.egl.EglTask;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
@@ -83,9 +85,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param callback
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
-		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		@Nullable final RenderHolderCallback callback) {
+		 final int maxClientVersion,
+		 @Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		 @Nullable final RenderHolderCallback callback) {
 
 		mCallback = callback;
 		mRendererTask = createRendererTask(width, height,
