@@ -29,7 +29,7 @@ import androidx.annotation.Size;
 /**
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
-public class GLTexture implements IGLSurface {
+public class GLTexture implements GLConst {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = GLTexture.class.getSimpleName();
 
@@ -182,7 +182,6 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャを破棄
 	 * GLコンテキスト/EGLレンダリングコンテキスト内で呼び出すこと
 	 */
-	@Override
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
 		releaseTexture();
@@ -192,8 +191,7 @@ public class GLTexture implements IGLSurface {
 	 * このインスタンスで管理しているテクスチャを有効にする(バインドする)
 	 * ビューポートの設定も行う
 	 */
-	@Override
-	public void makeCurrent() {
+	public void bind() {
 //		if (DEBUG) Log.v(TAG, "makeCurrent:");
 		GLES20.glActiveTexture(TEX_UNIT);	// テクスチャユニットを選択
 		GLES20.glBindTexture(TEX_TARGET, mTextureId);
@@ -217,7 +215,6 @@ public class GLTexture implements IGLSurface {
 	 * @param width
 	 * @param height
 	 */
-	@Override
 	public void setViewPort(final int x, final int y, final int width, final int height) {
 		viewPortX = x;
 		viewPortY = y;
@@ -230,14 +227,12 @@ public class GLTexture implements IGLSurface {
 	/**
 	 * このインスタンスで管理しているテクスチャを無効にする(アンバインドする)
 	 */
-	@Override
-	public void swap() {
+	public void unbind() {
 //		if (DEBUG) Log.v(TAG, "swap:");
 		GLES20.glActiveTexture(TEX_UNIT);	// テクスチャユニットを選択
 		GLES20.glBindTexture(TEX_TARGET, 0);
 	}
 
-	@Override
 	public boolean isValid() {
 		return mTextureId > GL_NO_TEXTURE;
 	}
@@ -246,7 +241,6 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャが外部テクスチャかどうかを取得
 	 * @return
 	 */
-	@Override
 	public boolean isOES() {
 		return TEX_TARGET == GL_TEXTURE_EXTERNAL_OES;
 	}
@@ -256,13 +250,11 @@ public class GLTexture implements IGLSurface {
 	 * @return
 	 */
 	@TexTarget
-	@Override
 	public int getTexTarget() {
 		return TEX_TARGET;
 	}
 
 	@TexUnit
-	@Override
 	public int getTexUnit() {
 		return TEX_UNIT;
 	}
@@ -271,17 +263,14 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャ名を取得
 	 * @return
 	 */
-	@Override
 	public int getTexId() {
 		return mTextureId;
 	}
 
-	@Override
 	public int getWidth() {
 		return 0;
 	}
 
-	@Override
 	public int getHeight() {
 		return 0;
 	}
@@ -299,7 +288,6 @@ public class GLTexture implements IGLSurface {
 	 */
 	@Size(min=16)
 	@NonNull
-	@Override
 	public float[] copyTexMatrix() {
 		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
 		return mResultMatrix;
@@ -312,7 +300,6 @@ public class GLTexture implements IGLSurface {
 	 * @param matrix
 	 * @param offset
 	 */
-	@Override
 	public void copyTexMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		System.arraycopy(mTexMatrix, 0, matrix, offset, mTexMatrix.length);
 	}
@@ -323,7 +310,6 @@ public class GLTexture implements IGLSurface {
 	 */
 	@Size(min=16)
 	@NonNull
-	@Override
 	public float[] getTexMatrix() {
 		return mTexMatrix;
 	}
@@ -332,7 +318,6 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャ幅を取得
 	 * @return
 	 */
-	@Override
 	public int getTexWidth() {
 		return mTexWidth;
 	}
@@ -341,7 +326,6 @@ public class GLTexture implements IGLSurface {
 	 * テクスチャ高さを取得
 	 * @return
 	 */
-	@Override
 	public int getTexHeight() {
 		return mTexHeight;
 	}
@@ -351,7 +335,6 @@ public class GLTexture implements IGLSurface {
 	 * 指定したビットマップをテクスチャに読み込む
  	 * @param bitmap
 	 */
-	@Override
 	public void loadBitmap(@NonNull final Bitmap bitmap) {
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
