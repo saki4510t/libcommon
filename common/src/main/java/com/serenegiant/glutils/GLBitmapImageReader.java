@@ -176,6 +176,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
 	 * @param reader
+	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
 	 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
@@ -184,6 +185,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@Override
 	public void onFrameAvailable(
 		@NonNull final GLImageReceiver reader,
+		final boolean isOES,
 		final int texId, @NonNull final float[] texMatrix) {
 
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");

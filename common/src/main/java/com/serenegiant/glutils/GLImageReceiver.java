@@ -85,6 +85,7 @@ public class GLImageReceiver {
 		/**
 		 * 映像をテクスチャとして受け取ったときの処理
 		 * @param reader
+		 * @param isOES
 		 * @param texId
 		 * @param texMatrix
 		 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
@@ -92,6 +93,7 @@ public class GLImageReceiver {
 		@WorkerThread
 		public void onFrameAvailable(
 			@NonNull final GLImageReceiver reader,
+			final boolean isOES,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}
 
@@ -407,7 +409,7 @@ public class GLImageReceiver {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		mCallback.onFrameAvailable(this, mTexId, mTexMatrix);
+		mCallback.onFrameAvailable(this, true, mTexId, mTexMatrix);
 	}
 
 	/**
