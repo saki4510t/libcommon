@@ -24,6 +24,7 @@ import android.os.Build;
 
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.ISurface;
+import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -285,7 +286,7 @@ public abstract class EGLBase implements EGLConst {
 	public static boolean isEGL14Supported() {
 		// XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に
 		// XXX 失敗する端末があるのでこちらも合わせてAP1>=21に変更
-		return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP);
+		return BuildCheck.isAPI21();
 	}
 
 	protected EGLBase() {
