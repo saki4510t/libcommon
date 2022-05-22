@@ -283,6 +283,14 @@ public class GLImageReader<T> {
 	}
 
 	/**
+	 * GLManagerを取得する
+	 * @return
+	 */
+	public GLManager getGLManager() {
+		return mManager;
+	}
+
+	/**
 	 * GLImageReaderが破棄されておらず利用可能かどうかを取得
 	 * @return
 	 */
