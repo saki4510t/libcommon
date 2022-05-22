@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -96,12 +96,12 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 		} else {
 			// has kernel, must also have tex offset and color adj
 			muTexOffsetLoc = GLES20.glGetUniformLocation(getProgram(), "uTexOffset");
-//			GLHelper.checkLocation(muTexOffsetLoc, "uTexOffset");	// 未使用だと削除されてしまうのでチェックしない
+//			GLUtils.checkLocation(muTexOffsetLoc, "uTexOffset");	// 未使用だと削除されてしまうのでチェックしない
 
 			setKernel(KERNEL_NULL, 0f);
 			setTexSize(256, 256);
 
-//			GLHelper.checkLocation(muColorAdjustLoc, "uColorAdjust");	// 未使用だと削除されてしまうのでチェックしない
+//			GLUtils.checkLocation(muColorAdjustLoc, "uColorAdjust");	// 未使用だと削除されてしまうのでチェックしない
 		}
 	}
 
@@ -113,7 +113,7 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 		// カーネル関数(行列)
 		if (muKernelLoc >= 0) {
 			GLES20.glUniform1fv(muKernelLoc, KERNEL_SIZE, mKernel, 0);
-			GLHelper.checkGlError("set kernel");
+			GLUtils.checkGlError("set kernel");
 		}
 		// テクセルオフセット
 		if (muTexOffsetLoc >= 0) {

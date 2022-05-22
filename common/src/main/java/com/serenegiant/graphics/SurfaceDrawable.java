@@ -37,7 +37,7 @@ import android.view.Surface;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLDrawer2D;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
@@ -378,7 +378,7 @@ public class SurfaceDrawable extends Drawable {
 			mEglTask.makeCurrent();
 			handleReleaseInputSurface();
 			mEglTask.makeCurrent();
-			mTexId = GLHelper.initTex(
+			mTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
@@ -417,7 +417,7 @@ public class SurfaceDrawable extends Drawable {
 				mInputTexture = null;
 			}
 			if (mTexId != 0) {
-				GLHelper.deleteTex(mTexId);
+				GLUtils.deleteTex(mTexId);
 				mTexId = 0;
 			}
 		}

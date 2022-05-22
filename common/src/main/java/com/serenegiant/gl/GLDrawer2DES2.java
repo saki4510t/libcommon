@@ -89,12 +89,12 @@ import static com.serenegiant.gl.ShaderConst.*;
 		if (USE_VBO) {
 			if (mBufVertex <= GL_NO_BUFFER) {
 				pVertex.clear();
-				mBufVertex = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pVertex, GLES20.GL_STATIC_DRAW);
+				mBufVertex = GLUtils.createBuffer(GLES20.GL_ARRAY_BUFFER, pVertex, GLES20.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex," + mBufVertex);
 			}
 			if (mBufTexCoord <= GL_NO_BUFFER) {
 				pTexCoord.clear();
-				mBufTexCoord = GLHelper.createBuffer(GLES20.GL_ARRAY_BUFFER, pTexCoord, GLES20.GL_STATIC_DRAW);
+				mBufTexCoord = GLUtils.createBuffer(GLES20.GL_ARRAY_BUFFER, pTexCoord, GLES20.GL_STATIC_DRAW);
 				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord," + mBufTexCoord);
 			}
 			// 頂点座標をセット
@@ -140,11 +140,11 @@ import static com.serenegiant.gl.ShaderConst.*;
 	protected void internalReleaseShader(final int program) {
 		// バッファーオブジェクトを破棄
 		if (mBufVertex > GL_NO_BUFFER) {
-			GLHelper.deleteBuffer(mBufVertex);
+			GLUtils.deleteBuffer(mBufVertex);
 			mBufVertex = GL_NO_BUFFER;
 		}
 		if (mBufTexCoord > GL_NO_BUFFER) {
-			GLHelper.deleteBuffer(mBufTexCoord);
+			GLUtils.deleteBuffer(mBufTexCoord);
 			mBufTexCoord = GL_NO_BUFFER;
 		}
 		// シェーダーを破棄

@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLContext;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
@@ -301,7 +301,7 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		handleReleaseInputSurface();
 		makeDefault();
 		GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		mTexId = GLHelper.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		mTexId = GLUtils.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mInputTexture = new SurfaceTexture(mTexId);
 		mInputSurface = new Surface(mInputTexture);
 		if (BuildCheck.isAndroid4_1()) {
@@ -340,7 +340,7 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			mInputTexture = null;
 		}
 		if (mTexId != 0) {
-			GLHelper.deleteTex(mTexId);
+			GLUtils.deleteTex(mTexId);
 			mTexId = 0;
 		}
 	}

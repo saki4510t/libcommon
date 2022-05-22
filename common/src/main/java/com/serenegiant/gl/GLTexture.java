@@ -20,7 +20,6 @@ package com.serenegiant.gl;
 
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
-import android.opengl.GLUtils;
 import android.opengl.Matrix;
 import android.util.Log;
 
@@ -362,7 +361,7 @@ public class GLTexture implements IGLSurface {
 			createTexture(width, height);
 		}
 		bindTexture();
-		GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
+		android.opengl.GLUtils.texImage2D(TEX_TARGET, 0, bitmap, 0);
 		GLES20.glBindTexture(TEX_TARGET, 0);
 		// initialize texture matrix
 		Matrix.setIdentityM(mTexMatrix, 0);
@@ -391,7 +390,7 @@ public class GLTexture implements IGLSurface {
 			}
 			mWidth = width;
 			mHeight = height;
-			mTextureId = GLHelper.initTex(TEX_TARGET, TEX_UNIT, FILTER_PARAM);
+			mTextureId = GLUtils.initTex(TEX_TARGET, TEX_UNIT, FILTER_PARAM);
 			// テクスチャのメモリ領域を確保する
 			GLES20.glTexImage2D(TEX_TARGET,
 				0,					// ミップマップレベル0(ミップマップしない)
@@ -416,7 +415,7 @@ public class GLTexture implements IGLSurface {
 
 	private void releaseTexture() {
 		if (!mWrappedTexture && (mTextureId > GL_NO_TEXTURE)) {
-			GLHelper.deleteTex(mTextureId);
+			GLUtils.deleteTex(mTextureId);
 			mTextureId = GL_NO_TEXTURE;
 		}
 	}

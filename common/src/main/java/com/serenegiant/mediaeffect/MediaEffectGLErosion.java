@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -40,7 +40,7 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		public MediaEffectErosionDrawer(final String fss) {
 			super(false, VERTEX_SHADER_ES2, fss);
 			muTexOffsetLoc = GLES20.glGetUniformLocation(getProgram(), "uTexOffset");
-			GLHelper.checkLocation(muTexOffsetLoc, "uTexOffset");
+			GLUtils.checkLocation(muTexOffsetLoc, "uTexOffset");
 		}
 
 		@Override

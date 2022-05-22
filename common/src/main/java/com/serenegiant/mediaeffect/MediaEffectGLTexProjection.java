@@ -23,7 +23,7 @@ import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 import android.util.Log;
 
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -43,7 +43,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 		public MediaEffectTexProjectionDrawer(final String vss, final String fss) {
 			super(false, vss, fss);
 			muTexMatrixLoc2 = GLES20.glGetUniformLocation(getProgram(), "uTexMatrix2");
-			GLHelper.checkLocation(muTexMatrixLoc2, "uTexMatrix2");
+			GLUtils.checkLocation(muTexMatrixLoc2, "uTexMatrix2");
 			reset();
 		}
 
@@ -54,7 +54,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 			// テクスチャ変換行列をセット
 			if (muTexMatrixLoc2 >= 0) {
 				GLES20.glUniformMatrix3fv(muTexMatrixLoc2, 1, false, texMatrix2, 0);
-				GLHelper.checkGlError("glUniformMatrix3fv");
+				GLUtils.checkGlError("glUniformMatrix3fv");
 			}
 			super.preDraw(tex_ids, tex_matrix, offset);
 		}

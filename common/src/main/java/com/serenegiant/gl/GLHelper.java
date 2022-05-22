@@ -42,7 +42,10 @@ import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 /**
  * OpenGL|ES2/3用のヘルパークラス
+ * @deprecated GLUtilsの同名メソッドを使うこと
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public final class GLHelper implements GLConst {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = GLHelper.class.getSimpleName();

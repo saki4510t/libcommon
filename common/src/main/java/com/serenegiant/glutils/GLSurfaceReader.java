@@ -27,7 +27,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
 
@@ -515,7 +515,7 @@ public class GLSurfaceReader<T> {
 			mManager.makeDefault();
 			handleReleaseInputSurface();
 			mManager.makeDefault();
-			mTexId = GLHelper.initTex(
+			mTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
@@ -556,7 +556,7 @@ public class GLSurfaceReader<T> {
 				mInputTexture = null;
 			}
 			if (mTexId != 0) {
-				GLHelper.deleteTex(mTexId);
+				GLUtils.deleteTex(mTexId);
 				mTexId = 0;
 			}
 		}

@@ -32,7 +32,7 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
@@ -419,7 +419,7 @@ public class StaticTextureSource implements GLConst {
 						if ((target != null) && target.canDraw()) {
 							try {
 								target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, null); // target.draw(mDrawer, GLES20.GL_TEXTURE0, mTexId, mTexMatrix);
-								GLHelper.checkGlError("handleDraw");
+								GLUtils.checkGlError("handleDraw");
 							} catch (final Exception e) {
 								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
 								mTargets.removeAt(i);
@@ -549,7 +549,7 @@ public class StaticTextureSource implements GLConst {
 			final int height = bitmap.getHeight();
 			if (mImageSource == null) {
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
-				GLHelper.checkGlError("handleSetBitmap");
+				GLUtils.checkGlError("handleSetBitmap");
 			}
 			mImageSource.loadBitmap(bitmap);
 			mVideoWidth = width;

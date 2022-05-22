@@ -437,7 +437,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @return texture ID
 	 */
 	public int initTex(@TexUnit final int texUnit) {
-		return GLHelper.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
+		return GLUtils.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
 	}
 
 	/**
@@ -448,7 +448,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @return
 	 */
 	public int initTex(@TexUnit final int texUnit, final int filterParam) {
-		return GLHelper.initTex(mTexTarget, texUnit, filterParam);
+		return GLUtils.initTex(mTexTarget, texUnit, filterParam);
 	}
 
 	/**
@@ -457,7 +457,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param hTex
 	 */
 	public void deleteTex(final int hTex) {
-		GLHelper.deleteTex(hTex);
+		GLUtils.deleteTex(hTex);
 	}
 
 	/**
@@ -510,7 +510,7 @@ public abstract class GLDrawer2D implements GLConst {
 
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
 		if (DEBUG) Log.v(TAG, "loadShader:");
-		return GLHelper.loadShader(vs, fs);
+		return GLUtils.loadShader(vs, fs);
 	}
 
 	protected abstract void internalReleaseShader(final int program);

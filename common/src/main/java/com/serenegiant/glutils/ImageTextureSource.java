@@ -25,7 +25,7 @@ import android.view.Choreographer;
 
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.GLUtils;
@@ -289,7 +289,7 @@ public class ImageTextureSource implements GLConst {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
-				GLHelper.checkGlError("createImageSource");
+				GLUtils.checkGlError("createImageSource");
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);

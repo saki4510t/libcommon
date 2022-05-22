@@ -26,7 +26,7 @@ import android.util.AttributeSet
 import android.util.Log
 import androidx.annotation.Size
 import com.serenegiant.gl.GLDrawer2D
-import com.serenegiant.gl.GLHelper
+import com.serenegiant.gl.GLUtils
 import com.serenegiant.glutils.IRendererCommon
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
@@ -118,7 +118,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 						mSurfaceTexture = null
 					}
 					if (mTexId != 0) {
-						GLHelper.deleteTex(mTexId)
+						GLUtils.deleteTex(mTexId)
 						mTexId = 0
 					}
 					if (mDrawer != null) {

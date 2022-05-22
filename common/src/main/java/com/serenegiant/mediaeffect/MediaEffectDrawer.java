@@ -22,7 +22,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import androidx.annotation.NonNull;
 
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -183,7 +183,7 @@ public class MediaEffectDrawer {
 
 		// テクスチャ用のロケーションは最低でも1つは確保する
 		muTexLoc = new int[numTex > 0 ? numTex : 1];
-		hProgram = GLHelper.loadShader(vss, fss);
+		hProgram = GLUtils.loadShader(vss, fss);
 		GLES20.glUseProgram(hProgram);
 		final int maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
 		final int maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");

@@ -29,7 +29,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -207,7 +207,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
 
 			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
-			mOverlayTexId = GLHelper.initTex(
+			mOverlayTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES,
 				GLES20.GL_TEXTURE1,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR,
@@ -236,7 +236,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			if (DEBUG) Log.v(TAG, "internalOnStart:uTex1=" + uTex1);
 
 			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
-			mOverlayTexId = GLHelper.initTex(
+			mOverlayTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES,
 				GLES30.GL_TEXTURE1,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR,
@@ -260,7 +260,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 			}
 			mOverlaySurface = null;
 			if (mOverlayTexId >= 0) {
-				GLHelper.deleteTex(mOverlayTexId);
+				GLUtils.deleteTex(mOverlayTexId);
 				mOverlayTexId = GL_NO_TEXTURE;
 			}
 			super.internalOnStop();

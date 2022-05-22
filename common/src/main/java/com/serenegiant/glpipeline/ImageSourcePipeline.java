@@ -26,7 +26,7 @@ import android.view.Choreographer;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLHelper;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLTexture;
 import com.serenegiant.math.Fraction;
 
@@ -214,7 +214,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
-				GLHelper.checkGlError("createImageSource");
+				GLUtils.checkGlError("createImageSource");
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
