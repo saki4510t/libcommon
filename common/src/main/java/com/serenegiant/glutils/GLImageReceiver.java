@@ -277,6 +277,31 @@ public class GLImageReceiver {
 	}
 
 	/**
+	 * テクスチャ名を取得
+	 * @return
+	 */
+	public int getTexId() {
+		synchronized (mSync) {
+			if (mInputSurface == null) {
+				throw new IllegalStateException("surface not ready, already released?");
+			}
+			return mTexId;
+		}
+	}
+
+	/**
+	 * テクスチャ変換行列を取得
+	 * @return
+	 */
+	@Size(min=16)
+	@NonNull
+	public float[] getTexMatrix() {
+		synchronized (mSync) {
+			return mTexMatrix;
+		}
+	}
+
+	/**
 	 * 映像受け取り用のSurfaceを取得
 	 * 既に破棄されているなどしてSurfaceが取得できないときはIllegalStateExceptionを投げる
 	 *
