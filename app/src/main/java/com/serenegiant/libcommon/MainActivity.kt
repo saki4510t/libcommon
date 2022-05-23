@@ -33,7 +33,6 @@ import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
-import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
 import com.serenegiant.widget.GLPipelineView
 
