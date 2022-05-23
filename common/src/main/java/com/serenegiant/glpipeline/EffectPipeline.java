@@ -41,7 +41,8 @@ import static com.serenegiant.gl.GLEffect.EFFECT_NON;
  * OpenGL|ESのシェーダーを使って映像効果付与をするGLPipeline実装
  * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のGLPipelineへ送る
  */
-public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
+public class EffectPipeline extends ProxyPipeline
+	implements GLSurfacePipeline, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
@@ -65,6 +66,8 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	@Nullable
 	private GLSurface work;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -196,6 +199,28 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public boolean isEffectOnly() {
 		return mEffectOnly;
+	}
+
+	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		synchronized (mSync) {
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				mManager.runOnGLThread(() -> {
+					if (mRendererTarget != null) {
+						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+					}
+				});
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
+		}
 	}
 
 	private int cnt;
@@ -362,7 +387,7 @@ public class EffectPipeline extends ProxyPipeline implements GLSurfacePipeline {
 						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = true;
 				}
-				mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 			}
 		}
 	}
