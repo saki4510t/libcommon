@@ -56,7 +56,7 @@ import androidx.annotation.WorkerThread;
  * RendererHolder系での同様のことが可能であるが、分配描画が不要な場合にはオーバースペックなので
  * 単純なプロキシするだけのクラスとして追加。
  */
-public abstract class SurfaceProxy implements GLConst {
+public abstract class SurfaceProxy implements GLConst, IMirror {
 	private static final String TAG = SurfaceProxy.class.getSimpleName();
 
 	/**
@@ -65,6 +65,7 @@ public abstract class SurfaceProxy implements GLConst {
 	 * 使った実装を使う。falseならOpenGL|ESとSurfaceTextureを使う。
 	 * ただしImageReader/ImageWriterを使う場合は次の制限がある。
 	 * ・動的なリサイズができない(破棄＆生成が必要)
+	 * ・ミラー設定ができない
 	 * ・フレームレート制限ができない
 	 * ・Surfaceで受け取る映像フォーマットがPixelFormat.RGBA_8888固定(かもしれない)
 	 * @param width
@@ -83,8 +84,12 @@ public abstract class SurfaceProxy implements GLConst {
 		}
 	}
 
+	@NonNull
+	protected final Object mSync = new Object();
 	private volatile boolean mReleased = false;
 	private int mWidth, mHeight;
+	@MirrorMode
+	protected int mMirror = MIRROR_NORMAL;
 
 	private SurfaceProxy(final int width, final int height) {
 		mWidth = Math.max(width, 1);
@@ -123,6 +128,14 @@ public abstract class SurfaceProxy implements GLConst {
 
 	public int getHeight() {
 		return mHeight;
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
+		}
 	}
 
 	@CallSuper
@@ -171,8 +184,6 @@ public abstract class SurfaceProxy implements GLConst {
 		 */
 		private static final int MAX_IMAGES = 2;
 
-		@NonNull
-		private final Object mSync = new Object();
 		private final Handler mAsyncHandler;
 		private ImageReader mImageReader;
 		private ImageWriter mImageWriter;
@@ -262,6 +273,11 @@ public abstract class SurfaceProxy implements GLConst {
 			throw new UnsupportedOperationException("SurfaceProxyReaderWriter does not support #resize");
 		}
 
+		@Override
+		public void setMirror(final int mirror) {
+			throw new UnsupportedOperationException("SurfaceProxyReaderWriter does not support #setMirror");
+		}
+
 //		private final ImageWriter.OnImageReleasedListener
 //			mOnImageReleasedListener = new ImageWriter.OnImageReleasedListener() {
 //			private int cnt = 0;
@@ -281,8 +297,6 @@ public abstract class SurfaceProxy implements GLConst {
 		private static final boolean DEBUG = false;	// set false on production
 		private static final String TAG = SurfaceProxyGLES.class.getSimpleName();
 
-		@NonNull
-		private final Object mSync = new Object();
 		@NonNull
 		private final GLImageReceiver mReceiver;
 		@NonNull
@@ -390,6 +404,22 @@ public abstract class SurfaceProxy implements GLConst {
 			super.resize(width, height);
 			checkValid();
 			mReceiver.resize(width, height);
+		}
+
+		@Override
+		public void setMirror(@MirrorMode final int mirror) {
+			synchronized (mSync) {
+				if (mMirror != mirror) {
+					mMirror = mirror;
+					if (mRendererTarget != null) {
+						mManager.runOnGLThread(() -> {
+							if (mRendererTarget != null) {
+								mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+							}
+						});
+					}
+				}
+			}
 		}
 
 		/**
@@ -531,7 +561,7 @@ public abstract class SurfaceProxy implements GLConst {
 							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					}
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+						mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 					}
 				}
 			}
