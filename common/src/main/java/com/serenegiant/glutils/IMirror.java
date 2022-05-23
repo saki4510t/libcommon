@@ -48,4 +48,30 @@ public interface IMirror {
 	 * @return 0:通常, 1:左右反転, 2:上下反転, 3:上下左右反転
 	 */
 	public @MirrorMode int getMirror();
+
+	/**
+	 * 指定したミラー設定を上下反転させて返す
+	 * @param mirror
+	 * @return
+	 */
+	@MirrorMode
+	public static int flipVertical(@MirrorMode final int mirror) {
+		final int result;
+		switch (mirror) {
+		case MIRROR_HORIZONTAL:
+			result = MIRROR_BOTH;
+			break;
+		case MIRROR_VERTICAL:
+			result = MIRROR_NORMAL;
+			break;
+		case MIRROR_BOTH:
+			result = MIRROR_HORIZONTAL;
+			break;
+		case MIRROR_NORMAL:
+		default:
+			result = MIRROR_VERTICAL;
+			break;
+		}
+		return result;
+	}
 }
