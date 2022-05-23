@@ -140,13 +140,11 @@ public class GLSurfaceWriter implements IMirror {
 		synchronized (mSync) {
 			if (mMirror != mirror) {
 				mMirror = mirror;
-				if (mRendererTarget != null) {
-					mManager.runOnGLThread(() -> {
-						if (mRendererTarget != null) {
-							mRendererTarget.setMirror(IMirror.flipVertical(mirror));
-						}
-					});
-				}
+				mManager.runOnGLThread(() -> {
+					if (mRendererTarget != null) {
+						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+					}
+				});
 			}
 		}
 	}

@@ -177,13 +177,11 @@ public class ImageTextureSource implements GLConst, IMirror {
 		synchronized (mSync) {
 			if (mMirror != mirror) {
 				mMirror = mirror;
-				if (mRendererTarget != null) {
-					mManager.runOnGLThread(() -> {
-						if (mRendererTarget != null) {
-							mRendererTarget.setMirror(mirror);
-						}
-					});
-				}
+				mManager.runOnGLThread(() -> {
+					if (mRendererTarget != null) {
+						mRendererTarget.setMirror(mirror);
+					}
+				});
 			}
 		}
 	}
