@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.serenegiant.mediastore.MediaStoreUtils;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.PermissionCheck;
+import com.serenegiant.system.PermissionUtils;
 import com.serenegiant.system.StorageInfo;
 import com.serenegiant.system.StorageUtils;
 import com.serenegiant.system.Time;
@@ -153,7 +153,7 @@ public class MediaSplitMuxerV2 implements IMuxer {
 			// 上位からDocumentFileが指定されたときはそれを使う
 			mOutputDir = outputDir;
 		} else if (!BuildCheck.isAPI29()
-			&& PermissionCheck.hasWriteExternalStorage(context)) {
+			&& PermissionUtils.hasWriteExternalStorage(context)) {
 			// API29未満で外部ストレージアクセスのパーミッションがある時
 			if (DEBUG) Log.v(TAG, "コンストラクタ:出力先ディレクトリのツリードキュメントの生成を試みる");
 			// FileUtils#getCaptureDirはFileUtils.getDirNameを含んだパスを返す
@@ -618,7 +618,7 @@ public class MediaSplitMuxerV2 implements IMuxer {
 					+ "/" + FileUtils.getDirName()
 					+ "/" + mOutputDirName,
 				fileName, null);
-		} else if (PermissionCheck.hasWriteExternalStorage(context)) {
+		} else if (PermissionUtils.hasWriteExternalStorage(context)) {
 			// フォールバック...コンストラクタで処理しているのでここへは来ないはず
 			if (DEBUG) Log.v(TAG, "createOutputDoc:外部ストレージへの書き込みを試みる");
 			// FileUtils#getCaptureDirはFileUtils.getDirNameを含んだパスを返す

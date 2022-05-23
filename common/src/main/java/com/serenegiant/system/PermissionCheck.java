@@ -37,6 +37,11 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
 
+/**
+ * パーミッション関係のヘルパーメソッド
+ * @deprecated PermissionUtilsの同名メソッドを使うこと
+ */
+@Deprecated
 public final class PermissionCheck {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = PermissionCheck.class.getSimpleName();

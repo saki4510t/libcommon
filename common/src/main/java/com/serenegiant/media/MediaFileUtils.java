@@ -23,7 +23,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.PermissionCheck;
+import com.serenegiant.system.PermissionUtils;
 import com.serenegiant.system.SAFUtils;
 import com.serenegiant.utils.FileUtils;
 
@@ -102,7 +102,7 @@ public class MediaFileUtils {
 		if (DEBUG) Log.v(TAG, "getRecordingRoot:type=" + type);
 		// SAF経由での録画用ディレクトリ取得を試みる
 		DocumentFile root = getSAFRecordingRoot(context, saveTreeId);
-		if ((root == null) && PermissionCheck.hasWriteExternalStorage(context)) {
+		if ((root == null) && PermissionUtils.hasWriteExternalStorage(context)) {
 			// SAF経由で録画用ディレクトリを取得できなかったが外部ストレージのアクセスパーミッションがある時
 			if (DEBUG) Log.d(TAG, "getRecordingRoot:アプリが外部ストレージへのアクセスパーミッションを保持していればパスの取得を試みる");
 			final File captureDir

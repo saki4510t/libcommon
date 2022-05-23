@@ -32,7 +32,7 @@ import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionCheck
+import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
 import com.serenegiant.widget.GLPipelineView
@@ -395,7 +395,7 @@ class MainActivity
 		// メッセージダイアログでキャンセルされた時とAndroid6でない時は自前でチェックして#checkPermissionResultを呼び出す
 		for (permission in permissions) {
 			checkPermissionResult(permission,
-				PermissionCheck.hasPermission(this, permission))
+				PermissionUtils.hasPermission(this, permission))
 		}
 	}
 
@@ -450,7 +450,7 @@ class MainActivity
 	 */
 	private fun checkPermissionReadExternalStorage(): Boolean {
 		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
-		return PermissionCheck.hasWriteExternalStorage(this)
+		return PermissionUtils.hasWriteExternalStorage(this)
 			|| (mPermissions != null
 				&& mPermissions!!.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, true))
 	}

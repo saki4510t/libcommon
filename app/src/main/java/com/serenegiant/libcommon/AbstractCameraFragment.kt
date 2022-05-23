@@ -34,7 +34,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
 import com.serenegiant.math.Fraction
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.system.PermissionCheck
+import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.SAFUtils
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.view.ViewUtils
@@ -102,7 +102,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		// カメラパーミッションが無いか、
 		// 録画に対応していててストレージアクセス/録音のパーミッションが無いなら
 		// 終了して前画面へ戻る
-		if (!PermissionCheck.hasCamera(activity)
+		if (!PermissionUtils.hasCamera(activity)
 			|| (isRecordingSupported() && !hasPermission())) {
 			popBackStack()
 		}
@@ -298,9 +298,9 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			false
 		} else (!BuildCheck.isAPI21()
 			|| SAFUtils.hasPermission(activity, REQUEST_ACCESS_SD)	// API>=19
-			|| (BuildCheck.isAPI28() || PermissionCheck.hasWriteExternalStorage(activity)))
-			&& PermissionCheck.hasAudio(activity)
-			&& PermissionCheck.hasCamera(activity)
+			|| (BuildCheck.isAPI28() || PermissionUtils.hasWriteExternalStorage(activity)))
+			&& PermissionUtils.hasAudio(activity)
+			&& PermissionUtils.hasCamera(activity)
 	}
 
 	companion object {
