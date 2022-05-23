@@ -18,7 +18,10 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
+import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.Nullable;
 
@@ -31,6 +34,56 @@ public class HandlerUtils {
 
 	private HandlerUtils() {
 		// インスタンス化を防止するためにデフォルトコンストラクタをprivateにする
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	public static void quitSafely(@Nullable final Handler handler) throws IllegalStateException {
+		final Looper looper = handler != null ? handler.getLooper() : null;
+		if (looper != null) {
+			looper.quitSafely();
+		} else {
+			throw new IllegalStateException("has no looper");
+		}
+	}
+
+	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
+	public static void NoThrowQuitSafely(@Nullable final Handler handler) {
+		try {
+			quitSafely(handler);
+		} catch (final Exception e) {
+			// ignore
+		}
+	}
+
+	public static void quit(@Nullable final Handler handler) throws IllegalStateException {
+		final Looper looper = handler != null ? handler.getLooper() : null;
+		if (looper != null) {
+			looper.quit();
+		} else {
+			throw new IllegalStateException("has no looper");
+		}
+	}
+
+	public static void NoThrowQuit(@Nullable final Handler handler) {
+		try {
+			quit(handler);
+		} catch (final Exception e) {
+			// ignore
+		}
+	}
+
+	/**
+	 * 指定したHandlerが実行可能(メッセージ送信・Runnable実行等を受け付ける)かどうかを取得
+	 * このメソッドを実行するとsendEmptyMessageでwhat=0を送信する可能性があるので注意
+	 * @param handler
+	 * @return
+	 */
+	public static boolean isActive(@Nullable final Handler handler) {
+		// Handler#getLooperとLooper#getThreadはNonNullなのでHandlerがnullでなければthread変数もnullじゃない
+		final Thread thread = handler != null ? handler.getLooper().getThread() : null;
+		// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
+		return (handler != null) && (thread != null)
+			&& thread.isAlive() && handler.sendEmptyMessage(0);
 	}
 
 	/**

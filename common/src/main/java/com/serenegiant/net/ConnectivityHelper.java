@@ -419,7 +419,7 @@ public class ConnectivityHelper {
 		final int activeNetworkType, final int prevNetworkType) {
 
 		synchronized (mSync) {
-			if (!HandlerUtils.isTerminated(mAsyncHandler)) {
+			if (HandlerUtils.isActive(mAsyncHandler)) {
 				mAsyncHandler.post(() -> {
 					try {
 						mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
@@ -437,7 +437,7 @@ public class ConnectivityHelper {
 	 */
 	private void callOnError(@NonNull final Throwable t) {
 		synchronized (mSync) {
-			if (!HandlerUtils.isTerminated(mAsyncHandler)) {
+			if (HandlerUtils.isActive(mAsyncHandler)) {
 				mAsyncHandler.post(() -> {
 					try {
 						mCallback.onError(t);
