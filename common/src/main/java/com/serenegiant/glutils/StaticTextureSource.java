@@ -21,6 +21,7 @@ package com.serenegiant.glutils;
 
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -34,7 +35,6 @@ import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLTexture;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -45,7 +45,7 @@ import com.serenegiant.math.Fraction;
  * 出力先Surfaceが1つだけならImageTextureSourceの方が効率的
  * FIXME GLES30対応を実装する
  */
-public class StaticTextureSource implements GLConst {
+public class StaticTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = StaticTextureSource.class.getSimpleName();
 
@@ -219,9 +219,32 @@ public class StaticTextureSource implements GLConst {
 		}
 	}
 
+	@Override
+	public void setMirror(@MirrorMode final int mirror) throws IllegalStateException {
+		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
+		final RendererTask task;
+		synchronized (mSync) {
+			task = mRendererTask;
+		}
+		if (task != null) {
+			if (task.mMirror != mirror) {
+				task.offer(REQUEST_MIRROR, mirror);
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mRendererTask != null ? mRendererTask.mMirror : MIRROR_NORMAL;
+		}
+	}
+
 	private static final int REQUEST_DRAW = 1;
 	private static final int REQUEST_ADD_SURFACE = 3;
 	private static final int REQUEST_REMOVE_SURFACE = 4;
+	private static final int REQUEST_MIRROR = 6;
 	private static final int REQUEST_SET_BITMAP = 7;
 
 	private static class RendererTask extends EglTask {
@@ -232,6 +255,8 @@ public class StaticTextureSource implements GLConst {
 		private GLDrawer2D mDrawer;
 		private int mVideoWidth, mVideoHeight;
 		private GLTexture mImageSource;
+		@MirrorMode
+		private int mMirror = MIRROR_NORMAL;
 
 		public RendererTask(final StaticTextureSource parent,
 			final int width, final int height, @Nullable final Fraction fps) {
@@ -303,6 +328,9 @@ public class StaticTextureSource implements GLConst {
 				break;
 			case REQUEST_REMOVE_SURFACE:
 				handleRemoveSurface(arg1);
+				break;
+			case REQUEST_MIRROR:
+				handleMirror(arg1);
 				break;
 			case REQUEST_SET_BITMAP:
 				handleSetBitmap((Bitmap)obj);
@@ -451,6 +479,7 @@ public class StaticTextureSource implements GLConst {
 				if (target == null) {
 					try {
 						target = createRendererTarget(id, getEgl(), surface, maxFps);
+						target.setMirror(mMirror);
 						mTargets.append(id, target);
 					} catch (final Exception e) {
 						Log.w(TAG, "invalid surface: surface=" + surface, e);
@@ -536,6 +565,19 @@ public class StaticTextureSource implements GLConst {
 				}
 			}
 			if (DEBUG) Log.v(TAG, "checkTarget:finished");
+		}
+
+		@WorkerThread
+		private void handleMirror(@MirrorMode final int mirror) {
+			if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
+			mMirror = mirror;
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				if (target != null) {
+					GLUtils.setMirror(target.getMvpMatrix(), mirror);
+				}
+			}
 		}
 
 		/**
