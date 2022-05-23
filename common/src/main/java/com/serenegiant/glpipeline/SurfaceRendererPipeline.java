@@ -36,7 +36,9 @@ import androidx.annotation.WorkerThread;
 /**
  * テクスチャが更新されたときにSurfaceへ転送するGLPipeline実装
  */
-public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfacePipeline {
+public class SurfaceRendererPipeline extends ProxyPipeline
+	implements GLSurfacePipeline, IMirror {
+
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfaceRendererPipeline.class.getSimpleName();
 
@@ -49,6 +51,8 @@ public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfaceP
 	private GLDrawer2D mDrawer;
 	@Nullable
 	private RendererTarget mRendererTarget;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -166,6 +170,28 @@ public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfaceP
 		}
 	}
 
+	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		synchronized (mSync) {
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				mManager.runOnGLThread(() -> {
+					if (mRendererTarget != null) {
+						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+					}
+				});
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
+		}
+	}
+
 	private int cnt;
 	@WorkerThread
 	@Override
@@ -245,7 +271,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfaceP
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 				}
 			}
 		}
