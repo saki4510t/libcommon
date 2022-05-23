@@ -147,8 +147,7 @@ public class HandlerThreadHandler extends Handler {
 	 */
 	private HandlerThreadHandler(@NonNull final Looper looper, final boolean async) {
 		super(looper);
-		final Thread thread = looper.getThread();
-		mId = thread != null ? thread.getId() : 0;
+		mId = looper.getThread().getId();
 		mAsynchronous = async;
 	}
 
@@ -161,8 +160,7 @@ public class HandlerThreadHandler extends Handler {
 		@Nullable final Callback callback, final boolean async) {
 
 		super(looper, callback);
-		final Thread thread = looper.getThread();
-		mId = thread != null ? thread.getId() : 0;
+		mId = looper.getThread().getId();
 		mAsynchronous = async;
 	}
 
