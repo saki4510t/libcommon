@@ -166,8 +166,8 @@ public class GLDrawer2D implements GLConst {
 	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
-		@NonNull final float[] vertices,
-		@NonNull final float[] texcoord,
+		@Nullable final float[] vertices,
+		@Nullable final float[] texcoord,
 		@Nullable final String vs, @Nullable final String fs) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
