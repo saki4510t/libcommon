@@ -34,14 +34,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
-import androidx.annotation.experimental.Experimental;
-import androidx.annotation.experimental.UseExperimental;
 
 /**
  * 受け取ったテクスチャをSurfaceへ転送するクラス
  * XXX 削除するかも
  */
-public class GLSurfaceWriter {
+public class GLSurfaceWriter implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLSurfaceWriter.class.getSimpleName();
 
@@ -59,6 +57,8 @@ public class GLSurfaceWriter {
 	private GLDrawer2D mDrawer;
 	@Nullable
 	private RendererTarget mRendererTarget;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -132,6 +132,30 @@ public class GLSurfaceWriter {
 	public int getId() {
 		synchronized (mSync) {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		}
+	}
+
+	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		synchronized (mSync) {
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				if (mRendererTarget != null) {
+					mManager.runOnGLThread(() -> {
+						if (mRendererTarget != null) {
+							mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+						}
+					});
+				}
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
 		}
 	}
 
@@ -257,7 +281,7 @@ public class GLSurfaceWriter {
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 				}
 			}
 		}
