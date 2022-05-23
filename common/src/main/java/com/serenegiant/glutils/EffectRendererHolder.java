@@ -18,21 +18,17 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
-import android.opengl.GLES20;
 import android.util.Log;
-import android.util.SparseArray;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
 import com.serenegiant.gl.EffectDrawer2D;
 import com.serenegiant.gl.GLDrawer2D;
 
-import static com.serenegiant.gl.ShaderConst.*;
 import static com.serenegiant.gl.GLEffect.*;
 
 /**
@@ -40,7 +36,6 @@ import static com.serenegiant.gl.GLEffect.*;
  * RendererHolderにフラグメントシェーダーでのフィルター処理を追加
  * ...カラーマトリックスを掛けるほうがいいかなぁ
  * ...色はuniform変数で渡す方がいいかも
- * FIXME EffectDrawer2Dを使うように変更する
  */
 public class EffectRendererHolder extends AbstractRendererHolder
 	implements IEffectRendererHolder {
@@ -89,7 +84,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, null);
+			maxClientVersion, sharedContext, flags);
 	}
 
 //================================================================================
@@ -114,8 +109,9 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 */
 	@Override
 	public int getCurrentEffect() {
-		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + ((MyRendererTask)mRendererTask).mEffect);
-		return ((MyRendererTask)mRendererTask).mEffect;
+		final GLDrawer2D drawer = mRendererTask.getDrawer();
+		return (drawer instanceof EffectDrawer2D)
+			? ((EffectDrawer2D) drawer).getCurrentEffect() : EFFECT_NON;
 	}
 
 	/**
@@ -172,27 +168,25 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 */
 	protected static final class MyRendererTask extends BaseRendererTask {
 
-		private final SparseArray<float[]> mParams = new SparseArray<float[]>();
-		private int muParamsLoc;
-		private float[] mCurrentParams;
-		private int mEffect;
-
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-			@Nullable GLDrawer2D.DrawerFactory factory) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags, factory);
+			super(parent, width, height, maxClientVersion, sharedContext, flags, new GLDrawer2D.DrawerFactory() {
+				@NonNull
+				@Override
+				public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+					return new EffectDrawer2D(isGLES3, isOES);
+				}
+			});
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 
 		public void changeEffect(final int effect) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#changeEffect:" + effect);
 			checkFinished();
-			if (mEffect != effect) {
-				offer(REQUEST_CHANGE_EFFECT, effect);
-			}
+			offer(REQUEST_CHANGE_EFFECT, effect);
 		}
 
 		public void setParams(final int effect, @NonNull final float[] params) {
@@ -204,44 +198,6 @@ public class EffectRendererHolder extends AbstractRendererHolder
 //================================================================================
 // ワーカースレッド上での処理
 //================================================================================
-		/**
-		 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
-		 */
-		@SuppressLint("NewApi")
-		@WorkerThread
-		@Override
-		protected void internalOnStart() {
-			super.internalOnStart();
-			if (DEBUG) Log.v(TAG, "MyRendererTask#internalOnStart:");
-			mParams.clear();
-			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
-				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
-				0.50f, 1.0f,		// 強調する彩度下限, 上限
-				0.40f, 1.0f,		// 強調する明度下限, 上限
-				1.0f, 1.0f, 5.0f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
-				1.0f, 1.0f, 1.0f,	// 通常時のファクター(H, S, Vの順)
-			});
-			mParams.put(EFFECT_EMPHASIZE_RED_YELLOW_WHITE, new float[] {
-				0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
-				0.50f, 1.0f,		// 強調する彩度下限, 上限
-				0.40f, 1.0f,		// 強調する明度下限, 上限
-				1.0f, 1.0f, 5.0f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
-				1.0f, 1.0f, 1.0f,	// 通常時のファクター(H, S, Vの順)
-			});
-			mParams.put(EFFECT_EMPHASIZE_YELLOW_WHITE, new float[] {
-				0.10f, 0.19f,			// 黄色の色相h下側閾値, 上側閾値
-				0.30f, 1.00f,			// 強調する彩度s下限, 上限
-				0.30f, 1.00f,			// 強調する明度v下限, 上限
-				1.00f, 1.00f, 5.00f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
-				1.00f, 0.80f, 0.80f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.8)と明度(x0.8)を少し落とす
-				0.15f, 0.40f,			// 白強調時の彩度上限, 白強調時の明度下限
-				0, 0, 0, 0,				// ダミー
-			});
-			mEffect = EFFECT_NON;
-			handleChangeEffect(EFFECT_NON);
-//			if (DEBUG) Log.v(TAG, "onStart:finished");
-		}
-
 		@WorkerThread
 		@Override
 		protected Object handleRequest(final int request,
@@ -267,73 +223,14 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		 * @param effect
 		 */
 		@WorkerThread
-		protected void handleChangeEffect(final int effect) {
+		private void handleChangeEffect(final int effect) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#handleChangeEffect:" + effect);
-			mEffect = effect;
-			if (mDrawer != null) {
-				switch (effect) {
-				case EFFECT_NON:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_EXT_ES2);
-					break;
-				case EFFECT_GRAY:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_GRAY_ES3 : FRAGMENT_SHADER_EXT_GRAY_ES2);
-					break;
-				case EFFECT_GRAY_REVERSE:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES3 : FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2);
-					break;
-				case EFFECT_BIN:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_BIN_ES3 : FRAGMENT_SHADER_EXT_BIN_ES2);
-					break;
-				case EFFECT_BIN_YELLOW:
-					mDrawer.updateShader(isGLES3()
-						?FRAGMENT_SHADER_EXT_BIN_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2);
-					break;
-				case EFFECT_BIN_GREEN:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_BIN_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_GREEN_ES2);
-					break;
-				case EFFECT_BIN_REVERSE:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_BIN_REVERSE_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2);
-					break;
-				case EFFECT_BIN_REVERSE_YELLOW:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2);
-					break;
-				case EFFECT_BIN_REVERSE_GREEN:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2);
-					break;
-				case EFFECT_EMPHASIZE_RED_YELLOW:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2);
-					break;
-				case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2);
-					break;
-				case EFFECT_EMPHASIZE_YELLOW_WHITE:
-					mDrawer.updateShader(isGLES3()
-						? FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2);
-					break;
-				default:
-					try {
-						((EffectRendererHolder)getParent())
-							.handleDefaultEffect(effect, mDrawer);
-					} catch (final Exception e) {
-						mDrawer.resetShader();
-						Log.w(TAG, e);
-					}
-					break;
-				}
-				muParamsLoc = mDrawer.glGetUniformLocation("uParams");
-				mCurrentParams = mParams.get(effect);
-				updateParams();
-			} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is not IShaderDrawer2d");
+			final GLDrawer2D drawer = getDrawer();
+			if (drawer instanceof EffectDrawer2D) {
+				((EffectDrawer2D)drawer).setEffect(effect);
+			} else if (DEBUG) {
+				Log.d(TAG, "handleChangeEffect: mDrawer is not EffectDrawer2D");
+			}
 		}
 		
 		/**
@@ -344,28 +241,11 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		@WorkerThread
 		private void handleSetParam(final int effect, @NonNull final float[] params) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#handleSetParam:" + effect);
-			if ((effect < EFFECT_NON) || (mEffect == effect)) {
-				mCurrentParams = params;
-				mParams.put(mEffect, params);
-				updateParams();
-			} else {
-				mParams.put(effect, params);
-			}
-		}
-		
-		/**
-		 * 映像効果用のパラメータをGPUへ適用
-		 */
-		@WorkerThread
-		private void updateParams() {
-			if (DEBUG) Log.v(TAG, "MyRendererTask#updateParams:");
-			final int n = Math.min(mCurrentParams != null
-				? mCurrentParams.length : 0, MAX_PARAM_NUM);
-			if ((muParamsLoc >= 0) && (n > 0)) {
-				if (mDrawer != null) {
-					mDrawer.glUseProgram();
-				} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is null");
-				GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
+			final GLDrawer2D drawer = getDrawer();
+			if (drawer instanceof EffectDrawer2D) {
+				((EffectDrawer2D) drawer).setParams(effect, params);
+			} else if (DEBUG) {
+				Log.d(TAG, "handleChangeEffect: mDrawer is not EffectDrawer2D");
 			}
 		}
 
