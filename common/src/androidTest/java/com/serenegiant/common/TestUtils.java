@@ -92,15 +92,17 @@ LOOP:		for (int y = 0; y < h; y++) {
 				for (int i = 0; i < num_images; i++) {
 					if (surface.isValid()) {
 						final Canvas canvas = surface.lockCanvas(inOutDirty);
-						if (canvas != null) {
-							try {
-								canvas.drawBitmap(bitmap, 0, 0, null);
-								Thread.sleep(30);
-							} catch (Exception e) {
-								break;
-							} finally {
-								surface.unlockCanvasAndPost(canvas);
+						try {
+							if (canvas != null) {
+								try {
+									canvas.drawBitmap(bitmap, 0, 0, null);
+									Thread.sleep(30);
+								} finally {
+									surface.unlockCanvasAndPost(canvas);
+								}
 							}
+						} catch (Exception e) {
+							break;
 						}
 					} else {
 						break;
