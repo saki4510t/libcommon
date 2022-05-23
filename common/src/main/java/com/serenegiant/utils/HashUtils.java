@@ -20,10 +20,13 @@ package com.serenegiant.utils;
 
 import android.util.Log;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.security.MessageDigest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.StringDef;
 
 /**
  * MessageDigestを使ったハッシュ計算用ヘルパークラス
@@ -36,6 +39,36 @@ public class HashUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	public static final String HASH_ALGORITHM_MD2 = "MD2";
+	public static final String HASH_ALGORITHM_MD5 = "MD5";
+	public static final String HASH_ALGORITHM_SHA1 = "SHA-1";
+	public static final String HASH_ALGORITHM_SHA224 = "SHA-224";
+	public static final String HASH_ALGORITHM_SHA256 = "SHA-256";
+	public static final String HASH_ALGORITHM_SHA384 = "SHA-384";
+	public static final String HASH_ALGORITHM_SHA512_224 = "SHA-512/224";
+	public static final String HASH_ALGORITHM_SHA512_256 = "SHA-512/256";
+	public static final String HASH_ALGORITHM_SHA3_224 = "SHA3-224";
+	public static final String HASH_ALGORITHM_SHA3_256 = "SHA3-256";
+	public static final String HASH_ALGORITHM_SHA3_384 = "SHA3-384";
+	public static final String HASH_ALGORITHM_SHA3_512 = "SHA3-512";
+
+	@StringDef({
+		HASH_ALGORITHM_MD2,
+		HASH_ALGORITHM_MD5,
+		HASH_ALGORITHM_SHA1,
+		HASH_ALGORITHM_SHA224,
+		HASH_ALGORITHM_SHA256,
+		HASH_ALGORITHM_SHA384,
+		HASH_ALGORITHM_SHA512_224,
+		HASH_ALGORITHM_SHA512_256,
+		HASH_ALGORITHM_SHA3_224,
+		HASH_ALGORITHM_SHA3_256,
+		HASH_ALGORITHM_SHA3_384,
+		HASH_ALGORITHM_SHA3_512,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface HashAlgorithm {}
+
 	/**
 	 * 指定した方法で計算したハッシュをbyte配列として返す
 	 * @param algorithm　"SHA-1", "MD5", "SHA-256"
@@ -43,7 +76,10 @@ public class HashUtils {
 	 * @return 正常に計算できればハッシュの16進数文字列, algorithmが存在しないなどで計算できなかった時null
 	 */
 	@Nullable
-	public static byte[] getDigest(@NonNull final String algorithm, @NonNull final byte[] data) {
+	public static byte[] getDigest(
+		@HashAlgorithm @NonNull final String algorithm,
+		@NonNull final byte[] data) {
+
 		try {
 			final MessageDigest digest = MessageDigest.getInstance(algorithm);
 			return digest.digest(data);
@@ -60,7 +96,10 @@ public class HashUtils {
 	 * @return 正常に計算できればハッシュの16進数文字列, algorithmが存在しないなどで計算できなかった時null
 	 */
 	@Nullable
-	public static String getDigestString(@NonNull final String algorithm, @NonNull final byte[] data) {
+	public static String getDigestString(
+		@HashAlgorithm @NonNull final String algorithm,
+		@NonNull final byte[] data) {
+
 		try {
 			return BufferHelper.toHexString(getDigest(algorithm, data));
 		} catch (final Exception e) {
