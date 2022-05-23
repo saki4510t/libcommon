@@ -28,7 +28,6 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLTexture;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -42,7 +41,7 @@ import androidx.annotation.WorkerThread;
  * 静止画をSurfaceへ出力するためのクラス
  * StaticTextureSourceと違って分配描画しないので出力先Surfaceが1つだけであればこちらの方が効率的
  */
-public class ImageTextureSource implements GLConst {
+public class ImageTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = ImageTextureSource.class.getSimpleName();
 
@@ -62,7 +61,8 @@ public class ImageTextureSource implements GLConst {
 	private GLDrawer2D mDrawer;
 	@Nullable
 	private RendererTarget mRendererTarget;
-
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -169,6 +169,30 @@ public class ImageTextureSource implements GLConst {
 	public boolean hasSurface() {
 		synchronized (mSync) {
 			return mRendererTarget != null;
+		}
+	}
+
+	@Override
+	public void setMirror(final int mirror) {
+		synchronized (mSync) {
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				if (mRendererTarget != null) {
+					mManager.runOnGLThread(() -> {
+						if (mRendererTarget != null) {
+							mRendererTarget.setMirror(mirror);
+						}
+					});
+				}
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
 		}
 	}
 
@@ -317,6 +341,7 @@ public class ImageTextureSource implements GLConst {
 				if ((mRendererTarget == null) && (surface != null)) {
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+					mRendererTarget.setMirror(mMirror);
 					if (mDrawer == null) {
 						mDrawer = GLDrawer2D.create(mManager.isGLES3(), false);
 					}
