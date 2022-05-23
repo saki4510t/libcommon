@@ -85,7 +85,7 @@ public class GLUtils implements GLConst {
 	/**
 	 * 対応しているGL|ESのバージョンを取得
 	 * XXX GLES30はAPI>=18以降なんだけどAPI=18でもGLコンテキスト生成に失敗する端末があるのでAP1>=21に変更
-	 * API>=21でGL_OES_EGL_image_external_essl3に対応していれば3, そうでなければ2を返す
+	 *     API>=21でGL_OES_EGL_image_external_essl3に対応していれば3, そうでなければ2を返す
 	 * @return
 	 */
 	public static synchronized int getSupportedGLVersion() {

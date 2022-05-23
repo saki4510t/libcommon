@@ -173,13 +173,14 @@ public class EffectRendererHolder extends AbstractRendererHolder
 			final int maxClientVersion,
 			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags, new GLDrawer2D.DrawerFactory() {
-				@NonNull
-				@Override
-				public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-					return new EffectDrawer2D(isGLES3, isOES);
-				}
-			});
+			super(parent, width, height, maxClientVersion, sharedContext, flags,
+				new GLDrawer2D.DrawerFactory() {
+					@NonNull
+					@Override
+					public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+						return new EffectDrawer2D(isGLES3, isOES);
+					}
+				});
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 

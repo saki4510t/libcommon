@@ -22,7 +22,6 @@ import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * OpenGL|ESを使った映像効果付与のためのシェーダーを定義する定数クラス
- * FIXME ShaderConstへ集約したほうがいいかもしれない
  */
 public class GLEffect {
 	private GLEffect() {

@@ -23,7 +23,6 @@ import android.opengl.GLES20;
 /**
  * Created by saki on 16/08/26.
  * フラグメントシェーダーとかの文字列定数達を集める
- * FIXME これはまだGLES20のみなのでGLES30用のを作る
  */
 public class ShaderConst implements GLConst {
 	public static final String SHADER_VERSION_ES2 = "#version 100\n";

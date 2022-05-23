@@ -30,7 +30,7 @@ import androidx.annotation.Size;
  * OpenGL|ESのテクスチャ操作用のヘルパークラス
  */
 public class GLTexture implements GLConst {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// XXX 実働時はfalseにすること
 	private static final String TAG = GLTexture.class.getSimpleName();
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;

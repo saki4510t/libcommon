@@ -24,10 +24,12 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 
 /**
- * OpenGL|ESのテキスチャ情報のホルダークラス
+ * OpenGL|ESのテクスチャ情報のホルダークラス
  */
-public class TextureWrapper implements Parcelable {
+public class TextureWrapper implements GLConst, Parcelable {
+	@TexTarget
 	public final int texTarget;
+	@TexUnit
 	public final int texUnit;
 	public final int texId;
 	public final int width;
@@ -42,8 +44,8 @@ public class TextureWrapper implements Parcelable {
 	 * @param height
 	 */
 	public TextureWrapper(
-		final int texTarget,
-		final int texUnit, final int texId,
+		@TexTarget final int texTarget,
+		@TexUnit final int texUnit, final int texId,
 		final int width, final int height) {
 
 		this.texTarget = texTarget;

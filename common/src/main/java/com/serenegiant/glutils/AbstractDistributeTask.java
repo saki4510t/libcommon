@@ -37,6 +37,9 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
+/**
+ * 分配描画処理の共通部分
+ */
 public abstract class AbstractDistributeTask implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDistributeTask.class.getSimpleName();
