@@ -250,7 +250,7 @@ public class EffectPipeline extends ProxyPipeline
 			}
 			if ((target != null)
 				&& target.canDraw()) {
-				target.draw(drawer.getDrawer(), GLES20.GL_TEXTURE0, texId, texMatrix);
+				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 			}
 			if (mEffectOnly && (work != null)) {
 				if (DEBUG && (++cnt % 100) == 0) {

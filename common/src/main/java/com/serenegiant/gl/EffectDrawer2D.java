@@ -22,9 +22,6 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.serenegiant.glutils.IMirror;
-
-import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -33,10 +30,9 @@ import static com.serenegiant.gl.GLEffect.*;
 import static com.serenegiant.gl.ShaderConst.*;
 
 /**
- * GLDrawerの継承クラスを使って映像効果を付与するためのヘルパークラス
- * このクラス自体はGLDrawer2Dの継承クラスではない
+ * 映像効果付与機能を追加したGLDrawer2D
  */
-public class EffectDrawer2D {
+public class EffectDrawer2D extends GLDrawer2D {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectDrawer2D.class.getSimpleName();
 
@@ -54,8 +50,6 @@ public class EffectDrawer2D {
 			@NonNull final GLDrawer2D drawer);
 	}
 
-	@NonNull
-	private final GLDrawer2D mDrawer;
 	@Nullable
 	private final EffectListener mEffectListener;
 	@NonNull
@@ -74,7 +68,7 @@ public class EffectDrawer2D {
 	 * @return
 	 */
 	public EffectDrawer2D(final boolean isGLES3, final boolean isOES) {
-		this(GLDrawer2D.create(isGLES3, isOES), null);
+		this(isGLES3, isOES, null, null, null, null, null);
 	}
 
 	/**
@@ -88,7 +82,7 @@ public class EffectDrawer2D {
 	 */
 	public EffectDrawer2D(final boolean isGLES3, final boolean isOES,
 		@Nullable EffectListener effectListener) {
-		this(GLDrawer2D.create(isGLES3, isOES), effectListener);
+		this(isGLES3, isOES, null, null, null, null, effectListener);
 	}
 
 	/**
@@ -103,7 +97,7 @@ public class EffectDrawer2D {
 		final float[] vertices, final float[] texcoord,
 		final boolean isOES) {
 
-		this(GLDrawer2D.create(isGLES3, isOES, vertices, texcoord), null);
+		this(isGLES3, isOES, vertices, texcoord, null, null, null);
 	}
 
 	/**
@@ -120,271 +114,35 @@ public class EffectDrawer2D {
 		final boolean isOES,
 		@Nullable EffectListener effectListener) {
 
-		this(GLDrawer2D.create(isGLES3, isOES, vertices, texcoord), effectListener);
+		this(isGLES3, isOES, vertices, texcoord, null, null, effectListener);
 	}
 
 	/**
 	 * コンストラクタ
-	 * 既に生成済みのGLDrawer2Dインスタンスを使う時
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param drawer
+	 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
+	 * @param isGLES3 GL|ES3かどうか
+	 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
+	 * 				通常の2Dテキスチャを描画に使うならfalse
+	 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
+	 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
 	 */
-	public EffectDrawer2D(@NonNull final GLDrawer2D drawer) {
-		this(drawer, null);
-	}
-
-	/**
-	 * コンストラクタ
-	 * 既に生成済みのGLDrawer2Dインスタンスを使う時
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param drawer
-	 * @param effectListener
-	 */
-	public EffectDrawer2D(@NonNull final GLDrawer2D drawer,
+	protected EffectDrawer2D(
+		final boolean isGLES3, final boolean isOES,
+		@NonNull @Size(min=8) final float[] vertices,
+		@NonNull @Size(min=8) final float[] texcoord,
+		@Nullable final String vs, @Nullable final String fs,
 		@Nullable EffectListener effectListener) {
-		mDrawer = drawer;
+
+		super(isGLES3, isOES, vertices, texcoord, vs, fs);
 		mEffectListener = effectListener;
 		resetShader();
-	}
-
-//--------------------------------------------------------------------------------
-// GLDrawerへの委譲メソッド
-
-	/**
-	 * 破棄処理。GLコンテキスト/EGLレンダリングコンテキスト内で呼び出さないとダメ
-	 */
-	@CallSuper
-	public void release() {
-		mDrawer.release();
-	}
-
-	/**
-	 * 外部テクスチャを使うかどうか
-	 * @return
-	 */
-	public boolean isOES() {
-		return mDrawer.isOES();
-	}
-
-	/**
-	 * 内部で保持しているGLDrawer2Dインスタンスを返す
-	 * @return
-	 */
-	@NonNull
-	public GLDrawer2D getDrawer() {
-		return mDrawer;
-	}
-
-	/**
-	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
-	 * IDrawer2Dの実装
-	 * @return
-	 */
-	@NonNull
-	public float[] getMvpMatrix() {
-		return mDrawer.getMvpMatrix();
-	}
-
-	/**
-	 * モデルビュー変換行列に行列を割り当てる
-	 * IDrawer2Dの実装
-	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
-	 * @param offset
-	 * @return
-	 */
-	public GLDrawer2D setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
-		return mDrawer;
-	}
-
-	/**
-	 * モデルビュー変換行列のコピーを取得
-	 * IDrawer2Dの実装
-	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
-	 * @param offset
-	 */
-	public void copyMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
-		mDrawer.copyMvpMatrix(matrix, offset);
-	}
-
-	/**
-	 * モデルビュー変換行列に左右・上下反転をセット
-	 * @param mirror
-	 */
-	public void setMirror(@IMirror.MirrorMode final int mirror) {
-		mDrawer.setMirror(mirror);
-	}
-
-	/**
-	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
-	 * @param degrees
-	 */
-	public void rotate(final int degrees) {
-		mDrawer.setMirror(degrees);
-	}
-
-	/**
-	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
-	 * @param degrees
-	 */
-	public void setRotation(final int degrees) {
-		mDrawer.setRotation(degrees);
-	}
-
-	/**
-	 * IGLSurfaceオブジェクトを描画するためのヘルパーメソッド
-	 * IGLSurfaceオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param surface
-	 */
-	public void draw(@NonNull final IGLSurface surface) {
-		mDrawer.draw(surface);
-	}
-
-	/**
-	 * 描画処理
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param texUnit
-	 * @param texId
-	 * @param texMatrix
-	 * @param texOffset
-	 * @param mvpMatrix
-	 * @param mvpOffset
-	 */
-	public synchronized void draw(
-		@TexUnit final int texUnit, final int texId,
-		@Nullable final float[] texMatrix, final int texOffset,
-		@Nullable final float[] mvpMatrix, final int mvpOffset) {
-
-		mDrawer.draw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
-	}
-
-	/**
-	 * テクスチャ変換行列をセット
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param texMatrix
-	 * @param offset
-	 */
-	protected void updateTexMatrix(final float[] texMatrix, final int offset) {
-		mDrawer.updateTexMatrix(texMatrix, offset);
-	}
-
-	/**
-	 * モデルビュー変換行列をセット
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param mvpMatrix
-	 */
-	protected void updateMvpMatrix(final float[] mvpMatrix, final int offset) {
-		mDrawer.updateMvpMatrix(mvpMatrix, offset);
-	}
-
-	/**
-	 * テクスチャをバインド
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param texUnit
-	 * @param texId
-	 */
-	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
-		mDrawer.bindTexture(texUnit, texId);
-	}
-
-	/**
-	 * 頂点座標をセット
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 */
-	protected void updateVertices() {
-		mDrawer.updateVertices();
-	}
-
-	/**
-	 * 描画実行
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 */
-	protected void drawVertices() {
-		mDrawer.drawVertices();
-	}
-
-	/**
-	 * 描画の後処理
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 */
-	protected void finishDraw() {
-		mDrawer.finishDraw();
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param texUnit
-	 * @return
-	 */
-	public int initTex(@TexUnit final int texUnit) {
-		return mDrawer.initTex(texUnit);
-	}
-
-	/**
-	 * テクスチャ名生成のヘルパーメソッド
-	 * GLHelper#initTexを呼び出すだけ
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param texUnit
-	 * @param filterParam
-	 * @return
-	 */
-	public int initTex(@TexUnit final int texUnit, @MinMagFilter final int filterParam) {
-		return mDrawer.initTex(texUnit, filterParam);
-	}
-
-	/**
-	 * テクスチャ名破棄のヘルパーメソッド
-	 * GLHelper.deleteTexを呼び出すだけ
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param hTex
-	 */
-	public void deleteTex(final int hTex) {
-		mDrawer.deleteTex(hTex);
-	}
-
-	/**
-	 * 頂点シェーダー・フラグメントシェーダーを変更する
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * glUseProgramが呼ばれた状態で返る
-	 * @param vs 頂点シェーダー文字列
-	 * @param fs フラグメントシェーダー文字列
-	 */
-	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
-		mDrawer.updateShader(vs, fs);
-	}
-
-	/**
-	 * シェーダーを破棄
-	 */
-	protected void releaseShader() {
-		mDrawer.releaseShader();
-	}
-
-	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
-		return mDrawer.loadShader(vs, fs);
-	}
-
-	protected void internalReleaseShader(final int program) {
-		mDrawer.internalReleaseShader(program);
-	}
-
-	/**
-	 * フラグメントシェーダーを変更する
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * glUseProgramが呼ばれた状態で返る
-	 * @param fs フラグメントシェーダー文字列
-	 */
-	public void updateShader(@NonNull final String fs) {
-		mDrawer.updateShader(fs);
 	}
 
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
 	public void resetShader() {
-		mDrawer.resetShader();
+		super.resetShader();
 		mParams.clear();
 		mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 			0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
@@ -412,54 +170,6 @@ public class EffectDrawer2D {
 		mEffect = EFFECT_NON;
 	}
 
-	/**
-	 * アトリビュート変数のロケーションを取得
-	 * glUseProgramが呼ばれた状態で返る
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param name
-	 * @return
-	 */
-	public int glGetAttribLocation(@NonNull final String name) {
-		return mDrawer.glGetAttribLocation(name);
-	}
-
-	/**
-	 * ユニフォーム変数のロケーションを取得
-	 * glUseProgramが呼ばれた状態で返る
-	 * @param name
-	 * @return
-	 */
-	public int glGetUniformLocation(@NonNull final String name) {
-		return mDrawer.glGetUniformLocation(name);
-	}
-
-	/**
-	 * glUseProgramが呼ばれた状態で返る
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 */
-	public void glUseProgram() {
-		mDrawer.glUseProgram();
-	}
-
-	/**
-	 * シェーダープログラム変更時の初期化処理
-	 * glUseProgramが呼ばれた状態で返る
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 */
-	protected void init() {
-		mDrawer.init();
-	}
-
-	/**
-	 * シェーダープログラムが使用可能かどうかをチェック
-	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param program
-	 * @return
-	 */
-	protected boolean validateProgram(final int program) {
-		return mDrawer.validateProgram(program);
-	}
-
 //--------------------------------------------------------------------------------
 // EffectDrawer2D固有のpublicメソッド
 	/**
@@ -483,66 +193,66 @@ public class EffectDrawer2D {
 			boolean handled = false;
 			try {
 				handled = (mEffectListener != null)
-					&& mEffectListener.onChangeEffect(effect, mDrawer);
+					&& mEffectListener.onChangeEffect(effect, this);
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
 			if (!handled) {
 				switch (effect) {
 				case EFFECT_NON:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_EXT_ES2);
 					break;
 				case EFFECT_GRAY:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_GRAY_ES3 : FRAGMENT_SHADER_EXT_GRAY_ES2);
 					break;
 				case EFFECT_GRAY_REVERSE:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES3 : FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2);
 					break;
 				case EFFECT_BIN:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_BIN_ES3 : FRAGMENT_SHADER_EXT_BIN_ES2);
 					break;
 				case EFFECT_BIN_YELLOW:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						?FRAGMENT_SHADER_EXT_BIN_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2);
 					break;
 				case EFFECT_BIN_GREEN:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_BIN_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_GREEN_ES2);
 					break;
 				case EFFECT_BIN_REVERSE:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_BIN_REVERSE_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2);
 					break;
 				case EFFECT_BIN_REVERSE_YELLOW:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2);
 					break;
 				case EFFECT_BIN_REVERSE_GREEN:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2);
 					break;
 				case EFFECT_EMPHASIZE_RED_YELLOW:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2);
 					break;
 				case EFFECT_EMPHASIZE_RED_YELLOW_WHITE:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2);
 					break;
 				case EFFECT_EMPHASIZE_YELLOW_WHITE:
-					mDrawer.updateShader(mDrawer.isGLES3
+					updateShader(isGLES3
 						? FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2);
 					break;
 				default:
-					mDrawer.resetShader();
+					resetShader();
 					break;
 				}
 			}
-			muParamsLoc = mDrawer.glGetUniformLocation("uParams");
+			muParamsLoc = glGetUniformLocation("uParams");
 			mCurrentParams = mParams.get(effect);
 			updateParams();
 		}
@@ -591,10 +301,7 @@ public class EffectDrawer2D {
 		final int n = Math.min(mCurrentParams != null
 			? mCurrentParams.length : 0, MAX_PARAM_NUM);
 		if ((muParamsLoc >= 0) && (n > 0)) {
-			if (mDrawer != null) {
-				mDrawer.glUseProgram();
-			} else if (DEBUG) Log.d(TAG, "handleChangeEffect: mDrawer is null");
-			// GLES30#glUniform1fvはGLES20の継承メソッドなのでGLES20のを使う
+			glUseProgram();
 			GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
 		}
 	}
