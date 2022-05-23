@@ -20,7 +20,6 @@ package com.serenegiant.gl;
 
 
 import android.opengl.GLES20;
-import android.opengl.GLES30;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -81,7 +80,7 @@ import static com.serenegiant.gl.ShaderConst.*;
 	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
 		GLES20.glActiveTexture(texUnit);
 		GLES20.glBindTexture(mTexTarget, texId);
-		GLES30.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
+		GLES20.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
 	}
 
 	@Override
@@ -217,4 +216,5 @@ import static com.serenegiant.gl.ShaderConst.*;
 		}
 		return false;
 	}
+
 }
