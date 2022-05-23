@@ -71,7 +71,7 @@ public class RendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		return new BaseRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, null);
 	}
 	
 }

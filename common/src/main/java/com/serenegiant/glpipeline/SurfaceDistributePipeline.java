@@ -24,6 +24,7 @@ import android.os.Message;
 import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.glutils.AbstractDistributeTask;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLManager;
@@ -61,7 +62,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 	 * @param manager
 	 */
 	public SurfaceDistributePipeline(@NonNull final GLManager manager) {
-		this(manager, false);
+		this(manager, false, null);
 	}
 
 	/**
@@ -70,7 +71,9 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 	 * @param manager
 	 * @param useSharedContext 共有コンテキストを使ったマルチスレッド処理を行うかどう
 	 */
-	public SurfaceDistributePipeline(@NonNull final GLManager manager, final boolean useSharedContext) {
+	public SurfaceDistributePipeline(
+		@NonNull final GLManager manager, final boolean useSharedContext,
+		@Nullable GLDrawer2D.DrawerFactory factory) {
 
 		super();
 		final Handler.Callback handlerCallback
@@ -94,7 +97,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 		}
 		mDistributeTask = new DistributeTask(
 			mManager.getGLContext(), glHandler,
-			getWidth(), getHeight());
+			getWidth(), getHeight(), factory);
 		mDistributeTask.start(RENDERER_THREAD_NAME);
 	}
 
@@ -287,9 +290,10 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 		 */
 		public DistributeTask(@NonNull final GLContext glContext,
 			@NonNull final Handler glHandler,
-			final int width, final int height) {
+			final int width, final int height,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 
-			super(width, height);
+			super(width, height, factory);
 			mGLContext = glContext;
 			mGLHandler = glHandler;
 			isGLES3 = glContext.isGLES3();

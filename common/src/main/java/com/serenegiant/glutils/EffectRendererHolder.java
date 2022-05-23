@@ -29,6 +29,7 @@ import android.util.SparseArray;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.EffectDrawer2D;
 import com.serenegiant.gl.GLDrawer2D;
 
 import static com.serenegiant.gl.ShaderConst.*;
@@ -88,7 +89,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, null);
 	}
 
 //================================================================================
@@ -179,9 +180,10 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
+			super(parent, width, height, maxClientVersion, sharedContext, flags, factory);
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 

@@ -30,6 +30,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -124,7 +125,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		return new MixRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, null);
 	}
 
 	private static final int REQUEST_SET_MASK = 10;
@@ -203,9 +204,10 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		public MixRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 
-			super(parent, width, height, maxClientVersion, sharedContext, flags);
+			super(parent, width, height, maxClientVersion, sharedContext, flags, factory);
 			if (BuildCheck.isAndroid5()) {
 				mAsyncHandler = HandlerThreadHandler.createHandler("OnFrameAvailable");
 			}

@@ -29,6 +29,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 
 import androidx.annotation.NonNull;
@@ -95,7 +96,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
 
 		return new OverlayRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, null);
 	}
 
 	public void setOverlay(final int id, @Nullable final Bitmap overlay) {
@@ -161,10 +162,11 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		public OverlayRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 
 			super(parent, width, height,
-				maxClientVersion, sharedContext, flags);
+				maxClientVersion, sharedContext, flags, factory);
 			if (DEBUG) Log.v(TAG, String.format("OverlayRendererTask(%dx%d)", width, height));
 		}
 

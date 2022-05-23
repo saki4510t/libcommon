@@ -522,9 +522,10 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		public BaseRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 
-			super(width, height);
+			super(width, height, factory);
 			mParent = parent;
 			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
 				@Override

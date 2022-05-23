@@ -63,6 +63,8 @@ public abstract class AbstractDistributeTask implements IMirror {
 	@NonNull
 	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
+	@NonNull
+	private final GLDrawer2D.DrawerFactory mDrawerFactory;
 	private int mVideoWidth, mVideoHeight;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
@@ -77,11 +79,14 @@ public abstract class AbstractDistributeTask implements IMirror {
 	 * @param width
 	 * @param height
 	 */
-	protected AbstractDistributeTask(final int width, final int height) {
+	protected AbstractDistributeTask(
+		final int width, final int height,
+		@Nullable GLDrawer2D.DrawerFactory factory) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mVideoWidth = width > 0 ? width : 640;
 		mVideoHeight = height > 0 ? height : 480;
+		mDrawerFactory = factory != null ? factory : GLDrawer2D.DEFAULT_FACTORY;
 		mReleased = false;
 	}
 
@@ -368,7 +373,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	@WorkerThread
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
-		mDrawer = GLDrawer2D.create(isOES3Supported(), true);
+		mDrawer = mDrawerFactory.create(isGLES3(), true);
 		handleReCreateInputSurface();
 	}
 
@@ -501,7 +506,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		final int n = mTargets.size();
 		if (isOES != mDrawer.isOES()) {
 			mDrawer.release();
-			mDrawer = GLDrawer2D.create(isOES3Supported(), isOES);
+			mDrawer = mDrawerFactory.create(isGLES3(), isOES);
 		}
 		for (int i = n - 1; i >= 0; i--) {
 			final RendererTarget target = mTargets.valueAt(i);
