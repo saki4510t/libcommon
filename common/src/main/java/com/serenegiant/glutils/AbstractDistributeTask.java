@@ -72,7 +72,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	private volatile boolean mIsFirstFrameRendered;
 	private volatile boolean mHasNewFrame;
 	private volatile boolean mReleased;
-	protected GLDrawer2D mDrawer;
+	private GLDrawer2D mDrawer;
 
 	/**
 	 * コンストラクタ
@@ -356,6 +356,12 @@ public abstract class AbstractDistributeTask implements IMirror {
 		return mRotation;
 	}
 
+	public GLDrawer2D getDrawer() {
+		synchronized (mSync) {
+			return mDrawer;
+		}
+	}
+
 //--------------------------------------------------------------------------------
 // ワーカースレッド上での処理
 //--------------------------------------------------------------------------------
@@ -373,7 +379,9 @@ public abstract class AbstractDistributeTask implements IMirror {
 	@WorkerThread
 	protected void internalOnStart() {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
-		mDrawer = mDrawerFactory.create(isGLES3(), true);
+		synchronized (mSync) {
+			mDrawer = mDrawerFactory.create(isGLES3(), true);
+		}
 		handleReCreateInputSurface();
 	}
 
@@ -504,15 +512,21 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 //		if (DEBUG) Log.v(TAG, "handleDrawTargets:");
 		final int n = mTargets.size();
-		if (isOES != mDrawer.isOES()) {
-			mDrawer.release();
-			mDrawer = mDrawerFactory.create(isGLES3(), isOES);
+		final GLDrawer2D drawer;
+		synchronized (mSync) {
+			if ((mDrawer == null) || (mDrawer.isOES() != isOES)) {
+				if (mDrawer != null) {
+					mDrawer.release();
+				}
+				mDrawer = mDrawerFactory.create(isGLES3(), isOES);
+			}
+			drawer = mDrawer;
 		}
 		for (int i = n - 1; i >= 0; i--) {
 			final RendererTarget target = mTargets.valueAt(i);
 			if ((target != null) && target.canDraw()) {
 				try {
-					target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, texMatrix);
+					target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				} catch (final Exception e) {
 					if (DEBUG) Log.w(TAG, e);
 					// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった

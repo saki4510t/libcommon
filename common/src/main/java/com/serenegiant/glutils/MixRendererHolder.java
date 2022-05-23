@@ -242,11 +242,12 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		protected void internalOnStart() {
 			if (DEBUG) Log.v(TAG, "internalOnStart:");
 			super.internalOnStart();
-			if (mDrawer != null) {
+			final GLDrawer2D drawer = getDrawer();
+			if (drawer != null) {
 				if (isGLES3()) {
-					internalOnStartES3();
+					internalOnStartES3(drawer);
 				} else {
-					internalOnStartES2();
+					internalOnStartES2(drawer);
 				}
 			}
 		}
@@ -256,15 +257,15 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 */
 		@SuppressLint("NewApi")
 		@WorkerThread
-		private void internalOnStartES2() {
+		private void internalOnStartES2(@NonNull final GLDrawer2D drawer) {
 			if (DEBUG) Log.v(TAG, String.format("internalOnStartES2:init mix texture(%dx%d)",
 				width(), height()));
-			mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
-			final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+			drawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES2);
+			final int uTex1 = drawer.glGetUniformLocation("sTexture");
 			GLES20.glUniform1i(uTex1, 0);
 
 			// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
-			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+			final int uTex2 = drawer.glGetUniformLocation("sTexture2");
 			mTexId2 = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
@@ -283,7 +284,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			GLES20.glUniform1i(uTex2, 1);
 
 			// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
-			final int uTex3 = mDrawer.glGetUniformLocation("sTexture3");
+			final int uTex3 = drawer.glGetUniformLocation("sTexture3");
 			mMaskTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE2,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
@@ -300,15 +301,15 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 */
 		@SuppressLint("NewApi")
 		@WorkerThread
-		private void internalOnStartES3() {
+		private void internalOnStartES3(@NonNull final GLDrawer2D drawer) {
 			if (DEBUG) Log.v(TAG, String.format("internalOnStartES3:init mix texture(%dx%d)",
 				width(), height()));
-			mDrawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
-			final int uTex1 = mDrawer.glGetUniformLocation("sTexture");
+			drawer.updateShader(MY_FRAGMENT_SHADER_EXT_ES3);
+			final int uTex1 = drawer.glGetUniformLocation("sTexture");
 			GLES30.glUniform1i(uTex1, 0);
 
 			// アルファブレンド用テクスチャ/SurfaceTexture/Surfaceを生成
-			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
+			final int uTex2 = drawer.glGetUniformLocation("sTexture2");
 			mTexId2 = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE1,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
@@ -327,7 +328,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 			GLES30.glUniform1i(uTex2, 1);
 
 			// マスク用テクスチャ/SurfaceTexture/Surfaceを生成
-			final int uTex3 = mDrawer.glGetUniformLocation("sTexture3");
+			final int uTex3 = drawer.glGetUniformLocation("sTexture3");
 			mMaskTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES30.GL_TEXTURE2,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
