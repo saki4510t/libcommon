@@ -27,6 +27,7 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.AbstractDistributeTask;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
@@ -41,7 +42,7 @@ import static com.serenegiant.glutils.IMirror.*;
  * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  * 分配描画が必要ない場合または分配先が少ない場合はSurfaceRendererPipelineの方が負荷が少ないかもしれない
  */
-public class SurfaceDistributePipeline extends ProxyPipeline {
+public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfaceDistributePipeline.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "SurfaceDistributePipeline";
@@ -234,7 +235,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline {
 	 * @param mirror
 	 */
 	public void setMirror(@MirrorMode final int mirror) {
-		mDistributeTask.mirror(mirror % MIRROR_NUM);
+		mDistributeTask.setMirror(mirror % MIRROR_NUM);
 	}
 
 	/**
@@ -243,7 +244,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline {
 	 */
 	@MirrorMode
 	public int getMirror() {
-		return mDistributeTask.mirror();
+		return mDistributeTask.getMirror();
 	}
 
 	/**

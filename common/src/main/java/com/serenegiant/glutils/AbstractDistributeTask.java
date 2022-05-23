@@ -37,9 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.IMirror.*;
-
-public abstract class AbstractDistributeTask {
+public abstract class AbstractDistributeTask implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDistributeTask.class.getSimpleName();
 
@@ -66,7 +64,7 @@ public abstract class AbstractDistributeTask {
 	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
 	private int mVideoWidth, mVideoHeight;
-	@IMirror.MirrorMode
+	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
 	private volatile boolean mIsFirstFrameRendered;
@@ -317,7 +315,7 @@ public abstract class AbstractDistributeTask {
 	}
 
 	@AnyThread
-	public void mirror(final int mirror) throws IllegalStateException {
+	public void setMirror(@MirrorMode final int mirror) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
 		if (mMirror != mirror) {
@@ -325,8 +323,8 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
-	@IMirror.MirrorMode
-	public int mirror() {
+	@MirrorMode
+	public int getMirror() {
 		return mMirror;
 	}
 
@@ -702,7 +700,7 @@ public abstract class AbstractDistributeTask {
 	 * @param mirror
 	 */
 	@WorkerThread
-	private void handleMirror(final int mirror) {
+	private void handleMirror(@MirrorMode final int mirror) {
 		if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
 		mMirror = mirror;
 		final int n = mTargets.size();
