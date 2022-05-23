@@ -87,7 +87,7 @@ public class GLDrawer2D implements GLConst {
 	 * @return
 	 */
 	public static GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, null, null);
+		return create(isGLES3, isOES, null, null, null, null);
 	}
 
 	/**
@@ -102,7 +102,7 @@ public class GLDrawer2D implements GLConst {
 		final boolean isGLES3, final boolean isOES,
 		@Nullable final String fs) {
 
-		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, null, fs);
+		return create(isGLES3, isOES, null, null, null, fs);
 	}
 
 	/**
@@ -118,7 +118,7 @@ public class GLDrawer2D implements GLConst {
 		final boolean isGLES3, final boolean isOES,
 		@Nullable final String vs, @Nullable final String fs) {
 
-		return create(isGLES3, isOES, DEFAULT_VERTICES, DEFAULT_TEXCOORD, vs, fs);
+		return create(isGLES3, isOES, null, null, vs, fs);
 	}
 
 	/**
@@ -248,13 +248,17 @@ public class GLDrawer2D implements GLConst {
 	 */
 	protected GLDrawer2D(
 		final boolean isGLES3, final boolean isOES,
-		@NonNull @Size(min=8) final float[] vertices,
-		@NonNull @Size(min=8) final float[] texcoord,
+		@Nullable @Size(min=8) final float[] vertices,
+		@Nullable @Size(min=8) final float[] texcoord,
 		@Nullable final String vs, @Nullable final String fs) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
-		VERTEX_NUM = Math.min(vertices.length, texcoord.length) / 2;
+		@NonNull
+		final float[] _vertices = (vertices != null && vertices.length >= 2) ? vertices : DEFAULT_VERTICES;
+		@NonNull
+		final float[] _texcoord = (texcoord != null && texcoord.length >= 2) ? texcoord : DEFAULT_TEXCOORD;
+		VERTEX_NUM = Math.min(_vertices.length, _texcoord.length) / 2;
 		VERTEX_SZ = VERTEX_NUM * 2;
 
 		final String _vs = !TextUtils.isEmpty(vs) ? vs
@@ -264,8 +268,8 @@ public class GLDrawer2D implements GLConst {
 					  : (isOES ? FRAGMENT_SHADER_EXT_ES2 : FRAGMENT_SHADER_ES2);
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
-		pVertex = BufferHelper.createFloatBuffer(vertices);
-		pTexCoord = BufferHelper.createFloatBuffer(texcoord);
+		pVertex = BufferHelper.createFloatBuffer(_vertices);
+		pTexCoord = BufferHelper.createFloatBuffer(_texcoord);
 
 		// モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
