@@ -55,6 +55,10 @@ import androidx.core.content.res.ResourcesCompat;
 import static com.serenegiant.glutils.IMirror.*;
 import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
+/**
+ * OpenGL|ES関係のヘルパーメソッド
+ * XXX フレームワークのGLUtilsと被るのでリネームした方がいいかも？
+ */
 public class GLUtils implements GLConst {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLUtils.class.getSimpleName();
