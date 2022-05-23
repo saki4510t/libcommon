@@ -45,6 +45,25 @@ public class GLDrawer2D implements GLConst {
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 
 	/**
+	 * GLDrawer2Dインスタンス生成用のファクトリーインターフェース
+	 */
+	public interface DrawerFactory {
+		@NonNull
+		public GLDrawer2D create(final boolean isGLES3, final boolean isOES);
+	}
+
+	/**
+	 * デフォルトのDrawerFactory実装
+	 */
+	public static DrawerFactory DEFAULT_FACTORY = new DrawerFactory() {
+		@NonNull
+		@Override
+		public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+			return GLDrawer2D.create(isGLES3, isOES);
+		}
+	};
+
+	/**
 	 * バッファオブジェクトを使って描画するかどうか
 	 */
 	protected static final boolean USE_VBO = true;
