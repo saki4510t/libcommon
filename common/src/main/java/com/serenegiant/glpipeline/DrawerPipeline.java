@@ -39,8 +39,9 @@ import androidx.annotation.WorkerThread;
  * 任意のGLDrawer2D(とその継承クラス)を使って描画するGLPipeline実装
  * 描画先のsurfaceにnullを指定すると描画後のテクスチャを次のGLPipelineへ送る
  */
-public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
-	private static final boolean DEBUG = true;	// set false on production
+public class DrawerPipeline extends ProxyPipeline
+	implements GLSurfacePipeline, IMirror {
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = DrawerPipeline.class.getSimpleName();
 
 	/**
@@ -109,6 +110,8 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	@Nullable
 	private GLSurface offscreenSurface;
+	@MirrorMode
+	private int mMirror = MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -244,6 +247,28 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public boolean isDrawOnly() {
 		return mDrawOnly;
+	}
+
+	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		synchronized (mSync) {
+			if (mMirror != mirror) {
+				mMirror = mirror;
+				mManager.runOnGLThread(() -> {
+					if (mRendererTarget != null) {
+						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+					}
+				});
+			}
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		synchronized (mSync) {
+			return mMirror;
+		}
 	}
 
 	@Override
@@ -392,7 +417,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					mDrawOnly = true;
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 				}
 			}
 		}
