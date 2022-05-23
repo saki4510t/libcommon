@@ -21,6 +21,7 @@ package com.serenegiant.gl;
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.glutils.IMirror;
@@ -39,7 +40,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * 描画領域全面にテクスチャを2D描画するためのヘルパークラス
  * 基本的に直接生成せずにGLDrawer2D#createメソッドを使うこと
  */
-public abstract class GLDrawer2D implements GLConst {
+public class GLDrawer2D implements GLConst {
 	private static final boolean DEBUG = false; // FIXME set false on release
 	private static final String TAG = GLDrawer2D.class.getSimpleName();
 
@@ -68,6 +69,15 @@ public abstract class GLDrawer2D implements GLConst {
 		0.0f, 0.0f,		// 左下
 	};
 	protected static final int FLOAT_SZ = Float.SIZE / 8;
+
+	/**
+	 * 頂点座標用バッファオブジェクト名
+	 */
+	private int mBufVertex = GL_NO_BUFFER;
+	/**
+	 * テクスチャ座標用バッファオブジェクト名
+	 */
+	private int mBufTexCoord = GL_NO_BUFFER;
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
@@ -161,9 +171,9 @@ public abstract class GLDrawer2D implements GLConst {
 		@Nullable final String vs, @Nullable final String fs) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLDrawer2DES3(isOES, vertices, texcoord, vs, fs);
+			return new GLDrawer2D(true, isOES, vertices, texcoord, vs, fs);
 		} else {
-			return new GLDrawer2DES2(isOES, vertices, texcoord, vs, fs);
+			return new GLDrawer2D(false, isOES, vertices, texcoord, vs, fs);
 		}
 	}
 
@@ -240,12 +250,18 @@ public abstract class GLDrawer2D implements GLConst {
 		final boolean isGLES3, final boolean isOES,
 		@NonNull @Size(min=8) final float[] vertices,
 		@NonNull @Size(min=8) final float[] texcoord,
-		@NonNull final String vs, @NonNull final String fs) {
+		@Nullable final String vs, @Nullable final String fs) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
 		VERTEX_NUM = Math.min(vertices.length, texcoord.length) / 2;
 		VERTEX_SZ = VERTEX_NUM * 2;
+
+		final String _vs = !TextUtils.isEmpty(vs) ? vs
+			: isGLES3 ? VERTEX_SHADER_ES3 : VERTEX_SHADER_ES2;
+		final String _fs = !TextUtils.isEmpty(fs) ? fs
+			: isGLES3 ? (isOES ? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_ES3)
+					  : (isOES ? FRAGMENT_SHADER_EXT_ES2 : FRAGMENT_SHADER_ES2);
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		pVertex = BufferHelper.createFloatBuffer(vertices);
@@ -254,7 +270,7 @@ public abstract class GLDrawer2D implements GLConst {
 		// モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
 
-		updateShader(vs, fs);
+		updateShader(_vs, _fs);
 	}
 
 	/**
@@ -397,38 +413,85 @@ public abstract class GLDrawer2D implements GLConst {
 
 	/**
 	 * テクスチャ変換行列をセット
-	 * @param tex_matrix
+	 * @param texMatrix
 	 * @param offset
 	 */
-	protected abstract void updateTexMatrix(@NonNull @Size(min=16) final float[] tex_matrix, final int offset);
+	protected void updateTexMatrix(@NonNull @Size(min=16) final float[] texMatrix, final int offset) {
+		GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
+	}
 
 	/**
 	 * モデルビュー変換行列をセット
 	 * @param mvpMatrix
 	 */
-	protected abstract void updateMvpMatrix(@NonNull @Size(min=16)  final float[] mvpMatrix, final int offset);
+	protected void updateMvpMatrix(@NonNull @Size(min=16)  final float[] mvpMatrix, final int offset) {
+		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
+	}
 
 	/**
 	 * テクスチャをバインド
 	 * @param texUnit
 	 * @param texId
 	 */
-	protected abstract void bindTexture(@TexUnit final int texUnit, final int texId);
+	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
+		GLES20.glActiveTexture(texUnit);
+		GLES20.glBindTexture(mTexTarget, texId);
+		GLES20.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
+	}
 
 	/**
 	 * 頂点座標をセット
 	 */
-	protected abstract void updateVertices();
+	protected void updateVertices() {
+		if (USE_VBO) {
+			if (mBufVertex <= GL_NO_BUFFER) {
+				pVertex.clear();
+				mBufVertex = GLUtils.createBuffer(GLES20.GL_ARRAY_BUFFER, pVertex, GLES20.GL_STATIC_DRAW);
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for vertex," + mBufVertex);
+			}
+			if (mBufTexCoord <= GL_NO_BUFFER) {
+				pTexCoord.clear();
+				mBufTexCoord = GLUtils.createBuffer(GLES20.GL_ARRAY_BUFFER, pTexCoord, GLES20.GL_STATIC_DRAW);
+				if (DEBUG) Log.v(TAG, "updateVertices:create buffer object for tex coord," + mBufTexCoord);
+			}
+			// 頂点座標をセット
+			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mBufVertex);
+			GLES20.glVertexAttribPointer(maPositionLoc,
+				2, GLES20.GL_FLOAT, false, 0, 0);
+			GLES20.glEnableVertexAttribArray(maPositionLoc);
+			// テクスチャ座標をセット
+			GLES20.glBindBuffer(GLES20.GL_ARRAY_BUFFER, mBufTexCoord);
+			GLES20.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES20.GL_FLOAT, false, 0, 0);
+			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+		} else {
+			// 頂点座標をセット
+			pVertex.clear();
+			GLES20.glVertexAttribPointer(maPositionLoc,
+				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pVertex);
+			GLES20.glEnableVertexAttribArray(maPositionLoc);
+			// テクスチャ座標をセット
+			pTexCoord.clear();
+			GLES20.glVertexAttribPointer(maTextureCoordLoc,
+				2, GLES20.GL_FLOAT, false, VERTEX_SZ, pTexCoord);
+			GLES20.glEnableVertexAttribArray(maTextureCoordLoc);
+		}
+	}
 
 	/**
 	 * 描画実行
 	 */
-	protected abstract void drawVertices();
+	protected void drawVertices() {
+		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+	}
 
 	/**
 	 * 描画の後処理
 	 */
-	protected abstract void finishDraw();
+	protected void finishDraw() {
+		GLES20.glBindTexture(mTexTarget, 0);
+        GLES20.glUseProgram(0);
+	}
 
 	/**
 	 * テクスチャ名生成のヘルパーメソッド
@@ -513,7 +576,19 @@ public abstract class GLDrawer2D implements GLConst {
 		return GLUtils.loadShader(vs, fs);
 	}
 
-	protected abstract void internalReleaseShader(final int program);
+	protected void internalReleaseShader(final int program) {
+		// バッファーオブジェクトを破棄
+		if (mBufVertex > GL_NO_BUFFER) {
+			GLUtils.deleteBuffer(mBufVertex);
+			mBufVertex = GL_NO_BUFFER;
+		}
+		if (mBufTexCoord > GL_NO_BUFFER) {
+			GLUtils.deleteBuffer(mBufTexCoord);
+			mBufTexCoord = GL_NO_BUFFER;
+		}
+		// シェーダーを破棄
+		GLES20.glDeleteProgram(program);
+	}
 
 	/**
 	 * アトリビュート変数のロケーションを取得
@@ -521,7 +596,10 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param name
 	 * @return
 	 */
-	public abstract int glGetAttribLocation(@NonNull final String name);
+	public int glGetAttribLocation(@NonNull final String name) {
+		GLES20.glUseProgram(hProgram);
+		return GLES20.glGetAttribLocation(hProgram, name);
+	}
 
 	/**
 	 * ユニフォーム変数のロケーションを取得
@@ -529,23 +607,50 @@ public abstract class GLDrawer2D implements GLConst {
 	 * @param name
 	 * @return
 	 */
-	public abstract int glGetUniformLocation(@NonNull final String name);
+	public int glGetUniformLocation(@NonNull final String name) {
+		GLES20.glUseProgram(hProgram);
+		return GLES20.glGetUniformLocation(hProgram, name);
+	}
 
 	/**
 	 * glUseProgramが呼ばれた状態で返る
 	 */
-	public abstract void glUseProgram();
+	public void glUseProgram() {
+		GLES20.glUseProgram(hProgram);
+	}
 
 	/**
 	 * シェーダープログラム変更時の初期化処理
 	 * glUseProgramが呼ばれた状態で返る
 	 */
-	protected abstract void init();
+	protected void init() {
+		if (DEBUG) Log.v(TAG, "init:");
+		GLES20.glUseProgram(hProgram);
+		maPositionLoc = GLES20.glGetAttribLocation(hProgram, "aPosition");
+		maTextureCoordLoc = GLES20.glGetAttribLocation(hProgram, "aTextureCoord");
+		muTextureLoc = GLES20.glGetAttribLocation(hProgram, "sTexture");
+		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
+		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
+		//
+		GLES20.glUniformMatrix4fv(muMVPMatrixLoc,
+			1, false, mMvpMatrix, 0);
+		GLES20.glUniformMatrix4fv(muTexMatrixLoc,
+			1, false, mMvpMatrix, 0);
+		updateVertices();
+	}
 
+	private final int[] status = new int[1];
 	/**
 	 * シェーダープログラムが使用可能かどうかをチェック
 	 * @param program
 	 * @return
 	 */
-	protected abstract boolean validateProgram(final int program);
+	protected boolean validateProgram(final int program) {
+		if (program >= 0) {
+			GLES20.glValidateProgram(program);
+			GLES20.glGetProgramiv(program, GLES20.GL_VALIDATE_STATUS, status, 0);
+			return status[0] == GLES20.GL_TRUE;
+		}
+		return false;
+	}
 }
