@@ -25,7 +25,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -392,7 +392,7 @@ public class DrawerPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					mDrawOnly = true;
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 				}
 			}
 		}

@@ -6,7 +6,7 @@ import android.graphics.Rect;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import androidx.annotation.NonNull;
@@ -75,7 +75,7 @@ LOOP:		for (int y = 0; y < h; y++) {
 	 * @return
 	 */
 	public static Bitmap flipVertical(@NonNull final Bitmap bitmap) {
-		return BitmapHelper.applyMirror(bitmap, IRendererCommon.MIRROR_VERTICAL);
+		return BitmapHelper.applyMirror(bitmap, IMirror.MIRROR_VERTICAL);
 	}
 
 	/**

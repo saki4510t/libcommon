@@ -531,7 +531,7 @@ public abstract class SurfaceProxy implements GLConst {
 							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					}
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
+						mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 					}
 				}
 			}

@@ -24,7 +24,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -245,7 +245,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline implements GLSurfaceP
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 				}
 			}
 		}

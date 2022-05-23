@@ -23,7 +23,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.utils.BufferHelper;
 
 import java.nio.FloatBuffer;
@@ -312,7 +312,7 @@ public abstract class GLDrawer2D implements GLConst {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mirror
 	 */
-	public void setMirror(@IRendererCommon.MirrorMode final int mirror) {
+	public void setMirror(@IMirror.MirrorMode final int mirror) {
 		GLUtils.setMirror(mMvpMatrix, mirror);
 	}
 

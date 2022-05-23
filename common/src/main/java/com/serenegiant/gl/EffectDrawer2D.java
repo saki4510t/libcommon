@@ -22,7 +22,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.util.SparseArray;
 
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -210,7 +210,7 @@ public class EffectDrawer2D {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mirror
 	 */
-	public void setMirror(@IRendererCommon.MirrorMode final int mirror) {
+	public void setMirror(@IMirror.MirrorMode final int mirror) {
 		mDrawer.setMirror(mirror);
 	}
 

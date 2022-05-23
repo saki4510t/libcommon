@@ -22,7 +22,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -73,32 +73,32 @@ public class BitmapHelperTest {
 			200, 200,15, 18,
 			Bitmap.Config.ARGB_8888);
 
-		final Bitmap normal = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_NORMAL);
+		final Bitmap normal = BitmapHelper.applyMirror(original, IMirror.MIRROR_NORMAL);
 		assertTrue(bitMapEquals(original, normal));
 
 		// 左右反転
-		final Bitmap flipHorizontal = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_HORIZONTAL);
+		final Bitmap flipHorizontal = BitmapHelper.applyMirror(original, IMirror.MIRROR_HORIZONTAL);
 		assertFalse(bitMapEquals(original, flipHorizontal));
 		// 2回左右反転させると元と一致するはず
-		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipHorizontal, IRendererCommon.MIRROR_HORIZONTAL)));
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipHorizontal, IMirror.MIRROR_HORIZONTAL)));
 
 		// 上下反転
-		final Bitmap flipVertical = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_VERTICAL);
+		final Bitmap flipVertical = BitmapHelper.applyMirror(original, IMirror.MIRROR_VERTICAL);
 		assertFalse(bitMapEquals(original, flipVertical));
 		// 2回上下反転させると元と一致するはず
-		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipVertical, IRendererCommon.MIRROR_VERTICAL)));
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipVertical, IMirror.MIRROR_VERTICAL)));
 
 		// 上下左右反転
-		final Bitmap flipBoth = BitmapHelper.applyMirror(original, IRendererCommon.MIRROR_BOTH);
+		final Bitmap flipBoth = BitmapHelper.applyMirror(original, IMirror.MIRROR_BOTH);
 		assertFalse(bitMapEquals(original, flipBoth));
 		// 2回上下反転させると元と一致するはず
-		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipBoth, IRendererCommon.MIRROR_BOTH)));
+		assertTrue(bitMapEquals(original, BitmapHelper.applyMirror(flipBoth, IMirror.MIRROR_BOTH)));
 
 		// 上下左右反転を左右反転して上下反転
 		assertTrue(bitMapEquals(original,
 			BitmapHelper.applyMirror(
-				BitmapHelper.applyMirror(flipBoth, IRendererCommon.MIRROR_HORIZONTAL),
-				IRendererCommon.MIRROR_VERTICAL)));
+				BitmapHelper.applyMirror(flipBoth, IMirror.MIRROR_HORIZONTAL),
+				IMirror.MIRROR_VERTICAL)));
 	}
 
 }

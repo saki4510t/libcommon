@@ -39,7 +39,7 @@ import java.lang.annotation.RetentionPolicy;
  * 分配描画インターフェース
  * FIXME GLPipeline/IPipelienSourceを使うIRendererHolder実装を作る
  */
-public interface IRendererHolder extends IRendererCommon {
+public interface IRendererHolder extends IMirror {
 	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;
 
 	public static final int OUTPUT_FORMAT_JPEG = 0;	// Bitmap.CompressFormat.JPEG

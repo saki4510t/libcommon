@@ -32,7 +32,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 
 import com.serenegiant.common.R;
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.NonNull;
@@ -45,7 +45,7 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
  * FIXME ViewTransformDelegaterを使うように変更する？AspectScaledTextureViewを継承しているから難しそう
  */
 public class ZoomAspectScaledTextureView
-	extends AspectScaledTextureView implements IRendererCommon {
+	extends AspectScaledTextureView implements IMirror {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = ZoomAspectScaledTextureView.class.getSimpleName();

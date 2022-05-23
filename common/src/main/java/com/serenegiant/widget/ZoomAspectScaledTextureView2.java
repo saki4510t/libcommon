@@ -34,7 +34,7 @@ import android.view.TextureView;
 import android.view.View;
 
 import com.serenegiant.common.R;
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.view.IViewTransformer;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.ViewTransformDelegater;
@@ -49,7 +49,7 @@ import static com.serenegiant.view.ViewTransformDelegater.*;
  * FIXME まだ挙動がおかしい
  */
 public class ZoomAspectScaledTextureView2
-	extends TransformTextureView implements IRendererCommon,
+	extends TransformTextureView implements IMirror,
 		TextureView.SurfaceTextureListener,
 		ViewTransformDelegater.ViewTransformListener,
 		IScaledView {

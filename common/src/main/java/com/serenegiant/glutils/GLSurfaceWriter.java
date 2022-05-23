@@ -257,7 +257,7 @@ public class GLSurfaceWriter {
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IRendererCommon.MIRROR_VERTICAL);
+					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 				}
 			}
 		}

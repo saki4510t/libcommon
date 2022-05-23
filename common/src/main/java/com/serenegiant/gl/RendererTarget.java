@@ -22,7 +22,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 import com.serenegiant.egl.EGLBase;
-import com.serenegiant.glutils.IRendererCommon;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
@@ -33,7 +33,7 @@ import androidx.annotation.Size;
  * Surface等の描画先のオブジェクトと関係する設定を保持するためのホルダークラス
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
-public class RendererTarget implements IRendererCommon {
+public class RendererTarget implements IMirror {
 
 	/**
 	 * ファクトリーメソッド
@@ -159,9 +159,9 @@ public class RendererTarget implements IRendererCommon {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mirror
 	 */
-	public void setMirror(@IRendererCommon.MirrorMode final int mirror) {
+	public void setMirror(@IMirror.MirrorMode final int mirror) {
 		@MirrorMode
-		final int _mirror = mirror % IRendererCommon.MIRROR_NUM;
+		final int _mirror = mirror % IMirror.MIRROR_NUM;
 		if (_mirror != mMirror) {
 			mMirror = _mirror;
 			GLUtils.setMirror(mMvpMatrix, _mirror);

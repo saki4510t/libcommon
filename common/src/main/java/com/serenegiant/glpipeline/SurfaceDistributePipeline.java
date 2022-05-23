@@ -34,7 +34,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.IRendererCommon.*;
+import static com.serenegiant.glutils.IMirror.*;
 
 /**
  * GLPipelineSourceで更新されたテクスチャをSurfaceへ分配描画するためのヘルパークラス

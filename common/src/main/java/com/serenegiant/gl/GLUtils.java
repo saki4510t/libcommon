@@ -52,7 +52,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.core.content.res.ResourcesCompat;
 
-import static com.serenegiant.glutils.IRendererCommon.*;
+import static com.serenegiant.glutils.IMirror.*;
 import static com.serenegiant.utils.BufferHelper.SIZEOF_FLOAT_BYTES;
 
 public class GLUtils implements GLConst {

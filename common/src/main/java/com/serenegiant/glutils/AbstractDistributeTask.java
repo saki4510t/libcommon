@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.glutils.IRendererCommon.*;
+import static com.serenegiant.glutils.IMirror.*;
 
 public abstract class AbstractDistributeTask {
 	private static final boolean DEBUG = false;	// set false on production
@@ -66,7 +66,7 @@ public abstract class AbstractDistributeTask {
 	private final SparseArray<RendererTarget>
 		mTargets = new SparseArray<>();
 	private int mVideoWidth, mVideoHeight;
-	@IRendererCommon.MirrorMode
+	@IMirror.MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mRotation = 0;
 	private volatile boolean mIsFirstFrameRendered;
@@ -325,7 +325,7 @@ public abstract class AbstractDistributeTask {
 		}
 	}
 
-	@IRendererCommon.MirrorMode
+	@IMirror.MirrorMode
 	public int mirror() {
 		return mMirror;
 	}

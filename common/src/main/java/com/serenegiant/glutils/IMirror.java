@@ -18,16 +18,15 @@ package com.serenegiant.glutils;
  *  limitations under the License.
 */
 
-import androidx.annotation.IntDef;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
+import androidx.annotation.IntDef;
+
 /**
- * @deprecated ミラー関係の定義だけになってるので廃止, 代わりにIMirrorを使うこと
+ * 映像のミラー処理用インターフェース
  */
-@Deprecated
-public interface IRendererCommon {
+public interface IMirror {
 	public static final int MIRROR_NORMAL = 0;
 	public static final int MIRROR_HORIZONTAL = 1;
 	public static final int MIRROR_VERTICAL = 2;

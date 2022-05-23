@@ -33,7 +33,7 @@ import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
-import com.serenegiant.glutils.IRendererCommon
+import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
@@ -99,7 +99,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 						+ MatrixUtils.toGLMatrixString(transform))
 					System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-					mDrawer!!.setMirror(IRendererCommon.MIRROR_VERTICAL)
+					mDrawer!!.setMirror(IMirror.MIRROR_VERTICAL)
 				}
 			}
 		})
