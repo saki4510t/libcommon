@@ -306,6 +306,17 @@ public abstract class AbstractDistributeTask implements IMirror {
 	}
 
 	/**
+	 * 分配描画用のSurfaceの数を取得
+	 * @return
+	 */
+	@AnyThread
+	public int getCount() {
+		synchronized (mTargets) {
+			return mTargets.size();
+		}
+	}
+
+	/**
 	 * リサイズ
 	 * @param width
 	 * @param height
