@@ -45,6 +45,7 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	 * ベンダー名・製品名・バージョン・シリアルを取得する
 	 * 新しいUsbDeviceInfoを生成して返す
 	 * #getDeviceInfo(final UsbManager, final UsbDevice, final UsbDeviceInfo)のラッパーメソッド
+	 * XXX 指定したUsbDeviceへのアクセスパーミッションがない場合に読めない情報があるので注意
 	 * @param context
 	 * @param device
 	 * @return
