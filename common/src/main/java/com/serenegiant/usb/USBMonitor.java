@@ -207,7 +207,7 @@ public final class USBMonitor implements Const {
 	 * 接続/切断およびパーミッション要求に成功した時のブロードキャストを受信するためのブロードキャストレシーバーを登録する
 	 * @throws IllegalStateException
 	 */
-	@SuppressLint("InlinedApi")
+	@SuppressLint({"InlinedApi", "WrongConstant"})
 	public synchronized void register() throws IllegalStateException {
 		if (destroyed) throw new IllegalStateException("already destroyed");
 		if (mPermissionIntent == null) {
@@ -449,7 +449,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 * @return true: 指定したUsbDeviceにパーミッションがある
 	 */
-	public final boolean hasPermission(final UsbDevice device) {
+	public boolean hasPermission(final UsbDevice device) {
 		return !destroyed
 			&& (device != null) && mUsbManager.hasPermission(device);
 	}
@@ -514,7 +514,7 @@ public final class USBMonitor implements Const {
 	 * @param context
 	 * @param intent
 	 */
-	protected void onReceive(final Context context, final Intent intent) {
+	private void onReceive(final Context context, final Intent intent) {
 		final String action = intent.getAction();
 		if (ACTION_USB_PERMISSION.equals(action)) {
 			// パーミッション要求の結果が返ってきた時
@@ -559,7 +559,7 @@ public final class USBMonitor implements Const {
 	 * ブロードキャスト受信用のIntentFilterを生成する
 	 * @return
 	 */
-	protected IntentFilter createIntentFilter() {
+	private IntentFilter createIntentFilter() {
 		final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		if (BuildCheck.isAndroid5()) {
 			filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
@@ -628,7 +628,7 @@ public final class USBMonitor implements Const {
 	 * パーミッション要求結果が返ってきた時の処理
 	 * @param device
 	 */
-	private final void processPermission(@NonNull final UsbDevice device) {
+	private void processPermission(@NonNull final UsbDevice device) {
 		mOnDeviceConnectListener.onPermission(device);
 	}
 
@@ -636,7 +636,7 @@ public final class USBMonitor implements Const {
 	 * 指定したUSB機器をopenした時の処理
 	 * @param device
 	 */
-	private final void processConnect(@NonNull final UsbDevice device,
+	private void processConnect(@NonNull final UsbDevice device,
 		@NonNull final UsbControlBlock ctrlBlock) {
 
 		if (destroyed) return;
@@ -659,7 +659,7 @@ public final class USBMonitor implements Const {
 	 * ユーザーキャンセル等でパーミッションを取得できなかったときの処理
 	 * @param device
 	 */
-	private final void processCancel(@NonNull final UsbDevice device) {
+	private void processCancel(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processCancel:");
 		mAsyncHandler.post(new Runnable() {
@@ -674,7 +674,7 @@ public final class USBMonitor implements Const {
 	 * 端末にUSB機器が接続されたときの処理
 	 * @param device
 	 */
-	private final void processAttach(@NonNull final UsbDevice device) {
+	private void processAttach(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processAttach:");
 		if (matches(device)) {
@@ -693,7 +693,7 @@ public final class USBMonitor implements Const {
 	 * 端末からUSB機器が取り外されたときの処理
 	 * @param device
 	 */
-	private final void processDettach(@NonNull final UsbDevice device) {
+	private void processDettach(@NonNull final UsbDevice device) {
 		if (destroyed) return;
 		if (DEBUG) Log.v(TAG, "processDettach:");
 		if (matches(device)) {
@@ -798,7 +798,7 @@ public final class USBMonitor implements Const {
 		private final SparseArray<SparseArray<UsbInterface>>
 			mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
 		@Nullable
-		protected UsbDeviceConnection mConnection;
+		private UsbDeviceConnection mConnection;
 
 		/**
 		 * 指定したUsbDeviceに関係づけたUsbControlBlockインスタンスを生成する
@@ -898,7 +898,7 @@ public final class USBMonitor implements Const {
 		}
 
 		@Nullable
-		public final UsbDevice getDevice() {
+		public UsbDevice getDevice() {
 			return mWeakDevice.get();
 		}
 
