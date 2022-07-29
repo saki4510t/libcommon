@@ -217,7 +217,7 @@ public class ConnectivityHelper {
 			mUIHandler.removeCallbacksAndMessages(null);
 			try {
 				mAsyncHandler.removeCallbacksAndMessages(null);
-				mAsyncHandler.getLooper().quit();
+				HandlerUtils.NoThrowQuit(mAsyncHandler);
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}

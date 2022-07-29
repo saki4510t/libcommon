@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import android.util.Log;
 
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -314,11 +315,7 @@ public class UdpBeacon {
 			mCallbacks.clear();
 			synchronized (mSync) {
 				if (mAsyncHandler != null) {
-					try {
-						mAsyncHandler.getLooper().quit();
-					} catch (final Exception e) {
-						// ignore
-					}
+					HandlerUtils.NoThrowQuit(mAsyncHandler);
 					mAsyncHandler = null;
 				}
 			}

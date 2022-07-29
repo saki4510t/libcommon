@@ -26,6 +26,7 @@ import android.util.Log;
 
 import com.serenegiant.io.ChannelHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -245,11 +246,7 @@ public abstract class AbstractChannelDataLink {
 				}
 			}
 			synchronized (this) {
-				try {
-					mSenderHandler.getLooper().quit();
-				} catch (final Exception e) {
-					// ignore
-				}
+				HandlerUtils.NoThrowQuit(mSenderHandler);
 			}
 			if (DEBUG) Log.v(TAG, "Client#internalRelease:finished");
 		}

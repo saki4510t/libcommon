@@ -34,6 +34,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -372,11 +373,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				mMaskTexId = -1;
 			}
 			if (mAsyncHandler != null) {
-				try {
-					mAsyncHandler.getLooper().quit();
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
+				HandlerUtils.NoThrowQuit(mAsyncHandler);
 				mAsyncHandler = null;
 			}
 			if (DEBUG) Log.v(TAG, "internalOnStop:finished");

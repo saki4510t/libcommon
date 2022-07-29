@@ -36,6 +36,7 @@ import android.widget.TextView;
 import com.serenegiant.common.R;
 import com.serenegiant.system.SAFUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
@@ -248,11 +249,7 @@ public class DocumentTreeRecyclerAdapter
 		synchronized (mSync) {
 			if (mAsyncHandler != null) {
 				mAsyncHandler.removeCallbacksAndMessages(null);
-				try {
-					mAsyncHandler.getLooper().quit();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
+				HandlerUtils.NoThrowQuit(mAsyncHandler);
 				mAsyncHandler = null;
 			}
 		}

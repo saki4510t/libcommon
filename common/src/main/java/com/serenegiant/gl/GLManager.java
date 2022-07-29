@@ -25,6 +25,7 @@ import android.view.Choreographer;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -201,7 +202,7 @@ public class GLManager {
 				public void run() {
 					mGLContext.release();
 					mGLHandler.removeCallbacksAndMessages(null);
-					mGLHandler.getLooper().quit();
+					HandlerUtils.NoThrowQuit(mGLHandler);
 				}
 			});
 		}

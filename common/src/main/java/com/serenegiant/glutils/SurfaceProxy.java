@@ -37,6 +37,7 @@ import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -225,11 +226,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					mImageReader = null;
 				}
 			}
-			try {
-				mAsyncHandler.getLooper().quit();
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
+			HandlerUtils.NoThrowQuit(mAsyncHandler);
 			super.internalRelease();
 		}
 

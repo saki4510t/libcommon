@@ -30,6 +30,7 @@ import androidx.annotation.WorkerThread
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
 import com.serenegiant.utils.HandlerThreadHandler
+import com.serenegiant.utils.HandlerUtils
 import java.io.IOException
 import java.util.concurrent.CopyOnWriteArraySet
 
@@ -120,7 +121,7 @@ class CameraDelegator(
 			if (mCameraHandler != null) {
 				if (DEBUG) Log.v(TAG, "release:")
 				mCameraHandler!!.removeCallbacksAndMessages(null)
-				mCameraHandler!!.looper.quit()
+				HandlerUtils.NoThrowQuit(mCameraHandler)
 				mCameraHandler = null
 			}
 		}

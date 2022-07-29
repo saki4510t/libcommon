@@ -28,6 +28,7 @@ import androidx.annotation.StringRes
 import androidx.fragment.app.Fragment
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.HandlerThreadHandler
+import com.serenegiant.utils.HandlerUtils
 
 open class BaseFragment : Fragment() {
 
@@ -93,11 +94,7 @@ open class BaseFragment : Fragment() {
 		mUIHandler.removeCallbacksAndMessages(null)
 		if (mAsyncHandler != null) {
 			mAsyncHandler!!.removeCallbacksAndMessages(null)
-			try {
-				mAsyncHandler!!.looper.quit()
-			} catch (e: Exception) {
-				if (DEBUG) Log.w(TAG, e)
-			}
+			HandlerUtils.NoThrowQuit(mAsyncHandler)
 			mAsyncHandler = null
 		}
 	}

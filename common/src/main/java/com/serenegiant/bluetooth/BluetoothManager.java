@@ -40,6 +40,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -202,11 +203,7 @@ public class BluetoothManager {
 				mState = STATE_RELEASED;
 				stop();
 				if (mAsyncHandler != null) {
-					try {
-						mAsyncHandler.getLooper().quit();
-					} catch (final Exception e) {
-						// ignore
-					}
+					HandlerUtils.NoThrowQuit(mAsyncHandler);
 					mAsyncHandler = null;
 				}
 				try {

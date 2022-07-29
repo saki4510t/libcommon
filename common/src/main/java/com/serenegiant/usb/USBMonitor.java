@@ -41,6 +41,7 @@ import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -185,11 +186,7 @@ public final class USBMonitor implements Const {
 					Log.e(TAG, "release:", e);
 				}
 			}
-			try {
-				mAsyncHandler.getLooper().quit();
-			} catch (final Exception e) {
-				Log.e(TAG, "release:", e);
-			}
+			HandlerUtils.NoThrowQuit(mAsyncHandler);
 		}
 	}
 

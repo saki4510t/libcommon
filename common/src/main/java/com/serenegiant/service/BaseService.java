@@ -42,6 +42,7 @@ import com.serenegiant.notification.NotificationFactory;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
 
 /**
  * サービスに各種ユーティリティーメソッドを追加
@@ -52,9 +53,13 @@ public abstract class BaseService extends LifecycleService {
 
 	private static final int NOTIFICATION_ID = R.string.service_name;
 
+	@NonNull
 	protected final Object mSync = new Object();
+	@NonNull
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
+	@Nullable
 	private Handler mAsyncHandler;
+	@Nullable
 	private LocalBroadcastManager mLocalBroadcastManager;
 	private volatile boolean mDestroyed;
 
@@ -83,11 +88,7 @@ public abstract class BaseService extends LifecycleService {
 			mUIHandler.removeCallbacksAndMessages(null);
 			if (mAsyncHandler != null) {
 				mAsyncHandler.removeCallbacksAndMessages(null);
-				try {
-					mAsyncHandler.getLooper().quit();
-				} catch (final Exception e) {
-					// ignore
-				}
+				HandlerUtils.NoThrowQuit(mAsyncHandler);
 				mAsyncHandler = null;
 			}
 			if (mLocalBroadcastManager != null) {
