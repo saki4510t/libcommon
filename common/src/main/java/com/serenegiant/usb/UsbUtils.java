@@ -122,6 +122,8 @@ public class UsbUtils implements Const {
 
 	/**
 	 * UAC機器かどうかを取得
+	 * FIXME UACブラックリスト機器(UAC対応のインターフェースを持ってるけど
+	 *       使おうとすると動かない・ストールする・クラッシュする機器)をオミットする仕組みを作る
 	 * @param device
 	 * @return
 	 */
