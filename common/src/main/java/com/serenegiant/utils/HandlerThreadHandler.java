@@ -191,29 +191,14 @@ public class HandlerThreadHandler extends Handler {
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public void quitSafely() throws IllegalStateException {
-		final Looper looper = getLooper();
-		if (looper != null) {
-			looper.quitSafely();
-		} else {
-			throw new IllegalStateException("has no looper");
-		}
+		getLooper().quitSafely();
 	}
 	
 	public void quit() throws IllegalStateException {
-		final Looper looper = getLooper();
-		if (looper != null) {
-			looper.quit();
-		} else {
-			throw new IllegalStateException("has no looper");
-		}
+		getLooper().quit();
 	}
 	
 	public boolean isCurrentThread() throws IllegalStateException {
-		final Looper looper = getLooper();
-		if (looper != null) {
-			return mId == Thread.currentThread().getId();
-		} else {
-			throw new IllegalStateException("has no looper");
-		}
+		return mId == Thread.currentThread().getId();
 	}
 }
