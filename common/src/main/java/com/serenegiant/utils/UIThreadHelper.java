@@ -41,7 +41,7 @@ public final class UIThreadHelper {
 	 * UIスレッドでRunnableを実行するためのヘルパーメソッド
 	 * @param task
 	 */
-	public static final void runOnUiThread(@NonNull final Runnable task) {
+	public static void runOnUiThread(@NonNull final Runnable task) {
 		if (Thread.currentThread() != sUiThread) {
 			sUIHandler.post(task);
 		} else {
@@ -53,7 +53,7 @@ public final class UIThreadHelper {
 		}
 	}
 
-	public static final void runOnUiThread(@NonNull final Runnable task, final long duration) {
+	public static void runOnUiThread(@NonNull final Runnable task, final long duration) {
 		if ((duration > 0) || Thread.currentThread() != sUiThread) {
 			sUIHandler.postDelayed(task, duration);
 		} else {
@@ -65,7 +65,7 @@ public final class UIThreadHelper {
 		}
 	}
 
-	public static final void removeFromUiThread(@NonNull final Runnable task) {
+	public static void removeFromUiThread(@NonNull final Runnable task) {
 		sUIHandler.removeCallbacks(task);
 	}
 }
