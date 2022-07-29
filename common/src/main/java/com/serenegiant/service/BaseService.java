@@ -38,7 +38,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.common.R;
-import com.serenegiant.notification.NotificationFactory;
+import com.serenegiant.notification.NotificationFactoryCompat;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -253,7 +253,7 @@ public abstract class BaseService extends LifecycleService {
 		final PendingIntent intent) {
 
 		showNotification(notificationId, title, content,
-			new NotificationFactory(this, channelId, channelId, 0,
+			new NotificationFactoryCompat(this, channelId, channelId, 0,
 				groupId, groupName, smallIconId, largeIconId) {
 
 				@Override
@@ -280,7 +280,7 @@ public abstract class BaseService extends LifecycleService {
 	 */
 	protected void showNotification(final int notificationId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
-		@NonNull final NotificationFactory factory) {
+		@NonNull final NotificationFactoryCompat factory) {
 	
 		if (DEBUG) Log.v(TAG, "showNotification:");
 		final NotificationManager manager

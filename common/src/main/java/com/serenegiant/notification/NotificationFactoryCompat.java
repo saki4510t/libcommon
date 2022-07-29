@@ -18,42 +18,36 @@ package com.serenegiant.notification;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
 import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationChannelGroup;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.common.R;
 import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
 
 import java.util.List;
 
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
+import androidx.core.app.NotificationChannelCompat;
+import androidx.core.app.NotificationChannelGroupCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 
 /**
  * Notification生成用のファクトリークラス
- * @deprecated NotificationFactoryCompatを使うこと
+ * NotificationFactoryをandroidxのNotification関係のcompat系を使って実装しなおした
  */
-@SuppressWarnings("deprecation")
-@Deprecated
-public class NotificationFactory {
+public class NotificationFactoryCompat {
 	private static final boolean DEBUG = false;	// set false on production
-	private static final String TAG = NotificationFactory.class.getSimpleName();
+	private static final String TAG = NotificationFactoryCompat.class.getSimpleName();
 
 	@NonNull
 	protected final Context context;
@@ -77,14 +71,13 @@ public class NotificationFactory {
 	 * @param channelTitle
 	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
 	 */
-	@SuppressLint("InlinedApi")
-	public NotificationFactory(
+	public NotificationFactoryCompat(
 		@NonNull final Context context,
 		@NonNull final String channelId, @Nullable final String channelTitle,
 		@DrawableRes final int smallIconId) {
 
 		this(context, channelId, channelId,
-			BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
+			NotificationManagerCompat.IMPORTANCE_NONE,
 			null, null, smallIconId, R.drawable.ic_notification);
 	}
 
@@ -95,14 +88,13 @@ public class NotificationFactory {
 	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
 	 * @param largeIconId
 	 */
-	@SuppressLint("InlinedApi")
-	public NotificationFactory(
+	public NotificationFactoryCompat(
 		@NonNull final Context context,
 		@NonNull final String channelId, @Nullable final String channelTitle,
 		@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
 
 		this(context, channelId, channelId,
-			BuildCheck.isAndroid7() ? NotificationManager.IMPORTANCE_NONE : 0,
+			NotificationManagerCompat.IMPORTANCE_NONE,
 			null, null, smallIconId, largeIconId);
 	}
 
@@ -116,7 +108,7 @@ public class NotificationFactory {
 	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ(IllegalArgumentExceptionを投げる)
 	 * @param largeIconId
 	 */
-	public NotificationFactory(
+	public NotificationFactoryCompat(
 		@NonNull final Context context,
 		@NonNull final String channelId,
 		@Nullable final String channelTitle,
@@ -148,7 +140,7 @@ public class NotificationFactory {
 //				if (DEBUG) Log.d(TAG, "createNotificationBuilder:failed to load small icon, try load as VectorDrawableCompat", e);
 				drawable = VectorDrawableCompat.create(context.getResources(), smallIconId, null);
 			}
-//				if (DEBUG) Log.v(TAG, "createNotificationBuilder:smallIcon=" + drawable);
+//			if (DEBUG) Log.v(TAG, "createNotificationBuilder:smallIcon=" + drawable);
 			if (drawable instanceof VectorDrawableCompat) {
 				throw new IllegalArgumentException("Can't use vector drawable as small icon before API21!");
 			}
@@ -169,16 +161,12 @@ public class NotificationFactory {
 	 * @param content
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	@NonNull
 	public Notification createNotification(
 		@NonNull final CharSequence title, @NonNull final CharSequence content) {
 
 		if (DEBUG) Log.v(TAG, "createNotification:");
-		if (BuildCheck.isOreo()) {
-			createNotificationChannel(context);
-		}
-
+		createNotificationChannel(context);
 		final NotificationCompat.Builder builder
 			= createNotificationBuilder(context, title, content);
 
@@ -187,7 +175,7 @@ public class NotificationFactory {
 	}
 
 	/**
-	 * Android 8以降用にNotificationChannelを生成する処理
+	 * NotificationChannelを生成する処理
 	 * NotificationManager#getNotificationChannelがnullを
 	 * 返したときのみ新規に作成する
 	 * #createNotificationrから呼ばれる
@@ -201,21 +189,20 @@ public class NotificationFactory {
 	 * @param context
 	 * @return
 	 */
-	@RequiresApi(Build.VERSION_CODES.O)
 	protected void createNotificationChannel(
 		@NonNull final Context context) {
 
 		if (DEBUG) Log.v(TAG, "createNotificationChannel:");
-		final NotificationManager manager
-			= ContextUtils.requireSystemService(context, NotificationManager.class);
+		final NotificationManagerCompat manager = NotificationManagerCompat.from(context);
 		if (manager.getNotificationChannel(channelId) == null) {
-			final NotificationChannel channel
-				= new NotificationChannel(channelId, channelTitle, importance);
+			final NotificationChannelCompat.Builder builder
+				= new NotificationChannelCompat.Builder(channelId, importance);
+			builder.setName(channelTitle);
 			if (!TextUtils.isEmpty(groupId)) {
 				createNotificationChannelGroup(context, groupId, groupName);
-				channel.setGroup(groupId);
+				builder.setGroup(groupId);
 			}
-			channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+			final NotificationChannelCompat channel = builder.build();
 			manager.createNotificationChannel(setupNotificationChannel(channel));
 		}
 	}
@@ -229,10 +216,9 @@ public class NotificationFactory {
 	 * @param channel
 	 * @return
 	 */
-	@RequiresApi(Build.VERSION_CODES.O)
 	@NonNull
-	protected NotificationChannel setupNotificationChannel(
-		@NonNull final NotificationChannel channel) {
+	protected NotificationChannelCompat setupNotificationChannel(
+		@NonNull final NotificationChannelCompat channel) {
 
 		if (DEBUG) Log.v(TAG, "setupNotificationChannel:");
 		return channel;
@@ -254,28 +240,28 @@ public class NotificationFactory {
 	 * @param groupName
 	 * @return
 	 */
-	@RequiresApi(Build.VERSION_CODES.O)
 	protected void createNotificationChannelGroup(
 		@NonNull final Context context,
 		@Nullable final String groupId, @Nullable final String groupName) {
 
 		if (DEBUG) Log.v(TAG, "createNotificationChannelGroup:groupId=" + groupId);
 		if (!TextUtils.isEmpty(groupId)) {
-			final NotificationManager manager
-				= ContextUtils.requireSystemService(context, NotificationManager.class);
-			final List<NotificationChannelGroup> groups
-				= manager.getNotificationChannelGroups();
+			final NotificationManagerCompat manager = NotificationManagerCompat.from(context);
+			final List<NotificationChannelGroupCompat> groups
+				= manager.getNotificationChannelGroupsCompat();
 
-			NotificationChannelGroup found = null;
-			for (final NotificationChannelGroup group: groups) {
+			NotificationChannelGroupCompat found = null;
+			for (final NotificationChannelGroupCompat group: groups) {
 				if (groupId.equals(group.getId())) {
 					found = group;
 					break;
 				}
 			}
 			if (found == null) {
-				found = new NotificationChannelGroup(groupId,
-					TextUtils.isEmpty(groupName) ? groupId : groupName);
+				final NotificationChannelGroupCompat.Builder builder
+					= new NotificationChannelGroupCompat.Builder(groupId);
+				builder.setName(TextUtils.isEmpty(groupName) ? groupId : groupName);
+				found = builder.build();
 				manager.createNotificationChannelGroup(
 					setupNotificationChannelGroup(found));
 			}
@@ -283,7 +269,7 @@ public class NotificationFactory {
 	}
 
 	/**
-	 * Android 8以降用にNotificationChannelGroupを生成する処理
+	 * NotificationChannelGroupを生成する処理
 	 * NotificationManager#getNotificationChannelGroupsに同じグループidの
 	 * ものが存在しない時のみ新規に作成する
 	 * NotificationManager#createNotificationChannelGroupが呼ばれる直前に
@@ -291,43 +277,30 @@ public class NotificationFactory {
 	 * @param group
 	 * @return
 	 */
-	@RequiresApi(Build.VERSION_CODES.O)
 	@NonNull
-	protected NotificationChannelGroup setupNotificationChannelGroup(
-		@NonNull final NotificationChannelGroup group) {
+	protected NotificationChannelGroupCompat setupNotificationChannelGroup(
+		@NonNull final NotificationChannelGroupCompat group) {
 
 		return group;
 	}
 
-	@SuppressLint("InlinedApi")
 	@NonNull
-	protected NotificationBuilder createNotificationBuilder(
+	protected NotificationCompat.Builder createNotificationBuilder(
 		@NonNull final Context context,
 		@NonNull final CharSequence title, @NonNull final CharSequence content) {
 
 		if (DEBUG) Log.v(TAG, "createNotificationBuilder:");
-		final NotificationBuilder builder
-			= new NotificationBuilder(context, channelId, smallIconId) {
-			@Override
-			protected PendingIntent createContentIntent() {
-				return NotificationFactory.this.createContentIntent();
-			}
-		};
+		final NotificationCompat.Builder builder
+			= new NotificationCompat.Builder(context, channelId);
 		builder.setContentTitle(title)
 			.setContentText(content)
+			.setContentIntent(createContentIntent())
+			.setDeleteIntent(createDeleteIntent())
 			.setSmallIcon(smallIconId)  // the status icon
 			.setStyle(new NotificationCompat.BigTextStyle()
 				.setBigContentTitle(title)
 				.bigText(content)
 				.setSummaryText(content));
-		final PendingIntent contentIntent = createContentIntent();
-		if (contentIntent != null) {
-			builder.setContentIntent(contentIntent);
-		}
-		final PendingIntent deleteIntent = createDeleteIntent();
-		if (deleteIntent != null) {
-			builder.setDeleteIntent(deleteIntent);
-		}
 		if (!TextUtils.isEmpty(groupId)) {
 			builder.setGroup(groupId);
 			// XXX 最初だけbuilder.setGroupSummaryが必要かも?
