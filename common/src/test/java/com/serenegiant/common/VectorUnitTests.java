@@ -310,7 +310,7 @@ public class VectorUnitTests {
 
 		final Vector v1 = new Vector(100, 200, 300);
 		// 長さは違うけど方向は同じベクトルとの角度
-		assertEquals(0.0f, v1.getAngle(v0), EPS);
+		assertEquals(0.0f, v1.angle(v0), EPS);
 
 		// 2次元(xy平面)
 		v0.set(10, 20, 0);
@@ -318,14 +318,14 @@ public class VectorUnitTests {
 		double cos = (v0.x * v1.x + v0.y * v1.y)
 			/ (Math.sqrt(v0.x * v0.x + v0.y * v0.y)
 				* Math.sqrt(v1.x * v1.x + v1.y * v1.y));
-		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.getAngle(v0), EPS);
+		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.angle(v0), EPS);
 
 		v0.set(10, 20, 0);
 		v1.set(40, 50, 0);
 		cos = (v0.x * v1.x + v0.y * v1.y)
 			/ (Math.sqrt(v0.x * v0.x + v0.y * v0.y)
 				* Math.sqrt(v1.x * v1.x + v1.y * v1.y));
-		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.getAngle(v0), EPS);
+		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.angle(v0), EPS);
 
 		// 3次元
 		v0.set(10, 20, 30);
@@ -333,7 +333,7 @@ public class VectorUnitTests {
 		cos = (v0.x * v1.x + v0.y * v1.y + v0.z * v1.z)
 			/ (Math.sqrt(v0.x * v0.x + v0.y * v0.y + v0.z * v0.z)
 				* Math.sqrt(v1.x * v1.x + v1.y * v1.y + v1.z * v1.z));
-		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.getAngle(v0), EPS);
+		assertEquals((float)(Math.acos(cos) * Vector.TO_DEGREE), v1.angle(v0), EPS);
 	}
 
 	@Test
