@@ -109,7 +109,7 @@ fun <E: Enum<E>> asEnum(id: Int, clazz: Class<Enum<E>>): Enum<E> {
  * @param id
  * @param label
  */
-fun <E: Enum<E>> asEnum(id: Int, label: String, clazz: Class<Enum<E>>): Enum<E> {
+fun <E: Enum<E>> asEnum(id: Int, label: String?, clazz: Class<Enum<E>>): Enum<E> {
 	try {
 		// 最初にidで探す
 		return asEnum(id, clazz)
@@ -117,7 +117,11 @@ fun <E: Enum<E>> asEnum(id: Int, label: String, clazz: Class<Enum<E>>): Enum<E> 
 		// ignore
 	}
 	// 見つからなければlabelで探す
-	return asEnum(label, clazz)
+	if (label != null) {
+		return asEnum(label, clazz)
+	} else {
+		throw NoSuchElementException()
+	}
 }
 
 /**
@@ -196,7 +200,7 @@ fun <E: Enum<E>> asEnum(id: Int, a: Enum<E>): Enum<E> {
  * @param label
  * @param a enumの型を判定するためのオブジェクト 本当はClass<Enum<E>>とかを渡したいけどうまくいかなかった
  */
-fun <E: Enum<E>> asEnum(id: Int, label: String, a: Enum<E>): Enum<E> {
+fun <E: Enum<E>> asEnum(id: Int, label: String?, a: Enum<E>): Enum<E> {
 	try {
 		// 最初にidで探す
 		return asEnum(id, a)
@@ -204,5 +208,9 @@ fun <E: Enum<E>> asEnum(id: Int, label: String, a: Enum<E>): Enum<E> {
 		// ignore
 	}
 	// 見つからなければlabelで探す
-	return asEnum(label, a)
+	if (label != null) {
+		return asEnum(label, a)
+	} else {
+		throw NoSuchElementException()
+	}
 }
