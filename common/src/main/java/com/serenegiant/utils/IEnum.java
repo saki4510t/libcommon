@@ -54,7 +54,6 @@ public class IEnum {
 	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final int id)
 		throws IllegalArgumentException {
 
-		E result;
 		for (final E e: enumClazz.getEnumConstants()) {
 			if (e.id() == id) {
 				return e;
@@ -73,7 +72,6 @@ public class IEnum {
 	public static <E extends EnumInterface> E as(final Class<E> enumClazz, final String label)
 		throws IllegalArgumentException {
 
-		E result;
 		if (!TextUtils.isEmpty(label)) {
 			for (final E e: enumClazz.getEnumConstants()) {
 				if (label.equalsIgnoreCase(e.label())) {
