@@ -382,6 +382,15 @@ public class GLDrawer2D implements GLConst {
 	}
 
 	/**
+	 * GLTextureオブジェクトを描画するためのヘルパーメソッド
+	 * GLTextureオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
+	 * @param texture
+	 */
+	public void draw(@NonNull final GLTexture texture) {
+		draw(texture.getTexUnit(), texture.getTexId(), texture.getTexMatrix(), 0, mMvpMatrix, 0);
+	}
+
+	/**
 	 * 描画処理
 	 * @param texUnit
 	 * @param texId
