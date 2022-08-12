@@ -271,11 +271,6 @@ public class DrawerPipeline extends ProxyPipeline
 		}
 	}
 
-	@Override
-	public void setParent(@Nullable final GLPipeline parent) {
-		super.setParent(parent);
-	}
-
 	private int cnt;
 	@WorkerThread
 	@Override
