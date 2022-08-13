@@ -38,6 +38,14 @@ public final class UIThreadHelper {
 	private static final Thread sUiThread = sUIHandler.getLooper().getThread();
 
 	/**
+	 * 内部で保持しているHandlerを取得
+	 * @return
+	 */
+	public static Handler getHandler() {
+		return sUIHandler;
+	}
+
+	/**
 	 * UIスレッドでRunnableを実行するためのヘルパーメソッド
 	 * @param task
 	 */
@@ -53,6 +61,11 @@ public final class UIThreadHelper {
 		}
 	}
 
+	/**
+	 * UIスレッドでRunnableを実行するためのヘルパーメソッド
+	 * @param task
+	 * @param duration
+	 */
 	public static void runOnUiThread(@NonNull final Runnable task, final long duration) {
 		if ((duration > 0) || Thread.currentThread() != sUiThread) {
 			sUIHandler.postDelayed(task, duration);
@@ -65,7 +78,19 @@ public final class UIThreadHelper {
 		}
 	}
 
+	/**
+	 * 指定したRunnableが未実行であれば実行待ちキューから取り除く
+	 * @param task
+	 */
 	public static void removeFromUiThread(@NonNull final Runnable task) {
 		sUIHandler.removeCallbacks(task);
 	}
+
+	/**
+	 * 実行待ちキューから未実行のタスク・メッセージを全て取り除く
+	 */
+	public static void removeAllFromUiThread() {
+		sUIHandler.removeCallbacksAndMessages(null);
+	}
+
 }
