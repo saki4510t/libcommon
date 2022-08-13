@@ -57,7 +57,7 @@ public class BrightnessHelper {
 	 * @param activity
 	 * @return
 	 */
-	public float getBrightness(@NonNull final Activity activity) {
+	public static float getBrightness(@NonNull final Activity activity) {
 		final WindowManager.LayoutParams lp = activity.getWindow().getAttributes();
 		return lp.screenBrightness;
 	}
