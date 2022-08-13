@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
+import com.serenegiant.libcommon.databinding.FragmentItemListBinding
 import com.serenegiant.libcommon.list.DummyContent
 import com.serenegiant.libcommon.list.DummyContent.DummyItem
 import com.serenegiant.libcommon.list.MyItemRecyclerViewAdapter
@@ -40,6 +41,7 @@ import com.serenegiant.libcommon.list.MyItemRecyclerViewAdapter
  */
 class TitleFragment: BaseFragment() {
 
+	private lateinit var list: RecyclerView
 	private var mColumnCount = 1
 	private var mListener: OnListFragmentInteractionListener? = null
 
@@ -62,22 +64,26 @@ class TitleFragment: BaseFragment() {
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
-
-		return inflater.inflate(R.layout.fragment_item_list, container, false)
+		return FragmentItemListBinding.inflate(inflater, container, false)
+		.apply {
+			this@TitleFragment.list = list
+			list.run {
+				// Set the adapter
+				layoutManager = if (mColumnCount <= 1) {
+					LinearLayoutManager(context)
+				} else {
+					GridLayoutManager(context, mColumnCount)
+				}
+				adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener)
+			}
+		}
+		.run {
+			root
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		// Set the adapter
-		if (view is RecyclerView) {
-			val context = view.getContext()
-			if (mColumnCount <= 1) {
-				view.layoutManager = LinearLayoutManager(context)
-			} else {
-				view.layoutManager = GridLayoutManager(context, mColumnCount)
-			}
-			view.adapter = MyItemRecyclerViewAdapter(DummyContent.ITEMS, mListener)
-		}
 	}
 
 	override fun internalOnResume() {
