@@ -49,7 +49,7 @@ import androidx.vectordrawable.graphics.drawable.VectorDrawableCompat;
 /**
  * 進捗表示用のView
  */
-public class ProgressView extends View {
+public class ProgressView extends View implements IProgressView {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ProgressView.class.getSimpleName();
 
@@ -218,6 +218,16 @@ public class ProgressView extends View {
 			}
 		}
 	}
+
+	/**
+	 * 現在のprogress値を取得
+	 * @return
+	 */
+	public int getProgress() {
+		synchronized (mSync) {
+			return mProgress;
+		}
+ 	}
 
 	/**
 	 * progressをUIスレッド上で更新するためのRunnable実装
