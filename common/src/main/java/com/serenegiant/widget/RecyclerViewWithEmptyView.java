@@ -129,10 +129,14 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 	@Override
 	protected void onAttachedToWindow() {
 		super.onAttachedToWindow();
-		// empty viewを探す
-		final int[] ids = new int[] {mEmptyViewId, R.id.empty, android.R.id.empty};
-		final View emptyView = ViewUtils.findViewInParent(this, ids, View.class);
-		setEmptyView(emptyView);
+		if (mEmptyView == null) {
+			// #setEmptyViewでempty viewが割り当てられていないときのみ
+			// empty viewを探す
+			final int[] ids = new int[] {mEmptyViewId, R.id.empty, android.R.id.empty};
+			final View emptyView = ViewUtils.findViewInParent(this, ids, View.class);
+			if (DEBUG) Log.v(TAG, "onAttachedToWindow:" + emptyView);
+			setEmptyView(emptyView);
+		}
 	}
 
 	public void setEmptyView(final View empty_view) {
