@@ -66,6 +66,12 @@ class TitleFragment: BaseFragment() {
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 		return FragmentItemListBinding.inflate(inflater, container, false)
 		.apply {
+			swipeRefresh.setOnRefreshListener {
+				// 何もしてないけどしたつもりになってちょっと待ってからプログレス表示を非表示にする
+				runOnUiThread({
+					swipeRefresh.isRefreshing = false
+				}, 1000)
+			}
 			this@TitleFragment.list = list
 			list.run {
 				// Set the adapter
