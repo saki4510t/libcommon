@@ -552,7 +552,7 @@ public class ViewUtils {
 
 		T result = null;
 LOOP:	for (final int id: ids) {
-			if (id == View.NO_ID) continue;;
+			if (id == View.NO_ID) continue;
 			final View v = view.findViewById(id);
 			if (clazz.isInstance(v)) {
 				result = (T)v;
