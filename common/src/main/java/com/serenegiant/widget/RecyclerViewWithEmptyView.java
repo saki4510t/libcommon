@@ -83,10 +83,10 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 		if (attrs != null) {
 			int defStyleRes = 0;
 			final TypedArray attribs = context.getTheme().obtainStyledAttributes(
-				attrs, R.styleable.RecycleViewWithEmptyView, defStyle, defStyleRes);
+				attrs, R.styleable.RecyclerViewWithEmptyView, defStyle, defStyleRes);
 			try {
-				if (attribs.hasValue(R.styleable.RecycleViewWithEmptyView_listDivider)) {
-					divider = attribs.getDrawable(R.styleable.RecycleViewWithEmptyView_listDivider);
+				if (attribs.hasValue(R.styleable.RecyclerViewWithEmptyView_listDivider)) {
+					divider = attribs.getDrawable(R.styleable.RecyclerViewWithEmptyView_listDivider);
 				}
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);

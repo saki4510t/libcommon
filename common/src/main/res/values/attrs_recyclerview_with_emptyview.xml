@@ -3,10 +3,6 @@
 	<attr name="listDivider" format="color|reference" value="@null" />
 	<attr name="emptyView" format="reference" value="@null" />
 
-	<declare-styleable name="RecycleViewWithEmptyView">
-		<attr name="listDivider" />
-	</declare-styleable>
-
 	<declare-styleable name="RecyclerViewWithEmptyView">
 		<attr name="listDivider" />
 		<attr name="emptyView" />
