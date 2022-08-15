@@ -587,24 +587,29 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	private void startScaleUpAnimation(AnimationListener listener) {
-		mCircleView.setVisibility(View.VISIBLE);
-		setProgressAlpha(MAX_ALPHA);
-//		mProgress.setAlpha(MAX_ALPHA);
-		mScaleAnimation = new Animation() {
-			@Override
-			public void applyTransformation(float interpolatedTime, Transformation t) {
-				setAnimationProgress(interpolatedTime);
+		// 画面回転したときに外部指定のプログレスビューが
+		// セットされていなくてクラッシュする可能性があるので
+		// nullチェックを追加
+		if (mCircleView != null) {
+			mCircleView.setVisibility(View.VISIBLE);
+			setProgressAlpha(MAX_ALPHA);
+//			mProgress.setAlpha(MAX_ALPHA);
+			mScaleAnimation = new Animation() {
+				@Override
+				public void applyTransformation(float interpolatedTime, Transformation t) {
+					setAnimationProgress(interpolatedTime);
+				}
+			};
+			mScaleAnimation.setDuration(mMediumAnimationDuration);
+			if ((mCircleView instanceof IAnimationView) && (listener != null)) {
+				((IAnimationView) mCircleView).setAnimationListener(listener);
 			}
-		};
-		mScaleAnimation.setDuration(mMediumAnimationDuration);
-		if ((mCircleView instanceof IAnimationView) && (listener != null)) {
-			((IAnimationView) mCircleView).setAnimationListener(listener);
+//			if (listener != null) {
+//				mCircleView.setAnimationListener(listener);
+//			}
+			mCircleView.clearAnimation();
+			mCircleView.startAnimation(mScaleAnimation);
 		}
-//		if (listener != null) {
-//			mCircleView.setAnimationListener(listener);
-//		}
-		mCircleView.clearAnimation();
-		mCircleView.startAnimation(mScaleAnimation);
 	}
 
 	/**
@@ -1521,12 +1526,17 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	void setTargetOffsetTopAndBottom(int offset) {
-		mCircleView.bringToFront();
-		if (mOwnProgressView) {
-			// 内部生成したprogress viewを使うとき
-			ViewCompat.offsetTopAndBottom(mCircleView, offset);
+		// 画面回転したときに外部指定のプログレスビューが
+		// セットされていなくてクラッシュする可能性があるので
+		// nullチェックを追加
+		if (mCircleView != null) {
+			mCircleView.bringToFront();
+			if (mOwnProgressView) {
+				// 内部生成したprogress viewを使うとき
+				ViewCompat.offsetTopAndBottom(mCircleView, offset);
+			}
+			mCurrentTargetOffsetTop = mCircleView.getTop();
 		}
-		mCurrentTargetOffsetTop = mCircleView.getTop();
 	}
 
 	private void onSecondaryPointerUp(MotionEvent ev) {
