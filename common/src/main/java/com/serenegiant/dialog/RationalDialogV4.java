@@ -24,6 +24,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -94,6 +95,10 @@ public class RationalDialogV4 extends DialogFragmentEx {
 			new RationalResource(R.string.permission_title, R.string.permission_network_state_reason));
 		mRationalResources.put(Manifest.permission.CHANGE_NETWORK_STATE,
 			new RationalResource(R.string.permission_title, R.string.permission_change_network_state_reason));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			mRationalResources.put(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+				new RationalResource(R.string.permission_title, R.string.permission_access_background_location));
+		}
 	}
 
 	/**

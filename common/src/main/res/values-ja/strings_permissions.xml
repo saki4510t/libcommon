@@ -57,6 +57,7 @@
 	<string name="permission_location_reason">位置情報を保存するために位置情報へのアクセス許可が必要です。</string>
 	<string name="permission_location_request">位置情報を保存するために位置情報へのアクセス許可が必要です。</string>
 	<string name="permission_location_finish">位置情報へのアクセス許可がありません。\n終了します。</string>
+	<string name="permission_access_background_location">Android10以降ではバックグラウンドアプリから位置情報へアクセスする許可が必要です。</string>
 	<!-- カメラアクセスのパーミッション -->
 	<string name="permission_camera">内蔵カメラへのアクセス許可がありません。</string>
 	<string name="permission_camera_finish">内蔵カメラへのアクセス許可がありません。\n終了します</string>

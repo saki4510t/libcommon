@@ -57,6 +57,7 @@
 	<string name="permission_location_reason">Location access permission is necessary to save location.</string>
 	<string name="permission_location_request">Location access permission is necessary to save location.</string>
 	<string name="permission_location_finish">No location access permission. \nApp will finish soon</string>
+	<string name="permission_access_background_location">Background location access permission is necessary on Android10 and later devices.</string>
 	<!-- カメラアクセスのパーミッション -->
 	<string name="permission_camera">No camera access permission</string>
 	<string name="permission_camera_finish">No camera access permission. \nApp will finish soon</string>
