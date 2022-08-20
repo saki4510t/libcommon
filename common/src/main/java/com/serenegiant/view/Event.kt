@@ -36,13 +36,13 @@ typealias LiveDataEvent<T> = LiveData<Event<T>>
 typealias MutableLiveDataEvent<T> = MutableLiveData<Event<T>>
 
 fun <T> LiveData<Event<T>>.observeEvent(owner: LifecycleOwner, observer: Observer<in T>) {
-    observe(owner, {
+    observe(owner) {
         check(it is EventImpl)
         if (!it.consumed) {
             it.consumed = true
             observer.onChanged(it.value)
         }
-    })
+    }
 }
 
 @MainThread

@@ -38,9 +38,9 @@ fun View.setupSnackbar(
 	lifecycleOwner: LifecycleOwner,
 	snackbarEvent: LiveData<Event<CharSequence>>, duration: Int,
 	callback: Snackbar.Callback? = null) {
-    snackbarEvent.observeEvent(lifecycleOwner, {
+    snackbarEvent.observeEvent(lifecycleOwner) {
 		showSnackbar(it, duration, callback)
-	})
+	}
 }
 
 /**
