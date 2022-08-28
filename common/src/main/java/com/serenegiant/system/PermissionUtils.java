@@ -830,7 +830,7 @@ public class PermissionUtils {
 	 */
 	public static boolean hasAccessLocation(@Nullable final Context context) {
 		return hasPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION)
-			&& hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+			|| hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
 	}
 
 	/**
