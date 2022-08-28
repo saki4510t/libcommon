@@ -32,7 +32,9 @@ public abstract class DialogFragmentEx extends DialogFragment {
 
 	protected static final String ARGS_KEY_REQUEST_CODE = "requestCode";
 	protected static final String ARGS_KEY_ID_TITLE = "title";
+	protected static final String ARGS_KEY_ID_TITLE_STRING = "title_string";
 	protected static final String ARGS_KEY_ID_MESSAGE = "message";
+	protected static final String ARGS_KEY_ID_MESSAGE_STRING = "message_string";
 	protected static final String ARGS_KEY_TAG = "tag";
 
 	@Override
