@@ -63,14 +63,38 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	 * ダイアログ表示用の文字列リソースのホルダークラス
 	 */
 	private static class RationalResource {
+		@NonNull
+		private final String permission;
 		@StringRes
-		public final int titleRes;
+		private final int titleRes;
 		@StringRes
-		public final int messageRes;
+		private final int messageRes;
 
-		public RationalResource(@StringRes final int titleRes, @StringRes final int messageRes) {
+		public RationalResource(
+			@NonNull final String permission,
+			@StringRes final int titleRes, @StringRes final int messageRes) {
+			this.permission = permission;
 			this.titleRes = titleRes;
 			this.messageRes = messageRes;
+		}
+
+		public CharSequence getTitle(@NonNull final Context context) {
+			return context.getText(titleRes);
+		}
+
+		public CharSequence getMessage(@NonNull final Context context) {
+
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+				// Android11/API30以上
+				if (Manifest.permission.ACCESS_BACKGROUND_LOCATION.equals(permission)) {
+					// Android11/API30以上でバッググラウンドでの位置情報取得パーミッションの時
+					// Android10/API29の時はgetBackgroundPermissionOptionLabelが使えないので
+					// 置換無しのリソース文字列なのでここでは処理しない
+					return context.getString(messageRes,
+						context.getPackageManager().getBackgroundPermissionOptionLabel());
+				}
+			}
+			return context.getText(messageRes);
 		}
 	}
 
@@ -80,24 +104,39 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	private static final Map<String, RationalResource> mRationalResources = new HashMap<>();
 	static {
 		mRationalResources.put(Manifest.permission.CAMERA,
-			new RationalResource(R.string.permission_title, R.string.permission_camera_reason));
+			new RationalResource(Manifest.permission.CAMERA,
+				R.string.permission_title, R.string.permission_camera_reason));
 		mRationalResources.put(Manifest.permission.WRITE_EXTERNAL_STORAGE,
-			new RationalResource(R.string.permission_title, R.string.permission_ext_storage_reason));
+			new RationalResource(Manifest.permission.WRITE_EXTERNAL_STORAGE,
+				R.string.permission_title, R.string.permission_ext_storage_reason));
 		mRationalResources.put(Manifest.permission.READ_EXTERNAL_STORAGE,
-			new RationalResource(R.string.permission_title, R.string.permission_read_ext_storage_reason));
+			new RationalResource(Manifest.permission.READ_EXTERNAL_STORAGE,
+				R.string.permission_title, R.string.permission_read_ext_storage_reason));
 		mRationalResources.put(Manifest.permission.RECORD_AUDIO,
-			new RationalResource(R.string.permission_title, R.string.permission_audio_recording_reason));
+			new RationalResource(Manifest.permission.RECORD_AUDIO,
+				R.string.permission_title, R.string.permission_audio_recording_reason));
 		mRationalResources.put(Manifest.permission.ACCESS_COARSE_LOCATION,
-			new RationalResource(R.string.permission_title, R.string.permission_location_reason));
+			new RationalResource(Manifest.permission.ACCESS_COARSE_LOCATION,
+				R.string.permission_title, R.string.permission_location_reason));
 		mRationalResources.put(Manifest.permission.ACCESS_FINE_LOCATION,
-			new RationalResource(R.string.permission_title, R.string.permission_location_reason));
+			new RationalResource(Manifest.permission.ACCESS_FINE_LOCATION,
+				R.string.permission_title, R.string.permission_location_reason));
 		mRationalResources.put(Manifest.permission.ACCESS_NETWORK_STATE,
-			new RationalResource(R.string.permission_title, R.string.permission_network_state_reason));
+			new RationalResource(Manifest.permission.ACCESS_NETWORK_STATE,
+				R.string.permission_title, R.string.permission_network_state_reason));
 		mRationalResources.put(Manifest.permission.CHANGE_NETWORK_STATE,
-			new RationalResource(R.string.permission_title, R.string.permission_change_network_state_reason));
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			new RationalResource(Manifest.permission.CHANGE_NETWORK_STATE,
+				R.string.permission_title, R.string.permission_change_network_state_reason));
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+			// Android11/API30以降
 			mRationalResources.put(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-				new RationalResource(R.string.permission_title, R.string.permission_access_background_location));
+				new RationalResource(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+					R.string.permission_title, R.string.permission_access_background_location_api30));
+		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+			// Android10/API29以降
+			mRationalResources.put(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+				new RationalResource(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+					R.string.permission_title, R.string.permission_access_background_location));
 		}
 	}
 
@@ -117,7 +156,9 @@ public class RationalDialogV4 extends DialogFragmentEx {
 		final RationalResource res = mRationalResources.containsKey(permission)
 			? mRationalResources.get(permission) : null;
 		if (res != null) {
-			return showDialog(parent, res.titleRes, res.messageRes, new String[] {permission});
+			return showDialog(parent,
+				res.getTitle(parent), res.getMessage(parent),
+				new String[] {permission});
 		}
 		return null;
 	}
@@ -135,10 +176,13 @@ public class RationalDialogV4 extends DialogFragmentEx {
 		@NonNull final Fragment parent,
 		@NonNull final String permission) {
 
+		final Context context = parent.requireContext();
 		final RationalResource res = mRationalResources.containsKey(permission)
 			? mRationalResources.get(permission) : null;
 		if (res != null) {
-			return showDialog(parent, res.titleRes, res.messageRes, new String[] {permission});
+			return showDialog(parent,
+				res.getTitle(context), res.getMessage(context),
+				new String[] {permission});
 		}
 		return null;
 	}
