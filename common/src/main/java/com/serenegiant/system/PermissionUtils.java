@@ -696,6 +696,10 @@ public class PermissionUtils {
 		int result = PackageManager.PERMISSION_DENIED;
 		try {
 			result = ContextCompat.checkSelfPermission(context, permissionName);
+			if (result == PackageManager.PERMISSION_GRANTED) {
+				// パーミッションがあればNeverAskAgainフラグをクリアする
+				setNeverAskAgain(context, permissionName, false);
+			}
 		} catch (final Exception e) {
 			if (DEBUG) Log.w(TAG, e);
 		}
@@ -714,6 +718,10 @@ public class PermissionUtils {
 		boolean result = false;
 		try {
 			result = ContextCompat.checkSelfPermission(context, permissionName) == PackageManager.PERMISSION_GRANTED;
+			if (result) {
+				// パーミッションがあればNeverAskAgainフラグをクリアする
+				setNeverAskAgain(context, permissionName, false);
+			}
 		} catch (final Exception e) {
 			if (DEBUG) Log.w(TAG, e);
 		}
@@ -737,6 +745,8 @@ public class PermissionUtils {
 			for (final String permission : permissions) {
 				if (ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED) {
 					result.add(permission);
+					// パーミッションがあればNeverAskAgainフラグをクリアする
+					setNeverAskAgain(context, permission, false);
 				}
 			}
 		}
@@ -760,7 +770,9 @@ public class PermissionUtils {
 				if (ContextCompat.checkSelfPermission(context, permission) != PackageManager.PERMISSION_GRANTED) {
 					// 1つでもパーミッションがなければfalse
 					result = false;
-					break;
+				} else {
+					// パーミッションがあればNeverAskAgainフラグをクリアする
+					setNeverAskAgain(context, permission, false);
 				}
 			}
 		}
