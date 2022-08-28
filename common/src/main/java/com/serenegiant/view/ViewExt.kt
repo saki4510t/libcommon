@@ -44,6 +44,22 @@ fun View.setupSnackbar(
 }
 
 /**
+ * Snackbar表示の準備
+ * @param lifecycleOwner
+ * @param snackbarEvent
+ * @param duration Snackbarの表示時間, Snackbar.LENGTH_SHORT, Snackbar.LENGTH_LONGまたはミリ秒
+ * @param callback Snackbar.Callback, null可, デフォルトnull
+ */
+fun View.setupSnackbar2(
+	lifecycleOwner: LifecycleOwner,
+	snackbarEvent: LiveData<CharSequence>, duration: Int,
+	callback: Snackbar.Callback? = null) {
+    snackbarEvent.observe(lifecycleOwner) {
+		showSnackbar(it, duration, callback)
+	}
+}
+
+/**
  * Snackbarの表示処理
  * @param message
  * @param duration Snackbarの表示時間, Snackbar.LENGTH_SHORT, Snackbar.LENGTH_LONGまたはミリ秒
