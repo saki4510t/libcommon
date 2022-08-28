@@ -237,6 +237,7 @@ public class PermissionUtils {
 	 * パーミッションを要求する
 	 * 結果はコールバックで受け取る。
 	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
 	 * @param permissions
 	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
 	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
@@ -302,6 +303,7 @@ public class PermissionUtils {
 	 * @param callback
 	 * @return
 	 */
+	@NonNull
 	public static Map<String, ActivityResultLauncher<String>> prepare(
 		@NonNull final ComponentActivity activity,
 		@NonNull final PermissionCallback callback) {
@@ -340,6 +342,7 @@ public class PermissionUtils {
 	 * @param callback
 	 * @return
 	 */
+	@NonNull
 	public static Map<String, ActivityResultLauncher<String>> prepare(
 		@NonNull final Fragment fragment,
 		@NonNull final PermissionCallback callback) {
@@ -373,11 +376,13 @@ public class PermissionUtils {
 
 	/**
 	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
 	 * @param activity
 	 * @param permissions
 	 * @param callback
 	 * @return
 	 */
+	@NonNull
 	public static ActivityResultLauncher<String[]> prepare(
 		@NonNull final ComponentActivity activity,
 		@NonNull final String[] permissions,
@@ -407,11 +412,13 @@ public class PermissionUtils {
 
 	/**
 	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
 	 * @param fragment
 	 * @param permissions
 	 * @param callback
 	 * @return
 	 */
+	@NonNull
 	public static ActivityResultLauncher<String[]> prepare(
 		@NonNull final Fragment fragment,
 		@NonNull final String[] permissions,
@@ -857,6 +864,7 @@ public class PermissionUtils {
 
 	/**
 	 * バックグラウンドからの位置情報アクセスのパーミッションが有るかどうかを確認
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
 	 *
 	 * @param context
 	 * @return
