@@ -19,6 +19,7 @@ package com.serenegiant.system;
 */
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -851,6 +853,18 @@ public class PermissionUtils {
 	 */
 	public static boolean hasAccessFineLocation(@Nullable final Context context) {
 		return hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION);
+	}
+
+	/**
+	 * バックグラウンドからの位置情報アクセスのパーミッションが有るかどうかを確認
+	 *
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint("InlinedApi")
+	public static boolean hasAccessBackgroundLocation(@Nullable final Context context) {
+		return (!BuildCheck.isAndroid10() && hasAccessLocation(context))
+			|| hasPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION);
 	}
 
 	/**
