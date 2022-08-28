@@ -185,6 +185,47 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	}
 
 	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param title
+	 * @param message
+	 * @param permissions
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static RationalDialogV4 showDialog(
+		@NonNull final FragmentActivity parent,
+		@NonNull final CharSequence title, @NonNull final CharSequence message,
+		@NonNull final String[] permissions) throws IllegalStateException {
+
+		final RationalDialogV4 dialog
+			= newInstance(title, message, permissions);
+		dialog.show(parent.getSupportFragmentManager(), TAG);
+		return dialog;
+	}
+
+	/**
+	 * ダイアログ表示のためのヘルパーメソッド
+	 * @param parent
+	 * @param title
+	 * @param message
+	 * @param permissions
+	 * @return
+	 * @throws IllegalStateException
+	 */
+	public static RationalDialogV4 showDialog(
+		@NonNull final Fragment parent,
+		@NonNull final CharSequence title, @NonNull final CharSequence message,
+		@NonNull final String[] permissions) throws IllegalStateException {
+
+		final RationalDialogV4 dialog
+			= newInstance(title, message, permissions);
+		dialog.setTargetFragment(parent, parent.getId());
+		dialog.show(parent.getParentFragmentManager(), TAG);
+		return dialog;
+	}
+
+	/**
 	 * ダイアログ生成のためのヘルパーメソッド
 	 * ダイアログ自体を直接生成せずにこのメソッドを呼び出すこと
 	 * @param titleRes
@@ -201,6 +242,28 @@ public class RationalDialogV4 extends DialogFragmentEx {
 		// ここでパラメータをセットする
 		args.putInt(ARGS_KEY_ID_TITLE, titleRes);
 		args.putInt(ARGS_KEY_ID_MESSAGE, messageRes);
+		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
+		fragment.setArguments(args);
+		return fragment;
+	}
+
+	/**
+	 * ダイアログ生成のためのヘルパーメソッド
+	 * ダイアログ自体を直接生成せずにこのメソッドを呼び出すこと
+	 * @param title
+	 * @param message
+	 * @param permissions
+	 * @return
+	 */
+	public static RationalDialogV4 newInstance(
+		@NonNull final CharSequence title, @NonNull final CharSequence message,
+		@NonNull final String[] permissions) {
+
+		final RationalDialogV4 fragment = new RationalDialogV4();
+		final Bundle args = new Bundle();
+		// ここでパラメータをセットする
+		args.putCharSequence(ARGS_KEY_ID_TITLE_STRING, title);
+		args.putCharSequence(ARGS_KEY_ID_MESSAGE_STRING, message);
 		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
 		fragment.setArguments(args);
 		return fragment;
@@ -253,15 +316,19 @@ public class RationalDialogV4 extends DialogFragmentEx {
 	@NonNull
 	@Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
-		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
-		final int id_title = args.getInt(ARGS_KEY_ID_TITLE);
-		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
-
 		final Activity activity = requireActivity();
+		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
+		final int titleId = args.getInt(ARGS_KEY_ID_TITLE);
+		final int messageId = args.getInt(ARGS_KEY_ID_MESSAGE);
+		final CharSequence titleText
+			= args.getCharSequence(ARGS_KEY_ID_TITLE_STRING, activity.getText(titleId));
+		final CharSequence messageText
+			= args.getCharSequence(ARGS_KEY_ID_TITLE_STRING, activity.getText(messageId));
+
 		return new AlertDialog.Builder(activity, getTheme())
 			.setIcon(android.R.drawable.ic_dialog_alert)
-			.setTitle(id_title)
-			.setMessage(id_message)
+			.setTitle(titleText)
+			.setMessage(messageText)
 			.setPositiveButton(android.R.string.ok, mOnClickListener)
 			.setNegativeButton(android.R.string.cancel, mOnClickListener)
 			.create();
