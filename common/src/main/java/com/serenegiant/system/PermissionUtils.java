@@ -28,7 +28,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
 import android.net.Uri;
-import android.os.Build;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -448,6 +447,17 @@ public class PermissionUtils {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * ActivityCompat.shouldShowRequestPermissionRationaleのラッパー
+	 * @param activity
+	 * @param permission
+	 * @return
+	 */
+	public static boolean shouldShowRequestPermissionRationale(
+		@NonNull final Activity activity, @NonNull final String permission) {
+		return ActivityCompat.shouldShowRequestPermissionRationale(activity, permission);
+	}
+
 	/**
 	 * 指定したパーミッション文字列配列で1つでもActivityCompat.shouldShowRequestPermissionRationaleがtrueになればtrueを返す
 	 * @param activity
