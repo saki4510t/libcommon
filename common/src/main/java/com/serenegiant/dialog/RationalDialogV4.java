@@ -61,6 +61,8 @@ public class RationalDialogV4 extends DialogFragmentEx {
 
 	/**
 	 * ダイアログ表示用の文字列リソースのホルダークラス
+	 * FIXME 個別の文字列/文字列リソースをダイアログフラグメントへ渡すよりも
+	 *       RationalResourceをParcelableにして引き渡す方が良いかもしれない
 	 */
 	private static class RationalResource {
 		@NonNull
