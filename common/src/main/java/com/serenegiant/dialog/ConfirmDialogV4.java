@@ -43,8 +43,6 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 
 	private static final String ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE
 		= "ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE";
-	private static final String ARGS_KEY_MESSAGE_STRING
-		= "ARGS_KEY_MESSAGE_STRING";
 	private static final String ARGS_KEY_ARGS
 		= "ARGS_KEY_ARGS";
 
@@ -268,8 +266,8 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
-		args.putInt(ARGS_KEY_ID_TITLE, id_title);
-		args.putInt(ARGS_KEY_ID_MESSAGE, id_message);
+		args.putInt(ARGS_KEY_TITLE_ID, id_title);
+		args.putInt(ARGS_KEY_MESSAGE_ID, id_message);
 		args.putCharSequence(ARGS_KEY_MESSAGE_STRING, message);
 		args.putBoolean(ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE, canceledOnTouchOutside);
 		args.putBundle(ARGS_KEY_ARGS, userArgs);
@@ -318,8 +316,8 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 	@Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
 		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
-		final int id_title = args.getInt(ARGS_KEY_ID_TITLE);
-		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
+		final int id_title = args.getInt(ARGS_KEY_TITLE_ID);
+		final int id_message = args.getInt(ARGS_KEY_MESSAGE_ID);
 		final CharSequence message = args.getCharSequence(ARGS_KEY_MESSAGE_STRING);
 		final boolean canceledOnTouchOutside = args.getBoolean(ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE);
 

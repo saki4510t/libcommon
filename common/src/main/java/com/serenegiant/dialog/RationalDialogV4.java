@@ -289,8 +289,8 @@ public class RationalDialogV4 extends DialogFragmentEx {
 			throw new IllegalArgumentException("wrong resource id or permissions has no element!");
 		}
 		// ここでパラメータをセットする
-		args.putInt(ARGS_KEY_ID_TITLE, titleRes);
-		args.putInt(ARGS_KEY_ID_MESSAGE, messageRes);
+		args.putInt(ARGS_KEY_TITLE_ID, titleRes);
+		args.putInt(ARGS_KEY_MESSAGE_ID, messageRes);
 		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
 		fragment.setArguments(args);
 		return fragment;
@@ -314,8 +314,8 @@ public class RationalDialogV4 extends DialogFragmentEx {
 			throw new IllegalArgumentException("permissions has no element!");
 		}
 		// ここでパラメータをセットする
-		args.putCharSequence(ARGS_KEY_ID_TITLE_STRING, title);
-		args.putCharSequence(ARGS_KEY_ID_MESSAGE_STRING, message);
+		args.putCharSequence(ARGS_KEY_TITLE_STRING, title);
+		args.putCharSequence(ARGS_KEY_MESSAGE_STRING, message);
 		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
 		fragment.setArguments(args);
 		return fragment;
@@ -370,12 +370,12 @@ public class RationalDialogV4 extends DialogFragmentEx {
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
 		final Activity activity = requireActivity();
 		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
-		final int titleId = args.getInt(ARGS_KEY_ID_TITLE);
-		final int messageId = args.getInt(ARGS_KEY_ID_MESSAGE);
+		final int titleId = args.getInt(ARGS_KEY_TITLE_ID);
+		final int messageId = args.getInt(ARGS_KEY_MESSAGE_ID);
 		final CharSequence titleText
-			= args.getCharSequence(ARGS_KEY_ID_TITLE_STRING, titleId != 0 ? activity.getText(titleId) : "");
+			= args.getCharSequence(ARGS_KEY_TITLE_STRING, titleId != 0 ? activity.getText(titleId) : "");
 		final CharSequence messageText
-			= args.getCharSequence(ARGS_KEY_ID_TITLE_STRING, messageId != 0 ? activity.getText(messageId) : "");
+			= args.getCharSequence(ARGS_KEY_MESSAGE_STRING, messageId != 0 ? activity.getText(messageId) : "");
 
 		return new AlertDialog.Builder(activity, getTheme())
 			.setIcon(android.R.drawable.ic_dialog_alert)

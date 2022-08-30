@@ -31,10 +31,10 @@ public abstract class DialogFragmentEx extends DialogFragment {
 	private static final String TAG = DialogFragmentEx.class.getSimpleName();
 
 	protected static final String ARGS_KEY_REQUEST_CODE = "requestCode";
-	protected static final String ARGS_KEY_ID_TITLE = "title";
-	protected static final String ARGS_KEY_ID_TITLE_STRING = "title_string";
-	protected static final String ARGS_KEY_ID_MESSAGE = "message";
-	protected static final String ARGS_KEY_ID_MESSAGE_STRING = "message_string";
+	protected static final String ARGS_KEY_TITLE_ID = "title_id";
+	protected static final String ARGS_KEY_TITLE_STRING = "title_string";
+	protected static final String ARGS_KEY_MESSAGE_ID = "message_id";
+	protected static final String ARGS_KEY_MESSAGE_STRING = "message_string";
 	protected static final String ARGS_KEY_TAG = "tag";
 
 	@Override

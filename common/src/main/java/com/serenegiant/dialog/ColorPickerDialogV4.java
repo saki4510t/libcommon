@@ -136,7 +136,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 			args = new Bundle();
 		}
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
-		args.putInt(ARGS_KEY_ID_TITLE, titleResId);
+		args.putInt(ARGS_KEY_TITLE_ID, titleResId);
 		args.putInt(KEY_COLOR_INIT, initialColor);
 		args.remove(KEY_COLOR_CURRENT);
 		setArguments(args);
@@ -151,7 +151,7 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		// onSaveInstanceStateで保存した値が入ったBundleオブジェクトが入っている
 		final Bundle args = requireArguments();
 		mRequestCode = args.getInt(ARGS_KEY_REQUEST_CODE);
-		mTitleResId = args.getInt(ARGS_KEY_ID_TITLE);
+		mTitleResId = args.getInt(ARGS_KEY_TITLE_ID);
 		mCurrentColor = mInitialColor = args.getInt(KEY_COLOR_INIT, DEFAULT_COLOR);
 		if (savedInstanceState != null) {
 			mCurrentColor = savedInstanceState.getInt(KEY_COLOR_CURRENT, mInitialColor);

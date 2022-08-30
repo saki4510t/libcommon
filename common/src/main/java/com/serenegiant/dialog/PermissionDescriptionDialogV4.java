@@ -112,8 +112,8 @@ public class PermissionDescriptionDialogV4 extends DialogFragmentEx {
 		final Bundle args = new Bundle();
 		// ここでパラメータをセットする
 		args.putInt(ARGS_KEY_REQUEST_CODE, requestCode);
-		args.putInt(ARGS_KEY_ID_TITLE, id_title);
-		args.putInt(ARGS_KEY_ID_MESSAGE, id_message);
+		args.putInt(ARGS_KEY_TITLE_ID, id_title);
+		args.putInt(ARGS_KEY_MESSAGE_ID, id_message);
 		args.putStringArray(ARGS_KEY_PERMISSIONS, permissions);
 		fragment.setArguments(args);
 		return fragment;
@@ -166,8 +166,8 @@ public class PermissionDescriptionDialogV4 extends DialogFragmentEx {
 	@Override
     public Dialog onCreateDialog(final Bundle savedInstanceState) {
 		final Bundle args = savedInstanceState != null ? savedInstanceState : requireArguments();
-		final int id_title = args.getInt(ARGS_KEY_ID_TITLE);
-		final int id_message = args.getInt(ARGS_KEY_ID_MESSAGE);
+		final int id_title = args.getInt(ARGS_KEY_TITLE_ID);
+		final int id_message = args.getInt(ARGS_KEY_MESSAGE_ID);
 
 		final Activity activity = requireActivity();
 		return new AlertDialog.Builder(activity, getTheme())
