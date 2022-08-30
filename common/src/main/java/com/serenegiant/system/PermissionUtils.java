@@ -115,6 +115,11 @@ public class PermissionUtils {
 	private final Map<String[], ActivityResultLauncher<String[]>> mMultiLaunchers = new HashMap<>();
 	@NonNull
 	private final PermissionCallback mCallback;
+	/**
+	 * パーミッション要求中に他のパーミッションを要求すると先に要求したパーミッションが拒絶されるので
+	 * パーミッション要求中かどうかを保持するためのフラグ
+	 */
+	private boolean mIsRequesting;
 
 	/**
 	 * コンストラクタ
@@ -130,7 +135,7 @@ public class PermissionUtils {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + activity);
 		mWeakActivity = new WeakReference<>(activity);
 		mCallback = callback;
-		mLaunchers.putAll(prepare(activity, callback));
+		mLaunchers.putAll(prepare(this, activity, callback));
 	}
 
 	/**
@@ -148,7 +153,15 @@ public class PermissionUtils {
 		final ComponentActivity activity = fragment.requireActivity();
 		mWeakActivity = new WeakReference<>(activity);
 		mCallback = callback;
-		mLaunchers.putAll(prepare(fragment, callback));
+		mLaunchers.putAll(prepare(this, fragment, callback));
+	}
+
+	/**
+	 * パーミッション要求中かどうかを取得
+	 * @return
+	 */
+	public boolean isRequesting() {
+		return mIsRequesting;
 	}
 
 	/**
@@ -160,7 +173,7 @@ public class PermissionUtils {
 	public PermissionUtils prepare(@NonNull final ComponentActivity activity,
 		@NonNull final String[] permissions) {
 		if(DEBUG) Log.v(TAG, "prepare:" + Arrays.toString(permissions));
-		mMultiLaunchers.put(permissions, prepare(activity, permissions, mCallback));
+		mMultiLaunchers.put(permissions, prepare(this, activity, permissions, mCallback));
 		return this;
 	}
 
@@ -173,7 +186,7 @@ public class PermissionUtils {
 	public PermissionUtils prepare(@NonNull final Fragment fragment,
 		@NonNull final String[] permissions) {
 		if(DEBUG) Log.v(TAG, "prepare:" + Arrays.toString(permissions));
-		mMultiLaunchers.put(permissions, prepare(fragment, permissions, mCallback));
+		mMultiLaunchers.put(permissions, prepare(this, fragment, permissions, mCallback));
 		return this;
 	}
 
@@ -181,19 +194,20 @@ public class PermissionUtils {
 	 * パーミッションを要求する
 	 * 結果はコールバックで受け取る。
 	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
+	 * 他のパーミッション要求中はfalseを返す
 	 * @param permission
 	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
 	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
 	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
 	 * @throws IllegalArgumentException
 	 */
-	public boolean requestPermission(
+	public synchronized boolean requestPermission(
 		@NonNull final String permission,
 		final boolean canShowRational) throws IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "requestPermission:" + permission);
 		final ComponentActivity activity = mWeakActivity.get();
-		if ((activity == null) || activity.isFinishing()) {
+		if ((activity == null) || activity.isFinishing() || mIsRequesting) {
 			return false;
 		}
 		final boolean hasPermission = PermissionUtils.hasPermission(activity, permission);
@@ -217,6 +231,7 @@ public class PermissionUtils {
 				final ActivityResultLauncher<String> launcher
 					= mLaunchers.containsKey(permission) ? mLaunchers.get(permission) : null;
 				if (launcher != null) {
+					mIsRequesting = true;
 					launcher.launch(permission);
 				} else {
 					// ここに来るのはプログラミングのミスのはず
@@ -236,6 +251,7 @@ public class PermissionUtils {
 	 * パーミッションを要求する
 	 * 結果はコールバックで受け取る。
 	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
+	 * 他のパーミッション要求中はfalseを返す
 	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
 	 * @param permissions
 	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
@@ -243,7 +259,7 @@ public class PermissionUtils {
 	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
 	 * @throws IllegalArgumentException
 	 */
-	public boolean requestPermission(
+	public synchronized boolean requestPermission(
 		@NonNull final String[] permissions,
 		final boolean canShowRational) throws IllegalArgumentException {
 
@@ -253,7 +269,7 @@ public class PermissionUtils {
 		}
 		if (DEBUG) Log.v(TAG, "requestPermission:" + Arrays.toString(permissions));
 		final ComponentActivity activity = mWeakActivity.get();
-		if ((activity == null) || activity.isFinishing()) {
+		if ((activity == null) || activity.isFinishing() || mIsRequesting) {
 			return false;
 		}
 		final boolean hasPermission = PermissionUtils.hasPermissionAll(activity, permissions);
@@ -279,6 +295,7 @@ public class PermissionUtils {
 				final ActivityResultLauncher<String[]> launcher
 					= mMultiLaunchers.containsKey(permissions) ? mMultiLaunchers.get(permissions) : null;
 				if (launcher != null) {
+					mIsRequesting = true;
 					launcher.launch(permissions);
 				} else {
 					// ここに来るのはプログラミングのミスのはず
@@ -296,14 +313,15 @@ public class PermissionUtils {
 
 //--------------------------------------------------------------------------------
 	/**
-	 * アプリのAndroidManifest.xmlで要求しているパーミッションの全てに対してActivityResultLauncherを生成して
+	 * アプリのAndroidManifest.xmlで要求しているパーミッションの全てに対して1つずつActivityResultLauncherを生成して
 	 * パーミッション文字列をキーとするMapとして返す
 	 * @param activity
 	 * @param callback
 	 * @return
 	 */
 	@NonNull
-	public static Map<String, ActivityResultLauncher<String>> prepare(
+	private static Map<String, ActivityResultLauncher<String>> prepare(
+		@NonNull final PermissionUtils parent,
 		@NonNull final ComponentActivity activity,
 		@NonNull final PermissionCallback callback) {
 
@@ -314,19 +332,23 @@ public class PermissionUtils {
 			final ActivityResultLauncher<String> requestPermissionLauncher
 				= activity.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
 					isGranted -> {
-						if (isGranted) {
-							if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
-							// ユーザーがパーミッションを許可した場合
-							setNeverAskAgain(context, permission, false);
-							callback.onPermission(permission);
-						} else {
-							if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
-							// ユーザーがパーミッションを許可しなかった場合
-							if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-								// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
-								setNeverAskAgain(context, permission, true);
+						try {
+							if (isGranted) {
+								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
+								// ユーザーがパーミッションを許可した場合
+								setNeverAskAgain(context, permission, false);
+								callback.onPermission(permission);
+							} else {
+								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
+								// ユーザーがパーミッションを許可しなかった場合
+								if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
+									setNeverAskAgain(context, permission, true);
+								}
+								callback.onPermissionDenied(permission);
 							}
-							callback.onPermissionDenied(permission);
+						} finally {
+							parent.mIsRequesting = false;
 						}
 					});
 			result.put(permission, requestPermissionLauncher);
@@ -335,14 +357,16 @@ public class PermissionUtils {
 	}
 
 	/**
-	 * アプリのAndroidManifest.xmlで要求しているパーミッションの全てに対してActivityResultLauncherを生成して
+	 * アプリのAndroidManifest.xmlで要求しているパーミッションの全てに対して1つずつActivityResultLauncherを生成して
 	 * パーミッション文字列をキーとするMapとして返す
+	 * @param parent
 	 * @param fragment
 	 * @param callback
 	 * @return
 	 */
 	@NonNull
-	public static Map<String, ActivityResultLauncher<String>> prepare(
+	private static Map<String, ActivityResultLauncher<String>> prepare(
+		@NonNull final PermissionUtils parent,
 		@NonNull final Fragment fragment,
 		@NonNull final PermissionCallback callback) {
 
@@ -353,7 +377,94 @@ public class PermissionUtils {
 			final ActivityResultLauncher<String> requestPermissionLauncher
 				= fragment.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
 					isGranted -> {
-						if (isGranted) {
+						try {
+							if (isGranted) {
+								if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
+								// ユーザーがパーミッションを許可した場合
+								setNeverAskAgain(activity, permission, false);
+								callback.onPermission(permission);
+							} else {
+								if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
+								// ユーザーがパーミッションを許可しなかった場合
+								if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+									// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
+									setNeverAskAgain(activity, permission, true);
+								}
+								callback.onPermissionDenied(permission);
+							}
+						} finally {
+							parent.mIsRequesting = false;
+						}
+					});
+			result.put(permission, requestPermissionLauncher);
+		}
+		return result;
+	}
+
+	/**
+	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
+	 * @param parent
+	 * @param activity
+	 * @param permissions
+	 * @param callback
+	 * @return
+	 */
+	@NonNull
+	private static ActivityResultLauncher<String[]> prepare(
+		@NonNull final PermissionUtils parent,
+		@NonNull final ComponentActivity activity,
+		@NonNull final String[] permissions,
+		@NonNull final PermissionCallback callback) {
+
+		return activity.registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+			result -> {
+				try {
+					for (final Map.Entry<String, Boolean> entry: result.entrySet()) {
+						final String permission = entry.getKey();
+						if (entry.getValue()) {
+							if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
+							// ユーザーがパーミッションを許可した場合
+							setNeverAskAgain(activity, permission, false);
+						} else {
+							if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
+							// ユーザーがパーミッションを許可しなかった場合
+							if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
+								// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
+								setNeverAskAgain(activity, permission, true);
+							}
+							callback.onPermissionDenied(permission);
+						}
+					}
+				} finally {
+					parent.mIsRequesting = false;
+				}
+			});
+	}
+
+	/**
+	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
+	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
+	 * @param parent
+	 * @param fragment
+	 * @param permissions
+	 * @param callback
+	 * @return
+	 */
+	@NonNull
+	private static ActivityResultLauncher<String[]> prepare(
+		@NonNull final PermissionUtils parent,
+		@NonNull final Fragment fragment,
+		@NonNull final String[] permissions,
+		@NonNull final PermissionCallback callback) {
+
+		final ComponentActivity activity = fragment.requireActivity();
+		return fragment.registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
+			result -> {
+				try {
+					for (final Map.Entry<String, Boolean> entry: result.entrySet()) {
+						final String permission = entry.getKey();
+						if (entry.getValue()) {
 							if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
 							// ユーザーがパーミッションを許可した場合
 							setNeverAskAgain(activity, permission, false);
@@ -367,81 +478,9 @@ public class PermissionUtils {
 							}
 							callback.onPermissionDenied(permission);
 						}
-					});
-			result.put(permission, requestPermissionLauncher);
-		}
-		return result;
-	}
-
-	/**
-	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
-	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
-	 * @param activity
-	 * @param permissions
-	 * @param callback
-	 * @return
-	 */
-	@NonNull
-	public static ActivityResultLauncher<String[]> prepare(
-		@NonNull final ComponentActivity activity,
-		@NonNull final String[] permissions,
-		@NonNull final PermissionCallback callback) {
-
-		return activity.registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-			result -> {
-				for (final Map.Entry<String, Boolean> entry: result.entrySet()) {
-					final String permission = entry.getKey();
-					if (entry.getValue()) {
-						if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
-						// ユーザーがパーミッションを許可した場合
-						setNeverAskAgain(activity, permission, false);
-						callback.onPermission(permission);
-					} else {
-						if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
-						// ユーザーがパーミッションを許可しなかった場合
-						if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-							// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
-							setNeverAskAgain(activity, permission, true);
-						}
-						callback.onPermissionDenied(permission);
 					}
-				}
-			});
-	}
-
-	/**
-	 * 指定したパーミッション文字列配列を一度にパーミッション要求するためのActivityResultLauncherインスタンスを生成する
-	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
-	 * @param fragment
-	 * @param permissions
-	 * @param callback
-	 * @return
-	 */
-	@NonNull
-	public static ActivityResultLauncher<String[]> prepare(
-		@NonNull final Fragment fragment,
-		@NonNull final String[] permissions,
-		@NonNull final PermissionCallback callback) {
-
-		final ComponentActivity activity = fragment.requireActivity();
-		return fragment.registerForActivityResult(new ActivityResultContracts.RequestMultiplePermissions(),
-			result -> {
-				for (final Map.Entry<String, Boolean> entry: result.entrySet()) {
-					final String permission = entry.getKey();
-					if (entry.getValue()) {
-						if (DEBUG) Log.v(TAG, "requestPermission:granted," + permission);
-						// ユーザーがパーミッションを許可した場合
-						setNeverAskAgain(activity, permission, false);
-						callback.onPermission(permission);
-					} else {
-						if (DEBUG) Log.v(TAG, "requestPermission:denied," + permission);
-						// ユーザーがパーミッションを許可しなかった場合
-						if (!ActivityCompat.shouldShowRequestPermissionRationale(activity, permission)) {
-							// この時点でshouldShowRequestPermissionRationale=falseになるのはユーザーが今後表示しないを選択してパーミッション要求を拒否した時
-							setNeverAskAgain(activity, permission, true);
-						}
-						callback.onPermissionDenied(permission);
-					}
+				} finally {
+					parent.mIsRequesting = false;
 				}
 			});
 	}
