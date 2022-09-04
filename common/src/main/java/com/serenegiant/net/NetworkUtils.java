@@ -28,9 +28,23 @@ import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Collections;
 
+import androidx.annotation.Nullable;
+
+/**
+ * ネットワーク関係のヘルパーメソッドを定義するヘルパークラス
+ */
 public class NetworkUtils {
 	private static final String TAG = NetworkUtils.class.getSimpleName();
 
+	private NetworkUtils() {
+		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateとする
+	}
+
+	/**
+	 * 自分自身のIPv4アドレスを取得する
+	 * @return
+	 */
+	@Nullable
 	public static String getLocalIPv4Address() {
 		try {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
@@ -74,6 +88,11 @@ public class NetworkUtils {
 		return null;
 	}
 
+	/**
+	 * 自分自身のOpV6アドレスを取得する
+	 * @return
+	 */
+	@Nullable
 	public static String getLocalIPv6Address() {
 		try {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
