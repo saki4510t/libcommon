@@ -51,7 +51,10 @@ public class NetworkUtils {
 			
 				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
 					if (!addr.isLoopbackAddress() && (addr instanceof Inet4Address)) {
-						return addr.getHostAddress();
+						final String a = addr.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							return addr.getHostAddress();
+						}
 					}
 				}
 			}
@@ -61,9 +64,11 @@ public class NetworkUtils {
 			
 				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
 					final InetAddress ad = addr.getAddress();
-					
 					if (!ad.isLoopbackAddress() && !(ad instanceof Inet4Address)) {
-						return ad.getHostAddress();
+						final String a = ad.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							return ad.getHostAddress();
+						}
 					}
 				}
 			}
