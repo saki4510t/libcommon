@@ -94,7 +94,7 @@ public class NetworkUtils {
 	}
 
 	/**
-	 * 自分自身のOpV6アドレスを取得する
+	 * 自分自身のIpV6アドレスを取得する
 	 * @return
 	 */
 	@Nullable
