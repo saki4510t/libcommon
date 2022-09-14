@@ -140,7 +140,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 	}
 
 	@CallSuper
-	protected void resize(final int width, final int height) {
+	public void resize(final int width, final int height) {
 		mWidth = Math.max(width, 1);
 		mHeight = Math.max(height, 1);
 	}
@@ -265,7 +265,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		}
 
 		@Override
-		protected void resize(final int width, final int height) {
+		public void resize(final int width, final int height) {
 			super.resize(width, height);
 			throw new UnsupportedOperationException("SurfaceProxyReaderWriter does not support #resize");
 		}
