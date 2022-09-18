@@ -130,7 +130,7 @@ public class RendererHolderTest {
 	}
 
 	@Test
-	public void rendererHolder_mageTextureSource() {
+	public void rendererHolder_imageTextureSource() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
