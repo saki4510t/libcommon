@@ -69,7 +69,7 @@ public class RendererHolderTest {
 	}
 
 	@Test
-	public void rendererHolder_staticTextureSource() {
+	public void staticTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -130,7 +130,7 @@ public class RendererHolderTest {
 	}
 
 	@Test
-	public void rendererHolder_imageTextureSource() {
+	public void imageTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
