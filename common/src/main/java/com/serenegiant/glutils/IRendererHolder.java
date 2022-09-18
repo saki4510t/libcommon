@@ -195,7 +195,11 @@ public interface IRendererHolder extends IMirror {
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@Deprecated
 	public void captureStill(@NonNull final String path,
 		@Nullable final OnCapturedListener listener)
 			throws FileNotFoundException, IllegalStateException;
@@ -205,7 +209,11 @@ public interface IRendererHolder extends IMirror {
 	 * 撮影完了を待機する
 	 * @param path
 	 * @param captureCompression JPEGの圧縮率, pngの時は無視
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@Deprecated
 	public void captureStill(@NonNull final String path,
 		@IntRange(from = 1L,to = 99L) final int captureCompression,
 		@Nullable final OnCapturedListener listener)
@@ -217,7 +225,11 @@ public interface IRendererHolder extends IMirror {
 	 * @param out
 	 * @param stillCaptureFormat
 	 * @param captureCompression
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@Deprecated
 	public void captureStill(@NonNull final OutputStream out,
 		@StillCaptureFormat final int stillCaptureFormat,
 		@IntRange(from = 1L,to = 99L) final int captureCompression,

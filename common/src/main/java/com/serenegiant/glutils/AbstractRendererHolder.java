@@ -309,7 +309,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 追加されている分配描画用のSurfaceの数を取得
 	 * @return
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public int getCount() {
 		return mRendererTask.getCount();
@@ -319,7 +318,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
 	@Override
 	public void captureStill(@NonNull final String path,
 		@Nullable final OnCapturedListener listener)
@@ -335,7 +339,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * 静止画を撮影する
 	 * 撮影完了を待機する
 	 * @param path
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
 	@Override
 	public void captureStill(@NonNull final String path,
 		@IntRange(from = 1L,to = 99L)final int captureCompression,
@@ -354,7 +363,11 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param captureFormat
 	 * @param captureCompression
 	 * @param listener
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
 	 */
+	@Deprecated
 	@Override
 	public void captureStill(@NonNull final OutputStream out,
 		@StillCaptureFormat final int captureFormat,
@@ -1061,7 +1074,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 
-		private final void release() {
+		private void release() {
 			if (captureSurface != null) {
 				captureSurface.makeCurrent();
 				captureSurface.release();
