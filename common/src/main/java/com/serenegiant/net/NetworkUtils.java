@@ -20,12 +20,14 @@ package com.serenegiant.net;
 
 import android.util.Log;
 
+import java.io.IOException;
 import java.net.Inet4Address;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Collections;
 
 import androidx.annotation.Nullable;
@@ -128,5 +130,61 @@ public class NetworkUtils {
 			Log.w(TAG, "getLocalIPv6Address", e);
 		}
 		return null;
+	}
+
+	public static void dump(@Nullable final InetAddress addr) {
+		if (addr == null) {
+			Log.i(TAG, "dumpInetAddress: null");
+		} else {
+			Log.i(TAG, "addr=" + addr);	// InetAddress#toString
+			Log.i(TAG, "address=" + Arrays.toString(addr.getAddress()));
+			Log.i(TAG, "hostAddress=" + addr.getHostAddress());
+			Log.i(TAG, "hostName=" + addr.getHostName());
+			Log.i(TAG, "isLoopback=" + addr.isLoopbackAddress());
+			Log.i(TAG, "isAny=" + addr.isAnyLocalAddress());
+			Log.i(TAG, "isAnyLocal=" + addr.isAnyLocalAddress());
+			Log.i(TAG, "isLinkLocal=" + addr.isLinkLocalAddress());
+			Log.i(TAG, "isSiteLocal=" + addr.isSiteLocalAddress());
+			Log.i(TAG, "isMCLinkLocal=" + addr.isMCLinkLocal());
+			Log.i(TAG, "isMCSiteLocal=" + addr.isMCSiteLocal());
+			Log.i(TAG, "isMCNodeLocal=" + addr.isMCNodeLocal());
+			Log.i(TAG, "isMCOrgLocal=" + addr.isMCOrgLocal());
+			Log.i(TAG, "isMCGGlobal=" + addr.isMCGlobal());
+			Log.i(TAG, "isMulticast=" + addr.isMulticastAddress());
+			try {
+				Log.i(TAG, "isReachable=" + addr.isReachable(1000));
+			} catch (final IOException e) {
+				Log.w(TAG, e);
+			}
+		}
+	}
+
+	public static String toString(@Nullable final InetAddress addr) {
+		final StringBuilder sb = new StringBuilder();
+		if (addr == null) {
+			sb.append("null");
+		} else {
+			sb.append("addr=").append(addr).append(",");
+			sb.append("address=").append(Arrays.toString(addr.getAddress())).append(",");
+			sb.append("hostAddress=").append(addr.getHostAddress()).append(",");
+			sb.append("hostName=").append(addr.getHostName()).append(",");
+			sb.append("isLoopback=").append(addr.isLoopbackAddress()).append(",");
+			sb.append("isAny=").append(addr.isAnyLocalAddress()).append(",");
+			sb.append("isAnyLocal=").append(addr.isAnyLocalAddress()).append(",");
+			sb.append("isLinkLocal=").append(addr.isLinkLocalAddress()).append(",");
+			sb.append("isSiteLocal=").append(addr.isSiteLocalAddress()).append(",");
+			sb.append("isMCLinkLocal=").append(addr.isMCLinkLocal()).append(",");
+			sb.append("isMCSiteLocal=").append(addr.isMCSiteLocal()).append(",");
+			sb.append("isMCNodeLocal=").append(addr.isMCNodeLocal()).append(",");
+			sb.append("isMCOrgLocal=").append(addr.isMCOrgLocal()).append(",");
+			sb.append("isMCGGlobal=").append(addr.isMCGlobal()).append(",");
+			sb.append("isMulticast=").append(addr.isMulticastAddress()).append(",");
+			try {
+				sb.append("isReachable=").append(addr.isReachable(1000));
+			} catch (final IOException e) {
+				sb.append(e);
+			}
+		}
+		return sb.toString();
 	}
 }
