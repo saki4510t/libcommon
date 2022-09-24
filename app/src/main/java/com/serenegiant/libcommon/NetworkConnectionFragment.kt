@@ -65,6 +65,11 @@ class NetworkConnectionFragment : BaseFragment() {
 		for (addr in ipv6s) {
 			Log.i(TAG, NetworkUtils.toString(addr))
 		}
+		Log.i(TAG, "dumpLocal")
+		val locals = NetworkUtils.getLocalAddresses()
+		for (addr in locals) {
+			NetworkUtils.dump(addr)
+		}
 	}
 
 	override fun onCreateView(inflater: LayoutInflater,

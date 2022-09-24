@@ -86,6 +86,43 @@ public class NetworkUtils {
 	}
 
 	/**
+	 * ループバック以外の自分自身のアドレスリストを取得する
+	 * @return
+	 */
+	@NonNull
+	public static List<InetAddress> getLocalAddresses() {
+		final List<InetAddress> result = new ArrayList<>();
+		try {
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+					if (!addr.isLoopbackAddress()) {
+						final String a = addr.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(addr);
+						}
+					}
+				}
+			}
+			// フォールバックする, 最初に見つかったもの以外のアドレスを返す,
+			// Bluetooth PANやWi-Fi Directでの接続時など
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
+					final InetAddress ad = addr.getAddress();
+					if (!ad.isLoopbackAddress() && !result.contains(ad)) {
+						final String a = ad.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(ad);
+						}
+					}
+				}
+			}
+		} catch (final SocketException | NullPointerException e) {
+			Log.e(TAG, "getLocalAddresses", e);
+		}
+		return result;
+	}
+
+	/**
 	 * ループバック以外の自分自身のIPv4アドレスリストを取得する
 	 * @return
 	 */
