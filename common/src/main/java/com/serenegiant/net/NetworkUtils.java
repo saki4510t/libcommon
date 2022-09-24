@@ -79,21 +79,6 @@ public class NetworkUtils {
 					}
 				}
 			}
-//			for (final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-//				 (interfaces != null)
-// 					&& interfaces.hasMoreElements(); ) {
-//
-//				final NetworkInterface intf =
-//					interfaces.nextElement();
-//				for (final Enumeration<InetAddress> addrs = intf.getInetAddresses();
-//					addrs.hasMoreElements(); ) {
-//
-//					final InetAddress addr = addrs.nextElement();
-//					if (!addr.isLoopbackAddress() && addr instanceof Inet4Address) {
-//						return addr.getHostAddress();
-//					}
-//				}
-//			}
 		} catch (final SocketException | NullPointerException e) {
 			Log.e(TAG, "getLocalIPv4Address", e);
 		}
@@ -123,7 +108,7 @@ public class NetworkUtils {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
 				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
 					final InetAddress ad = addr.getAddress();
-					if (!ad.isLoopbackAddress() && !(ad instanceof Inet4Address)) {
+					if (!ad.isLoopbackAddress() && (ad instanceof Inet4Address) && !result.contains(ad)) {
 						final String a = ad.getHostAddress();
 						if ((a != null) && !a.contains("dummy")) {
 							result.add(ad);
@@ -151,21 +136,6 @@ public class NetworkUtils {
 					}
 				}
 			}
-//			for (final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
-//				 (interfaces != null)
-//				 	&& interfaces.hasMoreElements(); ) {
-//
-//				final NetworkInterface intf =
-//					interfaces.nextElement();
-//				for (final Enumeration<InetAddress> addrs = intf.getInetAddresses();
-//					 addrs.hasMoreElements(); ) {
-//
-//					final InetAddress addr = addrs.nextElement();
-//					if (!addr.isLoopbackAddress() && addr instanceof Inet6Address) {
-//						return addr.getHostAddress();
-//					}
-//				}
-//			}
 		} catch (final SocketException | NullPointerException e) {
 			Log.w(TAG, "getLocalIPv6Address", e);
 		}
