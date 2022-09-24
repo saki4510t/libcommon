@@ -158,7 +158,7 @@ public class NetworkUtils {
 				}
 			}
 		} catch (final SocketException | NullPointerException e) {
-			Log.w(TAG, "getLocalIPv6Address", e);
+			Log.w(TAG, "getLocalIPv6Addresses", e);
 		}
 		return result;
 	}
