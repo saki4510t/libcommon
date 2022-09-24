@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.serenegiant.net.ConnectivityHelper
 import com.serenegiant.net.ConnectivityHelper.ConnectivityCallback
+import com.serenegiant.net.NetworkUtils
 
 /*
  * libcommon
@@ -45,6 +46,15 @@ class NetworkConnectionFragment : BaseFragment() {
 		super.onCreate(savedInstanceState)
 		if (mHelper == null) {
 			mHelper = ConnectivityHelper(requireContext(), mConnectivityCallback)
+		}
+		NetworkUtils.dumpAll()
+		for (addr in NetworkUtils.getLocalIPv4Addresses()) {
+			NetworkUtils.dump(addr)
+			Log.i(TAG, NetworkUtils.toString(addr))
+		}
+		for (addr in NetworkUtils.getLocalIPv6Addresses()) {
+			NetworkUtils.dump(addr)
+			Log.i(TAG, NetworkUtils.toString(addr))
 		}
 	}
 
