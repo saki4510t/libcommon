@@ -237,6 +237,13 @@ public class NetworkUtils {
 			Log.i(TAG, "  isMCOrgLocal=" + addr.isMCOrgLocal());
 			Log.i(TAG, "  isMCGGlobal=" + addr.isMCGlobal());
 			Log.i(TAG, "  isMulticast=" + addr.isMulticastAddress());
+			if (addr instanceof Inet4Address) {
+				Log.i(TAG, "  isIpv4=true");
+			} else if (addr instanceof Inet6Address) {
+				final Inet6Address _addr = (Inet6Address)addr;
+				Log.i(TAG, "  isIpv6=true");
+				Log.i(TAG, "  isIPv4CompatibleAddress=" + _addr.isIPv4CompatibleAddress());
+			}
 			ThreadPool.queueEvent(() -> {
 				try {
 					Log.i(TAG, "  isReachable=" + addr.isReachable(1000));
@@ -287,6 +294,13 @@ public class NetworkUtils {
 			sb.append("isMCOrgLocal=").append(addr.isMCOrgLocal()).append(",");
 			sb.append("isMCGGlobal=").append(addr.isMCGlobal()).append(",");
 			sb.append("isMulticast=").append(addr.isMulticastAddress()).append(",");
+			if (addr instanceof Inet4Address) {
+				sb.append("isIpv4=true").append(",");
+			} else if (addr instanceof Inet6Address) {
+				final Inet6Address _addr = (Inet6Address)addr;
+				sb.append("isIpv6=true").append(",");
+				sb.append("isIPv4CompatibleAddress=").append(_addr.isIPv4CompatibleAddress()).append(",");
+			}
 			ThreadPool.queueEvent(() -> {
 				try {
 					sb.append("isReachable=").append(addr.isReachable(1000)).append(",");
