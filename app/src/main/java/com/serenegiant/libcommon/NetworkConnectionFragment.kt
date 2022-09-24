@@ -47,13 +47,22 @@ class NetworkConnectionFragment : BaseFragment() {
 		if (mHelper == null) {
 			mHelper = ConnectivityHelper(requireContext(), mConnectivityCallback)
 		}
+		Log.i(TAG, "dumpAll")
 		NetworkUtils.dumpAll()
-		for (addr in NetworkUtils.getLocalIPv4Addresses()) {
+		Log.i(TAG, "dumpIpV4All")
+		val ipv4s = NetworkUtils.getLocalIPv4Addresses()
+		for (addr in ipv4s) {
 			NetworkUtils.dump(addr)
+		}
+		for (addr in ipv4s) {
 			Log.i(TAG, NetworkUtils.toString(addr))
 		}
-		for (addr in NetworkUtils.getLocalIPv6Addresses()) {
+		Log.i(TAG, "dumpIpV6All")
+		val ipv6s = NetworkUtils.getLocalIPv6Addresses()
+		for (addr in ipv6s) {
 			NetworkUtils.dump(addr)
+		}
+		for (addr in ipv6s) {
 			Log.i(TAG, NetworkUtils.toString(addr))
 		}
 	}
