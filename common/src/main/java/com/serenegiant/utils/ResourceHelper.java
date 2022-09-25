@@ -22,7 +22,18 @@ import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
 
+import com.serenegiant.nio.CharsetsUtils;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.Charset;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.RawRes;
 
 /**
  * デフォルト値付きでリソース値を取得するためのヘルパークラス
@@ -130,4 +141,57 @@ public class ResourceHelper {
 
 		return result;
 	}
+
+	/**
+	 * rawリソースをバイト配列に読み込む
+	 * @param context
+	 * @param resId
+	 * @return
+	 * @throws IOException
+	 */
+	public static byte[] getRawResource(@NonNull final Context context, @RawRes final int resId) throws IOException {
+	    final InputStream is = new BufferedInputStream(context.getResources().openRawResource(resId));
+	    final ByteArrayOutputStream bout = new ByteArrayOutputStream();
+	    final byte[] readBuffer = new byte[4 * 1024];
+	    try {
+	        int read;
+	        do {
+	            read = is.read(readBuffer, 0, readBuffer.length);
+	            if(read == -1) {
+	                break;
+	            }
+	            bout.write(readBuffer, 0, read);
+	        } while(true);
+	        return bout.toByteArray();
+	    } finally {
+	        is.close();
+	    }
+	}
+
+	/**
+	 * エンコードを指定してrawリソースからUTF-8文字列を読み込む
+	 * @param context
+	 * @param resId
+	 * @param encoding
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getRawString(
+		@NonNull final Context context, @RawRes final int resId,
+		@NonNull final Charset encoding) throws IOException {
+	    return new String(getRawResource(context, resId), encoding);
+	}
+
+	/**
+	 * rawリソースからUTF-8文字列を読み込む
+	 * @param context
+	 * @param resId
+	 * @return
+	 * @throws IOException
+	 */
+	public static String getRawString(
+		@NonNull final Context context, @RawRes final int resId) throws IOException {
+	    return new String(getRawResource(context, resId), CharsetsUtils.UTF8);
+	}
+
 }
