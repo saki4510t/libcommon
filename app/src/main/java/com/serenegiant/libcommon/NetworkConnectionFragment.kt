@@ -94,6 +94,10 @@ class NetworkConnectionFragment : BaseFragment() {
 		} catch (e: Exception) {
 			Log.w(TAG, e);
 		}
+		if (BuildCheck.isAPI21()) {
+			Log.i(TAG, "SoftAp addr=${WifiApUtils.getLocalIPv4Address(context)}")
+			Log.i(TAG, "SoftAp addr=${WifiApUtils.getLocalIPv6Address(context)}")
+		}
 	}
 
 	override fun onCreateView(inflater: LayoutInflater,

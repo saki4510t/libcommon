@@ -3,6 +3,8 @@ package com.serenegiant.net;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
 import android.net.wifi.SoftApConfiguration;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
@@ -14,9 +16,18 @@ import com.serenegiant.system.ContextUtils;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.reflect.Method;
+import java.net.Inet4Address;
+import java.net.Inet6Address;
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 /**
@@ -136,6 +147,101 @@ public class WifiApUtils {
 			if (DEBUG) Log.w(TAG, e);
 		}
 		return false;
+	}
+
+	/**
+	 * SoftApの自分側IPv4アドレスを取得する
+	 * @param context
+	 * @return SoftApが無効または取得できなければnull
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static String getLocalIPv4Address(@NonNull final Context context) {
+		if (isWifiApEnabled(context)) {
+			final WifiManager manager
+				= ContextUtils.requireSystemService(context, WifiManager.class);
+			// 自分が接続しているWi-Fiの情報を取得
+			final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
+			if (properties != null) {
+				// 自分がどこかに接続しているときは接続しているIPアドレスを除外する
+				final List<InetAddress> addresses = new ArrayList<>();
+				try {
+					for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+						for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+							if (!addr.isLoopbackAddress() && (addr instanceof Inet4Address)) {
+								final String a = addr.getHostAddress();
+								if ((a != null) && !a.contains("dummy")) {
+									addresses.add(addr);
+								}
+							}
+						}
+					}
+					// 自分が接続しているときはその接続のIPアドレスを除外する
+					final List<LinkAddress> linked = properties.getLinkAddresses();
+					for (final LinkAddress addr: linked) {
+						addresses.remove(addr.getAddress());
+					}
+					if (!addresses.isEmpty()) {
+						return addresses.get(0).getHostAddress();
+					}
+				} catch (final SocketException | NullPointerException e) {
+					Log.e(TAG, "getLocalIPv4Address", e);
+				}
+			} else {
+				// 自分がどこにも繋がっていなければ普通にローカルアドレスの取得を試みる
+				return NetworkUtils.getLocalIPv4Address();
+			}
+		}
+		return null;
+	}
+
+	/**
+	 * SoftApの自分側IPv6アドレスを取得する
+	 * @param context
+	 * @return SoftApが無効または取得できなければnull
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static String getLocalIPv6Address(@NonNull final Context context) {
+		if (isWifiApEnabled(context)) {
+			final WifiManager manager
+				= ContextUtils.requireSystemService(context, WifiManager.class);
+			// 自分が接続しているWi-Fiの情報を取得
+			final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
+			Log.i(TAG, "LinkProperties=" + properties);
+			if (properties != null) {
+				// 自分がどこかに接続しているときは接続しているIPアドレスを除外する
+				final List<InetAddress> addresses = new ArrayList<>();
+				try {
+					for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+						for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+							if (!addr.isLoopbackAddress() && (addr instanceof Inet6Address)) {
+								final String a = addr.getHostAddress();
+								if ((a != null) && !a.contains("dummy")) {
+									addresses.add(addr);
+								}
+							}
+						}
+					}
+					// 自分が接続しているときはその接続のIPアドレスを除外する
+					final List<LinkAddress> linked = properties.getLinkAddresses();
+					for (final LinkAddress addr: linked) {
+						addresses.remove(addr.getAddress());
+					}
+					if (!addresses.isEmpty()) {
+						return addresses.get(0).getHostAddress();
+					}
+				} catch (final SocketException | NullPointerException e) {
+					Log.e(TAG, "getLocalIPv6Address", e);
+				}
+			} else {
+				// 自分がどこにも繋がっていなければ普通にローカルアドレスの取得を試みる
+				return NetworkUtils.getLocalIPv6Address();
+			}
+		}
+		return null;
 	}
 
 	/**
