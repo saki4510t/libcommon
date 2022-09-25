@@ -210,7 +210,6 @@ public class WifiApUtils {
 				= ContextUtils.requireSystemService(context, WifiManager.class);
 			// 自分が接続しているWi-Fiの情報を取得
 			final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
-			Log.i(TAG, "LinkProperties=" + properties);
 			if (properties != null) {
 				// 自分がどこかに接続しているときは接続しているIPアドレスを除外する
 				final List<InetAddress> addresses = new ArrayList<>();
