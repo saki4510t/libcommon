@@ -18,6 +18,7 @@ package com.serenegiant.net;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -34,6 +35,7 @@ import androidx.annotation.Nullable;
  * テストサーバー等でSSL/TLSの証明書のエラーで接続できない時に一時的にごまかすために使う
  * 本番環境では使わないこと
  */
+@SuppressLint("CustomX509TrustManager")
 public class TrustAllX509TrustManager implements X509TrustManager {
 	private final boolean debug;
 	private final String tag;
