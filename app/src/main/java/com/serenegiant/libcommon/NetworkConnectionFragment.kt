@@ -89,7 +89,8 @@ class NetworkConnectionFragment : BaseFragment() {
 		}
 		try {
 			Log.i(TAG, "SoftAp state=${WifiApUtils.getWifiApStateString(context)}")
-			Log.i(TAG, "SoftAp config=${WifiApUtils.getWifiApConfiguration(context)}")
+			// これはNETWORK_SETTINGSパーミッションが必要みたいで実行できない
+//			Log.i(TAG, "SoftAp config=${WifiApUtils.getWifiApConfiguration(context)}")
 		} catch (e: Exception) {
 			Log.w(TAG, e);
 		}
