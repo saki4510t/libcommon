@@ -1,0 +1,139 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.serenegiant",
+    "module": "common",
+    "version": "8.4.1",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "7.3.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "releaseVariantReleaseApiPublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-8.4.1.aar",
+          "url": "common-8.4.1.aar",
+          "size": 1625388,
+          "sha512": "563a907fc43751411a11efe72c66949e88526b3bea5ffae09adfc6e038c3013ff3ebdc779c3372aca68a98761a21ae055e26b53f76ba63616bb5d0f12cb9b340",
+          "sha256": "0f219528a317da7020c2f2d33a996ffc706f8bfb00cf8856009372fbd7eaebc2",
+          "sha1": "d6da850af8a6d37b6c6466d705e3836da4c49cb5",
+          "md5": "75c8f4a3384963e35fb808bafdb8f1a5"
+        }
+      ]
+    },
+    {
+      "name": "releaseVariantReleaseRuntimePublication",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.libraryelements": "aar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "org.jetbrains.kotlin",
+          "module": "kotlin-stdlib-jdk8",
+          "version": {
+            "requires": "1.7.10"
+          }
+        },
+        {
+          "group": "androidx.core",
+          "module": "core-ktx",
+          "version": {
+            "requires": "1.6.0"
+          }
+        },
+        {
+          "group": "androidx.legacy",
+          "module": "legacy-support-v4",
+          "version": {
+            "requires": "1.0.0"
+          }
+        },
+        {
+          "group": "androidx.appcompat",
+          "module": "appcompat",
+          "version": {
+            "requires": "1.3.1"
+          }
+        },
+        {
+          "group": "androidx.recyclerview",
+          "module": "recyclerview",
+          "version": {
+            "requires": "1.2.1"
+          }
+        },
+        {
+          "group": "androidx.preference",
+          "module": "preference-ktx",
+          "version": {
+            "requires": "1.1.1"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-extensions",
+          "version": {
+            "requires": "2.2.0"
+          }
+        },
+        {
+          "group": "androidx.exifinterface",
+          "module": "exifinterface",
+          "version": {
+            "requires": "1.3.3"
+          }
+        },
+        {
+          "group": "com.google.android.material",
+          "module": "material",
+          "version": {
+            "requires": "1.4.0"
+          }
+        },
+        {
+          "group": "androidx.lifecycle",
+          "module": "lifecycle-viewmodel-ktx",
+          "version": {
+            "requires": "2.3.1"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "common-8.4.1.aar",
+          "url": "common-8.4.1.aar",
+          "size": 1625388,
+          "sha512": "563a907fc43751411a11efe72c66949e88526b3bea5ffae09adfc6e038c3013ff3ebdc779c3372aca68a98761a21ae055e26b53f76ba63616bb5d0f12cb9b340",
+          "sha256": "0f219528a317da7020c2f2d33a996ffc706f8bfb00cf8856009372fbd7eaebc2",
+          "sha1": "d6da850af8a6d37b6c6466d705e3836da4c49cb5",
+          "md5": "75c8f4a3384963e35fb808bafdb8f1a5"
+        }
+      ]
+    }
+  ]
+}
