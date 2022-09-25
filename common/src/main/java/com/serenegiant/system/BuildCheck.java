@@ -634,6 +634,14 @@ public final class BuildCheck {
 	 * あぁーる API>=30
 	 * @return
 	 */
+	public static boolean isR() {
+		return check((Build.VERSION_CODES.R));
+	}
+
+	/**
+	 * あぁーる API>=30
+	 * @return
+	 */
 	public static boolean isAndroid11() {
 		return check((Build.VERSION_CODES.R));
 	}
@@ -658,31 +666,63 @@ public final class BuildCheck {
 	 * えすどす API>=31
 	 * @return
 	 */
+	public static boolean isS() {
+		return check((31));
+	}
+
+	/**
+	 * えすどす API>=31
+	 * @return
+	 */
 	public static boolean isAndroid12() {
 		return check(31);
 	}
 
 	/**
-	 * てぃらみっす API>=32
+	 * えすぶいつぅ API>=32
 	 * @return
 	 */
-	public static boolean isAndroidT() {
+	public static boolean isS2() {
 		return check(32);
 	}
 
 	/**
-	 * てぃらみっす API>=32
+	 * えすぶいつぅ API>=32
 	 * @return
 	 */
-	public static boolean isAndroid13() {
+	public static boolean isAndroid12S2() {
 		return check(32);
 	}
 
 	/**
-	 * てぃらみっす API>=32
+	 * えすぶいつぅ API>=32
 	 * @return
 	 */
 	public static boolean isAPI32() {
 		return check(32);
+	}
+
+	/**
+	 * てぃらみっす API>=33
+	 * @return
+	 */
+	public static boolean isT() {
+		return check(33);
+	}
+
+	/**
+	 * てぃらみっす API>=33
+	 * @return
+	 */
+	public static boolean isAndroid13() {
+		return check(33);
+	}
+
+	/**
+	 * てぃらみっす API>=33
+	 * @return
+	 */
+	public static boolean isAPI33() {
+		return check(33);
 	}
 }
