@@ -46,6 +46,8 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.HandlerUtils;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -811,6 +813,85 @@ public class ConnectivityHelper {
 			return (activeNetworkInfo != null) && (activeNetworkInfo.isConnectedOrConnecting());
 		}
 		return false;
+	}
+
+	/**
+	 * ConnectivityManager#getActiveNetworkはAPI>=23なので
+	 * ConnectivityManager#getActiveNetworkInfo,
+	 * getAllNetworks, getNetworkInfoを使って
+	 * 一致するNetworkを探すことで簡易的にAPI21以降でも
+	 * 使えるようにするヘルパーメソッド
+	 * API>=21
+	 * @param manager
+	 * @return 見つからなければnull
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static Network getActiveNetwork(@NonNull final ConnectivityManager manager) {
+		if (BuildCheck.isAPI23()) {
+			return manager.getActiveNetwork();
+		} else {
+			final NetworkInfo info = manager.getActiveNetworkInfo();
+			final Network[] networks = manager.getAllNetworks();
+			if ((networks != null) && (info != null)) {
+				for (final Network network: networks) {
+					final NetworkInfo i = manager.getNetworkInfo(network);
+					if ((i != null)
+						&& (info.getType() == i.getType())
+						&& (info.getSubtype() == i.getSubtype()
+						&& (info.getClass() == i.getClass()))
+						&& (info.getState() == i.getState())) {
+						return network;
+					}
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * ConnectivityManager#getActiveLinkPropertiesはdeprecatedなので
+	 * getActiveNetworkとgetLinkPropertiesを使って等価機能を実装
+	 * API>=21
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static LinkProperties getActiveLinkProperties(@NonNull final Context context) {
+		final ConnectivityManager manager
+			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+		final Network active = getActiveNetwork(manager);
+		return manager.getLinkProperties(active);
+	}
+
+	/**
+	 * 全てのネットワークのLinkPropertiesを取得する
+	 * API>=21
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<LinkProperties> getLinkPropertiesAll(@NonNull final Context context) {
+		final ConnectivityManager manager
+			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+		final List<LinkProperties> result = new ArrayList<>();
+
+		final Network[] networks = manager.getAllNetworks();
+		if (networks != null) {
+			for (final Network network: networks) {
+				final LinkProperties properties = manager.getLinkProperties(network);
+				if (properties != null) {
+					result.add(properties);
+				}
+			}
+		}
+
+		return result;
 	}
 
 //--------------------------------------------------------------------------------
