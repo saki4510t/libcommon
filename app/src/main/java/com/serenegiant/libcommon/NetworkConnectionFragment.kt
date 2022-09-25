@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.serenegiant.net.ConnectivityHelper
 import com.serenegiant.net.ConnectivityHelper.ConnectivityCallback
 import com.serenegiant.net.NetworkUtils
+import com.serenegiant.system.BuildCheck
 
 /*
  * libcommon
@@ -69,6 +70,12 @@ class NetworkConnectionFragment : BaseFragment() {
 		val locals = NetworkUtils.getLocalAddresses()
 		for (addr in locals) {
 			NetworkUtils.dump(addr)
+		}
+		if (BuildCheck.isAPI21()) {
+			Log.i(TAG, "getLinkPropertiesAll")
+			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(requireContext())) {
+				Log.i(TAG, "$linkProperties")
+			}
 		}
 	}
 
