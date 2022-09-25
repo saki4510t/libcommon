@@ -72,9 +72,17 @@ class NetworkConnectionFragment : BaseFragment() {
 			NetworkUtils.dump(addr)
 		}
 		if (BuildCheck.isAPI21()) {
+			Log.i(TAG, "getNetworkAll")
+			for (network in ConnectivityHelper.getNetworkAll(requireContext())) {
+				Log.i(TAG, "$network")
+			}
 			Log.i(TAG, "getLinkPropertiesAll")
 			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(requireContext())) {
 				Log.i(TAG, "$linkProperties")
+			}
+			Log.i(TAG, "getLinkPropertiesAll")
+			for (caps in ConnectivityHelper.getNetworkCapabilitiesAll(requireContext())) {
+				Log.i(TAG, "$caps")
 			}
 		}
 	}

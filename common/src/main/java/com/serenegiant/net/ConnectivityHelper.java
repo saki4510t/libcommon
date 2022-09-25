@@ -47,6 +47,8 @@ import com.serenegiant.utils.HandlerUtils;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -822,6 +824,24 @@ public class ConnectivityHelper {
 	 * 一致するNetworkを探すことで簡易的にAPI21以降でも
 	 * 使えるようにするヘルパーメソッド
 	 * API>=21
+	 * @param context
+	 * @return 見つからなければnull
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static Network getActiveNetwork(@NonNull final Context context) {
+		return getActiveNetwork(
+			ContextUtils.requireSystemService(context, ConnectivityManager.class));
+	}
+
+	/**
+	 * ConnectivityManager#getActiveNetworkはAPI>=23なので
+	 * ConnectivityManager#getActiveNetworkInfo,
+	 * getAllNetworks, getNetworkInfoを使って
+	 * 一致するNetworkを探すことで簡易的にAPI21以降でも
+	 * 使えるようにするヘルパーメソッド
+	 * API>=21
 	 * @param manager
 	 * @return 見つからなければnull
 	 */
@@ -848,6 +868,26 @@ public class ConnectivityHelper {
 			}
 			return null;
 		}
+	}
+
+	/**
+	 * 全てのネットワークのNetworkを取得する
+	 * API>=21
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<Network> getNetworkAll(@NonNull final Context context) {
+		final ConnectivityManager manager
+			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+		final Network[] networks = manager.getAllNetworks();
+		if (networks != null) {
+			return Arrays.asList(networks);
+		}
+
+		return Collections.emptyList();
 	}
 
 	/**
@@ -887,6 +927,49 @@ public class ConnectivityHelper {
 				final LinkProperties properties = manager.getLinkProperties(network);
 				if (properties != null) {
 					result.add(properties);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * 全てのネットワークのNetworkCapabilitiesを取得する
+	 * API>=21
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static NetworkCapabilities getActiveNetworkCapabilities(@NonNull final Context context) {
+		final ConnectivityManager manager
+			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+
+		return manager.getNetworkCapabilities(getActiveNetwork(manager));
+	}
+
+	/**
+	 * 全てのネットワークのNetworkCapabilitiesを取得する
+	 * API>=21
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<NetworkCapabilities> getNetworkCapabilitiesAll(@NonNull final Context context) {
+		final ConnectivityManager manager
+			= ContextUtils.requireSystemService(context, ConnectivityManager.class);
+		final List<NetworkCapabilities> result = new ArrayList<>();
+
+		final Network[] networks = manager.getAllNetworks();
+		if (networks != null) {
+			for (final Network network: networks) {
+				final NetworkCapabilities caps = manager.getNetworkCapabilities(network);
+				if (caps != null) {
+					result.add(caps);
 				}
 			}
 		}
