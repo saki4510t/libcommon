@@ -82,7 +82,7 @@ class NetworkConnectionFragment : BaseFragment() {
 			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(context)) {
 				Log.i(TAG, "$linkProperties")
 			}
-			Log.i(TAG, "getLinkPropertiesAll")
+			Log.i(TAG, "getNetworkCapabilitiesAll")
 			for (caps in ConnectivityHelper.getNetworkCapabilitiesAll(context)) {
 				Log.i(TAG, "$caps")
 			}
