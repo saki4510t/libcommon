@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import com.serenegiant.net.ConnectivityHelper
 import com.serenegiant.net.ConnectivityHelper.ConnectivityCallback
 import com.serenegiant.net.NetworkUtils
+import com.serenegiant.net.WifiApUtils
 import com.serenegiant.system.BuildCheck
 
 /*
@@ -71,19 +72,26 @@ class NetworkConnectionFragment : BaseFragment() {
 		for (addr in locals) {
 			NetworkUtils.dump(addr)
 		}
+		val context = requireContext()
 		if (BuildCheck.isAPI21()) {
 			Log.i(TAG, "getNetworkAll")
-			for (network in ConnectivityHelper.getNetworkAll(requireContext())) {
+			for (network in ConnectivityHelper.getNetworkAll(context)) {
 				Log.i(TAG, "$network")
 			}
 			Log.i(TAG, "getLinkPropertiesAll")
-			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(requireContext())) {
+			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(context)) {
 				Log.i(TAG, "$linkProperties")
 			}
 			Log.i(TAG, "getLinkPropertiesAll")
-			for (caps in ConnectivityHelper.getNetworkCapabilitiesAll(requireContext())) {
+			for (caps in ConnectivityHelper.getNetworkCapabilitiesAll(context)) {
 				Log.i(TAG, "$caps")
 			}
+		}
+		try {
+			Log.i(TAG, "SoftAp state=${WifiApUtils.getWifiApStateString(context)}")
+			Log.i(TAG, "SoftAp config=${WifiApUtils.getWifiApConfiguration(context)}")
+		} catch (e: Exception) {
+			Log.w(TAG, e);
 		}
 	}
 
