@@ -21,6 +21,10 @@
 	<!-- Android 9 以降でフォアグラウンドサービスを実行するため -->
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 
+	<!-- 位置情報・BluetoothやWiFiのスキャンを利用できるようにするため -->
+	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+
 	<application
 		android:name="androidx.multidex.MultiDexApplication"
 		android:allowBackup="true"
@@ -29,7 +33,9 @@
 		android:supportsRtl="true"
 		android:theme="@style/AppTheme"
 		tools:ignore="GoogleAppIndexingWarning">
-		<activity android:name=".MainActivity">
+
+		<activity android:name=".MainActivity"
+			android:exported="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
 				<category android:name="android.intent.category.LAUNCHER"/>
