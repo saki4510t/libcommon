@@ -103,6 +103,17 @@ class NetworkConnectionFragment : BaseFragment() {
 			Log.i(TAG, "SoftAp v4 addr=${WifiApUtils.getLocalIPv4Address(context)}")
 			Log.i(TAG, "SoftAp v6 addr=${WifiApUtils.getLocalIPv6Address(context)}")
 		}
+		Log.i(TAG, "local v4 addr=${NetworkUtils.getLocalIPv4Address()}")
+		Log.i(TAG, "local v6 addr=${NetworkUtils.getLocalIPv6Address()}")
+		if (BuildCheck.isAPI21()) {
+			Log.i(TAG, "linked v4 addr=${NetworkUtils.getLinkedIPv4Addresses(context)}")
+			Log.i(TAG, "linked v6 addr=${NetworkUtils.getLinkedIPv6Addresses(context)}")
+			Log.i(TAG, "getLinkedAddresses")
+			val linkedAddrs = NetworkUtils.getLinkedAddresses(context)
+			for (addr in linkedAddrs) {
+				NetworkUtils.dump(addr)
+			}
+		}
 	}
 
 	override fun onCreateView(inflater: LayoutInflater,

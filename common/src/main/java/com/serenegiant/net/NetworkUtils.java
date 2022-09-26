@@ -18,6 +18,11 @@ package com.serenegiant.net;
  *  limitations under the License.
 */
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.net.LinkAddress;
+import android.net.LinkProperties;
+import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.utils.ThreadPool;
@@ -38,6 +43,7 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 
 /**
  * ネットワーク関係のヘルパーメソッドを定義するヘルパークラス
@@ -51,6 +57,7 @@ public class NetworkUtils {
 
 	/**
 	 * 自分自身のIPv4アドレスを取得する
+	 * SoftApが有効なときにSoftApのホスト側アドレスが返る可能性がある
 	 * @return
 	 */
 	@Nullable
@@ -64,6 +71,7 @@ public class NetworkUtils {
 
 	/**
 	 * ループバック以外の自分自身のIPv4アドレスリストを取得する
+	 * SoftApが有効なときにSoftApのホスト側アドレスも含む
 	 * @return
 	 */
 	@NonNull
@@ -100,6 +108,7 @@ public class NetworkUtils {
 
 	/**
 	 * 自分自身のIpV6アドレスを取得する
+	 * SoftApが有効なときにSoftApのホスト側アドレスが返る可能性がある
 	 * @return
 	 */
 	@Nullable
@@ -113,6 +122,7 @@ public class NetworkUtils {
 
 	/**
 	 * ループバック以外の自分自身のIpV6アドレス一覧を取得する
+	 * SoftApが有効なときにSoftApのホスト側アドレスも含む
 	 * @return
 	 */
 	@NonNull
@@ -149,6 +159,7 @@ public class NetworkUtils {
 
 	/**
 	 * ループバッグ以外で最初に見つかったアドレスを返す
+	 * SoftApが有効なときにSoftApのホスト側アドレスを返す可能性がある
 	 * @return
 	 */
 	@Nullable
@@ -162,6 +173,7 @@ public class NetworkUtils {
 
 	/**
 	 * ループバック以外の自分自身のアドレスリストを取得する
+	 * SoftApが有効なときにSoftApのホスト側アドレスも含む
 	 * @return
 	 */
 	@NonNull
@@ -229,6 +241,80 @@ public class NetworkUtils {
 		} catch (final SocketException | NullPointerException e) {
 			Log.e(TAG, "getLoopbackAddresses", e);
 		}
+		return result;
+	}
+
+	/**
+	 * アクティブなネットワークのIpv4アドレス一覧を取得
+	 * 0または1つのはず
+	 * SoftApのホスト側アドレスがこれに含まれることはないみたい
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<InetAddress> getLinkedIPv4Addresses(@NonNull final Context context) {
+		final List<InetAddress> result = new ArrayList<>();
+		final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
+		if (properties != null) {
+			final List<LinkAddress> linked = properties.getLinkAddresses();
+			for (final LinkAddress addr: linked) {
+				final InetAddress ad = addr.getAddress();
+				if (ad instanceof Inet4Address) {
+					result.add(ad);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * アクティブなネットワークのIpv4アドレス一覧を取得
+	 * 存在していれば1個以上のはず
+	 * SoftApのホスト側アドレスがこれに含まれることはないみたい
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<InetAddress> getLinkedIPv6Addresses(@NonNull final Context context) {
+		final List<InetAddress> result = new ArrayList<>();
+		final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
+		if (properties != null) {
+			final List<LinkAddress> linked = properties.getLinkAddresses();
+			for (final LinkAddress addr: linked) {
+				final InetAddress ad = addr.getAddress();
+				if (ad instanceof Inet6Address) {
+					result.add(ad);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * アクティブなネットワークに存在するアドレス一覧を取得する
+	 * SoftApのホスト側アドレスがこれに含まれることはないみたい
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@NonNull
+	public static List<InetAddress> getLinkedAddresses(@NonNull final Context context) {
+		final List<InetAddress> result = new ArrayList<>();
+		final LinkProperties properties = ConnectivityHelper.getActiveLinkProperties(context);
+		if (properties != null) {
+			final List<LinkAddress> linked = properties.getLinkAddresses();
+			for (final LinkAddress addr: linked) {
+				result.add(addr.getAddress());
+			}
+		}
+
 		return result;
 	}
 
