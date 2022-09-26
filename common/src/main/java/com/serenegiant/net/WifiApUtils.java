@@ -190,8 +190,7 @@ public class WifiApUtils {
 				}
 			}
 		}
-		// SoftApのアドレスが取得できなければ普通にローカルアドレスの取得を試みる
-		return NetworkUtils.getLocalIPv4Address();
+		return null;
 	}
 
 	/**
@@ -235,8 +234,7 @@ public class WifiApUtils {
 				}
 			}
 		}
-		// SoftApのアドレスが取得できなければ普通にローカルアドレスの取得を試みる
-		return NetworkUtils.getLocalIPv6Address();
+		return null;
 	}
 
 	/**
