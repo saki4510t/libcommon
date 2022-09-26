@@ -188,12 +188,10 @@ public class WifiApUtils {
 				} catch (final SocketException | NullPointerException e) {
 					Log.e(TAG, "getLocalIPv4Address", e);
 				}
-			} else {
-				// 自分がどこにも繋がっていなければ普通にローカルアドレスの取得を試みる
-				return NetworkUtils.getLocalIPv4Address();
 			}
 		}
-		return null;
+		// SoftApのアドレスが取得できなければ普通にローカルアドレスの取得を試みる
+		return NetworkUtils.getLocalIPv4Address();
 	}
 
 	/**
@@ -235,12 +233,10 @@ public class WifiApUtils {
 				} catch (final SocketException | NullPointerException e) {
 					Log.e(TAG, "getLocalIPv6Address", e);
 				}
-			} else {
-				// 自分がどこにも繋がっていなければ普通にローカルアドレスの取得を試みる
-				return NetworkUtils.getLocalIPv6Address();
 			}
 		}
-		return null;
+		// SoftApのアドレスが取得できなければ普通にローカルアドレスの取得を試みる
+		return NetworkUtils.getLocalIPv6Address();
 	}
 
 	/**
