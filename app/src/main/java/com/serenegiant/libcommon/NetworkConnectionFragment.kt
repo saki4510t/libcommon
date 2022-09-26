@@ -72,6 +72,11 @@ class NetworkConnectionFragment : BaseFragment() {
 		for (addr in locals) {
 			NetworkUtils.dump(addr)
 		}
+		Log.i(TAG, "dumpLoopBacks")
+		val loopbacks = NetworkUtils.getLoopbackAddresses()
+		for (addr in loopbacks) {
+			NetworkUtils.dump(addr)
+		}
 		val context = requireContext()
 		if (BuildCheck.isAPI21()) {
 			Log.i(TAG, "getNetworkAll")
@@ -95,8 +100,8 @@ class NetworkConnectionFragment : BaseFragment() {
 			Log.w(TAG, e);
 		}
 		if (BuildCheck.isAPI21()) {
-			Log.i(TAG, "SoftAp addr=${WifiApUtils.getLocalIPv4Address(context)}")
-			Log.i(TAG, "SoftAp addr=${WifiApUtils.getLocalIPv6Address(context)}")
+			Log.i(TAG, "SoftAp v4 addr=${WifiApUtils.getLocalIPv4Address(context)}")
+			Log.i(TAG, "SoftAp v6 addr=${WifiApUtils.getLocalIPv6Address(context)}")
 		}
 	}
 

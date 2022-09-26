@@ -55,71 +55,11 @@ public class NetworkUtils {
 	 */
 	@Nullable
 	public static String getLocalIPv4Address() {
-		try {
-			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
-					if (!addr.isLoopbackAddress() && (addr instanceof Inet4Address)) {
-						final String a = addr.getHostAddress();
-						if ((a != null) && !a.contains("dummy")) {
-							return addr.getHostAddress();
-						}
-					}
-				}
-			}
-			// フォールバックする, 最初に見つかったInet4Address以外のアドレスを返す,
-			// Bluetooth PANやWi-Fi Directでの接続時など
-			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
-					final InetAddress ad = addr.getAddress();
-					if (!ad.isLoopbackAddress() && !(ad instanceof Inet4Address)) {
-						final String a = ad.getHostAddress();
-						if ((a != null) && !a.contains("dummy")) {
-							return ad.getHostAddress();
-						}
-					}
-				}
-			}
-		} catch (final SocketException | NullPointerException e) {
-			Log.e(TAG, "getLocalIPv4Address", e);
+		final List<InetAddress> addrs = getLocalIPv4Addresses();
+		if (!addrs.isEmpty()) {
+			return addrs.get(0).getHostAddress();
 		}
 		return null;
-	}
-
-	/**
-	 * ループバック以外の自分自身のアドレスリストを取得する
-	 * @return
-	 */
-	@NonNull
-	public static List<InetAddress> getLocalAddresses() {
-		final List<InetAddress> result = new ArrayList<>();
-		try {
-			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
-					if (!addr.isLoopbackAddress()) {
-						final String a = addr.getHostAddress();
-						if ((a != null) && !a.contains("dummy")) {
-							result.add(addr);
-						}
-					}
-				}
-			}
-			// フォールバックする, 最初に見つかったもの以外のアドレスを返す,
-			// Bluetooth PANやWi-Fi Directでの接続時など
-			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
-					final InetAddress ad = addr.getAddress();
-					if (!ad.isLoopbackAddress() && !result.contains(ad)) {
-						final String a = ad.getHostAddress();
-						if ((a != null) && !a.contains("dummy")) {
-							result.add(ad);
-						}
-					}
-				}
-			}
-		} catch (final SocketException | NullPointerException e) {
-			Log.e(TAG, "getLocalAddresses", e);
-		}
-		return result;
 	}
 
 	/**
@@ -140,8 +80,7 @@ public class NetworkUtils {
 					}
 				}
 			}
-			// フォールバックする, 最初に見つかったInet4Address以外のアドレスを返す,
-			// Bluetooth PANやWi-Fi Directでの接続時など
+			// フォールバックする, Bluetooth PANやWi-Fi Directでの接続時など
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
 				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
 					final InetAddress ad = addr.getAddress();
@@ -165,16 +104,9 @@ public class NetworkUtils {
 	 */
 	@Nullable
 	public static String getLocalIPv6Address() {
-		try {
-			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
-					if (!addr.isLoopbackAddress() && (addr instanceof Inet6Address)) {
-						return addr.getHostAddress();
-					}
-				}
-			}
-		} catch (final SocketException | NullPointerException e) {
-			Log.w(TAG, "getLocalIPv6Address", e);
+		final List<InetAddress> addrs = getLocalIPv6Addresses();
+		if (!addrs.isEmpty()) {
+			return addrs.get(0).getHostAddress();
 		}
 		return null;
 	}
@@ -190,12 +122,112 @@ public class NetworkUtils {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
 				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
 					if (!addr.isLoopbackAddress() && (addr instanceof Inet6Address)) {
-						result.add(addr);
+						final String a = addr.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(addr);
+						}
+					}
+				}
+			}
+			// フォールバックする, Bluetooth PANやWi-Fi Directでの接続時など
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
+					final InetAddress ad = addr.getAddress();
+					if (!ad.isLoopbackAddress() && (ad instanceof Inet6Address) && !result.contains(ad)) {
+						final String a = ad.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(ad);
+						}
 					}
 				}
 			}
 		} catch (final SocketException | NullPointerException e) {
 			Log.w(TAG, "getLocalIPv6Addresses", e);
+		}
+		return result;
+	}
+
+	/**
+	 * ループバッグ以外で最初に見つかったアドレスを返す
+	 * @return
+	 */
+	@Nullable
+	public static String getLocalAddress() {
+		final List<InetAddress> addrs = getLocalAddresses();
+		if (!addrs.isEmpty()) {
+			return addrs.get(0).getHostAddress();
+		}
+		return null;
+	}
+
+	/**
+	 * ループバック以外の自分自身のアドレスリストを取得する
+	 * @return
+	 */
+	@NonNull
+	public static List<InetAddress> getLocalAddresses() {
+		final List<InetAddress> result = new ArrayList<>();
+		try {
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+					if (!addr.isLoopbackAddress()) {
+						final String a = addr.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(addr);
+						}
+					}
+				}
+			}
+			// フォールバックする, Bluetooth PANやWi-Fi Directでの接続時など
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
+					final InetAddress ad = addr.getAddress();
+					if (!ad.isLoopbackAddress() && !result.contains(ad)) {
+						final String a = ad.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(ad);
+						}
+					}
+				}
+			}
+		} catch (final SocketException | NullPointerException e) {
+			Log.e(TAG, "getLocalAddresses", e);
+		}
+		return result;
+	}
+
+	/**
+	 * ループバックアドレスリストを取得する
+	 * @return
+	 */
+	@NonNull
+	public static List<InetAddress> getLoopbackAddresses() {
+		final List<InetAddress> result = new ArrayList<>();
+		try {
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+					if (addr.isLoopbackAddress()) {
+						final String a = addr.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(addr);
+						}
+					}
+				}
+			}
+			// フォールバックする, Bluetooth PANやWi-Fi Directでの接続時など
+			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
+				for (final InterfaceAddress addr: intf.getInterfaceAddresses()) {
+					final InetAddress ad = addr.getAddress();
+					if (ad.isLoopbackAddress() && !result.contains(ad)) {
+						final String a = ad.getHostAddress();
+						if ((a != null) && !a.contains("dummy")) {
+							result.add(ad);
+						}
+					}
+				}
+			}
+		} catch (final SocketException | NullPointerException e) {
+			Log.e(TAG, "getLoopbackAddresses", e);
 		}
 		return result;
 	}
