@@ -55,7 +55,6 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * <uses-permission android:name="android.permission.INTERNET" />
  * <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
  * <uses-permission android:name="android.permission.READ_PHONE_STATE" />
- * <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
  *
  * <uses-feature android:name="android.hardware.wifi.direct"/>
  */
@@ -70,6 +69,13 @@ public class WiFiP2pHelper {
 	 * @param context
 	 * @return
 	 */
+	@RequiresPermission(allOf = {
+		android.Manifest.permission.ACCESS_WIFI_STATE,
+		android.Manifest.permission.CHANGE_WIFI_STATE,
+		android.Manifest.permission.CHANGE_NETWORK_STATE,
+		android.Manifest.permission.INTERNET,
+		android.Manifest.permission.ACCESS_NETWORK_STATE,
+		android.Manifest.permission.READ_PHONE_STATE})
 	public static synchronized WiFiP2pHelper getInstance(@NonNull final Context context) {
 		if ((sWiFiP2PHelper == null) || (sWiFiP2PHelper.mWeakContext.get() == null)) {
 			sWiFiP2PHelper = new WiFiP2pHelper(context);
