@@ -22,13 +22,10 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.PermissionGroupInfo;
-import android.net.Uri;
-import android.provider.Settings;
 import android.util.Log;
 
 import java.lang.ref.WeakReference;
@@ -950,12 +947,11 @@ public class PermissionUtils {
 	 * アプリの詳細設定へ遷移させる(パーミッションを取得できなかった時など)
 	 *
 	 * @param context
+	 * @deprecated SettingsUtils.openSettingsAppDetailsを使うこと
 	 */
+	@Deprecated
 	public static void openSettings(@NonNull final Context context) {
-		final Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-		final Uri uri = Uri.fromParts("package", context.getPackageName(), null);
-		intent.setData(uri);
-		context.startActivity(intent);
+		SettingsUtils.openSettingsAppDetails(context);
 	}
 
 	/**
