@@ -85,6 +85,12 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	}
 
 	@Override
+	public void setParent(@Nullable final GLPipeline parent) {
+		super.setParent(parent);
+		throw new UnsupportedOperationException("Can't set parent to GLPipelineSource");
+	}
+
+	@Override
 	protected void internalRelease() {
 		if (isValid()) {
 			mManager.runOnGLThread(new Runnable() {

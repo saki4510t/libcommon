@@ -33,6 +33,7 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
@@ -122,6 +123,12 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		mGLContext = mManager.getGLContext();
 		mCallback = callback;
 		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
+	}
+
+	@Override
+	public void setParent(@Nullable final GLPipeline parent) {
+		super.setParent(parent);
+		throw new UnsupportedOperationException("Can't set parent to GLPipelineSource");
 	}
 
 	/**
