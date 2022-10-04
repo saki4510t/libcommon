@@ -36,7 +36,7 @@ public class ProxyPipeline implements GLPipeline {
 	private static final int DEFAULT_HEIGHT = 480;
 
 	@NonNull
-	private final Object mSync = new Object();
+	protected final Object mSync = new Object();
 	private int mWidth, mHeight;
 	@Nullable
 	private GLPipeline mParent;
@@ -131,7 +131,9 @@ public class ProxyPipeline implements GLPipeline {
 	 */
 	public boolean isActive() {
 		synchronized (mSync) {
-			return !mReleased && (mPipeline != null) && (mParent != null);
+			// 破棄されていない
+			// && (親と繋がっている || GLPipelineSourceで子と繋がっている)
+			return !mReleased && (mParent != null);
 		}
 	}
 

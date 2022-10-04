@@ -140,7 +140,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	@Override
 	public boolean isActive() {
 		synchronized (mSync) {
-			return !mReleased && (mParent != null) || (mPipeline != null);
+			return !mReleased && (mParent != null);
 		}
 	}
 

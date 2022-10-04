@@ -43,8 +43,6 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
 
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 	@Nullable
 	private GLTexture mImageSource;
@@ -70,6 +68,19 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 					createImageSource(bitmap, fps);
 				}
 			});
+		}
+	}
+
+	/**
+	 * GLPipelineの実装
+	 * パイプラインチェーンに組み込まれているかどうかを取得
+	 * @return
+	 */
+	@Override
+	public boolean isActive() {
+		synchronized (mSync) {
+			// 破棄されていない && 子と繋がっている
+			return isValid() && (getPipeline() != null);
 		}
 	}
 

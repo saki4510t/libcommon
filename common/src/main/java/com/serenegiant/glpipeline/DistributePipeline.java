@@ -134,7 +134,7 @@ public class DistributePipeline implements GLPipeline {
 	 */
 	public boolean isActive() {
 		synchronized (mSync) {
-			return !mReleased && !mPipelines.isEmpty() && (mParent != null);
+			return !mReleased && (mParent != null);
 		}
 	}
 

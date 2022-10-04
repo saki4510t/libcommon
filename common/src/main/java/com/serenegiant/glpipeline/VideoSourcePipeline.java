@@ -50,8 +50,6 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 3;
 
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 	/**
 	 * 自分用のGLManagerを保持しているかどうか
@@ -186,6 +184,19 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	public boolean isValid() {
 		// super#isValidはProxyPipelineなので常にtrueを返す
 		return mManager.isValid() && (mInputSurface != null) && mInputSurface.isValid();
+	}
+
+	/**
+	 * GLPipelineの実装
+	 * パイプラインチェーンに組み込まれているかどうかを取得
+	 * @return
+	 */
+	@Override
+	public boolean isActive() {
+		synchronized (mSync) {
+			// 破棄されていない && 子と繋がっている
+			return isValid() && (getPipeline() != null);
+		}
 	}
 
 	/**
