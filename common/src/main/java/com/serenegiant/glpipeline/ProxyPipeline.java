@@ -58,7 +58,7 @@ public class ProxyPipeline implements GLPipeline {
 	 */
 	protected ProxyPipeline(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		if ((width > 0) || (height > 0)) {
+		if ((width > 0) && (height > 0)) {
 			mWidth = width;
 			mHeight = height;
 		} else {
