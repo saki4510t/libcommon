@@ -70,7 +70,7 @@ public abstract class IAudioSampler {
 		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
 		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
 		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
-		default: AUDIO_SOURCES[0] = source;
+		default: AUDIO_SOURCES[0] = source; break;
 		}
 		AudioRecord audioRecord = null;
 		for (final int src: AUDIO_SOURCES) {
