@@ -69,8 +69,8 @@ public abstract class IAudioSampler {
 		switch (source) {
 		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
 		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
-		case 1:
-		default:AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;		// 自動(UACのopenに失敗した時など)
+		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
+		default: AUDIO_SOURCES[0] = source;
 		}
 		AudioRecord audioRecord = null;
 		for (final int src: AUDIO_SOURCES) {
