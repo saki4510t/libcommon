@@ -45,17 +45,17 @@ public class AudioSampler extends IAudioSampler {
 	private final int BUFFER_SIZE;
 	private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
-	public AudioSampler(final int audio_source, final int channel_num,
-		final int sampling_rate, final int samples_per_frame, final int frames_per_buffer) {
+	public AudioSampler(final int audioSource, final int channelNum,
+		final int samplingRate, final int samplesPerFrame, final int framesPerBuffer) {
 
 		super();
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		// パラメータを保存
-		AUDIO_SOURCE = audio_source;
-		CHANNEL_COUNT = channel_num;
-		SAMPLING_RATE = sampling_rate;
-		SAMPLES_PER_FRAME = samples_per_frame * channel_num;
-		BUFFER_SIZE = getAudioBufferSize(channel_num, sampling_rate, samples_per_frame, frames_per_buffer);
+		AUDIO_SOURCE = audioSource;
+		CHANNEL_COUNT = channelNum;
+		SAMPLING_RATE = samplingRate;
+		SAMPLES_PER_FRAME = samplesPerFrame * channelNum;
+		BUFFER_SIZE = getAudioBufferSize(channelNum, samplingRate, samplesPerFrame, framesPerBuffer);
 	}
 
 	/**
