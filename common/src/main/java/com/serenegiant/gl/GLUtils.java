@@ -196,6 +196,7 @@ public class GLUtils implements GLConst {
 	 * @param height
 	 * @return 読み取ったピクセルデータの入ったByteBuffer, orderはLITTLE_ENDIAN
 	 */
+	@NonNull
 	public static ByteBuffer glReadPixels(
 		@Nullable final ByteBuffer buffer,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
