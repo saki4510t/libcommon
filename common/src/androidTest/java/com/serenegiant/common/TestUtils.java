@@ -24,7 +24,7 @@ public class TestUtils {
 	 * @param b
 	 * @return
 	 */
-	public static boolean bitMapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b) {
+	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b) {
 		boolean result = false;
 		if ((a.getWidth() == b.getWidth())
 			&& (a.getHeight() == b.getHeight()

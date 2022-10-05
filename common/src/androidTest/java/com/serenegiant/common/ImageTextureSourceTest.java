@@ -114,7 +114,7 @@ public class ImageTextureSourceTest {
 //			dump(b);
 			assertNotNull(b);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitMapEquals(original, b));
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}

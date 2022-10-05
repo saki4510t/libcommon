@@ -49,7 +49,6 @@ import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
@@ -280,7 +279,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(b);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -351,14 +350,14 @@ public class GLPipelineTest {
 			result1.copyPixelsFromBuffer(buffer1);
 //			dump(result1);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitMapEquals(original, result1));
+			assertTrue(bitmapEquals(original, result1));
 
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result2 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result2.copyPixelsFromBuffer(buffer2);
 //			dump(result2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitMapEquals(original, result2));
+			assertTrue(bitmapEquals(original, result2));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -432,7 +431,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
-			assertTrue(bitMapEquals(original, flipVertical(result)));
+			assertTrue(bitmapEquals(original, flipVertical(result)));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -446,7 +445,7 @@ public class GLPipelineTest {
 	public void effectPipeline1() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(original);
+		dump(original);
 
 		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
@@ -489,8 +488,8 @@ public class GLPipelineTest {
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitMapEquals(original, result));
+			dump(result);
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -550,7 +549,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -612,7 +611,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -669,7 +668,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -709,7 +708,7 @@ public class GLPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 //			dump(result);
 			assertEquals(1, cnt.get());
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -752,7 +751,7 @@ public class GLPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 //			dump(result);
 			assertEquals(NUM_TRIGGERS, cnt.get());
-			assertTrue(bitMapEquals(original, result));
+			assertTrue(bitmapEquals(original, result));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
