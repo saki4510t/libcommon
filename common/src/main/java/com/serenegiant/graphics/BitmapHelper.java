@@ -855,7 +855,7 @@ public final class BitmapHelper {
 			dest = Bitmap.createBitmap(src);
 		} else if (!src.equals(dest)) {
 			final Canvas canvas = new Canvas(dest);
-			canvas.setBitmap(src);
+			canvas.drawBitmap(src, 0, 0, new Paint());
 		}
 		return dest;
 	}

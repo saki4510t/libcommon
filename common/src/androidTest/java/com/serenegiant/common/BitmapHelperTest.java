@@ -41,6 +41,9 @@ import static com.serenegiant.common.TestUtils.*;
 public class BitmapHelperTest {
 	private static final String TAG = BitmapHelperTest.class.getSimpleName();
 
+	private static final int WIDTH = 200;
+	private static final int HEIGHT = 200;
+
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
@@ -51,13 +54,27 @@ public class BitmapHelperTest {
 		final Context context = ApplicationProvider.getApplicationContext();
 	}
 
+	@Test
+	public void copy() {
+		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT,15, 18,
+			Bitmap.Config.ARGB_8888);
+		// copyBitmapのコピー先をnullとした場合は内部で自動生成
+		final Bitmap dst = BitmapHelper.copyBitmap(b0, null);
+		assertTrue(bitMapEquals(b0, dst));
+		// あらかじめ割り当てたビットマップへコピーする場合
+		final Bitmap dst1 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		BitmapHelper.copyBitmap(b0, dst1);
+		assertTrue(bitMapEquals(b0, dst1));
+	}
+
 	/**
 	 * BitmapHelper#invertAlphaのテスト
 	 */
 	@Test
 	public void invertAlpha() {
 		final Bitmap b0 = BitmapHelper.genMaskImage(
-			0, 200, 200,60,
+			0, WIDTH, HEIGHT,60,
 			Color.RED,0, 100);
 		final Bitmap inverted = BitmapHelper.invertAlpha(b0);
 		// 2回アルファ値を反転させると元と一致するはず
@@ -70,7 +87,7 @@ public class BitmapHelperTest {
 	@Test
 	public void applyMirror() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			200, 200,15, 18,
+			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
 
 		final Bitmap normal = BitmapHelper.applyMirror(original, IMirror.MIRROR_NORMAL);
