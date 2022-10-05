@@ -24,6 +24,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.glpipeline.CapturePipeline;
 import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.DrawerPipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
@@ -48,6 +49,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
@@ -671,6 +673,90 @@ public class GLPipelineTest {
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Test
+	public void capturePipeline_oneshot() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		// ImageSourcePipeline → CapturePipeline
+
+		final GLManager manager = new GLManager();
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+
+		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+			@Override
+			public void onCapture(@NonNull final Bitmap bitmap) {
+				BitmapHelper.copyBitmap(bitmap, result);
+				cnt.incrementAndGet();
+				sem.release();
+			}
+		});
+
+
+		source.setPipeline(capturePipeline);
+
+		assertTrue(validatePipelineOrder(source, source, capturePipeline));
+
+		capturePipeline.trigger();
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+//			dump(result);
+			assertEquals(1, cnt.get());
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+		cnt.set(0);
+	}
+
+	@Test
+	public void capturePipeline_multiple() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		final int NUM_TRIGGERS = 9;
+		// ImageSourcePipeline → CapturePipeline
+
+		final GLManager manager = new GLManager();
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+
+		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		final Semaphore sem = new Semaphore(0);
+		final AtomicInteger cnt = new AtomicInteger();
+		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
+			@Override
+			public void onCapture(@NonNull final Bitmap bitmap) {
+				BitmapHelper.copyBitmap(bitmap, result);
+				if (cnt.incrementAndGet() >= NUM_TRIGGERS) {
+					sem.release();
+				}
+			}
+		});
+
+
+		source.setPipeline(capturePipeline);
+
+		assertTrue(validatePipelineOrder(source, source, capturePipeline));
+
+		capturePipeline.trigger(NUM_TRIGGERS, 100);
+		try {
+			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+//			dump(result);
+			assertEquals(NUM_TRIGGERS, cnt.get());
+			assertTrue(bitMapEquals(original, result));
+		} catch (final InterruptedException e) {
+			e.printStackTrace();
+		}
+		cnt.set(0);
 	}
 
 //--------------------------------------------------------------------------------
