@@ -161,6 +161,12 @@ class MainActivity
 				}
 				fragment = UsbFragment.newInstance()
 			}
+			R.string.title_audio_record -> {
+				if (!checkPermissionAudio()) {
+					return
+				}
+				fragment = AudioRecordFragment.newInstance()
+			}
 			R.string.title_camera -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
