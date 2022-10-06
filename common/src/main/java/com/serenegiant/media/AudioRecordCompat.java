@@ -57,6 +57,32 @@ public class AudioRecordCompat {
   	@Retention(RetentionPolicy.SOURCE)
   	public @interface AudioChannel {}
 
+	/**
+	 * チャネル数またはAudioFormat.CHANNEL_IN_MONO/CHANNEL_IN_STEREOを
+	 * CHANNEL_IN_MONO/CHANNEL_IN_STEREOに変換する
+	 * @param channels 1, 2, CHANNEL_IN_MONO, CHANNEL_IN_STEREOのいずれか
+	 * @return 1またはCHANNEL_IN_MONOであればCHANNEL_IN_MONO,
+	 * 			2またはCHANNEL_IN_STEREOであればCHANNEL_IN_STEREO,
+	 * 			それ以外はCHANNEL_IN_STEREO
+	 */
+	@AudioChannel
+	public static int getAudioChannel(final int channels) {
+		@AudioRecordCompat.AudioChannel
+		final int audioChannel;
+		switch (channels) {
+		case AudioFormat.CHANNEL_IN_MONO:
+			audioChannel = AudioFormat.CHANNEL_IN_MONO;
+			break;
+		case AudioFormat.CHANNEL_IN_STEREO:
+			audioChannel = AudioFormat.CHANNEL_IN_STEREO;
+			break;
+		default:
+			audioChannel = (channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO);
+			break;
+		}
+		return audioChannel;
+	}
+
    /**
   	 * AudioRecord生成用のヘルパーメソッド
   	 * @param source
@@ -84,15 +110,13 @@ public class AudioRecordCompat {
   				.setAudioFormat(new AudioFormat.Builder()
   					.setEncoding(format)
   					.setSampleRate(samplingRate)
-  					.setChannelMask((channels == 1
-  						? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO))
+  					.setChannelMask(channels)
   					.build())
   				.setBufferSizeInBytes(bufferSize)
   				.build();
   		} else {
   			audioRecord = new AudioRecord(source, samplingRate,
-  				(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
-  				format, bufferSize);
+  				channels, format, bufferSize);
   		}
   		if (audioRecord == null) {
   			throw new UnsupportedOperationException ("Failed to create AudioRecord");
