@@ -20,7 +20,6 @@ package com.serenegiant.media;
 
 import java.nio.ByteBuffer;
 
-import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.util.Log;
 
@@ -43,7 +42,6 @@ public class AudioSampler extends IAudioSampler {
     private final int SAMPLING_RATE, CHANNEL_COUNT;
 	private final int SAMPLES_PER_FRAME;
 	private final int BUFFER_SIZE;
-	private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
 	public AudioSampler(final int audioSource, final int channelNum,
 		final int samplingRate, final int samplesPerFrame, final int framesPerBuffer) {
@@ -107,25 +105,6 @@ public class AudioSampler extends IAudioSampler {
 	protected static final class AudioRecordRec {
 		AudioRecord audioRecord;
 		int bufferSize;
-	}
-
-	/**
-	 * AudioRecorder初期化時に使用するバッファサイズを計算
-	 * @param channel_num
-	 * @param sampling_rate
-	 * @param samples_per_frame
-	 * @param frames_per_buffer
-	 * @return
-	 */
-	public static int getAudioBufferSize(final int channel_num,
-			final int sampling_rate, final int samples_per_frame, final int frames_per_buffer) {
-		final int min_buffer_size = AudioRecord.getMinBufferSize(sampling_rate,
-			(channel_num == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
-			AUDIO_FORMAT);
-		int buffer_size = samples_per_frame * frames_per_buffer;
-		if (buffer_size < min_buffer_size)
-			buffer_size = ((min_buffer_size / samples_per_frame) + 1) * samples_per_frame * 2 * channel_num;
-		return buffer_size;
 	}
 
 	/**

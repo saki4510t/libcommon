@@ -38,7 +38,9 @@ public class AudioRecordCompat {
       // インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
    }
 
-   public static final int AUDIO_SOURCE_UAC = 100;
+	public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+
+	public static final int AUDIO_SOURCE_UAC = 100;
   	@IntDef({
   		MediaRecorder.AudioSource.DEFAULT,
   		MediaRecorder.AudioSource.MIC,
@@ -56,6 +58,25 @@ public class AudioRecordCompat {
   	})
   	@Retention(RetentionPolicy.SOURCE)
   	public @interface AudioChannel {}
+
+	/**
+	 * AudioRecorder初期化時に使用するバッファサイズを計算
+	 * @param channelNum
+	 * @param samplingTate
+	 * @param samplesPerFrame
+	 * @param framesPerBuffer
+	 * @return
+	 */
+	public static int getAudioBufferSize(final int channelNum, final int format,
+			final int samplingTate, final int samplesPerFrame, final int framesPerBuffer) {
+		final int minBufferSize = AudioRecord.getMinBufferSize(samplingTate,
+			(channelNum == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
+			format);
+		int bufferSize = samplesPerFrame * framesPerBuffer;
+		if (bufferSize < minBufferSize)
+			bufferSize = ((minBufferSize / samplesPerFrame) + 1) * samplesPerFrame * 2 * channelNum;
+		return bufferSize;
+	}
 
 	/**
 	 * チャネル数またはAudioFormat.CHANNEL_IN_MONO/CHANNEL_IN_STEREOを

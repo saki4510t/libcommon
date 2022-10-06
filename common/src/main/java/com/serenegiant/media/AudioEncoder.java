@@ -21,6 +21,7 @@ package com.serenegiant.media;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
@@ -92,12 +93,14 @@ public class AudioEncoder extends AbstractAudioEncoder {
     		super("AudioThread");
     	}
 
+		@SuppressLint("MissingPermission")
     	@Override
-    	public final void run() {
+    	public void run() {
     		if (DEBUG) Log.v(TAG, getName() + " started");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			final int buffer_size = AudioSampler.getAudioBufferSize(mChannelCount, mSampleRate,
-				AbstractAudioEncoder.SAMPLES_PER_FRAME, AbstractAudioEncoder.FRAMES_PER_BUFFER);
+			final int buffer_size = AudioRecordCompat.getAudioBufferSize(
+				mChannelCount, AudioRecordCompat.AUDIO_FORMAT,
+				mSampleRate, AbstractAudioEncoder.SAMPLES_PER_FRAME, AbstractAudioEncoder.FRAMES_PER_BUFFER);
 /*
 			final Class audioSystemClass = Class.forName("android.media.AudioSystem");
 			// will disable the headphone
