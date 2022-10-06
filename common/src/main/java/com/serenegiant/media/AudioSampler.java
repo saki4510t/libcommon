@@ -20,18 +20,21 @@ package com.serenegiant.media;
 
 import java.nio.ByteBuffer;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.media.AudioRecord;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 
 /**
  * AudioRecordを使って音声データを取得し、登録したコールバックへ分配するためのクラス
  * 同じ音声入力ソースに対して複数のAudioRecordを生成するとエラーになるのでシングルトン的にアクセス出来るようにするため
  */
 public class AudioSampler extends IAudioSampler {
-//	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = AudioSampler.class.getSimpleName();
 
 	@NonNull
@@ -42,9 +45,40 @@ public class AudioSampler extends IAudioSampler {
     private final int SAMPLING_RATE, CHANNEL_COUNT;
 	private final int SAMPLES_PER_FRAME;
 	private final int BUFFER_SIZE;
+	private final boolean FORCE_SOURCE;
 
+	/**
+	 * コンストラクタ
+	 * @param audioSource 音声ソース, MediaRecorder.AudioSourceのどれか
+	 *     ただし、一般アプリで利用できないVOICE_UPLINK(2)はCAMCORDER(5)へ
+	 *     VOICE_DOWNLINK(3)はVOICE_COMMUNICATION(7)
+	 *     VOICE_CALL(4)はMIC(1)へ置換する
+	 * @param channelNum
+	 * @param samplingRate
+	 * @param samplesPerFrame
+	 * @param framesPerBuffer
+	 */
 	public AudioSampler(final int audioSource, final int channelNum,
 		final int samplingRate, final int samplesPerFrame, final int framesPerBuffer) {
+
+		this(audioSource, channelNum, samplingRate, samplesPerFrame, framesPerBuffer, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param audioSource 音声ソース, MediaRecorder.AudioSourceのどれか
+	 *     ただし、一般アプリで利用できないVOICE_UPLINK(2)はCAMCORDER(5)へ
+	 *     VOICE_DOWNLINK(3)はVOICE_COMMUNICATION(7)
+	 *     VOICE_CALL(4)はMIC(1)へ置換する
+	 * @param channelNum 音声チャネル数, 1 or 2
+	 * @param samplingRate サンプリングレート
+	 * @param samplesPerFrame 1フレーム辺りのサンプル数
+	 * @param framesPerBuffer バッファ辺りのフレーム数
+	 * @param forceSource 音声ソースを強制するかどうか, falseなら利用可能な音声ソースを順に試す
+	 */
+	public AudioSampler(final int audioSource, final int channelNum,
+		final int samplingRate, final int samplesPerFrame, final int framesPerBuffer,
+		final boolean forceSource) {
 
 		super();
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -53,7 +87,10 @@ public class AudioSampler extends IAudioSampler {
 		CHANNEL_COUNT = channelNum;
 		SAMPLING_RATE = samplingRate;
 		SAMPLES_PER_FRAME = samplesPerFrame * channelNum;
-		BUFFER_SIZE = getAudioBufferSize(channelNum, samplingRate, samplesPerFrame, framesPerBuffer);
+		BUFFER_SIZE = AudioRecordCompat.getAudioBufferSize(
+			channelNum, AudioRecordCompat.AUDIO_FORMAT,
+			samplingRate, samplesPerFrame, framesPerBuffer);
+		FORCE_SOURCE = forceSource;
 	}
 
 	/**
@@ -69,6 +106,7 @@ public class AudioSampler extends IAudioSampler {
 	 * 音声データサンプリング開始
 	 * 実際の処理は別スレッド上で実行される
 	 */
+	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	@Override
 	public synchronized void start() {
 //		if (DEBUG) Log.v(TAG, "start:mIsCapturing=" + mIsCapturing);
@@ -116,8 +154,9 @@ public class AudioSampler extends IAudioSampler {
     		super("AudioThread");
     	}
 
+		@SuppressLint("MissingPermission")
     	@Override
-    	public final void run() {
+    	public void run() {
 //    		if (DEBUG) Log.v(TAG, "AudioThread:start");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
 //    		if (DEBUG) Log.v(TAG, getName() + " started");
@@ -129,8 +168,21 @@ public class AudioSampler extends IAudioSampler {
 */
 			int retry = 3;
 RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
-				final AudioRecord audioRecord = createAudioRecord(
-					AUDIO_SOURCE, SAMPLING_RATE, CHANNEL_COUNT, AUDIO_FORMAT, BUFFER_SIZE);
+				@AudioRecordCompat.AudioChannel
+				final int audioChannel = AudioRecordCompat.getAudioChannel(CHANNEL_COUNT);
+				AudioRecord audioRecord;
+				if (FORCE_SOURCE) {
+					try {
+						audioRecord = AudioRecordCompat.newInstance(
+							AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.AUDIO_FORMAT, BUFFER_SIZE);
+					} catch (final Exception e) {
+						Log.d(TAG, "AudioThread:", e);
+						audioRecord = null;
+					}
+				} else {
+					audioRecord = createAudioRecord(
+						AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.AUDIO_FORMAT, BUFFER_SIZE);
+				}
 				int err_count = 0;
 				if (audioRecord != null) {
 					try {
