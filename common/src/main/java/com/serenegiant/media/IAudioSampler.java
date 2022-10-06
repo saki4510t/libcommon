@@ -36,7 +36,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 public abstract class IAudioSampler {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
 
 	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
@@ -71,6 +71,7 @@ public abstract class IAudioSampler {
             	audioRecord = null;
             }
             if (audioRecord != null) {
+            	if (DEBUG) Log.v(IAudioSampler.class.getSimpleName(), "createAudioRecord:created, src=" + src);
             	break;
 			}
     	}
@@ -128,13 +129,13 @@ public abstract class IAudioSampler {
 	 * 音声データのサンプリングを停止して全てのコールバックを削除する
 	 */
 	public void release() {
-//		if (DEBUG) Log.v(TAG, "release:mIsCapturing=" + mIsCapturing);
+		if (DEBUG) Log.v(TAG, "release:mIsCapturing=" + mIsCapturing);
 		if (isStarted()) {
 			stop();
 		}
 //		mIsCapturing = false;	// 念の為に
 		mCallbacks.clear();
-//		if (DEBUG) Log.v(TAG, "release:finished");
+		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
 	/**
@@ -142,7 +143,7 @@ public abstract class IAudioSampler {
 	 */
 	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	public synchronized void start() {
-//		if (DEBUG) Log.v(TAG, "start:");
+		if (DEBUG) Log.v(TAG, "start:");
 		// コールバック用スレッドを生成＆実行
 		synchronized (mCallbackSync) {
 			if (mCallbackThread == null) {
@@ -151,14 +152,14 @@ public abstract class IAudioSampler {
 				mCallbackThread.start();
 			}
 		}
-//		if (DEBUG) Log.v(TAG, "start:finished");
+		if (DEBUG) Log.v(TAG, "start:finished");
 	}
 
 	/**
 	 * 音声サンプリング終了
 	 */
 	public synchronized void stop() {
-//		if (DEBUG) Log.v(TAG, "stop:");
+		if (DEBUG) Log.v(TAG, "stop:");
 //		new Throwable().printStackTrace();
 		synchronized (mCallbackSync) {
 			final boolean capturing = mIsCapturing;
@@ -172,7 +173,7 @@ public abstract class IAudioSampler {
 				}
 			}
 		}
-//		if (DEBUG) Log.v(TAG, "stop:finished");
+		if (DEBUG) Log.v(TAG, "stop:finished");
 	}
 
 	/**
@@ -323,7 +324,7 @@ public abstract class IAudioSampler {
 
     	@Override
     	public final void run() {
-//    		if (DEBUG) Log.i(TAG, "CallbackThread:start");
+    		if (DEBUG) Log.i(TAG, "CallbackThread:start");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
 			RecycleMediaData data;
     		for (; mIsCapturing ;) {
@@ -341,7 +342,7 @@ public abstract class IAudioSampler {
     		synchronized (mCallbackSync) {
 				mCallbackSync.notifyAll();
 			}
-//    		if (DEBUG) Log.i(TAG, "CallbackThread:finished");
+    		if (DEBUG) Log.i(TAG, "CallbackThread:finished");
     	}
     }
 
