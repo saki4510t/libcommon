@@ -41,7 +41,7 @@ class UsbFragment : BaseFragment() {
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
 		if (DEBUG) Log.v(TAG, "onAttach:$mUSBMonitor")
-		requireActivity().title = getString(R.string.title_usB_monitor)
+		requireActivity().title = getString(R.string.title_usb_monitor)
 		if (mUSBMonitor == null) {
 			mUSBMonitor = USBMonitor(context, mOnDeviceConnectListener)
 			var filters

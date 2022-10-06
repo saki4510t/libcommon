@@ -23,7 +23,7 @@
 	<string name="title_request_saf_permission" translatable="false">SAFUtils</string>
 	<string name="title_saf_filer" translatable="false">SAFFiler</string>
 	<string name="title_network_connection" translatable="false">NetworkConnection</string>
-	<string name="title_usB_monitor" translatable="false">UsbMonitor</string>
+	<string name="title_usb_monitor" translatable="false">UsbMonitor</string>
 	<string name="title_camera" translatable="false">Camera</string>
 	<string name="title_camera_rec" translatable="false">Camera(MediaAVRecorder)</string>
 	<string name="title_camera_rec_split" translatable="false">Camera(SplitRec)</string>
@@ -54,7 +54,7 @@
 		<item>@string/title_request_saf_permission</item>
 		<item>@string/title_saf_filer</item>
 		<item>@string/title_network_connection</item>
-		<item>@string/title_usB_monitor</item>
+		<item>@string/title_usb_monitor</item>
 		<item>@string/title_camera</item>
 		<item>@string/title_camera_rec</item>
 		<item>@string/title_camera_rec_split</item>

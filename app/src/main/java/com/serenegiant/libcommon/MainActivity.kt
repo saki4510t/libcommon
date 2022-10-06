@@ -154,7 +154,7 @@ class MainActivity
 				}
 				fragment = NetworkConnectionFragment.newInstance()
 			}
-			R.string.title_usB_monitor -> {	// UsbMonitor
+			R.string.title_usb_monitor -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
 					return
