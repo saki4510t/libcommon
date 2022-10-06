@@ -18,45 +18,33 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import android.Manifest;
+import android.annotation.SuppressLint;
+import android.media.AudioRecord;
+import android.media.MediaRecorder;
+import android.util.Log;
+
+import com.serenegiant.system.Time;
+
 import java.nio.ByteBuffer;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
-import android.annotation.SuppressLint;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
-import android.util.Log;
-
-import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.Time;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 
 public abstract class IAudioSampler {
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
 
-	public static final int AUDIO_SOURCE_UAC = 100;
-	@IntDef({
-		MediaRecorder.AudioSource.DEFAULT,
-		MediaRecorder.AudioSource.MIC,
-		MediaRecorder.AudioSource.CAMCORDER,
-		MediaRecorder.AudioSource.VOICE_RECOGNITION,
-		MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-		AUDIO_SOURCE_UAC,
-	})
-	@Retention(RetentionPolicy.SOURCE)
-	public @interface AudioSource {}
-
-	@SuppressLint("NewApi")
+	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
+	@Nullable
 	public static AudioRecord createAudioRecord(
 		final int source, final int sampling_rate, final int channels, final int format, final int buffer_size) {
 
-		@AudioSource
+		@AudioRecordCompat.AudioSource
 		final int[] AUDIO_SOURCES = new int[] {
 			MediaRecorder.AudioSource.DEFAULT,		// ここ(1つ目)は引数で置き換えられる
 			MediaRecorder.AudioSource.CAMCORDER,	// これにするとUSBオーディオルーティングが有効な場合でも内蔵マイクからの音になる
@@ -72,34 +60,19 @@ public abstract class IAudioSampler {
 		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
 		default: AUDIO_SOURCES[0] = source; break;
 		}
+
+		@AudioRecordCompat.AudioChannel
+		final int audioChannel = AudioRecordCompat.getAudioChannel(channels);
 		AudioRecord audioRecord = null;
 		for (final int src: AUDIO_SOURCES) {
             try {
-            	if (BuildCheck.isAndroid6()) {
-					audioRecord = new AudioRecord.Builder()
-						.setAudioSource(src)
-						.setAudioFormat(new AudioFormat.Builder()
-							.setEncoding(format)
-							.setSampleRate(sampling_rate)
-							.setChannelMask((channels == 1
-								? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO))
-							.build())
-						.setBufferSizeInBytes(buffer_size)
-						.build();
-				} else {
-					audioRecord = new AudioRecord(src, sampling_rate,
-						(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO),
-						format, buffer_size);
-				}
-				if (audioRecord.getState() != AudioRecord.STATE_INITIALIZED) {
-					audioRecord.release();
-					audioRecord = null;
-				}
+            	audioRecord = AudioRecordCompat.newInstance(src, sampling_rate, audioChannel, format, buffer_size);
             } catch (final Exception e) {
             	audioRecord = null;
             }
-            if (audioRecord != null)
+            if (audioRecord != null) {
             	break;
+			}
     	}
 		return audioRecord;
 	}
@@ -167,6 +140,7 @@ public abstract class IAudioSampler {
 	/**
 	 * 音声サンプリング開始
 	 */
+	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	public synchronized void start() {
 //		if (DEBUG) Log.v(TAG, "start:");
 		// コールバック用スレッドを生成＆実行
