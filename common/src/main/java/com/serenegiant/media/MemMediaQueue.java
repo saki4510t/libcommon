@@ -21,6 +21,8 @@ package com.serenegiant.media;
 import com.serenegiant.utils.Pool;
 
 import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
 
@@ -116,6 +118,7 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 		};
 	}
 
+	@Override
 	public void init(@Nullable final Object... args) {
 		clear();
 		mPool.init(args);
@@ -125,6 +128,13 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	public void clear() {
 		mQueue.clear();
 		mPool.clear();
+	}
+
+	@Override
+	public void drainAll() {
+		final List<RecycleMediaData> list = new ArrayList<>();
+		mQueue.drainTo(list);
+		mPool.recycle(list);
 	}
 
 	/**

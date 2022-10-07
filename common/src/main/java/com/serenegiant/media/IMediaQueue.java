@@ -39,6 +39,11 @@ public interface IMediaQueue<T extends IRecycleBuffer> extends IRecycleParent<T>
 	public void clear();
 
 	/**
+	 * キュー内のデータを全てリサイクルして空にする
+	 */
+	public void drainAll();
+
+	/**
 	 * バッファプールからIRecycleBufferを取得
 	 * @return
 	 */

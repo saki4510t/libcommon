@@ -234,6 +234,13 @@ public abstract class IAudioSampler {
 	}
 
 	/**
+	 * キュー内のデータを全てリサイクルして空にする
+	 */
+	public void drainAll() {
+		mAudioQueue.drainAll();
+	}
+
+	/**
 	 * 音声データ取得時のコールバックを呼び出す
 	 * @param data
 	 */
