@@ -802,7 +802,7 @@ public final class USBMonitor implements Const {
 		@NonNull
 		private final WeakReference<USBMonitor> mWeakMonitor;
 		@NonNull
-		private final WeakReference<UsbDevice> mWeakDevice;
+		private final UsbDevice mDevice;
 		@NonNull
 		private final UsbDeviceInfo mInfo;
 		@NonNull
@@ -822,7 +822,7 @@ public final class USBMonitor implements Const {
 
 //			if (DEBUG) Log.v(TAG, "UsbControlBlock:device=" + device);
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
-			mWeakDevice = new WeakReference<UsbDevice>(device);
+			mDevice = device;
 			// XXX UsbManager#openDeviceはIllegalArgumentExceptionを投げる可能性がある
 			try {
 				mConnection = monitor.mUsbManager.openDevice(device);
@@ -852,17 +852,17 @@ public final class USBMonitor implements Const {
 		 */
 		private UsbControlBlock(final UsbControlBlock src) throws IllegalStateException {
 			final USBMonitor monitor = src.getMonitor();
-			final UsbDevice device = src.getDevice();
-			if (device == null) {
-				throw new IllegalStateException("device may already be removed");
+			if (monitor == null) {
+				throw new IllegalStateException("USBMonitor is already released?");
 			}
+			final UsbDevice device = src.getDevice();
 			mConnection = monitor.mUsbManager.openDevice(device);
 			if (mConnection == null) {
 				throw new IllegalStateException("device may already be removed or have no permission");
 			}
 			mInfo = UsbDeviceInfo.getDeviceInfo(monitor.mUsbManager, device, null);
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
-			mWeakDevice = new WeakReference<UsbDevice>(device);
+			mDevice = device;
 			monitor.processConnect(device, this);
 		}
 
@@ -908,9 +908,9 @@ public final class USBMonitor implements Const {
 			return mWeakMonitor.get();
 		}
 
-		@Nullable
+		@NonNull
 		public UsbDevice getDevice() {
-			return mWeakDevice.get();
+			return mDevice;
 		}
 
 		@NonNull
@@ -927,8 +927,7 @@ public final class USBMonitor implements Const {
 		 */
 		@NonNull
 		public String getDeviceName() {
-			final UsbDevice device = mWeakDevice.get();
-			return device != null ? device.getDeviceName() : "";
+			return mDevice.getDeviceName();
 		}
 
 		/**
@@ -938,8 +937,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 */
 		public int getDeviceId() {
-			final UsbDevice device = mWeakDevice.get();
-			return device != null ? device.getDeviceId() : 0;
+			return mDevice.getDeviceId();
 		}
 
 		/**
@@ -1015,8 +1013,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 */
 		public int getVenderId() {
-			final UsbDevice device = mWeakDevice.get();
-			return device != null ? device.getVendorId() : 0;
+			return mDevice.getVendorId();
 		}
 
 		/**
@@ -1024,8 +1021,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 */
 		public int getProductId() {
-			final UsbDevice device = mWeakDevice.get();
-			return device != null ? device.getProductId() : 0;
+			return mDevice.getProductId();
 		}
 
 		/**
@@ -1099,10 +1095,9 @@ public final class USBMonitor implements Const {
 			}
 			UsbInterface intf = intfs.get(altsetting);
 			if (intf == null) {
-				final UsbDevice device = mWeakDevice.get();
-				final int n = device.getInterfaceCount();
+				final int n = mDevice.getInterfaceCount();
 				for (int i = 0; i < n; i++) {
-					final UsbInterface temp = device.getInterface(i);
+					final UsbInterface temp = mDevice.getInterface(i);
 					if ((temp.getId() == interface_id) && (temp.getAlternateSetting() == altsetting)) {
 						intf = temp;
 						break;
@@ -1272,7 +1267,7 @@ public final class USBMonitor implements Const {
 				connection.close();
 				final USBMonitor monitor = getMonitor();
 				final UsbDevice device = getDevice();
-				if ((monitor != null) && (device != null)) {
+				if (monitor != null) {
 					monitor.callOnDisconnect(device, this);
 				}
 			}
@@ -1283,10 +1278,9 @@ public final class USBMonitor implements Const {
 			if (o == null) return false;
 			if (o instanceof UsbControlBlock) {
 				final UsbDevice device = ((UsbControlBlock) o).getDevice();
-				return device == null ? mWeakDevice.get() == null
-						: device.equals(mWeakDevice.get());
+				return device.equals(mDevice);
 			} else if (o instanceof UsbDevice) {
-				return o.equals(mWeakDevice.get());
+				return o.equals(mDevice);
 			}
 			return super.equals(o);
 		}
