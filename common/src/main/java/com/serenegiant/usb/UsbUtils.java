@@ -510,9 +510,9 @@ public class UsbUtils implements Const {
 					sb.setLength(0);
 					for (int i = 0; i < num_interface; i++) {
 						sb.append(String.format(Locale.US, "interface%d:%s",
-							i, device.getInterface(i).toString()));
+							i, device.getInterface(i)));
 					}
-					Log.i(TAG, "key=" + key + ":" + device + ":" + sb.toString());
+					Log.i(TAG, "key=" + key + ":" + device + ":" + sb);
 				}
 			} else {
 				Log.i(TAG, "no device");
