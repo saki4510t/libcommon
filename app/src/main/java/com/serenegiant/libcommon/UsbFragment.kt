@@ -54,14 +54,6 @@ class UsbFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "onAttach:uvc=$filters")
 			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac)
 			if (DEBUG) Log.v(TAG, "onAttach:uac=$filters")
-			// API>=28以上でclass,subclassが0になってのでinterfaceClass等を追加した定義の読み込みテスト
-			filters  = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude_intf)
-			mUSBMonitor!!.setDeviceFilter(filters)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc_exclude_sub=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_intf)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc_sub=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac_intf)
-			if (DEBUG) Log.v(TAG, "onAttach:uac_sub=$filters")
 		}
 	}
 
