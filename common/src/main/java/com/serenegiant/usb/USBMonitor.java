@@ -1029,7 +1029,7 @@ public final class USBMonitor implements Const {
 		 * @return
 		 */
 		public String getUsbVersion() {
-			return mInfo.usb_version;
+			return mInfo.bcdUsb;
 		}
 
 		/**
