@@ -170,13 +170,13 @@ public class UsbDeviceInfo implements Const, Parcelable {
 					}
 					if (languageCount > 0) {
 						if (TextUtils.isEmpty(result.manufacturer)) {
-							result.manufacturer = UsbUtils.getString(connection, desc[14], languageCount, languages);
+							result.manufacturer = UsbUtils.getString(connection, ((int)desc[14] & 0xff), languageCount, languages);
 						}
 						if (TextUtils.isEmpty(result.product)) {
-							result.product = UsbUtils.getString(connection, desc[15], languageCount, languages);
+							result.product = UsbUtils.getString(connection, ((int)desc[15] & 0xff), languageCount, languages);
 						}
 						if (TextUtils.isEmpty(result.serial)) {
-							result.serial = UsbUtils.getString(connection, desc[16], languageCount, languages);
+							result.serial = UsbUtils.getString(connection, ((int)desc[16] & 0xff), languageCount, languages);
 						}
 					}
 				}
