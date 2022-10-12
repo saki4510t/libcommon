@@ -136,8 +136,8 @@ public class UsbDeviceInfo implements Const, Parcelable {
 			if (connection != null) {
 				final byte[] desc = connection.getRawDescriptors();
 				if (desc != null) {
-					if (TextUtils.isEmpty(result.usb_version)) {
-						result.usb_version = String.format("%x.%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
+					if (TextUtils.isEmpty(result.bcdUsb)) {
+						result.bcdUsb = String.format("%02x%02x", ((int)desc[3] & 0xff), ((int)desc[2] & 0xff));
 					}
 					if (TextUtils.isEmpty(result.version)) {
 						result.version = String.format("%x.%02x", ((int)desc[13] & 0xff), ((int)desc[12] & 0xff));
@@ -201,7 +201,7 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	public UsbDevice device;
 	/** 機器が対応しているUSB規格 */
 	@Nullable
-	public String usb_version;
+	public String bcdUsb;
 	/** ベンダー名 */
 	@Nullable
 	public String manufacturer;
@@ -230,7 +230,7 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	 */
 	public UsbDeviceInfo(@NonNull final Parcel in) {
 		device = in.readParcelable(UsbDevice.class.getClassLoader());
-		usb_version = in.readString();
+		bcdUsb = in.readString();
 		manufacturer = in.readString();
 		product = in.readString();
 		version = in.readString();
@@ -243,16 +243,16 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	 */
 	private void clear() {
 		device = null;
-		usb_version = manufacturer = product = version = serial = null;
+		bcdUsb = manufacturer = product = version = serial = null;
 		configCounts = -1;
 	}
 
 	@NonNull
 	@Override
 	public String toString() {
-		return String.format("UsbDeviceInfo:usb_version=%s,"
-		 	+ "manufacturer=%s,product=%s,version=%s,serial=%s,configCounts=%s",
-			usb_version != null ? usb_version : "",
+		return String.format("UsbDeviceInfo(bcdUsb=%s,"
+		 	+ "manufacturer=%s,product=%s,version=%s,serial=%s,configCounts=%s)",
+			bcdUsb != null ? bcdUsb : "",
 			manufacturer != null ? manufacturer : "",
 			product != null ? product : "",
 			version != null ? version : "",
@@ -268,7 +268,7 @@ public class UsbDeviceInfo implements Const, Parcelable {
 	@Override
 	public void writeToParcel(final Parcel dest, final int flags) {
 		dest.writeParcelable(device, flags);
-		dest.writeString(usb_version);
+		dest.writeString(bcdUsb);
 		dest.writeString(manufacturer);
 		dest.writeString(product);
 		dest.writeString(version);
