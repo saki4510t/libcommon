@@ -151,10 +151,14 @@ public class UsbDeviceInfo implements Const, Parcelable {
 						}
 					}
 					if (TextUtils.isEmpty(result.serial)) {
-						result.serial = connection.getSerial();
+						result.serial = getSerialNumber(connection);
 					}
 					if (result.configCounts < 0) {
-						// FIXME 未実装 デバイスディスクリプタをパースせんとなりゃん
+						// デバイスディスクリプタを読み込んでコンフィギュレーションディスクリプタの個数を取得する
+						result.configCounts = getNumConfigurations(connection);
+					}
+					if (result.configCounts < 0) {
+						// コンフィギュレーションディスクリプタが0個はUSB機器ではないのでとりあえず強制的に1にする
 						result.configCounts = 1;
 					}
 
@@ -195,6 +199,160 @@ public class UsbDeviceInfo implements Const, Parcelable {
 		return result;
 	}
 
+//--------------------------------------------------------------------------------
+// デバイスディスクリプタ読み取り関係
+	/**
+	 * デバイスディスクリプタを読んでbcdUSBを取得する
+	 * @param connection
+	 * @return
+	 */
+	public static int getBcdUSB(@NonNull final UsbDeviceConnection connection) {
+		return (getDeviceDescriptorByte(connection, 3) << 8)
+			+ getDeviceDescriptorByte(connection, 2);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでデバイスクラスを取得する
+	 * @param connection
+	 * @return
+	 */
+	public static int getDeviceClass(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceDescriptorByte(connection, 4);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでデバイスサブクラスを取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getDeviceSubClass(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceDescriptorByte(connection, 5);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでデバイスプロトコルを取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getDeviceProtocol(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceDescriptorByte(connection, 6);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでベンダーIDを取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getVendorId(@NonNull final UsbDeviceConnection connection) {
+		return (getDeviceDescriptorByte(connection, 9) << 8)
+			+ getDeviceDescriptorByte(connection, 8);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでプロダクトIDを取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getProductId(@NonNull final UsbDeviceConnection connection) {
+		return (getDeviceDescriptorByte(connection, 11) << 8)
+			+ getDeviceDescriptorByte(connection, 10);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでプロダクトIDを取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getBcdDevice(@NonNull final UsbDeviceConnection connection) {
+		return (getDeviceDescriptorByte(connection, 13) << 8)
+			+ getDeviceDescriptorByte(connection, 12);
+	}
+
+	/**
+	 * USB機器からベンダー名文字列の取得を試みる
+	 * @param connection
+	 * @return
+	 */
+	@Nullable
+	public static String getVendorName(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceString(connection, 14);
+	}
+
+	/**
+	 * USB機器からプロダクト名文字列の取得を試みる
+	 * @param connection
+	 * @return
+	 */
+	@Nullable
+	public static String getProductName(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceString(connection, 15);
+	}
+
+	/**
+	 * USB機器からシリアル番号文字列の取得を試みる
+	 * @param connection
+	 * @return
+	 */
+	@Nullable
+	public static String getSerialNumber(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceString(connection, 16);
+	}
+
+	/**
+	 * デバイスディスクリプタを読んでコンフィギュレーションディスクリプタの個数を取得する
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @return
+	 */
+	public static int getNumConfigurations(@NonNull final UsbDeviceConnection connection) {
+		return getDeviceDescriptorByte(connection, 17);
+	}
+
+
+	/**
+	 * デバイスディスクリプタ読み取り用のヘルパーメソッド
+	 * 読み取れなかった場合は0を返す
+	 * @param connection
+	 * @param offset
+	 * @return
+	 */
+	private static int getDeviceDescriptorByte(@NonNull final UsbDeviceConnection connection, final int offset) {
+		final byte[] desc = connection.getRawDescriptors();
+		if ((desc != null) && (desc.length >= 0x12)
+			&& (desc[0] == 0x12) && (desc[1] == 0x01)) {
+			// bLength = 0x12, bDescriptorType = 0x01 -> Device Descriptor
+//			Log.i(TAG, String.format("%02x", ((int)desc[offset]) & 0xff));
+			return ((int)desc[offset]) & 0xff;
+		} else {
+			return 0;
+		}
+	}
+
+	@Nullable
+	private static String getDeviceString(@NonNull final UsbDeviceConnection connection, final int offset) {
+		String result = null;
+
+		final byte[] languages = new byte[256];
+		int languageCount = 0;
+		// controlTransfer(int requestType, int request, int value, int index, byte[] buffer, int length, int timeout)
+		int res = connection.controlTransfer(
+			USB_REQ_STANDARD_DEVICE_GET, // USB_DIR_IN | USB_TYPE_STANDARD | USB_RECIP_DEVICE
+			USB_REQ_GET_DESCRIPTOR,
+			(USB_DT_STRING << 8)/* | 0*/, 0, languages, 256, 0);
+		if (res > 0) {
+			languageCount = (res - 2) / 2;
+		}
+		if (languageCount > 0) {
+			result = UsbUtils.getString(connection, getDeviceDescriptorByte(connection, offset), languageCount, languages);
+		}
+
+		return result;
+	}
 //--------------------------------------------------------------------------------
 	/** 設定してあるUsbDevice */
 	@Nullable

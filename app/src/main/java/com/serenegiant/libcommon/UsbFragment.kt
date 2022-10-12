@@ -29,6 +29,8 @@ import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
+import com.serenegiant.usb.UsbDeviceInfo
+import com.serenegiant.utils.BufferHelper
 import com.serenegiant.view.ViewUtils
 
 /**
@@ -131,7 +133,27 @@ class UsbFragment : BaseFragment() {
 		}
 
 		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName},${ctrlBlock}")
+			Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName}")
+			val connection = ctrlBlock.connection
+			val info = UsbDeviceInfo.getDeviceInfo(ctrlBlock, null)
+			if (DEBUG) {
+				Log.v(TAG, "info=$info")
+				Log.v(TAG, "device=$device")
+				if (connection != null) {
+					Log.v(TAG, "desc=${BufferHelper.toHexString(connection.rawDescriptors, 0, 32)}")
+					Log.v(TAG, String.format("bcdUSB=0x%04x", UsbDeviceInfo.getBcdUSB(connection)))
+					Log.v(TAG, String.format("class=0x%02x", UsbDeviceInfo.getDeviceClass(connection)))
+					Log.v(TAG, String.format("subClass=0x%02x", UsbDeviceInfo.getDeviceSubClass(connection)))
+					Log.v(TAG, String.format("protocol=0x%02x", UsbDeviceInfo.getDeviceProtocol(connection)))
+					Log.v(TAG, String.format("vendorId=0x%04x", UsbDeviceInfo.getVendorId(connection)))
+					Log.v(TAG, String.format("productId=0x%04x", UsbDeviceInfo.getProductId(connection)))
+					Log.v(TAG, String.format("bcdDevice=0x%04x", UsbDeviceInfo.getBcdDevice(connection)))
+					Log.v(TAG, "vendorName=${UsbDeviceInfo.getVendorName(connection)}")
+					Log.v(TAG, "productName=${UsbDeviceInfo.getProductName(connection)}")
+					Log.v(TAG, "serialNumber=${UsbDeviceInfo.getSerialNumber(connection)}")
+					Log.v(TAG, "numConfigs=${UsbDeviceInfo.getNumConfigurations(connection)}")
+				}
+			}
 			// USB機器がopenした時,1秒後にcloseする
 			queueEvent({
 				ctrlBlock.close()
