@@ -150,7 +150,7 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 		if (mEmptyView != null) {
 			if (!isInEditMode()) {
 				// ASのレイアウトエディタで編集中ではないときのみ
-				final Adapter adapter = getAdapter();
+				final Adapter<?> adapter = getAdapter();
 				post(new Runnable() {
 					@Override
 					public void run() {
