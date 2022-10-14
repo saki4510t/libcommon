@@ -110,10 +110,11 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 
 	@Override
 	public void setAdapter(final Adapter adapter) {
-		if (getAdapter() != adapter) {
+		final Adapter<?> prev = getAdapter();
+		if (prev != adapter) {
 			try {
-				if (getAdapter() != null) {
-					getAdapter().unregisterAdapterDataObserver(mAdapterDataObserver);
+				if (prev != null) {
+					prev.unregisterAdapterDataObserver(mAdapterDataObserver);
 				}
 			} catch (final Exception e) {
 				// ignore
