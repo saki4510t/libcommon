@@ -243,9 +243,10 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		}
 
 		/**
-		 *
+		 * 映像受け取り用Surfaceを設定
+		 * ImageReader/ImageWriterを使う場合は最大フレームレート指定は無視される
 		 * @param surface
-		 * @param fps 最大フレームレート
+		 * @param fps 最大フレームレート, nullまたは0以下なら無制限
 		 */
 		@Override
 		public void setSurface(@Nullable final Object surface, @Nullable final Fraction fps) {
