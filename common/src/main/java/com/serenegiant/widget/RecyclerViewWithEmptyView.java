@@ -146,7 +146,7 @@ public class RecyclerViewWithEmptyView extends RecyclerView {
 		}
 	}
 
-	protected void updateEmptyView() {
+	public void updateEmptyView() {
 		if (mEmptyView != null) {
 			if (!isInEditMode()) {
 				// ASのレイアウトエディタで編集中ではないときのみ
