@@ -25,7 +25,6 @@ plugins {
 
 android {
     compileSdkVersion versionCompiler
-//	buildToolsVersion versionBuildTool
 
    	compileOptions {
    		sourceCompatibility javaSourceCompatibility
