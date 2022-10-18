@@ -40,7 +40,6 @@ ext {
 	androidXLegacyV4 = '1.0.0'
 	androidXExif = '1.3.3'
 	androidXLifecycle = '2.2.0'
-	androidXLifecycleExt = '2.2.0'
 	androidXMultiDex = '2.0.1'
 	androidXMaterial = '1.4.0'
 	androidXRecyclerview = '1.2.1'

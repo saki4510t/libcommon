@@ -95,13 +95,13 @@ dependencies {
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
 	implementation "androidx.preference:preference-ktx:${androidXPreference}"
-	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 
 	//noinspection GradleDependency
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXLifecycleKtx}"
 	//noinspection GradleDependency
+	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
 	kapt "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 }
 

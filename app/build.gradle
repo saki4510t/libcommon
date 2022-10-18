@@ -53,7 +53,6 @@ dependencies {
 	//noinspection GradleDependency
 	implementation "androidx.appcompat:appcompat:${androidXVersion}"
 	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
-	implementation "androidx.lifecycle:lifecycle-extensions:${androidXLifecycleExt}"
 	implementation "androidx.constraintlayout:constraintlayout:${androidXConstraint}"
 	implementation "com.google.android.material:material:${androidXMaterial}"
 	implementation "androidx.multidex:multidex:${androidXMultiDex}"
