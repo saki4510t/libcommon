@@ -1,7 +1,9 @@
 plugins {
 	id 'com.android.library'
-	id 'kotlin-android'
-	id 'kotlin-kapt'
+	id 'org.jetbrains.kotlin.android'
+	id 'org.jetbrains.kotlin.kapt'
+	id 'org.jetbrains.dokka'
+	id 'maven-publish'
 }
 
 /*
@@ -24,6 +26,7 @@ plugins {
 */
 
 android {
+	namespace 'com.serenegiant.common'
     compileSdkVersion versionCompiler
 
    	compileOptions {
@@ -36,12 +39,10 @@ android {
         targetSdkVersion versionTarget
         versionCode versionCodeNum
         versionName versionNameString
-		// AGP 4.1.0以降でrootプロジェクト以外のBuildConfigにVERSION_CODEとVERSION_NAMEが
+		// AGP 4.1.0以降でライブラリプロジェクトのBuildConfigにVERSION_CODEとVERSION_NAMEが
 		// 含まれなくなってしまったのでワークアラウンドを追加
 		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
 		buildConfigField 'String', 'VERSION_NAME', "\"${rootProject.versionNameString}\""
-
-        buildConfigField "String", "STL_NAME", "\"${project.property("STL_NAME")}\""
 
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
@@ -64,8 +65,6 @@ android {
 }
 
 dependencies {
-    api fileTree(dir: 'libs', include: ['*.jar'])
-
 	testImplementation 'junit:junit:4.13.2'
 
 	// Core library
@@ -80,38 +79,37 @@ dependencies {
 
 	// Espresso dependencies
 	androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
-//	androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.2.0'
-//	androidTestImplementation 'androidx.test.espresso:espresso-intents:3.2.0'
-//	androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.2.0'
-//	androidTestImplementation 'androidx.test.espresso:espresso-web:3.2.0'
-//	androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.2.0'
-//	androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.2.0'
-	androidTestImplementation "androidx.multidex:multidex:${androidXMultiDex}"
+//	androidTestImplementation 'androidx.test.espresso:espresso-contrib:3.4.0'
+//	androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
+//	androidTestImplementation 'androidx.test.espresso:espresso-accessibility:3.4.0'
+//	androidTestImplementation 'androidx.test.espresso:espresso-web:3.4.0'
+//	androidTestImplementation 'androidx.test.espresso.idling:idling-concurrent:3.4.0'
+//	androidTestImplementation 'androidx.test.espresso:espresso-idling-resource:3.4.0'
+	androidTestImplementation "androidx.multidex:multidex:$androidXMultiDex"
 
-	//noinspection GradleDependency
-	implementation "androidx.core:core-ktx:${androidXCore}"
-	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
-	//noinspection GradleDependency
-	implementation "androidx.appcompat:appcompat:${androidXVersion}"
-	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
-	implementation "androidx.preference:preference-ktx:${androidXPreference}"
-	implementation "androidx.exifinterface:exifinterface:${androidXExif}"
-	implementation "com.google.android.material:material:${androidXMaterial}"
-
-	//noinspection GradleDependency
-	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXLifecycleKtx}"
-	//noinspection GradleDependency
+	// androidx
+	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
+	implementation "androidx.appcompat:appcompat:$androidXVersion"
+	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
+	implementation "androidx.exifinterface:exifinterface:$androidXExif"
+	implementation "com.google.android.material:material:$androidXMaterial"
+	implementation "androidx.lifecycle:lifecycle-process:$androidXLifecycle"
+	// ktx
+	implementation "androidx.core:core-ktx:$androidXCore"
+	implementation "androidx.preference:preference-ktx:$androidXPreference"
+	implementation "androidx.fragment:fragment-ktx:$androidXFragmentKtx"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-savedstate:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
 	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
-	kapt "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
-}
-
-repositories {
-	mavenCentral()
+	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
+	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinStdLibVersion"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 }
 
 def repo = new File(rootDir, "repository")
 
-apply plugin: 'maven-publish'
+//apply plugin: 'maven-publish'
 
 afterEvaluate {
 	publishing {

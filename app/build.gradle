@@ -1,10 +1,12 @@
 plugins {
 	id 'com.android.application'
-	id 'kotlin-android'
-	id 'kotlin-kapt'
+	id 'org.jetbrains.kotlin.android'
+	id 'org.jetbrains.kotlin.kapt'
+	id 'org.jetbrains.dokka'
 }
 
 android {
+	namespace 'com.serenegiant.libcommon'
     compileSdkVersion versionCompiler
 
    	compileOptions {
@@ -46,27 +48,19 @@ android {
 }
 
 dependencies {
-	implementation fileTree(dir: 'libs', include: ['*.jar'])
-	//noinspection GradleDependency
-	implementation "androidx.core:core-ktx:${androidXCore}"
-	implementation "androidx.legacy:legacy-support-v4:${androidXLegacyV4}"
-	//noinspection GradleDependency
-	implementation "androidx.appcompat:appcompat:${androidXVersion}"
-	implementation "androidx.recyclerview:recyclerview:${androidXRecyclerview}"
-	implementation "androidx.constraintlayout:constraintlayout:${androidXConstraint}"
-	implementation "com.google.android.material:material:${androidXMaterial}"
+	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
+	implementation "androidx.appcompat:appcompat:$androidXVersion"
+	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
+	implementation "androidx.constraintlayout:constraintlayout:$androidXConstraint"
+	implementation "com.google.android.material:material:$androidXMaterial"
 	implementation "androidx.multidex:multidex:${androidXMultiDex}"
 
-	//noinspection GradleDependency
-	implementation "androidx.fragment:fragment-ktx:${androidXFragmentKtx}"
-	//noinspection GradleDependency
-	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${androidXLifecycleKtx}"
-	//noinspection GradleDependency
-	implementation "androidx.lifecycle:lifecycle-livedata-ktx:${androidXLifecycleKtx}"
-	//noinspection GradleDependency
-	kapt "androidx.lifecycle:lifecycle-common-java8:${androidXLifecycleKtx}"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinStdLibVersion"
-	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${kotlinCoroutinesVersion}"
+	implementation "androidx.core:core-ktx:$androidXCore"
+	implementation "androidx.fragment:fragment-ktx:$androidXFragmentKtx"
+	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
+	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
+	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	implementation project(':common')
 }
