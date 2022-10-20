@@ -66,8 +66,7 @@ public final class USBMonitor implements Const {
 	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = "USBMonitor";
 
-	private static final String ACTION_USB_PERMISSION_BASE = "com.serenegiant.USB_PERMISSION.";
-	private final String ACTION_USB_PERMISSION = ACTION_USB_PERMISSION_BASE + hashCode();
+	private static final String ACTION_USB_PERMISSION = "com.serenegiant.USB_PERMISSION";
 
 	/**
 	 * USB機器の状態変更時のコールバックリスナー
