@@ -123,6 +123,40 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
+	 * デフォルトのOnDeviceConnectListener実装
+	 */
+	public static class DefaultOnDeviceConnectListener implements OnDeviceConnectListener {
+		@Override
+		public void onAttach(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onDetach(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onPermission(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onConnected(@NonNull final UsbDevice device, @NonNull final UsbControlBlock ctrlBlock) {
+		}
+
+		@Override
+		public void onDisconnect(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onCancel(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t) {
+			Log.w(TAG, t);
+		}
+	}
+
+	/**
 	 * OpenしているUsbControlBlock一覧
 	 */
 	@NonNull
