@@ -27,7 +27,6 @@ import android.view.View
 import android.view.ViewGroup
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
-import com.serenegiant.usb.USBMonitor.OnDeviceConnectListener
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
 import com.serenegiant.usb.UsbDeviceInfo
 import com.serenegiant.utils.BufferHelper
@@ -108,13 +107,21 @@ class UsbFragment : BaseFragment() {
 	}
 
 	//--------------------------------------------------------------------------------
-	private val mOnDeviceConnectListener: OnDeviceConnectListener
-		= object : OnDeviceConnectListener {
+	private val mOnDeviceConnectListener: USBMonitor.Callback
+		= object : USBMonitor.Callback {
 
 		override fun onAttach(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device.deviceName}")
 			// USB機器が接続された時
-			mUSBMonitor?.requestPermission(device)
+			if (false) {
+				// こっちは通常の使い方
+				mUSBMonitor?.requestPermission(device)
+			} else {
+				// staticメソッド版のrequestPermissionを使って違うContextからパーミッション要求する場合
+				// こっちでパーミッション要求した場合でもUSBMonitor#registerで登録したBroadcastReceiverで
+				// 結果を受け取れる
+				USBMonitor.requestPermission(requireContext().applicationContext, device, mOnDeviceConnectListener2)
+			}
 		}
 
 		override fun onPermission(device: UsbDevice) {
@@ -169,6 +176,21 @@ class UsbFragment : BaseFragment() {
 
 		override fun onError(usbDevice: UsbDevice?, throwable: Throwable) {
 			Log.w(TAG, throwable)
+		}
+	}
+
+	private val mOnDeviceConnectListener2 = object : USBMonitor.PermissionCallback() {
+		override fun onPermission(device: UsbDevice) {
+			if (DEBUG) Log.v(TAG, "mOnDeviceConnectListener2#onPermission:${device.deviceName}")
+		}
+
+		override fun onCancel(device: UsbDevice) {
+			if (DEBUG) Log.v(TAG, "mOnDeviceConnectListener2#onCancel:${device.deviceName}")
+			// パーミッションを取得できなかった時
+		}
+
+		override fun onError(device: UsbDevice?, t: Throwable) {
+			Log.w(TAG, t)
 		}
 	}
 

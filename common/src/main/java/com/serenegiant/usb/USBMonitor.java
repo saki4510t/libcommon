@@ -42,6 +42,7 @@ import com.serenegiant.utils.BufferHelper;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.utils.ThreadPool;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -52,6 +53,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.CountDownLatch;
 
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
@@ -71,7 +73,7 @@ public final class USBMonitor implements Const {
 	/**
 	 * USB機器の状態変更時のコールバックリスナー
 	 */
-	public interface OnDeviceConnectListener {
+	public interface Callback {
 		/**
 		 * USB機器が取り付けられたか電源が入った時
 		 * @param device
@@ -122,9 +124,18 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
-	 * デフォルトのOnDeviceConnectListener実装
+	 * USB機器の状態変更時のコールバックリスナー
+	 * Callbackのシノニム
+	 * @deprecated Callbackを使うこと
 	 */
-	public static class DefaultOnDeviceConnectListener implements OnDeviceConnectListener {
+	@Deprecated
+	public interface OnDeviceConnectListener extends Callback {
+	}
+
+	/**
+	 * パーミッション要求時には呼ばれないコールバックリスナーを実装したCallback実装
+	 */
+	public static abstract class PermissionCallback implements Callback {
 		@Override
 		public void onAttach(@NonNull final UsbDevice device) {
 		}
@@ -134,15 +145,22 @@ public final class USBMonitor implements Const {
 		}
 
 		@Override
-		public void onPermission(@NonNull final UsbDevice device) {
-		}
-
-		@Override
-		public void onConnected(@NonNull final UsbDevice device, @NonNull final UsbControlBlock ctrlBlock) {
+		public void onConnected(
+			@NonNull final UsbDevice device,
+			@NonNull final UsbControlBlock ctrlBlock) {
 		}
 
 		@Override
 		public void onDisconnect(@NonNull final UsbDevice device) {
+		}
+	}
+
+	/**
+	 * デフォルトのPermissionCallback/Callback実装
+	 */
+	public static PermissionCallback DEFAULT_CALLBACK = new PermissionCallback() {
+		@Override
+		public void onPermission(@NonNull final UsbDevice device) {
 		}
 
 		@Override
@@ -151,9 +169,8 @@ public final class USBMonitor implements Const {
 
 		@Override
 		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t) {
-			Log.w(TAG, t);
 		}
-	}
+	};
 
 	/**
 	 * OpenしているUsbControlBlock一覧
@@ -165,7 +182,7 @@ public final class USBMonitor implements Const {
 	@NonNull
 	private final UsbManager mUsbManager;
 	@NonNull
-	private final OnDeviceConnectListener mOnDeviceConnectListener;
+	private final Callback mCallback;
 	@Nullable
 	private PendingIntent mPermissionIntent = null;
 	@NonNull
@@ -197,12 +214,12 @@ public final class USBMonitor implements Const {
 	 * @param listener
 	 */
 	public USBMonitor(@NonNull final Context context,
-		@NonNull final OnDeviceConnectListener listener) {
+		@NonNull final Callback listener) {
 
 		if (DEBUG) Log.v(TAG, "USBMonitor:コンストラクタ");
 		mWeakContext = new WeakReference<Context>(context);
 		mUsbManager = ContextUtils.requireSystemService(context, UsbManager.class);
-		mOnDeviceConnectListener = listener;
+		mCallback = listener;
 		mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
 		destroyed = false;
 		if (DEBUG) Log.v(TAG, "USBMonitor:mUsbManager=" + mUsbManager);
@@ -256,13 +273,7 @@ public final class USBMonitor implements Const {
 			if (DEBUG) Log.i(TAG, "register:");
 			final Context context = mWeakContext.get();
 			if (context != null) {
-				int flags = 0;
-				if (BuildCheck.isAPI31()) {
-					// FLAG_MUTABLE指定必須
-					// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
-					flags |= PendingIntentCompat.FLAG_MUTABLE;
-				}
-				mPermissionIntent = PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
+				mPermissionIntent = createIntent(context);
 				final IntentFilter filter = createIntentFilter();
 				context.registerReceiver(mUsbReceiver, filter);
 			} else {
@@ -457,7 +468,7 @@ public final class USBMonitor implements Const {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mOnDeviceConnectListener.onAttach(device);
+					mCallback.onAttach(device);
 				}
 			});
 		}
@@ -544,6 +555,84 @@ public final class USBMonitor implements Const {
 		return result;
 	}
 
+	/**
+	 * パーミッションを要求する
+	 * @param context
+	 * @param device
+	 * @throws IllegalStateException
+	 */
+	public static void requestPermission(
+		@NonNull final Context context,
+		@NonNull final UsbDevice device)
+			throws IllegalArgumentException {
+		requestPermission(context, device, DEFAULT_CALLBACK);
+	}
+
+	/**
+	 * パーミッションを要求する
+	 * @param context
+	 * @param device
+	 * @param callback
+	 * @throws IllegalStateException
+	 */
+	public static void requestPermission(
+		@NonNull final Context context,
+		@NonNull final UsbDevice device,
+		@NonNull final Callback callback)
+			throws IllegalArgumentException {
+
+		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		final UsbManager manager = ContextUtils.requireSystemService(context, UsbManager.class);
+		ThreadPool.queueEvent(() -> {
+			final CountDownLatch latch = new CountDownLatch(1);
+			// USBMonitorインスタンスにセットしているコールバックも呼び出されるようにするために
+			// パーミッションがあってもなくてもパーミッション要求する
+			final BroadcastReceiver receiver = new BroadcastReceiver() {
+				@Override
+				public void onReceive(final Context context, final Intent intent) {
+					final String action = intent.getAction();
+					try {
+						if (ACTION_USB_PERMISSION.equals(action)) {
+							// パーミッション要求の結果が返ってきた時
+							final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+							if ((device != null)
+								&& (manager.hasPermission(device)
+									|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
+								// パーミッションを取得できた時・・・デバイスとの通信の準備をする
+								callback.onPermission(device);
+							} else if (device == null) {
+								// パーミッションを取得できなかった時
+								callback.onCancel(device);
+							} else {
+								// パーミッションを取得できなかった時,
+								// OS側がおかしいかAPI>=31でPendingIntentにFLAG_MUTABLEを指定していないとき
+								callback.onError(device, new UsbPermissionException("device is null"));
+							}
+						} else {
+							callback.onCancel(device);
+						}
+					} finally {
+						latch.countDown();
+					}
+				}
+			};
+			if (DEBUG) Log.v(TAG, "requestPermission#registerReceiver:");
+			context.registerReceiver(receiver, createIntentFilter());
+			try {
+				manager.requestPermission(device, createIntent(context));
+				latch.await();
+			} catch (final Exception e) {
+				// Android5.1.xのGALAXY系でandroid.permission.sec.MDM_APP_MGMT
+				// という意味不明の例外生成するみたい
+				Log.w(TAG, e);
+				callback.onCancel(device);
+			} finally {
+				if (DEBUG) Log.v(TAG, "requestPermission#unregisterReceiver:");
+				context.unregisterReceiver(receiver);
+			}
+		});
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * 指定したUsbDeviceをopenする
@@ -608,10 +697,27 @@ public final class USBMonitor implements Const {
 	}
 
 	/**
+	 * USB機器アクセスパーミッション要求時に結果を受け取るためのPendingIntentを生成する
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint({"WrongConstant"})
+	private static PendingIntent createIntent(@NonNull final Context context) {
+		int flags = 0;
+		if (BuildCheck.isAPI31()) {
+			// FLAG_MUTABLE指定必須
+			// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
+			flags |= PendingIntentCompat.FLAG_MUTABLE;
+		}
+		return PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
+	}
+
+
+	/**
 	 * ブロードキャスト受信用のIntentFilterを生成する
 	 * @return
 	 */
-	private IntentFilter createIntentFilter() {
+	private static IntentFilter createIntentFilter() {
 		final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
 		if (BuildCheck.isAndroid5()) {
 			filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);	// SC-06Dはこのactionが来ない
@@ -665,7 +771,7 @@ public final class USBMonitor implements Const {
 					mAsyncHandler.post(new Runnable() {
 						@Override
 						public void run() {
-							mOnDeviceConnectListener.onAttach(device);
+							mCallback.onAttach(device);
 						}
 					});
 				}
@@ -681,7 +787,7 @@ public final class USBMonitor implements Const {
 	 * @param device
 	 */
 	private void processPermission(@NonNull final UsbDevice device) {
-		mOnDeviceConnectListener.onPermission(device);
+		mCallback.onPermission(device);
 	}
 
 	/**
@@ -701,7 +807,7 @@ public final class USBMonitor implements Const {
 				@Override
 				public void run() {
 //					if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
-					mOnDeviceConnectListener.onConnected(device, ctrlBlock);
+					mCallback.onConnected(device, ctrlBlock);
 				}
 			});
 		}
@@ -717,7 +823,7 @@ public final class USBMonitor implements Const {
 		mAsyncHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				mOnDeviceConnectListener.onCancel(device);
+				mCallback.onCancel(device);
 			}
 		});
 	}
@@ -735,7 +841,7 @@ public final class USBMonitor implements Const {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mOnDeviceConnectListener.onAttach(device);
+					mCallback.onAttach(device);
 				}
 			});
 		}
@@ -755,7 +861,7 @@ public final class USBMonitor implements Const {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					mOnDeviceConnectListener.onDetach(device);
+					mCallback.onDetach(device);
 				}
 			});
 		}
@@ -776,7 +882,7 @@ public final class USBMonitor implements Const {
 		mAsyncHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				mOnDeviceConnectListener.onDisconnect(ctrlBlock.getDevice());
+				mCallback.onDisconnect(ctrlBlock.getDevice());
 			}
 		});
 	}
@@ -793,7 +899,7 @@ public final class USBMonitor implements Const {
 		mAsyncHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				mOnDeviceConnectListener.onError(device, t);
+				mCallback.onError(device, t);
 			}
 		});
 	}
