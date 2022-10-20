@@ -24,6 +24,7 @@
 	<string name="title_saf_filer" translatable="false">SAFFiler</string>
 	<string name="title_network_connection" translatable="false">NetworkConnection</string>
 	<string name="title_usb_monitor" translatable="false">UsbMonitor</string>
+	<string name="title_window_insets" translatable="false">WindowInsets</string>
 	<string name="title_audio_record" translatable="false">AudioRecord</string>
 	<string name="title_camera" translatable="false">Camera</string>
 	<string name="title_camera_rec" translatable="false">Camera(MediaAVRecorder)</string>
@@ -56,6 +57,7 @@
 		<item>@string/title_saf_filer</item>
 		<item>@string/title_network_connection</item>
 		<item>@string/title_usb_monitor</item>
+		<item>@string/title_window_insets</item>
 		<item>@string/title_audio_record</item>
 		<item>@string/title_camera</item>
 		<item>@string/title_camera_rec</item>

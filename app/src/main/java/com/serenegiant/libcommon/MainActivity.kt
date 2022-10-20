@@ -161,6 +161,9 @@ class MainActivity
 				}
 				fragment = UsbFragment.newInstance()
 			}
+			R.string.title_window_insets -> {
+				fragment = WindowInsetsFragment.newInstance()
+			}
 			R.string.title_audio_record -> {
 				if (!checkPermissionAudio()) {
 					return
