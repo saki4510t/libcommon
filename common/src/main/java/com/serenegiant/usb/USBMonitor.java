@@ -53,6 +53,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 
+import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -76,16 +77,19 @@ public final class USBMonitor implements Const {
 		 * USB機器が取り付けられたか電源が入った時
 		 * @param device
 		 */
+		@AnyThread
 		public void onAttach(@NonNull final UsbDevice device);
 		/**
 		 * USB機器が取り外されたか電源が切られた時(open中であればonDisconnectの後に呼ばれる)
 		 * @param device
 		 */
+		@AnyThread
 		public void onDetach(@NonNull final UsbDevice device);
 		/**
 		 * パーミッション要求結果が返ってきた時
 		 * @param device
 		 */
+		@AnyThread
 		public void onPermission(@NonNull final UsbDevice device);
 		/**
 		 * USB機器がopenされた時,
@@ -93,6 +97,7 @@ public final class USBMonitor implements Const {
 		 * @param device
 		 * @param ctrlBlock
 		 */
+		@AnyThread
 		public void onConnected(@NonNull final UsbDevice device,
 			@NonNull final UsbControlBlock ctrlBlock);
 		/**
@@ -100,17 +105,20 @@ public final class USBMonitor implements Const {
 		 * デバイスは既にclose済み(2015/01/06呼び出すタイミングをclose前からclose後に変更)
 		 * @param device
 		 */
+		@AnyThread
 		public void onDisconnect(@NonNull final UsbDevice device);
 		/**
 		 * キャンセルまたはユーザーからパーミッションを得られなかった時
 		 * @param device
 		 */
+		@AnyThread
 		public void onCancel(@NonNull final UsbDevice device);
 		/**
 		 * パーミッション要求時等で非同期実行中にエラーになった時
 		 * @param device
 		 * @param t
 		 */
+		@AnyThread
 		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t);
 	}
 
