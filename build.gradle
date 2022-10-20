@@ -41,6 +41,6 @@ ext {
 	kotlinStdLibVersion = '1.7.20'
 	kotlinCoroutinesVersion = '1.6.4'
 
-    versionCodeNum = 398
-    versionNameString = '8.7.2'
+    versionCodeNum = 399
+    versionNameString = '8.8.0'
 }
