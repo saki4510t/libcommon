@@ -175,8 +175,8 @@ public class ThreadPool {
 	 */
 	private static class PausableThreadPoolExecutor extends ThreadPoolExecutor {
 		private boolean isPaused;
-		private ReentrantLock pauseLock = new ReentrantLock();
-		private Condition unpaused = pauseLock.newCondition();
+		private final ReentrantLock pauseLock = new ReentrantLock();
+		private final Condition unPaused = pauseLock.newCondition();
 
 		public PausableThreadPoolExecutor(
 			final int corePoolSize, final int maximumPoolSize,
@@ -195,7 +195,7 @@ public class ThreadPool {
 			try {
 				while (isPaused) {
 					// ポース中は実行待機する
-					unpaused.await();
+					unPaused.await();
 				}
 			} catch (final InterruptedException ie) {
 				t.interrupt();
@@ -217,7 +217,7 @@ public class ThreadPool {
 			pauseLock.lock();
 			try {
 				isPaused = false;
-				unpaused.signalAll();
+				unPaused.signalAll();
 			} finally {
 				pauseLock.unlock();
 			}
