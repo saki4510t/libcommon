@@ -32,9 +32,9 @@
 			<enum name="frame_type_circle2" value="6" />
 			<enum name="frame_type_cross_circle2" value="7" />
 		</attr>
-		<!-- 外枠の線幅 -->
+		<!-- フレームの線幅 -->
 		<attr name="frame_width" format="dimension" default="3dp" />
-		<!-- 外枠の色 -->
+		<!-- フレームの色 -->
 		<attr name="frame_color" format="reference|color|integer" default="#ffb1b1b1" />
 		<!-- スケールの種類 -->
 		<attr name="scale_type" default="scale_none" >
@@ -52,5 +52,7 @@
 		<attr name="scale_scale" format="float" default="1" />
 		<!-- 目盛りの色 -->
 		<attr name="tick_color" format="reference|color|integer" default="#ffb1b1b1" />
+		<!-- 外周枠を表示するかどうか -->
+		<attr name="show_outline" format="boolean" default="true" />
 	</declare-styleable>
 </resources>

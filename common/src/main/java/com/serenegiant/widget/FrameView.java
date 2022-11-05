@@ -83,6 +83,7 @@ public class FrameView extends View {
 	private int mFrameType;
 	private int mFrameColor;
 	private float mFrameWidth;
+	private boolean mShowOutline = true;
 	@ScaleType
 	private int mScaleType;
 	private int mScaleColor, mTickColor;
@@ -116,6 +117,7 @@ public class FrameView extends View {
 		mTickColor = attribs.getColor(R.styleable.FrameView_tick_color, mScaleColor);
 		mRotation = attribs.getFloat(R.styleable.FrameView_scale_rotation, 0);
 		mScale = attribs.getFloat(R.styleable.FrameView_scale_scale, 1.0f);
+		mShowOutline = attribs.getBoolean(R.styleable.FrameView_show_outline, true);
 		attribs.recycle();
 		mPaint.setStyle(Paint.Style.STROKE);
 //		if (DEBUG) Log.v(TAG, "mFrameWidth=" + mFrameWidth);
@@ -149,10 +151,12 @@ public class FrameView extends View {
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 		if (mFrameType != FRAME_TYPE_NONE) {
-			mPaint.setStrokeWidth(mFrameWidth);
-			mPaint.setColor(mFrameColor);
-			// 外周枠を描画
-			canvas.drawRect(mBoundsRect, mPaint);
+			if (mShowOutline || (mFrameType == FRAME_TYPE_FRAME)) {
+				// 外周枠を描画
+				mPaint.setStrokeWidth(mFrameWidth);
+				mPaint.setColor(mFrameColor);
+				canvas.drawRect(mBoundsRect, mPaint);
+			}
 			mPaint.setStrokeWidth(mScaleWidth);
 			mPaint.setColor(mScaleColor);
 			final float centerX = mCenterX;
@@ -230,6 +234,9 @@ public class FrameView extends View {
 					}
 					canvas.drawCircle(centerX, centerY, r4 / 2, mPaint);
 					canvas.drawCircle(centerX, centerY, r4, mPaint);
+					break;
+				case FRAME_TYPE_FRAME:
+				case FRAME_TYPE_NONE:
 					break;
 				}
 			} finally {
