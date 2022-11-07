@@ -33,6 +33,8 @@ import android.media.MediaCodecList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import android.media.MediaFormat;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -178,7 +180,7 @@ public final class MediaCodecUtils {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static final JSONObject getVideo() throws JSONException{
+	private static JSONObject getVideo() throws JSONException{
 		final JSONObject result = new JSONObject();
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
@@ -239,7 +241,7 @@ public final class MediaCodecUtils {
 	 * @return
 	 * @throws JSONException
 	 */
-	private static final JSONObject getAudio() throws JSONException {
+	private static JSONObject getAudio() throws JSONException {
 		final JSONObject result = new JSONObject();
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
@@ -266,7 +268,7 @@ public final class MediaCodecUtils {
      * @param colorFormat
      * @return
      */
-    public static final String getColorFormatName(final int colorFormat) {
+    public static String getColorFormatName(final int colorFormat) {
     	switch (colorFormat) {
     	case MediaCodecInfo.CodecCapabilities.COLOR_Format12bitRGB444:
     		return "COLOR_Format12bitRGB444";
@@ -740,7 +742,7 @@ public final class MediaCodecUtils {
 	/**
 	 * コーデックの情報を更新する
 	 */
-	private static final void updateCodecs() {
+	private static void updateCodecs() {
     	if (sCodecList.size() == 0) {
 	    	// コーデックの一覧を取得
 	        final int n = MediaCodecList.getCodecCount();
@@ -754,7 +756,7 @@ public final class MediaCodecUtils {
 	 * コーデックの数を取得する
 	 * @return
 	 */
-    public static final int getCodecCount() {
+    public static int getCodecCount() {
     	updateCodecs();
     	return sCodecList.size();
     }
@@ -763,7 +765,7 @@ public final class MediaCodecUtils {
 	 * コーデック情報一覧を取得する
 	 * @return
 	 */
-    public static final List<MediaCodecInfo> getCodecs() {
+    public static List<MediaCodecInfo> getCodecs() {
     	updateCodecs();
     	return sCodecList;
     }
@@ -773,7 +775,7 @@ public final class MediaCodecUtils {
 	 * @param ix
 	 * @return
 	 */
-    public static final MediaCodecInfo getCodecInfoAt(final int ix) {
+    public static MediaCodecInfo getCodecInfoAt(final int ix) {
     	updateCodecs();
     	return sCodecList.get(ix);
     }
@@ -937,7 +939,7 @@ public final class MediaCodecUtils {
 	 * @param colorFormat
 	 * @return
 	 */
-    public static final boolean isRecognizedVideoFormat(final int colorFormat) {
+    public static boolean isRecognizedVideoFormat(final int colorFormat) {
     	final int n = recognizedFormats != null ? recognizedFormats.length : 0;
     	for (int i = 0; i < n; i++) {
     		if (recognizedFormats[i] == colorFormat) {
@@ -952,7 +954,7 @@ public final class MediaCodecUtils {
 	 * 使用可能なカラーフォーマットはrecognizedFormatsに設定する(Encoderで設定しているのはYUV420PlanarかYUV420SemiPlanar)
 	 * 使用可能なものが無ければ0を返す
 	 */
-	public static final int selectColorFormat(final MediaCodecInfo codecInfo, final String mimeType) {
+	public static int selectColorFormat(final MediaCodecInfo codecInfo, final String mimeType) {
 		int result = 0;
 		final MediaCodecInfo.CodecCapabilities capabilities = getCodecCapabilities(codecInfo, mimeType);
 		final int[] colorFormats = capabilities.colorFormats;
@@ -971,7 +973,7 @@ public final class MediaCodecUtils {
 	/**
 	 * エンコード用コーデックの一覧をログに出力する
 	 */
-	public static final void dumpEncoders() {
+	public static void dumpEncoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
@@ -993,7 +995,7 @@ public final class MediaCodecUtils {
 	/**
 	 * デコード用コーデックの一覧をログに出力する
 	 */
-	public static final void dumpDecoders() {
+	public static void dumpDecoders() {
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
@@ -1016,7 +1018,7 @@ public final class MediaCodecUtils {
      * Returns true if the specified color format is semi-planar YUV.  Throws an exception
      * if the color format is not recognized (e.g. not YUV).
      */
-    public static final boolean isSemiPlanarYUV(final int colorFormat) {
+    public static boolean isSemiPlanarYUV(final int colorFormat) {
         switch (colorFormat) {
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
             case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
@@ -1039,7 +1041,7 @@ public final class MediaCodecUtils {
 	 * @return
 	 */
 	@Nullable
-	public static final MediaCodecInfo selectAudioEncoder(final String mimeType) {
+	public static MediaCodecInfo selectAudioEncoder(final String mimeType) {
 //    	if (DEBUG) Log.v(TAG, "selectAudioCodec:");
 
  		MediaCodecInfo result = null;
@@ -1119,7 +1121,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param offset
 	 * @return
 	 */
-	public static final int findStartMarker(@NonNull final byte[] array, final int offset) {
+	public static int findStartMarker(@NonNull final byte[] array, final int offset) {
 		return BufferHelper.byteComp(array, offset, START_MARKER, START_MARKER.length);
 	}
 }
