@@ -53,27 +53,60 @@ public class BufferHelper {
 	 * @param offset
 	 * @param size
 	 */
-	public static final void dump(final String tag,
+	public static final void dump(@NonNull final String tag,
 		final ByteBuffer buffer, final int offset, final int size) {
 
-		dump(tag, buffer, offset, size, false);
+		dump(tag, null, buffer, offset, size, false);
 	}
 
 	/**
 	 * ByteBufferの中身をlogCatへ出力する
 	 * @param tag
+	 * @param prefix
+	 * @param buffer
+	 * @param offset
+	 * @param size
+	 */
+	public static final void dump(
+		@NonNull final String tag, final String prefix,
+		final ByteBuffer buffer, final int offset, final int size) {
+
+		dump(tag, prefix, buffer, offset, size, false);
+	}
+
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param buffer
+	 * @param offset
+	 * @param size
+	 * @param findAnnexB
+	 */
+	public static final void dump(@NonNull final String tag,
+		final ByteBuffer buffer, final int offset, final int size, final boolean findAnnexB) {
+
+		dump(tag, null, buffer, offset, size, findAnnexB);
+	}
+
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param _prefix
 	 * @param _buffer
 	 * @param offset
 	 * @param _size
 	 * @param findAnnexB
 	 */
-	public static final void dump(final String tag,
+	public static final void dump(
+		@NonNull final String tag, @Nullable final String _prefix,
 		final ByteBuffer _buffer, final int offset, final int _size, final boolean findAnnexB) {
 
+		@NonNull
+		final String prefix = _prefix != null ? _prefix : "dump:";
 	    final byte[] dump = new byte[BUF_LEN];
 //		if (DEBUG) Log.i(TAG, "dump:" + buffer);
 		if (_buffer == null) return;
-		final ByteBuffer buffer = _buffer.duplicate();
+		final ByteBuffer buffer = _buffer.asReadOnlyBuffer();
 		final int n = buffer.limit();
 		final int pos = buffer.position();
 //		final int cap = buffer.capacity();
@@ -94,12 +127,12 @@ public class BufferHelper {
 				do {
 					index = byteComp(dump, index+1, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
 					if (index >= 0) {
-						Log.i(tag, "found ANNEXB: start index=" + index);
+						Log.i(tag, prefix + " found ANNEXB: start index=" + index);
 					}
 				} while (index >= 0);
 			}
 		}
-		Log.i(tag, "dump:" + sb.toString());
+		Log.i(tag, prefix + sb);
 	}
 
 	/**
@@ -107,12 +140,30 @@ public class BufferHelper {
 	 * @param tag
 	 * @param buffer
 	 * @param offset
-	 * @param _size
+	 * @param size
 	 * @param findAnnexB
 	 */
 	public static final void dump(final String tag,
+		final byte[] buffer, final int offset, final int size, final boolean findAnnexB) {
+
+		dump(tag, null, buffer, offset, size, findAnnexB);
+	}
+
+	/**
+	 * ByteBufferの中身をlogCatへ出力する
+	 * @param tag
+	 * @param _prefix
+	 * @param buffer
+	 * @param offset
+	 * @param _size
+	 * @param findAnnexB
+	 */
+	public static final void dump(
+		@NonNull final String tag, @Nullable final String _prefix,
 		final byte[] buffer, final int offset, final int _size, final boolean findAnnexB) {
 
+		@NonNull
+		final String prefix = _prefix != null ? _prefix : "dump:";
 		final int n = buffer != null ? buffer.length : 0;
 		if (n == 0) return;
 		int size = _size;
@@ -127,11 +178,11 @@ public class BufferHelper {
 			do {
 				index = byteComp(buffer, index+1, ANNEXB_START_MARK, ANNEXB_START_MARK.length);
 				if (index >= 0) {
-					Log.i(tag, "found ANNEXB: start index=" + index);
+					Log.i(tag, prefix + " found ANNEXB: start index=" + index);
 				}
 			} while (index >= 0);
 		}
-		Log.i(tag, "dump:" + sb.toString());
+		Log.i(tag, prefix + sb);
 	}
 
     /**
