@@ -17,3 +17,4 @@ dependencyResolutionManagement {
 rootProject.name = "libcommon"
 include ':app'
 include ':common'
+include ':common:core'
