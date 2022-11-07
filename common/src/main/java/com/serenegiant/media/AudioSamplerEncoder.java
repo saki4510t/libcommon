@@ -21,10 +21,12 @@ package com.serenegiant.media;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
+import android.Manifest;
 import android.media.MediaRecorder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresPermission;
 
 /**
  * AudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
@@ -73,6 +75,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		mSampler = sampler;
 	}
 
+	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	@Override
 	public void start() {
 		super.start();

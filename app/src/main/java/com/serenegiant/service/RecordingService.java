@@ -373,6 +373,7 @@ public class RecordingService extends BaseService {
 	 * @throws IllegalStateException
 	 * @throws IOException
 	 */
+	@SuppressLint("MissingPermission")
 	void prepare()
 		throws IllegalStateException, IOException {
 

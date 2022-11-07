@@ -56,6 +56,7 @@ import com.serenegiant.media.MediaScreenEncoder;
 import com.serenegiant.media.VideoConfig;
 import com.serenegiant.mediastore.MediaStoreUtils;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.PermissionUtils;
 import com.serenegiant.utils.FileUtils;
 
 import java.io.IOException;
@@ -122,6 +123,7 @@ public class ScreenRecorderService extends BaseService {
 		return null;
 	}
 
+	@SuppressLint("MissingPermission")
 	@Override
 	public int onStartCommand(final Intent intent, final int flags, final int startId) {
 		super.onStartCommand(intent, flags, startId);
@@ -334,6 +336,7 @@ public class ScreenRecorderService extends BaseService {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressLint("MissingPermission")
 	private IRecorder createRecorder(
 		@NonNull final DocumentFile outputFile,
 		@NonNull final MediaProjection projection,
@@ -346,12 +349,15 @@ public class ScreenRecorderService extends BaseService {
 		final IVideoEncoder videoEncoder = new MediaScreenEncoder(recorder, mEncoderListener, projection, densityDpi); // API>=21
 		videoEncoder.setVideoConfig(-1, 30, 10);
 		videoEncoder.setVideoSize(width, height);
-		mAudioSampler = new AudioSampler(2,
-			CHANNEL_COUNT, SAMPLE_RATE,
-			AbstractAudioEncoder.SAMPLES_PER_FRAME,
-			AbstractAudioEncoder.FRAMES_PER_BUFFER);
-		mAudioSampler.start();
-		new AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler);
+		if (PermissionUtils.hasAudio(this)) {
+			// 音声取得のパーミッションがあるときだけ録音もする
+			mAudioSampler = new AudioSampler(2,
+				CHANNEL_COUNT, SAMPLE_RATE,
+				AbstractAudioEncoder.SAMPLES_PER_FRAME,
+				AbstractAudioEncoder.FRAMES_PER_BUFFER);
+			mAudioSampler.start();
+			new AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler);
+		}
 		if (DEBUG) Log.v(TAG, "createRecorder:finished");
 		return recorder;
 	}
