@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1123,5 +1124,25 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 */
 	public static int findStartMarker(@NonNull final byte[] array, final int offset) {
 		return BufferHelper.byteComp(array, offset, START_MARKER, START_MARKER.length);
+	}
+
+	/**
+	 * 指定したMediaFormatをlogCatへダンプする
+	 * @param format
+	 */
+	public static void dump(@NonNull final MediaFormat format) {
+		Log.i(TAG, "format:" + format.toString());
+		ByteBuffer csd0 = format.getByteBuffer("csd-0");
+		if (csd0 != null) {
+			csd0 = csd0.asReadOnlyBuffer();
+			csd0.position(csd0.capacity()).flip();
+			BufferHelper.dump(TAG, "csd0:", csd0, 0, 64);
+		}
+		ByteBuffer csd1 = format.getByteBuffer("csd-1");
+		if (csd1 != null) {
+			csd1 = csd1.asReadOnlyBuffer();
+			csd1.position(csd1.capacity()).flip();
+			BufferHelper.dump(TAG, "csd1:", csd1, 0, 64);
+		}
 	}
 }

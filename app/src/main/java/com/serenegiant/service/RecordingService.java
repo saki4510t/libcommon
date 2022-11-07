@@ -44,6 +44,7 @@ import com.serenegiant.media.AbstractAudioEncoder;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.IAudioSampler;
 import com.serenegiant.media.IMuxer;
+import com.serenegiant.media.MediaCodecUtils;
 import com.serenegiant.media.MediaMuxerWrapper;
 import com.serenegiant.media.MediaReaper;
 import com.serenegiant.media.VideoConfig;
@@ -1053,6 +1054,7 @@ public class RecordingService extends BaseService {
 			@NonNull final MediaFormat format) {
 
 			if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
+			if (DEBUG) MediaCodecUtils.dump(format);
 			switch (reaper.reaperType()) {
 			case MediaReaper.REAPER_VIDEO:
 				mVideoFormat = format;
