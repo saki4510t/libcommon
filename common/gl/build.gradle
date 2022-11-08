@@ -95,7 +95,7 @@ afterEvaluate {
 		publications {
 			release(MavenPublication) {
 				groupId = 'com.serenegiant'
-				artifactId = 'common'
+				artifactId = 'common-gl'
 				version = versionNameString
 				from components.release
 				pom {
