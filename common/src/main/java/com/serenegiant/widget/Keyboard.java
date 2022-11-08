@@ -112,12 +112,12 @@ public class Keyboard {
 	/**
 	 * Key instance for the shift key, if present
 	 */
-	private Keyboard.Key[] mShiftKeys = {null, null};
+	private final Keyboard.Key[] mShiftKeys = {null, null};
 
 	/**
 	 * Key index for the shift key, if present
 	 */
-	private int[] mShiftKeyIndices = {-1, -1};
+	private final int[] mShiftKeyIndices = {-1, -1};
 
 	/**
 	 * Current key width, while loading the keyboard
@@ -226,7 +226,7 @@ public class Keyboard {
 		 */
 		public int mode;
 
-		private Keyboard parent;
+		private final Keyboard parent;
 
 		public Row(@NonNull final Keyboard parent) {
 			this.parent = parent;
@@ -366,7 +366,7 @@ public class Keyboard {
 		/**
 		 * The keyboard that this key belongs to
 		 */
-		private Keyboard keyboard;
+		private final Keyboard keyboard;
 		/**
 		 * If this key pops up a mini keyboard, this is the resource id for the XML layout for that
 		 * keyboard.
@@ -565,14 +565,10 @@ public class Keyboard {
 			boolean rightEdge = (edgeFlags & EDGE_RIGHT) > 0;
 			boolean topEdge = (edgeFlags & EDGE_TOP) > 0;
 			boolean bottomEdge = (edgeFlags & EDGE_BOTTOM) > 0;
-			if ((x >= this.x || (leftEdge && x <= this.x + this.width))
+			return ((x >= this.x || (leftEdge && x <= this.x + this.width))
 				&& (x < this.x + this.width || (rightEdge && x >= this.x))
 				&& (y >= this.y || (topEdge && y <= this.y + this.height))
-				&& (y < this.y + this.height || (bottomEdge && y >= this.y))) {
-				return true;
-			} else {
-				return false;
-			}
+				&& (y < this.y + this.height || (bottomEdge && y >= this.y)));
 		}
 
 		/**
@@ -957,7 +953,7 @@ public class Keyboard {
 		Key key = null;
 		Row currentRow = null;
 		Resources res = context.getResources();
-		boolean skipRow = false;
+		boolean skipRow;
 
 		try {
 			int event;
@@ -1008,8 +1004,8 @@ public class Keyboard {
 						y += currentRow.verticalGap;
 						y += currentRow.defaultHeight;
 						row++;
-					} else {
-						// TODO: error or extend?
+//					} else {
+//						// TODO: error or extend?
 					}
 				}
 			}
