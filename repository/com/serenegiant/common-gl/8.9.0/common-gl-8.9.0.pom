@@ -8,7 +8,7 @@
   <!-- do_not_remove: published-with-gradle-metadata -->
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.serenegiant</groupId>
-  <artifactId>common-media</artifactId>
+  <artifactId>common-gl</artifactId>
   <version>8.9.0</version>
   <packaging>aar</packaging>
   <inceptionYear>2014</inceptionYear>
@@ -126,12 +126,6 @@
     <dependency>
       <groupId>com.serenegiant</groupId>
       <artifactId>common-core</artifactId>
-      <version>8.9.0</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.serenegiant</groupId>
-      <artifactId>common-gl</artifactId>
       <version>8.9.0</version>
       <scope>runtime</scope>
     </dependency>

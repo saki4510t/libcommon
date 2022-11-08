@@ -2,7 +2,7 @@
   "formatVersion": "1.1",
   "component": {
     "group": "com.serenegiant",
-    "module": "common-media",
+    "module": "common-gl",
     "version": "8.9.0",
     "attributes": {
       "org.gradle.status": "release"
@@ -33,13 +33,13 @@
       ],
       "files": [
         {
-          "name": "common-media-8.9.0.aar",
-          "url": "common-media-8.9.0.aar",
-          "size": 41730,
-          "sha512": "84f442510202d48c58c91729aed922de7aabe7f631fb8ccaf1c07c3eb983684fc78bdd271d7d08fb45b3a0a03f876a9f5199801e80960ed05d7b65758f10b5d0",
-          "sha256": "fab6dbdf054d0845b089df1562d5f4c30c95b56ef75c7014949c9501b1b04cc1",
-          "sha1": "2c63343a2ae0c8915a4c49b9a0d8d23a73a6e819",
-          "md5": "7fa527afa1615144ee3dc0b1e8458709"
+          "name": "common-gl-8.9.0.aar",
+          "url": "common-gl-8.9.0.aar",
+          "size": 41723,
+          "sha512": "e6e3bca17017f191f53e12377abf69ed9be45a6774b0bf4b7a567c889ce054c9bfc1abbee67fe8a39aca19cffe3c4ce817263a9fbcab1758c68ca8ba725c4b26",
+          "sha256": "cf92fadc2269c5a130e39ce06bf78b016fbfd74c968e625a6f72727ddc2d1bc8",
+          "sha1": "2e25007427db6d91111e4fa9e33ecdf9420415db",
+          "md5": "48a239b8d18ccf8faa3156a63c7397cf"
         }
       ]
     },
@@ -170,24 +170,17 @@
           "version": {
             "requires": "8.9.0"
           }
-        },
-        {
-          "group": "com.serenegiant",
-          "module": "common-gl",
-          "version": {
-            "requires": "8.9.0"
-          }
         }
       ],
       "files": [
         {
-          "name": "common-media-8.9.0.aar",
-          "url": "common-media-8.9.0.aar",
-          "size": 41730,
-          "sha512": "84f442510202d48c58c91729aed922de7aabe7f631fb8ccaf1c07c3eb983684fc78bdd271d7d08fb45b3a0a03f876a9f5199801e80960ed05d7b65758f10b5d0",
-          "sha256": "fab6dbdf054d0845b089df1562d5f4c30c95b56ef75c7014949c9501b1b04cc1",
-          "sha1": "2c63343a2ae0c8915a4c49b9a0d8d23a73a6e819",
-          "md5": "7fa527afa1615144ee3dc0b1e8458709"
+          "name": "common-gl-8.9.0.aar",
+          "url": "common-gl-8.9.0.aar",
+          "size": 41723,
+          "sha512": "e6e3bca17017f191f53e12377abf69ed9be45a6774b0bf4b7a567c889ce054c9bfc1abbee67fe8a39aca19cffe3c4ce817263a9fbcab1758c68ca8ba725c4b26",
+          "sha256": "cf92fadc2269c5a130e39ce06bf78b016fbfd74c968e625a6f72727ddc2d1bc8",
+          "sha1": "2e25007427db6d91111e4fa9e33ecdf9420415db",
+          "md5": "48a239b8d18ccf8faa3156a63c7397cf"
         }
       ]
     }
