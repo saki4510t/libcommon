@@ -68,7 +68,7 @@ class NumberKeyboardFragment : BaseFragment() {
 		super.internalOnPause()
 	}
 
-	fun initView(rootView: View) {
+	private fun initView(rootView: View) {
 		mInputEditText = rootView.findViewById(R.id.edittext)
 		mKeyboardView = rootView.findViewById(R.id.number_keyboardview)
 		mDelegater = object : KeyboardDelegater(
