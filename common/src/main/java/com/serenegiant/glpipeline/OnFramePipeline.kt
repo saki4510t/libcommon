@@ -22,7 +22,7 @@ import androidx.annotation.Size
 */
 
 /**
- * 映像が更新されたときのコースバックインターフェースを呼び出すだけのGLPipeline実装
+ * 映像が更新されたときのコースバックインターフェースを呼び出すだけのProxyPipeline実装
  */
 class OnFramePipeline(private val mListener: OnFrameAvailableListener)
 : ProxyPipeline() {

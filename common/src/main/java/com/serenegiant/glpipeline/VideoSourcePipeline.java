@@ -40,7 +40,7 @@ import androidx.annotation.WorkerThread;
 /**
  * 映像をSurface/SurfaceTextureとして受け取って
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
- * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
+ * useSharedContext=VideoSourcePipeline + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  */
 public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production
