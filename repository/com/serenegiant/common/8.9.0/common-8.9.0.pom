@@ -123,23 +123,5 @@
       <version>1.6.4</version>
       <scope>runtime</scope>
     </dependency>
-    <dependency>
-      <groupId>com.serenegiant</groupId>
-      <artifactId>common-core</artifactId>
-      <version>8.9.0</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>libcommon.common</groupId>
-      <artifactId>gl</artifactId>
-      <version>unspecified</version>
-      <scope>runtime</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.serenegiant</groupId>
-      <artifactId>common-media</artifactId>
-      <version>8.9.0</version>
-      <scope>runtime</scope>
-    </dependency>
   </dependencies>
 </project>

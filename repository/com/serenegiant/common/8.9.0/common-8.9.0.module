@@ -163,27 +163,6 @@
           "version": {
             "requires": "1.6.4"
           }
-        },
-        {
-          "group": "com.serenegiant",
-          "module": "common-core",
-          "version": {
-            "requires": "8.9.0"
-          }
-        },
-        {
-          "group": "libcommon.common",
-          "module": "gl",
-          "version": {
-            "requires": "unspecified"
-          }
-        },
-        {
-          "group": "com.serenegiant",
-          "module": "common-media",
-          "version": {
-            "requires": "8.9.0"
-          }
         }
       ],
       "files": [

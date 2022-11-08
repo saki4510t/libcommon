@@ -105,9 +105,9 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
-	implementation project(':common:core')
-	implementation project(':common:gl')
-	implementation project(':common:media')
+//	implementation project(':common:core')
+//	implementation project(':common:gl')
+//	implementation project(':common:media')
 }
 
 def repo = new File(rootDir, "repository")
