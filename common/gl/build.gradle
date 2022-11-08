@@ -82,3 +82,40 @@ dependencies {
 
 	implementation project(':common:core')
 }
+
+def repo = new File(rootDir, "repository")
+
+afterEvaluate {
+	publishing {
+		repositories {
+			maven {
+				url = "file://${repo.absolutePath}"
+			}
+		}
+		publications {
+			release(MavenPublication) {
+				groupId = 'com.serenegiant'
+				artifactId = 'common'
+				version = versionNameString
+				from components.release
+				pom {
+					inceptionYear = '2014'
+					licenses {
+						license {
+							name = 'The Apache Software License, Version 2.0'
+							url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+							distribution = 'repo'
+						}
+					}
+					developers {
+						developer {
+							id = 'saki4510t'
+							name = 't_saki'
+							email = 't_saki@serenegiant.com'
+						}
+					}
+				}
+			}
+		}
+	}
+}
