@@ -46,6 +46,8 @@ public class CapturePipeline extends ProxyPipeline {
 	public interface Callback {
 		@AnyThread
 		public void onCapture(@NonNull final Bitmap bitmap);
+		@AnyThread
+		public void onError(@NonNull final Throwable t);
 	}
 
 	@NonNull
@@ -155,27 +157,33 @@ public class CapturePipeline extends ProxyPipeline {
 			final int h = getHeight();
 			final Bitmap bitmap = mPool.obtain(w, h);
 			if (bitmap != null) {
-				// GLSurfaceを経由してテクスチャを読み取る
-				final GLSurface surface = GLSurface.wrap(isOES, GLES20.GL_TEXTURE0, texId, w, h);
-				surface.makeCurrent();
-				@NonNull
-				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
-				bitmap.copyPixelsFromBuffer(buffer);
-				mBuffer = buffer;
-				// コールバックをワーカースレッド上で呼び出す
-				ThreadPool.queueEvent(() -> {
-					try {
-						mCallback.onCapture(bitmap);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					} finally {
-						if (bitmap.isRecycled()) {
-							mPool.release(bitmap);
-						} else {
-							mPool.recycle(bitmap);
+				try {
+					// GLSurfaceを経由してテクスチャを読み取る
+					final GLSurface surface = GLSurface.wrap(isOES, GLES20.GL_TEXTURE0, texId, w, h);
+					surface.makeCurrent();
+					@NonNull
+					final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
+					bitmap.copyPixelsFromBuffer(buffer);
+					mBuffer = buffer;
+					// コールバックをワーカースレッド上で呼び出す
+					ThreadPool.queueEvent(() -> {
+						try {
+							mCallback.onCapture(bitmap);
+						} catch (final Exception e) {
+							Log.w(TAG, e);
+						} finally {
+							if (bitmap.isRecycled()) {
+								mPool.release(bitmap);
+							} else {
+								mPool.recycle(bitmap);
+							}
 						}
-					}
-				});
+					});
+				} catch (final Exception e) {
+					ThreadPool.queueEvent(() -> {
+						mCallback.onError(e);
+					});
+				}
 			}
 		}
 	}

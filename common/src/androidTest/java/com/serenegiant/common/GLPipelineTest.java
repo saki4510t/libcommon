@@ -695,8 +695,12 @@ public class GLPipelineTest {
 				cnt.incrementAndGet();
 				sem.release();
 			}
+			@Override
+			public void onError(@NonNull final Throwable t) {
+				Log.w(TAG, t);
+				sem.release();
+			}
 		});
-
 
 		source.setPipeline(capturePipeline);
 
@@ -737,6 +741,12 @@ public class GLPipelineTest {
 				if (cnt.incrementAndGet() >= NUM_TRIGGERS) {
 					sem.release();
 				}
+			}
+
+			@Override
+			public void onError(@NonNull final Throwable t) {
+				Log.w(TAG, t);
+				sem.release();
 			}
 		});
 
