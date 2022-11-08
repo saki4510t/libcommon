@@ -130,6 +130,12 @@
       <scope>runtime</scope>
     </dependency>
     <dependency>
+      <groupId>libcommon.common</groupId>
+      <artifactId>gl</artifactId>
+      <version>unspecified</version>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
       <groupId>com.serenegiant</groupId>
       <artifactId>common-media</artifactId>
       <version>8.9.0</version>

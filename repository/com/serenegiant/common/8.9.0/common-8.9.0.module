@@ -172,6 +172,13 @@
           }
         },
         {
+          "group": "libcommon.common",
+          "module": "gl",
+          "version": {
+            "requires": "unspecified"
+          }
+        },
+        {
           "group": "com.serenegiant",
           "module": "common-media",
           "version": {

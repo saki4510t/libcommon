@@ -106,6 +106,7 @@ dependencies {
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	implementation project(':common:core')
+	implementation project(':common:gl')
 	implementation project(':common:media')
 }
 
