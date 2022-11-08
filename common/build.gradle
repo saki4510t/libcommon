@@ -103,10 +103,10 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
 	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
-	implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinStdLibVersion"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
 	implementation project(':common:core')
+	implementation project(':common:media')
 }
 
 def repo = new File(rootDir, "repository")

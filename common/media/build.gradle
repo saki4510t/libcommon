@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-	namespace 'com.serenegiant.core'
+	namespace 'com.serenegiant.media'
 	compileSdkVersion versionCompiler
 
 	compileOptions {
@@ -79,6 +79,9 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-service:$androidXLifecycleKtx"
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
+
+	implementation project(':common:core')
+	implementation project(':common:gl')
 }
 
 def repo = new File(rootDir, "repository")
@@ -93,7 +96,7 @@ afterEvaluate {
 		publications {
 			release(MavenPublication) {
 				groupId = 'com.serenegiant'
-				artifactId = 'common-core'
+				artifactId = 'common-media'
 				version = versionNameString
 				from components.release
 				pom {
