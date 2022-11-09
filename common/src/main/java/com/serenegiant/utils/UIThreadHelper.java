@@ -46,6 +46,14 @@ public final class UIThreadHelper {
 	}
 
 	/**
+	 * UIスレッド上で実行しているかどうかを取得
+	 * @return
+	 */
+	public static boolean isUiThread() {
+		return Thread.currentThread().getId() == sUiThread.getId();
+	}
+
+	/**
 	 * UIスレッドでRunnableを実行するためのヘルパーメソッド
 	 * @param task
 	 */
