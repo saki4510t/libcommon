@@ -122,13 +122,13 @@ public class GLPipelineTest {
 		assertEquals(src, GLPipeline.find(dst3, ProxyPipeline.class));
 
 		// 全てを除去
-		dst1.remove(); dst3.remove(); dst3.remove();
+		dst1.remove(); dst2.remove(); dst3.remove();
 		// あらかじめ繋いだパイプラインを一括で追加
 		dst1.setPipeline(dst2); dst2.setPipeline(dst3);
 		src.setPipeline(dst1);
 		assertTrue(validatePipelineOrder(src, src, dst1, dst2, dst3));
 		// 全てを除去
-		dst1.remove(); dst3.remove(); dst3.remove();
+		dst1.remove(); dst2.remove(); dst3.remove();
 		// あらかじめ繋いだパイプラインを一括でinsert
 		src.setPipeline(dst1);
 		dst2.setPipeline(dst3);
