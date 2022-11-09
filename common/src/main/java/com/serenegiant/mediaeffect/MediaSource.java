@@ -82,8 +82,8 @@ public class MediaSource implements ISource {
 			if ((width > 0) && (height > 0)) {
 				// FIXME フィルタ処理自体は大丈夫そうなんだけどImageProcessorの処理がおかしくなるので今は2の乗数には丸めない
 				// 代わりにImageProcessorの縦横のサイズ自体を2の乗数にする
-				mSourceScreen = GLSurface.newInstance(false, width, height, false, false);
-				mOutputScreen = GLSurface.newInstance(false, width, height, false, false);
+				mSourceScreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false, false);
+				mOutputScreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false, false);
 				mWidth = width;
 				mHeight = height;
 				mSrcTexIds[0] = mSourceScreen.getTexId();

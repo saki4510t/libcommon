@@ -19,6 +19,8 @@ package com.serenegiant.mediaeffect;
 */
 
 import androidx.annotation.NonNull;
+
+import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLSurface;
@@ -156,7 +158,7 @@ public class MediaEffectGLBase implements IEffect {
 
 		if (!mEnabled) return;
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(false, width, height, false);
+			mOutputOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false);
 		}
 		if ((out_tex_id != mOutputOffscreen.getTexId())
 			|| (width != mOutputOffscreen.getWidth())

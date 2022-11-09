@@ -382,7 +382,9 @@ public class EffectPipeline extends ProxyPipeline
 					mEffectOnly = false;
 				} else {
 					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					work = GLSurface.newInstance(mManager.isGLES3(), getWidth(), getHeight());
+					work = GLSurface.newInstance(
+						mManager.isGLES3(), GLES20.GL_TEXTURE0,
+						getWidth(), getHeight());
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
 					mEffectOnly = true;

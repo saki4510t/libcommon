@@ -19,6 +19,7 @@ package com.serenegiant.mediaeffect;
 */
 
 import android.graphics.Bitmap;
+import android.opengl.GLES20;
 
 import com.serenegiant.gl.GLSurface;
 
@@ -31,7 +32,9 @@ public class MediaImageSource extends MediaSource {
 	 */
 	public MediaImageSource(final Bitmap src) {
 		super(src.getWidth(), src.getHeight());
-		mImageOffscreen = GLSurface.newInstance(false, mWidth, mHeight, false);
+		mImageOffscreen = GLSurface.newInstance(
+			false, GLES20.GL_TEXTURE0,
+			mWidth, mHeight, false);
 		setSource(src);
 	}
 

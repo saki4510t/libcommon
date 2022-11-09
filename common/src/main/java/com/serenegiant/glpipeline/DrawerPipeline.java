@@ -406,7 +406,9 @@ public class DrawerPipeline extends ProxyPipeline
 					mDrawOnly = false;
 				} else if (isValid()) {
 					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					offscreenSurface = GLSurface.newInstance(mManager.isGLES3(), getWidth(), getHeight());
+					offscreenSurface = GLSurface.newInstance(
+						mManager.isGLES3(), GLES20.GL_TEXTURE0,
+						getWidth(), getHeight());
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), offscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
 					mDrawOnly = true;

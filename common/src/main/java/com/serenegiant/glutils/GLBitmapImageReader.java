@@ -69,6 +69,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	 * SurfaceTextureへ割り当てたテクスチャをバックバッファとしてラップして
 	 * 読み取り可能にするためのGLSurface
 	 */
+	@Nullable
 	private GLSurface mReadSurface;
 	private volatile boolean mAllBitmapAcquired = false;
 
@@ -207,7 +208,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 				try {
 					// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
 					mReadSurface = GLSurface.wrap(reader.isGLES3(),
-						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE1, texId,
+						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, texId,
 						width, height, false);
 				} catch (final Exception e) {
 					Log.w(TAG, e);

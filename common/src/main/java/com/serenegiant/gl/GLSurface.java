@@ -49,6 +49,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param height
 	 */
 	@SuppressLint("NewApi")
+	@Deprecated
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int width, final int height) {
 
@@ -63,7 +64,6 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
-	 * テクスチャユニットはGL_TEXTURE0
 	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
@@ -94,6 +94,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
 	 */
 	@SuppressLint("NewApi")
+	@Deprecated
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int width, final int height,
 		final boolean use_depth_buffer) {
@@ -109,7 +110,6 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)をwrapするためのコンストラクタ
-	 * テクスチャユニットはGL_TEXTURE0
 	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
@@ -142,6 +142,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param adjust_power2
 	 */
 	@SuppressLint("NewApi")
+	@Deprecated
 	public static GLSurface newInstance(final boolean isGLES3,
 		final int width, final int height,
 		final boolean use_depth_buffer, final boolean adjust_power2) {
