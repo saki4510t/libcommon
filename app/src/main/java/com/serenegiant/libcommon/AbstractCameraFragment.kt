@@ -329,26 +329,22 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		override fun onCapture(bitmap: Bitmap) {
 			if (DEBUG) Log.v(TAG, "onCapture:bitmap=$bitmap")
 			try {
-				try {
-					val ctx = requireContext()
-					val ext = "png"
-					val outputFile = MediaStoreUtils.getContentDocument(
-						ctx, "image/$ext",
-						"${Environment.DIRECTORY_DCIM}/${FileUtils.DIR_NAME}",
-						"${FileUtils.getDateTimeString()}.$ext", null
-					)
-					if (DEBUG) Log.v(TAG, "takePicture: save to $outputFile")
-					val output = ctx.contentResolver.openOutputStream(outputFile.uri)
-					if (output != null) {
-						try {
-							bitmap.compress(Bitmap.CompressFormat.PNG, 80, output)
-						} finally {
-							output.close()
-							MediaStoreUtils.updateContentUri(ctx, outputFile)
-						}
+				val ctx = requireContext()
+				val ext = "png"
+				val outputFile = MediaStoreUtils.getContentDocument(
+					ctx, "image/$ext",
+					"${Environment.DIRECTORY_DCIM}/${FileUtils.DIR_NAME}",
+					"${FileUtils.getDateTimeString()}.$ext", null
+				)
+				if (DEBUG) Log.v(TAG, "takePicture: save to $outputFile")
+				val output = ctx.contentResolver.openOutputStream(outputFile.uri)
+				if (output != null) {
+					try {
+						bitmap.compress(Bitmap.CompressFormat.PNG, 80, output)
+					} finally {
+						output.close()
+						MediaStoreUtils.updateContentUri(ctx, outputFile)
 					}
-				} finally {
-					bitmap.recycle()
 				}
 				if (DEBUG) Log.v(TAG, "onCapture:finished")
 			} catch (e: Exception) {
