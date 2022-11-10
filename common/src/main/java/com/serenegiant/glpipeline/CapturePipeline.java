@@ -158,7 +158,7 @@ public class CapturePipeline extends ProxyPipeline {
 
 	/**
 	 * キャプチャ処理
-	 * FIXME テストは通るけどGLSurface.wrapでクラッシュするときがある
+	 * FIXME テクスチャ変換行列が適用されていないので映像のない部分も含めて保存されてしまう
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
