@@ -29,9 +29,9 @@ import com.serenegiant.utils.ThreadPool;
 
 import java.nio.ByteBuffer;
 
-import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.WorkerThread;
 
 /**
  * 静止画キャプチャ機能を追加したProxyPipeline実装
@@ -44,9 +44,9 @@ public class CapturePipeline extends ProxyPipeline {
 	 * キャプチャ時のコールバックリスナー
 	 */
 	public interface Callback {
-		@AnyThread
+		@WorkerThread
 		public void onCapture(@NonNull final Bitmap bitmap);
-		@AnyThread
+		@WorkerThread
 		public void onError(@NonNull final Throwable t);
 	}
 
