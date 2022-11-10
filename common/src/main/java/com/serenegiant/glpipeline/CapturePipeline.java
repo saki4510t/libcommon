@@ -177,6 +177,7 @@ public class CapturePipeline extends ProxyPipeline {
 				surface.makeCurrent();
 				@NonNull
 				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
+				surface.release();
 				bitmap.copyPixelsFromBuffer(buffer);
 				mBuffer = buffer;
 				// コールバックをワーカースレッド上で呼び出す

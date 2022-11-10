@@ -25,6 +25,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
@@ -65,12 +66,6 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	private final Paint mPaint = new Paint();
 	@Nullable
 	private ByteBuffer mWorkBuffer;
-	/**
-	 * SurfaceTextureへ割り当てたテクスチャをバックバッファとしてラップして
-	 * 読み取り可能にするためのGLSurface
-	 */
-	@Nullable
-	private GLSurface mReadSurface;
 	private volatile boolean mAllBitmapAcquired = false;
 
 	@Nullable
@@ -153,10 +148,6 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	public void onReleaseInputSurface(@NonNull final GLImageReceiver reader) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
-		if (mReadSurface != null) {
-			mReadSurface.release();
-			mReadSurface = null;
-		}
 	}
 
 	/**
@@ -203,22 +194,15 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		final Bitmap bitmap = obtainBitmap(width, height);
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
-//			// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
-			if (mReadSurface == null) {
-				try {
-					// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-					mReadSurface = GLSurface.wrap(reader.isGLES3(),
-						GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE4, texId,
-						width, height, false);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-					return;
-				}
-			}
-			mReadSurface.makeCurrent();
-			// オフスクリーンから読み取り
+			// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
+			final GLSurface readSurface = GLSurface.wrap(reader.isGLES3(),
+				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE4, texId, width, height, false);
+			readSurface.makeCurrent();
+			// テクスチャをバックバッファとしたオフスクリーンから読み取り
 			mWorkBuffer.clear();
 			GLUtils.glReadPixels(mWorkBuffer, width, height);
+			readSurface.release();
 			// Bitmapへ代入
 			mWorkBuffer.clear();
 			bitmap.copyPixelsFromBuffer(mWorkBuffer);
