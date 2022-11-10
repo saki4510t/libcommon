@@ -580,7 +580,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		if (target == null) {
 			try {
 				target = createRendererTarget(getEgl(), ts.id, ts.surface, ts.maxFps);
-				GLUtils.setMirror(target.getMvpMatrix(), mMirror);
+				target.setMirror(mMirror);
 				synchronized (mTargets) {
 					mTargets.append(ts.id, target);
 				}
@@ -740,7 +740,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		for (int i = 0; i < n; i++) {
 			final RendererTarget target = mTargets.valueAt(i);
 			if (target != null) {
-				GLUtils.setMirror(target.getMvpMatrix(), mirror);
+				target.setMirror(mirror);
 			}
 		}
 	}
