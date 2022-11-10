@@ -134,6 +134,31 @@ public class GLUtils implements GLConst {
 	}
 
 	/**
+	 * 現在のスレッドにGLコンテキストが存在していてGLES3に対応しているかどうかを取得
+	 * @return
+	 */
+	public static boolean isOnGLES3() throws IllegalStateException {
+		try {
+			final int glVersion;
+			final String extensions = GLES20.glGetString(GLES20.GL_EXTENSIONS); // API >= 8
+			if (DEBUG) Log.i(TAG, "getSupportedGLVersion:" + extensions);
+			if ((extensions == null) || !extensions.contains("GL_OES_EGL_image_external")) {
+				// GL_OES_EGL_image_externalが存在していない
+				glVersion = 1;
+			} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)) {
+				// API>=21ならGL_OES_EGL_image_external_essl3をチェックする
+				glVersion = extensions.contains("GL_OES_EGL_image_external_essl3")
+					? 3 : 2;
+			} else {
+				glVersion = 2;
+			}
+			return glVersion >= 3;
+		} catch (final Exception e) {
+			throw new IllegalStateException(e);
+		}
+	}
+
+	/**
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mvp
 	 * @param mirror
