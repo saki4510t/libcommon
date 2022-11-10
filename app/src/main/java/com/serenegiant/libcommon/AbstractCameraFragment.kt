@@ -21,7 +21,9 @@ package com.serenegiant.libcommon
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Surface
@@ -32,7 +34,10 @@ import android.widget.ImageButton
 import android.widget.TextView
 import androidx.annotation.LayoutRes
 import androidx.annotation.StringRes
+import androidx.annotation.WorkerThread
+import com.serenegiant.glpipeline.CapturePipeline
 import com.serenegiant.math.Fraction
+import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.SAFUtils
@@ -59,6 +64,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 * button for start/stop recording
 	 */
 	private var mRecordButton: ImageButton? = null
+
+	private var mCapture: CapturePipeline? = null
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -92,6 +99,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			v.pipelineMode = pipelineMode
 			v.enableFaceDetect = enableFaceDetect
 		}
+		mCapture = CapturePipeline(mCaptureCallback)
 	}
 
 	public override fun internalOnResume() {
@@ -99,6 +107,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnResume:")
 		mCameraView!!.onResume()
 		mCameraView!!.addListener(mOnFrameAvailableListener)
+		if (mCameraView is GLPipelineView) {
+			val v = mCameraView as GLPipelineView
+			v.addPipeline(mCapture!!)
+		}
 		// カメラパーミッションが無いか、
 		// 録画に対応していててストレージアクセス/録音のパーミッションが無いなら
 		// 終了して前画面へ戻る
@@ -111,9 +123,16 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	public override fun internalOnPause() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:")
 		stopRecording()
+		mCapture!!.remove()
 		mCameraView!!.removeListener(mOnFrameAvailableListener)
 		mCameraView!!.onPause()
 		super.internalOnPause()
+	}
+
+	override fun internalRelease() {
+		mCapture?.release()
+		mCapture = null
+		super.internalRelease()
 	}
 
 	//================================================================================
@@ -181,6 +200,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	}
 
 	protected open fun onLongClick(view: View): Boolean {
+		if (DEBUG) Log.v(TAG, "onLongClick:${view}")
+		mCapture?.trigger()
 		return false
 	}
 
@@ -301,6 +322,44 @@ abstract class AbstractCameraFragment : BaseFragment() {
 			|| (BuildCheck.isAPI28() || PermissionUtils.hasWriteExternalStorage(activity)))
 			&& PermissionUtils.hasAudio(activity)
 			&& PermissionUtils.hasCamera(activity)
+	}
+
+	private val mCaptureCallback = object : CapturePipeline.Callback {
+		@WorkerThread
+		override fun onCapture(bitmap: Bitmap) {
+			if (DEBUG) Log.v(TAG, "onCapture:bitmap=$bitmap")
+			try {
+				try {
+					val ctx = requireContext()
+					val ext = "png"
+					val outputFile = MediaStoreUtils.getContentDocument(
+						ctx, "image/$ext",
+						"${Environment.DIRECTORY_DCIM}/${FileUtils.DIR_NAME}",
+						"${FileUtils.getDateTimeString()}.$ext", null
+					)
+					if (DEBUG) Log.v(TAG, "takePicture: save to $outputFile")
+					val output = ctx.contentResolver.openOutputStream(outputFile.uri)
+					if (output != null) {
+						try {
+							bitmap.compress(Bitmap.CompressFormat.PNG, 80, output)
+						} finally {
+							output.close()
+							MediaStoreUtils.updateContentUri(ctx, outputFile)
+						}
+					}
+				} finally {
+					bitmap.recycle()
+				}
+				if (DEBUG) Log.v(TAG, "onCapture:finished")
+			} catch (e: Exception) {
+				Log.w(TAG, e)
+			}
+		}
+
+		@WorkerThread
+		override fun onError(t: Throwable) {
+			Log.w(TAG, t)
+		}
 	}
 
 	companion object {

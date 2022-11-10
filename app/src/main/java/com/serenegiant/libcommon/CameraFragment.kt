@@ -72,7 +72,7 @@ class CameraFragment : AbstractCameraFragment() {
 	}
 
 	override fun onLongClick(view: View): Boolean {
-		if (DEBUG) Log.v(TAG, "onLongClick:${view}")
+		super.onLongClick(view)
 		if (mCameraView is EffectCameraGLSurfaceView) {
 			val v = view as EffectCameraGLSurfaceView
 			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
