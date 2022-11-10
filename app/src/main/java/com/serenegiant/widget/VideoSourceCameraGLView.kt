@@ -124,17 +124,11 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		if (mVideoSourcePipeline != null) {
-			mVideoSourcePipeline!!.pipeline = null
-		}
-		if (mDistributor != null) {
-			mDistributor!!.release()
-			mDistributor = null
-		}
-		if (mVideoSourcePipeline != null) {
-			mVideoSourcePipeline!!.release()
-			mVideoSourcePipeline = null
-		}
+		mVideoSourcePipeline?.pipeline = null
+		mDistributor?.release()
+		mDistributor = null
+		mVideoSourcePipeline?.release()
+		mVideoSourcePipeline = null
 	}
 
 	/**
@@ -202,7 +196,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
 			mDistributor = SurfaceDistributePipeline(mVideoSourcePipeline!!.glManager)
-			mVideoSourcePipeline!!.pipeline = mDistributor!!
+			GLPipeline.append(mVideoSourcePipeline!!, mDistributor!!)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -225,11 +219,10 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		if (mVideoSourcePipeline != null) {
-			val last = GLPipeline.findLast(mVideoSourcePipeline!!)
-			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
-			last.pipeline = pipeline
-			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(mVideoSourcePipeline!!));
+		val source = mVideoSourcePipeline
+		if (source != null) {
+			GLPipeline.append(source, pipeline)
+			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
 		} else {
 			throw IllegalStateException()
 		}

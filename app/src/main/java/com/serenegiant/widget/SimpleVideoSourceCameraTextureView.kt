@@ -148,9 +148,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		val source = mVideoSourcePipeline
+		mVideoSourcePipeline?.release()
 		mVideoSourcePipeline = null
-		source?.release()
 	}
 
 	override fun setVideoSize(width: Int, height: Int) {
@@ -307,9 +306,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	override fun addPipeline(pipeline: GLPipeline)  {
 		val source = mVideoSourcePipeline
 		if (source != null) {
-			val last = GLPipeline.findLast(source)
-			if (DEBUG) Log.v(TAG, "addPipeline:last=${last}")
-			last.pipeline = pipeline
+			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
 		} else {
 			throw IllegalStateException()
