@@ -40,13 +40,14 @@ import com.serenegiant.gl.GLUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
-import java.lang.IllegalStateException
 import javax.microedition.khronos.egl.EGLConfig
 import javax.microedition.khronos.opengles.GL10
 
 /**
  * カメラ映像をVideoSourceとDistributor経由で取得してプレビュー表示するためのGLSurfaceView実装
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
+ * FIXME mVideoSourcePipelineが呼ばれるタイミングだとmVideoSourcePipelineが未生成なのでクラッシュする
+ *       暫定的にaddPipelineで例外生成しないように変更したが静止画キャプチャが動作しない
  */
 class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null)
@@ -195,7 +196,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
 		} else {
-			throw IllegalStateException()
+			Log.w(TAG, "addPipeline: mVideoSourcePipeline not ready!")
+//			throw IllegalStateException()
 		}
 	}
 
