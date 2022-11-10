@@ -152,38 +152,49 @@ public class CapturePipeline extends ProxyPipeline {
 			}
 		}
 		if (needCapture) {
-			// キャプチャする場合
-			final int w = getWidth();
-			final int h = getHeight();
-			final Bitmap bitmap = mPool.obtain(w, h);
-			if (bitmap != null) {
-				try {
-					// GLSurfaceを経由してテクスチャを読み取る
-					final GLSurface surface = GLSurface.wrap(isOES, GLES20.GL_TEXTURE4, texId, w, h);
-					surface.makeCurrent();
-					@NonNull
-					final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
-					bitmap.copyPixelsFromBuffer(buffer);
-					mBuffer = buffer;
-					// コールバックをワーカースレッド上で呼び出す
-					ThreadPool.queueEvent(() -> {
-						try {
-							mCallback.onCapture(bitmap);
-						} catch (final Exception e) {
-							Log.w(TAG, e);
-						} finally {
-							if (bitmap.isRecycled()) {
-								mPool.release(bitmap);
-							} else {
-								mPool.recycle(bitmap);
-							}
+			doCapture(isOES, texId, texMatrix);
+		}
+	}
+
+	/**
+	 * キャプチャ処理
+	 * FIXME テストは通るけどGLSurface.wrapでクラッシュするときがある
+	 * @param isOES
+	 * @param texId
+	 * @param texMatrix
+	 */
+	private void doCapture(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+		if (DEBUG) Log.v(TAG, "doCapture:");
+		final int w = getWidth();
+		final int h = getHeight();
+		final Bitmap bitmap = mPool.obtain(w, h);
+		if (bitmap != null) {
+			try {
+				// GLSurfaceを経由してテクスチャを読み取る
+				final GLSurface surface = GLSurface.wrap(isOES, GLES20.GL_TEXTURE4, texId, w, h);
+				surface.makeCurrent();
+				@NonNull
+				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
+				bitmap.copyPixelsFromBuffer(buffer);
+				mBuffer = buffer;
+				// コールバックをワーカースレッド上で呼び出す
+				ThreadPool.queueEvent(() -> {
+					try {
+						mCallback.onCapture(bitmap);
+					} catch (final Exception e) {
+						Log.w(TAG, e);
+					} finally {
+						if (bitmap.isRecycled()) {
+							mPool.release(bitmap);
+						} else {
+							mPool.recycle(bitmap);
 						}
-					});
-				} catch (final Exception e) {
-					ThreadPool.queueEvent(() -> {
-						mCallback.onError(e);
-					});
-				}
+					}
+				});
+			} catch (final Exception e) {
+				ThreadPool.queueEvent(() -> {
+					mCallback.onError(e);
+				});
 			}
 		}
 	}
