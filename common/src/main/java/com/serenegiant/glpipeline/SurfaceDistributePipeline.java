@@ -363,7 +363,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 
 		@Override
 		public boolean offer(final int request, final int arg1) {
-			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1));
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, 0));
 		}
 
 		@Override
