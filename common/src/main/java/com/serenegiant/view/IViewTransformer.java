@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 
 /**
  * android.graphics.Matrixを使った表示内容のトランスフォームを行うViewの場合
+ * FIXME IMirrorを継承してミラー処理を実装したい
  */
 public interface IViewTransformer extends IContentTransformer {
 	/**
