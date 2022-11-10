@@ -171,7 +171,9 @@ public class CapturePipeline extends ProxyPipeline {
 		if (bitmap != null) {
 			try {
 				// GLSurfaceを経由してテクスチャを読み取る
-				final GLSurface surface = GLSurface.wrap(isOES, GLES20.GL_TEXTURE4, texId, w, h);
+				final GLSurface surface = GLSurface.wrap(false,
+					isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+					GLES20.GL_TEXTURE4, texId, w, h, false);
 				surface.makeCurrent();
 				@NonNull
 				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);

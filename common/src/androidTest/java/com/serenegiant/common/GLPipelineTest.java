@@ -262,7 +262,9 @@ public class GLPipelineTest {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT);
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
@@ -310,7 +312,9 @@ public class GLPipelineTest {
 					this.remove();
 					if (sem1.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT);
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer1, WIDTH, HEIGHT);
 						sem1.release();
@@ -331,7 +335,9 @@ public class GLPipelineTest {
 					this.remove();
 					if (sem2.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(), GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT);
+						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer2, WIDTH, HEIGHT);
 						sem2.release();
@@ -408,8 +414,8 @@ public class GLPipelineTest {
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはVideoSourceからのテクスチャなのでisOES=trueのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE4, texId,
-							WIDTH, HEIGHT, false);
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
@@ -467,8 +473,8 @@ public class GLPipelineTest {
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							GL_TEXTURE_2D, GLES20.GL_TEXTURE4, texId,
-							WIDTH, HEIGHT, false);
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
@@ -526,8 +532,8 @@ public class GLPipelineTest {
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							GL_TEXTURE_2D, GLES20.GL_TEXTURE4, texId,
-							WIDTH, HEIGHT, false);
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
@@ -587,8 +593,8 @@ public class GLPipelineTest {
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							GL_TEXTURE_2D, GLES20.GL_TEXTURE4, texId,
-							WIDTH, HEIGHT, false);
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
@@ -646,8 +652,8 @@ public class GLPipelineTest {
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							GL_TEXTURE_2D, GLES20.GL_TEXTURE4, texId,
-							WIDTH, HEIGHT, false);
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
 						sem.release();
