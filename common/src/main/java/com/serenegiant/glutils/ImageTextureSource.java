@@ -280,6 +280,25 @@ public class ImageTextureSource implements GLConst, IMirror {
 	}
 
 	/**
+	 * 描画処理(黒で塗りつぶすだけ)
+	 * Choreographer.FrameCallbackからmImageSource == nullのときだけ呼ばれる
+	 */
+	@WorkerThread
+	private void onFrameAvailable() {
+		if (isValid()) {
+			@Nullable
+			final RendererTarget target;
+			synchronized (mSync) {
+				target = mRendererTarget;
+			}
+			if ((target != null)
+				&& target.canDraw()) {
+				target.clear(0);
+			}
+		}
+	}
+
+	/**
 	 * 映像ソース用のGLTextureを破棄する
 	 */
 	@WorkerThread
@@ -405,6 +424,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 				synchronized (mSync) {
 					if (mImageSource != null) {
 						onFrameAvailable(mImageSource.getTexId(), mImageSource.getTexMatrix());
+					} else {
+						onFrameAvailable();
 					}
 				}
 			}
