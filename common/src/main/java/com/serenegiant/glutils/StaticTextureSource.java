@@ -44,6 +44,7 @@ import com.serenegiant.math.Fraction;
  * ImageTextureSourceと違って複数のsurfaceへ分配描画する
  * 出力先Surfaceが1つだけならImageTextureSourceの方が効率的
  * FIXME GLES30対応を実装する
+ * FIXME ImageTextureSourceと同じようにChoreographerで書き換える
  */
 public class StaticTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
