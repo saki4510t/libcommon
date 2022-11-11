@@ -18,31 +18,42 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.annotation.SuppressLint;
+import android.graphics.Canvas;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 import android.media.MediaFormat;
+import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Surface;
 
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
+/**
+ * FIXME 音声バージョンのtestVideoMediaFormatを追加する
+ */
 public final class MediaCodecUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaCodecUtils.class.getSimpleName();
@@ -1217,4 +1228,110 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		}
 	}
 
+	/**
+	 * 実際に映像をエンコードしてMediaFormatを取得する
+	 * 映像ソースはsurfaceから入力する
+	 * @param mime
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+	@NonNull
+	public static MediaFormat testVideoMediaFormat(
+		@NonNull final String mime, final int width, final int height) throws IOException {
+
+		return testVideoMediaFormat(mime, width, height, new VideoConfig());
+	}
+
+	/**
+	 * 実際に映像をエンコードしてMediaFormatを取得する
+	 * 映像ソースはsurfaceから入力する
+	 * @param mime 映像エンコーダーの種類
+	 * @param width 映像幅
+	 * @param height 映像高さ
+	 * @param config エンコード設定
+	 * @return
+	 */
+	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
+	@NonNull
+	public static MediaFormat testVideoMediaFormat(
+		@NonNull final String mime, final int width, final int height,
+		@Nullable final VideoConfig config) throws IOException {
+
+		if (DEBUG) Log.v(TAG, String.format("testVideoMediaFormat:mime=%s,size(%dx%d)", mime, width, height));
+		final VideoConfig _config = config != null ? config : new VideoConfig();
+		final MediaFormat format = MediaFormat.createVideoFormat(mime, width, height);
+
+		// MediaCodecに適用するパラメータを設定する。誤った設定をするとMediaCodec#configureが
+		// 復帰不可能な例外を生成する
+		format.setInteger(MediaFormat.KEY_COLOR_FORMAT, MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface);    // API >= 18
+		format.setInteger(MediaFormat.KEY_BIT_RATE, _config.getBitrate(width, height));
+		format.setInteger(MediaFormat.KEY_FRAME_RATE, _config.captureFps());
+		format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL, _config.calcIFrameIntervals());
+		if (DEBUG) dump(TAG, format);
+
+		// 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
+		// エンコーダーへの入力に使うSurfaceを取得する
+		final AtomicReference<MediaFormat> result = new AtomicReference<>();
+		final CountDownLatch latch = new CountDownLatch(1);
+		if (DEBUG) Log.v(TAG, "testVideoMediaFormat:create encoder");
+		final MediaCodec encoder = MediaCodec.createEncoderByType(mime);
+		if (DEBUG) Log.v(TAG, "testVideoMediaFormat:configure encoder");
+		encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+		final Surface surface = encoder.createInputSurface();    // API >= 18
+		if (DEBUG) Log.v(TAG, "testVideoMediaFormat:start encoder");
+		encoder.start();
+		if (DEBUG) Log.v(TAG, "testVideoMediaFormat:create and start VideoReaper");
+		final MediaReaper.VideoReaper reaper = new MediaReaper.VideoReaper(
+			encoder, new MediaReaper.ReaperListener() {
+			@Override
+			public void writeSampleData(@NonNull final MediaReaper reaper, @NonNull final ByteBuffer byteBuf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
+				if (DEBUG) Log.v(TAG, "writeSampleData:");
+			}
+
+			@Override
+			public void onOutputFormatChanged(@NonNull final MediaReaper reaper, @NonNull final MediaFormat format) {
+				if (DEBUG) Log.v(TAG, "onOutputFormatChanged:");
+				result.set(format);
+				latch.countDown();
+			}
+
+			@Override
+			public void onStop(@NonNull final MediaReaper reaper) {
+				if (DEBUG) Log.v(TAG, "onStop:");
+			}
+
+			@Override
+			public void onError(@NonNull final MediaReaper reaper, final Throwable t) {
+				Log.w(TAG, t);
+			}
+		},
+		width, height);
+		try {
+			for (int i = 0; i < 10; i++) {
+				final Canvas canvas = surface.lockCanvas(null);
+				try {
+					canvas.drawColor(0xffff0000);
+				} finally {
+					surface.unlockCanvasAndPost(canvas);
+				}
+				reaper.frameAvailableSoon();
+				try {
+					if (DEBUG) Log.v(TAG, "testVideoMediaFormat:wait MediaFormat");
+					if (latch.await(15, TimeUnit.MILLISECONDS)) {
+						break;
+					}
+				} catch (final InterruptedException e) {
+					break;
+				}
+			}
+		} finally {
+			encoder.stop();
+			encoder.release();
+			reaper.release();
+		}
+		if (DEBUG) Log.i(TAG, "testVideoMediaFormat:result=" + result.get());
+		return result.get();
+	}
 }
