@@ -458,7 +458,22 @@ public class StaticTextureSource implements GLConst, IMirror {
 					}
 				}
 			} else {
-				Log.w(TAG, "mImageSource is not ready");
+				// イメージソースがないときは黒く塗りつぶす
+				synchronized (mTargets) {
+					final int n = mTargets.size();
+					for (int i = n - 1; i >= 0; i--) {
+						final RendererTarget target = mTargets.valueAt(i);
+						if ((target != null) && target.canDraw()) {
+							try {
+								target.clear(0);
+							} catch (final Exception e) {
+								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
+								mTargets.removeAt(i);
+								target.release();
+							}
+						}
+					}
+				}
 			}
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			GLES20.glFlush();
