@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -43,6 +44,7 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
 public final class MediaCodecUtils {
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaCodecUtils.class.getSimpleName();
 
 	private MediaCodecUtils() {
@@ -1175,4 +1177,44 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 			BufferHelper.dump(_tag, "csd1:", csd1, 0, 64);
 		}
 	}
+
+	/**
+	 * 指定したMediaCodecInfoをlogCatへダンプする
+	 * @param info
+	 */
+	public static void dump(@NonNull final MediaCodecInfo info) {
+		dump(TAG, info);
+	}
+
+	/**
+	 * 指定したMediaCodecInfoをlogCatへダンプする
+	 * @param tag
+	 * @param info
+	 */
+	public static void dump(@Nullable final String tag, @NonNull final MediaCodecInfo info) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		final String[] supportedTypes = info.getSupportedTypes();
+		Log.i(_tag, "name=" + info.getName());
+		if (BuildCheck.isAPI29()) {
+			Log.i(_tag, "canonicalName=" + info.getCanonicalName());
+			Log.i(_tag, "isAlias=" + info.isAlias());
+			Log.i(_tag, "isHardwareAccelerated=" + info.isHardwareAccelerated());
+			Log.i(_tag, "isSoftwareOnly=" + info.isSoftwareOnly());
+			Log.i(_tag, "isVendor=" + info.isVendor());
+		}
+		Log.i(_tag, "isEncoder=" + info.isEncoder());
+		Log.i(_tag, "supportedTypes=" + Arrays.toString(supportedTypes));
+		for (final String type: supportedTypes) {
+			final MediaCodecInfo.CodecCapabilities caps = info.getCapabilitiesForType(type);
+			final int[] colorFormats = caps.colorFormats;
+			for (final int colorFormat: colorFormats) {
+				Log.i(_tag, "type=" + type + ",colorFormat=" + getColorFormatName(colorFormat));
+			}
+			final MediaCodecInfo.CodecProfileLevel[] profileLevels = caps.profileLevels;
+			for (final MediaCodecInfo.CodecProfileLevel profileLevel: profileLevels) {
+				Log.i(_tag, "type=" + type + ",profileLevel=" + getProfileLevelString(type, profileLevel));
+			}
+		}
+	}
+
 }
