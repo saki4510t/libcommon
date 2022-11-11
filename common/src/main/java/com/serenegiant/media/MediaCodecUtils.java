@@ -738,6 +738,7 @@ public final class MediaCodecUtils {
 
 //--------------------------------------------------------------------------------
     // 静的にキャッシュするようにした
+    @NonNull
     private static final List<MediaCodecInfo> sCodecList = new ArrayList<MediaCodecInfo>();
 
 	/**
@@ -975,6 +976,15 @@ public final class MediaCodecUtils {
 	 * エンコード用コーデックの一覧をログに出力する
 	 */
 	public static void dumpEncoders() {
+		dumpEncoders(TAG);
+	}
+
+	/**
+	 * エンコード用コーデックの一覧をログに出力する
+	 * @param tag
+	 */
+	public static void dumpEncoders(@Nullable final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
@@ -986,7 +996,7 @@ public final class MediaCodecUtils {
 			// コーデックの一覧を出力する
             final String[] types = codecInfo.getSupportedTypes();
             for (int j = 0; j < types.length; j++) {
-            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
+            	Log.i(_tag, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
             	// カラーフォーマットを出力する
             	selectColorFormat(codecInfo, types[j]);
             }
@@ -997,6 +1007,15 @@ public final class MediaCodecUtils {
 	 * デコード用コーデックの一覧をログに出力する
 	 */
 	public static void dumpDecoders() {
+		dumpDecoders(TAG);
+	}
+
+	/**
+	 * デコード用コーデックの一覧をログに出力する
+	 * @param tag
+	 */
+	public static void dumpDecoders(@Nullable final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
     	// コーデックの一覧を取得
         final int numCodecs = getCodecCount();
         for (int i = 0; i < numCodecs; i++) {
@@ -1008,7 +1027,7 @@ public final class MediaCodecUtils {
             // コーデックの一覧を出力する
             final String[] types = codecInfo.getSupportedTypes();
             for (int j = 0; j < types.length; j++) {
-            	Log.i(TAG, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
+            	Log.i(_tag, "codec:" + codecInfo.getName() + ",MIME:" + types[j]);
             	// カラーフォーマットを出力する
             	selectColorFormat(codecInfo, types[j]);
             }
@@ -1118,6 +1137,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 
 	/**
 	 * codec specific dataの先頭マーカー位置を検索
+	 * BufferHelper.byteCompのシノニム
 	 * @param array
 	 * @param offset
 	 * @return
@@ -1131,18 +1151,28 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param format
 	 */
 	public static void dump(@NonNull final MediaFormat format) {
-		Log.i(TAG, "format:" + format.toString());
+		dump(TAG, format);
+	}
+
+	/**
+	 * 指定したMediaFormatをlogCatへダンプする
+	 * @param tag
+	 * @param format
+	 */
+	public static void dump(@Nullable final String tag, @NonNull final MediaFormat format) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		Log.i(_tag, "format:" + format.toString());
 		ByteBuffer csd0 = format.getByteBuffer("csd-0");
 		if (csd0 != null) {
 			csd0 = csd0.asReadOnlyBuffer();
 			csd0.position(csd0.capacity()).flip();
-			BufferHelper.dump(TAG, "csd0:", csd0, 0, 64);
+			BufferHelper.dump(_tag, "csd0:", csd0, 0, 64);
 		}
 		ByteBuffer csd1 = format.getByteBuffer("csd-1");
 		if (csd1 != null) {
 			csd1 = csd1.asReadOnlyBuffer();
 			csd1.position(csd1.capacity()).flip();
-			BufferHelper.dump(TAG, "csd1:", csd1, 0, 64);
+			BufferHelper.dump(_tag, "csd1:", csd1, 0, 64);
 		}
 	}
 }
