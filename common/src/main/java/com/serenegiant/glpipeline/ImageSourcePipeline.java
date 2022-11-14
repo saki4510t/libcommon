@@ -47,6 +47,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@Nullable
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
+	private volatile long mFrameIntervalMs;
 
 	/**
 	 * コンストラクタ
@@ -235,6 +236,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
+			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
+			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
 		}
 		if (needResize) {
 			resize(width, height);
@@ -252,13 +255,18 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				final long delayMs = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
-				prevFrameTimeNs = frameTimeNanos;
-				if (delayMs <= 0) {
-					mManager.postFrameCallbackDelayed(this, 0);
-				} else {
-					mManager.postFrameCallbackDelayed(this, delayMs);
+				if (prevFrameTimeNs <= 0) {
+					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
 				}
+				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
+				prevFrameTimeNs = frameTimeNanos;
+				if (delta < 0) {
+					// フレームレートから想定されるより呼び出しが遅かった場合
+					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);
+				} else {
+					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
+				}
+				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
 				synchronized (mSync) {
 					if (mImageSource != null) {
 						onFrameAvailable(false, mImageSource.getTexId(), mImageSource.getTexMatrix());

@@ -55,6 +55,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@Nullable
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
+	private volatile long mFrameIntervalMs;
 	private volatile boolean mReleased = false;
 	private int mWidth, mHeight;
 	@Nullable
@@ -68,7 +69,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * コンストラクタ
 	 * @param manager
 	 * @param bitmap nullのときは後で#setSourceを呼び出さないと#onFrameAvailableが呼び出されない
-	 * @param fps nullの時は30fps相当
+	 * @param fps nullの時は30fps相当, 30fpsよりも大きいと想定通りのフレームレートにならないことが多いので注意
 	 */
 	public ImageTextureSource(
 		@NonNull final GLManager manager,
@@ -216,30 +217,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 
 	/**
 	 * ISurfacePipelineの実装
-	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
-	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
-	 * @throws IllegalStateException
-	 * @throws IllegalArgumentException
-	 */
-	public void setSurface(@Nullable final Object surface)
-		throws IllegalStateException, IllegalArgumentException {
-
-		setSurface(surface, null);
-	}
-
-	/**
-	 * ISurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
-	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
 	public void setSurface(
-		@Nullable final Object surface,
-		@Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException {
+		@Nullable final Object surface) throws IllegalStateException, IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "setSurface:" + surface);
 		if (!isValid()) {
@@ -251,7 +236,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				createTargetOnGL(surface, maxFps);
+				createTargetOnGL(surface);
 			}
 		});
 	}
@@ -320,12 +305,13 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 */
 	@WorkerThread
 	private void createImageSource(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
-		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap);
+		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap + ",fps=" + fps);
 		mManager.removeFrameCallback(mFrameCallback);
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
 		final boolean needResize = (getWidth() != width) || (getHeight() != height);
 		final float _fps = fps != null ? fps.asFloat() : 30.0f;
+		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
 		synchronized (mSync) {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
@@ -334,6 +320,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
+			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
+			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
 			mWidth = width;
 			mHeight = height;
 		}
@@ -343,10 +331,9 @@ public class ImageTextureSource implements GLConst, IMirror {
 	/**
 	 * 描画先のSurfaceとGLDrawer2Dを生成
 	 * @param surface
-	 * @param maxFps
 	 */
 	@WorkerThread
-	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+	private void createTargetOnGL(@Nullable final Object surface) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
 		synchronized (mSync) {
 			synchronized (mSync) {
@@ -357,7 +344,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 				}
 				if ((mRendererTarget == null) && (surface != null)) {
 					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+						mManager.getEgl(), surface, 0);
 					mRendererTarget.setMirror(mMirror);
 					if (mDrawer == null) {
 						mDrawer = GLDrawer2D.create(mManager.isGLES3(), false);
@@ -414,13 +401,18 @@ public class ImageTextureSource implements GLConst, IMirror {
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				final long delayMs = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
-				prevFrameTimeNs = frameTimeNanos;
-				if (delayMs <= 0) {
-					mManager.postFrameCallbackDelayed(this, 0);
-				} else {
-					mManager.postFrameCallbackDelayed(this, delayMs);
+				if (prevFrameTimeNs <= 0) {
+					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
 				}
+				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
+				prevFrameTimeNs = frameTimeNanos;
+				if (delta < 0) {
+					// フレームレートから想定されるより呼び出しが遅かった場合
+					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);
+				} else {
+					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
+				}
+				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
 				synchronized (mSync) {
 					if (mImageSource != null) {
 						onFrameAvailable(mImageSource.getTexId(), mImageSource.getTexMatrix());
