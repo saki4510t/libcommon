@@ -50,7 +50,9 @@ public class StaticTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = StaticTextureSource.class.getSimpleName();
 
+	@NonNull
 	private final Object mSync = new Object();
+	@Nullable
 	private RendererTask mRendererTask;
 
 	/**
@@ -58,7 +60,7 @@ public class StaticTextureSource implements GLConst, IMirror {
 	 * @param bitmap
 	 */
 	public StaticTextureSource(@Nullable final Bitmap bitmap) {
-		this(bitmap, new Fraction(10));
+		this(bitmap, new Fraction(10), null);
 	}
 
 	/**
@@ -66,7 +68,7 @@ public class StaticTextureSource implements GLConst, IMirror {
 	 * @param fps nullなら10fps
 	 */
 	public StaticTextureSource(@Nullable final Fraction fps) {
-		this(null, fps);
+		this(null, fps, null);
 	}
 
 	/**
@@ -75,9 +77,23 @@ public class StaticTextureSource implements GLConst, IMirror {
 	 * @param fps nullなら10fps
 	 */
 	public StaticTextureSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
+		this(bitmap, fps, null);
+	}
+
+	/**
+	 * ソースの静止画とフレームレートを指定可能なコンストラクタ
+	 * @param bitmap
+	 * @param fps nullなら10fps
+	 * @param listener フレーム毎のコールバックリスナー
+	 */
+	public StaticTextureSource(
+		@Nullable final Bitmap bitmap,
+		@Nullable final Fraction fps,
+		@Nullable final OnFrameAvailableListener listener) {
+
 		final int width = bitmap != null ? bitmap.getWidth() : 1;
 		final int height = bitmap != null ? bitmap.getHeight() : 1;
-		mRendererTask = new RendererTask(this, width, height, fps);
+		mRendererTask = new RendererTask(this, width, height, fps, listener);
 		new Thread(mRendererTask, TAG).start();
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -252,6 +268,8 @@ public class StaticTextureSource implements GLConst, IMirror {
 		private final SparseArray<RendererTarget> mTargets
 			= new SparseArray<>();
 		private final StaticTextureSource mParent;
+		@Nullable
+		private final OnFrameAvailableListener mListener;
 		private final long mIntervalsNs;
 		private GLDrawer2D mDrawer;
 		private int mVideoWidth, mVideoHeight;
@@ -260,10 +278,13 @@ public class StaticTextureSource implements GLConst, IMirror {
 		private int mMirror = MIRROR_NORMAL;
 
 		public RendererTask(final StaticTextureSource parent,
-			final int width, final int height, @Nullable final Fraction fps) {
+			final int width, final int height,
+			@Nullable final Fraction fps,
+			@Nullable final OnFrameAvailableListener listener) {
 
 			super(GLUtils.getSupportedGLVersion(), null, 0);
 			mParent = parent;
+			mListener = listener;
 			mVideoWidth = width;
 			mVideoHeight = height;
 			final float _fps = fps != null ? fps.asFloat() : 0.0f;
@@ -477,6 +498,9 @@ public class StaticTextureSource implements GLConst, IMirror {
 			}
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			GLES20.glFlush();
+			if (mListener != null) {
+				mListener.onFrameAvailable();
+			}
 //			if (DEBUG) Log.v(TAG, "handleDraw:finish");
 		}
 

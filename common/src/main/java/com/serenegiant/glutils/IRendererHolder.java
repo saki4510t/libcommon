@@ -53,9 +53,9 @@ public interface IRendererHolder extends IMirror {
 	/**
 	 * IRendererHolderからのコールバックリスナー
 	 */
-	public interface RenderHolderCallback {
+	public interface RenderHolderCallback extends OnFrameAvailableListener {
 		public void onCreate(Surface surface);
-		public void onFrameAvailable();
+//		public void onFrameAvailable();
 		public void onDestroy();
 	}
 

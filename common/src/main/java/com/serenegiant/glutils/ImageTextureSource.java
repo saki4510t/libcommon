@@ -53,6 +53,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
+	private final OnFrameAvailableListener mListener;
+	@Nullable
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
 	private volatile long mFrameIntervalMs;
@@ -74,9 +76,25 @@ public class ImageTextureSource implements GLConst, IMirror {
 	public ImageTextureSource(
 		@NonNull final GLManager manager,
 		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
+
+		this(manager, bitmap, fps, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param manager
+	 * @param bitmap nullのときは後で#setSourceを呼び出さないと#onFrameAvailableが呼び出されない
+	 * @param fps nullの時は30fps相当, 30fpsよりも大きいと想定通りのフレームレートにならないことが多いので注意
+	 * @param listener フレーム毎のコールバックリスナー
+	 */
+	public ImageTextureSource(
+		@NonNull final GLManager manager,
+		@Nullable final Bitmap bitmap, @Nullable final Fraction fps,
+		@Nullable OnFrameAvailableListener listener) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
 		mManager = manager;
+		mListener = listener;
 		mWidth = DEFAULT_WIDTH;
 		mHeight = DEFAULT_HEIGHT;
 		if (bitmap != null) {
@@ -419,6 +437,9 @@ public class ImageTextureSource implements GLConst, IMirror {
 					} else {
 						onFrameAvailable();
 					}
+				}
+				if (mListener != null) {
+					mListener.onFrameAvailable();
 				}
 			}
 		}
