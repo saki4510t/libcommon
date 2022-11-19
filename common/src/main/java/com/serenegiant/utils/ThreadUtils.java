@@ -60,4 +60,28 @@ public class ThreadUtils {
 			// ignore
 		}
 	}
+
+	/**
+	 * 呼び出し元スレッドがデーモンスレッドかどうかを取得する
+	 * @return
+	 */
+	public static boolean isDaemon() {
+		return Thread.currentThread().isDaemon();
+	}
+
+	/**
+	 * 呼び出し元スレッドが実行中かどうかを取得する
+	 * @return
+	 */
+	public static boolean isAlive() {
+		return Thread.currentThread().isAlive();
+	}
+
+	/**
+	 * 呼び出し元スレッドが中断されたかどうかを取得する
+	 * @return
+	 */
+	public static boolean isInterrupted() {
+		return Thread.currentThread().isInterrupted();
+	}
 }
