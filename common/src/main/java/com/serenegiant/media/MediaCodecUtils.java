@@ -20,6 +20,7 @@ package com.serenegiant.media;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,6 +58,8 @@ import com.serenegiant.utils.BufferHelper;
 public final class MediaCodecUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaCodecUtils.class.getSimpleName();
+
+	private static final long TIMEOUT_USEC = 10000L;	// 10ミリ秒
 
 	private MediaCodecUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
@@ -1332,6 +1335,138 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 			reaper.release();
 		}
 		if (DEBUG) Log.i(TAG, "testVideoMediaFormat:result=" + result.get());
+		return result.get();
+	}
+
+	/**
+	 * 実際にダミー音声データをエンコードしてMediaFormatを取得する
+	 * @param mime 音声エンコーダーの種類
+	 * @param sampleRate サンプリングレート AbstractAudioEncoder.DEFAULT_SAMPLE_RATE = 44100
+	 * @param channelCount チャネル数 1または2
+	 * @param bitrate ビットレート AbstractAudioEncoder.DEFAULT_BIT_RATE = 64000
+	 * @return
+	 * @throws IOException
+	 */
+	@NonNull
+	public static MediaFormat testAudioMediaFormat(
+		@NonNull final String mime,
+		final int sampleRate, final int channelCount,
+		final int bitrate) throws IOException {
+
+		return testAudioMediaFormat(mime,
+			sampleRate, channelCount, bitrate,
+			AbstractAudioEncoder.SAMPLES_PER_FRAME, AbstractAudioEncoder.FRAMES_PER_BUFFER);
+	}
+
+	/**
+	 * 実際にダミー音声データをエンコードしてMediaFormatを取得する
+	 * @param mime 音声エンコーダーの種類
+	 * @param sampleRate サンプリングレート AbstractAudioEncoder.DEFAULT_SAMPLE_RATE = 44100
+	 * @param channelCount チャネル数 1または2
+	 * @param bitrate ビットレート AbstractAudioEncoder.DEFAULT_BIT_RATE = 64000
+	 * @param samplesPerFrame AbstractAudioEncoder.SAMPLES_PER_FRAME
+	 * @param framesPerBuffer AbstractAudioEncoder.FRAMES_PER_BUFFER
+	 * @return
+	 * @throws IOException
+	 */
+	@NonNull
+	public static MediaFormat testAudioMediaFormat(
+		@NonNull final String mime,
+		final int sampleRate, final int channelCount,
+		final int bitrate,
+		final int samplesPerFrame, final int framesPerBuffer) throws IOException {
+
+		final MediaFormat format = MediaFormat.createAudioFormat(mime, sampleRate, channelCount);
+		format.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
+		format.setInteger(MediaFormat.KEY_CHANNEL_MASK, AudioRecordCompat.getAudioChannel(channelCount));
+		format.setInteger(MediaFormat.KEY_BIT_RATE, bitrate);
+		format.setInteger(MediaFormat.KEY_CHANNEL_COUNT, channelCount);
+		if (DEBUG) dump(TAG, format);
+
+		// 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
+		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:create encoder");
+		final MediaCodec encoder = MediaCodec.createEncoderByType(mime);
+		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:configure encoder");
+		encoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+
+		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:create and start AudioReaper");
+		final AtomicReference<MediaFormat> result = new AtomicReference<>();
+		final CountDownLatch latch = new CountDownLatch(1);
+		final MediaReaper.AudioReaper reaper = new MediaReaper.AudioReaper(
+			encoder, new MediaReaper.ReaperListener() {
+			@Override
+			public void writeSampleData(@NonNull final MediaReaper reaper, @NonNull final ByteBuffer byteBuf, @NonNull final MediaCodec.BufferInfo bufferInfo) {
+				if (DEBUG) Log.v(TAG, "writeSampleData:");
+			}
+
+			@Override
+			public void onOutputFormatChanged(@NonNull final MediaReaper reaper, @NonNull final MediaFormat format) {
+				if (DEBUG) Log.v(TAG, "onOutputFormatChanged:");
+				result.set(format);
+				latch.countDown();
+			}
+
+			@Override
+			public void onStop(@NonNull final MediaReaper reaper) {
+				if (DEBUG) Log.v(TAG, "onStop:");
+			}
+
+			@Override
+			public void onError(@NonNull final MediaReaper reaper, final Throwable t) {
+				Log.w(TAG, t);
+			}
+		}, sampleRate, channelCount);
+
+		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:start encoder");
+		encoder.start();
+
+		final int bufferSize = AudioRecordCompat.getAudioBufferSize(
+			channelCount, AudioRecordCompat.AUDIO_FORMAT,
+			sampleRate, samplesPerFrame, framesPerBuffer);
+		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:buffer size=" + bufferSize);
+		try {
+			final ByteBuffer buffer = ByteBuffer.allocateDirect(bufferSize).order(ByteOrder.nativeOrder());
+			final long startTimeUs = System.nanoTime() / 1000L;
+			int numFrames = 0;
+			while (numFrames < 10) {
+				final ByteBuffer[] inputBuffers = encoder.getInputBuffers();
+				final int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
+				if (inputBufferIndex >= 0) {
+					final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
+					final int sz = Math.min(bufferSize, inputBuffer.capacity());
+					buffer.position(sz);
+					buffer.flip();
+					inputBuffer.clear();
+					inputBuffer.put(buffer);
+					if (DEBUG) Log.v(TAG, "testAudioMediaFormat:queueInputBuffer," + numFrames);
+					final long ptsUs = startTimeUs + numFrames * 40000L;
+						if (numFrames > 2 && (latch.getCount() == 0)) {
+							if (DEBUG) Log.v(TAG, "testAudioMediaFormat:queue EOS");
+							encoder.queueInputBuffer(inputBufferIndex, 0, 0,
+								ptsUs, MediaCodec.BUFFER_FLAG_END_OF_STREAM);
+							reaper.frameAvailableSoon();
+							break;
+						} else {
+							encoder.queueInputBuffer(inputBufferIndex, 0, sz,
+								ptsUs, 0);
+						}
+					numFrames++;
+				}
+				reaper.frameAvailableSoon();
+			}
+			try {
+				if (!latch.await(1000, TimeUnit.MILLISECONDS)) {
+					throw new IOException("Failed to get output format");
+				}
+			} catch (final InterruptedException e) {
+				// ignore
+			}
+		} finally {
+			encoder.stop();
+			encoder.release();
+			reaper.release();
+		}
+		if (DEBUG) Log.i(TAG, "testAudioMediaFormat:result=" + result.get());
 		return result.get();
 	}
 }

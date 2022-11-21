@@ -3,6 +3,7 @@ package com.serenegiant.common;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 
+import com.serenegiant.media.AbstractAudioEncoder;
 import com.serenegiant.media.MediaCodecUtils;
 
 import org.junit.Assert;
@@ -35,5 +36,18 @@ public class MediaFormatTest {
       Assert.assertTrue(csd1.capacity() > 0);
       Assert.assertEquals(VIDEO_WIDTH, format.getInteger("width"));
       Assert.assertEquals(VIDEO_HEIGHT, format.getInteger("height"));
+   }
+
+   @Test
+   public void testAudioMediaFormatTest() throws IOException {
+      final MediaFormat format = MediaCodecUtils.testAudioMediaFormat(
+         MediaCodecUtils.MIME_AUDIO_AAC,
+         AbstractAudioEncoder.DEFAULT_SAMPLE_RATE,
+          1, AbstractAudioEncoder.DEFAULT_BIT_RATE);
+      Assert.assertNotNull(format);
+      MediaCodecUtils.dump(format);
+      final ByteBuffer csd0 = format.getByteBuffer("csd-0");
+      Assert.assertNotNull(csd0);
+      Assert.assertTrue(csd0.capacity() > 0);
    }
 }
