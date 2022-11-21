@@ -324,12 +324,36 @@ public class NetworkUtils {
 	public static void dumpAll() {
 		try {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
-					dump(addr);
-				}
+				dump(intf);
 			}
 		} catch (final SocketException | NullPointerException e) {
 			Log.w(TAG, "dumpAll", e);
+		}
+	}
+
+	/**
+	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
+	 * @param intf
+	 */
+	public static void dump(@Nullable final NetworkInterface intf) {
+		if (intf == null) {
+			Log.i(TAG, "NetworkInterface is null");
+		} else {
+			Log.i(TAG, "intf=" + intf);
+			Log.i(TAG, "intf:name=" + intf.getName());
+			Log.i(TAG, "intf:displayName=" + intf.getDisplayName());
+			Log.i(TAG, "intf:interfaceAddresses=" + intf.getInterfaceAddresses());
+			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+				Log.i(TAG, "intf:index=" + intf.getIndex());
+				try {
+					Log.i(TAG, "intf:mtu=" + intf.getMTU());
+				} catch (final SocketException e) {
+					// ignore
+				}
+			}
+			for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
+				dump(addr);
+			}
 		}
 	}
 
