@@ -350,17 +350,15 @@ class CameraTimelapseRecFragment : AbstractCameraFragment() {
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
 			pipelineMode: Int = GLPipelineView.PREVIEW_ONLY,
 			enablePipelineEncode: Boolean = false,
-			enableFaceDetect: Boolean = false): CameraTimelapseRecFragment {
-
-			val fragment = CameraTimelapseRecFragment()
-			val args = Bundle()
-			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
-			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
-			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
-			args.putBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, enablePipelineEncode)
-			args.putBoolean(ARGS_KEY_ENABLE_FACE_DETECT, enableFaceDetect)
-			fragment.arguments = args
-			return fragment
+			enableFaceDetect: Boolean = false)
+			= CameraTimelapseRecFragment().apply {
+				arguments = Bundle().apply {
+					putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
+					putInt(ARGS_KEY_TITLE_ID, titleRes)
+					putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
+					putBoolean(ARGS_KEY_ENABLE_PIPELINE_RECORD, enablePipelineEncode)
+					putBoolean(ARGS_KEY_ENABLE_FACE_DETECT, enableFaceDetect)
+				}
 		}
 	}
 }

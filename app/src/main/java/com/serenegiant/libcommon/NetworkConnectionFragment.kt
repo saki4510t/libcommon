@@ -97,7 +97,7 @@ class NetworkConnectionFragment : BaseFragment() {
 			// これはNETWORK_SETTINGSパーミッションが必要みたいで実行できない
 //			Log.i(TAG, "SoftAp config=${WifiApUtils.getWifiApConfiguration(context)}")
 		} catch (e: Exception) {
-			Log.w(TAG, e);
+			Log.w(TAG, e)
 		}
 		if (BuildCheck.isAPI21()) {
 			Log.i(TAG, "SoftAp v4 addr=${WifiApUtils.getLocalIPv4Address(context)}")
@@ -130,10 +130,6 @@ class NetworkConnectionFragment : BaseFragment() {
 			+ ConnectivityHelper.isMobileNetworkReachable(requireContext()))
 		if (DEBUG) Log.v(TAG, "isNetworkReachable:"
 			+ ConnectivityHelper.isNetworkReachable(requireContext()))
-	}
-
-	override fun internalOnPause() {
-		super.internalOnPause()
 	}
 
 	override fun internalRelease() {
@@ -173,11 +169,10 @@ class NetworkConnectionFragment : BaseFragment() {
 		 *
 		 * @return A new instance of fragment NetworkConnectionFragment.
 		 */
-		fun newInstance(): NetworkConnectionFragment {
-			val fragment = NetworkConnectionFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = NetworkConnectionFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

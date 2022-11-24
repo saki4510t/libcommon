@@ -20,6 +20,7 @@ package com.serenegiant.libcommon
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -47,6 +48,7 @@ class TitleFragment: BaseFragment() {
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
+		if (DEBUG) Log.v(TAG, "onAttach:")
 		mListener = if (context is OnListFragmentInteractionListener) {
 			context
 		} else {
@@ -57,13 +59,15 @@ class TitleFragment: BaseFragment() {
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onCreate:")
 		if (arguments != null) {
 			mColumnCount = requireArguments().getInt(ARG_COLUMN_COUNT)
 		}
 	}
 
 	override fun onCreateView(inflater: LayoutInflater,
-		container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		container: ViewGroup?, savedInstanceState: Bundle?): View {
+		if (DEBUG) Log.v(TAG, "onCreateView:")
 		return FragmentItemListBinding.inflate(inflater, container, false)
 		.apply {
 			swipeRefresh.setOnRefreshListener {
@@ -88,16 +92,14 @@ class TitleFragment: BaseFragment() {
 		}
 	}
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-	}
-
 	override fun internalOnResume() {
 		super.internalOnResume()
+		if (DEBUG) Log.v(TAG, "internalOnResume:")
 		requireActivity().title = getString(R.string.app_name)
 	}
 
 	override fun onDetach() {
+		if (DEBUG) Log.v(TAG, "onDetach:")
 		mListener = null
 		super.onDetach()
 	}
@@ -120,12 +122,10 @@ class TitleFragment: BaseFragment() {
 		private val TAG = TitleFragment::class.java.simpleName
 		private const val ARG_COLUMN_COUNT = "column-count"
 
-		fun newInstance(columnCount: Int): TitleFragment {
-			val fragment = TitleFragment()
-			val args = Bundle()
-			args.putInt(ARG_COLUMN_COUNT, columnCount)
-			fragment.arguments = args
-			return fragment
+		fun newInstance(columnCount: Int) = TitleFragment().apply {
+			arguments = Bundle().apply {
+				putInt(ARG_COLUMN_COUNT, columnCount)
+			}
 		}
 	}
 }

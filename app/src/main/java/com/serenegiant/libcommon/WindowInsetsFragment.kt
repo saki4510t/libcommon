@@ -56,7 +56,7 @@ class WindowInsetsFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		return FragmentWindowInsetsBinding.inflate(inflater, container, false)
 		.apply {
-			onLongClickListener = View.OnLongClickListener { v ->
+			onLongClickListener = View.OnLongClickListener {
 				toggleFullScreen(root)
 				textView.text = "$mIsFullScreen"
 				return@OnLongClickListener true
@@ -127,11 +127,10 @@ class WindowInsetsFragment : BaseFragment() {
 			or WindowInsetsCompat.Type.captionBar()
 			or WindowInsetsCompat.Type.systemBars())
 
-		fun newInstance(): WindowInsetsFragment {
-			val fragment = WindowInsetsFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = WindowInsetsFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

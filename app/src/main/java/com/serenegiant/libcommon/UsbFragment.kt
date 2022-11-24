@@ -198,11 +198,10 @@ class UsbFragment : BaseFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = UsbFragment::class.java.simpleName
 
-		fun newInstance(): UsbFragment {
-			val fragment = UsbFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = UsbFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

@@ -66,7 +66,7 @@ class ScreenCaptureFragment : BaseFragment() {
 		super.onViewCreated(view, savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onViewCreated:")
 		mViewModel.run {
-			isChecked.observe(viewLifecycleOwner, {
+			isChecked.observe(viewLifecycleOwner) {
 				if (DEBUG) Log.v(TAG, "check changed:isCheck=${it}/${isChecked.value}," +
 					"isReceived=${isReceived},isRecording=${isRecording}")
 				// 最初のステータス更新要求が終了するまではなにもしない
@@ -77,7 +77,7 @@ class ScreenCaptureFragment : BaseFragment() {
 						stopScreenCapture()
 					}
 				}
-			})
+			}
 		}
 	}
 
@@ -96,11 +96,10 @@ class ScreenCaptureFragment : BaseFragment() {
 		private const val DEBUG = true // set false on production
 		private val TAG = ScreenCaptureFragment::class.java.simpleName
 
-		fun newInstance(): ScreenCaptureFragment {
-			val fragment = ScreenCaptureFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = ScreenCaptureFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

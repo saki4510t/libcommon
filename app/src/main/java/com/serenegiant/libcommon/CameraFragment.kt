@@ -180,15 +180,13 @@ class CameraFragment : AbstractCameraFragment() {
 
 		fun newInstance(
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
-			pipelineMode: Int = GLPipelineView.PREVIEW_ONLY): CameraFragment {
-
-			val fragment = CameraFragment()
-			val args = Bundle()
-			args.putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
-			args.putInt(ARGS_KEY_TITLE_ID, titleRes)
-			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
-			fragment.arguments = args
-			return fragment
+			pipelineMode: Int = GLPipelineView.PREVIEW_ONLY)
+			= CameraFragment().apply {
+				arguments = Bundle().apply {
+					putInt(ARGS_KEY_LAYOUT_ID, layoutRes)
+					putInt(ARGS_KEY_TITLE_ID, titleRes)
+					putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
+				}
 		}
 	}
 }

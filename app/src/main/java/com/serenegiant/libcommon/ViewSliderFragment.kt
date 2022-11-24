@@ -137,5 +137,11 @@ class ViewSliderFragment : BaseFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private const val USE_CONSTRAINT_LAYOUT = false
 		private val TAG = ViewSliderFragment::class.java.simpleName
+
+		fun newInstance() = ViewSliderFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
+		}
 	}
 }

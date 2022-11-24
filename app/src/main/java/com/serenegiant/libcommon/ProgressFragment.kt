@@ -64,5 +64,11 @@ class ProgressFragment : BaseFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = ProgressFragment::class.java.simpleName
+
+	fun newInstance() = ProgressFragment().apply {
+		arguments = Bundle().apply {
+			// 今は何もない
+		}
+	}
 	}
 }

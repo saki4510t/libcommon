@@ -236,7 +236,7 @@ open class BaseFragment : Fragment() {
 					mToast!!.cancel()
 					mToast = null
 				}
-				val text = args.let { getString(msg, it) }
+				val text = getString(msg, args)
 				mToast = Toast.makeText(activity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) { // ignore

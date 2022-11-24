@@ -204,12 +204,10 @@ class ImageFragment: BaseFragment() {
 		private const val ARG_MEDIA_INFO = "ARG_MEDIA_INFO"
 
 		@JvmStatic
-		fun newInstance(info: MediaInfo): ImageFragment {
-			val fragment = ImageFragment()
-			val args = Bundle()
-			args.putParcelable(ARG_MEDIA_INFO, info)
-			fragment.arguments = args
-			return fragment
+		fun newInstance(info: MediaInfo) = ImageFragment().apply {
+			arguments = Bundle().apply {
+				putParcelable(ARG_MEDIA_INFO, info)
+			}
 		}
 	}
 }

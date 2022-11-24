@@ -159,12 +159,10 @@ class VideoPlaybackFragment : BaseFragment() {
 		 * @param info
 		 * @return
 		 */
-		fun newInstance(info: MediaInfo): VideoPlaybackFragment {
-			val fragment = VideoPlaybackFragment()
-			val args = Bundle()
-			args.putParcelable(ARG_MEDIA_INFO, info)
-			fragment.arguments = args
-			return fragment
+		fun newInstance(info: MediaInfo) = VideoPlaybackFragment().apply {
+			arguments = Bundle().apply {
+				putParcelable(ARG_MEDIA_INFO, info)
+			}
 		}
 	}
 }

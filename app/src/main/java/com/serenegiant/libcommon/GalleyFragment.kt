@@ -108,8 +108,10 @@ class GalleyFragment : BaseFragment() {
 		private const val DEBUG = false // FIXME 実働時はfalseにすること
 		private val TAG = GalleyFragment::class.java.simpleName
 
-		fun newInstance(): GalleyFragment {
-			return GalleyFragment()
+		fun newInstance() = GalleyFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

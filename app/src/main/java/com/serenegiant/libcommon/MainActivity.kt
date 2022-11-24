@@ -143,7 +143,7 @@ class MainActivity
 			}
 			R.string.title_saf_filer -> {	// SAFContentProvider
 				if (BuildCheck.isLollipop()) {
-					fragment = SAFFilerFragment()
+					fragment = SAFFilerFragment.newInstance()
 				} else {
 					showToast(Toast.LENGTH_SHORT, "This feature is only available on API>=21")
 				}
@@ -263,7 +263,7 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = MaskCameraSurfaceFragment()
+				fragment = MaskCameraSurfaceFragment.newInstance()
 			}
 			R.string.title_video_source_camera -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
@@ -316,7 +316,7 @@ class MainActivity
 					|| !checkPermissionAudio()) {
 					return
 				}
-				fragment = CameraSurfaceFragment()
+				fragment = CameraSurfaceFragment.newInstance()
 			}
 			R.string.title_simple_camera_source -> {	// SimpleVideoSourceCameraGLView
 				if (!checkPermissionCamera()
@@ -349,13 +349,13 @@ class MainActivity
 				fragment = GalleyFragment2()
 			}
 			R.string.title_number_keyboard -> {	// NumberKeyboard
-				fragment = NumberKeyboardFragment()
+				fragment = NumberKeyboardFragment.newInstance()
 			}
 			R.string.title_view_slider -> {	// ViewSlider
-				fragment = ViewSliderFragment()
+				fragment = ViewSliderFragment.newInstance()
 			}
 			R.string.title_progress_view -> {	// ProgressView
-				fragment = ProgressFragment()
+				fragment = ProgressFragment.newInstance()
 			}
 			R.string.title_permissions -> {	// PermissionUtils
 				fragment = PermissionFragment.newInstance()

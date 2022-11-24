@@ -62,6 +62,12 @@ class MaskCameraSurfaceFragment : BaseFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = MaskCameraSurfaceFragment::class.java.simpleName
+
+		fun newInstance() = MaskCameraSurfaceFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
+		}
 	}
 
 }

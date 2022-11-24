@@ -87,5 +87,11 @@ class NumberKeyboardFragment : BaseFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = NumberKeyboardFragment::class.java.simpleName
+
+		fun newInstance() = NumberKeyboardFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
+		}
 	}
 }

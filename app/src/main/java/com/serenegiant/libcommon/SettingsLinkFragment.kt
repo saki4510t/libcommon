@@ -22,7 +22,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.serenegiant.libcommon.databinding.FragmentSettingsLinkBinding
 import com.serenegiant.system.SettingsUtils
@@ -32,36 +31,29 @@ import com.serenegiant.system.SettingsUtils
  * 端末のアプリ設定画面への繊維ボタンを表示するFragment
  */
 class SettingsLinkFragment : Fragment() {
-	private var mBinding: FragmentSettingsLinkBinding? = null
+	private lateinit var mBinding: FragmentSettingsLinkBinding
 	override fun onCreateView(
 		inflater: LayoutInflater,
 		container: ViewGroup?,
-		savedInstanceState: Bundle?
-	): View {
-		mBinding = DataBindingUtil.inflate(
-			inflater,
-			R.layout.fragment_settings_link, container, false
-		)
-		return mBinding!!.root
-	}
+		savedInstanceState: Bundle?): View {
 
-	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-		super.onViewCreated(view, savedInstanceState)
-		init()
-	}
-
-	private fun init() {
-		mBinding!!.onClickListener = View.OnClickListener { v -> // 端末のアプリ設定を開く
-			SettingsUtils.openSettingsAppDetails(v.context)
+		return FragmentSettingsLinkBinding.inflate(inflater,
+			container, false)
+		.apply {
+			mBinding = this
+			onClickListener = View.OnClickListener { v -> // 端末のアプリ設定を開く
+				SettingsUtils.openSettingsAppDetails(v.context)
+			}
+		}.run {
+			root
 		}
 	}
 
 	companion object {
-		fun newInstance(): SettingsLinkFragment {
-			val fragment = SettingsLinkFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = SettingsLinkFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

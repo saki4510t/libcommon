@@ -162,14 +162,13 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = EffectCameraFragment::class.java.simpleName
 
-		fun newInstance(pipelineMode: Int = GLPipelineView.EFFECT_ONLY): EffectCameraFragment {
-			val fragment = EffectCameraFragment()
-			val args = Bundle()
-			args.putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_effect)
-			args.putInt(ARGS_KEY_TITLE_ID, R.string.title_effect_camera)
-			args.putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
-			fragment.arguments = args
-			return fragment
+		fun newInstance(pipelineMode: Int = GLPipelineView.EFFECT_ONLY)
+			= EffectCameraFragment().apply {
+				arguments = Bundle().apply {
+					putInt(ARGS_KEY_LAYOUT_ID, R.layout.fragment_camera_effect)
+					putInt(ARGS_KEY_TITLE_ID, R.string.title_effect_camera)
+					putInt(ARGS_KEY_PIPELINE_MODE, pipelineMode)
+				}
 		}
 	}
 }

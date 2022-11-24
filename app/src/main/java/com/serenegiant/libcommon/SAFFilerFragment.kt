@@ -119,5 +119,11 @@ class SAFFilerFragment
 	companion object {
 		private const val DEBUG = true // set false on production
 		private val TAG = SAFFilerFragment::class.java.simpleName
+
+		fun newInstance() = SAFFilerFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
+		}
 	}
 }

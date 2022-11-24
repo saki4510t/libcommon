@@ -130,11 +130,10 @@ class AudioRecordFragment : BaseFragment() {
 		private const val DEBUG = true // set false oon production
 		private val TAG = AudioRecordFragment::class.java.simpleName
 
-		fun newInstance(): AudioRecordFragment {
-			val fragment = AudioRecordFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = AudioRecordFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

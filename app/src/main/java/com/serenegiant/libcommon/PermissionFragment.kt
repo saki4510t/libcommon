@@ -29,7 +29,6 @@ import com.serenegiant.dialog.RationalDialogV4
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
-import java.util.*
 
 class PermissionFragment : BaseFragment(), RationalDialogV4.DialogResultListener {
 	private var mPermissions: PermissionUtils? = null
@@ -214,11 +213,10 @@ class PermissionFragment : BaseFragment(), RationalDialogV4.DialogResultListener
 			Manifest.permission.ACCESS_COARSE_LOCATION
 		)
 
-		fun newInstance(): PermissionFragment {
-			val fragment = PermissionFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = PermissionFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }

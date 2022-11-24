@@ -230,11 +230,10 @@ class SAFUtilsFragment: BaseFragment(), ConfirmDialogListener {
 		private const val DEBUG = true // set false on production
 		private val TAG = SAFUtilsFragment::class.java.simpleName
 
-		fun newInstance(): SAFUtilsFragment {
-			val fragment = SAFUtilsFragment()
-			val args = Bundle()
-			fragment.arguments = args
-			return fragment
+		fun newInstance() = SAFUtilsFragment().apply {
+			arguments = Bundle().apply {
+				// 今は何もない
+			}
 		}
 	}
 }
