@@ -18,16 +18,14 @@ package com.serenegiant.libcommon
  *  limitations under the License.
 */
 
-import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import com.serenegiant.libcommon.databinding.FragmentSettingsLinkBinding
+import com.serenegiant.system.SettingsUtils
 
 /**
  * ユーザーがアプリに権限付与をしなかったために機能を実行できない時に
@@ -54,10 +52,7 @@ class SettingsLinkFragment : Fragment() {
 
 	private fun init() {
 		mBinding!!.onClickListener = View.OnClickListener { v -> // 端末のアプリ設定を開く
-			val context = v.context
-			val uriString = "package:" + context.packageName
-			val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS, Uri.parse(uriString))
-			context.startActivity(intent)
+			SettingsUtils.openSettingsAppDetails(v.context)
 		}
 	}
 
