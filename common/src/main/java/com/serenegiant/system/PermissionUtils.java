@@ -886,7 +886,8 @@ public class PermissionUtils {
 	 * @return 外部ストレージへの読み込みパーミッションがあればtrue
 	 */
 	public static boolean hasReadExternalStorage(@Nullable final Context context) {
-		return hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		return hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
+			|| hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
 	}
 
 	/**
