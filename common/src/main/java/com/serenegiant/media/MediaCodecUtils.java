@@ -56,7 +56,7 @@ import com.serenegiant.utils.BufferHelper;
  * FIXME 音声バージョンのtestVideoMediaFormatを追加する
  */
 public final class MediaCodecUtils {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = MediaCodecUtils.class.getSimpleName();
 
 	private static final long TIMEOUT_USEC = 10000L;	// 10ミリ秒

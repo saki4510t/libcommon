@@ -180,7 +180,7 @@ RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
 						audioRecord = null;
 					}
 				} else {
-					audioRecord = createAudioRecord(
+					audioRecord = AudioRecordCompat.createAudioRecord(
 						AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.AUDIO_FORMAT, BUFFER_SIZE);
 				}
 				int err_count = 0;

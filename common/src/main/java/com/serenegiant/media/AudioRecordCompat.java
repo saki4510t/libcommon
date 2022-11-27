@@ -23,6 +23,7 @@ import android.annotation.SuppressLint;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
 
@@ -31,12 +32,16 @@ import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 public class AudioRecordCompat {
-   private AudioRecordCompat() {
-      // インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
-   }
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = AudioRecordCompat.class.getSimpleName();
+
+	private AudioRecordCompat() {
+		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
+	}
 
 	public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
@@ -106,12 +111,12 @@ public class AudioRecordCompat {
 
    /**
   	 * AudioRecord生成用のヘルパーメソッド
-  	 * @param source
-  	 * @param samplingRate 音声ソース, MediaRecorder.AudioSource.DEFAULT, MIC,
-  	 * 			CAMCORDER, VOICE_RECOGNITION, VOICE_COMMUNICATIONまたはAUDIO_SOURCE_UAC
+  	 * @param source 音声ソース, MediaRecorder.AudioSource.DEFAULT, MIC,
+  	 * 					CAMCORDER, VOICE_RECOGNITION, VOICE_COMMUNICATIONまたはAUDIO_SOURCE_UAC
+  	 * @param samplingRate サンプリングレート
   	 * @param channels 音声チャネル AudioFormat.CHANNEL_IN_MONOかAudioFormat.CHANNEL_IN_STEREOのどちらか
   	 * @param format AudioFormat.ENCODING_PCM_16BIT
-  	 * @param bufferSize バッファサイズ
+  	 * @param bufferSize バッファサイズ 基本はgetAudioBufferSizeで取得した値を使うこと
   	 * @return
   	 * @throws UnsupportedOperationException
   	 */
@@ -148,4 +153,54 @@ public class AudioRecordCompat {
   		}
   		return audioRecord;
   	}
+
+	/**
+	 * AudioRecordを生成する
+	 * sourceで指定した映像ソースに対応するMediaRecorder.AudioSourceを選択するが
+	 * 使用できないときは自動的に他のMediaRecorder.AudioSourceを選択する
+	 * @param source
+	 * @param samplingRate
+	 * @param channels
+	 * @param format
+	 * @param bufferSize バッファサイズ 基本はgetAudioBufferSizeで取得した値を使うこと
+	 * @return
+	 */
+	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
+	@Nullable
+	public static AudioRecord createAudioRecord(
+		final int source, final int samplingRate, final int channels, final int format, final int bufferSize) {
+
+		@AudioSource
+		final int[] AUDIO_SOURCES = new int[] {
+			MediaRecorder.AudioSource.DEFAULT,		// ここ(1つ目)は引数で置き換えられる
+			MediaRecorder.AudioSource.CAMCORDER,	// これにするとUSBオーディオルーティングが有効な場合でも内蔵マイクからの音になる
+			MediaRecorder.AudioSource.MIC,
+			MediaRecorder.AudioSource.DEFAULT,
+			MediaRecorder.AudioSource.VOICE_COMMUNICATION,
+			MediaRecorder.AudioSource.VOICE_RECOGNITION,
+		};
+
+		switch (source) {
+		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
+		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
+		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
+		default: AUDIO_SOURCES[0] = source; break;
+		}
+
+		@AudioChannel
+		final int audioChannel = getAudioChannel(channels);
+		AudioRecord audioRecord = null;
+		for (final int src: AUDIO_SOURCES) {
+            try {
+            	audioRecord = newInstance(src, samplingRate, audioChannel, format, bufferSize);
+            } catch (final Exception e) {
+            	audioRecord = null;
+            }
+            if (audioRecord != null) {
+            	if (DEBUG) Log.v(IAudioSampler.class.getSimpleName(), "createAudioRecord:created, src=" + src);
+            	break;
+			}
+    	}
+		return audioRecord;
+	}
 }

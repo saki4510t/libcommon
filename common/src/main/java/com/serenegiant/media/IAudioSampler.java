@@ -39,10 +39,23 @@ public abstract class IAudioSampler {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
 
+	/**
+	 * AudioRecordを生成する
+	 * 指定したソースに対応するMediaRecorder.AudioSourceを選択するが使用できないときは
+	 * 自動的に他のMediaRecorder.AudioSourceを選択する
+	 * @param source
+	 * @param samplingRate
+	 * @param channels
+	 * @param format
+	 * @param bufferSize
+	 * @return
+	 * @deprecated AudioRecordCompatの同名メソッドを使うこと
+	 */
+	@Deprecated
 	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	@Nullable
 	public static AudioRecord createAudioRecord(
-		final int source, final int sampling_rate, final int channels, final int format, final int buffer_size) {
+		final int source, final int samplingRate, final int channels, final int format, final int bufferSize) {
 
 		@AudioRecordCompat.AudioSource
 		final int[] AUDIO_SOURCES = new int[] {
@@ -66,7 +79,7 @@ public abstract class IAudioSampler {
 		AudioRecord audioRecord = null;
 		for (final int src: AUDIO_SOURCES) {
             try {
-            	audioRecord = AudioRecordCompat.newInstance(src, sampling_rate, audioChannel, format, buffer_size);
+            	audioRecord = AudioRecordCompat.newInstance(src, samplingRate, audioChannel, format, bufferSize);
             } catch (final Exception e) {
             	audioRecord = null;
             }

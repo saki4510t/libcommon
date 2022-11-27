@@ -103,7 +103,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 			// will enable the headphone
 			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
 */
-    		final AudioRecord audioRecord = IAudioSampler.createAudioRecord(
+    		final AudioRecord audioRecord = AudioRecordCompat.createAudioRecord(
     			mAudioSource, mSampleRate, mChannelCount, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
 			int err_count = 0;
             if (audioRecord != null) {
