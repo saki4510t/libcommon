@@ -134,6 +134,9 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	public void drainAll() {
 		final List<RecycleMediaData> list = new ArrayList<>();
 		mQueue.drainTo(list);
+		for (final RecycleMediaData data: list) {
+			data.setRecycled(true);
+		}
 		mPool.recycle(list);
 	}
 
@@ -145,7 +148,11 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	@Nullable
 	@Override
 	public RecycleMediaData obtain(@Nullable final Object... args) {
-		return mPool.obtain(args);
+		final RecycleMediaData result = mPool.obtain(args);
+		if (result != null) {
+			result.setRecycled(false);
+		}
+		return result;
 	}
 
 	/**
@@ -155,6 +162,7 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	 */
 	@Override
 	public boolean queueFrame(@NonNull final RecycleMediaData buffer) {
+		buffer.setRecycled(false);
 		return mQueue.offer(buffer);
 	}
 	
@@ -185,7 +193,12 @@ public class MemMediaQueue implements IMediaQueue<RecycleMediaData> {
 	
 	@Override
 	public boolean recycle(@NonNull final RecycleMediaData buffer) {
-		return mPool.recycle(buffer);
+		if (!buffer.isRecycled()) {
+			buffer.setRecycled(true);
+			return mPool.recycle(buffer);
+		} else {
+			return false;
+		}
 	}
 
 }

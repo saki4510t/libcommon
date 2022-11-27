@@ -31,6 +31,8 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	@NonNull
 	private final WeakReference<IRecycleParent<RecycleMediaData>> mWeakParent;
 
+	private volatile boolean mIsRecycled = false;
+
 	/**
 	 * コンストラクタ
 	 * @param parent 親となるIRecycleParentオブジェクト
@@ -84,13 +86,25 @@ public class RecycleMediaData extends MediaData implements IRecycleBuffer {
 	public RecycleMediaData(@NonNull final RecycleMediaData src) {
 		super(src);
 		mWeakParent = new WeakReference<IRecycleParent<RecycleMediaData>>(src.mWeakParent.get());
+		mIsRecycled = src.mIsRecycled;
 	}
 
 	@Override
 	public void recycle() {
-		final IRecycleParent<RecycleMediaData> parent = mWeakParent.get();
-		if (parent != null) {
-			parent.recycle(this);
+		if (!isRecycled()) {
+			final IRecycleParent<RecycleMediaData> parent = mWeakParent.get();
+			if (parent != null) {
+				parent.recycle(this);
+			}
 		}
+	}
+
+	@Override
+	public boolean isRecycled() {
+		return mIsRecycled;
+	}
+
+	/*package*/ void setRecycled(final boolean recycled) {
+		mIsRecycled = recycled;
 	}
 }

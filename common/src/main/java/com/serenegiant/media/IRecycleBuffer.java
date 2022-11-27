@@ -33,6 +33,12 @@ public interface IRecycleBuffer {
 	public void recycle();
 
 	/**
+	 * リサイクルしたかどうかを取得
+	 * @return
+	 */
+	public boolean isRecycled();
+
+	/**
 	 * IRecycleBuffer生成用ファクトリーインターフェース
 	 */
 	public interface Factory<T extends IRecycleBuffer> {
