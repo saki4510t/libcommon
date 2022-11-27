@@ -67,8 +67,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 				|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
 				throw new IllegalArgumentException("invalid audio source:" + audio_source);
 			sampler = new AudioSampler(audio_source, 1,
-				AudioRecordCompat.DEFAULT_SAMPLE_RATE,
-				AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER);
+				AudioRecordCompat.DEFAULT_SAMPLE_RATE);
 			mOwnSampler = true;
 		} else {
 			mOwnSampler = false;

@@ -52,7 +52,9 @@ public class AudioRecordCompat {
 	 */
 	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
 	/**
-	 * 音声データ1フレームあたりのサンプリングバイト数
+	 * 音声データ1フレームあたりのサンプリング数
+	 * この値に1サンプルあたりのバイト数(PCM_16BITなら2、PCM_8BITなら1)を掛けて
+	 * チャネル数を掛けると1フレームあたりのデータバイト数になる
 	 */
     public static final int SAMPLES_PER_FRAME = 1024;		// AAC, bytes/frame/channel
 	/**
@@ -82,8 +84,21 @@ public class AudioRecordCompat {
 	/**
 	 * AudioRecorder初期化時に使用するバッファサイズを計算
 	 * @param channelNum
+	 * @param samplingRate
+	 * @return
+	 */
+	public static int getAudioBufferSize(
+		final int channelNum, final int format, final int samplingRate) {
+
+		return getAudioBufferSize(channelNum, format, samplingRate,
+			SAMPLES_PER_FRAME, FRAMES_PER_BUFFER);
+	}
+
+	/**
+	 * AudioRecorder初期化時に使用するバッファサイズを計算
+	 * @param channelNum
 	 * @param samplingTate
-	 * @param samplesPerFrame
+	 * @param samplesPerFrame 1つの音声データ(1フレーム)辺りのサンプリング数
 	 * @param framesPerBuffer
 	 * @return
 	 */

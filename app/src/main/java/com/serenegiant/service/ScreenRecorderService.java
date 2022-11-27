@@ -353,9 +353,7 @@ public class ScreenRecorderService extends BaseService {
 		if (PermissionUtils.hasAudio(this)) {
 			// 音声取得のパーミッションがあるときだけ録音もする
 			mAudioSampler = new AudioSampler(2,
-				CHANNEL_COUNT, SAMPLE_RATE,
-				AudioRecordCompat.SAMPLES_PER_FRAME,
-				AudioRecordCompat.FRAMES_PER_BUFFER);
+				CHANNEL_COUNT, SAMPLE_RATE);
 			mAudioSampler.start();
 			new AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler);
 		}

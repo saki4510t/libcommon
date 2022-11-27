@@ -203,9 +203,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		mVideoEncoder!!.setVideoConfig(-1, VIDEO_FPS, 10)
 		if (audio_source >= 0) {
 			mAudioSampler = AudioSampler(audio_source,
-				audio_channels, SAMPLE_RATE,
-				AudioRecordCompat.SAMPLES_PER_FRAME,
-				AudioRecordCompat.FRAMES_PER_BUFFER)
+				audio_channels, SAMPLE_RATE)
 			mAudioSampler!!.start()
 			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler)
 		}

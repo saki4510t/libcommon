@@ -93,9 +93,7 @@ class AudioRecordFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "startRecord:")
 		isRecording = true
 		val sampler = AudioSampler(MediaRecorder.AudioSource.CAMCORDER,
-			1, AudioRecordCompat.DEFAULT_SAMPLE_RATE,
-			AudioRecordCompat.SAMPLES_PER_FRAME,
-			AudioRecordCompat.FRAMES_PER_BUFFER)
+			1, AudioRecordCompat.DEFAULT_SAMPLE_RATE)
 		SoundCheck.getInstance().setAudioSampler(sampler,
 			object : SoundCheck.SoundCheckCallback {
 			override fun onStart() {

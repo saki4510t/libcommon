@@ -94,8 +94,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
     	public void run() {
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
 			final int buffer_size = AudioRecordCompat.getAudioBufferSize(
-				mChannelCount, AudioRecordCompat.AUDIO_FORMAT,
-				mSampleRate, AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER);
+				mChannelCount, AudioRecordCompat.AUDIO_FORMAT, mSampleRate);
 /*
 			final Class audioSystemClass = Class.forName("android.media.AudioSystem");
 			// will disable the headphone

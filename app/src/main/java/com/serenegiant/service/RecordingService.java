@@ -834,9 +834,7 @@ public class RecordingService extends BaseService {
 		if (sampleRate > 0 && ((channelCount == 1) || (channelCount == 2))) {
 			if (DEBUG) Log.v(TAG, "createOwnAudioSampler:create AudioSampler");
 			mAudioSampler = new AudioSampler(2,
-				channelCount, sampleRate,
-				AudioRecordCompat.SAMPLES_PER_FRAME,
-				AudioRecordCompat.FRAMES_PER_BUFFER);
+				channelCount, sampleRate);
 			mIsOwnAudioSampler = true;
 		}
 	}

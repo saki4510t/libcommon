@@ -61,6 +61,22 @@ public class AudioSampler extends IAudioSampler {
 	 *     VOICE_CALL(4)はMIC(1)へ置換する
 	 * @param channelNum
 	 * @param samplingRate
+	 */
+	public AudioSampler(final int audioSource,
+		final int channelNum, final int samplingRate) {
+
+		this(audioSource, channelNum, samplingRate,
+			AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param audioSource 音声ソース, MediaRecorder.AudioSourceのどれか
+	 *     ただし、一般アプリで利用できないVOICE_UPLINK(2)はCAMCORDER(5)へ
+	 *     VOICE_DOWNLINK(3)はVOICE_COMMUNICATION(7)
+	 *     VOICE_CALL(4)はMIC(1)へ置換する
+	 * @param channelNum
+	 * @param samplingRate
 	 * @param samplesPerFrame
 	 * @param framesPerBuffer
 	 */
