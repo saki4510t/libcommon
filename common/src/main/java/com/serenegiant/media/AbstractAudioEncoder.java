@@ -36,7 +36,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
 	public static final int DEFAULT_BIT_RATE = 64000;		// 64[kbps]		5-320[kbps]
     public static final int SAMPLES_PER_FRAME = 1024;		// AAC, bytes/frame/channel
-	public static final int FRAMES_PER_BUFFER = 25; 		// AAC, frame/mBuffer/sec
+	public static final int FRAMES_PER_BUFFER = 25; 		// AAC, frame/buffer/sec
 
     protected int mAudioSource;
     protected int mChannelCount;
