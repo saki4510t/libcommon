@@ -305,6 +305,38 @@ public class MediaData {
 	}
 
 	/**
+	 * 内部バッファから読み取る
+	 * read((buffer, 0, buffer.length))と等価
+	 *
+	 * 前回の#setまたは#read呼び出しでセットされたposition位置から続けて読み取る,
+	 * #getはclear → position(size) → flipするので必ず先頭から読み取ることになるので注意
+	 * @param buffer
+	 * @return
+	 */
+	public int read(@NonNull final byte[] buffer) {
+		return read(buffer, 0, buffer.length);
+	}
+
+	/**
+	 * 内部バッファから読み取る
+	 *
+	 * 前回の#setまたは#read呼び出しでセットされたposition位置から続けて読み取る,
+	 * #getはclear → position(size) → flipするので必ず先頭から読み取ることになるので注意
+	 * @param buffer
+	 * @param offset
+	 * @param length
+	 * @return
+	 */
+	public int read(@NonNull final byte[] buffer, final int offset, final int length) {
+		final ByteBuffer buf = mBuffer;
+		final int min = (buf != null) ? Math.min(length, size() - buf.position()) : 0;
+		if (min > 0) {
+			buf.get(buffer, offset, min);
+		}
+		return min;
+	}
+
+	/**
 	 * データの内容を取得する
 	 * @param buffer
 	 * @throws ArrayIndexOutOfBoundsException
