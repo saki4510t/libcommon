@@ -113,6 +113,9 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		                ByteBuffer buffer;
 		                audioRecord.startRecording();
 		                try {
+							final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME
+								* mChannelCount
+								* AudioRecordCompat.getBitResolution(AudioRecordCompat.AUDIO_FORMAT);
 		                	RecycleMediaData data;
 		                	for ( ; ; ) {
 		                		if (!mIsCapturing || mRequestStop) break;
@@ -136,7 +139,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		                		buffer = data.get();
 		                		buffer.clear();
 		                		try {
-		                			readBytes = audioRecord.read(buffer, AudioRecordCompat.SAMPLES_PER_FRAME);
+		                			readBytes = audioRecord.read(buffer, sizeInBytes);
 		                		} catch (final Exception e) {
 //		    		        		Log.w(TAG, "AudioRecord#read failed:", e);
 		                			break;

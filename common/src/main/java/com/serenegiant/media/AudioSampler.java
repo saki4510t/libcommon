@@ -44,9 +44,15 @@ public class AudioSampler extends IAudioSampler {
     private final int AUDIO_SOURCE;
     private final int SAMPLING_RATE, CHANNEL_COUNT;
 	/**
-	 * AudioRecordから1度に読み込みを試みる最大バイト数
+	 * AudioRecordから1度に読み込みを試みるサンプル数(バイト数とは限らない)
+	 * 1フレームあたりのサンプリング数xチャネル数
 	 */
 	private final int SAMPLES_PER_FRAME;
+	/**
+	 * AudioRecordから1℃に読み込みを試みるバイト数
+	 * SAMPLES_PER_FRAME x 1サンプル辺りのバイト数
+	 */
+	private final int BYTES_PER_FRAME;
 	/**
 	 * AudioRecord初期化時に使うバッファのサイズ
 	 */
@@ -109,6 +115,8 @@ public class AudioSampler extends IAudioSampler {
 		CHANNEL_COUNT = channelNum;
 		SAMPLING_RATE = samplingRate;
 		SAMPLES_PER_FRAME = samplesPerFrame * channelNum;
+		BYTES_PER_FRAME = SAMPLES_PER_FRAME
+			* AudioRecordCompat.getBitResolution(AudioRecordCompat.AUDIO_FORMAT);
 		BUFFER_SIZE = AudioRecordCompat.getAudioBufferSize(
 			channelNum, AudioRecordCompat.AUDIO_FORMAT,
 			samplingRate, samplesPerFrame, framesPerBuffer);
@@ -116,13 +124,23 @@ public class AudioSampler extends IAudioSampler {
 	}
 
 	/**
+	 * 音声データ１つ辺りのサンプリング数を返す
+	 * 1フレーム辺りのサンプリング数xチャネル数
+	 * @return
+	 */
+	public int getSampledPerFrame() {
+		return SAMPLES_PER_FRAME;
+	}
+
+	/**
 	 * 音声データ１つ当たりのバイト数を返す
+	 * 1フレーム辺りのサンプリング数xチャネル数x1サンプルあたりのバイト数
 	 * (AudioRecordから1度に読み込みを試みる最大バイト数)
 	 * @return
 	 */
 	@Override
 	public int getBufferSize() {
-		return SAMPLES_PER_FRAME;
+		return BYTES_PER_FRAME;
 	}
 
 	/**
@@ -136,7 +154,7 @@ public class AudioSampler extends IAudioSampler {
 		super.start();
 		synchronized (mSync) {
 			if (mAudioThread == null) {
-				init_pool(SAMPLES_PER_FRAME);
+				init_pool(BYTES_PER_FRAME);
 				// 内蔵マイクからの音声取り込みスレッド生成＆実行
 				mAudioThread = new AudioThread();
 				mAudioThread.start();
@@ -240,9 +258,9 @@ LOOP:							for ( ; mIsCapturing ;) {
 										// try to read audio data
 										buffer = data.get();
 										buffer.clear();
-										// 1回に読み込むのはSAMPLES_PER_FRAMEバイト
+										// 1回に読み込むのはBYTES_PER_FRAMEバイト
 										try {
-											readBytes = audioRecord.read(buffer, SAMPLES_PER_FRAME);
+											readBytes = audioRecord.read(buffer, BYTES_PER_FRAME);
 										} catch (final Exception e) {
 											Log.e(TAG, "AudioRecord#read failed:" + e);
 											err_count++;

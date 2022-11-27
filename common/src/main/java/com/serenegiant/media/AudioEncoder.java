@@ -115,7 +115,9 @@ public class AudioEncoder extends AbstractAudioEncoder {
 		                int readBytes;
 		                audioRecord.startRecording();
 		                try {
-		                	final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME * mChannelCount;
+		                	final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME
+		                		* mChannelCount
+		                		* AudioRecordCompat.getBitResolution(AudioRecordCompat.AUDIO_FORMAT);
 		                	for ( ; ;) {
 		                		if (!mIsCapturing || mRequestStop) break;
 								// check recording state
