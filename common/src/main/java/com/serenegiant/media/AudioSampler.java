@@ -43,7 +43,13 @@ public class AudioSampler extends IAudioSampler {
 	private AudioThread mAudioThread;
     private final int AUDIO_SOURCE;
     private final int SAMPLING_RATE, CHANNEL_COUNT;
+	/**
+	 * AudioRecordから1度に読み込みを試みる最大バイト数
+	 */
 	private final int SAMPLES_PER_FRAME;
+	/**
+	 * AudioRecord初期化時に使うバッファのサイズ
+	 */
 	private final int BUFFER_SIZE;
 	private final boolean FORCE_SOURCE;
 
@@ -95,6 +101,7 @@ public class AudioSampler extends IAudioSampler {
 
 	/**
 	 * 音声データ１つ当たりのバイト数を返す
+	 * (AudioRecordから1度に読み込みを試みる最大バイト数)
 	 * @return
 	 */
 	@Override

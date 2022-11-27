@@ -240,6 +240,7 @@ public abstract class IAudioSampler {
 	public abstract int getBitResolution();
 	/**
 	 * 音声データ１つ当たりのバイト数を返す
+	 * (AudioRecordから1度に読み込みを試みる最大バイト数)
 	 * @return
 	 */
 	public int getBufferSize() {

@@ -43,6 +43,9 @@ public class AudioRecordCompat {
 		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
 	}
 
+	/**
+	 * デフォルトの音声フォーマット
+	 */
 	public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 
 	public static final int AUDIO_SOURCE_UAC = 100;
