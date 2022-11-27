@@ -27,10 +27,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ToggleButton
-import com.serenegiant.media.AbstractAudioEncoder
-import com.serenegiant.media.AudioSampler
-import com.serenegiant.media.IAudioSampler
-import com.serenegiant.media.SoundCheck
+import com.serenegiant.media.*
 import com.serenegiant.widget.ProgressView
 
 class AudioRecordFragment : BaseFragment() {
@@ -96,9 +93,9 @@ class AudioRecordFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "startRecord:")
 		isRecording = true
 		val sampler = AudioSampler(MediaRecorder.AudioSource.CAMCORDER,
-			1, AbstractAudioEncoder.DEFAULT_SAMPLE_RATE,
-			AbstractAudioEncoder.SAMPLES_PER_FRAME,
-			AbstractAudioEncoder.FRAMES_PER_BUFFER)
+			1, AudioRecordCompat.DEFAULT_SAMPLE_RATE,
+			AudioRecordCompat.SAMPLES_PER_FRAME,
+			AudioRecordCompat.FRAMES_PER_BUFFER)
 		SoundCheck.getInstance().setAudioSampler(sampler,
 			object : SoundCheck.SoundCheckCallback {
 			override fun onStart() {

@@ -47,6 +47,18 @@ public class AudioRecordCompat {
 	 * デフォルトの音声フォーマット
 	 */
 	public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+	/**
+	 * デフォルトのサンプリングレート
+	 */
+	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
+	/**
+	 * 音声データ1フレームあたりのサンプリングバイト数
+	 */
+    public static final int SAMPLES_PER_FRAME = 1024;		// AAC, bytes/frame/channel
+	/**
+	 * バッファ辺りのフレーム数
+	 */
+	public static final int FRAMES_PER_BUFFER = 25; 		// AAC, frame/buffer/sec
 
 	public static final int AUDIO_SOURCE_UAC = 100;
   	@IntDef({

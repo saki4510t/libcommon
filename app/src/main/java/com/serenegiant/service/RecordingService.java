@@ -41,6 +41,7 @@ import com.serenegiant.libcommon.Const;
 import com.serenegiant.libcommon.MainActivity;
 import com.serenegiant.libcommon.R;
 import com.serenegiant.media.AbstractAudioEncoder;
+import com.serenegiant.media.AudioRecordCompat;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.IAudioSampler;
 import com.serenegiant.media.IMuxer;
@@ -834,8 +835,8 @@ public class RecordingService extends BaseService {
 			if (DEBUG) Log.v(TAG, "createOwnAudioSampler:create AudioSampler");
 			mAudioSampler = new AudioSampler(2,
 				channelCount, sampleRate,
-				AbstractAudioEncoder.SAMPLES_PER_FRAME,
-				AbstractAudioEncoder.FRAMES_PER_BUFFER);
+				AudioRecordCompat.SAMPLES_PER_FRAME,
+				AudioRecordCompat.FRAMES_PER_BUFFER);
 			mIsOwnAudioSampler = true;
 		}
 	}

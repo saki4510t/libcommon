@@ -4,6 +4,7 @@ import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 
 import com.serenegiant.media.AbstractAudioEncoder;
+import com.serenegiant.media.AudioRecordCompat;
 import com.serenegiant.media.MediaCodecUtils;
 
 import org.junit.Assert;
@@ -42,7 +43,7 @@ public class MediaFormatTest {
    public void testAudioMediaFormatTest() throws IOException {
       final MediaFormat format = MediaCodecUtils.testAudioMediaFormat(
          MediaCodecUtils.MIME_AUDIO_AAC,
-         AbstractAudioEncoder.DEFAULT_SAMPLE_RATE,
+          AudioRecordCompat.DEFAULT_SAMPLE_RATE,
           1, AbstractAudioEncoder.DEFAULT_BIT_RATE);
       Assert.assertNotNull(format);
       MediaCodecUtils.dump(format);

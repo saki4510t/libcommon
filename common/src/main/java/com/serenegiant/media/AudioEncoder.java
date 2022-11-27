@@ -50,7 +50,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 		@NonNull final EncoderListener listener,
 		final int audio_source, final int audio_channels) {
 
-		super(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		super(recorder, listener, audio_source, audio_channels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (audio_source < MediaRecorder.AudioSource.DEFAULT
 			|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
@@ -97,7 +97,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
 			final int buffer_size = AudioRecordCompat.getAudioBufferSize(
 				mChannelCount, AudioRecordCompat.AUDIO_FORMAT,
-				mSampleRate, AbstractAudioEncoder.SAMPLES_PER_FRAME, AbstractAudioEncoder.FRAMES_PER_BUFFER);
+				mSampleRate, AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER);
 /*
 			final Class audioSystemClass = Class.forName("android.media.AudioSystem");
 			// will disable the headphone
@@ -116,7 +116,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 		                int readBytes;
 		                audioRecord.startRecording();
 		                try {
-		                	final int sizeInBytes = AbstractAudioEncoder.SAMPLES_PER_FRAME * mChannelCount;
+		                	final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME * mChannelCount;
 		                	for ( ; ;) {
 		                		if (!mIsCapturing || mRequestStop) break;
 								// check recording state
@@ -200,9 +200,9 @@ public class AudioEncoder extends AbstractAudioEncoder {
             	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
             	// ダミーデータを書き込む
             	for (int i = 0; mIsCapturing && (i < 5); i++) {
-	    			buf.position(AbstractAudioEncoder.SAMPLES_PER_FRAME);
+	    			buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 	    			buf.flip();
-					encode(buf, AbstractAudioEncoder.SAMPLES_PER_FRAME, getInputPTSUs());
+					encode(buf, AudioRecordCompat.SAMPLES_PER_FRAME, getInputPTSUs());
 					frameAvailableSoon();
 					synchronized(this) {
 						try {

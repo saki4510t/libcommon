@@ -43,6 +43,7 @@ import com.serenegiant.libcommon.Const;
 import com.serenegiant.libcommon.MainActivity;
 import com.serenegiant.libcommon.R;
 import com.serenegiant.media.AbstractAudioEncoder;
+import com.serenegiant.media.AudioRecordCompat;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.AudioSamplerEncoder;
 import com.serenegiant.media.Encoder;
@@ -353,8 +354,8 @@ public class ScreenRecorderService extends BaseService {
 			// 音声取得のパーミッションがあるときだけ録音もする
 			mAudioSampler = new AudioSampler(2,
 				CHANNEL_COUNT, SAMPLE_RATE,
-				AbstractAudioEncoder.SAMPLES_PER_FRAME,
-				AbstractAudioEncoder.FRAMES_PER_BUFFER);
+				AudioRecordCompat.SAMPLES_PER_FRAME,
+				AudioRecordCompat.FRAMES_PER_BUFFER);
 			mAudioSampler.start();
 			new AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler);
 		}

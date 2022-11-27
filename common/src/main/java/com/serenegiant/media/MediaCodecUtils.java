@@ -1355,7 +1355,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 
 		return testAudioMediaFormat(mime,
 			sampleRate, channelCount, bitrate,
-			AbstractAudioEncoder.SAMPLES_PER_FRAME, AbstractAudioEncoder.FRAMES_PER_BUFFER);
+			AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER);
 	}
 
 	/**

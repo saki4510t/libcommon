@@ -33,9 +33,13 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "AbstractAudioEncoder";
 
-	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
 	public static final int DEFAULT_BIT_RATE = 64000;		// 64[kbps]		5-320[kbps]
+
+	@Deprecated
+	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
+	@Deprecated
     public static final int SAMPLES_PER_FRAME = 1024;		// AAC, bytes/frame/channel
+	@Deprecated
 	public static final int FRAMES_PER_BUFFER = 25; 		// AAC, frame/buffer/sec
 
     protected int mAudioSource;
@@ -56,7 +60,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 		@NonNull final EncoderListener listener,
 		final int audio_source, final int audio_channels) {
 
-		this(recorder, listener, audio_source, audio_channels, DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		this(recorder, listener, audio_source, audio_channels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 	}
 
 	/**

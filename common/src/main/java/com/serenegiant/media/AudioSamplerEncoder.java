@@ -58,7 +58,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 
 		super(recorder, listener, audio_source,
 			sampler != null ? sampler.getChannels() : 1,
-			sampler != null ? sampler.getSamplingFrequency() : DEFAULT_SAMPLE_RATE,
+			sampler != null ? sampler.getSamplingFrequency() : AudioRecordCompat.DEFAULT_SAMPLE_RATE,
 			DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		// もしAudioSamplerが指定されていない場合には内部で生成する
@@ -67,7 +67,8 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 				|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
 				throw new IllegalArgumentException("invalid audio source:" + audio_source);
 			sampler = new AudioSampler(audio_source, 1,
-				DEFAULT_SAMPLE_RATE, SAMPLES_PER_FRAME, FRAMES_PER_BUFFER);
+				AudioRecordCompat.DEFAULT_SAMPLE_RATE,
+				AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER);
 			mOwnSampler = true;
 		} else {
 			mOwnSampler = false;
@@ -150,12 +151,12 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 			if (frame_count == 0) {
 		    	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
 		    	// ダミーデータを書き込む
-		    	final ByteBuffer buf = ByteBuffer.allocateDirect(SAMPLES_PER_FRAME).order(ByteOrder.nativeOrder());
+		    	final ByteBuffer buf = ByteBuffer.allocateDirect(AudioRecordCompat.SAMPLES_PER_FRAME).order(ByteOrder.nativeOrder());
 		    	for (int i = 0; mIsCapturing && (i < 5); i++) {
 		    		buf.clear();
-					buf.position(SAMPLES_PER_FRAME);
+					buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 					buf.flip();
-					encode(buf, SAMPLES_PER_FRAME, getInputPTSUs());
+					encode(buf, AudioRecordCompat.SAMPLES_PER_FRAME, getInputPTSUs());
 					frameAvailableSoon();
 					synchronized (this) {
 						try {
