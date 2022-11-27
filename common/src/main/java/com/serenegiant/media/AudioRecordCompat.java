@@ -75,11 +75,20 @@ public class AudioRecordCompat {
   	public @interface AudioSource {}
 
   	@IntDef({
-  		AudioFormat.CHANNEL_IN_MONO,
-  		AudioFormat.CHANNEL_IN_STEREO,
+		AudioFormat.CHANNEL_IN_MONO,
+		AudioFormat.CHANNEL_IN_STEREO,
   	})
   	@Retention(RetentionPolicy.SOURCE)
   	public @interface AudioChannel {}
+
+	@SuppressLint("InlinedApi")
+	@IntDef({
+		AudioFormat.ENCODING_PCM_16BIT,
+		AudioFormat.ENCODING_PCM_8BIT,
+		AudioFormat.ENCODING_PCM_FLOAT,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface AudioFormats {}
 
 	/**
 	 * AudioRecorder初期化時に使用するバッファサイズを計算
@@ -137,6 +146,24 @@ public class AudioRecordCompat {
 			break;
 		}
 		return audioChannel;
+	}
+
+	/**
+	 * 1サンプリングあたりのバイト数を取得する
+	 * 未知の音声フォーマットに対しては1を返す
+	 * @param format ENCODING_PCM_16BIT, ENCODING_PCM_8BIT, ENCODING_PCM_FLOAT
+	 * @return
+	 */
+	public static int getBitResolution(@AudioFormats final int format) {
+		switch (format) {
+		case AudioFormat.ENCODING_PCM_16BIT:
+			return 2;
+		case AudioFormat.ENCODING_PCM_FLOAT:
+			return 4;
+		case AudioFormat.ENCODING_PCM_8BIT:
+		default:
+			return 1;
+		}
 	}
 
    /**
