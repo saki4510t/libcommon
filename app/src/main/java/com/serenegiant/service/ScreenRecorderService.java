@@ -42,8 +42,6 @@ import android.view.Surface;
 import com.serenegiant.libcommon.Const;
 import com.serenegiant.libcommon.MainActivity;
 import com.serenegiant.libcommon.R;
-import com.serenegiant.media.AbstractAudioEncoder;
-import com.serenegiant.media.AudioRecordCompat;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.AudioSamplerEncoder;
 import com.serenegiant.media.Encoder;
@@ -355,7 +353,7 @@ public class ScreenRecorderService extends BaseService {
 			mAudioSampler = new AudioSampler(2,
 				CHANNEL_COUNT, SAMPLE_RATE);
 			mAudioSampler.start();
-			new AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler);
+			new AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler);
 		}
 		if (DEBUG) Log.v(TAG, "createRecorder:finished");
 		return recorder;

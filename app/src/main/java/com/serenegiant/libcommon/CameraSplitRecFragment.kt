@@ -205,7 +205,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 			mAudioSampler = AudioSampler(audio_source,
 				audio_channels, SAMPLE_RATE)
 			mAudioSampler!!.start()
-			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, 2, mAudioSampler)
+			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler)
 		}
 		if (DEBUG) Log.v(TAG, "createRecorder:finished")
 		return recorder

@@ -22,7 +22,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import android.Manifest;
-import android.media.MediaRecorder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -32,13 +31,9 @@ import androidx.annotation.RequiresPermission;
  * AudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
  */
 public class AudioSamplerEncoder extends AbstractAudioEncoder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "AudioSamplerEncoder";
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final String TAG = AudioSamplerEncoder.class.getSimpleName();
 
-	/**
-	 * このオブジェクト内でAudioSamplerを生成したかどうか
-	 */
-	private final boolean mOwnSampler;
 	@NonNull
 	private final IAudioSampler mSampler;
 	private int frame_count = 0;
@@ -47,31 +42,17 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	 * コンストラクタ
 	 * @param recorder
 	 * @param listener
-	 * @param audio_source
 	 * @param sampler
 	 */
 	public AudioSamplerEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
-		final int audio_source,
 		@Nullable IAudioSampler sampler) {
 
-		super(recorder, listener, audio_source,
-			sampler != null ? sampler.getChannels() : 1,
-			sampler != null ? sampler.getSamplingFrequency() : AudioRecordCompat.DEFAULT_SAMPLE_RATE,
+		super(recorder, listener, sampler.getAudioSource(),
+			sampler.getChannels(), sampler.getSamplingFrequency(),
 			DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		// もしAudioSamplerが指定されていない場合には内部で生成する
-		if (sampler == null) {
-			if (audio_source < MediaRecorder.AudioSource.DEFAULT
-				|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
-				throw new IllegalArgumentException("invalid audio source:" + audio_source);
-			sampler = new AudioSampler(audio_source, 1,
-				AudioRecordCompat.DEFAULT_SAMPLE_RATE);
-			mOwnSampler = true;
-		} else {
-			mOwnSampler = false;
-		}
 		mSampler = sampler;
 	}
 
@@ -80,27 +61,13 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	public void start() {
 		super.start();
 		mSampler.addCallback(mSoundSamplerCallback);
-		if (mOwnSampler) {
-			mSampler.start();
-		}
 		new Thread(mAudioTask, "AudioTask").start();
 	}
 
 	@Override
 	public void stop() {
 		mSampler.removeCallback(mSoundSamplerCallback);
-		if (mOwnSampler) {
-			mSampler.stop();
-		}
 		super.stop();
-	}
-
-	@Override
-	public void release() {
-		if (mOwnSampler) {
-			mSampler.release();
-		}
-		super.release();
 	}
 
 	/**
