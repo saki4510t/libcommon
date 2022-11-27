@@ -372,6 +372,17 @@ public class MediaData {
 	}
 
 	/**
+	 * 内部で保持しているByteBufferをそのまま返す
+	 * 他の#getはclear → position(size) → flipするので
+	 * 必ず先頭から読み取ることになる
+	 * @return
+	 */
+	@Nullable
+	public ByteBuffer getRaw() {
+		return mBuffer;
+	}
+
+	/**
 	 * 内部バッファの容量を取得
 	 * @return
 	 */
@@ -386,6 +397,15 @@ public class MediaData {
 	 */
 	public int remaining() {
 		return mBuffer != null ? mBuffer.remaining() : 0;
+	}
+
+	/**
+	 * データのposition取得用
+	 * 内部バッファのpositionを呼び出す
+	 * @return
+	 */
+	public int position() {
+		return mBuffer != null ? mBuffer.position() : 0;
 	}
 
 	/**
