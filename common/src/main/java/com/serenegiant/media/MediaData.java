@@ -380,6 +380,15 @@ public class MediaData {
 	}
 
 	/**
+	 * データの残量を取得
+	 * 内部バッファのremainingを呼び出す
+	 * @return
+	 */
+	public int remaining() {
+		return mBuffer != null ? mBuffer.remaining() : 0;
+	}
+
+	/**
 	 * 内部で保持しているByteBufferのバイトオーダーを返す
 	 * @return
 	 */
