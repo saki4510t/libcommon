@@ -18,9 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
-import android.os.Build;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -209,7 +207,6 @@ public class MediaData {
 	 * @param buffer
 	 * @param info
 	 */
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void set(
 		@Nullable ByteBuffer buffer,
 		@NonNull final MediaCodec.BufferInfo info) {
@@ -222,7 +219,6 @@ public class MediaData {
 	 * @param buffer
 	 * @param info
 	 */
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void set(
 		final int trackIx,
 		@Nullable ByteBuffer buffer,
@@ -370,7 +366,6 @@ public class MediaData {
 	 * MediaCodec.BufferInfoとしてメタデータを取得する
 	 * @param info
 	 */
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 	public void get(@NonNull final MediaCodec.BufferInfo info) {
 		info.set(0, mSize, mPresentationTimeUs, mFlags);
 	}

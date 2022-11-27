@@ -45,7 +45,6 @@ import androidx.documentfile.provider.DocumentFile;
 /**
  * MediaStoreへアクセスするためのヘルパークラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaStoreUtils {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaStoreUtils.class.getSimpleName();

@@ -18,19 +18,16 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
-import android.os.Build;
 
 import androidx.annotation.NonNull;
 
 /**
  * 音声データをMediaCodecを使ってAACエンコードするための基本クラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractAudioEncoder extends AbstractEncoder
 	implements IAudioEncoder {
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること

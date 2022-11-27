@@ -18,9 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.MediaFormat;
-import android.os.Build;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -29,7 +27,6 @@ import java.nio.ByteOrder;
  * 別途H.264/AVCでエンコード済みの映像データを受け取ってバッファリングして引き渡すためのIVideoEncoder実装
  * webカメラがH.264エンコードに対応している場合などにデコード＆再エンコードをしないで直接録画できるようにするため
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class FakeVideoEncoder extends AbstractFakeEncoder
 	implements IVideoEncoder {
 	

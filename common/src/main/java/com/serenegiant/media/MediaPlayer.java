@@ -19,7 +19,6 @@ package com.serenegiant.media;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaExtractor;
 import android.media.MediaMetadataRetriever;
@@ -43,7 +42,6 @@ import androidx.annotation.WorkerThread;
  * 動画再生用のヘルパークラス
  */
 @SuppressLint("InlinedApi")
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class MediaPlayer {
     private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
     private static final String TAG = MediaPlayer.class.getSimpleName();

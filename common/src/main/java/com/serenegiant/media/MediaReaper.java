@@ -19,7 +19,6 @@ package com.serenegiant.media;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.os.Build;
@@ -42,7 +41,6 @@ import androidx.annotation.WorkerThread;
 /**
  * MediaCodecのエンコーダーからエンコード済みデータを非同期で引き出してmuxer等へ引き渡すためのヘルパークラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class MediaReaper implements Runnable {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = MediaReaper.class.getSimpleName();

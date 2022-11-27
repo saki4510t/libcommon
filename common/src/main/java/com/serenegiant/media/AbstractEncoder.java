@@ -19,10 +19,8 @@ package com.serenegiant.media;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -36,7 +34,6 @@ import androidx.annotation.Nullable;
 /**
  * MediaCodecを使ったエンコーダーの基本クラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractEncoder implements Encoder {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractEncoder.class.getSimpleName();

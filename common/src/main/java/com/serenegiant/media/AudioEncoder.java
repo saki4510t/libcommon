@@ -22,11 +22,9 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -34,7 +32,6 @@ import androidx.annotation.NonNull;
 /**
  * AudioRecordから音声データを取得してMediaCodecエンコーダーでエンコードするためのクラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 public class AudioEncoder extends AbstractAudioEncoder {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AudioEncoder.class.getSimpleName();

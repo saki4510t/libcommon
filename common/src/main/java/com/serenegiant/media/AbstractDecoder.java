@@ -35,7 +35,6 @@ import androidx.annotation.RequiresApi;
 /**
  * MediaCodecのデコーダーのラッパー用基本クラス
  */
-@RequiresApi(Build.VERSION_CODES.JELLY_BEAN)
 public abstract class AbstractDecoder implements Decoder {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = AbstractDecoder.class.getSimpleName();
