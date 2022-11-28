@@ -43,10 +43,9 @@ public abstract class Pool<T> {
 	 * コンストラクタ
 	 * @param initNum
 	 * @param maxNumInPool プール内に保持できる最大数==最大生成数
-	 * @param args initを呼ぶ際のオプション引数, Tの生成に必要な値を渡す, 省略可
 	 */
-	public Pool(final int initNum, final int maxNumInPool, @Nullable final Object... args) {
-		this(initNum, maxNumInPool, maxNumInPool, args);
+	public Pool(final int initNum, final int maxNumInPool) {
+		this(initNum, maxNumInPool, maxNumInPool, (Object) null);
 	}
 	
 	/**
