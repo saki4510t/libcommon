@@ -46,7 +46,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 	override fun internalStartRecording() {
 		if (DEBUG) Log.v(TAG, "internalStartRecording:mRecorder=$mRecorder")
 		if (mRecorder == null) {
-			if (DEBUG) Log.v(TAG, "internalStartRecording:get PostMuxRecorder")
+			if (DEBUG) Log.v(TAG, "internalStartRecording:get ServiceRecorder")
 			mRecorder = ServiceRecorder(requireContext(), mCallback)
 		} else {
 			Log.w(TAG, "internalStartRecording:recorder is not null, already start recording?")
@@ -64,6 +64,17 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		val recorder = mRecorder
 		recorder?.frameAvailableSoon()
 	}
+
+	override fun onLongClick(view: View): Boolean {
+		super.onLongClick(view)
+		if (mCameraView is EffectCameraGLSurfaceView) {
+			val v = view as EffectCameraGLSurfaceView
+			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+			return true
+		}
+		return false
+	}
+
 
 	private var mRecordingSurfaceId = 0
 	private val mCallback = object: ServiceRecorder.Callback {
@@ -116,14 +127,18 @@ class EffectCameraFragment : AbstractCameraFragment() {
 					val output: DocumentFile?
 					= if (BuildCheck.isAPI29()) {
 						// API29以降は対象範囲別ストレージ
+						// DocumentFile.fromSingleUrはAPI>=19
 						MediaStoreUtils.getContentDocument(
 							context, "video/mp4",
-							null,
+							Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
 							FileUtils.getDateTimeString() + ".mp4", null)
 					} else {
-						val dir = MediaFileUtils.getRecordingRoot(
-							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
-						dir!!.createFile("*/*", FileUtils.getDateTimeString() + ".mp4")
+						// ここの#getRecordingRoot呼び出しと#getRecordingFile呼び出しは等価
+//						val dir = MediaFileUtils.getRecordingRoot(
+//							context, Environment.DIRECTORY_MOVIES, Const.REQUEST_ACCESS_SD)
+//						dir!!.createFile("video/mp4", FileUtils.getDateTimeString() + ".mp4")
+						MediaFileUtils.getRecordingFile(
+							context, Const.REQUEST_ACCESS_SD, Environment.DIRECTORY_MOVIES, "video/mp4", ".mp4")
 					}
 					if (DEBUG) Log.v(TAG, "onReady:output=$output," + output?.uri)
 					if (output != null) {
@@ -146,16 +161,6 @@ class EffectCameraFragment : AbstractCameraFragment() {
 			}
 			stopRecording()
 		}
-	}
-
-	override fun onLongClick(view: View): Boolean {
-		super.onLongClick(view)
-		if (mCameraView is EffectCameraGLSurfaceView) {
-			val v = view as EffectCameraGLSurfaceView
-			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
-			return true
-		}
-		return false
 	}
 
 	companion object {
