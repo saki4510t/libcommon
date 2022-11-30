@@ -54,7 +54,7 @@ class NetworkConnectionFragment : BaseFragment() {
 		Log.i(TAG, "dumpIpV4All")
 		val ipv4s = NetworkUtils.getLocalIPv4Addresses()
 		for (addr in ipv4s) {
-			NetworkUtils.dump(addr)
+			NetworkUtils.dump(TAG, addr)
 		}
 		for (addr in ipv4s) {
 			Log.i(TAG, NetworkUtils.toString(addr))
@@ -62,7 +62,7 @@ class NetworkConnectionFragment : BaseFragment() {
 		Log.i(TAG, "dumpIpV6All")
 		val ipv6s = NetworkUtils.getLocalIPv6Addresses()
 		for (addr in ipv6s) {
-			NetworkUtils.dump(addr)
+			NetworkUtils.dump(TAG, addr)
 		}
 		for (addr in ipv6s) {
 			Log.i(TAG, NetworkUtils.toString(addr))
@@ -70,12 +70,12 @@ class NetworkConnectionFragment : BaseFragment() {
 		Log.i(TAG, "dumpLocal")
 		val locals = NetworkUtils.getLocalAddresses()
 		for (addr in locals) {
-			NetworkUtils.dump(addr)
+			NetworkUtils.dump(TAG, addr)
 		}
 		Log.i(TAG, "dumpLoopBacks")
 		val loopbacks = NetworkUtils.getLoopbackAddresses()
 		for (addr in loopbacks) {
-			NetworkUtils.dump(addr)
+			NetworkUtils.dump(TAG, addr)
 		}
 		val context = requireContext()
 		if (BuildCheck.isAPI21()) {
@@ -85,7 +85,7 @@ class NetworkConnectionFragment : BaseFragment() {
 			}
 			Log.i(TAG, "getLinkPropertiesAll")
 			for (linkProperties in ConnectivityHelper.getLinkPropertiesAll(context)) {
-				Log.i(TAG, "$linkProperties")
+				NetworkUtils.dump(TAG, linkProperties)
 			}
 			Log.i(TAG, "getNetworkCapabilitiesAll")
 			for (caps in ConnectivityHelper.getNetworkCapabilitiesAll(context)) {
@@ -111,7 +111,7 @@ class NetworkConnectionFragment : BaseFragment() {
 			Log.i(TAG, "getLinkedAddresses")
 			val linkedAddrs = NetworkUtils.getLinkedAddresses(context)
 			for (addr in linkedAddrs) {
-				NetworkUtils.dump(addr)
+				NetworkUtils.dump(TAG, addr)
 			}
 			Log.i(TAG, "gateway=${ConnectivityHelper.getActiveGateway(context)}")
 		}

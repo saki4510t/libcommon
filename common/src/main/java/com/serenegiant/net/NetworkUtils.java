@@ -320,14 +320,22 @@ public class NetworkUtils {
 
 		return result;
 	}
-
 	/**
 	 * 利用可能なネットワークインターフェースに存在する全てのネットワークアドレスをlogCatへ出力する
 	 */
 	public static void dumpAll() {
+		dumpAll(TAG);
+	}
+
+	/**
+	 * 利用可能なネットワークインターフェースに存在する全てのネットワークアドレスをlogCatへ出力する
+	 * @param tag
+	 */
+	public static void dumpAll(@Nullable final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
 		try {
 			for (final NetworkInterface intf: Collections.list(NetworkInterface.getNetworkInterfaces())) {
-				dump(intf);
+				dump(_tag, null, intf);
 			}
 		} catch (final SocketException | NullPointerException e) {
 			Log.w(TAG, "dumpAll", e);
@@ -338,24 +346,46 @@ public class NetworkUtils {
 	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
 	 * @param intf
 	 */
+	@Deprecated
 	public static void dump(@Nullable final NetworkInterface intf) {
+		dump(TAG, null, intf);
+	}
+
+	/**
+	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
+	 * @param tag
+	 * @param intf
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final NetworkInterface intf) {
+		dump(tag, null, intf);
+	}
+
+	/**
+	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
+	 * @param tag
+	 * @param prefix
+	 * @param intf
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final String prefix, @Nullable final NetworkInterface intf) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		final String _prefix = TextUtils.isEmpty(prefix) ? "" : prefix;
 		if (intf == null) {
-			Log.i(TAG, "NetworkInterface is null");
+			Log.i(_tag, "NetworkInterface is null");
 		} else {
-			Log.i(TAG, "intf=" + intf);
-			Log.i(TAG, "intf:name=" + intf.getName());
-			Log.i(TAG, "intf:displayName=" + intf.getDisplayName());
-			Log.i(TAG, "intf:interfaceAddresses=" + intf.getInterfaceAddresses());
+			Log.i(_tag, _prefix + "intf:" + intf);
+			Log.i(_tag, _prefix + "  name=" + intf.getName());
+			Log.i(_tag, _prefix + "  displayName=" + intf.getDisplayName());
+			Log.i(_tag, _prefix + "  interfaceAddresses=" + intf.getInterfaceAddresses());
 			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				Log.i(TAG, "intf:index=" + intf.getIndex());
+				Log.i(_tag, _prefix + "  index=" + intf.getIndex());
 				try {
-					Log.i(TAG, "intf:mtu=" + intf.getMTU());
+					Log.i(_tag, _prefix + "  mtu=" + intf.getMTU());
 				} catch (final SocketException e) {
 					// ignore
 				}
 			}
 			for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
-				dump(addr);
+				dump(_tag, _prefix, addr);
 			}
 		}
 	}
@@ -364,41 +394,63 @@ public class NetworkUtils {
 	 * 指定したネットワークアドレスの値をlogCatへ出力する
 	 * @param addr
 	 */
+	@Deprecated
 	public static void dump(@Nullable final InetAddress addr) {
+		dump(TAG, null, addr);
+	}
+
+	/**
+	 * 指定したネットワークアドレスの値をlogCatへ出力する
+	 * @param tag
+	 * @param addr
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final InetAddress addr) {
+		dump(tag, null, addr);
+	}
+
+	/**
+	 * 指定したネットワークアドレスの値をlogCatへ出力する
+	 * @param tag
+	 * @param prefix
+	 * @param addr
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final String prefix, @Nullable final InetAddress addr) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		final String _prefix = TextUtils.isEmpty(prefix) ? "" : prefix;
 		final CountDownLatch latch = new CountDownLatch(1);
 		if (addr == null) {
-			Log.i(TAG, "dumpInetAddress: null");
+			Log.i(_tag, "dumpInetAddress: null");
 		} else {
-			Log.i(TAG, "addr=" + addr);	// InetAddress#toString
-			Log.i(TAG, "  address=" + Arrays.toString(addr.getAddress()));
-			Log.i(TAG, "  hostAddress=" + addr.getHostAddress());
+			Log.i(_tag, _prefix + "addr=" + addr);	// InetAddress#toString
+			Log.i(_tag, _prefix + "  address=" + Arrays.toString(addr.getAddress()));
+			Log.i(_tag, _prefix + "  hostAddress=" + addr.getHostAddress());
 			try {
 				final String hostName = addr.getHostName();
-				Log.i(TAG, "  hostName=" + hostName);
+				Log.i(_tag, _prefix + "  hostName=" + hostName);
 			} catch (final Exception e) {
-				Log.i(TAG, "  hostName=");
+				Log.i(_tag, _prefix + "  hostName=");
 			}
-			Log.i(TAG, "  isLoopback=" + addr.isLoopbackAddress());
-			Log.i(TAG, "  isAny=" + addr.isAnyLocalAddress());
-			Log.i(TAG, "  isAnyLocal=" + addr.isAnyLocalAddress());
-			Log.i(TAG, "  isLinkLocal=" + addr.isLinkLocalAddress());
-			Log.i(TAG, "  isSiteLocal=" + addr.isSiteLocalAddress());
-			Log.i(TAG, "  isMCLinkLocal=" + addr.isMCLinkLocal());
-			Log.i(TAG, "  isMCSiteLocal=" + addr.isMCSiteLocal());
-			Log.i(TAG, "  isMCNodeLocal=" + addr.isMCNodeLocal());
-			Log.i(TAG, "  isMCOrgLocal=" + addr.isMCOrgLocal());
-			Log.i(TAG, "  isMCGGlobal=" + addr.isMCGlobal());
-			Log.i(TAG, "  isMulticast=" + addr.isMulticastAddress());
+			Log.i(_tag, _prefix + "  isLoopback=" + addr.isLoopbackAddress());
+			Log.i(_tag, _prefix + "  isAny=" + addr.isAnyLocalAddress());
+			Log.i(_tag, _prefix + "  isAnyLocal=" + addr.isAnyLocalAddress());
+			Log.i(_tag, _prefix + "  isLinkLocal=" + addr.isLinkLocalAddress());
+			Log.i(_tag, _prefix + "  isSiteLocal=" + addr.isSiteLocalAddress());
+			Log.i(_tag, _prefix + "  isMCLinkLocal=" + addr.isMCLinkLocal());
+			Log.i(_tag, _prefix + "  isMCSiteLocal=" + addr.isMCSiteLocal());
+			Log.i(_tag, _prefix + "  isMCNodeLocal=" + addr.isMCNodeLocal());
+			Log.i(_tag, _prefix + "  isMCOrgLocal=" + addr.isMCOrgLocal());
+			Log.i(_tag, _prefix + "  isMCGGlobal=" + addr.isMCGlobal());
+			Log.i(_tag, _prefix + "  isMulticast=" + addr.isMulticastAddress());
 			if (addr instanceof Inet4Address) {
-				Log.i(TAG, "  isIpv4=true");
+				Log.i(_tag, _prefix + "  isIpv4=true");
 			} else if (addr instanceof Inet6Address) {
 				final Inet6Address _addr = (Inet6Address)addr;
-				Log.i(TAG, "  isIpv6=true");
-				Log.i(TAG, "  isIPv4CompatibleAddress=" + _addr.isIPv4CompatibleAddress());
+				Log.i(_tag, _prefix + "  isIpv6=true");
+				Log.i(_tag, _prefix + "  isIPv4CompatibleAddress=" + _addr.isIPv4CompatibleAddress());
 			}
 			ThreadPool.queueEvent(() -> {
 				try {
-					Log.i(TAG, "  isReachable=" + addr.isReachable(1000));
+					Log.i(_tag, _prefix + "  isReachable=" + addr.isReachable(1000));
 				} catch (final IOException e) {
 					Log.w(TAG, e);
 				}
@@ -406,7 +458,7 @@ public class NetworkUtils {
 			});
 			try {
 				if (!latch.await(1000, TimeUnit.MILLISECONDS)) {
-					Log.i(TAG, "  isReachable=timeout");
+					Log.i(_tag, _prefix + "  isReachable=timeout");
 				}
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
@@ -416,23 +468,98 @@ public class NetworkUtils {
 
 	/**
 	 * RouteInfo#toStringだと全部の情報が出力されないのでRouteInfoの内容をlogCateへ出力するためのヘルパーメソッド
+	 * @param info
+	 */
+	@Deprecated
+	public static void dump(@NonNull final RouteInfo info) {
+		dump(TAG, null, info);
+	}
+
+	/**
+	 * RouteInfo#toStringだと全部の情報が出力されないのでRouteInfoの内容をlogCateへ出力するためのヘルパーメソッド
 	 * @param tag
 	 * @param info
 	 */
 	public static void dump(@Nullable final String tag, @NonNull final RouteInfo info) {
+		dump(tag, null, info);
+	}
+
+	/**
+	 * RouteInfo#toStringだと全部の情報が出力されないのでRouteInfoの内容をlogCateへ出力するためのヘルパーメソッド
+	 * @param tag
+	 * @param prefix
+	 * @param info
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final String prefix, @NonNull final RouteInfo info) {
 		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
-		Log.i(_tag, info.toString());
+		final String _prefix = TextUtils.isEmpty(prefix) ? "" : prefix;
+		Log.i(_tag, _prefix + info);
 		if (BuildCheck.isAPI21()) {
-			Log.i(_tag, "  destination=" + info.getDestination());
-			Log.i(_tag, "  gateway=" + info.getGateway());
-			Log.i(_tag, "  interface=" + info.getInterface());
-			Log.i(_tag, "  isDefaultRoute=" + info.isDefaultRoute());
+			Log.i(_tag, _prefix + "  destination=" + info.getDestination());
+			Log.i(_tag, _prefix + "  gateway=" + info.getGateway());
+			Log.i(_tag, _prefix + "  interface=" + info.getInterface());
+			Log.i(_tag, _prefix + "  isDefaultRoute=" + info.isDefaultRoute());
 		}
 		if (BuildCheck.isAPI29()) {
-			Log.i(_tag, "  hasGateway=" + info.hasGateway());
+			Log.i(_tag, _prefix + "  hasGateway=" + info.hasGateway());
 		}
 		if (BuildCheck.isAPI33()) {
-			Log.i(_tag, "  type=" + info.getType());
+			Log.i(_tag, _prefix + "  type=" + info.getType());
+		}
+	}
+
+	/**
+	 * LinkPropertiesの内容をlogCatへ出力するためのヘルパーメソッド
+	 * @param properties
+	 */
+	@Deprecated
+	public static void dump(@Nullable final LinkProperties properties) {
+		dump(TAG, null, properties);
+	}
+
+	/**
+	 * LinkPropertiesの内容をlogCatへ出力するためのヘルパーメソッド
+	 * @param tag
+	 * @param properties
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final LinkProperties properties) {
+		dump(tag, null, properties);
+	}
+
+	/**
+	 * LinkPropertiesの内容をlogCatへ出力するためのヘルパーメソッド
+	 * @param tag
+	 * @param prefix
+	 * @param properties
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final String prefix, @Nullable final LinkProperties properties) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		if (properties == null) {
+			Log.i(_tag, "dumpLinkProperties: null");
+		} else {
+			Log.i(_tag, properties.toString());
+			if (BuildCheck.isAPI21()) {
+				Log.i(_tag, "  interfaceName=" + properties.getInterfaceName());
+				Log.i(_tag, "  linkedAddress=" + properties.getLinkAddresses());
+				Log.i(_tag, "  dns=" + properties.getDnsServers());
+				Log.i(_tag, "  domains=" + properties.getDomains());
+				final List<RouteInfo> routes = properties.getRoutes();
+				for (final RouteInfo route: routes) {
+					dump(_tag, "    ", route);
+				}
+				Log.i(_tag, "  httpProxy=" + properties.getHttpProxy());
+			}
+			if (BuildCheck.isAPI28()) {
+				Log.i(_tag, "  isPrivateDnsActive=" + properties.isPrivateDnsActive());
+				Log.i(_tag, "  privateDhcpServer=" + properties.getPrivateDnsServerName());
+			}
+			if (BuildCheck.isAPI29()) {
+				Log.i(_tag, "  mtu=" + properties.getMtu());
+			}
+			if (BuildCheck.isAPI30()) {
+				Log.i(_tag, "  dhcpServer=" + properties.getDhcpServerAddress());
+				Log.i(_tag, "  nat64Prefix=" + properties.getNat64Prefix());
+			}
 		}
 	}
 
