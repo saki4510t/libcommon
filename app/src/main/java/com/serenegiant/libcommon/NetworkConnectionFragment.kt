@@ -113,6 +113,7 @@ class NetworkConnectionFragment : BaseFragment() {
 			for (addr in linkedAddrs) {
 				NetworkUtils.dump(addr)
 			}
+			Log.i(TAG, "gateway=${ConnectivityHelper.getActiveGateway(context)}")
 		}
 	}
 

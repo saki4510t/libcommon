@@ -18,6 +18,7 @@ package com.serenegiant.net;
  *  limitations under the License.
  */
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
@@ -30,6 +31,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.NetworkInfo;
 import android.net.NetworkRequest;
+import android.net.RouteInfo;
 import android.os.Build;
 import android.os.Handler;
 
@@ -38,6 +40,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
@@ -46,6 +49,7 @@ import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.HandlerUtils;
 
 import java.lang.ref.WeakReference;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1135,6 +1139,33 @@ public class ConnectivityHelper {
 		default:
 			return String.format(Locale.US, "UNKNOWN(%d)", networkType);
 		}
+	}
+
+	/**
+	 * アクティブなネットワークのゲートウエイのIPアドレスを取得するためのヘルパーメソッド
+	 * @param context
+	 * @return
+	 */
+	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@Nullable
+	public static InetAddress getActiveGateway(@NonNull final Context context) {
+		final LinkProperties properties = getActiveLinkProperties(context);
+		if (properties != null) {
+			final List<RouteInfo> routes = properties.getRoutes();
+			InetAddress gateway = null;
+			for (final RouteInfo route: routes) {
+				if (DEBUG) NetworkUtils.dump(TAG, route);
+				if (route.isDefaultRoute()) {
+					gateway = route.getGateway();
+					if (gateway != null) {
+						break;
+					}
+				}
+			}
+			return gateway;
+		}
+		return null;
 	}
 
 }

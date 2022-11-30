@@ -22,9 +22,12 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
+import android.net.RouteInfo;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadPool;
 
 import java.io.IOException;
@@ -408,6 +411,28 @@ public class NetworkUtils {
 			} catch (final InterruptedException e) {
 				e.printStackTrace();
 			}
+		}
+	}
+
+	/**
+	 * RouteInfo#toStringだと全部の情報が出力されないのでRouteInfoの内容をlogCateへ出力するためのヘルパーメソッド
+	 * @param tag
+	 * @param info
+	 */
+	public static void dump(@Nullable final String tag, @NonNull final RouteInfo info) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		Log.i(_tag, info.toString());
+		if (BuildCheck.isAPI21()) {
+			Log.i(_tag, "  destination=" + info.getDestination());
+			Log.i(_tag, "  gateway=" + info.getGateway());
+			Log.i(_tag, "  interface=" + info.getInterface());
+			Log.i(_tag, "  isDefaultRoute=" + info.isDefaultRoute());
+		}
+		if (BuildCheck.isAPI29()) {
+			Log.i(_tag, "  hasGateway=" + info.hasGateway());
+		}
+		if (BuildCheck.isAPI33()) {
+			Log.i(_tag, "  type=" + info.getType());
 		}
 	}
 
