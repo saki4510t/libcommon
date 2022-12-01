@@ -44,7 +44,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * 描画先のsurfaceにnullを指定するとマスク処理したテクスチャを次のGLPipelineへ送る
  */
 public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MaskPipeline.class.getSimpleName();
 
 	@NonNull

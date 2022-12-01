@@ -46,7 +46,7 @@ import androidx.lifecycle.DefaultLifecycleObserver;
  * 上3つを総称してシステムバー(システムUI)
  */
 public class SysUiUtils implements DefaultLifecycleObserver {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SysUiUtils.class.getSimpleName();
 
 	@SuppressLint("InlinedApi")

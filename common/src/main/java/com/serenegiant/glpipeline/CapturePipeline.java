@@ -39,7 +39,7 @@ import androidx.annotation.WorkerThread;
  * 静止画キャプチャ機能を追加したProxyPipeline実装
  */
 public class CapturePipeline extends ProxyPipeline {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = CapturePipeline.class.getSimpleName();
 
 	/**
