@@ -93,7 +93,7 @@ public class SettingsUtils {
 	}
 
 	/**
-	 * 機内モード設定画面
+	 * Wi-Fi設定画面
 	 * @param context
 	 */
 	public static void openSettingsWiFi(@NonNull final Context context) {
