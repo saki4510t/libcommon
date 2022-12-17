@@ -132,7 +132,7 @@ public abstract class IAudioSampler {
 	@NonNull
 	private final Set<SoundSamplerCallback> mCallbacks
 		= new CopyOnWriteArraySet<SoundSamplerCallback>();
-	protected volatile boolean mIsCapturing;
+	private volatile boolean mIsCapturing;
 
 	public IAudioSampler() {
 		mAudioQueue = new MemMediaQueue(MAX_POOL_SIZE, MAX_POOL_SIZE, MAX_QUEUE_SIZE);
@@ -142,7 +142,7 @@ public abstract class IAudioSampler {
 	 * 音声データのサンプリングを停止して全てのコールバックを削除する
 	 */
 	public void release() {
-		if (DEBUG) Log.v(TAG, "release:mIsCapturing=" + mIsCapturing);
+		if (DEBUG) Log.v(TAG, "release:isStarted=" + isStarted());
 		if (isStarted()) {
 			stop();
 		}
@@ -209,12 +209,24 @@ public abstract class IAudioSampler {
 		}
 	}
 
+	protected void setIsCapturing(final boolean isCapturing) {
+		mIsCapturing = isCapturing;
+	}
+
 	/**
 	 * 音声データのサンプリング中かどうかを返す
 	 * @return
 	 */
 	public boolean isStarted() {
 		return mIsCapturing;
+	}
+
+	/**
+	 * コールバックが登録されているかどうか
+	 * @return
+	 */
+	public boolean hasCallback() {
+		return !mCallbacks.isEmpty();
 	}
 
 	/**

@@ -150,7 +150,7 @@ public class AudioSampler extends IAudioSampler {
 	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
 	@Override
 	public synchronized void start() {
-//		if (DEBUG) Log.v(TAG, "start:mIsCapturing=" + mIsCapturing);
+		if (DEBUG) Log.v(TAG, "start:isStarted=" + isStarted());
 		super.start();
 		synchronized (mSync) {
 			if (mAudioThread == null) {
@@ -167,9 +167,9 @@ public class AudioSampler extends IAudioSampler {
 	 */
 	@Override
 	public synchronized void stop() {
-//		if (DEBUG) Log.v(TAG, "stop:mIsCapturing=" + mIsCapturing);
+		if (DEBUG) Log.v(TAG, "stop:isStarted=" + isStarted());
+		setIsCapturing(false);
 		synchronized (mSync) {
-			mIsCapturing = false;
 			mAudioThread = null;
 			mSync.notify();
 		}
@@ -208,7 +208,7 @@ public class AudioSampler extends IAudioSampler {
 			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
 */
 			int retry = 3;
-RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
+RETRY_LOOP:	for ( ; isStarted() && (retry > 0) ; ) {
 				@AudioRecordCompat.AudioChannel
 				final int audioChannel = AudioRecordCompat.getAudioChannel(CHANNEL_COUNT);
 				AudioRecord audioRecord;
@@ -227,14 +227,14 @@ RETRY_LOOP:	for ( ; mIsCapturing && (retry > 0) ; ) {
 				int err_count = 0;
 				if (audioRecord != null) {
 					try {
-						if (mIsCapturing) {
+						if (isStarted()) {
 //		        			if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
 							int readBytes;
 							ByteBuffer buffer;
 							audioRecord.startRecording();
 							try {
 								RecycleMediaData data;
-LOOP:							for ( ; mIsCapturing ;) {
+LOOP:							for ( ; isStarted() ;) {
 									data = obtain();
 									if (data != null) {
 										// check recording state
@@ -326,9 +326,9 @@ LOOP:							for ( ; mIsCapturing ;) {
 					} finally {
 						audioRecord.release();
 					}
-					if (mIsCapturing && (err_count > 0) && (retry > 0)) {
+					if (isStarted() && (err_count > 0) && (retry > 0)) {
 						// キャプチャリング中でエラーからのリカバリー処理が必要なときは0.5秒待機
-						for (int i = 0; mIsCapturing && (i < 5); i++) {
+						for (int i = 0; isStarted() && (i < 5); i++) {
 							synchronized (mSync) {
 								try {
 									mSync.wait(100);
