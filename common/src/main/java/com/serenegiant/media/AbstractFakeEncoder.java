@@ -70,7 +70,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * エンコード実行中フラグ
 	 */
-	private volatile boolean mIsCapturing;
+	private volatile boolean mIsEncoding;
 	/**
 	 * 終了要求フラグ(新規エンコード禁止フラグ)
 	 */
@@ -261,7 +261,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		final int offset, final int size,
 		final long presentationTimeUs, final int flags) throws IllegalStateException {
 		
-		if (!mIsCapturing) {
+		if (!mIsEncoding) {
 			throw new IllegalStateException();
 		}
 		if (mRequestStop) return false;
@@ -271,8 +271,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	}
 	
 	@Override
-	public boolean isCapturing() {
-		return mIsCapturing;
+	public boolean isEncoding() {
+		return mIsEncoding;
 	}
 	
 	/**
@@ -284,7 +284,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 //		if (DEBUG) Log.v(TAG, "prepare:");
 		mTrackIndex = -1;
 		mRecorderStarted = false;
-		mIsCapturing = mWaitingKeyFrame = true;
+		mIsEncoding = mWaitingKeyFrame = true;
 		mRequestStop = mIsEOS = false;
 		callOnStartEncode(null, -1, false);
 	}
@@ -296,7 +296,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	public void start() {
 //		if (DEBUG) Log.v(TAG, "start:");
 		synchronized (mSync) {
-			if (mIsCapturing && !mRequestStop) {
+			if (mIsEncoding && !mRequestStop) {
 				initPool();
 				// フレーム処理スレッドを生成＆起床
 				mDrainThread = new Thread(mDrainTask, getClass().getSimpleName());
@@ -339,7 +339,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	public void frameAvailableSoon() {
 //		if (DEBUG) Log.v(TAG, "frameAvailableSoon:");
 		synchronized (mSync) {
-			if (!mIsCapturing || mRequestStop) {
+			if (!mIsEncoding || mRequestStop) {
 				return;
 			}
 			mSync.notifyAll();
@@ -439,11 +439,11 @@ public abstract class AbstractFakeEncoder implements Encoder {
 				mRequestStop = false;
 				mSync.notify();
 			}
-			for ( ; mIsCapturing ; ) {
+			for (; mIsEncoding; ) {
 				final RecycleMediaData frame = waitFrame(MAX_WAIT_FRAME_MS);
 				if (frame != null) {
 					try {
-						if (mIsCapturing) {
+						if (mIsEncoding) {
 							handleFrame(frame);
 						}
 					} finally {
@@ -453,7 +453,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			} // end of while
 			synchronized (mSync) {
 				mRequestStop = true;
-				mIsCapturing = false;
+				mIsEncoding = false;
 			}
 			mDrainThread = null;
 //			if (DEBUG) Log.v(TAG, "mDrainTask:finished");
@@ -574,8 +574,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	private void internalRelease() {
 //		if (DEBUG) Log.d(TAG, "internalRelease:");
 		mIsEOS = true;
-		if (mIsCapturing) {
-			mIsCapturing = false;
+		if (mIsEncoding) {
+			mIsEncoding = false;
 			try {
 				mListener.onStopEncode(this);
 			} catch (final Exception e) {

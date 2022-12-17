@@ -28,6 +28,7 @@ import com.serenegiant.system.Time;
 
 import java.nio.ByteBuffer;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -58,7 +59,7 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * エンコード実行中フラグ
      */
-    protected volatile boolean mIsCapturing;
+    protected volatile boolean mIsEncoding;
     /**
      * 終了要求フラグ(新規エンコード禁止フラグ)
      */
@@ -173,7 +174,7 @@ public abstract class AbstractEncoder implements Encoder {
 	public  void start() {
 //    	if (DEBUG) Log.v(TAG, "start");
 		synchronized (mSync) {
-			mIsCapturing = true;
+			mIsEncoding = true;
 			mRequestStop = false;
 		}
 	}
@@ -205,7 +206,7 @@ public abstract class AbstractEncoder implements Encoder {
 	public void frameAvailableSoon() {
 //    	if (DEBUG) Log.v(TAG, "AbstractEncoder#frameAvailableSoon");
         synchronized (mSync) {
-            if (!mIsCapturing || mRequestStop) {
+            if (!mIsEncoding || mRequestStop) {
                 return;
             }
 			if (mReaper != null) {
@@ -225,7 +226,7 @@ public abstract class AbstractEncoder implements Encoder {
 			@NonNull final MediaCodec.BufferInfo bufferInfo) {
 
 //			if (DEBUG) Log.v(TAG, "writeSampleData:");
-			if (mIsCapturing && !mRequestStop && (mRecorder != null)) {
+			if (mIsEncoding && !mRequestStop && (mRecorder != null)) {
 				mRecorder.writeSampleData(mTrackIndex, byteBuf, bufferInfo);
 			}
 		}
@@ -236,7 +237,7 @@ public abstract class AbstractEncoder implements Encoder {
 			@NonNull final MediaFormat format) {
 
 			if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
-			if (mIsCapturing && !mRequestStop && (mRecorder != null)) {
+			if (mIsEncoding && !mRequestStop && (mRecorder != null)) {
 				startRecorder(mRecorder, format);
 			}
 		}
@@ -257,18 +258,19 @@ public abstract class AbstractEncoder implements Encoder {
 	/**
 	 * 子クラスでOverrideした時でもEncoder#releaseを呼び出すこと
 	 */
+	@CallSuper
 	@Override
 	public  void release() {
 		if (DEBUG) Log.d(TAG, "release:");
 		mRecorder = null;
-		if (mIsCapturing) {
+		if (mIsEncoding) {
 			try {
 				mListener.onStopEncode(this);
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, "release: failed onStopped", e);
 			}
 		}
-		mIsCapturing = false;
+		mIsEncoding = false;
         if (mMediaCodec != null) {
 			try {
 				if (DEBUG) Log.v(TAG, "release: call MediaCodec#stop");
@@ -312,9 +314,9 @@ public abstract class AbstractEncoder implements Encoder {
 	}
 
 	@Override
-	public boolean isCapturing() {
+	public boolean isEncoding() {
         synchronized (mSync) {
-            return mIsCapturing;
+            return mIsEncoding;
         }
 	}
 
@@ -327,11 +329,11 @@ public abstract class AbstractEncoder implements Encoder {
 	@Override
 	public  void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
 		synchronized (mSync) {
-			if (!mIsCapturing || mRequestStop) return;
+			if (!mIsEncoding || mRequestStop) return;
 			if (mMediaCodec == null) return;
 		}
 		final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
-        while (mIsCapturing) {
+        while (mIsEncoding) {
 	        final int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);
 	        if (inputBufferIndex >= 0) {
 	            final ByteBuffer inputBuffer = inputBuffers[inputBufferIndex];
@@ -399,7 +401,7 @@ public abstract class AbstractEncoder implements Encoder {
 	}
 
 	protected void stopRecorder(final IRecorder recorder) {
-   		mIsCapturing = false;
+   		mIsEncoding = false;
 	}
 
 	/**

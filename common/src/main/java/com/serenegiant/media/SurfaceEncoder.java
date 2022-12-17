@@ -58,7 +58,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
         mTrackIndex = -1;
 //        mRecorderStarted = false;
-        mIsCapturing = true;
+        mIsEncoding = true;
 //        mIsEOS = false;
 
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);

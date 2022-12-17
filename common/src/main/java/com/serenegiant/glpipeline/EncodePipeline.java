@@ -357,7 +357,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 		if (DEBUG) Log.v(TAG, "internalPrepare:");
         mTrackIndex = -1;
-        mIsCapturing = true;
+        mIsEncoding = true;
 
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
         if (codecInfo == null) {

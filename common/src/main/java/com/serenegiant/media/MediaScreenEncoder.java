@@ -61,7 +61,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 		if (DEBUG) Log.v(TAG, "internalPrepare:");
 		mTrackIndex = -1;
-		mIsCapturing = true;
+		mIsEncoding = true;
 
 		final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MIME);
 		if (codecInfo == null) {
@@ -220,7 +220,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //				if (DEBUG) Log.v(TAG, "DrawTask#onFrameAvailable:mIsRecording=" + mIsRecording);
-				if (mIsCapturing) {
+				if (mIsEncoding) {
 					synchronized (mSync) {
 						requestDraw = true;
 						mSync.notify();
@@ -246,7 +246,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 						}
 					}
 				}
-				if (mIsCapturing && !mRequestStop) {
+				if (mIsEncoding && !mRequestStop) {
 					if (localRequestDraw) {
 						mSourceTexture.updateTexImage();
 						mSourceTexture.getTransformMatrix(mTexMatrix);

@@ -28,7 +28,7 @@ public interface Encoder {
 	public void signalEndOfInputStream();
 	public void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
 	public void frameAvailableSoon();
-	public boolean isCapturing();
+	public boolean isEncoding();
 	@Deprecated
 	public String getOutputPath();
 	@Deprecated
