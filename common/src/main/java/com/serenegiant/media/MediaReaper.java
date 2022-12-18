@@ -429,7 +429,7 @@ LOOP:	while (mIsRunning) {
                     try {
 	                   	mBufferInfo.presentationTimeUs
 	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-	                   	mListener.writeSampleData(MediaReaper.this, encodedData, mBufferInfo);
+						callOnWriteSampleData(encodedData, mBufferInfo);
                     } catch (final TimeoutException e) {
 //						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
 						callOnError(e);
@@ -516,7 +516,7 @@ LOOP:	while (mIsRunning) {
                     try {
 	                   	mBufferInfo.presentationTimeUs
 	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-	                   	mListener.writeSampleData(MediaReaper.this, encodedData, mBufferInfo);
+						callOnWriteSampleData(encodedData, mBufferInfo);
                     } catch (final TimeoutException e) {
 //						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
 						callOnError(e);
@@ -580,6 +580,13 @@ LOOP:	while (mIsRunning) {
 			callOnError(e);
 		}
 		return true;
+	}
+
+	@WorkerThread
+	private void callOnWriteSampleData(
+		@NonNull final ByteBuffer buffer,
+		@NonNull final MediaCodec.BufferInfo info) {
+		mListener.writeSampleData(MediaReaper.this, buffer, info);
 	}
 
 	@WorkerThread
