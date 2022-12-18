@@ -139,7 +139,7 @@ public class MediaAVTimelapseRecorder extends Recorder {
 	@SuppressWarnings("deprecation")
 	@Override
 	public synchronized void addEncoder(final Encoder encoder) throws UnsupportedOperationException {
-		if ((encoder instanceof IAudioEncoder) || (encoder.isAudio())) {
+		if (encoder instanceof IAudioEncoder) {
 			throw new UnsupportedOperationException("MediaAVTimelapseRecorder only support video encoder!");
 		}
 		super.addEncoder(encoder);

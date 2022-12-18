@@ -118,9 +118,4 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 		return false;
 	}
 
-	@Override
-	public final boolean isAudio() {
-		return true;
-	}
-
 }

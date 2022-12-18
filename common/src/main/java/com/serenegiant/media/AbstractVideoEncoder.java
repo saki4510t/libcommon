@@ -83,11 +83,6 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
     	return mHeight;
     }
 
-	@Override
-	public final boolean isAudio() {
-		return false;
-	}
-
     public static boolean supportsAdaptiveStreaming = BuildCheck.isKitKat();
 
     @TargetApi(Build.VERSION_CODES.KITKAT)

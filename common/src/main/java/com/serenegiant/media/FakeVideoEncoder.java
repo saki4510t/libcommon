@@ -125,13 +125,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		
 		super(mime_type, recorder, listener, defaultFrameSz, maxPoolSz, maxQueueSz);
 	}
-	
-	@Deprecated
-	@Override
-	public boolean isAudio() {
-		return false;
-	}
-	
+
 	/**
 	 * Muxer初期化用のMediaFormatを生成する
 	 * @param csd

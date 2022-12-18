@@ -111,17 +111,6 @@ public abstract class AbstractEncoder implements Encoder {
 		return mRecorder.getConfig();
 	}
 
-    /**
-     * 出力ファイルのパスを返す
-     * @return
-     */
-	@SuppressWarnings("deprecation")
-    @Deprecated
-    @Override
-	public String getOutputPath() {
-    	return mRecorder != null ? mRecorder.getOutputPath() : null;
-    }
-
 	public int getCaptureFormat() {
 		return -1;
 	}
@@ -146,7 +135,7 @@ public abstract class AbstractEncoder implements Encoder {
 			if (mListener instanceof EncoderListener2) {
 				((EncoderListener2)mListener).onStartEncode(this, surface, mayFail);
 			} else {
-			mListener.onStartEncode(this, surface, getCaptureFormat(), mayFail);
+				mListener.onStartEncode(this, surface, getCaptureFormat(), mayFail);
 			}
 		} catch (final Exception e) {
 			Log.w(TAG, e);

@@ -194,17 +194,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	}
 	
 	/**
-	 * 出力ファイルのパスを返す
-	 * @return
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	@Override
-	public String getOutputPath() {
-		return mRecorder != null ? mRecorder.getOutputPath() : null;
-	}
-
-	/**
 	 * 子クラスでOverrideした時でもEncoder#releaseを呼び出すこと
 	 */
 	@Override
@@ -366,7 +355,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 			if (mListener instanceof EncoderListener2) {
 				((EncoderListener2)mListener).onStartEncode(this, source, mayFail);
 			} else {
-			mListener.onStartEncode(this, source, captureFormat, mayFail);
+				mListener.onStartEncode(this, source, captureFormat, mayFail);
 			}
 		} catch (final Exception e) {
 			Log.w(TAG, e);
