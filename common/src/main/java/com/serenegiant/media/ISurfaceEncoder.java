@@ -20,10 +20,13 @@ package com.serenegiant.media;
 
 import android.view.Surface;
 
+import androidx.annotation.Nullable;
+
 /**
  * 単にSurfaceを使って映像をエンコードすることをマークするだけ...
  * と思ったけど、メソッドも移動した
  */
 public interface ISurfaceEncoder extends IVideoEncoder {
+	@Nullable
 	public Surface getInputSurface();
 }
