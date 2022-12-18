@@ -360,18 +360,13 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param source
 	 * @param captureFormat
 	 */
-	@SuppressWarnings("deprecation")
 	protected void callOnStartEncode(
 		@Nullable final Surface source,
 		final int captureFormat, final boolean mayFail) {
 		
 //		if (DEBUG) Log.v(TAG, "callOnStartEncode:mListener=" + mListener);
 		try {
-			if (mListener instanceof EncoderListener2) {
-				((EncoderListener2)mListener).onStartEncode(this, source, mayFail);
-			} else {
-				mListener.onStartEncode(this, source, captureFormat, mayFail);
-			}
+			mListener.onStartEncode(this, source, mayFail);
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}
