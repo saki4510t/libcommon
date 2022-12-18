@@ -44,10 +44,12 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param listener
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener) {
 		
-		super(MIME_AVC, recorder, listener);
+		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 	
 	/**
@@ -58,10 +60,77 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param frameSz
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener, final int frameSz) {
 		
-		super(MIME_AVC, recorder, listener, frameSz);
+		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
+	public FakeVideoEncoder(final String mimeType,
+		final IRecorder recorder, final EncoderListener listener) {
+
+		this(mimeType, recorder, EncoderListener2.wrap(listener),
+			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz
+	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
+	public FakeVideoEncoder(final String mimeType,
+		final IRecorder recorder, final EncoderListener listener,
+		final int defaultFrameSz) {
+
+		this(mimeType, recorder, EncoderListener2.wrap(listener),
+			defaultFrameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 * @param defaultFrameSz
+	 * @param maxPoolSz
+	 * @param maxQueueSz
+	 */
+	@SuppressWarnings("deprecation")
+	@Deprecated
+	public FakeVideoEncoder(final String mimeType,
+		final IRecorder recorder, final EncoderListener listener,
+		final int defaultFrameSz, final int maxPoolSz, final int maxQueueSz) {
+
+		this(mimeType, recorder, EncoderListener2.wrap(listener),
+			defaultFrameSz, maxPoolSz, maxQueueSz);
+	}
+
+	/**
+	 * コンストラクタ
+	 * H.264/AVC用
+	 * @param recorder
+	 * @param listener
+	 * @param frameSz
+	 */
+	public FakeVideoEncoder(final IRecorder recorder,
+		final EncoderListener2 listener, final int frameSz) {
+
+		this(MIME_AVC, recorder, listener,
+			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
 	/**
@@ -73,57 +142,28 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param maxPoolSz
 	 * @param maxQueueSz
 	 */
-	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final IRecorder recorder,
-		final EncoderListener listener, final int frameSz,
+		final EncoderListener2 listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
 		
-		super(MIME_AVC, recorder, listener, frameSz, maxPoolSz, maxQueueSz);
-	}
-	
-	/**
-	 * コンストラクタ
-	 * @param mime_type
-	 * @param recorder
-	 * @param listener
-	 */
-	@SuppressWarnings("deprecation")
-	public FakeVideoEncoder(final String mime_type,
-		final IRecorder recorder, final EncoderListener listener) {
-		
-		super(mime_type, recorder, listener);
-	}
-	
-	/**
-	 * コンストラクタ
-	 * @param mime_type
-	 * @param recorder
-	 * @param listener
-	 * @param defaultFrameSz
-	 */
-	@SuppressWarnings("deprecation")
-	public FakeVideoEncoder(final String mime_type,
-		final IRecorder recorder, final EncoderListener listener,
-		final int defaultFrameSz) {
-		
-		super(mime_type, recorder, listener, defaultFrameSz);
+		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
 	/**
 	 * コンストラクタ
-	 * @param mime_type
+	 * @param mimeType
 	 * @param recorder
 	 * @param listener
 	 * @param defaultFrameSz
 	 * @param maxPoolSz
 	 * @param maxQueueSz
 	 */
-	@SuppressWarnings("deprecation")
-	public FakeVideoEncoder(final String mime_type,
-		final IRecorder recorder, final EncoderListener listener,
+	public FakeVideoEncoder(final String mimeType,
+		final IRecorder recorder, final EncoderListener2 listener,
 		final int defaultFrameSz, final int maxPoolSz, final int maxQueueSz) {
 		
-		super(mime_type, recorder, listener, defaultFrameSz, maxPoolSz, maxQueueSz);
+		super(mimeType, recorder, listener, defaultFrameSz, maxPoolSz, maxQueueSz);
 	}
 
 	/**

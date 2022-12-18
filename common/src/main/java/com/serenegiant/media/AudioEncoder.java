@@ -46,12 +46,31 @@ public class AudioEncoder extends AbstractAudioEncoder {
 	 * @param audioChannels
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
 		final int audioSource, final int audioChannels) {
 
-		super(recorder, listener, audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		this(recorder, EncoderListener2.wrap(listener),
+			audioSource, audioChannels);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audioSource
+	 * @param audioChannels
+	 */
+	public AudioEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener,
+		final int audioSource, final int audioChannels) {
+
+		super(recorder, listener,
+			audioSource, audioChannels,
+			AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (audioSource < MediaRecorder.AudioSource.DEFAULT
 			|| audioSource > MediaRecorder.AudioSource.VOICE_COMMUNICATION)

@@ -34,6 +34,7 @@ import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.AbstractVideoEncoder;
 import com.serenegiant.media.EncoderListener;
+import com.serenegiant.media.EncoderListener2;
 import com.serenegiant.media.IRecorder;
 import com.serenegiant.media.MediaCodecUtils;
 import com.serenegiant.media.MediaReaper;
@@ -74,10 +75,25 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	 * @param listener
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public EncodePipeline(
 		@NonNull final GLManager manager,
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener) {
+
+		this(manager, recorder, EncoderListener2.wrap(listener));
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param manager
+	 * @param recorder
+	 * @param listener
+	 */
+	public EncodePipeline(
+		@NonNull final GLManager manager,
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener) {
 
 		super(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener);
 		mManager = manager;

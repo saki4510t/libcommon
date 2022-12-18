@@ -53,15 +53,16 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * フレームプールの最大数
 	 */
-	private static final int DEFAULT_MAX_POOL_SZ = 8;
+	static final int DEFAULT_MAX_POOL_SZ = 8;
 	/**
 	 * フレームキューの最大数
 	 */
-	private static final int DEFAULT_MAX_QUEUE_SZ = 6;
+	static final int DEFAULT_MAX_QUEUE_SZ = 6;
 	/**
 	 * デフォルトのフレームサイズ
 	 */
-	private static final int DEFAULT_FRAME_SZ = 1024;
+	static final int DEFAULT_FRAME_SZ = 1024;
+
 	/**
 	 * フレームの待ち時間
 	 */
@@ -102,8 +103,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * エンコーダーイベントコールバックリスナー
 	 */
-	@SuppressWarnings("deprecation")
-	private final EncoderListener mListener;
+	private final EncoderListener2 mListener;
 	/**
 	 * MIME
 	 */
@@ -131,11 +131,12 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param listener
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener) {
 		
-		this(mimeType, recorder, listener, DEFAULT_FRAME_SZ,
-			DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+		this(mimeType, recorder, EncoderListener2.wrap(listener),
+			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 	
 	/**
@@ -146,11 +147,12 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param frameSz
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener, final int frameSz) {
-		
-		this(mimeType, recorder, listener, frameSz,
-			DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
+
+		this(mimeType, recorder, EncoderListener2.wrap(listener),
+			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 	
 	/**
@@ -161,16 +163,31 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param frameSz デフォルトで確保するフレームデータのサイズ
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
-		
+
+		this(mimeType, recorder, EncoderListener2.wrap(listener), frameSz, maxPoolSz, maxQueueSz);
+	}
+
+	/**
+	 * コンストラクタ
+ 	 * @param mimeType
+	 * @param recorder
+	 * @param listener
+	 * @param frameSz デフォルトで確保するフレームデータのサイズ
+	 */
+	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener, final int frameSz,
+		final int maxPoolSz, final int maxQueueSz) {
+
 		MIME_TYPE = mimeType;
 		FRAME_SZ = frameSz;
 		mRecorder = recorder;
 		mListener = listener;
 		mFrameQueue = new MemMediaQueue(Math.min(maxPoolSz, 2), maxPoolSz, maxQueueSz);
-		
+
 		recorder.addEncoder(this);
 	}
 

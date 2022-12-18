@@ -43,10 +43,19 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
     protected int mIFrameIntervals = -1;
 
 	@SuppressWarnings("deprecation")
+	@Deprecated
     public AbstractVideoEncoder(
     	@NonNull final String mime,
     	@NonNull final IRecorder recorder,
     	@NonNull final EncoderListener listener) {
+
+		super(mime, recorder, EncoderListener2.wrap(listener));
+    }
+
+    public AbstractVideoEncoder(
+    	@NonNull final String mime,
+    	@NonNull final IRecorder recorder,
+    	@NonNull final EncoderListener2 listener) {
 
 		super(mime, recorder, listener);
     }

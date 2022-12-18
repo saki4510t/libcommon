@@ -52,14 +52,15 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * @param audioSource
 	 * @param audioChannels
 	 */
-	@Deprecated
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
 		final int audioSource, final int audioChannels) {
 
-		this(recorder, listener, audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		this(recorder, EncoderListener2.wrap(listener),
+			audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 	}
 
 	/**
@@ -72,9 +73,27 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * @param bitRate
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
+		final int audioSource, final int audioChannels, final int sampleRate, final int bitRate) {
+
+		this(recorder, EncoderListener2.wrap(listener), audioSource, audioChannels, sampleRate, bitRate);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param audioSource
+	 * @param audioChannels
+	 * @param sampleRate
+	 * @param bitRate
+	 */
+	public AbstractAudioEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener,
 		final int audioSource, final int audioChannels, final int sampleRate, final int bitRate) {
 
 		super(MediaCodecUtils.MIME_AUDIO_AAC, recorder, listener);

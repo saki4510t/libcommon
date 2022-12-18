@@ -45,9 +45,24 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	 * @param sampler
 	 */
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AudioSamplerEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
+		@Nullable IAudioSampler sampler) {
+
+		this(recorder, EncoderListener2.wrap(listener), sampler);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param recorder
+	 * @param listener
+	 * @param sampler
+	 */
+	public AudioSamplerEncoder(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener,
 		@Nullable IAudioSampler sampler) {
 
 		super(recorder, listener, sampler.getAudioSource(),

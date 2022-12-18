@@ -50,12 +50,23 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	private final MemMediaQueue mAudioQueue;
 
 	@SuppressWarnings("deprecation")
+	@Deprecated
 	public AudioEncoderBuffered(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
 		final int audioSource, final int audioChannels) {
 
-		super(recorder, listener, audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		this(recorder, EncoderListener2.wrap(listener),
+			audioSource, audioChannels);
+	}
+
+	public AudioEncoderBuffered(
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener,
+		final int audioSource, final int audioChannels) {
+
+		super(recorder, listener,
+			audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (audioSource < MediaRecorder.AudioSource.DEFAULT
 			|| audioSource > MediaRecorder.AudioSource.VOICE_COMMUNICATION)

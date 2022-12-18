@@ -45,7 +45,6 @@ import com.serenegiant.libcommon.R;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.AudioSamplerEncoder;
 import com.serenegiant.media.Encoder;
-import com.serenegiant.media.EncoderListener;
 import com.serenegiant.media.EncoderListener2;
 import com.serenegiant.media.IAudioSampler;
 import com.serenegiant.media.IRecorder;

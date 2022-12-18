@@ -49,9 +49,8 @@ public abstract class AbstractEncoder implements Encoder {
 	/**
 	 * エンコーダーイベントコールバックリスナー
 	 */
-	@SuppressWarnings("deprecation")
 	@NonNull
-	private final EncoderListener mListener;
+	private final EncoderListener2 mListener;
 	/**
 	 * MIME
 	 */
@@ -85,13 +84,21 @@ public abstract class AbstractEncoder implements Encoder {
 
 //********************************************************************************
 	@SuppressWarnings("deprecation")
-    public AbstractEncoder(@NonNull final String mime_type,
+	@Deprecated
+    public AbstractEncoder(@NonNull final String mimeType,
     	@NonNull final IRecorder recorder,
     	@NonNull final EncoderListener listener) {
 
+		this(mimeType, recorder, EncoderListener2.wrap(listener));
+    }
+
+    public AbstractEncoder(@NonNull final String mimeType,
+    	@NonNull final IRecorder recorder,
+    	@NonNull final EncoderListener2 listener) {
+
     	if (listener == null) throw new NullPointerException("EncodeListener is null");
     	if (recorder == null) throw new NullPointerException("recorder is null");
-    	MIME_TYPE = mime_type;
+    	MIME_TYPE = mimeType;
     	mRecorder = recorder;
     	mListener = listener;
 		recorder.addEncoder(this);
