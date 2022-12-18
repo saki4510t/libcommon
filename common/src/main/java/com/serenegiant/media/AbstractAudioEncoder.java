@@ -91,12 +91,11 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
         mTrackIndex = -1;
 
 // 音声を取り込んでAACにエンコードするためのMediaCodecの準備
-        final MediaCodecInfo audioCodecInfo = MediaCodecUtils.selectAudioEncoder(MIME_TYPE);
-        if (audioCodecInfo == null) {
-//			Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
-            return true;
+        final MediaCodecInfo codecInfo = MediaCodecUtils.selectAudioEncoder(MIME_TYPE);
+        if (codecInfo == null) {
+			throw new IllegalArgumentException("Unable to find an appropriate codec for " + MIME_TYPE);
         }
-//		if (DEBUG) Log.i(TAG, "selected codec: " + audioCodecInfo.getName());
+//		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 
         final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
 		audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);

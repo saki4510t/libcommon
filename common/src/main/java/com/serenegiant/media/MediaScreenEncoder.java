@@ -66,8 +66,10 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 
 		final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MIME);
 		if (codecInfo == null) {
-			Log.e(TAG, "Unable to find an appropriate codec for " + MIME);
-			return true;
+			throw new IllegalArgumentException("Unable to find an appropriate codec for " + MIME);
+		}
+		if ((mWidth < MIN_WIDTH) || (mHeight < MIN_HEIGHT)) {
+			throw new IllegalArgumentException("Wrong video size(" + mWidth + "x" + mHeight + ")");
 		}
 		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 //		/*if (DEBUG) */dumpProfileLevel(VIDEO_MIME_TYPE, codecInfo);

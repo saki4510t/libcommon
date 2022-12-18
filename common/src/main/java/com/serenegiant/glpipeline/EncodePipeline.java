@@ -361,10 +361,12 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
         mIsEncoding = true;
 
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
-        if (codecInfo == null) {
-			if (DEBUG) Log.e(TAG, "Unable to find an appropriate codec for " + MIME_TYPE);
-            return true;
-        }
+		if (codecInfo == null) {
+			throw new IllegalArgumentException("Unable to find an appropriate codec for " + MediaCodecUtils.MIME_VIDEO_AVC);
+		}
+		if ((mWidth < MIN_WIDTH) || (mHeight < MIN_HEIGHT)) {
+			throw new IllegalArgumentException("Wrong video size(" + mWidth + "x" + mHeight + ")");
+		}
 		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 //		/*if (DEBUG) */dumpProfileLevel(VIDEO_MIME_TYPE, codecInfo);
         final boolean mayFail

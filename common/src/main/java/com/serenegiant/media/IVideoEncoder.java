@@ -23,6 +23,15 @@ package com.serenegiant.media;
  * 動画エンコーダーインターフェース
  */
 public interface IVideoEncoder extends Encoder {
+	/**
+	 * 映像サイズの最小値(幅)
+	 */
+	public static final int MIN_WIDTH = 160;
+	/**
+	 * 映像サイズの最小値(高さ)
+	 */
+	public static final int MIN_HEIGHT = 120;
+
 	public void setVideoSize(final int width, final int height)
 		throws IllegalArgumentException, IllegalStateException;
 	public int getWidth();
