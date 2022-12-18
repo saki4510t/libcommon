@@ -33,8 +33,6 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 //	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private static final String TAG = FakeVideoEncoder.class.getSimpleName();
 
-	public static final String MIME_AVC = "video/avc";
-	
 	protected int mWidth, mHeight;
 	
 	/**
@@ -48,7 +46,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener) {
 		
-		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
 			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 	
@@ -64,7 +62,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener, final int frameSz) {
 		
-		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
 			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
@@ -129,7 +127,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener2 listener, final int frameSz) {
 
-		this(MIME_AVC, recorder, listener,
+		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener,
 			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
@@ -146,7 +144,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		final EncoderListener2 listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
 		
-		this(MIME_AVC, recorder, EncoderListener2.wrap(listener),
+		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
 			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
