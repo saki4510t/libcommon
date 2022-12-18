@@ -46,7 +46,8 @@ public class AudioRecordCompat {
 	/**
 	 * デフォルトの音声フォーマット
 	 */
-	public static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
+	@AudioFormats
+	public static final int DEFAULT_AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
 	/**
 	 * デフォルトのサンプリングレート
 	 */
@@ -86,6 +87,7 @@ public class AudioRecordCompat {
 		AudioFormat.ENCODING_PCM_16BIT,
 		AudioFormat.ENCODING_PCM_8BIT,
 		AudioFormat.ENCODING_PCM_FLOAT,
+		AudioFormat.ENCODING_AAC_LC,
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface AudioFormats {}
@@ -161,6 +163,7 @@ public class AudioRecordCompat {
 		case AudioFormat.ENCODING_PCM_FLOAT:
 			return 4;
 		case AudioFormat.ENCODING_PCM_8BIT:
+		case AudioFormat.ENCODING_AAC_LC:
 		default:
 			return 1;
 		}

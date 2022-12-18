@@ -116,9 +116,9 @@ public class AudioSampler extends IAudioSampler {
 		SAMPLING_RATE = samplingRate;
 		SAMPLES_PER_FRAME = samplesPerFrame * channelNum;
 		BYTES_PER_FRAME = SAMPLES_PER_FRAME
-			* AudioRecordCompat.getBitResolution(AudioRecordCompat.AUDIO_FORMAT);
+			* AudioRecordCompat.getBitResolution(AudioRecordCompat.DEFAULT_AUDIO_FORMAT);
 		BUFFER_SIZE = AudioRecordCompat.getAudioBufferSize(
-			channelNum, AudioRecordCompat.AUDIO_FORMAT,
+			channelNum, AudioRecordCompat.DEFAULT_AUDIO_FORMAT,
 			samplingRate, samplesPerFrame, framesPerBuffer);
 		FORCE_SOURCE = forceSource;
 	}
@@ -141,6 +141,12 @@ public class AudioSampler extends IAudioSampler {
 	@Override
 	public int getBufferSize() {
 		return BYTES_PER_FRAME;
+	}
+
+	@AudioRecordCompat.AudioFormats
+	@Override
+	public int getAudioFormat() {
+		return AudioRecordCompat.DEFAULT_AUDIO_FORMAT;
 	}
 
 	/**
@@ -215,14 +221,14 @@ RETRY_LOOP:	for ( ; isStarted() && (retry > 0) ; ) {
 				if (FORCE_SOURCE) {
 					try {
 						audioRecord = AudioRecordCompat.newInstance(
-							AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.AUDIO_FORMAT, BUFFER_SIZE);
+							AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.DEFAULT_AUDIO_FORMAT, BUFFER_SIZE);
 					} catch (final Exception e) {
 						Log.d(TAG, "AudioThread:", e);
 						audioRecord = null;
 					}
 				} else {
 					audioRecord = AudioRecordCompat.createAudioRecord(
-						AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.AUDIO_FORMAT, BUFFER_SIZE);
+						AUDIO_SOURCE, SAMPLING_RATE, audioChannel, AudioRecordCompat.DEFAULT_AUDIO_FORMAT, BUFFER_SIZE);
 				}
 				int err_count = 0;
 				if (audioRecord != null) {

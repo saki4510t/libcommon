@@ -1421,7 +1421,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		encoder.start();
 
 		final int bufferSize = AudioRecordCompat.getAudioBufferSize(
-			channelCount, AudioRecordCompat.AUDIO_FORMAT,
+			channelCount, AudioRecordCompat.DEFAULT_AUDIO_FORMAT,
 			sampleRate, samplesPerFrame, framesPerBuffer);
 		if (DEBUG) Log.v(TAG, "testAudioMediaFormat:buffer size=" + bufferSize);
 		try {

@@ -248,6 +248,9 @@ public abstract class IAudioSampler {
 		return !mCallbacks.isEmpty();
 	}
 
+	@AudioRecordCompat.AudioFormats
+	public abstract int getAudioFormat();
+
 	/**
 	 * 音声入力ソースを返す
 	 * 100以上ならUAC
