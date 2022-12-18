@@ -55,16 +55,8 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
     }
 
 	@Override
-	public int getCaptureFormat() {
-		return 0; // AbstractUVCCamera.CAPTURE_RGB565;
-	}
-
-	@Override
-	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
+	protected Encoder internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
         mTrackIndex = -1;
-//        mRecorderStarted = false;
-        mIsEncoding = true;
-//        mIsEOS = false;
 
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
         if (codecInfo == null) {
@@ -96,12 +88,12 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
         // エンコーダーへの入力に使うSurfaceを取得する
-        mMediaCodec = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC);
-        mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        mInputSurface = mMediaCodec.createInputSurface();	// API >= 18
-        mMediaCodec.start();
-		mReaper = new MediaReaper.VideoReaper(mMediaCodec, listener, mWidth, mHeight);
-		return mayFail;
+        final MediaCodec mediaCodec = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC);
+		mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        mInputSurface = mediaCodec.createInputSurface();	// API >= 18
+		mediaCodec.start();
+		final MediaReaper reaper = new MediaReaper.VideoReaper(mediaCodec, listener, mWidth, mHeight);
+		return new Encoder(mediaCodec, reaper, mayFail);
 	}
 
     /**
@@ -113,14 +105,5 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
         super.release();
         mInputSurface = null;
     }
-
-    @Override
-	public void signalEndOfInputStream() {
-//		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + this);
-//		mIsEOS = true;
-        if (mMediaCodec != null) {
-        	mMediaCodec.signalEndOfInputStream();	// API >= 18
-		}
-	}
 
 }

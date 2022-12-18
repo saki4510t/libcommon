@@ -244,6 +244,7 @@ public abstract class Recorder implements IRecorder {
 		return mState <= STATE_INITIALIZED;
 	}
 
+	@Override
 	public boolean isReleased() {
 		return mReleased;
 	}

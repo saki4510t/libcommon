@@ -105,18 +105,18 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	}
 
 	@Override
-	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
+	protected Encoder internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 //		if (DEBUG) Log.v(TAG, "internalPrepare:");
         mTrackIndex = -1;
-
+		final String mimeType = getMimeType();
 // 音声を取り込んでAACにエンコードするためのMediaCodecの準備
-        final MediaCodecInfo codecInfo = MediaCodecUtils.selectAudioEncoder(MIME_TYPE);
+        final MediaCodecInfo codecInfo = MediaCodecUtils.selectAudioEncoder(mimeType);
         if (codecInfo == null) {
-			throw new IllegalArgumentException("Unable to find an appropriate codec for " + MIME_TYPE);
+			throw new IllegalArgumentException("Unable to find an appropriate codec for " + mimeType);
         }
 //		if (DEBUG) Log.i(TAG, "selected codec: " + codecInfo.getName());
 
-        final MediaFormat audioFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
+        final MediaFormat audioFormat = MediaFormat.createAudioFormat(mimeType, mSampleRate, mChannelCount);
 		audioFormat.setInteger(MediaFormat.KEY_AAC_PROFILE, MediaCodecInfo.CodecProfileLevel.AACObjectLC);
 		audioFormat.setInteger(MediaFormat.KEY_CHANNEL_MASK,
 			mChannelCount == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO);
@@ -126,12 +126,12 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 //      audioFormat.setLong(MediaFormat.KEY_DURATION, (long)durationInMs );
 //		if (DEBUG) Log.i(TAG, "format: " + audioFormat);
 
-		mMediaCodec = MediaCodec.createEncoderByType(MIME_TYPE);
-        mMediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        mMediaCodec.start();
-        mReaper = new MediaReaper.AudioReaper(mMediaCodec, listener, mSampleRate, mChannelCount);
+		final MediaCodec mediaCodec = MediaCodec.createEncoderByType(mimeType);
+		mediaCodec.configure(audioFormat, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+		mediaCodec.start();
+        final MediaReaper reaper = new MediaReaper.AudioReaper(mediaCodec, listener, mSampleRate, mChannelCount);
 //		if (DEBUG) Log.i(TAG, "internalPrepare:finished");
-		return false;
+		return new Encoder(mediaCodec, reaper, false);
 	}
 
 }

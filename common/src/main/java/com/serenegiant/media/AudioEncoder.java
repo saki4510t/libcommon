@@ -130,7 +130,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
             final ByteBuffer buf = ByteBuffer.allocateDirect(buffer_size).order(ByteOrder.nativeOrder());
             if (audioRecord != null) {
 	            try {
-	            	if (mIsEncoding) {
+	            	if (isEncoding()) {
 	//    				if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
 		                int readBytes;
 		                audioRecord.startRecording();
@@ -139,7 +139,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 		                		* mChannelCount
 		                		* AudioRecordCompat.getBitResolution(AudioRecordCompat.AUDIO_FORMAT);
 		                	for ( ; ;) {
-		                		if (!mIsEncoding || mRequestStop) break;
+		                		if (!isEncoding() || isRequestStop()) break;
 								// check recording state
 								final int recordingState = audioRecord.getRecordingState();
 								if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
@@ -220,7 +220,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
             if (frame_count == 0) {
             	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
             	// ダミーデータを書き込む
-            	for (int i = 0; mIsEncoding && (i < 5); i++) {
+            	for (int i = 0; isEncoding() && (i < 5); i++) {
 					buf.clear();
 	    			buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 	    			buf.flip();

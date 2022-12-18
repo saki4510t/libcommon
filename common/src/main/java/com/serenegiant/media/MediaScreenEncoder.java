@@ -76,10 +76,9 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	}
 
 	@Override
-	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
+	protected Encoder internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 		if (DEBUG) Log.v(TAG, "internalPrepare:");
 		mTrackIndex = -1;
-		mIsEncoding = true;
 
 		final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MIME);
 		if (codecInfo == null) {
@@ -105,13 +104,13 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 
 		// 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
 		// エンコーダーへの入力に使うSurfaceを取得する
-		mMediaCodec = MediaCodec.createEncoderByType(MIME);
-		mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-		mInputSurface = mMediaCodec.createInputSurface();    // API >= 18
-		mMediaCodec.start();
-		mReaper = new MediaReaper.VideoReaper(mMediaCodec, listener, mWidth, mHeight);
+		final MediaCodec mediaCodec = MediaCodec.createEncoderByType(MIME);
+		mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+		mInputSurface = mediaCodec.createInputSurface();    // API >= 18
+		mediaCodec.start();
+		final MediaReaper reaper = new MediaReaper.VideoReaper(mediaCodec, listener, mWidth, mHeight);
 		new Thread(mDrawTask, DrawTask.class.getSimpleName()).start();
-		return false;
+		return new Encoder(mediaCodec, reaper, false);
 	}
 
 	/**
@@ -135,14 +134,6 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		if (DEBUG) Log.d(TAG, "stop:");
 		mDrawTask.release();
 		super.stop();
-	}
-
-	@Override
-	public void signalEndOfInputStream() {
-		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + this);
-		if (mMediaCodec != null) {
-			mMediaCodec.signalEndOfInputStream();    // API >= 18
-		}
 	}
 
 	private volatile boolean requestDraw;
@@ -240,7 +231,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			@Override
 			public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //				if (DEBUG) Log.v(TAG, "DrawTask#onFrameAvailable:mIsRecording=" + mIsRecording);
-				if (mIsEncoding) {
+				if (isEncoding()) {
 					synchronized (mSync) {
 						requestDraw = true;
 						mSync.notify();
@@ -266,7 +257,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 						}
 					}
 				}
-				if (mIsEncoding && !mRequestStop) {
+				if (isEncoding() && !isRequestStop()) {
 					if (localRequestDraw) {
 						mSourceTexture.updateTexImage();
 						mSourceTexture.getTransformMatrix(mTexMatrix);
@@ -323,7 +314,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		@Override
 		public void onStopped() {
 			if (DEBUG) Log.v(TAG, "VirtualDisplay.Callback#onStopped:");
-			mRequestStop = true;
+			requestStop();
 		}
 	};
 }

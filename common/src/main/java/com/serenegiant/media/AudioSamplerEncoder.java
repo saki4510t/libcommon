@@ -96,7 +96,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs) {
     		synchronized (mSync) {
     			// 既に終了しているか終了指示が出てれば何もしない
-        		if (!mIsEncoding || mRequestStop) return;
+        		if (!isEncoding() || isRequestStop()) return;
     		}
 			if (buffer.remaining() > 0) {
 				// 音声データを受け取った時はエンコーダーへ書き込む
@@ -122,7 +122,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		public void run() {
 			for (; ;) {
         		synchronized (mSync) {
-            		if (!mIsEncoding || mRequestStop) break;
+            		if (!isEncoding() || isRequestStop()) break;
             		try {
 						mSync.wait();
 					} catch (final InterruptedException e) {
@@ -134,7 +134,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		    	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
 		    	// ダミーデータを書き込む
 		    	final ByteBuffer buf = ByteBuffer.allocateDirect(AudioRecordCompat.SAMPLES_PER_FRAME).order(ByteOrder.nativeOrder());
-		    	for (int i = 0; mIsEncoding && (i < 5); i++) {
+		    	for (int i = 0; isEncoding() && (i < 5); i++) {
 		    		buf.clear();
 					buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 					buf.flip();

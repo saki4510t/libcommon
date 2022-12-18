@@ -262,7 +262,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			// 次のGLPipelineへつなぐ
 			pipeline.onFrameAvailable(isOES, texId, texMatrix);
 		}
-		if (!mReleased && !mRequestStop) {
+		if (!mReleased && !isRequestStop()) {
 			if ((target != null)
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
@@ -357,25 +357,14 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 
 	/**
 	 * AbstractEncoderの実装
-	 * @return
-	 */
-	@Override
-	public int getCaptureFormat() {
-		return 0; // AbstractUVCCamera.CAPTURE_RGB565;
-	}
-
-	/**
-	 * AbstractEncoderの実装
 	 * @param listener
 	 * @return
 	 * @throws Exception
 	 */
 	@Override
-	protected boolean internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
+	protected Encoder internalPrepare(@NonNull final MediaReaper.ReaperListener listener) throws Exception {
 		if (DEBUG) Log.v(TAG, "internalPrepare:");
         mTrackIndex = -1;
-        mIsEncoding = true;
-
         final MediaCodecInfo codecInfo = MediaCodecUtils.selectVideoEncoder(MediaCodecUtils.MIME_VIDEO_AVC);
 		if (codecInfo == null) {
 			throw new IllegalArgumentException("Unable to find an appropriate codec for " + MediaCodecUtils.MIME_VIDEO_AVC);
@@ -403,21 +392,13 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 
         // 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
         // エンコーダーへの入力に使うSurfaceを取得する
-        mMediaCodec = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC);
-        mMediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
-        final Surface surface = mMediaCodec.createInputSurface();	// API >= 18
-        mMediaCodec.start();
-		mReaper = new MediaReaper.VideoReaper(mMediaCodec, listener, mWidth, mHeight);
+        final MediaCodec mediaCodec = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC);
+		mediaCodec.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE);
+        final Surface surface = mediaCodec.createInputSurface();	// API >= 18
+		mediaCodec.start();
+		final MediaReaper reaper = new MediaReaper.VideoReaper(mediaCodec, listener, mWidth, mHeight);
 		createTarget(surface, getConfig().getCaptureFps());
-		return mayFail;
-	}
-
-	@Override
-	public void signalEndOfInputStream() {
-		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=" + this);
-		if (mMediaCodec != null) {
-			mMediaCodec.signalEndOfInputStream();    // API >= 18
-		}
+		return new Encoder(mediaCodec, reaper, mayFail);
 	}
 
 }

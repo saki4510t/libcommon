@@ -125,6 +125,12 @@ public interface IRecorder {
 	 */
 	public boolean isStopped();
 
+	/**
+	 * #releaseが呼ばれたかどうか
+	 * @return
+	 */
+	public boolean isReleased();
+
 	public int getState();
 
 	public void setMuxer(final IMuxer muxer);

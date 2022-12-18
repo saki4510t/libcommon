@@ -18,14 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
-import android.media.MediaCodec;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
-
-import com.serenegiant.system.BuildCheck;
-
 import androidx.annotation.NonNull;
 
 /**
@@ -90,19 +82,6 @@ public abstract class AbstractVideoEncoder extends AbstractEncoder
 	@Override
     public int getHeight() {
     	return mHeight;
-    }
-
-    public static boolean supportsAdaptiveStreaming = BuildCheck.isKitKat();
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-	public void adjustBitrate(final int targetBitrate) {
-        if (supportsAdaptiveStreaming && mMediaCodec != null) {
-            final Bundle bitrate = new Bundle();
-            bitrate.putInt(MediaCodec.PARAMETER_KEY_VIDEO_BITRATE, targetBitrate);
-            mMediaCodec.setParameters(bitrate);
-        } else if (!supportsAdaptiveStreaming) {
-			Log.w(TAG, "adjustBitrate: Ignoring adjustVideoBitrate call. This functionality is only available on Android API 19+");
-        }
     }
 
 }
