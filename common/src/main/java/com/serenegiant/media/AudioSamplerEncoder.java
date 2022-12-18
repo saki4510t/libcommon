@@ -124,7 +124,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
         		synchronized (mSync) {
             		if (!isEncoding() || isRequestStop()) break;
             		try {
-						mSync.wait();
+						mSync.wait(300);
 					} catch (final InterruptedException e) {
 						break;
 					}
