@@ -103,8 +103,27 @@ public abstract class IAudioSampler {
 		 * @param buffer
 		 * @param size
 		 * @param presentationTimeUs
+		 * @deprecated サイズ指定のない#onDataを使うこと
 		 */
-		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs);
+		public default void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
+			if (size > 0) {
+				buffer.clear();
+				buffer.position(size);
+				buffer.flip();
+			}
+			onData(buffer, presentationTimeUs);
+		}
+
+		/**
+		 * 音声データが準備出来た時に呼び出される。
+		 * presentationTimeUsは音声データを取得した時の時刻だが、他のコールバックでの処理によっては
+		 * 遅延して呼び出される可能性がある。任意のスレッド上で実行される。
+		 * 可能な限り早く処理を終えること。
+		 * @param buffer
+		 * @param presentationTimeUs
+		 */
+		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs);
+
 		/**
 		 * エラーが起こった時の処理(今は未使用)
 		 * @param e
@@ -280,7 +299,7 @@ public abstract class IAudioSampler {
 				buf.clear();
 				buf.position(size);
 				buf.flip();
-				callback.onData(buf, size, pts);
+				callback.onData(buf, pts);
 			} catch (final Exception e) {
 				mCallbacks.remove(callback);
 				Log.w(TAG, "callOnData:", e);

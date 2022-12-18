@@ -226,7 +226,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 				}
     			if (data != null) {
     				if (data.size() > 0) {
-    					encode(data.get(), data.size(), data.presentationTimeUs());
+    					encode(data.get(), data.presentationTimeUs());
     					frameAvailableSoon();
     					frame_count++;
     				}
@@ -238,9 +238,10 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 		    	// ダミーデータを書き込む
 		    	final ByteBuffer buf = ByteBuffer.allocateDirect(mBufferSize).order(ByteOrder.nativeOrder());
 		    	for (int i = 0; mIsEncoding && (i < 5); i++) {
+					buf.clear();
 					buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 					buf.flip();
-					encode(buf, AudioRecordCompat.SAMPLES_PER_FRAME, getInputPTSUs());
+					encode(buf, getInputPTSUs());
 					frameAvailableSoon();
 					synchronized (this) {
 						try {

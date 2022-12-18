@@ -93,12 +93,12 @@ public class SoundCheck {
 		private long prevSamplingUs;
 
 		@Override
-		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
+		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs) {
 			if (mBusy || (presentationTimeUs - prevSamplingUs < MIN_SOUND_CHECK_INTERVAL_US)) return;
 			mBusy = true;
 			synchronized (mSoundSync) {
 				prevSamplingUs = presentationTimeUs;
-				mSoundBufferSize = size / 2;
+				mSoundBufferSize = buffer.remaining() / 2;
 				final ShortBuffer buf = buffer.asShortBuffer();	// FIXME 16ビットPCMのみ対応
 				if (mSoundBuffer == null || (mSoundBuffer.length < mSoundBufferSize)) {
 					mSoundBuffer = new short[mSoundBufferSize];

@@ -40,8 +40,6 @@ import android.view.Surface;
 import com.serenegiant.libcommon.Const;
 import com.serenegiant.libcommon.MainActivity;
 import com.serenegiant.libcommon.R;
-import com.serenegiant.media.AbstractAudioEncoder;
-import com.serenegiant.media.AudioRecordCompat;
 import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.IAudioSampler;
 import com.serenegiant.media.IMuxer;
@@ -367,7 +365,7 @@ public class RecordingService extends BaseService {
 		if (mAudioSampler != null) {
 			throw new UnsupportedOperationException("audioSampler is already set");
 		}
-		encodeAudio(buffer, buffer.limit(), presentationTimeUs);
+		encodeAudio(buffer, presentationTimeUs);
 	}
 
 	/**
@@ -1093,8 +1091,8 @@ public class RecordingService extends BaseService {
 		= new AudioSampler.SoundSamplerCallback() {
 
 		@Override
-		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
-			encodeAudio(buffer, size, presentationTimeUs);
+		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs) {
+			encodeAudio(buffer, presentationTimeUs);
 		}
 
 		@Override
@@ -1107,11 +1105,10 @@ public class RecordingService extends BaseService {
 	 * 音声データをエンコード
 	 * 既に終了しているか終了指示が出てれば何もしない
 	 * @param buffer
-	 * @param size
 	 * @param presentationTimeUs
 	 */
 	private void encodeAudio(
-		@NonNull final ByteBuffer buffer, final int size,
+		@NonNull final ByteBuffer buffer,
 		final long presentationTimeUs) {
 
 		final MediaReaper.AudioReaper reaper;
@@ -1127,10 +1124,10 @@ public class RecordingService extends BaseService {
 				+ ",reaper=" + reaper + ",encoder=" + encoder);
 			return;
 		}
-		if (size > 0) {
+		if (buffer.remaining() > 0) {
 			// 音声データを受け取った時はエンコーダーへ書き込む
 			try {
-				encode(encoder, buffer, size, presentationTimeUs);
+				encode(encoder, buffer, presentationTimeUs);
 				reaper.frameAvailableSoon();
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
@@ -1144,15 +1141,15 @@ public class RecordingService extends BaseService {
 	/**
 	 * バイト配列をエンコードする場合
 	 * @param buffer
-	 * @param length　書き込むバイト配列の長さ。0ならBUFFER_FLAG_END_OF_STREAMフラグをセットする
 	 * @param presentationTimeUs [マイクロ秒]
 	 */
 	private void encode(@NonNull final MediaCodec encoder,
-		@Nullable final ByteBuffer buffer, final int length, final long presentationTimeUs) {
+		@Nullable final ByteBuffer buffer, final long presentationTimeUs) {
 
 		if (BuildCheck.isLollipop()) {
-			encodeV21(encoder, buffer, length, presentationTimeUs);
+			encodeV21(encoder, buffer, presentationTimeUs);
 		} else {
+			final int length = buffer != null ? buffer.remaining() : 0;
 			final ByteBuffer[] inputBuffers = encoder.getInputBuffers();
 			for ( ; isRecording() && !mIsEos ;) {
 				final int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
@@ -1185,13 +1182,13 @@ public class RecordingService extends BaseService {
 	/**
 	 * バイト配列をエンコードする場合(API21/Android5以降)
 	 * @param buffer
-	 * @param length　書き込むバイト配列の長さ。0ならBUFFER_FLAG_END_OF_STREAMフラグをセットする
 	 * @param presentationTimeUs [マイクロ秒]
 	 */
 	@SuppressLint("NewApi")
 	private void encodeV21(@NonNull final MediaCodec encoder,
-		@Nullable final ByteBuffer buffer, final int length, final long presentationTimeUs) {
+		@Nullable final ByteBuffer buffer, final long presentationTimeUs) {
 
+		final int length = buffer != null ? buffer.remaining() : 0;
 		for ( ; isRecording() && !mIsEos ;) {
 			final int inputBufferIndex = encoder.dequeueInputBuffer(TIMEOUT_USEC);
 			if (inputBufferIndex >= 0) {
@@ -1228,6 +1225,6 @@ public class RecordingService extends BaseService {
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
     	// ・・・らしいので空バッファを送る。encode内でBUFFER_FLAG_END_OF_STREAMを付けてセットする
-        encode(encoder, null, 0, getInputPTSUs());
+        encode(encoder, null, getInputPTSUs());
 	}
 }

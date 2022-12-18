@@ -231,15 +231,13 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * このクラスではサポートしていない。
 	 * 代わりに#queueFrameへエンコード済みのフレームを渡すこと
 	 * @param buffer
-	 * @param length
 	 * @param presentationTimeUs
 	 */
 	@Override
-	public void encode(final ByteBuffer buffer, final int length,
-		final long presentationTimeUs) {
+	public void encode(@Nullable final ByteBuffer buffer, final long presentationTimeUs) {
 		throw new UnsupportedOperationException("can not call encode");
 	}
-	
+
 	/**
 	 * フレームデータをキューに追加する
 	 * @param buffer

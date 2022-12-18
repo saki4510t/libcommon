@@ -21,12 +21,64 @@ package com.serenegiant.media;
 import java.nio.ByteBuffer;
 
 public interface Encoder {
+	/**
+	 * エンコーダーを準備
+	 * @throws Exception
+	 */
 	public void prepare()  throws Exception;
+
+	/**
+	 * エンコード開始
+	 */
 	public void start();;
+
+	/**
+	 * エンコード終了
+	 */
 	public void stop();
+
+	/**
+	 * エンコードを破棄
+	 */
 	public void release();
+
+	/**
+	 * エンコード終了指示
+	 */
 	public void signalEndOfInputStream();
-	public void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs);
+
+	/**
+	 * バイト配列をエンコードする場合
+	 * @param buffer
+	 * @param length
+	 * @param presentationTimeUs
+	 * @deprecated lengthを指定せずにByteBuffer#remaningを使う#encodeを使用すること
+	 */
+	@Deprecated
+	public default void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
+		if ((buffer != null) && (length > 0)) {
+			buffer.clear();
+			buffer.position(length);
+			buffer.flip();
+		}
+		encode(buffer, presentationTimeUs);
+	}
+
+	/**
+	 * バイト配列をエンコードする場合
+	 * @param buffer
+	 * @param presentationTimeUs [マイクロ秒]
+	 */
+	public void encode(final ByteBuffer buffer, final long presentationTimeUs);
+
+	/**
+	 * エンコーダーへデータが入力されたことを通知
+	 */
 	public void frameAvailableSoon();
+
+	/**
+	 * エンコード中かどうかを取得
+	 * @return
+	 */
 	public boolean isEncoding();
 }

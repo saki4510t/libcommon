@@ -306,7 +306,7 @@ public abstract class AbstractEncoder implements Encoder {
         // MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
         // 空のバッファをセットするのと等価である
     	// ・・・らしいので空バッファを送る。encode内でBUFFER_FLAG_END_OF_STREAMを付けてセットする
-        encode(null, 0, getInputPTSUs());
+        encode(null, getInputPTSUs());
 	}
 
 	@Override
@@ -319,15 +319,16 @@ public abstract class AbstractEncoder implements Encoder {
     /**
      * バイト配列をエンコードする場合
      * @param buffer
-     * @param length　書き込むバイト配列の長さ。0ならBUFFER_FLAG_END_OF_STREAMフラグをセットする
      * @param presentationTimeUs [マイクロ秒]
      */
 	@Override
-	public  void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
+	public  void encode(final ByteBuffer buffer, final long presentationTimeUs) {
 		synchronized (mSync) {
 			if (!mIsEncoding || mRequestStop) return;
 			if (mMediaCodec == null) return;
 		}
+
+		final int length = buffer != null ? buffer.remaining() : 0;
 		final ByteBuffer[] inputBuffers = mMediaCodec.getInputBuffers();
         while (mIsEncoding) {
 	        final int inputBufferIndex = mMediaCodec.dequeueInputBuffer(TIMEOUT_USEC);

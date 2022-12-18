@@ -150,7 +150,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 									// 内蔵マイクからの音声入力をエンコーダーにセット
 									buf.position(readBytes);
 									buf.flip();
-									encode(buf, readBytes, getInputPTSUs());
+									encode(buf, getInputPTSUs());
 									frameAvailableSoon();
 								} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
 									err_count = 0;
@@ -202,9 +202,10 @@ public class AudioEncoder extends AbstractAudioEncoder {
             	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
             	// ダミーデータを書き込む
             	for (int i = 0; mIsEncoding && (i < 5); i++) {
+					buf.clear();
 	    			buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 	    			buf.flip();
-					encode(buf, AudioRecordCompat.SAMPLES_PER_FRAME, getInputPTSUs());
+					encode(buf, getInputPTSUs());
 					frameAvailableSoon();
 					synchronized(this) {
 						try {

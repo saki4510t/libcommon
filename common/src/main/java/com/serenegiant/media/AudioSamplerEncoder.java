@@ -78,15 +78,15 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		= new AudioSampler.SoundSamplerCallback() {
 
 		@Override
-		public void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
+		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs) {
     		synchronized (mSync) {
     			// 既に終了しているか終了指示が出てれば何もしない
         		if (!mIsEncoding || mRequestStop) return;
     		}
-			if (size > 0) {
+			if (buffer.remaining() > 0) {
 				// 音声データを受け取った時はエンコーダーへ書き込む
 				frameAvailableSoon();
-				encode(buffer, size, presentationTimeUs);
+				encode(buffer, presentationTimeUs);
 				frame_count++;
 			}
 		}
@@ -123,7 +123,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		    		buf.clear();
 					buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
 					buf.flip();
-					encode(buf, AudioRecordCompat.SAMPLES_PER_FRAME, getInputPTSUs());
+					encode(buf, getInputPTSUs());
 					frameAvailableSoon();
 					synchronized (this) {
 						try {
