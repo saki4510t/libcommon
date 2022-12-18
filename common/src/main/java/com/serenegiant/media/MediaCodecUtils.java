@@ -1471,11 +1471,28 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	}
 
 	/**
+	 * MediaFormatのコピーコンストラクタがAPI>=29なので中身をコピーするヘルパーメソッド
+	 * API>=29ならコピーコンストラクタを呼び出す,
+	 * API<29なら#asStringで文字列にしてから#asMediaFormatで新規生成する
+	 * @param format
+	 * @return
+	 */
+	@NonNull
+	public static MediaFormat duplicate(@NonNull final MediaFormat format) {
+		if (BuildCheck.isAPI29()) {
+			return new MediaFormat(format);
+		} else {
+			return asMediaFormat(asString(format));
+		}
+	}
+
+	/**
 	 * MediaFormatのシリアライズ用, Gsonの方が良かった？
 	 * @param format
 	 * @return
 	 */
 	@SuppressLint("InlinedApi")
+	@NonNull
 	public static String asString(@NonNull final MediaFormat format) {
 		final JSONObject map = new JSONObject();
 		try {
@@ -1549,9 +1566,13 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * MediaFormatのデシリアライズ用, Gsonの方が良かった？
 	 * @param format_str
 	 * @return
+	 * @throws IllegalArgumentException 解析できなかった
 	 */
 	@SuppressLint("InlinedApi")
-	public static MediaFormat asMediaFormat(@NonNull final String format_str) {
+	@NonNull
+	public static MediaFormat asMediaFormat(@NonNull final String format_str)
+		throws IllegalArgumentException {
+
 		MediaFormat format = new MediaFormat();
 		try {
 			final JSONObject map = new JSONObject(format_str);
@@ -1615,8 +1636,7 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 			if (map.has("csd-2"))
 				format.setByteBuffer("csd-2", asByteBuffer((String)map.get("csd-2")));
 		} catch (final JSONException e) {
-			Log.e(TAG, "writeFormat:" + format_str, e);
-			format = null;
+			throw new IllegalArgumentException(e);
 		}
 		return format;
 	}

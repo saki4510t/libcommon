@@ -43,3 +43,13 @@ fun MediaFormat.getCsd(name: String, removeStartMarker: Boolean = false): ByteAr
 		byteArrayOf()
 	}
 }
+
+/**
+ * MediaFormatのコピーコンストラクタがAPI>=29なので中身をコピーするためのヘルパー関数
+ * MediaCodecUtils.duplicateを呼び出す
+ * API>=29ならコピーコンストラクタを呼び出す,
+ * API<29なら#asStringで文字列にしてから#asMediaFormatで新規生成する
+ */
+fun MediaFormat.duplicate(): MediaFormat {
+	return MediaCodecUtils.duplicate(this)
+}
