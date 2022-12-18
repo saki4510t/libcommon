@@ -55,6 +55,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * @param audio_channels
 	 */
 	@Deprecated
+	@SuppressWarnings("deprecation")
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
@@ -72,6 +73,7 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * @param sample_rate
 	 * @param bit_rate
 	 */
+	@SuppressWarnings("deprecation")
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,

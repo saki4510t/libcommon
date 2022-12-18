@@ -23,19 +23,16 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-@Deprecated
-public interface EncoderListener {
+@SuppressWarnings("deprecation")
+public interface EncoderListener2 extends EncoderListener {
 	/**
 	 * エンコード開始
 	 * @param encoder
 	 * @param source
-	 * @param captureFormat
 	 * @param mayFail
 	 */
-	@Deprecated
-	public default void onStartEncode(
-		@NonNull final Encoder encoder,
-		@Nullable final Surface source, final int captureFormat, final boolean mayFail) {}
+	public void onStartEncode(@NonNull final Encoder encoder,
+		@Nullable final Surface source, final boolean mayFail);
 	/**
 	 * エンコード終了
 	 * @param encoder

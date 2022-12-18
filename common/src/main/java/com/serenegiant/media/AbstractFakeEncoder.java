@@ -102,6 +102,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	/**
 	 * エンコーダーイベントコールバックリスナー
 	 */
+	@SuppressWarnings("deprecation")
 	private final EncoderListener mListener;
 	/**
 	 * MIME
@@ -129,6 +130,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param recorder
 	 * @param listener
 	 */
+	@SuppressWarnings("deprecation")
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener) {
 		
@@ -143,6 +145,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param listener
 	 * @param frameSz
 	 */
+	@SuppressWarnings("deprecation")
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener, final int frameSz) {
 		
@@ -157,6 +160,7 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param listener
 	 * @param frameSz デフォルトで確保するフレームデータのサイズ
 	 */
+	@SuppressWarnings("deprecation")
 	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
@@ -352,12 +356,18 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	 * @param source
 	 * @param captureFormat
 	 */
-	protected void callOnStartEncode(final Surface source,
+	@SuppressWarnings("deprecation")
+	protected void callOnStartEncode(
+		@Nullable final Surface source,
 		final int captureFormat, final boolean mayFail) {
 		
 //		if (DEBUG) Log.v(TAG, "callOnStartEncode:mListener=" + mListener);
 		try {
+			if (mListener instanceof EncoderListener2) {
+				((EncoderListener2)mListener).onStartEncode(this, source, mayFail);
+			} else {
 			mListener.onStartEncode(this, source, captureFormat, mayFail);
+			}
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}

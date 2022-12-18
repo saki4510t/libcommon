@@ -49,6 +49,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	@NonNull
 	private final MemMediaQueue mAudioQueue;
 
+	@SuppressWarnings("deprecation")
 	public AudioEncoderBuffered(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,

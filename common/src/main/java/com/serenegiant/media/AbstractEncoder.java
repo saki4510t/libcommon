@@ -49,6 +49,7 @@ public abstract class AbstractEncoder implements Encoder {
 	/**
 	 * エンコーダーイベントコールバックリスナー
 	 */
+	@SuppressWarnings("deprecation")
 	@NonNull
 	private final EncoderListener mListener;
 	/**
@@ -83,6 +84,7 @@ public abstract class AbstractEncoder implements Encoder {
     private IRecorder mRecorder;
 
 //********************************************************************************
+	@SuppressWarnings("deprecation")
     public AbstractEncoder(@NonNull final String mime_type,
     	@NonNull final IRecorder recorder,
     	@NonNull final EncoderListener listener) {
@@ -134,13 +136,18 @@ public abstract class AbstractEncoder implements Encoder {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
 	public final void prepare() throws Exception {
 		final boolean mayFail = internalPrepare(mReaperListener);
 		final Surface surface = (this instanceof ISurfaceEncoder) ?
 			((ISurfaceEncoder)this).getInputSurface() : null;
 		try {
+			if (mListener instanceof EncoderListener2) {
+				((EncoderListener2)mListener).onStartEncode(this, surface, mayFail);
+			} else {
 			mListener.onStartEncode(this, surface, getCaptureFormat(), mayFail);
+			}
 		} catch (final Exception e) {
 			Log.w(TAG, e);
 		}

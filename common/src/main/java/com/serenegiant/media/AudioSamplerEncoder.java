@@ -44,6 +44,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	 * @param listener
 	 * @param sampler
 	 */
+	@SuppressWarnings("deprecation")
 	public AudioSamplerEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,

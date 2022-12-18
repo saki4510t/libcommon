@@ -211,7 +211,7 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		return recorder
 	}
 
-	private val mRecorderCallback: RecorderCallback = object : RecorderCallback {
+	private val mRecorderCallback = object : RecorderCallback {
 		override fun onPrepared(recorder: IRecorder) {
 			if (DEBUG) Log.v(TAG, "mRecorderCallback#onPrepared:" + recorder
 				+ ",mEncoderSurface=" + mEncoderSurface)
@@ -287,10 +287,9 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		}
 	}
 
-	private val mEncoderListener: EncoderListener = object : EncoderListener {
+	private val mEncoderListener = object : EncoderListener2 {
 		override fun onStartEncode(
-			encoder: Encoder, source: Surface?,
-			captureFormat: Int, mayFail: Boolean) {
+			encoder: Encoder, source: Surface?, mayFail: Boolean) {
 			if (DEBUG) Log.v(TAG, "mEncoderListener#onStartEncode:$encoder")
 		}
 

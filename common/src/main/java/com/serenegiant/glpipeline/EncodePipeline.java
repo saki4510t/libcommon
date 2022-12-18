@@ -73,6 +73,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	 * @param recorder
 	 * @param listener
 	 */
+	@SuppressWarnings("deprecation")
 	public EncodePipeline(
 		@NonNull final GLManager manager,
 		@NonNull final IRecorder recorder,

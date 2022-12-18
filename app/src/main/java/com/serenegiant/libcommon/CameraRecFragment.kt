@@ -297,9 +297,9 @@ class CameraRecFragment : AbstractCameraFragment() {
 		}
 	}
 
-	private val mEncoderListener: EncoderListener = object : EncoderListener {
-		override fun onStartEncode(encoder: Encoder, source: Surface?,
-								   captureFormat: Int, mayFail: Boolean) {
+	private val mEncoderListener = object : EncoderListener2 {
+		override fun onStartEncode(
+			encoder: Encoder, source: Surface?, mayFail: Boolean) {
 			if (DEBUG) Log.v(TAG, "mEncoderListener#onStartEncode:$encoder")
 		}
 

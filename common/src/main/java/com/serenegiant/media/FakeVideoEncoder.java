@@ -43,6 +43,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param recorder
 	 * @param listener
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener) {
 		
@@ -56,6 +57,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param listener
 	 * @param frameSz
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener, final int frameSz) {
 		
@@ -71,6 +73,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param maxPoolSz
 	 * @param maxQueueSz
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final IRecorder recorder,
 		final EncoderListener listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
@@ -84,6 +87,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param recorder
 	 * @param listener
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final String mime_type,
 		final IRecorder recorder, final EncoderListener listener) {
 		
@@ -97,6 +101,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param listener
 	 * @param defaultFrameSz
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final String mime_type,
 		final IRecorder recorder, final EncoderListener listener,
 		final int defaultFrameSz) {
@@ -113,6 +118,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * @param maxPoolSz
 	 * @param maxQueueSz
 	 */
+	@SuppressWarnings("deprecation")
 	public FakeVideoEncoder(final String mime_type,
 		final IRecorder recorder, final EncoderListener listener,
 		final int defaultFrameSz, final int maxPoolSz, final int maxQueueSz) {

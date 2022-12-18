@@ -45,6 +45,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 	 * @param audio_source
 	 * @param audio_channels
 	 */
+	@SuppressWarnings("deprecation")
 	public AudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,

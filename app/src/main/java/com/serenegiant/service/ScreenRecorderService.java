@@ -46,6 +46,7 @@ import com.serenegiant.media.AudioSampler;
 import com.serenegiant.media.AudioSamplerEncoder;
 import com.serenegiant.media.Encoder;
 import com.serenegiant.media.EncoderListener;
+import com.serenegiant.media.EncoderListener2;
 import com.serenegiant.media.IAudioSampler;
 import com.serenegiant.media.IRecorder;
 import com.serenegiant.media.IVideoEncoder;
@@ -405,11 +406,11 @@ public class ScreenRecorderService extends BaseService {
 		}
 	};
 
-	private final EncoderListener mEncoderListener = new EncoderListener() {
+	private final EncoderListener2 mEncoderListener = new EncoderListener2() {
 		@Override
 		public void onStartEncode(
 			@NonNull final Encoder encoder, Surface source,
-			final int captureFormat, final boolean mayFail) {
+			final boolean mayFail) {
 
 			if (DEBUG) Log.v(TAG, "EncoderListener#onStartEncode:" + encoder);
 		}

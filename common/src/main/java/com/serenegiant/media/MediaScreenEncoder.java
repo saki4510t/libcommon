@@ -45,6 +45,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	 * @param listener
 	 * @param projection
 	 */
+	@SuppressWarnings("deprecation")
 	public MediaScreenEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,

@@ -37,6 +37,7 @@ public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEnco
 
 	protected Surface mInputSurface;
 
+	@SuppressWarnings("deprecation")
     public SurfaceEncoder(final IRecorder recorder, final EncoderListener listener) {
 		super(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener);
     }
