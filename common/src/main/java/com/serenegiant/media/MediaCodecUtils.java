@@ -53,7 +53,7 @@ import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
 /**
- * FIXME 音声バージョンのtestVideoMediaFormatを追加する
+ * MediaCodec関係のユーティリティ関数を集めたクラス
  */
 public final class MediaCodecUtils {
 	private static final boolean DEBUG = false;	// set false on production
