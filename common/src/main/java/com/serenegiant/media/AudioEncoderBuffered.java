@@ -53,13 +53,13 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	public AudioEncoderBuffered(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
-		final int audio_source, final int audio_channels) {
+		final int audioSource, final int audioChannels) {
 
-		super(recorder, listener, audio_source, audio_channels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		super(recorder, listener, audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		if (audio_source < MediaRecorder.AudioSource.DEFAULT
-			|| audio_source > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
-			throw new IllegalArgumentException("invalid audio source:" + audio_source);
+		if (audioSource < MediaRecorder.AudioSource.DEFAULT
+			|| audioSource > MediaRecorder.AudioSource.VOICE_COMMUNICATION)
+			throw new IllegalArgumentException("invalid audio source:" + audioSource);
 		mAudioQueue = new MemMediaQueue(MAX_POOL_SIZE, MAX_POOL_SIZE, MAX_QUEUE_SIZE);
 	}
 

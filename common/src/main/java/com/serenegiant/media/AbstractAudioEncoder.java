@@ -49,40 +49,40 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * コンストラクタ
 	 * @param recorder
 	 * @param listener
-	 * @param audio_source
-	 * @param audio_channels
+	 * @param audioSource
+	 * @param audioChannels
 	 */
 	@Deprecated
 	@SuppressWarnings("deprecation")
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
-		final int audio_source, final int audio_channels) {
+		final int audioSource, final int audioChannels) {
 
-		this(recorder, listener, audio_source, audio_channels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
+		this(recorder, listener, audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param recorder
 	 * @param listener
-	 * @param audio_source
-	 * @param audio_channels
-	 * @param sample_rate
-	 * @param bit_rate
+	 * @param audioSource
+	 * @param audioChannels
+	 * @param sampleRate
+	 * @param bitRate
 	 */
 	@SuppressWarnings("deprecation")
 	public AbstractAudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener listener,
-		final int audio_source, final int audio_channels, final int sample_rate, final int bit_rate) {
+		final int audioSource, final int audioChannels, final int sampleRate, final int bitRate) {
 
 		super(MediaCodecUtils.MIME_AUDIO_AAC, recorder, listener);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mAudioSource = audio_source;
-		mChannelCount = audio_channels;
-		mSampleRate = sample_rate;
-		mBitRate = bit_rate;
+		mAudioSource = audioSource;
+		mChannelCount = audioChannels;
+		mSampleRate = sampleRate;
+		mBitRate = bitRate;
 	}
 
 	@Override
