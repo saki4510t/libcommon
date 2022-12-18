@@ -1469,4 +1469,195 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 		if (DEBUG) Log.i(TAG, "testAudioMediaFormat:result=" + result.get());
 		return result.get();
 	}
+
+	/**
+	 * MediaFormatのシリアライズ用, Gsonの方が良かった？
+	 * @param format
+	 * @return
+	 */
+	@SuppressLint("InlinedApi")
+	public static String asString(@NonNull final MediaFormat format) {
+		final JSONObject map = new JSONObject();
+		try {
+			if (format.containsKey(MediaFormat.KEY_MIME))
+				map.put(MediaFormat.KEY_MIME,
+					format.getString(MediaFormat.KEY_MIME));
+			if (format.containsKey(MediaFormat.KEY_WIDTH))
+				map.put(MediaFormat.KEY_WIDTH,
+					format.getInteger(MediaFormat.KEY_WIDTH));
+			if (format.containsKey(MediaFormat.KEY_HEIGHT))
+				map.put(MediaFormat.KEY_HEIGHT,
+					format.getInteger(MediaFormat.KEY_HEIGHT));
+			if (format.containsKey(MediaFormat.KEY_BIT_RATE))
+				map.put(MediaFormat.KEY_BIT_RATE,
+					format.getInteger(MediaFormat.KEY_BIT_RATE));
+			if (format.containsKey(MediaFormat.KEY_COLOR_FORMAT))
+				map.put(MediaFormat.KEY_COLOR_FORMAT,
+					format.getInteger(MediaFormat.KEY_COLOR_FORMAT));
+			if (format.containsKey(MediaFormat.KEY_FRAME_RATE))
+				map.put(MediaFormat.KEY_FRAME_RATE,
+					format.getInteger(MediaFormat.KEY_FRAME_RATE));
+			if (format.containsKey(MediaFormat.KEY_I_FRAME_INTERVAL))
+				map.put(MediaFormat.KEY_I_FRAME_INTERVAL,
+					format.getInteger(MediaFormat.KEY_I_FRAME_INTERVAL));
+			if (format.containsKey(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER))
+				map.put(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER,
+					format.getLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER));
+			if (format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE))
+				map.put(MediaFormat.KEY_MAX_INPUT_SIZE,
+					format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE));
+			if (format.containsKey(MediaFormat.KEY_DURATION))
+				map.put(MediaFormat.KEY_DURATION,
+					format.getInteger(MediaFormat.KEY_DURATION));
+			if (format.containsKey(MediaFormat.KEY_CHANNEL_COUNT))
+				map.put(MediaFormat.KEY_CHANNEL_COUNT,
+					format.getInteger(MediaFormat.KEY_CHANNEL_COUNT));
+			if (format.containsKey(MediaFormat.KEY_SAMPLE_RATE))
+				map.put(MediaFormat.KEY_SAMPLE_RATE,
+					format.getInteger(MediaFormat.KEY_SAMPLE_RATE));
+			if (format.containsKey(MediaFormat.KEY_CHANNEL_MASK))
+				map.put(MediaFormat.KEY_CHANNEL_MASK,
+					format.getInteger(MediaFormat.KEY_CHANNEL_MASK));
+			if (format.containsKey(MediaFormat.KEY_AAC_PROFILE))
+				map.put(MediaFormat.KEY_AAC_PROFILE,
+					format.getInteger(MediaFormat.KEY_AAC_PROFILE));
+			if (format.containsKey(MediaFormat.KEY_AAC_SBR_MODE))
+				map.put(MediaFormat.KEY_AAC_SBR_MODE,
+					format.getInteger(MediaFormat.KEY_AAC_SBR_MODE));
+			if (format.containsKey(MediaFormat.KEY_MAX_INPUT_SIZE))
+				map.put(MediaFormat.KEY_MAX_INPUT_SIZE,
+					format.getInteger(MediaFormat.KEY_MAX_INPUT_SIZE));
+			if (format.containsKey(MediaFormat.KEY_IS_ADTS))
+				map.put(MediaFormat.KEY_IS_ADTS,
+					format.getInteger(MediaFormat.KEY_IS_ADTS));
+			if (format.containsKey("what"))
+				map.put("what", format.getInteger("what"));
+			if (format.containsKey("csd-0"))
+				map.put("csd-0", asString(format.getByteBuffer("csd-0")));
+			if (format.containsKey("csd-1"))
+				map.put("csd-1", asString(format.getByteBuffer("csd-1")));
+			if (format.containsKey("csd-2"))
+				map.put("csd-2", asString(format.getByteBuffer("csd-2")));
+		} catch (final JSONException e) {
+			Log.e(TAG, "writeFormat:", e);
+		}
+
+		return map.toString();
+	}
+
+	/**
+	 * MediaFormatのデシリアライズ用, Gsonの方が良かった？
+	 * @param format_str
+	 * @return
+	 */
+	@SuppressLint("InlinedApi")
+	public static MediaFormat asMediaFormat(@NonNull final String format_str) {
+		MediaFormat format = new MediaFormat();
+		try {
+			final JSONObject map = new JSONObject(format_str);
+			if (map.has(MediaFormat.KEY_MIME))
+				format.setString(MediaFormat.KEY_MIME,
+					(String)map.get(MediaFormat.KEY_MIME));
+			if (map.has(MediaFormat.KEY_WIDTH))
+				format.setInteger(MediaFormat.KEY_WIDTH,
+					(Integer)map.get(MediaFormat.KEY_WIDTH));
+			if (map.has(MediaFormat.KEY_HEIGHT))
+				format.setInteger(MediaFormat.KEY_HEIGHT,
+					(Integer)map.get(MediaFormat.KEY_HEIGHT));
+			if (map.has(MediaFormat.KEY_BIT_RATE))
+				format.setInteger(MediaFormat.KEY_BIT_RATE,
+					(Integer)map.get(MediaFormat.KEY_BIT_RATE));
+			if (map.has(MediaFormat.KEY_COLOR_FORMAT))
+				format.setInteger(MediaFormat.KEY_COLOR_FORMAT,
+					(Integer)map.get(MediaFormat.KEY_COLOR_FORMAT));
+			if (map.has(MediaFormat.KEY_FRAME_RATE))
+				format.setInteger(MediaFormat.KEY_FRAME_RATE,
+					(Integer)map.get(MediaFormat.KEY_FRAME_RATE));
+			if (map.has(MediaFormat.KEY_I_FRAME_INTERVAL))
+				format.setInteger(MediaFormat.KEY_I_FRAME_INTERVAL,
+					(Integer)map.get(MediaFormat.KEY_I_FRAME_INTERVAL));
+			if (map.has(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER))
+				format.setLong(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER,
+					(Long)map.get(MediaFormat.KEY_REPEAT_PREVIOUS_FRAME_AFTER));
+			if (map.has(MediaFormat.KEY_MAX_INPUT_SIZE))
+				format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,
+					(Integer)map.get(MediaFormat.KEY_MAX_INPUT_SIZE));
+			if (map.has(MediaFormat.KEY_DURATION))
+				format.setInteger(MediaFormat.KEY_DURATION,
+					(Integer)map.get(MediaFormat.KEY_DURATION));
+			if (map.has(MediaFormat.KEY_CHANNEL_COUNT))
+				format.setInteger(MediaFormat.KEY_CHANNEL_COUNT,
+					(Integer) map.get(MediaFormat.KEY_CHANNEL_COUNT));
+			if (map.has(MediaFormat.KEY_SAMPLE_RATE))
+				format.setInteger(MediaFormat.KEY_SAMPLE_RATE,
+					(Integer) map.get(MediaFormat.KEY_SAMPLE_RATE));
+			if (map.has(MediaFormat.KEY_CHANNEL_MASK))
+				format.setInteger(MediaFormat.KEY_CHANNEL_MASK,
+					(Integer) map.get(MediaFormat.KEY_CHANNEL_MASK));
+			if (map.has(MediaFormat.KEY_AAC_PROFILE))
+				format.setInteger(MediaFormat.KEY_AAC_PROFILE,
+					(Integer) map.get(MediaFormat.KEY_AAC_PROFILE));
+			if (map.has(MediaFormat.KEY_AAC_SBR_MODE))
+				format.setInteger(MediaFormat.KEY_AAC_SBR_MODE,
+					(Integer) map.get(MediaFormat.KEY_AAC_SBR_MODE));
+			if (map.has(MediaFormat.KEY_MAX_INPUT_SIZE))
+				format.setInteger(MediaFormat.KEY_MAX_INPUT_SIZE,
+					(Integer) map.get(MediaFormat.KEY_MAX_INPUT_SIZE));
+			if (map.has(MediaFormat.KEY_IS_ADTS))
+				format.setInteger(MediaFormat.KEY_IS_ADTS,
+					(Integer) map.get(MediaFormat.KEY_IS_ADTS));
+			if (map.has("what"))
+				format.setInteger("what", (Integer)map.get("what"));
+			if (map.has("csd-0"))
+				format.setByteBuffer("csd-0", asByteBuffer((String)map.get("csd-0")));
+			if (map.has("csd-1"))
+				format.setByteBuffer("csd-1", asByteBuffer((String)map.get("csd-1")));
+			if (map.has("csd-2"))
+				format.setByteBuffer("csd-2", asByteBuffer((String)map.get("csd-2")));
+		} catch (final JSONException e) {
+			Log.e(TAG, "writeFormat:" + format_str, e);
+			format = null;
+		}
+		return format;
+	}
+
+	/**
+	 * バイトバッファーの内容を文字列に変換するためのヘルパーメソッド
+	 * @param buffer
+	 * @return
+	 */
+	/*package*/ static final String asString(@NonNull final ByteBuffer buffer) {
+		final byte[] temp = new byte[16];
+		final StringBuilder sb = new StringBuilder();
+		int n = (buffer != null ? buffer.limit() : 0);
+		if (n > 0) {
+			buffer.rewind();
+			int sz = Math.min(n, 16);
+			n -= sz;
+			for (; sz > 0; sz = Math.min(n, 16), n -= sz) {
+				buffer.get(temp, 0, sz);
+				for (int i = 0; i < sz; i++) {
+					sb.append(temp[i]).append(',');
+				}
+			}
+		}
+		return sb.toString();
+	}
+
+	/**
+	 * 文字列表記から元のバイトバッファーに戻すためのヘルパーメソッド
+	 * @param str
+	 * @return
+	 */
+	/*package*/ static final ByteBuffer asByteBuffer(@NonNull final String str) {
+		final String[] hex = str.split(",");
+		final int m = hex.length;
+		final byte[] temp = new byte[m];
+		int n = 0;
+		for (int i = 0; i < m; i++) {
+			if (!TextUtils.isEmpty(hex[i]))
+				temp[n++] = (byte)Integer.parseInt(hex[i]);
+		}
+		return (n > 0) ? ByteBuffer.wrap(temp, 0, n) : null;
+	}
 }
