@@ -22,4 +22,5 @@ package com.serenegiant.media;
  * 音声エンコーダーであることを示すためのマーカーインターフェース
  */
 public interface IAudioEncoder extends Encoder {
+	public static final int DEFAULT_BIT_RATE = 64000;		// 64[kbps]		5-320[kbps]
 }
