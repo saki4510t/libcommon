@@ -99,6 +99,34 @@ public abstract class AbstractEncoder extends MediaEncoder {
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * エンコード済みデータを書き込む
+	 * @param byteBuf
+	 * @param bufferInfo
+	 */
+	protected void writeSampleData(
+		@NonNull final ByteBuffer byteBuf,
+		@NonNull final MediaCodec.BufferInfo bufferInfo) {
+
+//		if (DEBUG) Log.v(TAG, "writeSampleData:");
+		if (isReady() && (mRecorder != null)) {
+			mRecorder.writeSampleData(mTrackIndex, byteBuf, bufferInfo);
+		}
+	}
+
+	/**
+	 * エンコーダーのMediaFormatが変更された時
+	 * @param format
+	 */
+	protected void onOutputFormatChanged(
+		@NonNull final MediaFormat format) {
+
+		if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
+		if (isReady() && (mRecorder != null)) {
+			startRecorder(mRecorder, format);
+		}
+	}
+
 	private final MediaReaper.ReaperListener mReaperListener
 		= new MediaReaper.ReaperListener() {
 		@Override
@@ -107,10 +135,7 @@ public abstract class AbstractEncoder extends MediaEncoder {
 			@NonNull final ByteBuffer byteBuf,
 			@NonNull final MediaCodec.BufferInfo bufferInfo) {
 
-//			if (DEBUG) Log.v(TAG, "writeSampleData:");
-			if (isEncoding() && !isRequestStop() && (mRecorder != null)) {
-				mRecorder.writeSampleData(mTrackIndex, byteBuf, bufferInfo);
-			}
+			AbstractEncoder.this.writeSampleData(byteBuf, bufferInfo);
 		}
 
 		@Override
@@ -118,10 +143,7 @@ public abstract class AbstractEncoder extends MediaEncoder {
 			@NonNull final MediaReaper reaper,
 			@NonNull final MediaFormat format) {
 
-			if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
-			if (isEncoding() && !isRequestStop() && (mRecorder != null)) {
-				startRecorder(mRecorder, format);
-			}
+			AbstractEncoder.this.onOutputFormatChanged(format);
 		}
 
 		@Override
