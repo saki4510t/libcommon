@@ -45,7 +45,7 @@ public class AudioSampler extends IAudioSampler {
     private final int SAMPLING_RATE, CHANNEL_COUNT;
 	/**
 	 * AudioRecordから1度に読み込みを試みるサンプル数(バイト数とは限らない)
-	 * 1フレームあたりのサンプリング数xチャネル数
+	 * 1フレーム1チャネルあたりのサンプリング数
 	 */
 	private final int SAMPLES_PER_FRAME;
 	/**
@@ -114,8 +114,8 @@ public class AudioSampler extends IAudioSampler {
 		AUDIO_SOURCE = audioSource;
 		CHANNEL_COUNT = channelNum;
 		SAMPLING_RATE = samplingRate;
-		SAMPLES_PER_FRAME = samplesPerFrame * channelNum;
-		BYTES_PER_FRAME = SAMPLES_PER_FRAME
+		SAMPLES_PER_FRAME = samplesPerFrame;
+		BYTES_PER_FRAME = samplesPerFrame * channelNum
 			* AudioRecordCompat.getBitResolution(AudioRecordCompat.DEFAULT_AUDIO_FORMAT);
 		BUFFER_SIZE = AudioRecordCompat.getAudioBufferSize(
 			channelNum, AudioRecordCompat.DEFAULT_AUDIO_FORMAT,
@@ -129,7 +129,7 @@ public class AudioSampler extends IAudioSampler {
 	 * @return
 	 */
 	public int getSampledPerFrame() {
-		return SAMPLES_PER_FRAME;
+		return SAMPLES_PER_FRAME * CHANNEL_COUNT;
 	}
 
 	/**
