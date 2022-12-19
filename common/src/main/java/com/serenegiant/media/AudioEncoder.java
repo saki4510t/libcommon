@@ -110,8 +110,7 @@ public class AudioEncoder extends AbstractAudioEncoder {
 
 				@Override
 				public boolean isRunning() {
-					return super.isRunning()
-						&& isEncoding() && !isRequestStop();
+					return super.isRunning() && isReady();
 				}
 
 				@Nullable

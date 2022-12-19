@@ -257,7 +257,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 						}
 					}
 				}
-				if (isEncoding() && !isRequestStop()) {
+				if (isReady()) {
 					if (localRequestDraw) {
 						mSourceTexture.updateTexImage();
 						mSourceTexture.getTransformMatrix(mTexMatrix);

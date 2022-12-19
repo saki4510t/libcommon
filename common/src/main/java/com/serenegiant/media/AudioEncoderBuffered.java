@@ -101,8 +101,7 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 				AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER) {
 				@Override
 				public boolean isRunning() {
-					return super.isRunning()
-						&& isEncoding() && !isRequestStop();
+					return super.isRunning() && isReady();
 				}
 
 				@Nullable
