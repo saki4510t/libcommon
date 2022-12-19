@@ -46,6 +46,7 @@ public interface IRecycleBuffer {
 		 * IRecycleBufferオブジェクトを生成する
 		 * @param parent
 		 * @param args IRecycleBufferの生成に必要なオプション引数, 省略可
+		 *        正数を指定した場合はバッファのサイズ、ByteOrderを指定するとバイトオーダーが指定されたものになる
 		 * @return
 		 */
 		@NonNull
