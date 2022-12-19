@@ -248,6 +248,14 @@ public abstract class IAudioSampler {
 		return !mCallbacks.isEmpty();
 	}
 
+	/**
+	 * コールバックリスナーを取得
+	 * @return
+	 */
+	protected Set<SoundSamplerCallback> getCallbacks() {
+		return mCallbacks;
+	}
+
 	@AudioRecordCompat.AudioFormats
 	public abstract int getAudioFormat();
 
