@@ -20,8 +20,6 @@ package com.serenegiant.media;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.util.Log;
 
 import com.serenegiant.system.Time;
@@ -32,64 +30,11 @@ import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 public abstract class IAudioSampler {
 	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
-
-	/**
-	 * AudioRecordを生成する
-	 * 指定したソースに対応するMediaRecorder.AudioSourceを選択するが使用できないときは
-	 * 自動的に他のMediaRecorder.AudioSourceを選択する
-	 * @param source
-	 * @param samplingRate
-	 * @param channels
-	 * @param format
-	 * @param bufferSize
-	 * @return
-	 * @deprecated AudioRecordCompatの同名メソッドを使うこと
-	 */
-	@Deprecated
-	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
-	@Nullable
-	public static AudioRecord createAudioRecord(
-		final int source, final int samplingRate, final int channels, final int format, final int bufferSize) {
-
-		@AudioRecordCompat.AudioSource
-		final int[] AUDIO_SOURCES = new int[] {
-			MediaRecorder.AudioSource.DEFAULT,		// ここ(1つ目)は引数で置き換えられる
-			MediaRecorder.AudioSource.CAMCORDER,	// これにするとUSBオーディオルーティングが有効な場合でも内蔵マイクからの音になる
-			MediaRecorder.AudioSource.MIC,
-			MediaRecorder.AudioSource.DEFAULT,
-			MediaRecorder.AudioSource.VOICE_COMMUNICATION,
-			MediaRecorder.AudioSource.VOICE_RECOGNITION,
-		};
-
-		switch (source) {
-		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
-		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
-		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
-		default: AUDIO_SOURCES[0] = source; break;
-		}
-
-		@AudioRecordCompat.AudioChannel
-		final int audioChannel = AudioRecordCompat.getAudioChannel(channels);
-		AudioRecord audioRecord = null;
-		for (final int src: AUDIO_SOURCES) {
-            try {
-            	audioRecord = AudioRecordCompat.newInstance(src, samplingRate, audioChannel, format, bufferSize);
-            } catch (final Exception e) {
-            	audioRecord = null;
-            }
-            if (audioRecord != null) {
-            	if (DEBUG) Log.v(IAudioSampler.class.getSimpleName(), "createAudioRecord:created, src=" + src);
-            	break;
-			}
-    	}
-		return audioRecord;
-	}
 
 	/**
 	 * 音声データ取得コールバックインターフェース
@@ -387,7 +332,7 @@ public abstract class IAudioSampler {
     	}
 
     	@Override
-    	public final void run() {
+    	public void run() {
     		if (DEBUG) Log.i(TAG, "CallbackThread:start");
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
 			RecycleMediaData data;
