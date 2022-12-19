@@ -286,10 +286,13 @@ public class AudioRecordCompat {
 		 */
 		private final int mSamplesPerFrame;
 		/**
-		 * AudioRecordから1℃に読み込みを試みるバイト数
+		 * AudioRecordから1度に読み込みを試みるバイト数
 		 * SAMPLES_PER_FRAME x 1サンプル辺りのバイト数
 		 */
 		private final int mBytesPerFrame;
+		/**
+		 * AudioRecordで使う内部バッファサイズ
+		 */
   		private final int mBufferSize;
 
 		/**
