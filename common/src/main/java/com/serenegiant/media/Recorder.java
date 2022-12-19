@@ -453,7 +453,7 @@ public abstract class Recorder implements IRecorder {
 		@NonNull final MediaCodec.BufferInfo bufferInfo) {
 
 		try {
-			if (!mReleased && (mStartedCount > 0)) {
+			if (!mReleased && isStarted()) {
 				mMuxer.writeSampleData(trackIndex, byteBuf, bufferInfo);
 			}
 		} catch (final Exception e) {
