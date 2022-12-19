@@ -61,7 +61,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 	 */
 	private final int SAMPLES_PER_FRAME;
 	/**
-	 * AudioRecordから1℃に読み込みを試みるバイト数
+	 * AudioRecordから1度に読み込みを試みるバイト数
 	 * SAMPLES_PER_FRAME x 1サンプル辺りのバイト数
 	 */
 	private final int BYTES_PER_FRAME;
