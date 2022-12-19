@@ -342,11 +342,12 @@ public abstract class IAudioSampler {
 	/**
 	 * 音声データバッファをプールから取得する。
 	 * プールがからの場合には最大MAX_POOL_SIZE個までは新規生成する
+	 * @param bufferBytes
 	 * @return
 	 */
-	protected RecycleMediaData obtain() {
+	protected RecycleMediaData obtain(final int bufferBytes) {
 //		if (DEBUG) Log.v(TAG, "obtain:" + mPool.size() + ",mBufferNum=" + mBufferNum);
-		return mAudioQueue.obtain(mDefaultBufferSize);
+		return mAudioQueue.obtain(bufferBytes);
 	}
 
 	protected boolean addMediaData(@NonNull final RecycleMediaData data) {
