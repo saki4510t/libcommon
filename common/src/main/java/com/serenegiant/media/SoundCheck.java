@@ -109,8 +109,8 @@ public class SoundCheck {
 		}
 
 		@Override
-		public void onError(final Exception e) {
-//			Log.w(TAG, "onError:" + e);
+		public void onError(@NonNull final Throwable t) {
+//			Log.w(TAG, "onError:" + t);
 		}
 	};
 

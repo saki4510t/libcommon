@@ -126,9 +126,9 @@ public abstract class IAudioSampler {
 
 		/**
 		 * エラーが起こった時の処理(今は未使用)
-		 * @param e
+		 * @param t
 		 */
-		public void onError(Exception e);
+		public void onError(@NonNull  Throwable t);
 	}
 
 	/**
@@ -322,7 +322,7 @@ public abstract class IAudioSampler {
 	 * エラー発生時のコールバックを呼び出す
 	 * @param e
 	 */
-    protected void callOnError(final Exception e) {
+    protected void callOnError(final Throwable e) {
 		for (final SoundSamplerCallback callback: mCallbacks) {
 			try {
 				callback.onError(e);

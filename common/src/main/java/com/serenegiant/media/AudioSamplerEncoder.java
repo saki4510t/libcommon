@@ -107,7 +107,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 		}
 
 		@Override
-		public void onError(final Exception e) {
+		public void onError(@NonNull final Throwable t) {
 		}
 	};
 

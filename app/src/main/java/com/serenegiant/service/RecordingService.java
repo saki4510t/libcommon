@@ -1096,8 +1096,8 @@ public class RecordingService extends BaseService {
 		}
 
 		@Override
-		public void onError(final Exception e) {
-			RecordingService.this.onError(e);
+		public void onError(@NonNull final Throwable t) {
+			RecordingService.this.onError(t);
 		}
 	};
 
