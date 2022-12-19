@@ -22,20 +22,28 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
+import android.media.AudioFormat;
+import android.media.MediaCodec;
+import android.media.MediaFormat;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 /**
- * AudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
+ * IAudioSampleから音声データを受け取ってMediaCodecでエンコードするためのクラス
+ * IAudioSamplerがすでにAACエンコードしている(EncodedAudioSampler)場合は
+ * 実際のエンコード処理をスキップする
  */
 public class AudioSamplerEncoder extends AbstractAudioEncoder {
-	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final boolean DEBUG = true;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AudioSamplerEncoder.class.getSimpleName();
 
 	@NonNull
 	private final IAudioSampler mSampler;
+	private final boolean mPreEncoded;
 	private int frame_count = 0;
 
 	/**
@@ -60,6 +68,7 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	 * @param listener
 	 * @param sampler
 	 */
+	@SuppressLint("InlinedApi")
 	public AudioSamplerEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener2 listener,
@@ -70,6 +79,8 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 			DEFAULT_BIT_RATE);
 //		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mSampler = sampler;
+		mPreEncoded = (sampler.getAudioFormat() == AudioFormat.ENCODING_AAC_LC);
+		if (DEBUG) Log.v(TAG, "AudioSamplerEncoder:mPreEncoded=" + mPreEncoded);
 	}
 
 	@RequiresPermission(Manifest.permission.RECORD_AUDIO)
@@ -87,11 +98,12 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	}
 
 	/**
-	 * AudioSampleからのコールバックリスナー
+	 * IAudioSampleからのコールバックリスナー
 	 */
-	private final AudioSampler.SoundSamplerCallback mSoundSamplerCallback
-		= new AudioSampler.SoundSamplerCallback() {
+	private final EncodedAudioSampler.Callback mSoundSamplerCallback
+		= new EncodedAudioSampler.Callback() {
 
+		private final MediaCodec.BufferInfo bufferInfo = new MediaCodec.BufferInfo();
 		@Override
 		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs) {
     		synchronized (mSync) {
@@ -99,15 +111,30 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
         		if (!isEncoding() || isRequestStop()) return;
     		}
 			if (buffer.remaining() > 0) {
-				// 音声データを受け取った時はエンコーダーへ書き込む
-				frameAvailableSoon();
-				encode(buffer, presentationTimeUs);
+				if (mPreEncoded) {
+					// すでにエンコードされている場合は直接書き込む
+					bufferInfo.set(0, buffer.remaining(), presentationTimeUs, 0);
+					writeSampleData(buffer, bufferInfo);
+				} else {
+					// エンコードされていない音声データを受け取った時はエンコーダーへ書き込む
+					frameAvailableSoon();
+					encode(buffer, presentationTimeUs);
+				}
 				frame_count++;
 			}
 		}
 
 		@Override
+		public void onOutputFormatChanged(@NonNull final MediaFormat format) {
+			if (DEBUG) Log.v(TAG, "onOutputFormatChanged:" + format);
+			if (mPreEncoded) {
+				AudioSamplerEncoder.this.onOutputFormatChanged(format);
+			}
+		}
+
+		@Override
 		public void onError(@NonNull final Throwable t) {
+			if (DEBUG) Log.w(TAG, t);
 		}
 	};
 
