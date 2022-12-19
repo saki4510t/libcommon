@@ -26,9 +26,13 @@ import android.media.MediaRecorder;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.Time;
+import com.serenegiant.utils.ThreadUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
@@ -262,5 +266,359 @@ public class AudioRecordCompat {
 			}
     	}
 		return audioRecord;
+	}
+
+	/**
+	 * AudioRecordから無圧縮PCM16bitで内蔵マイクからの音声データを取得してキューへ書き込むためのスレッドの実行部
+	 */
+	public static abstract class AudioRecordTask implements Runnable {
+		@NonNull
+		private final Object mSync = new Object();
+		@AudioFormats
+		private final int mAudioSource;
+		private final int mChannelCount;
+  		private final int mSamplingRate;
+		private final boolean mGenDummyFrameIfNoData;
+  		private final boolean mForceSource;
+		/**
+		 * AudioRecordから1度に読み込みを試みるサンプル数(バイト数とは限らない)
+		 * 1フレーム1チャネルあたりのサンプリング数
+		 */
+		private final int mSamplesPerFrame;
+		/**
+		 * AudioRecordから1℃に読み込みを試みるバイト数
+		 * SAMPLES_PER_FRAME x 1サンプル辺りのバイト数
+		 */
+		private final int mBytesPerFrame;
+  		private final int mBufferSize;
+
+		/**
+		 * 実行中かどうか
+		 */
+		private volatile boolean mIsRunning;
+		/**
+		 * 前回MediaCodecへのエンコード時に使ったpresentationTimeUs
+		 */
+		private long prevInputPTSUs = -1;
+
+		/**
+		 * コンストラクタ
+		 * @param audioSource 音声ソース, MediaRecorder.AudioSourceのどれか
+		 *     ただし、一般アプリで利用できないVOICE_UPLINK(2)はCAMCORDER(5)へ
+		 *     VOICE_DOWNLINK(3)はVOICE_COMMUNICATION(7)
+		 *     VOICE_CALL(4)はMIC(1)へ置換する
+		 * @param channelCount 音声チャネル数, 1 or 2
+		 * @param samplingRate サンプリングレート
+		 * @param samplesPerFrame 1フレーム辺りのサンプル数
+		 * @param framesPerBuffer バッファ辺りのフレーム数
+		 */
+		public AudioRecordTask(
+			@AudioFormats final int audioSource, final int channelCount, final int samplingRate,
+			final int samplesPerFrame, final int framesPerBuffer) {
+			this(audioSource, channelCount, samplingRate,
+				samplesPerFrame, framesPerBuffer,
+				false, false);
+		}
+
+		/**
+		 * コンストラクタ
+		 * @param audioSource 音声ソース, MediaRecorder.AudioSourceのどれか
+		 *     ただし、一般アプリで利用できないVOICE_UPLINK(2)はCAMCORDER(5)へ
+		 *     VOICE_DOWNLINK(3)はVOICE_COMMUNICATION(7)
+		 *     VOICE_CALL(4)はMIC(1)へ置換する
+		 * @param channelCount 音声チャネル数, 1 or 2
+		 * @param samplingRate サンプリングレート
+		 * @param samplesPerFrame 1フレーム辺りのサンプル数
+		 * @param framesPerBuffer バッファ辺りのフレーム数
+		 * @param forceSource 音声ソースを強制するかどうか, falseなら利用可能な音声ソースを順に試す
+		 * @param genDummyFrameIfNoData 音声データを全く取得できなかったときにダミーデータを生成するかどうか
+		 */
+		public AudioRecordTask(
+			@AudioFormats final int audioSource, final int channelCount, final int samplingRate,
+			final int samplesPerFrame, final int framesPerBuffer,
+			final boolean forceSource,
+			final boolean genDummyFrameIfNoData) {
+			mAudioSource = audioSource;
+			mChannelCount = channelCount;
+			mSamplingRate = samplingRate;
+			mForceSource = forceSource;
+			mGenDummyFrameIfNoData = genDummyFrameIfNoData;
+			mSamplesPerFrame = samplesPerFrame;
+			mBytesPerFrame = samplesPerFrame * channelCount
+				* AudioRecordCompat.getBitResolution(AudioRecordCompat.DEFAULT_AUDIO_FORMAT);
+			mBufferSize = getAudioBufferSize(
+				channelCount, DEFAULT_AUDIO_FORMAT,
+				samplingRate, samplesPerFrame, framesPerBuffer);
+		}
+
+		public int getAudioSource() {
+			return mAudioSource;
+		}
+
+		@AudioFormats
+		public int getAudioFormat() {
+			return DEFAULT_AUDIO_FORMAT;
+		}
+
+		public int getChannels() {
+			return mChannelCount;
+		}
+
+		public int getSamplingFrequency() {
+			return mSamplingRate;
+		}
+
+		/**
+		 * 音声データ１つ辺りのサンプリング数を返す
+		 * 1フレーム辺りのサンプリング数xチャネル数
+		 * @return
+		 */
+		public int getSampledPerFrame() {
+			return mSamplesPerFrame * mChannelCount;
+		}
+
+		/**
+		 * 音声データ１つ当たりのバイト数を返す
+		 * 1フレーム辺りのサンプリング数xチャネル数x1サンプルあたりのバイト数
+		 * (AudioRecordから1度に読み込みを試みる最大バイト数)
+		 * @return
+		 */
+		public int getBufferSize() {
+			return mBytesPerFrame;
+		}
+
+		public int getBitResolution() {
+			return 16;	// AudioFormat.ENCODING_PCM_16BIT
+		}
+
+		/**
+		 * 音声取得終了要求
+		 */
+		public void requestStop() {
+			mIsRunning = false;
+		}
+
+		public boolean isRunning() {
+			return mIsRunning;
+		}
+
+		@SuppressLint("MissingPermission")
+		@Override
+		public void run() {
+    		if (DEBUG) Log.v(TAG, "AudioTask:start");
+			mIsRunning = true;
+    		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
+			onStart();
+			int retry = 3;
+			int numFrames = 0;
+RETRY_LOOP:	while (isRunning() && (retry > 0)) {
+				@AudioChannel
+				final int audioChannel = getAudioChannel(mChannelCount);
+				AudioRecord audioRecord;
+				if (mForceSource) {
+					try {
+						audioRecord = newInstance(
+							mAudioSource, mSamplingRate, audioChannel, DEFAULT_AUDIO_FORMAT, mBufferSize);
+					} catch (final Exception e) {
+						Log.d(TAG, "AudioTask:", e);
+						audioRecord = null;
+					}
+				} else {
+					audioRecord = createAudioRecord(
+						mAudioSource, mSamplingRate, audioChannel, DEFAULT_AUDIO_FORMAT, mBufferSize);
+				}
+				int errCount = 0;
+				if (audioRecord != null) {
+					try {
+						if (isRunning()) {
+		        			if (DEBUG) Log.v(TAG, "AudioTask:start audio recording");
+							int readBytes;
+							ByteBuffer buffer;
+							audioRecord.startRecording();
+							try {
+								MediaData data;
+LOOP:							while (isRunning()) {
+									data = obtain(mBufferSize);
+									if (data != null) {
+										// check recording state
+										final int recordingState = audioRecord.getRecordingState();
+										if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
+											if (errCount == 0) {
+												Log.e(TAG, "not a recording state," + recordingState);
+											}
+											errCount++;
+											recycle(data);
+											if (errCount > 20) {
+												retry--;
+												break LOOP;
+											} else {
+												synchronized (mSync) {
+													mSync.wait(100);
+												}
+												continue;
+											}
+										}
+										// try to read audio data
+										buffer = data.get();
+										buffer.clear();
+										// 1回に読み込むのはBYTES_PER_FRAMEバイト
+										try {
+											readBytes = audioRecord.read(buffer, mBytesPerFrame);
+										} catch (final Exception e) {
+											Log.e(TAG, "AudioRecord#read failed:" + e);
+											errCount++;
+											retry--;
+											recycle(data);
+											onError(e);
+											break LOOP;
+										}
+										if (readBytes > 0) {
+											// 正常に読み込めた時
+											errCount = 0;
+											numFrames++;
+											data.presentationTimeUs(getInputPTSUs())
+												.size(readBytes);
+											buffer.position(readBytes);
+											buffer.flip();
+											// 音声データキューに追加する
+											queueData(data);
+											continue;
+										} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
+											errCount = 0;
+											recycle(data);
+											continue;
+										} else if (readBytes == AudioRecord.ERROR) {
+											if (errCount == 0) {
+												Log.e(TAG, "Read error ERROR");
+											}
+										} else if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
+											if (errCount == 0) {
+												Log.e(TAG, "Read error ERROR_BAD_VALUE");
+											}
+										} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
+											if (errCount == 0) {
+												Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
+											}
+										} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
+											Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
+											errCount++;
+											retry--;
+											recycle(data);
+											break LOOP;
+										} else if (readBytes < 0) {
+											if (errCount == 0) {
+												Log.e(TAG, "Read returned unknown err " + readBytes);
+											}
+										}
+										errCount++;
+										recycle(data);
+									} // end of if (data != null)
+									if (errCount > 10) {
+										retry--;
+										break LOOP;
+									}
+								} // end of while (isRunning())
+								if (DEBUG) Log.v(TAG, "AudioTask:stop audio recording");
+							} finally {
+								audioRecord.stop();
+							}
+						}	// if (isRunning())
+					} catch (final Exception e) {
+						retry--;
+						onError(e);
+					} finally {
+						audioRecord.release();
+					}
+					if (isRunning() && (errCount > 0) && (retry > 0)) {
+						// キャプチャリング中でエラーからのリカバリー処理が必要なときは0.5秒待機
+						for (int i = 0; isRunning() && (i < 5); i++) {
+							synchronized (mSync) {
+								try {
+									mSync.wait(100);
+								} catch (final InterruptedException e) {
+									break RETRY_LOOP;
+								}
+							}
+						}
+					}
+				} else {
+					onError(new RuntimeException("AudioRecord failed to initialize"));
+					retry = 0;	// 初期化できんかったときはリトライしない
+				}
+			}	// end of for
+			if (mGenDummyFrameIfNoData && (numFrames == 0)) {
+				// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
+				// ダミー音声データの書き込みを試みる
+				final ByteBuffer buf = ByteBuffer.allocateDirect(mBufferSize).order(ByteOrder.nativeOrder());
+				for (int i = 0; i < 5; i++) {
+					final MediaData data = obtain(mBufferSize);
+					if (data != null) {
+						buf.clear();
+						buf.position(mBufferSize);
+						buf.flip();
+						data.set(buf, mBufferSize, getInputPTSUs());
+						ThreadUtils.NoThrowSleep(40);
+					}
+				}
+			}
+			onStop();
+    		if (DEBUG) Log.v(TAG, "AudioTask:finished");
+    	} // #run
+
+		/**
+		 * 音声データを読み込むためのMediaDataオブジェクトを取得
+		 * @return
+		 */
+		@Nullable
+		protected abstract MediaData obtain(final int bufferBytes);
+
+		/**
+		 * 取得した音声データをキューに入れる処理
+		 * @param data
+		 */
+		protected abstract void queueData(@NonNull final MediaData data);
+
+		/**
+		 * #obtainで取得したMediaData(またはその継承オブジェクト)へ
+		 * 音声データを取得できなかったときに再利用するための処理
+		 * dataがRecycleMediaDataであればRecycleMediaData#recycleを呼び出す
+		 * @param data
+		 */
+		protected void recycle(@NonNull final MediaData data) {
+			if (data instanceof RecycleMediaData) {
+				((RecycleMediaData) data).recycle();
+			}
+		}
+
+		/**
+		 * 今回の書き込み用のpresentationTimeUs値を取得
+		 * @return
+		 */
+	    @SuppressLint("NewApi")
+		protected long getInputPTSUs() {
+			long result = Time.nanoTime() / 1000L;
+			if (result <= prevInputPTSUs) {
+				result = prevInputPTSUs + 9643;
+			}
+			prevInputPTSUs = result;
+			return result;
+	    }
+
+		/**
+		 * 音声サンプリング開始
+		 */
+		protected void onStart() {}
+
+		/**
+		 * 音声サンプリング終了
+		 */
+		protected void onStop() {}
+
+		/**
+		 * 音声サンプリングでエラー発生
+		 * @param t
+		 */
+		protected abstract void onError(@NonNull final Throwable t);
+
 	}
 }
