@@ -212,8 +212,15 @@ class CameraRecFragment : AbstractCameraFragment() {
 		mVideoEncoder!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
 		mVideoEncoder!!.setVideoConfig(-1, VIDEO_FPS, 10)
 		if (audio_source >= 0) {
-			mAudioSampler = AudioSampler(audio_source,
-				audio_channels, SAMPLE_RATE)
+			mAudioSampler = if (USE_ENCODED_AUDIO_SAMPLER) {
+				// AAC LCへエンコードしてからバッファリングする音声サンプラー
+				EncodedAudioSampler(audio_source,
+					audio_channels, SAMPLE_RATE)
+			} else {
+				// 通常の音声サンプラー
+				AudioSampler(audio_source,
+					audio_channels, SAMPLE_RATE)
+			}
 			mAudioSampler!!.start()
 			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler)
 		}
@@ -326,6 +333,12 @@ class CameraRecFragment : AbstractCameraFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = CameraRecFragment::class.java.simpleName
+
+		/**
+		 * EncodedAudioSamplerを使うかどうか
+		 * falseならAudioSamplerを使う
+		 */
+		private const val USE_ENCODED_AUDIO_SAMPLER = false
 
 		fun newInstance(
 			@LayoutRes layoutRes: Int, @StringRes titleRes: Int,
