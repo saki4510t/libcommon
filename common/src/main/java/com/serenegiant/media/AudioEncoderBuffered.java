@@ -22,19 +22,17 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.TimeUnit;
 
-import android.annotation.SuppressLint;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  *　FIFOキューによるバッファリング付きのAudioEncoder
  */
 public class AudioEncoderBuffered extends AbstractAudioEncoder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AudioEncoderBuffered.class.getSimpleName();
 
 	private static final int MAX_POOL_SIZE = 100;
@@ -98,119 +96,31 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	 */
     private final class AudioThread extends Thread {
     	public AudioThread() {
-    		super("AudioThread");
-    	}
+    		super(new AudioRecordCompat.AudioRecordTask(
+				mAudioSource, mChannelCount, mSampleRate,
+				AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER) {
+				@Override
+				public boolean isRunning() {
+					return super.isRunning()
+						&& isEncoding() && !isRequestStop();
+				}
 
-		@SuppressLint("MissingPermission")
-    	@Override
-    	public void run() {
-    		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			final int buffer_size = AudioRecordCompat.getAudioBufferSize(
-				mChannelCount, AudioRecordCompat.DEFAULT_AUDIO_FORMAT, mSampleRate);
-/*
-			final Class audioSystemClass = Class.forName("android.media.AudioSystem");
-			// will disable the headphone
-			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_UNAVAILABLE, new String(""));
-			// will enable the headphone
-			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
-*/
-    		final AudioRecord audioRecord = AudioRecordCompat.createAudioRecord(
-    			mAudioSource, mSampleRate, mChannelCount, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
-			int err_count = 0;
-            if (audioRecord != null) {
-	            try {
-	            	if (isEncoding()) {
-//						if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
-		                int readBytes;
-		                ByteBuffer buffer;
-		                audioRecord.startRecording();
-		                try {
-							final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME
-								* mChannelCount
-								* AudioRecordCompat.getBitResolution(AudioRecordCompat.DEFAULT_AUDIO_FORMAT);
-		                	RecycleMediaData data;
-		                	for ( ; ; ) {
-		                		if (!isEncoding() || isRequestStop()) break;
-								// check recording state
-								final int recordingState = audioRecord.getRecordingState();
-								if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
-									if (err_count == 0) {
-										Log.e(TAG, "not a recording state," + recordingState);
-									}
-									err_count++;
-									if (err_count > 20) {
-										break;
-									} else {
-										synchronized (mSync) {
-											mSync.wait(100);
-										}
-										continue;
-									}
-								}
-		                		data = mAudioQueue.obtain(mBufferSize);
-		                		buffer = data.get();
-		                		buffer.clear();
-		                		try {
-		                			readBytes = audioRecord.read(buffer, sizeInBytes);
-		                		} catch (final Exception e) {
-//		    		        		Log.w(TAG, "AudioRecord#read failed:", e);
-		                			break;
-		                		}
-								if (readBytes > 0) {
-									// 内蔵マイクからの音声入力をエンコーダーにセット
-									err_count = 0;
-									// FIXME ここはMediaDataのセッターで一括でセットするように変更する
-									data.presentationTimeUs(getInputPTSUs())
-										.size(readBytes);
-									buffer.position(readBytes);
-									buffer.flip();
-									mAudioQueue.queueFrame(data);
-									continue;
-								} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
-									err_count = 0;
-									data.recycle();
-									continue;
-								} else if (readBytes == AudioRecord.ERROR) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR");
-									}
-								} else if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR_BAD_VALUE");
-									}
-								} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-									}
-								} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
-									Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
-									data.recycle();
-									// FIXME AudioRecordを再生成しないといけない
-									break;
-								} else if (readBytes < 0) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read returned unknown err " + readBytes);
-									}
-								}
-								err_count++;
-								data.recycle();
-				    			if (err_count > 10) {
-				    				break;
-								}
-		                	}	// end of for ( ; ; )
-		                } finally {
-		                	audioRecord.stop();
-		                }
-	            	}	// if (mIsCapturing)
-	            } catch (final Exception e) {
-//	        		Log.e(TAG, "exception on AudioRecord:", e);
-	            } finally {
-	            	audioRecord.release();
-	            }
-//	    	} else {
-//        		Log.w(TAG, "AudioRecord failed to initialize");
-	    	}	// if (audioRecord != null)
-//			if (DEBUG) Log.v(TAG, "AudioThread:finished");
+				@Nullable
+				@Override
+				protected MediaData obtain(final int bufferBytes) {
+					return mAudioQueue.obtain(bufferBytes);
+				}
+
+				@Override
+				protected void queueData(@NonNull final MediaData data) {
+					mAudioQueue.queueFrame((RecycleMediaData) data);
+				}
+
+				@Override
+				protected void onError(@NonNull final Throwable t) {
+					if (DEBUG) Log.w(TAG, t);
+				}
+			},"AudioThread");
     	}
     }
 

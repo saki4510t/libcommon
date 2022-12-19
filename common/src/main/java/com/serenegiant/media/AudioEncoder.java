@@ -18,16 +18,11 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
-
-import android.annotation.SuppressLint;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
 import android.media.MediaRecorder;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * AudioRecordから音声データを取得してMediaCodecエンコーダーでエンコードするためのクラス
@@ -107,135 +102,41 @@ public class AudioEncoder extends AbstractAudioEncoder {
 	 */
     private final class AudioThread extends Thread {
     	public AudioThread() {
-    		super("AudioThread");
-    	}
+    		super(new AudioRecordCompat.AudioRecordTask(
+				mAudioSource, mChannelCount, mSampleRate,
+				AudioRecordCompat.SAMPLES_PER_FRAME, AudioRecordCompat.FRAMES_PER_BUFFER,
+				false, true) {
+				private final MediaData data = new MediaData();
 
-		@SuppressLint("MissingPermission")
-    	@Override
-    	public void run() {
-    		if (DEBUG) Log.v(TAG, getName() + " started");
-    		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			final int buffer_size = AudioRecordCompat.getAudioBufferSize(
-				mChannelCount, AudioRecordCompat.DEFAULT_AUDIO_FORMAT, 	mSampleRate);
-/*
-			final Class audioSystemClass = Class.forName("android.media.AudioSystem");
-			// will disable the headphone
-			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_UNAVAILABLE, new String(""));
-			// will enable the headphone
-			setDeviceConnectionState.Invoke(audioSystemClass, (Integer)DEVICE_OUT_WIRED_HEADPHONE, (Integer)DEVICE_STATE_AVAILABLE, new Lang.String(""));
-*/
-    		final AudioRecord audioRecord = AudioRecordCompat.createAudioRecord(
-    			mAudioSource, mSampleRate, mChannelCount, AudioFormat.ENCODING_PCM_16BIT, buffer_size);
-            int frame_count = 0, err_count = 0;
-            final ByteBuffer buf = ByteBuffer.allocateDirect(buffer_size).order(ByteOrder.nativeOrder());
-            if (audioRecord != null) {
-	            try {
-	            	if (isEncoding()) {
-	//    				if (DEBUG) Log.v(TAG, "AudioThread:start audio recording");
-		                int readBytes;
-		                audioRecord.startRecording();
-		                try {
-		                	final int sizeInBytes = AudioRecordCompat.SAMPLES_PER_FRAME
-		                		* mChannelCount
-		                		* AudioRecordCompat.getBitResolution(AudioRecordCompat.DEFAULT_AUDIO_FORMAT);
-		                	for ( ; ;) {
-		                		if (!isEncoding() || isRequestStop()) break;
-								// check recording state
-								final int recordingState = audioRecord.getRecordingState();
-								if (recordingState != AudioRecord.RECORDSTATE_RECORDING) {
-									if (err_count == 0) {
-										Log.e(TAG, "not a recording state," + recordingState);
-									}
-									err_count++;
-									if (err_count > 20) {
-										break;
-									} else {
-										synchronized (mSync) {
-											mSync.wait(100);
-										}
-										continue;
-									}
-								}
-		                		buf.clear();
-		                		try {
-		                			readBytes = audioRecord.read(buf, sizeInBytes);
-		                		} catch (final Exception e) {
-//		    		        		Log.w(TAG, "AudioRecord#read failed:", e);
-		                			break;
-		                		}
-								if (readBytes > 0) {
-									err_count = 0;
-									frame_count++;
-									// 内蔵マイクからの音声入力をエンコーダーにセット
-									buf.position(readBytes);
-									buf.flip();
-									encode(buf, getInputPTSUs());
-									frameAvailableSoon();
-								} else if (readBytes == AudioRecord.SUCCESS) {	// == 0
-									err_count = 0;
-									continue;
-								} else if (readBytes == AudioRecord.ERROR) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR");
-									}
-									err_count++;
-								} else if (readBytes == AudioRecord.ERROR_BAD_VALUE) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR_BAD_VALUE");
-									}
-				    				err_count++;
-				    			} else if (readBytes == AudioRecord.ERROR_INVALID_OPERATION) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR_INVALID_OPERATION");
-									}
-				    				err_count++;
-								} else if (readBytes == AudioRecord.ERROR_DEAD_OBJECT) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read error ERROR_DEAD_OBJECT");
-									}
-									err_count++;
-									// FIXME この時はAudioRecordを再生成しないといけない
-								} else if (readBytes < 0) {
-									if (err_count == 0) {
-										Log.e(TAG, "Read returned unknown err " + readBytes);
-									}
-									err_count++;
-								}
-				    			if (err_count > 10) break;
-		                	}
-		                	if (frame_count > 0)
-		                		frameAvailableSoon();
-		                } finally {
-		                	audioRecord.stop();
-		                }
-	            	}
-	            } catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, "exception on AudioRecord", e);
-	            } finally {
-	            	audioRecord.release();
-	            }
-//	    	} else {
-//        		Log.w(TAG, "AudioRecord failed to initialize");
-	    	}
-            if (frame_count == 0) {
-            	// 1フレームも書き込めなかった時は動画出力時にMediaMuxerがクラッシュしないように
-            	// ダミーデータを書き込む
-            	for (int i = 0; isEncoding() && (i < 5); i++) {
-					buf.clear();
-	    			buf.position(AudioRecordCompat.SAMPLES_PER_FRAME);
-	    			buf.flip();
-					encode(buf, getInputPTSUs());
+				@Override
+				public boolean isRunning() {
+					return super.isRunning()
+						&& isEncoding() && !isRequestStop();
+				}
+
+				@Nullable
+				@Override
+				protected MediaData obtain(final int bufferBytes) {
+					data.resize(bufferBytes);
+					return data;
+				}
+
+				@Override
+				protected void recycle(@NonNull final MediaData data) {
+					// 1つしか使っていないのでリサイクルは不用
+				}
+
+				@Override
+				protected void queueData(@NonNull final MediaData data) {
+					encode(data.get(), data.presentationTimeUs());
 					frameAvailableSoon();
-					synchronized(this) {
-						try {
-							wait(50);
-						} catch (final InterruptedException e) {
-							// ignore
-						}
-					}
-            	}
-            }
-			if (DEBUG) Log.v(TAG, "AudioThread:finished");
+				}
+
+				@Override
+				protected void onError(@NonNull final Throwable t) {
+					if (DEBUG) Log.w(TAG, t);
+				}
+			}, "AudioThread");
     	}
     }
 
