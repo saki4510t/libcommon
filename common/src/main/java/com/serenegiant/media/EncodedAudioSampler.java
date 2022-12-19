@@ -41,7 +41,7 @@ import androidx.annotation.RequiresPermission;
  * AudioSamplerのAACエンコード済みバージョン
  */
 public class EncodedAudioSampler extends IAudioSampler {
-	private static final boolean DEBUG = true; // set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = EncodedAudioSampler.class.getSimpleName();
 
 	/**
