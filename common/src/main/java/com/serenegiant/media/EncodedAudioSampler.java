@@ -245,7 +245,20 @@ public class EncodedAudioSampler extends IAudioSampler {
     			SAMPLES_PER_FRAME, BYTES_PER_FRAME,
     			FORCE_SOURCE, false) {
 
-    			@Override
+				/**
+				 * 音声データ受け取り用のMediaDataオブジェクト
+				 * こっちはすぐにエンコーダーへ入れてしまうのでバッファリング不要
+				 */
+				@NonNull
+				private final MediaData data = new MediaData();
+
+				@Override
+				protected void onStart() {
+					super.onStart();
+					data.resize(getBufferSize());
+				}
+
+				@Override
 				public boolean isRunning() {
 					return super.isRunning() && isStarted();
 				}
@@ -253,7 +266,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 				@Nullable
 				@Override
 				protected MediaData obtain(final int bufferBytes) {
-					return EncodedAudioSampler.this.obtain(bufferBytes);
+					return data;
 				}
 
 				@Override
@@ -267,11 +280,8 @@ public class EncodedAudioSampler extends IAudioSampler {
 						try {
 							encoder.encode(data.get(), data.presentationTimeUs());
 						} catch (final Exception e) {
-							recycle(data);
 							callOnError(e);
 						}
-					} else {
-						recycle(data);
 					}
 				}
 
