@@ -263,6 +263,10 @@ public abstract class MediaEncoder implements Encoder {
 		mRequestStop = true;
 	}
 
+	protected boolean isReady() {
+		return mIsEncoding && !mRequestStop;
+	}
+
 	@NonNull
 	public String getMimeType() {
 		return MIME_TYPE;
