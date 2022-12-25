@@ -68,7 +68,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 	private final boolean FORCE_SOURCE;
 
 	@Nullable
-	private AudioThread mAudioThread;
+	private AudioRecordCompat.AudioRecordTask mAudioTask;
 	@Nullable
 	private MediaEncoder.MediaAudioEncoder mEncoder;
 	@NonNull
@@ -184,6 +184,13 @@ public class EncodedAudioSampler extends IAudioSampler {
 		return 16;	// AudioFormat.ENCODING_PCM_16BIT
 	}
 
+	@Override
+	public int getAudioSessionId() {
+		synchronized (mSync) {
+			return mAudioTask != null ? mAudioTask.getAudioSessionId() : 0;
+		}
+	}
+
 	@NonNull
 	public MediaFormat getMediaFormat() {
 		return mMediaFormat;
@@ -199,7 +206,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 		if (DEBUG) Log.v(TAG, "start:isStarted=" + isStarted());
 		super.start();
 		synchronized (mSync) {
-			if (mAudioThread == null) {
+			if (mAudioTask == null) {
 				init_pool(BYTES_PER_FRAME);
 				try {
 					// エンコーダーを生成
@@ -207,8 +214,57 @@ public class EncodedAudioSampler extends IAudioSampler {
 					mEncoder.prepare();
 					mEncoder.start();
 					// 内蔵マイクからの音声取り込みスレッド生成＆実行
-					mAudioThread = new AudioThread();
-					mAudioThread.start();
+					mAudioTask = new AudioRecordCompat.AudioRecordTask(
+						AUDIO_SOURCE, CHANNEL_COUNT, SAMPLING_RATE,
+						SAMPLES_PER_FRAME, BYTES_PER_FRAME,
+						FORCE_SOURCE, false) {
+
+						/**
+						 * 音声データ受け取り用のMediaDataオブジェクト
+						 * こっちはすぐにエンコーダーへ入れてしまうのでバッファリング不要
+						 */
+						@NonNull
+						private final MediaData data = new MediaData();
+
+						@Override
+						protected void onStart() {
+							super.onStart();
+							data.resize(getBufferSize());
+						}
+
+						@Override
+						public boolean isRunning() {
+							return super.isRunning() && isStarted();
+						}
+
+						@Nullable
+						@Override
+						protected MediaData obtain(final int bufferBytes) {
+							return data;
+						}
+
+						@Override
+						protected void queueData(@NonNull final MediaData data) {
+							// キューへ入れる代わりにエンコーダーへ入れる
+							final MediaEncoder encoder;
+							synchronized (mSync) {
+								encoder = mEncoder;
+							}
+							if (encoder != null) {
+								try {
+									encoder.encode(data.get(), data.presentationTimeUs());
+								} catch (final Exception e) {
+									callOnError(e);
+								}
+							}
+						}
+
+						@Override
+						protected void onError(@NonNull final Throwable t) {
+							callOnError(t);
+						}
+					};
+					new Thread(mAudioTask, "AudioThread").start();
 				} catch (Exception e) {
 					stop();
 				}
@@ -229,7 +285,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 				mEncoder.release();
 				mEncoder = null;
 			}
-			mAudioThread = null;
+			mAudioTask = null;
 			mSync.notify();
 		}
 		super.stop();

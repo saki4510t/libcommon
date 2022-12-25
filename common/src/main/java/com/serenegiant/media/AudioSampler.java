@@ -36,7 +36,7 @@ public class AudioSampler extends IAudioSampler {
 	@NonNull
 	private final Object mSync = new Object();
 	@Nullable
-	private AudioThread mAudioThread;
+	private AudioRecordCompat.AudioRecordTask mAudioTask;
     private final int AUDIO_SOURCE;
     private final int SAMPLING_RATE, CHANNEL_COUNT;
 	/**
@@ -148,11 +148,36 @@ public class AudioSampler extends IAudioSampler {
 		if (DEBUG) Log.v(TAG, "start:isStarted=" + isStarted());
 		super.start();
 		synchronized (mSync) {
-			if (mAudioThread == null) {
+			if (mAudioTask == null) {
 				init_pool(BYTES_PER_FRAME);
 				// 内蔵マイクからの音声取り込みスレッド生成＆実行
-				mAudioThread = new AudioThread();
-				mAudioThread.start();
+				mAudioTask = new AudioRecordCompat.AudioRecordTask(
+					AUDIO_SOURCE, CHANNEL_COUNT, SAMPLING_RATE,
+					SAMPLES_PER_FRAME, BYTES_PER_FRAME, FORCE_SOURCE, false) {
+
+					@Override
+					public boolean isRunning() {
+						return super.isRunning()
+							&& AudioSampler.this.isStarted();
+					}
+
+					@Nullable
+					@Override
+					protected MediaData obtain(final int bufferBytes) {
+						return AudioSampler.this.obtain(bufferBytes);
+					}
+
+					@Override
+					protected void queueData(@NonNull final MediaData data) {
+						addMediaData((RecycleMediaData) data);
+					}
+
+					@Override
+					protected void onError(@NonNull final Throwable t) {
+						callOnError(t);
+					}
+				};
+				new Thread(mAudioTask, "AudioTread").start();
 			}
 		}
 	}
@@ -165,7 +190,7 @@ public class AudioSampler extends IAudioSampler {
 		if (DEBUG) Log.v(TAG, "stop:isStarted=" + isStarted());
 		setIsCapturing(false);
 		synchronized (mSync) {
-			mAudioThread = null;
+			mAudioTask = null;
 			mSync.notify();
 		}
 		super.stop();
@@ -175,40 +200,6 @@ public class AudioSampler extends IAudioSampler {
 	public int getAudioSource() {
 		return AUDIO_SOURCE;
 	}
-
-	/**
-	 * AudioRecordから無圧縮PCM16bitで内蔵マイクからの音声データを取得してキューへ書き込むためのスレッド
-	 */
-    private final class AudioThread extends Thread {
-    	public AudioThread() {
-    		super(new AudioRecordCompat.AudioRecordTask(
-    			AUDIO_SOURCE, CHANNEL_COUNT, SAMPLING_RATE,
-    			SAMPLES_PER_FRAME, BYTES_PER_FRAME, FORCE_SOURCE, false) {
-
-    			@Override
-				public boolean isRunning() {
-					return super.isRunning()
-						&& AudioSampler.this.isStarted();
-				}
-
-				@Nullable
-				@Override
-				protected MediaData obtain(final int bufferBytes) {
-					return AudioSampler.this.obtain(bufferBytes);
-				}
-
-				@Override
-				protected void queueData(@NonNull final MediaData data) {
-					addMediaData((RecycleMediaData) data);
-				}
-
-				@Override
-				protected void onError(@NonNull final Throwable t) {
-					callOnError(t);
-				}
-			}, "AudioThread");
-    	}
-    }
 
 	@Override
 	public int getChannels() {
@@ -223,6 +214,13 @@ public class AudioSampler extends IAudioSampler {
 	@Override
 	public int getBitResolution() {
 		return 16;	// AudioFormat.ENCODING_PCM_16BIT
+	}
+
+	@Override
+	public int getAudioSessionId() {
+		synchronized (mSync) {
+			return mAudioTask != null ? mAudioTask.getAudioSessionId() : 0;
+		}
 	}
 
 }

@@ -225,6 +225,13 @@ public abstract class IAudioSampler {
 	 * @return
 	 */
 	public abstract int getBitResolution();
+
+	/**
+	 * 音声セッションIDを取得
+	 * @return 無効な場合は0を返す
+	 */
+	public abstract int getAudioSessionId();
+
 	/**
 	 * 音声データ１つ当たりのバイト数を返す
 	 * (AudioRecordから1度に読み込みを試みる最大バイト数)
