@@ -303,6 +303,12 @@ public class AudioRecordCompat {
 		 * 前回MediaCodecへのエンコード時に使ったpresentationTimeUs
 		 */
 		private long prevInputPTSUs = -1;
+		/**
+		 * 音声セッションID
+		 * onStart - onStop間でのみ有効
+		 * 無効なときは0
+		 */
+		private volatile int mAudioSessionId;
 
 		/**
 		 * コンストラクタ
@@ -405,13 +411,21 @@ public class AudioRecordCompat {
 			return mIsRunning;
 		}
 
+		/**
+		 * 音声セッションIDを取得する
+		 * onStart空onStop間でのみ有効
+		 * @return 0: 無効な値
+		 */
+		public int getAudioSessionId() {
+			return mAudioSessionId;
+		}
+
 		@SuppressLint("MissingPermission")
 		@Override
 		public void run() {
     		if (DEBUG) Log.v(TAG, "AudioTask:start");
 			mIsRunning = true;
     		android.os.Process.setThreadPriority(android.os.Process.THREAD_PRIORITY_AUDIO); // THREAD_PRIORITY_URGENT_AUDIO
-			onStart();
 			int retry = 3;
 			int numFrames = 0;
 RETRY_LOOP:	while (isRunning() && (retry > 0)) {
@@ -432,6 +446,8 @@ RETRY_LOOP:	while (isRunning() && (retry > 0)) {
 				}
 				int errCount = 0;
 				if (audioRecord != null) {
+					mAudioSessionId = audioRecord.getAudioSessionId();
+					onStart();
 					try {
 						if (isRunning()) {
 		        			if (DEBUG) Log.v(TAG, "AudioTask:start audio recording");
@@ -526,12 +542,14 @@ LOOP:							while (isRunning()) {
 								audioRecord.stop();
 							}
 						}	// if (isRunning())
+						mAudioSessionId = 0;
 					} catch (final Exception e) {
 						retry--;
 						onError(e);
 					} finally {
 						audioRecord.release();
 					}
+					onStop();
 					if (isRunning() && (errCount > 0) && (retry > 0)) {
 						// キャプチャリング中でエラーからのリカバリー処理が必要なときは0.5秒待機
 						for (int i = 0; isRunning() && (i < 5); i++) {
@@ -609,11 +627,13 @@ LOOP:							while (isRunning()) {
 
 		/**
 		 * 音声サンプリング開始
+		 * 複数回呼ばれる可能性がある
 		 */
 		protected void onStart() {}
 
 		/**
 		 * 音声サンプリング終了
+		 * 複数回呼ばれる可能性がある
 		 */
 		protected void onStop() {}
 
