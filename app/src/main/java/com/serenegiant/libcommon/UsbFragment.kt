@@ -139,7 +139,6 @@ class UsbFragment : BaseFragment() {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
 				if (connection != null) {
-					Log.v(TAG, "desc=${BufferHelper.toHexString(connection.rawDescriptors, 0, 32)}")
 					Log.v(TAG, String.format("bcdUSB=0x%04x", UsbDeviceInfo.getBcdUSB(connection)))
 					Log.v(TAG, String.format("class=0x%02x", UsbDeviceInfo.getDeviceClass(connection)))
 					Log.v(TAG, String.format("subClass=0x%02x", UsbDeviceInfo.getDeviceSubClass(connection)))
@@ -151,6 +150,7 @@ class UsbFragment : BaseFragment() {
 					Log.v(TAG, "productName=${UsbDeviceInfo.getProductName(connection)}")
 					Log.v(TAG, "serialNumber=${UsbDeviceInfo.getSerialNumber(connection)}")
 					Log.v(TAG, "numConfigs=${UsbDeviceInfo.getNumConfigurations(connection)}")
+					Log.v(TAG, "descAll=${BufferHelper.toHexString(connection.rawDescriptors)}")
 				}
 			}
 			// USB機器がopenした時,1秒後にcloseする
