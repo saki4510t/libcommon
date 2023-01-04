@@ -22,4 +22,11 @@ import android.widget.Checkable;
 
 public interface CheckableEx extends Checkable {
 	static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
+
+	/**
+	 * CheckableにsetCheckedに対応するゲッターがないと双方向データバインディング時に
+	 * 余分に手間がかかるので#getCheckedで#isCheckedを呼び出すように追加
+	 * @return
+	 */
+	public default boolean getChecked() { return isChecked(); }
 }
