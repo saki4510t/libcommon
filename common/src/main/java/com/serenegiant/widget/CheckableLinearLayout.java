@@ -25,12 +25,16 @@ import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
+
 public class CheckableLinearLayout extends LinearLayout implements CheckableEx, Touchable {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "CheckableLinearLayout";
 
 	private boolean mChecked;
+	@Nullable
+	private OnCheckedChangeListener mListener;
 
 	public CheckableLinearLayout(final Context context) {
 		this(context, null);
@@ -42,6 +46,13 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 
 	public CheckableLinearLayout(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+	}
+
+	@Override
+	public void setOnCheckedChangeListener(@Nullable final OnCheckedChangeListener listener) {
+		synchronized (this) {
+			mListener = listener;
+		}
 	}
 
 	@Override
@@ -62,6 +73,13 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
             		((Checkable)v).setChecked(checked);
             }
             refreshDrawableState();
+			final OnCheckedChangeListener listener;
+			synchronized (this) {
+				listener = mListener;
+			}
+			if (listener != null) {
+				listener.onCheckedChanged(this, checked);
+			}
         }
 	}
 

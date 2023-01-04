@@ -26,9 +26,13 @@ import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
 
+import androidx.annotation.Nullable;
+
 public class CheckableRelativeLayout extends RelativeLayout implements CheckableEx, Touchable {
 
 	private boolean mIsChecked;
+	@Nullable
+	private OnCheckedChangeListener mListener;
 
 	public CheckableRelativeLayout(final Context context) {
 		this(context, null);
@@ -38,6 +42,12 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
 		super(context, attrs);
 	}
 
+	@Override
+	public void setOnCheckedChangeListener(@Nullable final OnCheckedChangeListener listener) {
+		synchronized (this) {
+			mListener = listener;
+		}
+	}
 
 	@Override
 	public boolean isChecked() {
@@ -50,6 +60,13 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
 			mIsChecked = checked;
 			updateChildState(this, checked);
             refreshDrawableState();
+			final OnCheckedChangeListener listener;
+			synchronized (this) {
+				listener = mListener;
+			}
+			if (listener != null) {
+				listener.onCheckedChanged(this, checked);
+			}
         }
 	}
 

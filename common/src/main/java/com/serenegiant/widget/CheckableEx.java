@@ -20,8 +20,21 @@ package com.serenegiant.widget;
 
 import android.widget.Checkable;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 public interface CheckableEx extends Checkable {
 	static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
+
+	public static interface OnCheckedChangeListener {
+		/**
+		 * Called when the checked state of a compound button has changed.
+		 *
+		 * @param checkable The compound button view whose state has changed.
+		 * @param isChecked  The new checked state of buttonView.
+		 */
+		void onCheckedChanged(@NonNull final CheckableEx checkable, final boolean isChecked);
+	}
 
 	/**
 	 * CheckableにsetCheckedに対応するゲッターがないと双方向データバインディング時に
@@ -29,4 +42,8 @@ public interface CheckableEx extends Checkable {
 	 * @return
 	 */
 	public boolean getChecked();
+
+	public void setOnCheckedChangeListener(
+		@Nullable final OnCheckedChangeListener listener);
+
 }

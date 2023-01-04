@@ -20,7 +20,9 @@ package com.serenegiant.widget;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.widget.CompoundButton;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 
 public class CheckableImageButton extends AppCompatImageButton implements CheckableEx {
@@ -28,6 +30,8 @@ public class CheckableImageButton extends AppCompatImageButton implements Checka
 	private static final String TAG = CheckableImageButton.class.getSimpleName();
 
 	private boolean mIsChecked;
+	@Nullable
+	private OnCheckedChangeListener mListener;
 
 	public CheckableImageButton(Context context) {
 		this(context, null, 0);
@@ -42,10 +46,24 @@ public class CheckableImageButton extends AppCompatImageButton implements Checka
 	}
 
 	@Override
+	public void setOnCheckedChangeListener(@Nullable final OnCheckedChangeListener listener) {
+		synchronized (this) {
+			mListener = listener;
+		}
+	}
+
+	@Override
 	public void setChecked(boolean checked) {
 		if (mIsChecked != checked) {
 			mIsChecked = checked;
             refreshDrawableState();
+			final OnCheckedChangeListener listener;
+			synchronized (this) {
+				listener = mListener;
+			}
+			if (listener != null) {
+				listener.onCheckedChanged(this, checked);
+			}
         }
 	}
 

@@ -21,6 +21,7 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.util.AttributeSet;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 public class CheckableImageView extends AppCompatImageView implements CheckableEx {
@@ -28,6 +29,8 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	private static final String TAG = CheckableImageView.class.getSimpleName();
 
 	private boolean mIsChecked;
+	@Nullable
+	private OnCheckedChangeListener mListener;
 
 	public CheckableImageView(Context context) {
 		this(context, null, 0);
@@ -42,10 +45,24 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
+	public void setOnCheckedChangeListener(@Nullable final OnCheckedChangeListener listener) {
+		synchronized (this) {
+			mListener = listener;
+		}
+	}
+
+	@Override
 	public void setChecked(boolean checked) {
 		if (mIsChecked != checked) {
 			mIsChecked = checked;
             refreshDrawableState();
+			final OnCheckedChangeListener listener;
+			synchronized (this) {
+				listener = mListener;
+			}
+			if (listener != null) {
+				listener.onCheckedChanged(this, checked);
+			}
         }
 	}
 
