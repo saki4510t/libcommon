@@ -33,6 +33,7 @@ ext {
 	androidXPreference = '1.2.0'
 	androidXConstraint = '2.1.4'
 	androidXLeanback = '1.0.0'
+	androidXDataBinding = '7.3.1'
 
 	androidXKtx = '1.6.0'
 	androidXLifecycleKtx = '2.5.1'

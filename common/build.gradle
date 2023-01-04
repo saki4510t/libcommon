@@ -94,6 +94,7 @@ dependencies {
 	implementation "androidx.exifinterface:exifinterface:$androidXExif"
 	implementation "com.google.android.material:material:$androidXMaterial"
 	implementation "androidx.lifecycle:lifecycle-process:$androidXLifecycle"
+	implementation "androidx.databinding:databinding-common:$androidXDataBinding"
 	// ktx
 	implementation "androidx.core:core-ktx:$androidXCore"
 	implementation "androidx.preference:preference-ktx:$androidXPreference"

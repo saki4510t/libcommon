@@ -25,24 +25,60 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.View.OnClickListener
 import android.view.ViewGroup
-import androidx.core.view.children
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.MutableLiveData
+import com.serenegiant.libcommon.databinding.FragmentCheckableexBinding
 import com.serenegiant.widget.CheckableEx
-import com.serenegiant.widget.Touchable
+import com.serenegiant.widget.CheckableEx.OnCheckedChangeListener
 
 class CheckableExFragment : BaseFragment() {
 
+	class ViewModel : androidx.lifecycle.ViewModel(), OnClickListener, OnCheckedChangeListener {
+		val isChecked = MutableLiveData(false)
+		val isGroupChecked = MutableLiveData(false)
+		override fun onClick(v: View) {
+			if (DEBUG) Log.v(TAG, "onClick:$v")
+			when (v.id) {
+			R.id.checkBtn1 -> {
+				isChecked.value = (isChecked.value == false)
+				isGroupChecked.value = (isChecked.value == true)
+			}
+			R.id.checkableGroup -> {
+				isGroupChecked.value = (isGroupChecked.value == false)
+			}
+			else -> {
+				if (v is CheckableEx) {
+					v.toggle()
+				}
+			}
+			}
+		}
+
+		override fun onCheckedChanged(checkable: CheckableEx, isChecked: Boolean) {
+			if (DEBUG) Log.v(TAG, "onCheckedChanged:$checkable.isChecked=$isChecked")
+		}
+	}
+
+	private val mViewModel: ViewModel by viewModels()
 	private lateinit var checkableGroup : CheckableEx
 
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
-		return inflater.inflate(R.layout.fragment_checkableex, container, false)
+		return FragmentCheckableexBinding.inflate(inflater, container, false)
+		.apply {
+			viewModel = mViewModel
+			lifecycleOwner = viewLifecycleOwner
+			this@CheckableExFragment.checkableGroup = checkableGroup
+		}
+		.run {
+			root
+		}
 	}
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
-		initView(view)
 	}
 
 	override fun onAttach(context: Context) {
@@ -59,24 +95,8 @@ class CheckableExFragment : BaseFragment() {
 	private fun initView(rootView: View) {
 		if (DEBUG) Log.v(TAG, "initView:")
 		checkableGroup = rootView.findViewById(R.id.checkableGroup)
-		if (rootView is ViewGroup) {
-			rootView.children.forEach {
-				if (it is CheckableEx) {
-					it.setOnClickListener(mOnClickListener)
-				}
-			}
-		}
 	}
 
-	private val mOnClickListener = OnClickListener { view ->
-		if (DEBUG) Log.v(TAG, "onClick:$view")
-		if (view is CheckableEx) {
-			view.toggle()
-		}
-		if (view.id == R.id.checkBtn1) {
-			checkableGroup.toggle()
-		}
-	}
 //--------------------------------------------------------------------------------
 	companion object {
 		private const val DEBUG = true // TODO set false on release
