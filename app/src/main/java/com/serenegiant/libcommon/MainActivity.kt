@@ -367,6 +367,9 @@ class MainActivity
 				}
 				fragment = ScreenCaptureFragment.newInstance()
 			}
+			R.string.title_checkable_ex -> {	// CheckableEx
+				fragment = CheckableExFragment.newInstance()
+			}
 			else -> {
 			}
 		}
