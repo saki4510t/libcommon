@@ -36,7 +36,7 @@ ext {
 
 	androidXKtx = '1.6.0'
 	androidXLifecycleKtx = '2.5.1'
-	androidXFragmentKtx = '1.5.4'
+	androidXFragmentKtx = '1.5.5'
 
 	kotlinStdLibVersion = '1.7.20'
 	kotlinCoroutinesVersion = '1.6.4'
