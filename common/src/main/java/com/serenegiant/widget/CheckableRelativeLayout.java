@@ -53,6 +53,11 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
         }
 	}
 
+	@Override
+	public boolean getChecked() {
+		return isChecked();
+	}
+
 	protected void updateChildState(final ViewGroup group, final boolean checked) {
 		final int n = group.getChildCount();
 		for (int i = 0; i < n; i++) {

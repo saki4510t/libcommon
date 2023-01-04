@@ -50,6 +50,11 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
+	public boolean getChecked() {
+		return isChecked();
+	}
+
+	@Override
 	public boolean isChecked() {
 		return mIsChecked;
 	}

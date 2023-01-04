@@ -28,5 +28,5 @@ public interface CheckableEx extends Checkable {
 	 * 余分に手間がかかるので#getCheckedで#isCheckedを呼び出すように追加
 	 * @return
 	 */
-	public default boolean getChecked() { return isChecked(); }
+	public boolean getChecked();
 }
