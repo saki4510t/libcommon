@@ -19,16 +19,17 @@ package com.serenegiant.preference;
  *  limitations under the License.
 */
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.serenegiant.utils.ObjectHelper;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-
 import java.util.Map;
 import java.util.Set;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 /**
  * Created by saki on 2016/11/05.
@@ -37,6 +38,27 @@ import java.util.Set;
 public class PrefHelper {
 	private PrefHelper() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
+	}
+
+	/**
+	 * deprecatedになったPreferenceManagerとその#getDefaultSharedPreferencesと等価な
+	 * 共有プレファレンス取得用ヘルパーメソッド
+	 * 共有プレファレンス名がパッケージ名 + "_preferences"の共有プレファレンスが返す
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static SharedPreferences getDefaultSharedPreferences(@NonNull final Context context) {
+		return context.getSharedPreferences(getDefaultSharedPreferencesName(context),
+			getDefaultSharedPreferencesMode());
+	}
+
+	public static String getDefaultSharedPreferencesName(Context context) {
+		return context.getPackageName() + "_preferences";
+	}
+
+	private static int getDefaultSharedPreferencesMode() {
+		return Context.MODE_PRIVATE;
 	}
 
 	public static short get(@Nullable final SharedPreferences pref,
