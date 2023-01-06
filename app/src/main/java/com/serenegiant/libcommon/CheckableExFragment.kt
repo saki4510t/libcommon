@@ -38,20 +38,6 @@ class CheckableExFragment : BaseFragment() {
 		val isGroupChecked = MutableLiveData(false)
 		override fun onClick(v: View) {
 			if (DEBUG) Log.v(TAG, "onClick:$v")
-			when (v.id) {
-			R.id.checkBtn1 -> {
-				isChecked.value = (isChecked.value == false)
-				isGroupChecked.value = (isChecked.value == true)
-			}
-			R.id.checkableGroup -> {
-				isGroupChecked.value = (isGroupChecked.value == false)
-			}
-			else -> {
-				if (v is CheckableEx) {
-					v.toggle()
-				}
-			}
-			}
 		}
 
 		override fun onCheckedChanged(checkable: CheckableEx, isChecked: Boolean) {
@@ -79,6 +65,11 @@ class CheckableExFragment : BaseFragment() {
 
 	override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 		super.onViewCreated(view, savedInstanceState)
+		mViewModel.apply {
+			isChecked.observe(viewLifecycleOwner) {
+				isGroupChecked.value = it
+			}
+		}
 	}
 
 	override fun onAttach(context: Context) {

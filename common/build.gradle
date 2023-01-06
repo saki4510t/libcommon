@@ -59,6 +59,7 @@ android {
 
 	buildFeatures {
 	    buildConfig = true
+		dataBinding = true
 	}
 
 	kotlinOptions.jvmTarget = "1.8"

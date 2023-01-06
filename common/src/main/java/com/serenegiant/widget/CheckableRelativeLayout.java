@@ -19,30 +19,49 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.RelativeLayout;
 
+import com.serenegiant.common.R;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class CheckableRelativeLayout extends RelativeLayout implements CheckableEx, Touchable {
+	private static final boolean DEBUG = false; // 実同時はfalseにすること
+	private static final String TAG = CheckableRelativeLayout.class.getSimpleName();
 
 	private boolean mIsChecked;
 	private boolean mCheckable = true;
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
-	public CheckableRelativeLayout(final Context context) {
-		this(context, null);
+	public CheckableRelativeLayout(@NonNull final Context context) {
+		this(context, null, 0);
 	}
 
-	public CheckableRelativeLayout(final Context context, final AttributeSet attrs) {
-		super(context, attrs);
+	public CheckableRelativeLayout(@NonNull final Context context, @Nullable final AttributeSet attrs) {
+		this(context, attrs, 0);
+	}
+
+	public CheckableRelativeLayout(@NonNull final Context context, @Nullable final AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.CheckableRelativeLayout, defStyleAttr, 0);
+		mCheckable = a.getBoolean(R.styleable.CheckableRelativeLayout_android_checkable, mCheckable);
+		final boolean clickable = a.getBoolean(R.styleable.CheckableRelativeLayout_android_clickable, false);
+		final boolean focusable = a.getBoolean(R.styleable.CheckableRelativeLayout_android_focusable, false);
+		a.recycle();
+		setClickable(clickable);
+		setFocusable(focusable);
 	}
 
 	@Override
@@ -83,12 +102,7 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
         }
 	}
 
-	@Override
-	public boolean getChecked() {
-		return isChecked();
-	}
-
-	protected void updateChildState(final ViewGroup group, final boolean checked) {
+	protected void updateChildState(@NonNull final ViewGroup group, final boolean checked) {
 		final int n = group.getChildCount();
 		for (int i = 0; i < n; i++) {
 			final View child = group.getChildAt(i);
@@ -101,6 +115,23 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
 	@Override
 	public void toggle() {
 		setChecked(!mIsChecked);
+	}
+
+	@Override
+	public boolean performClick() {
+		if (DEBUG) Log.v(TAG, "performClick:isClickable=" + isClickable() + ",isCheckable=" + isCheckable());
+		if (mCheckable) {
+			toggle();
+		}
+
+		final boolean handled = super.performClick();
+		if (!handled) {
+			// View only makes a sound effect if the onClickListener was
+			// called, so we'll need to make one here instead.
+			playSoundEffect(SoundEffectConstants.CLICK);
+		}
+
+		return handled;
 	}
 
 	@Override
@@ -123,7 +154,7 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	protected void onRestoreInstanceState(final Parcelable state) {
 		if (!(state instanceof SavedState)) {
 			super.onRestoreInstanceState(state);
 			return;

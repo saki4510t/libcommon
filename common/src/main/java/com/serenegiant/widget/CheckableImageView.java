@@ -19,8 +19,13 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.SoundEffectConstants;
+
+import com.serenegiant.common.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,16 +40,24 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
-	public CheckableImageView(Context context) {
+	public CheckableImageView(@NonNull final Context context) {
 		this(context, null, 0);
 	}
 
-	public CheckableImageView(Context context, AttributeSet attrs) {
+	public CheckableImageView(@NonNull final Context context, @Nullable final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public CheckableImageView(Context context, AttributeSet attrs, int defStyleAttr) {
+	public CheckableImageView(@NonNull final Context context, @Nullable final AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.CheckableImageView, defStyleAttr, 0);
+		mCheckable = a.getBoolean(R.styleable.CheckableImageButton_android_checkable, mCheckable);
+		final boolean clickable = a.getBoolean(R.styleable.CheckableImageView_android_clickable, false);
+		final boolean focusable = a.getBoolean(R.styleable.CheckableImageView_android_focusable, false);
+		a.recycle();
+		setClickable(clickable);
+		setFocusable(focusable);
 	}
 
 	@Override
@@ -65,7 +78,7 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
-	public void setChecked(boolean checked) {
+	public void setChecked(final boolean checked) {
 		if (mCheckable && (mIsChecked != checked)) {
 			mIsChecked = checked;
             refreshDrawableState();
@@ -80,11 +93,6 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
-	public boolean getChecked() {
-		return isChecked();
-	}
-
-	@Override
 	public boolean isChecked() {
 		return mIsChecked;
 	}
@@ -92,6 +100,23 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	@Override
 	public void toggle() {
 		setChecked(!mIsChecked);
+	}
+
+	@Override
+	public boolean performClick() {
+		if (DEBUG) Log.v(TAG, "performClick:isClickable=" + isClickable() + ",isCheckable=" + isCheckable());
+		if (mCheckable) {
+			toggle();
+		}
+
+		final boolean handled = super.performClick();
+		if (!handled) {
+			// View only makes a sound effect if the onClickListener was
+			// called, so we'll need to make one here instead.
+			playSoundEffect(SoundEffectConstants.CLICK);
+		}
+
+		return handled;
 	}
 
 	@Override
@@ -114,7 +139,7 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	protected void onRestoreInstanceState(final Parcelable state) {
 		if (!(state instanceof SavedState)) {
 			super.onRestoreInstanceState(state);
 			return;

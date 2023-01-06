@@ -36,13 +36,9 @@
 		android:layout_width="match_parent"
 		android:layout_height="match_parent">
 
-<!--
-			FIXME CheckableImageButtonに対して双方向データバインディングを割り当てるとビルド通らない
-			android:checked="@={viewModel.isChecked()}"
-			FIXME CheckableImageButtonのandroid:onCheckChangedへOnCheckedChangeListenerを割り当てるとビルドが通らない
-			android:onCheckedChanged="@{viewModel}"
--->
-
+		<!-- CheckableImageButton
+			デフォルトclickable=true, focusable=true
+		-->
 		<com.serenegiant.widget.CheckableImageButton
 			android:id="@+id/checkBtn1"
 			android:layout_width="100dp"
@@ -52,14 +48,17 @@
 			android:layout_marginTop="16dp"
 			android:layout_marginEnd="16dp"
 			android:layout_marginRight="16dp"
-			android:checked="@{viewModel.isChecked}"
-			android:onClickListener="@{viewModel}"
+			android:checked="@={viewModel.isChecked}"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
 			app:srcCompat="@drawable/checkable1" />
 
-		<!-- 子Viewがタッチイベントを処理しない場合はこのCheckableLinearLayoutのonClickListenerが呼び出される -->
+		<!--
+			子Viewがタッチイベントを処理しない場合はこのCheckableLinearLayoutがクリックイベントを処理する
+			デフォルトではクリックイベントを受け付けないのでclickable=trueを指定
+			子Viewのチェック状態を反転する
+		 -->
 		<com.serenegiant.widget.CheckableLinearLayout
 			android:id="@+id/checkableGroup"
 			android:layout_width="0dp"
@@ -67,14 +66,18 @@
 			android:orientation="vertical"
 			android:padding="32dp"
 			android:background="@color/SLATEGRAY"
-			android:checked="@{viewModel.isGroupChecked}"
-			android:onClickListener="@{viewModel}"
+			android:checked="@={viewModel.isGroupChecked}"
+			android:clickable="true"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toBottomOf="@+id/checkBtn1">
 
-			<!-- onClickListenerを指定しないCheckableImageView, 上位のCheckableLinearLayoutのonClickListenerが呼ばれる -->
+			<!--
+				onClickListenerを指定しないCheckableImageView,
+				自前ではクリックイベントを処理しないので上位のCheckableLinearLayoutが処理する
+					= CheckableLinearLayout内の子Viewのチェック状態が反転する
+			-->
 			<com.serenegiant.widget.CheckableImageView
 				android:id="@+id/checkableImageView1"
 				android:layout_width="match_parent"
@@ -82,15 +85,23 @@
 				android:layout_weight="1"
 				app:srcCompat="@drawable/checkable2" />
 
+			<!--
+				データバインディングは割り当てていないけど
+				デフォルトclickable=true, focusable=trueなので
+				クリックイベントを処理して自分のチェック状態を反転する
+			-->
 			<com.serenegiant.widget.CheckableImageButton
 				android:id="@+id/checkableImageView12"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="1"
-				android:onClickListener="@{viewModel}"
 				app:srcCompat="@drawable/checkable1" />
 
-			<!-- onClickListenerを指定したCheckableImageView, 指定したonClickListenerが呼ばれる -->
+			<!--
+				onClickListenerを指定したCheckableImageView,
+				onClickListenerを指定することでclickable=trueになるので
+				クリックイベントを処理して自分のチェック状態を反転する
+			 -->
 			<com.serenegiant.widget.CheckableImageView
 				android:id="@+id/checkableImageView3"
 				android:layout_width="match_parent"

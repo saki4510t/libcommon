@@ -22,8 +22,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.widget.Checkable;
 
-import com.google.android.material.internal.CheckableImageButton;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.customview.view.AbsSavedState;
@@ -43,13 +41,6 @@ public interface CheckableEx extends Checkable {
 
 	public void setCheckable(final boolean checkable);
 	public boolean isCheckable();
-
-	/**
-	 * CheckableにsetCheckedに対応するゲッターがないと双方向データバインディング時に
-	 * 余分に手間がかかるので#getCheckedで#isCheckedを呼び出すように追加
-	 * @return
-	 */
-	public boolean getChecked();
 
 	public void setOnCheckedChangeListener(
 		@Nullable final OnCheckedChangeListener listener);

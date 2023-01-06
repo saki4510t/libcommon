@@ -19,36 +19,49 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
+import android.view.SoundEffectConstants;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
+
+import com.serenegiant.common.R;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class CheckableLinearLayout extends LinearLayout implements CheckableEx, Touchable {
-
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "CheckableLinearLayout";
+	private static final boolean DEBUG = false; // 実同時はfalseにすること
+	private static final String TAG = CheckableLinearLayout.class.getSimpleName();
 
 	private boolean mIsChecked;
 	private boolean mCheckable = true;
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
-	public CheckableLinearLayout(final Context context) {
+	public CheckableLinearLayout(@NonNull final Context context) {
 		this(context, null);
 	}
 
-	public CheckableLinearLayout(final Context context, final AttributeSet attrs) {
+	public CheckableLinearLayout(@NonNull final Context context, @Nullable final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
-	public CheckableLinearLayout(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public CheckableLinearLayout(@NonNull final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+		final TypedArray a = context.getTheme().obtainStyledAttributes(
+			attrs, R.styleable.CheckableLinearLayout, defStyleAttr, 0);
+		mCheckable = a.getBoolean(R.styleable.CheckableLinearLayout_android_checkable, mCheckable);
+		final boolean clickable = a.getBoolean(R.styleable.CheckableLinearLayout_android_clickable, false);
+		final boolean focusable = a.getBoolean(R.styleable.CheckableLinearLayout_android_focusable, false);
+		a.recycle();
+		setClickable(clickable);
+		setFocusable(focusable);
 	}
 
 	@Override
@@ -78,13 +91,7 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 //		if (DEBUG) Log.v(TAG, "setChecked:" + checked);
 		if (mCheckable && (mIsChecked != checked)) {
 			mIsChecked = checked;
-            final int n = this.getChildCount();
-            View v;
-            for (int i = 0; i < n; i++) {
-            	v = this.getChildAt(i);
-            	if (v instanceof Checkable)
-            		((Checkable)v).setChecked(checked);
-            }
+			updateChildState(this, checked);
             refreshDrawableState();
 			final OnCheckedChangeListener listener;
 			synchronized (this) {
@@ -96,14 +103,36 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
         }
 	}
 
-	@Override
-	public boolean getChecked() {
-		return isChecked();
+	protected void updateChildState(@NonNull final ViewGroup group, final boolean checked) {
+		final int n = group.getChildCount();
+		for (int i = 0; i < n; i++) {
+			final View child = group.getChildAt(i);
+			if (child instanceof Checkable) {
+				((Checkable)child).setChecked(checked);
+			}
+		}
 	}
 
 	@Override
 	public void toggle() {
 		setChecked(!mIsChecked);
+	}
+
+	@Override
+	public boolean performClick() {
+		if (DEBUG) Log.v(TAG, "performClick:isClickable=" + isClickable() + ",isCheckable=" + isCheckable());
+		if (mCheckable) {
+			toggle();
+		}
+
+		final boolean handled = super.performClick();
+		if (!handled) {
+			// View only makes a sound effect if the onClickListener was
+			// called, so we'll need to make one here instead.
+			playSoundEffect(SoundEffectConstants.CLICK);
+		}
+
+		return handled;
 	}
 
 	@Override
@@ -126,7 +155,7 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	protected void onRestoreInstanceState(final Parcelable state) {
 		if (!(state instanceof SavedState)) {
 			super.onRestoreInstanceState(state);
 			return;
