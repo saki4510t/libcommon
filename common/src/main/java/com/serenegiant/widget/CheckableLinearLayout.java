@@ -32,7 +32,8 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 //	private static final String TAG = "CheckableLinearLayout";
 
-	private boolean mChecked;
+	private boolean mIsChecked;
+	private boolean mCheckable = true;
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
@@ -56,15 +57,25 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 	}
 
 	@Override
+	public void setCheckable(final boolean checkable) {
+		this.mCheckable = checkable;
+	}
+
+	@Override
+	public boolean isCheckable() {
+		return mCheckable;
+	}
+
+	@Override
 	public boolean isChecked() {
-		return mChecked;
+		return mIsChecked;
 	}
 
 	@Override
 	public void setChecked(final boolean checked) {
 //		if (DEBUG) Log.v(TAG, "setChecked:" + checked);
-		if (mChecked != checked) {
-			mChecked = checked;
+		if (mCheckable && (mIsChecked != checked)) {
+			mIsChecked = checked;
             final int n = this.getChildCount();
             View v;
             for (int i = 0; i < n; i++) {
@@ -90,7 +101,7 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
 
 	@Override
 	public void toggle() {
-		setChecked(!mChecked);
+		setChecked(!mIsChecked);
 	}
 
 	@Override

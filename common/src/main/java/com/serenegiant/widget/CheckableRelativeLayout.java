@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 public class CheckableRelativeLayout extends RelativeLayout implements CheckableEx, Touchable {
 
 	private boolean mIsChecked;
+	private boolean mCheckable = true;
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
@@ -50,13 +51,23 @@ public class CheckableRelativeLayout extends RelativeLayout implements Checkable
 	}
 
 	@Override
+	public void setCheckable(final boolean checkable) {
+		this.mCheckable = checkable;
+	}
+
+	@Override
+	public boolean isCheckable() {
+		return mCheckable;
+	}
+
+	@Override
 	public boolean isChecked() {
 		return mIsChecked;
 	}
 
 	@Override
 	public void setChecked(final boolean checked) {
-		if (mIsChecked != checked) {
+		if (mCheckable && (mIsChecked != checked)) {
 			mIsChecked = checked;
 			updateChildState(this, checked);
             refreshDrawableState();

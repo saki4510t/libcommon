@@ -36,6 +36,9 @@ public interface CheckableEx extends Checkable {
 		void onCheckedChanged(@NonNull final CheckableEx checkable, final boolean isChecked);
 	}
 
+	public void setCheckable(final boolean checkable);
+	public boolean isCheckable();
+
 	/**
 	 * CheckableにsetCheckedに対応するゲッターがないと双方向データバインディング時に
 	 * 余分に手間がかかるので#getCheckedで#isCheckedを呼び出すように追加

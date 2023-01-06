@@ -29,6 +29,7 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	private static final String TAG = CheckableImageView.class.getSimpleName();
 
 	private boolean mIsChecked;
+	private boolean mCheckable = true;
 	@Nullable
 	private OnCheckedChangeListener mListener;
 
@@ -52,8 +53,18 @@ public class CheckableImageView extends AppCompatImageView implements CheckableE
 	}
 
 	@Override
+	public void setCheckable(final boolean checkable) {
+		this.mCheckable = checkable;
+	}
+
+	@Override
+	public boolean isCheckable() {
+		return mCheckable;
+	}
+
+	@Override
 	public void setChecked(boolean checked) {
-		if (mIsChecked != checked) {
+		if (mCheckable && (mIsChecked != checked)) {
 			mIsChecked = checked;
             refreshDrawableState();
 			final OnCheckedChangeListener listener;
