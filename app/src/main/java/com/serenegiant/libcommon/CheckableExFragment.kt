@@ -49,7 +49,7 @@ class CheckableExFragment : BaseFragment() {
 	private lateinit var checkableGroup : CheckableEx
 
 	override fun onCreateView(inflater: LayoutInflater,
-		container: ViewGroup?, savedInstanceState: Bundle?): View? {
+		container: ViewGroup?, savedInstanceState: Bundle?): View {
 
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		return FragmentCheckableexBinding.inflate(inflater, container, false)
@@ -80,12 +80,6 @@ class CheckableExFragment : BaseFragment() {
 	override fun onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:")
 		super.onDestroy()
-	}
-
-//--------------------------------------------------------------------------------
-	private fun initView(rootView: View) {
-		if (DEBUG) Log.v(TAG, "initView:")
-		checkableGroup = rootView.findViewById(R.id.checkableGroup)
 	}
 
 //--------------------------------------------------------------------------------
