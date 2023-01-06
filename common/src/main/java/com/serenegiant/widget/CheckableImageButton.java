@@ -19,8 +19,10 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageButton;
 
@@ -101,5 +103,27 @@ public class CheckableImageButton extends AppCompatImageButton implements Checka
         }
         return drawableState;
     }
+
+	@NonNull
+	@Override
+	protected Parcelable onSaveInstanceState() {
+		Parcelable superState = super.onSaveInstanceState();
+		SavedState savedState = new SavedState(superState);
+		savedState.checked = mIsChecked;
+		savedState.checkable = mCheckable;
+		return savedState;
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		if (!(state instanceof SavedState)) {
+			super.onRestoreInstanceState(state);
+			return;
+		}
+		SavedState savedState = (SavedState) state;
+		super.onRestoreInstanceState(savedState.getSuperState());
+		mCheckable = savedState.checkable;
+		setChecked(savedState.checked);
+	}
 
 }

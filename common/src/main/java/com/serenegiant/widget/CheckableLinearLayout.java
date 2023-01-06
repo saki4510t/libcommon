@@ -19,12 +19,14 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Checkable;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class CheckableLinearLayout extends LinearLayout implements CheckableEx, Touchable {
@@ -112,6 +114,28 @@ public class CheckableLinearLayout extends LinearLayout implements CheckableEx, 
         }
         return drawableState;
     }
+
+	@NonNull
+	@Override
+	protected Parcelable onSaveInstanceState() {
+		Parcelable superState = super.onSaveInstanceState();
+		SavedState savedState = new SavedState(superState);
+		savedState.checked = mIsChecked;
+		savedState.checkable = mCheckable;
+		return savedState;
+	}
+
+	@Override
+	protected void onRestoreInstanceState(Parcelable state) {
+		if (!(state instanceof SavedState)) {
+			super.onRestoreInstanceState(state);
+			return;
+		}
+		SavedState savedState = (SavedState) state;
+		super.onRestoreInstanceState(savedState.getSuperState());
+		mCheckable = savedState.checkable;
+		setChecked(savedState.checked);
+	}
 
 	private float mTouchX, mTouchY;
 	@Override

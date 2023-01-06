@@ -18,10 +18,15 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.widget.Checkable;
+
+import com.google.android.material.internal.CheckableImageButton;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.customview.view.AbsSavedState;
 
 public interface CheckableEx extends Checkable {
 	static final int[] CHECKED_STATE_SET = { android.R.attr.state_checked };
@@ -48,5 +53,55 @@ public interface CheckableEx extends Checkable {
 
 	public void setOnCheckedChangeListener(
 		@Nullable final OnCheckedChangeListener listener);
+
+	/**
+	 * 状態を保存復帰するためのAbsSavedState実装
+	 */
+	static class SavedState extends AbsSavedState {
+		boolean checked;
+		boolean checkable;
+
+		public SavedState(@NonNull final Parcelable superState) {
+			super(superState);
+		}
+
+		public SavedState(@NonNull final Parcel src, final ClassLoader loader) {
+			super(src, loader);
+			readFromParcel(src);
+		}
+
+		@Override
+		public void writeToParcel(@NonNull final Parcel dst, final int flags) {
+			super.writeToParcel(dst, flags);
+			dst.writeInt(checked ? 1 : 0);
+			dst.writeInt(checkable ? 1 : 0);
+		}
+
+		private void readFromParcel(@NonNull final Parcel src) {
+			checked = src.readInt() == 1;
+			checkable = src.readInt() == 1;
+		}
+
+		public static final Creator<SavedState> CREATOR =
+			new ClassLoaderCreator<SavedState>() {
+				@NonNull
+				@Override
+				public SavedState createFromParcel(@NonNull final Parcel src, final ClassLoader loader) {
+					return new SavedState(src, loader);
+				}
+
+				@NonNull
+				@Override
+				public SavedState createFromParcel(@NonNull final Parcel src) {
+					return new SavedState(src, null);
+				}
+
+				@NonNull
+				@Override
+				public SavedState[] newArray(final int size) {
+					return new SavedState[size];
+				}
+			};
+	}
 
 }
