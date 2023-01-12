@@ -21,9 +21,14 @@ package com.serenegiant.media;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
 import android.os.Build;
 import android.util.Log;
+
+import com.serenegiant.system.ContextUtils;
+
+import java.lang.ref.WeakReference;
 
 import androidx.activity.ComponentActivity;
 import androidx.activity.result.ActivityResultLauncher;
@@ -51,12 +56,20 @@ public class ScreenCaptureUtils {
 
 	public interface ScreenCaptureCallback {
 		/**
+		 * ScreenCaptureUtils#requestScreenCaptureが成功した時のコールバック
 		 * MediaProjectionManager#getMediaProjectionへ引き渡すIntent
 		 * このコールバックメソッドが呼ばれたときはActivity.RESULT_OKなので
 		 * getMediaProjectionの第1引数はActivity.RESULT_OKにすること
 		 * @param data
 		 */
 		public void onResult(@NonNull final Intent data);
+
+		/**
+		 * ScreenCaptureUtils#requestMediaProjectionが成功してスクリーンキャプチャー用の
+		 * MediaProjectionを取得できたときのコールバック
+		 * @param projection
+		 */
+		public void onResult(@NonNull final MediaProjection projection);
 
 		/**
 		 * スクリーンキャプチャーの許可要求をユーザーが拒否したとき
@@ -66,6 +79,7 @@ public class ScreenCaptureUtils {
 
 	@NonNull
 	private final ActivityResultLauncher<Void> mLauncher;
+	private final ActivityResultLauncher<Void> mProjectionLauncher;
 	private boolean mRequestProjection;
 
 	/**
@@ -79,6 +93,16 @@ public class ScreenCaptureUtils {
 
 		mLauncher = activity.registerForActivityResult(
 			new ScreenCapture(),
+			result -> {
+				if (DEBUG) Log.v(TAG, "onActivityResult:" + result);
+				if (result != null) {
+					callback.onResult(result);
+				} else {
+					callback.onFailed();
+				}
+			});
+		mProjectionLauncher = activity.registerForActivityResult(
+			new MediaProjectionContract(activity),
 			result -> {
 				if (DEBUG) Log.v(TAG, "onActivityResult:" + result);
 				if (result != null) {
@@ -107,12 +131,34 @@ public class ScreenCaptureUtils {
 					callback.onFailed();
 				}
 			});
+		mProjectionLauncher = fragment.registerForActivityResult(
+			new MediaProjectionContract(fragment.requireContext()),
+			result -> {
+				if (DEBUG) Log.v(TAG, "onActivityResult:" + result);
+				if (result != null) {
+					callback.onResult(result);
+				} else {
+					callback.onFailed();
+				}
+			});
 	}
 
 	/**
 	 * スクリーンキャプチャーの許可を求める
+	 * 成功すればScreenCaptureCallback#onResult(@NonNull final Intent)が呼ばれる
 	 */
 	public void requestScreenCapture() {
+		if (!mRequestProjection) {
+			mRequestProjection = true;
+			mLauncher.launch(null);
+		}
+	}
+
+	/**
+	 * スクリーンキャプチャーの許可を求める
+	 * 成功すればScreenCaptureCallback#onResult(@NonNull final MediaProjection)が呼ばれる
+	 */
+	public void requestMediaProjection() {
 		if (!mRequestProjection) {
 			mRequestProjection = true;
 			mLauncher.launch(null);
@@ -136,9 +182,8 @@ public class ScreenCaptureUtils {
 		@Override
 		public Intent createIntent(@NonNull Context context, final Void unsued) {
 			if (DEBUG) Log.v(TAG, "createIntent:");
-			final MediaProjectionManager manager =
-				(MediaProjectionManager) context.getSystemService(
-					Context.MEDIA_PROJECTION_SERVICE);
+			final MediaProjectionManager manager
+				= ContextUtils.requireSystemService(context, MediaProjectionManager.class);
 			return manager.createScreenCaptureIntent();
 		}
 
@@ -158,6 +203,60 @@ public class ScreenCaptureUtils {
 			return ((intent!= null)
 				&& (resultCode == Activity.RESULT_OK))
 				? intent : null;
+		}
+	}
+
+	/**
+	 * MediaProjectionManager/MediaProjectionを利用したスクリーンキャプチャー
+	 * 開始要求に使うためのActivityResultContract実装
+	 * こっちのoutの型はMediaProjectionでMediaProjectionManager#getMediaProjectionを使って
+	 * MediaProjectionを取得する処理までを一括で行う
+	 */
+	private static class MediaProjectionContract extends ActivityResultContract<Void, MediaProjection> {
+		private static final String TAG = MediaProjection.class.getSimpleName();
+
+		@NonNull
+		private final WeakReference<Context> mWeakContext;
+
+		private MediaProjectionContract(@NonNull final Context context) {
+			mWeakContext = new WeakReference<>(context);
+		}
+
+		@CallSuper
+		@NonNull
+		@Override
+		public Intent createIntent(@NonNull final Context context, final Void unused) {
+			final MediaProjectionManager manager
+				= ContextUtils.requireSystemService(context, MediaProjectionManager.class);
+			return manager.createScreenCaptureIntent();
+		}
+
+		@Nullable
+		@Override
+		public final SynchronousResult<MediaProjection> getSynchronousResult(
+			@NonNull Context context, @Nullable Void unused) {
+			if (DEBUG) Log.v(TAG, "getSynchronousResult:");
+			return null;
+		}
+
+		@Override
+		public MediaProjection parseResult(final int resultCode, @Nullable Intent intent) {
+			if (DEBUG) Log.v(TAG, "parseResult:resultCode=" + resultCode + "," + intent);
+			if ((intent!= null)
+				&& (resultCode == Activity.RESULT_OK)) {
+
+				try {
+					final Context context = mWeakContext.get();
+					if (context != null) {
+						final MediaProjectionManager manager
+							= ContextUtils.requireSystemService(context, MediaProjectionManager.class);
+						return manager.getMediaProjection(Activity.RESULT_OK, intent);
+					}
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			}
+			return null;
 		}
 	}
 }

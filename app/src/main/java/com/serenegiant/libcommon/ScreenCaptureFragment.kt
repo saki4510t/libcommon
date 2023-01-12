@@ -2,6 +2,7 @@ package com.serenegiant.libcommon
 
 import android.content.Context
 import android.content.Intent
+import android.media.projection.MediaProjection
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -35,6 +36,12 @@ class ScreenCaptureFragment : BaseFragment() {
 				if (DEBUG) Log.v(TAG, "onResult:$data")
 				// スクリーンキャプチャーサービス開始要求
 				mViewModel.startScreenCapture(data)
+			}
+
+			override fun onResult(projection: MediaProjection) {
+				if (DEBUG) Log.v(TAG, "onResult:$projection")
+				// ScreenCaptureFragmentではScreenCaptureUtils#requestMediaProjectioを
+				// 呼び出さないのでこのコールバックが呼び出されることはない
 			}
 
 			override fun onFailed() {
