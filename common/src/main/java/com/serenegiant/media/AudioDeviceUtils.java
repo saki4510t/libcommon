@@ -18,13 +18,26 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.content.Context;
 import android.media.AudioDeviceInfo;
+import android.media.AudioManager;
 import android.os.Build;
+import android.text.TextUtils;
+import android.util.Log;
+
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.ContextUtils;
+
+import java.util.Arrays;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 public class AudioDeviceUtils {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = AudioDeviceUtils.class.getSimpleName();
+
 	private AudioDeviceUtils() {
 		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
 	}
@@ -72,4 +85,77 @@ public class AudioDeviceUtils {
 		}
 	}
 
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public static String toString(@Nullable final AudioDeviceInfo info) {
+		if (info == null) {
+			return "AudioDeviceInfo{null}";
+		} else {
+			final StringBuilder sb = new StringBuilder("AudioDeviceInfo{");
+			sb.append("name=").append(info.getProductName())
+				.append(",type=").append(getAudioTypeString(info)).append("(").append(info.getType()).append(")")
+				.append(",id=").append(info.getId())
+				.append(",isSource=").append(info.isSource())
+				.append(",isSink=").append(info.isSink())
+				.append(",channelCounts=").append(Arrays.toString(info.getChannelCounts()))
+				.append(",channelIndexMasks=").append(Arrays.toString(info.getChannelIndexMasks()))
+				.append(",channelMasks=").append(Arrays.toString(info.getChannelMasks()))
+				.append(",sampleRates=").append(Arrays.toString(info.getSampleRates()))
+				.append(",encodings=").append(Arrays.toString(info.getEncodings()));
+			if (BuildCheck.isAPI28()) {
+				sb.append(",address=").append(info.getAddress());
+			}
+			if (BuildCheck.isAPI30()) {
+				sb.append(",encapsulationModes=").append(Arrays.toString(info.getEncapsulationModes()))
+					.append(",encapsulationMetadataTypes=").append(Arrays.toString(info.getEncapsulationMetadataTypes()));
+			}
+			if (BuildCheck.isAPI31()) {
+				sb.append(",profiles=").append(info.getAudioProfiles())
+					.append(",descriptors").append(info.getAudioDescriptors());
+			}
+			sb.append("}");
+			return sb.toString();
+		}
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public static void dumpAudioDevice(@NonNull final Context context, final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		@NonNull
+		final AudioManager manager = ContextUtils.requireSystemService(context, AudioManager.class);
+		@NonNull
+		final AudioDeviceInfo[] infos = manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS | AudioManager.GET_DEVICES_INPUTS);
+		int i = 0;
+		for (final AudioDeviceInfo info: infos) {
+			Log.i(_tag, i + ")" + toString(info));
+			i++;
+		}
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public static void dumpInputAudioDevice(@NonNull final Context context, final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		@NonNull
+		final AudioManager manager = ContextUtils.requireSystemService(context, AudioManager.class);
+		@NonNull
+		final AudioDeviceInfo[] infos = manager.getDevices(AudioManager.GET_DEVICES_INPUTS);
+		int i = 0;
+		for (final AudioDeviceInfo info: infos) {
+			Log.i(_tag, i + ")" + toString(info));
+			i++;
+		}
+	}
+
+	@RequiresApi(api = Build.VERSION_CODES.M)
+	public static void dumpOutputAudioDevice(@NonNull final Context context, final String tag) {
+		final String _tag = TextUtils.isEmpty(tag) ? TAG : tag;
+		@NonNull
+		final AudioManager manager = ContextUtils.requireSystemService(context, AudioManager.class);
+		@NonNull
+		final AudioDeviceInfo[] infos = manager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
+		int i = 0;
+		for (final AudioDeviceInfo info: infos) {
+			Log.i(_tag, i + ")" + toString(info));
+			i++;
+		}
+	}
 }
