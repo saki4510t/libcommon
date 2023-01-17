@@ -413,7 +413,7 @@ public class AudioRecordCompat {
 
 		/**
 		 * 音声セッションIDを取得する
-		 * onStart空onStop間でのみ有効
+		 * onStart〜onStop間でのみ有効
 		 * @return 0: 無効な値
 		 */
 		public int getAudioSessionId() {
