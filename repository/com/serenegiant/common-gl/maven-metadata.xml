@@ -3,8 +3,8 @@
   <groupId>com.serenegiant</groupId>
   <artifactId>common-gl</artifactId>
   <versioning>
-    <latest>8.11.5</latest>
-    <release>8.11.5</release>
+    <latest>8.11.6</latest>
+    <release>8.11.6</release>
     <versions>
       <version>8.9.0</version>
       <version>8.9.1</version>
@@ -23,7 +23,8 @@
       <version>8.11.3</version>
       <version>8.11.4</version>
       <version>8.11.5</version>
+      <version>8.11.6</version>
     </versions>
-    <lastUpdated>20230106133918</lastUpdated>
+    <lastUpdated>20230117045305</lastUpdated>
   </versioning>
 </metadata>
