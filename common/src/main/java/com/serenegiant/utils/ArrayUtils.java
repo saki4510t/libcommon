@@ -18,6 +18,11 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.os.Bundle;
+import android.os.Parcelable;
+import android.util.Log;
+
+import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
@@ -30,8 +35,95 @@ import androidx.annotation.Nullable;
  * 配列用のヘルパークラス
  */
 public class ArrayUtils {
+	private static final boolean DEBUG = false;	// set false on production
+	private static final String TAG = ArrayUtils.class.getSimpleName();
+
 	private ArrayUtils() {
 		// インスタンス化をエラーにするためにコンストラクタをprivateに
+	}
+
+	public static enum ArrayType {
+		NOT_A_ARRAY,
+		UNKNOWN_ARRAY,
+		BUNDLE_ARRAY,
+		CHAR_ARRAY,
+		STRING_ARRAY,
+		CHARSEQUENCE_ARRAY,
+		BYTE_ARRAY,
+		SHORT_ARRAY,
+		INT_ARRAY,
+		LONG_ARRAY,
+		FLOAT_ARRAY,
+		DOUBLE_ARRAY,
+		PARCELABLE_ARRAY,
+		SERIALIZABLE_ARRAY,
+	}
+
+	/**
+	 * 引数が配列ならばその配列要素のクラスを返す
+	 * 配列でなければnullを返す
+	 * @param obj
+	 * @return
+	 */
+	@Nullable
+	public static Class<?> getArrayClass(@Nullable final Object obj) {
+		final Class<?> clazz = obj != null ? obj.getClass() : null;
+		if ((clazz != null) && clazz.isArray()) {
+			return clazz.getComponentType();
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * 引数の配列要素の種類を取得する
+	 * 配列でなければNOT_A_ARRAY, 未対応配列であればUNKNOWN_ARRAYを返す
+	 * プリミティブとそれに対応する型の配列(int/Integerなど)はプリミティブかどうかを区別せず判定する
+	 * @param obj
+	 * @return
+	 */
+	@NonNull
+	public static ArrayType getArrayType(@Nullable final Object obj) {
+		final Class<?> clazz = obj != null ? obj.getClass() : null;
+		if ((clazz != null) && clazz.isArray()) {
+			final Class<?> arrayClazz = clazz.getComponentType();
+			if (arrayClazz == Bundle.class) {
+				return ArrayType.BUNDLE_ARRAY;
+			} else if ((arrayClazz == char.class) || (arrayClazz == Character.class)) {
+				return ArrayType.CHAR_ARRAY;
+			} else if (arrayClazz == String.class) {
+				return ArrayType.STRING_ARRAY;
+			} else if (arrayClazz == CharSequence.class) {
+				return ArrayType.CHARSEQUENCE_ARRAY;
+			} else if ((arrayClazz == byte.class) || (arrayClazz == Byte.class)) {
+				return ArrayType.BYTE_ARRAY;
+			} else if ((arrayClazz == short.class) || (arrayClazz == Short.class)) {
+				return ArrayType.SHORT_ARRAY;
+			} else if ((arrayClazz == int.class) || (arrayClazz == Integer.class)) {
+				return ArrayType.INT_ARRAY;
+			} else if ((arrayClazz == long.class) || (arrayClazz == Long.class)) {
+				return ArrayType.LONG_ARRAY;
+			} else if ((arrayClazz == float.class) || (arrayClazz == Float.class)) {
+				return ArrayType.FLOAT_ARRAY;
+			} else if ((arrayClazz == double.class) || (arrayClazz == Double.class)) {
+				return ArrayType.DOUBLE_ARRAY;
+			} else {
+				@NonNull
+				final Class<?>[] intfs = arrayClazz.getInterfaces();
+				if (DEBUG) Log.v(TAG, "getArrayType:arrayClazz=" + arrayClazz + ",intfs=" + Arrays.toString(intfs));
+				for (final Class<?> intf: intfs) {
+					if (intf == Parcelable.class) {
+						return ArrayType.PARCELABLE_ARRAY;
+					}
+					if (intf == Serializable.class) {
+						return ArrayType.SERIALIZABLE_ARRAY;
+					}
+				}
+			}
+			return ArrayType.UNKNOWN_ARRAY;
+		} else {
+			return ArrayType.NOT_A_ARRAY;
+		}
 	}
 
 	/**
