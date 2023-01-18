@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.app;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -21,13 +21,12 @@ package com.serenegiant.utils;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
+
 import androidx.annotation.NonNull;
 
 /**
  * サービスやコンテントプロバイダー等の有効無効を設定するためのヘルパークラス
- * @deprecated appパッケージへ移動
  */
-@Deprecated
 public class ComponentUtils {
 	private ComponentUtils() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
