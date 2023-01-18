@@ -21,7 +21,7 @@ import java.io.IOException
 * libcommon
 * utility/helper classes for myself
 *
-* Copyright (c) 2014-2022 saki t_saki@serenegiant.com
+* Copyright (c) 2014-2023 saki t_saki@serenegiant.com
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
