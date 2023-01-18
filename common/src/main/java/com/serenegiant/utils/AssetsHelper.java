@@ -39,10 +39,14 @@ public class AssetsHelper {
 		final StringBuilder sb = new StringBuilder();
 		final char[] buf = new char[1024];
 		final BufferedReader reader = new BufferedReader(new InputStreamReader(assets.open(name)));
-		int r = reader.read(buf);
-		while (r > 0) {
-			sb.append(buf, 0, r);
-			r = reader.read(buf);
+		try {
+			int r = reader.read(buf);
+			while (r > 0) {
+				sb.append(buf, 0, r);
+				r = reader.read(buf);
+			}
+		} finally {
+			reader.close();
 		}
 		return sb.toString();
 	}
