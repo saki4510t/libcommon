@@ -22,6 +22,7 @@ import android.view.View
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import com.google.android.material.snackbar.Snackbar
+import com.serenegiant.common.R
 
 /*
  * データバインディングでLiveDataに合わせてスナックバーを表示するためのヘルパー用View拡張
@@ -68,10 +69,18 @@ fun View.setupSnackbar2(
 private fun View.showSnackbar(
 	message: CharSequence, duration: Int,
 	callback: Snackbar.Callback? = null) {
-    Snackbar.make(this, message, duration)
+
+	val snackbar = getTag(R.id.snackbar)
+	if ((snackbar is Snackbar) && snackbar.isShown) {
+		snackbar.dismiss()
+	}
+	if (message.isNotEmpty()) {
+		Snackbar.make(this, message, duration)
 		.apply {
 			if (callback != null) {
 				addCallback(callback)
 			}
+			this@showSnackbar.setTag(R.id.snackbar, this)
 		}.show()
+	}
 }
