@@ -46,7 +46,7 @@ import static org.junit.Assert.assertTrue;
 public class ChoreographerTest {
    private static final String TAG = ChoreographerTest.class.getSimpleName();
 
-   private static final int MAX_FRAMES = 50;
+   private static final int MAX_FRAMES = 120;
    private static final long MAX_WAIT_MS = 20000L;
 
    @Test
@@ -187,19 +187,28 @@ public class ChoreographerTest {
 
    private static void frameRate(final Handler asyncHandler, final int requestFps) {
       final long frameIntervalNs = Math.round(1000000000.0 / requestFps);
-      final long frameIntervalMs = frameIntervalNs / 1000000L - 5;
 
       final AtomicInteger numFrames = new AtomicInteger();
       final CountDownLatch latch = new CountDownLatch(1);
       final Choreographer.FrameCallback callback
          = new Choreographer.FrameCallback() {
+         private long firstTimeNs = -1L;
          @Override
          public void doFrame(final long frameTimeNanos) {
             final int n = numFrames.incrementAndGet();
+            final Choreographer choreographer = Choreographer.getInstance();
+            final long current = System.nanoTime();
+            if (firstTimeNs < 0) {
+               firstTimeNs = System.nanoTime();
+            }
+            long ms = (firstTimeNs + frameIntervalNs * (n + 1) - current) / 1000000L;
+            if (ms < 5L) {
+               ms = 0L;
+            }
             if (n < MAX_FRAMES) {
-               Choreographer.getInstance().postFrameCallbackDelayed(this, frameIntervalMs);
+               choreographer.postFrameCallbackDelayed(this, ms);
             } else {
-               Choreographer.getInstance().removeFrameCallback(this);
+               choreographer.removeFrameCallback(this);
                latch.countDown();
             }
          }
