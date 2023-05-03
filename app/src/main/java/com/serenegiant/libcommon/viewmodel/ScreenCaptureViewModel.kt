@@ -26,7 +26,7 @@ import android.content.IntentFilter
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.map
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.service.ScreenRecorderService
 
@@ -34,8 +34,8 @@ class ScreenCaptureViewModel(application: Application) : AndroidViewModel(applic
 
 	var isRecording = false
 	val isChecked by lazy { MutableLiveData(isRecording) }
-	val recordingLabel = Transformations.map(isChecked) {
-		value -> if (value) "stop" else "start"
+	val recordingLabel = isChecked.map {
+		if (it) "stop" else "start"
 	}
 	private val mBroadcastReceiver = MyBroadcastReceiver()
 	var isReceived = false
