@@ -49,6 +49,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.io.BitBufferReader;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.BufferHelper;
 
@@ -1679,5 +1680,183 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 				temp[n++] = (byte)Integer.parseInt(hex[i]);
 		}
 		return (n > 0) ? ByteBuffer.wrap(temp, 0, n) : null;
+	}
+
+	/**
+	 * H.264のSPS(CSD)の解析結果を保持するPOJO
+	 */
+	public static class H264SpsConfig {
+		public final int width;
+		public final int height;
+		public final int fps;
+		public final int profile;
+
+		/*package*/ H264SpsConfig(final int width, final int height, final int fps, final int profile) {
+			this.width = width;
+			this.height = height;
+			this.fps = fps;
+			this.profile = profile;
+		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "H264SpsConfig{" +
+				"width=" + width +
+				",height=" + height +
+				",fps=" + fps +
+				",profile=" + profile +
+				'}';
+		}
+	}
+
+//--------------------------------------------------------------------------------
+// based on https://github.com/stephenyin/h264_sps_decoder/blob/master/sps.cpp
+// ・元々の実装だと引数自体を書き換えていたけどh.264のデコーダーへ渡すSPSが書き換えられてしまうと
+// 　都合が悪いのでコピーしたものを解析に使うように変更
+// ・変数の型がDWORDやUINTをtypedefして使っていたのをuint32_tへ変更
+// ・c/c++からJavaへ書き換え
+//--------------------------------------------------------------------------------
+
+	/**
+	 * データ中にスタートマーカと同じ値(N[00] 00 00 01(N>=0))が現れたときに
+	 * エスケープしていたのを元のデータに復元する
+	 *
+	 * @param buf
+	 */
+	/*package*/ static void de_emulation_prevention(@NonNull final ByteBuffer buf) {
+		final int tmp_buf_size = buf.limit();
+		int buf_size = tmp_buf_size;
+		for (int i = 0; i < (tmp_buf_size - 2); i++) {
+			// check for 0x000003
+			final int val = (buf.get(i)) + (buf.get(i + 1)) + (buf.get(i + 2) ^ 0x03);
+			if (val == 0) {
+				// kick out 0x03
+				for (int j = i + 2; j < tmp_buf_size - 1; j++) {
+					buf.put(j, buf.get(j + 1));
+				}
+
+				// and so we should devrease bufsize
+				buf_size--;
+			}
+		}
+		buf.position(buf_size);
+		buf.flip();
+	}
+
+	@Nullable
+	public static H264SpsConfig decodeSps(@NonNull final ByteBuffer buf) {
+		de_emulation_prevention(buf);
+		final BitBufferReader reader = new BitBufferReader(buf);
+
+		final long forbidden_zero_bit = reader.readBits(1);
+		final long nal_ref_idc = reader.readBits(2);
+		final long nal_unit_type = reader.readBits(5);
+		if (nal_unit_type == 7/*NAL_UNIT_SEQUENCE_PARAM_SET*/) {
+			boolean timing_info_present_flag = false;
+			int width, height;
+			int fps = 0;
+			final int profile_idc = (int)reader.readBits(8);
+			final long constraint_set0_flag = reader.readBits(1);//(buf[1] & 0x80)>>7;
+			final long constraint_set1_flag = reader.readBits(1);//(buf[1] & 0x40)>>6;
+			final long constraint_set2_flag = reader.readBits(1);//(buf[1] & 0x20)>>5;
+			final long constraint_set3_flag = reader.readBits(1);//(buf[1] & 0x10)>>4;
+			final long reserved_zero_4bits = reader.readBits(4);
+			final long level_idc = reader.readBits(8);
+			final long seq_parameter_set_id = reader.ue();
+			if (profile_idc == 100 || profile_idc == 110 ||
+				profile_idc == 122 || profile_idc == 144) {
+				final long chroma_format_idc = reader.ue();
+				if (chroma_format_idc == 3) {
+					final long residual_colour_transform_flag = reader.readBits(1);
+				}
+				final long bit_depth_luma_minus8 = reader.ue();
+				final long bit_depth_chroma_minus8 = reader.ue();
+				final long qpprime_y_zero_transform_bypass_flag = reader.readBits(1);
+				final boolean seq_scaling_matrix_present_flag = reader.readBoolean();
+				final int[] seq_scaling_list_present_flag = new int[8];
+				if (seq_scaling_matrix_present_flag) {
+					for (int i = 0; i < 8; i++) {
+						seq_scaling_list_present_flag[i] = (int) reader.readBits(1);
+					}
+				}
+			}
+			long log2_max_frame_num_minus4 = reader.ue();
+			long pic_order_cnt_type = reader.ue();
+			if (pic_order_cnt_type == 0) {
+				final long log2_max_pic_order_cnt_lsb_minus4 = reader.ue();
+			} else if (pic_order_cnt_type == 1) {
+				final long delta_pic_order_always_zero_flag = reader.readBits(1);
+				final long offset_for_non_ref_pic = reader.se();
+				final long offset_for_top_to_bottom_field = reader.se();
+				final int num_ref_frames_in_pic_order_cnt_cycle = (int) reader.ue();
+				final int[] offset_for_ref_frame = new int[num_ref_frames_in_pic_order_cnt_cycle];
+				for (int i = 0; i < num_ref_frames_in_pic_order_cnt_cycle; i++) {
+					offset_for_ref_frame[i] = (int) reader.se();
+				}
+			}
+			final long num_ref_frames = reader.ue();
+			final long gaps_in_frame_num_value_allowed_flag = reader.readBits(1);
+			final long pic_width_in_mbs_minus1 = reader.ue();
+			final long pic_height_in_map_units_minus1 = reader.ue();
+			width = (int)(pic_width_in_mbs_minus1 + 1) * 16;
+			height = (int)(pic_height_in_map_units_minus1 + 1) * 16;
+			final boolean frame_mbs_only_flag = reader.readBoolean();
+			if (!frame_mbs_only_flag) {
+				final long mb_adaptive_frame_field_flag = reader.readBits(1);
+			}
+			final long direct_8x8_inference_flag = reader.readBits(1);
+			final boolean frame_cropping_flag = reader.readBoolean();
+			if (frame_cropping_flag) {
+				final long frame_crop_left_offset = reader.ue();
+				final long frame_crop_right_offset = reader.ue();
+				final long frame_crop_top_offset = reader.ue();
+				final long frame_crop_bottom_offset = reader.ue();
+			}
+			final boolean vui_parameter_present_flag = reader.readBoolean();
+			if (vui_parameter_present_flag) {
+				final boolean aspect_ratio_info_present_flag = reader.readBoolean();
+				if (aspect_ratio_info_present_flag) {
+					final long aspect_ratio_idc = reader.readBits(8);
+					if (aspect_ratio_idc == 255) {
+						final long sar_width = reader.readBits(16);
+						final long sar_height = reader.readBits(16);
+					}
+				}
+				final boolean overscan_info_present_flag = reader.readBoolean();
+				if (overscan_info_present_flag) {
+					final long overscan_appropriate_flagu = reader.readBits(1);
+				}
+				final boolean video_signal_type_present_flag = reader.readBoolean();
+				if (video_signal_type_present_flag) {
+					final long video_format = reader.readBits(3);
+					final long video_full_range_flag = reader.readBits(1);
+					final boolean colour_description_present_flag = reader.readBoolean();
+					if (colour_description_present_flag) {
+						final long colour_primaries = reader.readBits(8);
+						final long transfer_characteristics = reader.readBits(8);
+						final long matrix_coefficients = reader.readBits(8);
+					}
+				}
+				final boolean chroma_loc_info_present_flag = reader.readBoolean();
+				if (chroma_loc_info_present_flag) {
+					final long chroma_sample_loc_type_top_field = reader.ue();
+					final long chroma_sample_loc_type_bottom_field = reader.ue();
+				}
+				timing_info_present_flag = reader.readBoolean();
+				if (timing_info_present_flag) {
+					final long num_units_in_tick = reader.readBits(32);
+					final long time_scale = reader.readBits(32);
+					fps = (int) (time_scale / num_units_in_tick);
+					final boolean fixed_frame_rate_flag = reader.readBoolean();
+					if (fixed_frame_rate_flag) {
+						fps /= 2;
+					}
+				}
+			}
+			return new H264SpsConfig(width, height, fps, profile_idc);
+		} else {
+			return null;
+		}
 	}
 }
