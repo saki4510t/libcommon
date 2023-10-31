@@ -40,6 +40,11 @@ import androidx.databinding.InverseBindingMethods;
 	@InverseBindingMethod(type = CheckableImageView.class, attribute = "android:checked"),
 	@InverseBindingMethod(type = CheckableLinearLayout.class, attribute = "android:checked"),
 	@InverseBindingMethod(type = CheckableRelativeLayout.class, attribute = "android:checked"),
+
+	@InverseBindingMethod(type = CheckableImageButton.class, attribute = "android:checkable"),
+	@InverseBindingMethod(type = CheckableImageView.class, attribute = "android:checkable"),
+	@InverseBindingMethod(type = CheckableLinearLayout.class, attribute = "android:checkable"),
+	@InverseBindingMethod(type = CheckableRelativeLayout.class, attribute = "android:checkable"),
 })
 
 public class CheckableExBindingAdapter {
@@ -47,6 +52,13 @@ public class CheckableExBindingAdapter {
 	public static void setChecked(CheckableImageButton checkable, final boolean checked) {
 		if (checkable.isChecked() != checked) {
 			checkable.setChecked(checked);
+		}
+	}
+
+	@BindingAdapter("android:checkable")
+	public static void setCheckable(CheckableImageButton checkable, final boolean checked) {
+		if (checkable.isCheckable() != checked) {
+			checkable.setCheckable(checked);
 		}
 	}
 
@@ -79,6 +91,13 @@ public class CheckableExBindingAdapter {
 		}
 	}
 
+	@BindingAdapter("android:checkable")
+	public static void setCheckable(CheckableImageView checkable, final boolean checked) {
+		if (checkable.isCheckable() != checked) {
+			checkable.setCheckable(checked);
+		}
+	}
+
 	@BindingAdapter(value = {"android:onCheckedChanged", "android:checkedAttrChanged"},
 		requireAll = false)
 	public static void setListeners(
@@ -108,6 +127,13 @@ public class CheckableExBindingAdapter {
 		}
 	}
 
+	@BindingAdapter("android:checkable")
+	public static void setCheckable(CheckableLinearLayout checkable, final boolean checked) {
+		if (checkable.isCheckable() != checked) {
+			checkable.setCheckable(checked);
+		}
+	}
+
 	@BindingAdapter(value = {"android:onCheckedChanged", "android:checkedAttrChanged"},
 		requireAll = false)
 	public static void setListeners(
@@ -134,6 +160,13 @@ public class CheckableExBindingAdapter {
 	public static void setChecked(CheckableRelativeLayout checkable, final boolean checked) {
 		if (checkable.isChecked() != checked) {
 			checkable.setChecked(checked);
+		}
+	}
+
+	@BindingAdapter("android:checkable")
+	public static void setCheckable(CheckableRelativeLayout checkable, final boolean checked) {
+		if (checkable.isCheckable() != checked) {
+			checkable.setCheckable(checked);
 		}
 	}
 
