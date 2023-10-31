@@ -68,6 +68,7 @@
 			android:background="@color/SLATEGRAY"
 			android:checked="@={viewModel.isGroupChecked}"
 			android:clickable="true"
+			android:focusable="true"
 			app:layout_constraintBottom_toBottomOf="parent"
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
@@ -115,14 +116,16 @@
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="0.25"
-				android:text="CheckBox" />
+				android:text="CheckBox"
+				tools:ignore="HardcodedText" />
 
 			<RadioButton
 				android:id="@+id/radioButton"
 				android:layout_width="match_parent"
 				android:layout_height="wrap_content"
 				android:layout_weight="0.25"
-				android:text="RadioButton" />
+				android:text="RadioButton"
+				tools:ignore="HardcodedText" />
 		</com.serenegiant.widget.CheckableLinearLayout>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 
