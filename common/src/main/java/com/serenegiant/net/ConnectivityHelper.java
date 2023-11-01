@@ -187,6 +187,8 @@ public class ConnectivityHelper {
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
 		mIsReleased = true;
+		// FIXME mIsReleased=trueならコールバックが呼び出されないように変更したので
+		//       release時だけ同期的にコールバックを呼ぶかどうかを要検討
 		updateActiveNetwork(NETWORK_TYPE_NON);
 		final Context context = mWeakContext.get();
 		if (context != null) {
@@ -427,7 +429,7 @@ public class ConnectivityHelper {
 		final int activeNetworkType, final int prevNetworkType) {
 
 		synchronized (mSync) {
-			if (HandlerUtils.isActive(mAsyncHandler)) {
+			if (!mIsReleased && HandlerUtils.isActive(mAsyncHandler)) {
 				mAsyncHandler.post(() -> {
 					try {
 						mCallback.onNetworkChanged(activeNetworkType, prevNetworkType);
@@ -445,7 +447,7 @@ public class ConnectivityHelper {
 	 */
 	private void callOnError(@NonNull final Throwable t) {
 		synchronized (mSync) {
-			if (HandlerUtils.isActive(mAsyncHandler)) {
+			if (!mIsReleased && HandlerUtils.isActive(mAsyncHandler)) {
 				mAsyncHandler.post(() -> {
 					try {
 						mCallback.onError(t);
@@ -531,7 +533,7 @@ public class ConnectivityHelper {
 	 */
 	private void updateActiveNetwork(final int activeNetworkType) {
 		synchronized (mSync) {
-			if (mActiveNetworkType != activeNetworkType) {
+			if (!mIsReleased && mActiveNetworkType != activeNetworkType) {
 				final int prev = mActiveNetworkType;
 				mActiveNetworkType = activeNetworkType;
 				callOnNetworkChanged(activeNetworkType, prev);
