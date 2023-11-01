@@ -149,7 +149,7 @@ class MainActivity
 				}
 			}
 			R.string.title_network_connection -> {	// NetworkConnection
-				if (!checkPermissionNetwork()) {
+				if (!checkPermissionNetwork() && checkPermissionWiFiState() && checkPermissionLocation()) {
 					return
 				}
 				fragment = NetworkConnectionFragment.newInstance()
@@ -499,6 +499,17 @@ class MainActivity
 			&& mPermissions!!.requestPermission(Manifest.permission.INTERNET, true)
 	}
 
+
+	/**
+	 * check permission to access wifi state
+	 * and request to show detail dialog to request permission
+	 *
+	 * @return true already have permission to access network
+	 */
+	private fun checkPermissionWiFiState(): Boolean {
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.ACCESS_WIFI_STATE, true)
+	}
 	/**
 	 * check permission to access gps
 	 * and request to show detail dialog to request permission
