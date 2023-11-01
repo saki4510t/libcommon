@@ -187,9 +187,15 @@ public class ConnectivityHelper {
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
 		mIsReleased = true;
-		// FIXME mIsReleased=trueならコールバックが呼び出されないように変更したので
-		//       release時だけ同期的にコールバックを呼ぶかどうかを要検討
-		updateActiveNetwork(NETWORK_TYPE_NON);
+		// mIsReleased=trueならコールバックが呼び出されないように変更したので同期的にコールバックを呼ぶ
+//		updateActiveNetwork(NETWORK_TYPE_NON);
+		final int prev = mActiveNetworkType;
+		mActiveNetworkType = NETWORK_TYPE_NON;
+		try {
+			mCallback.onNetworkChanged(NETWORK_TYPE_NON, prev);
+		} catch (final Exception e) {
+			// ignore
+		}
 		final Context context = mWeakContext.get();
 		if (context != null) {
 			mWeakContext.clear();
