@@ -145,14 +145,15 @@ class NetworkConnectionFragment : BaseFragment() {
 		= object : ConnectivityCallback {
 
 		override fun onNetworkChanged(activeNetworkType: Int, prevNetworkType: Int) {
+			val context = requireContext();
 			if (DEBUG) Log.v(TAG, "onNetworkChanged:"
 				+ ConnectivityHelper.getNetworkTypeString(activeNetworkType))
 			if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:"
-				+ ConnectivityHelper.isWifiNetworkReachable(requireContext()))
+				+ ConnectivityHelper.isWifiNetworkReachable(context))
 			if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:"
-				+ ConnectivityHelper.isMobileNetworkReachable(requireContext()))
+				+ ConnectivityHelper.isMobileNetworkReachable(context))
 			if (DEBUG) Log.v(TAG, "isNetworkReachable:"
-				+ ConnectivityHelper.isNetworkReachable(requireContext()))
+				+ ConnectivityHelper.isNetworkReachable(context))
 		}
 
 		override fun onError(t: Throwable) {
