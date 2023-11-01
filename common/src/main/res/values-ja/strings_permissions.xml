@@ -66,6 +66,4 @@
 	<string name="permission_camera_reason">静止画/動画撮影のために内蔵カメラへのアクセス許可が必要です。</string>
 	<string name="permission_camera_request">内蔵カメラへのアクセス許可が必要です</string>
 	<string name="permission_camera_reason_android9_uvc">Android9以降ではUVC機器へアクセスするにはカメラへのアクセス許可が必要です。</string>
-	<!-- ハードウエアID・通話状態へのアクセスパーミッション -->
-	<string name="permission_hardware_id_request">通話するにはハードウエアID/通話状態へのアクセス許可が必要です。</string>
 </resources>
