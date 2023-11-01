@@ -49,9 +49,7 @@ class MainActivity
 		setContentView(R.layout.activity_main)
 		// パーミッション要求の準備
 		mPermissions = PermissionUtils(this, mCallback)
-			.prepare(this,
-				arrayOf(Manifest.permission.ACCESS_FINE_LOCATION,
-						Manifest.permission.ACCESS_COARSE_LOCATION))
+			.prepare(this, LOCATION_PERMISSIONS)
 		DummyContent.createItems(this, R.array.list_items)
 		if (savedInstanceState == null) {
 			// IRecorderで使う最大録画時間を無制限(-1)にする
