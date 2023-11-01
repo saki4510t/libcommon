@@ -38,11 +38,19 @@ public class HandlerUtils {
 
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static void quitSafely(@Nullable final Handler handler) throws IllegalStateException {
-		final Looper looper = handler != null ? handler.getLooper() : null;
-		if (looper != null) {
-			looper.quitSafely();
+		if (handler instanceof HandlerThreadHandler) {
+			if (((HandlerThreadHandler) handler).isActive()) {
+				((HandlerThreadHandler) handler).quitSafely();
+			} else {
+				throw new IllegalStateException("already quit");
+			}
 		} else {
-			throw new IllegalStateException("has no looper");
+			final Looper looper = handler != null ? handler.getLooper() : null;
+			if (looper != null) {
+				looper.quitSafely();
+			} else {
+				throw new IllegalStateException("has no looper");
+			}
 		}
 	}
 
@@ -56,11 +64,19 @@ public class HandlerUtils {
 	}
 
 	public static void quit(@Nullable final Handler handler) throws IllegalStateException {
-		final Looper looper = handler != null ? handler.getLooper() : null;
-		if (looper != null) {
-			looper.quit();
+		if (handler instanceof HandlerThreadHandler) {
+			if (((HandlerThreadHandler) handler).isActive()) {
+				((HandlerThreadHandler) handler).quit();
+			} else {
+				throw new IllegalStateException("already quit");
+			}
 		} else {
-			throw new IllegalStateException("has no looper");
+			final Looper looper = handler != null ? handler.getLooper() : null;
+			if (looper != null) {
+				looper.quit();
+			} else {
+				throw new IllegalStateException("has no looper");
+			}
 		}
 	}
 
@@ -84,7 +100,9 @@ public class HandlerUtils {
 		try {
 			// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
 			return (handler != null) && (thread != null)
-				&& thread.isAlive() && handler.sendEmptyMessage(0);
+				&& thread.isAlive()
+				&& (((handler instanceof HandlerThreadHandler) && ((HandlerThreadHandler) handler).isActive())
+					|| handler.sendEmptyMessage(0));
 		} catch (final Exception e) {
 			return false;
 		}
@@ -102,7 +120,9 @@ public class HandlerUtils {
 		try {
 			// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
 			return (handler == null) || (thread == null)
-				|| !thread.isAlive() || !handler.sendEmptyMessage(0);
+				|| !thread.isAlive()
+				|| ((handler instanceof HandlerThreadHandler) && !((HandlerThreadHandler) handler).isActive())
+				|| !handler.sendEmptyMessage(0);
 		} catch (final Exception e) {
 			return true;
 		}

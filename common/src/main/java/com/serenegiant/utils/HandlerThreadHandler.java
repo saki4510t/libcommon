@@ -140,6 +140,7 @@ public class HandlerThreadHandler extends Handler {
 //--------------------------------------------------------------------------------
 	private final long mId;
 	private final boolean mAsynchronous;
+	private volatile boolean mIsActive = true;
 
 	/**
 	 * コンストラクタ
@@ -182,7 +183,11 @@ public class HandlerThreadHandler extends Handler {
 
 			msg.setAsynchronous(true);
 		}
-		return super.sendMessageAtTime(msg, uptimeMillis);
+		if (mIsActive) {
+			return super.sendMessageAtTime(msg, uptimeMillis);
+		} else {
+			return false;
+		}
 	}
 
 	public long getId() {
@@ -191,14 +196,20 @@ public class HandlerThreadHandler extends Handler {
 	
 	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public void quitSafely() throws IllegalStateException {
+		mIsActive = false;
 		getLooper().quitSafely();
 	}
 	
 	public void quit() throws IllegalStateException {
+		mIsActive = false;
 		getLooper().quit();
 	}
 	
 	public boolean isCurrentThread() throws IllegalStateException {
 		return mId == Thread.currentThread().getId();
+	}
+
+	public boolean isActive() {
+		return mIsActive;
 	}
 }
