@@ -82,4 +82,20 @@ public class WiFiUtils {
 		return false;
   	}
 
+//	/**
+//	 * 接続中のWiFiインターフェースのMACアドレスを取得する
+//	 * XXX ハードウエアIDの１つで一般的には利用を推奨されていないので利用時は注意
+//	 *     Android6以降では通常のアプリから呼び出すとダミーのMACアドレス(02:00:00:00:00:00)が返る
+//	 * @param context
+//	 * @return
+//	 */
+//	@SuppressLint("HardwareIds")
+//	@RequiresPermission(allOf = {Manifest.permission.ACCESS_WIFI_STATE, Manifest.permission.ACCESS_FINE_LOCATION})
+//	@Nullable
+//	public static String getMacAddress(@NonNull final Context context) {
+//		final WifiManager wifi
+//			= ContextUtils.requireSystemService(context, WifiManager.class);
+//		final WifiInfo info = wifi.getConnectionInfo();
+//		return info != null ? info.getMacAddress() : null;
+//	}
 }
