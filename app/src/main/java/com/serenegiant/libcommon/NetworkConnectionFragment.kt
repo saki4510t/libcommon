@@ -41,11 +41,13 @@ class NetworkConnectionFragment : BaseFragment() {
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
+		if (DEBUG) Log.v(TAG, "onAttach:")
 		requireActivity().title = getString(R.string.title_network_connection)
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
+		if (DEBUG) Log.v(TAG, "onCreate:")
 		if (mHelper == null) {
 			mHelper = ConnectivityHelper(requireContext(), mConnectivityCallback)
 		}
@@ -120,11 +122,13 @@ class NetworkConnectionFragment : BaseFragment() {
 	override fun onCreateView(inflater: LayoutInflater,
 		container: ViewGroup?, savedInstanceState: Bundle?): View? {
 
+		if (DEBUG) Log.v(TAG, "onCreateView:")
 		return inflater.inflate(R.layout.fragment_network_connection, container, false)
 	}
 
 	override fun internalOnResume() {
 		super.internalOnResume()
+		if (DEBUG) Log.v(TAG, "internalOnResume:")
 		if (DEBUG) Log.v(TAG, "isWifiNetworkReachable:"
 			+ ConnectivityHelper.isWifiNetworkReachable(requireContext()))
 		if (DEBUG) Log.v(TAG, "isMobileNetworkReachable:"
@@ -133,12 +137,23 @@ class NetworkConnectionFragment : BaseFragment() {
 			+ ConnectivityHelper.isNetworkReachable(requireContext()))
 	}
 
+	override fun internalOnPause() {
+		if (DEBUG) Log.v(TAG, "internalOnPause:")
+		super.internalOnPause()
+	}
+
 	override fun internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:")
 		if (mHelper != null) {
 			mHelper!!.release()
 			mHelper = null
 		}
 		super.internalRelease()
+	}
+
+	override fun onDetach() {
+		if (DEBUG) Log.v(TAG, "onDetach:")
+		super.onDetach()
 	}
 
 	private val mConnectivityCallback: ConnectivityCallback
