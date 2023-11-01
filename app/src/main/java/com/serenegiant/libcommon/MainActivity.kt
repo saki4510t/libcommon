@@ -152,6 +152,12 @@ class MainActivity
 				}
 				fragment = NetworkConnectionFragment.newInstance()
 			}
+			R.string.title_telephony -> {	// Telephony
+				if (!checkPermissionPhoneState() || !checkPermissionSMS() || !checkPermissionPhoneNumber()) {
+					return
+				}
+				fragment = TelephonyFragment.newInstance()
+			}
 			R.string.title_usb_monitor -> {	// UsbMonitor
 				if (BuildCheck.isAndroid9()
 					&& !checkPermissionCamera()) {
@@ -497,7 +503,6 @@ class MainActivity
 			&& mPermissions!!.requestPermission(Manifest.permission.INTERNET, true)
 	}
 
-
 	/**
 	 * check permission to access wifi state
 	 * and request to show detail dialog to request permission
@@ -508,6 +513,7 @@ class MainActivity
 		return mPermissions != null
 			&& mPermissions!!.requestPermission(Manifest.permission.ACCESS_WIFI_STATE, true)
 	}
+
 	/**
 	 * check permission to access gps
 	 * and request to show detail dialog to request permission
@@ -516,6 +522,40 @@ class MainActivity
 	private fun checkPermissionLocation(): Boolean {
 		return mPermissions != null
 			&& mPermissions!!.requestPermission(LOCATION_PERMISSIONS, true)
+	}
+
+	/**
+	 * check permission to read phone state
+	 * and request to show detail dialog to request permission
+	 *
+	 * @return true already have permission to access network
+	 */
+	private fun checkPermissionPhoneState(): Boolean {
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.READ_PHONE_STATE, true)
+	}
+
+	/**
+	 * check permission to read phone state
+	 * and request to show detail dialog to request permission
+	 *
+	 * @return true already have permission to access network
+	 */
+	private fun checkPermissionPhoneNumber(): Boolean {
+		return !BuildCheck.isAPI26()
+			|| (mPermissions != null
+				&& mPermissions!!.requestPermission(Manifest.permission.READ_PHONE_NUMBERS, true))
+	}
+
+	/**
+	 * check permission to read phone state
+	 * and request to show detail dialog to request permission
+	 *
+	 * @return true already have permission to access network
+	 */
+	private fun checkPermissionSMS(): Boolean {
+		return mPermissions != null
+			&& mPermissions!!.requestPermission(Manifest.permission.READ_SMS, true)
 	}
 
 	/**
