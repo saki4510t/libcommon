@@ -123,22 +123,40 @@ public class RationalDialogV4 extends DialogFragmentEx {
 		mRationalResources.put(Manifest.permission.ACCESS_FINE_LOCATION,
 			new RationalResource(Manifest.permission.ACCESS_FINE_LOCATION,
 				R.string.permission_title, R.string.permission_location_reason));
+		mRationalResources.put(Manifest.permission.INTERNET,
+			new RationalResource(Manifest.permission.INTERNET,
+				R.string.permission_title, R.string.permission_network_reason));
 		mRationalResources.put(Manifest.permission.ACCESS_NETWORK_STATE,
 			new RationalResource(Manifest.permission.ACCESS_NETWORK_STATE,
 				R.string.permission_title, R.string.permission_network_state_reason));
 		mRationalResources.put(Manifest.permission.CHANGE_NETWORK_STATE,
 			new RationalResource(Manifest.permission.CHANGE_NETWORK_STATE,
 				R.string.permission_title, R.string.permission_change_network_state_reason));
+		mRationalResources.put(Manifest.permission.ACCESS_WIFI_STATE,
+			new RationalResource(Manifest.permission.ACCESS_WIFI_STATE,
+				R.string.permission_title, R.string.permission_access_wifi_state_reason));
+		mRationalResources.put(Manifest.permission.READ_PHONE_STATE,
+			new RationalResource(Manifest.permission.READ_PHONE_STATE,
+				R.string.permission_title, R.string.permission_read_phone_state_reason));
+		mRationalResources.put(Manifest.permission.READ_SMS,
+			new RationalResource(Manifest.permission.READ_SMS,
+				R.string.permission_title, R.string.permission_read_sms_reason));
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 			// Android11/API30以降
 			mRationalResources.put(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
 				new RationalResource(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
 					R.string.permission_title, R.string.permission_access_background_location_api30));
-		} else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			// Android10/API29以降
 			mRationalResources.put(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
 				new RationalResource(Manifest.permission.ACCESS_BACKGROUND_LOCATION,
 					R.string.permission_title, R.string.permission_access_background_location));
+		}
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+			mRationalResources.put(Manifest.permission.READ_PHONE_NUMBERS,
+				new RationalResource(Manifest.permission.READ_PHONE_NUMBERS,
+					R.string.permission_title, R.string.permission_read_phone_number));
 		}
 	}
 

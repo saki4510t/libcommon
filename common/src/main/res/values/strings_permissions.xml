@@ -39,8 +39,8 @@
 	<string name="permission_read_ext_storage_finish">No reading external storage permission. \nApp will finish soon</string>
 	<!-- ネットワークアクセスのパーミッション INTERNET -->
 	<string name="permission_network">No network access permission.</string>
-	<string name="permission_network_reason">Network access permission is necessary for streaming.</string>
-	<string name="permission_network_request">Network access permission is necessary for streaming.</string>
+	<string name="permission_network_reason">Network access permission is necessary to use this app.</string>
+	<string name="permission_network_request">Network access permission is necessary to use this app.</string>
 	<string name="permission_network_finish">No network access permission. \nApp will finish soon</string>
 	<!-- ネットワーク情報アクセスのパーミッション ACCESS_NETWORK_STATE -->
 	<string name="permission_network_state">No permission to access network state</string>
@@ -52,6 +52,26 @@
 	<string name="permission_change_network_state_reason">Permission to change network state is necessary to change network connection.</string>
 	<string name="permission_change_network_state_request">Permission to change network state is necessary to change network connection.</string>
 	<string name="permission_change_network_state_finish">No permission to change network state. \nApp will finish soon</string>
+	<!-- WiFi情報アクセスのパーミッション ACCESS_WIFI_STATE -->
+	<string name="permission_access_wifi_state">No permission to read Wi-Fi state.</string>
+	<string name="permission_access_wifi_state_reason">App needs permission to read Wi-Fi state.</string>
+	<string name="permission_access_wifi_state_request">App needs permission to read Wi-Fi state.</string>
+	<string name="permission_access_wifi_state_finish">No permission to read Wi-Fi state.\nAoo wil finish soon.</string>
+	<!-- 電話情報読み取りのパーミッション READ_PHONE_STATE -->
+	<string name="permission_read_phone_state">No permission to read phone state.</string>
+	<string name="permission_read_phone_state_reason">App needs permission to read phone state.</string>
+	<string name="permission_read_phone_state_request">App needs permission to read phone state.</string>
+	<string name="permission_read_phone_state_finish">No permission to read phone state.\nApp wil finish soon.</string>
+	<!-- 電話番号読み取りのパーミッション READ_PHONE_NUMBER -->
+	<string name="permission_read_phone_number">No permission to read phone number.</string>
+	<string name="permission_read_phone_number_reason">App needs permission to read phone number.</string>
+	<string name="permission_read_phone_number_request">App needs permission to read phone number.</string>
+	<string name="permission_read_phone_number_finish">No permission to read phone number.\nApp will finish soon.</string>
+	<!-- SMS読み取りパーミッション(電話番号読み取り時にも必要) READ_SMS -->
+	<string name="permission_read_sms">No permission to read SMS.</string>
+	<string name="permission_read_sms_reason">App needs permission to read SMS.\nThis permission is also required when app needs to read phone number.</string>
+	<string name="permission_read_sms_request">App needs permission to read SMS.\nThis permission is also required when app needs to read phone number.</string>
+	<string name="permission_read_sms_finish">No permission to read SMS.\nApp wil finish soon.</string>
 	<!-- 位置情報のパーミッション -->
 	<string name="permission_location">No location access permission</string>
 	<string name="permission_location_reason">Location access permission is necessary to save location.</string>

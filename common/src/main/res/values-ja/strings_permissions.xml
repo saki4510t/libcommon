@@ -39,8 +39,8 @@
 	<string name="permission_read_ext_storage_finish">外部ストレージの読み込みパーミッションがありません。\n終了します。</string>
 	<!-- ネットワークアクセスのパーミッション INTERNET -->
 	<string name="permission_network">ネットワークへのアクセス許可がありません。</string>
-	<string name="permission_network_reason">ストリーミングを行うにははネットワークへのアクセス許可が必要です。</string>
-	<string name="permission_network_request">ストリーミングを行うにはネットワークへのアクセス許可が必要です。</string>
+	<string name="permission_network_reason">アプリを利用するにはネットワークへのアクセス許可が必要です。</string>
+	<string name="permission_network_request">アプリを利用するにはネットワークへのアクセス許可が必要です。</string>
 	<string name="permission_network_finish">ネットワークアクセス許可がありません。\n終了します。</string>
 	<!-- ネットワーク情報アクセスのパーミッション ACCESS_NETWORK_STATE -->
 	<string name="permission_network_state">ネットワーク情報へのアクセス許可がありません。</string>
@@ -52,6 +52,26 @@
 	<string name="permission_change_network_state_reason">ネットワーク接続変更のためにネットワーク情報変更の許可が必要です。</string>
 	<string name="permission_change_network_state_request">ネットワーク接続変更のためにネットワーク情報変更の許可が必要です。</string>
 	<string name="permission_change_network_state_finish">ネットワーク情報変更のアクセス許可がありません。\n終了します。</string>
+	<!-- WiFi情報アクセスのパーミッション ACCESS_WIFI_STATE -->
+	<string name="permission_access_wifi_state">WiFi情報アクセスの許可がありません。</string>
+	<string name="permission_access_wifi_state_reason">WiFi情報取得のためにWiFi情報へのアクセス許可が必要です。</string>
+	<string name="permission_access_wifi_state_request">WiFの情報取得のためにWiFi情報へのアクセス許可が必要です。</string>
+	<string name="permission_access_wifi_state_finish">WiFi情報取得のためのアクセス許可がありません。\n終了します。</string>
+	<!-- 電話情報読み取りのパーミッション READ_PHONE_STATE -->
+	<string name="permission_read_phone_state">電話情報読み取りの許可がありません。</string>
+	<string name="permission_read_phone_state_reason">アプリの実行には電話情報読み取りのための許可が必要です。</string>
+	<string name="permission_read_phone_state_request">アプリの実行には電話情報読み取りのための許可が必要です。</string>
+	<string name="permission_read_phone_state_finish">電話情報読み取りの許可がありません。\n終了します。</string>
+	<!-- 電話番号読み取りのパーミッション READ_PHONE_NUMBER -->
+	<string name="permission_read_phone_number">電話番号読み取りの許可がありません。</string>
+	<string name="permission_read_phone_number_reason">アプリの実行には電話番号読み取りの許可が必要です。</string>
+	<string name="permission_read_phone_number_request">アプリの実行には電話番号読み取りの許可が必要です。</string>
+	<string name="permission_read_phone_number_finish">電話番号読み取りの許可がありません。\n終了します。</string>
+	<!-- SMS読み取りパーミッション(電話番号読み取り時にも必要) READ_SMS -->
+	<string name="permission_read_sms">SMS読み取りの許可がありません。</string>
+	<string name="permission_read_sms_reason">アプリの実行にはSMS読み取りの許可が必要です\n(電話番号読み取り時にも必要になります)。</string>
+	<string name="permission_read_sms_request">アプリの実行にはSMS読み取りの許可が必要です\n(電話番号読み取り時にも必要になります)。</string>
+	<string name="permission_read_sms_finish">SMS読み取りの許可がありません。\n終了します。</string>
 	<!-- 位置情報のパーミッション -->
 	<string name="permission_location">位置情報へのアクセス許可がありません。</string>
 	<string name="permission_location_reason">位置情報を保存するために位置情報へのアクセス許可が必要です。</string>
