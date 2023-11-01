@@ -81,9 +81,13 @@ public class HandlerUtils {
 	public static boolean isActive(@Nullable final Handler handler) {
 		// Handler#getLooperとLooper#getThreadはNonNullなのでHandlerがnullでなければthread変数もnullじゃない
 		final Thread thread = handler != null ? handler.getLooper().getThread() : null;
-		// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
-		return (handler != null) && (thread != null)
-			&& thread.isAlive() && handler.sendEmptyMessage(0);
+		try {
+			// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
+			return (handler != null) && (thread != null)
+				&& thread.isAlive() && handler.sendEmptyMessage(0);
+		} catch (final Exception e) {
+			return false;
+		}
 	}
 
 	/**
@@ -95,8 +99,12 @@ public class HandlerUtils {
 	public static boolean isTerminated(@Nullable final Handler handler) {
 		// Handler#getLooperとLooper#getThreadはNonNullなのでHandlerがnullでなければthread変数もnullじゃない
 		final Thread thread = handler != null ? handler.getLooper().getThread() : null;
-		// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
-		return (handler == null) || (thread == null)
-			|| !thread.isAlive() || !handler.sendEmptyMessage(0);
+		try {
+			// XXX sendEmptyMessageでwhat=0を送って返り値がfalseならHandler/Looperが終了しているとみなす
+			return (handler == null) || (thread == null)
+				|| !thread.isAlive() || !handler.sendEmptyMessage(0);
+		} catch (final Exception e) {
+			return true;
+		}
 	}
 }
