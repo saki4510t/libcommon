@@ -149,7 +149,7 @@ class MainActivity
 				}
 			}
 			R.string.title_network_connection -> {	// NetworkConnection
-				if (!checkPermissionNetwork() && checkPermissionWiFiState() && checkPermissionLocation()) {
+				if (!checkPermissionNetwork() || !checkPermissionWiFiState() || !checkPermissionLocation()) {
 					return
 				}
 				fragment = NetworkConnectionFragment.newInstance()
