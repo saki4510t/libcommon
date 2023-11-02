@@ -75,7 +75,7 @@ public abstract class AudioDecoder extends AbstractDecoder {
 	}
 
 	@Override
-	protected void internalPrepare(final int trackIndex, @NonNull final MediaFormat format) {
+	public void prepare(final int trackIndex, @NonNull final MediaFormat format) {
 		final int audioChannels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT);
 		final int audioSampleRate = format.getInteger(MediaFormat.KEY_SAMPLE_RATE);
 		final int min_buf_size = AudioTrack.getMinBufferSize(audioSampleRate,

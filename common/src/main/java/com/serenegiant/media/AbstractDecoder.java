@@ -103,7 +103,7 @@ public abstract class AbstractDecoder implements Decoder {
 		if (mTrackIndex >= 0) {
 			extractor.selectTrack(mTrackIndex);
 			mFormat = extractor.getTrackFormat(mTrackIndex);
-			internalPrepare(mTrackIndex, mFormat);
+			prepare(mTrackIndex, mFormat);
 		} else {
 			throw new IllegalArgumentException("Track not found for " + mMimeType);
 		}
@@ -115,7 +115,7 @@ public abstract class AbstractDecoder implements Decoder {
 	 * @param trackIndex
 	 * @param format
 	 */
-	protected abstract void internalPrepare(final int trackIndex, @NonNull final MediaFormat format);
+	public abstract void prepare(final int trackIndex, @NonNull final MediaFormat format);
 
 	/**
 	 * デコーダー生成とデコード開始処理

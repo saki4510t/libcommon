@@ -78,7 +78,7 @@ public abstract class VideoDecoder extends AbstractDecoder {
 	}
 
 	@Override
-	protected void internalPrepare(final int trackIndex, @NonNull final MediaFormat format) {
+	public void prepare(final int trackIndex, @NonNull final MediaFormat format) {
 	}
 
 	@Override
