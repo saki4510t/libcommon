@@ -96,7 +96,7 @@ public class UsbConnector implements Cloneable, Closeable {
       if (mConnection != null) {
          final int fd = mConnection.getFileDescriptor();
          final byte[] rawDesc = mConnection.getRawDescriptors();
-         Log.i(TAG, String.format(Locale.US,
+         if (DEBUG) Log.v(TAG, String.format(Locale.US,
              "name=%s,fd=%d,rawDesc=", name, fd)
              + BufferHelper.toHexString(rawDesc, 0, 16));
       } else {

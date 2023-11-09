@@ -53,7 +53,7 @@ import androidx.core.content.ContextCompat;
  *     #onReceiveを呼び出す。
  */
 public class UsbPermission extends BroadcastReceiver {
-	private static final boolean DEBUG = true;	// XXX 実働時にはfalseにすること
+	private static final boolean DEBUG = false;	// XXX 実働時にはfalseにすること
 	private static final String TAG = "UsbPermission";
 
 	public static final String ACTION_USB_PERMISSION = "com.serenegiant.USB_PERMISSION";
