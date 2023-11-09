@@ -20,31 +20,20 @@ package com.serenegiant.usb;
  *  moved from aAndUsb
 */
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
-import android.hardware.usb.UsbDeviceConnection;
-import android.hardware.usb.UsbEndpoint;
-import android.hardware.usb.UsbInterface;
-import android.hardware.usb.UsbManager;
-import android.os.Build;
 import android.util.Log;
-import android.util.SparseArray;
-
-import com.serenegiant.utils.BufferHelper;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 /**
  * USB機器の接続/切断イベント処理、USB機器アクセスパーミッション要求処理
@@ -363,18 +352,9 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * (UsbControlBlockを生成してファイルディスクリプタを取得してネイティブ側へ引き渡したときに
 	 * 勝手にcloseされてしまわないようにするため)
 	 */
-	public static final class UsbControlBlock implements Cloneable {
-		@NonNull
-		private final WeakReference<USBMonitor> mWeakMonitor;
-		@NonNull
-		private final UsbDevice mDevice;
-		@NonNull
-		private final UsbDeviceInfo mInfo;
-		@NonNull
-		private final SparseArray<SparseArray<UsbInterface>>
-			mInterfaces = new SparseArray<SparseArray<UsbInterface>>();
+	public static final class UsbControlBlock extends UsbConnector {
 		@Nullable
-		private UsbDeviceConnection mConnection;
+		private WeakReference<USBMonitor> mWeakMonitor;
 
 		/**
 		 * 指定したUsbDeviceに関係づけたUsbControlBlockインスタンスを生成する
@@ -385,28 +365,9 @@ public final class USBMonitor extends UsbDetector implements Const {
 		private UsbControlBlock(@NonNull final USBMonitor monitor, @NonNull final UsbDevice device)
 			throws IOException {
 
+			super(monitor.getUsbManager(), device);
 //			if (DEBUG) Log.v(TAG, "UsbControlBlock:device=" + device);
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
-			mDevice = device;
-			final UsbManager manager = monitor.getUsbManager();
-			// XXX UsbManager#openDeviceはIllegalArgumentExceptionを投げる可能性がある
-			try {
-				mConnection = manager.openDevice(device);
-			} catch (final Exception e) {
-				throw new IOException(e);
-			}
-			final String name = device.getDeviceName();
-			if (mConnection != null) {
-				final int fd = mConnection.getFileDescriptor();
-				final byte[] rawDesc = mConnection.getRawDescriptors();
-				Log.i(TAG, String.format(Locale.US,
-					"name=%s,fd=%d,rawDesc=", name, fd)
-						+ BufferHelper.toHexString(rawDesc, 0, 16));
-			} else {
-				// 多分ここには来ない(openDeviceの時点でIOException)けど年のために
-				throw new IOException("could not connect to device " + name);
-			}
-			mInfo = UsbDeviceInfo.getDeviceInfo(manager, device, null);
 			monitor.processConnect(device, this);
 		}
 
@@ -415,39 +376,16 @@ public final class USBMonitor extends UsbDetector implements Const {
 		 * 単純コピー(参照を共有)ではなく同じUsbDeviceへアクセスするための別のUsbDeviceConnection/UsbDeviceInfoを生成する
 		 * @param src
 		 * @throws IllegalStateException
+		 * @throws IOException
 		 */
-		private UsbControlBlock(final UsbControlBlock src) throws IllegalStateException {
+		private UsbControlBlock(final UsbControlBlock src) throws IllegalStateException, IOException {
+			super(src.getUsbManager(), src.getDevice());
 			final USBMonitor monitor = src.getMonitor();
 			if (monitor == null) {
 				throw new IllegalStateException("USBMonitor is already released?");
 			}
-			final UsbDevice device = src.getDevice();
-			final UsbManager manager = monitor.getUsbManager();
-			mConnection = manager.openDevice(device);
-			if (mConnection == null) {
-				throw new IllegalStateException("device may already be removed or have no permission");
-			}
-			mInfo = UsbDeviceInfo.getDeviceInfo(manager, device, null);
 			mWeakMonitor = new WeakReference<USBMonitor>(monitor);
-			mDevice = device;
-			monitor.processConnect(device, this);
-		}
-
-		@Override
-		protected void finalize() throws Throwable {
-			try {
-				close();
-			} finally {
-				super.finalize();
-			}
-		}
-
-		/**
-		 * 対応するUSB機器がopenしていて使用可能かどうかを取得
-		 * @return
-		 */
-		public synchronized boolean isValid() {
-			return mConnection != null;
+			monitor.processConnect(getDevice(), this);
 		}
 
 		/**
@@ -457,350 +395,18 @@ public final class USBMonitor extends UsbDetector implements Const {
 		 * @return
 		 * @throws CloneNotSupportedException
 		 */
-		@SuppressWarnings("CloneDoesntCallSuperClone")
 		@NonNull
 		@Override
 		public UsbControlBlock clone() throws CloneNotSupportedException {
-			final UsbControlBlock ctrlblock;
-			try {
-				ctrlblock = new UsbControlBlock(this);
-			} catch (final IllegalStateException e) {
-				throw new CloneNotSupportedException(e.getMessage());
-			}
-			return ctrlblock;
+			final UsbControlBlock result = (UsbControlBlock)super.clone();
+			// USBMonitorの弱参照は別途生成する
+			result.mWeakMonitor = new WeakReference<USBMonitor>(getMonitor());
+			return result;
 		}
 
 		@Nullable
 		public USBMonitor getMonitor() {
-			return mWeakMonitor.get();
-		}
-
-		@NonNull
-		public UsbDevice getDevice() {
-			return mDevice;
-		}
-
-		@NonNull
-		public UsbDeviceInfo getInfo() {
-			return mInfo;
-		}
-
-		/**
-		 * 機器名を取得
-		 * UsbDevice#mUsbDeviceを呼び出しているので
-		 * 端末内でユニークな値だけど抜き差しすれば変わる
-		 * すでに取り外されたり破棄されているときは空文字列が返る
-		 * @return
-		 */
-		@NonNull
-		public String getDeviceName() {
-			return mDevice.getDeviceName();
-		}
-
-		/**
-		 * 機器IDを取得
-		 * UsbDevice#getDeviceIdを呼び出しているので
-		 * 端末内でユニークな値だけど抜き差しすれば変わる
-		 * @return
-		 */
-		public int getDeviceId() {
-			return mDevice.getDeviceId();
-		}
-
-		/**
-		 * UsbDeviceConnectionを取得
-		 * UsbControlBlockでの排他制御から切り離されてしまうので注意
-		 * @return
-		 */
-		@Nullable
-		public synchronized UsbDeviceConnection getConnection() {
-	
-			return mConnection;
-		}
-
-		/**
-		 * UsbDeviceConnectionを取得
-		 * UsbControlBlockでの排他制御から切り離されてしまうので注意
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@NonNull
-		public  synchronized  UsbDeviceConnection requireConnection()
-			throws IllegalStateException {
-
-			checkConnection();
-			return mConnection;
-		}
-
-		/**
-		 * Usb機器へアクセスするためのファイルディスクリプタを取得
-		 * 使用不可の場合は0を返す
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		public synchronized int getFileDescriptor() {
-			return mConnection != null ? mConnection.getFileDescriptor() : 0;
-		}
-
-		/**
-		 * Usb機器へアクセスするためのファイルディスクリプタを取得
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		public synchronized int requireFileDescriptor() throws IllegalStateException {
-			checkConnection();
-			return mConnection.getFileDescriptor();
-		}
-
-		/**
-		 * Usb機器のディスクリプタを取得
-		 * 使用不可の場合はnullを返す
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@Nullable
-		public synchronized byte[] getRawDescriptors() {
-			checkConnection();
-			return mConnection != null ? mConnection.getRawDescriptors() : null;
-		}
-
-		/**
-		 * Usb機器のディスクリプタを取得
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@NonNull
-		public synchronized byte[] requireRawDescriptors() throws IllegalStateException {
-			checkConnection();
-			return mConnection.getRawDescriptors();
-		}
-
-		/**
-		 * ベンダーIDを取得
-		 * @return
-		 */
-		public int getVenderId() {
-			return mDevice.getVendorId();
-		}
-
-		/**
-		 * プロダクトIDを取得
-		 * @return
-		 */
-		public int getProductId() {
-			return mDevice.getProductId();
-		}
-
-		/**
-		 * USBのバージョンを取得
-		 * @return
-		 */
-		public String getUsbVersion() {
-			return mInfo.bcdUsb;
-		}
-
-		/**
-		 * マニュファクチャ名(ベンダー名)を取得
-		 * @return
-		 */
-		public String getManufacture() {
-			return mInfo.manufacturer;
-		}
-
-		/**
-		 * 製品名を取得
-		 * @return
-		 */
-		public String getProductName() {
-			return mInfo.product;
-		}
-
-		/**
-		 * 製品のバージョンを取得
-		 * @return
-		 */
-		public String getVersion() {
-			return mInfo.version;
-		}
-
-		/**
-		 * シリアルナンバーを取得
-		 * @return
-		 */
-		public String getSerial() {
-			return mInfo.serial;
-		}
-
-		/**
-		 * インターフェースを取得する
-		 * Java内でインターフェースをopenして使う時
-		 * @param interface_id
-		 * @throws IllegalStateException
-		 */
-		public synchronized UsbInterface getInterface(final int interface_id)
-			throws IllegalStateException {
-
-			return getInterface(interface_id, 0);
-		}
-
-		/**
-		 * インターフェースを取得する
-		 * @param interface_id
-		 * @param altsetting
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@SuppressLint("NewApi")
-		public synchronized UsbInterface getInterface(final int interface_id, final int altsetting)
-			throws IllegalStateException {
-
-			checkConnection();
-			SparseArray<UsbInterface> intfs = mInterfaces.get(interface_id);
-			if (intfs == null) {
-				intfs = new SparseArray<UsbInterface>();
-				mInterfaces.put(interface_id, intfs);
-			}
-			UsbInterface intf = intfs.get(altsetting);
-			if (intf == null) {
-				final int n = mDevice.getInterfaceCount();
-				for (int i = 0; i < n; i++) {
-					final UsbInterface temp = mDevice.getInterface(i);
-					if ((temp.getId() == interface_id) && (temp.getAlternateSetting() == altsetting)) {
-						intf = temp;
-						break;
-					}
-				}
-				if (intf != null) {
-					intfs.append(altsetting, intf);
-				}
-			}
-			return intf;
-		}
-
-		/**
-		 * インターフェースを開く
-		 * @param intf
-		 * @throws IllegalStateException
-		 */
-		public synchronized void claimInterface(final UsbInterface intf)
-			throws IllegalStateException {
-
-			claimInterface(intf, true);
-		}
-
-		/**
-		 * インターフェースを開く
-		 * @param intf
-		 * @param force
-		 * @throws IllegalStateException
-		 */
-		public synchronized void claimInterface(final UsbInterface intf, final boolean force)
-			throws IllegalStateException {
-
-			checkConnection();
-			mConnection.claimInterface(intf, force);
-		}
-
-		/**
-		 * インターフェースを閉じる
-		 * @param intf
-		 * @throws IllegalStateException
-		 */
-		public synchronized void releaseInterface(final UsbInterface intf)
-			throws IllegalStateException {
-
-			checkConnection();
-			final SparseArray<UsbInterface> intfs = mInterfaces.get(intf.getId());
-			if (intfs != null) {
-				final int index = intfs.indexOfValue(intf);
-				intfs.removeAt(index);
-				if (intfs.size() == 0) {
-					mInterfaces.remove(intf.getId());
-				}
-			}
-			mConnection.releaseInterface(intf);
-		}
-		
-		/**
-		 * 指定したエンドポイントに対してバルク転送を実行する
-		 * @param endpoint
-		 * @param buffer
-		 * @param offset
-		 * @param length
-		 * @param timeout
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-		public synchronized int bulkTransfer(final UsbEndpoint endpoint,
-			final byte[] buffer, final int offset, final int length, final int timeout)
-				throws IllegalStateException {
-				
-			checkConnection();
-			return mConnection.bulkTransfer(endpoint, buffer, offset, length, timeout);
-		}
-		
-		/**
-		 * 指定したエンドポイントに対してバルク転送を実行する
- 		 * @param endpoint
-		 * @param buffer
-		 * @param length
-		 * @param timeout
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		public synchronized int bulkTransfer(final UsbEndpoint endpoint,
-			final byte[] buffer, final int length, final int timeout)
-				throws IllegalStateException {
-			
-			checkConnection();
-			return mConnection.bulkTransfer(endpoint, buffer, length, timeout);
-		}
-		
-		/**
-		 * コントロール転送を実行する
- 		 * @param requestType
-		 * @param request
-		 * @param value
-		 * @param index
-		 * @param buffer
-		 * @param offset
-		 * @param length
-		 * @param timeout
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
-		public synchronized int controlTransfer(final int requestType, final int request,
-			final int value, final int index,
-			final byte[] buffer, final int offset, final int length, final int timeout)
-				throws IllegalStateException {
-			
-			checkConnection();
-			return mConnection.controlTransfer(requestType, request,
-				value, index, buffer, offset, length, timeout);
-		}
-		
-		/**
-		 * コントロール転送を実行する
-		 * @param requestType
-		 * @param request
-		 * @param value
-		 * @param index
-		 * @param buffer
-		 * @param length
-		 * @param timeout
-		 * @return
-		 * @throws IllegalStateException
-		 */
-		public synchronized int controlTransfer(final int requestType, final int request,
-			final int value, final int index,
-			final byte[] buffer, final int length, final int timeout)
-				throws IllegalStateException {
-
-			checkConnection();
-			return mConnection.controlTransfer(requestType, request,
-				value, index, buffer, length, timeout);
+			return mWeakMonitor != null ? mWeakMonitor.get() : null;
 		}
 
 		/**
@@ -810,33 +416,12 @@ public final class USBMonitor extends UsbDetector implements Const {
 		public void close() {
 			if (DEBUG) Log.i(TAG, "UsbControlBlock#close:");
 
-			UsbDeviceConnection connection;
-			synchronized (this) {
-				connection = mConnection;
-				mConnection = null;
-			}
-			if (connection != null) {
-				// 2015/01/06 closeしてからonDisconnectを呼び出すように変更
-				// openしているinterfaceが有れば閉じる XXX Java側でインターフェースを使う時
-				final int n = mInterfaces.size();
-				for (int i = 0; i < n; i++) {
-					final SparseArray<UsbInterface> intfs = mInterfaces.valueAt(i);
-					if (intfs != null) {
-						final int m = intfs.size();
-						for (int j = 0; j < m; j++) {
-							final UsbInterface intf = intfs.valueAt(j);
-							connection.releaseInterface(intf);
-						}
-						intfs.clear();
-					}
-				}
-				mInterfaces.clear();
-				connection.close();
-				final USBMonitor monitor = getMonitor();
-				final UsbDevice device = getDevice();
-				if (monitor != null) {
-					monitor.callOnDisconnect(device, this);
-				}
+			super.close();
+			final UsbDevice device = getDevice();
+			final USBMonitor monitor = getMonitor();
+			mWeakMonitor = null;
+			if (monitor != null) {
+				monitor.callOnDisconnect(device, this);
 			}
 		}
 
@@ -845,17 +430,9 @@ public final class USBMonitor extends UsbDetector implements Const {
 			if (o == null) return false;
 			if (o instanceof UsbControlBlock) {
 				final UsbDevice device = ((UsbControlBlock) o).getDevice();
-				return device.equals(mDevice);
-			} else if (o instanceof UsbDevice) {
-				return o.equals(mDevice);
+				return device.equals(getDevice());
 			}
 			return super.equals(o);
-		}
-
-		private synchronized void checkConnection() throws IllegalStateException {
-			if (mConnection == null) {
-				throw new IllegalStateException("already closed");
-			}
 		}
 
 	} // end ofUsbControlBlock
