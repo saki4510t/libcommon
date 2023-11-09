@@ -186,7 +186,7 @@ public final class USBMonitor implements Const {
 	@Nullable
 	private PendingIntent mPermissionIntent = null;
 	@NonNull
-	private final List<DeviceFilter> mDeviceFilters = new ArrayList<DeviceFilter>();
+	private final List<DeviceFilter> mDeviceFilters = new ArrayList<>();
 	/**
 	 * 現在接続されている機器一覧
 	 */
