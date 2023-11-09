@@ -133,8 +133,13 @@ class UsbFragment : BaseFragment() {
 
 		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
 			Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName}")
-			val connection = ctrlBlock.connection
-			val info = UsbDeviceInfo.getDeviceInfo(ctrlBlock, null)
+			// テストのためにクローンする
+			val cloned = ctrlBlock.clone()
+			// 元のUsbControlBlockはcloseする
+			ctrlBlock.close()
+			// クローンしたUsbControlBlockを使ってアクセスする
+			val connection = cloned.connection
+			val info = UsbDeviceInfo.getDeviceInfo(cloned, null)
 			if (DEBUG) {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
@@ -155,7 +160,7 @@ class UsbFragment : BaseFragment() {
 			}
 			// USB機器がopenした時,1秒後にcloseする
 			queueEvent({
-				ctrlBlock.close()
+				cloned.close()
 			}, 1000)
 		}
 
