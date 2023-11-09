@@ -1,0 +1,423 @@
+package com.serenegiant.usb;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2023 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+*/
+
+import android.annotation.SuppressLint;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.hardware.usb.UsbDevice;
+import android.hardware.usb.UsbManager;
+import android.os.Handler;
+import android.util.Log;
+
+import com.serenegiant.app.PendingIntentCompat;
+import com.serenegiant.system.BuildCheck;
+import com.serenegiant.system.ContextUtils;
+import com.serenegiant.utils.HandlerThreadHandler;
+import com.serenegiant.utils.HandlerUtils;
+import com.serenegiant.utils.ThreadPool;
+
+import java.lang.ref.WeakReference;
+import java.util.concurrent.CountDownLatch;
+
+import androidx.annotation.AnyThread;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+
+/**
+ * USBMonitorからUSB機器アクセスパーミッション要求関係の処理を分離
+ * XXX このクラスを単独で使う場合はregister/unregisterを呼び出してパーミッション要求結果の
+ *     Intentを受け取るためのBroadcastReceiverを登録/登録解除する必要がある。
+ *     USBMonitor等他のクラスで共通のBroadcastReceiverでIntentを受け取って
+ *     処理する場合にはregister/unregisterを呼び出さずにIntent受信時に
+ *     #onReceiveを呼び出す。
+ */
+public class UsbPermission extends BroadcastReceiver {
+	private static final boolean DEBUG = true;	// XXX 実働時にはfalseにすること
+	private static final String TAG = "UsbPermission";
+
+	public static final String ACTION_USB_PERMISSION = "com.serenegiant.USB_PERMISSION";
+
+	/**
+	 * USB機器の状態変更時のコールバックリスナー
+	 */
+	public interface Callback {
+		/**
+		 * パーミッション要求結果が返ってきた時
+		 * @param device
+		 */
+		@AnyThread
+		public void onPermission(@NonNull final UsbDevice device);
+		/**
+		 * キャンセルまたはユーザーからパーミッションを得られなかった時
+		 * @param device
+		 */
+		@AnyThread
+		public void onCancel(@NonNull final UsbDevice device);
+		/**
+		 * パーミッション要求時等で非同期実行中にエラーになった時
+		 * @param device
+		 * @param t
+		 */
+		@AnyThread
+		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t);
+	}
+
+//--------------------------------------------------------------------------------
+	@NonNull
+	private final WeakReference<Context> mWeakContext;
+	@NonNull
+	private final UsbManager mUsbManager;
+	@NonNull
+	private final Callback mCallback;
+	@NonNull
+	private final PendingIntent mPermissionIntent;
+	private final boolean mOwnHandler;
+	@NonNull
+	private final Handler mAsyncHandler;
+
+	private volatile boolean mReleased;
+	private boolean mRegistered;
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 */
+	public UsbPermission(
+		@NonNull final Context context,
+		@NonNull final Callback callback) {
+
+		this(context, callback, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param context
+	 * @param callback
+	 * @param asyncHandler
+	 */
+	public UsbPermission(
+		@NonNull final Context context,
+		@NonNull final Callback callback,
+		@Nullable final Handler asyncHandler) {
+
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		mWeakContext = new WeakReference<Context>(context);
+		mUsbManager = ContextUtils.requireSystemService(context, UsbManager.class);
+		mCallback = callback;
+		mPermissionIntent = createIntent(context);
+		mOwnHandler = (asyncHandler == null);
+		if (mOwnHandler) {
+			mAsyncHandler = HandlerThreadHandler.createHandler(TAG);
+		} else {
+			mAsyncHandler = asyncHandler;
+		}
+	}
+
+	/**
+	 * 関係するリソースを破棄する。再利用はできない
+	 */
+	public void release() {
+		if (DEBUG) Log.v(TAG, "release:");
+		unregister();
+		mReleased = true;
+		if (mOwnHandler) {
+			HandlerUtils.NoThrowQuit(mAsyncHandler);
+		}
+		mWeakContext.clear();
+	}
+
+	/**
+	 * すでに破棄されたかどうかを取得
+	 * @return
+	 */
+	public boolean isReleased() {
+		return mReleased;
+	}
+
+	public boolean isRegistered() {
+		return mRegistered;
+	}
+
+	/**
+	 * USB機器アクセスパーミッション要求時のインテントを処理するためのブロードキャストレシーバーを登録する
+	 * @throws IllegalStateException
+	 */
+	public synchronized void register() throws IllegalStateException {
+		if (DEBUG) Log.v(TAG, "register:" + mRegistered);
+		if (!mRegistered) {
+			final Context context = requireContext();
+			final IntentFilter filter = new IntentFilter(ACTION_USB_PERMISSION);
+			ContextCompat.registerReceiver(context, this, filter, ContextCompat.RECEIVER_EXPORTED);
+			mRegistered = true;
+		}
+	}
+
+	/**
+	 * USB機器アクセスパーミッション要求時のインテントを処理するためのブロードキャストレシーバーを登録を解除する
+	 * @throws IllegalStateException
+	 */
+	public synchronized void unregister() throws IllegalStateException {
+		if (DEBUG) Log.v(TAG, "unregister:" + mRegistered);
+		if (mRegistered) {
+			mRegistered = false;
+			final Context context = requireContext();
+			context.unregisterReceiver(this);
+		}
+	}
+
+	/**
+	 * パーミッションを要求する
+	 * @param device
+	 * @return パーミッション要求が失敗したらtrueを返す
+	 * @throws IllegalStateException
+	 */
+	public synchronized boolean requestPermission(@Nullable final UsbDevice device)
+		throws IllegalStateException {
+
+		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		boolean result = false;
+		if (!isReleased()) {
+			if (device != null) {
+				if (mUsbManager.hasPermission(device)) {
+					// 既にパーミッションが有れば接続する
+					processPermission(device);
+				} else {
+					try {
+						// パーミッションがなければ要求する
+						mUsbManager.requestPermission(device, mPermissionIntent);
+					} catch (final Exception e) {
+						// Android5.1.xのGALAXY系でandroid.permission.sec.MDM_APP_MGMT
+						// という意味不明の例外生成するみたい
+						Log.w(TAG, e);
+						processCancel(device);
+						result = true;
+					}
+				}
+			} else {
+				callOnError(device, new UsbPermissionException("device is null"));
+				result = true;
+			}
+		} else {
+			throw new IllegalStateException("already destroyed");
+		}
+		return result;
+	}
+
+	/**
+	 * BroadcastReceiverの抽象メソッドの実装
+	 * @param context The Context in which the receiver is running.
+	 * @param intent The Intent being received.
+	 */
+	@Override
+	public void onReceive(final Context context, final Intent intent) {
+		if (DEBUG) Log.v(TAG, "onReceive:" + intent);
+		final String action = intent.getAction();
+		if (ACTION_USB_PERMISSION.equals(action)) {
+			// パーミッション要求の結果が返ってきた時
+			synchronized (this) {
+				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+				if ((device != null)
+					&& (hasPermission(mUsbManager, device)
+					|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
+					// パーミッションを取得できた時・・・デバイスとの通信の準備をする
+					processPermission(device);
+				} else if (device != null) {
+					// パーミッションを取得できなかった時
+					processCancel(device);
+				} else {
+					// パーミッションを取得できなかった時,
+					// OS側がおかしいかAPI>=31でPendingIntentにFLAG_MUTABLEを指定していないとき
+					callOnError(device, new UsbPermissionException("device is null"));
+				}
+			}
+		}
+	}
+
+//--------------------------------------------------------------------------------
+	protected Context getContext() {
+		return mWeakContext.get();
+	}
+
+	protected Context requireContext() throws IllegalStateException {
+		final Context result = getContext();
+		if (mReleased || (result == null)) {
+			throw new IllegalStateException("already released!");
+		}
+		return result;
+	}
+
+	/**
+	 * パーミッション要求結果が返ってきた時の処理
+	 * @param device
+	 */
+	private void processPermission(@NonNull final UsbDevice device) {
+		if (DEBUG) Log.v(TAG, "processPermission:");
+		mCallback.onPermission(device);
+	}
+
+	/**
+	 * ユーザーキャンセル等でパーミッションを取得できなかったときの処理
+	 * @param device
+	 */
+	private void processCancel(@NonNull final UsbDevice device) {
+		if (DEBUG) Log.v(TAG, "processCancel:");
+		if (!mReleased) {
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.onCancel(device);
+				}
+			});
+		}
+	}
+
+	/**
+	 * エラーコールバック呼び出し処理
+	 * @param device
+	 * @param t
+	 */
+	protected void callOnError(
+		@Nullable final UsbDevice device,
+		@NonNull final Throwable t) {
+
+		if (DEBUG) Log.v(TAG, "callOnError:" + t);
+		if (!mReleased) {
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.onError(device, t);
+				}
+			});
+		}
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * USB機器アクセスパーミッション要求時に結果を受け取るためのPendingIntentを生成する
+	 * @param context
+	 * @return
+	 */
+	@SuppressLint({"WrongConstant"})
+	public static PendingIntent createIntent(@NonNull final Context context) {
+		int flags = 0;
+		if (BuildCheck.isAPI31()) {
+			// FLAG_MUTABLE指定必須
+			// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
+			flags |= PendingIntentCompat.FLAG_MUTABLE;
+		}
+		return PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
+	}
+
+	/**
+	 * 指定したUsbDeviceが示すUSB機器へのアクセスパーミッションがあるかどうかを取得
+	 * @param context
+	 * @param device
+	 * @return true: 指定したUsbDeviceにパーミッションがある
+	 */
+	public static boolean hasPermission(
+		@NonNull final Context context,
+		@Nullable final UsbDevice device) {
+
+		return hasPermission(ContextUtils.requireSystemService(context, UsbManager.class), device);
+	}
+
+	/**
+	 * 指定したUsbDeviceが示すUSB機器へのアクセスパーミッションがあるかどうかを取得
+	 * @param manager
+	 * @param device
+	 * @return true: 指定したUsbDeviceにパーミッションがある
+	 */
+	public static boolean hasPermission(
+		@NonNull final UsbManager manager,
+		@Nullable final UsbDevice device) {
+
+		return (device != null) && manager.hasPermission(device);
+	}
+
+	/**
+	 * パーミッションを要求する
+	 * @param context
+	 * @param device
+	 * @param callback
+	 * @throws IllegalStateException
+	 */
+	public static void requestPermission(
+		@NonNull final Context context,
+		@NonNull final UsbDevice device,
+		@NonNull final Callback callback)
+		throws IllegalArgumentException {
+
+		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		final UsbManager manager = ContextUtils.requireSystemService(context, UsbManager.class);
+		ThreadPool.queueEvent(() -> {
+			final CountDownLatch latch = new CountDownLatch(1);
+			// USBMonitorインスタンスにセットしているコールバックも呼び出されるようにするために
+			// パーミッションがあってもなくてもパーミッション要求する
+			final BroadcastReceiver receiver = new BroadcastReceiver() {
+				@Override
+				public void onReceive(final Context context, final Intent intent) {
+					final String action = intent.getAction();
+					try {
+						if (ACTION_USB_PERMISSION.equals(action)) {
+							// パーミッション要求の結果が返ってきた時
+							final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+							if ((device != null)
+								&& (manager.hasPermission(device)
+								|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
+								// パーミッションを取得できた時・・・デバイスとの通信の準備をする
+								callback.onPermission(device);
+							} else if (device == null) {
+								// パーミッションを取得できなかった時
+								callback.onCancel(device);
+							} else {
+								// パーミッションを取得できなかった時,
+								// OS側がおかしいかAPI>=31でPendingIntentにFLAG_MUTABLEを指定していないとき
+								callback.onError(device, new UsbPermissionException("device is null"));
+							}
+						} else {
+							callback.onCancel(device);
+						}
+					} finally {
+						latch.countDown();
+					}
+				}
+			};
+			if (DEBUG) Log.v(TAG, "requestPermission#registerReceiver:");
+			ContextCompat.registerReceiver(context, receiver, new IntentFilter(ACTION_USB_PERMISSION), ContextCompat.RECEIVER_EXPORTED);
+			try {
+				manager.requestPermission(device, createIntent(context));
+				latch.await();
+			} catch (final Exception e) {
+				// Android5.1.xのGALAXY系でandroid.permission.sec.MDM_APP_MGMT
+				// という意味不明の例外生成するみたい
+				Log.w(TAG, e);
+				callback.onCancel(device);
+			} finally {
+				if (DEBUG) Log.v(TAG, "requestPermission#unregisterReceiver:");
+				context.unregisterReceiver(receiver);
+			}
+		});
+	}
+}
