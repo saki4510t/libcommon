@@ -51,6 +51,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 		/**
 		 * USB機器がopenされた時,
 		 * 4.xx.yyと異なりUsbControlBlock#cloneでも呼ばれる
+		 * FIXME UsbControlBlockの代わりにUsbConnectorを使うように変更する
 		 * @param device
 		 * @param ctrlBlock
 		 */
