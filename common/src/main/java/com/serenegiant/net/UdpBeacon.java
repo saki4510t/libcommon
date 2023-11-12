@@ -296,7 +296,8 @@ public class UdpBeacon {
 		mRcvMinIntervalsMs = rcv_min_intervals_ms;
 	}
 
-	public void finalize() throws Throwable {
+	@Override
+	protected void finalize() throws Throwable {
 		try {
 			release();
 		} finally {
