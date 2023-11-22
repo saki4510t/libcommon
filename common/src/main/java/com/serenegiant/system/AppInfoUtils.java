@@ -96,7 +96,9 @@ public class AppInfoUtils {
 			final PackageInfo pi = pm.getPackageInfo(info.packageName, PackageManager.GET_CONFIGURATIONS);
 			if ((pi.reqFeatures != null) && (pi.reqFeatures.length > 0)) {
 				for (final FeatureInfo fi: pi.reqFeatures) {
-					result.add(fi.name);
+					if (fi.name != null) {
+						result.add(fi.name);
+					}
 				}
 			} else if (DEBUG) {
 				if (DEBUG) Log.v(TAG, "hasFeature:has no features.");
