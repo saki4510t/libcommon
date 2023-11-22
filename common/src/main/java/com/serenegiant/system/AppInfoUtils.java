@@ -80,8 +80,56 @@ public class AppInfoUtils {
 		return (info.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0;
 	}
 
+//--------------------------------------------------------------------------------
 	/**
-	 * 指定したfeatureをmanifestで要求しているかどうか
+	 * AndroidManifest.xmlで要求している機能フラグ一覧を取得する
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static List<String> requestedFeatures(@NonNull final Context context) {
+		final List<String> result = new ArrayList<>();
+
+		final PackageManager pm = context.getPackageManager();
+		final ApplicationInfo info = context.getApplicationInfo();
+		try {
+			final PackageInfo pi = pm.getPackageInfo(info.packageName, PackageManager.GET_CONFIGURATIONS);
+			if ((pi.reqFeatures != null) && (pi.reqFeatures.length > 0)) {
+				for (final FeatureInfo fi: pi.reqFeatures) {
+					result.add(fi.name);
+				}
+			} else if (DEBUG) {
+				if (DEBUG) Log.v(TAG, "hasFeature:has no features.");
+			}
+//			if ((pi.featureGroups != null) && (pi.featureGroups.length > 0)) {
+//				for (final FeatureGroupInfo fi: pi.featureGroups) {
+//					if (DEBUG) Log.v(TAG, "hasFeature:" + fi);
+//				}
+//			} else if (DEBUG) {
+//				if (DEBUG) Log.v(TAG, "hasFeature:has no feature groups.");
+//			}
+		} catch (final PackageManager.NameNotFoundException e) {
+			if (DEBUG) Log.d(TAG, "hasFeature:", e);
+		}
+
+		return result;
+	}
+
+	/**
+	 * 指定したfeatureをAndroidManifest.xmlで要求しているかどうか
+	 * @param context
+	 * @param feature
+	 * @return
+	 */
+	public static boolean hasFeature(
+		@NonNull final Context context,
+		@NonNull final String feature) {
+
+		return hasFeature(context, context.getApplicationInfo(), feature);
+	}
+
+	/**
+	 * 指定したfeatureをAndroidManifest.xmlで要求しているかどうか
 	 * @param context
 	 * @param info
 	 * @param feature
@@ -118,6 +166,61 @@ public class AppInfoUtils {
 		return false;
 	}
 
+	/**
+	 * 指定したfeature全てをAndroidManifest.xmlで要求しているかどうか
+	 * @param context
+	 * @param features
+	 * @return
+	 */
+	public static boolean hasFeaturesAll(
+		@NonNull final Context context,
+		@NonNull final String[] features) {
+
+		return hasFeaturesAll(context, context.getApplicationInfo(), features);
+	}
+
+	/**
+	 * 指定したfeature全てをAndroidManifest.xmlで要求しているかどうか
+	 * @param context
+	 * @param info
+	 * @param features
+	 * @return
+	 */
+	public static boolean hasFeaturesAll(
+		@NonNull final Context context,
+		@NonNull final ApplicationInfo info,
+		@NonNull final String[] features) {
+
+		boolean result = true;
+		final PackageManager pm = context.getPackageManager();
+		try {
+			final PackageInfo pi = pm.getPackageInfo(info.packageName, PackageManager.GET_CONFIGURATIONS);
+			if ((pi.reqFeatures != null) && (pi.reqFeatures.length > 0)) {
+				for (final String feature: features) {
+					boolean found = false;
+					for (final FeatureInfo fi: pi.reqFeatures) {
+						if (feature.equals(fi.name)) {
+							if (DEBUG) Log.v(TAG, "hasFeature:has " + feature);
+							found =  true;
+							break;
+						}
+					}
+					result |= found;
+					if (!result) {
+						break;
+					}
+				}
+			} else if (DEBUG) {
+				if (DEBUG) Log.v(TAG, "hasFeature:has no features.");
+			}
+		} catch (final PackageManager.NameNotFoundException e) {
+			if (DEBUG) Log.d(TAG, "hasFeature:", e);
+		}
+
+		return result;
+	}
+
+//--------------------------------------------------------------------------------
 	/**
 	 * ApplicationInfoのフィルター処理用インターフェース
 	 */
