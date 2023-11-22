@@ -27,7 +27,7 @@ plugins {
 
 android {
 	namespace 'com.serenegiant.common'
-    compileSdkVersion versionCompiler
+    compileSdk versionCompiler
 
    	compileOptions {
    		sourceCompatibility javaSourceCompatibility
