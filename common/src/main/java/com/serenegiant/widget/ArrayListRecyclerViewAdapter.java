@@ -18,6 +18,7 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,6 +36,8 @@ import java.util.List;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.DiffUtil;
+import androidx.recyclerview.widget.ListAdapter;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
@@ -42,7 +45,7 @@ import androidx.recyclerview.widget.RecyclerView;
  * @param <T>
  */
 public abstract class ArrayListRecyclerViewAdapter<T>
-	extends RecyclerView.Adapter<ArrayListRecyclerViewAdapter.ViewHolder<T>> {
+	extends ListAdapter<T, ArrayListRecyclerViewAdapter.ViewHolder<T>> {
 
 	private static final boolean DEBUG = false;	// FIXME set false when production
 	private static final String TAG = ArrayListRecyclerViewAdapter.class.getSimpleName();
@@ -91,8 +94,10 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 
     public ArrayListRecyclerViewAdapter(
     	@LayoutRes final int itemViewLayoutId,
-		@NonNull final List<T> items) {
+		@NonNull final List<T> items,
+		@NonNull final DiffUtil.ItemCallback<T> diffCallback) {
 
+		super(diffCallback);
 		mItemViewId = itemViewLayoutId;
 		mItems = items;
 		synchronized (mItems) {
@@ -184,6 +189,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 		return mRecycleView;
 	}
 
+	@SuppressLint("NotifyDataSetChanged")
 	public void clear() {
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
@@ -214,6 +220,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 	 * 指定したコレクションで置き換える
 	 * @param collection
 	 */
+	@SuppressLint("NotifyDataSetChanged")
 	public void replaceAll(final Collection<? extends T> collection) {
 		synchronized (mItems) {
 			unregisterDataSetObserver(mItems);
@@ -224,6 +231,7 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 		notifyDataSetChanged();
 	}
 
+	@SuppressLint("NotifyDataSetChanged")
 	public void sort(final Comparator<? super T> comparator) {
 		synchronized (mItems) {
 			Collections.sort(mItems, comparator);
@@ -355,6 +363,23 @@ public abstract class ArrayListRecyclerViewAdapter<T>
 			}
  		}
 	};
+
+	/**
+	 * DiffUtil.ItemCallbackのデフォルト実装クラス
+	 * @param <T>
+	 */
+	public static class DiffCallback<T> extends DiffUtil.ItemCallback<T> {
+		@Override
+		public boolean areItemsTheSame(@NonNull final T oldItem, @NonNull final T newItem) {
+			return oldItem == newItem;
+		}
+
+		@SuppressLint("DiffUtilEquals")
+		@Override
+		public boolean areContentsTheSame(@NonNull final T oldItem, @NonNull final T newItem) {
+			return oldItem.equals(newItem);
+		}
+	}
 
     public static class ViewHolder<T> extends RecyclerView.ViewHolder {
         public final View mView;

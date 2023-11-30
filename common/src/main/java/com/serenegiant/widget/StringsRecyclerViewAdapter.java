@@ -43,7 +43,7 @@ public class StringsRecyclerViewAdapter extends ArrayListRecyclerViewAdapter<Str
 		@LayoutRes final int itemViewLayoutId,
 		@NonNull final List<String> items) {
 
-		super(itemViewLayoutId, items);
+		super(itemViewLayoutId, items, new DiffCallback<String>());
 	}
 
 	@Override
