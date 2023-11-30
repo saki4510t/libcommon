@@ -869,6 +869,15 @@ public final class BuildCheck {
 	 * @return
 	 */
 	@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
+	public static boolean isTiramisu() {
+		return check(Build.VERSION_CODES.TIRAMISU);
+	}
+
+	/**
+	 * てぃらみっす API>=33
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.TIRAMISU)
 	public static boolean isAndroid13() {
 		return check(Build.VERSION_CODES.TIRAMISU);
 	}
