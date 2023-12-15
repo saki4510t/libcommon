@@ -65,19 +65,32 @@ class ViewSliderFragment : BaseFragment() {
 		mRootView = rootView
 		rootView.setOnTouchListener(mOnTouchListener)
 		mViewSliderLeft = ViewSlider(rootView, R.id.slide_view_left, ViewSlider.HORIZONTAL)
-		mViewSliderLeft!!.hide(0)
-		mViewSliderLeft!!.targetView.setOnTouchListener(mOnTouchListener)
+		.apply {
+			hide(0)
+			targetView.setOnTouchListener(mOnTouchListener)
+			setViewSliderListener(mViewSliderListener)
+		}
 
 		mViewSliderTop = ViewSlider(rootView, R.id.slide_view_top, ViewSlider.VERTICAL)
-		mViewSliderTop!!.hide(0)
-		mViewSliderTop!!.targetView.setOnTouchListener(mOnTouchListener)
+		.apply {
+			hide(0)
+			targetView.setOnTouchListener(mOnTouchListener)
+			setViewSliderListener(mViewSliderListener)
+		}
 
 		mViewSliderRight = ViewSlider(rootView, R.id.slide_view_right, ViewSlider.HORIZONTAL)
-		mViewSliderRight!!.hide(0)
-		mViewSliderRight!!.targetView.setOnTouchListener(mOnTouchListener)
+		.apply {
+			hide(0)
+			targetView.setOnTouchListener(mOnTouchListener)
+			setViewSliderListener(mViewSliderListener)
+		}
 
 		mViewSliderBottom = ViewSlider(rootView, R.id.slide_view_bottom)
-		mViewSliderBottom!!.hide(0)
+		.apply {
+			hide(0)
+			targetView.setOnTouchListener(mOnTouchListener)
+			setViewSliderListener(mViewSliderListener)
+		}
 	}
 
 	private val mOnTouchListener = View.OnTouchListener { view, event ->
@@ -131,6 +144,16 @@ class ViewSliderFragment : BaseFragment() {
 			}
 		}
 		return@OnTouchListener true
+	}
+
+	private val mViewSliderListener = object : ViewSlider.ViewSliderListener {
+		override fun onOpened(targetView: View) {
+			if (DEBUG) Log.v(TAG, "onOpened:$targetView")
+		}
+
+		override fun onClosed(targetView: View) {
+			if (DEBUG) Log.v(TAG, "onClosed:$targetView")
+		}
 	}
 
 	companion object {

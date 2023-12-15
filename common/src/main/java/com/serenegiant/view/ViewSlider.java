@@ -32,6 +32,7 @@ import androidx.annotation.IdRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
@@ -45,6 +46,21 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 public class ViewSlider {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewSlider.class.getSimpleName();
+
+	/**
+	 * ViewSliderの表示状態が変更し終わったときのコールバックリスナー
+	 */
+	public interface ViewSliderListener {
+		/**
+		 * ターゲットViewが表示されたとき
+		 */
+		public void onOpened(@NonNull final View targetView);
+
+		/**
+		 * ターゲットViewが非表示になったとき
+		 */
+		public void onClosed(@NonNull final View targetView);
+	}
 
 	/**
 	 * 垂直方向にアニメーション
@@ -102,6 +118,9 @@ public class ViewSlider {
 	 */
 	@Orientation
 	private int mOrientation;
+
+	@Nullable
+	private ViewSliderListener mListener;
 
 	/**
 	 * コンストラクタ
@@ -328,6 +347,10 @@ public class ViewSlider {
 			&& (mTarget.getWidth() > 0) && (mTarget.getHeight() > 0);
 	}
 
+	public void setViewSliderListener(@Nullable final ViewSliderListener listener) {
+		mListener = listener;
+	}
+
 	/**
 	 * ターゲットViewをスライドイン
 	 * @param autoHideDurationMs
@@ -407,10 +430,31 @@ public class ViewSlider {
 							ViewUtils.requestResize(mTarget, mTargetMinWidth, mTargetMaxHeight);
 						}
 						mTarget.setVisibility(View.INVISIBLE);
+						callViewSlideListener(true);
 					}
 				}
 			}
 		});
+	}
+
+	/**
+	 * コールバックリスナーがセットされていれば呼び出す
+	 * @param closed
+	 */
+	private void callViewSlideListener(final boolean closed) {
+		final ViewSliderListener listener = mListener;
+		if (listener != null) {
+			mTarget.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					if (closed) {
+						listener.onClosed(getTargetView());
+					} else {
+						listener.onOpened(getTargetView());
+					}
+				}
+			}, 1);
+		}
 	}
 
 	private final View.OnLayoutChangeListener mOnLayoutChangeListener
@@ -459,8 +503,10 @@ public class ViewSlider {
 						}
 					}, duration);
 				}
+				callViewSlideListener(false);
 			} else {
 				mTarget.setVisibility(View.INVISIBLE);
+				callViewSlideListener(true);
 			}
 		}
 
