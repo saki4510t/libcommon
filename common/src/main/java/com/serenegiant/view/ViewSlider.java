@@ -147,6 +147,18 @@ public class ViewSlider {
 	 * @param parent 親View
 	 * @param target アニメーションさせるView
 	 * @param orientation アニメーションの方向
+	 * @throws IllegalArgumentException
+	 */
+	public ViewSlider(@NonNull final View parent, @NonNull final View target,
+		@Orientation final int orientation) throws IllegalArgumentException {
+		this(parent, target, orientation, DEFAULT_DURATION_RESIZE_MS);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param parent 親View
+	 * @param target アニメーションさせるView
+	 * @param orientation アニメーションの方向
 	 * @param resizeDuration
 	 * @throws IllegalArgumentException
 	 */
