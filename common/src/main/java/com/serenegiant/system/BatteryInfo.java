@@ -139,15 +139,7 @@ public class BatteryInfo implements Parcelable {
 	 * @param batteryStatus
 	 */
 	public BatteryInfo(@NonNull final Intent batteryStatus) {
-		level = batteryStatus.getIntExtra(BatteryManager.EXTRA_LEVEL, 0);
-		scale = batteryStatus.getIntExtra(BatteryManager.EXTRA_SCALE, 100);
-		temperature = batteryStatus.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0) / 10.0f;
-		battery = (100.0f * level) / (scale != 0 ? scale : 100);
-		voltage = batteryStatus.getIntExtra(BatteryManager.EXTRA_VOLTAGE, 0) / 1000.0f;
-		technology = batteryStatus.getStringExtra(BatteryManager.EXTRA_TECHNOLOGY);
-		status = batteryStatus.getIntExtra(BatteryManager.EXTRA_STATUS, BatteryManager.BATTERY_STATUS_UNKNOWN);
-		health = batteryStatus.getIntExtra(BatteryManager.EXTRA_HEALTH, BatteryManager.BATTERY_HEALTH_UNKNOWN);
-		plugged = batteryStatus.getIntExtra(BatteryManager.EXTRA_PLUGGED, 0);
+		set(batteryStatus);
 	}
 
 	/**
