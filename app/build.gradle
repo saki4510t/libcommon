@@ -49,13 +49,13 @@ android {
 
 dependencies {
 	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
-	implementation "androidx.appcompat:appcompat:$androidXVersion"
+	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
 	implementation "androidx.constraintlayout:constraintlayout:$androidXConstraint"
 	implementation "com.google.android.material:material:$androidXMaterial"
 	implementation "androidx.multidex:multidex:${androidXMultiDex}"
 
-	implementation "androidx.core:core-ktx:$androidXCore"
+	implementation "androidx.core:core-ktx:$androidXCoreKtx"
 	implementation "androidx.fragment:fragment-ktx:$androidXFragmentKtx"
 	implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleKtx"
 	implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleKtx"
