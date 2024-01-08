@@ -37,13 +37,13 @@ public class MemInfo {
 	}
 
 	@SuppressLint("NewApi")
-	public static JSONObject get(final Context contex) throws JSONException {
+	public static JSONObject get(final Context context) throws JSONException {
 		final JSONObject result = new JSONObject();
 		try {
 			try {
 				final ActivityManager.MemoryInfo mem_info = new ActivityManager.MemoryInfo();
 				final ActivityManager am
-					= ContextUtils.requireSystemService(contex, ActivityManager.class);
+					= ContextUtils.requireSystemService(context, ActivityManager.class);
 				am.getMemoryInfo(mem_info);
 				final JSONObject am_info = new JSONObject();
 				am_info.put("availMem", mem_info.availMem);
