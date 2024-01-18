@@ -37,10 +37,10 @@ import com.serenegiant.common.R
  */
 fun View.setupSnackbar(
 	lifecycleOwner: LifecycleOwner,
-	snackbarEvent: LiveData<Event<CharSequence>>, duration: Int,
+	snackbarEvent: LiveData<Event<CharSequence>>, duration: LiveData<Event<Int>>,
 	callback: Snackbar.Callback? = null) {
     snackbarEvent.observeEvent(lifecycleOwner) {
-		showSnackbar(it, duration, callback)
+		showSnackbar(it, duration.value?.value ?: Snackbar.LENGTH_LONG, callback)
 	}
 }
 
@@ -53,10 +53,10 @@ fun View.setupSnackbar(
  */
 fun View.setupSnackbar2(
 	lifecycleOwner: LifecycleOwner,
-	snackbarEvent: LiveData<CharSequence>, duration: Int,
+	snackbarEvent: LiveData<CharSequence>, duration: LiveData<Int>,
 	callback: Snackbar.Callback? = null) {
     snackbarEvent.observe(lifecycleOwner) {
-		showSnackbar(it, duration, callback)
+		showSnackbar(it, duration.value ?: Snackbar.LENGTH_LONG, callback)
 	}
 }
 
