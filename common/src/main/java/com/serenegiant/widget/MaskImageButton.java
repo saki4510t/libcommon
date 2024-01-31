@@ -30,6 +30,7 @@ import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
+import com.serenegiant.graphics.CanvasUtils;
 import com.serenegiant.system.BuildCheck;
 
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -97,19 +98,13 @@ public class MaskImageButton extends AppCompatImageButton {
 		}
     }
 
-	@SuppressLint("NewApi")
 	@Override
 	protected synchronized void onDraw(final Canvas canvas) {
-		final int saveCount = canvas.saveLayer(mViewBoundsF, mCopyPaint,
-			Canvas.ALL_SAVE_FLAG);
+		final int saveCount = CanvasUtils.saveLayer(canvas, mViewBoundsF, mCopyPaint);
 		try {
 			if (mMaskDrawable != null) {
 				mMaskDrawable.draw(canvas);
-				if (BuildCheck.isLollipop()) {
-					canvas.saveLayer(mViewBoundsF, mMaskedPaint);
-				} else {
-					canvas.saveLayer(mViewBoundsF, mMaskedPaint, Canvas.ALL_SAVE_FLAG);
-				}
+				CanvasUtils.saveLayer(canvas, mViewBoundsF, mMaskedPaint);
 			}
 			super.onDraw(canvas);
 		} finally {
