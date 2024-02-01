@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<declare-styleable name="RPGMessageView">
+		<!-- 1行あたりの文字数 -->
+		<attr name="cols" format="integer" default="8" />
+		<!-- 表示する行数 -->
+		<attr name="rows" format="integer" default="2" />
+		<!-- 表示する文字の色 -->
+		<attr name="android:textColor" format="color" />
+		<!-- メッセージを表示する際の文字と文字の遅延時間[ミリ秒], 0なら最短, 負ならView側のデフォルト値 -->
+		<attr name="durationPerChar" format="integer" default="-1" />
+		<!-- メッセージを表示する際に改行/行送りしたときの遅延時間[ミリ秒], 0なら最短, 負ならView側のデフォルト値 -->
+		<attr name="durationPerLine" format="integer" default="-1" />
+	</declare-styleable>
+</resources>

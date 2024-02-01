@@ -374,6 +374,9 @@ class MainActivity
 			R.string.title_checkable_ex -> {	// CheckableEx
 				fragment = CheckableExFragment.newInstance()
 			}
+			R.string.title_rpg_message_view -> {
+				fragment = RPGMessageFragment.newInstance()
+			}
 			else -> {
 			}
 		}

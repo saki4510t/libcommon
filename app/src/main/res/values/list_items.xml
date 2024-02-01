@@ -53,6 +53,7 @@
 	<string name="title_permissions" translatable="false">Permissions</string>
 	<string name="title_screen_capture" translatable="false">ScreenCapture</string>
 	<string name="title_checkable_ex" translatable="false">CheckableEx</string>
+	<string name="title_rpg_message_view" translatable="false">RPGMessageView</string>
 
 	<string-array name="list_items">
 		<item>@string/title_request_saf_permission</item>
@@ -88,5 +89,6 @@
 		<item>@string/title_permissions</item>
 		<item>@string/title_screen_capture</item>
 		<item>@string/title_checkable_ex</item>
+		<item>@string/title_rpg_message_view</item>
 	</string-array>
 </resources>
