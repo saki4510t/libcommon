@@ -7,9 +7,9 @@
 		<attr name="rows" format="integer" default="2" />
 		<!-- 表示する文字の色 -->
 		<attr name="android:textColor" format="color" />
-		<!-- 表示する文字のストローク色 -->
+		<!-- 文字の輪郭線を描画するときのストローク色, #00000000なら表示しない -->
 		<attr name="textStrokeColor" format="color" default="0" />
-		<!-- 表示する文字のストローク幅 -->
+		<!-- 文字の輪郭線を描画する時のストローク幅, 0なら表示しない -->
 		<attr name="textStrokeWidth" format="dimension" default="0" />
 		<!-- 文字の背景に使う色/drawable -->
 		<attr name="textBackground" format="reference" />
