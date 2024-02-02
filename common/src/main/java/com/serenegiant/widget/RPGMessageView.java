@@ -25,6 +25,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
@@ -118,6 +119,10 @@ public class RPGMessageView extends View {
 	 * 文字の輪郭を描画する時に使うPaintインスタンス
 	 */
 	private final Paint mTextStrokePaint = new Paint();
+	/**
+	 * 文字描画の背景drawable
+	 */
+	private Drawable mTextBackground = null;
 	/**
 	 * 文字を描画する際の文字領域取得用
 	 */
@@ -239,6 +244,8 @@ public class RPGMessageView extends View {
 			if (mDrawDurationMsPerLine < 0) {
 				mDrawDurationMsPerLine = DEFAULT_DURATION_MS_PER_LINE;
 			}
+			// 文字背景用drawable
+			mTextBackground = a.getDrawable(R.styleable.RPGMessageView_textBackground);
 		} finally {
 			a.recycle();
 		}
@@ -299,6 +306,10 @@ public class RPGMessageView extends View {
 					// 上下左右中央に表示
 					final float xx = x + (mColWidth - textWidth[0]) / 2.0f;
 					final float yy = y - (mRowHeight - boundHeight/*mTextBound.height()*/) / 2.0f;
+					if (mTextBackground != null) {
+						mTextBackground.setBounds((int)(x), (int)(y - mRowHeight), (int)(x + mColWidth), (int)(y));
+						mTextBackground.draw(canvas);
+					}
 					if (mHasTextStroke) {
 						canvas.drawText(mMessage, pos, 1, xx, yy, mTextStrokePaint);
 					}

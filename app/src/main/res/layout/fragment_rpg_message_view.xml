@@ -46,6 +46,7 @@
 			app:rows="4"
 			app:textStrokeColor="@color/BLACK"
 			app:textStrokeWidth="1dp"
+			app:textBackground="@color/QUARTER_CLEAR_BLACK"
 		/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
