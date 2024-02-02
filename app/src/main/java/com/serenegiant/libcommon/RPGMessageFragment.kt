@@ -20,6 +20,7 @@ package com.serenegiant.libcommon
 
 import android.content.Context
 import android.content.pm.ActivityInfo
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -54,7 +55,10 @@ class RPGMessageFragment : BaseFragment() {
 		requireActivity().window.addFlags(
 			WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS or WindowManager.LayoutParams.FLAG_FULLSCREEN)
 		requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-		mBinding.message.eventListener = object : RPGMessageView.MessageEventListener {
+		mBinding.message.apply {
+			setTypeface(Typeface.SERIF)
+		}
+		.eventListener = object : RPGMessageView.MessageEventListener {
 			/**
 			 * メッセージがすべて表示されたときのイベントコールバック
 			 * @param view

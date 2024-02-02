@@ -35,6 +35,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.CanvasUtils;
+import com.serenegiant.system.BuildCheck;
 
 import java.util.Arrays;
 
@@ -122,7 +123,13 @@ public class RPGMessageView extends View {
 	/**
 	 * 文字描画の背景drawable
 	 */
-	private Drawable mTextBackground = null;
+	@Nullable
+	private Drawable mTextBackground;
+	/**
+	 * 文字描画のTypeface
+	 */
+	@Nullable
+	private Typeface mTextTypeface = null;
 	/**
 	 * 文字を描画する際の文字領域取得用
 	 */
@@ -246,6 +253,11 @@ public class RPGMessageView extends View {
 			}
 			// 文字背景用drawable
 			mTextBackground = a.getDrawable(R.styleable.RPGMessageView_textBackground);
+//			// 文字表示に使うTypeface
+//			// XXX API26以降でTypedArray#getFontが使えるはずだけどinflate時にクラッシュするので無効に
+//			if (BuildCheck.isAPI26()) {
+//				mTextTypeface = a.getFont(R.styleable.RPGMessageView_android_typeface);
+//			}
 		} finally {
 			a.recycle();
 		}
@@ -380,6 +392,24 @@ public class RPGMessageView extends View {
 		resetGrid();
 	}
 
+	/**
+	 * 文字の背景に使う色/drawableを設定
+	 * @param drawable
+	 */
+	public void setTextBackground(@Nullable final Drawable drawable) {
+		mTextBackground = drawable;
+	}
+
+	/**
+	 * 文字描画に使うTypefaceを指定
+	 * nullの場合はデフォルトのTypeface.M
+	 * @param typeface
+	 */
+	public void setTypeface(@Nullable final Typeface typeface) {
+		mTextTypeface = typeface;
+		updatePaints();
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * 文字列を追加
@@ -487,13 +517,26 @@ public class RPGMessageView extends View {
 		// 1文字あたりの描画領域のサイズを計算
 		mColWidth = clientWidth / mCols;
 		mRowHeight = clientHeight / mRows;
+		updatePaints();
+		setText(mText);
+	}
+
+	/**
+	 * 描画用のPaintの設定を更新
+	 */
+	private void updatePaints() {
+		if (mTextTypeface != null) {
+			mTextPaint.setTypeface(mTextTypeface);
+			mTextStrokePaint.setTypeface(mTextTypeface);
+		} else {
+			// デフォルトは等幅フォント
+			mTextPaint.setTypeface(Typeface.MONOSPACE);
+			mTextStrokePaint.setTypeface(Typeface.MONOSPACE);
+		}
 		// テキストサイズを計算
 		final float sz = Math.min(mColWidth, mRowHeight) * 0.95f;
 		mTextPaint.setTextSize(sz);
-		mTextPaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
 		mTextStrokePaint.setTextSize(sz);
-		mTextStrokePaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
-		setText(mText);
 	}
 
 	/**

@@ -5,6 +5,8 @@
 		<attr name="cols" format="integer" default="8" />
 		<!-- 表示する行数 -->
 		<attr name="rows" format="integer" default="2" />
+		<!-- 文字表示のTypeface, API26以降でTypedArray#getFontが使えるはずだけどinflate時にクラッシュするので無効に -->
+		<!-- <attr name="android:typeface" /> -->
 		<!-- 表示する文字の色 -->
 		<attr name="android:textColor" format="color" />
 		<!-- 文字の輪郭線を描画するときのストローク色, #00000000なら表示しない -->
