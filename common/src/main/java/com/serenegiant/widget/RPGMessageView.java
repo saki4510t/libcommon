@@ -35,6 +35,8 @@ import android.view.View;
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.CanvasUtils;
 
+import java.util.Arrays;
+
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -67,6 +69,7 @@ public class RPGMessageView extends View {
 		public void onCleared(@NonNull final RPGMessageView view);
 	}
 
+	private static final char EMPTY_CHAR = '\0';
 	/**
 	 * 1行あたりの文字数の最大値
 	 */
@@ -376,11 +379,9 @@ public class RPGMessageView extends View {
 		// 表示するmMessage文字配列の追加位置をリセット
 		mNextMessageIx = 0;
 		mActionOnMessageEnd = Integer.MAX_VALUE;
-		// 未使用部分はスペースで埋める
+		// 未使用部分を埋める
 		final int len = mCols * mRows;
-		for (int i = 0; i < len; i++) {
-			mMessage[i] = ' ';
-		}
+		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
 		postInvalidate();
 	}
 
@@ -397,10 +398,8 @@ public class RPGMessageView extends View {
 		// 表示するmMessage文字配列の追加位置をリセット
 		mNextMessageIx = 0;
 		mActionOnMessageEnd = Integer.MAX_VALUE;
-		// 未使用部分はスペースで埋める
-		for (int i = 0; i < len; i++) {
-			mMessage[i] = ' ';
-		}
+		// 未使用部分を埋める
+		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
 		postInvalidate();
 		if (mEventListener != null) {
 			mEventListener.onCleared(this);
@@ -439,9 +438,7 @@ public class RPGMessageView extends View {
 		mNextMessageIx = 0;
 		mActionOnMessageEnd = Integer.MAX_VALUE;
 		// 未使用部分はスペースで埋める
-		for (int i = 0; i < len; i++) {
-			mMessage[i] = ' ';
-		}
+		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
 		postInvalidate();
 	}
 
@@ -476,7 +473,7 @@ public class RPGMessageView extends View {
 			// 次の描画要求が必要かどうか
 			boolean hasNextMessage = true;
 			// 次に表示する文字
-			char ch = (mNextAppendIx < mText.length()) ? mText.charAt(mNextAppendIx) : ' ';
+			char ch = (mNextAppendIx < mText.length()) ? mText.charAt(mNextAppendIx) : EMPTY_CHAR;
 			if (mNextMessageIx == mCols - 1) {
 				lineEnd = true;
 			}
@@ -534,8 +531,6 @@ public class RPGMessageView extends View {
 		mNextMessageIx = 0;
 		final int len = mCols * mRows;
 		System.arraycopy(mMessage, 0, mMessage, mCols, (len - mCols));
-		for (int i = 0; i < mCols; i++) {
-			mMessage[i] = ' ';
-		}
+		Arrays.fill(mMessage, 0, mCols, EMPTY_CHAR);
 	}
 }
