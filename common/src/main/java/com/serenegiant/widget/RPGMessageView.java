@@ -272,11 +272,13 @@ public class RPGMessageView extends View {
 			final int top = getPaddingTop();
 			mMessagePaint.getTextBounds("W", 0, 1, mTextBound);
 			final int boundHeight = mTextBound.height();
-			for (int ix = 0; ix < mCols; ix++) {
-				final float x = ix * mColWidth + left;
-				for (int iy = 0; iy < mRows; iy++) {
-					final int pos = iy * mCols + ix;
-					final float y = (mRows - iy) * mRoeHeight + top;
+			for (int iy = 0; iy < mRows; iy++) {
+				final float y = (mRows - iy) * mRoeHeight + top;
+				final int px = iy * mCols;
+				for (int ix = 0; ix < mCols; ix++) {
+					final int pos = px + ix;
+					if (mMessage[pos] == EMPTY_CHAR) break;
+					final float x = ix * mColWidth + left;
 					mMessagePaint.getTextWidths(mMessage, pos, 1, textWidth);
 					// 上下左右中央に表示
 					final float xx = x + (mColWidth - textWidth[0]) / 2.0f;
