@@ -151,7 +151,7 @@ public class RPGMessageView extends View {
 	/**
 	 * 1文字の描画領域の高さ
 	 */
-	private float mRoeHeight = 0.0f;
+	private float mRowHeight = 0.0f;
 	/**
 	 * onDrawで描画するときの文字配列
 	 * mCols x mRows
@@ -275,7 +275,7 @@ public class RPGMessageView extends View {
 					final float x = ix * mColWidth;
 					canvas.drawLine(x, 0.0f, x, height, mGridPaint);
 					for (int iy = 0; iy <= mRows; iy++) {
-						final float y = iy * mRoeHeight;
+						final float y = iy * mRowHeight;
 						canvas.drawLine(0.0f, y, width, y, mGridPaint);
 					}
 				}
@@ -289,7 +289,7 @@ public class RPGMessageView extends View {
 			mTextPaint.getTextBounds("W", 0, 1, mTextBound);
 			final int boundHeight = mTextBound.height();
 			for (int iy = 0; iy < mRows; iy++) {
-				final float y = (mRows - iy) * mRoeHeight + top;
+				final float y = (mRows - iy) * mRowHeight + top;
 				final int px = iy * mCols;
 				for (int ix = 0; ix < mCols; ix++) {
 					final int pos = px + ix;
@@ -298,7 +298,7 @@ public class RPGMessageView extends View {
 					mTextPaint.getTextWidths(mMessage, pos, 1, textWidth);
 					// 上下左右中央に表示
 					final float xx = x + (mColWidth - textWidth[0]) / 2.0f;
-					final float yy = y - (mRoeHeight - boundHeight/*mTextBound.height()*/) / 2.0f;
+					final float yy = y - (mRowHeight - boundHeight/*mTextBound.height()*/) / 2.0f;
 					if (mHasTextStroke) {
 						canvas.drawText(mMessage, pos, 1, xx, yy, mTextStrokePaint);
 					}
@@ -475,9 +475,9 @@ public class RPGMessageView extends View {
 		final float clientHeight = height - getPaddingTop() - getPaddingBottom();
 		// 1文字あたりの描画領域のサイズを計算
 		mColWidth = clientWidth / mCols;
-		mRoeHeight = clientHeight / mRows;
+		mRowHeight = clientHeight / mRows;
 		// テキストサイズを計算
-		final float sz = Math.min(mColWidth, mRoeHeight) * 0.95f;
+		final float sz = Math.min(mColWidth, mRowHeight) * 0.95f;
 		mTextPaint.setTextSize(sz);
 		mTextPaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
 		mTextStrokePaint.setTextSize(sz);
