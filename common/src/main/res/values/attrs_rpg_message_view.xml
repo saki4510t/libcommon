@@ -7,6 +7,10 @@
 		<attr name="rows" format="integer" default="2" />
 		<!-- 表示する文字の色 -->
 		<attr name="android:textColor" format="color" />
+		<!-- 表示する文字のストローク色 -->
+		<attr name="textStrokeColor" format="color" default="0" />
+		<!-- 表示する文字のストローク幅 -->
+		<attr name="textStrokeWidth" format="dimension" default="0" />
 		<!-- メッセージを表示する際の文字と文字の遅延時間[ミリ秒], 0なら最短, 負ならView側のデフォルト値 -->
 		<attr name="durationPerChar" format="integer" default="-1" />
 		<!-- メッセージを表示する際に改行/行送りしたときの遅延時間[ミリ秒], 0なら最短, 負ならView側のデフォルト値 -->

@@ -113,7 +113,11 @@ public class RPGMessageView extends View {
 	/**
 	 * 文字を描画するときに使うPaintインスタンス
 	 */
-	private final Paint mMessagePaint = new Paint();
+	private final Paint mTextPaint = new Paint();
+	/**
+	 * 文字の輪郭を描画する時に使うPaintインスタンス
+	 */
+	private final Paint mTextStrokePaint = new Paint();
 	/**
 	 * 文字を描画する際の文字領域取得用
 	 */
@@ -178,7 +182,10 @@ public class RPGMessageView extends View {
 	 * 0: スペースと同じ(ただしmTextの範囲外)
 	 */
 	private char mPrevChar = 0;
-
+	/**
+	 * 文字に輪郭線を付加して表示するかどうか
+	 */
+	private boolean mHasTextStroke = false;
 //--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
@@ -212,7 +219,16 @@ public class RPGMessageView extends View {
 			mCols = a.getInteger(R.styleable.RPGMessageView_cols, DEFAULT_COLS);
 			mRows = a.getInteger(R.styleable.RPGMessageView_rows, DEFAULT_ROWS);
 			// 文字色
-			mMessagePaint.setColor(a.getColor(R.styleable.RPGMessageView_android_textColor, mMessagePaint.getColor()));
+			mTextPaint.setColor(a.getColor(R.styleable.RPGMessageView_android_textColor, mTextPaint.getColor()));
+			final int strokeColor = a.getColor(R.styleable.RPGMessageView_textStrokeColor, mTextPaint.getColor());
+			final float strokeWidth = a.getDimension(R.styleable.RPGMessageView_textStrokeWidth, 0);
+			if (DEBUG) Log.v(TAG, String.format("stroke cl=0x%08x,w=%f", strokeColor, strokeWidth));
+			if ((strokeColor != mTextPaint.getColor()) && (strokeWidth > 0)) {
+				mHasTextStroke = true;
+				mTextStrokePaint.setStyle(Paint.Style.STROKE);
+				mTextStrokePaint.setStrokeWidth(strokeWidth);
+				mTextStrokePaint.setColor(strokeColor);
+			}
 			// 文字間の表示待機時間[ミリ秒]
 			mDrawDurationMsPerChar = a.getInteger(R.styleable.RPGMessageView_durationPerChar, DEFAULT_DURATION_MS_PER_CHAR);
 			if (mDrawDurationMsPerChar < 0) {
@@ -270,20 +286,23 @@ public class RPGMessageView extends View {
 			}
 			final int left = getPaddingLeft();
 			final int top = getPaddingTop();
-			mMessagePaint.getTextBounds("W", 0, 1, mTextBound);
+			mTextPaint.getTextBounds("W", 0, 1, mTextBound);
 			final int boundHeight = mTextBound.height();
 			for (int iy = 0; iy < mRows; iy++) {
 				final float y = (mRows - iy) * mRoeHeight + top;
 				final int px = iy * mCols;
 				for (int ix = 0; ix < mCols; ix++) {
 					final int pos = px + ix;
-					if (mMessage[pos] == EMPTY_CHAR) break;
+					if (mMessage[pos] == EMPTY_CHAR) break;	// EMPTY_CHAR以降は描画をスキップ
 					final float x = ix * mColWidth + left;
-					mMessagePaint.getTextWidths(mMessage, pos, 1, textWidth);
+					mTextPaint.getTextWidths(mMessage, pos, 1, textWidth);
 					// 上下左右中央に表示
 					final float xx = x + (mColWidth - textWidth[0]) / 2.0f;
 					final float yy = y - (mRoeHeight - boundHeight/*mTextBound.height()*/) / 2.0f;
-					canvas.drawText(mMessage, pos, 1, xx, yy, mMessagePaint);
+					if (mHasTextStroke) {
+						canvas.drawText(mMessage, pos, 1, xx, yy, mTextStrokePaint);
+					}
+					canvas.drawText(mMessage, pos, 1, xx, yy, mTextPaint);
 				}
 			}
 		} catch (Exception e) {
@@ -458,9 +477,11 @@ public class RPGMessageView extends View {
 		mColWidth = clientWidth / mCols;
 		mRoeHeight = clientHeight / mRows;
 		// テキストサイズを計算
-		final float min = Math.min(mColWidth, mRoeHeight);
-		mMessagePaint.setTextSize(min * 0.95f);
-		mMessagePaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
+		final float sz = Math.min(mColWidth, mRoeHeight) * 0.95f;
+		mTextPaint.setTextSize(sz);
+		mTextPaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
+		mTextStrokePaint.setTextSize(sz);
+		mTextStrokePaint.setTypeface(Typeface.MONOSPACE);	// 等幅フォント
 		setText(mText);
 	}
 

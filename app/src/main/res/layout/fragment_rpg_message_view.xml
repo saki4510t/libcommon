@@ -43,6 +43,9 @@
 			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:cols="30"
-			app:rows="4" />
+			app:rows="4"
+			app:textStrokeColor="@color/BLACK"
+			app:textStrokeWidth="1dp"
+		/>
 	</androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
