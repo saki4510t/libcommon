@@ -35,10 +35,10 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.CanvasUtils;
-import com.serenegiant.system.BuildCheck;
 
 import java.util.Arrays;
 
+import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -145,7 +145,7 @@ public class RPGMessageView extends View {
 	 */
 	private long mDrawDurationMsPerChar;
 	/**
-	 * 行送り後の遅延時間[ミリ秒]
+	 * 行送り後の待機時間[ミリ秒]
 	 */
 	private long mDrawDurationMsPerLine;
 	/**
@@ -410,6 +410,44 @@ public class RPGMessageView extends View {
 		updatePaints();
 	}
 
+	/**
+	 * 文字色を設定
+	 * @param color
+	 */
+	public void setTextColor(@ColorInt final int color) {
+		mTextPaint.setColor(color);
+	}
+
+	/**
+	 * 文字の輪郭線を設定
+	 * @param color 文字色と同じ場合は輪郭線を表示しない
+	 * @param width 0なら輪郭線を表示しない
+	 */
+	public void setTextStroke(@ColorInt final int color, final float width) {
+		mTextStrokePaint.setColor(color);
+		mTextStrokePaint.setStrokeWidth(width);
+		mHasTextStroke = (color != mTextPaint.getColor()) && (width > 0);
+	}
+
+	/**
+	 * 文字を描画する間隔[ミリ秒]を設定
+	 * @param durationMs
+	 */
+	public void setDurationPerChar(final long durationMs) {
+		if (durationMs >= 0) {
+			mDrawDurationMsPerChar = durationMs;
+		}
+	}
+
+	/**
+	 * 行送り後の待機時間[ミリ秒]を設定
+	 * @param durationMs
+	 */
+	public void setDurationPerLine(final long durationMs) {
+		if (durationMs >= 0) {
+			mDrawDurationMsPerLine = durationMs;
+		}
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * 文字列を追加
