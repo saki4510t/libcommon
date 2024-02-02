@@ -247,7 +247,7 @@ public class RPGMessageView extends View {
 	final float[] textWidth = new float[1];
 	@Override
 	protected void onDraw(final Canvas canvas) {
-		if (DEBUG) Log.v(TAG, "onDraw:");
+//		if (DEBUG) Log.v(TAG, "onDraw:");
 		final int saveCount = CanvasUtils.saveLayer(canvas, mViewBoundsF, mPaintCopied);
 		try {
 			super.onDraw(canvas);
@@ -468,7 +468,7 @@ public class RPGMessageView extends View {
 	 * 表示する文字を更新
 	 */
 	private void updateMessage() {
-		if (DEBUG) Log.v(TAG, String.format("updateMessage:text=%s,ix=%d", mText, mNextAppendIx));
+//		if (DEBUG) Log.v(TAG, String.format("updateMessage:text=%s,ix=%d", mText, mNextAppendIx));
 		if ((mNextAppendIx >= 0) && (!TextUtils.isEmpty(mText))) {
 			// 行末かどうか
 			boolean lineEnd = false;
@@ -517,7 +517,7 @@ public class RPGMessageView extends View {
 				}
 			}
 			if (hasNextMessage) {
-				if (DEBUG) Log.v(TAG, "updateMessage:postInvalidateDelayed");
+//				if (DEBUG) Log.v(TAG, "updateMessage:postInvalidateDelayed");
 				// 行末かどうかで次に描画するまでの時間を調整する
 				postInvalidateDelayed(
 					lineEnd ? mDrawDurationMsPerLine : mDrawDurationMsPerChar);
@@ -529,7 +529,7 @@ public class RPGMessageView extends View {
 	 * 表示用文字配列を1行分繰り上げる
 	 */
 	private void lineFeed() {
-		if (DEBUG) Log.v(TAG, "lineFeed:");
+//		if (DEBUG) Log.v(TAG, "lineFeed:");
 		mNextMessageIx = 0;
 		final int len = mCols * mRows;
 		System.arraycopy(mMessage, 0, mMessage, mCols, (len - mCols));
