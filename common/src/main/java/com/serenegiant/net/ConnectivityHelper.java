@@ -40,7 +40,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.system.BuildCheck;
