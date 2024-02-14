@@ -26,8 +26,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -98,7 +96,6 @@ public class RPGMessageView extends View {
 	private static final int DEFAULT_DURATION_MS_PER_LINE = 500;
 
 //--------------------------------------------------------------------------------
-	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	/**
 	 * Viewのサイズを示すRectFインスタンス
 	 * #saveLayer呼び出し時に使用される描画領域の最大サイズ
@@ -455,7 +452,7 @@ public class RPGMessageView extends View {
 	 */
 	public void addText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "addText:" + text);
-		mUIHandler.removeCallbacks(mClearTask);
+		removeCallbacks(mClearTask);
 		if (!TextUtils.isEmpty(text)) {
 			mText = (TextUtils.isEmpty(mText) ? "" : mText) + text;
 			if (mNextAppendIx < 0) {
@@ -472,7 +469,7 @@ public class RPGMessageView extends View {
 	 */
 	public void setText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "setText:" + text);
-		mUIHandler.removeCallbacks(mClearTask);
+		removeCallbacks(mClearTask);
 		mText = text;
 		// 次に表示用に追加するmText中の文字位置をリセット
 		mNextAppendIx = 0;
@@ -490,7 +487,7 @@ public class RPGMessageView extends View {
 	 */
 	public void clear() {
 		if (DEBUG) Log.v(TAG, "clear:");
-		mUIHandler.removeCallbacks(mClearTask);
+		removeCallbacks(mClearTask);
 		final int len = mCols * mRows;
 		mText = "";
 		// 文字の追加処理をしない
@@ -625,7 +622,7 @@ public class RPGMessageView extends View {
 					// 指定時間後にクリアする場合
 					mNextAppendIx = -1;
 					hasNextMessage = false;
-					mUIHandler.postDelayed(mClearTask, mActionOnMessageEnd);
+					postDelayed(mClearTask, mActionOnMessageEnd);
 					mActionOnMessageEnd = Integer.MAX_VALUE;
 				}
 			}
