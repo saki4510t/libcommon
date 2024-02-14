@@ -31,6 +31,7 @@ import androidx.lifecycle.lifecycleScope
 import com.serenegiant.libcommon.databinding.FragmentRpgMessageViewBinding
 import com.serenegiant.widget.RPGMessageView
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
 class RPGMessageFragment : BaseFragment() {
@@ -74,9 +75,12 @@ class RPGMessageFragment : BaseFragment() {
 			 * @param view
 			 */
 			override fun onCleared(view: RPGMessageView) {
-				lifecycleScope.launch {
-					delay(1000)
-					view.setText(MESSAGE)
+				if (DEBUG) Log.v(TAG, "onCleared:")
+				if (!APPEND_MESSAGE) {
+					lifecycleScope.launch {
+						delay(APPEND_INTERVAL_MS)
+						view.setText(MESSAGE)
+					}
 				}
 			}
 		}
@@ -92,6 +96,21 @@ class RPGMessageFragment : BaseFragment() {
 		lifecycleScope.launch {
 			delay(1000)
 			mBinding.message.setText(MESSAGE)
+			var cnt = 0
+			if (APPEND_MESSAGE) {
+				while (isActive) {
+					delay(APPEND_INTERVAL_MS)
+					mBinding.message.addLine("Message${cnt++}\n")
+					delay(1000)
+					mBinding.message.addLine("Message${cnt++}\n")
+					delay(1000)
+					mBinding.message.addLine("Message${cnt++}\n")
+					delay(1000)
+					mBinding.message.addLine("Message${cnt++}\n")
+					delay(1000)
+					mBinding.message.addLine("Message${cnt++}\n")
+				}
+			}
 		}
 	}
 
@@ -112,7 +131,9 @@ class RPGMessageFragment : BaseFragment() {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = RPGMessageFragment::class.java.simpleName
 
+		private const val APPEND_MESSAGE = true
 		private const val MESSAGE = "012345678901234567890123456789\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ\nあいうえお漢字カタカナ\n日本語を表示\nこの行を表示してから一定時間後にクリアする"
+		private const val APPEND_INTERVAL_MS = 10000L
 
 		fun newInstance() = RPGMessageFragment().apply {
 			arguments = Bundle().apply {
