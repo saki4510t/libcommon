@@ -149,11 +149,11 @@ public class RPGMessageView extends View {
 	/**
 	 * 1行あたりに表示する文字数
 	 */
-	private int mCols = 8;
+	private int mCols = DEFAULT_COLS;
 	/**
 	 * 表示する行数
 	 */
-	private int mRows = 4;
+	private int mRows = DEFAULT_ROWS;
 	/**
 	 * 1文字の描画領域の幅
 	 */
@@ -227,8 +227,8 @@ public class RPGMessageView extends View {
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
 			attrs, R.styleable.RPGMessageView, defStyleAttr, 0);
 		try {
-			mCols = a.getInteger(R.styleable.RPGMessageView_cols, DEFAULT_COLS);
-			mRows = a.getInteger(R.styleable.RPGMessageView_rows, DEFAULT_ROWS);
+			mCols = a.getInteger(R.styleable.RPGMessageView_cols, mCols);
+			mRows = a.getInteger(R.styleable.RPGMessageView_rows, mRows);
 			// 文字色
 			mTextPaint.setColor(a.getColor(R.styleable.RPGMessageView_android_textColor, mTextPaint.getColor()));
 			final int strokeColor = a.getColor(R.styleable.RPGMessageView_textStrokeColor, mTextPaint.getColor());
