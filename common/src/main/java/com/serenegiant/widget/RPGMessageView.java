@@ -70,6 +70,7 @@ public class RPGMessageView extends View {
 	}
 
 	private static final char EMPTY_CHAR = '\0';
+	private static final char CR_CHAR = '\n';
 	/**
 	 * 1行あたりの文字数の最大値
 	 */
