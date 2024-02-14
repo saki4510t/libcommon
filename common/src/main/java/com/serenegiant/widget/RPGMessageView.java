@@ -447,6 +447,21 @@ public class RPGMessageView extends View {
 	}
 //--------------------------------------------------------------------------------
 	/**
+	 * 1行追加する
+	 * @param text
+	 */
+	public void addLine(@Nullable final String text) {
+		if (DEBUG) Log.v(TAG, "addText:" + text);
+		if (!TextUtils.isEmpty(text)) {
+			if ((mText.length() > 0) && (mText.charAt(mText.length()-1) != CR_CHAR)) {
+				// 空文字列でなくて末尾がCRでないときはCR付きで追加
+				addText(CR_CHAR + text);
+			} else {
+				addText(text);
+			}
+		}
+	}
+	/**
 	 * 文字列を追加
 	 * @param text
 	 */
