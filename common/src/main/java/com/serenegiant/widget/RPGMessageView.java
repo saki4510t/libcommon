@@ -175,7 +175,8 @@ public class RPGMessageView extends View {
 	/**
 	 * 表示待ちの文字列
 	 */
-	private String mText;
+	@NonNull
+	private String mText = "";
 	/**
 	 * 次に表示用に追加するmText中の文字の位置[-1, mText.length)
 	 */
@@ -486,7 +487,7 @@ public class RPGMessageView extends View {
 	public void setText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "setText:" + text);
 		removeCallbacks(mClearTask);
-		mText = text;
+		mText = TextUtils.isEmpty(text) ? "" : text;
 		// 次に表示用に追加するmText中の文字位置をリセット
 		mNextAppendIx = 0;
 		// 表示するmMessage文字配列の追加位置をリセット
