@@ -204,9 +204,9 @@ public class RPGMessageView extends View {
 	 */
 	private long mNextInvalidateMs = 0L;
 	/**
-	 * メッセージ配列に何か文字がセットされているかどうか
+	 * 文字がセットされている行数
 	 */
-	private boolean mMessageVisible = false;
+	private int mVisibleRows = 0;
 //--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
@@ -467,7 +467,7 @@ public class RPGMessageView extends View {
 		if (DEBUG) Log.v(TAG, "addLine:" + text);
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
-		if (mFirstLine.isEmpty() && mLines.isEmpty() && mMessageVisible) {
+		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
 			// 既に表示するメッセージが無いとき
 			// ...ただしクリア待ちで前回のメッセージが表示されているかもしれないのでリセットする
 			if (durationMs > 0) {
@@ -497,7 +497,7 @@ public class RPGMessageView extends View {
 		if (DEBUG) Log.v(TAG, "addText:" + text);
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
-		if (mFirstLine.isEmpty() && mLines.isEmpty() && mMessageVisible) {
+		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
 			// 既に表示するメッセージが無いとき
 			// ...ただしクリア待ちで前回のメッセージが表示されているかもしれないのでリセットする
 			if (durationMs > 0) {
@@ -573,7 +573,7 @@ public class RPGMessageView extends View {
 		if (DEBUG) Log.v(TAG, "reset:");
 		removeCallbacks(mClearTask);
 		mLines.clear();
-		mMessageVisible = false;
+		mVisibleRows = 0;
 		// 文字の追加処理をしない
 		mNextAppendIx = -1;
 		mNextInvalidateMs = -1L;
@@ -599,6 +599,7 @@ public class RPGMessageView extends View {
 			// 次に表示用に追加するmText中の文字位置をリセット
 			mNextAppendIx = 0;
 			mNextMessageColIx = 0;
+			mVisibleRows = (mVisibleRows + 1) % mRows;
 			result = true;
 		}
 
@@ -686,7 +687,6 @@ public class RPGMessageView extends View {
 				}
 			}
 			if (ch != EMPTY_CHAR) {
-				mMessageVisible = true;
 				mMessage[mNextMessageColIx] = ch;
 				mNextMessageColIx++;
 			}
@@ -705,9 +705,8 @@ public class RPGMessageView extends View {
 					postDelayed(mClearTask, mActionOnMessageEnd);
 					mActionOnMessageEnd = Integer.MAX_VALUE;
 				} else {
-					// メッセージ無くなるまで行送りのためにスペースを追加するとき
-					// FIXME 未実装 とりあえずなにもしない
-					mActionOnMessageEnd = Integer.MAX_VALUE;
+					// すべての表示が無くなるまで行送りする場合
+					mVisibleRows = mRows - 1;
 				}
 			}
 			if (hasNextMessage) {
@@ -719,11 +718,16 @@ public class RPGMessageView extends View {
 			}
 		} else if (mActionOnMessageEnd < 0) {
 			// メッセージ無くなるまで行送りのためにスペースを追加するとき
-			// FIXME 未実装 とりあえず1回だけ行送りする
-			lineFeed();
-			mNextAppendIx = -1;
-			mNextMessageColIx = -1;
-			mActionOnMessageEnd = Integer.MAX_VALUE;
+			if (DEBUG) Log.v(TAG, "updateMessage:空行送り," + mVisibleRows);
+			final long durationMs = mDrawDurationMsPerLine;
+			mNextInvalidateMs = System.currentTimeMillis() + durationMs;
+			if (mVisibleRows > 0) {
+				lineFeed();
+				mVisibleRows--;
+				postInvalidateDelayed(durationMs);
+			} else {
+				postDelayed(mClearTask, durationMs);
+			}
 		}
 	}
 
