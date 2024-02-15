@@ -3,8 +3,8 @@
   <groupId>com.serenegiant</groupId>
   <artifactId>common-media</artifactId>
   <versioning>
-    <latest>8.18.1</latest>
-    <release>8.18.1</release>
+    <latest>8.18.2</latest>
+    <release>8.18.2</release>
     <versions>
       <version>8.9.0</version>
       <version>8.9.1</version>
@@ -36,7 +36,8 @@
       <version>8.17.0</version>
       <version>8.18.0</version>
       <version>8.18.1</version>
+      <version>8.18.2</version>
     </versions>
-    <lastUpdated>20240215011116</lastUpdated>
+    <lastUpdated>20240215014704</lastUpdated>
   </versioning>
 </metadata>
