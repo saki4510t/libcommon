@@ -465,6 +465,7 @@ public class RPGMessageView extends View {
 	 */
 	public void addLine(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "addLine:" + text);
+		if (TextUtils.isEmpty(text)) return;
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
 		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
@@ -495,6 +496,7 @@ public class RPGMessageView extends View {
 	 */
 	public void addText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "addText:" + text);
+		if (TextUtils.isEmpty(text)) return;
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
 		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
