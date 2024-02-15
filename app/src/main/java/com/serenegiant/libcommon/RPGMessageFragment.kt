@@ -132,7 +132,7 @@ class RPGMessageFragment : BaseFragment() {
 		private val TAG = RPGMessageFragment::class.java.simpleName
 
 		private const val APPEND_MESSAGE = true
-		private const val MESSAGE = "012345678901234567890123456789\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ\nあいうえお漢字カタカナ\n日本語を表示\nこの行を表示してから一定時間後にクリアする"
+		private const val MESSAGE = "012345678901234567890123456789\n012345678901234567890123456789abcd\nABCDEFGHIJKLMNOPQRSTUVWXYZ\nＡＢＣＤＥＦＧＨＩＪＫＬＭＮＯＰＱＲＳＴＵＶＷＸＹＺ\nあいうえお漢字カタカナ\n日本語を表示\nこの行を表示してから一定時間後にクリアする"
 		private const val APPEND_INTERVAL_MS = 10000L
 
 		fun newInstance() = RPGMessageFragment().apply {

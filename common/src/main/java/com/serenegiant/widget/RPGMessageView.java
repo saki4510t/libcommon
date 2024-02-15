@@ -759,15 +759,16 @@ public class RPGMessageView extends View {
 			final String[] splits = text.split(CR_STR);
 			for (int i = 0; i < splits.length; i++) {
 				String s = splits[i];
-				if (s.isEmpty()) continue;	// 空白行はスキップする
-				if (s.length() < mCols) {
-					// 横幅より短ければそのまま追加
-					result.add(s);
-				} else {
-					// 横幅より長いときは横幅毎に追加
-					while (s.length() > 0) {
-						result.add(s.substring(0, mCols));
-						s = s.substring(mCols);
+				while (!s.isEmpty()) {
+					if (s.length() <= mCols) {
+						// 横幅より短ければそのまま追加
+						result.add(s);
+						break;
+					} else {
+						// 横幅より長いときは横幅毎に追加
+						final int ix = Math.min(s.length(), mCols);
+						result.add(s.substring(0, ix));
+						s = s.substring(ix);
 					}
 				}
 			}
