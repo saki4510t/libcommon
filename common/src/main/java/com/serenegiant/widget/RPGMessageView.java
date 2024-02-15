@@ -34,7 +34,10 @@ import android.view.View;
 import com.serenegiant.common.R;
 import com.serenegiant.graphics.CanvasUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
@@ -70,7 +73,7 @@ public class RPGMessageView extends View {
 	}
 
 	private static final char EMPTY_CHAR = '\0';
-	private static final char CR_CHAR = '\n';
+	private static final String CR_STR = "\n";
 	/**
 	 * 1行あたりの文字数の最大値
 	 */
@@ -88,7 +91,7 @@ public class RPGMessageView extends View {
 	 */
 	private static final int DEFAULT_ROWS = 4;
 	/**
-	 * 1文字表示するのに費やす時間のデフォルト値(250ms)
+	 * 1文字表示するのに費やす時間のデフォルト値(50ms)
 	 */
 	private static final int DEFAULT_DURATION_MS_PER_CHAR = 50;
 	/**
@@ -171,12 +174,16 @@ public class RPGMessageView extends View {
 	/**
 	 * 次に表示する文字配列の位置[0, mCols)
 	 */
-	private int mNextMessageIx = 0;
+	private int mNextMessageColIx = 0;
 	/**
 	 * 表示待ちの文字列
 	 */
+	private final LinkedList<String> mLines = new LinkedList<>();
+	/**
+	 * 次に追加する行文字列
+	 */
 	@NonNull
-	private String mText = "";
+	private String mFirstLine = "";
 	/**
 	 * 次に表示用に追加するmText中の文字の位置[-1, mText.length)
 	 */
@@ -189,14 +196,17 @@ public class RPGMessageView extends View {
 	 */
 	private int mActionOnMessageEnd = Integer.MAX_VALUE;
 	/**
-	 * 最後に表示した文字
-	 * 0: スペースと同じ(ただしmTextの範囲外)
-	 */
-	private char mPrevChar = 0;
-	/**
 	 * 文字に輪郭線を付加して表示するかどうか
 	 */
 	private boolean mHasTextStroke = false;
+	/**
+	 * 次にinvalidate予定の時刻
+	 */
+	private long mNextInvalidateMs = 0L;
+	/**
+	 * メッセージ配列に何か文字がセットされているかどうか
+	 */
+	private boolean mMessageVisible = false;
 //--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
@@ -298,7 +308,7 @@ public class RPGMessageView extends View {
 					}
 				}
 			}
-			if (mNextMessageIx >= 0) {
+			if (mNextMessageColIx >= 0) {
 				// 表示する文字を更新
 				updateMessage();
 			}
@@ -328,7 +338,7 @@ public class RPGMessageView extends View {
 				}
 			}
 		} catch (Exception e) {
-			Log.w(TAG, e);
+			if (DEBUG) Log.w(TAG, e);
 		} finally {
 			canvas.restoreToCount(saveCount);
 		}
@@ -449,54 +459,88 @@ public class RPGMessageView extends View {
 	}
 //--------------------------------------------------------------------------------
 	/**
-	 * 1行追加する
+	 * 行追加する
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
 	 * @param text
 	 */
 	public void addLine(@Nullable final String text) {
-		if (DEBUG) Log.v(TAG, "addText:" + text);
-		if (!TextUtils.isEmpty(text)) {
-			if ((mText.length() > 0) && (mText.charAt(mText.length()-1) != CR_CHAR)) {
-				// 空文字列でなくて末尾がCRでないときはCR付きで追加
-				addText(CR_CHAR + text);
+		if (DEBUG) Log.v(TAG, "addLine:" + text);
+		removeCallbacks(mClearTask);
+		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
+		if (mFirstLine.isEmpty() && mLines.isEmpty() && mMessageVisible) {
+			// 既に表示するメッセージが無いとき
+			// ...ただしクリア待ちで前回のメッセージが表示されているかもしれないのでリセットする
+			if (durationMs > 0) {
+				lineFeed();
 			} else {
-				addText(text);
+				reset();
+			}
+		}
+		mLines.addAll(splitLines(text));
+		if (popFirstIfNeed()) {
+			// 新たに1行目をとりだしたときだけ再描画要求する
+			if (durationMs <= 0) {
+				postInvalidate();
+			} else {
+				postInvalidateDelayed(durationMs);
 			}
 		}
 	}
+
 	/**
 	 * 文字列を追加
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
+	 * 追加する先頭行を既存の最後の行に連結する
 	 * @param text
 	 */
 	public void addText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "addText:" + text);
 		removeCallbacks(mClearTask);
-		if (!TextUtils.isEmpty(text)) {
-			mText = (TextUtils.isEmpty(mText) ? "" : mText) + text;
-			if (mNextAppendIx < 0) {
-				mNextAppendIx = 0;
-				mNextMessageIx = 0;
+		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
+		if (mFirstLine.isEmpty() && mLines.isEmpty() && mMessageVisible) {
+			// 既に表示するメッセージが無いとき
+			// ...ただしクリア待ちで前回のメッセージが表示されているかもしれないのでリセットする
+			if (durationMs > 0) {
+				lineFeed();
+			} else {
+				reset();
 			}
 		}
-		postInvalidate();
+		final List<String> lines = splitLines(text);
+		if (mLines.isEmpty()) {
+			// 描画するメッセージが無いときはそのまま追加
+			mLines.addAll(lines);
+		} else if (!lines.isEmpty()) {
+			// 先頭行はmTextの最後の文字列に連結する
+			final String last = mLines.removeLast();
+			mLines.add(last + lines.get(0));
+			lines.remove(0);
+			// それ以外は行として追加する
+			mLines.addAll(lines);
+		}
+		if (popFirstIfNeed()) {
+			// 新たに1行目をとりだしたときだけ再描画要求する
+			if (durationMs <= 0) {
+				postInvalidate();
+			} else {
+				postInvalidateDelayed(durationMs);
+			}
+		}
 	}
 
 	/**
 	 * 文字列を置き換え
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
 	 * @param text
 	 */
 	public void setText(@Nullable final String text) {
 		if (DEBUG) Log.v(TAG, "setText:" + text);
-		removeCallbacks(mClearTask);
-		mText = TextUtils.isEmpty(text) ? "" : text;
-		// 次に表示用に追加するmText中の文字位置をリセット
-		mNextAppendIx = 0;
-		// 表示するmMessage文字配列の追加位置をリセット
-		mNextMessageIx = 0;
-		mActionOnMessageEnd = Integer.MAX_VALUE;
-		// 未使用部分を埋める
-		final int len = mCols * mRows;
-		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
-		postInvalidate();
+		reset();
+		mLines.addAll(splitLines(text));
+		if (popFirstIfNeed()) {
+			// 新たに1行目をとりだしたときだけ再描画要求する
+			postInvalidate();
+		}
 	}
 
 	/**
@@ -504,22 +548,14 @@ public class RPGMessageView extends View {
 	 */
 	public void clear() {
 		if (DEBUG) Log.v(TAG, "clear:");
-		removeCallbacks(mClearTask);
-		final int len = mCols * mRows;
-		mText = "";
-		// 文字の追加処理をしない
-		mNextAppendIx = -1;
-		// 表示するmMessage文字配列の追加位置をリセット
-		mNextMessageIx = 0;
-		mActionOnMessageEnd = Integer.MAX_VALUE;
-		// 未使用部分を埋める
-		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
+		reset();
 		postInvalidate();
 		if (mEventListener != null) {
 			mEventListener.onCleared(this);
 		}
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * clearを遅延呼び出しするためのRunnable
 	 */
@@ -529,7 +565,46 @@ public class RPGMessageView extends View {
 			clear();
 		}
 	};
-//--------------------------------------------------------------------------------
+
+	/**
+	 * 表示関係の変数をリセットする
+	 */
+	private void reset() {
+		if (DEBUG) Log.v(TAG, "reset:");
+		removeCallbacks(mClearTask);
+		mLines.clear();
+		mMessageVisible = false;
+		// 文字の追加処理をしない
+		mNextAppendIx = -1;
+		mNextInvalidateMs = -1L;
+		// 表示するmMessage文字配列の追加位置をリセット
+		mNextMessageColIx = 0;
+		mActionOnMessageEnd = Integer.MAX_VALUE;
+		// 未使用部分を埋める
+		final int len = mCols * mRows;
+		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
+	}
+
+	/**
+	 * 必要であれば＆可能であれば先頭行を取り出す
+	 * @return 先頭行を取り出したときはtrue
+	 */
+	private boolean popFirstIfNeed() {
+		boolean result = false;
+
+		if (((mNextAppendIx < 0) || mFirstLine.isEmpty()) && !mLines.isEmpty()) {
+			if (DEBUG) Log.v(TAG, "popFirstIfNeed:pop first line");
+			// 先頭行はmTextへ取り出しておく
+			mFirstLine = mLines.removeFirst();
+			// 次に表示用に追加するmText中の文字位置をリセット
+			mNextAppendIx = 0;
+			mNextMessageColIx = 0;
+			result = true;
+		}
+
+		return result;
+	}
+
 	/**
 	 * 描画グリッドをリセット
 	 */
@@ -546,13 +621,8 @@ public class RPGMessageView extends View {
 		}
 		if (DEBUG) Log.v(TAG, String.format("resetGrid:(%dx%d)", mCols, mRows));
 		final int len = mCols * mRows;
-		mText = "";
 		mMessage = new char[len];
-		mNextAppendIx = -1;
-		mNextMessageIx = 0;
-		mActionOnMessageEnd = Integer.MAX_VALUE;
-		// 未使用部分はスペースで埋める
-		Arrays.fill(mMessage, 0, len, EMPTY_CHAR);
+		reset();
 		postInvalidate();
 	}
 
@@ -570,7 +640,9 @@ public class RPGMessageView extends View {
 		mColWidth = clientWidth / mCols;
 		mRowHeight = clientHeight / mRows;
 		updatePaints();
-		setText(mText);
+		final List<String> copy = new ArrayList<>(mLines);
+		reset();
+		mLines.addAll(copy);
 	}
 
 	/**
@@ -595,60 +667,63 @@ public class RPGMessageView extends View {
 	 * 表示する文字を更新
 	 */
 	private void updateMessage() {
-//		if (DEBUG) Log.v(TAG, String.format("updateMessage:text=%s,ix=%d", mText, mNextAppendIx));
-		if ((mNextAppendIx >= 0) && (!TextUtils.isEmpty(mText))) {
-			// 行末かどうか
-			boolean lineEnd = false;
+		if (DEBUG) Log.v(TAG, String.format("updateMessage:text=%s,ix=%d", mFirstLine, mNextAppendIx));
+		if ((mNextAppendIx >= 0) && !mFirstLine.isEmpty()) {
 			// 次の描画要求が必要かどうか
 			boolean hasNextMessage = true;
 			// 次に表示する文字
-			char ch = (mNextAppendIx < mText.length()) ? mText.charAt(mNextAppendIx) : EMPTY_CHAR;
-			if (mNextMessageIx == mCols - 1) {
-				lineEnd = true;
+			char ch = (mNextAppendIx < mFirstLine.length()) ? mFirstLine.charAt(mNextAppendIx) : EMPTY_CHAR;
+			mNextAppendIx++;
+			// 行末かどうか
+			final boolean lineEnd = mNextAppendIx == mFirstLine.length();
+			if ((ch == EMPTY_CHAR) && (mNextAppendIx == mFirstLine.length() + 1)) {
+				// 行末+1文字目で行送りする
+				mFirstLine = "";
+				mNextAppendIx = -1;
+				if (!mLines.isEmpty()) {
+					lineFeed();
+					popFirstIfNeed();
+				}
 			}
-			if ((mNextMessageIx == mCols)
-				|| ((mPrevChar == '\n') && (mNextMessageIx > 0))) {
-				// 右側へはみ出しす時または前回の文字が改行コードの時は行送りをする
-				// ただし行頭に改行コードが来たときは行送りしない
-				lineFeed();
+			if (ch != EMPTY_CHAR) {
+				mMessageVisible = true;
+				mMessage[mNextMessageColIx] = ch;
+				mNextMessageColIx++;
 			}
-			mPrevChar = ch;
-			if (ch != '\n') {
-				mMessage[mNextMessageIx] = ch;
-				mNextAppendIx++;
-				mNextMessageIx++;
-			} else {
-				// 改行コードが来たときは1文字進めるだけ
-				mNextAppendIx++;
-				lineEnd = true;
-			}
-			if (mNextAppendIx >= mText.length()) {
+			if (mFirstLine.isEmpty() && mLines.isEmpty()) {
+				if (DEBUG) Log.v(TAG, "updateMessage:end of message");
 				// 最後までメッセージが表示されたとき
 				if (mActionOnMessageEnd == Integer.MAX_VALUE) {
 					// メッセー表示完了時のアクションが不明ならイベントリスナーからの取得を試みる
 					mActionOnMessageEnd = mEventListener != null ? mEventListener.onMessageEnd(this) : 2000;
 				}
-				if (mActionOnMessageEnd < 0) {
-					// メッセージ無くなるまで行送りのためにスペースを追加するとき
-					if (mNextAppendIx >= mText.length() + mMessage.length) {
-						mNextAppendIx = -1;
-						hasNextMessage = false;
-						mActionOnMessageEnd = Integer.MAX_VALUE;
-					}
-				} else {
+				if (mActionOnMessageEnd >= 0) {
 					// 指定時間後にクリアする場合
 					mNextAppendIx = -1;
 					hasNextMessage = false;
+					mNextInvalidateMs = System.currentTimeMillis() + mActionOnMessageEnd;
 					postDelayed(mClearTask, mActionOnMessageEnd);
+					mActionOnMessageEnd = Integer.MAX_VALUE;
+				} else {
+					// メッセージ無くなるまで行送りのためにスペースを追加するとき
+					// FIXME 未実装 とりあえずなにもしない
 					mActionOnMessageEnd = Integer.MAX_VALUE;
 				}
 			}
 			if (hasNextMessage) {
 //				if (DEBUG) Log.v(TAG, "updateMessage:postInvalidateDelayed");
 				// 行末かどうかで次に描画するまでの時間を調整する
-				postInvalidateDelayed(
-					lineEnd ? mDrawDurationMsPerLine : mDrawDurationMsPerChar);
+				final long durationMs = lineEnd ? mDrawDurationMsPerLine : mDrawDurationMsPerChar;
+				mNextInvalidateMs = System.currentTimeMillis() + durationMs;
+				postInvalidateDelayed(durationMs);
 			}
+		} else if (mActionOnMessageEnd < 0) {
+			// メッセージ無くなるまで行送りのためにスペースを追加するとき
+			// FIXME 未実装 とりあえず1回だけ行送りする
+			lineFeed();
+			mNextAppendIx = -1;
+			mNextMessageColIx = -1;
+			mActionOnMessageEnd = Integer.MAX_VALUE;
 		}
 	}
 
@@ -656,10 +731,43 @@ public class RPGMessageView extends View {
 	 * 表示用文字配列を1行分繰り上げる
 	 */
 	private void lineFeed() {
-//		if (DEBUG) Log.v(TAG, "lineFeed:");
-		mNextMessageIx = 0;
+		if (DEBUG) Log.v(TAG, "lineFeed:");
 		final int len = mCols * mRows;
+		// 1行分前にずらす
 		System.arraycopy(mMessage, 0, mMessage, mCols, (len - mCols));
 		Arrays.fill(mMessage, 0, mCols, EMPTY_CHAR);
+	}
+
+	/**
+	 * 文字列を行に分割する
+	 * ・改行があれば分割
+	 * ・mColsより長い文字列も分割
+	 * @param text
+	 * @return
+	 */
+	@NonNull
+	private List<String> splitLines(@Nullable final String text) {
+		final List<String> result = new ArrayList<>();
+
+		if (!TextUtils.isEmpty(text)) {
+			final String[] splits = text.split(CR_STR);
+			for (int i = 0; i < splits.length; i++) {
+				String s = splits[i];
+				if (s.isEmpty()) continue;	// 空白行はスキップする
+				if (s.length() < mCols) {
+					// 横幅より短ければそのまま追加
+					result.add(s);
+				} else {
+					// 横幅より長いときは横幅毎に追加
+					while (s.length() > 0) {
+						result.add(s.substring(0, mCols));
+						s = s.substring(mCols);
+					}
+				}
+			}
+		}
+		if (DEBUG) Log.v(TAG, "splitLines:" + result);
+
+		return result;
 	}
 }
