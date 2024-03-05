@@ -894,20 +894,32 @@ public final class BitmapHelper {
 
 //--------------------------------------------------------------------------------
 	/**
-	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのビットマップを生成
+	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのRGB565のビットマップを生成する
+	 * 全体が40x40で20x20の四角を白とグレーで塗りつぶす
 	 * @return
 	 */
 	@NonNull
 	public static Bitmap makeCheckBitmap() {
-        final Bitmap bm = Bitmap.createBitmap(40, 40, Bitmap.Config.RGB_565);
-        final Canvas c = new Canvas(bm);
-        c.drawColor(Color.WHITE);
-        final Paint p = new Paint();
-        p.setColor(Color.LTGRAY);
-        c.drawRect(0, 0, 20, 20, p);
-        c.drawRect(20, 20, 40, 40, p);
-        return bm;
+		return makeCheckBitmap(Bitmap.Config.RGB_565);
     }
+
+	/**
+	 * 透過部分の背景用に白とグレーの市松模様の単位パターンの指定したBitmap.configのビットマップを生成する
+	 * 全体が40x40で20x20の四角を白とグレーで塗りつぶす
+	 * @param config
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap makeCheckBitmap(@NonNull final Bitmap.Config config) {
+		final Bitmap bm = Bitmap.createBitmap(40, 40, config);
+		final Canvas c = new Canvas(bm);
+		c.drawColor(Color.WHITE);
+		final Paint p = new Paint();
+		p.setColor(Color.LTGRAY);
+		c.drawRect(0, 0, 20, 20, p);
+		c.drawRect(20, 20, 40, 40, p);
+		return bm;
+	}
 
 	/**
 	 * 透過部分の背景用に白とグレーの市松模様の単位パターンのビットマップを生成
