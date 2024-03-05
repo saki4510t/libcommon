@@ -253,7 +253,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -303,7 +303,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem1 = new Semaphore(0);
 		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline1 = new ProxyPipeline() {
+		final ProxyPipeline pipeline1 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -326,7 +326,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem2 = new Semaphore(0);
 		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline2 = new ProxyPipeline() {
+		final ProxyPipeline pipeline2 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -403,7 +403,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -464,7 +464,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -523,7 +523,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -584,7 +584,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -643,7 +643,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
