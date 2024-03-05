@@ -21,6 +21,7 @@ package com.serenegiant.common;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
@@ -28,6 +29,7 @@ import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class TestUtils {
 	private static final String TAG = BitmapHelperTest.class.getSimpleName();
@@ -43,6 +45,17 @@ public class TestUtils {
 	 * @return
 	 */
 	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b) {
+		return bitmapEquals(a, b, false);
+	}
+
+	/**
+	 * 指定したビットマップがピクセル単位で一致するかどうかを確認
+	 * @param a
+	 * @param b
+	 * @param dumpOnError
+	 * @return
+	 */
+	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b, final boolean dumpOnError) {
 		boolean result = false;
 		if ((a.getWidth() == b.getWidth())
 			&& (a.getHeight() == b.getHeight()
@@ -53,12 +66,18 @@ public class TestUtils {
 LOOP:		for (int y = 0; y < h; y++) {
 				for (int x = 0; x < w; x++) {
 					if (!a.getColor(x, y).equals(b.getColor(x, y))) {
-						Log.w(TAG, String.format("ピクセルが違う@(%dx%d),a=0x%08x,b=0x%08x",
-							x, y, a.getColor(x, y).toArgb(), b.getColor(x, y).toArgb()));
+						Log.w(TAG, String.format("ピクセルが違う@(%d,%d)sz(%dx%d),a=0x%08x,b=0x%08x",
+							x, y, w, h,
+							a.getColor(x, y).toArgb(),
+							b.getColor(x, y).toArgb()));
 						result = false;
 						break LOOP;
 					}
 				}
+			}
+			if (!result && dumpOnError) {
+				dump(TAG, "a=", a);
+				dump(TAG, "b=", b);
 			}
 		} else {
 			Log.w(TAG, String.format("ピクセルが違うa(%dx%d),b=(%dx%d))",
@@ -72,10 +91,21 @@ LOOP:		for (int y = 0; y < h; y++) {
 	 * @param bitmap
 	 */
 	public static void dump(@NonNull final Bitmap bitmap) {
+		dump(TAG, null, bitmap);
+	}
+
+	/**
+	 * 指定したビットマップのピクセルのうち0以外を16進文字列としてlogCatへ出力する
+	 * @param tag
+	 * @param bitmap
+	 */
+	public static void dump(@Nullable final String tag, @Nullable final String prefix, @NonNull final Bitmap bitmap) {
 		final StringBuilder sb = new StringBuilder();
 		final int w = bitmap.getWidth();
 		final int h = bitmap.getHeight();
-		Log.i(TAG, String.format("dump:(%dx%d)", w, h));
+		final String t = (TextUtils.isEmpty(tag) ? TAG : tag);
+		final String header = (TextUtils.isEmpty(prefix) ? "dump:" : prefix);
+		Log.i(t, String.format("%s(%dx%d)", header, w, h));
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				final int cl = bitmap.getColor(x, y).toArgb();
@@ -84,7 +114,7 @@ LOOP:		for (int y = 0; y < h; y++) {
 				}
 			}
 		}
-		Log.i(TAG, "dump:" + sb);
+		Log.i(t, header + sb);
 	}
 
 	/**

@@ -285,7 +285,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(b);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -365,14 +365,14 @@ public class GLPipelineTest {
 			result1.copyPixelsFromBuffer(buffer1);
 //			dump(result1);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result1));
+			assertTrue(bitmapEquals(original, result1, true));
 
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result2 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result2.copyPixelsFromBuffer(buffer2);
 //			dump(result2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result2));
+			assertTrue(bitmapEquals(original, result2, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -450,7 +450,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
-			assertTrue(bitmapEquals(original, flipVertical(result)));
+			assertTrue(bitmapEquals(original, flipVertical(result), true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -467,7 +467,7 @@ public class GLPipelineTest {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-		dump(original);
+//		dump(original);
 
 		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
@@ -513,8 +513,7 @@ public class GLPipelineTest {
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
-			dump(result);
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -578,7 +577,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -644,7 +643,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -705,7 +704,7 @@ public class GLPipelineTest {
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -755,7 +754,7 @@ public class GLPipelineTest {
 			assertEquals(1, cnt.get());
 			final Bitmap b = result.get();
 			assertNotNull(b);
-			assertTrue(bitmapEquals(original, b));
+			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -810,7 +809,7 @@ public class GLPipelineTest {
 			assertEquals(NUM_TRIGGERS, cnt.get());
 			final Bitmap b = result.get();
 			assertNotNull(b);
-			assertTrue(bitmapEquals(original, b));
+			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
