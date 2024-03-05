@@ -122,6 +122,8 @@ public class GLImageReceiverTest {
 //		dump(bitmap);
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
 		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用

@@ -233,6 +233,8 @@ public class GLPipelineTest {
 //		dump(bitmap);
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
 		// #getInputSurfaceと#getInputSurfaceTextureはUnsupportedOperationExceptionを
@@ -297,6 +299,8 @@ public class GLPipelineTest {
 //		dump(bitmap);
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final DistributePipeline distributor = new DistributePipeline();
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		source.setPipeline(distributor);
@@ -383,6 +387,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline - SurfaceRendererPipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
@@ -458,6 +464,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -516,6 +524,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -576,6 +586,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline → EffectPipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -637,6 +649,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline - DrawerPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
+
+		assertTrue(manager.isValid());
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
@@ -691,6 +705,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline → CapturePipeline
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
@@ -737,6 +753,8 @@ public class GLPipelineTest {
 		// ImageSourcePipeline → CapturePipeline
 
 		final GLManager manager = new GLManager();
+		assertTrue(manager.isValid());
+
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
