@@ -253,7 +253,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -272,7 +272,7 @@ public class GLPipelineTest {
 				}
 			}
 		};
-		source.setPipeline(pipeline);
+		source.setPipeline(proxy);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
@@ -403,7 +403,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -423,11 +423,11 @@ public class GLPipelineTest {
 				}
 			}
 		};
-		videoSourcePipeline.setPipeline(pipeline);
+		videoSourcePipeline.setPipeline(proxy);
 
 		// SurfacePipelineとVideoSourceの間はSurfaceを経由したやりとりだけでGLPipelineとして接続しているわけではない
 		assertTrue(validatePipelineOrder(source, source, surfacePipeline));
-		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, pipeline));
+		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -446,6 +446,8 @@ public class GLPipelineTest {
 	/**
 	 * EffectPipelineが動作するかどうかを検証
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
+	 * FIXME これはいつも失敗する(生成されるビットマップが一致しない)
+	 *       でも#effectPipeline2と#effectPipeline3は成功する
 	 */
 	@Test
 	public void effectPipeline1() {
@@ -462,7 +464,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -484,9 +486,9 @@ public class GLPipelineTest {
 		};
 
 		source.setPipeline(effectPipeline1);
-		effectPipeline1.setPipeline(pipeline);
+		effectPipeline1.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, effectPipeline1, pipeline));
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -521,7 +523,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -544,9 +546,9 @@ public class GLPipelineTest {
 
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
-		effectPipeline2.setPipeline(pipeline);
+		effectPipeline2.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, pipeline));
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -582,7 +584,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -606,9 +608,9 @@ public class GLPipelineTest {
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
 		effectPipeline2.setPipeline(effectPipeline3);
-		effectPipeline3.setPipeline(pipeline);
+		effectPipeline3.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, effectPipeline3, pipeline));
+		assertTrue(validatePipelineOrder(source, source, effectPipeline1, effectPipeline2, effectPipeline3, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -641,7 +643,7 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline pipeline = new ProxyPipeline() {
+		final ProxyPipeline proxy = new ProxyPipeline() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
@@ -663,9 +665,9 @@ public class GLPipelineTest {
 		};
 
 		source.setPipeline(drawerPipeline);
-		drawerPipeline.setPipeline(pipeline);
+		drawerPipeline.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline, pipeline));
+		assertTrue(validatePipelineOrder(source, source, drawerPipeline, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
