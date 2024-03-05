@@ -21,6 +21,8 @@ android {
         versionCode versionCodeNum
         versionName versionNameString
 
+		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
 		// AGP 4.1.0以降でrootプロジェクト以外のBuildConfigにVERSION_CODEとVERSION_NAMEが
 		// 含まれなくなってしまったのでワークアラウンドを追加
 		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
@@ -48,6 +50,28 @@ android {
 }
 
 dependencies {
+	testImplementation "junit:junit:$jUnitVersion"
+
+	// Core library
+	androidTestImplementation "androidx.test:core:$androidTestCoreVersion"
+	// AndroidJUnitRunner and JUnit Rules
+	androidTestImplementation "androidx.test:runner:$androidTestRunner"
+	androidTestImplementation "androidx.test:rules:$androidTestRules"
+	// Assertions
+	androidTestImplementation "androidx.test.ext:junit:$androidTestJnuit"
+//	androidTestImplementation 'androidx.test.ext:truth:1.2.0'
+//	androidTestImplementation 'com.google.truth:truth:0.42'
+
+	// Espresso dependencies
+	androidTestImplementation "androidx.test.espresso:espresso-core:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso:espresso-contrib:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso:espresso-intents:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso:espresso-accessibility:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso:espresso-web:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso.idling:idling-concurrent:$androidTestEspresso"
+//	androidTestImplementation "androidx.test.espresso:espresso-idling-resource:$androidTestEspresso"
+	androidTestImplementation "androidx.multidex:multidex-instrumentation:2.0.0"
+
 	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
