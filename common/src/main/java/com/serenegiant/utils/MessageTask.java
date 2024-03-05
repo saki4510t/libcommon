@@ -525,7 +525,7 @@ LOOP:	while (mIsRunning) {
 			final Request req = obtain(REQUEST_TASK_RUN_AND_WAIT, arg1, arg2, obj);
 			if (!isOnWorkerThread()) {
 				// ワーカースレッド上でなければワーカースレッド上での実行要求＆結果を待機する
-				final Semaphore sync = new Semaphore(0);
+				final Semaphore sem = new Semaphore(0);
 				final AtomicReference<Object> ret = new AtomicReference<>();
 				req.request_for_result = request;
 				req.result = null;
@@ -533,13 +533,13 @@ LOOP:	while (mIsRunning) {
 					@Override
 					public void onResult(@NonNull final Request req, final Object result) {
 						ret.set(result);
-						sync.release();
+						sem.release();
 					}
 				};
 				mRequestQueue.offer(req);
 				while (mIsRunning && (req.request_for_result != REQUEST_TASK_NON)) {
 					try {
-						sync.acquire(100);
+						sem.acquire(100);
 					} catch (final InterruptedException e) {
 						break;
 					}

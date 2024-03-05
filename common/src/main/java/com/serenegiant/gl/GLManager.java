@@ -153,7 +153,7 @@ public class GLManager {
 		}
 		mGLHandler = handler;
 		mHandlerThreadId = handler.getId();
-		final Semaphore sync = new Semaphore(0);
+		final Semaphore sem = new Semaphore(0);
 		mGLHandler.postAtFrontOfQueue(new Runnable() {
 			@Override
 			public void run() {
@@ -163,12 +163,12 @@ public class GLManager {
 				} catch (final Exception e) {
 					Log.w(TAG, e);
 				}
-				sync.release();
+				sem.release();
 			}
 		});
 		// ワーカースレッドの初期化待ち
 		try {
-			if (!sync.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
+			if (!sem.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
 				// タイムアウトしたとき
 				mInitialized = false;
 			}
@@ -220,7 +220,7 @@ public class GLManager {
 
 		if (mInitialized) {
 			mInitialized = false;
-			final Semaphore sync = new Semaphore(0);
+			final Semaphore sem = new Semaphore(0);
 			mGLHandler.postAtFrontOfQueue(new Runnable() {
 				@Override
 				public void run() {
@@ -230,12 +230,12 @@ public class GLManager {
 					} catch (final Exception e) {
 						Log.w(TAG, e);
 					}
-					sync.release();
+					sem.release();
 				}
 			});
 			// ワーカースレッドの初期化待ち
 			try {
-				if (!sync.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
+				if (!sem.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
 					// タイムアウトしたとき
 					mInitialized = false;
 				}

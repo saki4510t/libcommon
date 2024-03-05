@@ -92,7 +92,7 @@ public class GLUtils implements GLConst {
 		if (sSupportedGLVersion < 1) {
 			// 一度も実行されていない時
 			final AtomicInteger result = new AtomicInteger(1);
-			final Semaphore sync = new Semaphore(0);
+			final Semaphore sem = new Semaphore(0);
 			final GLContext context = new GLContext(3, null, 0);
 			// ダミースレッド上でEGL/GLコンテキストを生成してエクステンション文字列をチェックする
 			new Thread(new Runnable() {
@@ -117,12 +117,12 @@ public class GLUtils implements GLConst {
 						Log.w(TAG, e);
 					} finally {
 						context.release();
-						sync.release();
+						sem.release();
 					}
 				}
 			}).start();
 			try {
-				if (sync.tryAcquire(500, TimeUnit.MILLISECONDS)) {
+				if (sem.tryAcquire(500, TimeUnit.MILLISECONDS)) {
 					sSupportedGLVersion = result.get();
 				}
 			} catch (final InterruptedException e) {
