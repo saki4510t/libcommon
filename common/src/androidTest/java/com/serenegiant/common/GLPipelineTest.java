@@ -49,6 +49,7 @@ import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
@@ -228,13 +229,14 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void imageSource() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
-
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
 		// #getInputSurfaceと#getInputSurfaceTextureはUnsupportedOperationExceptionを
@@ -294,6 +296,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void distributePipeline() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -301,8 +304,10 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
-		final DistributePipeline distributor = new DistributePipeline();
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+
+		final DistributePipeline distributor = new DistributePipeline();
 		source.setPipeline(distributor);
 
 		final Semaphore sem1 = new Semaphore(0);
@@ -380,6 +385,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void surfacePipeline_videoSourcePipeline() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -389,6 +395,7 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
@@ -457,6 +464,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void effectPipeline1() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 		dump(original);
@@ -466,6 +474,7 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -517,6 +526,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void effectPipeline2() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -526,6 +536,7 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -579,6 +590,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void effectPipeline3() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -588,6 +600,7 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
@@ -642,6 +655,7 @@ public class GLPipelineTest {
 	 */
 	@Test
 	public void drawerPipeline() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -649,8 +663,9 @@ public class GLPipelineTest {
 		// ImageSourcePipeline - DrawerPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = new GLManager();
-
 		assertTrue(manager.isValid());
+
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
@@ -698,6 +713,7 @@ public class GLPipelineTest {
 
 	@Test
 	public void capturePipeline_oneshot() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -707,15 +723,16 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				BitmapHelper.copyBitmap(bitmap, result);
+				result.set(Bitmap.createBitmap(bitmap));
 				cnt.incrementAndGet();
 				sem.release();
 			}
@@ -736,7 +753,9 @@ public class GLPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 //			dump(result);
 			assertEquals(1, cnt.get());
-			assertTrue(bitmapEquals(original, result));
+			final Bitmap b = result.get();
+			assertNotNull(b);
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
@@ -745,6 +764,7 @@ public class GLPipelineTest {
 
 	@Test
 	public void capturePipeline_multiple() {
+		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
@@ -755,15 +775,16 @@ public class GLPipelineTest {
 		final GLManager manager = new GLManager();
 		assertTrue(manager.isValid());
 
+		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicInteger cnt = new AtomicInteger();
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				BitmapHelper.copyBitmap(bitmap, result);
+				result.set(Bitmap.createBitmap(bitmap));
 				if (cnt.incrementAndGet() >= NUM_TRIGGERS) {
 					sem.release();
 				}
@@ -787,7 +808,9 @@ public class GLPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 //			dump(result);
 			assertEquals(NUM_TRIGGERS, cnt.get());
-			assertTrue(bitmapEquals(original, result));
+			final Bitmap b = result.get();
+			assertNotNull(b);
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			e.printStackTrace();
 		}
