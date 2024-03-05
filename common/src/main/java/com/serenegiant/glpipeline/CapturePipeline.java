@@ -46,8 +46,22 @@ public class CapturePipeline extends ProxyPipeline {
 	 * キャプチャ時のコールバックリスナー
 	 */
 	public interface Callback {
+		/**
+		 * キャプチャ時のコールバック
+		 * ワーカースレッド上で呼び出される
+		 * 引数のBitmapはOOM抑制・高速化のためにビットマッププールで管理＆再利用するので
+		 * このコールバックを抜けた後にアクセスしないようにすること(必要であればコピー)
+		 * &Bitmap#recycleを可能な限り呼び出さないこと
+		 * @param bitmap
+		 */
 		@WorkerThread
 		public void onCapture(@NonNull final Bitmap bitmap);
+
+		/**
+		 * キャプチャ時にエラーが発生したときのコールバック
+		 * ワーカースレッド上で呼び出される
+		 * @param t
+		 */
 		@WorkerThread
 		public void onError(@NonNull final Throwable t);
 	}
@@ -88,6 +102,9 @@ public class CapturePipeline extends ProxyPipeline {
 	@Nullable
 	private GLDrawer2D mDrawer;
 
+	/**
+	 * OOM抑制・高速化のためにキャプチャに使うBitmapを管理するビットマッププール
+	 */
 	private final Pool<Bitmap> mPool = new Pool<Bitmap>(0, 4) {
 		@NonNull
 		@Override

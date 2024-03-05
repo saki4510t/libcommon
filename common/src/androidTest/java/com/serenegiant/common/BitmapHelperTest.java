@@ -54,8 +54,12 @@ public class BitmapHelperTest {
 		final Context context = ApplicationProvider.getApplicationContext();
 	}
 
+	/**
+	 * BitmapHelper.makeCheckBitmapが生成したビットマップの比較テスト
+	 */
 	@Test
 	public void bitmapEqualsTest() {
+		// b0とb1は同じ内容のビットマップ, b2は異なる内容のビットマップ
 		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
@@ -69,6 +73,9 @@ public class BitmapHelperTest {
 		assertFalse(bitmapEquals(b0, b2));
 	}
 
+	/**
+	 * BitmapHelper#copyBitmapのテスト
+	 */
 	@Test
 	public void copy() {
 		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
