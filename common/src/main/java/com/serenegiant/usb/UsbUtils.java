@@ -33,6 +33,7 @@ import com.serenegiant.nio.CharsetsUtils;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.ContextUtils;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -130,6 +131,65 @@ public class UsbUtils implements Const {
 	public static boolean isUAC(@NonNull final UsbDevice device) {
 		return isSupported(device, 1, 1, -1)		// UAC Audio control interface
 			|| isSupported(device, 1, 2, -1);	// UAC Audio stream interface
+	}
+
+	/**
+	 * 指定したUsbDeviceが指定したクラス・サブクラス・プロトコルに対応したUsbInterfaceリストを取得する
+	 * @param device
+	 * @param clazz 負数ならワイルドカード
+	 * @param subClass 負数ならワイルドカード
+	 * @param protocol 負数ならワイルドカード
+	 * @return
+	 */
+	@NonNull
+	public static List<UsbInterface> findInterfaces(
+		@NonNull final UsbDevice device,
+		final int clazz, final int subClass, final int protocol) {
+
+		final List<UsbInterface> result = new ArrayList<>();
+		// インターフェースクラス・インターフェースサブクラス・インターフェースプロトコルが一致するかどうかをチェック
+		final int n = device.getInterfaceCount();
+		for (int i = 0; i < n; i++) {
+			final UsbInterface intf = device.getInterface(i);
+			if (((clazz < 0) || (clazz == intf.getInterfaceClass()))
+				&& ((subClass < 0) || (subClass == intf.getInterfaceSubclass()))
+				&& ((protocol < 0) || (protocol == intf.getInterfaceProtocol()))) {
+				result.add(intf);
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * UVCのインターフェースを取得
+	 * @param device
+	 * @return
+	 */
+	@Nullable
+	public static List<UsbInterface> findUVCInterfaces(@NonNull final UsbDevice device) {
+		// UVC Video control interface
+		final List<UsbInterface> result
+			= new ArrayList<>(findInterfaces(device, 14, 1, -1));
+		result.addAll(findInterfaces(device, 14, 2, -1));
+
+		return result;
+	}
+
+	/**
+	 * UACのインターフェースを取得
+	 * @param device
+	 * @return
+	 */
+	@Nullable
+	public static List<UsbInterface> findUACInterfaces(@NonNull final UsbDevice device) {
+		// UAC Audio control interface
+		final List<UsbInterface> result
+			= new ArrayList<>(findInterfaces(device, 1, 1, -1));
+		// UAC Audio stream interface
+		result.addAll(findInterfaces(device, 1, 2, -1));
+
+		return result;
 	}
 
 //--------------------------------------------------------------------------------

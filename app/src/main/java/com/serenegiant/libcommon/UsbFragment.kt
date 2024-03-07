@@ -29,6 +29,7 @@ import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
 import com.serenegiant.usb.UsbDeviceInfo
+import com.serenegiant.usb.UsbUtils
 import com.serenegiant.utils.BufferHelper
 import com.serenegiant.view.ViewUtils
 
@@ -129,6 +130,14 @@ class UsbFragment : BaseFragment() {
 			// パーミッションを取得できた時, openする
 			val ctrlBlock = mUSBMonitor?.openDevice(device)
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${ctrlBlock}")
+			if (UsbUtils.isUVC(device)) {
+				val intfs = UsbUtils.findUVCInterfaces(device)
+				if (DEBUG) Log.v(TAG, "onPermission:uvc=$intfs")
+			}
+			if (UsbUtils.isUAC(device)) {
+				val intfs = UsbUtils.findUACInterfaces(device)
+				if (DEBUG) Log.v(TAG, "onPermission:uac=$intfs")
+			}
 		}
 
 		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
