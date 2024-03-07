@@ -303,7 +303,7 @@ public class UsbConnector implements Cloneable, Closeable {
     * ベンダーIDを取得
     * @return
     */
-   public int getVenderId() {
+   public int getVendorId() {
       return mDevice.getVendorId();
    }
 
