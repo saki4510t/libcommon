@@ -358,44 +358,44 @@ public class UsbConnector implements Cloneable, Closeable {
    /**
     * インターフェースを取得する
     * Java内でインターフェースをopenして使う時
-    * @param interface_id
+    * @param interfaceId
     * @throws IllegalStateException
     */
-   public synchronized UsbInterface getInterface(final int interface_id)
+   public synchronized UsbInterface getInterface(final int interfaceId)
        throws IllegalStateException {
 
-      return getInterface(interface_id, 0);
+      return getInterface(interfaceId, 0);
    }
 
    /**
     * インターフェースを取得する
-    * @param interface_id
-    * @param altsetting
+    * @param interfaceId
+    * @param altSetting
     * @return
     * @throws IllegalStateException
     */
    @SuppressLint("NewApi")
-   public synchronized UsbInterface getInterface(final int interface_id, final int altsetting)
+   public synchronized UsbInterface getInterface(final int interfaceId, final int altSetting)
        throws IllegalStateException {
 
       checkConnection();
-      SparseArray<UsbInterface> intfs = mInterfaces.get(interface_id);
+      SparseArray<UsbInterface> intfs = mInterfaces.get(interfaceId);
       if (intfs == null) {
          intfs = new SparseArray<UsbInterface>();
-         mInterfaces.put(interface_id, intfs);
+         mInterfaces.put(interfaceId, intfs);
       }
-      UsbInterface intf = intfs.get(altsetting);
+      UsbInterface intf = intfs.get(altSetting);
       if (intf == null) {
          final int n = mDevice.getInterfaceCount();
          for (int i = 0; i < n; i++) {
             final UsbInterface temp = mDevice.getInterface(i);
-            if ((temp.getId() == interface_id) && (temp.getAlternateSetting() == altsetting)) {
+            if ((temp.getId() == interfaceId) && (temp.getAlternateSetting() == altSetting)) {
                intf = temp;
                break;
             }
          }
          if (intf != null) {
-            intfs.append(altsetting, intf);
+            intfs.append(altSetting, intf);
          }
       }
       return intf;
