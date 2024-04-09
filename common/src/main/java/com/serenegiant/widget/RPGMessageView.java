@@ -375,6 +375,14 @@ public class RPGMessageView extends View {
 	}
 
 	/**
+	 * 1行あたりの文字数を取得
+	 * @return
+	 */
+	public int getCols() {
+		return mCols;
+	}
+
+	/**
 	 * 表示行数をセット
 	 * @param rows
 	 * @throws IllegalArgumentException
@@ -385,6 +393,14 @@ public class RPGMessageView extends View {
 		}
 		mRows = rows;
 		resetGrid();
+	}
+
+	/**
+	 * 表示行数を取得
+	 * @return
+	 */
+	public int getRows() {
+		return mRows;
 	}
 
 	/**
@@ -410,6 +426,15 @@ public class RPGMessageView extends View {
 	}
 
 	/**
+	 * 文字の背景に使う色/drawableを取得
+	 * 内部変数をそのまま返すので変更は要注意
+	 * @return
+	 */
+	public Drawable getTextBackground() {
+		return mTextBackground;
+	}
+
+	/**
 	 * 文字描画に使うTypefaceを指定
 	 * nullの場合はデフォルトのTypeface.M
 	 * @param typeface
@@ -420,11 +445,61 @@ public class RPGMessageView extends View {
 	}
 
 	/**
+	 * 文字描画に使うTypefaceを取得
+	 * 内部変数をそのまま返すので変更してはだめ!
+	 * @return
+	 */
+	public Typeface getTypeface() {
+		return mTextTypeface;
+	}
+
+	/**
 	 * 文字色を設定
 	 * @param color
 	 */
 	public void setTextColor(@ColorInt final int color) {
 		mTextPaint.setColor(color);
+	}
+
+	/**
+	 * 文字色を取得
+	 * @return
+	 */
+	@ColorInt
+	public int getTextColor() {
+		return mTextPaint.getColor();
+	}
+
+	/**
+	 * 文字の輪郭線色を設定
+	 * @param color 文字色と同じ場合は輪郭線を表示しない
+	 */
+	public void setTextStrokeColor(@ColorInt final int color) {
+		setTextStroke(color, mTextStrokePaint.getStrokeWidth());
+	}
+
+	/**
+	 * 文字の輪郭線色を取得
+	 * @return
+	 */
+	@ColorInt
+	public int getTextStrokeColor() {
+		return mTextStrokePaint.getColor();
+	}
+
+	/**
+	 * 文字の輪郭線幅を設定
+	 * @param width 0なら輪郭線を表示しない
+	 */
+	public void setTextStrokeWidth(final int width) {
+		setTextStroke(mTextStrokePaint.getColor(), width);
+	}
+
+	/**
+	 * 文字の輪郭線幅を設定
+	 */
+	public int getTextStrokeWidth() {
+		return mHasTextStroke ? mTextStrokePaint.getColor() : 0;
 	}
 
 	/**
@@ -449,6 +524,14 @@ public class RPGMessageView extends View {
 	}
 
 	/**
+	 * 文字を描画する間隔[ミリ秒]を取得
+	 * @return
+	 */
+	public long getDurationPerChar() {
+		return mDrawDurationMsPerChar;
+	}
+
+	/**
 	 * 行送り後の待機時間[ミリ秒]を設定
 	 * @param durationMs
 	 */
@@ -456,6 +539,14 @@ public class RPGMessageView extends View {
 		if (durationMs >= 0) {
 			mDrawDurationMsPerLine = durationMs;
 		}
+	}
+
+	/**
+	 * 行送り後の待機時間[ミリ秒]を取得
+	 * @return
+	 */
+	public long getDurationPerLine() {
+		return mDrawDurationMsPerLine;
 	}
 //--------------------------------------------------------------------------------
 	/**
