@@ -43,16 +43,26 @@
 			android:id="@+id/checkBtn1"
 			android:layout_width="100dp"
 			android:layout_height="100dp"
-			android:layout_marginStart="16dp"
-			android:layout_marginLeft="16dp"
+			android:layout_marginStart="32dp"
+			android:layout_marginLeft="32dp"
 			android:layout_marginTop="16dp"
-			android:layout_marginEnd="16dp"
-			android:layout_marginRight="16dp"
 			android:checked="@={viewModel.isChecked}"
-			app:layout_constraintEnd_toEndOf="parent"
 			app:layout_constraintStart_toStartOf="parent"
 			app:layout_constraintTop_toTopOf="parent"
 			app:srcCompat="@drawable/checkable1" />
+
+		<com.serenegiant.widget.CheckableButton
+			android:id="@+id/checkBtn2"
+			android:layout_width="100dp"
+			android:layout_height="100dp"
+			android:layout_marginTop="16dp"
+			android:layout_marginEnd="32dp"
+			android:layout_marginRight="32dp"
+			android:background="@drawable/checkable1"
+			android:checked="@={viewModel.isChecked}"
+			android:text="@string/title_checkable_ex"
+			app:layout_constraintEnd_toEndOf="parent"
+			app:layout_constraintTop_toTopOf="parent" />
 
 		<!--
 			子Viewがタッチイベントを処理しない場合はこのCheckableLinearLayoutがクリックイベントを処理する

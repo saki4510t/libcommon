@@ -32,17 +32,20 @@ import androidx.databinding.InverseBindingMethods;
 @BindingMethods({
 	@BindingMethod(type = CheckableImageButton.class, attribute = "android:onCheckedChanged", method = "setOnCheckedChangeListener"),
 	@BindingMethod(type = CheckableImageView.class, attribute = "android:onCheckedChanged", method = "setOnCheckedChangeListener"),
+	@BindingMethod(type = CheckableButton.class, attribute = "android:onCheckedChanged", method = "setOnCheckedChangeListener"),
 	@BindingMethod(type = CheckableLinearLayout.class, attribute = "android:onCheckedChanged", method = "setOnCheckedChangeListener"),
 	@BindingMethod(type = CheckableRelativeLayout.class, attribute = "android:onCheckedChanged", method = "setOnCheckedChangeListener"),
 })
 @InverseBindingMethods({
 	@InverseBindingMethod(type = CheckableImageButton.class, attribute = "android:checked"),
 	@InverseBindingMethod(type = CheckableImageView.class, attribute = "android:checked"),
+	@InverseBindingMethod(type = CheckableButton.class, attribute = "android:checked"),
 	@InverseBindingMethod(type = CheckableLinearLayout.class, attribute = "android:checked"),
 	@InverseBindingMethod(type = CheckableRelativeLayout.class, attribute = "android:checked"),
 
 	@InverseBindingMethod(type = CheckableImageButton.class, attribute = "android:checkable"),
 	@InverseBindingMethod(type = CheckableImageView.class, attribute = "android:checkable"),
+	@InverseBindingMethod(type = CheckableButton.class, attribute = "android:checkable"),
 	@InverseBindingMethod(type = CheckableLinearLayout.class, attribute = "android:checkable"),
 	@InverseBindingMethod(type = CheckableRelativeLayout.class, attribute = "android:checkable"),
 })
@@ -120,6 +123,43 @@ public class CheckableExBindingAdapter {
 	}
 
 //--------------------------------------------------------------------------------
+	@BindingAdapter("android:checked")
+	public static void setChecked(CheckableButton checkable, final boolean checked) {
+		if (checkable.isChecked() != checked) {
+			checkable.setChecked(checked);
+		}
+	}
+
+	@BindingAdapter("android:checkable")
+	public static void setCheckable(CheckableButton checkable, final boolean checked) {
+		if (checkable.isCheckable() != checked) {
+			checkable.setCheckable(checked);
+		}
+	}
+
+	@BindingAdapter(value = {"android:onCheckedChanged", "android:checkedAttrChanged"},
+		requireAll = false)
+	public static void setListeners(
+		@NonNull CheckableButton checkable,
+		CheckableEx.OnCheckedChangeListener listener,
+		InverseBindingListener attrChange) {
+		if (attrChange == null) {
+			checkable.setOnCheckedChangeListener(listener);
+		} else {
+			checkable.setOnCheckedChangeListener(new CheckableEx.OnCheckedChangeListener() {
+				@Override
+				public void onCheckedChanged(@NonNull CheckableEx checkable, boolean isChecked) {
+					if (listener != null) {
+						listener.onCheckedChanged(checkable, isChecked);
+					}
+					attrChange.onChange();
+				}
+			});
+		}
+	}
+
+	//--------------------------------------------------------------------------------
+
 	@BindingAdapter("android:checked")
 	public static void setChecked(CheckableLinearLayout checkable, final boolean checked) {
 		if (checkable.isChecked() != checked) {
