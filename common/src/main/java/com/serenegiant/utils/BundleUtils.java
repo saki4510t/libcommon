@@ -116,6 +116,7 @@ public class BundleUtils {
 				} else {
 					sb.append(key).append("=").append(value);
 				}
+				sb.append(",");
 			}
 			sb.append("}");
 			return sb.toString();
