@@ -118,7 +118,20 @@ public class ByteBufferOutputStream extends OutputStream implements IWritable {
 	
 	@Override
 	public void write(final ByteBuffer src) throws IOException {
-		wrappedBuffer.put(src);
+		int oldPosition = 0;
+		try {
+			oldPosition = wrappedBuffer.position();
+			wrappedBuffer.put(src);
+		} catch (final BufferOverflowException ex) {
+			if (autoEnlarge) {
+				final int newBufferSize
+					= Math.max(wrappedBuffer.capacity() * 2, oldPosition + src.remaining());
+				growTo(newBufferSize);
+				write(src);
+			} else {
+				throw ex;
+			}
+		}
 	}
 
 	@Override
