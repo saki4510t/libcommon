@@ -163,7 +163,7 @@ class MainActivity
 					&& !checkPermissionCamera()) {
 					return
 				}
-				fragment = UsbFragment.newInstance()
+				fragment = UsbMonitorFragment.newInstance()
 			}
 			R.string.title_window_insets -> {
 				fragment = WindowInsetsFragment.newInstance()

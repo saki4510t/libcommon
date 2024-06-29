@@ -36,7 +36,7 @@ import com.serenegiant.view.ViewUtils
 /**
  * A simple [BaseFragment] subclass.
  */
-class UsbFragment : BaseFragment() {
+class UsbMonitorFragment : BaseFragment() {
 
 	private var mUSBMonitor: USBMonitor? = null
 
@@ -72,7 +72,7 @@ class UsbFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return customInflater.inflate(R.layout.fragment_usb, container, false)
+		return customInflater.inflate(R.layout.fragment_usb_monitor, container, false)
 	}
 
 	override fun internalOnResume() {
@@ -210,9 +210,9 @@ class UsbFragment : BaseFragment() {
 
 	companion object {
 		private const val DEBUG = true // TODO set false on release
-		private val TAG = UsbFragment::class.java.simpleName
+		private val TAG = UsbMonitorFragment::class.java.simpleName
 
-		fun newInstance() = UsbFragment().apply {
+		fun newInstance() = UsbMonitorFragment().apply {
 			arguments = Bundle().apply {
 				// 今は何もない
 			}
