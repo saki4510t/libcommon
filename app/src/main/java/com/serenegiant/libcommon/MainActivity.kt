@@ -641,11 +641,9 @@ class MainActivity
 	private fun showToast(duration: Int, msg: String?, vararg args: Any?) {
 		runOnUiThread {
 			try {
-				if (mToast != null) {
-					mToast!!.cancel()
-					mToast = null
-				}
-				val text = if (args != null) String.format(msg!!, *args) else msg!!
+				mToast?.cancel()
+				mToast = null
+				val text = String.format(msg!!, *args)
 				mToast = Toast.makeText(this@MainActivity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) { // ignore
@@ -660,10 +658,8 @@ class MainActivity
 	private fun showToast(duration: Int, @StringRes msg: Int, vararg args: Any?) {
 		runOnUiThread {
 			try {
-				if (mToast != null) {
-					mToast!!.cancel()
-					mToast = null
-				}
+				mToast?.cancel()
+				mToast = null
 				val text = args?.let { getString(msg, it) } ?: getString(msg)
 				mToast = Toast.makeText(this@MainActivity, text, duration)
 				mToast!!.show()
@@ -678,10 +674,8 @@ class MainActivity
 	 */
 	private fun clearToast() {
 		try {
-			if (mToast != null) {
-				mToast!!.cancel()
-				mToast = null
-			}
+			mToast?.cancel()
+			mToast = null
 		} catch (e: Exception) {
 			if (DEBUG) Log.d(TAG, "clearToast", e)
 		}
