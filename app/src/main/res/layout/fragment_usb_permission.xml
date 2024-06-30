@@ -1,4 +1,5 @@
-package com.serenegiant.libcommon
+<?xml version="1.0" encoding="utf-8"?>
+<!--
 /*
  * libcommon
  * utility/helper classes for myself
@@ -17,14 +18,11 @@ package com.serenegiant.libcommon
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
 */
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	tools:context=".UsbMonitorFragment">
 
-object Const {
-	const val REQUEST_ACCESS_SD = 34567
-	const val APP_DIR = "libcommon"
-
-	/*package*/
-	const val PREF_NAME = "com.serenegiant.libcommon"
-
-	const val ACTION_REQUEST_USB_PERMISSION = "ACTION_REQUEST_USB_PERMISSION"
-	const val EXTRA_REQUEST_USB_PERMISSION = "EXTRA_REQUEST_USB_PERMISSION"
-}
+</FrameLayout>

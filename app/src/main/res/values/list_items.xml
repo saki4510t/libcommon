@@ -25,6 +25,7 @@
 	<string name="title_network_connection" translatable="false">NetworkConnection</string>
 	<string name="title_telephony" translatable="false">Telephony</string>
 	<string name="title_usb_monitor" translatable="false">UsbMonitor</string>
+	<string name="title_usb_permission" translatable="false">UsbDetector+UsbPermission</string>
 	<string name="title_window_insets" translatable="false">WindowInsets</string>
 	<string name="title_audio_record" translatable="false">AudioRecord</string>
 	<string name="title_camera" translatable="false">Camera</string>
@@ -61,6 +62,7 @@
 		<item>@string/title_network_connection</item>
 		<item>@string/title_telephony</item>
 		<item>@string/title_usb_monitor</item>
+		<item>@string/title_usb_permission</item>
 		<item>@string/title_window_insets</item>
 		<item>@string/title_audio_record</item>
 		<item>@string/title_camera</item>

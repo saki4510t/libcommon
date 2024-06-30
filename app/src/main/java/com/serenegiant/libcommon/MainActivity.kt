@@ -20,12 +20,19 @@ package com.serenegiant.libcommon
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.BroadcastReceiver
+import android.content.Context
+import android.content.Intent
+import android.content.IntentFilter
+import android.hardware.usb.UsbDevice
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.dialog.RationalDialogV4
 import com.serenegiant.libcommon.TitleFragment.OnListFragmentInteractionListener
 import com.serenegiant.libcommon.list.DummyContent
@@ -34,6 +41,7 @@ import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
+import com.serenegiant.usb.USBMonitor
 import com.serenegiant.widget.GLPipelineView
 
 class MainActivity
@@ -58,6 +66,26 @@ class MainActivity
 				.beginTransaction()
 				.replace(R.id.container, TitleFragment.newInstance(1))
 				.commit()
+			LocalBroadcastManager.getInstance(this)
+				.registerReceiver(object: BroadcastReceiver() {
+					override fun onReceive(context: Context?, intent: Intent?) {
+						if (DEBUG) Log.v(TAG, "onReceive:$intent")
+						when (intent?.action) {
+							Const.ACTION_REQUEST_USB_PERMISSION -> {
+								val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+									intent.getParcelableExtra(Const.EXTRA_REQUEST_USB_PERMISSION, UsbDevice::class.java)
+								} else {
+									intent.getParcelableExtra(Const.EXTRA_REQUEST_USB_PERMISSION)
+								}
+								if (device != null) {
+									USBMonitor.requestPermission(this@MainActivity, device)
+								}
+							}
+						}
+					}
+				}, IntentFilter().apply {
+					addAction(Const.ACTION_REQUEST_USB_PERMISSION)
+				})
 		}
 	}
 
@@ -164,6 +192,13 @@ class MainActivity
 					return
 				}
 				fragment = UsbMonitorFragment.newInstance()
+			}
+			R.string.title_usb_permission -> {	// UsbDetector+UsbPermission
+				if (BuildCheck.isAndroid9()
+					&& !checkPermissionCamera()) {
+					return
+				}
+				fragment = UsbPermissionFragment.newInstance()
 			}
 			R.string.title_window_insets -> {
 				fragment = WindowInsetsFragment.newInstance()
