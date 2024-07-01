@@ -37,7 +37,7 @@ public class IntentUtils {
 		} else {
 			final StringBuilder sb = new StringBuilder("Intent{");
 			sb.append("action="); sb.append(intent.getAction());
-			sb.append(",flags="); sb.append(intent.getFlags());
+			sb.append(",flags="); sb.append(String.format("0x%08x", intent.getFlags()));
 			final Bundle extra = intent.getExtras();
 			sb.append(",extra={"); sb.append(BundleUtils.toString(extra)); sb.append("}");
 			sb.append("}");
