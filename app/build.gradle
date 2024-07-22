@@ -16,7 +16,7 @@ android {
 
     defaultConfig {
         applicationId "com.serenegiant.libcommon"
-        minSdkVersion 16
+        minSdkVersion 19
         targetSdkVersion versionTarget
         versionCode versionCodeNum
         versionName versionNameString

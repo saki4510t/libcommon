@@ -8,7 +8,7 @@ plugins {
 
 android {
 	namespace 'com.serenegiant.core'
-	compileSdkVersion versionCompiler
+	compileSdk versionCompiler
 
 	compileOptions {
 		sourceCompatibility javaSourceCompatibility
@@ -16,7 +16,7 @@ android {
 	}
 
 	defaultConfig {
-		minSdkVersion 16
+		minSdkVersion 19
 		targetSdkVersion versionTarget
 		versionCode versionCodeNum
 		versionName versionNameString
