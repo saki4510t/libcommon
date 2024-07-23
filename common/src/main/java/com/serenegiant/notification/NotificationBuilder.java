@@ -18,6 +18,7 @@ package com.serenegiant.notification;
  *  limitations under the License.
 */
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Notification;
 import android.app.PendingIntent;
@@ -27,13 +28,18 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioAttributes;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.annotation.RequiresPermission;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.core.app.ServiceCompat;
+
 import android.widget.RemoteViews;
 
 import com.serenegiant.system.BuildCheck;
@@ -118,6 +124,8 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param content
 	 * @param factory
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	public static void showNotification(@NonNull final Context context,
 		final int notificationId, @NonNull final String channelId,
 		final String title, final String content,
@@ -140,6 +148,8 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param smallIconId
 	 * @param factory
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	public static void showNotification(@NonNull final Context context,
 		@Nullable final String tag,
 		final int notificationId, @NonNull final String channelId,
@@ -266,6 +276,8 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param notificationId
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	public NotificationBuilder notify(final int notificationId) {
 		notify(mContext, null, notificationId, build());
 		return this;
@@ -277,7 +289,10 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param notificationId
 	 * @return
 	 */
-	public NotificationBuilder notify(@Nullable final String tag, final int notificationId) {
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
+	public NotificationBuilder notify(
+		@Nullable final String tag, final int notificationId) {
 		notify(mContext, tag, notificationId, build());
 		return this;
 	}
@@ -288,10 +303,12 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param notificationId
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	public NotificationBuilder notifyForeground(@NonNull final Service service,
-		final int notificationId) {
+		final int notificationId, final int foregroundServiceType) {
 		
-		return notifyForeground(service, null, notificationId);
+		return notifyForeground(service, null, notificationId, foregroundServiceType);
 	}
 	
 	/**
@@ -301,10 +318,14 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param notificationId
 	 * @return
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	public NotificationBuilder notifyForeground(@NonNull final Service service,
-		@Nullable final String tag, final int notificationId) {
+		@Nullable final String tag, final int notificationId,
+		final int foregroundServiceType) {
 		final Notification notification = build();
-		service.startForeground(notificationId, notification);
+		ServiceCompat.startForeground(service, notificationId, notification, foregroundServiceType);
+//		service.startForeground(notificationId, notification);
 		notify(service, tag, notificationId, notification);
 		return this;
 	}
@@ -938,13 +959,13 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 	 * @param notificationId
 	 * @param notification
 	 */
+	@RequiresApi(api = Build.VERSION_CODES.TIRAMISU)
+	@RequiresPermission(Manifest.permission.POST_NOTIFICATIONS)
 	private static void notify(@NonNull final Context context,
 		@Nullable final String tag, final int notificationId,
 		@NonNull final Notification notification) {
-		
+
 		NotificationManagerCompat.from(context)
 			.notify(tag, notificationId, notification);
 	}
-	
-	
 }
