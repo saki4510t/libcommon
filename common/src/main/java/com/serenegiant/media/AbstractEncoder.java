@@ -52,22 +52,6 @@ public abstract class AbstractEncoder extends MediaEncoder {
 	 * @param mimeType
 	 * @param recorder
 	 * @param listener
-	 * @deprecated EncoderListener2を引数に取るコンストラクタを使うこと
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-    public AbstractEncoder(@NonNull final String mimeType,
-    	@NonNull final IRecorder recorder,
-    	@NonNull final EncoderListener listener) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener));
-    }
-
-	/**
-	 * コンストラクタ
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
 	 */
     public AbstractEncoder(@NonNull final String mimeType,
     	@NonNull final IRecorder recorder,
