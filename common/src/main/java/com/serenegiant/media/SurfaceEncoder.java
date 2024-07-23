@@ -18,11 +18,9 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
-import android.os.Build;
 import android.view.Surface;
 
 import androidx.annotation.NonNull;
@@ -30,17 +28,11 @@ import androidx.annotation.NonNull;
 /**
  * 映像をSurfaceで受け取ってMediaCodecでエンコードするクラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class SurfaceEncoder extends AbstractVideoEncoder implements ISurfaceEncoder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "SurfaceEncoder";
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final String TAG = "SurfaceEncoder";
 
 	protected Surface mInputSurface;
-
-	@SuppressWarnings("deprecation")
-    public SurfaceEncoder(final IRecorder recorder, final EncoderListener listener) {
-		this(recorder, EncoderListener2.wrap(listener));
-    }
 
     public SurfaceEncoder(final IRecorder recorder, final EncoderListener2 listener) {
 		super(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener);
