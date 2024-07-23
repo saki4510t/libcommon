@@ -51,43 +51,6 @@ public abstract class AbstractAudioEncoder extends AbstractEncoder
 	 * @param listener
 	 * @param audioSource
 	 * @param audioChannels
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AbstractAudioEncoder(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		final int audioSource, final int audioChannels) {
-
-		this(recorder, EncoderListener2.wrap(listener),
-			audioSource, audioChannels, AudioRecordCompat.DEFAULT_SAMPLE_RATE, DEFAULT_BIT_RATE);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param recorder
-	 * @param listener
-	 * @param audioSource
-	 * @param audioChannels
-	 * @param sampleRate
-	 * @param bitRate
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AbstractAudioEncoder(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		final int audioSource, final int audioChannels, final int sampleRate, final int bitRate) {
-
-		this(recorder, EncoderListener2.wrap(listener), audioSource, audioChannels, sampleRate, bitRate);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param recorder
-	 * @param listener
-	 * @param audioSource
-	 * @param audioChannels
 	 * @param sampleRate
 	 * @param bitRate
 	 */
