@@ -191,7 +191,7 @@ class ImageFragment: BaseFragment() {
 				}
 			} catch (e: IOException) {
 				if (DEBUG) Log.w(TAG, e)
-				result = loadDefaultBitmap(context, R.drawable.ic_error_outline_red_24dp)
+				result = loadDefaultBitmap(context, com.serenegiant.common.R.drawable.ic_error_outline_red_24dp)
 			}
 			return result!!
 		}

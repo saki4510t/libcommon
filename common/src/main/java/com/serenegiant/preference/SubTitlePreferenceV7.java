@@ -62,7 +62,7 @@ public final class SubTitlePreferenceV7 extends Preference {
 	}
 
 	public SubTitlePreferenceV7(final Context context, final AttributeSet attrs) {
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.preferenceStyle,
 			android.R.attr.preferenceStyle));
 	}
 

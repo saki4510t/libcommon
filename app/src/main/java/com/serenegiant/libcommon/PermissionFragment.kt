@@ -130,14 +130,14 @@ class PermissionFragment : BaseFragment(), RationalDialogV4.DialogResultListener
 					"デフォルトのダイアログ表示ができなかったので自前で表示しないといけない," + permission)
 				if (Manifest.permission.INTERNET == permission) {
 					RationalDialogV4.showDialog(this@PermissionFragment,
-						R.string.permission_title,
-						R.string.permission_network_request,
+						com.serenegiant.common.R.string.permission_title,
+						com.serenegiant.common.R.string.permission_network_request,
 						arrayOf(Manifest.permission.INTERNET))
 				} else if ((Manifest.permission.ACCESS_FINE_LOCATION == permission)
 					|| (Manifest.permission.ACCESS_COARSE_LOCATION == permission)) {
 					RationalDialogV4.showDialog(this@PermissionFragment,
-						R.string.permission_title,
-						R.string.permission_location_request,
+						com.serenegiant.common.R.string.permission_title,
+						com.serenegiant.common.R.string.permission_location_request,
 						LOCATION_PERMISSIONS
 					)
 				}
@@ -150,8 +150,8 @@ class PermissionFragment : BaseFragment(), RationalDialogV4.DialogResultListener
 			if (LOCATION_PERMISSIONS.contentEquals(permissions)) {
 				RationalDialogV4.showDialog(
 					this@PermissionFragment,
-					R.string.permission_title,
-					R.string.permission_location_request,
+					com.serenegiant.common.R.string.permission_title,
+					com.serenegiant.common.R.string.permission_location_request,
 					LOCATION_PERMISSIONS
 				)
 			}

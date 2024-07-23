@@ -72,7 +72,7 @@ class NumberKeyboardFragment : BaseFragment() {
 		mInputEditText = rootView.findViewById(R.id.edittext)
 		mKeyboardView = rootView.findViewById(R.id.number_keyboardview)
 		mDelegater = object : KeyboardDelegater(
-			mInputEditText!!, mKeyboardView!!, R.xml.keyboard_number) {
+			mInputEditText!!, mKeyboardView!!, com.serenegiant.common.R.xml.keyboard_number) {
 
 			override fun onCancelClick() {
 				if (DEBUG) Log.v(TAG, "onCancelClick:")

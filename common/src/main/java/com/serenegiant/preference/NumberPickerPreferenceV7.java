@@ -48,7 +48,7 @@ public class NumberPickerPreferenceV7 extends DialogPreference {
 	public NumberPickerPreferenceV7(@NonNull final Context context,
 		@Nullable final AttributeSet attrs) {
 
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.dialogPreferenceStyle,
 			android.R.attr.dialogPreferenceStyle));
 	}
 

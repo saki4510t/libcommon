@@ -43,7 +43,7 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 	public ColorPickerDialogPreferenceV7(@NonNull final Context context,
 		@Nullable final AttributeSet attrs) {
 
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.dialogPreferenceStyle,
 			android.R.attr.dialogPreferenceStyle));
 	}
 

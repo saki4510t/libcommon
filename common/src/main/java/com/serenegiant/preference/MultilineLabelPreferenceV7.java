@@ -38,7 +38,7 @@ public class MultilineLabelPreferenceV7 extends Preference {
 	}
 
 	public MultilineLabelPreferenceV7(final Context context, final AttributeSet attrs) {
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.preferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.preferenceStyle,
 			android.R.attr.preferenceStyle));
 	}
 

@@ -66,6 +66,8 @@ dependencies {
 	// androidx
 	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
+	//noinspection KtxExtensionAvailable
+	implementation "androidx.preference:preference:$androidXPreference"
 	implementation "androidx.recyclerview:recyclerview:$androidXRecyclerview"
 	implementation "androidx.exifinterface:exifinterface:$androidXExif"
 	implementation "com.google.android.material:material:$androidXMaterial"

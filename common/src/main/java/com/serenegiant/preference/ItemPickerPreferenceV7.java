@@ -47,7 +47,7 @@ public final class ItemPickerPreferenceV7 extends Preference {
 	}
 
 	public ItemPickerPreferenceV7(final Context context, final AttributeSet attrs) {
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.dialogPreferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.dialogPreferenceStyle,
 			android.R.attr.dialogPreferenceStyle));
 	}
 

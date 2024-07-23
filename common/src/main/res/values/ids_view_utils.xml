@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+<!--<item type="id" name="thumbnail" />-->
+<!--<item type="id" name="icon" />-->
+	<item type="id" name="image" />
+<!--<item type="id" name="title" />-->
+<!--<item type="id" name="content" />-->
+</resources>

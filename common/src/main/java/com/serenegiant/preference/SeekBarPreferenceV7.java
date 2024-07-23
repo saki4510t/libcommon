@@ -61,7 +61,7 @@ public final class SeekBarPreferenceV7 extends Preference {
 	}
 
 	public SeekBarPreferenceV7(final Context context, final AttributeSet attrs) {
-		this(context, attrs, TypedArrayUtils.getAttr(context, R.attr.seekBarPreferenceStyle,
+		this(context, attrs, TypedArrayUtils.getAttr(context, androidx.preference.R.attr.seekBarPreferenceStyle,
 			android.R.attr.preferenceStyle));
 	}
 

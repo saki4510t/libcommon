@@ -465,19 +465,19 @@ class MainActivity
 		// パーミッションがないときにはメッセージを表示する
 		if (!result && permission != null) {
 			if (Manifest.permission.RECORD_AUDIO == permission) {
-				showToast(Toast.LENGTH_SHORT, R.string.permission_audio)
+				showToast(Toast.LENGTH_SHORT, com.serenegiant.common.R.string.permission_audio)
 			}
 			if (Manifest.permission.WRITE_EXTERNAL_STORAGE == permission) {
-				showToast(Toast.LENGTH_SHORT, R.string.permission_ext_storage)
+				showToast(Toast.LENGTH_SHORT, com.serenegiant.common.R.string.permission_ext_storage)
 			}
 			if (Manifest.permission.CAMERA == permission) {
-				showToast(Toast.LENGTH_SHORT, R.string.permission_camera)
+				showToast(Toast.LENGTH_SHORT, com.serenegiant.common.R.string.permission_camera)
 			}
 			if (Manifest.permission.INTERNET == permission) {
-				showToast(Toast.LENGTH_SHORT, R.string.permission_network)
+				showToast(Toast.LENGTH_SHORT, com.serenegiant.common.R.string.permission_network)
 			}
 			if (Manifest.permission.ACCESS_FINE_LOCATION == permission) {
-				showToast(Toast.LENGTH_SHORT, R.string.permission_location)
+				showToast(Toast.LENGTH_SHORT, com.serenegiant.common.R.string.permission_location)
 			}
 		}
 	}
@@ -610,14 +610,14 @@ class MainActivity
 					"デフォルトのダイアログ表示ができなかったので自前で表示しないといけない," + permission)
 				if (Manifest.permission.INTERNET == permission) {
 					RationalDialogV4.showDialog(this@MainActivity,
-						R.string.permission_title,
-						R.string.permission_network_request,
+						com.serenegiant.common.R.string.permission_title,
+						com.serenegiant.common.R.string.permission_network_request,
 						arrayOf(Manifest.permission.INTERNET))
 				} else if ((Manifest.permission.ACCESS_FINE_LOCATION == permission)
 					|| (Manifest.permission.ACCESS_COARSE_LOCATION == permission)) {
 					RationalDialogV4.showDialog(this@MainActivity,
-						R.string.permission_title,
-						R.string.permission_location_request,
+						com.serenegiant.common.R.string.permission_title,
+						com.serenegiant.common.R.string.permission_location_request,
 						LOCATION_PERMISSIONS)
 				}
 			}
@@ -628,8 +628,8 @@ class MainActivity
 			// 複数パーミッションの一括要求時はデフォルトのダイアログ表示がないので自前で実装する
 			if (LOCATION_PERMISSIONS.contentEquals(permissions)) {
 				RationalDialogV4.showDialog(this@MainActivity,
-					R.string.permission_title,
-					R.string.permission_location_request,
+					com.serenegiant.common.R.string.permission_title,
+					com.serenegiant.common.R.string.permission_location_request,
 					LOCATION_PERMISSIONS)
 			}
 		}
