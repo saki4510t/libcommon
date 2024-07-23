@@ -25,9 +25,7 @@ import android.annotation.SuppressLint
 import android.annotation.TargetApi
 import android.app.Activity
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
@@ -39,7 +37,9 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.DrawableRes
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.libcommon.Const
 import com.serenegiant.libcommon.MainActivity
 import com.serenegiant.libcommon.R
@@ -56,6 +56,7 @@ import com.serenegiant.media.MediaFileUtils
 import com.serenegiant.media.MediaScreenEncoder
 import com.serenegiant.media.VideoConfig
 import com.serenegiant.mediastore.MediaStoreUtils
+import com.serenegiant.notification.NotificationCompat
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.utils.FileUtils
@@ -63,14 +64,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.io.IOException
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
- /**
+/**
  * MediaProjectionからのスクリーンキャプチャ映像を録画するためのService実装
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class ScreenRecorderService : BaseService() {
+class ScreenRecorderService : LifecycleService() {
 	private lateinit var mMediaProjectionManager: MediaProjectionManager
 	private val mVideoConfig = VideoConfig()
+	private val mLock = ReentrantLock()
 	private var mRecorder: IRecorder? = null
 	private var mAudioSampler: IAudioSampler? = null
 
@@ -83,7 +87,7 @@ class ScreenRecorderService : BaseService() {
 
 	override fun onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:")
-		releaseNotification()
+		NotificationCompat.releaseNotification(this)
 		super.onDestroy()
 	}
 
@@ -123,23 +127,8 @@ class ScreenRecorderService : BaseService() {
 	 * BaseServiceの抽象メソッドの実装
 	 * @return
 	 */
-	override fun createIntentFilter(): IntentFilter? {
-		return null
-	}
-
-	/**
-	 * BaseServiceの抽象メソッドの実装
-	 * @param context
-	 * @param intent
-	 */
-	override fun onReceiveLocalBroadcast(context: Context, intent: Intent) {}
-
-	/**
-	 * BaseServiceの抽象メソッドの実装
-	 * @return
-	 */
 	@SuppressLint("InlinedApi")
-	override fun contextIntent(): PendingIntent {
+	private fun contextIntent(): PendingIntent {
 		var flags = 0
 		if (BuildCheck.isAPI31()) {
 			flags = flags or PendingIntent.FLAG_IMMUTABLE
@@ -160,14 +149,14 @@ class ScreenRecorderService : BaseService() {
 	}
 
 	private fun updateStatus(): Boolean {
-		val isRecording: Boolean
-		synchronized(mSync) { isRecording = mRecorder != null }
-		val result = Intent()
-		result.setAction(ACTION_QUERY_STATUS_RESULT)
-		result.putExtra(EXTRA_QUERY_RESULT_RECORDING, isRecording)
-		result.putExtra(EXTRA_QUERY_RESULT_PAUSING, false)
+		val isRecording = mLock.withLock { mRecorder != null }
+		val intent = Intent()
+		intent.setAction(ACTION_QUERY_STATUS_RESULT)
+		intent.putExtra(EXTRA_QUERY_RESULT_RECORDING, isRecording)
+		intent.putExtra(EXTRA_QUERY_RESULT_PAUSING, false)
 		if (DEBUG) Log.v(TAG, "sendBroadcast:isRecording=$isRecording")
-		sendLocalBroadcast(result)
+		LocalBroadcastManager.getInstance(this)
+			.sendBroadcast(intent)
 		return isRecording
 	}
 
@@ -179,7 +168,7 @@ class ScreenRecorderService : BaseService() {
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private fun startScreenRecord(intent: Intent) {
 		if (DEBUG) Log.v(TAG, "startScreenRecord:$mRecorder")
-		showNotification(
+		NotificationCompat.showNotification(this,
 			NOTIFICATION,
 			getString(R.string.notification_service),
 			NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
@@ -188,8 +177,9 @@ class ScreenRecorderService : BaseService() {
 			ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
 			contextIntent()
 		)
-		synchronized(mSync) {
-			if (mRecorder == null) {
+		lifecycleScope.launch(Dispatchers.Default) {
+			val recorder = mLock.withLock { mRecorder }
+			if (recorder == null) {
 				// get MediaProjection
 				val projection =
 					mMediaProjectionManager.getMediaProjection(Activity.RESULT_OK, intent)
@@ -215,27 +205,21 @@ class ScreenRecorderService : BaseService() {
 							height = (height / scale).toInt()
 						}
 					}
-					if (DEBUG) Log.v(
-						TAG,
-						String.format(
-							"startRecording:(%d,%d)(%d,%d)",
-							metrics.widthPixels,
-							metrics.heightPixels,
-							width,
-							height
-						)
-					)
+					if (DEBUG) Log.v(TAG, String.format(
+						"startRecording:(%d,%d)(%d,%d)",
+						metrics.widthPixels, metrics.heightPixels,
+						width, height))
 					try {
 						val outputFile = if (BuildCheck.isAPI29()) {
 							// API29以降は対象範囲別ストレージ
 							MediaStoreUtils.getContentDocument(
-								this, "video/mp4",
+								this@ScreenRecorderService, "video/mp4",
 								Environment.DIRECTORY_MOVIES + "/" + Const.APP_DIR,
 								FileUtils.getDateTimeString() + ".mp4", null
 							)
 						} else {
 							MediaFileUtils.getRecordingFile(
-								this,
+								this@ScreenRecorderService,
 								Const.REQUEST_ACCESS_SD,
 								Environment.DIRECTORY_MOVIES,
 								"video/mp4",
@@ -265,14 +249,15 @@ class ScreenRecorderService : BaseService() {
 	private fun stopScreenRecord() {
 		if (DEBUG) Log.v(TAG, "stopScreenRecord:$mRecorder")
 		var needStop = true
-		synchronized(mSync) {
-			if (mRecorder != null) {
+		lifecycleScope.launch(Dispatchers.Default) {
+			val recorder = mLock.withLock { mRecorder }
+			if (recorder != null) {
 				needStop = !releaseRecorder()
 				// you should not wait here
 			}
-		}
-		if (needStop) {
-			stopSelf()
+			if (needStop) {
+				stopSelf()
+			}
 		}
 	}
 
@@ -287,7 +272,7 @@ class ScreenRecorderService : BaseService() {
 		projection: MediaProjection,
 		densityDpi: Int, width: Int, height: Int
 	) {
-		var recorder = mRecorder
+		var recorder = mLock.withLock { mRecorder }
 		if (DEBUG) Log.d(TAG, "startEncoder:recorder=$recorder")
 		if (recorder == null) {
 			try {
@@ -298,12 +283,13 @@ class ScreenRecorderService : BaseService() {
 					width, height)
 				recorder.prepare()
 				recorder.startRecording()
-				mRecorder = recorder
+				mLock.withLock {
+					mRecorder = recorder
+				}
 			} catch (e: Exception) {
 				Log.w(TAG, "startEncoder:", e)
 				stopSampler()
 				recorder?.stopRecording()
-				mRecorder = null
 				throw e
 			}
 		}
@@ -324,7 +310,7 @@ class ScreenRecorderService : BaseService() {
 		densityDpi: Int, width: Int, height: Int
 	): IRecorder {
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputFile.uri)
-		val recorder: IRecorder = MediaAVRecorder(this, mRecorderCallback, outputFile)
+		val recorder = MediaAVRecorder(this, mRecorderCallback, outputFile)
 		if (DEBUG) Log.v(TAG, "createRecorder:create MediaScreenEncoder")
 		val videoEncoder: IVideoEncoder =
 			MediaScreenEncoder(recorder, mEncoderListener, projection, densityDpi) // API>=21
@@ -356,7 +342,7 @@ class ScreenRecorderService : BaseService() {
 		override fun onStopped(recorder: IRecorder) {
 			if (DEBUG) Log.v(TAG, "RecorderCallback#onStopped:$recorder")
 			stopSampler()
-			mRecorder = null
+			mLock.withLock { mRecorder = null }
 			try {
 				lifecycleScope.launch(Dispatchers.Default) {
 					delay(1000L)
@@ -393,8 +379,7 @@ class ScreenRecorderService : BaseService() {
 		}
 
 		override fun onDestroy(encoder: Encoder) {
-			if (DEBUG) Log.v(TAG, "EncoderListener#onDestroy:"
-					+ encoder + ",mRecorder=" + mRecorder)
+			if (DEBUG) Log.v(TAG, "EncoderListener#onDestroy:$encoder,recorder=$mRecorder")
 		}
 
 		override fun onError(e: Throwable) {
@@ -409,12 +394,14 @@ class ScreenRecorderService : BaseService() {
 	 */
 	private fun releaseRecorder(): Boolean {
 		var result = false
-		synchronized(mSync) {
-			if (mRecorder != null && (mRecorder!!.isReady || mRecorder!!.isStarted)) {
-				mRecorder!!.stopRecording()
-				result = true
-			}
+		val recorder = mLock.withLock {
+			val r = mRecorder
 			mRecorder = null
+			r
+		}
+		if ((recorder != null) && (recorder.isReady || recorder.isStarted)) {
+			recorder.stopRecording()
+			result = true
 		}
 		return result
 	}

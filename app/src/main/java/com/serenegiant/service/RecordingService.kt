@@ -22,7 +22,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.content.pm.ServiceInfo
 import android.media.AudioFormat
 import android.media.MediaCodec
@@ -37,6 +36,7 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.DrawableRes
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.serenegiant.libcommon.Const
 import com.serenegiant.libcommon.MainActivity
@@ -52,6 +52,7 @@ import com.serenegiant.media.MediaReaper.AudioReaper
 import com.serenegiant.media.MediaReaper.ReaperListener
 import com.serenegiant.media.MediaReaper.VideoReaper
 import com.serenegiant.media.VideoConfig
+import com.serenegiant.notification.NotificationCompat
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.FileUtils
 import com.serenegiant.utils.ThreadUtils
@@ -74,7 +75,7 @@ import kotlin.concurrent.withLock
  * 対策としてServiceとして実装してアプリのライフサイクルと
  * MP4ファイル出力を切り離すためにServiceとして実装する
  */
-open class RecordingService() : BaseService() {
+open class RecordingService() : LifecycleService() {
 	/**
 	 * RecordingServiceのステート変更時のコールバックリスナー
 	 */
@@ -84,6 +85,7 @@ open class RecordingService() : BaseService() {
 			state: Int
 		)
 	}
+
 	//--------------------------------------------------------------------------------
 	/**
 	 * Binder class to access this local service
@@ -95,8 +97,6 @@ open class RecordingService() : BaseService() {
 
 	//--------------------------------------------------------------------------------
 	private val mListeners: MutableSet<StateChangeListener?> = CopyOnWriteArraySet()
-
-	//--------------------------------------------------------------------------------
 	private val binder: IBinder = LocalBinder()
 	private val mLock = ReentrantLock()
 	private var mVideoConfig: VideoConfig? = null
@@ -152,7 +152,7 @@ open class RecordingService() : BaseService() {
 			mIsBind = false
 		}
 		if (DEBUG) Log.v(TAG, "onDestroy:releaseNotification")
-		releaseNotification()
+		NotificationCompat.releaseNotification(this)
 		mListeners.clear()
 		super.onDestroy()
 	}
@@ -168,7 +168,7 @@ open class RecordingService() : BaseService() {
 		super.onBind(intent)
 		if (DEBUG) Log.v(TAG, "onBind:intent=$intent")
 		// XXX API21未満はVectorDrawableを通知領域のスモールアイコンにできない
-		showNotification(
+		NotificationCompat.showNotification(this,
 			NOTIFICATION,
 			getString(R.string.notification_service),
 			NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
@@ -455,28 +455,13 @@ open class RecordingService() : BaseService() {
 	//--------------------------------------------------------------------------------
 	/**
 	 * BaseServiceの抽象メソッドの実装
-	 * @return
-	 */
-	override fun createIntentFilter(): IntentFilter? {
-		return null
-	}
-
-	/**
-	 * BaseServiceの抽象メソッドの実装
-	 * @param context
-	 * @param intent
-	 */
-	override fun onReceiveLocalBroadcast(context: Context, intent: Intent) {}
-
-	/**
-	 * BaseServiceの抽象メソッドの実装
 	 * サービスノティフィケーションを選択した時に実行されるPendingIntentの生成
 	 * 普通はMainActivityを起動させる。
 	 * デフォルトはnullを返すだけでノティフィケーションを選択しても何も実行されない。
 	 * @return
 	 */
 	@SuppressLint("InlinedApi")
-	override fun contextIntent(): PendingIntent {
+	private fun contextIntent(): PendingIntent {
 		var flags = 0
 		if (BuildCheck.isAPI31()) {
 			flags = flags or PendingIntent.FLAG_IMMUTABLE
@@ -517,7 +502,7 @@ open class RecordingService() : BaseService() {
 				changed = mState != newState
 				mState = newState
 			}
-			if (changed && !isDestroyed) {
+			if (changed) {
 				try {
 					lifecycleScope.launch(Dispatchers.Default) {
 						for (listener: StateChangeListener? in mListeners) {
@@ -541,13 +526,13 @@ open class RecordingService() : BaseService() {
 	private fun checkStopSelf() {
 		if (DEBUG) Log.v(TAG, "checkStopSelf:mIsBind=$mIsBind,isRunning=$isRunning")
 		lifecycleScope.launch {
-			if (!isDestroyed && canStopSelf(mIsBind or isRunning)) {
+			if (canStopSelf(mIsBind or isRunning)) {
 				if (DEBUG) Log.v(TAG, "stopSelf")
 				state = STATE_RELEASING
 				try {
 					lifecycleScope.launch(Dispatchers.Default) {
 						if (DEBUG) Log.v(TAG, "checkStopSelf:releaseNotification")
-						releaseNotification(
+						NotificationCompat.releaseNotification(this@RecordingService,
 							NOTIFICATION,
 							getString(R.string.notification_service))
 						stopSelf()
@@ -565,14 +550,14 @@ open class RecordingService() : BaseService() {
 	 * @return 終了可能であればtrue
 	 */
 	private fun canStopSelf(isRunning: Boolean): Boolean {
-		if (DEBUG) Log.v(TAG, ("canStopSelf:isRunning=$isRunning,isDestroyed=$isDestroyed"))
+		if (DEBUG) Log.v(TAG, ("canStopSelf:isRunning=$isRunning,isBonded=$mIsBind"))
 		return !isRunning
 	}
 	//--------------------------------------------------------------------------------
 	/**
 	 * 録画設定をリセット
 	 */
-	protected fun internalResetSettings() {
+	private fun internalResetSettings() {
 		if (DEBUG) Log.v(TAG, "internalResetSettings:")
 		mFrameRate = -1
 		mHeight = -1
@@ -730,7 +715,7 @@ open class RecordingService() : BaseService() {
 		if (DEBUG) Log.v(TAG, "releaseEncoder:finished")
 	}
 
-	protected fun createOwnAudioSampler(sampleRate: Int, channelCount: Int) {
+	private fun createOwnAudioSampler(sampleRate: Int, channelCount: Int) {
 		if (DEBUG) Log.v(TAG, String.format(
 				"createOwnAudioSampler:sampling=%d,channelCount=%d",
 				sampleRate, channelCount)
@@ -746,7 +731,7 @@ open class RecordingService() : BaseService() {
 		}
 	}
 
-	protected fun releaseOwnAudioSampler() {
+	private fun releaseOwnAudioSampler() {
 		if (DEBUG) Log.v(TAG, "releaseOwnAudioSampler:own=$mIsOwnAudioSampler,$mAudioSampler")
 		if (mAudioSampler != null) {
 			mAudioSampler!!.removeCallback(mSoundSamplerCallback)
@@ -790,7 +775,7 @@ open class RecordingService() : BaseService() {
 	/**
 	 * 録画終了の実態, mSyncをロックして呼ばれる
 	 */
-	protected fun internalStop() {
+	private fun internalStop() {
 		if (DEBUG) Log.v(TAG, "internalStop:")
 		val muxer = mLock.withLock {
 			val r = mMuxer
@@ -879,7 +864,7 @@ open class RecordingService() : BaseService() {
 	 * @param accessId
 	 * @return
 	 */
-	protected fun checkFreeSpace(context: Context?, accessId: Int): Boolean {
+	private fun checkFreeSpace(context: Context?, accessId: Int): Boolean {
 		return (BuildCheck.isAPI29() // API29以降は対象範囲別ストレージなので容量のチェックができない
 			|| FileUtils.checkFreeSpace(context,
 			requireConfig().maxDuration(), System.currentTimeMillis(), accessId
@@ -916,7 +901,7 @@ open class RecordingService() : BaseService() {
 				MediaReaper.REAPER_AUDIO -> muxer.writeSampleData(mAudioTrackIx, buffer, info)
 				else -> if (DEBUG) Log.v(TAG, "onWriteSampleData:unexpected reaper type")
 			}
-		} else if (isRecording && !isDestroyed) {
+		} else if (isRecording) {
 			if (DEBUG) Log.v(TAG, ("onWriteSampleData:muxer is not set yet,state=$state,reaperType=${reaper.reaperType()}"))
 		}
 	}
@@ -1115,7 +1100,7 @@ open class RecordingService() : BaseService() {
 	 * 指定したMediaCodecエンコーダーへEOSを送る(音声エンコーダー用)
 	 * @param encoder
 	 */
-	protected fun signalEndOfInputStream(encoder: MediaCodec) {
+	private fun signalEndOfInputStream(encoder: MediaCodec) {
 		if (DEBUG) Log.i(TAG, "signalEndOfInputStream:encoder=$encoder")
 		// MediaCodec#signalEndOfInputStreamはBUFFER_FLAG_END_OF_STREAMフラグを付けて
 		// 空のバッファをセットするのと等価である

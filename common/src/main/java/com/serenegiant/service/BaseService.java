@@ -42,7 +42,9 @@ import com.serenegiant.utils.HandlerUtils;
 
 /**
  * サービスに各種ユーティリティーメソッドを追加
+ * @deprecated LifecycleService(または適当なService)と必要であればNotificationCompatを使うこと
  */
+@Deprecated
 public abstract class BaseService extends LifecycleService {
 	private static final boolean DEBUG = false;	// FIXME set false on production
 	private static final String TAG = BaseService.class.getSimpleName();
