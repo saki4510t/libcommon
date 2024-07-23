@@ -40,24 +40,6 @@ public class AudioEncoder extends AbstractAudioEncoder {
 	 * @param audioSource
 	 * @param audioChannels
 	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AudioEncoder(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		final int audioSource, final int audioChannels) {
-
-		this(recorder, EncoderListener2.wrap(listener),
-			audioSource, audioChannels);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param recorder
-	 * @param listener
-	 * @param audioSource
-	 * @param audioChannels
-	 */
 	public AudioEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener2 listener,
