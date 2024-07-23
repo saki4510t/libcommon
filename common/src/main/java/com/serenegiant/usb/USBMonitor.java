@@ -68,15 +68,6 @@ public final class USBMonitor extends UsbDetector implements Const {
 	}
 
 	/**
-	 * USB機器の状態変更時のコールバックリスナー
-	 * Callbackのシノニム
-	 * @deprecated Callbackを使うこと
-	 */
-	@Deprecated
-	public interface OnDeviceConnectListener extends Callback {
-	}
-
-	/**
 	 * パーミッション要求時には呼ばれないコールバックリスナーを実装したCallback実装
 	 */
 	public static abstract class PermissionCallback implements Callback {
