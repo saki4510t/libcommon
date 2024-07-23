@@ -18,12 +18,10 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaFormat;
 import android.opengl.GLES20;
-import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -33,7 +31,6 @@ import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.AbstractVideoEncoder;
-import com.serenegiant.media.EncoderListener;
 import com.serenegiant.media.EncoderListener2;
 import com.serenegiant.media.IRecorder;
 import com.serenegiant.media.MediaCodecUtils;
@@ -48,7 +45,6 @@ import androidx.annotation.WorkerThread;
 /**
  * MediaCodecの映像エンコーダーでエンコードするためのGLPipeline/AbstractVideoEncoder実装
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EncodePipeline.class.getSimpleName();
@@ -67,22 +63,6 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private GLDrawer2D mDrawer;
 	@Nullable
 	private RendererTarget mRendererTarget;
-
-	/**
-	 * コンストラクタ
-	 * @param manager
-	 * @param recorder
-	 * @param listener
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public EncodePipeline(
-		@NonNull final GLManager manager,
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener) {
-
-		this(manager, recorder, EncoderListener2.wrap(listener));
-	}
 
 	/**
 	 * コンストラクタ
