@@ -96,8 +96,6 @@ public class MediaMuxerWrapper implements IMuxer {
 	private final MediaMuxer mMuxer;
 	@Nullable
 	private final OutputStream mOutputStream;
-	@Nullable
-	private final String mOutputPath;
 	private volatile boolean mIsStarted;
 	private boolean mReleased;
 
@@ -112,7 +110,6 @@ public class MediaMuxerWrapper implements IMuxer {
 
 		mMuxer = new MediaMuxer(outputPath, format);
 		mOutputStream = null;
-		mOutputPath = outputPath;
 	}
 
 	/**
@@ -127,7 +124,6 @@ public class MediaMuxerWrapper implements IMuxer {
 
 		mMuxer = new MediaMuxer(fd, format);
 		mOutputStream = null;
-		mOutputPath = null;
 	}
 
 	/**
@@ -143,7 +139,6 @@ public class MediaMuxerWrapper implements IMuxer {
 
 		mMuxer = new MediaMuxer(output.getFD(), format);
 		mOutputStream = output;
-		mOutputPath = null; // FIXME FileOutputStream生成時のファイルパスを代入したい
 	}
 
 	/**
@@ -151,7 +146,6 @@ public class MediaMuxerWrapper implements IMuxer {
 	 * @param output
 	 * @param format
 	 */
-	@SuppressWarnings("deprecation")
 	@RequiresApi(api = Build.VERSION_CODES.O)
 	public MediaMuxerWrapper(
 		@NonNull final MediaStoreOutputStream output,
@@ -160,7 +154,6 @@ public class MediaMuxerWrapper implements IMuxer {
 
 		mMuxer = new MediaMuxer(output.getFd(), format);
 		mOutputStream = output;
-		mOutputPath = output.getOutputPath();
 	}
 
 	@Override
