@@ -26,14 +26,6 @@ import androidx.annotation.Size
  */
 class OnFramePipeline(private val mListener: com.serenegiant.glutils.OnFrameAvailableListener)
 : ProxyPipeline() {
-	/**
-	 * 映像が更新されたときの通知用コールバックリスナー
-	 * @deprecated com.serenegiant.glutils.OnFrameAvailableListenerのシノニムなので
-	 *     直接com.serenegiant.glutils.OnFrameAvailableListenerを使うこと
-	 */
-	@Deprecated("use OnFrameAvailableListener in com.serenegiant.glutils package")
-	interface OnFrameAvailableListener : com.serenegiant.glutils.OnFrameAvailableListener
-
 	override fun onFrameAvailable(
 		isOES: Boolean, texId: Int,
 		@Size(min = 16) texMatrix: FloatArray) {
