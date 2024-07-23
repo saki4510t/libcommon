@@ -31,6 +31,7 @@ import android.os.Looper;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ServiceCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
@@ -149,10 +150,12 @@ public abstract class BaseService extends LifecycleService {
 	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
+	 * @param foregroundServiceType
 	 * @param intent
 	 */
 	protected void showNotification(@DrawableRes final int smallIconId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
+		final int foregroundServiceType,
 		final PendingIntent intent) {
 
 		showNotification(NOTIFICATION_ID,
@@ -160,28 +163,7 @@ public abstract class BaseService extends LifecycleService {
 			null, null,
 			smallIconId, R.drawable.ic_notification,
 			title, content,
-			true, intent);
-	}
-
-	/**
-	 * 通知領域に指定したメッセージを表示する。
-	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
-	 * @param title
-	 * @param content
-	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
-	 * @param intent
-	 */
-	protected void showNotification(@DrawableRes final int smallIconId,
-		@NonNull final CharSequence title, @NonNull final CharSequence content,
-		final boolean isForegroundService,
-		final PendingIntent intent) {
-
-		showNotification(NOTIFICATION_ID,
-			getString(R.string.service_name),
-			null, null,
-			smallIconId, R.drawable.ic_notification,
-			title, content,
-			isForegroundService, intent);
+			foregroundServiceType, intent);
 	}
 
 	/**
@@ -190,6 +172,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
 	 * @param title
 	 * @param content
+	 * @param foregroundServiceType
 	 * @param intent
 	 */
 	protected void showNotification(final int notificationId,
@@ -197,39 +180,15 @@ public abstract class BaseService extends LifecycleService {
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
+		final int foregroundServiceType,
 		final PendingIntent intent) {
 		
 		showNotification(notificationId, channelId, null, null,
 			smallIconId, largeIconId,
 			title, content,
-			true, intent);
+			foregroundServiceType, intent);
 	}
 	
-	/**
-	 * 通知領域に指定したメッセージを表示する。フォアグラウンドサービスとして動作させる。
-	 * こっちはAndroid 8以降でのグループid/グループ名の指定可能
-	 * @param notificationId
-	 * @param groupId
-	 * @param groupName
-	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
-	 * @param title
-	 * @param content
-	 * @param intent
-	 */
-	protected void showNotification(final int notificationId,
-		@NonNull final String channelId,
-		@Nullable final String groupId, @Nullable final String groupName,
-		@DrawableRes final int smallIconId,
-		@DrawableRes final int largeIconId,
-		@NonNull final CharSequence title, @NonNull final CharSequence content,
-		final PendingIntent intent) {
-		
-		showNotification(notificationId, channelId,
-			groupId, groupName,
-			smallIconId, largeIconId,
-			title, content, true, intent);
-	}
-
 	/**
 	 * 通知領域に指定したメッセージを表示する。
 	 * こっちはAndroid 8以降でのグループid/グループ名の指定可能
@@ -241,7 +200,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param largeIconId
 	 * @param title
 	 * @param content
-	 * @param isForegroundService フォアグラウンドサービスとして動作させるかどうか
+	 * @param foregroundServiceType フォアグラウンドサービスとして動作させるかどうか
 	 * @param intent
 	 */
 	protected void showNotification(final int notificationId,
@@ -250,17 +209,17 @@ public abstract class BaseService extends LifecycleService {
 		@DrawableRes final int smallIconId,
 		@DrawableRes final int largeIconId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
-		final boolean isForegroundService,
+		final int foregroundServiceType,
 		final PendingIntent intent) {
 
 		showNotification(notificationId, title, content,
 			new NotificationFactoryCompat(this, channelId, channelId, 0,
-				groupId, groupName, smallIconId, largeIconId) {
+				groupId, groupName, smallIconId, largeIconId, foregroundServiceType) {
 
 				@Override
 				public boolean isForegroundService() {
-					if (DEBUG) Log.v(TAG, "showNotification:isForegroundService=" + isForegroundService);
-					return isForegroundService;
+					if (DEBUG) Log.v(TAG, "showNotification:foregroundServiceType=" + foregroundServiceType);
+					return foregroundServiceType != 0;
 				}
 
 				@Nullable
@@ -288,7 +247,7 @@ public abstract class BaseService extends LifecycleService {
 			= ContextUtils.requireSystemService(this, NotificationManager.class);
 		final Notification notification = factory.createNotification(content, title);
 		if (factory.isForegroundService()) {
-			startForeground(notificationId, notification);
+			ServiceCompat.startForeground(this, notificationId, notification, factory.getForegroundServiceType());
 		}
 		if (DEBUG) Log.v(TAG, "showNotification:notify");
 		manager.notify(notificationId, notification);
@@ -299,29 +258,7 @@ public abstract class BaseService extends LifecycleService {
 	 */
 	protected void releaseNotification() {
 		releaseNotification(NOTIFICATION_ID,
-			getString(R.string.service_name),
-			R.drawable.ic_notification, R.drawable.ic_notification,
-			getString(R.string.service_name), getString(R.string.service_stop));
-	}
-	
-	/**
-	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
-	 * @param notificationId
-	 * @param channelId
-	 * @param smallIconId	API21未満ではVectorDrawableを指定してはだめ
-	 * @param largeIconId
-	 * @param title
-	 * @param content
-	 */
-	@SuppressLint("NewApi")
-	protected void releaseNotification(final int notificationId,
-		@NonNull final String channelId,
-		@DrawableRes final int smallIconId,
-		@DrawableRes final int largeIconId,
-		@NonNull final CharSequence title, @NonNull final CharSequence content) {
-
-		showNotification(notificationId, channelId, smallIconId, largeIconId, title, content, null);
-		releaseNotification(notificationId, channelId);
+			getString(R.string.service_name));
 	}
 	
 	/**

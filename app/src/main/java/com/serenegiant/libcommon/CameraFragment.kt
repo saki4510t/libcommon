@@ -28,6 +28,7 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
+import androidx.lifecycle.lifecycleScope
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.media.MediaFileUtils
 import com.serenegiant.mediastore.MediaStoreUtils
@@ -37,6 +38,8 @@ import com.serenegiant.utils.FileUtils
 import com.serenegiant.widget.EffectCameraGLSurfaceView
 import com.serenegiant.widget.GLPipelineView
 import com.serenegiant.widget.SimpleVideoSourceCameraTextureView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 
 /**
@@ -63,8 +66,10 @@ class CameraFragment : AbstractCameraFragment() {
 		if (DEBUG) Log.v(TAG, "internalStopRecording:mRecorder=$mRecorder")
 		val recorder = mRecorder
 		mRecorder = null
-		recorder?.stop()
-		recorder?.release()
+		lifecycleScope.launch(Dispatchers.Default) {
+			recorder?.stop()
+			recorder?.release()
+		}
 	}
 
 	override fun onFrameAvailable() {
@@ -98,13 +103,15 @@ class CameraFragment : AbstractCameraFragment() {
 			}
 			val recorder = mRecorder
 			if (recorder != null) {
-				try {
-					recorder.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS, 0.25f)
-					recorder.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
-					recorder.prepare()
-				} catch (e: Exception) {
-					Log.w(TAG, e)
-					stopRecording() // 非同期で呼ばないとデッドロックするかも
+				lifecycleScope.launch(Dispatchers.Default) {
+					try {
+						recorder.setVideoSettings(VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS, 0.25f)
+						recorder.setAudioSettings(SAMPLE_RATE, CHANNEL_COUNT)
+						recorder.prepare()
+					} catch (e: Exception) {
+						Log.w(TAG, e)
+						stopRecording() // 非同期で呼ばないとデッドロックするかも
+					}
 				}
 			}
 		}
@@ -114,18 +121,20 @@ class CameraFragment : AbstractCameraFragment() {
 			if (DEBUG) Log.v(TAG, "onPrepared:")
 			val recorder = mRecorder
 			if (recorder != null) {
-				try {
-					val surface = recorder.inputSurface // API>=18
-					if (surface != null) {
-						mRecordingSurfaceId = surface.hashCode()
-						mCameraView!!.addSurface(mRecordingSurfaceId, surface, true)
-					} else {
-						Log.w(TAG, "surface is null")
+				lifecycleScope.launch(Dispatchers.Default) {
+					try {
+						val surface = recorder.getInputSurface() // API>=18
+						if (surface != null) {
+							mRecordingSurfaceId = surface.hashCode()
+							mCameraView!!.addSurface(mRecordingSurfaceId, surface, true)
+						} else {
+							Log.w(TAG, "surface is null")
+							stopRecording() // 非同期で呼ばないとデッドロックするかも
+						}
+					} catch (e: Exception) {
+						Log.w(TAG, e)
 						stopRecording() // 非同期で呼ばないとデッドロックするかも
 					}
-				} catch (e: Exception) {
-					Log.w(TAG, e)
-					stopRecording() // 非同期で呼ばないとデッドロックするかも
 				}
 			}
 		}
@@ -154,7 +163,9 @@ class CameraFragment : AbstractCameraFragment() {
 					}
 					if (DEBUG) Log.v(TAG, "onReady:output=$output," + output?.uri)
 					if (output != null) {
-						recorder.start(output)
+						lifecycleScope.launch(Dispatchers.Default) {
+							recorder.start(output)
+						}
 					} else {
 						throw IOException()
 					}

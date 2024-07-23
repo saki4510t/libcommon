@@ -23,6 +23,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ServiceInfo
 import android.media.AudioFormat
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -62,7 +63,9 @@ import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.concurrent.CopyOnWriteArraySet
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
+import kotlin.concurrent.withLock
 
 /**
  * MP4として録音録画するためのService実装
@@ -95,6 +98,7 @@ open class RecordingService() : BaseService() {
 
 	//--------------------------------------------------------------------------------
 	private val binder: IBinder = LocalBinder()
+	private val mLock = ReentrantLock()
 	private var mVideoConfig: VideoConfig? = null
 	private var mIntent: Intent? = null
 	private var mState = STATE_UNINITIALIZED
@@ -130,20 +134,26 @@ open class RecordingService() : BaseService() {
 	private var mMuxer: IMuxer? = null
 	private var mVideoTrackIx = -1
 	private var mAudioTrackIx = -1
+
 	override fun onCreate() {
 		super.onCreate()
 		if (DEBUG) Log.v(TAG, "onCreate:")
+		mLock.withLock {
+			mState = STATE_UNINITIALIZED
+			mIsBind = false
+		}
 		internalResetSettings()
 	}
 
 	override fun onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:")
-		synchronized(mSync) {
+		mLock.withLock {
 			mState = STATE_UNINITIALIZED
 			mIsBind = false
-			releaseNotification()
-			mListeners.clear()
 		}
+		if (DEBUG) Log.v(TAG, "onDestroy:releaseNotification")
+		releaseNotification()
+		mListeners.clear()
 		super.onDestroy()
 	}
 
@@ -153,6 +163,7 @@ open class RecordingService() : BaseService() {
 		return START_STICKY
 	}
 
+	@SuppressLint("InlinedApi")
 	override fun onBind(intent: Intent): IBinder {
 		super.onBind(intent)
 		if (DEBUG) Log.v(TAG, "onBind:intent=$intent")
@@ -163,25 +174,22 @@ open class RecordingService() : BaseService() {
 			NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
 			getString(R.string.notification_service),
 			getString(R.string.app_name),
+			ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA,
 			contextIntent()
 		)
-		synchronized(mSync) {
-			if (mState == STATE_UNINITIALIZED) {
-				state = STATE_INITIALIZED
-			}
-			mIsBind = true
+		if (mState == STATE_UNINITIALIZED) {
+			state = STATE_INITIALIZED
 		}
-		synchronized(mSync) { mIntent = intent }
+		mIsBind = true
+		mIntent = intent
 		return binder
 	}
 
 	override fun onUnbind(intent: Intent): Boolean {
 		if (DEBUG) Log.d(TAG, "onUnbind:$intent")
-		synchronized(mSync) {
-			mIsBind = false
-			mIntent = null
-			mListeners.clear()
-		}
+		mIsBind = false
+		mIntent = null
+		mListeners.clear()
 		checkStopSelf()
 		if (DEBUG) Log.v(TAG, "onUnbind:finished")
 		return false // onRebind使用不可
@@ -196,7 +204,7 @@ open class RecordingService() : BaseService() {
 	 */
 	val isRecording: Boolean
 		get() {
-			synchronized(mSync) {
+			mLock.withLock {
 				val state: Int = state
 				return ((state == STATE_PREPARING)
 					|| (state == STATE_PREPARED)
@@ -214,7 +222,7 @@ open class RecordingService() : BaseService() {
 	 */
 	private val isRunning: Boolean
 		get() {
-			synchronized(mSync) {
+			mLock.withLock {
 				val state: Int = state
 				return (isRecording
 					|| (state == STATE_SCAN_FILE))
@@ -254,12 +262,10 @@ open class RecordingService() : BaseService() {
 		width: Int, height: Int,
 		frameRate: Int, bpp: Float
 	) {
-		if (DEBUG) Log.v(
-			TAG,
-			String.format("setVideoSettings:(%dx%d)@%d", width, height, frameRate)
-		)
+		if (DEBUG) Log.v(TAG, String.format("setVideoSettings:(%dx%d)@%d",
+			width, height, frameRate))
 		if (state != STATE_INITIALIZED) {
-			throw IllegalStateException()
+			throw IllegalStateException("state=$state")
 		}
 		mWidth = width
 		mHeight = height
@@ -281,9 +287,7 @@ open class RecordingService() : BaseService() {
 		}
 		releaseOwnAudioSampler()
 		if (mAudioSampler !== sampler) {
-			if (mAudioSampler != null) {
-				mAudioSampler!!.removeCallback(mSoundSamplerCallback)
-			}
+			mAudioSampler?.removeCallback(mSoundSamplerCallback)
 			mAudioSampler = sampler
 			mChannelCount = 0
 			mSampleRate = 0
@@ -298,12 +302,10 @@ open class RecordingService() : BaseService() {
 	 */
 	@Throws(IllegalStateException::class)
 	fun setAudioSettings(sampleRate: Int, channelCount: Int) {
-		if (DEBUG) Log.v(
-			TAG,
-			String.format("setAudioSettings:sampling=%d,channelCount=%d", sampleRate, channelCount)
-		)
+		if (DEBUG) Log.v(TAG, String.format("setAudioSettings:sampling=%d,channelCount=%d",
+			sampleRate, channelCount))
 		if (state != STATE_INITIALIZED) {
-			throw IllegalStateException()
+			throw IllegalStateException("state=$state")
 		}
 		if ((mSampleRate != sampleRate) || (mChannelCount != channelCount)) {
 			createOwnAudioSampler(sampleRate, channelCount)
@@ -340,9 +342,9 @@ open class RecordingService() : BaseService() {
 	@Throws(IllegalStateException::class, IOException::class)
 	fun prepare() {
 		if (DEBUG) Log.v(TAG, "prepare:")
-		synchronized(mSync) {
+		lifecycleScope.launch(Dispatchers.Default) {
 			if (state != STATE_INITIALIZED) {
-				throw IllegalStateException()
+				throw IllegalStateException("state=$state")
 			}
 			state = STATE_PREPARING
 			try {
@@ -371,8 +373,7 @@ open class RecordingService() : BaseService() {
 					createEncoder(mSampleRate, mChannelCount)
 				}
 				if (((mAudioSampler != null)
-						&& !mAudioSampler!!.isStarted)
-				) {
+						&& !mAudioSampler!!.isStarted)) {
 					if (DEBUG) Log.v(TAG, "prepare:start audio sampler")
 					mAudioSampler!!.start()
 				}
@@ -396,9 +397,9 @@ open class RecordingService() : BaseService() {
 	@Throws(IllegalStateException::class, IOException::class)
 	fun start(output: DocumentFile) {
 		if (DEBUG) Log.v(TAG, "start:")
-		synchronized(mSync) {
+		lifecycleScope.launch(Dispatchers.Default) {
 			if ((!mUseVideo || (mVideoFormat != null)) && (!mUseAudio || (mAudioFormat != null))) {
-				if (checkFreeSpace(this, Const.REQUEST_ACCESS_SD)) {
+				if (checkFreeSpace(this@RecordingService, Const.REQUEST_ACCESS_SD)) {
 					internalStart(output, mVideoFormat, mAudioFormat)
 				} else {
 					throw IOException()
@@ -415,7 +416,7 @@ open class RecordingService() : BaseService() {
 	 */
 	fun stop() {
 		if (DEBUG) Log.v(TAG, "stop:")
-		synchronized(mSync) {
+		lifecycleScope.launch(Dispatchers.Default) {
 			if (mAudioEncoder != null) {
 				signalEndOfInputStream(mAudioEncoder!!)
 			}
@@ -424,22 +425,22 @@ open class RecordingService() : BaseService() {
 		}
 	}
 
+	/**
+	 * 映像入力用のSurfaceを取得する
+	 * @return
+	 * @throws IllegalStateException #prepareと#startの間以外で呼ぶとIllegalStateExceptionを投げる
+	 */
 	@get:Throws(IllegalStateException::class)
 	val inputSurface: Surface?
-		/**
-		 * 映像入力用のSurfaceを取得する
-		 * @return
-		 * @throws IllegalStateException #prepareと#startの間以外で呼ぶとIllegalStateExceptionを投げる
-		 */
 		get() {
 			if (DEBUG) Log.v(TAG, "getInputSurface:")
-			synchronized(mSync) {
-				if (mState == STATE_PREPARED) {
-					frameAvailableSoon()
-					return mInputSurface
-				} else {
-					throw IllegalStateException()
+			if (state == STATE_PREPARED) {
+				frameAvailableSoon()
+				return mLock.withLock {
+					mInputSurface
 				}
+			} else {
+				throw IllegalStateException()
 			}
 		}
 
@@ -448,9 +449,7 @@ open class RecordingService() : BaseService() {
 	 * MediaReaper#frameAvailableSoonを呼ぶためのヘルパーメソッド
 	 */
 	fun frameAvailableSoon() {
-		synchronized(mSync) {
-			mVideoReaper?.frameAvailableSoon()
-		}
+		mVideoReaper?.frameAvailableSoon()
 	}
 
 	//--------------------------------------------------------------------------------
@@ -489,9 +488,7 @@ open class RecordingService() : BaseService() {
 	}
 
 	private val intent: Intent?
-		get() {
-			synchronized(mSync) { return mIntent }
-		}
+		get() = mIntent
 
 	/**
 	 * 録画設定を取得
@@ -510,19 +507,15 @@ open class RecordingService() : BaseService() {
 	 */
 	private var state: Int
 		get() {
-			synchronized(mSync) { return mState }
+			return mLock.withLock {
+				mState
+			}
 		}
-		/**
-		 * 録画サービスの状態をセット
-		 * 状態が変化したときにはコールバックを呼び出す
-		 * @param newState
-		 */
 		private set(newState) {
 			var changed: Boolean
-			synchronized(mSync) {
+			mLock.withLock {
 				changed = mState != newState
 				mState = newState
-//				mSync.notifyAll()
 			}
 			if (changed && !isDestroyed) {
 				try {
@@ -546,20 +539,17 @@ open class RecordingService() : BaseService() {
 	 * 終了可能であればService#stopSelfを呼び出す
 	 */
 	private fun checkStopSelf() {
-		if (DEBUG) Log.v(TAG, "checkStopSelf:")
-		synchronized(mSync) {
+		if (DEBUG) Log.v(TAG, "checkStopSelf:mIsBind=$mIsBind,isRunning=$isRunning")
+		lifecycleScope.launch {
 			if (!isDestroyed && canStopSelf(mIsBind or isRunning)) {
 				if (DEBUG) Log.v(TAG, "stopSelf")
 				state = STATE_RELEASING
 				try {
 					lifecycleScope.launch(Dispatchers.Default) {
+						if (DEBUG) Log.v(TAG, "checkStopSelf:releaseNotification")
 						releaseNotification(
 							NOTIFICATION,
-							getString(R.string.notification_service),
-							NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
-							getString(R.string.notification_service),
-							getString(R.string.app_name)
-						)
+							getString(R.string.notification_service))
 						stopSelf()
 					}
 				} catch (e: Exception) {
@@ -575,25 +565,22 @@ open class RecordingService() : BaseService() {
 	 * @return 終了可能であればtrue
 	 */
 	private fun canStopSelf(isRunning: Boolean): Boolean {
-		if (DEBUG) Log.v(
-			TAG, ("canStopSelf:isRunning=" + isRunning
-				+ ",isDestroyed=" + isDestroyed)
-		)
+		if (DEBUG) Log.v(TAG, ("canStopSelf:isRunning=$isRunning,isDestroyed=$isDestroyed"))
 		return !isRunning
 	}
 	//--------------------------------------------------------------------------------
 	/**
-	 * mSyncをロックして呼ばれる
+	 * 録画設定をリセット
 	 */
 	protected fun internalResetSettings() {
 		if (DEBUG) Log.v(TAG, "internalResetSettings:")
 		mFrameRate = -1
-		mHeight = mFrameRate
-		mWidth = mHeight
+		mHeight = -1
+		mWidth = -1
 		mBpp = -1.0f
 		mUseAudio = false
-		mUseVideo = mUseAudio
-		mIsEos = mUseVideo
+		mUseVideo = false
+		mIsEos = false
 	}
 
 	/**
@@ -607,10 +594,8 @@ open class RecordingService() : BaseService() {
 	 */
 	@Throws(IllegalStateException::class, IOException::class)
 	protected fun internalPrepare(
-		width: Int,
-		height: Int,
-		frameRate: Int,
-		bpp: Float
+		width: Int, height: Int,
+		frameRate: Int, bpp: Float
 	) {
 		if (DEBUG) Log.v(TAG, "internalPrepare:video")
 	}
@@ -655,14 +640,17 @@ open class RecordingService() : BaseService() {
 		if (DEBUG) Log.d(TAG, "createEncoder:video format:$format")
 
 		// 設定したフォーマットに従ってMediaCodecのエンコーダーを生成する
-		mVideoEncoder = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC)
-		mVideoEncoder!!.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
+		val videoEncoder = MediaCodec.createEncoderByType(MediaCodecUtils.MIME_VIDEO_AVC)
+		mVideoEncoder = videoEncoder
+		videoEncoder.configure(format, null, null, MediaCodec.CONFIGURE_FLAG_ENCODE)
 		// エンコーダーへの入力に使うSurfaceを取得する
-		mInputSurface = mVideoEncoder!!.createInputSurface() // API >= 18
-		mVideoEncoder!!.start()
+		mLock.withLock {
+			mInputSurface = videoEncoder.createInputSurface() // API >= 18
+		}
+		videoEncoder.start()
 		mVideoReaper = VideoReaper(
-			mVideoEncoder!!, mReaperListener, width, height
-		)
+			videoEncoder, mReaperListener,
+			width, height)
 		if (DEBUG) Log.v(TAG, "createEncoder:finished")
 	}
 
@@ -726,15 +714,15 @@ open class RecordingService() : BaseService() {
 		if (DEBUG) Log.v(TAG, "releaseEncoder:")
 		val videoReaper: VideoReaper?
 		val audioReaper: AudioReaper?
-		synchronized(mSync) {
+		mLock.withLock {
 			videoReaper = mVideoReaper
 			mVideoReaper = null
 			audioReaper = mAudioReaper
 			mAudioReaper = null
+			mInputSurface = null
 		}
 		videoReaper?.release()
 		mVideoEncoder = null
-		mInputSurface = null
 		audioReaper?.release()
 		mAudioEncoder = null
 		releaseOwnAudioSampler()
@@ -766,7 +754,7 @@ open class RecordingService() : BaseService() {
 				mAudioSampler!!.release()
 				mAudioSampler = null
 				mChannelCount = 0
-				mSampleRate = mChannelCount
+				mSampleRate = 0
 			}
 		}
 		mIsOwnAudioSampler = false
@@ -787,17 +775,16 @@ open class RecordingService() : BaseService() {
 		audioFormat: MediaFormat?
 	) {
 		if (DEBUG) Log.v(TAG, "internalStart:")
-		MediaMuxerWrapper.USE_MEDIASTORE_OUTPUT_STREAM = USE_MEDIASTORE_OUTPUT_STREAM
+		MediaMuxerWrapper.USE_MEDIASTORE_OUTPUT_STREAM = USE_MEDIASTORE_OUTPUT_STREAM && BuildCheck.isAndroid8()
 		val muxer: MediaMuxerWrapper =
 			MediaMuxerWrapper.newInstance(this, output, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 				?: throw IllegalArgumentException()
-		mMuxer = muxer
+		mLock.withLock {
+			mMuxer = muxer
+		}
 		mVideoTrackIx = if (videoFormat != null) muxer.addTrack(videoFormat) else -1
 		mAudioTrackIx = if (audioFormat != null) muxer.addTrack(audioFormat) else -1
-		mMuxer!!.start()
-//		synchronized(mSync) {
-//			mSync.notifyAll()
-//		}
+		muxer.start()
 	}
 
 	/**
@@ -805,8 +792,11 @@ open class RecordingService() : BaseService() {
 	 */
 	protected fun internalStop() {
 		if (DEBUG) Log.v(TAG, "internalStop:")
-		val muxer = mMuxer
-		mMuxer = null
+		val muxer = mLock.withLock {
+			val r = mMuxer
+			mMuxer = null
+			r
+		}
 		if (muxer != null) {
 			try {
 				if (DEBUG) Log.v(TAG, "internalStop:stop muxer,$muxer")
@@ -819,12 +809,16 @@ open class RecordingService() : BaseService() {
 			} else {
 				null
 			}
-			try {
-				if (DEBUG) Log.v(TAG, "internalStop:release muxer")
-				muxer.release()
-			} catch (e: Exception) {
-				Log.w(TAG, e)
+			lifecycleScope.launch(Dispatchers.Default) {
+				try {
+					if (DEBUG) Log.v(TAG, "internalStop:release muxer")
+					muxer.release()
+					if (DEBUG) Log.v(TAG, "internalStop:muxer released")
+				} catch (e: Exception) {
+					Log.w(TAG, e)
+				}
 			}
+			if (DEBUG) Log.v(TAG, "internalStop:outputPath=$outputPath")
 			if (!TextUtils.isEmpty(outputPath)) {
 				try {
 					val out = File(outputPath!!)
@@ -841,20 +835,25 @@ open class RecordingService() : BaseService() {
 								arrayOf("video/mp4")
 							) { path, uri ->
 								if (DEBUG) Log.v(TAG, "onScanCompleted:path=$path,uri=$uri")
-								this@RecordingService.onScanCompleted(null)
+								mScanFileTimeoutJob?.cancel()
+								onScanCompleted(null)
 							}
 						} catch (e: Exception) {
+							mScanFileTimeoutJob?.cancel()
 							onScanCompleted(e)
 						}
 					}
 				} catch (e: Exception) {
+					mScanFileTimeoutJob?.cancel()
 					onScanCompleted(e)
 				}
 			}
 		}
+		if (DEBUG) Log.v(TAG, "internalStop:state=$state")
 		if (state == STATE_RECORDING) {
 			state = STATE_INITIALIZED
 		}
+		checkStopSelf()
 	}
 
 	/**
@@ -864,7 +863,7 @@ open class RecordingService() : BaseService() {
 	private var mScanFileTimeoutJob: Job? = null
 
 	private fun onScanCompleted(t: Throwable?) {
-		mScanFileTimeoutJob?.cancel()
+		if (DEBUG) Log.v(TAG, "onScanCompleted:$t")
 		if (t != null) {
 			Log.w(TAG, t)
 		}
@@ -897,48 +896,41 @@ open class RecordingService() : BaseService() {
 	 */
 	protected fun onWriteSampleData(
 		reaper: MediaReaper,
-		buffer: ByteBuffer,
-		info: MediaCodec.BufferInfo,
-		ptsUs: Long
-	) {
+		buffer: ByteBuffer, info: MediaCodec.BufferInfo,
+		ptsUs: Long) {
 //		if (DEBUG) Log.v(TAG, "onWriteSampleData:");
-		var muxer: IMuxer?
-		synchronized(mSync) {
-			if (mMuxer == null) {
-				var i: Int = 0
-				while (isRecording && (i < 100)) {
-					if (mMuxer == null) {
-						ThreadUtils.NoThrowSleep(10)
-					} else {
-						break
-					}
-					i++
-				}
+		var muxer = mLock.withLock {
+			mMuxer
+		}
+		var i = 0
+		while (isRecording && (i < 100) && (muxer == null)) {
+			ThreadUtils.NoThrowSleep(10L)
+			muxer = mLock.withLock {
+				mMuxer
 			}
-			muxer = mMuxer
+			i++
 		}
 		if (muxer != null) {
 			when (reaper.reaperType()) {
-				MediaReaper.REAPER_VIDEO -> muxer!!.writeSampleData(mVideoTrackIx, buffer, info)
-				MediaReaper.REAPER_AUDIO -> muxer!!.writeSampleData(mAudioTrackIx, buffer, info)
+				MediaReaper.REAPER_VIDEO -> muxer.writeSampleData(mVideoTrackIx, buffer, info)
+				MediaReaper.REAPER_AUDIO -> muxer.writeSampleData(mAudioTrackIx, buffer, info)
 				else -> if (DEBUG) Log.v(TAG, "onWriteSampleData:unexpected reaper type")
 			}
 		} else if (isRecording && !isDestroyed) {
-			if (DEBUG) Log.v(TAG, ("onWriteSampleData:muxer is not set yet, " +
-					"state=" + state + ",reaperType=" + reaper.reaperType())
-			)
+			if (DEBUG) Log.v(TAG, ("onWriteSampleData:muxer is not set yet,state=$state,reaperType=${reaper.reaperType()}"))
 		}
 	}
 
 	protected fun onError(t: Throwable?) {
 		Log.w(TAG, t)
+		stop()
 	}
 
 	//--------------------------------------------------------------------------------
 	/**
 	 * MediaReaperからのコールバックリスナーの実装
 	 */
-	private val mReaperListener: ReaperListener = object : ReaperListener {
+	private val mReaperListener = object : ReaperListener {
 		override fun writeSampleData(
 			reaper: MediaReaper,
 			byteBuf: ByteBuffer, bufferInfo: MediaCodec.BufferInfo
@@ -972,7 +964,9 @@ open class RecordingService() : BaseService() {
 
 		override fun onStop(reaper: MediaReaper) {
 			if (DEBUG) Log.v(TAG, "onStop:")
-			synchronized(mSync) { releaseEncoder() }
+			mLock.withLock {
+				releaseEncoder()
+			}
 		}
 
 		override fun onError(reaper: MediaReaper, t: Throwable) {
@@ -984,7 +978,7 @@ open class RecordingService() : BaseService() {
 	/**
 	 * AudioSampleからのコールバックリスナー
 	 */
-	private val mSoundSamplerCallback: SoundSamplerCallback = object : SoundSamplerCallback {
+	private val mSoundSamplerCallback = object : SoundSamplerCallback {
 		override fun onData(buffer: ByteBuffer, presentationTimeUs: Long) {
 			encodeAudio(buffer, presentationTimeUs)
 		}
@@ -1006,12 +1000,12 @@ open class RecordingService() : BaseService() {
 	) {
 		val reaper: AudioReaper?
 		val encoder: MediaCodec?
-		synchronized(mSync) {
-			// 既に終了しているか終了指示が出てれば何もしない
+		mLock.withLock {
 			reaper = mAudioReaper
 			encoder = mAudioEncoder
 		}
 		if (!isRecording || (reaper == null) || (encoder == null)) {
+			// 既に終了しているか終了指示が出てれば何もしない
 			if (DEBUG) Log.d(TAG, ("encodeAudio:isRunning=" + isRunning
 					+ ",reaper=" + reaper + ",encoder=" + encoder))
 			return

@@ -23,22 +23,30 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
-import android.os.Build
 import android.os.IBinder
 import android.util.Log
 import android.view.Surface
-import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
 import com.serenegiant.media.IAudioSampler
-import com.serenegiant.service.RecordingService
 import com.serenegiant.service.RecordingService.LocalBinder
 import com.serenegiant.service.RecordingService.StateChangeListener
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.utils.ThreadUtils
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.io.IOException
 import java.lang.ref.WeakReference
 import java.nio.ByteBuffer
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.concurrent.Volatile
+import kotlin.concurrent.withLock
 
 /**
  * RecordingServiceへアクセスをカプセル化するためのヘルパークラス
@@ -77,7 +85,12 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	//--------------------------------------------------------------------------------
 	private val mWeakContext: WeakReference<Context>
 	private val mCallback: Callback
-	protected val mServiceSync = Any()
+	/**
+	 * 録画サービスとの接続状態取得用のリスナーの実装
+	 */
+	private val mServiceConnection: ServiceConnection
+	protected val mServiceLock = ReentrantLock()
+	private val mScope = CoroutineScope(Job() + Dispatchers.Default +  CoroutineName("scope_$TAG"))
 
 	@Volatile
 	private var mReleased = false
@@ -89,19 +102,50 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		mWeakContext = WeakReference(context)
 		mCallback = callback
+		mServiceConnection = object : ServiceConnection {
+			override fun onServiceConnected(name: ComponentName, service: IBinder) {
+				if (DEBUG) Log.v(TAG, "onServiceConnected:name=$name")
+				mServiceLock.withLock {
+					if (mState == STATE_BINDING) {
+						mState = STATE_BIND
+					}
+					mService = (service as LocalBinder).service
+					mService?.addListener(mStateChangeListener)
+				}
+				mScope.launch {
+					mCallback.onConnected()
+				}
+			}
+
+			override fun onServiceDisconnected(name: ComponentName) {
+				if (DEBUG) Log.v(TAG, "onServiceDisconnected:name=$name")
+				if (mScope.isActive) {
+					mScope.launch {
+						mCallback.onDisconnected()
+					}
+				}
+				mServiceLock.withLock {
+					mState = STATE_UNINITIALIZED
+					mService?.removeListener(mStateChangeListener)
+					mService = null
+				}
+			}
+		}
 		val serviceIntent = createServiceIntent(context)
 		if (BuildCheck.isOreo()) {
 			context.startForegroundService(serviceIntent)
 		} else {
 			context.startService(serviceIntent)
 		}
-		doBindService()
+		mScope.launch {
+			doBindService()
+		}
 	}
 
 	/**
 	 * 関係するリソースを破棄する
 	 */
-	fun release() {
+	suspend fun release() {
 		if (!mReleased) {
 			mReleased = true
 			if (DEBUG) Log.v(TAG, "release:")
@@ -109,19 +153,22 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 		}
 	}
 
+	/**
+	 * サービスとバインドして使用可能になっているかどうかを取得
+	 * @return
+	 */
 	val isReady: Boolean
-		/**
-		 * サービスとバインドして使用可能になっているかどうかを取得
-		 * @return
-		 */
 		get() {
-			synchronized(mServiceSync) { return !mReleased && mService != null }
+			mServiceLock.withLock {
+				return !mReleased && mService != null
+			}
 		}
+
+	/**
+	 * 録画中かどうかを取得
+	 * @return
+	 */
 	val isRecording: Boolean
-		/**
-		 * 録画中かどうかを取得
-		 * @return
-		 */
 		get() {
 			val service = peekService()
 			return !mReleased && service != null && service.isRecording
@@ -136,13 +183,13 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @throws IllegalStateException
 	 */
 	@Throws(IllegalStateException::class)
-	fun setVideoSettings(
+	suspend fun setVideoSettings(
 		width: Int, height: Int,
 		frameRate: Int, bpp: Float
 	) {
 		if (DEBUG) Log.v(TAG, "setVideoSettings:")
 		checkReleased()
-		val service = service
+		val service = getService()
 		service?.setVideoSettings(width, height, frameRate, bpp)
 	}
 
@@ -152,10 +199,10 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @param sampler
 	 */
 	@Throws(IllegalStateException::class)
-	fun setAudioSampler(sampler: IAudioSampler) {
+	suspend fun setAudioSampler(sampler: IAudioSampler) {
 		if (DEBUG) Log.v(TAG, "setAudioSampler:")
 		checkReleased()
-		val service = service
+		val service = getService()
 		service?.setAudioSampler(sampler)
 	}
 
@@ -167,10 +214,10 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @throws IllegalStateException
 	 */
 	@Throws(IllegalStateException::class)
-	fun setAudioSettings(sampleRate: Int, channelCount: Int) {
+	suspend fun setAudioSettings(sampleRate: Int, channelCount: Int) {
 		if (DEBUG) Log.v(TAG, "setAudioSettings:")
 		checkReleased()
-		val service = service
+		val service = getService()
 		service?.setAudioSettings(sampleRate, channelCount)
 	}
 
@@ -180,9 +227,9 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @throws IOException
 	 */
 	@Throws(IllegalStateException::class, IOException::class)
-	fun prepare() {
+	suspend fun prepare() {
 		if (DEBUG) Log.v(TAG, "prepare:")
-		val service = service
+		val service = getService()
 		service?.prepare()
 	}
 
@@ -193,10 +240,10 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @throws IOException
 	 */
 	@Throws(IllegalStateException::class, IOException::class)
-	fun start(output: DocumentFile) {
+	suspend fun start(output: DocumentFile) {
 		if (DEBUG) Log.v(TAG, "start:output=" + output + ",uri=" + output.uri)
 		checkReleased()
-		val service = service
+		val service = getService()
 		if (service != null) {
 			service.start(output)
 		} else {
@@ -207,32 +254,33 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	/**
 	 * 録画終了
 	 */
-	fun stop() {
+	suspend fun stop() {
 		if (DEBUG) Log.v(TAG, "stop:")
-		val service = service
+		val service = getService()
 		service?.stop()
 	}
 
-	val inputSurface: Surface?
-		/**
-		 * 録画用の映像を入力するためのSurfaceを取得
-		 * @return
-		 */
-		get() {
-			if (DEBUG) Log.v(TAG, "getInputSurface:")
-			checkReleased()
-			val service = service
-			return service?.inputSurface
-		}
+	/**
+	 * 録画用の映像を入力するためのSurfaceを取得
+	 * @return
+	 */
+	suspend fun getInputSurface(): Surface? {
+		if (DEBUG) Log.v(TAG, "getInputSurface:")
+		checkReleased()
+		val service = getService()
+		return service?.inputSurface
+	}
 
 	/**
 	 * 録画用の映像フレームが準備できた時に録画サービスへ通知するためのメソッド
 	 */
 	fun frameAvailableSoon() {
 //		if (DEBUG) Log.v(TAG, "frameAvailableSoon:");
-		val service = service
-		if (!mReleased && service != null) {
-			service.frameAvailableSoon()
+		mScope.launch {
+			val service = getService()
+			if (!mReleased && service != null) {
+				service.frameAvailableSoon()
+			}
 		}
 	}
 
@@ -247,15 +295,17 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 		buffer: ByteBuffer,
 		presentationTimeUs: Long
 	) {
-
 //		if (DEBUG) Log.v(TAG, "writeAudioFrame:");
 		checkReleased()
-		val service = service
-		service?.writeAudioFrame(buffer, presentationTimeUs)
+		mScope.launch {
+			val service = getService()
+			service?.writeAudioFrame(buffer, presentationTimeUs)
+		}
 	}
 
 	//--------------------------------------------------------------------------------
 	private fun createServiceIntent(context: Context): Intent {
+		if (DEBUG) Log.v(TAG, "createServiceIntent:")
 		return Intent(RecordingService::class.java.name)
 			.setPackage(context.packageName)
 	}
@@ -263,10 +313,12 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	/**
 	 * #releaseの実態
 	 */
-	private fun internalRelease() {
+	private suspend fun internalRelease() {
+		if (DEBUG) Log.v(TAG, "internalRelease:")
 		mCallback.onDisconnected()
 		stop()
 		doUnBindService()
+		mScope.cancel()
 	}
 
 	/**
@@ -281,56 +333,30 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	}
 
 	/**
-	 * 録画サービスとの接続状態取得用のリスナーの実装
-	 */
-	private val mServiceConnection: ServiceConnection = object : ServiceConnection {
-		override fun onServiceConnected(name: ComponentName, service: IBinder) {
-			if (DEBUG) Log.v(TAG, "onServiceConnected:name=$name")
-			synchronized(mServiceSync) {
-				if (mState == STATE_BINDING) {
-					mState = STATE_BIND
-				}
-				mService = (service as LocalBinder).service
-//				mServiceSync.notifyAll()
-				mService!!.addListener(mStateChangeListener)
-			}
-			mCallback.onConnected()
-		}
-
-		override fun onServiceDisconnected(name: ComponentName) {
-			if (DEBUG) Log.v(TAG, "onServiceDisconnected:name=$name")
-			mCallback.onDisconnected()
-			synchronized(mServiceSync) {
-				if (mService != null) {
-					mService!!.removeListener(mStateChangeListener)
-				}
-				mState = STATE_UNINITIALIZED
-				mService = null
-//				mServiceSync.notifyAll()
-			}
-		}
-	}
-
-	/**
 	 * Bind client to camera connection service
 	 */
 	private fun doBindService() {
 		if (DEBUG) Log.v(TAG, "doBindService:")
 		val context = mWeakContext.get()
 		if (context != null) {
-			synchronized(mServiceSync) {
+			val needBind = mServiceLock.withLock {
 				if (mState == STATE_UNINITIALIZED && mService == null) {
 					mState = STATE_BINDING
-					val intent = createServiceIntent(context)
-					if (DEBUG) Log.v(TAG, "call Context#bindService")
-					val result = context.bindService(
-						intent,
-						mServiceConnection, Context.BIND_AUTO_CREATE
-					)
-					if (!result) {
-						mState = STATE_UNINITIALIZED
-						Log.w(TAG, "failed to bindService")
-					}
+					true
+				} else {
+					false
+				}
+			}
+			if (needBind) {
+				val intent = createServiceIntent(context)
+				if (DEBUG) Log.v(TAG, "call Context#bindService,connection=$mServiceConnection")
+				val result = context.bindService(
+					intent,
+					mServiceConnection, Context.BIND_AUTO_CREATE
+				)
+				if (!result) {
+					mState = STATE_UNINITIALIZED
+					Log.w(TAG, "failed to bindService")
 				}
 			}
 		}
@@ -340,14 +366,15 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * Unbind from camera service
 	 */
 	private fun doUnBindService() {
-		val needUnbind: Boolean
-		synchronized(mServiceSync) {
-			needUnbind = mService != null
+		val needUnbind = mServiceLock.withLock {
+			val b = mService != null
 			mService = null
 			if (mState == STATE_BIND) {
 				mState = STATE_UNBINDING
 			}
+			b
 		}
+		if (DEBUG) Log.v(TAG, "doUnBindService:needUnbind=$needUnbind")
 		if (needUnbind) {
 			if (DEBUG) Log.v(TAG, "doUnBindService:")
 			val context = mWeakContext.get()
@@ -364,23 +391,23 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 *
 	 * @return
 	 */
-	private val service: RecordingService?
-		get() {
+	private suspend fun getService(): RecordingService? {
 //		if (DEBUG) Log.v(TAG, "getService:");
-			var result: RecordingService? = null
-			synchronized(mServiceSync) {
+		var result: RecordingService? = null
+		while (!mReleased && (result == null)) {
+			delay(100)
+			result = mServiceLock.withLock {
 				if (mState == STATE_BINDING || mState == STATE_BIND) {
-					if (mService == null) {
-						while (!mReleased && (mService == null)) {
-							ThreadUtils.NoThrowSleep(100)
-						}
-					}
-					result = mService
+					mService
+				} else {
+					if (DEBUG) Log.v(TAG, "getService:state is not BIND/BINDING,$mState")
+					null
 				}
 			}
-			//		if (DEBUG) Log.v(TAG, "getService:finished:" + result);
-			return result
 		}
+		if (DEBUG && (result == null)) Log.v(TAG, "getService:finished with null");
+		return result
+	}
 
 	/**
 	 * 接続中の録画サービスを取得する。
@@ -389,7 +416,9 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 	 * @return
 	 */
 	private fun peekService(): RecordingService? {
-		synchronized(mServiceSync) { return mService }
+		return mServiceLock.withLock {
+			mService
+		}
 	}
 
 	/**

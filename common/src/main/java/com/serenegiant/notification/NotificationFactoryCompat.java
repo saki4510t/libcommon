@@ -64,7 +64,7 @@ public class NotificationFactoryCompat {
 	protected final int smallIconId;	// API21未満ではVectorDrawableを指定してはだめ
 	@DrawableRes
 	protected final int largeIconId;
-
+	protected final int foregroundServiceType;
 	/**
 	 * コンストラクタ
 	 * @param channelId
@@ -74,11 +74,12 @@ public class NotificationFactoryCompat {
 	public NotificationFactoryCompat(
 		@NonNull final Context context,
 		@NonNull final String channelId, @Nullable final String channelTitle,
-		@DrawableRes final int smallIconId) {
+		@DrawableRes final int smallIconId, final int foregroundServiceType) {
 
 		this(context, channelId, channelId,
 			NotificationManagerCompat.IMPORTANCE_NONE,
-			null, null, smallIconId, R.drawable.ic_notification);
+			null, null, smallIconId, R.drawable.ic_notification,
+			foregroundServiceType);
 	}
 
 	/**
@@ -91,11 +92,13 @@ public class NotificationFactoryCompat {
 	public NotificationFactoryCompat(
 		@NonNull final Context context,
 		@NonNull final String channelId, @Nullable final String channelTitle,
-		@DrawableRes final int smallIconId, @DrawableRes final int largeIconId) {
+		@DrawableRes final int smallIconId, @DrawableRes final int largeIconId,
+		final int foregroundServiceType) {
 
 		this(context, channelId, channelId,
 			NotificationManagerCompat.IMPORTANCE_NONE,
-			null, null, smallIconId, largeIconId);
+			null, null, smallIconId, largeIconId,
+			foregroundServiceType);
 	}
 
 	/**
@@ -114,7 +117,8 @@ public class NotificationFactoryCompat {
 		@Nullable final String channelTitle,
 		final int importance,
 		@Nullable final String groupId, @Nullable final String groupName,
-		@DrawableRes final int smallIconId, @DrawableRes final int largeIconId)
+		@DrawableRes final int smallIconId, @DrawableRes final int largeIconId,
+		final int foregroundServiceType)
 			throws IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
@@ -126,6 +130,7 @@ public class NotificationFactoryCompat {
 		this.groupName = TextUtils.isEmpty(groupName) ? groupId : groupName;
 		this.smallIconId = smallIconId;
 		this.largeIconId = largeIconId;
+		this.foregroundServiceType = foregroundServiceType;
 		if (!BuildCheck.isAPI21()) {
 			// API21未満だとVectorDrawableをsmall iconに割り当てれないのでチェックを追加
 			// Builder#setSmallIconをする前にチェックしてAPI21未満&vector drawableの時には
@@ -153,6 +158,10 @@ public class NotificationFactoryCompat {
 	 */
 	public boolean isForegroundService() {
 		return true;
+	}
+
+	public int getForegroundServiceType() {
+		return foregroundServiceType;
 	}
 
 	/**

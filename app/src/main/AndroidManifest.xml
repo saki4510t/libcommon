@@ -19,10 +19,13 @@
 	<uses-permission android:name="android.permission.RECORD_AUDIO"/>
 	<uses-permission android:name="android.permission.CAMERA"/>
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 
 	<!-- Android 9 以降でフォアグラウンドサービスを実行するため -->
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+	<!-- Android 14以降でフォアグラウンドサービスを実行するため -->
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
+	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
 
 	<!-- 位置情報・BluetoothやWiFiのスキャンを利用できるようにするため -->
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
@@ -48,7 +51,8 @@
 		<service
 			android:name="com.serenegiant.service.RecordingService"
 			android:exported="false"
-			android:enabled="true" >
+			android:enabled="true"
+			android:foregroundServiceType="camera">
 			<intent-filter>
 				<action android:name="com.serenegiant.service.RecordingService" />
 			</intent-filter>
@@ -57,7 +61,8 @@
 		<service
 			android:name="com.serenegiant.service.ScreenRecorderService"
 			android:exported="false"
-			android:enabled="true" >
+			android:enabled="true"
+			android:foregroundServiceType="mediaProjection">
 			<intent-filter>
 				<action android:name="com.serenegiant.service.ScreenRecorderService" />
 			</intent-filter>

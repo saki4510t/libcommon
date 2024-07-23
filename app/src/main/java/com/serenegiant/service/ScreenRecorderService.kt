@@ -28,6 +28,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.ServiceInfo
 import android.media.projection.MediaProjection
 import android.media.projection.MediaProjectionManager
 import android.os.Build
@@ -174,9 +175,19 @@ class ScreenRecorderService : BaseService() {
 	 * start screen recording as .mp4 file
 	 * @param intent
 	 */
+	@SuppressLint("InlinedApi")
 	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 	private fun startScreenRecord(intent: Intent) {
 		if (DEBUG) Log.v(TAG, "startScreenRecord:$mRecorder")
+		showNotification(
+			NOTIFICATION,
+			getString(R.string.notification_service),
+			NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
+			getString(R.string.notification_service),
+			getString(R.string.app_name),
+			ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PROJECTION,
+			contextIntent()
+		)
 		synchronized(mSync) {
 			if (mRecorder == null) {
 				// get MediaProjection
@@ -240,14 +251,6 @@ class ScreenRecorderService : BaseService() {
 						} else {
 							throw IOException("could not access storage")
 						}
-						showNotification(
-							NOTIFICATION,
-							getString(R.string.notification_service),
-							NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
-							getString(R.string.notification_service),
-							getString(R.string.app_name),
-							contextIntent()
-						)
 					} catch (e: IOException) {
 						Log.w(TAG, e)
 					}
