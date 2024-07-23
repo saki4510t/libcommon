@@ -40,7 +40,6 @@ import androidx.documentfile.provider.DocumentFile;
  * Rawファイル形式でエンコードデータをファイルに書き出すためのIMuxer実装
  * 実際のファイルへの出力はMediaRawFilerWriterで行う。
  * 実際のmp4ファイルへの出力は別途PostMuxBuilderで行う。
- *
  * 映像エンコード処理と音声エンコード処理とmux処理を同時に実行すると
  * 映像and/or音声が正常に記録されない端末がいくつかあるので、
  * 一度一時ファイルへ書き出しておいてエンコード終了後にmux処理を
