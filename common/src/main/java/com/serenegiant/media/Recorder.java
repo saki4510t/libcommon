@@ -496,7 +496,7 @@ public abstract class Recorder implements IRecorder {
 		}
 	}
 
-	protected void callOnError(final Exception e) {
+	protected void callOnError(@NonNull final Exception e) {
 //		if (DEBUG) Log.v(TAG, "callOnError:");
 		if (!mReleased && (mCallback != null)) {
 			try {

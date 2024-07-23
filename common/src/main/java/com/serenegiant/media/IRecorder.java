@@ -34,10 +34,10 @@ import android.view.Surface;
 public interface IRecorder {
 
 	public interface RecorderCallback {
-		public void onPrepared(IRecorder recorder);
-		public void onStarted(IRecorder recorder);
-		public void onStopped(IRecorder recorder);
-		public void onError(Exception e);
+		public void onPrepared(@NonNull final IRecorder recorder);
+		public void onStarted(@NonNull final IRecorder recorder);
+		public void onStopped(@NonNull final IRecorder recorder);
+		public void onError(@NonNull Exception e);
 	}
 
 	/**

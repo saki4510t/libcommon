@@ -111,6 +111,7 @@ public abstract class BaseService extends LifecycleService {
 	 * create IntentFilter to receive local broadcast
 	 * @return null if you don't want to receive local broadcast
 	 */
+	@Nullable
 	protected abstract IntentFilter createIntentFilter();
 
 	/** BroadcastReceiver to receive local broadcast */
