@@ -20,22 +20,6 @@
 */
 -->
 <resources>
-	<!--
-		プログレスの進行方向, direction属性はdeprecated
-		背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
-		デフォルトのbottom_to_topにしてandroid:rotationで回転させる
-	-->
-	<attr name="direction" default="bottom_to_top" >
-		<!-- 左から右へ -->
-		<enum name="left_to_right" value="0" />
-		<!-- 見日から左へ -->
-		<enum name="right_to_left" value="180" />
-		<!-- 下から上へ -->
-		<enum name="bottom_to_top" value="90" />
-		<!-- 上から下へ -->
-		<enum name="top_to_bottom" value="270" />
-	</attr>
-
 	<attr name="drawableCompat" format="reference" />
 	<attr name="backgroundCompat" format="reference" />
 	<attr name="backgroundTintCompat" format="color" />
@@ -49,12 +33,6 @@
 		<attr name="drawableCompat" />
 		<!-- プログレス表示用の色、android:drawableが指定されている場合はtint色として使う -->
 		<attr name="android:color" />
-		<!--
-			プログレスの進行方向, direction属性はdeprecated
-			背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
-			デフォルトのbottom_to_topにしてandroid:rotationで回転させる
-		-->
-		<attr name="direction" />
 		<attr name="android:min" />
 		<attr name="android:max" />
 		<attr name="android:progress" />

@@ -36,10 +36,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
-import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.content.ContextCompat;
@@ -59,32 +56,8 @@ public class ProgressView extends View implements IProgressView {
 		}
 	}
 
-	/*
-	 * XXX	背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
-	 * 		#setDirectionを使わずに(デフォルトのDIRECTION_BOTTOM_TO_TOP)にして
-	 * 		android:rotationで回転させること
-	 */
-	@Deprecated
-	public static final int DIRECTION_LEFT_TO_RIGHT = 0;
-	@Deprecated
-	public static final int DIRECTION_RIGHT_TO_LEFT = 180;
-	public static final int DIRECTION_BOTTOM_TO_TOP = 90;
-	@Deprecated
-	public static final int DIRECTION_TOP_TO_BOTTOM = 270;
-
-	@SuppressWarnings("deprecation")
-	@IntDef({
-		DIRECTION_LEFT_TO_RIGHT,
-		DIRECTION_RIGHT_TO_LEFT,
-		DIRECTION_BOTTOM_TO_TOP,
-		DIRECTION_TOP_TO_BOTTOM})
-	@Retention(RetentionPolicy.SOURCE)
-	public @interface Direction {}
-
 	private final Object mSync = new Object();
 
-	@Direction
-	private int mDirectionDegrees = DIRECTION_BOTTOM_TO_TOP;
 	/**
 	 * progressの最小・最大値
 	 * それぞれの値でサチュレーション計算する
@@ -160,7 +133,6 @@ public class ProgressView extends View implements IProgressView {
 			setBackground(bk);
 		}
 		mProgressColor = a.getColor(R.styleable.ProgressView_android_color, mProgressColor);
-		mDirectionDegrees = checkDirection(a.getInt(R.styleable.ProgressView_direction, mDirectionDegrees));
 		mMin = a.getInt(R.styleable.ProgressView_android_min, mMin);
 		mMax = a.getInt(R.styleable.ProgressView_android_min, mMax);
 		if (mMin == mMax) {
@@ -176,7 +148,7 @@ public class ProgressView extends View implements IProgressView {
 	}
 
 	@Override
-	protected void onDraw(final Canvas canvas) {
+	protected void onDraw(@NonNull final Canvas canvas) {
 		super.onDraw(canvas);
 		if (mClipDrawable != null) {
 			mClipDrawable.draw(canvas);
@@ -250,29 +222,6 @@ public class ProgressView extends View implements IProgressView {
 	};
 
 	/**
-	 * プログレスの進行方向を指定
-	 * @param directionDegrees 0:
-	 * @deprecated 背景・プログレスにDrawableを適用したときの回転処理が面倒でうまく実装できていないので
-	 * 		#setDirectionを使わずに(デフォルトのDIRECTION_BOTTOM_TO_TOP)にしてandroid:rotationで回転させること
-	 */
-	@Deprecated
-	public void setDirection(@Direction int directionDegrees) {
-		directionDegrees = checkDirection(((directionDegrees / 90) * 90) % 360);
-		if (mDirectionDegrees != directionDegrees) {
-			mDirectionDegrees = directionDegrees;
-			resize();
-		}
-	}
-
-	/**
-	 * プログレスの進行方向を取得
-	 * @return
-	 */
-	public int getDirection() {
-		return mDirectionDegrees;
-	}
-
-	/**
 	 * progress表示用の色を指定する。
 	 * #setDrawableと#setColorは後から呼び出した方が優先される。
 	 * @param color
@@ -314,7 +263,6 @@ public class ProgressView extends View implements IProgressView {
 	 * Progress表示用のDrawableを設定
 	 * @param drawable
 	 */
-	@SuppressWarnings("deprecation")
 	@SuppressLint({"RtlHardcoded"})
 	protected void refreshDrawable(@Nullable final Drawable drawable) {
 		final int level;
@@ -338,31 +286,10 @@ public class ProgressView extends View implements IProgressView {
 			DrawableCompat.setTint(mDrawable, mProgressColor);
 			DrawableCompat.setTintMode(mDrawable, PorterDuff.Mode.SRC_IN);
 		}
-		int gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.LEFT;
-		int orientation = ClipDrawable.HORIZONTAL;
-		switch (mDirectionDegrees) {
-		case DIRECTION_LEFT_TO_RIGHT:		// 右をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_RIGHT,rotation=" + mDirectionDegrees + ",level=" + level);
-			break;
-		case DIRECTION_BOTTOM_TO_TOP:	// 上をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP,rotation=" + mDirectionDegrees + ",level=" + level);
-			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
-			orientation = ClipDrawable.VERTICAL;
-			break;
-		case DIRECTION_RIGHT_TO_LEFT:	// 左をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_LEFT,rotation=" + mDirectionDegrees + ",level=" + level);
-			gravity = Gravity.FILL_VERTICAL | CLIP_HORIZONTAL | Gravity.RIGHT;
-			orientation = ClipDrawable.HORIZONTAL;
-			break;
-		case DIRECTION_TOP_TO_BOTTOM:	// 下をクリップ
-			if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_BOTTOM,rotation=" + mDirectionDegrees + ",level=" + level);
-			gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.TOP;
-			orientation = ClipDrawable.VERTICAL;
-			break;
-		default:
-			if (DEBUG) Log.v(TAG, "refreshDrawable:unexpected,rotation=" + mDirectionDegrees + ",level=" + level);
-			break;
-		}
+		// 上をクリップ
+		if (DEBUG) Log.v(TAG, "refreshDrawable:CLIP_TOP,level=" + level);
+		int gravity = Gravity.FILL_HORIZONTAL | CLIP_VERTICAL | Gravity.BOTTOM;
+		int orientation = ClipDrawable.VERTICAL;
 		// プログレス表示用のClipDrawableを生成
 		mClipDrawable = new ClipDrawable(mDrawable, gravity, orientation);
 		final Rect outRect = new Rect();
