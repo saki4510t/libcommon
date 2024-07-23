@@ -20,7 +20,6 @@ package com.serenegiant.glutils;
 
 import android.graphics.SurfaceTexture;
 import androidx.annotation.IntDef;
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -30,14 +29,12 @@ import android.view.Surface;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.math.Fraction;
 
-import java.io.FileNotFoundException;
-import java.io.OutputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 /**
  * 分配描画インターフェース
- * FIXME GLPipeline/IPipelienSourceを使うIRendererHolder実装を作る
+ * FIXME GLPipeline/IPipelineSourceを使うIRendererHolder実装を作る
  */
 public interface IRendererHolder extends IMirror {
 	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;
@@ -190,51 +187,6 @@ public interface IRendererHolder extends IMirror {
 	 * @return
 	 */
 	public int getCount();
-
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param path
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@Deprecated
-	public void captureStill(@NonNull final String path,
-		@Nullable final OnCapturedListener listener)
-			throws FileNotFoundException, IllegalStateException;
-
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param path
-	 * @param captureCompression JPEGの圧縮率, pngの時は無視
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@Deprecated
-	public void captureStill(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L) final int captureCompression,
-		@Nullable final OnCapturedListener listener)
-			throws FileNotFoundException, IllegalStateException;
-
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param out
-	 * @param stillCaptureFormat
-	 * @param captureCompression
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@Deprecated
-	public void captureStill(@NonNull final OutputStream out,
-		@StillCaptureFormat final int stillCaptureFormat,
-		@IntRange(from = 1L,to = 99L) final int captureCompression,
-		@Nullable final OnCapturedListener listener)
-			throws IllegalStateException;
 
 	/**
 	 * レンダリングスレッド上で指定したタスクを実行する

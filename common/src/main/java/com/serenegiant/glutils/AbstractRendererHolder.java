@@ -44,9 +44,6 @@ import com.serenegiant.gl.ISurface;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
-import java.io.BufferedOutputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -312,82 +309,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	@Override
 	public int getCount() {
 		return mRendererTask.getCount();
-	}
-
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param path
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	@Override
-	public void captureStill(@NonNull final String path,
-		@Nullable final OnCapturedListener listener)
-			throws FileNotFoundException, IllegalStateException {
-
-		if (DEBUG) Log.v(TAG, "captureStill:" + path);
-
-		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), DEFAULT_CAPTURE_COMPRESSION, listener);
-	}
-	
-	/**
-	 * 静止画を撮影する
-	 * 撮影完了を待機する
-	 * @param path
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	@Override
-	public void captureStill(@NonNull final String path,
-		@IntRange(from = 1L,to = 99L)final int captureCompression,
-		@Nullable final OnCapturedListener listener)
-			throws FileNotFoundException, IllegalStateException {
-
-		if (DEBUG) Log.v(TAG, "captureStill:" + path
-			+ ",captureCompression=" + captureCompression);
-		captureStill(new BufferedOutputStream(new FileOutputStream(path)),
-			getCaptureFormat(path), captureCompression, listener);
-	}
-
-	/**
-	 * 実際の静止画撮影要求メソッド
-	 * @param out
-	 * @param captureFormat
-	 * @param captureCompression
-	 * @param listener
-	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
-	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
-	 *     静止画キャプチャ機能は削除する予定
-	 */
-	@Deprecated
-	@Override
-	public void captureStill(@NonNull final OutputStream out,
-		@StillCaptureFormat final int captureFormat,
-		@IntRange(from = 1L,to = 99L) final int captureCompression,
-		@Nullable final OnCapturedListener listener) throws IllegalStateException {
-
-		synchronized (mSync) {
-			if (!isRunning) {
-				throw new IllegalStateException("already released?");
-			}
-			if (mCaptureStream != null) {
-				throw new IllegalStateException("already run still capturing now");
-			}
-			mCaptureStream = out;
-			mCaptureFormat = captureFormat;
-			mCaptureCompression = captureCompression;
-			mOnCapturedListener = listener;
-			mSync.notifyAll();
-		}
-		if (DEBUG) Log.v(TAG, "captureStill:終了");
 	}
 
 	/**
