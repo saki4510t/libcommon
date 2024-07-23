@@ -30,15 +30,8 @@ import androidx.annotation.NonNull;
  */
 public abstract class AbstractAudioEncoder extends AbstractEncoder
 	implements IAudioEncoder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
-//	private static final String TAG = "AbstractAudioEncoder";
-
-	@Deprecated
-	public static final int DEFAULT_SAMPLE_RATE = 44100;	// 44.1[KHz]	8-48[kHz] 全機種で保証されているのは44100だけ
-	@Deprecated
-    public static final int SAMPLES_PER_FRAME = 1024;		// AAC, bytes/frame/channel
-	@Deprecated
-	public static final int FRAMES_PER_BUFFER = 25; 		// AAC, frame/buffer/sec
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
+	private static final String TAG = AbstractAudioEncoder.class.getSimpleName();
 
     protected int mAudioSource;
     protected int mChannelCount;
