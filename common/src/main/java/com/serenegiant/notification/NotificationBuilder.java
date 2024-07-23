@@ -244,24 +244,19 @@ public abstract class NotificationBuilder extends NotificationCompat.Builder {
 		if (mChannelBuilder.getImportance() == NotificationManagerCompat.IMPORTANCE_NONE) {
 			// importanceが設定されていないときでmPriorityがセットされていればそれに従う
 			switch (mPriority) {
-			case NotificationCompat.PRIORITY_MIN:
+			case NotificationCompat.PRIORITY_MIN ->
 				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_MIN);
-				break;
-			case NotificationCompat.PRIORITY_LOW:
+			case NotificationCompat.PRIORITY_LOW ->
 				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_LOW);
-				break;
-			case NotificationCompat.PRIORITY_DEFAULT:
+			case NotificationCompat.PRIORITY_DEFAULT ->
 				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_DEFAULT);
-				break;
-			case NotificationCompat.PRIORITY_HIGH:
+			case NotificationCompat.PRIORITY_HIGH ->
 				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_HIGH);
-				break;
-			case NotificationCompat.PRIORITY_MAX:
+			case NotificationCompat.PRIORITY_MAX ->
 				mChannelBuilder.setImportance(NotificationManagerCompat.IMPORTANCE_MAX);
-				break;
-			default:
+			default -> {
 				// ChannelBuilder側の設定に従う==IMPORTANCE_DEFAULT
-				break;
+			}
 			}
 		}
 		mChannelBuilder.build();
