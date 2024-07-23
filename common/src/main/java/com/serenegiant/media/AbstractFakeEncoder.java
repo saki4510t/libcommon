@@ -19,10 +19,8 @@ package com.serenegiant.media;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import android.util.Log;
@@ -39,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 /**
  * すでにエンコード済みのデータを受け取ってMediaCodecでエンコードしたように扱えるようにするためのヘルパークラス
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
 public abstract class AbstractFakeEncoder implements Encoder {
 
 //	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
@@ -123,54 +120,6 @@ public abstract class AbstractFakeEncoder implements Encoder {
 	
 	private Thread mDrainThread;
 	
-	/**
-	 * コンストラクタ
-	 * フレームデータのデフォルトサイズはDEFAULT_FRAME_SZ=1024バイト
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener) {
-		
-		this(mimeType, recorder, EncoderListener2.wrap(listener),
-			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-	
-	/**
-	 * コンストラクタ
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 * @param frameSz
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener, final int frameSz) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener),
-			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-	
-	/**
-	 * コンストラクタ
- 	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 * @param frameSz デフォルトで確保するフレームデータのサイズ
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AbstractFakeEncoder(final String mimeType, @NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener, final int frameSz,
-		final int maxPoolSz, final int maxQueueSz) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener), frameSz, maxPoolSz, maxQueueSz);
-	}
-
 	/**
 	 * コンストラクタ
  	 * @param mimeType
