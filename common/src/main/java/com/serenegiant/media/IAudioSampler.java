@@ -46,26 +46,6 @@ public abstract class IAudioSampler {
 		 * 遅延して呼び出される可能性がある。任意のスレッド上で実行される。
 		 * 可能な限り早く処理を終えること。
 		 * @param buffer
-		 * @param size
-		 * @param presentationTimeUs
-		 * @deprecated サイズ指定のない#onDataを使うこと
-		 */
-		@Deprecated
-		public default void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
-			if (size > 0) {
-				buffer.clear();
-				buffer.position(size);
-				buffer.flip();
-			}
-			onData(buffer, presentationTimeUs);
-		}
-
-		/**
-		 * 音声データが準備出来た時に呼び出される。
-		 * presentationTimeUsは音声データを取得した時の時刻だが、他のコールバックでの処理によっては
-		 * 遅延して呼び出される可能性がある。任意のスレッド上で実行される。
-		 * 可能な限り早く処理を終えること。
-		 * @param buffer
 		 * @param presentationTimeUs
 		 */
 		public void onData(@NonNull final ByteBuffer buffer, final long presentationTimeUs);
