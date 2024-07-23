@@ -344,15 +344,6 @@ public class NetworkUtils {
 
 	/**
 	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
-	 * @param intf
-	 */
-	@Deprecated
-	public static void dump(@Nullable final NetworkInterface intf) {
-		dump(TAG, null, intf);
-	}
-
-	/**
-	 * 指定したNetworkInterfaceの情報をlogCatへ出力する
 	 * @param tag
 	 * @param intf
 	 */
@@ -376,27 +367,16 @@ public class NetworkUtils {
 			Log.i(_tag, _prefix + "  name=" + intf.getName());
 			Log.i(_tag, _prefix + "  displayName=" + intf.getDisplayName());
 			Log.i(_tag, _prefix + "  interfaceAddresses=" + intf.getInterfaceAddresses());
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				Log.i(_tag, _prefix + "  index=" + intf.getIndex());
-				try {
-					Log.i(_tag, _prefix + "  mtu=" + intf.getMTU());
-				} catch (final SocketException e) {
-					// ignore
-				}
+			Log.i(_tag, _prefix + "  index=" + intf.getIndex());
+			try {
+				Log.i(_tag, _prefix + "  mtu=" + intf.getMTU());
+			} catch (final SocketException e) {
+				// ignore
 			}
 			for (final InetAddress addr: Collections.list(intf.getInetAddresses())) {
 				dump(_tag, _prefix, addr);
 			}
 		}
-	}
-
-	/**
-	 * 指定したネットワークアドレスの値をlogCatへ出力する
-	 * @param addr
-	 */
-	@Deprecated
-	public static void dump(@Nullable final InetAddress addr) {
-		dump(TAG, null, addr);
 	}
 
 	/**
@@ -443,8 +423,7 @@ public class NetworkUtils {
 			Log.i(_tag, _prefix + "  isMulticast=" + addr.isMulticastAddress());
 			if (addr instanceof Inet4Address) {
 				Log.i(_tag, _prefix + "  isIpv4=true");
-			} else if (addr instanceof Inet6Address) {
-				final Inet6Address _addr = (Inet6Address)addr;
+			} else if (addr instanceof final Inet6Address _addr) {
 				Log.i(_tag, _prefix + "  isIpv6=true");
 				Log.i(_tag, _prefix + "  isIPv4CompatibleAddress=" + _addr.isIPv4CompatibleAddress());
 			}
@@ -464,15 +443,6 @@ public class NetworkUtils {
 				e.printStackTrace();
 			}
 		}
-	}
-
-	/**
-	 * RouteInfo#toStringだと全部の情報が出力されないのでRouteInfoの内容をlogCateへ出力するためのヘルパーメソッド
-	 * @param info
-	 */
-	@Deprecated
-	public static void dump(@NonNull final RouteInfo info) {
-		dump(TAG, null, info);
 	}
 
 	/**
@@ -506,15 +476,6 @@ public class NetworkUtils {
 		if (BuildCheck.isAPI33()) {
 			Log.i(_tag, _prefix + "  type=" + info.getType());
 		}
-	}
-
-	/**
-	 * LinkPropertiesの内容をlogCatへ出力するためのヘルパーメソッド
-	 * @param properties
-	 */
-	@Deprecated
-	public static void dump(@Nullable final LinkProperties properties) {
-		dump(TAG, null, properties);
 	}
 
 	/**
@@ -597,8 +558,7 @@ public class NetworkUtils {
 			sb.append("isMulticast=").append(addr.isMulticastAddress()).append(",");
 			if (addr instanceof Inet4Address) {
 				sb.append("isIpv4=true").append(",");
-			} else if (addr instanceof Inet6Address) {
-				final Inet6Address _addr = (Inet6Address)addr;
+			} else if (addr instanceof final Inet6Address _addr) {
 				sb.append("isIpv6=true").append(",");
 				sb.append("isIPv4CompatibleAddress=").append(_addr.isIPv4CompatibleAddress()).append(",");
 			}
