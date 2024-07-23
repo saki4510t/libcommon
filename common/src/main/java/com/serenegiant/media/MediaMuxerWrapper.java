@@ -18,7 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaCodec.BufferInfo;
 import android.media.MediaFormat;
@@ -46,7 +45,6 @@ import androidx.documentfile.provider.DocumentFile;
 /**
  * MediaMuxerをIMuxerインターフェースでラップ
  */
-@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 public class MediaMuxerWrapper implements IMuxer {
 	private static final String TAG = MediaMuxerWrapper.class.getSimpleName();
 
@@ -172,12 +170,6 @@ public class MediaMuxerWrapper implements IMuxer {
 		} finally {
 			super.finalize();
 		}
-	}
-
-	@Deprecated
-	@Nullable
-	public String getOutputPath() {
-		return mOutputPath;
 	}
 
 	@Override
