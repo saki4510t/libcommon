@@ -471,88 +471,6 @@ public final class BitmapHelper {
 	}
 
 //--------------------------------------------------------------------------------
-// XXX InputStreamを使う場合 資料のためにコメントとして残す
-
-//	/**
-//	 * ファイルからビットマップを読み込んでBitmapとして返す
-//	 * @param in
-//	 * @return
-//	 * @deprecated BitmapFactory.decodeStreamを使う
-//	 */
-//	@Deprecated
-//	@Nullable
-//	public static Bitmap asBitmap(final InputStream in) {
-//		Bitmap bitmap = null;
-//		if (in != null) {
-//			bitmap = BitmapFactory.decodeStream(in);
-//		}
-//		return bitmap;
-//	}
-
-//	/**
-//	 * ファイルからビットマップを読み込んで指定した幅・高さに最も近い大きさのBitmapとして返す
-//	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
-//	 * @param in
-//	 * @param requestWidth
-//	 * @param requestHeight
-//	 * @return
-//	 */
-//	@Deprecated
-//	@Nullable
-//	public static Bitmap asBitmap(final InputStream in, final int requestWidth, final int requestHeight) {
-////		Bitmap bitmap = null;
-////		if (in != null) {
-////			final BitmapFactory.Options options = new BitmapFactory.Options();
-////			final Rect outPadding = new Rect();
-////			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-////			BitmapFactory.decodeStream(in, outPadding, options);
-////			options.inJustDecodeBounds = false;
-////			options.inSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-////			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
-////		}
-////		return bitmap;
-//		throw new UnsupportedOperationException("This never work well and made unsupported");
-//	}
-
-//	/**
-//	 * ファイルからビットマップデータを読み込んで指定した幅・高さのBitmapとして返す
-//	 // FIXME これはうまくいかない, リサイズするにはinから2回読み込まないといけない
-//	 * @param in
-//	 * @param requestWidth
-//	 * @param requestHeight
-//	 * @return
-//	 */
-//	@Deprecated
-//	@Nullable
-//	public static Bitmap asBitmapStrictSize(final InputStream in, final int requestWidth, final int requestHeight) {
-////		Bitmap bitmap = null;
-////		if (in != null) {
-////			final BitmapFactory.Options options = new BitmapFactory.Options();
-////			final Rect outPadding = new Rect();
-////			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
-////			BitmapFactory.decodeStream(in, outPadding, options);
-////			// 一番近いサイズになるSamplingSizeを計算
-////			final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
-////			// 2のベキ乗に丸める=MSBを取得
-////			final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
-////			options.inSampleSize = inSampleSize;
-//////			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
-////			options.inJustDecodeBounds = false;
-////			bitmap = BitmapFactory.decodeStream(in, outPadding, options);
-////			if ((inSampleSize != calcedSampleSize)
-////				|| (bitmap.getWidth() != requestWidth)
-////				|| (bitmap.getHeight() != requestHeight)) {
-////
-////				final Bitmap newBitmap = scaleBitmap(bitmap, requestWidth, requestHeight);
-////				bitmap.recycle();
-////				bitmap = newBitmap;
-////			}
-////		}
-////		return bitmap;
-//		throw new UnsupportedOperationException("This never work well and made unsupported");
-//	}
-
-//--------------------------------------------------------------------------------
 	/**
 	 * DrawableをBitmapへ変換する
 	 * @param drawable
@@ -876,17 +794,10 @@ public final class BitmapHelper {
 		} else {
 			final Matrix m = new Matrix();
 			switch (_mirror) {
-			case IMirror.MIRROR_HORIZONTAL:
-				m.preScale(-1, 1);
-				break;
-			case IMirror.MIRROR_VERTICAL:
-				m.preScale(1, -1);
-				break;
-			case IMirror.MIRROR_BOTH:
-				m.preScale(-1, -1);
-				break;
-			default:
-				break;
+			case IMirror.MIRROR_HORIZONTAL -> m.preScale(-1, 1);
+			case IMirror.MIRROR_VERTICAL -> m.preScale(1, -1);
+			case IMirror.MIRROR_BOTH -> m.preScale(-1, -1);
+			default -> {}
 			}
 			return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
 		}
@@ -1089,22 +1000,12 @@ public final class BitmapHelper {
 		final int rotation = exif.getAttributeInt(
 			ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_UNDEFINED);
 
-		int result;
-		switch (rotation) {
-		case ExifInterface.ORIENTATION_ROTATE_90:
-			result = 90;
-			break;
-		case ExifInterface.ORIENTATION_ROTATE_180:
-			result = 180;
-			break;
-		case ExifInterface.ORIENTATION_ROTATE_270:
-			result = 270;
-			break;
-		case ExifInterface.ORIENTATION_UNDEFINED:
-		default:
-			result = 0;
-			break;
-		}
+		int result = switch (rotation) {
+			case ExifInterface.ORIENTATION_ROTATE_90 -> 90;
+			case ExifInterface.ORIENTATION_ROTATE_180 -> 180;
+			case ExifInterface.ORIENTATION_ROTATE_270 -> 270;
+			default -> 0;
+		};
 		if (DEBUG) Log.v(TAG, "getOrientation:" + result);
 		return result;
 	}
@@ -1184,19 +1085,13 @@ public final class BitmapHelper {
 	 * @return
 	 */
 	public static int getPixelBytes(@NonNull final Bitmap.Config config) {
-		switch (config) {
-		case ALPHA_8:
-			return 1;
-		case RGB_565:
-		case ARGB_4444:
-			return 2;
-		case ARGB_8888:
-			return 4;
-		case RGBA_F16:
-			return 8;
-		default:
-			throw new IllegalArgumentException("Unexpected config type" + config);
-		}
+		return switch (config) {
+			case ALPHA_8 -> 1;
+			case RGB_565, ARGB_4444 -> 2;
+			case ARGB_8888 -> 4;
+			case RGBA_F16 -> 8;
+			default -> throw new IllegalArgumentException("Unexpected config type" + config);
+		};
 	}
 
 //--------------------------------------------------------------------------------
