@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.media.MediaMuxer;
 import android.util.Log;
 
 import java.io.BufferedInputStream;
@@ -40,7 +39,6 @@ import androidx.documentfile.provider.DocumentFile;
 /**
  * rawファイルに書き出したエンコード済みの録画・音声データから
  * mp4ファイルを生成するためのヘルパークラス
- *
  * 映像エンコード処理と音声エンコード処理とmux処理を同時に実行すると
  * 映像and/or音声が正常に記録されない端末がいくつかあるので、
  * 一度一時ファイルへ書き出しておいてエンコード終了後にmux処理を
@@ -79,51 +77,7 @@ class PostMuxBuilder extends PostMuxCommon {
 	public void cancel() {
 		mIsRunning = false;
 	}
-	
-	/**
-	 * 一時ファイルからmp4ファイルを生成する。
-	 * 終了まで返らないのでUIスレッドでは呼び出さないこと
-	 * @param tempDirPath
-	 * @param outputPath
-	 * @throws IOException
-	 */
-	@Deprecated
-	public void buildFromRawFile(@NonNull final Context context,
-		@NonNull final String tempDirPath,
-		@NonNull final String outputPath) throws IOException {
 
-		if (DEBUG) Log.v(TAG, "buildFromRawFile:");
-		final File tempDir = new File(tempDirPath);
-		final File videoFile = new File(tempDir, VIDEO_NAME);
-		final File audioFile = new File(tempDir, AUDIO_NAME);
-		final File output = new File(outputPath);
-		final boolean hasVideo = videoFile.exists() && videoFile.canRead();
-		final boolean hasAudio = audioFile.exists() && audioFile.canRead();
-		if (hasVideo || hasAudio) {
-			@SuppressLint("InlinedApi")
-			final IMuxer muxer = new MediaMuxerWrapper(outputPath,
-				MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			if (muxer != null) {
-				mIsRunning = true;
-				try {
-					final DataInputStream videoIn = hasVideo
-						? new DataInputStream(
-							new BufferedInputStream(new FileInputStream(videoFile)))
-						: null;
-					final DataInputStream audioIn = hasAudio
-						? new DataInputStream(
-							new BufferedInputStream(new FileInputStream(audioFile)))
-						: null;
-					internalBuild(muxer, videoIn, audioIn);
-				} finally {
-					mIsRunning = false;
-					muxer.release();
-				}
-			} // if (muxer != null)
-		}
-		if (DEBUG) Log.v(TAG, "buildFromRawFile:finished");
-	}
-	
 	@SuppressLint("NewApi")
 	public void buildFromRawFile(@NonNull final Context context,
 		@NonNull final String tempDirPath,
@@ -139,8 +93,6 @@ class PostMuxBuilder extends PostMuxCommon {
 			IMuxer muxer = mMuxerFactory.createMuxer(context, mUseMediaMuxer, output);
 			if (muxer == null) {
 				throw new IOException("Failed to create muxer");
-//				muxer = mMuxerFactory.createMuxer(mUseMediaMuxer,
-//					context.getContentResolver().openFileDescriptor(output.getUri(), "rw").getFd());
 			}
 			if (muxer != null) {
 				try {
@@ -273,48 +225,6 @@ class PostMuxBuilder extends PostMuxCommon {
 		}
 	}
 
-	/**
-	 * 一時ファイルからmp4ファイルを生成する。
-	 * 終了まで返らないのでUIスレッドでは呼び出さないこと
-	 * @param tempDirPath
-	 * @param outputPath
-	 * @throws IOException
-	 */
-	@Deprecated
-	public void buildFromRawChannel(@NonNull final Context context,
-		@NonNull final String tempDirPath,
-		@NonNull final String outputPath) throws IOException {
-
-		if (DEBUG) Log.v(TAG, "buildFromRawFile:");
-		final File tempDir = new File(tempDirPath);
-		final File videoFile = new File(tempDir, VIDEO_NAME);
-		final File audioFile = new File(tempDir, AUDIO_NAME);
-		final File output = new File(outputPath);
-		final boolean hasVideo = videoFile.exists() && videoFile.canRead();
-		final boolean hasAudio = audioFile.exists() && audioFile.canRead();
-		if (hasVideo || hasAudio) {
-			@SuppressLint("InlinedApi")
-			final IMuxer muxer = new MediaMuxerWrapper(outputPath,
-				MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			if (muxer != null) {
-				mIsRunning = true;
-				try {
-					final ByteChannel videoIn = hasVideo
-						? new FileInputStream(videoFile).getChannel()
-						: null;
-					final ByteChannel audioIn = hasAudio
-						? new FileInputStream(audioFile).getChannel()
-						: null;
-					internalBuild(muxer, videoIn, audioIn);
-				} finally {
-					mIsRunning = false;
-					muxer.release();
-				}
-			} // if (muxer != null)
-		}
-		if (DEBUG) Log.v(TAG, "buildFromRawFile:finished");
-	}
-	
 	@SuppressLint("NewApi")
 	public void buildFromRawChannel(@NonNull final Context context,
 		@NonNull final String tempDirPath,
@@ -330,8 +240,6 @@ class PostMuxBuilder extends PostMuxCommon {
 			IMuxer muxer = mMuxerFactory.createMuxer(context, mUseMediaMuxer, output);
 			if (muxer == null) {
 				throw new IOException("Failed to create muxer");
-//				muxer = mMuxerFactory.createMuxer(mUseMediaMuxer,
-//					context.getContentResolver().openFileDescriptor(output.getUri(), "rw").getFd());
 			}
 			if (muxer != null) {
 				try {
