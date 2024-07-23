@@ -43,27 +43,6 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param isGLES3
-	 * @param width
-	 * @param height
-	 */
-	@SuppressLint("NewApi")
-	@Deprecated
-	public static GLSurface newInstance(final boolean isGLES3,
-		final int width, final int height) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, false, DEFAULT_ADJUST_POWER2);
-		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, false, DEFAULT_ADJUST_POWER2);
-		}
-	}
-
-	/**
-	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * @param isGLES3
 	 * @param tex_unit
 	 * @param width
@@ -82,29 +61,6 @@ public abstract class GLSurface implements IGLSurface {
 			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
-		}
-	}
-
-	/**
-	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param isGLES3
-	 * @param width dimension of offscreen(width)
-	 * @param height dimension of offscreen(height)
-	 * @param use_depth_buffer set true if you use depth buffer. the depth is fixed as 16bits
-	 */
-	@SuppressLint("NewApi")
-	@Deprecated
-	public static GLSurface newInstance(final boolean isGLES3,
-		final int width, final int height,
-		final boolean use_depth_buffer) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
-		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
 
@@ -129,30 +85,6 @@ public abstract class GLSurface implements IGLSurface {
 			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
 				width, height,
 				use_depth_buffer, DEFAULT_ADJUST_POWER2);
-		}
-	}
-
-	/**
-	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
-	 * テクスチャユニットはGL_TEXTURE0
-	 * @param isGLES3
-	 * @param width
-	 * @param height
-	 * @param use_depth_buffer
-	 * @param adjust_power2
-	 */
-	@SuppressLint("NewApi")
-	@Deprecated
-	public static GLSurface newInstance(final boolean isGLES3,
-		final int width, final int height,
-		final boolean use_depth_buffer, final boolean adjust_power2) {
-
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, GLES30.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, adjust_power2);
-		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, adjust_power2);
 		}
 	}
 
