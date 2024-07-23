@@ -145,13 +145,6 @@ public class MediaAVTimelapseRecorder extends Recorder {
 		super.addEncoder(encoder);
 	}
 
-	@Deprecated
-	@Nullable
-	@Override
-	public String getOutputPath() {
-		return mOutputPath;
-	}
-
 	@Nullable
 	@Override
 	public DocumentFile getOutputFile() {

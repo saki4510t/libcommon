@@ -383,13 +383,6 @@ public class MediaAVRecorder extends Recorder {
 	}
 
 //--------------------------------------------------------------------------------
-	@Deprecated
-	@Nullable
-	@Override
-	public String getOutputPath() {
-		return mOutputPath;
-	}
-
 	@Nullable
 	@Override
 	public DocumentFile getOutputFile() {

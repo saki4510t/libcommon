@@ -88,13 +88,6 @@ public class MediaAVSplitRecorderV2 extends Recorder {
 		return false;
 	}
 
-	@Deprecated
-	@Nullable
-	@Override
-	public String getOutputPath() {
-		throw new UnsupportedOperationException("");
-	}
-
 	@Nullable
 	@Override
 	public DocumentFile getOutputFile() {

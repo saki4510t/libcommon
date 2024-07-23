@@ -137,10 +137,6 @@ public interface IRecorder {
 
 	public IMuxer getMuxer();
 
-	@Deprecated
-	@Nullable
-	public String getOutputPath();
-	
 	@Nullable
 	public DocumentFile getOutputFile();
 
