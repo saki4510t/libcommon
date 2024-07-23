@@ -19,7 +19,6 @@ package com.serenegiant.mediastore;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.ContentValues;
@@ -164,7 +163,6 @@ public class MediaStoreUtils {
 	 * @param dataPath
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static DocumentFile getContentDocument(
 		@NonNull final Context context,
 		@Nullable final String mimeType,
@@ -361,60 +359,22 @@ public class MediaStoreUtils {
 //--------------------------------------------------------------------------------
 	@Nullable
 	public static Uri getUri(final int mediaType, final long id) {
-		switch (mediaType) {
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
-			return ContentUris.withAppendedId(
-				MediaStore.Files.getContentUri("external"), id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-			return ContentUris.withAppendedId(
-				MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-			return ContentUris.withAppendedId(
-				MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-			return ContentUris.withAppendedId(
-				MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
-		default:
-			return null;
-		}
+		return switch (mediaType) {
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE ->
+				ContentUris.withAppendedId(
+					MediaStore.Files.getContentUri("external"), id);
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE ->
+				ContentUris.withAppendedId(
+					MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO ->
+				ContentUris.withAppendedId(
+					MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, id);
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO ->
+				ContentUris.withAppendedId(
+					MediaStore.Video.Media.EXTERNAL_CONTENT_URI, id);
+			default -> null;
+		};
 
 	}
 
-//--------------------------------------------------------------------------------
-	/**
-	 * 静止画をMediaStoreへ登録
-	 * @param context
-	 * @param mime "image/jpeg"等
-	 * @param path 絶対パス
-	 */
-	@Deprecated
-	public static Uri registerImage(@NonNull final Context context,
-		@NonNull final String mime, @NonNull final String path) {
-
-		if (DEBUG) Log.v(TAG, "registerImage:" + path);
-		final ContentValues cv = new ContentValues();
-		cv.put(MediaStore.Images.Media.MIME_TYPE, mime);
-		cv.put(MediaStore.MediaColumns.DATA, path);
-		return context.getContentResolver().insert(
-			MediaStore.Images.Media.EXTERNAL_CONTENT_URI, cv);
-	}
-
-	/**
-	 * 動画をMediaStoreへ登録
-	 * @param context
-	 * @param mime
-	 * @param path
-	 */
-	@Deprecated
-	public static Uri registerVideo(@NonNull final Context context,
-		@NonNull final String mime, @NonNull final String path) {
-
-		if (DEBUG) Log.v(TAG, "registerVideo:" + path);
-		final ContentValues cv = new ContentValues();
-		cv.put(MediaStore.Video.Media.MIME_TYPE, mime);
-		cv.put(MediaStore.MediaColumns.DATA, path);
-		return context.getContentResolver().insert(
-			MediaStore.Video.Media.EXTERNAL_CONTENT_URI, cv);
-	}
 }
