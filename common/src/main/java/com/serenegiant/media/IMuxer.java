@@ -27,7 +27,6 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaMuxer;
 import android.net.Uri;
-import android.os.ParcelFileDescriptor;
 
 import com.serenegiant.system.BuildCheck;
 
@@ -52,11 +51,9 @@ public interface IMuxer {
 	 * IMuxer生成処理を移譲するためのファクトリーインターフェース
 	 */
 	public interface IMuxerFactory {
-		@Deprecated
-		public IMuxer createMuxer(final boolean useMediaMuxer, final String outputPath) throws IOException;
-		@Deprecated
-		public IMuxer createMuxer(final boolean useMediaMuxer, final int fd) throws IOException;
-		public IMuxer createMuxer(@NonNull final Context context, final boolean useMediaMuxer,
+		public IMuxer createMuxer(
+			@NonNull final Context context,
+			final boolean useMediaMuxer,
 			@NonNull final DocumentFile file) throws IOException;
 	}
 
@@ -64,55 +61,15 @@ public interface IMuxer {
 	 * デフォルトのIMuxerFactory実装
 	 */
 	public static class DefaultFactory implements IMuxerFactory {
-		@SuppressLint("InlinedApi")
-		public IMuxer createMuxer(final boolean useMediaMuxer, final String outputPath) throws IOException {
-			IMuxer result;
-			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
-				result = new MediaMuxerWrapper(outputPath,
-					MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			} else {
-				throw new IOException("Unsupported muxer type");
-//				result = new VideoMuxer(output_oath);
-			}
-			return result;
-		}
-
-		@SuppressLint("NewApi")
-		public IMuxer createMuxer(final boolean useMediaMuxer, final int fd) throws IOException {
-			IMuxer result;
-			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
-				if (BuildCheck.isAPI29()) {
-					// API29以上は対象範囲別ストレージなのでMediaStoreOutputStreamを使いたいところだけど
-					// fdからMediaMuxerWrapperは生成できない
-					throw new UnsupportedOperationException("createMuxer from fd does not support on API29 and later devices");
-				} else if (BuildCheck.isAPI26()) {
-					final ParcelFileDescriptor pfd = ParcelFileDescriptor.fromFd(fd);
-					result = new MediaMuxerWrapper(pfd.getFileDescriptor(),
-						MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-				} else {
-					throw new UnsupportedOperationException("createMuxer from fd does not support on API<26");
-				}
-			} else {
-				throw new IOException("Unsupported muxer type");
-//				result = new VideoMuxer(fd);
-			}
-			return result;
-		}
-
 		@SuppressLint("NewApi")
 		public IMuxer createMuxer(@NonNull final Context context,
 			final boolean useMediaMuxer,
 			@NonNull final DocumentFile file) throws IOException {
 
 			final Uri uri = file.getUri();
-			IMuxer result = null;
-			if (useMediaMuxer && BuildCheck.isAPI18()) {	// MediaMuxerはAPI>=18
-				result = MediaMuxerWrapper.newInstance(context, file, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
-			}
+			IMuxer result = MediaMuxerWrapper.newInstance(context, file, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4);
 			if (result == null) {
 				throw new IOException("Unsupported muxer type");
-//				result = new VideoMuxer(context.getContentResolver()
-//					.openFileDescriptor(file.getUri(), "rw").getFd());
 			}
 			return result;
 		}
