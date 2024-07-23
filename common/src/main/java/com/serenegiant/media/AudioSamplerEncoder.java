@@ -52,22 +52,6 @@ public class AudioSamplerEncoder extends AbstractAudioEncoder {
 	 * @param listener
 	 * @param sampler
 	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AudioSamplerEncoder(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		@Nullable IAudioSampler sampler) {
-
-		this(recorder, EncoderListener2.wrap(listener), sampler);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param recorder
-	 * @param listener
-	 * @param sampler
-	 */
 	@SuppressLint("InlinedApi")
 	public AudioSamplerEncoder(
 		@NonNull final IRecorder recorder,
