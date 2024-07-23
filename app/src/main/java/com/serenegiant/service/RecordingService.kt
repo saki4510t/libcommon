@@ -789,11 +789,11 @@ open class RecordingService() : LifecycleService() {
 			} catch (e: Exception) {
 				Log.w(TAG, e)
 			}
-			val outputPath: String? = if (muxer is MediaMuxerWrapper) {
-				muxer.outputPath
-			} else {
-				null
-			}
+//			val outputPath: String? = if (muxer is MediaMuxerWrapper) {
+//				muxer.outputPath
+//			} else {
+//				null
+//			}
 			lifecycleScope.launch(Dispatchers.Default) {
 				try {
 					if (DEBUG) Log.v(TAG, "internalStop:release muxer")
@@ -803,36 +803,36 @@ open class RecordingService() : LifecycleService() {
 					Log.w(TAG, e)
 				}
 			}
-			if (DEBUG) Log.v(TAG, "internalStop:outputPath=$outputPath")
-			if (!TextUtils.isEmpty(outputPath)) {
-				try {
-					val out = File(outputPath!!)
-					if (out.exists() && out.canRead()) {
-						if (DEBUG) Log.v(TAG, "internalStop:scanFile $outputPath")
-						state = STATE_SCAN_FILE
-						mScanFileTimeoutJob = lifecycleScope.launch {
-							delay(5000L)
-							onScanCompleted(RuntimeException("scanFile timeout"))
-						}
-						try {
-							MediaScannerConnection.scanFile(this.applicationContext,
-								arrayOf(outputPath),
-								arrayOf("video/mp4")
-							) { path, uri ->
-								if (DEBUG) Log.v(TAG, "onScanCompleted:path=$path,uri=$uri")
-								mScanFileTimeoutJob?.cancel()
-								onScanCompleted(null)
-							}
-						} catch (e: Exception) {
-							mScanFileTimeoutJob?.cancel()
-							onScanCompleted(e)
-						}
-					}
-				} catch (e: Exception) {
-					mScanFileTimeoutJob?.cancel()
-					onScanCompleted(e)
-				}
-			}
+//			if (DEBUG) Log.v(TAG, "internalStop:outputPath=$outputPath")
+//			if (!TextUtils.isEmpty(outputPath)) {
+//				try {
+//					val out = File(outputPath!!)
+//					if (out.exists() && out.canRead()) {
+//						if (DEBUG) Log.v(TAG, "internalStop:scanFile $outputPath")
+//						state = STATE_SCAN_FILE
+//						mScanFileTimeoutJob = lifecycleScope.launch {
+//							delay(5000L)
+//							onScanCompleted(RuntimeException("scanFile timeout"))
+//						}
+//						try {
+//							MediaScannerConnection.scanFile(this.applicationContext,
+//								arrayOf(outputPath),
+//								arrayOf("video/mp4")
+//							) { path, uri ->
+//								if (DEBUG) Log.v(TAG, "onScanCompleted:path=$path,uri=$uri")
+//								mScanFileTimeoutJob?.cancel()
+//								onScanCompleted(null)
+//							}
+//						} catch (e: Exception) {
+//							mScanFileTimeoutJob?.cancel()
+//							onScanCompleted(e)
+//						}
+//					}
+//				} catch (e: Exception) {
+//					mScanFileTimeoutJob?.cancel()
+//					onScanCompleted(e)
+//				}
+//			}
 		}
 		if (DEBUG) Log.v(TAG, "internalStop:state=$state")
 		if (state == STATE_RECORDING) {
@@ -841,22 +841,22 @@ open class RecordingService() : LifecycleService() {
 		checkStopSelf()
 	}
 
-	/**
-	 * 何らかの理由でMediaScannerConnectionから#onScanCompletedが
-	 * 呼ばれなかったときにステートをリセットするためのRunnable
-	 */
-	private var mScanFileTimeoutJob: Job? = null
+//	/**
+//	 * 何らかの理由でMediaScannerConnectionから#onScanCompletedが
+//	 * 呼ばれなかったときにステートをリセットするためのRunnable
+//	 */
+//	private var mScanFileTimeoutJob: Job? = null
 
-	private fun onScanCompleted(t: Throwable?) {
-		if (DEBUG) Log.v(TAG, "onScanCompleted:$t")
-		if (t != null) {
-			Log.w(TAG, t)
-		}
-		if (state == STATE_SCAN_FILE) {
-			state = STATE_INITIALIZED
-		}
-		checkStopSelf()
-	}
+//	private fun onScanCompleted(t: Throwable?) {
+//		if (DEBUG) Log.v(TAG, "onScanCompleted:$t")
+//		if (t != null) {
+//			Log.w(TAG, t)
+//		}
+//		if (state == STATE_SCAN_FILE) {
+//			state = STATE_INITIALIZED
+//		}
+//		checkStopSelf()
+//	}
 
 	/**
 	 * 空き容量をチェック
