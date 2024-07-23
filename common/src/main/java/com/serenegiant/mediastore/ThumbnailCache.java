@@ -256,16 +256,6 @@ public class ThumbnailCache {
 	 * 指定したキーに対応するビットマップをキャッシュに追加する
 	 * @param key
 	 * @param bitmap
-	 */
-	@Deprecated
-	public void put(@NonNull final String key, @NonNull final Bitmap bitmap) {
-		put(key, bitmap, false);
-	}
-
-	/**
-	 * 指定したキーに対応するビットマップをキャッシュに追加する
-	 * @param key
-	 * @param bitmap
 	 * @param shouldOverride
 	 */
 	public void put(
