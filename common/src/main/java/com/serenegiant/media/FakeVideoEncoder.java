@@ -40,88 +40,6 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 	 * H.264/AVC用
 	 * @param recorder
 	 * @param listener
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public FakeVideoEncoder(final IRecorder recorder,
-		final EncoderListener listener) {
-		
-		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
-			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-	
-	/**
-	 * コンストラクタ
-	 * H.264/AVC用
-	 * @param recorder
-	 * @param listener
-	 * @param frameSz
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public FakeVideoEncoder(final IRecorder recorder,
-		final EncoderListener listener, final int frameSz) {
-		
-		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
-			frameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public FakeVideoEncoder(final String mimeType,
-		final IRecorder recorder, final EncoderListener listener) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener),
-			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 * @param defaultFrameSz
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public FakeVideoEncoder(final String mimeType,
-		final IRecorder recorder, final EncoderListener listener,
-		final int defaultFrameSz) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener),
-			defaultFrameSz, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param mimeType
-	 * @param recorder
-	 * @param listener
-	 * @param defaultFrameSz
-	 * @param maxPoolSz
-	 * @param maxQueueSz
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public FakeVideoEncoder(final String mimeType,
-		final IRecorder recorder, final EncoderListener listener,
-		final int defaultFrameSz, final int maxPoolSz, final int maxQueueSz) {
-
-		this(mimeType, recorder, EncoderListener2.wrap(listener),
-			defaultFrameSz, maxPoolSz, maxQueueSz);
-	}
-
-	/**
-	 * コンストラクタ
-	 * H.264/AVC用
-	 * @param recorder
-	 * @param listener
 	 * @param frameSz
 	 */
 	public FakeVideoEncoder(final IRecorder recorder,
@@ -144,7 +62,7 @@ public class FakeVideoEncoder extends AbstractFakeEncoder
 		final EncoderListener2 listener, final int frameSz,
 		final int maxPoolSz, final int maxQueueSz) {
 		
-		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, EncoderListener2.wrap(listener),
+		this(MediaCodecUtils.MIME_VIDEO_AVC, recorder, listener,
 			DEFAULT_FRAME_SZ, DEFAULT_MAX_POOL_SZ, DEFAULT_MAX_QUEUE_SZ);
 	}
 
