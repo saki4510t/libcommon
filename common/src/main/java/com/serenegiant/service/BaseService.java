@@ -19,8 +19,6 @@ package com.serenegiant.service;
 */
 
 import android.annotation.SuppressLint;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -31,17 +29,14 @@ import android.os.Looper;
 import androidx.annotation.DrawableRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ServiceCompat;
 import androidx.lifecycle.LifecycleService;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.common.R;
+import com.serenegiant.notification.NotificationCompat;
 import com.serenegiant.notification.NotificationFactoryCompat;
-import com.serenegiant.system.BuildCheck;
-import com.serenegiant.system.ContextUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 import com.serenegiant.utils.HandlerUtils;
 
@@ -153,16 +148,14 @@ public abstract class BaseService extends LifecycleService {
 	 * @param foregroundServiceType
 	 * @param intent
 	 */
+	@Deprecated
 	protected void showNotification(@DrawableRes final int smallIconId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final int foregroundServiceType,
 		final PendingIntent intent) {
 
-		showNotification(NOTIFICATION_ID,
-			getString(R.string.service_name),
-			null, null,
-			smallIconId, R.drawable.ic_notification,
-			title, content,
+		NotificationCompat.showNotification(this,
+			smallIconId, title, content,
 			foregroundServiceType, intent);
 	}
 
@@ -175,6 +168,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param foregroundServiceType
 	 * @param intent
 	 */
+	@Deprecated
 	protected void showNotification(final int notificationId,
 		@NonNull final String channelId,
 		@DrawableRes final int smallIconId,
@@ -182,8 +176,9 @@ public abstract class BaseService extends LifecycleService {
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		final int foregroundServiceType,
 		final PendingIntent intent) {
-		
-		showNotification(notificationId, channelId, null, null,
+
+		NotificationCompat.showNotification(this,
+			notificationId, channelId, null, null,
 			smallIconId, largeIconId,
 			title, content,
 			foregroundServiceType, intent);
@@ -203,6 +198,7 @@ public abstract class BaseService extends LifecycleService {
 	 * @param foregroundServiceType フォアグラウンドサービスとして動作させるかどうか
 	 * @param intent
 	 */
+	@Deprecated
 	protected void showNotification(final int notificationId,
 		@NonNull final String channelId,
 		@Nullable final String groupId, @Nullable final String groupName,
@@ -212,23 +208,11 @@ public abstract class BaseService extends LifecycleService {
 		final int foregroundServiceType,
 		final PendingIntent intent) {
 
-		showNotification(notificationId, title, content,
-			new NotificationFactoryCompat(this, channelId, channelId, 0,
-				groupId, groupName, smallIconId, largeIconId, foregroundServiceType) {
-
-				@Override
-				public boolean isForegroundService() {
-					if (DEBUG) Log.v(TAG, "showNotification:foregroundServiceType=" + foregroundServiceType);
-					return foregroundServiceType != 0;
-				}
-
-				@Nullable
-				@Override
-				protected PendingIntent createContentIntent() {
-					return intent;
-				}
-			}
-		);
+		NotificationCompat.showNotification(this,
+			notificationId, channelId,
+			groupId, groupName,
+			smallIconId, largeIconId,
+			title, content, foregroundServiceType, intent);
 	}
 	
 	/**
@@ -238,39 +222,36 @@ public abstract class BaseService extends LifecycleService {
 	 * @param content
 	 * @param factory
 	 */
+	@Deprecated
 	protected void showNotification(final int notificationId,
 		@NonNull final CharSequence title, @NonNull final CharSequence content,
 		@NonNull final NotificationFactoryCompat factory) {
 	
-		if (DEBUG) Log.v(TAG, "showNotification:");
-		final NotificationManager manager
-			= ContextUtils.requireSystemService(this, NotificationManager.class);
-		final Notification notification = factory.createNotification(content, title);
-		if (factory.isForegroundService()) {
-			ServiceCompat.startForeground(this, notificationId, notification, factory.getForegroundServiceType());
-		}
-		if (DEBUG) Log.v(TAG, "showNotification:notify");
-		manager.notify(notificationId, notification);
+		NotificationCompat.showNotification(this,
+			notificationId, title, content, factory);
 	}
 
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
+	@Deprecated
 	protected void releaseNotification() {
-		releaseNotification(NOTIFICATION_ID,
+		NotificationCompat.releaseNotification(
+			this,
+			NOTIFICATION_ID,
 			getString(R.string.service_name));
 	}
 	
 	/**
 	 * 通知領域を開放する。フォアグラウンドサービスとしての動作を終了する
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	protected void releaseNotification(final int notificationId,
 		@NonNull final String channelId) {
 
-		if (DEBUG) Log.v(TAG, "releaseNotification:");
-		stopForeground(true);
-		cancelNotification(notificationId, channelId);
+		NotificationCompat.releaseNotification(this,
+			notificationId, channelId);
 	}
 
 	/**
@@ -279,15 +260,13 @@ public abstract class BaseService extends LifecycleService {
 	 * @param channelId Android 8以降でnull以外なら対応するNotificationChannelを削除する.
 	 * 			nullまたはAndroid 8未満の場合は何もしない
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	protected void cancelNotification(final int notificationId,
 		@Nullable final String channelId) {
 
-		if (DEBUG) Log.v(TAG, "cancelNotification:");
-		final NotificationManager manager
-			= ContextUtils.requireSystemService(this, NotificationManager.class);
-		manager.cancel(notificationId);
-		releaseNotificationChannel(channelId);
+		NotificationCompat.cancelNotification(this,
+			notificationId, channelId);
 	}
 
 	/**
@@ -296,45 +275,31 @@ public abstract class BaseService extends LifecycleService {
 	 * Android 8以降のNotificationChannelを削除しない
 	 * @param notificationId
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	protected void cancelNotification(final int notificationId) {
 
-		cancelNotification(notificationId, null);
+		NotificationCompat.cancelNotification(this, notificationId, null);
 	}
 	
 	/**
 	 * 指定したNotificationChannelを破棄する
 	 * @param channelId
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	protected void releaseNotificationChannel(@Nullable final String channelId) {
-		if (DEBUG) Log.v(TAG, "releaseNotificationChannel:");
-		if (!TextUtils.isEmpty(channelId) && BuildCheck.isOreo()) {
-			final NotificationManager manager
-				= ContextUtils.requireSystemService(this, NotificationManager.class);
-			try {
-				manager.deleteNotificationChannel(channelId);
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
+		NotificationCompat.releaseNotificationChannel(this, channelId);
 	}
 	
 	/**
 	 * 指定したNotificationGroupを削除する
 	 * @param groupId
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	protected void releaseNotificationGroup(@NonNull final String groupId) {
-		if (!TextUtils.isEmpty(groupId) && BuildCheck.isOreo()) {
-			final NotificationManager manager
-				= ContextUtils.requireSystemService(this, NotificationManager.class);
-			try {
-				manager.deleteNotificationChannelGroup(groupId);
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		}
+		NotificationCompat.releaseNotificationGroup(this, groupId);
 	}
 
 	/**
