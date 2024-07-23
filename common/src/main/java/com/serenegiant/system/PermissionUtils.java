@@ -945,17 +945,6 @@ public class PermissionUtils {
 	}
 
 	/**
-	 * アプリの詳細設定へ遷移させる(パーミッションを取得できなかった時など)
-	 *
-	 * @param context
-	 * @deprecated SettingsUtils.openSettingsAppDetailsを使うこと
-	 */
-	@Deprecated
-	public static void openSettings(@NonNull final Context context) {
-		SettingsUtils.openSettingsAppDetails(context);
-	}
-
-	/**
 	 * AndroidManifest.xmlに設定されているはずのパーミッションをチェックする
 	 *
 	 * @param context
