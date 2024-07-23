@@ -50,23 +50,6 @@ public interface Encoder {
 	/**
 	 * バイト配列をエンコードする場合
 	 * @param buffer
-	 * @param length
-	 * @param presentationTimeUs
-	 * @deprecated lengthを指定せずにByteBuffer#remaningを使う#encodeを使用すること
-	 */
-	@Deprecated
-	public default void encode(final ByteBuffer buffer, final int length, final long presentationTimeUs) {
-		if ((buffer != null) && (length > 0)) {
-			buffer.clear();
-			buffer.position(length);
-			buffer.flip();
-		}
-		encode(buffer, presentationTimeUs);
-	}
-
-	/**
-	 * バイト配列をエンコードする場合
-	 * @param buffer
 	 * @param presentationTimeUs [マイクロ秒]
 	 */
 	public void encode(final ByteBuffer buffer, final long presentationTimeUs);
