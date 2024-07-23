@@ -14,11 +14,11 @@ tasks.register('clean', Delete) {
 }
 
 ext {
-	javaSourceCompatibility = JavaVersion.VERSION_1_8
-	javaTargetCompatibility = JavaVersion.VERSION_1_8
+	javaSourceCompatibility = JavaVersion.VERSION_17
+	javaTargetCompatibility = JavaVersion.VERSION_17
 
-	versionCompiler = 33
-	versionTarget = 28
+	versionCompiler = 34
+	versionTarget = 34
 
 	// variable that can be referenced to keep support libs consistent
 	jUnitVersion = '4.13.2'
@@ -30,22 +30,22 @@ ext {
 
 	androidXAppCompat = '1.6.1'
 	androidXLegacyV4 = '1.0.0'
-	androidXExif = '1.3.6'
-	androidXLifecycle = '2.6.2'
+	androidXExif = '1.3.7'
+	androidXLifecycle = '2.8.3'
 	androidXMultiDex = '2.0.1'
-	androidXMaterial = '1.9.0'
+	androidXMaterial = '1.12.0'
 	androidXRecyclerview = '1.3.2'
 	androidXPreference = '1.2.1'
 	androidXConstraint = '2.1.4'
 	androidXLeanback = '1.0.0'
-	androidXDataBinding = '8.1.4'
+	androidXDataBinding = '8.5.1'
 
-	androidXCoreKtx = '1.10.1'
-	androidXLifecycleKtx = '2.6.2'
+	androidXCoreKtx = '1.13.1'
+	androidXLifecycleKtx = '2.8.3'
 	androidXFragmentKtx = '1.5.7'
 
-	kotlinStdLibVersion = '1.8.10'
-	kotlinCoroutinesVersion = '1.6.4'
+	kotlinStdLibVersion = '1.9.24'
+	kotlinCoroutinesVersion = '1.8.1'
 
     versionCodeNum = 437
     versionNameString = '8.21.0'

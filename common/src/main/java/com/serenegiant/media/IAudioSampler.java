@@ -50,6 +50,7 @@ public abstract class IAudioSampler {
 		 * @param presentationTimeUs
 		 * @deprecated サイズ指定のない#onDataを使うこと
 		 */
+		@Deprecated
 		public default void onData(@NonNull final ByteBuffer buffer, final int size, final long presentationTimeUs) {
 			if (size > 0) {
 				buffer.clear();
