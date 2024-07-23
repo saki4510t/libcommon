@@ -47,17 +47,6 @@ public class AudioEncoderBuffered extends AbstractAudioEncoder {
 	@NonNull
 	private final MemMediaQueue mAudioQueue;
 
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public AudioEncoderBuffered(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		final int audioSource, final int audioChannels) {
-
-		this(recorder, EncoderListener2.wrap(listener),
-			audioSource, audioChannels);
-	}
-
 	public AudioEncoderBuffered(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener2 listener,
