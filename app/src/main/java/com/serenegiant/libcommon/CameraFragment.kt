@@ -63,6 +63,7 @@ class CameraFragment : AbstractCameraFragment() {
 		if (DEBUG) Log.v(TAG, "internalStopRecording:mRecorder=$mRecorder")
 		val recorder = mRecorder
 		mRecorder = null
+		recorder?.stop()
 		recorder?.release()
 	}
 
