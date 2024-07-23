@@ -23,8 +23,7 @@ import android.view.Surface;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-@SuppressWarnings("deprecation")
-public interface EncoderListener2 extends EncoderListener {
+public interface EncoderListener2 {
 	/**
 	 * エンコード開始
 	 * @param encoder
@@ -48,38 +47,4 @@ public interface EncoderListener2 extends EncoderListener {
 	 */
 	public void onError(@NonNull final Throwable e);
 
-	/**
-	 * すでにEncoderListener2であればそのまま返す
-	 * EncoderListenerであればEncoderListener2にラップして返す
-	 * @param listener
-	 * @return
-	 */
-	@NonNull
-	public static EncoderListener2 wrap(@NonNull final EncoderListener listener) {
-		if (listener instanceof EncoderListener2) {
-			return (EncoderListener2) listener;
-		} else {
-			return new EncoderListener2() {
-				@Override
-				public void onStartEncode(@NonNull final Encoder encoder, @Nullable final Surface source, final boolean mayFail) {
-					listener.onStartEncode(encoder, source, 0, mayFail);
-				}
-
-				@Override
-				public void onStopEncode(@NonNull final Encoder encoder) {
-					listener.onStopEncode(encoder);
-				}
-
-				@Override
-				public void onDestroy(@NonNull final Encoder encoder) {
-					listener.onDestroy(encoder);
-				}
-
-				@Override
-				public void onError(@NonNull final Throwable t) {
-					listener.onError(t);
-				}
-			};
-		}
-	}
 }
