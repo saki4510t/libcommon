@@ -32,7 +32,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.documentfile.provider.DocumentFile;
 
 /**
@@ -49,70 +48,6 @@ public class MediaStoreOutputStream extends OutputStream {
 	private final Uri mUri;
 	@NonNull
 	private final FileOutputStream mOutputStream;	// XXX BufferedOutputStreamでラップしたいけどgetFDを使うにはFileOutputStreamでないとだめ
-	@Nullable
-	private final String mOutputPath;
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param mimeType
-	 * @param nameWithExt
-	 * @throws FileNotFoundException
-	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public MediaStoreOutputStream(@NonNull final Context context,
-		@Nullable final String mimeType,
-		@NonNull final String nameWithExt)
-			throws FileNotFoundException {
-		this(context, mimeType, null, nameWithExt);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param mimeType
-	 * @param relativePath
-	 * @param nameWithExt
-	 * @throws FileNotFoundException
-	 */
-	@Deprecated
-	public MediaStoreOutputStream(@NonNull final Context context,
-		@Nullable final String mimeType,
-		@Nullable final String relativePath,
-		@NonNull final String nameWithExt)
-			throws FileNotFoundException {
-
-		mCr = context.getContentResolver();
-		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, null);
-		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "w");
-		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
-		mOutputPath = UriHelper.getPath(context, mUri);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param mimeType
-	 * @param relativePath
-	 * @param nameWithExt
-	 * @param dataPath
-	 * @throws FileNotFoundException
-	 */
-	@Deprecated
-	public MediaStoreOutputStream(@NonNull final Context context,
-		@Nullable final String mimeType,
-		@Nullable final String relativePath,
-		@NonNull final String nameWithExt,
-		@Nullable final String dataPath)
-			throws FileNotFoundException {
-
-		mCr = context.getContentResolver();
-		mUri = MediaStoreUtils.getContentUri(mCr, mimeType, relativePath, nameWithExt, dataPath);
-		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
-		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
-		mOutputPath = UriHelper.getPath(context, mUri);
-	}
 
 	/**
 	 * コンストラクタ
@@ -127,18 +62,11 @@ public class MediaStoreOutputStream extends OutputStream {
 		mUri = output.getUri();
 		final ParcelFileDescriptor pfd = mCr.openFileDescriptor(mUri, "rw");
 		mOutputStream = new FileOutputStream(pfd.getFileDescriptor());
-		mOutputPath = UriHelper.getPath(context, mUri);
 	}
 
 	@NonNull
 	public Uri getUri() {
 		return mUri;
-	}
-
-	@Deprecated
-	@Nullable
-	public String getOutputPath() {
-		return mOutputPath;
 	}
 
 	@NonNull
