@@ -63,24 +63,6 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 	 * @param listener
 	 * @param projection
 	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public MediaScreenEncoder(
-		@NonNull final IRecorder recorder,
-		@NonNull final EncoderListener listener,
-		@NonNull final MediaProjection projection,
-		final int density) {
-
-		this(recorder, EncoderListener2.wrap(listener), projection, density);
-	}
-
-	/**
-	 * コンストラクタ
-	 *
-	 * @param recorder
-	 * @param listener
-	 * @param projection
-	 */
 	public MediaScreenEncoder(
 		@NonNull final IRecorder recorder,
 		@NonNull final EncoderListener2 listener,
