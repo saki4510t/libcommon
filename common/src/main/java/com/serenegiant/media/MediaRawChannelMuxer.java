@@ -21,7 +21,6 @@ package com.serenegiant.media;
 import android.content.Context;
 import android.media.MediaCodec;
 import android.media.MediaFormat;
-import android.media.MediaScannerConnection;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -41,7 +40,6 @@ import androidx.documentfile.provider.DocumentFile;
  * Rawファイル形式でエンコードデータをファイルに書き出すためのIMuxer実装
  * 実際のファイルへの出力はMediaRawChannelWriterで行う。
  * 実際のmp4ファイルへの出力は別途PostMuxBuilderで行う。
- *
  * 映像エンコード処理と音声エンコード処理とmux処理を同時に実行すると
  * 映像and/or音声が正常に記録されない端末がいくつかあるので、
  * 一度一時ファイルへ書き出しておいてエンコード終了後にmux処理を
@@ -66,15 +64,9 @@ public class MediaRawChannelMuxer implements IPostMuxer {
 	 */
 	private final MediaFormat mConfigFormatAudio;
 	/**
-	 * mp4ファイルの出力先ファイル(絶対パス文字列)
-	 */
-	@Deprecated
-	@Nullable
-	private final String mOutputPath;
-	/**
 	 * mp4ファイルの出力先第る(DocumentFile)
 	 */
-	@Nullable
+	@NonNull
 	private final DocumentFile mOutputDoc;
 	/**
 	 * 一時ファイルを保存するディレクトリ名
@@ -100,33 +92,6 @@ public class MediaRawChannelMuxer implements IPostMuxer {
 	 * @param configFormatVideo
 	 * @param configFormatAudio
 	 */
-	@SuppressWarnings("deprecation")
-	@Deprecated
-	public MediaRawChannelMuxer(@NonNull final Context context,
-		@Nullable final VideoConfig config,
-		@NonNull final String output,
-		@Nullable final MediaFormat configFormatVideo,
-		@Nullable final MediaFormat configFormatAudio) {
-
-		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mWeakContext = new WeakReference<Context>(context);
-		mVideoConfig = config != null ? config : new VideoConfig();
-		mOutputPath = output;
-		mOutputDoc = null;
-		mTempName = FileUtils.getDateTimeString();
-		mConfigFormatVideo = configFormatVideo;
-		mConfigFormatAudio = configFormatAudio;
-	}
-	
-	/**
-	 * コンストラクタ
-	 * @param context
-	 * @param config
-	 * @param output 最終出力先ファイル
-	 * @param configFormatVideo
-	 * @param configFormatAudio
-	 */
-	@SuppressWarnings("deprecation")
 	public MediaRawChannelMuxer(@NonNull final Context context,
 		@Nullable final VideoConfig config,
 		@NonNull final DocumentFile output,
@@ -136,7 +101,6 @@ public class MediaRawChannelMuxer implements IPostMuxer {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mWeakContext = new WeakReference<Context>(context);
 		mVideoConfig = config != null ? config : new VideoConfig();
-		mOutputPath = null;
 		mOutputDoc = output;
 		mTempName = FileUtils.getDateTimeString();
 		mConfigFormatVideo = configFormatVideo;
@@ -209,38 +173,17 @@ public class MediaRawChannelMuxer implements IPostMuxer {
 	 * 一時rawファイルからmp4ファイルを生成する・
 	 * mp4ファイル生成終了まで返らないので注意
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public void build() throws IOException {
 		if (DEBUG) Log.v(TAG, "buildFromRawFile:");
 		final Context context = getContext();
 		final String tempDir = getTempDir();
 		if (DEBUG) Log.v(TAG, "buildFromRawFile:tempDir=" + tempDir);
-		if (!TextUtils.isEmpty(mOutputPath)) {
-			try {
-				final PostMuxBuilder builder = new PostMuxBuilder(mVideoConfig.useMediaMuxer());
-				builder.buildFromRawChannel(context, tempDir, mOutputPath);	// XXX これはdeprecated
-			} finally {
-				delete(new File(tempDir));
-			}
-			// MediaScannerConnection#scanFileの呼び出しは
-			// アプリケーションコンテキストでないとだめ
-			try {
-				MediaScannerConnection.scanFile(context.getApplicationContext(),
-					new String[] {mOutputPath}, null, null);
-			} catch (final Exception e) {
-				Log.w(TAG, e);
-			}
-		} else if (mOutputDoc != null) {
-			try {
-				final PostMuxBuilder builder = new PostMuxBuilder(mVideoConfig.useMediaMuxer());
-				builder.buildFromRawChannel(context, tempDir, mOutputDoc);
-			} finally {
-				delete(new File(tempDir));
-			}
-		} else {
-			// ここには来ないはず
-			throw new IOException("unexpected output file");
+		try {
+			final PostMuxBuilder builder = new PostMuxBuilder(mVideoConfig.useMediaMuxer());
+			builder.buildFromRawChannel(context, tempDir, mOutputDoc);
+		} finally {
+			delete(new File(tempDir));
 		}
 		if (DEBUG) Log.v(TAG, "buildFromRawFile:finished");
 	}
