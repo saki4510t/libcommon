@@ -32,6 +32,7 @@ import com.serenegiant.glpipeline.*
 import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
+import com.serenegiant.glutils.OnFrameAvailableListener
 import com.serenegiant.math.Fraction
 import com.serenegiant.view.ViewTransformDelegater
 
@@ -205,8 +206,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						// OnFramePipelineを追加する
 						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
 						val p = GLPipeline.findLast(source)
-						p.pipeline = OnFramePipeline(object :
-							OnFramePipeline.OnFrameAvailableListener {
+						p.pipeline = OnFramePipeline(object : OnFrameAvailableListener {
 							var cnt: Int = 0
 							override fun onFrameAvailable() {
 								if (DEBUG && ((++cnt) % 100 == 0)) {
