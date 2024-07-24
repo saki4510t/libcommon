@@ -97,7 +97,7 @@ public class RendererHolderTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface readerSurface = receiver.getSurface();
@@ -159,7 +159,7 @@ public class RendererHolderTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface readerSurface = receiver.getSurface();
@@ -221,7 +221,7 @@ public class RendererHolderTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface readerSurface = receiver.getSurface();

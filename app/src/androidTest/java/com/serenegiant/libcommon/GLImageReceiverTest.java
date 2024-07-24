@@ -95,7 +95,7 @@ public class GLImageReceiverTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface surface = receiver.getSurface();
@@ -152,7 +152,7 @@ public class GLImageReceiverTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface surface = receiver.getSurface();

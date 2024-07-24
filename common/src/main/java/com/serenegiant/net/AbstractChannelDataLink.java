@@ -169,7 +169,7 @@ public abstract class AbstractChannelDataLink {
 
 			if (DEBUG) Log.v(TAG, "Client#コンストラクタ:channel=" + channel);
 			mWeakParent = new WeakReference<AbstractChannelDataLink>(parent);
-			mSenderHandler = HandlerThreadHandler.createHandler(this);
+			mSenderHandler = HandlerThreadHandler.createHandler(TAG, this);
 			mChannel = channel;
 		}
 		

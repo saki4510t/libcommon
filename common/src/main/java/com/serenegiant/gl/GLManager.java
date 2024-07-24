@@ -18,7 +18,6 @@ package com.serenegiant.gl;
  *  limitations under the License.
 */
 
-import android.os.Build;
 import android.os.Handler;
 import android.util.Log;
 import android.view.Choreographer;
@@ -143,14 +142,7 @@ public class GLManager {
 			throw new IllegalArgumentException("wrong type of masterSurface");
 		}
 		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
-		final HandlerThreadHandler handler;
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP_MR1) {
-			// API>=22ならHandlerを非同期仕様で初期化
-			handler = HandlerThreadHandler.createHandler(TAG, callback, true);
-		} else {
-			// API<22ならHandlerをLooperによる同期バリアを受ける設定で初期化
-			handler = HandlerThreadHandler.createHandler(TAG, callback);
-		}
+		final HandlerThreadHandler handler = HandlerThreadHandler.createHandler(TAG, callback, true);
 		mGLHandler = handler;
 		mHandlerThreadId = handler.getId();
 		final Semaphore sem = new Semaphore(0);

@@ -100,7 +100,7 @@ public class SurfaceProxyTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface readerSurface = receiver.getSurface();
@@ -160,7 +160,7 @@ public class SurfaceProxyTest {
 					}
 				}
 			}
-		}, HandlerThreadHandler.createHandler());
+		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
 		final Surface readerSurface = receiver.getSurface();
