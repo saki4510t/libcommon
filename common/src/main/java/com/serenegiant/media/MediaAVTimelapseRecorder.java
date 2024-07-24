@@ -26,7 +26,6 @@ import android.util.Log;
 import com.serenegiant.system.StorageInfo;
 import com.serenegiant.system.StorageUtils;
 import com.serenegiant.utils.FileUtils;
-import com.serenegiant.utils.UriHelper;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -39,7 +38,6 @@ import androidx.documentfile.provider.DocumentFile;
  * Encoderを使ってタイムラプス録画するためのRecorder実装
  * 実際には入力映像のフレームレートにかかわらず固定のフレームレートになるRecorder実装。
  * 音声には対応しない(#addEncoderでUnsupportedOperationExceptionを投げる)
- *
  * XXX 入力映像のフレームレートを動画ファイルのフレームレートよりも遅くすることでタイムラプス動画になる
  *     例えば動画ファイルのフレームレートを30fps(デフォルト)で、入力映像のフレームレートを5fpsにすると
  *     30÷5=6倍速になる
@@ -54,7 +52,6 @@ public class MediaAVTimelapseRecorder extends Recorder {
 	 */
 	private static final long DEFAULT_FRAME_INTERVALS_US = 1000000L / 30;
 
-	private final String mOutputPath;
 	@NonNull
 	private final DocumentFile mOutputFile;
 	/**
@@ -117,7 +114,6 @@ public class MediaAVTimelapseRecorder extends Recorder {
 
 		super(context, callback, config, factory);
 		mOutputFile = output;
-		mOutputPath = UriHelper.getPath(context, output.getUri());
 		@NonNull
 		final VideoConfig _config = getConfig();
 		if (_config.getCaptureFps().asDouble() >= 0) {
@@ -136,7 +132,6 @@ public class MediaAVTimelapseRecorder extends Recorder {
 	 * @param encoder
 	 * @throws UnsupportedOperationException
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	public synchronized void addEncoder(final Encoder encoder) throws UnsupportedOperationException {
 		if (encoder instanceof IAudioEncoder) {
@@ -155,7 +150,6 @@ public class MediaAVTimelapseRecorder extends Recorder {
 	 * ディスクの空き容量をチェックして足りなければtrueを返す
 	 * @return true: 空き容量が足りない
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean check() {
 		final Context context = requireContext();
@@ -169,9 +163,8 @@ public class MediaAVTimelapseRecorder extends Recorder {
 		} catch (final IOException e) {
 			Log.w(TAG, e);
 		}
-		return (context == null)
-			|| !FileUtils.checkFreeSpace(context,
-					getConfig().maxDuration(), mStartTime, 0);
+		// チェックできないときは常にfalseにする
+		return false;
 	}
 
 	@Override

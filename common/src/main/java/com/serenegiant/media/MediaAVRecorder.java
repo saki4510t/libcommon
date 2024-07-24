@@ -109,7 +109,6 @@ public class MediaAVRecorder extends Recorder {
 	 * ディスクの空き容量をチェックして足りなければtrueを返す
 	 * @return true: 空き容量が足りない
 	 */
-	@SuppressWarnings("deprecation")
 	@Override
 	protected boolean check() {
 		final Context context = requireContext();
@@ -124,10 +123,8 @@ public class MediaAVRecorder extends Recorder {
 		} catch (final IOException e) {
 			Log.w(TAG, e);
 		}
-		return (context == null)
-			|| ((mOutputFile == null)
-				&& !FileUtils.checkFreeSpace(context,
-					getConfig().maxDuration(), mStartTime, mSaveTreeId));
+		// チェックできないときは常にfalseを返す
+		return false;
 	}
 
 	protected void setupMuxer(

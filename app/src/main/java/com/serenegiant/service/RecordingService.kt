@@ -20,7 +20,6 @@ package com.serenegiant.service
 
 import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.media.AudioFormat
@@ -28,17 +27,14 @@ import android.media.MediaCodec
 import android.media.MediaCodecInfo
 import android.media.MediaFormat
 import android.media.MediaMuxer
-import android.media.MediaScannerConnection
 import android.os.Binder
 import android.os.IBinder
-import android.text.TextUtils
 import android.util.Log
 import android.view.Surface
 import androidx.annotation.DrawableRes
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
-import com.serenegiant.libcommon.Const
 import com.serenegiant.libcommon.MainActivity
 import com.serenegiant.libcommon.R
 import com.serenegiant.media.AudioSampler
@@ -54,13 +50,9 @@ import com.serenegiant.media.MediaReaper.VideoReaper
 import com.serenegiant.media.VideoConfig
 import com.serenegiant.notification.NotificationCompat
 import com.serenegiant.system.BuildCheck
-import com.serenegiant.utils.FileUtils
 import com.serenegiant.utils.ThreadUtils
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.io.File
 import java.io.IOException
 import java.nio.ByteBuffer
 import java.util.concurrent.CopyOnWriteArraySet
@@ -399,11 +391,7 @@ open class RecordingService() : LifecycleService() {
 		if (DEBUG) Log.v(TAG, "start:")
 		lifecycleScope.launch(Dispatchers.Default) {
 			if ((!mUseVideo || (mVideoFormat != null)) && (!mUseAudio || (mAudioFormat != null))) {
-				if (checkFreeSpace(this@RecordingService, Const.REQUEST_ACCESS_SD)) {
-					internalStart(output, mVideoFormat, mAudioFormat)
-				} else {
-					throw IOException()
-				}
+				internalStart(output, mVideoFormat, mAudioFormat)
 			} else {
 				throw IllegalStateException("Not all MediaFormat received.")
 			}
@@ -857,19 +845,6 @@ open class RecordingService() : LifecycleService() {
 //		}
 //		checkStopSelf()
 //	}
-
-	/**
-	 * 空き容量をチェック
-	 * @param context
-	 * @param accessId
-	 * @return
-	 */
-	private fun checkFreeSpace(context: Context?, accessId: Int): Boolean {
-		return (BuildCheck.isAPI29() // API29以降は対象範囲別ストレージなので容量のチェックができない
-			|| FileUtils.checkFreeSpace(context,
-			requireConfig().maxDuration(), System.currentTimeMillis(), accessId
-		))
-	}
 
 	/**
 	 * エンコード済みのフレームデータを書き出す
