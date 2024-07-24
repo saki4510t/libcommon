@@ -375,18 +375,21 @@ public class GLImageReceiver {
 	@WorkerThread
 	protected boolean handleMessage(@NonNull final Message msg) {
 		switch (msg.what) {
-		case REQUEST_UPDATE_TEXTURE:
+		case REQUEST_UPDATE_TEXTURE -> {
 			handleUpdateTexImage();
 			return true;
-		case REQUEST_UPDATE_SIZE:
+		}
+		case REQUEST_UPDATE_SIZE -> {
 			handleResize(msg.arg1, msg.arg2);
 			return true;
-		case REQUEST_RECREATE_MASTER_SURFACE:
+		}
+		case REQUEST_RECREATE_MASTER_SURFACE -> {
 			handleReCreateInputSurface();
 			return true;
-		default:
+		}
+		default -> {
 			if (DEBUG) Log.v(TAG, "handleRequest:" + msg);
-			break;
+		}
 		}
 		return false;
 	}

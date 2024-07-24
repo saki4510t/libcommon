@@ -183,24 +183,17 @@ public final class CursorHelper {
 				sb.append("row=").append(row).append(", ");
 				for (int i = 0; i < n; i++) {
 					switch (cursor.getType(i)) {
-					case Cursor.FIELD_TYPE_FLOAT:
+					case Cursor.FIELD_TYPE_FLOAT ->
 						sb.append(columnNames[i]).append("=").append(cursor.getDouble(i));
-						break;
-					case Cursor.FIELD_TYPE_INTEGER:
+					case Cursor.FIELD_TYPE_INTEGER ->
 						sb.append(columnNames[i]).append("=").append(cursor.getLong(i));
-						break;
-					case Cursor.FIELD_TYPE_STRING:
+					case Cursor.FIELD_TYPE_STRING ->
 						sb.append(columnNames[i]).append("=").append(cursor.getString(i));
-						break;
-					case Cursor.FIELD_TYPE_BLOB:
+					case Cursor.FIELD_TYPE_BLOB ->
 						sb.append(columnNames[i]).append("=").append("BLOB");
-						break;
-					case Cursor.FIELD_TYPE_NULL:
+					case Cursor.FIELD_TYPE_NULL ->
 						sb.append(columnNames[i]).append("=").append("NULL");
-						break;
-					default:
-						sb.append(columnNames[i]).append("=").append("UNKNOWN");
-						break;
+					default -> sb.append(columnNames[i]).append("=").append("UNKNOWN");
 					}
 					sb.append(", ");
 				}
@@ -230,24 +223,18 @@ public final class CursorHelper {
 			sb.append("{");
 			for (int i = 0; i < n; i++) {
 				switch (cursor.getType(i)) {
-				case Cursor.FIELD_TYPE_FLOAT:
+				case Cursor.FIELD_TYPE_FLOAT ->
 					sb.append(columnNames[i]).append("=").append(cursor.getDouble(i));
-					break;
-				case Cursor.FIELD_TYPE_INTEGER:
+				case Cursor.FIELD_TYPE_INTEGER ->
 					sb.append(columnNames[i]).append("=").append(cursor.getLong(i));
-					break;
-				case Cursor.FIELD_TYPE_STRING:
+				case Cursor.FIELD_TYPE_STRING ->
 					sb.append(columnNames[i]).append("=").append(cursor.getString(i));
-					break;
-				case Cursor.FIELD_TYPE_BLOB:
+				case Cursor.FIELD_TYPE_BLOB ->
 					sb.append(columnNames[i]).append("=").append("BLOB");
-					break;
-				case Cursor.FIELD_TYPE_NULL:
+				case Cursor.FIELD_TYPE_NULL ->
 					sb.append(columnNames[i]).append("=").append("NULL");
-					break;
-				default:
+				default ->
 					sb.append(columnNames[i]).append("=").append("UNKNOWN");
-					break;
 				}
 				if (i < n-1) {
 					sb.append(",");

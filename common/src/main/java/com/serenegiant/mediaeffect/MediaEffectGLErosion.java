@@ -248,17 +248,12 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		"}\n";
 
 	private static String getFragmentShader(final int radius) {
-		switch (radius) {
-		case 0:
-		case 1:
-			return FRAGMENT_SHADER_1;
-		case 2:
-			return FRAGMENT_SHADER_2;
-		case 3:
-			return FRAGMENT_SHADER_3;
-		default:
-			return FRAGMENT_SHADER_4;
-		}
+		return switch (radius) {
+			case 0, 1 -> FRAGMENT_SHADER_1;
+			case 2 -> FRAGMENT_SHADER_2;
+			case 3 -> FRAGMENT_SHADER_3;
+			default -> FRAGMENT_SHADER_4;
+		};
 	}
 
 	public MediaEffectGLErosion() {

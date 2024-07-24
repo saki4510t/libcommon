@@ -367,20 +367,13 @@ public class MediaPlayer {
 							localReq = mRequest;
 							mRequest = REQ_NON;
 						}
-						switch (mState) {
-						case STATE_STOP:
-							isRunning = processStop(localReq);
-							break;
-						case STATE_PREPARED:
-							isRunning = processPrepared(localReq);
-							break;
-						case STATE_PLAYING:
-							isRunning = processPlaying(localReq);
-							break;
-						case STATE_PAUSED:
-							isRunning = processPaused(localReq);
-							break;
-						}
+						isRunning = switch (mState) {
+							case STATE_STOP -> processStop(localReq);
+							case STATE_PREPARED -> processPrepared(localReq);
+							case STATE_PLAYING -> processPlaying(localReq);
+							case STATE_PAUSED -> processPaused(localReq);
+							default -> isRunning;
+						};
 					} catch (final InterruptedException e) {
 						break;
 					} catch (final Exception e) {
@@ -406,23 +399,19 @@ public class MediaPlayer {
 	private boolean processStop(final int req) throws InterruptedException, IOException {
 		boolean isRunning = true;
 		switch (req) {
-		case REQ_PREPARE:
-			handlePrepare(mSource);
-			break;
-		case REQ_START:
-		case REQ_PAUSE:
-		case REQ_RESUME:
-			throw new IllegalStateException("invalid state:" + mState);
-		case REQ_QUIT:
-			isRunning = false;
-			break;
-//		case REQ_SEEK:
-//		case REQ_STOP:
-		default:
+		case REQ_PREPARE -> handlePrepare(mSource);
+		case REQ_START,
+			REQ_PAUSE,
+			REQ_RESUME ->
+				throw new IllegalStateException("invalid state:" + mState);
+		case REQ_QUIT -> isRunning = false;
+//		case REQ_SEEK -> {}
+//		case REQ_STOP -> {}
+		default -> {
 			synchronized (mSync) {
 				mSync.wait();
 			}
-			break;
+		}
 		}
 		synchronized (mSync) {
 			isRunning &= mIsRunning;
@@ -439,25 +428,19 @@ public class MediaPlayer {
 	private boolean processPrepared(final int req) throws InterruptedException {
 		boolean isRunning = true;
 		switch (req) {
-		case REQ_START:
-			handleStart();
-			break;
-		case REQ_PAUSE:
-		case REQ_RESUME:
-			throw new IllegalStateException("invalid state:" + mState);
-		case REQ_STOP:
-			handleStop();
-			break;
-		case REQ_QUIT:
-			isRunning = false;
-			break;
-//		case REQ_PREPARE:
-//		case REQ_SEEK:
-		default:
+		case REQ_START -> handleStart();
+		case REQ_PAUSE,
+			REQ_RESUME ->
+				throw new IllegalStateException("invalid state:" + mState);
+		case REQ_STOP -> handleStop();
+		case REQ_QUIT -> isRunning = false;
+//		case REQ_PREPARE -> {}
+//		case REQ_SEEK -> {}
+		default -> {
 			synchronized (mSync) {
 				mSync.wait();
 			}
-			break;
+		}
 		} // end of switch (req)
 		synchronized (mSync) {
 			isRunning &= mIsRunning;
@@ -473,25 +456,15 @@ public class MediaPlayer {
 	private boolean processPlaying(final int req) {
 		boolean isRunning = true;
 		switch (req) {
-		case REQ_PREPARE:
-		case REQ_START:
-		case REQ_RESUME:
-			throw new IllegalStateException("invalid state:" + mState);
-		case REQ_SEEK:
-			handleSeek(mRequestTime);
-			break;
-		case REQ_STOP:
-			handleStop();
-			break;
-		case REQ_PAUSE:
-			handlePause();
-			break;
-		case REQ_QUIT:
-			isRunning = false;
-			break;
-		default:
-			handleLoop(mCallback);
-			break;
+		case REQ_PREPARE,
+			REQ_START,
+			REQ_RESUME ->
+				throw new IllegalStateException("invalid state:" + mState);
+		case REQ_SEEK -> handleSeek(mRequestTime);
+		case REQ_STOP -> handleStop();
+		case REQ_PAUSE -> handlePause();
+		case REQ_QUIT -> isRunning = false;
+		default -> handleLoop(mCallback);
 		} // end of switch (req)
 		synchronized (mSync) {
 			isRunning &= mIsRunning;
@@ -508,27 +481,19 @@ public class MediaPlayer {
 	private boolean processPaused(final int req) throws InterruptedException {
 		boolean isRunning = true;
 		switch (req) {
-		case REQ_PREPARE:
-		case REQ_START:
-			throw new IllegalStateException("invalid state:" + mState);
-		case REQ_SEEK:
-			handleSeek(mRequestTime);
-			break;
-		case REQ_STOP:
-			handleStop();
-			break;
-		case REQ_RESUME:
-			handleResume();
-			break;
-		case REQ_QUIT:
-			isRunning = false;
-			break;
-//		case REQ_PAUSE:
-		default:
+		case REQ_PREPARE,
+			REQ_START ->
+				throw new IllegalStateException("invalid state:" + mState);
+		case REQ_SEEK -> handleSeek(mRequestTime);
+		case REQ_STOP -> handleStop();
+		case REQ_RESUME -> handleResume();
+		case REQ_QUIT -> isRunning = false;
+//		case REQ_PAUSE -> {}
+		default -> {
 			synchronized (mSync) {
 				mSync.wait();
 			}
-			break;
+		}
 		} // end of switch (req)
 		synchronized (mSync) {
 			isRunning &= mIsRunning;

@@ -171,30 +171,26 @@ public class FrameView extends View {
 				switch (mFrameType) {
 				case FRAME_TYPE_CROSS_FULL:
 					switch (mScaleType) {
-					case SCALE_TYPE_NONE:
+					case SCALE_TYPE_NONE -> {
 						canvas.drawLine(centerX, mBoundsRect.top, centerX, mBoundsRect.bottom, mPaint);
 						canvas.drawLine(mBoundsRect.left, centerY, mBoundsRect.right, centerY, mPaint);
-						break;
-					case SCALE_TYPE_INCH:
+					}
+					case SCALE_TYPE_INCH ->
 						draw_scale_full(canvas, mWidth, mHeight, metrics.xdpi / 10.0f, metrics.ydpi / 10.0f, 10);
-						break;
-					case SCALE_TYPE_MM:
+					case SCALE_TYPE_MM ->
 						draw_scale_full(canvas, mWidth, mHeight, metrics.xdpi / 12.7f, metrics.ydpi / 12.7f, 5);
-						break;
 					}
 					break;
 				case FRAME_TYPE_CROSS_QUARTER:
 					switch (mScaleType) {
-					case SCALE_TYPE_NONE:
+					case SCALE_TYPE_NONE -> {
 						canvas.drawLine(centerX, centerY - r4, centerX, centerY + r4, mPaint);
 						canvas.drawLine(centerX - r4, centerY, centerX + r4, centerY, mPaint);
-						break;
-					case SCALE_TYPE_INCH:
+					}
+					case SCALE_TYPE_INCH ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 10.0f, metrics.ydpi / 10.0f, 10);
-						break;
-					case SCALE_TYPE_MM:
+					case SCALE_TYPE_MM ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 12.7f, metrics.ydpi / 12.7f, 5);
-						break;
 					}
 					break;
 				case FRAME_TYPE_CIRCLE:
@@ -202,16 +198,14 @@ public class FrameView extends View {
 					break;
 				case FRAME_TYPE_CROSS_CIRCLE:
 					switch (mScaleType) {
-					case SCALE_TYPE_NONE:
+					case SCALE_TYPE_NONE -> {
 						canvas.drawLine(centerX, centerY - r4, centerX, centerY + r4, mPaint);
 						canvas.drawLine(centerX - r4, centerY, centerX + r4, centerY, mPaint);
-						break;
-					case SCALE_TYPE_INCH:
+					}
+					case SCALE_TYPE_INCH ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 10.0f, metrics.ydpi / 10.0f, 10);
-						break;
-					case SCALE_TYPE_MM:
+					case SCALE_TYPE_MM ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 12.7f, metrics.ydpi / 12.7f, 5);
-						break;
 					}
 					canvas.drawCircle(centerX, centerY, r4, mPaint);
 					break;
@@ -221,16 +215,14 @@ public class FrameView extends View {
 					break;
 				case FRAME_TYPE_CROSS_CIRCLE2:
 					switch (mScaleType) {
-					case SCALE_TYPE_NONE:
+					case SCALE_TYPE_NONE -> {
 						canvas.drawLine(centerX, centerY - r4, centerX, centerY + r4, mPaint);
 						canvas.drawLine(centerX - r4, centerY, centerX + r4, centerY, mPaint);
-						break;
-					case SCALE_TYPE_INCH:
+					}
+					case SCALE_TYPE_INCH ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 10.0f, metrics.ydpi / 10.0f, 10);
-						break;
-					case SCALE_TYPE_MM:
+					case SCALE_TYPE_MM ->
 						draw_scale_full(canvas, r2, r2, metrics.xdpi / 12.7f, metrics.ydpi / 12.7f, 5);
-						break;
 					}
 					canvas.drawCircle(centerX, centerY, r4 / 2, mPaint);
 					canvas.drawCircle(centerX, centerY, r4, mPaint);

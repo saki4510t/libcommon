@@ -373,23 +373,23 @@ public class ZoomAspectScaledTextureView2
 	private void applyMirrorMode() {
 		if (DEBUG) Log.v(TAG, "applyMirrorMode");
 		switch (mMirrorMode) {
-		case MIRROR_HORIZONTAL:
+		case MIRROR_HORIZONTAL -> {
 			setScaleX(-1.0f);
 			setScaleY(1.0f);
-			break;
-		case MIRROR_VERTICAL:
+		}
+		case MIRROR_VERTICAL -> {
 			setScaleX(1.0f);
 			setScaleY(-1.0f);
-			break;
-		case MIRROR_BOTH:
+		}
+		case MIRROR_BOTH -> {
 			setScaleX(-1.0f);
 			setScaleY(-1.0f);
-			break;
-		case MIRROR_NORMAL:
-		default:
+		}
+//		case MIRROR_NORMAL,
+		default -> {
 			setScaleX(1.0f);
 			setScaleY(1.0f);
-			break;
+		}
 		}
 	}
 

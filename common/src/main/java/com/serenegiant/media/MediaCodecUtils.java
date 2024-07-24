@@ -287,112 +287,107 @@ public final class MediaCodecUtils {
      * @return
      */
     public static String getColorFormatName(final int colorFormat) {
-    	switch (colorFormat) {
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format12bitRGB444:
-    		return "COLOR_Format12bitRGB444";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB1555:
-    		return "COLOR_Format16bitARGB1555";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB4444:
-    		return "COLOR_Format16bitARGB4444";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitBGR565:
-    		return "COLOR_Format16bitBGR565";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitRGB565:
-    		return "COLOR_Format16bitRGB565";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format18BitBGR666:
-    		return "COLOR_Format18BitBGR666";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format18bitARGB1665:
-    		return "COLOR_Format18bitARGB1665";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format18bitRGB666:
-    		return "COLOR_Format18bitRGB666";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format19bitARGB1666:
-    		return "COLOR_Format19bitARGB1666";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format24BitABGR6666:
-    		return "COLOR_Format24BitABGR6666";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format24BitARGB6666:
-    		return "COLOR_Format24BitARGB6666";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitARGB1887:
-    		return "COLOR_Format24bitARGB1887";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitBGR888:
-    		return "COLOR_Format24bitBGR888";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitRGB888:
-    		return "COLOR_Format24bitRGB888";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format25bitARGB1888:
-    		return "COLOR_Format25bitARGB1888";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format32bitARGB8888:
-    		return "COLOR_Format32bitARGB8888";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format32bitBGRA8888:
-    		return "COLOR_Format32bitBGRA8888";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_Format8bitRGB332:
-    		return "COLOR_Format8bitRGB332";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatCbYCrY:
-    		return "COLOR_FormatCbYCrY";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatCrYCbY:
-    		return "COLOR_FormatCrYCbY";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL16:
-    		return "COLOR_FormatL16";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL2:
-    		return "COLOR_FormatL2";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL24:
-    		return "COLOR_FormatL24";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL32:
-    		return "COLOR_FormatL32";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL4:
-    		return "COLOR_FormatL4";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatL8:
-    		return "COLOR_FormatL8";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatMonochrome:
-    		return "COLOR_FormatMonochrome";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer10bit:
-    		return "COLOR_FormatRawBayer10bit";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bit:
-    		return "COLOR_FormatRawBayer8bit";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bitcompressed:
-    		return "COLOR_FormatRawBayer8bitcompressed";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface:	// = OMX_COLOR_FormatAndroidOpaque(0x7F000789)
-    		return "COLOR_FormatSurface_COLOR_FormatAndroidOpaque";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYCbYCr:
-    		return "COLOR_FormatYCbYCr";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYCrYCb:
-    		return "COLOR_FormatYCrYCb";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411PackedPlanar:
-    		return "COLOR_FormatYUV411PackedPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411Planar:
-    		return "COLOR_FormatYUV411Planar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-    		return "COLOR_FormatYUV420PackedPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-    		return "COLOR_FormatYUV420PackedSemiPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-    		return "COLOR_FormatYUV420Planar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-    		return "COLOR_FormatYUV420SemiPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedPlanar:
-    		return "COLOR_FormatYUV422PackedPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedSemiPlanar:
-    		return "COLOR_FormatYUV422PackedSemiPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422Planar:
-    		return "COLOR_FormatYUV422Planar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422SemiPlanar:
-    		return "COLOR_FormatYUV422SemiPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Interleaved:
-    		return "COLOR_FormatYUV444Interleaved";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:	// = OMX_QCOM_COLOR_FormatYVU420SemiPlanar(0x7FA30C00)
-    		return "COLOR_QCOM_FormatYUV420SemiPlanar";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar: // = OMX_TI_COLOR_FormatYUV420PackedSemiPlanar(0x7F000100)
-    		return "COLOR_TI_FormatYUV420PackedSemiPlanar";
-    	case 0x6F000000:
-    		return "OMX_COLOR_FormatKhronosExtensions";
-    	case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible: // = 0x7F420888;
-    		return "COLOR_FormatYUV420Flexible";
-    	case 0x7FA30C03:
-    		return "OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka";
-    	case 0x7FC00002:
-    		return "OMX_SEC_COLOR_FormatNV12Tiled";
-    	case 0x7FA30C04:
-    		return "OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m";
-    	default:
-    		return String.format(Locale.getDefault(), "COLOR_Format_Unknown(%d)", colorFormat);
-    	}
+		return switch (colorFormat) {
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format12bitRGB444 ->
+				"COLOR_Format12bitRGB444";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB1555 ->
+				"COLOR_Format16bitARGB1555";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitARGB4444 ->
+				"COLOR_Format16bitARGB4444";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitBGR565 ->
+				"COLOR_Format16bitBGR565";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format16bitRGB565 ->
+				"COLOR_Format16bitRGB565";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format18BitBGR666 ->
+				"COLOR_Format18BitBGR666";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format18bitARGB1665 ->
+				"COLOR_Format18bitARGB1665";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format18bitRGB666 ->
+				"COLOR_Format18bitRGB666";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format19bitARGB1666 ->
+				"COLOR_Format19bitARGB1666";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format24BitABGR6666 ->
+				"COLOR_Format24BitABGR6666";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format24BitARGB6666 ->
+				"COLOR_Format24BitARGB6666";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitARGB1887 ->
+				"COLOR_Format24bitARGB1887";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitBGR888 ->
+				"COLOR_Format24bitBGR888";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format24bitRGB888 ->
+				"COLOR_Format24bitRGB888";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format25bitARGB1888 ->
+				"COLOR_Format25bitARGB1888";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format32bitARGB8888 ->
+				"COLOR_Format32bitARGB8888";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format32bitBGRA8888 ->
+				"COLOR_Format32bitBGRA8888";
+			case MediaCodecInfo.CodecCapabilities.COLOR_Format8bitRGB332 ->
+				"COLOR_Format8bitRGB332";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatCbYCrY ->
+				"COLOR_FormatCbYCrY";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatCrYCbY ->
+				"COLOR_FormatCrYCbY";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL16 ->
+				"COLOR_FormatL16";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL2 ->
+				"COLOR_FormatL2";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL24 ->
+				"COLOR_FormatL24";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL32 ->
+				"COLOR_FormatL32";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL4 ->
+				"COLOR_FormatL4";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatL8 ->
+				"COLOR_FormatL8";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatMonochrome ->
+				"COLOR_FormatMonochrome";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer10bit ->
+				"COLOR_FormatRawBayer10bit";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bit ->
+				"COLOR_FormatRawBayer8bit";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatRawBayer8bitcompressed ->
+				"COLOR_FormatRawBayer8bitcompressed";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatSurface ->    // = OMX_COLOR_FormatAndroidOpaque(0x7F000789)
+				"COLOR_FormatSurface_COLOR_FormatAndroidOpaque";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYCbYCr ->
+				"COLOR_FormatYCbYCr";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYCrYCb ->
+				"COLOR_FormatYCrYCb";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411PackedPlanar ->
+				"COLOR_FormatYUV411PackedPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV411Planar ->
+				"COLOR_FormatYUV411Planar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar ->
+				"COLOR_FormatYUV420PackedPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar ->
+				"COLOR_FormatYUV420PackedSemiPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar ->
+				"COLOR_FormatYUV420Planar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar ->
+				"COLOR_FormatYUV420SemiPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedPlanar ->
+				"COLOR_FormatYUV422PackedPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422PackedSemiPlanar ->
+				"COLOR_FormatYUV422PackedSemiPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422Planar ->
+				"COLOR_FormatYUV422Planar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV422SemiPlanar ->
+				"COLOR_FormatYUV422SemiPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV444Interleaved ->
+				"COLOR_FormatYUV444Interleaved";
+			case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar ->    // = OMX_QCOM_COLOR_FormatYVU420SemiPlanar(0x7FA30C00)
+				"COLOR_QCOM_FormatYUV420SemiPlanar";
+			case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar -> // = OMX_TI_COLOR_FormatYUV420PackedSemiPlanar(0x7F000100)
+				"COLOR_TI_FormatYUV420PackedSemiPlanar";
+			case 0x6F000000 -> "OMX_COLOR_FormatKhronosExtensions";
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Flexible -> // = 0x7F420888;
+				"COLOR_FormatYUV420Flexible";
+			case 0x7FA30C03 -> "OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar64x32Tile2m8ka";
+			case 0x7FC00002 -> "OMX_SEC_COLOR_FormatNV12Tiled";
+			case 0x7FA30C04 -> "OMX_QCOM_COLOR_FormatYUV420PackedSemiPlanar32m";
+			default -> String.format(Locale.getDefault(), "COLOR_Format_Unknown(%d)", colorFormat);
+		};
     }
 
 	/**
@@ -405,344 +400,327 @@ public final class MediaCodecUtils {
     	String result;
     	if (!TextUtils.isEmpty(mimeType)) {
 	    	if (mimeType.equalsIgnoreCase("video/avc")) {
-		    	switch (profileLevel.profile) {
-		        // from OMX_VIDEO_AVCPROFILETYPE
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline:	// 0x01;
-		    		result = "AVCProfileBaseline"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileMain:		// 0x02;
-		    		result = "AVCProfileMain"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileExtended:	// 0x04;
-		    		result = "AVCProfileExtended"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh:		// 0x08;
-		    		result = "AVCProfileHigh"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh10:		// 0x10;
-		    		result = "AVCProfileHigh10"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh422:	// 0x20;
-		    		result = "AVCProfileHigh422"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh444:	// 0x40;
-		    		result = "AVCProfileHigh444"; break;
-		    	default:
-		    		result = "unknown profile " + profileLevel.profile; break;
-		    	}
-	    		switch (profileLevel.level) {
-	            // from OMX_VIDEO_AVCLEVELTYPE
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel1:		// 0x01;
-		    		result = result + ".AVCLevel1"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel1b:		// 0x02;
-		    		result = result + ".AVCLevel1b"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel11:		// 0x04;
-		    		result = result + ".AVCLevel11"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel12:		// 0x08;
-		    		result = result + ".AVCLevel12"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel13:		// 0x10;
-		    		result = result + ".AVCLevel13"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel2:		// 0x20;
-		    		result = result + ".AVCLevel2"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel21:		// 0x40;
-		    		result = result + ".AVCLevel21"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel22:		// 0x80;
-		    		result = result + ".AVCLevel22"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel3:		// 0x100;
-		    		result = result + ".AVCLevel3"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel31:		// 0x200;
-		    		result = result + ".AVCLevel31"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel32:		// 0x400;
-		    		result = result + ".AVCLevel32"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel4:		// 0x800;
-		    		result = result + ".AVCLevel4"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel41:		// 0x1000;
-		    		result = result + ".AVCLevel41"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel42:		// 0x2000;
-		    		result = result + ".AVCLevel42"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel5:		// 0x4000;
-		    		result = result + ".AVCLevel5"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AVCLevel51:		// 0x8000;
-		    		result = result + ".AVCLevel51"; break;
-		    	default:
-		    		result = result + ".unknown level " + profileLevel.level; break;
-	    		}
+				result = switch (profileLevel.profile) {
+					// from OMX_VIDEO_AVCPROFILETYPE
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileBaseline ->    // 0x01;
+						"AVCProfileBaseline";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileMain ->        // 0x02;
+						"AVCProfileMain";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileExtended ->    // 0x04;
+						"AVCProfileExtended";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh ->        // 0x08;
+						"AVCProfileHigh";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh10 ->        // 0x10;
+						"AVCProfileHigh10";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh422 ->    // 0x20;
+						"AVCProfileHigh422";
+					case MediaCodecInfo.CodecProfileLevel.AVCProfileHigh444 ->    // 0x40;
+						"AVCProfileHigh444";
+					default -> "unknown profile " + profileLevel.profile;
+				};
+				result = switch (profileLevel.level) {
+					// from OMX_VIDEO_AVCLEVELTYPE
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel1 ->        // 0x01;
+						result + ".AVCLevel1";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel1b ->        // 0x02;
+						result + ".AVCLevel1b";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel11 ->        // 0x04;
+						result + ".AVCLevel11";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel12 ->        // 0x08;
+						result + ".AVCLevel12";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel13 ->        // 0x10;
+						result + ".AVCLevel13";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel2 ->        // 0x20;
+						result + ".AVCLevel2";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel21 ->        // 0x40;
+						result + ".AVCLevel21";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel22 ->        // 0x80;
+						result + ".AVCLevel22";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel3 ->        // 0x100;
+						result + ".AVCLevel3";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel31 ->        // 0x200;
+						result + ".AVCLevel31";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel32 ->        // 0x400;
+						result + ".AVCLevel32";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel4 ->        // 0x800;
+						result + ".AVCLevel4";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel41 ->        // 0x1000;
+						result + ".AVCLevel41";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel42 ->        // 0x2000;
+						result + ".AVCLevel42";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel5 ->        // 0x4000;
+						result + ".AVCLevel5";
+					case MediaCodecInfo.CodecProfileLevel.AVCLevel51 ->        // 0x8000;
+						result + ".AVCLevel51";
+					default -> result + ".unknown level " + profileLevel.level;
+				};
 	    	} else if (mimeType.equalsIgnoreCase("video/h263")) {
-		    	switch (profileLevel.profile) {
-		    	// from OMX_VIDEO_H263PROFILETYPE
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileBaseline:				// 0x01;
-		    		result = "H263ProfileBaseline"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileH320Coding:			// 0x02;
-		    		result = "H263ProfileH320Coding"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileBackwardCompatible:	// 0x04;
-		    		result = "H263ProfileBackwardCompatible"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV2:					// 0x08;
-		    		result = "H263ProfileISWV2"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV3:					// 0x10;
-		    		result = "H263ProfileISWV3"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileHighCompression:		// 0x20;
-		    		result = "H263ProfileHighCompression"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileInternet:				// 0x40;
-		    		result = "H263ProfileInternet"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileInterlace:				// 0x80;
-		    		result = "H263ProfileInterlace"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263ProfileHighLatency:			// 0x100;
-		    		result = "H263ProfileHighLatency"; break;
-		    	default:
-		    		result = "unknown profile " + profileLevel.profile; break;
-		    	}
-	    		switch (profileLevel.level) {
-	            // from OMX_VIDEO_H263LEVELTYPE
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level10:					// 0x01;
-		    		result = result + ".H263Level10"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level20:					// 0x02;
-		    		result = result + ".H263Level20"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level30:					// 0x04;
-		    		result = result + ".H263Level30"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level40:					// 0x08;
-		    		result = result + ".H263Level40"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level45:					// 0x10;
-		    		result = result + ".H263Level45"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level50:					// 0x20;
-		    		result = result + ".H263Level50"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level60:					// 0x40;
-		    		result = result + ".H263Level60"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.H263Level70:					// 0x80;
-		    		result = result + ".H263Level70"; break;
-		    	default:
-		    		result = result + ".unknown level " + profileLevel.level; break;
-	    		}
+				result = switch (profileLevel.profile) {
+					// from OMX_VIDEO_H263PROFILETYPE
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileBaseline ->                // 0x01;
+						"H263ProfileBaseline";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileH320Coding ->            // 0x02;
+						"H263ProfileH320Coding";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileBackwardCompatible ->    // 0x04;
+						"H263ProfileBackwardCompatible";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV2 ->                    // 0x08;
+						"H263ProfileISWV2";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileISWV3 ->                    // 0x10;
+						"H263ProfileISWV3";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileHighCompression ->        // 0x20;
+						"H263ProfileHighCompression";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileInternet ->                // 0x40;
+						"H263ProfileInternet";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileInterlace ->                // 0x80;
+						"H263ProfileInterlace";
+					case MediaCodecInfo.CodecProfileLevel.H263ProfileHighLatency ->            // 0x100;
+						"H263ProfileHighLatency";
+					default -> "unknown profile " + profileLevel.profile;
+				};
+				result = switch (profileLevel.level) {
+					// from OMX_VIDEO_H263LEVELTYPE
+					case MediaCodecInfo.CodecProfileLevel.H263Level10 ->                    // 0x01;
+						result + ".H263Level10";
+					case MediaCodecInfo.CodecProfileLevel.H263Level20 ->                    // 0x02;
+						result + ".H263Level20";
+					case MediaCodecInfo.CodecProfileLevel.H263Level30 ->                    // 0x04;
+						result + ".H263Level30";
+					case MediaCodecInfo.CodecProfileLevel.H263Level40 ->                    // 0x08;
+						result + ".H263Level40";
+					case MediaCodecInfo.CodecProfileLevel.H263Level45 ->                    // 0x10;
+						result + ".H263Level45";
+					case MediaCodecInfo.CodecProfileLevel.H263Level50 ->                    // 0x20;
+						result + ".H263Level50";
+					case MediaCodecInfo.CodecProfileLevel.H263Level60 ->                    // 0x40;
+						result + ".H263Level60";
+					case MediaCodecInfo.CodecProfileLevel.H263Level70 ->                    // 0x80;
+						result + ".H263Level70";
+					default -> result + ".unknown level " + profileLevel.level;
+				};
 	    	} else if (mimeType.equalsIgnoreCase("video/mpeg4")) {
-		    	switch (profileLevel.profile) {
-	            // from OMX_VIDEO_MPEG4PROFILETYPE
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimple:			// 0x01;
-		    		result = "MPEG4ProfileSimple"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleScalable:	// 0x02;
-		    		result = "MPEG4ProfileSimpleScalable"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCore:				// 0x04;
-		    		result = "MPEG4ProfileCore"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileMain:				// 0x08;
-		    		result = "MPEG4ProfileMain"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileNbit:				// 0x10;
-		    		result = "MPEG4ProfileNbit"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileScalableTexture:	// 0x20;
-		    		result = "MPEG4ProfileScalableTexture"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFace:		// 0x40;
-		    		result = "MPEG4ProfileSimpleFace"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFBA:		// 0x80;
-		    		result = "MPEG4ProfileSimpleFBA"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileBasicAnimated:	// 0x100;
-		    		result = "MPEG4ProfileBasicAnimated"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileHybrid:			// 0x200;
-		    		result = "MPEG4ProfileHybrid"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedRealTime:	// 0x400;
-		    		result = "MPEG4ProfileAdvancedRealTime"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCoreScalable:		// 0x800;
-		    		result = "MPEG4ProfileCoreScalable"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCoding:	// 0x1000;
-		    		result = "MPEG4ProfileAdvancedCoding"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCore:		// 0x2000;
-		    		result = "MPEG4ProfileAdvancedCore"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedScalable:	// 0x4000;
-		    		result = "MPEG4ProfileAdvancedScalable"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedSimple:	// 0x8000;
-		    		result = "MPEG4ProfileAdvancedSimple"; break;
-		    	default:
-		    		result = "unknown profile " + profileLevel.profile; break;
-		    	}
-	    		switch (profileLevel.level) {
-	            // from OMX_VIDEO_MPEG4LEVELTYPE
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level0:			// 0x01;
-	        		result = result + ".MPEG4Level0"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level0b:			// 0x02;
-	        		result = result + ".MPEG4Level0b"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level1:			// 0x04;
-	        		result = result + ".MPEG4Level1"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level2:			// 0x08;
-	        		result = result + ".MPEG4Level2"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level3:			// 0x10;
-	        		result = result + ".MPEG4Level3"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level4:			// 0x20;
-	        		result = result + ".MPEG4Level4"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level4a:			// 0x40;
-	        		result = result + ".MPEG4Level4a"; break;
-	        	case MediaCodecInfo.CodecProfileLevel.MPEG4Level5:			// 0x80;
-	        		result = result + ".MPEG4Level5"; break;
-		    	default:
-		    		result = result + ".unknown level " + profileLevel.level; break;
-	    		}
-	    	} else if (mimeType.equalsIgnoreCase("ausio/aac")) {
+				result = switch (profileLevel.profile) {
+					// from OMX_VIDEO_MPEG4PROFILETYPE
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimple ->            // 0x01;
+						"MPEG4ProfileSimple";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleScalable ->    // 0x02;
+						"MPEG4ProfileSimpleScalable";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCore ->                // 0x04;
+						"MPEG4ProfileCore";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileMain ->                // 0x08;
+						"MPEG4ProfileMain";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileNbit ->                // 0x10;
+						"MPEG4ProfileNbit";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileScalableTexture ->    // 0x20;
+						"MPEG4ProfileScalableTexture";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFace ->        // 0x40;
+						"MPEG4ProfileSimpleFace";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileSimpleFBA ->        // 0x80;
+						"MPEG4ProfileSimpleFBA";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileBasicAnimated ->    // 0x100;
+						"MPEG4ProfileBasicAnimated";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileHybrid ->            // 0x200;
+						"MPEG4ProfileHybrid";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedRealTime ->    // 0x400;
+						"MPEG4ProfileAdvancedRealTime";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileCoreScalable ->        // 0x800;
+						"MPEG4ProfileCoreScalable";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCoding ->    // 0x1000;
+						"MPEG4ProfileAdvancedCoding";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedCore ->        // 0x2000;
+						"MPEG4ProfileAdvancedCore";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedScalable ->    // 0x4000;
+						"MPEG4ProfileAdvancedScalable";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4ProfileAdvancedSimple ->    // 0x8000;
+						"MPEG4ProfileAdvancedSimple";
+					default -> "unknown profile " + profileLevel.profile;
+				};
+				result = switch (profileLevel.level) {
+					// from OMX_VIDEO_MPEG4LEVELTYPE
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level0 ->            // 0x01;
+						result + ".MPEG4Level0";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level0b ->            // 0x02;
+						result + ".MPEG4Level0b";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level1 ->            // 0x04;
+						result + ".MPEG4Level1";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level2 ->            // 0x08;
+						result + ".MPEG4Level2";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level3 ->            // 0x10;
+						result + ".MPEG4Level3";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level4 ->            // 0x20;
+						result + ".MPEG4Level4";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level4a ->            // 0x40;
+						result + ".MPEG4Level4a";
+					case MediaCodecInfo.CodecProfileLevel.MPEG4Level5 ->            // 0x80;
+						result + ".MPEG4Level5";
+					default -> result + ".unknown level " + profileLevel.level;
+				};
+	    	} else if (mimeType.equalsIgnoreCase("audio/aac")) {
 	            // from OMX_AUDIO_AACPROFILETYPE
-		    	switch (profileLevel.level) {
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectMain:		// 1;
-		    		result = "AACObjectMain"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectLC:			// 2;
-		    		result = "AACObjectLC"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectSSR:			// 3;
-		    		result = "AACObjectSSR"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectLTP:			// 4;
-		    		result = "AACObjectLTP"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectHE:			// 5;
-		    		result = "AACObjectHE"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectScalable:	// 6;
-		    		result = "AACObjectScalable"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectERLC:		// 17;
-		    		result = "AACObjectERLC"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectLD:			// 23;
-		    		result = "AACObjectLD"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectHE_PS:		// 29;
-		    		result = "AACObjectHE_PS"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.AACObjectELD:			// 39;
-		    		result = "AACObjectELD"; break;
-				case MediaCodecInfo.CodecProfileLevel.AACObjectXHE:			// 42, xHE-AAC (includes USAC)
-					result = "AACObjectXHE"; break;
-		    	default:
-		    		result = "profile:unknown " + profileLevel.profile; break;
-		    	}
+				result = switch (profileLevel.level) {
+					case MediaCodecInfo.CodecProfileLevel.AACObjectMain ->        // 1;
+						"AACObjectMain";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectLC ->            // 2;
+						"AACObjectLC";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectSSR ->            // 3;
+						"AACObjectSSR";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectLTP ->            // 4;
+						"AACObjectLTP";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectHE ->            // 5;
+						"AACObjectHE";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectScalable ->    // 6;
+						"AACObjectScalable";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectERLC ->        // 17;
+						"AACObjectERLC";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectLD ->            // 23;
+						"AACObjectLD";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectHE_PS ->        // 29;
+						"AACObjectHE_PS";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectELD ->            // 39;
+						"AACObjectELD";
+					case MediaCodecInfo.CodecProfileLevel.AACObjectXHE ->            // 42, xHE-AAC (includes USAC)
+						"AACObjectXHE";
+					default -> "profile:unknown " + profileLevel.profile;
+				};
 	    	} else if (mimeType.equalsIgnoreCase("video/vp8")) {
-		    	switch (profileLevel.profile) {
-	            // from OMX_VIDEO_VP8PROFILETYPE
-		    	case MediaCodecInfo.CodecProfileLevel.VP8ProfileMain:		// 0x01;
-		    		result = "VP8ProfileMain"; break;
-		    	default:
-		    		result = "unknown profile " + profileLevel.profile; break;
-		    	}
-				switch (profileLevel.level) {
-	            // from OMX_VIDEO_VP8LEVELTYPE
-		    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version0:	// 0x01;
-		    		result = result + ".VP8Level_Version0"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version1:	// 0x02;
-		    		result = result + ".VP8Level_Version1"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version2:	// 0x04;
-		    		result = result + ".VP8Level_Version2"; break;
-		    	case MediaCodecInfo.CodecProfileLevel.VP8Level_Version3:	// 0x08;
-		    		result = result + ".VP8Level_Version3"; break;
-		    	default:
-		    		result = result + ".unknown level" + profileLevel.level; break;
-		    	}
+				// from OMX_VIDEO_VP8PROFILETYPE
+				if (profileLevel.profile == MediaCodecInfo.CodecProfileLevel.VP8ProfileMain) {        // 0x01;
+					result = "VP8ProfileMain";
+				} else {
+					result = "unknown profile " + profileLevel.profile;
+				}
+				result = switch (profileLevel.level) {
+					// from OMX_VIDEO_VP8LEVELTYPE
+					case MediaCodecInfo.CodecProfileLevel.VP8Level_Version0 ->    // 0x01;
+						result + ".VP8Level_Version0";
+					case MediaCodecInfo.CodecProfileLevel.VP8Level_Version1 ->    // 0x02;
+						result + ".VP8Level_Version1";
+					case MediaCodecInfo.CodecProfileLevel.VP8Level_Version2 ->    // 0x04;
+						result + ".VP8Level_Version2";
+					case MediaCodecInfo.CodecProfileLevel.VP8Level_Version3 ->    // 0x08;
+						result + ".VP8Level_Version3";
+					default -> result + ".unknown level" + profileLevel.level;
+				};
 			} else if (mimeType.equalsIgnoreCase("video/vp9")) {
-				switch (profileLevel.profile) {
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile0:			// 0x01, VP9 Profile 0 4:2:0 8-bit
-					result = "VP9Profile0"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile1:			// 0x02, VP9 Profile 1 4:2:2 8-bit
-					result = "VP9Profile1"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile2:			// 0x04, VP9 Profile 2 4:2:0 10-bit
-					result = "VP9Profile2"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile3:			// 0x08, VP9 Profile 3 4:2:2 10-bit
-					result = "VP9Profile3"; break;
-    			// HDR profiles also support passing HDR metadata
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR:		// 0x1000, VP9 Profile 2 4:2:0 10-bit HDR
-					result = "VP9Profile2HDR"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR:		// 0x2000, VP9 Profile 3 4:2:2 10-bit HDR
-					result = "VP9Profile3HDR"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR10Plus:	// 0x4000, VP9 Profile 2 4:2:0 10-bit HDR10Plus
-					result = "VP9Profile2HDR10Plus"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR10Plus:	// 0x8000, VP9 Profile 3 4:2:2 10-bit HDR10Plus
-					result = "VP9Profile3HDR10Plus"; break;
-				default:
-					result = "unknown profile " + profileLevel.profile;
-					break;
-				}
-				switch (profileLevel.level) {
-				case MediaCodecInfo.CodecProfileLevel.VP9Level1:			// 0x1
-					result = result + ".VP9Level1"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level11:			// 0x2
-					result = result + ".VP9Level11"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level2:			// 0x4
-					result = result + ".VP9Level2"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level21:			// 0x8
-					result = result + ".VP9Level21"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level3:			// 0x10
-					result = result + ".VP9Level3"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level31:			// 0x20
-					result = result + ".VP9Level31"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level4:			// 0x40
-					result = result + ".VP9Level4"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level41:			// 0x80
-					result = result + ".VP9Level41"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level5:			// 0x100
-					result = result + ".VP9Level5"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level51:			// 0x200
-					result = result + ".VP9Level51"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level52:			// 0x400
-					result = result + ".VP9Level52"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level6:			// 0x800
-					result = result + ".VP9Level6"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level61:			// 0x1000
-					result = result + ".VP9Level61"; break;
-				case MediaCodecInfo.CodecProfileLevel.VP9Level62:			// 0x2000
-					result = result + ".VP9Level62"; break;
-				default:
-					result = result + ".unknown level" + profileLevel.level;
-					break;
-				}
+				result = switch (profileLevel.profile) {
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile0 ->            // 0x01, VP9 Profile 0 4:2:0 8-bit
+						"VP9Profile0";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile1 ->            // 0x02, VP9 Profile 1 4:2:2 8-bit
+						"VP9Profile1";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile2 ->            // 0x04, VP9 Profile 2 4:2:0 10-bit
+						"VP9Profile2";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile3 ->            // 0x08, VP9 Profile 3 4:2:2 10-bit
+						"VP9Profile3";
+					// HDR profiles also support passing HDR metadata
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR ->        // 0x1000, VP9 Profile 2 4:2:0 10-bit HDR
+						"VP9Profile2HDR";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR ->        // 0x2000, VP9 Profile 3 4:2:2 10-bit HDR
+						"VP9Profile3HDR";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile2HDR10Plus ->    // 0x4000, VP9 Profile 2 4:2:0 10-bit HDR10Plus
+						"VP9Profile2HDR10Plus";
+					case MediaCodecInfo.CodecProfileLevel.VP9Profile3HDR10Plus ->    // 0x8000, VP9 Profile 3 4:2:2 10-bit HDR10Plus
+						"VP9Profile3HDR10Plus";
+					default -> "unknown profile " + profileLevel.profile;
+				};
+				result = switch (profileLevel.level) {
+					case MediaCodecInfo.CodecProfileLevel.VP9Level1 ->            // 0x1
+						result + ".VP9Level1";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level11 ->            // 0x2
+						result + ".VP9Level11";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level2 ->            // 0x4
+						result + ".VP9Level2";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level21 ->            // 0x8
+						result + ".VP9Level21";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level3 ->            // 0x10
+						result + ".VP9Level3";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level31 ->            // 0x20
+						result + ".VP9Level31";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level4 ->            // 0x40
+						result + ".VP9Level4";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level41 ->            // 0x80
+						result + ".VP9Level41";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level5 ->            // 0x100
+						result + ".VP9Level5";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level51 ->            // 0x200
+						result + ".VP9Level51";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level52 ->            // 0x400
+						result + ".VP9Level52";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level6 ->            // 0x800
+						result + ".VP9Level6";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level61 ->            // 0x1000
+						result + ".VP9Level61";
+					case MediaCodecInfo.CodecProfileLevel.VP9Level62 ->            // 0x2000
+						result + ".VP9Level62";
+					default -> result + ".unknown level" + profileLevel.level;
+				};
 			} else if (mimeType.equalsIgnoreCase("video/hevc")) {
-				switch (profileLevel.profile) {
-				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain:		// 0x01
-					result = "HEVCProfileMain"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10:	// 0x02
-					result = "HEVCProfileMain10"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMainStill:	// 0x04
-					result = "HEVCProfileMainStill"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10:	// 0x1000
-					result = "HEVCProfileMain10HDR10"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10Plus:	// 0x2000
-					result = "HEVCProfileMain10HDR10Plus"; break;
-				default:
-					result = "unknown profile " + profileLevel.profile;
-					break;
-				}
-				switch (profileLevel.level) {
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel1:	// 0x1
-					result = result + ".HEVCMainTierLevel1"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel1:	// 0x2
-					result = result + ".HEVCHighTierLevel1"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel2:	// 0x4
-					result = result + ".HEVCMainTierLevel2"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel2:	// 0x8
-					result = result + ".HEVCHighTierLevel2"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel21:	// 0x10
-					result = result + ".HEVCMainTierLevel21"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel21:	// 0x20
-					result = result + ".HEVCHighTierLevel21"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel3:	// 0x40
-					result = result + ".HEVCMainTierLevel3"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel3:	// 0x80
-					result = result + ".HEVCHighTierLevel3"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel31:	// 0x100
-					result = result + ".HEVCMainTierLevel31"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel31:	// 0x200
-					result = result + ".HEVCHighTierLevel31"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel4:	// 0x400
-					result = result + ".HEVCMainTierLevel4"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel4:	// 0x800
-					result = result + ".HEVCHighTierLevel4"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel41:	// 0x1000
-					result = result + ".HEVCMainTierLevel41"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel41:	// 0x2000
-					result = result + ".HEVCHighTierLevel41"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel5:	// 0x4000
-					result = result + ".HEVCMainTierLevel5"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel5:	// 0x8000
-					result = result + ".HEVCHighTierLevel5"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel51:	// 0x10000
-					result = result + ".HEVCMainTierLevel51"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel51:	// 0x20000
-					result = result + ".HEVCHighTierLevel51"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel52:	// 0x40000
-					result = result + ".HEVCMainTierLevel52"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel52:	// 0x80000
-					result = result + ".HEVCHighTierLevel52"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel6:	// 0x100000
-					result = result + ".HEVCMainTierLevel6"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel6:	// 0x200000
-					result = result + ".HEVCHighTierLevel6"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel61:	// 0x400000
-					result = result + ".HEVCMainTierLevel61"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel61:	// 0x800000
-					result = result + ".HEVCHighTierLevel61"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel62:	// 0x1000000
-					result = result + ".HEVCMainTierLevel62"; break;
-				case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel62:	// 0x2000000
-					result = result + ".HEVCHighTierLevel62"; break;
-				default:
-					result = result + ".unknown level" + profileLevel.level;
-					break;
-				}
+				result = switch (profileLevel.profile) {
+					case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain ->        // 0x01
+						"HEVCProfileMain";
+					case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10 ->    // 0x02
+						"HEVCProfileMain10";
+					case MediaCodecInfo.CodecProfileLevel.HEVCProfileMainStill ->    // 0x04
+						"HEVCProfileMainStill";
+					case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10 ->    // 0x1000
+						"HEVCProfileMain10HDR10";
+					case MediaCodecInfo.CodecProfileLevel.HEVCProfileMain10HDR10Plus ->    // 0x2000
+						"HEVCProfileMain10HDR10Plus";
+					default -> "unknown profile " + profileLevel.profile;
+				};
+				result = switch (profileLevel.level) {
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel1 ->    // 0x1
+						result + ".HEVCMainTierLevel1";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel1 ->    // 0x2
+						result + ".HEVCHighTierLevel1";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel2 ->    // 0x4
+						result + ".HEVCMainTierLevel2";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel2 ->    // 0x8
+						result + ".HEVCHighTierLevel2";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel21 ->    // 0x10
+						result + ".HEVCMainTierLevel21";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel21 ->    // 0x20
+						result + ".HEVCHighTierLevel21";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel3 ->    // 0x40
+						result + ".HEVCMainTierLevel3";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel3 ->    // 0x80
+						result + ".HEVCHighTierLevel3";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel31 ->    // 0x100
+						result + ".HEVCMainTierLevel31";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel31 ->    // 0x200
+						result + ".HEVCHighTierLevel31";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel4 ->    // 0x400
+						result + ".HEVCMainTierLevel4";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel4 ->    // 0x800
+						result + ".HEVCHighTierLevel4";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel41 ->    // 0x1000
+						result + ".HEVCMainTierLevel41";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel41 ->    // 0x2000
+						result + ".HEVCHighTierLevel41";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel5 ->    // 0x4000
+						result + ".HEVCMainTierLevel5";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel5 ->    // 0x8000
+						result + ".HEVCHighTierLevel5";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel51 ->    // 0x10000
+						result + ".HEVCMainTierLevel51";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel51 ->    // 0x20000
+						result + ".HEVCHighTierLevel51";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel52 ->    // 0x40000
+						result + ".HEVCMainTierLevel52";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel52 ->    // 0x80000
+						result + ".HEVCHighTierLevel52";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel6 ->    // 0x100000
+						result + ".HEVCMainTierLevel6";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel6 ->    // 0x200000
+						result + ".HEVCHighTierLevel6";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel61 ->    // 0x400000
+						result + ".HEVCMainTierLevel61";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel61 ->    // 0x800000
+						result + ".HEVCHighTierLevel61";
+					case MediaCodecInfo.CodecProfileLevel.HEVCMainTierLevel62 ->    // 0x1000000
+						result + ".HEVCMainTierLevel62";
+					case MediaCodecInfo.CodecProfileLevel.HEVCHighTierLevel62 ->    // 0x2000000
+						result + ".HEVCHighTierLevel62";
+					default -> result + ".unknown level" + profileLevel.level;
+				};
 	    	} else {
 	    		result = "unknown profile " + profileLevel.profile;
 	    	}
@@ -1056,18 +1034,17 @@ public final class MediaCodecUtils {
      * if the color format is not recognized (e.g. not YUV).
      */
     public static boolean isSemiPlanarYUV(final int colorFormat) {
-        switch (colorFormat) {
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar:
-                return false;
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar:
-            case MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar:
-                return true;
-            default:
-                throw new RuntimeException("unknown format " + colorFormat);
-        }
+		return switch (colorFormat) {
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420Planar,
+				MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedPlanar ->
+				false;
+			case MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420SemiPlanar,
+				MediaCodecInfo.CodecCapabilities.COLOR_FormatYUV420PackedSemiPlanar,
+				MediaCodecInfo.CodecCapabilities.COLOR_TI_FormatYUV420PackedSemiPlanar,
+				MediaCodecInfo.CodecCapabilities.COLOR_QCOM_FormatYUV420SemiPlanar ->
+				true;
+			default -> throw new RuntimeException("unknown format " + colorFormat);
+		};
     }
 
 //================================================================================
@@ -1240,7 +1217,6 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param height
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	@NonNull
 	public static MediaFormat testVideoMediaFormat(
 		@NonNull final String mime, final int width, final int height) throws IOException {
@@ -1257,7 +1233,6 @@ LOOP:	for (int i = 0; i < numCodecs; i++) {
 	 * @param config エンコード設定
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	@NonNull
 	public static MediaFormat testVideoMediaFormat(
 		@NonNull final String mime, final int width, final int height,

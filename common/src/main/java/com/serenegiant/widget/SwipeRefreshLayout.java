@@ -878,41 +878,33 @@ public class SwipeRefreshLayout extends ViewGroup
 		}
 
 		switch (action) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN -> {
 			setTargetOffsetTopAndBottom(mOriginalOffsetTop - mCircleView.getTop());
 			mActivePointerId = ev.getPointerId(0);
 			mIsBeingDragged = false;
-
 			pointerIndex = ev.findPointerIndex(mActivePointerId);
 			if (pointerIndex < 0) {
 				return false;
 			}
 			mInitialDownY = ev.getY(pointerIndex);
-			break;
-
-		case MotionEvent.ACTION_MOVE:
+		}
+		case MotionEvent.ACTION_MOVE -> {
 			if (mActivePointerId == INVALID_POINTER) {
 				Log.e(LOG_TAG, "Got ACTION_MOVE event but don't have an active pointer id.");
 				return false;
 			}
-
 			pointerIndex = ev.findPointerIndex(mActivePointerId);
 			if (pointerIndex < 0) {
 				return false;
 			}
 			final float y = ev.getY(pointerIndex);
 			startDragging(y);
-			break;
-
-		case MotionEvent.ACTION_POINTER_UP:
-			onSecondaryPointerUp(ev);
-			break;
-
-		case MotionEvent.ACTION_UP:
-		case MotionEvent.ACTION_CANCEL:
+		}
+		case MotionEvent.ACTION_POINTER_UP -> onSecondaryPointerUp(ev);
+		case MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
 			mIsBeingDragged = false;
 			mActivePointerId = INVALID_POINTER;
-			break;
+		}
 		}
 
 		return mIsBeingDragged;
@@ -1362,12 +1354,11 @@ public class SwipeRefreshLayout extends ViewGroup
 		}
 
 		switch (action) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN -> {
 			mActivePointerId = ev.getPointerId(0);
 			mIsBeingDragged = false;
-			break;
-
-		case MotionEvent.ACTION_MOVE: {
+		}
+		case MotionEvent.ACTION_MOVE -> {
 			pointerIndex = ev.findPointerIndex(mActivePointerId);
 			if (pointerIndex < 0) {
 				Log.e(LOG_TAG, "Got ACTION_MOVE event but have an invalid active pointer id.");
@@ -1388,9 +1379,8 @@ public class SwipeRefreshLayout extends ViewGroup
 					return false;
 				}
 			}
-			break;
 		}
-		case MotionEvent.ACTION_POINTER_DOWN: {
+		case MotionEvent.ACTION_POINTER_DOWN -> {
 			pointerIndex = ev.getActionIndex();
 			if (pointerIndex < 0) {
 				Log.e(LOG_TAG,
@@ -1398,14 +1388,9 @@ public class SwipeRefreshLayout extends ViewGroup
 				return false;
 			}
 			mActivePointerId = ev.getPointerId(pointerIndex);
-			break;
 		}
-
-		case MotionEvent.ACTION_POINTER_UP:
-			onSecondaryPointerUp(ev);
-			break;
-
-		case MotionEvent.ACTION_UP: {
+		case MotionEvent.ACTION_POINTER_UP -> onSecondaryPointerUp(ev);
+		case MotionEvent.ACTION_UP -> {
 			pointerIndex = ev.findPointerIndex(mActivePointerId);
 			if (pointerIndex < 0) {
 				Log.e(LOG_TAG, "Got ACTION_UP event but don't have an active pointer id.");
@@ -1421,8 +1406,9 @@ public class SwipeRefreshLayout extends ViewGroup
 			mActivePointerId = INVALID_POINTER;
 			return false;
 		}
-		case MotionEvent.ACTION_CANCEL:
+		case MotionEvent.ACTION_CANCEL -> {
 			return false;
+		}
 		}
 
 		return true;

@@ -206,15 +206,9 @@ public class EffectRendererHolder extends AbstractRendererHolder
 
 			Object result = null;
 			switch (request) {
-			case REQUEST_CHANGE_EFFECT:
-				handleChangeEffect(arg1);
-				break;
-			case REQUEST_SET_PARAMS:
-				handleSetParam(arg1, (float[])obj);
-				break;
-			default:
-				result = super.handleRequest(request, arg1, arg2, obj);
-				break;
+			case REQUEST_CHANGE_EFFECT -> handleChangeEffect(arg1);
+			case REQUEST_SET_PARAMS -> handleSetParam(arg1, (float[]) obj);
+			default -> result = super.handleRequest(request, arg1, arg2, obj);
 			}
 			return result;
 		}

@@ -225,22 +225,13 @@ public class ViewUtils {
 	 * @return
 	 */
 	private static int rotation2Degrees(@Rotation final int rotation) {
-		final int degrees;
-		switch (rotation) {
-		case Surface.ROTATION_90:
-			degrees = 90;
-			break;
-		case Surface.ROTATION_180:
-			degrees = 180;
-			break;
-		case Surface.ROTATION_270:
-			degrees = 270;
-			break;
-		case Surface.ROTATION_0:
-		default:
-			degrees = 0;
-			break;
-		}
+		final int degrees = switch (rotation) {
+			case Surface.ROTATION_0 -> 0;
+			case Surface.ROTATION_90 -> 90;
+			case Surface.ROTATION_180 -> 180;
+			case Surface.ROTATION_270 -> 270;
+			default -> 0;
+		};
 		return degrees;
 	}
 

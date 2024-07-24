@@ -272,12 +272,8 @@ public class ColorPickerDialogV4 extends DialogFragmentEx {
 		public void onClick(final DialogInterface dialog, final int which) {
 			if (DEBUG) Log.v(TAG, "onClick:which=" + which);
 			switch (which) {
-			case DialogInterface.BUTTON_POSITIVE:
-				dialog.dismiss();
-				break;
-			case DialogInterface.BUTTON_NEGATIVE:
-				dialog.cancel();
-				break;
+			case DialogInterface.BUTTON_POSITIVE -> dialog.dismiss();
+			case DialogInterface.BUTTON_NEGATIVE -> dialog.cancel();
 			}
 		}
 	};

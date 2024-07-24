@@ -203,9 +203,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 			makeCurrent();
 			if (display != null) {
 				if (DEBUG) Log.v(TAG, "DrawTask#onStop:release VirtualDisplay");
-				if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-					display.release();
-				}
+				display.release();
 			}
 			if (DEBUG) Log.v(TAG, "DrawTask#onStop:tear down MediaProjection");
 			if (mMediaProjection != null) {

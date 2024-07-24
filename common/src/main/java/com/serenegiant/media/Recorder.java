@@ -588,25 +588,23 @@ public abstract class Recorder implements IRecorder {
 				return;
 			}
 			switch (msg.what) {
-			case MSG_SEND_EOS:			// キャプチャ終了要求メッセージ
+			case MSG_SEND_EOS ->            // キャプチャ終了要求メッセージ
 				recorder.stopRecording();
-				break;
-            case MSG_CHECK_FREESPACE:	// 空き容量チェックメッセージ
-            	if (!mThread.check(recorder)) {
-            		sendEmptyMessageDelayed(MSG_CHECK_FREESPACE, CHECK_INTERVAL);
-            	} else {
-            		recorder.stopRecording();
-            	}
-				break;
-			case MSG_SEND_QUIT:
+			case MSG_CHECK_FREESPACE -> {    // 空き容量チェックメッセージ
+				if (!mThread.check(recorder)) {
+					sendEmptyMessageDelayed(MSG_CHECK_FREESPACE, CHECK_INTERVAL);
+				} else {
+					recorder.stopRecording();
+				}
+			}
+			case MSG_SEND_QUIT -> {
 				try {
 					Looper.myLooper().quit();
 				} catch (final Exception e) {
 					// ignore
 				}
-				break;
-			default:
-				super.handleMessage(msg);
+			}
+			default -> super.handleMessage(msg);
 			}
 		}
 

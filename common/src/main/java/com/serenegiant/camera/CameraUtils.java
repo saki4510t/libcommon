@@ -404,28 +404,26 @@ cameraLoop:
 		final List<Integer> formats = params.getSupportedPictureFormats();
 		for (final int format: formats) {
 			switch (format) {
-			case ImageFormat.DEPTH16:			Log.i(TAG, "supported: DEPTH16"); break;
-			case ImageFormat.DEPTH_POINT_CLOUD:	Log.i(TAG, "supported: DEPTH_POINT_CLOUD"); break;
-			case ImageFormat.FLEX_RGBA_8888:	Log.i(TAG, "supported: FLEX_RGBA_8888"); break;
-			case ImageFormat.FLEX_RGB_888:		Log.i(TAG, "supported: FLEX_RGB_888"); break;
-			case ImageFormat.JPEG:				Log.i(TAG, "supported: JPEG"); break;
-			case ImageFormat.NV16:				Log.i(TAG, "supported: NV16"); break;
-			case ImageFormat.NV21:				Log.i(TAG, "supported: NV21"); break;
-			case ImageFormat.PRIVATE:			Log.i(TAG, "supported: PRIVATE"); break;
-			case ImageFormat.RAW10:				Log.i(TAG, "supported: RAW10"); break;
-			case ImageFormat.RAW12:				Log.i(TAG, "supported: RAW12"); break;
-			case ImageFormat.RAW_PRIVATE:		Log.i(TAG, "supported: RAW_PRIVATE"); break;
-			case ImageFormat.RAW_SENSOR:		Log.i(TAG, "supported: RAW_SENSOR"); break;
-			case ImageFormat.RGB_565:			Log.i(TAG, "supported: RGB_565"); break;
-			case ImageFormat.UNKNOWN:			Log.i(TAG, "supported: UNKNOWN"); break;
-			case ImageFormat.YUV_420_888:		Log.i(TAG, "supported: YUV_420_888"); break;
-			case ImageFormat.YUV_422_888:		Log.i(TAG, "supported: YUV_422_888"); break;
-			case ImageFormat.YUV_444_888:		Log.i(TAG, "supported: YUV_444_888"); break;
-			case ImageFormat.YUY2:				Log.i(TAG, "supported: YUY2"); break;
-			case ImageFormat.YV12:				Log.i(TAG, "supported: YV12"); break;
-			default:
-				Log.i(TAG, String.format("supported: unknown, %08x", format));
-				break;
+			case ImageFormat.DEPTH16 -> Log.i(TAG, "supported: DEPTH16");
+			case ImageFormat.DEPTH_POINT_CLOUD -> Log.i(TAG, "supported: DEPTH_POINT_CLOUD");
+			case ImageFormat.FLEX_RGBA_8888 -> Log.i(TAG, "supported: FLEX_RGBA_8888");
+			case ImageFormat.FLEX_RGB_888 -> Log.i(TAG, "supported: FLEX_RGB_888");
+			case ImageFormat.JPEG -> Log.i(TAG, "supported: JPEG");
+			case ImageFormat.NV16 -> Log.i(TAG, "supported: NV16");
+			case ImageFormat.NV21 -> Log.i(TAG, "supported: NV21");
+			case ImageFormat.PRIVATE -> Log.i(TAG, "supported: PRIVATE");
+			case ImageFormat.RAW10 -> Log.i(TAG, "supported: RAW10");
+			case ImageFormat.RAW12 -> Log.i(TAG, "supported: RAW12");
+			case ImageFormat.RAW_PRIVATE -> Log.i(TAG, "supported: RAW_PRIVATE");
+			case ImageFormat.RAW_SENSOR -> Log.i(TAG, "supported: RAW_SENSOR");
+			case ImageFormat.RGB_565 -> Log.i(TAG, "supported: RGB_565");
+			case ImageFormat.UNKNOWN -> Log.i(TAG, "supported: UNKNOWN");
+			case ImageFormat.YUV_420_888 -> Log.i(TAG, "supported: YUV_420_888");
+			case ImageFormat.YUV_422_888 -> Log.i(TAG, "supported: YUV_422_888");
+			case ImageFormat.YUV_444_888 -> Log.i(TAG, "supported: YUV_444_888");
+			case ImageFormat.YUY2 -> Log.i(TAG, "supported: YUY2");
+			case ImageFormat.YV12 -> Log.i(TAG, "supported: YV12");
+			default -> Log.i(TAG, String.format("supported: unknown, %08x", format));
 			}
 		}
 	}
@@ -438,28 +436,26 @@ cameraLoop:
 		final List<Integer> formats = params.getSupportedPreviewFormats();
 		for (final int format: formats) {
 			switch (format) {
-			case ImageFormat.DEPTH16:			Log.i(TAG, "supported: DEPTH16"); break;
-			case ImageFormat.DEPTH_POINT_CLOUD:	Log.i(TAG, "supported: DEPTH_POINT_CLOUD"); break;
-			case ImageFormat.FLEX_RGBA_8888:	Log.i(TAG, "supported: FLEX_RGBA_8888"); break;
-			case ImageFormat.FLEX_RGB_888:		Log.i(TAG, "supported: FLEX_RGB_888"); break;
-			case ImageFormat.JPEG:				Log.i(TAG, "supported: JPEG"); break;
-			case ImageFormat.NV16:				Log.i(TAG, "supported: NV16"); break;
-			case ImageFormat.NV21:				Log.i(TAG, "supported: NV21"); break;
-			case ImageFormat.PRIVATE:			Log.i(TAG, "supported: PRIVATE"); break;
-			case ImageFormat.RAW10:				Log.i(TAG, "supported: RAW10"); break;
-			case ImageFormat.RAW12:				Log.i(TAG, "supported: RAW12"); break;
-			case ImageFormat.RAW_PRIVATE:		Log.i(TAG, "supported: RAW_PRIVATE"); break;
-			case ImageFormat.RAW_SENSOR:		Log.i(TAG, "supported: RAW_SENSOR"); break;
-			case ImageFormat.RGB_565:			Log.i(TAG, "supported: RGB_565"); break;
-			case ImageFormat.UNKNOWN:			Log.i(TAG, "supported: UNKNOWN"); break;
-			case ImageFormat.YUV_420_888:		Log.i(TAG, "supported: YUV_420_888"); break;
-			case ImageFormat.YUV_422_888:		Log.i(TAG, "supported: YUV_422_888"); break;
-			case ImageFormat.YUV_444_888:		Log.i(TAG, "supported: YUV_444_888"); break;
-			case ImageFormat.YUY2:				Log.i(TAG, "supported: YUY2"); break;
-			case ImageFormat.YV12:				Log.i(TAG, "supported: YV12"); break;
-			default:
-				Log.i(TAG, String.format("supported: unknown, %08x", format));
-				break;
+			case ImageFormat.DEPTH16 -> Log.i(TAG, "supported: DEPTH16");
+			case ImageFormat.DEPTH_POINT_CLOUD -> Log.i(TAG, "supported: DEPTH_POINT_CLOUD");
+			case ImageFormat.FLEX_RGBA_8888 -> Log.i(TAG, "supported: FLEX_RGBA_8888");
+			case ImageFormat.FLEX_RGB_888 -> Log.i(TAG, "supported: FLEX_RGB_888");
+			case ImageFormat.JPEG -> Log.i(TAG, "supported: JPEG");
+			case ImageFormat.NV16 -> Log.i(TAG, "supported: NV16");
+			case ImageFormat.NV21 -> Log.i(TAG, "supported: NV21");
+			case ImageFormat.PRIVATE -> Log.i(TAG, "supported: PRIVATE");
+			case ImageFormat.RAW10 -> Log.i(TAG, "supported: RAW10");
+			case ImageFormat.RAW12 -> Log.i(TAG, "supported: RAW12");
+			case ImageFormat.RAW_PRIVATE -> Log.i(TAG, "supported: RAW_PRIVATE");
+			case ImageFormat.RAW_SENSOR -> Log.i(TAG, "supported: RAW_SENSOR");
+			case ImageFormat.RGB_565 -> Log.i(TAG, "supported: RGB_565");
+			case ImageFormat.UNKNOWN -> Log.i(TAG, "supported: UNKNOWN");
+			case ImageFormat.YUV_420_888 -> Log.i(TAG, "supported: YUV_420_888");
+			case ImageFormat.YUV_422_888 -> Log.i(TAG, "supported: YUV_422_888");
+			case ImageFormat.YUV_444_888 -> Log.i(TAG, "supported: YUV_444_888");
+			case ImageFormat.YUY2 -> Log.i(TAG, "supported: YUY2");
+			case ImageFormat.YV12 -> Log.i(TAG, "supported: YV12");
+			default -> Log.i(TAG, String.format("supported: unknown, %08x", format));
 			}
 		}
 	}

@@ -59,14 +59,14 @@ abstract class MediaRawChannelWriter extends PostMuxCommon {
 		@NonNull final MediaFormat outputFormat,
 		@NonNull final String tempDir) throws IOException {
 
-		switch (mediaType) {
-		case TYPE_VIDEO:
-			return new MediaRawVideoWriter(context, configFormat, outputFormat, tempDir);
-		case TYPE_AUDIO:
-			return new MediaRawAudioWriter(context, configFormat, outputFormat, tempDir);
-		default:
-			throw new IOException("Unexpected media type=" + mediaType);
-		}
+		return switch (mediaType) {
+			case TYPE_VIDEO ->
+				new MediaRawVideoWriter(context, configFormat, outputFormat, tempDir);
+			case TYPE_AUDIO ->
+				new MediaRawAudioWriter(context, configFormat, outputFormat, tempDir);
+			default ->
+				throw new IOException("Unexpected media type=" + mediaType);
+		};
 	}
 	
 //================================================================================

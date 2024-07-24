@@ -1132,20 +1132,14 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	public static String getNetworkTypeString(final int networkType) {
-		switch (networkType) {
-		case NETWORK_TYPE_NON:
-			return "NON";
-		case NETWORK_TYPE_MOBILE:
-			return "MOBILE";
-		case NETWORK_TYPE_WIFI:
-			return "WIFI";
-		case NETWORK_TYPE_BLUETOOTH:
-			return "BLUETOOTH";
-		case NETWORK_TYPE_ETHERNET:
-			return "ETHERNET";
-		default:
-			return String.format(Locale.US, "UNKNOWN(%d)", networkType);
-		}
+		return switch (networkType) {
+			case NETWORK_TYPE_NON -> "NON";
+			case NETWORK_TYPE_MOBILE -> "MOBILE";
+			case NETWORK_TYPE_WIFI -> "WIFI";
+			case NETWORK_TYPE_BLUETOOTH -> "BLUETOOTH";
+			case NETWORK_TYPE_ETHERNET -> "ETHERNET";
+			default -> String.format(Locale.US, "UNKNOWN(%d)", networkType);
+		};
 	}
 
 	/**

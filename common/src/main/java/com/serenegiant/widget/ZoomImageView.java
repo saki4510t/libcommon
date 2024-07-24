@@ -513,7 +513,7 @@ public class ZoomImageView extends TransformImageView
 	public void onStateChanged(@NonNull final View view, final int newState) {
 		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		switch (newState) {
-		case ViewTransformDelegater.STATE_ROTATING:
+		case ViewTransformDelegater.STATE_ROTATING -> {
 			if (mColorReverseFilter == null) {
 				mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
 			}
@@ -521,10 +521,8 @@ public class ZoomImageView extends TransformImageView
 			// post runnable to reset the color reversing
 			if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
 			postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
-			break;
-		case ViewTransformDelegater.STATE_NON:
-			resetColorFilter();
-			break;
+		}
+		case ViewTransformDelegater.STATE_NON -> resetColorFilter();
 		}
 		if (mViewTransformListener != null) {
 			mViewTransformListener.onStateChanged(view, newState);

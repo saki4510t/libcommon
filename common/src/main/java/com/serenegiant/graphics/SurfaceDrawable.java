@@ -288,18 +288,10 @@ public class SurfaceDrawable extends Drawable {
 		final int arg1, final int arg2, final Object obj) {
 
 		switch (request) {
-		case REQUEST_DRAW:
-			handleDraw();
-			break;
-		case REQUEST_UPDATE_SIZE:
-			handleResize(arg1, arg2);
-			break;
-		case REQUEST_RECREATE_MASTER_SURFACE:
-			handleReCreateInputSurface();
-			break;
-		default:
-			if (DEBUG) Log.v(TAG, "handleRequest:" + request);
-			break;
+		case REQUEST_DRAW -> handleDraw();
+		case REQUEST_UPDATE_SIZE -> handleResize(arg1, arg2);
+		case REQUEST_RECREATE_MASTER_SURFACE -> handleReCreateInputSurface();
+		default -> { if (DEBUG) Log.v(TAG, "handleRequest:" + request); }
 		}
 		return null;
 	}

@@ -435,41 +435,21 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 //		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
 		switch (request) {
-		case REQUEST_DRAW:
-			handleDraw(arg2 != 0, arg1, (float[])obj);
-			break;
-		case REQUEST_UPDATE_SIZE:
-			handleResize(arg1, arg2);
-			break;
-		case REQUEST_ADD_SURFACE:
+		case REQUEST_DRAW -> handleDraw(arg2 != 0, arg1, (float[]) obj);
+		case REQUEST_UPDATE_SIZE -> handleResize(arg1, arg2);
+		case REQUEST_ADD_SURFACE -> {
 			if (obj instanceof TargetSurface) {
-				handleAddSurface((TargetSurface)obj);
+				handleAddSurface((TargetSurface) obj);
 			}
-			break;
-		case REQUEST_REMOVE_SURFACE:
-			handleRemoveSurface(arg1);
-			break;
-		case REQUEST_REMOVE_SURFACE_ALL:
-			handleRemoveAll();
-			break;
-		case REQUEST_RECREATE_MASTER_SURFACE:
-			handleReCreateInputSurface();
-			break;
-		case REQUEST_MIRROR:
-			handleMirror(arg1);
-			break;
-		case REQUEST_ROTATE:
-			handleRotate(arg1, arg2);
-			break;
-		case REQUEST_CLEAR:
-			handleClear(arg1, arg2);
-			break;
-		case REQUEST_CLEAR_ALL:
-			handleClearAll(arg1);
-			break;
-		case REQUEST_SET_MVP:
-			handleSetMvp(arg1, arg2, (float[])obj);
-			break;
+		}
+		case REQUEST_REMOVE_SURFACE -> handleRemoveSurface(arg1);
+		case REQUEST_REMOVE_SURFACE_ALL -> handleRemoveAll();
+		case REQUEST_RECREATE_MASTER_SURFACE -> handleReCreateInputSurface();
+		case REQUEST_MIRROR -> handleMirror(arg1);
+		case REQUEST_ROTATE -> handleRotate(arg1, arg2);
+		case REQUEST_CLEAR -> handleClear(arg1, arg2);
+		case REQUEST_CLEAR_ALL -> handleClearAll(arg1);
+		case REQUEST_SET_MVP -> handleSetMvp(arg1, arg2, (float[]) obj);
 		}
 		return null;
 	}

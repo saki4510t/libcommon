@@ -165,22 +165,22 @@ public class GLUtils implements GLConst {
 	 */
 	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @MirrorMode final int mirror) {
 		switch (mirror) {
-		case MIRROR_NORMAL:
+		case MIRROR_NORMAL -> {
 			mvp[0] = Math.abs(mvp[0]);
 			mvp[5] = Math.abs(mvp[5]);
-			break;
-		case MIRROR_HORIZONTAL:
-			mvp[0] = -Math.abs(mvp[0]);	// flip left-right
+		}
+		case MIRROR_HORIZONTAL -> {
+			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
 			mvp[5] = Math.abs(mvp[5]);
-			break;
-		case MIRROR_VERTICAL:
+		}
+		case MIRROR_VERTICAL -> {
 			mvp[0] = Math.abs(mvp[0]);
-			mvp[5] = -Math.abs(mvp[5]);	// flip up-side down
-			break;
-		case MIRROR_BOTH:
-			mvp[0] = -Math.abs(mvp[0]);	// flip left-right
-			mvp[5] = -Math.abs(mvp[5]);	// flip up-side down
-			break;
+			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+		}
+		case MIRROR_BOTH -> {
+			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
+			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+		}
 		}
 	}
 

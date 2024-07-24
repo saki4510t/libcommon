@@ -472,48 +472,21 @@ public abstract class AbstractChannelDataLink {
 					final int type = ChannelHelper.readInt(mChannel);
 					if (DEBUG) Log.v(TAG, "Client#doReceiveLoop:type=" + type);
 					switch (type) {
-					case TYPE_NULL:
-						callOnReceive(null);
-						break;
-					case TYPE_BYTE_BUFFER:
-						callOnReceive(ChannelHelper.readByteBuffer(mChannel));
-						break;
-					case TYPE_BOOL:
-						callOnReceive(ChannelHelper.readBoolean(mChannel));
-						break;
-					case TYPE_INT:
-						callOnReceive(ChannelHelper.readInt(mChannel));
-						break;
-					case TYPE_LONG:
-						callOnReceive(ChannelHelper.readLong(mChannel));
-						break;
-					case TYPE_FLOAT:
-						callOnReceive(ChannelHelper.readFloat(mChannel));
-						break;
-					case TYPE_DOUBLE:
-						callOnReceive(ChannelHelper.readDouble(mChannel));
-						break;
-					case TYPE_STRING:
-						callOnReceive(ChannelHelper.readString(mChannel));
-						break;
-					case TYPE_BYTE_ARRAY:
-						callOnReceive(ChannelHelper.readByteArray(mChannel));
-						break;
-					case TYPE_BOOL_ARRAY:
-						callOnReceive(ChannelHelper.readBooleanArray(mChannel));
-						break;
-					case TYPE_INT_ARRAY:
-						callOnReceive(ChannelHelper.readIntArray(mChannel));
-						break;
-					case TYPE_LONG_ARRAY:
-						callOnReceive(ChannelHelper.readLongArray(mChannel));
-						break;
-					case TYPE_FLOAT_ARRAY:
-						callOnReceive(ChannelHelper.readFloatArray(mChannel));
-						break;
-					case TYPE_DOUBLE_ARRAY:
+					case TYPE_NULL -> callOnReceive(null);
+					case TYPE_BYTE_BUFFER -> callOnReceive(ChannelHelper.readByteBuffer(mChannel));
+					case TYPE_BOOL -> callOnReceive(ChannelHelper.readBoolean(mChannel));
+					case TYPE_INT -> callOnReceive(ChannelHelper.readInt(mChannel));
+					case TYPE_LONG -> callOnReceive(ChannelHelper.readLong(mChannel));
+					case TYPE_FLOAT -> callOnReceive(ChannelHelper.readFloat(mChannel));
+					case TYPE_DOUBLE -> callOnReceive(ChannelHelper.readDouble(mChannel));
+					case TYPE_STRING -> callOnReceive(ChannelHelper.readString(mChannel));
+					case TYPE_BYTE_ARRAY -> callOnReceive(ChannelHelper.readByteArray(mChannel));
+					case TYPE_BOOL_ARRAY -> callOnReceive(ChannelHelper.readBooleanArray(mChannel));
+					case TYPE_INT_ARRAY -> callOnReceive(ChannelHelper.readIntArray(mChannel));
+					case TYPE_LONG_ARRAY -> callOnReceive(ChannelHelper.readLongArray(mChannel));
+					case TYPE_FLOAT_ARRAY -> callOnReceive(ChannelHelper.readFloatArray(mChannel));
+					case TYPE_DOUBLE_ARRAY ->
 						callOnReceive(ChannelHelper.readDoubleArray(mChannel));
-						break;
 					}
 				} catch (final SocketException | ClosedChannelException e) {
 					break;
@@ -588,106 +561,107 @@ public abstract class AbstractChannelDataLink {
 			if (DEBUG) Log.v(TAG, "handleMessage:msg=" + msg);
 			try {
 				// 内部コマンド
-				switch (msg.what) {
-				case REQ_RELEASE:
+				if (msg.what == REQ_RELEASE) {
 					internalRelease();
 					return true;
 				}
 				// データ送信
 				switch (msg.what) {
-				case TYPE_NULL:
+				case TYPE_NULL -> {
 					ChannelHelper.write(mChannel, TYPE_NULL);
 					return true;
-				case TYPE_BYTE_BUFFER:
+				}
+				case TYPE_BYTE_BUFFER -> {
 					if (msg.obj instanceof ByteBuffer) {
 						ChannelHelper.write(mChannel, TYPE_BYTE_BUFFER);
-						ChannelHelper.write(mChannel, (ByteBuffer)msg.obj);
+						ChannelHelper.write(mChannel, (ByteBuffer) msg.obj);
 					}
 					return true;
-				case TYPE_BOOL:
+				}
+				case TYPE_BOOL -> {
 					if (msg.obj instanceof Boolean) {
 						ChannelHelper.write(mChannel, TYPE_BOOL);
-						ChannelHelper.write(mChannel, (boolean)msg.obj);
+						ChannelHelper.write(mChannel, (boolean) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_INT:
+				}
+				case TYPE_INT -> {
 					if (msg.obj instanceof Integer) {
 						ChannelHelper.write(mChannel, TYPE_INT);
-						ChannelHelper.write(mChannel, (int)msg.obj);
+						ChannelHelper.write(mChannel, (int) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_LONG:
+				}
+				case TYPE_LONG -> {
 					if (msg.obj instanceof Long) {
 						ChannelHelper.write(mChannel, TYPE_LONG);
-						ChannelHelper.write(mChannel, (long)msg.obj);
+						ChannelHelper.write(mChannel, (long) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_FLOAT:
+				}
+				case TYPE_FLOAT -> {
 					if (msg.obj instanceof Float) {
 						ChannelHelper.write(mChannel, TYPE_FLOAT);
-						ChannelHelper.write(mChannel, (float)msg.obj);
+						ChannelHelper.write(mChannel, (float) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_DOUBLE:
+				}
+				case TYPE_DOUBLE -> {
 					if (msg.obj instanceof Double) {
 						ChannelHelper.write(mChannel, TYPE_DOUBLE);
-						ChannelHelper.write(mChannel, (double)msg.obj);
+						ChannelHelper.write(mChannel, (double) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_STRING:
+				}
+				case TYPE_STRING -> {
 					if (msg.obj instanceof String) {
 						ChannelHelper.write(mChannel, TYPE_STRING);
-						ChannelHelper.write(mChannel, (String)msg.obj);
+						ChannelHelper.write(mChannel, (String) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_BYTE_ARRAY:
+				}
+				case TYPE_BYTE_ARRAY -> {
 					if (msg.obj instanceof byte[]) {
 						ChannelHelper.write(mChannel, TYPE_BYTE_ARRAY);
-						ChannelHelper.write(mChannel, (byte[])msg.obj);
+						ChannelHelper.write(mChannel, (byte[]) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_BOOL_ARRAY:
+				}
+				case TYPE_BOOL_ARRAY -> {
 					if (msg.obj instanceof boolean[]) {
 						ChannelHelper.write(mChannel, TYPE_BOOL_ARRAY);
-						ChannelHelper.write(mChannel, (boolean[])msg.obj);
+						ChannelHelper.write(mChannel, (boolean[]) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_INT_ARRAY:
+				}
+				case TYPE_INT_ARRAY -> {
 					if (msg.obj instanceof int[]) {
 						ChannelHelper.write(mChannel, TYPE_INT_ARRAY);
-						ChannelHelper.write(mChannel, (int[])msg.obj);
+						ChannelHelper.write(mChannel, (int[]) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_LONG_ARRAY:
+				}
+				case TYPE_LONG_ARRAY -> {
 					if (msg.obj instanceof long[]) {
 						ChannelHelper.write(mChannel, TYPE_LONG_ARRAY);
-						ChannelHelper.write(mChannel, (long[])msg.obj);
+						ChannelHelper.write(mChannel, (long[]) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_FLOAT_ARRAY:
+				}
+				case TYPE_FLOAT_ARRAY -> {
 					if (msg.obj instanceof float[]) {
 						ChannelHelper.write(mChannel, TYPE_FLOAT_ARRAY);
-						ChannelHelper.write(mChannel, (float[])msg.obj);
+						ChannelHelper.write(mChannel, (float[]) msg.obj);
 						return true;
 					}
-					break;
-				case TYPE_DOUBLE_ARRAY:
+				}
+				case TYPE_DOUBLE_ARRAY -> {
 					if (msg.obj instanceof double[]) {
 						ChannelHelper.write(mChannel, TYPE_DOUBLE_ARRAY);
-						ChannelHelper.write(mChannel, (double[])msg.obj);
+						ChannelHelper.write(mChannel, (double[]) msg.obj);
 						return true;
 					}
-					break;
+				}
 				}
 			} catch (final SocketException e) {
 				if (DEBUG) Log.w(TAG, e);

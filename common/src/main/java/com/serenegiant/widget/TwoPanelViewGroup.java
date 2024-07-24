@@ -404,18 +404,15 @@ public class TwoPanelViewGroup extends FrameLayout {
 		} else if (n > 0) {
 			// 子Viewが2個ある時
 			switch (mDisplayMode) {
-			case MODE_SELECT_1:
-			case MODE_SINGLE_1:
+			case MODE_SELECT_1,
+				MODE_SINGLE_1 ->
 				onMeasureSelect1(maxChildWidth, maxChildHeight, widthMeasureSpec, heightMeasureSpec);
-				break;
-			case MODE_SELECT_2:
-			case MODE_SINGLE_2:
+			case MODE_SELECT_2,
+				MODE_SINGLE_2 ->
 				onMeasureSelect2(maxChildWidth, maxChildHeight, widthMeasureSpec, heightMeasureSpec);
-				break;
-//			case MODE_SPLIT:
-			default:
+//			case MODE_SPLIT,
+			default ->
 				onMeasureSplit(maxChildWidth, maxChildHeight, widthMeasureSpec, heightMeasureSpec);
-				break;
 			}
 		} else {
 			super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -540,18 +537,14 @@ public class TwoPanelViewGroup extends FrameLayout {
 		} else if (n > 0) {
 			// 子Viewが2個ある時
 			switch (mDisplayMode) {
-			case MODE_SELECT_1:
-			case MODE_SINGLE_1:
+			case MODE_SELECT_1,
+				MODE_SINGLE_1 ->
 				onLayoutSelect1(changed, _left, _top, _right, _bottom);
-				break;
-			case MODE_SELECT_2:
-			case MODE_SINGLE_2:
+			case MODE_SELECT_2,
+				MODE_SINGLE_2 ->
 				onLayoutSelect2(changed, _left, _top, _right, _bottom);
-				break;
-//			case MODE_SPLIT:
-			default:
-				onLayoutSplit(changed, _left, _top, _right, _bottom);
-				break;
+//			case MODE_SPLIT,
+			default -> onLayoutSplit(changed, _left, _top, _right, _bottom);
 			}
 		} else {
 			super.onLayout(changed, left, top, right, bottom);
@@ -680,33 +673,27 @@ public class TwoPanelViewGroup extends FrameLayout {
 		final int absoluteGravity = Gravity.getAbsoluteGravity(gravity, layoutDirection);
 		final int verticalGravity = gravity & Gravity.VERTICAL_GRAVITY_MASK;
 
-		switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
-		case Gravity.CENTER_HORIZONTAL:
-			childLeft = left + (right - left - width) / 2 +
-				lp.leftMargin - lp.rightMargin;
-			break;
-		case Gravity.RIGHT:
-			childLeft = right - width - lp.rightMargin;
-			break;
-		case Gravity.LEFT:
-		default:
-			childLeft = left + lp.leftMargin;
-		}
+		childLeft = switch (absoluteGravity & Gravity.HORIZONTAL_GRAVITY_MASK) {
+			case Gravity.CENTER_HORIZONTAL ->
+				left + (right - left - width) / 2 +
+					lp.leftMargin - lp.rightMargin;
+			case Gravity.RIGHT ->
+				right - width - lp.rightMargin;
+			default ->
+				left + lp.leftMargin;
+		};
 
-		switch (verticalGravity) {
-		case Gravity.TOP:
-			childTop = top + lp.topMargin;
-			break;
-		case Gravity.CENTER_VERTICAL:
-			childTop = top + (bottom - top - height) / 2 +
-				lp.topMargin - lp.bottomMargin;
-			break;
-		case Gravity.BOTTOM:
-			childTop = bottom - height - lp.bottomMargin;
-			break;
-		default:
-			childTop = top + lp.topMargin;
-		}
+		childTop = switch (verticalGravity) {
+			case Gravity.TOP ->
+				top + lp.topMargin;
+			case Gravity.CENTER_VERTICAL ->
+				top + (bottom - top - height) / 2 +
+					lp.topMargin - lp.bottomMargin;
+			case Gravity.BOTTOM ->
+				bottom - height - lp.bottomMargin;
+			default ->
+				top + lp.topMargin;
+		};
 
 		child.layout(childLeft, childTop, childLeft + width, childTop + height);
 	}
@@ -731,24 +718,24 @@ public class TwoPanelViewGroup extends FrameLayout {
 		final View ch2 = mFlipChildPos ? mChild1 : mChild2;
 		try {
 			switch (mDisplayMode) {
-			case MODE_SELECT_1:
-			case MODE_SINGLE_1:
+			case MODE_SELECT_1,
+				MODE_SINGLE_1 -> {
 				removeView(ch1);
 				addView(ch1, 0);
 				ch1.setVisibility(VISIBLE);
-				ch2.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_1) ? VISIBLE: INVISIBLE);
-				break;
-			case MODE_SELECT_2:
-			case MODE_SINGLE_2:
+				ch2.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_1) ? VISIBLE : INVISIBLE);
+			}
+			case MODE_SELECT_2,
+				MODE_SINGLE_2 -> {
 				removeView(ch2);
 				addView(ch2, 0);
-				ch1.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_2) ? VISIBLE: INVISIBLE);
+				ch1.setVisibility(mEnableSubWindow && (mDisplayMode != MODE_SINGLE_2) ? VISIBLE : INVISIBLE);
 				ch2.setVisibility(VISIBLE);
-				break;
-			case MODE_SPLIT:
+			}
+			case MODE_SPLIT -> {
 				ch1.setVisibility(VISIBLE);
 				ch2.setVisibility(VISIBLE);
-				break;
+			}
 			}
 		} finally {
 			mChild1 = mFlipChildPos ? ch2 : ch1;

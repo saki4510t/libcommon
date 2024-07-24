@@ -286,23 +286,20 @@ public class GyroHelper {
 		private void getOrientation(final float[] rotateMatrix, final float[] result) {
 
 			switch (mRotation) {
-			case Surface.ROTATION_0:
+			case Surface.ROTATION_0 -> {
 				SensorManager.getOrientation(rotateMatrix, result);
 				return;
-			case Surface.ROTATION_90:
-				SensorManager.remapCoordinateSystem(
-					rotateMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, outR);
-				break;
-			case Surface.ROTATION_180:
+			}
+			case Surface.ROTATION_90 -> SensorManager.remapCoordinateSystem(
+				rotateMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, outR);
+			case Surface.ROTATION_180 -> {
 				SensorManager.remapCoordinateSystem(
 					rotateMatrix, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, outR2);
 				SensorManager.remapCoordinateSystem(
 					outR2, SensorManager.AXIS_Y, SensorManager.AXIS_MINUS_X, outR);
-				break;
-			case Surface.ROTATION_270:
-				SensorManager.remapCoordinateSystem(
-					outR, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, outR);
-				break;
+			}
+			case Surface.ROTATION_270 -> SensorManager.remapCoordinateSystem(
+				outR, SensorManager.AXIS_MINUS_Y, SensorManager.AXIS_MINUS_X, outR);
 			}
 			SensorManager.getOrientation(outR, result);
 		}
@@ -323,7 +320,7 @@ public class GyroHelper {
 			final float[] values = event.values;
 			final int type = event.sensor.getType();
 			switch (type) {
-			case Sensor.TYPE_MAGNETIC_FIELD:	// 磁気センサー
+			case Sensor.TYPE_MAGNETIC_FIELD -> {    // 磁気センサー
 				synchronized (mSensorSync) {
 					// ハイパスフィルターを通して取得
 					// alpha=t/(t+dt), dt≒20msec@SENSOR_DELAY_GAME, tはローパスフィルタの時定数(t=80)
@@ -336,26 +333,28 @@ public class GyroHelper {
 					mAzimuthValues[1] *= TO_DEGREE;
 					mAzimuthValues[2] *= TO_DEGREE;
 				}
-				break;
-			case Sensor.TYPE_GRAVITY:			// 重力センサー
+			}
+			case Sensor.TYPE_GRAVITY -> {            // 重力センサー
 				synchronized (mSensorSync) {
 					System.arraycopy(values, 0, mGravityValues, 0, 3);
 				}
-				break;
-			case Sensor.TYPE_ACCELEROMETER:		// 加速度センサー
+			}
+			case Sensor.TYPE_ACCELEROMETER -> {        // 加速度センサー
 				synchronized (mSensorSync) {
 					System.arraycopy(values, 0, mAccelValues, 0, 3);
-					System.arraycopy(values, 0, mGravityValues, 0, 3);	// 重力センサーが無い時は加速度センサーで代用
+					System.arraycopy(values, 0, mGravityValues, 0, 3);    // 重力センサーが無い時は加速度センサーで代用
 				}
-				break;
-			case Sensor.TYPE_GYROSCOPE:			// ジャイロセンサー
+			}
+			case Sensor.TYPE_GYROSCOPE -> {            // ジャイロセンサー
 				synchronized (mSensorSync) {
 					System.arraycopy(values, 0, mGyroValues, 0, 3);
 				}
-				break;
-			default:
-				if (DEBUG) Log.v(TAG, "onSensorChanged:" + String.format(Locale.US, "その他%d(%f,%f,%f)", type, values[0], values[1], values[2]));
-				break;
+			}
+			default -> {
+				if (DEBUG) Log.v(TAG, "onSensorChanged:"
+					+ String.format(Locale.US, "その他%d(%f,%f,%f)",
+						type, values[0], values[1], values[2]));
+			}
 			}
 		}
 

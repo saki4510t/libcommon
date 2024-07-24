@@ -226,7 +226,7 @@ public class ZoomAspectScaledTextureView
 		{
 			// moving with single and multi touch
 			switch (mState) {
-			case STATE_WAITING:
+			case STATE_WAITING -> {
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
 
@@ -234,27 +234,27 @@ public class ZoomAspectScaledTextureView
 					setState(STATE_DRAGGING);
 					return true;
 				}
-				break;
-			case STATE_DRAGGING:
+			}
+			case STATE_DRAGGING -> {
 				if (processDrag(event))
 					return true;
-				break;
-			case STATE_CHECKING:
+			}
+			case STATE_CHECKING -> {
 				if (checkTouchMoved(event)
 					&& ((mHandleTouchEvent & TOUCH_ENABLED_ZOOM) == TOUCH_ENABLED_ZOOM)) {
 
 					startZoom(event);
 					return true;
 				}
-				break;
-			case STATE_ZOOMING:
+			}
+			case STATE_ZOOMING -> {
 				if (processZoom(event))
 					return true;
-				break;
-			case STATE_ROTATING:
+			}
+			case STATE_ROTATING -> {
 				if (processRotate(event))
 					return true;
-				break;
+			}
 			}
 			break;
 		}
@@ -736,23 +736,23 @@ public class ZoomAspectScaledTextureView
 	private void applyMirrorMode() {
 		if (DEBUG) Log.v(TAG, "applyMirrorMode");
 		switch (mMirrorMode) {
-		case MIRROR_HORIZONTAL:
+		case MIRROR_HORIZONTAL -> {
 			setScaleX(-1.0f);
 			setScaleY(1.0f);
-			break;
-		case MIRROR_VERTICAL:
+		}
+		case MIRROR_VERTICAL -> {
 			setScaleX(1.0f);
 			setScaleY(-1.0f);
-			break;
-		case MIRROR_BOTH:
+		}
+		case MIRROR_BOTH -> {
 			setScaleX(-1.0f);
 			setScaleY(-1.0f);
-			break;
-		case MIRROR_NORMAL:
-		default:
+		}
+//		case IMirror.MIRROR_NORMAL,
+		default -> {
 			setScaleX(1.0f);
 			setScaleY(1.0f);
-			break;
+		}
 		}
 	}
 

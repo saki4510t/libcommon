@@ -198,12 +198,12 @@ public class OrientationSeekbar extends AppCompatSeekBar {
 		}
 		// 以下は縦の場合の処理
 		switch (event.getAction()) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN -> {
 			onChangeListener.onStartTrackingTouch(this);
 			setPressed(true);
 			setSelected(true);
-			break;
-		case MotionEvent.ACTION_MOVE:
+		}
+		case MotionEvent.ACTION_MOVE -> {
 			super.onTouchEvent(event);
 			// 下が0、上が最大値
 			int progress = getMax() - (int) (getMax() * event.getY() / getHeight());
@@ -214,31 +214,28 @@ public class OrientationSeekbar extends AppCompatSeekBar {
 			if (progress > getMax()) {
 				progress = getMax();
 			}
-
 			setProgress(progress);
-
 			if (progress != lastProgress) {
 				lastProgress = progress;
 				onChangeListener.onProgressChanged(this, progress, true);
 			}
-
 			onSizeChanged(getWidth(), getHeight(), 0, 0);
 			onChangeListener.onProgressChanged(
 				this, (int) (getMax() * event.getY() / getHeight()), true);
 			// シークバーを動かす
 			setPressed(true);
 			setSelected(true);
-			break;
-		case MotionEvent.ACTION_UP:
+		}
+		case MotionEvent.ACTION_UP -> {
 			onChangeListener.onStopTrackingTouch(this);
 			setPressed(false);
 			setSelected(false);
-			break;
-		case MotionEvent.ACTION_CANCEL:
+		}
+		case MotionEvent.ACTION_CANCEL -> {
 			super.onTouchEvent(event);
 			setPressed(false);
 			setSelected(false);
-			break;
+		}
 		}
 		return true;
 	}

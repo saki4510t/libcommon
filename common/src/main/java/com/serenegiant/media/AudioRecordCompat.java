@@ -139,18 +139,12 @@ public class AudioRecordCompat {
 	@AudioChannel
 	public static int getAudioChannel(final int channels) {
 		@AudioRecordCompat.AudioChannel
-		final int audioChannel;
-		switch (channels) {
-		case AudioFormat.CHANNEL_IN_MONO:
-			audioChannel = AudioFormat.CHANNEL_IN_MONO;
-			break;
-		case AudioFormat.CHANNEL_IN_STEREO:
-			audioChannel = AudioFormat.CHANNEL_IN_STEREO;
-			break;
-		default:
-			audioChannel = (channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO);
-			break;
-		}
+		final int audioChannel = switch (channels) {
+			case AudioFormat.CHANNEL_IN_MONO -> AudioFormat.CHANNEL_IN_MONO;
+			case AudioFormat.CHANNEL_IN_STEREO -> AudioFormat.CHANNEL_IN_STEREO;
+			default ->
+				(channels == 1 ? AudioFormat.CHANNEL_IN_MONO : AudioFormat.CHANNEL_IN_STEREO);
+		};
 		return audioChannel;
 	}
 
@@ -245,10 +239,10 @@ public class AudioRecordCompat {
 		};
 
 		switch (source) {
-		case 2:	AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER; break;	// 内蔵マイク
-		case 3: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION; break;
-		case 4: AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC; break;
-		default: AUDIO_SOURCES[0] = source; break;
+		case 2 -> AUDIO_SOURCES[0] = MediaRecorder.AudioSource.CAMCORDER;	// 内蔵マイク
+		case 3 -> AUDIO_SOURCES[0] = MediaRecorder.AudioSource.VOICE_COMMUNICATION;
+		case 4 -> AUDIO_SOURCES[0] = MediaRecorder.AudioSource.MIC;
+		default -> AUDIO_SOURCES[0] = source;
 		}
 
 		@AudioChannel

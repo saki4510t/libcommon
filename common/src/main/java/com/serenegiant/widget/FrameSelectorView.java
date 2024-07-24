@@ -182,15 +182,12 @@ public class FrameSelectorView extends LinearLayout {
 	public void setScaleType(final int scale_type) {
 		if (mScaleTypeRadioGroup != null) {
 			switch (scale_type) {
-			case FrameView.SCALE_TYPE_INCH:
+			case FrameView.SCALE_TYPE_INCH ->
 				mScaleTypeRadioGroup.check(R.id.scale_type_inch_radiobutton);
-				break;
-			case FrameView.SCALE_TYPE_MM:
+			case FrameView.SCALE_TYPE_MM ->
 				mScaleTypeRadioGroup.check(R.id.scale_type_mm_radiobutton);
-				break;
-			default:
+			default ->
 				mScaleTypeRadioGroup.check(R.id.scale_type_non_radiobutton);
-				break;
 			}
 		}
 	}

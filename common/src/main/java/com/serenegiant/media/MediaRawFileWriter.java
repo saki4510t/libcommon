@@ -33,7 +33,6 @@ import androidx.annotation.NonNull;
 
 /**
  * MediaCodecからのエンコード済みのフレームデータをrawファイルへ出力するクラス
- *
  * 映像エンコード処理と音声エンコード処理とmux処理を同時に実行すると
  * 映像and/or音声が正常に記録されない端末がいくつかあるので、
  * 一度一時ファイルへ書き出しておいてエンコード終了後にmux処理を
@@ -60,14 +59,14 @@ abstract class MediaRawFileWriter extends PostMuxCommon {
 		@NonNull final MediaFormat outputFormat,
 		@NonNull final String tempDir) throws IOException {
 
-		switch (mediaType) {
-		case TYPE_VIDEO:
-			return new MediaRawVideoWriter(context, configFormat, outputFormat, tempDir);
-		case TYPE_AUDIO:
-			return new MediaRawAudioWriter(context, configFormat, outputFormat, tempDir);
-		default:
-			throw new IOException("Unexpected media type=" + mediaType);
-		}
+		return switch (mediaType) {
+			case TYPE_VIDEO ->
+				new MediaRawVideoWriter(context, configFormat, outputFormat, tempDir);
+			case TYPE_AUDIO ->
+				new MediaRawAudioWriter(context, configFormat, outputFormat, tempDir);
+			default ->
+				throw new IOException("Unexpected media type=" + mediaType);
+		};
 	}
 	
 //================================================================================

@@ -263,8 +263,7 @@ public class MediaSplitMuxerV2 implements IMuxer {
 		if (DEBUG) Log.v(TAG, "addTrack:" + format);
 		int result = mLastTrackIndex + 1;
 		switch (result) {
-		case 0:
-		case 1:
+		case 0, 1 -> {
 			if (format.containsKey(MediaFormat.KEY_MIME)) {
 				final String mime = format.getString(MediaFormat.KEY_MIME);
 				if (mime.startsWith("video/")) {
@@ -280,9 +279,8 @@ public class MediaSplitMuxerV2 implements IMuxer {
 				throw new IllegalArgumentException("has no mime type");
 			}
 			mLastTrackIndex++;
-			break;
-		default:
-			throw new IllegalArgumentException();
+		}
+		default -> throw new IllegalArgumentException();
 		}
 		if (DEBUG) Log.v(TAG, "addTrack:finished,result=" + result);
 		return result;

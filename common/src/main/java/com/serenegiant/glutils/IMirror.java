@@ -56,22 +56,13 @@ public interface IMirror {
 	 */
 	@MirrorMode
 	public static int flipVertical(@MirrorMode final int mirror) {
-		final int result;
-		switch (mirror) {
-		case MIRROR_HORIZONTAL:
-			result = MIRROR_BOTH;
-			break;
-		case MIRROR_VERTICAL:
-			result = MIRROR_NORMAL;
-			break;
-		case MIRROR_BOTH:
-			result = MIRROR_HORIZONTAL;
-			break;
-		case MIRROR_NORMAL:
-		default:
-			result = MIRROR_VERTICAL;
-			break;
-		}
+		final int result = switch (mirror) {
+			case MIRROR_HORIZONTAL -> MIRROR_BOTH;
+			case MIRROR_VERTICAL -> MIRROR_NORMAL;
+			case MIRROR_BOTH -> MIRROR_HORIZONTAL;
+			case MIRROR_NORMAL -> MIRROR_VERTICAL;
+			default -> MIRROR_VERTICAL;
+		};
 		return result;
 	}
 }

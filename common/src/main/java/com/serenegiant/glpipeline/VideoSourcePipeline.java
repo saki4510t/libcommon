@@ -274,17 +274,21 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	protected boolean handleMessage(@NonNull final Message msg) {
 //		if (DEBUG) Log.v(TAG, "handleMessage:" + msg);
 		switch (msg.what) {
-		case REQUEST_UPDATE_TEXTURE:
+		case REQUEST_UPDATE_TEXTURE -> {
 			handleUpdateTex();
 			return true;
-		case REQUEST_UPDATE_SIZE:
+		}
+		case REQUEST_UPDATE_SIZE -> {
 			handleResize(msg.arg1, msg.arg2);
 			return true;
-		case REQUEST_RECREATE_MASTER_SURFACE:
+		}
+		case REQUEST_RECREATE_MASTER_SURFACE -> {
 			handleReCreateInputSurface();
 			return true;
-		default:
+		}
+		default -> {
 			return false;
+		}
 		}
 	}
 

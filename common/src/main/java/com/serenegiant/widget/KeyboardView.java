@@ -423,21 +423,15 @@ public class KeyboardView extends View implements View.OnClickListener {
 		@Override
 		public void handleMessage(@NonNull final Message msg) {
 			switch (msg.what) {
-			case MSG_SHOW_PREVIEW:
-				mParent.showKey(msg.arg1);
-				break;
-			case MSG_REMOVE_PREVIEW:
-				mParent.mPreviewText.setVisibility(INVISIBLE);
-				break;
-			case MSG_REPEAT:
+			case MSG_SHOW_PREVIEW -> mParent.showKey(msg.arg1);
+			case MSG_REMOVE_PREVIEW -> mParent.mPreviewText.setVisibility(INVISIBLE);
+			case MSG_REPEAT -> {
 				if (mParent.repeatKey()) {
 					Message repeat = Message.obtain(this, MSG_REPEAT);
 					sendMessageDelayed(repeat, REPEAT_INTERVAL);
 				}
-				break;
-			case MSG_LONGPRESS:
-				mParent.openPopupIfRequired((MotionEvent) msg.obj);
-				break;
+			}
+			case MSG_LONGPRESS -> mParent.openPopupIfRequired((MotionEvent) msg.obj);
 			}
 		}
 	}
@@ -1069,32 +1063,22 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (mAccessibilityManager.isEnabled()) {
 			AccessibilityEvent event = AccessibilityEvent.obtain(eventType);
 			onInitializeAccessibilityEvent(event);
-			final String text;
-			switch (code) {
-			case Keyboard.KEYCODE_ALT:
-				text = getContext().getString(R.string.keyboardview_keycode_alt);
-				break;
-			case Keyboard.KEYCODE_CANCEL:
-				text = getContext().getString(R.string.keyboardview_keycode_cancel);
-				break;
-			case Keyboard.KEYCODE_DELETE:
-				text = getContext().getString(R.string.keyboardview_keycode_delete);
-				break;
-			case Keyboard.KEYCODE_DONE:
-				text = getContext().getString(R.string.keyboardview_keycode_done);
-				break;
-			case Keyboard.KEYCODE_MODE_CHANGE:
-				text = getContext().getString(R.string.keyboardview_keycode_mode_change);
-				break;
-			case Keyboard.KEYCODE_SHIFT:
-				text = getContext().getString(R.string.keyboardview_keycode_shift);
-				break;
-			case '\n':
-				text = getContext().getString(R.string.keyboardview_keycode_enter);
-				break;
-			default:
-				text = String.valueOf((char) code);
-			}
+			final String text = switch (code) {
+				case Keyboard.KEYCODE_ALT ->
+					getContext().getString(R.string.keyboardview_keycode_alt);
+				case Keyboard.KEYCODE_CANCEL ->
+					getContext().getString(R.string.keyboardview_keycode_cancel);
+				case Keyboard.KEYCODE_DELETE ->
+					getContext().getString(R.string.keyboardview_keycode_delete);
+				case Keyboard.KEYCODE_DONE ->
+					getContext().getString(R.string.keyboardview_keycode_done);
+				case Keyboard.KEYCODE_MODE_CHANGE ->
+					getContext().getString(R.string.keyboardview_keycode_mode_change);
+				case Keyboard.KEYCODE_SHIFT ->
+					getContext().getString(R.string.keyboardview_keycode_shift);
+				case '\n' -> getContext().getString(R.string.keyboardview_keycode_enter);
+				default -> String.valueOf((char) code);
+			};
 			event.getText().add(text);
 			mAccessibilityManager.sendAccessibilityEvent(event);
 		}
@@ -1250,18 +1234,12 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (mAccessibilityManager.isTouchExplorationEnabled() && event.getPointerCount() == 1) {
 			final int action = event.getAction();
 			switch (action) {
-			case MotionEvent.ACTION_HOVER_ENTER: {
+			case MotionEvent.ACTION_HOVER_ENTER ->
 				event.setAction(MotionEvent.ACTION_DOWN);
-			}
-			break;
-			case MotionEvent.ACTION_HOVER_MOVE: {
+			case MotionEvent.ACTION_HOVER_MOVE ->
 				event.setAction(MotionEvent.ACTION_MOVE);
-			}
-			break;
-			case MotionEvent.ACTION_HOVER_EXIT: {
+			case MotionEvent.ACTION_HOVER_EXIT ->
 				event.setAction(MotionEvent.ACTION_UP);
-			}
-			break;
 			}
 			return onTouchEvent(event);
 		}
@@ -1345,7 +1323,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 		}
 
 		switch (action) {
-		case MotionEvent.ACTION_DOWN:
+		case MotionEvent.ACTION_DOWN -> {
 			mAbortKey = false;
 			mStartX = touchX;
 			mStartY = touchY;
@@ -1377,9 +1355,8 @@ public class KeyboardView extends View implements View.OnClickListener {
 				mHandler.sendMessageDelayed(msg, LONGPRESS_TIMEOUT);
 			}
 			showPreview(keyIndex);
-			break;
-
-		case MotionEvent.ACTION_MOVE:
+		}
+		case MotionEvent.ACTION_MOVE -> {
 			boolean continueLongPress = false;
 			if (keyIndex != NOT_A_KEY) {
 				if (mCurrentKey == NOT_A_KEY) {
@@ -1412,9 +1389,8 @@ public class KeyboardView extends View implements View.OnClickListener {
 			}
 			showPreview(mCurrentKey);
 			mLastMoveTime = eventTime;
-			break;
-
-		case MotionEvent.ACTION_UP:
+		}
+		case MotionEvent.ACTION_UP -> {
 			removeMessages();
 			if (keyIndex == mCurrentKey) {
 				mCurrentKeyTime += eventTime - mLastMoveTime;
@@ -1439,14 +1415,14 @@ public class KeyboardView extends View implements View.OnClickListener {
 			}
 			invalidateKey(keyIndex);
 			mRepeatKeyIndex = NOT_A_KEY;
-			break;
-		case MotionEvent.ACTION_CANCEL:
+		}
+		case MotionEvent.ACTION_CANCEL -> {
 			removeMessages();
 			dismissPopupKeyboard();
 			mAbortKey = true;
 			showPreview(NOT_A_KEY);
 			invalidateKey(mCurrentKey);
-			break;
+		}
 		}
 		mLastX = touchX;
 		mLastY = touchY;

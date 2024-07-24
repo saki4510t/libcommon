@@ -477,7 +477,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		{
 			// moving with single and multi touch
 			switch (mState) {
-			case STATE_WAITING:
+			case STATE_WAITING -> {
 				if (((mHandleTouchEvent & TOUCH_ENABLED_MOVE) == TOUCH_ENABLED_MOVE)
 					&& checkTouchMoved(event)) {
 
@@ -485,27 +485,27 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 					setState(STATE_DRAGGING);
 					return true;
 				}
-				break;
-			case STATE_DRAGGING:
+			}
+			case STATE_DRAGGING -> {
 				if (processDrag(event))
 					return true;
-				break;
-			case STATE_CHECKING:
+			}
+			case STATE_CHECKING -> {
 				if (checkTouchMoved(event)
 					&& ((mHandleTouchEvent & TOUCH_ENABLED_ZOOM) == TOUCH_ENABLED_ZOOM)) {
 
 					startZoom(event);
 					return true;
 				}
-				break;
-			case STATE_ZOOMING:
+			}
+			case STATE_ZOOMING -> {
 				if (processZoom(event))
 					return true;
-				break;
-			case STATE_ROTATING:
+			}
+			case STATE_ROTATING -> {
 				if (processRotate(event))
 					return true;
-				break;
+			}
 			}
 			break;
 		}
@@ -720,26 +720,23 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		// apply matrix
 		mImageMatrix.reset();
 		switch (mScaleMode) {
-		case SCALE_MODE_STRETCH_TO_FIT:
+		case SCALE_MODE_STRETCH_TO_FIT ->
 			mImageMatrix.setScale(scaleX, scaleY);
-			break;
-		case SCALE_MODE_KEEP_ASPECT:
-		case SCALE_MODE_CROP:
-		{
-			final float scale = mScaleMode == SCALE_MODE_CROP
-				? Math.max(scaleX, scaleY)	// SCALE_MODE_CROP
-				: Math.min(scaleX, scaleY);	// SCALE_MODE_KEEP_ASPECT
-			final float dx = Math.round((viewWidth - contentWidth * scale) * 0.5f);
-			final float dy = Math.round((viewHeight - contentHeight * scale) * 0.5f);
+		case SCALE_MODE_KEEP_ASPECT,
+			SCALE_MODE_CROP -> {
+				final float scale = mScaleMode == SCALE_MODE_CROP
+					? Math.max(scaleX, scaleY)    // SCALE_MODE_CROP
+					: Math.min(scaleX, scaleY);    // SCALE_MODE_KEEP_ASPECT
+				final float dx = Math.round((viewWidth - contentWidth * scale) * 0.5f);
+				final float dy = Math.round((viewHeight - contentHeight * scale) * 0.5f);
 
-			mImageMatrix.setScale(scale, scale);
-			mImageMatrix.postTranslate(dx, dy);
-			if (DEBUG) Log.v(TAG,
-				String.format("setupDefaultTransform:scale(%f,%f)→%f, d(%f,%f)",
-					scaleX,scaleY, scale,
-					dx, dy));
-			break;
-		}
+				mImageMatrix.setScale(scale, scale);
+				mImageMatrix.postTranslate(dx, dy);
+				if (DEBUG) Log.v(TAG,
+					String.format("setupDefaultTransform:scale(%f,%f)→%f, d(%f,%f)",
+						scaleX, scaleY, scale,
+						dx, dy));
+			}
 		}
 		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
 		setTransform(mImageMatrix);

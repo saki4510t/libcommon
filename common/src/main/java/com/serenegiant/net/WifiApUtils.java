@@ -275,20 +275,14 @@ public class WifiApUtils {
 
 	@NonNull
 	public static String getWifiApStateString(@WifiApState final int state) {
-		switch (state) {
-		case WIFI_AP_STATE_DISABLING:
-			return "disabling";
-		case WIFI_AP_STATE_DISABLED:
-			return "disabled";
-		case WIFI_AP_STATE_ENABLING:
-			return "enabling";
-		case WIFI_AP_STATE_ENABLED:
-			return "enabled";
-		case WIFI_AP_STATE_FAILED:
-			return "failed";
-		default:
-			return "";
-		}
+		return switch (state) {
+			case WIFI_AP_STATE_DISABLING -> "disabling";
+			case WIFI_AP_STATE_DISABLED -> "disabled";
+			case WIFI_AP_STATE_ENABLING -> "enabling";
+			case WIFI_AP_STATE_ENABLED -> "enabled";
+			case WIFI_AP_STATE_FAILED -> "failed";
+			default -> "";
+		};
 	}
 
 	/**

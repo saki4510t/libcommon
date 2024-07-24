@@ -339,7 +339,7 @@ public class ColorPickerView extends View {
 		case MotionEvent.ACTION_MOVE:
 			boolean modified = false;
 			switch (mState) {
-			case STATE_COLOR:
+			case STATE_COLOR -> {
 				final float angle = (float) Math.atan2(dy, dx);
 				// [-PI ... PI]を[0....1]に変換する
 				float unit = angle / (2 * PI);
@@ -347,23 +347,23 @@ public class ColorPickerView extends View {
 					unit += 1;
 				}
 				// x+軸に対する角度[度]が色相, 中心からの距離をノーマライズした値が彩度とする
-				setColor(mAlpha, 360.0f - unit * 360.0f, (float)Math.sqrt(d) / radius, mVal, true);
+				setColor(mAlpha, 360.0f - unit * 360.0f, (float) Math.sqrt(d) / radius, mVal, true);
 				modified = true;
-				break;
-			case STATE_ALPHA:
+			}
+			case STATE_ALPHA -> {
 				// アルファ値変更スライダーにタッチした時の処理
 				if (modified = trackAlpha(x, y)) {
 					setHueColorArray(mAlpha, COLORS);
 					mPaint.setShader(new SweepGradient(0, 0, COLORS, null));
 				}
-				break;
-			case STATE_VAL:
+			}
+			case STATE_VAL -> {
 				// 明度変更スライダーにタッチした時の処理
 				if (modified = trackVal(x, y)) {
 					setHueColorArray(mAlpha, COLORS);
 					mPaint.setShader(new SweepGradient(0, 0, COLORS, null));
 				}
-				break;
+			}
 			}
 			if (modified) {
 				if (mColorPickerListener != null)

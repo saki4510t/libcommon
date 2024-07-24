@@ -18,6 +18,7 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
@@ -47,42 +48,42 @@ public class AudioDeviceUtils {
 	 * @param info
 	 * @return
 	 */
+	@SuppressLint("SwitchIntDef")
 	@RequiresApi(api = Build.VERSION_CODES.M)
 	public static String getAudioTypeString(@NonNull final AudioDeviceInfo info) {
-		switch (info.getType()) {
-		case AudioDeviceInfo.TYPE_BUILTIN_EARPIECE: return "TYPE_BUILTIN_EARPIECE";
-		case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER: return "TYPE_BUILTIN_SPEAKER";
-		case AudioDeviceInfo.TYPE_WIRED_HEADSET: return "TYPE_WIRED_HEADSET";
-		case AudioDeviceInfo.TYPE_WIRED_HEADPHONES: return "TYPE_WIRED_HEADPHONES";
-		case AudioDeviceInfo.TYPE_BLUETOOTH_SCO: return "TYPE_BLUETOOTH_SCO";
-		case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP: return "TYPE_BLUETOOTH_A2DP";
-		case AudioDeviceInfo.TYPE_HDMI: return "TYPE_HDMI";
-		case AudioDeviceInfo.TYPE_DOCK: return "TYPE_DOCK";
-		case AudioDeviceInfo.TYPE_USB_ACCESSORY: return "TYPE_USB_ACCESSORY";
-		case AudioDeviceInfo.TYPE_USB_DEVICE: return "TYPE_USB_DEVICE";
-		case AudioDeviceInfo.TYPE_USB_HEADSET: return "TYPE_USB_HEADSET";
-		case AudioDeviceInfo.TYPE_TELEPHONY: return "TYPE_TELEPHONY";
-		case AudioDeviceInfo.TYPE_LINE_ANALOG: return "TYPE_LINE_ANALOG";
-		case AudioDeviceInfo.TYPE_HDMI_ARC: return "TYPE_HDMI_ARC";
-		case AudioDeviceInfo.TYPE_HDMI_EARC: return "TYPE_HDMI_EARC";
-		case AudioDeviceInfo.TYPE_LINE_DIGITAL: return "TYPE_LINE_DIGITAL";
-		case AudioDeviceInfo.TYPE_FM: return "TYPE_FM";
-		case AudioDeviceInfo.TYPE_AUX_LINE: return "TYPE_AUX_LINE";
-		case AudioDeviceInfo.TYPE_IP: return "TYPE_IP";
-		case AudioDeviceInfo.TYPE_BUS: return "TYPE_BUS";
-		case AudioDeviceInfo.TYPE_HEARING_AID: return "TYPE_HEARING_AID";
-		case AudioDeviceInfo.TYPE_BUILTIN_MIC: return "TYPE_BUILTIN_MIC";
-		case AudioDeviceInfo.TYPE_FM_TUNER: return "TYPE_FM_TUNER";
-		case AudioDeviceInfo.TYPE_TV_TUNER: return "TYPE_TV_TUNER";
-		case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE: return "TYPE_BUILTIN_SPEAKER_SAFE";
-		case AudioDeviceInfo.TYPE_REMOTE_SUBMIX: return "TYPE_REMOTE_SUBMIX";
-		case AudioDeviceInfo.TYPE_BLE_HEADSET: return "TYPE_BLE_HEADSET";
-		case AudioDeviceInfo.TYPE_BLE_SPEAKER: return "TYPE_BLE_SPEAKER";
-		case 28: return "TYPE_ECHO_REFERENCE";	// TYPE_ECHO_REFERENCEがエラーになるので即値で指定
-		case AudioDeviceInfo.TYPE_BLE_BROADCAST: return "TYPE_BLE_BROADCAST";
-		default:
-			return "UNKNOWN" + info.getType();
-		}
+		return switch (info.getType()) {
+			case AudioDeviceInfo.TYPE_BUILTIN_EARPIECE -> "TYPE_BUILTIN_EARPIECE";
+			case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER -> "TYPE_BUILTIN_SPEAKER";
+			case AudioDeviceInfo.TYPE_WIRED_HEADSET -> "TYPE_WIRED_HEADSET";
+			case AudioDeviceInfo.TYPE_WIRED_HEADPHONES -> "TYPE_WIRED_HEADPHONES";
+			case AudioDeviceInfo.TYPE_BLUETOOTH_SCO -> "TYPE_BLUETOOTH_SCO";
+			case AudioDeviceInfo.TYPE_BLUETOOTH_A2DP -> "TYPE_BLUETOOTH_A2DP";
+			case AudioDeviceInfo.TYPE_HDMI -> "TYPE_HDMI";
+			case AudioDeviceInfo.TYPE_DOCK -> "TYPE_DOCK";
+			case AudioDeviceInfo.TYPE_USB_ACCESSORY -> "TYPE_USB_ACCESSORY";
+			case AudioDeviceInfo.TYPE_USB_DEVICE -> "TYPE_USB_DEVICE";
+			case AudioDeviceInfo.TYPE_USB_HEADSET -> "TYPE_USB_HEADSET";
+			case AudioDeviceInfo.TYPE_TELEPHONY -> "TYPE_TELEPHONY";
+			case AudioDeviceInfo.TYPE_LINE_ANALOG -> "TYPE_LINE_ANALOG";
+			case AudioDeviceInfo.TYPE_HDMI_ARC -> "TYPE_HDMI_ARC";
+			case AudioDeviceInfo.TYPE_HDMI_EARC -> "TYPE_HDMI_EARC";
+			case AudioDeviceInfo.TYPE_LINE_DIGITAL -> "TYPE_LINE_DIGITAL";
+			case AudioDeviceInfo.TYPE_FM -> "TYPE_FM";
+			case AudioDeviceInfo.TYPE_AUX_LINE -> "TYPE_AUX_LINE";
+			case AudioDeviceInfo.TYPE_IP -> "TYPE_IP";
+			case AudioDeviceInfo.TYPE_BUS -> "TYPE_BUS";
+			case AudioDeviceInfo.TYPE_HEARING_AID -> "TYPE_HEARING_AID";
+			case AudioDeviceInfo.TYPE_BUILTIN_MIC -> "TYPE_BUILTIN_MIC";
+			case AudioDeviceInfo.TYPE_FM_TUNER -> "TYPE_FM_TUNER";
+			case AudioDeviceInfo.TYPE_TV_TUNER -> "TYPE_TV_TUNER";
+			case AudioDeviceInfo.TYPE_BUILTIN_SPEAKER_SAFE -> "TYPE_BUILTIN_SPEAKER_SAFE";
+			case AudioDeviceInfo.TYPE_REMOTE_SUBMIX -> "TYPE_REMOTE_SUBMIX";
+			case AudioDeviceInfo.TYPE_BLE_HEADSET -> "TYPE_BLE_HEADSET";
+			case AudioDeviceInfo.TYPE_BLE_SPEAKER -> "TYPE_BLE_SPEAKER";
+			case 28 -> "TYPE_ECHO_REFERENCE";    // TYPE_ECHO_REFERENCEがエラーになるので即値で指定
+			case AudioDeviceInfo.TYPE_BLE_BROADCAST -> "TYPE_BLE_BROADCAST";
+			default -> "UNKNOWN" + info.getType();
+		};
 	}
 
 	@RequiresApi(api = Build.VERSION_CODES.M)

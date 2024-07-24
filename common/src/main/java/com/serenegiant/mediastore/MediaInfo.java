@@ -307,23 +307,15 @@ public class MediaInfo implements Parcelable {
 
 //--------------------------------------------------------------------------------
 	private static String mediaType(final int mediaType) {
-		switch (mediaType) {
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE:
-			return "none";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE:
-			return "image";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO:
-			return "audio";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO:
-			return "video";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST:
-			return "playlist";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_SUBTITLE:
-			return "subtitle";
-		case MediaStore.Files.FileColumns.MEDIA_TYPE_DOCUMENT:
-			return "document";
-		default:
-			return String.format(Locale.US, "unknown:%d", mediaType);
-		}
+		return switch (mediaType) {
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_NONE -> "none";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_IMAGE -> "image";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_AUDIO -> "audio";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_VIDEO -> "video";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_PLAYLIST -> "playlist";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_SUBTITLE -> "subtitle";
+			case MediaStore.Files.FileColumns.MEDIA_TYPE_DOCUMENT -> "document";
+			default -> String.format(Locale.US, "unknown:%d", mediaType);
+		};
 	}
 }

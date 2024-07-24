@@ -377,12 +377,10 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 				final String action = intent != null ? intent.getAction() : null;
 				if (!TextUtils.isEmpty(action)) {
 					switch (action) {
-					case APP_ACTION_SHOW_MESSAGE:
+					case APP_ACTION_SHOW_MESSAGE ->
 						showMessage(context, intent);
-						break;
-					case APP_ACTION_HIDE_MESSAGE:
+					case APP_ACTION_HIDE_MESSAGE ->
 						hideMessage(intent.getLongExtra(APP_EXTRA_KEY_MESSAGE_HIDE_DELAY_MS, 0));
-						break;
 					}
 				}
 			}

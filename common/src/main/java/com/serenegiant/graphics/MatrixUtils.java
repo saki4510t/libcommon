@@ -308,22 +308,16 @@ public class MatrixUtils {
 			final RectF dstBounds = new RectF(0, 0, vwidth, vheight);
 			final RectF srcBounds = new RectF(0, 0, dwidth, dheight);
 			switch (scaleType) {
-			case FIT_XY:
+			case FIT_XY ->
 				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.FILL);
-				break;
-			case FIT_START:
+			case FIT_START ->
 				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.START);
-				break;
-			case FIT_CENTER:
+			case FIT_CENTER ->
 				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.CENTER);
-				break;
-			case FIT_END:
+			case FIT_END ->
 				drawMatrix.setRectToRect(srcBounds, dstBounds, Matrix.ScaleToFit.END);
-				break;
-			case MATRIX:
-			default:
-				// do nothing
-				break;
+			default -> { // do nothing
+			}
 			}
 		}
 	}

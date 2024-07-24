@@ -342,21 +342,11 @@ public class StaticTextureSource implements GLConst, IMirror {
 			final int arg1, final int arg2, final Object obj) {
 
 			switch (request) {
-			case REQUEST_DRAW:
-				handleDraw();
-				break;
-			case REQUEST_ADD_SURFACE:
-				handleAddSurface(arg1, obj, arg2);
-				break;
-			case REQUEST_REMOVE_SURFACE:
-				handleRemoveSurface(arg1);
-				break;
-			case REQUEST_MIRROR:
-				handleMirror(arg1);
-				break;
-			case REQUEST_SET_BITMAP:
-				handleSetBitmap((Bitmap)obj);
-				break;
+			case REQUEST_DRAW -> handleDraw();
+			case REQUEST_ADD_SURFACE -> handleAddSurface(arg1, obj, arg2);
+			case REQUEST_REMOVE_SURFACE -> handleRemoveSurface(arg1);
+			case REQUEST_MIRROR -> handleMirror(arg1);
+			case REQUEST_SET_BITMAP -> handleSetBitmap((Bitmap) obj);
 			}
 			return null;
 		}

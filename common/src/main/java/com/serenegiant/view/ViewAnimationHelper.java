@@ -226,15 +226,12 @@ public class ViewAnimationHelper {
 					public void run() {
 						try {
 							switch (event) {
-							case ANIMATION_EVENT_START:
+							case ANIMATION_EVENT_START ->
 								listener.onAnimationStart(anim, target, animType);
-								break;
-							case ANIMATION_EVENT_END:
+							case ANIMATION_EVENT_END ->
 								listener.onAnimationEnd(anim, target, animType);
-								break;
-							case ANIMATION_EVENT_CANCEL:
+							case ANIMATION_EVENT_CANCEL ->
 								listener.onAnimationCancel(anim, target, animType);
-								break;
 							}
 						} catch (final Exception e) {
 							Log.w(TAG, e);

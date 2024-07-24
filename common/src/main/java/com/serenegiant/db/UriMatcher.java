@@ -241,25 +241,23 @@ public class UriMatcher
                 final UriMatcher n = list.get(j);
           which_switch:
                 switch (n.mWhich) {
-                    case EXACT:
-                        if (n.mText.equals(u)) {
-                            node = n;
-                        }
-                        break;
-                    case NUMBER:
-                    	// XXX saki セグメントの先頭に有る正負符号は数字の一部として扱うように変更
-                        final int lk = u.length();
-                        for (int k = 0; k < lk; k++) {
-                            final char c = u.charAt(k);
-                            if (((c == '-') || (c == '+')) && (k != 0) || (k > 0) && ((c < '0' || c > '9'))) {
-                                break which_switch;
-                            }
-                        }
+                case EXACT -> {
+                    if (n.mText.equals(u)) {
                         node = n;
-                        break;
-                    case TEXT:
-                        node = n;
-                        break;
+                    }
+                }
+                case NUMBER -> {
+                    // XXX saki セグメントの先頭に有る正負符号は数字の一部として扱うように変更
+                    final int lk = u.length();
+                    for (int k = 0; k < lk; k++) {
+                        final char c = u.charAt(k);
+                        if (((c == '-') || (c == '+')) && (k != 0) || (k > 0) && ((c < '0' || c > '9'))) {
+                            break which_switch;
+                        }
+                    }
+                    node = n;
+                }
+                case TEXT -> node = n;
                 }
                 if (node != null) {
                     break;
