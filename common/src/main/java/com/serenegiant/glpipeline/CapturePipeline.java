@@ -24,7 +24,6 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLSurface;
-import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.utils.Pool;
 import com.serenegiant.utils.ThreadPool;
@@ -259,11 +258,7 @@ public class CapturePipeline extends ProxyPipeline {
 				}
 				// オフスクリーンへ描画
 				mOffscreen.makeCurrent();
-				final GLTexture texture = GLTexture.wrap(
-					isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-					GLES20.GL_TEXTURE0, texId, w, h);
-				System.arraycopy(texMatrix, 0, texture.getTexMatrix(), 0, 16);
-				mDrawer.draw(texture);
+				mDrawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
 				// オフスクリーンから読み込み
 				@NonNull
 				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
