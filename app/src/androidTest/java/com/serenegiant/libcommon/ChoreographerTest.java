@@ -180,7 +180,7 @@ public class ChoreographerTest {
 
    @Test
    public void frameRate60() {
-      final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG, true);
+      final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 60);
       HandlerUtils.quit(asyncHandler);
    }
