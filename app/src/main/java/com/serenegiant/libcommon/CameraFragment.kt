@@ -19,13 +19,11 @@ package com.serenegiant.libcommon
 */
 
 import android.content.Context
-import android.os.Build
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
 import android.view.View
 import androidx.annotation.LayoutRes
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.lifecycleScope
@@ -116,7 +114,6 @@ class CameraFragment : AbstractCameraFragment() {
 			}
 		}
 
-		@RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		override fun onPrepared() {
 			if (DEBUG) Log.v(TAG, "onPrepared:")
 			val recorder = mRecorder

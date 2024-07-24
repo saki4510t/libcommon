@@ -19,13 +19,11 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
-import android.os.Build;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -896,7 +894,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			}
 		}
 
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		private final void captureLoopGLES3() {
 			int width = -1, height = -1;
 			ByteBuffer buf = null;

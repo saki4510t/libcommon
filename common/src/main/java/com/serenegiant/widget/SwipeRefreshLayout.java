@@ -22,7 +22,6 @@ package com.serenegiant.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -533,22 +532,14 @@ public class SwipeRefreshLayout extends ViewGroup
 
 	private int getProgressAlpha() {
 		final Drawable background = mCircleView.getBackground();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			return background != null
-				? background.getAlpha() : (int)(mCircleView.getAlpha() * 255.0f);
-		} else {
-			return (int)(mCircleView.getAlpha() * 255.0f);
-		}
+		return background != null
+			? background.getAlpha() : (int)(mCircleView.getAlpha() * 255.0f);
 	}
 
 	private void setProgressAlpha(final int alpha) {
 		final Drawable background = mCircleView.getBackground();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			if (background != null) {
-				background.setAlpha(alpha);
-			} else {
-				mCircleView.setAlpha(alpha / 255.0f);
-			}
+		if (background != null) {
+			background.setAlpha(alpha);
 		} else {
 			mCircleView.setAlpha(alpha / 255.0f);
 		}

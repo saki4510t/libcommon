@@ -18,8 +18,6 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -36,7 +34,6 @@ public class HandlerUtils {
 		// インスタンス化を防止するためにデフォルトコンストラクタをprivateにする
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static void quitSafely(@Nullable final Handler handler) throws IllegalStateException {
 		if (handler instanceof HandlerThreadHandler) {
 			if (((HandlerThreadHandler) handler).isActive()) {
@@ -54,7 +51,6 @@ public class HandlerUtils {
 		}
 	}
 
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static void NoThrowQuitSafely(@Nullable final Handler handler) {
 		try {
 			quitSafely(handler);

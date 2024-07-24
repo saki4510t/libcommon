@@ -18,10 +18,8 @@ package com.serenegiant.egl;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
-import android.os.Build;
 import android.util.Log;
 import android.view.Surface;
 
@@ -254,13 +252,11 @@ import androidx.annotation.Nullable;
 			mEglBase.swap(mEglSurface);
 		}
 
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		@Override
 		public void swap(final long presentationTimeNs) {
 			mEglBase.swap(mEglSurface, presentationTimeNs);
 		}
 
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void setPresentationTime(final long presentationTimeNs) {
 //			EGLExt.eglPresentationTimeANDROID(mEglBase.mEglDisplay,
 // 				mEglSurface, presentationTimeNs);

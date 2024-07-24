@@ -18,7 +18,6 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -65,7 +64,6 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public static boolean hasPermission(
 		@NonNull final Context context,
 		final int treeId) {
@@ -84,7 +82,6 @@ public class SAFUtils {
 		return false;
 	}
 
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	public static boolean hasPermission(
 		@NonNull final List<UriPermission> persistedUriPermissions,
 		@NonNull final Uri uri) {
@@ -123,7 +120,6 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static Uri takePersistableUriPermission(
 		@NonNull final Context context,
@@ -144,24 +140,19 @@ public class SAFUtils {
 	 * @param treeId
 	 * @throws UnsupportedOperationException
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public static void releasePersistableUriPermission(
 		@NonNull final Context context,
 		final int treeId) {
-		if (BuildCheck.isKitKat()) {
-			final String key = getKey(treeId);
-			final Uri uri = loadUri(context, key);
-			if (uri != null) {
-				try {
-					context.getContentResolver().releasePersistableUriPermission(uri,	// API>=19
-						Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-				} catch (final SecurityException e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
-				clearUri(context, key);
+		final String key = getKey(treeId);
+		final Uri uri = loadUri(context, key);
+		if (uri != null) {
+			try {
+				context.getContentResolver().releasePersistableUriPermission(uri,	// API>=19
+					Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+			} catch (final SecurityException e) {
+				if (DEBUG) Log.w(TAG, e);
 			}
-		} else {
-			throw new UnsupportedOperationException("should be API>=19");
+			clearUri(context, key);
 		}
 	}
 
@@ -177,7 +168,6 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static DocumentFile getDir(
 		@NonNull final Context context,
@@ -282,7 +272,6 @@ public class SAFUtils {
 	 * @throws UnsupportedOperationException
 	 * @throws IOException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static DocumentFile getFile(
 		@NonNull final Context context,
@@ -345,7 +334,6 @@ public class SAFUtils {
 	 * @return
 	 * @throws FileNotFoundException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static OutputStream getOutputStream(
 		@NonNull final Context context,
@@ -407,7 +395,6 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static InputStream getInputStream(
 		@NonNull final Context context,
@@ -470,7 +457,6 @@ public class SAFUtils {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static ParcelFileDescriptor getFd(
 		@NonNull final Context context,
@@ -538,7 +524,6 @@ public class SAFUtils {
 	 * @param context
 	 * @return
 	 */
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	@NonNull
 	public static Map<Integer, Uri> getStorageUriAll(@NonNull final Context context) {
 		final Map<Integer, Uri> result = new HashMap<>();
@@ -656,32 +641,27 @@ public class SAFUtils {
 	 * @return
 	 * @throws UnsupportedOperationException
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 	@Nullable
 	/*package*/static Uri getStorageUri(
 		@NonNull final Context context,
 		final int treeId) throws UnsupportedOperationException {
 
-		if (BuildCheck.isKitKat()) {
-			final Uri uri = loadUri(context, getKey(treeId));
-			if (uri != null) {
-				boolean found = false;
-				// 恒常的に保持しているUriパーミッションの一覧を取得する
-				final List<UriPermission> list
-					= context.getContentResolver().getPersistedUriPermissions();	// API>=19
-				for (final UriPermission item: list) {
-					if (item.getUri().equals(uri)) {	// API>=19
-						// 指定したドキュメントツリーIDに対応するUriへのパーミッションを恒常的に保持していた時
-						found = true;
-						break;
-					}
-				}
-				if (found) {
-					return uri;
+		final Uri uri = loadUri(context, getKey(treeId));
+		if (uri != null) {
+			boolean found = false;
+			// 恒常的に保持しているUriパーミッションの一覧を取得する
+			final List<UriPermission> list
+				= context.getContentResolver().getPersistedUriPermissions();	// API>=19
+			for (final UriPermission item: list) {
+				if (item.getUri().equals(uri)) {	// API>=19
+					// 指定したドキュメントツリーIDに対応するUriへのパーミッションを恒常的に保持していた時
+					found = true;
+					break;
 				}
 			}
-		} else {
-			throw new UnsupportedOperationException("should be API>=21");
+			if (found) {
+				return uri;
+			}
 		}
 		return null;
 	}

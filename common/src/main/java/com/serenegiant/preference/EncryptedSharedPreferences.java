@@ -417,7 +417,6 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	 * API>=23の場合にはAES, API<23の場合はRSAで暗号化・復号する
 	 * 各アプリに対応する鍵がないときは自動的に生成する
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public static class KeyStoreObfuscator implements Obfuscator {
 
 		/**

@@ -19,8 +19,6 @@ package com.serenegiant.egl;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
-import android.os.Build;
 
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.ISurface;
@@ -74,11 +72,8 @@ public abstract class EGLBase implements EGLConst {
 	public static IContext<?> wrapContext(@Nullable final Object context) {
 		if (context instanceof IContext) {
 			return (IContext<?>)context;
-		} else if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-			&& (context instanceof android.opengl.EGLContext)) {
-
+		} else if (context instanceof android.opengl.EGLContext) {
 			return EGLBase14.wrap((android.opengl.EGLContext)context);
-
 		} else if (context instanceof javax.microedition.khronos.egl.EGLContext) {
 			return EGLBase10.wrap((javax.microedition.khronos.egl.EGLContext)context);
 		} else if (context == null) {
@@ -95,9 +90,7 @@ public abstract class EGLBase implements EGLConst {
 	 */
 	@SuppressLint("NewApi")
 	public static IConfig<?> wrapConfig(@NonNull final Object eglConfig) {
-		if ((Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
-			&& (eglConfig instanceof android.opengl.EGLConfig)) {
-
+		if (eglConfig instanceof android.opengl.EGLConfig) {
 			return EGLBase14.wrap((android.opengl.EGLConfig)eglConfig);
 		} else if (eglConfig instanceof javax.microedition.khronos.egl.EGLConfig) {
 			return EGLBase10.wrap((javax.microedition.khronos.egl.EGLConfig)eglConfig);
@@ -279,7 +272,6 @@ public abstract class EGLBase implements EGLConst {
 		 * only works well now when using EGLBase14
 		 * @param presentationTimeNs
 		 */
-		@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 		public void swap(final long presentationTimeNs);
 	}
 

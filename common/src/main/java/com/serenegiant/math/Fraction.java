@@ -18,11 +18,9 @@ package com.serenegiant.math;
  *  limitations under the License.
 */
 
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.util.Arrays;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
@@ -547,11 +545,7 @@ public class Fraction implements Parcelable {
 
 	@Override
 	public int hashCode() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			return Objects.hash(mNumerator, mDenominator);
-		} else {
-			return Arrays.hashCode(new int[] {mNumerator, mDenominator});
-		}
+		return Objects.hash(mNumerator, mDenominator);
 	}
 
 	@NonNull

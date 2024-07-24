@@ -413,7 +413,6 @@ public abstract class MediaEncoder implements Encoder {
 
 	public static boolean supportsAdaptiveStreaming = BuildCheck.isKitKat();
 
-	@TargetApi(Build.VERSION_CODES.KITKAT)
 	public void adjustBitrate(final int targetBitrate) {
 		if (supportsAdaptiveStreaming && mMediaCodec != null) {
 			final Bundle bitrate = new Bundle();

@@ -23,11 +23,9 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.opengl.Matrix;
-import android.os.Build;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.annotation.Size;
 
 /**
@@ -659,7 +657,6 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * OpenGL|ES3用のGLSurface実装
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN_MR2)
 	private static class GLSurfaceES3 extends GLSurface {
 		/**
 		 * 既存のテクスチャをwrapするためのコンストラクタ

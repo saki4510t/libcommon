@@ -225,9 +225,7 @@ public class MediaInfo implements Parcelable {
 					if (pfd.getFd() == 0) {
 						throw new IOException("Failed to get fd");
 					}
-					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-						pfd.checkError();
-					}
+					pfd.checkError();
 				} finally {
 					pfd.close();
 				}

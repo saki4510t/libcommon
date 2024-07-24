@@ -20,6 +20,8 @@ package com.serenegiant.nio;
 
 import android.os.Build;
 
+import com.serenegiant.system.BuildCheck;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
@@ -58,7 +60,7 @@ public class CharsetsUtils {
 	public static final Charset UTF16LE;
 
 	static {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+		if (BuildCheck.isKitKat()) {
 			UTF8 = StandardCharsets.UTF_8;
 			UTF16 = StandardCharsets.UTF_16;
 			UTF16BE = StandardCharsets.UTF_16BE;

@@ -19,10 +19,8 @@ package com.serenegiant.gl;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -350,7 +348,6 @@ public class GLContext implements EGLConst {
 	 * @param presentationTimeNs
 	 * @throws IllegalStateException
 	 */
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	@WorkerThread
 	public void swap(final long presentationTimeNs) throws IllegalStateException {
 		synchronized (mSync) {
@@ -365,7 +362,6 @@ public class GLContext implements EGLConst {
 	/**
 	 * eglWaitGLとeglWaitNativeを呼ぶ
 	 * 基本的には使わないはず
-	 *
 	 * eglWaitGL: コマンドキュー内のコマンドをすべて転送する, GLES20.glFinish()と同様の効果
 	 * eglWaitNative: GPU側の描画処理が終了するまで実行をブロックする
 	 */

@@ -21,7 +21,6 @@ package com.serenegiant.bluetooth;
 import android.Manifest;
 import android.bluetooth.BluetoothClass;
 import android.bluetooth.BluetoothDevice;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -59,11 +58,7 @@ public class BluetoothDeviceInfo implements Parcelable {
 	/*package*/BluetoothDeviceInfo(final BluetoothDevice device) {
 		name = device.getName();
 		address =  device.getAddress();
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-			type = device.getType();
-		} else {
-			type = 0;
-		}
+		type = device.getType();
 		final BluetoothClass clazz = device.getBluetoothClass();
 		deviceClass = clazz != null ? clazz.getDeviceClass() : 0;
 		bondState = device.getBondState();

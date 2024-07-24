@@ -19,7 +19,6 @@ package com.serenegiant.utils;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
@@ -194,7 +193,6 @@ public class HandlerThreadHandler extends Handler {
 		return mId;
 	}
 	
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
 	public void quitSafely() throws IllegalStateException {
 		mIsActive = false;
 		getLooper().quitSafely();

@@ -25,7 +25,6 @@ import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
-import android.os.Build;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -38,7 +37,6 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 /**
  * USB機器をopen/closeしてアクセスするためのヘルパークラス
@@ -455,7 +453,6 @@ public class UsbConnector implements Cloneable, Closeable {
     * @return
     * @throws IllegalStateException
     */
-   @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
    public synchronized int bulkTransfer(
       final UsbEndpoint endpoint,
       final byte[] buffer, final int offset, final int length, final int timeout)
@@ -496,7 +493,6 @@ public class UsbConnector implements Cloneable, Closeable {
     * @return
     * @throws IllegalStateException
     */
-   @RequiresApi(Build.VERSION_CODES.JELLY_BEAN_MR2)
    public synchronized int controlTransfer(
       final int requestType, final int request,
       final int value, final int index,

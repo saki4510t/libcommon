@@ -21,7 +21,6 @@ package com.serenegiant.view;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.pm.ActivityInfo;
-import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -39,7 +38,6 @@ import androidx.lifecycle.DefaultLifecycleObserver;
 /**
  * 全画面表示等の処理を行うためのヘルパークラス
  * androidxのWindowInsetsControllerCompatを使わない時用
- *
  * 画面最上段の時計等が表示されている領域がステータスバー
  * タブレットで最下段に表示されるのがシステムバー(Android4.x?)
  * ハードウエアキーの無いスマホでホームボタンやバックキー等が表示されるのがナビゲーションバー
@@ -78,10 +76,8 @@ public class SysUiUtils implements DefaultLifecycleObserver {
 				| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION	// ナビゲーションバーの高さを無視してレイアウトする
 				| View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN			// ステータスバーの高さを無視してレイアウトする
 				| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION			// ナビゲーションバーを隠す
-				| View.SYSTEM_UI_FLAG_FULLSCREEN;				// ステータスバーを隠す
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			flags |= View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
-		}
+				| View.SYSTEM_UI_FLAG_FULLSCREEN				// ステータスバーを隠す
+				| View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
 		return flags;
 	}
 
@@ -278,16 +274,12 @@ public class SysUiUtils implements DefaultLifecycleObserver {
 		int flag = decorView.getSystemUiVisibility();
 		if (visible) {
 			flag &= ~FLAGS_FULLSCREEN;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				flag &= ~(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-						| View.SYSTEM_UI_FLAG_IMMERSIVE);
-			}
+			flag &= ~(View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+					| View.SYSTEM_UI_FLAG_IMMERSIVE);
 		} else {
 			flag = FLAGS_FULLSCREEN;
-			if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-				flag |= (mUseImmersiveSticky ? View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-					: (mUseImmersiveMode ? View.SYSTEM_UI_FLAG_IMMERSIVE : 0));
-			}
+			flag |= (mUseImmersiveSticky ? View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+				: (mUseImmersiveMode ? View.SYSTEM_UI_FLAG_IMMERSIVE : 0));
 		}
 		decorView.setSystemUiVisibility(flag);
 	}

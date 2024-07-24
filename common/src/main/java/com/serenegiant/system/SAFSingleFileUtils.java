@@ -44,7 +44,6 @@ import androidx.fragment.app.Fragment;
  * Storage Access Framework/DocumentFile関係のヘルパークラス
  * KITKAT以降で個別のファイル毎にパーミッション要求する場合をSAFUtilsより分離
  */
-@TargetApi(Build.VERSION_CODES.KITKAT)
 public class SAFSingleFileUtils {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SAFSingleFileUtils.class.getSimpleName();
@@ -238,8 +237,7 @@ public class SAFSingleFileUtils {
 		@NonNull final Context context, final Uri uri) {
 
 		try {
-			return BuildCheck.isKitKat()
-				&& DocumentsContract.deleteDocument(context.getContentResolver(), uri);
+			return DocumentsContract.deleteDocument(context.getContentResolver(), uri);
 		} catch (final FileNotFoundException e) {
 			return false;
 		}

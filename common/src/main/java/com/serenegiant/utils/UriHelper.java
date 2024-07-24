@@ -93,10 +93,8 @@ public final class UriHelper {
 		list.add(Environment.DIRECTORY_MOVIES);
 		list.add(Environment.DIRECTORY_DOWNLOADS);
 		list.add(Environment.DIRECTORY_DCIM);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-			list.add(Environment.DIRECTORY_DOCUMENTS);	// API>=19
-		}
-		 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+		list.add(Environment.DIRECTORY_DOCUMENTS);	// API>=19
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 			 list.add(Environment.DIRECTORY_AUDIOBOOKS);	// API>=29
 		 }
 		STANDARD_DIRECTORIES = list.toArray(new String[0]);

@@ -22,7 +22,6 @@ import android.annotation.SuppressLint;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaExtractor;
 import android.media.MediaMetadataRetriever;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -673,11 +672,9 @@ public class MediaPlayer {
 		if (!TextUtils.isEmpty(value)) {
 			mVideoHeight = Integer.parseInt(value);
 		}
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);	// API>=17
-			if (!TextUtils.isEmpty(value)) {
-				mRotation = Integer.parseInt(value);
-			}
+		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION);	// API>=17
+		if (!TextUtils.isEmpty(value)) {
+			mRotation = Integer.parseInt(value);
 		}
 		value = metaData.extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE);
 		if (!TextUtils.isEmpty(value)) {
