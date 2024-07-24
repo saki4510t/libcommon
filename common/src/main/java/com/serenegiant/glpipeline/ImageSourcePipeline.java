@@ -234,7 +234,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		synchronized (mSync) {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
-				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
+				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
 				GLUtils.checkGlError("createImageSource");
 			}
 			mImageSource.loadBitmap(bitmap);

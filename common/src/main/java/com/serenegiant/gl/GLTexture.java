@@ -43,6 +43,7 @@ public class GLTexture implements GLConst {
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
 	 */
+	@Deprecated
 	public static GLTexture newInstance(final int width, final int height) {
 		return new GLTexture(
 			GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
@@ -58,6 +59,7 @@ public class GLTexture implements GLConst {
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
 	 */
+	@Deprecated
 	public static GLTexture newInstance(
 		@TexUnit final int texUnit,
 		final int width, final int height) {

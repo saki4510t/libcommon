@@ -411,7 +411,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			|| (mMaskTexture.getHeight() != height)) {
 			// 最初またはマスクのサイズが変更されたときはGLTextureを生成する
 			releaseMaskOnGL();
-			mMaskTexture = GLTexture.newInstance(GLES20.GL_TEXTURE1, width, height);
+			mMaskTexture = GLTexture.newInstance(GLES20.GL_TEXTURE1, width, height, GLES20.GL_LINEAR);
 			mMaskTexture.bindTexture();
 			final int uTex2 = mDrawer.glGetUniformLocation("sTexture2");
 			GLES20.glUniform1i(uTex2, GLUtils.gLTextureUnit2Index(GLES20.GL_TEXTURE1));

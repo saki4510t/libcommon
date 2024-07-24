@@ -620,7 +620,7 @@ public class StaticTextureSource implements GLConst, IMirror {
 			final int width = bitmap.getWidth();
 			final int height = bitmap.getHeight();
 			if (mImageSource == null) {
-				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height);
+				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
 				GLUtils.checkGlError("handleSetBitmap");
 			}
 			mImageSource.loadBitmap(bitmap);
