@@ -50,6 +50,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
 	private volatile long mFrameIntervalMs;
+	private long prevFrameTimeNs;
 
 	/**
 	 * コンストラクタ
@@ -244,6 +245,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		if (needResize) {
 			resize(width, height);
 		}
+		prevFrameTimeNs = -1L;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
@@ -252,12 +254,11 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	private final Choreographer.FrameCallback mFrameCallback
 		= new Choreographer.FrameCallback() {
-		private long prevFrameTimeNs;
 		@WorkerThread
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				if (prevFrameTimeNs <= 0) {
+				if (prevFrameTimeNs < 0) {
 					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
 				}
 				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;

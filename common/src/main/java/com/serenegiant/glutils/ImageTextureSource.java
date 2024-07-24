@@ -59,6 +59,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
 	private volatile long mFrameIntervalMs;
+	private long prevFrameTimeNs;
 	private volatile boolean mReleased = false;
 	private int mWidth, mHeight;
 	@Nullable
@@ -344,6 +345,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 			mWidth = width;
 			mHeight = height;
 		}
+		prevFrameTimeNs = -1L;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
@@ -415,12 +417,11 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 */
 	private final Choreographer.FrameCallback mFrameCallback
 		= new Choreographer.FrameCallback() {
-		private long prevFrameTimeNs;
 		@WorkerThread
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				if (prevFrameTimeNs <= 0) {
+				if (prevFrameTimeNs < 0) {
 					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
 				}
 				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
