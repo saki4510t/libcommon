@@ -783,8 +783,8 @@ public class GLPipelineTest {
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				result.set(Bitmap.createBitmap(bitmap));
 				if (cnt.incrementAndGet() >= NUM_TRIGGERS) {
+					result.set(Bitmap.createBitmap(bitmap));
 					sem.release();
 				}
 			}
