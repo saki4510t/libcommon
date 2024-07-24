@@ -177,6 +177,10 @@ public class ImageTextureSourceTest {
 		frameRate(60);
 	}
 
+	/**
+	 * FIXME なぜか35, 45, 50fpsだけ10%以上遅くなってパスしない
+	 * @param requestFps
+	 */
 	private static void frameRate(final int requestFps) {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
