@@ -38,41 +38,6 @@ public class GLTexture implements GLConst {
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
 	 * テクスチャターゲットはGL_TEXTURE_2D
-	 * テクスチャユニットはGL_TEXTURE0固定なので複数同時には使用できない
-	 * filter_paramはGLES30.GL_LINEAR
-	 * @param width テクスチャサイズ
-	 * @param height テクスチャサイズ
-	 */
-	@Deprecated
-	public static GLTexture newInstance(final int width, final int height) {
-		return new GLTexture(
-			GLES20.GL_TEXTURE_2D, GLES20.GL_TEXTURE0, GL_NO_TEXTURE,
-			width, height, DEFAULT_ADJUST_POWER2,
-			GLES20.GL_LINEAR);
-	}
-
-	/**
-	 * インスタンス生成のためのヘルパーメソッド
-	 * テクスチャターゲットはGL_TEXTURE_2D
-	 * filter_paramはGLES30.GL_LINEAR
-	 * @param texUnit
-	 * @param width テクスチャサイズ
-	 * @param height テクスチャサイズ
-	 */
-	@Deprecated
-	public static GLTexture newInstance(
-		@TexUnit final int texUnit,
-		final int width, final int height) {
-
-		return new GLTexture(
-			GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
-			width, height, DEFAULT_ADJUST_POWER2,
-			GLES20.GL_LINEAR);
-	}
-
-	/**
-	 * インスタンス生成のためのヘルパーメソッド
-	 * テクスチャターゲットはGL_TEXTURE_2D
 	 * @param texUnit
 	 * @param width テクスチャサイズ
 	 * @param height テクスチャサイズ
