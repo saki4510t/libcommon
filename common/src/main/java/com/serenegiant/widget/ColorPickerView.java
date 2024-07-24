@@ -354,14 +354,16 @@ public class ColorPickerView extends View {
 			}
 			case STATE_ALPHA -> {
 				// アルファ値変更スライダーにタッチした時の処理
-				if (modified = trackAlpha(x, y)) {
+				modified = trackAlpha(x, y);
+				if (modified) {
 					setHueColorArray(mAlpha, COLORS);
 					mPaint.setShader(new SweepGradient(0, 0, COLORS, null));
 				}
 			}
 			case STATE_VAL -> {
 				// 明度変更スライダーにタッチした時の処理
-				if (modified = trackVal(x, y)) {
+				modified = trackVal(x, y);
+				if (modified) {
 					setHueColorArray(mAlpha, COLORS);
 					mPaint.setShader(new SweepGradient(0, 0, COLORS, null));
 				}
