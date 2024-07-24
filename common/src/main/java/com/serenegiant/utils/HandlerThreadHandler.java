@@ -38,7 +38,7 @@ public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @return
 	 */
 	@Deprecated
@@ -48,7 +48,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param priority The priority to run the thread at. The value supplied must be from
 	 * 			{@link android.os.Process} and not from java.lang.Thread.
 	 * @return
@@ -59,7 +59,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
 	 * @return
 	 */
@@ -69,7 +69,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @return
 	 */
@@ -81,7 +81,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @param priority The priority to run the thread at. The value supplied must be from
 	 * 			{@link android.os.Process} and not from java.lang.Thread.
@@ -95,7 +95,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @param priority The priority to run the thread at. The value supplied must be from
 	 * 			{@link android.os.Process} and not from java.lang.Thread.
@@ -109,7 +109,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param callback
 	 * @return
 	 */
@@ -121,7 +121,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param callback
 	 * @param priority The priority to run the thread at. The value supplied must be from
 	 * 			{@link android.os.Process} and not from java.lang.Thread.
@@ -135,7 +135,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param callback
 	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
 	 * @return
@@ -148,7 +148,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @param callback
 	 * @return
@@ -160,7 +160,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @param callback
 	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
@@ -173,7 +173,7 @@ public class HandlerThreadHandler extends Handler {
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド, API>=22
+	 * インスタンス生成用ヘルパーメソッド
 	 * @param name
 	 * @param callback
 	 * @param priority The priority to run the thread at. The value supplied must be from
