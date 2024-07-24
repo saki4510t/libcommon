@@ -47,6 +47,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
+	private static final float DEFAULT_FPS = 30.0f;
 
 	@NonNull
 	private final Object mSync = new Object();
@@ -328,7 +329,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
 		final boolean needResize = (getWidth() != width) || (getHeight() != height);
-		final float _fps = fps != null ? fps.asFloat() : 30.0f;
+		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
 		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
 		synchronized (mSync) {
 			if ((mImageSource == null) || needResize) {

@@ -42,6 +42,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
 
+	private static final float DEFAULT_FPS = 30.0f;
+
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
@@ -227,7 +229,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
 		final boolean needResize = (getWidth() != width) || (getHeight() != height);
-		final float _fps = fps != null ? fps.asFloat() : 30.0f;
+		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
 		synchronized (mSync) {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
