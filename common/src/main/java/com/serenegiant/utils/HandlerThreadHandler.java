@@ -24,14 +24,15 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
+import android.os.Process;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 /**
  * ワーカースレッド上で処理を行うためのHandler実装
  * インスタンス化のためのヘルパーメソッド$createHandler内でHandlerThreadを生成＆スタートする
+ * XXX API>=28でasync=trueならHandler#createAsyncを使ってもよいかも
  */
 public class HandlerThreadHandler extends Handler {
 	private static final String TAG = "HandlerThreadHandler";
@@ -40,19 +41,31 @@ public class HandlerThreadHandler extends Handler {
 	 * インスタンス生成用メルパーメソッド
 	 * @return
 	 */
+	@Deprecated
 	@SuppressLint("NewApi")
 	public static final HandlerThreadHandler createHandler() {
-		return createHandler(TAG, false);
+		return createHandler(TAG, null, Process.THREAD_PRIORITY_DEFAULT, false);
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド, API>=22
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * インスタンス生成用メルパーメソッド
+	 * @param priority The priority to run the thread at. The value supplied must be from
+	 * 			{@link android.os.Process} and not from java.lang.Thread.
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	@Deprecated
+	public static final HandlerThreadHandler createHandler(final int priority) {
+		return createHandler(TAG, null, priority, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
+	 * @return
+	 */
+	@Deprecated
 	public static final HandlerThreadHandler createHandler(final boolean async) {
-		return createHandler(TAG, async);
+		return createHandler(TAG, null, Process.THREAD_PRIORITY_DEFAULT, async);
 	}
 
 	/**
@@ -64,22 +77,35 @@ public class HandlerThreadHandler extends Handler {
 	public static final HandlerThreadHandler createHandler(
 		final String name) {
 
-		return createHandler(name, false);
+		return createHandler(name, null, Process.THREAD_PRIORITY_DEFAULT, false);
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド, API>=22
+	 * インスタンス生成用メルパーメソッド
 	 * @param name
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @param priority The priority to run the thread at. The value supplied must be from
+	 * 			{@link android.os.Process} and not from java.lang.Thread.
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	@SuppressLint("NewApi")
 	public static final HandlerThreadHandler createHandler(
-		final String name, final boolean async) {
+		final String name, final int priority) {
 
-		final HandlerThread thread = new HandlerThread(name);
-		thread.start();
-		return new HandlerThreadHandler(thread.getLooper(), async);
+		return createHandler(name, null, priority, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param name
+	 * @param priority The priority to run the thread at. The value supplied must be from
+	 * 			{@link android.os.Process} and not from java.lang.Thread.
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
+	 * @return
+	 */
+	public static final HandlerThreadHandler createHandler(
+		final String name, final int priority, final boolean async) {
+
+		return createHandler(TAG, null, priority, async);
 	}
 
 	/**
@@ -87,23 +113,38 @@ public class HandlerThreadHandler extends Handler {
 	 * @param callback
 	 * @return
 	 */
+	@Deprecated
 	public static final HandlerThreadHandler createHandler(
 		@Nullable final Callback callback) {
 
-		return createHandler(TAG, callback);
+		return createHandler(TAG, callback, Process.THREAD_PRIORITY_DEFAULT, false);
 	}
 
 	/**
-	 * インスタンス生成用メルパーメソッド, API>=22
+	 * インスタンス生成用メルパーメソッド
 	 * @param callback
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @param priority The priority to run the thread at. The value supplied must be from
+	 * 			{@link android.os.Process} and not from java.lang.Thread.
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
+	@Deprecated
+	public static final HandlerThreadHandler createHandler(
+		@Nullable final Callback callback, final int priority) {
+
+		return createHandler(TAG, callback, priority, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param callback
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
+	 * @return
+	 */
+	@Deprecated
 	public static final HandlerThreadHandler createHandler(
 		@Nullable final Callback callback, final boolean async) {
 
-		return createHandler(TAG, callback, async);
+		return createHandler(TAG, callback, Process.THREAD_PRIORITY_DEFAULT, async);
 	}
 
 	/**
@@ -115,23 +156,36 @@ public class HandlerThreadHandler extends Handler {
 	public static final HandlerThreadHandler createHandler(
 		final String name, @Nullable final Callback callback) {
 
-		final HandlerThread thread = new HandlerThread(name);
-		thread.start();
-		return new HandlerThreadHandler(thread.getLooper(), callback, false);
+		return createHandler(name, callback, Process.THREAD_PRIORITY_DEFAULT, false);
+	}
+
+	/**
+	 * インスタンス生成用メルパーメソッド
+	 * @param name
+	 * @param callback
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか，API<22なら無視される
+	 * @return
+	 */
+	public static final HandlerThreadHandler createHandler(
+		final String name, @Nullable final Callback callback, final boolean async) {
+
+		return createHandler(name, callback, Process.THREAD_PRIORITY_DEFAULT, async);
 	}
 
 	/**
 	 * インスタンス生成用メルパーメソッド, API>=22
 	 * @param name
 	 * @param callback
-	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか
+	 * @param priority The priority to run the thread at. The value supplied must be from
+	 * 			{@link android.os.Process} and not from java.lang.Thread.
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか, API<22なら無視される
 	 * @return
 	 */
-	@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP_MR1)
 	public static final HandlerThreadHandler createHandler(
-		final String name, @Nullable final Callback callback, final boolean async) {
+		final String name, @Nullable final Callback callback,
+		final int priority, final boolean async) {
 
-		final HandlerThread thread = new HandlerThread(name);
+		final HandlerThread thread = new HandlerThread(name, priority);
 		thread.start();
 		return new HandlerThreadHandler(thread.getLooper(), callback, async);
 	}
@@ -144,17 +198,8 @@ public class HandlerThreadHandler extends Handler {
 	/**
 	 * コンストラクタ
 	 * @param looper
-	 */
-	private HandlerThreadHandler(@NonNull final Looper looper, final boolean async) {
-		super(looper);
-		mId = looper.getThread().getId();
-		mAsynchronous = async;
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param looper
 	 * @param callback
+	 * @param async Lopperの同期バリアの影響を受けずに非同期実行するかどうか, API<22なら無視される
 	 */
 	private HandlerThreadHandler(@NonNull final Looper looper,
 		@Nullable final Callback callback, final boolean async) {
@@ -168,7 +213,6 @@ public class HandlerThreadHandler extends Handler {
 	 * mAsynchronous=trueでAPI>=22の場合にMessage#setAsynchronousで非同期設定フラグをつける。
 	 * 今のHandlerの実装だと#sendMessageAtTimeと#sendMessageAtFrontOfQueueから
 	 * #enqueueMessage(private)を呼び出していてその中でsetAsynchronousが呼び出されている。
-	 *
 	 * sendMessageAtFrontOfQueueもoverrideしたいけどfinalなのでoverrideできない
 	 * @param msg
 	 * @param uptimeMillis
