@@ -52,6 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -66,14 +67,26 @@ public class GLPipelineTest {
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
 
+	@Nullable
+	private GLManager mManager;
+
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		mManager = new GLManager();
+		assertTrue(mManager.isValid());
+		mManager.getEgl();
+		assertEquals(1, mManager.getMasterWidth());
+		assertEquals(1, mManager.getMasterHeight());
 	}
 
 	@After
 	public void cleanUp() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		if (mManager != null) {
+			mManager.release();
+			mManager = null;
+		}
 	}
 
 	/**
@@ -234,8 +247,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
@@ -301,8 +313,7 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -392,8 +403,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline - SurfaceRendererPipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -471,8 +481,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -532,8 +541,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -596,8 +604,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline → EffectPipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -661,8 +668,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline - DrawerPipeline → ProxyPipeline → テクスチャ読み取り
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -719,8 +725,7 @@ public class GLPipelineTest {
 
 		// ImageSourcePipeline → CapturePipeline
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -771,8 +776,7 @@ public class GLPipelineTest {
 		final int NUM_TRIGGERS = 9;
 		// ImageSourcePipeline → CapturePipeline
 
-		final GLManager manager = new GLManager();
-		assertTrue(manager.isValid());
+		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
