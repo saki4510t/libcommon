@@ -44,6 +44,8 @@ public class BundleUtils {
 		} else {
 			final StringBuilder sb = new StringBuilder("Bundle{");
 			final Set<String> keys = data.keySet();
+			final int n = keys.size();
+			int i = 0;
 			for (final String key: keys) {
 				final Object value = data.get(key);
 				if (value.getClass().isArray()) {
@@ -116,7 +118,10 @@ public class BundleUtils {
 				} else {
 					sb.append(key).append("=").append(value);
 				}
-				sb.append(",");
+				i++;
+				if (i < n) {
+					sb.append(",");
+				}
 			}
 			sb.append("}");
 			return sb.toString();
