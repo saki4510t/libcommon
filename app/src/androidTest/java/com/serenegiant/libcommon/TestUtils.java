@@ -57,17 +57,17 @@ public class TestUtils {
 	 */
 	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b, final boolean dumpOnError) {
 		boolean result = false;
-		if ((a.getWidth() == b.getWidth())
-			&& (a.getHeight() == b.getHeight()
+		final int width = a.getWidth();
+		final int height = a.getHeight();
+		if ((width == b.getWidth())
+			&& (height == b.getHeight()
 			&& (a.getConfig() == b.getConfig()))) {
-			final int w = a.getWidth();
-			final int h = a.getHeight();
 			result = true;
-LOOP:		for (int y = 0; y < h; y++) {
-				for (int x = 0; x < w; x++) {
+LOOP:		for (int y = 0; y < height; y++) {
+				for (int x = 0; x < width; x++) {
 					if (!a.getColor(x, y).equals(b.getColor(x, y))) {
 						Log.w(TAG, String.format("ピクセルが違う@(%d,%d)sz(%dx%d),a=0x%08x,b=0x%08x",
-							x, y, w, h,
+							x, y, width, height,
 							a.getColor(x, y).toArgb(),
 							b.getColor(x, y).toArgb()));
 						result = false;
@@ -81,7 +81,7 @@ LOOP:		for (int y = 0; y < h; y++) {
 			}
 		} else {
 			Log.w(TAG, String.format("ピクセルが違うa(%dx%d),b=(%dx%d))",
-				a.getWidth(), a.getHeight(), b.getWidth(), b.getHeight()));
+				width, height, b.getWidth(), b.getHeight()));
 		}
 		return result;
 	}
