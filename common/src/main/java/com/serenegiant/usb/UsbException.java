@@ -19,11 +19,13 @@ package com.serenegiant.usb;
 */
 
 import java.io.IOException;
+import java.io.Serial;
 
 /**
  * USB関係の例外
  */
 public class UsbException extends IOException {
+	@Serial
 	private static final long serialVersionUID = 9211466216423287742L;
 
 	public UsbException() {

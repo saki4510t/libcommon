@@ -21,6 +21,7 @@ package com.serenegiant.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.text.TextUtils;
@@ -87,7 +88,7 @@ public final class SeekBarPreferenceV7 extends Preference {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
+	public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
 //		if (DEBUG) Log.w(TAG, "onBindView:");
 		if ((mSeekbarLayoutId == 0) || (mSeekbarId == 0)) return;
@@ -197,7 +198,7 @@ public final class SeekBarPreferenceV7 extends Preference {
 		}
 	}
 
-	protected String formatValueLabel(final int value, final boolean fromUser) {
+	private String formatValueLabel(final int value, final boolean fromUser) {
 		try {
 			return String.format(mFmtStr, value * mScaleValue);
 		} catch (final Exception e) {

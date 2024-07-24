@@ -37,7 +37,7 @@ import androidx.fragment.app.FragmentActivity;
  * パーミッション要求前に説明を表示するためのDialogFragment実装
  */
 public class PermissionDescriptionDialogV4 extends DialogFragmentEx {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = PermissionDescriptionDialogV4.class.getSimpleName();
 
 	private static final String ARGS_KEY_PERMISSIONS = "permissions";

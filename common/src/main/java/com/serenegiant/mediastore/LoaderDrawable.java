@@ -37,7 +37,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public abstract class LoaderDrawable extends Drawable implements Runnable {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = LoaderDrawable.class.getSimpleName();
 
 	private static final int DEFAULT_PAINT_FLAGS =
@@ -71,7 +71,7 @@ public abstract class LoaderDrawable extends Drawable implements Runnable {
 	}
 
     @Override
-    protected void onBoundsChange(final Rect bounds) {
+    protected void onBoundsChange(@NonNull final Rect bounds) {
         super.onBoundsChange(bounds);
         updateDrawMatrix(getBounds());
     }

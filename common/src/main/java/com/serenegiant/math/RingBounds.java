@@ -18,10 +18,10 @@ package com.serenegiant.math;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 public class RingBounds extends CylinderBounds {
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = -5157039256747626240L;
 	protected float height;				// 高さの1/2
 	protected float inner_r;			// 内円柱の半径

@@ -39,7 +39,7 @@ import java.util.Locale;
  * ジャイロセンセーからのデータ取得・計算用ヘルパークラス
  */
 public class GyroHelper {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = GyroHelper.class.getSimpleName();
 
 	private static final int[] SENSOR_TYPES = {

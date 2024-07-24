@@ -44,7 +44,7 @@ import androidx.documentfile.provider.DocumentFile;
  */
 @SuppressLint("NewApi")
 public class MediaAVTimelapseRecorder extends Recorder {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaAVTimelapseRecorder.class.getSimpleName();
 
 	/**

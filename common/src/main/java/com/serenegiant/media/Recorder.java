@@ -37,7 +37,7 @@ import androidx.annotation.Nullable;
  * 録音録画用ヘルパークラスの基本部分
  */
 public abstract class Recorder implements IRecorder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = Recorder.class.getSimpleName();
 
 	public static final long CHECK_INTERVAL = 45 * 1000L;	// 空き容量,EOSのチェクする間隔[ミリ秒](=45秒)

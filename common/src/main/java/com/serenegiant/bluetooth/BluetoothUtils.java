@@ -44,7 +44,7 @@ import androidx.fragment.app.Fragment;
  * のパーミッションが必要
  */
 public class BluetoothUtils {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = BluetoothUtils.class.getSimpleName();
 
 	public interface BluetoothEnableCallback {

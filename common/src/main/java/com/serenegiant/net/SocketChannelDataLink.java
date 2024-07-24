@@ -39,7 +39,7 @@ import java.nio.channels.SocketChannel;
  * ServerSocketChannel/SocketChannelを使ったAbstractChannelDataLink実装
  */
 public class SocketChannelDataLink extends AbstractChannelDataLink {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = SocketChannelDataLink.class.getSimpleName();
 	
 	public static final int DEFAULT_SERVER_PORT = 6000;
@@ -234,7 +234,7 @@ public class SocketChannelDataLink extends AbstractChannelDataLink {
 		}
 		
 		public synchronized void release() {
-		if (DEBUG) Log.v(TAG, "ServerTask#release:");
+			if (DEBUG) Log.v(TAG, "ServerTask#release:");
 			mIsRunning = false;
 			if (mServerChannel != null) {
 				try {

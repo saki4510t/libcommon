@@ -60,7 +60,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
 public class MediaStoreCursorRecyclerAdapter
 	extends RecyclerView.Adapter<MediaStoreCursorRecyclerAdapter.ViewHolder> {
 
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreCursorRecyclerAdapter.class.getSimpleName();
 
 	@NonNull

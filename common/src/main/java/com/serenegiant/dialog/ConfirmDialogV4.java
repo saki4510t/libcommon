@@ -38,7 +38,7 @@ import androidx.fragment.app.FragmentActivity;
  * 表示要求するActivity/FragmentはConfirmDialogListenerを実装していないといけない
  */
 public class ConfirmDialogV4 extends DialogFragmentEx {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ConfirmDialogV4.class.getSimpleName();
 
 	private static final String ARGS_KEY_CANCELED_ON_TOUCH_OUTSIDE

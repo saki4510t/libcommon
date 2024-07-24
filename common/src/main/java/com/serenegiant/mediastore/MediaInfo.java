@@ -21,7 +21,6 @@ package com.serenegiant.mediastore;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Parcel;
 import android.os.ParcelFileDescriptor;
 import android.os.Parcelable;
@@ -30,6 +29,7 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -40,7 +40,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * MediaStoreの情報を保持するためのコンテナクラス
  */
 public class MediaInfo implements Parcelable {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaInfo.class.getSimpleName();
 
 	public static final Creator<MediaInfo> CREATOR = new Creator<MediaInfo>() {
@@ -256,19 +256,17 @@ public class MediaInfo implements Parcelable {
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o) return true;
-		if (!(o instanceof MediaInfo)) return false;
-
-		final MediaInfo mediaInfo = (MediaInfo) o;
+		if (!(o instanceof final MediaInfo mediaInfo)) return false;
 
 		if (id != mediaInfo.id) return false;
 		if (mediaType != mediaInfo.mediaType) return false;
 		if (width != mediaInfo.width) return false;
 		if (height != mediaInfo.height) return false;
 		if (orientation != mediaInfo.orientation) return false;
-		if (data != null ? !data.equals(mediaInfo.data) : mediaInfo.data != null) return false;
-		if (title != null ? !title.equals(mediaInfo.title) : mediaInfo.title != null) return false;
-		if (mime != null ? !mime.equals(mediaInfo.mime) : mediaInfo.mime != null) return false;
-		return displayName != null ? displayName.equals(mediaInfo.displayName) : mediaInfo.displayName == null;
+		if (!Objects.equals(data, mediaInfo.data)) return false;
+		if (!Objects.equals(title, mediaInfo.title)) return false;
+		if (!Objects.equals(mime, mediaInfo.mime)) return false;
+		return Objects.equals(displayName, mediaInfo.displayName);
 	}
 
 	@Override

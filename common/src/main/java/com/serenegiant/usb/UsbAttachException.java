@@ -18,12 +18,14 @@ package com.serenegiant.usb;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 /**
  * UsbManager.ACTION_USB_DEVICE_ATTACHEDを受け取っときに
  * 対象となるUsbDeviceがnullだったときの例外
  */
 public class UsbAttachException extends UsbException {
-
+	@Serial
 	private static final long serialVersionUID = -3877870687869763167L;
 
 	public UsbAttachException() {

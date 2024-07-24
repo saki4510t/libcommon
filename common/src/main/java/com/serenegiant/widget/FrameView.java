@@ -33,6 +33,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import androidx.annotation.IntDef;
+import androidx.annotation.NonNull;
 
 public class FrameView extends View {
 //	private static final boolean DEBUG = false;	// FIXME 実同時はfalseにすること
@@ -148,7 +149,7 @@ public class FrameView extends View {
 	}
 
 	@Override
-	protected void onDraw(Canvas canvas) {
+	protected void onDraw(@NonNull Canvas canvas) {
 		super.onDraw(canvas);
 		if (mFrameType != FRAME_TYPE_NONE) {
 			if (mShowOutline || (mFrameType == FRAME_TYPE_FRAME)) {

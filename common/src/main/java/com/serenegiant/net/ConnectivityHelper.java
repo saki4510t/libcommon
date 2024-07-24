@@ -61,7 +61,7 @@ import java.util.Locale;
  * ACCESS_NETWORK_STATEパーミッションが必要
  */
 public class ConnectivityHelper {
-	private static final boolean DEBUG = false; // FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false; // 実働時はfalseにすること
 	private static final String TAG = ConnectivityHelper.class.getSimpleName();
 
 	/**

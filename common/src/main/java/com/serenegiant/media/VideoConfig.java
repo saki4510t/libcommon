@@ -18,7 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -197,7 +196,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 */
 	@NonNull
 	public VideoConfig setUseMediaMuxer(final boolean use) {
-		mUseMediaMuxer = use & (Build.VERSION.SDK_INT >= 18);
+		mUseMediaMuxer = use & BuildCheck.isAPI18();
 
 		return this;
 	}
@@ -217,7 +216,7 @@ public class VideoConfig implements Parcelable, Cloneable {
 	 */
 	@NonNull
 	public VideoConfig setUseSurfaceCapture(final boolean use) {
-		mUseSurfaceCapture = use & (Build.VERSION.SDK_INT >= 18);
+		mUseSurfaceCapture = use & BuildCheck.isAPI18();;
 
 		return this;
 	}

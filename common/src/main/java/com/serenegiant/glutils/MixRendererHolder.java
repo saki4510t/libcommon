@@ -49,7 +49,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * 映像1の上にマスク画像のアルファ値でくり抜いた映像に2を合成する
  */
 public class MixRendererHolder extends AbstractRendererHolder {
-	private static final boolean DEBUG = false; // FIXME set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = MixRendererHolder.class.getSimpleName();
 	
 	/**

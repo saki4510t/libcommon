@@ -39,7 +39,7 @@ import androidx.annotation.WorkerThread;
  * MessageTaskまたはその継承クラスをTreadへ引き渡して実行する
  */
 public abstract class MessageTask implements Runnable {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MessageTask.class.getSimpleName();
 
 	/**

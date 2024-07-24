@@ -41,10 +41,8 @@ import android.media.MediaCodecList;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.RequiresApi;
 
 import android.media.MediaFormat;
-import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;

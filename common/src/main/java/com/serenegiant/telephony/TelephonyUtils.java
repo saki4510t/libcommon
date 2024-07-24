@@ -30,7 +30,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
 
 public class TelephonyUtils {
-   private static final boolean DEBUG = true; // FIXME 実働時はfalseにすること
+   private static final boolean DEBUG = true; // 実働時はfalseにすること
    private static final String TAG = TelephonyUtils.class.getSimpleName();
    private TelephonyUtils() {
       // インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに

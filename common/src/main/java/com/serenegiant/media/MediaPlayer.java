@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread;
  */
 @SuppressLint("InlinedApi")
 public class MediaPlayer {
-    private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+    private static final boolean DEBUG = false;	// 実働時はfalseにすること
     private static final String TAG = MediaPlayer.class.getSimpleName();
 
 	private static final int TIMEOUT_USEC = 10000;	// 10msec

@@ -141,11 +141,10 @@ public class CheckableButton extends AppCompatButton implements CheckableEx {
 
 	@Override
 	public void onRestoreInstanceState(final Parcelable state) {
-		if (!(state instanceof CheckableEx.SavedState)) {
+		if (!(state instanceof final CheckableEx.SavedState savedState)) {
 			super.onRestoreInstanceState(state);
 			return;
 		}
-		CheckableEx.SavedState savedState = (CheckableEx.SavedState) state;
 		super.onRestoreInstanceState(savedState.getSuperState());
 		mCheckable = savedState.checkable;
 		setChecked(savedState.checked);

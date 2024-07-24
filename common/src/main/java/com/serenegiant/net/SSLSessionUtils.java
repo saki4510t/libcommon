@@ -49,7 +49,7 @@ public class SSLSessionUtils {
 		Log.i(TAG, "lastAccessedTime=" + session.getLastAccessedTime());
 		Log.i(TAG, "isValid=" + session.isValid());
 		final String[] names = session.getValueNames();
-		if ((names != null) && (names.length > 0)) {
+		if (names != null) {
 			for (final String name: names) {
 				Log.i(TAG, "values[" + name + "]=" + session.getValue(name));
 			}

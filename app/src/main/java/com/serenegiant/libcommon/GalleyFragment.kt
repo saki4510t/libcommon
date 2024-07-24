@@ -105,7 +105,7 @@ class GalleyFragment : BaseFragment() {
 	}
 
 	companion object {
-		private const val DEBUG = false // FIXME 実働時はfalseにすること
+		private const val DEBUG = false // 実働時はfalseにすること
 		private val TAG = GalleyFragment::class.java.simpleName
 
 		fun newInstance() = GalleyFragment().apply {

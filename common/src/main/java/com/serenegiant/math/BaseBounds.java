@@ -18,12 +18,11 @@ package com.serenegiant.math;
  *  limitations under the License.
 */
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public abstract class BaseBounds implements Serializable {
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = 5504958491886331189L;
 	public final Vector position = new Vector();
 	public final Vector angle = new Vector();

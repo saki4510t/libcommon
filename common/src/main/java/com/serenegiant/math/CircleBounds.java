@@ -18,14 +18,13 @@ package com.serenegiant.math;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 /**
  * 円(2D)/球(3D)オブジェクト
  */
 public class CircleBounds extends BaseBounds {
-
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = -6571630061846420508L;
 
 	public CircleBounds(final float x, final float y, final float z, final float radius) {

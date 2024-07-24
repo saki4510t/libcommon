@@ -39,7 +39,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public abstract class ThumbnailLoaderDrawable extends Drawable implements Runnable {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ThumbnailLoaderDrawable.class.getSimpleName();
 
 	private static final int DEFAULT_PAINT_FLAGS =

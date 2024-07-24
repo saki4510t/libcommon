@@ -303,7 +303,6 @@ public class MediaData {
 	/**
 	 * 内部バッファから読み取る
 	 * read((buffer, 0, buffer.length))と等価
-	 *
 	 * 前回の#setまたは#read呼び出しでセットされたposition位置から続けて読み取る,
 	 * #getはclear → position(size) → flipするので必ず先頭から読み取ることになるので注意
 	 * @param buffer
@@ -315,7 +314,6 @@ public class MediaData {
 
 	/**
 	 * 内部バッファから読み取る
-	 *
 	 * 前回の#setまたは#read呼び出しでセットされたposition位置から続けて読み取る,
 	 * #getはclear → position(size) → flipするので必ず先頭から読み取ることになるので注意
 	 * @param buffer

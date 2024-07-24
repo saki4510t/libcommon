@@ -18,7 +18,6 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -138,7 +137,6 @@ public class SAFSingleFileUtils {
 		}
 	}
 
-	@TargetApi(19)
 	private static class SingleDocument extends ActivityResultContract<Intent, Pair<Integer, Uri>> {
 		private static final String TAG = SingleDocument.class.getSimpleName();
 

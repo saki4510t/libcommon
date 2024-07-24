@@ -25,12 +25,11 @@ import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.serenegiant.common.R;
 import com.serenegiant.utils.TypedArrayUtils;
 import com.serenegiant.widget.ColorPickerView;
 
 public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ColorPickerDialogPreferenceV7.class.getSimpleName();
 
 	private int mColor = 0xffff0000;
@@ -54,7 +53,7 @@ public class ColorPickerDialogPreferenceV7 extends DialogPreferenceV7 {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
+	public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
 		mColor = getPersistedInt(mColor);
 	}

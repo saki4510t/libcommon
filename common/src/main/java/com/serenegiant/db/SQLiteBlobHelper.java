@@ -28,7 +28,7 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.ArrayUtils;
 
 public class SQLiteBlobHelper {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 //	private static final String TAG = SQLiteBlobHelper.class.getSimpleName();
 	
 	/**

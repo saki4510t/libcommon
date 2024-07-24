@@ -20,13 +20,13 @@ package com.serenegiant.preference;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.serenegiant.common.R;
 import com.serenegiant.utils.TypedArrayUtils;
 
 public class MultilineLabelPreferenceV7 extends Preference {
@@ -47,7 +47,7 @@ public class MultilineLabelPreferenceV7 extends Preference {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
+	public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
 //		if (DEBUG) Log.w(TAG, "onBindViewHolder:");
 		try {

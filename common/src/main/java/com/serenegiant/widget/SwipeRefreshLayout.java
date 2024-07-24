@@ -207,7 +207,9 @@ public class SwipeRefreshLayout extends ViewGroup
 	 */
 	private boolean mEnableLegacyRequestDisallowInterceptTouch;
 
-	private Animation.AnimationListener mRefreshListener = new Animation.AnimationListener() {
+	private final Animation.AnimationListener mRefreshListener
+		= new Animation.AnimationListener() {
+
 		@Override
 		public void onAnimationStart(Animation animation) {
 		}
@@ -305,7 +307,7 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	protected void onRestoreInstanceState(Parcelable state) {
+	protected void onRestoreInstanceState(final Parcelable state) {
 		SavedState savedState = (SavedState) state;
 		super.onRestoreInstanceState(savedState.getSuperState());
 		setRefreshing(savedState.mRefreshing);
@@ -317,7 +319,7 @@ public class SwipeRefreshLayout extends ViewGroup
 		reset();
 	}
 
-	private void setColorViewAlpha(int targetAlpha) {
+	private void setColorViewAlpha(final int targetAlpha) {
 		setProgressAlpha(targetAlpha);
 //		mProgress.setAlpha(targetAlpha);
 	}
@@ -1000,7 +1002,7 @@ public class SwipeRefreshLayout extends ViewGroup
 	// NestedScrollingParent 2
 
 	@Override
-	public boolean onStartNestedScroll(View child, View target, int axes, int type) {
+	public boolean onStartNestedScroll(@NonNull final View child, @NonNull final View target, int axes, int type) {
 		if (type == ViewCompat.TYPE_TOUCH) {
 			return onStartNestedScroll(child, target, axes);
 		} else {
@@ -1009,7 +1011,7 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public void onNestedScrollAccepted(View child, View target, int axes, int type) {
+	public void onNestedScrollAccepted(@NonNull final View child, @NonNull final View target, int axes, int type) {
 		// Should always be true because onStartNestedScroll returns false for all type !=
 		// ViewCompat.TYPE_TOUCH, but check just in case.
 		if (type == ViewCompat.TYPE_TOUCH) {
@@ -1018,7 +1020,7 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public void onStopNestedScroll(View target, int type) {
+	public void onStopNestedScroll(@NonNull final View target, int type) {
 		// Should always be true because onStartNestedScroll returns false for all type !=
 		// ViewCompat.TYPE_TOUCH, but check just in case.
 		if (type == ViewCompat.TYPE_TOUCH) {
@@ -1027,14 +1029,17 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public void onNestedScroll(View target, int dxConsumed, int dyConsumed, int dxUnconsumed,
+	public void onNestedScroll(@NonNull final View target, int dxConsumed, int dyConsumed, int dxUnconsumed,
 							   int dyUnconsumed, int type) {
 		onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed, type,
 			mNestedScrollingV2ConsumedCompat);
 	}
 
 	@Override
-	public void onNestedPreScroll(View target, int dx, int dy, int[] consumed, int type) {
+	public void onNestedPreScroll(
+		@NonNull final View target,
+		final int dx, final int dy,
+		@NonNull final int[] consumed, int type) {
 		// Should always be true because onStartNestedScroll returns false for all type !=
 		// ViewCompat.TYPE_TOUCH, but check just in case.
 		if (type == ViewCompat.TYPE_TOUCH) {
@@ -1045,13 +1050,17 @@ public class SwipeRefreshLayout extends ViewGroup
 	// NestedScrollingParent 1
 
 	@Override
-	public boolean onStartNestedScroll(View child, View target, int nestedScrollAxes) {
+	public boolean onStartNestedScroll(
+		@NonNull final View child, @NonNull final View target,
+		final int nestedScrollAxes) {
 		return isEnabled() && !mReturningToStart && !mRefreshing
 			&& (nestedScrollAxes & ViewCompat.SCROLL_AXIS_VERTICAL) != 0;
 	}
 
 	@Override
-	public void onNestedScrollAccepted(View child, View target, int axes) {
+	public void onNestedScrollAccepted(
+		@NonNull final View child, @NonNull final View target,
+		final int axes) {
 		// Reset the counter of how much leftover scroll needs to be consumed.
 		mNestedScrollingParentHelper.onNestedScrollAccepted(child, target, axes);
 		// Dispatch up to the nested parent
@@ -1061,7 +1070,10 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public void onNestedPreScroll(View target, int dx, int dy, int[] consumed) {
+	public void onNestedPreScroll(
+		@NonNull final View target,
+		final int dx, final int dy,
+		@NonNull final int[] consumed) {
 		// If we are in the middle of consuming, a scroll, then we want to move the spinner back up
 		// before allowing the list to scroll
 		if (dy > 0 && mTotalUnconsumed > 0) {
@@ -1113,7 +1125,7 @@ public class SwipeRefreshLayout extends ViewGroup
 
 	@Override
 	public void onNestedScroll(
-		final View target, final int dxConsumed, final int dyConsumed,
+		@NonNull final View target, final int dxConsumed, final int dyConsumed,
 		final int dxUnconsumed, final int dyUnconsumed) {
 
 		onNestedScroll(target, dxConsumed, dyConsumed, dxUnconsumed, dyUnconsumed,
@@ -1121,14 +1133,16 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public boolean onNestedPreFling(View target, float velocityX,
-									float velocityY) {
+	public boolean onNestedPreFling(
+		@NonNull View target,
+		final float velocityX, final float velocityY) {
 		return dispatchNestedPreFling(velocityX, velocityY);
 	}
 
 	@Override
 	public boolean onNestedFling(
-		View target, float velocityX, float velocityY,
+		@NonNull final View target,
+		final float velocityX, final float velocityY,
 		boolean consumed) {
 
 		return dispatchNestedFling(velocityX, velocityY, consumed);
@@ -1330,7 +1344,7 @@ public class SwipeRefreshLayout extends ViewGroup
 	}
 
 	@Override
-	public boolean onTouchEvent(MotionEvent ev) {
+	public boolean onTouchEvent(final MotionEvent ev) {
 		final int action = ev.getActionMasked();
 		int pointerIndex = -1;
 

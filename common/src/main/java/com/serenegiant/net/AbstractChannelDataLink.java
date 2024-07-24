@@ -38,7 +38,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
 public abstract class AbstractChannelDataLink {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = AbstractChannelDataLink.class.getSimpleName();
 
 	public interface Callback {

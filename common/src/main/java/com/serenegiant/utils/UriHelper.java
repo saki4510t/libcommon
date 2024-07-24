@@ -44,7 +44,7 @@ import java.util.ArrayList;
  * Android10以降の対象範囲別外部ストレージのUriは正常に動作しないかも
  */
 public final class UriHelper {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = UriHelper.class.getSimpleName();
 
 	private UriHelper() {
@@ -64,13 +64,14 @@ public final class UriHelper {
 			try {
 				final String[] columns = { MediaStore.Images.Media.DATA };
 				final Cursor cursor = cr.query(uri, columns, null, null, null);
-				if (cursor != null)
-				try {
-					if (cursor.moveToFirst()) {
-						path = cursor.getString(0);
+				if (cursor != null) {
+					try {
+						if (cursor.moveToFirst()) {
+							path = cursor.getString(0);
+						}
+					} finally {
+						cursor.close();
 					}
-				} finally {
-					cursor.close();
 				}
 			} catch (final Exception e) {
 //				if (DEBUG) Log.w(TAG, e);

@@ -18,11 +18,14 @@ package com.serenegiant.usb;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 /**
  * UsbManager.ACTION_USB_DEVICE_DETACHEDを受け取ったときに
  * 対象となるUsbDeviceがnullの時の例外
  */
 public class UsbDetachException extends UsbException {
+	@Serial
 	private static final long serialVersionUID = 7103814156749087460L;
 
 	public UsbDetachException() {

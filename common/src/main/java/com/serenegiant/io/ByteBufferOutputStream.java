@@ -68,7 +68,7 @@ public class ByteBufferOutputStream extends OutputStream implements IWritable {
 	 * currently accumulated output in the output stream is discarded. The output stream can be used
 	 * again, reusing the already allocated buffer space.
 	 *
-	 * @see java.io.ByteArrayInputStream#count
+	 * @see java.io.ByteArrayInputStream
 	 */
 	public void reset() {
 		wrappedBuffer.rewind();

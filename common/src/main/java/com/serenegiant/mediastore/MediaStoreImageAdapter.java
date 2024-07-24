@@ -56,7 +56,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  * こっちはサムネイルではなくファイルからBitmapを指定サイズで読み込む
  */
 public class MediaStoreImageAdapter extends PagerAdapter {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreImageAdapter.class.getSimpleName();
 
 	@NonNull

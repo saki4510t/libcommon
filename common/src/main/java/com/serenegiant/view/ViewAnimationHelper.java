@@ -191,25 +191,24 @@ public class ViewAnimationHelper {
 	 */
 	private static final Animator.AnimatorListener mAnimatorListener = new Animator.AnimatorListener() {
 		@Override
-		public void onAnimationStart(final Animator animator) {
+		public void onAnimationStart(@NonNull final Animator animator) {
 			onAnimation(animator, ANIMATION_EVENT_START);
 		}
 		@Override
-		public void onAnimationEnd(final Animator animator) {
+		public void onAnimationEnd(@NonNull final Animator animator) {
 			onAnimation(animator, ANIMATION_EVENT_END);
 		}
 		@Override
-		public void onAnimationCancel(final Animator animator) {
+		public void onAnimationCancel(@NonNull final Animator animator) {
 			onAnimation(animator, ANIMATION_EVENT_CANCEL);
 		}
 		@Override
-		public void onAnimationRepeat(final Animator animation) {
+		public void onAnimationRepeat(@NonNull final Animator animation) {
 		}
 	};
 
 	private static void onAnimation(final Animator animator, final int event) {
-		if (animator instanceof ObjectAnimator) {
-			final ObjectAnimator anim = (ObjectAnimator)animator;
+		if (animator instanceof final ObjectAnimator anim) {
 			final View target = (View)anim.getTarget();
 			if (target == null) return;	// これはありえないはずだけど
 

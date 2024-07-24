@@ -22,6 +22,7 @@ import android.opengl.Matrix;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Locale;
@@ -34,9 +35,7 @@ import androidx.annotation.Size;
  * ベクトル計算用ヘルパークラス
  */
 public class Vector implements Parcelable, Serializable, Cloneable {
-	/**
-	 * serialVersionUID
-	 */
+	@Serial
 	private static final long serialVersionUID = 1620440892067002860L;
 
 	public static final double TO_RADIAN = (Math.PI / 180.0);

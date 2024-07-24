@@ -20,13 +20,13 @@ package com.serenegiant.math;
 
 import android.graphics.Rect;
 
+import java.io.Serial;
+
 /**
  * 四角オブジェクト(2D)
  */
 public class RectangleBounds extends BaseBounds {
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = 260429282595037220L;
 	public final Vector box = new Vector();	// 高さ(x), 幅(y) 奥行き(z)の1/2
 	private final Rect boundsRect = new Rect();

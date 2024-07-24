@@ -40,7 +40,7 @@ import com.serenegiant.system.BuildCheck;
  * 2つの子Viewを指定した位置に自動配置するViewGroup
  */
 public class TwoPanelViewGroup extends FrameLayout {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = TwoPanelViewGroup.class.getSimpleName();
 
 	/**

@@ -393,8 +393,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	public void onRestoreInstanceState(final Parcelable state) {
 		if (DEBUG) Log.v(TAG, "onRestoreInstanceState:");
-		if (state instanceof SavedState) {
-			final SavedState saved = (SavedState)state;
+		if (state instanceof final SavedState saved) {
 			mIsRestored = true;
 			mImageMatrix.setValues(saved.mMatrixCache);
 			mState = saved.mState;

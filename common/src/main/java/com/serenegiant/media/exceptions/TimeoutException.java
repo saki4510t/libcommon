@@ -18,11 +18,10 @@ package com.serenegiant.media.exceptions;
  *  limitations under the License.
 */
 
-public class TimeoutException extends RuntimeException {
+import java.io.Serial;
 
-	/**
-	 * 
-	 */
+public class TimeoutException extends RuntimeException {
+	@Serial
 	private static final long serialVersionUID = -7207769104864850593L;
 
 	public TimeoutException() {

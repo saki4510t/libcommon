@@ -18,10 +18,13 @@ package com.serenegiant.security;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 /**
  * 暗号化・復号時のエラーを通知するためのException実装
  */
 public class ObfuscatorException extends Exception {
+	@Serial
 	private static final long serialVersionUID = -437726590003072651L;
 
 	public ObfuscatorException() {

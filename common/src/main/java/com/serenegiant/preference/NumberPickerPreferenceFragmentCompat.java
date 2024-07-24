@@ -94,7 +94,7 @@ public class NumberPickerPreferenceFragmentCompat extends PreferenceDialogFragme
 	}
 
 	@Override
-	protected View onCreateDialogView(final Context context) {
+	protected View onCreateDialogView(@NonNull final Context context) {
 		if (DEBUG) Log.v(TAG, "onCreateDialogView:");
 		final NumberPicker picker = new NumberPicker(context);
 		picker.setOnValueChangedListener(mOnValueChangeListener);
@@ -106,7 +106,7 @@ public class NumberPickerPreferenceFragmentCompat extends PreferenceDialogFragme
 	}
 
 	@Override
-	protected void onPrepareDialogBuilder(final AlertDialog.Builder builder) {
+	protected void onPrepareDialogBuilder(@NonNull final AlertDialog.Builder builder) {
 		super.onPrepareDialogBuilder(builder);
 
 		/*

@@ -44,7 +44,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * ビットマップのアルファ値に応じてアルファブレンドされる
  */
 public class OverlayRendererHolder extends AbstractRendererHolder {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = OverlayRendererHolder.class.getSimpleName();
 
 	/**

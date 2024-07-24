@@ -441,8 +441,11 @@ public class KeyboardView extends View implements View.OnClickListener {
 		if (mGestureDetector == null) {
 			mGestureDetector = new GestureDetector(getContext(), new GestureDetector.SimpleOnGestureListener() {
 				@Override
-				public boolean onFling(MotionEvent me1, MotionEvent me2,
-									   float velocityX, float velocityY) {
+				public boolean onFling(
+					final MotionEvent me1,
+					@NonNull final MotionEvent me2,
+					float velocityX, float velocityY) {
+
 					if (mPossiblePoly) return false;
 					final float absX = Math.abs(velocityX);
 					final float absY = Math.abs(velocityY);
@@ -705,7 +708,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 	}
 
 	@Override
-	public void onDraw(Canvas canvas) {
+	public void onDraw(@NonNull final Canvas canvas) {
 		super.onDraw(canvas);
 		if (mDrawPending || mBuffer == null || mKeyboardChanged) {
 			onBufferDraw();
@@ -1289,7 +1292,7 @@ public class KeyboardView extends View implements View.OnClickListener {
 		return result;
 	}
 
-	private boolean onModifiedTouchEvent(MotionEvent me, boolean possiblePoly) {
+	private boolean onModifiedTouchEvent(final MotionEvent me, final boolean possiblePoly) {
 		int touchX = (int) me.getX() - getPaddingLeft();
 		int touchY = (int) me.getY() - getPaddingTop();
 		if (touchY >= -mVerticalCorrection)

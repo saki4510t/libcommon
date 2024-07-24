@@ -28,7 +28,7 @@ import androidx.annotation.Nullable;
  * Hold shared texture that has camera frame and draw them to registered surface if needs<br>
  */
 public class RendererHolder extends AbstractRendererHolder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = RendererHolder.class.getSimpleName();
 
 	/**

@@ -45,7 +45,7 @@ import androidx.fragment.app.FragmentActivity;
  * PermissionDescriptionDialogV4と違ってこちらは要求コードを使わない(permissionsの文字列で判別)
  */
 public class RationalDialogV4 extends DialogFragmentEx {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = RationalDialogV4.class.getSimpleName();
 
 	private static final String ARGS_KEY_PERMISSIONS = "permissions";

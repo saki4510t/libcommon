@@ -50,7 +50,7 @@ import androidx.collection.LruCache;
  * メモリーキャッシュとディスクキャッシュの2段構成
  */
 public class ThumbnailCache {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ThumbnailCache.class.getSimpleName();
 
 	private static final int DISK_CACHE_SIZE = 1024 * 1024 * 10; // 10MB

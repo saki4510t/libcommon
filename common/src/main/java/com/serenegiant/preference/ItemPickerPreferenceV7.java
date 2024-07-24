@@ -21,6 +21,7 @@ package com.serenegiant.preference;
 import android.content.Context;
 import android.content.res.TypedArray;
 
+import androidx.annotation.NonNull;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceViewHolder;
 import android.util.AttributeSet;
@@ -29,13 +30,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 
-import com.serenegiant.common.R;
 import com.serenegiant.utils.TypedArrayUtils;
 import com.serenegiant.widget.ItemPicker;
 import com.serenegiant.widget.ItemPicker.OnChangedListener;
 
 public final class ItemPickerPreferenceV7 extends Preference {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ItemPickerPreferenceV7.class.getSimpleName();
 
 	private int preferenceValue;
@@ -56,11 +56,10 @@ public final class ItemPickerPreferenceV7 extends Preference {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
+	public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
 		RelativeLayout parent = null;
-		if (holder.itemView instanceof ViewGroup) {
-			final ViewGroup group = (ViewGroup)holder.itemView;
+		if (holder.itemView instanceof final ViewGroup group) {
 			for (int i = group.getChildCount() - 1; i >= 0; i--) {
 				final View v = group.getChildAt(i);
 				if (v instanceof RelativeLayout) {

@@ -52,7 +52,7 @@ import static com.serenegiant.mediastore.MediaStoreUtils.*;
  */
 public class MediaStoreAdapter extends CursorAdapter {
 
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaStoreAdapter.class.getSimpleName();
 
 	private int mThumbnailWidth = 200, mThumbnailHeight = 200;

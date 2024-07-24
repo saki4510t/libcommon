@@ -42,7 +42,6 @@ import androidx.fragment.app.Fragment;
 /**
  * MediaProjectionManagerでスクリーンキャプチャーするためのヘルパークラス
  * MediaProjectionManager#getMediaProjectionへ引き渡すIntentを取得する
- *
  * 本当はoutの型をMediaProjectionにしてMediaProjectionの取得まで実行したい
  * ところだけど、それだとバックグラウンドで録画や映像伝送する際にバックグラウンド
  * 動作のServiceへ引き渡すのが難しくなるので、

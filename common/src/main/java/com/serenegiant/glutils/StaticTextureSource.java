@@ -47,7 +47,7 @@ import com.serenegiant.math.Fraction;
  * FIXME ImageTextureSourceと同じようにChoreographerで書き換える
  */
 public class StaticTextureSource implements GLConst, IMirror {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = StaticTextureSource.class.getSimpleName();
 
 	@NonNull

@@ -141,11 +141,10 @@ public class CheckableImageButton extends AppCompatImageButton implements Checka
 
 	@Override
 	protected void onRestoreInstanceState(final Parcelable state) {
-		if (!(state instanceof SavedState)) {
+		if (!(state instanceof final SavedState savedState)) {
 			super.onRestoreInstanceState(state);
 			return;
 		}
-		SavedState savedState = (SavedState) state;
 		super.onRestoreInstanceState(savedState.getSuperState());
 		mCheckable = savedState.checkable;
 		setChecked(savedState.checked);

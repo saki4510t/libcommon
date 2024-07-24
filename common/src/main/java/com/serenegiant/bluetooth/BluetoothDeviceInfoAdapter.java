@@ -39,7 +39,7 @@ import java.util.List;
  * Bluetooth機器を一覧表示するためのadapter
  */
 public class BluetoothDeviceInfoAdapter extends ArrayAdapter<BluetoothDeviceInfo> {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = BluetoothDeviceInfoAdapter.class.getSimpleName();
 
 	private final LayoutInflater mInflater;

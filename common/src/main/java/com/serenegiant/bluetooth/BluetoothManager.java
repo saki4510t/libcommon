@@ -20,8 +20,6 @@ package com.serenegiant.bluetooth;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.Fragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
@@ -48,7 +46,6 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -63,7 +60,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  */
 @SuppressLint("MissingPermission")
 public class BluetoothManager {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = BluetoothManager.class.getSimpleName();
 
 //********************************************************************************

@@ -61,7 +61,7 @@ import com.serenegiant.utils.BitsHelper;
 import com.serenegiant.utils.UriHelper;
 
 public final class BitmapHelper {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = BitmapHelper.class.getSimpleName();
 
 	private BitmapHelper() {

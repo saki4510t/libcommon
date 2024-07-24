@@ -73,8 +73,7 @@ public class RendererTarget implements IMirror {
 		if (surface instanceof ISurface) {	// IGLSurfaceはISurfaceの子なのでここに含む
 			mTargetSurface = (ISurface)surface;
 			mOwnSurface = false;
-		} else if (surface instanceof TextureWrapper) {
-			final TextureWrapper wrapper = (TextureWrapper)surface;
+		} else if (surface instanceof final TextureWrapper wrapper) {
 			mTargetSurface = GLSurface.wrap(egl.isGLES3(),
 				wrapper.texTarget, wrapper.texUnit, wrapper.texId,
 				wrapper.width, wrapper.height, false);

@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -161,7 +162,7 @@ public class ReentrantReadWriteList<V> implements List<V> {
 		boolean result;
 		mReadLock.lock();
 		try {
-			result = mList.containsAll(collection);
+			result = new HashSet<>(mList).containsAll(collection);
 		} finally {
 			mReadLock.unlock();
 		}

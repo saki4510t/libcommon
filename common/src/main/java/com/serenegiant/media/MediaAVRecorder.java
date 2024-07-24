@@ -38,7 +38,7 @@ import androidx.documentfile.provider.DocumentFile;
  */
 @SuppressLint("NewApi")
 public class MediaAVRecorder extends Recorder {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaAVRecorder.class.getSimpleName();
 
 	protected final int mSaveTreeId;	// 0以外: SFAを使った出力を行うかどうか

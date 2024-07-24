@@ -39,11 +39,13 @@ import android.view.View;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.ShaderDrawable;
 
+import androidx.annotation.NonNull;
+
 /**
  * 色相円とアルファ・明度から色を選択するためのView
  */
 public class ColorPickerView extends View {
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 //	private static final String TAG = "ColorPickerView";
 
 	private static final float SQRT2 = (float)Math.sqrt(2);
@@ -177,7 +179,7 @@ public class ColorPickerView extends View {
 	}
 
 	@Override
-	protected void onDraw(final Canvas canvas) {
+	protected void onDraw(@NonNull final Canvas canvas) {
 		mSelectionPaint.setStyle(Paint.Style.FILL);
 		if (mShowSelectedColor) {
 			// 透過した時の背景(白黒市松模様)を描画

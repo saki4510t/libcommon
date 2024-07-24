@@ -59,7 +59,7 @@ import java.util.concurrent.CopyOnWriteArraySet;
  * <uses-feature android:name="android.hardware.wifi.direct"/>
  */
 public class WiFiP2pHelper {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = WiFiP2pHelper.class.getSimpleName();
 
 	private static WiFiP2pHelper sWiFiP2PHelper;

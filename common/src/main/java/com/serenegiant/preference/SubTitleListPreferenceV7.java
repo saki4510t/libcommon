@@ -34,6 +34,7 @@ import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.IdRes;
 import androidx.annotation.LayoutRes;
+import androidx.annotation.NonNull;
 import androidx.annotation.StringRes;
 import androidx.annotation.UiThread;
 import androidx.preference.ListPreference;
@@ -78,7 +79,7 @@ public final class SubTitleListPreferenceV7 extends ListPreference {
 	}
 
 	@Override
-	public void onBindViewHolder(final PreferenceViewHolder holder) {
+	public void onBindViewHolder(@NonNull final PreferenceViewHolder holder) {
 		super.onBindViewHolder(holder);
 //		if (DEBUG) Log.w(TAG, "onBindView:");
 		if (mSubTitleLayoutId == 0) return;

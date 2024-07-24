@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread;
  * StaticTextureSourceと違って分配描画しないので出力先Surfaceが1つだけであればこちらの方が効率的
  */
 public class ImageTextureSource implements GLConst, IMirror {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ImageTextureSource.class.getSimpleName();
 
 	private static final int DEFAULT_WIDTH = 640;

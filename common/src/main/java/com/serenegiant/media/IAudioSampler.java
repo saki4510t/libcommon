@@ -33,7 +33,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresPermission;
 
 public abstract class IAudioSampler {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private final String TAG = getClass().getSimpleName();
 
 	/**

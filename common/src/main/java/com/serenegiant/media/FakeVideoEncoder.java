@@ -30,7 +30,7 @@ import java.nio.ByteOrder;
 public class FakeVideoEncoder extends AbstractFakeEncoder
 	implements IVideoEncoder {
 	
-//	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+//	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = FakeVideoEncoder.class.getSimpleName();
 
 	protected int mWidth, mHeight;

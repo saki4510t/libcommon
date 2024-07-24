@@ -40,7 +40,7 @@ import static com.serenegiant.gl.GLEffect.*;
 public class EffectRendererHolder extends AbstractRendererHolder
 	implements IEffectRendererHolder {
 
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = EffectRendererHolder.class.getSimpleName();
 
 //================================================================================

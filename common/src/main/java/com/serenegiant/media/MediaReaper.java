@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread;
  * MediaCodecのエンコーダーからエンコード済みデータを非同期で引き出してmuxer等へ引き渡すためのヘルパークラス
  */
 public abstract class MediaReaper implements Runnable {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MediaReaper.class.getSimpleName();
 
 	public static final int REAPER_VIDEO = 0;

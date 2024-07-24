@@ -38,7 +38,7 @@ import java.util.List;
 
 
 public class ValueSelectorAdapter extends ArrayAdapter<ValueSelectorAdapter.ValueEntry> {
-	private static final boolean DEBUG = false;	// FIXME 実働時はfalseにすること
+	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ValueSelectorAdapter.class.getSimpleName();
 
 	public interface ValueSelectorAdapterListener {

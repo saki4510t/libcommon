@@ -18,7 +18,6 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.BlurMaskFilter;
 import android.graphics.Canvas;
@@ -31,7 +30,6 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 
 import com.serenegiant.graphics.CanvasUtils;
-import com.serenegiant.system.BuildCheck;
 
 import androidx.appcompat.widget.AppCompatImageButton;
 

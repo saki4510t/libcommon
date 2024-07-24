@@ -158,7 +158,7 @@ public class OrientationSeekbar extends AppCompatSeekBar {
 	 * @param canvas
 	 */
 	@Override
-	public void draw(final Canvas canvas) {
+	public void draw(@NonNull final Canvas canvas) {
 		final boolean isHorizontal = mOrientation == HORIZONTAL;
 		final float w = isHorizontal ? getWidth() : getHeight();
 		final float h = isHorizontal ? getHeight() : getWidth();

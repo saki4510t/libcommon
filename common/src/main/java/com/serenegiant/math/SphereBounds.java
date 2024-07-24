@@ -18,14 +18,13 @@ package com.serenegiant.math;
  *  limitations under the License.
 */
 
+import java.io.Serial;
+
 /**
  * 球オブジェクト(3D)
  */
 public class SphereBounds extends CircleBounds {
-
-	/**
-	 * 
-	 */
+	@Serial
 	private static final long serialVersionUID = 5374122610666117206L;
 
 	public SphereBounds(final float x, final float y, final float z, final float radius) {
