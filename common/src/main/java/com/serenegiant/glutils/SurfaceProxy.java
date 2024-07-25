@@ -41,6 +41,7 @@ import com.serenegiant.utils.HandlerUtils;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -85,8 +86,11 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		}
 	}
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	protected final Object mSync = new Object();
+	protected final ReentrantLock mLock = new ReentrantLock();
 	private volatile boolean mReleased = false;
 	private int mWidth, mHeight;
 	@MirrorMode
@@ -134,8 +138,11 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 	@MirrorMode
 	@Override
 	public int getMirror() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mMirror;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -201,13 +208,16 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					if (DEBUG) Log.v(TAG, "onImageAvailable:" + (++cnt));
 					final Image image = reader.acquireLatestImage();
 					if (image != null) {
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							if (mImageWriter != null) {
 								if (DEBUG) Log.v(TAG, "onImageAvailable:queueInputImage");
 								mImageWriter.queueInputImage(image); // 自動的にcloseされる
 							} else {
 								image.close();
 							}
+						} finally {
+							mLock.unlock();
 						}
 					}
 				}
@@ -216,7 +226,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 		@Override
 		protected void internalRelease() {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if (mImageWriter != null) {
 					mImageWriter.close();
 					mImageWriter = null;
@@ -225,6 +236,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					mImageReader.close();
 					mImageReader = null;
 				}
+			} finally {
+				mLock.unlock();
 			}
 			HandlerUtils.NoThrowQuit(mAsyncHandler);
 			super.internalRelease();
@@ -233,12 +246,15 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		@NonNull
 		@Override
 		public Surface getInputSurface() {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if ((mImageReader != null) && isValid()) {
 					return mImageReader.getSurface();
 				} else {
 					throw new IllegalStateException("already released?");
 				}
+			} finally {
+				mLock.unlock();
 			}
 		}
 
@@ -251,7 +267,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		@Override
 		public void setSurface(@Nullable final Object surface, @Nullable final Fraction fps) {
 			if (DEBUG) Log.v(TAG, "setSurface:" + surface);
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if (mImageWriter != null) {
 					mImageWriter.close();
 					mImageWriter = null;
@@ -262,6 +279,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					// XXX ImageReaderからのImageをキューに入れるだけならOnImageReleasedListenerやdequeueInputImageは不要
 //					mImageWriter.setOnImageReleasedListener(mOnImageReleasedListener, mAsyncHandler);
 				}
+			} finally {
+				mLock.unlock();
 			}
 		}
 
@@ -406,7 +425,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 		@Override
 		public void setMirror(@MirrorMode final int mirror) {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if (mMirror != mirror) {
 					mMirror = mirror;
 					mManager.runOnGLThread(() -> {
@@ -415,6 +435,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 						}
 					});
 				}
+			} finally {
+				mLock.unlock();
 			}
 		}
 
@@ -516,7 +538,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 			final GLDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
 					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 					if (mDrawer != null) {
@@ -527,6 +550,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				}
 				drawer = mDrawer;
 				target = mRendererTarget;
+			} finally {
+				mLock.unlock();
 			}
 			if ((target != null)
 				&& target.canDraw()) {
@@ -545,21 +570,22 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		@WorkerThread
 		private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 			if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-			synchronized (mSync) {
-				synchronized (mSync) {
-					if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-						// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-						mRendererTarget.release();
-						mRendererTarget = null;
-					}
-					if ((mRendererTarget == null) && (surface != null)) {
-						mRendererTarget = RendererTarget.newInstance(
-							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					}
-					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
-					}
+			mLock.lock();
+			try {
+				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+					mRendererTarget.release();
+					mRendererTarget = null;
 				}
+				if ((mRendererTarget == null) && (surface != null)) {
+					mRendererTarget = RendererTarget.newInstance(
+						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				}
+				if (mRendererTarget != null) {
+					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+				}
+			} finally {
+				mLock.unlock();
 			}
 		}
 
@@ -567,11 +593,14 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		private void releaseTargetOnGL() {
 			final GLDrawer2D drawer;
 			final RendererTarget target;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				drawer = mDrawer;
 				mDrawer = null;
 				target = mRendererTarget;
 				mRendererTarget = null;
+			} finally {
+				mLock.unlock();
 			}
 			if ((drawer != null) || (target != null)) {
 				if (DEBUG) Log.v(TAG, "releaseTarget:");

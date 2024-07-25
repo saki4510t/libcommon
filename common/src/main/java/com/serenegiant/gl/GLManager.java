@@ -28,6 +28,7 @@ import com.serenegiant.utils.HandlerUtils;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -44,6 +45,11 @@ public class GLManager {
 	@NonNull
 	private final Handler mGLHandler;
 	private final long mHandlerThreadId;
+	/**
+	 * 排他制御用
+	 */
+	@NonNull
+	private final ReentrantLock mLock = new ReentrantLock();
 	private boolean mInitialized;
 	private boolean mReleased;
 
@@ -185,18 +191,23 @@ public class GLManager {
 	 * 関連するリソースを廃棄する
 	 * 再利用はできない
 	 */
-	public synchronized void release() {
+	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		if (!mReleased) {
-			mReleased = true;
-			mGLHandler.postAtFrontOfQueue(new Runnable() {
-				@Override
-				public void run() {
-					mGLContext.release();
-					mGLHandler.removeCallbacksAndMessages(null);
-					HandlerUtils.NoThrowQuit(mGLHandler);
-				}
-			});
+		mLock.lock();
+		try {
+			if (!mReleased) {
+				mReleased = true;
+				mGLHandler.postAtFrontOfQueue(new Runnable() {
+					@Override
+					public void run() {
+						mGLContext.release();
+						mGLHandler.removeCallbacksAndMessages(null);
+						HandlerUtils.NoThrowQuit(mGLHandler);
+					}
+				});
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -246,8 +257,13 @@ public class GLManager {
 	 * GLコンテキストが有効かどうか
 	 * @return
 	 */
-	public synchronized boolean isValid() {
-		return mInitialized && !mReleased;
+	public boolean isValid() {
+		mLock.lock();
+		try {
+			return mInitialized && !mReleased;
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -301,15 +317,20 @@ public class GLManager {
 	 * @return
 	 * @throws RuntimeException
 	 */
-	public synchronized GLManager createShared(
+	public GLManager createShared(
 		@Nullable final Handler.Callback callback)	throws RuntimeException {
 
 		if (DEBUG) Log.v(TAG, "createShared:");
-		checkValid();
-		return new GLManager(mGLContext.getMaxClientVersion(),
-			mGLContext.getContext(), mGLContext.getFlags(),
-			null, 0, 0,
-			callback);
+		mLock.lock();
+		try {
+			checkValid();
+			return new GLManager(mGLContext.getMaxClientVersion(),
+				mGLContext.getContext(), mGLContext.getFlags(),
+				null, 0, 0,
+				callback);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -319,10 +340,15 @@ public class GLManager {
 	 * @throws IllegalStateException
 	 */
 	@NonNull
-	public synchronized Handler getGLHandler() throws IllegalStateException {
+	public Handler getGLHandler() throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "getGLHandler:");
-		checkValid();
-		return mGLHandler;
+		mLock.lock();
+		try {
+			checkValid();
+			return mGLHandler;
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -332,12 +358,17 @@ public class GLManager {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	public synchronized Handler createGLHandler(
+	public Handler createGLHandler(
 		@Nullable final Handler.Callback callback) throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "createGLHandler:");
-		checkValid();
-		return new Handler(mGLHandler.getLooper(), callback);
+		mLock.lock();
+		try {
+			checkValid();
+			return new Handler(mGLHandler.getLooper(), callback);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -346,9 +377,14 @@ public class GLManager {
 	 * @throws IllegalStateException
 	 */
 	@NonNull
-	public synchronized GLContext getGLContext() throws IllegalStateException {
-		checkValid();
-		return mGLContext;
+	public GLContext getGLContext() throws IllegalStateException {
+		mLock.lock();
+		try {
+			checkValid();
+			return mGLContext;
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -373,16 +409,21 @@ public class GLManager {
 	 * GLコンテキストを保持しているスレッド上での実行要求
 	 * @param task
 	 */
-	public synchronized void runOnGLThread(final Runnable task)
+	public void runOnGLThread(final Runnable task)
 		throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "runOnGLThread:");
-		checkValid();
-		if (isGLThread()) {
-			// GLスレッド上で呼ばれたときはそのまま実行する
-			task.run();
-		} else {
-			mGLHandler.post(task);
+		mLock.lock();
+		try {
+			checkValid();
+			if (isGLThread()) {
+				// GLスレッド上で呼ばれたときはそのまま実行する
+				task.run();
+			} else {
+				mGLHandler.post(task);
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -392,18 +433,23 @@ public class GLManager {
 	 * @param delayMs
 	 * @throws IllegalStateException
 	 */
-	public synchronized void runOnGLThread(final Runnable task, final long delayMs)
+	public void runOnGLThread(final Runnable task, final long delayMs)
 		throws IllegalStateException{
 
 		if (DEBUG) Log.v(TAG, "runOnGLThread:");
-		checkValid();
-		if (delayMs > 0) {
-			mGLHandler.postDelayed(task, delayMs);
-		} else if (isGLThread()) {
-			// GLスレッド上で呼ばれたときはそのまま実行する
-			task.run();
-		} else {
-			mGLHandler.post(task);
+		mLock.lock();
+		try {
+			checkValid();
+			if (delayMs > 0) {
+				mGLHandler.postDelayed(task, delayMs);
+			} else if (isGLThread()) {
+				// GLスレッド上で呼ばれたときはそのまま実行する
+				task.run();
+			} else {
+				mGLHandler.post(task);
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -413,23 +459,28 @@ public class GLManager {
 	 * @param delayMs
 	 * @throws IllegalStateException
 	 */
-	public synchronized void postFrameCallbackDelayed(
+	public void postFrameCallbackDelayed(
 		@NonNull final Choreographer.FrameCallback callback,
 		final long delayMs) throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "postFrameCallbackDelayed:");
-		checkValid();
-		if (isGLThread()) {
-			// すでにGLスレッド上であれば直接実行
-			Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
-		} else {
-			// 別スレッド上にいるならGLスレッド上へ投げる
-			mGLHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
-				}
-			});
+		mLock.lock();
+		try {
+			checkValid();
+			if (isGLThread()) {
+				// すでにGLスレッド上であれば直接実行
+				Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
+			} else {
+				// 別スレッド上にいるならGLスレッド上へ投げる
+				mGLHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
+					}
+				});
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -438,23 +489,28 @@ public class GLManager {
 	 * @param callback
 	 * @throws IllegalStateException
 	 */
-	public synchronized void removeFrameCallback(
+	public void removeFrameCallback(
 		@NonNull final Choreographer.FrameCallback callback)
 			throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "removeFrameCallback:");
-		checkValid();
-		if (isGLThread()) {
-			// すでにGLスレッド上であれば直接実行
-			Choreographer.getInstance().removeFrameCallback(callback);
-		} else {
-			// 別スレッド上にいるならGLスレッド上へ投げる
-			mGLHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					Choreographer.getInstance().removeFrameCallback(callback);
-				}
-			});
+		mLock.lock();
+		try {
+			checkValid();
+			if (isGLThread()) {
+				// すでにGLスレッド上であれば直接実行
+				Choreographer.getInstance().removeFrameCallback(callback);
+			} else {
+				// 別スレッド上にいるならGLスレッド上へ投げる
+				mGLHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						Choreographer.getInstance().removeFrameCallback(callback);
+					}
+				});
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 //--------------------------------------------------------------------------------

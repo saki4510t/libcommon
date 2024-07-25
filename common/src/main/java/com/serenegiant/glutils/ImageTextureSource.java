@@ -31,6 +31,8 @@ import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -49,8 +51,11 @@ public class ImageTextureSource implements GLConst, IMirror {
 	private static final int DEFAULT_HEIGHT = 480;
 	private static final float DEFAULT_FPS = 30.0f;
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
@@ -150,11 +155,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * @throws IllegalStateException
 	 */
 	public int getTexId() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource != null ? mImageSource.getTexId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -167,11 +175,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@Size(min=16)
 	@NonNull
 	public float[] getTexMatrix() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource.getTexMatrix();
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -188,14 +199,18 @@ public class ImageTextureSource implements GLConst, IMirror {
 	}
 
 	public boolean hasSurface() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@Override
 	public void setMirror(final int mirror) {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mMirror != mirror) {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
@@ -204,14 +219,19 @@ public class ImageTextureSource implements GLConst, IMirror {
 					}
 				});
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@MirrorMode
 	@Override
 	public int getMirror() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mMirror;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -224,12 +244,15 @@ public class ImageTextureSource implements GLConst, IMirror {
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if (bitmap == null) {
 						releaseImageSource();
 					} else {
 						createImageSource(bitmap, fps);
 					}
+				} finally {
+					mLock.unlock();
 				}
 			}
 		});
@@ -272,9 +295,12 @@ public class ImageTextureSource implements GLConst, IMirror {
 			final GLDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				drawer = mDrawer;
 				target = mRendererTarget;
+			} finally {
+				mLock.unlock();
 			}
 			if ((drawer != null)
 				&& (target != null)
@@ -293,8 +319,11 @@ public class ImageTextureSource implements GLConst, IMirror {
 		if (isValid()) {
 			@Nullable
 			final RendererTarget target;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				target = mRendererTarget;
+			} finally {
+				mLock.unlock();
 			}
 			if ((target != null)
 				&& target.canDraw()) {
@@ -309,12 +338,15 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@WorkerThread
 	private void releaseImageSource() {
 		mManager.removeFrameCallback(mFrameCallback);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mImageSource != null) {
 				if (DEBUG) Log.v(TAG, "releaseImageSource:");
 				mImageSource.release();
 				mImageSource = null;
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -332,7 +364,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 		final boolean needResize = (getWidth() != width) || (getHeight() != height);
 		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
 		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
@@ -344,6 +377,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
 			mWidth = width;
 			mHeight = height;
+		} finally {
+			mLock.unlock();
 		}
 		prevFrameTimeNs = -1L;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
@@ -356,22 +391,23 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		synchronized (mSync) {
-			synchronized (mSync) {
-				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-					mRendererTarget.release();
-					mRendererTarget = null;
-				}
-				if ((mRendererTarget == null) && (surface != null)) {
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, 0);
-					mRendererTarget.setMirror(mMirror);
-					if (mDrawer == null) {
-						mDrawer = GLDrawer2D.create(mManager.isGLES3(), false);
-					}
+		mLock.lock();
+		try {
+			if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+				// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+				mRendererTarget.release();
+				mRendererTarget = null;
+			}
+			if ((mRendererTarget == null) && (surface != null)) {
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, 0);
+				mRendererTarget.setMirror(mMirror);
+				if (mDrawer == null) {
+					mDrawer = GLDrawer2D.create(mManager.isGLES3(), false);
 				}
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -379,11 +415,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 	private void releaseTarget() {
 		final GLDrawer2D drawer;
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			drawer = mDrawer;
 			mDrawer = null;
 			target = mRendererTarget;
 			mRendererTarget = null;
+		} finally {
+			mLock.unlock();
 		}
 		if ((drawer != null) || (target != null)) {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
@@ -433,12 +472,15 @@ public class ImageTextureSource implements GLConst, IMirror {
 					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
 				}
 				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if (mImageSource != null) {
 						onFrameAvailable(mImageSource.getTexId(), mImageSource.getTexMatrix());
 					} else {
 						onFrameAvailable();
 					}
+				} finally {
+					mLock.unlock();
 				}
 				if (mListener != null) {
 					mListener.onFrameAvailable();

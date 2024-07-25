@@ -47,8 +47,6 @@ public class EffectPipeline extends ProxyPipeline
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 
 	@Nullable
@@ -171,8 +169,11 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	@Override
 	public boolean hasSurface() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -182,8 +183,11 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	@Override
 	public int getId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -203,7 +207,8 @@ public class EffectPipeline extends ProxyPipeline
 
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mMirror != mirror) {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
@@ -212,14 +217,19 @@ public class EffectPipeline extends ProxyPipeline
 					}
 				});
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@MirrorMode
 	@Override
 	public int getMirror() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mMirror;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -245,8 +255,11 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer.setEffect(mEffect);
 			}
 			drawer = mDrawer;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				target = mRendererTarget;
+			} finally {
+				mLock.unlock();
 			}
 			if ((target != null)
 				&& target.canDraw()) {
@@ -282,8 +295,11 @@ public class EffectPipeline extends ProxyPipeline
 					EffectDrawer2D drawer = mDrawer;
 					mDrawer = null;
 					if (drawer != null) {
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							mEffect = drawer.getCurrentEffect();
+						} finally {
+							mLock.unlock();
 						}
 						drawer.release();
 					}
@@ -305,8 +321,11 @@ public class EffectPipeline extends ProxyPipeline
 				public void run() {
 					if (mDrawer != null) {
 						mDrawer.resetEffect();
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							mEffect = mDrawer.getCurrentEffect();
+						} finally {
+							mLock.unlock();
 						}
 					}
 				}
@@ -331,8 +350,11 @@ public class EffectPipeline extends ProxyPipeline
 					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
 					if (mDrawer != null) {
 						mDrawer.setEffect(effect);
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							mEffect = mDrawer.getCurrentEffect();
+						} finally {
+							mLock.unlock();
 						}
 					}
 				}
@@ -344,8 +366,11 @@ public class EffectPipeline extends ProxyPipeline
 
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mEffect;
+		} finally {
+			mLock.unlock();
 		}
 	}
 //--------------------------------------------------------------------------------
@@ -366,7 +391,8 @@ public class EffectPipeline extends ProxyPipeline
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
 				if (mRendererTarget != null) {
 					mRendererTarget.release();
@@ -391,6 +417,8 @@ public class EffectPipeline extends ProxyPipeline
 				}
 				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -399,11 +427,14 @@ public class EffectPipeline extends ProxyPipeline
 		final RendererTarget target;
 		final GLSurface w;
 		mDrawer = null;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			target = mRendererTarget;
 			mRendererTarget = null;
 			w = work;
 			work = null;
+		} finally {
+			mLock.unlock();
 		}
 		if ((drawer != null) || (target != null)) {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");

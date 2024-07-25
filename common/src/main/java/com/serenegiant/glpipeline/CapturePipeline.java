@@ -29,6 +29,7 @@ import com.serenegiant.utils.Pool;
 import com.serenegiant.utils.ThreadPool;
 
 import java.nio.ByteBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -66,7 +67,7 @@ public class CapturePipeline extends ProxyPipeline {
 	}
 
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final Callback mCallback;
 
@@ -154,11 +155,14 @@ public class CapturePipeline extends ProxyPipeline {
 	 * @param intervalsMs 複数回キャプチャする場合の周期[ミリ秒]
 	 */
 	public void trigger(final int numCaptures, final long intervalsMs) {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mCaptureCnt = 0;
 			mNumCaptures = numCaptures;
 			mIntervalsMs = intervalsMs;
 			mLastCaptureMs = 0L;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -168,13 +172,16 @@ public class CapturePipeline extends ProxyPipeline {
 		// キャプチャするかどうかを判定
 		final long current = System.currentTimeMillis();
 		final boolean needCapture;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			needCapture = (mNumCaptures != 0) && (mCaptureCnt < mNumCaptures)
 				&& (current - mLastCaptureMs > mIntervalsMs);
 			if (needCapture) {
 				mLastCaptureMs = current;
 				mCaptureCnt++;
 			}
+		} finally {
+			mLock.unlock();
 		}
 		if (needCapture) {
 //			doCapture(isOES, texId, texMatrix);

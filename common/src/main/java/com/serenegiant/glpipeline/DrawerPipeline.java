@@ -91,8 +91,6 @@ public class DrawerPipeline extends ProxyPipeline
 	};
 
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 	@NonNull
 	private final Callback mCallback;
@@ -219,8 +217,11 @@ public class DrawerPipeline extends ProxyPipeline
 	 */
 	@Override
 	public boolean hasSurface() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -230,8 +231,11 @@ public class DrawerPipeline extends ProxyPipeline
 	 */
 	@Override
 	public int getId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -251,7 +255,8 @@ public class DrawerPipeline extends ProxyPipeline
 
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mMirror != mirror) {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
@@ -260,14 +265,19 @@ public class DrawerPipeline extends ProxyPipeline
 					}
 				});
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@MirrorMode
 	@Override
 	public int getMirror() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mMirror;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -288,8 +298,11 @@ public class DrawerPipeline extends ProxyPipeline
 		}
 		@Nullable
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			target = mRendererTarget;
+		} finally {
+			mLock.unlock();
 		}
 		if ((target != null)
 			&& target.canDraw()) {
@@ -356,7 +369,8 @@ public class DrawerPipeline extends ProxyPipeline
 					@Override
 					public void run() {
 						if (DEBUG) Log.v(TAG, "releaseAll#run:");
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							if (mRendererTarget != null) {
 								if (DEBUG) Log.v(TAG, "releaseAll:release target");
 								mRendererTarget.release();
@@ -367,6 +381,8 @@ public class DrawerPipeline extends ProxyPipeline
 								offscreenSurface.release();
 								offscreenSurface = null;
 							}
+						} finally {
+							mLock.unlock();
 						}
 						if (mDrawer != null) {
 							mCallback.releaseDrawer(mManager, mDrawer);
@@ -390,7 +406,8 @@ public class DrawerPipeline extends ProxyPipeline
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
 				if (mRendererTarget != null) {
 					mRendererTarget.release();
@@ -417,6 +434,8 @@ public class DrawerPipeline extends ProxyPipeline
 					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 				}
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 

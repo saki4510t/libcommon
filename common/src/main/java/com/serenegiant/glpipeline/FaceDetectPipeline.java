@@ -67,8 +67,6 @@ public class FaceDetectPipeline extends ProxyPipeline {
 
 //--------------------------------------------------------------------------------
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 	/**
 	 * 検出処理を行う最大フレームレート
@@ -177,7 +175,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			final GLDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				width = getWidth();
 				height = getHeight();
 				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
@@ -195,6 +194,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 					createTarget();
 				}
 				target = mRendererTarget;
+			} finally {
+				mLock.unlock();
 			}
 			if ((target != null) && target.canDraw()) {
 				// API1からあるFaceDetectorはBitmapからしか検出できないのでテキスチャをオフスクリーンへ描画して
@@ -210,11 +211,14 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				// Bitmapへ代入
 				mWorkBuffer.clear();
 				mAsyncHandler.removeCallbacks(mDetectTask);
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if (mWorkBitmap != null) {
 						mWorkBitmap.copyPixelsFromBuffer(mWorkBuffer);
 						mAsyncHandler.post(mDetectTask);
 					}
+				} finally {
+					mLock.unlock();
 				}
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
@@ -235,9 +239,12 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				public void run() {
 					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
 					GLDrawer2D drawer;
-					synchronized (mSync) {
+					mLock.lock();
+					try {
 						drawer = mDrawer;
 						mDrawer = null;
+					} finally {
+						mLock.unlock();
 					}
 					if (drawer != null) {
 						drawer.release();
@@ -255,7 +262,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 		if (DEBUG) Log.v(TAG, "createTarget:");
 		final int width = getWidth();
 		final int height = getHeight();
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mRendererTarget != null) {
 				mRendererTarget.release();
 				mRendererTarget = null;
@@ -275,6 +283,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			mWorkBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
 			mWorkBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			mDetector = new FaceDetector(width, height, mMaxDetectNum);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -283,7 +293,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 		final GLDrawer2D drawer;
 		final RendererTarget target;
 		final EGLBase.IEglSurface surface;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			drawer = mDrawer;
 			mDrawer = null;
 			target = mRendererTarget;
@@ -296,6 +307,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			}
 			mWorkBuffer = null;
 			mDetector = null;
+		} finally {
+			mLock.unlock();
 		}
 		if ((drawer != null) || (target != null)) {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
@@ -338,7 +351,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 		public void run() {
 			final Bitmap bitmap565;
 			final int width, height;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				// FaceDetectorはRGB565でないと検出できないので変換＆コピーする
 				if (mWorkBitmap != null) {
 					bitmap565 = mWorkBitmap.copy(Bitmap.Config.RGB_565, true);
@@ -347,6 +361,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				} else {
 					return;
 				}
+			} finally {
+				mLock.unlock();
 			}
 			// OpenGL|ESから読み取った映像は通常とは上下反転しているのでひっくり返す
 			m.preScale(1, -1);

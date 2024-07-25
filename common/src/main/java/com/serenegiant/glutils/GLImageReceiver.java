@@ -32,6 +32,7 @@ import com.serenegiant.system.BuildCheck;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntRange;
@@ -97,8 +98,11 @@ public class GLImageReceiver {
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final GLManager mManager;
 	/**
@@ -192,8 +196,11 @@ public class GLImageReceiver {
 		});
 		try {
 			final Surface surface;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				surface = mInputSurface;
+			} finally {
+				mLock.unlock();
 			}
 			if (surface == null) {
 				if (sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
@@ -263,8 +270,11 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	public int getWidth() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mWidth;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -273,8 +283,11 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	public int getHeight() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mHeight;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -283,11 +296,14 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	public int getTexId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mInputSurface == null) {
 				throw new IllegalStateException("surface not ready, already released?");
 			}
 			return mTexId;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -298,8 +314,11 @@ public class GLImageReceiver {
 	@Size(min=16)
 	@NonNull
 	public float[] getTexMatrix() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mTexMatrix;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -312,11 +331,14 @@ public class GLImageReceiver {
 	 */
 	@NonNull
 	public Surface getSurface() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mInputSurface == null) {
 				throw new IllegalStateException("surface not ready, already released?");
 			}
 			return mInputSurface;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -329,11 +351,14 @@ public class GLImageReceiver {
 	 */
 	@NonNull
 	public SurfaceTexture getSurfaceTexture() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mInputTexture == null) {
 				throw new IllegalStateException("surface not ready, already released?");
 			}
 			return mInputTexture;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -344,10 +369,13 @@ public class GLImageReceiver {
 	public void resize(@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 		final int _width = Math.max(width, 1);
 		final int _height = Math.max(height, 1);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mWidth != _width) || (mHeight != _height)) {
 				mGLHandler.sendMessage(mGLHandler.obtainMessage(REQUEST_UPDATE_SIZE, _width, _height));
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -425,9 +453,12 @@ public class GLImageReceiver {
 	@CallSuper
 	private void handleResize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mWidth = width;
 			mHeight = height;
+		} finally {
+			mLock.unlock();
 		}
 		if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
 			mInputTexture.setDefaultBufferSize(width, height);
@@ -443,7 +474,8 @@ public class GLImageReceiver {
 	@CallSuper
 	private void handleReCreateInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mManager.makeDefault();
 			handleReleaseInputSurface();
 			mManager.makeDefault();
@@ -458,6 +490,8 @@ public class GLImageReceiver {
 			}
 			mCallback.onCreateInputSurface(this);
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -470,7 +504,8 @@ public class GLImageReceiver {
 	private void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		mCallback.onReleaseInputSurface(this);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mInputSurface != null) {
 				try {
 					mInputSurface.release();
@@ -491,6 +526,8 @@ public class GLImageReceiver {
 				GLUtils.deleteTex(mTexId);
 				mTexId = 0;
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 

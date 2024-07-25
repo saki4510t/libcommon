@@ -82,9 +82,12 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	@Override
 	public boolean isActive() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			// 破棄されていない && 子と繋がっている
 			return isValid() && (getPipeline() != null);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -143,11 +146,14 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	@Override
 	public int getTexId() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource != null ? mImageSource.getTexId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -161,11 +167,14 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@NonNull
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (!isValid() || (mImageSource == null)) {
 				throw new IllegalStateException("already released or image not set yet.");
 			}
 			return mImageSource.getTexMatrix();
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -181,9 +190,12 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			// 映像ソースが準備できていなければスキップする
 			if (!isValid() || (mImageSource == null)) return;
+		} finally {
+			mLock.unlock();
 		}
 		if (DEBUG && (++cnt % 100) == 0) {
 			Log.v(TAG, "onFrameAvailable:" + cnt);
@@ -200,12 +212,15 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if (bitmap == null) {
 						releaseImageSource();
 					} else {
 						createImageSource(bitmap, fps);
 					}
+				} finally {
+					mLock.unlock();
 				}
 			}
 		});
@@ -214,12 +229,15 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@WorkerThread
 	private void releaseImageSource() {
 		mManager.removeFrameCallback(mFrameCallback);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mImageSource != null) {
 				if (DEBUG) Log.v(TAG, "releaseImageSource:");
 				mImageSource.release();
 				mImageSource = null;
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -231,7 +249,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		final int height = bitmap.getHeight();
 		final boolean needResize = (getWidth() != width) || (getHeight() != height);
 		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSource();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
@@ -241,6 +260,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
 			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
 			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
+		} finally {
+			mLock.unlock();
 		}
 		if (needResize) {
 			resize(width, height);
@@ -270,10 +291,13 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
 				}
 				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if (mImageSource != null) {
 						onFrameAvailable(false, mImageSource.getTexId(), mImageSource.getTexMatrix());
 					}
+				} finally {
+					mLock.unlock();
 				}
 			}
 		}

@@ -29,6 +29,8 @@ import com.serenegiant.egl.EGLConst;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.system.SysPropReader;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -54,7 +56,7 @@ public class GLContext implements EGLConst {
 	 * 排他制御用
 	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	/**
 	 * 初期化に使用可能なGL|ESのバージョン
 	 * 1,2,3のいずれか
@@ -147,7 +149,8 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void release() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mGLThreadId = 0;
 			if (mEglMasterSurface != null) {
 				mEglMasterSurface.release();
@@ -157,6 +160,8 @@ public class GLContext implements EGLConst {
 				mEgl.release();
 				mEgl = null;
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -235,12 +240,15 @@ public class GLContext implements EGLConst {
 	 */
 	@NonNull
 	public EGLBase getEgl() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mEgl != null) {
 				return mEgl;
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -250,12 +258,15 @@ public class GLContext implements EGLConst {
 	 * @throws IllegalStateException
 	 */
 	public EGLBase.IConfig<?> getConfig() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mEgl != null) {
 				return mEgl.getConfig();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -281,8 +292,11 @@ public class GLContext implements EGLConst {
 	 * @return
 	 */
 	public int getMasterWidth() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mEglMasterSurface != null ? mEglMasterSurface.getWidth() : 1;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -292,8 +306,11 @@ public class GLContext implements EGLConst {
 	 * @return
 	 */
 	public int getMasterHeight() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mEglMasterSurface != null ? mEglMasterSurface.getHeight() : 1;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -304,12 +321,15 @@ public class GLContext implements EGLConst {
 	 */
 	@NonNull
 	public EGLBase.IContext<?> getContext() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			final EGLBase.IContext<?> result = mEgl != null ? mEgl.getContext() : null;
 			if (result == null) {
 				throw new IllegalStateException();
 			}
 			return result;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -319,12 +339,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void makeDefault() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
 				mEglMasterSurface.makeCurrent();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -334,12 +357,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void swap() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
 				mEglMasterSurface.swap();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -350,12 +376,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void swap(final long presentationTimeNs) throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mEgl != null) && (mEglMasterSurface != null)) {
 				mEglMasterSurface.swap(presentationTimeNs);
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -367,12 +396,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void sync() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mEgl != null) {
 				mEgl.sync();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -382,12 +414,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void waitGL() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mEgl != null) {
 				mEgl.waitGL();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -398,12 +433,15 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void waitNative() throws IllegalStateException {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mEgl != null) {
 				mEgl.waitNative();
 			} else {
 				throw new IllegalStateException();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -413,8 +451,11 @@ public class GLContext implements EGLConst {
 	 * @return
 	 */
 	public long getGLThreadId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mGLThreadId;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -423,8 +464,11 @@ public class GLContext implements EGLConst {
 	 * @return
 	 */
 	public boolean inGLThread() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mGLThreadId == Thread.currentThread().getId();
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -449,8 +493,11 @@ public class GLContext implements EGLConst {
 	 * @return GLコンテキストが無効なら0が返る, 有効なら0, 1, 2, 3のいずれか(API>=16なので1が返ることはないはずだけど)
 	 */
 	public int getGlVersion() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return  (mEgl != null) ? mEgl.getGlVersion() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 

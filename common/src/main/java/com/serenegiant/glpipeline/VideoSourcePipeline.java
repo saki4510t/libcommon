@@ -200,9 +200,12 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	@Override
 	public boolean isActive() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			// 破棄されていない && 子と繋がっている
 			return isValid() && (getPipeline() != null);
+		} finally {
+			mLock.unlock();
 		}
 	}
 

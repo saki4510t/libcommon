@@ -36,6 +36,8 @@ import com.serenegiant.media.IRecorder;
 import com.serenegiant.media.MediaCodecUtils;
 import com.serenegiant.media.MediaReaper;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,8 +51,11 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EncodePipeline.class.getSimpleName();
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
@@ -95,10 +100,13 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		mReleased = true;
 		releaseTarget();
 		final GLPipeline pipeline;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			pipeline = mPipeline;
 			mPipeline = null;
 			mParent = null;
+		} finally {
+			mLock.unlock();
 		}
 		if (pipeline != null) {
 			pipeline.release();
@@ -136,24 +144,33 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	 */
 	@Override
 	public boolean isActive() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return !mReleased && (mParent != null);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@Override
 	public void setParent(@Nullable final GLPipeline parent) {
 		if (DEBUG) Log.v(TAG, "setParent:" + parent);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mParent = parent;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@Nullable
 	@Override
 	public GLPipeline getParent() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mParent;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -164,8 +181,11 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	@Override
 	public void setPipeline(@Nullable final GLPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + pipeline);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mPipeline = pipeline;
+		} finally {
+			mLock.unlock();
 		}
 		if (pipeline != null) {
 			pipeline.setParent(this);
@@ -179,8 +199,11 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	 */
 	@Nullable
 	public GLPipeline getPipeline() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mPipeline;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -188,7 +211,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:");
 		GLPipeline parent;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			parent = mParent;
 			if (mParent instanceof DistributePipeline) {
 				// 親がDistributePipelineの時は自分を取り除くだけ
@@ -199,6 +223,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			}
 			mParent = null;
 			mPipeline = null;
+		} finally {
+			mLock.unlock();
 		}
 		if (parent != null) {
 			parent = GLPipeline.findFirst(parent);
@@ -225,7 +251,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		final GLDrawer2D drawer;
 		@Nullable
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			pipeline = mPipeline;
 			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
@@ -237,6 +264,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			}
 			drawer = mDrawer;
 			target = mRendererTarget;
+		} finally {
+			mLock.unlock();
 		}
 		if (pipeline != null) {
 			// 次のGLPipelineへつなぐ
@@ -257,8 +286,11 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	@Override
 	public void refresh() {
 		final GLPipeline pipeline;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			pipeline = mPipeline;
+		} finally {
+			mLock.unlock();
 		}
 		if (pipeline != null) {
 			pipeline.refresh();
@@ -275,7 +307,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		mManager.runOnGLThread(new Runnable() {
 			@Override
 			public void run() {
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
 						// すでにRendererTargetが生成されていて描画先surfaceが変更された時
 						mRendererTarget.release();
@@ -286,6 +319,8 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 						mRendererTarget = RendererTarget.newInstance(
 							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 					}
+				} finally {
+					mLock.unlock();
 				}
 			}
 		});
@@ -294,11 +329,14 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private void releaseTarget() {
 		final GLDrawer2D drawer;
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			drawer = mDrawer;
 			mDrawer = null;
 			target = mRendererTarget;
 			mRendererTarget = null;
+		} finally {
+			mLock.unlock();
 		}
 		if ((drawer != null) || (target != null)) {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");

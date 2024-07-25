@@ -33,6 +33,7 @@ import com.serenegiant.utils.Pool;
 
 import java.nio.ByteBuffer;
 import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -47,8 +48,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	private static final boolean DEBUG = false;
 	private static final String TAG = GLBitmapImageReader.class.getSimpleName();
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final Bitmap.Config mConfig;
 	/**
@@ -95,8 +99,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 			@NonNull
 			@Override
 			protected Bitmap createObject(@Nullable final Object... args) {
-				synchronized (mSync) {
+				mLock.lock();
+				try {
 					return Bitmap.createBitmap(mWidth, mHeight, config);
+				} finally {
+					mLock.unlock();
 				}
 			}
 		};
@@ -159,9 +166,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@Override
 	public void onResize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("onResize:(%dx%d)", width, height));
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mWidth = width;
 			mHeight = height;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -185,9 +195,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		final int height = reader.getHeight();
 		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				mWidth = width;
 				mHeight = height;
+			} finally {
+				mLock.unlock();
 			}
 			mWorkBuffer = ByteBuffer.allocateDirect(bytes);
 		}
@@ -226,7 +239,8 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		@Nullable final OnImageAvailableListener<Bitmap> listener,
 		@Nullable final Handler handler) throws IllegalArgumentException {
 
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (listener != null) {
 				Looper looper = handler != null ? handler.getLooper() : Looper.myLooper();
 				if (looper == null) {
@@ -241,6 +255,8 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 				mListener = null;
 				mListenerHandler = null;
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -333,13 +349,16 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	 * OnImageAvailableListener#onImageAvailableを呼び出す
 	 */
 	private void callOnFrameAvailable() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mListenerHandler != null) {
 				mListenerHandler.removeCallbacks(mOnImageAvailableTask);
 				mListenerHandler.post(mOnImageAvailableTask);
 			} else if (DEBUG) {
 				Log.w(TAG, "handleDraw: Unexpectedly listener handler is null!");
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -349,10 +368,13 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	private final Runnable mOnImageAvailableTask = new Runnable() {
 		@Override
 		public void run() {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				if (mListener != null) {
 					mListener.onImageAvailable(GLBitmapImageReader.this);
 				}
+			} finally {
+				mLock.unlock();
 			}
 		}
 	};

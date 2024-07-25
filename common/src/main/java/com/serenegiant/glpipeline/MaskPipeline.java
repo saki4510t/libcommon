@@ -48,8 +48,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final String TAG = MaskPipeline.class.getSimpleName();
 
 	@NonNull
-	private final Object mSync = new Object();
-	@NonNull
 	private final GLManager mManager;
 
 	@Nullable
@@ -121,8 +119,11 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:");
 		if (isValid()) {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				mMaskBitmap = null;
+			} finally {
+				mLock.unlock();
 			}
 			releaseAll();
 		}
@@ -181,8 +182,11 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	@Override
 	public boolean hasSurface() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -192,8 +196,11 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	@Override
 	public int getId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -230,9 +237,12 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		final RendererTarget target;
 		@Nullable
 		final Bitmap bitmap;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			target = mRendererTarget;
 			bitmap = mMaskBitmap;
+		} finally {
+			mLock.unlock();
 		}
 		if (mRequestUpdateMask) {
 			mRequestUpdateMask = false;
@@ -306,9 +316,12 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "setMask:");
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mMaskBitmap = bitmap;
 			mRequestUpdateMask = true;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -322,7 +335,8 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					@Override
 					public void run() {
 						if (DEBUG) Log.v(TAG, "releaseAll#run:");
-						synchronized (mSync) {
+						mLock.lock();
+						try {
 							if (mRendererTarget != null) {
 								if (DEBUG) Log.v(TAG, "releaseAll:release target");
 								mRendererTarget.release();
@@ -333,6 +347,8 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 								work.release();
 								work = null;
 							}
+						} finally {
+							mLock.unlock();
 						}
 						releaseDrawerOnGL();
 					}
@@ -353,7 +369,8 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
 				if (mRendererTarget != null) {
 					mRendererTarget.release();
@@ -380,6 +397,8 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 				}
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 

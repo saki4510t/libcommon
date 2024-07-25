@@ -22,6 +22,7 @@ import android.util.Log;
 
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -40,8 +41,11 @@ public class DistributePipeline implements GLPipeline {
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	private int mWidth, mHeight;
 	@Nullable
 	private GLPipeline mParent;
@@ -94,8 +98,11 @@ public class DistributePipeline implements GLPipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:" + this);
 		mReleased = true;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mParent = null;
+		} finally {
+			mLock.unlock();
 		}
 		for (final GLPipeline pipeline: mPipelines) {
 			pipeline.release();
@@ -133,8 +140,11 @@ public class DistributePipeline implements GLPipeline {
 	 * @return
 	 */
 	public boolean isActive() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return !mReleased && (mParent != null);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -156,8 +166,11 @@ public class DistributePipeline implements GLPipeline {
 	public void setParent(@Nullable final GLPipeline parent) {
 		if (!mReleased) {
 			if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				mParent = parent;
+			} finally {
+				mLock.unlock();
 			}
 		} else {
 			throw new IllegalStateException("already released!");
@@ -167,8 +180,11 @@ public class DistributePipeline implements GLPipeline {
 	@Nullable
 	@Override
 	public GLPipeline getParent() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mParent;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -236,7 +252,8 @@ public class DistributePipeline implements GLPipeline {
 		if (DEBUG) Log.v(TAG, "remove:" + this);
 		final GLPipeline first = GLPipeline.findFirst(this);
 		GLPipeline parent;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			parent = mParent;
 			if (mParent != null) {
 				if (mPipelines.size() == 1) {
@@ -248,6 +265,8 @@ public class DistributePipeline implements GLPipeline {
 				}
 			}
 			mParent = null;
+		} finally {
+			mLock.unlock();
 		}
 		if (first != this) {
 			GLPipeline.validatePipelineChain(first);

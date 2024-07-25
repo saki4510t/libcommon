@@ -29,6 +29,7 @@ import com.serenegiant.math.Fraction;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -43,8 +44,11 @@ public class GLSurfaceWriter implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLSurfaceWriter.class.getSimpleName();
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final GLManager mManager;
 	/**
@@ -120,8 +124,11 @@ public class GLSurfaceWriter implements IMirror {
 	 * @return
 	 */
 	public boolean hasSurface() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -130,14 +137,18 @@ public class GLSurfaceWriter implements IMirror {
 	 * @return Surfaceがセットされていればそのid(#hashCode)、セットされていなければ0を返す
 	 */
 	public int getId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mMirror != mirror) {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
@@ -146,14 +157,19 @@ public class GLSurfaceWriter implements IMirror {
 					}
 				});
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
 	@MirrorMode
 	@Override
 	public int getMirror() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mMirror;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -238,7 +254,8 @@ public class GLSurfaceWriter implements IMirror {
 		final GLDrawer2D drawer;
 		@Nullable
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if ((mDrawer == null) || isOES != mDrawer.isOES()) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
@@ -249,6 +266,8 @@ public class GLSurfaceWriter implements IMirror {
 			}
 			drawer = mDrawer;
 			target = mRendererTarget;
+		} finally {
+			mLock.unlock();
 		}
 		if ((target != null)
 			&& target.canDraw()) {
@@ -267,21 +286,22 @@ public class GLSurfaceWriter implements IMirror {
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		synchronized (mSync) {
-			synchronized (mSync) {
-				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-					mRendererTarget.release();
-					mRendererTarget = null;
-				}
-				if ((mRendererTarget == null) && (surface != null)) {
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-				}
-				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
-				}
+		mLock.lock();
+		try {
+			if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+				// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+				mRendererTarget.release();
+				mRendererTarget = null;
 			}
+			if ((mRendererTarget == null) && (surface != null)) {
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+			}
+			if (mRendererTarget != null) {
+				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -289,11 +309,14 @@ public class GLSurfaceWriter implements IMirror {
 	private void releaseTargetOnGL() {
 		final GLDrawer2D drawer;
 		final RendererTarget target;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			drawer = mDrawer;
 			mDrawer = null;
 			target = mRendererTarget;
 			mRendererTarget = null;
+		} finally {
+			mLock.unlock();
 		}
 		if ((drawer != null) || (target != null)) {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");

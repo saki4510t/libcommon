@@ -20,6 +20,8 @@ package com.serenegiant.glpipeline;
 
 import android.util.Log;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -35,8 +37,11 @@ public class ProxyPipeline implements GLPipeline {
 	private static final int DEFAULT_WIDTH = 640;
 	private static final int DEFAULT_HEIGHT = 480;
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	protected final Object mSync = new Object();
+	protected final ReentrantLock mLock = new ReentrantLock();
 	private int mWidth, mHeight;
 	@Nullable
 	private GLPipeline mParent;
@@ -89,10 +94,13 @@ public class ProxyPipeline implements GLPipeline {
 		if (DEBUG) Log.v(TAG, "internalRelease:" + this);
 		mReleased = true;
 		final GLPipeline pipeline;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			pipeline = mPipeline;
 			mPipeline = null;
 			mParent = null;
+		} finally {
+			mLock.unlock();
 		}
 		if (pipeline != null) {
 			pipeline.release();
@@ -130,10 +138,13 @@ public class ProxyPipeline implements GLPipeline {
 	 * @return
 	 */
 	public boolean isActive() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			// 破棄されていない
 			// && (親と繋がっている || GLPipelineSourceで子と繋がっている)
 			return !mReleased && (mParent != null);
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -155,8 +166,11 @@ public class ProxyPipeline implements GLPipeline {
 	public void setParent(@Nullable final GLPipeline parent) {
 		if (!mReleased) {
 			if (DEBUG) Log.v(TAG, "setParent:" + this + ",parent=" + parent);
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				mParent = parent;
+			} finally {
+				mLock.unlock();
 			}
 		} else {
 			throw new IllegalStateException("already released!");
@@ -165,8 +179,11 @@ public class ProxyPipeline implements GLPipeline {
 	@Nullable
 	@Override
 	public GLPipeline getParent() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mParent;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -175,8 +192,11 @@ public class ProxyPipeline implements GLPipeline {
 	public void setPipeline(@Nullable final GLPipeline pipeline) {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
 		if (!mReleased) {
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				mPipeline = pipeline;
+			} finally {
+				mLock.unlock();
 			}
 			if (pipeline != null) {
 				pipeline.setParent(this);
@@ -189,8 +209,11 @@ public class ProxyPipeline implements GLPipeline {
 
 	@Nullable
 	public GLPipeline getPipeline() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mPipeline;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -200,7 +223,8 @@ public class ProxyPipeline implements GLPipeline {
 		if (DEBUG) Log.v(TAG, "remove:" + this);
 		final GLPipeline first = GLPipeline.findFirst(this);
 		GLPipeline parent;
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			parent = mParent;
 			if (mParent instanceof DistributePipeline) {
 				// 親がDistributePipelineの時は自分を取り除くだけ
@@ -211,6 +235,8 @@ public class ProxyPipeline implements GLPipeline {
 			}
 			mParent = null;
 			mPipeline = null;
+		} finally {
+			mLock.unlock();
 		}
 		if (first != this) {
 			GLPipeline.validatePipelineChain(first);
@@ -226,8 +252,11 @@ public class ProxyPipeline implements GLPipeline {
 
 		if (!mReleased) {
 			final GLPipeline pipeline;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				pipeline = mPipeline;
+			} finally {
+				mLock.unlock();
 			}
 			if (pipeline != null) {
 				pipeline.onFrameAvailable(isOES, texId, texMatrix);
@@ -239,8 +268,11 @@ public class ProxyPipeline implements GLPipeline {
 	public void refresh() {
 		if (!mReleased) {
 			final GLPipeline pipeline;
-			synchronized (mSync) {
+			mLock.lock();
+			try {
 				pipeline = mPipeline;
+			} finally {
+				mLock.unlock();
 			}
 			if (pipeline != null) {
 				pipeline.refresh();

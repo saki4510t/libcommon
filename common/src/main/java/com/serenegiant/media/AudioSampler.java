@@ -21,6 +21,8 @@ package com.serenegiant.media;
 import android.Manifest;
 import android.util.Log;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
@@ -33,8 +35,11 @@ public class AudioSampler extends IAudioSampler {
 	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = AudioSampler.class.getSimpleName();
 
+	/**
+	 * 排他制御用
+	 */
 	@NonNull
-	private final Object mSync = new Object();
+	protected final ReentrantLock mLock = new ReentrantLock();
 	@Nullable
 	private AudioRecordCompat.AudioRecordTask mAudioTask;
     private final int AUDIO_SOURCE;
@@ -147,7 +152,8 @@ public class AudioSampler extends IAudioSampler {
 	public synchronized void start() {
 		if (DEBUG) Log.v(TAG, "start:isStarted=" + isStarted());
 		super.start();
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			if (mAudioTask == null) {
 				init_pool(BYTES_PER_FRAME);
 				// 内蔵マイクからの音声取り込みスレッド生成＆実行
@@ -179,6 +185,8 @@ public class AudioSampler extends IAudioSampler {
 				};
 				new Thread(mAudioTask, "AudioTread").start();
 			}
+		} finally {
+			mLock.unlock();
 		}
 	}
 
@@ -189,9 +197,11 @@ public class AudioSampler extends IAudioSampler {
 	public synchronized void stop() {
 		if (DEBUG) Log.v(TAG, "stop:isStarted=" + isStarted());
 		setIsCapturing(false);
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			mAudioTask = null;
-			mSync.notify();
+		} finally {
+			mLock.unlock();
 		}
 		super.stop();
 	}
@@ -218,8 +228,11 @@ public class AudioSampler extends IAudioSampler {
 
 	@Override
 	public int getAudioSessionId() {
-		synchronized (mSync) {
+		mLock.lock();
+		try {
 			return mAudioTask != null ? mAudioTask.getAudioSessionId() : 0;
+		} finally {
+			mLock.unlock();
 		}
 	}
 
