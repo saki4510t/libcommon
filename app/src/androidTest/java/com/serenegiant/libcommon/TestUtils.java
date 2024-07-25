@@ -45,18 +45,37 @@ public class TestUtils {
 	 * @return
 	 */
 	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b) {
-		return bitmapEquals(a, b, false);
+		return bitmapEquals(a, b, false, false);
 	}
 
 	/**
 	 * 指定したビットマップがピクセル単位で一致するかどうかを確認
 	 * @param a
 	 * @param b
-	 * @param dumpOnError
+	 * @param dumpOnError 一致しないピクセルが見つかったときにlogcatへビットマップデータを出力するかどうか
 	 * @return
 	 */
-	public static boolean bitmapEquals(@NonNull final Bitmap a, @NonNull final Bitmap b, final boolean dumpOnError) {
+	public static boolean bitmapEquals(
+		@NonNull final Bitmap a, @NonNull final Bitmap b,
+		final boolean dumpOnError) {
+		return bitmapEquals(a, b, dumpOnError, false);
+	}
+
+	/**
+	 * 指定したビットマップがピクセル単位で一致するかどうかを確認
+	 * @param a
+	 * @param b
+	 * @param dumpOnError 一致しないピクセルが見つかったときにlogcatへビットマップデータを出力するかどうか
+	 * @param checkAll 一致しないピクセルが見つかった場合でも全てのピクセルを確認するかどうか
+	 * @return
+	 */
+	public static boolean bitmapEquals(
+		@NonNull final Bitmap a, @NonNull final Bitmap b,
+		final boolean dumpOnError,
+		final boolean checkAll) {
+
 		boolean result = false;
+		int errCnt = 0;
 		final int width = a.getWidth();
 		final int height = a.getHeight();
 		if ((width == b.getWidth())
@@ -70,17 +89,23 @@ LOOP:		for (int y = 0; y < height; y++) {
 							x, y, width, height,
 							a.getColor(x, y).toArgb(),
 							b.getColor(x, y).toArgb()));
+						errCnt++;
 						result = false;
-						break LOOP;
+						if (!checkAll) {
+							break LOOP;
+						}
 					}
 				}
+			}
+			if (!result && checkAll) {
+				Log.i(TAG, "errCnt=" + errCnt + "/" + (width * height));
 			}
 			if (!result && dumpOnError) {
 				dump(TAG, "a=", a);
 				dump(TAG, "b=", b);
 			}
 		} else {
-			Log.w(TAG, String.format("ピクセルが違うa(%dx%d),b=(%dx%d))",
+			Log.w(TAG, String.format("サイズが違うa(%dx%d),b=(%dx%d))",
 				width, height, b.getWidth(), b.getHeight()));
 		}
 		return result;
