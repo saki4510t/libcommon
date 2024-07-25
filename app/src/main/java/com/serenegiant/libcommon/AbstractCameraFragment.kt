@@ -55,15 +55,15 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	/**
 	 * for camera preview display
 	 */
-	protected var mCameraView: ICameraView? = null
+	protected lateinit var mCameraView: ICameraView
 	/**
 	 * for scale mode display
 	 */
-	private var mScaleModeView: TextView? = null
+	private lateinit var mScaleModeView: TextView
 	/**
 	 * button for start/stop recording
 	 */
-	private var mRecordButton: ImageButton? = null
+	private lateinit var mRecordButton: ImageButton
 
 	private var mCapture: CapturePipeline? = null
 
@@ -86,15 +86,15 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onViewCreated:")
 		val cameraView: View = view.findViewById(R.id.cameraView)
 		mCameraView = cameraView  as ICameraView
-		mCameraView!!.getView().setOnClickListener(mOnClickListener)
-		mCameraView!!.getView().setOnLongClickListener(mOnLongClickListener)
-		mCameraView!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
+		mCameraView.getView().setOnClickListener(mOnClickListener)
+		mCameraView.getView().setOnLongClickListener(mOnLongClickListener)
+		mCameraView.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
 		mScaleModeView = view.findViewById(R.id.scalemode_textview)
 		updateScaleModeText()
 		mRecordButton = view.findViewById(R.id.record_button)
-		mRecordButton!!.setOnClickListener(mOnClickListener)
-		mRecordButton!!.setOnLongClickListener(mOnLongClickListener)
-		mRecordButton!!.visibility = if (isRecordingSupported()) View.VISIBLE else View.GONE
+		mRecordButton.setOnClickListener(mOnClickListener)
+		mRecordButton.setOnLongClickListener(mOnLongClickListener)
+		mRecordButton.visibility = if (isRecordingSupported()) View.VISIBLE else View.GONE
 		if (mCameraView is SimpleVideoSourceCameraTextureView) {
 			val v = mCameraView as SimpleVideoSourceCameraTextureView
 			v.pipelineMode = pipelineMode
@@ -106,8 +106,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	public override fun internalOnResume() {
 		super.internalOnResume()
 		if (DEBUG) Log.v(TAG, "internalOnResume:")
-		mCameraView!!.onResume()
-		mCameraView!!.addListener(mOnFrameAvailableListener)
+		mCameraView.onResume()
+		mCameraView.addListener(mOnFrameAvailableListener)
 		if (mCameraView is GLPipelineView) {
 			val v = mCameraView as GLPipelineView
 			v.addPipeline(mCapture!!)
@@ -125,8 +125,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "internalOnPause:")
 		stopRecording()
 		mCapture!!.remove()
-		mCameraView!!.removeListener(mOnFrameAvailableListener)
-		mCameraView!!.onPause()
+		mCameraView.removeListener(mOnFrameAvailableListener)
+		mCameraView.onPause()
 		super.internalOnPause()
 	}
 
@@ -138,7 +138,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 
 	//================================================================================
 	protected open fun isRecordingSupported(): Boolean {
-		return mCameraView != null && mCameraView!!.isRecordingSupported()
+		return mCameraView.isRecordingSupported()
 	}
 
 	@get:LayoutRes
@@ -184,11 +184,11 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		when (view.id) {
 			R.id.cameraView -> {
 				if (mCameraView is IScaledView) {
-					val scaleMode = (mCameraView!!.getScaleMode() + 1) % 3
-					mCameraView!!.setScaleMode(scaleMode)
+					val scaleMode = (mCameraView.getScaleMode() + 1) % 3
+					mCameraView.setScaleMode(scaleMode)
 				} else {
-					val scaleMode = (mCameraView!!.getScaleMode() + 1) % 4
-					mCameraView!!.setScaleMode(scaleMode)
+					val scaleMode = (mCameraView.getScaleMode() + 1) % 4
+					mCameraView.setScaleMode(scaleMode)
 				}
 				updateScaleModeText()
 			}
@@ -207,9 +207,9 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	}
 
 	private fun updateScaleModeText() {
-		val scaleMode = mCameraView!!.getScaleMode()
+		val scaleMode = mCameraView.getScaleMode()
 		if (mCameraView is IScaledView) {
-			mScaleModeView!!.text =
+			mScaleModeView.text =
 				when (scaleMode) {
 					0 -> "keep aspect"
 					1 -> "scale to fit"
@@ -217,7 +217,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 					else -> ""
 				}
 		} else {
-			mScaleModeView!!.text =
+			mScaleModeView.text =
 				when (scaleMode) {
 					0 -> "scale to fit"
 					1 -> "keep aspect(viewport)"
@@ -232,9 +232,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val id = surface?.hashCode() ?: 0
 		if (DEBUG) Log.d(TAG, "addSurface:id=$id")
 		synchronized(mSync) {
-			if (mCameraView != null) {
-				mCameraView!!.addSurface(id, surface!!, true, maxFps)
-			}
+			mCameraView.addSurface(id, surface!!, true, maxFps)
 		}
 		if (DEBUG) Log.v(TAG, "addSurface:finished")
 	}
@@ -247,9 +245,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		val id = surface?.hashCode() ?: 0
 		if (DEBUG) Log.d(TAG, "removeSurface:id=$id")
 		synchronized(mSync) {
-			if (mCameraView != null) {
-				mCameraView!!.removeSurface(id)
-			}
+			mCameraView.removeSurface(id)
 		}
 		if (DEBUG) Log.v(TAG, "removeSurface:finished")
 	}
@@ -265,16 +261,16 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 */
 	private fun startRecording() {
 		if (DEBUG) Log.v(TAG, "startRecording:")
-		mRecordButton!!.setColorFilter(-0x10000) // turn red
+		mRecordButton.setColorFilter(-0x10000) // turn red
 		try {
 			if (hasPermission()) {
 				internalStartRecording()
 			} else {
-				mRecordButton!!.setColorFilter(0)
+				mRecordButton.setColorFilter(0)
 				Log.e(TAG, "startCapture:has something missing permission(s)")
 			}
 		} catch (e: Exception) {
-			mRecordButton!!.setColorFilter(0)
+			mRecordButton.setColorFilter(0)
 			Log.e(TAG, "startCapture:", e)
 		}
 	}
@@ -287,14 +283,14 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	 */
 	protected fun stopRecording() {
 		if (DEBUG) Log.v(TAG, "stopRecording:")
-		mRecordButton!!.setColorFilter(0) // return to default color
+		mRecordButton.setColorFilter(0) // return to default color
 		internalStopRecording()
 	}
 
 	protected abstract fun internalStopRecording()
 
 	protected fun clearRecordingState() {
-		mRecordButton!!.setColorFilter(0)
+		mRecordButton.setColorFilter(0)
 	}
 
 	private val mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener
