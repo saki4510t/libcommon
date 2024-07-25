@@ -28,7 +28,7 @@ ext {
 	androidTestRules = '1.5.0'
 	androidTestEspresso = '3.5.1'
 
-	androidXAppCompat = '1.6.1'
+	androidXAppCompat = '1.6.1'	// 1.7.x以降にするとminSDK=21が必須なので1.6.xを使う
 	androidXLegacyV4 = '1.0.0'
 	androidXExif = '1.3.7'
 	androidXLifecycle = '2.8.3'
@@ -42,7 +42,7 @@ ext {
 
 	androidXCoreKtx = '1.13.1'
 	androidXLifecycleKtx = '2.8.3'
-	androidXFragmentKtx = '1.5.7'
+	androidXFragmentKtx = '1.7.1'	// 1.8.x以降にするとminSDK=21が必須なので1.7.xを使う
 
 	kotlinStdLibVersion = '1.9.24'
 	kotlinCoroutinesVersion = '1.8.1'
