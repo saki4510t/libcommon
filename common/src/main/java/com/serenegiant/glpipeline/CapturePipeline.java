@@ -39,7 +39,7 @@ import androidx.annotation.WorkerThread;
  * 静止画キャプチャ機能を追加したProxyPipeline実装
  */
 public class CapturePipeline extends ProxyPipeline {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = CapturePipeline.class.getSimpleName();
 
 	/**
@@ -105,7 +105,7 @@ public class CapturePipeline extends ProxyPipeline {
 	/**
 	 * OOM抑制・高速化のためにキャプチャに使うBitmapを管理するビットマッププール
 	 */
-	private final Pool<Bitmap> mPool = new Pool<Bitmap>(0, 4) {
+	private final Pool<Bitmap> mPool = new Pool<>(0, 4) {
 		@NonNull
 		@Override
 		protected Bitmap createObject(@Nullable final Object... args) {
@@ -137,6 +137,7 @@ public class CapturePipeline extends ProxyPipeline {
 	 */
 	public CapturePipeline(@NonNull final Callback callback) {
 		super();
+		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mCallback = callback;
 		mCaptureCnt = mNumCaptures = 0;
 		mLastCaptureMs = mIntervalsMs = 0L;
@@ -155,6 +156,7 @@ public class CapturePipeline extends ProxyPipeline {
 	 * @param intervalsMs 複数回キャプチャする場合の周期[ミリ秒]
 	 */
 	public void trigger(final int numCaptures, final long intervalsMs) {
+		if (DEBUG) Log.v(TAG, "trigger:num=" + numCaptures + ",intervalsMs=" + intervalsMs);
 		mLock.lock();
 		try {
 			mCaptureCnt = 0;
@@ -242,7 +244,7 @@ public class CapturePipeline extends ProxyPipeline {
 	 * @param texMatrix
 	 */
 	private void doOffscreenCapture(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-		if (DEBUG) Log.v(TAG, "doCapture:");
+		if (DEBUG) Log.v(TAG, "doOffscreenCapture:");
 		final int w = getWidth();
 		final int h = getHeight();
 		final Bitmap bitmap = mPool.obtain(w, h);
@@ -255,12 +257,14 @@ public class CapturePipeline extends ProxyPipeline {
 					if (mOffscreen != null) {
 						mOffscreen.release();
 					}
+					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLSurface as offscreen");
 					mOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE4, w, h);
 				}
 				if ((mDrawer == null) || (mDrawer.isOES() != isOES)) {
 					if (mDrawer != null) {
 						mDrawer.release();
 					}
+					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLDrawer2D");
 					mDrawer = GLDrawer2D.create(false, isOES);
 				}
 				// オフスクリーンへ描画
@@ -274,6 +278,7 @@ public class CapturePipeline extends ProxyPipeline {
 				mBuffer = buffer;
 				// コールバックをワーカースレッド上で呼び出す
 				ThreadPool.queueEvent(() -> {
+					if (DEBUG) Log.v(TAG, "doOffscreenCapture:call onCapture callback");
 					try {
 						mCallback.onCapture(bitmap);
 					} catch (final Exception e) {

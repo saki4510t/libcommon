@@ -71,12 +71,19 @@ class EffectCameraFragment : AbstractCameraFragment() {
 
 	override fun onLongClick(view: View): Boolean {
 		super.onLongClick(view)
-		if (view == mCameraView) {
-			// カメラ映像表示Viewを長押ししたとき
-			if (mCameraView is EffectCameraGLSurfaceView) {
-				val v = view as EffectCameraGLSurfaceView
-				v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
-				return true
+		when (view.id) {
+			R.id.cameraView -> {
+				// カメラ映像表示Viewを長押ししたとき
+				if (mCameraView is EffectCameraGLSurfaceView) {
+					val v = view as EffectCameraGLSurfaceView
+					v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+					return true
+				}
+			}
+			R.id.record_button -> {
+				if (triggerStillCapture()) {
+					return true
+				}
 			}
 		}
 		return false

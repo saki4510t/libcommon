@@ -63,7 +63,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 	/**
 	 * button for start/stop recording
 	 */
-	private lateinit var mRecordButton: ImageButton
+	protected lateinit var mRecordButton: ImageButton
 
 	private var mCapture: CapturePipeline? = null
 
@@ -89,6 +89,9 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		mCameraView.getView().setOnClickListener(mOnClickListener)
 		mCameraView.getView().setOnLongClickListener(mOnLongClickListener)
 		mCameraView.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
+		if (mCameraView !is GLPipelineView) {
+			Log.d(TAG, "onViewCreated:camera view is not a GLPipelineView,$cameraView")
+		}
 		mScaleModeView = view.findViewById(R.id.scalemode_textview)
 		updateScaleModeText()
 		mRecordButton = view.findViewById(R.id.record_button)
@@ -110,7 +113,10 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		mCameraView.addListener(mOnFrameAvailableListener)
 		if (mCameraView is GLPipelineView) {
 			val v = mCameraView as GLPipelineView
+			if (DEBUG) Log.v(TAG, "internalOnResume:add capture pipeline")
 			v.addPipeline(mCapture!!)
+		} else {
+			if (DEBUG) Log.d(TAG, "internalOnResume:camera view is not a GLPipelineView")
 		}
 		// カメラパーミッションが無いか、
 		// 録画に対応していててストレージアクセス/録音のパーミッションが無いなら
@@ -202,8 +208,19 @@ abstract class AbstractCameraFragment : BaseFragment() {
 
 	protected open fun onLongClick(view: View): Boolean {
 		if (DEBUG) Log.v(TAG, "onLongClick:${view}")
-		mCapture?.trigger()
 		return false
+	}
+
+	protected fun triggerStillCapture(): Boolean {
+		val capture = mCapture
+		if (DEBUG) Log.v(TAG, "triggerStillCapture:$capture")
+		return if (capture != null) {
+			capture.trigger()
+			true
+		} else {
+			if (DEBUG) Log.v(TAG, "triggerStillCapture:CapturePipeline is null")
+			false
+		}
 	}
 
 	private fun updateScaleModeText() {
