@@ -60,15 +60,18 @@ class CameraTimelapseRecFragment : AbstractCameraFragment() {
 
 	override fun onLongClick(view: View): Boolean {
 		super.onLongClick(view)
-		if (mCameraView is EffectCameraGLSurfaceView) {
-			val v = view as EffectCameraGLSurfaceView
-			v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
-			return true
-		} else if (mCameraView is SimpleVideoSourceCameraTextureView) {
-			val v = view as SimpleVideoSourceCameraTextureView
-			if (v.isEffectSupported()) {
+		if (view == mCameraView) {
+			// カメラ映像表示Viewを長押ししたとき
+			if (mCameraView is EffectCameraGLSurfaceView) {
+				val v = view as EffectCameraGLSurfaceView
 				v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
 				return true
+			} else if (mCameraView is SimpleVideoSourceCameraTextureView) {
+				val v = view as SimpleVideoSourceCameraTextureView
+				if (v.isEffectSupported()) {
+					v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+					return true
+				}
 			}
 		}
 		return false

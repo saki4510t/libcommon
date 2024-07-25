@@ -93,6 +93,7 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		updateScaleModeText()
 		mRecordButton = view.findViewById(R.id.record_button)
 		mRecordButton!!.setOnClickListener(mOnClickListener)
+		mRecordButton!!.setOnLongClickListener(mOnLongClickListener)
 		mRecordButton!!.visibility = if (isRecordingSupported()) View.VISIBLE else View.GONE
 		if (mCameraView is SimpleVideoSourceCameraTextureView) {
 			val v = mCameraView as SimpleVideoSourceCameraTextureView
