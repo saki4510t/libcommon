@@ -41,7 +41,7 @@ import com.serenegiant.media.VideoConfig
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
 import com.serenegiant.system.PermissionUtils.PermissionCallback
-import com.serenegiant.usb.USBMonitor
+import com.serenegiant.usb.UsbPermission
 import com.serenegiant.widget.GLPipelineView
 
 class MainActivity
@@ -78,7 +78,7 @@ class MainActivity
 									intent.getParcelableExtra(Const.EXTRA_REQUEST_USB_PERMISSION)
 								}
 								if (device != null) {
-									USBMonitor.requestPermission(this@MainActivity, device)
+									UsbPermission.requestPermission(this@MainActivity, device)
 								}
 							}
 						}

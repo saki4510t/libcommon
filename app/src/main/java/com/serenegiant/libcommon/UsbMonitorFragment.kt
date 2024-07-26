@@ -29,6 +29,7 @@ import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.USBMonitor.UsbControlBlock
 import com.serenegiant.usb.UsbDeviceInfo
+import com.serenegiant.usb.UsbPermission
 import com.serenegiant.usb.UsbUtils
 import com.serenegiant.utils.BufferHelper
 import com.serenegiant.view.ViewUtils
@@ -121,7 +122,7 @@ class UsbMonitorFragment : BaseFragment() {
 				// staticメソッド版のrequestPermissionを使って違うContextからパーミッション要求する場合
 				// こっちでパーミッション要求した場合でもUSBMonitor#registerで登録したBroadcastReceiverで
 				// 結果を受け取れる
-				USBMonitor.requestPermission(requireContext().applicationContext, device, mOnDeviceConnectListener2)
+				UsbPermission.requestPermission(requireContext().applicationContext, device, mOnDeviceConnectListener2)
 			}
 		}
 

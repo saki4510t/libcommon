@@ -207,12 +207,14 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * @param context
 	 * @param device
 	 * @throws IllegalStateException
+	 * @deprecated UsbPermissionの同名メソッドを使う
 	 */
+	@Deprecated
 	public static void requestPermission(
 		@NonNull final Context context,
 		@NonNull final UsbDevice device)
 			throws IllegalArgumentException {
-		UsbPermission.requestPermission(context, device, DEFAULT_CALLBACK);
+		UsbPermission.requestPermission(context, device, UsbPermission.DEFAULT_CALLBACK);
 	}
 
 	/**
@@ -221,7 +223,9 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * @param device
 	 * @param callback
 	 * @throws IllegalStateException
+	 * @deprecated UsbPermissionの同名メソッドを使う
 	 */
+	@Deprecated
 	public static void requestPermission(
 		@NonNull final Context context,
 		@NonNull final UsbDevice device,

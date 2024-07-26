@@ -83,7 +83,24 @@ public class UsbPermission extends BroadcastReceiver {
 		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t);
 	}
 
-//--------------------------------------------------------------------------------
+	/**
+	 * デフォルトのCallback実装
+	 */
+	public static Callback DEFAULT_CALLBACK = new Callback() {
+		@Override
+		public void onPermission(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onCancel(@NonNull final UsbDevice device) {
+		}
+
+		@Override
+		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t) {
+		}
+	};
+
+	//--------------------------------------------------------------------------------
 	@NonNull
 	private final WeakReference<Context> mWeakContext;
 	@NonNull
