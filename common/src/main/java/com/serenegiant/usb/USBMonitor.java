@@ -90,23 +90,6 @@ public final class USBMonitor extends UsbDetector implements Const {
 		}
 	}
 
-	/**
-	 * デフォルトのPermissionCallback/Callback実装
-	 */
-	public static PermissionCallback DEFAULT_CALLBACK = new PermissionCallback() {
-		@Override
-		public void onPermission(@NonNull final UsbDevice device) {
-		}
-
-		@Override
-		public void onCancel(@NonNull final UsbDevice device) {
-		}
-
-		@Override
-		public void onError(@Nullable final UsbDevice device, @NonNull final Throwable t) {
-		}
-	};
-
 //--------------------------------------------------------------------------------
 	/**
 	 * OpenしているUsbControlBlock一覧

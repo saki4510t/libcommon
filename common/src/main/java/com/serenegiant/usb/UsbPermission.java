@@ -50,11 +50,12 @@ import androidx.core.content.ContextCompat;
  *     Intentを受け取るためのBroadcastReceiverを登録/登録解除する必要がある。
  *     USBMonitor等他のクラスで共通のBroadcastReceiverでIntentを受け取って
  *     処理する場合にはregister/unregisterを呼び出さずにIntent受信時に
- *     #onReceiveを呼び出す。
+ *     #onReceiveを呼び出すか、このクラスインスタンス自体をBroadcastReceiverとして
+ *     Context.register/unregisterへ引き渡す
  */
 public class UsbPermission extends BroadcastReceiver {
 	private static final boolean DEBUG = false;	// XXX 実働時にはfalseにすること
-	private static final String TAG = "UsbPermission";
+	private static final String TAG = UsbPermission.class.getSimpleName();
 
 	public static final String ACTION_USB_PERMISSION = "com.serenegiant.USB_PERMISSION";
 
@@ -273,11 +274,11 @@ public class UsbPermission extends BroadcastReceiver {
 	}
 
 //--------------------------------------------------------------------------------
-	protected Context getContext() {
+	private Context getContext() {
 		return mWeakContext.get();
 	}
 
-	protected Context requireContext() throws IllegalStateException {
+	private Context requireContext() throws IllegalStateException {
 		final Context result = getContext();
 		if (mReleased || (result == null)) {
 			throw new IllegalStateException("already released!");
@@ -315,7 +316,7 @@ public class UsbPermission extends BroadcastReceiver {
 	 * @param device
 	 * @param t
 	 */
-	protected void callOnError(
+	private void callOnError(
 		@Nullable final UsbDevice device,
 		@NonNull final Throwable t) {
 
@@ -337,14 +338,16 @@ public class UsbPermission extends BroadcastReceiver {
 	 * @return
 	 */
 	@SuppressLint({"WrongConstant"})
-	public static PendingIntent createIntent(@NonNull final Context context) {
+	private static PendingIntent createIntent(@NonNull final Context context) {
 		int flags = 0;
 		if (BuildCheck.isAPI31()) {
 			// FLAG_MUTABLE指定必須
 			// FLAG_IMMUTABLEだとOS側から返ってくるIntentでdeviceがnullになってしまう
 			flags |= PendingIntentCompat.FLAG_MUTABLE;
 		}
-		return PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), flags);
+		final Intent intent = new Intent(ACTION_USB_PERMISSION);
+		intent.setPackage(context.getPackageName());
+		return PendingIntent.getBroadcast(context, 0, intent, flags);
 	}
 
 	/**
@@ -371,6 +374,22 @@ public class UsbPermission extends BroadcastReceiver {
 		@Nullable final UsbDevice device) {
 
 		return (device != null) && manager.hasPermission(device);
+	}
+
+	/**
+	 * パーミッションを要求する
+	 * activityClassはアプリのデフォルトActivityを使う
+	 * コールバックはしない(内部的にはDEFAULT_CALLBACKを使う)
+	 * @param context
+	 * @param device
+	 * @throws IllegalStateException
+	 */
+	public static void requestPermission(
+		@NonNull final Context context,
+		@NonNull final UsbDevice device)
+		throws IllegalArgumentException {
+
+		requestPermission(context, device, DEFAULT_CALLBACK);
 	}
 
 	/**
