@@ -303,6 +303,24 @@ public class AppInfoUtils {
 
 //--------------------------------------------------------------------------------
 	/**
+	 * デフォルトActivityのComponentNameを取得する
+	 * @param context
+	 * @param packageName
+	 * @return
+	 */
+	@Nullable
+	public static ComponentName getDefaultActivityName(
+		@NonNull final Context context,
+		@NonNull final String packageName) {
+
+		String activityFQCN = null;
+		final PackageManager pm = context.getPackageManager();
+		@Nullable
+		final Intent intent = pm.getLaunchIntentForPackage(packageName);
+		return intent != null ? intent.getComponent() : null;
+	}
+
+	/**
 	 * デフォルトActivityのFQCN文字列を取得する
 	 * @param context
 	 * @param packageName
@@ -313,18 +331,9 @@ public class AppInfoUtils {
 		@NonNull final Context context,
 		@NonNull final String packageName) {
 
-		String activityFQCN = null;
-		final PackageManager pm = context.getPackageManager();
 		@Nullable
-		final Intent intent = pm.getLaunchIntentForPackage(packageName);
-		@Nullable
-		final ComponentName componentName = intent != null ? intent.getComponent() : null;
-		if (componentName != null) {
-			activityFQCN = componentName.getClassName();
-//		} else {
-//			// ここには来ないはずだけどデフォルトのランチャーアクティビティが無い時
-		}
-		return activityFQCN;
+		final ComponentName componentName = getDefaultActivityName(context, packageName);
+		return componentName != null ? componentName.getClassName() : null;
 	}
 //--------------------------------------------------------------------------------
 	/**
@@ -412,6 +421,22 @@ public class AppInfoUtils {
 	}
 
 	/**
+	 * ランチャーActivity一覧を取得
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static List<ComponentName> getLauncherActivityNames(
+		@NonNull final Context context,
+		@Nullable final AppInfoFilterCallback filter) {
+
+		return getActivityNames(context,
+			new Intent(Intent.ACTION_MAIN)
+				.addCategory(Intent.CATEGORY_LAUNCHER),
+			filter);
+	}
+
+	/**
 	 * 指定したIntentで起動可能なActivity一覧を取得
 	 * @param context
 	 * @return
@@ -449,6 +474,50 @@ public class AppInfoUtils {
 					}
 				}
 				result.add(info);
+			}
+		}
+		if (DEBUG) Log.v(TAG, "getLauncherActivities:n=" + result.size());
+		return result;
+	}
+
+	/**
+	 * 指定したIntentで起動可能なActivity一覧を取得
+	 * @param context
+	 * @return
+	 */
+	@NonNull
+	public static List<ComponentName> getActivityNames(
+		@NonNull final Context context,
+		@NonNull final Intent intent,
+		@Nullable final AppInfoFilterCallback filter) {
+
+		final List<ComponentName> result = new ArrayList<>();
+		final PackageManager pm = context.getPackageManager();
+		@NonNull
+		final List<ResolveInfo> list;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			list = pm.queryIntentActivities(intent, PackageManager.MATCH_ALL | PackageManager.GET_META_DATA);
+		} else {
+			list = pm.queryIntentActivities(intent, PackageManager.GET_META_DATA);
+		}
+		for (final ResolveInfo item: list) {
+			final ActivityInfo info = item.activityInfo;
+			if ((filter == null) || filter.onFilter(info.applicationInfo)) {
+				if (TextUtils.isEmpty(info.packageName)) {
+					try {
+						info.packageName = info.applicationInfo.packageName;
+					} catch (final Exception e) {
+						if (DEBUG) Log.w(TAG, e);
+					}
+				}
+				if (TextUtils.isEmpty(info.targetActivity)) {
+					if (info.name.startsWith(".")) {
+						info.targetActivity = info.packageName + info.name;
+					} else {
+						info.targetActivity = info.name;
+					}
+				}
+				result.add(new ComponentName(info.packageName, info.name));
 			}
 		}
 		if (DEBUG) Log.v(TAG, "getLauncherActivities:n=" + result.size());
