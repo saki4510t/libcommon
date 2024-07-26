@@ -890,4 +890,32 @@ public final class BuildCheck {
 	public static boolean isAPI33() {
 		return check(Build.VERSION_CODES.TIRAMISU);
 	}
+
+	/**
+	 * けーきをひっくりかえすな API>=34
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+	public static boolean isUpsizeDownCake() {
+		return check(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
+	}
+
+	/**
+	 * けーきをひっくりかえすな API>=34
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+	public static boolean isAndroid14() {
+		return check(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
+	}
+
+	/**
+	 * けーきをひっくりかえすな API>=34
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+	public static boolean isAPI34() {
+		return check(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
+	}
+
 }
