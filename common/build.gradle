@@ -63,6 +63,7 @@ android {
 }
 
 dependencies {
+	androidTestImplementation "androidx.multidex:multidex-instrumentation:2.0.0"
 	// androidx
 	implementation "androidx.legacy:legacy-support-v4:$androidXLegacyV4"
 	implementation "androidx.appcompat:appcompat:$androidXAppCompat"
