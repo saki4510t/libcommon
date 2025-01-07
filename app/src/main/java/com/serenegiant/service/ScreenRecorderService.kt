@@ -3,7 +3,7 @@ package com.serenegiant.service
  * ScreenRecordingSample
  * Sample project to capture and save audio from internal mic and video from screen as MPEG4 file.
  *
- * Copyright (c) 2015-2024 saki t_saki@serenegiant.com
+ * Copyright (c) 2015-2025 saki t_saki@serenegiant.com
  *
  * File name: ScreenRecorderService.java
  *
