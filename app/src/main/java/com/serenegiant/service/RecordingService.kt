@@ -878,6 +878,9 @@ open class RecordingService() : LifecycleService() {
 			}
 		} else if (isRecording) {
 			if (DEBUG) Log.v(TAG, ("onWriteSampleData:muxer is not set yet,state=$state,reaperType=${reaper.reaperType()}"))
+			if (!mIsBind) {
+				stop()
+			}
 		}
 	}
 
@@ -1084,7 +1087,7 @@ open class RecordingService() : LifecycleService() {
 	}
 
 	companion object {
-		private const val DEBUG = false // set false on production
+		private const val DEBUG = true // set false on production
 		private val TAG = RecordingService::class.java.simpleName
 
 		/**
