@@ -27,7 +27,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
-import com.serenegiant.usb.USBMonitor.UsbControlBlock
+import com.serenegiant.usb.UsbConnector
 import com.serenegiant.usb.UsbDeviceInfo
 import com.serenegiant.usb.UsbPermission
 import com.serenegiant.usb.UsbUtils
@@ -129,8 +129,8 @@ class UsbMonitorFragment : BaseFragment() {
 		override fun onPermission(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${device.deviceName}")
 			// パーミッションを取得できた時, openする
-			val ctrlBlock = mUSBMonitor?.openDevice(device)
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${ctrlBlock}")
+			val connector = mUSBMonitor?.openDevice(device)
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${connector}")
 			if (UsbUtils.isUVC(device)) {
 				val intfs = UsbUtils.findUVCInterfaces(device)
 				if (DEBUG) Log.v(TAG, "onPermission:uvc=$intfs")
@@ -141,13 +141,13 @@ class UsbMonitorFragment : BaseFragment() {
 			}
 		}
 
-		override fun onConnected(device: UsbDevice, ctrlBlock: UsbControlBlock) {
+		override fun onConnected(device: UsbDevice, connector: UsbConnector) {
 			Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName}")
 			// テストのためにクローンする
-			val cloned = ctrlBlock.clone()
-			// 元のUsbControlBlockはcloseする
-			ctrlBlock.close()
-			// クローンしたUsbControlBlockを使ってアクセスする
+			val cloned = connector.clone()
+			// 元のUsbConnectorはcloseする
+			connector.close()
+			// クローンしたUsbConnectorを使ってアクセスする
 			val connection = cloned.connection
 			val info = UsbDeviceInfo.getDeviceInfo(cloned, null)
 			if (DEBUG) {

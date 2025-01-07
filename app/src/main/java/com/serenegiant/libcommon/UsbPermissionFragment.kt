@@ -174,10 +174,10 @@ class UsbPermissionFragment : BaseFragment() {
 			// テストのためにクローンする
 			if (DEBUG) Log.v(TAG, "onPermission:clone connector")
 			val cloned = connector.clone()
-			// 元のUsbControlBlockはcloseする
+			// 元のUsbConnectorはcloseする
 			if (DEBUG) Log.v(TAG, "onPermission:connector")
 			connector.close()
-			// クローンしたUsbControlBlockを使ってアクセスする
+			// クローンしたUsbConnectorを使ってアクセスする
 			val info = cloned.info
 			if (DEBUG) {
 				val connection = cloned.connection

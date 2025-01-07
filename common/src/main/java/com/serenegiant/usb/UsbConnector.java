@@ -137,7 +137,7 @@ public class UsbConnector implements Cloneable, Closeable {
     */
    @Override
    public void close() {
-      if (DEBUG) Log.i(TAG, "UsbControlBlock#close:");
+      if (DEBUG) Log.i(TAG, "close:");
 
       UsbDeviceConnection connection;
       synchronized (this) {
@@ -145,7 +145,6 @@ public class UsbConnector implements Cloneable, Closeable {
          mConnection = null;
       }
       if (connection != null) {
-         // 2015/01/06 closeしてからonDisconnectを呼び出すように変更
          // openしているinterfaceが有れば閉じる XXX Java側でインターフェースを使う時
          final int n = mInterfaces.size();
          for (int i = 0; i < n; i++) {
@@ -231,18 +230,17 @@ public class UsbConnector implements Cloneable, Closeable {
 
    /**
     * UsbDeviceConnectionを取得
-    * UsbControlBlockでの排他制御から切り離されてしまうので注意
+    * UsbConnectorでの排他制御から切り離されてしまうので注意
     * @return
     */
    @Nullable
    public synchronized UsbDeviceConnection getConnection() {
-
       return mConnection;
    }
 
    /**
     * UsbDeviceConnectionを取得
-    * UsbControlBlockでの排他制御から切り離されてしまうので注意
+    * UsbConnectorでの排他制御から切り離されてしまうので注意
     * @return
     * @throws IllegalStateException
     */

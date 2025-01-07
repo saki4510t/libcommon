@@ -88,15 +88,15 @@ public class UsbDeviceInfo implements Const, Parcelable {
 
 	/**
 	 * USB機器情報(ベンダー名・製品名・バージョン・シリアル等)を取得する
-	 * @param ctrlBlock
+	 * @param connector
 	 * @param out
 	 * @return
 	 */
 	@NonNull
 	public static UsbDeviceInfo getDeviceInfo(
-		@NonNull final USBMonitor.UsbControlBlock ctrlBlock, @Nullable final UsbDeviceInfo out) {
+		@NonNull final UsbConnector connector, @Nullable final UsbDeviceInfo out) {
 
-		return getDeviceInfo(ctrlBlock.getConnection(), ctrlBlock.getDevice(), out);
+		return getDeviceInfo(connector.getConnection(), connector.getDevice(), out);
 	}
 
 	/**

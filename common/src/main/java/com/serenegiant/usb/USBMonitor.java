@@ -45,19 +45,19 @@ public final class USBMonitor extends UsbDetector implements Const {
 	private static final String TAG = "USBMonitor";
 
 	/**
-	 * USB機器の状態変更時のコールバックリスナー
+	 * USB機器の接続/切断時のコールバックリスナー
 	 */
-	public interface Callback extends UsbDetector.Callback, UsbPermission.Callback {
+	public interface ConnectionCallback {
 		/**
 		 * USB機器がopenされた時,
-		 * 4.xx.yyと異なりUsbControlBlock#cloneでも呼ばれる
-		 * FIXME UsbControlBlockの代わりにUsbConnectorを使うように変更する
+		 * 4.xx.yyと異なりUsbConnector#cloneでも呼ばれる
 		 * @param device
-		 * @param ctrlBlock
+		 * @param connector
 		 */
 		@AnyThread
-		public void onConnected(@NonNull final UsbDevice device,
-			@NonNull final UsbControlBlock ctrlBlock);
+		public void onConnected(
+			@NonNull final UsbDevice device,
+			@NonNull final UsbConnector connector);
 		/**
 		 * open中のUSB機器が取り外されたか電源が切られた時
 		 * デバイスは既にclose済み(2015/01/06呼び出すタイミングをclose前からclose後に変更)
@@ -65,6 +65,12 @@ public final class USBMonitor extends UsbDetector implements Const {
 		 */
 		@AnyThread
 		public void onDisconnect(@NonNull final UsbDevice device);
+	}
+
+	/**
+	 * USB機器の状態変更時のコールバックリスナー
+	 */
+	public interface Callback extends UsbDetector.Callback, UsbPermission.Callback, ConnectionCallback {
 	}
 
 	/**
@@ -82,7 +88,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 		@Override
 		public void onConnected(
 			@NonNull final UsbDevice device,
-			@NonNull final UsbControlBlock ctrlBlock) {
+			@NonNull final UsbConnector connector) {
 		}
 
 		@Override
@@ -92,10 +98,10 @@ public final class USBMonitor extends UsbDetector implements Const {
 
 //--------------------------------------------------------------------------------
 	/**
-	 * OpenしているUsbControlBlock一覧
+	 * OpenしているUsbConnector一覧
 	 */
 	@NonNull
-	private final List<UsbControlBlock> mCtrlBlocks = new ArrayList<>();
+	private final List<UsbConnector> mConnectors = new ArrayList<>();
 	@NonNull
 	private final Callback mCallback;
 
@@ -126,14 +132,14 @@ public final class USBMonitor extends UsbDetector implements Const {
 		unregister();
 		if (!isReleased()) {
 			// モニターしているUSB機器を全てcloseする
-			final List<UsbControlBlock> ctrlBlocks;
-			synchronized (mCtrlBlocks) {
-				ctrlBlocks = new ArrayList<>(mCtrlBlocks);
-				mCtrlBlocks.clear();
+			final List<UsbConnector> connectors;
+			synchronized (mConnectors) {
+				connectors = new ArrayList<>(mConnectors);
+				mConnectors.clear();
 			}
-			for (final UsbControlBlock ctrlBlock: ctrlBlocks) {
+			for (final UsbConnector connector: connectors) {
 				try {
-					ctrlBlock.close();
+					connector.close();
 				} catch (final Exception e) {
 					Log.e(TAG, "release:", e);
 				}
@@ -225,7 +231,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * @return
 	 * @throws SecurityException パーミッションがなければSecurityExceptionを投げる
 	 */
-	public UsbControlBlock openDevice(final UsbDevice device) throws IOException {
+	public UsbConnector openDevice(final UsbDevice device) throws IOException {
 		if (DEBUG) Log.v(TAG, "openDevice:device=" + device);
 		if (hasPermission(device)) {
 			return new UsbControlBlock(USBMonitor.this, device);    // この中でopenDeviceする
@@ -252,19 +258,19 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * @param device
 	 */
 	private void processConnect(@NonNull final UsbDevice device,
-		@NonNull final UsbControlBlock ctrlBlock) {
+		@NonNull final UsbConnector connector) {
 
 		if (isReleased()) return;
 		if (DEBUG) Log.v(TAG, "processConnect:");
-		synchronized (mCtrlBlocks) {
-			mCtrlBlocks.add(ctrlBlock);
+		synchronized (mConnectors) {
+			mConnectors.add(connector);
 		}
 		if (hasPermission(device)) {
 			post(new Runnable() {
 				@Override
 				public void run() {
 //					if (DEBUG) Log.v(TAG, "processConnect:device=" + device);
-					mCallback.onConnected(device, ctrlBlock);
+					mCallback.onConnected(device, connector);
 				}
 			});
 		}
@@ -272,36 +278,36 @@ public final class USBMonitor extends UsbDetector implements Const {
 
 	/**
 	 * USB機器との接続がcloseされたときの処理
-	 * @param ctrlBlock
+	 * @param connector
 	 */
 	private void callOnDisconnect(@NonNull final UsbDevice device,
-		@NonNull final UsbControlBlock ctrlBlock) {
+		@NonNull final UsbConnector connector) {
 
 		if (isReleased()) return;
 		if (DEBUG) Log.v(TAG, "callOnDisconnect:");
-		synchronized (mCtrlBlocks) {
-			mCtrlBlocks.remove(ctrlBlock);
+		synchronized (mConnectors) {
+			mConnectors.remove(connector);
 		}
 		post(new Runnable() {
 			@Override
 			public void run() {
-				mCallback.onDisconnect(ctrlBlock.getDevice());
+				mCallback.onDisconnect(connector.getDevice());
 			}
 		});
 	}
 
 	/**
-	 * 指定したUsbDeviceに関係するUsbControlBlockの一覧を取得する
+	 * 指定したUsbDeviceに関係するUsbConnectorの一覧を取得する
 	 * @param device
 	 * @return
 	 */
 	@NonNull
-	private List<UsbControlBlock> findCtrlBlocks(@NonNull final UsbDevice device) {
-		final List<UsbControlBlock> result = new ArrayList<>();
-		synchronized (mCtrlBlocks) {
-			for (final UsbControlBlock ctrlBlock: mCtrlBlocks) {
-				if (ctrlBlock.getDevice().equals(device)) {
-					result.add(ctrlBlock);
+	private List<UsbConnector> findConnectors(@NonNull final UsbDevice device) {
+		final List<UsbConnector> result = new ArrayList<>();
+		synchronized (mConnectors) {
+			for (final UsbConnector connector: mConnectors) {
+				if (connector.getDevice().equals(device)) {
+					result.add(connector);
 				}
 			}
 		}
@@ -309,17 +315,17 @@ public final class USBMonitor extends UsbDetector implements Const {
 	}
 
 	/**
-	 * 指定したUsbDeviceに関係するUsbControlBlockをすべてmCtrlBlocksから削除してcloseする
+	 * 指定したUsbDeviceに関係するUsbConnectorをすべてmConnectorsから削除してcloseする
 	 * @param device
 	 */
 	private void removeAll(@NonNull final UsbDevice device) {
 		@NonNull
-		final List<UsbControlBlock> list = findCtrlBlocks(device);
-		synchronized (mCtrlBlocks) {
-			mCtrlBlocks.removeAll(list);
+		final List<UsbConnector> list = findConnectors(device);
+		synchronized (mConnectors) {
+			mConnectors.removeAll(list);
 		}
-		for (final UsbControlBlock ctrlBlock: list) {
-			ctrlBlock.close();
+		for (final UsbConnector connector: list) {
+			connector.close();
 		}
 	}
 
@@ -331,7 +337,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	 * (UsbControlBlockを生成してファイルディスクリプタを取得してネイティブ側へ引き渡したときに
 	 * 勝手にcloseされてしまわないようにするため)
 	 */
-	public static final class UsbControlBlock extends UsbConnector {
+	private static final class UsbControlBlock extends UsbConnector {
 		@Nullable
 		private WeakReference<USBMonitor> mWeakMonitor;
 
@@ -370,7 +376,6 @@ public final class USBMonitor extends UsbDetector implements Const {
 		/**
 		 * クローンで複製する。
 		 * 別途openし直すのでパーミッションが既に無いと失敗する。
-		 * 複製したUsbControlBlockはUSBMonitorのリストに保持されていないので自前で破棄処理をすること
 		 * @return
 		 * @throws CloneNotSupportedException
 		 */
@@ -379,7 +384,9 @@ public final class USBMonitor extends UsbDetector implements Const {
 		public UsbControlBlock clone() throws CloneNotSupportedException {
 			final UsbControlBlock result = (UsbControlBlock)super.clone();
 			// USBMonitorの弱参照は別途生成する
-			result.mWeakMonitor = new WeakReference<USBMonitor>(getMonitor());
+			final USBMonitor monitor = getMonitor();
+			result.mWeakMonitor = new WeakReference<USBMonitor>(monitor);
+			monitor.processConnect(getDevice(), result);
 			return result;
 		}
 
