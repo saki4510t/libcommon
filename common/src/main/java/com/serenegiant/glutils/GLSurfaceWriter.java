@@ -38,8 +38,10 @@ import androidx.annotation.WorkerThread;
 
 /**
  * 受け取ったテクスチャをSurfaceへ転送するクラス
- * XXX 削除するかも
+ * @Deprecated 使わないのでdeprecatedに
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class GLSurfaceWriter implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLSurfaceWriter.class.getSimpleName();
