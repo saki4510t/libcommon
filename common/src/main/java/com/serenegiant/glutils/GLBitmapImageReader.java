@@ -78,6 +78,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	private Handler mListenerHandler;
 	private int mWidth;
 	private int mHeight;
+	private volatile boolean mEnabled = true;
 
 	/**
 	 * コンストラクタ
@@ -190,6 +191,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		final boolean isOES,
 		final int texId, @NonNull final float[] texMatrix) {
 
+		if (!mEnabled) return;
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
 		final int width = receiver.getWidth();
 		final int height = receiver.getHeight();
@@ -309,6 +311,15 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		} else {
 			mPool.release(image);
 		}
+	}
+
+	/**
+	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * @param enabled
+	 */
+	@Override
+	public void setEnabled(final Boolean enabled) {
+		mEnabled = enabled;
 	}
 
 //--------------------------------------------------------------------------------

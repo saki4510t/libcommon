@@ -71,5 +71,10 @@ public interface ImageReader<T> {
 	 * @param image
 	 */
 	public void recycle(@NonNull final T image);
-
+	/**
+	 * ImageReaderの有効無効をセットする
+	 * enabled=falseなら映像の受け取り処理を行わない
+	 * @param enabled
+	 */
+	public void setEnabled(final Boolean enabled);
 }
