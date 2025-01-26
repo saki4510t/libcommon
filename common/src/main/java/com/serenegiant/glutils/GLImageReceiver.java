@@ -60,7 +60,7 @@ public class GLImageReceiver {
 	 */
 	public interface Callback {
 		@WorkerThread
-		public void onInitialize(@NonNull final GLImageReceiver reader);
+		public void onInitialize(@NonNull final GLImageReceiver receiver);
 		/**
 		 * 関係するリソースを破棄する
 		 */
@@ -70,12 +70,12 @@ public class GLImageReceiver {
 		 * 映像入力用Surfaceが生成されたときの処理
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final GLImageReceiver reader);
+		public void onCreateInputSurface(@NonNull final GLImageReceiver receiver);
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final GLImageReceiver reader);
+		public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver);
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
@@ -85,7 +85,7 @@ public class GLImageReceiver {
 		public void onResize(final int width, final int height);
 		/**
 		 * 映像をテクスチャとして受け取ったときの処理
-		 * @param reader
+		 * @param receiver
 		 * @param isOES
 		 * @param texId
 		 * @param texMatrix
@@ -93,7 +93,7 @@ public class GLImageReceiver {
 		 */
 		@WorkerThread
 		public void onFrameAvailable(
-			@NonNull final GLImageReceiver reader,
+			@NonNull final GLImageReceiver receiver,
 			final boolean isOES,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}

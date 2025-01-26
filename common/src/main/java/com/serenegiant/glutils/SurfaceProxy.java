@@ -355,7 +355,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				new GLImageReceiver.Callback() {
 
 				@Override
-				public void onInitialize(@NonNull final GLImageReceiver reader) {
+				public void onInitialize(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onInitialize:");
 				}
 
@@ -366,13 +366,13 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				}
 
 				@Override
-				public void onCreateInputSurface(@NonNull final GLImageReceiver reader) {
+				public void onCreateInputSurface(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 					sem.release();
 				}
 
 				@Override
-				public void onReleaseInputSurface(@NonNull final GLImageReceiver reader) {
+				public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 				}
 
@@ -383,7 +383,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 				@Override
 				public void onFrameAvailable(
-					@NonNull final GLImageReceiver reader,
+					@NonNull final GLImageReceiver receiver,
 					final boolean isOES,
 					final int texId, @NonNull final float[] texMatrix) {
 					renderTargetOnGL(isOES, texId, texMatrix);

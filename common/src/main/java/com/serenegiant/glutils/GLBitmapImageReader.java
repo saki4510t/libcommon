@@ -111,11 +111,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param reader
+	 * @param receiver
 	 */
 	@WorkerThread
 	@Override
-	public void onInitialize(@NonNull final GLImageReceiver reader) {
+	public void onInitialize(@NonNull final GLImageReceiver receiver) {
 		if (DEBUG) Log.v(TAG, "onInitialize:");
 		// do nothing now
 	}
@@ -137,22 +137,22 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param reader
+	 * @param receiver
 	 */
 	@WorkerThread
 	@Override
-	public void onCreateInputSurface(@NonNull final GLImageReceiver reader) {
+	public void onCreateInputSurface(@NonNull final GLImageReceiver receiver) {
 		if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 		// do nothing now
 	}
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param reader
+	 * @param receiver
 	 */
 	@WorkerThread
 	@Override
-	public void onReleaseInputSurface(@NonNull final GLImageReceiver reader) {
+	public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
 	}
@@ -177,7 +177,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param reader
+	 * @param receiver
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
@@ -186,13 +186,13 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
-		@NonNull final GLImageReceiver reader,
+		@NonNull final GLImageReceiver receiver,
 		final boolean isOES,
 		final int texId, @NonNull final float[] texMatrix) {
 
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
-		final int width = reader.getWidth();
-		final int height = reader.getHeight();
+		final int width = receiver.getWidth();
+		final int height = receiver.getHeight();
 		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
 			mLock.lock();
@@ -208,7 +208,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
 			// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-			final GLSurface readSurface = GLSurface.wrap(reader.isGLES3(),
+			final GLSurface readSurface = GLSurface.wrap(receiver.isGLES3(),
 				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 				GLES20.GL_TEXTURE4, texId, width, height, false);
 			readSurface.makeCurrent();
