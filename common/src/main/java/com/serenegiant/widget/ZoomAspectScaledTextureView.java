@@ -41,8 +41,8 @@ import androidx.annotation.Nullable;
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
 /**
- * FIXME 拡大縮小回転移動処理をDelegaterへ分けたい
- * FIXME ViewTransformDelegaterを使うように変更する？AspectScaledTextureViewを継承しているから難しそう
+ * FIXME 拡大縮小回転移動処理をDelegatorへ分けたい
+ * FIXME ViewTransformDelegatorを使うように変更する？AspectScaledTextureViewを継承しているから難しそう
  */
 public class ZoomAspectScaledTextureView
 	extends AspectScaledTextureView implements IMirror {

@@ -45,7 +45,7 @@ import androidx.annotation.Nullable;
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
 /**
- * ViewTransformDelegaterを使って拡大縮小回転平行移動をするTextureView
+ * ViewTransformDelegatorを使って拡大縮小回転平行移動をするTextureView
  * FIXME まだ挙動がおかしい
  */
 public class ZoomAspectScaledTextureView2
