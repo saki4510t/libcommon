@@ -128,6 +128,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@Override
 	public void onRelease() {
 		if (DEBUG) Log.v(TAG, "release:");
+		mEnabled = false;
 		setOnImageAvailableListener(null, null);
 		synchronized (mQueue) {
 			mQueue.clear();
