@@ -26,6 +26,8 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLConst;
+import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
@@ -141,6 +143,22 @@ public class GLImageReceiver {
 
 	/**
 	 * コンストラクタ
+	 * @param shared コンテキストの共有元GLContext
+	 * @param width
+	 * @param height
+	 * @param callback
+	 */
+	public GLImageReceiver(
+		@NonNull final GLContext shared,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		@NonNull final Callback callback) {
+		this(new GLManager(shared, null), false, width, height, callback);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param manager
+	 * @param useSharedContext
 	 * @param width
 	 * @param height
 	 * @param callback
