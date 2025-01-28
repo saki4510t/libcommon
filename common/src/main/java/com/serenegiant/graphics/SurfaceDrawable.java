@@ -236,6 +236,8 @@ public class SurfaceDrawable extends Drawable {
 		return mEglTask.getEgl();
 	}
 
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	protected EGLBase.IContext<?> getContext() {
 		return mEglTask.getContext();
 	}

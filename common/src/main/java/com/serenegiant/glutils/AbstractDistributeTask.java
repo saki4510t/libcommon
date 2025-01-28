@@ -803,6 +803,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	public abstract EGLBase getEgl();
 	@NonNull
 	public abstract GLContext getGLContext();
+	@Deprecated
 	@NonNull
 	public abstract EGLBase.IContext<?> getContext();
 	public abstract int getGlVersion();

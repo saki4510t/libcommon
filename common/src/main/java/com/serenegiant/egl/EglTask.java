@@ -158,6 +158,7 @@ public abstract class EglTask extends MessageTask {
 		return mGLContext.getConfig();
 	}
 
+	@Deprecated
 	@NonNull
 	public EGLBase.IContext<?> getContext() {
 		return mGLContext.getContext();

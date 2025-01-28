@@ -27,6 +27,7 @@ import androidx.annotation.Size;
 import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
+import com.serenegiant.gl.GLContext;
 import com.serenegiant.math.Fraction;
 
 import java.lang.annotation.Retention;
@@ -70,6 +71,19 @@ public interface IRendererHolder extends IMirror {
 	 */
 	public void release();
 
+	/**
+	 * GLContextを取得する
+	 * @return
+	 */
+	@NonNull
+	public GLContext getGLContext();
+
+	/**
+	 * EGLBase.IContext<?>を取得する
+	 * @return
+	 * @deprecated use #getGLContext instead
+	 */
+	@Deprecated
 	@Nullable
 	public EGLBase.IContext<?> getContext();
 

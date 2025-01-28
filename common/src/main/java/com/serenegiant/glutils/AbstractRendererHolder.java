@@ -120,11 +120,21 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 //		if (DEBUG) Log.v(TAG, "release:finished");
 	}
 
+	@Override
+	@NonNull
+	public GLContext getGLContext() {
+		return mRendererTask.getGLContext();
+	}
+
+	@Deprecated
+	@SuppressWarnings("deprecation")
 	@Nullable
+	@Override
 	public EGLBase.IContext<?> getContext() {
 		return mRendererTask.getContext();
 	}
 
+	@Deprecated
 	public int getGlVersion() {
 		return mRendererTask.getGlVersion();
 	}
@@ -552,6 +562,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			return mEglTask.getGLContext();
 		}
 
+		@Deprecated
+		@SuppressWarnings("deprecation")
 		@NonNull
 		@Override
 		public EGLBase.IContext<?> getContext() {
