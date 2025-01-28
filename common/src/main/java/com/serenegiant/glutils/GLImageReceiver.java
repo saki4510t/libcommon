@@ -26,7 +26,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
@@ -45,7 +44,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装した抽象クラス
+ * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装
  */
 public class GLImageReceiver {
 	private static final boolean DEBUG = false;
@@ -158,17 +157,17 @@ public class GLImageReceiver {
 	/**
 	 * コンストラクタ
 	 * @param manager
-	 * @param useSharedContext
+	 * @param useSharedManager
 	 * @param width
 	 * @param height
 	 * @param callback
 	 */
 	public GLImageReceiver(
-		@NonNull final GLManager manager, final boolean useSharedContext,
+		@NonNull final GLManager manager, final boolean useSharedManager,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@NonNull final Callback callback) {
 
-		mOwnManager = useSharedContext;
+		mOwnManager = useSharedManager;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
 			@Override
@@ -176,7 +175,7 @@ public class GLImageReceiver {
 				return GLImageReceiver.this.handleMessage(msg);
 			}
 		};
-		if (useSharedContext) {
+		if (useSharedManager) {
 			mManager = manager.createShared(handlerCallback);
 			mGLHandler = mManager.getGLHandler();
 		} else {
@@ -186,7 +185,7 @@ public class GLImageReceiver {
 		mWidth = width;
 		mHeight = height;
 		mCallback = callback;
-		final Semaphore sem = new Semaphore(0);
+		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
 		mGLHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -203,7 +202,6 @@ public class GLImageReceiver {
 			throw new RuntimeException("failed to init", e);
 		}
 		// 映像受け取り用のテクスチャ/SurfaceTexture/Surfaceを生成
-//		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
 		sem.release(sem.availablePermits());
 		mGLHandler.post(new Runnable() {
 			@Override
@@ -228,7 +226,7 @@ public class GLImageReceiver {
 				}
 			}
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			// ignore
 		}
 	}
 
@@ -246,13 +244,16 @@ public class GLImageReceiver {
 	 */
 	public final void release() {
 		if (!mReleased) {
-			if (DEBUG) Log.v(TAG, "release:");
 			mReleased = true;
+			if (DEBUG) Log.v(TAG, "release:");
 			mIsReaderValid = false;
 			internalRelease();
 		}
 	}
 
+	/**
+	 * 関連するリソースを破棄する
+	 */
 	protected void internalRelease() {
 		if (mManager.isValid()) {
 			mGLHandler.post(new Runnable() {
@@ -380,10 +381,19 @@ public class GLImageReceiver {
 		}
 	}
 
+	/**
+	 * GL|ES3を使っているかどうか
+	 * @return
+	 */
 	protected boolean isGLES3() {
 		return mManager.isGLES3();
 	}
 
+	/**
+	 * 映像サイズを変更要求
+	 * @param width
+	 * @param height
+	 */
 	public void resize(@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 		final int _width = Math.max(width, 1);
 		final int _height = Math.max(height, 1);
@@ -441,7 +451,7 @@ public class GLImageReceiver {
 	}
 
 	/**
-	 *
+	 * テクスチャ更新要求の処理
 	 */
 	private int drawCnt;
 	@WorkerThread
