@@ -339,18 +339,18 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 * @param manager
 		 * @param width
 		 * @param height
-		 * @param useSharedContext
+		 * @param useSharedManager
 		 */
 		public SurfaceProxyGLES(
 			@NonNull final GLManager manager,
 			final int width, final int height,
-			final boolean useSharedContext) throws IllegalStateException {
+			final boolean useSharedManager) throws IllegalStateException {
 
 			super(width, height);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 			final Semaphore sem = new Semaphore(0);
 			mReceiver = new GLImageReceiver(
-				manager, useSharedContext,
+				manager, useSharedManager,
 				width, height,
 				new GLImageReceiver.Callback() {
 
