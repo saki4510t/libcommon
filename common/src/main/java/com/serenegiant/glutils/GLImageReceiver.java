@@ -38,6 +38,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import androidx.annotation.CallSuper;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
@@ -55,11 +56,30 @@ public class GLImageReceiver {
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 
 	/**
+	 * #onFrameAvailableだけを後から差し替えれるようにCallbackインターフェースから分離
+	 * GLコンテキストを保持したスレッド上で実行される
+	 */
+	public interface FrameAvailableCallback {
+		/**
+		 * 映像をテクスチャとして受け取ったときの処理
+		 * @param receiver
+		 * @param isOES
+		 * @param texId
+		 * @param texMatrix
+		 */
+		@WorkerThread
+		public void onFrameAvailable(
+			@NonNull final GLImageReceiver receiver,
+			final boolean isOES,
+			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
+	}
+
+	/**
 	 * Surfaceを経由してテクスチャとして受け取った映像を処理するためのインターフェース
 	 * WorkerThreadアノテーションの付いているインターフェースメソッドは全てGLコンテキストを
 	 * 保持したスレッド上で実行される
 	 */
-	public interface Callback {
+	public interface Callback extends FrameAvailableCallback {
 		@WorkerThread
 		public void onInitialize(@NonNull final GLImageReceiver receiver);
 		/**
@@ -84,19 +104,6 @@ public class GLImageReceiver {
 		 */
 		@WorkerThread
 		public void onResize(final int width, final int height);
-		/**
-		 * 映像をテクスチャとして受け取ったときの処理
-		 * @param receiver
-		 * @param isOES
-		 * @param texId
-		 * @param texMatrix
-		 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
-		 */
-		@WorkerThread
-		public void onFrameAvailable(
-			@NonNull final GLImageReceiver receiver,
-			final boolean isOES,
-			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}
 
 	/**
@@ -116,6 +123,8 @@ public class GLImageReceiver {
 	private int mHeight;
 	@NonNull
 	private final Callback mCallback;
+	@NonNull
+	private FrameAvailableCallback mFrameAvailableCallback;
 	private volatile boolean mReleased = false;
 	private boolean mIsReaderValid = false;
 
@@ -185,6 +194,7 @@ public class GLImageReceiver {
 		mWidth = width;
 		mHeight = height;
 		mCallback = callback;
+		mFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
 		mGLHandler.post(new Runnable() {
 			@Override
@@ -251,6 +261,26 @@ public class GLImageReceiver {
 		}
 	}
 
+	/**
+	 * FrameAvailableCallbackを差し替える
+	 * @param callback callbackがnull以外のFrameAvailableCallbackを指定した場合にはコンストラクタで
+	 *                 引き渡したコールバックの#onFrameAvailableは呼ばれない。
+	 *                 callbackがnullの場合はコンストラクタで引き渡したコールバックに戻る。
+	 */
+	public void setFrameAvailableCallback(@Nullable final FrameAvailableCallback callback) {
+		if (mManager.isValid()) {
+			mGLHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					if (callback != null) {
+						mFrameAvailableCallback = callback;
+					} else {
+						mFrameAvailableCallback = mCallback;
+					}
+				}
+			});
+		}
+	}
 	/**
 	 * 関連するリソースを破棄する
 	 */
@@ -468,7 +498,7 @@ public class GLImageReceiver {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		mCallback.onFrameAvailable(this, true, mTexId, mTexMatrix);
+		mFrameAvailableCallback.onFrameAvailable(this, true, mTexId, mTexMatrix);
 	}
 
 	/**
