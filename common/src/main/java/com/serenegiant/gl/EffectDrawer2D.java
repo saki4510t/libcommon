@@ -254,7 +254,7 @@ public class EffectDrawer2D extends GLDrawer2D {
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
-	 * @param effect EFFECT_NONより大きいこと
+	 * @param effect EFFECT_NONより小さい時は現在選択中の映像フィルタにパラメータ配列をセットする
 	 * @param params
 	 * @throws IllegalArgumentException effectが範囲外ならIllegalArgumentException生成
 	 */
