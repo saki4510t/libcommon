@@ -514,6 +514,15 @@ public class EffectPipeline extends ProxyPipeline
 		}
 	}
 
+	/**
+	 * changeEffectで映像効果を指定したときに内蔵の映像効果設定処理を実行する前に呼ばれる
+	 * GLEffect.NON〜GLEffect.EFFECT_NUM(12)-1についてはEffectDrawer2Dで既定の設定が可能
+	 * effectにそれ以外を指定し#onChangeEffectがfalse返すとシェーダーがリセットされてEFFECT_NONになる
+	 * @param effect
+	 * @param drawer
+	 * @return trueを返すと処理済みで内蔵の映像効果設定処理を行わない、
+	 *         falseを返すと内蔵の映像効果設定処理を行う
+	 */
 	@WorkerThread
 	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 		return false;
