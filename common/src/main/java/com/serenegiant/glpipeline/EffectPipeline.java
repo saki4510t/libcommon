@@ -339,8 +339,19 @@ public class EffectPipeline extends ProxyPipeline
 	 * 映像効果をセット
 	 * @param effect
 	 * @throws IllegalStateException
+	 * @deprecated use #changeEffect instead
 	 */
+	@Deprecated
 	public void setEffect(final int effect) throws IllegalStateException {
+		changeEffect(effect);
+	}
+
+	/**
+	 * 映像効果をセット
+	 * @param effect
+	 * @throws IllegalStateException
+	 */
+	public void changeEffect(final int effect) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if (isValid()) {
 			mManager.runOnGLThread(new Runnable() {
