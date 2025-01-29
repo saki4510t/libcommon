@@ -26,6 +26,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -384,7 +385,43 @@ public class EffectPipeline extends ProxyPipeline
 			mLock.unlock();
 		}
 	}
-//--------------------------------------------------------------------------------
+
+	/**
+	 * 現在選択中の映像フィルタにパラメータ配列をセット
+	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
+	 * @param params
+	 */
+	public void setParams(@NonNull final float[] params) throws IllegalStateException {
+		setParams(mEffect, params);
+	}
+
+	/**
+	 * 指定した映像フィルタにパラメータ配列をセット
+	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
+	 * @param effect EFFECT_NONより大きいこと
+	 * @param params
+	 * @throws IllegalStateException
+	 */
+	public void setParams(final int effect, @NonNull final float[] params)
+		throws IllegalStateException {
+
+		if (isValid()) {
+			mManager.runOnGLThread(new Runnable() {
+				@WorkerThread
+				@Override
+				public void run() {
+					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
+					if (mDrawer != null) {
+						mDrawer.setParams(effect, params);
+					}
+				}
+			});
+		} else {
+			throw new IllegalStateException("already released!");
+		}
+	}
+
+	//--------------------------------------------------------------------------------
 	final EffectDrawer2D.EffectListener mEffectListener
 		= new EffectDrawer2D.EffectListener() {
 			@WorkerThread
