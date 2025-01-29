@@ -38,7 +38,7 @@ import androidx.annotation.RequiresPermission;
  * 実際のエンコード処理をスキップする
  */
 public class AudioSamplerEncoder extends AbstractAudioEncoder {
-	private static final boolean DEBUG = true;	// FIXME 実働時にはfalseにすること
+	private static final boolean DEBUG = false;	// FIXME 実働時にはfalseにすること
 	private static final String TAG = AudioSamplerEncoder.class.getSimpleName();
 
 	@NonNull

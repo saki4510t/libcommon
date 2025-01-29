@@ -114,7 +114,7 @@ public class CameraUtils implements CameraConst {
 			camera.setParameters(params);
 			// get the actual preview size
 			final Camera.Size previewSize = camera.getParameters().getPreviewSize();
-			Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
+			if (DEBUG) Log.d(TAG, String.format("handleStartPreview(%d, %d),fps(%d-%d)",
 				previewSize.width, previewSize.height, fps[0], fps[1]));
 		}
 		return camera;
@@ -185,7 +185,7 @@ cameraLoop:
 		for (final Camera.Size size : params.getSupportedPreviewSizes()) {
 			if (((width <= 0) || (height <= 0))
 				|| ((size.width == width) && (size.height == height))) {
-				Log.d(TAG, String.format("match supported preview size:%dx%d", size.width, size.height));
+				if (DEBUG) Log.d(TAG, String.format("match supported preview size:%dx%d", size.width, size.height));
 				params.setPreviewSize(size.width, size.height);
 				params.setPictureSize(size.width, size.height);
 				return size;
