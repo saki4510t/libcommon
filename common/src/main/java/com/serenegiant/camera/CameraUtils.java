@@ -46,6 +46,7 @@ import androidx.annotation.Nullable;
 /**
  * Camera API用のヘルパークラス
  */
+@SuppressWarnings("deprecation")
 public class CameraUtils implements CameraConst {
 	private static final boolean DEBUG = false;
 	private static final String TAG = CameraUtils.class.getSimpleName();
