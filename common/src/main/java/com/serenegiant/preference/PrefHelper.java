@@ -184,6 +184,7 @@ public class PrefHelper {
 //--------------------------------------------------------------------------------
 	/**
 	 * 共有プレファレンスの中身をコピー
+	 * dstにsrcと同じキーの値があっても強制的に上書きする
 	 * @param src
 	 * @param dst
 	 */
@@ -212,6 +213,81 @@ public class PrefHelper {
 						editor.putFloat(key, (Float)value);
 					} else if (value instanceof Boolean) {
 						editor.putBoolean(key, (Boolean)value);
+					}
+				}
+			} finally {
+				editor.apply();
+			}
+		}
+	}
+
+	/**
+	 * 共有プレファレンスをマージするときに同じキーに対応する値が存在するときにsrcとdstの
+	 * どちらの値を使うかを判定するためのコールバックインターフェース
+	 */
+	public interface SharedPreferencesMergeCallback {
+		/**
+		 * ソース側とデスティネーション側に同じキーの値が存在するときにどちらの値を使うかを判定するためのコールバック
+		 * @param key
+		 * @param srcValue
+		 * @param dstValue
+		 * @return trueを返すとならソース側の値を使う(=dstを上書きする)、
+		 *         falseを返すとデスティネーション側の値を使う(=dstを上書きしない)
+		 */
+		public boolean onMerge(final String key, final Object srcValue, final Object dstValue);
+	}
+
+	/**
+	 * 共有プレファレンスの中身をマージ
+	 * 同じキーが存在する場合には上書きしない
+	 * @param src
+	 * @param dst
+	 */
+	public static void merge(
+		@NonNull final SharedPreferences src,
+		@NonNull final SharedPreferences dst) {
+		merge(src, dst, null);
+	}
+
+	/**
+	 * 共有プレファレンスの中身をマージ
+	 * @param src
+	 * @param dst
+	 * @param callback nullなら同じキーが存在するときに上書きしない
+	 */
+	@SuppressWarnings("unchecked")
+	public static void merge(
+		@NonNull final SharedPreferences src,
+		@NonNull final SharedPreferences dst,
+		@Nullable SharedPreferencesMergeCallback callback) {
+
+		final Map<String, ?> srcValues = src.getAll();
+		if ((srcValues != null) && !srcValues.isEmpty()) {
+			final SharedPreferences.Editor editor = dst.edit();
+			try {
+				for (final Map.Entry<String, ?> srcEntry: srcValues.entrySet()) {
+					final String key = srcEntry.getKey();
+					final Object srcValue = srcEntry.getValue();
+					boolean override = false;
+					if (dst.contains(key)) {
+						final Object dstValue = getObject(dst, key, null);
+						override = callback != null && callback.onMerge(key, srcValue, dstValue);
+					}
+					if (override) {
+						if (srcValue instanceof String) {
+							editor.putString(key, (String)srcValue);
+						} else if (srcValue instanceof Set) {
+							// SharedPreferencesに入るSetはSet<String>のみ
+							editor.putStringSet(key, (Set<String>)srcValue);
+						} else if (srcValue instanceof Integer) {
+							editor.putInt(key, (int)srcValue);
+						} else if (srcValue instanceof Long) {
+							editor.putLong(key, (long)srcValue);
+						} else if (srcValue instanceof Float) {
+							editor.putFloat(key, (Float)srcValue);
+						} else if (srcValue instanceof Boolean) {
+							editor.putBoolean(key, (Boolean)srcValue);
+						}
 					}
 				}
 			} finally {
