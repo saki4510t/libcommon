@@ -98,29 +98,6 @@ public class GLViewTransformer {
 	}
 
 	/**
-	 * ViewContentTransformerで保持しているトランスフォームマトリックスを
-	 * ターゲットViewに設定されているトランスフォームマトリックスに設定する
-	 * @param saveAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
-	 * @return
-	 */
-	@NonNull
-	public GLViewTransformer updateTransform(final boolean saveAsDefault) {
-		internalGetTransform(mTransform);
-		if (saveAsDefault) {
-			System.arraycopy(mTransform, 0, mDefaultTransform, 0, 16);
-			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
-			if (DEBUG) Log.v(TAG, "updateTransform:default="
-				+ MatrixUtils.toGLMatrixString(mDefaultTransform));
-			resetValues();
-		} else {
-			calcValues(mTransform);
-		}
-		if (DEBUG) Log.v(TAG, "updateTransform:" + saveAsDefault
-			+ "," + MatrixUtils.toGLMatrixString(mTransform));
-		return this;
-	}
-
-	/**
 	 * トランスフォームマトリックスを設定する
 	 * @param transform nullまたは要素数が16未満なら単位行列が設定される
 	 */
@@ -151,6 +128,29 @@ public class GLViewTransformer {
 		}
 		System.arraycopy(mTransform, 0, result, 0, 16);
 		return result;
+	}
+
+	/**
+	 * ViewContentTransformerで保持しているトランスフォームマトリックスを
+	 * ターゲットViewに設定されているトランスフォームマトリックスに設定する
+	 * @param saveAsDefault 設定したトランスフォームマトリックスをデフォルトにトランスフォームマトリックスとして使うかどうか
+	 * @return
+	 */
+	@NonNull
+	public GLViewTransformer updateTransform(final boolean saveAsDefault) {
+		internalGetTransform(mTransform);
+		if (saveAsDefault) {
+			System.arraycopy(mTransform, 0, mDefaultTransform, 0, 16);
+			// mDefaultTranslateからの相対値なのでtranslate/scale/rotateをクリアする
+			if (DEBUG) Log.v(TAG, "updateTransform:default="
+				+ MatrixUtils.toGLMatrixString(mDefaultTransform));
+			resetValues();
+		} else {
+			calcValues(mTransform);
+		}
+		if (DEBUG) Log.v(TAG, "updateTransform:" + saveAsDefault
+			+ "," + MatrixUtils.toGLMatrixString(mTransform));
+		return this;
 	}
 
 	/**
