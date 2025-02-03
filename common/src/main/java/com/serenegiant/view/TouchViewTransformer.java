@@ -157,12 +157,12 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * 表示内容のトランスフォームマトリックス
 	 */
 	@NonNull
-	protected final Matrix mImageMatrix = new Matrix();
+	protected final Matrix mContentMatrix = new Matrix();
 	/**
 	 * タッチ操作開始時のトランスフォームマトリックスを保存
 	 */
 	@NonNull
-	private final Matrix mSavedImageMatrix = new Matrix();
+	private final Matrix mSavedContentMatrix = new Matrix();
 	/**
 	 * 移動可能範囲を指定
 	 */
@@ -279,7 +279,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		if (DEBUG) Log.v(TAG, "onRestoreInstanceState:");
 		if (state instanceof final SavedState saved) {
 			mIsRestored = true;
-			mImageMatrix.setValues(saved.mMatrixCache);
+			mContentMatrix.setValues(saved.mMatrixCache);
 			mState = saved.mState;
 			mHandleTouchEvent = saved.mHandleTouchEvent;
 			mMinScale = saved.mMinScale;
@@ -303,7 +303,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		saveState.mMinScale = mMinScale;
 		saveState.mMaxScale = mMaxScale;
 		saveState.mCurrentDegrees = mCurrentDegrees;
-		mImageMatrix.getValues(saveState.mMatrixCache);
+		mContentMatrix.getValues(saveState.mMatrixCache);
 		return saveState;
 	}
 
@@ -506,17 +506,17 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		if (DEBUG) Log.v(TAG, String.format("setScaleRelative:%f,min=%f,max=%f",
 			scaleRelative, mMinScale, mMaxScale));
 		// restore the Matrix
-		getTransform(mImageMatrix);
+		getTransform(mContentMatrix);
 		// calculate the zooming scale from the distance between touched positions
 		// calculate the applied zooming scale
 		final float tmpScale = scaleRelative * getScale();
 		if ((tmpScale >= mMinScale) && (tmpScale <= mMaxScale)) {
 			// change scale with scale value and pivot point
-			if (mImageMatrix.postScale(scaleRelative, scaleRelative,
+			if (mContentMatrix.postScale(scaleRelative, scaleRelative,
 				getViewWidth() / 2.0f, getViewHeight() / 2.0f)) {
 
 				// when Matrix is changed, apply to target view
-				setTransform(mImageMatrix);
+				setTransform(mContentMatrix);
 			}
 		}
 
@@ -601,10 +601,10 @@ public abstract class TouchViewTransformer extends ViewTransformer
 				mContentRect.width(), mContentRect.height()));
 
 		// apply matrix
-		mImageMatrix.reset();
+		mContentMatrix.reset();
 		switch (mScaleMode) {
 		case SCALE_MODE_STRETCH_TO_FIT ->
-			mImageMatrix.setScale(scaleX, scaleY);
+			mContentMatrix.setScale(scaleX, scaleY);
 		case SCALE_MODE_KEEP_ASPECT,
 			SCALE_MODE_CROP -> {
 				final float scale = mScaleMode == SCALE_MODE_CROP
@@ -613,17 +613,17 @@ public abstract class TouchViewTransformer extends ViewTransformer
 				final float dx = Math.round((viewWidth - contentWidth * scale) * 0.5f);
 				final float dy = Math.round((viewHeight - contentHeight * scale) * 0.5f);
 
-				mImageMatrix.setScale(scale, scale);
-				mImageMatrix.postTranslate(dx, dy);
+				mContentMatrix.setScale(scale, scale);
+				mContentMatrix.postTranslate(dx, dy);
 				if (DEBUG) Log.v(TAG,
 					String.format("setupDefaultTransform:scale(%f,%f)→%f, d(%f,%f)",
 						scaleX, scaleY, scale,
 						dx, dy));
 			}
 		}
-		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mImageMatrix);
-		setTransform(mImageMatrix);
-		setDefault(mImageMatrix);
+		if (DEBUG) Log.v(TAG, "setupDefaultTransform:scaleMode=" + mScaleMode + "," + mContentMatrix);
+		setTransform(mContentMatrix);
+		setDefault(mContentMatrix);
 	}
 
 	/**
@@ -648,14 +648,14 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		float scale = getScale();
 		if (scale < mMinScale) {
 			scale = mMinScale;
-			getTransform(mImageMatrix);
-			mImageMatrix.setScale(scale, scale);
-			setTransform(mImageMatrix);
+			getTransform(mContentMatrix);
+			mContentMatrix.setScale(scale, scale);
+			setTransform(mContentMatrix);
 		} else if (scale > mMaxScale) {
 			scale = mMaxScale;
-			getTransform(mImageMatrix);
-			mImageMatrix.setScale(scale, scale);
-			setTransform(mImageMatrix);
+			getTransform(mContentMatrix);
+			mContentMatrix.setScale(scale, scale);
+			setTransform(mContentMatrix);
 		}
 	}
 
@@ -670,8 +670,8 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		if (mState != state) {
 			mState = state;
 			// get and save the internal Matrix of super class
-			getTransform(mSavedImageMatrix);
-			mImageMatrix.set(mSavedImageMatrix);
+			getTransform(mSavedContentMatrix);
+			mContentMatrix.set(mSavedContentMatrix);
 			if (mViewTransformListener != null) {
 				mViewTransformListener.onStateChanged(getTargetView(), state);
 			}
@@ -710,7 +710,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		mTransCoords[1] = mTransCoords[3] = mContentRect.top;
 		mTransCoords[5] = mTransCoords[7] = mContentRect.bottom;
 		mTransCoords[2] = mTransCoords[4] = mContentRect.right;
-		mImageMatrix.mapPoints(mTransCoords);
+		mContentMatrix.mapPoints(mTransCoords);
 		for (int i = 0; i < 8; i += 2) {
 			mTransCoords[i] += dx;
 			mTransCoords[i+1] += dy;
@@ -776,9 +776,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			if ((dx != 0) || (dy != 0)) {
 //				if (DEBUG) Log.v(TAG, String.format("processDrag:dx=%f,dy=%f", dx, dy));
 				// apply move
-				if (mImageMatrix.postTranslate(dx, dy)) {
+				if (mContentMatrix.postTranslate(dx, dy)) {
 					// when Matrix is changed, apply to target view
-					setTransform(mImageMatrix);
+					setTransform(mContentMatrix);
 				}
 			}
 		}
@@ -859,9 +859,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		}
 
 		// change scale with scale value and pivot point
-		if (mImageMatrix.postScale(scale, scale, mPivotX, mPivotY)) {
+		if (mContentMatrix.postScale(scale, scale, mPivotX, mPivotY)) {
 			// when Matrix is changed, apply to target view
-			setTransform(mImageMatrix);
+			setTransform(mContentMatrix);
 		}
 
 		return true;
@@ -927,9 +927,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			restoreMatrix();
 			mCurrentDegrees = calcAngle(event);
 			mIsRotating = Math.abs(((int)(mCurrentDegrees / 360.f)) * 360.f - mCurrentDegrees) > ViewUtils.EPS;
-			if (mIsRotating && mImageMatrix.postRotate(mCurrentDegrees, mPivotX, mPivotY)) {
+			if (mIsRotating && mContentMatrix.postRotate(mCurrentDegrees, mPivotX, mPivotY)) {
 				// when Matrix is changed, apply to target view
-				setTransform(mImageMatrix);
+				setTransform(mContentMatrix);
 				return true;
 			}
 		}
@@ -971,7 +971,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * restore the Matrix to the one when state changed
 	 */
 	protected void restoreMatrix() {
-		mImageMatrix.set(mSavedImageMatrix);
+		mContentMatrix.set(mSavedContentMatrix);
 	}
 
 	/**
