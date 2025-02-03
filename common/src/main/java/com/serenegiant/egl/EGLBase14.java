@@ -120,7 +120,10 @@ import androidx.annotation.Nullable;
 			if (GLUtils.isSupportedSurface(surface)) {
 				mEglSurface = mEglBase.createWindowSurface(surface);
 				mOwnSurface = true;
-				setViewPort(0, 0, getWidth(), getHeight());
+				// XXX GLContextのマスターサーフェースとして生成するときに
+				//     call to OpenGL ES API with no current context (logged once per thread)
+				//     とワーニングが出てしまうのでここではsetViewPortを呼ばない
+//				setViewPort(0, 0, getWidth(), getHeight());
 			} else {
 				throw new IllegalArgumentException("unsupported surface");
 			}
@@ -146,7 +149,10 @@ import androidx.annotation.Nullable;
 				mEglSurface = mEglBase.createOffscreenSurface(width, height);
 			}
 			mOwnSurface = true;
-			setViewPort(0, 0, getWidth(), getHeight());
+			// XXX GLContextのマスターサーフェースとして生成するときに
+			//     call to OpenGL ES API with no current context (logged once per thread)
+			//     とワーニングが出てしまうのでここではsetViewPortを呼ばない
+//			setViewPort(0, 0, getWidth(), getHeight());
 		}
 
 		/**
@@ -167,7 +173,10 @@ import androidx.annotation.Nullable;
 			mGLVersion = eglBase.getGlVersion();
 			mEglSurface = EGL14.eglGetCurrentSurface(readDraw);
 			mOwnSurface = false;
-			setViewPort(0, 0, getWidth(), getHeight());
+			// XXX GLContextのマスターサーフェースとして生成するときに
+			//     call to OpenGL ES API with no current context (logged once per thread)
+			//     とワーニングが出てしまうのでここではsetViewPortを呼ばない
+//			setViewPort(0, 0, getWidth(), getHeight());
 		}
 
 		@Override
