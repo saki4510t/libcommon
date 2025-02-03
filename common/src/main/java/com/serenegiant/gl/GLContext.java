@@ -21,6 +21,7 @@ package com.serenegiant.gl;
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.os.Process;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -190,6 +191,7 @@ public class GLContext implements EGLConst {
 		@Nullable final Object surface, final int width, final int height)
 			throws IllegalArgumentException {
 
+		Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
 		if ((mEgl == null)
 			&& ((mSharedContext == null)
 				|| (mSharedContext instanceof EGLBase.IContext))) {
