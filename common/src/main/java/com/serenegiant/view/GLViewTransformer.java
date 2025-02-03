@@ -21,6 +21,7 @@ package com.serenegiant.view;
 import android.graphics.PointF;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.View;
 
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.widget.IGLTransformView;
@@ -93,8 +94,8 @@ public class GLViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	public IGLTransformView getTargetView() {
-		return mTargetView;
+	public View getTargetView() {
+		return mTargetView.getView();
 	}
 
 	/**
