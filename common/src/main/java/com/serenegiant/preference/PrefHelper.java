@@ -222,19 +222,22 @@ public class PrefHelper {
 	}
 
 	/**
-	 * 共有プレファレンスをマージするときに同じキーに対応する値が存在するときにsrcとdstの
-	 * どちらの値を使うかを判定するためのコールバックインターフェース
+	 * 共有プレファレンスをマージする時にキー値ペアのコピーを行うかどうかを判定するための
+	 * コールバックインターフェース
 	 */
 	public interface SharedPreferencesMergeCallback {
 		/**
-		 * ソース側とデスティネーション側に同じキーの値が存在するときにどちらの値を使うかを判定するためのコールバック
+		 * コピーを行うかどうかを判定するコールバックメソッド
 		 * @param key
-		 * @param srcValue
-		 * @param dstValue
-		 * @return trueを返すとならソース側の値を使う(=dstを上書きする)、
-		 *         falseを返すとデスティネーション側の値を使う(=dstを上書きしない)
+		 * @param contains コピー先にキー含まれているかどうか
+		 * @param srcValue コピー元の値
+		 * @param dstValue コピー先の値(コピー先にキーが含まれていないときはnull)
+		 * @return trueを返すとならコピー元の値を使う(=dstを上書きする)、
+		 *         falseを返すとコピー先の値を使う(=dstを上書きしない)
 		 */
-		public boolean onMerge(final String key, final Object srcValue, final Object dstValue);
+		public boolean onMerge(
+			@NonNull final String key, final boolean contains,
+			final Object srcValue, final Object dstValue);
 	}
 
 	/**
@@ -268,13 +271,11 @@ public class PrefHelper {
 				for (final Map.Entry<String, ?> srcEntry: srcValues.entrySet()) {
 					final String key = srcEntry.getKey();
 					final Object srcValue = srcEntry.getValue();
-					boolean needCopy = true;
-					if (dst.contains(key)) {
-						// dstに同じキーが含まれている場合
-						final Object dstValue = getObject(dst, key, null);
-						// callbackがnull以外でtrueを返すと上書きする
-						needCopy = callback != null && callback.onMerge(key, srcValue, dstValue);
-					}
+					final Object dstValue = getObject(dst, key, null);
+					final boolean contains = dst.contains(key);
+					// callbackがnull以外でtrueを返すと上書きする
+					boolean needCopy = (!contains && (callback == null))
+						|| ((callback != null) && callback.onMerge(key, contains, srcValue, dstValue));
 					if (needCopy) {
 						if (srcValue instanceof String) {
 							editor.putString(key, (String)srcValue);
