@@ -19,6 +19,7 @@ package com.serenegiant.gl;
 */
 
 import android.os.Handler;
+import android.os.Process;
 import android.util.Log;
 import android.view.Choreographer;
 
@@ -45,6 +46,7 @@ public class GLManager {
 	@NonNull
 	private final Handler mGLHandler;
 	private final long mHandlerThreadId;
+	private final int mThreadPriority;
 	/**
 	 * 排他制御用
 	 */
@@ -59,9 +61,10 @@ public class GLManager {
 	 */
 	public GLManager() {
 		this(GLUtils.getSupportedGLVersion(),
-			 null, 0,
-			  null, 0,0,
-			  null);
+			null, 0,
+			null, 0,0,
+			Process.THREAD_PRIORITY_DEFAULT,
+			null);
 	}
 
 	/**
@@ -73,6 +76,7 @@ public class GLManager {
 		this(GLUtils.getSupportedGLVersion(),
 			null, 0,
 			null, 0, 0,
+			Process.THREAD_PRIORITY_DEFAULT,
 			callback);
 	}
 
@@ -83,6 +87,7 @@ public class GLManager {
 	public GLManager(final int maxClientVersion) {
 		this(maxClientVersion, null, 0,
 			null, 0, 0,
+			Process.THREAD_PRIORITY_DEFAULT,
 			null);
 	}
 
@@ -94,7 +99,7 @@ public class GLManager {
 	public GLManager(final int maxClientVersion,
 		@Nullable final Handler.Callback callback) {
 
-		this(maxClientVersion, null, 0, null, 0, 0, callback);
+		this(maxClientVersion, null, 0, null, 0, 0, Process.THREAD_PRIORITY_DEFAULT, callback);
 	}
 
 	/**
@@ -109,6 +114,7 @@ public class GLManager {
 			manager.getGLContext().getContext(),
 			manager.getGLContext().getFlags(),
 			null, 0, 0,
+			Process.THREAD_PRIORITY_DEFAULT,
 			callback);
 	}
 
@@ -123,6 +129,7 @@ public class GLManager {
 		this(shared.getMaxClientVersion(),
 			shared.getContext(), shared.getFlags(),
 			null, 0, 0,
+			Process.THREAD_PRIORITY_DEFAULT,
 			callback);
 	}
 
@@ -137,7 +144,10 @@ public class GLManager {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final Handler.Callback callback)
 			throws IllegalArgumentException, IllegalStateException {
-		this(maxClientVersion, sharedContext, flags, null, 0, 0, callback);
+		this(maxClientVersion, sharedContext, flags,
+			null, 0, 0,
+			Process.THREAD_PRIORITY_DEFAULT,
+			callback);
 	}
 	/**
 	 * コンストラクタ
@@ -149,11 +159,13 @@ public class GLManager {
 	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
 	 * @param masterHeight GLコンテキスト保持用のEglSurfaceのサイズ(高さ)、0以下の場合は1になる
 	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
+	 * @param threadPriority スレッドの優先度、Process.THREAD_PRIORITY_XXXで指定, デフォルトはTHREAD_PRIORITY_DEFAULT
 	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
 	 */
 	public GLManager(final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final Object masterSurface, final int masterWidth, final int masterHeight,
+		final int threadPriority,
 		@Nullable final Handler.Callback callback)
 			throws IllegalArgumentException, IllegalStateException {
 
@@ -161,8 +173,9 @@ public class GLManager {
 		if ((masterSurface != null) && !GLUtils.isSupportedSurface(masterSurface)) {
 			throw new IllegalArgumentException("wrong type of masterSurface");
 		}
+		mThreadPriority = threadPriority;
 		mGLContext = new GLContext(maxClientVersion, sharedContext, flags);
-		final HandlerThreadHandler handler = HandlerThreadHandler.createHandler(TAG, callback, true);
+		final HandlerThreadHandler handler = HandlerThreadHandler.createHandler(TAG, callback, threadPriority, true);
 		mGLHandler = handler;
 		mHandlerThreadId = handler.getId();
 		final Semaphore sem = new Semaphore(0);
@@ -341,6 +354,7 @@ public class GLManager {
 			return new GLManager(mGLContext.getMaxClientVersion(),
 				mGLContext.getContext(), mGLContext.getFlags(),
 				null, 0, 0,
+				mThreadPriority,
 				callback);
 		} finally {
 			mLock.unlock();
