@@ -18,7 +18,6 @@ package com.serenegiant.gl;
  *  limitations under the License.
 */
 
-import android.annotation.SuppressLint;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.text.TextUtils;
@@ -80,23 +79,6 @@ public class GLDrawer2D implements GLConst {
 		1.0f, 1.0f,		// 右下
 		0.0f, 1.0f,		// 左下
 	};
-	// 元々のDEFAULT_TEXCOORDはテクスチャ座標を上下反転させたこっちだった
-	protected static final float[] DEFAULT_TEXCOORD_FLIP_VERTICAL = {
-		1.0f, 1.0f,		// 右上
-		0.0f, 1.0f,		// 左上
-		1.0f, 0.0f,		// 右下
-		0.0f, 0.0f,		// 左下
-	};
-	protected static final int FLOAT_SZ = Float.SIZE / 8;
-
-	/**
-	 * 頂点座標用バッファオブジェクト名
-	 */
-	private int mBufVertex = GL_NO_BUFFER;
-	/**
-	 * テクスチャ座標用バッファオブジェクト名
-	 */
-	private int mBufTexCoord = GL_NO_BUFFER;
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
@@ -116,7 +98,6 @@ public class GLDrawer2D implements GLConst {
 	 * @param fs
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
 		@Nullable final String fs) {
@@ -132,7 +113,6 @@ public class GLDrawer2D implements GLConst {
 	 * @param fs
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
 		@Nullable final String vs, @Nullable final String fs) {
@@ -148,7 +128,6 @@ public class GLDrawer2D implements GLConst {
 	 * @param texcoord
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
 		@NonNull final float[] vertices,
@@ -165,7 +144,6 @@ public class GLDrawer2D implements GLConst {
 	 * @param texcoord
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
 		@NonNull final float[] vertices,
@@ -182,7 +160,6 @@ public class GLDrawer2D implements GLConst {
 	 * @param isOES
 	 * @return
 	 */
-	@SuppressLint("NewApi")
 	public static GLDrawer2D create(
 		final boolean isGLES3, final boolean isOES,
 		@Nullable final float[] vertices,
@@ -194,7 +171,14 @@ public class GLDrawer2D implements GLConst {
 			isOES, vertices, texcoord, vs, fs);
 	}
 
-//================================================================================
+	/**
+	 * 頂点座標用バッファオブジェクト名
+	 */
+	private int mBufVertex = GL_NO_BUFFER;
+	/**
+	 * テクスチャ座標用バッファオブジェクト名
+	 */
+	private int mBufTexCoord = GL_NO_BUFFER;
 	/**
 	 * GLES3を使うかどうか
 	 */
