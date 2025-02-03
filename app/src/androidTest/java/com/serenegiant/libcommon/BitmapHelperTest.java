@@ -77,7 +77,7 @@ public class BitmapHelperTest {
 	 * BitmapHelper#copyBitmapのテスト
 	 */
 	@Test
-	public void copy() {
+	public void copyTest() {
 		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
@@ -94,7 +94,7 @@ public class BitmapHelperTest {
 	 * BitmapHelper#invertAlphaのテスト
 	 */
 	@Test
-	public void invertAlpha() {
+	public void invertAlphaTest() {
 		final Bitmap b0 = BitmapHelper.genMaskImage(
 			0, WIDTH, HEIGHT,60,
 			Color.RED,0, 100);
@@ -107,7 +107,7 @@ public class BitmapHelperTest {
 	 * BitmapHelper#applyMirrorのテスト
 	 */
 	@Test
-	public void applyMirror() {
+	public void applyMirrorTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);

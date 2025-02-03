@@ -69,7 +69,7 @@ public class ImageTextureSourceTest {
 	}
 
 	@Test
-	public void imageTextureSource() {
+	public void imageTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -123,57 +123,57 @@ public class ImageTextureSourceTest {
 	}
 
 	@Test
-	public void frameRate5() {
+	public void frameRate5Test() {
 		frameRate(5);
 	}
 
 	@Test
-	public void frameRate10() {
+	public void frameRate10Test() {
 		frameRate(10);
 	}
 
 	@Test
-	public void frameRate15() {
+	public void frameRate15Test() {
 		frameRate(15);
 	}
 
 	@Test
-	public void frameRate20() {
+	public void frameRate20Test() {
 		frameRate(20);
 	}
 
 	@Test
-	public void frameRate24() {
+	public void frameRate24Test() {
 		frameRate(24);
 	}
 
 	@Test
-	public void frameRate30() {
+	public void frameRate30Test() {
 		frameRate(30);
 	}
 
 	@Test
-	public void frameRate33() {
+	public void frameRate33Test() {
 		frameRate(33);
 	}
 
 	@Test
-	public void frameRate35() {
+	public void frameRate35Test() {
 		frameRate(35);
 	}
 
 	@Test
-	public void frameRate45() {
+	public void frameRate45Test() {
 		frameRate(45);
 	}
 
 	@Test
-	public void frameRate50() {
+	public void frameRate50Test() {
 		frameRate(50);
 	}
 
 	@Test
-	public void frameRate60() {
+	public void frameRate60Test() {
 		frameRate(60);
 	}
 

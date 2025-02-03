@@ -66,7 +66,7 @@ public class SurfaceProxyTest {
 	}
 
 	@Test
-	public void surfaceProxyReaderWriter() {
+	public void surfaceProxyReaderWriterTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -126,7 +126,7 @@ public class SurfaceProxyTest {
 	}
 
 	@Test
-	public void surfaceProxyGLES() {
+	public void surfaceProxyGLESTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);

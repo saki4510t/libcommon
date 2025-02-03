@@ -56,7 +56,7 @@ public class GLManagerTest {
 	}
 
 	@Test
-	public void glManager() {
+	public void glManagerTest() {
 		try {
 			final GLManager manager = new GLManager();
 			assertTrue(manager.isValid());

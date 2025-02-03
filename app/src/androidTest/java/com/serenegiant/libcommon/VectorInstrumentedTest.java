@@ -36,7 +36,7 @@ public class VectorInstrumentedTest {
 	private static final float EPS = (float)Math.pow(10., Float.MIN_EXPONENT + 2);
 
 	@Test
-	public void rotate_test() throws Exception {
+	public void rotateTest() throws Exception {
 		final Vector v = new Vector(100, 0, 0);
 		// rotate
 		v.set(100, 0, 0).rotate(30, 0, 0, 1);

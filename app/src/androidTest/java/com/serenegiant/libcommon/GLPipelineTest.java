@@ -93,7 +93,7 @@ public class GLPipelineTest {
 	 * パイプラインの接続・切断・検索が正常に動作するかどうかを確認
 	 */
 	@Test
-	public void insert_remove_append_find() {
+	public void insertRemoveAppendFindTest() {
 		final ProxyPipeline src = new ProxyPipeline();
 		final ProxyPipeline dst1 = new ProxyPipeline();
 		final ProxyPipeline dst2 = new ProxyPipeline();
@@ -154,7 +154,7 @@ public class GLPipelineTest {
 	 * 正常にパイプラインに伝播して呼び出されるかどうかを確認
 	 */
 	@Test
-	public void proxyPipeline() {
+	public void proxyPipelineTest() {
 		final ProxyPipeline src = new ProxyPipeline();
 		final AtomicInteger cnt1 = new AtomicInteger();
 		final ProxyPipeline dst1 = new ProxyPipeline() {
@@ -241,7 +241,7 @@ public class GLPipelineTest {
 	 * ImageSourceパイプラインが正常に映像ソースとして動作するかどうかを検証
 	 */
 	@Test
-	public void imageSource() {
+	public void imageSourceTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -307,7 +307,7 @@ public class GLPipelineTest {
 	 * DistributePipelineで複数のGLPipelineへの分配処理が動作するかどうかを検証
 	 */
 	@Test
-	public void distributePipeline() {
+	public void distributePipelineTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -395,7 +395,7 @@ public class GLPipelineTest {
 	 * 供給できるかどうかを検証
 	 */
 	@Test
-	public void surfacePipeline_videoSourcePipeline() {
+	public void surfacePipelineVideoSourcePipelineTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -473,7 +473,7 @@ public class GLPipelineTest {
 	 *       でも#effectPipeline2と#effectPipeline3は成功する
 	 */
 	@Test
-	public void effectPipeline1() {
+	public void effectPipelineTest1() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -533,7 +533,7 @@ public class GLPipelineTest {
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
 	 */
 	@Test
-	public void effectPipeline2() {
+	public void effectPipelineTest2() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -596,7 +596,7 @@ public class GLPipelineTest {
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
 	 */
 	@Test
-	public void effectPipeline3() {
+	public void effectPipelineTest3() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -660,7 +660,7 @@ public class GLPipelineTest {
 	 * DrawerPipelineが動作するかどうかを検証
 	 */
 	@Test
-	public void drawerPipeline() {
+	public void drawerPipelineTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -717,7 +717,7 @@ public class GLPipelineTest {
 	}
 
 	@Test
-	public void capturePipeline_oneshot() {
+	public void capturePipelineOneshotTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -767,7 +767,7 @@ public class GLPipelineTest {
 	}
 
 	@Test
-	public void capturePipeline_multiple() {
+	public void capturePipelineMultipleTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -848,6 +848,5 @@ public class GLPipelineTest {
 		}
 		return result;
 	}
-
 
 }

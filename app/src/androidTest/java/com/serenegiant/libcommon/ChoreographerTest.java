@@ -50,7 +50,7 @@ public class ChoreographerTest {
    private static final long MAX_WAIT_MS = 20000L;
 
    @Test
-   public void countFrames() {
+   public void countFramesTest() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       final AtomicInteger numFrames = new AtomicInteger();
       final CountDownLatch latch = new CountDownLatch(1);
@@ -123,63 +123,63 @@ public class ChoreographerTest {
 //   }
 
    @Test
-   public void frameRate10() {
+   public void frameRate10Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 10);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate15() {
+   public void frameRate15Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 15);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate20() {
+   public void frameRate20Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 20);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate30() {
+   public void frameRate30Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 30);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate33() {
+   public void frameRate33Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 33);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate40() {
+   public void frameRate40Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 40);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate45() {
+   public void frameRate45Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 45);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate50() {
+   public void frameRate50Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 50);
       HandlerUtils.quit(asyncHandler);
    }
 
    @Test
-   public void frameRate60() {
+   public void frameRate60Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 60);
       HandlerUtils.quit(asyncHandler);

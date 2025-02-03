@@ -70,7 +70,7 @@ public class GLManagerTest2 {
 	}
 
 	@Test
-	public void glManager() {
+	public void glManagerTest() {
 		final AtomicBoolean booleanResult = new AtomicBoolean();
 		runOnGL(new GLRunnable() {
 			@Override

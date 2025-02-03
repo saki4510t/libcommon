@@ -117,7 +117,7 @@ public class GLImageReceiverTest {
 	}
 
 	@Test
-	public void pipelineReader() {
+	public void pipelineReaderTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
