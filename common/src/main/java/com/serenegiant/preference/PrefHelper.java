@@ -268,12 +268,14 @@ public class PrefHelper {
 				for (final Map.Entry<String, ?> srcEntry: srcValues.entrySet()) {
 					final String key = srcEntry.getKey();
 					final Object srcValue = srcEntry.getValue();
-					boolean override = false;
+					boolean needCopy = true;
 					if (dst.contains(key)) {
+						// dstに同じキーが含まれている場合
 						final Object dstValue = getObject(dst, key, null);
-						override = callback != null && callback.onMerge(key, srcValue, dstValue);
+						// callbackがnull以外でtrueを返すと上書きする
+						needCopy = callback != null && callback.onMerge(key, srcValue, dstValue);
 					}
-					if (override) {
+					if (needCopy) {
 						if (srcValue instanceof String) {
 							editor.putString(key, (String)srcValue);
 						} else if (srcValue instanceof Set) {
