@@ -100,12 +100,8 @@ public class EffectPipeline extends ProxyPipeline
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
-		manager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				createTargetOnGL(surface, maxFps);
-			}
+		manager.runOnGLThread(() -> {
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -154,12 +150,8 @@ public class EffectPipeline extends ProxyPipeline
 		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				createTargetOnGL(surface, maxFps);
-			}
+		mManager.runOnGLThread(() -> {
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -281,22 +273,18 @@ public class EffectPipeline extends ProxyPipeline
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
 		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					EffectDrawer2D drawer = mDrawer;
-					mDrawer = null;
-					if (drawer != null) {
-						mLock.lock();
-						try {
-							mEffect = drawer.getCurrentEffect();
-						} finally {
-							mLock.unlock();
-						}
-						drawer.release();
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
+				EffectDrawer2D drawer = mDrawer;
+				mDrawer = null;
+				if (drawer != null) {
+					mLock.lock();
+					try {
+						mEffect = drawer.getCurrentEffect();
+					} finally {
+						mLock.unlock();
 					}
+					drawer.release();
 				}
 			});
 		}
@@ -309,18 +297,14 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	public void resetEffect() throws IllegalStateException {
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (mDrawer != null) {
-						mDrawer.resetEffect();
-						mLock.lock();
-						try {
-							mEffect = mDrawer.getCurrentEffect();
-						} finally {
-							mLock.unlock();
-						}
+			mManager.runOnGLThread(() -> {
+				if (mDrawer != null) {
+					mDrawer.resetEffect();
+					mLock.lock();
+					try {
+						mEffect = mDrawer.getCurrentEffect();
+					} finally {
+						mLock.unlock();
 					}
 				}
 			});
@@ -348,19 +332,15 @@ public class EffectPipeline extends ProxyPipeline
 	public void changeEffect(final int effect) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
-					if (mDrawer != null) {
-						mDrawer.setEffect(effect);
-						mLock.lock();
-						try {
-							mEffect = mDrawer.getCurrentEffect();
-						} finally {
-							mLock.unlock();
-						}
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
+				if (mDrawer != null) {
+					mDrawer.setEffect(effect);
+					mLock.lock();
+					try {
+						mEffect = mDrawer.getCurrentEffect();
+					} finally {
+						mLock.unlock();
 					}
 				}
 			});
@@ -399,14 +379,10 @@ public class EffectPipeline extends ProxyPipeline
 		throws IllegalStateException {
 
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
-					if (mDrawer != null) {
-						mDrawer.setParams(effect, params);
-					}
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
+				if (mDrawer != null) {
+					mDrawer.setParams(effect, params);
 				}
 			});
 		} else {
@@ -484,21 +460,17 @@ public class EffectPipeline extends ProxyPipeline
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
 			if (mManager.isValid()) {
 				try {
-					mManager.runOnGLThread(new Runnable() {
-						@WorkerThread
-						@Override
-						public void run() {
-							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-								drawer.release();
-							}
-							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-								target.release();
-							}
-							if (w != null) {
-								w.release();
-							}
+					mManager.runOnGLThread(() -> {
+						if (drawer != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+							drawer.release();
+						}
+						if (target != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+							target.release();
+						}
+						if (w != null) {
+							w.release();
 						}
 					});
 				} catch (final Exception e) {

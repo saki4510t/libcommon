@@ -145,12 +145,8 @@ public class DrawerPipeline extends ProxyPipeline
 		}
 		mManager = manager;
 		mCallback = callback;
-		manager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				createTargetOnGL(surface, maxFps);
-			}
+		manager.runOnGLThread(() -> {
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -199,12 +195,8 @@ public class DrawerPipeline extends ProxyPipeline
 		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				createTargetOnGL(surface, maxFps);
-			}
+		mManager.runOnGLThread(() -> {
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -328,15 +320,11 @@ public class DrawerPipeline extends ProxyPipeline
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
 		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					if (mDrawer != null) {
-						mCallback.releaseDrawer(mManager, mDrawer);
-						mDrawer = null;
-					}
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
+				if (mDrawer != null) {
+					mCallback.releaseDrawer(mManager, mDrawer);
+					mDrawer = null;
 				}
 			});
 		}
@@ -347,13 +335,9 @@ public class DrawerPipeline extends ProxyPipeline
 	public void resize(final int width, final int height) throws IllegalStateException {
 		super.resize(width, height);
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				if (DEBUG) Log.v(TAG, "resize#run:");
-				mCallback.onResize(mManager, mDrawer, width, height);
-			}
+		mManager.runOnGLThread(() -> {
+			if (DEBUG) Log.v(TAG, "resize#run:");
+			mCallback.onResize(mManager, mDrawer, width, height);
 		});
 	}
 
@@ -362,31 +346,27 @@ public class DrawerPipeline extends ProxyPipeline
 		if (DEBUG) Log.v(TAG, "releaseAll:");
 		if (mManager.isValid()) {
 			try {
-				mManager.runOnGLThread(new Runnable() {
-					@WorkerThread
-					@Override
-					public void run() {
-						if (DEBUG) Log.v(TAG, "releaseAll#run:");
-						mLock.lock();
-						try {
-							if (mRendererTarget != null) {
-								if (DEBUG) Log.v(TAG, "releaseAll:release target");
-								mRendererTarget.release();
-								mRendererTarget = null;
-							}
-							if (offscreenSurface != null) {
-								if (DEBUG) Log.v(TAG, "releaseAll:release work");
-								offscreenSurface.release();
-								offscreenSurface = null;
-							}
-						} finally {
-							mLock.unlock();
+				mManager.runOnGLThread(() -> {
+					if (DEBUG) Log.v(TAG, "releaseAll#run:");
+					mLock.lock();
+					try {
+						if (mRendererTarget != null) {
+							if (DEBUG) Log.v(TAG, "releaseAll:release target");
+							mRendererTarget.release();
+							mRendererTarget = null;
 						}
-						if (mDrawer != null) {
-							mCallback.releaseDrawer(mManager, mDrawer);
+						if (offscreenSurface != null) {
+							if (DEBUG) Log.v(TAG, "releaseAll:release work");
+							offscreenSurface.release();
+							offscreenSurface = null;
 						}
-						mDrawer = null;
+					} finally {
+						mLock.unlock();
 					}
+					if (mDrawer != null) {
+						mCallback.releaseDrawer(mManager, mDrawer);
+					}
+					mDrawer = null;
 				});
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);

@@ -304,25 +304,21 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	 */
 	private void createTarget(@NonNull final Surface surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:surface=" + surface + ",maxFps=" + maxFps);
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				mLock.lock();
-				try {
-					if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-						// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-						mRendererTarget.release();
-						mRendererTarget = null;
-					}
-					if ((mRendererTarget == null)
-						&& GLUtils.isSupportedSurface(surface)) {
-						mRendererTarget = RendererTarget.newInstance(
-							mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					}
-				} finally {
-					mLock.unlock();
+		mManager.runOnGLThread(() -> {
+			mLock.lock();
+			try {
+				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+					mRendererTarget.release();
+					mRendererTarget = null;
 				}
+				if ((mRendererTarget == null)
+					&& GLUtils.isSupportedSurface(surface)) {
+					mRendererTarget = RendererTarget.newInstance(
+						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				}
+			} finally {
+				mLock.unlock();
 			}
 		});
 	}
@@ -343,18 +339,14 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
 			if (mManager.isValid()) {
 				try {
-					mManager.runOnGLThread(new Runnable() {
-						@WorkerThread
-						@Override
-						public void run() {
-							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-								drawer.release();
-							}
-							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-								target.release();
-							}
+					mManager.runOnGLThread(() -> {
+						if (drawer != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+							drawer.release();
+						}
+						if (target != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+							target.release();
 						}
 					});
 				} catch (final Exception e) {

@@ -65,12 +65,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
 		mManager = manager;
 		if (bitmap != null) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					createImageSource(bitmap, fps);
-				}
+			mManager.runOnGLThread(() -> {
+				createImageSource(bitmap, fps);
 			});
 		}
 	}
@@ -100,11 +96,8 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@Override
 	protected void internalRelease() {
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@Override
-				public void run() {
-					releaseImageSource();
-				}
+			mManager.runOnGLThread(() -> {
+				releaseImageSource();
 			});
 		}
 		super.internalRelease();
@@ -209,19 +202,16 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @param fps
 	 */
 	public void setSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
-		mManager.runOnGLThread(new Runnable() {
-			@Override
-			public void run() {
-				mLock.lock();
-				try {
-					if (bitmap == null) {
-						releaseImageSource();
-					} else {
-						createImageSource(bitmap, fps);
-					}
-				} finally {
-					mLock.unlock();
+		mManager.runOnGLThread(() -> {
+			mLock.lock();
+			try {
+				if (bitmap == null) {
+					releaseImageSource();
+				} else {
+					createImageSource(bitmap, fps);
 				}
+			} finally {
+				mLock.unlock();
 			}
 		});
 	}

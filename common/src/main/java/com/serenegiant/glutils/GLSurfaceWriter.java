@@ -324,18 +324,14 @@ public class GLSurfaceWriter implements IMirror {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
 			if (mManager.isValid()) {
 				try {
-					mManager.runOnGLThread(new Runnable() {
-						@WorkerThread
-						@Override
-						public void run() {
-							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-								drawer.release();
-							}
-							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-								target.release();
-							}
+					mManager.runOnGLThread(() -> {
+						if (drawer != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+							drawer.release();
+						}
+						if (target != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+							target.release();
 						}
 					});
 				} catch (final Exception e) {

@@ -437,7 +437,7 @@ public class GLManager {
 	 * GLコンテキストを保持しているスレッド上での実行要求
 	 * @param task
 	 */
-	public void runOnGLThread(final Runnable task)
+	public void runOnGLThread(@NonNull final Runnable task)
 		throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "runOnGLThread:");
@@ -461,7 +461,7 @@ public class GLManager {
 	 * @param delayMs
 	 * @throws IllegalStateException
 	 */
-	public void runOnGLThread(final Runnable task, final long delayMs)
+	public void runOnGLThread(@NonNull final Runnable task, final long delayMs)
 		throws IllegalStateException{
 
 		if (DEBUG) Log.v(TAG, "runOnGLThread:");

@@ -105,13 +105,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
-		manager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				final boolean isGLES3 = manager.isGLES3();
-				createTargetOnGL(surface, maxFps);
-			}
+		manager.runOnGLThread(() -> {
+			final boolean isGLES3 = manager.isGLES3();
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -160,12 +156,8 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				createTargetOnGL(surface, maxFps);
-			}
+		mManager.runOnGLThread(() -> {
+			createTargetOnGL(surface, maxFps);
 		});
 	}
 
@@ -268,13 +260,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
 		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					releaseDrawerOnGL();
-				}
+			mManager.runOnGLThread(() ->{
+				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
+				releaseDrawerOnGL();
 			});
 		}
 	}
@@ -284,13 +272,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	public void resize(final int width, final int height) throws IllegalStateException {
 		super.resize(width, height);
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				if (DEBUG) Log.v(TAG, "resize#run:");
-				releaseMaskOnGL();
-			}
+		mManager.runOnGLThread(() -> {
+			if (DEBUG) Log.v(TAG, "resize#run:");
+			releaseMaskOnGL();
 		});
 	}
 
@@ -303,13 +287,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "setMask:");
-		mManager.runOnGLThread(new Runnable() {
-			@WorkerThread
-			@Override
-			public void run() {
-				mMaskBitmap = bitmap;
-				mRequestUpdateMask = true;
-			}
+		mManager.runOnGLThread(() -> {
+			mMaskBitmap = bitmap;
+			mRequestUpdateMask = true;
 		});
 	}
 
@@ -324,24 +304,20 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		}
 		if (mManager.isValid()) {
 			try {
-				mManager.runOnGLThread(new Runnable() {
-					@WorkerThread
-					@Override
-					public void run() {
-						if (DEBUG) Log.v(TAG, "releaseAll#run:");
-						mMaskBitmap = null;
-						if (mRendererTarget != null) {
-							if (DEBUG) Log.v(TAG, "releaseAll:release target");
-							mRendererTarget.release();
-							mRendererTarget = null;
-						}
-						if (work != null) {
-							if (DEBUG) Log.v(TAG, "releaseAll:release work");
-							work.release();
-							work = null;
-						}
-						releaseDrawerOnGL();
+				mManager.runOnGLThread(() -> {
+					if (DEBUG) Log.v(TAG, "releaseAll#run:");
+					mMaskBitmap = null;
+					if (mRendererTarget != null) {
+						if (DEBUG) Log.v(TAG, "releaseAll:release target");
+						mRendererTarget.release();
+						mRendererTarget = null;
 					}
+					if (work != null) {
+						if (DEBUG) Log.v(TAG, "releaseAll:release work");
+						work.release();
+						work = null;
+					}
+					releaseDrawerOnGL();
 				});
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);

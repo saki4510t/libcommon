@@ -233,22 +233,18 @@ public class FaceDetectPipeline extends ProxyPipeline {
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
 		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					GLDrawer2D drawer;
-					mLock.lock();
-					try {
-						drawer = mDrawer;
-						mDrawer = null;
-					} finally {
-						mLock.unlock();
-					}
-					if (drawer != null) {
-						drawer.release();
-					}
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
+				GLDrawer2D drawer;
+				mLock.lock();
+				try {
+					drawer = mDrawer;
+					mDrawer = null;
+				} finally {
+					mLock.unlock();
+				}
+				if (drawer != null) {
+					drawer.release();
 				}
 			});
 		}
@@ -314,22 +310,18 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
 			if (mManager.isValid()) {
 				try {
-					mManager.runOnGLThread(new Runnable() {
-						@WorkerThread
-						@Override
-						public void run() {
-							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-								drawer.release();
-							}
-							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-								target.release();
-							}
-							if (surface != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release work surface");
-								surface.release();
-							}
+					mManager.runOnGLThread(() -> {
+						if (drawer != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+							drawer.release();
+						}
+						if (target != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+							target.release();
+						}
+						if (surface != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release work surface");
+							surface.release();
 						}
 					});
 				} catch (final Exception e) {

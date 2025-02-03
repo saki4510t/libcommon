@@ -105,12 +105,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 		mWidth = DEFAULT_WIDTH;
 		mHeight = DEFAULT_HEIGHT;
 		if (bitmap != null) {
-			mManager.runOnGLThread(new Runnable() {
-				@WorkerThread
-				@Override
-				public void run() {
-					createImageSource(bitmap, fps);
-				}
+			mManager.runOnGLThread(() -> {
+				createImageSource(bitmap, fps);
 			});
 		}
 	}
@@ -133,12 +129,9 @@ public class ImageTextureSource implements GLConst, IMirror {
 
 	protected void internalRelease() {
 		if (isValid()) {
-			mManager.runOnGLThread(new Runnable() {
-				@Override
-				public void run() {
-					releaseImageSource();
-					releaseTarget();
-				}
+			mManager.runOnGLThread(() -> {
+				releaseImageSource();
+				releaseTarget();
 			});
 		}
 	}
@@ -241,19 +234,16 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * @param fps
 	 */
 	public void setSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
-		mManager.runOnGLThread(new Runnable() {
-			@Override
-			public void run() {
-				mLock.lock();
-				try {
-					if (bitmap == null) {
-						releaseImageSource();
-					} else {
-						createImageSource(bitmap, fps);
-					}
-				} finally {
-					mLock.unlock();
+		mManager.runOnGLThread(() -> {
+			mLock.lock();
+			try {
+				if (bitmap == null) {
+					releaseImageSource();
+				} else {
+					createImageSource(bitmap, fps);
 				}
+			} finally {
+				mLock.unlock();
 			}
 		});
 	}
@@ -276,11 +266,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(new Runnable() {
-			@Override
-			public void run() {
-				createTargetOnGL(surface);
-			}
+		mManager.runOnGLThread(() -> {
+			createTargetOnGL(surface);
 		});
 	}
 
@@ -428,18 +415,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 			if (DEBUG) Log.v(TAG, "releaseTarget:");
 			if (mManager.isValid()) {
 				try {
-					mManager.runOnGLThread(new Runnable() {
-						@WorkerThread
-						@Override
-						public void run() {
-							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-								drawer.release();
-							}
-							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-								target.release();
-							}
+					mManager.runOnGLThread(() -> {
+						if (drawer != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+							drawer.release();
+						}
+						if (target != null) {
+							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+							target.release();
 						}
 					});
 				} catch (final Exception e) {

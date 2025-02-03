@@ -66,14 +66,11 @@ public class GLManagerTest {
 			final Semaphore sem = new Semaphore(0);
 			final AtomicBoolean booleanResult = new AtomicBoolean();
 			final AtomicInteger intResult = new AtomicInteger();
-			manager.runOnGLThread(new Runnable() {
-				@Override
-				public void run() {
-					GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-					intResult.set(GLES20.glGetError());
-					booleanResult.set(manager.isGLThread());
-					sem.release();
-				}
+			manager.runOnGLThread(() -> {
+				GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+				intResult.set(GLES20.glGetError());
+				booleanResult.set(manager.isGLThread());
+				sem.release();
 			});
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
 			assertTrue(booleanResult.get());
@@ -84,14 +81,11 @@ public class GLManagerTest {
 			assertEquals(2, manager.getMasterWidth());
 			assertEquals(3, manager.getMasterHeight());
 
-			manager.runOnGLThread(new Runnable() {
-				@Override
-				public void run() {
-					GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-					intResult.set(GLES20.glGetError());
-					booleanResult.set(manager.isGLThread());
-					sem.release();
-				}
+			manager.runOnGLThread(() -> {
+				GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+				intResult.set(GLES20.glGetError());
+				booleanResult.set(manager.isGLThread());
+				sem.release();
 			});
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
 			assertTrue(booleanResult.get());
