@@ -186,53 +186,53 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * 頂点の数
 	 */
-	protected final int VERTEX_NUM;
+	private final int VERTEX_NUM;
 	/**
 	 * 頂点配列のサイズ
 	 */
-	protected final int VERTEX_SZ;
+	private final int VERTEX_SZ;
 	/**
 	 * 頂点座標
 	 */
-	protected final FloatBuffer pVertex;
+	private final FloatBuffer pVertex;
 	/**
 	 * テクスチャ座標
 	 */
-	protected final FloatBuffer pTexCoord;
+	private final FloatBuffer pTexCoord;
 	/**
 	 * テクスチャターゲット
 	 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 */
 	@TexTarget
-	protected final int mTexTarget;
+	private final int mTexTarget;
 
-	protected int hProgram;
+	private int hProgram;
 	/**
 	 * 頂点座標のlocation
 	 */
-	protected int maPositionLoc;
+	private int maPositionLoc;
 	/**
 	 * テクスチャ座標のlocation
 	 */
-	protected int maTextureCoordLoc;
+	private int maTextureCoordLoc;
 	/**
 	 * 使用するテクスチャユニットのlocation
 	 */
-	protected int muTextureLoc;
+	private int muTextureLoc;
 	/**
 	 * モデルビュー変換行列のlocation
 	 */
-	protected int muMVPMatrixLoc;
+	private int muMVPMatrixLoc;
 	/**
 	 * テクスチャ座標変換行列のlocation
 	 */
-	protected int muTexMatrixLoc;
+	private int muTexMatrixLoc;
 	/**
 	 * モデルビュー変換行列
 	 */
 	@Size(min=16)
     @NonNull
-	protected final float[] mMvpMatrix = new float[16];
+	private final float[] mMvpMatrix = new float[16];
 	/**
 	 * エラーカウンタ
 	 */
