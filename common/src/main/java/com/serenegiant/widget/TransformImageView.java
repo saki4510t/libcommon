@@ -75,20 +75,6 @@ public class TransformImageView extends AppCompatImageView
 		super.setScaleType(scaleType);
 	}
 
-	protected void superSetImageMatrix(@Nullable final Matrix transform) {
-		super.setImageMatrix(transform);
-	}
-
-	protected Matrix superGetImageMatrix(@Nullable final Matrix transform) {
-		Matrix result = transform;
-		if (result != null) {
-			result.set(super.getImageMatrix());
-		} else {
-			result = new Matrix(super.getImageMatrix());
-		}
-		return result;
-	}
-
 	/**
 	 * IViewTransformerをセット
 	 * @param transformer
@@ -126,7 +112,7 @@ public class TransformImageView extends AppCompatImageView
 	 */
 	@Override
 	public void setTransform(@Nullable final Matrix transform) {
-		superSetImageMatrix(transform);
+		super.setImageMatrix(transform);
 	}
 
 	/**
@@ -137,7 +123,13 @@ public class TransformImageView extends AppCompatImageView
 	@NonNull
 	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		return superGetImageMatrix(transform);
+		Matrix result = transform;
+		if (result != null) {
+			result.set(super.getImageMatrix());
+		} else {
+			result = new Matrix(super.getImageMatrix());
+		}
+		return result;
 	}
 
 }
