@@ -299,6 +299,47 @@ public class PrefHelper {
 	}
 
 	/**
+	 * fromで指定した共有プレファレンスからkeysSrcで指定した共有プレファレンスに含まれるキーを全て取り除く
+	 * @param from
+	 * @param keysSrc
+	 * @return
+	 */
+	public static boolean removeAll(
+		@NonNull final SharedPreferences from,
+		@NonNull final SharedPreferences keysSrc) {
+		final String[] keys = keysSrc.getAll().keySet().toArray(new String[0]);
+		return removeAll(from, keys);
+	}
+
+	/**
+	 * fromで指定した共有プレファレンスからkeysで指定したキーを全て取り除く
+	 * @param from
+	 * @param keys
+	 * @return
+	 */
+	public static boolean removeAll(
+		@NonNull final SharedPreferences from,
+		final String[] keys) {
+
+		boolean removed = false;
+		if ((keys != null) && (keys.length > 0)) {
+			final SharedPreferences.Editor editor = from.edit();
+			try {
+				for (final String key: keys) {
+					if (from.contains(key)) {
+						editor.remove(key);
+						removed = true;
+					}
+				}
+			} finally {
+				editor.apply();
+			}
+		}
+
+		return removed;
+	}
+
+	/**
 	 * 共有プレファレンスのkey-valueペアをLog.dでlogCatへ出力
 	 * @param tag
 	 * @param preferences
