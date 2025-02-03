@@ -200,7 +200,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 		private final float[] mMatrixCache = new float[9];
 
         /**
-         * constractor to restore state
+         * constructor to restore state
          */
         public SavedState(final Parcel in) {
             super(in);
@@ -339,7 +339,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 */
 	private float mMinScale = DEFAULT_MIN_SCALE;
 	/**
-	 * current state, -1/STATE_NON/STATE_WATING/STATE_DRAGGING/STATE_CHECKING
+	 * current state, -1/STATE_NON/STATE_WAITING/STATE_DRAGGING/STATE_CHECKING
 	 * 					/STATE_ZOOMING/STATE_ROTATING
 	 */
 	@State
