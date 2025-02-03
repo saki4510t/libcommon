@@ -23,7 +23,6 @@ import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.serenegiant.view.IViewTransformer;
 import com.serenegiant.view.ViewTransformer;
 
 import androidx.annotation.NonNull;
@@ -31,16 +30,17 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.AppCompatImageView;
 
 /**
- * ImageView(AppCompatImageView)へIViewTransformerによる
+ * ImageView(AppCompatImageView)へViewTransformerによる
  * 表示内容のトランスフォーム機能を追加
  */
-public class TransformImageView extends AppCompatImageView {
+public class TransformImageView extends AppCompatImageView
+	implements ITransformView {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = TransformImageView.class.getSimpleName();
 
 	@Nullable
-	private IViewTransformer mViewTransformer;
+	private ViewTransformer mViewTransformer;
 
 	/**
 	 * コンストラクタ
@@ -93,7 +93,7 @@ public class TransformImageView extends AppCompatImageView {
 	 * IViewTransformerをセット
 	 * @param transformer
 	 */
-	public void setViewTransformer(@Nullable final IViewTransformer transformer) {
+	public void setViewTransformer(@Nullable final ViewTransformer transformer) {
 		mViewTransformer = transformer;
 	}
 
@@ -103,45 +103,41 @@ public class TransformImageView extends AppCompatImageView {
 	 * @return
 	 */
 	@NonNull
-	public IViewTransformer getViewTransformer() {
+	public ViewTransformer getViewTransformer() {
 		if (mViewTransformer == null) {
-			mViewTransformer = new DefaultViewTransformer(this);
+			mViewTransformer = new ViewTransformer(this);
 		}
 		return mViewTransformer;
 	}
 //--------------------------------------------------------------------------------
 	/**
-	 * トランスフォームマトリックス設定用のヘルパーメソッド
-	 * @param transform
+	 * ITransformViewの実装
+	 * @return
 	 */
-	public void setTransform(@Nullable final Matrix transform) {
-		getViewTransformer().setTransform(transform);
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
 	}
 
 	/**
-	 * トランスフォームマトリックス取得用のヘルパーメソッド
+	 * ITransformViewの実装
+	 * @param transform
+	 */
+	@Override
+	public void setTransform(@Nullable final Matrix transform) {
+		superSetImageMatrix(transform);
+	}
+
+	/**
+	 * ITransformViewの実装
 	 * @param transform
 	 * @return
 	 */
+	@NonNull
+	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
-		return getViewTransformer().getTransform(transform);
+		return superGetImageMatrix(transform);
 	}
 
-//--------------------------------------------------------------------------------
-	public static class DefaultViewTransformer extends ViewTransformer {
-		public DefaultViewTransformer(@NonNull final TransformImageView view) {
-			super(view);
-		}
-
-		@Override
-		protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-			((TransformImageView)getTargetView()).superSetImageMatrix(transform);
-		}
-
-		@NonNull
-		@Override
-		protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-			return ((TransformImageView)getTargetView()).superGetImageMatrix(transform);
-		}
-	}
 }

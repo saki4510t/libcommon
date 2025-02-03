@@ -83,10 +83,6 @@ class CameraImageView @JvmOverloads constructor(
 		scaleType = ScaleType.CENTER_CROP
 	}
 
-	override fun getView() : View {
-		return this
-	}
-
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
 		mCameraDelegator.onResume()

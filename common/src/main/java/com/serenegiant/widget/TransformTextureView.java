@@ -19,23 +19,27 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
-import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.View;
 
-import com.serenegiant.view.IViewTransformer;
 import com.serenegiant.view.ViewTransformer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-public class TransformTextureView extends TextureView {
+/**
+ * TextureViewへViewTransformerによる
+ * 表示内容のトランスフォーム機能を追加
+ */
+public class TransformTextureView extends TextureView
+	implements ITransformView {
+
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = TransformTextureView.class.getSimpleName();
 
 	@Nullable
-	private IViewTransformer mViewTransformer;
+	private ViewTransformer mViewTransformer;
 
 	/**
 	 * コンストラクタ
@@ -68,16 +72,8 @@ public class TransformTextureView extends TextureView {
 	 * IViewTransformerをセット
 	 * @param transformer
 	 */
-	public void setViewTransformer(@Nullable final IViewTransformer transformer) {
+	public void setViewTransformer(@Nullable final ViewTransformer transformer) {
 		mViewTransformer = transformer;
-	}
-
-	protected void superSetTransform(@Nullable final Matrix transform) {
-		super.setTransform(transform);
-	}
-
-	protected Matrix superGetTransform(@Nullable final Matrix transform) {
-		return super.getTransform(transform);
 	}
 
 	/**
@@ -86,29 +82,20 @@ public class TransformTextureView extends TextureView {
 	 * @return
 	 */
 	@NonNull
-	public IViewTransformer getViewTransformer() {
+	public ViewTransformer getViewTransformer() {
 		if (mViewTransformer == null) {
-			mViewTransformer = new DefaultViewTransformer(this);
+			mViewTransformer = new ViewTransformer(this);
 		}
 		return mViewTransformer;
 	}
 
-//--------------------------------------------------------------------------------
-	public static class DefaultViewTransformer extends ViewTransformer {
-		public DefaultViewTransformer(@NonNull final TransformTextureView view) {
-			super(view);
-		}
-
-		@Override
-		protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-			((TransformTextureView)getTargetView()).superSetTransform(transform);
-		}
-
-		@NonNull
-		@Override
-		protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-			return ((TransformTextureView)getTargetView()).superGetTransform(transform);
-		}
+	/**
+	 * ITransformViewの実装
+	 * @return
+	 */
+	@NonNull
+	@Override
+	public View getView() {
+		return this;
 	}
-
 }

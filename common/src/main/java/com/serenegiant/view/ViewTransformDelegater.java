@@ -32,6 +32,7 @@ import android.view.View;
 import android.view.ViewConfiguration;
 
 import com.serenegiant.widget.IScaledView;
+import com.serenegiant.widget.ITransformView;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -367,7 +368,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public ViewTransformDelegater(@NonNull final View parent) {
+	public ViewTransformDelegater(@NonNull final ITransformView parent) {
 		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (parent instanceof ViewTransformListener) {

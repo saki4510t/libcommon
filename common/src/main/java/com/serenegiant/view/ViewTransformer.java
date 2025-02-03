@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.View;
 
 import com.serenegiant.graphics.MatrixUtils;
+import com.serenegiant.widget.ITransformView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -31,13 +32,13 @@ import androidx.annotation.Nullable;
 /**
  * ITransformViewの表示内容のトランスフォーム用ヘルパークラス
  */
-public abstract class ViewTransformer implements IViewTransformer {
+public class ViewTransformer {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ViewTransformer.class.getSimpleName();
 
 	@NonNull
-	private final View mTargetView;
+	private final ITransformView mTargetView;
 	/**
 	 * デフォルトのトランスフォームマトリックス
 	 * #setDefaultで変更していなければコンストラクタ実行時に
@@ -75,7 +76,7 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 * コンストラクタ
 	 * @param view
 	 */
-	public ViewTransformer(@NonNull final View view) {
+	public ViewTransformer(@NonNull final ITransformView view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);
@@ -87,7 +88,7 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 */
 	@NonNull
 	public View getTargetView() {
-		return mTargetView;
+		return mTargetView.getView();
 	}
 
 	/**
@@ -95,7 +96,6 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 * @param transform nullなら単位行列が設定される
 	 */
 	@NonNull
-	@Override
 	public ViewTransformer setTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + transform);
 		if (mTransform != transform) {
@@ -112,7 +112,6 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public Matrix getTransform(@Nullable final Matrix transform) {
 		if (transform != null) {
 			transform.set(mTransform);
@@ -129,7 +128,6 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public ViewTransformer updateTransform(final boolean saveAsDefault) {
 		internalGetTransform(mTransform);
 		if (saveAsDefault) {
@@ -150,7 +148,6 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public ViewTransformer setDefault(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "setDefault=" + transform);
 		if (mDefaultTransform != transform) {
@@ -395,10 +392,8 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 */
 	private void internalSetTransform(@Nullable final Matrix transform) {
 		if (DEBUG) Log.v(TAG, "internalSetTransform:" + transform);
-		setTransform(mTargetView, transform);
+		mTargetView.setTransform(transform);
 	}
-
-	protected abstract void setTransform(@NonNull final View view, @Nullable final Matrix transform);
 
 	/**
 	 * ITransformViewからのトランスフォームマトリックス取得処理
@@ -409,15 +404,12 @@ public abstract class ViewTransformer implements IViewTransformer {
 	 */
 	@NonNull
 	private Matrix internalGetTransform(@Nullable final Matrix transform) {
-		final Matrix result = getTransform(mTargetView, transform);
+		final Matrix result = mTargetView.getTransform(transform);
 		if ((result != transform) && (transform != null)) {
 			transform.set(result);
 		}
 		return result;
 	}
-
-	@NonNull
-	protected abstract Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform);
 
 	/**
 	 * トランスフォームマトリックスを設定
@@ -450,8 +442,10 @@ public abstract class ViewTransformer implements IViewTransformer {
 					mCurrentRotate += 360;
 				}
 			}
-			final int w2 = mTargetView.getWidth() >> 1;
-			final int h2 = mTargetView.getHeight() >> 1;
+			@NonNull
+			final View view = mTargetView.getView();
+			final int w2 = view.getWidth() >> 1;
+			final int h2 = view.getHeight() >> 1;
 			// 回転 → 拡大縮小 → 平行移動 → デフォルト
 			// デフォルトトランスフォームマトリックスをセット
 			mTransform.set(mDefaultTransform);

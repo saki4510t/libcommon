@@ -35,7 +35,7 @@ import androidx.annotation.Size;
  * IGLTransformViewのトランスフォーム処理用ヘルパークラス
  * OpenGL|ESのモデルビュー変換行列を操作してトランスフォームを実行する
  */
-public class GLViewTransformer implements IGLViewTransformer {
+public class GLViewTransformer {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
 	private static final String TAG = GLViewTransformer.class.getSimpleName();
@@ -104,7 +104,6 @@ public class GLViewTransformer implements IGLViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public GLViewTransformer updateTransform(final boolean saveAsDefault) {
 		internalGetTransform(mTransform);
 		if (saveAsDefault) {
@@ -126,7 +125,6 @@ public class GLViewTransformer implements IGLViewTransformer {
 	 * @param transform nullまたは要素数が16未満なら単位行列が設定される
 	 */
 	@NonNull
-	@Override
 	public final GLViewTransformer setTransform(@Nullable @Size(min=16) final float[] transform) {
 		if (DEBUG) Log.v(TAG, "setTransform:" + Arrays.toString(transform));
 		if ((transform != null) && (transform.length >= 16)) {
@@ -146,7 +144,6 @@ public class GLViewTransformer implements IGLViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public float[] getTransform(@Nullable final float[] transform) {
 		float[] result = transform;
 		if ((result == null) && (transform.length < 16)) {
@@ -162,7 +159,6 @@ public class GLViewTransformer implements IGLViewTransformer {
 	 * @return
 	 */
 	@NonNull
-	@Override
 	public GLViewTransformer setDefault(@Nullable @Size(min=16) final float[] transform) {
 		if ((transform == null) || (transform.length < 16)) {
 			Matrix.setIdentityM(mDefaultTransform, 0);

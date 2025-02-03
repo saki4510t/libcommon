@@ -132,26 +132,8 @@ public class ZoomImageView extends TransformImageView
 		}
 
 		mDelegater = new ViewTransformDelegater(this) {
-			@Override
-			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				if (DEBUG) Log.v(TAG, "setTransform:" + transform);
-				superSetImageMatrix(transform);
-			}
-
-			@NonNull
-			@Override
-			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				if (DEBUG) {
-					final Matrix result = superGetImageMatrix(transform);
-					if (DEBUG) Log.v(TAG, "getTransform:" + result);
-					return result;
-				} else {
-					return superGetImageMatrix(transform);
-				}
-			}
-
 			/**
-			 * ITransformViewの実装
+			 * ViewTransformDelegaterの実装
 			 * View表示内容の大きさを取得
 			 * @return
 			 */
@@ -169,7 +151,7 @@ public class ZoomImageView extends TransformImageView
 			}
 
 			/**
-			 * ITransformViewの実装
+			 * ViewTransformDelegaterの実装
 			 * View表内容の拡大縮小回転平行移動を初期化時の追加処理
 			 */
 			@Override

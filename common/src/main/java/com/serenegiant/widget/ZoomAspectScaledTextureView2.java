@@ -35,12 +35,11 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IMirror;
-import com.serenegiant.view.IViewTransformer;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.ViewTransformDelegater;
+import com.serenegiant.view.ViewTransformer;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 
 import static com.serenegiant.view.ViewTransformDelegater.*;
 
@@ -137,30 +136,19 @@ public class ZoomAspectScaledTextureView2
 
 		super.setSurfaceTextureListener(this);
 		ViewTransformDelegater delegater = new ViewTransformDelegater(this) {
-			@Override
-			protected void setTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				if (DEBUG) Log.v(TAG, "setTransform:" + transform);
-				superSetTransform(transform);
-			}
-
-			@NonNull
-			@Override
-			protected Matrix getTransform(@NonNull final View view, @Nullable final Matrix transform) {
-				if (DEBUG) {
-					final Matrix result = superGetTransform(transform);
-					if (DEBUG) Log.v(TAG, "getTransform:" + result);
-					return result;
-				} else {
-					return superGetTransform(transform);
-				}
-			}
-
+			/**
+			 * ViewTransformDelegaterの実装
+			 * @return
+			 */
 			@Override
 			public RectF getContentBounds() {
 				if (DEBUG) Log.v(TAG, "getContentBounds:");
 				return ZoomAspectScaledTextureView2.this.getContentBounds();
 			}
 
+			/**
+			 * ViewTransformDelegaterの実装
+			 */
 			@Override
 			public void onInit() {
 				if (DEBUG) Log.v(TAG, "onInit:");
@@ -198,7 +186,7 @@ public class ZoomAspectScaledTextureView2
 	@Override
 	protected void onDetachedFromWindow() {
 		if (DEBUG) Log.v(TAG, "onDetachedFromWindow:");
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).clearPendingTasks();
 		}
@@ -209,7 +197,7 @@ public class ZoomAspectScaledTextureView2
 	protected Parcelable onSaveInstanceState() {
 		if (DEBUG) Log.v(TAG, "onSaveInstanceState:");
 
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			return ((ViewTransformDelegater) transformer).onSaveInstanceState(super.onSaveInstanceState());
 		} else {
@@ -225,7 +213,7 @@ public class ZoomAspectScaledTextureView2
 		if (state instanceof AbsSavedState) {
 			super.onRestoreInstanceState(((AbsSavedState) state).getSuperState());
 		}
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).onRestoreInstanceState(state);
 		}
@@ -236,7 +224,7 @@ public class ZoomAspectScaledTextureView2
 		if (DEBUG) Log.v(TAG, "onConfigurationChanged:" + newConfig);
 
 		super.onConfigurationChanged(newConfig);
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).onConfigurationChanged(newConfig);
 		}
@@ -250,7 +238,7 @@ public class ZoomAspectScaledTextureView2
 			return true;	// 処理済み
 		}
 
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if ((transformer instanceof ViewTransformDelegater)
 			&& ((ViewTransformDelegater) transformer).onTouchEvent(event)) {
 
@@ -333,7 +321,7 @@ public class ZoomAspectScaledTextureView2
 	 * @param enabled
 	 */
 	public void setEnableHandleTouchEvent(@ViewTransformDelegater.TouchMode final int enabled) {
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).setEnableHandleTouchEvent(enabled);
 		}
@@ -345,7 +333,7 @@ public class ZoomAspectScaledTextureView2
 	 */
 	@ViewTransformDelegater.TouchMode
 	public int getEnableHandleTouchEvent() {
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			return ((ViewTransformDelegater) transformer).getEnableHandleTouchEvent();
 		} else {
@@ -356,7 +344,7 @@ public class ZoomAspectScaledTextureView2
 //================================================================================
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).init();
 		}
@@ -437,7 +425,7 @@ public class ZoomAspectScaledTextureView2
 
 	@Override
 	public void setScaleMode(@ScaleMode final int scaleMode) {
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			((ViewTransformDelegater) transformer).setScaleMode(scaleMode);
 		}
@@ -446,7 +434,7 @@ public class ZoomAspectScaledTextureView2
 	@ScaleMode
 	@Override
 	public int getScaleMode() {
-		final IViewTransformer transformer = getViewTransformer();
+		final ViewTransformer transformer = getViewTransformer();
 		if (transformer instanceof ViewTransformDelegater) {
 			return ((ViewTransformDelegater) transformer).getScaleMode();
 		} else {

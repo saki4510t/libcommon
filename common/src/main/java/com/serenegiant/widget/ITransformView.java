@@ -1,4 +1,4 @@
-package com.serenegiant.view;
+package com.serenegiant.widget;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -18,9 +18,21 @@ package com.serenegiant.view;
  *  limitations under the License.
 */
 
+import android.graphics.Matrix;
+import android.view.View;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+
 /**
- * Viewの表示内容の拡大縮小回転平行移動のデリゲーターを示すインターフェース
- * コレ自体はプレースホルダー, 実際は下位のインターフェースを使うこと
+ * ViewTransformerで表示内容のトランスフォーム可能なViewのインターフェース
  */
-public interface IContentTransformer {
+public interface ITransformView {
+	@NonNull
+	public View getView();
+	@Size(min=16)
+	@NonNull
+	Matrix getTransform(@Nullable final Matrix transform);
+	public void setTransform(@Nullable final Matrix transform);
 }
