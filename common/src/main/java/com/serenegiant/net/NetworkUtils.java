@@ -440,7 +440,7 @@ public class NetworkUtils {
 					Log.i(_tag, _prefix + "  isReachable=timeout");
 				}
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				// ignore
 			}
 		}
 	}
@@ -575,7 +575,7 @@ public class NetworkUtils {
 					sb.append("isReachable=").append("timeout").append(",");
 				}
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				// ignore
 			}
 		}
 		return sb.toString();

@@ -20,6 +20,7 @@ package com.serenegiant.libcommon;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
@@ -124,7 +125,7 @@ public class RendererHolderTest {
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
 			assertTrue(bitmapEquals(original, flipVertical(b)));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 		source.removeSurface(surface.hashCode());
 		rendererHolder.removeSurface(readerSurface.hashCode());
@@ -186,7 +187,7 @@ public class RendererHolderTest {
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
 			assertTrue(bitmapEquals(original, flipVertical(b)));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 		source.setSurface(null);
 		rendererHolder.removeSurface(readerSurface.hashCode());
@@ -249,7 +250,7 @@ public class RendererHolderTest {
 				// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
 				assertTrue(bitmapEquals(original, flipVertical(b)));
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				Log.d(TAG, "interrupted", e);
 			}
 			source.removeSurface(surface.hashCode());
 			rendererHolder.removeSurface(readerSurface.hashCode());
@@ -274,7 +275,7 @@ public class RendererHolderTest {
 				// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
 				assertTrue(bitmapEquals(original, flipVertical(b)));
 			} catch (final InterruptedException e) {
-				e.printStackTrace();
+				Log.d(TAG, "interrupted", e);
 			}
 			source.removeSurface(surface.hashCode());
 			rendererHolder.removeSurface(readerSurface.hashCode());

@@ -1011,7 +1011,6 @@ public class Keyboard {
 			}
 		} catch (Exception e) {
 			Log.e(TAG, "Parse error:" + e);
-			e.printStackTrace();
 		}
 		mTotalHeight = y - mDefaultVerticalGap;
 	}

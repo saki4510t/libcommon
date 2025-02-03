@@ -77,7 +77,7 @@ public class StorageUtils {
     			}
     		}
     	} catch (final Exception e) {
-    	    e.printStackTrace();
+			// ignore
     	}
 //		Log.i(TAG, "Path of sd card external: " + externalpath);
 //		Log.i(TAG, "Path of internal memory: " + internalpath);

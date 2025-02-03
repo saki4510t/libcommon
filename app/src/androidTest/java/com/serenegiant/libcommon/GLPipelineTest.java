@@ -299,7 +299,7 @@ public class GLPipelineTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -385,7 +385,7 @@ public class GLPipelineTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, result2, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -462,7 +462,7 @@ public class GLPipelineTest {
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
 			assertTrue(bitmapEquals(original, flipVertical(result), true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -524,7 +524,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -587,7 +587,7 @@ public class GLPipelineTest {
 //			dump(result);
 			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -652,7 +652,7 @@ public class GLPipelineTest {
 //			dump(result);
 			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -712,7 +712,7 @@ public class GLPipelineTest {
 //			dump(result);
 			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -761,7 +761,7 @@ public class GLPipelineTest {
 			assertNotNull(b);
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 		cnt.set(0);
 	}
@@ -815,7 +815,7 @@ public class GLPipelineTest {
 			assertNotNull(b);
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 		cnt.set(0);
 	}

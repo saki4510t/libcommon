@@ -118,7 +118,7 @@ public class ImageTextureSourceTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 
@@ -238,7 +238,7 @@ public class ImageTextureSourceTest {
 			// フレームレートが指定値の±10%以内にはいっているかどうか
 			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 }

@@ -162,9 +162,9 @@ public final class CrashExceptionHandler implements UncaughtExceptionHandler {
 				writer.print(json.toString());
 				writer.flush();
 			} catch (final FileNotFoundException e) {
-				e.printStackTrace();
+				// ignore
 			} catch (final JSONException e) {
-				e.printStackTrace();
+				// ignore
 			} finally {
 				if (writer != null) {
 					writer.close();

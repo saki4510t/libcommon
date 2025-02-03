@@ -20,6 +20,7 @@ package com.serenegiant.libcommon;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.GLImageReceiver;
@@ -119,7 +120,7 @@ public class SurfaceProxyTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 
 	}
@@ -178,7 +179,7 @@ public class SurfaceProxyTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
-			e.printStackTrace();
+			Log.d(TAG, "interrupted", e);
 		}
 	}
 

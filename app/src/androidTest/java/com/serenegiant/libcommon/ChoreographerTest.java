@@ -78,7 +78,7 @@ public class ChoreographerTest {
          Log.i(TAG, "numFrames=" + n);
          Log.i(TAG, "fps=" + fps);
       } catch (InterruptedException e) {
-         e.printStackTrace();
+         Log.d(TAG, "interrupted", e);
       }
       HandlerUtils.quit(asyncHandler);
    }
@@ -116,7 +116,7 @@ public class ChoreographerTest {
 //            Log.i(TAG, "numFrames=" + n);
 //            Log.i(TAG, "fps=" + fps);
 //         } catch (InterruptedException e) {
-//            e.printStackTrace();
+//             ignore
 //         }
 //         HandlerUtils.quit(asyncHandler);
 //      }
@@ -227,7 +227,7 @@ public class ChoreographerTest {
          // フレームレートが指定値の±10%以内にはいっているかどうか
          assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
       } catch (InterruptedException e) {
-         e.printStackTrace();
+         Log.d(TAG, "interrupted", e);
       }
    }
 
