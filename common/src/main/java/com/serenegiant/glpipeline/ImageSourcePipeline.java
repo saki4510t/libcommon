@@ -50,7 +50,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
 	private volatile long mFrameIntervalMs;
-	private long prevFrameTimeNs;
+	private long mPrevFrameTimeNs;
 
 	/**
 	 * コンストラクタ
@@ -266,7 +266,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		if (needResize) {
 			resize(width, height);
 		}
-		prevFrameTimeNs = -1L;
+		mPrevFrameTimeNs = -1L;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
@@ -279,11 +279,11 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				if (prevFrameTimeNs < 0) {
-					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
+				if (mPrevFrameTimeNs < 0) {
+					mPrevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
 				}
-				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
-				prevFrameTimeNs = frameTimeNanos;
+				final long delta = (mFrameIntervalNs - (frameTimeNanos - mPrevFrameTimeNs)) / 1000000L;
+				mPrevFrameTimeNs = frameTimeNanos;
 				if (delta < 0) {
 					// フレームレートから想定されるより呼び出しが遅かった場合
 					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);

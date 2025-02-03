@@ -50,8 +50,7 @@ public class DistributePipeline implements GLPipeline {
 	@Nullable
 	private GLPipeline mParent;
 	@NonNull
-	private final Set<GLPipeline> mPipelines
-		= new CopyOnWriteArraySet<GLPipeline>();
+	private final Set<GLPipeline> mPipelines = new CopyOnWriteArraySet<>();
 	private volatile boolean mReleased = false;
 
 	/**

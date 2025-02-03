@@ -26,7 +26,6 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -67,6 +66,7 @@ public class EffectPipeline extends ProxyPipeline
 	private GLSurface work;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
+	private int mSurfaceId = 0;
 
 	/**
 	 * コンストラクタ
@@ -172,7 +172,7 @@ public class EffectPipeline extends ProxyPipeline
 	public boolean hasSurface() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null;
+			return mSurfaceId != 0;
 		} finally {
 			mLock.unlock();
 		}
@@ -186,7 +186,7 @@ public class EffectPipeline extends ProxyPipeline
 	public int getId() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+			return mSurfaceId;
 		} finally {
 			mLock.unlock();
 		}
@@ -242,10 +242,6 @@ public class EffectPipeline extends ProxyPipeline
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if (isValid()) {
-			@NonNull
-			final EffectDrawer2D drawer;
-			@Nullable
-			final RendererTarget target;
 			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
@@ -255,13 +251,10 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
 				mDrawer.setEffect(mEffect);
 			}
-			drawer = mDrawer;
-			mLock.lock();
-			try {
-				target = mRendererTarget;
-			} finally {
-				mLock.unlock();
-			}
+			@NonNull
+			final EffectDrawer2D drawer = mDrawer;
+			@Nullable
+			final RendererTarget target = mRendererTarget;
 			if ((target != null)
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
@@ -439,34 +432,36 @@ public class EffectPipeline extends ProxyPipeline
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		mLock.lock();
-		try {
-			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
-				if (mRendererTarget != null) {
-					mRendererTarget.release();
-					mRendererTarget = null;
-				}
-				if (work != null) {
-					work.release();
-					work = null;
-				}
-				if (GLUtils.isSupportedSurface(surface)) {
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					mEffectOnly = false;
-				} else {
-					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					work = GLSurface.newInstance(
-						mManager.isGLES3(), GLES20.GL_TEXTURE0,
-						getWidth(), getHeight());
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
-					mEffectOnly = true;
-				}
-				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
+			mSurfaceId = 0;
+			if (mRendererTarget != null) {
+				mRendererTarget.release();
+				mRendererTarget = null;
 			}
-		} finally {
-			mLock.unlock();
+			if (work != null) {
+				work.release();
+				work = null;
+			}
+			if (GLUtils.isSupportedSurface(surface)) {
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				mEffectOnly = false;
+			} else {
+				if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+				work = GLSurface.newInstance(
+					mManager.isGLES3(), GLES20.GL_TEXTURE0,
+					getWidth(), getHeight());
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
+				mEffectOnly = true;
+			}
+			mLock.lock();
+			try {
+				mSurfaceId = mRendererTarget.getId();
+			} finally {
+				mLock.unlock();
+			}
+			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 		}
 	}
 
@@ -477,6 +472,7 @@ public class EffectPipeline extends ProxyPipeline
 		mDrawer = null;
 		mLock.lock();
 		try {
+			mSurfaceId = 0;
 			target = mRendererTarget;
 			mRendererTarget = null;
 			w = work;

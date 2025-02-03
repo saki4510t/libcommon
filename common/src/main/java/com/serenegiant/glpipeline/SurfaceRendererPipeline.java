@@ -51,7 +51,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	private RendererTarget mRendererTarget;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
-
+	private int mSurfaceId = 0;
 	/**
 	 * コンストラクタ
 	 * @param manager
@@ -149,7 +149,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	public boolean hasSurface() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null;
+			return mSurfaceId != 0;
 		} finally {
 			mLock.unlock();
 		}
@@ -168,7 +168,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	public int getId() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+			return mSurfaceId;
 		} finally {
 			mLock.unlock();
 		}
@@ -211,25 +211,18 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 
 		super.onFrameAvailable(isOES, texId, texMatrix);
 		if (isValid()) {
-			@NonNull
-			final GLDrawer2D drawer;
-			@Nullable
-			final RendererTarget target;
-			mLock.lock();
-			try {
-				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
-					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-					if (mDrawer != null) {
-						mDrawer.release();
-					}
-					if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-					mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+			if ((mDrawer == null) || isOES != mDrawer.isOES()) {
+				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+				if (mDrawer != null) {
+					mDrawer.release();
 				}
-				drawer = mDrawer;
-				target = mRendererTarget;
-			} finally {
-				mLock.unlock();
+				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
+				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
 			}
+			@NonNull
+			final GLDrawer2D drawer = mDrawer;
+			@Nullable
+			final RendererTarget target = mRendererTarget;
 			if ((target != null)
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
@@ -251,14 +244,8 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				@Override
 				public void run() {
 					if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-					GLDrawer2D drawer;
-					mLock.lock();
-					try {
-						drawer = mDrawer;
-						mDrawer = null;
-					} finally {
-						mLock.unlock();
-					}
+					GLDrawer2D drawer = mDrawer;
+					mDrawer = null;
 					if (drawer != null) {
 						drawer.release();
 					}
@@ -275,22 +262,24 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		mLock.lock();
-		try {
-			if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
-				// すでにRendererTargetが生成されていて描画先surfaceが変更された時
-				mRendererTarget.release();
-				mRendererTarget = null;
+		if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
+			// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+			mSurfaceId = 0;
+			mRendererTarget.release();
+			mRendererTarget = null;
+		}
+		if ((mRendererTarget == null) && (surface != null)) {
+			mRendererTarget = RendererTarget.newInstance(
+				mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+		}
+		if (mRendererTarget != null) {
+			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+			mLock.lock();
+			try {
+				mSurfaceId = mRendererTarget.getId();
+			} finally {
+				mLock.unlock();
 			}
-			if ((mRendererTarget == null) && (surface != null)) {
-				mRendererTarget = RendererTarget.newInstance(
-					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-			}
-			if (mRendererTarget != null) {
-				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
-			}
-		} finally {
-			mLock.unlock();
 		}
 	}
 
@@ -300,6 +289,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 		final RendererTarget target;
 		mLock.lock();
 		try {
+			mSurfaceId = 0;
 			drawer = mDrawer;
 			mDrawer = null;
 			target = mRendererTarget;

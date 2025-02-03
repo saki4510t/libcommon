@@ -305,6 +305,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private void createTarget(@NonNull final Surface surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:surface=" + surface + ",maxFps=" + maxFps);
 		mManager.runOnGLThread(new Runnable() {
+			@WorkerThread
 			@Override
 			public void run() {
 				mLock.lock();

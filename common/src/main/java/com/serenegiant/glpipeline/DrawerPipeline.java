@@ -110,6 +110,7 @@ public class DrawerPipeline extends ProxyPipeline
 	private GLSurface offscreenSurface;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
+	private int mSurfaceId = 0;
 
 	/**
 	 * コンストラクタ
@@ -219,7 +220,7 @@ public class DrawerPipeline extends ProxyPipeline
 	public boolean hasSurface() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null;
+			return mSurfaceId != 0;
 		} finally {
 			mLock.unlock();
 		}
@@ -233,7 +234,7 @@ public class DrawerPipeline extends ProxyPipeline
 	public int getId() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+			return mSurfaceId;
 		} finally {
 			mLock.unlock();
 		}
@@ -406,36 +407,38 @@ public class DrawerPipeline extends ProxyPipeline
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		mLock.lock();
-		try {
-			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
-				if (mRendererTarget != null) {
-					mRendererTarget.release();
-					mRendererTarget = null;
-				}
-				if (offscreenSurface != null) {
-					offscreenSurface.release();
-					offscreenSurface = null;
-				}
-				if (GLUtils.isSupportedSurface(surface)) {
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					mDrawOnly = false;
-				} else if (isValid()) {
-					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					offscreenSurface = GLSurface.newInstance(
-						mManager.isGLES3(), GLES20.GL_TEXTURE0,
-						getWidth(), getHeight());
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), offscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
-					mDrawOnly = true;
-				}
-				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
-				}
+		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
+			mSurfaceId = 0;
+			if (mRendererTarget != null) {
+				mRendererTarget.release();
+				mRendererTarget = null;
 			}
-		} finally {
-			mLock.unlock();
+			if (offscreenSurface != null) {
+				offscreenSurface.release();
+				offscreenSurface = null;
+			}
+			if (GLUtils.isSupportedSurface(surface)) {
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				mDrawOnly = false;
+			} else if (isValid()) {
+				if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+				offscreenSurface = GLSurface.newInstance(
+					mManager.isGLES3(), GLES20.GL_TEXTURE0,
+					getWidth(), getHeight());
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), offscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
+				mDrawOnly = true;
+			}
+			if (mRendererTarget != null) {
+				mLock.lock();
+				try {
+					mSurfaceId = mRendererTarget.getId();
+				} finally {
+					mLock.unlock();
+				}
+				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+			}
 		}
 	}
 

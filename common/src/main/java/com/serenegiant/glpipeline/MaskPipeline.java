@@ -72,7 +72,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * マスク用GLTexture更新要求
 	 */
 	private volatile boolean mRequestUpdateMask;
-
+	private int mSurfaceId = 0;
 	/**
 	 * コンストラクタ
 	 * @param manager
@@ -119,12 +119,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:");
 		if (isValid()) {
-			mLock.lock();
-			try {
-				mMaskBitmap = null;
-			} finally {
-				mLock.unlock();
-			}
 			releaseAll();
 		}
 		super.internalRelease();
@@ -184,7 +178,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	public boolean hasSurface() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null;
+			return mSurfaceId != 0;
 		} finally {
 			mLock.unlock();
 		}
@@ -198,7 +192,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	public int getId() {
 		mLock.lock();
 		try {
-			return mRendererTarget != null ? mRendererTarget.getId() : 0;
+			return mSurfaceId;
 		} finally {
 			mLock.unlock();
 		}
@@ -234,16 +228,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		@NonNull
 		final GLDrawer2D drawer = mDrawer;
 		@Nullable
-		final RendererTarget target;
+		final RendererTarget target = mRendererTarget;
 		@Nullable
-		final Bitmap bitmap;
-		mLock.lock();
-		try {
-			target = mRendererTarget;
-			bitmap = mMaskBitmap;
-		} finally {
-			mLock.unlock();
-		}
+		final Bitmap bitmap = mMaskBitmap;
 		if (mRequestUpdateMask) {
 			mRequestUpdateMask = false;
 			if (bitmap != null) {
@@ -316,18 +303,25 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	public void setMask(@Nullable final Bitmap bitmap) {
 		if (DEBUG) Log.v(TAG, "setMask:");
-		mLock.lock();
-		try {
-			mMaskBitmap = bitmap;
-			mRequestUpdateMask = true;
-		} finally {
-			mLock.unlock();
-		}
+		mManager.runOnGLThread(new Runnable() {
+			@WorkerThread
+			@Override
+			public void run() {
+				mMaskBitmap = bitmap;
+				mRequestUpdateMask = true;
+			}
+		});
 	}
 
 //--------------------------------------------------------------------------------
 	private void releaseAll() {
 		if (DEBUG) Log.v(TAG, "releaseAll:");
+		mLock.lock();
+		try {
+			mSurfaceId = 0;
+		} finally {
+			mLock.unlock();
+		}
 		if (mManager.isValid()) {
 			try {
 				mManager.runOnGLThread(new Runnable() {
@@ -335,20 +329,16 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					@Override
 					public void run() {
 						if (DEBUG) Log.v(TAG, "releaseAll#run:");
-						mLock.lock();
-						try {
-							if (mRendererTarget != null) {
-								if (DEBUG) Log.v(TAG, "releaseAll:release target");
-								mRendererTarget.release();
-								mRendererTarget = null;
-							}
-							if (work != null) {
-								if (DEBUG) Log.v(TAG, "releaseAll:release work");
-								work.release();
-								work = null;
-							}
-						} finally {
-							mLock.unlock();
+						mMaskBitmap = null;
+						if (mRendererTarget != null) {
+							if (DEBUG) Log.v(TAG, "releaseAll:release target");
+							mRendererTarget.release();
+							mRendererTarget = null;
+						}
+						if (work != null) {
+							if (DEBUG) Log.v(TAG, "releaseAll:release work");
+							work.release();
+							work = null;
 						}
 						releaseDrawerOnGL();
 					}
@@ -369,36 +359,38 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
 		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		mLock.lock();
-		try {
-			if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
-				if (mRendererTarget != null) {
-					mRendererTarget.release();
-					mRendererTarget = null;
-				}
-				if (work != null) {
-					work.release();
-					work = null;
-				}
-				if (GLUtils.isSupportedSurface(surface)) {
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-					mMaskOnly = false;
-				} else if (isValid()) {
-					if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-					work = GLSurface.newInstance(
-						mManager.isGLES3(), GLES20.GL_TEXTURE0,
-						getWidth(), getHeight());
-					mRendererTarget = RendererTarget.newInstance(
-						mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
-					mMaskOnly = true;
-				}
-				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
-				}
+		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
+			mSurfaceId = 0;
+			if (mRendererTarget != null) {
+				mRendererTarget.release();
+				mRendererTarget = null;
 			}
-		} finally {
-			mLock.unlock();
+			if (work != null) {
+				work.release();
+				work = null;
+			}
+			if (GLUtils.isSupportedSurface(surface)) {
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+				mMaskOnly = false;
+			} else if (isValid()) {
+				if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+				work = GLSurface.newInstance(
+					mManager.isGLES3(), GLES20.GL_TEXTURE0,
+					getWidth(), getHeight());
+				mRendererTarget = RendererTarget.newInstance(
+					mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
+				mMaskOnly = true;
+			}
+			if (mRendererTarget != null) {
+				mLock.lock();
+				try {
+					mSurfaceId = mRendererTarget.getId();
+				} finally {
+					mLock.unlock();
+				}
+				mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
+			}
 		}
 	}
 
