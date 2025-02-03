@@ -34,7 +34,7 @@ import androidx.appcompat.widget.AppCompatImageView;
  * 表示内容のトランスフォーム機能を追加
  */
 public class TransformImageView extends AppCompatImageView
-	implements ITransformView {
+	implements ITransformView<Matrix> {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = TransformImageView.class.getSimpleName();

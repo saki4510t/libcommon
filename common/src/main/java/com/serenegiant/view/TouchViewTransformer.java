@@ -370,7 +370,7 @@ public abstract class TouchViewTransformer extends ViewTransformer {
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public TouchViewTransformer(@NonNull final ITransformView parent) {
+	public TouchViewTransformer(@NonNull final ITransformView<Matrix> parent) {
 		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (parent instanceof ViewTransformListener) {

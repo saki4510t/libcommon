@@ -19,6 +19,7 @@ package com.serenegiant.widget;
 */
 
 import android.content.Context;
+import android.graphics.Matrix;
 import android.util.AttributeSet;
 import android.view.TextureView;
 import android.view.View;
@@ -33,7 +34,7 @@ import androidx.annotation.Nullable;
  * 表示内容のトランスフォーム機能を追加
  */
 public class TransformTextureView extends TextureView
-	implements ITransformView {
+	implements ITransformView<Matrix> {
 
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = TransformTextureView.class.getSimpleName();

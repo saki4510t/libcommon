@@ -18,15 +18,14 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
-import android.view.View;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
-public interface IGLTransformView {
-	@NonNull
-	public View getView();
+/**
+ * ITransformView<float[]>のメソッドに@Sizeアノテーションを追加
+ */
+public interface IGLTransformView extends ITransformView<float[]> {
 	@Size(min=16)
 	@NonNull
 	public float[] getTransform(@Nullable @Size(min=16) final float[] transform);

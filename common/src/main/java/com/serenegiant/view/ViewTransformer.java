@@ -38,7 +38,7 @@ public class ViewTransformer {
 	private static final String TAG = ViewTransformer.class.getSimpleName();
 
 	@NonNull
-	private final ITransformView mTargetView;
+	private final ITransformView<Matrix> mTargetView;
 	/**
 	 * デフォルトのトランスフォームマトリックス
 	 * #setDefaultで変更していなければコンストラクタ実行時に
@@ -76,7 +76,7 @@ public class ViewTransformer {
 	 * コンストラクタ
 	 * @param view
 	 */
-	public ViewTransformer(@NonNull final ITransformView view) {
+	public ViewTransformer(@NonNull final ITransformView<Matrix> view) {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mTargetView = view;
 		updateTransform(true);

@@ -18,7 +18,6 @@ package com.serenegiant.widget;
  *  limitations under the License.
 */
 
-import android.graphics.Matrix;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -28,11 +27,11 @@ import androidx.annotation.Size;
 /**
  * ViewTransformerで表示内容のトランスフォーム可能なViewのインターフェース
  */
-public interface ITransformView {
+public interface ITransformView<T> {
 	@NonNull
 	public View getView();
 	@Size(min=16)
 	@NonNull
-	Matrix getTransform(@Nullable final Matrix transform);
-	public void setTransform(@Nullable final Matrix transform);
+	T getTransform(@Nullable final T transform);
+	public void setTransform(@Nullable final T transform);
 }
