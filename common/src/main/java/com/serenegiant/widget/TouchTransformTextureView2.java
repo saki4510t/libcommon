@@ -48,14 +48,14 @@ import static com.serenegiant.view.TouchViewTransformer.*;
  * ViewTransformDelegatorを使って拡大縮小回転平行移動をするTextureView
  * FIXME まだ挙動がおかしい
  */
-public class ZoomAspectScaledTextureView2
+public class TouchTransformTextureView2
 	extends TransformTextureView implements IMirror,
 		TextureView.SurfaceTextureListener,
 		ITouchViewTransformer.ViewTransformListener<Matrix>,
 		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
-	private static final String TAG = ZoomAspectScaledTextureView2.class.getSimpleName();
+	private static final String TAG = TouchTransformTextureView2.class.getSimpleName();
 
 	/**
 	 * プレビュー表示用のSurfaceTextureが存在しているかどうか
@@ -81,7 +81,7 @@ public class ZoomAspectScaledTextureView2
 	 * コンストラクタ
 	 * @param context
 	 */
-	public ZoomAspectScaledTextureView2(final Context context) {
+	public TouchTransformTextureView2(final Context context) {
 		this(context, null, 0);
 	}
 
@@ -90,7 +90,7 @@ public class ZoomAspectScaledTextureView2
 	 * @param context
 	 * @param attrs
 	 */
-	public ZoomAspectScaledTextureView2(final Context context, final AttributeSet attrs) {
+	public TouchTransformTextureView2(final Context context, final AttributeSet attrs) {
 		this(context, attrs, 0);
 	}
 
@@ -100,7 +100,7 @@ public class ZoomAspectScaledTextureView2
 	 * @param attrs
 	 * @param defStyleAttr
 	 */
-	public ZoomAspectScaledTextureView2(final Context context, final AttributeSet attrs, final int defStyleAttr) {
+	public TouchTransformTextureView2(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		@TouchMode
@@ -140,7 +140,7 @@ public class ZoomAspectScaledTextureView2
 			@Override
 			public RectF getContentBounds() {
 				if (DEBUG) Log.v(TAG, "getContentBounds:");
-				return ZoomAspectScaledTextureView2.this.getContentBounds();
+				return TouchTransformTextureView2.this.getContentBounds();
 			}
 			@Override
 			public void onInit() {
