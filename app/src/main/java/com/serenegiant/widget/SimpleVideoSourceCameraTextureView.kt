@@ -34,7 +34,7 @@ import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glutils.OnFrameAvailableListener
 import com.serenegiant.math.Fraction
-import com.serenegiant.view.ViewTransformDelegater
+import com.serenegiant.view.TouchViewTransformer
 
 /**
  * VideoSourceを使ってカメラ映像を受け取りSurfacePipelineで描画処理を行うZoomAspectScaledTextureView/ICameraView実装
@@ -57,7 +57,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		mGLManager = GLManager()
 		mGLContext = mGLManager.glContext
 		mGLHandler = mGLManager.glHandler
-		setEnableHandleTouchEvent(ViewTransformDelegater.TOUCH_DISABLED)
+		setEnableHandleTouchEvent(TouchViewTransformer.TOUCH_DISABLED)
 		mCameraDelegator = CameraDelegator(this@SimpleVideoSourceCameraTextureView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			object : CameraDelegator.ICameraRenderer {

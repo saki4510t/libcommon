@@ -31,7 +31,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
 
-import com.serenegiant.widget.IScaledView;
 import com.serenegiant.widget.ITransformView;
 
 import java.lang.annotation.Retention;
@@ -41,25 +40,25 @@ import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.serenegiant.widget.IScaledView.*;
+import static com.serenegiant.widget.IScaledView.SCALE_MODE_CROP;
+import static com.serenegiant.widget.IScaledView.SCALE_MODE_KEEP_ASPECT;
+import static com.serenegiant.widget.IScaledView.SCALE_MODE_STRETCH_TO_FIT;
+import static com.serenegiant.widget.IScaledView.ScaleMode;
 
 /**
  * 拡大縮小平行移動回転可能なViewのためのdelegater
- * @deprecated TouchViewTransformerを使うこと
  */
-@SuppressWarnings("deprecation")
-@Deprecated
-public abstract class ViewTransformDelegater extends ViewTransformer {
+public abstract class TouchViewTransformer extends ViewTransformer {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
-	private static final String TAG = ViewTransformDelegater.class.getSimpleName();
+	private static final String TAG = TouchViewTransformer.class.getSimpleName();
 
 //--------------------------------------------------------------------------------
 	// constants
-	public static final int TOUCH_DISABLED			= TouchViewTransformer.TOUCH_DISABLED;
-	public static final int TOUCH_ENABLED_MOVE		= TouchViewTransformer.TOUCH_ENABLED_MOVE;
-	public static final int TOUCH_ENABLED_ZOOM		= TouchViewTransformer.TOUCH_ENABLED_ZOOM;
-	public static final int TOUCH_ENABLED_ROTATE	= TouchViewTransformer.TOUCH_ENABLED_ROTATE;
+	public static final int TOUCH_DISABLED			= 0x00000000;
+	public static final int TOUCH_ENABLED_MOVE		= 0x00000001;
+	public static final int TOUCH_ENABLED_ZOOM		= 0x00000001 << 1;
+	public static final int TOUCH_ENABLED_ROTATE	= 0x00000001 << 2;
 	public static final int TOUCH_ENABLED_ALL
 		= TOUCH_ENABLED_MOVE | TOUCH_ENABLED_ZOOM | TOUCH_ENABLED_ROTATE;	// 0x00000007
 
@@ -80,31 +79,31 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	/**
 	 * ステートをリセットするときの一時値
 	 */
-	public static final int STATE_RESET = TouchViewTransformer.STATE_RESET;
+	public static final int STATE_RESET = -1;
 	/**
 	 * State: ユーザー操作無し
 	 */
-	public static final int STATE_NON = TouchViewTransformer.STATE_NON;
+	public static final int STATE_NON = 0;
 	/**
 	 * State: シングルタッチがあったのでユーザー操作待機中
 	 */
-	public static final int STATE_WAITING = TouchViewTransformer.STATE_WAITING;
+	public static final int STATE_WAITING = 1;
 	/**
 	 * State: 平行移動処理中
 	*/
-	public static final int STATE_DRAGGING = TouchViewTransformer.STATE_DRAGGING;
+	public static final int STATE_DRAGGING = 2;
 	/**
 	 * State: 拡大縮小・回転操作の待機中
 	 */
-	public static final int STATE_CHECKING = TouchViewTransformer.STATE_CHECKING;
+	public static final int STATE_CHECKING = 3;
 	/**
 	 * State: 拡大縮小処理中
 	*/
-	public static final int STATE_ZOOMING = TouchViewTransformer.STATE_ZOOMING;
+	public static final int STATE_ZOOMING = 4;
 	/**
 	 * State: 回転処理中
 	 */
-	public static final int STATE_ROTATING = TouchViewTransformer.STATE_ROTATING;
+	public static final int STATE_ROTATING = 5;
 
 	@IntDef({
 		STATE_RESET,
@@ -154,7 +153,19 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	/**
 	 * callback listener called when rotation started.
 	 */
-	public interface ViewTransformListener extends TouchViewTransformer.ViewTransformListener {
+	public interface ViewTransformListener {
+		/**
+		 * タッチ状態が変化したとき
+		 * @param view
+		 * @param newState
+		 */
+		public void onStateChanged(@NonNull final View view, final int newState);
+		/**
+		 * トランスフォームマトリックスが変化したときの処理
+ 		 * @param view
+		 * @param transform
+		 */
+		public void onTransformed(@NonNull final View view, @NonNull final Matrix transform);
 	}
 
 	/**
@@ -246,7 +257,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	/**
 	 * スケールモード
 	 */
-	@IScaledView.ScaleMode
+	@ScaleMode
 	private int mScaleMode;
 	/**
 	 * スケールモードがキープアスペクトの場合にViewのサイズをアスペクト比に合わせて変更するかどうか
@@ -359,7 +370,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * コンストラクタ
 	 * @param parent
 	 */
-	public ViewTransformDelegater(@NonNull final ITransformView parent) {
+	public TouchViewTransformer(@NonNull final ITransformView parent) {
 		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		if (parent instanceof ViewTransformListener) {
@@ -610,7 +621,7 @@ public abstract class ViewTransformDelegater extends ViewTransformer {
 	 * @param scaleRelative
 	 * @return
 	 */
-	public ViewTransformDelegater setScaleRelative(final float scaleRelative) {
+	public TouchViewTransformer setScaleRelative(final float scaleRelative) {
 		if (DEBUG) Log.v(TAG, String.format("setScaleRelative:%f,min=%f,max=%f",
 			scaleRelative, mMinScale, mMaxScale));
 		// restore the Matrix

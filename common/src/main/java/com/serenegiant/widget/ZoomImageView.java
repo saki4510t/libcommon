@@ -40,7 +40,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.serenegiant.common.R;
-import com.serenegiant.view.ViewTransformDelegater;
+import com.serenegiant.view.TouchViewTransformer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -49,7 +49,7 @@ import androidx.annotation.Nullable;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class ZoomImageView extends TransformImageView
-	implements ViewTransformDelegater.ViewTransformListener,
+	implements TouchViewTransformer.ViewTransformListener,
 		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
@@ -71,7 +71,7 @@ public class ZoomImageView extends TransformImageView
 	};
 
 //--------------------------------------------------------------------------------
-	private final ViewTransformDelegater mDelegater;
+	private final TouchViewTransformer mDelegater;
 
 	/**
 	 * ColorFilter to reverse the color of the image
@@ -88,7 +88,7 @@ public class ZoomImageView extends TransformImageView
 	private WaitReverseReset mWaitReverseReset;
 
 	@Nullable
-	private ViewTransformDelegater.ViewTransformListener mViewTransformListener;
+	private TouchViewTransformer.ViewTransformListener mViewTransformListener;
 
 	/**
 	 * コンストラクタ
@@ -131,7 +131,7 @@ public class ZoomImageView extends TransformImageView
 			a.recycle();
 		}
 
-		mDelegater = new ViewTransformDelegater(this) {
+		mDelegater = new TouchViewTransformer(this) {
 			/**
 			 * ViewTransformDelegaterの実装
 			 * View表示内容の大きさを取得
@@ -296,7 +296,7 @@ public class ZoomImageView extends TransformImageView
 	 * タッチ操作の有効無効設定
 	 * @param enabled
 	 */
-	public void setEnableHandleTouchEvent(@ViewTransformDelegater.TouchMode final int enabled) {
+	public void setEnableHandleTouchEvent(@TouchViewTransformer.TouchMode final int enabled) {
 		mDelegater.setEnableHandleTouchEvent(enabled);
 	}
 
@@ -304,7 +304,7 @@ public class ZoomImageView extends TransformImageView
 	 * タッチ操作の有効無効設定を取得
 	 * @return
 	 */
-	@ViewTransformDelegater.TouchMode
+	@TouchViewTransformer.TouchMode
 	public int getEnableHandleTouchEvent() {
 		return mDelegater.getEnableHandleTouchEvent();
 	}
@@ -350,7 +350,7 @@ public class ZoomImageView extends TransformImageView
 	 * @param listener
 	 */
 	public void setViewTransformListener(
-		final ViewTransformDelegater.ViewTransformListener listener) {
+		final TouchViewTransformer.ViewTransformListener listener) {
 		mViewTransformListener = listener;
 	}
 
@@ -359,7 +359,7 @@ public class ZoomImageView extends TransformImageView
 	 * @return
 	 */
 	@Nullable
-	public ViewTransformDelegater.ViewTransformListener getViewTransformListener() {
+	public TouchViewTransformer.ViewTransformListener getViewTransformListener() {
 		return mViewTransformListener;
 	}
 
@@ -495,7 +495,7 @@ public class ZoomImageView extends TransformImageView
 	public void onStateChanged(@NonNull final View view, final int newState) {
 		if (DEBUG) Log.v(TAG, "onStateChanged:" + newState);
 		switch (newState) {
-		case ViewTransformDelegater.STATE_ROTATING -> {
+		case TouchViewTransformer.STATE_ROTATING -> {
 			if (mColorReverseFilter == null) {
 				mColorReverseFilter = new ColorMatrixColorFilter(new ColorMatrix(REVERSE));
 			}
@@ -504,7 +504,7 @@ public class ZoomImageView extends TransformImageView
 			if (mWaitReverseReset == null) mWaitReverseReset = new WaitReverseReset();
 			postDelayed(mWaitReverseReset, REVERSING_TIMEOUT);
 		}
-		case ViewTransformDelegater.STATE_NON -> resetColorFilter();
+		case TouchViewTransformer.STATE_NON -> resetColorFilter();
 		}
 		if (mViewTransformListener != null) {
 			mViewTransformListener.onStateChanged(view, newState);

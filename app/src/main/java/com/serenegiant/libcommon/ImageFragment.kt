@@ -30,7 +30,7 @@ import com.serenegiant.mediastore.ImageLoader
 import com.serenegiant.mediastore.LoaderDrawable
 import com.serenegiant.mediastore.MediaInfo
 import com.serenegiant.view.MotionEventUtils
-import com.serenegiant.view.ViewTransformDelegater
+import com.serenegiant.view.TouchViewTransformer
 import com.serenegiant.widget.ZoomImageView
 import java.io.IOException
 import kotlin.math.sign
@@ -90,12 +90,12 @@ class ImageFragment: BaseFragment() {
 		mImageView!!.setOnClickListener {
 			v -> if (DEBUG) Log.v(TAG, "onClick:$v")
 		}
-		mImageView!!.enableHandleTouchEvent = (ViewTransformDelegater.TOUCH_ENABLED_MOVE
-			or ViewTransformDelegater.TOUCH_ENABLED_ZOOM
-			or ViewTransformDelegater.TOUCH_ENABLED_ROTATE)
-		mImageView!!.viewTransformListener = object: ViewTransformDelegater.ViewTransformListener {
+		mImageView!!.enableHandleTouchEvent = (TouchViewTransformer.TOUCH_ENABLED_MOVE
+			or TouchViewTransformer.TOUCH_ENABLED_ZOOM
+			or TouchViewTransformer.TOUCH_ENABLED_ROTATE)
+		mImageView!!.viewTransformListener = object: TouchViewTransformer.ViewTransformListener {
 			override fun onStateChanged(view: View, newState: Int) {
-				if (newState == ViewTransformDelegater.STATE_NON) {
+				if (newState == TouchViewTransformer.STATE_NON) {
 					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")
 				}
 			}

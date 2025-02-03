@@ -38,7 +38,7 @@ import com.serenegiant.view.ViewUtils;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import static com.serenegiant.view.ViewTransformDelegater.*;
+import static com.serenegiant.view.TouchViewTransformer.*;
 
 /**
  * FIXME 拡大縮小回転移動処理をDelegatorへ分けたい
