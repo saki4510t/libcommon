@@ -32,7 +32,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class TestUtils {
-	private static final String TAG = BitmapHelperTest.class.getSimpleName();
+	private static final String TAG = TestUtils.class.getSimpleName();
 
 	private TestUtils() {
 		// インスタンス化をエラーとするためにデフォルトコンストラクタをprivateに
