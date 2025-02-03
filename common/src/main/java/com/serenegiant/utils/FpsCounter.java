@@ -20,48 +20,89 @@ package com.serenegiant.utils;
 
 import com.serenegiant.system.Time;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 /**
  * フレームレート測定用ヘルパークラス
  */
 public class FpsCounter {
-	private int cnt, prevCnt;
-	private long startTime, prevTime;
-	private float fps, totalFps;
+	private final ReentrantLock mLock = new ReentrantLock();
+	private int mCnt, mPrevCnt;
+	private long mStartTime, mPrevTime;
+	private float mFps, mTotalFps;
+
+	/**
+	 * コンストラクタ
+	 */
 	public FpsCounter() {
 		reset();
 	}
 
-	public synchronized FpsCounter reset() {
-		cnt = prevCnt = 0;
-		startTime = prevTime = Time.nanoTime() - 1;
+	/**
+	 * カウンタ・フレームレートをリセット
+	 * @return
+	 */
+	public FpsCounter reset() {
+		mLock.lock();
+		try {
+			mCnt = mPrevCnt = 0;
+			mStartTime = mPrevTime = Time.nanoTime() - 1;
+		} finally {
+			mLock.unlock();
+		}
+
 		return this;
 	}
 
 	/**
 	 * フレームをカウント
 	 */
-	public synchronized void count() {
-		cnt++;
+	public void count() {
+		mLock.lock();
+		try {
+			mCnt++;
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
 	 * FPSの値を更新, 1秒程度毎に呼び出す
 	 * @return
 	 */
-	public synchronized FpsCounter update() {
+	public FpsCounter update() {
 		final long t = Time.nanoTime();
-		fps = (cnt - prevCnt) * 1000000000.0f / (t - prevTime);
-		prevCnt = cnt;
-		prevTime = t;
-		totalFps = cnt * 1000000000.0f / (t - startTime);
+		int cnt, prevCnt;
+		mLock.lock();
+		try {
+			cnt = mCnt;
+			prevCnt = mPrevCnt;
+			mPrevCnt = cnt;
+		} finally {
+			mLock.unlock();
+		}
+		mFps = (cnt - prevCnt) * 1000000000.0f / (t - mPrevTime);
+		mPrevTime = t;
+		mTotalFps = cnt * 1000000000.0f / (t - mStartTime);
+
 		return this;
 	}
 
-	public synchronized float getFps() {
-		return fps;
+	/**
+	 * #update呼び出し時のフレームレートを取得
+	 * 原則として#updateを呼び出したのと同じスレッド上で呼び出すこと
+	 * @return
+	 */
+	public float getFps() {
+		return mFps;
 	}
 
-	public synchronized float getTotalFps() {
-		return totalFps;
+	/**
+	 * #reset呼び出しからの平均フレームレートを取得
+	 * 原則として#updateを呼び出したのと同じスレッド上で呼び出すこと
+	 * @return
+	 */
+	public float getTotalFps() {
+		return mTotalFps;
 	}
 }
