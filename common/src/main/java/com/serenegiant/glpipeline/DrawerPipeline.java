@@ -56,8 +56,7 @@ public class DrawerPipeline extends ProxyPipeline
 		public void releaseDrawer(
 			@NonNull final GLManager glManager, @NonNull final GLDrawer2D drawer);
 		@WorkerThread
-		@Nullable
-		public GLDrawer2D onResize(
+		public void onResize(
 			@NonNull final GLManager glManager, @Nullable final GLDrawer2D drawer,
 			final int width, final int height);
 	}
@@ -77,16 +76,14 @@ public class DrawerPipeline extends ProxyPipeline
 			drawer.release();
 		}
 
-		@Nullable
 		@Override
-		public GLDrawer2D onResize(
+		public void onResize(
 			@NonNull final GLManager glManager, @Nullable final GLDrawer2D drawer,
 			final int width, final int height) {
 
 			if (drawer != null) {
 				drawer.release();
 			}
-			return null;
 		}
 	};
 
@@ -355,7 +352,7 @@ public class DrawerPipeline extends ProxyPipeline
 			@Override
 			public void run() {
 				if (DEBUG) Log.v(TAG, "resize#run:");
-				mDrawer = mCallback.onResize(mManager, mDrawer, width, height);
+				mCallback.onResize(mManager, mDrawer, width, height);
 			}
 		});
 	}
