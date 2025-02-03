@@ -189,11 +189,9 @@ public class GLDrawer2D implements GLConst {
 		@Nullable final float[] texcoord,
 		@Nullable final String vs, @Nullable final String fs) {
 
-		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLDrawer2D(true, isOES, vertices, texcoord, vs, fs);
-		} else {
-			return new GLDrawer2D(false, isOES, vertices, texcoord, vs, fs);
-		}
+		return new GLDrawer2D(
+			isGLES3 && (GLUtils.getSupportedGLVersion() > 2),
+			isOES, vertices, texcoord, vs, fs);
 	}
 
 //================================================================================
