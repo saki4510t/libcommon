@@ -411,6 +411,7 @@ public class ZoomImageView extends TransformImageView
 // IScaledView
 	private double mRequestedAspect = -1.0;
 	/**
+	 * IScaledViewの実装
 	 * アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
 	 */
 	@Override
@@ -422,11 +423,23 @@ public class ZoomImageView extends TransformImageView
 		}
 	}
 
+	/**
+	 * IScaledViewの実装
+	 * Viewの要求アスペクト比を設定する。アスペクト比=<code>幅 / 高さ</code>.
+	 * @param width
+	 * @param height
+	 */
 	@Override
 	public void setAspectRatio(final int width, final int height) {
 		setAspectRatio(width / (double)height);
 	}
 
+	/**
+	 * IScaledViewの実装
+	 * 現在の要求アスペクト比を取得
+	 * @return
+	 * @return
+	 */
 	@Override
 	public double getAspectRatio() {
 		return mRequestedAspect;
@@ -453,6 +466,10 @@ public class ZoomImageView extends TransformImageView
 		return mDelegater.getScaleMode();
 	}
 
+	/**
+	 * IScaledViewの実装
+	 * @param keepAspect
+	 */
 	@Override
 	public void setNeedResizeToKeepAspect(final boolean keepAspect) {
 		mDelegater.setKeepAspect(keepAspect);
