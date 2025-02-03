@@ -29,6 +29,7 @@ import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.mediastore.ImageLoader
 import com.serenegiant.mediastore.LoaderDrawable
 import com.serenegiant.mediastore.MediaInfo
+import com.serenegiant.view.ITouchViewTransformer
 import com.serenegiant.view.MotionEventUtils
 import com.serenegiant.view.TouchViewTransformer
 import com.serenegiant.widget.TouchTransformImageView
@@ -93,7 +94,7 @@ class ImageFragment: BaseFragment() {
 		mImageView!!.enableHandleTouchEvent = (TouchViewTransformer.TOUCH_ENABLED_MOVE
 			or TouchViewTransformer.TOUCH_ENABLED_ZOOM
 			or TouchViewTransformer.TOUCH_ENABLED_ROTATE)
-		mImageView!!.viewTransformListener = object: TouchViewTransformer.ViewTransformListener {
+		mImageView!!.viewTransformListener = object: ITouchViewTransformer.ViewTransformListener<Matrix> {
 			override fun onStateChanged(view: View, newState: Int) {
 				if (newState == TouchViewTransformer.STATE_NON) {
 					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")

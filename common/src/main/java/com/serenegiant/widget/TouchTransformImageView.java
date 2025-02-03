@@ -40,6 +40,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.serenegiant.common.R;
+import com.serenegiant.view.ITouchViewTransformer;
 import com.serenegiant.view.TouchViewTransformer;
 
 import androidx.annotation.NonNull;
@@ -49,7 +50,7 @@ import androidx.annotation.Nullable;
  * 表示内容を拡大縮小回転平行移動できるImageView実装
  */
 public class TouchTransformImageView extends TransformImageView
-	implements TouchViewTransformer.ViewTransformListener,
+	implements ITouchViewTransformer.ViewTransformListener<Matrix>,
 		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
@@ -88,7 +89,7 @@ public class TouchTransformImageView extends TransformImageView
 	private WaitReverseReset mWaitReverseReset;
 
 	@Nullable
-	private TouchViewTransformer.ViewTransformListener mViewTransformListener;
+	private TouchViewTransformer.ViewTransformListener<Matrix> mViewTransformListener;
 
 	/**
 	 * コンストラクタ
@@ -350,7 +351,7 @@ public class TouchTransformImageView extends TransformImageView
 	 * @param listener
 	 */
 	public void setViewTransformListener(
-		final TouchViewTransformer.ViewTransformListener listener) {
+		final TouchViewTransformer.ViewTransformListener<Matrix> listener) {
 		mViewTransformListener = listener;
 	}
 
@@ -359,7 +360,7 @@ public class TouchTransformImageView extends TransformImageView
 	 * @return
 	 */
 	@Nullable
-	public TouchViewTransformer.ViewTransformListener getViewTransformListener() {
+	public TouchViewTransformer.ViewTransformListener<Matrix> getViewTransformListener() {
 		return mViewTransformListener;
 	}
 

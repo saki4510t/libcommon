@@ -35,6 +35,7 @@ import android.view.View;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IMirror;
+import com.serenegiant.view.ITouchViewTransformer;
 import com.serenegiant.view.MeasureSpecDelegater;
 import com.serenegiant.view.TouchViewTransformer;
 import com.serenegiant.view.ViewTransformer;
@@ -50,7 +51,7 @@ import static com.serenegiant.view.TouchViewTransformer.*;
 public class ZoomAspectScaledTextureView2
 	extends TransformTextureView implements IMirror,
 		TextureView.SurfaceTextureListener,
-		TouchViewTransformer.ViewTransformListener,
+		ITouchViewTransformer.ViewTransformListener<Matrix>,
 		IScaledView {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
@@ -136,19 +137,11 @@ public class ZoomAspectScaledTextureView2
 
 		super.setSurfaceTextureListener(this);
 		TouchViewTransformer delegater = new TouchViewTransformer(this) {
-			/**
-			 * ViewTransformDelegaterの実装
-			 * @return
-			 */
 			@Override
 			public RectF getContentBounds() {
 				if (DEBUG) Log.v(TAG, "getContentBounds:");
 				return ZoomAspectScaledTextureView2.this.getContentBounds();
 			}
-
-			/**
-			 * ViewTransformDelegaterの実装
-			 */
 			@Override
 			public void onInit() {
 				if (DEBUG) Log.v(TAG, "onInit:");
