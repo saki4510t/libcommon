@@ -23,7 +23,6 @@ import android.graphics.SurfaceTexture
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
-import android.view.View
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
 import com.serenegiant.math.Fraction
@@ -34,7 +33,7 @@ import java.lang.UnsupportedOperationException
  */
 class CameraImageView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: ZoomImageView(context, attrs, defStyleAttr), ICameraView {
+		: TouchTransformImageView(context, attrs, defStyleAttr), ICameraView {
 
 	private val mCameraDelegator: CameraDelegator
 	private val mDrawable: SurfaceDrawable

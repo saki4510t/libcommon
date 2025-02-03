@@ -31,7 +31,7 @@ import com.serenegiant.mediastore.LoaderDrawable
 import com.serenegiant.mediastore.MediaInfo
 import com.serenegiant.view.MotionEventUtils
 import com.serenegiant.view.TouchViewTransformer
-import com.serenegiant.widget.ZoomImageView
+import com.serenegiant.widget.TouchTransformImageView
 import java.io.IOException
 import kotlin.math.sign
 
@@ -42,7 +42,7 @@ import kotlin.math.sign
 class ImageFragment: BaseFragment() {
 
 	private var mInfo: MediaInfo? = null
-	private var mImageView: ZoomImageView? = null
+	private var mImageView: TouchTransformImageView? = null
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
