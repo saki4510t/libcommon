@@ -86,5 +86,7 @@ dependencies {
 	implementation "androidx.lifecycle:lifecycle-common-java8:$androidXLifecycleKtx"
 	implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$kotlinCoroutinesVersion"
 
+	implementation "com.google.code.gson:gson:$gsonVersion"
+
 	implementation project(':common')
 }

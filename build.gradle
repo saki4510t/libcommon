@@ -46,6 +46,7 @@ ext {
 
 	kotlinStdLibVersion = '1.9.24'
 	kotlinCoroutinesVersion = '1.8.1'
+	gsonVersion = "2.10.1"	// インスツルメンツテスト・テストアプリ用
 
     versionCodeNum = 444
     versionNameString = '9.3.0'
