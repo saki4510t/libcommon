@@ -32,8 +32,10 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Point;
 import android.graphics.RadialGradient;
 import android.graphics.Rect;
 import android.graphics.Shader;
@@ -877,6 +879,60 @@ public final class BitmapHelper {
 
 		final Bitmap bm = Bitmap.createBitmap(width, height, config);
 		bm.eraseColor(color);
+
+		return bm;
+	}
+
+	/**
+	 * 指定した色でグラデーションしたビットマップを生成
+	 * (0, 0)がcolor1、(width,height)がcolor2
+	 * @param width
+	 * @param height
+	 * @param color1
+	 * @param color2
+	 * @param config
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap makeGradientBitmap(
+		final int width, final int height,
+		final int color1, final int color2,
+		@NonNull final Bitmap.Config config) {
+
+		return makeGradientBitmap(
+			width, height,
+			color1, new Point(0, 0),
+			color2, new Point(width, height),
+			config);
+	}
+
+	/**
+	 * 指定した色でグラデーションしたビットマップを生成
+	 * p1がcolor1、p2がcolor2
+	 * @param width
+	 * @param height
+	 * @param color1
+	 * @param p1
+	 * @param color2
+	 * @param p2
+	 * @param config
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap makeGradientBitmap(
+		final int width, final int height,
+		final int color1, final Point p1,
+		final int color2, final Point p2,
+		@NonNull final Bitmap.Config config) {
+
+		final Bitmap bm = Bitmap.createBitmap(width, height, config);
+		final Canvas c = new Canvas(bm);
+		c.drawColor(color1);
+		final LinearGradient grad = new LinearGradient(p1.x, p1.y, p2.x, p2.y, color1, color2, Shader.TileMode.CLAMP);
+		final Paint paint = new Paint();
+		paint.setStyle(Paint.Style.FILL);
+		paint.setShader(grad);
+		c.drawRect(0, 0, width, height, paint);
 
 		return bm;
 	}

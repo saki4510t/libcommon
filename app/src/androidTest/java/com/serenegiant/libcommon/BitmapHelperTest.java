@@ -102,6 +102,22 @@ public class BitmapHelperTest {
 		}
 	}
 
+	@Test
+	public void makeGradientBitmapTest() {
+		final int color1 = 0xff000000;
+		final int color2 = 0xffffffff;
+		final Bitmap b = BitmapHelper.makeGradientBitmap(
+			WIDTH, HEIGHT, color1, color2,
+			Bitmap.Config.ARGB_8888);
+
+		assertEquals(WIDTH, b.getWidth());
+		assertEquals(HEIGHT, b.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b.getConfig());
+		// グラデーションだと指定した色そのものにならなくてうまくチェックできない
+//		assertEquals(color1, b.getColor(0, 0).toArgb());
+//		assertEquals(color2, b.getColor(WIDTH, HEIGHT).toArgb());
+	}
+
 	/**
 	 * BitmapHelper#copyBitmapのテスト
 	 */
