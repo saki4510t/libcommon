@@ -415,6 +415,9 @@ class MainActivity
 			R.string.title_service_foreground -> {
 				fragment = ForegroundServiceFragment.newInstance()
 			}
+			R.string.bitmap_helper -> {
+				fragment = BitmapFragment.newInstance()
+			}
 			else -> {
 			}
 		}
