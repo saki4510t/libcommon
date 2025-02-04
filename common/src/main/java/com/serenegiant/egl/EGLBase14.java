@@ -602,7 +602,7 @@ import androidx.annotation.Nullable;
         EGL14.eglQueryContext(mEglDisplay,
         	mContext.eglContext, EGL14.EGL_CONTEXT_CLIENT_VERSION, values, 0);
 		if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {
-			Log.d(TAG, String.format("EGLContext created, client version %d(request %d) ",
+			Log.v(TAG, String.format("EGLContext created, client version %d(request %d) ",
 				values[0], maxClientVersion));
 		}
         makeDefault();	// makeCurrent(EGL14.EGL_NO_SURFACE);

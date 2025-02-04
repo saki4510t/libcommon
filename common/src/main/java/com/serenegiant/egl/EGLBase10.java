@@ -636,7 +636,7 @@ import androidx.annotation.Nullable;
 		mEgl.eglQueryContext(mEglDisplay,
 			mContext.eglContext, EGL_CONTEXT_CLIENT_VERSION, values);
 		if (mEgl.eglGetError() == EGL10.EGL_SUCCESS) {
-			Log.d(TAG, String.format("EGLContext created, client version %d(request %d) ",
+			Log.v(TAG, String.format("EGLContext created, client version %d(request %d) ",
 				values[0], maxClientVersion));
 		}
         makeDefault();
