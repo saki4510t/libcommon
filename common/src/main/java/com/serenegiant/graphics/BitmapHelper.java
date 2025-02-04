@@ -85,8 +85,9 @@ public final class BitmapHelper {
 	 * @param bitmap
 	 * @param format Bitmap.CompressFormat.JPEGまたはBitmap.CompressFormat.PNGまたはBitmap.CompressFormat.WEBP
 	 * @param quality JPEGのときのみ有効(0,100]
-	 * @return
+	 * @return 正常に変換できればbyte[]、変換できなければnullを返す
 	 */
+	@Nullable
 	public static byte[] BitmapToByteArray(@NonNull final Bitmap bitmap,
 		final Bitmap.CompressFormat format, final int quality) {
 
