@@ -24,6 +24,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import androidx.annotation.NonNull;
+
 /**
  * JSONから例外生成なし＆デフォルト値付きて値取得するためのヘルパークラス
  */
@@ -35,7 +37,7 @@ public class JSONHelper {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
-	public static long getLong(final JSONObject payload, final String key, final long defaultValue) throws JSONException {
+	public static long getLong(@NonNull final JSONObject payload, final String key, final long defaultValue) throws JSONException {
 		long result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -51,7 +53,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static long optLong(final JSONObject payload, final String key, final long defaultValue) {
+	public static long optLong(@NonNull final JSONObject payload, final String key, final long defaultValue) {
 		long result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -71,7 +73,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static long optLong(final JSONArray payload, final int index, final long defaultValue) {
+	public static long optLong(@NonNull final JSONArray payload, final int index, final long defaultValue) {
 		long result = defaultValue;
 		if (payload.length() > index) {
 			try {
@@ -91,7 +93,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static int getInt(final JSONObject payload, final String key, final int defaultValue) throws JSONException {
+	public static int getInt(@NonNull final JSONObject payload, final String key, final int defaultValue) throws JSONException {
 		int result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -107,7 +109,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static int optInt(final JSONObject payload, final String key, final int defaultValue) {
+	public static int optInt(@NonNull final JSONObject payload, final String key, final int defaultValue) {
 		int result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -127,7 +129,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static int optInt(final JSONArray payload, final int index, final int defaultValue) {
+	public static int optInt(@NonNull final JSONArray payload, final int index, final int defaultValue) {
 		int result = defaultValue;
 		if (payload.length() > index) {
 			try {
@@ -147,7 +149,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static boolean getBoolean(final JSONObject payload, final String key, final boolean defaultValue) throws JSONException {
+	public static boolean getBoolean(@NonNull final JSONObject payload, final String key, final boolean defaultValue) throws JSONException {
 		boolean result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -163,7 +165,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static boolean optBoolean(final JSONObject payload, final String key, final boolean defaultValue) {
+	public static boolean optBoolean(@NonNull final JSONObject payload, final String key, final boolean defaultValue) {
 		boolean result = defaultValue;
 		if (payload.has(key)) {
 			try {
@@ -183,7 +185,7 @@ public class JSONHelper {
 		return result;
 	}
 
-	public static boolean optBoolean(final JSONArray payload, final int index, final boolean defaultValue) {
+	public static boolean optBoolean(@NonNull final JSONArray payload, final int index, final boolean defaultValue) {
 		boolean result = defaultValue;
 		if (payload.length() > index) {
 			try {
