@@ -300,7 +300,7 @@ public class GLUtils implements GLConst {
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_WRAP_T, wrap);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MIN_FILTER, minFilter);
 		GLES20.glTexParameteri(texTarget, GLES20.GL_TEXTURE_MAG_FILTER, magFilter);
-		Log.d(TAG, "initTex:texId=" + tex[0]);
+		if (DEBUG) Log.d(TAG, "initTex:texId=" + tex[0]);
 		return tex[0];
 	}
 
@@ -369,7 +369,7 @@ public class GLUtils implements GLConst {
 
 		int[] textureUnits = new int[1];
 		GLES20.glGetIntegerv(GLES20.GL_MAX_TEXTURE_IMAGE_UNITS, textureUnits, 0);
-		Log.v(TAG, "GL_MAX_TEXTURE_IMAGE_UNITS=" + textureUnits[0]);
+		if (DEBUG) Log.v(TAG, "GL_MAX_TEXTURE_IMAGE_UNITS=" + textureUnits[0]);
 		final int n = Math.min(texIds.length, textureUnits[0]);
 		for (int i = 0; i < n; i++) {
 			texIds[i] = initTex(texTarget, ShaderConst.TEX_NUMBERS[i],
