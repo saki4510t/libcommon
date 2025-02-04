@@ -862,6 +862,26 @@ public final class BitmapHelper {
     }
 
 	/**
+	 * 単色で塗りつぶしたBitmapを生成
+	 * @param width
+	 * @param height
+	 * @param color
+	 * @param config
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap makeFilledBitmap(
+		final int width, final int height,
+		final int color,
+		@NonNull final Bitmap.Config config) {
+
+		final Bitmap bm = Bitmap.createBitmap(width, height, config);
+		bm.eraseColor(color);
+
+		return bm;
+	}
+
+	/**
 	 * マスク用Bitmapを生成
 	 * @return
 	 */

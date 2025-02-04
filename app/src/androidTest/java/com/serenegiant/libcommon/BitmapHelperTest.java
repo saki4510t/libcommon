@@ -63,14 +63,43 @@ public class BitmapHelperTest {
 		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
+		assertEquals(WIDTH, b0.getWidth());
+		assertEquals(HEIGHT, b0.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b0.getConfig());
+
 		final Bitmap b1 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
+		assertEquals(WIDTH, b1.getWidth());
+		assertEquals(HEIGHT, b1.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b1.getConfig());
+
 		final Bitmap b2 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 19,
 			Bitmap.Config.ARGB_8888);
+		assertEquals(WIDTH, b2.getWidth());
+		assertEquals(HEIGHT, b2.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b2.getConfig());
+
 		assertTrue(bitmapEquals(b0, b1));
 		assertFalse(bitmapEquals(b0, b2));
+	}
+
+	@Test
+	public void makeFilledBitmapTest() {
+		final int color = 0x7f123456;
+		final Bitmap b = BitmapHelper.makeFilledBitmap(
+			WIDTH, HEIGHT, color,
+			Bitmap.Config.ARGB_8888);
+
+		assertEquals(WIDTH, b.getWidth());
+		assertEquals(HEIGHT, b.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b.getConfig());
+		for (int y = 0; y < HEIGHT; y++) {
+			for (int x = 0; x < WIDTH; x++) {
+				assertEquals(color, b.getColor(x, y).toArgb());
+			}
+		}
 	}
 
 	/**
@@ -81,12 +110,23 @@ public class BitmapHelperTest {
 		final Bitmap b0 = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
+		assertEquals(WIDTH, b0.getWidth());
+		assertEquals(HEIGHT, b0.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, b0.getConfig());
+
 		// copyBitmapのコピー先をnullとした場合は内部で自動生成
 		final Bitmap dst = BitmapHelper.copyBitmap(b0, null);
+		assertEquals(WIDTH, dst.getWidth());
+		assertEquals(HEIGHT, dst.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, dst.getConfig());
 		assertTrue(bitmapEquals(b0, dst));
+
 		// あらかじめ割り当てたビットマップへコピーする場合
 		final Bitmap dst1 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 		BitmapHelper.copyBitmap(b0, dst1);
+		assertEquals(WIDTH, dst1.getWidth());
+		assertEquals(HEIGHT, dst1.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, dst1.getConfig());
 		assertTrue(bitmapEquals(b0, dst1));
 	}
 
@@ -99,6 +139,9 @@ public class BitmapHelperTest {
 			0, WIDTH, HEIGHT,60,
 			Color.RED,0, 100);
 		final Bitmap inverted = BitmapHelper.invertAlpha(b0);
+		assertEquals(WIDTH, inverted.getWidth());
+		assertEquals(HEIGHT, inverted.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, inverted.getConfig());
 		// 2回アルファ値を反転させると元と一致するはず
 		assertTrue(bitmapEquals(b0, BitmapHelper.invertAlpha(inverted)));
 	}
@@ -111,27 +154,42 @@ public class BitmapHelperTest {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
+		assertEquals(WIDTH, original.getWidth());
+		assertEquals(HEIGHT, original.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, original.getConfig());
 
 		final Bitmap normal = BitmapHelper.applyMirror(original, IMirror.MIRROR_NORMAL);
 		assertTrue(bitmapEquals(original, normal));
+		assertEquals(WIDTH, normal.getWidth());
+		assertEquals(HEIGHT, normal.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, normal.getConfig());
 
 		// 左右反転
 		final Bitmap flipHorizontal = BitmapHelper.applyMirror(original, IMirror.MIRROR_HORIZONTAL);
 		assertFalse(bitmapEquals(original, flipHorizontal));
 		// 2回左右反転させると元と一致するはず
 		assertTrue(bitmapEquals(original, BitmapHelper.applyMirror(flipHorizontal, IMirror.MIRROR_HORIZONTAL)));
+		assertEquals(WIDTH, flipHorizontal.getWidth());
+		assertEquals(HEIGHT, flipHorizontal.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, flipHorizontal.getConfig());
 
 		// 上下反転
 		final Bitmap flipVertical = BitmapHelper.applyMirror(original, IMirror.MIRROR_VERTICAL);
 		assertFalse(bitmapEquals(original, flipVertical));
 		// 2回上下反転させると元と一致するはず
 		assertTrue(bitmapEquals(original, BitmapHelper.applyMirror(flipVertical, IMirror.MIRROR_VERTICAL)));
+		assertEquals(WIDTH, flipVertical.getWidth());
+		assertEquals(HEIGHT, flipVertical.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, flipVertical.getConfig());
 
 		// 上下左右反転
 		final Bitmap flipBoth = BitmapHelper.applyMirror(original, IMirror.MIRROR_BOTH);
 		assertFalse(bitmapEquals(original, flipBoth));
 		// 2回上下反転させると元と一致するはず
 		assertTrue(bitmapEquals(original, BitmapHelper.applyMirror(flipBoth, IMirror.MIRROR_BOTH)));
+		assertEquals(WIDTH, flipBoth.getWidth());
+		assertEquals(HEIGHT, flipBoth.getHeight());
+		assertEquals(Bitmap.Config.ARGB_8888, flipBoth.getConfig());
 
 		// 上下左右反転を左右反転して上下反転
 		assertTrue(bitmapEquals(original,
