@@ -32,6 +32,7 @@ import com.serenegiant.glpipeline.GLPipelineSource
 import com.serenegiant.glpipeline.MaskPipeline
 import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.gl.GLManager
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.graphics.BitmapHelper
 import java.io.IOException
 import java.util.concurrent.Semaphore
@@ -93,7 +94,7 @@ class MaskCameraSurfaceView @JvmOverloads constructor(context: Context?,
 			val sem = Semaphore(0)
 			source = VideoSourcePipeline(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
-				object : GLPipelineSource.PipelineSourceCallback {
+				object : GLPipelineSurfaceSource.PipelineSourceCallback {
 
 					override fun onCreate(surface: Surface) {
 						if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")

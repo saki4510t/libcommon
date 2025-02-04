@@ -42,7 +42,7 @@ import androidx.annotation.WorkerThread;
  * 他のPipelineからテクスチャとして利用可能とするためのヘルパークラス
  * useSharedContext=VideoSourcePipeline + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  */
-public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSource {
+public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSurfaceSource {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = VideoSourcePipeline.class.getSimpleName();
 

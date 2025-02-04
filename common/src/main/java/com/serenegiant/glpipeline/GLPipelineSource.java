@@ -18,37 +18,15 @@ package com.serenegiant.glpipeline;
  *  limitations under the License.
 */
 
-import android.graphics.SurfaceTexture;
-import android.view.Surface;
-
 import com.serenegiant.gl.GLManager;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
-import androidx.annotation.WorkerThread;
 
 /**
  * 映像ソースとなるGLPipelineインターフェース
  */
 public interface GLPipelineSource extends GLPipeline {
-	/**
-	 * PipelineSourceからのコールバックリスナー
-	 */
-	public interface PipelineSourceCallback {
-		/**
-		 * 映像受け取り用のSurfaceが生成された
-		 * @param surface
-		 */
-		@WorkerThread
-		public void onCreate(@NonNull final  Surface surface);
-
-		/**
-		 * 映像受け取り用のSurfaceが破棄された
-		 */
-		@WorkerThread
-		public void onDestroy();
-	}
-
 	/**
 	 * GLManagerを取得する
 	 * @return
@@ -56,26 +34,6 @@ public interface GLPipelineSource extends GLPipeline {
 	 */
 	@NonNull
 	public GLManager getGLManager() throws IllegalStateException;
-
-	/**
-	 * 映像入力用のSurfaceTextureを取得
-	 * PipelineSourceCallback#onCreateが呼び出されてから
-	 * PipelineSourceCallback#onDestroyが呼び出されるまでの間有効
-	 * @return
-	 * @throws IllegalStateException
-	 */
-	@NonNull
-	public SurfaceTexture getInputSurfaceTexture() throws IllegalStateException;
-
-	/**
-	 * 映像入力用のSurfaceを取得
-	 * PipelineSourceCallback#onCreateが呼び出されてから
-	 * PipelineSourceCallback#onDestroyが呼び出されるまでの間有効
-	 * @return
-	 * @throws IllegalStateException
-	 */
-	@NonNull
-	public Surface getInputSurface() throws IllegalStateException;
 
 	/**
 	 * テクスチャ名を取得

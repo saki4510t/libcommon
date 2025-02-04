@@ -30,7 +30,7 @@ import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.GLPipelineSource.PipelineSourceCallback
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.glutils.IMirror

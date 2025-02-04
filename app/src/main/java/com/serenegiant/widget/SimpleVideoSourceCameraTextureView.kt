@@ -368,7 +368,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		return VideoSourcePipeline(mGLManager,
 			width,
 			height,
-			object : GLPipelineSource.PipelineSourceCallback {
+			object : GLPipelineSurfaceSource.PipelineSourceCallback {
 
 				override fun onCreate(surface: Surface) {
 					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")

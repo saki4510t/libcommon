@@ -30,6 +30,7 @@ import com.serenegiant.glpipeline.DrawerPipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSource;
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
@@ -250,22 +251,6 @@ public class GLPipelineTest {
 		final GLManager manager = mManager;
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		// ImageSourceはGLPipelineSourceを実装しているけど外部からは映像を受け取れないので
-		// #getInputSurfaceと#getInputSurfaceTextureはUnsupportedOperationExceptionを
-		// 返すことを検証
-		Throwable ex = null;
-		try {
-			source.getInputSurface();
-		} catch (final Exception e) {
-			ex = e;
-		}
-		assertTrue(ex instanceof UnsupportedOperationException);
-		try {
-			source.getInputSurfaceTexture();
-		} catch (final Exception e) {
-			ex = e;
-		}
-		assertTrue(ex instanceof UnsupportedOperationException);
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
@@ -412,7 +397,7 @@ public class GLPipelineTest {
 		source.setPipeline(surfacePipeline);
 
 		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,
-			new GLPipelineSource.PipelineSourceCallback() {
+			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
 					surfacePipeline.setSurface(surface);

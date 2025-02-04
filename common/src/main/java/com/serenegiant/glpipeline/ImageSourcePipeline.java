@@ -19,11 +19,9 @@ package com.serenegiant.glpipeline;
 */
 
 import android.graphics.Bitmap;
-import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Choreographer;
-import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
@@ -107,28 +105,6 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@Override
 	public GLManager getGLManager() throws IllegalStateException {
 		return mManager;
-	}
-
-	/**
-	 * ImageSourceでは対応していないのでUnsupportedOperationExceptionを投げる
-	 * @return
-	 * @throws UnsupportedOperationException
-	 */
-	@NonNull
-	@Override
-	public SurfaceTexture getInputSurfaceTexture() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("");
-	}
-
-	/**
-	 * ImageSourceでは対応していないのでUnsupportedOperationExceptionを投げる
-	 * @return
-	 * @throws UnsupportedOperationException
-	 */
-	@NonNull
-	@Override
-	public Surface getInputSurface() throws UnsupportedOperationException {
-		throw new UnsupportedOperationException("");
 	}
 
 	/**
