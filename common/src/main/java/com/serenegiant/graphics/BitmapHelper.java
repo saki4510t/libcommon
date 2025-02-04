@@ -157,13 +157,13 @@ public final class BitmapHelper {
 			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
 			BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
 			// 一番近いサイズになるSamplingSizeを計算
-			final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
+			final int calcSampleSize = calcSampleSize(options, requestWidth, requestHeight);
 			// 2のベキ乗に丸める=MSBを取得
-			final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
+			final int inSampleSize = 1 << BitsHelper.MSB(calcSampleSize);
 			options.inSampleSize = inSampleSize;
 			options.inJustDecodeBounds = false;
 			bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-			if ((inSampleSize != calcedSampleSize)
+			if ((inSampleSize != calcSampleSize)
 				|| (bitmap.getWidth() != requestWidth)
 				|| (bitmap.getHeight() != requestHeight)) {
 
@@ -336,15 +336,15 @@ public final class BitmapHelper {
 			options.inJustDecodeBounds = true;	// Bitmapを生成せずにサイズ等の情報だけを取得する
 			BitmapFactory.decodeFileDescriptor(fd, null, options);
 			// 一番近いサイズになるSamplingSizeを計算
-			final int calcedSampleSize = calcSampleSize(options, requestWidth, requestHeight);
+			final int calcSampleSize = calcSampleSize(options, requestWidth, requestHeight);
 			// 2のベキ乗に丸める=MSBを取得
-			final int inSampleSize = 1 << BitsHelper.MSB(calcedSampleSize);
+			final int inSampleSize = 1 << BitsHelper.MSB(calcSampleSize);
 			options.inSampleSize = inSampleSize;
-//			options.inMutable = (inSampleSize != calcedSampleSize);	// サイズ変更する時はmutableにする
+//			options.inMutable = (inSampleSize != calcSampleSize);	// サイズ変更する時はmutableにする
 			options.inJustDecodeBounds = false;
 			bitmap = BitmapFactory.decodeFileDescriptor(fd, null, options);
 			final int orientation = getOrientation(fd);
-			if ((inSampleSize != calcedSampleSize)
+			if ((inSampleSize != calcSampleSize)
 				|| (orientation != 0)
 				|| (bitmap.getWidth() != requestWidth)
 				|| (bitmap.getHeight() != requestHeight)) {

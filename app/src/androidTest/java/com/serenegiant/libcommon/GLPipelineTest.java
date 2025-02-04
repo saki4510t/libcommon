@@ -670,7 +670,7 @@ public class GLPipelineTest {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
 						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+						// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
 							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
 							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
