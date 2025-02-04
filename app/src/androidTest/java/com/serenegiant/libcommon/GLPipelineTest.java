@@ -29,7 +29,6 @@ import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.DrawerPipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
-import com.serenegiant.glpipeline.GLPipelineSource;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
