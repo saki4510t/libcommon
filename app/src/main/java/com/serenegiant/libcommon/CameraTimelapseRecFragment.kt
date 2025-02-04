@@ -195,15 +195,16 @@ class CameraTimelapseRecFragment : AbstractCameraFragment() {
 	/**
 	 * create recorder and related encoder
 	 * @param outputFile
-	 * @param audio_source
-	 * @param audio_channels
+	 * @param audioSource
+	 * @param audioChannels
 	 * @param align16
 	 * @return
 	 * @throws IOException
 	 */
 	@Throws(IOException::class)
-	private fun createRecorder(outputFile: DocumentFile,
-		audio_source: Int, audio_channels: Int,
+	private fun createRecorder(
+		outputFile: DocumentFile,
+		audioSource: Int, audioChannels: Int,
 		align16: Boolean): Recorder {
 
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputFile.uri)

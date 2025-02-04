@@ -698,7 +698,7 @@ class MainActivity
 			try {
 				mToast?.cancel()
 				mToast = null
-				val text = args?.let { getString(msg, it) } ?: getString(msg)
+				val text = getString(msg, args) ?: getString(msg)
 				mToast = Toast.makeText(this@MainActivity, text, duration)
 				mToast!!.show()
 			} catch (e: Exception) {

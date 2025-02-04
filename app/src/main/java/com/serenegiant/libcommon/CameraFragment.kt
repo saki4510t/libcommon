@@ -107,7 +107,7 @@ class CameraFragment : AbstractCameraFragment() {
 		override fun onConnected() {
 			if (DEBUG) Log.v(TAG, "onConnected:")
 			if (mRecordingSurfaceId != 0) {
-				mCameraView!!.removeSurface(mRecordingSurfaceId)
+				mCameraView.removeSurface(mRecordingSurfaceId)
 				mRecordingSurfaceId = 0
 			}
 			val recorder = mRecorder
@@ -134,7 +134,7 @@ class CameraFragment : AbstractCameraFragment() {
 						val surface = recorder.getInputSurface() // API>=18
 						if (surface != null) {
 							mRecordingSurfaceId = surface.hashCode()
-							mCameraView!!.addSurface(mRecordingSurfaceId, surface, true)
+							mCameraView.addSurface(mRecordingSurfaceId, surface, true)
 						} else {
 							Log.w(TAG, "surface is null")
 							stopRecording() // 非同期で呼ばないとデッドロックするかも
@@ -187,7 +187,7 @@ class CameraFragment : AbstractCameraFragment() {
 		override fun onDisconnected() {
 			if (DEBUG) Log.v(TAG, "onDisconnected:")
 			if (mRecordingSurfaceId != 0) {
-				mCameraView!!.removeSurface(mRecordingSurfaceId)
+				mCameraView.removeSurface(mRecordingSurfaceId)
 				mRecordingSurfaceId = 0
 			}
 			stopRecording()

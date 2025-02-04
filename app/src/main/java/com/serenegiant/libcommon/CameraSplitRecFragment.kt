@@ -183,8 +183,8 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 	/**
 	 * create recorder and related encoder
 	 * @param outputDir
-	 * @param audio_source
-	 * @param audio_channels
+	 * @param audioSource
+	 * @param audioChannels
 	 * @param align16
 	 * @return
 	 * @throws IOException
@@ -192,9 +192,11 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 	@SuppressLint("MissingPermission")
 	@Suppress("DEPRECATION")
 	@Throws(IOException::class)
-	private fun createRecorder(outputDir: DocumentFile?,
-		audio_source: Int, audio_channels: Int,
+	private fun createRecorder(
+		outputDir: DocumentFile?,
+		audioSource: Int, audioChannels: Int,
 		align16: Boolean): Recorder {
+
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputDir?.uri)
 		val recorder = MediaAVSplitRecorderV2(
 			requireContext(), mRecorderCallback, null, MAX_FILE_SIZE)
@@ -211,9 +213,9 @@ class CameraSplitRecFragment : AbstractCameraFragment() {
 		}
 		mVideoEncoder!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
 		mVideoEncoder!!.setVideoConfig(-1, VIDEO_FPS, 10)
-		if (audio_source >= 0) {
-			mAudioSampler = AudioSampler(audio_source,
-				audio_channels, SAMPLE_RATE)
+		if (audioSource >= 0) {
+			mAudioSampler = AudioSampler(audioSource,
+				audioChannels, SAMPLE_RATE)
 			mAudioSampler!!.start()
 			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler)
 		}

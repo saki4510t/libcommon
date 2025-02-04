@@ -194,17 +194,19 @@ class CameraRecFragment : AbstractCameraFragment() {
 	/**
 	 * create recorder and related encoder
 	 * @param outputFile
-	 * @param audio_source
-	 * @param audio_channels
+	 * @param audioSource
+	 * @param audioChannels
 	 * @param align16
 	 * @return
 	 * @throws IOException
 	 */
 	@SuppressLint("MissingPermission")
 	@Throws(IOException::class)
-	private fun createRecorder(outputFile: DocumentFile,
-								 audio_source: Int, audio_channels: Int,
-								 align16: Boolean): Recorder {
+	private fun createRecorder(
+		outputFile: DocumentFile,
+		audioSource: Int, audioChannels: Int,
+		align16: Boolean): Recorder {
+
 		if (DEBUG) Log.v(TAG, "createRecorder:basePath=" + outputFile.uri)
 		val recorder = MediaAVRecorder(
 			requireContext(), mRecorderCallback, outputFile)
@@ -221,15 +223,15 @@ class CameraRecFragment : AbstractCameraFragment() {
 		}
 		mVideoEncoder!!.setVideoSize(VIDEO_WIDTH, VIDEO_HEIGHT)
 		mVideoEncoder!!.setVideoConfig(-1, VIDEO_FPS, 10)
-		if (audio_source >= 0) {
+		if (audioSource >= 0) {
 			mAudioSampler = if (USE_ENCODED_AUDIO_SAMPLER) {
 				// AAC LCへエンコードしてからバッファリングする音声サンプラー
-				EncodedAudioSampler(audio_source,
-					audio_channels, SAMPLE_RATE)
+				EncodedAudioSampler(audioSource,
+					audioChannels, SAMPLE_RATE)
 			} else {
 				// 通常の音声サンプラー
-				AudioSampler(audio_source,
-					audio_channels, SAMPLE_RATE)
+				AudioSampler(audioSource,
+					audioChannels, SAMPLE_RATE)
 			}
 			mAudioSampler!!.start()
 			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler)
