@@ -54,7 +54,7 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).doubleValue() != 0;
 		} else if (value instanceof String) {
-			// 空文字列だけではなく空白文字列だけもデフォルト値にする
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue;
@@ -115,8 +115,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).byteValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -173,8 +175,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).shortValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -231,8 +235,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).intValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -289,8 +295,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).longValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -341,8 +349,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).floatValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -393,8 +403,10 @@ public class ObjectHelper {
 		} else if (value instanceof Number) {
 			return ((Number)value).doubleValue();
 		} else if (value instanceof String) {
-			if (!TextUtils.isEmpty((String)value)) {
-				final String v = (String)value;
+			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
+			final String trimmedValue = ((String) value).trim();
+			if (!TextUtils.isEmpty(trimmedValue)) {
+				final String v = trimmedValue;
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
