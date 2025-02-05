@@ -145,9 +145,14 @@ public class ObjectHelper {
 				} catch (final Exception e) {
 					//
 				}
-				return  Boolean.parseBoolean((String)value) ? (byte)1 : (byte)0;
+				if ("true".equalsIgnoreCase(v)) {
+					return (byte)1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 
@@ -205,9 +210,14 @@ public class ObjectHelper {
 				} catch (final Exception e) {
 					//
 				}
-				return  Boolean.parseBoolean((String)value) ? (short)1 : (short)0;
+				if ("true".equalsIgnoreCase(v)) {
+					return (short)1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 
@@ -265,9 +275,14 @@ public class ObjectHelper {
 				} catch (final Exception e) {
 					//
 				}
-				return Boolean.parseBoolean((String)value) ? 1 : 0;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 
@@ -319,9 +334,14 @@ public class ObjectHelper {
 				} catch (final Exception e2) {
 					//
 				}
-				return Boolean.parseBoolean((String)value) ? 1 : 0;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 
@@ -373,9 +393,14 @@ public class ObjectHelper {
 				} catch (final Exception e2) {
 					//
 				}
-				return Boolean.parseBoolean((String)value) ? 1 : 0;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 
@@ -427,9 +452,14 @@ public class ObjectHelper {
 				} catch (final Exception e2) {
 					//
 				}
-				return Boolean.parseBoolean((String)value) ? 1 : 0;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 			}
 		}
+
 		return defaultValue;
 	}
 }
