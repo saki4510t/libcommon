@@ -119,6 +119,8 @@
         </Options>
       </option>
     </inspection_tool>
+    <inspection_tool class="OptionalOfNullableMisuseMerged" />
+    <inspection_tool class="PatternVariableCanBeUsed" enabled="true" level="TEXT ATTRIBUTES" enabled_by_default="true" editorAttributes="REASSIGNED_LOCAL_VARIABLE_ATTRIBUTES" />
     <inspection_tool class="ReturnFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="SafeVarargsDetector" enabled="false" level="WARNING" enabled_by_default="false" />
     <inspection_tool class="ThrowFromFinallyBlock" enabled="false" level="WARNING" enabled_by_default="false" />
