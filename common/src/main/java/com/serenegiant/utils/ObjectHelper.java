@@ -118,13 +118,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return (byte)Integer.parseInt(v.substring(2), 16);
+						return ((Integer)Integer.parseInt(vv, 16)).byteValue();
 					} catch (final Exception e1) {
-						return (byte)Long.parseLong(v.substring(2), 16);
+						return ((Long)Long.parseLong(vv, 16)).byteValue();
 					}
 				}
 				try {
@@ -183,13 +184,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return (short)Integer.parseInt(v.substring(2), 16);
+						return ((Integer)Integer.parseInt(vv, 16)).shortValue();
 					} catch (final Exception e1) {
-						return (short)Long.parseLong(v.substring(2), 16);
+						return ((Long)Long.parseLong(vv, 16)).shortValue();
 					}
 				}
 				try {
@@ -248,13 +250,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return Integer.parseInt(v.substring(2), 16);
+						return Integer.parseInt(vv, 16);
 					} catch (final Exception e1) {
-						return ((Long)Long.parseLong(v.substring(2), 16)).intValue();
+						return ((Long)Long.parseLong(vv, 16)).intValue();
 					}
 				}
 				try {
@@ -313,11 +316,12 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return Long.parseLong(v.substring(2), 16);
+						return Long.parseLong(vv, 16);
 					} catch (final Exception e1) {
 						//
 					}
