@@ -21,12 +21,16 @@ package com.serenegiant.libcommon;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+
+import java.io.Serializable;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -183,5 +187,85 @@ LOOP:		for (int y = 0; y < height; y++) {
 				}
 			}
 		}).start();
+	}
+
+//--------------------------------------------------------------------------------
+// テストに使うダミーのクラス
+//--------------------------------------------------------------------------------
+
+	/*package*/static class ParcelableValue implements Parcelable {
+		public final int value;
+
+		ParcelableValue(final int value) {
+			this.value = value;
+		}
+
+		ParcelableValue(@NonNull final Parcel src) {
+			value = src.readInt();
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(@NonNull final Parcel dst, final int flags) {
+			dst.writeInt(value);
+		}
+
+		public static final Parcelable.Creator<?> CREATOR
+			= new Parcelable.Creator<ParcelableValue>() {
+			@Override
+			public ParcelableValue createFromParcel(@NonNull final Parcel src) {
+				return new ParcelableValue(src);
+			}
+
+			@Override
+			public ParcelableValue[] newArray(final int size) {
+				return new ParcelableValue[0];
+			}
+		};
+	}
+
+	/*package*/static class BothValue implements Parcelable, Serializable {
+		public final int value;
+
+		BothValue(final int value) {
+			this.value = value;
+		}
+
+		BothValue(@NonNull final Parcel src) {
+			value = src.readInt();
+		}
+
+		@Override
+		public int describeContents() {
+			return 0;
+		}
+
+		@Override
+		public void writeToParcel(@NonNull final Parcel dst, final int flags) {
+			dst.writeInt(value);
+		}
+
+		public static final Parcelable.Creator<?> CREATOR
+			= new Parcelable.Creator<BothValue>() {
+			@Override
+			public BothValue createFromParcel(@NonNull final Parcel src) {
+				return new BothValue(src);
+			}
+
+			@Override
+			public BothValue[] newArray(final int size) {
+				return new BothValue[0];
+			}
+		};
+	}
+
+	/*package*/record SerializableValue(int value) implements Serializable {
+	}
+
+	/*package*/record Value(int value) {
 	}
 }

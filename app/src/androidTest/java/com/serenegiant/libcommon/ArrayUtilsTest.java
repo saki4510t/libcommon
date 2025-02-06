@@ -19,8 +19,11 @@ package com.serenegiant.libcommon;
 */
 
 import android.os.Bundle;
-import android.os.Parcel;
-import android.os.Parcelable;
+
+import com.serenegiant.libcommon.TestUtils.BothValue;
+import com.serenegiant.libcommon.TestUtils.Value;
+import com.serenegiant.libcommon.TestUtils.ParcelableValue;
+import com.serenegiant.libcommon.TestUtils.SerializableValue;
 
 import com.serenegiant.utils.ArrayUtils;
 
@@ -28,9 +31,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.Serializable;
-
-import androidx.annotation.NonNull;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 @RunWith(AndroidJUnit4.class)
@@ -216,89 +216,4 @@ public class ArrayUtilsTest {
 		Assert.assertEquals(ArrayUtils.ArrayType.UNKNOWN_ARRAY, ArrayUtils.getArrayType(new Object[10]));
 	}
 
-	private static class ParcelableValue implements Parcelable {
-		public final int value;
-
-		ParcelableValue(final int value) {
-			this.value = value;
-		}
-
-		ParcelableValue(@NonNull final Parcel src) {
-			value = src.readInt();
-		}
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(@NonNull final Parcel dst, final int flags) {
-			dst.writeInt(value);
-		}
-
-		public static final Parcelable.Creator<?> CREATOR
-			= new Parcelable.Creator<ParcelableValue>() {
-			@Override
-			public ParcelableValue createFromParcel(@NonNull final Parcel src) {
-				return new ParcelableValue(src);
-			}
-
-			@Override
-			public ParcelableValue[] newArray(final int size) {
-				return new ParcelableValue[0];
-			}
-		};
-	}
-
-	private static class BothValue implements Parcelable, Serializable {
-		public final int value;
-
-		BothValue(final int value) {
-			this.value = value;
-		}
-
-		BothValue(@NonNull final Parcel src) {
-			value = src.readInt();
-		}
-
-		@Override
-		public int describeContents() {
-			return 0;
-		}
-
-		@Override
-		public void writeToParcel(@NonNull final Parcel dst, final int flags) {
-			dst.writeInt(value);
-		}
-
-		public static final Parcelable.Creator<?> CREATOR
-			= new Parcelable.Creator<BothValue>() {
-			@Override
-			public BothValue createFromParcel(@NonNull final Parcel src) {
-				return new BothValue(src);
-			}
-
-			@Override
-			public BothValue[] newArray(final int size) {
-				return new BothValue[0];
-			}
-		};
-	}
-
-	private static class SerializableValue implements Serializable {
-		public final int value;
-
-		public SerializableValue(final int value) {
-			this.value = value;
-		}
-	}
-
-	private static class Value {
-		public final int value;
-
-		public Value(final int value) {
-			this.value = value;
-		}
-	}
 }
