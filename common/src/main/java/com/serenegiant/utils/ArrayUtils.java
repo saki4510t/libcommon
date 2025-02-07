@@ -151,7 +151,8 @@ public class ArrayUtils {
 	 */
 	public static <T> boolean contains(@NonNull final T[] values, final T value) {
 		for (final T v: values) {
-			if ((v != null) && v.equals(value)) {
+			if (((v != null) && v.equals(value))
+				|| ((v == null) && (value == null))) {
 				return true;
 			}
 		}
