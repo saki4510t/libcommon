@@ -466,4 +466,37 @@ public class ObjectHelper {
 
 		return defaultValue;
 	}
+
+	/**
+	 * ObjectをasXXXで変換して比較する
+	 * valueがプリミティブ以外の場合はvalue#equals(object)で比較する
+	 * @param value
+	 * @param object
+	 * @return
+	 * @param <T>
+	 */
+	public static <T> boolean equals(final T value, final Object object) {
+		if (value == null) {
+			return (object == null);
+		}
+		// これより下はvalue!=null
+		final Class<?> valueClass = ClassUtils.getPrimitiveClass(value);
+		if (valueClass == Boolean.TYPE) {
+			return (boolean)value == asBoolean(object, !(boolean)value);
+		} else if (valueClass == Byte.TYPE) {
+			return (byte)value == asByte(object, (byte)(~(byte)value));
+		} else if (valueClass == Short.TYPE) {
+			return (short)value == asShort(object, (short)(~(short)value));
+		} else if (valueClass == Integer.TYPE) {
+			return (int)value == asInt(object, ~(int)value);
+		} else if (valueClass == Long.TYPE) {
+			return (long)value == asLong(object, ~(long)value);
+		} else if (valueClass == Float.TYPE) {
+			return (float)value == asFloat(object, ((float)value + 1.0f) / 2.0f);
+		} else if (valueClass == Double.TYPE) {
+			return (double)value == asDouble(object, ((double)value + 1.0) / 2.0);
+		} else {
+			return value.equals(object);
+		}
+	}
 }
