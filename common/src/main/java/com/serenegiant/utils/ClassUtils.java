@@ -27,7 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class ClassUtils {
-	private static final boolean DEBUG = true;	// XXX set false on production
+	private static final boolean DEBUG = false;	// XXX set false on production
 	private static final String TAG = ClassUtils.class.getSimpleName();
 
 	private ClassUtils() {
