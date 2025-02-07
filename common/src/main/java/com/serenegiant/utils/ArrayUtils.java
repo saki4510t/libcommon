@@ -76,6 +76,21 @@ public class ArrayUtils {
 	}
 
 	/**
+	 * 引数が配列ならばその配列要素のクラスを返す
+	 * 要素がプリミティブまたはプリミティブのボクシングクラスの場合はプリミティブの型を返す
+	 * 配列でなければnullを返す
+	 * XXX kotlin側でClassUtils.getPrimitiveClass(ArrayUtils.getArrayClass(obj))を呼ぶのと
+	 *     Java側でClassUtils.getPrimitiveClass(ArrayUtils.getArrayClass(obj))を呼ぶのとは
+	 *     結果が違う(kotlin側で呼ぶとjava.lang.Classになる)
+	 * @param obj
+	 * @return
+	 */
+	@Nullable
+	public static Class<?> getPrimitiveArrayClass(@Nullable final Object obj) {
+		return ClassUtils.getPrimitiveClass(getArrayClass(obj));
+	}
+
+	/**
 	 * 引数の配列要素の種類を取得する
 	 * 配列でなければNOT_A_ARRAY, 未対応配列であればUNKNOWN_ARRAYを返す
 	 * プリミティブとそれに対応する型の配列(int/Integerなど)はプリミティブかどうかを区別せず判定する

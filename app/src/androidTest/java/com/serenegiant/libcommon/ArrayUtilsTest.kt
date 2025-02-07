@@ -138,6 +138,114 @@ class ArrayUtilsTest {
 	}
 
 	/**
+	 * ArrayUtils.getPrimitiveArrayClassが想定通りの値を返すかどうかをテスト
+	 * ArrayUtils.getPrimitiveArrayClassの実体はClassUtils.getPrimitiveClass(ArrayUtils.getArrayClass)だけど
+	 * Java側でClassUtils.getPrimitiveClass(ArrayUtils.getArrayClass)を呼ぶのと
+	 * kotlin側でClassUtils.getPrimitiveClass(ArrayUtils.getArrayClass)を呼ぶのとは結果が違う
+	 * (Java側で呼べばプリミティブの型クラスが返ってくるけどkotlin側で呼ぶとjava.lang.Classが返ってくる)
+	 */
+	@Test
+	fun primitiveArrayClassTest() {
+		assertNull(ArrayUtils.getPrimitiveArrayClass(null))
+		assertNull(ArrayUtils.getPrimitiveArrayClass(Value(0)))
+		assertNull(ArrayUtils.getPrimitiveArrayClass(Any()))
+
+		assertEquals(Bundle::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Bundle>(0)))
+		assertEquals(Bundle::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Bundle>(10)))
+		assertEquals(Bundle::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(Bundle())))
+
+		assertEquals(String::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<String>(0)))
+		assertEquals(String::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<String>(10)))
+		assertEquals(String::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf("")))
+
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(CharArray(0)))
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(CharArray(10)))
+
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Char>(0)))
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Char>(10)))
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toChar())))
+		assertEquals(Char::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf('a')))
+
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(ByteArray(0)))
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(ByteArray(10)))
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(byteArrayOf(java.lang.Byte.decode("0"))))
+
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Byte>(0)))
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Byte>(10)))
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toByte())))
+		assertEquals(Byte::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(java.lang.Byte.decode("0"))))
+
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(ShortArray(0)))
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(ShortArray(10)))
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(shortArrayOf(java.lang.Short.decode("0"))))
+
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Short>(0)))
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Short>(10)))
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toShort())))
+		assertEquals(Short::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(java.lang.Short.decode("0"))))
+
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(IntArray(0)))
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(IntArray(10)))
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(intArrayOf(Integer.decode("0"))))
+
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Int>(0)))
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Int>(10)))
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20)))
+		assertEquals(Int::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(Integer.decode("0"))))
+
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(LongArray(0)))
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(LongArray(10)))
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(longArrayOf(java.lang.Long.decode("0"))))
+
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Long>(0)))
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Long>(10)))
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toLong())))
+		assertEquals(Long::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(java.lang.Long.decode("0"))))
+
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(FloatArray(0)))
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(FloatArray(10)))
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(floatArrayOf("0.0".toFloat())))
+
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Float>(0)))
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Float>(10)))
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toFloat())))
+		assertEquals(Float::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf("0.0".toFloat())))
+
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(DoubleArray(0)))
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(DoubleArray(10)))
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(doubleArrayOf("0.0".toDouble())))
+
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Double>(0)))
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Double>(10)))
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(0x20.toDouble())))
+		assertEquals(Double::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf("0.0".toDouble())))
+
+		// Parcelableを実装していればPARCELABLE_ARRAY
+		assertEquals(ParcelableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<ParcelableValue>(0)))
+		assertEquals(ParcelableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<ParcelableValue>(10)))
+		assertEquals(ParcelableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(ParcelableValue(0))))
+
+		// ParcelableとSerializableの両方を実装している場合はPARCELABLE_ARRAY
+		assertEquals(BothValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<BothValue>(0)))
+		assertEquals(BothValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<BothValue>(10)))
+		assertEquals(BothValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(BothValue(0))))
+
+		// Serializableを実装していればSERIALIZABLE_ARRAY
+		assertEquals(SerializableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<SerializableValue>(0)))
+		assertEquals(SerializableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<SerializableValue>(10)))
+		assertEquals(SerializableValue::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(SerializableValue(0))))
+
+		// その他クラスの亜配列はUNKNOWN_ARRAY
+		assertEquals(Value::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Value>(0)))
+		assertEquals(Value::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Value>(10)))
+		assertEquals(Value::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOf(Value(0))))
+//		assertEquals(Void::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Void>(0)))
+//		assertEquals(Void::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Void>(10)))
+		assertEquals(Any::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Any>(0)))
+		assertEquals(Any::class.java, ArrayUtils.getPrimitiveArrayClass(arrayOfNulls<Any>(10)))
+	}
+
+	/**
 	 * ArrayUtils.getArrayTypeが想定通りの値を返すかどうかをテスト
 	 */
 	@Test
