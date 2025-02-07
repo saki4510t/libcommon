@@ -257,6 +257,7 @@ public class ArrayUtils {
 		return new ArrayList<>(Arrays.asList(array));
 	}
 
+//--------------------------------------------------------------------------------
 	/**
 	 * float[]をbyte[]に変換して返す
 	 *
@@ -555,5 +556,230 @@ public class ArrayUtils {
 			array[i + 7] = tmp.getLong();
 		}
 		return array;
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時はfalseとする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static boolean[] toPrimitiveArray(@NonNull final Boolean[] array) {
+		return toPrimitiveArray(array, false);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static boolean[] toPrimitiveArray(@NonNull final Boolean[] array, final boolean nullValue) {
+		final int n = array.length;;
+		final boolean[] result = new boolean[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = (array[i] != null) ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時は0とする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static byte[] toPrimitiveArray(@NonNull final Byte[] array) {
+		return toPrimitiveArray(array, (byte)0);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static byte[] toPrimitiveArray(@NonNull final Byte[] array, final byte nullValue) {
+		final int n = array.length;;
+		final byte[] result = new byte[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時は0とする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static short[] toPrimitiveArray(@NonNull final Short[] array) {
+		return toPrimitiveArray(array, (short)0);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static short[] toPrimitiveArray(@NonNull final Short[] array, final short nullValue) {
+		final int n = array.length;;
+		final short[] result = new short[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時は0とする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static int[] toPrimitiveArray(@NonNull final Integer[] array) {
+		return toPrimitiveArray(array, 0);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static int[] toPrimitiveArray(@NonNull final Integer[] array, final int nullValue) {
+		final int n = array.length;;
+		final int[] result = new int[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時は0とする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static long[] toPrimitiveArray(@NonNull final Long[] array) {
+		return toPrimitiveArray(array, 0);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static long[] toPrimitiveArray(@NonNull final Long[] array, final long nullValue) {
+		final int n = array.length;;
+		final long[] result = new long[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時はFloat.NaNとする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static float[] toPrimitiveArray(@NonNull final Float[] array) {
+		return toPrimitiveArray(array, Float.NaN);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static float[] toPrimitiveArray(@NonNull final Float[] array, final float nullValue) {
+		final int n = array.length;;
+		final float[] result = new float[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * arrayの要素がnullの時はDouble.NaNとする
+	 * @param array
+	 * @return
+	 */
+	@NonNull
+	public static double[] toPrimitiveArray(@NonNull final Double[] array) {
+		return toPrimitiveArray(array, Double.NaN);
+	}
+
+	/**
+	 * Javaだとプリミティブの配列とプリミティブのボクシングクラスの配列で互換性がないので
+	 * スマートじゃ無いけどアンボクシングしてプリミティブの配列に変換する
+	 * XXX floatArrayToByteArrayとかと同じでコピーの高速化をした方がよいかも
+	 * arrayの要素がnullの時はnullValueとする
+	 * @param array
+	 * @param nullValue arrayの要素がnullの時の値
+	 * @return
+	 */
+	@NonNull
+	public static double[] toPrimitiveArray(@NonNull final Double[] array, final double nullValue) {
+		final int n = array.length;;
+		final double[] result = new double[n];
+		for (int i = 0; i < n; i++) {
+			result[i] = array[i] != null ? array[i] : nullValue;
+		}
+
+		return result;
 	}
 }
