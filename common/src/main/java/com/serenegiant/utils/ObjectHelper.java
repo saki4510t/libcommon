@@ -41,17 +41,8 @@ public class ObjectHelper {
 			return (Boolean)value;
 		} else if (value instanceof Byte) {
 			return ((Byte)value) != 0;
-		} else if (value instanceof Short) {
-			return ((Short)value) != 0;
-		} else if (value instanceof Integer) {
-			return ((Integer)value) != 0;
-		} else if (value instanceof Long) {
-			return ((Long)value) != 0;
-		} else if (value instanceof Float) {
-			return ((Float)value) != 0;
-		} else if (value instanceof Double) {
-			return ((Double)value) != 0;
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).doubleValue() != 0;
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -105,19 +96,8 @@ public class ObjectHelper {
 	public static byte asByte(final Object value, final byte defaultValue) {
 		if (value instanceof Boolean) {
 			return (Boolean)value ? (byte)1 : (byte)0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value).byteValue();
-		} else if (value instanceof Integer) {
-			return ((Integer)value).byteValue();
-		} else if (value instanceof Long) {
-			return ((Long)value).byteValue();
-		} else if (value instanceof Float) {
-			return ((Float)value).byteValue();
-		} else if (value instanceof Double) {
-			return ((Double)value).byteValue();
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).byteValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -171,19 +151,8 @@ public class ObjectHelper {
 	public static short asShort(final Object value, final short defaultValue) {
 		if (value instanceof Boolean) {
 			return (Boolean)value ? (short)1 : (short)0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value);
-		} else if (value instanceof Integer) {
-			return ((Integer)value).shortValue();
-		} else if (value instanceof Long) {
-			return ((Long)value).shortValue();
-		} else if (value instanceof Float) {
-			return ((Float)value).shortValue();
-		} else if (value instanceof Double) {
-			return ((Double)value).shortValue();
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).shortValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -237,19 +206,8 @@ public class ObjectHelper {
 	public static int asInt(final Object value, final int defaultValue) {
 		if (value instanceof Boolean) {
 			return ((Boolean)value) ? 1 : 0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value);
-		} else if (value instanceof Integer) {
-			return (Integer)value;
-		} else if (value instanceof Long) {
-			return ((Long)value).intValue();
-		} else if (value instanceof Float) {
-			return ((Float)value).intValue();
-		} else if (value instanceof Double) {
-			return ((Double)value).intValue();
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).intValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -303,19 +261,8 @@ public class ObjectHelper {
 	public static long asLong(final Object value, final long defaultValue) {
 		if (value instanceof Boolean) {
 			return ((Boolean)value) ? 1 : 0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value);
-		} else if (value instanceof Integer) {
-			return (Integer)value;
-		} else if (value instanceof Long) {
-			return (Long)value;
-		} else if (value instanceof Float) {
-			return ((Float)value).longValue();
-		} else if (value instanceof Double) {
-			return ((Double)value).longValue();
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).longValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -363,19 +310,8 @@ public class ObjectHelper {
 	public static float asFloat(final Object value, final float defaultValue) {
 		if (value instanceof Boolean) {
 			return ((Boolean)value) ? 1 : 0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value);
-		} else if (value instanceof Integer) {
-			return (Integer)value;
-		} else if (value instanceof Long) {
-			return ((Long)value).floatValue();
-		} else if (value instanceof Float) {
-			return (Float)value;
-		} else if (value instanceof Double) {
-			return ((Double)value).floatValue();
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).floatValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
@@ -422,19 +358,8 @@ public class ObjectHelper {
 	public static double asDouble(final Object value, final double defaultValue) {
 		if (value instanceof Boolean) {
 			return ((Boolean)value) ? 1 : 0;
-		} else if (value instanceof Byte) {
-			return ((Byte)value);
-		} else if (value instanceof Short) {
-			return ((Short)value);
-		} else if (value instanceof Integer) {
-			return (Integer)value;
-		} else if (value instanceof Long) {
-			return ((Long)value).doubleValue();
-		} else if (value instanceof Float) {
-			return (Float)value;
-		} else if (value instanceof Double) {
-			return (Double)value;
 		} else if (value instanceof Number) {
+			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).doubleValue();
 		} else if (value instanceof String) {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
