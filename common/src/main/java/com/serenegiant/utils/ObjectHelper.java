@@ -197,7 +197,8 @@ public class ObjectHelper {
 	}
 
 	@Nullable
-	private static Number asNumber(final String value) {
+	private static Number asNumber(@Nullable final String value) {
+		if (value == null) return null;
 		// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 		final String trimmedValue = value.trim();
 		if (!TextUtils.isEmpty(trimmedValue)) {
