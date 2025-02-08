@@ -58,6 +58,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue;
+				if ("true".equalsIgnoreCase(v)) {
+					return true;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return false;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -84,7 +89,7 @@ public class ObjectHelper {
 				} catch (final Exception e) {
 					//
 				}
-				return Boolean.parseBoolean((String)value);
+				return Boolean.parseBoolean(v);
 			}
 		}
 
@@ -185,6 +190,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue.toLowerCase();
+				if ("true".equalsIgnoreCase(v)) {
+					return (short)1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
@@ -211,11 +221,6 @@ public class ObjectHelper {
 					return ((Long)Long.parseLong(v, 16)).shortValue();
 				} catch (final Exception e) {
 					//
-				}
-				if ("true".equalsIgnoreCase(v)) {
-					return (short)1;
-				} else if ("false".equalsIgnoreCase(v)) {
-					return 0;
 				}
 			}
 		}
@@ -251,6 +256,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue.toLowerCase();
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
@@ -277,11 +287,6 @@ public class ObjectHelper {
 					return ((Long)Long.parseLong(v, 16)).intValue();
 				} catch (final Exception e) {
 					//
-				}
-				if ("true".equalsIgnoreCase(v)) {
-					return 1;
-				} else if ("false".equalsIgnoreCase(v)) {
-					return 0;
 				}
 			}
 		}
@@ -317,6 +322,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue.toLowerCase();
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
@@ -337,11 +347,6 @@ public class ObjectHelper {
 					return Long.parseLong(v, 16);
 				} catch (final Exception e2) {
 					//
-				}
-				if ("true".equalsIgnoreCase(v)) {
-					return 1;
-				} else if ("false".equalsIgnoreCase(v)) {
-					return 0;
 				}
 			}
 		}
@@ -377,6 +382,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -396,11 +406,6 @@ public class ObjectHelper {
 					return ((Long)Long.parseLong(v, 16)).floatValue();
 				} catch (final Exception e2) {
 					//
-				}
-				if ("true".equalsIgnoreCase(v)) {
-					return 1;
-				} else if ("false".equalsIgnoreCase(v)) {
-					return 0;
 				}
 			}
 		}
@@ -436,6 +441,11 @@ public class ObjectHelper {
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
 				final String v = trimmedValue;
+				if ("true".equalsIgnoreCase(v)) {
+					return 1;
+				} else if ("false".equalsIgnoreCase(v)) {
+					return 0;
+				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("0X")) {
 					try {
@@ -455,11 +465,6 @@ public class ObjectHelper {
 					return ((Long)Long.parseLong(v, 16)).doubleValue();
 				} catch (final Exception e2) {
 					//
-				}
-				if ("true".equalsIgnoreCase(v)) {
-					return 1;
-				} else if ("false".equalsIgnoreCase(v)) {
-					return 0;
 				}
 			}
 		}
