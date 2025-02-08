@@ -773,12 +773,30 @@ public final class BitmapHelper {
 	@NonNull
 	public static Bitmap copyBitmap(@NonNull final Bitmap src, Bitmap dest) {
 		if (dest == null) {
+			// XXX Bitmap.createBitmapだと実体を共有するBitmapが生成される可能性がある
 			dest = Bitmap.createBitmap(src);
 		} else if (!src.equals(dest)) {
 			final Canvas canvas = new Canvas(dest);
 			canvas.drawBitmap(src, 0, 0, new Paint());
 		}
 		return dest;
+	}
+
+	/**
+	 * Bitmap#createBitmapやそれを内部で使うBitmapHelper#copyBitmapだと実体を共有する
+	 * Bitmapを生成してしまう可能性がある…コピー元がリサイクルされたりすると正常にアクセス
+	 * できなくなる可能性があるので、確実に別のBitmapとして生成するためのヘルパー
+	 * @param src
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap deepCopyBitmap(@NonNull final Bitmap src) {
+		// 同じサイズ・同じコンフィグのBitmapを生成
+		final Bitmap dst = Bitmap.createBitmap(src.getWidth(), src.getHeight(), src.getConfig());
+		final Canvas canvas = new Canvas(dst);
+		canvas.drawBitmap(src, 0, 0, new Paint());
+
+		return dst;
 	}
 
 	/**
