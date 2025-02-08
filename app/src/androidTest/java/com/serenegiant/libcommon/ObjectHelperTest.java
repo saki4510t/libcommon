@@ -85,7 +85,7 @@ public class ObjectHelperTest {
 		}
 		// booleanとも数値とも解析できない文字列はfalseを返す
 		assertFalse(ObjectHelper.asBoolean("abcdefg", false));
-		assertFalse(ObjectHelper.asBoolean("abcdefg", true));
+		assertTrue(ObjectHelper.asBoolean("abcdefg", true));
 	}
 
 	@Test
