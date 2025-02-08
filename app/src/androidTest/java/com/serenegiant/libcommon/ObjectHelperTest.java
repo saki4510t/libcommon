@@ -361,4 +361,58 @@ public class ObjectHelperTest {
 		}
 	}
 
+	@Test
+	public void asTest() {
+		assertEquals(false, ObjectHelper.as(false, true));
+		assertEquals(true, ObjectHelper.as(true, false));
+		assertEquals(false, ObjectHelper.as("false", true));
+		assertEquals(true, ObjectHelper.as("true", false));
+		assertEquals(false, ObjectHelper.as("False", true));
+		assertEquals(true, ObjectHelper.as("True", false));
+		assertEquals(false, ObjectHelper.as("FALSE", true));
+		assertEquals(true, ObjectHelper.as("TRUE", false));
+		// assertEquals(long,long)とassertEquals(Object,Object)が決定できないので明示的にlongへキャスト
+		assertEquals(Byte.MIN_VALUE, (long)ObjectHelper.as(Byte.MIN_VALUE, Byte.MAX_VALUE));
+		assertEquals(Byte.MAX_VALUE, (long)ObjectHelper.as(Byte.MAX_VALUE, Byte.MIN_VALUE));
+		assertEquals(Short.MIN_VALUE, (long)ObjectHelper.as(Short.MIN_VALUE, Short.MAX_VALUE));
+		assertEquals(Short.MAX_VALUE, (long)ObjectHelper.as(Short.MAX_VALUE, Short.MIN_VALUE));
+		assertEquals(Integer.MIN_VALUE, (long)ObjectHelper.as(Integer.MIN_VALUE, Integer.MAX_VALUE));
+		assertEquals(Integer.MAX_VALUE, (long)ObjectHelper.as(Integer.MAX_VALUE, Integer.MIN_VALUE));
+		assertEquals(Long.MIN_VALUE, (long)ObjectHelper.as(Long.MIN_VALUE, Long.MAX_VALUE));
+		assertEquals(Long.MAX_VALUE, (long)ObjectHelper.as(Long.MAX_VALUE, Long.MIN_VALUE));
+		assertEquals(Float.MIN_VALUE, ObjectHelper.as(Float.MIN_VALUE, Float.MAX_VALUE), EPS_FLOAT);
+		assertEquals(Float.MAX_VALUE, ObjectHelper.as(Float.MAX_VALUE, Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(Double.MIN_VALUE, ObjectHelper.as(Double.MIN_VALUE, Double.MAX_VALUE), EPS_DOUBLE);
+		assertEquals(Double.MAX_VALUE, ObjectHelper.as(Double.MAX_VALUE, Double.MIN_VALUE), EPS_DOUBLE);
+		for (int i = -100; i < 100; i++) {
+			// 文字列はそのまま返す
+			assertEquals("", ObjectHelper.as("", "" + i));
+			assertEquals("    ", ObjectHelper.as("    ", "" + i));
+			assertEquals("abcdefg", ObjectHelper.as("abcdefg", "" + i));
+			// 数値として解析できればその値のint値を返す
+			assertEquals(i, (long)ObjectHelper.as((byte)i, Byte.MIN_VALUE));
+			assertEquals(i, (long)ObjectHelper.as((short)i, Short.MIN_VALUE));
+			assertEquals(i, (long)ObjectHelper.as((int)i, Integer.MIN_VALUE));
+			assertEquals(i, (long)ObjectHelper.as((int)i, (Integer.valueOf(Integer.MIN_VALUE))));
+			assertEquals(i, (long)ObjectHelper.as((long)i, Long.MIN_VALUE));
+			assertEquals(i * 0.123f, ObjectHelper.as(i * 0.123f, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i * 0.456, ObjectHelper.as(i * 0.456, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, (long)ObjectHelper.as(i + "", Integer.MIN_VALUE));
+			if (i < 0) {
+				assertEquals(i, (long)ObjectHelper.as("-0x" + Integer.toHexString(Math.abs(i)), Integer.MIN_VALUE));
+			} else {
+				assertEquals(i, (long)ObjectHelper.as("0x" + Integer.toHexString(i), Integer.MIN_VALUE));
+			}
+			assertEquals(i, ObjectHelper.as(i + ".", Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.as(i + ".0", Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.as(Double.toHexString(i), Double.MIN_VALUE), EPS_DOUBLE);
+			// 解析できない文字列はデフォルト値を返す
+			assertEquals(i, (long)ObjectHelper.as("abcdefg" + i, i));
+		}
+		for (int i = 0; i < 26; i++) {
+			// 解析できない文字はデフォルト値を返す
+			assertEquals(i, (long)ObjectHelper.as((char)('a' + i), i));
+			assertEquals(i, (long)ObjectHelper.as((char)('A' + i), i));
+		}
+	}
 }

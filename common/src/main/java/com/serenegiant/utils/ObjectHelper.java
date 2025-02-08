@@ -236,6 +236,45 @@ public class ObjectHelper {
 	}
 
 	/**
+	 * デフォルト値の型へ型変換するヘルパー
+	 * @param value
+	 * @param defaultValue
+	 * @return
+	 * @param <T>
+	 */
+	@SuppressWarnings("unchecked")
+	public static <T> T as(@NonNull final Object value, @NonNull final T defaultValue) {
+		final Class<?> clazz = ClassUtils.getClass(defaultValue);
+		final Class<?> primitiveClass = ClassUtils.getPrimitiveClass(clazz);
+		Object result = value;
+		if (primitiveClass == Boolean.TYPE) {
+			result = asBoolean(value, (boolean)defaultValue);
+		} else if (primitiveClass == Byte.TYPE) {
+			result = asByte(value, (byte)defaultValue);
+		} else if (primitiveClass == Short.TYPE) {
+			result = asShort(value, (short)defaultValue);
+		} else if (primitiveClass == Integer.TYPE) {
+			result = asInt(value, (int)defaultValue);
+		} else if (primitiveClass == Long.TYPE) {
+			result = asLong(value, (long)defaultValue);
+		} else if (primitiveClass == Float.TYPE) {
+			result = asFloat(value, (float)defaultValue);
+		} else if (primitiveClass == Double.TYPE) {
+			result = asDouble(value, (double)defaultValue);
+		} else if (defaultValue instanceof CharSequence) {
+			// 文字列の時はtoStringを呼ぶ
+			result = value.toString();
+		}
+
+		if (clazz.isInstance(result)) {
+			return (T)result;
+		} else {
+			// 値の型がデフォルト値の型と違う時はデフォルト値にする
+			return defaultValue;
+		}
+	}
+
+	/**
 	 * 強制的に特定の型に変換するためのヘルパー
 	 * ・プリミティブでもプリミティブのボクシングクラスでもなければ無変換
 	 * ・プリミティブまたはプリミティブのボクシングクラスが指定されたときに
