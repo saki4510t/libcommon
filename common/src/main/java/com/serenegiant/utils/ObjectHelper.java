@@ -39,8 +39,6 @@ public class ObjectHelper {
 		// XXX char(文字)の処理を入れた方が良い？intに暗黙のキャストされるから問題ない？
 		if (value instanceof Boolean) {
 			return (Boolean)value;
-		} else if (value instanceof Byte) {
-			return ((Byte)value) != 0;
 		} else if (value instanceof Number) {
 			// Byte/Short/Integer/Long/Float/Doubleは全てNumberを継承しているので個別の条件分岐は省いてNumberとして判定
 			return ((Number)value).doubleValue() != 0;
