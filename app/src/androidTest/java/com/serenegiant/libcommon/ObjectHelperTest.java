@@ -32,7 +32,8 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class ObjectHelperTest {
 
-	private static final double EPS = 0.000000000;
+	private static final double EPS_FLOAT = Float.MIN_NORMAL;
+	private static final double EPS_DOUBLE = Double.MIN_NORMAL;
 
 	@Test
 	public void asBooleanTest() {
@@ -99,6 +100,8 @@ public class ObjectHelperTest {
 		assertEquals(1, ObjectHelper.asByte("True", Byte.MIN_VALUE));
 		assertEquals(0, ObjectHelper.asByte("FALSE", Byte.MIN_VALUE));
 		assertEquals(1, ObjectHelper.asByte("TRUE", Byte.MIN_VALUE));
+		assertEquals(Byte.MIN_VALUE, ObjectHelper.asByte(Byte.MIN_VALUE, Byte.MAX_VALUE));
+		assertEquals(Byte.MAX_VALUE, ObjectHelper.asByte(Byte.MAX_VALUE, Byte.MIN_VALUE));
 		for (byte i = -100; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asByte("", i));
@@ -144,6 +147,8 @@ public class ObjectHelperTest {
 		assertEquals(1, ObjectHelper.asShort("True", Short.MIN_VALUE));
 		assertEquals(0, ObjectHelper.asShort("FALSE", Short.MIN_VALUE));
 		assertEquals(1, ObjectHelper.asShort("TRUE", Short.MIN_VALUE));
+		assertEquals(Short.MIN_VALUE, ObjectHelper.asShort(Short.MIN_VALUE, Short.MAX_VALUE));
+		assertEquals(Short.MAX_VALUE, ObjectHelper.asShort(Short.MAX_VALUE, Short.MIN_VALUE));
 		for (short i = -100; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asShort("", i));
@@ -189,6 +194,8 @@ public class ObjectHelperTest {
 		assertEquals(1, ObjectHelper.asInt("True", Integer.MIN_VALUE));
 		assertEquals(0, ObjectHelper.asInt("FALSE", Integer.MIN_VALUE));
 		assertEquals(1, ObjectHelper.asInt("TRUE", Integer.MIN_VALUE));
+		assertEquals(Integer.MIN_VALUE, ObjectHelper.asInt(Integer.MIN_VALUE, Integer.MAX_VALUE));
+		assertEquals(Integer.MAX_VALUE, ObjectHelper.asInt(Integer.MAX_VALUE, Integer.MIN_VALUE));
 		for (int i = -100; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asInt("", i));
@@ -234,6 +241,8 @@ public class ObjectHelperTest {
 		assertEquals(1L, ObjectHelper.asLong("True", Long.MIN_VALUE));
 		assertEquals(0L, ObjectHelper.asLong("FALSE", Long.MIN_VALUE));
 		assertEquals(1L, ObjectHelper.asLong("TRUE", Long.MIN_VALUE));
+		assertEquals(Long.MIN_VALUE, ObjectHelper.asLong(Long.MIN_VALUE, Long.MAX_VALUE));
+		assertEquals(Long.MAX_VALUE, ObjectHelper.asLong(Long.MAX_VALUE, Long.MIN_VALUE));
 		for (long i = -100L; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asLong("", i));
@@ -271,80 +280,84 @@ public class ObjectHelperTest {
 	@Test
 	public void asFloatTest() {
 		// booleanまたはbooleanの文字列ならその値を返す
-		assertEquals(0, ObjectHelper.asFloat(false, Float.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asFloat(true, Float.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asFloat("false", Float.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asFloat("true", Float.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asFloat("False", Float.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asFloat("True", Float.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asFloat("FALSE", Float.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asFloat("TRUE", Float.MIN_VALUE), EPS);
+		assertEquals(0, ObjectHelper.asFloat(false, Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(1, ObjectHelper.asFloat(true, Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(0, ObjectHelper.asFloat("false", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(1, ObjectHelper.asFloat("true", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(0, ObjectHelper.asFloat("False", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(1, ObjectHelper.asFloat("True", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(0, ObjectHelper.asFloat("FALSE", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(1, ObjectHelper.asFloat("TRUE", Float.MIN_VALUE), EPS_FLOAT);
+		assertEquals(Float.MIN_VALUE, ObjectHelper.asFloat(Float.MIN_VALUE, Float.MAX_VALUE), EPS_FLOAT);
+		assertEquals(Float.MAX_VALUE, ObjectHelper.asFloat(Float.MAX_VALUE, Float.MIN_VALUE), EPS_FLOAT);
 		for (int i = -100; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asFloat("", i), EPS);
+			assertEquals(i, ObjectHelper.asFloat("", i), EPS_FLOAT);
 			// ブランク文字列(String#trimで空文字列になる空白だけの文字列)はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asFloat("    ", i), EPS);
-			assertEquals(i, ObjectHelper.asFloat("    ", i), EPS);
+			assertEquals(i, ObjectHelper.asFloat("    ", i), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat("    ", i), EPS_FLOAT);
 			// nullはデフォルト値を返す
-			assertEquals(i, ObjectHelper.asFloat(null, i), EPS);
+			assertEquals(i, ObjectHelper.asFloat(null, i), EPS_FLOAT);
 			// 数値として解析できればその値のint値を返す
-			assertEquals(i, ObjectHelper.asFloat((byte)i, Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat((short)i, Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat((int)i, Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat((float)i, Float.MIN_VALUE), EPS);
-			assertEquals((float)(i * 0.123f), ObjectHelper.asFloat(i * 0.123f, Float.MIN_VALUE), EPS);
-			assertEquals((float)(i * 0.456), ObjectHelper.asFloat(i * 0.456, Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat(i + "", Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat(i + ".", Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat(i + ".0", Float.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asFloat(Float.toHexString(i), Float.MIN_VALUE), EPS);
+			assertEquals(i, ObjectHelper.asFloat((byte)i, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat((short)i, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat((int)i, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat((float)i, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals((float)(i * 0.123f), ObjectHelper.asFloat(i * 0.123f, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals((float)(i * 0.456), ObjectHelper.asFloat(i * 0.456, Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat(i + "", Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat(i + ".", Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat(i + ".0", Float.MIN_VALUE), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat(Float.toHexString(i), Float.MIN_VALUE), EPS_FLOAT);
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asFloat("abcdefg" + i, i), EPS);
+			assertEquals(i, ObjectHelper.asFloat("abcdefg" + i, i), EPS_FLOAT);
 		}
 		for (int i = 0; i < 26; i++) {
 			// 解析できない文字はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asFloat((char)('a' + i), i), EPS);
-			assertEquals(i, ObjectHelper.asFloat((char)('A' + i), i), EPS);
+			assertEquals(i, ObjectHelper.asFloat((char)('a' + i), i), EPS_FLOAT);
+			assertEquals(i, ObjectHelper.asFloat((char)('A' + i), i), EPS_FLOAT);
 		}
 	}
 
 	@Test
 	public void asDoubleTest() {
 		// booleanまたはbooleanの文字列ならその値を返す
-		assertEquals(0, ObjectHelper.asDouble(false, Double.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asDouble(true, Double.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asDouble("false", Double.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asDouble("true", Double.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asDouble("False", Double.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asDouble("True", Double.MIN_VALUE), EPS);
-		assertEquals(0, ObjectHelper.asDouble("FALSE", Double.MIN_VALUE), EPS);
-		assertEquals(1, ObjectHelper.asDouble("TRUE", Double.MIN_VALUE), EPS);
+		assertEquals(0, ObjectHelper.asDouble(false, Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(1, ObjectHelper.asDouble(true, Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(0, ObjectHelper.asDouble("false", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(1, ObjectHelper.asDouble("true", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(0, ObjectHelper.asDouble("False", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(1, ObjectHelper.asDouble("True", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(0, ObjectHelper.asDouble("FALSE", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(1, ObjectHelper.asDouble("TRUE", Double.MIN_VALUE), EPS_DOUBLE);
+		assertEquals(Double.MIN_VALUE, ObjectHelper.asDouble(Double.MIN_VALUE, Double.MAX_VALUE), EPS_DOUBLE);
+		assertEquals(Double.MAX_VALUE, ObjectHelper.asDouble(Double.MAX_VALUE, Double.MIN_VALUE), EPS_DOUBLE);
 		for (int i = -100; i < 100; i++) {
 			// 空文字列はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asDouble("", i), EPS);
+			assertEquals(i, ObjectHelper.asDouble("", i), EPS_DOUBLE);
 			// ブランク文字列(String#trimで空文字列になる空白だけの文字列)はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asDouble("    ", i), EPS);
-			assertEquals(i, ObjectHelper.asDouble("    ", i), EPS);
+			assertEquals(i, ObjectHelper.asDouble("    ", i), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble("    ", i), EPS_DOUBLE);
 			// nullはデフォルト値を返す
-			assertEquals(i, ObjectHelper.asDouble(null, i), EPS);
+			assertEquals(i, ObjectHelper.asDouble(null, i), EPS_DOUBLE);
 			// 数値として解析できればその値のint値を返す
-			assertEquals(i, ObjectHelper.asDouble((byte)i, Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble((short)i, Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble((int)i, Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble((float)i, Double.MIN_VALUE), EPS);
-			assertEquals((double) (i * 0.123f), ObjectHelper.asDouble(i * 0.123f, Double.MIN_VALUE), EPS);
-			assertEquals((double)(i * 0.456), ObjectHelper.asDouble(i * 0.456, Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble(i + "", Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble(i + ".", Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble(i + ".0", Double.MIN_VALUE), EPS);
-			assertEquals(i, ObjectHelper.asDouble(Double.toHexString(i), Double.MIN_VALUE), EPS);
+			assertEquals(i, ObjectHelper.asDouble((byte)i, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble((short)i, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble((int)i, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble((float)i, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals((double) (i * 0.123f), ObjectHelper.asDouble(i * 0.123f, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals((double)(i * 0.456), ObjectHelper.asDouble(i * 0.456, Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble(i + "", Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble(i + ".", Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble(i + ".0", Double.MIN_VALUE), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble(Double.toHexString(i), Double.MIN_VALUE), EPS_DOUBLE);
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asDouble("abcdefg" + i, i), EPS);
+			assertEquals(i, ObjectHelper.asDouble("abcdefg" + i, i), EPS_DOUBLE);
 		}
 		for (int i = 0; i < 26; i++) {
 			// 解析できない文字はデフォルト値を返す
-			assertEquals(i, ObjectHelper.asDouble((char)('a' + i), i), EPS);
-			assertEquals(i, ObjectHelper.asDouble((char)('A' + i), i), EPS);
+			assertEquals(i, ObjectHelper.asDouble((char)('a' + i), i), EPS_DOUBLE);
+			assertEquals(i, ObjectHelper.asDouble((char)('A' + i), i), EPS_DOUBLE);
 		}
 	}
 
