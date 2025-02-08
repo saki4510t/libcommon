@@ -88,11 +88,10 @@ public class TestUtils {
 			result = true;
 LOOP:		for (int y = 0; y < height; y++) {
 				for (int x = 0; x < width; x++) {
-					if (!a.getColor(x, y).equals(b.getColor(x, y))) {
+					if (a.getPixel(x, y) != b.getPixel(x, y)) {
 						Log.w(TAG, String.format("ピクセルが違う@(%d,%d)sz(%dx%d),a=0x%08x,b=0x%08x",
 							x, y, width, height,
-							a.getColor(x, y).toArgb(),
-							b.getColor(x, y).toArgb()));
+							a.getPixel(x, y), b.getPixel(x, y)));
 						errCnt++;
 						result = false;
 						if (!checkAll) {
@@ -137,7 +136,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		Log.i(t, String.format("%s(%dx%d)", header, w, h));
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
-				final int cl = bitmap.getColor(x, y).toArgb();
+				final int cl = bitmap.getPixel(x, y);
 				if (cl != 0) {
 					sb.append(String.format("%08x", cl));
 				}
