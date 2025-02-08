@@ -56,10 +56,11 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return Integer.parseInt(v.substring(2), 16) != 0;
+						return Long.parseLong(vv, 16) != 0;
 					} catch (final Exception e1) {
-						return Long.parseLong(v.substring(2), 16) != 0;
+						//
 					}
 				}
 				try {
@@ -108,9 +109,9 @@ public class ObjectHelper {
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
 					try {
-						return ((Integer)Integer.parseInt(vv, 16)).byteValue();
-					} catch (final Exception e1) {
 						return ((Long)Long.parseLong(vv, 16)).byteValue();
+					} catch (final Exception e1) {
+						//
 					}
 				}
 				try {
@@ -168,9 +169,9 @@ public class ObjectHelper {
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
 					try {
-						return ((Integer)Integer.parseInt(vv, 16)).shortValue();
-					} catch (final Exception e1) {
 						return ((Long)Long.parseLong(vv, 16)).shortValue();
+					} catch (final Exception e1) {
+						//
 					}
 				}
 				try {
@@ -223,9 +224,9 @@ public class ObjectHelper {
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					final String vv = v.replace("0x", "");
 					try {
-						return Integer.parseInt(vv, 16);
-					} catch (final Exception e1) {
 						return ((Long)Long.parseLong(vv, 16)).intValue();
+					} catch (final Exception e1) {
+						//
 					}
 				}
 				try {
@@ -325,8 +326,9 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return ((Long)Long.parseLong(v.substring(2), 16)).floatValue();
+						return ((Long)Long.parseLong(vv, 16)).floatValue();
 					} catch (final Exception e1) {
 						//
 					}
@@ -373,8 +375,9 @@ public class ObjectHelper {
 				}
 				// 16進文字列かも
 				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
+					final String vv = v.replace("0x", "");
 					try {
-						return ((Long)Long.parseLong(v.substring(2), 16)).doubleValue();
+						return ((Long)Long.parseLong(vv, 16)).doubleValue();
 					} catch (final Exception e1) {
 						//
 					}

@@ -52,6 +52,8 @@ public class ObjectHelperTest {
 		assertFalse(ObjectHelper.asBoolean("0", true));
 		assertFalse(ObjectHelper.asBoolean("0.0", true));
 		assertFalse(ObjectHelper.asBoolean("0x0", true));
+		assertFalse(ObjectHelper.asBoolean("-0x0", true));
+		assertFalse(ObjectHelper.asBoolean("+0x0", true));
 		// 空文字列はデフォルト値を返す
 		assertFalse(ObjectHelper.asBoolean("", false));
 		assertTrue(ObjectHelper.asBoolean("", true));
@@ -71,6 +73,8 @@ public class ObjectHelperTest {
 			assertTrue(ObjectHelper.asBoolean(i * 0.456, false));
 			assertTrue(ObjectHelper.asBoolean("" + i, false));
 			assertTrue(ObjectHelper.asBoolean("0x" + i, false));
+			assertTrue(ObjectHelper.asBoolean("-0x" + i, false));
+			assertTrue(ObjectHelper.asBoolean("+0x" + i, false));
 		}
 		for (int i = 0; i < 26; i++) {
 			// 解析できない文字はデフォルト値を返す
@@ -117,6 +121,7 @@ public class ObjectHelperTest {
 				assertEquals(i, ObjectHelper.asByte("-0x" + Integer.toHexString(Math.abs(i)), Byte.MIN_VALUE));
 			} else {
 				assertEquals(i, ObjectHelper.asByte("0x" + Integer.toHexString(i), Byte.MIN_VALUE));
+				assertEquals(i, ObjectHelper.asByte("+0x" + Integer.toHexString(i), Byte.MIN_VALUE));
 			}
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asByte("abcdefg" + i, i));
@@ -161,6 +166,7 @@ public class ObjectHelperTest {
 				assertEquals(i, ObjectHelper.asShort("-0x" + Integer.toHexString(Math.abs(i)), Short.MIN_VALUE));
 			} else {
 				assertEquals(i, ObjectHelper.asShort("0x" + Integer.toHexString(i), Short.MIN_VALUE));
+				assertEquals(i, ObjectHelper.asShort("+0x" + Integer.toHexString(i), Short.MIN_VALUE));
 			}
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asShort("abcdefg" + i, i));
@@ -205,6 +211,7 @@ public class ObjectHelperTest {
 				assertEquals(i, ObjectHelper.asInt("-0x" + Integer.toHexString(Math.abs(i)), Integer.MIN_VALUE));
 			} else {
 				assertEquals(i, ObjectHelper.asInt("0x" + Integer.toHexString(i), Integer.MIN_VALUE));
+				assertEquals(i, ObjectHelper.asInt("+0x" + Integer.toHexString(i), Integer.MIN_VALUE));
 			}
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asInt("abcdefg" + i, i));
@@ -249,6 +256,7 @@ public class ObjectHelperTest {
 				assertEquals(i, ObjectHelper.asLong("-0x" + Long.toHexString(Math.abs(i)), Long.MIN_VALUE));
 			} else {
 				assertEquals(i, ObjectHelper.asLong("0x" + Long.toHexString(i), Long.MIN_VALUE));
+				assertEquals(i, ObjectHelper.asLong("+0x" + Long.toHexString(i), Long.MIN_VALUE));
 			}
 			// booleanとも数値とも解析できない文字列はデフォルト値を返す
 			assertEquals(i, ObjectHelper.asLong("abcdefg" + i, i));
