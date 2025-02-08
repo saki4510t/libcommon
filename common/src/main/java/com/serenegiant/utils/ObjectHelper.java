@@ -244,7 +244,7 @@ public class ObjectHelper {
 	 * @param clazz 変換先の型
 	 * @return
 	 */
-	@Nullable
+	@NonNull
 	public static Object as(@NonNull final Object value, @NonNull final Class<?> clazz) {
 		final Class<?> primitiveClass = ClassUtils.getPrimitiveClass(clazz);
 		if (primitiveClass == Boolean.TYPE) {
