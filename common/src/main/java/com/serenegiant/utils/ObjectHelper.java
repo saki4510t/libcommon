@@ -20,6 +20,7 @@ package com.serenegiant.utils;
 
 import android.text.TextUtils;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 /**
@@ -232,6 +233,38 @@ public class ObjectHelper {
 		}
 
 		return null;
+	}
+
+	/**
+	 * 強制的に特定の型に変換するためのヘルパー
+	 * ・プリミティブでもプリミティブのボクシングクラスでもなければ無変換
+	 * ・プリミティブまたはプリミティブのボクシングクラスが指定されたときに
+	 * 　変換できないオブジェクトが渡されたときは0になるので注意！
+	 * @param value
+	 * @param clazz 変換先の型
+	 * @return
+	 */
+	@Nullable
+	public static Object as(@NonNull final Object value, @NonNull final Class<?> clazz) {
+		final Class<?> primitiveClass = ClassUtils.getPrimitiveClass(clazz);
+		if (primitiveClass == Boolean.TYPE) {
+			return asBoolean(value, (boolean) value);
+		} else if (primitiveClass == Byte.TYPE) {
+			return asByte(value, (byte)0);
+		} else if (primitiveClass == Short.TYPE) {
+			return asShort(value, (short)0);
+		} else if (primitiveClass == Integer.TYPE) {
+			return asInt(value, 0);
+		} else if (primitiveClass == Long.TYPE) {
+			return asLong(value, 0);
+		} else if (primitiveClass == Float.TYPE) {
+			return asFloat(value, 0);
+		} else if (primitiveClass == Double.TYPE) {
+			return asDouble(value, 0);
+		} else {
+			// プリミティブでもプリミティブのボクシングクラスでもない時は無変換
+			return value;
+		}
 	}
 
 	/**
