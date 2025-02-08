@@ -747,7 +747,6 @@ public class GLPipelineTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
-		cnt.set(0);
 	}
 
 	@Test
@@ -801,7 +800,6 @@ public class GLPipelineTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
-		cnt.set(0);
 	}
 
 //--------------------------------------------------------------------------------
