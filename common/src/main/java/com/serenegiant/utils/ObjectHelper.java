@@ -48,14 +48,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				if ("true".equalsIgnoreCase(v)) {
 					return true;
 				} else if ("false".equalsIgnoreCase(v)) {
 					return false;
 				}
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					try {
 						return Integer.parseInt(v.substring(2), 16) != 0;
 					} catch (final Exception e1) {
@@ -317,14 +317,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				if ("true".equalsIgnoreCase(v)) {
 					return 1;
 				} else if ("false".equalsIgnoreCase(v)) {
 					return 0;
 				}
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					try {
 						return ((Long)Long.parseLong(v.substring(2), 16)).floatValue();
 					} catch (final Exception e1) {
@@ -365,14 +365,14 @@ public class ObjectHelper {
 			// 空文字列だけではなくブランク文字列(空白文字列だけ)もデフォルト値にする
 			final String trimmedValue = ((String) value).trim();
 			if (!TextUtils.isEmpty(trimmedValue)) {
-				final String v = trimmedValue;
+				final String v = trimmedValue.toLowerCase();
 				if ("true".equalsIgnoreCase(v)) {
 					return 1;
 				} else if ("false".equalsIgnoreCase(v)) {
 					return 0;
 				}
 				// 16進文字列かも
-				if (v.startsWith("0x") || v.startsWith("0X")) {
+				if (v.startsWith("0x") || v.startsWith("-0x") || v.startsWith("+0x")) {
 					try {
 						return ((Long)Long.parseLong(v.substring(2), 16)).doubleValue();
 					} catch (final Exception e1) {
