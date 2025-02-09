@@ -63,8 +63,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@Nullable
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
-	private volatile long mFrameIntervalMs;
-	private long prevFrameTimeNs;
+	private long mFirstTimeNs;
+	private long mNumFrames;
 	private volatile boolean mReleased = false;
 	private int mWidth, mHeight;
 	@Nullable
@@ -360,14 +360,14 @@ public class ImageTextureSource implements GLConst, IMirror {
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
-			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
 			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
 			mWidth = width;
 			mHeight = height;
 		} finally {
 			mLock.unlock();
 		}
-		prevFrameTimeNs = -1L;
+		mFirstTimeNs = -1L;
+		mNumFrames = 0;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
@@ -443,18 +443,15 @@ public class ImageTextureSource implements GLConst, IMirror {
 		@Override
 		public void doFrame(final long frameTimeNanos) {
 			if (isValid()) {
-				if (prevFrameTimeNs < 0) {
-					prevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
+				final long n = (++mNumFrames);
+				if (mFirstTimeNs < 0) {
+					mFirstTimeNs = frameTimeNanos;
 				}
-				final long delta = (mFrameIntervalNs - (frameTimeNanos - prevFrameTimeNs)) / 1000000L;
-				prevFrameTimeNs = frameTimeNanos;
-				if (delta < 0) {
-					// フレームレートから想定されるより呼び出しが遅かった場合
-					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);
-				} else {
-					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
+				long ms = (mFirstTimeNs + mFrameIntervalNs * (n + 1) - frameTimeNanos) / 1000000L;
+				if (ms < 5L) {
+					ms = 0L;
 				}
-				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
+				mManager.postFrameCallbackDelayed(this, ms);
 				mLock.lock();
 				try {
 					if (mImageSource != null) {

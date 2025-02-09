@@ -178,7 +178,7 @@ public class ImageTextureSourceTest {
 	}
 
 	/**
-	 * FIXME なぜか35, 45, 50fpsだけ10%以上遅くなってパスしない
+	 * フレームレートを指定して想定通りのフレームレート±10%になるかどうかを確認
 	 * @param requestFps
 	 */
 	private static void frameRate(final int requestFps) {
