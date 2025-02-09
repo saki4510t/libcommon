@@ -126,7 +126,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if ((out_tex_id != mOutputOffscreen2.getTexId())
 			|| (width != mOutputOffscreen2.getWidth())
 			|| (height != mOutputOffscreen2.getHeight())) {
-			mOutputOffscreen2.assignTexture(out_tex_id, width, height);
+			mOutputOffscreen2.assignTexture(out_tex_id, width, height, null);
 		}
 		mOutputOffscreen2.makeCurrent();
 		final int[] ids = new int[] { mOutputOffscreen.getTexId() };

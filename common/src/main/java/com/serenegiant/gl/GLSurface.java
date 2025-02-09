@@ -26,6 +26,7 @@ import android.opengl.Matrix;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 /**
@@ -239,7 +240,7 @@ public abstract class GLSurface implements IGLSurface {
 		if (tex <= GL_NO_TEXTURE) {
 			tex = genTexture(texTarget, texUnit, mTexWidth, mTexHeight);
 		}
-		assignTexture(tex, width, height);
+		assignTexture(tex, width, height, null);
 		// assignTexture内で強制的にmWrappedTexture=trueになるので正しい値に上書き
 		mWrappedTexture = texId > GL_NO_TEXTURE;
 //		setViewPort(0, 0, mWidth, mHeight);
@@ -325,6 +326,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * IGLSurfaceの実装
 	 * バックバッファとして使っているテクスチャの実際の幅を取得
+	 * 外部からのテクスチャをラップしたときは正しくないかもしれない
 	 * @return
 	 */
 	@Override
@@ -335,6 +337,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * IGLSurfaceの実装
 	 * バックバッファとして使っているテクスチャの実際の高さを取得
+	 * 外部からのテクスチャをラップしたときは正しくないかもしれない
 	 * @return
 	 */
 	@Override
@@ -395,9 +398,12 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param texId
 	 * @param width
 	 * @param height
+	 * @param texMatrix
 	 */
-	public abstract void assignTexture(final int texId,
-		final int width, final int height);
+	public abstract void assignTexture(
+		final int texId,
+		final int width, final int height,
+		@Nullable @Size(min=16) final float[] texMatrix);
 
 	/**
 	 * オフスクリーン描画用のフレームバッファオブジェクトを生成する
@@ -494,10 +500,13 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param texId
 		 * @param width
 		 * @param height
+		 * @param texMatrix
 		 */
 		@Override
-		public void assignTexture(final int texId,
-			final int width, final int height) {
+		public void assignTexture(
+			final int texId,
+			final int width, final int height,
+			@Nullable @Size(min=16) final float[] texMatrix) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
 				releaseFrameBuffer();
@@ -533,10 +542,14 @@ public abstract class GLSurface implements IGLSurface {
 			 // デフォルトのフレームバッファに戻す
 			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0);
 
-			// テクスチャ座標変換行列を初期化
-			Matrix.setIdentityM(mTexMatrix, 0);
-			mTexMatrix[0] = width / (float)mTexWidth;
-			mTexMatrix[5] = height / (float)mTexHeight;
+			if (texMatrix != null) {
+				System.arraycopy(texMatrix, 0, mTexMatrix, 0, 16);
+			} else {
+				// テクスチャ座標変換行列を初期化
+				Matrix.setIdentityM(mTexMatrix, 0);
+				mTexMatrix[0] = width / (float)mTexWidth;
+				mTexMatrix[5] = height / (float)mTexHeight;
+			}
 			setViewPort(0, 0, mWidth, mHeight);
 		}
 
@@ -735,9 +748,13 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param texId
 		 * @param width
 		 * @param height
+		 * @param texMatrix
 		 */
-		public void assignTexture(final int texId,
-			final int width, final int height) {
+		@Override
+		public void assignTexture(
+			final int texId,
+			final int width, final int height,
+			@Nullable @Size(min=16) final float[] texMatrix) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
 				releaseFrameBuffer();
@@ -773,10 +790,14 @@ public abstract class GLSurface implements IGLSurface {
 			 // デフォルトのフレームバッファに戻す
 			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, 0);
 
-			// テクスチャ座標変換行列を初期化
-			Matrix.setIdentityM(mTexMatrix, 0);
-			mTexMatrix[0] = width / (float)mTexWidth;
-			mTexMatrix[5] = height / (float)mTexHeight;
+			if (texMatrix != null) {
+				System.arraycopy(texMatrix, 0, mTexMatrix, 0, 16);
+			} else {
+				// テクスチャ座標変換行列を初期化
+				Matrix.setIdentityM(mTexMatrix, 0);
+				mTexMatrix[0] = width / (float)mTexWidth;
+				mTexMatrix[5] = height / (float)mTexHeight;
+			}
 			setViewPort(0, 0, mWidth, mHeight);
 		}
 

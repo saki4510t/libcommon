@@ -163,7 +163,7 @@ public class MediaEffectGLBase implements IEffect {
 		if ((out_tex_id != mOutputOffscreen.getTexId())
 			|| (width != mOutputOffscreen.getWidth())
 			|| (height != mOutputOffscreen.getHeight())) {
-			mOutputOffscreen.assignTexture(out_tex_id, width, height);
+			mOutputOffscreen.assignTexture(out_tex_id, width, height, null);
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
