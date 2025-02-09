@@ -53,6 +53,8 @@ public class EffectPipeline extends ProxyPipeline
 	private EffectDrawer2D mDrawer;
 	private int mEffect = EFFECT_NON;
 	@Nullable
+	private Fraction mMaxFps;
+	@Nullable
 	private RendererTarget mRendererTarget;
 	/**
 	 * 映像効果付与してそのまま次のGLPipelineへ送るかSurfaceへ描画するか
@@ -63,7 +65,7 @@ public class EffectPipeline extends ProxyPipeline
 	 * 映像効果付与してそのまま次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
-	private GLSurface work;
+	private GLSurface mOffscreenSurface;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mSurfaceId = 0;
@@ -109,7 +111,7 @@ public class EffectPipeline extends ProxyPipeline
 	protected void internalRelease() {
 		if (DEBUG) Log.v(TAG, "internalRelease:");
 		if (isValid()) {
-			releaseTarget();
+			releaseAll();
 		}
 		super.internalRelease();
 	}
@@ -243,6 +245,12 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
 				mDrawer.setEffect(mEffect);
 			}
+			if (mEffectOnly && (mOffscreenSurface != null)
+				&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {
+				// オフスクリーンを使って描画処理したテクスチャを次へ渡すときで
+				// オフスクリーンのリサイズが必要なとき
+				reCreateTargetOnGL(null, mMaxFps);
+			}
 			@NonNull
 			final EffectDrawer2D drawer = mDrawer;
 			@Nullable
@@ -251,12 +259,12 @@ public class EffectPipeline extends ProxyPipeline
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 			}
-			if (mEffectOnly && (work != null)) {
+			if (mEffectOnly && (mOffscreenSurface != null)) {
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
 				}
 				// 映像効果付与したテクスチャを次へ渡す
-				super.onFrameAvailable(work.isOES(), work.getTexId(), work.getTexMatrix());
+				super.onFrameAvailable(mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
 			} else {
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
@@ -391,57 +399,7 @@ public class EffectPipeline extends ProxyPipeline
 	}
 
 	//--------------------------------------------------------------------------------
-	final EffectDrawer2D.EffectListener mEffectListener
-		= new EffectDrawer2D.EffectListener() {
-			@WorkerThread
-			@Override
-			public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
-				return EffectPipeline.this.onChangeEffect(effect, drawer);
-			}
-		};
-
-	/**
-	 * 描画先のSurfaceを生成
-	 * @param surface
-	 * @param maxFps
-	 */
-	@WorkerThread
-	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
-		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
-			mSurfaceId = 0;
-			if (mRendererTarget != null) {
-				mRendererTarget.release();
-				mRendererTarget = null;
-			}
-			if (work != null) {
-				work.release();
-				work = null;
-			}
-			if (GLUtils.isSupportedSurface(surface)) {
-				mRendererTarget = RendererTarget.newInstance(
-					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-				mEffectOnly = false;
-			} else {
-				if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-				work = GLSurface.newInstance(
-					mManager.isGLES3(), GLES20.GL_TEXTURE0,
-					getWidth(), getHeight());
-				mRendererTarget = RendererTarget.newInstance(
-					mManager.getEgl(), work, maxFps != null ? maxFps.asFloat() : 0);
-				mEffectOnly = true;
-			}
-			mLock.lock();
-			try {
-				mSurfaceId = mRendererTarget.getId();
-			} finally {
-				mLock.unlock();
-			}
-			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
-		}
-	}
-
-	private void releaseTarget() {
+	private void releaseAll() {
 		final EffectDrawer2D drawer = mDrawer;
 		final RendererTarget target;
 		final GLSurface w;
@@ -451,8 +409,8 @@ public class EffectPipeline extends ProxyPipeline
 			mSurfaceId = 0;
 			target = mRendererTarget;
 			mRendererTarget = null;
-			w = work;
-			work = null;
+			w = mOffscreenSurface;
+			mOffscreenSurface = null;
 		} finally {
 			mLock.unlock();
 		}
@@ -481,6 +439,68 @@ public class EffectPipeline extends ProxyPipeline
 			}
 		}
 	}
+
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
+	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
+			reCreateTargetOnGL(surface, maxFps);
+		}
+	}
+
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
+	private void reCreateTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		mSurfaceId = 0;
+		mMaxFps = maxFps;
+		if (mRendererTarget != null) {
+			mRendererTarget.release();
+			mRendererTarget = null;
+		}
+		if (mOffscreenSurface != null) {
+			mOffscreenSurface.release();
+			mOffscreenSurface = null;
+		}
+		if (GLUtils.isSupportedSurface(surface)) {
+			mRendererTarget = RendererTarget.newInstance(
+				mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+			mEffectOnly = false;
+		} else {
+			if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+			mOffscreenSurface = GLSurface.newInstance(
+				mManager.isGLES3(), GLES20.GL_TEXTURE0,
+				getWidth(), getHeight());
+			mRendererTarget = RendererTarget.newInstance(
+				mManager.getEgl(), mOffscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
+			mEffectOnly = true;
+		}
+		mLock.lock();
+		try {
+			mSurfaceId = mRendererTarget.getId();
+		} finally {
+			mLock.unlock();
+		}
+		mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+	}
+
+	final EffectDrawer2D.EffectListener mEffectListener
+		= new EffectDrawer2D.EffectListener() {
+		@WorkerThread
+		@Override
+		public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+			return EffectPipeline.this.onChangeEffect(effect, drawer);
+		}
+	};
 
 	/**
 	 * changeEffectで映像効果を指定したときに内蔵の映像効果設定処理を実行する前に呼ばれる
