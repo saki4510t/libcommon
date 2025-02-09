@@ -268,7 +268,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					if (last.hasSurface()) {
 						last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 					} else {
-						last.setSurface(surface, null)
+						last.setSurface(surface, maxFps)
 					}
 				}
 				else -> {
