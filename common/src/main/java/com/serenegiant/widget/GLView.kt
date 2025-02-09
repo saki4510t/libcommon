@@ -35,6 +35,8 @@ import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.ISurface
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 /**
  * SurfaceViewのSurfaceへOpenGL|ESで描画するためのヘルパークラス
@@ -79,6 +81,7 @@ open class GLView @JvmOverloads constructor(
 		fun onSurfaceDestroyed()
 	}
 
+	private val mLock = ReentrantLock()
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext
 	private val mGLHandler: Handler
@@ -221,7 +224,7 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@AnyThread
 	override fun setTransform(@Size(min=16) transform: FloatArray?) {
-		synchronized(mMatrix) {
+		mLock.withLock {
 			if (transform != null) {
 				System.arraycopy(transform, 0, mMatrix, 0, 16)
 			} else {
@@ -240,7 +243,7 @@ open class GLView @JvmOverloads constructor(
 		if (result == null) {
 			result = FloatArray(16)
 		}
-		synchronized(mMatrix) {
+		mLock.withLock {
 			System.arraycopy(mMatrix, 0, result, 0, 16)
 		}
 
@@ -279,7 +282,7 @@ open class GLView @JvmOverloads constructor(
 			if (mHasSurface) {
 				mGLManager.postFrameCallbackDelayed(this, 0)
 				makeDefault()
-				synchronized(mMatrix) {
+				mLock.withLock {
 					if (mMatrixChanged) {
 						applyTransformMatrix(mMatrix)
 						mMatrixChanged = false
