@@ -35,28 +35,28 @@ import androidx.annotation.Size;
  */
 public abstract class GLSurface implements IGLSurface {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "GLSurface";
+	private static final String TAG = GLSurface.class.getSimpleName();
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D), デプスバッファ無し
 	 * @param isGLES3
-	 * @param tex_unit
+	 * @param texUnit
 	 * @param width
 	 * @param height
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		@TexUnit final int tex_unit,
+		@TexUnit final int texUnit,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		}
@@ -65,70 +65,70 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)をwrapするためのコンストラクタ
 	 * @param isGLES3
-	 * @param tex_unit
+	 * @param texUnit
 	 * @param width
 	 * @param height
-	 * @param use_depth_buffer
+	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		@TexUnit final int tex_unit,
-		final int width, final int height, final boolean use_depth_buffer) {
+		@TexUnit final int texUnit,
+		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
 
 	/**
 	 * インスタンス生成のヘルパーメソッド(GL_TEXTURE_2D)
 	 * @param isGLES3
-	 * @param tex_unit
+	 * @param texUnit
 	 * @param width
 	 * @param height
-	 * @param use_depth_buffer
-	 * @param adjust_power2
+	 * @param useDepthBuffer
+	 * @param adjustPower2
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface newInstance(final boolean isGLES3,
-		@TexUnit final int tex_unit,
+		@TexUnit final int texUnit,
 		final int width, final int height,
-		final boolean use_depth_buffer, final boolean adjust_power2) {
+		final boolean useDepthBuffer, final boolean adjustPower2) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, adjust_power2);
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+				width, height, useDepthBuffer, adjustPower2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, GL_NO_TEXTURE,
-				width, height, use_depth_buffer, adjust_power2);
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+				width, height, useDepthBuffer, adjustPower2);
 		}
 	}
 
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド, デプスバッファなし
 	 * @param isGLES3
-	 * @param tex_id
-	 * @param tex_unit
+	 * @param texId
+	 * @param texUnit
 	 * @param width
 	 * @param height
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		@TexUnit final int tex_unit, final int tex_id,
+		@TexUnit final int texUnit, final int texId,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		}
@@ -137,25 +137,25 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * 既存のテクスチャ(GL_TEXTURE_2D)をwrapするためのインスタンス生成のヘルパーメソッド
 	 * @param isGLES3
-	 * @param tex_unit
-	 * @param tex_id
+	 * @param texUnit
+	 * @param texId
 	 * @param width
 	 * @param height
-	 * @param use_depth_buffer
+	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		@TexUnit final int tex_unit, final int tex_id,
-		final int width, final int height, final boolean use_depth_buffer) {
+		@TexUnit final int texUnit, final int texId,
+		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, tex_unit, tex_id,
+			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, tex_unit, tex_id,
+			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
 
@@ -167,26 +167,26 @@ public abstract class GLSurface implements IGLSurface {
 	 *     SurfaceTexture#updateTexImageを呼ぶ前にGLSurfaceでラップすると
 	 *     assignTextureでフレームバッファーをセットするときにクラッシュするので注意
 	 * @param isGLES3
-	 * @param tex_target GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
-	 * @param tex_unit
-	 * @param tex_id
+	 * @param texTarget GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
+	 * @param texUnit
+	 * @param texId
 	 * @param width
 	 * @param height
-	 * @param use_depth_buffer
+	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
 	public static GLSurface wrap(final boolean isGLES3,
-		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
-		final int width, final int height, final boolean use_depth_buffer) {
+		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
+		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(tex_target, tex_unit, tex_id,
+			return new GLSurfaceES3(texTarget, texUnit, texId,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(tex_target, tex_unit, tex_id,
+			return new GLSurfaceES2(texTarget, texUnit, texId,
 				width, height,
-				use_depth_buffer, DEFAULT_ADJUST_POWER2);
+				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
 	}
 
@@ -214,34 +214,34 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * 既存のテクスチャをwrapするためのコンストラクタ
-	 * @param tex_target GL_TEXTURE_2D
-	 * @param tex_id
+	 * @param texTarget GL_TEXTURE_2D
+	 * @param texId
 	 * @param width
 	 * @param height
-	 * @param use_depth_buffer
-	 * @param adjust_power2
+	 * @param useDepthBuffer
+	 * @param adjustPower2
 	 */
 	@SuppressLint("NewApi")
 	private GLSurface(final boolean isGLES3,
-		@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
+		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 		final int width, final int height,
-		final boolean use_depth_buffer, final boolean adjust_power2) {
+		final boolean useDepthBuffer, final boolean adjustPower2) {
 
 		if (DEBUG) Log.v(TAG, "Constructor");
 		this.isGLES3 = isGLES3;
-		TEX_TARGET = tex_target;
-		TEX_UNIT = tex_unit;
-		mHasDepthBuffer = use_depth_buffer;
-		mAdjustPower2 = adjust_power2;
+		TEX_TARGET = texTarget;
+		TEX_UNIT = texUnit;
+		mHasDepthBuffer = useDepthBuffer;
+		mAdjustPower2 = adjustPower2;
 
 		createFrameBuffer(width, height);
-		int tex = tex_id;
+		int tex = texId;
 		if (tex <= GL_NO_TEXTURE) {
-			tex = genTexture(tex_target, tex_unit, mTexWidth, mTexHeight);
+			tex = genTexture(texTarget, texUnit, mTexWidth, mTexHeight);
 		}
 		assignTexture(tex, width, height);
 		// assignTexture内で強制的にmWrappedTexture=trueになるので正しい値に上書き
-		mWrappedTexture = tex_id > GL_NO_TEXTURE;
+		mWrappedTexture = texId > GL_NO_TEXTURE;
 //		setViewPort(0, 0, mWidth, mHeight);
 	}
 
@@ -392,11 +392,11 @@ public abstract class GLSurface implements IGLSurface {
 
 	/**
 	 * 指定したテクスチャをこのオフスクリーンに割り当てる
-	 * @param texture_name
+	 * @param texId
 	 * @param width
 	 * @param height
 	 */
-	public abstract void assignTexture(final int texture_name,
+	public abstract void assignTexture(final int texId,
 		final int width, final int height);
 
 	/**
@@ -421,23 +421,23 @@ public abstract class GLSurface implements IGLSurface {
 		/**
 		 * 既存のテクスチャをwrapするためのコンストラクタ
 		 *
-		 * @param tex_target       GL_TEXTURE_2D
-		 * @param tex_unit
-		 * @param tex_id
+		 * @param texTarget       GL_TEXTURE_2D
+		 * @param texUnit
+		 * @param texId
 		 * @param width
 		 * @param height
-		 * @param use_depth_buffer
-		 * @param adjust_power2
+		 * @param useDepthBuffer
+		 * @param adjustPower2
 		 */
 		private GLSurfaceES2(
-			@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
+			@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 			final int width, final int height,
-			final boolean use_depth_buffer, final boolean adjust_power2) {
+			final boolean useDepthBuffer, final boolean adjustPower2) {
 
 			super(false,
-				tex_target, tex_unit, tex_id,
+				texTarget, texUnit, texId,
 				width, height,
-				use_depth_buffer, adjust_power2);
+				useDepthBuffer, adjustPower2);
 		}
 
 		@Override
@@ -491,12 +491,12 @@ public abstract class GLSurface implements IGLSurface {
 
 		/**
 		 * 指定したテクスチャをこのオフスクリーンに割り当てる
-		 * @param texture_name
+		 * @param texId
 		 * @param width
 		 * @param height
 		 */
 		@Override
-		public void assignTexture(final int texture_name,
+		public void assignTexture(final int texId,
 			final int width, final int height) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
@@ -507,7 +507,7 @@ public abstract class GLSurface implements IGLSurface {
 				GLUtils.deleteTex(mFBOTexId);
 			}
 			mWrappedTexture = true;
-			mFBOTexId = texture_name;
+			mFBOTexId = texId;
 			GLES20.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
 			GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, mFrameBufferObj);
@@ -635,19 +635,19 @@ public abstract class GLSurface implements IGLSurface {
 
 		/**
 		 * カラーバッファのためにテクスチャを生成する
-		 * @param tex_target
-		 * @param tex_unit
-		 * @param tex_width
-		 * @param tex_height
+		 * @param texTarget
+		 * @param texUnit
+		 * @param texWidth
+		 * @param texHeight
 		 * @return
 		 */
-		protected int genTexture(final int tex_target, final int tex_unit,
-			final int tex_width, final int tex_height) {
+		protected int genTexture(final int texTarget, final int texUnit,
+			final int texWidth, final int texHeight) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = GLUtils.initTex(tex_target, tex_unit,
+			final int tex_name = GLUtils.initTex(texTarget, texUnit,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
-			GLES20.glTexImage2D(tex_target, 0, GLES20.GL_RGBA, tex_width, tex_height, 0,
+			GLES20.glTexImage2D(texTarget, 0, GLES20.GL_RGBA, texWidth, texHeight, 0,
 				GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 			GLUtils.checkGlError("glTexImage2D");
 			mWrappedTexture = false;
@@ -662,23 +662,23 @@ public abstract class GLSurface implements IGLSurface {
 		/**
 		 * 既存のテクスチャをwrapするためのコンストラクタ
 		 *
-		 * @param tex_target       GL_TEXTURE_2D
-		 * @param tex_unit
-		 * @param tex_id
+		 * @param texTarget       GL_TEXTURE_2D
+		 * @param texUnit
+		 * @param texId
 		 * @param width
 		 * @param height
-		 * @param use_depth_buffer
-		 * @param adjust_power2
+		 * @param useDepthBuffer
+		 * @param adjustPower2
 		 */
 		private GLSurfaceES3(
-			@TexTarget final int tex_target, @TexUnit final int tex_unit, final int tex_id,
+			@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 			final int width, final int height,
-			final boolean use_depth_buffer, final boolean adjust_power2) {
+			final boolean useDepthBuffer, final boolean adjustPower2) {
 
 			super(true,
-				tex_target, tex_unit, tex_id,
+				texTarget, texUnit, texId,
 				width, height,
-				use_depth_buffer, adjust_power2);
+				useDepthBuffer, adjustPower2);
 		}
 
 		@Override
@@ -732,11 +732,11 @@ public abstract class GLSurface implements IGLSurface {
 
 		/**
 		 * 指定したテクスチャをこのオフスクリーンに割り当てる
-		 * @param texture_name
+		 * @param texId
 		 * @param width
 		 * @param height
 		 */
-		public void assignTexture(final int texture_name,
+		public void assignTexture(final int texId,
 			final int width, final int height) {
 
 			if ((width > mTexWidth) || (height > mTexHeight)) {
@@ -747,7 +747,7 @@ public abstract class GLSurface implements IGLSurface {
 				GLUtils.deleteTex(mFBOTexId);
 			}
 			mWrappedTexture = true;
-			mFBOTexId = texture_name;
+			mFBOTexId = texId;
 			GLES30.glActiveTexture(TEX_UNIT);
 			 // フレームバッファオブジェクトをbindする
 			GLES30.glBindFramebuffer(GLES30.GL_FRAMEBUFFER, mFrameBufferObj);
@@ -876,19 +876,19 @@ public abstract class GLSurface implements IGLSurface {
 
 		/**
 		 * カラーバッファのためにテクスチャを生成する
-		 * @param tex_target
-		 * @param tex_unit
-		 * @param tex_width
-		 * @param tex_height
+		 * @param texTarget
+		 * @param texUnit
+		 * @param texWidth
+		 * @param texHeight
 		 * @return
 		 */
-		protected int genTexture(final int tex_target, final int tex_unit,
-			final int tex_width, final int tex_height) {
+		protected int genTexture(final int texTarget, final int texUnit,
+			final int texWidth, final int texHeight) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = GLUtils.initTex(tex_target, tex_unit,
+			final int tex_name = GLUtils.initTex(texTarget, texUnit,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
-			GLES30.glTexImage2D(tex_target, 0, GLES30.GL_RGBA, tex_width, tex_height, 0,
+			GLES30.glTexImage2D(texTarget, 0, GLES30.GL_RGBA, texWidth, texHeight, 0,
 				GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null);
 			GLUtils.checkGlError("glTexImage2D");
 			mWrappedTexture = false;
