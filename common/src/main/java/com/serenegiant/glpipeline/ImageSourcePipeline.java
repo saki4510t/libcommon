@@ -19,13 +19,11 @@ package com.serenegiant.glpipeline;
 */
 
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
 import android.util.Log;
-import android.view.Choreographer;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLUtils;
-import com.serenegiant.gl.GLTexture;
+import com.serenegiant.glutils.ImageTextureSource;
+import com.serenegiant.glutils.OnFrameAvailableListener;
 import com.serenegiant.math.Fraction;
 
 import androidx.annotation.NonNull;
@@ -44,11 +42,11 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 
 	@NonNull
 	private final GLManager mManager;
-	@Nullable
-	private GLTexture mImageSource;
-	private volatile long mFrameIntervalNs;
-	private volatile long mFrameIntervalMs;
-	private long mPrevFrameTimeNs;
+
+	@NonNull
+	private final ImageTextureSource mImageTextureSource;
+	// 現在の映像サイズ
+	private int mWidth = 0, mHeight = 0;
 
 	/**
 	 * コンストラクタ
@@ -62,11 +60,12 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
 		mManager = manager;
-		if (bitmap != null) {
-			mManager.runOnGLThread(() -> {
-				createImageSource(bitmap, fps);
-			});
-		}
+		mImageTextureSource = new ImageTextureSource(manager, bitmap, fps, new OnFrameAvailableListener() {
+			@Override
+			public void onFrameAvailable() {
+				ImageSourcePipeline.this.onFrameAvailable(false, mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
+			}
+		});
 	}
 
 	/**
@@ -93,11 +92,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 
 	@Override
 	protected void internalRelease() {
-		if (isValid()) {
-			mManager.runOnGLThread(() -> {
-				releaseImageSource();
-			});
-		}
+		mImageTextureSource.release();
 		super.internalRelease();
 	}
 
@@ -115,15 +110,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	@Override
 	public int getTexId() throws IllegalStateException {
-		mLock.lock();
-		try {
-			if (!isValid() || (mImageSource == null)) {
-				throw new IllegalStateException("already released or image not set yet.");
-			}
-			return mImageSource != null ? mImageSource.getTexId() : 0;
-		} finally {
-			mLock.unlock();
-		}
+		return mImageTextureSource.getTexId();
 	}
 
 	/**
@@ -136,15 +123,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@NonNull
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {
-		mLock.lock();
-		try {
-			if (!isValid() || (mImageSource == null)) {
-				throw new IllegalStateException("already released or image not set yet.");
-			}
-			return mImageSource.getTexMatrix();
-		} finally {
-			mLock.unlock();
-		}
+		return mImageTextureSource.getTexMatrix();
 	}
 
 	@Override
@@ -162,13 +141,19 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		mLock.lock();
 		try {
 			// 映像ソースが準備できていなければスキップする
-			if (!isValid() || (mImageSource == null)) return;
+			if (!isValid() || !mImageTextureSource.isValid()) return;
 		} finally {
 			mLock.unlock();
 		}
 		if (DEBUG && (++cnt % 100) == 0) {
 			Log.v(TAG, "onFrameAvailable:" + cnt);
 		}
+		if ((mWidth != mImageTextureSource.getWidth()) || (mHeight != mImageTextureSource.getHeight())) {
+			mWidth = mImageTextureSource.getWidth();
+			mHeight = mImageTextureSource.getHeight();
+			resize(mWidth, mHeight);
+		}
+
 		super.onFrameAvailable(isOES, texId, texMatrix);
 	}
 
@@ -178,95 +163,69 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @param fps
 	 */
 	public void setSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
-		mManager.runOnGLThread(() -> {
-			mLock.lock();
-			try {
-				if (bitmap == null) {
-					releaseImageSource();
-				} else {
-					createImageSource(bitmap, fps);
-				}
-			} finally {
-				mLock.unlock();
-			}
-		});
+		mImageTextureSource.setSource(bitmap, fps);
 	}
 
-	@WorkerThread
-	private void releaseImageSource() {
-		mManager.removeFrameCallback(mFrameCallback);
-		mLock.lock();
-		try {
-			if (mImageSource != null) {
-				if (DEBUG) Log.v(TAG, "releaseImageSource:");
-				mImageSource.release();
-				mImageSource = null;
-			}
-		} finally {
-			mLock.unlock();
-		}
-	}
+//	@WorkerThread
+//	private void createImageSource(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
+//		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap);
+//		mManager.removeFrameCallback(mFrameCallback);
+//		final int width = bitmap.getWidth();
+//		final int height = bitmap.getHeight();
+//		final boolean needResize = (getWidth() != width) || (getHeight() != height);
+//		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
+//		mLock.lock();
+//		try {
+//			if ((mImageSource == null) || needResize) {
+//				releaseImageSource();
+//				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
+//				GLUtils.checkGlError("createImageSource");
+//			}
+//			mImageSource.loadBitmap(bitmap);
+//			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
+//			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
+//			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
+//		} finally {
+//			mLock.unlock();
+//		}
+//		if (needResize) {
+//			resize(width, height);
+//		}
+//		mPrevFrameTimeNs = -1L;
+//		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
+//	}
 
-	@WorkerThread
-	private void createImageSource(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
-		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap);
-		mManager.removeFrameCallback(mFrameCallback);
-		final int width = bitmap.getWidth();
-		final int height = bitmap.getHeight();
-		final boolean needResize = (getWidth() != width) || (getHeight() != height);
-		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
-		mLock.lock();
-		try {
-			if ((mImageSource == null) || needResize) {
-				releaseImageSource();
-				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
-				GLUtils.checkGlError("createImageSource");
-			}
-			mImageSource.loadBitmap(bitmap);
-			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
-			mFrameIntervalMs = mFrameIntervalNs / 1000000L - 5;
-			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
-		} finally {
-			mLock.unlock();
-		}
-		if (needResize) {
-			resize(width, height);
-		}
-		mPrevFrameTimeNs = -1L;
-		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
-	}
-
-	/**
-	 * 一定時間毎にonFrameAvailableを呼び出すためのChoreographer.FrameCallback実装
-	 */
-	private final Choreographer.FrameCallback mFrameCallback
-		= new Choreographer.FrameCallback() {
-		@WorkerThread
-		@Override
-		public void doFrame(final long frameTimeNanos) {
-			if (isValid()) {
-				if (mPrevFrameTimeNs < 0) {
-					mPrevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
-				}
-				final long delta = (mFrameIntervalNs - (frameTimeNanos - mPrevFrameTimeNs)) / 1000000L;
-				mPrevFrameTimeNs = frameTimeNanos;
-				if (delta < 0) {
-					// フレームレートから想定されるより呼び出しが遅かった場合
-					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);
-				} else {
-					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
-				}
-				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
-				mLock.lock();
-				try {
-					if (mImageSource != null) {
-						onFrameAvailable(false, mImageSource.getTexId(), mImageSource.getTexMatrix());
-					}
-				} finally {
-					mLock.unlock();
-				}
-			}
-		}
-	};
+//	/**
+//	 * 一定時間毎にonFrameAvailableを呼び出すためのChoreographer.FrameCallback実装
+//	 */
+//	private final Choreographer.FrameCallback mFrameCallback
+//		= new Choreographer.FrameCallback() {
+//		@WorkerThread
+//		@Override
+//		public void doFrame(final long frameTimeNanos) {
+//			if (isValid()) {
+//				if (mPrevFrameTimeNs < 0) {
+//					mPrevFrameTimeNs = frameTimeNanos - mFrameIntervalNs;
+//				}
+//				final long delta = (mFrameIntervalNs - (frameTimeNanos - mPrevFrameTimeNs)) / 1000000L;
+//				mPrevFrameTimeNs = frameTimeNanos;
+//				if (delta < 0) {
+//					// フレームレートから想定されるより呼び出しが遅かった場合
+//					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs + delta);
+//				} else {
+//					mManager.postFrameCallbackDelayed(this, mFrameIntervalMs);
+//				}
+//				if (DEBUG && (delta != 0)) Log.v(TAG, "delta=" + delta);
+//				mLock.lock();
+//				try {
+//					if (mImageSource != null) {
+//						onFrameAvailable(false, mImageSource.getTexId(), mImageSource.getTexMatrix());
+//					}
+//				} finally {
+//					mLock.unlock();
+//				}
+//			}
+//		}
+//	};
 
 }
