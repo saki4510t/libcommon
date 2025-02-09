@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -42,27 +44,32 @@ import static org.junit.Assert.*;
 public class GLManagerTest {
 	private static final String TAG = GLManagerTest.class.getSimpleName();
 
-	private static final int WIDTH = 100;
-	private static final int HEIGHT = 100;
+	@Nullable
+	private GLManager mManager;
 
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		mManager = new GLManager();
+		assertTrue(mManager.isValid());
+		mManager.getEgl();
+		assertEquals(1, mManager.getMasterWidth());
+		assertEquals(1, mManager.getMasterHeight());
 	}
 
 	@After
 	public void cleanUp() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		if (mManager != null) {
+			mManager.release();
+			mManager = null;
+		}
 	}
 
 	@Test
-	public void glManagerTest() {
+	public void glManagerTest1() {
 		try {
-			final GLManager manager = new GLManager();
-			assertTrue(manager.isValid());
-			manager.getEgl();
-			assertEquals(1, manager.getMasterWidth());
-			assertEquals(1, manager.getMasterHeight());
+			final GLManager manager = mManager;
 			final Semaphore sem = new Semaphore(0);
 			final AtomicBoolean booleanResult = new AtomicBoolean();
 			final AtomicInteger intResult = new AtomicInteger();
@@ -90,11 +97,67 @@ public class GLManagerTest {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
 			assertTrue(booleanResult.get());
 			assertEquals(GLES20.GL_NO_ERROR, intResult.get());
-
-			manager.release();
 		} catch (final Exception e) {
 			throw new AssertionError(e);
 		}
 	}
 
+	@Test
+	public void glManagerTest2() {
+		final AtomicBoolean booleanResult = new AtomicBoolean();
+		runOnGL(new GLRunnable() {
+			@Override
+			public void run(@NonNull final GLManager manager) {
+				booleanResult.set(manager.isGLThread());
+			}
+		}, booleanResult, 100);
+		assertTrue(booleanResult.get());
+
+		final AtomicInteger intResult = new AtomicInteger();
+		runOnGL(new GLRunnable() {
+			@Override
+			public void run(@NonNull final GLManager manager) {
+				GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+				intResult.set(GLES20.glGetError());
+			}
+		}, intResult, 200);
+		assertEquals(GLES20.GL_NO_ERROR, intResult.get());
+	}
+
+//--------------------------------------------------------------------------------
+	/**
+	 * GLコンテキスト上で実行するRunnable類似のインターフェース
+	 */
+	private interface GLRunnable {
+		public void run(@NonNull final GLManager manager);
+	}
+
+	/**
+	 * GLManager#runOnGLThreadでGLRunnableを実行して
+	 * 結果が返ってくるの待機するためのヘルパーメソッド
+	 * @param task
+	 * @param result
+	 * @param maxWaitMs
+	 * @param <T>
+	 * @return
+	 */
+	private <T> T runOnGL(
+		@NonNull final GLRunnable task,
+		@NonNull final T result,
+		final long maxWaitMs) {
+
+		final GLManager manager = mManager;
+		assertNotNull(manager);
+		final Semaphore sem = new Semaphore(0);
+		manager.runOnGLThread(() -> {
+			task.run(manager);
+			sem.release();
+		});
+		try {
+			assertTrue(sem.tryAcquire(maxWaitMs, TimeUnit.MILLISECONDS));
+		} catch (final InterruptedException e) {
+			throw new AssertionError(e);
+		}
+		return result;
+	}
 }
