@@ -39,8 +39,6 @@ import static org.junit.Assert.assertTrue;
 
 /**
  * Choreographerのフレームコールバックの呼び出し周期を確認するテスト
- * 33までと60は大丈夫っぽいけどそれ以外は1-4割りぐらいずれる
- * でも画面に指で触れていればおよそ指定通りになることもあるみたい
  */
 @RunWith(AndroidJUnit4.class)
 public class ChoreographerTest {
@@ -197,11 +195,10 @@ public class ChoreographerTest {
          public void doFrame(final long frameTimeNanos) {
             final int n = numFrames.incrementAndGet();
             final Choreographer choreographer = Choreographer.getInstance();
-            final long current = System.nanoTime();
             if (firstTimeNs < 0) {
-               firstTimeNs = System.nanoTime();
+               firstTimeNs = frameTimeNanos;
             }
-            long ms = (firstTimeNs + frameIntervalNs * (n + 1) - current) / 1000000L;
+            long ms = (firstTimeNs + frameIntervalNs * (n + 1) - frameTimeNanos) / 1000000L;
             if (ms < 5L) {
                ms = 0L;
             }
