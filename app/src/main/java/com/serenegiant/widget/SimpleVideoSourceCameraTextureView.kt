@@ -107,14 +107,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				surface: SurfaceTexture): Boolean {
 
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureDestroyed:")
-				val source = mVideoSourcePipeline
-				if (source != null) {
-					val pipeline = GLSurfacePipeline.findById(source, surface.hashCode())
-					if (pipeline != null) {
-						pipeline.remove()
-						pipeline.release()
-					}
-				}
+				removeSurface(surface.hashCode())
 				return true
 			}
 
@@ -287,10 +280,13 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:id=${id}")
-		val found = GLSurfacePipeline.findById(mVideoSourcePipeline!!, id)
-		if (found != null) {
-			found.remove()
-			found.release()
+		val source = mVideoSourcePipeline
+		if (source != null) {
+			val found = GLSurfacePipeline.findById(source, id)
+			if (found != null) {
+				found.remove()
+				found.release()
+			}
 		}
 	}
 
