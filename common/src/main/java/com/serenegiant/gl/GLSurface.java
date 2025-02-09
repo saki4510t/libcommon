@@ -236,7 +236,7 @@ public abstract class GLSurface implements IGLSurface {
 
 		createFrameBuffer(width, height);
 		int tex = tex_id;
-		if (tex < 0) {
+		if (tex <= GL_NO_TEXTURE) {
 			tex = genTexture(tex_target, tex_unit, mTexWidth, mTexHeight);
 		}
 		assignTexture(tex, width, height);
