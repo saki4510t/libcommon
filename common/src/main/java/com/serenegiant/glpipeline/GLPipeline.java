@@ -219,13 +219,28 @@ public interface GLPipeline extends GLConst {
 	 */
 	@NonNull
 	public static String pipelineString(@NonNull final GLPipeline root) {
+		return pipelineString(root, true);
+	}
+
+	/**
+	 * 指定したGLPipelineからのパイプラインチェーンを角カッコでくくったカンマ区切りの文字列に変換する
+	 * @param root
+	 * @param simpleName シンプルなクラス名だけにするかパイプラインオブジェクト自体をtoStringするかどうあｋ
+	 * @return
+	 */
+	@NonNull
+	public static String pipelineString(@NonNull final GLPipeline root, final boolean simpleName) {
 		final StringBuilder sb = new StringBuilder("[");
 		GLPipeline pipeline = root;
 		while (pipeline != null) {
 			if (pipeline != root) {
 				sb.append(',');
 			}
-			sb.append(pipeline);
+			if (simpleName) {
+				sb.append(pipeline.getClass().getSimpleName());
+			} else {
+				sb.append(pipeline);
+			}
 			pipeline = pipeline.getPipeline();
 		}
 		sb.append("]");
