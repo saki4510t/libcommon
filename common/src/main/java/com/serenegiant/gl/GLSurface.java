@@ -242,7 +242,7 @@ public abstract class GLSurface implements IGLSurface {
 		assignTexture(tex, width, height);
 		// assignTexture内で強制的にmWrappedTexture=trueになるので正しい値に上書き
 		mWrappedTexture = tex_id > GL_NO_TEXTURE;
-		setViewPort(0, 0, mWidth, mHeight);
+//		setViewPort(0, 0, mWidth, mHeight);
 	}
 
 //--------------------------------------------------------------------------------
@@ -537,6 +537,7 @@ public abstract class GLSurface implements IGLSurface {
 			Matrix.setIdentityM(mTexMatrix, 0);
 			mTexMatrix[0] = width / (float)mTexWidth;
 			mTexMatrix[5] = height / (float)mTexHeight;
+			setViewPort(0, 0, mWidth, mHeight);
 		}
 
 		/**
@@ -776,6 +777,7 @@ public abstract class GLSurface implements IGLSurface {
 			Matrix.setIdentityM(mTexMatrix, 0);
 			mTexMatrix[0] = width / (float)mTexWidth;
 			mTexMatrix[5] = height / (float)mTexHeight;
+			setViewPort(0, 0, mWidth, mHeight);
 		}
 
 		/**
