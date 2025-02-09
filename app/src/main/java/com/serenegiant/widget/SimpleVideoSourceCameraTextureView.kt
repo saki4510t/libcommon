@@ -190,7 +190,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
 		val source = mVideoSourcePipeline
 		if (source != null) {
-			when (val last = GLPipeline.findLast(source)) {
+			val last = GLPipeline.findLast(source)
+			if (DEBUG) Log.v(TAG, "addSurface:last=$last")
+			when (last) {
 				mVideoSourcePipeline -> {
 					source.pipeline = createPipeline(surface, maxFps)
 					if (SUPPORT_RECORDING) {
@@ -273,6 +275,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				}
 			}
+			if (DEBUG) Log.v(TAG, "addSurface:" + GLPipeline.pipelineString(source))
 		} else {
 			throw IllegalStateException("already released?")
 		}

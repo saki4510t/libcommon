@@ -245,6 +245,7 @@ public class DrawerPipeline extends ProxyPipeline
 
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
+		if (DEBUG) Log.v(TAG, "setMirror:" + mirror);
 		mLock.lock();
 		try {
 			if (mMirror != mirror) {
