@@ -136,6 +136,10 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "onResume:")
 		mVideoSourcePipeline = createVideoSource(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+		if (USE_DRAWER_PIPELINE) {
+			if (DEBUG) Log.v(TAG, "onResume:add DrawerPipeline")
+			mVideoSourcePipeline!!.pipeline = DrawerPipeline(mGLManager, DrawerPipeline.DEFAULT_CALLBACK)
+		}
 		mCameraDelegator.onResume()
 	}
 
@@ -412,5 +416,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		 */
 		private const val USE_SHARED_CONTEXT = false
 		private const val SUPPORT_RECORDING = true
+		/**
+		 * テスト用にDrawerPipelineを接続するかどうか
+		 */
+		private const val USE_DRAWER_PIPELINE = true
 	}
 }
