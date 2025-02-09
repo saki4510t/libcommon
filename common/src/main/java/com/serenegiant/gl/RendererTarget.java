@@ -158,6 +158,7 @@ public class RendererTarget implements IMirror {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mirror
 	 */
+	@Override
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
 		@MirrorMode
 		final int _mirror = mirror % IMirror.MIRROR_NUM;
@@ -167,6 +168,7 @@ public class RendererTarget implements IMirror {
 		}
 	}
 
+	@MirrorMode
 	@Override
 	public int getMirror() {
 		return mMirror;

@@ -235,6 +235,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 	 * ミラーモードをセット
 	 * @param mirror
 	 */
+	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		mDistributeTask.setMirror(mirror % MIRROR_NUM);
 	}
@@ -244,6 +245,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 	 * @return
 	 */
 	@MirrorMode
+	@Override
 	public int getMirror() {
 		return mDistributeTask.getMirror();
 	}

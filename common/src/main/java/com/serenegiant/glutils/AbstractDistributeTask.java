@@ -334,6 +334,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	}
 
 	@AnyThread
+	@Override
 	public void setMirror(@MirrorMode final int mirror) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "mirror:" + mirror);
 		checkFinished();
@@ -343,6 +344,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	}
 
 	@MirrorMode
+	@Override
 	public int getMirror() {
 		return mMirror;
 	}
