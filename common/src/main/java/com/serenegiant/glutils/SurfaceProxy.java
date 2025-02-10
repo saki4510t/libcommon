@@ -455,7 +455,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					mMirror = mirror;
 					mManager.runOnGLThread(() -> {
 						if (mRendererTarget != null) {
-							mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+							mRendererTarget.setMirror(mirror);
 						}
 					});
 				}
@@ -573,6 +573,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					}
 					if (DEBUG) Log.v(TAG, "renderTargetOnGL:create GLDrawer2D");
 					mDrawer = GLDrawer2D.create(isGLES3, isOES);
+					mDrawer.setMirror(MIRROR_VERTICAL);
 				}
 				drawer = mDrawer;
 				target = mRendererTarget;
@@ -610,7 +611,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
 				if (mRendererTarget != null) {
-					mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+					mRendererTarget.setMirror(mMirror);
 				}
 			} finally {
 				mLock.unlock();

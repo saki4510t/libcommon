@@ -254,7 +254,7 @@ public class DrawerPipeline extends ProxyPipeline
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+						mRendererTarget.setMirror(mirror);
 					}
 				});
 			}
@@ -289,6 +289,7 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = mCallback.createDrawer(mManager, isOES);
+			mDrawer.setMirror(MIRROR_VERTICAL);
 		}
 		if (mDrawOnly && (mOffscreenSurface != null)
 			&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {
@@ -438,7 +439,7 @@ public class DrawerPipeline extends ProxyPipeline
 			} finally {
 				mLock.unlock();
 			}
-			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+			mRendererTarget.setMirror(mMirror);
 		}
 	}
 }

@@ -217,6 +217,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			releaseDrawerOnGL();
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = createDrawerOnGL( isGLES3, isOES);
+			mDrawer.setMirror(IMirror.MIRROR_VERTICAL);
 		}
 		@NonNull
 		final GLDrawer2D drawer = mDrawer;
@@ -366,7 +367,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 				} finally {
 					mLock.unlock();
 				}
-				mRendererTarget.setMirror(IMirror.MIRROR_VERTICAL);
 			}
 		}
 	}

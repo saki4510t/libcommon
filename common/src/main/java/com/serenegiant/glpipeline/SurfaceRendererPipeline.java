@@ -176,7 +176,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+						mRendererTarget.setMirror(mirror);
 					}
 				});
 			}
@@ -213,6 +213,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+				mDrawer.setMirror(MIRROR_VERTICAL);
 			}
 			@NonNull
 			final GLDrawer2D drawer = mDrawer;
@@ -264,7 +265,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 		}
 		if (mRendererTarget != null) {
-			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+			mRendererTarget.setMirror(mMirror);
 			mLock.lock();
 			try {
 				mSurfaceId = mRendererTarget.getId();

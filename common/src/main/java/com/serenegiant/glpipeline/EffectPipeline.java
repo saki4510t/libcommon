@@ -208,7 +208,7 @@ public class EffectPipeline extends ProxyPipeline
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+						mRendererTarget.setMirror(mirror);
 					}
 				});
 			}
@@ -244,6 +244,7 @@ public class EffectPipeline extends ProxyPipeline
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
+				mDrawer.setMirror(MIRROR_VERTICAL);
 				mDrawer.setEffect(mEffect);
 			}
 			if (mEffectOnly && (mOffscreenSurface != null)
@@ -491,7 +492,7 @@ public class EffectPipeline extends ProxyPipeline
 		} finally {
 			mLock.unlock();
 		}
-		mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+		mRendererTarget.setMirror(mMirror);
 	}
 
 	final EffectDrawer2D.EffectListener mEffectListener

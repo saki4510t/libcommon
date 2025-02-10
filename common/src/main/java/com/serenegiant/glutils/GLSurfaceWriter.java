@@ -155,7 +155,7 @@ public class GLSurfaceWriter implements IMirror {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
 					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(IMirror.flipVertical(mirror));
+						mRendererTarget.setMirror(mirror);
 					}
 				});
 			}
@@ -265,6 +265,7 @@ public class GLSurfaceWriter implements IMirror {
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+				mDrawer.setMirror(MIRROR_VERTICAL);
 			}
 			drawer = mDrawer;
 			target = mRendererTarget;
@@ -300,7 +301,7 @@ public class GLSurfaceWriter implements IMirror {
 					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 			}
 			if (mRendererTarget != null) {
-				mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
+				mRendererTarget.setMirror(mMirror);
 			}
 		} finally {
 			mLock.unlock();
