@@ -311,7 +311,7 @@ public class VideoSourcePipeline extends ProxyPipeline implements GLPipelineSurf
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
-			onFrameAvailable(true, mTexId, mTexMatrix);
+			onFrameAvailable( mManager.isGLES3(), true, mTexId, mTexMatrix);
 		}
 	}
 

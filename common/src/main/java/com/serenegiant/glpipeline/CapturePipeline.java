@@ -173,8 +173,12 @@ public class CapturePipeline extends ProxyPipeline {
 	}
 
 	@Override
-	public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-		super.onFrameAvailable(isOES, texId, texMatrix);
+	public void onFrameAvailable(
+		final boolean isGLES3,
+		final boolean isOES, final int texId,
+		@NonNull final float[] texMatrix) {
+
+		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 		// キャプチャするかどうかを判定
 		final long current = System.currentTimeMillis();
 		final boolean needCapture;

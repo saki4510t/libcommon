@@ -106,12 +106,14 @@ public interface GLPipeline extends GLConst {
 
 	/**
 	 * 新しく映像を受け取ったときの処理
+	 * @param isGLES3
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
 	 */
 	@WorkerThread
 	public void onFrameAvailable(
+		final boolean isGLES3,
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix);
 

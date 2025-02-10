@@ -159,24 +159,32 @@ public class GLPipelineTest {
 		final AtomicInteger cnt1 = new AtomicInteger();
 		final ProxyPipeline dst1 = new ProxyPipeline() {
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				cnt1.incrementAndGet();
 			}
 		};
 		final AtomicInteger cnt2 = new AtomicInteger();
 		final ProxyPipeline dst2 = new ProxyPipeline() {
-			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				cnt2.incrementAndGet();
 			}
 		};
 		final AtomicInteger cnt3 = new AtomicInteger();
 		final ProxyPipeline dst3 = new ProxyPipeline() {
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				cnt3.incrementAndGet();
 			}
 		};
@@ -186,7 +194,7 @@ public class GLPipelineTest {
 		final int LOOP_NUM = 10;
 		final float[] texMatrix = new float[16];
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM, cnt1.get());
 		assertEquals(0, cnt2.get());
@@ -194,7 +202,7 @@ public class GLPipelineTest {
 
 		dst1.setPipeline(dst2);
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 2, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -202,7 +210,7 @@ public class GLPipelineTest {
 
 		dst2.setPipeline(dst3);
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 3, cnt1.get());
 		assertEquals(LOOP_NUM * 2, cnt2.get());
@@ -212,7 +220,7 @@ public class GLPipelineTest {
 		cnt1.set(0); cnt2.set(0); cnt3.set(0);
 
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -221,7 +229,7 @@ public class GLPipelineTest {
 		// 中間のパイプラインを除去したときに正常に動作するかどうかを確認
 		dst2.remove();
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 2, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -230,7 +238,7 @@ public class GLPipelineTest {
 		// 一番後ろのパイプライを除去したときに正常に動作するかどうかを確認
 		dst3.remove();
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, 0, texMatrix);
+			src.onFrameAvailable(false, false, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 3, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -256,8 +264,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
@@ -310,8 +321,11 @@ public class GLPipelineTest {
 		final ProxyPipeline pipeline1 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					this.remove();
 					if (sem1.availablePermits() == 0) {
@@ -333,8 +347,11 @@ public class GLPipelineTest {
 		final ProxyPipeline pipeline2 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					this.remove();
 					if (sem2.availablePermits() == 0) {
@@ -413,8 +430,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
@@ -477,8 +497,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
@@ -538,8 +561,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
@@ -602,8 +628,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {
@@ -664,8 +693,11 @@ public class GLPipelineTest {
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
-			public void onFrameAvailable(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isOES, texId, texMatrix);
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() >= 30) {
 					source.setPipeline(null);
 					if (sem.availablePermits() == 0) {

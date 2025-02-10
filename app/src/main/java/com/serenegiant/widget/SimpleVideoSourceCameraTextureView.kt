@@ -32,6 +32,7 @@ import com.serenegiant.glpipeline.*
 import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
+import com.serenegiant.glutils.GLImageReceiver
 import com.serenegiant.glutils.OnFrameAvailableListener
 import com.serenegiant.math.Fraction
 import com.serenegiant.view.TouchViewTransformer
@@ -205,9 +206,17 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						// OnFramePipelineを追加する
 						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
 						val p = GLPipeline.findLast(source)
-						p.pipeline = OnFramePipeline(object : OnFrameAvailableListener {
+						p.pipeline = OnFramePipeline(object :
+							GLImageReceiver.FrameAvailableCallback {
 							var cnt: Int = 0
-							override fun onFrameAvailable() {
+
+							override fun onFrameAvailable(
+								isGLES3: Boolean,
+								isOES: Boolean,
+								width: Int, height: Int,
+								texId: Int,
+								texMatrix: FloatArray
+							) {
 								if (DEBUG && ((++cnt) % 100 == 0)) {
 									Log.v(TAG, "onFrameAvailable:${cnt}")
 								}

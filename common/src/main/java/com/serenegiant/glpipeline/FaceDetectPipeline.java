@@ -164,10 +164,11 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
+		final boolean isGLES3,
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
-		super.onFrameAvailable(isOES, texId, texMatrix);
+		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 		if (isActive()) {
 			final int width;
 			final int height;

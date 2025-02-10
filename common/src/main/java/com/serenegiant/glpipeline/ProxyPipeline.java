@@ -247,6 +247,7 @@ public class ProxyPipeline implements GLPipeline {
 	@CallSuper
 	@Override
 	public void onFrameAvailable(
+		final boolean isGLES3,
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
@@ -259,7 +260,7 @@ public class ProxyPipeline implements GLPipeline {
 				mLock.unlock();
 			}
 			if (pipeline != null) {
-				pipeline.onFrameAvailable(isOES, texId, texMatrix);
+				pipeline.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 			}
 		}
 	}

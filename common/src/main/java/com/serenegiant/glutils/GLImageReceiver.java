@@ -71,7 +71,8 @@ public class GLImageReceiver {
 		 */
 		@WorkerThread
 		public void onFrameAvailable(
-			final boolean isGLES3, final boolean isOES,
+			final boolean isGLES3,
+			final boolean isOES,
 			final int width, final int height,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}

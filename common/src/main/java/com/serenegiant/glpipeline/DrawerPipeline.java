@@ -278,6 +278,7 @@ public class DrawerPipeline extends ProxyPipeline
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
+		final boolean isGLES3,
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
@@ -313,13 +314,13 @@ public class DrawerPipeline extends ProxyPipeline
 				Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
 			}
 			// 描画処理した後のたテクスチャを次へ渡す
-			super.onFrameAvailable(mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
+			super.onFrameAvailable(isGLES3, mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
 		} else {
 			if (DEBUG && (++cnt % 100) == 0) {
 				Log.v(TAG, "onFrameAvailable:" + cnt);
 			}
 			// こっちはオリジナルのテクスチャを渡す
-			super.onFrameAvailable(isOES, texId, texMatrix);
+			super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 		}
 	}
 

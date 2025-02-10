@@ -20,6 +20,7 @@ package com.serenegiant.gl;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.IMirror;
@@ -34,7 +35,8 @@ import androidx.annotation.Size;
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
 public class RendererTarget implements IMirror {
-
+	private static final boolean DEBUG = true;
+	private static final String TAG = RendererTarget.class.getSimpleName();
 	/**
 	 * ファクトリーメソッド
 	 * @param egl
@@ -46,6 +48,7 @@ public class RendererTarget implements IMirror {
 		@NonNull final EGLBase egl,
 		@NonNull final Object surface, final float maxFps) {
 
+		if (DEBUG) Log.v(TAG, "newInstance:maxFps=" + maxFps);
 		return (maxFps > 0)
 			? new RendererTargetHasWait(egl, surface, maxFps)
 			: new RendererTarget(egl, surface);	// no limitation of maxFps
@@ -69,6 +72,7 @@ public class RendererTarget implements IMirror {
 	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 */
 	protected RendererTarget(@NonNull final EGLBase egl, @NonNull final Object surface) {
+		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 		mSurface = surface;
 		if (surface instanceof ISurface) {	// IGLSurfaceはISurfaceの子なのでここに含む
 			mTargetSurface = (ISurface)surface;
@@ -91,6 +95,7 @@ public class RendererTarget implements IMirror {
 	 * 生成したEglSurface等を破棄する
 	 */
 	public void release() {
+		if (DEBUG) Log.v(TAG, "release:");
 		if (mOwnSurface && (mTargetSurface != null)) {
 			mTargetSurface.release();
 		}
@@ -160,6 +165,7 @@ public class RendererTarget implements IMirror {
 	 */
 	@Override
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
+		if (DEBUG) Log.v(TAG, "setMirror:" + mirror);
 		@MirrorMode
 		final int _mirror = mirror % IMirror.MIRROR_NUM;
 		if (_mirror != mMirror) {
@@ -289,6 +295,7 @@ public class RendererTarget implements IMirror {
 			@NonNull final Object surface, final float maxFps) {
 
 			super(egl, surface);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:");
 			mIntervalsNs = Math.round(1000000000.0 / maxFps);
 			mIntervalsDeltaNs = -Math.round(mIntervalsNs * 0.03);	// 3%ならショートしても良いことにする
 			mNextDraw = Time.nanoTime() + mIntervalsNs;

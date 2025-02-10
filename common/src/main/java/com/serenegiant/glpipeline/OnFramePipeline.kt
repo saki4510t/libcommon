@@ -1,6 +1,7 @@
 package com.serenegiant.glpipeline
 
 import androidx.annotation.Size
+import com.serenegiant.glutils.GLImageReceiver
 
 /*
  * libcommon
@@ -24,13 +25,14 @@ import androidx.annotation.Size
 /**
  * 映像が更新されたときのコースバックインターフェースを呼び出すだけのProxyPipeline実装
  */
-class OnFramePipeline(private val mListener: com.serenegiant.glutils.OnFrameAvailableListener)
+class OnFramePipeline(private val mListener: GLImageReceiver.FrameAvailableCallback)
 : ProxyPipeline() {
 	override fun onFrameAvailable(
+		isGLES3: Boolean,
 		isOES: Boolean, texId: Int,
 		@Size(min = 16) texMatrix: FloatArray) {
 
-		super.onFrameAvailable(isOES, texId, texMatrix)
-		mListener.onFrameAvailable()
+		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix)
+		mListener.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix)
 	}
 }
