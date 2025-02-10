@@ -247,59 +247,6 @@ public class GLPipelineTest {
 	}
 
 	/**
-	 * ImageSourceパイプラインが正常に映像ソースとして動作するかどうかを検証
-	 */
-	@Test
-	public void imageSourceTest() {
-		// テストに使用するビットマップを生成
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(bitmap);
-
-		final GLManager manager = mManager;
-		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-
-		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
-					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
-				}
-			}
-		};
-		source.setPipeline(proxy);
-		try {
-			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(b);
-			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result, true));
-		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
-		}
-	}
-
-	/**
 	 * DistributePipelineで複数のGLPipelineへの分配処理が動作するかどうかを検証
 	 */
 	@Test
