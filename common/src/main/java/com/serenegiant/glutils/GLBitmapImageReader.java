@@ -179,8 +179,8 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param isOES
 	 * @param isGLES3
+	 * @param isOES
 	 * @param width
 	 * @param height
 	 * @param texId
@@ -190,7 +190,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
-		final boolean isOES, final boolean isGLES3,
+		final boolean isGLES3, final boolean isOES,
 		final int width, final int height,
 		final int texId, @NonNull final float[] texMatrix) {
 
