@@ -83,7 +83,7 @@ public class GLImageReceiver {
 	 */
 	public interface Callback extends FrameAvailableCallback {
 		@WorkerThread
-		public void onInitialize(@NonNull final GLImageReceiver receiver);
+		public void onInitialize(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
 		/**
 		 * 関係するリソースを破棄する
 		 */
@@ -93,12 +93,12 @@ public class GLImageReceiver {
 		 * 映像入力用Surfaceが生成されたときの処理
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final GLImageReceiver receiver);
+		public void onCreateInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver);
+		public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
