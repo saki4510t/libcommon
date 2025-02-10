@@ -113,4 +113,85 @@ public class StaticTextureSourceTest {
 		}
 		source.removeSurface(surface.hashCode());
 	}
+
+	@Test
+	public void imageTest2() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final Semaphore sem = new Semaphore(0);
+
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final GLBitmapImageReader reader1
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader1.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
+				final Bitmap bitmap = reader.acquireLatestImage();
+				if (bitmap != null) {
+					try {
+						if (cnt.incrementAndGet() == 2) {
+							Log.i(TAG, "onImageAvailable1:release Semaphore");
+							result1.set(Bitmap.createBitmap(bitmap));
+							sem.release();
+						}
+					} finally {
+						reader.recycle(bitmap);
+					}
+				}
+			}
+		}, HandlerThreadHandler.createHandler(TAG));
+		final GLImageReceiver receiver1 = new GLImageReceiver(WIDTH, HEIGHT, reader1);
+		final Surface surface1 = receiver1.getSurface();
+		assertNotNull(surface1);
+		source.addSurface(surface1.hashCode(), surface1, false);
+
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final GLBitmapImageReader reader2
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
+		reader2.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
+				final Bitmap bitmap = reader.acquireLatestImage();
+				if (bitmap != null) {
+					try {
+						if (cnt.incrementAndGet() == 2) {
+							Log.i(TAG, "onImageAvailable2:release Semaphore");
+							result1.set(Bitmap.createBitmap(bitmap));
+							sem.release();
+						}
+					} finally {
+						reader.recycle(bitmap);
+					}
+				}
+			}
+		}, HandlerThreadHandler.createHandler(TAG));
+		final GLImageReceiver receiver2 = new GLImageReceiver(WIDTH, HEIGHT, reader2);
+		final Surface surface2 = receiver2.getSurface();
+		assertNotNull(surface2);
+		source.addSurface(surface2.hashCode(), surface2, false);
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(2, 2000, TimeUnit.MILLISECONDS));
+			final Bitmap b1 = result1.get();
+//			dump(b1);
+			assertNotNull(b1);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b1));
+
+			final Bitmap b2 = result1.get();
+//			dump(b1);
+			assertNotNull(b2);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b2));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+		}
+		source.removeSurface(surface1.hashCode());
+		source.removeSurface(surface2.hashCode());
+	}
 }
