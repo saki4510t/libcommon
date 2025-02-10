@@ -29,7 +29,6 @@ import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glutils.GLImageReceiver;
 import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.IMirror;
 import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -127,8 +126,6 @@ public class GLImageReceiverTest {
 
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
-		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用
-		renderer.setMirror(IMirror.MIRROR_VERTICAL);
 		GLPipeline.append(source, renderer);
 
 		final Semaphore sem = new Semaphore(0);

@@ -213,7 +213,6 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
-				mDrawer.setMirror(MIRROR_VERTICAL);
 			}
 			@NonNull
 			final GLDrawer2D drawer = mDrawer;

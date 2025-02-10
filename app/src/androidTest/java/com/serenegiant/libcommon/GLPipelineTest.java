@@ -37,6 +37,7 @@ import com.serenegiant.glpipeline.VideoSourcePipeline;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -410,6 +411,8 @@ public class GLPipelineTest {
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
+		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用
+		surfacePipeline.setMirror(IMirror.MIRROR_VERTICAL);
 		source.setPipeline(surfacePipeline);
 
 		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,
