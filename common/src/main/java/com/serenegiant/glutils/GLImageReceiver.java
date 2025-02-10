@@ -201,12 +201,12 @@ public class GLImageReceiver {
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
 		mGLHandler.post(() -> {
 			try {
-				handleOnStart();
+				handleOnStartOnGL();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
 			try {
-				handleReCreateInputSurface();
+				handleReCreateInputSurfaceOnGL();
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
@@ -276,7 +276,7 @@ public class GLImageReceiver {
 	protected void internalRelease() {
 		if (mManager.isValid()) {
 			mGLHandler.post(() -> {
-				handleOnStop();
+				handleOnStopOnGL();
 				if (mOwnManager) {
 					mManager.release();
 				}
@@ -429,7 +429,7 @@ public class GLImageReceiver {
 	 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
 	 */
 	@WorkerThread
-	private void handleOnStart() {
+	private void handleOnStartOnGL() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
 		mCallback.onInitialize(this);
 	}
@@ -438,9 +438,9 @@ public class GLImageReceiver {
 	 * ワーカースレッド終了時の処理(ここはまだワーカースレッド上)
 	 */
 	@WorkerThread
-	private void handleOnStop() {
+	private void handleOnStopOnGL() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
-		handleReleaseInputSurface();
+		handleReleaseInputSurfaceOnGL();
 		mCallback.onRelease();
 	}
 
@@ -448,15 +448,15 @@ public class GLImageReceiver {
 	protected boolean handleMessage(@NonNull final Message msg) {
 		switch (msg.what) {
 		case REQUEST_UPDATE_TEXTURE -> {
-			handleUpdateTexImage();
+			handleUpdateTexImageOnGL();
 			return true;
 		}
 		case REQUEST_UPDATE_SIZE -> {
-			handleResize(msg.arg1, msg.arg2);
+			handleResizeOnGL(msg.arg1, msg.arg2);
 			return true;
 		}
 		case REQUEST_RECREATE_MASTER_SURFACE -> {
-			handleReCreateInputSurface();
+			handleReCreateInputSurfaceOnGL();
 			return true;
 		}
 		default -> {
@@ -471,7 +471,7 @@ public class GLImageReceiver {
 	 */
 	private int drawCnt;
 	@WorkerThread
-	private void handleUpdateTexImage() {
+	private void handleUpdateTexImageOnGL() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		try {
 			mManager.makeDefault();
@@ -495,7 +495,7 @@ public class GLImageReceiver {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	@CallSuper
-	private void handleResize(final int width, final int height) {
+	private void handleResizeOnGL(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		mLock.lock();
 		try {
@@ -516,12 +516,12 @@ public class GLImageReceiver {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	@CallSuper
-	private void handleReCreateInputSurface() {
+	private void handleReCreateInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		mLock.lock();
 		try {
 			mManager.makeDefault();
-			handleReleaseInputSurface();
+			handleReleaseInputSurfaceOnGL();
 			mManager.makeDefault();
 			mTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
@@ -545,7 +545,7 @@ public class GLImageReceiver {
 	@SuppressLint("NewApi")
 	@WorkerThread
 	@CallSuper
-	private void handleReleaseInputSurface() {
+	private void handleReleaseInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		mCallback.onReleaseInputSurface(this);
 		mLock.lock();
