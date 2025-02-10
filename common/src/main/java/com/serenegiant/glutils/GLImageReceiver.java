@@ -51,9 +51,18 @@ public class GLImageReceiver {
 	private static final boolean DEBUG = false;
 	private static final String TAG = GLImageReceiver.class.getSimpleName();
 
+	/**
+	 * SurfaceTextureが映像を受け取ったときの更新要求
+	 */
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
+	/**
+	 * 映像サイズ変更要求
+	 */
 	private static final int REQUEST_UPDATE_SIZE = 2;
-	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
+	/**
+	 * 映像受け取り用テクスチャ/SurfaceTexture/Surfaceの(再)生成要求
+	 */
+	private static final int REQUEST_RECREATE_INPUT_SURFACE = 5;
 
 	/**
 	 * #onFrameAvailableだけを後から差し替えれるようにCallbackインターフェースから分離
@@ -91,12 +100,12 @@ public class GLImageReceiver {
 		@WorkerThread
 		public void onRelease();
 		/**
-		 * 映像入力用Surfaceが生成されたときの処理
+		 * 映像入力用Surfaceが生成されたときの処理、生成直後に毎回呼ばれる
 		 */
 		@WorkerThread
 		public void onCreateInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
 		/**
-		 * 映像入力用Surfaceが破棄されるときの処理
+		 * 映像入力用Surfaceが破棄されるときの処理、これは実際に破棄される直前に毎回呼ばれる
 		 */
 		@WorkerThread
 		public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
@@ -131,12 +140,24 @@ public class GLImageReceiver {
 	private volatile boolean mReleased = false;
 	private boolean mIsReaderValid = false;
 
-	// 映像受け取り用テクスチャ/SurfaceTexture/Surface関係
+	/**
+	 * 映像受け取り用SurfaceTextureの#getTransformMatrixで受け取った
+	 * テクスチャ変換行列を保持する
+	 */
 	@Size(min=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
+	/**
+	 * 映像受け取り用のSurfaceTextureでラップしたテクスチャID
+	 */
 	private int mTexId;
+	/**
+	 * 映像受け取り用SurfaceTexture
+	 */
 	private SurfaceTexture mInputTexture;
+	/**
+	 * 映像受け取り用SurfaceTextureから生成したSurface
+	 */
 	private Surface mInputSurface;
 
 	/**
@@ -455,7 +476,7 @@ public class GLImageReceiver {
 			handleResizeOnGL(msg.arg1, msg.arg2);
 			return true;
 		}
-		case REQUEST_RECREATE_MASTER_SURFACE -> {
+		case REQUEST_RECREATE_INPUT_SURFACE -> {
 			handleReCreateInputSurfaceOnGL();
 			return true;
 		}
@@ -547,7 +568,10 @@ public class GLImageReceiver {
 	@CallSuper
 	private void handleReleaseInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
-		mCallback.onReleaseInputSurface(this);
+		final Surface surface = getSurface();
+		if (surface != null) {
+			mCallback.onReleaseInputSurface(this);
+		}
 		mLock.lock();
 		try {
 			if (mInputSurface != null) {
