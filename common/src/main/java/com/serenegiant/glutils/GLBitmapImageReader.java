@@ -238,6 +238,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	 * @param handler
 	 * @throws IllegalArgumentException
 	 */
+	@Override
 	public void setOnImageAvailableListener(
 		@Nullable final OnImageAvailableListener<Bitmap> listener,
 		@Nullable final Handler handler) throws IllegalArgumentException {
