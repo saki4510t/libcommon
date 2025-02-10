@@ -200,21 +200,16 @@ public class GLImageReceiver {
 		mFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
 		mGLHandler.post(() -> {
-			handleOnStart();
-			sem.release();
-		});
-		// 初期化待ち
-		try {
-			if (!sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
-				throw new RuntimeException("failed to init");
+			try {
+				handleOnStart();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
-		} catch (final InterruptedException e) {
-			throw new RuntimeException("failed to init", e);
-		}
-		// 映像受け取り用のテクスチャ/SurfaceTexture/Surfaceを生成
-		sem.release(sem.availablePermits());
-		mGLHandler.post(() -> {
-			handleReCreateInputSurface();
+			try {
+				handleReCreateInputSurface();
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
 			sem.release();
 		});
 		try {
