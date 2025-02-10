@@ -62,6 +62,9 @@ public class RendererTarget implements IMirror {
 	@Size(min=16)
 	@NonNull
 	private final float[] mMvpMatrix = new float[16];
+	@Size(min=16)
+	@NonNull
+	private final float[] mWorkMatrix = new float[16];
 	private volatile boolean mEnable = true;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
@@ -204,25 +207,13 @@ public class RendererTarget implements IMirror {
 			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
 			// ハングアップする機種があるのでクリアしとく
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
-			doDraw(drawer, texUnit, textId, texMatrix, mMvpMatrix);
+			// GLDrawer2Dのモデルビュー変換行列と引数のモデルビュー変換行列(=RendererTargetへ適用されたモデルビュー変換行列)を乗算
+			// 乗算の順がこれでいいかは要検討
+			Matrix.multiplyMM(mWorkMatrix, 0, drawer.getMvpMatrix(), 0, mMvpMatrix, 0);
+			// 乗算したモデルビュー変換行列で描画
+			drawer.draw(texUnit, textId, texMatrix, 0, mWorkMatrix, 0);
 			mTargetSurface.swap();
 		}
-	}
-
-	/**
-	 * Drawの描画処理の実体
-	 * サーフェースのmakeCurrent/swap処理は上位で実行
-	 * @param drawer
-	 * @param textId
-	 * @param texMatrix
-	 * @param mvpMatrix
-	 */
-	protected static void doDraw(@NonNull final GLDrawer2D drawer,
-		final int texUnit, final int textId,
-		@Nullable final float[] texMatrix, @NonNull final float[] mvpMatrix) {
-
-		drawer.setMvpMatrix(mvpMatrix, 0);
-		drawer.draw(texUnit, textId, texMatrix, 0);
 	}
 
 	/**
