@@ -108,12 +108,12 @@ public class MediaEffectDrawer {
 		/**
 		 * テクスチャのバインド処理
 		 * mSyncはロックされて呼び出される
-		 * @param tex_ids texture ID
+		 * @param texIds texture ID
 		 */
-		protected void bindTexture(@NonNull final int[] tex_ids) {
+		protected void bindTexture(@NonNull final int[] texIds) {
 			GLES20.glActiveTexture(TEX_NUMBERS[0]);
-			if (tex_ids[0] != GL_NO_TEXTURE) {
-				GLES20.glBindTexture(mTexTarget, tex_ids[0]);
+			if (texIds[0] != GL_NO_TEXTURE) {
+				GLES20.glBindTexture(mTexTarget, texIds[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
 			}
 		}
@@ -261,16 +261,16 @@ public class MediaEffectDrawer {
 
 	/**
 	 * preDraw => draw => postDrawを順に呼び出す
-	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * @param texIds texture ID
+	 * @param texMatrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	public void apply(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	public void apply(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
 		synchronized (mSync) {
 			GLES20.glUseProgram(hProgram);
-			preDraw(tex_ids, tex_matrix, offset);
-			draw(tex_ids, tex_matrix, offset);
+			preDraw(texIds, texMatrix, offset);
+			draw(texIds, texMatrix, offset);
 			postDraw();
 		}
 	}
@@ -279,28 +279,27 @@ public class MediaEffectDrawer {
 	 * 描画の前処理
 	 * テクスチャ変換行列/モデルビュー変換行列を代入, テクスチャをbindする
 	 * mSyncはロックされて呼び出される
-	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * @param texIds texture ID
+	 * @param texMatrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void preDraw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
-		if ((muTexMatrixLoc >= 0) && (tex_matrix != null)) {
-			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, tex_matrix, offset);
+	protected void preDraw(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
+		if ((muTexMatrixLoc >= 0) && (texMatrix != null)) {
+			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
 		}
 		if (muMVPMatrixLoc >= 0) {
 			GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 		}
-		bindTexture(tex_ids);
+		bindTexture(texIds);
 	}
 
-	protected void bindTexture(@NonNull final int[] tex_ids) {
-		final int n = tex_ids.length < muTexLoc.length
-			? tex_ids.length : muTexLoc.length;
+	protected void bindTexture(@NonNull final int[] texIds) {
+		final int n = Math.min(texIds.length, muTexLoc.length);
 		for (int i = 0; i < n; i++) {
-			if (tex_ids[i] != GL_NO_TEXTURE) {
+			if (texIds[i] != GL_NO_TEXTURE) {
 				GLES20.glActiveTexture(TEX_NUMBERS[i]);
-				GLES20.glBindTexture(mTexTarget, tex_ids[i]);
+				GLES20.glBindTexture(mTexTarget, texIds[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);
 			}
 		}
@@ -309,12 +308,12 @@ public class MediaEffectDrawer {
 	/**
 	 * 実際の描画実行, GLES20.glDrawArraysを呼び出すだけ
 	 * mSyncはロックされて呼び出される
-	 * @param tex_ids texture ID
-	 * @param tex_matrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
+	 * @param texIds texture ID
+	 * @param texMatrix テクスチャ変換行列、nullならば以前に適用したものが再利用される.
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void draw(@NonNull final int[] tex_ids, final float[] tex_matrix, final int offset) {
+	protected void draw(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
 //		if (DEBUG) Log.v(TAG, "draw");
 		// これが実際の描画
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);

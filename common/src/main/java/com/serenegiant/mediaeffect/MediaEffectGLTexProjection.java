@@ -48,15 +48,15 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 		}
 
 		@Override
-		protected void preDraw(@NonNull final int[] tex_ids,
-			final float[] tex_matrix, final int offset) {
+		protected void preDraw(@NonNull final int[] texIds,
+			final float[] texMatrix, final int offset) {
 
 			// テクスチャ変換行列をセット
 			if (muTexMatrixLoc2 >= 0) {
 				GLES20.glUniformMatrix3fv(muTexMatrixLoc2, 1, false, texMatrix2, 0);
 				GLUtils.checkGlError("glUniformMatrix3fv");
 			}
-			super.preDraw(tex_ids, tex_matrix, offset);
+			super.preDraw(texIds, texMatrix, offset);
 		}
 
 		public void reset() {
@@ -140,8 +140,8 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 		"varying vec2 vTextureCoord;\n" +	// フラグメントシェーダーへ引き渡すテクスチャ座標
 		"void main() {\n" +
 			"gl_Position = uMVPMatrix * aPosition;\n" +				// 頂点座標を計算
-			"vec3 tex_coord = vec3((uTexMatrix * aTextureCoord).xy, 1.0);\n" +		// テクスチャ座標を計算
-			"vec3 temp = uTexMatrix2 * tex_coord;\n" +
+			"vec3 texCoord = vec3((uTexMatrix * aTextureCoord).xy, 1.0);\n" +		// テクスチャ座標を計算
+			"vec3 temp = uTexMatrix2 * texCoord;\n" +
 			"vTextureCoord = temp.xy / temp.z;\n" +
 //			"vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
 		"}\n";

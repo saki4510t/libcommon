@@ -179,16 +179,16 @@ public class MediaSource implements ISource {
 	/**
 	 * 入力用オフスクリーンに映像をセット
 	 * @param drawer オフスクリーン描画用GLDrawer2D
-	 * @param tex_id
-	 * @param tex_matrix
+	 * @param texId
+	 * @param texMatrix
 	 * @return
 	 */
 	public MediaSource setSource(final GLDrawer2D drawer,
-		final int tex_id, final float[] tex_matrix) {
+		final int texId, final float[] texMatrix) {
 
 		mSourceScreen.makeCurrent();
 		try {
-			drawer.draw(GLES20.GL_TEXTURE0, tex_id, tex_matrix, 0);
+			drawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
 		} catch (RuntimeException e) {
 			Log.w(TAG, e);
 		} finally {

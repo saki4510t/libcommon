@@ -106,10 +106,10 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 	}
 
 	@Override
-	protected void preDraw(@NonNull final int[] tex_ids,
-		final float[] tex_matrix, final int offset) {
+	protected void preDraw(@NonNull final int[] texIds,
+						   final float[] texMatrix, final int offset) {
 
-		super.preDraw(tex_ids, tex_matrix, offset);
+		super.preDraw(texIds, texMatrix, offset);
 		// カーネル関数(行列)
 		if (muKernelLoc >= 0) {
 			GLES20.glUniform1fv(muKernelLoc, KERNEL_SIZE, mKernel, 0);

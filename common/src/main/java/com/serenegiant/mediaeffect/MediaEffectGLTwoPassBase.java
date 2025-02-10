@@ -94,14 +94,14 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	/**
 	 * If you know the source texture came from MediaSource,
 	 * using #apply(MediaSource) is much efficient instead of this
-	 * @param src_tex_ids
+	 * @param srcTexIds
 	 * @param width
 	 * @param height
-	 * @param out_tex_id
+	 * @param outTexId
 	 */
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids,
-		final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] srcTexIds,
+		final int width, final int height, final int outTexId) {
 
 		if (!mEnabled) return;
 		// パス1
@@ -112,7 +112,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.swap();
 		}
@@ -123,10 +123,10 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 				width, height, false);
 		}
 		// パス2
-		if ((out_tex_id != mOutputOffscreen2.getTexId())
+		if ((outTexId != mOutputOffscreen2.getTexId())
 			|| (width != mOutputOffscreen2.getWidth())
 			|| (height != mOutputOffscreen2.getHeight())) {
-			mOutputOffscreen2.assignTexture(out_tex_id, width, height, null);
+			mOutputOffscreen2.assignTexture(outTexId, width, height, null);
 		}
 		mOutputOffscreen2.makeCurrent();
 		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
@@ -142,7 +142,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	}
 
 	@Override
-	public void apply(@NonNull final int[] src_tex_ids,
+	public void apply(@NonNull final int[] srcTexIds,
 		@NonNull final GLSurface output) {
 
 
@@ -155,7 +155,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.swap();
 		}
@@ -177,7 +177,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
 		final GLSurface output_tex = src.getOutputTexture();
-		final int[] src_tex_ids = src.getSourceTexId();
+		final int[] srcTexIds = src.getSourceTexId();
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		// パス1
@@ -188,7 +188,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.swap();
 		}

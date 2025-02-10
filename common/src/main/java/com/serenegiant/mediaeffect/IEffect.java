@@ -23,9 +23,9 @@ import androidx.annotation.NonNull;
 import com.serenegiant.gl.GLSurface;
 
 public interface IEffect {
-	public void apply(@NonNull final int[] src_tex_ids,
-		final int width, final int height, final int out_tex_id);
-	public void apply(@NonNull final int[] src_tex_ids,
+	public void apply(@NonNull final int[] srcTexIds,
+		final int width, final int height, final int outTexId);
+	public void apply(@NonNull final int[] srcTexIds,
 		@NonNull final GLSurface output);
 	public void apply(ISource src);
 	public void release();

@@ -88,10 +88,10 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 		}
 		
 		@Override
-		protected void preDraw(@NonNull final int[] tex_ids,
-			final float[] tex_matrix, final int offset) {
+		protected void preDraw(@NonNull final int[] texIds,
+							   final float[] texMatrix, final int offset) {
 
-			super.preDraw(tex_ids, tex_matrix, offset);
+			super.preDraw(texIds, texMatrix, offset);
 			if (muMixRate >= 0) {
 				synchronized (mSync) {
 					GLES20.glUniform1f(muMixRate, mMixRate);

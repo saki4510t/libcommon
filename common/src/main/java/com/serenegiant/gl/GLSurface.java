@@ -417,8 +417,9 @@ public abstract class GLSurface implements IGLSurface {
 	 */
     protected abstract void releaseFrameBuffer();
 
-	protected abstract int genTexture(final int tex_target, final int tex_unit,
-		final int tex_width, final int tex_height);
+	protected abstract int genTexture(
+		final int texTarget, final int texUnit,
+		final int texWidth, final int texHeight);
 
 	/**
 	 * OpenGL|ES2用のGLSurface実装
@@ -657,14 +658,14 @@ public abstract class GLSurface implements IGLSurface {
 		protected int genTexture(final int texTarget, final int texUnit,
 			final int texWidth, final int texHeight) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = GLUtils.initTex(texTarget, texUnit,
+			final int texId = GLUtils.initTex(texTarget, texUnit,
 				GLES20.GL_LINEAR, GLES20.GL_LINEAR, GLES20.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
 			GLES20.glTexImage2D(texTarget, 0, GLES20.GL_RGBA, texWidth, texHeight, 0,
 				GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, null);
 			GLUtils.checkGlError("glTexImage2D");
 			mWrappedTexture = false;
-			return tex_name;
+			return texId;
 		}
 	}	// GLSurfaceGLES2
 
@@ -906,14 +907,14 @@ public abstract class GLSurface implements IGLSurface {
 		protected int genTexture(final int texTarget, final int texUnit,
 			final int texWidth, final int texHeight) {
 			// カラーバッファのためにテクスチャを生成する
-			final int tex_name = GLUtils.initTex(texTarget, texUnit,
+			final int texId = GLUtils.initTex(texTarget, texUnit,
 				GLES30.GL_LINEAR, GLES30.GL_LINEAR, GLES30.GL_CLAMP_TO_EDGE);
 			// テクスチャのメモリ領域を確保する
 			GLES30.glTexImage2D(texTarget, 0, GLES30.GL_RGBA, texWidth, texHeight, 0,
 				GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, null);
 			GLUtils.checkGlError("glTexImage2D");
 			mWrappedTexture = false;
-			return tex_name;
+			return texId;
 		}
 	}	// GLSurfaceGLES3
 }

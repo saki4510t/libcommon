@@ -376,40 +376,40 @@ public class GLDrawer2D implements GLConst {
 	 * 描画処理
 	 * @param texUnit
 	 * @param texId
-	 * @param tex_matrix
+	 * @param texMatrix
 	 * @param offset
 	 */
 	public synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
-		@Nullable final float[] tex_matrix, final int offset) {
+		@Nullable final float[] texMatrix, final int offset) {
 
-		draw(texUnit, texId, tex_matrix, offset, mMvpMatrix, 0);
+		draw(texUnit, texId, texMatrix, offset, mMvpMatrix, 0);
 	}
 
 	/**
 	 * 描画処理
 	 * @param texUnit
 	 * @param texId
-	 * @param tex_matrix
-	 * @param tex_offset
-	 * @param mvp_matrix
-	 * @param mvp_offset
+	 * @param texMatrix
+	 * @param texOffset
+	 * @param mvpMatrix
+	 * @param mvpOffset
 	 */
 	public synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
-		@Nullable final float[] tex_matrix, final int tex_offset,
-		@Nullable final float[] mvp_matrix, final int mvp_offset) {
+		@Nullable final float[] texMatrix, final int texOffset,
+		@Nullable final float[] mvpMatrix, final int mvpOffset) {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
 		glUseProgram();
-		if (tex_matrix != null) {
+		if (texMatrix != null) {
 			// テクスチャ変換行列が指定されている時
-			updateTexMatrix(tex_matrix, tex_offset);
+			updateTexMatrix(texMatrix, texOffset);
 		}
-		if (mvp_matrix != null) {
+		if (mvpMatrix != null) {
 			// モデルビュー変換行列が指定されている時
-			updateMvpMatrix(mvp_matrix, mvp_offset);
+			updateMvpMatrix(mvpMatrix, mvpOffset);
 		}
 		bindTexture(texUnit, texId);
 		if (validateProgram(hProgram)) {

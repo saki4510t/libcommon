@@ -46,20 +46,20 @@ public class MediaEffect implements IEffect {
 	}
 
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids,
-		final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] srcTexIds,
+		final int width, final int height, final int outTexId) {
 
 		if (mEnabled && (mEffect != null)) {
-			mEffect.apply(src_tex_ids[0], width, height, out_tex_id);
+			mEffect.apply(srcTexIds[0], width, height, outTexId);
 		}
 	}
 
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids,
+	public void apply(@NonNull final int [] srcTexIds,
 		@NonNull final GLSurface output) {
 
 		if (mEnabled && (mEffect != null)) {
-			mEffect.apply(src_tex_ids[0],
+			mEffect.apply(srcTexIds[0],
 				output.getWidth(), output.getHeight(),
 				output.getTexId());
 		}

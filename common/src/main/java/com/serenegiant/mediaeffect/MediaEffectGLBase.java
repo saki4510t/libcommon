@@ -147,40 +147,40 @@ public class MediaEffectGLBase implements IEffect {
 	/**
 	 * If you know the source texture came from MediaSource,
 	 * using #apply(MediaSource) is much efficient instead of this
-	 * @param src_tex_ids
+	 * @param srcTexIds
 	 * @param width
 	 * @param height
-	 * @param out_tex_id
+	 * @param outTexId
 	 */
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids,
-		final int width, final int height, final int out_tex_id) {
+	public void apply(@NonNull final int [] srcTexIds,
+		final int width, final int height, final int outTexId) {
 
 		if (!mEnabled) return;
 		if (mOutputOffscreen == null) {
 			mOutputOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false);
 		}
-		if ((out_tex_id != mOutputOffscreen.getTexId())
+		if ((outTexId != mOutputOffscreen.getTexId())
 			|| (width != mOutputOffscreen.getWidth())
 			|| (height != mOutputOffscreen.getHeight())) {
-			mOutputOffscreen.assignTexture(out_tex_id, width, height, null);
+			mOutputOffscreen.assignTexture(outTexId, width, height, null);
 		}
 		mOutputOffscreen.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, mOutputOffscreen.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
 		} finally {
 			mOutputOffscreen.swap();
 		}
 	}
 
 	@Override
-	public void apply(@NonNull final int [] src_tex_ids,
+	public void apply(@NonNull final int [] srcTexIds,
 		@NonNull final GLSurface output) {
 
 		if (!mEnabled) return;
 		output.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, output.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, output.copyTexMatrix(), 0);
 		} finally {
 			output.swap();
 		}
@@ -195,10 +195,10 @@ public class MediaEffectGLBase implements IEffect {
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
 		final GLSurface output_tex = src.getOutputTexture();
-		final int[] src_tex_ids = src.getSourceTexId();
+		final int[] srcTexIds = src.getSourceTexId();
 		output_tex.makeCurrent();
 		try {
-			mDrawer.apply(src_tex_ids, output_tex.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, output_tex.copyTexMatrix(), 0);
 		} finally {
 			output_tex.swap();
 		}
