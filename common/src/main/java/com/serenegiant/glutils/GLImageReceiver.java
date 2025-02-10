@@ -490,10 +490,10 @@ public class GLImageReceiver {
 	/**
 	 * テクスチャ更新要求の処理
 	 */
-	private int drawCnt;
+	private int updateTextImageCnt;
 	@WorkerThread
 	private void handleUpdateTexImageOnGL() {
-		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
+		if (DEBUG && ((++updateTextImageCnt % 100) == 0)) Log.v(TAG, "handleUpdateTexImageOnGL:" + updateTextImageCnt);
 		try {
 			mManager.makeDefault();
 			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
@@ -502,7 +502,7 @@ public class GLImageReceiver {
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
-			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
+			Log.e(TAG, "handleUpdateTexImageOnGL:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
 		mFrameAvailableCallback.onFrameAvailable( isGLES3(), true, mWidth, mHeight, mTexId, mTexMatrix);
