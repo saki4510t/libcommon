@@ -161,28 +161,25 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * @param num_images
 	 */
 	public static void inputImagesAsync(@NonNull final Bitmap bitmap, @NonNull final Surface surface, final int num_images) {
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				final Rect inOutDirty = new Rect();
-				for (int i = 0; i < num_images; i++) {
-					if (surface.isValid()) {
-						final Canvas canvas = surface.lockCanvas(inOutDirty);
-						try {
-							if (canvas != null) {
-								try {
-									canvas.drawBitmap(bitmap, 0, 0, null);
-									Thread.sleep(30);
-								} finally {
-									surface.unlockCanvasAndPost(canvas);
-								}
+		new Thread(() -> {
+			final Rect inOutDirty = new Rect();
+			for (int i = 0; i < num_images; i++) {
+				if (surface.isValid()) {
+					final Canvas canvas = surface.lockCanvas(inOutDirty);
+					try {
+						if (canvas != null) {
+							try {
+								canvas.drawBitmap(bitmap, 0, 0, null);
+								Thread.sleep(30);
+							} finally {
+								surface.unlockCanvasAndPost(canvas);
 							}
-						} catch (Exception e) {
-							break;
 						}
-					} else {
+					} catch (Exception e) {
 						break;
 					}
+				} else {
+					break;
 				}
 			}
 		}).start();

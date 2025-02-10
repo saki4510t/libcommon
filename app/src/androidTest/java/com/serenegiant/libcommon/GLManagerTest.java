@@ -105,21 +105,15 @@ public class GLManagerTest {
 	@Test
 	public void glManagerTest2() {
 		final AtomicBoolean booleanResult = new AtomicBoolean();
-		runOnGL(new GLRunnable() {
-			@Override
-			public void run(@NonNull final GLManager manager) {
-				booleanResult.set(manager.isGLThread());
-			}
+		runOnGL((manager) -> {
+			booleanResult.set(manager.isGLThread());
 		}, booleanResult, 100);
 		assertTrue(booleanResult.get());
 
 		final AtomicInteger intResult = new AtomicInteger();
-		runOnGL(new GLRunnable() {
-			@Override
-			public void run(@NonNull final GLManager manager) {
-				GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
-				intResult.set(GLES20.glGetError());
-			}
+		runOnGL((manager) -> {
+			GLES20.glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+			intResult.set(GLES20.glGetError());
 		}, intResult, 200);
 		assertEquals(GLES20.GL_NO_ERROR, intResult.get());
 	}
