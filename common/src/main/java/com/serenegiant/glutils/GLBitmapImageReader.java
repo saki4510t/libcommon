@@ -97,16 +97,38 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		mHeight = height;
 		mConfig = config;
 		mMaxImages = maxImages;
-		mPool = new Pool<Bitmap>(1, maxImages) {
+		mPool = new Pool<Bitmap>(1, maxImages, maxImages, mWidth, mHeight) {
 			@NonNull
 			@Override
 			protected Bitmap createObject(@Nullable final Object... args) {
-				mLock.lock();
-				try {
-					return Bitmap.createBitmap(mWidth, mHeight, config);
-				} finally {
-					mLock.unlock();
+				final int w = (int)args[0];
+				final int h = (int)args[1];
+				return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+			}
+
+			@Override
+			public void release(@NonNull final Bitmap bitmap) {
+				if (!bitmap.isRecycled()) {
+					bitmap.recycle();
 				}
+				super.release(bitmap);
+			}
+
+			@Nullable
+			@Override
+			public Bitmap obtain(@Nullable final Object... args) {
+				final int w = (int)args[0];
+				final int h = (int)args[1];
+				Bitmap result = super.obtain(args);
+				while ((result != null)
+					&& (result.isRecycled()
+					|| (result.getWidth() != w)
+					|| (result.getHeight() != h))) {
+					// サイズが違う・リサイクルされてしまっているBitmapは返さない
+					release(result);
+					result = super.obtain(args);
+				}
+				return result;
 			}
 		};
 	}
@@ -359,7 +381,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	@Nullable
 	private Bitmap obtainBitmap(final int width, final int height) {
-		Bitmap result = mPool.obtain();
+		Bitmap result = mPool.obtain(width, height);
 		if (result == null) {
 			// フレームプールが空の時はキューの一番古い物を取得する
 			synchronized (mQueue) {
@@ -368,7 +390,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		}
 		if ((result != null) && ((result.getWidth() != width) || result.getHeight() != height)) {
 			// 途中でサイズが変更されプール内に古いサイズのBitmapが残ってしまったときの処理
-			result = Bitmap.createBitmap(mWidth, mHeight, mConfig);
+			result = Bitmap.createBitmap(width, height, mConfig);
 		}
 		return result;
 	}

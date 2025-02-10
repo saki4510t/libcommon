@@ -41,6 +41,11 @@ public abstract class Pool<T> {
 	
 	/**
 	 * コンストラクタ
+	 * #createObject呼び出し時にオプション引数が必須であれば
+	 * (=#initや#obtain呼び出し時にオプション引数が必須)
+	 * コンストラクタもこのオプション引数付きのものを呼ぶか
+	 * またはinitNum=0で呼び出さないと#createObjectで
+	 * エラーになるので注意
 	 * @param initNum
 	 * @param maxNumInPool プール内に保持できる最大数==最大生成数
 	 */
