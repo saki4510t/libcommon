@@ -24,6 +24,7 @@ import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Surface;
 
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLSurface;
@@ -112,11 +113,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param receiver
 	 */
 	@WorkerThread
 	@Override
-	public void onInitialize(@NonNull final GLImageReceiver receiver) {
+	public void onInitialize() {
 		if (DEBUG) Log.v(TAG, "onInitialize:");
 		// do nothing now
 	}
@@ -139,22 +139,24 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param receiver
+	 * @param surface
+	 * @param width
+	 * @param height
 	 */
 	@WorkerThread
 	@Override
-	public void onCreateInputSurface(@NonNull final GLImageReceiver receiver) {
+	public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
 		if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 		// do nothing now
 	}
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param receiver
+	 * @param surface
 	 */
 	@WorkerThread
 	@Override
-	public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver) {
+	public void onReleaseInputSurface(@NonNull final Surface surface) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
 	}

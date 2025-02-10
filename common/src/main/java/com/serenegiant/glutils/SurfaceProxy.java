@@ -373,7 +373,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 				@WorkerThread
 				@Override
-				public void onInitialize(@NonNull final GLImageReceiver receiver) {
+				public void onInitialize() {
 					if (DEBUG) Log.v(TAG, "onInitialize:");
 				}
 
@@ -386,14 +386,14 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 				@WorkerThread
 				@Override
-				public void onCreateInputSurface(@NonNull final GLImageReceiver receiver) {
+				public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
 					if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 					sem.release();
 				}
 
 				@WorkerThread
 				@Override
-				public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver) {
+				public void onReleaseInputSurface(@NonNull final Surface surface) {
 					if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 				}
 

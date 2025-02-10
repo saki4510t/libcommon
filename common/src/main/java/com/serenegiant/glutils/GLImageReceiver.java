@@ -48,7 +48,7 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装
  */
 public class GLImageReceiver {
-	private static final boolean DEBUG = false;
+	private static final boolean DEBUG = true;
 	private static final String TAG = GLImageReceiver.class.getSimpleName();
 
 	/**
@@ -93,7 +93,7 @@ public class GLImageReceiver {
 	 */
 	public interface Callback extends FrameAvailableCallback {
 		@WorkerThread
-		public void onInitialize(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
+		public void onInitialize();
 		/**
 		 * 関係するリソースを破棄する
 		 */
@@ -103,12 +103,12 @@ public class GLImageReceiver {
 		 * 映像入力用Surfaceが生成されたときの処理、生成直後に毎回呼ばれる
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
+		public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height);
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理、これは実際に破棄される直前に毎回呼ばれる
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver/*XXX GLImageReceiverを引き渡すのを止めるかも*/);
+		public void onReleaseInputSurface(@NonNull final Surface surface);
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
@@ -452,7 +452,7 @@ public class GLImageReceiver {
 	@WorkerThread
 	private void handleOnStartOnGL() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
-		mCallback.onInitialize(this);
+		mCallback.onInitialize();
 	}
 
 	/**
@@ -553,7 +553,7 @@ public class GLImageReceiver {
 			if (BuildCheck.isAndroid4_1()) {
 				mInputTexture.setDefaultBufferSize(mWidth, mHeight);
 			}
-			mCallback.onCreateInputSurface(this);
+			mCallback.onCreateInputSurface(mInputSurface, mWidth, mHeight);
 			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		} finally {
 			mLock.unlock();
@@ -568,9 +568,15 @@ public class GLImageReceiver {
 	@CallSuper
 	private void handleReleaseInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
-		final Surface surface = getSurface();
+		final Surface surface;
+		mLock.lock();
+		try {
+			surface = mInputSurface;
+		} finally {
+			mLock.unlock();
+		}
 		if (surface != null) {
-			mCallback.onReleaseInputSurface(this);
+			mCallback.onReleaseInputSurface(surface);
 		}
 		mLock.lock();
 		try {
