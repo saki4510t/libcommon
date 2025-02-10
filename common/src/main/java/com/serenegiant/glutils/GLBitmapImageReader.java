@@ -250,7 +250,6 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 			GLUtils.glReadPixels(mWorkBuffer, width, height);
 			readSurface.release();
 			// Bitmapへ代入
-			mWorkBuffer.clear();
 			bitmap.copyPixelsFromBuffer(mWorkBuffer);
 			synchronized (mQueue) {
 				mQueue.addLast(bitmap);
