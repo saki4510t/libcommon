@@ -22,9 +22,10 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
 import com.serenegiant.utils.ThreadPool;
 
@@ -93,18 +94,7 @@ public class CapturePipeline extends ProxyPipeline {
 	 * 映像読み取り用のワークバッファ
 	 */
 	@Nullable
-	private ByteBuffer mBuffer;
-	/**
-	 * 映像読み取り用オフスクリーン
-	 */
-	@Nullable
-	private GLSurface mOffscreen;
-	@Nullable
-	private GLDrawer2D mDrawer;
-	/**
-	 * フレームコールバック処理がOESテクスチャだったかどうか
-	 */
-	private boolean mIsOES = false;
+	private ByteBuffer mWorkBuffer;
 
 	/**
 	 * OOM抑制・高速化のためにキャプチャに使うBitmapを管理するビットマッププール
@@ -216,57 +206,49 @@ public class CapturePipeline extends ProxyPipeline {
 			mLock.unlock();
 		}
 		if (needCapture) {
-			if (isOES) {
-				doOffscreenCaptureOES(isGLES3, isOES, texId, texMatrix);
-			} else {
-				doOffscreenCapture(isGLES3, isOES, texId, texMatrix);
-			}
+			doCapture(isGLES3,
+				getWidth(), getHeight(),
+				isOES, texId, texMatrix);
 		}
 	}
 
 	/**
-	 * テクスチャ変換行列を適用してオフスクリーン描画してからキャプチャする
+	 * キャプチャを実行
 	 * @param isGLES3
+	 * @param width
+	 * @param height
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
 	 */
-	private void doOffscreenCaptureOES(
+	private void doCapture(
 		final boolean isGLES3,
-		final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-		if (DEBUG) Log.v(TAG, "doOffscreenCapture:");
-		final int w = getWidth();
-		final int h = getHeight();
-		final Bitmap bitmap = mPool.obtain(w, h);
+		final int width, final int height,
+		final boolean isOES,
+		final int texId, @NonNull final float[] texMatrix) {
+
+		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes);
+		}
+		final Bitmap bitmap = mPool.obtain(width, height);
 		if (bitmap != null) {
 			try {
-				if ((mOffscreen == null)
-					|| (w != mOffscreen.getWidth())
-					|| (h != mOffscreen.getHeight())) {
-
-					if (mOffscreen != null) {
-						mOffscreen.release();
-					}
-					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLSurface as offscreen");
-					mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE4, w, h);
+				// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
+				// FIXME テクスチャ変換行列が適用されていない！
+				final GLSurface readSurface = GLSurface.wrap(isGLES3,
+					isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
+					GLES20.GL_TEXTURE4, texId, width, height, false);
+				try {
+					readSurface.makeCurrent();
+					// テクスチャをバックバッファとしたオフスクリーンから読み取り
+					mWorkBuffer.clear();
+					GLUtils.glReadPixels(mWorkBuffer, width, height);
+				} finally {
+					readSurface.release();
 				}
-				if ((mDrawer == null) || (mDrawer.isGLES3 != isGLES3) || (mIsOES != isOES)) {
-					if (mDrawer != null) {
-						mDrawer.release();
-					}
-					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLDrawer2D");
-					mDrawer = GLDrawer2D.create(isGLES3, isOES);
-					mIsOES = isOES;
-				}
-				// オフスクリーンへ描画
-				mOffscreen.makeCurrent();
-				mDrawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
-				// オフスクリーンから読み込み
-				@NonNull
-				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
-				mOffscreen.swap();
-				bitmap.copyPixelsFromBuffer(buffer);
-				mBuffer = buffer;
+				// Bitmapへ代入
+				bitmap.copyPixelsFromBuffer(mWorkBuffer);
 				// コールバックをワーカースレッド上で呼び出す
 				ThreadPool.queueEvent(() -> {
 					if (DEBUG) Log.v(TAG, "doOffscreenCapture:call onCapture callback");
@@ -290,61 +272,4 @@ public class CapturePipeline extends ProxyPipeline {
 		}
 	}
 
-	/**
-	 * テクスチャをラップして読み取ってビットマップへ変換する
-	 * @param isGLES3
-	 * @param isOES
-	 * @param texId
-	 * @param texMatrix
-	 */
-	private void doOffscreenCapture(
-		final boolean isGLES3,
-		final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
-		if (DEBUG) Log.v(TAG, "doOffscreenCapture:");
-		mIsOES = isOES;	// 呼び出し元でisOES=falseで分岐しているので常にfalse
-		final int w = getWidth();
-		final int h = getHeight();
-		final Bitmap bitmap = mPool.obtain(w, h);
-		if (bitmap != null) {
-			try {
-				if ((mOffscreen == null)
-					|| (w != mOffscreen.getWidth())
-					|| (h != mOffscreen.getHeight())) {
-
-					if (mOffscreen != null) {
-						mOffscreen.release();
-					}
-					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLSurface as offscreen");
-					mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE4, w, h);
-				}
-				mOffscreen.assignTexture(texId, w, h, texMatrix);
-				// ラップしたテクスチャをバックバッファとするオフスクリーンへ切り替える
-				mOffscreen.makeCurrent();
-				// オフスクリーンから読み込み
-				@NonNull
-				final ByteBuffer buffer = GLUtils.glReadPixels(mBuffer, w, h);
-				bitmap.copyPixelsFromBuffer(buffer);
-				mBuffer = buffer;
-				// コールバックをワーカースレッド上で呼び出す
-				ThreadPool.queueEvent(() -> {
-					if (DEBUG) Log.v(TAG, "doOffscreenCapture:call onCapture callback");
-					try {
-						mCallback.onCapture(bitmap);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					} finally {
-						if (bitmap.isRecycled()) {
-							mPool.release(bitmap);
-						} else {
-							mPool.recycle(bitmap);
-						}
-					}
-				});
-			} catch (final Exception e) {
-				ThreadPool.queueEvent(() -> {
-					mCallback.onError(e);
-				});
-			}
-		}
-	}
 }

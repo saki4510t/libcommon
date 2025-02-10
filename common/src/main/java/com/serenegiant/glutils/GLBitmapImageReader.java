@@ -241,6 +241,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
 			// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
+			// FIXME テクスチャ変換行列が適用されていない！
 			final GLSurface readSurface = GLSurface.wrap(isGLES3,
 				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 				GLES20.GL_TEXTURE4, texId, width, height, false);
