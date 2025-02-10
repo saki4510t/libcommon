@@ -244,11 +244,14 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 			final GLSurface readSurface = GLSurface.wrap(isGLES3,
 				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 				GLES20.GL_TEXTURE4, texId, width, height, false);
-			readSurface.makeCurrent();
-			// テクスチャをバックバッファとしたオフスクリーンから読み取り
-			mWorkBuffer.clear();
-			GLUtils.glReadPixels(mWorkBuffer, width, height);
-			readSurface.release();
+			try {
+				readSurface.makeCurrent();
+				// テクスチャをバックバッファとしたオフスクリーンから読み取り
+				mWorkBuffer.clear();
+				GLUtils.glReadPixels(mWorkBuffer, width, height);
+			} finally {
+				readSurface.release();
+			}
 			// Bitmapへ代入
 			bitmap.copyPixelsFromBuffer(mWorkBuffer);
 			synchronized (mQueue) {
