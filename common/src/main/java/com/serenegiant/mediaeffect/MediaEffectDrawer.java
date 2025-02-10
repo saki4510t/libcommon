@@ -21,6 +21,8 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import com.serenegiant.gl.GLUtils;
 
@@ -128,11 +130,14 @@ public class MediaEffectDrawer {
 		}
 	}
 
+	@NonNull
 	protected final Object mSync = new Object();
+	@TexTarget
 	protected final int mTexTarget;
 	protected final int muMVPMatrixLoc;
 	protected final int muTexMatrixLoc;
 	protected final int[] muTexLoc;
+	@NonNull
 	protected final float[] mMvpMatrix = new float[16];
 	protected int hProgram;
 
@@ -226,6 +231,8 @@ public class MediaEffectDrawer {
 		return hProgram;
 	}
 
+	@NonNull
+	@Size(min=16)
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}
@@ -244,7 +251,7 @@ public class MediaEffectDrawer {
 	 * @param offset
 	 * @return
 	 */
-	public void setMvpMatrix(final float[] matrix, final int offset) {
+	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		synchronized (mSync) {
 			System.arraycopy(matrix, offset, mMvpMatrix, 0, mMvpMatrix.length);
 		}
@@ -255,7 +262,7 @@ public class MediaEffectDrawer {
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
-	public void getMvpMatrix(final float[] matrix, final int offset) {
+	public void getMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
 		System.arraycopy(mMvpMatrix, 0, matrix, offset, mMvpMatrix.length);
 	}
 
@@ -266,7 +273,7 @@ public class MediaEffectDrawer {
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	public void apply(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
+	public void apply(@NonNull final int[] texIds, @Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 		synchronized (mSync) {
 			GLES20.glUseProgram(hProgram);
 			preDraw(texIds, texMatrix, offset);
@@ -284,7 +291,7 @@ public class MediaEffectDrawer {
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void preDraw(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
+	protected void preDraw(@NonNull final int[] texIds, @Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 		if ((muTexMatrixLoc >= 0) && (texMatrix != null)) {
 			GLES20.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, offset);
 		}
@@ -313,7 +320,7 @@ public class MediaEffectDrawer {
 	 * 			領域チェックしていないのでoffsetから16個以上確保しておくこと
 	 * @param offset テクスチャ変換行列のオフセット
 	 */
-	protected void draw(@NonNull final int[] texIds, final float[] texMatrix, final int offset) {
+	protected void draw(@NonNull final int[] texIds, @Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 //		if (DEBUG) Log.v(TAG, "draw");
 		// これが実際の描画
 		GLES20.glDrawArrays(GLES20.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);

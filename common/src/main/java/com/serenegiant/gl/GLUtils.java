@@ -457,85 +457,119 @@ public class GLUtils implements GLConst {
 		GLES20.glDeleteTextures(tex.length, tex, 0);
 	}
 
+	/**
+	 * リソースから読み込んだDrawableを描画してテクスチャを生成する
+	 * サイズは256x256固定
+	 * @param context
+	 * @param resId
+	 * @return
+	 */
 	public static int loadTextureFromResource(final Context context, final int resId) {
 		return loadTextureFromResource(context, resId, null);
 	}
 
+	/**
+	 * リソースから読み込んだDrawableを描画してテクスチャを生成する
+	 * サイズは256x256固定
+	 * @param context
+	 * @param drawableResId
+	 * @param theme
+	 * @return
+	 */
 	@SuppressLint("NewApi")
-	public static int loadTextureFromResource(final Context context, final int resId, final Resources.Theme theme) {
+	public static int loadTextureFromResource(@NonNull final Context context, final int drawableResId, final Resources.Theme theme) {
 		if (DEBUG) Log.v(TAG, "loadTextureFromResource:");
+		final int[] textures = new int[1];
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-		// get a canvas to paint over the bitmap
-		final Canvas canvas = new Canvas(bitmap);
-		canvas.drawARGB(0,0,255,0);
+		try {
+			// get a canvas to paint over the bitmap
+			final Canvas canvas = new Canvas(bitmap);
+			canvas.drawARGB(0,0,255,0);
 
-		// get a background image from resources
-		// note the image format must match the bitmap format
-		final Drawable background = ResourcesCompat.getDrawable(context.getResources(), resId, theme);
-		background.setBounds(0, 0, 256, 256);
-		background.draw(canvas); // draw the background to our bitmap
+			// get a background image from resources
+			// note the image format must match the bitmap format
+			final Drawable background = ResourcesCompat.getDrawable(context.getResources(), drawableResId, theme);
+			background.setBounds(0, 0, 256, 256);
+			background.draw(canvas); // draw the background to our bitmap
 
-		final int[] textures = new int[1];
+			//Generate one texture pointer...
+			GLES20.glGenTextures(1, textures, 0);
+			//...and makeCurrent it to our array
+			GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
 
-		//Generate one texture pointer...
-		GLES20.glGenTextures(1, textures, 0);
-		//...and makeCurrent it to our array
-		GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, textures[0]);
+			//Create Nearest Filtered Texture
+			GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
+			GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
 
-		//Create Nearest Filtered Texture
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-			GLES20.GL_TEXTURE_MIN_FILTER, GLES20.GL_NEAREST);
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-			GLES20.GL_TEXTURE_MAG_FILTER, GLES20.GL_LINEAR);
+			//Different possible texture parameters, e.g. GLES20.GL_CLAMP_TO_EDGE
+			GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
+			GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
 
-		//Different possible texture parameters, e.g. GLES20.GL_CLAMP_TO_EDGE
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-			GLES20.GL_TEXTURE_WRAP_S, GLES20.GL_REPEAT);
-		GLES20.glTexParameterf(GLES20.GL_TEXTURE_2D,
-			GLES20.GL_TEXTURE_WRAP_T, GLES20.GL_REPEAT);
-
-		//Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
-		android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-		//Clean up
-		bitmap.recycle();
+			//Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
+			android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+		} finally {
+			// Clean up
+			bitmap.recycle();
+		}
 
 		return textures[0];
 	}
 
+	/**
+	 * 指定した文字を描画したテクスチャを生成する
+	 * サイズは256x256固定
+	 * @param text
+	 * @return
+	 */
 	public static int createTextureWithTextContent(@NonNull final String text) {
 		return createTextureWithTextContent(text, GLES20.GL_TEXTURE0);
 	}
 
+	/**
+	 * 指定した文字を描画したテクスチャを生成する
+	 * サイズは256x256固定
+	 * @param text
+	 * @param texUnit
+	 * @return
+	 */
 	public static int createTextureWithTextContent(
 		@NonNull final String text, @TexUnit final int texUnit) {
 
 		if (DEBUG) Log.v(TAG, "createTextureWithTextContent:");
+		final int texture;
 		// Create an empty, mutable bitmap
 		final Bitmap bitmap = Bitmap.createBitmap(256, 256, Bitmap.Config.ARGB_8888);
-		// get a canvas to paint over the bitmap
-		final Canvas canvas = new Canvas(bitmap);
-		canvas.drawARGB(0,0,255,0);
+		try {
+			// get a canvas to paint over the bitmap
+			final Canvas canvas = new Canvas(bitmap);
+			canvas.drawARGB(0,0,255,0);
 
-		// Draw the text
-		final Paint textPaint = new Paint();
-		textPaint.setTextSize(32);
-		textPaint.setAntiAlias(true);
-		textPaint.setARGB(0xff, 0xff, 0xff, 0xff);
-		// draw the text centered
-		canvas.drawText(text, 16, 112, textPaint);
+			// Draw the text
+			final Paint textPaint = new Paint();
+			textPaint.setTextSize(32);
+			textPaint.setAntiAlias(true);
+			textPaint.setARGB(0xff, 0xff, 0xff, 0xff);
+			// draw the text centered
+			canvas.drawText(text, 16, 112, textPaint);
 
-		final int texture = initTex(GLES20.GL_TEXTURE_2D,
-			texUnit, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
+			texture = initTex(GLES20.GL_TEXTURE_2D,
+				texUnit, GLES20.GL_NEAREST, GLES20.GL_LINEAR, GLES20.GL_REPEAT);
 
-		// Alpha blending
-		// GLES20.glEnable(GLES20.GL_BLEND);
-		// GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
+			// Alpha blending
+			// GLES20.glEnable(GLES20.GL_BLEND);
+			// GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 
-		// Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
-		android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
-		// Clean up
-		bitmap.recycle();
+			// Use the Android GLUtils to specify a two-dimensional texture image from our bitmap
+			android.opengl.GLUtils.texImage2D(GLES20.GL_TEXTURE_2D, 0, bitmap, 0);
+		} finally {
+			// Clean up
+			bitmap.recycle();
+		}
 
 		return texture;
 	}
@@ -543,17 +577,17 @@ public class GLUtils implements GLConst {
 	/**
 	 * load, compile and link shader from Assets files
 	 * @param context
-	 * @param vss_asset source file name in Assets of vertex shader
-	 * @param fss_asset source file name in Assets of fragment shader
+	 * @param vssAssetName source file name in Assets of vertex shader
+	 * @param fssAssetName source file name in Assets of fragment shader
 	 * @return
 	 */
 	public static int loadShader(@NonNull final Context context,
-		final String vss_asset, final String fss_asset) {
+		@NonNull final String vssAssetName, @NonNull final String fssAssetName) {
 
 		int program;
 		try {
-			final String vss = AssetsHelper.loadString(context.getAssets(), vss_asset);
-			final String fss = AssetsHelper.loadString(context.getAssets(), vss_asset);
+			final String vss = AssetsHelper.loadString(context.getAssets(), vssAssetName);
+			final String fss = AssetsHelper.loadString(context.getAssets(), fssAssetName);
 			program = loadShader(vss, fss);
 		} catch (final IOException e) {
 			program = 0;
@@ -567,7 +601,7 @@ public class GLUtils implements GLConst {
 	 * @param fss source of fragment shader
 	 * @return
 	 */
-	public static int loadShader(final String vss, final String fss) {
+	public static int loadShader(@NonNull final String vss, @NonNull final String fss) {
 		if (DEBUG) Log.v(TAG, "loadShader:");
 		final int[] compiled = new int[1];
 		// 頂点シェーダーをコンパイル
@@ -609,7 +643,7 @@ public class GLUtils implements GLConst {
 	  *
 	  * @return A handle to the shader, or 0 on failure.
 	  */
-	public static int loadShader(final int shaderType, final String source) {
+	public static int loadShader(@ShaderType final int shaderType, @NonNull final String source) {
 		int shader = GLES20.glCreateShader(shaderType);
 		checkGlError("glCreateShader type=" + shaderType);
 		GLES20.glShaderSource(shader, source);

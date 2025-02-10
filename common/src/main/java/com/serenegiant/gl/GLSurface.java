@@ -277,6 +277,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * バックバッファとして使っているテクスチャのテクスチャターゲット(GL_TEXTURE_2D等)を取得
 	 * @return
 	 */
+	@TexTarget
 	@Override
 	public int getTexTarget() {
 		return TEX_TARGET;
@@ -418,7 +419,7 @@ public abstract class GLSurface implements IGLSurface {
     protected abstract void releaseFrameBuffer();
 
 	protected abstract int genTexture(
-		final int texTarget, final int texUnit,
+		@TexTarget final int texTarget, @TexUnit final int texUnit,
 		final int texWidth, final int texHeight);
 
 	/**
@@ -904,7 +905,9 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param texHeight
 		 * @return
 		 */
-		protected int genTexture(final int texTarget, final int texUnit,
+		@Override
+		protected int genTexture(
+			@TexTarget final int texTarget, @TexUnit final int texUnit,
 			final int texWidth, final int texHeight) {
 			// カラーバッファのためにテクスチャを生成する
 			final int texId = GLUtils.initTex(texTarget, texUnit,

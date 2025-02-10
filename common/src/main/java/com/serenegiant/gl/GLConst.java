@@ -28,8 +28,8 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 
 public interface GLConst {
-	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;
-	public static final int GL_TEXTURE_2D           = 0x0DE1;
+	public static final int GL_TEXTURE_EXTERNAL_OES	= 0x8D65;	// = GLES11Ext.GL_TEXTURE_EXTERNAL_OES
+	public static final int GL_TEXTURE_2D           = 0x0DE1;	// = GLES20.GL_TEXTURE_2D
 	/**
 	 * 無効なテクスチャ名/テクスチャID
 	 */
@@ -114,4 +114,13 @@ public interface GLConst {
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Wrap {}
+
+	@IntDef({
+		GLES20.GL_VERTEX_SHADER,
+		GLES20.GL_FRAGMENT_SHADER,
+		GLES30.GL_VERTEX_SHADER,
+		GLES30.GL_FRAGMENT_SHADER,
+	})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface ShaderType {}
 }

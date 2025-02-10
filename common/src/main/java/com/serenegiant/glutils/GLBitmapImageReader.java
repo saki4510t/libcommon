@@ -111,8 +111,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		};
 	}
 
+//--------------------------------------------------------------------------------
+// 	 GLImageReceiver.Callbackの実装
+//--------------------------------------------------------------------------------
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.Callbackの実装
 	 */
 	@WorkerThread
 	@Override
@@ -122,7 +125,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.Callbackの実装
 	 */
 	@WorkerThread
 	@Override
@@ -138,7 +141,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.Callbackの実装
 	 * @param surface
 	 * @param width
 	 * @param height
@@ -151,7 +154,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.Callbackの実装
 	 * @param surface
 	 */
 	@WorkerThread
@@ -162,7 +165,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.Callbackの実装
 	 * @param width
 	 * @param height
 	 */
@@ -179,8 +182,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		}
 	}
 
+//--------------------------------------------------------------------------------
+// 	 GLImageReceiver.FrameAvailableCallbackの実装
+//--------------------------------------------------------------------------------
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * GLImageReceiver.FrameAvailableCallbackの実装
 	 * @param isGLES3
 	 * @param isOES
 	 * @param width
@@ -234,7 +240,11 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		callOnFrameAvailable();
 	}
 
+//--------------------------------------------------------------------------------
+// 	 ImageReader<Bitmap>の実装
+//--------------------------------------------------------------------------------
 	/**
+	 * ImageReader<Bitmap>の実装
 	 * 読み取った映像データの準備ができたときのコールバックリスナーを登録
 	 * @param listener
 	 * @param handler
@@ -267,11 +277,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * ImageReader<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
+	@Override
 	public Bitmap acquireLatestImage() throws IllegalStateException {
 		synchronized (mQueue) {
 			final Bitmap result = mQueue.pollLast();
@@ -286,11 +297,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * ImageReader<Bitmap>の実装
 	 * @return
 	 * @throws IllegalStateException
 	 */
 	@Nullable
+	@Override
 	public Bitmap acquireNextImage() throws IllegalStateException {
 		synchronized (mQueue) {
 			final Bitmap result = mQueue.pollFirst();
@@ -302,9 +314,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * ImageReader<Bitmap>の実装
 	 * @param image
 	 */
+	@Override
 	public void recycle(@NonNull final Bitmap image) {
 		mAllBitmapAcquired = false;
 		// Bitmap#recycleが呼ばれてしまっていると再利用できないのでプールに戻せない。
@@ -318,7 +331,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	}
 
 	/**
-	 * GLImageReceiver.ImageReader<Bitmap>の実装
+	 * ImageReader<Bitmap>の実装
 	 * @param enabled
 	 */
 	@Override

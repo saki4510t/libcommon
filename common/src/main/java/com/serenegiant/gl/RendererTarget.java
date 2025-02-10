@@ -198,8 +198,8 @@ public class RendererTarget implements IMirror {
 	 * @param texMatrix
 	 */
 	public void draw(@NonNull final GLDrawer2D drawer,
-		final int texUnit, final int textId,
-		@Nullable final float[] texMatrix) {
+		@GLConst.TexUnit final int texUnit, final int textId,
+		@Nullable @Size(min=16) final float[] texMatrix) {
 
 		if (mTargetSurface != null) {
 			mTargetSurface.makeCurrent();
@@ -310,8 +310,8 @@ public class RendererTarget implements IMirror {
 		 */
 		@Override
 		public void draw(@NonNull final GLDrawer2D drawer,
-			final int texUnit, final int textId,
-			@Nullable final float[] texMatrix) {
+			@GLConst.TexUnit final int texUnit, final int textId,
+			@Nullable @Size(min=16) final float[] texMatrix) {
 
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 			super.draw(drawer, texUnit, textId, texMatrix);

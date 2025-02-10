@@ -381,7 +381,7 @@ public class GLDrawer2D implements GLConst {
 	 */
 	public synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
-		@Nullable final float[] texMatrix, final int offset) {
+		@Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 
 		draw(texUnit, texId, texMatrix, offset, mMvpMatrix, 0);
 	}
@@ -397,8 +397,8 @@ public class GLDrawer2D implements GLConst {
 	 */
 	public synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
-		@Nullable final float[] texMatrix, final int texOffset,
-		@Nullable final float[] mvpMatrix, final int mvpOffset) {
+		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
+		@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
@@ -438,7 +438,7 @@ public class GLDrawer2D implements GLConst {
 	 * モデルビュー変換行列をセット
 	 * @param mvpMatrix
 	 */
-	protected void updateMvpMatrix(@NonNull @Size(min=16)  final float[] mvpMatrix, final int offset) {
+	protected void updateMvpMatrix(@NonNull @Size(min=16) final float[] mvpMatrix, final int offset) {
 		GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mvpMatrix, offset);
 	}
 
@@ -585,11 +585,21 @@ public class GLDrawer2D implements GLConst {
 		hProgram = GL_NO_PROGRAM;
 	}
 
+	/**
+	 * シェーダーをコンパイル
+	 * @param vs 頂点シェーダーのソース文字列
+	 * @param fs フラグメントシェーダーのソース文字列
+	 * @return
+	 */
 	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
 		if (DEBUG) Log.v(TAG, "loadShader:");
 		return GLUtils.loadShader(vs, fs);
 	}
 
+	/**
+	 * シェーダー破棄処理の実体
+	 * @param program
+	 */
 	protected void internalReleaseShader(final int program) {
 		// バッファーオブジェクトを破棄
 		if (mBufVertex > GL_NO_BUFFER) {
