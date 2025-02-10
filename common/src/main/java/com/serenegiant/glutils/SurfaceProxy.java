@@ -383,8 +383,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 				@Override
 				public void onFrameAvailable(
-					@NonNull final GLImageReceiver receiver,
-					final boolean isOES,
+					final boolean isOES, final boolean isGLES3,
+					final int width, final int height,
 					final int texId, @NonNull final float[] texMatrix) {
 					renderTargetOnGL(isOES, texId, texMatrix);
 				}

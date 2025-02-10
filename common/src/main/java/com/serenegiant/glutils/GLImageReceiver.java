@@ -62,15 +62,17 @@ public class GLImageReceiver {
 	public interface FrameAvailableCallback {
 		/**
 		 * 映像をテクスチャとして受け取ったときの処理
-		 * @param receiver
 		 * @param isOES
+		 * @param isGLES3
+		 * @param width
+		 * @param height,
 		 * @param texId
 		 * @param texMatrix
 		 */
 		@WorkerThread
 		public void onFrameAvailable(
-			@NonNull final GLImageReceiver receiver,
-			final boolean isOES,
+			final boolean isOES, final boolean isGLES3,
+			final int width, final int height,
 			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
 	}
 
@@ -498,7 +500,7 @@ public class GLImageReceiver {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
 			return;
 		}
-		mFrameAvailableCallback.onFrameAvailable(this, true, mTexId, mTexMatrix);
+		mFrameAvailableCallback.onFrameAvailable( true, isGLES3(), mWidth, mHeight, mTexId, mTexMatrix);
 	}
 
 	/**

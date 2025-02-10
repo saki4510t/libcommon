@@ -179,8 +179,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 
 	/**
 	 * GLImageReceiver.ImageReader<Bitmap>の実装
-	 * @param receiver
 	 * @param isOES
+	 * @param isGLES3
+	 * @param width
+	 * @param height
 	 * @param texId
 	 * @param texMatrix
 	 * @return true: #onImageAvailableコールバックメソッドを呼び出す, false: 呼び出さない
@@ -188,14 +190,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 	@WorkerThread
 	@Override
 	public void onFrameAvailable(
-		@NonNull final GLImageReceiver receiver,
-		final boolean isOES,
+		final boolean isOES, final boolean isGLES3,
+		final int width, final int height,
 		final int texId, @NonNull final float[] texMatrix) {
 
 		if (!mEnabled) return;
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
-		final int width = receiver.getWidth();
-		final int height = receiver.getHeight();
 		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
 			mLock.lock();
@@ -211,7 +211,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
 			// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-			final GLSurface readSurface = GLSurface.wrap(receiver.isGLES3(),
+			final GLSurface readSurface = GLSurface.wrap(isGLES3,
 				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 				GLES20.GL_TEXTURE4, texId, width, height, false);
 			readSurface.makeCurrent();
