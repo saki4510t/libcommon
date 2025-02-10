@@ -180,6 +180,20 @@ public class CapturePipeline extends ProxyPipeline {
 		}
 	}
 
+	/**
+	 * キャプチャ中であればキャンセルする
+	 */
+	public void cancel() {
+		if (DEBUG) Log.v(TAG, "cancel");
+		mLock.lock();
+		try {
+			mCaptureCnt = mNumCaptures = 0;
+			mLastCaptureMs = mIntervalsMs = 0L;
+		} finally {
+			mLock.unlock();
+		}
+	}
+
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
