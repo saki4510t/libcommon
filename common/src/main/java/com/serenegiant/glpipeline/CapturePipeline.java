@@ -217,20 +217,23 @@ public class CapturePipeline extends ProxyPipeline {
 		}
 		if (needCapture) {
 			if (isOES) {
-				doOffscreenCaptureOES(isOES, texId, texMatrix);
+				doOffscreenCaptureOES(isGLES3, isOES, texId, texMatrix);
 			} else {
-				doOffscreenCapture(isOES, texId, texMatrix);
+				doOffscreenCapture(isGLES3, isOES, texId, texMatrix);
 			}
 		}
 	}
 
 	/**
 	 * テクスチャ変換行列を適用してオフスクリーン描画してからキャプチャする
+	 * @param isGLES3
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
 	 */
-	private void doOffscreenCaptureOES(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	private void doOffscreenCaptureOES(
+		final boolean isGLES3,
+		final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		if (DEBUG) Log.v(TAG, "doOffscreenCapture:");
 		final int w = getWidth();
 		final int h = getHeight();
@@ -245,14 +248,14 @@ public class CapturePipeline extends ProxyPipeline {
 						mOffscreen.release();
 					}
 					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLSurface as offscreen");
-					mOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE4, w, h);
+					mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE4, w, h);
 				}
-				if ((mDrawer == null) || (mDrawer.isOES() != isOES) || (mIsOES != isOES)) {
+				if ((mDrawer == null) || (mDrawer.isGLES3 != isGLES3) || (mIsOES != isOES)) {
 					if (mDrawer != null) {
 						mDrawer.release();
 					}
 					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLDrawer2D");
-					mDrawer = GLDrawer2D.create(false, isOES);
+					mDrawer = GLDrawer2D.create(isGLES3, isOES);
 					mIsOES = isOES;
 				}
 				// オフスクリーンへ描画
@@ -289,11 +292,14 @@ public class CapturePipeline extends ProxyPipeline {
 
 	/**
 	 * テクスチャをラップして読み取ってビットマップへ変換する
+	 * @param isGLES3
 	 * @param isOES
 	 * @param texId
 	 * @param texMatrix
 	 */
-	private void doOffscreenCapture(final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
+	private void doOffscreenCapture(
+		final boolean isGLES3,
+		final boolean isOES, final int texId, @NonNull final float[] texMatrix) {
 		if (DEBUG) Log.v(TAG, "doOffscreenCapture:");
 		mIsOES = isOES;	// 呼び出し元でisOES=falseで分岐しているので常にfalse
 		final int w = getWidth();
@@ -309,7 +315,7 @@ public class CapturePipeline extends ProxyPipeline {
 						mOffscreen.release();
 					}
 					if (DEBUG) Log.v(TAG, "doOffscreenCapture:create GLSurface as offscreen");
-					mOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE4, w, h);
+					mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE4, w, h);
 				}
 				mOffscreen.assignTexture(texId, w, h, texMatrix);
 				// ラップしたテクスチャをバックバッファとするオフスクリーンへ切り替える
