@@ -118,6 +118,14 @@ public class CapturePipeline extends ProxyPipeline {
 			return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 		}
 
+		@Override
+		public void release(@NonNull final Bitmap bitmap) {
+			if (!bitmap.isRecycled()) {
+				bitmap.recycle();
+			}
+			super.release(bitmap);
+		}
+
 		@Nullable
 		@Override
 		public Bitmap obtain(@Nullable final Object... args) {
