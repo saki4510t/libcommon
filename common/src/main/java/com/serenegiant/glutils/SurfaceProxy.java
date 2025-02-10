@@ -206,6 +206,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				@Override
 				public void onImageAvailable(final ImageReader reader) {
 					if (DEBUG) Log.v(TAG, "onImageAvailable:" + (++cnt));
+					// 入力用SurfaceからImageReaderが受け取ったImageを
+					// ImageWriterへ書き込んでSurfaceへコピーする
 					final Image image = reader.acquireLatestImage();
 					if (image != null) {
 						mLock.lock();
@@ -249,6 +251,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 			mLock.lock();
 			try {
 				if ((mImageReader != null) && isValid()) {
+					// ImageReaderからのSurfaceを映像入力用に返す
 					return mImageReader.getSurface();
 				} else {
 					throw new IllegalStateException("already released?");
@@ -262,7 +265,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 * 映像受け取り用Surfaceを設定
 		 * ImageReader/ImageWriterを使う場合は最大フレームレート指定は無視される
 		 * @param surface
-		 * @param fps 最大フレームレート, nullまたは0以下なら無制限
+		 * @param fps 最大フレームレート, nullまたは0以下なら無制限(SurfaceProxyReaderWriterでは無視される)
 		 */
 		@Override
 		public void setSurface(@Nullable final Object surface, @Nullable final Fraction fps) {
@@ -278,6 +281,8 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					mImageWriter = ImageWriter.newInstance((Surface)surface, MAX_IMAGES);
 					// XXX ImageReaderからのImageをキューに入れるだけならOnImageReleasedListenerやdequeueInputImageは不要
 //					mImageWriter.setOnImageReleasedListener(mOnImageReleasedListener, mAsyncHandler);
+				} else if (surface != null) {
+					throw new IllegalArgumentException("Unsupported surface type," + surface);
 				}
 			} finally {
 				mLock.unlock();
@@ -310,6 +315,16 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 	}
 
 //--------------------------------------------------------------------------------
+
+	/**
+	 * OpenGL|ESを使ってSurfaceで受け取った映像をSurfaceへ引き渡すためのSurfaceProxy実装
+	 * 内部動作的には、
+	 * ・GLImageReceiverからSurface/SurfaceTextureを入力用Surfaceとして取得
+	 * 　= OESテクスチャとして映像を受け取り
+	 * ・出力用SurfaceをRendererTargetとしてOpenGL|ESでの描画先として
+	 * 　今のところ出力用RendererTargetのモデルビュー変換行列を上下反転させてある
+	 * ・GLDrawer2DでOESテクスチャを出力用SurfaceをRendererTargetへ描画
+	 */
 	public static class SurfaceProxyGLES extends SurfaceProxy {
 		private static final boolean DEBUG = false;	// set false on production
 		private static final String TAG = SurfaceProxyGLES.class.getSimpleName();
@@ -348,47 +363,56 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 			super(width, height);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:");
+
+			// 映像入力用Surface/SurfaceTextureが生成されるのを待機するためのSemaphore
 			final Semaphore sem = new Semaphore(0);
 			mReceiver = new GLImageReceiver(
 				manager, useSharedManager,
 				width, height,
 				new GLImageReceiver.Callback() {
 
+				@WorkerThread
 				@Override
 				public void onInitialize(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onInitialize:");
 				}
 
+				@WorkerThread
 				@Override
 				public void onRelease() {
 					if (DEBUG) Log.v(TAG, "onRelease:");
 					releaseTargetOnGL();
 				}
 
+				@WorkerThread
 				@Override
 				public void onCreateInputSurface(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onCreateInputSurface:");
 					sem.release();
 				}
 
+				@WorkerThread
 				@Override
 				public void onReleaseInputSurface(@NonNull final GLImageReceiver receiver) {
 					if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 				}
 
+				@WorkerThread
 				@Override
 				public void onResize(final int width, final int height) {
 					if (DEBUG) Log.v(TAG, "onResize:");
 				}
 
+				@WorkerThread
 				@Override
 				public void onFrameAvailable(
 					final boolean isGLES3, final boolean isOES,
 					final int width, final int height,
 					final int texId, @NonNull final float[] texMatrix) {
-					renderTargetOnGL(isOES, texId, texMatrix);
+					renderTargetOnGL(isGLES3, isOES, texId, texMatrix);
 				}
 			});
+			// 映像入力用Surface/SurfaceTextureが生成されるのを待機
 			try {
 				if (!sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
 					throw new IllegalStateException();
@@ -502,17 +526,18 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 * すでにsurfaceがセットされている時に#setSurfaceで違うsurfaceをセットすると古いsurfaceは破棄される
 		 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 		 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
-		 * @param fps 最大フレームレート, nullまた0以下なら無制限
+		 * @param maxFps 最大フレームレート, nullまた0以下なら無制限
 		 * @throws IllegalStateException
 		 * @throws IllegalArgumentException
 		 */
 		@Override
-		public void setSurface(@Nullable final Object surface, @Nullable final Fraction fps)
+		public void setSurface(@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
+			if (DEBUG) Log.v(TAG, "setSurface:" + surface + ",maxFps=" + maxFps);
 			checkValid();
 			mManager.runOnGLThread(() -> {
-				createTargetOnGL(surface, fps);
+				createTargetOnGL(surface, maxFps);
 			});
 		}
 
@@ -530,6 +555,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 	//--------------------------------------------------------------------------------
 		private int cnt = 0;
 		private void renderTargetOnGL(
+			final boolean isGLES3,
 			final boolean isOES, final int texId,
 			@NonNull @Size(min=16) final float[] texMatrix) {
 
@@ -540,13 +566,13 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 			final RendererTarget target;
 			mLock.lock();
 			try {
-				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
+				if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 					if (mDrawer != null) {
 						mDrawer.release();
 					}
-					if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-					mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+					if (DEBUG) Log.v(TAG, "renderTargetOnGL:create GLDrawer2D");
+					mDrawer = GLDrawer2D.create(isGLES3, isOES);
 				}
 				drawer = mDrawer;
 				target = mRendererTarget;
@@ -557,7 +583,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
-					Log.v(TAG, "onFrameAvailable:" + cnt);
+					Log.v(TAG, "renderTargetOnGL:" + cnt);
 				}
 			}
 		}
@@ -574,10 +600,12 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 			try {
 				if ((mRendererTarget != null) && (mRendererTarget.getSurface() != surface)) {
 					// すでにRendererTargetが生成されていて描画先surfaceが変更された時
+					if (DEBUG) Log.v(TAG, "createTargetOnGL:release RendererTarget");
 					mRendererTarget.release();
 					mRendererTarget = null;
 				}
 				if ((mRendererTarget == null) && (surface != null)) {
+					if (DEBUG) Log.v(TAG, "createTargetOnGL:create RendererTarget");
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}
@@ -603,16 +631,16 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 				mLock.unlock();
 			}
 			if ((drawer != null) || (target != null)) {
-				if (DEBUG) Log.v(TAG, "releaseTarget:");
+				if (DEBUG) Log.v(TAG, "releaseTargetOnGL:");
 				if (mManager.isValid()) {
 					try {
 						mManager.runOnGLThread(() -> {
 							if (drawer != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
+								if (DEBUG) Log.v(TAG, "releaseTargetOnGL:release GLDrawer2D");
 								drawer.release();
 							}
 							if (target != null) {
-								if (DEBUG) Log.v(TAG, "releaseTarget:release target");
+								if (DEBUG) Log.v(TAG, "releaseTargetOnGL:release RendererTarget");
 								target.release();
 							}
 						});
@@ -620,7 +648,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 						if (DEBUG) Log.w(TAG, e);
 					}
 				} else if (DEBUG) {
-					Log.w(TAG, "releaseTarget:unexpectedly GLManager is already released!");
+					Log.w(TAG, "releaseTargetOnGL:unexpectedly GLManager is already released!");
 				}
 			}
 		}

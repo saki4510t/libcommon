@@ -65,6 +65,12 @@ public class SurfaceProxyTest {
 		final Context context = ApplicationProvider.getApplicationContext();
 	}
 
+	/**
+	 * SurfaceProxyReaderWriter => GLImageReceiver => GLBitmapImageReaderと接続して
+	 * SurfaceProxyReaderWriterから取得したSurfaceへCanvas#drawBitmapでビットマップを
+	 * 書き込んで、書き込んだビットマップとGLBitmapImageReaderで読み込んだ
+	 * ビットマップが一致するかどうかを検証する
+	 */
 	@Test
 	public void surfaceProxyReaderWriterTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -104,12 +110,11 @@ public class SurfaceProxyTest {
 		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface readerSurface = receiver.getSurface();
-		assertNotNull(readerSurface);
-		// プロキシに映像読み取り用Surfaceをセット
-		proxy.setSurface(readerSurface);
-
-		// プロキシへ映像を書き込み
+		final Surface receiverSurface = receiver.getSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
+		assertNotNull(receiverSurface);
+		// SurfaceProxyReaderWriterへ映像読み取り用Surfaceをセット
+		proxy.setSurface(receiverSurface);
+		// 初段のSurfaceProxyReaderWriterの入力用Surfaceへ静止画を描き込む
 		inputImagesAsync(original, inputSurface, MAX_IMAGES);
 
 		try {
@@ -125,16 +130,22 @@ public class SurfaceProxyTest {
 
 	}
 
+	/**
+	 * SurfaceProxyGLES => GLImageReceiver => GLBitmapImageReaderと接続して
+	 * SurfaceProxyGLESから取得したSurfaceへCanvas#drawBitmapでビットマップを
+	 * 書き込んで、書き込んだビットマップとGLBitmapImageReaderで読み込んだ
+	 * ビットマップが一致するかどうかを検証する
+	 */
 	@Test
 	public void surfaceProxyGLESTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		// SurfaceProxyReaderWriterを生成
+		// SurfaceProxyGLESを生成
 		final SurfaceProxy proxy = SurfaceProxy.newInstance(WIDTH, HEIGHT, false);
 		assertTrue(proxy instanceof SurfaceProxy.SurfaceProxyGLES);
-		final Surface inputSurface = proxy.getInputSurface();
+		final Surface inputSurface = proxy.getInputSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
 		assertNotNull(inputSurface);
 
 		// 映像読み取り用にSurfaceReaderを準備
@@ -164,11 +175,11 @@ public class SurfaceProxyTest {
 		}, HandlerThreadHandler.createHandler(TAG));
 
 		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface readerSurface = receiver.getSurface();
-		assertNotNull(readerSurface);
+		final Surface receiverSurface = receiver.getSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
+		assertNotNull(receiverSurface);
 		// プロキシに映像読み取り用Surfaceをセット
-		proxy.setSurface(readerSurface);
-
+		proxy.setSurface(receiverSurface);
+		// 初段のSurfaceProxyGLESの入力用Surfaceへ静止画を描き込む
 		inputImagesAsync(original, inputSurface, MAX_IMAGES);
 
 		try {

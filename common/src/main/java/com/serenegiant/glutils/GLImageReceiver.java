@@ -199,12 +199,9 @@ public class GLImageReceiver {
 		mCallback = callback;
 		mFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
-		mGLHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				handleOnStart();
-				sem.release();
-			}
+		mGLHandler.post(() -> {
+			handleOnStart();
+			sem.release();
 		});
 		// 初期化待ち
 		try {
@@ -216,12 +213,9 @@ public class GLImageReceiver {
 		}
 		// 映像受け取り用のテクスチャ/SurfaceTexture/Surfaceを生成
 		sem.release(sem.availablePermits());
-		mGLHandler.post(new Runnable() {
-			@Override
-			public void run() {
-				handleReCreateInputSurface();
-				sem.release();
-			}
+		mGLHandler.post(() -> {
+			handleReCreateInputSurface();
+			sem.release();
 		});
 		try {
 			final Surface surface;
@@ -272,14 +266,11 @@ public class GLImageReceiver {
 	 */
 	public void setFrameAvailableCallback(@Nullable final FrameAvailableCallback callback) {
 		if (mManager.isValid()) {
-			mGLHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					if (callback != null) {
-						mFrameAvailableCallback = callback;
-					} else {
-						mFrameAvailableCallback = mCallback;
-					}
+			mGLHandler.post(() -> {
+				if (callback != null) {
+					mFrameAvailableCallback = callback;
+				} else {
+					mFrameAvailableCallback = mCallback;
 				}
 			});
 		}
@@ -289,13 +280,10 @@ public class GLImageReceiver {
 	 */
 	protected void internalRelease() {
 		if (mManager.isValid()) {
-			mGLHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					handleOnStop();
-					if (mOwnManager) {
-						mManager.release();
-					}
+			mGLHandler.post(() -> {
+				handleOnStop();
+				if (mOwnManager) {
+					mManager.release();
 				}
 			});
 		}
