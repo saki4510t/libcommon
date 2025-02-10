@@ -452,13 +452,14 @@ public class StaticTextureSource implements GLConst, IMirror {
 			// 各Surfaceへ描画する
 			if (mImageSource != null) {
 				final int texId = mImageSource.getTexId();
+				final float[] texMatrix = mImageSource.getTexMatrix();
 				synchronized (mTargets) {
 					final int n = mTargets.size();
 					for (int i = n - 1; i >= 0; i--) {
 						final RendererTarget target = mTargets.valueAt(i);
 						if ((target != null) && target.canDraw()) {
 							try {
-								target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, null); // target.draw(mDrawer, GLES20.GL_TEXTURE0, mTexId, mTexMatrix);
+								target.draw(mDrawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 								GLUtils.checkGlError("handleDraw");
 							} catch (final Exception e) {
 								// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
