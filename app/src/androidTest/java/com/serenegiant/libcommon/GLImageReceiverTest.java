@@ -166,9 +166,10 @@ public class GLImageReceiverTest {
 //			dump(b);
 			assertNotNull(b);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, b));
+			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+			fail();
 		}
 	}
 }
