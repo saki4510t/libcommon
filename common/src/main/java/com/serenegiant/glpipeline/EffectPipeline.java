@@ -202,6 +202,7 @@ public class EffectPipeline extends ProxyPipeline
 
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
+		if (DEBUG) Log.v(TAG, "setMirror:" + mirror);
 		mLock.lock();
 		try {
 			if (mMirror != mirror) {
@@ -237,13 +238,13 @@ public class EffectPipeline extends ProxyPipeline
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
 		if (isValid()) {
-			if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
+			if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
 					mDrawer.release();
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-				mDrawer = new EffectDrawer2D(mManager.isGLES3(), isOES, mEffectListener);
+				mDrawer = new EffectDrawer2D(isGLES3, isOES, mEffectListener);
 				mDrawer.setMirror(MIRROR_VERTICAL);
 				mDrawer.setEffect(mEffect);
 			}
@@ -280,8 +281,9 @@ public class EffectPipeline extends ProxyPipeline
 	@Override
 	public void refresh() {
 		super.refresh();
+		if (DEBUG) Log.v(TAG, "refresh:");
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
-		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
+		//     パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
@@ -462,7 +464,7 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	@WorkerThread
 	private void reCreateTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
-		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		if (DEBUG) Log.v(TAG, "reCreateTargetOnGL:" + surface);
 		mSurfaceId = 0;
 		mMaxFps = maxFps;
 		if (mRendererTarget != null) {
