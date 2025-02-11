@@ -35,6 +35,8 @@ import androidx.annotation.WorkerThread;
 
 /**
  * テクスチャが更新されたときにSurfaceへ転送するGLPipeline実装
+ * パイプライン → SurfaceRendererPipeline (→ パイプライン)
+ *                → Surface
  */
 public class SurfaceRendererPipeline extends ProxyPipeline
 	implements GLSurfacePipeline, IMirror {

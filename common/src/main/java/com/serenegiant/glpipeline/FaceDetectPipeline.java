@@ -43,6 +43,8 @@ import androidx.annotation.WorkerThread;
 
 /**
  * 顔検出をしてコールバックするGLPipeline実装
+ * パイプライン → FaceDetectPipeline (→ パイプライン)
+ *                → 顔認識 → onDetectedコールバック呼び出し
  */
 public class FaceDetectPipeline extends ProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production

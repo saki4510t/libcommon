@@ -38,6 +38,8 @@ import androidx.annotation.WorkerThread;
 /**
  * 任意のGLDrawer2D(とその継承クラス)を使って描画するGLPipeline実装
  * 描画先のsurfaceにnullを指定すると描画後のテクスチャを次のGLPipelineへ送る
+ * パイプライン → DrawerPipeline (→ パイプライン)
+ *                (→ Surface)
  */
 public class DrawerPipeline extends ProxyPipeline
 	implements GLSurfacePipeline, IMirror {

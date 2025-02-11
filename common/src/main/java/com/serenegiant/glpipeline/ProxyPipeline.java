@@ -29,6 +29,7 @@ import androidx.annotation.Size;
 
 /**
  * GLPipelineのインターフェースメソッドの基本的機能を実装＆中継をするだけのGLPipeline実装
+ * パイプライン → ProxyPipeline (→ パイプライン)
  */
 public class ProxyPipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production

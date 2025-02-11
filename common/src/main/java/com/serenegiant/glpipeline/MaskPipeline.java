@@ -42,6 +42,10 @@ import static com.serenegiant.gl.ShaderConst.*;
 /**
  * OpenGL|ESのシェーダーを使って映像にマスク処理するGLPipeline実装
  * 描画先のsurfaceにnullを指定するとマスク処理したテクスチャを次のGLPipelineへ送る
+ *              マスク用静止画
+ *                 ↓
+ * パイプライン → MaskPipeline (→ パイプライン)
+ *                (→ Surface)
  */
 public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private static final boolean DEBUG = false;	// set false on production

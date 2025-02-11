@@ -33,6 +33,10 @@ import androidx.annotation.Size;
  * 複数のGLPipelineへテクスチャを分配するGLPipeline実装
  * SurfaceDistributePipelineはSurfaceへ分配描画するのに対し
  * DistributePipelineは下流のGLPipeline#onFrameAvailableを呼び出すだけ
+ * パイプライン → DistributePipeline (→ パイプライン)
+ *                → パイプライン
+ *                → パイプライン
+ *                → ...
  */
 public class DistributePipeline implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production

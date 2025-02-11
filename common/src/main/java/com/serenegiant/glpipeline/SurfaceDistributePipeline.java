@@ -40,6 +40,10 @@ import androidx.annotation.WorkerThread;
  * GLPipelineSourceで更新されたテクスチャをSurfaceへ分配描画するためのヘルパークラス
  * useSharedContext=falseでVideoSource + SurfaceDistributePipeline ≒ IRendererHolder/RendererHolder
  * 分配描画が必要ない場合または分配先が少ない場合はSurfaceRendererPipelineの方が負荷が少ないかもしれない
+ * パイプライン → SurfaceDistributePipeline (→ パイプライン)
+ *                → Surface
+ *                → Surface
+ *                → ...
  */
 public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror {
 	private static final boolean DEBUG = false;	// set false on production

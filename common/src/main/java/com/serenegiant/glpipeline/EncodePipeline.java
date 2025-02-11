@@ -46,6 +46,8 @@ import androidx.annotation.WorkerThread;
 
 /**
  * MediaCodecの映像エンコーダーでエンコードするためのGLPipeline/AbstractVideoEncoder実装
+ * パイプライン → EncodePipeline (→ パイプライン)
+ *                → IRecorderへ映像書き込み
  */
 public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	private static final boolean DEBUG = false;	// set false on production

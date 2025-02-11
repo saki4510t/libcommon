@@ -40,6 +40,8 @@ import static com.serenegiant.gl.GLEffect.EFFECT_NON;
 /**
  * OpenGL|ESのシェーダーを使って映像効果付与をするGLPipeline実装
  * 描画先のsurfaceにnullを指定すると映像効果を付与したテクスチャを次のGLPipelineへ送る
+ * パイプライン → EffectPipeline (→ パイプライン)
+ *                (→ Surface)
  */
 public class EffectPipeline extends ProxyPipeline
 	implements GLSurfacePipeline, IMirror {

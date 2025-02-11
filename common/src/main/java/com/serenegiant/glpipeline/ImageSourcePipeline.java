@@ -33,6 +33,7 @@ import androidx.annotation.WorkerThread;
 
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
+ * ビットマップ → ImageSourcePipeline (→ パイプライン)
  */
 public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSource {
 	private static final boolean DEBUG = false;	// set false on production

@@ -24,6 +24,9 @@ import com.serenegiant.glutils.GLImageReceiver
 
 /**
  * 映像が更新されたときのコースバックインターフェースを呼び出すだけのProxyPipeline実装
+ * ProxyPipelineを無名クラスで生成して#onFrameAvailableをオーバーライドするのとほぼ等価
+ * パイプライン → OnFramePipeline (→ パイプライン)
+ *                → onFrameAvailableコールバック呼び出し
  */
 class OnFramePipeline(private val mListener: GLImageReceiver.FrameAvailableCallback)
 : ProxyPipeline() {

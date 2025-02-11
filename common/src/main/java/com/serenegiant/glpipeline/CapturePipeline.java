@@ -38,6 +38,8 @@ import androidx.annotation.WorkerThread;
 
 /**
  * 静止画キャプチャ機能を追加したProxyPipeline実装
+ * パイプライン → CapturePipeline (→ パイプライン)
+ *                → Bitmap → onCaptureコールバック呼び出し
  */
 public class CapturePipeline extends ProxyPipeline {
 	private static final boolean DEBUG = false;	// set false on production
