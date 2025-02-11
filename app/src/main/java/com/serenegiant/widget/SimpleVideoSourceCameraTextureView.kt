@@ -139,7 +139,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		if (USE_DRAWER_PIPELINE) {
 			if (DEBUG) Log.v(TAG, "onResume:add DrawerPipeline")
-			mVideoSourcePipeline!!.pipeline = DrawerPipeline(mGLManager, DrawerPipeline.DEFAULT_CALLBACK)
+			mVideoSourcePipeline!!.append(DrawerPipeline(mGLManager, DrawerPipeline.DEFAULT_CALLBACK))
 		}
 		mCameraDelegator.onResume()
 	}
