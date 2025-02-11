@@ -222,13 +222,8 @@ public class DistributePipeline implements GLPipeline {
 		if (DEBUG) Log.v(TAG, "setPipeline:" + this + ",pipeline=" + pipeline);
 		if (pipeline == null) {
 			throw new IllegalArgumentException("DistributePipeline#setPipeline can't accept null!");
-		}
-		if (!mReleased) {
-			mPipelines.add(pipeline);
-			pipeline.setParent(this);
-			pipeline.resize(mWidth, mHeight);
 		} else {
-			throw new IllegalStateException("already released!");
+			addPipeline(pipeline);
 		}
 	}
 
