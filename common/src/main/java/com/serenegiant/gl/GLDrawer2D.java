@@ -79,7 +79,10 @@ public class GLDrawer2D implements GLConst {
 		1.0f, 1.0f,		// 右下
 		0.0f, 1.0f,		// 左下
 	};
-	// 元々のDEFAULT_TEXCOORDはテクスチャ座標を上下反転させたこっちだった
+	// XXX 元々のDEFAULT_TEXCOORDはテクスチャ座標を上下反転させたこっちだった
+	//     これだと頂点座標はそのままでテクスチャだけ反転してしまうので
+	//     1パス処理する毎に映像が意図せず上下反転してしまう。
+	//     頂点座標とテクスチャ座標のx/y軸を合わせてどちらも変更しないとだめ。
 	protected static final float[] DEFAULT_TEXCOORD_FLIP_VERTICAL = {
 		1.0f, 1.0f,		// 右上
 		0.0f, 1.0f,		// 左上
