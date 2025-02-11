@@ -38,10 +38,11 @@ import static org.junit.Assert.*;
 
 /**
  * com.serenegiant.system.EncryptedSharedPreferences用のインスツルメンテーションテスト用クラス
+ * EncryptedSharedPreferences.AESObfuscatorを使って暗号化・復号を行う
  */
 @RunWith(AndroidJUnit4.class)
-public class EncryptedSharedPreferencesTest {
-	private static final String TAG = EncryptedSharedPreferencesTest.class.getSimpleName();
+public class EncryptedSharedPrefAESTest {
+	private static final String TAG = EncryptedSharedPrefAESTest.class.getSimpleName();
 
 	private static final byte[] SALT = {
 		(byte)0x69, (byte)0x27, (byte)0x3f, (byte)0x61,

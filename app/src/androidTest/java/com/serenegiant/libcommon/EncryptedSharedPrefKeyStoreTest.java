@@ -38,10 +38,11 @@ import static org.junit.Assert.*;
 
 /**
  * com.serenegiant.system.EncryptedSharedPreferences用のインスツルメンテーションテスト用クラス
+ * EncryptedSharedPreferences.KeyStoreObfuscatorを使って暗号化・復号を行う
  */
 @RunWith(AndroidJUnit4.class)
-public class EncryptedSharedPreferencesTest2 {
-	private static final String TAG = EncryptedSharedPreferencesTest2.class.getSimpleName();
+public class EncryptedSharedPrefKeyStoreTest {
+	private static final String TAG = EncryptedSharedPrefKeyStoreTest.class.getSimpleName();
 
 	private static final double EPS_FLOAT = Float.MIN_NORMAL;
 
