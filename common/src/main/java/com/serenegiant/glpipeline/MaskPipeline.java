@@ -106,7 +106,6 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		}
 		mManager = manager;
 		manager.runOnGLThread(() -> {
-			final boolean isGLES3 = manager.isGLES3();
 			createTargetOnGL(surface, maxFps);
 		});
 	}
@@ -216,7 +215,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			releaseDrawerOnGL();
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = createDrawerOnGL( isGLES3, isOES);
+			mDrawer = createDrawerOnGL(isGLES3, isOES);
 			mDrawer.setMirror(IMirror.MIRROR_VERTICAL);
 		}
 		@NonNull
@@ -260,9 +259,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		super.refresh();
 		if (DEBUG) Log.v(TAG, "refresh:");
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
-		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
+		//     パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(() ->{
+			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
 				releaseDrawerOnGL();
 			});
@@ -336,7 +335,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 	@WorkerThread
 	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
-		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		if (DEBUG) Log.v(TAG, "createTargetOnGL:" + surface);
 		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
 			mSurfaceId = 0;
 			if (mRendererTarget != null) {
@@ -352,7 +351,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				mMaskOnly = false;
 			} else if (isValid()) {
-				if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
+				if (DEBUG) Log.v(TAG, "createTargetOnGL:create GLSurface as work texture");
 				work = GLSurface.newInstance(
 					mManager.isGLES3(), GLES20.GL_TEXTURE0,
 					getWidth(), getHeight());
@@ -423,43 +422,68 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 */
 
 	private static final String FRAGMENT_SHADER_BASE_ES2
-		= SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying vec2 vTextureCoord;\n" +
-		"uniform %s sTexture;\n" +	// 入力テクスチャA
-		"uniform %s sTexture2;\n" +	// 入力テクスチャB
-		"void main() {\n" +
-		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
-		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
-		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
-		"}\n";
+		= """
+			%s
+			%s
+			precision highp float;
+			varying vec2 vTextureCoord;
+			uniform %s sTexture;
+			uniform %s sTexture2;
+			void main() {
+				highp vec4 tex1 = texture2D(sTexture, vTextureCoord);
+				highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);
+				gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
+			}
+			""";
+//		"%s" +
+//		"precision highp float;\n" +
+//		"varying vec2 vTextureCoord;\n" +
+//		"uniform %s sTexture;\n" +	// 入力テクスチャA
+//		"uniform %s sTexture2;\n" +	// 入力テクスチャB
+//		"void main() {\n" +
+//		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
+//		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
+//		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
+//		"}\n";
 	private static final String MY_FRAGMENT_SHADER_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			HEADER_2D, SAMPLER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			HEADER_OES_ES2, SAMPLER_OES, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES, SAMPLER_2D);
 
 	private static final String FRAGMENT_SHADER_BASE_ES3
-		= SHADER_VERSION_ES3 +
-		"%s" +
-		"precision highp float;\n" +
-		"in vec2 vTextureCoord;\n" +
-		"uniform %s sTexture;\n" +	// 入力テクスチャA
-		"uniform %s sTexture2;\n" +	// 入力テクスチャB
-		"layout(location = 0) out vec4 o_FragColor;\n" +
-		"void main() {\n" +
-		"    highp vec4 tex1 = texture(sTexture, vTextureCoord);\n" +
-		"    highp vec4 tex2 = texture(sTexture2, vTextureCoord);\n" +
-		"    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
-		"}\n";
+		= """
+			%s
+			%s
+			precision highp float;
+			in vec2 vTextureCoord;
+			uniform %s sTexture;
+			uniform %s sTexture2;
+			layout(location = 0) out vec4 o_FragColor;
+			void main() {
+				highp vec4 tex1 = texture(sTexture, vTextureCoord);
+				highp vec4 tex2 = texture(sTexture2, vTextureCoord);
+				o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
+			}
+			""";
+//		"%s\n" +
+//		"precision highp float;\n" +
+//		"in vec2 vTextureCoord;\n" +
+//		"uniform %s sTexture;\n" +	// 入力テクスチャA
+//		"uniform %s sTexture2;\n" +	// 入力テクスチャB
+//		"layout(location = 0) out vec4 o_FragColor;\n" +
+//		"void main() {\n" +
+//		"    highp vec4 tex1 = texture(sTexture, vTextureCoord);\n" +
+//		"    highp vec4 tex2 = texture(sTexture2, vTextureCoord);\n" +
+//		"    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);\n" +
+//		"}\n";
 
 	private static final String MY_FRAGMENT_SHADER_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			HEADER_2D, SAMPLER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			HEADER_OES_ES3, SAMPLER_OES, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, SAMPLER_2D);
 
 }
