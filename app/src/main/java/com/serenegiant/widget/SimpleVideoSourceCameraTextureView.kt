@@ -33,6 +33,7 @@ import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glutils.GLImageReceiver
+import com.serenegiant.glutils.IMirror
 import com.serenegiant.glutils.OnFrameAvailableListener
 import com.serenegiant.math.Fraction
 import com.serenegiant.view.TouchViewTransformer
@@ -192,6 +193,9 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		isRecordable: Boolean,
 		maxFps: Fraction?) {
 
+		// XXX AndroidのView座標系とOpenGL|ESの座標系ではY軸の方向が逆になっている。
+		//     GL系のクラスはOpenGL|ES座標系で処理するのでViewへ表示させたり録画する場合には
+		//     明示的にIMirror.MIRROR_VERTICALを指定して上下を反転させる必要がある。
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
 		val source = mVideoSourcePipeline
 		if (source != null) {
@@ -278,14 +282,14 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					}
 				}
 				is GLSurfacePipeline -> {
-					if (last.hasSurface()) {
-						last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
-					} else {
-						last.setSurface(surface, maxFps)
+					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps).apply {
+						mirror = IMirror.MIRROR_VERTICAL
 					}
 				}
 				else -> {
-					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
+					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps).apply {
+						mirror = IMirror.MIRROR_VERTICAL
+					}
 				}
 			}
 			if (DEBUG) Log.v(TAG, "addSurface:" + GLPipeline.pipelineString(source))
@@ -414,6 +418,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				if (DEBUG) Log.v(TAG, "createPipeline:create SurfaceRendererPipeline")
 				SurfaceRendererPipeline(mGLManager, surface, maxFps)
 			}
+		}.apply {
+			mirror = IMirror.MIRROR_VERTICAL
 		}
 	}
 
