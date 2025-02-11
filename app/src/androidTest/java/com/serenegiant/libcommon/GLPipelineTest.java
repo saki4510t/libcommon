@@ -784,33 +784,4 @@ public class GLPipelineTest {
 		}
 	}
 
-//--------------------------------------------------------------------------------
-	/**
-	 * パイプラインチェーン内の順番を検証する
-	 * @param head
-	 * @param args
-	 * @return
-	 */
-	private boolean validatePipelineOrder(@NonNull final GLPipeline head, @NonNull GLPipeline... args) {
-		boolean result = true;
-		final int n = args.length;
-		int cnt = 0;
-		GLPipeline p = GLPipeline.findFirst(head);
-		for (int i = 0; i < n; i++) {
-			if (p != args[i]) {
-				Log.w(TAG, "パイプラインチェーン内の順番が違う");
-				result = false;
-				break;
-			}
-			if (++cnt < n) {
-				p = p.getPipeline();
-			}
-		}
-		if (p.getPipeline() != null) {
-			Log.w(TAG, "パイプラインチェーン内のパイプラインの数が違う");
-			result = false;
-		}
-		return result;
-	}
-
 }
