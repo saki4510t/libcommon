@@ -239,6 +239,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 									val face: FaceDetector.Face = faces[i]
 									val point = PointF()
 									face.getMidPoint(point)
+									Log.v(TAG, "onDetected:sz((${width}x${height}),num=$i/${num}")
 									Log.v(TAG, "onDetected:Confidence=" + face.confidence())
 									Log.v(TAG, "onDetected:MidPoint.X=" + point.x)
 									Log.v(TAG, "onDetected:MidPoint.Y=" + point.y)
