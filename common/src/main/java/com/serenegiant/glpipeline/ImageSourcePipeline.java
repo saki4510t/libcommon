@@ -63,8 +63,10 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		mImageTextureSource = new ImageTextureSource(manager, bitmap, fps, new OnFrameAvailableListener() {
 			@Override
 			public void onFrameAvailable() {
-				ImageSourcePipeline.this.onFrameAvailable(
-					mManager.isGLES3(), false, mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
+				if (isActive()) {
+					ImageSourcePipeline.this.onFrameAvailable(
+						mManager.isGLES3(), false, mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
+				}
 			}
 		});
 	}
