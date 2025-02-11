@@ -33,6 +33,7 @@ import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -235,7 +236,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLImageReceiver
 			} finally {
 				mLock.unlock();
 			}
-			mWorkBuffer = ByteBuffer.allocateDirect(bytes);
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 		}
 		final Bitmap bitmap = obtainBitmap(width, height);
 		if (bitmap != null) {

@@ -42,6 +42,7 @@ import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -147,7 +148,8 @@ public class SurfaceDrawable extends Drawable {
 			}
 		};
 		mBitmap = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888);
-		mWorkBuffer = ByteBuffer.allocateDirect(imageWidth * imageHeight * 4);
+		final int bytes = imageWidth * imageHeight * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+		mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 		new Thread(mEglTask, TAG).start();
 		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
 	}
@@ -350,7 +352,8 @@ public class SurfaceDrawable extends Drawable {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		if ((mImageWidth != width) || (mImageHeight != height)) {
 			mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
-			mWorkBuffer = ByteBuffer.allocateDirect(width * height * 4);
+			final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 			mImageWidth = width;
 			mImageHeight = height;
 			updateTransformMatrix();

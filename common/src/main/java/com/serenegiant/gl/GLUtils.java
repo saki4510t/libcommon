@@ -35,6 +35,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.system.Stacktrace;
 import com.serenegiant.utils.AssetsHelper;
 
@@ -226,7 +227,7 @@ public class GLUtils implements GLConst {
 		@Nullable final ByteBuffer buffer,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 
-		final int sz = width * height * 4;
+		final int sz = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		ByteBuffer buf = buffer;
 		if ((buf == null) || (buf.capacity() < sz)) {
 			if (DEBUG) Log.v(TAG, "glReadPixels:allocate direct bytebuffer");

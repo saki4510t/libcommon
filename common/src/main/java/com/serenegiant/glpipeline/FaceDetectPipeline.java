@@ -28,6 +28,7 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.HandlerThreadHandler;
 
@@ -277,7 +278,8 @@ public class FaceDetectPipeline extends ProxyPipeline {
 			offscreen = mManager.getEgl().createOffscreen(width, height);
 			mRendererTarget = RendererTarget.newInstance(
 				mManager.getEgl(), offscreen, mMaxFps > 0 ? mMaxFps : DEFAULT_MAX_FPS);
-			mWorkBuffer = ByteBuffer.allocateDirect(width * height * 4).order(ByteOrder.LITTLE_ENDIAN);
+			final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 			mWorkBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 			mDetector = new FaceDetector(width, height, mMaxDetectNum);
 		} finally {

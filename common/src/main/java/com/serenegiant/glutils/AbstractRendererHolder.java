@@ -39,6 +39,7 @@ import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.ISurface;
+import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
@@ -848,8 +849,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 						width = mRendererTask.width();
 						height = mRendererTask.height();
-						buf = ByteBuffer.allocateDirect(width * height * 4);
-				    	buf.order(ByteOrder.LITTLE_ENDIAN);
+						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+						buf = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 				    	if (captureSurface != null) {
 				    		captureSurface.release();
 				    		captureSurface = null;
@@ -938,8 +939,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 						width = mRendererTask.width();
 						height = mRendererTask.height();
-						buf = ByteBuffer.allocateDirect(width * height * 4);
-				    	buf.order(ByteOrder.LITTLE_ENDIAN);
+						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+						buf = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 				    	if (captureSurface != null) {
 				    		captureSurface.release();
 				    		captureSurface = null;
