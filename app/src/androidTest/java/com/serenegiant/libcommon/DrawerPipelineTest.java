@@ -92,7 +92,63 @@ public class DrawerPipelineTest {
 
 		final GLManager manager = mManager;
 
+		final Semaphore sem = new Semaphore(0);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() == 30) {
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
+				}
+			}
+		};
+
+		// 映像ソースを生成
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		GLPipeline.append(source, drawerPipeline);
+		GLPipeline.append(source, proxy);
+
+		assertTrue(validatePipelineOrder(source, source, drawerPipeline, proxy));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			source.release();
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitmapEquals(original, result, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+		}
+	}
+
+	/**
+	 * DrawerPipelineが動作するかどうかを検証
+	 * ImageSourcePipeline - DrawerPipeline → DrawerPipeline → ProxyPipeline → テクスチャ読み取り
+	 */
+	@Test
+	public void drawerPipelineTest2() {
+		// テストに使用するビットマップを生成
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		final GLManager manager = mManager;
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
@@ -119,10 +175,75 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		GLPipeline.append(source, drawerPipeline);
+		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		GLPipeline.append(source, drawerPipeline1);
+		GLPipeline.append(source, drawerPipeline2);
 		GLPipeline.append(source, proxy);
 
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline, proxy));
+		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, proxy));
+
+		try {
+			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			source.release();
+			// パイプラインを経由して読み取った映像データをビットマップに戻す
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+//			dump(result);
+			assertTrue(bitmapEquals(original, result, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+		}
+	}
+
+	/**
+	 * DrawerPipelineが動作するかどうかを検証
+	 * ImageSourcePipeline - DrawerPipeline → DrawerPipeline → DrawerPipeline → ProxyPipeline → テクスチャ読み取り
+	 */
+	@Test
+	public void drawerPipelineTest3() {
+		// テストに使用するビットマップを生成
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		final GLManager manager = mManager;
+
+		final Semaphore sem = new Semaphore(0);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
+		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() == 30) {
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
+				}
+			}
+		};
+
+		// 映像ソースを生成
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline3 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		GLPipeline.append(source, drawerPipeline1);
+		GLPipeline.append(source, drawerPipeline2);
+		GLPipeline.append(source, drawerPipeline3);
+		GLPipeline.append(source, proxy);
+
+		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, drawerPipeline3, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
