@@ -51,6 +51,7 @@ import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import static com.serenegiant.libcommon.TestUtils.allocateBuffer;
 import static com.serenegiant.libcommon.TestUtils.bitmapEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -160,7 +161,7 @@ public class ImageSourcePipelineTest {
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override

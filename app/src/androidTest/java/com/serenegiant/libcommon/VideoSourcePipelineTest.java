@@ -117,8 +117,7 @@ public class VideoSourcePipelineTest {
 		final Surface inputSurface = videoSourcePipeline.getInputSurface();
 		assertNotNull(inputSurface);
 
-		final int bytes = WIDTH * HEIGHT * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override

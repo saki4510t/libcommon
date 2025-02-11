@@ -32,6 +32,8 @@ import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -214,6 +216,17 @@ LOOP:		for (int y = 0; y < height; y++) {
 		return result;
 	}
 
+	/**
+	 * glReadPixelsでフレームバッファを読み取ってビットマップを生成するときに使うバッファを割り当てる
+	 * Bitmap.Config.ARGB_8888とする
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	public static ByteBuffer allocateBuffer(final int width, final int height) {
+		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+		return ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
+	}
 //--------------------------------------------------------------------------------
 // テストに使うダミーのクラス
 //--------------------------------------------------------------------------------

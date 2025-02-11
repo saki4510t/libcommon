@@ -108,7 +108,7 @@ public class GLPipelineTest {
 		source.setPipeline(distributor);
 
 		final Semaphore sem1 = new Semaphore(0);
-		final ByteBuffer buffer1 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer1 = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline pipeline1 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -134,7 +134,7 @@ public class GLPipelineTest {
 		distributor.addPipeline(pipeline1);
 
 		final Semaphore sem2 = new Semaphore(0);
-		final ByteBuffer buffer2 = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer2 = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline pipeline2 = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -218,7 +218,7 @@ public class GLPipelineTest {
 			});
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -285,7 +285,7 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -349,7 +349,7 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -416,7 +416,7 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline3 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -481,7 +481,7 @@ public class GLPipelineTest {
 		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = ByteBuffer.allocateDirect(WIDTH * HEIGHT * 4).order(ByteOrder.LITTLE_ENDIAN);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
 		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
