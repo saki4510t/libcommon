@@ -202,7 +202,6 @@ public class GLPipelineTest {
 
 		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
 		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用
-		surfacePipeline.setMirror(IMirror.MIRROR_VERTICAL);
 		source.setPipeline(surfacePipeline);
 
 		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,
@@ -257,7 +256,7 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
-			assertTrue(bitmapEquals(original, flipVertical(result), true));
+			assertTrue(bitmapEquals(original, result, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
