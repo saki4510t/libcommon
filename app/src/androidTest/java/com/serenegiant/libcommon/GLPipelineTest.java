@@ -255,8 +255,6 @@ public class GLPipelineTest {
 	/**
 	 * EffectPipelineが動作するかどうかを検証
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
-	 * FIXME これはいつも失敗する(生成されるビットマップが一致しない)
-	 *       でも#effectPipeline2と#effectPipeline3は成功する
 	 */
 	@Test
 	public void effectPipelineTest1() {
