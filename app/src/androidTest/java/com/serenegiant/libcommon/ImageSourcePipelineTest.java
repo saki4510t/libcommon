@@ -40,7 +40,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -103,7 +102,6 @@ public class ImageSourcePipelineTest {
 //		dump(bitmap);
 
 		final GLManager manager = mManager;
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -116,11 +114,9 @@ public class ImageSourcePipelineTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= MAX_FRAMES) {
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == MAX_FRAMES) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
@@ -129,11 +125,13 @@ public class ImageSourcePipelineTest {
 			}
 		}, HandlerThreadHandler.createHandler(TAG));
 
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		final OnFramePipeline pipeline = new OnFramePipeline(reader);
 		source.setPipeline(pipeline);
 
 		try {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
+			source.release();
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -157,8 +155,6 @@ public class ImageSourcePipelineTest {
 //		dump(bitmap);
 
 		final GLManager manager = mManager;
-		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
@@ -170,24 +166,25 @@ public class ImageSourcePipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
-					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
+				if (cnt.incrementAndGet() == 30) {
+					// GLSurfaceを経由してテクスチャを読み取る
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
 				}
 			}
 		};
+
+		// 映像ソースを生成
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		source.setPipeline(proxy);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
 			result.copyPixelsFromBuffer(buffer);
