@@ -74,9 +74,7 @@ public class ImageTextureSourceTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		// 映像ソース用にImageTextureSourceを生成
 		final GLManager manager = new GLManager();
-		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(30));
 
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
@@ -90,12 +88,9 @@ public class ImageTextureSourceTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= MAX_FRAMES) {
-							source.setSurface(null);
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == MAX_FRAMES) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
@@ -108,6 +103,8 @@ public class ImageTextureSourceTest {
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
+		// 映像ソース用にImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(30));
 		// 映像受け取り用Surfaceをセット
 		source.setSurface(surface);
 		try {
@@ -186,9 +183,7 @@ public class ImageTextureSourceTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		// 映像ソース用にImageTextureSourceを生成
 		final GLManager manager = new GLManager();
-		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(requestFps));
 
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
@@ -202,12 +197,9 @@ public class ImageTextureSourceTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (numFrames.incrementAndGet() >= MAX_FRAMES) {
-							source.setSurface(null);
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (numFrames.incrementAndGet() == MAX_FRAMES) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
@@ -220,6 +212,8 @@ public class ImageTextureSourceTest {
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
+		// 映像ソース用にImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(requestFps));
 		// 映像受け取り用Surfaceをセット
 		source.setSurface(surface);
 		try {
