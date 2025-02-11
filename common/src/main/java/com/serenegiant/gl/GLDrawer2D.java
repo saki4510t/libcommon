@@ -79,6 +79,13 @@ public class GLDrawer2D implements GLConst {
 		1.0f, 1.0f,		// 右下
 		0.0f, 1.0f,		// 左下
 	};
+	// 元々のDEFAULT_TEXCOORDはテクスチャ座標を上下反転させたこっちだった
+	protected static final float[] DEFAULT_TEXCOORD_FLIP_VERTICAL = {
+		1.0f, 1.0f,		// 右上
+		0.0f, 1.0f,		// 左上
+		1.0f, 0.0f,		// 右下
+		0.0f, 0.0f,		// 左下
+	};
 
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
