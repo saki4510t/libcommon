@@ -45,19 +45,18 @@ public class DrawerPipeline extends ProxyPipeline
 	private static final String TAG = DrawerPipeline.class.getSimpleName();
 
 	/**
-	 * GLDrawer2D生成・破棄のコールバックリスナー
+	 * GLDrawer2D生成・破棄・リサイズ時のコールバックリスナー
 	 */
 	public interface Callback {
 		@WorkerThread
 		@NonNull
 		public GLDrawer2D createDrawer(
-			@NonNull final GLManager glManager, final boolean isOES);
+			final boolean isGLES3, final boolean isOES);
 		@WorkerThread
-		public void releaseDrawer(
-			@NonNull final GLManager glManager, @NonNull final GLDrawer2D drawer);
+		public void releaseDrawer(@NonNull final GLDrawer2D drawer);
 		@WorkerThread
 		public void onResize(
-			@NonNull final GLManager glManager, @Nullable final GLDrawer2D drawer,
+			@Nullable final GLDrawer2D drawer,
 			final int width, final int height);
 	}
 
@@ -67,18 +66,18 @@ public class DrawerPipeline extends ProxyPipeline
 	public static Callback DEFAULT_CALLBACK = new Callback() {
 		@NonNull
 		@Override
-		public GLDrawer2D createDrawer(@NonNull final GLManager glManager, final boolean isOES) {
-			return GLDrawer2D.create(glManager.isGLES3(), isOES);
+		public GLDrawer2D createDrawer(final boolean isGLES3, final boolean isOES) {
+			return GLDrawer2D.create(isGLES3, isOES);
 		}
 
 		@Override
-		public void releaseDrawer(@NonNull final GLManager glManager, @NonNull final GLDrawer2D drawer) {
+		public void releaseDrawer(@NonNull final GLDrawer2D drawer) {
 			drawer.release();
 		}
 
 		@Override
 		public void onResize(
-			@NonNull final GLManager glManager, @Nullable final GLDrawer2D drawer,
+			@Nullable final GLDrawer2D drawer,
 			final int width, final int height) {
 
 			if (drawer != null) {
@@ -285,10 +284,10 @@ public class DrawerPipeline extends ProxyPipeline
 		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			if (mDrawer != null) {
-				mCallback.releaseDrawer(mManager, mDrawer);
+				mCallback.releaseDrawer(mDrawer);
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = mCallback.createDrawer(mManager, isOES);
+			mDrawer = mCallback.createDrawer(isGLES3, isOES);
 			mDrawer.setMirror(MIRROR_VERTICAL);
 		}
 		if (mDrawOnly && (mOffscreenSurface != null)
@@ -335,7 +334,7 @@ public class DrawerPipeline extends ProxyPipeline
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
 				if (mDrawer != null) {
-					mCallback.releaseDrawer(mManager, mDrawer);
+					mCallback.releaseDrawer(mDrawer);
 					mDrawer = null;
 				}
 			});
@@ -349,7 +348,7 @@ public class DrawerPipeline extends ProxyPipeline
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		mManager.runOnGLThread(() -> {
 			if (DEBUG) Log.v(TAG, "resize#run:");
-			mCallback.onResize(mManager, mDrawer, width, height);
+			mCallback.onResize(mDrawer, width, height);
 		});
 	}
 
@@ -376,7 +375,7 @@ public class DrawerPipeline extends ProxyPipeline
 						mLock.unlock();
 					}
 					if (mDrawer != null) {
-						mCallback.releaseDrawer(mManager, mDrawer);
+						mCallback.releaseDrawer(mDrawer);
 					}
 					mDrawer = null;
 				});
