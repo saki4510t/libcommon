@@ -83,11 +83,9 @@ public class StaticTextureSourceTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= 30) {
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == 30) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);

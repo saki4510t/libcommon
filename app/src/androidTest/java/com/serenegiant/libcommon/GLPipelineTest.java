@@ -113,17 +113,15 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					this.remove();
-					if (sem1.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer1, WIDTH, HEIGHT);
-						sem1.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer1, WIDTH, HEIGHT);
+					sem1.release();
 				}
 			}
 		};
@@ -139,17 +137,15 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					this.remove();
-					if (sem2.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer2, WIDTH, HEIGHT);
-						sem2.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer2, WIDTH, HEIGHT);
+					sem2.release();
 				}
 			}
 		};
@@ -223,18 +219,16 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはVideoSourceからのテクスチャなのでisOES=trueのはず
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはVideoSourceからのテクスチャなのでisOES=trueのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
 				}
 			}
 		};
@@ -290,18 +284,16 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
 				}
 			}
 		};
@@ -354,18 +346,16 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
 				}
 			}
 		};
@@ -421,18 +411,16 @@ public class GLPipelineTest {
 				final boolean isOES, final int texId,
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() >= 30) {
+				if (cnt.incrementAndGet() == 30) {
 					source.setPipeline(null);
-					if (sem.availablePermits() == 0) {
-						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-						final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-						surface.makeCurrent();
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-						sem.release();
-					}
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
+					sem.release();
 				}
 			}
 		};
@@ -477,9 +465,10 @@ public class GLPipelineTest {
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				result.set(Bitmap.createBitmap(bitmap));
-				cnt.incrementAndGet();
-				sem.release();
+				if (cnt.incrementAndGet() == 1) {
+					result.set(Bitmap.createBitmap(bitmap));
+					sem.release();
+				}
 			}
 			@Override
 			public void onError(@NonNull final Throwable t) {
@@ -527,7 +516,7 @@ public class GLPipelineTest {
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				if (cnt.incrementAndGet() >= NUM_TRIGGERS) {
+				if (cnt.incrementAndGet() == NUM_TRIGGERS) {
 					result.set(Bitmap.createBitmap(bitmap));
 					sem.release();
 				}

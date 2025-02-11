@@ -87,11 +87,9 @@ public class RendererHolderTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= 5) {
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == 5) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
@@ -149,11 +147,9 @@ public class RendererHolderTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= 5) {
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == 5) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
@@ -211,11 +207,9 @@ public class RendererHolderTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() >= 5) {
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
+						if (cnt.incrementAndGet() == 5) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
 						}
 					} finally {
 						reader.recycle(bitmap);
