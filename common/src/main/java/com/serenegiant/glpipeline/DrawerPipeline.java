@@ -282,7 +282,7 @@ public class DrawerPipeline extends ProxyPipeline
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
-		if ((mDrawer == null) || (isOES != mDrawer.isOES())) {
+		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			if (mDrawer != null) {
 				mCallback.releaseDrawer(mManager, mDrawer);
@@ -330,7 +330,7 @@ public class DrawerPipeline extends ProxyPipeline
 		super.refresh();
 		if (DEBUG) Log.v(TAG, "refresh:");
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
-		// XXX パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
+		//     パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
