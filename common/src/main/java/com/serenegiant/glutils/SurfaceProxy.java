@@ -573,7 +573,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					}
 					if (DEBUG) Log.v(TAG, "renderTargetOnGL:create GLDrawer2D");
 					mDrawer = GLDrawer2D.create(isGLES3, isOES);
-					mDrawer.setMirror(MIRROR_VERTICAL);
+					mDrawer.setMirror(MIRROR_VERTICAL);	// XXX 今のところ上下反転させないとテストが通らない
 				}
 				drawer = mDrawer;
 				target = mRendererTarget;

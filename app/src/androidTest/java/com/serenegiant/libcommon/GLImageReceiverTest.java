@@ -67,6 +67,11 @@ public class GLImageReceiverTest {
 		final Context context = ApplicationProvider.getApplicationContext();
 	}
 
+	/**
+	 * inputImagesAsyncでCanvasを経由して書き込んだBitmapをGLImageReceiver(とGLBitmapImageReader)で
+	 * 読み取れることを検証
+	 * Bitmap -> inputImagesAsync -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 */
 	@Test
 	public void surfaceReadTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -115,6 +120,13 @@ public class GLImageReceiverTest {
 		}
 	}
 
+	/**
+	 * ImageSourcePipelineからの映像ソースをSurfaceRendererPipelineでテクスチャとして受け取って
+	 * GLImageReceiverのSurfaceへ書き込んでGLBitmapImageReaderでビットマップへ変換して
+	 * 読み取れることを検証
+	 * Bitmap -> ImageSourcePipeline -> SurfaceRendererPipeline
+	 * 			-> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 */
 	@Test
 	public void pipelineReaderTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
