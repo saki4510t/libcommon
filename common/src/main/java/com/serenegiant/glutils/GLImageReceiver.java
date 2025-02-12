@@ -48,7 +48,7 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装
  */
 public class GLImageReceiver {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = GLImageReceiver.class.getSimpleName();
 
 	/**

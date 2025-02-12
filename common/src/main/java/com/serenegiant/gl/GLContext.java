@@ -551,11 +551,11 @@ public class GLContext implements EGLConst {
 	@SuppressLint("InlinedApi")
 	@WorkerThread
 	public static void logVersionInfo() {
-		Log.d(TAG, "vendor:" + GLES20.glGetString(GLES20.GL_VENDOR));
-		Log.d(TAG, "renderer:" + GLES20.glGetString(GLES20.GL_RENDERER));
-		Log.d(TAG, "version:" + GLES20.glGetString(GLES20.GL_VERSION));
-		Log.d(TAG, "supported version:" + supportedGLESVersion());
-		Log.d(TAG, "extensions:" + GLES20.glGetString(GLES20.GL_EXTENSIONS));
+		Log.v(TAG, "vendor:" + GLES20.glGetString(GLES20.GL_VENDOR));
+		Log.v(TAG, "renderer:" + GLES20.glGetString(GLES20.GL_RENDERER));
+		Log.v(TAG, "version:" + GLES20.glGetString(GLES20.GL_VERSION));
+		Log.v(TAG, "supported version:" + supportedGLESVersion());
+		Log.v(TAG, "extensions:" + GLES20.glGetString(GLES20.GL_EXTENSIONS));
 	}
 
 	/**

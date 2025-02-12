@@ -35,7 +35,7 @@ import androidx.annotation.Size;
  * 同じ内容のクラスだったからEffectRendererHolder/RendererHolderのインナークラスを外に出した
  */
 public class RendererTarget implements IMirror {
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
 	private static final String TAG = RendererTarget.class.getSimpleName();
 	/**
 	 * ファクトリーメソッド
