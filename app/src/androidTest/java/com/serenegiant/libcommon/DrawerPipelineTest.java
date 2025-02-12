@@ -23,6 +23,7 @@ import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
 
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
@@ -117,7 +118,7 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		GLPipeline.append(source, drawerPipeline);
 		GLPipeline.append(source, proxy);
 
@@ -175,8 +176,8 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		GLPipeline.append(source, drawerPipeline1);
 		GLPipeline.append(source, drawerPipeline2);
 		GLPipeline.append(source, proxy);
@@ -235,9 +236,9 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
-		final DrawerPipeline drawerPipeline3 = new DrawerPipeline(manager, DrawerPipeline.DEFAULT_CALLBACK);
+		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline drawerPipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 		GLPipeline.append(source, drawerPipeline1);
 		GLPipeline.append(source, drawerPipeline2);
 		GLPipeline.append(source, drawerPipeline3);

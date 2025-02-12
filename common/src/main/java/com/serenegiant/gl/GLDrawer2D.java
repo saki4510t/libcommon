@@ -32,6 +32,7 @@ import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
+import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -47,6 +48,7 @@ public class GLDrawer2D implements GLConst {
 	 * GLDrawer2Dインスタンス生成用のファクトリーインターフェース
 	 */
 	public interface DrawerFactory {
+		@WorkerThread
 		@NonNull
 		public GLDrawer2D create(final boolean isGLES3, final boolean isOES);
 	}
@@ -55,6 +57,7 @@ public class GLDrawer2D implements GLConst {
 	 * デフォルトのDrawerFactory実装
 	 */
 	public static DrawerFactory DEFAULT_FACTORY = new DrawerFactory() {
+		@WorkerThread
 		@NonNull
 		@Override
 		public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {

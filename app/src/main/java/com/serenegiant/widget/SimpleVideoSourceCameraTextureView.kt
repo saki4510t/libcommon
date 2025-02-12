@@ -30,6 +30,7 @@ import android.view.Surface
 import android.view.View
 import com.serenegiant.glpipeline.*
 import com.serenegiant.gl.GLContext
+import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glutils.GLImageReceiver
@@ -139,7 +140,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		if (USE_DRAWER_PIPELINE) {
 			if (DEBUG) Log.v(TAG, "onResume:add DrawerPipeline")
-			mSurfaceSourcePipeline!!.append(DrawerPipeline(mGLManager, DrawerPipeline.DEFAULT_CALLBACK))
+			mSurfaceSourcePipeline!!.append(DrawerPipeline(mGLManager, GLDrawer2D.DEFAULT_FACTORY))
 		}
 		mCameraDelegator.onResume()
 	}

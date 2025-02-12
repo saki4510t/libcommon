@@ -36,7 +36,7 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 /**
- * 任意のGLDrawer2D(とその継承クラス)を使って描画するGLPipeline実装
+ * 任意のGLDrawer2D(とその継承クラス)を使ってテクスチャを描画するGLPipeline実装
  * 描画先のsurfaceにnullを指定すると描画後のテクスチャを次のGLPipelineへ送る
  * パイプライン → DrawerPipeline (→ パイプライン)
  *                (→ Surface)
@@ -46,52 +46,10 @@ public class DrawerPipeline extends ProxyPipeline
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = DrawerPipeline.class.getSimpleName();
 
-	/**
-	 * GLDrawer2D生成・破棄・リサイズ時のコールバックリスナー
-	 */
-	public interface Callback {
-		@WorkerThread
-		@NonNull
-		public GLDrawer2D createDrawer(
-			final boolean isGLES3, final boolean isOES);
-		@WorkerThread
-		public void releaseDrawer(@NonNull final GLDrawer2D drawer);
-		@WorkerThread
-		public void onResize(
-			@Nullable final GLDrawer2D drawer,
-			final int width, final int height);
-	}
-
-	/**
-	 * デフォルトのCallbackインターフェースの実装
-	 */
-	public static Callback DEFAULT_CALLBACK = new Callback() {
-		@NonNull
-		@Override
-		public GLDrawer2D createDrawer(final boolean isGLES3, final boolean isOES) {
-			return GLDrawer2D.create(isGLES3, isOES);
-		}
-
-		@Override
-		public void releaseDrawer(@NonNull final GLDrawer2D drawer) {
-			drawer.release();
-		}
-
-		@Override
-		public void onResize(
-			@Nullable final GLDrawer2D drawer,
-			final int width, final int height) {
-
-			if (drawer != null) {
-				drawer.release();
-			}
-		}
-	};
-
 	@NonNull
 	private final GLManager mManager;
 	@NonNull
-	private final Callback mCallback;
+	private final GLDrawer2D.DrawerFactory mDrawerFactory;
 	@Nullable
 	private GLDrawer2D mDrawer;
 	@Nullable
@@ -114,30 +72,80 @@ public class DrawerPipeline extends ProxyPipeline
 
 	/**
 	 * コンストラクタ
+	 * 明示的に#setSurfaceでSurfaceを指定しない場合、GLDrawer2Dで描画した映像を次のパイプラインへ送る
 	 * @param manager
-	 * @param callback
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
 	public DrawerPipeline(
-		@NonNull final GLManager manager, @NonNull final Callback callback)
+		@NonNull final GLManager manager)
 		throws IllegalStateException, IllegalArgumentException {
 
-		this(manager,  callback, null, null);
+		this(manager,  GLDrawer2D.DEFAULT_FACTORY, null, null);
 	}
 
 	/**
 	 * コンストラクタ
-	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
+	 * surfaceがnullの場合、明示的に#setSurfaceでSurfaceを指定しなければGLDrawer2Dで描画した映像を次のパイプラインへ送る
 	 * @param manager
-	 * @param callback
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public DrawerPipeline(
+		@NonNull final GLManager manager,
+		@Nullable final Object surface)
+		throws IllegalStateException, IllegalArgumentException {
+
+		this(manager,  GLDrawer2D.DEFAULT_FACTORY, surface, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * surfaceがnullの場合、明示的に#setSurfaceでSurfaceを指定しなければGLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * @param manager
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
 	public DrawerPipeline(
-		@NonNull final GLManager manager, @NonNull final Callback callback,
+		@NonNull final GLManager manager,
+		@Nullable final Object surface, @Nullable final Fraction maxFps)
+		throws IllegalStateException, IllegalArgumentException {
+
+		this(manager,  GLDrawer2D.DEFAULT_FACTORY, surface, maxFps);
+	}
+
+	/**
+	 * コンストラクタ
+	 * 明示的に#setSurfaceでSurfaceを指定しない場合、GLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * @param manager
+	 * @param drawerFactory
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public DrawerPipeline(
+		@NonNull final GLManager manager, @NonNull final GLDrawer2D.DrawerFactory drawerFactory)
+		throws IllegalStateException, IllegalArgumentException {
+
+		this(manager,  drawerFactory, null, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * surfaceがnullの場合、明示的に#setSurfaceでSurfaceを指定しなければGLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
+	 * @param manager
+	 * @param drawerFactory
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public DrawerPipeline(
+		@NonNull final GLManager manager,
+		@NonNull final GLDrawer2D.DrawerFactory drawerFactory,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -147,7 +155,7 @@ public class DrawerPipeline extends ProxyPipeline
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
-		mCallback = callback;
+		mDrawerFactory = drawerFactory;
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
 		});
@@ -286,10 +294,11 @@ public class DrawerPipeline extends ProxyPipeline
 		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 			if (mDrawer != null) {
-				mCallback.releaseDrawer(mDrawer);
+				mDrawer.release();
+				mDrawer = null;
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = mCallback.createDrawer(isGLES3, isOES);
+			mDrawer = mDrawerFactory.create(isGLES3, isOES);
 			mDrawer.setMirror(MIRROR_VERTICAL);
 		}
 		if (mDrawOnly && (mOffscreenSurface != null)
@@ -336,7 +345,7 @@ public class DrawerPipeline extends ProxyPipeline
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
 				if (mDrawer != null) {
-					mCallback.releaseDrawer(mDrawer);
+					mDrawer.release();
 					mDrawer = null;
 				}
 			});
@@ -350,7 +359,10 @@ public class DrawerPipeline extends ProxyPipeline
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		mManager.runOnGLThread(() -> {
 			if (DEBUG) Log.v(TAG, "resize#run:");
-			mCallback.onResize(mDrawer, width, height);
+			if (mDrawer != null) {
+				mDrawer.release();
+				mDrawer = null;
+			}
 		});
 	}
 
@@ -377,9 +389,9 @@ public class DrawerPipeline extends ProxyPipeline
 						mLock.unlock();
 					}
 					if (mDrawer != null) {
-						mCallback.releaseDrawer(mDrawer);
+						mDrawer.release();
+						mDrawer = null;
 					}
-					mDrawer = null;
 				});
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
