@@ -135,7 +135,7 @@ class UsbPermissionFragment : BaseFragment() {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device.deviceName}")
 			// USB機器が接続された時
 			// ここはActivityのコンテキスト内だから直接UsbPermission#requestPermissionを呼び出してもOK
-			// サーバイスのコンテキストやアプリケーションコンテキストなどどのコンテキストかわからない場合を
+			// サービスのコンテキストやアプリケーションコンテキストなどどのコンテキストかわからない場合を
 			// 想定してローカルブロードキャストでActivityへIntentを送って処理して貰う
 			// XXX Activityのコンテキスト以外からパーミッション要求等のシステムダイアログ/システムUIが
 			//     表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合がある
