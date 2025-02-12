@@ -106,7 +106,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	private final Callback mCallback;
 
 	@Nullable
-	private final UsbPermission mPermissionUtils;
+	private final UsbPermission mUsbPermission;
 
 	/**
 	 * コンストラクタ
@@ -118,7 +118,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 		super(context, callback);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mCallback = callback;
-		mPermissionUtils = new UsbPermission(context, callback, getHandler());
+		mUsbPermission = new UsbPermission(context, callback, getHandler());
 	}
 
 	/**
@@ -128,7 +128,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	@Override
 	public void release() {
 		if (DEBUG) Log.i(TAG, "release:");
-		mPermissionUtils.release();
+		mUsbPermission.release();
 		unregister();
 		if (!isReleased()) {
 			// モニターしているUSB機器を全てcloseする
@@ -188,7 +188,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	public boolean requestPermission(@Nullable final UsbDevice device)
 		throws IllegalStateException {
 
-		return mPermissionUtils.requestPermission(device);
+		return mUsbPermission.requestPermission(device);
 	}
 
 	/**
@@ -249,7 +249,7 @@ public final class USBMonitor extends UsbDetector implements Const {
 	@Override
 	protected void onReceive(final Context context, final Intent intent) {
 		super.onReceive(context, intent);
-		mPermissionUtils.onReceive(context, intent);
+		mUsbPermission.onReceive(context, intent);
 	}
 
 //--------------------------------------------------------------------------------
