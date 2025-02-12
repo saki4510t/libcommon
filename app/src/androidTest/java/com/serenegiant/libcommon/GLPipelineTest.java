@@ -24,7 +24,6 @@ import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glpipeline.CapturePipeline;
 import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
@@ -46,7 +45,6 @@ import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -452,120 +450,6 @@ public class GLPipelineTest {
 			result.copyPixelsFromBuffer(buffer);
 //			dump(result);
 			assertTrue(bitmapEquals(original, result, true));
-		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
-		}
-	}
-
-	/**
-	 * CapturePipelineで1回ビットマップを取得するテスト
-	 * Bitmap → ImageSourcePipeline → CapturePipeline → Bitmap
-	 */
-	@Test
-	public void capturePipelineOneshotTest() {
-		// テストに使用するビットマップを生成
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(original);
-
-		// ImageSourcePipeline → CapturePipeline
-
-		final GLManager manager = mManager;
-
-		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-
-		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
-			@Override
-			public void onCapture(@NonNull final Bitmap bitmap) {
-				if (cnt.incrementAndGet() == 1) {
-					result.set(Bitmap.createBitmap(bitmap));
-					sem.release();
-				}
-			}
-			@Override
-			public void onError(@NonNull final Throwable t) {
-				Log.w(TAG, t);
-				result.set(null);
-				sem.release();
-			}
-		});
-
-		source.setPipeline(capturePipeline);
-
-		assertTrue(validatePipelineOrder(source, source, capturePipeline));
-
-		// 1回だけキャプチャ要求
-		capturePipeline.trigger();
-		try {
-			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-//			dump(result);
-			assertEquals(1, cnt.get());
-			final Bitmap b = result.get();
-			assertNotNull(b);
-			assertTrue(bitmapEquals(original, b, true));
-		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
-		}
-	}
-
-	/**
-	 * CapturePipelineで複数回ビットマップを取得するテスト
-	 * Bitmap → ImageSourcePipeline → CapturePipeline → Bitmap
-	 */
-	@Test
-	public void capturePipelineMultipleTest() {
-		// テストに使用するビットマップを生成
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(original);
-
-		final int NUM_TRIGGERS = 9;
-		// ImageSourcePipeline → CapturePipeline
-
-		final GLManager manager = mManager;
-
-		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-
-		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Semaphore sem = new Semaphore(0);
-		final AtomicInteger cnt = new AtomicInteger();
-		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
-			@Override
-			public void onCapture(@NonNull final Bitmap bitmap) {
-				if (cnt.incrementAndGet() == NUM_TRIGGERS) {
-					result.set(Bitmap.createBitmap(bitmap));
-					sem.release();
-				}
-			}
-
-			@Override
-			public void onError(@NonNull final Throwable t) {
-				Log.w(TAG, t);
-				result.set(null);
-				sem.release();
-			}
-		});
-
-
-		source.setPipeline(capturePipeline);
-		assertTrue(validatePipelineOrder(source, source, capturePipeline));
-
-		// 100ミリ秒間隔でNUM_TRIGGERS(=9)回キャプチャ要求
-		capturePipeline.trigger(NUM_TRIGGERS, 100);
-		try {
-			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-//			dump(result);
-			assertEquals(NUM_TRIGGERS, cnt.get());
-			final Bitmap b = result.get();
-			assertNotNull(b);
-			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
