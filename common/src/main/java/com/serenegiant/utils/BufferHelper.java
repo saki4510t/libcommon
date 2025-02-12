@@ -293,8 +293,9 @@ public class BufferHelper {
 	 * @param bytes
 	 * @return
 	 */
-	public static String toHexString(@NonNull final byte[] bytes) {
-		return toHexString(bytes, 0, bytes.length);
+	@NonNull
+	public static String toHexString(@Nullable final byte[] bytes) {
+		return toHexString(bytes, 0, bytes != null ? bytes.length : 0);
 	}
 
 	/**
@@ -304,9 +305,12 @@ public class BufferHelper {
 	 * @param len 出力する最大バイト数
 	 * @return
 	 */
-	public static String toHexString(final byte[] bytes,
+	@NonNull
+	public static String toHexString(
+		@Nullable final byte[] bytes,
 		final int offset, final int len) {
 
+		if ((bytes == null) || (len == 0)) return "";
 		final int n = (bytes != null) ? bytes.length : 0;
 		final int m = Math.min(n, offset + len);
 		final StringBuilder sb = new StringBuilder(n * 2 + 2);
