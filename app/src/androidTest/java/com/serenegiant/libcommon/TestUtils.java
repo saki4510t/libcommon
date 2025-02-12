@@ -21,22 +21,32 @@ package com.serenegiant.libcommon;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
+import android.opengl.GLES20;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
+import com.serenegiant.glutils.GLImageReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import static com.serenegiant.gl.GLConst.GL_TEXTURE_2D;
+import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 public class TestUtils {
 	private static final String TAG = TestUtils.class.getSimpleName();
@@ -227,6 +237,86 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		return ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 	}
+
+	/**
+	 * GLImageReceiverで映像をテクスチャとして受け取ってGLSurface.wrapで
+	 * バックバッファとしてアクセスできるようにラップしてglReadPixelsで
+	 * ByteBufferへ書き込むためのSurfaceを生成する
+	 * Surface -> GLImageReceiver
+	 * 				-> GLSurface.wrap -> glReadPixels -> ByteBuffer
+	 * @param manager
+	 * @param width
+	 * @param height
+	 * @param numFrames
+	 * @param sem
+	 * @param buffer
+	 * @throws IllegalArgumentException bufferサイズが小さすぎる・numFramesが1未満・width/heightが2未満
+	 * @return
+	 */
+	public static Surface createGLImageReceiverSurface(
+		@NonNull final GLManager manager,
+		final int width, final int height,
+		final int numFrames,
+		@NonNull final Semaphore sem,
+		@NonNull final ByteBuffer buffer) throws IllegalArgumentException {
+
+		if (numFrames < 1) {
+			throw new IllegalArgumentException("numFrames is too small, must be more than 0");
+		}
+		if ((width < 2) || (height < 2)) {
+			throw new IllegalArgumentException("width and or height is too small, must be more than or equals 2");
+		}
+		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+		if (buffer.capacity() < bytes) {
+			throw new IllegalArgumentException("buffer capacity is too small");
+		}
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLImageReceiver receiver = new GLImageReceiver(
+			manager, false,
+			width, height,
+			new GLImageReceiver.Callback() {
+				@Override
+				public void onInitialize() {
+				}
+
+				@Override
+				public void onRelease() {
+				}
+
+				@Override
+				public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
+				}
+
+				@Override
+				public void onReleaseInputSurface(@NonNull final Surface surface) {
+				}
+
+				@Override
+				public void onResize(final int width, final int height) {
+				}
+
+				@Override
+				public void onFrameAvailable(
+					final boolean isGLES3, final boolean isOES,
+					final int width, final int height,
+					final int texId, @NonNull final float[] texMatrix) {
+
+					if (cnt.incrementAndGet() == numFrames) {
+						// GLSurfaceを経由してテクスチャを読み取る
+						// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
+						final GLSurface surface = GLSurface.wrap(isGLES3,
+							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+							GLES20.GL_TEXTURE4, texId, width, height, false);
+						surface.makeCurrent();
+						final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
+						sem.release();
+					}
+				}
+			}
+		);
+		return receiver.getSurface();
+	}
+
 //--------------------------------------------------------------------------------
 // テストに使うダミーのクラス
 //--------------------------------------------------------------------------------
