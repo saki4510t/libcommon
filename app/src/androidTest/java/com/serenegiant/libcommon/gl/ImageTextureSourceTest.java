@@ -37,12 +37,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -58,23 +60,65 @@ public class ImageTextureSourceTest {
 	private static final int MAX_FRAMES = 50;
 	private static final long MAX_WAIT_MS = 20000L;
 
+	@Nullable
+	private GLManager mManager;
+
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		mManager = new GLManager();
+		assertTrue(mManager.isValid());
+		mManager.getEgl();
+		assertEquals(1, mManager.getMasterWidth());
+		assertEquals(1, mManager.getMasterHeight());
 	}
 
 	@After
 	public void cleanUp() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		if (mManager != null) {
+			mManager.release();
+			mManager = null;
+		}
 	}
 
 	@Test
-	public void imageTextureSourceTest() {
+	public void imageTextureSourceTest1() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final GLManager manager = new GLManager();
+		final GLManager manager = mManager;
+
+		// 映像受け取り用にGLImageReceiverを生成
+		final Semaphore sem = new Semaphore(0);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
+		final Surface surface = createGLImageReceiverSurface(
+			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, buffer);
+		assertNotNull(surface);
+
+		// 映像ソース用にImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(30));
+		// 映像受け取り用Surfaceをセット
+		source.setSurface(surface);
+		try {
+			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, result));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
+
+	@Test
+	public void imageTextureSourceTest2() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
 
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
@@ -115,75 +159,74 @@ public class ImageTextureSourceTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
+			fail();
 		}
 	}
 
 	@Test
 	public void frameRate5Test() {
-		frameRate(5);
+		frameRate(mManager, 5);
 	}
 
 	@Test
 	public void frameRate10Test() {
-		frameRate(10);
+		frameRate(mManager, 10);
 	}
 
 	@Test
 	public void frameRate15Test() {
-		frameRate(15);
+		frameRate(mManager, 15);
 	}
 
 	@Test
 	public void frameRate20Test() {
-		frameRate(20);
+		frameRate(mManager, 20);
 	}
 
 	@Test
 	public void frameRate24Test() {
-		frameRate(24);
+		frameRate(mManager, 24);
 	}
 
 	@Test
 	public void frameRate30Test() {
-		frameRate(30);
+		frameRate(mManager, 30);
 	}
 
 	@Test
 	public void frameRate33Test() {
-		frameRate(33);
+		frameRate(mManager, 33);
 	}
 
 	@Test
 	public void frameRate35Test() {
-		frameRate(35);
+		frameRate(mManager, 35);
 	}
 
 	@Test
 	public void frameRate45Test() {
-		frameRate(45);
+		frameRate(mManager, 45);
 	}
 
 	@Test
 	public void frameRate50Test() {
-		frameRate(50);
+		frameRate(mManager, 50);
 	}
 
 	@Test
 	public void frameRate60Test() {
-		frameRate(60);
+		frameRate(mManager, 60);
 	}
 
 	/**
 	 * フレームレートを指定して想定通りのフレームレート±10%になるかどうかを確認
+	 * @param manager
 	 * @param requestFps
 	 */
-	private static void frameRate(final int requestFps) {
+	private static void frameRate(@NonNull final GLManager manager, final int requestFps) {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
-
-		final GLManager manager = new GLManager();
 
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
@@ -232,7 +275,7 @@ public class ImageTextureSourceTest {
 			// フレームレートが指定値の±10%以内にはいっているかどうか
 			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
 		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
+			fail();
 		}
 	}
 }

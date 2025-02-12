@@ -38,6 +38,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -68,6 +69,41 @@ public class GLImageReceiverTest {
 	}
 
 	/**
+	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLImageReceiverで
+	 * 読み取れることを検証
+	 * Bitmap -> inputImagesAsync
+	 * 				↓
+	 * 				Surface -> GLImageReceiver
+	 * 							-> GLSurface.wrap -> glReadPixels -> ByteBuffer
+	 */
+	@Test
+	public void surfaceReaderTest1() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = new GLManager();
+		final Semaphore sem = new Semaphore(0);
+		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
+		// 映像受け取り用にSurfaceReaderを生成
+		final Surface surface = createGLImageReceiverSurface(
+			manager, WIDTH, HEIGHT, 10, sem, buffer);
+		assertNotNull(surface);
+		inputImagesAsync(original, surface, 10);
+
+		try {
+			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
+			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+			result.copyPixelsFromBuffer(buffer);
+			assertNotNull(result);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, result));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
+
+	/**
 	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLImageReceiver
 	 * (とGLBitmapImageReader)で読み取れることを検証
 	 * Bitmap -> inputImagesAsync
@@ -76,7 +112,7 @@ public class GLImageReceiverTest {
 	 * 							-> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
-	public void surfaceReaderTest() {
+	public void surfaceReaderTest2() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -117,7 +153,7 @@ public class GLImageReceiverTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
-			Log.d(TAG, "interrupted", e);
+			fail();
 		}
 	}
 
