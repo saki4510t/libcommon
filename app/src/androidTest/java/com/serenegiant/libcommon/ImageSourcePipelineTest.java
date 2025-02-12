@@ -52,6 +52,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import static com.serenegiant.libcommon.TestUtils.allocateBuffer;
 import static com.serenegiant.libcommon.TestUtils.bitmapEquals;
+import static com.serenegiant.libcommon.TestUtils.validatePipelineOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
@@ -92,8 +93,12 @@ public class ImageSourcePipelineTest {
 	}
 
 	/**
-	 * ImageSourceパイプラインが正常に映像ソースとして動作するかどうかを検証
+	 * ImageSourcePipelineが正常に映像ソースとして動作するかどうかを検証
 	 * こっちはOnFramePipelineを経由してGLBitmapImageReaderで映像を受け取る
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ OnFramePipeline
+	 * 				↓
+	 * 				コールバック → GLBitmapImageReader → Bitmap
 	 */
 	@Test
 	public void imageSourceTest1() {
@@ -128,6 +133,7 @@ public class ImageSourcePipelineTest {
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		final OnFramePipeline pipeline = new OnFramePipeline(reader);
 		source.setPipeline(pipeline);
+		assertTrue(validatePipelineOrder(source, source, pipeline));
 
 		try {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
@@ -144,8 +150,10 @@ public class ImageSourcePipelineTest {
 	}
 
 	/**
-	 * ImageSourceパイプラインが正常に映像ソースとして動作するかどうかを検証
+	 * ImageSourcePipelineが正常に映像ソースとして動作するかどうかを検証
 	 * こっちはProxyPipelineを経由して映像を受け取る
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void imageSourceTest2() {
@@ -181,6 +189,8 @@ public class ImageSourcePipelineTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		source.setPipeline(proxy);
+		assertTrue(validatePipelineOrder(source, source, proxy));
+
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));

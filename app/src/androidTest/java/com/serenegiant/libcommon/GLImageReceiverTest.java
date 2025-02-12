@@ -68,12 +68,15 @@ public class GLImageReceiverTest {
 	}
 
 	/**
-	 * inputImagesAsyncでCanvasを経由して書き込んだBitmapをGLImageReceiver(とGLBitmapImageReader)で
-	 * 読み取れることを検証
-	 * Bitmap -> inputImagesAsync -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLImageReceiver
+	 * (とGLBitmapImageReader)で読み取れることを検証
+	 * Bitmap -> inputImagesAsync
+	 * 				↓
+	 * 				Surface -> GLImageReceiver
+	 * 							-> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
-	public void surfaceReadTest() {
+	public void surfaceReaderTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -122,8 +125,10 @@ public class GLImageReceiverTest {
 	 * ImageSourcePipelineからの映像ソースをSurfaceRendererPipelineでテクスチャとして受け取って
 	 * GLImageReceiverのSurfaceへ書き込んでGLBitmapImageReaderでビットマップへ変換して
 	 * 読み取れることを検証
-	 * Bitmap -> ImageSourcePipeline -> SurfaceRendererPipeline
-	 * 			-> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * Bitmap -> ImageSourcePipeline
+	 * 				-> SurfaceRendererPipeline
+	 * 					↓
+	 * 					-> Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
 	public void pipelineReaderTest() {
@@ -164,6 +169,7 @@ public class GLImageReceiverTest {
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 		renderer.setSurface(surface);
+		assertTrue(validatePipelineOrder(source, source, renderer));
 
 		try {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));

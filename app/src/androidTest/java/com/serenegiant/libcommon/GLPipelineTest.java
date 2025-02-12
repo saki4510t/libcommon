@@ -87,6 +87,11 @@ public class GLPipelineTest {
 
 	/**
 	 * DistributePipelineで複数のGLPipelineへの分配処理が動作するかどうかを検証
+	 * Bitmap → ImageSourcePipeline
+	 * 				→ DistributePipeline
+	 * 					↓
+	 * 					→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
+	 * 					→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void distributePipelineTest() {
@@ -174,9 +179,14 @@ public class GLPipelineTest {
 	}
 
 	/**
-	 * ImageSourceからの映像をSurfacePipelineでSurfaceへ転送
-	 * SurfacePipelineをカメラ等の映像限とみなしてVideoSourceで映像ソースとして
+	 * ImageSourcePipelineからの映像をSurfaceRendererPipelineでSurfaceへ転送
+	 * Surfaceの映像をカメラ等のからの映像とみなしてVideoSourcePipelineで映像ソースとして
 	 * 供給できるかどうかを検証
+	 * Bitmap → ImageSourcePipeline
+	 * 		→ SurfaceRendererPipeline
+	 * 			↓
+	 * 			Surface → VideoSourcePipeline
+	 * 						→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfacePipelineVideoSourcePipelineTest() {
@@ -184,8 +194,6 @@ public class GLPipelineTest {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
-
-		// ImageSourcePipeline - SurfaceRendererPipeline → (Surface) → VideoSourcePipeline - ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = mManager;
 
@@ -255,6 +263,9 @@ public class GLPipelineTest {
 	/**
 	 * EffectPipelineが動作するかどうかを検証
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ EffectPipeline
+	 * 				→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void effectPipelineTest1() {
@@ -263,14 +274,12 @@ public class GLPipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		// ImageSourcePipeline - EffectPipeline → ProxyPipeline → テクスチャ読み取り
-
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final EffectPipeline effectPipeline1 = new EffectPipeline(manager);
+		final EffectPipeline effectPipeline = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
 		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
@@ -296,10 +305,10 @@ public class GLPipelineTest {
 			}
 		};
 
-		source.setPipeline(effectPipeline1);
-		effectPipeline1.setPipeline(proxy);
+		source.setPipeline(effectPipeline);
+		effectPipeline.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, effectPipeline1, proxy));
+		assertTrue(validatePipelineOrder(source, source, effectPipeline, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -314,8 +323,12 @@ public class GLPipelineTest {
 	}
 
 	/**
-	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
+	 * EffectPipelineを2つ連結処理したときに想定通りに動作になるかどうかを検証
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ EffectPipeline
+	 * 				→ EffectPipeline
+	 * 					→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void effectPipelineTest2() {
@@ -323,8 +336,6 @@ public class GLPipelineTest {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
-
-		// ImageSourcePipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = mManager;
 
@@ -378,8 +389,13 @@ public class GLPipelineTest {
 	}
 
 	/**
-	 * EffectPipelineを複数連結理をしたときに想定通りに動作になるかどうかを検証
+	 * EffectPipelineを3つ連結処理したときに想定通りに動作になるかどうかを検証
 	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ EffectPipeline
+	 * 				→ EffectPipeline
+	 * 					→ EffectPipeline
+	 * 						→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void effectPipelineTest3() {
@@ -387,8 +403,6 @@ public class GLPipelineTest {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
-
-		// ImageSourcePipeline → EffectPipeline → EffectPipeline → EffectPipeline → ProxyPipeline → テクスチャ読み取り
 
 		final GLManager manager = mManager;
 
@@ -443,6 +457,10 @@ public class GLPipelineTest {
 		}
 	}
 
+	/**
+	 * CapturePipelineで1回ビットマップを取得するテスト
+	 * Bitmap → ImageSourcePipeline → CapturePipeline → Bitmap
+	 */
 	@Test
 	public void capturePipelineOneshotTest() {
 		// テストに使用するビットマップを生成
@@ -471,6 +489,7 @@ public class GLPipelineTest {
 			@Override
 			public void onError(@NonNull final Throwable t) {
 				Log.w(TAG, t);
+				result.set(null);
 				sem.release();
 			}
 		});
@@ -479,6 +498,7 @@ public class GLPipelineTest {
 
 		assertTrue(validatePipelineOrder(source, source, capturePipeline));
 
+		// 1回だけキャプチャ要求
 		capturePipeline.trigger();
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
@@ -493,6 +513,10 @@ public class GLPipelineTest {
 		}
 	}
 
+	/**
+	 * CapturePipelineで複数回ビットマップを取得するテスト
+	 * Bitmap → ImageSourcePipeline → CapturePipeline → Bitmap
+	 */
 	@Test
 	public void capturePipelineMultipleTest() {
 		// テストに使用するビットマップを生成
@@ -523,15 +547,16 @@ public class GLPipelineTest {
 			@Override
 			public void onError(@NonNull final Throwable t) {
 				Log.w(TAG, t);
+				result.set(null);
 				sem.release();
 			}
 		});
 
 
 		source.setPipeline(capturePipeline);
-
 		assertTrue(validatePipelineOrder(source, source, capturePipeline));
 
+		// 100ミリ秒間隔でNUM_TRIGGERS(=9)回キャプチャ要求
 		capturePipeline.trigger(NUM_TRIGGERS, 100);
 		try {
 			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
