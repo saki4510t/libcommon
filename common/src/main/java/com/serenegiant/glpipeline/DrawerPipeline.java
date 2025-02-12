@@ -89,22 +89,6 @@ public class DrawerPipeline extends ProxyPipeline
 	 * surfaceがnullの場合、明示的に#setSurfaceでSurfaceを指定しなければGLDrawer2Dで描画した映像を次のパイプラインへ送る
 	 * @param manager
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
-	 * @throws IllegalStateException
-	 * @throws IllegalArgumentException
-	 */
-	public DrawerPipeline(
-		@NonNull final GLManager manager,
-		@Nullable final Object surface)
-		throws IllegalStateException, IllegalArgumentException {
-
-		this(manager,  GLDrawer2D.DEFAULT_FACTORY, surface, null);
-	}
-
-	/**
-	 * コンストラクタ
-	 * surfaceがnullの場合、明示的に#setSurfaceでSurfaceを指定しなければGLDrawer2Dで描画した映像を次のパイプラインへ送る
-	 * @param manager
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException

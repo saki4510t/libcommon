@@ -48,6 +48,8 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 
 	@NonNull
 	private final GLManager mManager;
+	@NonNull
+	private final GLDrawer2D.DrawerFactory mDrawerFactory;
 
 	@Nullable
 	private GLDrawer2D mDrawer;
@@ -63,15 +65,16 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public SurfaceRendererPipeline(@NonNull final GLManager manager)
+	public SurfaceRendererPipeline(
+		@NonNull final GLManager manager)
 			throws IllegalStateException, IllegalArgumentException {
-		this(manager, null, null);
+		this(manager, GLDrawer2D.DEFAULT_FACTORY, null, null);
 	}
 
 	/**
 	 * コンストラクタ
-	 * @param manager
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
+	 * @param manager
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
@@ -79,6 +82,24 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	 */
 	public SurfaceRendererPipeline(
 		@NonNull final GLManager manager,
+		@Nullable final Object surface, @Nullable final Fraction maxFps)
+		throws IllegalStateException, IllegalArgumentException {
+		this(manager, GLDrawer2D.DEFAULT_FACTORY, surface, maxFps);
+	}
+
+	/**
+	 * コンストラクタ
+	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
+	 * @param manager
+	 * @param drawerFactory
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public SurfaceRendererPipeline(
+		@NonNull final GLManager manager,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -88,6 +109,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
+		mDrawerFactory = drawerFactory;
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
 		});
@@ -216,7 +238,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 					mDrawer.release();
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-				mDrawer = GLDrawer2D.create(mManager.isGLES3(), isOES);
+				mDrawer = mDrawerFactory.create(isGLES3, isOES);
 			}
 			@NonNull
 			final GLDrawer2D drawer = mDrawer;
