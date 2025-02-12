@@ -32,6 +32,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
+import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glutils.GLImageReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
@@ -242,7 +243,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	/**
 	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
 	 * Bitmapを受け取るためのSurfaceを生成する
-	 * Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * Surface → GLImageReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param width
 	 * @param height
@@ -264,7 +265,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	/**
 	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
 	 * Bitmapを受け取るためのSurfaceを生成する
-	 * Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * Surface → GLImageReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param width
 	 * @param height
@@ -333,7 +334,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
 						final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-						bitmap.copyPixelsFromBuffer(buffer);
+						bitmap.copyPixelsFromBuffer(buf);
 						result.set(bitmap);
 						sem.release();
 					}
@@ -342,6 +343,76 @@ LOOP:		for (int y = 0; y < height; y++) {
 		);
 
 		return receiver.getSurface();
+	}
+
+	/**
+	 * 映像をテクスチャとして受け取ってBitmapを受け取るためのProxyPipelineを生成する
+	 * ProxyPipeline -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * @param width
+	 * @param height
+	 * @param numFrames
+	 * @param sem
+	 * @param result
+	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
+	 * @return
+	 */
+	public static GLPipeline createImageReceivePipeline(
+		final int width, final int height,
+		final int numFrames,
+		@NonNull final Semaphore sem,
+		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
+		return createImageReceivePipeline(width, height, numFrames, sem, result, new AtomicInteger());
+	}
+
+	/**
+	 * 映像をテクスチャとして受け取ってBitmapを受け取るためのProxyPipelineを生成する
+	 * ProxyPipeline -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * @param width
+	 * @param height
+	 * @param numFrames
+	 * @param sem
+	 * @param result
+	 * @param cnt
+	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
+	 * @return
+	 */
+	public static GLPipeline createImageReceivePipeline(
+		final int width, final int height,
+		final int numFrames,
+		@NonNull final Semaphore sem,
+		@NonNull final AtomicReference<Bitmap> result,
+		@NonNull final AtomicInteger cnt) throws IllegalArgumentException {
+
+		if (numFrames < 1) {
+			throw new IllegalArgumentException("numFrames is too small, must be more than 0");
+		}
+		if ((width < 2) || (height < 2)) {
+			throw new IllegalArgumentException("width and or height is too small, must be more than or equals 2");
+		}
+		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+		final ByteBuffer buffer = allocateBuffer(width, height);
+		return new ProxyPipeline(width, height) {
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3,
+				final boolean isOES, final int texId,
+				@NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				if (cnt.incrementAndGet() == numFrames) {
+					// GLSurfaceを経由してテクスチャを読み取る
+					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
+					final GLSurface surface = GLSurface.wrap(isGLES3,
+						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
+						GLES20.GL_TEXTURE4, texId, width, height, false);
+					surface.makeCurrent();
+					final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
+					final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+					bitmap.copyPixelsFromBuffer(buf);
+					result.set(bitmap);
+					sem.release();
+				}
+			}
+		};
 	}
 
 //--------------------------------------------------------------------------------
