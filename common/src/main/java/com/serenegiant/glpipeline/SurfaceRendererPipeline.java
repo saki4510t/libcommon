@@ -35,6 +35,8 @@ import androidx.annotation.WorkerThread;
 
 /**
  * テクスチャが更新されたときにSurfaceへ転送するGLPipeline実装
+ * このクラスは他のGLSurfacePipelineインターフェース実装クラスと異なり、
+ * アップストリームからのテクスチャを変更せずそのまま次のパイプランへ送る
  * パイプライン → SurfaceRendererPipeline (→ パイプライン)
  *                → Surface
  */
