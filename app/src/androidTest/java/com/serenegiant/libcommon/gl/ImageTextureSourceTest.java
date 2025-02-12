@@ -37,7 +37,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -92,9 +91,9 @@ public class ImageTextureSourceTest {
 
 		// 映像受け取り用にGLImageReceiverを生成
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Surface surface = createGLImageReceiverSurface(
-			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, buffer);
+			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result);
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
@@ -103,10 +102,10 @@ public class ImageTextureSourceTest {
 		source.setSurface(surface);
 		try {
 			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
+			final Bitmap resultBitmap = result.get();
+			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
 		}

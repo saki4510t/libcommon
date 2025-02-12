@@ -41,6 +41,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -239,18 +240,16 @@ LOOP:		for (int y = 0; y < height; y++) {
 	}
 
 	/**
-	 * GLImageReceiverで映像をテクスチャとして受け取ってGLSurface.wrapで
-	 * バックバッファとしてアクセスできるようにラップしてglReadPixelsで
-	 * ByteBufferへ書き込むためのSurfaceを生成する
-	 * Surface -> GLImageReceiver
-	 * 				-> GLSurface.wrap -> glReadPixels -> ByteBuffer
+	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
+	 * Bitmapを受け取るためのSurfaceを生成する
+	 * Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
 	 * @param manager
 	 * @param width
 	 * @param height
 	 * @param numFrames
 	 * @param sem
-	 * @param buffer
-	 * @throws IllegalArgumentException bufferサイズが小さすぎる・numFramesが1未満・width/heightが2未満
+	 * @param result
+	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
 	 * @return
 	 */
 	public static Surface createGLImageReceiverSurface(
@@ -258,7 +257,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final int width, final int height,
 		final int numFrames,
 		@NonNull final Semaphore sem,
-		@NonNull final ByteBuffer buffer) throws IllegalArgumentException {
+		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
 
 		if (numFrames < 1) {
 			throw new IllegalArgumentException("numFrames is too small, must be more than 0");
@@ -267,9 +266,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 			throw new IllegalArgumentException("width and or height is too small, must be more than or equals 2");
 		}
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-		if (buffer.capacity() < bytes) {
-			throw new IllegalArgumentException("buffer capacity is too small");
-		}
+		final ByteBuffer buffer = allocateBuffer(width, height);
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLImageReceiver receiver = new GLImageReceiver(
 			manager, false,
@@ -281,6 +278,9 @@ LOOP:		for (int y = 0; y < height; y++) {
 
 				@Override
 				public void onRelease() {
+					if (sem.availablePermits() == 0) {
+						sem.release();
+					}
 				}
 
 				@Override
@@ -309,11 +309,15 @@ LOOP:		for (int y = 0; y < height; y++) {
 							GLES20.GL_TEXTURE4, texId, width, height, false);
 						surface.makeCurrent();
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
+						final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+						bitmap.copyPixelsFromBuffer(buffer);
+						result.set(bitmap);
 						sem.release();
 					}
 				}
 			}
 		);
+
 		return receiver.getSurface();
 	}
 

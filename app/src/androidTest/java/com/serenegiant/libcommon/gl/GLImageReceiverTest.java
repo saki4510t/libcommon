@@ -38,7 +38,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -84,20 +83,18 @@ public class GLImageReceiverTest {
 
 		final GLManager manager = new GLManager();
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		// 映像受け取り用にSurfaceReaderを生成
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Surface surface = createGLImageReceiverSurface(
-			manager, WIDTH, HEIGHT, 10, sem, buffer);
+			manager, WIDTH, HEIGHT, 10, sem, result);
 		assertNotNull(surface);
 		inputImagesAsync(original, surface, 10);
 
 		try {
 			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-			assertNotNull(result);
+			final Bitmap resultBitmap = result.get();
+			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result));
+			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
 		}
