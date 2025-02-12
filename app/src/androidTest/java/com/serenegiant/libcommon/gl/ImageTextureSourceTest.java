@@ -24,13 +24,9 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glutils.GLImageReceiver;
-import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import org.junit.After;
 import org.junit.Before;
@@ -180,27 +176,8 @@ public class ImageTextureSourceTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger numFrames = new AtomicInteger();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (numFrames.incrementAndGet() == MAX_FRAMES) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface surface = receiver.getSurface();
+		final Surface surface = createGLImageReceiverSurface(
+			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result, numFrames);
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成

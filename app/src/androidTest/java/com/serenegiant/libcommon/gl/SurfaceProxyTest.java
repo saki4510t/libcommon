@@ -23,12 +23,9 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.glutils.GLImageReceiver;
-import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.ImageReader;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.SurfaceProxy;
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,7 +37,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -66,10 +62,9 @@ public class SurfaceProxyTest {
 	}
 
 	/**
-	 * SurfaceProxyReaderWriter => GLImageReceiver => GLBitmapImageReaderと接続して
+	 * SurfaceProxyReaderWriter => GLImageReceiverと接続して
 	 * SurfaceProxyReaderWriterから取得したSurfaceへCanvas#drawBitmapでビットマップを
-	 * 書き込んで、書き込んだビットマップとGLBitmapImageReaderで読み込んだ
-	 * ビットマップが一致するかどうかを検証する
+	 * 書き込んで、書き込んだビットマップとで読み込んだビットマップが一致するかどうかを検証する
 	 */
 	@Test
 	public void surfaceProxyReaderWriterTest() {
@@ -83,34 +78,12 @@ public class SurfaceProxyTest {
 		final Surface inputSurface = proxy.getInputSurface();
 		assertNotNull(inputSurface);
 
-		// 映像読み取り用にSurfaceReaderを準備
+		// 映像受け取り用にGLImageReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() >= (int)(MAX_IMAGES * 0.9f)) {
-							proxy.setSurface(null);
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface receiverSurface = receiver.getSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface receiverSurface = createGLImageReceiverSurface(
+			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// SurfaceProxyReaderWriterへ映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);
@@ -118,7 +91,8 @@ public class SurfaceProxyTest {
 		inputImagesAsync(original, inputSurface, MAX_IMAGES);
 
 		try {
-			assertTrue(sem.tryAcquire(MAX_IMAGES * 32, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(MAX_IMAGES * 50, TimeUnit.MILLISECONDS));
+			assertEquals(MAX_IMAGES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -148,34 +122,12 @@ public class SurfaceProxyTest {
 		final Surface inputSurface = proxy.getInputSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
 		assertNotNull(inputSurface);
 
-		// 映像読み取り用にSurfaceReaderを準備
+		// 映像受け取り用にGLImageReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() >= (int)(MAX_IMAGES * 0.9f)) {
-							proxy.setSurface(null);
-							if (sem.availablePermits() == 0) {
-								result.set(Bitmap.createBitmap(bitmap));
-								sem.release();
-							}
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface receiverSurface = receiver.getSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface receiverSurface = createGLImageReceiverSurface(
+			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// プロキシに映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);
@@ -183,7 +135,8 @@ public class SurfaceProxyTest {
 		inputImagesAsync(original, inputSurface, MAX_IMAGES);
 
 		try {
-			assertTrue(sem.tryAcquire(MAX_IMAGES * 32, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(MAX_IMAGES * 50, TimeUnit.MILLISECONDS));
+			assertEquals(MAX_IMAGES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);

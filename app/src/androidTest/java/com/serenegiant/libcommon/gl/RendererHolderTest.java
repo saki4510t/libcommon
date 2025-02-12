@@ -24,15 +24,11 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glutils.GLImageReceiver;
-import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import org.junit.After;
 import org.junit.Before;
@@ -44,7 +40,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -78,28 +73,9 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() == 5) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface readerSurface = receiver.getSurface();
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface readerSurface = createGLImageReceiverSurface(
+			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// 映像ソースとしてStaticTextureSourceを生成
@@ -116,6 +92,7 @@ public class RendererHolderTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertEquals(5, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -138,28 +115,9 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() == 5) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface readerSurface = receiver.getSurface();
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface readerSurface = createGLImageReceiverSurface(
+			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// 映像ソースとしてImageTextureSourceを生成
@@ -176,6 +134,7 @@ public class RendererHolderTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertEquals(5, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -198,28 +157,9 @@ public class RendererHolderTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
 		final AtomicInteger cnt = new AtomicInteger();
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() == 5) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface readerSurface = receiver.getSurface();
+		final Surface readerSurface = createGLImageReceiverSurface(
+			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// テストするRendererHolderを生成
@@ -237,6 +177,7 @@ public class RendererHolderTest {
 			try {
 				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 				assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+				assertEquals(5, cnt.get());
 				final Bitmap b = result.get();
 	//			dump(b);
 				assertNotNull(b);
@@ -262,6 +203,7 @@ public class RendererHolderTest {
 			try {
 				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 				assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+				assertEquals(5, cnt.get());
 				final Bitmap b = result.get();
 	//			dump(b);
 				assertNotNull(b);

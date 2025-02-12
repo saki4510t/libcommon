@@ -20,17 +20,13 @@ package com.serenegiant.libcommon.glpipeline;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.DrawerPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
-import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -38,12 +34,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -94,27 +88,8 @@ public class DrawerPipelineTest {
 		final GLManager manager = mManager;
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -129,10 +104,9 @@ public class DrawerPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -152,27 +126,8 @@ public class DrawerPipelineTest {
 		final GLManager manager = mManager;
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -189,10 +144,9 @@ public class DrawerPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -212,27 +166,8 @@ public class DrawerPipelineTest {
 		final GLManager manager = mManager;
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -251,10 +186,9 @@ public class DrawerPipelineTest {
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}

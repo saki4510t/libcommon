@@ -20,7 +20,6 @@ package com.serenegiant.libcommon.glpipeline;
 
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.opengl.GLES20;
 import android.util.Log;
 import android.view.Surface;
 
@@ -29,12 +28,9 @@ import com.serenegiant.glpipeline.EffectPipeline;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
-import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -42,10 +38,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.nio.ByteBuffer;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -108,51 +103,13 @@ public class GLPipelineTest {
 		source.setPipeline(distributor);
 
 		final Semaphore sem1 = new Semaphore(0);
-		final ByteBuffer buffer1 = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline pipeline1 = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					this.remove();
-					// GLSurfaceを経由してテクスチャを読み取る
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer1, WIDTH, HEIGHT);
-					sem1.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final GLPipeline pipeline1 = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem1, result1);
 		distributor.addPipeline(pipeline1);
 
 		final Semaphore sem2 = new Semaphore(0);
-		final ByteBuffer buffer2 = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline pipeline2 = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					this.remove();
-					// GLSurfaceを経由してテクスチャを読み取る
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer2, WIDTH, HEIGHT);
-					sem2.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final GLPipeline pipeline2 = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem2, result2);
 		distributor.addPipeline(pipeline2);
 
 		try {
@@ -160,18 +117,16 @@ public class GLPipelineTest {
 			assertTrue(sem1.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			assertTrue(sem2.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result1 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result1.copyPixelsFromBuffer(buffer1);
-//			dump(result1);
+			final Bitmap resultBitmap1 = result1.get();
+//			dump(resultBitmap1);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result1, true));
+			assertTrue(bitmapEquals(original, resultBitmap1, true));
 
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result2 = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result2.copyPixelsFromBuffer(buffer2);
-//			dump(result2);
+			final Bitmap resultBitmap2 = result2.get();
+//			dump(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, result2, true));
+			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -217,28 +172,8 @@ public class GLPipelineTest {
 			});
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					source.setPipeline(null);
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはSurfaceSourcePipelineからのテクスチャなのでisOES=trueのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 		GLPipeline.append(surfaceSource, proxy);
 
 		// SurfacePipelineとSurfaceSourcePipelineの間はSurfaceを経由したやりとりだけで
@@ -249,12 +184,10 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
-			assertTrue(bitmapEquals(original, result, true));
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -282,28 +215,8 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					source.setPipeline(null);
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		source.setPipeline(effectPipeline);
 		effectPipeline.setPipeline(proxy);
@@ -313,10 +226,8 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -346,28 +257,8 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline2 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					source.setPipeline(null);
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
@@ -379,10 +270,9 @@ public class GLPipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -414,28 +304,8 @@ public class GLPipelineTest {
 		final EffectPipeline effectPipeline3 = new EffectPipeline(manager);
 
 		final Semaphore sem = new Semaphore(0);
-		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
-		final ProxyPipeline proxy = new ProxyPipeline(WIDTH, HEIGHT) {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-				if (cnt.incrementAndGet() == 30) {
-					source.setPipeline(null);
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはEffectPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
-					surface.makeCurrent();
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, WIDTH, HEIGHT);
-					sem.release();
-				}
-			}
-		};
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
 
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
@@ -447,11 +317,9 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			// パイプラインを経由して読み取った映像データをビットマップに戻す
-			final Bitmap result = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
-			result.copyPixelsFromBuffer(buffer);
-//			dump(result);
-			assertTrue(bitmapEquals(original, result, true));
+			final Bitmap resultBitmap = result.get();
+//			dump(resultBitmap);
+			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
