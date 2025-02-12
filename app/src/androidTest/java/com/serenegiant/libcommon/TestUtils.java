@@ -258,6 +258,30 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final int numFrames,
 		@NonNull final Semaphore sem,
 		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
+		return createGLImageReceiverSurface(manager, width, height, numFrames, sem, result, new AtomicInteger());
+	}
+
+	/**
+	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
+	 * Bitmapを受け取るためのSurfaceを生成する
+	 * Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * @param manager
+	 * @param width
+	 * @param height
+	 * @param numFrames
+	 * @param sem
+	 * @param result
+	 * @param cnt
+	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
+	 * @return
+	 */
+	public static Surface createGLImageReceiverSurface(
+		@NonNull final GLManager manager,
+		final int width, final int height,
+		final int numFrames,
+		@NonNull final Semaphore sem,
+		@NonNull final AtomicReference<Bitmap> result,
+		@NonNull final AtomicInteger cnt) throws IllegalArgumentException {
 
 		if (numFrames < 1) {
 			throw new IllegalArgumentException("numFrames is too small, must be more than 0");
@@ -267,7 +291,6 @@ LOOP:		for (int y = 0; y < height; y++) {
 		}
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		final ByteBuffer buffer = allocateBuffer(width, height);
-		final AtomicInteger cnt = new AtomicInteger();
 		final GLImageReceiver receiver = new GLImageReceiver(
 			manager, false,
 			width, height,
