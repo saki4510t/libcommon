@@ -26,6 +26,7 @@ import android.view.Surface;
 
 import com.serenegiant.glpipeline.DistributePipeline;
 import com.serenegiant.glpipeline.EffectPipeline;
+import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
@@ -183,11 +184,11 @@ public class GLPipelineTest {
 	 * Bitmap → ImageSourcePipeline
 	 * 		→ SurfaceRendererPipeline
 	 * 			↓
-	 * 			Surface → VideoSourcePipeline
+	 * 			Surface → SurfaceSourcePipeline
 	 * 						→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
-	public void surfacePipelineVideoSourcePipelineTest() {
+	public void imageSourceToSurfaceSourcePipelineTest() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -198,20 +199,20 @@ public class GLPipelineTest {
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 
-		final SurfaceRendererPipeline surfacePipeline = new SurfaceRendererPipeline(manager);
+		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
 		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用
-		source.setPipeline(surfacePipeline);
+		GLPipeline.append(source, renderer);
 
 		final SurfaceSourcePipeline surfaceSource = new SurfaceSourcePipeline(manager, WIDTH, HEIGHT,
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					surfacePipeline.setSurface(surface);
+					renderer.setSurface(surface);
 				}
 
 				@Override
 				public void onDestroy() {
-					surfacePipeline.setSurface(null);
+					renderer.setSurface(null);
 				}
 			});
 
@@ -238,11 +239,11 @@ public class GLPipelineTest {
 				}
 			}
 		};
-		source.setPipeline(proxy);
+		GLPipeline.append(surfaceSource, proxy);
 
 		// SurfacePipelineとSurfaceSourcePipelineの間はSurfaceを経由したやりとりだけで
 		// GLPipelineとして接続しているわけではない
-		assertTrue(validatePipelineOrder(source, source, surfacePipeline));
+		assertTrue(validatePipelineOrder(source, source, renderer));
 		assertTrue(validatePipelineOrder(surfaceSource, surfaceSource, proxy));
 
 		try {
