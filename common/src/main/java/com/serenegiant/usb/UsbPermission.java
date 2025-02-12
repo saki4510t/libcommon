@@ -119,7 +119,10 @@ public class UsbPermission extends BroadcastReceiver {
 
 	/**
 	 * コンストラクタ
-	 * @param context
+	 * @param context XXX Activity以外のコンテキストからUSBパーミッション要求等のシステムダイアログ/システムUIが
+	 *                    表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合があるので
+	 *                    Contextとしているけど可能な限りActivityを引き渡すこと。
+	 *                    (パーミッション要求しなければアプリケーションコンテキストやサービスコンテキストでもOK)
 	 * @param callback
 	 */
 	public UsbPermission(
@@ -131,7 +134,10 @@ public class UsbPermission extends BroadcastReceiver {
 
 	/**
 	 * コンストラクタ
-	 * @param context
+	 * @param context XXX Activity以外のコンテキストからUSBパーミッション要求等のシステムダイアログ/システムUIが
+	 *                    表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合があるので
+	 *                    Contextとしているけど可能な限りActivityを引き渡すこと。
+	 *                    (パーミッション要求しなければアプリケーションコンテキストやサービスコンテキストでもOK)
 	 * @param callback
 	 * @param asyncHandler
 	 */
@@ -379,8 +385,12 @@ public class UsbPermission extends BroadcastReceiver {
 	/**
 	 * パーミッションを要求する
 	 * activityClassはアプリのデフォルトActivityを使う
-	 * コールバックはしない(内部的にはDEFAULT_CALLBACKを使う)
-	 * @param context
+	 * コールバックはしない(内部的にはDEFAULT_CALLBACKを使う)ので
+	 * 結果の取得が必要であればグローバルブロードキャストを受け取ること
+	 * @param context XXX Activity以外のコンテキストからUSBパーミッション要求等のシステムダイアログ/システムUIが
+	 *                    表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合があるので
+	 *                    Contextとしているけど可能な限りActivityを引き渡すこと。
+	 *                    (パーミッション要求しなければアプリケーションコンテキストやサービスコンテキストでもOK)
 	 * @param device
 	 * @throws IllegalStateException
 	 */
@@ -394,7 +404,10 @@ public class UsbPermission extends BroadcastReceiver {
 
 	/**
 	 * パーミッションを要求する
-	 * @param context
+	 * @param context XXX Activity以外のコンテキストからUSBパーミッション要求等のシステムダイアログ/システムUIが
+	 *                    表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合があるので
+	 *                    Contextとしているけど可能な限りActivityを引き渡すこと。
+	 *                    (パーミッション要求しなければアプリケーションコンテキストやサービスコンテキストでもOK)
 	 * @param device
 	 * @param callback
 	 * @throws IllegalStateException
