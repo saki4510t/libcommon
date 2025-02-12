@@ -38,7 +38,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -82,6 +81,10 @@ public class VideoSourcePipelineTest {
 
 	/**
 	 * VideoSourcePipelineパイプラインが正常に映像ソースとして動作するかどうかを検証
+	 * Bitmap → inputImagesAsync
+	 * 				↓
+	 * 				Surface → VideoSourcePipeline
+	 * 							→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void videoSourcePipelineTest() {
@@ -141,7 +144,6 @@ public class VideoSourcePipelineTest {
 			}
 		};
 		videoSourcePipeline.setPipeline(proxy);
-
 		// 想定したとおりに接続されているかどうかを検証
 		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, proxy));
 		// 実際の映像はSurfaceを経由して映像を書き込む
