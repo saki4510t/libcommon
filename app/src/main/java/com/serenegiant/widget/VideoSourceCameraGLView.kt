@@ -31,8 +31,8 @@ import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
-import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
@@ -50,7 +50,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 	private val mCameraDelegator: CameraDelegator
 	private val mCameraRenderer: CameraRenderer
-	private var mVideoSourcePipeline: VideoSourcePipeline? = null
+	private var mSurfaceSourcePipeline: SurfaceSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 
@@ -72,7 +72,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 			@WorkerThread
 			override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
-				mVideoSourcePipeline!!.resize(width, height)
+				mSurfaceSourcePipeline!!.resize(width, height)
 				mCameraDelegator.startPreview(
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			}
@@ -80,8 +80,8 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			@SuppressLint("WrongThread")
 			@WorkerThread
 			override fun drawFrame() {
-				if (mVideoSourcePipeline != null) {
-					handleDraw(mVideoSourcePipeline!!.texId, mVideoSourcePipeline!!.texMatrix)
+				if (mSurfaceSourcePipeline != null) {
+					handleDraw(mSurfaceSourcePipeline!!.texId, mSurfaceSourcePipeline!!.texMatrix)
 				}
 			}
 
@@ -112,7 +112,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
-		mVideoSourcePipeline = createVideoSource(
+		mSurfaceSourcePipeline = createSurfaceSource(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		mCameraDelegator.onResume()
 	}
@@ -124,11 +124,11 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		mVideoSourcePipeline?.pipeline = null
+		mSurfaceSourcePipeline?.pipeline = null
 		mDistributor?.release()
 		mDistributor = null
-		mVideoSourcePipeline?.release()
-		mVideoSourcePipeline = null
+		mSurfaceSourcePipeline?.release()
+		mSurfaceSourcePipeline = null
 	}
 
 	/**
@@ -195,8 +195,8 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mVideoSourcePipeline!!.glManager)
-			GLPipeline.append(mVideoSourcePipeline!!, mDistributor!!)
+			mDistributor = SurfaceDistributePipeline(mSurfaceSourcePipeline!!.glManager)
+			GLPipeline.append(mSurfaceSourcePipeline!!, mDistributor!!)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -219,7 +219,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		val source = mVideoSourcePipeline
+		val source = mSurfaceSourcePipeline
 		if (source != null) {
 			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
@@ -231,15 +231,15 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	// GLPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	/**
-	 * VideoSourceインスタンスを生成
+	 * SurfaceSourcePipelineインスタンスを生成
 	 * @param width
 	 * @param height
 	 * @return
 	 */
-	private fun createVideoSource(
-		width: Int, height: Int): VideoSourcePipeline {
+	private fun createSurfaceSource(
+		width: Int, height: Int): SurfaceSourcePipeline {
 
-		return VideoSourcePipeline(getGLManager(),
+		return SurfaceSourcePipeline(getGLManager(),
 			width,
 			height,
 			object : PipelineSourceCallback {
@@ -267,7 +267,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	private fun handleDraw(texId: Int, texMatrix: FloatArray) {
 		if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
 		// draw to preview screen
-		if ((mDrawer != null) && (mVideoSourcePipeline != null)) {
+		if ((mDrawer != null) && (mSurfaceSourcePipeline != null)) {
 			mDrawer!!.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0)
 		}
 		GLES20.glFlush()
@@ -282,18 +282,18 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 		: ICameraRenderer {
 
 		override fun hasSurface(): Boolean {
-			return mVideoSourcePipeline != null
+			return mSurfaceSourcePipeline != null
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
-			mVideoSourcePipeline!!.resize(width, height)
+			mSurfaceSourcePipeline!!.resize(width, height)
 		}
 
 		override fun getInputSurface(): SurfaceTexture {
 
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-			checkNotNull(mVideoSourcePipeline)
-			return mVideoSourcePipeline!!.inputSurfaceTexture
+			checkNotNull(mSurfaceSourcePipeline)
+			return mSurfaceSourcePipeline!!.inputSurfaceTexture
 		}
 
 		fun updateViewport() {

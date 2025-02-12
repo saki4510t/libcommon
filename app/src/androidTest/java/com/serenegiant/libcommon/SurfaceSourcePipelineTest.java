@@ -29,7 +29,7 @@ import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ProxyPipeline;
-import com.serenegiant.glpipeline.VideoSourcePipeline;
+import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -51,8 +51,8 @@ import static org.junit.Assert.*;
 import static com.serenegiant.libcommon.TestUtils.*;
 
 @RunWith(AndroidJUnit4.class)
-public class VideoSourcePipelineTest {
-	private static final String TAG = VideoSourcePipelineTest.class.getSimpleName();
+public class SurfaceSourcePipelineTest {
+	private static final String TAG = SurfaceSourcePipelineTest.class.getSimpleName();
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
@@ -87,7 +87,7 @@ public class VideoSourcePipelineTest {
 	 * 							→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
-	public void videoSourcePipelineTest() {
+	public void surfaceSourcePipelineTest() {
 		final int NUM_FRAMES = 30;
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -97,7 +97,7 @@ public class VideoSourcePipelineTest {
 		final GLManager manager = mManager;
 
 		final Semaphore sem = new Semaphore(0);
-		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(
+		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
 			manager, WIDTH, HEIGHT,
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
@@ -117,7 +117,7 @@ public class VideoSourcePipelineTest {
 		} catch (InterruptedException e) {
 			fail();
 		}
-		final Surface inputSurface = videoSourcePipeline.getInputSurface();
+		final Surface inputSurface = source.getInputSurface();
 		assertNotNull(inputSurface);
 
 		final ByteBuffer buffer = allocateBuffer(WIDTH, HEIGHT);
@@ -143,9 +143,9 @@ public class VideoSourcePipelineTest {
 				}
 			}
 		};
-		videoSourcePipeline.setPipeline(proxy);
+		source.setPipeline(proxy);
 		// 想定したとおりに接続されているかどうかを検証
-		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, proxy));
+		assertTrue(validatePipelineOrder(source, source, proxy));
 		// 実際の映像はSurfaceを経由して映像を書き込む
 		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2);
 

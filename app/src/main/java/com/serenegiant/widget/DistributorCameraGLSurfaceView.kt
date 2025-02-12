@@ -33,10 +33,10 @@ import com.serenegiant.egl.EGLBase
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
-import com.serenegiant.glpipeline.VideoSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.GLUtils
+import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import com.serenegiant.math.Fraction
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
@@ -56,7 +56,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
 	private lateinit var mGLManager: GLManager
-	private var mVideoSourcePipeline: VideoSourcePipeline? = null
+	private var mVideoSourcePipeline: SurfaceSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 
 	init {
@@ -209,14 +209,14 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	}
 
 	/**
-	 * VideoSourceインスタンスを生成
+	 * SurfaceSourcePipelineインスタンスを生成
 	 * @param width
 	 * @param height
 	 * @return
 	 */
-	private fun createVideoSource(
-		width: Int, height: Int): VideoSourcePipeline {
-		return VideoSourcePipeline(mGLManager,
+	private fun createSurfaceSource(
+		width: Int, height: Int): SurfaceSourcePipeline {
+		return SurfaceSourcePipeline(mGLManager,
 			width,
 			height,
 			object : PipelineSourceCallback {
@@ -261,7 +261,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				0,
 				null
 			)
-			mVideoSourcePipeline = createVideoSource(
+			mVideoSourcePipeline = createSurfaceSource(
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)

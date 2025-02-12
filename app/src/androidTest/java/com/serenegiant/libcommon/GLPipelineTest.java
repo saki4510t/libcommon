@@ -30,7 +30,7 @@ import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
-import com.serenegiant.glpipeline.VideoSourcePipeline;
+import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
@@ -202,7 +202,7 @@ public class GLPipelineTest {
 		// OpenGLの描画を経由するとビットマップが上下反転してしまうのであらかじめ上下判定設定を適用
 		source.setPipeline(surfacePipeline);
 
-		final VideoSourcePipeline videoSourcePipeline = new VideoSourcePipeline(manager, WIDTH, HEIGHT,
+		final SurfaceSourcePipeline surfaceSource = new SurfaceSourcePipeline(manager, WIDTH, HEIGHT,
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
@@ -228,7 +228,7 @@ public class GLPipelineTest {
 				if (cnt.incrementAndGet() == 30) {
 					source.setPipeline(null);
 					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはVideoSourceからのテクスチャなのでisOES=trueのはず
+					// ここに来るのはSurfaceSourcePipelineからのテクスチャなのでisOES=trueのはず
 					final GLSurface surface = GLSurface.wrap(manager.isGLES3(),
 						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
 						GLES20.GL_TEXTURE4, texId, WIDTH, HEIGHT, false);
@@ -238,11 +238,12 @@ public class GLPipelineTest {
 				}
 			}
 		};
-		videoSourcePipeline.setPipeline(proxy);
+		source.setPipeline(proxy);
 
-		// SurfacePipelineとVideoSourceの間はSurfaceを経由したやりとりだけでGLPipelineとして接続しているわけではない
+		// SurfacePipelineとSurfaceSourcePipelineの間はSurfaceを経由したやりとりだけで
+		// GLPipelineとして接続しているわけではない
 		assertTrue(validatePipelineOrder(source, source, surfacePipeline));
-		assertTrue(validatePipelineOrder(videoSourcePipeline, videoSourcePipeline, proxy));
+		assertTrue(validatePipelineOrder(surfaceSource, surfaceSource, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
