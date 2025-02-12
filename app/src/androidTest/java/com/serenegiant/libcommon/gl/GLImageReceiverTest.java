@@ -27,11 +27,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
-import com.serenegiant.glutils.GLImageReceiver;
-import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.utils.HandlerThreadHandler;
 
 import org.junit.After;
 import org.junit.Before;
@@ -40,10 +36,8 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import androidx.annotation.NonNull;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -73,7 +67,7 @@ public class GLImageReceiverTest {
 	 * Bitmap -> inputImagesAsync
 	 * 				↓
 	 * 				Surface -> GLImageReceiver
-	 * 							-> GLSurface.wrap -> glReadPixels -> ByteBuffer
+	 * 							-> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
 	public void surfaceReaderTest1() {
@@ -95,60 +89,6 @@ public class GLImageReceiverTest {
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap));
-		} catch (final InterruptedException e) {
-			fail();
-		}
-	}
-
-	/**
-	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLImageReceiver
-	 * (とGLBitmapImageReader)で読み取れることを検証
-	 * Bitmap -> inputImagesAsync
-	 * 				↓
-	 * 				Surface -> GLImageReceiver
-	 * 							-> GLBitmapImageReader -> Bitmap
-	 */
-	@Test
-	public void surfaceReaderTest2() {
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(bitmap);
-
-		final Semaphore sem = new Semaphore(0);
-		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() == 5) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface surface = receiver.getSurface();
-		assertNotNull(surface);
-
-		inputImagesAsync(original, surface, 10);
-
-		try {
-			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
-			final Bitmap b = result.get();
-//			dump(b);
-			assertNotNull(b);
-			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			fail();
 		}
@@ -178,29 +118,10 @@ public class GLImageReceiverTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, 2);
-		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
-			@Override
-			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
-				final Bitmap bitmap = reader.acquireLatestImage();
-				if (bitmap != null) {
-					try {
-						if (cnt.incrementAndGet() == 5) {
-							result.set(Bitmap.createBitmap(bitmap));
-							sem.release();
-						}
-					} finally {
-						reader.recycle(bitmap);
-					}
-				}
-			}
-		}, HandlerThreadHandler.createHandler(TAG));
-
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
-		final Surface surface = receiver.getSurface();
+		final Surface surface = createGLImageReceiverSurface(
+			manager, WIDTH, HEIGHT, 10, sem, result);
 		assertNotNull(surface);
+
 		renderer.setSurface(surface);
 		assertTrue(validatePipelineOrder(source, source, renderer));
 
