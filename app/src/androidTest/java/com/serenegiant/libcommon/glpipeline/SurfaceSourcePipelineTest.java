@@ -1,4 +1,4 @@
-package com.serenegiant.libcommon;
+package com.serenegiant.libcommon.glpipeline;
 /*
  * libcommon
  * utility/helper classes for myself

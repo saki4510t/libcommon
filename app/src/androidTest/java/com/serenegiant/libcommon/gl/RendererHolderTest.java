@@ -1,4 +1,4 @@
-package com.serenegiant.libcommon;
+package com.serenegiant.libcommon.gl;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -54,7 +54,7 @@ import static org.junit.Assert.*;
 @RunWith(AndroidJUnit4.class)
 public class RendererHolderTest {
 
-	private static final String TAG = GLImageReceiverTest.class.getSimpleName();
+	private static final String TAG = RendererHolderTest.class.getSimpleName();
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;

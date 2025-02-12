@@ -1,4 +1,4 @@
-package com.serenegiant.libcommon;
+package com.serenegiant.libcommon.gl;
 /*
  * libcommon
  * utility/helper classes for myself
