@@ -36,6 +36,7 @@ import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ThreadUtils;
 
 import java.io.Serializable;
 import java.nio.ByteBuffer;
@@ -185,7 +186,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 						if (canvas != null) {
 							try {
 								canvas.drawBitmap(bitmap, 0, 0, null);
-								Thread.sleep(30);
+								ThreadUtils.NoThrowSleep(30L);
 							} finally {
 								surface.unlockCanvasAndPost(canvas);
 							}
