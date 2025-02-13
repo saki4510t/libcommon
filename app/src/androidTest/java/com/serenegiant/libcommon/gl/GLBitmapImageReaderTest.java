@@ -109,7 +109,7 @@ public class GLBitmapImageReaderTest {
 			}
 		}, HandlerThreadHandler.createHandler(TAG));
 
-		final GLImageReceiver receiver = new GLImageReceiver(WIDTH, HEIGHT, reader);
+		final GLImageReceiver receiver = new GLImageReceiver(mManager, WIDTH, HEIGHT, reader);
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 		inputImagesAsync(original, surface, MAX_FRAMES);

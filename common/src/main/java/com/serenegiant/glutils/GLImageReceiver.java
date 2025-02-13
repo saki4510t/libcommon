@@ -26,7 +26,6 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.system.BuildCheck;
@@ -124,11 +123,7 @@ public class GLImageReceiver {
 	@NonNull
 	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
-	private final GLManager mManager;
-	/**
-	 * 自分用のGLManagerを保持しているかどうか
-	 */
-	private final boolean mOwnManager;
+	private final GLManager mGLManager;
 	@NonNull
 	private final Handler mGLHandler;
 	private int mWidth;
@@ -154,53 +149,27 @@ public class GLImageReceiver {
 	/**
 	 * 映像受け取り用SurfaceTexture
 	 */
+	@Nullable
 	private SurfaceTexture mInputTexture;
 	/**
 	 * 映像受け取り用SurfaceTextureから生成したSurface
 	 */
+	@Nullable
 	private Surface mInputSurface;
 
 	/**
 	 * コンストラクタ
+	 * 映像入力用Surfacetexture/Surfaceが生成されるまで実行がブロックされる
+	 * @param glManager
 	 * @param width
 	 * @param height
 	 * @param callback
 	 */
 	public GLImageReceiver(
+		@NonNull final GLManager glManager,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@NonNull final Callback callback) {
 
-		this(new GLManager(), false, width, height, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param shared コンテキストの共有元GLContext
-	 * @param width
-	 * @param height
-	 * @param callback
-	 */
-	public GLImageReceiver(
-		@NonNull final GLContext shared,
-		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
-		@NonNull final Callback callback) {
-		this(new GLManager(shared, null), false, width, height, callback);
-	}
-
-	/**
-	 * コンストラクタ
-	 * @param manager
-	 * @param useSharedManager
-	 * @param width
-	 * @param height
-	 * @param callback
-	 */
-	public GLImageReceiver(
-		@NonNull final GLManager manager, final boolean useSharedManager,
-		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
-		@NonNull final Callback callback) {
-
-		mOwnManager = useSharedManager;
 		final Handler.Callback handlerCallback
 			= new Handler.Callback() {
 			@Override
@@ -208,13 +177,8 @@ public class GLImageReceiver {
 				return GLImageReceiver.this.handleMessage(msg);
 			}
 		};
-		if (useSharedManager) {
-			mManager = manager.createShared(handlerCallback);
-			mGLHandler = mManager.getGLHandler();
-		} else {
-			mManager = manager;
-			mGLHandler = manager.createGLHandler(handlerCallback);
-		}
+		mGLManager = glManager;
+		mGLHandler = glManager.createGLHandler(handlerCallback);
 		mWidth = width;
 		mHeight = height;
 		mCallback = callback;
@@ -281,7 +245,7 @@ public class GLImageReceiver {
 	 *                 callbackがnullの場合はコンストラクタで引き渡したコールバックに戻る。
 	 */
 	public void setFrameAvailableCallback(@Nullable final FrameAvailableCallback callback) {
-		if (mManager.isValid()) {
+		if (mGLManager.isValid()) {
 			mGLHandler.post(() -> {
 				if (callback != null) {
 					mFrameAvailableCallback = callback;
@@ -295,12 +259,9 @@ public class GLImageReceiver {
 	 * 関連するリソースを破棄する
 	 */
 	protected void internalRelease() {
-		if (mManager.isValid()) {
+		if (mGLManager.isValid()) {
 			mGLHandler.post(() -> {
 				handleOnStopOnGL();
-				if (mOwnManager) {
-					mManager.release();
-				}
 			});
 		}
 	}
@@ -310,7 +271,7 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	public GLManager getGLManager() {
-		return mManager;
+		return mGLManager;
 	}
 
 	/**
@@ -318,7 +279,7 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	public boolean isValid() {
-		return !mReleased && mIsReaderValid && mManager.isValid();
+		return !mReleased && mIsReaderValid && mGLManager.isValid();
 	}
 
 	/**
@@ -423,7 +384,7 @@ public class GLImageReceiver {
 	 * @return
 	 */
 	protected boolean isGLES3() {
-		return mManager.isGLES3();
+		return mGLManager.isGLES3();
 	}
 
 	/**
@@ -495,10 +456,10 @@ public class GLImageReceiver {
 	private void handleUpdateTexImageOnGL() {
 		if (DEBUG && ((++updateTextImageCnt % 100) == 0)) Log.v(TAG, "handleUpdateTexImageOnGL:" + updateTextImageCnt);
 		try {
-			mManager.makeDefault();
+			mGLManager.makeDefault();
 			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
 			GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-			mManager.swap();
+			mGLManager.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
@@ -541,9 +502,9 @@ public class GLImageReceiver {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 		mLock.lock();
 		try {
-			mManager.makeDefault();
+			mGLManager.makeDefault();
 			handleReleaseInputSurfaceOnGL();
-			mManager.makeDefault();
+			mGLManager.makeDefault();
 			mTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);

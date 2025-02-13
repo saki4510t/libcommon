@@ -346,7 +346,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 */
 		private SurfaceProxyGLES(
 			final int width, final int height) throws IllegalStateException {
-			this(new GLManager(), width, height, false);
+			this(new GLManager(), width, height);
 		}
 
 		/**
@@ -354,12 +354,10 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 * @param manager
 		 * @param width
 		 * @param height
-		 * @param useSharedManager
 		 */
 		public SurfaceProxyGLES(
 			@NonNull final GLManager manager,
-			final int width, final int height,
-			final boolean useSharedManager) throws IllegalStateException {
+			final int width, final int height) throws IllegalStateException {
 
 			super(width, height);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -367,7 +365,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 			// 映像入力用Surface/SurfaceTextureが生成されるのを待機するためのSemaphore
 			final Semaphore sem = new Semaphore(0);
 			mReceiver = new GLImageReceiver(
-				manager, useSharedManager,
+				manager,
 				width, height,
 				new GLImageReceiver.Callback() {
 

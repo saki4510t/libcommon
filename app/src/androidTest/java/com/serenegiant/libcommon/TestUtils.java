@@ -293,7 +293,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		final ByteBuffer buffer = allocateBuffer(width, height);
 		final GLImageReceiver receiver = new GLImageReceiver(
-			manager, false,
+			manager,
 			width, height,
 			new GLImageReceiver.Callback() {
 				@Override
