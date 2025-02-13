@@ -418,7 +418,7 @@ public class UsbPermission extends BroadcastReceiver {
 		@NonNull final Callback callback)
 		throws IllegalArgumentException {
 
-		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device);
+		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device.getDeviceName() + ",callback=" + callback);
 		final UsbManager manager = ContextUtils.requireSystemService(context, UsbManager.class);
 		ThreadPool.queueEvent(() -> {
 			final CountDownLatch latch = new CountDownLatch(1);

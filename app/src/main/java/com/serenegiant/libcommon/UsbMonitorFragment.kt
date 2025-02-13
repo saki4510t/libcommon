@@ -127,23 +127,23 @@ class UsbMonitorFragment : BaseFragment() {
 		}
 
 		override fun onPermission(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${device.deviceName}")
-			// パーミッションを取得できた時, openする
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:パーミッションを取得できた時, openする")
 			val connector = mUSBMonitor?.openDevice(device)
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${connector}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:${connector}")
 			if (UsbUtils.isUVC(device)) {
 				val intfs = UsbUtils.findUVCInterfaces(device)
-				if (DEBUG) Log.v(TAG, "onPermission:uvc=$intfs")
+				if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:uvc=$intfs")
 			}
 			if (UsbUtils.isUAC(device)) {
 				val intfs = UsbUtils.findUACInterfaces(device)
-				if (DEBUG) Log.v(TAG, "onPermission:uac=$intfs")
+				if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:uac=$intfs")
 			}
 		}
 
 		override fun onConnected(device: UsbDevice, connector: UsbConnector) {
-			Log.v(TAG, "OnDeviceConnectListener:onConnected:${device.deviceName}")
-			// テストのためにクローンする
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onConnected:${device.deviceName}")
+			// テストのためにクローンする(これはこの関数を抜けるときにcloseされる)
 			val cloned = connector.clone()
 			// 元のUsbConnectorはcloseする
 			connector.close()
@@ -154,18 +154,22 @@ class UsbMonitorFragment : BaseFragment() {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
 				if (connection != null) {
-					Log.v(TAG, String.format("bcdUSB=0x%04x", UsbDeviceInfo.getBcdUSB(connection)))
-					Log.v(TAG, String.format("class=0x%02x", UsbDeviceInfo.getDeviceClass(connection)))
-					Log.v(TAG, String.format("subClass=0x%02x", UsbDeviceInfo.getDeviceSubClass(connection)))
-					Log.v(TAG, String.format("protocol=0x%02x", UsbDeviceInfo.getDeviceProtocol(connection)))
-					Log.v(TAG, String.format("vendorId=0x%04x", UsbDeviceInfo.getVendorId(connection)))
-					Log.v(TAG, String.format("productId=0x%04x", UsbDeviceInfo.getProductId(connection)))
-					Log.v(TAG, String.format("bcdDevice=0x%04x", UsbDeviceInfo.getBcdDevice(connection)))
-					Log.v(TAG, "vendorName=${UsbDeviceInfo.getVendorName(connection)}")
-					Log.v(TAG, "productName=${UsbDeviceInfo.getProductName(connection)}")
-					Log.v(TAG, "serialNumber=${UsbDeviceInfo.getSerialNumber(connection)}")
-					Log.v(TAG, "numConfigs=${UsbDeviceInfo.getNumConfigurations(connection)}")
-					Log.v(TAG, "descAll=${BufferHelper.toHexString(connection.rawDescriptors)}")
+					try {
+						Log.v(TAG, String.format("bcdUSB=0x%04x", UsbDeviceInfo.getBcdUSB(connection)))
+						Log.v(TAG, String.format("class=0x%02x", UsbDeviceInfo.getDeviceClass(connection)))
+						Log.v(TAG, String.format("subClass=0x%02x", UsbDeviceInfo.getDeviceSubClass(connection)))
+						Log.v(TAG, String.format("protocol=0x%02x", UsbDeviceInfo.getDeviceProtocol(connection)))
+						Log.v(TAG, String.format("vendorId=0x%04x", UsbDeviceInfo.getVendorId(connection)))
+						Log.v(TAG, String.format("productId=0x%04x", UsbDeviceInfo.getProductId(connection)))
+						Log.v(TAG, String.format("bcdDevice=0x%04x", UsbDeviceInfo.getBcdDevice(connection)))
+						Log.v(TAG, "vendorName=${UsbDeviceInfo.getVendorName(connection)}")
+						Log.v(TAG, "productName=${UsbDeviceInfo.getProductName(connection)}")
+						Log.v(TAG, "serialNumber=${UsbDeviceInfo.getSerialNumber(connection)}")
+						Log.v(TAG, "numConfigs=${UsbDeviceInfo.getNumConfigurations(connection)}")
+						Log.v(TAG, "descAll=${BufferHelper.toHexString(connection.rawDescriptors)}")
+					} catch (e: Exception) {
+						Log.w(TAG, e)
+					}
 				}
 			}
 			// USB機器がopenした時,1秒後にcloseする
@@ -175,17 +179,17 @@ class UsbMonitorFragment : BaseFragment() {
 		}
 
 		override fun onDisconnect(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDisconnect:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onDisconnect:${device.deviceName}")
 			// USB機器がcloseした時
 		}
 
 		override fun onDetach(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDetach:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onDetach:${device.deviceName}")
 			// USB機器が取り外された時
 		}
 
 		override fun onCancel(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "onCancel:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onCancel:${device.deviceName}")
 			// パーミッションを取得できなかった時
 		}
 

@@ -132,7 +132,7 @@ class UsbPermissionFragment : BaseFragment() {
 		= object : UsbDetector.Callback {
 
 		override fun onAttach(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onAttach:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "UsbDetector.Callback#onAttach:${device.deviceName}")
 			// USB機器が接続された時
 			// ここはActivityのコンテキスト内だから直接UsbPermission#requestPermissionを呼び出してもOK
 			// サービスのコンテキストやアプリケーションコンテキストなどどのコンテキストかわからない場合を
@@ -147,7 +147,7 @@ class UsbPermissionFragment : BaseFragment() {
 		}
 
 		override fun onDetach(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onDetach:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "UsbDetector.Callback#onDetach:${device.deviceName}")
 			// USB機器が取り外された時
 		}
 
@@ -160,22 +160,22 @@ class UsbPermissionFragment : BaseFragment() {
 		= object : UsbPermission.Callback {
 
 		override fun onPermission(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener:onPermission:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:${device.deviceName}")
 			// パーミッションを取得できた時, openする
 			val connector = UsbConnector(requireContext(), device)
 			if (UsbUtils.isUVC(device)) {
 				val intfs = UsbUtils.findUVCInterfaces(device)
-				if (DEBUG) Log.v(TAG, "onPermission:uvc=$intfs")
+				if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:uvc=$intfs")
 			}
 			if (UsbUtils.isUAC(device)) {
 				val intfs = UsbUtils.findUACInterfaces(device)
-				if (DEBUG) Log.v(TAG, "onPermission:uac=$intfs")
+				if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:uac=$intfs")
 			}
 			// テストのためにクローンする
-			if (DEBUG) Log.v(TAG, "onPermission:clone connector")
+			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#nPermission:clone connector")
 			val cloned = connector.clone()
 			// 元のUsbConnectorはcloseする
-			if (DEBUG) Log.v(TAG, "onPermission:connector")
+			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:close connector")
 			connector.close()
 			// クローンしたUsbConnectorを使ってアクセスする
 			val info = cloned.info
@@ -201,13 +201,13 @@ class UsbPermissionFragment : BaseFragment() {
 			// USB機器がopenした時,1秒後にcloseする
 			lifecycleScope.launch(Dispatchers.Default) {
 				delay(1000L)
-				if (DEBUG) Log.v(TAG, "onPermission:close cloned")
+				if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:close cloned")
 				cloned.close()
 			}
 		}
 
 		override fun onCancel(device: UsbDevice) {
-			if (DEBUG) Log.v(TAG, "onCancel:${device.deviceName}")
+			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onCancel:${device.deviceName}")
 			// パーミッションを取得できなかった時
 		}
 
