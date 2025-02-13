@@ -100,7 +100,7 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 	/**
 	 * 関係するリソースを破棄する、再利用はできない
 	 */
-	public final void release() {
+	public void release() {
 		if (!mReleased) {
 			mReleased = true;
 			if (DEBUG) Log.v(TAG, "release:");
