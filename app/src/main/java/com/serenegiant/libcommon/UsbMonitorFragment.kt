@@ -46,7 +46,7 @@ class UsbMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onAttach:$mUSBMonitor")
 		requireActivity().title = getString(R.string.title_usb_monitor)
 		if (mUSBMonitor == null) {
-			mUSBMonitor = USBMonitor(context, mOnDeviceConnectListener)
+			mUSBMonitor = USBMonitor(requireActivity(), mOnDeviceConnectListener)
 			var filters
 				 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
 			mUSBMonitor!!.setDeviceFilter(filters)
@@ -122,7 +122,7 @@ class UsbMonitorFragment : BaseFragment() {
 				// staticメソッド版のrequestPermissionを使って違うContextからパーミッション要求する場合
 				// こっちでパーミッション要求した場合でもUSBMonitor#registerで登録したBroadcastReceiverで
 				// 結果を受け取れる
-				UsbPermission.requestPermission(requireContext().applicationContext, device, mOnDeviceConnectListener2)
+				UsbPermission.requestPermission(requireActivity(), device, mOnDeviceConnectListener2)
 			}
 		}
 
