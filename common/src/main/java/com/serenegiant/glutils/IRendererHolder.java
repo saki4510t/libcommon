@@ -60,6 +60,20 @@ public interface IRendererHolder extends IMirror {
 		public void onCaptured(@NonNull final IRendererHolder rendererHolder, final boolean success);
 	}
 
+	public static class DefaultRenderHolderCallback implements RenderHolderCallback {
+		@Override
+		public void onCreate(final Surface surface) {
+		}
+		@Override
+		public void onDestroy() {
+		}
+		@Override
+		public void onFrameAvailable() {
+		}
+	};
+
+	public static final RenderHolderCallback DEFAULT_CALLBACK = new DefaultRenderHolderCallback();
+
 	/**
 	 * 実行中かどうか
 	 * @return
