@@ -295,7 +295,7 @@ public class GLSurfaceReceiver {
 	 */
 	protected void internalRelease() {
 		if (mGLManager.isValid()) {
-			mGLHandler.post(() -> {
+			mGLHandler.postAtFrontOfQueue(() -> {
 				handleOnStopOnGL();
 			});
 		}
