@@ -1,7 +1,7 @@
 package com.serenegiant.glpipeline
 
 import androidx.annotation.Size
-import com.serenegiant.glutils.GLImageReceiver
+import com.serenegiant.glutils.GLSurfaceReceiver
 
 /*
  * libcommon
@@ -28,7 +28,7 @@ import com.serenegiant.glutils.GLImageReceiver
  * パイプライン → OnFramePipeline (→ パイプライン)
  *                → onFrameAvailableコールバック呼び出し
  */
-class OnFramePipeline(private val mListener: GLImageReceiver.FrameAvailableCallback)
+class OnFramePipeline(private val mListener: GLSurfaceReceiver.FrameAvailableCallback)
 : ProxyPipeline() {
 	override fun onFrameAvailable(
 		isGLES3: Boolean,

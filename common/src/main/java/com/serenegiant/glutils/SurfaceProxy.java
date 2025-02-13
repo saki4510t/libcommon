@@ -330,7 +330,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		private static final String TAG = SurfaceProxyGLES.class.getSimpleName();
 
 		@NonNull
-		private final GLImageReceiver mReceiver;
+		private final GLSurfaceReceiver mReceiver;
 		@NonNull
 		private final GLManager mManager;	// = GLImageReceiver#getGLManager()
 		// 映像転送用
@@ -364,10 +364,10 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 
 			// 映像入力用Surface/SurfaceTextureが生成されるのを待機するためのSemaphore
 			final Semaphore sem = new Semaphore(0);
-			mReceiver = new GLImageReceiver(
+			mReceiver = new GLSurfaceReceiver(
 				manager,
 				width, height,
-				new GLImageReceiver.Callback() {
+				new GLSurfaceReceiver.Callback() {
 
 				@WorkerThread
 				@Override

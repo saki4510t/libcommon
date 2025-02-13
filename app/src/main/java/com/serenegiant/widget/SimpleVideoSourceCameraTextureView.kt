@@ -33,7 +33,7 @@ import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
-import com.serenegiant.glutils.GLImageReceiver
+import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.math.Fraction
 import com.serenegiant.view.TouchViewTransformer
@@ -211,7 +211,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 						if (DEBUG) Log.v(TAG, "addSurface:create OnFramePipeline")
 						val p = GLPipeline.findLast(source)
 						p.pipeline = OnFramePipeline(object :
-							GLImageReceiver.FrameAvailableCallback {
+							GLSurfaceReceiver.FrameAvailableCallback {
 							var cnt: Int = 0
 
 							override fun onFrameAvailable(

@@ -33,7 +33,7 @@ import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
-import com.serenegiant.glutils.GLImageReceiver;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 
@@ -292,10 +292,10 @@ LOOP:		for (int y = 0; y < height; y++) {
 		}
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		final ByteBuffer buffer = allocateBuffer(width, height);
-		final GLImageReceiver receiver = new GLImageReceiver(
+		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager,
 			width, height,
-			new GLImageReceiver.Callback() {
+			new GLSurfaceReceiver.Callback() {
 				@Override
 				public void onInitialize() {
 				}

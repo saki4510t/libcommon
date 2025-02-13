@@ -24,7 +24,7 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLBitmapImageReader;
-import com.serenegiant.glutils.GLImageReceiver;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.HandlerThreadHandler;
@@ -109,7 +109,7 @@ public class GLBitmapImageReaderTest {
 			}
 		}, HandlerThreadHandler.createHandler(TAG));
 
-		final GLImageReceiver receiver = new GLImageReceiver(mManager, WIDTH, HEIGHT, reader);
+		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(mManager, WIDTH, HEIGHT, reader);
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 		inputImagesAsync(original, surface, MAX_FRAMES);
