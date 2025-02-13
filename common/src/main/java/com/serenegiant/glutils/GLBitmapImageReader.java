@@ -44,7 +44,7 @@ import androidx.annotation.WorkerThread;
 import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
- * GLImageReceiverを使ってBitmapとして映像を受け取るためのImageReader<Bitmap></>実装
+ * GLSurfaceReceiverを使ってBitmapとして映像を受け取るためのImageReader<Bitmap></>実装
  */
 public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiver.Callback {
 	private static final boolean DEBUG = false;
@@ -135,10 +135,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 //--------------------------------------------------------------------------------
-// 	 GLImageReceiver.Callbackの実装
+// 	 GLSurfaceReceiver.Callbackの実装
 //--------------------------------------------------------------------------------
 	/**
-	 * GLImageReceiver.Callbackの実装
+	 * GLSurfaceReceiver.Callbackの実装
 	 */
 	@WorkerThread
 	@Override
@@ -148,7 +148,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 	/**
-	 * GLImageReceiver.Callbackの実装
+	 * GLSurfaceReceiver.Callbackの実装
 	 */
 	@WorkerThread
 	@Override
@@ -164,7 +164,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 	/**
-	 * GLImageReceiver.Callbackの実装
+	 * GLSurfaceReceiver.Callbackの実装
 	 * @param surface
 	 * @param width
 	 * @param height
@@ -177,7 +177,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 	/**
-	 * GLImageReceiver.Callbackの実装
+	 * GLSurfaceReceiver.Callbackの実装
 	 * @param surface
 	 */
 	@WorkerThread
@@ -188,7 +188,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 	/**
-	 * GLImageReceiver.Callbackの実装
+	 * GLSurfaceReceiver.Callbackの実装
 	 * @param width
 	 * @param height
 	 */
@@ -206,10 +206,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	}
 
 //--------------------------------------------------------------------------------
-// 	 GLImageReceiver.FrameAvailableCallbackの実装
+// 	 GLSurfaceReceiver.FrameAvailableCallbackの実装
 //--------------------------------------------------------------------------------
 	/**
-	 * GLImageReceiver.FrameAvailableCallbackの実装
+	 * GLSurfaceReceiver.FrameAvailableCallbackの実装
 	 * @param isGLES3
 	 * @param isOES
 	 * @param width

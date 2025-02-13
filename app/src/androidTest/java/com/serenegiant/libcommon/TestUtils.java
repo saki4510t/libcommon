@@ -241,9 +241,9 @@ LOOP:		for (int y = 0; y < height; y++) {
 	}
 
 	/**
-	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
+	 * GLSurfaceReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
 	 * Bitmapを受け取るためのSurfaceを生成する
-	 * Surface → GLImageReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param width
 	 * @param height
@@ -253,19 +253,19 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
 	 * @return
 	 */
-	public static Surface createGLImageReceiverSurface(
+	public static Surface createGLSurfaceReceiverSurface(
 		@NonNull final GLManager manager,
 		final int width, final int height,
 		final int numFrames,
 		@NonNull final Semaphore sem,
 		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
-		return createGLImageReceiverSurface(manager, width, height, numFrames, sem, result, new AtomicInteger());
+		return createGLSurfaceReceiverSurface(manager, width, height, numFrames, sem, result, new AtomicInteger());
 	}
 
 	/**
-	 * GLImageReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
+	 * GLSurfaceReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
 	 * Bitmapを受け取るためのSurfaceを生成する
-	 * Surface → GLImageReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param width
 	 * @param height
@@ -276,7 +276,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
 	 * @return
 	 */
-	public static Surface createGLImageReceiverSurface(
+	public static Surface createGLSurfaceReceiverSurface(
 		@NonNull final GLManager manager,
 		final int width, final int height,
 		final int numFrames,
@@ -347,7 +347,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 
 	/**
 	 * 映像をテクスチャとして受け取ってBitmapを受け取るためのProxyPipelineを生成する
-	 * ProxyPipeline -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * ProxyPipeline -> GLSurfaceReceiver -> GLBitmapImageReader -> Bitmap
 	 * @param width
 	 * @param height
 	 * @param numFrames
@@ -366,7 +366,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 
 	/**
 	 * 映像をテクスチャとして受け取ってBitmapを受け取るためのProxyPipelineを生成する
-	 * ProxyPipeline -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * ProxyPipeline -> GLSurfaceReceiver -> GLBitmapImageReader -> Bitmap
 	 * @param width
 	 * @param height
 	 * @param numFrames

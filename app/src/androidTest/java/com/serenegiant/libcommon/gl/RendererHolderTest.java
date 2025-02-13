@@ -74,7 +74,7 @@ public class RendererHolderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface readerSurface = createGLImageReceiverSurface(
+		final Surface readerSurface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 
@@ -116,7 +116,7 @@ public class RendererHolderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface readerSurface = createGLImageReceiverSurface(
+		final Surface readerSurface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 
@@ -158,7 +158,7 @@ public class RendererHolderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface readerSurface = createGLImageReceiverSurface(
+		final Surface readerSurface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
 		assertNotNull(readerSurface);
 

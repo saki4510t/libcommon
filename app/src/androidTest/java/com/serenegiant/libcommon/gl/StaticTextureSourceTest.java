@@ -75,7 +75,7 @@ public class StaticTextureSourceTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface surface = createGLImageReceiverSurface(
+		final Surface surface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 30, sem, result, cnt);
 		assertNotNull(surface);
 		source.addSurface(surface.hashCode(), surface, false);
@@ -108,7 +108,7 @@ public class StaticTextureSourceTest {
 
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLImageReceiverSurface(
+		final Surface surface1 = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 30, sem, result1, cnt1);
 		assertNotNull(surface1);
 
@@ -116,7 +116,7 @@ public class StaticTextureSourceTest {
 
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLImageReceiverSurface(
+		final Surface surface2 = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, 30, sem, result2, cnt2);
 		assertNotNull(surface2);
 		source.addSurface(surface2.hashCode(), surface2, false);

@@ -319,7 +319,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 	/**
 	 * OpenGL|ESを使ってSurfaceで受け取った映像をSurfaceへ引き渡すためのSurfaceProxy実装
 	 * 内部動作的には、
-	 * ・GLImageReceiverからSurface/SurfaceTextureを入力用Surfaceとして取得
+	 * ・GLSurfaceReceiverからSurface/SurfaceTextureを入力用Surfaceとして取得
 	 * 　= OESテクスチャとして映像を受け取り
 	 * ・出力用SurfaceをRendererTargetとしてOpenGL|ESでの描画先として
 	 * 　今のところ出力用RendererTargetのモデルビュー変換行列を上下反転させてある
@@ -332,7 +332,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		@NonNull
 		private final GLSurfaceReceiver mReceiver;
 		@NonNull
-		private final GLManager mManager;	// = GLImageReceiver#getGLManager()
+		private final GLManager mManager;
 		// 映像転送用
 		@Nullable
 		private GLDrawer2D mDrawer = null;

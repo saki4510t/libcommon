@@ -62,7 +62,7 @@ public class SurfaceProxyTest {
 	}
 
 	/**
-	 * SurfaceProxyReaderWriter => GLImageReceiverと接続して
+	 * SurfaceProxyReaderWriter => GLSurfaceReceiverと接続して
 	 * SurfaceProxyReaderWriterから取得したSurfaceへCanvas#drawBitmapでビットマップを
 	 * 書き込んで、書き込んだビットマップとで読み込んだビットマップが一致するかどうかを検証する
 	 */
@@ -78,11 +78,11 @@ public class SurfaceProxyTest {
 		final Surface inputSurface = proxy.getInputSurface();
 		assertNotNull(inputSurface);
 
-		// 映像受け取り用にGLImageReceiverを生成
+		// 映像受け取り用にGLSurfaceReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface receiverSurface = createGLImageReceiverSurface(
+		final Surface receiverSurface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// SurfaceProxyReaderWriterへ映像読み取り用Surfaceをセット
@@ -105,7 +105,7 @@ public class SurfaceProxyTest {
 	}
 
 	/**
-	 * SurfaceProxyGLES => GLImageReceiver => GLBitmapImageReaderと接続して
+	 * SurfaceProxyGLES => GLSurfaceReceiver => GLBitmapImageReaderと接続して
 	 * SurfaceProxyGLESから取得したSurfaceへCanvas#drawBitmapでビットマップを
 	 * 書き込んで、書き込んだビットマップとGLBitmapImageReaderで読み込んだ
 	 * ビットマップが一致するかどうかを検証する
@@ -122,11 +122,11 @@ public class SurfaceProxyTest {
 		final Surface inputSurface = proxy.getInputSurface();	// このSurfaceはSurfaceTexture由来なのでOESテクスチャ
 		assertNotNull(inputSurface);
 
-		// 映像受け取り用にGLImageReceiverを生成
+		// 映像受け取り用にGLSurfaceReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface receiverSurface = createGLImageReceiverSurface(
+		final Surface receiverSurface = createGLSurfaceReceiverSurface(
 			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// プロキシに映像読み取り用Surfaceをセット

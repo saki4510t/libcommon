@@ -85,10 +85,10 @@ public class ImageTextureSourceTest {
 
 		final GLManager manager = mManager;
 
-		// 映像受け取り用にGLImageReceiverを生成
+		// 映像受け取り用にGLSurfaceReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Surface surface = createGLImageReceiverSurface(
+		final Surface surface = createGLSurfaceReceiverSurface(
 			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result);
 		assertNotNull(surface);
 
@@ -176,7 +176,7 @@ public class ImageTextureSourceTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger numFrames = new AtomicInteger();
-		final Surface surface = createGLImageReceiverSurface(
+		final Surface surface = createGLSurfaceReceiverSurface(
 			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result, numFrames);
 		assertNotNull(surface);
 

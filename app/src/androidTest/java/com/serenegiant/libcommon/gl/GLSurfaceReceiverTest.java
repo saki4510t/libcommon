@@ -45,8 +45,8 @@ import static com.serenegiant.libcommon.TestUtils.*;
 import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
-public class GLImageReceiverTest {
-	private static final String TAG = GLImageReceiverTest.class.getSimpleName();
+public class GLSurfaceReceiverTest {
+	private static final String TAG = GLSurfaceReceiverTest.class.getSimpleName();
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
@@ -62,11 +62,11 @@ public class GLImageReceiverTest {
 	}
 
 	/**
-	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLImageReceiverで
+	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLSurfaceReceiverで
 	 * 読み取れることを検証
 	 * Bitmap -> inputImagesAsync
 	 * 				↓
-	 * 				Surface -> GLImageReceiver
+	 * 				Surface -> GLSurfaceReceiver
 	 * 							-> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
@@ -78,7 +78,7 @@ public class GLImageReceiverTest {
 		final GLManager manager = new GLManager();
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Surface surface = createGLImageReceiverSurface(
+		final Surface surface = createGLSurfaceReceiverSurface(
 			manager, WIDTH, HEIGHT, 10, sem, result);
 		assertNotNull(surface);
 		inputImagesAsync(original, surface, 10);
@@ -96,12 +96,12 @@ public class GLImageReceiverTest {
 
 	/**
 	 * ImageSourcePipelineからの映像ソースをSurfaceRendererPipelineでテクスチャとして受け取って
-	 * GLImageReceiverのSurfaceへ書き込んでGLBitmapImageReaderでビットマップへ変換して
+	 * GLSurfaceReceiverのSurfaceへ書き込んでGLBitmapImageReaderでビットマップへ変換して
 	 * 読み取れることを検証
 	 * Bitmap -> ImageSourcePipeline
 	 * 				-> SurfaceRendererPipeline
 	 * 					↓
-	 * 					-> Surface -> GLImageReceiver -> GLBitmapImageReader -> Bitmap
+	 * 					-> Surface -> GLSurfaceReceiver -> GLBitmapImageReader -> Bitmap
 	 */
 	@Test
 	public void pipelineReaderTest() {
@@ -118,7 +118,7 @@ public class GLImageReceiverTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Surface surface = createGLImageReceiverSurface(
+		final Surface surface = createGLSurfaceReceiverSurface(
 			manager, WIDTH, HEIGHT, 10, sem, result);
 		assertNotNull(surface);
 
