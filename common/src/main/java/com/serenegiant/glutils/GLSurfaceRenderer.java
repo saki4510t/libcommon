@@ -285,6 +285,14 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		}
 	}
 
+	@AnyThread
+	public void removeSurfaceAll() {
+		if (DEBUG) Log.v(TAG, "removeSurfaceAll:");
+		if (isValid()) {
+			mGLManager.runOnGLThread(() -> releaseOnGL());
+		}
+	}
+
 	/**
 	 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
 	 * @param id
