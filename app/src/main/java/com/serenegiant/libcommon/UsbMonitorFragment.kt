@@ -129,6 +129,10 @@ class UsbMonitorFragment : BaseFragment() {
 		override fun onPermission(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:${device.deviceName}")
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:パーミッションを取得できた時, openする")
+			// XXX USBMonitor#openDeviceを呼ぶと#onConnected/#onDisconnectedの呼び出し処理が含まれる特別な
+			//     UsbConnectorオブジェクトが生成される
+			//     一方UsbConnector(Context,UsbDevice)コンストラクタで生成すると#onConnected/#onDisconnectedが
+			//     呼び出されない素のUsbConnectorを生成できるがこの場合は自前でライフサイクルの管理が必要になる。
 			val connector = mUSBMonitor?.openDevice(device)
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:${connector}")
 			if (UsbUtils.isUVC(device)) {
@@ -143,13 +147,22 @@ class UsbMonitorFragment : BaseFragment() {
 
 		override fun onConnected(device: UsbDevice, connector: UsbConnector) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onConnected:${device.deviceName}")
-			// テストのためにクローンする(これはこの関数を抜けるときにcloseされる)
-			val cloned = connector.clone()
+			// XXX このコールバック関数に引き渡されるUsbConnectorはUSBMonitor#UsbControlBlockで
+			//     #onConnected/#onDisconnectを呼び出すためにUsbConnectorを拡張したオブジェクトである。
+			//     なのでこの関数内でconnector#cloneやUSBMonitor#openを呼んで再度UsbConnectorを
+			//     生成すると連鎖的に#onConnectedコールバックが呼ばれてしまうことになる。
+			//     ・この関数内でconnector#cloneやUSBMonitor#openを呼ばないようにする
+			//     ・連鎖してopenを繰り返していないか自前でチェックする
+			//     ・#onConnected/#onDisconnectが呼び出されないようにUsbConnector(Context,UsbDevice)でUsbConnectorを生成する
+			//     などで意図せずに連鎖的にopen(onConnected)が繰り返されないようにする必要がある
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#nPermission:close connector")
 			// 元のUsbConnectorはcloseする
 			connector.close()
-			// クローンしたUsbConnectorを使ってアクセスする
-			val connection = cloned.connection
-			val info = UsbDeviceInfo.getDeviceInfo(cloned, null)
+			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#nPermission:create connector")
+			val newConnector = UsbConnector(requireContext(), device)
+			// 新規作成したUsbConnectorを使ってアクセスする
+			val connection = newConnector.connection
+			val info = UsbDeviceInfo.getDeviceInfo(newConnector, null)
 			if (DEBUG) {
 				Log.v(TAG, "info=$info")
 				Log.v(TAG, "device=$device")
@@ -174,7 +187,8 @@ class UsbMonitorFragment : BaseFragment() {
 			}
 			// USB機器がopenした時,1秒後にcloseする
 			queueEvent({
-				cloned.close()
+				if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onConnected:close newConnector")
+				newConnector.close()
 			}, 1000)
 		}
 

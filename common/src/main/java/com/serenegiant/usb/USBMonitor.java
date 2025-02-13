@@ -51,6 +51,13 @@ public final class USBMonitor extends UsbDetector implements Const {
 		/**
 		 * USB機器がopenされた時,
 		 * 4.xx.yyと異なりUsbConnector#cloneでも呼ばれる
+		 * XXX このコールバック内でUSBMonitor#openやconnector#clone等で新しく
+		 *     UsbControlBlockを生成すると再度onConnectedが呼び出されるので連鎖的に
+		 *     USB機器のopenが繰り返されてしまうので、
+		 *     ・このコールバック内で新しくUsbControlBlockを生成しないようにする
+		 *     ・このコールバックが呼ばれたときに既にopenしているかどうかを自前で確認する
+		 *     ・#onConnected/#onDisconnectが呼び出されないようにUsbConnector(Context,UsbDevice)でUsbConnectorを生成する
+		 *     などで意図せずに連鎖的にopen(onConnected)が繰り返されないようにする必要がある
 		 * @param device
 		 * @param connector
 		 */
