@@ -117,6 +117,41 @@ public class GLSurfaceReceiver {
 		public void onResize(final int width, final int height);
 	}
 
+	public static class DefaultCallback implements Callback {
+		@NonNull
+		private final FrameAvailableCallback mFrameAvailableCallback;
+		public DefaultCallback(@NonNull final FrameAvailableCallback onFrameAvailableCallback) {
+			mFrameAvailableCallback = onFrameAvailableCallback;
+		}
+
+		@Override
+		public void onInitialize() {
+		}
+
+		@Override
+		public void onRelease() {
+		}
+
+		@Override
+		public void onReleaseInputSurface(@NonNull final Surface surface) {
+		}
+
+		@Override
+		public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
+		}
+
+		@Override
+		public void onResize(final int width, final int height) {
+		}
+
+		@Override
+		public void onFrameAvailable(
+			final boolean isGLES3, final boolean isOES,
+			final int width, final int height,
+			final int texId, @NonNull final float[] texMatrix) {
+			mFrameAvailableCallback.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
+		}
+	}
 	/**
 	 * 排他制御用
 	 */
