@@ -52,8 +52,8 @@ public interface IRendererHolder extends IMirror {
 	 * IRendererHolderからのコールバックリスナー
 	 */
 	public interface RenderHolderCallback extends OnFrameAvailableListener {
-		public void onCreate(Surface surface);
-		public void onDestroy();
+		public void onCreateSurface(Surface surface);
+		public void onDestroySurface();
 	}
 
 	public interface OnCapturedListener {
@@ -62,10 +62,10 @@ public interface IRendererHolder extends IMirror {
 
 	public static class DefaultRenderHolderCallback implements RenderHolderCallback {
 		@Override
-		public void onCreate(final Surface surface) {
+		public void onCreateSurface(final Surface surface) {
 		}
 		@Override
-		public void onDestroy() {
+		public void onDestroySurface() {
 		}
 		@Override
 		public void onFrameAvailable() {

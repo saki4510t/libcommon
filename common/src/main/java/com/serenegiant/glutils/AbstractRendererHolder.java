@@ -414,7 +414,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected void callOnCreate(Surface surface) {
 		if (mCallback != null) {
 			try {
-				mCallback.onCreate(surface);
+				mCallback.onCreateSurface(surface);
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}
@@ -434,7 +434,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected void callOnDestroy() {
 		if (mCallback != null) {
 			try {
-				mCallback.onDestroy();
+				mCallback.onDestroySurface();
 			} catch (final Exception e) {
 				Log.w(TAG, e);
 			}

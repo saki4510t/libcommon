@@ -187,7 +187,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	private val mRenderHolderCallback: RenderHolderCallback
 		= object : RenderHolderCallback {
 
-		override fun onCreate(surface: Surface) {
+		override fun onCreateSurface(surface: Surface) {
 			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onCreate:")
 		}
 
@@ -196,7 +196,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			mCameraDelegator.callOnFrameAvailable()
 		}
 
-		override fun onDestroy() {
+		override fun onDestroySurface() {
 			if (DEBUG) Log.v(TAG, "RenderHolderCallback#onDestroy:")
 		}
 	}
