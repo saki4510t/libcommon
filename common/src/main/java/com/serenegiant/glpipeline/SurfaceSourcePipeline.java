@@ -49,7 +49,7 @@ public class SurfaceSourcePipeline extends ProxyPipeline implements GLPipelineSu
 
 	private static final int REQUEST_UPDATE_TEXTURE = 1;
 	private static final int REQUEST_UPDATE_SIZE = 2;
-	private static final int REQUEST_RECREATE_MASTER_SURFACE = 3;
+	private static final int REQUEST_RECREATE_INPUT_SURFACE = 3;
 
 	@NonNull
 	private final GLManager mManager;
@@ -123,7 +123,7 @@ public class SurfaceSourcePipeline extends ProxyPipeline implements GLPipelineSu
 		}
 		mGLContext = mManager.getGLContext();
 		mCallback = callback;
-		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
+		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_INPUT_SURFACE);
 	}
 
 	@Override
@@ -286,7 +286,7 @@ public class SurfaceSourcePipeline extends ProxyPipeline implements GLPipelineSu
 			handleResize(msg.arg1, msg.arg2);
 			return true;
 		}
-		case REQUEST_RECREATE_MASTER_SURFACE -> {
+		case REQUEST_RECREATE_INPUT_SURFACE -> {
 			handleReCreateInputSurface();
 			return true;
 		}
