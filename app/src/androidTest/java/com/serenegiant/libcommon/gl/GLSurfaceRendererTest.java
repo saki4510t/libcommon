@@ -26,7 +26,9 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.GLSurfaceRenderer;
+import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;
 
 import org.junit.After;
@@ -188,4 +190,72 @@ public class GLSurfaceRendererTest {
 		}
 	}
 
+	/**
+	 * GLSurfaceRendererを使って受け取ったテクスチャを複数のSurfaceへ分配描画できることを検証
+	 */
+	@Test
+	public void staticTextureSourceRestartTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final int NUM_FRAMES = 100;
+
+		final GLManager manager = mGLManager;
+
+		// 分配描画用にGLSurfaceRendererを生成
+		final GLSurfaceRenderer renderer = new GLSurfaceRenderer(
+			manager, WIDTH, HEIGHT, GLDrawer2D.DEFAULT_FACTORY);
+
+		final Semaphore sem = new Semaphore(0);
+
+		// 描画結果受け取り用にSurfaceを生成
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final Surface surface1 = createGLSurfaceReceiverSurface(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(surface1);
+		renderer.addSurface(surface1.hashCode(), surface1, null);
+
+		// 描画結果受け取り用にSurfaceを生成
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final Surface surface2 = createGLSurfaceReceiverSurface(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(surface2);
+		renderer.addSurface(surface2.hashCode(), surface2, null);
+
+		// 複数のSurfaceを追加できたかどうかを確認
+		ThreadUtils.NoThrowSleep(100);
+		assertEquals(2, renderer.getCount());
+
+		// 映像ソースとしてStaticTextureSourceを生成
+		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+
+		// 映像書き込み用GLSurfaceReceiverを生成
+		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
+			manager, WIDTH, HEIGHT,
+			new GLSurfaceReceiver.DefaultCallback(renderer));
+		final Surface inputSurface = receiver.getSurface();
+		assertNotNull(inputSurface);
+		// StaticTextureSource →　GLSurfaceReceiverと繋ぐ
+		source.addSurface(inputSurface.hashCode(), inputSurface, false);
+
+		try {
+			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			// それぞれのSurfaceが受け取った映像フレーム数を確認
+			assertTrue(cnt1.get() >= NUM_FRAMES);
+			assertTrue(cnt2.get() >= NUM_FRAMES);
+			// 受け取った映像を検証
+			final Bitmap resultBitmap1 = result1.get();
+			assertNotNull(resultBitmap1);
+			final Bitmap resultBitmap2 = result2.get();
+			assertNotNull(resultBitmap2);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, resultBitmap1));
+			assertTrue(bitmapEquals(original, resultBitmap2));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
 }
