@@ -35,7 +35,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
-import kotlin.jvm.Transient;
 
 /**
  * 現在のスレッド上にGLコンテキストを生成する
@@ -77,7 +76,6 @@ public class GLContext implements EGLConst {
 	/**
 	 * EGLアクセスオブジェクト
 	 */
-	@Transient
 	@Nullable
 	private EGLBase mEgl = null;
 	/**
@@ -85,18 +83,15 @@ public class GLContext implements EGLConst {
 	 * #initializeで指定したSurface/SurfaceHolder/SurfaceTexture/SurfaceViewの
 	 * windows surfaceから生成したもの、またはオフスクリーン
 	 */
-	@Transient
 	@Nullable
 	private EGLBase.IEglSurface mEglMasterSurface;
 	/**
 	 * レンダリングコンテキストを紐付けたスレッドのID
 	 */
-	@Transient
 	private long mGLThreadId;
 	/**
 	 * GL|ESのエクステンション文字列のキャッシュ用
 	 */
-	@Transient
 	@Nullable
 	private String mGlExtensions;
 
