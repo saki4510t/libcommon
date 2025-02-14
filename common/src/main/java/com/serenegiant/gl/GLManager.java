@@ -46,7 +46,7 @@ public class GLManager {
 	@NonNull
 	private final Handler mGLHandler;
 	private final long mHandlerThreadId;
-	private final int mThreadPriority;
+	private int mThreadPriority;
 	/**
 	 * 排他制御用
 	 */
@@ -541,6 +541,25 @@ public class GLManager {
 			mLock.unlock();
 		}
 	}
+
+	/**
+	 * スレッドの優先度を変更
+	 * @param priority Process.THREAD_PRIORITY_XXXで指定する
+	 */
+	public void setPriority(final int priority) {
+		checkValid();
+		if (priority != mThreadPriority) {
+			runOnGLThread(() -> {
+				try {
+					Process.setThreadPriority(priority);
+					mThreadPriority = priority;
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
+				}
+			});
+		}
+	}
+
 //--------------------------------------------------------------------------------
 	/**
 	 * GLコンテキストが破棄されていないかどうかを確認
