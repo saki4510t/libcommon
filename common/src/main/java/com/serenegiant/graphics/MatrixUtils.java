@@ -112,7 +112,6 @@ public class MatrixUtils {
 	 * @param mirror
 	 */
 	public static void setMirror(@NonNull final Matrix matrix, @IMirror.MirrorMode final int mirror) {
-		matrix.reset();
 		switch (mirror) {
 		case IMirror.MIRROR_HORIZONTAL -> matrix.preScale(-1, 1);
 		case IMirror.MIRROR_VERTICAL -> matrix.preScale(1, -1);
