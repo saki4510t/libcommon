@@ -184,7 +184,7 @@ public class SurfaceDistributorTest {
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
-			final Bitmap resultBitmap2 = result1.get();
+			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap1));
@@ -249,7 +249,7 @@ public class SurfaceDistributorTest {
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
-			final Bitmap resultBitmap2 = result1.get();
+			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap1));
@@ -315,7 +315,7 @@ public class SurfaceDistributorTest {
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
-			final Bitmap resultBitmap2 = result1.get();
+			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap1));
@@ -378,7 +378,7 @@ public class SurfaceDistributorTest {
 				// 受け取った映像を検証
 				final Bitmap resultBitmap1 = result1.get();
 				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result1.get();
+				final Bitmap resultBitmap2 = result2.get();
 				assertNotNull(resultBitmap2);
 				// 元のビットマップと同じかどうかを検証
 				assertTrue(bitmapEquals(original, resultBitmap1));
@@ -408,7 +408,7 @@ public class SurfaceDistributorTest {
 				// 受け取った映像を検証
 				final Bitmap resultBitmap1 = result1.get();
 				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result1.get();
+				final Bitmap resultBitmap2 = result2.get();
 				assertNotNull(resultBitmap2);
 				// 元のビットマップと同じかどうかを検証
 				assertTrue(bitmapEquals(original, resultBitmap1));
