@@ -125,6 +125,7 @@ public class CapturePipeline extends ProxyPipeline {
 			final int h = (int)args[1];
 			Bitmap result = super.obtain(args);
 			while ((result != null)
+				&& isActive()
 				&& (result.isRecycled()
 					|| (result.getWidth() != w)
 					|| (result.getHeight() != h))) {
