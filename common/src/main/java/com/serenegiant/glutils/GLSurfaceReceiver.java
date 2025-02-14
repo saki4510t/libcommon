@@ -497,11 +497,10 @@ public class GLSurfaceReceiver {
 			mGLManager.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
+			mFrameAvailableCallback.onFrameAvailable(isGLES3(), true, mWidth, mHeight, mTexId, mTexMatrix);
 		} catch (final Exception e) {
 			Log.e(TAG, "handleUpdateTexImageOnGL:thread id =" + Thread.currentThread().getId(), e);
-			return;
 		}
-		mFrameAvailableCallback.onFrameAvailable( isGLES3(), true, mWidth, mHeight, mTexId, mTexMatrix);
 	}
 
 	/**
