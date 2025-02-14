@@ -107,6 +107,22 @@ public class MatrixUtils {
 	}
 
 	/**
+	 * 左右・上下反転をセット
+	 * @param matrix
+	 * @param mirror
+	 */
+	public static void setMirror(@NonNull final Matrix matrix, @IMirror.MirrorMode final int mirror) {
+		matrix.reset();
+		switch (mirror) {
+		case IMirror.MIRROR_HORIZONTAL -> matrix.preScale(-1, 1);
+		case IMirror.MIRROR_VERTICAL -> matrix.preScale(1, -1);
+		case IMirror.MIRROR_BOTH -> matrix.preScale(-1, -1);
+		case IMirror.MIRROR_NORMAL -> {}
+		default -> {}
+		}
+	}
+
+	/**
 	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
 	 * @param mvp
 	 * @param degrees
