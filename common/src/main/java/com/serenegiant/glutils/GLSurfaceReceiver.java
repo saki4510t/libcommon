@@ -544,8 +544,7 @@ public class GLSurfaceReceiver {
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
-			// XXX この時点ではSurfaceTextureへ渡したテクスチャへメモリーが割り当てられておらずGLSurfaceを生成できない。
-			//     少なくとも1回はSurfaceTexture#updateTexImageが呼ばれた後でGLSurfaceでラップする
+			// XXX この時点ではSurfaceTextureへ渡したテクスチャへメモリーが割り当てられていない
 			if (BuildCheck.isAndroid4_1()) {
 				mInputTexture.setDefaultBufferSize(mWidth, mHeight);
 			}
