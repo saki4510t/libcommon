@@ -141,6 +141,18 @@ public class MatrixUtils {
 	}
 
 	/**
+	 * OpenGLの4x4(列優先)行列をandroid.graphics.Matrixの3x3行列に変換する
+	 * (アフィン変換のみ)
+	 * @param transform
+	 * @return
+	 */
+	public static Matrix toAndroidMatrix(@NonNull @Size(min=16)final float[] transform) {
+		final Matrix result = new Matrix();
+		final float[] work = new float[9];
+		return toAndroidMatrix(transform, result, work);
+	}
+
+	/**
 	 * OpenGL|ESの4x4行列を列優先で文字列化
 	 * @param transform
 	 * @return
