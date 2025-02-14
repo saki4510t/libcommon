@@ -292,8 +292,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		if ((width < 2) || (height < 2)) {
 			throw new IllegalArgumentException("width and or height is too small, must be more than or equals 2");
 		}
-		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-		final ByteBuffer buffer = allocateBuffer(width, height);
+
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager,
 			width, height,
@@ -328,13 +327,17 @@ LOOP:		for (int y = 0; y < height; y++) {
 					final int texId, @NonNull final float[] texMatrix) {
 
 					if (cnt.incrementAndGet() == numFrames) {
+						Log.v(TAG, "createGLSurfaceReceiverSurface:create Bitmap from texture");
 						// GLSurfaceを経由してテクスチャを読み取る
 						// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
 						final GLSurface surface = GLSurface.wrap(isGLES3,
 							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
 							GLES20.GL_TEXTURE4, texId, width, height, false);
 						surface.makeCurrent();
+						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+						final ByteBuffer buffer = allocateBuffer(width, height);
 						final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
+						surface.release();
 						final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 						bitmap.copyPixelsFromBuffer(buf);
 						result.set(bitmap);
@@ -391,8 +394,6 @@ LOOP:		for (int y = 0; y < height; y++) {
 		if ((width < 2) || (height < 2)) {
 			throw new IllegalArgumentException("width and or height is too small, must be more than or equals 2");
 		}
-		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-		final ByteBuffer buffer = allocateBuffer(width, height);
 		return new ProxyPipeline(width, height) {
 			@Override
 			public void onFrameAvailable(
@@ -401,13 +402,17 @@ LOOP:		for (int y = 0; y < height; y++) {
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() == numFrames) {
+					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture");
 					// GLSurfaceを経由してテクスチャを読み取る
 					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
 					final GLSurface surface = GLSurface.wrap(isGLES3,
 						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
 						GLES20.GL_TEXTURE4, texId, width, height, false);
 					surface.makeCurrent();
+					final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+					final ByteBuffer buffer = allocateBuffer(width, height);
 					final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
+					surface.release();
 					final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 					bitmap.copyPixelsFromBuffer(buf);
 					result.set(bitmap);
