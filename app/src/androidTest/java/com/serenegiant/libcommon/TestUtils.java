@@ -36,6 +36,7 @@ import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.utils.ThreadUtils;
 
 import java.io.Serializable;
@@ -177,7 +178,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * @param num_images
 	 */
 	public static void inputImagesAsync(@NonNull final Bitmap bitmap, @NonNull final Surface surface, final int num_images) {
-		new Thread(() -> {
+		ThreadPool.queueEvent(() -> {
 			final Rect inOutDirty = new Rect();
 			for (int i = 0; i < num_images; i++) {
 				if (surface.isValid()) {
@@ -186,7 +187,6 @@ LOOP:		for (int y = 0; y < height; y++) {
 						if (canvas != null) {
 							try {
 								canvas.drawBitmap(bitmap, 0, 0, null);
-								ThreadUtils.NoThrowSleep(30L);
 							} finally {
 								surface.unlockCanvasAndPost(canvas);
 							}
@@ -194,11 +194,12 @@ LOOP:		for (int y = 0; y < height; y++) {
 					} catch (Exception e) {
 						break;
 					}
+					ThreadUtils.NoThrowSleep(30L);
 				} else {
 					break;
 				}
 			}
-		}).start();
+		});
 	}
 
 	/**
