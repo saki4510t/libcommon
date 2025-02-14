@@ -163,7 +163,9 @@ public class GLUtils implements GLConst {
 	 * モデルビュー変換行列に左右・上下反転をセット
 	 * @param mvp
 	 * @param mirror
+	 * @deprecated MatrixUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @MirrorMode final int mirror) {
 		switch (mirror) {
 		case MIRROR_NORMAL -> {
@@ -189,7 +191,9 @@ public class GLUtils implements GLConst {
 	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
 	 * @param mvp
 	 * @param degrees
+	 * @deprecated MatrixUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
 		if ((degrees % 180) != 0) {
 			Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
@@ -200,7 +204,9 @@ public class GLUtils implements GLConst {
 	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
 	 * @param mvp
 	 * @param degrees
+	 * @deprecated MatrixUtilsの同名メソッドを使うこと
 	 */
+	@Deprecated
 	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
 		Matrix.setIdentityM(mvp, 0);
 		if ((degrees % 180) != 0) {

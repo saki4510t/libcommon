@@ -40,6 +40,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.ISurface;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 
@@ -858,7 +859,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
-						GLUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
+						MatrixUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();
@@ -948,7 +949,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
 					}
 					if (isRunning && (width > 0) && (height > 0)) {
-						GLUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
+						MatrixUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
 						mMvpMatrix[5] *= -1.0f;	// flip up-side down
 						drawer.setMvpMatrix(mMvpMatrix, 0);
 						captureSurface.makeCurrent();

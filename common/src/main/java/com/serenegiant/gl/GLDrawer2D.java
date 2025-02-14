@@ -24,6 +24,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.BufferHelper;
 
 import java.nio.FloatBuffer;
@@ -347,7 +348,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param mirror
 	 */
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
-		GLUtils.setMirror(mMvpMatrix, mirror);
+		MatrixUtils.setMirror(mMvpMatrix, mirror);
 	}
 
 	/**
@@ -355,7 +356,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param degrees
 	 */
 	public void rotate(final int degrees) {
-		GLUtils.rotate(mMvpMatrix, degrees);
+		MatrixUtils.rotate(mMvpMatrix, degrees);
 	}
 
 	/**
@@ -363,7 +364,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param degrees
 	 */
 	public void setRotation(final int degrees) {
-		GLUtils.setRotation(mMvpMatrix, degrees);
+		MatrixUtils.setRotation(mMvpMatrix, degrees);
 	}
 
 	/**

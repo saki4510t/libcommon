@@ -28,6 +28,7 @@ import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.utils.ThreadUtils;
 
@@ -738,7 +739,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		mRotation = degree;
 		final RendererTarget target = mTargets.get(id);
 		if (target != null) {
-			GLUtils.setRotation(target.getMvpMatrix(), degree);
+			MatrixUtils.setRotation(target.getMvpMatrix(), degree);
 		}
 	}
 

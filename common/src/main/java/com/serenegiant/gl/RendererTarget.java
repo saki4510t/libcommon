@@ -24,6 +24,7 @@ import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.IMirror;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.system.Time;
 
 import androidx.annotation.NonNull;
@@ -173,7 +174,7 @@ public class RendererTarget implements IMirror {
 		final int _mirror = mirror % IMirror.MIRROR_NUM;
 		if (_mirror != mMirror) {
 			mMirror = _mirror;
-			GLUtils.setMirror(mMvpMatrix, _mirror);
+			MatrixUtils.setMirror(mMvpMatrix, _mirror);
 		}
 	}
 

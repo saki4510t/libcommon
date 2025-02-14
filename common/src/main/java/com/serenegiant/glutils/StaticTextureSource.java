@@ -36,6 +36,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.RendererTarget;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 
 /**
@@ -606,7 +607,7 @@ public class StaticTextureSource implements GLConst, IMirror {
 			for (int i = 0; i < n; i++) {
 				final RendererTarget target = mTargets.valueAt(i);
 				if (target != null) {
-					GLUtils.setMirror(target.getMvpMatrix(), mirror);
+					MatrixUtils.setMirror(target.getMvpMatrix(), mirror);
 				}
 			}
 		}

@@ -23,11 +23,15 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.widget.ImageView;
 
+import com.serenegiant.glutils.IMirror;
+
 import java.util.HashMap;
 import java.util.Map;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Size;
+
+import static com.serenegiant.glutils.IMirror.*;
 
 public class MatrixUtils {
 	private MatrixUtils() {
@@ -74,6 +78,55 @@ public class MatrixUtils {
 		final float scaleX = mat[Matrix.MSCALE_X];
 		final float skewY = mat[Matrix.MSKEW_Y];
 		return (float) Math.sqrt(scaleX * scaleX + skewY * skewY);
+	}
+
+	/**
+	 * モデルビュー変換行列に左右・上下反転をセット
+	 * @param mvp
+	 * @param mirror
+	 */
+	public static void setMirror(@NonNull @Size(min=16) final float[] mvp, @IMirror.MirrorMode final int mirror) {
+		switch (mirror) {
+		case MIRROR_NORMAL -> {
+			mvp[0] = Math.abs(mvp[0]);
+			mvp[5] = Math.abs(mvp[5]);
+		}
+		case MIRROR_HORIZONTAL -> {
+			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
+			mvp[5] = Math.abs(mvp[5]);
+		}
+		case MIRROR_VERTICAL -> {
+			mvp[0] = Math.abs(mvp[0]);
+			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+		}
+		case MIRROR_BOTH -> {
+			mvp[0] = -Math.abs(mvp[0]);    // flip left-right
+			mvp[5] = -Math.abs(mvp[5]);    // flip up-side down
+		}
+		}
+	}
+
+	/**
+	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
+	 * @param mvp
+	 * @param degrees
+	 */
+	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
+		if ((degrees % 180) != 0) {
+			android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+		}
+	}
+
+	/**
+	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
+	 * @param mvp
+	 * @param degrees
+	 */
+	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
+		android.opengl.Matrix.setIdentityM(mvp, 0);
+		if ((degrees % 180) != 0) {
+			android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
+		}
 	}
 
 	/**
