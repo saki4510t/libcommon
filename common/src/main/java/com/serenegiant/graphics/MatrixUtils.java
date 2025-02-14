@@ -167,6 +167,17 @@ public class MatrixUtils {
 	}
 
 	/**
+	 * android.graphics.Matrixの3x3行列をOpenGLの4x4(列優先)行列に変換する
+	 * @param matrix
+	 * @return
+	 */
+	@NonNull
+	@Size(min=16)
+	public static float[] toGLMatrix(@NonNull final Matrix matrix) {
+		return toGLMatrix(matrix, new float[16], new float[9]);
+	}
+
+	/**
 	 * OpenGLの4x4(列優先)行列をandroid.graphics.Matrixの3x3行列に変換する
 	 * (アフィン変換のみ)
 	 * @param transform
@@ -236,6 +247,52 @@ public class MatrixUtils {
 			']';
 	}
 
+	/**
+	 * AndroidのMatrix(3x3)をOpenGLの行列と同じ列優先で文字列に変換する
+	 * Android Matrix(3x3)			Open GL Matrix(4x4)
+	 * |a11 a12 a13|  |0 1 2|      |a11 a12   0 a13|   |0 4 8  12|
+	 * |a21 a22 a23|  |3 4 5|      |a21 a22   0 a23|   |1 5 9  13|
+	 * |a31 a32 a33|  |6 7 8|      |  0   0   1   0|   |2 6 10 14|
+	 *                             |a31 a32   0 a33|   |3 7 11 15|
+	 * @param matrix
+	 * @return
+	 */
+	public static String toString(@NonNull final Matrix matrix) {
+		final float[] work = new float[9];
+		matrix.getValues(work);
+		return "AMatrix[" +
+			work[0] + ", " +
+			work[3] + ", " +
+			work[6] + ", " +
+			"][" +
+			work[1] + ", " +
+			work[4] + ", " +
+			work[7] + ", " +
+			"][" +
+			work[2] +
+			work[5] + ", " +
+			work[6] +
+			']';
+	}
+
+	public static boolean compare(
+		@NonNull final Matrix matrix,
+		@NonNull @Size(min=16)final float[] mat,
+		final float eps) {
+
+		final float[] work = new float[9];
+		matrix.getValues(work);
+
+		return (Math.abs(work[Matrix.MSCALE_X] - mat[0]) < eps)
+			&& (Math.abs(work[Matrix.MSKEW_Y] - mat[1]) < eps)
+			&& (Math.abs(work[Matrix.MPERSP_0] - mat[3]) < eps)
+			&& (Math.abs(work[Matrix.MSKEW_X] - mat[4]) < eps)
+			&& (Math.abs(work[Matrix.MSCALE_Y] - mat[5]) < eps)
+			&& (Math.abs(work[Matrix.MPERSP_1] - mat[7]) < eps)
+			&& (Math.abs(work[Matrix.MTRANS_X] - mat[12]) < eps)
+			&& (Math.abs(work[Matrix.MTRANS_Y] - mat[13]) < eps)
+			&& (Math.abs(work[Matrix.MPERSP_2] - mat[15]) < eps);
+	}
 //--------------------------------------------------------------------------------
 	/**
 	 * ImageView.ScaleTypeと同じ
