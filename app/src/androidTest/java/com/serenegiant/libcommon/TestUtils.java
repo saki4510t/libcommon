@@ -185,12 +185,15 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final int numImages,
 		@NonNull final AtomicBoolean requestStop) {
 		ThreadPool.queueEvent(() -> {
+			Log.v(TAG, "inputImagesAsync:start," + bitmap);
 			final Rect inOutDirty = new Rect();
+			int cnt = 0;
 			for (int i = 0; i < numImages; i++) {
 				if (!requestStop.get() && surface.isValid()) {
 					final Canvas canvas = surface.lockCanvas(inOutDirty);
 					try {
 						if (canvas != null) {
+							cnt++;
 							try {
 								canvas.drawBitmap(bitmap, 0, 0, null);
 							} finally {
@@ -205,6 +208,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 					break;
 				}
 			}
+			Log.v(TAG, "inputImagesAsync:finished," + cnt + "/" + numImages);
 		});
 	}
 
