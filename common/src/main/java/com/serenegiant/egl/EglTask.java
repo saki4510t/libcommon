@@ -18,6 +18,8 @@ package com.serenegiant.egl;
  *  limitations under the License.
 */
 
+import android.os.Process;
+
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.utils.MessageTask;
@@ -109,7 +111,7 @@ public abstract class EglTask extends MessageTask {
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
 
-		mGLContext.initialize(null, mMasterWidth, mMasterHeight);
+		mGLContext.initialize(null, mMasterWidth, mMasterHeight, Process.THREAD_PRIORITY_DISPLAY);
 	}
 
 	/**

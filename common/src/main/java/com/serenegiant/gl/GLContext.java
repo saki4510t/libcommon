@@ -168,7 +168,7 @@ public class GLContext implements EGLConst {
 	 */
 	@WorkerThread
 	public void initialize() throws IllegalArgumentException {
-		initialize(null, 1, 1);
+		initialize(null, 1, 1, Process.THREAD_PRIORITY_DISPLAY);
 	}
 
 	/**
@@ -179,14 +179,17 @@ public class GLContext implements EGLConst {
 	 * @param width オフスクリーンの幅 1未満の場合は1
 	 * @param height オフスクリーン高さ  1未満の場合は1
 	 * @param height オフスクリーン高さ  1未満の場合は1
+	 * @param priority スレッドの優先度、Process.THREAD_PRIORITY_DISPLAY
 	 * @throws IllegalArgumentException
 	 */
 	@WorkerThread
 	public void initialize(
-		@Nullable final Object surface, final int width, final int height)
+		@Nullable final Object surface,
+		final int width, final int height,
+		final int priority)
 			throws IllegalArgumentException {
 
-		Process.setThreadPriority(Process.THREAD_PRIORITY_DISPLAY);
+		Process.setThreadPriority(priority);
 		if ((mEgl == null)
 			&& ((mSharedContext == null)
 				|| (mSharedContext instanceof EGLBase.IContext))) {

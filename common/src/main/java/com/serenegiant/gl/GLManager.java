@@ -63,7 +63,7 @@ public class GLManager {
 		this(GLUtils.getSupportedGLVersion(),
 			null, 0,
 			null, 0,0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			null);
 	}
 
@@ -76,7 +76,7 @@ public class GLManager {
 		this(GLUtils.getSupportedGLVersion(),
 			null, 0,
 			null, 0, 0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			callback);
 	}
 
@@ -87,7 +87,7 @@ public class GLManager {
 	public GLManager(final int maxClientVersion) {
 		this(maxClientVersion, null, 0,
 			null, 0, 0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			null);
 	}
 
@@ -99,7 +99,9 @@ public class GLManager {
 	public GLManager(final int maxClientVersion,
 		@Nullable final Handler.Callback callback) {
 
-		this(maxClientVersion, null, 0, null, 0, 0, Process.THREAD_PRIORITY_DEFAULT, callback);
+		this(maxClientVersion, null, 0,
+			null, 0, 0,
+			Process.THREAD_PRIORITY_DISPLAY, callback);
 	}
 
 	/**
@@ -114,7 +116,7 @@ public class GLManager {
 			manager.getGLContext().getContext(),
 			manager.getGLContext().getFlags(),
 			null, 0, 0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			callback);
 	}
 
@@ -129,7 +131,7 @@ public class GLManager {
 		this(shared.getMaxClientVersion(),
 			shared.getContext(), shared.getFlags(),
 			null, 0, 0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			callback);
 	}
 
@@ -146,7 +148,7 @@ public class GLManager {
 			throws IllegalArgumentException, IllegalStateException {
 		this(maxClientVersion, sharedContext, flags,
 			null, 0, 0,
-			Process.THREAD_PRIORITY_DEFAULT,
+			Process.THREAD_PRIORITY_DISPLAY,
 			callback);
 	}
 	/**
@@ -159,7 +161,7 @@ public class GLManager {
 	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
 	 * @param masterHeight GLコンテキスト保持用のEglSurfaceのサイズ(高さ)、0以下の場合は1になる
 	 * 						masterSurfaceにnull以外を指定した場合は有効な値をセットすること
-	 * @param threadPriority スレッドの優先度、Process.THREAD_PRIORITY_XXXで指定, デフォルトはTHREAD_PRIORITY_DEFAULT
+	 * @param threadPriority スレッドの優先度、Process.THREAD_PRIORITY_XXXで指定, デフォルトはProcess.THREAD_PRIORITY_DISPLAY
 	 * @param callback GLコンテキストを保持したワーカースレッド上での実行用Handlerのメッセージ処理用コールバック
 	 */
 	public GLManager(final int maxClientVersion,
@@ -183,7 +185,7 @@ public class GLManager {
 			@Override
 			public void run() {
 				try {
-					mGLContext.initialize(masterSurface, masterWidth, masterHeight);
+					mGLContext.initialize(masterSurface, masterWidth, masterHeight, threadPriority);
 					mInitialized = true;
 				} catch (final Exception e) {
 					Log.w(TAG, e);
@@ -255,7 +257,7 @@ public class GLManager {
 				@Override
 				public void run() {
 					try {
-						mGLContext.initialize(masterSurface, masterWidth, masterHeight);
+						mGLContext.initialize(masterSurface, masterWidth, masterHeight, mThreadPriority);
 						mInitialized = true;
 					} catch (final Exception e) {
 						Log.w(TAG, e);
