@@ -117,8 +117,15 @@ public abstract class Pool<T> {
 				result = mPool.remove(mPool.size() - 1);
 			}
 			if ((result == null) && (mCreatedObjects < mLimitNum)) {
-				result = createObject(args);
-				mCreatedObjects++;
+				int n = mCreatedObjects == 0 ? 1 : mCreatedObjects * 2;
+				n = Math.min(n, mLimitNum);
+				for (int i = 0; i < n; i++) {
+					mPool.add(createObject(args));
+					mCreatedObjects++;
+				}
+				if (!mPool.isEmpty()) {
+					result = mPool.remove(mPool.size() - 1);
+				}
 			}
 		}
 		return result;
