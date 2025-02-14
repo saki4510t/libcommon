@@ -34,6 +34,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -49,7 +50,7 @@ public class SurfaceProxyTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
-	private static final int MAX_IMAGES = 200;
+	private static final int NUM_FRAMES = 200;
 
 	@Before
 	public void prepare() {
@@ -83,16 +84,19 @@ public class SurfaceProxyTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface receiverSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// SurfaceProxyReaderWriterへ映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);
 		// 初段のSurfaceProxyReaderWriterの入力用Surfaceへ静止画を描き込む
-		inputImagesAsync(original, inputSurface, MAX_IMAGES);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES, requestStop);
 
 		try {
-			assertTrue(sem.tryAcquire(MAX_IMAGES * 50, TimeUnit.MILLISECONDS));
-			assertEquals(MAX_IMAGES, cnt.get());
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -127,16 +131,18 @@ public class SurfaceProxyTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface receiverSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, MAX_IMAGES, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(receiverSurface);
 		// プロキシに映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);
 		// 初段のSurfaceProxyGLESの入力用Surfaceへ静止画を描き込む
-		inputImagesAsync(original, inputSurface, MAX_IMAGES);
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES, requestStop);
 
 		try {
-			assertTrue(sem.tryAcquire(MAX_IMAGES * 50, TimeUnit.MILLISECONDS));
-			assertEquals(MAX_IMAGES, cnt.get());
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);

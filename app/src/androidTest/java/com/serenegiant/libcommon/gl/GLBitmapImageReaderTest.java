@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -53,7 +54,7 @@ public class GLBitmapImageReaderTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
-	private static final int MAX_FRAMES = 50;
+	private static final int NUM_FRAMES = 50;
 	private static final long MAX_WAIT_MS = 20000L;
 
 	@Nullable
@@ -90,7 +91,7 @@ public class GLBitmapImageReaderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, MAX_FRAMES);
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -98,7 +99,7 @@ public class GLBitmapImageReaderTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() == MAX_FRAMES) {
+						if (cnt.incrementAndGet() == NUM_FRAMES) {
 							result.set(Bitmap.createBitmap(bitmap));
 							sem.release();
 						}
@@ -112,10 +113,13 @@ public class GLBitmapImageReaderTest {
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(mManager, WIDTH, HEIGHT, reader);
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
-		inputImagesAsync(original, surface, MAX_FRAMES);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
 			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);

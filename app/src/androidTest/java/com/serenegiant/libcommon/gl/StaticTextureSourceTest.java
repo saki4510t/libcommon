@@ -51,6 +51,7 @@ public class StaticTextureSourceTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
+	private static final int NUM_FRAMES = 50;
 
 	@Before
 	public void prepare() {
@@ -76,14 +77,14 @@ public class StaticTextureSourceTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface surface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, 30, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(surface);
 		source.addSurface(surface.hashCode(), surface, false);
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			assertTrue(cnt.get() >= 30);
+			assertTrue(cnt.get() >= NUM_FRAMES);
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -109,7 +110,7 @@ public class StaticTextureSourceTest {
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
 		final Surface surface1 = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, 30, sem, result1, cnt1);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
 		assertNotNull(surface1);
 
 		source.addSurface(surface1.hashCode(), surface1, false);
@@ -123,16 +124,16 @@ public class StaticTextureSourceTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(2, 2000, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			assertTrue(cnt1.get() >= 30);
+			assertTrue(cnt1.get() >= NUM_FRAMES);
 			final Bitmap b1 = result1.get();
 //			dump(b1);
 			assertNotNull(b1);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b1));
 
-			assertTrue(cnt2.get() >= 30);
+			assertTrue(cnt2.get() >= NUM_FRAMES);
 			final Bitmap b2 = result2.get();
 //			dump(b1);
 			assertNotNull(b2);

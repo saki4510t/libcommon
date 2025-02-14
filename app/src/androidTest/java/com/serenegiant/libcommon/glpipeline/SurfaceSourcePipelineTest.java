@@ -36,6 +36,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
@@ -52,6 +53,7 @@ public class SurfaceSourcePipelineTest {
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
+	private static final int NUM_FRAMES = 50;
 
 	@Nullable
 	private GLManager mManager;
@@ -84,7 +86,6 @@ public class SurfaceSourcePipelineTest {
 	 */
 	@Test
 	public void surfaceSourcePipelineTest() {
-		final int NUM_FRAMES = 30;
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -122,11 +123,13 @@ public class SurfaceSourcePipelineTest {
 		// 想定したとおりに接続されているかどうかを検証
 		assertTrue(validatePipelineOrder(source, source, proxy));
 		// 実際の映像はSurfaceを経由して映像を書き込む
-		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2);
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
 
 		try {
 			// 30fpsで30枚なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);

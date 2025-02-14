@@ -44,8 +44,7 @@ import static org.junit.Assert.assertTrue;
 public class ChoreographerTest {
    private static final String TAG = ChoreographerTest.class.getSimpleName();
 
-   private static final int MAX_FRAMES = 120;
-   private static final long MAX_WAIT_MS = 20000L;
+   private static final int NUM_FRAMES = 120;
 
    @Test
    public void countFramesTest() {
@@ -57,7 +56,7 @@ public class ChoreographerTest {
          @Override
          public void doFrame(final long frameTimeNanos) {
             final int n = numFrames.incrementAndGet();
-            if (n < MAX_FRAMES) {
+            if (n < NUM_FRAMES) {
                Choreographer.getInstance().postFrameCallbackDelayed(this, 0);
             } else {
                latch.countDown();
@@ -69,7 +68,7 @@ public class ChoreographerTest {
          Choreographer.getInstance().postFrameCallbackDelayed(callback, 0);
       });
       try {
-         assertTrue(latch.await(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+         assertTrue(latch.await(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
          final long endTimeNs = SystemClock.elapsedRealtimeNanos();
          final int n = numFrames.get();
          final float fps = (n * 1000000000f) / (endTimeNs - startTimeNs);
@@ -120,7 +119,14 @@ public class ChoreographerTest {
 //      }
 //   }
 
-   @Test
+   @Test(timeout = 300000)
+   public void frameRate5Test() {
+      final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
+      frameRate(asyncHandler, 5);
+      HandlerUtils.quit(asyncHandler);
+   }
+
+   @Test(timeout = 200000)
    public void frameRate10Test() {
       final Handler asyncHandler = HandlerThreadHandler.createHandler(TAG);
       frameRate(asyncHandler, 10);
@@ -202,7 +208,7 @@ public class ChoreographerTest {
             if (ms < 5L) {
                ms = 0L;
             }
-            if (n < MAX_FRAMES) {
+            if (n < NUM_FRAMES) {
                choreographer.postFrameCallbackDelayed(this, ms);
             } else {
                choreographer.removeFrameCallback(this);
@@ -215,7 +221,7 @@ public class ChoreographerTest {
          Choreographer.getInstance().postFrameCallbackDelayed(callback, 0);
       });
       try {
-         assertTrue(latch.await(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+         assertTrue(latch.await(NUM_FRAMES * ((1000 / requestFps) + 20L), TimeUnit.MILLISECONDS));
          final long endTimeNs = SystemClock.elapsedRealtimeNanos();
          final int n = numFrames.get();
          final float fps = (n * 1000000000f) / (endTimeNs - startTimeNs);

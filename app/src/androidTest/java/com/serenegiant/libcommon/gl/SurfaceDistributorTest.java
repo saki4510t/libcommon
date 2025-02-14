@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -59,6 +60,7 @@ public class SurfaceDistributorTest {
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
+	private static final int NUM_FRAMES = 50;
 
 	@Nullable
 	private GLManager mGLManager;
@@ -91,7 +93,6 @@ public class SurfaceDistributorTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final int NUM_FRAMES = 100;
 		final GLManager manager = mGLManager;
 
 		final SurfaceDistributor distributor = new SurfaceDistributor(
@@ -116,10 +117,13 @@ public class SurfaceDistributorTest {
 
 		final Surface inputSurface = distributor.getSurface();
 		assertNotNull(inputSurface);
-		inputImagesAsync(original, inputSurface, NUM_FRAMES + 5);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES + 5, requestStop);
 
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
 			assertTrue(cnt.get() >= NUM_FRAMES);
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
@@ -139,7 +143,6 @@ public class SurfaceDistributorTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final int NUM_FRAMES = 100;
 		final GLManager manager = mGLManager;
 
 		final SurfaceDistributor distributor = new SurfaceDistributor(
@@ -174,10 +177,13 @@ public class SurfaceDistributorTest {
 		// Surface経由してBitmapを書き込み
 		final Surface inputSurface = distributor.getSurface();
 		assertNotNull(inputSurface);
-		inputImagesAsync(original, inputSurface, NUM_FRAMES + 5);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES + 5, requestStop);
 
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -202,7 +208,6 @@ public class SurfaceDistributorTest {
 	 */
 	@Test
 	public void surfaceDistributorChangeSourceTest() {
-		final int NUM_FRAMES = 100;
 		final GLManager manager = mGLManager;
 
 		final SurfaceDistributor distributor = new SurfaceDistributor(
@@ -233,10 +238,13 @@ public class SurfaceDistributorTest {
 //			dump(bitmap);
 			final Surface inputSurface = distributor.getSurface();
 			assertNotNull(inputSurface);
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 5);
+
+			final AtomicBoolean requestStop = new AtomicBoolean();
+			inputImagesAsync(original, inputSurface, NUM_FRAMES + 5, requestStop);
 
 			try {
 				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				requestStop.set(true);
 				assertTrue(cnt.get() >= NUM_FRAMES);
 				final Bitmap resultBitmap = result.get();
 				assertNotNull(resultBitmap);
@@ -254,7 +262,6 @@ public class SurfaceDistributorTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final int NUM_FRAMES = 100;
 		final GLManager manager = mGLManager;
 
 		// テストするSurfaceDistributorを生成
@@ -320,7 +327,6 @@ public class SurfaceDistributorTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
 
-		final int NUM_FRAMES = 100;
 		final GLManager manager = mGLManager;
 
 		// テストするSurfaceDistributorを生成
@@ -386,11 +392,6 @@ public class SurfaceDistributorTest {
 	 */
 	@Test
 	public void staticTextureSourceChangeSourceTest() {
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(bitmap);
-
-		final int NUM_FRAMES = 5;
 		final GLManager manager = mGLManager;
 
 		// テストするSurfaceDistributorを生成
@@ -423,6 +424,9 @@ public class SurfaceDistributorTest {
 			Log.v(TAG, "staticTextureSourceRestartTest:0");
 			cnt1.set(0);
 			cnt2.set(0);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
 			// 映像ソースとしてStaticTextureSourceを生成
 			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 			final Surface inputSurface = distributor.getSurface();
@@ -454,6 +458,9 @@ public class SurfaceDistributorTest {
 			Log.v(TAG, "staticTextureSourceRestartTest:" + i);
 			cnt1.set(0);
 			cnt2.set(0);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
 			// 映像ソースとしてStaticTextureSourceを生成
 			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 			final Surface inputSurface = distributor.getSurface();

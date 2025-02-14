@@ -51,6 +51,7 @@ public class CapturePipelineTest {
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
+	private static final int NUM_FRAMES = 10;
 
 	@Nullable
 	private GLManager mManager;
@@ -138,7 +139,6 @@ public class CapturePipelineTest {
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(original);
 
-		final int NUM_TRIGGERS = 9;
 		final GLManager manager = mManager;
 
 		// 映像ソースを生成
@@ -150,7 +150,7 @@ public class CapturePipelineTest {
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
-				if (cnt.incrementAndGet() == NUM_TRIGGERS) {
+				if (cnt.incrementAndGet() == NUM_FRAMES) {
 					result.set(Bitmap.createBitmap(bitmap));
 					sem.release();
 				}
@@ -169,12 +169,12 @@ public class CapturePipelineTest {
 		assertTrue(validatePipelineOrder(source, source, capturePipeline));
 
 		// 100ミリ秒間隔でNUM_TRIGGERS(=9)回キャプチャ要求
-		capturePipeline.trigger(NUM_TRIGGERS, 100);
+		capturePipeline.trigger(NUM_FRAMES, 100);
 		try {
 			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 //			dump(result);
-			assertEquals(NUM_TRIGGERS, cnt.get());
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
 			assertNotNull(b);
 			assertTrue(bitmapEquals(original, b, true));

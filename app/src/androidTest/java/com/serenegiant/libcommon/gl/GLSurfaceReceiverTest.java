@@ -28,6 +28,7 @@ import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.utils.ThreadUtils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -36,6 +37,8 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.test.core.app.ApplicationProvider;
@@ -50,6 +53,7 @@ public class GLSurfaceReceiverTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
+	private static final int NUM_FRAMES = 50;
 
 	@Before
 	public void prepare() {
@@ -79,12 +83,15 @@ public class GLSurfaceReceiverTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, 10, sem, result);
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 		assertNotNull(surface);
-		inputImagesAsync(original, surface, 10);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
-			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
@@ -119,14 +126,14 @@ public class GLSurfaceReceiverTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, 10, sem, result);
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 		assertNotNull(surface);
 
 		renderer.setSurface(surface);
 		assertTrue(validatePipelineOrder(source, source, renderer));
 
 		try {
-			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -135,6 +142,52 @@ public class GLSurfaceReceiverTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 			fail();
+		}
+	}
+
+	/**
+	 * inputImagesAsyncでCanvasを経由してSurfaceへ書き込んだBitmapをGLSurfaceReceiverで
+	 * 読み取れることを検証
+	 * 途中で映像ソースを切り替える場合
+	 * FIXME 1回目はOKだけど映像ソースを切り替えるとビットマップが一致しない、1回目のビットマップになってる
+	 * Bitmap -> inputImagesAsync
+	 * 				↓
+	 * 				Surface -> GLSurfaceReceiver
+	 * 							-> GLBitmapImageReader -> Bitmap
+	 */
+	@Test
+	public void surfaceReaderChangeSourceTest() {
+		final GLManager manager = new GLManager();
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface surface = createGLSurfaceReceiverSurface(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(surface);
+
+		for (int i = 0; i < 3; i++) {
+			Log.v(TAG, "surfaceReaderChangeSourceTest:" + i);
+			cnt.set(0);
+			result.set(null);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
+
+			final AtomicBoolean requestStop = new AtomicBoolean();
+			inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
+
+			try {
+				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				requestStop.set(true);
+				assertTrue(cnt.get() >= NUM_FRAMES);
+				final Bitmap resultBitmap = result.get();
+				assertNotNull(resultBitmap);
+				// 元のビットマップと同じかどうかを検証
+				assertTrue(bitmapEquals(original, resultBitmap));	// i=0はOKだけどi=1でエラーになる
+			} catch (final InterruptedException e) {
+				fail();
+			}
+			ThreadUtils.NoThrowSleep(100L);
 		}
 	}
 }

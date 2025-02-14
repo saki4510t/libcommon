@@ -52,8 +52,7 @@ public class ImageTextureSourceTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
-	private static final int MAX_FRAMES = 50;
-	private static final long MAX_WAIT_MS = 20000L;
+	private static final int NUM_FRAMES = 120;
 
 	@Nullable
 	private GLManager mManager;
@@ -89,7 +88,7 @@ public class ImageTextureSourceTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result);
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
@@ -97,7 +96,7 @@ public class ImageTextureSourceTest {
 		// 映像受け取り用Surfaceをセット
 		source.setSurface(surface);
 		try {
-			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
@@ -107,12 +106,12 @@ public class ImageTextureSourceTest {
 		}
 	}
 
-	@Test
+	@Test(timeout = 30000)
 	public void frameRate5Test() {
 		frameRate(mManager, 5);
 	}
 
-	@Test
+	@Test(timeout = 20000)
 	public void frameRate10Test() {
 		frameRate(mManager, 10);
 	}
@@ -177,7 +176,7 @@ public class ImageTextureSourceTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger numFrames = new AtomicInteger();
 		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, MAX_FRAMES, sem, result, numFrames);
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, numFrames);
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
@@ -186,7 +185,7 @@ public class ImageTextureSourceTest {
 		source.setSurface(surface);
 		try {
 			final long startTimeNs = System.nanoTime();
-			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * ((1000 / requestFps) + 20L), TimeUnit.MILLISECONDS));
 			final long endTimeNs = System.nanoTime();
 			final int n = numFrames.get();
 			final float fps = (n * 1000000000f) / (endTimeNs - startTimeNs);

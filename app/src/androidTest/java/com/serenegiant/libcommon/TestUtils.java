@@ -43,6 +43,7 @@ import java.io.Serializable;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -175,13 +176,18 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * 非同期で指定したSurfaceへCanvasを使って指定した枚数指定したBitmapを書き込む
 	 * @param bitmap
 	 * @param surface
-	 * @param num_images
+	 * @param numImages
+	 * @param requestStop
 	 */
-	public static void inputImagesAsync(@NonNull final Bitmap bitmap, @NonNull final Surface surface, final int num_images) {
+	public static void inputImagesAsync(
+		@NonNull final Bitmap bitmap,
+		@NonNull final Surface surface,
+		final int numImages,
+		@NonNull final AtomicBoolean requestStop) {
 		ThreadPool.queueEvent(() -> {
 			final Rect inOutDirty = new Rect();
-			for (int i = 0; i < num_images; i++) {
-				if (surface.isValid()) {
+			for (int i = 0; i < numImages; i++) {
+				if (!requestStop.get() && surface.isValid()) {
 					final Canvas canvas = surface.lockCanvas(inOutDirty);
 					try {
 						if (canvas != null) {

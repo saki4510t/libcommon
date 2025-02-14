@@ -51,6 +51,7 @@ public class DrawerPipelineTest {
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
+	private static final int NUM_FRAMES = 50;
 
 	@Nullable
 	private GLManager mManager;
@@ -89,7 +90,7 @@ public class DrawerPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -101,7 +102,7 @@ public class DrawerPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -127,7 +128,7 @@ public class DrawerPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -141,7 +142,7 @@ public class DrawerPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -167,7 +168,7 @@ public class DrawerPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -183,7 +184,7 @@ public class DrawerPipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();

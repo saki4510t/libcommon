@@ -59,7 +59,7 @@ public class ImageSourcePipelineTest {
 
 	private static final int WIDTH = 128;
 	private static final int HEIGHT = 128;
-	private static final int MAX_FRAMES = 2;
+	private static final int NUM_FRAMES = 50;
 
 	@Nullable
 	private GLManager mManager;
@@ -102,7 +102,7 @@ public class ImageSourcePipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, MAX_FRAMES);
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -110,7 +110,7 @@ public class ImageSourcePipelineTest {
 				final Bitmap bitmap = reader.acquireLatestImage();
 				if (bitmap != null) {
 					try {
-						if (cnt.incrementAndGet() == MAX_FRAMES) {
+						if (cnt.incrementAndGet() == NUM_FRAMES) {
 							result.set(Bitmap.createBitmap(bitmap));
 							sem.release();
 						}
@@ -127,7 +127,7 @@ public class ImageSourcePipelineTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline));
 
 		try {
-			assertTrue(sem.tryAcquire(1000, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			final Bitmap b = result.get();
 //			dump(b);
@@ -157,7 +157,7 @@ public class ImageSourcePipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, 30, sem, result);
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -166,7 +166,7 @@ public class ImageSourcePipelineTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();

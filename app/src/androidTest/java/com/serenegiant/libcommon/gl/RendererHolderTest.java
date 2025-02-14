@@ -53,6 +53,7 @@ public class RendererHolderTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
+	private static final int NUM_FRAMES = 50;
 
 	@Before
 	public void prepare() {
@@ -75,7 +76,7 @@ public class RendererHolderTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface readerSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// 映像ソースとしてStaticTextureSourceを生成
@@ -91,8 +92,8 @@ public class RendererHolderTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			assertEquals(5, cnt.get());
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -117,7 +118,7 @@ public class RendererHolderTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface readerSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// 映像ソースとしてImageTextureSourceを生成
@@ -133,8 +134,8 @@ public class RendererHolderTest {
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			assertEquals(5, cnt.get());
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -149,23 +150,22 @@ public class RendererHolderTest {
 	}
 
 	@Test
-	public void staticTextureSourceRestartTest() {
-		final Bitmap original = BitmapHelper.makeCheckBitmap(
-			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//		dump(bitmap);
-
+	public void staticTextureSourceChangeTest() {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final Surface readerSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, 5, sem, result, cnt);
+			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(readerSurface);
 
 		// テストするRendererHolderを生成
 		final RendererHolder rendererHolder = new RendererHolder(WIDTH, HEIGHT, null);
 		{
 			cnt.set(0);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
 			// 映像ソースとしてStaticTextureSourceを生成
 			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 			final Surface surface = rendererHolder.getSurface();
@@ -176,8 +176,8 @@ public class RendererHolderTest {
 
 			try {
 				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-				assertEquals(5, cnt.get());
+				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				assertEquals(NUM_FRAMES, cnt.get());
 				final Bitmap b = result.get();
 	//			dump(b);
 				assertNotNull(b);
@@ -193,6 +193,9 @@ public class RendererHolderTest {
 		// 一度繋いだ映像ソースが破棄された後新しい映像ソースを繋ぐ
 		{
 			cnt.set(0);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 13, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
 			// 映像ソースとしてStaticTextureSourceを生成
 			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 			final Surface surface = rendererHolder.getSurface();
@@ -202,8 +205,8 @@ public class RendererHolderTest {
 			rendererHolder.addSurface(readerSurface.hashCode(), readerSurface, false);
 			try {
 				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-				assertEquals(5, cnt.get());
+				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				assertEquals(NUM_FRAMES, cnt.get());
 				final Bitmap b = result.get();
 	//			dump(b);
 				assertNotNull(b);
