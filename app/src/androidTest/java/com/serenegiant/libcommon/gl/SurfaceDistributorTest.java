@@ -194,6 +194,60 @@ public class SurfaceDistributorTest {
 		}
 	}
 
+	/**
+	 * SurfaceDistributorがSurfaceを経由して受け取った映像をSurfaceへ描画できることを検証
+	 * 映像ソースを途中で変更する
+	 * FIXME 1回目はOKだけど映像ソースを変えた後でビットマップが一致しない
+	 *       GLSurfaceReceiverの問題かも
+	 */
+	@Test
+	public void surfaceDistributorChangeSourceTest() {
+		final int NUM_FRAMES = 100;
+		final GLManager manager = mGLManager;
+
+		final SurfaceDistributor distributor = new SurfaceDistributor(
+			manager, false,
+			WIDTH, HEIGHT,
+			GLDrawer2D.DEFAULT_FACTORY,
+			IRendererHolder.DEFAULT_CALLBACK);
+
+		// 描画結果受け取り用にSurfaceを生成
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final Surface surface = createGLSurfaceReceiverSurface(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(surface);
+		distributor.addSurface(surface.hashCode(), surface, false, null);
+
+		// addSurfaceは非同期なのでちょっとまたないと反映されない
+		ThreadUtils.NoThrowSleep(100);
+		// 正常にSurfaceを追加できたかどうかを確認
+		assertEquals(1, distributor.getCount());
+
+		for (int i = 0; i < 3; i++) {
+			Log.v(TAG, "surfaceDistributorTest2:" + i);
+			cnt.set(0);
+			final Bitmap original = BitmapHelper.makeCheckBitmap(
+				WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
+//			dump(bitmap);
+			final Surface inputSurface = distributor.getSurface();
+			assertNotNull(inputSurface);
+			inputImagesAsync(original, inputSurface, NUM_FRAMES + 5);
+
+			try {
+				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				assertTrue(cnt.get() >= NUM_FRAMES);
+				final Bitmap resultBitmap = result.get();
+				assertNotNull(resultBitmap);
+				// 元のビットマップと同じかどうかを検証
+				assertTrue(bitmapEquals(original, resultBitmap));
+			} catch (final InterruptedException e) {
+				fail();
+			}
+		}
+	}
+
 	@Test
 	public void staticTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -325,8 +379,13 @@ public class SurfaceDistributorTest {
 		}
 	}
 
+	/**
+	 * 映像ソースを切り替えても正常に描画できることを検証
+	 * FIXME 1回目はOKだけど映像ソースを変えた後でビットマップが一致しない
+	 *       GLSurfaceReceiverの問題かも
+	 */
 	@Test
-	public void staticTextureSourceRestartTest() {
+	public void staticTextureSourceChangeSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
@@ -359,7 +418,9 @@ public class SurfaceDistributorTest {
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false, null);
 
+		// 1回目
 		{
+			Log.v(TAG, "staticTextureSourceRestartTest:0");
 			cnt1.set(0);
 			cnt2.set(0);
 			// 映像ソースとしてStaticTextureSourceを生成
@@ -371,6 +432,7 @@ public class SurfaceDistributorTest {
 
 			try {
 				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				source.removeSurface(inputSurface.hashCode());
 				source.release();
 				// それぞれのSurfaceが受け取った映像フレーム数を確認
 				assertTrue(cnt1.get() >= NUM_FRAMES);
@@ -384,12 +446,12 @@ public class SurfaceDistributorTest {
 				assertTrue(bitmapEquals(original, resultBitmap1));
 				assertTrue(bitmapEquals(original, resultBitmap2));
 			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				fail();
 			}
-			source.removeSurface(inputSurface.hashCode());
 		}
-		// 一度繋いだ映像ソースが破棄された後新しい映像ソースを繋ぐ
-		{
+		// 映像ソースを切り替える
+		for (int i = 1; i < 3; i++) {
+			Log.v(TAG, "staticTextureSourceRestartTest:" + i);
 			cnt1.set(0);
 			cnt2.set(0);
 			// 映像ソースとしてStaticTextureSourceを生成
@@ -401,6 +463,7 @@ public class SurfaceDistributorTest {
 
 			try {
 				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+				source.removeSurface(inputSurface.hashCode());
 				source.release();
 				// それぞれのSurfaceが受け取った映像フレーム数を確認
 				assertTrue(cnt1.get() >= NUM_FRAMES);
@@ -414,7 +477,7 @@ public class SurfaceDistributorTest {
 				assertTrue(bitmapEquals(original, resultBitmap1));
 				assertTrue(bitmapEquals(original, resultBitmap2));
 			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				fail();
 			}
 		}
 	}
