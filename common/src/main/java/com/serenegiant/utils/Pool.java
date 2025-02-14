@@ -66,7 +66,27 @@ public abstract class Pool<T> {
 		mLimitNum = limitNum;
 		init(args);
 	}
-	
+
+	/**
+	 * 呼び出した時点でプール内に存在するオブジェクトの数を返す
+	 * @return
+	 */
+	public int available() {
+		synchronized (mPool) {
+			return mPool.size();
+		}
+	}
+
+	/**
+	 * 呼び出した時点でプールからオブジェクトを取得可能かどうかを返す
+	 * @return
+	 */
+	public boolean isNotEmpty() {
+		synchronized (mPool) {
+			return !mPool.isEmpty();
+		}
+	}
+
 	/**
 	 * プール内のオブジェクトを破棄して新たに初期数まで確保する
 	 * @param args オプション引数, Tの生成に必要な値を渡す, #createObjectへ引き渡される, 省略可
