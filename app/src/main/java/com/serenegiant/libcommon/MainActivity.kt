@@ -49,7 +49,7 @@ class MainActivity
 		OnListFragmentInteractionListener,
 		RationalDialogV4.DialogResultListener {
 
-	private var mPermissions: PermissionUtils? = null
+	private lateinit var mPermissions: PermissionUtils
 	private var mIsResumed = false
 
 	override fun onCreate(savedInstanceState: Bundle?) {
@@ -445,10 +445,8 @@ class MainActivity
 		if (DEBUG) Log.v(TAG, "onDialogResult:result=${result}," + permissions.contentToString())
 		if (result) { // メッセージダイアログでOKを押された時はパーミッション要求する
 			if (BuildCheck.isMarshmallow()) {
-				if (mPermissions != null) {
-					mPermissions!!.requestPermission(permissions, false)
-					return
-				}
+				mPermissions.requestPermission(permissions, false)
+				return
 			}
 		}
 		// メッセージダイアログでキャンセルされた時とAndroid6でない時は自前でチェックして#checkPermissionResultを呼び出す
@@ -497,8 +495,7 @@ class MainActivity
 	private fun checkPermissionWriteExternalStorage(): Boolean {
 		// API29以降は対象範囲別ストレージ＆MediaStoreを使うのでWRITE_EXTERNAL_STORAGEパーミッションは不要
 		return (BuildCheck.isAPI29()
-			|| (mPermissions != null
-				&& mPermissions!!.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, true)))
+			|| mPermissions.requestPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE, true))
 	}
 
 	/**
@@ -510,8 +507,7 @@ class MainActivity
 	private fun checkPermissionReadExternalStorage(): Boolean {
 		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
 		return PermissionUtils.hasWriteExternalStorage(this)
-			|| (mPermissions != null
-				&& mPermissions!!.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, true))
+			|| mPermissions.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, true)
 	}
 
 	/**
@@ -521,8 +517,7 @@ class MainActivity
 	 * @return true already have permission to record audio
 	 */
 	private fun checkPermissionAudio(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.RECORD_AUDIO, true)
+		return mPermissions.requestPermission(Manifest.permission.RECORD_AUDIO, true)
 	}
 
 	/**
@@ -532,8 +527,7 @@ class MainActivity
 	 * @return true already have permission to access internal camera
 	 */
 	private fun checkPermissionCamera(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.CAMERA, true)
+		return mPermissions.requestPermission(Manifest.permission.CAMERA, true)
 	}
 
 	/**
@@ -543,8 +537,7 @@ class MainActivity
 	 * @return true already have permission to access network
 	 */
 	private fun checkPermissionNetwork(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.INTERNET, true)
+		return mPermissions.requestPermission(Manifest.permission.INTERNET, true)
 	}
 
 	/**
@@ -554,8 +547,7 @@ class MainActivity
 	 * @return true already have permission to access network
 	 */
 	private fun checkPermissionWiFiState(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.ACCESS_WIFI_STATE, true)
+		return mPermissions.requestPermission(Manifest.permission.ACCESS_WIFI_STATE, true)
 	}
 
 	/**
@@ -564,8 +556,7 @@ class MainActivity
 	 * @return true already have permission to access gps
 	 */
 	private fun checkPermissionLocation(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(LOCATION_PERMISSIONS, true)
+		return mPermissions.requestPermission(LOCATION_PERMISSIONS, true)
 	}
 
 	/**
@@ -575,8 +566,7 @@ class MainActivity
 	 * @return true already have permission to access network
 	 */
 	private fun checkPermissionPhoneState(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.READ_PHONE_STATE, true)
+		return mPermissions.requestPermission(Manifest.permission.READ_PHONE_STATE, true)
 	}
 
 	/**
@@ -587,8 +577,7 @@ class MainActivity
 	 */
 	private fun checkPermissionPhoneNumber(): Boolean {
 		return !BuildCheck.isAPI26()
-			|| (mPermissions != null
-				&& mPermissions!!.requestPermission(Manifest.permission.READ_PHONE_NUMBERS, true))
+			|| mPermissions.requestPermission(Manifest.permission.READ_PHONE_NUMBERS, true)
 	}
 
 	/**
@@ -598,8 +587,7 @@ class MainActivity
 	 * @return true already have permission to access network
 	 */
 	private fun checkPermissionSMS(): Boolean {
-		return mPermissions != null
-			&& mPermissions!!.requestPermission(Manifest.permission.READ_SMS, true)
+		return mPermissions.requestPermission(Manifest.permission.READ_SMS, true)
 	}
 
 	/**
