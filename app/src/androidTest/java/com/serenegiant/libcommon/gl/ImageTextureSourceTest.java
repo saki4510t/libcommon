@@ -24,9 +24,11 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 
 import org.junit.After;
@@ -78,11 +80,61 @@ public class ImageTextureSourceTest {
 	}
 
 	/**
+	 * createGLSurfaceReceiver/GLSurfaceReceiverを使うとSurfaceTextureを経由するので
+	 * GL_TEXTURE_EXTERNAL_OESになってしまうのと1回GLDrawer2Dでの描画処理が走ってしまうので
+	 * OnFrameAvailableListenerを使ってGL_TEXTURE_2Dテクスチャから読み取るテスト
+	 * Bitmap → ImageTextureSource
+	 * 			→ OnFrameAvailableListener → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void imageTextureSourceTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
+
+		// 映像ソース用にImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(30));
+		// 映像受け取り用にOnFrameAvailableListenerをセット
+		// XXX Javaだとコンストラクタへ引き渡したOnFrameAvailableListener内からでも
+		//     source変数へアクセスできるけど、お行儀が悪いので元々はコンストラクタでしか
+		//     OnFrameAvailableListenerをセットできなかったけど#setOnFrameAvailableListenerを
+		//     追加して後からOnFrameAvailableListenerをセットできるようにした
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		source.setOnFrameAvailableListener(() -> {
+			// ここはGLコンテキスト内
+			if (cnt.incrementAndGet() == NUM_FRAMES) {
+				final int texId = source.getTexId();
+				final float[] texMatrix = source.getTexMatrix();
+				final int width = source.getWidth();
+				final int height = source.getHeight();
+				Log.v(TAG, "OnFrameAvailableListener:create Bitmap from texture, texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
+				result.set(GLUtils.glCopyTextureToBitmap(
+					false, width, height, texId, texMatrix, null));
+				sem.release();
+			}
+		});
+		try {
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
+			final Bitmap resultBitmap = result.get();
+			assertNotNull(resultBitmap);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, resultBitmap));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
+
+	/**
 	 * Bitmap → ImageTextureSource
 	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
-	public void imageTextureSourceTest() {
+	public void imageTextureSourceTest2() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
