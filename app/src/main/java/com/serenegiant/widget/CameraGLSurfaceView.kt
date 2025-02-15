@@ -20,9 +20,11 @@ package com.serenegiant.widget
 
 import android.content.Context
 import android.util.AttributeSet
+import com.serenegiant.gl.GLManager
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.glutils.RendererHolder
+import com.serenegiant.glutils.SurfaceDistributor
 
 /**
  * Sub class of GLSurfaceView to display camera preview and write video frame to capturing surface
@@ -35,6 +37,7 @@ class CameraGLSurfaceView @JvmOverloads constructor(
 		width: Int, height: Int, callback: RenderHolderCallback?): IRendererHolder {
 
 		return RendererHolder(width, height, glVersion, null, 0, callback)
+//		return SurfaceDistributor(width, height, callback)
 	}
 
 	companion object {

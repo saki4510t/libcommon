@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.SurfaceProxy;
 import com.serenegiant.graphics.BitmapHelper;
 
@@ -38,6 +39,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
@@ -52,26 +54,43 @@ public class SurfaceProxyTest {
 	private static final int HEIGHT = 100;
 	private static final int NUM_FRAMES = 200;
 
+	@Nullable
+	private GLManager mManager;
+
 	@Before
 	public void prepare() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		mManager = new GLManager();
+		assertTrue(mManager.isValid());
+		mManager.getEgl();
+		assertEquals(1, mManager.getMasterWidth());
+		assertEquals(1, mManager.getMasterHeight());
 	}
 
 	@After
 	public void cleanUp() {
 		final Context context = ApplicationProvider.getApplicationContext();
+		if (mManager != null) {
+			mManager.release();
+			mManager = null;
+		}
 	}
 
 	/**
-	 * SurfaceProxyReaderWriter => GLSurfaceReceiverと接続して
-	 * SurfaceProxyReaderWriterから取得したSurfaceへCanvas#drawBitmapでビットマップを
-	 * 書き込んで、書き込んだビットマップとで読み込んだビットマップが一致するかどうかを検証する
+	 * SurfaceProxyReaderWriterがSurfaceを経由して受け取った映像をGLSurfaceReceiverの
+	 * Surfaceを経由してテクスチャスチャとして受け取った映像をBitmapへ変換したときに
+	 * 元のビットマップと一致するかどうかを検証する
+	 * Bitmap -> inputImagesAsync → (Surface)
+	 * 	→ SurfaceProxyReaderWriter
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceProxyReaderWriterTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
+
+		final GLManager manager = mManager;
 
 		// SurfaceProxyReaderWriterを生成
 		final SurfaceProxy proxy = SurfaceProxy.newInstance(WIDTH, HEIGHT, true);
@@ -83,8 +102,10 @@ public class SurfaceProxyTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface receiverSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface receiverSurface = receiver.getSurface();
 		assertNotNull(receiverSurface);
 		// SurfaceProxyReaderWriterへ映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);
@@ -109,16 +130,20 @@ public class SurfaceProxyTest {
 	}
 
 	/**
-	 * SurfaceProxyGLES => GLSurfaceReceiver => GLBitmapImageReaderと接続して
-	 * SurfaceProxyGLESから取得したSurfaceへCanvas#drawBitmapでビットマップを
-	 * 書き込んで、書き込んだビットマップとGLBitmapImageReaderで読み込んだ
-	 * ビットマップが一致するかどうかを検証する
+	 * SurfaceProxyGLESがSurfaceを経由して受け取った映像をGLSurfaceReceiverの
+	 * Surfaceを経由してテクスチャスチャとして受け取った映像をBitmapへ変換したときに
+	 * 元のビットマップと一致するかどうかを検証する
+	 * Bitmap -> inputImagesAsync → (Surface)
+	 * 	→ SurfaceProxyGLES
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceProxyGLESTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
 //		dump(bitmap);
+
+		final GLManager manager = mManager;
 
 		// SurfaceProxyGLESを生成
 		final SurfaceProxy proxy = SurfaceProxy.newInstance(WIDTH, HEIGHT, false);
@@ -130,8 +155,10 @@ public class SurfaceProxyTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface receiverSurface = createGLSurfaceReceiverSurface(
-			new GLManager(), WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface receiverSurface = receiver.getSurface();
 		assertNotNull(receiverSurface);
 		// プロキシに映像読み取り用Surfaceをセット
 		proxy.setSurface(receiverSurface);

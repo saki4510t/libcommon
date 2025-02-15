@@ -45,6 +45,8 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装
+ * FIXME RendererHolderだと入力ソースを変更時にSurfaceの再生成しなくても
+ *       正常に動作するのにこっちはテクスチャが更新されなくなる
  */
 public class GLSurfaceReceiver {
 	private static final boolean DEBUG = false;
@@ -383,6 +385,7 @@ public class GLSurfaceReceiver {
 	 */
 	@NonNull
 	public Surface getSurface() throws IllegalStateException {
+		checkInputSurface();
 		mLock.lock();
 		try {
 			if (mInputSurface == null) {
@@ -403,6 +406,7 @@ public class GLSurfaceReceiver {
 	 */
 	@NonNull
 	public SurfaceTexture getSurfaceTexture() throws IllegalStateException {
+		checkInputSurface();
 		mLock.lock();
 		try {
 			if (mInputTexture == null) {
@@ -437,6 +441,52 @@ public class GLSurfaceReceiver {
 			}
 		} finally {
 			mLock.unlock();
+		}
+	}
+
+	/**
+	 * 映像入力用Surface/Surfacetextureを(再)生成する
+	 * 呼び出し元スレッドをブロックする
+	 */
+	public void reCreateInputSurface() {
+		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
+		mGLHandler.post(() -> {
+			try {
+				handleReCreateInputSurfaceOnGL();
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
+			sem.release();
+		});
+		try {
+			final Surface surface;
+			mLock.lock();
+			try {
+				surface = mInputSurface;
+			} finally {
+				mLock.unlock();
+			}
+			if (surface == null) {
+				if (sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
+					mIsReaderValid = true;
+				} else {
+					throw new RuntimeException("failed to create surface");
+				}
+			}
+		} catch (final InterruptedException e) {
+			// ignore
+		}
+	}
+
+	/**
+	 * 分配描画用のマスターSurfaceが有効かどうかをチェックして無効なら再生成する
+	 * @throws IllegalStateException
+	 */
+	private void checkInputSurface() throws IllegalStateException {
+		if (!isValid()) throw new IllegalStateException("Already released?");
+		if ((mInputSurface == null) || (!mInputSurface.isValid())) {
+			if (DEBUG) Log.d(TAG, "checkInputSurface:invalid master surface");
+			reCreateInputSurface();
 		}
 	}
 

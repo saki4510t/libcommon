@@ -20,11 +20,13 @@ package com.serenegiant.libcommon.gl;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
@@ -86,6 +88,9 @@ public class SurfaceDistributorTest {
 
 	/**
 	 * SurfaceDistributorがSurfaceを経由して受け取った映像をSurfaceへ描画できることを検証
+	 * Bitmap → inputImagesAsync → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceDistributorTest() {
@@ -105,8 +110,10 @@ public class SurfaceDistributorTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface surface = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 		distributor.addSurface(surface.hashCode(), surface, false, null);
 
@@ -124,7 +131,8 @@ public class SurfaceDistributorTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			assertTrue(cnt.get() >= NUM_FRAMES);
+			distributor.release();
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
@@ -136,6 +144,11 @@ public class SurfaceDistributorTest {
 
 	/**
 	 * SurfaceDistributorがSurfaceを経由して受け取った映像を複数のSurfaceへ分配描画できることを検証
+	 * Bitmap → inputImagesAsync → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		↓
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceDistributorTest2() {
@@ -156,16 +169,20 @@ public class SurfaceDistributorTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
 		assertNotNull(surface1);
 		distributor.addSurface(surface1.hashCode(), surface1, false, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false, null);
 
@@ -184,9 +201,10 @@ public class SurfaceDistributorTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
+			distributor.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
-			assertTrue(cnt1.get() >= NUM_FRAMES);
-			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
@@ -205,6 +223,9 @@ public class SurfaceDistributorTest {
 	 * 映像ソースを途中で変更する
 	 * FIXME 1回目はOKだけど映像ソースを変えた後でビットマップが一致しない
 	 *       GLSurfaceReceiverの問題かも
+	 * Bitmap → inputImagesAsync → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void surfaceDistributorChangeSourceTest() {
@@ -220,8 +241,10 @@ public class SurfaceDistributorTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface surface = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 		distributor.addSurface(surface.hashCode(), surface, false, null);
 
@@ -230,32 +253,50 @@ public class SurfaceDistributorTest {
 		// 正常にSurfaceを追加できたかどうかを確認
 		assertEquals(1, distributor.getCount());
 
-		for (int i = 0; i < 3; i++) {
-			Log.v(TAG, "surfaceDistributorTest2:" + i);
-			cnt.set(0);
-			final Bitmap original = BitmapHelper.makeCheckBitmap(
-				WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
-//			dump(bitmap);
-			final Surface inputSurface = distributor.getSurface();
-			assertNotNull(inputSurface);
+		try {
+			for (int i = 0; i < 3; i++) {
+				Log.v(TAG, "surfaceDistributorChangeSourceTest:" + i);
+				cnt.set(0);
+				final Bitmap original = BitmapHelper.makeCheckBitmap(
+					WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
+//				dump(bitmap);
+				final Surface inputSurface = distributor.getSurface();
+				assertNotNull(inputSurface);
 
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 5, requestStop);
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, inputSurface, NUM_FRAMES + 5, requestStop);
 
-			try {
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-				assertTrue(cnt.get() >= NUM_FRAMES);
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, resultBitmap));
-			} catch (final InterruptedException e) {
-				fail();
+				try {
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					// 元のビットマップと同じかどうかを検証
+					assertTrue(bitmapEquals(original, resultBitmap));
+					// 映像入力用SurfaceTexture/Surfaceを強制的に再生成させる
+					distributor.reset();
+				} catch (final InterruptedException e) {
+					fail();
+				}
+				// XXX ここでちょっと待機しないとなぜか2回目のinputImagesAsyncが即終了してしまう時がある
+				//     inputImagesAsyncへ渡しているAtomicBooleanがコラプトしてる…
+				ThreadUtils.NoThrowSleep(100L);
 			}
+		} catch (final Exception e) {
+			Log.w(TAG, e);
+		} finally {
+			distributor.release();
 		}
 	}
 
+	/**
+	 * Bitmap → StaticTextureSource → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		↓
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
 	@Test
 	public void staticTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -276,16 +317,20 @@ public class SurfaceDistributorTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
 		assertNotNull(surface1);
 		distributor.addSurface(surface1.hashCode(), surface1, false, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false, null);
 
@@ -304,9 +349,10 @@ public class SurfaceDistributorTest {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.removeSurface(inputSurface.hashCode());
 			source.release();
+			distributor.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
-			assertTrue(cnt1.get() >= NUM_FRAMES);
-			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
@@ -321,6 +367,13 @@ public class SurfaceDistributorTest {
 		source.removeSurface(inputSurface.hashCode());
 	}
 
+	/**
+	 * Bitmap → ImageTextureSource → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		↓
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
 	@Test
 	public void imageTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -341,16 +394,20 @@ public class SurfaceDistributorTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
 		assertNotNull(surface1);
 		distributor.addSurface(surface1.hashCode(), surface1, false, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false, null);
 
@@ -369,9 +426,10 @@ public class SurfaceDistributorTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
+			distributor.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
-			assertTrue(cnt1.get() >= NUM_FRAMES);
-			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
@@ -387,8 +445,11 @@ public class SurfaceDistributorTest {
 
 	/**
 	 * 映像ソースを切り替えても正常に描画できることを検証
-	 * FIXME 1回目はOKだけど映像ソースを変えた後でビットマップが一致しない
-	 *       GLSurfaceReceiverの問題かも
+	 * Bitmap → StaticTextureSource → (Surface)
+	 * 	→ SurfaceDistributor
+	 * 		↓
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void staticTextureSourceChangeSourceTest() {
@@ -406,86 +467,64 @@ public class SurfaceDistributorTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
 		assertNotNull(surface1);
 		distributor.addSurface(surface1.hashCode(), surface1, false, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false, null);
 
-		// 1回目
-		{
-			Log.v(TAG, "staticTextureSourceRestartTest:0");
-			cnt1.set(0);
-			cnt2.set(0);
-			final Bitmap original = BitmapHelper.makeCheckBitmap(
-				WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
-//			dump(bitmap);
-			// 映像ソースとしてStaticTextureSourceを生成
-			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
-			final Surface inputSurface = distributor.getSurface();
-			assertNotNull(inputSurface);
-			// StaticTextureSource →　SurfaceDistributorと繋ぐ
-			source.addSurface(inputSurface.hashCode(), inputSurface, false);
+		try {
+			// 映像ソースを切り替える
+			for (int i = 0; i < 3; i++) {
+				Log.v(TAG, "staticTextureSourceRestartTest:" + i);
+				cnt1.set(0);
+				cnt2.set(0);
+				final Bitmap original = BitmapHelper.makeCheckBitmap(
+					WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
+//				dump(bitmap);
+				// 映像ソースとしてStaticTextureSourceを生成
+				final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+				final SurfaceTexture st = distributor.getSurfaceTexture();
+				final Surface inputSurface = new Surface(st);
+				assertNotNull(inputSurface);
+				// StaticTextureSource →　SurfaceDistributorと繋ぐ
+				source.addSurface(inputSurface.hashCode(), inputSurface, false);
 
-			try {
-				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				source.removeSurface(inputSurface.hashCode());
-				source.release();
-				// それぞれのSurfaceが受け取った映像フレーム数を確認
-				assertTrue(cnt1.get() >= NUM_FRAMES);
-				assertTrue(cnt2.get() >= NUM_FRAMES);
-				// 受け取った映像を検証
-				final Bitmap resultBitmap1 = result1.get();
-				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result2.get();
-				assertNotNull(resultBitmap2);
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, resultBitmap1));
-				assertTrue(bitmapEquals(original, resultBitmap2));
-			} catch (final InterruptedException e) {
-				fail();
+				try {
+					assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					source.removeSurface(inputSurface.hashCode());
+					source.release();
+					// それぞれのSurfaceが受け取った映像フレーム数を確認
+					assertEquals(NUM_FRAMES, cnt1.get());
+					assertEquals(NUM_FRAMES, cnt2.get());
+					// 受け取った映像を検証
+					final Bitmap resultBitmap1 = result1.get();
+					assertNotNull(resultBitmap1);
+					final Bitmap resultBitmap2 = result2.get();
+					assertNotNull(resultBitmap2);
+					// 元のビットマップと同じかどうかを検証
+					assertTrue(bitmapEquals(original, resultBitmap1));
+					assertTrue(bitmapEquals(original, resultBitmap2));
+				} catch (final InterruptedException e) {
+					fail();
+				} finally {
+					inputSurface.release();
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-		}
-		// 映像ソースを切り替える
-		for (int i = 1; i < 3; i++) {
-			Log.v(TAG, "staticTextureSourceRestartTest:" + i);
-			cnt1.set(0);
-			cnt2.set(0);
-			final Bitmap original = BitmapHelper.makeCheckBitmap(
-				WIDTH, HEIGHT, 15, 12 + i, Bitmap.Config.ARGB_8888);
-//			dump(bitmap);
-			// 映像ソースとしてStaticTextureSourceを生成
-			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
-			final Surface inputSurface = distributor.getSurface();
-			assertNotNull(inputSurface);
-			// StaticTextureSource →　SurfaceDistributorと繋ぐ
-			source.addSurface(inputSurface.hashCode(), inputSurface, false);
-
-			try {
-				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				source.removeSurface(inputSurface.hashCode());
-				source.release();
-				// それぞれのSurfaceが受け取った映像フレーム数を確認
-				assertTrue(cnt1.get() >= NUM_FRAMES);
-				assertTrue(cnt2.get() >= NUM_FRAMES);
-				// 受け取った映像を検証
-				final Bitmap resultBitmap1 = result1.get();
-				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result2.get();
-				assertNotNull(resultBitmap2);
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, resultBitmap1));
-				assertTrue(bitmapEquals(original, resultBitmap2));
-			} catch (final InterruptedException e) {
-				fail();
-			}
+		} finally {
+			distributor.release();
 		}
 	}
 

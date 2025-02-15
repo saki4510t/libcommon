@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
@@ -76,6 +77,10 @@ public class ImageTextureSourceTest {
 		}
 	}
 
+	/**
+	 * Bitmap → ImageTextureSource
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
 	@Test
 	public void imageTextureSourceTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -87,8 +92,11 @@ public class ImageTextureSourceTest {
 		// 映像受け取り用にGLSurfaceReceiverを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
@@ -97,6 +105,7 @@ public class ImageTextureSourceTest {
 		source.setSurface(surface);
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
@@ -163,6 +172,8 @@ public class ImageTextureSourceTest {
 
 	/**
 	 * フレームレートを指定して想定通りのフレームレート±10%になるかどうかを確認
+	 * Bitmap → ImageTextureSource
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param requestFps
 	 */
@@ -174,9 +185,11 @@ public class ImageTextureSourceTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final AtomicInteger numFrames = new AtomicInteger();
-		final Surface surface = createGLSurfaceReceiverSurface(
-			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, numFrames);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
@@ -187,7 +200,8 @@ public class ImageTextureSourceTest {
 			final long startTimeNs = System.nanoTime();
 			assertTrue(sem.tryAcquire(NUM_FRAMES * ((1000 / requestFps) + 20L), TimeUnit.MILLISECONDS));
 			final long endTimeNs = System.nanoTime();
-			final int n = numFrames.get();
+			assertEquals(NUM_FRAMES, cnt.get());
+			final int n = cnt.get();
 			final float fps = (n * 1000000000f) / (endTimeNs - startTimeNs);
 			Log.i(TAG, "numFrames=" + n);
 			Log.i(TAG, "fps=" + fps + "/" + requestFps);

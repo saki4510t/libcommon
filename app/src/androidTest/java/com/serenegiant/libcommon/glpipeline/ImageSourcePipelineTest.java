@@ -101,10 +101,10 @@ public class ImageSourcePipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
 		final GLBitmapImageReader reader
 			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
-			final AtomicInteger cnt = new AtomicInteger();
 			@Override
 			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
 				final Bitmap bitmap = reader.acquireLatestImage();
@@ -129,6 +129,7 @@ public class ImageSourcePipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
+			assertTrue(cnt.get() >= NUM_FRAMES);
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -157,7 +158,8 @@ public class ImageSourcePipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -168,6 +170,7 @@ public class ImageSourcePipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
+			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);

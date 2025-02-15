@@ -104,9 +104,11 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		if (!mReleased) {
 			mReleased = true;
 			if (DEBUG) Log.v(TAG, "release:");
-			mGLManager.getGLHandler().postAtFrontOfQueue(() -> {
-				releaseOnGL();
-			});
+			if (mGLManager.isValid()) {
+				mGLManager.getGLHandler().postAtFrontOfQueue(() -> {
+					releaseOnGL();
+				});
+			}
 		}
 	}
 

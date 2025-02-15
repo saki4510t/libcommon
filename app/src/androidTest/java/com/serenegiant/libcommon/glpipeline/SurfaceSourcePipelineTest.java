@@ -37,6 +37,7 @@ import org.junit.runner.RunWith;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
@@ -118,7 +119,8 @@ public class SurfaceSourcePipelineTest {
 		assertNotNull(inputSurface);
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		source.setPipeline(proxy);
 		// 想定したとおりに接続されているかどうかを検証
 		assertTrue(validatePipelineOrder(source, source, proxy));
@@ -130,6 +132,7 @@ public class SurfaceSourcePipelineTest {
 			// 30fpsで30枚なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
+			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);

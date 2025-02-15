@@ -40,6 +40,7 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
@@ -105,16 +106,20 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
-		final GLPipeline pipeline1 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1);
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final GLPipeline pipeline1 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
 		distributor.addPipeline(pipeline1);
 
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
-		final GLPipeline pipeline2 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result2);
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final GLPipeline pipeline2 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
 		distributor.addPipeline(pipeline2);
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap1 = result1.get();
 //			dump(resultBitmap1);
@@ -172,7 +177,8 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		GLPipeline.append(surfaceSource, proxy);
 
 		// SurfacePipelineとSurfaceSourcePipelineの間はSurfaceを経由したやりとりだけで
@@ -183,6 +189,7 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないときはこっち
@@ -215,7 +222,8 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		source.setPipeline(effectPipeline);
 		effectPipeline.setPipeline(proxy);
@@ -225,6 +233,7 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
@@ -257,7 +266,8 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
@@ -268,6 +278,7 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);
@@ -304,7 +315,8 @@ public class GLPipelineTest {
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result);
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		source.setPipeline(effectPipeline1);
 		effectPipeline1.setPipeline(effectPipeline2);
@@ -316,6 +328,7 @@ public class GLPipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 //			dump(resultBitmap);
 			assertTrue(bitmapEquals(original, resultBitmap, true));

@@ -21,7 +21,6 @@ package com.serenegiant.libcommon;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.opengl.GLES20;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.text.TextUtils;
@@ -29,7 +28,6 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
@@ -49,9 +47,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import static com.serenegiant.gl.GLConst.GL_TEXTURE_2D;
-import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 public class TestUtils {
 	private static final String TAG = TestUtils.class.getSimpleName();
@@ -253,30 +248,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	}
 
 	/**
-	 * GLSurfaceReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
-	 * Bitmapを受け取るためのSurfaceを生成する
-	 * Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
-	 * @param manager
-	 * @param width
-	 * @param height
-	 * @param numFrames
-	 * @param sem
-	 * @param result
-	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
-	 * @return
-	 */
-	public static Surface createGLSurfaceReceiverSurface(
-		@NonNull final GLManager manager,
-		final int width, final int height,
-		final int numFrames,
-		@NonNull final Semaphore sem,
-		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
-		return createGLSurfaceReceiverSurface(manager, width, height, numFrames, sem, result, new AtomicInteger());
-	}
-
-	/**
-	 * GLSurfaceReceiverで映像をテクスチャとして受け取ってGLBitmapImageReaderで
-	 * Bitmapを受け取るためのSurfaceを生成する
+	 * 映像をテクスチャとして受け取ってBitmapとして読み取るためのGLSurfaceReceiverを生成する
 	 * Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * @param manager
 	 * @param width
@@ -288,7 +260,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
 	 * @return
 	 */
-	public static Surface createGLSurfaceReceiverSurface(
+	public static GLSurfaceReceiver createGLSurfaceReceiver(
 		@NonNull final GLManager manager,
 		final int width, final int height,
 		final int numFrames,
@@ -306,30 +278,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager,
 			width, height,
-			new GLSurfaceReceiver.Callback() {
-				@Override
-				public void onInitialize() {
-				}
-
-				@Override
-				public void onRelease() {
-					if (sem.availablePermits() == 0) {
-						sem.release();
-					}
-				}
-
-				@Override
-				public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
-				}
-
-				@Override
-				public void onReleaseInputSurface(@NonNull final Surface surface) {
-				}
-
-				@Override
-				public void onResize(final int width, final int height) {
-				}
-
+			new GLSurfaceReceiver.DefaultCallback(new GLSurfaceReceiver.FrameAvailableCallback() {
 				@Override
 				public void onFrameAvailable(
 					final boolean isGLES3, final boolean isOES,
@@ -338,45 +287,14 @@ LOOP:		for (int y = 0; y < height; y++) {
 
 					if (cnt.incrementAndGet() == numFrames) {
 						Log.v(TAG, "createGLSurfaceReceiverSurface:create Bitmap from texture");
-						// GLSurfaceを経由してテクスチャを読み取る
-						// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
-						final GLSurface surface = GLSurface.wrap(isGLES3,
-							isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-							GLES20.GL_TEXTURE4, texId, width, height, false);
-						surface.makeCurrent();
-						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-						final ByteBuffer buffer = allocateBuffer(width, height);
-						final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
-						surface.release();
-						final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-						bitmap.copyPixelsFromBuffer(buf);
-						result.set(bitmap);
+						result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 						sem.release();
 					}
 				}
-			}
+			})
 		);
 
-		return receiver.getSurface();
-	}
-
-	/**
-	 * 映像をテクスチャとして受け取ってBitmapを受け取るためのProxyPipelineを生成する
-	 * ProxyPipeline -> GLSurfaceReceiver -> GLBitmapImageReader -> Bitmap
-	 * @param width
-	 * @param height
-	 * @param numFrames
-	 * @param sem
-	 * @param result
-	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
-	 * @return
-	 */
-	public static GLPipeline createImageReceivePipeline(
-		final int width, final int height,
-		final int numFrames,
-		@NonNull final Semaphore sem,
-		@NonNull final AtomicReference<Bitmap> result) throws IllegalArgumentException {
-		return createImageReceivePipeline(width, height, numFrames, sem, result, new AtomicInteger());
+		return receiver;
 	}
 
 	/**
@@ -413,19 +331,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() == numFrames) {
 					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture");
-					// GLSurfaceを経由してテクスチャを読み取る
-					// ここに来るのはDrawerPipelineからのテクスチャなのでisOES=falseのはず
-					final GLSurface surface = GLSurface.wrap(isGLES3,
-						isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D,
-						GLES20.GL_TEXTURE4, texId, width, height, false);
-					surface.makeCurrent();
-					final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-					final ByteBuffer buffer = allocateBuffer(width, height);
-					final ByteBuffer buf = GLUtils.glReadPixels(buffer, width, height);
-					surface.release();
-					final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-					bitmap.copyPixelsFromBuffer(buf);
-					result.set(bitmap);
+					result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 					sem.release();
 				}
 			}

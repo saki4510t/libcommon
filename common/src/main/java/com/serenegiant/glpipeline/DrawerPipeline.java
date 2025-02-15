@@ -283,7 +283,7 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = mDrawerFactory.create(isGLES3, isOES);
-			mDrawer.setMirror(MIRROR_VERTICAL);
+			mDrawer.setMirror(MIRROR_VERTICAL);	// FIXME 他も同じだけどなぜか上下反転させないとテスト通らない
 		}
 		if (mDrawOnly && (mOffscreenSurface != null)
 			&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {

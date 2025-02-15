@@ -137,7 +137,6 @@ public class SurfaceDistributor implements IRendererHolder {
 	 */
 	@Override
 	public void release() {
-		mGLSurfaceReceiver.release();
 		if (!mReleased) {
 			mReleased = true;
 			if (DEBUG) Log.v(TAG, "release:");
@@ -184,6 +183,8 @@ public class SurfaceDistributor implements IRendererHolder {
 	@Override
 	public void reset() {
 		// たぶん不要
+		mGLSurfaceRenderer.refresh();
+		mGLSurfaceReceiver.reCreateInputSurface();
 	}
 
 	@Override

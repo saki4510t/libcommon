@@ -247,7 +247,7 @@ public class EffectPipeline extends ProxyPipeline
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = new EffectDrawer2D(isGLES3, isOES, mEffectListener);
-				mDrawer.setMirror(MIRROR_VERTICAL);
+				mDrawer.setMirror(MIRROR_VERTICAL);	// FIXME 他も同じだけどなぜか上下反転させないとテスト通らない
 				mDrawer.setEffect(mEffect);
 			}
 			if (mEffectOnly && (mOffscreenSurface != null)

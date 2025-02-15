@@ -81,6 +81,10 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャをSurfaceへ描画できることを検証
+	 * Bitmap -> inputImagesAsync → (Surface)
+	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
+	 * 		→ GLSurfaceRenderer
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void gLSurfaceRendererTest() {
@@ -98,8 +102,10 @@ public class GLSurfaceRendererTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final Surface surface = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver bitmapReceiver = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(bitmapReceiver);
+		final Surface surface = bitmapReceiver.getSurface();
 		assertNotNull(surface);
 		renderer.addSurface(surface.hashCode(), surface, null);
 		ThreadUtils.NoThrowSleep(100);
@@ -117,7 +123,8 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			assertTrue(cnt.get() >= NUM_FRAMES);
+			renderer.release();
+			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
@@ -129,6 +136,12 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャを複数のSurfaceへ分配描画できることを検証
+	 * Bitmap -> inputImagesAsync → (Surface)
+	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
+	 * 		→ GLSurfaceRenderer
+	 * 			↓
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void gLSurfaceRendererTest2() {
@@ -147,16 +160,20 @@ public class GLSurfaceRendererTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
 		assertNotNull(surface1);
 		renderer.addSurface(surface1.hashCode(), surface1, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
 		assertNotNull(surface2);
 		renderer.addSurface(surface2.hashCode(), surface2, null);
 
@@ -177,9 +194,10 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
+			renderer.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
-			assertTrue(cnt1.get() >= NUM_FRAMES);
-			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
@@ -195,6 +213,12 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャを複数のSurfaceへ分配描画できることを検証
+	 * Bitmap -> StaticTextureSource → (Surface)
+	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
+	 * 		→ GLSurfaceRenderer
+	 * 			↓
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
 	public void staticTextureSourceRestartTest() {
@@ -213,16 +237,20 @@ public class GLSurfaceRendererTest {
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final Surface surface1 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver bitmapReceiver1 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(bitmapReceiver1);
+		final Surface surface1 = bitmapReceiver1.getSurface();
 		assertNotNull(surface1);
 		renderer.addSurface(surface1.hashCode(), surface1, null);
 
 		// 描画結果受け取り用にSurfaceを生成
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final Surface surface2 = createGLSurfaceReceiverSurface(
+		final GLSurfaceReceiver bitmapReceiver2 = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(bitmapReceiver2);
+		final Surface surface2 = bitmapReceiver2.getSurface();
 		assertNotNull(surface2);
 		renderer.addSurface(surface2.hashCode(), surface2, null);
 
@@ -230,23 +258,25 @@ public class GLSurfaceRendererTest {
 		ThreadUtils.NoThrowSleep(100);
 		assertEquals(2, renderer.getCount());
 
-		// 映像ソースとしてStaticTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
-
 		// 映像書き込み用GLSurfaceReceiverを生成
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager, WIDTH, HEIGHT,
 			new GLSurfaceReceiver.DefaultCallback(renderer));
 		final Surface inputSurface = receiver.getSurface();
 		assertNotNull(inputSurface);
+
+		// 映像ソースとしてStaticTextureSourceを生成
+		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
 		// StaticTextureSource →　GLSurfaceReceiverと繋ぐ
 		source.addSurface(inputSurface.hashCode(), inputSurface, false);
 
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
+			renderer.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
-			assertTrue(cnt1.get() >= NUM_FRAMES);
-			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertEquals(NUM_FRAMES, cnt1.get());
+			assertEquals(NUM_FRAMES, cnt2.get());
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);

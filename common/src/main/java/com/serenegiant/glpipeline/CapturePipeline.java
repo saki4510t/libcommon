@@ -19,13 +19,16 @@ package com.serenegiant.glpipeline;
 */
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.Pool;
 import com.serenegiant.utils.ThreadPool;
 
@@ -51,7 +54,7 @@ public class CapturePipeline extends ProxyPipeline {
 	public interface Callback {
 		/**
 		 * キャプチャ時のコールバック
-		 * ワーカースレッド上で呼び出される
+		 * GLスレッド上で呼び出されるので可能な限り早く終了すること
 		 * 引数のBitmapはOOM抑制・高速化のためにビットマッププールで管理＆再利用するので
 		 * このコールバックを抜けた後にアクセスしないようにすること(必要であればコピー)
 		 * &Bitmap#recycleを可能な限り呼び出さないこと
@@ -97,6 +100,11 @@ public class CapturePipeline extends ProxyPipeline {
 	 */
 	@Nullable
 	private ByteBuffer mWorkBuffer;
+	/**
+	 * 映像読み取り用のワークビットマップ
+	 */
+	@Nullable
+	private Bitmap mWorkBitmap;
 
 	/**
 	 * OOM抑制・高速化のためにキャプチャに使うBitmapを管理するビットマッププール
@@ -231,47 +239,70 @@ public class CapturePipeline extends ProxyPipeline {
 		final int texId, @NonNull final float[] texMatrix) {
 
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
+		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() < bytes)) {
 			mWorkBuffer = ByteBuffer.allocateDirect(bytes);
 		}
-		final Bitmap bitmap = mPool.obtain(width, height);
-		if (bitmap != null) {
+		if ((mWorkBitmap == null) || (mWorkBitmap.getByteCount() < bytes)) {
+			mWorkBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		}
+		try {
+			if (DEBUG) Log.v(TAG, "texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix) + ",isOES=" + isOES);
+			// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
+			final GLSurface readSurface = GLSurface.wrap(isGLES3,
+				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
+				GLES20.GL_TEXTURE4, texId, width, height, false);
 			try {
-				// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-				// FIXME テクスチャ変換行列が適用されていない！
-				final GLSurface readSurface = GLSurface.wrap(isGLES3,
-					isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
-					GLES20.GL_TEXTURE4, texId, width, height, false);
-				try {
-					readSurface.makeCurrent();
-					// テクスチャをバックバッファとしたオフスクリーンから読み取り
-					mWorkBuffer.clear();
-					GLUtils.glReadPixels(mWorkBuffer, width, height);
-				} finally {
-					readSurface.release();
-				}
-				// Bitmapへ代入
-				bitmap.copyPixelsFromBuffer(mWorkBuffer);
-				// コールバックをワーカースレッド上で呼び出す
-				ThreadPool.queueEvent(() -> {
-					if (DEBUG) Log.v(TAG, "doOffscreenCapture:call onCapture callback");
-					try {
-						mCallback.onCapture(bitmap);
-					} catch (final Exception e) {
-						Log.w(TAG, e);
-					} finally {
-						if (bitmap.isRecycled()) {
-							mPool.release(bitmap);
-						} else {
-							mPool.recycle(bitmap);
-						}
-					}
-				});
-			} catch (final Exception e) {
-				ThreadPool.queueEvent(() -> {
-					mCallback.onError(e);
-				});
+				// テクスチャをバックバッファとするオフスクリーンからglReadPixelsでByteBufferへ画像データを読み込む
+				readSurface.makeCurrent();
+				mWorkBuffer.clear();
+				GLUtils.glReadPixels(mWorkBuffer, width, height);
+			} finally {
+				readSurface.release();
 			}
+			final Bitmap bitmap = mPool.obtain(width, height);
+			if (bitmap != null) {
+				try {
+					final Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
+					if (isOES || !matrix.isIdentity()) {
+						if (isOES) {
+							// FIXME GL_TEXTURE_EXTERNAL_OESの時はなぜか上下反転させないといけない？
+							//       GL_TEXTURE_2Dの時に反転させると結果が一致しない
+							MatrixUtils.setMirror(matrix, IMirror.MIRROR_VERTICAL);
+						}
+						// ワーク用Bitmapへ書き込む
+						mWorkBitmap.copyPixelsFromBuffer(mWorkBuffer);
+						// テクスチャ変換行列を適用する
+						// XXX ここでBitmapが生成されるのを避けるのは困難
+						//     ワーク用のBitmapをもう1つ用意してそれをバックバッファとするCanvasを作って
+						//     matrixを適用してCanvasへ描画してBitmap#copyPixelsToBufferだといけそうだけど
+						//     上下反転以外だと画像がおかしくなりそう
+						final Bitmap scaled = Bitmap.createBitmap(mWorkBitmap, 0, 0, width, height, matrix, true);
+						// バッファに書き戻す
+						mWorkBuffer.clear();
+						scaled.copyPixelsToBuffer(mWorkBuffer);
+						mWorkBuffer.flip();
+						scaled.recycle();
+					}
+					// コールバック用のBitmapへ書き込む
+					bitmap.copyPixelsFromBuffer(mWorkBuffer);
+					// これをスレッドプールで呼び出すと優先順位が低くてなかなか呼び出されずにプールが空になってしまう
+					mCallback.onCapture(bitmap);
+				} catch (final Exception e) {
+					Log.w(TAG, e);
+				} finally {
+					if (bitmap.isRecycled()) {
+						mPool.release(bitmap);
+					} else {
+						mPool.recycle(bitmap);
+					}
+				}
+			} else if (DEBUG) {
+				Log.d(TAG, "doCapture:couldn't get bitmap from pool");
+			}
+		} catch (final Exception e) {
+			ThreadPool.queueEvent(() -> {
+				mCallback.onError(e);
+			});
 		}
 	}
 

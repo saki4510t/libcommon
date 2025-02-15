@@ -35,7 +35,9 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.system.Stacktrace;
 import com.serenegiant.utils.AssetsHelper;
 
@@ -251,6 +253,53 @@ public class GLUtils implements GLConst {
 		buf.flip();
 
 		return buf;
+	}
+
+	/**
+	 * OpenGL|ESのテクスチャをビットマップへ読み込む
+	 * GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てて
+	 * glReadPixelsでByteBufferへ読み込んだ画像データをBitmapへ割り当てて
+	 * テクスチャ変換行列を適用して返す
+	 * OpenGL|ESのコンテキスト上で呼び出さないといけない
+	 * @param isOES
+	 * @param width
+	 * @param height
+	 * @param texId
+	 * @param texMatrix
+	 * @param workBuffer
+	 * @return
+	 */
+	public static Bitmap glCopyTextureToBitmap(
+		final boolean isOES,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
+		@Nullable final ByteBuffer workBuffer) {
+
+		// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
+		final GLSurface readSurface = GLSurface.wrap(false,
+			isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
+			GLES20.GL_TEXTURE4, texId, width, height, false);
+		// テクスチャをバックバッファとするオフスクリーンからglReadPixelsでByteBufferへ画像データを読み込む
+		readSurface.makeCurrent();
+		final ByteBuffer buf = glReadPixels(workBuffer, width, height);
+		readSurface.release();
+		// ByteBufferからビットマップへ画像データをコピーする
+		final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		bitmap.copyPixelsFromBuffer(buf);
+		// テクスチャ変換行列を適用する
+		final android.graphics.Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
+		if (isOES || !matrix.isIdentity()) {
+			// テクスチャ変換行列を適用した新しいBitmapを生成して返す
+			if (isOES) {
+				// FIXME GL_TEXTURE_EXTERNAL_OESの時はなぜか上下反転させないといけない？
+				//       GL_TEXTURE_2Dの時に反転させると結果が一致しない
+				MatrixUtils.setMirror(matrix, IMirror.MIRROR_VERTICAL);
+			}
+			return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+		} else {
+			// 単位行列の場合はそのままBitmapを返す
+			return bitmap;
+		}
 	}
 
 	/**

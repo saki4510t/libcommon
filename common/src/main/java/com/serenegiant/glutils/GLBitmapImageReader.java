@@ -20,14 +20,11 @@ package com.serenegiant.glutils;
 
 import android.graphics.Bitmap;
 import android.graphics.Paint;
-import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.gl.GLConst;
-import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
@@ -40,8 +37,6 @@ import java.util.concurrent.locks.ReentrantLock;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
-
-import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * GLSurfaceReceiverを使ってBitmapとして映像を受け取るためのImageReader<Bitmap></>実装
@@ -241,20 +236,10 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		final Bitmap bitmap = obtainBitmap(width, height);
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
-			// テクスチャをバックバッファとしてアクセスできるようにGLSurfaceでラップする
-			// FIXME テクスチャ変換行列が適用されていない！
-			final GLSurface readSurface = GLSurface.wrap(isGLES3,
-				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
-				GLES20.GL_TEXTURE4, texId, width, height, false);
-			try {
-				readSurface.makeCurrent();
-				// テクスチャをバックバッファとしたオフスクリーンから読み取り
-				mWorkBuffer.clear();
-				GLUtils.glReadPixels(mWorkBuffer, width, height);
-			} finally {
-				readSurface.release();
-			}
-			// Bitmapへ代入
+			final Bitmap readBitmap = GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null);
+			mWorkBuffer.clear();
+			readBitmap.copyPixelsToBuffer(mWorkBuffer);
+			mWorkBuffer.flip();
 			bitmap.copyPixelsFromBuffer(mWorkBuffer);
 			synchronized (mQueue) {
 				mQueue.addLast(bitmap);
