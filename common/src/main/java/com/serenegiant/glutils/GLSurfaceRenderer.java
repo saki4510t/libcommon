@@ -494,12 +494,18 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 //		if (DEBUG) Log.v(TAG, "drawOnGL:" + cnt);
 		// RendererTargetへ描画実行
 		final int n = mTargets.size();
-		for (int i = 0; i < n; i++) {
+		for (int i = n - 1; i >= 0; i--) {	// 列挙中に#removeAtを呼べるように後ろからアクセスする
 			@NonNull
 			final RendererTarget target = mTargets.valueAt(i);
 			if (target.canDraw()) {
 				if (DEBUG) Log.v(TAG, "drawOnGL:" + cnt);
-				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
+				try {
+					target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
+				} catch (final Exception e) {
+					// removeSurfaceが呼ばれなかったかremoveSurfaceを呼ぶ前に破棄されてしまった
+					mTargets.removeAt(i);
+					target.release();
+				}
 			} else if (DEBUG) {
 				Log.v(TAG, "drawOnGL:id=" + target.getId() + " can not draw");
 			}
