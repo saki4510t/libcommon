@@ -39,13 +39,13 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
-import static org.junit.Assert.*;
-
 import static com.serenegiant.libcommon.TestUtils.*;
+import static org.junit.Assert.*;
 
 @RunWith(AndroidJUnit4.class)
 public class StaticTextureSourceTest {
@@ -53,7 +53,7 @@ public class StaticTextureSourceTest {
 
 	private static final int WIDTH = 100;
 	private static final int HEIGHT = 100;
-	private static final int NUM_FRAMES = 50;
+	private static final int NUM_FRAMES = 120;
 
 	@Nullable
 	private GLManager mGLManager;
@@ -176,5 +176,108 @@ public class StaticTextureSourceTest {
 		}
 		source.removeSurface(surface1.hashCode());
 		source.removeSurface(surface2.hashCode());
+	}
+
+	@Test(timeout = 30000)
+	public void frameRate5Test() {
+		frameRate(mGLManager, 5);
+	}
+
+	@Test(timeout = 20000)
+	public void frameRate10Test() {
+		frameRate(mGLManager, 10);
+	}
+
+	@Test
+	public void frameRate15Test() {
+		frameRate(mGLManager, 15);
+	}
+
+	@Test
+	public void frameRate20Test() {
+		frameRate(mGLManager, 20);
+	}
+
+	@Test
+	public void frameRate24Test() {
+		frameRate(mGLManager, 24);
+	}
+
+	@Test
+	public void frameRate30Test() {
+		frameRate(mGLManager, 30);
+	}
+
+	@Test
+	public void frameRate33Test() {
+		frameRate(mGLManager, 33);
+	}
+
+	@Test
+	public void frameRate35Test() {
+		frameRate(mGLManager, 35);
+	}
+
+	@Test
+	public void frameRate45Test() {
+		frameRate(mGLManager, 45);
+	}
+
+	@Test
+	public void frameRate50Test() {
+		frameRate(mGLManager, 50);
+	}
+
+	@Test
+	public void frameRate60Test() {
+		frameRate(mGLManager, 60);
+	}
+
+	/**
+	 * フレームレートを指定して想定通りのフレームレート±10%になるかどうかを確認
+	 * Bitmap → StaticTextureSource
+	 * 				↓
+	 * 				→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * @param manager
+	 * @param requestFps
+	 */
+	private static void frameRate(@NonNull final GLManager manager, final int requestFps) {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		// 映像受け取り用にSurfaceReaderを生成
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
+		assertNotNull(surface);
+
+		// 映像ソース用にImageTextureSourceを生成
+		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(requestFps), null);
+		// 映像受け取り用Surfaceをセット
+		source.addSurface(surface.hashCode(), surface, false);
+		try {
+			final long startTimeNs = System.nanoTime();
+			assertTrue(sem.tryAcquire(NUM_FRAMES * ((1000 / requestFps) + 20L), TimeUnit.MILLISECONDS));
+			final long endTimeNs = System.nanoTime();
+			assertEquals(NUM_FRAMES, cnt.get());
+			final int n = cnt.get();
+			final float fps = (n * 1000000000f) / (endTimeNs - startTimeNs);
+			Log.i(TAG, "numFrames=" + n);
+			Log.i(TAG, "fps=" + fps + "/" + requestFps);
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b));
+			// フレームレートが指定値の±10%以内にはいっているかどうか
+			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
+		} catch (final InterruptedException e) {
+			fail();
+		}
 	}
 }
