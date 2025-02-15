@@ -408,9 +408,6 @@ class MainActivity
 			R.string.title_rpg_message_view -> {
 				fragment = RPGMessageFragment.newInstance()
 			}
-			R.string.title_service_foreground -> {
-				fragment = ForegroundServiceFragment.newInstance()
-			}
 			R.string.bitmap_helper -> {
 				fragment = BitmapFragment.newInstance()
 			}
