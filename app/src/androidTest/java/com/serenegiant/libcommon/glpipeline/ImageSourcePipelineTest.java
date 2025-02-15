@@ -23,12 +23,15 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.OnFramePipeline;
 import com.serenegiant.glutils.GLBitmapImageReader;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import org.junit.After;
@@ -181,4 +184,60 @@ public class ImageSourcePipelineTest {
 		}
 	}
 
+	/**
+	 * ImageSourcePipelineが正常に映像ソースとして動作するかどうかを検証
+	 * こっちはOnFramePipelineを経由してFrameAvailableCallbackコールバックで
+	 * テクスチャから映像を読み取る
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ OnFramePipeline
+	 * 				↓
+	 * 				コールバック → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void imageSourceTest3() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver.FrameAvailableCallback callback = new GLSurfaceReceiver.FrameAvailableCallback() {
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3, final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+
+				// ここはGLコンテキスト内
+				if (cnt.incrementAndGet() == NUM_FRAMES) {
+					Log.v(TAG, "onFrameAvailable:create Bitmap from texture, isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
+					result.set(GLUtils.glCopyTextureToBitmap(
+						false, width, height, texId, texMatrix, null));
+					sem.release();
+				}
+			}
+		};
+
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final OnFramePipeline pipeline = new OnFramePipeline(callback);
+		source.setPipeline(pipeline);
+		assertTrue(validatePipelineOrder(source, source, pipeline));
+
+		try {
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
+			assertTrue(cnt.get() >= NUM_FRAMES);
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+			fail();
+		}
+	}
 }
