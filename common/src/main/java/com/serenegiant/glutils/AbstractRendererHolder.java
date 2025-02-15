@@ -164,7 +164,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 */
 	@Override
 	public void reset() {
-		mRendererTask.checkMasterSurface();
+		mRendererTask.requestRecreateMasterSurface();
 	}
 
 	/**
