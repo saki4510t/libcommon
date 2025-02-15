@@ -62,7 +62,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 
 	/**
 	 * コンストラクタ
-	 * 共有コンテキストを使わず引数のGLPipelineSourceと同じコンテキスト上で実行する
+	 * 共有コンテキストを使わず引数のGLManagerと同じコンテキスト上で実行する
 	 * @param manager
 	 */
 	public SurfaceDistributePipeline(@NonNull final GLManager manager) {
