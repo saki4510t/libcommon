@@ -42,6 +42,8 @@ import androidx.annotation.WorkerThread;
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、
  * 静止画をSurfaceへ出力するためのクラス
  * StaticTextureSourceと違って分配描画しないので出力先Surfaceが1つだけであればこちらの方が効率的
+ * Surfaceをセットせずに、OnFrameAvailableListenerが呼ばれたタイミングで
+ * 内包する映像ソースのテクスチャid/テクスチャ変換行列へアクセスすることも可能
  */
 public class ImageTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること

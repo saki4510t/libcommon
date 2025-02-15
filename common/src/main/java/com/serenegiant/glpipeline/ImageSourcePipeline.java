@@ -33,6 +33,7 @@ import androidx.annotation.WorkerThread;
 
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
+ * これが生成する映像ソースのテクスチャはGL_TEXTURE_2D
  * ビットマップ → ImageSourcePipeline (→ パイプライン)
  */
 public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSource {
@@ -44,6 +45,13 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@NonNull
 	private final GLManager mManager;
 
+	/**
+	 * GLTextureを使って静止画をテクスチャとして読み込みChoreographerを使って定期的に
+	 * #onFrameAvailableを呼び出す代わりに、ImageTextureSource利用する(Surfaceはセットしない)
+	 * ImageTextureSourceにはSurfaceをセットしなくてもGLTextureを使って静止画を
+	 * テクスチャとして読み込みChoreographerを使って定期的に#OnFrameAvailableListener
+	 * リスナーを呼び出す機能があるので。
+	 */
 	@NonNull
 	private final ImageTextureSource mImageTextureSource;
 	// 現在の映像サイズ
