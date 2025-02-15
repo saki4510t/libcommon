@@ -132,11 +132,7 @@ open class ServiceRecorder @SuppressLint("NewApi") constructor(
 			}
 		}
 		val serviceIntent = createServiceIntent(context)
-		if (BuildCheck.isOreo()) {
-			context.startForegroundService(serviceIntent)
-		} else {
-			context.startService(serviceIntent)
-		}
+		context.startService(serviceIntent)
 		mScope.launch {
 			doBindService()
 		}

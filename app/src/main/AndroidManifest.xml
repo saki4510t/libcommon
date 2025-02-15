@@ -24,7 +24,6 @@
 	<!-- Android 9 以降でフォアグラウンドサービスを実行するため -->
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 	<!-- Android 14以降でフォアグラウンドサービスを実行するため -->
-	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA"/>
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION"/>
 
 	<!-- 位置情報・BluetoothやWiFiのスキャンを利用できるようにするため -->
@@ -51,8 +50,7 @@
 		<service
 			android:name="com.serenegiant.service.RecordingService"
 			android:exported="false"
-			android:enabled="true"
-			android:foregroundServiceType="camera">
+			android:enabled="true">
 			<intent-filter>
 				<action android:name="com.serenegiant.service.RecordingService" />
 			</intent-filter>

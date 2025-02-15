@@ -21,7 +21,6 @@ package com.serenegiant.service
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
-import android.content.pm.ServiceInfo
 import android.media.AudioFormat
 import android.media.MediaCodec
 import android.media.MediaCodecInfo
@@ -160,15 +159,6 @@ open class RecordingService() : LifecycleService() {
 		super.onBind(intent)
 		if (DEBUG) Log.v(TAG, "onBind:intent=$intent")
 		// XXX API21未満はVectorDrawableを通知領域のスモールアイコンにできない
-		NotificationCompat.showNotification(this,
-			NOTIFICATION,
-			getString(R.string.notification_service),
-			NOTIFICATION_ICON_ID, R.drawable.ic_recording_service,
-			getString(R.string.notification_service),
-			getString(R.string.app_name),
-			ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA,
-			contextIntent()
-		)
 		if (mState == STATE_UNINITIALIZED) {
 			state = STATE_INITIALIZED
 		}
