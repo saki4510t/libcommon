@@ -94,10 +94,10 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 			}
 
 			override fun applyTransformMatrix(@Size(min=16) transform: FloatArray) {
+				System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 				if (mDrawer != null) {
 					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
 						+ MatrixUtils.toGLMatrixString(transform))
-					System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 					mDrawer!!.setMirror(IMirror.MIRROR_VERTICAL)
 				}

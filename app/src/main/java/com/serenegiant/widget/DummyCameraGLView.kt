@@ -89,8 +89,8 @@ class DummyCameraGLView @JvmOverloads constructor(
 			}
 
 			override fun applyTransformMatrix(@Size(min=16) transform: FloatArray) {
+				System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 				if (mDrawer != null) {
-					System.arraycopy(transform, 0, mMvpMatrix, 0, 16)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
 				}
 			}
