@@ -34,6 +34,7 @@ import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.ThreadPool;
 import com.serenegiant.utils.ThreadUtils;
 
@@ -286,7 +287,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 					final int texId, @NonNull final float[] texMatrix) {
 
 					if (cnt.incrementAndGet() == numFrames) {
-						Log.v(TAG, "createGLSurfaceReceiverSurface:create Bitmap from texture");
+						Log.v(TAG, "createGLSurfaceReceiver:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 						result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 						sem.release();
 					}
@@ -330,7 +331,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 				@NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
 				if (cnt.incrementAndGet() == numFrames) {
-					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture");
+					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 					result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 					sem.release();
 				}
