@@ -33,6 +33,7 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
+import androidx.core.content.IntentCompat;
 
 import android.text.TextUtils;
 import android.util.Log;
@@ -447,7 +448,7 @@ public class BluetoothManager {
 //			if (DEBUG) Log.v(TAG, "onReceive:intent=" + intent);
 			final String action = intent != null ? intent.getAction() : null;
 			if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-				final BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+				final BluetoothDevice device = IntentCompat.getParcelableExtra(intent, BluetoothDevice.EXTRA_DEVICE, BluetoothDevice.class);
 				// ペアリング済みのものは既に追加されているので無視して、それ以外のものを追加する
 				if (device.getBondState() != BluetoothDevice.BOND_BONDED) {
 					synchronized (mDiscoveredDeviceList) {

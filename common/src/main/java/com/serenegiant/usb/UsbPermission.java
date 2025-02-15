@@ -43,6 +43,7 @@ import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 
 /**
  * USBMonitorからUSB機器アクセスパーミッション要求関係の処理を分離
@@ -261,7 +262,7 @@ public class UsbPermission extends BroadcastReceiver {
 		if (ACTION_USB_PERMISSION.equals(action)) {
 			// パーミッション要求の結果が返ってきた時
 			synchronized (this) {
-				final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+				final UsbDevice device = IntentCompat.getParcelableExtra(intent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
 				if ((device != null)
 					&& (hasPermission(mUsbManager, device)
 					|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
@@ -431,7 +432,7 @@ public class UsbPermission extends BroadcastReceiver {
 					try {
 						if (ACTION_USB_PERMISSION.equals(action)) {
 							// パーミッション要求の結果が返ってきた時
-							final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+							final UsbDevice device = IntentCompat.getParcelableExtra(intent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
 							if ((device != null)
 								&& (manager.hasPermission(device)
 								|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {

@@ -45,6 +45,7 @@ import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
 
 /**
  * USBMonitorからUSB機器の接続・切断イベントに関する処理を分離
@@ -492,7 +493,7 @@ public class UsbDetector {
 			// デバイスが取り付けられた時の処理・・・SC-06DはこのActionが来ない.ACTION_USB_DEVICE_DETACHEDは来る
 			// Nexus7/5はaddActionしてれば来るけど、どのAndroidバージョンから来るのかわからない
 			// Android5以降なら大丈夫そう
-			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+			final UsbDevice device = IntentCompat.getParcelableExtra(intent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
 			if (device != null) {
 				processAttach(device);
 			} else {
@@ -500,7 +501,7 @@ public class UsbDetector {
 			}
 		} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 			// デバイスが取り外された時
-			final UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+			final UsbDevice device = IntentCompat.getParcelableExtra(intent, UsbManager.EXTRA_DEVICE, UsbDevice.class);
 			if (device != null) {
 				processDettach(device);
 			} else {

@@ -38,6 +38,7 @@ import java.util.Locale;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
+import androidx.core.content.IntentCompat;
 
 /**
  * スナックバー類似のメッセージ表示処理のヘルパークラス
@@ -249,7 +250,7 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 			final long autoHideDurationMs = intent.getLongExtra(APP_EXTRA_KEY_MESSAGE_AUTO_HIDE, MESSAGE_DURATION_INFINITY);
 			final int msgId = intent.getIntExtra(APP_EXTRA_KEY_MESSAGE_ID, 0);
 			final String msg = intent.getStringExtra(APP_EXTRA_KEY_MESSAGE);
-			final Intent clickIntent = intent.getParcelableExtra(APP_EXTRA_KEY_CLICK_INTENT);
+			final Intent clickIntent = IntentCompat.getParcelableExtra(intent, APP_EXTRA_KEY_CLICK_INTENT, Intent.class);
 			if ((msgId != 0) && !TextUtils.isEmpty(msg)) {
 				// フォーマット用文字列リソース
 				showMessage(getString(msgId, msg), autoHideDurationMs, clickIntent);

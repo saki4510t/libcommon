@@ -33,6 +33,7 @@ import android.net.wifi.p2p.WifiP2pManager;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresPermission;
+import androidx.core.content.IntentCompat;
 
 import android.util.Log;
 
@@ -534,8 +535,8 @@ public class WiFiP2pHelper {
 	        } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
 				// ピアとの接続状態が変化した時
 				try {
-					final NetworkInfo networkInfo = intent.getParcelableExtra(
-						WifiP2pManager.EXTRA_NETWORK_INFO);
+					final NetworkInfo networkInfo = IntentCompat.getParcelableExtra(intent,
+						WifiP2pManager.EXTRA_NETWORK_INFO, NetworkInfo.class);
 		
 					if (DEBUG) Log.v(TAG, "onReceive:WIFI_P2P_CONNECTION_CHANGED_ACTION, networkInfo=" + networkInfo);
 
@@ -554,8 +555,8 @@ public class WiFiP2pHelper {
 				if (DEBUG) Log.v(TAG, "onReceive:WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
 	        	// 自デバイスの状態が変化した時
 	        	try {
-					final WifiP2pDevice device = intent.getParcelableExtra(
-						WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+					final WifiP2pDevice device = IntentCompat.getParcelableExtra(intent,
+						WifiP2pManager.EXTRA_WIFI_P2P_DEVICE, WifiP2pDevice.class);
 					mParent.updateDevice(device);
 				} catch (final Exception e) {
 					mParent.callOnError(e);

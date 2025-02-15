@@ -25,12 +25,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.hardware.usb.UsbDevice
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.IntentCompat
 import androidx.fragment.app.Fragment
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.dialog.RationalDialogV4
@@ -72,11 +72,7 @@ class MainActivity
 						if (DEBUG) Log.v(TAG, "onReceive:$intent")
 						when (intent?.action) {
 							Const.ACTION_REQUEST_USB_PERMISSION -> {
-								val device = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-									intent.getParcelableExtra(Const.EXTRA_REQUEST_USB_PERMISSION, UsbDevice::class.java)
-								} else {
-									intent.getParcelableExtra(Const.EXTRA_REQUEST_USB_PERMISSION)
-								}
+								val device = IntentCompat.getParcelableExtra(intent, Const.EXTRA_REQUEST_USB_PERMISSION, UsbDevice::class.java)
 								if (device != null) {
 									UsbPermission.requestPermission(this@MainActivity, device)
 								}
