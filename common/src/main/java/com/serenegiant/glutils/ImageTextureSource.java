@@ -61,7 +61,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@NonNull
 	private final GLManager mManager;
 	@Nullable
-	private final OnFrameAvailableListener mListener;
+	private OnFrameAvailableListener mListener;
 	@Nullable
 	private GLTexture mImageSource;
 	private volatile long mFrameIntervalNs;
@@ -274,6 +274,20 @@ public class ImageTextureSource implements GLConst, IMirror {
 	}
 
 	/**
+	 * OnFrameAvailableListenerをセット
+	 * @param listener
+	 */
+	public void setOnFrameAvailableListener(@Nullable OnFrameAvailableListener listener) {
+		if (DEBUG) Log.v(TAG, "setOnFrameAvailableListener:" + listener);
+		mLock.lock();
+		try {
+			mListener = listener;
+		} finally {
+			mLock.unlock();
+		}
+	}
+
+	/**
 	 * 描画処理
 	 * Choreographer.FrameCallbackからmImageSource != nullのときだけ呼ばれる
 	 */
@@ -454,8 +468,10 @@ public class ImageTextureSource implements GLConst, IMirror {
 					ms = 0L;
 				}
 				mManager.postFrameCallbackDelayed(this, ms);
+				final OnFrameAvailableListener listener;
 				mLock.lock();
 				try {
+					listener = mListener;
 					if (mImageSource != null) {
 						onFrameAvailable(mImageSource.getTexId(), mImageSource.getTexMatrix());
 					} else {
@@ -464,8 +480,8 @@ public class ImageTextureSource implements GLConst, IMirror {
 				} finally {
 					mLock.unlock();
 				}
-				if (mListener != null) {
-					mListener.onFrameAvailable();
+				if (listener != null) {
+					listener.onFrameAvailable();
 				}
 			}
 		}
