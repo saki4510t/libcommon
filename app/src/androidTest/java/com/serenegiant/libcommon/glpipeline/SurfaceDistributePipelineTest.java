@@ -81,7 +81,7 @@ public class SurfaceDistributePipelineTest {
 	 * ImageSourcePipelineからの映像ソースをSurfaceDistributePipelineでSurfaceへ
 	 * 描画してGLSurfaceReceiverで読み取れることを検証
 	 * Bitmap -> ImageSourcePipeline
-	 * 		→ SurfaceDistributePipeline
+	 * 		→ SurfaceDistributePipeline → ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 * 			↓
 	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
 	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
@@ -124,26 +124,38 @@ public class SurfaceDistributePipelineTest {
 		assertNotNull(surface2);
 		distributor.addSurface(surface2.hashCode(), surface2, false);
 
+		// パイプライン経由での映像受け取り用にProxyPipelineを生成
+		final AtomicReference<Bitmap> result3 = new AtomicReference<>();
+		final AtomicInteger cnt3 = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(
+			WIDTH, HEIGHT, NUM_FRAMES, sem, result3, cnt3);
+		GLPipeline.append(source, proxy);
+		assertTrue(validatePipelineOrder(source, source, distributor, proxy));
+
 		// addSurfaceは非同期なのでちょっとまたないと反映されない
 		ThreadUtils.NoThrowSleep(100);
 		// 正常にSurfaceを追加できたかどうかを確認
 		assertEquals(2, distributor.getCount());
 
 		try {
-			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertTrue(sem.tryAcquire(3, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
 			distributor.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
+			assertTrue(cnt3.get() >= NUM_FRAMES);
 			// 受け取った映像を検証
 			final Bitmap resultBitmap1 = result1.get();
 			assertNotNull(resultBitmap1);
 			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
+			final Bitmap resultBitmap3 = result3.get();
+			assertNotNull(resultBitmap3);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap1));
 			assertTrue(bitmapEquals(original, resultBitmap2));
+			assertTrue(bitmapEquals(original, resultBitmap3));
 		} catch (final InterruptedException e) {
 			fail();
 		}
