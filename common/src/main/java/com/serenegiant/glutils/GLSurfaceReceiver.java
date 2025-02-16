@@ -45,6 +45,7 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surfaceを経由して映像をテクスチャとして受け取るためのクラスの基本部分を実装
+ * SurfaceTextureを使うので生成されるテクスチャはGL_TEXTURE_EXTERNAL_OES
  * FIXME RendererHolderだと入力ソースを変更時にSurfaceの再生成しなくても
  *       正常に動作するのにこっちはテクスチャが更新されなくなる
  */

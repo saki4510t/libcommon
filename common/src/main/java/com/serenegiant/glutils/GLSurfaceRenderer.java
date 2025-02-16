@@ -184,7 +184,12 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = mDrawerFactory.create(isGLES3, isOES);
-				mDrawer.setMirror(MIRROR_VERTICAL);	// FIXME 他も同じだけどなぜか上下反転させないとテスト通らない
+				if (isOES) {
+					// XXX DrawerPipelineと違ってGL_TEXTURE_EXTERNAL_OESの時に上下反転させないとだめみたい
+					//     GLUtils#glCopyTextureToBitmapと同じ
+					//     常に上下反転させると入力テクスチャがGL_TEXTURE_2Dの時に結果が上下反転してしまう
+					mDrawer.setMirror(MIRROR_VERTICAL);
+				}
 			}
 			resizeOnGL(width, height);
 			final GLDrawer2D drawer = mDrawer;

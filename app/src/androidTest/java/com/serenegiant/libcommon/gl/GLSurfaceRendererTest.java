@@ -26,6 +26,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.GLSurfaceRenderer;
+import com.serenegiant.glutils.ImageTextureSource;
 import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
@@ -81,6 +82,7 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャをSurfaceへ描画できることを検証
+	 * GLSurfaceReceiverを使うのでGLSurfaceRendererが受け取るテクスチャはGL_TEXTURE_EXTERNAL_OES
 	 * Bitmap -> inputImagesAsync → (Surface)
 	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
 	 * 		→ GLSurfaceRenderer
@@ -136,6 +138,7 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャを複数のSurfaceへ分配描画できることを検証
+	 * GLSurfaceReceiverを使うのでGLSurfaceRendererが受け取るテクスチャはGL_TEXTURE_EXTERNAL_OES
 	 * Bitmap -> inputImagesAsync → (Surface)
 	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
 	 * 		→ GLSurfaceRenderer
@@ -213,6 +216,7 @@ public class GLSurfaceRendererTest {
 
 	/**
 	 * GLSurfaceRendererを使って受け取ったテクスチャを複数のSurfaceへ分配描画できることを検証
+	 * GLSurfaceReceiverを使うのでGLSurfaceRendererが受け取るテクスチャはGL_TEXTURE_EXTERNAL_OES
 	 * Bitmap -> StaticTextureSource → (Surface)
 	 * 	→ GLSurfaceReceiver　→ (テクスチャ)
 	 * 		→ GLSurfaceRenderer
@@ -285,6 +289,66 @@ public class GLSurfaceRendererTest {
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, resultBitmap1));
 			assertTrue(bitmapEquals(original, resultBitmap2));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
+
+	/**
+	 * GLSurfaceRendererを使って受け取ったテクスチャをSurfaceへ描画できることを検証
+	 * ImageTextureSourceからの映像ソースなのでGLSurfaceRendererが受け取るテクスチャはGL_TEXTURE_2D
+	 * Bitmap -> ImageTextureSource →
+	 * 	→ OnFrameAvailableListener
+	 * 		↓ コールバック
+	 * 		→ GLSurfaceRenderer
+	 * 			→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void imageTextureSourceRenderTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mGLManager;
+
+		// 分配描画用にGLSurfaceRendererを生成
+		final GLSurfaceRenderer renderer = new GLSurfaceRenderer(
+			manager, WIDTH, HEIGHT, GLDrawer2D.DEFAULT_FACTORY);
+
+		// 描画結果受け取り用にSurfaceを生成
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver bitmapReceiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(bitmapReceiver);
+		final Surface surface = bitmapReceiver.getSurface();
+		assertNotNull(surface);
+		renderer.addSurface(surface.hashCode(), surface, null);
+		ThreadUtils.NoThrowSleep(100);
+		assertEquals(1, renderer.getCount());
+
+		// 映像ソース用にImageTextureSourceを生成
+		final ImageTextureSource source = new ImageTextureSource(manager, original, new Fraction(30));
+		source.setOnFrameAvailableListener(() -> {
+			// ここはGLコンテキスト内
+			final int texId = source.getTexId();
+			final float[] texMatrix = source.getTexMatrix();
+			final int width = source.getWidth();
+			final int height = source.getHeight();
+			// GLSurfaceRendererへ映像を引き渡す
+			renderer.onFrameAvailable(manager.isGLES3(), false, width, height, texId, texMatrix);
+		});
+
+		try {
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
+			renderer.release();
+			assertEquals(NUM_FRAMES, cnt.get());
+			final Bitmap resultBitmap = result.get();
+			assertNotNull(resultBitmap);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
 		}
