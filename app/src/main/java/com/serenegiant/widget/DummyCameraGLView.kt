@@ -33,6 +33,7 @@ import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.ImageSourcePipeline
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.graphics.BitmapHelper
+import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.libcommon.R
 import com.serenegiant.math.Fraction
 import java.lang.IllegalStateException
@@ -41,6 +42,11 @@ import java.lang.IllegalStateException
  * カメラからの映像の代わりに静止画をプレビュー表示するためのICameraView実装
  * GLViewを継承
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
+ * Bitmap(Drawable) → ImageSourcePipeline
+ * 		→ SurfaceDistributePipeline → 内包するtexId/texMatrixをGLDrawer2DでGLViewのSurfaceへ描画(1)
+ * 			↓
+ * 			→ (Surface) → RecordingServiceのMediaCodecでエンコード(2)
+ * XXX (1)(2)とも正常な映像の向きになっている
  */
 class DummyCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
@@ -240,7 +246,11 @@ class DummyCameraGLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
 	private fun handleDraw(texId: Int, texMatrix: FloatArray) {
-		if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
+		if (DEBUG && ((++cnt2 % 300) == 0)) {
+			Log.v(TAG, "handleDraw:$cnt2")
+			Log.v(TAG, "handleDraw:mvpMatrix=${MatrixUtils.toGLMatrixString(mDrawer!!.mvpMatrix)}}")
+			Log.v(TAG, "handleDraw:texMatrix=${MatrixUtils.toGLMatrixString(texMatrix)}}")
+		}
 		// draw to preview screen
 		if (mHasSurface && (mDrawer != null)) {
 			mDrawer!!.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0)
