@@ -29,6 +29,7 @@ import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceRendererPipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.gl.GLManager;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -76,6 +77,51 @@ public class SurfaceRendererPipelineTest {
 		if (mManager != null) {
 			mManager.release();
 			mManager = null;
+		}
+	}
+
+	/**
+	 * ImageSourcePipelineからの映像ソースをImageSourcePipelineでSurfaceへ
+	 * 描画してGLSurfaceReceiverで読み取れることを検証
+	 * Bitmap -> ImageSourcePipeline → SurfaceRendererPipeline
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void surfaceRendererPipelineTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
+
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
+		GLPipeline.append(source, renderer);
+
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicInteger cnt = new AtomicInteger();
+		final GLSurfaceReceiver receiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		assertNotNull(receiver);
+		final Surface surface = receiver.getSurface();
+		assertNotNull(surface);
+
+		renderer.setSurface(surface);
+		assertTrue(validatePipelineOrder(source, source, renderer));
+
+		try {
+			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
+			assertEquals(NUM_FRAMES, cnt.get());
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+			fail();
 		}
 	}
 
