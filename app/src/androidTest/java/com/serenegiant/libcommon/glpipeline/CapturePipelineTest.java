@@ -136,10 +136,10 @@ public class CapturePipelineTest {
 
 	/**
 	 * CapturePipelineで1回ビットマップを取得するテスト
-	 * VideoSourcePipelineからの映像ソースなのでGL_TEXTURE_EXTERNAL_OESテクスチャ
+	 * SurfaceSourcePipelineからの映像ソースなのでGL_TEXTURE_EXTERNAL_OESテクスチャ
 	 * Bitmap → inputImagesAsync
 	 * 				↓
-	 * 				Surface → VideoSourcePipeline
+	 * 				Surface → SurfaceSourcePipeline
 	 * 							 → CapturePipeline → Bitmap
 	 */
 	@Test
@@ -275,10 +275,10 @@ public class CapturePipelineTest {
 
 	/**
 	 * CapturePipelineで1回ビットマップを取得するテスト
-	 * VideoSourcePipelineからの映像ソースなのでGL_TEXTURE_EXTERNAL_OESテクスチャ
+	 * SurfaceSourcePipelineからの映像ソースなのでGL_TEXTURE_EXTERNAL_OESテクスチャ
 	 * Bitmap → inputImagesAsync
 	 * 				↓
-	 * 				Surface → VideoSourcePipeline
+	 * 				Surface → SurfaceSourcePipeline
 	 * 							 → CapturePipeline → Bitmap
 	 */
 	@Test
