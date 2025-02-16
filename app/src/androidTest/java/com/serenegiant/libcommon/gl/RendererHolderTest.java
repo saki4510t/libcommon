@@ -123,8 +123,7 @@ public class RendererHolderTest {
 //			dump(b);
 			assertNotNull(b);
 			// 元のビットマップと同じかどうかを検証
-			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
-			assertTrue(bitmapEquals(original, flipVertical(b)));
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -176,7 +175,7 @@ public class RendererHolderTest {
 			assertNotNull(b);
 			// 元のビットマップと同じかどうかを検証
 			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
-			assertTrue(bitmapEquals(original, flipVertical(b)));
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -245,8 +244,7 @@ public class RendererHolderTest {
 //			dump(b);
 			assertNotNull(b);
 			// 元のビットマップと同じかどうかを検証
-			// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
-			assertTrue(bitmapEquals(original, flipVertical(b)));
+			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 		}
@@ -297,8 +295,7 @@ public class RendererHolderTest {
 	//			dump(b);
 				assertNotNull(b);
 				// 元のビットマップと同じかどうかを検証
-				// GLDrawer2Dのテクスチャ座標配列で上下反転させないので結果も上下入れ替わる
-				assertTrue(bitmapEquals(original, flipVertical(b)));
+				assertTrue(bitmapEquals(original, b));
 			} catch (final InterruptedException e) {
 				Log.d(TAG, "interrupted", e);
 			}

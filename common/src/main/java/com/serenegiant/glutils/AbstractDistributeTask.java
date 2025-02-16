@@ -398,6 +398,10 @@ public abstract class AbstractDistributeTask implements IMirror {
 		if (DEBUG) Log.v(TAG, "internalOnStart:");
 		synchronized (mSync) {
 			mDrawer = mDrawerFactory.create(isGLES3(), true);
+			// XXX GLSurfaceRendererのテスト結果からするとGL_TEXTURE_EXTERNAL_OESの時に上下反転させないとだめみたい
+			//     ただしSurfaceTexture経由で受け取ったテクスチャなのでここに来るのは常にGL_TEXTURE_EXTERNAL_OESなので
+			//     常に上下反転させる
+			mDrawer.setMirror(MIRROR_VERTICAL);
 		}
 		handleReCreateInputSurface();
 	}

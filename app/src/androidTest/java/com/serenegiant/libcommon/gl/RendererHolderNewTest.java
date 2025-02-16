@@ -134,7 +134,7 @@ public class RendererHolderNewTest {
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap)));
+			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
 		}
@@ -205,8 +205,8 @@ public class RendererHolderNewTest {
 			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap1)));
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap2)));
+			assertTrue(bitmapEquals(original, resultBitmap1));
+			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
 		}
@@ -265,7 +265,7 @@ public class RendererHolderNewTest {
 					final Bitmap resultBitmap = result.get();
 					assertNotNull(resultBitmap);
 					// 元のビットマップと同じかどうかを検証
-					assertTrue(bitmapEquals(original, flipVertical(resultBitmap)));
+					assertTrue(bitmapEquals(original, resultBitmap));
 					// 映像入力用SurfaceTexture/Surfaceを強制的に再生成させる
 					rendererHolder.reset();
 				} catch (final InterruptedException e) {
@@ -347,8 +347,8 @@ public class RendererHolderNewTest {
 			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap1)));
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap2)));
+			assertTrue(bitmapEquals(original, resultBitmap1));
+			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
 		}
@@ -418,8 +418,8 @@ public class RendererHolderNewTest {
 			final Bitmap resultBitmap2 = result2.get();
 			assertNotNull(resultBitmap2);
 			// 元のビットマップと同じかどうかを検証
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap1)));
-			assertTrue(bitmapEquals(original, flipVertical(resultBitmap2)));
+			assertTrue(bitmapEquals(original, resultBitmap1));
+			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
 		}
@@ -495,8 +495,8 @@ public class RendererHolderNewTest {
 					final Bitmap resultBitmap2 = result2.get();
 					assertNotNull(resultBitmap2);
 					// 元のビットマップと同じかどうかを検証
-					assertTrue(bitmapEquals(original, flipVertical(resultBitmap1)));
-					assertTrue(bitmapEquals(original, flipVertical(resultBitmap2)));
+					assertTrue(bitmapEquals(original, resultBitmap1));
+					assertTrue(bitmapEquals(original, resultBitmap2));
 				} catch (final InterruptedException e) {
 					fail();
 				} finally {
