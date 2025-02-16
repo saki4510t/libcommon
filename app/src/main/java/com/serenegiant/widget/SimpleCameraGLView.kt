@@ -132,8 +132,8 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 				if (mDrawer != null) {
 					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
 						+ MatrixUtils.toGLMatrixString(transform))
+					MatrixUtils.setMirror(transform, IMirror.MIRROR_VERTICAL)
 					mDrawer!!.setMvpMatrix(transform, 0)
-					mDrawer!!.setMirror(IMirror.MIRROR_VERTICAL)
 				}
 			}
 		})

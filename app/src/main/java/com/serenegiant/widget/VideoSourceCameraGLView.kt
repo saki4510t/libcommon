@@ -98,8 +98,8 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 				if (mDrawer != null) {
 					if (DEBUG) Log.v(TAG, "applyTransformMatrix:"
 						+ MatrixUtils.toGLMatrixString(transform))
+					MatrixUtils.setMirror(mMvpMatrix, IMirror.MIRROR_VERTICAL)
 					mDrawer!!.setMvpMatrix(mMvpMatrix, 0)
-					mDrawer!!.setMirror(IMirror.MIRROR_VERTICAL)
 				}
 			}
 		})

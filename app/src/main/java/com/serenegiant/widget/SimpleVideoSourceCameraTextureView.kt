@@ -283,14 +283,10 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 					}
 				}
 				is GLSurfacePipeline -> {
-					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps).apply {
-						mirror = IMirror.MIRROR_VERTICAL
-					}
+					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				}
 				else -> {
-					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps).apply {
-						mirror = IMirror.MIRROR_VERTICAL
-					}
+					last.pipeline = SurfaceRendererPipeline(mGLManager, surface, maxFps)
 				}
 			}
 			if (DEBUG) Log.v(TAG, "addSurface:" + GLPipeline.pipelineString(source))
@@ -419,8 +415,6 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				if (DEBUG) Log.v(TAG, "createPipeline:create SurfaceRendererPipeline")
 				SurfaceRendererPipeline(mGLManager, surface, maxFps)
 			}
-		}.apply {
-			mirror = IMirror.MIRROR_VERTICAL
 		}
 	}
 

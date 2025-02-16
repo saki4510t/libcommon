@@ -37,6 +37,8 @@ import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
+import com.serenegiant.glutils.IMirror
+import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
@@ -423,6 +425,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 						 1.0f)
 				}
 			}
+			MatrixUtils.setMirror(mMvpMatrix, IMirror.MIRROR_VERTICAL)
 			mDrawer?.setMvpMatrix(mMvpMatrix, 0)
 		}
 

@@ -31,6 +31,7 @@ import android.view.SurfaceHolder
 import android.view.View
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLUtils
+import com.serenegiant.glutils.IMirror
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.graphics.MatrixUtils
@@ -391,6 +392,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 						1.0f)
 				}
 			}
+			MatrixUtils.setMirror(mMvpMatrix, IMirror.MIRROR_VERTICAL)
 			Log.v(TAG, "updateViewport:" + MatrixUtils.toGLMatrixString(mMvpMatrix))
 			mDrawer?.setMvpMatrix(mMvpMatrix, 0)
 		}
