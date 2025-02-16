@@ -283,7 +283,15 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = mDrawerFactory.create(isGLES3, isOES);
-			mDrawer.setMirror(MIRROR_VERTICAL);	// FIXME 他も同じだけどなぜか上下反転させないとテスト通らない
+			if (!isOES) {
+				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
+				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
+				//     DrawerPipelineを0, 1, 2, 3個連結した場合の結果から全ての組み合わせでテストが通るのは、
+				//     GLUtils#glCopyTextureToBitmapとは逆で、
+				//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
+				//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
+				mDrawer.setMirror(MIRROR_VERTICAL);
+			}
 		}
 		if (mDrawOnly && (mOffscreenSurface != null)
 			&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {
