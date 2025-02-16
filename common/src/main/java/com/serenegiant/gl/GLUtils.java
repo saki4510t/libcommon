@@ -291,8 +291,8 @@ public class GLUtils implements GLConst {
 		if (isOES || !matrix.isIdentity()) {
 			// テクスチャ変換行列を適用した新しいBitmapを生成して返す
 			if (isOES) {
-				// FIXME GL_TEXTURE_EXTERNAL_OESの時はなぜか上下反転させないといけない？
-				//       GL_TEXTURE_2Dの時に反転させると結果が一致しない
+				// XXX GL_TEXTURE_EXTERNAL_OESの時はなぜか上下反転させないといけない？
+				//     GL_TEXTURE_2Dの時に反転させると結果が一致しない
 				MatrixUtils.setMirror(matrix, IMirror.MIRROR_VERTICAL);
 			}
 			return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
