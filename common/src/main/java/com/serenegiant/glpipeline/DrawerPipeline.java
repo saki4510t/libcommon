@@ -59,6 +59,10 @@ public class DrawerPipeline extends ProxyPipeline
 	/**
 	 * 描画処理した後のテクスチャを次のGLPipelineへ送るかSurfaceへ描画するか
 	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
+	 * FIXME 今はsetSurfaceで有効なSurfaceをセットしたかどうかになっていて
+	 *       trueの時だけ下流パイプラインへも描画結果を転送するようになっている。
+	 *       これだとSurfaceへ描画＆下流パイプラインへも描画結果を転送という
+	 *       設定がができないのでコンストラクタで指定するように変更する。
 	 */
 	private volatile boolean mDrawOnly;
 	/**
