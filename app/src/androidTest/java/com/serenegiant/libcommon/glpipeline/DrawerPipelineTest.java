@@ -193,17 +193,17 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline);
+		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			drawerPipeline.release();
+			pipeline1.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -235,20 +235,20 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline1);
-		GLPipeline.append(source, drawerPipeline2);
+		GLPipeline.append(source, pipeline1);
+		GLPipeline.append(source, pipeline2);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			drawerPipeline1.release();
-			drawerPipeline2.release();
+			pipeline1.release();
+			pipeline2.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -280,23 +280,23 @@ public class DrawerPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline1);
-		GLPipeline.append(source, drawerPipeline2);
-		GLPipeline.append(source, drawerPipeline3);
+		GLPipeline.append(source, pipeline1);
+		GLPipeline.append(source, pipeline2);
+		GLPipeline.append(source, pipeline3);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, drawerPipeline3, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			drawerPipeline1.release();
-			drawerPipeline2.release();
-			drawerPipeline3.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -422,11 +422,11 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline1);
+		GLPipeline.append(source, pipeline1);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
 		// 実際の映像はSurfaceを経由して映像を書き込む
 		final AtomicBoolean requestStop = new AtomicBoolean();
@@ -494,13 +494,13 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline1);
-		GLPipeline.append(source, drawerPipeline2);
+		GLPipeline.append(source, pipeline1);
+		GLPipeline.append(source, pipeline2);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
 		// 実際の映像はSurfaceを経由して映像を書き込む
 		final AtomicBoolean requestStop = new AtomicBoolean();
@@ -568,15 +568,15 @@ public class DrawerPipelineTest {
 		assertNotNull(inputSurface);
 
 		// 検証するDrawerPipelineを生成
-		final DrawerPipeline drawerPipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
-		final DrawerPipeline drawerPipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline1 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline2 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
+		final DrawerPipeline pipeline3 = new DrawerPipeline(manager, GLDrawer2D.DEFAULT_FACTORY);
 
-		GLPipeline.append(source, drawerPipeline1);
-		GLPipeline.append(source, drawerPipeline2);
-		GLPipeline.append(source, drawerPipeline3);
+		GLPipeline.append(source, pipeline1);
+		GLPipeline.append(source, pipeline2);
+		GLPipeline.append(source, pipeline3);
 		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, drawerPipeline1, drawerPipeline2, drawerPipeline3, proxy));
+		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
 		// 実際の映像はSurfaceを経由して映像を書き込む
 		final AtomicBoolean requestStop = new AtomicBoolean();
