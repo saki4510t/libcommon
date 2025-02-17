@@ -30,6 +30,7 @@ import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -51,47 +52,78 @@ public class EffectPipeline extends ProxyPipeline
 	@NonNull
 	private final GLManager mManager;
 
+	/**
+	 * 次のパイプラインへ送るテクスチャの挙動指定フラグ
+	 */
+	@PipelineMode
+	private final int mPipelineMode;
+
+	/**
+	 * 描画処理した後のテクスチャを次のGLPipelineへ送るか前のパイプラインからの
+	 * テクスチャをそのまま次のパイプラインへ送るか
+	 */
+	private volatile boolean mPathThrough = true;
 	@Nullable
 	private EffectDrawer2D mDrawer;
 	private int mEffect = EFFECT_NON;
 	@Nullable
 	private Fraction mMaxFps;
-	@Nullable
-	private RendererTarget mRendererTarget;
-	/**
-	 * 映像効果付与してそのまま次のGLPipelineへ送るかSurfaceへ描画するか
-	 * setSurfaceで有効な描画先Surfaceをセットしていればfalse、セットしていなければtrue
-	 * FIXME 今はsetSurfaceで有効なSurfaceをセットしたかどうかになっていて
-	 *       trueの時だけ下流パイプラインへも描画結果を転送するようになっている。
-	 *       これだとSurfaceへ描画＆下流パイプラインへも描画結果を転送という
-	 *       設定がができないのでコンストラクタで指定するように変更する。
-	 */
-	private volatile boolean mEffectOnly;
-	/**
-	 * 映像効果付与してそのまま次のGLPipelineへ送る場合のワーク用GLSurface
-	 */
-	@Nullable
-	private GLSurface mOffscreenSurface;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mSurfaceId = 0;
 
 	/**
+	 * Surfaceへの描画用
+	 */
+	@Nullable
+	private RendererTarget mSurfaceTarget = null;
+
+	/**
+	 * 描画処理した結果を次のGLPipelineへ送る場合のワーク用GLSurface
+	 */
+	@Nullable
+	private GLSurface mOffscreenSurface = null;
+	/**
+	 * オフスクリーンのGLSurfaceへの描画用
+	 */
+	@Nullable
+	private RendererTarget mOffscreenTarget = null;
+
+	/**
 	 * コンストラクタ
-	 * @param manager
+	 * 明示的に#setSurfaceでSurfaceを指定しない場合、GLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * null以外のSurfaceを指定した場合は前のパイプラインからのテクスチャをそのまま次のパイプラインへ送る
 	 * @param manager
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
-	public EffectPipeline(@NonNull final GLManager manager)
-			throws IllegalStateException, IllegalArgumentException {
-		this(manager,  null, null);
+	public EffectPipeline(
+		@NonNull final GLManager manager)
+		throws IllegalStateException, IllegalArgumentException {
+
+		this(manager,  PIPELINE_MODE_DEFAULT, null, null);
 	}
 
 	/**
 	 * コンストラクタ
+	 * 明示的に#setSurfaceでSurfaceを指定しない場合、GLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * null以外のSurfaceを指定した場合は前のパイプラインからのテクスチャをそのまま次のパイプラインへ送る
 	 * @param manager
-	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public EffectPipeline(
+		@NonNull final GLManager manager,
+		@Nullable final Object surface, @Nullable final Fraction maxFps)
+		throws IllegalStateException, IllegalArgumentException {
+		this(manager,  PIPELINE_MODE_DEFAULT, surface, maxFps);
+	}
+
+	/**
+	 * コンストラクタ
+	 * #setSurfaceでsurfaceをセットしたかどうかにかかわらずpipelineModeで指定したとおりのテクスチャを次のパイプラインへ送る
+	 * @param manager
+	 * @param pipelineMode
 	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
@@ -99,6 +131,7 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	public EffectPipeline(
 		@NonNull final GLManager manager,
+		@PipelineMode final int pipelineMode,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
 
@@ -108,6 +141,7 @@ public class EffectPipeline extends ProxyPipeline
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
+		mPipelineMode = pipelineMode;
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
 		});
@@ -197,15 +231,6 @@ public class EffectPipeline extends ProxyPipeline
 		return super.isValid() && mManager.isValid();
 	}
 
-	/**
-	 * 映像効果付与をSurfaceへせずに次のGLPipelineへ送るだけかどうか
-	 * コンストラクタまたはsetSurfaceで描画先のsurfaceにnullを指定するとtrue
-	 * @return
-	 */
-	public boolean isEffectOnly() {
-		return mEffectOnly;
-	}
-
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		if (DEBUG) Log.v(TAG, "setMirror:" + mirror);
@@ -214,8 +239,11 @@ public class EffectPipeline extends ProxyPipeline
 			if (mMirror != mirror) {
 				mMirror = mirror;
 				mManager.runOnGLThread(() -> {
-					if (mRendererTarget != null) {
-						mRendererTarget.setMirror(mirror);
+					if (mSurfaceTarget != null) {
+						mSurfaceTarget.setMirror(IMirror.flipVertical(mirror));
+					}
+					if (mOffscreenTarget != null) {
+						mOffscreenTarget.setMirror(mirror);
 					}
 				});
 			}
@@ -243,44 +271,56 @@ public class EffectPipeline extends ProxyPipeline
 		final boolean isOES, final int texId,
 		@NonNull @Size(min=16) final float[] texMatrix) {
 
-		if (isValid()) {
-			if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
-				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-				if (mDrawer != null) {
-					mDrawer.release();
-				}
-				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-				mDrawer = new EffectDrawer2D(isGLES3, isOES, mEffectListener);
-				mDrawer.setMirror(MIRROR_VERTICAL);	// FIXME 他も同じだけどなぜか上下反転させないとテスト通らない
-				mDrawer.setEffect(mEffect);
+		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
+			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
+			if (mDrawer != null) {
+				mDrawer.release();
+				mDrawer = null;
 			}
-			if (mEffectOnly && (mOffscreenSurface != null)
-				&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {
-				// オフスクリーンを使って描画処理したテクスチャを次へ渡すときで
-				// オフスクリーンのリサイズが必要なとき
-				reCreateTargetOnGL(null, mMaxFps);
+			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
+			mDrawer = new EffectDrawer2D(isGLES3, isOES, mEffectListener);
+			if (!isOES) {
+				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
+				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
+				//     DrawerPipelineを0, 1, 2, 3個連結した場合の結果から全ての組み合わせでテストが通るのは、
+				//     GLUtils#glCopyTextureToBitmapとは逆で、
+				//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
+				//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
+				mDrawer.setMirror(MIRROR_VERTICAL);
 			}
-			@NonNull
-			final EffectDrawer2D drawer = mDrawer;
-			@Nullable
-			final RendererTarget target = mRendererTarget;
-			if ((target != null)
-				&& target.canDraw()) {
-				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
-			}
-			if (mEffectOnly && (mOffscreenSurface != null)) {
-				if (DEBUG && (++cnt % 100) == 0) {
-					Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
-				}
-				// 映像効果付与したテクスチャを次へ渡す
-				super.onFrameAvailable(isGLES3, mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
-			} else {
-				if (DEBUG && (++cnt % 100) == 0) {
-					Log.v(TAG, "onFrameAvailable:" + cnt);
-				}
-				// こっちはオリジナルのテクスチャを渡す
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
-			}
+			mDrawer.setEffect(mEffect);
+		}
+		if ((mOffscreenSurface != null)
+			&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {
+			// オフスクリーンを使って描画処理したテクスチャを次へ渡すときで
+			// オフスクリーンのリサイズが必要なとき
+			reCreateTargetOnGL(null, mMaxFps);
+		}
+
+		final GLDrawer2D drawer = mDrawer;
+		if (drawer != null) {
+			renderTarget(drawer, mSurfaceTarget, texId, texMatrix);
+			renderTarget(drawer, mOffscreenTarget, texId, texMatrix);
+		}
+		if (mPathThrough || (mOffscreenTarget == null)) {	// mOffscreenSurfaceのnullチェックはバグ避け
+			// こっちはオリジナルのテクスチャを渡す
+			super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+		} else {
+			// 描画処理した後のたテクスチャを次へ渡す
+			super.onFrameAvailable(isGLES3, mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
+		}
+		if (DEBUG && (++cnt % 100) == 0) {
+			Log.v(TAG, "onFrameAvailable:path through=" + mPathThrough + "," + cnt);
+		}
+	}
+
+	private static void renderTarget(
+		@NonNull final GLDrawer2D drawer,
+		@Nullable final RendererTarget target,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
+		if ((target != null)
+			&& target.canDraw()) {
+			target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 		}
 	}
 
@@ -306,6 +346,20 @@ public class EffectPipeline extends ProxyPipeline
 				}
 			});
 		}
+	}
+
+	@CallSuper
+	@Override
+	public void resize(final int width, final int height) throws IllegalStateException {
+		super.resize(width, height);
+		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
+		mManager.runOnGLThread(() -> {
+			if (DEBUG) Log.v(TAG, "resize#run:");
+			if (mDrawer != null) {
+				mDrawer.release();
+				mDrawer = null;
+			}
+		});
 	}
 
 //--------------------------------------------------------------------------------
@@ -408,101 +462,6 @@ public class EffectPipeline extends ProxyPipeline
 		}
 	}
 
-	//--------------------------------------------------------------------------------
-	private void releaseAll() {
-		final EffectDrawer2D drawer = mDrawer;
-		final RendererTarget target;
-		final GLSurface w;
-		mDrawer = null;
-		mLock.lock();
-		try {
-			mSurfaceId = 0;
-			target = mRendererTarget;
-			mRendererTarget = null;
-			w = mOffscreenSurface;
-			mOffscreenSurface = null;
-		} finally {
-			mLock.unlock();
-		}
-		if ((drawer != null) || (target != null)) {
-			if (DEBUG) Log.v(TAG, "releaseTarget:");
-			if (mManager.isValid()) {
-				try {
-					mManager.runOnGLThread(() -> {
-						if (drawer != null) {
-							if (DEBUG) Log.v(TAG, "releaseTarget:release drawer");
-							drawer.release();
-						}
-						if (target != null) {
-							if (DEBUG) Log.v(TAG, "releaseTarget:release target");
-							target.release();
-						}
-						if (w != null) {
-							w.release();
-						}
-					});
-				} catch (final Exception e) {
-					if (DEBUG) Log.w(TAG, e);
-				}
-			} else if (DEBUG) {
-				Log.w(TAG, "releaseTarget:unexpectedly GLManager is already released!");
-			}
-		}
-	}
-
-	/**
-	 * 描画先のSurfaceを生成
-	 * @param surface
-	 * @param maxFps
-	 */
-	@WorkerThread
-	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
-		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
-		if ((mRendererTarget == null) || (mRendererTarget.getSurface() != surface)) {
-			reCreateTargetOnGL(surface, maxFps);
-		}
-	}
-
-	/**
-	 * 描画先のSurfaceを生成
-	 * @param surface
-	 * @param maxFps
-	 */
-	@WorkerThread
-	private void reCreateTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
-		if (DEBUG) Log.v(TAG, "reCreateTargetOnGL:" + surface);
-		mSurfaceId = 0;
-		mMaxFps = maxFps;
-		if (mRendererTarget != null) {
-			mRendererTarget.release();
-			mRendererTarget = null;
-		}
-		if (mOffscreenSurface != null) {
-			mOffscreenSurface.release();
-			mOffscreenSurface = null;
-		}
-		if (GLUtils.isSupportedSurface(surface)) {
-			mRendererTarget = RendererTarget.newInstance(
-				mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
-			mEffectOnly = false;
-		} else {
-			if (DEBUG) Log.v(TAG, "createTarget:create GLSurface as work texture");
-			mOffscreenSurface = GLSurface.newInstance(
-				mManager.isGLES3(), GLES20.GL_TEXTURE0,
-				getWidth(), getHeight());
-			mRendererTarget = RendererTarget.newInstance(
-				mManager.getEgl(), mOffscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
-			mEffectOnly = true;
-		}
-		mLock.lock();
-		try {
-			mSurfaceId = mRendererTarget.getId();
-		} finally {
-			mLock.unlock();
-		}
-		mRendererTarget.setMirror(mMirror);
-	}
-
 	final EffectDrawer2D.EffectListener mEffectListener
 		= new EffectDrawer2D.EffectListener() {
 		@WorkerThread
@@ -525,4 +484,114 @@ public class EffectPipeline extends ProxyPipeline
 	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
 		return false;
 	}
+
+	//--------------------------------------------------------------------------------
+	private void releaseAll() {
+		if (DEBUG) Log.v(TAG, "releaseAll:");
+		if (mManager.isValid()) {
+			try {
+				mManager.runOnGLThread(() -> {
+					if (DEBUG) Log.v(TAG, "releaseAll#run:");
+					releaseTargetOnGL();
+					if (mDrawer != null) {
+						mDrawer.release();
+						mDrawer = null;
+					}
+				});
+			} catch (final Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
+		} else if (DEBUG) {
+			Log.w(TAG, "releaseAll:unexpectedly GLManager is already released!");
+		}
+	}
+
+	/**
+	 * Surface/オフスクリーンへの描画用RendererTargetと関係するオブジェクトを破棄する
+	 */
+	@WorkerThread
+	private void releaseTargetOnGL() {
+		mLock.lock();
+		try {
+			mSurfaceId = 0;
+		} finally {
+			mLock.unlock();
+		}
+		if (mSurfaceTarget != null) {
+			if (DEBUG) Log.v(TAG, "releaseTargetOnGL:release target for surface");
+			mSurfaceTarget.release();
+			mSurfaceTarget = null;
+		}
+		if (mOffscreenTarget != null) {
+			if (DEBUG) Log.v(TAG, "releaseTargetOnGL:release target for offscreen");
+			mOffscreenTarget.release();
+			mOffscreenTarget = null;
+		}
+		if (mOffscreenSurface != null) {
+			if (DEBUG) Log.v(TAG, "releaseTargetOnGL:release offscreen");
+			mOffscreenSurface.release();
+			mOffscreenSurface = null;
+		}
+		mPathThrough = true;
+	}
+
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
+	private void createTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "createTarget:" + surface);
+		if ((mSurfaceTarget == null) || (mSurfaceTarget.getSurface() != surface)) {
+			reCreateTargetOnGL(surface, maxFps);
+		}
+	}
+
+	/**
+	 * 描画先のSurfaceを生成
+	 * @param surface
+	 * @param maxFps
+	 */
+	@WorkerThread
+	private void reCreateTargetOnGL(@Nullable final Object surface, @Nullable final Fraction maxFps) {
+		if (DEBUG) Log.v(TAG, "reCreateTargetOnGL:" + surface);
+		mSurfaceId = 0;
+		mMaxFps = maxFps;
+		releaseTargetOnGL();
+		if (isValid()) {
+			if (GLUtils.isSupportedSurface(surface)) {
+				// 有効なSurfaceが引き渡されたとき
+				mSurfaceTarget = RendererTarget.newInstance(
+					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
+			}
+			// 前のパイプラインからのテクスチャをそのまま次のパイプラインへ渡すかどうか
+			mPathThrough = (mPipelineMode & PIPELINE_MODE_PATH_THROUGH) == PIPELINE_MODE_PATH_THROUGH;
+			if (mPipelineMode == PIPELINE_MODE_DEFAULT) {
+				// デフォルトの挙動は有効なSurfaceが無い時にfalse
+				mPathThrough = mSurfaceTarget != null;
+			}
+			if (!mPathThrough) {
+				if (DEBUG) Log.v(TAG, String.format("reCreateTargetOnGL:create GLSurface as offscreen(%dx%d)", getWidth(), getHeight()));
+				mOffscreenSurface = GLSurface.newInstance(
+					mManager.isGLES3(), GLES20.GL_TEXTURE0,
+					getWidth(), getHeight());
+				mOffscreenTarget = RendererTarget.newInstance(
+					mManager.getEgl(), mOffscreenSurface, maxFps != null ? maxFps.asFloat() : 0);
+			}
+		}
+		if (mSurfaceTarget != null) {
+			mLock.lock();
+			try {
+				mSurfaceId = mSurfaceTarget.getId();
+			} finally {
+				mLock.unlock();
+			}
+			mSurfaceTarget.setMirror(IMirror.flipVertical(mMirror));
+		}
+		if (mOffscreenTarget != null) {
+			mOffscreenTarget.setMirror(mMirror);
+		}
+	}
+
 }

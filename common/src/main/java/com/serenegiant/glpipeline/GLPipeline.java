@@ -22,6 +22,10 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLConst;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+
+import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -32,6 +36,44 @@ import androidx.annotation.WorkerThread;
  */
 public interface GLPipeline extends GLConst {
 	static final String TAG = GLPipeline.class.getSimpleName();
+
+	/**
+	 * 次のパイプランへ送るテクスチャの挙動指定フラグ
+	 * デフォルトの挙動
+	 * 以前の実装の通りコンストラクタまたは#setSurfaceで有効なSurfaceが
+	 * セットされていれば前のパイプラインから受け取ったテクスチャをそのまま
+	 * 次のパイプラインへ送る。
+	 * 有効なSurfaceが指定されていなければ前のパイプラインからのテクスチャへ
+	 * 処理を行ったものを次のパイプランへ送る。
+	 */
+	public static final int PIPELINE_MODE_DEFAULT = 0;
+	/**
+	 * 次のパイプランへ送るテクスチャの挙動指定フラグ
+	 * 前のパイプラインから受け取ったテクスチャをそのまま次のパイプラインへ送る
+	 */
+	public static final int PIPELINE_MODE_PATH_THROUGH = 1;
+	/**
+	 * 次のパイプランへ送るテクスチャの挙動指定フラグ
+	 * 前のパイプラインからのテクスチャへ処理を行ったものを次のパイプランへ送る
+	 */
+	public static final int PIPELINE_MODE_DRAW = 2;
+	/**
+	 * 次のパイプランへ送るテクスチャの挙動指定フラグ
+	 * 前のパイプラインから受け取ったテクスチャをそのまま次のパイプラインへ送る
+	 * ただしSurfaceがセットされている場合Surfaceへは処理を行った物を送る
+	 */
+	public static final int PIPELINE_MODE_BOTH = 3;
+	/**
+	 * 次のパイプランへ送るテクスチャの挙動指定フラグ
+	 * 現在対応しているのはDrawerPipelineとEffectPipeline
+	 */
+	@IntDef({
+		PIPELINE_MODE_DEFAULT,
+		PIPELINE_MODE_PATH_THROUGH,
+		PIPELINE_MODE_DRAW,
+		PIPELINE_MODE_BOTH})
+	@Retention(RetentionPolicy.SOURCE)
+	public @interface PipelineMode {}
 
 	/**
 	 * 関係するリソースを破棄
