@@ -29,6 +29,7 @@ import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
+import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
 
 import org.junit.After;
@@ -231,7 +232,7 @@ public class EffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	@Test
-	public void EffectPipelineOESTest1() {
+	public void effectPipelineOESTest1() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -303,7 +304,7 @@ public class EffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	@Test
-	public void drawerPipelineOESTest2() {
+	public void effectPipelineOESTest2() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -377,7 +378,7 @@ public class EffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	@Test
-	public void drawerPipelineOESTest3() {
+	public void effectPipelineOESTest3() {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -443,4 +444,155 @@ public class EffectPipelineTest {
 		}
 	}
 
+	/**
+	 * EffectPipelineへ繋いだProxyPipelineとEffectPipelineへセットしたSurfaceの
+	 * 両方へ映像が転送されることを検証
+	 * 映像ソースがImageSourcePipelineなのでGL_TEXTURE_2D
+	 * (FIXME 個別の映像効果付与が想定通りかどうかは未検証)
+	 * Bitmap → ImageSourcePipeline
+	 * 			→ EffectPipeline
+	 * 				↓
+	 * 				→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
+	 * 				→ (Surface) → GLSurfaceReceiver	→ GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void effectPipelineWithSurfaceTest1() {
+		// テストに使用するビットマップを生成
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		final GLManager manager = mManager;
+
+		// 映像ソースを生成
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		// テスト対象のEffectPipelineを生成
+		final EffectPipeline pipeline = new EffectPipeline(manager);
+
+		final Semaphore sem = new Semaphore(0);
+
+		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(proxy);
+		pipeline.setPipeline(proxy);
+
+		// Surfaceを経由した映像の受け取り用にGLSurfaceReceiverを生成する
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final GLSurfaceReceiver bitmapReceiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(bitmapReceiver);
+		final Surface receiverSurface = bitmapReceiver.getSurface();
+		assertNotNull(receiverSurface);
+		pipeline.setSurface(receiverSurface);
+
+		source.setPipeline(pipeline);
+		assertTrue(validatePipelineOrder(source, source, pipeline, proxy));
+
+		try {
+			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			assertTrue(cnt1.get() >= NUM_FRAMES);
+			assertTrue(cnt2.get() >= NUM_FRAMES);
+			final Bitmap resultBitmap1 = result1.get();
+			assertNotNull(resultBitmap1);
+			final Bitmap resultBitmap2 = result2.get();
+			assertNotNull(resultBitmap2);
+			assertTrue(bitmapEquals(original, resultBitmap1, true));
+			assertTrue(bitmapEquals(original, resultBitmap2, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+		}
+	}
+
+	/**
+	 * EffectPipelineが動作するかどうかを検証
+	 * SurfaceSourcePipelineからの映像ソースなのでGL_TEXTURE_EXTERNAL_OESテクスチャ
+	 * Bitmap → inputImagesAsync
+	 * 				↓
+	 * 				→ (Surface) → SurfaceSourcePipeline
+	 * 								 → EffectPipeline
+	 * 								 	↓
+	 * 								 	→ ProxyPipeline → テクスチャ読み取り
+	 * 									→ (Surface) → GLSurfaceReceiver	→ GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void drawerPipelineOESTestWithSurface1() {
+		// テストに使用するビットマップを生成
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(original);
+
+		final GLManager manager = mManager;
+
+		final Semaphore sem = new Semaphore(0);
+
+		// 映像ソースを生成
+		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
+			manager, WIDTH, HEIGHT,
+			new GLPipelineSurfaceSource.PipelineSourceCallback() {
+				@Override
+				public void onCreate(@NonNull final Surface surface) {
+					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					sem.release();
+				}
+
+				@Override
+				public void onDestroy() {
+					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+				}
+			});
+		try {
+			// Surfaceの生成を待機
+			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
+		} catch (InterruptedException e) {
+			fail();
+		}
+		final Surface inputSurface = source.getInputSurface();
+		assertNotNull(inputSurface);
+
+		// 検証するEffectPipelineを生成
+		final EffectPipeline pipeline1 = new EffectPipeline(manager);
+
+		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		assertNotNull(proxy);
+		pipeline1.setPipeline(proxy);
+
+		// Surfaceを経由した映像の受け取り用にGLSurfaceReceiverを生成する
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final GLSurfaceReceiver bitmapReceiver = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		assertNotNull(bitmapReceiver);
+		final Surface receiverSurface = bitmapReceiver.getSurface();
+		assertNotNull(receiverSurface);
+		pipeline1.setSurface(receiverSurface);
+
+		source.setPipeline(pipeline1);
+		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
+
+		// 実際の映像はSurfaceを経由して映像を書き込む
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+
+		try {
+			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
+			source.release();
+			assertTrue(cnt1.get() >= NUM_FRAMES);
+			assertTrue(cnt2.get() >= NUM_FRAMES);
+			final Bitmap resultBitmap1 = result1.get();
+			assertNotNull(resultBitmap1);
+			final Bitmap resultBitmap2 = result2.get();
+			assertNotNull(resultBitmap2);
+			assertTrue(bitmapEquals(original, resultBitmap1, true));
+			assertTrue(bitmapEquals(original, resultBitmap2, true));
+		} catch (final InterruptedException e) {
+			Log.d(TAG, "interrupted", e);
+		}
+	}
 }
