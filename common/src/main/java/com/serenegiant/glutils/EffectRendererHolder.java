@@ -143,20 +143,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 			throw new IllegalArgumentException("invalid effect number:" + effect);
 		}
 	}
-	
-	/**
-	 * 内蔵映像効果以外のeffectを指定したときの処理
-	 * 描画用のワーカースレッド上で呼び出される
-	 * このクラスでは無変換のフラグメントシェーダーを適用する
-	 * @param effect
-	 * @param drawer GLDrawer2Dインスタンス
-	 */
-	protected void handleDefaultEffect(final int effect,
-		@NonNull final GLDrawer2D drawer) {
 
-		drawer.resetShader();
-	}
-	
 //================================================================================
 // 実装
 //================================================================================
