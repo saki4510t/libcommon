@@ -466,7 +466,7 @@ public class EffectPipeline extends ProxyPipeline
 		= new EffectDrawer2D.EffectListener() {
 		@WorkerThread
 		@Override
-		public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+		public boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
 			return EffectPipeline.this.onChangeEffect(effect, drawer);
 		}
 	};
@@ -481,7 +481,7 @@ public class EffectPipeline extends ProxyPipeline
 	 *         falseを返すと内蔵の映像効果設定処理を行う
 	 */
 	@WorkerThread
-	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+	protected boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
 		return false;
 	}
 

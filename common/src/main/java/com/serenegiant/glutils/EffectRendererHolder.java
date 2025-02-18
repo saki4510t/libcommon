@@ -158,8 +158,9 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 */
 	private final EffectDrawer2D.EffectListener mEffectListener
 		= new EffectDrawer2D.EffectListener() {
+		@WorkerThread
 		@Override
-		public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+		public boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
 			return EffectRendererHolder.this.onChangeEffect(effect, drawer);
 		}
 	};
@@ -170,7 +171,8 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * @param drawer
 	 * @return trueを返すとEffectDrawer2Dでの処理をしない, falseならEffectDrawer2Dでの処理を行う
 	 */
-	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+	@WorkerThread
+	protected boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
 		return false;	// falseを返すとEffectDrawer2Dでのデフォルトの処理を行う
 	}
 

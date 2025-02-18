@@ -48,7 +48,7 @@ public class EffectDrawer2D extends GLDrawer2D {
 		 * @return trueを返すとEffectDrawer2Dでの処理をしない, falseならEffectDrawer2Dでの処理を行う
 		 */
 		public boolean onChangeEffect(final int effect,
-			@NonNull final GLDrawer2D drawer);
+			@NonNull final EffectDrawer2D drawer);
 	}
 
 	/**
