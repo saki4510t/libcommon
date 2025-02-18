@@ -100,7 +100,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 //================================================================================
 	
 	/**
-	 * IEffectRendererHolderの実装
+	 * IEffect/IEffectRendererHolderの実装
 	 * 映像効果をセット
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
@@ -111,7 +111,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	}
 	
 	/**
-	 * IEffectRendererHolderの実装
+	 * IEffect/IEffectRendererHolderの実装
 	 * 現在の映像効果番号を取得
 	 * @return
 	 */
@@ -123,7 +123,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	}
 
 	/**
-	 * IEffectRendererHolderの実装
+	 * IEffect/IEffectRendererHolderの実装
 	 * 現在選択中の映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param params
@@ -134,7 +134,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	}
 
 	/**
-	 * IEffectRendererHolderの実装
+	 * IEffect/IEffectRendererHolderの実装
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param effect EFFECT_NONより大きいこと

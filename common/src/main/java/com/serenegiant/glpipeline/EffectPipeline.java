@@ -26,6 +26,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.IEffect;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -45,7 +46,7 @@ import static com.serenegiant.gl.GLEffect.EFFECT_NON;
  *                (→ Surface)
  */
 public class EffectPipeline extends ProxyPipeline
-	implements GLSurfacePipeline, IMirror {
+	implements GLSurfacePipeline, IMirror, IEffect {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectPipeline.class.getSimpleName();
 
@@ -397,10 +398,12 @@ public class EffectPipeline extends ProxyPipeline
 	}
 
 	/**
+	 * IEffectの実装
 	 * 映像効果をセット
 	 * @param effect
 	 * @throws IllegalStateException
 	 */
+	@Override
 	public void changeEffect(final int effect) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if (isValid()) {
@@ -421,6 +424,11 @@ public class EffectPipeline extends ProxyPipeline
 		}
 	}
 
+	/**
+	 * IEffectの実装
+	 * @return
+	 */
+	@Override
 	public int getCurrentEffect() {
 		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
 		mLock.lock();
@@ -432,21 +440,25 @@ public class EffectPipeline extends ProxyPipeline
 	}
 
 	/**
+	 * IEffectの実装
 	 * 現在選択中の映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param params
 	 */
+	@Override
 	public void setParams(@NonNull final float[] params) throws IllegalStateException {
 		setParams(mEffect, params);
 	}
 
 	/**
+	 * IEffectの実装
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * @param effect EFFECT_NONより大きいこと
 	 * @param params
 	 * @throws IllegalStateException
 	 */
+	@Override
 	public void setParams(final int effect, @NonNull final float[] params)
 		throws IllegalStateException {
 

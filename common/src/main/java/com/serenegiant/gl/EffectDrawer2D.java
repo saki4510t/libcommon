@@ -33,7 +33,7 @@ import static com.serenegiant.gl.ShaderConst.*;
 /**
  * 映像効果付与機能を追加したGLDrawer2D
  */
-public class EffectDrawer2D extends GLDrawer2D {
+public class EffectDrawer2D extends GLDrawer2D implements IEffect {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EffectDrawer2D.class.getSimpleName();
 
@@ -246,24 +246,38 @@ public class EffectDrawer2D extends GLDrawer2D {
 	}
 
 	/**
+	 * IEffectの実装
+	 * @param effect
+	 */
+	@Override
+	public void changeEffect(final int effect) {
+		setEffect(effect);
+	}
+
+	/**
+	 * IEffectの実装
 	 * 現在の映像効果番号を取得
 	 * @return
 	 */
+	@Override
 	public int getCurrentEffect() {
 		return mEffect;
 	}
 
 	/**
+	 * IEffectの実装
 	 * 現在選択中の映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 * @param params
 	 */
+	@Override
 	public void setParams(@NonNull final float[] params) {
 		setParams(mEffect, params);
 	}
 
 	/**
+	 * IEffectの実装
 	 * 指定した映像フィルタにパラメータ配列をセット
 	 * 現在対応しているのは色強調用の映像効果のみ(n=12以上必要)
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
@@ -271,6 +285,7 @@ public class EffectDrawer2D extends GLDrawer2D {
 	 * @param params
 	 * @throws IllegalArgumentException effectが範囲外ならIllegalArgumentException生成
 	 */
+	@Override
 	public void setParams(final int effect, @NonNull final float[] params)
 		throws IllegalArgumentException {
 
