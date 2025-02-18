@@ -25,6 +25,7 @@ import android.util.SparseArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
+import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.gl.GLEffect.*;
 import static com.serenegiant.gl.ShaderConst.*;
@@ -49,6 +50,18 @@ public class EffectDrawer2D extends GLDrawer2D {
 		public boolean onChangeEffect(final int effect,
 			@NonNull final GLDrawer2D drawer);
 	}
+
+	/**
+	 * EffectDrawer2D用のDrawerFactoryのデフォルト実装
+	 */
+	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {
+		@WorkerThread
+		@NonNull
+		@Override
+		public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+			return new EffectDrawer2D(isGLES3, isOES);
+		}
+	};
 
 	@Nullable
 	private final EffectListener mEffectListener;
