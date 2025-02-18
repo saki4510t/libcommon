@@ -84,7 +84,15 @@ public class EffectRendererHolder extends AbstractRendererHolder
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags,
+			new GLDrawer2D.DrawerFactory() {
+				@NonNull
+				@Override
+				public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+					return new EffectDrawer2D(isGLES3, isOES, mEffectListener);
+				}
+			}
+		);
 	}
 
 //================================================================================
@@ -144,6 +152,28 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		}
 	}
 
+	/**
+	 * EffectDrawer2Dで映像効果適用する前に呼ばれるコールバックインターフェースを生成
+	 * #onChangeEffectがtrueを返すとEffectDrawer2Dのデフォルトの処理を行わない
+	 */
+	private final EffectDrawer2D.EffectListener mEffectListener
+		= new EffectDrawer2D.EffectListener() {
+		@Override
+		public boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+			return EffectRendererHolder.this.onChangeEffect(effect, drawer);
+		}
+	};
+
+	/**
+	 * EffectDrawer2Dでのデフォルトの処理前に呼び出される
+	 * @param effect
+	 * @param drawer
+	 * @return trueを返すとEffectDrawer2Dでの処理をしない, falseならEffectDrawer2Dでの処理を行う
+	 */
+	protected boolean onChangeEffect(final int effect, @NonNull final GLDrawer2D drawer) {
+		return false;	// falseを返すとEffectDrawer2Dでのデフォルトの処理を行う
+	}
+
 //================================================================================
 // 実装
 //================================================================================
@@ -158,16 +188,10 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		public MyRendererTask(@NonNull final AbstractRendererHolder parent,
 			final int width, final int height,
 			final int maxClientVersion,
-			@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+			@Nullable GLDrawer2D.DrawerFactory factory) {
 			
-			super(parent, width, height, maxClientVersion, sharedContext, flags,
-				new GLDrawer2D.DrawerFactory() {
-					@NonNull
-					@Override
-					public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-						return new EffectDrawer2D(isGLES3, isOES);
-					}
-				});
+			super(parent, width, height, maxClientVersion, sharedContext, flags, factory);
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
 		}
 
