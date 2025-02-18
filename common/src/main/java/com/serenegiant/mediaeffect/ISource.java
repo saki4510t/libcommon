@@ -44,7 +44,7 @@ public interface ISource {
 	 * @param effect
 	 * @return
 	 */
-	public ISource apply(IEffect effect);
+	public ISource apply(IMediaEffect effect);
 	public int getWidth();
 	public int getHeight();
 	@NonNull

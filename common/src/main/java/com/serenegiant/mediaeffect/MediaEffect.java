@@ -26,7 +26,7 @@ import android.text.TextUtils;
 
 import com.serenegiant.gl.GLSurface;
 
-public class MediaEffect implements IEffect {
+public class MediaEffect implements IMediaEffect {
 	protected final EffectContext mEffectContext;
 	protected Effect mEffect;
 	protected boolean mEnabled = true;
@@ -101,7 +101,7 @@ public class MediaEffect implements IEffect {
 	}
 
 	@Override
-	public IEffect setEnable(final boolean enable) {
+	public IMediaEffect setEnable(final boolean enable) {
 		mEnabled = enable;
 		return this;
 	}

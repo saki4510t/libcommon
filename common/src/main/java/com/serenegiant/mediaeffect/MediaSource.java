@@ -100,7 +100,7 @@ public class MediaSource implements ISource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(final IEffect effect) {
+	public ISource apply(final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (needSwap) {
 				final GLSurface temp = mSourceScreen;

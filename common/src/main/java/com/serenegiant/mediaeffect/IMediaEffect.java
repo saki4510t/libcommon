@@ -18,10 +18,18 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-/**
- * 互換性のためにIMediaEffectインターフェースを継承して残しておく
- * @deprecated IMediaEffectを使うこと
- */
-@Deprecated
-public interface IEffect extends IMediaEffect {
+import com.serenegiant.gl.GLSurface;
+
+import androidx.annotation.NonNull;
+
+public interface IMediaEffect {
+	public void apply(@NonNull final int[] srcTexIds,
+		final int width, final int height, final int outTexId);
+	public void apply(@NonNull final int[] srcTexIds,
+		@NonNull final GLSurface output);
+	public void apply(ISource src);
+	public void release();
+	public IMediaEffect resize(final int width, final int height);
+	public boolean enabled();
+	public IMediaEffect setEnable(final boolean enable);
 }

@@ -70,7 +70,7 @@ public class MediaImageSource extends MediaSource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(IEffect effect) {
+	public ISource apply(IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (isReset) {
 				isReset = false;

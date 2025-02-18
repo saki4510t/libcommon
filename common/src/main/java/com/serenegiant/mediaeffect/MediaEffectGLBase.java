@@ -30,7 +30,7 @@ import static com.serenegiant.gl.ShaderConst.*;
 /**
  * OpenGL|ES2のフラグメントシェーダーで映像効果を与える時の基本クラス
  */
-public class MediaEffectGLBase implements IEffect {
+public class MediaEffectGLBase implements IMediaEffect {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLBase";
 
@@ -139,7 +139,7 @@ public class MediaEffectGLBase implements IEffect {
 	}
 
 	@Override
-	public IEffect setEnable(final boolean enable) {
+	public IMediaEffect setEnable(final boolean enable) {
 		mEnabled = enable;
 		return this;
 	}
