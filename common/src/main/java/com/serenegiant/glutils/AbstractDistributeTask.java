@@ -452,10 +452,10 @@ public abstract class AbstractDistributeTask implements IMirror {
 		case REQUEST_REMOVE_SURFACE -> handleRemoveSurface(arg1);
 		case REQUEST_REMOVE_SURFACE_ALL -> handleRemoveAll();
 		case REQUEST_RECREATE_MASTER_SURFACE -> handleReCreateInputSurface();
-		case REQUEST_MIRROR -> handleMirror(arg1);
+		case REQUEST_MIRROR -> handleMirror(0, arg1);
 		case REQUEST_ROTATE -> handleRotate(arg1, arg2);
 		case REQUEST_CLEAR -> handleClear(arg1, arg2);
-		case REQUEST_CLEAR_ALL -> handleClearAll(arg1);
+		case REQUEST_CLEAR_ALL -> handleClear(0, arg1);
 		case REQUEST_SET_MVP -> handleSetMvp(arg1, arg2, (float[]) obj);
 		}
 		return null;
@@ -670,28 +670,22 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 	/**
 	 * 指定したIDの分配描画用Surfaceを指定した色で塗りつぶす
-	 * @param id
+	 * @param id 0なら全てのSurfaceを対象にする
 	 * @param color
 	 */
 	@WorkerThread
 	private void handleClear(final int id, final int color) {
 		if (DEBUG) Log.v(TAG, "handleClear:" + id);
-		final RendererTarget target = mTargets.get(id);
-		if ((target != null) && target.isValid()) {
-			target.clear(color);
-		}
-	}
-
-	/**
-	 * 分配描画用Surface全てを指定した色で塗りつぶす
-	 * @param color
-	 */
-	@WorkerThread
-	private void handleClearAll(final int color) {
-		if (DEBUG) Log.v(TAG, "handleClearAll:");
-		final int n = mTargets.size();
-		for (int i = 0; i < n; i++) {
-			final RendererTarget target = mTargets.valueAt(i);
+		if (id == 0) {
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				if ((target != null) && target.isValid()) {
+					target.clear(color);
+				}
+			}
+		} else {
+			final RendererTarget target = mTargets.get(id);
 			if ((target != null) && target.isValid()) {
 				target.clear(color);
 			}
@@ -700,7 +694,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 	/**
 	 * モデルビュー変換行列を適用する
-	 * @param id
+	 * @param id 0なら全てのSurfaceを対象にする
 	 * @param offset
 	 * @param mvp
 	 */
@@ -709,24 +703,42 @@ public abstract class AbstractDistributeTask implements IMirror {
 		final int offset, @NonNull @Size(min=16) final float[] mvp) {
 
 		if (DEBUG) Log.v(TAG, "handleSetMvp:" + id);
-		final RendererTarget target = mTargets.get(id);
-		if ((target != null) && target.isValid()) {
-			System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
+		if (id == 0) {
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				if ((target != null) && target.isValid()) {
+					System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
+				}
+			}
+		} else {
+			final RendererTarget target = mTargets.get(id);
+			if ((target != null) && target.isValid()) {
+				System.arraycopy(mvp, offset, target.getMvpMatrix(), 0, 16);
+			}
 		}
 	}
 
 	/**
 	 * ミラーモードをセット
+	 * @param id 0なら全てのSurfaceを対象にする
 	 * @param mirror
 	 */
 	@WorkerThread
-	private void handleMirror(@MirrorMode final int mirror) {
+	private void handleMirror(final int id, @MirrorMode final int mirror) {
 		if (DEBUG) Log.v(TAG, "handleMirror:" + mirror);
 		mMirror = mirror;
-		final int n = mTargets.size();
-		for (int i = 0; i < n; i++) {
-			final RendererTarget target = mTargets.valueAt(i);
-			if (target != null) {
+		if (id == 0) {
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				if ((target != null) && target.isValid()) {
+					target.setMirror(mirror);
+				}
+			}
+		} else {
+			final RendererTarget target = mTargets.get(id);
+			if ((target != null) && target.isValid()) {
 				target.setMirror(mirror);
 			}
 		}
@@ -734,16 +746,26 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 	/**
 	 * 描画する映像の回転を設定
-	 * @param id
+	 * @param id 0なら全てのSurfaceを対象にする
 	 * @param degree
 	 */
 	@WorkerThread
 	private void handleRotate(final int id, final int degree) {
 		if (DEBUG) Log.v(TAG, "handleRotate:" + id);
 		mRotation = degree;
-		final RendererTarget target = mTargets.get(id);
-		if (target != null) {
-			MatrixUtils.setRotation(target.getMvpMatrix(), degree);
+		if (id == 0) {
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				if ((target != null) && target.isValid()) {
+					MatrixUtils.setRotation(target.getMvpMatrix(), degree);
+				}
+			}
+		} else {
+			final RendererTarget target = mTargets.get(id);
+			if ((target != null) && target.isValid()) {
+				MatrixUtils.setRotation(target.getMvpMatrix(), degree);
+			}
 		}
 	}
 
