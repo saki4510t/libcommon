@@ -21,7 +21,7 @@ package com.serenegiant.glpipeline;
 import android.opengl.GLES20;
 import android.util.Log;
 
-import com.serenegiant.gl.EffectDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
@@ -65,7 +65,7 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	private volatile boolean mPathThrough = true;
 	@Nullable
-	private EffectDrawer2D mDrawer;
+	private GLEffectDrawer2D mDrawer;
 	private int mEffect = EFFECT_NON;
 	@Nullable
 	private Fraction mMaxFps;
@@ -279,7 +279,7 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer = null;
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = new EffectDrawer2D(isGLES3, isOES, mEffectListener);
+			mDrawer = new GLEffectDrawer2D(isGLES3, isOES, mEffectListener);
 			if (!isOES) {
 				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
 				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
@@ -334,7 +334,7 @@ public class EffectPipeline extends ProxyPipeline
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-				EffectDrawer2D drawer = mDrawer;
+				GLEffectDrawer2D drawer = mDrawer;
 				mDrawer = null;
 				if (drawer != null) {
 					mLock.lock();
@@ -474,11 +474,11 @@ public class EffectPipeline extends ProxyPipeline
 		}
 	}
 
-	final EffectDrawer2D.EffectListener mEffectListener
-		= new EffectDrawer2D.EffectListener() {
+	final GLEffectDrawer2D.EffectListener mEffectListener
+		= new GLEffectDrawer2D.EffectListener() {
 		@WorkerThread
 		@Override
-		public boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
+		public boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
 			return EffectPipeline.this.onChangeEffect(effect, drawer);
 		}
 	};
@@ -493,7 +493,7 @@ public class EffectPipeline extends ProxyPipeline
 	 *         falseを返すと内蔵の映像効果設定処理を行う
 	 */
 	@WorkerThread
-	protected boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
+	protected boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
 		return false;
 	}
 

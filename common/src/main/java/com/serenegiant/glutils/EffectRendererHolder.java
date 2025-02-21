@@ -26,7 +26,7 @@ import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
-import com.serenegiant.gl.EffectDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLDrawer2D;
 
 import static com.serenegiant.gl.GLEffect.*;
@@ -89,7 +89,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 				@NonNull
 				@Override
 				public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-					return new EffectDrawer2D(isGLES3, isOES, mEffectListener);
+					return new GLEffectDrawer2D(isGLES3, isOES, mEffectListener);
 				}
 			}
 		);
@@ -118,8 +118,8 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	@Override
 	public int getCurrentEffect() {
 		final GLDrawer2D drawer = mRendererTask.getDrawer();
-		return (drawer instanceof EffectDrawer2D)
-			? ((EffectDrawer2D) drawer).getCurrentEffect() : EFFECT_NON;
+		return (drawer instanceof GLEffectDrawer2D)
+			? ((GLEffectDrawer2D) drawer).getCurrentEffect() : EFFECT_NON;
 	}
 
 	/**
@@ -156,11 +156,11 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * EffectDrawer2Dで映像効果適用する前に呼ばれるコールバックインターフェースを生成
 	 * #onChangeEffectがtrueを返すとEffectDrawer2Dのデフォルトの処理を行わない
 	 */
-	private final EffectDrawer2D.EffectListener mEffectListener
-		= new EffectDrawer2D.EffectListener() {
+	private final GLEffectDrawer2D.EffectListener mEffectListener
+		= new GLEffectDrawer2D.EffectListener() {
 		@WorkerThread
 		@Override
-		public boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
+		public boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
 			return EffectRendererHolder.this.onChangeEffect(effect, drawer);
 		}
 	};
@@ -172,7 +172,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * @return trueを返すとEffectDrawer2Dでの処理をしない, falseならEffectDrawer2Dでの処理を行う
 	 */
 	@WorkerThread
-	protected boolean onChangeEffect(final int effect, @NonNull final EffectDrawer2D drawer) {
+	protected boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
 		return false;	// falseを返すとEffectDrawer2Dでのデフォルトの処理を行う
 	}
 
@@ -234,8 +234,8 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		private void handleChangeEffect(final int effect) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#handleChangeEffect:" + effect);
 			final GLDrawer2D drawer = getDrawer();
-			if (drawer instanceof EffectDrawer2D) {
-				((EffectDrawer2D)drawer).setEffect(effect);
+			if (drawer instanceof GLEffectDrawer2D) {
+				((GLEffectDrawer2D)drawer).setEffect(effect);
 			} else if (DEBUG) {
 				Log.d(TAG, "handleChangeEffect: mDrawer is not EffectDrawer2D");
 			}
@@ -250,8 +250,8 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		private void handleSetParam(final int effect, @NonNull final float[] params) {
 			if (DEBUG) Log.v(TAG, "MyRendererTask#handleSetParam:" + effect);
 			final GLDrawer2D drawer = getDrawer();
-			if (drawer instanceof EffectDrawer2D) {
-				((EffectDrawer2D) drawer).setParams(effect, params);
+			if (drawer instanceof GLEffectDrawer2D) {
+				((GLEffectDrawer2D) drawer).setParams(effect, params);
 			} else if (DEBUG) {
 				Log.d(TAG, "handleChangeEffect: mDrawer is not EffectDrawer2D");
 			}
