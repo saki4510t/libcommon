@@ -51,20 +51,15 @@ public class GLDrawer2D implements GLConst {
 	public interface DrawerFactory {
 		@WorkerThread
 		@NonNull
-		public GLDrawer2D create(final boolean isGLES3, final boolean isOES);
+		public default GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+			return GLDrawer2D.create(isGLES3, isOES);
+		}
 	}
 
 	/**
 	 * デフォルトのDrawerFactory実装
 	 */
-	public static DrawerFactory DEFAULT_FACTORY = new DrawerFactory() {
-		@WorkerThread
-		@NonNull
-		@Override
-		public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
-			return GLDrawer2D.create(isGLES3, isOES);
-		}
-	};
+	public static DrawerFactory DEFAULT_FACTORY = new DrawerFactory() {};
 
 	/**
 	 * バッファオブジェクトを使って描画するかどうか

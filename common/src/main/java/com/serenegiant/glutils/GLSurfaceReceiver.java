@@ -95,29 +95,29 @@ public class GLSurfaceReceiver {
 	 */
 	public interface Callback extends FrameAvailableCallback {
 		@WorkerThread
-		public void onInitialize();
+		public default void onInitialize() {}
 		/**
 		 * 関係するリソースを破棄する
 		 */
 		@WorkerThread
-		public void onRelease();
+		public default void onRelease() {}
 		/**
 		 * 映像入力用Surfaceが生成されたときの処理、生成直後に毎回呼ばれる
 		 */
 		@WorkerThread
-		public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height);
+		public default void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {}
 		/**
 		 * 映像入力用Surfaceが破棄されるときの処理、これは実際に破棄される直前に毎回呼ばれる
 		 */
 		@WorkerThread
-		public void onReleaseInputSurface(@NonNull final Surface surface);
+		public default void onReleaseInputSurface(@NonNull final Surface surface) {}
 		/**
 		 * 映像サイズ変更要求が来たときの処理
 		 * @param width
 		 * @param height
 		 */
 		@WorkerThread
-		public void onResize(final int width, final int height);
+		public default void onResize(final int width, final int height) {}
 	}
 
 	public static class DefaultCallback implements Callback {
@@ -125,26 +125,6 @@ public class GLSurfaceReceiver {
 		private final FrameAvailableCallback mFrameAvailableCallback;
 		public DefaultCallback(@NonNull final FrameAvailableCallback onFrameAvailableCallback) {
 			mFrameAvailableCallback = onFrameAvailableCallback;
-		}
-
-		@Override
-		public void onInitialize() {
-		}
-
-		@Override
-		public void onRelease() {
-		}
-
-		@Override
-		public void onReleaseInputSurface(@NonNull final Surface surface) {
-		}
-
-		@Override
-		public void onCreateInputSurface(@NonNull final Surface surface, final int width, final int height) {
-		}
-
-		@Override
-		public void onResize(final int width, final int height) {
 		}
 
 		@Override

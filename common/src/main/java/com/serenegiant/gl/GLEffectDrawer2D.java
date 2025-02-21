@@ -43,7 +43,9 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	public interface DrawerFactory extends GLDrawer2D.DrawerFactory {
 		@WorkerThread
 		@NonNull
-		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES);
+		public default GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
+			return new GLEffectDrawer2D(isGLES3, isOES);
+		}
 	}
 
 	/**
@@ -63,14 +65,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	/**
 	 * EffectDrawer2D用のDrawerFactoryのデフォルト実装
 	 */
-	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {
-		@WorkerThread
-		@NonNull
-		@Override
-		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
-			return new GLEffectDrawer2D(isGLES3, isOES);
-		}
-	};
+	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {};
 
 	@Nullable
 	private final EffectListener mEffectListener;
