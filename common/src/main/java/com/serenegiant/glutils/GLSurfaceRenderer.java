@@ -135,7 +135,7 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		try {
 			if (mMirror != mirror) {
 				mMirror = mirror;
-				mGLManager.runOnGLThread(() -> setMirrorOnGL(mirror));
+				mGLManager.runOnGLThread(() -> setMirrorOnGL(0, mirror));
 			}
 		} finally {
 			mLock.unlock();
@@ -302,7 +302,7 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 
 	/**
 	 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
-	 * @param id
+	 * @param id id=0なら描画先のSurface全てを指定した色で塗りつぶす、#clearSurfaceAllと同じ
 	 * @param color
 	 * @throws IllegalStateException
 	 */
@@ -313,9 +313,17 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		if (DEBUG) Log.v(TAG, "clearSurface:" + id + ",cl=" + color);
 		checkValid();
 		mGLManager.runOnGLThread(() -> {
-			final RendererTarget target = mTargets.get(id);
-			if (target != null) {
-				target.clear(color);
+			if (id == 0) {
+				final int n = mTargets.size();
+				for (int i = 0; i < n; i++) {
+					final RendererTarget target = mTargets.valueAt(i);
+					target.clear(color);
+				}
+			} else {
+				final RendererTarget target = mTargets.get(id);
+				if (target != null) {
+					target.clear(color);
+				}
 			}
 		});
 	}
@@ -343,7 +351,7 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 
 	/**
 	 * 指定したidに対応するSurfaceへモデルビュー変換行列を適用する
-	 * @param id
+	 * @param id id=0なら全てのSurfaceへモデルビュー変換行列を適用する
 	 * @param offset
 	 * @param matrix
 	 * @throws IllegalStateException
@@ -359,9 +367,17 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		checkValid();
 		if ((matrix != null) && (matrix.length >= offset + 16)) {
 			mGLManager.runOnGLThread(() -> {
-				final RendererTarget target = mTargets.get(id);
-				if (target != null) {
-					System.arraycopy(matrix, offset, target.getMvpMatrix(), 0, 16);
+				if (id == 0) {
+					final int n = mTargets.size();
+					for (int i = 0; i < n; i++) {
+						final RendererTarget target = mTargets.valueAt(i);
+						System.arraycopy(matrix, offset, target.getMvpMatrix(), 0, 16);
+					}
+				} else {
+					final RendererTarget target = mTargets.get(id);
+					if (target != null) {
+						System.arraycopy(matrix, offset, target.getMvpMatrix(), 0, 16);
+					}
 				}
 			});
 		} else {
@@ -405,7 +421,7 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 
 	/**
 	 * 指定したidに対応するSurfaceへの描画を一時的に有効/無効設定する
-	 * @param id
+	 * @param id id=0なら全てのSurfaceへの描画を一時的に有効/無効設定する
 	 * @param enable
 	 */
 	@AnyThread
@@ -413,9 +429,17 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 		if (DEBUG) Log.v(TAG, "setEnabled:" + id + ",enable=" + enable);
 		if (isValid()) {
 			mGLManager.runOnGLThread(() -> {
-				final RendererTarget target = mTargets.get(id);
-				if (target != null) {
-					target.setEnabled(enable);
+				if (id == 0) {
+					final int n = mTargets.size();
+					for (int i = 0; i < n; i++) {
+						final RendererTarget target = mTargets.valueAt(i);
+						target.setEnabled(enable);
+					}
+				} else {
+					final RendererTarget target = mTargets.get(id);
+					if (target != null) {
+						target.setEnabled(enable);
+					}
 				}
 			});
 		}
@@ -470,15 +494,23 @@ public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallba
 
 	/**
 	 * 描画先RendererTargetへミラーモードを適用
+	 * @param id
 	 * @param mirror
 	 */
 	@WorkerThread
-	protected void setMirrorOnGL(@MirrorMode final int mirror) {
+	protected void setMirrorOnGL(final int id, @MirrorMode final int mirror) {
 		if (DEBUG) Log.v(TAG, "setMirrorOnGL:" + mirror);
-		final int n = mTargets.size();
-		for (int i = 0; i < n; i++) {
-			final RendererTarget target = mTargets.valueAt(i);
-			target.setMirror(mirror);
+		if (id == 0) {
+			final int n = mTargets.size();
+			for (int i = 0; i < n; i++) {
+				final RendererTarget target = mTargets.valueAt(i);
+				target.setMirror(mirror);
+			}
+		} else {
+			final RendererTarget target = mTargets.get(id);
+			if (target != null) {
+				target.setMirror(mirror);
+			}
 		}
 	}
 

@@ -28,6 +28,7 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.math.Fraction;
 
+import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -127,12 +128,17 @@ public class SurfaceDistributor implements IRendererHolder {
 		}
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@Override
 	public boolean isRunning() {
 		return !mReleased && mGLSurfaceReceiver.isValid();
 	}
 
 	/**
+	 * IRendererHolderの実装
 	 * 関係するリソースを破棄する、再利用はできない
 	 */
 	@Override
@@ -158,28 +164,47 @@ public class SurfaceDistributor implements IRendererHolder {
 		}
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@NonNull
 	@Override
 	public GLContext getGLContext() {
 		return mGlManager.getGLContext();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@Nullable
 	@Override
 	public EGLBase.IContext<?> getContext() {
 		return mGlManager.getGLContext().getContext();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@Override
 	public Surface getSurface() {
 		return mGLSurfaceReceiver.getSurface();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@Override
 	public SurfaceTexture getSurfaceTexture() {
 		return mGLSurfaceReceiver.getSurfaceTexture();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 */
 	@Override
 	public void reset() {
 		// たぶん不要
@@ -187,6 +212,12 @@ public class SurfaceDistributor implements IRendererHolder {
 		mGLSurfaceReceiver.reCreateInputSurface();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param width
+	 * @param height
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void resize(final int width, final int height) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
@@ -195,6 +226,14 @@ public class SurfaceDistributor implements IRendererHolder {
 		}
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param id 普通は#hashCodeを使う
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param isRecordable
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
 	@Override
 	public void addSurface(
 		final int id, final Object surface,
@@ -203,6 +242,15 @@ public class SurfaceDistributor implements IRendererHolder {
 		this.addSurface(id, surface, isRecordable, null);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param id 普通は#hashCodeを使う
+	 * @param surface Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapperのいずれか
+	 * @param isRecordable
+	 * @param maxFps nullまたは0以下なら制限しない
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
 	@Override
 	public void addSurface(
 		final int id, final Object surface,
@@ -213,62 +261,126 @@ public class SurfaceDistributor implements IRendererHolder {
 		mGLSurfaceRenderer.addSurface(id, surface, maxFps);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param id
+	 */
 	@Override
 	public void removeSurface(final int id) {
 		mGLSurfaceRenderer.removeSurface(id);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 */
 	@Override
 	public void removeSurfaceAll() {
 //		if (DEBUG) Log.v(TAG, "removeSurfaceAll:id=" + id);
 		mGLSurfaceRenderer.removeSurfaceAll();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * 指定したIDの分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param id id=0なら描画先のSurface全てを指定した色で塗りつぶす、#clearSurfaceAllと同じ
+	 * @param color
+	 * @throws IllegalStateException
+	 */
+	@AnyThread
 	@Override
 	public void clearSurface(final int id, final int color) {
 		mGLSurfaceRenderer.clearSurface(id, color);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * すべての分配描画用のSurfaceを指定した色で塗りつぶす
+	 * @param color
+	 * @throws IllegalStateException
+	 */
+	@AnyThread
 	@Override
 	public void clearSurfaceAll(final int color) {
 		mGLSurfaceRenderer.clearSurfaceAll(color);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * 指定したidに対応するSurfaceへモデルビュー変換行列を適用する
+	 * @param id id=0なら全てのSurfaceへモデルビュー変換行列を適用する
+	 * @param offset
+	 * @param matrix
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	@AnyThread
 	@Override
 	public void setMvpMatrix(final int id, final int offset, @NonNull final float[] matrix) {
 		mGLSurfaceRenderer.setMvpMatrix(id, offset, matrix);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param id
+	 * @return
+	 */
 	@Override
 	public boolean isEnabled(final int id) {
 		return mGLSurfaceRenderer.isEnabled(id);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * 指定したidに対応するSurfaceへの描画を一時的に有効/無効設定する
+	 * @param id id=0なら全てのSurfaceへの描画を一時的に有効/無効設定する
+	 * @param enable
+	 */
+	@AnyThread
 	@Override
 	public void setEnabled(final int id, final boolean enable) {
 		mGLSurfaceRenderer.setEnabled(id, enable);
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 */
 	@Override
 	public void requestFrame() {
 		// FIXME 未実装
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @return
+	 */
 	@Override
 	public int getCount() {
 		return mGLSurfaceRenderer.getCount();
 	}
 
+	/**
+	 * IRendererHolderの実装
+	 * @param task
+	 */
 	@Override
 	public void queueEvent(@NonNull final Runnable task) {
 		mGlManager.runOnGLThread(task);
 	}
 
+	/**
+	 * IMirrorの実装
+	 * @param mirror 0:通常, 1:左右反転, 2:上下反転, 3:上下左右反転
+	 * @throws IllegalStateException
+	 */
 	@Override
 	public void setMirror(@MirrorMode final int mirror) {
 		mGLSurfaceRenderer.setMirror(mirror);
 	}
 
+	/**
+	 * IMirrorの実装
+	 * @return
+	 */
 	@Override
 	public int getMirror() {
 		return mGLSurfaceRenderer.getMirror();
