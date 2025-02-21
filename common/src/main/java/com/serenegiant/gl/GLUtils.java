@@ -276,6 +276,16 @@ public class GLUtils implements GLConst {
 		@Nullable final ByteBuffer workBuffer) {
 
 		// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
+		// FIXME wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
+		//       フレームバッファオブジェクト関係でエラーになる端末がある。
+		//       ex. NEC PC-TE507FAW(ANDROID6)
+		//       どういう条件で起こるか不明だけどこの場合も、
+		//       独立したGLSurfaceでオフスクリーンを生成
+		//       → オフスクリーンのGLSurfaceからRendererTargetを生成
+		//       → RendererTargetへGLDrawer2Dでレンダリング
+		//       → GLSurface#makeCurrentでGLSurfaceのオフスクリーンのバックバッファへ切り替え
+		//       → glReadPixelsで読み取る
+		//       のであれば正常に読み取ることができる。
 		final GLSurface readSurface = GLSurface.wrap(false,
 			isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 			GLES20.GL_TEXTURE4, texId, width, height, false);
