@@ -38,6 +38,15 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	private static final String TAG = GLEffectDrawer2D.class.getSimpleName();
 
 	/**
+	 * GLDrawer2Dインスタンス生成用のファクトリーインターフェース
+	 */
+	public interface DrawerFactory extends GLDrawer2D.DrawerFactory {
+		@WorkerThread
+		@NonNull
+		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES);
+	}
+
+	/**
 	 * 映像効果セット時の処理を移譲するためのインターフェース
 	 */
 	public interface EffectListener {
@@ -58,7 +67,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		@WorkerThread
 		@NonNull
 		@Override
-		public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
 			return new GLEffectDrawer2D(isGLES3, isOES);
 		}
 	};

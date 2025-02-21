@@ -85,10 +85,10 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags,
-			new GLDrawer2D.DrawerFactory() {
+			new GLEffectDrawer2D.DrawerFactory() {
 				@NonNull
 				@Override
-				public GLDrawer2D create(final boolean isGLES3, final boolean isOES) {
+				public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
 					return new GLEffectDrawer2D(isGLES3, isOES, mEffectListener);
 				}
 			}
@@ -191,7 +191,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 			final int width, final int height,
 			final int maxClientVersion,
 			@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-			@Nullable GLDrawer2D.DrawerFactory factory) {
+			@Nullable GLEffectDrawer2D.DrawerFactory factory) {
 			
 			super(parent, width, height, maxClientVersion, sharedContext, flags, factory);
 			if (DEBUG) Log.v(TAG, "MyRendererTask#コンストラクタ:");
