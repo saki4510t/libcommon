@@ -38,8 +38,8 @@ import androidx.annotation.NonNull;
 /**
  * OpenGL|ESとEGLの情報取得用ヘルパークラス
  */
-public class OpenGLInfo {
-	private OpenGLInfo() {
+public class GLInfo {
+	private GLInfo() {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
