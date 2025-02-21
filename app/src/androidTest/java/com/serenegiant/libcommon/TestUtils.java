@@ -268,6 +268,31 @@ LOOP:		for (int y = 0; y < height; y++) {
 		@NonNull final Semaphore sem,
 		@NonNull final AtomicReference<Bitmap> result,
 		@NonNull final AtomicInteger cnt) throws IllegalArgumentException {
+		return createGLSurfaceReceiver(manager, width, height, numFrames, sem, result, cnt, false);
+	}
+	/**
+	 * 映像をテクスチャとして受け取ってBitmapとして読み取るためのGLSurfaceReceiverを生成する
+	 * Surface → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * @param manager
+	 * @param width
+	 * @param height
+	 * @param numFrames
+	 * @param sem
+	 * @param result
+	 * @param cnt
+	 * @param useOffscreenRendering true: オフスクリーンサーフェースへ描画してからキャプチャする、
+	 *                              false: 受け取ったテクスチャをGLSurface#wrapでバックバッファとしてラップしてキャプチャする
+	 * @throws IllegalArgumentException numFramesが1未満・width/heightが2未満
+	 * @return
+	 */
+	public static GLSurfaceReceiver createGLSurfaceReceiver(
+		@NonNull final GLManager manager,
+		final int width, final int height,
+		final int numFrames,
+		@NonNull final Semaphore sem,
+		@NonNull final AtomicReference<Bitmap> result,
+		@NonNull final AtomicInteger cnt,
+		final boolean useOffscreenRendering) throws IllegalArgumentException {
 
 		if (numFrames < 1) {
 			throw new IllegalArgumentException("numFrames is too small, must be more than 0");
@@ -288,7 +313,11 @@ LOOP:		for (int y = 0; y < height; y++) {
 
 					if (cnt.incrementAndGet() == numFrames) {
 						Log.v(TAG, "createGLSurfaceReceiver:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
-						result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
+						if (useOffscreenRendering) {
+							result.set(GLUtils.glDrawTextureToBitmap(manager.getEgl(), isGLES3, isOES, width, height, texId, texMatrix, null));
+						} else {
+							result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
+						}
 						sem.release();
 					}
 				}

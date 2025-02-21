@@ -35,6 +35,7 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
+import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
@@ -298,7 +299,7 @@ public class GLUtils implements GLConst {
 		@Nullable final ByteBuffer workBuffer) {
 
 		// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
-		// FIXME wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
+		// FIXME GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
 		//       フレームバッファオブジェクト関係でエラーになる端末がある。
 		//       ex. NEC PC-TE507FAW(ANDROID6)
 		//       どういう条件で起こるか不明だけどこの場合も、
@@ -335,9 +336,55 @@ public class GLUtils implements GLConst {
 	}
 
 	/**
-	 * OpenGL|ESのエラーをチェックしてlogCatに出力する
-	 * @param op
+	 * 指定したテクスチャをGLSurfaceのオフスクリーンへGLDrawer2Dで描画してからglReadPixelsで
+	 * ByteBufferへ読み込んでBitmapへセットする
+	 * GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
+	 * フレームバッファオブジェクト関係でエラーになる端末があるのでその対策用
+	 * @param egl
+	 * @param isGLES3
+	 * @param isOES
+	 * @param width
+	 * @param height
+	 * @param texId
+	 * @param texMatrix
+	 * @param buffer
+	 * @return
 	 */
+	public static Bitmap glDrawTextureToBitmap(
+		@NonNull final EGLBase egl,
+		final boolean isGLES3, final boolean isOES,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
+		@Nullable final ByteBuffer buffer) {
+
+		// オフスクリーン描画用にGLSurfaceを生成する(EglSurfaceでも大丈夫なはず)
+		final GLSurface surface = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
+		// オフスクリーンサーフェースへ描画するためのRendererTargetを生成
+		final RendererTarget target = RendererTarget.newInstance(egl, surface, 0.0f);
+		// オフスクリーン描画用にGLDrawer2Dを生成
+		final GLDrawer2D drawer = GLDrawer2D.create(isGLES3, isOES);
+		final Bitmap bitmap;
+		try {
+			// オフスクリーンSurfaceへ描画
+			target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
+			// オフスクリーンのフレームバッファへ切り替え
+			surface.makeCurrent();
+			// glReadPixelsでBitmapへ読み込む
+			bitmap = glReadPixelsToBitmap(buffer, width, height);
+			surface.swap();
+		} finally {
+			drawer.release();
+			target.release();
+			surface.release();
+		}
+
+		return bitmap;
+	}
+
+	/**
+		 * OpenGL|ESのエラーをチェックしてlogCatに出力する
+		 * @param op
+		 */
     public static void checkGlError(final String op) {
         final int error = GLES20.glGetError();
         if (error != GLES20.GL_NO_ERROR) {
