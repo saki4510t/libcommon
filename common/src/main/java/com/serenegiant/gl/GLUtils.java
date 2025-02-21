@@ -229,6 +229,8 @@ public class GLUtils implements GLConst {
 	 * @param width
 	 * @param height
 	 * @return 読み取ったピクセルデータの入ったByteBuffer, orderはLITTLE_ENDIAN
+	 *         positionをセットしてから#flipしてある。
+	 *         引数のByteBufferと同じとは限らないので注意
 	 */
 	@NonNull
 	public static ByteBuffer glReadPixels(
@@ -253,6 +255,26 @@ public class GLUtils implements GLConst {
 		buf.flip();
 
 		return buf;
+	}
+
+	/**
+	 * GLES20.glReadPixelsのヘルパーメソッド
+	 * RGBA8888として読み取る(=1ピクセル4バイト)
+	 * @param buffer nullまたはサイズが小さいかまたはでないときは新規生成する
+	 * @param width
+	 * @param height
+	 * @return 読み取ったピクセルデータの入ったBitmap
+	 */
+	@NonNull
+	public static Bitmap glReadPixelsToBitmap(
+		@Nullable final ByteBuffer buffer,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
+
+		final ByteBuffer buf = glReadPixels(buffer, width, height);
+		// ByteBufferからビットマップへ画像データをコピーする
+		final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		bitmap.copyPixelsFromBuffer(buf);
+		return bitmap;
 	}
 
 	/**
