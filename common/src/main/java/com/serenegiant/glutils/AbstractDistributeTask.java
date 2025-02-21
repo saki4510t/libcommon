@@ -360,6 +360,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		return mVideoHeight;
 	}
 
+	@Deprecated
 	public void rotation(final int degree) {
 		if (DEBUG) Log.v(TAG, "mirror:" + degree);
 		checkFinished();
@@ -368,6 +369,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		}
 	}
 
+	@Deprecated
 	@AnyThread
 	public int rotation() {
 		return mRotation;
