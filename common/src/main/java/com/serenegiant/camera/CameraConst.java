@@ -19,6 +19,7 @@ package com.serenegiant.camera;
 */
 
 import android.hardware.Camera;
+import android.text.TextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -51,9 +52,9 @@ public interface CameraConst {
 	 * カメラ情報保持用のヘルパークラス
 	 */
 	public static final class CameraInfo {
-		public String id;
+		public String id = null;
 		@FaceType
-		public int face;
+		public int face = FACING_UNSPECIFIED;
 		public int orientation;
 		public int width, height;
 
@@ -97,6 +98,15 @@ public interface CameraConst {
 		public void set(@FaceType final int face) {
 			this.face = face;
 			id = String.format(Locale.US, "FACE_%d", face);
+		}
+
+		/**
+		 * 有効なカメラ設定を保持しているかどうか
+		 * idがnull/空文字列ではない & width>0 & height>0
+		 * @return
+		 */
+		public boolean isValid() {
+			return !TextUtils.isEmpty(id) && (width > 0) && (height > 0);
 		}
 
 		@NonNull
