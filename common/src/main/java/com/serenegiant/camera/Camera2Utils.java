@@ -130,9 +130,9 @@ cameraLoop:
 	/**
 	 * 指定した条件に合うカメラを探す
 	 * @param manager
+	 * @param preferedFace
 	 * @param width
 	 * @param height
-	 * @param preferedFace
 	 * @param degrees
 	 * @return
 	 * @throws CameraAccessException
@@ -140,12 +140,13 @@ cameraLoop:
 	@Nullable
 	public static CameraConst.CameraInfo findCamera(
 		@NonNull final CameraManager manager,
+		@CameraConst.FaceType final int preferedFace,
 		final int width, final int height,
-		final int preferedFace, final int degrees)
+		final int degrees)
 			throws CameraAccessException {
 
-		if (DEBUG) Log.v(TAG, String.format("findCamera:Size(%dx%d),preferedFace=%d,degrees=%d",
-			width, height, preferedFace, degrees));
+		if (DEBUG) Log.v(TAG, String.format("findCamera:preferedFace=%d,Size(%dx%d),degrees=%d",
+			preferedFace, width, height, degrees));
 
 		String cameraId = null;
 		Size previewSize = null;
