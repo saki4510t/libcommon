@@ -32,7 +32,9 @@ import androidx.annotation.NonNull;
  */
 public interface CameraConst {
 	public static final int FACING_UNSPECIFIED = -1;
+	@SuppressWarnings("deprecation")
 	public static final int FACING_BACK = Camera.CameraInfo.CAMERA_FACING_BACK;
+	@SuppressWarnings("deprecation")
 	public static final int FACING_FRONT = Camera.CameraInfo.CAMERA_FACING_FRONT;
 
 	@IntDef({
@@ -101,8 +103,22 @@ public interface CameraConst {
 		@Override
 		public String toString() {
 			return String.format(Locale.US,
-				"Size(%dx%d),face=%d, id=%s, orientation=%d",
-				width, height, face, id, orientation);
+				"CameraInfo(face=%s(%d),id=%s,Size(%dx%d),orientation=%d)",
+				faceString(face), face, id, width, height, orientation);
+		}
+	}
+
+	/**
+	 * FaceTypeを文字列表記に変換する
+	 * @param face
+	 * @return
+	 */
+	private static String faceString(@FaceType final int face) {
+		switch (face) {
+		case FACING_BACK: return "BACK";
+		case FACING_FRONT: return "FRONT";
+		case FACING_UNSPECIFIED:
+		default: return "UNSPECIFIED";
 		}
 	}
 }
