@@ -36,6 +36,7 @@ public final class CameraInfo {
 	public int face = CameraConst.FACING_UNSPECIFIED;
 	public int orientation;
 	public int width, height;
+	public boolean canDisableShutterSound;
 
 	/**
 	 * コンストラクタ
@@ -109,12 +110,14 @@ public final class CameraInfo {
 		if (other == null) {
 			id = null;
 			width = height = 0;
+			canDisableShutterSound = false;
 		} else if (other != this) {
 			id = other.id;
 			face = other.face;
 			orientation = other.orientation;
 			width = other.width;
 			height = other.height;
+			canDisableShutterSound = other.canDisableShutterSound;
 		}
 	}
 
