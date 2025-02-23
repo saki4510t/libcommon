@@ -633,7 +633,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 		if (DEBUG) Log.v(TAG, "handleRemoveAll:");
 		synchronized (mTargets) {
 			final int n = mTargets.size();
-			Log.i(TAG, "handleRemoveAll:n=" + n);
+			if (DEBUG) Log.i(TAG, "handleRemoveAll:n=" + n);
 			for (int i = 0; i < n; i++) {
 				final RendererTarget target = mTargets.valueAt(i);
 				if (target != null) {

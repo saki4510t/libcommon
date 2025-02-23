@@ -259,7 +259,7 @@ cameraLoop:
 		final Size ppsfv =  Collections.max(Arrays.asList(sizes), new CompareSizesByArea());
 		// widthまたはheightが未指定名の時は最大解像度を使う・・・ここは1080pに制限しといた方が良いかもしれない
 		if ((_width <= 0) || (_height <= 0)) {
-			Log.d(TAG, "chooseOptimalSize:select" + ppsfv);
+			if (DEBUG) Log.d(TAG, "chooseOptimalSize:select" + ppsfv);
 			return ppsfv;
 		}
 
@@ -282,7 +282,7 @@ cameraLoop:
 		for (Size sz : sizes) {
 			if ((sz.getWidth() == width) && (sz.getHeight() == height)) {
 				selectedSize = sz;
-				Log.v(TAG, "chooseOptimalSize:found(" + selectedSize + ")");
+				if (DEBUG) Log.v(TAG, "chooseOptimalSize:found(" + selectedSize + ")");
 				return selectedSize;
 			}
 		}
@@ -328,7 +328,7 @@ cameraLoop:
 		}
 		// アスペクト比の差が+/-5%未満のがあればそれを選択する
 		if ((selectedSize != null) && (selectedDelta < 0.05)) {
-			Log.d(TAG, String.format("chooseOptimalSize:select(%dx%d), request(%d,%d)",
+			if (DEBUG) Log.d(TAG, String.format("chooseOptimalSize:select(%dx%d), request(%d,%d)",
 				selectedSize.getWidth(), selectedSize.getHeight(), width, height));
 			return selectedSize;
 		}
@@ -342,7 +342,7 @@ cameraLoop:
 		if (selectedSize == null) {
 			selectedSize = ppsfv;
 		}
-		Log.d(TAG, "chooseOptimalSize:select(" + selectedSize + ")");
+		if (DEBUG) Log.d(TAG, "chooseOptimalSize:select(" + selectedSize + ")");
 		return selectedSize;
 	}
 

@@ -378,7 +378,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				return
 			}
 			val viewAspect = viewWidth / viewHeight.toDouble()
-			Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
+			if (DEBUG) Log.i(TAG, String.format("updateViewport:view(%d,%d)%f,video(%1.0f,%1.0f)",
 				viewWidth, viewHeight, viewAspect, videoWidth, videoHeight))
 			Matrix.setIdentityM(mMvpMatrix, 0)
 			when (val scaleMode = mCameraDelegator.scaleMode) {
@@ -404,7 +404,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 						y = (viewHeight - height) / 2
 					}
 					// set viewport to draw keeping aspect ration of camera image
-					Log.i(TAG, String.format("updateViewport:xy(%d,%d),size(%d,%d)",
+					if (DEBUG) Log.i(TAG, String.format("updateViewport:xy(%d,%d),size(%d,%d)",
 						x, y, width, height))
 					GLES20.glViewport(x, y, width, height)
 				}
@@ -417,7 +417,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 							scaleX.coerceAtLeast(scaleY) else scaleX.coerceAtMost(scaleY)
 					val width = scale * videoWidth
 					val height = scale * videoHeight
-					Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
+					if (DEBUG) Log.i(TAG, String.format("updateViewport:size(%1.0f,%1.0f),scale(%f,%f),mat(%f,%f)",
 						width, height, scaleX, scaleY, width / viewWidth, height / viewHeight))
 					Matrix.scaleM(mMvpMatrix, 0,
 						(width / viewWidth).toFloat(),
