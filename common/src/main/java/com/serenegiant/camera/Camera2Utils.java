@@ -18,6 +18,7 @@ package com.serenegiant.camera;
  *  limitations under the License.
 */
 
+import android.content.Context;
 import android.graphics.Rect;
 import android.graphics.SurfaceTexture;
 import android.hardware.camera2.CameraAccessException;
@@ -26,10 +27,13 @@ import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.MediaCodec;
+import android.opengl.Matrix;
 import android.os.Build;
 import android.text.TextUtils;
 import android.util.Log;
 import android.util.Size;
+
+import com.serenegiant.view.ViewUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -340,5 +344,37 @@ cameraLoop:
 		}
 		Log.d(TAG, "chooseOptimalSize:select(" + selectedSize + ")");
 		return selectedSize;
+	}
+
+	/**
+	 * モデルビュー変換行列を画面の回転に合わせて回転させる
+	 * @param context
+	 * @param matrix
+	 * @param offset
+	 */
+	public static void updateRotation(
+		@NonNull final Context context,
+		@androidx.annotation.Size(min=16) @NonNull final float[] matrix, final int offset) {
+		final int screenRotationDegree = ViewUtils.getRotationDegrees(context);
+		updateRotation(screenRotationDegree, matrix, offset);
+	}
+
+	/**
+	 * モデルビュー変換行列を画面の回転に合わせて回転させる
+	 * @param screenRotationDegree 画面の回転角, 0, 90, 180, 270のいずれか
+	 * @param matrix
+	 * @param offset
+	 */
+	public static void updateRotation(
+		final int screenRotationDegree,
+		@androidx.annotation.Size(min=16) @NonNull final float[] matrix, final int offset) {
+
+		if (offset + 16 < matrix.length) {
+			throw new IndexOutOfBoundsException("matrix length should too small");
+		}
+		Matrix.setIdentityM(matrix, offset);
+		if ((screenRotationDegree % 180) != 0) {
+			Matrix.rotateM(matrix, offset, -screenRotationDegree, 0.0f, 0.0f, 1.0f);
+		}
 	}
 }
