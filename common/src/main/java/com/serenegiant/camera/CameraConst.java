@@ -19,14 +19,11 @@ package com.serenegiant.camera;
 */
 
 import android.hardware.Camera;
-import android.text.TextUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.Locale;
 
 import androidx.annotation.IntDef;
-import androidx.annotation.NonNull;
 
 /**
  * Camera/Camera2関係の定数
@@ -49,81 +46,11 @@ public interface CameraConst {
 	public static final int DEFAULT_HEIGHT = 480;
 
 	/**
-	 * カメラ情報保持用のヘルパークラス
-	 */
-	public static final class CameraInfo {
-		public String id = null;
-		@FaceType
-		public int face = FACING_UNSPECIFIED;
-		public int orientation;
-		public int width, height;
-
-		public CameraInfo() {
-		}
-
-		public CameraInfo(final String id, final int face, final int orientation,
-			final int width, final int height) {
-
-			this.id = id;
-			this.face = face;
-			this.orientation = orientation;
-			this.width = width;
-			this.height = height;
-		}
-
-		public CameraInfo(final String id, final int face, final int orientation) {
-			this.id = id;
-			this.face = face;
-			this.orientation = orientation;
-		}
-
-		public void set(final String id, final int face, final int orientation,
-			final int width, final int height) {
-
-			this.id = id;
-			this.face = face;
-			this.orientation = orientation;
-			this.width = width;
-			this.height = height;
-		}
-
-		public void set(@NonNull final CameraInfo other) {
-			id = other.id;
-			face = other.face;
-			orientation = other.orientation;
-			width = other.width;
-			height = other.height;
-		}
-
-		public void set(@FaceType final int face) {
-			this.face = face;
-			id = String.format(Locale.US, "FACE_%d", face);
-		}
-
-		/**
-		 * 有効なカメラ設定を保持しているかどうか
-		 * idがnull/空文字列ではない & width>0 & height>0
-		 * @return
-		 */
-		public boolean isValid() {
-			return !TextUtils.isEmpty(id) && (width > 0) && (height > 0);
-		}
-
-		@NonNull
-		@Override
-		public String toString() {
-			return String.format(Locale.US,
-				"CameraInfo(face=%s(%d),id=%s,Size(%dx%d),orientation=%d)",
-				faceString(face), face, id, width, height, orientation);
-		}
-	}
-
-	/**
 	 * FaceTypeを文字列表記に変換する
 	 * @param face
 	 * @return
 	 */
-	private static String faceString(@FaceType final int face) {
+	static String faceString(@FaceType final int face) {
 		switch (face) {
 		case FACING_BACK: return "BACK";
 		case FACING_FRONT: return "FRONT";

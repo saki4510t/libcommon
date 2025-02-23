@@ -82,13 +82,13 @@ public class Camera2Utils implements CameraConst {
 	 * @return
 	 * @throws CameraAccessException
 	 */
-	public static CameraConst.CameraInfo findCamera(
+	public static CameraInfo findCamera(
 		@NonNull final CameraManager manager,
 		@CameraConst.FaceType final int preferedFace)
 			throws CameraAccessException {
 
 		if (DEBUG) Log.v(TAG, "findCamera:preferedFace=" + preferedFace);
-		CameraConst.CameraInfo info = null;
+		CameraInfo info = null;
 		int targetFace;
 		final String[] cameraIds = manager.getCameraIdList();
 		if ((cameraIds != null) && (cameraIds.length > 0)) {
@@ -120,7 +120,7 @@ cameraLoop:
 				}
 			}
 			if (!TextUtils.isEmpty(cameraId)) {
-				info = new CameraConst.CameraInfo(cameraId, face, orientation,
+				info = new CameraInfo(cameraId, face, orientation,
 					CameraConst.DEFAULT_WIDTH, CameraConst.DEFAULT_HEIGHT);
 			}
 		}
@@ -138,7 +138,7 @@ cameraLoop:
 	 * @throws CameraAccessException
 	 */
 	@Nullable
-	public static CameraConst.CameraInfo findCamera(
+	public static CameraInfo findCamera(
 		@NonNull final CameraManager manager,
 		@CameraConst.FaceType final int preferedFace,
 		final int width, final int height,
@@ -183,7 +183,7 @@ cameraLoop:
 			}
 		}
 		if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
-			return new CameraConst.CameraInfo(cameraId, targetFace, orientation,
+			return new CameraInfo(cameraId, targetFace, orientation,
 				previewSize.getWidth(), previewSize.getHeight());
 		}
 		if (DEBUG) Log.w(TAG, "findCamera: not found");
@@ -201,7 +201,7 @@ cameraLoop:
 	 * @return
 	 * @throws CameraAccessException
 	 */
-	public static CameraConst.CameraInfo chooseOptimalSize(
+	public static CameraInfo chooseOptimalSize(
 		@NonNull final CameraManager manager,
 		final String cameraId, @CameraConst.FaceType final int targetFace,
 		final int width, final int height, final int degrees)
@@ -219,7 +219,7 @@ cameraLoop:
 			= chooseOptimalSize(characteristics, map, width, height, degrees);
 		final int orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 		if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
-			return new CameraConst.CameraInfo(cameraId, targetFace, orientation,
+			return new CameraInfo(cameraId, targetFace, orientation,
 				previewSize.getWidth(), previewSize.getHeight());
 		}
 		return null;
