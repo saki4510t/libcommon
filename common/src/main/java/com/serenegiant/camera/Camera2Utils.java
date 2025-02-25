@@ -147,6 +147,32 @@ cameraLoop:
 		@CameraConst.FaceType final int preferedFace,
 		final int width, final int height,
 		final int degrees)
+		throws CameraAccessException {
+
+		return findCamera(
+			manager, preferedFace,
+			width, height, degrees,
+			SurfaceTexture.class);
+	}
+
+	/**
+	 * 指定した条件に合うカメラを探す
+	 * @param manager
+	 * @param preferedFace
+	 * @param width
+	 * @param height
+	 * @param degrees
+	 * @param clazz StreamConfigurationMap#getOutputSizesに指定するクラス
+	 *              SurfaceTexture.class, MediaCodex.class, MediaRecorder.class
+	 * @return
+	 * @throws CameraAccessException
+	 */
+	@Nullable
+	public static CameraInfo findCamera(
+		@NonNull final CameraManager manager,
+		@CameraConst.FaceType final int preferedFace,
+		final int width, final int height, final int degrees,
+		@NonNull final Class<?> clazz)
 			throws CameraAccessException {
 
 		if (DEBUG) Log.v(TAG, String.format("findCamera:preferedFace=%d,Size(%dx%d),degrees=%d",
@@ -171,7 +197,7 @@ cameraLoop:
 					if (characteristics.get(CameraCharacteristics.LENS_FACING) == targetFace) {
 						final StreamConfigurationMap map = characteristics.get(
 								CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-						previewSize = chooseOptimalSize(characteristics, map, width, height, degrees);
+						previewSize = chooseOptimalSize(characteristics, map, width, height, degrees, clazz);
 						orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 						cameraId = id;
 						break cameraLoop;
@@ -210,6 +236,31 @@ cameraLoop:
 		final String cameraId, @CameraConst.FaceType final int targetFace,
 		final int width, final int height, final int degrees)
 			throws CameraAccessException {
+		return chooseOptimalSize(
+			manager, cameraId,
+			targetFace, width, height, degrees,
+			SurfaceTexture.class);
+	}
+
+	/**
+	 * 指定した条件に合う解像度を選択する
+	 * @param manager
+	 * @param cameraId
+	 * @param targetFace
+	 * @param width
+	 * @param height
+	 * @param degrees
+	 * @param clazz StreamConfigurationMap#getOutputSizesに指定するクラス
+	 *              SurfaceTexture.class, MediaCodex.class, MediaRecorder.class
+	 * @return
+	 * @throws CameraAccessException
+	 */
+	public static CameraInfo chooseOptimalSize(
+		@NonNull final CameraManager manager,
+		final String cameraId, @CameraConst.FaceType final int targetFace,
+		final int width, final int height, final int degrees,
+		@NonNull final Class<?> clazz)
+			throws CameraAccessException {
 
 		if (DEBUG) Log.v(TAG,
 			String.format("chooseOptimalSize:Size(%dx%d),targetFace=%d,degrees=%d",
@@ -220,7 +271,7 @@ cameraLoop:
 		final StreamConfigurationMap map = characteristics.get(
 				CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 		final Size previewSize
-			= chooseOptimalSize(characteristics, map, width, height, degrees);
+			= chooseOptimalSize(characteristics, map, width, height, degrees, clazz);
 		final int orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
 		if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
 			return new CameraInfo(cameraId, targetFace, orientation,
@@ -233,19 +284,42 @@ cameraLoop:
 	 * 指定した条件に合う解像度を選択する
 	 * @param characteristics
 	 * @param map
-	 * @param _width
-	 * @param _height
+	 * @param width
+	 * @param height
 	 * @param degrees
 	 * @return
 	 */
 	public static Size chooseOptimalSize(
 		final CameraCharacteristics characteristics,
 		final StreamConfigurationMap map,
-		final int _width, final int _height, final int degrees) {
+		final int width, final int height, final int degrees) {
+
+		return chooseOptimalSize(
+			characteristics, map,
+			width, height, degrees,
+			SurfaceTexture.class);
+	}
+
+	/**
+	 * 指定した条件に合う解像度を選択する
+	 * @param characteristics
+	 * @param map
+	 * @param width
+	 * @param height
+	 * @param degrees
+	 * @param clazz StreamConfigurationMap#getOutputSizesにしていするクラス
+	 *              SurfaceTexture.class, MediaCodex.class, MediaRecorder.class
+	 * @return
+	 */
+	public static Size chooseOptimalSize(
+		final CameraCharacteristics characteristics,
+		final StreamConfigurationMap map,
+		final int width, final int height, final int degrees,
+		@NonNull final Class<?> clazz) {
 
 		if (DEBUG) Log.v(TAG,
 			String.format("chooseOptimalSize:size(%d,%d),degrees=%d",
-				_width, _height, degrees));
+				width, height, degrees));
 
 		// カメラの物理的な有効解像度を取得する
 		final Rect activeArraySize = characteristics.get(CameraCharacteristics.SENSOR_INFO_ACTIVE_ARRAY_SIZE);
@@ -258,29 +332,29 @@ cameraLoop:
 		// MediaCodec用の最大解像度を探す
 		final Size ppsfv =  Collections.max(Arrays.asList(sizes), new CompareSizesByArea());
 		// widthまたはheightが未指定名の時は最大解像度を使う・・・ここは1080pに制限しといた方が良いかもしれない
-		if ((_width <= 0) || (_height <= 0)) {
+		if ((width <= 0) || (height <= 0)) {
 			if (DEBUG) Log.d(TAG, "chooseOptimalSize:select" + ppsfv);
 			return ppsfv;
 		}
 
 		// 縦画面か横画面かに合わせてアスペクト比を計算する(カメラ側は常に横長)
-		final int width = Math.max(_width, _height);
-		final int height = Math.min(_width, _height);
-		final double aspect = (width > 0) && (height > 0)
-			? (width / (double)height)
+		final int videoWidth = Math.max(width, height);
+		final int videoHeight = Math.min(width, height);
+		final double aspect = (videoWidth > 0) && (videoHeight > 0)
+			? (videoWidth / (double)videoHeight)
 			: (ppsfv.getWidth() / (double)ppsfv.getHeight());
-		final long max_areas = (width > 0) && (height > 0) ? width * (long)height : ppsfv.getWidth() * (long)ppsfv.getHeight();
+		final long max_areas = (videoWidth > 0) && (videoHeight > 0) ? videoWidth * (long)videoHeight : ppsfv.getWidth() * (long)ppsfv.getHeight();
 		double a, r, selectedDelta = Double.MAX_VALUE;
 		Size selectedSize = null;
 		long areas;
 
 		// SurfaceTextureへの描画用の解像度を一覧を取得
-		sizes = map.getOutputSizes(SurfaceTexture.class);
+		sizes = map.getOutputSizes(clazz);
 		if (DEBUG) { for (final Size sz : sizes) { Log.v(TAG, "chooseOptimalSize:getOutputSizes(SurfaceTexture)=" + sz); } }
 
 		// サイズが一致するものを探す
 		for (Size sz : sizes) {
-			if ((sz.getWidth() == width) && (sz.getHeight() == height)) {
+			if ((sz.getWidth() == videoWidth) && (sz.getHeight() == videoHeight)) {
 				selectedSize = sz;
 				if (DEBUG) Log.v(TAG, "chooseOptimalSize:found(" + selectedSize + ")");
 				return selectedSize;
@@ -301,7 +375,7 @@ cameraLoop:
 					possible.add(sz);
 				}
 				// 指定幅と同じであればよりアスペクト比の差が小さいものを保持する
-				if (sz.getWidth() == width) {
+				if (sz.getWidth() == videoWidth) {
 					if (r < selectedDelta) {
 						selectedSize = sz;
 						selectedDelta = r;
@@ -316,7 +390,7 @@ cameraLoop:
 			selectedDelta = Double.MAX_VALUE;
 			selectedSize = null;
 			for (Size sz : sizes) {
-				if (sz.getWidth() == width) {
+				if (sz.getWidth() == videoWidth) {
 					a = sz.getWidth() / (double)sz.getHeight();
 					r = Math.abs(a - aspect) / aspect;
 					if (r < selectedDelta) {
@@ -329,7 +403,7 @@ cameraLoop:
 		// アスペクト比の差が+/-5%未満のがあればそれを選択する
 		if ((selectedSize != null) && (selectedDelta < 0.05)) {
 			if (DEBUG) Log.d(TAG, String.format("chooseOptimalSize:select(%dx%d), request(%d,%d)",
-				selectedSize.getWidth(), selectedSize.getHeight(), width, height));
+				selectedSize.getWidth(), selectedSize.getHeight(), videoWidth, videoHeight));
 			return selectedSize;
 		}
 		// アスペクト比の差が0.2未満の中で最大解像度を取得する
