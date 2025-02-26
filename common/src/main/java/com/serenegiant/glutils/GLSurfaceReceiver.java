@@ -65,6 +65,10 @@ public class GLSurfaceReceiver {
 	 * 映像受け取り用テクスチャ/SurfaceTexture/Surfaceの(再)生成要求
 	 */
 	private static final int REQUEST_RECREATE_INPUT_SURFACE = 5;
+	/**
+	 * Surfaceの生成待ち時間[ミリ秒]
+	 */
+	private static final long CREATE_SURFACE_WAIT_MS = 2500L;
 
 	/**
 	 * #onFrameAvailableだけを後から差し替えれるようにCallbackインターフェースから分離
@@ -151,7 +155,7 @@ public class GLSurfaceReceiver {
 	@NonNull
 	private FrameAvailableCallback mFrameAvailableCallback;
 	private volatile boolean mReleased = false;
-	private boolean mIsReaderValid = false;
+	private boolean mIsReceiverValid = false;
 
 	/**
 	 * 映像受け取り用SurfaceTextureの#getTransformMatrixで受け取った
@@ -202,11 +206,11 @@ public class GLSurfaceReceiver {
 		mCallback = callback;
 		mFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
-		mGLHandler.post(() -> {
+		mGLHandler.postAtFrontOfQueue(() -> {
 			try {
 				handleOnStartOnGL();
 			} catch (final Exception e) {
-				Log.w(TAG, e);
+				if (DEBUG) Log.w(TAG, e);
 			}
 			try {
 				handleReCreateInputSurfaceOnGL();
@@ -216,19 +220,20 @@ public class GLSurfaceReceiver {
 			sem.release();
 		});
 		try {
-			final Surface surface;
-			mLock.lock();
-			try {
-				surface = mInputSurface;
-			} finally {
-				mLock.unlock();
-			}
-			if (surface == null) {
-				if (sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
-					mIsReaderValid = true;
-				} else {
-					throw new RuntimeException("failed to create surface");
+			if (sem.tryAcquire(CREATE_SURFACE_WAIT_MS, TimeUnit.MILLISECONDS)) {
+				final Surface surface;
+				mLock.lock();
+				try {
+					surface = mInputSurface;
+				} finally {
+					mLock.unlock();
 				}
+				mIsReceiverValid = (surface != null) && surface.isValid();
+			} else {
+				mIsReceiverValid = false;
+			}
+			if (!mIsReceiverValid) {
+				throw new RuntimeException("failed to create surface");
 			}
 		} catch (final InterruptedException e) {
 			// ignore
@@ -251,7 +256,7 @@ public class GLSurfaceReceiver {
 		if (!mReleased) {
 			mReleased = true;
 			if (DEBUG) Log.v(TAG, "release:");
-			mIsReaderValid = false;
+			mIsReceiverValid = false;
 			internalRelease();
 		}
 	}
@@ -297,7 +302,7 @@ public class GLSurfaceReceiver {
 	 * @return
 	 */
 	public boolean isValid() {
-		return !mReleased && mIsReaderValid && mGLManager.isValid();
+		return !mReleased && mIsReceiverValid && mGLManager.isValid();
 	}
 
 	/**
@@ -440,19 +445,20 @@ public class GLSurfaceReceiver {
 			sem.release();
 		});
 		try {
-			final Surface surface;
-			mLock.lock();
-			try {
-				surface = mInputSurface;
-			} finally {
-				mLock.unlock();
-			}
-			if (surface == null) {
-				if (sem.tryAcquire(1000, TimeUnit.MILLISECONDS)) {
-					mIsReaderValid = true;
-				} else {
-					throw new RuntimeException("failed to create surface");
+			if (sem.tryAcquire(CREATE_SURFACE_WAIT_MS, TimeUnit.MILLISECONDS)) {
+				final Surface surface;
+				mLock.lock();
+				try {
+					surface = mInputSurface;
+				} finally {
+					mLock.unlock();
 				}
+				mIsReceiverValid = (surface != null) && surface.isValid();
+			} else {
+				mIsReceiverValid = false;
+			}
+			if (!mIsReceiverValid) {
+				throw new RuntimeException("failed to create surface");
 			}
 		} catch (final InterruptedException e) {
 			// ignore
@@ -594,39 +600,36 @@ public class GLSurfaceReceiver {
 	private void handleReleaseInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 		final Surface surface;
+		final SurfaceTexture surfaceTexture;
+		final int texId;
 		mLock.lock();
 		try {
 			surface = mInputSurface;
+			mInputSurface = null;
+			surfaceTexture = mInputTexture;
+			mInputTexture = null;
+			texId = mTexId;
+			mTexId = 0;
 		} finally {
 			mLock.unlock();
 		}
 		if (surface != null) {
 			mCallback.onReleaseInputSurface(surface);
+			try {
+				surface.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+			}
 		}
-		mLock.lock();
-		try {
-			if (mInputSurface != null) {
-				try {
-					mInputSurface.release();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				mInputSurface = null;
+		if (surfaceTexture != null) {
+			try {
+				surfaceTexture.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
-			if (mInputTexture != null) {
-				try {
-					mInputTexture.release();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				mInputTexture = null;
-			}
-			if (mTexId != 0) {
-				GLUtils.deleteTex(mTexId);
-				mTexId = 0;
-			}
-		} finally {
-			mLock.unlock();
+		}
+		if (texId != 0) {
+			GLUtils.deleteTex(texId);
 		}
 	}
 
