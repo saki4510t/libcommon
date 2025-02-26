@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 import androidx.annotation.ColorInt;
 import androidx.annotation.IntRange;
@@ -207,6 +208,10 @@ public class RPGMessageView extends View {
 	 * 文字がセットされている行数
 	 */
 	private int mVisibleRows = 0;
+	/**
+	 * 最後にセットまたは追加されたメッセージ
+	 */
+	private String mLastText = null;
 //--------------------------------------------------------------------------------
 	/**
 	 * コンストラクタ
@@ -290,7 +295,7 @@ public class RPGMessageView extends View {
 
 	final float[] textWidth = new float[1];
 	@Override
-	protected void onDraw(final Canvas canvas) {
+	protected void onDraw(@NonNull final Canvas canvas) {
 //		if (DEBUG) Log.v(TAG, "onDraw:");
 		final int saveCount = CanvasUtils.saveLayer(canvas, mViewBoundsF, mPaintCopied);
 		try {
@@ -555,8 +560,20 @@ public class RPGMessageView extends View {
 	 * @param text
 	 */
 	public void addLine(@Nullable final String text) {
+		addLine(text, true);
+	}
+
+	/**
+	 * 行追加する
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
+	 * @param text
+	 * @param force 前回と同じテキストがセットされたときにもセットするかどうか
+	 */
+	public void addLine(@Nullable final String text, final boolean force) {
 		if (DEBUG) Log.v(TAG, "addLine:" + text);
 		if (TextUtils.isEmpty(text)) return;
+		if (!force && Objects.equals(text, mLastText)) return;
+		mLastText = text;
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
 		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
@@ -586,8 +603,21 @@ public class RPGMessageView extends View {
 	 * @param text
 	 */
 	public void addText(@Nullable final String text) {
+		addText(text, true);
+	}
+
+	/**
+	 * 文字列を追加
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
+	 * 追加する先頭行を既存の最後の行に連結する
+	 * @param text
+	 * @param force 前回と同じテキストがセットされたときにもセットするかどうか
+	 */
+	public void addText(@Nullable final String text, final boolean force) {
 		if (DEBUG) Log.v(TAG, "addText:" + text);
 		if (TextUtils.isEmpty(text)) return;
+		if (!force && Objects.equals(text, mLastText)) return;
+		mLastText = text;
 		removeCallbacks(mClearTask);
 		final long durationMs = mNextInvalidateMs - System.currentTimeMillis();
 		if (mFirstLine.isEmpty() && mLines.isEmpty() && (mVisibleRows > 0)) {
@@ -627,7 +657,19 @@ public class RPGMessageView extends View {
 	 * @param text
 	 */
 	public void setText(@Nullable final String text) {
+		setText(text, true);
+	}
+
+	/**
+	 * 文字列を置き換え
+	 * 文字列に改行コードが含まれる場合は複数行に分割して追加する
+	 * @param text
+	 * @param force 前回と同じテキストがセットされたときにもセットするかどうか
+	 */
+	public void setText(@Nullable final String text, final boolean force) {
 		if (DEBUG) Log.v(TAG, "setText:" + text);
+		if (!force && Objects.equals(text, mLastText)) return;
+		mLastText = text;
 		reset();
 		mLines.addAll(splitLines(text));
 		if (popFirstIfNeed()) {
@@ -642,6 +684,7 @@ public class RPGMessageView extends View {
 	public void clear() {
 		if (DEBUG) Log.v(TAG, "clear:");
 		reset();
+		mLastText = null;
 		postInvalidate();
 		if (mEventListener != null) {
 			mEventListener.onCleared(this);
