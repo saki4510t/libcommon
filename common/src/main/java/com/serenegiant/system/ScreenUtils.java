@@ -19,6 +19,10 @@ package com.serenegiant.system;
 */
 
 import android.app.Activity;
+import android.content.Context;
+import android.hardware.display.DisplayManager;
+import android.os.PowerManager;
+import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -51,5 +55,28 @@ public class ScreenUtils {
 				}
 			}
 		});
+	}
+
+	/**
+	 * 画面がONになっているかどうかを取得する
+	 * @param context
+	 * @return
+	 */
+	public static boolean isScreenOn(@NonNull final Context context) {
+		if (BuildCheck.isAPI20()) {
+			final DisplayManager dm = ContextUtils.requireSystemService(context, DisplayManager.class);
+			boolean screenOn = false;
+			for (Display display: dm.getDisplays()) {
+				if (display.getState() != Display.STATE_OFF) {
+					screenOn = true;
+				}
+			}
+			return screenOn;
+		} else {
+			final PowerManager pm = ContextUtils.requireSystemService(context, PowerManager.class);
+			// これは端末がユーザーからの操作を受け付ける状態かどうか(=isInteractive)なので
+			// 実際の画面ON/OFF状態とは異なる可能性がある
+			return pm.isScreenOn();
+		}
 	}
 }
