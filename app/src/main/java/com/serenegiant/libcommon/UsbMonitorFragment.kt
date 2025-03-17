@@ -122,7 +122,7 @@ class UsbMonitorFragment : BaseFragment() {
 				// staticメソッド版のrequestPermissionを使って違うContextからパーミッション要求する場合
 				// こっちでパーミッション要求した場合でもUSBMonitor#registerで登録したBroadcastReceiverで
 				// 結果を受け取れる
-				UsbPermission.requestPermission(requireActivity(), device, mOnDeviceConnectListener2)
+				UsbPermission.requestPermission(requireActivity(), device, mOnDeviceConnectListener2, 5000)
 			}
 		}
 

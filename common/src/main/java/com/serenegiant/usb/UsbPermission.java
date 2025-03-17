@@ -38,6 +38,7 @@ import com.serenegiant.utils.ThreadPool;
 
 import java.lang.ref.WeakReference;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
@@ -110,7 +111,7 @@ public class UsbPermission extends BroadcastReceiver {
 	@NonNull
 	private final Callback mCallback;
 	@NonNull
-	private final PendingIntent mPermissionIntent;
+	private PendingIntent mPermissionIntent;
 	private final boolean mOwnHandler;
 	@NonNull
 	private final Handler mAsyncHandler;
@@ -205,6 +206,7 @@ public class UsbPermission extends BroadcastReceiver {
 	 */
 	public synchronized void unregister() throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "unregister:" + mRegistered);
+		cancelRRequestPermission();
 		if (mRegistered) {
 			mRegistered = false;
 			final Context context = requireContext();
@@ -248,6 +250,18 @@ public class UsbPermission extends BroadcastReceiver {
 			throw new IllegalStateException("already destroyed");
 		}
 		return result;
+	}
+
+	/**
+	 * 要求中のUSB機器アクセスパーミッション要求をキャンセルする
+	 * XXX requestPermissionへ渡したPendingIntentをキャンセルしても
+	 *     パーミッション要求自体はキャンセルされずダイアログが表示された
+	 *     ままになるので効果ない(´･ω･`)
+	 */
+	public synchronized void cancelRRequestPermission() {
+		if (DEBUG) Log.v(TAG, "cancelRRequestPermission:");
+		mPermissionIntent.cancel();
+		mPermissionIntent = createIntent(requireContext());
 	}
 
 	/**
@@ -400,7 +414,7 @@ public class UsbPermission extends BroadcastReceiver {
 		@NonNull final UsbDevice device)
 		throws IllegalArgumentException {
 
-		requestPermission(context, device, DEFAULT_CALLBACK);
+		requestPermission(context, device, DEFAULT_CALLBACK, 0);
 	}
 
 	/**
@@ -416,7 +430,27 @@ public class UsbPermission extends BroadcastReceiver {
 	public static void requestPermission(
 		@NonNull final Context context,
 		@NonNull final UsbDevice device,
-		@NonNull final Callback callback)
+		@NonNull final Callback callback) {
+
+		requestPermission(context, device, callback, 0);
+	}
+
+	/**
+	 * パーミッションを要求する
+	 * @param context XXX Activity以外のコンテキストからUSBパーミッション要求等のシステムダイアログ/システムUIが
+	 *                    表示される処理を要求すると、ダイアログ等がアプリの背面に回ってしまう場合があるので
+	 *                    Contextとしているけど可能な限りActivityを引き渡すこと。
+	 *                    (パーミッション要求しなければアプリケーションコンテキストやサービスコンテキストでもOK)
+	 * @param device
+	 * @param callback
+	 * @param timeoutMs 最大待ち時間[ミリ秒] 0以下なら無限待ち
+	 * @throws IllegalStateException
+	 */
+	public static void requestPermission(
+		@NonNull final Context context,
+		@NonNull final UsbDevice device,
+		@NonNull final Callback callback,
+		final long timeoutMs)
 		throws IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "requestPermission:device=" + device.getDeviceName() + ",callback=" + callback);
@@ -457,8 +491,19 @@ public class UsbPermission extends BroadcastReceiver {
 			if (DEBUG) Log.v(TAG, "requestPermission#registerReceiver:");
 			ContextCompat.registerReceiver(context, receiver, new IntentFilter(ACTION_USB_PERMISSION), ContextCompat.RECEIVER_EXPORTED);
 			try {
-				manager.requestPermission(device, createIntent(context));
-				latch.await();
+				final PendingIntent intent = createIntent(context);
+				manager.requestPermission(device, intent);
+				if (timeoutMs > 0) {
+					if (!latch.await(timeoutMs, TimeUnit.MILLISECONDS)) {
+						if (DEBUG) Log.v(TAG, "requestPermission:timeout, cancel PendingIntent");
+						// XXX requestPermissionへ渡したPendingIntentをキャンセルしても
+						//  パーミッション要求自体はキャンセルされずダイアログが表示されたままになる(´･ω･`)
+						intent.cancel();
+					}
+				} else {
+					// 無限待ち
+					latch.await();
+				}
 			} catch (final Exception e) {
 				// Android5.1.xのGALAXY系でandroid.permission.sec.MDM_APP_MGMT
 				// という意味不明の例外生成するみたい
