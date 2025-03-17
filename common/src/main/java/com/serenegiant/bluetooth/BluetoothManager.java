@@ -238,7 +238,7 @@ public class BluetoothManager {
 			}
 			// 既にペアリング済みのBluetooth機器一覧を取得する
 			final Set<BluetoothDevice> pairedDevices = mAdapter.getBondedDevices();
-			if (pairedDevices.size() > 0) {
+			if (!pairedDevices.isEmpty()) {
 				for (final BluetoothDevice device : pairedDevices) {
 					result.add(new BluetoothDeviceInfo(device));
 				}
@@ -265,7 +265,7 @@ public class BluetoothManager {
 			final Set<BluetoothDevice> pairedDevices = mAdapter.getBondedDevices();
 			synchronized (mDiscoveredDeviceList) {
 				mDiscoveredDeviceList.clear();
-				if (pairedDevices.size() > 0) {
+				if (!pairedDevices.isEmpty()) {
 					for (final BluetoothDevice device : pairedDevices) {
 						mDiscoveredDeviceList.add(new BluetoothDeviceInfo(device));
 					}

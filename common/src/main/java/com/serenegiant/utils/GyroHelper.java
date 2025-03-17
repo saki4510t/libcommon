@@ -105,7 +105,7 @@ public class GyroHelper {
 			mRegistered = true;
 			for (final int sensor_type : SENSOR_TYPES) {
 				final List<Sensor> sensors = mSensorManager.getSensorList(sensor_type);
-				if ((sensors != null) && (sensors.size() > 0)) {
+				if ((sensors != null) && !sensors.isEmpty()) {
 					if (sensor_type == Sensor.TYPE_GRAVITY) {
 						Log.i(TAG, "hasGravity");
 						hasGravity = true;

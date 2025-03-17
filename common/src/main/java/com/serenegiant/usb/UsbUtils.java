@@ -310,7 +310,7 @@ public class UsbUtils implements Const {
 		final HashMap<String, UsbDevice> list = usbManager.getDeviceList();
 		if ((list != null) && !list.isEmpty()) {
 			final Set<String> keys = list.keySet();
-			if (keys != null && keys.size() > 0) {
+			if (keys != null && !keys.isEmpty()) {
 				final StringBuilder sb = new StringBuilder();
 				for (final String key: keys) {
 					final UsbDevice device = list.get(key);

@@ -135,7 +135,7 @@ public class XmlHelper {
 					// ignore
 				}
 			}
-			if (list.size() > 0) {
+			if (!list.isEmpty()) {
 				result = new int[list.size()];
 				int i = 0;
 				for (final Integer value: list) {
@@ -163,7 +163,7 @@ public class XmlHelper {
 					// ignore
 				}
 			}
-			if (list.size() > 0) {
+			if (!list.isEmpty()) {
 				result = new boolean[list.size()];
 				int i = 0;
 				for (final Boolean value: list) {
