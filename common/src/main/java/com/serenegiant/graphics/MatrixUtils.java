@@ -127,9 +127,7 @@ public class MatrixUtils {
 	 * @param degrees
 	 */
 	public static void rotate(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
-		if ((degrees % 180) != 0) {
-			android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
-		}
+		android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 	}
 
 	/**
@@ -139,9 +137,7 @@ public class MatrixUtils {
 	 */
 	public static void setRotation(@NonNull @Size(min=16) final float[] mvp, final int degrees) {
 		android.opengl.Matrix.setIdentityM(mvp, 0);
-		if ((degrees % 180) != 0) {
-			android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
-		}
+		android.opengl.Matrix.rotateM(mvp, 0, degrees, 0.0f, 0.0f, 1.0f);
 	}
 
 	/**
