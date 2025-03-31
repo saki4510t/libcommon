@@ -392,10 +392,36 @@ public class UsbDetector {
 
 	/**
 	 * 接続中のUSB機器に対してattachイベントを再生成させる
+	 * 以前接続されていたが現在は接続されていないUSB機器があればデタッチイベントを起こす
 	 */
 	public void refreshDevices() {
-		final List<UsbDevice> devices = getDeviceList();
-		for (final UsbDevice device: devices) {
+		final List<UsbDevice> currentDevices = getDeviceList();
+		// 現在は接続されていいないが以前は接続されていた機器を探す
+		// アプリがポーズ中/バックグラウンド中にUSB機器が取り外された時のため
+		final Collection<UsbDevice> prevDevices;
+		synchronized (mAttachedDevices) {
+			prevDevices = new HashSet<>(mAttachedDevices);
+			mAttachedDevices.clear();
+			mAttachedDevices.addAll(currentDevices);
+		}
+		// ポーズ中/バックグラウンド中に取り外されたUSB機器を探す
+		final List<UsbDevice> removed = new ArrayList<>();
+		for (final UsbDevice device: prevDevices) {
+			if (!currentDevices.contains(device)) {
+				removed.add(device);
+			}
+		}
+		// 取り外された機器に対してデタッチイベントを起こす
+		for (final UsbDevice device: removed) {
+			mAsyncHandler.post(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.onDetach(device);
+				}
+			});
+		}
+		// 現在接続されているUSB機器全てに対してアタッチイベントを起こす
+		for (final UsbDevice device: currentDevices) {
 			mAsyncHandler.post(new Runnable() {
 				@Override
 				public void run() {
