@@ -339,7 +339,7 @@ public class UsbDetector {
 	 */
 	@NonNull
 	public List<UsbDevice> getDeviceList() {
-		final List<UsbDevice> result = new ArrayList<UsbDevice>();
+		final List<UsbDevice> result = new ArrayList<>();
 		if (mReleased) return result;
 		final HashMap<String, UsbDevice> deviceList = mUsbManager.getDeviceList();
 		if (deviceList != null) {
@@ -450,30 +450,45 @@ public class UsbDetector {
 			// 現在接続されている機器
 			final List<UsbDevice> currentDevices = getDeviceList();
 			if (DEBUG) Log.v(TAG, "mDeviceCheckRunnable:current=" + currentDevices.size());
-			final List<UsbDevice> mChanged = new ArrayList<>();
 			final Collection<UsbDevice> prevDevices;
 			synchronized (mAttachedDevices) {
 				prevDevices = new HashSet<>(mAttachedDevices);
 				mAttachedDevices.clear();
 				mAttachedDevices.addAll(currentDevices);
 			}
-			// 現在は接続されているが以前は接続されていなかった機器を探す
-			for (final UsbDevice device: currentDevices) {
-				if (!prevDevices.contains(device)) {
-					mChanged.add(device);
+			// 現在は接続されていいないが以前は接続されていた機器を探す
+			// アプリがポーズ中/バックグラウンド中にUSB機器が取り外された時のため
+			final List<UsbDevice> removed = new ArrayList<>();
+			for (final UsbDevice device: prevDevices) {
+				if (!currentDevices.contains(device)) {
+					removed.add(device);
 				}
 			}
-			final int n = mChanged.size();
-			if (n > 0) {
-				for (int i = 0; i < n; i++) {
-					final UsbDevice device = mChanged.get(i);
-					mAsyncHandler.post(new Runnable() {
-						@Override
-						public void run() {
-							mCallback.onAttach(device);
-						}
-					});
+			// 現在は接続されているが以前は接続されていなかった機器を探す
+			// アプリ起動前に接続されたUSB機器の検出のため
+			final List<UsbDevice> added = new ArrayList<>();
+			for (final UsbDevice device: currentDevices) {
+				if (!prevDevices.contains(device)) {
+					added.add(device);
 				}
+			}
+			// 取り外された機器に対してデタッチイベントを起こす
+			for (final UsbDevice device: removed) {
+				mAsyncHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mCallback.onDetach(device);
+					}
+				});
+			}
+			// 新たに追加された機器に対してアタッチイベントを起こす
+			for (final UsbDevice device: added) {
+				mAsyncHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						mCallback.onAttach(device);
+					}
+				});
 			}
 			if (mEnablePolling) {
 				mAsyncHandler.postDelayed(mDeviceCheckRunnable, mPollingIntervalsMs);	// 1秒に1回確認
