@@ -48,6 +48,6 @@ ext {
 	kotlinCoroutinesVersion = '1.8.1'
 	gsonVersion = "2.10.1"	// インスツルメンツテスト・テストアプリ用
 
-    versionCodeNum = 451
-    versionNameString = '9.6.2'
+    versionCodeNum = 452
+    versionNameString = '9.7.0'
 }
