@@ -207,7 +207,8 @@ public class CapturePipeline extends ProxyPipeline {
 		final boolean needCapture;
 		mLock.lock();
 		try {
-			needCapture = (mNumCaptures != 0) && (mCaptureCnt < mNumCaptures)
+			needCapture = (mNumCaptures != 0)
+				&& ((mNumCaptures < 0) || (mCaptureCnt < mNumCaptures))
 				&& (current - mLastCaptureMs > mIntervalsMs);
 			if (needCapture) {
 				mLastCaptureMs = current;
