@@ -331,6 +331,39 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	}
 
 	/**
+	 * 静止画撮影要求
+	 * @param out
+	 * @param captureFormat
+	 * @param captureCompression
+	 * @param listener
+	 * @deprecated GL|ESのテクスチャをBitmapとしてキャプチャするための
+	 *     ImageReader(GLBitmapImageReader)を追加したのでIRenderer自体での
+	 *     静止画キャプチャ機能は削除する予定
+	 */
+	@Deprecated
+	protected void captureStill(
+		@NonNull final OutputStream out,
+		@StillCaptureFormat final int captureFormat,
+		@IntRange(from = 1L,to = 99L) final int captureCompression,
+		@Nullable final OnCapturedListener listener) throws IllegalStateException {
+
+		synchronized (mSync) {
+			if (!isRunning) {
+				throw new IllegalStateException("already released?");
+			}
+			if (mCaptureStream != null) {
+				throw new IllegalStateException("already run still capturing now");
+			}
+			mCaptureStream = out;
+			mCaptureFormat = captureFormat;
+			mCaptureCompression = captureCompression;
+			mOnCapturedListener = listener;
+			mSync.notifyAll();
+		}
+		if (DEBUG) Log.v(TAG, "captureStill:終了");
+	}
+
+	/**
 	 * パス文字列の拡張子を調べて静止画圧縮フォーマットを取得する。
 	 * jpeg(jpg)/png/webpのいずれでもなければIllegalArgumentExceptionを投げる
 	 * @param path
