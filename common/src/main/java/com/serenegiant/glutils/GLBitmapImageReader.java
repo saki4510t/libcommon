@@ -75,7 +75,12 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	private Handler mListenerHandler;
 	private int mWidth;
 	private int mHeight;
-	private volatile boolean mEnabled = true;
+	/**
+	 * 受け取ったテクスチャからBitmapの生成をするかどうか
+	 * #setOnImageAvailableListenerでリスナー/Handlerとしてnullを渡すと無効になる
+	 * #setOnImageAvailableListenerへ有効なリスナー/Handlerを渡すと有効になる
+	 */
+	private volatile boolean mEnabled = false;
 
 	/**
 	 * コンストラクタ
@@ -282,6 +287,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 				mListener = null;
 				mListenerHandler = null;
 			}
+			mEnabled = (mListener != null) && (mListenerHandler != null);
 		} finally {
 			mLock.unlock();
 		}
@@ -343,11 +349,13 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 
 	/**
 	 * ImageReader<Bitmap>の実装
+	 * テクスチャからBitmapを生成するかどうかをセット
+	 * 有効なOnImageAvailableListenerとHandlerが設定されていなければ常にfalseがセットされる
 	 * @param enabled
 	 */
 	@Override
 	public void setEnabled(final Boolean enabled) {
-		mEnabled = enabled;
+		mEnabled = enabled && (mListener != null) && (mListenerHandler != null);
 	}
 
 //--------------------------------------------------------------------------------
