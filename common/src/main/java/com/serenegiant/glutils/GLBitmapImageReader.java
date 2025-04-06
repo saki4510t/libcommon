@@ -81,6 +81,23 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	 * #setOnImageAvailableListenerへ有効なリスナー/Handlerを渡すと有効になる
 	 */
 	private volatile boolean mEnabled = false;
+	/**
+	 * キャプチャ回数
+	 * -1: 無制限, 0: 無効, 1以上: 指定回数
+	 */
+	private int mNumCaptures;
+	/**
+	 * キャプチャ周期[ミリ秒]
+	 */
+	private long mIntervalsMs;
+	/**
+	 * キャプチャした回数
+	 */
+	private int mCaptureCnt;
+	/**
+	 * キャプチャしたシステム時刻[ミリ秒]
+	 */
+	private long mLastCaptureMs;
 
 	/**
 	 * コンストラクタ
@@ -94,10 +111,13 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		@NonNull final Bitmap.Config config, final int maxImages) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		mWidth = width;
-		mHeight = height;
 		mConfig = config;
 		mMaxImages = maxImages;
+		mWidth = width;
+		mHeight = height;
+		mCaptureCnt = 0;
+		mNumCaptures = -1;	// 無制限
+		mLastCaptureMs = mIntervalsMs = 0L;
 		mPool = new Pool<Bitmap>(1, maxImages, maxImages, mWidth, mHeight) {
 			@NonNull
 			@Override
@@ -132,6 +152,45 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 				return result;
 			}
 		};
+	}
+
+	/**
+	 * 1回だけキャプチャ要求
+	 */
+	public void trigger() {
+		trigger(1, 0L);
+	}
+
+	/**
+	 * 指定した条件でキャプチャ要求
+	 * @param numCaptures キャプチャ回数, -1: 無制限, 0: 無効, 1以上: 指定回数
+	 * @param intervalsMs 複数回キャプチャする場合の周期[ミリ秒]
+	 */
+	public void trigger(final int numCaptures, final long intervalsMs) {
+		if (DEBUG) Log.v(TAG, "trigger:num=" + numCaptures + ",intervalsMs=" + intervalsMs);
+		mLock.lock();
+		try {
+			mCaptureCnt = 0;
+			mNumCaptures = numCaptures;
+			mIntervalsMs = intervalsMs;
+			mLastCaptureMs = 0L;
+		} finally {
+			mLock.unlock();
+		}
+	}
+
+	/**
+	 * キャプチャ中であればキャンセルする
+	 */
+	public void cancel() {
+		if (DEBUG) Log.v(TAG, "cancel");
+		mLock.lock();
+		try {
+			mCaptureCnt = mNumCaptures = 0;
+			mLastCaptureMs = mIntervalsMs = 0L;
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 //--------------------------------------------------------------------------------
@@ -225,8 +284,24 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		final int width, final int height,
 		final int texId, @NonNull final float[] texMatrix) {
 
-		if (!mEnabled) return;
 //		if (DEBUG) Log.v(TAG, "onFrameAvailable:");
+		// キャプチャするかどうかを判定
+		final long current = System.currentTimeMillis();
+		final boolean needCapture;
+		mLock.lock();
+		try {
+			needCapture = mEnabled && (mNumCaptures != 0)
+				&& ((mNumCaptures < 0) || (mCaptureCnt < mNumCaptures))
+				&& (current - mLastCaptureMs > mIntervalsMs);
+			if (needCapture) {
+				mLastCaptureMs = current;
+				mCaptureCnt++;
+			}
+		} finally {
+			mLock.unlock();
+		}
+		if (!needCapture) return;
+
 		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
 			mLock.lock();
