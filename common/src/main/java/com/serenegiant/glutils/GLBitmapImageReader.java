@@ -272,7 +272,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 				Looper looper = handler != null ? handler.getLooper() : Looper.myLooper();
 				if (looper == null) {
 					throw new IllegalArgumentException(
-						"handler is null but the current thread is not a looper");
+						"handler is null but the current thread does not have a looper");
 				}
 				if (mListenerHandler == null || mListenerHandler.getLooper() != looper) {
 					mListenerHandler = new Handler(looper);
