@@ -72,28 +72,6 @@ public class GLSurfaceReceiver {
 	private static final long CREATE_SURFACE_WAIT_MS = 2500L;
 
 	/**
-	 * #onFrameAvailableだけを後から差し替えれるようにCallbackインターフェースから分離
-	 * GLコンテキストを保持したスレッド上で実行される
-	 */
-	public interface GLFrameAvailableCallback {
-		/**
-		 * 映像をテクスチャとして受け取ったときの処理
-		 * @param isGLES3
-		 * @param isOES
-		 * @param width
-		 * @param height,
-		 * @param texId
-		 * @param texMatrix
-		 */
-		@WorkerThread
-		public void onFrameAvailable(
-			final boolean isGLES3,
-			final boolean isOES,
-			final int width, final int height,
-			final int texId, @Size(min=16) @NonNull final float[] texMatrix);
-	}
-
-	/**
 	 * Surfaceを経由してテクスチャとして受け取った映像を処理するためのインターフェース
 	 * WorkerThreadアノテーションの付いているインターフェースメソッドは全てGLコンテキストを
 	 * 保持したスレッド上で実行される

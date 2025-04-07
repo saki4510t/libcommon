@@ -28,6 +28,7 @@ import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ImageSourcePipeline;
 import com.serenegiant.glpipeline.OnFramePipeline;
 import com.serenegiant.glutils.GLBitmapImageReader;
+import com.serenegiant.glutils.GLFrameAvailableCallback;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageReader;
 import com.serenegiant.graphics.BitmapHelper;
@@ -204,7 +205,7 @@ public class ImageSourcePipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLSurfaceReceiver.GLFrameAvailableCallback callback = new GLSurfaceReceiver.GLFrameAvailableCallback() {
+		final GLFrameAvailableCallback callback = new GLFrameAvailableCallback() {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3, final boolean isOES,

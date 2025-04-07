@@ -31,6 +31,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glpipeline.GLPipeline;
 import com.serenegiant.glpipeline.ProxyPipeline;
+import com.serenegiant.glutils.GLFrameAvailableCallback;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
@@ -304,7 +305,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager,
 			width, height,
-			new GLSurfaceReceiver.DefaultCallback(new GLSurfaceReceiver.GLFrameAvailableCallback() {
+			new GLSurfaceReceiver.DefaultCallback(new GLFrameAvailableCallback() {
 				@Override
 				public void onFrameAvailable(
 					final boolean isGLES3, final boolean isOES,
