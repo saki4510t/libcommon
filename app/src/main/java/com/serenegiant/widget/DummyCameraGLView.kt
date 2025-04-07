@@ -36,6 +36,7 @@ import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.libcommon.R
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import java.lang.IllegalStateException
 
 /**
@@ -52,7 +53,7 @@ class DummyCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: AspectScaledGLView(context, attrs, defStyle), ICameraView, GLPipelineView {
 
-	private var mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener? = null
+	private var mOnFrameAvailableListener: OnFrameAvailableListener? = null
 	private var mImageSourcePipeline: ImageSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
@@ -135,14 +136,14 @@ class DummyCameraGLView @JvmOverloads constructor(
 	/**
 	 * ICameraViewの実装
 	 */
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		mOnFrameAvailableListener = listener
 	}
 
 	/**
 	 * ICameraViewの実装
 	 */
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		mOnFrameAvailableListener = null
 	}
 

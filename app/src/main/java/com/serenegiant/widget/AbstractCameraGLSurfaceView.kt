@@ -36,6 +36,7 @@ import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import javax.microedition.khronos.egl.EGLConfig
@@ -112,11 +113,11 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 		super.onPause()
 	}
 
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		mCameraDelegator.addListener(listener)
 	}
 
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		mCameraDelegator.removeListener(listener)
 	}
 

@@ -25,6 +25,7 @@ import android.util.AttributeSet
 import android.util.Log
 import android.view.View
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import java.lang.IllegalStateException
 import java.lang.UnsupportedOperationException
 
@@ -115,12 +116,12 @@ class CameraTextureView @JvmOverloads constructor(
 		mCameraDelegator.setVideoSize(width, height)
 	}
 
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
 		mCameraDelegator.addListener(listener)
 	}
 
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
 		mCameraDelegator.removeListener(listener)
 	}

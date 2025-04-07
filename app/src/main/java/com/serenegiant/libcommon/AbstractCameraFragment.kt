@@ -37,6 +37,7 @@ import androidx.annotation.StringRes
 import androidx.annotation.WorkerThread
 import com.serenegiant.glpipeline.CapturePipeline
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.mediastore.MediaStoreUtils
 import com.serenegiant.system.BuildCheck
 import com.serenegiant.system.PermissionUtils
@@ -310,12 +311,8 @@ abstract class AbstractCameraFragment : BaseFragment() {
 		mRecordButton.setColorFilter(0)
 	}
 
-	private val mOnFrameAvailableListener: CameraDelegator.OnFrameAvailableListener
-		= object : CameraDelegator.OnFrameAvailableListener {
-
-		override fun onFrameAvailable() {
-			this@AbstractCameraFragment.onFrameAvailable()
-		}
+	private val mOnFrameAvailableListener = OnFrameAvailableListener {
+		this@AbstractCameraFragment.onFrameAvailable()
 	}
 
 	protected abstract fun onFrameAvailable()

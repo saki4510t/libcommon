@@ -29,6 +29,7 @@ import android.view.View
 import androidx.annotation.WorkerThread
 import com.serenegiant.camera.CameraConst
 import com.serenegiant.camera.CameraUtils
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.utils.HandlerUtils
 import java.io.IOException
@@ -41,13 +42,6 @@ class CameraDelegator(
 	view: View,
 	width: Int, height: Int,
 	cameraRenderer: ICameraRenderer) {
-
-	/**
-	 * 映像が更新されたときの通知用コールバックリスナー
-	 */
-	interface OnFrameAvailableListener {
-		fun onFrameAvailable()
-	}
 
 	/**
 	 * カメラ映像をGLSurfaceViewへ描画するためのGLSurfaceView.Rendererインターフェース

@@ -40,6 +40,7 @@ import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.utils.HandlerThreadHandler
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import javax.microedition.khronos.egl.EGLConfig
@@ -125,11 +126,11 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		super.onPause()
 	}
 
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		mCameraDelegator.addListener(listener)
 	}
 
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		mCameraDelegator.removeListener(listener)
 	}
 

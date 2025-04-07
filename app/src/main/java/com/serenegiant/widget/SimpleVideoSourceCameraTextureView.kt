@@ -36,6 +36,7 @@ import com.serenegiant.gl.GLManager
 import com.serenegiant.glutils.GLSurfaceReceiver
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.view.TouchViewTransformer
 
 /**
@@ -157,12 +158,12 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		mCameraDelegator.setVideoSize(width, height)
 	}
 
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
 		mCameraDelegator.addListener(listener)
 	}
 
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
 		mCameraDelegator.removeListener(listener)
 	}

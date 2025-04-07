@@ -26,6 +26,7 @@ import android.view.Surface
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.graphics.SurfaceDrawable
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import java.lang.UnsupportedOperationException
 
 /**
@@ -97,12 +98,12 @@ class CameraImageView @JvmOverloads constructor(
 		mCameraDelegator.setVideoSize(width, height)
 	}
 
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
 		mCameraDelegator.addListener(listener)
 	}
 
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
 		mCameraDelegator.removeListener(listener)
 	}

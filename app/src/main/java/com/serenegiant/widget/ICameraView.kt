@@ -20,6 +20,7 @@ package com.serenegiant.widget
 
 import android.view.View
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 
 /**
  * CameraDelegatorの親Viewがサポートしないといけないインターフェースメソッド
@@ -32,8 +33,8 @@ interface ICameraView {
 
 	fun setVideoSize(width: Int, height: Int)
 
-	fun addListener(listener: CameraDelegator.OnFrameAvailableListener)
-	fun removeListener(listener: CameraDelegator.OnFrameAvailableListener)
+	fun addListener(listener: OnFrameAvailableListener)
+	fun removeListener(listener: OnFrameAvailableListener)
 
 	fun getScaleMode(): Int
 	fun setScaleMode(mode: Int)

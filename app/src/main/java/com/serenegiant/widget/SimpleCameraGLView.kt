@@ -30,6 +30,7 @@ import com.serenegiant.gl.GLUtils
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
+import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
 import java.lang.UnsupportedOperationException
 
@@ -171,7 +172,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 * ICameraViewの実装
 	 * @param listener
 	 */
-	override fun addListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun addListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "addListener:")
 		mCameraDelegator.addListener(listener)
 	}
@@ -180,7 +181,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	 * ICameraViewの実装
 	 * @param listener
 	 */
-	override fun removeListener(listener: CameraDelegator.OnFrameAvailableListener) {
+	override fun removeListener(listener: OnFrameAvailableListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:")
 		mCameraDelegator.removeListener(listener)
 	}
