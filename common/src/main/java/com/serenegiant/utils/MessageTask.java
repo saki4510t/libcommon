@@ -196,6 +196,7 @@ public abstract class MessageTask implements Runnable {
 	 * @param obj
 	 */
 	protected void init(final int arg1, final int arg2, @Nullable final Object obj) {
+		if (DEBUG) Log.v(TAG, "init:");
 		mFinished = false;
 		mRequestQueue.offer(obtain(REQUEST_TASK_START, arg1, arg2, obj));
 //		offer(REQUEST_TASK_START, arg1, arg2, obj);
@@ -251,6 +252,7 @@ public abstract class MessageTask implements Runnable {
 					break;
 				}
 			} // end of while
+			if (DEBUG) Log.v(TAG, "waitReady:" + mIsRunning);
 			return mIsRunning;
 		}
 	}
@@ -277,6 +279,7 @@ public abstract class MessageTask implements Runnable {
 
 	@Override
 	public void run() {
+		if (DEBUG) Log.v(TAG, "run:");
 		Request request = null;
 		mIsRunning = true;
 		mFinished = false;

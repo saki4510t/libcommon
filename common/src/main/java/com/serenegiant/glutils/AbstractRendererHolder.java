@@ -521,6 +521,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 		@Override
 		public void notifyParent(final boolean isRunning) {
+			if (DEBUG) Log.v(TAG, "notifyParent:" + isRunning);
 			synchronized (mParent.mSync) {
 				mParent.isRunning = isRunning;
 				mParent.mSync.notifyAll();
@@ -547,6 +548,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		@Override
 		protected void handleReCreateInputSurface() {
+			if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
 			makeCurrent();
 			handleReleaseInputSurface();
 			makeCurrent();
@@ -568,6 +570,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@WorkerThread
 		@Override
 		protected void handleReleaseInputSurface() {
+			if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
 			if (mInputSurface != null) {
 				try {
 					mInputSurface.release();
@@ -622,7 +625,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public Surface getSurface() {
-//			if (DEBUG) Log.v(TAG, "getSurface:" + mInputSurface);
+			if (DEBUG) Log.v(TAG, "getSurface:" + mInputSurface);
 			checkMasterSurface();
 			return mInputSurface;
 		}
@@ -632,7 +635,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @return
 		 */
 		public SurfaceTexture getSurfaceTexture() {
-//		if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mInputTexture);
+			if (DEBUG) Log.v(TAG, "getSurfaceTexture:" + mInputTexture);
 			checkMasterSurface();
 			return mInputTexture;
 		}

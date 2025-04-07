@@ -19,6 +19,7 @@ package com.serenegiant.egl;
 */
 
 import android.os.Process;
+import android.util.Log;
 
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLUtils;
@@ -93,6 +94,7 @@ public abstract class EglTask extends MessageTask {
 		@NonNull final GLContext glContext,
 		final int masterWidth, final int masterHeight) {
 
+		if (DEBUG) Log.v(TAG, "コンストラクタ");
 		mGLContext = glContext;
 		mMasterWidth = Math.max(masterWidth, 1);
 		mMasterHeight = Math.max(masterHeight, 1);
@@ -110,7 +112,7 @@ public abstract class EglTask extends MessageTask {
 	@Override
 	protected void onInit(final int flags,
 		final int maxClientVersion, final Object sharedContext) {
-
+		if (DEBUG) Log.v(TAG, "onInit:");
 		mGLContext.initialize(null, mMasterWidth, mMasterHeight, Process.THREAD_PRIORITY_DISPLAY);
 	}
 
