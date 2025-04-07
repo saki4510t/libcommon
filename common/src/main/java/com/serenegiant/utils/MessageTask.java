@@ -146,7 +146,8 @@ public abstract class MessageTask implements Runnable {
 	private final ReentrantReadWriteList<Request> mRequestPool;
 	@NonNull
 	private final LinkedBlockingDeque<Request> mRequestQueue;
-	private volatile boolean mIsRunning, mFinished;
+	private volatile boolean mIsRunning;
+	private volatile boolean mFinished;
 	private Thread mWorkerThread;
 	private long mWorkerThreadId;
 
@@ -186,6 +187,8 @@ public abstract class MessageTask implements Runnable {
 		for (int i = 0; i < init_num; i++) {
 			if (!mRequestPool.add(new Request())) break;
 		}
+		mIsRunning = false;
+		mFinished = false;
 	}
 
 	/**
@@ -281,7 +284,7 @@ public abstract class MessageTask implements Runnable {
 	public void run() {
 		if (DEBUG) Log.v(TAG, "run:");
 		Request request = null;
-		mIsRunning = true;
+		// ここでmIsRunning=trueにしてしまうと初期化・開始処理が終了する前に#waitReadyが抜けてしまうの
 		mFinished = false;
 		try {
 			// #initが呼ばれて最初のリクエストがくるのを待機する
@@ -291,29 +294,30 @@ public abstract class MessageTask implements Runnable {
 			mIsRunning = false;
 			mFinished = true;
 		}
-		synchronized (mSync) {
-			if (mIsRunning) {
-				mWorkerThread = Thread.currentThread();
-				mWorkerThreadId = mWorkerThread.getId();
-				try {
-					onInit(request.arg1, request.arg2, request.obj);
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-					mIsRunning = false;
-					mFinished = true;
-				}
+		if (!mFinished) {
+			mWorkerThread = Thread.currentThread();
+			mWorkerThreadId = mWorkerThread.getId();
+			try {
+				onInit(request.arg1, request.arg2, request.obj);
+			} catch (final Exception e) {
+				Log.w(TAG, e);
+				mIsRunning = false;
+				mFinished = true;
 			}
-			mSync.notifyAll();
 		}
-		if (mIsRunning) {
+		if (!mFinished) {
 			try {
 				onStart();
+				mIsRunning = true;
 			} catch (final Exception e) {
 				if (callOnError(e)) {
 					mIsRunning = false;
 					mFinished = true;
 				}
 			}
+		}
+		synchronized (mSync) {
+			mSync.notify();
 		}
 LOOP:	while (mIsRunning) {
 			try {
@@ -388,7 +392,7 @@ LOOP:	while (mIsRunning) {
 			// callOnError(e);
 		}
 		synchronized (mSync) {
-			mSync.notifyAll();
+			mSync.notify();
 		}
 	}
 
