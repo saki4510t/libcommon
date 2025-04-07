@@ -1,4 +1,4 @@
-package com.serenegiant.glutils;
+package com.serenegiant.media;
 /*
  * libcommon
  * utility/helper classes for myself

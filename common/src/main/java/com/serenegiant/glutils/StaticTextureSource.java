@@ -38,6 +38,7 @@ import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
+import com.serenegiant.media.OnFrameAvailableListener;
 
 /**
  * MediaCodecのデコーダーでデコードした動画やカメラからの映像の代わりに、

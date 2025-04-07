@@ -23,8 +23,8 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.ImageTextureSource;
-import com.serenegiant.glutils.OnFrameAvailableListener;
 import com.serenegiant.math.Fraction;
+import com.serenegiant.media.OnFrameAvailableListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;

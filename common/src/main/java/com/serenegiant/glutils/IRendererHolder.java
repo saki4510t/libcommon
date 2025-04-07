@@ -29,6 +29,7 @@ import android.view.Surface;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.math.Fraction;
+import com.serenegiant.media.OnFrameAvailableListener;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

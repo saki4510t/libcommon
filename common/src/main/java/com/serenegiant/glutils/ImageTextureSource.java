@@ -30,6 +30,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
+import com.serenegiant.media.OnFrameAvailableListener;
 
 import java.util.concurrent.locks.ReentrantLock;
 
