@@ -75,7 +75,7 @@ public class GLSurfaceReceiver {
 	 * #onFrameAvailableだけを後から差し替えれるようにCallbackインターフェースから分離
 	 * GLコンテキストを保持したスレッド上で実行される
 	 */
-	public interface FrameAvailableCallback {
+	public interface GLFrameAvailableCallback {
 		/**
 		 * 映像をテクスチャとして受け取ったときの処理
 		 * @param isGLES3
@@ -98,7 +98,7 @@ public class GLSurfaceReceiver {
 	 * WorkerThreadアノテーションの付いているインターフェースメソッドは全てGLコンテキストを
 	 * 保持したスレッド上で実行される
 	 */
-	public interface Callback extends FrameAvailableCallback {
+	public interface Callback extends GLFrameAvailableCallback {
 		@WorkerThread
 		public default void onInitialize() {}
 		/**
@@ -127,9 +127,9 @@ public class GLSurfaceReceiver {
 
 	public static class DefaultCallback implements Callback {
 		@NonNull
-		private final FrameAvailableCallback mFrameAvailableCallback;
-		public DefaultCallback(@NonNull final FrameAvailableCallback onFrameAvailableCallback) {
-			mFrameAvailableCallback = onFrameAvailableCallback;
+		private final GLFrameAvailableCallback mGLFrameAvailableCallback;
+		public DefaultCallback(@NonNull final GLFrameAvailableCallback onGLFrameAvailableCallback) {
+			mGLFrameAvailableCallback = onGLFrameAvailableCallback;
 		}
 
 		@Override
@@ -137,7 +137,7 @@ public class GLSurfaceReceiver {
 			final boolean isGLES3, final boolean isOES,
 			final int width, final int height,
 			final int texId, @NonNull final float[] texMatrix) {
-			mFrameAvailableCallback.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
+			mGLFrameAvailableCallback.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		}
 	}
 	/**
@@ -154,7 +154,7 @@ public class GLSurfaceReceiver {
 	@NonNull
 	private final Callback mCallback;
 	@NonNull
-	private FrameAvailableCallback mFrameAvailableCallback;
+	private GLFrameAvailableCallback mGLFrameAvailableCallback;
 	private volatile boolean mReleased = false;
 	private boolean mIsReceiverValid = false;
 
@@ -205,7 +205,7 @@ public class GLSurfaceReceiver {
 		mWidth = width;
 		mHeight = height;
 		mCallback = callback;
-		mFrameAvailableCallback = mCallback;
+		mGLFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
 		mGLHandler.postAtFrontOfQueue(() -> {
 			try {
@@ -268,13 +268,13 @@ public class GLSurfaceReceiver {
 	 *                 引き渡したコールバックの#onFrameAvailableは呼ばれない。
 	 *                 callbackがnullの場合はコンストラクタで引き渡したコールバックに戻る。
 	 */
-	public void setFrameAvailableCallback(@Nullable final FrameAvailableCallback callback) {
+	public void setFrameAvailableCallback(@Nullable final GLFrameAvailableCallback callback) {
 		if (mGLManager.isValid()) {
 			mGLHandler.post(() -> {
 				if (callback != null) {
-					mFrameAvailableCallback = callback;
+					mGLFrameAvailableCallback = callback;
 				} else {
-					mFrameAvailableCallback = mCallback;
+					mGLFrameAvailableCallback = mCallback;
 				}
 			});
 		}
@@ -535,7 +535,7 @@ public class GLSurfaceReceiver {
 			mGLManager.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
-			mFrameAvailableCallback.onFrameAvailable(isGLES3(), true, mWidth, mHeight, mTexId, mTexMatrix);
+			mGLFrameAvailableCallback.onFrameAvailable(isGLES3(), true, mWidth, mHeight, mTexId, mTexMatrix);
 		} catch (final Exception e) {
 			Log.e(TAG, "handleUpdateTexImageOnGL:thread id =" + Thread.currentThread().getId(), e);
 		}

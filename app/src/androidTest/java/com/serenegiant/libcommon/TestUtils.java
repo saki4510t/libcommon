@@ -304,7 +304,7 @@ LOOP:		for (int y = 0; y < height; y++) {
 		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(
 			manager,
 			width, height,
-			new GLSurfaceReceiver.DefaultCallback(new GLSurfaceReceiver.FrameAvailableCallback() {
+			new GLSurfaceReceiver.DefaultCallback(new GLSurfaceReceiver.GLFrameAvailableCallback() {
 				@Override
 				public void onFrameAvailable(
 					final boolean isGLES3, final boolean isOES,

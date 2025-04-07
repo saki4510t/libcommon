@@ -44,7 +44,7 @@ import androidx.annotation.WorkerThread;
  * テクスチャとして受け取った映像をSurfaceへ描画するためのクラスの基本部分を実装
  * AbstractRendererHolderの代替
  */
-public class GLSurfaceRenderer implements GLSurfaceReceiver.FrameAvailableCallback, IMirror {
+public class GLSurfaceRenderer implements GLSurfaceReceiver.GLFrameAvailableCallback, IMirror {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLSurfaceRenderer.class.getSimpleName();
 

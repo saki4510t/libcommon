@@ -204,7 +204,7 @@ public class ImageSourcePipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLSurfaceReceiver.FrameAvailableCallback callback = new GLSurfaceReceiver.FrameAvailableCallback() {
+		final GLSurfaceReceiver.GLFrameAvailableCallback callback = new GLSurfaceReceiver.GLFrameAvailableCallback() {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3, final boolean isOES,

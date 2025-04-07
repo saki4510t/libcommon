@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
  */
 @Deprecated
 public class GLImageReceiver extends GLSurfaceReceiver {
-	public interface FrameAvailableCallback extends GLSurfaceReceiver.FrameAvailableCallback {}
+	public interface FrameAvailableCallback extends GLFrameAvailableCallback {}
 	public interface Callback extends GLSurfaceReceiver.Callback {}
 
 	/**
