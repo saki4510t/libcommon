@@ -19,12 +19,8 @@ package com.serenegiant.glutils;
 */
 
 import android.annotation.SuppressLint;
-import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
-import android.opengl.GLES30;
-import android.opengl.Matrix;
-import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -38,16 +34,8 @@ import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.gl.ISurface;
-import com.serenegiant.graphics.BitmapHelper;
-import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
-
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 
 import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
@@ -58,21 +46,12 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = AbstractRendererHolder.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "RendererHolder";
-	private static final String CAPTURE_THREAD_NAME = "CaptureTask";
 
 	@NonNull
 	private final Object mSync = new Object();
 	@Nullable
 	private final RenderHolderCallback mCallback;
 	private volatile boolean isRunning;
-
-	@Nullable
-	private OutputStream mCaptureStream;
-	@StillCaptureFormat
-	private int mCaptureFormat;
-	@IntRange(from = 1L,to = 99L)
-	private int mCaptureCompression = DEFAULT_CAPTURE_COMPRESSION;
-	private OnCapturedListener mOnCapturedListener;
 	@NonNull
 	protected final BaseRendererTask mRendererTask;
 
@@ -98,7 +77,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			// 初期化に失敗した時
 			throw new RuntimeException("failed to start renderer thread");
 		}
-		startCaptureTask();
 	}
 
 //--------------------------------------------------------------------------------
@@ -330,48 +308,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		mRendererTask.queueEvent(task);
 	}
 
-	/**
-	 * パス文字列の拡張子を調べて静止画圧縮フォーマットを取得する。
-	 * jpeg(jpg)/png/webpのいずれでもなければIllegalArgumentExceptionを投げる
-	 * @param path
-	 * @return
-	 * @throws IllegalArgumentException
-	 */
-	@StillCaptureFormat
-	private static int getCaptureFormat(@NonNull final String path)
-		throws IllegalArgumentException {
-
-		int result;
-		final String _path = path.toLowerCase();
-		if (path.endsWith(".jpg") || path.endsWith(".jpeg")) {
-			result = OUTPUT_FORMAT_JPEG;
-		} else if (path.endsWith(".png")) {
-			result = OUTPUT_FORMAT_PNG;
-		} else if (path.endsWith(".webp")) {
-			result = OUTPUT_FORMAT_WEBP;
-		} else {
-			throw new IllegalArgumentException("unknown compress format(extension)");
-		}
-		return result;
-	}
-	
-	/**
-	 * 静止画圧縮フォーマットをBitmap.CompressFormatに変換する
-	 * @param captureFormat
-	 * @return
-	 */
-	private static Bitmap.CompressFormat getCaptureFormat(
-		@StillCaptureFormat final int captureFormat) {
-
-		Bitmap.CompressFormat result = switch (captureFormat) {
-			case OUTPUT_FORMAT_PNG -> Bitmap.CompressFormat.PNG;
-			case OUTPUT_FORMAT_WEBP -> Bitmap.CompressFormat.WEBP;
-			case OUTPUT_FORMAT_JPEG -> Bitmap.CompressFormat.JPEG;
-			default -> Bitmap.CompressFormat.JPEG;
-		};
-		return result;
-	}
-
 //--------------------------------------------------------------------------------
 
 	/**
@@ -389,28 +325,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags);
 	
-//--------------------------------------------------------------------------------
-	protected void startCaptureTask() {
-		new Thread(mCaptureTask, CAPTURE_THREAD_NAME).start();
-		synchronized (mSync) {
-			if (!isRunning) {
-				try {
-					mSync.wait();
-				} catch (final InterruptedException e) {
-					// ignore
-				}
-			}
-		}
-	}
-	
-	protected void notifyCapture() {
-//		if (DEBUG) Log.v(TAG, "notifyCapture:");
-		synchronized (mSync) {
-			// キャプチャタスクに映像が更新されたことを通知
-			mSync.notify();
-		}
-	}
-
 //--------------------------------------------------------------------------------
 	protected void callOnCreate(Surface surface) {
 		if (mCallback != null) {
@@ -624,7 +538,6 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 			super.handleDrawTargets(isOES, texId, texMatrix);
-			mParent.notifyCapture();
 		}
 
 		/**
@@ -760,260 +673,5 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		}
 
 	}	// BaseRendererTask
-
-//--------------------------------------------------------------------------------
-
-	protected void setupCaptureDrawer(final GLDrawer2D drawer) {
-	}
-	
-	/**
-	 * 静止画を非同期でキャプチャするためのRunnable
-	 */
-	private final Runnable mCaptureTask = new Runnable() {
-		private GLContext mContext;
-		private ISurface captureSurface;
-		private GLDrawer2D drawer;
-		@Size(min=16)
-		@NonNull
-		private final float[] mMvpMatrix = new float[16];
-
-    	@Override
-		public void run() {
-//			if (DEBUG) Log.v(TAG, "captureTask start");
-			synchronized (mSync) {
-				// 描画スレッドが実行されるまで待機
-				for (; !isRunning && !mRendererTask.isFinished(); ) {
-					try {
-						mSync.wait(1000);
-					} catch (final InterruptedException e) {
-						break;
-					}
-				}
-			}
-			if (isRunning) {
-				init();
-				try {
-					if (mContext.isOES3Supported()) {
-						captureLoopGLES3();
-					} else {
-						captureLoopGLES2();
-					}
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				} finally {
-					// release resources
-					release();
-				}
-			}
-//			if (DEBUG) Log.v(TAG, "captureTask finished");
-		}
-
-		private final void init() {
-			mContext = new GLContext(mRendererTask.getGLContext());
-			mContext.initialize();
-	    	captureSurface = mContext.getEgl().createOffscreen(
-	    		mRendererTask.width(), mRendererTask.height());
-			Matrix.setIdentityM(mMvpMatrix, 0);
-			drawer = GLDrawer2D.create(mContext.isOES3Supported(), true);
-			setupCaptureDrawer(drawer);
-		}
-
-		private final void captureLoopGLES2() {
-			int width = -1, height = -1;
-			ByteBuffer buf = null;
-			int captureCompression = DEFAULT_CAPTURE_COMPRESSION;
-//			if (DEBUG) Log.v(TAG, "captureTask loop");
-			for (; isRunning ;) {
-				synchronized (mSync) {
-					if (mCaptureStream == null) {
-						try {
-							mSync.wait();
-						} catch (final InterruptedException e) {
-							break;
-						}
-						if (mCaptureStream != null) {
-//							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
-							captureCompression = mCaptureCompression;
-							if ((captureCompression <= 0) || (captureCompression >= 100)) {
-								captureCompression = 90;
-							}
-						} else {
-							// 起床されたけどmCaptureStreamがnullだった
-							continue;
-						}
-					}
-					if (DEBUG) Log.v(TAG, "#captureLoopGLES2:start capture");
-					boolean success = false;
-					if ((buf == null)
-						|| (width != mRendererTask.width())
-						|| (height != mRendererTask.height())) {
-
-						width = mRendererTask.width();
-						height = mRendererTask.height();
-						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-						buf = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
-				    	if (captureSurface != null) {
-				    		captureSurface.release();
-				    		captureSurface = null;
-				    	}
-				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
-					}
-					if (isRunning && (width > 0) && (height > 0)) {
-						MatrixUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
-						mMvpMatrix[5] *= -1.0f;	// flip up-side down
-						drawer.setMvpMatrix(mMvpMatrix, 0);
-						captureSurface.makeCurrent();
-						drawer.draw(GLES20.GL_TEXTURE0, mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
-						captureSurface.swap();
-				        buf.clear();
-				        GLES20.glReadPixels(0, 0, width, height,
-				        	GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, buf);
-//				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
-				        final Bitmap.CompressFormat compressFormat
-				        	= getCaptureFormat(mCaptureFormat);
-						try {
-					        try {
-					            final Bitmap bmp = Bitmap.createBitmap(
-					            	width, height, Bitmap.Config.ARGB_8888);
-						        buf.clear();
-					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
-					            bmp.recycle();
-								mCaptureStream.flush();
-								success = true;
-					        } finally {
-					            mCaptureStream.close();
-					        }
-						} catch (final IOException e) {
-							Log.w(TAG, "failed to save file", e);
-						}
-					} else if (isRunning) {
-						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
-					}
-					if (DEBUG) Log.i(TAG, "#captureLoopGLES2:静止画撮影終了");
-					mCaptureStream = null;
-					if (mOnCapturedListener != null) {
-						try {
-							mOnCapturedListener.onCaptured(AbstractRendererHolder.this, success);
-						} catch (final Exception e) {
-							if (DEBUG) Log.w(TAG, e);
-						}
-					}
-					mOnCapturedListener = null;
-					mSync.notifyAll();
-				}	// end of synchronized (mSync)
-			}	// end of for (; isRunning ;)
-			synchronized (mSync) {
-				mSync.notifyAll();
-			}
-		}
-
-		private final void captureLoopGLES3() {
-			int width = -1, height = -1;
-			ByteBuffer buf = null;
-			int captureCompression = 90;
-//			if (DEBUG) Log.v(TAG, "captureTask loop");
-			for (; isRunning ;) {
-				synchronized (mSync) {
-					if (mCaptureStream == null) {
-						try {
-							mSync.wait();
-						} catch (final InterruptedException e) {
-							break;
-						}
-						if (mCaptureStream != null) {
-//							if (DEBUG) Log.i(TAG, "静止画撮影要求を受け取った");
-							captureCompression = mCaptureCompression;
-							if ((captureCompression <= 0) || (captureCompression >= 100)) {
-								captureCompression = 90;
-							}
-						} else {
-							// 起床されたけどmCaptureStreamがnullだった
-							continue;
-						}
-					}
-					if (DEBUG) Log.v(TAG, "#captureLoopGLES3:start capture");
-					boolean success = false;
-					if ((buf == null)
-						|| (width != mRendererTask.width())
-						|| (height != mRendererTask.height())) {
-
-						width = mRendererTask.width();
-						height = mRendererTask.height();
-						final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-						buf = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
-				    	if (captureSurface != null) {
-				    		captureSurface.release();
-				    		captureSurface = null;
-				    	}
-				    	captureSurface = mContext.getEgl().createOffscreen(width, height);
-					}
-					if (isRunning && (width > 0) && (height > 0)) {
-						MatrixUtils.setMirror(mMvpMatrix, mRendererTask.getMirror());
-						mMvpMatrix[5] *= -1.0f;	// flip up-side down
-						drawer.setMvpMatrix(mMvpMatrix, 0);
-						captureSurface.makeCurrent();
-						drawer.draw(GLES20.GL_TEXTURE0, mRendererTask.mTexId, mRendererTask.mTexMatrix, 0);
-						captureSurface.swap();
-				        buf.clear();
-						// FIXME これはGL|ES3のPBOとglMapBufferRange/glUnmapBufferを使うように変更する
-				        GLES30.glReadPixels(0, 0, width, height,
-							GLES30.GL_RGBA, GLES30.GL_UNSIGNED_BYTE, buf);
-//				        if (DEBUG) Log.v(TAG, "save pixels to file:" + captureFile);
-						final Bitmap.CompressFormat compressFormat
-							= getCaptureFormat(mCaptureFormat);
-						try {
-					        try {
-					            final Bitmap bmp = Bitmap.createBitmap(
-					            	width, height, Bitmap.Config.ARGB_8888);
-						        buf.clear();
-					            bmp.copyPixelsFromBuffer(buf);
-					            bmp.compress(compressFormat, captureCompression, mCaptureStream);
-					            bmp.recycle();
-								mCaptureStream.flush();
-								success = true;
-					        } finally {
-					            mCaptureStream.close();
-					        }
-						} catch (final IOException e) {
-							Log.w(TAG, "failed to save file", e);
-						}
-					} else if (isRunning) {
-						Log.w(TAG, "#captureLoopGLES3:unexpectedly width/height is zero");
-					}
-					if (DEBUG) Log.i(TAG, "#captureLoopGLES3:静止画撮影終了");
-					mCaptureStream = null;
-					if (mOnCapturedListener != null) {
-						try {
-							mOnCapturedListener.onCaptured(AbstractRendererHolder.this, success);
-						} catch (final Exception e) {
-							if (DEBUG) Log.w(TAG, e);
-						}
-					}
-					mOnCapturedListener = null;
-					mSync.notifyAll();
-				}	// end of synchronized (mSync)
-			}	// end of for (; isRunning ;)
-			synchronized (mSync) {
-				mSync.notifyAll();
-			}
-		}
-
-		private void release() {
-			if (captureSurface != null) {
-				captureSurface.makeCurrent();
-				captureSurface.release();
-				captureSurface = null;
-			}
-			if (drawer != null) {
-				drawer.release();
-				drawer = null;
-			}
-			if (mContext != null) {
-				mContext.release();
-				mContext = null;
-			}
-		}
-	};	// mCaptureTask
 
 }
