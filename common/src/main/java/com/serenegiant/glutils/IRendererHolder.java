@@ -19,7 +19,6 @@ package com.serenegiant.glutils;
 */
 
 import android.graphics.SurfaceTexture;
-import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -31,23 +30,11 @@ import com.serenegiant.gl.GLContext;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.OnFrameAvailableListener;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-
 /**
  * 分配描画インターフェース
  * FIXME GLPipeline/IPipelineSourceを使うIRendererHolder実装を作る
  */
 public interface IRendererHolder extends IMirror {
-	public static final int DEFAULT_CAPTURE_COMPRESSION = 80;
-
-	public static final int OUTPUT_FORMAT_JPEG = 0;	// Bitmap.CompressFormat.JPEG
-	public static final int OUTPUT_FORMAT_PNG = 1;	// Bitmap.CompressFormat.PNG
-	public static final int OUTPUT_FORMAT_WEBP = 2;	// Bitmap.CompressFormat.WEBP
-
-	@IntDef({OUTPUT_FORMAT_JPEG, OUTPUT_FORMAT_PNG, OUTPUT_FORMAT_WEBP})
-	@Retention(RetentionPolicy.SOURCE)
-	public @interface StillCaptureFormat {}
 
 	/**
 	 * IRendererHolderからのコールバックリスナー
@@ -55,10 +42,6 @@ public interface IRendererHolder extends IMirror {
 	public interface RenderHolderCallback extends OnFrameAvailableListener {
 		public default void onCreateSurface(Surface surface) {}
 		public default void onDestroySurface() {}
-	}
-
-	public interface OnCapturedListener {
-		public void onCaptured(@NonNull final IRendererHolder rendererHolder, final boolean success);
 	}
 
 	public static class DefaultRenderHolderCallback implements RenderHolderCallback {
