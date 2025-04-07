@@ -21,13 +21,11 @@ package com.serenegiant.glutils;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 import android.util.Log;
-import android.view.Choreographer;
 
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLTexture;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.OnFrameAvailableListener;
@@ -50,10 +48,6 @@ public class ImageTextureSource implements GLConst, IMirror {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = ImageTextureSource.class.getSimpleName();
 
-	private static final int DEFAULT_WIDTH = 640;
-	private static final int DEFAULT_HEIGHT = 480;
-	private static final float DEFAULT_FPS = 30.0f;
-
 	/**
 	 * 排他制御用
 	 */
@@ -61,15 +55,10 @@ public class ImageTextureSource implements GLConst, IMirror {
 	private final ReentrantLock mLock = new ReentrantLock();
 	@NonNull
 	private final GLManager mManager;
+	@NonNull
+	private final GLTextureSource mSource;
 	@Nullable
 	private OnFrameAvailableListener mListener;
-	@Nullable
-	private GLTexture mImageSource;
-	private volatile long mFrameIntervalNs;
-	private long mFirstTimeNs;
-	private long mNumFrames;
-	private volatile boolean mReleased = false;
-	private int mWidth, mHeight;
 	@Nullable
 	private GLDrawer2D mDrawer;
 	@Nullable
@@ -103,15 +92,17 @@ public class ImageTextureSource implements GLConst, IMirror {
 		@Nullable OnFrameAvailableListener listener) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
+		mSource = new GLTextureSource(manager, bitmap, fps, new GLFrameAvailableCallback() {
+			@Override
+			public void onFrameAvailable(
+				final boolean isGLES3, final boolean isOES,
+				final int width, final int height,
+				final int texId, @Size(min=16) @NonNull final float[] texMatrix) {
+				ImageTextureSource.this.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
+			}
+		});
 		mManager = manager;
 		mListener = listener;
-		mWidth = DEFAULT_WIDTH;
-		mHeight = DEFAULT_HEIGHT;
-		if (bitmap != null) {
-			mManager.runOnGLThread(() -> {
-				createImageSource(bitmap, fps);
-			});
-		}
 	}
 
 	@Override
@@ -124,16 +115,13 @@ public class ImageTextureSource implements GLConst, IMirror {
 	}
 
 	public final void release() {
-		if (!mReleased) {
-			mReleased = true;
-			internalRelease();
-		}
+		mSource.release();
+		internalRelease();
 	}
 
 	protected void internalRelease() {
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
-				releaseImageSource();
 				releaseTarget();
 			});
 		}
@@ -151,15 +139,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * @throws IllegalStateException
 	 */
 	public int getTexId() throws IllegalStateException {
-		mLock.lock();
-		try {
-			if (!isValid() || (mImageSource == null)) {
-				throw new IllegalStateException("already released or image not set yet.");
-			}
-			return mImageSource != null ? mImageSource.getTexId() : 0;
-		} finally {
-			mLock.unlock();
-		}
+		return mSource.getTexId();
 	}
 
 	/**
@@ -171,27 +151,19 @@ public class ImageTextureSource implements GLConst, IMirror {
 	@Size(min=16)
 	@NonNull
 	public float[] getTexMatrix() throws IllegalStateException {
-		mLock.lock();
-		try {
-			if (!isValid() || (mImageSource == null)) {
-				throw new IllegalStateException("already released or image not set yet.");
-			}
-			return mImageSource.getTexMatrix();
-		} finally {
-			mLock.unlock();
-		}
+		return mSource.getTexMatrix();
 	}
 
 	public boolean isValid() {
-		return !mReleased && mManager.isValid();
+		return mSource.isValid();
 	}
 
 	public int getWidth() {
-		return mWidth;
+		return mSource.getWidth();
 	}
 
 	public int getHeight() {
-		return mHeight;
+		return mSource.getHeight();
 	}
 
 	public boolean hasSurface() {
@@ -237,18 +209,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * @param fps
 	 */
 	public void setSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
-		mManager.runOnGLThread(() -> {
-			mLock.lock();
-			try {
-				if (bitmap == null) {
-					releaseImageSource();
-				} else {
-					createImageSource(bitmap, fps);
-				}
-			} finally {
-				mLock.unlock();
-			}
-		});
+		mSource.setSource(bitmap, fps);
 	}
 
 	/**
@@ -289,20 +250,31 @@ public class ImageTextureSource implements GLConst, IMirror {
 	}
 
 	/**
-	 * 描画処理
-	 * Choreographer.FrameCallbackからmImageSource != nullのときだけ呼ばれる
+	 * 映像をテクスチャとして受け取ったときの処理
+	 * @param isGLES3
+	 * @param isOES
+	 * @param width
+	 * @param height,
+	 * @param texId
+	 * @param texMatrix
 	 */
 	@WorkerThread
-	private void onFrameAvailable(final int texId, final float[] texMatrix) {
+	private void onFrameAvailable(
+		final boolean isGLES3,
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @Size(min=16) @NonNull final float[] texMatrix) {
 		if (isValid()) {
 			@NonNull
 			final GLDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
+			@Nullable OnFrameAvailableListener listener;
 			mLock.lock();
 			try {
 				drawer = mDrawer;
 				target = mRendererTarget;
+				listener = mListener;
 			} finally {
 				mLock.unlock();
 			}
@@ -311,81 +283,10 @@ public class ImageTextureSource implements GLConst, IMirror {
 				&& target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 			}
-		}
-	}
-
-	/**
-	 * 描画処理(黒で塗りつぶすだけ)
-	 * Choreographer.FrameCallbackからmImageSource == nullのときだけ呼ばれる
-	 */
-	@WorkerThread
-	private void onFrameAvailable() {
-		if (isValid()) {
-			@Nullable
-			final RendererTarget target;
-			mLock.lock();
-			try {
-				target = mRendererTarget;
-			} finally {
-				mLock.unlock();
-			}
-			if ((target != null)
-				&& target.canDraw()) {
-				target.clear(0);
+			if (listener != null) {
+				listener.onFrameAvailable();
 			}
 		}
-	}
-
-	/**
-	 * 映像ソース用のGLTextureを破棄する
-	 */
-	@WorkerThread
-	private void releaseImageSource() {
-		mManager.removeFrameCallback(mFrameCallback);
-		mLock.lock();
-		try {
-			if (mImageSource != null) {
-				if (DEBUG) Log.v(TAG, "releaseImageSource:");
-				mImageSource.release();
-				mImageSource = null;
-			}
-		} finally {
-			mLock.unlock();
-		}
-	}
-
-	/**
-	 * 映像ソース用のGLTextureを生成する
-	 * @param bitmap
-	 * @param fps
-	 */
-	@WorkerThread
-	private void createImageSource(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
-		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap + ",fps=" + fps);
-		mManager.removeFrameCallback(mFrameCallback);
-		final int width = bitmap.getWidth();
-		final int height = bitmap.getHeight();
-		final boolean needResize = (getWidth() != width) || (getHeight() != height);
-		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
-		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
-		mLock.lock();
-		try {
-			if ((mImageSource == null) || needResize) {
-				releaseImageSource();
-				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
-				GLUtils.checkGlError("createImageSource");
-			}
-			mImageSource.loadBitmap(bitmap);
-			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
-			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
-			mWidth = width;
-			mHeight = height;
-		} finally {
-			mLock.unlock();
-		}
-		mFirstTimeNs = -1L;
-		mNumFrames = 0;
-		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
 	/**
@@ -450,41 +351,4 @@ public class ImageTextureSource implements GLConst, IMirror {
 			}
 		}
 	}
-
-	/**
-	 * 一定時間毎にonFrameAvailableを呼び出すためのChoreographer.FrameCallback実装
-	 */
-	private final Choreographer.FrameCallback mFrameCallback
-		= new Choreographer.FrameCallback() {
-		@WorkerThread
-		@Override
-		public void doFrame(final long frameTimeNanos) {
-			if (isValid()) {
-				final long n = (++mNumFrames);
-				if (mFirstTimeNs < 0) {
-					mFirstTimeNs = frameTimeNanos;
-				}
-				long ms = (mFirstTimeNs + mFrameIntervalNs * (n + 1) - frameTimeNanos) / 1000000L;
-				if (ms < 5L) {
-					ms = 0L;
-				}
-				mManager.postFrameCallbackDelayed(this, ms);
-				final OnFrameAvailableListener listener;
-				mLock.lock();
-				try {
-					listener = mListener;
-					if (mImageSource != null) {
-						onFrameAvailable(mImageSource.getTexId(), mImageSource.getTexMatrix());
-					} else {
-						onFrameAvailable();
-					}
-				} finally {
-					mLock.unlock();
-				}
-				if (listener != null) {
-					listener.onFrameAvailable();
-				}
-			}
-		}
-	};
 }
