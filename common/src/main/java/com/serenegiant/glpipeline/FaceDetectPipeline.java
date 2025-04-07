@@ -168,21 +168,18 @@ public class FaceDetectPipeline extends ProxyPipeline {
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix) {
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
-		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		if (isActive()) {
-			final int width;
-			final int height;
 			@NonNull
 			final GLDrawer2D drawer;
 			@Nullable
 			final RendererTarget target;
 			mLock.lock();
 			try {
-				width = getWidth();
-				height = getHeight();
 				if ((mDrawer == null) || isOES != mDrawer.isOES()) {
 					// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 					if (mDrawer != null) {

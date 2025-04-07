@@ -212,8 +212,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix) {
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
@@ -248,13 +249,13 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 				Log.v(TAG, "onFrameAvailable:effectOnly," + cnt);
 			}
 			// 映像効果付与したテクスチャを次へ渡す
-			super.onFrameAvailable(isGLES3, work.isOES(), work.getTexId(), work.getTexMatrix());
+			super.onFrameAvailable(isGLES3, work.isOES(), width, height, work.getTexId(), work.getTexMatrix());
 		} else {
 			if (DEBUG && (++cnt % 100) == 0) {
 				Log.v(TAG, "onFrameAvailable:" + cnt);
 			}
 			// こっちはオリジナルのテクスチャを渡す
-			super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		}
 	}
 

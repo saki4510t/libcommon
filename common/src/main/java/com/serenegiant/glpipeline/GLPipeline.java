@@ -21,6 +21,7 @@ package com.serenegiant.glpipeline;
 import android.util.Log;
 
 import com.serenegiant.gl.GLConst;
+import com.serenegiant.glutils.GLFrameAvailableCallback;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -28,13 +29,11 @@ import java.lang.annotation.RetentionPolicy;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.annotation.Size;
-import androidx.annotation.WorkerThread;
 
 /**
  * 映像受け取り・映像効果付与・プレビュー表示等を動的に組み合わせて逐次処理するためのインターフェース定義
  */
-public interface GLPipeline extends GLConst {
+public interface GLPipeline extends GLConst, GLFrameAvailableCallback {
 	static final String TAG = GLPipeline.class.getSimpleName();
 
 	/**
@@ -145,19 +144,6 @@ public interface GLPipeline extends GLConst {
 	 * 自分が最上位だとすべてのパイプラインが開放される
 	 */
 	public void remove();
-
-	/**
-	 * 新しく映像を受け取ったときの処理
-	 * @param isGLES3
-	 * @param isOES
-	 * @param texId
-	 * @param texMatrix
-	 */
-	@WorkerThread
-	public void onFrameAvailable(
-		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix);
 
 	/**
 	 * パイプラインチェーンからパイプラインが削除されたので更新要求する

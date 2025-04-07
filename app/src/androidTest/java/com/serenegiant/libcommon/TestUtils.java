@@ -357,9 +357,10 @@ LOOP:		for (int y = 0; y < height; y++) {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 				if (cnt.incrementAndGet() == numFrames) {
 					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 					result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));

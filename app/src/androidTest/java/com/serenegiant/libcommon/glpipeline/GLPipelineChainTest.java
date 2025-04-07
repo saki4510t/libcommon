@@ -39,6 +39,9 @@ import static com.serenegiant.libcommon.TestUtils.*;
 public class GLPipelineChainTest {
 	private static final String TAG = GLPipelineChainTest.class.getSimpleName();
 
+	private static final int WIDTH = 100;
+	private static final int HEIGHT = 100;
+
 	/**
 	 * パイプラインの接続・切断・検索が正常に動作するかどうかを確認
 	 */
@@ -111,19 +114,22 @@ public class GLPipelineChainTest {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 				cnt1.incrementAndGet();
 			}
 		};
 		final AtomicInteger cnt2 = new AtomicInteger();
 		final ProxyPipeline dst2 = new ProxyPipeline() {
+			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 				cnt2.incrementAndGet();
 			}
 		};
@@ -132,9 +138,10 @@ public class GLPipelineChainTest {
 			@Override
 			public void onFrameAvailable(
 				final boolean isGLES3,
-				final boolean isOES, final int texId,
-				@NonNull final float[] texMatrix) {
-				super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+				final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 				cnt3.incrementAndGet();
 			}
 		};
@@ -144,7 +151,7 @@ public class GLPipelineChainTest {
 		final int LOOP_NUM = 10;
 		final float[] texMatrix = new float[16];
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false, WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM, cnt1.get());
 		assertEquals(0, cnt2.get());
@@ -152,7 +159,7 @@ public class GLPipelineChainTest {
 
 		dst1.setPipeline(dst2);
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false, WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 2, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -160,7 +167,7 @@ public class GLPipelineChainTest {
 
 		dst2.setPipeline(dst3);
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false,  WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 3, cnt1.get());
 		assertEquals(LOOP_NUM * 2, cnt2.get());
@@ -170,7 +177,7 @@ public class GLPipelineChainTest {
 		cnt1.set(0); cnt2.set(0); cnt3.set(0);
 
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false,  WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -179,7 +186,7 @@ public class GLPipelineChainTest {
 		// 中間のパイプラインを除去したときに正常に動作するかどうかを確認
 		dst2.remove();
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false,  WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 2, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());
@@ -188,7 +195,7 @@ public class GLPipelineChainTest {
 		// 一番後ろのパイプライを除去したときに正常に動作するかどうかを確認
 		dst3.remove();
 		for (int i = 0; i < LOOP_NUM; i++) {
-			src.onFrameAvailable(false, false, 0, texMatrix);
+			src.onFrameAvailable(false, false, WIDTH, HEIGHT, 0, texMatrix);
 		}
 		assertEquals(LOOP_NUM * 3, cnt1.get());
 		assertEquals(LOOP_NUM, cnt2.get());

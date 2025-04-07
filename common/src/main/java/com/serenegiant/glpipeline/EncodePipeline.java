@@ -245,8 +245,9 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix) {
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 		@Nullable
 		final GLPipeline pipeline;
@@ -272,7 +273,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 		}
 		if (pipeline != null) {
 			// 次のGLPipelineへつなぐ
-			pipeline.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+			pipeline.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		}
 		if (!mReleased && !isRequestStop()) {
 			if ((target != null)

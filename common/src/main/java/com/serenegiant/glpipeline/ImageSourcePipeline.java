@@ -74,7 +74,9 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			public void onFrameAvailable() {
 				if (isActive()) {
 					ImageSourcePipeline.this.onFrameAvailable(
-						mManager.isGLES3(), false, mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
+						mManager.isGLES3(), false,
+						getWidth(), getHeight(),
+						mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
 				}
 			}
 		});
@@ -148,8 +150,9 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix) {
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 		mLock.lock();
 		try {
@@ -167,7 +170,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 			resize(mWidth, mHeight);
 		}
 
-		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 	}
 
 	/**

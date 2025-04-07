@@ -33,10 +33,11 @@ class OnFramePipeline(private val mListener: GLFrameAvailableCallback)
 : ProxyPipeline() {
 	override fun onFrameAvailable(
 		isGLES3: Boolean,
-		isOES: Boolean, texId: Int,
-		@Size(min = 16) texMatrix: FloatArray) {
+		isOES: Boolean,
+		width: Int, height: Int,
+		texId: Int, @Size(min = 16) texMatrix: FloatArray) {
 
-		super.onFrameAvailable(isGLES3, isOES, texId, texMatrix)
+		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix)
 		mListener.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix)
 	}
 }

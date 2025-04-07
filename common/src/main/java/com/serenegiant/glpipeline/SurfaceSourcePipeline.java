@@ -312,7 +312,10 @@ public class SurfaceSourcePipeline extends ProxyPipeline implements GLPipelineSu
 			mInputTexture.getTransformMatrix(mTexMatrix);
 			GLES20.glFlush();
 			ThreadUtils.NoThrowSleep(0, 0);
-			onFrameAvailable( mManager.isGLES3(), true, mTexId, mTexMatrix);
+			onFrameAvailable(
+				mManager.isGLES3(), true,
+				getWidth(), getHeight(),
+				mTexId, mTexMatrix);
 		}
 	}
 

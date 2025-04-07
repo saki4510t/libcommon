@@ -288,8 +288,9 @@ public class DrawerPipeline extends ProxyPipeline
 	@Override
 	public void onFrameAvailable(
 		final boolean isGLES3,
-		final boolean isOES, final int texId,
-		@NonNull @Size(min=16) final float[] texMatrix) {
+		final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
@@ -323,10 +324,13 @@ public class DrawerPipeline extends ProxyPipeline
 		}
 		if (mPathThrough || (mOffscreenTarget == null)) {	// mOffscreenSurfaceのnullチェックはバグ避け
 			// こっちはオリジナルのテクスチャを渡す
-			super.onFrameAvailable(isGLES3, isOES, texId, texMatrix);
+			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		} else {
 			// 描画処理した後のたテクスチャを次へ渡す
-			super.onFrameAvailable(isGLES3, mOffscreenSurface.isOES(), mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
+			super.onFrameAvailable(
+				isGLES3, mOffscreenSurface.isOES(),
+				width, height,
+				mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
 		}
 		if (DEBUG && (++cnt % 100) == 0) {
 			Log.v(TAG, "onFrameAvailable:path through=" + mPathThrough + "," + cnt);
