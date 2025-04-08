@@ -502,6 +502,11 @@ public class RendererHolderNewTest {
 				} finally {
 					inputSurface.release();
 				}
+				// XXX #resetかclearSurfaceAllを入れないと2巡目でエラーになる
+				//     #getSurface/#getSurfaceTexture内でclearSurfaceAllを
+				//     呼んでもだめだった
+//				rendererHolder.reset();
+				rendererHolder.clearSurfaceAll(0xff000000);
 				ThreadUtils.NoThrowSleep(100L);
 			}
 		} finally {
