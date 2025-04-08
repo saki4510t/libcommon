@@ -124,7 +124,7 @@ public class GLTextureSource implements GLConst {
 
 	protected void internalRelease() {
 		if (isValid()) {
-			mManager.runOnGLThread(() -> {
+			mManager.getGLHandler().postAtFrontOfQueue(() -> {
 				releaseImageSourceOnGL();
 			});
 		}
