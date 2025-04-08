@@ -180,8 +180,8 @@ public class GLSurfaceReceiver {
 		};
 		mGLManager = glManager;
 		mGLHandler = glManager.createGLHandler(handlerCallback);
-		mWidth = width;
-		mHeight = height;
+		mWidth = Math.max(width, 1);
+		mHeight = Math.max(height, 1);
 		mCallback = callback;
 		mGLFrameAvailableCallback = mCallback;
 		final Semaphore sem = new Semaphore(0);	// CountdownLatchの方が良いかも?
