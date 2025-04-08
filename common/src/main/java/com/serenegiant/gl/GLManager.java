@@ -487,13 +487,15 @@ public class GLManager {
 	 * GLコンテキスト上で実行されるChoreographer.FrameCallbackをpostする
 	 * @param callback
 	 * @param delayMs
+	 * @return true: GLワーカースレッドへpostした, false: 既にGLワーカースレッド上なので現在のスレッド上で実行要求した
 	 * @throws IllegalStateException
 	 */
-	public void postFrameCallbackDelayed(
+	public boolean postFrameCallbackDelayed(
 		@NonNull final Choreographer.FrameCallback callback,
 		final long delayMs) throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "postFrameCallbackDelayed:");
+		boolean result = false;
 		mLock.lock();
 		try {
 			checkValid();
@@ -502,6 +504,7 @@ public class GLManager {
 				Choreographer.getInstance().postFrameCallbackDelayed(callback, delayMs);
 			} else {
 				// 別スレッド上にいるならGLスレッド上へ投げる
+				result = true;
 				mGLHandler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -512,6 +515,8 @@ public class GLManager {
 		} finally {
 			mLock.unlock();
 		}
+
+		return result;
 	}
 
 	/**
