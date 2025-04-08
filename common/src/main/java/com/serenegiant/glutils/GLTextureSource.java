@@ -248,6 +248,7 @@ public class GLTextureSource implements GLConst {
 		mManager.removeFrameCallback(mFrameCallback);
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
+		if ((width <= 0) || (height <= 0)) return;
 		final boolean needResize = (mWidth != width) || (mHeight != height);
 		final float _fps = fps != null ? fps.asFloat() : DEFAULT_FPS;
 		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
