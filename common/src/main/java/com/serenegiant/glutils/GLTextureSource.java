@@ -101,7 +101,7 @@ public class GLTextureSource implements GLConst {
 		mHeight = DEFAULT_HEIGHT;
 		if (bitmap != null) {
 			mManager.runOnGLThread(() -> {
-				createImageSource(bitmap, fps);
+				createImageSourceOnGL(bitmap, fps);
 			});
 		}
 	}
@@ -125,7 +125,7 @@ public class GLTextureSource implements GLConst {
 	protected void internalRelease() {
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
-				releaseImageSource();
+				releaseImageSourceOnGL();
 			});
 		}
 	}
@@ -195,9 +195,9 @@ public class GLTextureSource implements GLConst {
 			mLock.lock();
 			try {
 				if (bitmap == null) {
-					releaseImageSource();
+					releaseImageSourceOnGL();
 				} else {
-					createImageSource(bitmap, fps);
+					createImageSourceOnGL(bitmap, fps);
 				}
 			} finally {
 				mLock.unlock();
@@ -223,7 +223,7 @@ public class GLTextureSource implements GLConst {
 	 * 映像ソース用のGLTextureを破棄する
 	 */
 	@WorkerThread
-	private void releaseImageSource() {
+	private void releaseImageSourceOnGL() {
 		mManager.removeFrameCallback(mFrameCallback);
 		mLock.lock();
 		try {
@@ -243,7 +243,7 @@ public class GLTextureSource implements GLConst {
 	 * @param fps
 	 */
 	@WorkerThread
-	private void createImageSource(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
+	private void createImageSourceOnGL(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
 		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap + ",fps=" + fps);
 		mManager.removeFrameCallback(mFrameCallback);
 		final int width = bitmap.getWidth();
@@ -254,7 +254,7 @@ public class GLTextureSource implements GLConst {
 		mLock.lock();
 		try {
 			if ((mImageSource == null) || needResize) {
-				releaseImageSource();
+				releaseImageSourceOnGL();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
 				GLUtils.checkGlError("createImageSource");
 			}
