@@ -223,15 +223,17 @@ public class GLTextureSource implements GLConst {
 	@WorkerThread
 	private void releaseImageSourceOnGL() {
 		mManager.removeFrameCallback(mFrameCallback);
+		final GLTexture source;
 		mLock.lock();
 		try {
-			if (mImageSource != null) {
-				if (DEBUG) Log.v(TAG, "releaseImageSource:");
-				mImageSource.release();
-				mImageSource = null;
-			}
+			source = mImageSource;
+			mImageSource = null;
 		} finally {
 			mLock.unlock();
+		}
+		if (source != null) {
+			if (DEBUG) Log.v(TAG, "releaseImageSourceOnGL:");
+			source.release();
 		}
 	}
 
@@ -242,7 +244,7 @@ public class GLTextureSource implements GLConst {
 	 */
 	@WorkerThread
 	private void createImageSourceOnGL(@NonNull final Bitmap bitmap, @Nullable final Fraction fps) {
-		if (DEBUG) Log.v(TAG, "createImageSource:" + bitmap + ",fps=" + fps);
+		if (DEBUG) Log.v(TAG, "createImageSourceOnGL:" + bitmap + ",fps=" + fps);
 		mManager.removeFrameCallback(mFrameCallback);
 		final int width = bitmap.getWidth();
 		final int height = bitmap.getHeight();
@@ -252,24 +254,24 @@ public class GLTextureSource implements GLConst {
 		if (_fps <= 0.0f) {
 			_fps = DEFAULT_FPS;
 		}
-		if (DEBUG) Log.v(TAG, "createImageSource:fps=" + _fps);
+		if (DEBUG) Log.v(TAG, "createImageSourceOnGL:fps=" + _fps);
 		mLock.lock();
 		try {
 			if ((mImageSource == null) || needResize) {
 				releaseImageSourceOnGL();
 				mImageSource = GLTexture.newInstance(GLES20.GL_TEXTURE0, width, height, GLES20.GL_LINEAR);
-				GLUtils.checkGlError("createImageSource");
+				GLUtils.checkGlError("createImageSourceOnGL");
 			}
 			mImageSource.loadBitmap(bitmap);
 			mFrameIntervalNs = Math.round(1000000000.0 / _fps);
-			if (DEBUG) Log.v(TAG, "createImageSource:mFrameIntervalNs=" + mFrameIntervalNs);
+			mFirstTimeNs = -1L;
+			mNumFrames = 0;
+			if (DEBUG) Log.v(TAG, "createImageSourceOnGL:mFrameIntervalNs=" + mFrameIntervalNs);
 			mWidth = width;
 			mHeight = height;
 		} finally {
 			mLock.unlock();
 		}
-		mFirstTimeNs = -1L;
-		mNumFrames = 0;
 		mManager.postFrameCallbackDelayed(mFrameCallback, 0);
 	}
 
@@ -292,14 +294,19 @@ public class GLTextureSource implements GLConst {
 				}
 				mManager.postFrameCallbackDelayed(this, ms);
 				final GLFrameAvailableCallback callback;
+				final GLTexture source;
+				final int width, height;
 				mLock.lock();
 				try {
 					callback = mCallback;
+					source = mImageSource;
+					width = mWidth;
+					height = mHeight;
 				} finally {
 					mLock.unlock();
 				}
-				if ((callback != null) && (mImageSource != null)) {
-					callback.onFrameAvailable(mIsGLES3, false, mWidth, mHeight, mImageSource.getTexId(), mImageSource.getTexMatrix());
+				if ((callback != null) && (source != null) && (width > 0) && (height > 0)) {
+					callback.onFrameAvailable(mIsGLES3, false, width, height, source.getTexId(), source.getTexMatrix());
 				}
 			}
 		}
