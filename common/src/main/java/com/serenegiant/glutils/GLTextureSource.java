@@ -45,8 +45,6 @@ public class GLTextureSource implements GLConst {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = GLTextureSource.class.getSimpleName();
 
-	private static final int DEFAULT_WIDTH = 640;
-	private static final int DEFAULT_HEIGHT = 480;
 	private static final float DEFAULT_FPS = 30.0f;
 
 	/**
@@ -97,8 +95,8 @@ public class GLTextureSource implements GLConst {
 		mManager = manager;
 		mIsGLES3 = mManager.isGLES3();
 		mCallback = callback;
-		mWidth = DEFAULT_WIDTH;
-		mHeight = DEFAULT_HEIGHT;
+		mWidth = 1;
+		mHeight = 1;
 		if (bitmap != null) {
 			mManager.runOnGLThread(() -> {
 				createImageSourceOnGL(bitmap, fps);
