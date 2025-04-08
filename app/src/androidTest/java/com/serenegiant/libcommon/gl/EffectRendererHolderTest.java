@@ -109,7 +109,7 @@ public class EffectRendererHolderTest {
 		assertNotNull(readerSurface);
 
 		// 映像ソースとしてStaticTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 
 		// テストするEffectRendererHolderを生成
 		final EffectRendererHolder rendererHolder = new EffectRendererHolder(WIDTH, HEIGHT, null);
@@ -284,7 +284,7 @@ public class EffectRendererHolderTest {
 				WIDTH, HEIGHT, 15 + i, 12, Bitmap.Config.ARGB_8888);
 //			dump(bitmap);
 			// 映像ソースとしてStaticTextureSourceを生成
-			final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+			final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 			final Surface surface = rendererHolder.getSurface();
 			assertNotNull(surface);
 			// StaticTextureSource →　EffectRendererHolder　→ SurfaceReaderと繋ぐ

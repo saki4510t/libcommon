@@ -29,7 +29,6 @@ import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.glutils.ImageTextureSource;
-import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
@@ -336,7 +335,7 @@ public class EffectRendererHolderNewTest {
 		assertEquals(2, rendererHolder.getCount());
 
 		// 映像ソースとしてStaticTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 		source.addSurface(inputSurface.hashCode(), inputSurface, false);
 
 		try {
@@ -475,14 +474,14 @@ public class EffectRendererHolderNewTest {
 
 		try {
 			for (int i = 0; i < 3; i++) {
-				Log.v(TAG, "staticTextureSourceRestartTest:" + i);
+				Log.v(TAG, "staticTextureSourceChangeSourceTest:" + i);
 				cnt1.set(0);
 				cnt2.set(0);
 				final Bitmap original = BitmapHelper.makeCheckBitmap(
 					WIDTH, HEIGHT, 15 + i, 12, Bitmap.Config.ARGB_8888);
 //				dump(bitmap);
 				// 映像ソースとしてStaticTextureSourceを生成
-				final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+				final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 				final SurfaceTexture st = rendererHolder.getSurfaceTexture();
 				final Surface inputSurface = new Surface(st);
 				assertNotNull(inputSurface);

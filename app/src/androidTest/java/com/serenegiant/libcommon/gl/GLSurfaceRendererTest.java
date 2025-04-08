@@ -270,7 +270,7 @@ public class GLSurfaceRendererTest {
 		assertNotNull(inputSurface);
 
 		// 映像ソースとしてStaticTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 		// StaticTextureSource →　GLSurfaceReceiverと繋ぐ
 		source.addSurface(inputSurface.hashCode(), inputSurface, false);
 

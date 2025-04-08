@@ -91,7 +91,7 @@ public class StaticTextureSourceTest {
 
 		final GLManager manager = mGLManager;
 
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
@@ -133,7 +133,7 @@ public class StaticTextureSourceTest {
 
 		final GLManager manager = mGLManager;
 
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 		final Semaphore sem = new Semaphore(0);
 
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
@@ -257,7 +257,7 @@ public class StaticTextureSourceTest {
 		assertNotNull(surface);
 
 		// 映像ソース用にImageTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(requestFps), null);
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(requestFps));
 		// 映像受け取り用Surfaceをセット
 		source.addSurface(surface.hashCode(), surface, false);
 		try {

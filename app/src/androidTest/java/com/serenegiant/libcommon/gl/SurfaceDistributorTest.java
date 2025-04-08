@@ -341,7 +341,7 @@ public class SurfaceDistributorTest {
 		assertEquals(2, distributor.getCount());
 
 		// 映像ソースとしてStaticTextureSourceを生成
-		final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+		final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 		source.addSurface(inputSurface.hashCode(), inputSurface, false);
 
 		try {
@@ -496,7 +496,7 @@ public class SurfaceDistributorTest {
 					WIDTH, HEIGHT, 15 + 1, 12, Bitmap.Config.ARGB_8888);
 //				dump(bitmap);
 				// 映像ソースとしてStaticTextureSourceを生成
-				final StaticTextureSource source = new StaticTextureSource(original, new Fraction(30));
+				final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
 				final SurfaceTexture st = distributor.getSurfaceTexture();
 				final Surface inputSurface = new Surface(st);
 				assertNotNull(inputSurface);
