@@ -22,14 +22,13 @@ import android.graphics.Bitmap;
 import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.glutils.ImageTextureSource;
+import com.serenegiant.glutils.GLFrameAvailableCallback;
+import com.serenegiant.glutils.GLTextureSource;
 import com.serenegiant.math.Fraction;
-import com.serenegiant.media.OnFrameAvailableListener;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
-import androidx.annotation.WorkerThread;
 
 /**
  * 静止画(Bitmap)を映像ソースとするためのGLPipelineSource実装
@@ -40,11 +39,6 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = ImageSourcePipeline.class.getSimpleName();
 
-	private static final float DEFAULT_FPS = 30.0f;
-
-	@NonNull
-	private final GLManager mManager;
-
 	/**
 	 * GLTextureを使って静止画をテクスチャとして読み込みChoreographerを使って定期的に
 	 * #onFrameAvailableを呼び出す代わりに、ImageTextureSource利用する(Surfaceはセットしない)
@@ -53,9 +47,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * リスナーを呼び出す機能があるので。
 	 */
 	@NonNull
-	private final ImageTextureSource mImageTextureSource;
-	// 現在の映像サイズ
-	private int mWidth = 0, mHeight = 0;
+	private final GLTextureSource mSource;
 
 	/**
 	 * コンストラクタ
@@ -68,16 +60,13 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
-		mManager = manager;
-		mImageTextureSource = new ImageTextureSource(manager, bitmap, fps, new OnFrameAvailableListener() {
+		mSource = new GLTextureSource(manager, bitmap, fps, new GLFrameAvailableCallback() {
 			@Override
-			public void onFrameAvailable() {
-				if (isActive()) {
-					ImageSourcePipeline.this.onFrameAvailable(
-						mManager.isGLES3(), false,
-						getWidth(), getHeight(),
-						mImageTextureSource.getTexId(), mImageTextureSource.getTexMatrix());
-				}
+			public void onFrameAvailable(
+				final boolean isGLES3, final boolean isOES,
+				final int width, final int height,
+				final int texId, @NonNull final float[] texMatrix) {
+				ImageSourcePipeline.this.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 			}
 		});
 	}
@@ -106,14 +95,14 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 
 	@Override
 	protected void internalRelease() {
-		mImageTextureSource.release();
+		mSource.release();
 		super.internalRelease();
 	}
 
 	@NonNull
 	@Override
 	public GLManager getGLManager() throws IllegalStateException {
-		return mManager;
+		return mSource.getGLManager();
 	}
 
 	/**
@@ -124,7 +113,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 */
 	@Override
 	public int getTexId() throws IllegalStateException {
-		return mImageTextureSource.getTexId();
+		return mSource.getTexId();
 	}
 
 	/**
@@ -137,37 +126,23 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	@NonNull
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {
-		return mImageTextureSource.getTexMatrix();
+		return mSource.getTexMatrix();
 	}
 
 	@Override
 	public boolean isValid() {
-		return super.isValid() && mManager.isValid();
+		return super.isValid() && mSource.isValid();
 	}
 
-	private int cnt;
-	@WorkerThread
 	@Override
 	public void onFrameAvailable(
-		final boolean isGLES3,
-		final boolean isOES,
+		final boolean isGLES3, final boolean isOES,
 		final int width, final int height,
-		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
+		final int texId, @NonNull final float[] texMatrix) {
 
-		mLock.lock();
-		try {
-			// 映像ソースが準備できていなければスキップする
-			if (!isValid() || !mImageTextureSource.isValid()) return;
-		} finally {
-			mLock.unlock();
-		}
-		if (DEBUG && (++cnt % 100) == 0) {
-			Log.v(TAG, "onFrameAvailable:" + cnt);
-		}
-		if ((mWidth != mImageTextureSource.getWidth()) || (mHeight != mImageTextureSource.getHeight())) {
-			mWidth = mImageTextureSource.getWidth();
-			mHeight = mImageTextureSource.getHeight();
-			resize(mWidth, mHeight);
+		if (!isValid()) return;
+		if ((width != getWidth()) || (height != getHeight())) {
+			resize(width, height);
 		}
 
 		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
@@ -179,7 +154,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @param fps
 	 */
 	public void setSource(@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
-		mImageTextureSource.setSource(bitmap, fps);
+		mSource.setSource(bitmap, fps);
 	}
 
 }
