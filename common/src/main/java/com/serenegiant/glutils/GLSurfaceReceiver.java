@@ -505,6 +505,7 @@ public class GLSurfaceReceiver {
 	private int updateTextImageCnt;
 	@WorkerThread
 	private void handleUpdateTexImageOnGL() {
+		if (!isValid() || (mWidth <= 0) || (mHeight <= 0)) return;
 		if (DEBUG && ((++updateTextImageCnt % 100) == 0)) Log.v(TAG, "handleUpdateTexImageOnGL:" + updateTextImageCnt);
 		try {
 			mGLManager.makeDefault();
