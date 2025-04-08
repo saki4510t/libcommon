@@ -146,10 +146,12 @@ public class SurfaceRendererPipelineTest {
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
-
+		// パイプラインからテクスチャを受け取ってSurfaceへ描画するSurfaceRendererPipelineを生成して追加
 		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
 		GLPipeline.append(source, renderer);
 
+		// Surfaceから映像を受け取ってパイプラインへ流すためのSurfaceSourcePipelineを生成
+		// Surfaceが生成されたらSurfaceRendererPipelineの描画先として設定する
 		final SurfaceSourcePipeline surfaceSource = new SurfaceSourcePipeline(manager, WIDTH, HEIGHT,
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
@@ -163,6 +165,7 @@ public class SurfaceRendererPipelineTest {
 				}
 			});
 
+		// 映像受け取り用のパイプラインを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
