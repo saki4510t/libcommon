@@ -88,6 +88,7 @@ public class ShaderConst implements GLConst {
 		}
 		""";
 
+	public static final String HSV_FUNCTIONS = FUNC_RGB2HSV + FUNC_HSV2RGB;
 	/**
 	 * RGBの輝度を取得
 	 * 変換係数との内積を計算するだけ

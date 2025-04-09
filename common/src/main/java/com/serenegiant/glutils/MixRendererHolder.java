@@ -132,42 +132,46 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	private static final int REQUEST_SET_MASK = 10;
 
 	private static final String FRAGMENT_SHADER_BASE_ES2
-		= SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +	// 入力テクスチャA
-		"uniform %s    sTexture2;\n" +	// 入力テクスチャB
-		"uniform %s    sTexture3;\n" +	// マスクM
-		"void main() {\n" +
-		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
-		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
-		"    highp float alpha = texture2D(sTexture3, vTextureCoord).a;\n" +
-		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
-		"}\n";
+		= """
+		%s
+		%s
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;  // input A
+		uniform %s    sTexture2; // input B
+		uniform %s    sTexture3; // mask
+		void main() {
+		    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);
+		    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);
+		    highp float alpha = texture2D(sTexture3, vTextureCoord).a;
+		    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);
+		}
+		""";
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			HEADER_OES_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2,
 			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
 	private static final String FRAGMENT_SHADER_BASE_ES3
-		= SHADER_VERSION_ES3 +
-		"%s" +
-		"precision highp float;\n" +
-		"in vec2 vTextureCoord;\n" +
-		"uniform %s sTexture;\n" +	// 入力テクスチャA
-		"uniform %s sTexture2;\n" +	// 入力テクスチャB
-		"uniform %s sTexture3;\n" +	// マスクM
-		"layout(location = 0) out vec4 o_FragColor;\n" +
-		"void main() {\n" +
-		"    highp vec4 tex1 = texture(sTexture, vTextureCoord);\n" +
-		"    highp vec4 tex2 = texture(sTexture2, vTextureCoord);\n" +
-		"    highp float alpha = texture(sTexture3, vTextureCoord).a;\n" +
-		"    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
-		"}\n";
+		= """
+		%s
+		%s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;  // input A
+		uniform %s sTexture2; // input B
+		uniform %s sTexture3; // mask
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+		    highp vec4 tex1 = texture(sTexture, vTextureCoord);
+		    highp vec4 tex2 = texture(sTexture2, vTextureCoord);
+		    highp float alpha = texture(sTexture3, vTextureCoord).a;
+		    o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);
+		}
+		""";
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			HEADER_OES_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3,
 			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
 
 	/**

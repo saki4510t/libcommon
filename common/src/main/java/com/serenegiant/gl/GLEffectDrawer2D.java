@@ -305,7 +305,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	private void updateParams() {
 		if (DEBUG) Log.v(TAG, "MyRendererTask#updateParams:");
 		final int n = Math.min(mCurrentParams != null
-			? mCurrentParams.length : 0, MAX_PARAM_NUM);
+			? mCurrentParams.length : 0, 18);
 		if ((muParamsLoc >= 0) && (n > 0)) {
 			glUseProgram();
 			GLES20.glUniform1fv(muParamsLoc, n, mCurrentParams, 0);
