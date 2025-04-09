@@ -508,10 +508,7 @@ public class GLSurfaceReceiver {
 		if (!isValid() || (mWidth <= 0) || (mHeight <= 0)) return;
 		if (DEBUG && ((++updateTextImageCnt % 100) == 0)) Log.v(TAG, "handleUpdateTexImageOnGL:" + updateTextImageCnt);
 		try {
-			mGLManager.makeDefault();
-			// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
-			GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
-			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			mGLManager.makeDefault(0xff000000);
 			mGLManager.swap();
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
