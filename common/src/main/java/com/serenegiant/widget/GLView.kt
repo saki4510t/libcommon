@@ -72,7 +72,7 @@ open class GLView @JvmOverloads constructor(
 		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 		 */
 		@WorkerThread
-		fun drawFrame()
+		fun drawFrame(frameTimeNanos: Long)
 		/**
 		 * Surfaceが破棄された
 		 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
@@ -288,8 +288,8 @@ open class GLView @JvmOverloads constructor(
 						mMatrixChanged = false
 					}
 				}
-				drawFrame()
 				mTarget?.swap()
+				drawFrame(frameTimeNanos)
 			}
 		}
 	}
@@ -329,10 +329,10 @@ open class GLView @JvmOverloads constructor(
 	 * EGL/GLコンテキストを保持しているワーカースレッド上で実行される
 	 */
 	@WorkerThread
-	protected fun drawFrame() {
+	protected fun drawFrame(frameTimeNanos: Long) {
 		if (mHasSurface) {
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
-			mGLRenderer?.drawFrame()
+			mGLRenderer?.drawFrame(frameTimeNanos)
 		}
 	}
 

@@ -80,7 +80,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 			@SuppressLint("WrongThread")
 			@WorkerThread
-			override fun drawFrame() {
+			override fun drawFrame(frameTimeNanos: Long) {
 				if (mSurfaceSourcePipeline != null) {
 					handleDraw(mSurfaceSourcePipeline!!.texId, mSurfaceSourcePipeline!!.texMatrix)
 				}

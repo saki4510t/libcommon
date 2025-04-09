@@ -99,7 +99,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			}
 
-			override fun drawFrame() {
+			override fun drawFrame(frameTimeNanos: Long) {
 				if (DEBUG && ++cnt % 1800 == 0) Log.v(TAG, "drawFrame:$cnt")
 				if (mRequestUpdateTex) {
 					mRequestUpdateTex = false
