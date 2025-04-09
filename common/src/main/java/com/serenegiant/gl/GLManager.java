@@ -18,6 +18,7 @@ package com.serenegiant.gl;
  *  limitations under the License.
 */
 
+import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Process;
 import android.util.Log;
@@ -424,6 +425,24 @@ public class GLManager {
 	public void makeDefault() throws IllegalStateException {
 		checkValid();
 		mGLContext.makeDefault();
+	}
+
+	/**
+	 * GLContext#makeDefaultを呼び出すためのヘルパーメソッド
+	 * 何も描画しないとハングアップする端末があるので指定色に塗りつぶす処理を追加
+	 * @param color
+	 * @throws IllegalStateException
+	 */
+	public void makeDefault(final int color) throws IllegalStateException {
+		makeDefault();
+		// 何も描画しないとハングアップする端末があるので適当に塗りつぶす
+		GLES20.glClearColor(
+			((color & 0x00ff0000) >>> 16) / 255.0f,	// R
+			((color & 0x0000ff00) >>>  8) / 255.0f,	// G
+			((color & 0x000000ff)) / 255.0f,		// B
+			((color & 0xff000000) >>> 24) / 255.0f	// A
+		);
+		GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 	}
 
 	/**
