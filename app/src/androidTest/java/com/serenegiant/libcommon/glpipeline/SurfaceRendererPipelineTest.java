@@ -144,12 +144,8 @@ public class SurfaceRendererPipelineTest {
 
 		final GLManager manager = mManager;
 
-		// 映像ソースを生成
-		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
 		// パイプラインからテクスチャを受け取ってSurfaceへ描画するSurfaceRendererPipelineを生成して追加
 		final SurfaceRendererPipeline renderer = new SurfaceRendererPipeline(manager);
-		GLPipeline.append(source, renderer);
-
 		// Surfaceから映像を受け取ってパイプラインへ流すためのSurfaceSourcePipelineを生成
 		// Surfaceが生成されたらSurfaceRendererPipelineの描画先として設定する
 		final SurfaceSourcePipeline surfaceSource = new SurfaceSourcePipeline(manager, WIDTH, HEIGHT,
@@ -170,6 +166,10 @@ public class SurfaceRendererPipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+
+		// 映像ソースを生成
+		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
+		GLPipeline.append(source, renderer);
 		GLPipeline.append(surfaceSource, proxy);
 
 		// SurfacePipelineとSurfaceSourcePipelineの間はSurfaceを経由したやりとりだけで
