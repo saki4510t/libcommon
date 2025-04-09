@@ -278,13 +278,17 @@ public class ImageTextureSource implements GLConst, IMirror {
 			} finally {
 				mLock.unlock();
 			}
-			if ((drawer != null)
-				&& (target != null)
-				&& target.canDraw()) {
-				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
-			}
-			if (listener != null) {
-				listener.onFrameAvailable();
+			try {
+				if ((drawer != null)
+					&& (target != null)
+					&& target.canDraw()) {
+					target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
+				}
+				if (listener != null) {
+					listener.onFrameAvailable();
+				}
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
 		}
 	}
