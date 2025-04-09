@@ -427,7 +427,7 @@ public class GLManager {
 	}
 
 	/**
-	 * GLContext#makeDefaultを呼び出すためのヘルパーメソッド
+	 * GLContext#swapを呼び出すためのヘルパーメソッド
 	 * @throws IllegalStateException
 	 */
 	public void swap() throws IllegalStateException {
