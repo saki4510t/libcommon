@@ -122,6 +122,7 @@ public class GLTextureSource implements GLConst {
 
 	protected void internalRelease() {
 		if (isValid()) {
+			mManager.removeFrameCallback(mFrameCallback);
 			mManager.getGLHandler().postAtFrontOfQueue(() -> {
 				releaseImageSourceOnGL();
 			});
