@@ -293,21 +293,27 @@ public class GLTextureSource implements GLConst {
 				if (ms < 5L) {
 					ms = 0L;
 				}
-				mManager.postFrameCallbackDelayed(this, ms);
-				final GLFrameAvailableCallback callback;
-				final GLTexture source;
-				final int width, height;
-				mLock.lock();
 				try {
-					callback = mCallback;
-					source = mImageSource;
-					width = mWidth;
-					height = mHeight;
-				} finally {
-					mLock.unlock();
-				}
-				if ((callback != null) && (source != null) && (width > 0) && (height > 0)) {
-					callback.onFrameAvailable(mIsGLES3, false, width, height, source.getTexId(), source.getTexMatrix());
+					mManager.postFrameCallbackDelayed(this, ms);
+					final GLFrameAvailableCallback callback;
+					final GLTexture source;
+					final int width, height;
+					mLock.lock();
+					try {
+						callback = mCallback;
+						source = mImageSource;
+						width = mWidth;
+						height = mHeight;
+					} finally {
+						mLock.unlock();
+					}
+					if ((callback != null) && (source != null) && (width > 0) && (height > 0)) {
+						mManager.makeDefault(0xff000000);
+						mManager.swap();
+						callback.onFrameAvailable(mIsGLES3, false, width, height, source.getTexId(), source.getTexMatrix());
+					}
+				} catch (final Exception e) {
+					if (DEBUG) Log.w(TAG, e);
 				}
 			}
 		}
