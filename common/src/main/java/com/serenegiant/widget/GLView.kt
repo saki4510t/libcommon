@@ -265,12 +265,23 @@ open class GLView @JvmOverloads constructor(
 	 */
 	@WorkerThread
  	protected fun makeDefault() {
- 		if (mTarget != null) {
- 			mTarget!!.makeCurrent()
+		val target = mTarget
+ 		if (target != null) {
+			target.makeCurrent()
 		} else {
-			mGLContext.makeDefault()
+			mGLManager.makeDefault(0xff000000.toInt())
 		}
  	}
+
+	@WorkerThread
+	protected fun swap() {
+		val target = mTarget
+		if (target != null) {
+			target.swap()
+		} else {
+			mGLManager.swap()
+		}
+	}
 
 	/**
 	 * Choreographerを使ったvsync同期用描画のFrameCallback実装
@@ -288,8 +299,8 @@ open class GLView @JvmOverloads constructor(
 						mMatrixChanged = false
 					}
 				}
-				mTarget?.swap()
 				drawFrame(frameTimeNanos)
+				swap()
 			}
 		}
 	}
