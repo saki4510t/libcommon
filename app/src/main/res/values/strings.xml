@@ -26,4 +26,5 @@
 	<string name="open_settings_reason" translatable="false">
 		App has no required permission(s) for your selected feature.\n
 		If you still want to run the feature, please grant related permission(s) to this app.</string>
+	<string name="title_dialog_color_picker" translatable="false">Select Color</string>
 </resources>

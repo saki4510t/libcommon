@@ -55,7 +55,8 @@
 	<string name="title_screen_capture" translatable="false">ScreenCapture</string>
 	<string name="title_checkable_ex" translatable="false">CheckableEx</string>
 	<string name="title_rpg_message_view" translatable="false">RPGMessageView</string>
-	<string name="bitmap_helper" translatable="false">BitmapHelper</string>
+	<string name="title_bitmap_helper" translatable="false">BitmapHelper</string>
+	<string name="title_color_picker" translatable="false">ColorPicker</string>
 
 	<string-array name="list_items">
 		<item>@string/title_request_saf_permission</item>
@@ -66,6 +67,7 @@
 		<item>@string/title_usb_permission</item>
 		<item>@string/title_window_insets</item>
 		<item>@string/title_audio_record</item>
+		<item>@string/title_color_picker</item>
 		<item>@string/title_camera</item>
 		<item>@string/title_camera_rec</item>
 		<item>@string/title_camera_rec_split</item>
@@ -93,6 +95,6 @@
 		<item>@string/title_screen_capture</item>
 		<item>@string/title_checkable_ex</item>
 		<item>@string/title_rpg_message_view</item>
-		<item>@string/bitmap_helper</item>
+		<item>@string/title_bitmap_helper</item>
 	</string-array>
 </resources>

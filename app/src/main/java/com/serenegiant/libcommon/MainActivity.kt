@@ -205,6 +205,9 @@ class MainActivity
 				}
 				fragment = AudioRecordFragment.newInstance()
 			}
+			R.string.title_color_picker -> {
+				fragment = ColorPickerFragment.newInstance()
+			}
 			R.string.title_camera -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
@@ -408,7 +411,7 @@ class MainActivity
 			R.string.title_rpg_message_view -> {
 				fragment = RPGMessageFragment.newInstance()
 			}
-			R.string.bitmap_helper -> {
+			R.string.title_bitmap_helper -> {
 				fragment = BitmapFragment.newInstance()
 			}
 			else -> {
