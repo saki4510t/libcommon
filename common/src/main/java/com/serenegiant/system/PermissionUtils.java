@@ -170,7 +170,9 @@ public class PermissionUtils {
 	public PermissionUtils prepare(@NonNull final ComponentActivity activity,
 		@NonNull final String[] permissions) {
 		if(DEBUG) Log.v(TAG, "prepare:" + Arrays.toString(permissions));
-		mMultiLaunchers.put(permissions, prepare(this, activity, permissions, mCallback));
+		if (permissions.length > 0) {
+			mMultiLaunchers.put(permissions, prepare(this, activity, permissions, mCallback));
+		}
 		return this;
 	}
 
@@ -183,7 +185,9 @@ public class PermissionUtils {
 	public PermissionUtils prepare(@NonNull final Fragment fragment,
 		@NonNull final String[] permissions) {
 		if(DEBUG) Log.v(TAG, "prepare:" + Arrays.toString(permissions));
-		mMultiLaunchers.put(permissions, prepare(this, fragment, permissions, mCallback));
+		if (permissions.length > 0) {
+			mMultiLaunchers.put(permissions, prepare(this, fragment, permissions, mCallback));
+		}
 		return this;
 	}
 
