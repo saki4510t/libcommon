@@ -924,6 +924,8 @@ public class PermissionUtils {
 
 	/**
 	 * 外部ストレージへの書き込みパーミッションがあるかどうかを確認
+	 * API>=29では常にfalse
+	 * API>=21なら基本的にSAF/DocumentFile+MediaStoreでアクセスする
 	 *
 	 * @param context
 	 * @return 外部ストレージへの書き込みパーミッションがあればtrue
@@ -934,13 +936,43 @@ public class PermissionUtils {
 
 	/**
 	 * 外部ストレージからの読み込みパーミッションがあるかどうかを確認
-	 *
+	 * API>=33ならREAD_MEDIA_AUDIO/READ_MEDIA_IMAGES/READ_MEDIA_VIDEOのいずれか
+	 * API>=29ならREAD_EXTERNAL_STORAGE
+	 * API28以下ならREAD_EXTERNAL_STORAGE/WRITE_EXTERNAL_STORAGEのいずれか
+	 * を保持していればtrue
+	 * XXX API>=33の場合、どれか1つ保持していればtrueを返すけど権限を保持していない種類のメディアファイルへ
+	 *     アクセスすると例外生成するので注意
 	 * @param context
 	 * @return 外部ストレージへの読み込みパーミッションがあればtrue
 	 */
 	public static boolean hasReadExternalStorage(@Nullable final Context context) {
-		return hasPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE)
-			|| hasPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		int numMissings = READ_MEDIA_PERMISSIONS.length;
+		try {
+			numMissings = missingPermissions(context, READ_MEDIA_PERMISSIONS).size();
+		} catch (final Exception e) {
+			// ignore
+		}
+
+		return numMissings < READ_MEDIA_PERMISSIONS.length;
+	}
+
+	/**
+	 * 外部ストレージからの読み込みパーミッションを全て保持しているかどうかを確認
+	 * API>=33ならREAD_MEDIA_AUDIO/READ_MEDIA_IMAGES/READ_MEDIA_VIDEOの全て
+	 * API>=29ならREAD_EXTERNAL_STORAGE
+	 * API28以下ならREAD_EXTERNAL_STORAGE/WRITE_EXTERNAL_STORAGEの全て
+	 * を保持していればtrue
+	 * @param context
+	 * @return 外部ストレージへの読み込みパーミッションがあればtrue
+	 */
+	public static boolean hasReadExternalStorageAll(@Nullable final Context context) {
+		int numMissings = READ_MEDIA_PERMISSIONS.length;
+		try {
+			numMissings = missingPermissions(context, READ_MEDIA_PERMISSIONS).size();
+		} catch (final Exception e) {
+			// ignore
+		}
+		return numMissings == 0;
 	}
 
 	/**
