@@ -330,6 +330,7 @@ public class PermissionUtils {
 		final Context context = activity;
 		final String[] requestedPermissions = PermissionUtils.requestedPermissions(context);
 		for (final String permission: requestedPermissions) {
+			if (DEBUG) Log.v(TAG, "prepare:" + permission + "=" + PermissionUtils.hasPermission(activity, permission));
 			final ActivityResultLauncher<String> requestPermissionLauncher
 				= activity.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
 					isGranted -> {
@@ -375,6 +376,7 @@ public class PermissionUtils {
 		final ComponentActivity activity = fragment.requireActivity();
 		final String[] requestedPermissions = PermissionUtils.requestedPermissions(activity);
 		for (final String permission: requestedPermissions) {
+			if (DEBUG) Log.v(TAG, "prepare:" + permission + "=" + PermissionUtils.hasPermission(activity, permission));
 			final ActivityResultLauncher<String> requestPermissionLauncher
 				= fragment.registerForActivityResult(new ActivityResultContracts.RequestPermission(),
 					isGranted -> {
