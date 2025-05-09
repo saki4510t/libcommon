@@ -25,6 +25,7 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.util.Log
 import android.view.*
+import androidx.core.os.BundleCompat
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.mediastore.ImageLoader
 import com.serenegiant.mediastore.LoaderDrawable
@@ -65,7 +66,7 @@ class ImageFragment: BaseFragment() {
 			args = arguments
 		}
 		if (args != null) {
-			mInfo = args.getParcelable(ARG_MEDIA_INFO)
+			mInfo = BundleCompat.getParcelable(args, ARG_MEDIA_INFO, MediaInfo::class.java)
 		}
 		initView(view)
 	}

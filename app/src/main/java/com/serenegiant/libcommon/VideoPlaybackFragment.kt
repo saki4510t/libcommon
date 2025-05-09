@@ -25,6 +25,7 @@ import android.util.Log
 import android.view.*
 import android.view.TextureView.SurfaceTextureListener
 import android.widget.Toast
+import androidx.core.os.BundleCompat
 import com.serenegiant.media.IFrameCallback
 import com.serenegiant.media.MediaPlayer
 import com.serenegiant.mediastore.MediaInfo
@@ -53,7 +54,7 @@ class VideoPlaybackFragment : BaseFragment() {
 			args = arguments
 		}
 		if (args != null) {
-			mInfo = args.getParcelable(ARG_MEDIA_INFO)
+			mInfo = BundleCompat.getParcelable(args, ARG_MEDIA_INFO, MediaInfo::class.java)
 		}
 		initView(view)
 	}
