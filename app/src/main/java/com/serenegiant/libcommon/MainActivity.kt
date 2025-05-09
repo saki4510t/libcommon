@@ -49,6 +49,7 @@ class MainActivity
 		OnListFragmentInteractionListener,
 		RationalDialogV4.DialogResultListener {
 
+	private lateinit var READ_MEDIA_PERMISSIONS: Array<String>
 	private lateinit var mPermissions: PermissionUtils
 	private var mIsResumed = false
 
@@ -56,8 +57,10 @@ class MainActivity
 		super.onCreate(savedInstanceState)
 		setContentView(R.layout.activity_main)
 		// パーミッション要求の準備
+		READ_MEDIA_PERMISSIONS = PermissionUtils.requestedPermissions(this, PermissionUtils.READ_MEDIA_PERMISSIONS)
 		mPermissions = PermissionUtils(this, mCallback)
-			.prepare(this, LOCATION_PERMISSIONS)
+			.prepare(this@MainActivity, LOCATION_PERMISSIONS)
+			.prepare(this@MainActivity, READ_MEDIA_PERMISSIONS)
 		DummyContent.createItems(this, R.array.list_items)
 		if (savedInstanceState == null) {
 			// IRecorderで使う最大録画時間を無制限(-1)にする
@@ -501,9 +504,11 @@ class MainActivity
 	 * @return true already have permission to access external storage
 	 */
 	private fun checkPermissionReadExternalStorage(): Boolean {
-		// WRITE_EXTERNAL_STORAGEがあればREAD_EXTERNAL_STORAGEはなくても大丈夫
-		return PermissionUtils.hasWriteExternalStorage(this)
-			|| mPermissions.requestPermission(Manifest.permission.READ_EXTERNAL_STORAGE, true)
+		if (!PermissionUtils.hasReadExternalStorage(this)) {
+			if (DEBUG) Log.v(TAG, "checkPermissionReadExternalStorage:request=$READ_MEDIA_PERMISSIONS")
+			return mPermissions.requestPermission(READ_MEDIA_PERMISSIONS, true)
+		}
+		return true
 	}
 
 	/**
