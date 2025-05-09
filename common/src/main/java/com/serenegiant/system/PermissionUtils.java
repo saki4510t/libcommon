@@ -759,6 +759,31 @@ public class PermissionUtils {
 	}
 
 	/**
+	 * アプリのAndroidManifestで要求している権限のうち指定した配列に含まれているものを取得する
+	 * @param context
+	 * @param permissions
+	 * @return
+	 */
+	@NonNull
+	public static String[] requestedPermissions(
+		@NonNull final Context context,
+		@NonNull final String[] permissions) {
+
+		final ArrayList<String> result = new ArrayList<>();
+
+		// AndroidManifestで要求している権限リストを取得
+		final List<String> requested = Arrays.asList(requestedPermissions(context));
+		for (final String permission: permissions) {
+			if (requested.contains(permission)) {
+				// 引数の配列に含まれている＆AndroidManifestでも要求しているものを追加
+				result.add(permission);
+			}
+		}
+
+		return result.toArray(new String[0]);
+	}
+
+	/**
 	 * パーミッションを確認
 	 *
 	 * @param context
