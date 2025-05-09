@@ -998,7 +998,7 @@ public class PermissionUtils {
 			context.getPackageName(), PackageManager.GET_PERMISSIONS);
 		final List<String> result = new ArrayList<>(expectations);
 		final String[] permissions = pi.requestedPermissions;
-		if ((permissions != null) && (permissions.length > 0)) {
+		if (permissions != null) {
 			for (String permission : permissions) {
 				if (hasPermission(context, permission)) {
 					result.remove(permission);
