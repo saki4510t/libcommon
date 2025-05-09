@@ -104,6 +104,28 @@ public class PermissionUtils {
 		}
 	}
 
+	/**
+	 * EXTERNAL_STORAGEからメディアファイル(AUDIO/IMAGE?VIDEO)を読み込むのに必要な権限配列
+	 * API>=33ならREAD_MEDIA_AUDIO/READ_MEDIA_IMAGES/READ_MEDIA_VIDEO
+	 * API>=29ならREAD_EXTERNAL_STORAGE
+	 * API<=28>ならREAD_EXTERNAL_STORAGE/WRITE_EXTERNAL_STORAGE
+	 */
+	public static final String[] READ_MEDIA_PERMISSIONS;
+	static {
+		final ArrayList<String> result = new ArrayList<>();
+		if (BuildCheck.isAPI33()) {
+			result.add(Manifest.permission.READ_MEDIA_AUDIO);
+			result.add(Manifest.permission.READ_MEDIA_IMAGES);
+			result.add(Manifest.permission.READ_MEDIA_VIDEO);
+		} else if (BuildCheck.isAPI29()) {
+			result.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+		} else {
+			result.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+			result.add(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+		}
+		READ_MEDIA_PERMISSIONS = result.toArray(new String[0]);
+	}
+
 	@NonNull
 	private final WeakReference<ComponentActivity> mWeakActivity;
 	@NonNull
