@@ -59,7 +59,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		mGLManager = GLManager()
 		mGLContext = mGLManager.glContext
 		mGLHandler = mGLManager.glHandler
-		setEnableHandleTouchEvent(TouchViewTransformer.TOUCH_DISABLED)
+		setEnableHandleTouchEvent(TouchViewTransformer.TOUCH_ENABLED_ALL)
 		mCameraDelegator = CameraDelegator(this@SimpleVideoSourceCameraTextureView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			object : CameraDelegator.ICameraRenderer {
