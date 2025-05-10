@@ -37,7 +37,9 @@ import android.view.Surface;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
@@ -47,6 +49,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
+
+import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
  * Surface/SurfaceTexture経由で受け取った映像を表示するDrawable
@@ -134,10 +138,21 @@ public class SurfaceDrawable extends Drawable {
 	 */
 	private Surface mInputSurface;
 	/**
-	 * テクスチャを読み取るためにオフスクリーン描画するためのGLDrawer2D
+	 * SurfaceTextureで映像を受け取ったテクスチャをオフスクリーン描画するためのGLSurface
+	 * XXX SurfaceTextureへ割り当てたテクスチャをGLSurfaceのバックバッファとしてラップして
+	 *     アクセスすることも可能だけどその場合はテクスチャ変換行列を別途Bitmapへ適用することに
+	 *     なる=中間に1つ余分にBitmapを生成することになるので、一旦オフスクリーン描画する方が
+	 *     パフォーマンス的によい
+	 */
+	private GLSurface mOffscreenSurface;
+	/**
+	 * オフスクリーンのGLSurfaceへ描画するためのRendererTarget
+	 */
+	private RendererTarget mTarget;
+	/**
+	 * オフスクリーン描画用のGLDrawer
 	 */
 	private GLDrawer2D mDrawer;
-
 	/**
 	 * Drawableの外形サイズ
 	 */
@@ -372,10 +387,20 @@ public class SurfaceDrawable extends Drawable {
 			mEglTask.swap();
 			return;
 		}
-		// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
-		mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
-		// オフスクリーンから読み取り
-		mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
+		if ((mOffscreenSurface == null) || (mOffscreenSurface.getWidth() != mImageWidth)
+			|| (mOffscreenSurface.getHeight() != mHeight)) {
+			handleReleaseOffscreen();
+			mOffscreenSurface = GLSurface.newInstance(isGLES3(), GLES20.GL_TEXTURE0, mImageWidth, mImageHeight);
+			mTarget = RendererTarget.newInstance(getEgl(), mOffscreenSurface, 0.0f);
+		}
+		if ((mOffscreenSurface != null) && (mTarget != null)) {
+			// オフスクリーンSurfaceへ描画
+			mTarget.draw(mDrawer, GLES20.GL_TEXTURE0, mTexId, mTexMatrix);
+			// オフスクリーンのフレームバッファへ切り替え
+			mOffscreenSurface.makeCurrent();
+			// オフスクリーンのバックバッファから読み込み
+			mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
+		}
 		mEglTask.swap();
 		// Bitmapへ代入
 		synchronized (mBitmap) {
@@ -410,6 +435,7 @@ public class SurfaceDrawable extends Drawable {
 				mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
 				final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 				mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
+				handleReleaseOffscreen();
 				mImageWidth = width;
 				mImageHeight = height;
 				updateTransformMatrix();
@@ -432,7 +458,7 @@ public class SurfaceDrawable extends Drawable {
 		handleReleaseInputSurface();
 		mEglTask.makeCurrent();
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
-		mTexId = mDrawer.initTex(GLES20.GL_TEXTURE0);
+		mTexId = GLUtils.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mInputTexture = new SurfaceTexture(mTexId);
 		mInputSurface = new Surface(mInputTexture);
 		if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
@@ -452,6 +478,7 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
+		handleReleaseOffscreen();
 		if (mInputSurface != null) {
 			try {
 				mInputSurface.release();
@@ -473,9 +500,17 @@ public class SurfaceDrawable extends Drawable {
 			GLUtils.deleteTex(mTexId);
 			mTexId = 0;
 		}
-		if (mDrawer != null) {
-			mDrawer.release();
-			mDrawer = null;
+	}
+
+	private void handleReleaseOffscreen() {
+		if (DEBUG) Log.v(TAG, "handleReleaseOffscreen:");
+		if (mTarget != null) {
+			mTarget.release();
+			mTarget = null;
+		}
+		if (mOffscreenSurface != null) {
+			mOffscreenSurface.release();
+			mOffscreenSurface = null;
 		}
 	}
 
