@@ -43,8 +43,8 @@ import kotlin.math.sign
  */
 class ImageFragment: BaseFragment() {
 
-	private var mInfo: MediaInfo? = null
-	private var mImageView: TouchTransformImageView? = null
+	private lateinit var mInfo: MediaInfo
+	private lateinit var mImageView: TouchTransformImageView
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -66,7 +66,7 @@ class ImageFragment: BaseFragment() {
 			args = arguments
 		}
 		if (args != null) {
-			mInfo = BundleCompat.getParcelable(args, ARG_MEDIA_INFO, MediaInfo::class.java)
+			mInfo = BundleCompat.getParcelable(args, ARG_MEDIA_INFO, MediaInfo::class.java)!!
 		}
 		initView(view)
 	}
@@ -87,18 +87,19 @@ class ImageFragment: BaseFragment() {
 
 //--------------------------------------------------------------------------------
 	private fun initView(rootView: View) {
-		if (DEBUG) Log.v(TAG, "initView:" + mInfo!!.uri)
+		if (DEBUG) Log.v(TAG, "initView:" + mInfo.uri)
 		mImageView = rootView.findViewById(R.id.image_view)
-		mImageView!!.setOnClickListener {
+		mImageView.setOnClickListener {
 			v -> if (DEBUG) Log.v(TAG, "onClick:$v")
 		}
-		mImageView!!.enableHandleTouchEvent = (TouchViewTransformer.TOUCH_ENABLED_MOVE
+		mImageView.enableHandleTouchEvent = (
+			TouchViewTransformer.TOUCH_ENABLED_MOVE
 			or TouchViewTransformer.TOUCH_ENABLED_ZOOM
 			or TouchViewTransformer.TOUCH_ENABLED_ROTATE)
-		mImageView!!.viewTransformListener = object: ITouchViewTransformer.ViewTransformListener<Matrix> {
+		mImageView.viewTransformListener = object: ITouchViewTransformer.ViewTransformListener<Matrix> {
 			override fun onStateChanged(view: View, newState: Int) {
 				if (newState == TouchViewTransformer.STATE_NON) {
-					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView!!.scale}")
+					if (DEBUG) Log.v(TAG, "onStateChanged:scale=${mImageView.scale}")
 				}
 			}
 
@@ -106,7 +107,7 @@ class ImageFragment: BaseFragment() {
 				if (DEBUG) Log.v(TAG, "onTransformed:${transform}")
 			}
 		}
-		mImageView!!.setOnGenericMotionListener(object : View.OnGenericMotionListener {
+		mImageView.setOnGenericMotionListener(object : View.OnGenericMotionListener {
 			override fun onGenericMotion(v: View?, event: MotionEvent?): Boolean {
 				if (MotionEventUtils.isFromSource(event!!, InputDevice.SOURCE_CLASS_POINTER)) {
 					when (event.action) {
@@ -120,7 +121,7 @@ class ImageFragment: BaseFragment() {
 						// process the scroll wheel movement...
 						val vScroll = event.getAxisValue(MotionEvent.AXIS_VSCROLL)
 						if (vScroll != 0.0f) {
-							mImageView!!.setScaleRelative(1.0f + vScroll.sign / 10.0f)	// 1.1か0.9
+							mImageView.setScaleRelative(1.0f + vScroll.sign / 10.0f)	// 1.1か0.9
 						}
 						return true
 					}
@@ -130,21 +131,21 @@ class ImageFragment: BaseFragment() {
 			}
 		})
 		if (USU_LOADER_DRAWABLE) {
-			var drawable = mImageView!!.drawable
+			var drawable = mImageView.drawable
 			if (drawable !is LoaderDrawable) {
 				drawable = ImageLoaderDrawable(
 					requireContext(), -1, -1)
-				mImageView!!.setImageDrawable(drawable)
+				mImageView.setImageDrawable(drawable)
 			}
-			(drawable as LoaderDrawable).startLoad(mInfo!!)
+			(drawable as LoaderDrawable).startLoad(mInfo)
 		} else {
 			queueEvent({
 //				mImageView.setImageURI(mInfo.getUri());
 				try {
 					val bitmap = BitmapHelper.asBitmap(
-						requireContext().contentResolver, mInfo!!.id)
+						requireContext().contentResolver, mInfo.id)
 					runOnUiThread ({
-						mImageView!!.setImageBitmap(bitmap)
+						mImageView.setImageBitmap(bitmap)
 					})
 				} catch (e: IOException) {
 					Log.w(TAG, e)
