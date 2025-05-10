@@ -273,8 +273,6 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected final void handleOnStart() {
 		if (DEBUG) Log.v(TAG, "handleOnStart:");
-		// OESテクスチャを直接ハンドリングできないのでオフスクリーンへ描画して読み込む
-		mDrawer = GLDrawer2D.create(isOES3Supported(), true);
 	}
 
 	/**
@@ -283,10 +281,6 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected final void handleOnStop() {
 		if (DEBUG) Log.v(TAG, "handleOnStop:");
-		if (mDrawer != null) {
-			mDrawer.release();
-			mDrawer = null;
-		}
 		handleReleaseInputSurface();
 	}
 
@@ -379,8 +373,8 @@ public class SurfaceDrawable extends Drawable {
 		mEglTask.makeCurrent();
 		handleReleaseInputSurface();
 		mEglTask.makeCurrent();
-		mTexId = GLUtils.initTex(
-			GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		mDrawer = GLDrawer2D.create(isGLES3(), true);
+		mTexId = mDrawer.initTex(GLES20.GL_TEXTURE0);
 		mInputTexture = new SurfaceTexture(mTexId);
 		mInputSurface = new Surface(mInputTexture);
 		if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
@@ -420,6 +414,10 @@ public class SurfaceDrawable extends Drawable {
 		if (mTexId != 0) {
 			GLUtils.deleteTex(mTexId);
 			mTexId = 0;
+		}
+		if (mDrawer != null) {
+			mDrawer.release();
+			mDrawer = null;
 		}
 	}
 
