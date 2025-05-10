@@ -229,9 +229,12 @@ public class SurfaceDrawable extends Drawable {
 	}
 //--------------------------------------------------------------------------------
 	@Override
-	protected void onBoundsChange(final Rect bounds) {
+	protected void onBoundsChange(@NonNull final Rect bounds) {
 		super.onBoundsChange(bounds);
-		updateTransformMatrix();
+		if (DEBUG) Log.v(TAG, "onBoundsChange:" + bounds);
+		synchronized (mSync) {
+			updateTransformMatrix();
+		}
 	}
 
 	protected EGLBase getEgl() {
@@ -351,12 +354,14 @@ public class SurfaceDrawable extends Drawable {
 	protected void handleResize(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		if ((mImageWidth != width) || (mImageHeight != height)) {
-			mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
-			final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
-			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
-			mImageWidth = width;
-			mImageHeight = height;
-			updateTransformMatrix();
+			synchronized (mSync) {
+				mBitmap.reconfigure(width, height, Bitmap.Config.ARGB_8888);
+				final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
+				mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
+				mImageWidth = width;
+				mImageHeight = height;
+				updateTransformMatrix();
+			}
 			if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
 				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
 				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
