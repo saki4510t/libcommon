@@ -48,8 +48,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
-import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
-
 /**
  * Surface/SurfaceTexture経由で受け取った映像を表示するDrawable
  */
@@ -57,17 +55,35 @@ public class SurfaceDrawable extends Drawable {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = SurfaceDrawable.class.getSimpleName();
 
+	/**
+	 * 映像取得用のSurfaceの生成時・破棄時のコールバック
+	 */
 	public interface Callback {
 		public void onCreateSurface(@NonNull final Surface surface);
 		public void onDestroySurface();
 	}
 
+	/**
+	 * 描画要求
+	 */
 	private static final int REQUEST_DRAW = 1;
+	/**
+	 * 映像サイズ変更要求
+	 */
 	private static final int REQUEST_UPDATE_SIZE = 2;
+	/**
+	 * 映像取得用のSurface/Surfacetexture再生成要求
+	 */
 	private static final int REQUEST_RECREATE_MASTER_SURFACE = 5;
 
+	/**
+	 * 排他処理用
+	 */
 	@NonNull
 	private final Object mSync = new Object();
+	/**
+	 * Drawable#invalidateSelfをUIスレッド上で呼び出すためのHandler
+	 */
 	@NonNull
 	private final Handler mUIHandler = new Handler(Looper.getMainLooper());
 	/**
@@ -78,19 +94,48 @@ public class SurfaceDrawable extends Drawable {
 	private final Callback mCallback;
 	@NonNull
 	private final EglTask mEglTask;
+	/**
+	 * Surface/SurfaceTextureを経由して受け取った映像を保持するBitmap
+	 */
 	@NonNull
 	private final Bitmap mBitmap;
+	/**
+	 * Drawable#drawでBitmapをDrawableへ描画する際の変換行列
+	 */
 	@NonNull
 	private final Matrix mTransform = new Matrix();
+	/**
+	 * Drawableへの描画処理に使うPaint実装
+	 */
 	@NonNull
 	private final Paint mPaint = new Paint();
+
+	// ここから下はEGL|GLコンテキスト上でのみアクセスする
+	/**
+	 * SurfaceTextureからテクスチャとして受け取る映像のテクスチャ変換行列
+	 */
 	@Size(min=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
+	/**
+	 * テクスチャの読み込みに使うワーク用バッファ
+	 */
 	private ByteBuffer mWorkBuffer;
+	/**
+	 * テクスチャID
+	 */
 	private int mTexId;
+	/**
+	 * 映像受け取り用のSurfaceTexture
+	 */
 	private SurfaceTexture mInputTexture;
+	/**
+	 * 映像受け取り用のSurface
+	 */
 	private Surface mInputSurface;
+	/**
+	 * テクスチャを読み取るためにオフスクリーン描画するためのGLDrawer2D
+	 */
 	private GLDrawer2D mDrawer;
 
 	/**
@@ -177,11 +222,13 @@ public class SurfaceDrawable extends Drawable {
 
 	@Override
 	public void setAlpha(final int alpha) {
+		if (DEBUG) Log.v(TAG, "setAlpha:" + alpha);
 		mPaint.setAlpha(alpha);
 	}
 
 	@Override
 	public void setColorFilter(@Nullable final ColorFilter filter) {
+		if (DEBUG) Log.v(TAG, "setColorFilter:" + filter);
 		mPaint.setColorFilter(filter);
 	}
 
@@ -284,6 +331,14 @@ public class SurfaceDrawable extends Drawable {
 		handleReleaseInputSurface();
 	}
 
+	/**
+	 * ワーカースレッド上でのイベントハンドラ
+	 * @param request
+	 * @param arg1
+	 * @param arg2
+	 * @param obj
+	 * @return
+	 */
 	@WorkerThread
 	protected Object handleRequest(final int request,
 		final int arg1, final int arg2, final Object obj) {
@@ -299,6 +354,9 @@ public class SurfaceDrawable extends Drawable {
 
 	private int drawCnt;
 
+	/**
+	 * 受け取ったテクスチャをオフスクリーン描画してBitmapへ読み込む
+	 */
 	@WorkerThread
 	protected void handleDraw() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
@@ -421,6 +479,9 @@ public class SurfaceDrawable extends Drawable {
 		}
 	}
 
+	/**
+	 * Drawable#drawでBitmapをDrawableへ描画する際の変換行列を更新
+	 */
 	private void updateTransformMatrix() {
 		@NonNull
 		final Rect bounds = getBounds();
@@ -433,16 +494,26 @@ public class SurfaceDrawable extends Drawable {
 		if (DEBUG) Log.v(TAG, "updateTransformMatrix:" + mTransform);
 	}
 
+	/**
+	 * Callback#onCreateSurface呼び出しのためのヘルパーメソッド
+	 * @param surface
+	 */
 	private void onCreateSurface(@NonNull final Surface surface) {
 		if (DEBUG) Log.v(TAG, "onCreateSurface:" + surface);
 		mCallback.onCreateSurface(surface);
 	}
 
+	/**
+	 * Callback#onDestroySurface呼び出しのためのヘルパーメソッド
+	 */
 	private void onDestroySurface() {
 		if (DEBUG) Log.v(TAG, "onDestroySurface:");
 		mCallback.onDestroySurface();
 	}
 
+	/**
+	 * SurfaceTextureが映像を受け取ったときのコールバックリスナー
+	 */
 	private final SurfaceTexture.OnFrameAvailableListener
 		mOnFrameAvailableListener = new SurfaceTexture.OnFrameAvailableListener() {
 		@Override
