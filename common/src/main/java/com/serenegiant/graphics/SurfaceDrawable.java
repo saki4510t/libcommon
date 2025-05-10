@@ -376,22 +376,20 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected void handleReCreateInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
-		synchronized (mSync) {
-			mEglTask.makeCurrent();
-			handleReleaseInputSurface();
-			mEglTask.makeCurrent();
-			mTexId = GLUtils.initTex(
-				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
-			mInputTexture = new SurfaceTexture(mTexId);
-			mInputSurface = new Surface(mInputTexture);
-			if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
-				mImageWidth, mImageHeight, getIntrinsicWidth(), getIntrinsicHeight()));
-			if (BuildCheck.isAndroid4_1()) {
-				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
-				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
-			}
-			mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
+		mEglTask.makeCurrent();
+		handleReleaseInputSurface();
+		mEglTask.makeCurrent();
+		mTexId = GLUtils.initTex(
+			GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
+		mInputTexture = new SurfaceTexture(mTexId);
+		mInputSurface = new Surface(mInputTexture);
+		if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
+			mImageWidth, mImageHeight, getIntrinsicWidth(), getIntrinsicHeight()));
+		if (BuildCheck.isAndroid4_1()) {
+			// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
+			mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
 		}
+		mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		onCreateSurface(mInputSurface);
 	}
 
@@ -402,28 +400,26 @@ public class SurfaceDrawable extends Drawable {
 	@WorkerThread
 	protected void handleReleaseInputSurface() {
 		if (DEBUG) Log.v(TAG, "handleReleaseInputSurface:");
-		synchronized (mSync) {
-			if (mInputSurface != null) {
-				try {
-					mInputSurface.release();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				mInputSurface = null;
-				onDestroySurface();
+		if (mInputSurface != null) {
+			try {
+				mInputSurface.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
-			if (mInputTexture != null) {
-				try {
-					mInputTexture.release();
-				} catch (final Exception e) {
-					Log.w(TAG, e);
-				}
-				mInputTexture = null;
+			mInputSurface = null;
+			onDestroySurface();
+		}
+		if (mInputTexture != null) {
+			try {
+				mInputTexture.release();
+			} catch (final Exception e) {
+				Log.w(TAG, e);
 			}
-			if (mTexId != 0) {
-				GLUtils.deleteTex(mTexId);
-				mTexId = 0;
-			}
+			mInputTexture = null;
+		}
+		if (mTexId != 0) {
+			GLUtils.deleteTex(mTexId);
+			mTexId = 0;
 		}
 	}
 
