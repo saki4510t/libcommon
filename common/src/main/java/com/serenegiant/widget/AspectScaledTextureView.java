@@ -36,11 +36,13 @@ import androidx.annotation.Nullable;
  * View/表示内容のスケーリング処理を追加したTextureView
  * スケーリングモードがSCALE_MODE_KEEP_ASPECTのときはViewのサイズ変更を行う
  */
+@Deprecated
 public class AspectScaledTextureView extends TransformTextureView
 	implements TextureView.SurfaceTextureListener,
 		IScaledView {
 
 	private static final boolean DEBUG = false;	// set false on production
+	@SuppressWarnings("deprecation")
 	private static final String TAG = AspectScaledTextureView.class.getSimpleName();
 
 	protected final Matrix mImageMatrix = new Matrix();

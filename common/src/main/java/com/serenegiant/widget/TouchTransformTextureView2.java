@@ -46,7 +46,6 @@ import static com.serenegiant.view.TouchViewTransformer.*;
 
 /**
  * ViewTransformDelegatorを使って拡大縮小回転平行移動をするTextureView
- * FIXME まだ挙動がおかしい
  */
 public class TouchTransformTextureView2
 	extends TransformTextureView implements IMirror,

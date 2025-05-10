@@ -31,7 +31,7 @@ import java.lang.UnsupportedOperationException
 
 class CameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: TouchTransformTextureView(context, attrs, defStyleAttr), ICameraView {
+		: TouchTransformTextureView2(context, attrs, defStyleAttr), ICameraView {
 
 	private val mCameraDelegator: CameraDelegator
 

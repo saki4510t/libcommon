@@ -43,7 +43,7 @@ import com.serenegiant.view.TouchViewTransformer
  */
 class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyleAttr: Int = 0)
-		: TouchTransformTextureView(context, attrs, defStyleAttr), ICameraView, GLPipelineView {
+		: TouchTransformTextureView2(context, attrs, defStyleAttr), ICameraView, GLPipelineView {
 
 	private val mGLManager: GLManager
 	private val mGLContext: GLContext

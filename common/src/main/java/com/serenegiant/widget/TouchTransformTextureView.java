@@ -45,10 +45,13 @@ import static com.serenegiant.view.TouchViewTransformer.*;
  * FIXME 拡大縮小回転移動処理をDelegatorへ分けたい
  * FIXME ViewTransformDelegatorを使うように変更する？AspectScaledTextureViewを継承しているから難しそう
  */
+@SuppressWarnings("deprecation")
+@Deprecated
 public class TouchTransformTextureView
 	extends AspectScaledTextureView implements IMirror {
 
 	private static final boolean DEBUG = false;	// TODO for debugging
+	@SuppressWarnings("deprecation")
 	private static final String TAG = TouchTransformTextureView.class.getSimpleName();
 
 	/**
