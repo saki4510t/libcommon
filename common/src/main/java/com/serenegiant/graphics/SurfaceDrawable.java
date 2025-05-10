@@ -122,6 +122,7 @@ public class SurfaceDrawable extends Drawable {
 		final int maxClientVersion,
 		@NonNull final Callback callback) {
 
+		if (DEBUG) Log.v(TAG, String.format("コンストラクタ:(%dx%d)", imageWidth, imageHeight));
 		mWidth = mImageWidth = imageWidth;
 		mHeight = mImageHeight = imageHeight;
 		mCallback = callback;
@@ -384,6 +385,8 @@ public class SurfaceDrawable extends Drawable {
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);
 			mInputSurface = new Surface(mInputTexture);
+			if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
+				mImageWidth, mImageHeight, getIntrinsicWidth(), getIntrinsicHeight()));
 			if (BuildCheck.isAndroid4_1()) {
 				// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
 				mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
@@ -434,6 +437,7 @@ public class SurfaceDrawable extends Drawable {
 		final float scaleY = mHeight / (float)mBitmap.getHeight();
 		mTransform.reset();
 		mTransform.postScale(scaleX, scaleY);
+		if (DEBUG) Log.v(TAG, "updateTransformMatrix:" + mTransform);
 	}
 
 	private void onCreateSurface(@NonNull final Surface surface) {
