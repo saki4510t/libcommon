@@ -89,12 +89,7 @@ public interface ITouchViewTransformer {
 	 * 拡大縮小・回転処理開始時の最小タッチ間隔
 	 * この値より小さい場合には拡大縮小・回転処理を行わない
 	 */
-	public static final float MIN_DISTANCE = 15.f;
-	/**
-	 * 拡大縮小・回転処理開始時の最小タッチ間隔の2乗
-	 * 処理の高速化のためにタッチ間隔の計算で平方根の処理をおこなわずに済むように
-	 */
-	public static final float MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
+	public static final float MIN_DISTANCE_DP = 16;
 	/**
 	 * 平行移動時に表示内容がView外へ出てしまうのを防ぐための制限値
 	 */

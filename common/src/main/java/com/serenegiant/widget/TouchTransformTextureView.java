@@ -33,6 +33,7 @@ import android.view.MotionEvent;
 
 import com.serenegiant.common.R;
 import com.serenegiant.glutils.IMirror;
+import com.serenegiant.system.DisplayMetricsUtils;
 import com.serenegiant.view.ViewUtils;
 
 import androidx.annotation.NonNull;
@@ -125,6 +126,16 @@ public class TouchTransformTextureView
 	 */
 	protected final float mMaxScale = DEFAULT_MAX_SCALE;
 	/**
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔
+	 * この値より小さい場合には拡大縮小・回転処理を行わない
+	 */
+	private final float MIN_DISTANCE;
+	/**
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔の2乗
+	 * 処理の高速化のためにタッチ間隔の計算で平方根の処理をおこなわずに済むように
+	 */
+	public final float MIN_DISTANCE_SQUARE;
+	/**
 	 * Minimum zoom scale, set in #init as fit the image to this view bounds
 	 */
 	private float mMinScale = DEFAULT_MIN_SCALE;
@@ -172,6 +183,8 @@ public class TouchTransformTextureView
 	public TouchTransformTextureView(final Context context, final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		if (DEBUG) Log.v(TAG, "コンストラクタ");
+		MIN_DISTANCE = DisplayMetricsUtils.dpToPixels(context, MIN_DISTANCE_DP);
+		MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
 		final TypedArray a = context.getTheme().obtainStyledAttributes(
 				attrs, R.styleable.ZoomAspectScaledTextureView, defStyleAttr, 0);
 		try {

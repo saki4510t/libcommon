@@ -30,6 +30,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.serenegiant.system.DisplayMetricsUtils;
 import com.serenegiant.widget.ITransformView;
 
 import androidx.annotation.NonNull;
@@ -186,6 +187,16 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	@NonNull
 	private final float[] mTransCoords = new float[8];
 	/**
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔
+	 * この値より小さい場合には拡大縮小・回転処理を行わない
+	 */
+	private final float MIN_DISTANCE;
+	/**
+	 * 拡大縮小・回転処理開始時の最小タッチ間隔の2乗
+	 * 処理の高速化のためにタッチ間隔の計算で平方根の処理をおこなわずに済むように
+	 */
+	public final float MIN_DISTANCE_SQUARE;
+	/**
 	 * タッチ操作時のタッチID
 	 */
 	private int mPrimaryId, mSecondaryId;
@@ -256,6 +267,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	public TouchViewTransformer(@NonNull final ITransformView<Matrix> parent) {
 		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		final View target = parent.getView();
+		MIN_DISTANCE = DisplayMetricsUtils.dpToPixels(target.getContext(), MIN_DISTANCE_DP);
+		MIN_DISTANCE_SQUARE = MIN_DISTANCE * MIN_DISTANCE;
 		if (parent instanceof ViewTransformListener) {
 			mViewTransformListener = (ViewTransformListener<Matrix>)parent;
 		}
