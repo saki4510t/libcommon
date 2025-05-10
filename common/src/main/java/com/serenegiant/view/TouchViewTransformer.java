@@ -372,8 +372,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 				}
 			}
 			case STATE_DRAGGING -> {
-				if (processDrag(event))
+				if (processDrag(event)) {
 					return true;
+				}
 			}
 			case STATE_CHECKING -> {
 				if (checkTouchMoved(event)
@@ -384,12 +385,14 @@ public abstract class TouchViewTransformer extends ViewTransformer
 				}
 			}
 			case STATE_ZOOMING -> {
-				if (processZoom(event))
+				if (processZoom(event)) {
 					return true;
+				}
 			}
 			case STATE_ROTATING -> {
-				if (processRotate(event))
+				if (processRotate(event)) {
 					return true;
+				}
 			}
 			}
 			break;
@@ -634,12 +637,15 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	public void clearPendingTasks() {
 		if (DEBUG) Log.v(TAG, "clearPendingTasks:");
 		final View view = getTargetView();
-		if (mWaitImageReset != null)
+		if (mWaitImageReset != null) {
 			view.removeCallbacks(mWaitImageReset);
-		if (mStartCheckRotate != null)
+		}
+		if (mStartCheckRotate != null) {
 			view.removeCallbacks(mStartCheckRotate);
-		if (mWaitReverseReset != null)
+		}
+		if (mWaitReverseReset != null) {
 			view.removeCallbacks(mWaitReverseReset);
+		}
 	}
 
 	/**
