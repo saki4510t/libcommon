@@ -65,6 +65,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	private final class StartCheckRotate implements Runnable {
 		@Override
 		public void run() {
+			if (DEBUG) Log.v(TAG, "StartCheckRotate:");
 			if (mState == STATE_CHECKING) {
 				setState(STATE_ROTATING);
 			}
@@ -251,6 +252,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * コンストラクタ
 	 * @param parent
 	 */
+	@SuppressWarnings("unchecked")
 	public TouchViewTransformer(@NonNull final ITransformView<Matrix> parent) {
 		super(parent);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
@@ -417,7 +419,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * 回転処理開始時のコールバックリスナー(ユーザーフィードバック用)を設定
 	 * @param listener
 	 */
-	public void setViewTransformListener(@Nullable final ViewTransformListener listener) {
+	public void setViewTransformListener(@Nullable final ViewTransformListener<Matrix> listener) {
 		mViewTransformListener = listener;
 	}
 
@@ -425,7 +427,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * 現在設定されている回転処理開始時のコールバックリスナーを取得
 	 * @return
 	 */
-	public ViewTransformListener getViewTransformListener() {
+	public ViewTransformListener<Matrix> getViewTransformListener() {
 		return mViewTransformListener;
 	}
 
@@ -700,6 +702,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * @param event
 	 */
 	private boolean processDrag(@NonNull final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "processDrag:" + event);
 
 		float dx = event.getX() - mPrimaryX;
 		float dy = event.getY() - mPrimaryY;
@@ -818,8 +821,9 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			mPivotY = (mPrimaryY + mSecondY) / 2.f;
 			//
 			if ((mHandleTouchEvent & TOUCH_ENABLED_ROTATE) == TOUCH_ENABLED_ROTATE) {
-				if (mStartCheckRotate == null)
+				if (mStartCheckRotate == null) {
 					mStartCheckRotate = new StartCheckRotate();
+				}
 				getTargetView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
 			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
@@ -832,6 +836,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * @return
 	 */
 	private final void startZoom(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "startZoom:" + event);
 
 		getTargetView().removeCallbacks(mStartCheckRotate);
 		setState(STATE_ZOOMING);
@@ -843,6 +848,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * @return
 	 */
 	private final boolean processZoom(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "processZoom:" + event);
 
 		// restore the Matrix
 		restoreMatrix();
@@ -921,6 +927,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 	 * @return
 	 */
 	private final boolean processRotate(final MotionEvent event) {
+		if (DEBUG) Log.v(TAG, "processRotate:" + event);
 
 		if (checkTouchMoved(event)) {
 			// restore the Matrix
