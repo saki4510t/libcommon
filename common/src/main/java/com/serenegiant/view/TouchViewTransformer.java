@@ -818,6 +818,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 		if (DEBUG) Log.v(TAG, "startCheck:" + event);
 
 		if (event.getPointerCount() > 1) {
+			if (DEBUG) Log.v(TAG, "startCheck:pointerCount=" + event.getPointerCount());
 			// primary touch
 			mPrimaryId = event.getPointerId(0);
 			mPrimaryX = event.getX(0);
@@ -831,9 +832,10 @@ public abstract class TouchViewTransformer extends ViewTransformer
 			final float dy = mSecondY - mPrimaryY;
 			final float distance = (float)Math.hypot(dx, dy);
 			if (distance < MIN_DISTANCE) {
-				//  ignore when the touch distance is too short
+				if (DEBUG) Log.v(TAG, "startCheck:ignore when the touch distance is too short");
 				return;
 			}
+			if (DEBUG) Log.v(TAG, "startCheck:primary=" + mPrimaryId + ",secondary=" + mSecondaryId);
 
 			mTouchDistance = distance;
 			// set pivot position to the middle coordinate
@@ -844,6 +846,7 @@ public abstract class TouchViewTransformer extends ViewTransformer
 				if (mStartCheckRotate == null) {
 					mStartCheckRotate = new StartCheckRotate();
 				}
+				if (DEBUG) Log.v(TAG, "startCheck:start waiting rotation," + CHECK_TIMEOUT);
 				getTargetView().postDelayed(mStartCheckRotate, CHECK_TIMEOUT);
 			}
 			setState(STATE_CHECKING); 		// start zoom/rotation check
