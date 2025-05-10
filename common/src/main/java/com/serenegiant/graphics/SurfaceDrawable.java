@@ -311,16 +311,20 @@ public class SurfaceDrawable extends Drawable {
 		mEglTask.removeRequest(REQUEST_DRAW);
 		try {
 			mEglTask.makeCurrent();
+			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
+			mEglTask.swap();
 			return;
 		}
 		// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
 		mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
 		// オフスクリーンから読み取り
 		mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
+		mEglTask.swap();
 		// Bitmapへ代入
 		synchronized (mBitmap) {
 			mBitmap.copyPixelsFromBuffer(mWorkBuffer);
