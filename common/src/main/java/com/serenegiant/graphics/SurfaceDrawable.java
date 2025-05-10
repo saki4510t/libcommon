@@ -38,7 +38,6 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
 import java.nio.ByteBuffer;
@@ -321,12 +320,8 @@ public class SurfaceDrawable extends Drawable {
 		// OESテクスチャをオフスクリーン(マスターサーフェース)へ描画
 		mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
 		// オフスクリーンから読み取り
-		mWorkBuffer.clear();
-		GLES20.glReadPixels(0, 0,
-			mImageWidth, mImageHeight,
-			GLES20.GL_RGBA, GLES20.GL_UNSIGNED_BYTE, mWorkBuffer);
+		mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
 		// Bitmapへ代入
-		mWorkBuffer.clear();
 		synchronized (mBitmap) {
 			mBitmap.copyPixelsFromBuffer(mWorkBuffer);
 		}
