@@ -642,7 +642,7 @@ public class SAFUtils {
 	 * @throws UnsupportedOperationException
 	 */
 	@Nullable
-	/*package*/static Uri getStorageUri(
+	public static Uri getStorageUri(
 		@NonNull final Context context,
 		final int treeId) throws UnsupportedOperationException {
 
