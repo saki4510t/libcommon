@@ -66,7 +66,7 @@ import kotlin.concurrent.withLock
  * 対策としてServiceとして実装してアプリのライフサイクルと
  * MP4ファイル出力を切り離すためにServiceとして実装する
  */
-open class RecordingService() : LifecycleService() {
+open class RecordingService : LifecycleService() {
 	/**
 	 * RecordingServiceのステート変更時のコールバックリスナー
 	 */
@@ -81,17 +81,17 @@ open class RecordingService() : LifecycleService() {
 	/**
 	 * Binder class to access this local service
 	 */
-	inner class LocalBinder() : Binder() {
+	inner class LocalBinder : Binder() {
 		val service: RecordingService
 			get() = this@RecordingService
 	}
 
 	//--------------------------------------------------------------------------------
-	private val mListeners: MutableSet<StateChangeListener?> = CopyOnWriteArraySet()
+	private val mListeners: MutableSet<StateChangeListener> = CopyOnWriteArraySet()
 	private val binder: IBinder = LocalBinder()
 	private val mLock = ReentrantLock()
-	private var mVideoConfig: VideoConfig? = null
-	private var mIntent: Intent? = null
+	private var mVideoConfig = VideoConfig()
+	private var mIntent = Intent()
 	private var mState = STATE_UNINITIALIZED
 	private var mIsBind = false
 
@@ -170,7 +170,7 @@ open class RecordingService() : LifecycleService() {
 	override fun onUnbind(intent: Intent): Boolean {
 		if (DEBUG) Log.d(TAG, "onUnbind:$intent")
 		mIsBind = false
-		mIntent = null
+		mIntent = Intent()
 		mListeners.clear()
 		checkStopSelf()
 		if (DEBUG) Log.v(TAG, "onUnbind:finished")
@@ -216,18 +216,16 @@ open class RecordingService() : LifecycleService() {
 	 * ステート変更時のコールバックリスナーを登録する
 	 * @param listener
 	 */
-	fun addListener(listener: StateChangeListener?) {
+	fun addListener(listener: StateChangeListener) {
 		if (DEBUG) Log.v(TAG, "addListener:$listener")
-		if (listener != null) {
-			mListeners.add(listener)
-		}
+		mListeners.add(listener)
 	}
 
 	/**
 	 * ステート変更時のコールバックリスナーを登録解除する
 	 * @param listener
 	 */
-	fun removeListener(listener: StateChangeListener?) {
+	fun removeListener(listener: StateChangeListener) {
 		if (DEBUG) Log.v(TAG, "removeListener:$listener")
 		mListeners.remove(listener)
 	}
@@ -450,7 +448,7 @@ open class RecordingService() : LifecycleService() {
 		)
 	}
 
-	private val intent: Intent?
+	private val intent: Intent
 		get() = mIntent
 
 	/**
@@ -458,10 +456,7 @@ open class RecordingService() : LifecycleService() {
 	 * @return
 	 */
 	private fun requireConfig(): VideoConfig {
-		if (mVideoConfig == null) {
-			mVideoConfig = VideoConfig()
-		}
-		return mVideoConfig!!
+		return mVideoConfig
 	}
 
 	/**
@@ -483,9 +478,9 @@ open class RecordingService() : LifecycleService() {
 			if (changed) {
 				try {
 					lifecycleScope.launch(Dispatchers.Default) {
-						for (listener: StateChangeListener? in mListeners) {
+						for (listener: StateChangeListener in mListeners) {
 							try {
-								listener!!.onStateChanged(this@RecordingService, newState)
+								listener.onStateChanged(this@RecordingService, newState)
 							} catch (e: Exception) {
 								mListeners.remove(listener)
 							}
@@ -742,11 +737,12 @@ open class RecordingService() : LifecycleService() {
 		val muxer: MediaMuxerWrapper =
 			MediaMuxerWrapper.newInstance(this, output, MediaMuxer.OutputFormat.MUXER_OUTPUT_MPEG_4)
 				?: throw IllegalArgumentException()
+		mVideoTrackIx = if (videoFormat != null) muxer.addTrack(videoFormat) else -1
+		mAudioTrackIx = if (audioFormat != null) muxer.addTrack(audioFormat) else -1
+		if (DEBUG) Log.v(TAG, "internalStart:videoTackIx=$mVideoTrackIx,audioTrackIx=$mAudioTrackIx")
 		mLock.withLock {
 			mMuxer = muxer
 		}
-		mVideoTrackIx = if (videoFormat != null) muxer.addTrack(videoFormat) else -1
-		mAudioTrackIx = if (audioFormat != null) muxer.addTrack(audioFormat) else -1
 		muxer.start()
 	}
 
@@ -767,11 +763,6 @@ open class RecordingService() : LifecycleService() {
 			} catch (e: Exception) {
 				Log.w(TAG, e)
 			}
-//			val outputPath: String? = if (muxer is MediaMuxerWrapper) {
-//				muxer.outputPath
-//			} else {
-//				null
-//			}
 			lifecycleScope.launch(Dispatchers.Default) {
 				try {
 					if (DEBUG) Log.v(TAG, "internalStop:release muxer")
@@ -781,36 +772,6 @@ open class RecordingService() : LifecycleService() {
 					Log.w(TAG, e)
 				}
 			}
-//			if (DEBUG) Log.v(TAG, "internalStop:outputPath=$outputPath")
-//			if (!TextUtils.isEmpty(outputPath)) {
-//				try {
-//					val out = File(outputPath!!)
-//					if (out.exists() && out.canRead()) {
-//						if (DEBUG) Log.v(TAG, "internalStop:scanFile $outputPath")
-//						state = STATE_SCAN_FILE
-//						mScanFileTimeoutJob = lifecycleScope.launch {
-//							delay(5000L)
-//							onScanCompleted(RuntimeException("scanFile timeout"))
-//						}
-//						try {
-//							MediaScannerConnection.scanFile(this.applicationContext,
-//								arrayOf(outputPath),
-//								arrayOf("video/mp4")
-//							) { path, uri ->
-//								if (DEBUG) Log.v(TAG, "onScanCompleted:path=$path,uri=$uri")
-//								mScanFileTimeoutJob?.cancel()
-//								onScanCompleted(null)
-//							}
-//						} catch (e: Exception) {
-//							mScanFileTimeoutJob?.cancel()
-//							onScanCompleted(e)
-//						}
-//					}
-//				} catch (e: Exception) {
-//					mScanFileTimeoutJob?.cancel()
-//					onScanCompleted(e)
-//				}
-//			}
 		}
 		if (DEBUG) Log.v(TAG, "internalStop:state=$state")
 		if (state == STATE_RECORDING) {
@@ -818,23 +779,6 @@ open class RecordingService() : LifecycleService() {
 		}
 		checkStopSelf()
 	}
-
-//	/**
-//	 * 何らかの理由でMediaScannerConnectionから#onScanCompletedが
-//	 * 呼ばれなかったときにステートをリセットするためのRunnable
-//	 */
-//	private var mScanFileTimeoutJob: Job? = null
-
-//	private fun onScanCompleted(t: Throwable?) {
-//		if (DEBUG) Log.v(TAG, "onScanCompleted:$t")
-//		if (t != null) {
-//			Log.w(TAG, t)
-//		}
-//		if (state == STATE_SCAN_FILE) {
-//			state = STATE_INITIALIZED
-//		}
-//		checkStopSelf()
-//	}
 
 	/**
 	 * エンコード済みのフレームデータを書き出す
@@ -853,7 +797,7 @@ open class RecordingService() : LifecycleService() {
 			mMuxer
 		}
 		var i = 0
-		while (isRecording && (i < 100) && (muxer == null)) {
+		while (isRecording && (i < 100) && ((muxer == null) || !muxer.isStarted())) {
 			ThreadUtils.NoThrowSleep(10L)
 			muxer = mLock.withLock {
 				mMuxer
@@ -982,6 +926,7 @@ open class RecordingService() : LifecycleService() {
 	 * @param buffer
 	 * @param presentationTimeUs ［マイクロ秒］
 	 */
+	@Suppress("DEPRECATION")
 	private fun encode(
 		encoder: MediaCodec,
 		buffer: ByteBuffer?, presentationTimeUs: Long
