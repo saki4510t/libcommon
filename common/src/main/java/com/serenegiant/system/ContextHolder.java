@@ -29,8 +29,10 @@ import android.os.Looper;
 
 import java.lang.ref.WeakReference;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 
 /**
@@ -205,6 +207,10 @@ public abstract class ContextHolder<T extends Context> {
 	@NonNull
 	public CharSequence getText(final int resId) throws IllegalStateException {
 		return requireContext().getText(resId);
+	}
+
+	public int getColor(@ColorRes final int resId) throws IllegalStateException {
+		return ResourcesCompat.getColor(requireResources(), resId, null);
 	}
 
 	public void sendLocalBroadcast(@NonNull final Intent intent) throws IllegalStateException {
