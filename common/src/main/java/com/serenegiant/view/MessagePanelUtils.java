@@ -66,6 +66,7 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 	private static final String APP_EXTRA_KEY_MESSAGE_ID = "APP_EXTRA_KEY_MESSAGE_ID";
 	private static final String APP_EXTRA_KEY_MESSAGE = "APP_EXTRA_KEY_MESSAGE";
 	private static final String APP_EXTRA_KEY_CLICK_INTENT = "APP_EXTRA_KEY_CLICK_INTENT";
+	private static final String APP_EXTRA_KEY_COLOR = "APP_EXTRA_KEY_COLOR";
 
 	// メッセージパネル非表示要求
 	private static final String APP_ACTION_HIDE_MESSAGE = "APP_ACTION_HIDE_MESSAGE";
@@ -248,18 +249,19 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 		private void showMessage(@NonNull final Context context, @NonNull final Intent intent) {
 			if (DEBUG) Log.v(TAG, "showMessage:" + intent);
 			final long autoHideDurationMs = intent.getLongExtra(APP_EXTRA_KEY_MESSAGE_AUTO_HIDE, MESSAGE_DURATION_INFINITY);
+			final int cl = intent.getIntExtra(APP_EXTRA_KEY_COLOR, mMessageTv.getCurrentTextColor());
 			final int msgId = intent.getIntExtra(APP_EXTRA_KEY_MESSAGE_ID, 0);
 			final String msg = intent.getStringExtra(APP_EXTRA_KEY_MESSAGE);
 			final Intent clickIntent = IntentCompat.getParcelableExtra(intent, APP_EXTRA_KEY_CLICK_INTENT, Intent.class);
 			if ((msgId != 0) && !TextUtils.isEmpty(msg)) {
 				// フォーマット用文字列リソース
-				showMessage(getString(msgId, msg), autoHideDurationMs, clickIntent);
+				showMessage(cl, getString(msgId, msg), autoHideDurationMs, clickIntent);
 			} else if (msgId != 0) {
 				// フォーマットなしの文字列リソース
-				showMessage(getString(msgId), autoHideDurationMs, clickIntent);
+				showMessage(cl, getString(msgId), autoHideDurationMs, clickIntent);
 			} else if (!TextUtils.isEmpty(msg)) {
 				// 文字列の即値指定
-				showMessage(msg, autoHideDurationMs, clickIntent);
+				showMessage(cl, msg, autoHideDurationMs, clickIntent);
 			} else {
 				// 例外オブジェクトからのメッセージ表示
 				try {
@@ -268,7 +270,7 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 					if (e != null) {
 						final String error = e.getMessage();
 						if (!TextUtils.isEmpty(error)) {
-							showMessage(error, autoHideDurationMs, clickIntent);
+							showMessage(cl, error, autoHideDurationMs, clickIntent);
 						}
 					}
 				} catch (final Exception e1) {
@@ -285,7 +287,7 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 		 * @param clickIntent メッセージパネルをクリックした時にローカルブルードキャストするIntent、
 		 * 			nullならローカルブロードキャストする代わりにメッセージパネルを非表示(#hideMessage)する
 		 */
-		private void showMessage(final String message, final long autoHideDurationMs, @Nullable final Intent clickIntent) {
+		private void showMessage(final int cl, final String message, final long autoHideDurationMs, @Nullable final Intent clickIntent) {
 			if (DEBUG) Log.v(TAG, "showMessage:" + message);
 			mPanelView.post(new Runnable() {
 				@Override
@@ -293,6 +295,7 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 					if (DEBUG) Log.i(TAG, String.format(Locale.US, "showMessage:size(%d,%d)",
 						mPanelView.getWidth(), mPanelView.getHeight()));
 					mMessageTv.setText(message);
+					mMessageTv.setTextColor(cl);
 					mPanelView.clearAnimation();
 					final ResizeAnimation expandAnimation
 						= new ResizeAnimation(mPanelView,
