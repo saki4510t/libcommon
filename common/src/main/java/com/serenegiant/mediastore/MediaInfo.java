@@ -27,14 +27,14 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.serenegiant.system.BuildCheck;
+
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Objects;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
-import static com.serenegiant.mediastore.MediaStoreUtils.*;
 
 /**
  * MediaStoreの情報を保持するためのコンテナクラス
@@ -65,6 +65,8 @@ public class MediaInfo implements Parcelable {
 	public int width;
 	public int height;
 	public int orientation;
+	public long dateTaken;
+	public long dateModified;
 
 	/**
 	 * デフォルトコンストラクタ
@@ -86,6 +88,8 @@ public class MediaInfo implements Parcelable {
 		width = src.width;
 		height = src.height;
 		orientation = src.orientation;
+		dateTaken = src.dateTaken;
+		dateModified = src.dateModified;
 	}
 
 	/**
@@ -102,6 +106,8 @@ public class MediaInfo implements Parcelable {
 		width = in.readInt();
 		height = in.readInt();
 		orientation = in.readInt();
+		dateTaken = in.readLong();
+		dateModified = in.readLong();
 	}
 
 	/**
@@ -109,7 +115,7 @@ public class MediaInfo implements Parcelable {
 	 * @param cursor
 	 */
 	MediaInfo(@NonNull final Cursor cursor) {
-		this(cursor, cursor.getInt(PROJ_INDEX_MEDIA_TYPE));
+		this(cursor, cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)));
 	}
 
 	/**
@@ -118,18 +124,7 @@ public class MediaInfo implements Parcelable {
 	 * @param cursor
 	 */
 	MediaInfo(@NonNull final Cursor cursor, final int mediaType) {
-		id = cursor.getLong(PROJ_INDEX_ID);
-		data = cursor.getString(PROJ_INDEX_DATA);
-		title = cursor.getString(PROJ_INDEX_TITLE);
-		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
-		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
-		this.mediaType = mediaType;
-		try {
-			width = cursor.getInt(PROJ_INDEX_WIDTH);
-			height = cursor.getInt(PROJ_INDEX_HEIGHT);
-		} catch (final Exception e) {
-			// ignore
-		}
+		loadFromCursor(cursor, mediaType);
 	}
 
 	/**
@@ -138,7 +133,7 @@ public class MediaInfo implements Parcelable {
 	 * @return
 	 */
 	MediaInfo loadFromCursor(@NonNull final Cursor cursor) {
-		return loadFromCursor(cursor, cursor.getInt(PROJ_INDEX_MEDIA_TYPE));
+		return loadFromCursor(cursor, cursor.getInt(cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE)));
 	}
 
 	/**
@@ -148,21 +143,72 @@ public class MediaInfo implements Parcelable {
 	 * @return
 	 */
 	MediaInfo loadFromCursor(@NonNull final Cursor cursor, final int mediaType) {
-		id = cursor.getLong(PROJ_INDEX_ID);
-		data = cursor.getString(PROJ_INDEX_DATA);
-		title = cursor.getString(PROJ_INDEX_TITLE);
-		mime = cursor.getString(PROJ_INDEX_MIME_TYPE);
-		displayName = cursor.getString(PROJ_INDEX_DISPLAY_NAME);
+		final int idColNum = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns._ID);
+		final int dataColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DATA);
+		final int titleColumn = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.TITLE);
+		final int mimeTypeColNum = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.MIME_TYPE);
+		final int mediaTypeColumnIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.MEDIA_TYPE);
+		final int displayNameIndex = cursor.getColumnIndexOrThrow(MediaStore.Files.FileColumns.DISPLAY_NAME);
+
+		final int orientationColNum = cursor.getColumnIndex(MediaStore.MediaColumns.ORIENTATION);
+		final int widthColumn = cursor.getColumnIndex(MediaStore.MediaColumns.WIDTH);
+		final int heightColumn = cursor.getColumnIndex(MediaStore.MediaColumns.HEIGHT);
+		final int dateTakenColNum = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_TAKEN);
+		final int dateModifiedColNum = cursor.getColumnIndex(MediaStore.MediaColumns.DATE_MODIFIED);
+
+		id = cursor.getLong(idColNum);
+		data = cursor.getString(dataColumn);
+		title = cursor.getString(titleColumn);
+		mime = cursor.getString(mimeTypeColNum);
+		displayName = cursor.getString(displayNameIndex);
+
 		this.mediaType = mediaType;
 		try {
-			width = cursor.getInt(PROJ_INDEX_WIDTH);
-			height = cursor.getInt(PROJ_INDEX_HEIGHT);
-			// Android 10以降でないとORIENTATIONが無い機種が多いのでここではセットしない
-//				orientation = cursor.getInt(PROJ_INDEX_ORIENTATION);
+			if (widthColumn >= 0) {
+				width = cursor.getInt(widthColumn);
+			} else {
+				width = 0;
+			}
 		} catch (final Exception e) {
 			// ignore
-			if (DEBUG) Log.w(TAG, e);
 		}
+		try {
+			if (heightColumn >= 0) {
+				height = cursor.getInt(heightColumn);
+			} else {
+				height = 0;
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+		try {
+			if (BuildCheck.isAndroid10() && (orientationColNum >= 0)) {
+				orientation = cursor.getInt(orientationColNum);
+			} else {
+				orientation = 0;
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+		try {
+			if (dateTakenColNum >= 0) {
+				dateTaken = cursor.getLong(dateTakenColNum);
+			} else {
+				dateTaken = 0L;
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+		try {
+			if (dateModifiedColNum >= 0) {
+				dateModified = cursor.getLong(dateModifiedColNum);
+			} else {
+				dateModified = 0L;
+			}
+		} catch (final Exception e) {
+			// ignore
+		}
+
 		return this;
 	}
 
@@ -180,6 +226,9 @@ public class MediaInfo implements Parcelable {
 		width = src.width;
 		height = src.height;
 		orientation = src.orientation;
+		dateTaken = src.dateTaken;
+		dateModified = src.dateModified;
+
 		return this;
 	}
 
@@ -250,6 +299,8 @@ public class MediaInfo implements Parcelable {
 			", width=" + width +
 			", height=" + height +
 			", orientation=" + orientation +
+			", dateTaken=" + dateTaken +
+			", dateModified=" + dateModified +
 			'}';
 	}
 
@@ -266,12 +317,14 @@ public class MediaInfo implements Parcelable {
 		if (!Objects.equals(data, mediaInfo.data)) return false;
 		if (!Objects.equals(title, mediaInfo.title)) return false;
 		if (!Objects.equals(mime, mediaInfo.mime)) return false;
+		if (dateTaken != mediaInfo.dateTaken) return false;
+		if (dateModified != mediaInfo.dateModified) return false;
 		return Objects.equals(displayName, mediaInfo.displayName);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = (int) (id ^ (id >>> 32));
+		int result = Long.hashCode(id);
 		result = 31 * result + (data != null ? data.hashCode() : 0);
 		result = 31 * result + (title != null ? title.hashCode() : 0);
 		result = 31 * result + (mime != null ? mime.hashCode() : 0);
@@ -280,6 +333,8 @@ public class MediaInfo implements Parcelable {
 		result = 31 * result + width;
 		result = 31 * result + height;
 		result = 31 * result + orientation;
+		result = 31 * result + Long.hashCode(dateTaken);
+		result = 31 * result + Long.hashCode(dateModified);
 		return result;
 	}
 
@@ -299,6 +354,8 @@ public class MediaInfo implements Parcelable {
 		dest.writeInt(width);
 		dest.writeInt(height);
 		dest.writeInt(orientation);
+		dest.writeLong(dateTaken);
+		dest.writeLong(dateModified);
 	}
 
 //--------------------------------------------------------------------------------
