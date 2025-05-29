@@ -28,27 +28,29 @@ public class MediaEffectGLCanny extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLCanny";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"%s" +
-		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform float uKernel[18];\n" +
-		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-		"uniform float uColorAdjust;\n" +
-		"const float lowerThreshold = 0.4;\n" +	// lowerとupperの値を入れ替えると白黒反転する
-		"const float upperThreshold = 0.8;\n" +
-		"void main() {\n" +
-		"    vec4 magdir = texture2D(sTexture, vTextureCoord);\n" +
-		"    vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];\n" +
-		"    float first = texture2D(sTexture, vTextureCoord + offset).r;\n" +
-		"    float second = texture2D(sTexture, vTextureCoord - offset).r;\n" +
-		"    float multiplier = step(first, magdir.r);\n" +
-		"    multiplier = multiplier * step(second, magdir.r);\n" +
-		"    float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);\n" +
-		"    multiplier = multiplier * threshold;\n" +
-		"    gl_FragColor = vec4(multiplier, multiplier, multiplier, 1.0);\n" +
-		"}\n";
+		"""
+		%s
+		#define KERNEL_SIZE3x3 %s
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float lowerThreshold = 0.4;	// lowerとupperの値を入れ替えると白黒反転する
+		const float upperThreshold = 0.8;
+		void main() {
+			vec4 magdir = texture2D(sTexture, vTextureCoord);
+			vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];
+			float first = texture2D(sTexture, vTextureCoord + offset).r;
+			float second = texture2D(sTexture, vTextureCoord - offset).r;
+			float multiplier = step(first, magdir.r);
+			multiplier = multiplier * step(second, magdir.r);
+			float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);
+			multiplier = multiplier * threshold;
+			gl_FragColor = vec4(multiplier, multiplier, multiplier, 1.0);
+		}
+		""";
 //		"void main() {\n" +
 //		"    vec4 magdir = texture2D(sTexture, vTextureCoord);\n" +
 //		"    float a = 0.5 / sin(3.14159 / 8.0); \n" +	// eight directions on grid
@@ -112,9 +114,9 @@ public class MediaEffectGLCanny extends MediaEffectGLBase {
 //		"    gl_FragColor = cannyEdge(vTextureCoord);\n" +
 //		"}\n";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, KERNEL_SIZE3x3, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, KERNEL_SIZE3x3, SAMPLER_OES);
 
 	public MediaEffectGLCanny() {
 		super(new MediaEffectKernel3x3Drawer(false, FRAGMENT_SHADER));

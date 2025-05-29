@@ -35,9 +35,11 @@ public class ShaderConst implements GLConst {
 	public static final String HEADER_OES_ES3 = "#extension GL_OES_EGL_image_external_essl3 : require\n";
 	public static final String SAMPLER_OES = "samplerExternalOES";
 
-	public static final int KERNEL_SIZE3x3 = 9;
-	public static final int KERNEL_SIZE5x5 = 25;
+	public static final int KERNEL_SIZE3x3_NUM = 9;
+	public static final int KERNEL_SIZE5x5_NUM = 25;
 
+	public static final String KERNEL_SIZE3x3 = "9";
+	public static final String KERNEL_SIZE5x5 = "25";
 //--------------------------------------------------------------------------------
 	public static final int[] TEX_NUMBERS = {
 		GLES20.GL_TEXTURE0, GLES20.GL_TEXTURE1,

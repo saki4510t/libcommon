@@ -74,7 +74,7 @@ public class MediaEffectGLExtraction extends MediaEffectGLBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
-	private final float[] mLimit = new float[KERNEL_SIZE3x3];
+	private final float[] mLimit = new float[KERNEL_SIZE3x3_NUM];
 
 	public MediaEffectGLExtraction() {
 		super(new MediaEffectKernel3x3Drawer(FRAGMENT_SHADER));
