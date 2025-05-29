@@ -63,11 +63,21 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	/**
+	 * デフォルトのEffectListener実装クラス
+	 */
+	public static class DefaultEffectListener implements EffectListener {
+		@Override
+		public boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
+			return GLEffectDrawer2D.defaultOnChangeEffect(drawer, effect);
+		}
+	}
+
+	/**
 	 * EffectDrawer2D用のDrawerFactoryのデフォルト実装
 	 */
 	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {};
 
-	@Nullable
+	@NonNull
 	private final EffectListener mEffectListener;
 	@NonNull
 	private final SparseArray<float[]> mParams = new SparseArray<float[]>();
@@ -151,7 +161,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		@Nullable EffectListener effectListener) {
 
 		super(isGLES3, isOES, vertices, texcoord, vs, fs);
-		mEffectListener = effectListener;
+		mEffectListener = effectListener != null ? effectListener : new DefaultEffectListener();
 		resetShader();
 	}
 
@@ -209,39 +219,12 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			mEffect = effect;
 			boolean handled = false;
 			try {
-				handled = (mEffectListener != null)
-					&& mEffectListener.onChangeEffect(effect, this);
+				handled = mEffectListener.onChangeEffect(effect, this);
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, e);
 			}
 			if (!handled) {
-				switch (effect) {
-				case EFFECT_NON -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_EXT_ES2);
-				case EFFECT_GRAY -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_GRAY_ES3 : FRAGMENT_SHADER_EXT_GRAY_ES2);
-				case EFFECT_GRAY_REVERSE -> updateShader(isGLES3
-					? FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES3 : FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2);
-				case EFFECT_BIN -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_ES3 : FRAGMENT_SHADER_EXT_BIN_ES2);
-				case EFFECT_BIN_YELLOW -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2);
-				case EFFECT_BIN_GREEN -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_GREEN_ES2);
-				case EFFECT_BIN_REVERSE -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_REVERSE_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2);
-				case EFFECT_BIN_REVERSE_YELLOW -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2);
-				case EFFECT_BIN_REVERSE_GREEN -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2);
-				case EFFECT_EMPHASIZE_RED_YELLOW -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2);
-				case EFFECT_EMPHASIZE_RED_YELLOW_WHITE -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2);
-				case EFFECT_EMPHASIZE_YELLOW_WHITE -> updateShader(isGLES3
-					? FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2);
-				default -> resetShader();
-				}
+				defaultOnChangeEffect(this, effect);
 			}
 			muParamsLoc = glGetUniformLocation("uParams");
 			mCurrentParams = mParams.get(effect);
@@ -312,4 +295,75 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 	}
 
+	/**
+	 * デフォルトの内蔵映像効果切り替え処理
+	 * @param drawer
+	 * @param effect
+	 * @return
+	 */
+	private static boolean defaultOnChangeEffect(@NonNull final GLEffectDrawer2D drawer, final int effect) {
+		final boolean isGLES3 = drawer.isGLES3;
+		final boolean isOES = drawer.isOES();
+		boolean handled = true;
+		switch (effect) {
+		case EFFECT_NON -> drawer.updateShader(drawer.isGLES3
+			? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_EXT_ES2);
+		case EFFECT_GRAY -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_GRAY_ES3 : FRAGMENT_SHADER_EXT_GRAY_ES2);
+		case EFFECT_GRAY_REVERSE -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES3 : FRAGMENT_SHADER_GRAY_EXT_REVERSE_ES2);
+		case EFFECT_BIN -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_ES3 : FRAGMENT_SHADER_EXT_BIN_ES2);
+		case EFFECT_BIN_YELLOW -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_YELLOW_ES2);
+		case EFFECT_BIN_GREEN -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_GREEN_ES2);
+		case EFFECT_BIN_REVERSE -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_REVERSE_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_ES2);
+		case EFFECT_BIN_REVERSE_YELLOW -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_YELLOW_ES2);
+		case EFFECT_BIN_REVERSE_GREEN -> drawer.updateShader(isGLES3
+			? FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES3 : FRAGMENT_SHADER_EXT_BIN_REVERSE_GREEN_ES2);
+		case EFFECT_EMPHASIZE_RED_YELLOW -> {
+			drawer.updateShader(isGLES3
+				? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOWS_ES2);
+			drawer.setParams(effect, new float[] {
+				0.17f, 0.85f,			// 赤色&黄色の色相下側閾値, 上側閾値
+				0.50f, 1.0f,			// 強調する彩度下限, 上限
+				0.40f, 1.0f,			// 強調する明度下限, 上限
+				1.0f, 1.0f, 5.0f,		// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+				1.0f, 1.0f, 1.0f,		// 通常時のファクター(H, S, Vの順)
+			});
+		}
+		case EFFECT_EMPHASIZE_RED_YELLOW_WHITE -> {
+			drawer.updateShader(isGLES3
+				? FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_RED_YELLOW_WHITE_ES2);
+			drawer.setParams(effect, new float[] {
+				0.17f, 0.85f,			// 赤色&黄色の色相下側閾値, 上側閾値
+				0.50f, 1.0f,			// 強調する彩度下限, 上限
+				0.40f, 1.0f,			// 強調する明度下限, 上限
+				1.0f, 1.0f, 5.0f,		// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+				1.0f, 1.0f, 1.0f,		// 通常時のファクター(H, S, Vの順)
+			});
+		}
+		case EFFECT_EMPHASIZE_YELLOW_WHITE -> {
+			drawer.updateShader(isGLES3
+				? FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES3 : FRAGMENT_SHADER_EXT_EMPHASIZE_YELLOW_WHITE_ES2);
+			drawer.setParams(effect, new float[] {
+				0.10f, 0.19f,			// 黄色の色相h下側閾値, 上側閾値
+				0.30f, 1.00f,			// 強調する彩度s下限, 上限
+				0.30f, 1.00f,			// 強調する明度v下限, 上限
+				1.00f, 1.00f, 5.00f,	// 強調時のファクター(H, S, Vの順) 明度(x5.0) = 1.0
+				1.00f, 0.80f, 0.80f,	// 通常時のファクター(H, S, Vの順) 彩度(x0.8)と明度(x0.8)を少し落とす
+				0.15f, 0.40f,			// 白強調時の彩度上限, 白強調時の明度下限
+				0, 0, 0, 0,				// ダミー
+			});
+		}
+		default -> {
+			drawer.resetShader();
+			handled = false;
+		}
+		}
+		return handled;
+	}
 }
