@@ -22,6 +22,7 @@ import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.gl.ShaderConst;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -32,18 +33,18 @@ import static com.serenegiant.gl.ShaderConst.*;
 public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 
 	public static final int KERNEL_SIZE = 9;
-	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
-	public static final float[] KERNEL_SOBEL_H = { 1f, 0f, -1f, 2f, 0f, -2f, 1f, 0f, -1f, };	// ソーベル(1次微分)
-	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
-	public static final float[] KERNEL_SOBEL2_H = { 3f, 0f, -3f, 10f, 0f, -10f, 3f, 0f, -3f, };
-	public static final float[] KERNEL_SOBEL2_V = { 3f, 10f, 3f, 0f, 0f, 0f, -3f, -10f, -3f, };
-	public static final float[] KERNEL_SHARPNESS = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// シャープネス
-	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
-	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
-	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均
-	public static final float[] KERNEL_GAUSSIAN = { 1/16f, 2/16f, 1/16f, 2/16f, 4/16f, 2/16f, 1/16f, 2/16f, 1/16f, };	// ガウシアン(ノイズ除去/)
-	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
-	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分)
+	public static final float[] KERNEL_NULL = ShaderConst.KERNEL_NULL;
+	public static final float[] KERNEL_SOBEL_H = ShaderConst.KERNEL_SOBEL_H;		// ソーベル(1次微分)
+	public static final float[] KERNEL_SOBEL_V = ShaderConst.KERNEL_SOBEL_V;
+	public static final float[] KERNEL_SOBEL2_H = ShaderConst.KERNEL_SOBEL2_H;
+	public static final float[] KERNEL_SOBEL2_V = ShaderConst.KERNEL_SOBEL2_V;
+	public static final float[] KERNEL_SHARPNESS = ShaderConst.KERNEL_SHARPNESS;	// シャープネス
+	public static final float[] KERNEL_EDGE_DETECT = ShaderConst.KERNEL_EDGE_DETECT;// エッジ検出
+	public static final float[] KERNEL_EMBOSS = ShaderConst.KERNEL_EMBOSS;			// エンボス, オフセット0.5f
+	public static final float[] KERNEL_SMOOTH = ShaderConst.KERNEL_SMOOTH;			// 移動平均
+	public static final float[] KERNEL_GAUSSIAN = ShaderConst.KERNEL_GAUSSIAN;		// ガウシアン(ノイズ除去/)
+	public static final float[] KERNEL_BRIGHTEN = ShaderConst.KERNEL_BRIGHTEN;
+	public static final float[] KERNEL_LAPLACIAN = ShaderConst.KERNEL_LAPLACIAN;	// ラプラシアン(2次微分)
 
 	private final int muKernelLoc;		// カーネル行列(float配列)
 	private final int muTexOffsetLoc;	// テクスチャオフセット(カーネル行列用)
