@@ -22,7 +22,14 @@ import android.util.Log;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
-/** Cannyエッジ検出フィルタ */
+/**
+ * Cannyエッジ検出フィルタ
+ * 1．ガウシアンフィルタでノイズ除去
+ * 2．ソーベルフィルタで輪郭強調
+ * 3．輝度の勾配の方向と大きさを計算
+ * 4．細線化を行うために非極大値抑制処理
+ * 5．誤検知したエッジを除去するためにヒステリシスしきい値処理
+ */
 public class MediaEffectGLCanny extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLCanny";
