@@ -1310,7 +1310,9 @@ public class ShaderConst implements GLConst {
 	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均
 	public static final float[] KERNEL_GAUSSIAN = { 1/16f, 2/16f, 1/16f, 2/16f, 4/16f, 2/16f, 1/16f, 2/16f, 1/16f, };	// ガウシアン(ノイズ除去/)
 	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
-	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分)
+	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分, 8近傍)
+	public static final float[] KERNEL_LAPLACIAN8 = KERNEL_LAPLACIAN;	// ラプラシアン(2次微分, 8近傍)
+	public static final float[] KERNEL_LAPLACIAN4 = { 0f, 1f, 0f, 1f, -4f, 1f, 0f, 1f, 0f, };	// ラプラシアン(2次微分, 4近傍)　8近傍より輪郭線が弱い
 
 	/**
 	 * カーネル関数による映像効果付与のフラグメントシェーダ
