@@ -27,7 +27,6 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.glutils.EffectRendererHolder;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.ImageTextureSource;
-import com.serenegiant.glutils.RendererHolder;
 import com.serenegiant.glutils.StaticTextureSource;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.math.Fraction;
