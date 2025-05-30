@@ -396,6 +396,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			muKernelLoc = glGetUniformLocation("uKernel");
 			muTexOffsetLoc = glGetUniformLocation("uTexOffset");
 			muColorAdjustLoc = glGetUniformLocation("uColorAdjust");
+			if (DEBUG) Log.v(TAG, "init:uKernel=" + muKernelLoc + ",uTexOffset=" + muTexOffsetLoc + ",uColorAdjust=" + muColorAdjustLoc);
 		}
 
 		@Override
@@ -420,6 +421,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 
 		public synchronized void setKernel(final float[] values, final float colorAdj) {
+			if (DEBUG) Log.v(TAG, "setKernel:");
 			if ((values == null) || (values.length < KERNEL_SIZE3x3_NUM)) {
 				throw new IllegalArgumentException("Kernel size is "
 					+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE3x3_NUM);
@@ -429,6 +431,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 
 		public synchronized void setColorAdjust(final float adjust) {
+			if (DEBUG) Log.v(TAG, "setColorAdjust:" + adjust);
 			mColorAdjust = adjust;
 		}
 
@@ -436,6 +439,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		 * Sets the size of the texture.  This is used to find adjacent texels when filtering.
 		 */
 		private void setTexSize() {
+			if (DEBUG) Log.v(TAG, "setTexSize:");
 			final float rw = 1.0f;
 			final float rh = 1.0f;
 
@@ -549,43 +553,55 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		int shaderType = 0;
 		switch (effect) {
 		case EFFECT_KERNEL_SOBEL_H -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_H");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL_H;
 		}
 		case EFFECT_KERNEL_SOBEL_V -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_V");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL_V;
 		}
 		case EFFECT_KERNEL_SOBEL2_H -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_H");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_H;
 		}
 		case EFFECT_KERNEL_SOBEL2_V -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_V");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_V;
 		}
 		case EFFECT_KERNEL_SHARPNESS -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SHARPNESS");
 			kernel = KERNEL_SHARPNESS;
 		}
 		case EFFECT_KERNEL_EDGE_DETECT -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EDGE_DETECT");
 			kernel = KERNEL_EDGE_DETECT;
 		}
 		case EFFECT_KERNEL_EMBOSS -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EMBOSS");
 			kernel = KERNEL_EMBOSS;
 		}
 		case EFFECT_KERNEL_SMOOTH -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SMOOTH");
 			kernel = KERNEL_SMOOTH;
 		}
 		case EFFECT_KERNEL_GAUSSIAN -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_GAUSSIAN");
 			kernel = KERNEL_GAUSSIAN;
 		}
 		case EFFECT_KERNEL_BRIGHTEN -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_BRIGHTEN");
 			kernel = KERNEL_BRIGHTEN;
 		}
 		case EFFECT_KERNEL_LAPLACIAN8 -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN8");
 			kernel = KERNEL_LAPLACIAN8;
 		}
 		case EFFECT_KERNEL_LAPLACIAN4 -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN4");
 			kernel = KERNEL_LAPLACIAN4;
 		}
 		default -> {
@@ -595,16 +611,19 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 		if (handled) {
 			if (shaderType == 1) {
+				if (DEBUG) Log.v(TAG, "onChangeKernel:set sobel shader");
 				drawer.updateShader(isGLES3
 					? (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES3 : FRAGMENT_SHADER_SOBEL_ES3)
 					: (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES2 : FRAGMENT_SHADER_SOBEL_ES2));
 			} else {
+				if (DEBUG) Log.v(TAG, "onChangeKernel:set normal 3x3 kernel shader");
 				drawer.updateShader(isGLES3
 					? (isOES ? FRAGMENT_SHADER_EXT_FILT3x3_ES3 : FRAGMENT_SHADER_FILT3x3_ES3)
 					: (isOES ? FRAGMENT_SHADER_EXT_FILT3x3_ES2 : FRAGMENT_SHADER_FILT3x3_ES2));
 			}
 		}
 		if (handled && (kernel != null)) {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:set kernel");
 			drawer.setKernel(kernel, drawer.mColorAdjust);
 		}
 		return handled;
