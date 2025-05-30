@@ -52,6 +52,8 @@ public class EffectPipeline extends ProxyPipeline
 
 	@NonNull
 	private final GLManager mManager;
+	@NonNull
+	private final GLEffectDrawer2D.DrawerFactory mDrawerFactory;
 
 	/**
 	 * 次のパイプラインへ送るテクスチャの挙動指定フラグ
@@ -102,7 +104,7 @@ public class EffectPipeline extends ProxyPipeline
 		@NonNull final GLManager manager)
 		throws IllegalStateException, IllegalArgumentException {
 
-		this(manager,  PIPELINE_MODE_DEFAULT, null, null);
+		this(manager, GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY, PIPELINE_MODE_DEFAULT, null, null);
 	}
 
 	/**
@@ -117,7 +119,23 @@ public class EffectPipeline extends ProxyPipeline
 		@NonNull final GLManager manager,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 		throws IllegalStateException, IllegalArgumentException {
-		this(manager,  PIPELINE_MODE_DEFAULT, surface, maxFps);
+		this(manager,  GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY, PIPELINE_MODE_DEFAULT, surface, maxFps);
+	}
+
+	/**
+	 * コンストラクタ
+	 * 明示的に#setSurfaceでSurfaceを指定しない場合、GLDrawer2Dで描画した映像を次のパイプラインへ送る
+	 * null以外のSurfaceを指定した場合は前のパイプラインからのテクスチャをそのまま次のパイプラインへ送る
+	 * @param manager
+	 * @param drawerFactory
+	 * @throws IllegalStateException
+	 * @throws IllegalArgumentException
+	 */
+	public EffectPipeline(
+		@NonNull final GLManager manager, @NonNull final GLEffectDrawer2D.DrawerFactory drawerFactory)
+		throws IllegalStateException, IllegalArgumentException {
+
+		this(manager,  drawerFactory, PIPELINE_MODE_DEFAULT, null, null);
 	}
 
 	/**
@@ -132,6 +150,7 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	public EffectPipeline(
 		@NonNull final GLManager manager,
+		@NonNull final GLEffectDrawer2D.DrawerFactory drawerFactory,
 		@PipelineMode final int pipelineMode,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 			throws IllegalStateException, IllegalArgumentException {
@@ -142,6 +161,7 @@ public class EffectPipeline extends ProxyPipeline
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
+		mDrawerFactory = drawerFactory;
 		mPipelineMode = pipelineMode;
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
@@ -280,7 +300,7 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer = null;
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = new GLEffectDrawer2D(isGLES3, isOES, mEffectListener);
+			mDrawer = mDrawerFactory.create(isGLES3, isOES);
 			if (!isOES) {
 				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
 				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
@@ -476,29 +496,6 @@ public class EffectPipeline extends ProxyPipeline
 		} else {
 			throw new IllegalStateException("already released!");
 		}
-	}
-
-	final GLEffectDrawer2D.EffectListener mEffectListener
-		= new GLEffectDrawer2D.EffectListener() {
-		@WorkerThread
-		@Override
-		public boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
-			return EffectPipeline.this.onChangeEffect(effect, drawer);
-		}
-	};
-
-	/**
-	 * changeEffectで映像効果を指定したときに内蔵の映像効果設定処理を実行する前に呼ばれる
-	 * GLEffect.NON〜GLEffect.EFFECT_NUM(12)-1についてはEffectDrawer2Dで既定の設定が可能
-	 * effectにそれ以外を指定し#onChangeEffectがfalse返すとシェーダーがリセットされてEFFECT_NONになる
-	 * @param effect
-	 * @param drawer
-	 * @return trueを返すと処理済みで内蔵の映像効果設定処理を行わない、
-	 *         falseを返すと内蔵の映像効果設定処理を行う
-	 */
-	@WorkerThread
-	protected boolean onChangeEffect(final int effect, @NonNull final GLEffectDrawer2D drawer) {
-		return false;
 	}
 
 	//--------------------------------------------------------------------------------
