@@ -411,16 +411,7 @@ public class GLDrawer2D implements GLConst {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
-		glUseProgram();
-		if (texMatrix != null) {
-			// テクスチャ変換行列が指定されている時
-			updateTexMatrix(texMatrix, texOffset);
-		}
-		if (mvpMatrix != null) {
-			// モデルビュー変換行列が指定されている時
-			updateMvpMatrix(mvpMatrix, mvpOffset);
-		}
-		bindTexture(texUnit, texId);
+		prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
 		if (validateProgram(hProgram)) {
 			drawVertices();
 			errCnt = 0;
@@ -432,6 +423,32 @@ public class GLDrawer2D implements GLConst {
 			}
 		}
 		finishDraw();
+	}
+
+	/**
+	 * 描画の準備
+	 * @param texUnit
+	 * @param texId
+	 * @param texMatrix
+	 * @param texOffset
+	 * @param mvpMatrix
+	 * @param mvpOffset
+	 */
+	protected void prepareDraw(
+		@TexUnit final int texUnit, final int texId,
+		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
+		@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
+
+		glUseProgram();
+		if (texMatrix != null) {
+			// テクスチャ変換行列が指定されている時
+			updateTexMatrix(texMatrix, texOffset);
+		}
+		if (mvpMatrix != null) {
+			// モデルビュー変換行列が指定されている時
+			updateMvpMatrix(mvpMatrix, mvpOffset);
+		}
+		bindTexture(texUnit, texId);
 	}
 
 	/**
