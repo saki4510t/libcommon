@@ -43,7 +43,9 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = EffectRendererHolder.class.getSimpleName();
 
-//================================================================================
+	@NonNull
+	private final GLEffectDrawer2D.DrawerFactory mDrawerFactory;
+
 	/**
 	 * コンストラクタ
 	 * @param width
@@ -55,7 +57,24 @@ public class EffectRendererHolder extends AbstractRendererHolder
 
 		this(width, height,
 			3, null, EGLConst.EGL_FLAG_RECORDABLE,
-			callback);
+			callback, null);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param callback
+	 * @param drawerFactory
+	 */
+	public EffectRendererHolder(
+		final int width, final int height,
+		@Nullable final RenderHolderCallback callback,
+		@Nullable GLEffectDrawer2D.DrawerFactory drawerFactory) {
+
+		this(width, height,
+			3, null, EGLConst.EGL_FLAG_RECORDABLE,
+			callback, drawerFactory);
 	}
 
 	/**
@@ -66,13 +85,16 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * @param sharedContext
 	 * @param flags
 	 * @param callback
+	 * @param drawerFactory
 	 */
 	public EffectRendererHolder(final int width, final int height,
 		final int maxClientVersion,
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		@Nullable final RenderHolderCallback callback) {
+		@Nullable final RenderHolderCallback callback,
+		@Nullable GLEffectDrawer2D.DrawerFactory drawerFactory) {
 
 		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		mDrawerFactory = drawerFactory != null ? drawerFactory : GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY;
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -85,14 +107,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags,
-			new GLEffectDrawer2D.DrawerFactory() {
-				@NonNull
-				@Override
-				public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
-					return new GLEffectDrawer2D(isGLES3, isOES, mEffectListener);
-				}
-			}
-		);
+			mDrawerFactory);
 	}
 
 //================================================================================
