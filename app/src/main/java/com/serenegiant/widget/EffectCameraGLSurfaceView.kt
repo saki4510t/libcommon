@@ -23,6 +23,7 @@ import android.util.AttributeSet
 import android.util.Log
 import com.serenegiant.glutils.EffectRendererHolder
 import com.serenegiant.gl.GLEffect
+import com.serenegiant.gl.GLEffectDrawer2D
 import com.serenegiant.glutils.IRendererHolder
 import com.serenegiant.glutils.IRendererHolder.RenderHolderCallback
 
@@ -42,7 +43,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 
 	set(effect) {
 		if (DEBUG) Log.v(TAG, "setEffect:$effect")
-		if ((effect >= 0) && (effect < GLEffect.EFFECT_NUM)) {
+		if (effect >= 0) {
 			post {
 				val rendererHolder = rendererHolder
 				if (rendererHolder is EffectRendererHolder) {
@@ -57,7 +58,8 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 		callback: RenderHolderCallback?): IRendererHolder {
 
 		if (DEBUG) Log.v(TAG, "createRendererHolder:")
-		return EffectRendererHolder(width, height, glVersion, null, 0, callback)
+		return EffectRendererHolder(width, height, glVersion, null, 0, callback,
+			GLEffectDrawer2D.DEFAULT_KERNEL_EFFECT_FACTORY)
 	}
 
 	companion object {
