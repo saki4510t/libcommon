@@ -176,6 +176,16 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	/**
+	 * テクスチャのサイズを設定する
+	 * @param width
+	 * @param height
+	 */
+	public synchronized void setTexSize(final int width, final int height) {
+		// このクラスではなにもしない
+		// GLKernelEffectDrawer2D等でオーバーライドする
+	}
+
+	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
 	public void resetShader() {
@@ -387,7 +397,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			@Nullable EffectListener effectListener) {
 
 			super(isGLES3, isOES, vertices, texcoord, vs, fs, effectListener);
-			setTexSize();
+			setTexSize(256, 256);	// 未設定だと正常に動作しないのでデフォルトの値を入れておく
 		}
 
 		@Override
@@ -436,12 +446,16 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 
 		/**
-		 * Sets the size of the texture.  This is used to find adjacent texels when filtering.
+		 * テクスチャのサイズを設定する
+		 * カーネル関数によるフィルター処理の際に近傍テクセルの位置を計算するのに使う
+		 * @param width
+		 * @param height
 		 */
-		private void setTexSize() {
+		@Override
+		public synchronized void setTexSize(final int width, final int height) {
 			if (DEBUG) Log.v(TAG, "setTexSize:");
-			final float rw = 1.0f;
-			final float rh = 1.0f;
+			final float rw = 1.0f / width;
+			final float rh = 1.0f / height;
 
 			mTexOffset[0] = -rw;	mTexOffset[1] = -rh;
 			mTexOffset[2] = 0f;		mTexOffset[3] = -rh;
