@@ -26,6 +26,7 @@ import android.util.SparseArray;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.graphics.MatrixUtils;
@@ -404,6 +405,9 @@ public abstract class AbstractDistributeTask implements IMirror {
 			//     ただしSurfaceTexture経由で受け取ったテクスチャなのでここに来るのは常にGL_TEXTURE_EXTERNAL_OESなので
 			//     常に上下反転させる
 			mDrawer.setMirror(MIRROR_VERTICAL);
+			if (mDrawer instanceof GLEffectDrawer2D) {
+				((GLEffectDrawer2D) mDrawer).setTexSize(width(), height());
+			}
 		}
 		handleReCreateInputSurface();
 	}
@@ -522,6 +526,9 @@ public abstract class AbstractDistributeTask implements IMirror {
 					mDrawer.release();
 				}
 				mDrawer = mDrawerFactory.create(isGLES3(), isOES);
+				if (mDrawer instanceof GLEffectDrawer2D) {
+					((GLEffectDrawer2D) mDrawer).setTexSize(width(), height());
+				}
 			}
 			drawer = mDrawer;
 		}
@@ -554,6 +561,9 @@ public abstract class AbstractDistributeTask implements IMirror {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		mVideoWidth = width;
 		mVideoHeight = height;
+		if (mDrawer instanceof GLEffectDrawer2D) {
+			((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
+		}
 	}
 
 	/**

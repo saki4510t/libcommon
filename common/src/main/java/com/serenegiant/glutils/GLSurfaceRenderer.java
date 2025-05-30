@@ -24,6 +24,7 @@ import android.util.Log;
 import android.util.SparseArray;
 
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
@@ -189,6 +190,9 @@ public class GLSurfaceRenderer implements GLFrameAvailableCallback, IMirror {
 					//     GLUtils#glCopyTextureToBitmapと同じ
 					//     常に上下反転させると入力テクスチャがGL_TEXTURE_2Dの時に結果が上下反転してしまう
 					mDrawer.setMirror(MIRROR_VERTICAL);
+				}
+				if (mDrawer instanceof GLEffectDrawer2D) {
+					((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
 				}
 			}
 			resizeOnGL(width, height);

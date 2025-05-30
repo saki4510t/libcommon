@@ -311,6 +311,7 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer.setMirror(MIRROR_VERTICAL);
 			}
 			mDrawer.setEffect(mEffect);
+			mDrawer.setTexSize(width, height);
 		}
 		if ((mOffscreenSurface != null)
 			&& ((mOffscreenSurface.getWidth() != getWidth()) || (mOffscreenSurface.getHeight() != getHeight()))) {

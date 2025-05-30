@@ -22,6 +22,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
@@ -308,6 +309,9 @@ public class DrawerPipeline extends ProxyPipeline
 				//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
 				//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
 				mDrawer.setMirror(MIRROR_VERTICAL);
+			}
+			if (mDrawer instanceof GLEffectDrawer2D) {
+				((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
 			}
 		}
 		if ((mOffscreenSurface != null)

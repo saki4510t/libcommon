@@ -22,6 +22,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IMirror;
@@ -240,6 +241,9 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				}
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = mDrawerFactory.create(isGLES3, isOES);
+				if (mDrawer instanceof GLEffectDrawer2D) {
+					((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
+				}
 			}
 			@NonNull
 			final GLDrawer2D drawer = mDrawer;
