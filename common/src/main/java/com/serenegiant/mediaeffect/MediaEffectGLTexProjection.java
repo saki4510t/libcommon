@@ -37,7 +37,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 	private static class MediaEffectTexProjectionDrawer
 		extends MediaEffectDrawer.MediaEffectSingleDrawer {
 
-		private float[] texMatrix2 = new float[9];
+		private final float[] texMatrix2 = new float[9];
 		private final int muTexMatrixLoc2;
 
 		public MediaEffectTexProjectionDrawer(final String vss, final String fss) {

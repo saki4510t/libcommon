@@ -24,7 +24,7 @@ import android.opengl.GLES20;
 import com.serenegiant.gl.GLSurface;
 
 public class MediaImageSource extends MediaSource {
-	private GLSurface mImageOffscreen;
+	private final GLSurface mImageOffscreen;
 	private boolean isReset;
 	/**
 	 * コンストラクタ
