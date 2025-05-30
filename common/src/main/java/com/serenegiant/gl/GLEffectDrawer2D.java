@@ -34,7 +34,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * 映像効果付与機能を追加したGLDrawer2D
  */
 public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
-	private static final boolean DEBUG = false;	// set false on production
+	private static final boolean DEBUG = true;	// set false on production
 	private static final String TAG = GLEffectDrawer2D.class.getSimpleName();
 
 	/**
@@ -618,6 +618,13 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN4");
 			kernel = KERNEL_LAPLACIAN4;
 		}
+		case EFFECT_KERNEL_CANNY -> {
+			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_CANNY");
+			shaderType = -1;
+			drawer.updateShader(isGLES3
+				? (isOES ? FRAGMENT_SHADER_EXT_CANNY_ES3 : FRAGMENT_SHADER_CANNY_ES3)
+				: (isOES ? FRAGMENT_SHADER_EXT_CANNY_ES2 : FRAGMENT_SHADER_CANNY_ES2));
+		}
 		default -> {
 			drawer.resetShader();
 			handled = false;
@@ -629,7 +636,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 				drawer.updateShader(isGLES3
 					? (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES3 : FRAGMENT_SHADER_SOBEL_ES3)
 					: (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES2 : FRAGMENT_SHADER_SOBEL_ES2));
-			} else {
+			} else if (shaderType >= 0) {
 				if (DEBUG) Log.v(TAG, "onChangeKernel:set normal 3x3 kernel shader");
 				drawer.updateShader(isGLES3
 					? (isOES ? FRAGMENT_SHADER_EXT_FILT3x3_ES3 : FRAGMENT_SHADER_FILT3x3_ES3)

@@ -125,8 +125,16 @@ public class GLEffect {
 	 * ラプラシアンフィルタ(8近傍)
 	 */
 	public static final int EFFECT_KERNEL_LAPLACIAN = EFFECT_KERNEL_LAPLACIAN8;
+	/**
+	 * Cannyのアルゴリズムによるエッジ強調処理用
+	 * MediaEffectGLCannyからインポート
+	 * XXX アルゴリズム的にはガウシアンフィルタによるノイズ除去＋ソーベルフィルタでの輪郭強調が
+	 *     ベースなのでとりあえずカーネルフィルタの定数にしているけど、実際のフラグメントシェーダーでは
+	 *     カーネル関数は使っていない
+	 */
+	public static final int EFFECT_KERNEL_CANNY = 1012;
 
-	public static final int EFFECT_KERNEL_NUM = 1012;
+	public static final int EFFECT_KERNEL_NUM = 1013;
 
 //--------------------------------------------------------------------------------
 	/**
@@ -641,4 +649,157 @@ public class GLEffect {
 		= String.format(FRAGMENT_SHADER_EMPHASIZE_YELLOW_WHITE_BASE_ES3,
 			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES,
 			HSV_FUNCTIONS);
+
+	private static final String FRAGMENT_SHADER_CANNY_BASE_ES2 = SHADER_VERSION_ES2 +
+		"""
+		%s
+		#define KERNEL_SIZE3x3 %s
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float lowerThreshold = 0.4;	// lowerとupperの値を入れ替えると白黒反転する
+		const float upperThreshold = 0.8;
+		void main() {
+			vec4 magdir = texture2D(sTexture, vTextureCoord);
+			vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];
+			float first = texture2D(sTexture, vTextureCoord + offset).r;
+			float second = texture2D(sTexture, vTextureCoord - offset).r;
+			float multiplier = step(first, magdir.r);
+			multiplier = multiplier * step(second, magdir.r);
+			float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);
+			multiplier = multiplier * threshold;
+			gl_FragColor = vec4(multiplier, multiplier, multiplier, 1.0);
+		}
+		""";
+//----
+//		"const float threshold = 0.2;\n" +
+//		"const vec2 unshift = vec2(1.0 / 256.0, 1.0);\n" +
+//		"const float atan0   = 0.414213;\n" +
+//		"const float atan45  = 2.414213;\n" +
+//		"const float atan90  = -2.414213;\n" +
+//		"const float atan135 = -0.414213;\n" +
+//		"vec2 atanForCanny(float x) {\n" +
+//		"    if (x < atan0 && x > atan135) {\n" +
+//		"        return vec2(1.0, 0.0);\n" +
+//		"    }\n" +
+//		"    if (x < atan90 && x > atan45) {\n" +
+//		"        return vec2(0.0, 1.0);\n" +
+//		"    }\n" +
+//		"    if (x > atan135 && x < atan90) {\n" +
+//		"        return vec2(-1.0, 1.0);\n" +
+//		"    }\n" +
+//		"    return vec2(1.0, 1.0);\n" +
+//		"}\n" +
+//		"vec4 cannyEdge(vec2 coords) {\n" +
+//		"    vec4 color = texture2D(sTexture, coords);\n" +
+//		"    color.z = dot(color.zw, unshift);\n" +
+//		"    if (color.z > threshold) {\n" +
+//		"        color.x -= 0.5;\n" +
+//		"        color.y -= 0.5;\n" +
+//		"        vec2 offset = atanForCanny(color.y / color.x);\n" +
+//		"        offset.x *= uTexOffset[7];\n" +
+//		"        offset.y *= uTexOffset[8];\n" +
+//		"        vec4 forward  = texture2D(sTexture, coords + offset);\n" +
+//		"        vec4 backward = texture2D(sTexture, coords - offset);\n" +
+//		"        forward.z  = dot(forward.zw, unshift);\n" +
+//		"        backward.z = dot(backward.zw, unshift);\n" +
+//		"        if (forward.z >= color.z ||\n" +
+//		"            backward.z >= color.z) {\n" +
+//		"            return vec4(0.0, 0.0, 0.0, 1.0);\n" +
+//		"        } else {\n" +
+//		"            color.x += 0.5; color.y += 0.5;\n" +
+//		"            return vec4(1.0, color.x, color.y, 1.0);\n" +
+//		"        }\n" +
+//		"    }\n" +
+//		"    return vec4(0.0, 0.0, 0.0, 1.0);\n" +
+//		"}\n" +
+//		"void main() {\n" +
+//		"    gl_FragColor = cannyEdge(vTextureCoord);\n" +
+//		"}\n";
+	public static final String FRAGMENT_SHADER_CANNY_ES2
+		= String.format(FRAGMENT_SHADER_CANNY_BASE_ES2,
+			HEADER_2D, KERNEL_SIZE3x3, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CANNY_ES2
+		= String.format(FRAGMENT_SHADER_CANNY_BASE_ES2,
+			HEADER_OES_ES2, KERNEL_SIZE3x3, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_CANNY_BASE_ES3 = SHADER_VERSION_ES3 +
+		"""
+		%s
+		#define KERNEL_SIZE3x3 %s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float lowerThreshold = 0.4;	// lowerとupperの値を入れ替えると白黒反転する
+		const float upperThreshold = 0.8;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 magdir = texture(sTexture, vTextureCoord);
+			vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];
+			float first = texture(sTexture, vTextureCoord + offset).r;
+			float second = texture(sTexture, vTextureCoord - offset).r;
+			float multiplier = step(first, magdir.r);
+			multiplier = multiplier * step(second, magdir.r);
+			float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);
+			multiplier = multiplier * threshold;
+			o_FragColor = vec4(multiplier, multiplier, multiplier, 1.0);
+		}
+		""";
+//----
+//		"const float threshold = 0.2;\n" +
+//		"const vec2 unshift = vec2(1.0 / 256.0, 1.0);\n" +
+//		"const float atan0   = 0.414213;\n" +
+//		"const float atan45  = 2.414213;\n" +
+//		"const float atan90  = -2.414213;\n" +
+//		"const float atan135 = -0.414213;\n" +
+//		"vec2 atanForCanny(float x) {\n" +
+//		"    if (x < atan0 && x > atan135) {\n" +
+//		"        return vec2(1.0, 0.0);\n" +
+//		"    }\n" +
+//		"    if (x < atan90 && x > atan45) {\n" +
+//		"        return vec2(0.0, 1.0);\n" +
+//		"    }\n" +
+//		"    if (x > atan135 && x < atan90) {\n" +
+//		"        return vec2(-1.0, 1.0);\n" +
+//		"    }\n" +
+//		"    return vec2(1.0, 1.0);\n" +
+//		"}\n" +
+//		"vec4 cannyEdge(vec2 coords) {\n" +
+//		"    vec4 color = texture(sTexture, coords);\n" +
+//		"    color.z = dot(color.zw, unshift);\n" +
+//		"    if (color.z > threshold) {\n" +
+//		"        color.x -= 0.5;\n" +
+//		"        color.y -= 0.5;\n" +
+//		"        vec2 offset = atanForCanny(color.y / color.x);\n" +
+//		"        offset.x *= uTexOffset[7];\n" +
+//		"        offset.y *= uTexOffset[8];\n" +
+//		"        vec4 forward  = texture(sTexture, coords + offset);\n" +
+//		"        vec4 backward = texture(sTexture, coords - offset);\n" +
+//		"        forward.z  = dot(forward.zw, unshift);\n" +
+//		"        backward.z = dot(backward.zw, unshift);\n" +
+//		"        if (forward.z >= color.z ||\n" +
+//		"            backward.z >= color.z) {\n" +
+//		"            return vec4(0.0, 0.0, 0.0, 1.0);\n" +
+//		"        } else {\n" +
+//		"            color.x += 0.5; color.y += 0.5;\n" +
+//		"            return vec4(1.0, color.x, color.y, 1.0);\n" +
+//		"        }\n" +
+//		"    }\n" +
+//		"    return vec4(0.0, 0.0, 0.0, 1.0);\n" +
+//		"}\n" +
+//		"void main() {\n" +
+//		"    o_FragColor = cannyEdge(vTextureCoord);\n" +
+//		"}\n";
+	public static final String FRAGMENT_SHADER_CANNY_ES3
+		= String.format(FRAGMENT_SHADER_CANNY_BASE_ES3,
+		HEADER_2D, KERNEL_SIZE3x3, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CANNY_ES3
+		= String.format(FRAGMENT_SHADER_CANNY_BASE_ES3,
+		HEADER_OES_ES3, KERNEL_SIZE3x3, SAMPLER_OES);
 }
