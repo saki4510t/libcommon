@@ -76,6 +76,16 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * EffectDrawer2D用のDrawerFactoryのデフォルト実装
 	 */
 	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {};
+	/**
+	 * GLKernelEffectDrawer2D用のDrawerFactoryのデフォルト実装
+	 */
+	public static DrawerFactory DEFAULT_KERNEL_EFFECT_FACTORY = new DrawerFactory() {
+		@WorkerThread
+		@NonNull
+		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
+			return new GLKernelEffectDrawer2D(isGLES3, isOES);
+		}
+	};
 
 	@NonNull
 	private final EffectListener mEffectListener;

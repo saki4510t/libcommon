@@ -73,6 +73,61 @@ public class GLEffect {
 	/** 内蔵映像効果の数 */
 	public static final int EFFECT_NUM = 12;
 
+	/**
+	 * ソーベルフィルタ(水平方向)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL_H = 1000;
+	/**
+	 * ソーベルフィルタ(垂直方向)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL_V = 1001;
+	/**
+	 * ソーベルフィルタ2(水平方向)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL2_H = 1002;
+	/**
+	 * ソーベルフィルタ2(垂直方向)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL2_V = 1003;
+	/**
+	 * シャープネス
+	 */
+	public static final int EFFECT_KERNEL_SHARPNESS = 1004;
+	/**
+	 * エッジ検出
+	 */
+	public static final int EFFECT_KERNEL_EDGE_DETECT = 1005;
+	/**
+	 * エンボス
+	 */
+	public static final int EFFECT_KERNEL_EMBOSS = 1006;
+	/**
+	 * 平滑化
+	 */
+	public static final int EFFECT_KERNEL_SMOOTH = 1007;
+	/**
+	 * ガウシアンフィルタ
+	 */
+	public static final int EFFECT_KERNEL_GAUSSIAN = 1008;
+	/**
+	 * 輝度アップ
+	 */
+	public static final int EFFECT_KERNEL_BRIGHTEN = 1009;
+	/**
+	 * ラプラシアンフィルタ(8近傍)
+	 */
+	public static final int EFFECT_KERNEL_LAPLACIAN8 = 1010;
+	/**
+	 * ラプラシアンフィルタ(4近傍)
+	 */
+	public static final int EFFECT_KERNEL_LAPLACIAN4 = 1011;
+	/**
+	 * ラプラシアンフィルタ(8近傍)
+	 */
+	public static final int EFFECT_KERNEL_LAPLACIAN = EFFECT_KERNEL_LAPLACIAN8;
+
+	public static final int EFFECT_KERNEL_NUM = 1012;
+
 //--------------------------------------------------------------------------------
 	/**
 	 * グレースケール変換のためのフラグメントシェーダーのベース文字列
