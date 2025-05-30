@@ -80,7 +80,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		super(width, height, maxClientVersion, sharedContext, flags, callback, null);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -123,10 +123,11 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory) {
 
 		return new MixRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, null);
+			maxClientVersion, sharedContext, flags, drawerFactory);
 	}
 
 	private static final int REQUEST_SET_MASK = 10;

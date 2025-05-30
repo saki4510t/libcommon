@@ -43,9 +43,6 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = EffectRendererHolder.class.getSimpleName();
 
-	@NonNull
-	private final GLEffectDrawer2D.DrawerFactory mDrawerFactory;
-
 	/**
 	 * コンストラクタ
 	 * @param width
@@ -93,8 +90,8 @@ public class EffectRendererHolder extends AbstractRendererHolder
 		@Nullable final RenderHolderCallback callback,
 		@Nullable GLEffectDrawer2D.DrawerFactory drawerFactory) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
-		mDrawerFactory = drawerFactory != null ? drawerFactory : GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY;
+		super(width, height, maxClientVersion, sharedContext, flags, callback,
+			drawerFactory != null ? drawerFactory : GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -102,12 +99,17 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	@NonNull
 	protected BaseRendererTask createRendererTask(final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory) {
 
 		if (DEBUG) Log.v(TAG, "createRendererTask:");
+		final GLEffectDrawer2D.DrawerFactory factory =
+			(drawerFactory instanceof GLEffectDrawer2D.DrawerFactory)
+				? (GLEffectDrawer2D.DrawerFactory)drawerFactory
+				: GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY;
 		return new MyRendererTask(this, width, height,
 			maxClientVersion, sharedContext, flags,
-			mDrawerFactory);
+			factory);
 	}
 
 //================================================================================

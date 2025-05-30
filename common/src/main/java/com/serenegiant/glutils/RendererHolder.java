@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLDrawer2D;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -60,7 +61,7 @@ public class RendererHolder extends AbstractRendererHolder {
 		@Nullable final RenderHolderCallback callback) {
 
 		super(width, height,
-			maxClientVersion, sharedContext, flags, callback);
+			maxClientVersion, sharedContext, flags, callback, null);
 	}
 
 	@NonNull
@@ -68,10 +69,11 @@ public class RendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory) {
 
 		return new BaseRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, null);
+			maxClientVersion, sharedContext, flags, drawerFactory);
 	}
 	
 }

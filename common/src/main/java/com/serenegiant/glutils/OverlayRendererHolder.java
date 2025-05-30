@@ -75,7 +75,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
 		@Nullable final RenderHolderCallback callback) {
 
-		super(width, height, maxClientVersion, sharedContext, flags, callback);
+		super(width, height, maxClientVersion, sharedContext, flags, callback, null);
 		setOverlay(0, null);
 	}
 
@@ -93,10 +93,11 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 	protected BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags) {
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory) {
 
 		return new OverlayRendererTask(this, width, height,
-			maxClientVersion, sharedContext, flags, null);
+			maxClientVersion, sharedContext, flags, drawerFactory);
 	}
 
 	public void setOverlay(final int id, @Nullable final Bitmap overlay) {

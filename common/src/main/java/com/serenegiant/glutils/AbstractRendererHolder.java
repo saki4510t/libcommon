@@ -43,7 +43,7 @@ import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
  * 分配描画インターフェースの共通部分を実装する抽象クラス
  */
 public abstract class AbstractRendererHolder implements IRendererHolder {
-	private static final boolean DEBUG = false;	// 実働時はfalseにすること
+	private static final boolean DEBUG = true;	// 実働時はfalseにすること
 	private static final String TAG = AbstractRendererHolder.class.getSimpleName();
 	private static final String RENDERER_THREAD_NAME = "RendererHolder";
 
@@ -65,13 +65,15 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	 * @param callback
 	 */
 	protected AbstractRendererHolder(final int width, final int height,
-		 final int maxClientVersion,
-		 @Nullable final EGLBase.IContext<?> sharedContext, final int flags,
-		 @Nullable final RenderHolderCallback callback) {
+		final int maxClientVersion,
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@Nullable final RenderHolderCallback callback,
+		@Nullable GLDrawer2D.DrawerFactory drawerFactory) {
 
 		mCallback = callback;
+		final GLDrawer2D.DrawerFactory factory  = drawerFactory != null ? drawerFactory : GLDrawer2D.DEFAULT_FACTORY;
 		mRendererTask = createRendererTask(width, height,
-			maxClientVersion, sharedContext, flags);
+			maxClientVersion, sharedContext, flags, factory);
 		mRendererTask.start(RENDERER_THREAD_NAME);
 		if (!mRendererTask.waitReady()) {
 			// 初期化に失敗した時
@@ -323,7 +325,8 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 	protected abstract BaseRendererTask createRendererTask(
 		final int width, final int height,
 		final int maxClientVersion,
-		@Nullable final EGLBase.IContext<?> sharedContext, final int flags);
+		@Nullable final EGLBase.IContext<?> sharedContext, final int flags,
+		@NonNull GLDrawer2D.DrawerFactory drawerFactory);
 	
 //--------------------------------------------------------------------------------
 	protected void callOnCreate(Surface surface) {
