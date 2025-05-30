@@ -69,6 +69,27 @@ class EffectCameraFragment : AbstractCameraFragment() {
 		recorder?.frameAvailableSoon()
 	}
 
+	private var mEffect = if (USE_KERNEL_FILTER) GLEffect.EFFECT_KERNEL_SOBEL_H else GLEffect.EFFECT_NON
+
+	/**
+	 * 次の映像効果を選択する
+	 */
+	private fun nextEffect(): Int {
+		if (USE_KERNEL_FILTER) {
+			mEffect += 1
+			if (mEffect == GLEffect.EFFECT_NUM) {
+				mEffect = GLEffect.EFFECT_KERNEL_SOBEL_H
+			}
+			if (mEffect >= GLEffect.EFFECT_KERNEL_NUM) {
+				mEffect = GLEffect.EFFECT_NON
+			}
+		} else {
+			mEffect = (mEffect + 1) % GLEffect.EFFECT_NUM
+		}
+
+		return mEffect
+	}
+
 	override fun onLongClick(view: View): Boolean {
 		super.onLongClick(view)
 		when (view.id) {
@@ -76,7 +97,7 @@ class EffectCameraFragment : AbstractCameraFragment() {
 				// カメラ映像表示Viewを長押ししたとき
 				if (mCameraView is EffectCameraGLSurfaceView) {
 					val v = view as EffectCameraGLSurfaceView
-					v.effect = (v.effect + 1) % GLEffect.EFFECT_NUM
+					v.effect = nextEffect()
 					return true
 				}
 			}
@@ -185,6 +206,11 @@ class EffectCameraFragment : AbstractCameraFragment() {
 	companion object {
 		private const val DEBUG = true // TODO set false on release
 		private val TAG = EffectCameraFragment::class.java.simpleName
+
+		/**
+		 * カーネル関数によるフィルタ処理を有効にするかどうか
+		 */
+		private const val USE_KERNEL_FILTER = true
 
 		fun newInstance(pipelineMode: Int = GLPipelineView.EFFECT_ONLY)
 			= EffectCameraFragment().apply {
