@@ -306,9 +306,9 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	public static class GLKernelEffectDrawer2D extends GLEffectDrawer2D {
-		private int muKernelLoc;		// カーネル行列(float配列)
-		private int muTexOffsetLoc;		// テクスチャオフセット(カーネル行列用)
-		private int muColorAdjustLoc;		// 色調整
+		private int muKernelLoc = -1;		// カーネル行列(float配列)
+		private int muTexOffsetLoc = -1;	// テクスチャオフセット(カーネル行列用)
+		private int muColorAdjustLoc = -1;	// 色調整
 		private final float[] mKernel3x3 = new float[KERNEL_SIZE3x3_NUM * 2];	// Inputs for convolution filter based shaders
 		private final float[] mTexOffset = new float[KERNEL_SIZE3x3_NUM * 2];
 		private float mColorAdjust;
