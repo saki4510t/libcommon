@@ -54,6 +54,9 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 	private var mHasSurface = false
 	private var mCamera: Camera? = null
 
+	private var mEffectsBuilder: MediaEffectPipeline.EffectsBuilder
+		= object : MediaEffectPipeline.EffectsBuilder{}
+
 	/**
 	 * コンストラクタ
 	 */
@@ -101,15 +104,16 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 		stopPreview()
 	}
 
+	fun changeEffect(effectsBuilder: MediaEffectPipeline.EffectsBuilder) {
+		mEffectsBuilder = effectsBuilder
+		pipeline?.changeEffect(mEffectsBuilder)
+	}
+
 	private fun createPipeline() {
 		if (DEBUG) Log.v(TAG, "createPipeline:pipeline=$pipeline")
 		if (pipeline == null) {
 			val manager = GLManager()
-			pipeline = MediaEffectPipeline(manager, object : MediaEffectPipeline.EffectsBuilder{
-				override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-					return mutableListOf(MediaEffectGrayScale(effectContext))
-				}
-			})
+			pipeline = MediaEffectPipeline(manager, mEffectsBuilder)
 			preview = SurfaceRendererPipeline(manager)
 			val sem = Semaphore(0)
 			source = SurfaceSourcePipeline(manager,
