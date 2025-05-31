@@ -194,13 +194,13 @@ public class MediaEffectGLBase implements IMediaEffect {
 	@Override
 	public void apply(final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output_tex = src.getOutputTexture();
+		final GLSurface output = src.getOutputTexture();
 		final int[] srcTexIds = src.getSourceTexId();
-		output_tex.makeCurrent();
+		output.makeCurrent();
 		try {
-			mDrawer.apply(srcTexIds, output_tex.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, output.copyTexMatrix(), 0);
 		} finally {
-			output_tex.swap();
+			output.swap();
 		}
 	}
 
