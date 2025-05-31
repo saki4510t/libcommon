@@ -410,17 +410,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 		// XXX #removeでパイプラインチェーンのどれかを削除するとなぜか映像が表示されなくなってしまうことへのワークアラウンド
 		//     パイプライン中のどれかでシェーダーを再生成すると表示されるようになる
 		if (isValid()) {
-			mManager.runOnGLThread(() -> {
-				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-				if (mSrcDrawer != null) {
-					mSrcDrawer.release();
-					mSrcDrawer = null;
-				}
-				if (mTargetDrawer != null) {
-					mTargetDrawer.release();
-					mTargetDrawer = null;
-				}
-			});
+			releaseDrawer();
 		}
 	}
 
@@ -431,14 +421,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		mManager.runOnGLThread(() -> {
 			if (DEBUG) Log.v(TAG, "resize#run:");
-			if (mSrcDrawer != null) {
-				mSrcDrawer.release();
-				mSrcDrawer = null;
-			}
-			if (mTargetDrawer != null) {
-				mTargetDrawer.release();
-				mTargetDrawer = null;
-			}
+			releaseDrawer();
 			if (mMediaSource != null) {
 				mMediaSource.resize(width, height);
 			}
@@ -465,6 +448,9 @@ public class MediaEffectPipeline extends ProxyPipeline
 				mEffects.add(new MediaEffectNull(mEffectContext));
 			}
 			if (DEBUG) Log.i(TAG, "changeEffect:" + mEffects.get(0));
+			// XXX MediaEffectGLXXX系だけの場合はここにMediaEffectNullを追加するか
+			//     GLDrawer2Dを破棄しないと正常に描画されない
+			releaseDrawer();
 			for (final IMediaEffect effect: mEffects) {
 				effect.resize(getWidth(), getHeight());
 			}
@@ -472,6 +458,29 @@ public class MediaEffectPipeline extends ProxyPipeline
 	}
 
 //--------------------------------------------------------------------------------
+	/**
+	 * XXX パイプラインのつなぎ替え時やEffectsBuilder変更時に映像がでなくなることへのワークアラウンド
+	 *     GLDrawer2Dを破棄＆再生成を行うと正常に表示されるようになるのでGLDrawer2Dの破棄処理をメソッド化
+	 */
+	private void releaseDrawer() {
+		if (DEBUG) Log.v(TAG, "releaseDrawer:");
+		try {
+			mManager.runOnGLThread(() -> {
+				if (DEBUG) Log.v(TAG, "releaseDrawer#run:");
+				if (mSrcDrawer != null) {
+					mSrcDrawer.release();
+					mSrcDrawer = null;
+				}
+				if (mTargetDrawer != null) {
+					mTargetDrawer.release();
+					mTargetDrawer = null;
+				}
+			});
+		} catch (final Exception e) {
+			if (DEBUG) Log.w(TAG, e);
+		}
+	}
+
 	private void releaseAll() {
 		if (DEBUG) Log.v(TAG, "releaseAll:");
 		if (mManager.isValid()) {
@@ -479,14 +488,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				mManager.runOnGLThread(() -> {
 					if (DEBUG) Log.v(TAG, "releaseAll#run:");
 					releaseTargetOnGL();
-					if (mSrcDrawer != null) {
-						mSrcDrawer.release();
-						mSrcDrawer = null;
-					}
-					if (mTargetDrawer != null) {
-						mTargetDrawer.release();
-						mTargetDrawer = null;
-					}
+					releaseDrawer();
 					if (mMediaSource != null) {
 						mMediaSource.release();
 						mMediaSource = null;
