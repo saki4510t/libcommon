@@ -19,6 +19,8 @@ package com.serenegiant.mediaeffect;
 */
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
 
 import android.opengl.GLES20;
 import android.util.Log;
@@ -106,7 +108,7 @@ public class MediaSource implements ISource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(final IMediaEffect effect) {
+	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (needSwap) {
 				final GLSurface temp = mSourceScreen;
@@ -141,11 +143,13 @@ public class MediaSource implements ISource {
 		return needSwap ? mOutputScreen.getTexId() : mSourceScreen.getTexId();
 	}
 
+	@Nullable
 	@Override
 	public float[] getTexMatrix() {
 		return needSwap ? mOutputScreen.copyTexMatrix() : mSourceScreen.copyTexMatrix();
 	}
 
+	@Nullable
 	@Override
 	public GLSurface getOutputTexture() {
 		return needSwap ? mOutputScreen : mSourceScreen;
@@ -168,11 +172,13 @@ public class MediaSource implements ISource {
 		}
 	}
 
+	@Deprecated
 	public MediaSource bind() {
 		mSourceScreen.makeCurrent();
 		return this;
 	}
 
+	@Deprecated
 	public MediaSource unbind() {
 		mSourceScreen.swap();
 		reset();
@@ -188,7 +194,8 @@ public class MediaSource implements ISource {
 	 */
 	public MediaSource setSource(
 		@NonNull final GLDrawer2D drawer,
-		final int texId, final float[] texMatrix) {
+		final int texId,
+		@Nullable @Size(min=16) final float[] texMatrix) {
 
 		mSourceScreen.makeCurrent();
 		try {

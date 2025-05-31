@@ -23,6 +23,8 @@ import android.opengl.GLES20;
 
 import com.serenegiant.gl.GLSurface;
 
+import androidx.annotation.NonNull;
+
 public class MediaImageSource extends MediaSource {
 	private final GLSurface mImageOffscreen;
 	private boolean isReset;
@@ -44,7 +46,7 @@ public class MediaImageSource extends MediaSource {
 	 * @param bitmap
 	 * @return
 	 */
-	public ISource setSource(final Bitmap bitmap) {
+	public ISource setSource(@NonNull final Bitmap bitmap) {
 		mImageOffscreen.loadBitmap(bitmap);
 		reset();
 		return this;
@@ -70,7 +72,7 @@ public class MediaImageSource extends MediaSource {
 	 * @return
 	 */
 	@Override
-	public ISource apply(IMediaEffect effect) {
+	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (isReset) {
 				isReset = false;

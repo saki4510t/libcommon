@@ -19,6 +19,7 @@ package com.serenegiant.mediaeffect;
 */
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import com.serenegiant.gl.GLSurface;
 
@@ -44,13 +45,15 @@ public interface ISource {
 	 * @param effect
 	 * @return
 	 */
-	public ISource apply(IMediaEffect effect);
+	public ISource apply(@NonNull final IMediaEffect effect);
 	public int getWidth();
 	public int getHeight();
 	@NonNull
 	public int[] getSourceTexId();
 	public int getOutputTexId();
+	@Nullable
 	public float[] getTexMatrix();
+	@Nullable
 	public GLSurface getOutputTexture();
 
 	/**
