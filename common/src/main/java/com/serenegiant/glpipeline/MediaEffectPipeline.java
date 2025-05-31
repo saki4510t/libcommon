@@ -367,6 +367,9 @@ public class MediaEffectPipeline extends ProxyPipeline
 						if (!output.isOES()) {
 							mTargetDrawer.setMirror(MIRROR_VERTICAL);
 						}
+						if (mTargetDrawer instanceof GLEffectDrawer2D) {
+							((GLEffectDrawer2D) mTargetDrawer).setTexSize(width, height);
+						}
 					}
 					renderTarget(mTargetDrawer, mSurfaceTarget, output.getTexId(), output.getTexMatrix());
 				}
