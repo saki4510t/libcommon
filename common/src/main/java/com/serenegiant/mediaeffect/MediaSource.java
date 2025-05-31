@@ -43,11 +43,11 @@ public class MediaSource implements ISource {
 	 * GLコンテキスト内で生成すること
 	 */
 	public MediaSource(final boolean isGLES3) {
-		this(isGLES3, GLES20.GL_TEXTURE0, 1, 1);
+		this(isGLES3, GLES20.GL_TEXTURE4, 1, 1);
 	}
 
 	public MediaSource(final boolean isGLES3, final int width, final int height) {
-		this(isGLES3, GLES20.GL_TEXTURE0, width, height);
+		this(isGLES3, GLES20.GL_TEXTURE4, width, height);
 	}
 
 	public MediaSource(final boolean isGLES3, final int texUnit, final int width, final int height) {
@@ -192,7 +192,7 @@ public class MediaSource implements ISource {
 
 		mSourceScreen.makeCurrent();
 		try {
-			drawer.draw(mTexUnit, texId, texMatrix, 0);
+			drawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
 		} catch (RuntimeException e) {
 			Log.w(TAG, e);
 		} finally {
