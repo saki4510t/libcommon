@@ -33,7 +33,7 @@ public class MediaSource implements ISource {
 	protected GLSurface mSourceScreen;
 	protected GLSurface mOutputScreen;
 	protected int mWidth, mHeight;
-	protected int[] mSrcTexIds = new int[1];
+	protected final int[] mSrcTexIds = new int[1];
 	protected boolean needSwap;
 
 	/**
@@ -183,7 +183,8 @@ public class MediaSource implements ISource {
 	 * @param texMatrix
 	 * @return
 	 */
-	public MediaSource setSource(final GLDrawer2D drawer,
+	public MediaSource setSource(
+		@NonNull final GLDrawer2D drawer,
 		final int texId, final float[] texMatrix) {
 
 		mSourceScreen.makeCurrent();
