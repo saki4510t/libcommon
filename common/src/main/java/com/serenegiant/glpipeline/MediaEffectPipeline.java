@@ -193,6 +193,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				// 空の時は単純コピーするMediaEffectNullを追加する
 				mEffects.add(new MediaEffectNull(mEffectContext));
 			}
+			if (DEBUG) Log.i(TAG, "コンストラクタ:" + mEffects.get(0));
 			createTargetOnGL(surface, maxFps);
 		});
 	}
@@ -457,6 +458,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				// 空の時は単純コピーするMediaEffectNullを追加する
 				mEffects.add(new MediaEffectNull(mEffectContext));
 			}
+			if (DEBUG) Log.i(TAG, "changeEffect:" + mEffects.get(0));
 			for (final IMediaEffect effect: mEffects) {
 				effect.resize(getWidth(), getHeight());
 			}
