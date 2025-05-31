@@ -30,6 +30,7 @@ import com.serenegiant.camera.CameraUtils
 import com.serenegiant.gl.GLManager
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.glpipeline.MediaEffectPipeline
+import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import java.io.IOException
 import java.util.concurrent.Semaphore
@@ -46,6 +47,7 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 
 	private var source: SurfaceSourcePipeline? = null
 	private var pipeline: MediaEffectPipeline? = null
+	private var preview: SurfaceRendererPipeline? = null
 	private var mHasSurface = false
 	private var mCamera: Camera? = null
 
@@ -61,8 +63,12 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 
 			override fun surfaceChanged(holder: SurfaceHolder, format: Int, width: Int, height: Int) {
 				if (DEBUG) Log.v(TAG, "surfaceChanged:")
-				createPipeline();
-				pipeline?.setSurface(holder)
+				createPipeline()
+				if (USE_PREVIEW) {
+					preview?.setSurface(holder)
+				} else {
+					pipeline?.setSurface(holder)
+				}
 				startPreview()
 			}
 
@@ -77,7 +83,12 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 	fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:hasSurface=$mHasSurface")
 		if (mHasSurface) {
-			createPipeline();
+			createPipeline()
+			if (USE_PREVIEW) {
+				preview?.setSurface(holder)
+			} else {
+				pipeline?.setSurface(holder)
+			}
 			startPreview()
 		}
 	}
@@ -92,6 +103,7 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 		if (pipeline == null) {
 			val manager = GLManager()
 			pipeline = MediaEffectPipeline(manager, object : MediaEffectPipeline.EffectsBuilder{})
+			preview = SurfaceRendererPipeline(manager)
 			val sem = Semaphore(0)
 			source = SurfaceSourcePipeline(manager,
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
@@ -107,6 +119,9 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 					}
 				})
 			sem.tryAcquire(1000, TimeUnit.MILLISECONDS)
+			if (USE_PREVIEW) {
+				pipeline?.pipeline = preview
+			}
 			source!!.pipeline = pipeline
 		}
 	}
@@ -136,11 +151,18 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 		source = null
 		pipeline?.release()
 		pipeline = null
+		preview?.release()
+		preview = null
 	}
 
 	companion object {
 		private const val DEBUG = true // set false on production
 		private val TAG = MediaEffectCameraSurfaceView::class.java.simpleName
 		private const val CAMERA_ID = 0
+
+		/**
+		 * SurfaceRendererPipelineを使ってプレビュー表示するかどうか
+		 */
+		private const val USE_PREVIEW = true
 	}
 }
