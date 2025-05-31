@@ -306,6 +306,14 @@ class MainActivity
 				}
 				fragment = MaskCameraSurfaceFragment.newInstance()
 			}
+			R.string.title_media_effect_camera -> { // MediaEffectCamera
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = MediaEffectCameraSurfaceFragment.newInstance()
+			}
 			R.string.title_video_source_camera -> {	// VideoSourceCamera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
