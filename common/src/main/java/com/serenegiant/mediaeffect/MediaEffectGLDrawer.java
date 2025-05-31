@@ -33,7 +33,7 @@ import java.util.Locale;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
-public class MediaEffectDrawer {
+public class MediaEffectGLDrawer {
 
 	protected boolean mEnabled = true;
 
@@ -44,64 +44,64 @@ public class MediaEffectDrawer {
 	private static final int VERTEX_NUM = 4;
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
 
-	public static MediaEffectDrawer newInstance() {
+	public static MediaEffectGLDrawer newInstance() {
 		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
-	public static MediaEffectDrawer newInstance(final int numTex) {
+	public static MediaEffectGLDrawer newInstance(final int numTex) {
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 		} else {
-			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
+			return new MediaEffectGLDrawer(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 		}
 	}
 
-	public static MediaEffectDrawer newInstance(final String fss) {
+	public static MediaEffectGLDrawer newInstance(final String fss) {
 		return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, fss);
 	}
 
-	public static MediaEffectDrawer newInstance(final int numTex, final String fss) {
+	public static MediaEffectGLDrawer newInstance(final int numTex, final String fss) {
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(false, VERTEX_SHADER_ES2, fss);
 		} else {
-			return new MediaEffectDrawer(numTex, false, VERTEX_SHADER_ES2, fss);
+			return new MediaEffectGLDrawer(numTex, false, VERTEX_SHADER_ES2, fss);
 		}
 	}
 
-	public static MediaEffectDrawer newInstance(final boolean isOES, final String fss) {
+	public static MediaEffectGLDrawer newInstance(final boolean isOES, final String fss) {
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	public static MediaEffectDrawer newInstance(final int numTex,
-		final boolean isOES, final String fss) {
+	public static MediaEffectGLDrawer newInstance(final int numTex,
+												  final boolean isOES, final String fss) {
 
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 		} else {
-			return new MediaEffectDrawer(numTex, isOES, VERTEX_SHADER_ES2, fss);
+			return new MediaEffectGLDrawer(numTex, isOES, VERTEX_SHADER_ES2, fss);
 		}
 	}
 
-	public static MediaEffectDrawer newInstance(final boolean isOES,
-		final String vss, final String fss) {
+	public static MediaEffectGLDrawer newInstance(final boolean isOES,
+												  final String vss, final String fss) {
 
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
-	public static MediaEffectDrawer newInstance(final int numTex,
-		final boolean isOES, final String vss, final String fss) {
+	public static MediaEffectGLDrawer newInstance(final int numTex,
+												  final boolean isOES, final String vss, final String fss) {
 
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(isOES, vss, fss);
 		} else {
-			return new MediaEffectDrawer(numTex, isOES, vss, fss);
+			return new MediaEffectGLDrawer(numTex, isOES, vss, fss);
 		}
 	}
 	
 	/**
 	 * テクスチャを1枚しか使わない場合はこちらを使うこと
 	 */
-	protected static class MediaEffectSingleDrawer extends MediaEffectDrawer {
+	protected static class MediaEffectSingleDrawer extends MediaEffectGLDrawer {
 		protected MediaEffectSingleDrawer(
 			final boolean isOES, final String vss, final String fss) {
 			super(1, isOES, vss, fss);
@@ -141,40 +141,40 @@ public class MediaEffectDrawer {
 	protected final float[] mMvpMatrix = new float[16];
 	protected int hProgram;
 
-	protected MediaEffectDrawer() {
+	protected MediaEffectGLDrawer() {
 		this(1, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
-	protected MediaEffectDrawer(final int numTex) {
+	protected MediaEffectGLDrawer(final int numTex) {
 		this(numTex, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
 	}
 
-	protected MediaEffectDrawer(final String fss) {
+	protected MediaEffectGLDrawer(final String fss) {
 		this(1, false, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectDrawer(final int numTex, final String fss) {
+	protected MediaEffectGLDrawer(final int numTex, final String fss) {
 		this(numTex, false, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectDrawer(final boolean isOES, final String fss) {
+	protected MediaEffectGLDrawer(final boolean isOES, final String fss) {
 		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectDrawer(final int numTex,
-		final boolean isOES, final String fss) {
+	protected MediaEffectGLDrawer(final int numTex,
+								  final boolean isOES, final String fss) {
 
 		this(numTex, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectDrawer(final boolean isOES,
-		final String vss, final String fss) {
+	protected MediaEffectGLDrawer(final boolean isOES,
+								  final String vss, final String fss) {
 
 		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
-	protected MediaEffectDrawer(final int numTex,
-		final boolean isOES, final String vss, final String fss) {
+	protected MediaEffectGLDrawer(final int numTex,
+								  final boolean isOES, final String vss, final String fss) {
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		final FloatBuffer pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)

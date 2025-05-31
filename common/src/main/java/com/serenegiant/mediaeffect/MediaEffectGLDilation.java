@@ -31,7 +31,7 @@ public class MediaEffectGLDilation extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLDilation";
 
 	private static class MediaEffectDilationDrawer
-		extends MediaEffectDrawer.MediaEffectSingleDrawer {
+		extends MediaEffectGLDrawer.MediaEffectSingleDrawer {
 
 		private final int muTexOffsetLoc;	// テクスチャオフセット
 		private final float[] mTexOffset = new float[82];

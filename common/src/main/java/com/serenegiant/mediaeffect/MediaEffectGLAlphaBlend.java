@@ -50,7 +50,7 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 	private static final String FRAGMENT_SHADER_EXT
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES, SAMPLER_OES);
 
-	private static class MediaEffectAlphaBlendDrawer extends MediaEffectDrawer {
+	private static class MediaEffectAlphaBlendDrawer extends MediaEffectGLDrawer {
 		private final int muMixRate;
 		private float mMixRate;
 		

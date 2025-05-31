@@ -48,7 +48,7 @@ public class MediaEffectGLSaturate extends MediaEffectGLBase {
 	}
 
 	public MediaEffectGLSaturate(final float saturation) {
-		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
 		setParameter(saturation);
 	}
 
@@ -58,7 +58,7 @@ public class MediaEffectGLSaturate extends MediaEffectGLBase {
 	 * @return
 	 */
 	public MediaEffectGLSaturate setParameter(final float saturation) {
-		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(saturation + 1.0f);
+		((MediaEffectGLColorAdjustDrawer)mDrawer).setColorAdjust(saturation + 1.0f);
 		return this;
 	}
 }

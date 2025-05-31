@@ -43,7 +43,7 @@ public class MediaEffectGLExposure extends MediaEffectGLBase {
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
 	public MediaEffectGLExposure() {
-		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -59,7 +59,7 @@ public class MediaEffectGLExposure extends MediaEffectGLBase {
 	 */
 	public MediaEffectGLExposure setParameter(final float exposure) {
 		setEnable(exposure != 0.0f);
-		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(exposure);
+		((MediaEffectGLColorAdjustDrawer)mDrawer).setColorAdjust(exposure);
 		return this;
 	}
 

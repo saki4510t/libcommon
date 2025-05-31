@@ -26,24 +26,24 @@ import static com.serenegiant.gl.ShaderConst.*;
 /**
  * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ
  */
-public class MediaEffectColorAdjustDrawer
-	extends MediaEffectDrawer.MediaEffectSingleDrawer {
+public class MediaEffectGLColorAdjustDrawer
+	extends MediaEffectGLDrawer.MediaEffectSingleDrawer {
 
 	private int muColorAdjustLoc;		// 色調整
 	private float mColorAdjust;
 
-	public MediaEffectColorAdjustDrawer(final String fss) {
+	public MediaEffectGLColorAdjustDrawer(final String fss) {
 		this(false, VERTEX_SHADER_ES2, fss);
 	}
 
-	public MediaEffectColorAdjustDrawer(final boolean isOES,
-		final String fss) {
+	public MediaEffectGLColorAdjustDrawer(final boolean isOES,
+										  final String fss) {
 
 		this(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	public MediaEffectColorAdjustDrawer(final boolean isOES,
-		final String vss, final String fss) {
+	public MediaEffectGLColorAdjustDrawer(final boolean isOES,
+										  final String vss, final String fss) {
 
 		super(isOES, vss, fss);
 		muColorAdjustLoc = GLES20.glGetUniformLocation(getProgram(), "uColorAdjust");

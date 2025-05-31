@@ -37,7 +37,7 @@ public class MediaEffectGLBase implements IMediaEffect {
 	protected GLSurface mOutputOffscreen;
 	protected volatile boolean mEnabled = true;
 
-	protected final MediaEffectDrawer mDrawer;
+	protected final MediaEffectGLDrawer mDrawer;
 
 	/**
 	 * フラグメントシェーダーを指定する場合のコンストラクタ(頂点シェーダーはデフォルトを使用)
@@ -45,7 +45,7 @@ public class MediaEffectGLBase implements IMediaEffect {
 	 * @param shader
 	 */
 	public MediaEffectGLBase(final int numTex, final String shader) {
-		this(MediaEffectDrawer.newInstance(numTex, false, VERTEX_SHADER_ES2, shader));
+		this(MediaEffectGLDrawer.newInstance(numTex, false, VERTEX_SHADER_ES2, shader));
 	}
 
 	/**
@@ -56,7 +56,7 @@ public class MediaEffectGLBase implements IMediaEffect {
 	public MediaEffectGLBase(final int numTex,
 							 final boolean isOES, final String shader) {
 
-		this(MediaEffectDrawer.newInstance(numTex, isOES, VERTEX_SHADER_ES2, shader));
+		this(MediaEffectGLDrawer.newInstance(numTex, isOES, VERTEX_SHADER_ES2, shader));
 	}
 
 	/**
@@ -68,14 +68,14 @@ public class MediaEffectGLBase implements IMediaEffect {
 	public MediaEffectGLBase(final int numTex,
 							 final boolean isOES, final String vss, final String fss) {
 
-		this(MediaEffectDrawer.newInstance(numTex, isOES, vss, fss));
+		this(MediaEffectGLDrawer.newInstance(numTex, isOES, vss, fss));
 	}
 	
 	/**
 	 * コンストラクタ
 	 * @param drawer
 	 */
-	public MediaEffectGLBase(final MediaEffectDrawer drawer) {
+	public MediaEffectGLBase(final MediaEffectGLDrawer drawer) {
 		mDrawer = drawer;
 //		resize(256, 256);
 	}

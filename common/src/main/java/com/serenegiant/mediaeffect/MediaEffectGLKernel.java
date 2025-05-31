@@ -25,7 +25,7 @@ public class MediaEffectGLKernel extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLKernel";
 
 	public MediaEffectGLKernel() {
-		super(new MediaEffectKernel3x3Drawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2));
+		super(new MediaEffectGLKernel3x3Drawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2));
 	}
 
 	public MediaEffectGLKernel(final float[] kernel) {
@@ -46,11 +46,11 @@ public class MediaEffectGLKernel extends MediaEffectGLBase {
 	}
 
 	public void setKernel(final float[] values, final float colorAdj) {
-		((MediaEffectKernel3x3Drawer)mDrawer).setKernel(values, colorAdj);
+		((MediaEffectGLKernel3x3Drawer)mDrawer).setKernel(values, colorAdj);
 	}
 
 	public void setColorAdjust(final float adjust) {
-		((MediaEffectKernel3x3Drawer)mDrawer).setColorAdjust(adjust);
+		((MediaEffectGLKernel3x3Drawer)mDrawer).setColorAdjust(adjust);
 	}
 
 	/**

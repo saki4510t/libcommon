@@ -30,7 +30,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * カーネル行列を用いた映像フィルタ処理
  * MediaEffectSingleDrawerを継承しているので、使用できるテクスチャは1つだけ
  */
-public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
+public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer {
 
 	public static final int KERNEL_SIZE = 9;
 	public static final float[] KERNEL_NULL = ShaderConst.KERNEL_NULL;
@@ -80,15 +80,15 @@ public class MediaEffectKernel3x3Drawer extends MediaEffectColorAdjustDrawer {
 	private static final String FRAGMENT_SHADER_EXT_FILT3x3
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES_ES2, SAMPLER_OES);
 
-	public MediaEffectKernel3x3Drawer(final String fss) {
+	public MediaEffectGLKernel3x3Drawer(final String fss) {
 		this(false, VERTEX_SHADER_ES2, fss);
 	}
 
-	public MediaEffectKernel3x3Drawer(final boolean isOES, final String fss) {
+	public MediaEffectGLKernel3x3Drawer(final boolean isOES, final String fss) {
 		this(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	public MediaEffectKernel3x3Drawer(final boolean isOES, final String vss, final String fss) {
+	public MediaEffectGLKernel3x3Drawer(final boolean isOES, final String vss, final String fss) {
 		super(isOES, vss, fss);
 		muKernelLoc = GLES20.glGetUniformLocation(getProgram(), "uKernel");
 		if (muKernelLoc < 0) {

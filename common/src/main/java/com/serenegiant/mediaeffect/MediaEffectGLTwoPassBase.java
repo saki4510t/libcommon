@@ -26,7 +26,7 @@ import com.serenegiant.gl.GLSurface;
 
 public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
-	protected final MediaEffectKernel3x3Drawer mDrawer2;
+	protected final MediaEffectGLKernel3x3Drawer mDrawer2;
 	protected GLSurface mOutputOffscreen2;
 
 	public MediaEffectGLTwoPassBase(final int numTex,
@@ -56,7 +56,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
 		super(numTex, isOES, vss1, fss1);
 		if (!vss1.equals(vss2) || !fss1.equals(fss2)) {
-			mDrawer2 = new MediaEffectKernel3x3Drawer(isOES, vss2, fss2);
+			mDrawer2 = new MediaEffectGLKernel3x3Drawer(isOES, vss2, fss2);
 		} else {
 			mDrawer2 = null;
 		}

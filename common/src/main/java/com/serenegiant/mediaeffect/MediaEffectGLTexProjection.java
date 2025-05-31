@@ -35,7 +35,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLTexProjection";
 
 	private static class MediaEffectTexProjectionDrawer
-		extends MediaEffectDrawer.MediaEffectSingleDrawer {
+		extends MediaEffectGLDrawer.MediaEffectSingleDrawer {
 
 		private final float[] texMatrix2 = new float[9];
 		private final int muTexMatrixLoc2;
@@ -148,7 +148,7 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
 		"%s" +
-		"#define KERNEL_SIZE3x3 " + MediaEffectKernel3x3Drawer.KERNEL_SIZE + "\n" +
+		"#define KERNEL_SIZE3x3 " + MediaEffectGLKernel3x3Drawer.KERNEL_SIZE + "\n" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +
 		"uniform %s    sTexture;\n" +

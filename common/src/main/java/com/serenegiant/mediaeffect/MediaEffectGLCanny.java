@@ -126,7 +126,7 @@ public class MediaEffectGLCanny extends MediaEffectGLBase {
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, KERNEL_SIZE3x3, SAMPLER_OES);
 
 	public MediaEffectGLCanny() {
-		super(new MediaEffectKernel3x3Drawer(false, FRAGMENT_SHADER));
+		super(new MediaEffectGLKernel3x3Drawer(false, FRAGMENT_SHADER));
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
 	}
 
@@ -136,7 +136,7 @@ public class MediaEffectGLCanny extends MediaEffectGLBase {
 	}
 
 	public MediaEffectGLCanny setParameter(final float threshold) {
-		((MediaEffectKernel3x3Drawer)mDrawer).setColorAdjust(threshold);
+		((MediaEffectGLKernel3x3Drawer)mDrawer).setColorAdjust(threshold);
 		return this;
 	}
 }

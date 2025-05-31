@@ -47,7 +47,7 @@ public class MediaEffectGLPosterize extends MediaEffectGLBase {
 	}
 
 	public MediaEffectGLPosterize(final float posterize) {
-		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
 		setParameter(posterize);
 	}
 
@@ -57,7 +57,7 @@ public class MediaEffectGLPosterize extends MediaEffectGLBase {
 	 * @return
 	 */
 	public MediaEffectGLPosterize setParameter(final float posterize) {
-		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(posterize);
+		((MediaEffectGLColorAdjustDrawer)mDrawer).setColorAdjust(posterize);
 		return this;
 	}
 }

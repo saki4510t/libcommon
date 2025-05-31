@@ -45,7 +45,7 @@ public class MediaEffectGLBrightness extends MediaEffectGLBase {
 	}
 
 	public MediaEffectGLBrightness(final float brightness) {
-		super(new MediaEffectColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
 		setParameter(brightness);
 	}
 
@@ -56,7 +56,7 @@ public class MediaEffectGLBrightness extends MediaEffectGLBase {
 	 */
 	public MediaEffectGLBrightness setParameter(final float brightness) {
 		setEnable(brightness != 0.0f);
-		((MediaEffectColorAdjustDrawer)mDrawer).setColorAdjust(brightness);
+		((MediaEffectGLColorAdjustDrawer)mDrawer).setColorAdjust(brightness);
 		return this;
 	}
 }
