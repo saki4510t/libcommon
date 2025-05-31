@@ -77,8 +77,16 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 * テクスチャをそのまま次のパイプラインへ送るか
 	 */
 	private volatile boolean mPathThrough = true;
+	/**
+	 * 受け取ったテクスチャをMediaSourceへセットするときに使うGLDrawer2D
+	 */
 	@Nullable
-	private GLDrawer2D mDrawer;
+	private GLDrawer2D mSrcDrawer;
+	/**
+	 * mSurfaceTargetへの描画時に使うGLDrawer2D
+	 */
+	@Nullable
+	private GLDrawer2D mTargetDrawer;
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mSurfaceId = 0;
@@ -311,14 +319,14 @@ public class MediaEffectPipeline extends ProxyPipeline
 		final int width, final int height,
 		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
-		if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
+		if ((mSrcDrawer == null) || (isGLES3 != mSrcDrawer.isGLES3) || (isOES != mSrcDrawer.isOES())) {
 			// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
-			if (mDrawer != null) {
-				mDrawer.release();
-				mDrawer = null;
+			if (mSrcDrawer != null) {
+				mSrcDrawer.release();
+				mSrcDrawer = null;
 			}
-			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
-			mDrawer = mDrawerFactory.create(isGLES3, isOES);
+			if (DEBUG) Log.v(TAG, "onFrameAvailable:create src GLDrawer2D");
+			mSrcDrawer = mDrawerFactory.create(isGLES3, isOES);
 			if (!isOES) {
 				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
 				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
@@ -326,17 +334,17 @@ public class MediaEffectPipeline extends ProxyPipeline
 				//     GLUtils#glCopyTextureToBitmapとは逆で、
 				//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
 				//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
-				mDrawer.setMirror(MIRROR_VERTICAL);
+				mSrcDrawer.setMirror(MIRROR_VERTICAL);
 			}
-			if (mDrawer instanceof GLEffectDrawer2D) {
-				((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
+			if (mSrcDrawer instanceof GLEffectDrawer2D) {
+				((GLEffectDrawer2D) mSrcDrawer).setTexSize(width, height);
 			}
 		}
 		if (mMediaSource == null) {
-			mMediaSource = new MediaSource(width, height);
+			mMediaSource = new MediaSource(isGLES3, width, height);
 		}
 
-		final GLDrawer2D drawer = mDrawer;
+		final GLDrawer2D drawer = mSrcDrawer;
 		final MediaSource mediaSource = mMediaSource;
 		if ((drawer != null) && (mediaSource != null)) {
 			// テクスチャをフィルター用にセット
@@ -346,9 +354,21 @@ public class MediaEffectPipeline extends ProxyPipeline
 					mediaSource.apply(effect);
 				}
 			}
-			final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
-			if (output != null) {
-				renderTarget(drawer, mSurfaceTarget, output.getTexId(), output.getTexMatrix());
+			if (mSurfaceTarget != null) {
+				final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
+				if (output != null) {
+					if ((mTargetDrawer == null) || (isGLES3 != mTargetDrawer.isGLES3) || (output.isOES() != mTargetDrawer.isOES())) {
+						if (mTargetDrawer != null) {
+							mTargetDrawer.release();
+						}
+						if (DEBUG) Log.v(TAG, "onFrameAvailable:create target GLDrawer2D");
+						mTargetDrawer = mDrawerFactory.create(isGLES3, output.isOES());
+						if (!output.isOES()) {
+							mTargetDrawer.setMirror(MIRROR_VERTICAL);
+						}
+					}
+					renderTarget(mTargetDrawer, mSurfaceTarget, output.getTexId(), output.getTexMatrix());
+				}
 			}
 		}
 		if (mPathThrough) {
@@ -388,9 +408,13 @@ public class MediaEffectPipeline extends ProxyPipeline
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
 				if (DEBUG) Log.v(TAG, "refresh#run:release drawer");
-				if (mDrawer != null) {
-					mDrawer.release();
-					mDrawer = null;
+				if (mSrcDrawer != null) {
+					mSrcDrawer.release();
+					mSrcDrawer = null;
+				}
+				if (mTargetDrawer != null) {
+					mTargetDrawer.release();
+					mTargetDrawer = null;
 				}
 			});
 		}
@@ -403,9 +427,13 @@ public class MediaEffectPipeline extends ProxyPipeline
 		if (DEBUG) Log.v(TAG, String.format("resize:(%dx%d)", width, height));
 		mManager.runOnGLThread(() -> {
 			if (DEBUG) Log.v(TAG, "resize#run:");
-			if (mDrawer != null) {
-				mDrawer.release();
-				mDrawer = null;
+			if (mSrcDrawer != null) {
+				mSrcDrawer.release();
+				mSrcDrawer = null;
+			}
+			if (mTargetDrawer != null) {
+				mTargetDrawer.release();
+				mTargetDrawer = null;
 			}
 			if (mMediaSource != null) {
 				mMediaSource.resize(width, height);
@@ -443,9 +471,13 @@ public class MediaEffectPipeline extends ProxyPipeline
 				mManager.runOnGLThread(() -> {
 					if (DEBUG) Log.v(TAG, "releaseAll#run:");
 					releaseTargetOnGL();
-					if (mDrawer != null) {
-						mDrawer.release();
-						mDrawer = null;
+					if (mSrcDrawer != null) {
+						mSrcDrawer.release();
+						mSrcDrawer = null;
+					}
+					if (mTargetDrawer != null) {
+						mTargetDrawer.release();
+						mTargetDrawer = null;
 					}
 					if (mMediaSource != null) {
 						mMediaSource.release();
