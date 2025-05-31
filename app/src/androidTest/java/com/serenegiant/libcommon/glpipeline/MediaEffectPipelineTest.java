@@ -718,7 +718,10 @@ public class MediaEffectPipelineTest {
 		mediaEffectPipelineOESTest1(builder);
 		mediaEffectPipelineOESTest2(builder);
 		mediaEffectPipelineOESTest3(builder);
+		drawerPipelineOESTestWithSurface1(builder);
+		mediaEffectPipelineWithSurfaceTest1(builder);
 	}
+
 	/**
 	 * MediaEffectPipelineが動作するかどうかを検証
 	 * 映像ソースがImageSourcePipelineなのでGL_TEXTURE_2D
