@@ -22,6 +22,10 @@ import android.media.effect.EffectContext;
 import android.media.effect.EffectFactory;
 import android.text.TextUtils;
 
+/**
+ * FIXME これはうまく動かない、urlから動画取得開始後しばらくしてから
+ *       内部的にクラッシュする(android.media.effect.FilterGraphEffect.apply(FilterGraphEffect)
+ */
 public class MediaEffectBackDropper extends MediaEffect {
 	/**
 	 * コンストラクタ
@@ -42,8 +46,9 @@ public class MediaEffectBackDropper extends MediaEffect {
 	 * @return
 	 */
 	public MediaEffectBackDropper setParameter(final String source) {
-		if (!TextUtils.isEmpty(source))
+		if (!TextUtils.isEmpty(source)) {
 			setParameter("source", source);
+		}
 		return this;
 	}
 }
