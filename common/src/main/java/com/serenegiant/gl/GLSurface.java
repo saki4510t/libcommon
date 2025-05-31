@@ -192,7 +192,7 @@ public abstract class GLSurface implements IGLSurface {
 	}
 
 //================================================================================
-	protected final boolean isGLES3;
+	public final boolean isGLES3;
 	@TexTarget
 	protected final int TEX_TARGET;
 	@TexUnit
