@@ -26,10 +26,10 @@ public class MediaEffectDocumentary extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectDocumentary(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_DOCUMENTARY);
+	public MediaEffectDocumentary(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_DOCUMENTARY);
 	}
 
 }

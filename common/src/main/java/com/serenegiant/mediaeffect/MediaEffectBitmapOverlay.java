@@ -27,13 +27,13 @@ public class MediaEffectBitmapOverlay extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param bitmap The overlay bitmap.
 	 */
-	public MediaEffectBitmapOverlay(final EffectContext effect_context,
+	public MediaEffectBitmapOverlay(final EffectContext effectContext,
 		final Bitmap bitmap) {
 
-		super(effect_context, EffectFactory.EFFECT_BITMAPOVERLAY);
+		super(effectContext, EffectFactory.EFFECT_BITMAPOVERLAY);
 		setParameter(bitmap);
 	}
 

@@ -26,11 +26,11 @@ public class MediaEffectVignette extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param scale The scale of vignetting. between 0 and 1. 0 means no change.
 	 */
-	public MediaEffectVignette(final EffectContext effect_context, final float scale) {
-		super(effect_context, EffectFactory.EFFECT_SHARPEN);
+	public MediaEffectVignette(final EffectContext effectContext, final float scale) {
+		super(effectContext, EffectFactory.EFFECT_SHARPEN);
 		setParameter(scale);
 	}
 

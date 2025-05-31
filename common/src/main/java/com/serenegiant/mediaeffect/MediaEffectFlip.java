@@ -26,28 +26,28 @@ public class MediaEffectFlip extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param flip_vertical
 	 * @param flip_horizontal
 	 */
-	public MediaEffectFlip(final EffectContext effect_context,
+	public MediaEffectFlip(final EffectContext effectContext,
 		final boolean flip_vertical, final boolean flip_horizontal) {
 
-		super(effect_context, EffectFactory.EFFECT_FLIP);
+		super(effectContext, EffectFactory.EFFECT_FLIP);
 		setParameter(flip_vertical, flip_horizontal);
 	}
 
 	/**
 	 *
-	 * @param flip_vertical
-	 * @param flip_horizontal
+	 * @param flipVertical
+	 * @param flipHorizontal
 	 * @return
 	 */
 	public MediaEffectFlip setParameter(
-		final boolean flip_vertical, final boolean flip_horizontal) {
+		final boolean flipVertical, final boolean flipHorizontal) {
 
-		setParameter("vertical", flip_vertical);
-		setParameter("horizontal", flip_horizontal);
+		setParameter("vertical", flipVertical);
+		setParameter("horizontal", flipHorizontal);
 		return this;
 	}
 }

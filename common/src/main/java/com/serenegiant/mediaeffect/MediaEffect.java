@@ -33,11 +33,11 @@ public class MediaEffect implements IMediaEffect {
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffect(final EffectContext effect_context, final String effectName) {
-		mEffectContext = effect_context;
-		final EffectFactory factory = effect_context.getFactory();
+	public MediaEffect(final EffectContext effectContext, final String effectName) {
+		mEffectContext = effectContext;
+		final EffectFactory factory = effectContext.getFactory();
 		if (TextUtils.isEmpty(effectName)) {
 			mEffect = null;
 		} else {

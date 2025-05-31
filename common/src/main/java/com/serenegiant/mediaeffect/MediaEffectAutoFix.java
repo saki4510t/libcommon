@@ -26,12 +26,12 @@ public class MediaEffectAutoFix extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param scale The scale of the adjustment. between 0 and 1.
 	 * Zero means no adjustment, while 1 indicates the maximum amount of adjustment.
 	 */
-	public MediaEffectAutoFix(final EffectContext effect_context, final float scale) {
-		super(effect_context, EffectFactory.EFFECT_AUTOFIX);
+	public MediaEffectAutoFix(final EffectContext effectContext, final float scale) {
+		super(effectContext, EffectFactory.EFFECT_AUTOFIX);
 		setParameter(scale);
 	}
 

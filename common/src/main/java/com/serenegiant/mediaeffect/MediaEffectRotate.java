@@ -26,12 +26,12 @@ public class MediaEffectRotate extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param angle The angle of rotation in degrees.
 	 * 			This will be rounded to the nearest multiple of 90.
 	 */
-	public MediaEffectRotate(final EffectContext effect_context, final int angle) {
-		super(effect_context, EffectFactory.EFFECT_ROTATE);
+	public MediaEffectRotate(final EffectContext effectContext, final int angle) {
+		super(effectContext, EffectFactory.EFFECT_ROTATE);
 		setParameter(angle);
 	}
 

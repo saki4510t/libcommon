@@ -26,11 +26,11 @@ public class MediaEffectFillLight extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param strength between 0 and 1. between 0 and 1. Zero means no change.
 	 */
-	public MediaEffectFillLight(final EffectContext effect_context, final float strength) {
-		super(effect_context, EffectFactory.EFFECT_FILLLIGHT);
+	public MediaEffectFillLight(final EffectContext effectContext, final float strength) {
+		super(effectContext, EffectFactory.EFFECT_FILLLIGHT);
 		setParameter(strength);
 	}
 

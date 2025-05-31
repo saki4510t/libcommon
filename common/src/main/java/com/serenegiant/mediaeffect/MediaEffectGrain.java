@@ -26,11 +26,11 @@ public class MediaEffectGrain extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param strength The strength of the grain effect. between 0 and 1. Zero means no change.
 	 */
-	public MediaEffectGrain(final EffectContext effect_context, final float strength) {
-		super(effect_context, EffectFactory.EFFECT_GRAIN);
+	public MediaEffectGrain(final EffectContext effectContext, final float strength) {
+		super(effectContext, EffectFactory.EFFECT_GRAIN);
 		setParameter(strength);
 	}
 

@@ -26,11 +26,11 @@ public class MediaEffectStraighten extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param angle The angle of rotation. between -45 and +45.
 	 */
-	public MediaEffectStraighten(final EffectContext effect_context, final float angle) {
-		super(effect_context, EffectFactory.EFFECT_STRAIGHTEN);
+	public MediaEffectStraighten(final EffectContext effectContext, final float angle) {
+		super(effectContext, EffectFactory.EFFECT_STRAIGHTEN);
 		setParameter(angle);
 	}
 

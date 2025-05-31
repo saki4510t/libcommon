@@ -26,22 +26,22 @@ public class MediaEffectBlackWhite extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectBlackWhite(final EffectContext effect_context) {
-		this(effect_context, 0.0f, 1.0f);
+	public MediaEffectBlackWhite(final EffectContext effectContext) {
+		this(effectContext, 0.0f, 1.0f);
 	}
 
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param black The value of the minimal pixel. 0-1
 	 * @param white The value of the maximal pixel. 0-1
 	 */
-	public MediaEffectBlackWhite(final EffectContext effect_context, final float black, final float white) {
-		super(effect_context, EffectFactory.EFFECT_BLACKWHITE);
+	public MediaEffectBlackWhite(final EffectContext effectContext, final float black, final float white) {
+		super(effectContext, EffectFactory.EFFECT_BLACKWHITE);
 		setParameter(black, white);
 	}
 

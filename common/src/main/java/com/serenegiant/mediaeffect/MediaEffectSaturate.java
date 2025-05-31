@@ -26,13 +26,13 @@ public class MediaEffectSaturate extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param scale The scale of color saturation.
 	 * 			between -1 and 1. 0 means no change,
 	 * 			while -1 indicates full desaturation, i.e. grayscale.
 	 */
-	public MediaEffectSaturate(final EffectContext effect_context, final float scale) {
-		super(effect_context, EffectFactory.EFFECT_SATURATE);
+	public MediaEffectSaturate(final EffectContext effectContext, final float scale) {
+		super(effectContext, EffectFactory.EFFECT_SATURATE);
 		setParameter(scale);
 	}
 

@@ -26,10 +26,10 @@ public class MediaEffectNull extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 * 入力テクスチャを無変換で出力テクスチャにコピーする
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectNull(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_AUTOFIX);
+	public MediaEffectNull(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_AUTOFIX);
 		setParameter("scale", 0.0f);	// scale=0.0fならコピー
 	}
 

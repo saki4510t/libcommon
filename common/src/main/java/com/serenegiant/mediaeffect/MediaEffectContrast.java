@@ -26,11 +26,11 @@ public class MediaEffectContrast extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param contrast The contrast multiplier. Float. 1.0 means no change; larger values will increase contrast.
 	 */
-	public MediaEffectContrast(final EffectContext effect_context, final float contrast) {
-		super(effect_context, EffectFactory.EFFECT_CONTRAST);
+	public MediaEffectContrast(final EffectContext effectContext, final float contrast) {
+		super(effectContext, EffectFactory.EFFECT_CONTRAST);
 		setParameter(contrast);
 	}
 

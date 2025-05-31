@@ -26,10 +26,10 @@ public class MediaEffectGrayScale extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectGrayScale(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_GRAYSCALE);
+	public MediaEffectGrayScale(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_GRAYSCALE);
 	}
 
 }

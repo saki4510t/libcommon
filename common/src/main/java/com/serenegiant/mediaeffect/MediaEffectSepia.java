@@ -26,10 +26,10 @@ public class MediaEffectSepia extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectSepia(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_SEPIA);
+	public MediaEffectSepia(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_SEPIA);
 	}
 
 }

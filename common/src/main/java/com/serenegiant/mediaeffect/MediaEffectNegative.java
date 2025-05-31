@@ -26,10 +26,10 @@ public class MediaEffectNegative extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectNegative(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_NEGATIVE);
+	public MediaEffectNegative(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_NEGATIVE);
 	}
 
 }

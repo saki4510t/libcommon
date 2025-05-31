@@ -31,12 +31,12 @@ public class MediaEffectBackDropper extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param source A URI for the background video to use.
 	 * This parameter must be supplied before calling apply() for the first time.
 	 */
-	public MediaEffectBackDropper(final EffectContext effect_context, final String source) {
-		super(effect_context, EffectFactory.EFFECT_BACKDROPPER);
+	public MediaEffectBackDropper(final EffectContext effectContext, final String source) {
+		super(effectContext, EffectFactory.EFFECT_BACKDROPPER);
 		setParameter(source);
 	}
 

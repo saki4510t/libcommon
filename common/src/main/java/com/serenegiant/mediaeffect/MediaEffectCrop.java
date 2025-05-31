@@ -26,7 +26,7 @@ public class MediaEffectCrop extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param x The origin's x-value. between 0 and width of the image.
 	 * @param y The origin's y-value. between 0 and height of the image.
 	 * @param width The width of the cropped image.
@@ -34,10 +34,10 @@ public class MediaEffectCrop extends MediaEffect {
 	 * @param height The height of the cropped image.
 	 * 			between 1 and the height of the image minus yorigin.
 	 */
-	public MediaEffectCrop(final EffectContext effect_context,
+	public MediaEffectCrop(final EffectContext effectContext,
 		final int x, final int y, final int width, final int height) {
 
-		super(effect_context, EffectFactory.EFFECT_CROP);
+		super(effectContext, EffectFactory.EFFECT_CROP);
 		setParameter(x, y, width, height);
 	}
 

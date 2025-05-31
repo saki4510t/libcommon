@@ -26,13 +26,13 @@ public class MediaEffectTint extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param tint The color of the tint.
 	 * 			representing an ARGB color with 8 bits per channel.
 	 * 			May be created using Color class.
 	 */
-	public MediaEffectTint(final EffectContext effect_context, final int tint) {
-		super(effect_context, EffectFactory.EFFECT_TINT);
+	public MediaEffectTint(final EffectContext effectContext, final int tint) {
+		super(effectContext, EffectFactory.EFFECT_TINT);
 		setParameter(tint);
 	}
 

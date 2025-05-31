@@ -25,10 +25,10 @@ public class MediaEffectFlipVertical extends MediaEffectFlip {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectFlipVertical(final EffectContext effect_context) {
-		super(effect_context, true, false);
+	public MediaEffectFlipVertical(final EffectContext effectContext) {
+		super(effectContext, true, false);
 	}
 
 }

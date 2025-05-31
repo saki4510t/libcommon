@@ -26,13 +26,13 @@ public class MediaEffectTemperature extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param scale The value of color temperature. between 0 and 1,
 	 * with 0 indicating cool, and 1 indicating warm.
 	 * A value of of 0.5 indicates no change.
 	 */
-	public MediaEffectTemperature(final EffectContext effect_context, final float scale) {
-		super(effect_context, EffectFactory.EFFECT_TEMPERATURE);
+	public MediaEffectTemperature(final EffectContext effectContext, final float scale) {
+		super(effectContext, EffectFactory.EFFECT_TEMPERATURE);
 		setParameter(scale);
 	}
 

@@ -26,11 +26,11 @@ public class MediaEffectFishEye extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param scale The scale of the distortion. between 0 and 1. Zero means no distortion.
 	 */
-	public MediaEffectFishEye(final EffectContext effect_context, final float scale) {
-		super(effect_context, EffectFactory.EFFECT_FISHEYE);
+	public MediaEffectFishEye(final EffectContext effectContext, final float scale) {
+		super(effectContext, EffectFactory.EFFECT_FISHEYE);
 		setParameter(scale);
 	}
 

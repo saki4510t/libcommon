@@ -26,10 +26,10 @@ public class MediaEffectCrossProcess extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 */
-	public MediaEffectCrossProcess(final EffectContext effect_context) {
-		super(effect_context, EffectFactory.EFFECT_CROSSPROCESS);
+	public MediaEffectCrossProcess(final EffectContext effectContext) {
+		super(effectContext, EffectFactory.EFFECT_CROSSPROCESS);
 	}
 
 }

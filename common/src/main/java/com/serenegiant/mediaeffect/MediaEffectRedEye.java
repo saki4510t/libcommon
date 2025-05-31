@@ -26,14 +26,14 @@ public class MediaEffectRedEye extends MediaEffect {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 *
-	 * @param effect_context
+	 * @param effectContext
 	 * @param centers Multiple center points (x, y) of the red eye regions.
 	 * 			An array of floats, where (f[2*i], f[2*i+1])
 	 * 			specifies the center of the i'th eye.
 	 * 			Coordinate values are expected to be normalized between 0 and 1.
 	 */
-	public MediaEffectRedEye(final EffectContext effect_context, final float[] centers) {
-		super(effect_context, EffectFactory.EFFECT_REDEYE);
+	public MediaEffectRedEye(final EffectContext effectContext, final float[] centers) {
+		super(effectContext, EffectFactory.EFFECT_REDEYE);
 		setParameter(centers);
 	}
 
