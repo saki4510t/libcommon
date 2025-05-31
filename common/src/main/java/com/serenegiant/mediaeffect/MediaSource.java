@@ -94,11 +94,9 @@ public class MediaSource implements ISource {
 				mOutputScreen = GLSurface.newInstance(isGLES3, mTexUnit, width, height, false, false);
 				mWidth = width;
 				mHeight = height;
-				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
 		}
-		needSwap = false;
-		return this;
+		return reset();
 	}
 
 	/**
