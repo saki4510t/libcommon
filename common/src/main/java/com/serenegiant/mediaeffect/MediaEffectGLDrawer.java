@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.graphics.MatrixUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -32,6 +33,7 @@ import java.nio.FloatBuffer;
 import java.util.Locale;
 
 import static com.serenegiant.gl.ShaderConst.*;
+import static com.serenegiant.glutils.IMirror.MIRROR_VERTICAL;
 
 public class MediaEffectGLDrawer {
 
@@ -201,6 +203,9 @@ public class MediaEffectGLDrawer {
 		}
         // モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);
+		if (!isOES) {
+			MatrixUtils.setMirror(mMvpMatrix, MIRROR_VERTICAL);
+		}
 		//
 		if (muMVPMatrixLoc >= 0) {
         	GLES20.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
