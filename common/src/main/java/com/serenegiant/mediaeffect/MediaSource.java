@@ -115,10 +115,7 @@ public class MediaSource implements ISource {
 				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
 			needSwap = !needSwap;
-//			effect.apply(mSrcTexIds,
-// 				mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(),
-// 				mOutputScreen.getTexId());
-			effect.apply(this); // このメソッド呼び出しは1つ上のコメントアウトしてある行と結果は等価だけど効率はいい。
+			effect.apply(this);
 		}
 		return this;
 	}

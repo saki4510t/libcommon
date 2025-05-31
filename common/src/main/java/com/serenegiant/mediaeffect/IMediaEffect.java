@@ -23,6 +23,7 @@ import com.serenegiant.gl.GLSurface;
 import androidx.annotation.NonNull;
 
 public interface IMediaEffect {
+	@Deprecated
 	public void apply(@NonNull final int[] srcTexIds,
 		final int width, final int height, final int outTexId);
 	public void apply(@NonNull final int[] srcTexIds,

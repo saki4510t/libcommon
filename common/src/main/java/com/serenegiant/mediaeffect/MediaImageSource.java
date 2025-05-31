@@ -84,9 +84,7 @@ public class MediaImageSource extends MediaSource {
 				}
 				needSwap = !needSwap;
 			}
-			effect.apply(mSrcTexIds,
-				mOutputScreen.getTexWidth(), mOutputScreen.getTexHeight(),
-				mOutputScreen.getTexId());
+			effect.apply(mSrcTexIds, mOutputScreen);
 		}
 		return this;
 	}
