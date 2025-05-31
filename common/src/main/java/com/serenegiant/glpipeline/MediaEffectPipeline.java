@@ -342,6 +342,11 @@ public class MediaEffectPipeline extends ProxyPipeline
 		if ((drawer != null) && (mediaSource != null)) {
 			// テクスチャをフィルター用にセット
 			mediaSource.setSource(drawer, texId, texMatrix);
+			for (final IMediaEffect effect: mEffects) {
+				if (effect.enabled()) {
+					mediaSource.apply(effect);
+				}
+			}
 			if (output != null) {
 				renderTarget(drawer, mSurfaceTarget, output.getTexId(), output.getTexMatrix());
 			}
