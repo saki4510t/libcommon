@@ -192,7 +192,8 @@ public class MediaEffectPipelineTest {
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
 				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
-				result.add(new MediaEffectBitmapOverlay(effectContext, bitmap));
+				result.add(new MediaEffectBitmapOverlay(effectContext,
+					bitmap.copy(Bitmap.Config.ARGB_8888, false)));
 				return result;
 			}
 		};
