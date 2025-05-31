@@ -30,6 +30,7 @@ public class MediaSource implements ISource {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaSource";
 
+	public final boolean isGLES3;
 	protected GLSurface mSourceScreen;
 	protected GLSurface mOutputScreen;
 	protected int mWidth, mHeight;
@@ -40,11 +41,13 @@ public class MediaSource implements ISource {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 */
-	public MediaSource() {
+	public MediaSource(final boolean isGLES3) {
+		this.isGLES3 = isGLES3;
 		resize(1, 1);
 	}
 
-	public MediaSource(final int width, final int height) {
+	public MediaSource(final boolean isGLES3, final int width, final int height) {
+		this.isGLES3 = isGLES3;
 		resize(width, height);
 	}
 
@@ -82,8 +85,8 @@ public class MediaSource implements ISource {
 			if ((width > 0) && (height > 0)) {
 				// FIXME フィルタ処理自体は大丈夫そうなんだけどImageProcessorの処理がおかしくなるので今は2の乗数には丸めない
 				// 代わりにImageProcessorの縦横のサイズ自体を2の乗数にする
-				mSourceScreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false, false);
-				mOutputScreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false, false);
+				mSourceScreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height, false, false);
+				mOutputScreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height, false, false);
 				mWidth = width;
 				mHeight = height;
 				mSrcTexIds[0] = mSourceScreen.getTexId();

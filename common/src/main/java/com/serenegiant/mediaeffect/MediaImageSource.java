@@ -30,8 +30,8 @@ public class MediaImageSource extends MediaSource {
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 */
-	public MediaImageSource(final Bitmap src) {
-		super(src.getWidth(), src.getHeight());
+	public MediaImageSource(final boolean isGLES3, final Bitmap src) {
+		super(isGLES3, src.getWidth(), src.getHeight());
 		mImageOffscreen = GLSurface.newInstance(
 			false, GLES20.GL_TEXTURE0,
 			mWidth, mHeight, false);
