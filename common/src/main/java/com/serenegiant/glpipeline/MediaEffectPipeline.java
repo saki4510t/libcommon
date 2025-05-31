@@ -455,6 +455,9 @@ public class MediaEffectPipeline extends ProxyPipeline
 	public void changeEffect(@NonNull final EffectsBuilder effectsBuilder) {
 		if (DEBUG) Log.v(TAG, "changeEffect:" + effectsBuilder);
 		mManager.runOnGLThread(() -> {
+			for (final IMediaEffect effect: mEffects) {
+				effect.release();
+			}
 			mEffects.clear();
 			mEffects.addAll(effectsBuilder.buildEffects(mEffectContext));
 			if (mEffects.isEmpty()) {
