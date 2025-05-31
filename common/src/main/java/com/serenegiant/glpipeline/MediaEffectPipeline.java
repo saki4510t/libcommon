@@ -356,7 +356,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				}
 			}
 			if (mSurfaceTarget != null) {
-				final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
+				final GLSurface output = mediaSource.getOutputTexture();
 				if (output != null) {
 					if ((mTargetDrawer == null) || (isGLES3 != mTargetDrawer.isGLES3) || (output.isOES() != mTargetDrawer.isOES())) {
 						if (mTargetDrawer != null) {
