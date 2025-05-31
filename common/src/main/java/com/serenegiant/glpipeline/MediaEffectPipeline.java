@@ -338,7 +338,6 @@ public class MediaEffectPipeline extends ProxyPipeline
 
 		final GLDrawer2D drawer = mDrawer;
 		final MediaSource mediaSource = mMediaSource;
-		final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
 		if ((drawer != null) && (mediaSource != null)) {
 			// テクスチャをフィルター用にセット
 			mediaSource.setSource(drawer, texId, texMatrix);
@@ -347,6 +346,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 					mediaSource.apply(effect);
 				}
 			}
+			final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
 			if (output != null) {
 				renderTarget(drawer, mSurfaceTarget, output.getTexId(), output.getTexMatrix());
 			}
@@ -354,12 +354,15 @@ public class MediaEffectPipeline extends ProxyPipeline
 		if (mPathThrough) {
 			// こっちはオリジナルのテクスチャを渡す
 			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
-		} else if (output != null) {
-			// 描画処理した後のたテクスチャを次へ渡す
-			super.onFrameAvailable(
-				isGLES3, output.isOES(),
-				width, height,
-				output.getTexId(), output.getTexMatrix());
+		} else {
+			final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
+			if (output != null) {
+				// 描画処理した後のたテクスチャを次へ渡す
+				super.onFrameAvailable(
+					isGLES3, output.isOES(),
+					width, height,
+					output.getTexId(), output.getTexMatrix());
+			}
 		}
 		if (DEBUG && (++cnt % 100) == 0) {
 			Log.v(TAG, "onFrameAvailable:path through=" + mPathThrough + "," + cnt);
