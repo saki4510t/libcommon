@@ -447,7 +447,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				// 空の時は単純コピーするMediaEffectNullを追加する
 				mEffects.add(new MediaEffectNull(mEffectContext));
 			}
-			if (DEBUG) Log.i(TAG, "changeEffect:" + mEffects.get(0));
+			if (DEBUG) Log.i(TAG, "changeEffect:n=" + mEffects.size() + "," + mEffects.get(0));
 			// XXX MediaEffectGLXXX系だけの場合はここにMediaEffectNullを追加するか
 			//     GLDrawer2Dを破棄しないと正常に描画されない
 			releaseDrawer();
