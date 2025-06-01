@@ -38,7 +38,10 @@ public class MediaSource implements ISource {
 	protected GLSurface mOutputScreen;
 	protected int mWidth, mHeight;
 	protected final int[] mSrcTexIds = new int[1];
-	protected boolean needSwap;
+	/**
+	 * リセット後最初の#apply呼び出しかどうか
+	 */
+	protected boolean firstApply;
 
 	/**
 	 * コンストラクタ
@@ -65,7 +68,7 @@ public class MediaSource implements ISource {
 	 */
 	@Override
 	public ISource reset() {
-		needSwap = false;
+		firstApply = true;
 		mSrcTexIds[0] = mSourceScreen.getTexId();
 		return this;
 	}
@@ -110,13 +113,15 @@ public class MediaSource implements ISource {
 	@Override
 	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
-			if (needSwap) {
+			if (firstApply) {
+				firstApply = false;
+			} else {
 				final GLSurface temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
 				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
-			needSwap = !needSwap;
+//			if (DEBUG) Log.i(TAG, "apply:" + mSourceScreen.getTexId() + "->" + mOutputScreen.getTexId() + "," + effect);
 			effect.apply(this);
 		}
 		return this;
@@ -140,19 +145,19 @@ public class MediaSource implements ISource {
 
 	@Override
 	public int getOutputTexId() {
-		return needSwap ? mOutputScreen.getTexId() : mSourceScreen.getTexId();
+		return mOutputScreen.getTexId();
 	}
 
 	@Nullable
 	@Override
 	public float[] getTexMatrix() {
-		return needSwap ? mOutputScreen.copyTexMatrix() : mSourceScreen.copyTexMatrix();
+		return mSourceScreen.copyTexMatrix();
 	}
 
 	@Nullable
 	@Override
 	public GLSurface getOutputTexture() {
-		return needSwap ? mOutputScreen : mSourceScreen;
+		return mOutputScreen;
 	}
 
 	/**
@@ -197,6 +202,7 @@ public class MediaSource implements ISource {
 		final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix) {
 
+//		if (DEBUG) Log.i(TAG, "setSource:" + mSourceScreen.getTexId());
 		mSourceScreen.makeCurrent();
 		try {
 			drawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);

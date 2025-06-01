@@ -27,7 +27,6 @@ import androidx.annotation.NonNull;
 
 public class MediaImageSource extends MediaSource {
 	private final GLSurface mImageOffscreen;
-	private boolean isReset;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
@@ -60,7 +59,6 @@ public class MediaImageSource extends MediaSource {
 	@Override
 	public ISource reset() {
 		super.reset();
-		isReset = true;
 		mSrcTexIds[0] = mImageOffscreen.getTexId();
 		return this;
 	}
@@ -74,17 +72,13 @@ public class MediaImageSource extends MediaSource {
 	@Override
 	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
-			if (isReset) {
-				isReset = false;
-				needSwap = true;
+			if (firstApply) {
+				firstApply = false;
 			} else {
-				if (needSwap) {
-					final GLSurface temp = mSourceScreen;
-					mSourceScreen = mOutputScreen;
-					mOutputScreen = temp;
-					mSrcTexIds[0] = mSourceScreen.getTexId();
-				}
-				needSwap = !needSwap;
+				final GLSurface temp = mSourceScreen;
+				mSourceScreen = mOutputScreen;
+				mOutputScreen = temp;
+				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
 			effect.apply(mSrcTexIds, mOutputScreen);
 		}
