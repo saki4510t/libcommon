@@ -80,7 +80,7 @@ public class MediaImageSource extends MediaSource {
 				mOutputScreen = temp;
 				mSrcTexIds[0] = mSourceScreen.getTexId();
 			}
-			effect.apply(mSrcTexIds, mOutputScreen);
+			effect.apply(this);
 		}
 		return this;
 	}

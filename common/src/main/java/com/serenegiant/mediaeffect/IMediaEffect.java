@@ -26,6 +26,7 @@ public interface IMediaEffect {
 	@Deprecated
 	public void apply(@NonNull final int[] srcTexIds,
 		final int width, final int height, final int outTexId);
+	@Deprecated
 	public void apply(@NonNull final int[] srcTexIds,
 		@NonNull final GLSurface output);
 	public void apply(ISource src);
