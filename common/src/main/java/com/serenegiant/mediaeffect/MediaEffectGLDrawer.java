@@ -25,6 +25,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.MatrixUtils;
 
 import java.nio.ByteBuffer;
@@ -33,9 +34,8 @@ import java.nio.FloatBuffer;
 import java.util.Locale;
 
 import static com.serenegiant.gl.ShaderConst.*;
-import static com.serenegiant.glutils.IMirror.MIRROR_VERTICAL;
 
-public class MediaEffectGLDrawer {
+public class MediaEffectGLDrawer implements IMirror {
 
 	protected boolean mEnabled = true;
 
@@ -99,7 +99,7 @@ public class MediaEffectGLDrawer {
 			return new MediaEffectGLDrawer(numTex, isOES, vss, fss);
 		}
 	}
-	
+
 	/**
 	 * テクスチャを1枚しか使わない場合はこちらを使うこと
 	 */
@@ -142,6 +142,8 @@ public class MediaEffectGLDrawer {
 	@NonNull
 	protected final float[] mMvpMatrix = new float[16];
 	protected int hProgram;
+	@MirrorMode
+	private int mMirror = IMirror.MIRROR_NORMAL;
 
 	protected MediaEffectGLDrawer() {
 		this(1, false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2);
@@ -230,6 +232,20 @@ public class MediaEffectGLDrawer {
 			GLES20.glDeleteProgram(hProgram);
 		}
 		hProgram = -1;
+	}
+
+	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		if (mMirror != mirror) {
+			mMirror = mirror;
+			MatrixUtils.setMirror(mMvpMatrix, mirror);
+		}
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		return mMirror;
 	}
 
 	protected int getProgram() {

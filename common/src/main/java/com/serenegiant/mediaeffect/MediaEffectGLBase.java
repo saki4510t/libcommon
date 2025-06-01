@@ -24,13 +24,14 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLSurface;
+import com.serenegiant.glutils.IMirror;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
 /**
  * OpenGL|ES2のフラグメントシェーダーで映像効果を与える時の基本クラス
  */
-public class MediaEffectGLBase implements IMediaEffect {
+public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLBase";
 
@@ -119,6 +120,17 @@ public class MediaEffectGLBase implements IMediaEffect {
 	}
 
 	@Override
+	public void setMirror(@MirrorMode final int mirror) {
+		mDrawer.setMirror(mirror);
+	}
+
+	@MirrorMode
+	@Override
+	public int getMirror() {
+		return mDrawer.getMirror();
+	}
+
+	@Override
 	public MediaEffectGLBase resize(final int width, final int height) {
 		// ISourceを使う時は出力用オフスクリーンは不要なのと
 		// ISourceを使わない時は描画時にチェックして生成するのでresize時には生成しないように変更
@@ -180,6 +192,7 @@ public class MediaEffectGLBase implements IMediaEffect {
 		if (!mEnabled) return;
 		output.makeCurrent();
 		try {
+			// FIXME ここのテクスチャマトリックスもソース側のを使わないとだめかも
 			mDrawer.apply(srcTexIds, output.copyTexMatrix(), 0);
 		} finally {
 			output.swap();
@@ -198,7 +211,7 @@ public class MediaEffectGLBase implements IMediaEffect {
 		final int[] srcTexIds = src.getSourceTexId();
 		output.makeCurrent();
 		try {
-			mDrawer.apply(srcTexIds, output.copyTexMatrix(), 0);
+			mDrawer.apply(srcTexIds, src.getTexMatrix(), 0);
 		} finally {
 			output.swap();
 		}
