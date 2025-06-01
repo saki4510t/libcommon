@@ -23,6 +23,7 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
@@ -70,6 +71,8 @@ public class MediaSource implements ISource {
 	public ISource reset() {
 		firstApply = true;
 		mSrcTexIds[0] = mSourceScreen.getTexId();
+		Matrix.setIdentityM(mSourceScreen.getTexMatrix(), 0);
+		Matrix.setIdentityM(mOutputScreen.getTexMatrix(), 0);
 		return this;
 	}
 
@@ -113,9 +116,7 @@ public class MediaSource implements ISource {
 	@Override
 	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
-			if (firstApply) {
-				firstApply = false;
-			} else {
+			if (!firstApply) {
 				final GLSurface temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
@@ -123,6 +124,7 @@ public class MediaSource implements ISource {
 			}
 //			if (DEBUG) Log.i(TAG, "apply:" + mSourceScreen.getTexId() + "->" + mOutputScreen.getTexId() + "," + effect);
 			effect.apply(this);
+			firstApply = false;
 		}
 		return this;
 	}
