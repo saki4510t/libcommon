@@ -34,17 +34,19 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLAlphaBlend";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform %s    sTexture2;\n" +
-		"uniform float uMixRate;\n" +
-		"void main() {\n" +
-		"    highp vec4 tex1 = texture2D(sTexture, vTextureCoord);\n" +
-		"    highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);\n" +
-		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * uMixRate), tex1.a);\n" +
-		"}\n";
+		"""
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform %s sTexture2;
+		uniform float uMixRate;
+		void main() {
+			highp vec4 tex1 = texture2D(sTexture, vTextureCoord);
+			highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);
+			gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * uMixRate), tex1.a);
+		}
+		""";
 	private static final String FRAGMENT_SHADER
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
@@ -88,8 +90,9 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 		}
 		
 		@Override
-		protected void preDraw(@NonNull final int[] texIds,
-							   final float[] texMatrix, final int offset) {
+		protected void preDraw(
+			@NonNull final int[] texIds,
+			final float[] texMatrix, final int offset) {
 
 			super.preDraw(texIds, texMatrix, offset);
 			if (muMixRate >= 0) {

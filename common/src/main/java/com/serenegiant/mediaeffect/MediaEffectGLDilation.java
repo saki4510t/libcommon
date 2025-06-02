@@ -44,8 +44,9 @@ public class MediaEffectGLDilation extends MediaEffectGLBase {
 		}
 
 		@Override
-		protected void preDraw(@NonNull final int[] texIds,
-							   final float[] texMatrix, final int offset) {
+		protected void preDraw(
+			@NonNull final int[] texIds,
+			final float[] texMatrix, final int offset) {
 
 			super.preDraw(texIds, texMatrix, offset);
 			// テクセルオフセット
@@ -115,137 +116,132 @@ public class MediaEffectGLDilation extends MediaEffectGLBase {
 	}
 
 	public static final String FRAGMENT_SHADER_1 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0] );\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1] ));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2] ));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3] ));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4] ));\n" +
-			"\n" +
-			"gl_FragColor = vec4(maxValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying       vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0] );
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1] ));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2] ));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3] ));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4] ));
+			gl_FragColor = vec4(maxValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_2 =
-		"precision lowp float;\n" +
-		"\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(maxValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			gl_FragColor = vec4(maxValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_3 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(maxValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));
+			gl_FragColor = vec4(maxValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_4 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[25]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[26]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[27]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[28]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[29]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[30]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[31]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[32]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[33]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[34]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[35]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[36]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[37]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[38]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[39]));\n" +
-			"maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[40]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(maxValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying       vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 maxValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[25]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[26]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[27]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[28]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[29]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[30]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[31]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[32]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[33]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[34]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[35]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[36]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[37]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[38]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[39]));
+			maxValue = max(maxValue, texture2D(sTexture, vTextureCoord + uTexOffset[40]));
+			gl_FragColor = vec4(maxValue.rgb, 1.0);
+		}
+		""";
 
 	private static String getFragmentShader(final int radius) {
 		return switch (radius) {

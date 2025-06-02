@@ -26,19 +26,24 @@ public class MediaEffectGLBrightness extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLBrightness";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform float uColorAdjust;\n" +
-		"void main() {\n" +
-		"    highp vec4 tex = texture2D(sTexture, vTextureCoord);\n" +
-		"    gl_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);\n" +
-		"}\n";
+		"""
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		void main() {
+		    highp vec4 tex = texture2D(sTexture, vTextureCoord);
+		    gl_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);
+		}
+		""";
+
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE,
+			HEADER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			HEADER_OES_ES2, SAMPLER_OES);
 
 	public MediaEffectGLBrightness() {
 		this(0.0f);

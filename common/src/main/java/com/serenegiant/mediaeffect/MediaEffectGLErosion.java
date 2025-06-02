@@ -44,8 +44,9 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		}
 
 		@Override
-		protected void preDraw(@NonNull final int[] texIds,
-							   final float[] texMatrix, final int offset) {
+		protected void preDraw(
+			@NonNull final int[] texIds,
+		final float[] texMatrix, final int offset) {
 
 			super.preDraw(texIds, texMatrix, offset);
 			// テクセルオフセット
@@ -115,137 +116,132 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 	}
 
 	public static final String FRAGMENT_SHADER_1 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0] );\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1] ));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2] ));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3] ));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4] ));\n" +
-			"\n" +
-			"gl_FragColor = vec4(minValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying       vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0] );
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1] ));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2] ));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3] ));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4] ));
+			gl_FragColor = vec4(minValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_2 =
-		"precision lowp float;\n" +
-		"\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(minValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying       vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			gl_FragColor = vec4(minValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_3 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(minValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() {
+			vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));
+			gl_FragColor = vec4(minValue.rgb, 1.0);
+		}
+		""";
 
 	public static final String FRAGMENT_SHADER_4 =
-		"precision lowp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform vec2  uTexOffset[41];\n" +
-		"uniform sampler2D sTexture;\n" +
-		"\n" +
-		"void main()\n" +
-		"{\n" +
-			"vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[25]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[26]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[27]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[28]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[29]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[30]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[31]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[32]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[33]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[34]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[35]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[36]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[37]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[38]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[39]));\n" +
-			"minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[40]));\n" +
-			"\n" +
-			"gl_FragColor = vec4(minValue.rgb, 1.0);\n" +
-		"}\n";
+		"""
+		precision lowp float;
+		varying       vec2 vTextureCoord;
+		uniform vec2  uTexOffset[41];
+		uniform sampler2D sTexture;
+		void main() "{
+			vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[3]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[4]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[5]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[6]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[7]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[8]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[9]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[10]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[11]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[12]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[13]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[14]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[15]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[16]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[17]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[18]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[19]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[20]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[21]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[22]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[23]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[24]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[25]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[26]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[27]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[28]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[29]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[30]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[31]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[32]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[33]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[34]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[35]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[36]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[37]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[38]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[39]));
+			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[40]));
+			gl_FragColor = vec4(minValue.rgb, 1.0);
+		}
+		""";
 
 	private static String getFragmentShader(final int radius) {
 		return switch (radius) {

@@ -28,15 +28,17 @@ public class MediaEffectGLPosterize extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLBrightness";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform float uColorAdjust;\n" +
-		"void main() {\n" +
-		"    vec4 tex = texture2D(sTexture, vTextureCoord);\n" +
-		"    gl_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;\n" +
-		"}\n";
+		"""
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		void main() {
+			vec4 tex = texture2D(sTexture, vTextureCoord);
+			gl_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;
+		}
+		""";
 	private static final String FRAGMENT_SHADER
 		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
 	private static final String FRAGMENT_SHADER_EXT

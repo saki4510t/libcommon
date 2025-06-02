@@ -26,22 +26,26 @@ public class MediaEffectGLSaturate extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLBrightness";
 
 	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"%s" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform float uColorAdjust;\n" +
-		FUNC_GET_INTENSITY +
-		"void main() {\n" +
-		"    highp vec4 tex = texture2D(sTexture, vTextureCoord);\n" +
-		"    highp float intensity = getIntensity(tex.rgb);\n" +
-		"    highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);\n" +
-		"    gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);\n" +
-		"}\n";
+		"""
+		%s
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uColorAdjust;
+		%s
+		void main() {
+			highp vec4 tex = texture2D(sTexture, vTextureCoord);
+			highp float intensity = getIntensity(tex.rgb);
+			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
+			gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
+		}
+		""";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D,
+			SAMPLER_2D, FUNC_GET_INTENSITY);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			HEADER_OES_ES2, SAMPLER_OES, FUNC_GET_INTENSITY);
 
 	public MediaEffectGLSaturate() {
 		this(0.0f);
