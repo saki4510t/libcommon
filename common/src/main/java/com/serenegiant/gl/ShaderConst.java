@@ -219,6 +219,57 @@ public class ShaderConst implements GLConst {
 	public static final String FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
+
+//--------------------------------------------------------------------------------
+	/**
+	 * 色変換行列を適用するフラグメントシェーダ
+	 * for ES2
+	 */
+	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES2
+		= """
+		%s
+		%s
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform mat4 uColorMatrixLoc;
+		void main() {
+			gl_FragColor = uColorMatrixLoc * texture2D(sTexture, vTextureCoord);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_COLOR_MATRIX_ES2
+		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_COLOR_MATRIX_EXT_ES2
+		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2,
+			HEADER_OES_ES2, SAMPLER_OES);
+
+	/**
+	 * 色変換行列を適用するフラグメントシェーダ
+	 * for ES3
+	 */
+	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3
+		= """
+		%s
+		%s
+		precision mediump float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform mat4 uColorMatrixLoc;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+		    o_FragColor = uColorMatrixLoc * texture(sTexture, vTextureCoord);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_COLOR_MATRIX_ES3
+		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_COLOR_MATRIX_EXT_ES3
+		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
 //--------------------------------------------------------------------------------
 	/**
 	 * 白黒二値変換するフラグメントシェーダ
