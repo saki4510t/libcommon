@@ -125,15 +125,6 @@ public class ShaderConst implements GLConst {
 	 */
 	public static final String VERTEX_SHADER_ES2
 		= SHADER_VERSION_ES2 + _VERTEX_SHADER_ES2;
-//		"uniform mat4 uMVPMatrix;\n" +				// モデルビュー変換行列
-//		"uniform mat4 uTexMatrix;\n" +				// テクスチャ変換行列
-//		"attribute highp vec4 aPosition;\n" +		// 頂点座標
-//		"attribute highp vec4 aTextureCoord;\n" +	// テクスチャ情報
-//		"varying highp vec2 vTextureCoord;\n" +		// フラグメントシェーダーへ引き渡すテクスチャ座標
-//		"void main() {\n" +
-//		"    gl_Position = uMVPMatrix * aPosition;\n" +
-//		"    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
-//		"}\n";
 
 	private static final String _VERTEX_SHADER_ES3
 		= """
@@ -154,15 +145,6 @@ public class ShaderConst implements GLConst {
 	 */
 	public static final String VERTEX_SHADER_ES3
 		= SHADER_VERSION_ES3 + _VERTEX_SHADER_ES3;
-//		"uniform mat4 uMVPMatrix;\n" +					// モデルビュー変換行列
-//		"uniform mat4 uTexMatrix;\n" +					// テクスチャ変換行列
-//		"in highp vec4 aPosition;\n" +					// 頂点座標
-//		"in highp vec4 aTextureCoord;\n" +				// テクスチャ情報
-//		"out highp vec2 vTextureCoord;\n" +				// フラグメントシェーダーへ引き渡すテクスチャ座標
-//		"void main() {\n" +
-//		"    gl_Position = uMVPMatrix * aPosition;\n" +
-//		"    vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
-//		"}\n";
 
 //--------------------------------------------------------------------------------
 // フラグメントシェーダー
@@ -181,13 +163,7 @@ public class ShaderConst implements GLConst {
 			gl_FragColor = texture2D(sTexture, vTextureCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"void main() {\n" +
-//		"    gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_ES2
@@ -209,14 +185,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, vTextureCoord);
 		}
 		""";
-//		"%s" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    o_FragColor = texture(sTexture, vTextureCoord);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_ES3
@@ -240,15 +209,7 @@ public class ShaderConst implements GLConst {
 			gl_FragColor = vec4(color, color, color, 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
-//		"    float color = tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11;\n" +
-//		"    gl_FragColor = vec4(color, color, color, 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_BW_ES2
 		= String.format(FRAGMENT_SHADER_BW_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_BW_ES2
@@ -272,16 +233,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = vec4(color, color, color, 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture(sTexture, vTextureCoord);\n" +
-//		"    float color = tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11;\n" +
-//		"    o_FragColor = vec4(color, color, color, 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_BW_ES3
 		= String.format(FRAGMENT_SHADER_BW_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_BW_ES3
@@ -305,15 +257,7 @@ public class ShaderConst implements GLConst {
 			gl_FragColor = vec4(color, color + 0.15, color, 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
-//		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
-//		"    gl_FragColor = vec4(color, color + 0.15, color, 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_NIGHT_ES2
 		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_NIGHT_ES2
@@ -337,16 +281,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = vec4(color, color + 0.15, color, 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture(sTexture, vTextureCoord);\n" +
-//		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
-//		"    o_FragColor = vec4(color, color + 0.15, color, 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_NIGHT_ES3
 		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_NIGHT_ES3
@@ -374,19 +309,7 @@ public class ShaderConst implements GLConst {
 			}
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture2D(sTexture, vTextureCoord);\n" +
-//		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
-//		"    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){ \n" +
-//		"        gl_FragColor = vec4(0, 0, 0, 0.0);\n" +
-//		"    }else{ \n" +
-//		"        gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
-//		"    }\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES2
 		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES2
@@ -414,20 +337,7 @@ public class ShaderConst implements GLConst {
 		    }
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec4 tc = texture(sTexture, vTextureCoord);\n" +
-//		"    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;\n" +
-//		"    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){ \n" +
-//		"        o_FragColor = vec4(0, 0, 0, 0.0);\n" +
-//		"    }else{ \n" +
-//		"        o_FragColor = texture(sTexture, vTextureCoord);\n" +
-//		"    }\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES3
 		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES3
@@ -458,22 +368,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = pow(r, 1.0/1.8) * 0.8;\n"+  // Squeeze it
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_SQUEEZE_ES2
 		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_SQUEEZE_ES2
@@ -504,23 +399,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = pow(r, 1.0/1.8) * 0.8;\n"+  // Squeeze it
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_SQUEEZE_ES3
 		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_SQUEEZE_ES3
@@ -542,6 +421,7 @@ public class ShaderConst implements GLConst {
 		void main() {
 			vec2 texCoord = vTextureCoord.xy;
 			vec2 normCoord = 2.0 * texCoord - 1.0;
+			// to polar coords
 			float r = length(normCoord);
 			float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);
 			phi = phi + (1.0 - smoothstep(-0.5, 0.5, r)) * 4.0;
@@ -551,22 +431,6 @@ public class ShaderConst implements GLConst {
 			gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    phi = phi + (1.0 - smoothstep(-0.5, 0.5, r)) * 4.0;\n"+ // Twirl it
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
 	public static final String FRAGMENT_SHADER_TWIRL_ES2
 		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_TWIRL_ES2
@@ -588,6 +452,7 @@ public class ShaderConst implements GLConst {
 		void main() {
 		    vec2 texCoord = vTextureCoord.xy;
 		    vec2 normCoord = 2.0 * texCoord - 1.0;
+			// to polar coords
 		    float r = length(normCoord);
 		    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);
 		    phi = phi + (1.0 - smoothstep(-0.5, 0.5, r)) * 4.0;
@@ -597,23 +462,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    phi = phi + (1.0 - smoothstep(-0.5, 0.5, r)) * 4.0;\n"+ // Twirl it
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_TWIRL_ES3
 		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_TWIRL_ES3
@@ -644,22 +493,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    if (r > 0.5) r = 0.5;\n"+ // Tunnel
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_TUNNEL_ES2
 		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES2
@@ -690,23 +524,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    if (r > 0.5) r = 0.5;\n"+ // Tunnel
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_TUNNEL_ES3
 		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES3
@@ -737,22 +555,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = r * smoothstep(-0.1, 0.5, r);\n"+ // Bulge
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_BULGE_ES2
 		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_BULGE_ES2
@@ -783,23 +586,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = r * smoothstep(-0.1, 0.5, r);\n"+ // Bulge
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_BULGE_ES3
 		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_BULGE_ES3
@@ -830,22 +617,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = 2.0 * r - r * smoothstep(0.0, 0.7, r);\n"+ // Dent
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_DENT_ES2
 		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_DENT_ES2
@@ -876,23 +648,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = 2.0 * r - r * smoothstep(0.0, 0.7, r);\n"+ // Dent
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_DENT_ES3
 		= String.format(FRAGMENT_SHADER_DENT_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_DENT_ES3
@@ -923,22 +679,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = r * r / sqrt(2.0);\n"+ // Fisheye
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_FISHEYE_ES2
 		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_FISHEYE_ES2
@@ -969,23 +710,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    float r = length(normCoord); // to polar coords \n" +
-//		"    float phi = atan(normCoord.y + uPosition.y, normCoord.x + uPosition.x);\n"+	// to polar coords
-//		"    r = r * r / sqrt(2.0);\n"+ // Fisheye
-//		"    normCoord.x = r * cos(phi); \n" +
-//		"    normCoord.y = r * sin(phi); \n" +
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_FISHEYE_ES3
 		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_FISHEYE_ES3
@@ -1015,21 +740,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    vec2 s = sign(normCoord + uPosition);\n"+
-//		"    normCoord = abs(normCoord);\n"+
-//		"    normCoord = 0.5 * normCoord + 0.5 * smoothstep(0.25, 0.5, normCoord) * normCoord;\n"+
-//		"    normCoord = s * normCoord;\n"+
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_STRETCH_ES2
 		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES2
@@ -1059,22 +770,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    vec2 s = sign(normCoord + uPosition);\n"+
-//		"    normCoord = abs(normCoord);\n"+
-//		"    normCoord = 0.5 * normCoord + 0.5 * smoothstep(0.25, 0.5, normCoord) * normCoord;\n"+
-//		"    normCoord = s * normCoord;\n"+
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_STRETCH_ES3
 		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES3
@@ -1101,18 +797,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = texture2D(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"varying vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    normCoord.x = normCoord.x * sign(normCoord.x + uPosition.x);\n"+
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    gl_FragColor = texture2D(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_MIRROR_ES2
 		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_MIRROR_ES2
@@ -1139,19 +824,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = texture(sTexture, texCoord);
 		}
 		""";
-//		"%s\n" +
-//		"precision mediump float;\n" +
-//		"in vec2 vTextureCoord;\n" +
-//		"uniform %s sTexture;\n" +
-//		"uniform vec2 uPosition;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec2 texCoord = vTextureCoord.xy;\n" +
-//		"    vec2 normCoord = 2.0 * texCoord - 1.0;\n"+
-//		"    normCoord.x = normCoord.x * sign(normCoord.x + uPosition.x);\n"+
-//		"    texCoord = normCoord / 2.0 + 0.5;\n"+
-//		"    o_FragColor = texture(sTexture, texCoord);\n"+
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_MIRROR_ES3
 		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_MIRROR_ES3
@@ -1194,34 +867,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = vec4(vec3(mag), 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"#define KERNEL_SIZE3x3 %s\n" +
-//		"precision highp float;\n" +
-//		"varying       vec2 vTextureCoord;\n" +
-//		"uniform %s    sTexture;\n" +
-//		"uniform float uKernel[18];\n" +
-//		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-//		"uniform float uColorAdjust;\n" +
-//		"void main() {\n" +
-//		"    vec3 t0 = texture2D(sTexture, vTextureCoord + uTexOffset[0]).rgb;\n" +
-//		"    vec3 t1 = texture2D(sTexture, vTextureCoord + uTexOffset[1]).rgb;\n" +
-//		"    vec3 t2 = texture2D(sTexture, vTextureCoord + uTexOffset[2]).rgb;\n" +
-//		"    vec3 t3 = texture2D(sTexture, vTextureCoord + uTexOffset[3]).rgb;\n" +
-//		"    vec3 t4 = texture2D(sTexture, vTextureCoord + uTexOffset[4]).rgb;\n" +
-//		"    vec3 t5 = texture2D(sTexture, vTextureCoord + uTexOffset[5]).rgb;\n" +
-//		"    vec3 t6 = texture2D(sTexture, vTextureCoord + uTexOffset[6]).rgb;\n" +
-//		"    vec3 t7 = texture2D(sTexture, vTextureCoord + uTexOffset[7]).rgb;\n" +
-//		"    vec3 t8 = texture2D(sTexture, vTextureCoord + uTexOffset[8]).rgb;\n" +
-//		"    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]\n" +
-//		"              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]\n" +
-//		"              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];\n" +
-//		"    //vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
-//		"    //          + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
-//		"    //          + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
-//		"    //float mag = length(abs(sumH) + abs(sumV));\n" +
-//		"    float mag = length(sumH);\n" +
-//		"    gl_FragColor = vec4(vec3(mag), 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_SOBEL_ES2
 		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES2
@@ -1264,35 +910,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = vec4(vec3(mag), 1.0);
 		}
 		""";
-//		"%s\n" +
-//		"#define KERNEL_SIZE3x3 9\n" +
-//		"precision highp float;\n" +
-//		"in       vec2 vTextureCoord;\n" +
-//		"uniform %s    sTexture;\n" +
-//		"uniform float uKernel[18];\n" +
-//		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-//		"uniform float uColorAdjust;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec3 t0 = texture(sTexture, vTextureCoord + uTexOffset[0]).rgb;\n" +
-//		"    vec3 t1 = texture(sTexture, vTextureCoord + uTexOffset[1]).rgb;\n" +
-//		"    vec3 t2 = texture(sTexture, vTextureCoord + uTexOffset[2]).rgb;\n" +
-//		"    vec3 t3 = texture(sTexture, vTextureCoord + uTexOffset[3]).rgb;\n" +
-//		"    vec3 t4 = texture(sTexture, vTextureCoord + uTexOffset[4]).rgb;\n" +
-//		"    vec3 t5 = texture(sTexture, vTextureCoord + uTexOffset[5]).rgb;\n" +
-//		"    vec3 t6 = texture(sTexture, vTextureCoord + uTexOffset[6]).rgb;\n" +
-//		"    vec3 t7 = texture(sTexture, vTextureCoord + uTexOffset[7]).rgb;\n" +
-//		"    vec3 t8 = texture(sTexture, vTextureCoord + uTexOffset[8]).rgb;\n" +
-//		"    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]\n" +
-//		"              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]\n" +
-//		"              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];\n" +
-////		"    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]\n" +
-////		"              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]\n" +
-////		"              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];\n" +
-////		"    float mag = length(abs(sumH) + abs(sumV));\n" +
-//		"    float mag = length(sumH);\n" +
-//		"    o_FragColor = vec4(vec3(mag), 1.0);\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_SOBEL_ES3
 		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES3
@@ -1343,27 +961,7 @@ public class ShaderConst implements GLConst {
 		    gl_FragColor = sum + uColorAdjust;
 		}
 		""";
-//		"%s\n" +
-//		"#define KERNEL_SIZE3x3 9\n" +
-//		"precision highp float;\n" +
-//		"varying       vec2 vTextureCoord;\n" +
-//		"uniform %s    sTexture;\n" +
-//		"uniform float uKernel[18];\n" +
-//		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-//		"uniform float uColorAdjust;\n" +
-//		"void main() {\n" +
-//		"    vec4 sum = vec4(0.0);\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];\n" +
-//		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];\n" +
-//		"    gl_FragColor = sum + uColorAdjust;\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_FILT3x3_ES2
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES2
@@ -1399,28 +997,7 @@ public class ShaderConst implements GLConst {
 		    o_FragColor = sum + uColorAdjust;
 		}
 		""";
-//		"%s\n" +
-//		"#define KERNEL_SIZE3x3 9\n" +
-//		"precision highp float;\n" +
-//		"in       vec2 vTextureCoord;\n" +
-//		"uniform %s    sTexture;\n" +
-//		"uniform float uKernel[18];\n" +
-//		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-//		"uniform float uColorAdjust;\n" +
-//		"layout(location = 0) out vec4 o_FragColor;\n" +
-//		"void main() {\n" +
-//		"    vec4 sum = vec4(0.0);\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];\n" +
-//		"    sum += texture(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];\n" +
-//		"    o_FragColor = sum + uColorAdjust;\n" +
-//		"}\n";
+
 	public static final String FRAGMENT_SHADER_FILT3x3_ES3
 		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES3
