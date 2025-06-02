@@ -66,29 +66,6 @@ public class GLDrawer2D implements GLConst {
 	 */
 	protected static final boolean USE_VBO = true;
 
-	protected static final float[] DEFAULT_VERTICES = {
-		1.0f, 1.0f,		// 右上
-		-1.0f, 1.0f,	// 左上
-		1.0f, -1.0f,	// 右下
-		-1.0f, -1.0f,	// 左下
-	};
-	protected static final float[] DEFAULT_TEXCOORD = {
-		1.0f, 0.0f,		// 右上
-		0.0f, 0.0f,		// 左上
-		1.0f, 1.0f,		// 右下
-		0.0f, 1.0f,		// 左下
-	};
-	// XXX 元々のDEFAULT_TEXCOORDはテクスチャ座標を上下反転させたこっちだった
-	//     これだと頂点座標はそのままでテクスチャだけ反転してしまうので
-	//     1パス処理する毎に映像が意図せず上下反転してしまう。
-	//     頂点座標とテクスチャ座標のx/y軸を合わせてどちらも変更しないとだめ。
-	protected static final float[] DEFAULT_TEXCOORD_FLIP_VERTICAL = {
-		1.0f, 1.0f,		// 右上
-		0.0f, 1.0f,		// 左上
-		1.0f, 0.0f,		// 右下
-		0.0f, 0.0f,		// 左下
-	};
-
 	/**
 	 * インスタンス生成のためのヘルパーメソッド
 	 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
@@ -265,9 +242,9 @@ public class GLDrawer2D implements GLConst {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isGLES3=" + isGLES3 + ",isOES=" + isOES);
 		this.isGLES3 = isGLES3;
 		@NonNull
-		final float[] _vertices = (vertices != null && vertices.length >= 2) ? vertices : DEFAULT_VERTICES;
+		final float[] _vertices = (vertices != null && vertices.length >= 2) ? vertices : DEFAULT_VERTICES_2D;
 		@NonNull
-		final float[] _texcoord = (texcoord != null && texcoord.length >= 2) ? texcoord : DEFAULT_TEXCOORD;
+		final float[] _texcoord = (texcoord != null && texcoord.length >= 2) ? texcoord : DEFAULT_TEXCOORD_2D;
 		VERTEX_NUM = Math.min(_vertices.length, _texcoord.length) / 2;
 		VERTEX_SZ = VERTEX_NUM * 2;
 
