@@ -70,12 +70,13 @@ public class MediaEffectGLDrawer implements IMirror {
 		}
 	}
 
-	public static MediaEffectGLDrawer newInstance(final boolean isOES, final String fss) {
+	public static MediaEffectGLDrawer newInstance(
+		final boolean isOES, final String fss) {
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	public static MediaEffectGLDrawer newInstance(final int numTex,
-												  final boolean isOES, final String fss) {
+	public static MediaEffectGLDrawer newInstance(
+		final int numTex, final boolean isOES, final String fss) {
 
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
@@ -84,14 +85,14 @@ public class MediaEffectGLDrawer implements IMirror {
 		}
 	}
 
-	public static MediaEffectGLDrawer newInstance(final boolean isOES,
-												  final String vss, final String fss) {
+	public static MediaEffectGLDrawer newInstance(
+		final boolean isOES, final String vss, final String fss) {
 
 		return new MediaEffectSingleDrawer(isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
-	public static MediaEffectGLDrawer newInstance(final int numTex,
-												  final boolean isOES, final String vss, final String fss) {
+	public static MediaEffectGLDrawer newInstance(
+		final int numTex, final boolean isOES, final String vss, final String fss) {
 
 		if (numTex <= 1) {
 			return new MediaEffectSingleDrawer(isOES, vss, fss);
@@ -165,20 +166,19 @@ public class MediaEffectGLDrawer implements IMirror {
 		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectGLDrawer(final int numTex,
-								  final boolean isOES, final String fss) {
-
+	protected MediaEffectGLDrawer(
+		final int numTex, final boolean isOES, final String fss) {
 		this(numTex, isOES, VERTEX_SHADER_ES2, fss);
 	}
 
-	protected MediaEffectGLDrawer(final boolean isOES,
-								  final String vss, final String fss) {
-
+	protected MediaEffectGLDrawer(
+		final boolean isOES, final String vss, final String fss) {
 		this(1, isOES, VERTEX_SHADER_ES2, fss);
 	}
 	
-	protected MediaEffectGLDrawer(final int numTex,
-								  final boolean isOES, final String vss, final String fss) {
+	protected MediaEffectGLDrawer(
+		final int numTex,
+		final boolean isOES, final String vss, final String fss) {
 
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		final FloatBuffer pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
