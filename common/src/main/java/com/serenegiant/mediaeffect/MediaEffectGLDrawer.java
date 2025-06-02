@@ -39,9 +39,6 @@ public class MediaEffectGLDrawer implements IMirror {
 
 	protected boolean mEnabled = true;
 
-	private static final float[] VERTICES = { 1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f, -1.0f, -1.0f };
-	private static final float[] TEXCOORD = { 1.0f, 1.0f, 0.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f };
-
 	private static final int FLOAT_SZ = Float.SIZE / 8;
 	private static final int VERTEX_NUM = 4;
 	private static final int VERTEX_SZ = VERTEX_NUM * 2;
@@ -183,11 +180,11 @@ public class MediaEffectGLDrawer implements IMirror {
 		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		final FloatBuffer pVertex = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 			.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pVertex.put(VERTICES);
+		pVertex.put(DEFAULT_VERTICES_2D);
 		pVertex.flip();
 		final FloatBuffer pTexCoord = ByteBuffer.allocateDirect(VERTEX_SZ * FLOAT_SZ)
 			.order(ByteOrder.nativeOrder()).asFloatBuffer();
-		pTexCoord.put(TEXCOORD);
+		pTexCoord.put(DEFAULT_TEXCOORD_2D);
 		pTexCoord.flip();
 
 		// テクスチャ用のロケーションは最低でも1つは確保する
