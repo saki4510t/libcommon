@@ -382,17 +382,20 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glDilationEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
-			@NonNull
-			public List<IMediaEffect> buildEffects(
-				@NonNull final EffectContext effectContext) {
-				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
-				result.add(new MediaEffectGLDilation(5));
-				return result;
-			}
-		};
-		mediaEffectPipelineTest(builder);
+		for (int i = 0; i < 5; i++) {
+			final int radius = i;
+			final MediaEffectPipeline.EffectsBuilder builder
+				= new MediaEffectPipeline.EffectsBuilder() {
+				@NonNull
+				public List<IMediaEffect> buildEffects(
+					@NonNull final EffectContext effectContext) {
+					final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
+					result.add(new MediaEffectGLDilation(radius));
+					return result;
+				}
+			};
+			mediaEffectPipelineTest(builder);
+		}
 	}
 
 	@Test
@@ -412,17 +415,20 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glErosionEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
-			@NonNull
-			public List<IMediaEffect> buildEffects(
-				@NonNull final EffectContext effectContext) {
-				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
-				result.add(new MediaEffectGLErosion(5));
-				return result;
-			}
-		};
-		mediaEffectPipelineTest(builder);
+		for (int i = 0; i < 5; i++) {
+			final int radius = i;
+			final MediaEffectPipeline.EffectsBuilder builder
+				= new MediaEffectPipeline.EffectsBuilder() {
+				@NonNull
+				public List<IMediaEffect> buildEffects(
+					@NonNull final EffectContext effectContext) {
+					final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
+					result.add(new MediaEffectGLErosion(radius));
+					return result;
+				}
+			};
+			mediaEffectPipelineTest(builder);
+		}
 	}
 
 	@Test
