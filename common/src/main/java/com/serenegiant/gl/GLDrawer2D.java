@@ -275,7 +275,6 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * 外部テクスチャを使うかどうか
-	 * IShaderDrawer2dの実装
 	 * @return
 	 */
 	public boolean isOES() {
@@ -284,7 +283,6 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * モデルビュー変換行列を取得(内部配列を直接返すので変更時は要注意)
-	 * IDrawer2Dの実装
 	 * @return
 	 */
 	@Size(min=16)
@@ -295,7 +293,7 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * モデルビュー変換行列に行列を割り当てる
-	 * IDrawer2Dの実装
+	 * #setMvpMatrix, #setMirror, #rotate, #setRotationは同じモデルビュー変換行列を変更するので注意!
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 * @return
@@ -307,7 +305,6 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * モデルビュー変換行列のコピーを取得
-	 * IDrawer2Dの実装
 	 * @param matrix 領域チェックしていないのでoffsetから16個以上必須
 	 * @param offset
 	 */
@@ -317,6 +314,7 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * モデルビュー変換行列に左右・上下反転をセット
+	 * #setMvpMatrix, #setMirror, #rotate, #setRotationは同じモデルビュー変換行列を変更するので注意!
 	 * @param mirror
 	 */
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
@@ -325,6 +323,7 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * 現在のモデルビュー変換行列をxy平面で指定した角度回転させる
+	 * #setMvpMatrix, #setMirror, #rotate, #setRotationは同じモデルビュー変換行列を変更するので注意!
 	 * @param degrees
 	 */
 	public void rotate(final int degrees) {
@@ -333,6 +332,7 @@ public class GLDrawer2D implements GLConst {
 
 	/**
 	 * モデルビュー変換行列にxy平面で指定した角度回転させた回転行列をセットする
+	 * #setMvpMatrix, #setMirror, #rotate, #setRotationは同じモデルビュー変換行列を変更するので注意!
 	 * @param degrees
 	 */
 	public void setRotation(final int degrees) {
