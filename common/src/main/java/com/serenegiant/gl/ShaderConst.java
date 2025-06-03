@@ -234,7 +234,10 @@ public class ShaderConst implements GLConst {
 		uniform %s sTexture;
 		uniform mat4 uColorMatrixLoc;
 		void main() {
-			gl_FragColor = uColorMatrixLoc * texture2D(sTexture, vTextureCoord);
+			vec4 cl = texture2D(sTexture, vTextureCoord);
+			float a = cl.a;
+			cl = vec4(cl.rgb, 1.0);
+			gl_FragColor = vec4((uColorMatrixLoc * cl).rgb, a);
 		}
 		""";
 
@@ -259,7 +262,10 @@ public class ShaderConst implements GLConst {
 		uniform mat4 uColorMatrixLoc;
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
-		    o_FragColor = uColorMatrixLoc * texture(sTexture, vTextureCoord);
+			vec4 cl = texture(sTexture, vTextureCoord);
+			float a = cl.a;
+			cl = vec4(cl.rgb, 1.0);
+		    o_FragColor = vec4((uColorMatrixLoc * cl).rgb, a);
 		}
 		""";
 
