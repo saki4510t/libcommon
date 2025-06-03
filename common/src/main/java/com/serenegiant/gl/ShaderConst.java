@@ -1100,6 +1100,10 @@ public class ShaderConst implements GLConst {
 	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
 	public static final float[] KERNEL_SOBEL2_H = { 3f, 0f, -3f, 10f, 0f, -10f, 3f, 0f, -3f, };
 	public static final float[] KERNEL_SOBEL2_V = { 3f, 10f, 3f, 0f, 0f, 0f, -3f, -10f, -3f, };
+	public static final float[] KERNEL_PREWITT_H = { -1f, -1f, -1f,  0f, 0f, 0f,  1f, 1f, 1f};
+	public static final float[] KERNEL_PREWITT_V = { -1f, 0f, 1f,  -1f, 0f, 1f,  -1f, 0f, 1f};
+	public static final float[] KERNEL_ROBERTS_H = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, -1f};
+	public static final float[] KERNEL_ROBERTS_V = { 0f, 0f, 0f,  0f, 0f, -1f,  0f, 1f, 0f};
 	public static final float[] KERNEL_SHARPNESS = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// シャープネス
 	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
 	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
