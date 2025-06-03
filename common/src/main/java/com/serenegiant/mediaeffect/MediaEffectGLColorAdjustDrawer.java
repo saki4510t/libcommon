@@ -60,7 +60,7 @@ public class MediaEffectGLColorAdjustDrawer
 			uColorAdjust = -1;
 		}
 		muColorAdjustLoc = uColorAdjust;
-		int muColorMatrix = GLES20.glGetUniformLocation(getProgram(), "uColorMatrixLoc");
+		int muColorMatrix = GLES20.glGetUniformLocation(getProgram(), "uColorMatrix");
 		if (muColorMatrix < 0) {
 			muColorMatrix = -1;
 		}
