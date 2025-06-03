@@ -26,6 +26,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.serenegiant.gl.ShaderConst
 import com.serenegiant.glpipeline.MediaEffectPipeline
 import com.serenegiant.graphics.BitmapHelper
 import com.serenegiant.mediaeffect.IMediaEffect
@@ -311,27 +312,27 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_BLACK_COLOR, 0))
+				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_BLACK_COLOR, 0))
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_GRAYSCALE, 0))
+				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_GRAYSCALE, 0))
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_CONTRAST, 0))
+				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_CONTRAST, 0))
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_CONTRAST, 16))
+				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_CONTRAST, 16))
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_SEPIA, 0))
+				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_SEPIA, 0))
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{

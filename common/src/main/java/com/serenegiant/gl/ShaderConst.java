@@ -20,6 +20,8 @@ package com.serenegiant.gl;
 
 import android.opengl.GLES20;
 
+import androidx.annotation.Size;
+
 /**
  * Created by saki on 16/08/26.
  * フラグメントシェーダーとかの文字列定数達を集める
@@ -221,6 +223,97 @@ public class ShaderConst implements GLConst {
 
 
 //--------------------------------------------------------------------------------
+	/*
+	 * R' | m11 m21 m31 m41 | R
+	 * G' | m12 m22 m32 m42 | G
+	 * B' | m13 m23 m33 m43 | B
+	 * 1  | m14 m24 m34 m44 | 1
+	 *
+	 * R' = m11R + m21G + m31B + m41
+	 * G' = m12R + m22G + m32B + m42
+	 * B' = m13R + m23G + m33B + m43
+	 * A' = A
+	 */
+
+	/**
+	 * セピア色
+	 */
+	@Size(value=32)
+	public static final float[] COLOR_MATRIX_SEPIA = {
+		// 1つ目
+		0.393f, 0.349f, 0.272f, 0.0f,
+		0.769f, 0.686f, 0.534f, 0.0f,
+		0.189f, 0.168f, 0.131f, 0.0f,
+		0.0f,   0.0f,   0.0f,   1.0f,
+		// 2つ目
+		0.3588f, 0.2990f, 0.2392f, 0.0f,
+		0.7044f, 0.5870f, 0.4696f, 0.0f,
+		0.1368f, 0.1140f, 0.0912f, 0.0f,
+		0.0f,    0.0f,    0.0f,    1.0f,
+	};
+
+	/**
+	 * グレースケール
+	 */
+	@Size(value = 16)
+	public static final float[] COLOR_MATRIX_GRAYSCALE = {
+		0.30f, 0.30f, 0.30f, 0.0f,
+		0.59f, 0.59f, 0.59f, 0.0f,
+		0.11f, 0.11f, 0.11f, 0.0f,
+		0.0f, 0.0f,  0.0f,  1.0f,
+	};
+
+	/**
+	 * 赤黒/緑黒/青黒
+	 */
+	@Size(value = 48)
+	public static final float[] COLOR_MATRIX_BLACK_COLOR = {
+		// RED-BLACK
+		1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		// GREEN-BLACK
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		// BLUE-BLACK
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
+	/**
+	 * コントラスト
+	 */
+	@Size(value = 16)
+	public static final float[] COLOR_MATRIX_CONTRAST = {
+		// up
+		1.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.5f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+		// down
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
+	/**
+	 * FIXME ネガポジ反転 真っ黒になってしまう
+	 * うまく適用されないのでフラグメントシェーダーでネガポジ反転させるMediaEffectGLNegativeを作った
+	 */
+	@Size(value = 16)
+	public static final float[] COLOR_MATRIX_NEGATIVE = {
+		-1.0f, 0.0f, 0.0f, 1.0f,
+		0.0f, -1.0f, 0.0f, 1.0f,
+		0.0f, 0.0f, -1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
 	/**
 	 * 色変換行列を適用するフラグメントシェーダ
 	 * for ES2
