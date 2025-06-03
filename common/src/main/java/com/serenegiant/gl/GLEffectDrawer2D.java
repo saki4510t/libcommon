@@ -567,59 +567,59 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		int shaderType = 0;
 		switch (effect) {
 		case EFFECT_KERNEL_SOBEL_H -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_H");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_H");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL_H;
 		}
 		case EFFECT_KERNEL_SOBEL_V -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_V");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_V");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL_V;
 		}
 		case EFFECT_KERNEL_SOBEL2_H -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_H");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_H");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_H;
 		}
 		case EFFECT_KERNEL_SOBEL2_V -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_V");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_V");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_V;
 		}
 		case EFFECT_KERNEL_SHARPNESS -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SHARPNESS");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SHARPNESS");
 			kernel = KERNEL_SHARPNESS;
 		}
 		case EFFECT_KERNEL_EDGE_DETECT -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EDGE_DETECT");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EDGE_DETECT");
 			kernel = KERNEL_EDGE_DETECT;
 		}
 		case EFFECT_KERNEL_EMBOSS -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EMBOSS");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EMBOSS");
 			kernel = KERNEL_EMBOSS;
 		}
 		case EFFECT_KERNEL_SMOOTH -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SMOOTH");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SMOOTH");
 			kernel = KERNEL_SMOOTH;
 		}
 		case EFFECT_KERNEL_GAUSSIAN -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_GAUSSIAN");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_GAUSSIAN");
 			kernel = KERNEL_GAUSSIAN;
 		}
 		case EFFECT_KERNEL_BRIGHTEN -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_BRIGHTEN");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_BRIGHTEN");
 			kernel = KERNEL_BRIGHTEN;
 		}
 		case EFFECT_KERNEL_LAPLACIAN8 -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN8");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN8");
 			kernel = KERNEL_LAPLACIAN8;
 		}
 		case EFFECT_KERNEL_LAPLACIAN4 -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN4");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_LAPLACIAN4");
 			kernel = KERNEL_LAPLACIAN4;
 		}
 		case EFFECT_KERNEL_CANNY -> {
-			if (DEBUG) Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_CANNY");
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_CANNY");
 			shaderType = -1;
 			drawer.updateShader(isGLES3
 				? (isOES ? FRAGMENT_SHADER_EXT_CANNY_ES3 : FRAGMENT_SHADER_CANNY_ES3)
