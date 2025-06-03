@@ -409,7 +409,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 	} // CameraRenderer
 
 	 companion object {
-		private const val DEBUG = true // TODO set false on release
+		private const val DEBUG = false // TODO set false on release
 		private val TAG = AbstractCameraGLSurfaceView::class.java.simpleName
 	}
 }

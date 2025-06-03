@@ -34,7 +34,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  * 映像効果付与機能を追加したGLDrawer2D
  */
 public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
-	private static final boolean DEBUG = true;	// set false on production
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = GLEffectDrawer2D.class.getSimpleName();
 
 	/**
