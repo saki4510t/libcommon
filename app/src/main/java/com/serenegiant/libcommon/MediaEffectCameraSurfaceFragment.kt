@@ -45,16 +45,22 @@ import com.serenegiant.mediaeffect.MediaEffectFlipVertical
 import com.serenegiant.mediaeffect.MediaEffectGLAlphaBlend
 import com.serenegiant.mediaeffect.MediaEffectGLBrightness
 import com.serenegiant.mediaeffect.MediaEffectGLCanny
+import com.serenegiant.mediaeffect.MediaEffectGLColorMatrix
+import com.serenegiant.mediaeffect.MediaEffectGLCrossProcess
 import com.serenegiant.mediaeffect.MediaEffectGLDilation
+import com.serenegiant.mediaeffect.MediaEffectGLDocumentary
 import com.serenegiant.mediaeffect.MediaEffectGLEmboss
 import com.serenegiant.mediaeffect.MediaEffectGLErosion
 import com.serenegiant.mediaeffect.MediaEffectGLExposure
 import com.serenegiant.mediaeffect.MediaEffectGLExtraction
 import com.serenegiant.mediaeffect.MediaEffectGLMaskedAlphaBlend
+import com.serenegiant.mediaeffect.MediaEffectGLNegative
 import com.serenegiant.mediaeffect.MediaEffectGLNull
 import com.serenegiant.mediaeffect.MediaEffectGLPosterize
 import com.serenegiant.mediaeffect.MediaEffectGLSaturate
+import com.serenegiant.mediaeffect.MediaEffectGLSphere
 import com.serenegiant.mediaeffect.MediaEffectGLTexProjection
+import com.serenegiant.mediaeffect.MediaEffectGLVignette
 import com.serenegiant.mediaeffect.MediaEffectGrain
 import com.serenegiant.mediaeffect.MediaEffectGrayScale
 import com.serenegiant.mediaeffect.MediaEffectLomoish
@@ -129,6 +135,16 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectAutoFix(effectContext, 0.5f))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(
+					MediaEffectAutoFix(effectContext, 0.5f),
+					MediaEffectCrop(effectContext,
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 4, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 4,
+						CameraDelegator.DEFAULT_PREVIEW_WIDTH / 2, CameraDelegator.DEFAULT_PREVIEW_HEIGHT / 2),
+				)
 			}
 		},
 		// FIXME これはうまく動かない、urlから動画取得開始後しばらくしてから
@@ -277,7 +293,7 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 				return mutableListOf(MediaEffectVignette(effectContext, 0.5f))
 			}
 		},
-		// OpenGL|ESでの映像フィルタ処理...FIXME なぜか真っ黒になって表示されない
+		// OpenGL|ESでの映像フィルタ処理
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLAlphaBlend(0.5f))
@@ -295,7 +311,47 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_BLACK_COLOR, 0))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_GRAYSCALE, 0))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_CONTRAST, 0))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_CONTRAST, 16))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorMatrix(MediaEffectGLColorMatrix.COLOR_MATRIX_SEPIA, 0))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLNegative())
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLCrossProcess())
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLDilation(2))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLDocumentary())
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
@@ -340,7 +396,18 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLSphere(
+					CameraDelegator.DEFAULT_PREVIEW_WIDTH / CameraDelegator.DEFAULT_PREVIEW_HEIGHT.toFloat()))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLTexProjection())
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLVignette())
 			}
 		},
 	)
