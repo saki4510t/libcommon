@@ -450,7 +450,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 				Matrix.setIdentityM(mColorMatrix, 0);
 			}
 		}
-	}
+	} // GLColorMatrixEffectDrawer2D
 
 	/**
 	 * 3x3のカーネル関数によるフィルタ処理を行うGLEffectDrawer2D実装
@@ -693,7 +693,9 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 		default -> {
 			if (drawer instanceof GLKernelEffectDrawer2D) {
-				handled = onChangeKernel((GLKernelEffectDrawer2D)drawer, effect);
+				handled = onChangeKernel((GLKernelEffectDrawer2D) drawer, effect);
+			} else if (drawer instanceof GLColorMatrixEffectDrawer2D) {
+				handled = onChangeColorMatrix((GLColorMatrixEffectDrawer2D) drawer, effect);
 			} else {
 				drawer.resetShader();
 				handled = false;
@@ -792,6 +794,11 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			drawer.setKernel(kernel, drawer.mColorAdjust);
 		}
 		return handled;
+	}
+
+	private static boolean onChangeColorMatrix(@NonNull final GLColorMatrixEffectDrawer2D drawer, final int effect) {
+		// 未実装
+		return false;
 	}
 }
 
