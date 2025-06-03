@@ -110,6 +110,7 @@ public class MediaEffectGLColorMatrix extends MediaEffectGLBase {
 
 	/**
 	 * FIXME ネガポジ反転 真っ黒になってしまう
+	 * うまく適用されないのでフラグメントシェーダーでネガポジ反転させるMediaEffectGLNegativeを作った
 	 */
 	@Size(value = 16)
 	public static final float[] COLOR_MATRIX_NEGATIVE = {
