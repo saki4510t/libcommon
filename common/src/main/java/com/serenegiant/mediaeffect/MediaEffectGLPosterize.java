@@ -18,38 +18,21 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import static com.serenegiant.gl.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_POSTERIZE_ES2;
 
 /**
  * FIXME ポスタライズ, うまく動かない
  */
 public class MediaEffectGLPosterize extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectGLBrightness";
-
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"""
-		%s
-		precision highp float;
-		varying vec2 vTextureCoord;
-		uniform %s sTexture;
-		uniform float uColorAdjust;
-		void main() {
-			vec4 tex = texture2D(sTexture, vTextureCoord);
-			gl_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;
-		}
-		""";
-	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
-	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+	private static final String TAG = "MediaEffectGLPosterize";
 
 	public MediaEffectGLPosterize() {
 		this(10.0f);
 	}
 
 	public MediaEffectGLPosterize(final float posterize) {
-		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER_POSTERIZE_ES2));
 		setParameter(posterize);
 	}
 

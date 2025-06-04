@@ -1333,6 +1333,49 @@ public class ShaderConst implements GLConst {
 		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+// ポスタライズフィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_POSTERIZE_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		void main() {
+			vec4 tex = texture2D(sTexture, vTextureCoord);
+			gl_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_POSTERIZE_ES2
+		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_POSTERIZE_ES2
+		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_POSTERIZE_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 tex = texture(sTexture, vTextureCoord);
+			o_FragColor = floor((tex * uColorAdjust) + vec4(0.5)) / uColorAdjust;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_POSTERIZE_ES3
+		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_POSTERIZE_ES3
+		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
