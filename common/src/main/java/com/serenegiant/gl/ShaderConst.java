@@ -1625,6 +1625,61 @@ public class ShaderConst implements GLConst {
 			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
+// ブラーフィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_BLUR_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		varying vec2 vTextureCoord;
+		uniform float uColorAdjust;	// [-1,+1] → [-0.01,+0.01]
+		void main(void) {
+			float step = uColorAdjust / 100.0;
+			vec3 c1 = texture2D(sTexture, vec2(vTextureCoord.s - step, vTextureCoord.t - step)).bgr;
+			vec3 c2 = texture2D(sTexture, vec2(vTextureCoord.s + step, vTextureCoord.t + step)).bgr;
+			vec3 c3 = texture2D(sTexture, vec2(vTextureCoord.s - step, vTextureCoord.t + step)).bgr;
+			vec3 c4 = texture2D(sTexture, vec2(vTextureCoord.s + step, vTextureCoord.t - step)).bgr;
+			gl_FragColor.a = 1.0;
+			gl_FragColor.rgb = (c1 + c2 + c3 + c4) / 4.0;
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_BLUR_ES2
+		= String.format(FRAGMENT_SHADER_BLUR_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_EXT_BLUR_ES2
+		= String.format(FRAGMENT_SHADER_BLUR_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
+
+	private static final String FRAGMENT_SHADER_BLUR_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		in vec2 vTextureCoord;
+		uniform float uColorAdjust;	// [-1,+1] → [-0.01,+0.01]
+		layout(location = 0) out vec4 o_FragColor;
+		void main(void) {
+			float step = uColorAdjust / 100.0;
+			vec3 c1 = texture2D(sTexture, vec2(vTextureCoord.s - step, vTextureCoord.t - step)).bgr;
+			vec3 c2 = texture2D(sTexture, vec2(vTextureCoord.s + step, vTextureCoord.t + step)).bgr;
+			vec3 c3 = texture2D(sTexture, vec2(vTextureCoord.s - step, vTextureCoord.t + step)).bgr;
+			vec3 c4 = texture2D(sTexture, vec2(vTextureCoord.s + step, vTextureCoord.t - step)).bgr;
+			o_FragColor.a = 1.0;
+			o_FragColor.rgb = (c1 + c2 + c3 + c4) / 4.0;
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_BLUR_ES3
+		= String.format(FRAGMENT_SHADER_BLUR_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_EXT_BLUR_ES3
+		= String.format(FRAGMENT_SHADER_BLUR_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
+
+//--------------------------------------------------------------------------------
 	private static final String FRAGMENT_SHADER_MEDIAN_3x3_BASE_ES2 =
 		"""
 		%s
