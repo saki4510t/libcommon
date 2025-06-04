@@ -1492,6 +1492,59 @@ public class ShaderConst implements GLConst {
 		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+// ビネットフィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_VIGNETTE_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		varying vec2 vTextureCoord;
+		uniform float uColorAdjust;
+		const vec2 vignetteCenter = vec2(0.5, 0.5);
+		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		void main() {
+			vec4 color = texture2D(sTexture, vTextureCoord);
+			float d = distance(vTextureCoord, vignetteCenter);
+			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
+			gl_FragColor = vec4(mix(color.rgb, vignetteColor, percent), color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_VIGNETTE_ES2
+		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_VIGNETTE_ES2
+		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_VIGNETTE_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		in vec2 vTextureCoord;
+		uniform float uColorAdjust;
+		const vec2 vignetteCenter = vec2(0.5, 0.5);
+		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 color = texture(sTexture, vTextureCoord);
+			float d = distance(vTextureCoord, vignetteCenter);
+			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
+			o_FragColor = vec4(mix(color.rgb, vignetteColor, percent), color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_VIGNETTE_ES3
+		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_VIGNETTE_ES3
+		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
