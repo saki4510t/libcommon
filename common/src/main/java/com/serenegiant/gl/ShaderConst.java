@@ -1053,7 +1053,100 @@ public class ShaderConst implements GLConst {
 		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3,
 			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
-	//--------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------
+// クロスプロセスフィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		varying vec2 vTextureCoord;
+		void main() {
+			vec4 color = texture2D(sTexture, vTextureCoord);
+			vec3 ncolor = vec3(0.0, 0.0, 0.0);
+			float value;
+			if (color.r < 0.5) {
+				value = color.r;
+			} else {
+				value = 1.0 - color.r;
+			}
+			float red = 4.0 * value * value * value;
+			if (color.r < 0.5) {
+				ncolor.r = red;
+			} else {
+				ncolor.r = 1.0 - red;
+			}
+			if (color.g < 0.5) {
+				value = color.g;
+			} else {
+				value = 1.0 - color.g;
+			}
+			float green = 2.0 * value * value;
+			if (color.g < 0.5) {
+				ncolor.g = green;
+			} else {
+				ncolor.g = 1.0 - green;
+			}
+			ncolor.b = color.b * 0.5 + 0.25;
+			gl_FragColor = vec4(ncolor.rgb, color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_CROSS_PROCESS_ES2
+		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CROSS_PROCESS_ES2
+		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		in vec2 vTextureCoord;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 color = texture(sTexture, vTextureCoord);
+			vec3 ncolor = vec3(0.0, 0.0, 0.0);
+			float value;
+			if (color.r < 0.5) {
+				value = color.r;
+			} else {
+				value = 1.0 - color.r;
+			}
+			float red = 4.0 * value * value * value;
+			if (color.r < 0.5) {
+				ncolor.r = red;
+			} else {
+				ncolor.r = 1.0 - red;
+			}
+			if (color.g < 0.5) {
+				value = color.g;
+			} else {
+				value = 1.0 - color.g;
+			}
+			float green = 2.0 * value * value;
+			if (color.g < 0.5) {
+				ncolor.g = green;
+			} else {
+				ncolor.g = 1.0 - green;
+			}
+			ncolor.b = color.b * 0.5 + 0.25;
+			o_FragColor = vec4(ncolor.rgb, color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_CROSS_PROCESS_ES3
+		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_CROSS_PROCESS_ES3
+		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
