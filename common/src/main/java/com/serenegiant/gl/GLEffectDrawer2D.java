@@ -29,8 +29,6 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.gl.GLEffect.*;
-import static com.serenegiant.gl.GLEffect.FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES2;
-import static com.serenegiant.gl.GLEffect.FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES2;
 import static com.serenegiant.gl.ShaderConst.*;
 
 /**

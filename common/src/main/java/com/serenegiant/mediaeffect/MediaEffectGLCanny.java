@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.util.Log;
 
-import static com.serenegiant.gl.GLEffect.FRAGMENT_SHADER_CANNY_ES2;
+import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_CANNY_ES2;
 
 /**
  * Cannyエッジ検出フィルタ
