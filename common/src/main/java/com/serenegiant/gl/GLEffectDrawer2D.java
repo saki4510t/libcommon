@@ -459,6 +459,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		private int muKernelLoc = -1;		// カーネル行列(float配列)
 		private int muTexOffsetLoc = -1;	// テクスチャオフセット(カーネル行列用)
 		private int muColorAdjustLoc = -1;	// 色調整
+		private int mKernelSize = KERNEL_SIZE3x3_NUM;
 		private final float[] mKernel3x3 = new float[KERNEL_SIZE3x3_NUM * 2];	// Inputs for convolution filter based shaders
 		private final float[] mTexOffset = new float[KERNEL_SIZE3x3_NUM * 2];
 		private float mColorAdjust;
@@ -561,7 +562,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			super.prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
 			// カーネル関数(行列)
 			if (muKernelLoc >= 0) {
-				GLES20.glUniform1fv(muKernelLoc, KERNEL_SIZE3x3_NUM, mKernel3x3, 0);
+				GLES20.glUniform1fv(muKernelLoc, mKernelSize, mKernel3x3, 0);
 				GLUtils.checkGlError("set kernel");
 			}
 			// テクセルオフセット
@@ -580,7 +581,12 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 				throw new IllegalArgumentException("Kernel size is "
 					+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE3x3_NUM);
 			}
-			System.arraycopy(values, 0, mKernel3x3, 0, KERNEL_SIZE3x3_NUM);
+			if (values.length >= KERNEL_SIZE3x3_NUM * 2) {
+				mKernelSize = KERNEL_SIZE3x3_NUM * 2;
+			} else {
+				mKernelSize = KERNEL_SIZE3x3_NUM;
+			}
+			System.arraycopy(values, 0, mKernel3x3, 0, mKernelSize);
 			setColorAdjust(colorAdj);
 		}
 
