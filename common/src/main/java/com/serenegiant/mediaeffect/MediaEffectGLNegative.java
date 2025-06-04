@@ -18,11 +18,7 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import static com.serenegiant.gl.ShaderConst.HEADER_2D;
-import static com.serenegiant.gl.ShaderConst.HEADER_OES_ES2;
-import static com.serenegiant.gl.ShaderConst.SAMPLER_2D;
-import static com.serenegiant.gl.ShaderConst.SAMPLER_OES;
-import static com.serenegiant.gl.ShaderConst.SHADER_VERSION_ES2;
+import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_NEGATIVE_ES2;
 import static com.serenegiant.gl.ShaderConst.VERTEX_SHADER_ES2;
 
 /** ネガポジ反転フィルター */
@@ -30,27 +26,9 @@ public class MediaEffectGLNegative extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLNegative";
 
-	private static final String FRAGMENT_SHADER_BASE_ES2
-		= """
-		%s
-		%s
-		precision mediump float;
-		varying vec2 vTextureCoord;
-		uniform %s sTexture;
-		void main() {
-			vec4 color = texture2D(sTexture, vTextureCoord);
-			gl_FragColor = vec4(1.0 - color.rgb, color.a);
-		}
-		""";
-
-	private static final String FRAGMENT_SHADER_ES2
-		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
-	private static final String FRAGMENT_SHADER_EXT_ES2
-		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
-
 	public MediaEffectGLNegative() {
 		super(new MediaEffectGLDrawer.MediaEffectSingleDrawer(
-			false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2));
+			false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_NEGATIVE_ES2));
 	}
 
 }

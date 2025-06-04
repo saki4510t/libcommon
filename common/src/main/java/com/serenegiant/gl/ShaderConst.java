@@ -1287,7 +1287,50 @@ public class ShaderConst implements GLConst {
 			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
 	public static final String FRAGMENT_SHADER_EXT_EXPOSURE_ES3
 		= String.format(FRAGMENT_SHADER_EXPOSURE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+//--------------------------------------------------------------------------------
+// ネガポジ反転フィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_NEGATIVE_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		void main() {
+			vec4 color = texture2D(sTexture, vTextureCoord);
+			gl_FragColor = vec4(1.0 - color.rgb, color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_NEGATIVE_ES2
+		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_NEGATIVE_ES2
+		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_NEGATIVE_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 color = texture(sTexture, vTextureCoord);
+			o_FragColor = vec4(1.0 - color.rgb, color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_NEGATIVE_ES3
+		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_NEGATIVE_ES3
+		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
 	/**
