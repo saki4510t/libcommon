@@ -50,6 +50,7 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 	private final int muTexOffsetLoc;	// テクスチャオフセット(カーネル行列用)
 	private final float[] mKernel = new float[KERNEL_SIZE * 2];	// Inputs for convolution filter based shaders
 	private final float[] mTexOffset = new float[KERNEL_SIZE * 2];
+	private int mKernelSize = KERNEL_SIZE;
 	private float mTexWidth;
 	private float mTexHeight;
 
@@ -86,7 +87,7 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 		super.preDraw(texIds, texMatrix, offset);
 		// カーネル関数(行列)
 		if (muKernelLoc >= 0) {
-			GLES20.glUniform1fv(muKernelLoc, KERNEL_SIZE, mKernel, 0);
+			GLES20.glUniform1fv(muKernelLoc, mKernelSize, mKernel, 0);
 			GLUtils.checkGlError("set kernel");
 		}
 		// テクセルオフセット
@@ -101,7 +102,12 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 				+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE);
 		}
 		synchronized (mSync) {
-			System.arraycopy(values, 0, mKernel, 0, KERNEL_SIZE);
+			if (values.length >= KERNEL_SIZE * 2) {
+				mKernelSize = KERNEL_SIZE * 2;
+			} else {
+				mKernelSize = KERNEL_SIZE;
+			}
+			System.arraycopy(values, 0, mKernel, 0, mKernelSize);
 			setColorAdjust(colorAdj);
 		}
 	}
