@@ -80,21 +80,53 @@ public class GLEffect {
 	 */
 	public static final int EFFECT_KERNEL_SOBEL_V = 1001;
 	/**
+	 * ソーベルフィルタ(水平＋垂直)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL_HV = 1002;
+	/**
 	 * ソーベルフィルタ2(水平方向)
 	 */
-	public static final int EFFECT_KERNEL_SOBEL2_H = 1002;
+	public static final int EFFECT_KERNEL_SOBEL2_H = 1003;
 	/**
 	 * ソーベルフィルタ2(垂直方向)
 	 */
-	public static final int EFFECT_KERNEL_SOBEL2_V = 1003;
+	public static final int EFFECT_KERNEL_SOBEL2_V = 1004;
+	/**
+	 * ソーベルフィルタ2(水平+垂直)
+	 */
+	public static final int EFFECT_KERNEL_SOBEL2_HV = 1005;
+	/**
+	 * プレヴィットフィルタ(水平方向)
+	 */
+	public static final int EFFECT_KERNEL_PREWITT_H = 1006;
+	/**
+	 * プレヴィットフィルタ(垂直方向)
+	 */
+	public static final int EFFECT_KERNEL_PREWITT_V = 1007;
+	/**
+	 * プレヴィットフィルタ(水平＋垂直)
+	 */
+	public static final int EFFECT_KERNEL_PREWITT_HV = 1008;
+	/**
+	 * ロバーツフィルタ(水平方向)
+	 */
+	public static final int EFFECT_KERNEL_ROBERTS_H = 1009;
+	/**
+	 * ロバーツフィルタ(垂直方向)
+	 */
+	public static final int EFFECT_KERNEL_ROBERTS_V = 1010;
+	/**
+	 * ロバーツフィルタ(水平＋垂直)
+	 */
+	public static final int EFFECT_KERNEL_ROBERTS_HV = 1011;
 	/**
 	 * エッジ強調4近傍(=シャープネス)
 	 */
-	public static final int EFFECT_KERNEL_EDGE_ENHANCE4 = 1004;
+	public static final int EFFECT_KERNEL_EDGE_ENHANCE4 = 1012;
 	/**
 	 * エッジ強調9近傍
 	 */
-	public static final int EFFECT_KERNEL_EDGE_ENHANCE8 = 1005;
+	public static final int EFFECT_KERNEL_EDGE_ENHANCE8 = 1013;
 	/**
 	 * シャープネス
 	 */
@@ -102,31 +134,31 @@ public class GLEffect {
 	/**
 	 * エッジ検出
 	 */
-	public static final int EFFECT_KERNEL_EDGE_DETECT = 1006;
+	public static final int EFFECT_KERNEL_EDGE_DETECT = 1014;
 	/**
 	 * エンボス
 	 */
-	public static final int EFFECT_KERNEL_EMBOSS = 1007;
+	public static final int EFFECT_KERNEL_EMBOSS = 1015;
 	/**
 	 * 平滑化
 	 */
-	public static final int EFFECT_KERNEL_SMOOTH = 1008;
+	public static final int EFFECT_KERNEL_SMOOTH = 1016;
 	/**
 	 * ガウシアンフィルタ
 	 */
-	public static final int EFFECT_KERNEL_GAUSSIAN = 1009;
+	public static final int EFFECT_KERNEL_GAUSSIAN = 1017;
 	/**
 	 * 輝度アップ
 	 */
-	public static final int EFFECT_KERNEL_BRIGHTEN = 1010;
+	public static final int EFFECT_KERNEL_BRIGHTEN = 1018;
 	/**
 	 * ラプラシアンフィルタ(8近傍)
 	 */
-	public static final int EFFECT_KERNEL_LAPLACIAN8 = 1011;
+	public static final int EFFECT_KERNEL_LAPLACIAN8 = 1019;
 	/**
 	 * ラプラシアンフィルタ(4近傍)
 	 */
-	public static final int EFFECT_KERNEL_LAPLACIAN4 = 1012;
+	public static final int EFFECT_KERNEL_LAPLACIAN4 = 1020;
 	/**
 	 * ラプラシアンフィルタ(8近傍)
 	 */
@@ -138,20 +170,19 @@ public class GLEffect {
 	 *     ベースなのでとりあえずカーネルフィルタの定数にしているけど、実際のフラグメントシェーダーでは
 	 *     カーネル関数は使っていない
 	 */
-	public static final int EFFECT_KERNEL_CANNY = 1013;
-
+	public static final int EFFECT_KERNEL_CANNY = 1021;
 	/**
 	 * Cannyで検出したエッジを元映像へ適用するフィルター
 	 * FIXME 適用処理は要検討(今は輝度加算)
 	 */
-	public static final int EFFECT_KERNEL_CANNY_ENHANCE = 1014;
+	public static final int EFFECT_KERNEL_CANNY_ENHANCE = 1022;
 	/**
 	 * カーネル関数によるフィルタ処理結果を元映像へ適用するフィルター
 	 * カーネル関数としてはエッジ検出を想定
 	 * FIXME 適用処理は要検討(今は輝度加算)
 	 */
-	public static final int EFFECT_KERNEL_KERNEL_ENHANCE = 1015;
+	public static final int EFFECT_KERNEL_KERNEL_ENHANCE = 1023;
 
-	public static final int EFFECT_KERNEL_NUM = 1016;
+	public static final int EFFECT_KERNEL_NUM = 1024;
 
 }

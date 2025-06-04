@@ -728,6 +728,11 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			shaderType = 1;
 			kernel = KERNEL_SOBEL_V;
 		}
+		case EFFECT_KERNEL_SOBEL_HV -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL_HV");
+			shaderType = 2;
+			kernel = concat(KERNEL_SOBEL_H, KERNEL_SOBEL_V);
+		}
 		case EFFECT_KERNEL_SOBEL2_H -> {
 			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_H");
 			shaderType = 1;
@@ -737,6 +742,41 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_V");
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_V;
+		}
+		case EFFECT_KERNEL_SOBEL2_HV -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SOBEL2_HV");
+			shaderType = 2;
+			kernel = concat(KERNEL_SOBEL2_H, KERNEL_SOBEL2_V);
+		}
+		case EFFECT_KERNEL_PREWITT_H -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_PREWITT_H");
+			shaderType = 1;
+			kernel = KERNEL_PREWITT_H;
+		}
+		case EFFECT_KERNEL_PREWITT_V -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_PREWITT_V");
+			shaderType = 1;
+			kernel = KERNEL_PREWITT_V;
+		}
+		case EFFECT_KERNEL_PREWITT_HV -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_PREWITT_HV");
+			shaderType = 2;
+			kernel = concat(KERNEL_PREWITT_H, KERNEL_PREWITT_V);
+		}
+		case EFFECT_KERNEL_ROBERTS_H -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_ROBERTS_H");
+			shaderType = 1;
+			kernel = KERNEL_ROBERTS_H;
+		}
+		case EFFECT_KERNEL_ROBERTS_V -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_ROBERTS_V");
+			shaderType = 1;
+			kernel = KERNEL_ROBERTS_V;
+		}
+		case EFFECT_KERNEL_ROBERTS_HV -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_ROBERTS_HV");
+			shaderType = 2;
+			kernel = concat(KERNEL_ROBERTS_H, KERNEL_ROBERTS_V);
 		}
 		case EFFECT_KERNEL_SHARPNESS -> {	// = EFFECT_KERNEL_EDGE_ENHANCE4
 			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SHARPNESS");
@@ -805,10 +845,16 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 		}
 		if (handled) {
 			if (shaderType == 1) {
-				if (DEBUG) Log.v(TAG, "onChangeKernel:set sobel shader");
+				if (DEBUG) Log.v(TAG, "onChangeKernel:set kernel edge detect shader");
 				drawer.updateShader(isGLES3
-					? (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES3 : FRAGMENT_SHADER_SOBEL_ES3)
-					: (isOES ? FRAGMENT_SHADER_EXT_SOBEL_ES2 : FRAGMENT_SHADER_SOBEL_ES2));
+					? (isOES ? FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_ES3 : FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_ES3)
+					: (isOES ? FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_ES2 : FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_ES2));
+			} else if (shaderType == 2) {
+				if (DEBUG) Log.v(TAG, "onChangeKernel:set kernel edge detect(horizontal+vertical) shader");
+				drawer.updateShader(isGLES3
+					? (isOES ? FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_HV_ES3 : FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_ES3)
+					: (isOES ? FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_HV_ES2 : FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_ES2));
+
 			} else if (shaderType >= 0) {
 				if (DEBUG) Log.v(TAG, "onChangeKernel:set normal 3x3 kernel shader");
 				drawer.updateShader(isGLES3
@@ -826,6 +872,15 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	private static boolean onChangeColorMatrix(@NonNull final GLColorMatrixEffectDrawer2D drawer, final int effect) {
 		// 未実装
 		return false;
+	}
+
+	@NonNull
+	private static float[] concat(@NonNull final float[] array1, @NonNull final float[] array2) {
+		final int n = array1.length + array2.length;
+		final float[] result = new float[n];
+		System.arraycopy(array1, 0, result, 0, array1.length);
+		System.arraycopy(array2, 0, result, array1.length, array2.length);
+		return result;
 	}
 }
 

@@ -104,6 +104,29 @@ public class ShaderConst implements GLConst {
 	};
 
 //--------------------------------------------------------------------------------
+// 3x3カーネル関数
+	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
+	public static final float[] KERNEL_SOBEL_H = { 1f, 0f, -1f, 2f, 0f, -2f, 1f, 0f, -1f, };	// ソーベル(1次微分)
+	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
+	public static final float[] KERNEL_SOBEL2_H = { 3f, 0f, -3f, 10f, 0f, -10f, 3f, 0f, -3f, };
+	public static final float[] KERNEL_SOBEL2_V = { 3f, 10f, 3f, 0f, 0f, 0f, -3f, -10f, -3f, };
+	public static final float[] KERNEL_PREWITT_H = { -1f, -1f, -1f,  0f, 0f, 0f,  1f, 1f, 1f};
+	public static final float[] KERNEL_PREWITT_V = { -1f, 0f, 1f,  -1f, 0f, 1f,  -1f, 0f, 1f};
+	public static final float[] KERNEL_ROBERTS_H = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, -1f};
+	public static final float[] KERNEL_ROBERTS_V = { 0f, 0f, 0f,  0f, 0f, -1f,  0f, 1f, 0f};
+	public static final float[] KERNEL_EDGE_ENHANCE4 = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// エッジ強調4近傍
+	public static final float[] KERNEL_EDGE_ENHANCE8 = { -1f, -1f, -1f, -1f, 9f, -1f, -1f, -1f, -1f, }; // エッジ強調8近傍
+	public static final float[] KERNEL_SHARPNESS = KERNEL_EDGE_ENHANCE4; // シャープネス=エッジ強調4近傍
+	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
+	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
+	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均
+	public static final float[] KERNEL_GAUSSIAN = { 1/16f, 2/16f, 1/16f, 2/16f, 4/16f, 2/16f, 1/16f, 2/16f, 1/16f, };	// ガウシアン(ノイズ除去/)
+	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
+	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分, 8近傍)
+	public static final float[] KERNEL_LAPLACIAN8 = KERNEL_LAPLACIAN;	// ラプラシアン(2次微分, 8近傍)
+	public static final float[] KERNEL_LAPLACIAN4 = { 0f, 1f, 0f, 1f, -4f, 1f, 0f, 1f, 0f, };	// ラプラシアン(2次微分, 4近傍)　8近傍より輪郭線が弱い
+
+//--------------------------------------------------------------------------------
 // 関数文字列定義
 	/**
 	 * RGBをHSVに変換
@@ -1727,10 +1750,92 @@ public class ShaderConst implements GLConst {
 
 //--------------------------------------------------------------------------------
 	/**
-	 * Sobel Effect付与のフラグメントシェーダ
+	 * 3x3カーネル関数によるエッジ検出のためのフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_SOBEL_BASE_ES2 =
+	private static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES2 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 9
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		void main() {
+		    vec3 t0 = texture2D(sTexture, vTextureCoord + uTexOffset[0]).rgb;
+		    vec3 t1 = texture2D(sTexture, vTextureCoord + uTexOffset[1]).rgb;
+		    vec3 t2 = texture2D(sTexture, vTextureCoord + uTexOffset[2]).rgb;
+		    vec3 t3 = texture2D(sTexture, vTextureCoord + uTexOffset[3]).rgb;
+		    vec3 t4 = texture2D(sTexture, vTextureCoord + uTexOffset[4]).rgb;
+		    vec3 t5 = texture2D(sTexture, vTextureCoord + uTexOffset[5]).rgb;
+		    vec3 t6 = texture2D(sTexture, vTextureCoord + uTexOffset[6]).rgb;
+		    vec3 t7 = texture2D(sTexture, vTextureCoord + uTexOffset[7]).rgb;
+		    vec3 t8 = texture2D(sTexture, vTextureCoord + uTexOffset[8]).rgb;
+		    vec3 sum = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]
+		              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]
+		              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];
+		    float mag = length(sum);
+		    gl_FragColor = vec4(vec3(mag), 1.0);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
+
+	/**
+	 * 3x3カーネル関数によるエッジ検出のためのフラグメントシェーダ
+	 * for ES3
+	 */
+	private static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES3 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 9
+		precision highp float;
+		in       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+		    vec3 t0 = texture(sTexture, vTextureCoord + uTexOffset[0]).rgb;
+		    vec3 t1 = texture(sTexture, vTextureCoord + uTexOffset[1]).rgb;
+		    vec3 t2 = texture(sTexture, vTextureCoord + uTexOffset[2]).rgb;
+		    vec3 t3 = texture(sTexture, vTextureCoord + uTexOffset[3]).rgb;
+		    vec3 t4 = texture(sTexture, vTextureCoord + uTexOffset[4]).rgb;
+		    vec3 t5 = texture(sTexture, vTextureCoord + uTexOffset[5]).rgb;
+		    vec3 t6 = texture(sTexture, vTextureCoord + uTexOffset[6]).rgb;
+		    vec3 t7 = texture(sTexture, vTextureCoord + uTexOffset[7]).rgb;
+		    vec3 t8 = texture(sTexture, vTextureCoord + uTexOffset[8]).rgb;
+		    vec3 sum = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]
+		              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]
+		              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];
+		    float mag = length(sum);
+		    o_FragColor = vec4(vec3(mag), 1.0);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
+
+//--------------------------------------------------------------------------------
+	/**
+	 * 3x3カーネル関数によるエッジ検出のためのフラグメントシェーダ(水平＋垂直)
+	 * for ES2
+	 */
+	private static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES2 =
 		"""
 		%s
 		%s
@@ -1754,27 +1859,26 @@ public class ShaderConst implements GLConst {
 		    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]
 		              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]
 		              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];
-		    //vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]
-		    //          + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]
-		    //          + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];
-		    //float mag = length(abs(sumH) + abs(sumV));
-		    float mag = length(sumH);
+		    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]
+		              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]
+		              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];
+		    float mag = length(sumH) + length(sumV);
 		    gl_FragColor = vec4(vec3(mag), 1.0);
 		}
 		""";
 
-	public static final String FRAGMENT_SHADER_SOBEL_ES2
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
-	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES2
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
+	public static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_HV_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
-	 * Sobel Effect付与のフラグメントシェーダ
+	 * 3x3カーネル関数によるエッジ検出のためのフラグメントシェーダ(水平＋垂直)
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_SOBEL_BASE_ES3 =
+	private static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES3 =
 		"""
 		%s
 		%s
@@ -1799,44 +1903,22 @@ public class ShaderConst implements GLConst {
 		    vec3 sumH = t0 * uKernel[0] + t1 * uKernel[1] + t2 * uKernel[2]
 		              + t3 * uKernel[3] + t4 * uKernel[4] + t5 * uKernel[5]
 		              + t6 * uKernel[6] + t7 * uKernel[7] + t8 * uKernel[8];
-		    //vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]
-		    //          + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]
-		    //          + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];
-		    //float mag = length(abs(sumH) + abs(sumV));
-		    float mag = length(sumH);
+		    vec3 sumV = t0 * uKernel[ 9] + t1 * uKernel[10] + t2 * uKernel[11]
+		              + t3 * uKernel[12] + t4 * uKernel[13] + t5 * uKernel[14]
+		              + t6 * uKernel[15] + t7 * uKernel[16] + t8 * uKernel[17];
+		    float mag = length(sumH) + length(sumV);
 		    o_FragColor = vec4(vec3(mag), 1.0);
 		}
 		""";
 
-	public static final String FRAGMENT_SHADER_SOBEL_ES3
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
-	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES3
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
+	public static final String FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL3x3_EDGE_DETECT_HV_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL3x3_EDGE_DETECT_HV_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
-	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
-	public static final float[] KERNEL_SOBEL_H = { 1f, 0f, -1f, 2f, 0f, -2f, 1f, 0f, -1f, };	// ソーベル(1次微分)
-	public static final float[] KERNEL_SOBEL_V = { 1f, 2f, 1f, 0f, 0f, 0f, -1f, -2f, -1f, };
-	public static final float[] KERNEL_SOBEL2_H = { 3f, 0f, -3f, 10f, 0f, -10f, 3f, 0f, -3f, };
-	public static final float[] KERNEL_SOBEL2_V = { 3f, 10f, 3f, 0f, 0f, 0f, -3f, -10f, -3f, };
-	public static final float[] KERNEL_PREWITT_H = { -1f, -1f, -1f,  0f, 0f, 0f,  1f, 1f, 1f};
-	public static final float[] KERNEL_PREWITT_V = { -1f, 0f, 1f,  -1f, 0f, 1f,  -1f, 0f, 1f};
-	public static final float[] KERNEL_ROBERTS_H = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, -1f};
-	public static final float[] KERNEL_ROBERTS_V = { 0f, 0f, 0f,  0f, 0f, -1f,  0f, 1f, 0f};
-	public static final float[] KERNEL_EDGE_ENHANCE4 = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// エッジ強調4近傍
-	public static final float[] KERNEL_EDGE_ENHANCE8 = { -1f, -1f, -1f, -1f, 9f, -1f, -1f, -1f, -1f, }; // エッジ強調8近傍
-	public static final float[] KERNEL_SHARPNESS = KERNEL_EDGE_ENHANCE4; // シャープネス=エッジ強調4近傍
-	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
-	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
-	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均
-	public static final float[] KERNEL_GAUSSIAN = { 1/16f, 2/16f, 1/16f, 2/16f, 4/16f, 2/16f, 1/16f, 2/16f, 1/16f, };	// ガウシアン(ノイズ除去/)
-	public static final float[] KERNEL_BRIGHTEN = { 1f, 1f, 1f, 1f, 2f, 1f, 1f, 1f, 1f, };
-	public static final float[] KERNEL_LAPLACIAN = { 1f, 1f, 1f, 1f, -8f, 1f, 1f, 1f, 1f, };	// ラプラシアン(2次微分, 8近傍)
-	public static final float[] KERNEL_LAPLACIAN8 = KERNEL_LAPLACIAN;	// ラプラシアン(2次微分, 8近傍)
-	public static final float[] KERNEL_LAPLACIAN4 = { 0f, 1f, 0f, 1f, -4f, 1f, 0f, 1f, 0f, };	// ラプラシアン(2次微分, 4近傍)　8近傍より輪郭線が弱い
-
 	/**
 	 * カーネル関数による映像効果付与のフラグメントシェーダ
 	 * for ES2
