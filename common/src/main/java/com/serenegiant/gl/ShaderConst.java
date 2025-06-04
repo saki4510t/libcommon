@@ -1146,7 +1146,107 @@ public class ShaderConst implements GLConst {
 		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3,
 		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
+
 //--------------------------------------------------------------------------------
+// ドキュメンタリー風映像フィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		varying vec2 vTextureCoord;
+		uniform float uColorAdjust;
+		const vec2 seed = vec2(1,50);
+		const float step_size = 0.01;
+		const vec2 vScale = vec2(1.0, 1.0);
+		const vec2 vignetteCenter = vec2(0.5, 0.5);
+		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		float rand(vec2 loc) {
+			float theta1 = dot(loc, vec2(0.9898, 0.233));
+			float theta2 = dot(loc, vec2(12.0, 78.0));
+			float value = cos(theta1) * sin(theta2) + sin(theta1) * cos(theta2);
+			// keep value of part1 in range: (2^-14 to 2^14).
+			float temp = mod(197.0 * value, 1.0) + value;
+			float part1 = mod(220.0 * temp, 1.0) + temp;
+			float part2 = value * 0.5453;
+			float part3 = cos(theta1 + theta2) * 0.43758;
+			return fract(part1 + part2 + part3);
+		}
+		void main() {
+			// black white
+			vec4 color = texture2D(sTexture, vTextureCoord);
+			float dither = rand(vTextureCoord + seed);
+			vec3 xform = clamp(2.0 * color.rgb, 0.0, 1.0);
+			vec3 temp = clamp(2.0 * (color.rgb + step_size), 0.0, 1.0);
+			vec3 new_color = clamp(xform + (temp - xform) * (dither - 0.5), 0.0, 1.0);
+			// grayscale
+			float gray = dot(new_color, vec3(0.299, 0.587, 0.114));
+			new_color = vec3(gray, gray, gray);
+			// vignette
+			float d = distance(vTextureCoord, vignetteCenter);
+			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
+			gl_FragColor = vec4(mix(new_color.rgb, vignetteColor, percent), color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_DOCUMENTARY_ES2
+		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_DOCUMENTARY_ES2
+		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_DOCUMENTARY_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		uniform %s sTexture;
+		in vec2 vTextureCoord;
+		uniform float uColorAdjust;
+		const vec2 seed = vec2(1,50);
+		const float step_size = 0.01;
+		const vec2 vScale = vec2(1.0, 1.0);
+		const vec2 vignetteCenter = vec2(0.5, 0.5);
+		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		layout(location = 0) out vec4 o_FragColor;
+		float rand(vec2 loc) {
+			float theta1 = dot(loc, vec2(0.9898, 0.233));
+			float theta2 = dot(loc, vec2(12.0, 78.0));
+			float value = cos(theta1) * sin(theta2) + sin(theta1) * cos(theta2);
+			// keep value of part1 in range: (2^-14 to 2^14).
+			float temp = mod(197.0 * value, 1.0) + value;
+			float part1 = mod(220.0 * temp, 1.0) + temp;
+			float part2 = value * 0.5453;
+			float part3 = cos(theta1 + theta2) * 0.43758;
+			return fract(part1 + part2 + part3);
+		}
+		void main() {
+			// black white
+			vec4 color = texture(sTexture, vTextureCoord);
+			float dither = rand(vTextureCoord + seed);
+			vec3 xform = clamp(2.0 * color.rgb, 0.0, 1.0);
+			vec3 temp = clamp(2.0 * (color.rgb + step_size), 0.0, 1.0);
+			vec3 new_color = clamp(xform + (temp - xform) * (dither - 0.5), 0.0, 1.0);
+			// grayscale
+			float gray = dot(new_color, vec3(0.299, 0.587, 0.114));
+			new_color = vec3(gray, gray, gray);
+			// vignette
+			float d = distance(vTextureCoord, vignetteCenter);
+			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
+			o_FragColor = vec4(mix(new_color.rgb, vignetteColor, percent), color.a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_DOCUMENTARY_ES3
+		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_DOCUMENTARY_ES3
+		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+	//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
