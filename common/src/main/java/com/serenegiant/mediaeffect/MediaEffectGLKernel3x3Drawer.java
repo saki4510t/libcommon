@@ -22,7 +22,6 @@ import android.opengl.GLES20;
 import androidx.annotation.NonNull;
 
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.gl.ShaderConst;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -33,19 +32,6 @@ import static com.serenegiant.gl.ShaderConst.*;
 public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer {
 
 	public static final int KERNEL_SIZE = 9;
-	public static final float[] KERNEL_NULL = ShaderConst.KERNEL_NULL;
-	public static final float[] KERNEL_SOBEL_H = ShaderConst.KERNEL_SOBEL_H;		// ソーベル(1次微分)
-	public static final float[] KERNEL_SOBEL_V = ShaderConst.KERNEL_SOBEL_V;
-	public static final float[] KERNEL_SOBEL2_H = ShaderConst.KERNEL_SOBEL2_H;
-	public static final float[] KERNEL_SOBEL2_V = ShaderConst.KERNEL_SOBEL2_V;
-	public static final float[] KERNEL_SHARPNESS = ShaderConst.KERNEL_SHARPNESS;	// シャープネス
-	public static final float[] KERNEL_EDGE_DETECT = ShaderConst.KERNEL_EDGE_DETECT;// エッジ検出
-	public static final float[] KERNEL_EMBOSS = ShaderConst.KERNEL_EMBOSS;			// エンボス, オフセット0.5f
-	public static final float[] KERNEL_SMOOTH = ShaderConst.KERNEL_SMOOTH;			// 移動平均
-	public static final float[] KERNEL_GAUSSIAN = ShaderConst.KERNEL_GAUSSIAN;		// ガウシアン(ノイズ除去/)
-	public static final float[] KERNEL_BRIGHTEN = ShaderConst.KERNEL_BRIGHTEN;
-	public static final float[] KERNEL_LAPLACIAN = ShaderConst.KERNEL_LAPLACIAN;	// ラプラシアン(2次微分)
-
 	private final int muKernelLoc;		// カーネル行列(float配列)
 	private final int muTexOffsetLoc;	// テクスチャオフセット(カーネル行列用)
 	private final float[] mKernel = new float[KERNEL_SIZE * 2];	// Inputs for convolution filter based shaders
