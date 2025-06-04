@@ -151,7 +151,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
 			SHADER_VERSION_ES2, HEADER_OES_ES2,
-			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+			SAMPLER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_BASE_ES3
 		= """
@@ -173,7 +173,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
 			SHADER_VERSION_ES3, HEADER_OES_ES3,
-			SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+			SAMPLER_OES_ES3, SAMPLER_OES_ES3, SAMPLER_OES_ES3);
 
 	/**
 	 * 描画タスク

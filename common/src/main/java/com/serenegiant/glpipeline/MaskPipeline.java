@@ -426,20 +426,20 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 *     sTexture2のサンプラーは常にSAMPLER_2D(=sampler2D)にしないといけないので注意
 	 */
 
-	private static final String FRAGMENT_SHADER_BASE_ES2
-		= """
-			%s
-			%s
-			precision highp float;
-			varying vec2 vTextureCoord;
-			uniform %s sTexture;
-			uniform %s sTexture2;
-			void main() {
-				highp vec4 tex1 = texture2D(sTexture, vTextureCoord);
-				highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);
-				gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
-			}
-			""";
+	private static final String FRAGMENT_SHADER_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform %s sTexture2;
+		void main() {
+			highp vec4 tex1 = texture2D(sTexture, vTextureCoord);
+			highp vec4 tex2 = texture2D(sTexture2, vTextureCoord);
+			gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
+		}
+		""";
 //		"%s" +
 //		"precision highp float;\n" +
 //		"varying vec2 vTextureCoord;\n" +
@@ -452,26 +452,26 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 //		"}\n";
 	private static final String MY_FRAGMENT_SHADER_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_2D_ES2);
 
-	private static final String FRAGMENT_SHADER_BASE_ES3
-		= """
-			%s
-			%s
-			precision highp float;
-			in vec2 vTextureCoord;
-			uniform %s sTexture;
-			uniform %s sTexture2;
-			layout(location = 0) out vec4 o_FragColor;
-			void main() {
-				highp vec4 tex1 = texture(sTexture, vTextureCoord);
-				highp vec4 tex2 = texture(sTexture2, vTextureCoord);
-				o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
-			}
-			""";
+	private static final String FRAGMENT_SHADER_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform %s sTexture2;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			highp vec4 tex1 = texture(sTexture, vTextureCoord);
+			highp vec4 tex2 = texture(sTexture2, vTextureCoord);
+			o_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a), tex1.a);
+		}
+		""";
 //		"%s\n" +
 //		"precision highp float;\n" +
 //		"in vec2 vTextureCoord;\n" +
@@ -486,9 +486,9 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 
 	private static final String MY_FRAGMENT_SHADER_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, SAMPLER_2D_ES3);
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, SAMPLER_2D_ES3);
 
 }

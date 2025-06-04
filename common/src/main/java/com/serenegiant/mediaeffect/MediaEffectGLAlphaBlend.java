@@ -33,8 +33,9 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLAlphaBlend";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE =
 		"""
+		%s
 		%s
 		precision highp float;
 		varying vec2 vTextureCoord;
@@ -48,9 +49,11 @@ public class MediaEffectGLAlphaBlend extends MediaEffectGLBase {
 		}
 		""";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static class MediaEffectAlphaBlendDrawer extends MediaEffectGLDrawer {
 		private final int muMixRate;

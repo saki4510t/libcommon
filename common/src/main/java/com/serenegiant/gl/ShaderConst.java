@@ -30,12 +30,21 @@ public class ShaderConst implements GLConst {
 	public static final String SHADER_VERSION_ES2 = "#version 100\n";
 	public static final String SHADER_VERSION_ES3 = "#version 300 es\n";
 
+	@Deprecated
 	public static final String HEADER_2D = "";
+	public static final String HEADER_2D_ES2 = "";
+	public static final String HEADER_2D_ES3 = "";
+	@Deprecated
 	public static final String SAMPLER_2D = "sampler2D";
+	public static final String SAMPLER_2D_ES2 = "sampler2D";
+	public static final String SAMPLER_2D_ES3 = "sampler2D";
 
 	public static final String HEADER_OES_ES2 = "#extension GL_OES_EGL_image_external : require\n";
 	public static final String HEADER_OES_ES3 = "#extension GL_OES_EGL_image_external_essl3 : require\n";
+	@Deprecated
 	public static final String SAMPLER_OES = "samplerExternalOES";
+	public static final String SAMPLER_OES_ES2 = "samplerExternalOES";
+	public static final String SAMPLER_OES_ES3 = "samplerExternalOES";
 
 	public static final int KERNEL_SIZE3x3_NUM = 9;
 	public static final int KERNEL_SIZE5x5_NUM = 25;
@@ -195,9 +204,11 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_ES2
-		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_ES2
-		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * テクスチャを単純コピーするだけのフラグメントシェーダ
@@ -217,9 +228,11 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_ES3
-		= String.format(FRAGMENT_SHADER_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_ES3
-		= String.format(FRAGMENT_SHADER_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 
 //--------------------------------------------------------------------------------
@@ -318,8 +331,8 @@ public class ShaderConst implements GLConst {
 	 * 色変換行列を適用するフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -336,17 +349,17 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_COLOR_MATRIX_ES2
 		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_COLOR_MATRIX_EXT_ES2
-		= String.format(FRAGMENT_SHADER_BASE_ES2, SHADER_VERSION_ES2,
-			HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * 色変換行列を適用するフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -364,18 +377,18 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_COLOR_MATRIX_ES3
 		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_COLOR_MATRIX_EXT_ES3
 		= String.format(FRAGMENT_SHADER_COLOR_MATRIX_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * 白黒二値変換するフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_BW_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_BW_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -389,16 +402,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_BW_ES2
-		= String.format(FRAGMENT_SHADER_BW_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BW_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_BW_ES2
-		= String.format(FRAGMENT_SHADER_BW_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BW_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * 白黒二値変換するフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_BW_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_BW_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -413,17 +428,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_BW_ES3
-		= String.format(FRAGMENT_SHADER_BW_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BW_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_BW_ES3
-		= String.format(FRAGMENT_SHADER_BW_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BW_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * ナイトビジョン風に強調表示するフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_NIGHT_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_NIGHT_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -437,16 +454,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_NIGHT_ES2
-		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_NIGHT_ES2
-		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * ナイトビジョン風に強調表示するフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_NIGHT_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_NIGHT_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -461,17 +480,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_NIGHT_ES3
-		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_NIGHT_ES3
-		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_NIGHT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * クロマキー合成用に緑を透過させるフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -489,16 +510,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES2
-		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES2
-		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * クロマキー合成用に緑を透過させるフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -517,17 +540,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_CHROMA_KEY_ES3
-		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_CHROMA_KEY_ES3
-		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_CHROMA_KEY_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * SQUEEZE効果付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -548,16 +573,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_SQUEEZE_ES2
-		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_SQUEEZE_ES2
-		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * SQUEEZE効果付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_SQUEEZE_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -579,17 +606,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_SQUEEZE_ES3
-		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_SQUEEZE_ES3
-		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_SQUEEZE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * TWIRL効果付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_TWIRL_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_TWIRL_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -610,16 +639,18 @@ public class ShaderConst implements GLConst {
 		}
 		""";
 	public static final String FRAGMENT_SHADER_TWIRL_ES2
-		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_TWIRL_ES2
-		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * TWIRL効果付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_TWIRL_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_TWIRL_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -642,17 +673,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_TWIRL_ES3
-		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_TWIRL_ES3
-		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_TWIRL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * TUNNEL Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_TUNNEL_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_TUNNEL_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -673,16 +706,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_TUNNEL_ES2
-		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES2
-		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * TUNNEL Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_TUNNEL_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_TUNNEL_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -704,17 +739,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_TUNNEL_ES3
-		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_TUNNEL_ES3
-		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_TUNNEL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Bulge Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_BULGE_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_BULGE_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -735,16 +772,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_BULGE_ES2
-		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_BULGE_ES2
-		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Bulge Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_BULGE_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_BULGE_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -766,17 +805,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_BULGE_ES3
-		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_BULGE_ES3
-		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BULGE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Dent Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_DENT_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_DENT_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -797,16 +838,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_DENT_ES2
-		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_DENT_ES2
-		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_DENT_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Dent Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_DENT_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_DENT_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -828,17 +871,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_DENT_ES3
-		= String.format(FRAGMENT_SHADER_DENT_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_DENT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_DENT_ES3
-		= String.format(FRAGMENT_SHADER_DENT_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_DENT_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Fisheye Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_FISHEYE_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_FISHEYE_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -859,16 +904,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_FISHEYE_ES2
-		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_FISHEYE_ES2
-		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Fisheye Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_FISHEYE_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_FISHEYE_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -890,17 +937,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_FISHEYE_ES3
-		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_FISHEYE_ES3
-		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_FISHEYE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Stretch Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_STRETCH_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_STRETCH_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -920,16 +969,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_STRETCH_ES2
-		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES2
-		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Stretch Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_STRETCH_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_STRETCH_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -950,17 +1001,19 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_STRETCH_ES3
-		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_STRETCH_ES3
-		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_STRETCH_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Mirror Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_MIRROR_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_MIRROR_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -977,16 +1030,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_MIRROR_ES2
-		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_MIRROR_ES2
-		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Mirror Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_MIRROR_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_MIRROR_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -1004,9 +1059,11 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_MIRROR_ES3
-		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_MIRROR_ES3
-		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // 輝度調整のフラグメントシェーダー
@@ -1026,10 +1083,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_BRIGHTNESS_ES2
 		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_BRIGHTNESS_ES2
 		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3 =
 		"""
@@ -1048,10 +1105,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_BRIGHTNESS_ES3
 		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_BRIGHTNESS_ES3
 		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // クロスプロセスフィルターのフラグメントシェーダー
@@ -1095,10 +1152,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_CROSS_PROCESS_ES2
 		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_CROSS_PROCESS_ES2
 		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3 =
 		"""
@@ -1141,10 +1198,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_CROSS_PROCESS_ES3
 		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_CROSS_PROCESS_ES3
 		= String.format(FRAGMENT_SHADER_CROSS_PROCESS_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 
 //--------------------------------------------------------------------------------
@@ -1192,10 +1249,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_DOCUMENTARY_ES2
 		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_DOCUMENTARY_ES2
 		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_DOCUMENTARY_BASE_ES3 =
 		"""
@@ -1241,10 +1298,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_DOCUMENTARY_ES3
 		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_DOCUMENTARY_ES3
 		= String.format(FRAGMENT_SHADER_DOCUMENTARY_BASE_ES2,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // 露出調整のフラグメントシェーダー, -10〜+10, 0だと無調整
@@ -1263,10 +1320,10 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_EXPOSURE_ES2
 		= String.format(FRAGMENT_SHADER_EXPOSURE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_EXPOSURE_ES2
 		= String.format(FRAGMENT_SHADER_EXPOSURE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_EXPOSURE_BASE_ES3 =
 		"""
@@ -1284,10 +1341,10 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_EXPOSURE_ES3
 		= String.format(FRAGMENT_SHADER_EXPOSURE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_EXPOSURE_ES3
 		= String.format(FRAGMENT_SHADER_EXPOSURE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // ネガポジ反転フィルターのフラグメントシェーダー
@@ -1306,10 +1363,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_NEGATIVE_ES2
 		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_NEGATIVE_ES2
 		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_NEGATIVE_BASE_ES3 =
 		"""
@@ -1327,10 +1384,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_NEGATIVE_ES3
 		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_NEGATIVE_ES3
 		= String.format(FRAGMENT_SHADER_NEGATIVE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // ポスタライズフィルターのフラグメントシェーダー
@@ -1349,10 +1406,10 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_POSTERIZE_ES2
 		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_POSTERIZE_ES2
 		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_POSTERIZE_BASE_ES3 =
 		"""
@@ -1370,10 +1427,10 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_POSTERIZE_ES3
 		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_POSTERIZE_ES3
 		= String.format(FRAGMENT_SHADER_POSTERIZE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // 彩度調整フィルターのフラグメントシェーダー
@@ -1395,10 +1452,10 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_SATURATE_ES2
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, FUNC_GET_INTENSITY);
 	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES2
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, FUNC_GET_INTENSITY);
 
 	private static final String FRAGMENT_SHADER_SATURATE_BASE_ES3 =
 		"""
@@ -1419,15 +1476,15 @@ public class ShaderConst implements GLConst {
 		""";
 	public static final String FRAGMENT_SHADER_SATURATE_ES3
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, FUNC_GET_INTENSITY);
 	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES3
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, FUNC_GET_INTENSITY);
 
 //--------------------------------------------------------------------------------
 // 球状にレンダリングするフラグメントシェーダー
-	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -1453,13 +1510,13 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_SPHERE_ES2
 		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_SPHERE_ES2
 		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
-	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision mediump float;
@@ -1486,10 +1543,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_SPHERE_ES3
 		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_SPHERE_ES3
 		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // ビネットフィルターのフラグメントシェーダー
@@ -1513,10 +1570,10 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_VIGNETTE_ES2
 		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_VIGNETTE_ES2
 		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES2,
-		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_VIGNETTE_BASE_ES3 =
 		"""
@@ -1539,18 +1596,18 @@ public class ShaderConst implements GLConst {
 
 	public static final String FRAGMENT_SHADER_VIGNETTE_ES3
 		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_VIGNETTE_ES3
 		= String.format(FRAGMENT_SHADER_VIGNETTE_BASE_ES3,
-		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	public static final String FRAGMENT_SHADER_SOBEL_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_SOBEL_BASE_ES2 =
+		"""
 		%s
 		%s
 		#define KERNEL_SIZE3x3 9
@@ -1583,16 +1640,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_SOBEL_ES2
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES2
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	public static final String FRAGMENT_SHADER_SOBEL_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_SOBEL_BASE_ES3 =
+		"""
 		%s
 		%s
 		#define KERNEL_SIZE3x3 9
@@ -1626,9 +1685,11 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_SOBEL_ES3
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_SOBEL_ES3
-		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_SOBEL_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 	public static final float[] KERNEL_NULL = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, 0f};
@@ -1654,8 +1715,8 @@ public class ShaderConst implements GLConst {
 	 * カーネル関数による映像効果付与のフラグメントシェーダ
 	 * for ES2
 	 */
-	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES2 =
+		"""
 		%s
 		%s
 		#define KERNEL_SIZE3x3 9
@@ -1681,16 +1742,18 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_FILT3x3_ES2
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2, SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES2
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2, SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * カーネル関数による映像効果付与のフラグメントシェーダ
 	 * for ES3
 	 */
-	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE_ES3 =
+		"""
 		%s
 		%s
 		#define KERNEL_SIZE3x3 9
@@ -1717,8 +1780,9 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String FRAGMENT_SHADER_FILT3x3_ES3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3, SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_FILT3x3_ES3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
-
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 }

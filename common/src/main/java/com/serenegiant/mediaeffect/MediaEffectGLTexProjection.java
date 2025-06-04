@@ -146,7 +146,8 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 //			"vTextureCoord = (uTexMatrix * aTextureCoord).xy;\n" +
 		"}\n";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE =
+		"%s" +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + MediaEffectGLKernel3x3Drawer.KERNEL_SIZE + "\n" +
 		"precision highp float;\n" +
@@ -156,9 +157,11 @@ public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 			"gl_FragColor = texture2D(sTexture, vTextureCoord);\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	public MediaEffectGLTexProjection() {
 		super(new MediaEffectTexProjectionDrawer(PROJ_VERTEX_SHADER, FRAGMENT_SHADER));

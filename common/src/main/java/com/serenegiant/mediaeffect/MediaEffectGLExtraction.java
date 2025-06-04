@@ -27,7 +27,8 @@ public class MediaEffectGLExtraction extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLExtraction";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE =
+		"%s" +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE3x3 + "\n" +
 		"precision highp float;\n" +
@@ -70,9 +71,11 @@ public class MediaEffectGLExtraction extends MediaEffectGLBase {
 		"    gl_FragColor = vec4(hsv2rgb(clamp(hsv, 0.0, 1.0)), 1.0);\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private final float[] mLimit = new float[KERNEL_SIZE3x3_NUM];
 

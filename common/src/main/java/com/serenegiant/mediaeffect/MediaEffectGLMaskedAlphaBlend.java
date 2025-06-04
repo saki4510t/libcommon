@@ -30,7 +30,8 @@ public class MediaEffectGLMaskedAlphaBlend extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLMaskedAlphaBlend";
 
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_BASE =
+		"%s" +
 		"%s" +
 		"precision highp float;\n" +
 		"varying       vec2 vTextureCoord;\n" +
@@ -44,11 +45,11 @@ public class MediaEffectGLMaskedAlphaBlend extends MediaEffectGLBase {
 		"    gl_FragColor = vec4(mix(tex1.rgb, tex2.rgb, tex2.a * alpha), tex1.a);\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D,
-			SAMPLER_2D, SAMPLER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, SAMPLER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_OES_ES2,
-		SAMPLER_OES, SAMPLER_OES, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_BASE,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_OES_ES2);
 
 	/**
 	 * コンストラクタ

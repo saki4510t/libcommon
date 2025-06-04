@@ -53,7 +53,8 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 	private float mTexWidth;
 	private float mTexHeight;
 
-	private static final String FRAGMENT_SHADER_FILT3x3_BASE = SHADER_VERSION_ES2 +
+	private static final String FRAGMENT_SHADER_FILT3x3_BASE =
+		"%s" +
 		"%s" +
 		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE + "\n" +
 		"precision highp float;\n" +
@@ -76,9 +77,11 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 		"    gl_FragColor = sum + uColorAdjust;\n" +
 		"}\n";
 	private static final String FRAGMENT_SHADER_FILT3x3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_2D, SAMPLER_2D);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	private static final String FRAGMENT_SHADER_EXT_FILT3x3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE, HEADER_OES_ES2, SAMPLER_OES);
+		= String.format(FRAGMENT_SHADER_FILT3x3_BASE,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	public MediaEffectGLKernel3x3Drawer(final String fss) {
 		this(false, VERTEX_SHADER_ES2, fss);

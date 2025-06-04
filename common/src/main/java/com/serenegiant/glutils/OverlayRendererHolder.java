@@ -105,8 +105,8 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		((OverlayRendererTask)mRendererTask).setOverlay(id, overlay);
 	}
 
-	private static final String FRAGMENT_SHADER_BASE_ES2
-		= """
+	private static final String FRAGMENT_SHADER_BASE_ES2 =
+		"""
 		%s
 		%s
 		precision highp float;
@@ -121,10 +121,10 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		""";
 	private static final String MY_FRAGMENT_SHADER_EXT_ES2
 		= String.format(FRAGMENT_SHADER_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES, SAMPLER_OES);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, SAMPLER_OES_ES2);
 
-	private static final String FRAGMENT_SHADER_BASE_ES3
-		= """
+	private static final String FRAGMENT_SHADER_BASE_ES3 =
+		"""
 		%s
 		%s
 		precision highp float;
@@ -140,7 +140,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		""";
 	private static final String MY_FRAGMENT_SHADER_EXT_ES3
 		= String.format(FRAGMENT_SHADER_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, SAMPLER_OES);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, SAMPLER_OES_ES3);
 
 	private static final int REQUEST_UPDATE_OVERLAY = 100;
 
