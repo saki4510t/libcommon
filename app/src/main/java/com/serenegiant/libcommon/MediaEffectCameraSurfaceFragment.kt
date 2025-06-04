@@ -72,6 +72,7 @@ import com.serenegiant.mediaeffect.MediaEffectRotate
 import com.serenegiant.mediaeffect.MediaEffectSaturate
 import com.serenegiant.mediaeffect.MediaEffectSepia
 import com.serenegiant.mediaeffect.MediaEffectSharpen
+import com.serenegiant.mediaeffect.MediaEffectStraighten
 import com.serenegiant.mediaeffect.MediaEffectTemperature
 import com.serenegiant.mediaeffect.MediaEffectTint
 import com.serenegiant.mediaeffect.MediaEffectVignette
@@ -281,6 +282,11 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectStraighten(effectContext, 0.5f))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectTemperature(effectContext, 0.75f))
 			}
 		},
@@ -337,11 +343,6 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
-				return mutableListOf(MediaEffectGLNegative())
-			}
-		},
-		object : MediaEffectPipeline.EffectsBuilder{
-			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLCrossProcess())
 			}
 		},
@@ -378,6 +379,11 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLMaskedAlphaBlend())	// マスク用テクスチャを指定していないので変化無し
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLNegative())
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
