@@ -25,7 +25,7 @@ public class MediaEffectGLKernel extends MediaEffectGLBase {
 	private static final String TAG = "MediaEffectGLKernel";
 
 	public MediaEffectGLKernel() {
-		super(new MediaEffectGLKernel3x3Drawer(false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_ES2));
+		super(new MediaEffectGLKernel3x3Drawer(false, FRAGMENT_SHADER_FILT3x3_ES2));
 	}
 
 	public MediaEffectGLKernel(final float[] kernel) {
