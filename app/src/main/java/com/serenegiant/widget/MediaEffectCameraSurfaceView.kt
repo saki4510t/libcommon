@@ -20,7 +20,6 @@ package com.serenegiant.widget
 
 import android.content.Context
 import android.hardware.Camera
-import android.media.effect.EffectContext
 import android.util.AttributeSet
 import android.util.Log
 import android.view.Surface
@@ -33,8 +32,6 @@ import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.glpipeline.MediaEffectPipeline
 import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
-import com.serenegiant.mediaeffect.IMediaEffect
-import com.serenegiant.mediaeffect.MediaEffectGrayScale
 import java.io.IOException
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
