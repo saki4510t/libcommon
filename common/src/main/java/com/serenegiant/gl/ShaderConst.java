@@ -1009,6 +1009,50 @@ public class ShaderConst implements GLConst {
 		= String.format(FRAGMENT_SHADER_MIRROR_BASE_ES3, SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+// 輝度調整のフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_BRIGHTNESS_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		void main() {
+		    highp vec4 tex = texture2D(sTexture, vTextureCoord);
+		    gl_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_BRIGHTNESS_ES2
+		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_BRIGHTNESS_ES2
+		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		void main() {
+		    highp vec4 tex = texture(sTexture, vTextureCoord);
+		    gl_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_BRIGHTNESS_ES3
+		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_BRIGHTNESS_ES3
+		= String.format(FRAGMENT_SHADER_BRIGHTNESS_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+	//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
