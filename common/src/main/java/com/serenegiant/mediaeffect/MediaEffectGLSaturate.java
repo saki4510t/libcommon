@@ -18,41 +18,19 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import static com.serenegiant.gl.ShaderConst.*;
+import static com.serenegiant.gl.ShaderConst.FRAGMENT_SHADER_SATURATE_ES2;
 
 /** 彩度調整([-1.0f,+1.0f]), 0だと無調整 */
 public class MediaEffectGLSaturate extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectGLBrightness";
-
-	private static final String FRAGMENT_SHADER_BASE = SHADER_VERSION_ES2 +
-		"""
-		%s
-		precision highp float;
-		varying       vec2 vTextureCoord;
-		uniform %s    sTexture;
-		uniform float uColorAdjust;
-		%s
-		void main() {
-			highp vec4 tex = texture2D(sTexture, vTextureCoord);
-			highp float intensity = getIntensity(tex.rgb);
-			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
-			gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
-		}
-		""";
-	private static final String FRAGMENT_SHADER
-		= String.format(FRAGMENT_SHADER_BASE, HEADER_2D,
-			SAMPLER_2D, FUNC_GET_INTENSITY);
-	private static final String FRAGMENT_SHADER_EXT
-		= String.format(FRAGMENT_SHADER_BASE,
-			HEADER_OES_ES2, SAMPLER_OES, FUNC_GET_INTENSITY);
+	private static final String TAG = "MediaEffectGLSaturate";
 
 	public MediaEffectGLSaturate() {
 		this(0.0f);
 	}
 
 	public MediaEffectGLSaturate(final float saturation) {
-		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER));
+		super(new MediaEffectGLColorAdjustDrawer(FRAGMENT_SHADER_SATURATE_ES2));
 		setParameter(saturation);
 	}
 

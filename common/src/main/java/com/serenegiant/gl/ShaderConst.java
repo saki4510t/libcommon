@@ -1376,6 +1376,55 @@ public class ShaderConst implements GLConst {
 			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
 
 //--------------------------------------------------------------------------------
+// 彩度調整フィルターのフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_SATURATE_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		%s
+		void main() {
+			highp vec4 tex = texture2D(sTexture, vTextureCoord);
+			highp float intensity = getIntensity(tex.rgb);
+			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
+			gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
+		}
+		""";
+	public static final String FRAGMENT_SHADER_SATURATE_ES2
+		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D, FUNC_GET_INTENSITY);
+	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES2
+		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES, FUNC_GET_INTENSITY);
+
+	private static final String FRAGMENT_SHADER_SATURATE_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		layout(location = 0) out vec4 o_FragColor;
+		%s
+		void main() {
+			highp vec4 tex = texture(sTexture, vTextureCoord);
+			highp float intensity = getIntensity(tex.rgb);
+			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
+			o_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
+		}
+		""";
+	public static final String FRAGMENT_SHADER_SATURATE_ES3
+		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D, FUNC_GET_INTENSITY);
+	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES3
+		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, FUNC_GET_INTENSITY);
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
