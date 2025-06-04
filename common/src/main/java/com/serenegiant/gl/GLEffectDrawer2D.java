@@ -29,6 +29,8 @@ import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
 import static com.serenegiant.gl.GLEffect.*;
+import static com.serenegiant.gl.GLEffect.FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES2;
+import static com.serenegiant.gl.GLEffect.FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES2;
 import static com.serenegiant.gl.ShaderConst.*;
 
 /**
@@ -770,6 +772,23 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			drawer.updateShader(isGLES3
 				? (isOES ? FRAGMENT_SHADER_EXT_CANNY_ES3 : FRAGMENT_SHADER_CANNY_ES3)
 				: (isOES ? FRAGMENT_SHADER_EXT_CANNY_ES2 : FRAGMENT_SHADER_CANNY_ES2));
+		}
+		case EFFECT_KERNEL_CANNY_ENHANCE -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_CANNY_ENHANCE");
+			shaderType = -1;
+			drawer.updateShader(isGLES3
+				? (isOES ? FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES3 : FRAGMENT_SHADER_CANNY_ENHANCE_ES3)
+				: (isOES ? FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES2 : FRAGMENT_SHADER_CANNY_ENHANCE_ES2));
+			drawer.setColorAdjust(0.5f);
+		}
+		case EFFECT_KERNEL_KERNEL_ENHANCE -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_KERNEL_ENHANCE");
+			shaderType = -1;
+			drawer.updateShader(isGLES3
+				? (isOES ? FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES3 : FRAGMENT_SHADER_KERNEL_ENHANCE_ES3)
+				: (isOES ? FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES2 : FRAGMENT_SHADER_KERNEL_ENHANCE_ES2));
+			kernel = KERNEL_SOBEL_V;
+			drawer.setColorAdjust(0.25f);
 		}
 		default -> {
 			drawer.resetShader();

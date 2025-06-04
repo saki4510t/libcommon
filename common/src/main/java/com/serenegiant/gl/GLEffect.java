@@ -134,7 +134,19 @@ public class GLEffect {
 	 */
 	public static final int EFFECT_KERNEL_CANNY = 1012;
 
-	public static final int EFFECT_KERNEL_NUM = 1013;
+	/**
+	 * Cannyで検出したエッジを元映像へ適用するフィルター
+	 * FIXME 適用処理は要検討(今は輝度加算)
+	 */
+	public static final int EFFECT_KERNEL_CANNY_ENHANCE = 1013;
+	/**
+	 * カーネル関数によるフィルタ処理結果を元映像へ適用するフィルター
+	 * カーネル関数としてはエッジ検出を想定
+	 * FIXME 適用処理は要検討(今は輝度加算)
+	 */
+	public static final int EFFECT_KERNEL_KERNEL_ENHANCE = 1014;
+
+	public static final int EFFECT_KERNEL_NUM = 1015;
 
 //--------------------------------------------------------------------------------
 	/**
@@ -804,4 +816,197 @@ public class GLEffect {
 	public static final String FRAGMENT_SHADER_EXT_CANNY_ES3
 		= String.format(FRAGMENT_SHADER_CANNY_BASE_ES3,
 			SHADER_VERSION_ES3, HEADER_OES_ES3, KERNEL_SIZE3x3, SAMPLER_OES_ES3);
+
+//--------------------------------------------------------------------------------
+// Cannyエッジ検出の結果を元画像へ適用してみる試み
+
+	private static final String FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES2 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 %s
+		precision highp float;
+		varying       vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float contrast = 1.2;
+		const float lowerThreshold = 0.4;	// lowerとupperの値を入れ替えると白黒反転する
+		const float upperThreshold = 0.8;
+		void main() {
+			vec4 magdir = texture2D(sTexture, vTextureCoord);
+			vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];
+			float first = texture2D(sTexture, vTextureCoord + offset).r;
+			float second = texture2D(sTexture, vTextureCoord - offset).r;
+			float multiplier = step(first, magdir.r);
+			multiplier = multiplier * step(second, magdir.r);
+			float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);
+			multiplier = multiplier * threshold * uColorAdjust;
+			// FIXME 検出したエッジ部分の適用方法は要検討
+		#if 1
+			// increase brightness on detected edge
+			magdir.rgb += multiplier;
+		#elif 1
+			// increase contrast
+			magdir.rgb = ((magdir.rgb - 0.5) * max(multiplier + contrast, 0.0)) + 0.5;
+		#elif 1
+			// increase brightness on detected edge
+			magdir.rgb += multiplier;
+			// increase contrast
+			magdir.rgb = ((magdir.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
+		#endif
+			gl_FragColor = magdir;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_CANNY_ENHANCE_ES2
+		= String.format(FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, KERNEL_SIZE3x3, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES2
+		= String.format(FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, KERNEL_SIZE3x3, SAMPLER_OES_ES2);
+
+	private static final String FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES3 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 %s
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s    sTexture;
+		uniform float uKernel[18];
+		uniform vec2  uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float contrast = 1.2;
+		const float lowerThreshold = 0.4;	// lowerとupperの値を入れ替えると白黒反転する
+		const float upperThreshold = 0.8;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 magdir = texture(sTexture, vTextureCoord);
+			vec2 offset = ((magdir.gb * 2.0) - 1.0) * uTexOffset[8];
+			float first = texture(sTexture, vTextureCoord + offset).r;
+			float second = texture(sTexture, vTextureCoord - offset).r;
+			float multiplier = step(first, magdir.r);
+			multiplier = multiplier * step(second, magdir.r);
+			float threshold = smoothstep(lowerThreshold, upperThreshold, magdir.r);
+			multiplier = multiplier * threshold * uColorAdjust;
+			// FIXME 検出したエッジ部分の適用方法は要検討
+		#if 1
+			// increase brightness on detected edge
+			magdir.rgb += multiplier;
+		#elif 1
+			// increase contrast
+			magdir.rgb = ((magdir.rgb - 0.5) * max(multiplier + contrast, 0.0)) + 0.5;
+		#elif 1
+			// increase brightness on detected edge
+			magdir.rgb += multiplier;
+			// increase contrast
+			magdir.rgb = ((magdir.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
+		#endif
+			o_FragColor = magdir;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_CANNY_ENHANCE_ES3
+		= String.format(FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, KERNEL_SIZE3x3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_EXT_CANNY_ENHANCE_ES3
+		= String.format(FRAGMENT_SHADER_CANNY_ENHANCE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, KERNEL_SIZE3x3, SAMPLER_OES_ES3);
+
+//--------------------------------------------------------------------------------
+// カーネル関数によるフィルタ処理を元映像へ適用してみる試み
+// カーネル関数としてはエッジ検出処理を想定
+
+	private static final String FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES2 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 9
+		precision highp float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uKernel[18];
+		uniform vec2 uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float contrast = 1.2;
+		void main() {
+		    vec4 sum = vec4(0.0);
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];
+		    sum += texture2D(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];
+		    vec4 color = texture2D(sTexture, vTextureCoord);
+		#if 1
+			// increase brightness on detected edge
+			color.rgb += (sum.rgb * uColorAdjust);
+		#elif 1
+			// increase contrast
+//			color.rgb = ((color.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
+			color.rgb = ((color.rgb - 0.5) * (max(sum.rgb, 0.0) * uColorAdjust + 1.0)) + 0.5;
+		#elsif
+			// increase brightness on detected edge
+			color.rgb += (sum.rgb * uColorAdjust);
+			color.rgb = ((color.rgb - 0.5) * (max(sum.rgb, 0.0) * uColorAdjust + 1.0)) + 0.5;
+		#endif
+			gl_FragColor = color;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_KERNEL_ENHANCE_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES2
+		= String.format(FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES2,
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
+
+	private static final String FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES3 =
+		"""
+		%s
+		%s
+		#define KERNEL_SIZE3x3 9
+		precision highp float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uKernel[18];
+		uniform vec2 uTexOffset[KERNEL_SIZE3x3];
+		uniform float uColorAdjust;
+		const float contrast = 1.2;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+		    vec4 sum = vec4(0.0);
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];
+		    sum += texture(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];
+		    vec4 color = texture(sTexture, vTextureCoord);
+		#if 1
+			// increase brightness on detected edge
+			color.rgb += (sum.rgb * uColorAdjust);
+		#elif 1
+			// increase contrast
+//			color.rgb = ((color.rgb - 0.5) * max(contrast, 0.0)) + 0.5;
+			color.rgb = ((color.rgb - 0.5) * (max(sum.rgb, 0.0) * uColorAdjust + 1.0)) + 0.5;
+		#elsif
+			// increase brightness on detected edge
+			color.rgb += (sum.rgb * uColorAdjust);
+			color.rgb = ((color.rgb - 0.5) * (max(sum.rgb, 0.0) * uColorAdjust + 1.0)) + 0.5;
+		#endif
+			o_FragColor = color;
+		}
+		""";
+	public static final String FRAGMENT_SHADER_KERNEL_ENHANCE_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_EXT_KERNEL_ENHANCE_ES3
+		= String.format(FRAGMENT_SHADER_KERNEL_ENHANCE_BASE_ES3,
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 }
