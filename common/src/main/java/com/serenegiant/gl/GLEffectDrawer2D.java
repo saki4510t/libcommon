@@ -734,9 +734,13 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			shaderType = 1;
 			kernel = KERNEL_SOBEL2_V;
 		}
-		case EFFECT_KERNEL_SHARPNESS -> {
+		case EFFECT_KERNEL_SHARPNESS -> {	// = EFFECT_KERNEL_EDGE_ENHANCE4
 			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_SHARPNESS");
 			kernel = KERNEL_SHARPNESS;
+		}
+		case EFFECT_KERNEL_EDGE_ENHANCE8 -> {
+			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EDGE_ENHANCE8");
+			kernel = KERNEL_EDGE_ENHANCE8;
 		}
 		case EFFECT_KERNEL_EDGE_DETECT -> {
 			/*if (DEBUG)*/ Log.v(TAG, "onChangeKernel:EFFECT_KERNEL_EDGE_DETECT");

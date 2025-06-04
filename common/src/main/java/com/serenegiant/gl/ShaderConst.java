@@ -1825,7 +1825,9 @@ public class ShaderConst implements GLConst {
 	public static final float[] KERNEL_PREWITT_V = { -1f, 0f, 1f,  -1f, 0f, 1f,  -1f, 0f, 1f};
 	public static final float[] KERNEL_ROBERTS_H = { 0f, 0f, 0f,  0f, 1f, 0f,  0f, 0f, -1f};
 	public static final float[] KERNEL_ROBERTS_V = { 0f, 0f, 0f,  0f, 0f, -1f,  0f, 1f, 0f};
-	public static final float[] KERNEL_SHARPNESS = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// シャープネス
+	public static final float[] KERNEL_EDGE_ENHANCE4 = { 0f, -1f, 0f, -1f, 5f, -1f, 0f, -1f, 0f,};	// エッジ強調4近傍
+	public static final float[] KERNEL_EDGE_ENHANCE8 = { -1f, -1f, -1f, -1f, 9f, -1f, -1f, -1f, -1f, }; // エッジ強調8近傍
+	public static final float[] KERNEL_SHARPNESS = KERNEL_EDGE_ENHANCE4; // シャープネス=エッジ強調4近傍
 	public static final float[] KERNEL_EDGE_DETECT = { -1f, -1f, -1f, -1f, 8f, -1f, -1f, -1f, -1f, }; // エッジ検出
 	public static final float[] KERNEL_EMBOSS = { 2f, 0f, 0f, 0f, -1f, 0f, 0f, 0f, -1f };	// エンボス, オフセット0.5f
 	public static final float[] KERNEL_SMOOTH = { 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, 1/9f, };	// 移動平均

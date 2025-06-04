@@ -90,37 +90,45 @@ public class GLEffect {
 	 */
 	public static final int EFFECT_KERNEL_SOBEL2_V = 1003;
 	/**
+	 * エッジ強調4近傍(=シャープネス)
+	 */
+	public static final int EFFECT_KERNEL_EDGE_ENHANCE4 = 1004;
+	/**
+	 * エッジ強調9近傍
+	 */
+	public static final int EFFECT_KERNEL_EDGE_ENHANCE8 = 1005;
+	/**
 	 * シャープネス
 	 */
-	public static final int EFFECT_KERNEL_SHARPNESS = 1004;
+	public static final int EFFECT_KERNEL_SHARPNESS = EFFECT_KERNEL_EDGE_ENHANCE4;
 	/**
 	 * エッジ検出
 	 */
-	public static final int EFFECT_KERNEL_EDGE_DETECT = 1005;
+	public static final int EFFECT_KERNEL_EDGE_DETECT = 1006;
 	/**
 	 * エンボス
 	 */
-	public static final int EFFECT_KERNEL_EMBOSS = 1006;
+	public static final int EFFECT_KERNEL_EMBOSS = 1007;
 	/**
 	 * 平滑化
 	 */
-	public static final int EFFECT_KERNEL_SMOOTH = 1007;
+	public static final int EFFECT_KERNEL_SMOOTH = 1008;
 	/**
 	 * ガウシアンフィルタ
 	 */
-	public static final int EFFECT_KERNEL_GAUSSIAN = 1008;
+	public static final int EFFECT_KERNEL_GAUSSIAN = 1009;
 	/**
 	 * 輝度アップ
 	 */
-	public static final int EFFECT_KERNEL_BRIGHTEN = 1009;
+	public static final int EFFECT_KERNEL_BRIGHTEN = 1010;
 	/**
 	 * ラプラシアンフィルタ(8近傍)
 	 */
-	public static final int EFFECT_KERNEL_LAPLACIAN8 = 1010;
+	public static final int EFFECT_KERNEL_LAPLACIAN8 = 1011;
 	/**
 	 * ラプラシアンフィルタ(4近傍)
 	 */
-	public static final int EFFECT_KERNEL_LAPLACIAN4 = 1011;
+	public static final int EFFECT_KERNEL_LAPLACIAN4 = 1012;
 	/**
 	 * ラプラシアンフィルタ(8近傍)
 	 */
@@ -132,21 +140,21 @@ public class GLEffect {
 	 *     ベースなのでとりあえずカーネルフィルタの定数にしているけど、実際のフラグメントシェーダーでは
 	 *     カーネル関数は使っていない
 	 */
-	public static final int EFFECT_KERNEL_CANNY = 1012;
+	public static final int EFFECT_KERNEL_CANNY = 1013;
 
 	/**
 	 * Cannyで検出したエッジを元映像へ適用するフィルター
 	 * FIXME 適用処理は要検討(今は輝度加算)
 	 */
-	public static final int EFFECT_KERNEL_CANNY_ENHANCE = 1013;
+	public static final int EFFECT_KERNEL_CANNY_ENHANCE = 1014;
 	/**
 	 * カーネル関数によるフィルタ処理結果を元映像へ適用するフィルター
 	 * カーネル関数としてはエッジ検出を想定
 	 * FIXME 適用処理は要検討(今は輝度加算)
 	 */
-	public static final int EFFECT_KERNEL_KERNEL_ENHANCE = 1014;
+	public static final int EFFECT_KERNEL_KERNEL_ENHANCE = 1015;
 
-	public static final int EFFECT_KERNEL_NUM = 1015;
+	public static final int EFFECT_KERNEL_NUM = 1016;
 
 //--------------------------------------------------------------------------------
 	/**
