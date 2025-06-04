@@ -1425,6 +1425,73 @@ public class ShaderConst implements GLConst {
 		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES, FUNC_GET_INTENSITY);
 
 //--------------------------------------------------------------------------------
+// 球状にレンダリングするフラグメントシェーダー
+	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES2
+		= """
+		%s
+		%s
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		const vec2 center = vec2(0.5, 0.5);
+		const float radius = 0.48;	// ちょっとだけ小さくしておく
+		const float refractiveIndex = 0.71;
+		void main() {
+			vec2 textureCoordinateToUse = vec2(vTextureCoord.x, (vTextureCoord.y * uColorAdjust + 0.5 - 0.5 * uColorAdjust));
+			float distanceFromCenter = distance(center, textureCoordinateToUse);
+			float checkForPresenceWithinSphere = step(distanceFromCenter, radius);
+			distanceFromCenter = distanceFromCenter / radius;
+			float normalizedDepth = radius * sqrt(1.0 - distanceFromCenter * distanceFromCenter);
+			vec3 sphereNormal = normalize(vec3(textureCoordinateToUse - center, normalizedDepth));
+			vec3 refractedVector = 2.0 * refract(vec3(0.0, 0.0, -1.0), sphereNormal, refractiveIndex);
+			refractedVector.xy = -refractedVector.xy;
+			vec3 tex = texture2D(sTexture, (refractedVector.xy + 1.0) * 0.5).rgb;
+			gl_FragColor = vec4(tex, 1.0) * checkForPresenceWithinSphere;
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_SPHERE_ES2
+		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_SPHERE_ES2
+		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES);
+
+	private static final String FRAGMENT_SHADER_SPHERE_BASE_ES3
+		= """
+		%s
+		%s
+		precision mediump float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform float uColorAdjust;
+		const vec2 center = vec2(0.5, 0.5);
+		const float radius = 0.48;	// ちょっとだけ小さくしておく
+		const float refractiveIndex = 0.71;
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec2 textureCoordinateToUse = vec2(vTextureCoord.x, (vTextureCoord.y * uColorAdjust + 0.5 - 0.5 * uColorAdjust));
+			float distanceFromCenter = distance(center, textureCoordinateToUse);
+			float checkForPresenceWithinSphere = step(distanceFromCenter, radius);
+			distanceFromCenter = distanceFromCenter / radius;
+			float normalizedDepth = radius * sqrt(1.0 - distanceFromCenter * distanceFromCenter);
+			vec3 sphereNormal = normalize(vec3(textureCoordinateToUse - center, normalizedDepth));
+			vec3 refractedVector = 2.0 * refract(vec3(0.0, 0.0, -1.0), sphereNormal, refractiveIndex);
+			refractedVector.xy = -refractedVector.xy;
+			vec3 tex = texture(sTexture, (refractedVector.xy + 1.0) * 0.5).rgb;
+			o_FragColor = vec4(tex, 1.0) * checkForPresenceWithinSphere;
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_SPHERE_ES3
+		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D, SAMPLER_2D);
+	public static final String FRAGMENT_SHADER_EXT_SPHERE_ES3
+		= String.format(FRAGMENT_SHADER_SPHERE_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES);
+
+//--------------------------------------------------------------------------------
 	/**
 	 * Sobel Effect付与のフラグメントシェーダ
 	 * for ES2
