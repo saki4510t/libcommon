@@ -55,6 +55,7 @@ import com.serenegiant.mediaeffect.MediaEffectGLErosion
 import com.serenegiant.mediaeffect.MediaEffectGLExposure
 import com.serenegiant.mediaeffect.MediaEffectGLExtraction
 import com.serenegiant.mediaeffect.MediaEffectGLMaskedAlphaBlend
+import com.serenegiant.mediaeffect.MediaEffectGLMedian3x3
 import com.serenegiant.mediaeffect.MediaEffectGLNegative
 import com.serenegiant.mediaeffect.MediaEffectGLNull
 import com.serenegiant.mediaeffect.MediaEffectGLPosterize
@@ -379,6 +380,11 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLMaskedAlphaBlend())	// マスク用テクスチャを指定していないので変化無し
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLMedian3x3())
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
