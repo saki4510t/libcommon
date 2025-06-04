@@ -58,59 +58,62 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		/**
 		 * Sets the size of the texture.  This is used to find adjacent texels when filtering.
 		 */
+		@Override
 		public void setTexSize(final int width, final int height) {
 			synchronized (mSync) {
-				mTexHeight = height;
-				mTexWidth = width;
-				final float rw = 1.0f / width;
-				final float rh = 1.0f / height;
+				if ((mTexWidth != width) || (mTexHeight != height)) {
+					mTexWidth = width;
+					mTexHeight = height;
+					final float rw = 1.0f / width;
+					final float rh = 1.0f / height;
 
-				// 中央
-				mTexOffset[0] = 0;		mTexOffset[1] = 0;
-				// 1ステップ
-				mTexOffset[2] = 0;		mTexOffset[3] = -rh;
-				mTexOffset[4] = 0;		mTexOffset[5] = +rh;
-				mTexOffset[6] = -rw;	mTexOffset[7] = 0;
-				mTexOffset[8] = +rw;	mTexOffset[9] = 0;
-				// 2ステップ
-				mTexOffset[10] = 0;				mTexOffset[11] = -rh * 2.0f;
-				mTexOffset[12] = 0;				mTexOffset[13] = +rh * 2.0f;
-				mTexOffset[14] = -rw * 2.0f;	mTexOffset[15] = 0;
-				mTexOffset[16] = +rw * 2.0f;	mTexOffset[17] = 0;
-				mTexOffset[18] = -rw;			mTexOffset[19] = -rh;
-				mTexOffset[20] = -rw;			mTexOffset[21] = +rh;
-				mTexOffset[22] = +rw;			mTexOffset[23] = -rh;
-				mTexOffset[24] = +rw;			mTexOffset[25] = +rh;
-				// 3ステップ
-				mTexOffset[26] = 0;				mTexOffset[27] = -rh * 3.0f;
-				mTexOffset[28] = 0;				mTexOffset[29] = +rh * 3.0f;
-				mTexOffset[30] = -rw * 3.0f;	mTexOffset[31] = 0;
-				mTexOffset[32] = +rw * 3.0f;	mTexOffset[33] = 0;
-				mTexOffset[34] = -rw * 2.0f;	mTexOffset[35] = -rh;
-				mTexOffset[36] = -rw * 2.0f;	mTexOffset[37] = +rh;
-				mTexOffset[38] = +rw * 2.0f;	mTexOffset[39] = -rh;
-				mTexOffset[40] = +rw * 2.0f;	mTexOffset[41] = +rh;
-				mTexOffset[42] = -rw;			mTexOffset[43] = -rh * 2.0f;
-				mTexOffset[44] = -rw;			mTexOffset[45] = +rh * 2.0f;
-				mTexOffset[46] = +rw;			mTexOffset[47] = -rh * 2.0f;
-				mTexOffset[48] = +rw;			mTexOffset[49] = +rh * 2.0f;
-				// 4ステップ
-				mTexOffset[50] = 0;				mTexOffset[51] = -rh * 4.0f;
-				mTexOffset[52] = 0;				mTexOffset[53] = +rh * 4.0f;
-				mTexOffset[54] = -rw * 4.0f;	mTexOffset[55] = 0;
-				mTexOffset[56] = +rw * 4.0f;	mTexOffset[57] = 0;
-				mTexOffset[58] = -rw * 3.0f;	mTexOffset[59] = -rh;
-				mTexOffset[60] = -rw * 3.0f;	mTexOffset[61] = +rh;
-				mTexOffset[62] = +rw * 3.0f;	mTexOffset[63] = -rh;
-				mTexOffset[64] = +rw * 3.0f;	mTexOffset[65] = +rh;
-				mTexOffset[66] = -rw * 2.0f;	mTexOffset[67] = -rh * 2.0f;
-				mTexOffset[68] = -rw * 2.0f;	mTexOffset[69] = +rh * 2.0f;
-				mTexOffset[70] = +rw * 2.0f;	mTexOffset[71] = -rh * 2.0f;
-				mTexOffset[72] = +rw * 2.0f;	mTexOffset[73] = +rh * 2.0f;
-				mTexOffset[74] = -rw;			mTexOffset[75] = -rh * 3.0f;
-				mTexOffset[76] = -rw;			mTexOffset[77] = +rh * 3.0f;
-				mTexOffset[78] = +rw;			mTexOffset[79] = -rh * 3.0f;
-				mTexOffset[80] = +rw;			mTexOffset[81] = +rh * 3.0f;
+					// 中央
+					mTexOffset[0] = 0;		mTexOffset[1] = 0;
+					// 1ステップ
+					mTexOffset[2] = 0;		mTexOffset[3] = -rh;
+					mTexOffset[4] = 0;		mTexOffset[5] = +rh;
+					mTexOffset[6] = -rw;	mTexOffset[7] = 0;
+					mTexOffset[8] = +rw;	mTexOffset[9] = 0;
+					// 2ステップ
+					mTexOffset[10] = 0;				mTexOffset[11] = -rh * 2.0f;
+					mTexOffset[12] = 0;				mTexOffset[13] = +rh * 2.0f;
+					mTexOffset[14] = -rw * 2.0f;	mTexOffset[15] = 0;
+					mTexOffset[16] = +rw * 2.0f;	mTexOffset[17] = 0;
+					mTexOffset[18] = -rw;			mTexOffset[19] = -rh;
+					mTexOffset[20] = -rw;			mTexOffset[21] = +rh;
+					mTexOffset[22] = +rw;			mTexOffset[23] = -rh;
+					mTexOffset[24] = +rw;			mTexOffset[25] = +rh;
+					// 3ステップ
+					mTexOffset[26] = 0;				mTexOffset[27] = -rh * 3.0f;
+					mTexOffset[28] = 0;				mTexOffset[29] = +rh * 3.0f;
+					mTexOffset[30] = -rw * 3.0f;	mTexOffset[31] = 0;
+					mTexOffset[32] = +rw * 3.0f;	mTexOffset[33] = 0;
+					mTexOffset[34] = -rw * 2.0f;	mTexOffset[35] = -rh;
+					mTexOffset[36] = -rw * 2.0f;	mTexOffset[37] = +rh;
+					mTexOffset[38] = +rw * 2.0f;	mTexOffset[39] = -rh;
+					mTexOffset[40] = +rw * 2.0f;	mTexOffset[41] = +rh;
+					mTexOffset[42] = -rw;			mTexOffset[43] = -rh * 2.0f;
+					mTexOffset[44] = -rw;			mTexOffset[45] = +rh * 2.0f;
+					mTexOffset[46] = +rw;			mTexOffset[47] = -rh * 2.0f;
+					mTexOffset[48] = +rw;			mTexOffset[49] = +rh * 2.0f;
+					// 4ステップ
+					mTexOffset[50] = 0;				mTexOffset[51] = -rh * 4.0f;
+					mTexOffset[52] = 0;				mTexOffset[53] = +rh * 4.0f;
+					mTexOffset[54] = -rw * 4.0f;	mTexOffset[55] = 0;
+					mTexOffset[56] = +rw * 4.0f;	mTexOffset[57] = 0;
+					mTexOffset[58] = -rw * 3.0f;	mTexOffset[59] = -rh;
+					mTexOffset[60] = -rw * 3.0f;	mTexOffset[61] = +rh;
+					mTexOffset[62] = +rw * 3.0f;	mTexOffset[63] = -rh;
+					mTexOffset[64] = +rw * 3.0f;	mTexOffset[65] = +rh;
+					mTexOffset[66] = -rw * 2.0f;	mTexOffset[67] = -rh * 2.0f;
+					mTexOffset[68] = -rw * 2.0f;	mTexOffset[69] = +rh * 2.0f;
+					mTexOffset[70] = +rw * 2.0f;	mTexOffset[71] = -rh * 2.0f;
+					mTexOffset[72] = +rw * 2.0f;	mTexOffset[73] = +rh * 2.0f;
+					mTexOffset[74] = -rw;			mTexOffset[75] = -rh * 3.0f;
+					mTexOffset[76] = -rw;			mTexOffset[77] = +rh * 3.0f;
+					mTexOffset[78] = +rw;			mTexOffset[79] = -rh * 3.0f;
+					mTexOffset[80] = +rw;			mTexOffset[81] = +rh * 3.0f;
+				}
 			}
 		}
 	}

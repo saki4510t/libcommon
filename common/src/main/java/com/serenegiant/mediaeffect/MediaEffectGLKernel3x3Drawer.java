@@ -101,11 +101,12 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 	/**
 	 * Sets the size of the texture.  This is used to find adjacent texels when filtering.
 	 */
+	@Override
 	public void setTexSize(final int width, final int height) {
 		synchronized (mSync) {
 			if ((mTexWidth != width) || (mTexHeight != height)) {
-				mTexHeight = height;
 				mTexWidth = width;
+				mTexHeight = height;
 				final float rw = 1.0f / width;
 				final float rh = 1.0f / height;
 
