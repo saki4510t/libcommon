@@ -53,36 +53,6 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 	private float mTexWidth;
 	private float mTexHeight;
 
-	private static final String FRAGMENT_SHADER_FILT3x3_BASE =
-		"%s" +
-		"%s" +
-		"#define KERNEL_SIZE3x3 " + KERNEL_SIZE + "\n" +
-		"precision highp float;\n" +
-		"varying       vec2 vTextureCoord;\n" +
-		"uniform %s    sTexture;\n" +
-		"uniform float uKernel[18];\n" +
-		"uniform vec2  uTexOffset[KERNEL_SIZE3x3];\n" +
-		"uniform float uColorAdjust;\n" +
-		"void main() {\n" +
-		"    vec4 sum = vec4(0.0);\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[0]) * uKernel[0];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[1]) * uKernel[1];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[2]) * uKernel[2];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[3]) * uKernel[3];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[4]) * uKernel[4];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[5]) * uKernel[5];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[6]) * uKernel[6];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[7]) * uKernel[7];\n" +
-		"    sum += texture2D(sTexture, vTextureCoord + uTexOffset[8]) * uKernel[8];\n" +
-		"    gl_FragColor = sum + uColorAdjust;\n" +
-		"}\n";
-	private static final String FRAGMENT_SHADER_FILT3x3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE,
-			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
-	private static final String FRAGMENT_SHADER_EXT_FILT3x3
-		= String.format(FRAGMENT_SHADER_FILT3x3_BASE,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
-
 	public MediaEffectGLKernel3x3Drawer(final String fss) {
 		this(false, VERTEX_SHADER_ES2, fss);
 	}
