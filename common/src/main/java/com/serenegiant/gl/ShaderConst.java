@@ -1039,9 +1039,10 @@ public class ShaderConst implements GLConst {
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
 		uniform float uColorAdjust;
+		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    highp vec4 tex = texture(sTexture, vTextureCoord);
-		    gl_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);
+		    o_FragColor = vec4(tex.rgb + vec3(uColorAdjust, uColorAdjust, uColorAdjust), tex.w);
 		}
 		""";
 
