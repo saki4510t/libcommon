@@ -508,6 +508,7 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * 描画の後処理
 	 */
+	@CallSuper
 	protected void finishDraw() {
 		GLES20.glBindTexture(texTarget, 0);
         GLES20.glUseProgram(0);
