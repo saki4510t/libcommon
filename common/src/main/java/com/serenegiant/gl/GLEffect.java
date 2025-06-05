@@ -68,8 +68,32 @@ public class GLEffect {
 	 * 白のパラメータは今はなし
 	 */
 	public static final int EFFECT_EMPHASIZE_YELLOW_WHITE = 11;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、白黒
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN = 12;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、黄黒
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN_YELLOW = 13;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、緑黒
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN_GREEN = 14;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、白黒,反転
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN_REVERSE = 15;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、黄黒,反転
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN_REVERSE_YELLOW = 15;
+	/**
+	 * 近傍を含めた9画素の平均値を閾値とする二値化、緑黒,反転
+	 */
+	public static final int EFFECT_ADAPTIVE_BIN_REVERSE_GREEN = 17;
 	/** 内蔵映像効果の数 */
-	public static final int EFFECT_NUM = 12;
+	public static final int EFFECT_NUM = 18;
 
 	/**
 	 * ソーベルフィルタ(水平方向)

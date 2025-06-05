@@ -2251,6 +2251,123 @@ public class ShaderConst implements GLConst {
 
 //--------------------------------------------------------------------------------
 	/**
+	 * 適応的2値化のためのフラグメントシェーダーのベース文字列
+	 * 対象画素と近傍8画素の平均値を閾値とする
+	 * XXX 画像内の輝度の差が大きくても二値化できるけど全体的にノイズが多くなってしまう
+	 *     平滑化してから適用したり、閾値を平均値の代わりに中央値にしたりもっと広い範囲を
+	 *     サンプリングした方がよいかも
+	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
+	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
+	 */
+	private static final String FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2
+		= """
+		%s
+		%s
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform vec2 uTexOffset[9];
+		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const vec3 cl = vec3(%s);
+		void main() {
+		    vec4 ave = vec4(0.0);
+		    vec4 tc = texture2D(sTexture, vTextureCoord);
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[0]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[1]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[2]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[3]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[4]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[5]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[6]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[7]) / 9.0;
+		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[8]) / 9.0;
+		    float threshold = dot(ave.rgb, conv);
+		    float intensity = dot(tc.rgb, conv);
+		    vec3 bin = step(threshold, vec3(intensity, intensity, intensity));
+		    gl_FragColor = vec4(cl * bin, 1.0);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, "1.0, 1.0, 1.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, "1.0, 1.0, 1.0");
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_YELLOW_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, "1.0, 1.0, 0.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_YELLOW_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, "1.0, 1.0, 0.0");
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_GREEN_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, "0.0, 1.0, 0.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_GREEN_ES2
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, "0.0, 1.0, 0.0");
+
+	/**
+	 * 適応的2値化のためのフラグメントシェーダーのベース文字列
+	 * 対象画素と近傍8画素の平均値を閾値とする
+	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
+	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
+	 */
+	private static final String FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3
+		= """
+		%s
+		%s
+		precision mediump float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform vec2 uTexOffset[9];
+		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const vec3 cl = vec3(%s);
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+		    vec4 ave = vec4(0.0);
+		    vec4 tc = texture(sTexture, vTextureCoord);
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[0]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[1]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[2]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[3]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[4]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[5]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[6]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[7]) / 9.0;
+		    ave += texture(sTexture, vTextureCoord + uTexOffset[8]) / 9.0;
+		    float threshold = dot(ave.rgb, conv);
+		    float intensity = dot(tc.rgb, conv);
+		    vec3 bin = step(threshold, vec3(intensity, intensity, intensity));
+		    o_FragColor = vec4(cl * bin, 1.0);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, "1.0, 1.0, 1.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, "1.0, 1.0, 1.0");
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_YELLOW_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, "1.0, 1.0, 0.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_YELLOW_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, "1.0, 1.0, 0.0");
+
+	public static final String FRAGMENT_SHADER_ADAPTIVE_BIN_GREEN_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, "0.0, 1.0, 0.0");
+	public static final String FRAGMENT_SHADER_EXT_ADAPTIVE_BIN_GREEN_ES3
+		= String.format(FRAGMENT_SHADER_ADAPTIVE_BIN_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, "0.0, 1.0, 0.0");
+
+	//--------------------------------------------------------------------------------
+	/**
 	 * 反転した2値化のためのフラグメントシェーダーのベース文字列
 	 * header(HEADER_OESかHEADER_2D)とサンプラーの種類文字列(SAMPLER_OESかSAMPLER_2D)、
 	 * 変換後の明るい部分用の色を指定するための文字列(R, G, Bの順)を渡すこと
