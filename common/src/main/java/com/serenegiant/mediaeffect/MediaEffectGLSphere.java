@@ -32,7 +32,7 @@ public class MediaEffectGLSphere extends MediaEffectGLBase {
 
 	public MediaEffectGLSphere(final float aspectRatio) {
 		super(new MediaEffectGLColorAdjustDrawer(
-			false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_SPHERE_ES2));
+			false, FRAGMENT_SHADER_SPHERE_ES2));
 		setAspectRatio(aspectRatio);
 	}
 

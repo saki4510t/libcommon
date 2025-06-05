@@ -49,7 +49,7 @@ public class MediaEffectGLKernel3x3Drawer extends MediaEffectGLColorAdjustDrawer
 	}
 
 	public MediaEffectGLKernel3x3Drawer(final boolean isOES, final String vss, final String fss) {
-		super(isOES, vss, fss);
+		super(isOES, vss, fss, 0);
 		muKernelLoc = GLES20.glGetUniformLocation(getProgram(), "uKernel");
 		if (muKernelLoc < 0) {
 			// no kernel in this one

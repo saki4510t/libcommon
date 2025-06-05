@@ -57,7 +57,7 @@ public class MediaEffectGLColorMatrix extends MediaEffectGLBase {
 	 */
 	public MediaEffectGLColorMatrix(@Nullable @Size(min=16) final float[] colorMatrix, final int offset) {
 		super(new MediaEffectGLColorAdjustDrawer(
-			false, VERTEX_SHADER_ES2, FRAGMENT_SHADER_COLOR_MATRIX_ES2));
+			false, FRAGMENT_SHADER_COLOR_MATRIX_ES2));
 		setColorMatrix(colorMatrix, offset);
 	}
 

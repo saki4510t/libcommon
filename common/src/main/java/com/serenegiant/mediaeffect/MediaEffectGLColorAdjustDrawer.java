@@ -21,6 +21,8 @@ package com.serenegiant.mediaeffect;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -36,25 +38,30 @@ public class MediaEffectGLColorAdjustDrawer
 
 	private final int muColorAdjustLoc;		// 色調整
 	private final int muColorMatrixLoc;		// 4x4色変換行列
+	private final int muParamsLoc;			// 補正パラメータ
 	private float mColorAdjust;				// 色調整オフセット
 	@Size(min=16)
 	@NonNull
 	protected final float[] mColorMatrix = new float[16];
+	@NonNull
+	protected final float[] mParams;
 
 	public MediaEffectGLColorAdjustDrawer(final String fss) {
-		this(false, VERTEX_SHADER_ES2, fss);
+		this(false, VERTEX_SHADER_ES2, fss, 0);
 	}
 
 	public MediaEffectGLColorAdjustDrawer(
 		final boolean isOES, final String fss) {
 
-		this(isOES, VERTEX_SHADER_ES2, fss);
+		this(isOES, VERTEX_SHADER_ES2, fss, 0);
 	}
 
 	public MediaEffectGLColorAdjustDrawer(
-		final boolean isOES, final String vss, final String fss) {
+		final boolean isOES, final String vss, final String fss,
+		final int numParams) {
 
 		super(isOES, vss, fss);
+		mParams = new float[numParams];
 		int uColorAdjust = GLES20.glGetUniformLocation(getProgram(), "uColorAdjust");
 		if (uColorAdjust < 0) {
 			uColorAdjust = -1;
@@ -65,7 +72,13 @@ public class MediaEffectGLColorAdjustDrawer
 			muColorMatrix = -1;
 		}
 		muColorMatrixLoc = muColorMatrix;
+		int uParams = GLES20.glGetUniformLocation(getProgram(), "uParams");
+		if (uParams < 0) {
+			uParams = -1;
+		}
+		muParamsLoc = uParams;
 		Matrix.setIdentityM(mColorMatrix, 0);
+		setParams(null, 0);
 	}
 
 	public void setColorAdjust(final float adjust) {
@@ -90,6 +103,22 @@ public class MediaEffectGLColorAdjustDrawer
 		}
 	}
 
+	/**
+	 * 補正パラメータをセット
+	 * paramsがnullまたは必要な個数に満たない場合は0クリアする
+	 * @param params
+	 * @param offset
+	 */
+	public void setParams(@Nullable @Size(min=16) final float[] params, final int offset) {
+		synchronized (mSync) {
+			if ((params != null) && (params.length >= mParams.length + offset)) {
+				System.arraycopy(params, offset, mParams, 0, mParams.length);
+			} else {
+				Arrays.fill(mParams, 0.0f);
+			}
+		}
+	}
+
 	@Override
 	protected void preDraw(@NonNull final int[] texIds,
 		final float[] texMatrix, final int offset) {
@@ -103,6 +132,10 @@ public class MediaEffectGLColorAdjustDrawer
 		}
 		if (muColorMatrixLoc >= 0) {
 			GLES20.glUniformMatrix4fv(muColorMatrixLoc, 1, false, mColorMatrix, 0);
+		}
+		final int n = mParams.length;
+		if ((muParamsLoc >= 0) && (n > 0)) {
+			GLES20.glUniform1fv(muParamsLoc, n, mParams, 0);
 		}
 	}
 }
