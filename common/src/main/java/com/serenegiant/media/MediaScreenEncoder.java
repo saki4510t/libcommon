@@ -35,6 +35,7 @@ import android.view.Surface;
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLUtils;
 import com.serenegiant.utils.HandlerThreadHandler;
 
 import androidx.annotation.NonNull;
@@ -162,7 +163,7 @@ public class MediaScreenEncoder extends AbstractVideoEncoder {
 		protected void onStart() {
 			if (DEBUG) Log.d(TAG, String.format("DrawTask#onStart:(%dx%d)", mWidth, mHeight));
 			mDrawer = GLDrawer2D.create(isGLES3(), true);
-			mTexId = mDrawer.initTex(GLES20.GL_TEXTURE0);
+			mTexId = GLUtils.initTex(mDrawer.texTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mSourceTexture = new SurfaceTexture(mTexId);
 			mSourceTexture.setDefaultBufferSize(mWidth, mHeight);    // これを入れないと映像が取れない
 			mSourceSurface = new Surface(mSourceTexture);

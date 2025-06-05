@@ -190,7 +190,7 @@ public class GLDrawer2D implements GLConst {
 	 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 	 */
 	@TexTarget
-	private final int mTexTarget;
+	public final int texTarget;
 
 	private int hProgram;
 	/**
@@ -254,7 +254,7 @@ public class GLDrawer2D implements GLConst {
 			: isGLES3 ? (isOES ? FRAGMENT_SHADER_EXT_ES3 : FRAGMENT_SHADER_ES3)
 					  : (isOES ? FRAGMENT_SHADER_EXT_ES2 : FRAGMENT_SHADER_ES2);
 
-		mTexTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
+		texTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
 		pVertex = BufferHelper.createFloatBuffer(_vertices);
 		pTexCoord = BufferHelper.createFloatBuffer(_texcoord);
 
@@ -278,7 +278,7 @@ public class GLDrawer2D implements GLConst {
 	 * @return
 	 */
 	public boolean isOES() {
-		return mTexTarget == GL_TEXTURE_EXTERNAL_OES;
+		return texTarget == GL_TEXTURE_EXTERNAL_OES;
 	}
 
 	/**
@@ -345,7 +345,7 @@ public class GLDrawer2D implements GLConst {
 	 * IDrawer2Dの実装
 	 * @param surface
 	 */
-	public void draw(@NonNull final IGLSurface surface) {
+	public final void draw(@NonNull final IGLSurface surface) {
 		draw(surface.getTexUnit(), surface.getTexId(), surface.getTexMatrix(), 0, mMvpMatrix, 0);
 	}
 
@@ -354,7 +354,7 @@ public class GLDrawer2D implements GLConst {
 	 * GLTextureオブジェクトで管理しているテクスチャ名とテクスチャ座標変換行列を使って描画する
 	 * @param texture
 	 */
-	public void draw(@NonNull final GLTexture texture) {
+	public final void draw(@NonNull final GLTexture texture) {
 		draw(texture.getTexUnit(), texture.getTexId(), texture.getTexMatrix(), 0, mMvpMatrix, 0);
 	}
 
@@ -365,7 +365,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param texMatrix
 	 * @param offset
 	 */
-	public synchronized void draw(
+	public final synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 
@@ -381,7 +381,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param mvpMatrix
 	 * @param mvpOffset
 	 */
-	public synchronized void draw(
+	public final synchronized void draw(
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
 		@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
@@ -411,6 +411,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param mvpMatrix
 	 * @param mvpOffset
 	 */
+	@CallSuper
 	protected void prepareDraw(
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
@@ -450,15 +451,17 @@ public class GLDrawer2D implements GLConst {
 	 * @param texUnit
 	 * @param texId
 	 */
+	@CallSuper
 	protected void bindTexture(@TexUnit final int texUnit, final int texId) {
 		GLES20.glActiveTexture(texUnit);
-		GLES20.glBindTexture(mTexTarget, texId);
+		GLES20.glBindTexture(texTarget, texId);
 		GLES20.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
 	}
 
 	/**
 	 * 頂点座標をセット
 	 */
+	@CallSuper
 	protected void updateVertices() {
 		if (USE_VBO) {
 			if (mBufVertex <= GL_NO_BUFFER) {
@@ -506,7 +509,7 @@ public class GLDrawer2D implements GLConst {
 	 * 描画の後処理
 	 */
 	protected void finishDraw() {
-		GLES20.glBindTexture(mTexTarget, 0);
+		GLES20.glBindTexture(texTarget, 0);
         GLES20.glUseProgram(0);
 	}
 
@@ -516,8 +519,9 @@ public class GLDrawer2D implements GLConst {
 	 * @param texUnit
 	 * @return texture ID
 	 */
+	@Deprecated
 	public int initTex(@TexUnit final int texUnit) {
-		return GLUtils.initTex(mTexTarget, texUnit, GLES20.GL_NEAREST);
+		return GLUtils.initTex(texTarget, texUnit, GLES20.GL_NEAREST);
 	}
 
 	/**
@@ -527,8 +531,9 @@ public class GLDrawer2D implements GLConst {
 	 * @param filterParam
 	 * @return
 	 */
+	@Deprecated
 	public int initTex(@TexUnit final int texUnit, final int filterParam) {
-		return GLUtils.initTex(mTexTarget, texUnit, filterParam);
+		return GLUtils.initTex(texTarget, texUnit, filterParam);
 	}
 
 	/**
@@ -536,6 +541,7 @@ public class GLDrawer2D implements GLConst {
 	 * GLHelper.deleteTexを呼び出すだけ
 	 * @param hTex
 	 */
+	@Deprecated
 	public void deleteTex(final int hTex) {
 		GLUtils.deleteTex(hTex);
 	}
@@ -547,6 +553,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param vs 頂点シェーダー文字列
 	 * @param fs フラグメントシェーダー文字列
 	 */
+	@CallSuper
 	public synchronized void updateShader(@NonNull final String vs, @NonNull final String fs) {
 		releaseShader();
 		hProgram = loadShader(vs, fs);
@@ -566,6 +573,7 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * 頂点シェーダー・フラグメントシェーダーをデフォルトに戻す
 	 */
+	@CallSuper
 	public void resetShader() {
 		releaseShader();
 		if (isGLES3) {
@@ -581,6 +589,7 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * シェーダーを破棄
 	 */
+	@CallSuper
 	protected void releaseShader() {
 		if (hProgram > GL_NO_PROGRAM) {
 			internalReleaseShader(hProgram);
@@ -594,7 +603,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param fs フラグメントシェーダーのソース文字列
 	 * @return
 	 */
-	protected int loadShader(@NonNull final String vs, @NonNull final String fs) {
+	protected final int loadShader(@NonNull final String vs, @NonNull final String fs) {
 		if (DEBUG) Log.v(TAG, "loadShader:");
 		return GLUtils.loadShader(vs, fs);
 	}
@@ -603,6 +612,7 @@ public class GLDrawer2D implements GLConst {
 	 * シェーダー破棄処理の実体
 	 * @param program
 	 */
+	@CallSuper
 	protected void internalReleaseShader(final int program) {
 		// バッファーオブジェクトを破棄
 		if (mBufVertex > GL_NO_BUFFER) {
@@ -623,7 +633,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param name
 	 * @return
 	 */
-	public int glGetAttribLocation(@NonNull final String name) {
+	public final int glGetAttribLocation(@NonNull final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetAttribLocation(hProgram, name);
 	}
@@ -634,7 +644,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param name
 	 * @return
 	 */
-	public int glGetUniformLocation(@NonNull final String name) {
+	public final int glGetUniformLocation(@NonNull final String name) {
 		GLES20.glUseProgram(hProgram);
 		return GLES20.glGetUniformLocation(hProgram, name);
 	}
@@ -642,7 +652,7 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * glUseProgramが呼ばれた状態で返る
 	 */
-	public void glUseProgram() {
+	public final void glUseProgram() {
 		GLES20.glUseProgram(hProgram);
 	}
 
@@ -650,6 +660,7 @@ public class GLDrawer2D implements GLConst {
 	 * シェーダープログラム変更時の初期化処理
 	 * glUseProgramが呼ばれた状態で返る
 	 */
+	@CallSuper
 	protected void init() {
 		if (DEBUG) Log.v(TAG, "init:");
 		GLES20.glUseProgram(hProgram);
@@ -672,7 +683,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param program
 	 * @return
 	 */
-	protected boolean validateProgram(final int program) {
+	protected final boolean validateProgram(final int program) {
 		if (program >= 0) {
 			GLES20.glValidateProgram(program);
 			GLES20.glGetProgramiv(program, GLES20.GL_VALIDATE_STATUS, status, 0);

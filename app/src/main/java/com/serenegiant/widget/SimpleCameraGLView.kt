@@ -82,7 +82,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 				if (DEBUG) Log.v(TAG, "onSurfaceCreated:")
 				synchronized(mSync) {
 					mDrawer = GLDrawer2D.create(isOES3Supported(), true)
-					mTexId = mDrawer!!.initTex(GLES20.GL_TEXTURE0)
+					mTexId = GLUtils.initTex(mDrawer!!.texTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST)
 					mSurfaceTexture = SurfaceTexture(mTexId)
 					mSurfaceTexture!!.setDefaultBufferSize(
 						CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)

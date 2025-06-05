@@ -269,7 +269,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)
 			// create texture ID
-			hTex = mDrawer!!.initTex(GLES20.GL_TEXTURE0)
+			hTex = GLUtils.initTex(mDrawer!!.texTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST)
 			// create SurfaceTexture with texture ID.
 			inputSurfaceTexture = SurfaceTexture(hTex)
 			inputSurfaceTexture!!.setDefaultBufferSize(
@@ -328,8 +328,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 		fun release() {
 			if (DEBUG) Log.v(TAG, "CameraRenderer#release:")
+			GLUtils.deleteTex(hTex)
 			if (mDrawer != null) {
-				mDrawer!!.deleteTex(hTex)
 //				mDrawer!!.release()	// GT-N7100で動作がおかしくなる
 				mDrawer = null
 			}

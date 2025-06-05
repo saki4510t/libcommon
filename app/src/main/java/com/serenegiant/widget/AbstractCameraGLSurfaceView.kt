@@ -234,7 +234,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			val drawer = GLDrawer2D.create(isOES3, true)
 			mDrawer = drawer
 			// create texture ID
-			hTex = drawer.initTex(GLES20.GL_TEXTURE0)
+			hTex = GLUtils.initTex(drawer.texTarget, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST)
 			// create SurfaceTexture with texture ID.
 			val st = SurfaceTexture(hTex)
 			inputSurfaceTexture = st
@@ -294,7 +294,7 @@ abstract class AbstractCameraGLSurfaceView @JvmOverloads constructor(
 			if (DEBUG) Log.v(TAG, "CameraRenderer#release:")
 			val drawer = mDrawer
 			mDrawer = null
-			drawer?.deleteTex(hTex)
+			GLUtils.deleteTex(hTex)
 //			drawer?.release()	// GT-N7100で動作がおかしくなる
 			val st = inputSurfaceTexture
 			inputSurfaceTexture = null
