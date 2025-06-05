@@ -629,6 +629,14 @@ public class GLDrawer2D implements GLConst {
 	}
 
 	/**
+	 * プログラムハンドル取得
+	 * @return
+	 */
+	public final int getProgram() {
+		return hProgram;
+	}
+
+	/**
 	 * アトリビュート変数のロケーションを取得
 	 * glUseProgramが呼ばれた状態で返る
 	 * @param name
