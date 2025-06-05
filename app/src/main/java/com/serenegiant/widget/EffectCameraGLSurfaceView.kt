@@ -59,7 +59,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "createRendererHolder:")
 		return EffectRendererHolder(width, height, glVersion, null, 0, callback,
-			GLEffectDrawer2D.DEFAULT_KERNEL_EFFECT_FACTORY)
+			GLEffectDrawer2D.DEFAULT_EFFECT_FACTORY)
 	}
 
 	companion object {

@@ -77,24 +77,25 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * EffectDrawer2D用のDrawerFactoryのデフォルト実装
 	 */
 	public static DrawerFactory DEFAULT_EFFECT_FACTORY = new DrawerFactory() {};
-	/**
-	 * GLKernelEffectDrawer2D用のDrawerFactoryのデフォルト実装
-	 */
-	public static DrawerFactory DEFAULT_KERNEL_EFFECT_FACTORY = new DrawerFactory() {
-		@WorkerThread
-		@NonNull
-		public GLEffectDrawer2D create(final boolean isGLES3, final boolean isOES) {
-			return new GLKernelEffectDrawer2D(isGLES3, isOES);
-		}
-	};
 
 	@NonNull
 	private final EffectListener mEffectListener;
 	@NonNull
 	private final SparseArray<float[]> mParams = new SparseArray<float[]>();
 	private int muParamsLoc;
+	private int muTexOffsetLoc = -1;	// テクスチャオフセット(カーネル行列用)
+	private int muKernelLoc = -1;		// カーネル行列(float配列)
+	private int muColorAdjustLoc = -1;		// 色調整
+	private int muColorMatrixLoc = -1;		// 4x4色変換行列
+	private float mColorAdjust = 0.0f;		// 色調整オフセット
 	@Nullable
 	private float[] mCurrentParams;
+	private final float[] mTexOffset = new float[KERNEL_SIZE3x3_NUM * 2];
+	@Size(min=16)
+	@NonNull
+	protected final float[] mColorMatrix = new float[16];
+	private final float[] mKernel3x3 = new float[KERNEL_SIZE3x3_NUM * 2];	// Inputs for convolution filter based shaders
+	private int mKernelSize = KERNEL_SIZE3x3_NUM;
 	private int mEffect;
 
 	/**
@@ -173,7 +174,45 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 
 		super(isGLES3, isOES, vertices, texcoord, vs, fs);
 		mEffectListener = effectListener != null ? effectListener : new DefaultEffectListener();
+		Matrix.setIdentityM(mColorMatrix, 0);
+		setTexSize(256, 256);	// 未設定だと正常に動作しないのでデフォルトの値を入れておく
 		resetShader();
+	}
+
+	@Override
+	protected void init() {
+		super.init();
+		muKernelLoc = glGetUniformLocation("uKernel");
+		muTexOffsetLoc = glGetUniformLocation("uTexOffset");
+		muColorMatrixLoc = glGetUniformLocation("uColorMatrix");
+		muColorAdjustLoc = glGetUniformLocation("uColorAdjust");
+		if (DEBUG) Log.v(TAG, "init:uKernel=" + muKernelLoc + ",uTexOffset" + muTexOffsetLoc + ",uColorMatrix=" + muColorMatrixLoc + ",uColorAdjust=" + muColorAdjustLoc);
+	}
+
+	@Override
+	protected void prepareDraw(
+		final int texUnit, final int texId, @Nullable final float[] texMatrix,
+		final int texOffset, @Nullable final float[] mvpMatrix, final int mvpOffset) {
+		super.prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
+//		if (DEBUG) Log.v(TAG, "prepareDraw:");
+		// テクセルオフセット
+		if (muTexOffsetLoc >= 0) {
+			GLES20.glUniform2fv(muTexOffsetLoc, KERNEL_SIZE3x3_NUM, mTexOffset, 0);
+		}
+		// カーネル関数(行列)
+		if (muKernelLoc >= 0) {
+			GLES20.glUniform1fv(muKernelLoc, mKernelSize, mKernel3x3, 0);
+			GLUtils.checkGlError("set kernel");
+		}
+		// 色変換行列
+		if (muColorMatrixLoc >= 0) {
+			GLES20.glUniformMatrix4fv(muColorMatrixLoc, 1, false, mColorMatrix, 0);
+			GLUtils.checkGlError("set color matrix");
+		}
+		// 色調整オフセット
+		if (muColorAdjustLoc >= 0) {
+			GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);
+		}
 	}
 
 	/**
@@ -182,8 +221,54 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * @param height
 	 */
 	public synchronized void setTexSize(final int width, final int height) {
-		// このクラスではなにもしない
-		// GLKernelEffectDrawer2D等でオーバーライドする
+		if (DEBUG) Log.v(TAG, "setTexSize:(" + width + "x" + height + ")");
+		final float rw = 1.0f / width;
+		final float rh = 1.0f / height;
+
+		mTexOffset[0] = -rw;	mTexOffset[1] = -rh;
+		mTexOffset[2] = 0f;		mTexOffset[3] = -rh;
+		mTexOffset[4] = rw;		mTexOffset[5] = -rh;
+
+		mTexOffset[6] = -rw;	mTexOffset[7] = 0f;
+		mTexOffset[8] = 0f;		mTexOffset[9] = 0f;
+		mTexOffset[10] = rw;	mTexOffset[11] = 0f;
+
+		mTexOffset[12] = -rw;	mTexOffset[13] = rh;
+		mTexOffset[14] = 0f;	mTexOffset[15] = rh;
+		mTexOffset[16] = rw;	mTexOffset[17] = rh;
+	}
+
+	public synchronized void setKernel(final float[] values, final float colorAdj) {
+		if (DEBUG) Log.v(TAG, "setKernel:");
+		if ((values == null) || (values.length < KERNEL_SIZE3x3_NUM)) {
+			throw new IllegalArgumentException("Kernel size is "
+				+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE3x3_NUM);
+		}
+		if (values.length >= KERNEL_SIZE3x3_NUM * 2) {
+			mKernelSize = KERNEL_SIZE3x3_NUM * 2;
+		} else {
+			mKernelSize = KERNEL_SIZE3x3_NUM;
+		}
+		System.arraycopy(values, 0, mKernel3x3, 0, mKernelSize);
+		setColorAdjust(colorAdj);
+	}
+
+	public synchronized void setColorAdjust(final float adjust) {
+		mColorAdjust = adjust;
+	}
+
+	/**
+	 * 色変換行列をセット
+	 * 指定したcolorMatrixがnullまたは要素数が16+offsetよりも小さい場合は単位行列になる
+	 * @param colorMatrix 色変換行列
+	 * @param offset
+	 */
+	public synchronized void setColorMatrix(@Nullable @Size(min=16) final float[] colorMatrix, final int offset) {
+		if ((colorMatrix != null) && (colorMatrix.length >= 16 + offset)) {
+			System.arraycopy(colorMatrix, offset, mColorMatrix, 0, mColorMatrix.length);
+		} else {
+			Matrix.setIdentityM(mColorMatrix, 0);
+		}
 	}
 
 	/**
@@ -237,6 +322,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 */
 	public void setEffect(final int effect) {
 		if (mEffect != effect) {
+			if (DEBUG) Log.v(TAG, "setEffect:" + mEffect + "=>" + effect);
 			mEffect = effect;
 			boolean handled = false;
 			try {
@@ -307,7 +393,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	private void updateParams() {
-		if (DEBUG) Log.v(TAG, "MyRendererTask#updateParams:");
+		if (DEBUG) Log.v(TAG, "updateParams:");
 		final int n = Math.min(mCurrentParams != null
 			? mCurrentParams.length : 0, 18);
 		if ((muParamsLoc >= 0) && (n > 0)) {
@@ -317,317 +403,13 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	/**
-	 * 4x4色変換行列によるフィルタ処理を行うGLEffectDrawer2D実装
-	 */
-	public static class GLColorMatrixEffectDrawer2D extends GLEffectDrawer2D {
-		private int muColorAdjustLoc = -1;		// 色調整
-		private int muColorMatrixLoc = -1;		// 4x4色変換行列
-		private float mColorAdjust = 0.0f;		// 色調整オフセット
-		@Size(min=16)
-		@NonNull
-		protected final float[] mColorMatrix = new float[16];
-
-		/**
-		 * コンストラクタ
-		 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @return
-		 */
-		public GLColorMatrixEffectDrawer2D(final boolean isGLES3, final boolean isOES) {
-			this(isGLES3, isOES, null, null, null, null, null);
-		}
-
-		/**
-		 * コンストラクタ
-		 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param isOES    外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @param effectListener
-		 * @return
-		 */
-		public GLColorMatrixEffectDrawer2D(
-			final boolean isGLES3, final boolean isOES,
-			@Nullable EffectListener effectListener) {
-			this(isGLES3, isOES, null, null, null, null, effectListener);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 */
-		public GLColorMatrixEffectDrawer2D(
-			final boolean isGLES3,
-			final float[] vertices, final float[] texcoord,
-			final boolean isOES) {
-
-			this(isGLES3, isOES, vertices, texcoord, null, null, null);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @param effectListener
-		 */
-		public GLColorMatrixEffectDrawer2D(
-			final boolean isGLES3,
-			final float[] vertices, final float[] texcoord,
-			final boolean isOES,
-			@Nullable EffectListener effectListener) {
-
-			this(isGLES3, isOES, vertices, texcoord, null, null, effectListener);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-		 * @param isGLES3 GL|ES3かどうか
-		 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
-		 * 				通常の2Dテキスチャを描画に使うならfalse
-		 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 */
-		protected GLColorMatrixEffectDrawer2D(
-			final boolean isGLES3, final boolean isOES,
-			@NonNull @Size(min=8) final float[] vertices,
-			@NonNull @Size(min=8) final float[] texcoord,
-			@Nullable final String vs, @Nullable final String fs,
-			@Nullable EffectListener effectListener) {
-
-			super(isGLES3, isOES, vertices, texcoord, vs, fs, effectListener);
-			Matrix.setIdentityM(mColorMatrix, 0);
-		}
-
-		@Override
-		protected void init() {
-			super.init();
-			muColorMatrixLoc = glGetUniformLocation("uColorMatrix");
-			muColorAdjustLoc = glGetUniformLocation("uColorAdjust");
-			if (DEBUG) Log.v(TAG, "init:colorMatrix=" + muColorMatrixLoc + ",,uColorAdjust=" + muColorAdjustLoc);
-		}
-
-		@Override
-		protected void prepareDraw(
-			@TexUnit final int texUnit, final int texId,
-			@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
-			@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
-			super.prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
-			// 色変換行列
-			if (muColorMatrixLoc >= 0) {
-				GLES20.glUniformMatrix4fv(muColorMatrixLoc, 1, false, mColorMatrix, 0);
-				GLUtils.checkGlError("set color matrix");
-			}
-			// 色調整オフセット
-			if (muColorAdjustLoc >= 0) {
-				GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);
-			}
-		}
-
-		public synchronized void setColorAdjust(final float adjust) {
-			 mColorAdjust = adjust;
-		}
-
-		/**
-		 * 色変換行列をセット
-		 * 指定したcolorMatrixがnullまたは要素数が16+offsetよりも小さい場合は単位行列になる
-		 * @param colorMatrix 色変換行列
-		 * @param offset
-		 */
-		public synchronized void setColorMatrix(@Nullable @Size(min=16) final float[] colorMatrix, final int offset) {
-			if ((colorMatrix != null) && (colorMatrix.length >= 16 + offset)) {
-				System.arraycopy(colorMatrix, offset, mColorMatrix, 0, mColorMatrix.length);
-			} else {
-				Matrix.setIdentityM(mColorMatrix, 0);
-			}
-		}
-	} // GLColorMatrixEffectDrawer2D
-
-	/**
-	 * 3x3のカーネル関数によるフィルタ処理を行うGLEffectDrawer2D実装
-	 */
-	public static class GLKernelEffectDrawer2D extends GLEffectDrawer2D {
-		private int muKernelLoc = -1;		// カーネル行列(float配列)
-		private int muTexOffsetLoc = -1;	// テクスチャオフセット(カーネル行列用)
-		private int muColorAdjustLoc = -1;	// 色調整
-		private int mKernelSize = KERNEL_SIZE3x3_NUM;
-		private final float[] mKernel3x3 = new float[KERNEL_SIZE3x3_NUM * 2];	// Inputs for convolution filter based shaders
-		private final float[] mTexOffset = new float[KERNEL_SIZE3x3_NUM * 2];
-		private float mColorAdjust;
-
-		/**
-		 * コンストラクタ
-		 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @return
-		 */
-		public GLKernelEffectDrawer2D(final boolean isGLES3, final boolean isOES) {
-			this(isGLES3, isOES, null, null, null, null, null);
-		}
-
-		/**
-		 * コンストラクタ
-		 * 頂点シェーダーとフラグメントシェーダはデフォルトのものを使う
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param isOES    外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @param effectListener
-		 * @return
-		 */
-		public GLKernelEffectDrawer2D(
-			final boolean isGLES3, final boolean isOES,
-			@Nullable EffectListener effectListener) {
-			this(isGLES3, isOES, null, null, null, null, effectListener);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 */
-		public GLKernelEffectDrawer2D(
-			final boolean isGLES3,
-			final float[] vertices, final float[] texcoord,
-			final boolean isOES) {
-
-			this(isGLES3, isOES, vertices, texcoord, null, null, null);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキストを保持したスレッド上で呼び出すこと
-		 * @param isGLES3	GL|ES3を使って描画するかどうか
-		 * @param vertices	頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord	テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 * @param isOES		外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue
-		 * @param effectListener
-		 */
-		public GLKernelEffectDrawer2D(
-			final boolean isGLES3,
-			final float[] vertices, final float[] texcoord,
-			final boolean isOES,
-			@Nullable EffectListener effectListener) {
-
-			this(isGLES3, isOES, vertices, texcoord, null, null, effectListener);
-		}
-
-		/**
-		 * コンストラクタ
-		 * GLコンテキスト/EGLレンダリングコンテキストが有効な状態で呼ばないとダメ
-		 * @param isGLES3 GL|ES3かどうか
-		 * @param isOES 外部テクスチャ(GL_TEXTURE_EXTERNAL_OES)を描画に使う場合はtrue。
-		 * 				通常の2Dテキスチャを描画に使うならfalse
-		 * @param vertices 頂点座標, floatを8個 = (x,y) x 4ペア
-		 * @param texcoord テクスチャ座標, floatを8個 = (s,t) x 4ペア
-		 */
-		protected GLKernelEffectDrawer2D(
-			final boolean isGLES3, final boolean isOES,
-			@NonNull @Size(min=8) final float[] vertices,
-			@NonNull @Size(min=8) final float[] texcoord,
-			@Nullable final String vs, @Nullable final String fs,
-			@Nullable EffectListener effectListener) {
-
-			super(isGLES3, isOES, vertices, texcoord, vs, fs, effectListener);
-			setTexSize(256, 256);	// 未設定だと正常に動作しないのでデフォルトの値を入れておく
-		}
-
-		@Override
-		protected void init() {
-			super.init();
-			muKernelLoc = glGetUniformLocation("uKernel");
-			muTexOffsetLoc = glGetUniformLocation("uTexOffset");
-			muColorAdjustLoc = glGetUniformLocation("uColorAdjust");
-			if (DEBUG) Log.v(TAG, "init:uKernel=" + muKernelLoc + ",uTexOffset=" + muTexOffsetLoc + ",uColorAdjust=" + muColorAdjustLoc);
-		}
-
-		@Override
-		protected void prepareDraw(
-			@TexUnit final int texUnit, final int texId,
-			@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
-			@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
-			super.prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
-			// カーネル関数(行列)
-			if (muKernelLoc >= 0) {
-				GLES20.glUniform1fv(muKernelLoc, mKernelSize, mKernel3x3, 0);
-				GLUtils.checkGlError("set kernel");
-			}
-			// テクセルオフセット
-			if (muTexOffsetLoc >= 0) {
-				GLES20.glUniform2fv(muTexOffsetLoc, KERNEL_SIZE3x3_NUM, mTexOffset, 0);
-			}
-			// 色調整オフセット
-			if (muColorAdjustLoc >= 0) {
-				GLES20.glUniform1f(muColorAdjustLoc, mColorAdjust);
-			}
-		}
-
-		public synchronized void setKernel(final float[] values, final float colorAdj) {
-			if (DEBUG) Log.v(TAG, "setKernel:");
-			if ((values == null) || (values.length < KERNEL_SIZE3x3_NUM)) {
-				throw new IllegalArgumentException("Kernel size is "
-					+ (values != null ? values.length : 0) + " vs. " + KERNEL_SIZE3x3_NUM);
-			}
-			if (values.length >= KERNEL_SIZE3x3_NUM * 2) {
-				mKernelSize = KERNEL_SIZE3x3_NUM * 2;
-			} else {
-				mKernelSize = KERNEL_SIZE3x3_NUM;
-			}
-			System.arraycopy(values, 0, mKernel3x3, 0, mKernelSize);
-			setColorAdjust(colorAdj);
-		}
-
-		public synchronized void setColorAdjust(final float adjust) {
-			if (DEBUG) Log.v(TAG, "setColorAdjust:" + adjust);
-			mColorAdjust = adjust;
-		}
-
-		/**
-		 * テクスチャのサイズを設定する
-		 * カーネル関数によるフィルター処理の際に近傍テクセルの位置を計算するのに使う
-		 * @param width
-		 * @param height
-		 */
-		@Override
-		public synchronized void setTexSize(final int width, final int height) {
-			if (DEBUG) Log.v(TAG, "setTexSize:");
-			final float rw = 1.0f / width;
-			final float rh = 1.0f / height;
-
-			mTexOffset[0] = -rw;	mTexOffset[1] = -rh;
-			mTexOffset[2] = 0f;		mTexOffset[3] = -rh;
-			mTexOffset[4] = rw;		mTexOffset[5] = -rh;
-
-			mTexOffset[6] = -rw;	mTexOffset[7] = 0f;
-			mTexOffset[8] = 0f;		mTexOffset[9] = 0f;
-			mTexOffset[10] = rw;	mTexOffset[11] = 0f;
-
-			mTexOffset[12] = -rw;	mTexOffset[13] = rh;
-			mTexOffset[14] = 0f;	mTexOffset[15] = rh;
-			mTexOffset[16] = rw;	mTexOffset[17] = rh;
-		}
-	} // GLKernelEffectDrawer2D
-
-	/**
 	 * デフォルトの内蔵映像効果切り替え処理
 	 * @param drawer
 	 * @param effect
 	 * @return
 	 */
 	private static boolean defaultOnChangeEffect(@NonNull final GLEffectDrawer2D drawer, final int effect) {
+		if (DEBUG) Log.i(TAG, "defaultOnChangeEffect:" + effect);
 		final boolean isGLES3 = drawer.isGLES3;
 		final boolean isOES = drawer.isOES();
 		boolean handled = true;
@@ -698,20 +480,13 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			});
 		}
 		default -> {
-			if (drawer instanceof GLKernelEffectDrawer2D) {
-				handled = onChangeKernel((GLKernelEffectDrawer2D) drawer, effect);
-			} else if (drawer instanceof GLColorMatrixEffectDrawer2D) {
-				handled = onChangeColorMatrix((GLColorMatrixEffectDrawer2D) drawer, effect);
-			} else {
-				drawer.resetShader();
-				handled = false;
-			}
+			handled = onChangeKernel(drawer, effect);
 		}
 		}
 		return handled;
 	}
 
-	private static boolean onChangeKernel(@NonNull final GLKernelEffectDrawer2D drawer, final int effect) {
+	private static boolean onChangeKernel(@NonNull final GLEffectDrawer2D drawer, final int effect) {
 		final boolean isGLES3 = drawer.isGLES3;
 		final boolean isOES = drawer.isOES();
 		float[] kernel = null;
@@ -867,11 +642,6 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 			drawer.setKernel(kernel, drawer.mColorAdjust);
 		}
 		return handled;
-	}
-
-	private static boolean onChangeColorMatrix(@NonNull final GLColorMatrixEffectDrawer2D drawer, final int effect) {
-		// 未実装
-		return false;
 	}
 
 	@NonNull
