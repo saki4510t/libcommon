@@ -22,7 +22,6 @@ package com.serenegiant.service
  * All files in the folder are under this Apache License, Version 2.0.
 */
 import android.annotation.SuppressLint
-import android.annotation.TargetApi
 import android.app.Activity
 import android.app.PendingIntent
 import android.content.Intent
@@ -36,6 +35,7 @@ import android.text.TextUtils
 import android.util.Log
 import android.view.Surface
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.documentfile.provider.DocumentFile
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
@@ -70,7 +70,7 @@ import kotlin.concurrent.withLock
 /**
  * MediaProjectionからのスクリーンキャプチャ映像を録画するためのService実装
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class ScreenRecorderService : LifecycleService() {
 	private lateinit var mMediaProjectionManager: MediaProjectionManager
 	private val mVideoConfig = VideoConfig()
@@ -165,7 +165,7 @@ class ScreenRecorderService : LifecycleService() {
 	 * @param intent
 	 */
 	@SuppressLint("InlinedApi")
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private fun startScreenRecord(intent: Intent) {
 		if (DEBUG) Log.v(TAG, "startScreenRecord:$mRecorder")
 		NotificationCompat.showNotification(this,

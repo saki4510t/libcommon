@@ -18,7 +18,6 @@ package com.serenegiant.preference;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
@@ -445,7 +444,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 		private static final String ALGORITHM_RSA = "RSA";
 		private static final String CIPHER_TRANSFORMATION_RSA = "RSA/ECB/PKCS1Padding";
 
-		@TargetApi(Build.VERSION_CODES.M)
+		@RequiresApi(Build.VERSION_CODES.M)
 		private static final String CIPHER_TRANSFORMATION_AES
 			= KeyProperties.KEY_ALGORITHM_AES
 				+ "/" + KeyProperties.BLOCK_MODE_CBC

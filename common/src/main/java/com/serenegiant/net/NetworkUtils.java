@@ -18,7 +18,6 @@ package com.serenegiant.net;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
@@ -46,6 +45,7 @@ import java.util.concurrent.TimeUnit;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
 /**
@@ -255,7 +255,7 @@ public class NetworkUtils {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<InetAddress> getLinkedIPv4Addresses(@NonNull final Context context) {
 		final List<InetAddress> result = new ArrayList<>();
@@ -281,7 +281,7 @@ public class NetworkUtils {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<InetAddress> getLinkedIPv6Addresses(@NonNull final Context context) {
 		final List<InetAddress> result = new ArrayList<>();
@@ -306,7 +306,7 @@ public class NetworkUtils {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<InetAddress> getLinkedAddresses(@NonNull final Context context) {
 		final List<InetAddress> result = new ArrayList<>();

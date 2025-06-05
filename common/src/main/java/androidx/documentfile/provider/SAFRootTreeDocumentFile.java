@@ -18,7 +18,6 @@ package androidx.documentfile.provider;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -38,7 +37,7 @@ import androidx.annotation.Nullable;
  * アプリがSAFを使って保持しているuriパーミッションの一覧を
  * 仮想的にディレクトリとしてアクセスできるようにするためのDocumentFile実装
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@androidx.annotation.RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFRootTreeDocumentFile extends DocumentFile {
 
 	/**

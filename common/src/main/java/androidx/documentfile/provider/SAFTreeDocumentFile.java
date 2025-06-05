@@ -18,7 +18,6 @@ package androidx.documentfile.provider;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -27,12 +26,13 @@ import com.serenegiant.system.SAFUtils;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 /**
  * SAFを使って取得したuriパーミッションに対応したTreeDocumentFile実装
  * #deleteを使って削除するとuriパーミッション自体も削除する
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class SAFTreeDocumentFile extends TreeDocumentFile {
 
 	@NonNull

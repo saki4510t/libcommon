@@ -18,7 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
@@ -214,7 +213,7 @@ public abstract class AudioDecoder extends AbstractDecoder {
 
 	}
 
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@androidx.annotation.RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private static class AudioDecoderAPI21 extends AudioDecoder {
 		private static final String TAG = AudioDecoderAPI21.class.getSimpleName();
 		/**

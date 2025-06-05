@@ -81,7 +81,7 @@ public class ChoreographerTest {
    }
 
 // API33未満の端末だとクラス読み込み時点でクラッシュして実行できない
-//   @TargetApi(33)
+//   @RequiresApi(33)
 //   @Test
 //   public void countVsyncFrames() {
 //      if (BuildCheck.isAPI33()) {

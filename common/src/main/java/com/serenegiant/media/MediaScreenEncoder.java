@@ -18,7 +18,6 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.graphics.SurfaceTexture;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
@@ -40,11 +39,12 @@ import com.serenegiant.utils.HandlerThreadHandler;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 /**
  * MediaProjectionからの映像をエンコードするためのAbstractVideoEncoder実装
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class MediaScreenEncoder extends AbstractVideoEncoder {
 	private static final boolean DEBUG = false;    // set false on production
 	private static final String TAG = MediaScreenEncoder.class.getSimpleName();

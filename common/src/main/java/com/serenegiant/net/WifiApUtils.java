@@ -19,7 +19,6 @@ package com.serenegiant.net;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.LinkAddress;
 import android.net.LinkProperties;
@@ -46,6 +45,7 @@ import java.util.List;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
 /**
@@ -173,7 +173,7 @@ public class WifiApUtils {
 	 * @return SoftApが無効または取得できなければnull
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static String getLocalIPv4Address(@NonNull final Context context) {
 		if (isWifiApEnabled(context)) {
@@ -220,7 +220,7 @@ public class WifiApUtils {
 	 * @return SoftApが無効または取得できなければnull
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static String getLocalIPv6Address(@NonNull final Context context) {
 		if (isWifiApEnabled(context)) {
@@ -323,7 +323,7 @@ public class WifiApUtils {
 	 * @throws UnsupportedOperationException
 	 */
 	@SuppressWarnings("all")
-	@TargetApi(Build.VERSION_CODES.R)
+	@RequiresApi(Build.VERSION_CODES.R)
 	@RequiresPermission("android.Manifest.permission.NETWORK_SETTINGS")
 	public static SoftApConfiguration getSoftApConfiguration(@NonNull final Context context)
 		throws UnsupportedOperationException {

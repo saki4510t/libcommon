@@ -20,7 +20,6 @@ package com.serenegiant.net;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -38,6 +37,7 @@ import android.os.Handler;
 import androidx.annotation.AnyThread;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.annotation.RequiresPermission;
 
 import android.util.Log;
@@ -117,13 +117,13 @@ public class ConnectivityHelper {
 	/**
 	 * API>=21でシステムのデフォルトのネットワーク接続がアクティブになったときの通知を受け取るためのOnNetworkActiveListenerインスタンス
 	 */
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	private ConnectivityManager.OnNetworkActiveListener mOnNetworkActiveListener;	// API>=21
 	/**
 	 * API>=21でネットワークの状態変更を受け取るためのNetworkCallbackインスタンス
 	 */
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	private ConnectivityManager.NetworkCallback mNetworkCallback;	// API>=21
 	/**
@@ -472,7 +472,7 @@ public class ConnectivityHelper {
 	 * @param caps
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private void updateActiveNetwork(
 		@Nullable final Network network,
 		@Nullable final NetworkCapabilities caps,
@@ -547,7 +547,7 @@ public class ConnectivityHelper {
 	}
 
 //--------------------------------------------------------------------------------
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private class MyOnNetworkActiveListener
 		implements ConnectivityManager.OnNetworkActiveListener {	// API>= 21
 
@@ -575,7 +575,7 @@ public class ConnectivityHelper {
 	}
 	
 //--------------------------------------------------------------------------------
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private class MyNetworkCallback extends ConnectivityManager.NetworkCallback {	// API>=21
 		private final String TAG = MyNetworkCallback.class.getSimpleName();
 	
@@ -839,7 +839,7 @@ public class ConnectivityHelper {
 	 * @return 見つからなければnull
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Network getActiveNetwork(@NonNull final Context context) {
 		return getActiveNetwork(
@@ -857,7 +857,7 @@ public class ConnectivityHelper {
 	 * @return 見つからなければnull
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static Network getActiveNetwork(@NonNull final ConnectivityManager manager) {
 		if (BuildCheck.isAPI23()) {
@@ -888,7 +888,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<Network> getNetworkAll(@NonNull final Context context) {
 		final ConnectivityManager manager
@@ -909,7 +909,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static LinkProperties getActiveLinkProperties(@NonNull final Context context) {
 		final ConnectivityManager manager
@@ -925,7 +925,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<LinkProperties> getLinkPropertiesAll(@NonNull final Context context) {
 		final ConnectivityManager manager
@@ -952,7 +952,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static NetworkCapabilities getActiveNetworkCapabilities(@NonNull final Context context) {
 		final ConnectivityManager manager
@@ -968,7 +968,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@NonNull
 	public static List<NetworkCapabilities> getNetworkCapabilitiesAll(@NonNull final Context context) {
 		final ConnectivityManager manager
@@ -999,7 +999,7 @@ public class ConnectivityHelper {
 	 */
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isWifiNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
@@ -1028,7 +1028,7 @@ public class ConnectivityHelper {
 	 */
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isMobileNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
@@ -1054,7 +1054,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isBluetoothNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
@@ -1076,7 +1076,7 @@ public class ConnectivityHelper {
 	 */
 	@SuppressLint("NewApi")
 	@RequiresPermission(android.Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	private static boolean isNetworkReachable(
 		@NonNull final ConnectivityManager manager,
 		@NonNull final Network network,
@@ -1148,7 +1148,7 @@ public class ConnectivityHelper {
 	 * @return
 	 */
 	@RequiresPermission(Manifest.permission.ACCESS_NETWORK_STATE)
-	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Nullable
 	public static InetAddress getActiveGateway(@NonNull final Context context) {
 		final LinkProperties properties = getActiveLinkProperties(context);

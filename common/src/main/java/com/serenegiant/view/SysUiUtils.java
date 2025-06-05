@@ -212,7 +212,7 @@ public class SysUiUtils implements DefaultLifecycleObserver {
 
 	/**
 	 * 全画面表示を切り替えるためのフラグ
-	 * ＠TargetApi(Build.VERSION_CODES.JELLY_BEAN)はフィールドに対してはセット出来ないので
+	 * ＠RequiresApi(Build.VERSION_CODES.JELLY_BEAN)はフィールドに対してはセット出来ないので
 	 * getFlagsFullscreenスタティックメソッドで割り当てる
 	 */
 	private static final int FLAGS_FULLSCREEN = getFlagsFullscreen();

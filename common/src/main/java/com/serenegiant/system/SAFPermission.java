@@ -18,7 +18,6 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -43,7 +42,7 @@ import androidx.fragment.app.Fragment;
 /**
  * SAFでディレクトリアクセスの権限を取得するためのヘルパークラス
  */
-@TargetApi(21)
+@RequiresApi(21)
 public class SAFPermission {
 	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = SAFPermission.class.getSimpleName();
@@ -141,7 +140,7 @@ public class SAFPermission {
 	 * @param initialUri
 	 * @throws IllegalStateException
 	 */
-	@TargetApi(26)
+	@RequiresApi(26)
 	public void requestPermission(
 		final int treeId,
 		@Nullable final Uri initialUri) throws IllegalStateException {
@@ -200,7 +199,7 @@ public class SAFPermission {
 		}
 	}
 
-	@TargetApi(21)
+	@RequiresApi(21)
 	private static class OpenDocumentTree extends ActivityResultContract<Pair<Integer, Uri>, Pair<Integer, Uri>> {
 		private static final String TAG = OpenDocumentTree.class.getSimpleName();
 		@Nullable

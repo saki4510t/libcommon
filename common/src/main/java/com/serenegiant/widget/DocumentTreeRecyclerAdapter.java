@@ -19,7 +19,6 @@ package com.serenegiant.widget;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
@@ -50,13 +49,14 @@ import java.util.regex.Pattern;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.documentfile.provider.DocumentFile;
 import androidx.recyclerview.widget.RecyclerView;
 
 /**
  * DocumentFileで指定したディレクトリ以下を一覧表示するためのRecyclerView.Adapter実装
  */
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 public class DocumentTreeRecyclerAdapter
 	extends RecyclerView.Adapter<DocumentTreeRecyclerAdapter.ViewHolder> {
 

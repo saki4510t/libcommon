@@ -19,7 +19,6 @@ package com.serenegiant.camera;
 */
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
@@ -42,6 +41,7 @@ import java.util.List;
 import androidx.annotation.IntDef;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 /**
  * Camera API用のヘルパークラス
@@ -51,7 +51,7 @@ public class CameraUtils implements CameraConst {
 	private static final boolean DEBUG = false;
 	private static final String TAG = CameraUtils.class.getSimpleName();
 
-	@TargetApi(Build.VERSION_CODES.N)
+	@RequiresApi(Build.VERSION_CODES.N)
 	@IntDef({
 		ImageFormat.UNKNOWN,
 		ImageFormat.RGB_565,

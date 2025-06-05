@@ -18,7 +18,6 @@ package com.serenegiant.graphics;
  *  limitations under the License.
 */
 
-import android.annotation.TargetApi;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Outline;
@@ -75,7 +74,7 @@ public class BaseShape extends Shape {
         mStdHeight2 = mStdHeight / 2.0f;
 	}
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @androidx.annotation.RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 	@Override
     public void getOutline(final Outline outline) {
         final RectF rect = boundsRect();
