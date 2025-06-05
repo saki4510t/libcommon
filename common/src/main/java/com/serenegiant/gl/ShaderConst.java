@@ -260,6 +260,17 @@ public class ShaderConst implements GLConst {
 	 */
 
 	/**
+	 * 無変換の色変換行列(単位行列)
+	 */
+	@Size(value=16)
+	public static final float[] COLOR_MATRIX_IDENTITY = {
+		1.0f, 0.0f, 0.0f, 0.0f,
+		0.0f, 1.0f, 0.0f, 0.0f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+
+	/**
 	 * セピア色
 	 */
 	@Size(value=32)
