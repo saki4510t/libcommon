@@ -292,9 +292,9 @@ public class ShaderConst implements GLConst {
 	 */
 	@Size(value = 16)
 	public static final float[] COLOR_MATRIX_GRAYSCALE = {
-		0.30f, 0.30f, 0.30f, 0.0f,
-		0.59f, 0.59f, 0.59f, 0.0f,
-		0.11f, 0.11f, 0.11f, 0.0f,
+		0.2125f, 0.2125f, 0.2125f, 0.0f,
+		0.7154f, 0.7154f, 0.7154f, 0.0f,
+		0.0721f, 0.0721f, 0.0721f, 0.0f,
 		0.0f, 0.0f,  0.0f,  1.0f,
 	};
 
@@ -496,10 +496,11 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 			vec4 tc = texture2D(sTexture, vTextureCoord);
-			float color = tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11;
-			gl_FragColor = vec4(color, color, color, 1.0);
+		    float intensity = dot(tc.rgb, conv);
+			gl_FragColor = vec4(intensity, intensity, intensity, 1.0);
 		}
 		""";
 
@@ -521,11 +522,12 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11;
-		    o_FragColor = vec4(color, color, color, 1.0);
+		    float intensity = dot(tc.rgb, conv);
+		    o_FragColor = vec4(intensity, intensity, intensity, 1.0);
 		}
 		""";
 
@@ -548,9 +550,10 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 			vec4 tc = texture2D(sTexture, vTextureCoord);
-			float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;
+			float color = (dot(tc.rgb, conv) - 0.5 * 1.5) + 0.8;
 			gl_FragColor = vec4(color, color + 0.15, color, 1.0);
 		}
 		""";
@@ -573,10 +576,11 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;
+			float color = (dot(tc.rgb, conv) - 0.5 * 1.5) + 0.8;
 		    o_FragColor = vec4(color, color + 0.15, color, 1.0);
 		}
 		""";
@@ -600,9 +604,10 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 			vec4 tc = texture2D(sTexture, vTextureCoord);
-			float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;
+			float color = (dot(tc.rgb, conv) - 0.5 * 1.5) + 0.8;
 			if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){
 				gl_FragColor = vec4(0, 0, 0, 0.0);
 			}else{
@@ -629,10 +634,11 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = ((tc.r * 0.3 + tc.g * 0.59 + tc.b * 0.11) - 0.5 * 1.5) + 0.8;
+			float color = (dot(tc.rgb, conv) - 0.5 * 1.5) + 0.8;
 		    if(tc.g > 0.6 && tc.b < 0.6 && tc.r < 0.6){
 		        o_FragColor = vec4(0, 0, 0, 0.0);
 		    }else{
