@@ -406,6 +406,86 @@ public class ShaderConst implements GLConst {
 
 //--------------------------------------------------------------------------------
 	/**
+	 * 非線形濃度変換(明るさ変換)と色変換行列を適用するフラグメントシェーダ
+	 * 補正データ点数を減らすため64+1個の補正データとしてintensityがその
+	 * 間に来る場合は補正値を線形補完して求める
+	 * for ES2
+	 */
+	private static final String FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES2 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		varying vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform mat4 uColorMatrix;
+		uniform float uParams[65];
+		const highp float iStep = 0.0158730; // = 1.0 / 63.0;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
+		void main() {
+			vec4 cl = texture2D(sTexture, vTextureCoord);
+			highp float intensity = dot(cl.rgb, conv);
+			int index = int(clamp(0.0, 63.0, intensity * 63.0));
+			highp float c0 = uParams[index];
+			highp float c1 = uParams[index+1];
+			highp float i0 = float(index) * iStep;
+			// 線形補間
+			highp float adjust = (c1 - c0) / iStep * (intensity - i0) + c0;
+			float a = cl.a;
+			// adjust brightness
+			cl.rgb += adjust;
+			gl_FragColor = vec4((uColorMatrix * cl).rgb, a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_COLOR_CORRECTION_ES2
+		= String.format(FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
+	public static final String FRAGMENT_SHADER_COLOR_CORRECTION_EXT_ES2
+		= String.format(FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES2,
+		SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
+
+	/**
+	 * 非線形濃度変換(明るさ変換)と色変換行列を適用するフラグメントシェーダ
+	 * 補正データ点数を減らすため64+1個の補正データとしてintensityがその
+	 * 間に来る場合は補正値を線形補完して求める
+	 * for ES3
+	 */
+	private static final String FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES3 =
+		"""
+		%s
+		%s
+		precision mediump float;
+		in vec2 vTextureCoord;
+		uniform %s sTexture;
+		uniform mat4 uColorMatrix;
+		uniform float uParams[256];
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
+		layout(location = 0) out vec4 o_FragColor;
+		void main() {
+			vec4 cl = texture(sTexture, vTextureCoord);
+			highp float intensity = dot(cl.rgb, conv);
+			int index = int(clamp(0.0, 63.0, intensity * 63.0));
+			highp float c0 = uParams[index];
+			highp float c1 = uParams[index+1];
+			highp float i0 = float(index) * iStep;
+			highp float adjust = (c1 - c0) / iStep * (intensity - i0) + c0;
+			float a = cl.a;
+			// adjust brightness
+			cl.rgb += adjust;
+		    o_FragColor = vec4((uColorMatrix * cl).rgb, a);
+		}
+		""";
+
+	public static final String FRAGMENT_SHADER_COLOR_CORRECTION_ES3
+		= String.format(FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
+	public static final String FRAGMENT_SHADER_COLOR_CORRECTION_EXT_ES3
+		= String.format(FRAGMENT_SHADER_COLOR_CORRECTION_BASE_ES3,
+		SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
+
+//--------------------------------------------------------------------------------
+	/**
 	 * 白黒二値変換するフラグメントシェーダ
 	 * for ES2
 	 */

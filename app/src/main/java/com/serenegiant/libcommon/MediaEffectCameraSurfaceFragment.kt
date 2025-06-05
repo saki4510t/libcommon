@@ -46,6 +46,7 @@ import com.serenegiant.mediaeffect.MediaEffectFlipVertical
 import com.serenegiant.mediaeffect.MediaEffectGLAlphaBlend
 import com.serenegiant.mediaeffect.MediaEffectGLBrightness
 import com.serenegiant.mediaeffect.MediaEffectGLCanny
+import com.serenegiant.mediaeffect.MediaEffectGLColorCorrection
 import com.serenegiant.mediaeffect.MediaEffectGLColorMatrix
 import com.serenegiant.mediaeffect.MediaEffectGLCrossProcess
 import com.serenegiant.mediaeffect.MediaEffectGLDilation
@@ -340,6 +341,34 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLColorMatrix(ShaderConst.COLOR_MATRIX_SEPIA, 0))
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setGamma(2.0f)
+				})
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setGamma(0.6f)
+				})
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setContrast(-0.5f)
+				})
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setContrast(0.5f)
+				})
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
