@@ -157,18 +157,6 @@ public class ShaderConst implements GLConst {
 		""";
 
 	public static final String HSV_FUNCTIONS = FUNC_RGB2HSV + FUNC_HSV2RGB;
-	/**
-	 * RGBの輝度を取得
-	 * 変換係数との内積を計算するだけ
-	 * 係数は(0.2125, 0.7154, 0.0721)
-	 */
-	public static final String FUNC_GET_INTENSITY =
-		"""
-		const highp vec3 luminanceWeighting = vec3(0.2125, 0.7154, 0.0721);
-		highp float getIntensity(vec3 c) {
-			return dot(c.rgb, luminanceWeighting);
-		}
-		""";
 
 //--------------------------------------------------------------------------------
 // 頂点シェーダー
@@ -1242,6 +1230,7 @@ public class ShaderConst implements GLConst {
 		const vec2 vScale = vec2(1.0, 1.0);
 		const vec2 vignetteCenter = vec2(0.5, 0.5);
 		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		float rand(vec2 loc) {
 			float theta1 = dot(loc, vec2(0.9898, 0.233));
 			float theta2 = dot(loc, vec2(12.0, 78.0));
@@ -1261,8 +1250,8 @@ public class ShaderConst implements GLConst {
 			vec3 temp = clamp(2.0 * (color.rgb + step_size), 0.0, 1.0);
 			vec3 new_color = clamp(xform + (temp - xform) * (dither - 0.5), 0.0, 1.0);
 			// grayscale
-			float gray = dot(new_color, vec3(0.299, 0.587, 0.114));
-			new_color = vec3(gray, gray, gray);
+			highp float intensity = dot(new_color, conv);
+			new_color = vec3(intensity, intensity, intensity);
 			// vignette
 			float d = distance(vTextureCoord, vignetteCenter);
 			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
@@ -1290,6 +1279,7 @@ public class ShaderConst implements GLConst {
 		const vec2 vScale = vec2(1.0, 1.0);
 		const vec2 vignetteCenter = vec2(0.5, 0.5);
 		const vec3 vignetteColor = vec3(0.0 ,0.0, 0.0);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		float rand(vec2 loc) {
 			float theta1 = dot(loc, vec2(0.9898, 0.233));
@@ -1310,8 +1300,8 @@ public class ShaderConst implements GLConst {
 			vec3 temp = clamp(2.0 * (color.rgb + step_size), 0.0, 1.0);
 			vec3 new_color = clamp(xform + (temp - xform) * (dither - 0.5), 0.0, 1.0);
 			// grayscale
-			float gray = dot(new_color, vec3(0.299, 0.587, 0.114));
-			new_color = vec3(gray, gray, gray);
+			highp float intensity = dot(new_color, conv);
+			new_color = vec3(intensity, intensity, intensity);
 			// vignette
 			float d = distance(vTextureCoord, vignetteCenter);
 			float percent = smoothstep(0.3, 0.75, d) * uColorAdjust;
@@ -1465,20 +1455,20 @@ public class ShaderConst implements GLConst {
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
 		uniform float uColorAdjust;
-		%s
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 			highp vec4 tex = texture2D(sTexture, vTextureCoord);
-			highp float intensity = getIntensity(tex.rgb);
+			highp float intensity = dot(tex.rgb, conv);
 			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
 			gl_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
 		}
 		""";
 	public static final String FRAGMENT_SHADER_SATURATE_ES2
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES2, HEADER_2D_ES2, SAMPLER_2D_ES2);
 	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES2
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES2,
-			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES2, HEADER_OES_ES2, SAMPLER_OES_ES2);
 
 	private static final String FRAGMENT_SHADER_SATURATE_BASE_ES3 =
 		"""
@@ -1488,21 +1478,21 @@ public class ShaderConst implements GLConst {
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
 		uniform float uColorAdjust;
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
-		%s
 		void main() {
 			highp vec4 tex = texture(sTexture, vTextureCoord);
-			highp float intensity = getIntensity(tex.rgb);
+			highp float intensity = dot(tex.rgb, conv);
 			highp vec3 greyScaleColor = vec3(intensity, intensity, intensity);
 			o_FragColor = vec4(mix(greyScaleColor, tex.rgb, uColorAdjust), tex.w);
 		}
 		""";
 	public static final String FRAGMENT_SHADER_SATURATE_ES3
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES3, HEADER_2D_ES3, SAMPLER_2D_ES3);
 	public static final String FRAGMENT_SHADER_EXT_SATURATE_ES3
 		= String.format(FRAGMENT_SHADER_SATURATE_BASE_ES3,
-			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3, FUNC_GET_INTENSITY);
+			SHADER_VERSION_ES3, HEADER_OES_ES3, SAMPLER_OES_ES3);
 
 //--------------------------------------------------------------------------------
 // 球状にレンダリングするフラグメントシェーダー
@@ -2061,11 +2051,11 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 		    vec4 tc = texture2D(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 cl3 = vec3(color, color, color);
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 cl3 = vec3(intensity, intensity, intensity);
 		    gl_FragColor = vec4(cl3, 1.0);
 		}
 		""";
@@ -2088,12 +2078,12 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 cl3 = vec3(color, color, color);
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 cl3 = vec3(intensity, intensity, intensity);
 		    o_FragColor = vec4(cl3, 1.0);
 		}
 		""";
@@ -2117,11 +2107,11 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		void main() {
 		    vec4 tc = texture2D(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 cl3 = vec3(color, color, color);
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 cl3 = vec3(intensity, intensity, intensity);
 		    gl_FragColor = vec4(clamp(vec3(1.0, 1.0, 1.0) - cl3, 0.0, 1.0), 1.0);
 		}
 		""";
@@ -2144,12 +2134,12 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 cl3 = vec3(color, color, color);
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 cl3 = vec3(intensity, intensity, intensity);
 		    o_FragColor = vec4(clamp(vec3(1.0, 1.0, 1.0) - cl3, 0.0, 1.0), 1.0);
 		}
 		""";
@@ -2174,12 +2164,13 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		void main() {
 		    vec4 tc = texture2D(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 bin = step(0.3, vec3(color, color, color));
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 grayScale = vec3(intensity, intensity, intensity);
+		    vec3 bin = step(0.3, grayScale);
 		    gl_FragColor = vec4(cl * bin, 1.0);
 		}
 		""";
@@ -2217,13 +2208,14 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 bin = step(0.3, vec3(color, color, color));
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 grayScale = vec3(intensity, intensity, intensity);
+		    vec3 bin = step(0.3, grayScale);
 		    o_FragColor = vec4(cl * bin, 1.0);
 		}
 		""";
@@ -2267,7 +2259,7 @@ public class ShaderConst implements GLConst {
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
 		uniform vec2 uTexOffset[9];
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		void main() {
 		    vec4 ave = vec4(0.0);
@@ -2281,8 +2273,8 @@ public class ShaderConst implements GLConst {
 		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[6]) / 9.0;
 		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[7]) / 9.0;
 		    ave += texture2D(sTexture, vTextureCoord + uTexOffset[8]) / 9.0;
-		    float threshold = dot(ave.rgb, conv);
-		    float intensity = dot(tc.rgb, conv);
+		    highp float threshold = dot(ave.rgb, conv);
+		    highp float intensity = dot(tc.rgb, conv);
 		    vec3 bin = step(threshold, vec3(intensity, intensity, intensity));
 		    gl_FragColor = vec4(cl * bin, 1.0);
 		}
@@ -2323,7 +2315,7 @@ public class ShaderConst implements GLConst {
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
 		uniform vec2 uTexOffset[9];
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
@@ -2338,8 +2330,8 @@ public class ShaderConst implements GLConst {
 		    ave += texture(sTexture, vTextureCoord + uTexOffset[6]) / 9.0;
 		    ave += texture(sTexture, vTextureCoord + uTexOffset[7]) / 9.0;
 		    ave += texture(sTexture, vTextureCoord + uTexOffset[8]) / 9.0;
-		    float threshold = dot(ave.rgb, conv);
-		    float intensity = dot(tc.rgb, conv);
+		    highp float threshold = dot(ave.rgb, conv);
+		    highp float intensity = dot(tc.rgb, conv);
 		    vec3 bin = step(threshold, vec3(intensity, intensity, intensity));
 		    o_FragColor = vec4(cl * bin, 1.0);
 		}
@@ -2379,12 +2371,13 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		varying vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		void main() {
 		    vec4 tc = texture2D(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 bin = step(0.3, vec3(color, color, color));
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 grayScale = vec3(intensity, intensity, intensity);
+		    vec3 bin = step(0.3, grayScale);
 		    gl_FragColor = vec4(cl * (vec3(1.0, 1.0, 1.0) - bin), 1.0);
 		}
 		""";
@@ -2422,13 +2415,14 @@ public class ShaderConst implements GLConst {
 		precision mediump float;
 		in vec2 vTextureCoord;
 		uniform %s sTexture;
-		const vec3 conv = vec3(0.3, 0.59, 0.11);
+		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		const vec3 cl = vec3(%s);
 		layout(location = 0) out vec4 o_FragColor;
 		void main() {
 		    vec4 tc = texture(sTexture, vTextureCoord);
-		    float color = dot(tc.rgb, conv);
-		    vec3 bin = step(0.3, vec3(color, color, color));
+		    highp float intensity = dot(tc.rgb, conv);
+		    highp vec3 grayScale = vec3(intensity, intensity, intensity);
+		    vec3 bin = step(0.3, grayScale);
 		    o_FragColor = vec4(cl * (vec3(1.0, 1.0, 1.0) - bin), 1.0);
 		}
 		""";
