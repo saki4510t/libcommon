@@ -27,6 +27,7 @@ import android.opengl.EGLExt;
 import android.opengl.EGLSurface;
 import android.opengl.GLES10;
 import android.opengl.GLES20;
+import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.gl.GLUtils;
@@ -35,12 +36,14 @@ import com.serenegiant.system.BuildCheck;
 import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 
 /**
  * EGLレンダリングコンテキストを生成＆使用するためのヘルパークラス
  * 直接インスタンス生成せずにEGLBaseのヘルパーメソッドを使うこと
  * XXX EGLBaseの中かinternalsパッケージに移動するかも
  */
+@RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 /*package*/ class EGLBase14 extends EGLBase {	// API >= 17
 	private static final boolean DEBUG = false;	// TODO set false on release
 	private static final String TAG = EGLBase14.class.getSimpleName();
