@@ -512,6 +512,7 @@ import androidx.annotation.RequiresApi;
 		EGL14.eglWaitNative(EGL14.EGL_CORE_NATIVE_ENGINE);
 	}
 
+	private static int sMinerVersionES3 = 2;
 	/**
 	 * 初期化の下請け
 	 * @param maxClientVersion
@@ -548,12 +549,28 @@ import androidx.annotation.RequiresApi;
 			if (DEBUG) Log.d(TAG, "init:GLES3で取得できるかどうか試してみる");
 			config = getConfig(3, withDepthBuffer, stencilBits, isRecordable);
 			if (config != null) {
-				final EGLContext context = createContext(sharedContext, config, 3);
-				if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {
-					// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
-					mEglConfig = wrap(config);
-					mContext = wrap(context);
-					mGlVersion = 3;
+				int minerVersion;
+				if (BuildCheck.isAPI24()) {
+					minerVersion = 2;
+				} else if (BuildCheck.isAPI21()) {
+					minerVersion = 1;
+				} else {
+					minerVersion = 0;
+				}
+				minerVersion = Math.min(minerVersion, sMinerVersionES3);
+				for (int miner = minerVersion; miner >= 0; miner--) {
+					final EGLContext context = createContext(sharedContext, config, 3, miner);
+					if (EGL14.eglGetError() == EGL14.EGL_SUCCESS) {
+						// ここは例外生成したくないのでcheckEglErrorの代わりに自前でチェック
+						mEglConfig = wrap(config);
+						mContext = wrap(context);
+						mGlVersion = 3;
+						sMinerVersionES3 = miner;
+						break;
+					}
+				}
+				if (!isValidContext()) {
+					sMinerVersionES3 = 0;
 				}
 			}
 		}
@@ -567,7 +584,7 @@ import androidx.annotation.RequiresApi;
 			}
 			try {
 				// create EGL rendering context
-				final EGLContext context = createContext(sharedContext, config, 2);
+				final EGLContext context = createContext(sharedContext, config, 2, 0);
 				checkEglError("eglCreateContext");
 				mEglConfig = wrap(config);
 				mContext = wrap(context);
@@ -579,7 +596,7 @@ import androidx.annotation.RequiresApi;
 						throw new RuntimeException("chooseConfig failed");
 					}
 					// create EGL rendering context
-					final EGLContext context = createContext(sharedContext, config, 2);
+					final EGLContext context = createContext(sharedContext, config, 2, 0);
 					checkEglError("eglCreateContext");
 					mEglConfig = wrap(config);
 					mContext = wrap(context);
@@ -594,7 +611,7 @@ import androidx.annotation.RequiresApi;
 				throw new RuntimeException("chooseConfig failed");
 			}
 			// create EGL rendering context
-			final EGLContext context = createContext(sharedContext, config, 1);
+			final EGLContext context = createContext(sharedContext, config, 1, 0);
 			checkEglError("eglCreateContext");
 			mEglConfig = wrap(config);
 			mContext = wrap(context);
@@ -657,14 +674,19 @@ import androidx.annotation.RequiresApi;
 	}
 
     private EGLContext createContext(final Context sharedContext,
-    	final EGLConfig config, final int version) {
+    	final EGLConfig config, final int version, final int minerVersion) {
 
 		if (DEBUG) Log.v(TAG, "createContext:version=" + version);
 
         final int[] attrib_list = {
         	EGL14.EGL_CONTEXT_CLIENT_VERSION, version,
-        	EGL14.EGL_NONE
+			EGL14.EGL_NONE, EGL14.EGL_NONE,
+        	EGL14.EGL_NONE,
         };
+		if ((version >= 3) && (minerVersion > 0)) {
+			attrib_list[2] = EGLExt.EGL_CONTEXT_MINOR_VERSION_KHR;
+			attrib_list[3] = minerVersion;
+		}
 		final EGLContext context = EGL14.eglCreateContext(mEglDisplay,
 			config, sharedContext.eglContext, attrib_list, 0);
 //		checkEglError("eglCreateContext");
