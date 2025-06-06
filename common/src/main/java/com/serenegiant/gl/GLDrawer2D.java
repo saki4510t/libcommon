@@ -255,8 +255,8 @@ public class GLDrawer2D implements GLConst {
 					  : (isOES ? FRAGMENT_SHADER_EXT_ES2 : FRAGMENT_SHADER_ES2);
 
 		texTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GL_TEXTURE_2D;
-		pVertex = BufferHelper.createFloatBuffer(_vertices);
-		pTexCoord = BufferHelper.createFloatBuffer(_texcoord);
+		pVertex = BufferHelper.createBuffer(_vertices);
+		pTexCoord = BufferHelper.createBuffer(_texcoord);
 
 		// モデルビュー変換行列を初期化
 		Matrix.setIdentityM(mMvpMatrix, 0);

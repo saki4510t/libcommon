@@ -22,6 +22,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -263,7 +264,17 @@ public class BufferHelper {
 	 * @param coords
 	 * @return
 	 */
+	@Deprecated
 	public static FloatBuffer createFloatBuffer(@NonNull final float[] coords) {
+		return createBuffer(coords);
+	}
+
+	/**
+	 * 引数のfloat配列と同じ長さのFloatBufferを生成して引数の値をセットする
+	 * @param coords
+	 * @return
+	 */
+	public static FloatBuffer createBuffer(@NonNull final float[] coords) {
 		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
 		final FloatBuffer result
 			= ByteBuffer.allocateDirect(coords.length * SIZEOF_FLOAT_BYTES)
@@ -271,7 +282,26 @@ public class BufferHelper {
 		result.put(coords).flip();
 		return result;
 	}
-	
+
+	/**
+	 * int1つのサイズ[バイト]
+	 */
+	public static final int SIZEOF_INT_BYTES = Integer.SIZE / 8;
+
+	/**
+	 * 引数のint配列と同じ長さのIntBufferを生成して引数の値をセットする
+	 * @param array
+	 * @return
+	 */
+	public static IntBuffer createBuffer(@NonNull final int[] array) {
+		// Allocate a direct ByteBuffer, using 4 bytes per float, and copy coords into it.
+		final IntBuffer result
+			= ByteBuffer.allocateDirect(array.length * SIZEOF_INT_BYTES)
+			.order(ByteOrder.nativeOrder()).asIntBuffer();
+		result.put(array).flip();
+		return result;
+	}
+
 	/**
 	 * 16進文字列をパースしてByteBufferとして返す
 	 * @param hexString
