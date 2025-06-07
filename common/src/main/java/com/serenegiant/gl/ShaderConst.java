@@ -29,6 +29,8 @@ import androidx.annotation.Size;
 public class ShaderConst implements GLConst {
 	public static final String SHADER_VERSION_ES2 = "#version 100\n";
 	public static final String SHADER_VERSION_ES3 = "#version 300 es\n";
+	public static final String SHADER_VERSION_ES31 = "#version 310 es\n";
+	public static final String SHADER_VERSION_ES32 = "#version 320 es\n";
 
 	@Deprecated
 	public static final String HEADER_2D = "";
@@ -196,6 +198,41 @@ public class ShaderConst implements GLConst {
 		}
 		""";
 
+	/**
+	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
+	 * for ES3
+	 */
+	public static final String VERTEX_SHADER_ES31 =
+		"""
+		#version 310 es
+		uniform mat4 uMVPMatrix;
+		uniform mat4 uTexMatrix;
+		in highp vec4 aPosition;
+		in highp vec4 aTextureCoord;
+		out highp vec2 vTextureCoord;
+		void main() {
+		    gl_Position = uMVPMatrix * aPosition;
+		    vTextureCoord = (uTexMatrix * aTextureCoord).xy;
+		}
+		""";
+
+	/**
+	 * モデルビュー変換行列とテクスチャ変換行列適用するだけの頂点シェーダー
+	 * for ES3
+	 */
+	public static final String VERTEX_SHADER_ES32 =
+		"""
+		#version 320 es
+		uniform mat4 uMVPMatrix;
+		uniform mat4 uTexMatrix;
+		in highp vec4 aPosition;
+		in highp vec4 aTextureCoord;
+		out highp vec2 vTextureCoord;
+		void main() {
+		    gl_Position = uMVPMatrix * aPosition;
+		    vTextureCoord = (uTexMatrix * aTextureCoord).xy;
+		}
+		""";
 //--------------------------------------------------------------------------------
 // フラグメントシェーダー
 	/**
