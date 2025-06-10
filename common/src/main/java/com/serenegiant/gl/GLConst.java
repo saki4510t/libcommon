@@ -21,6 +21,8 @@ package com.serenegiant.gl;
 import android.opengl.GLES11Ext;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.opengl.GLES31;
+import android.opengl.GLES32;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -100,6 +102,10 @@ public interface GLConst {
 		GLES20.GL_NEAREST,
 		GLES30.GL_LINEAR,
 		GLES30.GL_NEAREST,
+		GLES31.GL_LINEAR,
+		GLES31.GL_NEAREST,
+		GLES32.GL_LINEAR,
+		GLES32.GL_NEAREST,
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface MinMagFilter {}
@@ -111,6 +117,12 @@ public interface GLConst {
 		GLES30.GL_REPEAT,
 		GLES30.GL_MIRRORED_REPEAT,
 		GLES30.GL_CLAMP_TO_EDGE,
+		GLES31.GL_REPEAT,
+		GLES31.GL_MIRRORED_REPEAT,
+		GLES31.GL_CLAMP_TO_EDGE,
+		GLES32.GL_REPEAT,
+		GLES32.GL_MIRRORED_REPEAT,
+		GLES32.GL_CLAMP_TO_EDGE,
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface Wrap {}
@@ -120,6 +132,12 @@ public interface GLConst {
 		GLES20.GL_FRAGMENT_SHADER,
 		GLES30.GL_VERTEX_SHADER,
 		GLES30.GL_FRAGMENT_SHADER,
+		GLES31.GL_VERTEX_SHADER,
+		GLES31.GL_FRAGMENT_SHADER,
+		GLES31.GL_COMPUTE_SHADER,
+		GLES32.GL_VERTEX_SHADER,
+		GLES32.GL_FRAGMENT_SHADER,
+		GLES32.GL_COMPUTE_SHADER,
 	})
 	@Retention(RetentionPolicy.SOURCE)
 	public @interface ShaderType {}
