@@ -206,9 +206,10 @@ public abstract class GLSurface implements IGLSurface {
 	/** オフスクリーンのカラーバッファに使うテクスチャ名 */
 	protected int mFBOTexId = GL_NO_TEXTURE;
 	/** // オフスクリーン用のバッファオブジェクト */
-	protected int mDepthBufferObj = GL_NO_BUFFER, mFrameBufferObj = GL_NO_BUFFER;
+	protected int mDepthBufferObj = GL_NO_BUFFER;
+	protected int mFrameBufferObj = GL_NO_BUFFER;
 	/** テクスチャ座標変換行列 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	protected final float[] mTexMatrix = new float[16];
 	protected int viewPortX, viewPortY, viewPortWidth, viewPortHeight;
