@@ -21,6 +21,7 @@ package com.serenegiant.libcommon
 import android.content.Context
 import android.graphics.Color
 import android.media.effect.EffectContext
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -55,6 +56,7 @@ import com.serenegiant.mediaeffect.MediaEffectGLEmboss
 import com.serenegiant.mediaeffect.MediaEffectGLErosion
 import com.serenegiant.mediaeffect.MediaEffectGLExposure
 import com.serenegiant.mediaeffect.MediaEffectGLExtraction
+import com.serenegiant.mediaeffect.MediaEffectGLHistogram
 import com.serenegiant.mediaeffect.MediaEffectGLMaskedAlphaBlend
 import com.serenegiant.mediaeffect.MediaEffectGLMedian3x3
 import com.serenegiant.mediaeffect.MediaEffectGLNegative
@@ -404,6 +406,15 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLExtraction())	// この設定だとなにもしない
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					mutableListOf(MediaEffectGLHistogram(false))
+				} else {
+					super.buildEffects(effectContext)
+				}
 			}
 		},
 		object : MediaEffectPipeline.EffectsBuilder{

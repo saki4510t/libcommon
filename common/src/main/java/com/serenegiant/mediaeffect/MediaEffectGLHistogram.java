@@ -1,0 +1,130 @@
+package com.serenegiant.mediaeffect;
+/*
+ * libcommon
+ * utility/helper classes for myself
+ *
+ * Copyright (c) 2014-2025 saki t_saki@serenegiant.com
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+
+import android.opengl.GLES20;
+import android.os.Build;
+import android.util.Log;
+
+import com.serenegiant.gl.GLHistogram;
+import com.serenegiant.gl.GLSurface;
+import com.serenegiant.glutils.IMirror;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+
+@RequiresApi(api = Build.VERSION_CODES.N)
+public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
+	private static final boolean DEBUG = true;
+	private static final String TAG = MediaEffectGLHistogram.class.getSimpleName();
+
+	private final GLHistogram mGLHistogram;
+	private GLSurface mOutputOffscreen;
+	private volatile boolean mEnabled = true;
+
+	public MediaEffectGLHistogram(final boolean isOES) {
+		mGLHistogram = new GLHistogram(isOES);
+	}
+
+	@Override
+	public void setMirror(final int mirror) {
+		mGLHistogram.setMirror(mirror);
+	}
+
+	@Override
+	public int getMirror() {
+		return mGLHistogram.getMirror();
+	}
+
+	@Override
+	public void apply(@NonNull final int[] srcTexIds, final int width, final int height, final int outTexId) {
+		if (!mEnabled) return;
+		if (mOutputOffscreen == null) {
+			mOutputOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false);
+		}
+		if ((outTexId != mOutputOffscreen.getTexId())
+			|| (width != mOutputOffscreen.getWidth())
+			|| (height != mOutputOffscreen.getHeight())) {
+			mOutputOffscreen.assignTexture(outTexId, width, height, null);
+		}
+		mOutputOffscreen.makeCurrent();
+		try {
+			mGLHistogram.draw(
+				width, height,
+				GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
+		} finally {
+			mOutputOffscreen.swap();
+		}
+	}
+
+	@Override
+	public void apply(@NonNull final int[] srcTexIds, @NonNull final GLSurface output) {
+		if (!mEnabled) return;
+		output.makeCurrent();
+		try {
+			// FIXME ここのテクスチャマトリックスもソース側のを使わないとだめかも
+			mGLHistogram.draw(
+				output.getWidth(), output.getHeight(),
+				GLES20.GL_TEXTURE0, srcTexIds[0], output.copyTexMatrix(), 0);
+		} finally {
+			output.swap();
+		}
+	}
+
+	@Override
+	public void apply(final ISource src) {
+		if (!mEnabled) return;
+		final GLSurface output = src.getOutputTexture();
+		final int[] srcTexIds = src.getSourceTexId();
+		output.makeCurrent();
+		try {
+			mGLHistogram.draw(
+				output.getWidth(), output.getHeight(),
+				GLES20.GL_TEXTURE0, srcTexIds[0], src.getTexMatrix(), 0);
+		} finally {
+			output.swap();
+		}
+	}
+
+	@Override
+	public void release() {
+		if (DEBUG) Log.v(TAG, "release:");
+		mGLHistogram.release();
+		if (mOutputOffscreen != null) {
+			mOutputOffscreen.release();
+			mOutputOffscreen = null;
+		}
+	}
+
+	@Override
+	public IMediaEffect resize(final int width, final int height) {
+		return this;
+	}
+
+	@Override
+	public boolean enabled() {
+		return mEnabled;
+	}
+
+	@Override
+	public IMediaEffect setEnable(final boolean enable) {
+		mEnabled = enable;
+		return this;
+	}
+}
