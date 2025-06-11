@@ -31,16 +31,18 @@ import android.graphics.drawable.Drawable;
 import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
-import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ThreadUtils;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -71,10 +73,10 @@ public class SurfaceDrawable extends Drawable {
 	 * 描画要求
 	 */
 	private static final int REQUEST_DRAW = 1;
-	/**
-	 * 映像サイズ変更要求
-	 */
-	private static final int REQUEST_UPDATE_SIZE = 2;
+//	/**
+//	 * 映像サイズ変更要求
+//	 */
+//	private static final int REQUEST_UPDATE_SIZE = 2;
 	/**
 	 * 映像取得用のSurface/Surfacetexture再生成要求
 	 */
@@ -97,7 +99,9 @@ public class SurfaceDrawable extends Drawable {
 	@NonNull
 	private final Callback mCallback;
 	@NonNull
-	private final EglTask mEglTask;
+	private final GLManager mGlManager;
+	@NonNull
+	private final Handler mGLHandler;
 	/**
 	 * Surface/SurfaceTextureを経由して受け取った映像を保持するBitmap
 	 */
@@ -185,33 +189,19 @@ public class SurfaceDrawable extends Drawable {
 		mWidth = mImageWidth = imageWidth;
 		mHeight = mImageHeight = imageHeight;
 		mCallback = callback;
-		mEglTask = new EglTask(maxClientVersion,
-			null, 0,
-			imageWidth, imageHeight) {
-
+		mGlManager = new GLManager();
+		final Handler.Callback handlerCallback
+			= new Handler.Callback() {
 			@Override
-			protected void onStart() {
-				handleOnStart();
-			}
-
-			@Override
-			protected void onStop() {
-				handleOnStop();
-			}
-
-			@Override
-			protected Object processRequest(final int request,
-				final int arg1, final int arg2, final Object obj)
-					throws TaskBreak {
-
-				return handleRequest(request, arg1, arg2, obj);
+			public boolean handleMessage(@NonNull final Message msg) {
+				return SurfaceDrawable.this.handleMessage(msg);
 			}
 		};
+		mGLHandler = mGlManager.createGLHandler(handlerCallback);
 		mBitmap = Bitmap.createBitmap(imageWidth, imageHeight, Bitmap.Config.ARGB_8888);
 		final int bytes = imageWidth * imageHeight * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
-		new Thread(mEglTask, TAG).start();
-		mEglTask.offer(REQUEST_RECREATE_MASTER_SURFACE);
+		mGLHandler.sendEmptyMessage(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 
 	@Override
@@ -225,7 +215,14 @@ public class SurfaceDrawable extends Drawable {
 
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		mEglTask.release();
+		mGlManager.getGLHandler().postAtFrontOfQueue(new Runnable() {
+			@Override
+			public void run() {
+				handleReleaseInputSurface();
+			}
+		});
+		ThreadUtils.NoThrowSleep(50L);
+		mGlManager.release();
 	}
 
 	@Override
@@ -286,7 +283,12 @@ public class SurfaceDrawable extends Drawable {
 	 */
 	public void resize(final int width, final int height) {
 		if ((width != mImageWidth) || (height != mImageHeight)) {
-			mEglTask.offer(REQUEST_UPDATE_SIZE, width, height);
+			mGlManager.runOnGLThread(new Runnable() {
+				@Override
+				public void run() {
+					handleResizeOnGL(width, height);
+				}
+			});
 		}
 	}
 //--------------------------------------------------------------------------------
@@ -300,21 +302,20 @@ public class SurfaceDrawable extends Drawable {
 	}
 
 	protected EGLBase getEgl() {
-		return mEglTask.getEgl();
+		return mGlManager.getEgl();
 	}
 
 	@Deprecated
-	@SuppressWarnings("deprecation")
 	protected EGLBase.IContext<?> getContext() {
-		return mEglTask.getContext();
+		return mGlManager.getGLContext().getContext();
 	}
 
 	protected boolean isGLES3() {
-		return mEglTask.isGLES3();
+		return mGlManager.isGLES3();
 	}
 
 	protected boolean isOES3Supported() {
-		return mEglTask.isOES3Supported();
+		return mGlManager.isGLES3();
 	}
 
 	protected int getTexId() {
@@ -330,14 +331,6 @@ public class SurfaceDrawable extends Drawable {
 //--------------------------------------------------------------------------------
 // ワーカースレッド上での処理
 	/**
-	 * ワーカースレッド開始時の処理(ここはワーカースレッド上)
-	 */
-	@WorkerThread
-	protected final void handleOnStart() {
-		if (DEBUG) Log.v(TAG, "handleOnStart:");
-	}
-
-	/**
 	 * ワーカースレッド終了時の処理(ここはまだワーカースレッド上)
 	 */
 	@WorkerThread
@@ -346,25 +339,23 @@ public class SurfaceDrawable extends Drawable {
 		handleReleaseInputSurface();
 	}
 
-	/**
-	 * ワーカースレッド上でのイベントハンドラ
-	 * @param request
-	 * @param arg1
-	 * @param arg2
-	 * @param obj
-	 * @return
-	 */
 	@WorkerThread
-	protected Object handleRequest(final int request,
-		final int arg1, final int arg2, final Object obj) {
-
-		switch (request) {
-		case REQUEST_DRAW -> handleDraw();
-		case REQUEST_UPDATE_SIZE -> handleResize(arg1, arg2);
-		case REQUEST_RECREATE_MASTER_SURFACE -> handleReCreateInputSurface();
-		default -> { if (DEBUG) Log.v(TAG, "handleRequest:" + request); }
+	protected boolean handleMessage(@NonNull final Message msg) {
+		switch (msg.what) {
+		case REQUEST_DRAW ->  {
+			handleDrawOnGL();
+			return true;
 		}
-		return null;
+		case REQUEST_RECREATE_MASTER_SURFACE -> {
+			handleReCreateInputSurfaceOnGL();
+			return true;
+		}
+		default -> {
+			if (DEBUG) Log.v(TAG, "handleRequest:" + msg);
+		}
+		}
+
+		return false;
 	}
 
 	private int drawCnt;
@@ -373,18 +364,17 @@ public class SurfaceDrawable extends Drawable {
 	 * 受け取ったテクスチャをオフスクリーン描画してBitmapへ読み込む
 	 */
 	@WorkerThread
-	protected void handleDraw() {
+	protected void handleDrawOnGL() {
 		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
-		mEglTask.removeRequest(REQUEST_DRAW);
 		try {
-			mEglTask.makeCurrent();
+			mGlManager.makeDefault();
 			GLES20.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
 			mInputTexture.updateTexImage();
 			mInputTexture.getTransformMatrix(mTexMatrix);
 		} catch (final Exception e) {
 			Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
-			mEglTask.swap();
+			mGlManager.swap();
 			return;
 		}
 		if ((mOffscreenSurface == null) || (mOffscreenSurface.getWidth() != mImageWidth)
@@ -401,7 +391,7 @@ public class SurfaceDrawable extends Drawable {
 			// オフスクリーンのバックバッファから読み込み
 			mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
 		}
-		mEglTask.swap();
+		mGlManager.swap();
 		// Bitmapへ代入
 		synchronized (mBitmap) {
 			mBitmap.copyPixelsFromBuffer(mWorkBuffer);
@@ -428,7 +418,7 @@ public class SurfaceDrawable extends Drawable {
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleResize(final int width, final int height) {
+	protected void handleResizeOnGL(final int width, final int height) {
 		if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 		if ((mImageWidth != width) || (mImageHeight != height)) {
 			synchronized (mSync) {
@@ -452,11 +442,11 @@ public class SurfaceDrawable extends Drawable {
 	 */
 	@SuppressLint("NewApi")
 	@WorkerThread
-	protected void handleReCreateInputSurface() {
+	protected void handleReCreateInputSurfaceOnGL() {
 		if (DEBUG) Log.v(TAG, "handleReCreateInputSurface:");
-		mEglTask.makeCurrent();
+		mGlManager.makeDefault();
 		handleReleaseInputSurface();
-		mEglTask.makeCurrent();
+		mGlManager.makeDefault();
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
 		mTexId = GLUtils.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mInputTexture = new SurfaceTexture(mTexId);
@@ -554,7 +544,7 @@ public class SurfaceDrawable extends Drawable {
 		@Override
 		public void onFrameAvailable(final SurfaceTexture surfaceTexture) {
 //			if (DEBUG) Log.v(TAG, "onFrameAvailable:");
-			mEglTask.offer(REQUEST_DRAW);
+			mGLHandler.sendEmptyMessage(REQUEST_DRAW);
 		}
 	};
 
