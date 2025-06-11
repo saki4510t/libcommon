@@ -460,6 +460,19 @@ public class GLContext implements EGLConst {
 	}
 
 	/**
+	 * EGL/GL|ESコンテキストが初期化済みかどうかを取得
+	 * @return
+	 */
+	public boolean isInitialized() {
+		mLock.lock();
+		try {
+			return mEgl != null && mEgl.isValidContext();
+		} finally {
+			mLock.unlock();
+		}
+	}
+
+	/**
 	 * GLコンテキストを保持しているスレッド上かどうかを取得
 	 * @return
 	 */
