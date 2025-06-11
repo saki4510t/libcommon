@@ -174,15 +174,15 @@ public class GLHistogram implements IMirror {
 		layout(std430, binding = 1) buffer Histogram {
 			uint counts[256 * 5];
 		};
-		uniform vec2 uTexSize;
+		uniform vec4 uROI[2];
 		uniform mat4 uTexMatrix;
 		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		
 		void main() {
 			vec4 pos = vec4(vec2(gl_GlobalInvocationID.xy), 0.0, 1.0);
 			vec2 uv = (uMVPMatrix * pos).xy;
-			if (uv.x >= uTexSize.x || uv.y >= uTexSize.y) return;
-			vec4 color = texture(srcImage, uv / uTexSize);
+			if ((uv.x < uROI[0].x) || (uv.x >= uROI[1].x) || (uv.y < uROI[0].y) || (uv.y >= uROI[1].y)) return;
+			vec4 color = texture(srcImage, uv / uROI[1]);
 		
 			// Assuming color values are in the range [0.0, 1.0]
 			// Convert to integer intensity [0, 255]
@@ -446,9 +446,9 @@ public class GLHistogram implements IMirror {
 	private final HistogramDrawer mComputeDrawer;
 	private final HistogramDrawer mRendererDrawer;
 	private final int mComputeProgram;
-	private final int muTexSizeLoc;
+	private final int muROILoc;
 	private final int muTexMatrixLoc;
-	private final float[] mTexSize = new float[2];
+	private final float[] mROI = new float[4];
 	/**
 	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
 	 */
@@ -491,14 +491,14 @@ public class GLHistogram implements IMirror {
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader");
 			mComputeProgram = ComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:mComputeProgram=" + mComputeProgram);
-			muTexSizeLoc = GLES31.glGetUniformLocation(mComputeProgram, "texSize");
-			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(texSize)");
+			muROILoc = GLES31.glGetUniformLocation(mComputeProgram, "uROI");
+			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uROI)");
 			muTexMatrixLoc = GLES31.glGetUniformLocation(mComputeProgram, "uTexMatrix");
 			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uTexMatrix)");
-			if (DEBUG) Log.v(TAG, "コンストラクタ:mTexSizeLoc=" + muTexSizeLoc);
+			if (DEBUG) Log.v(TAG, "コンストラクタ:muROILoc=" + muROILoc + ",muTexMatrixLoc=" + muTexMatrixLoc);
 		} else {
 			mComputeProgram = -1;
-			muTexSizeLoc = -1;
+			muROILoc = -1;
 			muTexMatrixLoc = -1;
 			mComputeDrawer = new HistogramDrawer(isOES,
 				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31) {
@@ -554,10 +554,10 @@ public class GLHistogram implements IMirror {
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram);
-				// テクスチャサイズをセット
-				mTexSize[0] = width;
-				mTexSize[1] = height;
-				GLES31.glUniform2fv(muTexSizeLoc, 1, mTexSize, 0);
+				// ROIをセット、今はテクスチャ全面をカウント対象とする, (0,0)-(width,height)
+				mROI[0] = 0; mROI[1] = 0;
+				mROI[2] = width; mROI[3] = height;
+				GLES31.glUniform2fv(muROILoc, 2, mROI, 0);
 				// テクスチャ変換行列をバインド
 				GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset);
 				// ヒストグラム用バッファをクリアしてバインド
