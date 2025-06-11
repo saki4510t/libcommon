@@ -521,8 +521,8 @@ public class GLHistogram implements IMirror {
 		}
 	}
 
-	private long cnt = 0;
-	private long drawTimeNs = 0;
+//	private long cnt = 0;
+//	private long drawTimeNs = 0;
 	/**
 	 * ヒストグラムのカウントと描画を実行
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
@@ -571,10 +571,10 @@ public class GLHistogram implements IMirror {
 			}
 		}
 		mRendererDrawer.draw(texUnit, texId, texMatrix, texOffset);
-		drawTimeNs += System.nanoTime() - startTimeNs;
-		if (DEBUG && (++cnt %100 == 0)) {
-			Log.i(TAG, "draw time=" + drawTimeNs / 1000000f / cnt + "ms,fps=" + (cnt / (drawTimeNs / 1000000000f)));
-		}
+//		drawTimeNs += System.nanoTime() - startTimeNs;
+//		if (DEBUG && (++cnt %100 == 0)) {
+//			Log.i(TAG, "draw time=" + drawTimeNs / 1000000f / cnt + "ms,fps=" + (cnt / (drawTimeNs / 1000000000f)));
+//		}
 	}
 
 	/**
