@@ -174,15 +174,15 @@ public class GLHistogram implements IMirror {
 		layout(std430, binding = 1) buffer Histogram {
 			uint counts[256 * 5];
 		};
-		uniform highp ivec2 texSize;
+		uniform vec2 uTexSize;
+		uniform mat4 uTexMatrix;
 		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		
 		void main() {
-			ivec2 uv = ivec2(gl_GlobalInvocationID.xy);
-//			ivec2 texSize = imageSize(srcImage);
-			if (uv.x >= texSize.x || uv.y >= texSize.y) return;
-//			vec4 color = imageLoad(srcImage, uv);
-			vec4 color = texture(srcImage, vec2(float(uv.x) / float(texSize.x), float(uv.y) / float(texSize.y)));
+			vec4 pos = vec4(vec2(gl_GlobalInvocationID.xy), 0.0, 1.0);
+			vec2 uv = (uMVPMatrix * pos).xy;
+			if (uv.x >= uTexSize.x || uv.y >= uTexSize.y) return;
+			vec4 color = texture(srcImage, uv / uTexSize);
 		
 			// Assuming color values are in the range [0.0, 1.0]
 			// Convert to integer intensity [0, 255]
@@ -197,10 +197,10 @@ public class GLHistogram implements IMirror {
 			uint countsB = atomicAdd(counts[512u + indexB], 1u) + 1u;
 			uint countsI = atomicAdd(counts[768u + indexI], 1u) + 1u;
 			// 最大値を更新
-			atomicMax(counts[1024u], countsR);
-			atomicMax(counts[1025u], countsG);
-			atomicMax(counts[1026u], countsB);
-			atomicMax(counts[1027u], countsI);
+//			atomicMax(counts[1024u], countsR);
+//			atomicMax(counts[1025u], countsG);
+//			atomicMax(counts[1026u], countsB);
+//			atomicMax(counts[1027u], countsI);
 			atomicMax(counts[1028u], max(max(max(countsR, countsG), countsB), countsI));
 		}
 		""";
@@ -446,8 +446,9 @@ public class GLHistogram implements IMirror {
 	private final HistogramDrawer mComputeDrawer;
 	private final HistogramDrawer mRendererDrawer;
 	private final int mComputeProgram;
-	private final int mTexSizeLoc;
-	private final int[] mTexSize = new int[2];
+	private final int muTexSizeLoc;
+	private final int muTexMatrixLoc;
+	private final float[] mTexSize = new float[2];
 	/**
 	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
 	 */
@@ -490,12 +491,15 @@ public class GLHistogram implements IMirror {
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader");
 			mComputeProgram = ComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:mComputeProgram=" + mComputeProgram);
-			mTexSizeLoc = GLES31.glGetUniformLocation(mComputeProgram, "texSize");
+			muTexSizeLoc = GLES31.glGetUniformLocation(mComputeProgram, "texSize");
 			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(texSize)");
-			if (DEBUG) Log.v(TAG, "コンストラクタ:mTexSizeLoc=" + mTexSizeLoc);
+			muTexMatrixLoc = GLES31.glGetUniformLocation(mComputeProgram, "uTexMatrix");
+			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uTexMatrix)");
+			if (DEBUG) Log.v(TAG, "コンストラクタ:mTexSizeLoc=" + muTexSizeLoc);
 		} else {
 			mComputeProgram = -1;
-			mTexSizeLoc = -1;
+			muTexSizeLoc = -1;
+			muTexMatrixLoc = -1;
 			mComputeDrawer = new HistogramDrawer(isOES,
 				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31) {
 				@Override
@@ -550,10 +554,12 @@ public class GLHistogram implements IMirror {
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram);
+				// テクスチャサイズをセット
 				mTexSize[0] = width;
 				mTexSize[1] = height;
-				GLES31.glUniform2iv(mTexSizeLoc, 1, mTexSize, 0);
-				// FIXME 未実装 テクスチャ変換行列をバインド
+				GLES31.glUniform2fv(muTexSizeLoc, 1, mTexSize, 0);
+				// テクスチャ変換行列をバインド
+				GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset);
 				// ヒストグラム用バッファをクリアしてバインド
 				clearAndBindHistogramBuffer(mHistogramRGBId);
 				// ソース映像のテクスチャをバインド
@@ -563,6 +569,7 @@ public class GLHistogram implements IMirror {
 				GLUtils.checkGlError("draw:glBindTexture,texUnit=" + texUnit);
 //				GLES31.glBindImageTexture(0, texId, 0, false, 0, GLES31.GL_READ_ONLY, GLES31.GL_RGBA8);
 //				GLUtils.checkGlError("draw:glBindImageTexture");
+				// コンピュート実効
 				GLES31.glDispatchCompute((width + 15) / 16, (height + 15) / 16, 1);
 				GLUtils.checkGlError("draw:glDispatchCompute");
 				GLES31.glMemoryBarrier(GLES31.GL_SHADER_STORAGE_BARRIER_BIT | GLES31.GL_BUFFER_UPDATE_BARRIER_BIT);
