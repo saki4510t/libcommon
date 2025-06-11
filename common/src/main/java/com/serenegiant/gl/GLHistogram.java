@@ -361,11 +361,11 @@ public class GLHistogram implements IMirror {
 		 */
 		protected void bindTexture(final int texLoc, @TexUnit final int texUnit, final int texId) {
 			GLES31.glActiveTexture(texUnit);
-			GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=" + texUnit + ",loc=" + texLoc);
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=" + texUnit + ",loc=" + texLoc);
 			GLES31.glBindTexture(texTarget, texId);
-			GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=" + texUnit + ",loc=" + texLoc);
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=" + texUnit + ",loc=" + texLoc);
 			GLES31.glUniform1i(texLoc, GLUtils.gLTextureUnit2Index(texUnit));
-			GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=" + texUnit + ",loc=" + texLoc);
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=" + texUnit + ",loc=" + texLoc);
 		}
 
 		/**
@@ -564,14 +564,14 @@ public class GLHistogram implements IMirror {
 				clearAndBindHistogramBuffer(mHistogramRGBId);
 				// ソース映像のテクスチャをバインド
 				GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
-				GLUtils.checkGlError("draw:glActiveTexture,texUnit=" + texUnit);
+				if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture,texUnit=" + texUnit);
 				GLES31.glBindTexture(texTarget, texId);
-				GLUtils.checkGlError("draw:glBindTexture,texUnit=" + texUnit);
+				if (DEBUG) GLUtils.checkGlError("draw:glBindTexture,texUnit=" + texUnit);
 //				GLES31.glBindImageTexture(0, texId, 0, false, 0, GLES31.GL_READ_ONLY, GLES31.GL_RGBA8);
-//				GLUtils.checkGlError("draw:glBindImageTexture");
+//				if (DEBUG) GLUtils.checkGlError("draw:glBindImageTexture");
 				// コンピュート実効
 				GLES31.glDispatchCompute((width + 15) / 16, (height + 15) / 16, 1);
-				GLUtils.checkGlError("draw:glDispatchCompute");
+				if (DEBUG) GLUtils.checkGlError("draw:glDispatchCompute");
 				GLES31.glMemoryBarrier(GLES31.GL_SHADER_STORAGE_BARRIER_BIT | GLES31.GL_BUFFER_UPDATE_BARRIER_BIT);
 			} else {
 				mComputeDrawer.draw(texUnit, texId, texMatrix, texOffset);
@@ -659,18 +659,18 @@ public class GLHistogram implements IMirror {
 		// 以降バッファIDとして0を指定するまではGL_SHADER_STORAGE_BUFFERを
 		// 指定したバッファの操作は全てこのbufferIDで示すバッファに対して行われる
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, bufferId);
-		GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(" + bufferId + ")");
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(" + bufferId + ")");
 		resetClearBuffer();
 		GLES31.glBufferSubData(GLES31.GL_SHADER_STORAGE_BUFFER,
 			0, SIZEOF_INT_BYTES * mClearBuffer.capacity(),	// sizeはバイト数なので注意
 			mClearBuffer);
-		GLUtils.checkGlError("clearAndBindHistogramBuffer:glBufferData");
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBufferData");
 		// バッファの指定をクリア
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0);
-		GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)");
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)");
 		// シェーダーへバインド
 		GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, bufferId);
-		GLUtils.checkGlError("initHistogramBuffer:glBindBufferBase");
+		if (DEBUG) GLUtils.checkGlError("initHistogramBuffer:glBindBufferBase");
 	}
 
 }
