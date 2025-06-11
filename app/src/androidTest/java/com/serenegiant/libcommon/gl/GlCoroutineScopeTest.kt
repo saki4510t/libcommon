@@ -20,6 +20,7 @@ package com.serenegiant.libcommon.gl
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.serenegiant.gl.GLInfo
+import com.serenegiant.gl.GLManager
 import com.serenegiant.gl.glCoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.runBlocking
@@ -34,6 +35,9 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class GlCoroutineScopeTest {
+	/**
+	 * 新規スレッドでGLコンテキストを生成して実行するためのGLCoroutineScopeのテスト
+	 */
 	@Test
 	fun glCoroutineScopeTest1() {
 		val scope = glCoroutineScope()
@@ -52,5 +56,30 @@ class GlCoroutineScopeTest {
 			}
 		}
 		scope.cancel()
+	}
+
+	/**
+	 * 既存のGLManagerのGLコンテキスト上で実行するためのGLCoroutineScopeのテスト
+	 */
+	@Test
+	fun glCoroutineScopeTest2() {
+		val glManager = GLManager()
+		val scope = glManager.glCoroutineScope()
+		runBlocking(scope.coroutineContext) {
+			try {
+				val info = GLInfo.getOnGL(scope.egl)
+//				Log.i("GlCoroutineScopeTest", info.toString())
+				val glInfo = info.get("GL_INFO") as JSONObject?
+				Assert.assertNotNull(glInfo)
+				Assert.assertNotNull(glInfo!!.get("GL_VERSION"))
+				val eglInfo = info.get("EGL_INFO") as JSONObject?
+				Assert.assertNotNull(eglInfo)
+				Assert.assertNotNull(eglInfo!!.get("EGL_VERSION"))
+			} catch (e: Exception) {
+				fail(e.message)
+			}
+		}
+		scope.cancel()
+		glManager.release()
 	}
 }

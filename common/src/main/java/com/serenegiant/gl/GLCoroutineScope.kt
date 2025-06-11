@@ -22,6 +22,7 @@ import android.util.Log
 import com.serenegiant.egl.EGLBase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.android.asCoroutineDispatcher
 import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.launch
@@ -53,17 +54,23 @@ private class GLCoroutineScopeImpl(
 	override val glContext: GLContext,
 	override val coroutineContext: CoroutineContext
 ) : GLCoroutineScope() {
+	private val mOwnGLContext = !glContext.isInitialized
+
 	init {
 		runBlocking(coroutineContext) {
 			if (DEBUG) Log.v(TAG, "initialize gl context")
-			glContext.initialize()
+			if (!glContext.isInitialized) {
+				glContext.initialize()
+			}
 		}
 		launch {
 			try {
 				awaitCancellation()
 			} finally {
-				if (DEBUG) Log.v(TAG, "release gl context")
-				glContext.release()
+				if (mOwnGLContext) {
+					if (DEBUG) Log.v(TAG, "release gl context")
+					glContext.release()
+				}
 			}
 		}
 	}
@@ -77,4 +84,13 @@ fun glCoroutineScope(): GLCoroutineScope {
 	return GLCoroutineScopeImpl(
 		GLContext(),
 		SupervisorJob() + executor.asCoroutineDispatcher())
+}
+
+/**
+ * 初期化済みのGLManagerからGLCoroutineScopeを取得する拡張関数
+ */
+fun GLManager.glCoroutineScope(): GLCoroutineScope {
+	return GLCoroutineScopeImpl(
+		glContext,
+		SupervisorJob() + glHandler.asCoroutineDispatcher())
 }
