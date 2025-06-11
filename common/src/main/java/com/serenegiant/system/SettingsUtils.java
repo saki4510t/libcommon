@@ -138,7 +138,7 @@ public class SettingsUtils {
 	 * テザリング設定画面
 	 * @param context
 	 */
-	public static void openSettingsThether(@NonNull final Context context) {
+	public static void openSettingsTether(@NonNull final Context context) {
 		final Intent intent = new Intent();
 		intent.setAction(ACTION_TETHER_SETTINGS);
 		context.startActivity(intent);
