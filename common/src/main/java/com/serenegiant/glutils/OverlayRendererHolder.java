@@ -24,6 +24,7 @@ import android.graphics.Canvas;
 import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
@@ -276,14 +277,12 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 
 		@WorkerThread
 		@Override
-		protected Object handleRequest(final int request,
-			final int arg1, final int arg2, final Object obj) {
-
-			Object result = null;
-			if (request == REQUEST_UPDATE_OVERLAY) {
-				handleUpdateOverlay(arg1, (Bitmap)obj);
+		protected boolean handleRequest(@NonNull final Message msg) {
+			boolean result = true;
+			if (msg.what == REQUEST_UPDATE_OVERLAY) {
+				handleUpdateOverlay(msg.arg1, (Bitmap)msg.obj);
 			} else {
-				result = super.handleRequest(request, arg1, arg2, obj);
+				result = super.handleRequest(msg);
 			}
 			return result;
 		}

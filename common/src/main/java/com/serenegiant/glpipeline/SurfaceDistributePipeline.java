@@ -84,7 +84,7 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 			= new Handler.Callback() {
 			@Override
 			public boolean handleMessage(@NonNull final Message msg) {
-				mDistributeTask.handleRequest(msg.what, msg.arg1, msg.arg2, msg.obj);
+				mDistributeTask.handleRequest(msg);
 				return true;
 			}
 		};
@@ -448,10 +448,9 @@ public class SurfaceDistributePipeline extends ProxyPipeline implements IMirror 
 		}
 
 		@Override
-		protected Object handleRequest(final int request,
-			final int arg1, final int arg2, final Object obj) {
+		protected boolean handleRequest(@NonNull final Message msg) {
 			// これはGLManagerから取得したワーカースレッド用Handlerのメッセージコールバックから呼び出せるようにoverride
-			return super.handleRequest(request, arg1, arg2, obj);
+			return super.handleRequest(msg);
 		}
 
 		@Override

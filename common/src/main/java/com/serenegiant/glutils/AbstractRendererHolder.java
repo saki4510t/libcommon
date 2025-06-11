@@ -26,16 +26,19 @@ import androidx.annotation.Nullable;
 import androidx.annotation.Size;
 import androidx.annotation.WorkerThread;
 
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
-import com.serenegiant.egl.EglTask;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
+import com.serenegiant.utils.ThreadUtils;
 
 import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
@@ -366,7 +369,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@NonNull
 		private final AbstractRendererHolder mParent;
 		@NonNull
-		private final EglTask mEglTask;
+		private final GLManager mGlManager;
+		@NonNull
+		private final Handler mGLHandler;
 		@Size(min=16)
 		@NonNull
 		final float[] mTexMatrix = new float[16];
@@ -391,122 +396,121 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 
 			super(width, height, factory);
 			mParent = parent;
-			mEglTask = new EglTask(maxClientVersion, sharedContext, flags) {
+			mGlManager = new GLManager(maxClientVersion, sharedContext, flags, null);
+			mGLHandler = mGlManager.createGLHandler(new Handler.Callback() {
 				@Override
-				protected void onStart() {
+				public boolean handleMessage(@NonNull final Message msg) {
+					return handleRequest(msg);
+				}
+			});
+			mGlManager.runOnGLThread(new Runnable() {
+				@Override
+				public void run() {
 					handleOnStart();
 				}
-
-				@Override
-				protected void onStop() {
-					handleOnStop();
-				}
-
-				@Override
-				protected Object processRequest(
-					final int request, final int arg1, final int arg2, final Object obj)
-						throws TaskBreak {
-
-					return handleRequest(request, arg1, arg2, obj);
-				}
-			};
+			});
 		}
 
 		@Override
 		public void release() {
 			if (DEBUG) Log.v(TAG, "release:");
-			mEglTask.release();
+			mGLHandler.postAtFrontOfQueue(new Runnable() {
+				@Override
+				public void run() {
+					handleOnStop();
+				}
+			});
+			ThreadUtils.NoThrowSleep(50L);
+			mGlManager.release();
 			super.release();
 		}
 
 		@Override
 		public void start(final String tag) {
-			new Thread(mEglTask, tag).start();
 		}
 
 		@Override
 		public boolean waitReady() {
-			return mEglTask.waitReady();
+			return mGlManager.isValid();
 		}
 
 		@Override
 		public boolean isRunning() {
-			return mEglTask.isRunning();
+			return mGlManager.isValid();
 		}
 
 		@Override
 		public boolean isFinished() {
-			return mEglTask.isFinished();
+			return !mGlManager.isValid();
 		}
 
 		@Override
 		public boolean offer(final int request) {
-			return mEglTask.offer(request);
+			return mGLHandler.sendEmptyMessage(request);
 		}
 
 		@Override
 		public boolean offer(final int request, final Object obj) {
-			return mEglTask.offer(request, obj);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, obj));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1) {
-			return mEglTask.offer(request, arg1);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, 0));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1, final int arg2) {
-			return mEglTask.offer(request, arg1, arg2);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, arg2));
 		}
 
 		@Override
 		public boolean offer(final int request, final int arg1, final int arg2, final Object obj) {
-			return mEglTask.offer(request, arg1, arg2, obj);
+			return mGLHandler.sendMessage(mGLHandler.obtainMessage(request, arg1, arg2, obj));
 		}
 
 		@Override
 		public void removeRequest(final int request) {
-			mEglTask.removeRequest(request);
+			mGLHandler.removeMessages(request);
 		}
 
 		@NonNull
 		@Override
 		public EGLBase getEgl() {
-			return mEglTask.getEgl();
+			return mGlManager.getEgl();
 		}
 
 		@NonNull
 		@Override
 		public GLContext getGLContext() {
-			return mEglTask.getGLContext();
+			return mGlManager.getGLContext();
 		}
 
 		@Deprecated
-		@SuppressWarnings("deprecation")
 		@NonNull
 		@Override
 		public EGLBase.IContext<?> getContext() {
-			return mEglTask.getContext();
+			return mGlManager.getGLContext().getContext();
 		}
 
 		@Override
 		public int getGlVersion() {
-			return mEglTask.getGlVersion();
+			return mGlManager.getGLContext().getGlVersion();
 		}
 
 		@Override
 		public void makeCurrent() {
-			mEglTask.makeCurrent();
+			mGlManager.makeDefault();
 		}
 
 		@Override
 		public boolean isGLES3() {
-			return mEglTask.isGLES3();
+			return mGlManager.isGLES3();
 		}
 
 		@Override
 		public boolean isOES3Supported() {
-			return mEglTask.isOES3Supported();
+			return mGlManager.isGLES3();
 		}
 
 		@Override
@@ -666,7 +670,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		 * @param task
 		 */
 		public void queueEvent(@NonNull final Runnable task) {
-			mEglTask.queueEvent(task);
+			mGlManager.runOnGLThread(task);
 		}
 
 		/**

@@ -22,6 +22,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
+import android.os.Message;
 import android.util.Log;
 
 import com.serenegiant.egl.EGLBase;
@@ -229,16 +230,14 @@ public class EffectRendererHolder extends AbstractRendererHolder
 //================================================================================
 // ワーカースレッド上での処理
 //================================================================================
-		@WorkerThread
 		@Override
-		protected Object handleRequest(final int request,
-			final int arg1, final int arg2, final Object obj) {
-
-			Object result = null;
-			switch (request) {
-			case REQUEST_CHANGE_EFFECT -> handleChangeEffect(arg1);
-			case REQUEST_SET_PARAMS -> handleSetParam(arg1, (float[]) obj);
-			default -> result = super.handleRequest(request, arg1, arg2, obj);
+		@WorkerThread
+		protected boolean handleRequest(@NonNull final Message msg) {
+			boolean result = true;
+			switch (msg.what) {
+			case REQUEST_CHANGE_EFFECT -> handleChangeEffect(msg.arg1);
+			case REQUEST_SET_PARAMS -> handleSetParam(msg.arg1, (float[]) msg.obj);
+			default -> result = super.handleRequest(msg);
 			}
 			return result;
 		}

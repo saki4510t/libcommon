@@ -25,6 +25,7 @@ import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.GLES30;
 import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
@@ -408,14 +409,12 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		}
 
 		@Override
-		protected Object handleRequest(final int request,
-			final int arg1, final int arg2, final Object obj) {
-
-			Object result = null;
-			if (request == REQUEST_SET_MASK) {
-				handleSetMask((Bitmap)obj);
+		protected boolean handleRequest(@NonNull final Message msg) {
+			boolean result = true;
+			if (msg.what == REQUEST_SET_MASK) {
+				handleSetMask((Bitmap)msg.obj);
 			} else {
-				result = super.handleRequest(request, arg1, arg2, obj);
+				result = super.handleRequest(msg);
 			}
 
 			return result;
@@ -426,7 +425,7 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		 * Bitmapがnullの時はα=1で全面を塗りつぶす(見えるように赤)
 		 * @param mask
 		 */
-		protected void handleSetMask(@Nullable final Bitmap mask) {
+		private void handleSetMask(@Nullable final Bitmap mask) {
 			if (DEBUG) Log.v(TAG, "handleSetMask:" + mask);
 			GLES20.glActiveTexture(GLES20.GL_TEXTURE2);
 			GLES20.glBindTexture(GL_TEXTURE_EXTERNAL_OES, mMaskTexId);

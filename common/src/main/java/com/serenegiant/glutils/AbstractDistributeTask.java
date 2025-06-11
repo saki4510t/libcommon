@@ -20,6 +20,7 @@ package com.serenegiant.glutils;
 
 import android.annotation.SuppressLint;
 import android.opengl.GLES20;
+import android.os.Message;
 import android.util.Log;
 import android.util.SparseArray;
 
@@ -443,28 +444,27 @@ public abstract class AbstractDistributeTask implements IMirror {
 	}
 
 	@WorkerThread
-	protected Object handleRequest(final int request,
-		final int arg1, final int arg2, final Object obj) {
-
+	protected boolean handleRequest(@NonNull final Message msg) {
 //		if (DEBUG) Log.v(TAG, "handleRequest:" + request);
-		switch (request) {
-		case REQUEST_DRAW -> handleDraw(arg2 != 0, arg1, (float[]) obj);
-		case REQUEST_UPDATE_SIZE -> handleResize(arg1, arg2);
+		switch (msg.what) {
+		case REQUEST_DRAW -> handleDraw(msg.arg2 != 0, msg.arg1, (float[]) msg.obj);
+		case REQUEST_UPDATE_SIZE -> handleResize(msg.arg1, msg.arg2);
 		case REQUEST_ADD_SURFACE -> {
-			if (obj instanceof TargetSurface) {
-				handleAddSurface((TargetSurface) obj);
+			if (msg.obj instanceof TargetSurface) {
+				handleAddSurface((TargetSurface) msg.obj);
 			}
 		}
-		case REQUEST_REMOVE_SURFACE -> handleRemoveSurface(arg1);
+		case REQUEST_REMOVE_SURFACE -> handleRemoveSurface(msg.arg1);
 		case REQUEST_REMOVE_SURFACE_ALL -> handleRemoveAll();
 		case REQUEST_RECREATE_MASTER_SURFACE -> handleReCreateInputSurface();
-		case REQUEST_MIRROR -> handleMirror(0, arg1);
-		case REQUEST_ROTATE -> handleRotate(arg1, arg2);
-		case REQUEST_CLEAR -> handleClear(arg1, arg2);
-		case REQUEST_CLEAR_ALL -> handleClear(0, arg1);
-		case REQUEST_SET_MVP -> handleSetMvp(arg1, arg2, (float[]) obj);
+		case REQUEST_MIRROR -> handleMirror(0, msg.arg1);
+		case REQUEST_ROTATE -> handleRotate(msg.arg1, msg.arg2);
+		case REQUEST_CLEAR -> handleClear(msg.arg1, msg.arg2);
+		case REQUEST_CLEAR_ALL -> handleClear(0, msg.arg1);
+		case REQUEST_SET_MVP -> handleSetMvp(msg.arg1, msg.arg2, (float[]) msg.obj);
 		}
-		return null;
+
+		return false;
 	}
 
 	/**
