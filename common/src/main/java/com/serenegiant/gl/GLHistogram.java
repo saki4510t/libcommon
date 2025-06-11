@@ -108,8 +108,8 @@ public class GLHistogram implements IMirror {
 //			atomicMax(counts[1024u], countsR);
 //			atomicMax(counts[1025u], countsG);
 //			atomicMax(counts[1026u], countsB);
-//			atomicMax(counts[1027u], countsI);
-			atomicMax(counts[1028u], max(max(max(countsR, countsG), countsB), countsI));
+			atomicMax(counts[1027u], countsI);
+			atomicMax(counts[1028u], max(max(countsR, countsG), countsB));
 		}
 		""";
 
@@ -200,8 +200,8 @@ public class GLHistogram implements IMirror {
 //			atomicMax(counts[1024u], countsR);
 //			atomicMax(counts[1025u], countsG);
 //			atomicMax(counts[1026u], countsB);
-//			atomicMax(counts[1027u], countsI);
-			atomicMax(counts[1028u], max(max(max(countsR, countsG), countsB), countsI));
+			atomicMax(counts[1027u], countsI);
+			atomicMax(counts[1028u], max(max(countsR, countsG), countsB));
 		}
 		""";
 
