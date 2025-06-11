@@ -137,7 +137,7 @@ public class GLHistogram implements IMirror {
 			float countsR = float(counts[index]);
 			float countsG = float(counts[index + 256u]);
 			float countsB = float(counts[index + 512u]);
-			float countsI = float(counts[index + 768u]);
+//			float countsI = float(counts[index + 768u]);
 			// 最大値を取得して正規化
 			float max = float(counts[1028u]);
 			vec3 counts = (vec3(countsR, countsG, countsB) / max) * SCALE;
