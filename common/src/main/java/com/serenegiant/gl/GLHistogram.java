@@ -94,10 +94,10 @@ public class GLHistogram implements IMirror {
 		
 			// Assuming color values are in the range [0.0, 1.0]
 			// Convert to integer intensity [0, 255]
-			uint indexR = uint(clamp(color.r * 255.0, 0.0, 255.0));
-			uint indexG = uint(clamp(color.g * 255.0, 0.0, 255.0));
-			uint indexB = uint(clamp(color.b * 255.0, 0.0, 255.0));
-			uint indexI = uint(clamp(dot(color.rgb, conv) * 255.0, 0.0, 255.0));
+			uint indexR = uint(color.r * 255.0);
+			uint indexG = uint(color.g * 255.0);
+			uint indexB = uint(color.b * 255.0);
+			uint indexI = uint(dot(color.rgb, conv) * 255.0);
 		
 			// Atomically increment the histogram bins
 			uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
@@ -186,10 +186,10 @@ public class GLHistogram implements IMirror {
 		
 			// Assuming color values are in the range [0.0, 1.0]
 			// Convert to integer intensity [0, 255]
-			uint indexR = uint(clamp(color.r * 255.0, 0.0, 255.0));
-			uint indexG = uint(clamp(color.g * 255.0, 0.0, 255.0));
-			uint indexB = uint(clamp(color.b * 255.0, 0.0, 255.0));
-			uint indexI = uint(clamp(dot(color.rgb, conv) * 255.0, 0.0, 255.0));
+			uint indexR = uint(color.r * 255.0);
+			uint indexG = uint(color.g * 255.0);
+			uint indexB = uint(color.b * 255.0);
+			uint indexI = uint(dot(color.rgb, conv) * 255.0);
 		
 			// Atomically increment the histogram bins
 			uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
