@@ -128,7 +128,7 @@ import androidx.annotation.RequiresApi;
 				//     とワーニングが出てしまうのでここではsetViewPortを呼ばない
 //				setViewPort(0, 0, getWidth(), getHeight());
 			} else {
-				throw new IllegalArgumentException("unsupported surface");
+				throw new IllegalArgumentException("unsupported surface," + surface);
 			}
 		}
 
