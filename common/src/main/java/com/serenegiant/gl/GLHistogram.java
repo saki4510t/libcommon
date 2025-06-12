@@ -205,13 +205,14 @@ public class GLHistogram implements IMirror {
 		}
 		""";
 
-	private static abstract class HistogramDrawer {
+	private static class HistogramDrawer {
 		/**
 		 * テクスチャターゲット
 		 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
 		 */
 		@TexTarget
 		public final int texTarget;
+		private final int histogramRGBId;
 		/**
 		 * 頂点座標用バッファオブジェクト名
 		 */
@@ -271,8 +272,9 @@ public class GLHistogram implements IMirror {
 		 * @param isOES
 		 * @param fss
 		 */
-		public HistogramDrawer(final boolean isOES, @NonNull final String fss) {
+		public HistogramDrawer(final boolean isOES, final int histogramRGBId, @NonNull final String fss) {
 			texTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GLES31.GL_TEXTURE_2D;
+			this.histogramRGBId = histogramRGBId;
 			VERTEX_NUM = Math.min(DEFAULT_VERTICES_2D.length, DEFAULT_TEXCOORD_2D.length) / 2;
 			VERTEX_SZ = VERTEX_NUM * 2;
 			pVertex = BufferHelper.createBuffer(DEFAULT_VERTICES_2D);
@@ -321,22 +323,7 @@ public class GLHistogram implements IMirror {
 			@Nullable @Size(min=16) final float[] texMatrix, final int texOffset) {
 
 //			if (DEBUG) Log.v(TAG, "compute:");
-			prepareDraw(texUnit, texId, texMatrix, texOffset);
-			GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
-			finishDraw();
-		}
-
-		/**
-		 * ヒストグラムのカウントの準備
-		 * @param texId
-		 * @param texMatrix
-		 * @param texOffset
-		 */
-		private void prepareDraw(
-			@TexUnit final int texUnit, final int texId,
-			@Nullable @Size(min=16) final float[] texMatrix, final int texOffset) {
-
-//			if (DEBUG) Log.v(TAG, "prepare:");
+			// 描画準備
 			GLES31.glUseProgram(hProgram);
 			if (texMatrix != null) {
 				// テクスチャ変換行列が指定されている時
@@ -346,26 +333,19 @@ public class GLHistogram implements IMirror {
 				GLES31.glUniformMatrix4fv(muMVPMatrixLoc, 1, false, mMvpMatrix, 0);
 			}
 			// ヒストグラムデータ用のテクスチャ/バッファをバインド
-			bindHistogram();
+			GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, histogramRGBId);
 			// 映像ソースのテクスチャをバインド
-			bindTexture(muTextureLoc, texUnit, texId);
-		}
-
-		protected abstract void bindHistogram();
-
-		/**
-		 * テクスチャをバインド
-		 * @param texLoc
-		 * @param texUnit
-		 * @param texId
-		 */
-		protected void bindTexture(final int texLoc, @TexUnit final int texUnit, final int texId) {
 			GLES31.glActiveTexture(texUnit);
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=" + texUnit + ",loc=" + texLoc);
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glActiveTexture,texUnit=" + texUnit + ",loc=" + muTextureLoc);
 			GLES31.glBindTexture(texTarget, texId);
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=" + texUnit + ",loc=" + texLoc);
-			GLES31.glUniform1i(texLoc, GLUtils.gLTextureUnit2Index(texUnit));
-			if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=" + texUnit + ",loc=" + texLoc);
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glBindTexture,texUnit=" + texUnit + ",loc=" + muTextureLoc);
+			GLES31.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit));
+			if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=" + texUnit + ",loc=" + muTextureLoc);
+			// 描画実行
+			GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, VERTEX_NUM);
+			// 描画終了処理
+			GLES31.glBindTexture(texTarget, 0);
+			GLES31.glUseProgram(0);
 		}
 
 		/**
@@ -409,15 +389,6 @@ public class GLHistogram implements IMirror {
 		}
 
 		/**
-		 * ヒストグラムのカウント終了処理
-		 */
-		private void finishDraw() {
-//			if (DEBUG) Log.v(TAG, "finish:");
-			GLES31.glBindTexture(texTarget, 0);
-			GLES31.glUseProgram(0);
-		}
-
-		/**
 		 * 関係するリソースを破棄
 		 * EGL|GLコンテキストの存在するスレッド上で実行すること
 		 */
@@ -436,7 +407,7 @@ public class GLHistogram implements IMirror {
 				GLES31.glDeleteProgram(hProgram);
 			}
 		}
-	}
+	} // HistogramDrawer
 
 	public final boolean isOES;
 	private final int texTarget;
@@ -500,24 +471,12 @@ public class GLHistogram implements IMirror {
 			mComputeProgram = -1;
 			muROILoc = -1;
 			muTexMatrixLoc = -1;
-			mComputeDrawer = new HistogramDrawer(isOES,
-				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31) {
-				@Override
-				protected void bindHistogram() {
-					clearAndBindHistogramBuffer(mHistogramRGBId);
-				}
-			};
+			mComputeDrawer = new HistogramDrawer(isOES, mHistogramRGBId,
+				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31);
 		}
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=" + isOES);
-		mRendererDrawer = new HistogramDrawer(isOES,
-			FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31) {
-			@Override
-			protected void bindHistogram() {
-				// シェーダーへバインド
-//				clearAndBindHistogramBuffer(mHistogramRGBId);
-				GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, mHistogramRGBId);
-			}
-		};
+		mRendererDrawer = new HistogramDrawer(isOES, mHistogramRGBId,
+			FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31);
 		if (!isOES) {
 			setMirror(MIRROR_VERTICAL);
 		}
@@ -550,6 +509,7 @@ public class GLHistogram implements IMirror {
 		final long startTimeNs = System.nanoTime();
 		if (Time.nanoTime() - mNextDraw > mIntervalsDeltaNs) {
 			mNextDraw = Time.nanoTime() + mIntervalsNs;
+			clearHistogramBuffer(mHistogramRGBId);
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram);
 				// ROIをセット、今はテクスチャ全面をカウント対象とする, (0,0)-(width,height)
@@ -558,8 +518,8 @@ public class GLHistogram implements IMirror {
 				GLES31.glUniform2fv(muROILoc, 2, mROI, 0);
 				// テクスチャ変換行列をバインド
 				GLES31.glUniformMatrix4fv(muTexMatrixLoc, 1, false, texMatrix, texOffset);
-				// ヒストグラム用バッファをクリアしてバインド
-				clearAndBindHistogramBuffer(mHistogramRGBId);
+				// ヒストグラム用バッファをバインド
+				GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, mHistogramRGBId);
 				// ソース映像のテクスチャをバインド
 				GLES31.glActiveTexture(GLES31.GL_TEXTURE0);
 				if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture,texUnit=" + texUnit);
@@ -567,7 +527,7 @@ public class GLHistogram implements IMirror {
 				if (DEBUG) GLUtils.checkGlError("draw:glBindTexture,texUnit=" + texUnit);
 //				GLES31.glBindImageTexture(0, texId, 0, false, 0, GLES31.GL_READ_ONLY, GLES31.GL_RGBA8);
 //				if (DEBUG) GLUtils.checkGlError("draw:glBindImageTexture");
-				// コンピュート実効
+				// コンピュート実行
 				GLES31.glDispatchCompute((width + 15) / 16, (height + 15) / 16, 1);
 				if (DEBUG) GLUtils.checkGlError("draw:glDispatchCompute");
 				GLES31.glMemoryBarrier(GLES31.GL_SHADER_STORAGE_BARRIER_BIT | GLES31.GL_BUFFER_UPDATE_BARRIER_BIT);
@@ -589,17 +549,17 @@ public class GLHistogram implements IMirror {
 	@WorkerThread
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
-		if (mHistogramRGBId > GL_NO_BUFFER) {
-			GLUtils.deleteBuffer(mHistogramRGBId);
-			mHistogramRGBId = GL_NO_BUFFER;
+		if (mComputeDrawer != null) {
+			mComputeDrawer.release();
 		}
 		if (mComputeProgram >= 0) {
 			GLES31.glDeleteProgram(mComputeProgram);
 		}
-		if (mComputeDrawer != null) {
-			mComputeDrawer.release();
-		}
 		mRendererDrawer.release();
+		if (mHistogramRGBId > GL_NO_BUFFER) {
+			GLUtils.deleteBuffer(mHistogramRGBId);
+			mHistogramRGBId = GL_NO_BUFFER;
+		}
 	}
 
 	@Override
@@ -649,10 +609,10 @@ public class GLHistogram implements IMirror {
 	}
 
 	/**
-	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトをクリアしてシェーダーへバインド
+	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトをクリアする
 	 * @return
 	 */
-	private void clearAndBindHistogramBuffer(final int bufferId) {
+	private void clearHistogramBuffer(final int bufferId) {
 		// 操作するバッファを指定
 		// 以降バッファIDとして0を指定するまではGL_SHADER_STORAGE_BUFFERを
 		// 指定したバッファの操作は全てこのbufferIDで示すバッファに対して行われる
@@ -666,9 +626,6 @@ public class GLHistogram implements IMirror {
 		// バッファの指定をクリア
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0);
 		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)");
-		// シェーダーへバインド
-		GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, bufferId);
-		if (DEBUG) GLUtils.checkGlError("initHistogramBuffer:glBindBufferBase");
 	}
 
 }
