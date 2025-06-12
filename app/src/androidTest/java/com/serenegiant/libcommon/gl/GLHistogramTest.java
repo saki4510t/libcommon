@@ -94,9 +94,15 @@ public class GLHistogramTest {
 				final boolean isGLES3, final boolean isOES,
 				final int width, final int height,
 				final int texId, @NonNull final float[] texMatrix) {
+				manager.makeDefault();
+				histogram[0].compute(
+					width, height,
+					GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+				manager.makeDefault();
 				histogram[0].draw(
 					width, height,
 					GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+				manager.swap();
 				if (cnt.incrementAndGet() == NUM_FRAMES) {
 					Log.v(TAG, "onFrameAvailable:create Bitmap from texture, texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 					result.set(GLUtils.glCopyTextureToBitmap(

@@ -269,6 +269,8 @@ public class HistogramPipeline extends ProxyPipeline
 
 		final GLHistogram histogram = mGLHistogram;
 		if (histogram != null) {
+			mManager.makeDefault();
+			histogram.compute(width, height, GLES20.GL_TEXTURE0, texId, texMatrix, 0);
 			renderTarget(histogram, width, height, mSurfaceTarget, texId, texMatrix);
 			renderTarget(histogram, width, height, mOffscreenTarget, texId, texMatrix);
 		}
@@ -294,9 +296,11 @@ public class HistogramPipeline extends ProxyPipeline
 		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 		if ((target != null)
 			&& target.canDraw()) {
+			target.makeCurrent();
 			histogram.draw(
 				width, height,
 				GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+			target.swap();
 		}
 	}
 

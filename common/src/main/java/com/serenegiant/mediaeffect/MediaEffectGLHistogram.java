@@ -64,6 +64,10 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 			mOutputOffscreen.assignTexture(outTexId, width, height, null);
 		}
 		mOutputOffscreen.makeCurrent();
+		mGLHistogram.compute(
+			width, height,
+			GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
+		mOutputOffscreen.makeCurrent();
 		try {
 			mGLHistogram.draw(
 				width, height,
@@ -76,11 +80,17 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	@Override
 	public void apply(@NonNull final int[] srcTexIds, @NonNull final GLSurface output) {
 		if (!mEnabled) return;
+		final int width = output.getWidth();;
+		final int height = output.getHeight();
+		output.makeCurrent();
+		mGLHistogram.compute(
+			width, height,
+			GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
 		output.makeCurrent();
 		try {
 			// FIXME ここのテクスチャマトリックスもソース側のを使わないとだめかも
 			mGLHistogram.draw(
-				output.getWidth(), output.getHeight(),
+				width, height,
 				GLES20.GL_TEXTURE0, srcTexIds[0], output.copyTexMatrix(), 0);
 		} finally {
 			output.swap();
@@ -92,6 +102,12 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 		if (!mEnabled) return;
 		final GLSurface output = src.getOutputTexture();
 		final int[] srcTexIds = src.getSourceTexId();
+		final int width = output.getWidth();;
+		final int height = output.getHeight();
+		output.makeCurrent();
+		mGLHistogram.compute(
+			width, height,
+			GLES20.GL_TEXTURE1, srcTexIds[0], src.getTexMatrix(), 0);
 		output.makeCurrent();
 		try {
 			mGLHistogram.draw(
