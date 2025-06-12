@@ -484,10 +484,10 @@ public class GLHistogram implements IMirror {
 		mIntervalsNs = Math.round(1000000000.0 / (maxFps > 0.0f ? maxFps : 2.0f));
 		mIntervalsDeltaNs = -Math.round(mIntervalsNs * 0.03);	// 3%ならショートしても良いことにする
 		mNextDraw = Time.nanoTime() + mIntervalsNs;
+		if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理");
+		mHistogramRGBId = initHistogramBuffer();
 		if (USB_COMPUTE_SHADER) {
 			mComputeDrawer = null;
-			if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理");
-			mHistogramRGBId = initHistogramBuffer();
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader");
 			mComputeProgram = ComputeUtils.loadShader(COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31);
 			if (DEBUG) Log.v(TAG, "コンストラクタ:mComputeProgram=" + mComputeProgram);
@@ -518,8 +518,6 @@ public class GLHistogram implements IMirror {
 				GLES31.glBindBufferBase(GLES31.GL_SHADER_STORAGE_BUFFER, 1, mHistogramRGBId);
 			}
 		};
-		if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理");
-		mHistogramRGBId = initHistogramBuffer();
 		if (!isOES) {
 			setMirror(MIRROR_VERTICAL);
 		}
