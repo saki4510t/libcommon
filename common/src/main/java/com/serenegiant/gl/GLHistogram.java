@@ -423,11 +423,15 @@ public class GLHistogram implements IMirror {
 	private long mNextDraw;
 	private final long mIntervalsNs;
 	private final long mIntervalsDeltaNs;
+	@Nullable
 	private final HistogramDrawer mComputeDrawer;
+	@NonNull
 	private final HistogramDrawer mRendererDrawer;
 	private final int mComputeProgram;
 	private final int muROILoc;
 	private final int muTexMatrixLoc;
+	@Size(value=4)
+	@Nullable
 	private final float[] mROI = new float[4];
 	/**
 	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
