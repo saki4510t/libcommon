@@ -114,54 +114,6 @@ public class GLHistogram implements IMirror {
 		""";
 
 	/**
-	 * 元映像にRGBヒストグラムを合成して描画するフラグメントシェーダー
-	 */
-	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31 =
-		"""
-		#version 310 es
-		#extension GL_ANDROID_extension_pack_es31a : require
-		precision highp float;
-		precision highp int;
-		precision highp uimage2D;
-		precision highp image2D;
-
-		in vec2 vTextureCoord;
-		uniform sampler2D sTexture;
-		layout(std430, binding = 1) buffer Histogram {
-			uint counts[256 * 5];
-		};
-		layout(location = 0) out vec4 o_FragColor;
-		const float EPS = 0.01;
-		const float SCALE = 0.5;
-		void main() {
-			vec4 color = texture(sTexture, vTextureCoord);
-			uint index = uint(vTextureCoord.x * 255.0);	// 0..255
-			// ヒストグラムを取得
-			float countsR = float(counts[index]);
-			float countsG = float(counts[index + 256u]);
-			float countsB = float(counts[index + 512u]);
-//			float countsI = float(counts[index + 768u]);
-			// 最大値を取得して正規化
-			float max = float(counts[1028u]);
-			vec3 counts = (vec3(countsR, countsG, countsB) / max) * SCALE;
-			vec3 countsL = counts - EPS;
-		
-			vec3 histogram = vec3(color.rgb);
-			float histogramY = 1.0 - vTextureCoord.y;
-			if ((histogramY > countsL.r) && (histogramY < counts.r)) {
-				histogram.r = 1.0;
-			}
-			if ((histogramY > countsL.g) && (histogramY < counts.g)) {
-				histogram.g = 1.0;
-			}
-			if ((histogramY > countsL.b) && (histogramY < counts.b)) {
-				histogram.b = 1.0;
-			}
-		    o_FragColor = vec4(mix(color.rgb, histogram, 0.5), color.a);
-		}
-		""";
-
-	/**
 	 * RGBヒストグラムをカウントするためのコンピュートシェーダー
 	 */
 	private static final String COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31 =
@@ -208,6 +160,54 @@ public class GLHistogram implements IMirror {
 //			atomicMax(counts[1026u], countsB);
 			atomicMax(counts[1027u], countsI);
 			atomicMax(counts[1028u], max(max(countsR, countsG), countsB));
+		}
+		""";
+
+	/**
+	 * 元映像にRGBヒストグラムを合成して描画するフラグメントシェーダー
+	 */
+	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31 =
+		"""
+		#version 310 es
+		#extension GL_ANDROID_extension_pack_es31a : require
+		precision highp float;
+		precision highp int;
+		precision highp uimage2D;
+		precision highp image2D;
+
+		in vec2 vTextureCoord;
+		uniform sampler2D sTexture;
+		layout(std430, binding = 1) buffer Histogram {
+			uint counts[256 * 5];
+		};
+		layout(location = 0) out vec4 o_FragColor;
+		const float EPS = 0.01;
+		const float SCALE = 0.5;
+		void main() {
+			vec4 color = texture(sTexture, vTextureCoord);
+			uint index = uint(vTextureCoord.x * 255.0);	// 0..255
+			// ヒストグラムを取得
+			float countsR = float(counts[index]);
+			float countsG = float(counts[index + 256u]);
+			float countsB = float(counts[index + 512u]);
+//			float countsI = float(counts[index + 768u]);
+			// 最大値を取得して正規化
+			float max = float(counts[1028u]);
+			vec3 counts = (vec3(countsR, countsG, countsB) / max) * SCALE;
+			vec3 countsL = counts - EPS;
+		
+			vec3 histogram = vec3(color.rgb);
+			float histogramY = 1.0 - vTextureCoord.y;
+			if ((histogramY > countsL.r) && (histogramY < counts.r)) {
+				histogram.r = 1.0;
+			}
+			if ((histogramY > countsL.g) && (histogramY < counts.g)) {
+				histogram.g = 1.0;
+			}
+			if ((histogramY > countsL.b) && (histogramY < counts.b)) {
+				histogram.b = 1.0;
+			}
+		    o_FragColor = vec4(mix(color.rgb, histogram, 0.5), color.a);
 		}
 		""";
 
