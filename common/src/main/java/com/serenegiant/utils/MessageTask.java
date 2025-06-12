@@ -38,6 +38,7 @@ import androidx.annotation.WorkerThread;
  * ヘルパークラス
  * MessageTaskまたはその継承クラスをTreadへ引き渡して実行する
  */
+@Deprecated
 public abstract class MessageTask implements Runnable {
 	private static final boolean DEBUG = false;	// 実働時はfalseにすること
 	private static final String TAG = MessageTask.class.getSimpleName();

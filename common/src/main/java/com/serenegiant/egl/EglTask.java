@@ -39,6 +39,7 @@ import androidx.annotation.WorkerThread;
  * 処理を追加したヘルパークラス
  * EglTaskまたはその継承クラスをTreadへ引き渡して実行する
  */
+@Deprecated
 public abstract class EglTask extends MessageTask {
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = EglTask.class.getSimpleName();
