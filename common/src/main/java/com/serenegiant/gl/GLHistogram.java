@@ -113,6 +113,9 @@ public class GLHistogram implements IMirror {
 		}
 		""";
 
+	/**
+	 * 元映像にRGBヒストグラムを合成して描画するフラグメントシェーダー
+	 */
 	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31 =
 		"""
 		#version 310 es
@@ -158,6 +161,9 @@ public class GLHistogram implements IMirror {
 		}
 		""";
 
+	/**
+	 * RGBヒストグラムをカウントするためのコンピュートシェーダー
+	 */
 	private static final String COMPUTE_SHADER_HISTOGRAM_COMPUTE_ES31 =
 		"""
 		#version 310 es
@@ -205,6 +211,9 @@ public class GLHistogram implements IMirror {
 		}
 		""";
 
+	/**
+	 * RGBヒストグラムのカウント・描画用
+	 */
 	private static class HistogramDrawer {
 		/**
 		 * テクスチャターゲット
