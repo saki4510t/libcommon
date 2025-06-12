@@ -212,6 +212,56 @@ public class GLHistogram implements IMirror {
 		""";
 
 	/**
+	 * RGBヒストグラムのみを全面に描画するフラグメントシェーダー
+	 */
+	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_ONLY_SSBO_ES31 =
+		"""
+		#version 310 es
+		#extension GL_ANDROID_extension_pack_es31a : require
+		precision highp float;
+		precision highp int;
+		precision highp uimage2D;
+		precision highp image2D;
+
+		in vec2 vTextureCoord;
+		uniform sampler2D sTexture;
+		layout(std430, binding = 1) buffer Histogram {
+			uint counts[256 * 5];
+		};
+		layout(location = 0) out vec4 o_FragColor;
+		const float EPS = 0.01;
+		void main() {
+//			vec4 color = texture(sTexture, vTextureCoord);
+			uint index = uint(vTextureCoord.x * 255.0);	// 0..255
+			// ヒストグラムを取得
+			float countsR = float(counts[index]);
+			float countsG = float(counts[index + 256u]);
+			float countsB = float(counts[index + 512u]);
+//			float countsI = float(counts[index + 768u]);
+			// 最大値を取得して正規化
+			float max = float(counts[1028u]);
+			vec3 counts = vec3(countsR, countsG, countsB) / max;
+			vec3 countsL = counts - EPS;
+		
+			vec4 histogram = vec4(0.0);
+			float histogramY = 1.0 - vTextureCoord.y;
+			if ((histogramY > countsL.r) && (histogramY < counts.r)) {
+				histogram.r = 1.0;
+				histogram.a = 1.0;
+			}
+			if ((histogramY > countsL.g) && (histogramY < counts.g)) {
+				histogram.g = 1.0;
+				histogram.a = 1.0;
+			}
+			if ((histogramY > countsL.b) && (histogramY < counts.b)) {
+				histogram.b = 1.0;
+				histogram.a = 1.0;
+			}
+		    o_FragColor = histogram;
+		}
+		""";
+
+	/**
 	 * RGBヒストグラムのカウント・描画用
 	 */
 	private static class HistogramDrawer {
