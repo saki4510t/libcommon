@@ -33,6 +33,7 @@ import java.nio.IntBuffer;
 
 import androidx.annotation.AnyThread;
 import androidx.annotation.FloatRange;
+import androidx.annotation.IntRange;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -69,6 +70,15 @@ public class GLHistogram implements IMirror {
 	 *     全テクセルをカウントせずに飛び飛びにカウントするように実装した方がいいかも
 	 */
 	private static final boolean USB_COMPUTE_SHADER = true;
+
+	/**
+	 * ヒストグラムのオフスクリーン描画先テクスチャの最小サイズ(幅)
+	 */
+	private static final int HISTOGRAM_WIDTH_MIN = 32;
+	/**
+	 * ヒストグラムのオフスクリーン描画先テクスチャの最小サイズ(高さ)
+	 */
+	private static final int HISTOGRAM_HEIGHT_MIN = 32;
 
 	/**
 	 * RGBヒストグラムのカウント用フラグメントシェーダー
@@ -547,20 +557,30 @@ public class GLHistogram implements IMirror {
 	/**
 	 * コンストラクタ
 	 * ヒストグラムの歳代更新頻度は2fps
+	 * ヒストグラムのオフスクリーン描画サイズは512x512
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @param isOES
 	 */
 	@WorkerThread
 	public GLHistogram(final boolean isOES) {
-		this(isOES, 2.0f);
+		this(isOES, 2.0f, 512, 512);
 	}
+
 	/**
 	 * コンストラクタ
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @param isOES
 	 * @param maxFps ヒストグラムの最大更新頻度、0以下なら2fps
+	 * @param width オフスクリーン描画するヒストグラムのサイズ(幅)、最小32
+	 * @param height オフスクリーン描画するヒストグラムのサイズ(高さ)、最小32
 	 */
 	@WorkerThread
-	public GLHistogram(final boolean isOES, final @FloatRange(from=0.0) float maxFps) {
+	public GLHistogram(
+		final boolean isOES,
+		final @FloatRange(from=0.0) float maxFps,
+		@IntRange(from=HISTOGRAM_WIDTH_MIN) final int width,
+		@IntRange(from=HISTOGRAM_HEIGHT_MIN) final int height) {
+
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=" + isOES + ",useComputeShader=" + USB_COMPUTE_SHADER + ",maxFps=" + maxFps);
 		this.isOES = isOES;
 		texTarget = isOES ? GL_TEXTURE_EXTERNAL_OES : GLES31.GL_TEXTURE_2D;
@@ -569,7 +589,8 @@ public class GLHistogram implements IMirror {
 		mNextDraw = Time.nanoTime() + mIntervalsNs;
 		if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理");
 		mHistogramRGBId = initHistogramBuffer();
-		mHistogramOffscreen = GLSurface.newInstance(true, GLES31.GL_TEXTURE3, 512, 512);
+		mHistogramOffscreen = GLSurface.newInstance(true, GLES31.GL_TEXTURE3,
+			Math.max(width, HISTOGRAM_WIDTH_MIN), Math.max(height, HISTOGRAM_HEIGHT_MIN));
 		if (USB_COMPUTE_SHADER) {
 			mComputeDrawer = null;
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader");
