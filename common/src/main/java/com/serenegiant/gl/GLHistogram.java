@@ -91,8 +91,6 @@ public class GLHistogram implements IMirror {
 		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
-		precision highp uimage2D;
-		precision highp image2D;
 		
 		in vec2 vTextureCoord;
 		uniform sampler2D sTexture;
@@ -135,12 +133,9 @@ public class GLHistogram implements IMirror {
 		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
-		precision highp uimage2D;
-		precision highp image2D;
 
 		layout (local_size_x = 16, local_size_y = 16) in;
 		
-//		layout(binding = 0, rgba8) uniform readonly image2D srcImage;
 		layout(binding = 0) uniform sampler2D srcImage;
 		layout(std430, binding = 1) buffer Histogram {
 			uint counts[256 * 5];
@@ -183,12 +178,9 @@ public class GLHistogram implements IMirror {
 	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31 =
 		"""
 		#version 310 es
-		#extension GL_ANDROID_extension_pack_es31a : require
 		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
-		precision highp uimage2D;
-		precision highp image2D;
 
 		in vec2 vTextureCoord;
 		uniform sampler2D sTexture;
@@ -232,12 +224,9 @@ public class GLHistogram implements IMirror {
 	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_ONLY_SSBO_ES31 =
 		"""
 		#version 310 es
-		#extension GL_ANDROID_extension_pack_es31a : require
 		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
-		precision highp uimage2D;
-		precision highp image2D;
 
 		in vec2 vTextureCoord;
 		uniform sampler2D sTexture;
