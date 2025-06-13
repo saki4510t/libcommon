@@ -68,7 +68,7 @@ public class GLHistogram implements IMirror {
 	 *     ヒストグラムの更新頻度を下げても結構カクツク
 	 *     全テクセルをカウントせずに飛び飛びにカウントするように実装した方がいいかも
 	 */
-	private static final boolean USB_COMPUTE_SHADER = false;
+	private static final boolean USB_COMPUTE_SHADER = true;
 
 	/**
 	 * RGBヒストグラムのカウント用フラグメントシェーダー
