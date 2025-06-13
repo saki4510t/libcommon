@@ -166,6 +166,7 @@ public class GLHistogram implements IMirror {
 
 	/**
 	 * 元映像にRGBヒストグラムを合成して描画するフラグメントシェーダー
+	 * これは今は使っていない
 	 */
 	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_SSBO_ES31 =
 		"""
@@ -263,6 +264,9 @@ public class GLHistogram implements IMirror {
 		}
 		""";
 
+	/**
+	 * 元映像のテクスチャと別途オフスクリーン描画したヒストグラムテクスチャを合成して表示するフラグメントシェーダー
+	 */
 	private static final String FRAGMENT_SHADER_MIX_ES31 =
 		"""
 		#version 310 es
