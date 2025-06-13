@@ -133,13 +133,13 @@ public class GLHistogram implements IMirror {
 		layout(std430, binding = 1) buffer Histogram {
 			uint counts[256 * 5];
 		};
-		uniform vec4 uROI[2];
+		uniform vec2 uROI[2];
 		uniform mat4 uTexMatrix;
 		const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 		
 		void main() {
 			vec4 pos = vec4(vec2(gl_GlobalInvocationID.xy), 0.0, 1.0);
-			vec2 uv = (uMVPMatrix * pos).xy;
+			vec2 uv = (uTexMatrix * pos).xy;
 			if ((uv.x < uROI[0].x) || (uv.x >= uROI[1].x) || (uv.y < uROI[0].y) || (uv.y >= uROI[1].y)) return;
 			vec4 color = texture(srcImage, uv / uROI[1]);
 		
