@@ -88,6 +88,7 @@ public class GLHistogram implements IMirror {
 		"""
 		#version 310 es
 		#extension GL_ANDROID_extension_pack_es31a : require
+		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
 		precision highp uimage2D;
@@ -104,11 +105,11 @@ public class GLHistogram implements IMirror {
 			vec4 color = texture(sTexture, vTextureCoord);
 		
 			// Assuming color values are in the range [0.0, 1.0]
-			// Convert to integer intensity [0, 255]
-			uint indexR = uint(color.r * 255.0);
-			uint indexG = uint(color.g * 255.0);
-			uint indexB = uint(color.b * 255.0);
-			uint indexI = uint(dot(color.rgb, conv) * 255.0);
+			// Convert to integer intensity [0, STEP]
+			uint indexR = uint(color.r * STEP);
+			uint indexG = uint(color.g * STEP);
+			uint indexB = uint(color.b * STEP);
+			uint indexI = uint(dot(color.rgb, conv) * STEP);
 		
 			// Atomically increment the histogram bins
 			uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
@@ -131,6 +132,7 @@ public class GLHistogram implements IMirror {
 		"""
 		#version 310 es
 		#extension GL_ANDROID_extension_pack_es31a : require
+		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
 		precision highp uimage2D;
@@ -154,11 +156,11 @@ public class GLHistogram implements IMirror {
 			vec4 color = texture(srcImage, uv / uROI[1]);
 		
 			// Assuming color values are in the range [0.0, 1.0]
-			// Convert to integer intensity [0, 255]
-			uint indexR = uint(color.r * 255.0);
-			uint indexG = uint(color.g * 255.0);
-			uint indexB = uint(color.b * 255.0);
-			uint indexI = uint(dot(color.rgb, conv) * 255.0);
+			// Convert to integer intensity [0, STEP]
+			uint indexR = uint(color.r * STEP);
+			uint indexG = uint(color.g * STEP);
+			uint indexB = uint(color.b * STEP);
+			uint indexI = uint(dot(color.rgb, conv) * STEP);
 		
 			// Atomically increment the histogram bins
 			uint countsR = atomicAdd(counts[       indexR], 1u) + 1u;
@@ -182,6 +184,7 @@ public class GLHistogram implements IMirror {
 		"""
 		#version 310 es
 		#extension GL_ANDROID_extension_pack_es31a : require
+		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
 		precision highp uimage2D;
@@ -197,7 +200,7 @@ public class GLHistogram implements IMirror {
 		const float SCALE = 0.5;
 		void main() {
 			vec4 color = texture(sTexture, vTextureCoord);
-			uint index = uint(vTextureCoord.x * 255.0);	// 0..255
+			uint index = uint(vTextureCoord.x * STEP);	// 0..STEP
 			// ヒストグラムを取得
 			float countsR = float(counts[index]);
 			float countsG = float(counts[index + 256u]);
@@ -230,6 +233,7 @@ public class GLHistogram implements IMirror {
 		"""
 		#version 310 es
 		#extension GL_ANDROID_extension_pack_es31a : require
+		#define STEP (255.0)
 		precision highp float;
 		precision highp int;
 		precision highp uimage2D;
@@ -245,7 +249,7 @@ public class GLHistogram implements IMirror {
 		const float SCALE = 0.75;
 		void main() {
 //			vec4 color = texture(sTexture, vTextureCoord);
-			uint index = uint(vTextureCoord.x * 255.0);	// 0..255
+			uint index = uint(vTextureCoord.x * STEP);	// 0..STEP
 			// ヒストグラムを取得
 			float countsR = float(counts[index]);
 			float countsG = float(counts[index + 256u]);
