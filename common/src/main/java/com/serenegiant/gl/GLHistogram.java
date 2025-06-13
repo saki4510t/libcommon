@@ -60,6 +60,27 @@ public class GLHistogram implements IMirror {
 	private static final String TAG = GLHistogram.class.getSimpleName();
 
 	/**
+	 * R成分のヒストグラムを描画
+	 */
+	public static final int HISTOGRAM_R = 1;
+	/**
+	 * G成分のヒストグラムを描画
+	 */
+	public static final int HISTOGRAM_G = 2;
+	/**
+	 * B成分のヒストグラムを描画
+	 */
+	public static final int HISTOGRAM_B = 4;
+	/**
+	 * 輝度成分のヒストグラムを描画
+	 */
+	public static final int HISTOGRAM_I = 9;
+	/**
+	 * RGBのヒストグラムを描画
+	 */
+	public static final int HISTOGRAM_RGB = HISTOGRAM_R | HISTOGRAM_G | HISTOGRAM_B;
+
+	/**
 	 * バッファオブジェクトを使って描画するかどうか
 	 */
 	private static final boolean USE_VBO = true;
@@ -219,7 +240,66 @@ public class GLHistogram implements IMirror {
 		""";
 
 	/**
+	 * 元映像のテクスチャと別途オフスクリーン描画したヒストグラムテクスチャを合成して表示するフラグメントシェーダー
+	 */
+	private static final String FRAGMENT_SHADER_MIX_SSBO_ES31 =
+		"""
+		#version 310 es
+		#define STEP (255.0)
+		precision highp float;
+		const float bkColor = 0.2;
+		in vec2 vTextureCoord;
+		uniform sampler2D sTexture;
+		layout(std430, binding = 1) buffer Histogram {
+			uint counts[256 * 5];
+		};
+		// Format: vec4(minU, minV, maxU, maxV) in normalized UV space (0.0 to 1.0)
+		uniform vec4 uEmbedRegion;
+		layout(location = 0) out vec4 o_FragColor;
+		const float EPS = 0.01;
+		const float SCALE = 0.75;
+		void main() {
+			bool isInsideEmbedRegion =
+				vTextureCoord.x >= uEmbedRegion.x
+				&& vTextureCoord.x <= uEmbedRegion.z
+				&& vTextureCoord.y >= uEmbedRegion.y
+				&& vTextureCoord.y <= uEmbedRegion.w;
+			highp vec4 tex1 = texture(sTexture, vTextureCoord);
+			if (isInsideEmbedRegion) {
+				vec2 relativePosInEmbedRegion = vTextureCoord - uEmbedRegion.xy;
+				vec2 embedRegionSize = uEmbedRegion.zw - uEmbedRegion.xy; // (maxU - minU, maxV - minV)
+				vec2 uvForTexture2 = relativePosInEmbedRegion / embedRegionSize;
+				uint index = uint(uvForTexture2.x * STEP);	// 0..STEP
+				// ヒストグラムを取得
+				float countsR = float(counts[index]);
+				float countsG = float(counts[index + 256u]);
+				float countsB = float(counts[index + 512u]);
+//				float countsI = float(counts[index + 768u]);
+				// 最大値を取得して正規化
+				float max = float(counts[1028u]) * SCALE;
+				vec3 counts = vec3(countsR, countsG, countsB) / max;
+				vec3 countsL = counts - EPS;
+				vec3 histogram = vec3(0.0);
+				float histogramY = 1.0 - uvForTexture2.y;
+				if ((histogramY > countsL.r) && (histogramY < counts.r)) {
+					histogram.r = 1.0;
+				}
+				if ((histogramY > countsL.g) && (histogramY < counts.g)) {
+					histogram.g = 1.0;
+				}
+				if ((histogramY > countsL.b) && (histogramY < counts.b)) {
+					histogram.b = 1.0;
+				}
+			    o_FragColor = vec4(mix(tex1.rgb, histogram, 0.5), tex1.a);
+			} else {
+				o_FragColor = tex1;
+			}
+		}
+		""";
+
+	/**
 	 * RGBヒストグラムのみを全面に描画するフラグメントシェーダー
+	 * これは今は使っていない
 	 */
 	private static final String FRAGMENT_SHADER_HISTOGRAM_DRAW_ONLY_SSBO_ES31 =
 		"""
@@ -516,13 +596,10 @@ public class GLHistogram implements IMirror {
 	@Nullable
 	private final HistogramDrawer mComputeDrawer;
 	@NonNull
-	private final HistogramDrawer mHistogramDrawer;
-	@NonNull
-	private final GLDrawer2D mRendererDrawer;
+	private final HistogramDrawer mRendererDrawer;
 	private final int mComputeProgram;
 	private final int muROILoc;
 	private final int muTexMatrixLoc;
-	private final int muHistogramTexLoc;
 	private final int muEmbedRegionLoc;
 	@Size(value=4)
 	@NonNull
@@ -544,8 +621,6 @@ public class GLHistogram implements IMirror {
 	private int mHistogramRGBId = GL_NO_BUFFER;
 	@MirrorMode
 	private int mMirror = IMirror.MIRROR_NORMAL;
-	@NonNull
-	private final GLSurface mHistogramOffscreen;
 
 	/**
 	 * コンストラクタ
@@ -556,7 +631,7 @@ public class GLHistogram implements IMirror {
 	 */
 	@WorkerThread
 	public GLHistogram(final boolean isOES) {
-		this(isOES, 2.0f, 512, 512);
+		this(isOES, 2.0f);
 	}
 
 	/**
@@ -564,15 +639,11 @@ public class GLHistogram implements IMirror {
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @param isOES
 	 * @param maxFps ヒストグラムの最大更新頻度、0以下なら2fps
-	 * @param width オフスクリーン描画するヒストグラムのサイズ(幅)、最小32
-	 * @param height オフスクリーン描画するヒストグラムのサイズ(高さ)、最小32
 	 */
 	@WorkerThread
 	public GLHistogram(
 		final boolean isOES,
-		final @FloatRange(from=0.0) float maxFps,
-		@IntRange(from=HISTOGRAM_WIDTH_MIN) final int width,
-		@IntRange(from=HISTOGRAM_HEIGHT_MIN) final int height) {
+		final @FloatRange(from=0.0) float maxFps) {
 
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=" + isOES + ",useComputeShader=" + USB_COMPUTE_SHADER + ",maxFps=" + maxFps);
 		this.isOES = isOES;
@@ -582,8 +653,6 @@ public class GLHistogram implements IMirror {
 		mNextDraw = Time.nanoTime() + mIntervalsNs;
 		if (DEBUG) Log.v(TAG, "コンストラクタ:ヒストグラム受け取り用のシェーダーストレージバッファ初期化処理");
 		mHistogramRGBId = initHistogramBuffer();
-		mHistogramOffscreen = GLSurface.newInstance(true, GLES31.GL_TEXTURE3,
-			Math.max(width, HISTOGRAM_WIDTH_MIN), Math.max(height, HISTOGRAM_HEIGHT_MIN));
 		if (USB_COMPUTE_SHADER) {
 			mComputeDrawer = null;
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create compute shader");
@@ -602,12 +671,10 @@ public class GLHistogram implements IMirror {
 				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31);
 		}
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create mHistogramDrawer,isOES=" + isOES);
-		mHistogramDrawer = new HistogramDrawer(isOES, mHistogramRGBId,
-			FRAGMENT_SHADER_HISTOGRAM_DRAW_ONLY_SSBO_ES31);
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=" + isOES);
-		mRendererDrawer = GLDrawer2D.create(true, isOES, FRAGMENT_SHADER_MIX_ES31);
-		muHistogramTexLoc = mRendererDrawer.glGetUniformLocation("sTexture2");
-		muEmbedRegionLoc = mRendererDrawer.glGetUniformLocation("uEmbedRegion");
+		mRendererDrawer = new HistogramDrawer(isOES, mHistogramRGBId,
+			FRAGMENT_SHADER_MIX_SSBO_ES31);
+		muEmbedRegionLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uEmbedRegion");
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)");
 		if (!isOES) {
 			setMirror(MIRROR_VERTICAL);
@@ -657,18 +724,9 @@ public class GLHistogram implements IMirror {
 			} else {
 				mComputeDrawer.draw(texUnit, texId, texMatrix, texOffset);
 			}
-			mHistogramOffscreen.makeCurrent();
-			mHistogramDrawer.draw(texUnit, texId, texMatrix, texOffset);
-			mHistogramOffscreen.swap();
 		}
-//		drawTimeNs += System.nanoTime() - startTimeNs;
-//		if (DEBUG && (++cnt %100 == 0)) {
-//			Log.i(TAG, "draw time=" + drawTimeNs / 1000000f / cnt + "ms,fps=" + (cnt / (drawTimeNs / 1000000000f)));
-//		}
 	}
 
-//	private long cnt = 0;
-//	private long drawTimeNs = 0;
 	/**
 	 * ヒストグラムのカウントと描画を実行
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
@@ -691,14 +749,9 @@ public class GLHistogram implements IMirror {
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset) {
 
-		mRendererDrawer.glUseProgram();
+		GLES31.glUseProgram(mRendererDrawer.hProgram);
 		// ヒストグラムテクスチャをバインド
 		GLES31.glActiveTexture(GLES31.GL_TEXTURE3);
-		if (DEBUG) GLUtils.checkGlError("draw:glActiveTexture,texUnit=" + texUnit + ",loc=" + muHistogramTexLoc);
-		GLES31.glBindTexture(GLES31.GL_TEXTURE_2D, mHistogramOffscreen.getTexId());
-		if (DEBUG) GLUtils.checkGlError("draw:glBindTexture,texUnit=" + texUnit + ",loc=" + muHistogramTexLoc);
-		GLES31.glUniform1i(muHistogramTexLoc, 3);
-		if (DEBUG) GLUtils.checkGlError("draw:glUniform1i,texUnit=" + texUnit + ",loc=" + muHistogramTexLoc);
 		synchronized (mHistogramRegion) {
 			GLES31.glUniform4fv(muEmbedRegionLoc, 1, mHistogramRegion, 0);
 		}
@@ -720,8 +773,6 @@ public class GLHistogram implements IMirror {
 			GLES31.glDeleteProgram(mComputeProgram);
 		}
 		mRendererDrawer.release();
-		mHistogramDrawer.release();
-		mHistogramOffscreen.release();
 		if (mHistogramRGBId > GL_NO_BUFFER) {
 			GLUtils.deleteBuffer(mHistogramRGBId);
 			mHistogramRGBId = GL_NO_BUFFER;
@@ -733,8 +784,9 @@ public class GLHistogram implements IMirror {
 		synchronized (this) {
 			if (mMirror != mirror) {
 				mMirror = mirror;
-				MatrixUtils.setMirror(mHistogramDrawer.mMvpMatrix, mirror);
-				mRendererDrawer.setMirror(mirror);
+//				MatrixUtils.setMirror(mHistogramDrawer.mMvpMatrix, mirror);
+//				mRendererDrawer.setMirror(mirror);
+				MatrixUtils.setMirror(mRendererDrawer.mMvpMatrix, mirror);
 			}
 		}
 	}
