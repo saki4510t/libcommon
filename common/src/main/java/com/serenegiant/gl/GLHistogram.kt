@@ -55,9 +55,13 @@ class GLHistogram @WorkerThread constructor(
 	 * RGBヒストグラムのカウント・描画用
 	 * @param isOES
 	 * @param histogramRGBId
+	 * @param vss
 	 * @param fss
 	 */
-	private class HistogramDrawer(isOES: Boolean, private val histogramRGBId: Int, fss: String) {
+	private class HistogramDrawer(
+		isOES: Boolean, private val histogramRGBId: Int,
+		vss: String,
+		fss: String) {
 		/**
 		 * テクスチャターゲット
 		 * GL_TEXTURE_EXTERNAL_OESかGL_TEXTURE_2D
@@ -135,7 +139,7 @@ class GLHistogram @WorkerThread constructor(
 
 		init {
 			if (DEBUG) Log.v(TAG, "コンストラクタ:create shader")
-			hProgram = GLUtils.loadShader(ShaderConst.VERTEX_SHADER_ES31, fss)
+			hProgram = GLUtils.loadShader(vss, fss)
 			GLES31.glUseProgram(hProgram)
 			// locationの取得処理
 			maPositionLoc = GLES31.glGetAttribLocation(hProgram, "aPosition")
@@ -268,10 +272,14 @@ class GLHistogram @WorkerThread constructor(
 	private val mIntervalsDeltaNs: Long
 	private var mComputeDrawer: HistogramDrawer? = null
 	private val mRendererDrawer: HistogramDrawer
-	private var mComputeProgram = 0
-	private var muROILoc = 0
-	private var muTexMatrixLoc = 0
+	private val mComputeProgram: Int
+	private val muROILoc: Int
+	private val muTexMatrixLoc: Int
 	private val muEmbedRegionLoc: Int
+	/**
+	 * RGBヒストグラム生成時に頂点座標を飛び飛びにカウントするための変換係数
+	 */
+	private val muStepFactorLoc: Int
 
 	@Size(value = 4)
 	private val mROI = FloatArray(4)
@@ -323,6 +331,8 @@ class GLHistogram @WorkerThread constructor(
 			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uROI)")
 			muTexMatrixLoc = GLES31.glGetUniformLocation(mComputeProgram, "uTexMatrix")
 			GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uTexMatrix)")
+			muStepFactorLoc = GLES31.glGetUniformLocation(mComputeProgram, "uStepFactor")
+			GLUtils.checkGlError("glGetUniformLocation(uStepFactor)")
 			if (DEBUG) Log.v(TAG, "コンストラクタ:muROILoc=$muROILoc,muTexMatrixLoc=$muTexMatrixLoc")
 		} else {
 			mComputeProgram = -1
@@ -330,12 +340,16 @@ class GLHistogram @WorkerThread constructor(
 			muTexMatrixLoc = -1
 			mComputeDrawer = HistogramDrawer(
 				isOES, mHistogramRGBId,
+				VERTEX_SHADER_STEPPED_ES31,
 				FRAGMENT_SHADER_HISTOGRAM_CNT_SSBO_ES31
 			)
+			muStepFactorLoc = GLES31.glGetUniformLocation(mComputeDrawer!!.hProgram, "uStepFactor")
+			GLUtils.checkGlError("glGetUniformLocation(uStepFactor)")
 		}
 		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=$isOES")
 		mRendererDrawer = HistogramDrawer(
 			isOES, mHistogramRGBId,
+			ShaderConst.VERTEX_SHADER_ES31,
 			FRAGMENT_SHADER_MIX_SSBO_ES31
 		)
 		muEmbedRegionLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uEmbedRegion")
@@ -364,8 +378,12 @@ class GLHistogram @WorkerThread constructor(
 		if (startTimeNs - mNextDraw > mIntervalsDeltaNs) {
 			mNextDraw = startTimeNs + mIntervalsNs
 			clearHistogramBuffer(mHistogramRGBId)
+			mROI[0] = 4.0f
+			mROI[1] = 3.0f
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram)
+				// ステップファクターをセット
+				GLES31.glUniform2fv(muStepFactorLoc, 1, mROI, 0)
 				// ROIをセット、今はテクスチャ全面をカウント対象とする, (0,0)-(width,height)
 				mROI[0] = 0f
 				mROI[1] = 0f
@@ -388,6 +406,9 @@ class GLHistogram @WorkerThread constructor(
 				if (DEBUG) GLUtils.checkGlError("draw:glDispatchCompute")
 				GLES31.glMemoryBarrier(GLES31.GL_SHADER_STORAGE_BARRIER_BIT or GLES31.GL_BUFFER_UPDATE_BARRIER_BIT)
 			} else {
+				GLES31.glUseProgram(mComputeDrawer!!.hProgram)
+				// ステップファクターをセット
+				GLES31.glUniform2fv(muStepFactorLoc, 1, mROI, 0)
 				mComputeDrawer!!.draw(texUnit, texId, texMatrix, texOffset)
 			}
 		}
@@ -604,7 +625,6 @@ class GLHistogram @WorkerThread constructor(
 		 * コンピュートシェーダーを使ってヒストグラムをカウントするかどうか
 		 * XXX コンピュートシェーダーを使ってもフラグメントシェーダーを使ってもかなり処理が重いので
 		 *     ヒストグラムの更新頻度を下げても結構カクツク
-		 *     全テクセルをカウントせずに飛び飛びにカウントするように実装した方がいいかも
 		 */
 		private const val USB_COMPUTE_SHADER = true
 
@@ -616,6 +636,25 @@ class GLHistogram @WorkerThread constructor(
 		 * ヒストグラムのデータサイズのバイト数
 		 */
 		private const val HISTOGRAM_BYTES = HISTOGRAM_SIZE * BufferHelper.SIZEOF_INT_BYTES
+
+		/**
+		 * RGBヒストグラムカウント用のモデルビュー変換行列とテクスチャ変換行列適用する頂点シェーダー
+		 * for ES3
+		 */
+		private const val VERTEX_SHADER_STEPPED_ES31: String =
+			"""
+			#version 310 es
+			uniform mat4 uMVPMatrix;
+			uniform mat4 uTexMatrix;
+			uniform highp vec2 uStepFactor;
+			in highp vec4 aPosition;
+			in highp vec4 aTextureCoord;
+			out highp vec2 vTextureCoord;
+			void main() {
+				gl_Position = uMVPMatrix * aPosition;
+				vTextureCoord = (uTexMatrix * aTextureCoord).xy * uStepFactor;
+			}
+			"""
 
 		/**
 		 * RGBヒストグラムのカウント用フラグメントシェーダー
@@ -635,8 +674,10 @@ class GLHistogram @WorkerThread constructor(
 				uint counts[256 * 5];
 			};
 			const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
-			
+
 			void main() {
+				if ((vTextureCoord.x < 0.0) || (vTextureCoord.x > 1.0)
+					|| (vTextureCoord.y < 0.0) || (vTextureCoord.y > 1.0)) return;
 				vec4 color = texture(sTexture, vTextureCoord);
 			
 				// Assuming color values are in the range [0.0, 1.0]
@@ -679,11 +720,11 @@ class GLHistogram @WorkerThread constructor(
 			};
 			uniform vec2 uROI[2];
 			uniform mat4 uTexMatrix;
+			uniform highp vec2 uStepFactor;
 			const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
-			
 			void main() {
 				vec4 pos = vec4(vec2(gl_GlobalInvocationID.xy), 0.0, 1.0);
-				vec2 uv = (uTexMatrix * pos).xy;
+				vec2 uv = (uTexMatrix * pos).xy * uStepFactor;
 				if ((uv.x < uROI[0].x) || (uv.x >= uROI[1].x) || (uv.y < uROI[0].y) || (uv.y >= uROI[1].y)) return;
 				vec4 color = texture(srcImage, uv / uROI[1]);
 			
