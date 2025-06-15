@@ -34,6 +34,7 @@ import com.serenegiant.glutils.IMirror.MirrorMode
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.system.Time
 import com.serenegiant.utils.BufferHelper
+import java.nio.ByteBuffer
 import java.nio.FloatBuffer
 import java.nio.IntBuffer
 import kotlin.math.min
@@ -284,7 +285,7 @@ class GLHistogram @WorkerThread constructor(
 	/**
 	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
 	 */
-	private val mClearBuffer: IntBuffer = BufferHelper.createBuffer(IntArray(256 * 5))
+	private val mClearBuffer: IntBuffer = BufferHelper.createBuffer(IntArray(HISTOGRAM_SIZE))
 
 	/**
 	 * ヒストグラムを受け取るシェーダーストレージバッファオブジェクトID
@@ -479,6 +480,30 @@ class GLHistogram @WorkerThread constructor(
 		}
 	}
 
+	/**
+	 * ヒストグラムデータを取得する
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
+	 */
+	@Size(value = HISTOGRAM_SIZE.toLong())
+	@WorkerThread
+	fun getHistogram(): IntArray {
+		val result = IntArray(HISTOGRAM_SIZE)
+		if (mHistogramRGBId != GLConst.GL_NO_BUFFER) {
+			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
+			val buffer = GLES31.glMapBufferRange(
+				GLES31.GL_SHADER_STORAGE_BUFFER,
+				0, HISTOGRAM_BYTES,	// lengthはバイト数なので注意
+				GLES31.GL_MAP_READ_BIT)
+			if (buffer is ByteBuffer) {
+				buffer.asIntBuffer().get(result)
+			}
+			GLES31.glUnmapBuffer(GLES31.GL_SHADER_STORAGE_BUFFER)
+			GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
+		}
+
+		return result
+	}
+
 	private fun resetClearBuffer() {
 		mClearBuffer.clear()
 		mClearBuffer.position(mClearBuffer.capacity())
@@ -501,7 +526,7 @@ class GLHistogram @WorkerThread constructor(
 		resetClearBuffer()
 		GLES31.glBufferData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
-			BufferHelper.SIZEOF_INT_BYTES * mClearBuffer.capacity(),  // sizeはバイト数なので注意
+			HISTOGRAM_BYTES,  // sizeはバイト数なので注意
 			mClearBuffer,
 			GLES31.GL_DYNAMIC_COPY
 		)
@@ -525,7 +550,7 @@ class GLHistogram @WorkerThread constructor(
 		resetClearBuffer()
 		GLES31.glBufferSubData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
-			0, BufferHelper.SIZEOF_INT_BYTES * mClearBuffer.capacity(),  // sizeはバイト数なので注意
+			0, HISTOGRAM_BYTES,  // sizeはバイト数なので注意
 			mClearBuffer
 		)
 		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBufferData")
@@ -575,6 +600,15 @@ class GLHistogram @WorkerThread constructor(
 		 *     全テクセルをカウントせずに飛び飛びにカウントするように実装した方がいいかも
 		 */
 		private const val USB_COMPUTE_SHADER = true
+
+		/**
+		 * ヒストグラムのデータ長
+		 */
+		private const val HISTOGRAM_SIZE = 256 * 5
+		/**
+		 * ヒストグラムのデータサイズのバイト数
+		 */
+		private const val HISTOGRAM_BYTES = HISTOGRAM_SIZE * BufferHelper.SIZEOF_INT_BYTES
 
 		/**
 		 * RGBヒストグラムのカウント用フラグメントシェーダー
