@@ -18,12 +18,16 @@ package com.serenegiant.gl
 *  limitations under the License.
 */
 
+import android.opengl.GLES20
+import android.opengl.GLES30
 import android.opengl.GLES31
+import android.opengl.GLES32
 import android.opengl.Matrix
 import android.os.Build
 import android.util.Log
 import androidx.annotation.AnyThread
 import androidx.annotation.FloatRange
+import androidx.annotation.IntDef
 import androidx.annotation.RequiresApi
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
@@ -615,6 +619,19 @@ class GLHistogram @WorkerThread constructor(
 		 * RGBのヒストグラムを描画
 		 */
 		const val HISTOGRAM_RGB: Int = HISTOGRAM_R or HISTOGRAM_G or HISTOGRAM_B
+
+		/**
+		 * ヒストグラムの種類
+		 */
+		@IntDef(
+			HISTOGRAM_R,
+			HISTOGRAM_G,
+			HISTOGRAM_B,
+			HISTOGRAM_I,
+			HISTOGRAM_RGB,
+		)
+		@Retention(AnnotationRetention.SOURCE)
+		annotation class HistogramType
 
 		/**
 		 * バッファオブジェクトを使って描画するかどうか
