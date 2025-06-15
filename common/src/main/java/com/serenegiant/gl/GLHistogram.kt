@@ -504,6 +504,13 @@ class GLHistogram @WorkerThread constructor(
 		return result
 	}
 
+	/**
+	 * ヒストグラムのデータを保持しているシェーダーストレージバッファオブジェクトのIDを取得する
+	 */
+	fun getHistogramBufferId(): Int {
+		return mHistogramRGBId
+	}
+
 	private fun resetClearBuffer() {
 		mClearBuffer.clear()
 		mClearBuffer.position(mClearBuffer.capacity())
