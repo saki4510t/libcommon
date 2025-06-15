@@ -280,6 +280,7 @@ class GLHistogram @WorkerThread constructor(
 	private val muROILoc: Int
 	private val muTexMatrixLoc: Int
 	private val muEmbedRegionLoc: Int
+	private val muHistogramTypeLoc: Int
 	/**
 	 * RGBヒストグラム生成時に頂点座標を飛び飛びにカウントするための変換係数
 	 */
@@ -358,6 +359,8 @@ class GLHistogram @WorkerThread constructor(
 		)
 		muEmbedRegionLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uEmbedRegion")
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)")
+		muHistogramTypeLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uHistogramType")
+		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uHistogramType)")
 		if (!isOES) {
 			mirror = IMirror.MIRROR_VERTICAL
 		}
@@ -446,6 +449,7 @@ class GLHistogram @WorkerThread constructor(
 		synchronized(mHistogramRegion) {
 			GLES31.glUniform4fv(muEmbedRegionLoc, 1, mHistogramRegion, 0)
 		}
+		GLES31.glUniform1i(muHistogramTypeLoc, histogramType)
 		if (DEBUG) GLUtils.checkGlError("draw:glUniform4fv,loc=$muEmbedRegionLoc")
 		mRendererDrawer.draw(texUnit, texId, texMatrix, texOffset)
 	}
@@ -504,6 +508,12 @@ class GLHistogram @WorkerThread constructor(
 			mHistogramRegion[3] = maxV
 		}
 	}
+
+	/**
+	 * ヒストグラムの種類
+	 */
+	@HistogramType
+	var histogramType: Int = HISTOGRAM_RGB
 
 	/**
 	 * ヒストグラムデータを取得する
@@ -613,7 +623,7 @@ class GLHistogram @WorkerThread constructor(
 		/**
 		 * 輝度成分のヒストグラムを描画
 		 */
-		const val HISTOGRAM_I: Int = 9
+		const val HISTOGRAM_I: Int = 8
 
 		/**
 		 * RGBのヒストグラムを描画
@@ -829,6 +839,7 @@ class GLHistogram @WorkerThread constructor(
 			};
 			// Format: vec4(minU, minV, maxU, maxV) in normalized UV space (0.0 to 1.0)
 			uniform vec4 uEmbedRegion;
+			uniform int uHistogramType;
 			layout(location = 0) out vec4 o_FragColor;
 			const float EPS = 0.01;
 			const float SCALE = 0.75;
@@ -855,13 +866,18 @@ class GLHistogram @WorkerThread constructor(
 					vec3 countsL = counts - EPS;
 					vec3 histogram = vec3(0.0);
 					float histogramY = 1.0 - uvForTexture2.y;
-					if ((histogramY > countsL.r) && (histogramY < counts.r)) {
+					if (((uHistogramType & 1) == 1) && (histogramY > countsL.r) && (histogramY < counts.r)) {
 						histogram.r = 1.0;
 					}
-					if ((histogramY > countsL.g) && (histogramY < counts.g)) {
+					if (((uHistogramType & 2) == 2) && (histogramY > countsL.g) && (histogramY < counts.g)) {
 						histogram.g = 1.0;
 					}
-					if ((histogramY > countsL.b) && (histogramY < counts.b)) {
+					if (((uHistogramType & 4) == 4) && (histogramY > countsL.b) && (histogramY < counts.b)) {
+						histogram.b = 1.0;
+					}
+					if (((uHistogramType & 8) == 8) && (histogramY > countsL.b) && (histogramY < counts.b)) {
+						histogram.r = 1.0;
+						histogram.g = 1.0;
 						histogram.b = 1.0;
 					}
 					o_FragColor = vec4(mix(tex1.rgb, histogram, 0.5), tex1.a);
