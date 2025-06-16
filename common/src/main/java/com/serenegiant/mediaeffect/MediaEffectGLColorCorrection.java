@@ -106,7 +106,7 @@ public class MediaEffectGLColorCorrection extends MediaEffectGLBase {
 		// ガンマ関数を使ってトーンカーブを生成する
 		final float[] params = new float[65];
 		for (int ix = 0; ix < 64; ix++) {
-			final float x =  ix* 4.0f;
+			final double x =  ix * 4.0;
 			params[ix] = (float)((255.0 * Math.pow(x / 255.0, 1.0 / gamma) - x) / 255.0);
 		}
 		params[64] = params[63];
@@ -138,6 +138,22 @@ public class MediaEffectGLColorCorrection extends MediaEffectGLBase {
 		}
 		params[64] = params[63];
 		if (DEBUG) Log.v(TAG, "setContrast:" + Arrays.toString(params));
+		setParams(params, 0);
+	}
+
+	/**
+	 * シグモイドカーブを補正パラメータとする
+	 * @param k
+	 * @param threshold 0.0〜1.0
+	 */
+	public void setSigmoid(final float k, final float threshold) {
+		final float[] params = new float[65];
+		for (int ix = 0; ix < 64; ix++) {
+			final double x =  ix * 4.0 / 255.0;
+			params[ix] = (float)(1.0 / (1.0 + Math.pow(Math.E, -k * (x - threshold))));
+		}
+		params[64] = params[63];
+		if (DEBUG) Log.v(TAG, "setSigmoid:" + Arrays.toString(params));
 		setParams(params, 0);
 	}
 }

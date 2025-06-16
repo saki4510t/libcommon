@@ -375,6 +375,20 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setSigmoid(10.0f, 0.5f)
+				})
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLColorCorrection().apply {
+					setSigmoid(5.0f, 0.8f)
+				})
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLCrossProcess())
 			}
 		},
