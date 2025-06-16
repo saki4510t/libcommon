@@ -385,9 +385,10 @@ class GLHistogram @WorkerThread constructor(
 		width: Int, height: Int,
 		@TexUnit texUnit: Int, texId: Int,
 		@Size(min = 16) texMatrix: FloatArray?, texOffset: Int
-	) {
+	): Boolean {
 		val startTimeNs = Time.nanoTime()
-		if (startTimeNs - mNextDraw > mIntervalsDeltaNs) {
+		val result = startTimeNs - mNextDraw > mIntervalsDeltaNs;
+		if (result) {
 			mNextDraw = startTimeNs + mIntervalsNs
 			clearHistogramBuffer(mHistogramRGBId)
 			if (USB_COMPUTE_SHADER) {
@@ -422,6 +423,8 @@ class GLHistogram @WorkerThread constructor(
 				mComputeDrawer!!.draw(texUnit, texId, texMatrix, texOffset)
 			}
 		}
+
+		return result
 	}
 
 	/**
