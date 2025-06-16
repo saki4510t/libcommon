@@ -839,7 +839,7 @@ class GLHistogram @WorkerThread constructor(
 			"""
 
 		/**
-		 * 元映像のテクスチャと別途オフスクリーン描画したヒストグラムテクスチャを合成して表示するフラグメントシェーダー
+		 * 元映像のテクスチャとストグラムを合成して表示するフラグメントシェーダー
 		 */
 		private const val FRAGMENT_SHADER_MIX_SSBO_ES31 =
 			"""
