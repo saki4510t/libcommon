@@ -38,8 +38,35 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	private GLSurface mOutputOffscreen;
 	private volatile boolean mEnabled = true;
 
+	/**
+	 * コンストラクタ
+	 * ヒストグラム平坦化補正は行わない
+	 * @param isOES
+	 */
 	public MediaEffectGLHistogram(final boolean isOES) {
-		mGLHistogram = new GLHistogram(isOES);
+		this(isOES, 2.0f, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param isOES
+	 * @param equalize ヒストグラム平坦化補正を行うかどうか
+	 */
+	public MediaEffectGLHistogram(final boolean isOES, final boolean equalize) {
+		this(isOES, 2.0f, equalize);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param isOES
+	 * @param maxFps ヒストグラムの最大更新頻度
+	 * @param equalize ヒストグラム平坦化補正を行うかどうか
+	 */
+	public MediaEffectGLHistogram(
+		final boolean isOES,
+		final float maxFps,
+		final boolean equalize) {
+		mGLHistogram = new GLHistogram(isOES, maxFps, equalize);
 	}
 
 	@Override
@@ -105,9 +132,11 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 		final int width = output.getWidth();;
 		final int height = output.getHeight();
 		output.makeCurrent();
-		mGLHistogram.compute(
+		if (mGLHistogram.compute(
 			width, height,
-			GLES20.GL_TEXTURE1, srcTexIds[0], src.getTexMatrix(), 0);
+			GLES20.GL_TEXTURE1, srcTexIds[0], src.getTexMatrix(), 0)) {
+			mGLHistogram.equalize();
+		}
 		output.makeCurrent();
 		try {
 			mGLHistogram.draw(

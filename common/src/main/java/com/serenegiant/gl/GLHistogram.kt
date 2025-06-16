@@ -44,13 +44,25 @@ import kotlin.math.min
  * RGBヒストグラム作成のヘルパークラス
  * OpenGL|ES3.1以降が必要
  * XXX 公式にはAPI>=21でES3.1対応だけど一部端末でES3の機能が抜けている場合があるのでAPI>=24とする
+ * ヒストグラム平坦化による補正描画を行う場合には定期的に#compute, ##, #drawを呼び出す必要がある
+ *
+ * コンストラクタでequalize=falseとしてあとからヒストグラム平坦化補正を有効にはできない
+ *
+ * コンストラクタでequalize=trueとして#equalizeを呼ばない場合、または#resetEqualizeを呼んで
+ * LUTを呼ぶとヒストグラム平坦化補正無しと同等の描画になる。
+ * ただしequalize=trueの場合はt#drawで常にRGB→HSV→RGBの変換とKUT参照が実行されるためヒストグラム
+ * 平坦化補正が不要な場合はequalize=falseで生成するべき
  * @param isOES
  * @param maxFps
+ * @param equalize #drawでヒストグラム平坦化による補正描画を行うかどうか
  */
 @RequiresApi(api = Build.VERSION_CODES.N)
 class GLHistogram @WorkerThread constructor(
-	isOES: Boolean,
-	@FloatRange(from = 0.0) maxFps: Float
+	@JvmField
+	val isOES: Boolean,
+	@FloatRange(from = 0.0) maxFps: Float,
+	@JvmField
+	val equalize: Boolean
 ) : IMirror {
 	/**
 	 * RGBヒストグラムのカウント・描画用
@@ -265,8 +277,6 @@ class GLHistogram @WorkerThread constructor(
 	} // HistogramDrawer
 
 
-	@JvmField
-	val isOES: Boolean
 	private val texTarget: Int
 	private var mNextDraw: Long
 	private val mIntervalsNs: Long
@@ -314,16 +324,15 @@ class GLHistogram @WorkerThread constructor(
 	/**
 	 * コンストラクタ
 	 * ヒストグラムの歳代更新頻度は2fps
-	 * ヒストグラムのオフスクリーン描画サイズは512x512
+	 * ヒストグラム平坦化による補正描画は行わない
 	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @param isOES
 	 */
 	@WorkerThread
-	constructor(isOES: Boolean) : this(isOES, 2.0f)
+	constructor(isOES: Boolean) : this(isOES, 2.0f, false)
 
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:isOES=$isOES,useComputeShader=$USB_COMPUTE_SHADER,maxFps=$maxFps")
-		this.isOES = isOES
 		texTarget = if (isOES) GLConst.GL_TEXTURE_EXTERNAL_OES else GLES31.GL_TEXTURE_2D
 		mIntervalsNs = Math.round(1000000000.0 / (if (maxFps > 0.0f) maxFps else 2.0f))
 		mIntervalsDeltaNs = -Math.round(mIntervalsNs * 0.03) // 3%ならショートしても良いことにする
@@ -354,11 +363,11 @@ class GLHistogram @WorkerThread constructor(
 			muStepFactorLoc = GLES31.glGetUniformLocation(mComputeDrawer!!.hProgram, "uStepFactor")
 			GLUtils.checkGlError("glGetUniformLocation(uStepFactor)")
 		}
-		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=$isOES")
+		if (DEBUG) Log.v(TAG, "コンストラクタ:create mRendererDrawer,isOES=$isOES,equalize=$equalize")
 		mRendererDrawer = HistogramDrawer(
 			isOES, mHistogramRGBId,
 			ShaderConst.VERTEX_SHADER_ES31,
-			FRAGMENT_SHADER_MIX_SSBO_ES31
+			if (equalize) FRAGMENT_SHADER_MIX_SSBO_EQ_ES31 else FRAGMENT_SHADER_MIX_SSBO_ES31
 		)
 		muEmbedRegionLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uEmbedRegion")
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)")
@@ -390,7 +399,7 @@ class GLHistogram @WorkerThread constructor(
 		val result = startTimeNs - mNextDraw > mIntervalsDeltaNs;
 		if (result) {
 			mNextDraw = startTimeNs + mIntervalsNs
-			clearHistogramBuffer(mHistogramRGBId)
+			clearHistogramBuffer()
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram)
 				// ステップファクターをセット
@@ -558,6 +567,47 @@ class GLHistogram @WorkerThread constructor(
 	}
 
 	/**
+	 * ヒストグラム平坦化用のLUTを計算
+	 * 累積分布関数でLUTを計算する
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
+	 */
+	@OptIn(ExperimentalUnsignedTypes::class)
+	@WorkerThread
+	fun equalize() {
+		val work = getHistogram().asUIntArray()	// XXX #asUIntArrayはOptInが必要
+		var total = 0.0f	// ヒストグラムの全ピクセル数
+		val dist = FloatArray(256)
+		for (ix in 0..255) {
+			val rgb = work[ix] + work[ix + 256] + work[ix + 512]	// R[ix] + G[ix] + B[ix]
+			total += rgb.toFloat()
+			dist[ix] = rgb.toFloat()
+		}
+		mClearBuffer.limit(mClearBuffer.capacity())
+		mClearBuffer.position(1280)
+		var sum = 0.0f
+		for (ix in 0..255) {
+			sum += dist[ix] / total	// 正規化ヒストグラムの累積頻度を計算
+			mClearBuffer.put((sum * 255.0f).toInt())	// 0..255に変換してセット
+		}
+		mClearBuffer.position(1280)
+		setLUT()
+	}
+
+	/**
+	 * ヒストグラム平坦化補正用のLUTをリセットする
+	 */
+	@WorkerThread
+	fun resetEqualize() {
+		mClearBuffer.limit(mClearBuffer.capacity())
+		mClearBuffer.position(1280)
+		for (ix in 0..255) {
+			mClearBuffer.put(ix)
+		}
+		mClearBuffer.position(1280)
+		setLUT()
+	}
+
+	/**
 	 * ヒストグラムのデータを保持しているシェーダーストレージバッファオブジェクトのIDを取得する
 	 */
 	fun getHistogramBufferId(): Int {
@@ -572,8 +622,10 @@ class GLHistogram @WorkerThread constructor(
 
 	/**
 	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトを生成
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @return
 	 */
+	@WorkerThread
 	private fun initHistogramBuffer(): Int {
 		if (DEBUG) Log.v(TAG, "initHistogramBuffer:")
 		// バッファオブジェクトを生成
@@ -583,7 +635,14 @@ class GLHistogram @WorkerThread constructor(
 		// 操作するバッファを指定
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, histogramBuffer[0])
 		GLUtils.checkGlError("initHistogramBuffer:glBindBuffer")
-		resetClearBuffer()
+		// デフォルトのLUTをセット
+		mClearBuffer.clear()
+		mClearBuffer.position(1280)
+		for (ix in 0..255) {
+			mClearBuffer.put(ix)
+		}
+		mClearBuffer.position(mClearBuffer.capacity())
+		mClearBuffer.flip()
 		GLES31.glBufferData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
 			HISTOGRAM_BYTES,  // sizeはバイト数なので注意
@@ -599,14 +658,16 @@ class GLHistogram @WorkerThread constructor(
 
 	/**
 	 * ヒストグラム受け取り用のシェーダーストレージバッファオブジェクトをクリアする
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
 	 * @return
 	 */
-	private fun clearHistogramBuffer(bufferId: Int) {
+	@WorkerThread
+	private fun clearHistogramBuffer() {
 		// 操作するバッファを指定
 		// 以降バッファIDとして0を指定するまではGL_SHADER_STORAGE_BUFFERを
 		// 指定したバッファの操作は全てこのbufferIDで示すバッファに対して行われる
-		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, bufferId)
-		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer($bufferId)")
+		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
+		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer($mHistogramRGBId)")
 		resetClearBuffer()
 		GLES31.glBufferSubData(
 			GLES31.GL_SHADER_STORAGE_BUFFER,
@@ -617,6 +678,30 @@ class GLHistogram @WorkerThread constructor(
 		// バッファの指定をクリア
 		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
 		if (DEBUG) GLUtils.checkGlError("clearAndBindHistogramBuffer:glBindBuffer(0)")
+	}
+
+	/**
+	 * ヒストグラム平坦化補正用のLUTをセットする
+	 * mClearBufferからヒストグラムのカウント用シェーダーストレージバッファオブジェクトのインデックス1280-1535をセットする
+	 * EGL|GLコンテキストの存在するスレッド上で実行すること
+	 */
+	@WorkerThread
+	private fun setLUT() {
+		// #glReadPixels, #glBufferData, #glBufferSubDataなどのGLESのバッファ関係の関数では
+		// Bufferのlimit/positionの操作は無視されてる気がする
+		mClearBuffer.limit(mClearBuffer.capacity())
+		mClearBuffer.position(1280)
+		// シェーダーストレージバッファオブジェクトのLUT領域を更新
+		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, mHistogramRGBId)
+		if (DEBUG) GLUtils.checkGlError("setLUT:glBindBuffer($mHistogramRGBId)")
+		GLES31.glBufferSubData(
+			GLES31.GL_SHADER_STORAGE_BUFFER,
+			1280 * BufferHelper.SIZEOF_INT_BYTES, 256 * BufferHelper.SIZEOF_INT_BYTES,  // sizeはバイト数なので注意
+			mClearBuffer
+		)
+		if (DEBUG) GLUtils.checkGlError("setLUT:glBufferData")
+		// バッファの指定をクリア
+		GLES31.glBindBuffer(GLES31.GL_SHADER_STORAGE_BUFFER, 0)
 	}
 
 	companion object {
@@ -878,6 +963,87 @@ class GLHistogram @WorkerThread constructor(
 					&& vTextureCoord.y >= uEmbedRegion.y
 					&& vTextureCoord.y <= uEmbedRegion.w;
 				highp vec4 tex1 = texture(sTexture, vTextureCoord);
+				if (isInsideEmbedRegion) {
+					vec2 relativePosInEmbedRegion = vTextureCoord - uEmbedRegion.xy;
+					vec2 embedRegionSize = uEmbedRegion.zw - uEmbedRegion.xy; // (maxU - minU, maxV - minV)
+					vec2 uvForTexture2 = relativePosInEmbedRegion / embedRegionSize;
+					uint index = uint(uvForTexture2.x * STEP);	// 0..STEP
+					// ヒストグラムを取得
+					float countsR = float(counts[index]);
+					float countsG = float(counts[index + 256u]);
+					float countsB = float(counts[index + 512u]);
+	//				float countsI = float(counts[index + 768u]);
+					// 最大値を取得して正規化
+					float max = float(counts[1028u]) * SCALE;
+					vec3 counts = vec3(countsR, countsG, countsB) / max;
+					vec3 countsL = counts - EPS;
+					vec3 histogram = vec3(0.0);
+					float histogramY = 1.0 - uvForTexture2.y;
+					if (((uHistogramType & 1) == 1) && (histogramY > countsL.r) && (histogramY < counts.r)) {
+						histogram.r = 1.0;
+					}
+					if (((uHistogramType & 2) == 2) && (histogramY > countsL.g) && (histogramY < counts.g)) {
+						histogram.g = 1.0;
+					}
+					if (((uHistogramType & 4) == 4) && (histogramY > countsL.b) && (histogramY < counts.b)) {
+						histogram.b = 1.0;
+					}
+					if (((uHistogramType & 8) == 8) && (histogramY > countsL.b) && (histogramY < counts.b)) {
+						histogram.r = 1.0;
+						histogram.g = 1.0;
+						histogram.b = 1.0;
+					}
+					o_FragColor = vec4(mix(tex1.rgb, histogram, 0.5), tex1.a);
+				} else {
+					o_FragColor = tex1;
+				}
+			}
+			"""
+
+		/**
+		 * 元映像のテクスチャとストグラムを合成して表示するフラグメントシェーダー
+		 * ヒストグラム平坦化のLUT値を使って輝度を調整する
+		 */
+		private const val FRAGMENT_SHADER_MIX_SSBO_EQ_ES31 =
+			"""
+			#version 310 es
+			#define STEP (255.0)
+			precision highp float;
+			const float bkColor = 0.2;
+			in vec2 vTextureCoord;
+			uniform sampler2D sTexture;
+			layout(std430, binding = 1) buffer Histogram {
+				uint counts[256 * 6];
+			};
+			// Format: vec4(minU, minV, maxU, maxV) in normalized UV space (0.0 to 1.0)
+			uniform vec4 uEmbedRegion;
+			uniform int uHistogramType;
+			layout(location = 0) out vec4 o_FragColor;
+			const float EPS = 0.01;
+			const float SCALE = 0.75;
+			vec3 rgb2hsv(vec3 c) {
+				const highp vec4 K = vec4(0.0, -1.0 / 3.0, 2.0 / 3.0, -1.0);
+				const highp float e = 1.0e-10;
+				vec4 p = mix(vec4(c.bg, K.wz), vec4(c.gb, K.xy), step(c.b, c.g));
+				vec4 q = mix(vec4(p.xyw, c.r), vec4(c.r, p.yzx), step(p.x, c.r));
+				float d = q.x - min(q.w, q.y);
+				return vec3(abs(q.z + (q.w - q.y) / (6.0 * d + e)), d / (q.x + e), q.x);
+			}
+			vec3 hsv2rgb(vec3 c) {
+				const highp vec4 K = vec4(1.0, 2.0 / 3.0, 1.0 / 3.0, 3.0);
+				vec3 p = abs(fract(c.xxx + K.xyz) * 6.0 - K.www);
+				return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
+			}
+			void main() {
+				bool isInsideEmbedRegion =
+					vTextureCoord.x >= uEmbedRegion.x
+					&& vTextureCoord.x <= uEmbedRegion.z
+					&& vTextureCoord.y >= uEmbedRegion.y
+					&& vTextureCoord.y <= uEmbedRegion.w;
+				highp vec4 tex1 = texture(sTexture, vTextureCoord);
+				highp vec3 hsv = rgb2hsv(tex1.rgb);
+				hsv.z = float(counts[1280u + uint(hsv.z * 255.0)]) / 255.0;
+				tex1 = vec4(hsv2rgb(hsv), tex1.a); 
 				if (isInsideEmbedRegion) {
 					vec2 relativePosInEmbedRegion = vTextureCoord - uEmbedRegion.xy;
 					vec2 embedRegionSize = uEmbedRegion.zw - uEmbedRegion.xy; // (maxU - minU, maxV - minV)

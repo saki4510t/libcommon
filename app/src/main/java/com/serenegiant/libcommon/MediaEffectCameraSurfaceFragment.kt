@@ -433,6 +433,15 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		},
 		object : MediaEffectPipeline.EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+					mutableListOf(MediaEffectGLHistogram(false, true))
+				} else {
+					super.buildEffects(effectContext)
+				}
+			}
+		},
+		object : MediaEffectPipeline.EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectGLMaskedAlphaBlend())	// マスク用テクスチャを指定していないので変化無し
 			}
 		},
