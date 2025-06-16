@@ -681,8 +681,9 @@ class GLHistogram @WorkerThread constructor(
 		 * インデックス1026:		B max(未計算)
 		 * インデックス1027:		I max
 		 * インデックス1028:		max
+		 * インデックス1280-1535:	ヒストグラム平坦化のLUT
 		 */
-		private const val HISTOGRAM_SIZE = 256 * 5
+		private const val HISTOGRAM_SIZE = 256 * 6
 		/**
 		 * ヒストグラムのデータサイズのバイト数
 		 */
@@ -722,7 +723,7 @@ class GLHistogram @WorkerThread constructor(
 			in vec2 vTextureCoord;
 			uniform sampler2D sTexture;
 			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 5];
+				uint counts[256 * 6];
 			};
 			const highp vec3 conv = vec3(0.2125, 0.7154, 0.0721);
 
@@ -814,7 +815,7 @@ class GLHistogram @WorkerThread constructor(
 			in vec2 vTextureCoord;
 			uniform sampler2D sTexture;
 			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 5];
+				uint counts[256 * 6];
 			};
 			layout(location = 0) out vec4 o_FragColor;
 			const float EPS = 0.01;
@@ -859,7 +860,7 @@ class GLHistogram @WorkerThread constructor(
 			in vec2 vTextureCoord;
 			uniform sampler2D sTexture;
 			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 5];
+				uint counts[256 * 6];
 			};
 			// Format: vec4(minU, minV, maxU, maxV) in normalized UV space (0.0 to 1.0)
 			uniform vec4 uEmbedRegion;
@@ -925,7 +926,7 @@ class GLHistogram @WorkerThread constructor(
 			in vec2 vTextureCoord;
 			uniform sampler2D sTexture;
 			layout(std430, binding = 1) buffer Histogram {
-				uint counts[256 * 5];
+				uint counts[256 * 6];
 			};
 			layout(location = 0) out vec4 o_FragColor;
 			const float EPS = 0.01;
