@@ -708,25 +708,26 @@ class GLHistogram @WorkerThread constructor(
 		private const val DEBUG = false // set false on production
 		private val TAG: String = GLHistogram::class.java.simpleName
 
+		const val HISTOGRAM_NON = 0
 		/**
 		 * R成分のヒストグラムを描画
 		 */
-		const val HISTOGRAM_R: Int = 1
+		const val HISTOGRAM_R = 1
 
 		/**
 		 * G成分のヒストグラムを描画
 		 */
-		const val HISTOGRAM_G: Int = 2
+		const val HISTOGRAM_G = 2
 
 		/**
 		 * B成分のヒストグラムを描画
 		 */
-		const val HISTOGRAM_B: Int = 4
+		const val HISTOGRAM_B = 4
 
 		/**
 		 * 輝度成分のヒストグラムを描画
 		 */
-		const val HISTOGRAM_I: Int = 8
+		const val HISTOGRAM_I = 8
 
 		/**
 		 * RGBのヒストグラムを描画
@@ -737,6 +738,7 @@ class GLHistogram @WorkerThread constructor(
 		 * ヒストグラムの種類
 		 */
 		@IntDef(
+			HISTOGRAM_NON,
 			HISTOGRAM_R,
 			HISTOGRAM_G,
 			HISTOGRAM_B,
@@ -1036,14 +1038,17 @@ class GLHistogram @WorkerThread constructor(
 			}
 			void main() {
 				bool isInsideEmbedRegion =
-					vTextureCoord.x >= uEmbedRegion.x
+					(uHistogramType & 9) != 0
+					&& vTextureCoord.x >= uEmbedRegion.x
 					&& vTextureCoord.x <= uEmbedRegion.z
 					&& vTextureCoord.y >= uEmbedRegion.y
 					&& vTextureCoord.y <= uEmbedRegion.w;
 				highp vec4 tex1 = texture(sTexture, vTextureCoord);
+				// ヒストグラム平坦化補正用LUTを参照して輝度を調整
 				highp vec3 hsv = rgb2hsv(tex1.rgb);
 				hsv.z = float(counts[1280u + uint(hsv.z * 255.0)]) / 255.0;
-				tex1 = vec4(hsv2rgb(hsv), tex1.a); 
+				tex1 = vec4(hsv2rgb(hsv), tex1.a);
+				// 描画処理
 				if (isInsideEmbedRegion) {
 					vec2 relativePosInEmbedRegion = vTextureCoord - uEmbedRegion.xy;
 					vec2 embedRegionSize = uEmbedRegion.zw - uEmbedRegion.xy; // (maxU - minU, maxV - minV)
