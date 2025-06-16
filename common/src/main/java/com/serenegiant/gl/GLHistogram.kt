@@ -18,10 +18,7 @@ package com.serenegiant.gl
 *  limitations under the License.
 */
 
-import android.opengl.GLES20
-import android.opengl.GLES30
 import android.opengl.GLES31
-import android.opengl.GLES32
 import android.opengl.Matrix
 import android.os.Build
 import android.util.Log
@@ -289,6 +286,12 @@ class GLHistogram @WorkerThread constructor(
 	@Size(value = 4)
 	private val mROI = FloatArray(4)
 
+	/**
+	 * ヒストグラムカウント時のサンプリング間隔
+	 */
+	@Size(value = 2)
+	private val mStepFactor = FloatArray(2)
+
 	@Size(value = 4)
 	private val mHistogramRegion = floatArrayOf(
 		0.1f, 0.75f,  // minU, minV,
@@ -361,6 +364,8 @@ class GLHistogram @WorkerThread constructor(
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(sTexture2)")
 		muHistogramTypeLoc = GLES31.glGetUniformLocation(mRendererDrawer.hProgram, "uHistogramType")
 		GLUtils.checkGlError("コンストラクタ:glGetUniformLocation(uHistogramType)")
+		mStepFactor[0] = 4.0f
+		mStepFactor[1] = 3.0f
 		if (!isOES) {
 			mirror = IMirror.MIRROR_VERTICAL
 		}
@@ -385,12 +390,10 @@ class GLHistogram @WorkerThread constructor(
 		if (startTimeNs - mNextDraw > mIntervalsDeltaNs) {
 			mNextDraw = startTimeNs + mIntervalsNs
 			clearHistogramBuffer(mHistogramRGBId)
-			mROI[0] = 4.0f
-			mROI[1] = 3.0f
 			if (USB_COMPUTE_SHADER) {
 				GLES31.glUseProgram(mComputeProgram)
 				// ステップファクターをセット
-				GLES31.glUniform2fv(muStepFactorLoc, 1, mROI, 0)
+				GLES31.glUniform2fv(muStepFactorLoc, 1, mStepFactor, 0)
 				// ROIをセット、今はテクスチャ全面をカウント対象とする, (0,0)-(width,height)
 				mROI[0] = 0f
 				mROI[1] = 0f
@@ -415,7 +418,7 @@ class GLHistogram @WorkerThread constructor(
 			} else {
 				GLES31.glUseProgram(mComputeDrawer!!.hProgram)
 				// ステップファクターをセット
-				GLES31.glUniform2fv(muStepFactorLoc, 1, mROI, 0)
+				GLES31.glUniform2fv(muStepFactorLoc, 1, mStepFactor, 0)
 				mComputeDrawer!!.draw(texUnit, texId, texMatrix, texOffset)
 			}
 		}
@@ -506,6 +509,18 @@ class GLHistogram @WorkerThread constructor(
 			mHistogramRegion[1] = minV
 			mHistogramRegion[2] = maxU
 			mHistogramRegion[3] = maxV
+		}
+	}
+
+	/**
+	 * ヒストグラムカウント時のサンプリング間隔を設定
+	 */
+	@AnyThread
+	fun setStepFactor(
+		@FloatRange(from = 1.0) sx: Float, @FloatRange(from = 1.0) sy: Float) {
+		synchronized(mStepFactor) {
+			mStepFactor[0] = if (sx >= 1.0) sx else 4.0f
+			mStepFactor[1] = if (sy >= 1.0) sy else 3.0f
 		}
 	}
 
