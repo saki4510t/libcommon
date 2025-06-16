@@ -18,18 +18,15 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import com.serenegiant.gl.GLSurface;
-
 import androidx.annotation.NonNull;
 
 public interface IMediaEffect {
-	@Deprecated
-	public void apply(@NonNull final int[] srcTexIds,
-		final int width, final int height, final int outTexId);
-	@Deprecated
-	public void apply(@NonNull final int[] srcTexIds,
-		@NonNull final GLSurface output);
-	public void apply(ISource src);
+	/**
+	 * 映像効果・フィルターを適用する
+	 * GLコンテキスト上で実行すること
+	 * @param src
+	 */
+	public void apply(@NonNull final ISource src);
 	public void release();
 	public IMediaEffect resize(final int width, final int height);
 	public boolean enabled();

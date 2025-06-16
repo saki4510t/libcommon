@@ -22,20 +22,26 @@ import android.media.effect.Effect;
 import android.media.effect.EffectContext;
 import android.media.effect.EffectFactory;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import android.text.TextUtils;
 
 import com.serenegiant.gl.GLSurface;
 
 public class MediaEffect implements IMediaEffect {
+	@NonNull
 	protected final EffectContext mEffectContext;
+	@Nullable
 	protected Effect mEffect;
 	protected boolean mEnabled = true;
+
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 * @param effectContext
+	 * @param effectName
 	 */
-	public MediaEffect(final EffectContext effectContext, final String effectName) {
+	public MediaEffect(@NonNull final EffectContext effectContext, final String effectName) {
 		mEffectContext = effectContext;
 		final EffectFactory factory = effectContext.getFactory();
 		if (TextUtils.isEmpty(effectName)) {
@@ -45,28 +51,12 @@ public class MediaEffect implements IMediaEffect {
 		}
 	}
 
+	/**
+	 * GLコンテキスト上で実行すること
+	 * @param src
+	 */
 	@Override
-	public void apply(@NonNull final int [] srcTexIds,
-		final int width, final int height, final int outTexId) {
-
-		if (mEnabled && (mEffect != null)) {
-			mEffect.apply(srcTexIds[0], width, height, outTexId);
-		}
-	}
-
-	@Override
-	public void apply(@NonNull final int [] srcTexIds,
-		@NonNull final GLSurface output) {
-
-		if (mEnabled && (mEffect != null)) {
-			mEffect.apply(srcTexIds[0],
-				output.getWidth(), output.getHeight(),
-				output.getTexId());
-		}
-	}
-
-	@Override
-	public void apply(final ISource src) {
+	public void apply(@NonNull final ISource src) {
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src.getSourceTexId()[0],
 				src.getWidth(), src.getHeight(),

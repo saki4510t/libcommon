@@ -80,52 +80,7 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	}
 
 	@Override
-	public void apply(@NonNull final int[] srcTexIds, final int width, final int height, final int outTexId) {
-		if (!mEnabled) return;
-		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false);
-		}
-		if ((outTexId != mOutputOffscreen.getTexId())
-			|| (width != mOutputOffscreen.getWidth())
-			|| (height != mOutputOffscreen.getHeight())) {
-			mOutputOffscreen.assignTexture(outTexId, width, height, null);
-		}
-		mOutputOffscreen.makeCurrent();
-		mGLHistogram.compute(
-			width, height,
-			GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
-		mOutputOffscreen.makeCurrent();
-		try {
-			mGLHistogram.draw(
-				width, height,
-				GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
-		} finally {
-			mOutputOffscreen.swap();
-		}
-	}
-
-	@Override
-	public void apply(@NonNull final int[] srcTexIds, @NonNull final GLSurface output) {
-		if (!mEnabled) return;
-		final int width = output.getWidth();;
-		final int height = output.getHeight();
-		output.makeCurrent();
-		mGLHistogram.compute(
-			width, height,
-			GLES20.GL_TEXTURE1, srcTexIds[0], mOutputOffscreen.copyTexMatrix(), 0);
-		output.makeCurrent();
-		try {
-			// FIXME ここのテクスチャマトリックスもソース側のを使わないとだめかも
-			mGLHistogram.draw(
-				width, height,
-				GLES20.GL_TEXTURE0, srcTexIds[0], output.copyTexMatrix(), 0);
-		} finally {
-			output.swap();
-		}
-	}
-
-	@Override
-	public void apply(final ISource src) {
+	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
 		final GLSurface output = src.getOutputTexture();
 		final int[] srcTexIds = src.getSourceTexId();

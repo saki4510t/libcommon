@@ -27,7 +27,7 @@ import com.serenegiant.gl.GLSurface;
 public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
 	protected final MediaEffectGLKernel3x3Drawer mDrawer2;
-	protected GLSurface mOutputOffscreen2;
+	protected GLSurface mOutputOffscreen;
 
 	public MediaEffectGLTwoPassBase(final int numTex,
 									final boolean isOES, final String fss) {
@@ -67,9 +67,9 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		if (mDrawer2 != null) {
 			mDrawer2.release();
 		}
-		if (mOutputOffscreen2 != null) {
-			mOutputOffscreen2.release();
-			mOutputOffscreen2 = null;
+		if (mOutputOffscreen != null) {
+			mOutputOffscreen.release();
+			mOutputOffscreen = null;
 		}
 		super.release();
 	}
@@ -91,90 +91,8 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 		return this;
 	}
 
-	/**
-	 * If you know the source texture came from MediaSource,
-	 * using #apply(MediaSource) is much efficient instead of this
-	 * @param srcTexIds
-	 * @param width
-	 * @param height
-	 * @param outTexId
-	 */
 	@Override
-	public void apply(@NonNull final int [] srcTexIds,
-		final int width, final int height, final int outTexId) {
-
-		if (!mEnabled) return;
-		// パス1
-		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(
-				false, GLES20.GL_TEXTURE0,
-				width, height, false);
-		}
-		mOutputOffscreen.makeCurrent();
-		try {
-			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
-		} finally {
-			mOutputOffscreen.swap();
-		}
-
-		if (mOutputOffscreen2 == null) {
-			mOutputOffscreen2 = GLSurface.newInstance(
-				false, GLES20.GL_TEXTURE0,
-				width, height, false);
-		}
-		// パス2
-		if ((outTexId != mOutputOffscreen2.getTexId())
-			|| (width != mOutputOffscreen2.getWidth())
-			|| (height != mOutputOffscreen2.getHeight())) {
-			mOutputOffscreen2.assignTexture(outTexId, width, height, null);
-		}
-		mOutputOffscreen2.makeCurrent();
-		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
-		try {
-			if (mDrawer2 != null) {
-				mDrawer2.apply(ids, mOutputOffscreen2.copyTexMatrix(), 0);
-			} else {
-				mDrawer.apply(ids, mOutputOffscreen2.copyTexMatrix(), 0);
-			}
-		} finally {
-			mOutputOffscreen2.swap();
-		}
-	}
-
-	@Override
-	public void apply(@NonNull final int[] srcTexIds,
-		@NonNull final GLSurface output) {
-
-
-		if (!mEnabled) return;
-		// パス1
-		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(
-				false, GLES20.GL_TEXTURE0,
-				output.getWidth(), output.getHeight(), false);
-		}
-		mOutputOffscreen.makeCurrent();
-		try {
-			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
-		} finally {
-			mOutputOffscreen.swap();
-		}
-		// パス2
-		output.makeCurrent();
-		final int[] ids = new int[] { mOutputOffscreen.getTexId() };
-		try {
-			if (mDrawer2 != null) {
-				mDrawer2.apply(ids, output.copyTexMatrix(), 0);
-			} else {
-				mDrawer.apply(ids, output.copyTexMatrix(), 0);
-			}
-		} finally {
-			output.swap();
-		}
-	}
-	
-	@Override
-	public void apply(final ISource src) {
+	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
 		final GLSurface output_tex = src.getOutputTexture();
 		final int[] srcTexIds = src.getSourceTexId();

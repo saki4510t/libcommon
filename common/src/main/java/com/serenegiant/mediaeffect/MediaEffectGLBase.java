@@ -18,13 +18,12 @@ package com.serenegiant.mediaeffect;
  *  limitations under the License.
 */
 
-import androidx.annotation.NonNull;
-
-import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.glutils.IMirror;
+
+import androidx.annotation.NonNull;
 
 import static com.serenegiant.gl.ShaderConst.*;
 
@@ -35,9 +34,8 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	private static final boolean DEBUG = false;
 	private static final String TAG = "MediaEffectGLBase";
 
-	protected GLSurface mOutputOffscreen;
 	protected volatile boolean mEnabled = true;
-
+	@NonNull
 	protected final MediaEffectGLDrawer mDrawer;
 
 	/**
@@ -54,8 +52,9 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	 * @param numTex
 	 * @param shader
 	 */
-	public MediaEffectGLBase(final int numTex,
-							 final boolean isOES, final String shader) {
+	public MediaEffectGLBase(
+		final int numTex,
+		final boolean isOES, final String shader) {
 
 		this(MediaEffectGLDrawer.newInstance(numTex, isOES, VERTEX_SHADER_ES2, shader));
 	}
@@ -66,8 +65,9 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	 * @param vss
 	 * @param fss
 	 */
-	public MediaEffectGLBase(final int numTex,
-							 final boolean isOES, final String vss, final String fss) {
+	public MediaEffectGLBase(
+		final int numTex,
+		final boolean isOES, final String vss, final String fss) {
 
 		this(MediaEffectGLDrawer.newInstance(numTex, isOES, vss, fss));
 	}
@@ -76,7 +76,7 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	 * コンストラクタ
 	 * @param drawer
 	 */
-	public MediaEffectGLBase(final MediaEffectGLDrawer drawer) {
+	public MediaEffectGLBase(@NonNull final MediaEffectGLDrawer drawer) {
 		mDrawer = drawer;
 //		resize(256, 256);
 	}
@@ -85,10 +85,6 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	public void release() {
 		if (DEBUG) Log.v(TAG, "release:");
 		mDrawer.release();
-		if (mOutputOffscreen != null) {
-			mOutputOffscreen.release();
-			mOutputOffscreen = null;
-		}
 	}
 
 	/**
@@ -132,13 +128,6 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 
 	@Override
 	public MediaEffectGLBase resize(final int width, final int height) {
-		// ISourceを使う時は出力用オフスクリーンは不要なのと
-		// ISourceを使わない時は描画時にチェックして生成するのでresize時には生成しないように変更
-/*		if ((mOutputOffscreen == null) || (width != mOutputOffscreen.getWidth())
-			|| (height != mOutputOffscreen.getHeight())) {
-			mOutputOffscreen.release();
-			mOutputOffscreen = new GLSurface(width, height, false);
-		} */
 		if (mDrawer != null) {
 			mDrawer.setTexSize(width, height);
 		}
@@ -157,55 +146,12 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	}
 
 	/**
-	 * If you know the source texture came from MediaSource,
-	 * using #apply(MediaSource) is much efficient instead of this
-	 * @param srcTexIds
-	 * @param width
-	 * @param height
-	 * @param outTexId
-	 */
-	@Override
-	public void apply(@NonNull final int [] srcTexIds,
-		final int width, final int height, final int outTexId) {
-
-		if (!mEnabled) return;
-		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(false, GLES20.GL_TEXTURE0, width, height, false);
-		}
-		if ((outTexId != mOutputOffscreen.getTexId())
-			|| (width != mOutputOffscreen.getWidth())
-			|| (height != mOutputOffscreen.getHeight())) {
-			mOutputOffscreen.assignTexture(outTexId, width, height, null);
-		}
-		mOutputOffscreen.makeCurrent();
-		try {
-			mDrawer.apply(srcTexIds, mOutputOffscreen.copyTexMatrix(), 0);
-		} finally {
-			mOutputOffscreen.swap();
-		}
-	}
-
-	@Override
-	public void apply(@NonNull final int [] srcTexIds,
-		@NonNull final GLSurface output) {
-
-		if (!mEnabled) return;
-		output.makeCurrent();
-		try {
-			// FIXME ここのテクスチャマトリックスもソース側のを使わないとだめかも
-			mDrawer.apply(srcTexIds, output.copyTexMatrix(), 0);
-		} finally {
-			output.swap();
-		}
-	}
-
-	/**
 	 * if your source texture comes from ISource,
 	 * please use this method instead of #apply(final int [], int, int, int)
 	 * @param src
 	 */
 	@Override
-	public void apply(final ISource src) {
+	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
 		final GLSurface output = src.getOutputTexture();
 		final int[] srcTexIds = src.getSourceTexId();
