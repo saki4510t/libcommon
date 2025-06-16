@@ -672,6 +672,15 @@ class GLHistogram @WorkerThread constructor(
 
 		/**
 		 * ヒストグラムのデータ長
+		 * インデックス0-255:		R
+		 * インデックス256-511:	G
+		 * インデックス512-767:	B
+		 * インデックス768-1023:	I
+		 * インデックス1024:		R max(未計算)
+		 * インデックス1025:		G max(未計算)
+		 * インデックス1026:		B max(未計算)
+		 * インデックス1027:		I max
+		 * インデックス1028:		max
 		 */
 		private const val HISTOGRAM_SIZE = 256 * 5
 		/**
