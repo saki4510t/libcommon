@@ -108,16 +108,16 @@ class GLHistogram @WorkerThread constructor(
 		/**
 		 * 頂点座標
 		 */
-		private val pVertex: FloatBuffer = BufferHelper.createBuffer(ShaderConst.DEFAULT_VERTICES_2D)
+		private val pVertex = BufferHelper.createBuffer(ShaderConst.DEFAULT_VERTICES_2D)
 
 		/**
 		 * テクスチャ座標
 		 */
-		private val pTexCoord: FloatBuffer = BufferHelper.createBuffer(ShaderConst.DEFAULT_TEXCOORD_2D)
+		private val pTexCoord = BufferHelper.createBuffer(ShaderConst.DEFAULT_TEXCOORD_2D)
 		val hProgram: Int
 
 		@Size(value = 16)
-		val mMvpMatrix: FloatArray = FloatArray(16)
+		val mMvpMatrix = FloatArray(16)
 		private var mRelease = false
 
 		/**
@@ -311,7 +311,7 @@ class GLHistogram @WorkerThread constructor(
 	/**
 	 * ヒストグラム受け取り用のテクスチャをゼロクリアするために使うIntBuffer
 	 */
-	private val mClearBuffer: IntBuffer = BufferHelper.createBuffer(IntArray(HISTOGRAM_SIZE))
+	private val mClearBuffer = BufferHelper.createBuffer(IntArray(HISTOGRAM_SIZE))
 
 	/**
 	 * ヒストグラムを受け取るシェーダーストレージバッファオブジェクトID
