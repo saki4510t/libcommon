@@ -40,6 +40,9 @@ import com.serenegiant.math.Fraction;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
+
 import static com.serenegiant.gl.ShaderConst.GL_TEXTURE_EXTERNAL_OES;
 
 /**
@@ -403,12 +406,26 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 					return handleRequest(msg);
 				}
 			});
+			final Semaphore sem = new Semaphore(0);
 			mGlManager.runOnGLThread(new Runnable() {
 				@Override
 				public void run() {
-					handleOnStart();
+					try {
+						handleOnStart();
+					} catch (final Exception e) {
+						if (DEBUG) Log.w(TAG, e);
+					}
+					sem.release();
 				}
 			});
+			// ワーカースレッドの初期化待ち
+			try {
+				if (!sem.tryAcquire(3000, TimeUnit.MILLISECONDS)) {
+					// タイムアウトしたとき
+				}
+			} catch (final InterruptedException e) {
+				// do nothing
+			}
 		}
 
 		@Override
