@@ -512,7 +512,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 		 * テクスチャ変換行列を取得
 		 * @return
 		 */
-		@Size(min=16)
+		@Size(value=16)
 		@NonNull
 		public float[] getTexMatrix() {
 			checkValid();

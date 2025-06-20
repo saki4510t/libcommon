@@ -102,7 +102,7 @@ public class GLTexture implements GLConst {
 	private final boolean ADJUST_POWER2;
 	private final boolean mWrappedTexture;
 	private int mTextureId;
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mTexMatrix = new float[16];	// テクスチャ変換行列
 	private int mTexWidth, mTexHeight;
@@ -245,7 +245,7 @@ public class GLTexture implements GLConst {
 	/**
 	 * #copyTexMatrix()の返り値用のfloat配列
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mResultMatrix = new float[16];
 	/**
@@ -253,7 +253,7 @@ public class GLTexture implements GLConst {
 	 * テクスチャ座標変換行列のコピーを取得
 	 * @return
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] copyTexMatrix() {
 		System.arraycopy(mTexMatrix, 0, mResultMatrix, 0, 16);
@@ -275,7 +275,7 @@ public class GLTexture implements GLConst {
 	 * テクスチャ座標変換行列を取得(内部配列をそのまま返すので変更時は要注意)
 	 * @return
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] getTexMatrix() {
 		return mTexMatrix;

@@ -180,14 +180,14 @@ public class MixRendererHolder extends AbstractRendererHolder {
 	 * 描画タスク
 	 */
 	private final class MixRendererTask extends BaseRendererTask {
-		@Size(min=16)
+		@Size(value=16)
 		@NonNull
 		private final float[] mTexMatrix2 = new float[16];
 		private int mTexId2;
 		private SurfaceTexture mMasterTexture2;
 		private Surface mMasterSurface2;
 
-		@Size(min=16)
+		@Size(value=16)
 		@NonNull
 		private final float[] mMaskTexMatrix = new float[16];
 		private int mMaskTexId;

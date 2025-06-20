@@ -148,7 +148,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] getTexMatrix() throws IllegalStateException {
 		return mSource.getTexMatrix();

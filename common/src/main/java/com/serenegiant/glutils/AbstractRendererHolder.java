@@ -375,7 +375,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		private final GLManager mGlManager;
 		@NonNull
 		private final Handler mGLHandler;
-		@Size(min=16)
+		@Size(value=16)
 		@NonNull
 		final float[] mTexMatrix = new float[16];
 		private int mTexId;

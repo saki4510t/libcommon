@@ -140,7 +140,7 @@ public class GLSurfaceReceiver {
 	 * 映像受け取り用SurfaceTextureの#getTransformMatrixで受け取った
 	 * テクスチャ変換行列を保持する
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
 	/**
@@ -330,7 +330,7 @@ public class GLSurfaceReceiver {
 	 * テクスチャ変換行列を取得
 	 * @return
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] getTexMatrix() {
 		mLock.lock();

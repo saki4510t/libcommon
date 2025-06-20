@@ -48,7 +48,7 @@ public class GLViewTransformer {
 	/**
 	 * トランスフォームマトリックス
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mTransform = new float[16];
 	/**
@@ -56,13 +56,13 @@ public class GLViewTransformer {
 	 * #setDefaultで変更していなければコンストラクタ実行時に
 	 * Viewから取得したトランスフォームマトリックス
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mDefaultTransform = new float[16];
 	/**
 	 * 計算用のワーク
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] work = new float[16];
 

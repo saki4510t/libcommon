@@ -60,10 +60,10 @@ public class RendererTarget implements IMirror {
 	private final boolean mOwnSurface;
 	/** 分配描画用Surfaceを元に生成したOpenGL|ESで描画する為のEglSurface */
 	private ISurface mTargetSurface;
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mMvpMatrix = new float[16];
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mWorkMatrix = new float[16];
 	private volatile boolean mEnable = true;
@@ -157,7 +157,7 @@ public class RendererTarget implements IMirror {
 	 * コピーではないので変更時は注意
 	 * @return
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;

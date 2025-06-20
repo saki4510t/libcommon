@@ -122,7 +122,7 @@ public class SurfaceDrawable extends Drawable {
 	/**
 	 * SurfaceTextureからテクスチャとして受け取る映像のテクスチャ変換行列
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	final float[] mTexMatrix = new float[16];
 	/**
@@ -322,7 +322,7 @@ public class SurfaceDrawable extends Drawable {
 		return mTexId;
 	}
 
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	protected float[] getTexMatrix() {
 		return mTexMatrix;

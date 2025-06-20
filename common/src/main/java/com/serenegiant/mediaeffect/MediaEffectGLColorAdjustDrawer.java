@@ -40,7 +40,7 @@ public class MediaEffectGLColorAdjustDrawer
 	private final int muColorMatrixLoc;		// 4x4色変換行列
 	private final int muParamsLoc;			// 補正パラメータ
 	private float mColorAdjust;				// 色調整オフセット
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	protected final float[] mColorMatrix = new float[16];
 	@NonNull

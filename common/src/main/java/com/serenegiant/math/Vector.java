@@ -50,10 +50,14 @@ public class Vector implements Parcelable, Serializable, Cloneable {
 	 */
 	public static final Vector normVector = new Vector(1,1,1).normalize();
 
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private static final float[] matrix = new float[16];
+	@Size(value=4)
+	@NonNull
 	private static final float[] inVec = new float[4];
+	@Size(value=4)
+	@NonNull
 	private static final float[] outVec = new float[4];
 
 	public float x, y, z;

@@ -350,7 +350,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * #copyTexMatrix()の返り値用のfloat配列
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	private final float[] mResultMatrix = new float[16];
 	/**
@@ -382,7 +382,7 @@ public abstract class GLSurface implements IGLSurface {
 	 * テクスチャ座標変換行列を取得(内部配列を直接返すので変更時は要注意)
 	 * @return
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	@Override
 	public float[] getTexMatrix() {

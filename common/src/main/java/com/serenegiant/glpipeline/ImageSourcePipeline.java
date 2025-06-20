@@ -122,7 +122,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	@Override
 	public float[] getTexMatrix() throws IllegalStateException {

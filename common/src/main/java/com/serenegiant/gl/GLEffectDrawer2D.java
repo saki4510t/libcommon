@@ -91,7 +91,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	@Nullable
 	private float[] mCurrentParams;
 	private final float[] mTexOffset = new float[KERNEL_SIZE3x3_NUM * 2];
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	protected final float[] mColorMatrix = new float[16];
 	private final float[] mKernel3x3 = new float[KERNEL_SIZE3x3_NUM * 2];	// Inputs for convolution filter based shaders

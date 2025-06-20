@@ -203,7 +203,7 @@ public class AspectScaledGLView extends GLView
 		if (DEBUG) Log.v(TAG, String.format("init:(%dx%d),mScaleMode=%d",
 			viewWidth ,viewHeight, mScaleMode) );
 		// apply matrix
-		@Size(min=16)
+		@Size(value=16)
 		@NonNull
 		final float[] transform = new float[16];
 		Matrix.setIdentityM(transform, 0);

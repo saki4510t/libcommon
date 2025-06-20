@@ -137,6 +137,7 @@ public class MediaEffectGLDrawer implements IMirror {
 	protected final int muMVPMatrixLoc;
 	protected final int muTexMatrixLoc;
 	protected final int[] muTexLoc;
+	@Size(value=16)
 	@NonNull
 	protected final float[] mMvpMatrix = new float[16];
 	protected int hProgram;
@@ -250,7 +251,7 @@ public class MediaEffectGLDrawer implements IMirror {
 	}
 
 	@NonNull
-	@Size(min=16)
+	@Size(value=16)
 	public float[] getMvpMatrix() {
 		return mMvpMatrix;
 	}

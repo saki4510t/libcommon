@@ -162,7 +162,7 @@ public class GLTextureSource implements GLConst {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	@Size(min=16)
+	@Size(value=16)
 	@NonNull
 	public float[] getTexMatrix() throws IllegalStateException {
 		mLock.lock();
