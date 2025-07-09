@@ -26,12 +26,13 @@ import com.serenegiant.gl.GLSurface;
 import androidx.annotation.NonNull;
 
 public class MediaImageSource extends MediaSource {
+	@NonNull
 	private final GLSurface mImageOffscreen;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 */
-	public MediaImageSource(final boolean isGLES3, final Bitmap src) {
+	public MediaImageSource(final boolean isGLES3, @NonNull final Bitmap src) {
 		super(isGLES3, src.getWidth(), src.getHeight());
 		mImageOffscreen = GLSurface.newInstance(
 			false, GLES20.GL_TEXTURE0,
