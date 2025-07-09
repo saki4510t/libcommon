@@ -60,7 +60,9 @@ public class MediaImageSource extends MediaSource {
 	@Override
 	public ISource reset() {
 		super.reset();
-		mSrcTexIds[0] = mImageOffscreen.getTexId();
+		if (mImageOffscreen != null) {
+			mSrcTexIds[0] = mImageOffscreen.getTexId();
+		}
 		return this;
 	}
 
