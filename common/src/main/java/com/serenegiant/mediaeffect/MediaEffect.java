@@ -33,7 +33,7 @@ public class MediaEffect implements IMediaEffect {
 	protected final EffectContext mEffectContext;
 	@Nullable
 	protected Effect mEffect;
-	protected boolean mEnabled = true;
+	protected boolean mEnabled;
 
 	/**
 	 * コンストラクタ
@@ -49,6 +49,7 @@ public class MediaEffect implements IMediaEffect {
 		} else {
 			mEffect = factory.createEffect(effectName);
 		}
+		mEnabled = mEffect != null;
 	}
 
 	/**
@@ -70,6 +71,7 @@ public class MediaEffect implements IMediaEffect {
 			mEffect.release();
 			mEffect = null;
 		}
+		mEnabled = false;
 	}
 
 	@Override
