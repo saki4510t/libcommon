@@ -24,6 +24,7 @@ import android.opengl.GLES20;
 import com.serenegiant.gl.GLSurface;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 public class MediaImageSource extends MediaSource {
 	@NonNull
@@ -86,6 +87,14 @@ public class MediaImageSource extends MediaSource {
 			effect.apply(this);
 		}
 		return this;
+	}
+
+	@Nullable
+	@Override
+	public GLSurface getResultTexture() {
+		// 一度もフィルターが適用されていない場合はmImageOffscreenを返す
+		// フィルターが1度でも適用されていればsuper.getOutputTexture()を返す
+		return firstApply ? mImageOffscreen : super.getResultTexture();
 	}
 
 }

@@ -355,7 +355,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				}
 			}
 			if (mSurfaceTarget != null) {
-				final GLSurface output = mediaSource.getOutputTexture();
+				final GLSurface output = mediaSource.getResultTexture();
 				if (output != null) {
 					if ((mTargetDrawer == null) || (isGLES3 != mTargetDrawer.isGLES3) || (output.isOES() != mTargetDrawer.isOES())) {
 						if (mTargetDrawer != null) {
@@ -378,7 +378,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 			// こっちはオリジナルのテクスチャを渡す
 			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		} else {
-			final GLSurface output = (mediaSource != null) ? mediaSource.getOutputTexture() : null;
+			final GLSurface output = (mediaSource != null) ? mediaSource.getResultTexture() : null;
 			if (output != null) {
 				// 描画処理した後のたテクスチャを次へ渡す
 				super.onFrameAvailable(

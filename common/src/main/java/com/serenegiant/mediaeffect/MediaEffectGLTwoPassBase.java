@@ -94,7 +94,7 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	@Override
 	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output_tex = src.getOutputTexture();
+		final GLSurface output_tex = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();
 		final int width = src.getWidth();
 		final int height = src.getHeight();

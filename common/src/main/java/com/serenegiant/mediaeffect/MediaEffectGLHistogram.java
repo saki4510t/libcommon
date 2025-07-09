@@ -82,7 +82,7 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	@Override
 	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output = src.getOutputTexture();
+		final GLSurface output = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();
 		final int width = output.getWidth();;
 		final int height = output.getHeight();

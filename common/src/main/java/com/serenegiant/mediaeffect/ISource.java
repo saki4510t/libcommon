@@ -48,13 +48,31 @@ public interface ISource {
 	public ISource apply(@NonNull final IMediaEffect effect);
 	public int getWidth();
 	public int getHeight();
+	/**
+	 * #applyで入力テクスチャを特定するためのテクスチャハンドル配列を取得
+	 * @return
+	 */
 	@NonNull
 	public int[] getSourceTexId();
-	public int getOutputTexId();
+	/**
+	 * #applyで出力先テクスチャを特定するためのテクスチャハンドルを取得
+	 * @return
+	 */
+	public int getOutputTargetTexId();
+	/**
+	 * #applyで出力先テクスチャを特定するためのGLSurfaceを取得
+	 * @return
+	 */
+	@Nullable
+	public GLSurface getOutputTargetTexture();
 	@Nullable
 	public float[] getTexMatrix();
+	/**
+	 * #apply終了後に出力結果へアクセスするためのGLSurfaceを取得
+	 * @return
+	 */
 	@Nullable
-	public GLSurface getOutputTexture();
+	public GLSurface getResultTexture();
 
 	/**
 	 * 関係するリソースを破棄

@@ -38,6 +38,7 @@ public class MediaSource implements ISource {
 	protected GLSurface mSourceScreen;
 	protected GLSurface mOutputScreen;
 	protected int mWidth, mHeight;
+	@NonNull
 	protected final int[] mSrcTexIds = new int[1];
 	/**
 	 * リセット後最初の#apply呼び出しかどうか
@@ -146,8 +147,14 @@ public class MediaSource implements ISource {
 	}
 
 	@Override
-	public int getOutputTexId() {
+	public int getOutputTargetTexId() {
 		return mOutputScreen.getTexId();
+	}
+
+	@Nullable
+	@Override
+	public GLSurface getOutputTargetTexture() {
+		return mOutputScreen;
 	}
 
 	@Nullable
@@ -158,8 +165,10 @@ public class MediaSource implements ISource {
 
 	@Nullable
 	@Override
-	public GLSurface getOutputTexture() {
-		return mOutputScreen;
+	public GLSurface getResultTexture() {
+		// 一度もフィルターが適用されていない場合はmmSourceScreenを返す
+		// フィルターが1度でも適用されていればmOutputScreenを返す
+		return firstApply ? mSourceScreen : mOutputScreen;
 	}
 
 	/**

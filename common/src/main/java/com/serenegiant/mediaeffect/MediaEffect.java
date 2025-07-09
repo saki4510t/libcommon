@@ -26,8 +26,6 @@ import androidx.annotation.Nullable;
 
 import android.text.TextUtils;
 
-import com.serenegiant.gl.GLSurface;
-
 public class MediaEffect implements IMediaEffect {
 	@NonNull
 	protected final EffectContext mEffectContext;
@@ -61,7 +59,7 @@ public class MediaEffect implements IMediaEffect {
 		if (mEnabled && (mEffect != null)) {
 			mEffect.apply(src.getSourceTexId()[0],
 				src.getWidth(), src.getHeight(),
-				src.getOutputTexId());
+				src.getOutputTargetTexId());
 		}
 	}
 
