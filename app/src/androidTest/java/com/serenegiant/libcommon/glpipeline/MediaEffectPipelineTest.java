@@ -32,6 +32,7 @@ import com.serenegiant.glpipeline.MediaEffectPipeline;
 import com.serenegiant.glpipeline.SurfaceSourcePipeline;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.graphics.BitmapHelper;
+import com.serenegiant.mediaeffect.EffectsBuilder;
 import com.serenegiant.mediaeffect.IMediaEffect;
 import com.serenegiant.mediaeffect.MediaEffectAutoFix;
 import com.serenegiant.mediaeffect.MediaEffectBackDropper;
@@ -130,16 +131,16 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void emptyEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 		};
 		mediaEffectPipelineTest(builder);
 	}
 
 	@Test
 	public void nullEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -153,8 +154,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void autoFixEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -168,8 +169,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void backDropperEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -186,8 +187,8 @@ public class MediaEffectPipelineTest {
 		final Bitmap bitmap = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT,15, 18,
 			Bitmap.Config.ARGB_8888);
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -202,8 +203,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void blackWhiteEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -217,8 +218,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void contrastEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -232,8 +233,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void cropEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -247,8 +248,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void crossProcessEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -262,8 +263,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void documentaryEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -277,8 +278,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void duoToneEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -292,8 +293,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void fillLightEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -307,8 +308,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void fishEyeEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -322,8 +323,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void flipEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -337,8 +338,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glAlphaBlendEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -352,8 +353,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glBrightnessEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -367,8 +368,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glCannyEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -384,8 +385,8 @@ public class MediaEffectPipelineTest {
 	public void glDilationEffectTest() {
 		for (int i = 0; i < 5; i++) {
 			final int radius = i;
-			final MediaEffectPipeline.EffectsBuilder builder
-				= new MediaEffectPipeline.EffectsBuilder() {
+			final EffectsBuilder builder
+				= new EffectsBuilder() {
 				@NonNull
 				public List<IMediaEffect> buildEffects(
 					@NonNull final EffectContext effectContext) {
@@ -400,8 +401,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glEmbossEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -417,8 +418,8 @@ public class MediaEffectPipelineTest {
 	public void glErosionEffectTest() {
 		for (int i = 0; i < 5; i++) {
 			final int radius = i;
-			final MediaEffectPipeline.EffectsBuilder builder
-				= new MediaEffectPipeline.EffectsBuilder() {
+			final EffectsBuilder builder
+				= new EffectsBuilder() {
 				@NonNull
 				public List<IMediaEffect> buildEffects(
 					@NonNull final EffectContext effectContext) {
@@ -433,8 +434,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glExposureEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -448,8 +449,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glExtractionEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -463,8 +464,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glMaskedAlphaBlendEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -478,8 +479,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glPosterizeEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -493,8 +494,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glSaturateEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -508,8 +509,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void glTexProjectionEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -523,8 +524,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void grainEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -538,8 +539,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void grayScaleEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -553,8 +554,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void lomoishEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -568,8 +569,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void negativeEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -583,8 +584,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void redEyeEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -598,8 +599,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void rotateEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -613,8 +614,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void saturateEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -628,8 +629,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void sepiaEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -643,8 +644,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void sharpenEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -658,8 +659,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void straightenEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -673,8 +674,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void temperatureEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -688,8 +689,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void tintEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -703,8 +704,8 @@ public class MediaEffectPipelineTest {
 
 	@Test
 	public void vignetteEffectTest() {
-		final MediaEffectPipeline.EffectsBuilder builder
-			= new MediaEffectPipeline.EffectsBuilder() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
 			@NonNull
 			public List<IMediaEffect> buildEffects(
 				@NonNull final EffectContext effectContext) {
@@ -718,7 +719,7 @@ public class MediaEffectPipelineTest {
 
 	//--------------------------------------------------------------------------------
 	private void mediaEffectPipelineTest(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		mediaEffectPipelineTest1(builder);
 		mediaEffectPipelineTest2(builder);
 		mediaEffectPipelineTest3(builder);
@@ -738,7 +739,7 @@ public class MediaEffectPipelineTest {
 	 * 				→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	private void mediaEffectPipelineTest1(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -782,7 +783,7 @@ public class MediaEffectPipelineTest {
 	 * 					→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	private void mediaEffectPipelineTest2(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -831,7 +832,7 @@ public class MediaEffectPipelineTest {
 	 * 						→ ProxyPipeline	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	private void mediaEffectPipelineTest3(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -880,7 +881,7 @@ public class MediaEffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	private void mediaEffectPipelineOESTest1(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -952,7 +953,7 @@ public class MediaEffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	private void mediaEffectPipelineOESTest2(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -1025,7 +1026,7 @@ public class MediaEffectPipelineTest {
 	 * 								 	→ ProxyPipeline → テクスチャ読み取り
 	 */
 	private void mediaEffectPipelineOESTest3(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -1102,7 +1103,7 @@ public class MediaEffectPipelineTest {
 	 * 				→ (Surface) → GLSurfaceReceiver	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	private void mediaEffectPipelineWithSurfaceTest1(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
@@ -1162,7 +1163,7 @@ public class MediaEffectPipelineTest {
 	 * 									→ (Surface) → GLSurfaceReceiver	→ GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	private void drawerPipelineOESTestWithSurface1(
-		@NonNull final MediaEffectPipeline.EffectsBuilder builder) {
+		@NonNull final EffectsBuilder builder) {
 		// テストに使用するビットマップを生成
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
 			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);

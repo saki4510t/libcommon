@@ -32,6 +32,7 @@ import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.glpipeline.MediaEffectPipeline
 import com.serenegiant.glpipeline.SurfaceRendererPipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
+import com.serenegiant.mediaeffect.EffectsBuilder
 import java.io.IOException
 import java.util.concurrent.Semaphore
 import java.util.concurrent.TimeUnit
@@ -51,8 +52,8 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 	private var mHasSurface = false
 	private var mCamera: Camera? = null
 
-	private var mEffectsBuilder: MediaEffectPipeline.EffectsBuilder
-		= object : MediaEffectPipeline.EffectsBuilder{}
+	private var mEffectsBuilder: EffectsBuilder
+		= object : EffectsBuilder{}
 
 	/**
 	 * コンストラクタ
@@ -101,7 +102,7 @@ class MediaEffectCameraSurfaceView @JvmOverloads constructor(
 		stopPreview()
 	}
 
-	fun changeEffect(effectsBuilder: MediaEffectPipeline.EffectsBuilder) {
+	fun changeEffect(effectsBuilder: EffectsBuilder) {
 		mEffectsBuilder = effectsBuilder
 		pipeline?.changeEffect(mEffectsBuilder)
 	}

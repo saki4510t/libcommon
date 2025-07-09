@@ -54,12 +54,11 @@ public class MediaEffectPipeline extends ProxyPipeline
 	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = MediaEffectPipeline.class.getSimpleName();
 
-	public interface EffectsBuilder {
-		@NonNull
-		public default List<IMediaEffect> buildEffects(
-			@NonNull final EffectContext effectContext) {
-			return new ArrayList<IMediaEffect>();
-		}
+	/**
+	 * @deprecated use com.serenegiant.mediaeffect.EffectsBuilder
+	 */
+	@Deprecated
+	public interface EffectsBuilder extends com.serenegiant.mediaeffect.EffectsBuilder {
 	}
 
 	@NonNull
@@ -115,7 +114,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 */
 	public MediaEffectPipeline(
 		@NonNull final GLManager manager,
-		@NonNull final EffectsBuilder effectsBuilder)
+		@NonNull final com.serenegiant.mediaeffect.EffectsBuilder effectsBuilder)
 		throws IllegalStateException, IllegalArgumentException {
 
 		this(manager, effectsBuilder, GLDrawer2D.DEFAULT_FACTORY, PIPELINE_MODE_DEFAULT, null, null);
@@ -133,7 +132,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 */
 	public MediaEffectPipeline(
 		@NonNull final GLManager manager,
-		@NonNull final EffectsBuilder effectsBuilder,
+		@NonNull final com.serenegiant.mediaeffect.EffectsBuilder effectsBuilder,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -151,7 +150,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 */
 	public MediaEffectPipeline(
 		@NonNull final GLManager manager,
-		@NonNull final EffectsBuilder effectsBuilder,
+		@NonNull final com.serenegiant.mediaeffect.EffectsBuilder effectsBuilder,
 		@NonNull final GLDrawer2D.DrawerFactory drawerFactory)
 		throws IllegalStateException, IllegalArgumentException {
 
@@ -172,7 +171,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 */
 	public MediaEffectPipeline(
 		@NonNull final GLManager manager,
-		@NonNull final EffectsBuilder effectsBuilder,
+		@NonNull final com.serenegiant.mediaeffect.EffectsBuilder effectsBuilder,
 		@NonNull final GLDrawer2D.DrawerFactory drawerFactory,
 		@PipelineMode final int pipelineMode,
 		@Nullable final Object surface, @Nullable final Fraction maxFps)
@@ -435,7 +434,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 	 * 映像効果を変更
 	 * @param effectsBuilder
 	 */
-	public void changeEffect(@NonNull final EffectsBuilder effectsBuilder) {
+	public void changeEffect(@NonNull final com.serenegiant.mediaeffect.EffectsBuilder effectsBuilder) {
 		if (DEBUG) Log.v(TAG, "changeEffect:" + effectsBuilder);
 		mManager.runOnGLThread(() -> {
 			for (final IMediaEffect effect: mEffects) {
