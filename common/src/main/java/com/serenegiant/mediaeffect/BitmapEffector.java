@@ -23,7 +23,7 @@ import androidx.annotation.Nullable;
  * IMediaEffectをBitmapへ適用するためのヘルパークラス
  */
 public class BitmapEffector {
-	private static final boolean DEBUG = true; // set false on production
+	private static final boolean DEBUG = false; // set false on production
 	private static final String TAG = BitmapEffector.class.getSimpleName();
 
 	private static final EffectsBuilder EMPTY_BUILDER = new EffectsBuilder() {
