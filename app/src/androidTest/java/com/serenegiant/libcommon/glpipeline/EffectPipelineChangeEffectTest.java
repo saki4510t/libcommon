@@ -123,7 +123,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			cnt.set(0);
 			result.set(null);
 
@@ -176,7 +176,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			cnt.set(0);
 			result.set(null);
 
@@ -233,7 +233,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			cnt.set(0);
 			result.set(null);
 
@@ -307,7 +307,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			// 実際の映像はSurfaceを経由して映像を書き込む
 			final AtomicBoolean requestStop = new AtomicBoolean();
 			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
@@ -387,7 +387,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			// 実際の映像はSurfaceを経由して映像を書き込む
 			final AtomicBoolean requestStop = new AtomicBoolean();
 			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
@@ -469,7 +469,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			// 実際の映像はSurfaceを経由して映像を書き込む
 			final AtomicBoolean requestStop = new AtomicBoolean();
 			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
@@ -540,7 +540,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline.changeEffect(effect);
+			pipeline.setEffect(effect);
 			cnt1.set(0);
 			result1.set(null);
 			cnt2.set(0);
@@ -633,7 +633,7 @@ public class EffectPipelineChangeEffectTest {
 		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
 		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.changeEffect(effect);
+			pipeline1.setEffect(effect);
 			cnt1.set(0);
 			result1.set(null);
 			cnt2.set(0);

@@ -364,7 +364,7 @@ public class EffectPipeline extends ProxyPipeline
 				if (drawer != null) {
 					mLock.lock();
 					try {
-						mEffect = drawer.getCurrentEffect();
+						mEffect = drawer.getEffect();
 					} finally {
 						mLock.unlock();
 					}
@@ -400,7 +400,7 @@ public class EffectPipeline extends ProxyPipeline
 					mDrawer.resetEffect();
 					mLock.lock();
 					try {
-						mEffect = mDrawer.getCurrentEffect();
+						mEffect = mDrawer.getEffect();
 					} finally {
 						mLock.unlock();
 					}
@@ -412,24 +412,13 @@ public class EffectPipeline extends ProxyPipeline
 	}
 
 	/**
-	 * 映像効果をセット
-	 * @param effect
-	 * @throws IllegalStateException
-	 * @deprecated use #changeEffect instead
-	 */
-	@Deprecated
-	public void setEffect(final int effect) throws IllegalStateException {
-		changeEffect(effect);
-	}
-
-	/**
 	 * IEffectの実装
 	 * 映像効果をセット
 	 * @param effect
 	 * @throws IllegalStateException
 	 */
 	@Override
-	public void changeEffect(final int effect) throws IllegalStateException {
+	public void setEffect(final int effect) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "setEffect:" + effect);
 		if (isValid()) {
 			mManager.runOnGLThread(() -> {
@@ -438,7 +427,7 @@ public class EffectPipeline extends ProxyPipeline
 					mDrawer.setEffect(effect);
 					mLock.lock();
 					try {
-						mEffect = mDrawer.getCurrentEffect();
+						mEffect = mDrawer.getEffect();
 					} finally {
 						mLock.unlock();
 					}
@@ -454,8 +443,8 @@ public class EffectPipeline extends ProxyPipeline
 	 * @return
 	 */
 	@Override
-	public int getCurrentEffect() {
-		if (DEBUG) Log.v(TAG, "getCurrentEffect:" + mDrawer.getCurrentEffect());
+	public int getEffect() {
+		if (DEBUG) Log.v(TAG, "getEffect:" + mDrawer.getEffect());
 		mLock.lock();
 		try {
 			return mEffect;

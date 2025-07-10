@@ -114,7 +114,7 @@ public class EffectRendererHolderChangeEffectTest {
 		for (int i = GLEffect.EFFECT_NON; i < GLEffect.EFFECT_NUM; i++) {
 			cnt.set(0);
 			result.set(null);
-			rendererHolder.changeEffect(i);
+			rendererHolder.setEffect(i);
 			final Bitmap original = BitmapHelper.makeCheckBitmap(
 				WIDTH, HEIGHT, 15 + i, 12, Bitmap.Config.ARGB_8888);
 //			dump(bitmap);

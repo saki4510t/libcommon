@@ -124,7 +124,7 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * @param effect
 	 */
 	@Override
-	public void changeEffect(final int effect) {
+	public void setEffect(final int effect) {
 		((MyRendererTask)mRendererTask).changeEffect(effect);
 	}
 	
@@ -134,10 +134,10 @@ public class EffectRendererHolder extends AbstractRendererHolder
 	 * @return
 	 */
 	@Override
-	public int getCurrentEffect() {
+	public int getEffect() {
 		final GLDrawer2D drawer = mRendererTask.getDrawer();
 		return (drawer instanceof GLEffectDrawer2D)
-			? ((GLEffectDrawer2D) drawer).getCurrentEffect() : EFFECT_NON;
+			? ((GLEffectDrawer2D) drawer).getEffect() : EFFECT_NON;
 	}
 
 	/**

@@ -320,6 +320,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * 継承して独自の映像効果を追加する時はEFFECT_NUMよりも大きい値を使うこと
 	 * @param effect
 	 */
+	@Override
 	public void setEffect(final int effect) {
 		if (mEffect != effect) {
 			if (DEBUG) Log.v(TAG, "setEffect:" + mEffect + "=>" + effect);
@@ -341,20 +342,11 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 
 	/**
 	 * IEffectの実装
-	 * @param effect
-	 */
-	@Override
-	public void changeEffect(final int effect) {
-		setEffect(effect);
-	}
-
-	/**
-	 * IEffectの実装
 	 * 現在の映像効果番号を取得
 	 * @return
 	 */
 	@Override
-	public int getCurrentEffect() {
+	public int getEffect() {
 		return mEffect;
 	}
 

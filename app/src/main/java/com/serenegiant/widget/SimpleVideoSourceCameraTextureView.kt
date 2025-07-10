@@ -343,7 +343,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		return if (source != null) {
 			val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
 			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
-			pipeline?.currentEffect ?: 0
+			pipeline?.effect ?: 0
 		} else {
 			0
 		}
@@ -356,7 +356,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				val source = mSurfaceSourcePipeline
 				if (source != null) {
 					val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
-					pipeline?.changeEffect(effect)
+					pipeline?.effect = effect
 				}
 			}
 		}

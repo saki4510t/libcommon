@@ -38,7 +38,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 	get() {
 		val rendererHolder = rendererHolder
 		if (DEBUG) Log.v(TAG, "getEffect:$rendererHolder")
-		return if (rendererHolder is EffectRendererHolder) rendererHolder.currentEffect else 0
+		return if (rendererHolder is EffectRendererHolder) rendererHolder.effect else 0
 	}
 
 	set(effect) {
@@ -47,7 +47,7 @@ class EffectCameraGLSurfaceView @JvmOverloads constructor(
 			post {
 				val rendererHolder = rendererHolder
 				if (rendererHolder is EffectRendererHolder) {
-					rendererHolder.changeEffect(effect)
+					rendererHolder.effect = effect
 				}
 			}
 		}
