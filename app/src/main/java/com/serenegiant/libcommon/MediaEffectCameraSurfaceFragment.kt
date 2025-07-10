@@ -27,6 +27,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.ShaderConst
 import com.serenegiant.glpipeline.MediaEffectPipeline
 import com.serenegiant.graphics.BitmapHelper
@@ -53,6 +54,7 @@ import com.serenegiant.mediaeffect.MediaEffectGLColorMatrix
 import com.serenegiant.mediaeffect.MediaEffectGLCrossProcess
 import com.serenegiant.mediaeffect.MediaEffectGLDilation
 import com.serenegiant.mediaeffect.MediaEffectGLDocumentary
+import com.serenegiant.mediaeffect.MediaEffectGLEffect
 import com.serenegiant.mediaeffect.MediaEffectGLEmboss
 import com.serenegiant.mediaeffect.MediaEffectGLErosion
 import com.serenegiant.mediaeffect.MediaEffectGLExposure
@@ -142,6 +144,26 @@ class MediaEffectCameraSurfaceFragment : BaseFragment() {
 		object : EffectsBuilder{
 			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
 				return mutableListOf(MediaEffectAutoFix(effectContext, 0.5f))
+			}
+		},
+		object : EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_ADAPTIVE_BIN))
+			}
+		},
+		object : EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_SOBEL_HV))
+			}
+		},
+		object : EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_BIN))
+			}
+		},
+		object : EffectsBuilder{
+			override fun buildEffects(effectContext: EffectContext): MutableList<IMediaEffect> {
+				return mutableListOf(MediaEffectGLEffect(GLEffect.EFFECT_KERNEL_CANNY_ENHANCE))
 			}
 		},
 		object : EffectsBuilder{

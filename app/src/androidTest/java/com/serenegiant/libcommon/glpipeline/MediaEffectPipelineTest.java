@@ -50,6 +50,7 @@ import com.serenegiant.mediaeffect.MediaEffectGLAlphaBlend;
 import com.serenegiant.mediaeffect.MediaEffectGLBrightness;
 import com.serenegiant.mediaeffect.MediaEffectGLCanny;
 import com.serenegiant.mediaeffect.MediaEffectGLDilation;
+import com.serenegiant.mediaeffect.MediaEffectGLEffect;
 import com.serenegiant.mediaeffect.MediaEffectGLEmboss;
 import com.serenegiant.mediaeffect.MediaEffectGLErosion;
 import com.serenegiant.mediaeffect.MediaEffectGLExposure;
@@ -91,6 +92,9 @@ import androidx.annotation.Nullable;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
 
+import static com.serenegiant.gl.GLEffect.EFFECT_ADAPTIVE_BIN;
+import static com.serenegiant.gl.GLEffect.EFFECT_KERNEL_SOBEL_HV;
+import static com.serenegiant.gl.GLEffect.EFFECT_NON;
 import static com.serenegiant.libcommon.TestUtils.createGLSurfaceReceiver;
 import static com.serenegiant.libcommon.TestUtils.createImageReceivePipeline;
 import static com.serenegiant.libcommon.TestUtils.inputImagesAsync;
@@ -711,6 +715,51 @@ public class MediaEffectPipelineTest {
 				@NonNull final EffectContext effectContext) {
 				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
 				result.add(new MediaEffectVignette(effectContext, 0.5f));
+				return result;
+			}
+		};
+		mediaEffectPipelineTest(builder);
+	}
+
+	@Test
+	public void glEffectEffectTestNon() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
+			@NonNull
+			public List<IMediaEffect> buildEffects(
+				@NonNull final EffectContext effectContext) {
+				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
+				result.add(new MediaEffectGLEffect(EFFECT_NON));
+				return result;
+			}
+		};
+		mediaEffectPipelineTest(builder);
+	}
+
+	@Test
+	public void glEffectEffectTestAdaptiveBin() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
+			@NonNull
+			public List<IMediaEffect> buildEffects(
+				@NonNull final EffectContext effectContext) {
+				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
+				result.add(new MediaEffectGLEffect(EFFECT_ADAPTIVE_BIN));
+				return result;
+			}
+		};
+		mediaEffectPipelineTest(builder);
+	}
+
+	@Test
+	public void glEffectEffectTestSobelHV() {
+		final EffectsBuilder builder
+			= new EffectsBuilder() {
+			@NonNull
+			public List<IMediaEffect> buildEffects(
+				@NonNull final EffectContext effectContext) {
+				final List<IMediaEffect> result = new ArrayList<IMediaEffect>();
+				result.add(new MediaEffectGLEffect(EFFECT_KERNEL_SOBEL_HV));
 				return result;
 			}
 		};
