@@ -23,6 +23,8 @@ import android.opengl.Matrix;
 import android.util.Log;
 import android.util.SparseArray;
 
+import java.util.Arrays;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.Size;
@@ -254,6 +256,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	public synchronized void setColorAdjust(final float adjust) {
+		if (DEBUG) Log.v(TAG, "setColorAdjust:" + adjust);
 		mColorAdjust = adjust;
 	}
 
@@ -264,6 +267,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * @param offset
 	 */
 	public synchronized void setColorMatrix(@Nullable @Size(min=16) final float[] colorMatrix, final int offset) {
+		if (DEBUG) Log.v(TAG, "setColorMatrix:" + Arrays.toString(colorMatrix));
 		if ((colorMatrix != null) && (colorMatrix.length >= 16 + offset)) {
 			System.arraycopy(colorMatrix, offset, mColorMatrix, 0, mColorMatrix.length);
 		} else {
@@ -276,6 +280,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 */
 	public void resetShader() {
 		super.resetShader();
+		if (DEBUG) Log.v(TAG, "resetShader:");
 		mParams.clear();
 		mParams.put(EFFECT_EMPHASIZE_RED_YELLOW, new float[] {
 			0.17f, 0.85f,		// 赤色&黄色の色相下側閾値, 上側閾値
@@ -311,6 +316,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	 * GLコンテキストを保持したスレッド上で呼び出すこと
 	 */
 	public void resetEffect() {
+		if (DEBUG) Log.v(TAG, "resetEffect:");
 		resetShader();
 	}
 
@@ -375,6 +381,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	public void setParams(final int effect, @NonNull final float[] params)
 		throws IllegalArgumentException {
 
+		if (DEBUG) Log.v(TAG, "setParams:effect=" + effect + ",params=" + Arrays.toString(params));
 		if ((effect < EFFECT_NON) || (mEffect == effect)) {
 			mCurrentParams = params;
 			mParams.put(mEffect, params);
@@ -488,6 +495,7 @@ public class GLEffectDrawer2D extends GLDrawer2D implements IEffect {
 	}
 
 	private static boolean onChangeKernel(@NonNull final GLEffectDrawer2D drawer, final int effect) {
+		if (DEBUG) Log.v(TAG, "onChangeKernel:effect=" + effect);
 		final boolean isGLES3 = drawer.isGLES3;
 		final boolean isOES = drawer.isOES();
 		float[] kernel = null;
