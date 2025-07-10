@@ -223,6 +223,8 @@ public class GLDrawer2D implements GLConst {
 	 * エラーカウンタ
 	 */
 	private int errCnt;
+	@IMirror.MirrorMode
+	private int mMirror = IMirror.MIRROR_NORMAL;
 
 	/**
 	 * コンストラクタ
@@ -318,7 +320,17 @@ public class GLDrawer2D implements GLConst {
 	 * @param mirror
 	 */
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
+		mMirror = mirror;
 		MatrixUtils.setMirror(mMvpMatrix, mirror);
+	}
+
+	/**
+	 * #setMirrorで適用したミラーモードを取得
+	 * 外部でモデルビュー変換行列を変更した場合は一致しない可能性がある
+	 * @return
+	 */
+	public int getMirror() {
+		return mMirror;
 	}
 
 	/**
