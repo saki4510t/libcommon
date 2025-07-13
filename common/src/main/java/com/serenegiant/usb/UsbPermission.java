@@ -206,7 +206,7 @@ public class UsbPermission extends BroadcastReceiver {
 	 */
 	public synchronized void unregister() throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "unregister:" + mRegistered);
-		cancelRRequestPermission();
+		cancelRequestPermission();
 		if (mRegistered) {
 			mRegistered = false;
 			final Context context = requireContext();
@@ -258,7 +258,7 @@ public class UsbPermission extends BroadcastReceiver {
 	 *     パーミッション要求自体はキャンセルされずダイアログが表示された
 	 *     ままになるので効果ない(´･ω･`)
 	 */
-	public synchronized void cancelRRequestPermission() {
+	public synchronized void cancelRequestPermission() {
 		if (DEBUG) Log.v(TAG, "cancelRRequestPermission:");
 		mPermissionIntent.cancel();
 		mPermissionIntent = createIntent(requireContext());
