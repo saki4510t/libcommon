@@ -431,14 +431,16 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		@Override
 		public void release() {
 			if (DEBUG) Log.v(TAG, "release:");
-			mGLHandler.postAtFrontOfQueue(new Runnable() {
-				@Override
-				public void run() {
-					handleOnStop();
-				}
-			});
-			ThreadUtils.NoThrowSleep(50L);
-			mGlManager.release();
+			if (isRunning()) {
+				mGLHandler.postAtFrontOfQueue(new Runnable() {
+					@Override
+					public void run() {
+						handleOnStop();
+					}
+				});
+				ThreadUtils.NoThrowSleep(50L);
+				mGlManager.release();
+			}
 			super.release();
 		}
 
