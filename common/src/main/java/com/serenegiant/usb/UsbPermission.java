@@ -472,7 +472,7 @@ public class UsbPermission extends BroadcastReceiver {
 								|| intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) ) {
 								// パーミッションを取得できた時・・・デバイスとの通信の準備をする
 								callback.onPermission(device);
-							} else if (device == null) {
+							} else if (device != null) {
 								// パーミッションを取得できなかった時
 								callback.onCancel(device);
 							} else {
