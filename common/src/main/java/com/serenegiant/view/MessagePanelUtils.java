@@ -193,10 +193,35 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 		@NonNull private final View mParentView;
 		@NonNull final View mPanelView;
 		@NonNull final TextView mMessageTv;
+		private final int mPanelWidthPx;
+		private final int mPanelHeightPx;
 
-		public MessageReceiver(@NonNull final Context context,
+		/**
+		 * コンストラクタ
+		 * コンストラクタ呼び出し時のpanelViewを記録して使うのでVisibilityとしてView.GONE以外を設定しておくこと
+		 * メッセージ表示時の高さとしてR.dimen.bottom_message_panel_height(84dp)とpanelViewのheightの大きい方を使う
+		 * @param context
+		 * @param panelView
+		 * @param messageTv
+		 */
+		public MessageReceiver(
+			@NonNull final Context context,
 			@NonNull final View panelView,
 			@NonNull final TextView messageTv) {
+			this(context, panelView, messageTv, 0);
+		}
+		/**
+		 * コンストラクタ
+		 * コンストラクタ呼び出し時のpanelViewを記録して使うのでVisibilityとしてView.GONE以外を設定しておくこと
+		 * @param context
+		 * @param panelView
+		 * @param messageTv
+		 * @param panelHeightPx 0以下ならR.dimen.bottom_message_panel_height(84dp)とpanelViewのheightの大きい方を使う
+		 */
+		public MessageReceiver(@NonNull final Context context,
+			@NonNull final View panelView,
+			@NonNull final TextView messageTv,
+			final int panelHeightPx) {
 
 			super(context);
 			final ViewParent parent = panelView.getParent();
@@ -206,6 +231,10 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 				Log.w(TAG, "parent is not a instance of View," + parent);
 				mParentView = panelView;
 			}
+			mPanelWidthPx = panelView.getWidth();
+			mPanelHeightPx = (panelHeightPx <= 0)
+				? Math.max(panelView.getHeight(), getResources().getDimensionPixelSize(R.dimen.bottom_message_panel_height))
+				: panelHeightPx;
 			mPanelView = panelView;
 			mPanelView.setVisibility(View.GONE);
 			mPanelView.setOnClickListener(new View.OnClickListener() {
@@ -292,16 +321,15 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 			mPanelView.post(new Runnable() {
 				@Override
 				public void run() {
-					if (DEBUG) Log.i(TAG, String.format(Locale.US, "showMessage:size(%d,%d)",
-						mPanelView.getWidth(), mPanelView.getHeight()));
+					if (DEBUG) Log.i(TAG, String.format(Locale.US, "showMessage:size(%d,%d)(%d,%d)",
+						mPanelWidthPx, mPanelHeightPx, mPanelView.getWidth(), mPanelView.getHeight()));
 					mMessageTv.setText(message);
 					mMessageTv.setTextColor(cl);
 					mPanelView.clearAnimation();
 					final ResizeAnimation expandAnimation
 						= new ResizeAnimation(mPanelView,
-							mParentView.getWidth(), 0,
-							mParentView.getWidth(),
-							getResources().getDimensionPixelSize(R.dimen.bottom_message_panel_height));
+						mPanelWidthPx, 0,
+						mPanelWidthPx, mPanelHeightPx);
 					expandAnimation.setDuration(DURATION_RESIZE_MS);
 					expandAnimation.setAnimationListener(mAnimationListener);
 					mPanelView.setVisibility(View.VISIBLE);
@@ -329,8 +357,8 @@ public abstract class MessagePanelUtils extends ContextHolder<Context> {
 						mPanelView.clearAnimation();
 						final ResizeAnimation collapseAnimation
 							= new ResizeAnimation(mPanelView,
-								mParentView.getWidth(), mPanelView.getHeight(),
-								mParentView.getWidth(), 0);
+							mPanelWidthPx, mPanelHeightPx,
+							mPanelWidthPx, 0);
 						collapseAnimation.setDuration(durationMs);
 						collapseAnimation.setAnimationListener(mAnimationListener);
 						mPanelView.setTag(R.id.visibility, 0);
