@@ -46,17 +46,18 @@ public class TypedArrayUtils {
 	public static float[] readArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final float defaultValue) {
 
-		float[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		float[] result = new float[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new float[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getFloat(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -71,17 +72,18 @@ public class TypedArrayUtils {
 	public static boolean[] readArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final boolean defaultValue) {
 
-		boolean[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		boolean[] result = new boolean[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new boolean[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getBoolean(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -96,9 +98,9 @@ public class TypedArrayUtils {
 	public static String[] readArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final String defaultValue) {
 
-		String[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		String[] result = new String[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new String[n];
 			for (int i = 0; i < n; i++) {
@@ -107,9 +109,10 @@ public class TypedArrayUtils {
 					result[i] = defaultValue;
 				}
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -124,9 +127,9 @@ public class TypedArrayUtils {
 	public static CharSequence[] readArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final CharSequence defaultValue) {
 
-		CharSequence[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		CharSequence[] result = new CharSequence[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new CharSequence[n];
 			for (int i = 0; i < n; i++) {
@@ -135,9 +138,10 @@ public class TypedArrayUtils {
 					result[i] = defaultValue;
 				}
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -152,17 +156,18 @@ public class TypedArrayUtils {
 	public static int[] readArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final int defaultValue) {
 
-		int[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		int[] result = new int[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new int[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getInt(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -181,16 +186,17 @@ public class TypedArrayUtils {
 			throws UnsupportedOperationException {
 
 		int[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new int[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getInteger(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			throw e;
 		}
+
 		return result;
 	}
 
@@ -205,17 +211,18 @@ public class TypedArrayUtils {
 	public static int[] readColorArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final int defaultValue) {
 
-		int[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		int[] result = new int[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new int[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getColor(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 	/**
@@ -229,17 +236,18 @@ public class TypedArrayUtils {
 	public static float[] readDimensionArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId, final float defaultValue) {
 
-		float[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		float[] result = new float[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new float[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getDimension(i, defaultValue);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
@@ -253,17 +261,18 @@ public class TypedArrayUtils {
 	public static Drawable[] readDrawableArray(@NonNull final Resources res,
 		@ArrayRes final int arrayId) {
 
-		Drawable[] result;
-		final TypedArray a = res.obtainTypedArray(arrayId);
-		try {
+		Drawable[] result = new Drawable[0];
+
+		try (final TypedArray a = res.obtainTypedArray(arrayId)) {
 			final int n = a.length();
 			result = new Drawable[n];
 			for (int i = 0; i < n; i++) {
 				result[i] = a.getDrawable(i);
 			}
-		} finally {
-			a.recycle();
+		} catch (final Exception e) {
+			// ignore
 		}
+
 		return result;
 	}
 
