@@ -39,7 +39,7 @@ public abstract class IAudioSampler {
 	/**
 	 * 音声データ取得コールバックインターフェース
 	 */
-	public interface SoundSamplerCallback {
+	public interface AudioSamplerCallback {
 		/**
 		 * 音声データが準備出来た時に呼び出される。
 		 * presentationTimeUsは音声データを取得した時の時刻だが、他のコールバックでの処理によっては
@@ -55,6 +55,10 @@ public abstract class IAudioSampler {
 		 * @param t
 		 */
 		public void onError(@NonNull  Throwable t);
+	}
+
+	@Deprecated
+	public interface SoundSamplerCallback extends AudioSamplerCallback {
 	}
 
 	/**
@@ -75,8 +79,8 @@ public abstract class IAudioSampler {
 	@NonNull
 	private final Object mCallbackSync = new Object();
 	@NonNull
-	private final Set<SoundSamplerCallback> mCallbacks
-		= new CopyOnWriteArraySet<SoundSamplerCallback>();
+	private final Set<AudioSamplerCallback> mCallbacks
+		= new CopyOnWriteArraySet<>();
 	private volatile boolean mIsCapturing;
 
 	public IAudioSampler() {
@@ -138,7 +142,7 @@ public abstract class IAudioSampler {
 	 * コールバックを追加する
 	 * @param callback
 	 */
-	public void addCallback(final SoundSamplerCallback callback) {
+	public void addCallback(final AudioSamplerCallback callback) {
 		if (callback != null) {
 			mCallbacks.add(callback);
 		}
@@ -148,7 +152,7 @@ public abstract class IAudioSampler {
 	 * コールバックを削除する
 	 * @param callback
 	 */
-	public void removeCallback(final SoundSamplerCallback callback) {
+	public void removeCallback(final AudioSamplerCallback callback) {
 		if (callback != null) {
 			mCallbacks.remove(callback);
 		}
@@ -178,7 +182,7 @@ public abstract class IAudioSampler {
 	 * コールバックリスナーを取得
 	 * @return
 	 */
-	protected Set<SoundSamplerCallback> getCallbacks() {
+	protected Set<AudioSamplerCallback> getCallbacks() {
 		return mCallbacks;
 	}
 
@@ -238,7 +242,7 @@ public abstract class IAudioSampler {
 		final ByteBuffer buf = data.get();
 		final int size = data.size();
 		final long pts = data.presentationTimeUs();
-		for (final SoundSamplerCallback callback: mCallbacks) {
+		for (final AudioSamplerCallback callback: mCallbacks) {
 			try {
 				buf.clear();
 				buf.position(size);
@@ -256,7 +260,7 @@ public abstract class IAudioSampler {
 	 * @param e
 	 */
     protected void callOnError(final Throwable e) {
-		for (final SoundSamplerCallback callback: mCallbacks) {
+		for (final AudioSamplerCallback callback: mCallbacks) {
 			try {
 				callback.onError(e);
 			} catch (final Exception e1) {

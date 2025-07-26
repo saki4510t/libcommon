@@ -38,7 +38,7 @@ import com.serenegiant.libcommon.MainActivity
 import com.serenegiant.libcommon.R
 import com.serenegiant.media.AudioSampler
 import com.serenegiant.media.IAudioSampler
-import com.serenegiant.media.IAudioSampler.SoundSamplerCallback
+import com.serenegiant.media.IAudioSampler.AudioSamplerCallback
 import com.serenegiant.media.IMuxer
 import com.serenegiant.media.MediaCodecUtils
 import com.serenegiant.media.MediaMuxerWrapper
@@ -267,7 +267,7 @@ open class RecordingService : LifecycleService() {
 		}
 		releaseOwnAudioSampler()
 		if (mAudioSampler !== sampler) {
-			mAudioSampler?.removeCallback(mSoundSamplerCallback)
+			mAudioSampler?.removeCallback(mAudioSamplerCallback)
 			mAudioSampler = sampler
 			mChannelCount = 0
 			mSampleRate = 0
@@ -343,7 +343,7 @@ open class RecordingService : LifecycleService() {
 				if (mAudioSampler != null) {
 					mSampleRate = mAudioSampler!!.samplingFrequency
 					mChannelCount = mAudioSampler!!.channels
-					mAudioSampler!!.addCallback(mSoundSamplerCallback)
+					mAudioSampler!!.addCallback(mAudioSamplerCallback)
 				}
 				if ((mSampleRate > 0)
 					&& (mChannelCount == 1) || (mChannelCount == 2)
@@ -707,7 +707,7 @@ open class RecordingService : LifecycleService() {
 	private fun releaseOwnAudioSampler() {
 		if (DEBUG) Log.v(TAG, "releaseOwnAudioSampler:own=$mIsOwnAudioSampler,$mAudioSampler")
 		if (mAudioSampler != null) {
-			mAudioSampler!!.removeCallback(mSoundSamplerCallback)
+			mAudioSampler!!.removeCallback(mAudioSamplerCallback)
 			if (mIsOwnAudioSampler) {
 				mAudioSampler!!.release()
 				mAudioSampler = null
@@ -875,7 +875,7 @@ open class RecordingService : LifecycleService() {
 	/**
 	 * AudioSampleからのコールバックリスナー
 	 */
-	private val mSoundSamplerCallback = object : SoundSamplerCallback {
+	private val mAudioSamplerCallback = object : AudioSamplerCallback {
 		override fun onData(buffer: ByteBuffer, presentationTimeUs: Long) {
 			encodeAudio(buffer, presentationTimeUs)
 		}

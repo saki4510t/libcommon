@@ -47,7 +47,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 	/**
 	 * MediaFormatが変更されたときのコールバックを追加したSoundSamplerCallback
 	 */
-	public interface Callback extends SoundSamplerCallback {
+	public interface Callback extends AudioSamplerCallback {
 		public void onOutputFormatChanged(@NonNull final MediaFormat format);
 	}
 
@@ -353,7 +353,7 @@ public class EncodedAudioSampler extends IAudioSampler {
 	 * コールバックを追加する
 	 * @param callback
 	 */
-	public void addCallback(final SoundSamplerCallback callback) {
+	public void addCallback(final AudioSamplerCallback callback) {
 		super.addCallback(callback);
 		if (DEBUG) Log.v(TAG, "addCallback:");
 		if (callback instanceof Callback) {
@@ -386,8 +386,8 @@ public class EncodedAudioSampler extends IAudioSampler {
 	private void callOnMediaFormatChanged(@NonNull MediaFormat format) {
 		if (DEBUG) Log.v(TAG, "callOnMediaFormatChanged:" + format);
 		ThreadPool.queueEvent(() -> {
-			final Set<SoundSamplerCallback> callbacks = getCallbacks();
-			for (final SoundSamplerCallback callback: callbacks) {
+			final Set<AudioSamplerCallback> callbacks = getCallbacks();
+			for (final AudioSamplerCallback callback: callbacks) {
 				if (callback instanceof Callback) {
 					((Callback) callback).onOutputFormatChanged(format);
 				}

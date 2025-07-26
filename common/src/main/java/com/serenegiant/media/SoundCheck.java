@@ -87,8 +87,8 @@ public class SoundCheck {
 	private int mSoundBufferSize;
 
 	private static final long MIN_SOUND_CHECK_INTERVAL_US = 300 * 1000;	// 300ミリ秒=1秒約3回
-	private final AudioSampler.SoundSamplerCallback mSoundSamplerCallback
-		= new AudioSampler.SoundSamplerCallback() {
+	private final AudioSampler.AudioSamplerCallback mSoundSamplerCallback
+		= new AudioSampler.AudioSamplerCallback() {
 
 		private long prevSamplingUs;
 
