@@ -18,6 +18,8 @@ package com.serenegiant.media;
  *  limitations under the License.
 */
 
+import com.serenegiant.utils.ThreadUtils;
+
 import java.nio.ByteBuffer;
 import java.nio.ShortBuffer;
 
@@ -60,10 +62,35 @@ public class SoundCheck {
     private SoundCheck() {
 	}
 
-	public void setAudioSampler(final IAudioSampler sampler, final SoundCheckCallback callback) {
+	/**
+	 * 音量取得中かどうか
+	 * @return
+	 */
+	public boolean isRunning() {
+		return mSoundCheckRunning;
+	}
+
+	/**
+	 * IAudioSamplerをクリアして音量チェックを終了する
+	 * #setAudioSampler(null, null)のシノニム
+	 */
+	public void clearSampler() {
+		setAudioSampler(null, null);
+	}
+
+	/**
+	 * IAudioSamplerとコールバック(SoundCheckCallback)をセット
+	 * @param sampler
+	 * @param callback
+	 */
+	public void setAudioSampler(@Nullable final IAudioSampler sampler, @Nullable final SoundCheckCallback callback) {
 		if (mAudioSampler != sampler) {
 			mSoundCheckRunning = false;
 			if (mAudioSampler != null) {
+				synchronized (mSoundSync) {
+					mSoundSync.notify();
+				}
+				ThreadUtils.NoThrowSleep(10L);	// #onStopコールバックを呼び出せるように一瞬待機
 				mAudioSampler.removeCallback(mSoundSamplerCallback);
 			}
 			mAudioSampler = sampler;
@@ -100,11 +127,11 @@ public class SoundCheck {
 				prevSamplingUs = presentationTimeUs;
 				mSoundBufferSize = buffer.remaining() / 2;
 				final ShortBuffer buf = buffer.asShortBuffer();	// FIXME 16ビットPCMのみ対応
-				if (mSoundBuffer == null || (mSoundBuffer.length < mSoundBufferSize)) {
+				if ((mSoundBuffer == null) || (mSoundBuffer.length < mSoundBufferSize)) {
 					mSoundBuffer = new short[mSoundBufferSize];
 				}
 				buf.get(mSoundBuffer, 0, mSoundBufferSize);
-				mSoundSync.notifyAll();
+				mSoundSync.notify();
 			}
 		}
 
@@ -117,9 +144,10 @@ public class SoundCheck {
 	private final Runnable mSoundCheckTask = new Runnable() {
 		@Override
 		public void run() {
-			if (mSoundCheckCallback != null) {
+			final SoundCheckCallback callback = mSoundCheckCallback;
+			if (callback != null) {
 				try {
-					mSoundCheckCallback.onStart();
+					callback.onStart();
 				} catch (final Exception e) {
 //					Log.w(TAG, "error on #onStart:", e);
 				}
@@ -144,9 +172,9 @@ public class SoundCheck {
 					}
 				}
 			} // for
-			if (mSoundCheckCallback != null) {
+			if (callback != null) {
 				try {
-					mSoundCheckCallback.onStop();
+					callback.onStop();
 				} catch (final Exception e) {
 //					Log.w(TAG, "error on #onStop:", e);
 				}
