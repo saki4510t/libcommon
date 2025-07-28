@@ -226,14 +226,17 @@ class CameraRecFragment : AbstractCameraFragment() {
 		if (audioSource >= 0) {
 			mAudioSampler = if (USE_ENCODED_AUDIO_SAMPLER) {
 				// AAC LCへエンコードしてからバッファリングする音声サンプラー
+				if (DEBUG) Log.v(TAG, "createRecorder:create EncodedAudioSampler")
 				EncodedAudioSampler(audioSource,
 					audioChannels, SAMPLE_RATE)
 			} else {
 				// 通常の音声サンプラー
+				if (DEBUG) Log.v(TAG, "createRecorder:create AudioSampler")
 				AudioSampler(audioSource,
 					audioChannels, SAMPLE_RATE)
 			}
 			mAudioSampler!!.start()
+			if (DEBUG) Log.v(TAG, "createRecorder:create AudioSamplerEncoder")
 			mAudioEncoder = AudioSamplerEncoder(recorder, mEncoderListener, mAudioSampler)
 		}
 		if (DEBUG) Log.v(TAG, "createRecorder:finished")
@@ -250,7 +253,7 @@ class CameraRecFragment : AbstractCameraFragment() {
 					if (mEncoderSurface == null) {
 						val surface = recorder.inputSurface
 						if (surface != null) {
-							if (DEBUG) Log.v(TAG, "use SurfaceEncoder")
+							if (DEBUG) Log.v(TAG, "mRecorderCallback#onPrepared:use SurfaceEncoder")
 							mEncoderSurface = surface
 							try {
 								addSurface(surface)
@@ -261,11 +264,11 @@ class CameraRecFragment : AbstractCameraFragment() {
 						}
 					}
 				} else if (encoder is EncodePipeline) {
-					if (DEBUG) Log.v(TAG, "use EncodePipeline")
+					if (DEBUG) Log.v(TAG, "mRecorderCallback#onPrepared:use EncodePipeline")
 					mEncoderSurface = null
 				} else if (encoder is IVideoEncoder) {
 					mEncoderSurface = null
-					throw RuntimeException("unknown video encoder $encoder")
+					throw RuntimeException("mRecorderCallback#onPrepared:unknown video encoder $encoder")
 				}
 			} catch (e: Exception) {
 				if (DEBUG) Log.w(TAG, e)
