@@ -127,14 +127,16 @@ public abstract class MediaEncoder implements Encoder {
 	@Override
 	public void release() {
 		if (DEBUG) Log.d(TAG, "release:");
-		if (mIsEncoding) {
+		final boolean shouldCallOnDestroy = (mMediaCodec != null) || (mReaper != null);
+		final boolean isEncoding = mIsEncoding;
+		mIsEncoding = false;
+		if (isEncoding && shouldCallOnDestroy) {
 			try {
 				mListener.onStopEncode(this);
 			} catch (final Exception e) {
 				if (DEBUG) Log.w(TAG, "release: failed onStopped", e);
 			}
 		}
-		mIsEncoding = false;
 		if (mMediaCodec != null) {
 			try {
 				if (DEBUG) Log.v(TAG, "release: call MediaCodec#stop");
@@ -149,10 +151,12 @@ public abstract class MediaEncoder implements Encoder {
 			mReaper.release();
 			mReaper = null;
 		}
-		try {
-			mListener.onDestroy(this);
-		} catch (final Exception e) {
-			if (DEBUG) Log.e(TAG, "release: onDestroy failed", e);
+		if (shouldCallOnDestroy) {
+			try {
+				mListener.onDestroy(this);
+			} catch (final Exception e) {
+				if (DEBUG) Log.e(TAG, "release: onDestroy failed", e);
+			}
 		}
 	}
 

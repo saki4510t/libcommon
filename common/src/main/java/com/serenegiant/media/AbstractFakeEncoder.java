@@ -531,6 +531,8 @@ public abstract class AbstractFakeEncoder implements Encoder {
 
 	private void internalRelease() {
 //		if (DEBUG) Log.d(TAG, "internalRelease:");
+		final IRecorder recorder = mRecorder;
+		mRecorder = null;
 		mIsEOS = true;
 		if (mIsEncoding) {
 			mIsEncoding = false;
@@ -542,21 +544,22 @@ public abstract class AbstractFakeEncoder implements Encoder {
 		}
 		if (mRecorderStarted) {
 			mRecorderStarted = false;
-			if (mRecorder != null) {
+			if (recorder != null) {
 				try {
 //					if (DEBUG) Log.v(TAG, "call IRecorder#stop");
-					mRecorder.stop(this);
+					recorder.stop(this);
 				} catch (final Exception e) {
 					Log.e(TAG, "failed stopping muxer", e);
 				}
 			}
 		}
-		try {
-			mListener.onDestroy(this);
-		} catch (final Exception e) {
-			Log.e(TAG, "destroy:", e);
+		if (recorder != null) {
+			try {
+				mListener.onDestroy(this);
+			} catch (final Exception e) {
+				Log.e(TAG, "destroy:", e);
+			}
 		}
-		mRecorder = null;
 		clearFrames();
 //		if (DEBUG) Log.d(TAG, "internalRelease:finished");
 	}
