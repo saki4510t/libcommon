@@ -34,6 +34,7 @@ import com.serenegiant.glpipeline.ProxyPipeline;
 import com.serenegiant.glutils.GLFrameAvailableCallback;
 import com.serenegiant.glutils.GLSurfaceReceiver;
 import com.serenegiant.glutils.IMirror;
+import com.serenegiant.glutils.IRendererHolder;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.ThreadPool;
@@ -130,6 +131,52 @@ LOOP:		for (int y = 0; y < height; y++) {
 	}
 
 	/**
+	 * ビットマップが指定した色で塗りつぶされているかどうかを確認する
+	 * @param bitmap
+	 * @param color
+	 * @param dumpOnError 一致しないピクセルが見つかったときにlogcatへビットマップデータを出力するかどうか
+	 * @param checkAll 一致しないピクセルが見つかった場合でも全てのピクセルを確認するかどうか
+	 * @return
+	 */
+	public static boolean bitmapFilledColor(
+		@NonNull final Bitmap bitmap, final int color,
+		final boolean dumpOnError,
+		final boolean checkAll) {
+
+		int errCnt = 0;
+		final int width = bitmap.getWidth();
+		final int height = bitmap.getHeight();
+		boolean result = true;
+LOOP:	for (int y = 0; y < height; y++) {
+			for (int x = 0; x < width; x++) {
+				if (bitmap.getPixel(x, y) != color) {
+					Log.w(TAG, String.format("ピクセルが違う@(%d,%d)sz(%dx%d),a=0x%08x,b=0x%08x",
+						x, y, width, height,
+						bitmap.getPixel(x, y), color));
+					errCnt++;
+					result = false;
+					if (!checkAll) {
+						break LOOP;
+					}
+				}
+			}
+		}
+		if (!result && checkAll) {
+			Log.i(TAG, "errCnt=" + errCnt + "/" + (width * height));
+		}
+		if (!result && dumpOnError) {
+			dump(TAG, "bitmap=", bitmap);
+		}
+//		Log.i(TAG, String.format("ARGB=%08x/%08x/%08x/%08x",
+//			((color & 0xff000000) >>> 24),	// A
+//			((color & 0x00ff0000) >>> 16),	// R
+//			((color & 0x0000ff00) >>>  8),	// G
+//			((color & 0x000000ff))			// B
+//		));
+		return result;
+	}
+
+	/**
 	 * 指定したビットマップのピクセルのうち0以外を16進文字列としてlogCatへ出力する
 	 * @param bitmap
 	 */
@@ -206,6 +253,37 @@ LOOP:		for (int y = 0; y < height; y++) {
 				}
 			}
 			Log.v(TAG, "inputImagesAsync:finished," + cnt + "/" + numImages);
+		});
+	}
+
+	/**
+	 * 一定時間毎に指定回数IRendererHolder#clearSurfaceAllを非同期で呼び出す
+	 * @param rendererHolder
+	 * @param color
+	 * @param numImages
+	 * @param requestStop
+	 */
+	public static void clearRendererAsync(
+		@NonNull final IRendererHolder rendererHolder,
+		final int color,
+		final int numImages,
+		@NonNull final AtomicBoolean requestStop) {
+		ThreadPool.queueEvent(() -> {
+			Log.v(TAG, "clearRendererAsync:start");
+			int cnt = 0;
+			for (int i = 0; i < numImages; i++) {
+				if (!requestStop.get() && rendererHolder.isRunning()) {
+					try {
+						rendererHolder.clearSurfaceAll(color);
+					} catch (Exception e) {
+						break;
+					}
+					ThreadUtils.NoThrowSleep(30L);
+				} else {
+					break;
+				}
+			}
+			Log.v(TAG, "clearRendererAsync:finished," + cnt + "/" + numImages);
 		});
 	}
 

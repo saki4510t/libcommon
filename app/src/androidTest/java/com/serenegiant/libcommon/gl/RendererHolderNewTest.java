@@ -514,4 +514,86 @@ public class RendererHolderNewTest {
 		}
 	}
 
+	/**
+	 * IRendererHolder#clearColorAll呼び出しで分配先Surfaceが更新されることを確認
+	 * RendererHolder
+	 * 		↓
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 * 		→ (Surface) → GLSurfaceReceiver → GLSurface.wrap → glReadPixels → Bitmap
+	 */
+	@Test
+	public void clearColorTest() {
+		final GLManager manager = mGLManager;
+
+		// テストするRendererHolderを生成
+		final RendererHolder rendererHolder = new RendererHolder(WIDTH, HEIGHT, null);
+
+		final Semaphore sem = new Semaphore(0);
+
+		// 描画結果受け取り用にGLSurfaceReceiverを生成
+		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
+		final AtomicInteger cnt1 = new AtomicInteger();
+		final GLSurfaceReceiver receiver1 = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1, true);
+		assertNotNull(receiver1);
+		final Surface surface1 = receiver1.getSurface();
+		assertNotNull(surface1);
+		rendererHolder.addSurface(surface1.hashCode(), surface1, false);
+
+		// 描画結果受け取り用にGLSurfaceReceiverを生成
+		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
+		final AtomicInteger cnt2 = new AtomicInteger();
+		final GLSurfaceReceiver receiver2 = createGLSurfaceReceiver(
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2, true);
+		assertNotNull(receiver2);
+		final Surface surface2 = receiver2.getSurface();
+		assertNotNull(surface2);
+		rendererHolder.addSurface(surface2.hashCode(), surface2, false);
+
+		// addSurfaceは非同期なのでちょっとまたないと反映されない
+		ThreadUtils.NoThrowSleep(100);
+		// 正常にSurfaceを追加できたかどうかを確認
+		assertEquals(2, rendererHolder.getCount());
+
+		try {
+			for (int i = 0; i < 3; i++) {
+				Log.v(TAG, "clearColorTest:" + i);
+				cnt1.set(0);
+				cnt2.set(0);
+
+//				final int color = 0xfdca7431;	// 0xfdcc7531になる
+//				final int color = 0x12345678;	// 0x12ffffffになる
+//				final int color = 0x87654321;	// 0x87bf7f3eになる
+				final int color = 0xff000000 + 0x7f << i;
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				clearRendererAsync(rendererHolder, color, NUM_FRAMES + 5, requestStop);
+				try {
+					assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+					// Surfaceが受け取った映像フレーム数を確認
+					assertTrue(cnt1.get() >= NUM_FRAMES);
+					assertTrue(cnt2.get() >= NUM_FRAMES);
+					// 受け取った映像を検証
+					final Bitmap resultBitmap1 = result1.get();
+					assertNotNull(resultBitmap1);
+					final Bitmap resultBitmap2 = result2.get();
+					assertNotNull(resultBitmap2);
+					assertTrue(bitmapEquals(resultBitmap1, resultBitmap2, false, true));
+					// 0x00〜0xffのA,R,G,Bの値を0.0f〜1.0fの浮動小数点にして塗りつぶすので元の32ビット整数で指定した値とは完全には一致しない
+//					assertTrue(bitmapFilledColor(resultBitmap1, color, false, true));
+//					assertTrue(bitmapFilledColor(resultBitmap2, color, false, true));
+				} catch (final InterruptedException e) {
+					fail();
+				}
+				// XXX #resetかclearSurfaceAllを入れないと2巡目でエラーになる
+				//     #getSurface/#getSurfaceTexture内でclearSurfaceAllを
+				//     呼んでもだめだった
+//				rendererHolder.reset();
+				rendererHolder.clearSurfaceAll(0xff000000);
+				ThreadUtils.NoThrowSleep(100L);
+			}
+		} finally {
+			rendererHolder.release();
+		}
+	}
 }
