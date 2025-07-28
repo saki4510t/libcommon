@@ -170,12 +170,11 @@ public abstract class MediaReaper implements Runnable {
 			final int ix0, final int ix1, final int ix2) {
 
 			if (DEBUG) Log.v(TAG, "AudioReaper#createOutputFormat");
-			MediaFormat outFormat;
 	        if (ix0 >= 0) {
 				if (DEBUG) Log.w(TAG, "csd may be wrong, it may be for video");
 	        }
 	        // audioの時はSTART_MARKが無いので全体をコピーして渡す
-	        outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
+			final MediaFormat outFormat = MediaFormat.createAudioFormat(MIME_TYPE, mSampleRate, mChannelCount);
 	        final ByteBuffer csd0 = ByteBuffer.allocateDirect(size).order(ByteOrder.nativeOrder());
 	        csd0.put(csd, 0, size);
 	        csd0.flip();
