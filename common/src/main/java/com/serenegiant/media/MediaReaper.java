@@ -416,7 +416,7 @@ LOOP:	while (mIsRunning) {
 					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
                 }
 
-                if (mBufferInfo.size != 0) {
+                if (mBufferInfo.size > 0) {
                 	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
             		count = 0;
                     if (!mRecorderStarted) {
@@ -503,7 +503,7 @@ LOOP:	while (mIsRunning) {
 					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
                 }
 
-                if (mBufferInfo.size != 0) {
+                if (mBufferInfo.size > 0) {
                 	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
             		count = 0;
                     if (!mRecorderStarted) {
