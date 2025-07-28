@@ -404,41 +404,44 @@ LOOP:	while (mIsRunning) {
                 	// 出力バッファインデックスが来てるのに出力バッファを取得できない・・・無いはずやねんけど
                     throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
                 }
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-//					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
-                	// Android4.3未満をターゲットにするならここで処理しないと駄目
-                    if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
-						final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
-                        if (callOnFormatChanged(outFormat)) {
-                        	break LOOP;
+				try {
+					if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+//						if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
+						// Android4.3未満をターゲットにするならここで処理しないと駄目
+						if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
+							final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
+							if (callOnFormatChanged(outFormat)) {
+								break LOOP;
+							}
 						}
-                    }
-					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
-                }
+						mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
+					}
 
-                if (mBufferInfo.size > 0) {
-                	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
-            		count = 0;
-                    if (!mRecorderStarted) {
-                    	// でも出力可能になっていない時
-                    	// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
-                        throw new RuntimeException("drain:muxer hasn't started");
-                    }
-                    // ファイルに出力(presentationTimeUsを調整)
-                    try {
-	                   	mBufferInfo.presentationTimeUs
-	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-						callOnWriteSampleData(encodedData, mBufferInfo);
-                    } catch (final TimeoutException e) {
-//						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
-						callOnError(e);
-                    } catch (final Exception e) {
-//						if (DEBUG) Log.w(TAG, e);
-						callOnError(e);
-                    }
-                }
-                // 出力済みのバッファをエンコーダーに返す
-                encoder.releaseOutputBuffer(encoderStatus, false);
+					if (mBufferInfo.size > 0) {
+						// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
+						count = 0;
+						if (!mRecorderStarted) {
+							// でも出力可能になっていない時
+							// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
+							throw new RuntimeException("drain:muxer hasn't started");
+						}
+						// ファイルに出力(presentationTimeUsを調整)
+						try {
+							mBufferInfo.presentationTimeUs
+								= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
+							callOnWriteSampleData(encodedData, mBufferInfo);
+						} catch (final TimeoutException e) {
+//							if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
+							callOnError(e);
+						} catch (final Exception e) {
+//							if (DEBUG) Log.w(TAG, e);
+							callOnError(e);
+						}
+					}
+				} finally {
+					// 出力済みのバッファをエンコーダーに返す
+					encoder.releaseOutputBuffer(encoderStatus, false);
+				}
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                 	// ストリーム終了指示が来た時
                 	callOnStop();
@@ -491,41 +494,44 @@ LOOP:	while (mIsRunning) {
                 	// 出力バッファインデックスが来てるのに出力バッファを取得できない・・・無いはずやねんけど
                     throw new RuntimeException("encoderOutputBuffer " + encoderStatus + " was null");
                 }
-                if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
-//					if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
-                	// Android4.3未満をターゲットにするならここで処理しないと駄目
-                    if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
-                    	final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
-                        if (callOnFormatChanged(outFormat)) {
-                        	break LOOP;
+				try {
+					if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_CODEC_CONFIG) != 0) {
+//						if (DEBUG) Log.d(TAG, "drain:BUFFER_FLAG_CODEC_CONFIG");
+						// Android4.3未満をターゲットにするならここで処理しないと駄目
+						if (!mRecorderStarted) {	// 1回目に来た時だけ処理する
+							final MediaFormat outFormat = createOutputFormat(mBufferInfo, encodedData);
+							if (callOnFormatChanged(outFormat)) {
+								break LOOP;
+							}
 						}
-                    }
-					mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
-                }
+						mBufferInfo.size = 0;	// XXX BUFFER_FLAG_CODEC_CONFIGが来たときはスキップさせないといけない
+					}
 
-                if (mBufferInfo.size > 0) {
-                	// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
-            		count = 0;
-                    if (!mRecorderStarted) {
-                    	// でも出力可能になっていない時
-                    	// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
-                        throw new RuntimeException("drain:muxer hasn't started");
-                    }
-                    // ファイルに出力(presentationTimeUsを調整)
-                    try {
-	                   	mBufferInfo.presentationTimeUs
-	                   		= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
-						callOnWriteSampleData(encodedData, mBufferInfo);
-                    } catch (final TimeoutException e) {
-//						if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
-						callOnError(e);
-                    } catch (final Exception e) {
-//						if (DEBUG) Log.w(TAG, e);
-						callOnError(e);
-                    }
-                }
-                // 出力済みのバッファをエンコーダーに返す
-                encoder.releaseOutputBuffer(encoderStatus, false);
+					if (mBufferInfo.size > 0) {
+						// エンコード済みバッファにデータが入っている時・・・待機カウンタをクリア
+						count = 0;
+						if (!mRecorderStarted) {
+							// でも出力可能になっていない時
+							// =INFO_OUTPUT_FORMAT_CHANGED/BUFFER_FLAG_CODEC_CONFIGをまだ受け取ってない時
+							throw new RuntimeException("drain:muxer hasn't started");
+						}
+						// ファイルに出力(presentationTimeUsを調整)
+						try {
+							mBufferInfo.presentationTimeUs
+								= getNextOutputPTSUs(mBufferInfo.presentationTimeUs);
+							callOnWriteSampleData(encodedData, mBufferInfo);
+						} catch (final TimeoutException e) {
+//							if (DEBUG) Log.v(TAG, "最大録画時間を超えた", e);
+							callOnError(e);
+						} catch (final Exception e) {
+//							if (DEBUG) Log.w(TAG, e);
+							callOnError(e);
+						}
+					}
+				} finally {
+					// 出力済みのバッファをエンコーダーに返す
+					encoder.releaseOutputBuffer(encoderStatus, false);
+				}
                 if ((mBufferInfo.flags & MediaCodec.BUFFER_FLAG_END_OF_STREAM) != 0) {
                 	// ストリーム終了指示が来た時
                 	callOnStop();
