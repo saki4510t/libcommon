@@ -548,6 +548,31 @@ public final class BitmapHelper {
 		return result;
 	}
 
+	/**
+	 * 指定したDrawableリソースからビットマップとして画像を取得する
+	 * @param context
+	 * @param drawableRes
+	 * @param width
+	 * @param height
+	 * @return
+	 */
+	@NonNull
+	public static Bitmap fromDrawable(
+		@NonNull final Context context,
+		@DrawableRes final int drawableRes,
+		@IntRange(from = 1) final int width, @IntRange(from = 1) final int height) {
+
+		Bitmap result = null;
+		if (drawableRes != 0) {
+			final Drawable drawable = ContextCompat.getDrawable(context, drawableRes);
+			result = fromDrawable(drawable, width, height);
+		}
+		if (result == null) {
+			throw new IllegalArgumentException("failed to load from resource " + drawableRes);
+		}
+		return result;
+	}
+
 //--------------------------------------------------------------------------------
 // Bitmapの操作メソッド
 
