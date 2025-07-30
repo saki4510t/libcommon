@@ -497,6 +497,8 @@ public final class BitmapHelper {
 	/**
 	 * DrawableをBitmapへ変換する
 	 * @param drawable
+	 * @param width
+	 * @param height
 	 * @return
 	 * @throws IllegalArgumentException
 	 */
@@ -519,6 +521,7 @@ public final class BitmapHelper {
 
 	/**
 	 * 指定したDrawableリソースからビットマップとして画像を取得する
+	 * @param context
 	 * @param drawableRes
 	 * @return
 	 */
