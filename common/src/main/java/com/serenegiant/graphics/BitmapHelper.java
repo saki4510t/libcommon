@@ -376,7 +376,11 @@ public final class BitmapHelper {
 		final Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 		final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 		if (pfd != null) {
-			result = asBitmap(pfd.getFileDescriptor());
+			try {
+				result = asBitmap(pfd.getFileDescriptor());
+			} finally {
+				pfd.close();
+			}
 		}
 		return result;
 	}
@@ -400,7 +404,11 @@ public final class BitmapHelper {
 		final Uri uri = ContentUris.withAppendedId(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, id);
 		final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 		if (pfd != null) {
-			result = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
+			try {
+				result = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
+			} finally {
+				pfd.close();
+			}
 		}
 		return result;
 	}
@@ -420,7 +428,11 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				bitmap = asBitmap(pfd.getFileDescriptor());
+				try {
+					bitmap = asBitmap(pfd.getFileDescriptor());
+				} finally {
+					pfd.close();
+				}
 			}
 		}
 		return bitmap;
@@ -443,7 +455,11 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				bitmap = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
+				try {
+					bitmap = asBitmap(pfd.getFileDescriptor(), requestWidth, requestHeight);
+				} finally {
+					pfd.close();
+				}
 			}
 		}
 //		if (DEBUG) Log.v(TAG, "asBitmap:" + bitmap);
@@ -467,7 +483,11 @@ public final class BitmapHelper {
 		if (uri != null) {
 			final ParcelFileDescriptor pfd = cr.openFileDescriptor(uri, "r");
 			if (pfd != null) {
-				bitmap = asBitmapStrictSize(pfd.getFileDescriptor(), requestWidth, requestHeight);
+				try {
+					bitmap = asBitmapStrictSize(pfd.getFileDescriptor(), requestWidth, requestHeight);
+				} finally {
+					pfd.close();
+				}
 			}
 		}
 		return bitmap;
