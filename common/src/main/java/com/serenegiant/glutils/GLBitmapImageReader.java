@@ -20,11 +20,14 @@ package com.serenegiant.glutils;
 
 import android.graphics.Bitmap;
 import android.graphics.Paint;
+import android.opengl.GLES20;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLDrawer2D;
+import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
@@ -46,6 +49,19 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	private static final boolean DEBUG = false;
 	private static final String TAG = GLBitmapImageReader.class.getSimpleName();
 
+	/**
+	 * テクスチャをオフスクリーン描画してオフスクリーンからビットマップへ読み込むかどうか
+	 * XXX GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTexture内で
+	 *     フレームバッファオブジェクト関係でエラーになる端末がある。
+	 * 		ex. NEC PC-TE507FAW(ANDROID6)
+	 * 		どういう条件で起こるか不明だけどこの場合も、
+	 * 		独立したGLSurfaceでオフスクリーンを生成
+	 * 		    → オフスクリーンのGLSurfaceへGLDrawer2Dでレンダリング
+	 * 		    → GLSurface#makeCurrentでGLSurfaceのオフスクリーンのバックバッファへ切り替え
+	 * 		    → glReadPixelsで読み取る
+	 * 		のであれば正常に読み取ることができる。
+	 */
+	private final boolean mUseOffscreenRendering;
 	/**
 	 * 排他制御用
 	 */
@@ -99,6 +115,16 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	 * キャプチャしたシステム時刻[ミリ秒]
 	 */
 	private long mLastCaptureMs;
+	/**
+	 * キャプチャに使うオフスクリーン
+	 */
+	@Nullable
+	private GLSurface mOffscreen;
+	/**
+	 * オフスクリーン描画用GLDrawer2D
+	 */
+	@Nullable
+	private GLDrawer2D mDrawer;
 
 	/**
 	 * コンストラクタ
@@ -111,7 +137,25 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		final int width, final int height,
 		@NonNull final Bitmap.Config config, final int maxImages) {
 
+		this(width, height, config, maxImages, false);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param config
+	 * @param maxImages
+	 * @param useOffscreenRendering テクスチャを一旦オフスクリーンへ描画してオフスクリーンからビットマップへ読み込むかどうか
+	 *                              一部機種でGLSurface#wrapが正常に動作しないことへのワークアラウンド
+	 */
+	public GLBitmapImageReader(
+		final int width, final int height,
+		@NonNull final Bitmap.Config config, final int maxImages,
+		final boolean useOffscreenRendering) {
+
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
+		mUseOffscreenRendering = useOffscreenRendering;
 		mConfig = config;
 		mMaxImages = maxImages;
 		mWidth = width;
@@ -245,6 +289,14 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	public void onReleaseInputSurface(@NonNull final Surface surface) {
 		if (DEBUG) Log.v(TAG, "onReleaseInputSurface:");
 		mWorkBuffer = null;
+		if (mOffscreen != null) {
+			mOffscreen.release();
+			mOffscreen = null;
+		}
+		if (mDrawer != null) {
+			mDrawer.release();
+			mDrawer = null;
+		}
 	}
 
 	/**
@@ -303,7 +355,22 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		}
 		if (!needCapture) return;
 
-		doCapture(isGLES3, isOES, width, height, texId, texMatrix);
+		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
+		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
+			mLock.lock();
+			try {
+				mWidth = width;
+				mHeight = height;
+			} finally {
+				mLock.unlock();
+			}
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
+		}
+		if (mUseOffscreenRendering) {
+			doCaptureOffscreen(isGLES3, isOES, width, height, texId, texMatrix);
+		} else {
+			doCapture(isGLES3, isOES, width, height, texId, texMatrix);
+		}
 		callOnFrameAvailable();
 	}
 
@@ -322,17 +389,6 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		final int width, final int height,
 		final int texId, @NonNull final float[] texMatrix) {
 
-		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
-		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
-			mLock.lock();
-			try {
-				mWidth = width;
-				mHeight = height;
-			} finally {
-				mLock.unlock();
-			}
-			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
-		}
 		final Bitmap bitmap = obtainBitmap(width, height);
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
@@ -346,7 +402,51 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 			}
 		} else {
 			mAllBitmapAcquired = true;
-			if (DEBUG) Log.w(TAG, "handleDraw: failed to obtain bitmap from pool!");
+			if (DEBUG) Log.w(TAG, "doCapture: failed to obtain bitmap from pool!");
+		}
+	}
+
+	@WorkerThread
+	private void doCaptureOffscreen(
+		final boolean isGLES3, final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull final float[] texMatrix) {
+
+		if ((mOffscreen == null)
+			|| (mOffscreen.getWidth() != width)
+			|| (mOffscreen.getHeight() != height)
+			|| (mOffscreen.isGLES3 != isGLES3)) {
+			if (mOffscreen != null) {
+				mOffscreen.release();
+			}
+			mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
+		}
+		if ((mDrawer == null) || (mDrawer.isGLES3 != isGLES3) || (mDrawer.isOES() != isOES)) {
+			if (mDrawer != null) {
+				mDrawer.release();
+			}
+			mDrawer = GLDrawer2D.create(isGLES3, isOES);
+		}
+		final Bitmap bitmap = obtainBitmap(width, height);
+		if ((mOffscreen != null) && (mDrawer != null) && (bitmap != null)) {
+			// オフスクリーンSurfaceへ描画
+			mOffscreen.makeCurrent();
+			mOffscreen.setViewPort(0, 0, width, height);
+			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
+			// ハングアップする機種があるのでクリアしとく
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			// GLDrawer2Dでオフスクリーンへ描画
+			mDrawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
+			// glReadPixelsでBitmapへ読み込む
+			final ByteBuffer buffer = GLUtils.glReadPixels(mWorkBuffer, width, height);
+			mOffscreen.swap();
+			bitmap.copyPixelsFromBuffer(buffer);
+			synchronized (mQueue) {
+				mQueue.addLast(bitmap);
+			}
+		} else {
+			mAllBitmapAcquired = true;
+			if (DEBUG) Log.w(TAG, "doCaptureOffscreen: failed to obtain bitmap from pool!");
 		}
 	}
 

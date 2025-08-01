@@ -79,6 +79,11 @@ public class GLBitmapImageReaderTest {
 		}
 	}
 
+	/**
+	 * GLSurface#wrapでソーステクスチャをフレームバッファへ割り当てて読み取るテスト
+	 * XXX NEC PC-TE507FAW(ANDROID6)等フレームバッファへの割り当て時にエラーが発生して
+	 *     正常に動作しない機種がある
+	 */
 	@Test
 	public void gLBitmapImageReaderTest() {
 		final Bitmap original = BitmapHelper.makeCheckBitmap(
@@ -92,6 +97,60 @@ public class GLBitmapImageReaderTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
 			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
+		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
+			final AtomicInteger cnt = new AtomicInteger();
+			@Override
+			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
+				final Bitmap bitmap = reader.acquireLatestImage();
+				if (bitmap != null) {
+					try {
+						if (cnt.incrementAndGet() == NUM_FRAMES) {
+							result.set(Bitmap.createBitmap(bitmap));
+							sem.release();
+						}
+					} finally {
+						reader.recycle(bitmap);
+					}
+				}
+			}
+		}, HandlerThreadHandler.createHandler(TAG));
+
+		final GLSurfaceReceiver receiver = new GLSurfaceReceiver(mManager, WIDTH, HEIGHT, reader);
+		final Surface surface = receiver.getSurface();
+		assertNotNull(surface);
+
+		final AtomicBoolean requestStop = new AtomicBoolean();
+		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
+
+		try {
+			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
+			requestStop.set(true);
+			final Bitmap b = result.get();
+//			dump(b);
+			assertNotNull(b);
+			// 元のビットマップと同じかどうかを検証
+			assertTrue(bitmapEquals(original, b));
+		} catch (final InterruptedException e) {
+			fail();
+		}
+	}
+
+	/**
+	 * オフスクリーン描画を使ったGLBitmapImageReaderでのBitmapキャプチャのテスト
+	 */
+	@Test
+	public void gLBitmapImageReaderOffscreenTest() {
+		final Bitmap original = BitmapHelper.makeCheckBitmap(
+			WIDTH, HEIGHT, 15, 12, Bitmap.Config.ARGB_8888);
+//		dump(bitmap);
+
+		final GLManager manager = mManager;
+
+		// 映像受け取り用にSurfaceReaderを生成
+		final Semaphore sem = new Semaphore(0);
+		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final GLBitmapImageReader reader
+			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES, true/*useOffscreenRendering*/);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
