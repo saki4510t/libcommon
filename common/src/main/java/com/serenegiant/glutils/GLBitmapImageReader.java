@@ -43,7 +43,6 @@ import androidx.annotation.WorkerThread;
 
 /**
  * GLSurfaceReceiverを使ってBitmapとして映像を受け取るためのImageReader<Bitmap></>実装
- * FIXME GLSurfaceReceiverと組み合わせてSurfaceからの静止画撮影を行うヘルパークラスを作る
  */
 public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiver.Callback {
 	private static final boolean DEBUG = false;

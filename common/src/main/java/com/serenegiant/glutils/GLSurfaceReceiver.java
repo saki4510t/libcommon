@@ -48,7 +48,6 @@ import static com.serenegiant.gl.GLConst.GL_TEXTURE_EXTERNAL_OES;
  * SurfaceTextureを使うので生成されるテクスチャはGL_TEXTURE_EXTERNAL_OES
  * FIXME RendererHolderだと入力ソースを変更時にSurfaceの再生成しなくても
  *       正常に動作するのにこっちはテクスチャが更新されなくなる
- * FIXME GLBitmapImageReaderと組み合わせてSurfaceからの静止画撮影を行うヘルパークラスを作る
  */
 public class GLSurfaceReceiver {
 	private static final boolean DEBUG = false;
