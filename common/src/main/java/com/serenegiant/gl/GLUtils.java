@@ -280,7 +280,7 @@ public class GLUtils implements GLConst {
 	 * @param buffer nullまたはサイズが小さいかまたはでないときは新規生成する
 	 * @param width
 	 * @param height
-	 * @param bitmap 
+	 * @param bitmap
 	 * @return 読み取ったピクセルデータの入ったBitmap
 	 */
 	@NonNull
@@ -289,8 +289,6 @@ public class GLUtils implements GLConst {
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		@Nullable final Bitmap bitmap) {
 
-		final ByteBuffer buf = glReadPixels(buffer, width, height);
-		// ByteBufferからビットマップへ画像データをコピーする
 		final Bitmap result;
 		if ((bitmap == null)
 			|| (bitmap.getWidth() != width)
@@ -300,6 +298,9 @@ public class GLUtils implements GLConst {
 		} else {
 			result = bitmap;
 		}
+		// ByteBufferへ映像を読み込む
+		final ByteBuffer buf = glReadPixels(buffer, width, height);
+		// ByteBufferからビットマップへ画像データをコピーする
 		result.copyPixelsFromBuffer(buf);
 
 		return result;
@@ -349,15 +350,6 @@ public class GLUtils implements GLConst {
 		@Nullable final ByteBuffer workBuffer,
 		@Nullable final Bitmap bitmap) {
 
-		final Bitmap result;
-		if ((bitmap == null)
-			|| (bitmap.getWidth() != width)
-			|| (bitmap.getHeight() != height)
-			|| bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
-			result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		} else {
-			result = bitmap;
-		}
 		// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
 		// FIXME GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
 		//       フレームバッファオブジェクト関係でエラーになる端末がある。
@@ -374,10 +366,8 @@ public class GLUtils implements GLConst {
 			GLES20.GL_TEXTURE4, texId, width, height, false);
 		// テクスチャをバックバッファとするオフスクリーンからglReadPixelsでByteBufferへ画像データを読み込む
 		readSurface.makeCurrent();
-		final ByteBuffer buf = glReadPixels(workBuffer, width, height);
+		final Bitmap result = glReadPixelsToBitmap(workBuffer, width, height, bitmap);
 		readSurface.release();
-		// ByteBufferからビットマップへ画像データをコピーする
-		result.copyPixelsFromBuffer(buf);
 		// テクスチャ変換行列を適用する
 		final android.graphics.Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
 		if (isOES || !matrix.isIdentity()) {
