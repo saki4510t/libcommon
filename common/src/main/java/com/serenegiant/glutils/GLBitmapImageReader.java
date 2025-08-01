@@ -336,7 +336,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		final Bitmap bitmap = obtainBitmap(width, height);
 		if (bitmap != null) {
 			mAllBitmapAcquired = false;
-			final Bitmap readBitmap = GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null);
+			final Bitmap readBitmap = GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, mWorkBuffer);
 			mWorkBuffer.clear();
 			readBitmap.copyPixelsToBuffer(mWorkBuffer);
 			mWorkBuffer.flip();
