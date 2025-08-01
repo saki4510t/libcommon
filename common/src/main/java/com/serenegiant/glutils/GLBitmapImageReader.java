@@ -303,6 +303,25 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 		}
 		if (!needCapture) return;
 
+		doCapture(isGLES3, isOES, width, height, texId, texMatrix);
+		callOnFrameAvailable();
+	}
+
+	/**
+	 * テクスチャをGLSurfaceでラップしてオフスクリーンとして読み取る
+	 * @param isGLES3
+	 * @param isOES
+	 * @param width
+	 * @param height
+	 * @param texId
+	 * @param texMatrix
+	 */
+	@WorkerThread
+	private void doCapture(
+		final boolean isGLES3, final boolean isOES,
+		final int width, final int height,
+		final int texId, @NonNull final float[] texMatrix) {
+
 		final int bytes = width * height * BitmapHelper.getPixelBytes(mConfig);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() != bytes)) {
 			mLock.lock();
@@ -329,7 +348,6 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 			mAllBitmapAcquired = true;
 			if (DEBUG) Log.w(TAG, "handleDraw: failed to obtain bitmap from pool!");
 		}
-		callOnFrameAvailable();
 	}
 
 //--------------------------------------------------------------------------------
