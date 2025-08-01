@@ -271,11 +271,38 @@ public class GLUtils implements GLConst {
 		@Nullable final ByteBuffer buffer,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height) {
 
+		return glReadPixelsToBitmap(buffer, width, height, null);
+	}
+
+	/**
+	 * GLES20.glReadPixelsのヘルパーメソッド
+	 * RGBA8888として読み取る(=1ピクセル4バイト)
+	 * @param buffer nullまたはサイズが小さいかまたはでないときは新規生成する
+	 * @param width
+	 * @param height
+	 * @param bitmap 
+	 * @return 読み取ったピクセルデータの入ったBitmap
+	 */
+	@NonNull
+	public static Bitmap glReadPixelsToBitmap(
+		@Nullable final ByteBuffer buffer,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		@Nullable final Bitmap bitmap) {
+
 		final ByteBuffer buf = glReadPixels(buffer, width, height);
 		// ByteBufferからビットマップへ画像データをコピーする
-		final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		bitmap.copyPixelsFromBuffer(buf);
-		return bitmap;
+		final Bitmap result;
+		if ((bitmap == null)
+			|| (bitmap.getWidth() != width)
+			|| (bitmap.getHeight() != height)
+			|| bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+			result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		} else {
+			result = bitmap;
+		}
+		result.copyPixelsFromBuffer(buf);
+
+		return result;
 	}
 
 	/**
