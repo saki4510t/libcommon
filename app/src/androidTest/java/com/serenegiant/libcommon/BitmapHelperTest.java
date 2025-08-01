@@ -214,4 +214,49 @@ public class BitmapHelperTest {
 				IMirror.MIRROR_VERTICAL)));
 	}
 
+	/**
+	 * 元々のBitmapで確保したメモリーサイズより大きくしようとするとIllegalArgumentExceptionを投げる
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void reconfigureMakeBiggerTest1() {
+		// 初期
+		final Bitmap bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		// 縦横を2倍
+		bitmap.reconfigure(WIDTH * 2, HEIGHT * 2, Bitmap.Config.ARGB_8888);
+	}
+
+	/**
+	 * 元々のBitmapで確保したメモリーサイズより大きくしようとするとIllegalArgumentExceptionを投げる
+	 * 縦横は同じだけどConfigがRGB565からARGB_8888でアロケーション済みメモリーが足りないのでIllegalArgumentException
+	 */
+	@Test(expected = IllegalArgumentException.class)
+	public void reconfigureMakeBiggerTest2() {
+		// 初期
+		final Bitmap bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.RGB_565);
+		// サイズは同じでRGB_565からARGB_8888
+		bitmap.reconfigure(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+	}
+
+	/**
+	 * 元々のBitmapで確保したメモリーサイズより小さくするのはOK
+	 */
+	@Test
+	public void reconfigureMakeSmallerTest1() {
+		// 初期
+		final Bitmap bitmap = Bitmap.createBitmap(WIDTH * 2, HEIGHT * 2, Bitmap.Config.ARGB_8888);
+		// 縦横を半分
+		bitmap.reconfigure(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+	}
+
+	/**
+	 * 元々のBitmapで確保したメモリーサイズより小さくするのはOK
+	 * 縦横は同じだけどConfigがARGB_8888からRGB565だとメモリーが余るのでOK
+	 */
+	@Test
+	public void reconfigureMakeSmallerTest2() {
+		// 初期
+		final Bitmap bitmap = Bitmap.createBitmap(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888);
+		// サイズは同じでARGB_8888からRGB_565
+		bitmap.reconfigure(WIDTH, HEIGHT, Bitmap.Config.RGB_565);
+	}
 }
