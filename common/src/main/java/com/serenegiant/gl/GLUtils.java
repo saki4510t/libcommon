@@ -356,8 +356,7 @@ public class GLUtils implements GLConst {
 		//       ex. NEC PC-TE507FAW(ANDROID6)
 		//       どういう条件で起こるか不明だけどこの場合も、
 		//       独立したGLSurfaceでオフスクリーンを生成
-		//       → オフスクリーンのGLSurfaceからRendererTargetを生成
-		//       → RendererTargetへGLDrawer2Dでレンダリング
+		//       → オフスクリーンのGLSurfaceへGLDrawer2Dでレンダリング
 		//       → GLSurface#makeCurrentでGLSurfaceのオフスクリーンのバックバッファへ切り替え
 		//       → glReadPixelsで読み取る
 		//       のであれば正常に読み取ることができる。
@@ -389,7 +388,6 @@ public class GLUtils implements GLConst {
 	 * ByteBufferへ読み込んでBitmapへセットする
 	 * GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
 	 * フレームバッファオブジェクト関係でエラーになる端末があるのでその対策用
-	 * @param egl
 	 * @param isGLES3
 	 * @param isOES
 	 * @param width
@@ -400,13 +398,12 @@ public class GLUtils implements GLConst {
 	 * @return
 	 */
 	public static Bitmap glDrawTextureToBitmap(
-		@NonNull final EGLBase egl,
 		final boolean isGLES3, final boolean isOES,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
 		@Nullable final ByteBuffer buffer) {
 
-		return glDrawTextureToBitmap(egl, isGLES3, isOES, width, height, texId, texMatrix, buffer, null);
+		return glDrawTextureToBitmap(isGLES3, isOES, width, height, texId, texMatrix, buffer, null);
 	}
 
 	/**
@@ -414,7 +411,6 @@ public class GLUtils implements GLConst {
 	 * ByteBufferへ読み込んでBitmapへセットする
 	 * GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
 	 * フレームバッファオブジェクト関係でエラーになる端末があるのでその対策用
-	 * @param egl
 	 * @param isGLES3
 	 * @param isOES
 	 * @param width
@@ -426,7 +422,6 @@ public class GLUtils implements GLConst {
 	 * @return
 	 */
 	public static Bitmap glDrawTextureToBitmap(
-		@NonNull final EGLBase egl,
 		final boolean isGLES3, final boolean isOES,
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
@@ -435,22 +430,23 @@ public class GLUtils implements GLConst {
 
 		// オフスクリーン描画用にGLSurfaceを生成する(EglSurfaceでも大丈夫なはず)
 		final GLSurface surface = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
-		// オフスクリーンサーフェースへ描画するためのRendererTargetを生成
-		final RendererTarget target = RendererTarget.newInstance(egl, surface, 0.0f);
 		// オフスクリーン描画用にGLDrawer2Dを生成
 		final GLDrawer2D drawer = GLDrawer2D.create(isGLES3, isOES);
 		final Bitmap result;
 		try {
 			// オフスクリーンSurfaceへ描画
-			target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
-			// オフスクリーンのフレームバッファへ切り替え
 			surface.makeCurrent();
+			surface.setViewPort(0, 0, width, height);
+			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
+			// ハングアップする機種があるのでクリアしとく
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			// 乗算したモデルビュー変換行列で描画
+			drawer.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0);
 			// glReadPixelsでBitmapへ読み込む
 			result = glReadPixelsToBitmap(buffer, width, height, bitmap);
 			surface.swap();
 		} finally {
 			drawer.release();
-			target.release();
 			surface.release();
 		}
 

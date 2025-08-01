@@ -393,7 +393,7 @@ LOOP:	for (int y = 0; y < height; y++) {
 					if (cnt.incrementAndGet() == numFrames) {
 						Log.v(TAG, "createGLSurfaceReceiver:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 						if (useOffscreenRendering) {
-							result.set(GLUtils.glDrawTextureToBitmap(manager.getEgl(), isGLES3, isOES, width, height, texId, texMatrix, null));
+							result.set(GLUtils.glDrawTextureToBitmap(isGLES3, isOES, width, height, texId, texMatrix, null));
 						} else {
 							result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 						}
