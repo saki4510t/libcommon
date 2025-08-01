@@ -297,7 +297,40 @@ public class GLUtils implements GLConst {
 		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
 		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
 		@Nullable final ByteBuffer workBuffer) {
+		return glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, workBuffer, null);
+	}
 
+	/**
+	 * OpenGL|ESのテクスチャをビットマップへ読み込む
+	 * GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てて
+	 * glReadPixelsでByteBufferへ読み込んだ画像データをBitmapへ割り当てて
+	 * テクスチャ変換行列を適用して返す
+	 * OpenGL|ESのコンテキスト上で呼び出さないといけない
+	 * @param isOES
+	 * @param width
+	 * @param height
+	 * @param texId
+	 * @param texMatrix
+	 * @param workBuffer
+	 * @param bitmap
+	 * @return
+	 */
+	public static Bitmap glCopyTextureToBitmap(
+		final boolean isOES,
+		@IntRange(from=1) final int width, @IntRange(from=1) final int height,
+		final int texId, @Size(min=16) @NonNull final float[] texMatrix,
+		@Nullable final ByteBuffer workBuffer,
+		@Nullable final Bitmap bitmap) {
+
+		final Bitmap result;
+		if ((bitmap == null)
+			|| (bitmap.getWidth() != width)
+			|| (bitmap.getHeight() != height)
+			|| bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+			result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+		} else {
+			result = bitmap;
+		}
 		// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
 		// FIXME GLSurface#wrapでテクスチャをバックバッファへ割り当てるときに#assignTextureで
 		//       フレームバッファオブジェクト関係でエラーになる端末がある。
@@ -317,8 +350,7 @@ public class GLUtils implements GLConst {
 		final ByteBuffer buf = glReadPixels(workBuffer, width, height);
 		readSurface.release();
 		// ByteBufferからビットマップへ画像データをコピーする
-		final Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-		bitmap.copyPixelsFromBuffer(buf);
+		result.copyPixelsFromBuffer(buf);
 		// テクスチャ変換行列を適用する
 		final android.graphics.Matrix matrix = MatrixUtils.toAndroidMatrix(texMatrix);
 		if (isOES || !matrix.isIdentity()) {
@@ -328,10 +360,10 @@ public class GLUtils implements GLConst {
 				//     GL_TEXTURE_2Dの時に反転させると結果が一致しない
 				MatrixUtils.setMirror(matrix, IMirror.MIRROR_VERTICAL);
 			}
-			return Bitmap.createBitmap(bitmap, 0, 0, width, height, matrix, true);
+			return Bitmap.createBitmap(result, 0, 0, width, height, matrix, true);
 		} else {
 			// 単位行列の場合はそのままBitmapを返す
-			return bitmap;
+			return result;
 		}
 	}
 
