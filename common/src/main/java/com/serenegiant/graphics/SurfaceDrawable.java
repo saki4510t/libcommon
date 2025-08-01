@@ -40,7 +40,6 @@ import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
 import com.serenegiant.gl.GLUtils;
-import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
 
@@ -149,10 +148,6 @@ public class SurfaceDrawable extends Drawable {
 	 *     パフォーマンス的によい
 	 */
 	private GLSurface mOffscreenSurface;
-	/**
-	 * オフスクリーンのGLSurfaceへ描画するためのRendererTarget
-	 */
-	private RendererTarget mTarget;
 	/**
 	 * オフスクリーン描画用のGLDrawer
 	 */
@@ -381,15 +376,19 @@ public class SurfaceDrawable extends Drawable {
 			|| (mOffscreenSurface.getHeight() != mHeight)) {
 			handleReleaseOffscreen();
 			mOffscreenSurface = GLSurface.newInstance(isGLES3(), GLES20.GL_TEXTURE0, mImageWidth, mImageHeight);
-			mTarget = RendererTarget.newInstance(getEgl(), mOffscreenSurface, 0.0f);
 		}
-		if ((mOffscreenSurface != null) && (mTarget != null)) {
+		if (mOffscreenSurface != null) {
 			// オフスクリーンSurfaceへ描画
-			mTarget.draw(mDrawer, GLES20.GL_TEXTURE0, mTexId, mTexMatrix);
-			// オフスクリーンのフレームバッファへ切り替え
 			mOffscreenSurface.makeCurrent();
+			mOffscreenSurface.setViewPort(0, 0, mImageWidth, mHeight);
+			// 本来は映像が全面に描画されるので#glClearでクリアする必要はないけど
+			// ハングアップする機種があるのでクリアしとく
+			GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
+			// GLDrawer2Dでオフスクリーンへ描画
+			mDrawer.draw(GLES20.GL_TEXTURE0, mTexId, mTexMatrix, 0);
 			// オフスクリーンのバックバッファから読み込み
 			mWorkBuffer = GLUtils.glReadPixels(mWorkBuffer, mImageWidth, mImageHeight);
+			mOffscreenSurface.swap();
 		}
 		mGlManager.swap();
 		// Bitmapへ代入
@@ -494,10 +493,6 @@ public class SurfaceDrawable extends Drawable {
 
 	private void handleReleaseOffscreen() {
 		if (DEBUG) Log.v(TAG, "handleReleaseOffscreen:");
-		if (mTarget != null) {
-			mTarget.release();
-			mTarget = null;
-		}
 		if (mOffscreenSurface != null) {
 			mOffscreenSurface.release();
 			mOffscreenSurface = null;
