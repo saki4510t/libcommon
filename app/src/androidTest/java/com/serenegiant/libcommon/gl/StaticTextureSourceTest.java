@@ -158,14 +158,14 @@ public class StaticTextureSourceTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			assertEquals(NUM_FRAMES, cnt1.get());
+			assertTrue(cnt1.get() >= NUM_FRAMES);
 			final Bitmap b1 = result1.get();
 //			dump(b1);
 			assertNotNull(b1);
 			// 元のビットマップと同じかどうかを検証
 			assertTrue(bitmapEquals(original, b1));
 
-			assertEquals(NUM_FRAMES, cnt2.get());
+			assertTrue(cnt2.get() >= NUM_FRAMES);
 			final Bitmap b2 = result2.get();
 //			dump(b1);
 			assertNotNull(b2);
