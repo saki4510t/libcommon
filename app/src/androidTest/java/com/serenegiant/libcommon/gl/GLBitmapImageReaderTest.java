@@ -96,7 +96,7 @@ public class GLBitmapImageReaderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
+			= new GLBitmapImageReader(WIDTH, HEIGHT, NUM_FRAMES);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -150,7 +150,7 @@ public class GLBitmapImageReaderTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES, true/*useOffscreenRendering*/);
+			= new GLBitmapImageReader(WIDTH, HEIGHT, NUM_FRAMES, true/*useOffscreenRendering*/);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override

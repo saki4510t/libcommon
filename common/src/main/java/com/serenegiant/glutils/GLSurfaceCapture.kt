@@ -40,7 +40,7 @@ class GLSurfaceCapture @JvmOverloads constructor(
 	useOffscreenRendering: Boolean = true
 ) {
 
-	private val mReader = GLBitmapImageReader(width, height, Bitmap.Config.ARGB_8888, 4, useOffscreenRendering)
+	private val mReader = GLBitmapImageReader(width, height, 4, useOffscreenRendering)
 	private val mReceiver = GLSurfaceReceiver(glManager, width, height, mReader)
 
 	init {

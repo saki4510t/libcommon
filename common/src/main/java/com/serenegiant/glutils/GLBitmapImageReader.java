@@ -129,26 +129,39 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param config
 	 * @param maxImages
 	 */
 	public GLBitmapImageReader(
-		final int width, final int height,
-		@NonNull final Bitmap.Config config, final int maxImages) {
+		final int width, final int height, final int maxImages) {
 
-		this(width, height, config, maxImages, false);
+		this(width, height, Bitmap.Config.ARGB_8888, maxImages, false);
 	}
 
 	/**
 	 * コンストラクタ
 	 * @param width
 	 * @param height
-	 * @param config
 	 * @param maxImages
 	 * @param useOffscreenRendering テクスチャを一旦オフスクリーンへ描画してオフスクリーンからビットマップへ読み込むかどうか
 	 *                              一部機種でGLSurface#wrapが正常に動作しないことへのワークアラウンド
 	 */
 	public GLBitmapImageReader(
+		final int width, final int height, final int maxImages,
+		final boolean useOffscreenRendering) {
+
+		this(width, height, Bitmap.Config.ARGB_8888, maxImages, useOffscreenRendering);
+	}
+
+	/**
+	 * コンストラクタ
+	 * @param width
+	 * @param height
+	 * @param config テクスチャからの読み取り処理の都合上現在は実質的にBitmap.Config.ARGB_8888のみ
+	 * @param maxImages
+	 * @param useOffscreenRendering テクスチャを一旦オフスクリーンへ描画してオフスクリーンからビットマップへ読み込むかどうか
+	 *                              一部機種でGLSurface#wrapが正常に動作しないことへのワークアラウンド
+	 */
+	protected GLBitmapImageReader(
 		final int width, final int height,
 		@NonNull final Bitmap.Config config, final int maxImages,
 		final boolean useOffscreenRendering) {
@@ -168,7 +181,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 			protected Bitmap createObject(@Nullable final Object... args) {
 				final int w = (int)args[0];
 				final int h = (int)args[1];
-				return Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
+				return Bitmap.createBitmap(w, h, mConfig);
 			}
 
 			@Override

@@ -107,7 +107,7 @@ public class ImageSourcePipelineTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLBitmapImageReader reader
-			= new GLBitmapImageReader(WIDTH, HEIGHT, Bitmap.Config.ARGB_8888, NUM_FRAMES);
+			= new GLBitmapImageReader(WIDTH, HEIGHT, NUM_FRAMES);
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			@Override
 			public void onImageAvailable(@NonNull final ImageReader<Bitmap> reader) {
