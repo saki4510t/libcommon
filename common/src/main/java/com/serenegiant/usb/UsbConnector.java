@@ -117,11 +117,12 @@ public class UsbConnector implements Cloneable, Closeable {
       final String name = device.getDeviceName();
       mUsbManager = src.mUsbManager;
       mDevice = device;
+      // コピー元オブジェクトをcloseしてもこのオブジェクトがcloseしないように別途openし直す
       mConnection = mUsbManager.openDevice(device);
       if (mConnection == null) {
          throw new IOException("could not connect to device " + name);
       }
-      mInfo = UsbDeviceInfo.getDeviceInfo(mConnection, device, null);
+      mInfo = src.mInfo;
    }
 
    @Override
