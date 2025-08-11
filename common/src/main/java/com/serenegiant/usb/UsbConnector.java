@@ -92,11 +92,13 @@ public class UsbConnector implements Cloneable, Closeable {
       }
       final String name = device.getDeviceName();
       if (mConnection != null) {
-         final int fd = mConnection.getFileDescriptor();
-         final byte[] rawDesc = mConnection.getRawDescriptors();
-         if (DEBUG) Log.v(TAG, String.format(Locale.US,
-             "name=%s,fd=%d,rawDesc=", name, fd)
-             + BufferHelper.toHexString(rawDesc, 0, 16));
+         if (DEBUG) {
+            final int fd = mConnection.getFileDescriptor();
+            final byte[] rawDesc = mConnection.getRawDescriptors();
+            Log.v(TAG, String.format(Locale.US,
+                "name=%s,fd=%d,rawDesc=", name, fd)
+                + BufferHelper.toHexString(rawDesc, 0, 16));
+         }
       } else {
          // 多分ここには来ない(openDeviceの時点でIOException)けど念のために
          throw new IOException("could not connect to device " + name);
