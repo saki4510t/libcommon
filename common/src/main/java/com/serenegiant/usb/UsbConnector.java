@@ -103,7 +103,7 @@ public class UsbConnector implements Cloneable, Closeable {
          // 多分ここには来ない(openDeviceの時点でIOException)けど念のために
          throw new IOException("could not connect to device " + name);
       }
-      mInfo = UsbDeviceInfo.getDeviceInfo(manager, device, null);
+      mInfo = UsbDeviceInfo.getDeviceInfo(mConnection, device, null);
    }
 
    /**
@@ -121,7 +121,7 @@ public class UsbConnector implements Cloneable, Closeable {
       if (mConnection == null) {
          throw new IOException("could not connect to device " + name);
       }
-      mInfo = UsbDeviceInfo.getDeviceInfo(mUsbManager, device, null);
+      mInfo = UsbDeviceInfo.getDeviceInfo(mConnection, device, null);
    }
 
    @Override
