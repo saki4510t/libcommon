@@ -918,4 +918,21 @@ public final class BuildCheck {
 		return check(Build.VERSION_CODES.UPSIDE_DOWN_CAKE);
 	}
 
+	/**
+	 * バニラアイス API>=35
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = 35/*Build.VERSION_CODES.VANILLA_ICE_CREAM*/)
+	public static boolean isAndroid15() {
+		return check(35/*Build.VERSION_CODES.VANILLA_ICE_CREAM*/);
+	}
+
+	/**
+	 * バニラアイス API>=35
+	 * @return
+	 */
+	@ChecksSdkIntAtLeast(api = 35/*Build.VERSION_CODES.VANILLA_ICE_CREAM*/)
+	public static boolean isAPI35() {
+		return check(35/*Build.VERSION_CODES.VANILLA_ICE_CREAM*/);
+	}
 }
