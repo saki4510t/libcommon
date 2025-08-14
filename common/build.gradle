@@ -37,8 +37,6 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion versionTarget
-        versionCode versionCodeNum
-        versionName versionNameString
 		// AGP 4.1.0以降でライブラリプロジェクトのBuildConfigにVERSION_CODEとVERSION_NAMEが
 		// 含まれなくなってしまったのでワークアラウンドを追加
 		buildConfigField 'int', 'VERSION_CODE', "${rootProject.versionCodeNum}"
