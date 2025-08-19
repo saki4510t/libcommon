@@ -19,8 +19,10 @@ package com.serenegiant.app;
  *
 */
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import com.serenegiant.system.ContextUtils;
@@ -74,6 +76,30 @@ public class ActivityUtils {
 			if (DEBUG) Log.v(TAG, "moveTaskToFront:" + id);
 	        activityManager.moveTaskToFront(id, ActivityManager.MOVE_TASK_WITH_HOME);
 	    }
+	}
+
+	/**
+	 * Activityをフォアグラウンドへ移動
+	 * Activityをフォアグラウンド/タスクのトップへ移動
+	 * @param activity
+	 */
+	public static void bringToForeground(@NonNull final Activity activity) {
+		if ((activity != null) && !activity.isFinishing()) {
+			final Intent intent = new Intent(activity, activity.getClass())
+				.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+			activity.startActivity(intent);
+		}
+	}
+
+	/**
+	 * 自分のアプリをフォアグラウンドへ移動
+	 * (ランチャーActivityをフォアグランド/タスクのトップへ移動)
+	 * @param context
+	 */
+	public static void bringToForeground(@NonNull final Context context) {
+		final Intent intent = context.getPackageManager().getLaunchIntentForPackage(context.getPackageName())
+			.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		context.startActivity(intent);
 	}
 
 }
