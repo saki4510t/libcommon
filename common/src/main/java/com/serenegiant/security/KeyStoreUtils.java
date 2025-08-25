@@ -55,6 +55,8 @@ import androidx.annotation.RequiresApi;
  * 暗号化・復号を行うためのヘルパークラス, API>=18
  * API>=23の場合にはAES, API<23の場合はRSAで暗号化・復号する
  * 各アプリに対応する鍵がないときは自動的に生成する
+ * API23未満からAPI23以降へAndroidをバージョンアップしたときは
+ * キータイプが一致しなくなりキーを再生成するので暗号化データは復号できなくなる。
  */
 public class KeyStoreUtils {
 	private static final boolean DEBUG = false;	// set false on production
@@ -100,6 +102,8 @@ public class KeyStoreUtils {
 
 	/**
 	 * 指定したキーに対応する値を暗号化してKeyStoreへ保存
+	 * API23未満からAPI23以降へAndroidをバージョンアップしたときは
+	 * キータイプが一致しなくなりキーを再生成するので暗号化データは復号できなくなる。
 	 * @param context
 	 * @param name
 	 * @param value
@@ -124,6 +128,8 @@ public class KeyStoreUtils {
 
 	/**
 	 * 指定したキーに対応する値を読み取って復号して返す
+	 * API23未満からAPI23以降へAndroidをバージョンアップしたときは
+	 * キータイプが一致しなくなりキーを再生成するので暗号化データは復号できなくなる。
 	 * @param context
 	 * @param name
 	 * @param encrypted

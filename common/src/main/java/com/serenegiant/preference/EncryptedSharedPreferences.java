@@ -415,6 +415,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	 * 暗号化・復号を行うためのヘルパークラス, API>=18
 	 * API>=23の場合にはAES, API<23の場合はRSAで暗号化・復号する
 	 * 各アプリに対応する鍵がないときは自動的に生成する
+	 * FIXME KeyStoreUtilsを使うように変更するかも
 	 */
 	public static class KeyStoreObfuscator implements Obfuscator {
 
