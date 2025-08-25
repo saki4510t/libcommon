@@ -85,7 +85,7 @@ public class KeyStoreUtils {
 		@NonNull final Context context,
 		@Nullable final String name) {
 
-		final String alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
+		final String alias = getAlias(context, name);
 		try {
 			final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
 			keyStore.load(null);
@@ -265,6 +265,18 @@ public class KeyStoreUtils {
 	}
 
 	/**
+	 * キーエリアス名取得のためのヘルパーメソッド
+	 * @param context
+	 * @param name
+	 * @return
+	 */
+	private static String getAlias(
+		@NonNull final Context context,
+		@Nullable final String name) {
+		return context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
+	}
+
+	/**
 	 * KeyStoreからKeyStore.Entryを取得する
 	 * 対象となるエリアスに対応するエントリーがないときは自動的に生成する
 	 * @return
@@ -276,7 +288,7 @@ public class KeyStoreUtils {
 		@NonNull final Context context,
 		@Nullable final String name) throws GeneralSecurityException, IOException {
 
-		final String alias = context.getPackageName() + (!TextUtils.isEmpty(name) ? ":" + name : "");
+		final String alias = getAlias(context, name);
 		final KeyStore keyStore = KeyStore.getInstance(KEY_STORE_TYPE);
 		keyStore.load(null);
 		boolean containsAlias = keyStore.containsAlias(alias);
