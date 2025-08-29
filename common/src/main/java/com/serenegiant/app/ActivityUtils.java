@@ -81,6 +81,7 @@ public class ActivityUtils {
 	/**
 	 * Activityをフォアグラウンドへ移動
 	 * Activityをフォアグラウンド/タスクのトップへ移動
+	 * AndroidManifest.xmlで対象のActivityへandroid:launchMode="singleTask"を指定
 	 * @param activity
 	 */
 	public static void bringToForeground(@NonNull final Activity activity) {
@@ -94,6 +95,7 @@ public class ActivityUtils {
 	/**
 	 * 自分のアプリをフォアグラウンドへ移動
 	 * (ランチャーActivityをフォアグランド/タスクのトップへ移動)
+	 * AndroidManifest.xmlでランチャーActivityへandroid:launchMode="singleTask"を指定
 	 * @param context
 	 */
 	public static void bringToForeground(@NonNull final Context context) {

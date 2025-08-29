@@ -30,6 +30,7 @@ import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.serenegiant.app.ActivityUtils
 import com.serenegiant.libcommon.databinding.FragmentUsbPermissionBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.UsbConnector
@@ -161,6 +162,15 @@ class UsbPermissionFragment : BaseFragment() {
 
 		override fun onPermission(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "UsbPermission.Callback#onPermission:${device.deviceName}")
+			// XXX 永続的USBアクセスパーミッションを取得できるようにしている場合、
+			//     アプリからのUSBアクセスパーミッション要求ダイアログに加えて
+			//     OS側からもUSBアクセスパーミッション要求ダイアログが表示される。
+			//     (ディスプレー下部からのスライドイン)
+			//     アプリ側のUSBアクセスパーミッション要求ダイアログで許可/キャンセルしても
+			//     OS側のUSBアクセスパーミッション要求ダイアログが表示されたままなので
+			//     自Activityをフォアグラウンドへ移動させることでOS側のダイアログを
+			//     非表示にする。
+			ActivityUtils.bringToForeground(requireActivity())
 			lifecycleScope.launch {
 				mBinding.message.text = "${mBinding.message.text}\nonPermission(${device.deviceName})"
 			}

@@ -28,6 +28,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
+import com.serenegiant.app.ActivityUtils
 import com.serenegiant.libcommon.databinding.FragmentUsbMonitorBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
@@ -130,6 +131,15 @@ class UsbMonitorFragment : BaseFragment() {
 		override fun onPermission(device: UsbDevice) {
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:${device.deviceName}")
 			if (DEBUG) Log.v(TAG, "OnDeviceConnectListener#onPermission:パーミッションを取得できた時, openする")
+			// XXX 永続的USBアクセスパーミッションを取得できるようにしている場合、
+			//     アプリからのUSBアクセスパーミッション要求ダイアログに加えて
+			//     OS側からもUSBアクセスパーミッション要求ダイアログが表示される。
+			//     (ディスプレー下部からのスライドイン)
+			//     アプリ側のUSBアクセスパーミッション要求ダイアログで許可/キャンセルしても
+			//     OS側のUSBアクセスパーミッション要求ダイアログが表示されたままなので
+			//     自Activityをフォアグラウンドへ移動させることでOS側のダイアログを
+			//     非表示にする。
+			ActivityUtils.bringToForeground(requireActivity())
 			lifecycleScope.launch {
 				mBinding.message.text = "${mBinding.message.text}\nonPermission:${device.deviceName}"
 			}
