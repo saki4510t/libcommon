@@ -58,6 +58,7 @@
 	<string name="title_rpg_message_view" translatable="false">RPGMessageView</string>
 	<string name="title_bitmap_helper" translatable="false">BitmapHelper</string>
 	<string name="title_color_picker" translatable="false">ColorPicker</string>
+	<string name="title_cpu_monitor" translatable="false">CPUMonitor</string>
 
 	<string-array name="list_items">
 		<item>@string/title_request_saf_permission</item>
@@ -98,5 +99,6 @@
 		<item>@string/title_checkable_ex</item>
 		<item>@string/title_rpg_message_view</item>
 		<item>@string/title_bitmap_helper</item>
+		<item>@string/title_cpu_monitor</item>
 	</string-array>
 </resources>

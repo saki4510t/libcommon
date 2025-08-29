@@ -425,6 +425,9 @@ class MainActivity
 			R.string.title_bitmap_helper -> {
 				fragment = BitmapFragment.newInstance()
 			}
+			R.string.title_cpu_monitor -> {
+				fragment = CpuMonitorFragment.newInstance()
+			}
 			else -> {
 			}
 		}
