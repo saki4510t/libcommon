@@ -64,7 +64,8 @@
 			android:name="com.serenegiant.service.ScreenRecorderService"
 			android:exported="false"
 			android:enabled="true"
-			android:foregroundServiceType="mediaProjection">
+			android:foregroundServiceType="mediaProjection"
+			tools:targetApi="21">
 			<intent-filter>
 				<action android:name="com.serenegiant.service.ScreenRecorderService" />
 			</intent-filter>
