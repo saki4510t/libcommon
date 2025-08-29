@@ -39,31 +39,29 @@ import com.serenegiant.view.ViewUtils
  */
 class UsbMonitorFragment : BaseFragment() {
 
-	private var mUSBMonitor: USBMonitor? = null
+	private lateinit var mUSBMonitor: USBMonitor
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
-		if (DEBUG) Log.v(TAG, "onAttach:$mUSBMonitor")
+		if (DEBUG) Log.v(TAG, "onAttach:")
 		requireActivity().title = getString(R.string.title_usb_monitor)
-		if (mUSBMonitor == null) {
-			mUSBMonitor = USBMonitor(requireActivity(), mOnDeviceConnectListener)
-			var filters
-				 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
-			mUSBMonitor!!.setDeviceFilter(filters)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc_exclude=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac)
-			if (DEBUG) Log.v(TAG, "onAttach:uac=$filters")
-		}
+		mUSBMonitor = USBMonitor(requireActivity(), mOnDeviceConnectListener)
+		var filters
+			 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
+		mUSBMonitor!!.setDeviceFilter(filters)
+		if (DEBUG) Log.v(TAG, "onAttach:uvc_exclude=$filters")
+		filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc)
+		if (DEBUG) Log.v(TAG, "onAttach:uvc=$filters")
+		filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac)
+		if (DEBUG) Log.v(TAG, "onAttach:uac=$filters")
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onCreate:")
-		if ((mUSBMonitor != null) && !mUSBMonitor!!.isRegistered) {
+		if (!mUSBMonitor.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register USBMonitor")
-			mUSBMonitor!!.register()
+			mUSBMonitor.register()
 		}
 	}
 
@@ -89,9 +87,9 @@ class UsbMonitorFragment : BaseFragment() {
 	override fun onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:")
 		try {
-			if ((mUSBMonitor != null) && mUSBMonitor!!.isRegistered) {
+			if (mUSBMonitor.isRegistered) {
 				if (DEBUG) Log.v(TAG, "onDestroy:unregister USBMonitor")
-				mUSBMonitor!!.unregister()
+				mUSBMonitor.unregister()
 			}
 		} catch (e: Exception) {
 			Log.w(TAG, e)
@@ -101,10 +99,7 @@ class UsbMonitorFragment : BaseFragment() {
 
 	override fun onDetach() {
 		if (DEBUG) Log.v(TAG, "onDetach:")
-		if (mUSBMonitor != null) {
-			mUSBMonitor!!.destroy()
-			mUSBMonitor = null
-		}
+		mUSBMonitor.destroy()
 		super.onDetach()
 	}
 

@@ -47,40 +47,34 @@ import kotlinx.coroutines.launch
  */
 class UsbPermissionFragment : BaseFragment() {
 
-	private var mUsbDetector: UsbDetector? = null
-	private var mUsbPermission: UsbPermission? = null
+	private lateinit var mUsbDetector: UsbDetector
+	private lateinit var mUsbPermission: UsbPermission
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
-		if (DEBUG) Log.v(TAG, "onAttach:mUsbDetector=$mUsbDetector,mUsbPermission=$mUsbPermission")
+		if (DEBUG) Log.v(TAG, "onAttach:")
 		requireActivity().title = getString(R.string.title_usb_permission)
-		if (mUsbDetector == null) {
-			val detector = UsbDetector(context, mOnDeviceConnectListener)
-			var filters
-				 = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
-			detector.setDeviceFilter(filters)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc_exclude=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc)
-			if (DEBUG) Log.v(TAG, "onAttach:uvc=$filters")
-			filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac)
-			if (DEBUG) Log.v(TAG, "onAttach:uac=$filters")
-			mUsbDetector = detector
-		}
-		if (mUsbPermission == null) {
-			mUsbPermission = UsbPermission(context, mUsbPermissionCallback)
-		}
+		mUsbDetector = UsbDetector(context, mOnDeviceConnectListener)
+		var filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc_exclude)
+		mUsbDetector.setDeviceFilter(filters)
+		if (DEBUG) Log.v(TAG, "onAttach:uvc_exclude=$filters")
+		filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uvc)
+		if (DEBUG) Log.v(TAG, "onAttach:uvc=$filters")
+		filters = DeviceFilter.getDeviceFilters(context, R.xml.device_filter_uac)
+		if (DEBUG) Log.v(TAG, "onAttach:uac=$filters")
+		mUsbPermission = UsbPermission(context, mUsbPermissionCallback)
 	}
 
 	override fun onCreate(savedInstanceState: Bundle?) {
 		super.onCreate(savedInstanceState)
 		if (DEBUG) Log.v(TAG, "onCreate:")
-		if ((mUsbDetector != null) && !mUsbDetector!!.isRegistered) {
+		if (!mUsbDetector.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register UsbDetector")
-			mUsbDetector?.register()
+			mUsbDetector.register()
 		}
-		if ((mUsbPermission != null) && !mUsbPermission!!.isRegistered) {
+		if (!mUsbPermission.isRegistered) {
 			if (DEBUG) Log.v(TAG, "onCreate:register UsbPermission")
-			mUsbPermission?.register()
+			mUsbPermission.register()
 		}
 	}
 
@@ -105,25 +99,19 @@ class UsbPermissionFragment : BaseFragment() {
 
 	override fun onDestroy() {
 		if (DEBUG) Log.v(TAG, "onDestroy:")
-		try {
-			mUsbDetector?.unregister()
-		} catch (e: Exception) {
-			Log.w(TAG, e)
+		if (mUsbDetector.isRegistered) {
+			mUsbDetector.unregister()
 		}
-		try {
-			mUsbPermission?.unregister()
-		} catch (e: Exception) {
-			Log.w(TAG, e)
+		if (mUsbPermission.isRegistered) {
+			mUsbPermission.unregister()
 		}
 		super.onDestroy()
 	}
 
 	override fun onDetach() {
 		if (DEBUG) Log.v(TAG, "onDetach:")
-		mUsbDetector?.release()
-		mUsbDetector = null
-		mUsbPermission?.release()
-		mUsbPermission = null
+		mUsbDetector.release()
+		mUsbPermission.release()
 		super.onDetach()
 	}
 
