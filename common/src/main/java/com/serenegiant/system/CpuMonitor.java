@@ -17,13 +17,18 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
+import androidx.annotation.NonNull;
+
 /**
- * FIXME Android6か7辺りからパーミッションがなくて値を取得できないのでtopまたはuptimeまたはvmstatを使うように修正
+ * API26以降はCPU周波数の最高周波数に対する割合の平均値をCPU負荷として返すため高めに表示される
+ * サーマルスロットリングでCPU周波数が制限されると見かけ上CPU負荷が低いように見えてしまうかも
  * Modified 2016 t_saki@serenegiant.com
+ * Modified 2025 t_saki@serenegiant.com
  *
  * Simple CPU monitor.  The caller creates a CpuMonitor object which can then
  * be used via sampleCpuUtilization() to collect the percentual use of the
@@ -67,6 +72,7 @@ import java.util.Scanner;
  */
 
 public final class CpuMonitor {
+	private static final boolean DEBUG = false;	// set false on production
 	private static final String TAG = "CpuMonitor";
 	private static final int SAMPLE_SAVE_NUMBER = 10;  // Assumed to be >= 3.
 
@@ -89,23 +95,36 @@ public final class CpuMonitor {
 			runTime = other.runTime;
 			idleTime = other.idleTime;
 		}
+
+		@NonNull
+		@Override
+		public String toString() {
+			return "ProcStat{" +
+				"runTime=" + runTime +
+				",idleTime=" + idleTime +
+				'}';
+		}
 	}
 
 //--------------------------------------------------------------------------------
 	private final int[] percentVec = new int[SAMPLE_SAVE_NUMBER];
 	private int sum3 = 0;
 	private int sum10 = 0;
-	private long[] cpuFreq;
+	private long[] cpuMinFreq;
+	private long[] cpuMaxFreq;
 	private int cpusPresent;
 	private double lastPercentFreq = -1;
 	private int cpuCurrent;
 	private int cpuAvg3;
 	private int cpuAvgAll;
 	private boolean initialized = false;
+	private String[] minPath;
 	private String[] maxPath;
 	private String[] curPath;
+	@NonNull
 	private final ProcStat lastProcStat = new ProcStat(0L, 0L);
-	private final Map<String, Integer> mCpuTemps = new HashMap<String, Integer>();
+	@NonNull
+	private final Map<String, Integer> mCpuTemps = new HashMap<>();
 	private int mTempNum = 0;
 	private float tempAve = 0;
 
@@ -128,15 +147,23 @@ public final class CpuMonitor {
 		} catch (IOException e) {
 			Log.e(TAG, "Error closing file");
 		}
+		if (DEBUG) Log.v(TAG, "init:cpusPresent=" + cpusPresent);
 
-		cpuFreq = new long [cpusPresent];
+		cpuMinFreq = new long [cpusPresent];
+		cpuMaxFreq = new long [cpusPresent];
+		minPath = new String[cpusPresent];
 		maxPath = new String[cpusPresent];
 		curPath = new String[cpusPresent];
 		for (int i = 0; i < cpusPresent; i++) {
-			cpuFreq[i] = 0;  // Frequency "not yet determined".
-			maxPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq";
+			cpuMinFreq[i] = 0;  // Frequency "not yet determined".
+			cpuMaxFreq[i] = 0;  // Frequency "not yet determined".
+			minPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_min_freq";	// cpuinfo_min_freq
+			maxPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_max_freq";	// cpuinfo_max_freq
 			curPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_cur_freq";
 		}
+		if (DEBUG) Log.v(TAG, "init:minPath=" + Arrays.toString(minPath));
+		if (DEBUG) Log.v(TAG, "init:maxPath=" + Arrays.toString(maxPath));
+		if (DEBUG) Log.v(TAG, "init:curPath=" + Arrays.toString(curPath));
 
 		lastProcStat.set(0, 0);
 
@@ -150,6 +177,7 @@ public final class CpuMonitor {
 				mTempNum++;
 			}
 		}
+		if (DEBUG) Log.v(TAG, "init:cpuTemp=" + mCpuTemps);
 
 		initialized = true;
 	}
@@ -172,56 +200,66 @@ public final class CpuMonitor {
 			init();
 		}
 
-		for (int i = 0; i < cpusPresent; i++) {
-			/*
-			 * For each CPU, attempt to first read its max frequency, then its
-			 * current frequency.  Once as the max frequency for a CPU is found,
-			 * save it in cpuFreq[].
-			 */
-
-			if (cpuFreq[i] == 0) {
-				// We have never found this CPU's max frequency.  Attempt to read it.
-				long cpufreqMax = readFreqFromFile(maxPath[i]);
-				if (cpufreqMax > 0) {
-					lastSeenMaxFreq = cpufreqMax;
-					cpuFreq[i] = cpufreqMax;
-					maxPath[i] = null;  // Kill path to free its memory.
-				}
-			} else {
-				lastSeenMaxFreq = cpuFreq[i];  // A valid, previously read value.
-			}
-
-			long cpufreqCur = readFreqFromFile(curPath[i]);
-			cpufreqCurSum += cpufreqCur;
-
-			/* Here, lastSeenMaxFreq might come from
-			 * 1. cpuFreq[i], or
-			 * 2. a previous iteration, or
-			 * 3. a newly read value, or
-			 * 4. hypothetically from the pre-loop dummy.
-			 */
-			cpufreqMaxSum += lastSeenMaxFreq;
-		}
-
-		if (cpufreqMaxSum == 0) {
-			Log.e(TAG, "Could not read max frequency for any CPU");
+		if (!initialized) {
 			return false;
 		}
 
-		/*
-		 * Since the cycle counts are for the period between the last invocation
-		 * and this present one, we average the percentual CPU frequencies between
-		 * now and the beginning of the measurement period.  This is significantly
-		 * incorrect only if the frequencies have peeked or dropped in between the
-		 * invocations.
-		 */
-		final double newPercentFreq = 100.0 * cpufreqCurSum / cpufreqMaxSum;
-		final double percentFreq = lastPercentFreq > 0 ? (lastPercentFreq + newPercentFreq) * 0.5 : newPercentFreq;
-		lastPercentFreq = newPercentFreq;
+		if (BuildCheck.isAPI26()) {
+			return sampleCpuUtilizationNew();
+		} else {
+			return sampleCpuUtilizationOld();
+		}
+	}
+
+	public int getCpuCurrent() {
+		return cpuCurrent;
+	}
+
+	public int getCpuAvg3() {
+		return cpuAvg3;
+	}
+
+	public int getCpuAvgAll() {
+		return cpuAvgAll;
+	}
+
+	public int getTempNum() {
+		return mTempNum;
+	}
+
+	public int getTemp(final int ix) {
+		int result = 0;
+		if ((ix >= 0) && (ix < mTempNum)) {
+			final String path = "/sys/class/hwmon/hwmon" + ix;
+			if (mCpuTemps.containsKey(path)) {
+				result = mCpuTemps.get(path);
+			}
+		}
+		return result;
+	}
+
+	public float getTempAve() {
+		return tempAve;
+	}
+
+	/**
+	 * Re-measure CPU use.  Call this method at an interval of around 1/s.
+	 * This method returns true on success.  The fields
+	 * cpuCurrent, cpuAvg3, and cpuAvgAll are updated on success, and represents:
+	 * cpuCurrent: The CPU use since the last sampleCpuUtilization call.
+	 * cpuAvg3: The average CPU over the last 3 calls.
+	 * cpuAvgAll: The average CPU over the last SAMPLE_SAVE_NUMBER calls.
+	 * CPU周辺の温度を取得するのが少し重いのでUIスレッドからは呼び出さないほうが良い
+	 */
+	private boolean sampleCpuUtilizationOld() {
+		double percentFreq = updateCpuFrequency();
+		if (percentFreq == 0) {
+			return false;
+		}
 
 		final ProcStat procStat = readIdleAndRunTime();
 		if (procStat == null) {
-			return false;
+			return sampleCpuUtilizationNew();
 		}
 
 		final long diffRunTime = procStat.runTime - lastProcStat.runTime;
@@ -271,35 +309,128 @@ public final class CpuMonitor {
 		return true;
 	}
 
-	public int getCpuCurrent() {
-		return cpuCurrent;
-	}
+	/**
+	 * Android8/API26以降では通常のアプリから/proc/statが読み込めなくなっている
+	 * (vmstat等もだめ)なので代わりにCPU周波数の割合をCPU負荷率として返す
+	 */
+	private boolean sampleCpuUtilizationNew() {
+		double percentFreq = updateCpuFrequency();
+		if (percentFreq == 0) {
+			return false;
+		}
+		int percent = Math.round((float)percentFreq);
+		percent = Math.max(0, Math.min(percent, 100));
 
-	public int getCpuAvg3() {
-		return cpuAvg3;
-	}
+		// Subtract old relevant measurement, add newest.
+		sum3 += percent - percentVec[2];
+		// Subtract oldest measurement, add newest.
+		sum10 += percent - percentVec[SAMPLE_SAVE_NUMBER - 1];
 
-	public int getCpuAvgAll() {
-		return cpuAvgAll;
-	}
+		// Rotate saved percent values, save new measurement in vacated spot.
+		for (int i = SAMPLE_SAVE_NUMBER - 1; i > 0; i--) {
+			percentVec[i] = percentVec[i - 1];
+		}
+		percentVec[0] = percent;
 
-	public int getTempNum() {
-		return mTempNum;
-	}
+		cpuCurrent = percent;
+		cpuAvg3 = sum3 / 3;
+		cpuAvgAll = sum10 / SAMPLE_SAVE_NUMBER;
 
-	public int getTemp(final int ix) {
-		int result = 0;
-		if ((ix >= 0) && (ix < mTempNum)) {
-			final String path = "/sys/class/hwmon/hwmon" + ix;
-			if (mCpuTemps.containsKey(path)) {
-				result = mCpuTemps.get(path);
+		tempAve = 0;
+		float tempCnt = 0;
+		for (final String path: mCpuTemps.keySet()) {
+			final File dir = new File(path);
+			if (dir.exists() && dir.canRead()) {
+				final File file = new File(dir, "temp1_input");
+				if (file.exists() && file.canRead()) {
+					final int temp = (int)readFreqFromFile(file.getAbsolutePath());
+					mCpuTemps.put(path, temp);
+					if (temp > 0) {
+						tempCnt++;
+						tempAve += temp > 1000 ? temp / 1000.0f : temp;
+					}
+				}
 			}
 		}
-		return result;
+		if (tempCnt > 0) {
+			tempAve /= tempCnt;
+		}
+		return true;
 	}
 
-	public float getTempAve() {
-		return tempAve;
+	/**
+	 * CPU周波数の取得計算処理を分離
+	 * 元々は周波数比率=現在のCPU周波数の合計÷最大周波数の合計
+	 * だったのを
+	 * 周波数比率=(現在のCPU周波数-最小周波数)の合計÷(最大周波数-最小周波数)の合計
+	 * に変更している
+	 * @return
+	 */
+	private double updateCpuFrequency() {
+		long lastSeenMinFreq = 0;
+		long lastSeenMaxFreq = 0;
+		long cpufreqCurSum = 0;
+		long cpufreqMaxSum = 0;
+
+		for (int i = 0; i < cpusPresent; i++) {
+			/*
+			 * For each CPU, attempt to first read its max frequency, then its
+			 * current frequency.  Once as the max frequency for a CPU is found,
+			 * save it in cpuFreq[].
+			 */
+
+			if (cpuMinFreq[i] == 0) {
+				// We have never found this CPU's max frequency.  Attempt to read it.
+				long cpufreqMin = readFreqFromFile(minPath[i]);
+				if (cpufreqMin > 0) {
+					lastSeenMinFreq = cpufreqMin;
+					cpuMinFreq[i] = cpufreqMin;
+					minPath[i] = null;  // Kill path to free its memory.
+				}
+			} else {
+				lastSeenMinFreq = cpuMinFreq[i];  // A valid, previously read value.
+			}
+
+			if (cpuMaxFreq[i] == 0) {
+				// We have never found this CPU's max frequency.  Attempt to read it.
+				long cpufreqMax = readFreqFromFile(maxPath[i]);
+				if (cpufreqMax > 0) {
+					lastSeenMaxFreq = cpufreqMax;
+					cpuMaxFreq[i] = cpufreqMax;
+					maxPath[i] = null;  // Kill path to free its memory.
+				}
+			} else {
+				lastSeenMaxFreq = cpuMaxFreq[i];  // A valid, previously read value.
+			}
+
+			long cpufreqCur = readFreqFromFile(curPath[i]);
+			cpufreqCurSum += (cpufreqCur - lastSeenMinFreq);
+
+			/* Here, lastSeenMaxFreq might come from
+			 * 1. cpuFreq[i], or
+			 * 2. a previous iteration, or
+			 * 3. a newly read value, or
+			 * 4. hypothetically from the pre-loop dummy.
+			 */
+			cpufreqMaxSum += (lastSeenMaxFreq - lastSeenMinFreq);
+		}
+
+		if (cpufreqMaxSum == 0) {
+			Log.e(TAG, "Could not read max frequency for any CPU");
+			return 0;
+		}
+
+		/*
+		 * Since the cycle counts are for the period between the last invocation
+		 * and this present one, we average the percentual CPU frequencies between
+		 * now and the beginning of the measurement period.  This is significantly
+		 * incorrect only if the frequencies have peeked or dropped in between the
+		 * invocations.
+		 */
+		final double newPercentFreq = 100.0 * cpufreqCurSum / cpufreqMaxSum;
+		final double percentFreq = lastPercentFreq > 0 ? (lastPercentFreq + newPercentFreq) * 0.5 : newPercentFreq;
+		lastPercentFreq = newPercentFreq;
+		return percentFreq;
 	}
 
 	/**
@@ -336,6 +467,7 @@ public final class CpuMonitor {
 		long runTime;
 		long idleTime;
 		try {
+			// API26以降ではruntime.execでcat /proc/statへアクセスするのもvmstatへアクセスするのもだめ
 			final FileReader fin = new FileReader("/proc/stat");
 			try {
 				final BufferedReader rdr = new BufferedReader(fin);
