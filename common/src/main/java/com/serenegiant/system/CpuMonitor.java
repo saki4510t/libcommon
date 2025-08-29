@@ -157,8 +157,8 @@ public final class CpuMonitor {
 		for (int i = 0; i < cpusPresent; i++) {
 			cpuMinFreq[i] = 0;  // Frequency "not yet determined".
 			cpuMaxFreq[i] = 0;  // Frequency "not yet determined".
-			minPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_min_freq";	// cpuinfo_min_freq
-			maxPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_max_freq";	// cpuinfo_max_freq
+			minPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_min_freq"; // scaling_min_freq
+			maxPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/cpuinfo_max_freq"; // scaling_max_freq
 			curPath[i] = "/sys/devices/system/cpu/cpu" + i + "/cpufreq/scaling_cur_freq";
 		}
 		if (DEBUG) Log.v(TAG, "init:minPath=" + Arrays.toString(minPath));
@@ -436,6 +436,7 @@ public final class CpuMonitor {
 	/**
 	 * Read a single integer value from the named file.  Return the read value
 	 * or if an error occurs return 0.
+	 * big.LITTLEで落ちているCPUの周波数は取得できない
 	 */
 	private long readFreqFromFile(String fileName) {
 		long number = 0;
@@ -453,8 +454,8 @@ public final class CpuMonitor {
 			}
 		} catch (final FileNotFoundException e) {
 			// CPU is offline, not an error.
-		} catch (final IOException e) {
-			Log.e(TAG, "Error closing file");
+		} catch (final Exception e) {
+			if (DEBUG) Log.e(TAG, "Error closing file");
 		}
 		return number;
 	}
