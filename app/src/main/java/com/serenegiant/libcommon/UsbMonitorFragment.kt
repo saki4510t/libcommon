@@ -25,6 +25,9 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
+import com.serenegiant.libcommon.databinding.FragmentCpuMonitorBinding
+import com.serenegiant.libcommon.databinding.FragmentUsbMonitorBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.USBMonitor
 import com.serenegiant.usb.UsbConnector
@@ -40,6 +43,7 @@ import com.serenegiant.view.ViewUtils
 class UsbMonitorFragment : BaseFragment() {
 
 	private lateinit var mUSBMonitor: USBMonitor
+	private lateinit var mBinding: FragmentUsbMonitorBinding
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -71,7 +75,14 @@ class UsbMonitorFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return customInflater.inflate(R.layout.fragment_usb_monitor, container, false)
+		return DataBindingUtil.inflate<FragmentUsbMonitorBinding?>(
+			customInflater,
+			R.layout.fragment_usb_monitor, container, false
+		).apply {
+			mBinding = this
+		}.run {
+			root
+		}
 	}
 
 	override fun internalOnResume() {

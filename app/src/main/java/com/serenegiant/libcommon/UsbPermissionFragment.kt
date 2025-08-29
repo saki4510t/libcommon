@@ -26,8 +26,11 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.serenegiant.libcommon.databinding.FragmentUsbMonitorBinding
+import com.serenegiant.libcommon.databinding.FragmentUsbPermissionBinding
 import com.serenegiant.usb.DeviceFilter
 import com.serenegiant.usb.UsbConnector
 import com.serenegiant.usb.UsbDetector
@@ -49,6 +52,7 @@ class UsbPermissionFragment : BaseFragment() {
 
 	private lateinit var mUsbDetector: UsbDetector
 	private lateinit var mUsbPermission: UsbPermission
+	private lateinit var mBinding: FragmentUsbPermissionBinding
 
 	override fun onAttach(context: Context) {
 		super.onAttach(context)
@@ -84,7 +88,14 @@ class UsbPermissionFragment : BaseFragment() {
 		if (DEBUG) Log.v(TAG, "onCreateView:")
 		val customInflater
 			= ViewUtils.createCustomLayoutInflater(requireContext(), inflater, R.style.AppTheme_Usb)
-		return customInflater.inflate(R.layout.fragment_usb_permission, container, false)
+		return DataBindingUtil.inflate<FragmentUsbPermissionBinding?>(
+			customInflater,
+			R.layout.fragment_usb_permission, container, false
+		).apply {
+			mBinding = this
+		}.run {
+			root
+		}
 	}
 
 	override fun internalOnResume() {
