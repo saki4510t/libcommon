@@ -135,6 +135,11 @@ public class PermissionUtils {
 	@NonNull
 	private final PermissionCallback mCallback;
 	/**
+	 * AndroidManifest.xmlで要求しているパーミッションの配列
+	 */
+	@NonNull
+	private final String[] mRequestedPermissions;
+	/**
 	 * パーミッション要求中に他のパーミッションを要求すると先に要求したパーミッションが拒絶されるので
 	 * パーミッション要求中かどうかを保持するためのフラグ
 	 */
@@ -154,7 +159,9 @@ public class PermissionUtils {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + activity);
 		mWeakActivity = new WeakReference<>(activity);
 		mCallback = callback;
+		mRequestedPermissions = requestedPermissions(activity);
 		mLaunchers.putAll(prepare(this, activity, callback));
+		prepare(activity, mRequestedPermissions);
 	}
 
 	/**
@@ -172,7 +179,9 @@ public class PermissionUtils {
 		final ComponentActivity activity = fragment.requireActivity();
 		mWeakActivity = new WeakReference<>(activity);
 		mCallback = callback;
+		mRequestedPermissions = requestedPermissions(activity);
 		mLaunchers.putAll(prepare(this, fragment, callback));
+		prepare(activity, mRequestedPermissions);
 	}
 
 	/**
@@ -211,6 +220,15 @@ public class PermissionUtils {
 			mMultiLaunchers.put(permissions, prepare(this, fragment, permissions, mCallback));
 		}
 		return this;
+	}
+
+	/**
+	 * AndroidManifest.xmlで要求しているパーミッションを全て要求する
+	 * @param canShowRational
+	 * @return
+	 */
+	public boolean requestPermissionAll(final boolean canShowRational) {
+		return requestPermission(mRequestedPermissions, canShowRational);
 	}
 
 	/**
@@ -276,7 +294,7 @@ public class PermissionUtils {
 	 * ただし、このメソッド呼び出し時にすでにパーミッションを保持している場合は#onPermissionを呼ばない。
 	 * 他のパーミッション要求中はfalseを返す
 	 * XXX ACCESS_COARSE_LOCATION/ACCESS_FINE_LOCATIONとACCESS_BACKGROUND_LOCATIONを同時に要求するとどちらも許可されないので注意
-	 * @param permissions
+	 * @param permissions #prepareを呼び出したのと同じString配列(中身が同じでも他の配列はだめ)
 	 * @param canShowRational パーミッション要求の確認ダイアログ表示後に再度パーミッション要求した時に
 	 * 							再度shouldShowRequestPermissionRationaleがヒットしてループしてしまうのを防ぐため
 	 * @return このメソッドを呼出した時点で指定したパーミッションを保持しているかどうか
