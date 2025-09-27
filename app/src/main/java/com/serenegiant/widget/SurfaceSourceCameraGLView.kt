@@ -28,17 +28,17 @@ import android.util.Log
 import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
-import com.serenegiant.glpipeline.SurfaceDistributePipeline
-import com.serenegiant.glpipeline.GLPipeline
-import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
 import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.glpipeline.GLPipeline
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
+import com.serenegiant.glpipeline.SurfaceDistributePipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.widget.CameraDelegator.ICameraRenderer
-import java.lang.IllegalStateException
 
 /**
  * カメラ映像をVideoSource経由で取得してプレビュー表示するためのICameraView実装
@@ -51,7 +51,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 
 	private val mCameraDelegator: CameraDelegator
 	private val mCameraRenderer: CameraRenderer
-	private var mSurfaceSourcePipeline: SurfaceSourcePipeline? = null
+	private var mSourcePipeline: GLPipelineSurfaceSource? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 	private val mMvpMatrix = FloatArray(16)
 
@@ -73,7 +73,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 
 			@WorkerThread
 			override fun onSurfaceChanged(format: Int, width: Int, height: Int) {
-				mSurfaceSourcePipeline!!.resize(width, height)
+				mSourcePipeline!!.resize(width, height)
 				mCameraDelegator.startPreview(
 					CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			}
@@ -81,8 +81,8 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 			@SuppressLint("WrongThread")
 			@WorkerThread
 			override fun drawFrame(frameTimeNanos: Long) {
-				if (mSurfaceSourcePipeline != null) {
-					handleDraw(mSurfaceSourcePipeline!!.texId, mSurfaceSourcePipeline!!.texMatrix)
+				if (mSourcePipeline != null) {
+					handleDraw(mSourcePipeline!!.texId, mSourcePipeline!!.texMatrix)
 				}
 			}
 
@@ -113,7 +113,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
-		mSurfaceSourcePipeline = createSurfaceSource(
+		mSourcePipeline = createSurfaceSource(
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 		mCameraDelegator.onResume()
 	}
@@ -125,11 +125,11 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		mSurfaceSourcePipeline?.pipeline = null
+		mSourcePipeline?.pipeline = null
 		mDistributor?.release()
 		mDistributor = null
-		mSurfaceSourcePipeline?.release()
-		mSurfaceSourcePipeline = null
+		mSourcePipeline?.release()
+		mSourcePipeline = null
 	}
 
 	/**
@@ -196,8 +196,8 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mSurfaceSourcePipeline!!.glManager)
-			GLPipeline.append(mSurfaceSourcePipeline!!, mDistributor!!)
+			mDistributor = SurfaceDistributePipeline(mSourcePipeline!!.glManager)
+			GLPipeline.append(mSourcePipeline!!, mDistributor!!)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -220,7 +220,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	 * GLPipelineViewの実装
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		val source = mSurfaceSourcePipeline
+		val source = mSourcePipeline
 		if (source != null) {
 			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
@@ -232,13 +232,13 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	// GLPipelineView#getGLManagerはGLViewに等価な#getGLManagerがあるので実装不要
 
 	/**
-	 * SurfaceSourcePipelineインスタンスを生成
+	 * GLPipelineSurfaceSourceインスタンスを生成
 	 * @param width
 	 * @param height
 	 * @return
 	 */
 	private fun createSurfaceSource(
-		width: Int, height: Int): SurfaceSourcePipeline {
+		width: Int, height: Int): GLPipelineSurfaceSource {
 
 		return SurfaceSourcePipeline(getGLManager(),
 			width,
@@ -268,7 +268,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	private fun handleDraw(texId: Int, texMatrix: FloatArray) {
 		if (DEBUG && ((++cnt2 % 100) == 0)) Log.v(TAG, "handleDraw:$cnt2")
 		// draw to preview screen
-		if ((mDrawer != null) && (mSurfaceSourcePipeline != null)) {
+		if ((mDrawer != null) && (mSourcePipeline != null)) {
 			mDrawer!!.draw(GLES20.GL_TEXTURE0, texId, texMatrix, 0)
 		}
 		GLES20.glFlush()
@@ -283,18 +283,18 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 		: ICameraRenderer {
 
 		override fun hasSurface(): Boolean {
-			return mSurfaceSourcePipeline != null
+			return mSourcePipeline != null
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
-			mSurfaceSourcePipeline!!.resize(width, height)
+			mSourcePipeline!!.resize(width, height)
 		}
 
 		override fun getInputSurface(): SurfaceTexture {
 
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-			checkNotNull(mSurfaceSourcePipeline)
-			return mSurfaceSourcePipeline!!.inputSurfaceTexture
+			checkNotNull(mSourcePipeline)
+			return mSourcePipeline!!.inputSurfaceTexture
 		}
 
 		fun updateViewport() {
