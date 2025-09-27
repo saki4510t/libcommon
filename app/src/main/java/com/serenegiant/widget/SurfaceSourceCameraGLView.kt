@@ -29,10 +29,12 @@ import android.view.Surface
 import androidx.annotation.Size
 import androidx.annotation.WorkerThread
 import com.serenegiant.gl.GLDrawer2D
+import com.serenegiant.gl.GLEffect
 import com.serenegiant.glpipeline.GLPipeline
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource
 import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
 import com.serenegiant.glpipeline.SurfaceDistributePipeline
+import com.serenegiant.glpipeline.SurfaceEffectSourcePipeline
 import com.serenegiant.glpipeline.SurfaceSourcePipeline
 import com.serenegiant.glutils.IMirror
 import com.serenegiant.graphics.MatrixUtils
@@ -113,8 +115,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	@Synchronized
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
-		mSourcePipeline = createSurfaceSource(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+		mSourcePipeline = createSurfaceSource()
 		mCameraDelegator.onResume()
 	}
 
@@ -195,11 +196,17 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 		maxFps: Fraction?) {
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
-		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mSourcePipeline!!.glManager)
-			GLPipeline.append(mSourcePipeline!!, mDistributor!!)
+		val source = mSourcePipeline
+		if (source != null) {
+			if (mDistributor == null) {
+				mDistributor = SurfaceDistributePipeline(mSourcePipeline!!.glManager)
+				GLPipeline.append(mSourcePipeline!!, mDistributor!!)
+				if (DEBUG) Log.v(TAG, "addSurface:" + GLPipeline.pipelineString(source))
+			}
+			mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
+		} else {
+			throw IllegalStateException()
 		}
-		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
 
 	/**
@@ -233,27 +240,31 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 
 	/**
 	 * GLPipelineSurfaceSourceインスタンスを生成
-	 * @param width
-	 * @param height
 	 * @return
 	 */
-	private fun createSurfaceSource(
-		width: Int, height: Int): GLPipelineSurfaceSource {
+	private fun createSurfaceSource(): GLPipelineSurfaceSource {
 
-		return SurfaceSourcePipeline(getGLManager(),
-			width,
-			height,
-			object : PipelineSourceCallback {
-
-				override fun onCreate(surface: Surface) {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
-				}
-
-				override fun onDestroy() {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
-				}
-			},
-			USE_SHARED_CONTEXT)
+		val callback = object: PipelineSourceCallback {
+			override fun onCreate(surface: Surface) {
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
+			}
+			override fun onDestroy() {
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
+			}
+		}
+		return if (USE_EFFECT) {
+			if (DEBUG) Log.v(TAG, "createSurfaceSource:create SurfaceEffectSourcePipeline")
+			SurfaceEffectSourcePipeline(getGLManager(),
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+				callback).apply {
+					effect = GLEffect.EFFECT_GRAY
+			}
+		} else {
+			if (DEBUG) Log.v(TAG, "createSurfaceSource:create SurfaceSourcePipeline")
+			SurfaceSourcePipeline(getGLManager(),
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+				callback, USE_SHARED_CONTEXT)
+		}
 	}
 
 	private var mDrawer: GLDrawer2D? = null
@@ -379,6 +390,13 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 		 */
 		private const val USE_SHARED_CONTEXT = false
+
+		/**
+		 * GLPipelineSurfaceSourceとしてSurfaceEffectSourcePipelineを使うかどうか
+		 * true: SurfaceEffectSourcePipelineを使う
+		 * false: SurfaceSourcePipelineを使う
+		 */
+		private const val USE_EFFECT = true
 	}
 
 }
