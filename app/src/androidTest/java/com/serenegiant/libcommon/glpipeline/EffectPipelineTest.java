@@ -251,13 +251,13 @@ public class EffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -323,13 +323,13 @@ public class EffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -397,13 +397,13 @@ public class EffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -534,13 +534,13 @@ public class EffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineTest#onDestroy:");
 				}
 			});
 		try {

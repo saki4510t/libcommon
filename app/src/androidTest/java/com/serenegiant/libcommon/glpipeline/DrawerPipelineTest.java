@@ -336,13 +336,13 @@ public class DrawerPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "DrawerPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "DrawerPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -404,13 +404,13 @@ public class DrawerPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "DrawerPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "DrawerPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -476,13 +476,13 @@ public class DrawerPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "DrawerPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "DrawerPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -550,13 +550,13 @@ public class DrawerPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "DrawerPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "DrawerPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -685,13 +685,13 @@ public class DrawerPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "DrawerPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "DrawerPipelineTest#onDestroy:");
 				}
 			});
 		try {

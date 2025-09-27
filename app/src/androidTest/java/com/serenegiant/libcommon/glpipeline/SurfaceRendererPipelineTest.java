@@ -127,7 +127,7 @@ public class SurfaceRendererPipelineTest {
 
 	/**
 	 * ImageSourcePipelineからの映像をSurfaceRendererPipelineでSurfaceへ転送
-	 * Surfaceの映像をカメラ等のからの映像とみなしてVideoSourcePipelineで映像ソースとして
+	 * Surfaceの映像をカメラ等のからの映像とみなしてSurfaceSourcePipelineで映像ソースとして
 	 * 供給できるかどうかを検証
 	 * Bitmap → ImageSourcePipeline
 	 * 		→ SurfaceRendererPipeline

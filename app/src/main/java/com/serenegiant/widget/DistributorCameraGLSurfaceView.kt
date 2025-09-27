@@ -49,7 +49,7 @@ import javax.microedition.khronos.opengles.GL10
 /**
  * カメラ映像をVideoSourceとDistributor経由で取得してプレビュー表示するためのGLSurfaceView実装
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
- * FIXME mVideoSourcePipelineが呼ばれるタイミングだとmVideoSourcePipelineが未生成なのでクラッシュする
+ * FIXME mSurfaceSourcePipelineが呼ばれるタイミングだとmSurfaceSourcePipelineが未生成なのでクラッシュする
  *       暫定的にaddPipelineで例外生成しないように変更したが静止画キャプチャが動作しない
  */
 class DistributorCameraGLSurfaceView @JvmOverloads constructor(
@@ -59,7 +59,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	private val mGLVersion: Int
 	private val mCameraDelegator: CameraDelegator
 	private lateinit var mGLManager: GLManager
-	private var mVideoSourcePipeline: SurfaceSourcePipeline? = null
+	private var mSurfaceSourcePipeline: SurfaceSourcePipeline? = null
 	private var mDistributor: SurfaceDistributePipeline? = null
 
 	init {
@@ -118,11 +118,11 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		mVideoSourcePipeline?.pipeline = null
+		mSurfaceSourcePipeline?.pipeline = null
 		mDistributor?.release()
 		mDistributor = null
-		mVideoSourcePipeline?.release()
-		mVideoSourcePipeline = null
+		mSurfaceSourcePipeline?.release()
+		mSurfaceSourcePipeline = null
 		super.onPause()
 	}
 
@@ -169,8 +169,8 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 
 		if (DEBUG) Log.v(TAG, "addSurface:$id")
 		if (mDistributor == null) {
-			mDistributor = SurfaceDistributePipeline(mVideoSourcePipeline!!.glManager)
-			GLPipeline.append(mVideoSourcePipeline!!, mDistributor!!)
+			mDistributor = SurfaceDistributePipeline(mSurfaceSourcePipeline!!.glManager)
+			GLPipeline.append(mSurfaceSourcePipeline!!, mDistributor!!)
 		}
 		mDistributor!!.addSurface(id, surface, isRecordable, maxFps)
 	}
@@ -194,12 +194,12 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		val source = mVideoSourcePipeline
+		val source = mSurfaceSourcePipeline
 		if (source != null) {
 			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
 		} else {
-			Log.w(TAG, "addPipeline: mVideoSourcePipeline not ready!")
+			Log.w(TAG, "addPipeline: mSurfaceSourcePipeline not ready!")
 //			throw IllegalStateException()
 		}
 	}
@@ -264,7 +264,7 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 				0,
 				null
 			)
-			mVideoSourcePipeline = createSurfaceSource(
+			mSurfaceSourcePipeline = createSurfaceSource(
 				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
 			val isOES3 = extensions.contains("GL_OES_EGL_image_external_essl3")
 			mDrawer = GLDrawer2D.create(isOES3, true)
@@ -315,15 +315,15 @@ class DistributorCameraGLSurfaceView @JvmOverloads constructor(
 		}
 
 		override fun onPreviewSizeChanged(width: Int, height: Int) {
-			mVideoSourcePipeline?.resize(width, height)
+			mSurfaceSourcePipeline?.resize(width, height)
 			mDistributor?.resize(width, height)
 			inputSurfaceTexture?.setDefaultBufferSize(width, height)
 		}
 
 		override fun getInputSurface(): SurfaceTexture {
 			if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-			checkNotNull(mVideoSourcePipeline)
-			return mVideoSourcePipeline!!.inputSurfaceTexture
+			checkNotNull(mSurfaceSourcePipeline)
+			return mSurfaceSourcePipeline!!.inputSurfaceTexture
 		}
 
 		fun release() {

@@ -79,10 +79,10 @@ public class SurfaceSourcePipelineTest {
 	}
 
 	/**
-	 * VideoSourcePipelineパイプラインが正常に映像ソースとして動作するかどうかを検証
+	 * SurfaceSourcePipelineパイプラインが正常に映像ソースとして動作するかどうかを検証
 	 * Bitmap → inputImagesAsync
 	 * 				↓
-	 * 				Surface → VideoSourcePipeline
+	 * 				Surface → SurfaceSourcePipeline
 	 * 							→ ProxyPipeline → GLSurface.wrap → glReadPixels → Bitmap
 	 */
 	@Test
@@ -100,13 +100,13 @@ public class SurfaceSourcePipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "SurfaceSourcePipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "SurfaceSourcePipelineTest#onDestroy:");
 				}
 			});
 		try {

@@ -281,13 +281,13 @@ public class EffectPipelineChangeEffectTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "CapturePipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onDestroy:");
 				}
 			});
 		try {
@@ -359,13 +359,13 @@ public class EffectPipelineChangeEffectTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onDestroy:");
 				}
 			});
 		try {
@@ -439,13 +439,13 @@ public class EffectPipelineChangeEffectTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onDestroy:");
 				}
 			});
 		try {
@@ -591,13 +591,13 @@ public class EffectPipelineChangeEffectTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "EffectPipelineChangeEffectTest#onDestroy:");
 				}
 			});
 		try {

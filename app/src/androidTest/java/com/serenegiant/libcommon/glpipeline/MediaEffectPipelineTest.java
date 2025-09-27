@@ -949,13 +949,13 @@ public class MediaEffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "MediaEffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "MediaEffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -1021,13 +1021,13 @@ public class MediaEffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "MediaEffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "MediaEffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -1094,13 +1094,13 @@ public class MediaEffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "MediaEffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "MediaEffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
@@ -1228,13 +1228,13 @@ public class MediaEffectPipelineTest {
 			new GLPipelineSurfaceSource.PipelineSourceCallback() {
 				@Override
 				public void onCreate(@NonNull final Surface surface) {
-					Log.v(TAG, "videoSourcePipelineTest#onCreate:" + surface);
+					Log.v(TAG, "MediaEffectPipelineTest#onCreate:" + surface);
 					sem.release();
 				}
 
 				@Override
 				public void onDestroy() {
-					Log.v(TAG, "videoSourcePipelineTest#onDestroy:");
+					Log.v(TAG, "MediaEffectPipelineTest#onDestroy:");
 				}
 			});
 		try {
