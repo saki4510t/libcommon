@@ -299,7 +299,7 @@ public class EffectPipeline extends ProxyPipeline
 				mDrawer.release();
 				mDrawer = null;
 			}
-			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
+			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D, effect=" + mEffect);
 			mDrawer = mDrawerFactory.create(isGLES3, isOES);
 			if (!isOES) {
 				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
@@ -328,15 +328,18 @@ public class EffectPipeline extends ProxyPipeline
 		if (mPathThrough || (mOffscreenTarget == null)) {	// mOffscreenSurfaceのnullチェックはバグ避け
 			// こっちはオリジナルのテクスチャを渡す
 			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
+			if (DEBUG && (++cnt % 100) == 0) {
+				Log.v(TAG, "onFrameAvailable:path through," + cnt);
+			}
 		} else {
 			// 描画処理した後のたテクスチャを次へ渡す
 			super.onFrameAvailable(
 				isGLES3, mOffscreenSurface.isOES(),
 				width, height,
 				mOffscreenSurface.getTexId(), mOffscreenSurface.getTexMatrix());
-		}
-		if (DEBUG && (++cnt % 100) == 0) {
-			Log.v(TAG, "onFrameAvailable:path through=" + mPathThrough + "," + cnt);
+			if (DEBUG && (++cnt % 100) == 0) {
+				Log.v(TAG, "onFrameAvailable:path effected," + cnt);
+			}
 		}
 	}
 
@@ -404,6 +407,14 @@ public class EffectPipeline extends ProxyPipeline
 					} finally {
 						mLock.unlock();
 					}
+				} else {
+					if (DEBUG) Log.v(TAG, "resetEffect:draw is null");
+					mLock.lock();
+					try {
+						mEffect = EFFECT_NON;
+					} finally {
+						mLock.unlock();
+					}
 				}
 			});
 		} else {
@@ -431,6 +442,14 @@ public class EffectPipeline extends ProxyPipeline
 					} finally {
 						mLock.unlock();
 					}
+				} else {
+					if (DEBUG) Log.v(TAG, "setEffect:draw is null");
+					mLock.lock();
+					try {
+						mEffect = effect;
+					} finally {
+						mLock.unlock();
+					}
 				}
 			});
 		} else {
@@ -444,7 +463,7 @@ public class EffectPipeline extends ProxyPipeline
 	 */
 	@Override
 	public int getEffect() {
-		if (DEBUG) Log.v(TAG, "getEffect:" + mDrawer.getEffect());
+		if (DEBUG) Log.v(TAG, "getEffect:" + mEffect + "/" + (mDrawer != null ? mDrawer.getEffect() : "null"));
 		mLock.lock();
 		try {
 			return mEffect;
@@ -481,6 +500,19 @@ public class EffectPipeline extends ProxyPipeline
 				if (DEBUG) Log.v(TAG, "setEffect#run:" + effect);
 				if (mDrawer != null) {
 					mDrawer.setParams(effect, params);
+					mLock.lock();
+					try {
+						mEffect = mDrawer.getEffect();
+					} finally {
+						mLock.unlock();
+					}
+				} else {
+					mLock.lock();
+					try {
+						mEffect = effect;
+					} finally {
+						mLock.unlock();
+					}
 				}
 			});
 		} else {
