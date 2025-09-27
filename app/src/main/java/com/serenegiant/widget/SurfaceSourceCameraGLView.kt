@@ -45,7 +45,7 @@ import java.lang.IllegalStateException
  * GLViewを継承
  * XXX useSharedContext = trueで共有コンテキストを使ったマルチスレッド処理を有効にするとGPUのドライバー内でクラッシュする端末がある
  */
-class VideoSourceCameraGLView @JvmOverloads constructor(
+class SurfaceSourceCameraGLView @JvmOverloads constructor(
 	context: Context?, attrs: AttributeSet? = null, defStyle: Int = 0)
 		: AspectScaledGLView(context, attrs, defStyle), ICameraView, GLPipelineView {
 
@@ -58,7 +58,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 	init {
 		if (DEBUG) Log.v(TAG, "コンストラクタ:")
 		mCameraRenderer = CameraRenderer()
-		mCameraDelegator = CameraDelegator(this@VideoSourceCameraGLView,
+		mCameraDelegator = CameraDelegator(this@SurfaceSourceCameraGLView,
 			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
 			mCameraRenderer)
 		setRenderer(object : GLRenderer {
@@ -374,7 +374,7 @@ class VideoSourceCameraGLView @JvmOverloads constructor(
 
 	companion object {
 		private const val DEBUG = true // TODO set false on release
-		private val TAG = VideoSourceCameraGLView::class.java.simpleName
+		private val TAG = SurfaceSourceCameraGLView::class.java.simpleName
 		/**
 		 * 共有GLコンテキストコンテキストを使ったマルチスレッド処理を行うかどうか
 		 */
