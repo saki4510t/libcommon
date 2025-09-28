@@ -33,10 +33,12 @@ import com.serenegiant.gl.GLContext
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLEffect
 import com.serenegiant.gl.GLManager
+import com.serenegiant.glpipeline.GLPipelineSurfaceSource.PipelineSourceCallback
 import com.serenegiant.glutils.GLFrameAvailableCallback
 import com.serenegiant.math.Fraction
 import com.serenegiant.media.OnFrameAvailableListener
 import com.serenegiant.view.TouchViewTransformer
+import com.serenegiant.widget.SurfaceSourceCameraGLView.Companion
 
 /**
  * VideoSourceを使ってカメラ映像を受け取りSurfacePipelineで描画処理を行うZoomAspectScaledTextureView/ICameraView実装
@@ -49,7 +51,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	private val mGLContext: GLContext
 	private val mGLHandler: Handler
 	private val mCameraDelegator: CameraDelegator
-	private var mSurfaceSourcePipeline: SurfaceSourcePipeline? = null
+	private var mSourcePipeline: GLPipelineSurfaceSource? = null
 	var pipelineMode = GLPipelineView.PREVIEW_ONLY
 	var enableFaceDetect = false
 
@@ -65,18 +67,18 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 			object : CameraDelegator.ICameraRenderer {
 				override fun hasSurface(): Boolean {
 					if (DEBUG) Log.v(TAG, "hasSurface:")
-					return mSurfaceSourcePipeline != null
+					return mSourcePipeline != null
 				}
 
 				override fun getInputSurface(): SurfaceTexture {
 					if (DEBUG) Log.v(TAG, "getInputSurfaceTexture:")
-					checkNotNull(mSurfaceSourcePipeline)
-					return mSurfaceSourcePipeline!!.inputSurfaceTexture
+					checkNotNull(mSourcePipeline)
+					return mSourcePipeline!!.inputSurfaceTexture
 				}
 
 				override fun onPreviewSizeChanged(width: Int, height: Int) {
 					if (DEBUG) Log.v(TAG, "onPreviewSizeChanged:(${width}x${height})")
-					mSurfaceSourcePipeline!!.resize(width, height)
+					mSourcePipeline!!.resize(width, height)
 					setAspectRatio(width, height)
 				}
 			}
@@ -87,7 +89,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 				surface: SurfaceTexture, width: Int, height: Int) {
 
 				if (DEBUG) Log.v(TAG, "onSurfaceTextureAvailable:(${width}x${height})")
-				val source = mSurfaceSourcePipeline
+				val source = mSourcePipeline
 				if (source != null) {
 					addSurface(surface.hashCode(), surface, false)
 					source.resize(width, height)
@@ -123,8 +125,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	override fun onDetachedFromWindow() {
-		val source = mSurfaceSourcePipeline
-		mSurfaceSourcePipeline = null
+		val source = mSourcePipeline
+		mSourcePipeline = null
 		source?.release()
 		mGLManager.release()
 		super.onDetachedFromWindow()
@@ -136,11 +138,10 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun onResume() {
 		if (DEBUG) Log.v(TAG, "onResume:")
-		mSurfaceSourcePipeline = createSurfaceSource(
-			CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT)
+		mSourcePipeline = createSurfaceSource()
 		if (USE_DRAWER_PIPELINE) {
 			if (DEBUG) Log.v(TAG, "onResume:add DrawerPipeline")
-			mSurfaceSourcePipeline!!.append(DrawerPipeline(mGLManager, GLDrawer2D.DEFAULT_FACTORY))
+			mSourcePipeline!!.append(DrawerPipeline(mGLManager, GLDrawer2D.DEFAULT_FACTORY))
 		}
 		mCameraDelegator.onResume()
 	}
@@ -148,8 +149,8 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	override fun onPause() {
 		if (DEBUG) Log.v(TAG, "onPause:")
 		mCameraDelegator.onPause()
-		mSurfaceSourcePipeline?.release()
-		mSurfaceSourcePipeline = null
+		mSourcePipeline?.release()
+		mSourcePipeline = null
 	}
 
 	override fun setVideoSize(width: Int, height: Int) {
@@ -197,12 +198,12 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		//     GL系のクラスはOpenGL|ES座標系で処理するのでViewへ表示させたり録画する場合には
 		//     明示的にIMirror.MIRROR_VERTICALを指定して上下を反転させる必要がある。
 		if (DEBUG) Log.v(TAG, "addSurface:id=${id},${surface}")
-		val source = mSurfaceSourcePipeline
+		val source = mSourcePipeline
 		if (source != null) {
 			val last = GLPipeline.findLast(source)
 			if (DEBUG) Log.v(TAG, "addSurface:last=$last")
 			when (last) {
-				mSurfaceSourcePipeline -> {
+				mSourcePipeline -> {
 					source.pipeline = createPipeline(surface, maxFps)
 					if (SUPPORT_RECORDING) {
 						// 通常の録画(#addSurfaceでエンコーダーへの映像入力用surfaceを受け取る)場合は
@@ -296,7 +297,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	override fun removeSurface(id: Int) {
 		if (DEBUG) Log.v(TAG, "removeSurface:id=${id}")
-		val source = mSurfaceSourcePipeline
+		val source = mSourcePipeline
 		if (source != null) {
 			val found = GLSurfacePipeline.findById(source, id)
 			if (found != null) {
@@ -316,7 +317,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	 * @param pipeline
 	 */
 	override fun addPipeline(pipeline: GLPipeline)  {
-		val source = mSurfaceSourcePipeline
+		val source = mSourcePipeline
 		if (source != null) {
 			GLPipeline.append(source, pipeline)
 			if (DEBUG) Log.v(TAG, "addPipeline:" + GLPipeline.pipelineString(source))
@@ -339,7 +340,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 
 	var effect: Int
 	get() {
-		val source = mSurfaceSourcePipeline
+		val source = mSourcePipeline
 		return if (source != null) {
 			val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
 			if (DEBUG) Log.v(TAG, "getEffect:$pipeline")
@@ -353,7 +354,7 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		if (DEBUG) Log.v(TAG, "setEffect:$effect")
 		if ((effect >= 0) && (effect < GLEffect.EFFECT_NUM)) {
 			post {
-				val source = mSurfaceSourcePipeline
+				val source = mSourcePipeline
 				if (source != null) {
 					val pipeline = GLPipeline.find(source, EffectPipeline::class.java)
 					pipeline?.effect = effect
@@ -369,28 +370,32 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 	}
 
 	/**
-	 * SurfaceSourcePipelineインスタンスを生成
-	 * @param width
-	 * @param height
+	 * GLPipelineSurfaceSourceインスタンスを生成
 	 * @return
 	 */
-	private fun createSurfaceSource(
-		width: Int, height: Int): SurfaceSourcePipeline {
-
-		return SurfaceSourcePipeline(mGLManager,
-			width,
-			height,
-			object : GLPipelineSurfaceSource.PipelineSourceCallback {
-
-				override fun onCreate(surface: Surface) {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
-				}
-
-				override fun onDestroy() {
-					if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
-				}
-			},
-			USE_SHARED_CONTEXT)
+	private fun createSurfaceSource(): GLPipelineSurfaceSource {
+		val callback = object: PipelineSourceCallback {
+			override fun onCreate(surface: Surface) {
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onCreate:$surface")
+			}
+			override fun onDestroy() {
+				if (DEBUG) Log.v(TAG, "PipelineSourceCallback#onDestroy:")
+			}
+		}
+		return if (USE_EFFECT) {
+			if (DEBUG) Log.v(TAG, "createSurfaceSource:create SurfaceEffectSourcePipeline")
+			SurfaceEffectSourcePipeline(getGLManager(),
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+				callback).apply {
+				effect = GLEffect.EFFECT_GRAY_REVERSE
+			}
+		} else {
+			if (DEBUG) Log.v(TAG, "createSurfaceSource:create SurfaceSourcePipeline")
+			SurfaceSourcePipeline(getGLManager(),
+				CameraDelegator.DEFAULT_PREVIEW_WIDTH, CameraDelegator.DEFAULT_PREVIEW_HEIGHT,
+				callback, USE_SHARED_CONTEXT
+			)
+		}
 	}
 
 	/**
@@ -429,5 +434,11 @@ class SimpleVideoSourceCameraTextureView @JvmOverloads constructor(
 		 * テスト用にDrawerPipelineを接続するかどうか
 		 */
 		private const val USE_DRAWER_PIPELINE = true
+		/**
+		 * GLPipelineSurfaceSourceとしてSurfaceEffectSourcePipelineを使うかどうか
+		 * true: SurfaceEffectSourcePipelineを使う
+		 * false: SurfaceSourcePipelineを使う
+		 */
+		private const val USE_EFFECT = true
 	}
 }

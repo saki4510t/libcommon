@@ -84,6 +84,8 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 			@WorkerThread
 			override fun drawFrame(frameTimeNanos: Long) {
 				mSourcePipeline?.let { source ->
+					// XXX これで描画するのはGLPipelineSurfaceSourceへ入力する映像なので
+					//     SurfaceEffectSourcePipelineを使っても映像効果付与されない
 					handleDraw(source.texId, source.texMatrix)
 				}
 			}
@@ -396,7 +398,7 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 		 * true: SurfaceEffectSourcePipelineを使う
 		 * false: SurfaceSourcePipelineを使う
 		 */
-		private const val USE_EFFECT = true
+		private const val USE_EFFECT = false
 	}
 
 }
