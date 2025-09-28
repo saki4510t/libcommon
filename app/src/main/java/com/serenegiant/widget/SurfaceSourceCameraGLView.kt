@@ -83,8 +83,8 @@ class SurfaceSourceCameraGLView @JvmOverloads constructor(
 			@SuppressLint("WrongThread")
 			@WorkerThread
 			override fun drawFrame(frameTimeNanos: Long) {
-				if (mSourcePipeline != null) {
-					handleDraw(mSourcePipeline!!.texId, mSourcePipeline!!.texMatrix)
+				mSourcePipeline?.let { source ->
+					handleDraw(source.texId, source.texMatrix)
 				}
 			}
 

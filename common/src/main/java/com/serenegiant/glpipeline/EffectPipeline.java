@@ -25,7 +25,6 @@ import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLSurface;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.IEffect;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
@@ -143,7 +142,7 @@ public class EffectPipeline extends ProxyPipeline
 	 * #setSurfaceでsurfaceをセットしたかどうかにかかわらずpipelineModeで指定したとおりのテクスチャを次のパイプラインへ送る
 	 * @param manager
 	 * @param pipelineMode
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -157,7 +156,7 @@ public class EffectPipeline extends ProxyPipeline
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
@@ -181,7 +180,7 @@ public class EffectPipeline extends ProxyPipeline
 	 * GLSurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え, 最大フレームレートの制限をしない
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
@@ -196,7 +195,7 @@ public class EffectPipeline extends ProxyPipeline
 	 * GLSurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -210,7 +209,7 @@ public class EffectPipeline extends ProxyPipeline
 		if (!isValid()) {
 			throw new IllegalStateException("already released?");
 		}
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager.runOnGLThread(() -> {
@@ -572,7 +571,7 @@ public class EffectPipeline extends ProxyPipeline
 
 	/**
 	 * 描画先のSurfaceを生成
-	 * @param surface
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps
 	 */
 	@WorkerThread
@@ -585,7 +584,7 @@ public class EffectPipeline extends ProxyPipeline
 
 	/**
 	 * 描画先のSurfaceを生成
-	 * @param surface
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps
 	 */
 	@WorkerThread
@@ -595,7 +594,7 @@ public class EffectPipeline extends ProxyPipeline
 		mMaxFps = maxFps;
 		releaseTargetOnGL();
 		if (isValid()) {
-			if (GLUtils.isSupportedSurface(surface)) {
+			if (RendererTarget.isSupportedSurface(surface)) {
 				// 有効なSurfaceが引き渡されたとき
 				mSurfaceTarget = RendererTarget.newInstance(
 					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);

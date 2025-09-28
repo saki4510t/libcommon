@@ -24,7 +24,6 @@ import android.util.Log;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -76,7 +75,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	 * コンストラクタ
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param manager
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -93,7 +92,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
 	 * @param manager
 	 * @param drawerFactory
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -106,7 +105,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
@@ -158,7 +157,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 		if (!isValid()) {
 			throw new IllegalStateException("already released?");
 		}
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager.runOnGLThread(() -> {
@@ -278,7 +277,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 
 	/**
 	 * 描画先のSurfaceを生成
-	 * @param surface
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps
 	 */
 	@WorkerThread

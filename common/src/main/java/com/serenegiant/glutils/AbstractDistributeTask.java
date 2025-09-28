@@ -28,7 +28,6 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.math.Fraction;
@@ -159,7 +158,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 		if (DEBUG) Log.v(TAG, "addSurface:" + id);
 		checkFinished();
-		if (!GLUtils.isSupportedSurface(surface)) {
+		if (!RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException(
 				"Surface should be one of Surface, SurfaceTexture or SurfaceHolder");
 		}

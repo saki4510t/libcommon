@@ -216,7 +216,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 	 * ISurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
 	 */
@@ -227,7 +227,7 @@ public class ImageTextureSource implements GLConst, IMirror {
 		if (!isValid()) {
 			throw new IllegalStateException("already released?");
 		}
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager.runOnGLThread(() -> {

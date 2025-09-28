@@ -26,7 +26,6 @@ import android.util.SparseArray;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 
@@ -262,7 +261,7 @@ public class GLSurfaceRenderer implements GLFrameAvailableCallback, IMirror {
 
 		if (DEBUG) Log.v(TAG, "addSurface:" + id + ",surface=" + surface);
 		checkValid();
-		if (!GLUtils.isSupportedSurface(surface)) {
+		if (!RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		if (isValid()) {

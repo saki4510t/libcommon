@@ -27,7 +27,6 @@ import android.view.Surface;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLUtils;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
 import com.serenegiant.media.AbstractVideoEncoder;
@@ -317,7 +316,7 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 					mRendererTarget = null;
 				}
 				if ((mRendererTarget == null)
-					&& GLUtils.isSupportedSurface(surface)) {
+					&& RendererTarget.isSupportedSurface(surface)) {
 					mRendererTarget = RendererTarget.newInstance(
 						mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				}

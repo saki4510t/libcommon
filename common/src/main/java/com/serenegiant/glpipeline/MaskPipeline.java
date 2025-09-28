@@ -93,7 +93,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * コンストラクタ
 	 * @param manager
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -105,7 +105,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:");
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
@@ -142,7 +142,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * GLSurfacePipelineの実装
 	 * 描画先のSurfaceを差し替え
 	 * 対応していないSurface形式の場合はIllegalArgumentExceptionを投げる
-	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps 最大フレームレート, nullまたはFraction#ZEROなら制限なし
 	 * @throws IllegalStateException
 	 * @throws IllegalArgumentException
@@ -156,7 +156,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		if (!isValid()) {
 			throw new IllegalStateException("already released?");
 		}
-		if ((surface != null) && !GLUtils.isSupportedSurface(surface)) {
+		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager.runOnGLThread(() -> {
@@ -335,7 +335,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 
 	/**
 	 * 描画先のSurfaceを生成
-	 * @param surface
+	 * @param surface nullまたはSurface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラス
 	 * @param maxFps
 	 */
 	@WorkerThread
@@ -351,7 +351,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 				work.release();
 				work = null;
 			}
-			if (GLUtils.isSupportedSurface(surface)) {
+			if (RendererTarget.isSupportedSurface(surface)) {
 				mRendererTarget = RendererTarget.newInstance(
 					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 				mMaskOnly = false;
