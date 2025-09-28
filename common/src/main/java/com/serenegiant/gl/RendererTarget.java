@@ -18,9 +18,13 @@ package com.serenegiant.gl;
  *  limitations under the License.
 */
 
+import android.graphics.SurfaceTexture;
 import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
+import android.view.Surface;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.IMirror;
@@ -38,6 +42,23 @@ import androidx.annotation.Size;
 public class RendererTarget implements IMirror {
 	private static final boolean DEBUG = false;
 	private static final String TAG = RendererTarget.class.getSimpleName();
+
+	/**
+	 * 対応しているSurfaceかどうかを確認
+	 * Surface/SurfaceHolder/SurfaceTexture/SurfaceView/TextureWrapper/IGLSurface/ISurfaceのいずれかまたはその子クラスならtrue
+	 * GLUtils#isSupportedSurfaceがtrueを返すクラスに加えてISurfaceとTextureWrapperを含む
+	 * @param surface
+	 * @return
+	 */
+	public static boolean isSupportedSurface(@Nullable final Object surface) {
+		return ((surface instanceof Surface)
+			|| (surface instanceof SurfaceHolder)
+			|| (surface instanceof SurfaceTexture)
+			|| (surface instanceof SurfaceView))
+			|| (surface instanceof ISurface)
+			|| (surface instanceof TextureWrapper);
+	}
+
 	/**
 	 * ファクトリーメソッド
 	 * @param egl
