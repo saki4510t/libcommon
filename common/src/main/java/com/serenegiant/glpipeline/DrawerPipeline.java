@@ -19,6 +19,7 @@ package com.serenegiant.glpipeline;
 */
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
@@ -68,6 +69,12 @@ public class DrawerPipeline extends ProxyPipeline
 	@MirrorMode
 	private int mMirror = MIRROR_NORMAL;
 	private int mSurfaceId = 0;
+	/**
+	 * モデルビュー変換行列
+	 */
+	@Size(value=16)
+	@NonNull
+	private final float[] mMvpMatrix = new float[16];
 
 	/**
 	 * Surfaceへの描画用
@@ -162,6 +169,7 @@ public class DrawerPipeline extends ProxyPipeline
 		mManager = manager;
 		mDrawerFactory = drawerFactory;
 		mPipelineMode = pipelineMode;
+		Matrix.setIdentityM(mMvpMatrix, 0);
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
 		});
@@ -283,6 +291,14 @@ public class DrawerPipeline extends ProxyPipeline
 		}
 	}
 
+	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
+		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+		final GLDrawer2D drawer = mDrawer;
+		if (drawer != null) {
+			drawer.setMvpMatrix(matrix, offset);
+		}
+	}
+
 	private int cnt;
 	@WorkerThread
 	@Override
@@ -300,6 +316,7 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = mDrawerFactory.create(isGLES3, isOES);
+			mDrawer.setMvpMatrix(mMvpMatrix, 0);
 			if (!isOES) {
 				// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
 				//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と

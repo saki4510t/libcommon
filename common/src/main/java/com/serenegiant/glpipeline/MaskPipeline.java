@@ -20,6 +20,7 @@ package com.serenegiant.glpipeline;
 
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
+import android.opengl.Matrix;
 import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
@@ -78,6 +79,13 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	private volatile boolean mRequestUpdateMask;
 	private int mSurfaceId = 0;
 	/**
+	 * モデルビュー変換行列
+	 */
+	@Size(value=16)
+	@NonNull
+	private final float[] mMvpMatrix = new float[16];
+
+	/**
 	 * コンストラクタ
 	 * @param manager
 	 * @param manager
@@ -109,6 +117,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
 		mManager = manager;
+		Matrix.setIdentityM(mMvpMatrix, 0);
 		manager.runOnGLThread(() -> {
 			createTargetOnGL(surface, maxFps);
 		});
@@ -207,6 +216,14 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 		return mMaskOnly;
 	}
 
+	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
+		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+		final GLDrawer2D drawer = mDrawer;
+		if (drawer != null) {
+			drawer.setMvpMatrix(matrix, offset);
+		}
+	}
+
 	private int cnt;
 	@WorkerThread
 	@Override
@@ -221,6 +238,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 			releaseDrawerOnGL();
 			if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 			mDrawer = createDrawerOnGL(isGLES3, isOES);
+			mDrawer.setMvpMatrix(mMvpMatrix, 0);
 			mDrawer.setMirror(IMirror.MIRROR_VERTICAL);
 		}
 		@NonNull

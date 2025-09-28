@@ -22,6 +22,7 @@ import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.IEffect;
@@ -433,7 +434,11 @@ public class SurfaceEffectSourcePipeline
 		return mEffectPipeline.getMirror();
 	}
 
-//--------------------------------------------------------------------------------
+	public void setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
+		mEffectPipeline.setMvpMatrix(matrix, offset);
+	}
+
+	//--------------------------------------------------------------------------------
 	protected void checkValid() throws IllegalStateException {
 		if (!mManager.isValid()) {
 			throw new IllegalStateException("Already released");
