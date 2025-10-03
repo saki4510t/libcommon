@@ -181,7 +181,7 @@ public class PermissionUtils {
 		mCallback = callback;
 		mRequestedPermissions = requestedPermissions(activity);
 		mLaunchers.putAll(prepare(this, fragment, callback));
-		prepare(activity, mRequestedPermissions);
+		prepare(fragment, mRequestedPermissions);
 	}
 
 	/**
