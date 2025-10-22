@@ -36,8 +36,6 @@ import com.serenegiant.graphics.MatrixUtils
 import com.serenegiant.system.Time
 import com.serenegiant.utils.BufferHelper
 import java.nio.ByteBuffer
-import java.nio.FloatBuffer
-import java.nio.IntBuffer
 import kotlin.math.min
 
 /**
@@ -95,7 +93,7 @@ class GLHistogram @WorkerThread constructor(
 		/**
 		 * 頂点の数
 		 */
-		private val VERTEX_NUM = (min(
+		private val mVertexNum = (min(
 			ShaderConst.DEFAULT_VERTICES_2D.size.toDouble(),
 			ShaderConst.DEFAULT_TEXCOORD_2D.size.toDouble()
 		) / 2).toInt()
@@ -103,7 +101,7 @@ class GLHistogram @WorkerThread constructor(
 		/**
 		 * 頂点配列のサイズ
 		 */
-		private val VERTEX_SZ = VERTEX_NUM * 2
+		private val mVertexSz = mVertexNum * 2
 
 		/**
 		 * 頂点座標
@@ -213,7 +211,7 @@ class GLHistogram @WorkerThread constructor(
 			GLES31.glUniform1i(muTextureLoc, GLUtils.gLTextureUnit2Index(texUnit))
 			if (DEBUG) GLUtils.checkGlError("bindTexture:glUniform1i,texUnit=$texUnit,loc=$muTextureLoc")
 			// 描画実行
-			GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, VERTEX_NUM)
+			GLES31.glDrawArrays(GLES31.GL_TRIANGLE_STRIP, 0, mVertexNum)
 			// 描画終了処理
 			GLES31.glBindTexture(texTarget, 0)
 			GLES31.glUseProgram(0)
@@ -246,11 +244,11 @@ class GLHistogram @WorkerThread constructor(
 			} else {
 				// 頂点座標をセット
 				pVertex.clear()
-				GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, VERTEX_SZ, pVertex)
+				GLES31.glVertexAttribPointer(maPositionLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pVertex)
 				GLES31.glEnableVertexAttribArray(maPositionLoc)
 				// テクスチャ座標をセット
 				pTexCoord.clear()
-				GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, VERTEX_SZ, pTexCoord)
+				GLES31.glVertexAttribPointer(maTextureCoordLoc, 2, GLES31.GL_FLOAT, false, mVertexSz, pTexCoord)
 				GLES31.glEnableVertexAttribArray(maTextureCoordLoc)
 			}
 		}
@@ -396,7 +394,7 @@ class GLHistogram @WorkerThread constructor(
 		@Size(min = 16) texMatrix: FloatArray?, texOffset: Int
 	): Boolean {
 		val startTimeNs = Time.nanoTime()
-		val result = startTimeNs - mNextDraw > mIntervalsDeltaNs;
+		val result = startTimeNs - mNextDraw > mIntervalsDeltaNs
 		if (result) {
 			mNextDraw = startTimeNs + mIntervalsNs
 			clearHistogramBuffer()

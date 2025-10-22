@@ -49,7 +49,7 @@ public class ConfirmDialogV4 extends DialogFragmentEx {
 	/**
 	 * ダイアログの表示結果を受け取るためのコールバックリスナー
 	 */
-	public static interface ConfirmDialogListener {
+	public interface ConfirmDialogListener {
 		/**
 		 * 確認結果を引き渡すためのコールバックメソッド
 		 * @param dialog

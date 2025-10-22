@@ -54,7 +54,7 @@ public class BluetoothDeviceInfo implements Parcelable {
 	 */
 	public final int bondState;
 
-	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	@RequiresPermission(allOf = {Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_CONNECT})
 	/*package*/BluetoothDeviceInfo(final BluetoothDevice device) {
 		name = device.getName();
 		address =  device.getAddress();

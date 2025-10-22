@@ -2,7 +2,6 @@ package com.serenegiant.glpipeline
 
 import androidx.annotation.Size
 import com.serenegiant.glutils.GLFrameAvailableCallback
-import com.serenegiant.glutils.GLSurfaceReceiver
 
 /*
  * libcommon

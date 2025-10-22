@@ -18,6 +18,7 @@ package com.serenegiant.utils;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.res.Resources;
 import android.text.TextUtils;
@@ -50,6 +51,7 @@ public class ResourceHelper {
 		String v = value;
 		if (!TextUtils.isEmpty(v) && v.startsWith("@")) {
 			final String r = v.substring(1);
+			@SuppressLint("DiscouragedApi")
 			final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
 			if (resId > 0) {
 				result = context.getResources().getInteger(resId);
@@ -80,6 +82,7 @@ public class ResourceHelper {
 			result = false;
 		} else if (!TextUtils.isEmpty(v) && v.startsWith("@")) {
 			final String r = v.substring(1);
+			@SuppressLint("DiscouragedApi")
 			final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
 			if (resId > 0) {
 				result = context.getResources().getBoolean(resId);
@@ -109,6 +112,7 @@ public class ResourceHelper {
 		}
 		if (!TextUtils.isEmpty(result) && result.startsWith("@")) {
 			final String r = result.substring(1);
+			@SuppressLint("DiscouragedApi")
 			final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
 			if (resId > 0) {
 				result = context.getResources().getString(resId);
@@ -130,6 +134,7 @@ public class ResourceHelper {
 			final String s = result.toString();
 			if (s.startsWith("@")) {
 				final String r = s.substring(1);
+				@SuppressLint("DiscouragedApi")
 				final int resId = context.getResources().getIdentifier(r, null, context.getPackageName());
 				if (resId > 0) {
 					result = context.getResources().getText(resId);

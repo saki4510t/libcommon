@@ -33,7 +33,6 @@ import java.util.Locale;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.view.GestureDetectorCompat;
 import androidx.core.view.ViewCompat;
 
 /**
@@ -53,7 +52,7 @@ public class CenteredTabLayout extends TabLayout {
 	/**
 	 * 左右フリック・タッチ操作用のGestureDetector
 	 */
-	private final GestureDetectorCompat mGestureDetector;
+	private final GestureDetector mGestureDetector;
 	/**
 	 * Tabの選択変更・スクロールをロックするかどうかのフラグ
 	 */
@@ -70,7 +69,7 @@ public class CenteredTabLayout extends TabLayout {
 	public CenteredTabLayout(@NonNull final Context context, @Nullable final AttributeSet attrs, final int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 		super.setTabMode(TabLayout.MODE_SCROLLABLE);	// MODE_FIXEDだと中央に表示や手動選択できない
-		mGestureDetector = new GestureDetectorCompat(context,
+		mGestureDetector = new GestureDetector(context,
 			new GestureDetector.SimpleOnGestureListener() {
 				@Override
 				public boolean onFling(final MotionEvent e1, final MotionEvent e2,

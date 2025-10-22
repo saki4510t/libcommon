@@ -18,6 +18,7 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -32,6 +33,7 @@ public class SettingsUtils {
 		// インスタンス化をエラーにするためにデフォルトコンストラクタをprivateに
 	}
 
+	@SuppressLint("DiscouragedApi")
 	public static int getMinimumScreenBrightnessSetting(final Context context) {
 		final Resources res = Resources.getSystem();
 		int id = res.getIdentifier("config_screenBrightnessSettingMinimum", "integer", "android"); // API17+
@@ -49,6 +51,7 @@ public class SettingsUtils {
 
 	public static int getMaximumScreenBrightnessSetting(final Context context) {
 		final Resources res = Resources.getSystem();
+		@SuppressLint("DiscouragedApi")
 		final int id = res.getIdentifier("config_screenBrightnessSettingMaximum", "integer", "android"); // API17+
 		if (id != 0) {
 			try {

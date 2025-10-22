@@ -119,50 +119,64 @@ public class BluetoothDeviceInfoRecyclerAdapter
 
 	public void add(@NonNull BluetoothDeviceInfo info) {
 		mValues.add(info);
-		notifyDataSetChanged();
+		notifyItemInserted(mValues.size() - 1);
 	}
 
 	public void add(final int index, @NonNull BluetoothDeviceInfo info) {
 		mValues.add(index, info);
-		notifyDataSetChanged();
+		notifyItemInserted(index);
 	}
 
 	public void addAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
-		mValues.addAll(collection);
-		notifyDataSetChanged();
+		if (!collection.isEmpty()) {
+			final int index = mValues.size() - 1;
+			mValues.addAll(collection);
+			notifyItemRangeInserted(index + 1, index + collection.size());
+		}
 	}
 	
 	public void remove(final BluetoothDeviceInfo info) {
-		mValues.remove(info);
-		notifyDataSetChanged();
+		final int index = mValues.indexOf(info);
+		if (index >= 0) {
+			mValues.remove(info);
+			notifyItemRemoved(index);
+		}
 	}
 
 	public void remove(final int index) {
-		mValues.remove(index);
-		notifyDataSetChanged();
+		if (index >= 0) {
+			mValues.remove(index);
+			notifyItemRemoved(index);
+		}
 	}
 	
+	@SuppressLint("NotifyDataSetChanged")
 	public void removeAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
 		mValues.removeAll(collection);
 		notifyDataSetChanged();
 	}
 
+	@SuppressLint("NotifyDataSetChanged")
 	public void retainAll(@NonNull Collection<? extends BluetoothDeviceInfo> collection) {
 		mValues.retainAll(collection);
 		notifyDataSetChanged();
 	}
 
 	public void clear() {
-		mValues.clear();
-		notifyDataSetChanged();
+		final int last = mValues.size() - 1;
+		if (last >= 0) {
+			mValues.clear();
+			notifyItemRangeRemoved(0, last);
+		}
 	}
 
+	@SuppressLint("NotifyDataSetChanged")
 	public void sort(final Comparator<? super BluetoothDeviceInfo> comparator) {
 		Collections.sort(mValues, comparator);
 		notifyDataSetChanged();
 	}
 
-	public class ViewHolder extends RecyclerView.ViewHolder {
+	public static class ViewHolder extends RecyclerView.ViewHolder {
 		public final View mView;
 		public final ImageView icon;
 		public final TextView nameTv;

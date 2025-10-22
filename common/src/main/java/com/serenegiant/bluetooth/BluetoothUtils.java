@@ -149,7 +149,7 @@ public class BluetoothUtils {
 	 * ペアリング済みのBluetooth機器一覧を取得する
 	 * @return Bluetoothに対応していないまたは無効なら空set
 	 */
-	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	@RequiresPermission(allOf = {Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_CONNECT})
 	@NonNull
 	public static Set<BluetoothDevice> getBondedDevices() {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
@@ -164,7 +164,7 @@ public class BluetoothUtils {
 	 * @return 既に探索可能であればtrue
 	 * @throws IllegalStateException
 	 */
-	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	@RequiresPermission(allOf = {Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_ADVERTISE})
 	public static boolean requestDiscoverable(@NonNull final Activity activity, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {
@@ -186,7 +186,7 @@ public class BluetoothUtils {
 	 * @return
 	 * @throws IllegalStateException
 	 */
-	@RequiresPermission(Manifest.permission.BLUETOOTH)
+	@RequiresPermission(allOf = {Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_SCAN})
 	public static boolean requestDiscoverable(@NonNull final Fragment fragment, final int duration) throws IllegalStateException {
 		final BluetoothAdapter adapter = BluetoothAdapter.getDefaultAdapter();
 		if ((adapter == null) || !adapter.isEnabled()) {

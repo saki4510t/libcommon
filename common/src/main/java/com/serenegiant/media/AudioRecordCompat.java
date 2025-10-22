@@ -178,7 +178,7 @@ public class AudioRecordCompat {
   	 * @return
   	 * @throws UnsupportedOperationException
   	 */
-  	@SuppressLint("NewApi")
+  	@SuppressLint({"NewApi", "WrongConstant"})
     @RequiresPermission(Manifest.permission.RECORD_AUDIO)
   	@NonNull
   	public static AudioRecord newInstance(
@@ -414,7 +414,7 @@ public class AudioRecordCompat {
 			return mAudioSessionId;
 		}
 
-		@SuppressLint("MissingPermission")
+		@SuppressLint({"MissingPermission", "WrongConstant"})
 		@Override
 		public void run() {
     		if (DEBUG) Log.v(TAG, "AudioTask:start");

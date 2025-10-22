@@ -18,6 +18,7 @@ package com.serenegiant.system;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -117,6 +118,7 @@ public class SAFSingleFileUtils {
 			this.callback = callback;
 		}
 
+		@SuppressLint("NewApi")
 		@Override
 		public void onActivityResult(final Pair<Integer, Uri> result) {
 			if (DEBUG) Log.v(TAG, "onActivityResult:" + result);

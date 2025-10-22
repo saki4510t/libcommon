@@ -259,14 +259,14 @@ public class ColorPickerView extends View {
 			final int height = getHeight();
 			mDrawingRect.set(0, 0, width, height);
 			// 右端(明度)と下端(アルファ)にスライダーを表示するスペースを確保
-			int dimeter = Math.min(width, height);
-			slider_width = dimeter / 10;	// 表示可能領域の10%
+			int diameter = Math.min(width, height);
+			slider_width = diameter / 10;	// 表示可能領域の10%
 			if (slider_width < 32) slider_width = (int)(32 * DENSITY);	// でも32dpを最小値とする
 			final int space = slider_width + (int)(16 * DENSITY);	// 更に16dpのスペースを開ける
 			// 色相円の直径
-			dimeter -= space;
+			diameter -= space;
 			// 色相円の外周半径
-			radius = dimeter >>> 1;
+			radius = diameter >>> 1;
 			radius2 = radius * radius;	// 2乗
 			// 色相円の中央座標
 			center_x = (width - (mShowValSlider ? slider_width : 0)) >>> 1;
@@ -624,10 +624,10 @@ public class ColorPickerView extends View {
 		canvas.drawRect(rect, mAlphaPaint);
 
 		final int color = HSVToColor(0xff, mHue, mSat, mVal);
-		final int acolor = HSVToColor(0, mHue, mSat, mVal);
+		final int aColor = HSVToColor(0, mHue, mSat, mVal);
 
 		final Shader alphaShader = new LinearGradient(
-			rect.left, rect.top, rect.right, rect.top, color, acolor, TileMode.CLAMP);
+			rect.left, rect.top, rect.right, rect.top, color, aColor, TileMode.CLAMP);
 
 		mAlphaPaint.setShader(alphaShader);
 		canvas.drawRect(rect, mAlphaPaint);

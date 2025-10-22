@@ -140,12 +140,14 @@ public class SAFPermission {
 	 * @param initialUri
 	 * @throws IllegalStateException
 	 */
-	@RequiresApi(26)
 	public void requestPermission(
 		final int treeId,
 		@Nullable final Uri initialUri) throws IllegalStateException {
 
 		if (DEBUG) Log.v(TAG, "requestPermission:");
+		if ((initialUri != null) && !BuildCheck.isAPI26()) {
+			throw new IllegalArgumentException("initialUri is available API>=26 only");
+		}
 		final Context context = mWeakContext.get();
 		if (context != null) {
 			SAFUtils.releasePersistableUriPermission(context, treeId);

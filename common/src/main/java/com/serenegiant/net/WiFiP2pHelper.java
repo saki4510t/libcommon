@@ -176,7 +176,7 @@ public class WiFiP2pHelper {
 	 * WiFi Directに対応した機器探索を開始
 	 * @throws IllegalStateException
 	 */
-	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES})
 	public synchronized void startDiscovery() throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "startDiscovery:");
 		if (mChannel != null) {
@@ -198,7 +198,7 @@ public class WiFiP2pHelper {
 	 * 指定したMACアドレスの機器へ接続を試みる
 	 * @param remoteMacAddress
 	 */
-	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES})
 	public void connect(@NonNull final String remoteMacAddress) {
 		if (DEBUG) Log.v(TAG, "connect:remoteMacAddress=" + remoteMacAddress);
 		final WifiP2pConfig config = new WifiP2pConfig();
@@ -211,7 +211,7 @@ public class WiFiP2pHelper {
 	 * 指定した機器へ接続を試みる
 	 * @param device
 	 */
-	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES})
 	public void connect(@NonNull final WifiP2pDevice device) {
 		if (DEBUG) Log.v(TAG, "connect:device=" + device);
 		final WifiP2pConfig config = new WifiP2pConfig();
@@ -225,7 +225,7 @@ public class WiFiP2pHelper {
 	 * @param config
 	 * @throws IllegalStateException
 	 */
-	@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+	@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES})
 	public void connect(@NonNull final WifiP2pConfig config) throws IllegalStateException {
 		if (DEBUG) Log.v(TAG, "connect:config=" + config);
 		if (mChannel != null) {
@@ -499,7 +499,7 @@ public class WiFiP2pHelper {
 	        mParent = parent;
 	    }
 	
-		@RequiresPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+		@RequiresPermission(allOf = {Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.NEARBY_WIFI_DEVICES})
 	    @Override
 	    public void onReceive(final Context context, final Intent intent) {
 	        final String action = (intent != null) ? intent.getAction() : null;

@@ -22,7 +22,6 @@ import android.graphics.SurfaceTexture;
 import android.util.Log;
 import android.view.Surface;
 
-import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.IEffect;

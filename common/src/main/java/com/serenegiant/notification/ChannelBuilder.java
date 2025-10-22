@@ -772,6 +772,7 @@ public class ChannelBuilder {
 	 * 		-> (setupNotificationChannel)
 	 * @param context
 	 */
+	@SuppressLint("WrongConstant")
 	@RequiresApi(Build.VERSION_CODES.O)
 	@Nullable
 	protected NotificationChannel createNotificationChannel(@NonNull final Context context) {

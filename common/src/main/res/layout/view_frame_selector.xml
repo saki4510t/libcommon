@@ -21,6 +21,7 @@
 -->
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:app="http://schemas.android.com/apk/res-auto"
+	xmlns:tools="http://schemas.android.com/tools"
 	android:orientation="vertical"
 	android:background="@color/QUARTER_CLEAR_WHITE"
 	android:layout_width="380dp"
@@ -212,7 +213,7 @@
 		android:layout_height="wrap_content"
 		android:id="@+id/line_width_textview"
 		android:text="6px"
-		/>
+		tools:ignore="PxUsage" />
 	<SeekBar
 		android:layout_width="match_parent"
 		android:layout_height="wrap_content"

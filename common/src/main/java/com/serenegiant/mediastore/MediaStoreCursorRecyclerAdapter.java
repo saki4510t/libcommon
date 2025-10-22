@@ -18,6 +18,7 @@ package com.serenegiant.mediastore;
  *  limitations under the License.
 */
 
+import android.annotation.SuppressLint;
 import android.content.AsyncQueryHandler;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -333,6 +334,7 @@ public class MediaStoreCursorRecyclerAdapter
 	 * @param newCursor
 	 * @return
 	 */
+	@SuppressLint("NotifyDataSetChanged")
 	@Nullable
 	protected Cursor swapCursor(@Nullable final Cursor newCursor) {
 		if (DEBUG) Log.v(TAG, "swapCursor:" + newCursor);
@@ -433,6 +435,7 @@ public class MediaStoreCursorRecyclerAdapter
 	}
 
 	private class MyDataSetObserver extends DataSetObserver {
+		@SuppressLint("NotifyDataSetChanged")
 		@Override
 		public void onChanged() {
 			mDataValid = true;

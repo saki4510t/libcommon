@@ -211,6 +211,7 @@ public class DocumentTreeRecyclerAdapter
 	 * @param newDir
 	 * @throws IOException
 	 */
+	@SuppressLint("NotifyDataSetChanged")
 	public void changeDir(@NonNull final DocumentFile newDir) throws IOException {
 		if (DEBUG) Log.v(TAG, "changeDir:newDir=" + newDir.getUri());
 		if (newDir.isDirectory()) {
@@ -318,6 +319,7 @@ public class DocumentTreeRecyclerAdapter
 				}
 			}
 			mUIHandler.postDelayed(new Runnable() {
+				@SuppressLint("NotifyDataSetChanged")
 				@Override
 				public void run() {
 					synchronized (mItems) {

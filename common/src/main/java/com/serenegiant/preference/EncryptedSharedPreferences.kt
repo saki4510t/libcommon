@@ -38,7 +38,7 @@ import android.content.SharedPreferences
  * ```
  */
 @SuppressLint("ApplySharedPref")
-public inline fun EncryptedSharedPreferences.edit(
+inline fun EncryptedSharedPreferences.edit(
 	commit: Boolean = false,
 	action: SharedPreferences.Editor.() -> Unit
 ) {
