@@ -26,6 +26,7 @@ import android.opengl.GLES20;
 import android.opengl.Matrix;
 import android.util.Log;
 
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLSurface;
 
@@ -177,7 +178,7 @@ public class MediaSource implements ISource {
 	 */
 	@Override
 	public void release() {
-		mSrcTexIds[0] = -1;
+		mSrcTexIds[0] = GLConst.GL_NO_TEXTURE;
 		if (mSourceScreen != null) {
 			mSourceScreen.release();
 			mSourceScreen = null;

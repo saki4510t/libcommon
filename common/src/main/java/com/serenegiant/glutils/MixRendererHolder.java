@@ -31,6 +31,7 @@ import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
@@ -364,9 +365,9 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				mMasterTexture2 = null;
 			}
 			mMasterSurface2 = null;
-			if (mTexId2 >= 0) {
+			if (mTexId2 > GLConst.GL_NO_TEXTURE) {
 				GLUtils.deleteTex(mTexId2);
-				mTexId2 = -1;
+				mTexId2 = GLConst.GL_NO_TEXTURE;
 			}
 
 			if (mMaskTexture != null) {
@@ -374,9 +375,9 @@ public class MixRendererHolder extends AbstractRendererHolder {
 				mMaskTexture = null;
 			}
 			mMaskSurface = null;
-			if (mMaskTexId >= 0) {
+			if (mMaskTexId > GLConst.GL_NO_TEXTURE) {
 				GLUtils.deleteTex(mMaskTexId);
-				mMaskTexId = -1;
+				mMaskTexId = GLConst.GL_NO_TEXTURE;
 			}
 			if (mAsyncHandler != null) {
 				HandlerUtils.NoThrowQuit(mAsyncHandler);

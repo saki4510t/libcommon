@@ -32,6 +32,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.egl.EGLBase;
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLContext;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
@@ -614,9 +615,9 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 				}
 				mInputTexture = null;
 			}
-			if (mTexId != 0) {
+			if (mTexId > GLConst.GL_NO_TEXTURE) {
 				GLUtils.deleteTex(mTexId);
-				mTexId = 0;
+				mTexId = GLConst.GL_NO_TEXTURE;
 			}
 		}
 

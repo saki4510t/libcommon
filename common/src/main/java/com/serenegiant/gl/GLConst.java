@@ -35,15 +35,15 @@ public interface GLConst {
 	/**
 	 * 無効なテクスチャ名/テクスチャID
 	 */
-	public static final int GL_NO_TEXTURE = -1;
+	public static final int GL_NO_TEXTURE = 0;
 	/**
 	 * 無効なバッファ名/バッファID
 	 */
-	public static final int GL_NO_BUFFER = -1;
+	public static final int GL_NO_BUFFER = 0;
 	/**
 	 * 無効なシェーダープログラム名/シェーダープログラムID
 	 */
-	public static final int GL_NO_PROGRAM = -1;
+	public static final int GL_NO_PROGRAM = 0;
 
 // OpenGL|ES関係の定数は全て整数で型チェックができないので間違えて違う引数に
 // してしまうことがあるので、アノテーションでチェックできるように、

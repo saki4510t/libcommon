@@ -25,6 +25,7 @@ import android.opengl.GLES20
 import android.util.AttributeSet
 import android.util.Log
 import androidx.annotation.Size
+import com.serenegiant.gl.GLConst
 import com.serenegiant.gl.GLDrawer2D
 import com.serenegiant.gl.GLUtils
 import com.serenegiant.glutils.IMirror
@@ -42,7 +43,7 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 	private val mCameraDelegator: CameraDelegator
 	private val mTexMatrix = FloatArray(16)
 	private var mDrawer: GLDrawer2D? = null
-	private var mTexId = 0
+	private var mTexId = GLConst.GL_NO_TEXTURE
 	private var mSurfaceTexture: SurfaceTexture? = null
 	@Volatile
 	private var mRequestUpdateTex = false
@@ -118,9 +119,9 @@ class SimpleCameraGLView @JvmOverloads constructor(context: Context?,
 						mSurfaceTexture!!.release()
 						mSurfaceTexture = null
 					}
-					if (mTexId != 0) {
+					if (mTexId > GLConst.GL_NO_TEXTURE) {
 						GLUtils.deleteTex(mTexId)
-						mTexId = 0
+						mTexId = GLConst.GL_NO_TEXTURE
 					}
 					if (mDrawer != null) {
 						mDrawer!!.release()

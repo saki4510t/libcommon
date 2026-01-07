@@ -114,7 +114,7 @@ public class MediaEffectGLDrawer implements IMirror {
 		 */
 		protected void bindTexture(@NonNull final int[] texIds) {
 			GLES20.glActiveTexture(TEX_NUMBERS[0]);
-			if (texIds[0] != GL_NO_TEXTURE) {
+			if (texIds[0] > GL_NO_TEXTURE) {
 				GLES20.glBindTexture(mTexTarget, texIds[0]);
 				GLES20.glUniform1i(muTexLoc[0], 0);
 			}
@@ -323,7 +323,7 @@ public class MediaEffectGLDrawer implements IMirror {
 	protected void bindTexture(@NonNull final int[] texIds) {
 		final int n = Math.min(texIds.length, muTexLoc.length);
 		for (int i = 0; i < n; i++) {
-			if (texIds[i] != GL_NO_TEXTURE) {
+			if (texIds[i] > GL_NO_TEXTURE) {
 				GLES20.glActiveTexture(TEX_NUMBERS[i]);
 				GLES20.glBindTexture(mTexTarget, texIds[i]);
 				GLES20.glUniform1i(muTexLoc[i], i);

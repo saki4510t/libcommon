@@ -26,6 +26,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Surface;
 
+import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
@@ -145,7 +146,7 @@ public class GLSurfaceReceiver {
 	/**
 	 * 映像受け取り用のSurfaceTextureでラップしたテクスチャID
 	 */
-	private int mTexId;
+	private int mTexId = GLConst.GL_NO_TEXTURE;
 	/**
 	 * 映像受け取り用SurfaceTexture
 	 */
@@ -586,7 +587,7 @@ public class GLSurfaceReceiver {
 			surfaceTexture = mInputTexture;
 			mInputTexture = null;
 			texId = mTexId;
-			mTexId = 0;
+			mTexId = GLConst.GL_NO_TEXTURE;
 		} finally {
 			mLock.unlock();
 		}
@@ -605,7 +606,7 @@ public class GLSurfaceReceiver {
 				Log.w(TAG, e);
 			}
 		}
-		if (texId != 0) {
+		if (texId > GLConst.GL_NO_TEXTURE) {
 			GLUtils.deleteTex(texId);
 		}
 	}
