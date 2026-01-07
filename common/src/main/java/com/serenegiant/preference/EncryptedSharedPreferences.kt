@@ -1,7 +1,7 @@
 package com.serenegiant.preference
 /*
  * Extension function for EncryptedSharedPreferences
- * Copyright (c) 2014-2025 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2026 saki t_saki@serenegiant.com
  *
  * Copyright (C) 2017 The Android Open Source Project
  *

@@ -7,7 +7,7 @@ import com.serenegiant.glutils.GLFrameAvailableCallback
  * libcommon
  * utility/helper classes for myself
  *
- * Copyright (c) 2014-2025 saki t_saki@serenegiant.com
+ * Copyright (c) 2014-2026 saki t_saki@serenegiant.com
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
