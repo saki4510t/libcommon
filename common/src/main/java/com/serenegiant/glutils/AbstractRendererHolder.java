@@ -579,6 +579,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 			makeCurrent();
 			handleReleaseInputSurface();
 			makeCurrent();
+			if (!isRunning()) return;
 			mTexId = GLUtils.initTex(
 				GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 			mInputTexture = new SurfaceTexture(mTexId);

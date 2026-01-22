@@ -126,6 +126,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 	 */
 	@AnyThread
 	public void requestRecreateMasterSurface() {
+		if (!isRunning()) return;
 		offer(REQUEST_RECREATE_MASTER_SURFACE);
 	}
 
@@ -476,7 +477,7 @@ public abstract class AbstractDistributeTask implements IMirror {
 
 //		if (DEBUG && ((++drawCnt % 100) == 0)) Log.v(TAG, "handleDraw:" + drawCnt);
 		removeRequest(REQUEST_DRAW);
-		if (!isMasterSurfaceValid()) {
+		if (isRunning() && !isMasterSurfaceValid()) {
 			Log.e(TAG, "handleDraw:invalid master surface");
 			offer(REQUEST_RECREATE_MASTER_SURFACE);
 			return;
@@ -493,7 +494,9 @@ public abstract class AbstractDistributeTask implements IMirror {
 				}
 			} catch (final Exception e) {
 				Log.e(TAG, "handleDraw:thread id =" + Thread.currentThread().getId(), e);
-				offer(REQUEST_RECREATE_MASTER_SURFACE);
+				if (isRunning()) {
+					offer(REQUEST_RECREATE_MASTER_SURFACE);
+				}
 				return;
 			}
 			handleDrawTargets(isOES, texId, texMatrix);
