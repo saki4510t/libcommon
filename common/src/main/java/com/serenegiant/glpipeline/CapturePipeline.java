@@ -24,7 +24,7 @@ import android.opengl.GLES20;
 import android.util.Log;
 
 import com.serenegiant.gl.GLConst;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
@@ -250,7 +250,7 @@ public class CapturePipeline extends ProxyPipeline {
 		try {
 			if (DEBUG) Log.v(TAG, "texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix) + ",isOES=" + isOES);
 			// GLSurfaceを使ったオフスクリーンへバックバッファとしてテクスチャを割り当てる
-			final GLSurface readSurface = GLSurface.wrap(isGLES3,
+			final GLOffscreen readSurface = GLOffscreen.wrap(isGLES3,
 				isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 				GLES20.GL_TEXTURE4, texId, width, height, false);
 			try {

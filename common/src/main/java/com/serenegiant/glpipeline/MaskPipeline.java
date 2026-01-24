@@ -25,7 +25,7 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
@@ -68,7 +68,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 	 * 映像効果付与してそのまま次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
-	private GLSurface work;
+	private GLOffscreen work;
 	@Nullable
 	private Bitmap mMaskBitmap;
 	@Nullable
@@ -375,7 +375,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 				mMaskOnly = false;
 			} else if (isValid()) {
 				if (DEBUG) Log.v(TAG, "createTargetOnGL:create GLSurface as work texture");
-				work = GLSurface.newInstance(
+				work = GLOffscreen.newInstance(
 					mManager.isGLES3(), GLES20.GL_TEXTURE0,
 					getWidth(), getHeight());
 				mRendererTarget = RendererTarget.newInstance(

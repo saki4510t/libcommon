@@ -5,7 +5,7 @@ import android.media.effect.EffectContext;
 import android.util.Log;
 
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
 
 import java.util.ArrayList;
@@ -187,7 +187,7 @@ public class BitmapEffector {
 							effectContext.release();
 						}
 						// ビットマップとして取得
-						final GLSurface output = source.getResultTexture();
+						final GLOffscreen output = source.getResultTexture();
 						output.makeCurrent();
 						// FIXME 映像効果を付与したビットマップを取得できない
 						//       ここでglClearで塗りつぶすとBitmapに反映されるので

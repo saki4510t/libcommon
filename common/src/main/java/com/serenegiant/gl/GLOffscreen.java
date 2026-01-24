@@ -33,10 +33,11 @@ import androidx.annotation.Size;
  * テクスチャへOpenGL|ESで描画するためのオフスクリーン描画クラス
  * テクスチャをカラーバッファとしてFBOに割り当てる
  * テクスチャへのオフスクリーン描画しないのであればGLTextureを使う方が良い
+ * XXX Renamed from GLSurface
  */
-public abstract class GLSurface implements IGLSurface {
+public abstract class GLOffscreen implements IGLSurface {
 	private static final boolean DEBUG = false;
-	private static final String TAG = GLSurface.class.getSimpleName();
+	private static final String TAG = GLOffscreen.class.getSimpleName();
 
 	private static final boolean DEFAULT_ADJUST_POWER2 = false;
 
@@ -48,16 +49,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param height
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
+	public static GLOffscreen newInstance(
+		final boolean isGLES3,
 		@TexUnit final int texUnit,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		}
@@ -72,16 +74,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
+	public static GLOffscreen newInstance(
+		final boolean isGLES3,
 		@TexUnit final int texUnit,
 		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
@@ -97,16 +100,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param adjustPower2
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface newInstance(final boolean isGLES3,
+	public static GLOffscreen newInstance(
+		final boolean isGLES3,
 		@TexUnit final int texUnit,
 		final int width, final int height,
 		final boolean useDepthBuffer, final boolean adjustPower2) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES3(GLES30.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height, useDepthBuffer, adjustPower2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
+			return new GLOffscreenES2(GLES20.GL_TEXTURE_2D, texUnit, GL_NO_TEXTURE,
 				width, height, useDepthBuffer, adjustPower2);
 		}
 	}
@@ -120,16 +124,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param height
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface wrap(final boolean isGLES3,
+	public static GLOffscreen wrap(
+		final boolean isGLES3,
 		@TexUnit final int texUnit, final int texId,
 		final int width, final int height) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
+			return new GLOffscreenES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
+			return new GLOffscreenES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				false, DEFAULT_ADJUST_POWER2);
 		}
@@ -145,16 +150,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface wrap(final boolean isGLES3,
+	public static GLOffscreen wrap(
+		final boolean isGLES3,
 		@TexUnit final int texUnit, final int texId,
 		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
+			return new GLOffscreenES3(GLES30.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
+			return new GLOffscreenES2(GLES20.GL_TEXTURE_2D, texUnit, texId,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
@@ -176,16 +182,17 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param useDepthBuffer
 	 */
 	@SuppressLint("NewApi")
-	public static GLSurface wrap(final boolean isGLES3,
+	public static GLOffscreen wrap(
+		final boolean isGLES3,
 		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 		final int width, final int height, final boolean useDepthBuffer) {
 
 		if (isGLES3 && (GLUtils.getSupportedGLVersion() > 2)) {
-			return new GLSurfaceES3(texTarget, texUnit, texId,
+			return new GLOffscreenES3(texTarget, texUnit, texId,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		} else {
-			return new GLSurfaceES2(texTarget, texUnit, texId,
+			return new GLOffscreenES2(texTarget, texUnit, texId,
 				width, height,
 				useDepthBuffer, DEFAULT_ADJUST_POWER2);
 		}
@@ -224,7 +231,8 @@ public abstract class GLSurface implements IGLSurface {
 	 * @param adjustPower2
 	 */
 	@SuppressLint("NewApi")
-	private GLSurface(final boolean isGLES3,
+	private GLOffscreen(
+		final boolean isGLES3,
 		@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 		final int width, final int height,
 		final boolean useDepthBuffer, final boolean adjustPower2) {
@@ -426,7 +434,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * OpenGL|ES2用のGLSurface実装
 	 */
-	private static class GLSurfaceES2 extends GLSurface {
+	private static class GLOffscreenES2 extends GLOffscreen {
 		/**
 		 * 既存のテクスチャをwrapするためのコンストラクタ
 		 *
@@ -438,7 +446,7 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param useDepthBuffer
 		 * @param adjustPower2
 		 */
-		private GLSurfaceES2(
+		private GLOffscreenES2(
 			@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 			final int width, final int height,
 			final boolean useDepthBuffer, final boolean adjustPower2) {
@@ -674,7 +682,7 @@ public abstract class GLSurface implements IGLSurface {
 	/**
 	 * OpenGL|ES3用のGLSurface実装
 	 */
-	private static class GLSurfaceES3 extends GLSurface {
+	private static class GLOffscreenES3 extends GLOffscreen {
 		/**
 		 * 既存のテクスチャをwrapするためのコンストラクタ
 		 *
@@ -686,7 +694,7 @@ public abstract class GLSurface implements IGLSurface {
 		 * @param useDepthBuffer
 		 * @param adjustPower2
 		 */
-		private GLSurfaceES3(
+		private GLOffscreenES3(
 			@TexTarget final int texTarget, @TexUnit final int texUnit, final int texId,
 			final int width, final int height,
 			final boolean useDepthBuffer, final boolean adjustPower2) {

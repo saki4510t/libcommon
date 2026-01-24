@@ -22,12 +22,12 @@ import android.opengl.GLES20;
 
 import androidx.annotation.NonNull;
 
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 
 public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 
 	protected final MediaEffectGLKernel3x3Drawer mDrawer2;
-	protected GLSurface mOutputOffscreen;
+	protected GLOffscreen mOutputOffscreen;
 
 	public MediaEffectGLTwoPassBase(final int numTex,
 									final boolean isOES, final String fss) {
@@ -94,13 +94,13 @@ public class MediaEffectGLTwoPassBase extends MediaEffectGLBase {
 	@Override
 	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output_tex = src.getOutputTargetTexture();
+		final GLOffscreen output_tex = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();
 		final int width = src.getWidth();
 		final int height = src.getHeight();
 		// パス1
 		if (mOutputOffscreen == null) {
-			mOutputOffscreen = GLSurface.newInstance(
+			mOutputOffscreen = GLOffscreen.newInstance(
 				false, GLES20.GL_TEXTURE0,
 				width, height, false);
 		}

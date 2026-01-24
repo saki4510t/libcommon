@@ -20,7 +20,7 @@ package com.serenegiant.mediaeffect;
 
 import android.util.Log;
 
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.glutils.IMirror;
 
 import androidx.annotation.NonNull;
@@ -153,7 +153,7 @@ public class MediaEffectGLBase implements IMediaEffect, IMirror {
 	@Override
 	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output = src.getOutputTargetTexture();
+		final GLOffscreen output = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();
 		output.makeCurrent();
 		try {

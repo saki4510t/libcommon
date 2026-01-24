@@ -23,7 +23,7 @@ import android.os.Build;
 import android.util.Log;
 
 import com.serenegiant.gl.GLHistogram;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.glutils.IMirror;
 
 import androidx.annotation.NonNull;
@@ -35,7 +35,7 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	private static final String TAG = MediaEffectGLHistogram.class.getSimpleName();
 
 	private final GLHistogram mGLHistogram;
-	private GLSurface mOutputOffscreen;
+	private GLOffscreen mOutputOffscreen;
 	private volatile boolean mEnabled = true;
 
 	/**
@@ -82,7 +82,7 @@ public class MediaEffectGLHistogram implements IMediaEffect, IMirror  {
 	@Override
 	public void apply(@NonNull final ISource src) {
 		if (!mEnabled) return;
-		final GLSurface output = src.getOutputTargetTexture();
+		final GLOffscreen output = src.getOutputTargetTexture();
 		final int[] srcTexIds = src.getSourceTexId();
 		final int width = output.getWidth();;
 		final int height = output.getHeight();

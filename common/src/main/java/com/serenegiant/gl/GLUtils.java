@@ -35,7 +35,6 @@ import android.view.Surface;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 
-import com.serenegiant.egl.EGLBase;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.graphics.MatrixUtils;
@@ -360,7 +359,7 @@ public class GLUtils implements GLConst {
 		//       → GLSurface#makeCurrentでGLSurfaceのオフスクリーンのバックバッファへ切り替え
 		//       → glReadPixelsで読み取る
 		//       のであれば正常に読み取ることができる。
-		final GLSurface readSurface = GLSurface.wrap(false,
+		final GLOffscreen readSurface = GLOffscreen.wrap(false,
 			isOES ? GL_TEXTURE_EXTERNAL_OES : GLConst.GL_TEXTURE_2D,
 			GLES20.GL_TEXTURE4, texId, width, height, false);
 		// テクスチャをバックバッファとするオフスクリーンからglReadPixelsでByteBufferへ画像データを読み込む
@@ -429,7 +428,7 @@ public class GLUtils implements GLConst {
 		@Nullable final Bitmap bitmap) {
 
 		// オフスクリーン描画用にGLSurfaceを生成する(EglSurfaceでも大丈夫なはず)
-		final GLSurface surface = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
+		final GLOffscreen surface = GLOffscreen.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
 		// オフスクリーン描画用にGLDrawer2Dを生成
 		final GLDrawer2D drawer = GLDrawer2D.create(isGLES3, isOES);
 		final Bitmap result;

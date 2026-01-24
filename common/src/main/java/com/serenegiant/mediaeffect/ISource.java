@@ -21,7 +21,7 @@ package com.serenegiant.mediaeffect;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 
 public interface ISource {
 	/**
@@ -64,7 +64,7 @@ public interface ISource {
 	 * @return
 	 */
 	@Nullable
-	public GLSurface getOutputTargetTexture();
+	public GLOffscreen getOutputTargetTexture();
 	@Nullable
 	public float[] getTexMatrix();
 	/**
@@ -72,7 +72,7 @@ public interface ISource {
 	 * @return
 	 */
 	@Nullable
-	public GLSurface getResultTexture();
+	public GLOffscreen getResultTexture();
 
 	/**
 	 * 関係するリソースを破棄

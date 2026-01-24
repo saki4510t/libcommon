@@ -21,21 +21,21 @@ package com.serenegiant.mediaeffect;
 import android.graphics.Bitmap;
 import android.opengl.GLES20;
 
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 public class MediaImageSource extends MediaSource {
 	@NonNull
-	private final GLSurface mImageOffscreen;
+	private final GLOffscreen mImageOffscreen;
 	/**
 	 * コンストラクタ
 	 * GLコンテキスト内で生成すること
 	 */
 	public MediaImageSource(final boolean isGLES3, @NonNull final Bitmap src) {
 		super(isGLES3, src.getWidth(), src.getHeight());
-		mImageOffscreen = GLSurface.newInstance(
+		mImageOffscreen = GLOffscreen.newInstance(
 			false, GLES20.GL_TEXTURE0,
 			mWidth, mHeight, false);
 		setSource(src);
@@ -79,7 +79,7 @@ public class MediaImageSource extends MediaSource {
 			if (firstApply) {
 				firstApply = false;
 			} else {
-				final GLSurface temp = mSourceScreen;
+				final GLOffscreen temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
 				mSrcTexIds[0] = mSourceScreen.getTexId();
@@ -91,7 +91,7 @@ public class MediaImageSource extends MediaSource {
 
 	@Nullable
 	@Override
-	public GLSurface getResultTexture() {
+	public GLOffscreen getResultTexture() {
 		// 一度もフィルターが適用されていない場合はmImageOffscreenを返す
 		// フィルターが1度でも適用されていればsuper.getOutputTexture()を返す
 		return firstApply ? mImageOffscreen : super.getResultTexture();

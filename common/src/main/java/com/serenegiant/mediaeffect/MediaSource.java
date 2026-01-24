@@ -28,7 +28,7 @@ import android.util.Log;
 
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 
 public class MediaSource implements ISource {
 	private static final boolean DEBUG = false;
@@ -36,8 +36,8 @@ public class MediaSource implements ISource {
 
 	public final boolean isGLES3;
 	private final int mTexUnit;
-	protected GLSurface mSourceScreen;
-	protected GLSurface mOutputScreen;
+	protected GLOffscreen mSourceScreen;
+	protected GLOffscreen mOutputScreen;
 	protected int mWidth, mHeight;
 	@NonNull
 	protected final int[] mSrcTexIds = new int[1];
@@ -100,8 +100,8 @@ public class MediaSource implements ISource {
 			if ((width > 0) && (height > 0)) {
 				// FIXME フィルタ処理自体は大丈夫そうなんだけどImageProcessorの処理がおかしくなるので今は2の乗数には丸めない
 				// 代わりにImageProcessorの縦横のサイズ自体を2の乗数にする
-				mSourceScreen = GLSurface.newInstance(isGLES3, mTexUnit, width, height, false, false);
-				mOutputScreen = GLSurface.newInstance(isGLES3, mTexUnit, width, height, false, false);
+				mSourceScreen = GLOffscreen.newInstance(isGLES3, mTexUnit, width, height, false, false);
+				mOutputScreen = GLOffscreen.newInstance(isGLES3, mTexUnit, width, height, false, false);
 				mWidth = width;
 				mHeight = height;
 			}
@@ -119,7 +119,7 @@ public class MediaSource implements ISource {
 	public ISource apply(@NonNull final IMediaEffect effect) {
 		if (mSourceScreen != null) {
 			if (!firstApply) {
-				final GLSurface temp = mSourceScreen;
+				final GLOffscreen temp = mSourceScreen;
 				mSourceScreen = mOutputScreen;
 				mOutputScreen = temp;
 				mSrcTexIds[0] = mSourceScreen.getTexId();
@@ -154,7 +154,7 @@ public class MediaSource implements ISource {
 
 	@Nullable
 	@Override
-	public GLSurface getOutputTargetTexture() {
+	public GLOffscreen getOutputTargetTexture() {
 		return mOutputScreen;
 	}
 
@@ -166,7 +166,7 @@ public class MediaSource implements ISource {
 
 	@Nullable
 	@Override
-	public GLSurface getResultTexture() {
+	public GLOffscreen getResultTexture() {
 		// 一度もフィルターが適用されていない場合はmmSourceScreenを返す
 		// フィルターが1度でも適用されていればmOutputScreenを返す
 		return firstApply ? mSourceScreen : mOutputScreen;

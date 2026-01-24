@@ -26,7 +26,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.math.Fraction;
@@ -370,7 +370,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 				}
 			}
 			if (mSurfaceTarget != null) {
-				final GLSurface output = mediaSource.getResultTexture();
+				final GLOffscreen output = mediaSource.getResultTexture();
 				if (output != null) {
 					if ((mTargetDrawer == null) || (isGLES3 != mTargetDrawer.isGLES3) || (output.isOES() != mTargetDrawer.isOES())) {
 						if (mTargetDrawer != null) {
@@ -393,7 +393,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 			// こっちはオリジナルのテクスチャを渡す
 			super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		} else {
-			final GLSurface output = (mediaSource != null) ? mediaSource.getResultTexture() : null;
+			final GLOffscreen output = (mediaSource != null) ? mediaSource.getResultTexture() : null;
 			if (output != null) {
 				// 描画処理した後のたテクスチャを次へ渡す
 				super.onFrameAvailable(

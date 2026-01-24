@@ -39,7 +39,7 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.gl.GLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 import com.serenegiant.utils.ThreadUtils;
@@ -148,7 +148,7 @@ public class SurfaceDrawable extends Drawable {
 	 *     なる=中間に1つ余分にBitmapを生成することになるので、一旦オフスクリーン描画する方が
 	 *     パフォーマンス的によい
 	 */
-	private GLSurface mOffscreenSurface;
+	private GLOffscreen mOffscreenSurface;
 	/**
 	 * オフスクリーン描画用のGLDrawer
 	 */
@@ -376,7 +376,7 @@ public class SurfaceDrawable extends Drawable {
 		if ((mOffscreenSurface == null) || (mOffscreenSurface.getWidth() != mImageWidth)
 			|| (mOffscreenSurface.getHeight() != mHeight)) {
 			handleReleaseOffscreen();
-			mOffscreenSurface = GLSurface.newInstance(isGLES3(), GLES20.GL_TEXTURE0, mImageWidth, mImageHeight);
+			mOffscreenSurface = GLOffscreen.newInstance(isGLES3(), GLES20.GL_TEXTURE0, mImageWidth, mImageHeight);
 		}
 		if (mOffscreenSurface != null) {
 			// オフスクリーンSurfaceへ描画

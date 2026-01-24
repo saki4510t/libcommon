@@ -27,7 +27,7 @@ import android.util.Log;
 import android.view.Surface;
 
 import com.serenegiant.gl.GLDrawer2D;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.graphics.BitmapHelper;
 import com.serenegiant.utils.Pool;
@@ -118,7 +118,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 	 * キャプチャに使うオフスクリーン
 	 */
 	@Nullable
-	private GLSurface mOffscreen;
+	private GLOffscreen mOffscreen;
 	/**
 	 * オフスクリーン描画用GLDrawer2D
 	 */
@@ -431,7 +431,7 @@ public class GLBitmapImageReader implements ImageReader<Bitmap>, GLSurfaceReceiv
 			if (mOffscreen != null) {
 				mOffscreen.release();
 			}
-			mOffscreen = GLSurface.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
+			mOffscreen = GLOffscreen.newInstance(isGLES3, GLES20.GL_TEXTURE0, width, height);
 		}
 		if ((mDrawer == null) || (mDrawer.isGLES3 != isGLES3) || (mDrawer.isOES() != isOES)) {
 			if (mDrawer != null) {

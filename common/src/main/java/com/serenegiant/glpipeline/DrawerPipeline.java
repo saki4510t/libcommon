@@ -25,7 +25,7 @@ import android.util.Log;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLEffectDrawer2D;
 import com.serenegiant.gl.GLManager;
-import com.serenegiant.gl.GLSurface;
+import com.serenegiant.gl.GLOffscreen;
 import com.serenegiant.glutils.IMirror;
 import com.serenegiant.gl.RendererTarget;
 import com.serenegiant.math.Fraction;
@@ -86,7 +86,7 @@ public class DrawerPipeline extends ProxyPipeline
 	 * 描画処理した結果を次のGLPipelineへ送る場合のワーク用GLSurface
 	 */
 	@Nullable
-	private GLSurface mOffscreenSurface = null;
+	private GLOffscreen mOffscreenSurface = null;
 	/**
 	 * オフスクリーンのGLSurfaceへの描画用
 	 */
@@ -486,7 +486,7 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (!mPathThrough) {
 				if (DEBUG) Log.v(TAG, String.format("reCreateTargetOnGL:create GLSurface as offscreen(%dx%d)", getWidth(), getHeight()));
-				mOffscreenSurface = GLSurface.newInstance(
+				mOffscreenSurface = GLOffscreen.newInstance(
 					mManager.isGLES3(), GLES20.GL_TEXTURE0,
 					getWidth(), getHeight());
 				mOffscreenTarget = RendererTarget.newInstance(
