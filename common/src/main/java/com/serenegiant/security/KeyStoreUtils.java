@@ -81,7 +81,7 @@ public class KeyStoreUtils {
 	/**
 	 * 指定したキーに対応する値をKeyStoreから削除
 	 * @param context
-	 * @param name
+	 * @param name キー名
 	 */
 	public static void deleteKey(
 		@NonNull final Context context,
@@ -105,8 +105,8 @@ public class KeyStoreUtils {
 	 * API23未満からAPI23以降へAndroidをバージョンアップしたときは
 	 * キータイプが一致しなくなりキーを再生成するので暗号化データは復号できなくなる。
 	 * @param context
-	 * @param name
-	 * @param value
+	 * @param name キー名
+	 * @param value 暗号化するテキスト
 	 * @return
 	 */
 	@Nullable
@@ -131,8 +131,8 @@ public class KeyStoreUtils {
 	 * API23未満からAPI23以降へAndroidをバージョンアップしたときは
 	 * キータイプが一致しなくなりキーを再生成するので暗号化データは復号できなくなる。
 	 * @param context
-	 * @param name
-	 * @param encrypted
+	 * @param name キー名
+	 * @param encrypted 暗号化されたテキスト
 	 * @return
 	 * @throws ObfuscatorException
 	 */
@@ -156,8 +156,8 @@ public class KeyStoreUtils {
 	/**
 	 * RSAで暗号化
 	 * @param context
-	 * @param name
-	 * @param value
+	 * @param name キー名
+	 * @param value 暗号化するテキスト
 	 * @return
 	 */
 	private static String encryptRSA(
@@ -181,8 +181,8 @@ public class KeyStoreUtils {
 	/**
 	 * RSAで復号
 	 * @param context
-	 * @param name
-	 * @param encrypted
+	 * @param name キー名
+	 * @param encrypted RSAで暗号化しtテキスト
 	 * @return
 	 * @throws ObfuscatorException
 	 */
@@ -207,8 +207,8 @@ public class KeyStoreUtils {
 	/**
 	 * AESで暗号化
 	 * @param context
-	 * @param name
-	 * @param value
+	 * @param name キー名
+	 * @param value 暗号化するテキスト
 	 * @return
 	 */
 	@RequiresApi(api = Build.VERSION_CODES.M)
@@ -235,8 +235,8 @@ public class KeyStoreUtils {
 	/**
 	 * AESで復号
 	 * @param context
-	 * @param name
-	 * @param encrypted
+	 * @param name キー名
+	 * @param encrypted AESで暗号化したテキスト
 	 * @return
 	 * @throws ObfuscatorException
 	 */
@@ -273,7 +273,7 @@ public class KeyStoreUtils {
 	/**
 	 * キーエリアス名取得のためのヘルパーメソッド
 	 * @param context
-	 * @param name
+	 * @param name キー名、空文字列ならアプリのパッケージ名を返す、空文字列以外ならアプリのパッケージ名 + ":" + nameを返す
 	 * @return
 	 */
 	private static String getAlias(
@@ -285,6 +285,8 @@ public class KeyStoreUtils {
 	/**
 	 * KeyStoreからKeyStore.Entryを取得する
 	 * 対象となるエリアスに対応するエントリーがないときは自動的に生成する
+	 * @param context
+	 * @param name キー名
 	 * @return
 	 * @throws GeneralSecurityException
 	 * @throws IOException
@@ -309,6 +311,7 @@ public class KeyStoreUtils {
 			}
 		}
 		if (!containsAlias) {
+			// キーペアが見つからないときは生成する
 			createKey(context, alias);
 		}
 		return keyStore.getEntry(alias, null);
@@ -317,9 +320,10 @@ public class KeyStoreUtils {
 	/**
 	 * キー生成のためのヘルパーメソッド
 	 * @param context
-	 * @param alias
+	 * @param alias キーエリアス名
 	 * @throws GeneralSecurityException
 	 */
+	@SuppressWarnings("deprecation")
 	private static void createKey(
 		@NonNull final Context context,
 		@NonNull final String alias) throws GeneralSecurityException {
@@ -360,11 +364,21 @@ public class KeyStoreUtils {
 		}
 	}
 
+	/**
+	 * バイト配列をBase64エンコードするためのヘルパー関数
+	 * @param bytes
+	 * @return
+	 */
 	@NonNull
 	private static String base64Encode(@NonNull final byte[] bytes) {
 		return new String(Base64.encode(bytes, Base64.NO_WRAP), CharsetsUtils.UTF8);
 	}
 
+	/**
+	 * Base64でエンコードしたテキストからバイト配列へデコードするためのヘルパー関数
+	 * @param encoded
+	 * @return
+	 */
 	@NonNull
 	private static byte[] base64decode(@NonNull final String encoded) {
 		return Base64.decode(encoded, Base64.NO_WRAP);

@@ -415,7 +415,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 	 * 暗号化・復号を行うためのヘルパークラス, API>=18
 	 * API>=23の場合にはAES, API<23の場合はRSAで暗号化・復号する
 	 * 各アプリに対応する鍵がないときは自動的に生成する
-	 * FIXME KeyStoreUtilsを使うように変更するかも
+	 * 暗号化/複合処理は同じなのでKeyStoreUtilsにしたいけどチェック用のヘッダーとかを追加していて直接の互換性がない
 	 */
 	public static class KeyStoreObfuscator implements Obfuscator {
 
@@ -439,7 +439,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 		}
 
 		private static final String KEY_STORE_TYPE = "AndroidKeyStore";
-		private static final String header = "com.serenegiant.KeyStoreObfuscator-1|";
+		private static final String HEADER = "com.serenegiant.KeyStoreObfuscator-1|";
 
 		// API22以下で利用
 		private static final String ALGORITHM_RSA = "RSA";
@@ -539,7 +539,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 				encryptor.init(Cipher.ENCRYPT_MODE, publicKey);
 				// Header is appended as an integrity check
 				return base64Encode(
-					encryptor.doFinal((header + key + value).getBytes(CharsetsUtils.UTF8)));
+					encryptor.doFinal((HEADER + key + value).getBytes(CharsetsUtils.UTF8)));
 			} catch (final GeneralSecurityException | IOException e) {
 				throw new RuntimeException("Invalid environment", e);
 			}
@@ -562,11 +562,11 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 				final Cipher decryptor = Cipher.getInstance(CIPHER_TRANSFORMATION_RSA);
 				decryptor.init(Cipher.DECRYPT_MODE, privateKey);
 				final String result = new String(decryptor.doFinal(base64decode(encrypted)), CharsetsUtils.UTF8);
-				final int headerIndex = result.indexOf(header+key);
+				final int headerIndex = result.indexOf(HEADER +key);
 				if (headerIndex != 0) {
 					throw new ObfuscatorException("Header not found (invalid data or key)" + (DEBUG ? (":" + encrypted) : ""));
 				}
-				return result.substring(header.length() + key.length());
+				return result.substring(HEADER.length() + key.length());
 			} catch (final GeneralSecurityException | IOException e) {
 				throw new ObfuscatorException(e.getMessage() + (DEBUG ? (":" + encrypted) : ""));
 			} catch (final IllegalArgumentException e) {
@@ -591,7 +591,7 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 				// Header is appended as an integrity check
 				return base64Encode(encryptor.getIV()) + "|"
 					+ base64Encode(
-						encryptor.doFinal((header + key + value).getBytes(CharsetsUtils.UTF8)));
+						encryptor.doFinal((HEADER + key + value).getBytes(CharsetsUtils.UTF8)));
 			} catch (final GeneralSecurityException | IOException e) {
 				throw new RuntimeException("Invalid environment", e);
 			}
@@ -622,12 +622,12 @@ public class EncryptedSharedPreferences implements SharedPreferences {
 				final String result = new String(
 					decryptor.doFinal(base64decode(split[1])),
 					CharsetsUtils.UTF8);
-				final int headerIndex = result.indexOf(header+key);
+				final int headerIndex = result.indexOf(HEADER +key);
 				if (headerIndex != 0) {
 					throw new ObfuscatorException("Header not found (invalid data or key)" + (DEBUG ? (":" + encrypted) : ""));
 				}
 				if (DEBUG) Log.v(TAG, "decryptAES:key=" + key + ",result=" + result);
-				return result.substring(header.length() + key.length());
+				return result.substring(HEADER.length() + key.length());
 			} catch (final GeneralSecurityException e) {
 				throw new ObfuscatorException(e.getMessage() + (DEBUG ? (":" + encrypted) : ""));
 			} catch (final IllegalArgumentException e) {
