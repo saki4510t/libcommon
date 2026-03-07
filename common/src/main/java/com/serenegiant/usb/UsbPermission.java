@@ -238,7 +238,7 @@ public class UsbPermission extends BroadcastReceiver {
 						// Android5.1.xのGALAXY系でandroid.permission.sec.MDM_APP_MGMT
 						// という意味不明の例外生成するみたい
 						Log.w(TAG, e);
-						processCancel(device);
+						callOnError(device, new UsbPermissionException(e));	// processCancel(device);
 						result = true;
 					}
 				}
