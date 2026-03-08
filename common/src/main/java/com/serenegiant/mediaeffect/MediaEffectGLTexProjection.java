@@ -32,7 +32,7 @@ import static com.serenegiant.gl.ShaderConst.*;
  */
 public class MediaEffectGLTexProjection extends MediaEffectGLBase {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectGLTexProjection";
+	private static final String TAG = MediaEffectGLTexProjection.class.getSimpleName();
 
 	private static class MediaEffectTexProjectionDrawer
 		extends MediaEffectGLDrawer.MediaEffectSingleDrawer {

@@ -39,7 +39,7 @@ import static com.serenegiant.gl.ShaderConst.VERTEX_SHADER_ES2;
  */
 public class MediaEffectGLColorCorrection extends MediaEffectGLBase implements IColorCorrection {
 	private static final boolean DEBUG = false;
-	private static final String TAG = "MediaEffectGLColorCorrection";
+	private static final String TAG = MediaEffectGLColorCorrection.class.getSimpleName();
 
 	/*
 	 * R' | m11 m21 m31 m41 | R
