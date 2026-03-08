@@ -33,6 +33,8 @@
 	<!-- 位置情報・BluetoothやWiFiのスキャンを利用できるようにするため -->
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+	<!-- フォアグラウンドサービスの場合は必須ではないけどターゲットがAndroid13/API33以降だとPOST_NOTIFICATIONSランタイム権限が必要とlintが言うので追加  -->
+	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
 	<application
 		android:name="androidx.multidex.MultiDexApplication"
