@@ -1,4 +1,4 @@
-package com.serenegiant.utils;
+package com.serenegiant.system;
 /*
  * libcommon
  * utility/helper classes for myself
@@ -25,9 +25,7 @@ import androidx.annotation.Nullable;
 
 /**
  * デバッグログ出力を実行時に切り替えれるようにするためのヘルパークラス
- * @deprecated systemパッケージ内のLogUtilsを使うこと
  */
-@Deprecated
 public class LogUtils {
 
 	private LogUtils() {
