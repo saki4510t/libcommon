@@ -507,7 +507,7 @@ public class MediaPlayer {
 	@WorkerThread
 	private void handlePrepare(final Object source) throws IOException {
 		if (DEBUG) Log.v(TAG, "handlePrepare:" + source);
-        synchronized (mSync) {
+		synchronized (mSync) {
 			if (mState != STATE_STOP) {
 				throw new RuntimeException("invalid state:" + mState);
 			}

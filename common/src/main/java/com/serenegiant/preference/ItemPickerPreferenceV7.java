@@ -138,7 +138,7 @@ public final class ItemPickerPreferenceV7 extends Preference {
 //			if (DEBUG) Log.v(TAG, "onChanged:");
 			callChangeListener(newVal);
 			preferenceValue = newVal;
-    		persistInt(preferenceValue);
+			persistInt(preferenceValue);
 		}
 	};
 

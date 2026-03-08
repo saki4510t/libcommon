@@ -54,11 +54,11 @@ public abstract class AbstractEncoder extends MediaEncoder {
 	 * @param listener
 	 */
     public AbstractEncoder(@NonNull final String mimeType,
-    	@NonNull final IRecorder recorder,
-    	@NonNull final EncoderListener2 listener) {
+		@NonNull final IRecorder recorder,
+		@NonNull final EncoderListener2 listener) {
 
 		super(mimeType, listener);
-    	mRecorder = recorder;
+		mRecorder = recorder;
 		recorder.addEncoder(this);
     }
 

@@ -74,7 +74,7 @@ public class ActivityUtils {
 	    if (id > 0) {
 			final ActivityManager activityManager = ContextUtils.requireSystemService(context, ActivityManager.class);
 			if (DEBUG) Log.v(TAG, "moveTaskToFront:" + id);
-	        activityManager.moveTaskToFront(id, ActivityManager.MOVE_TASK_WITH_HOME);
+			activityManager.moveTaskToFront(id, ActivityManager.MOVE_TASK_WITH_HOME);
 	    }
 	}
 

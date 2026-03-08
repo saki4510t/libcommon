@@ -590,7 +590,7 @@ import androidx.annotation.Nullable;
 		if ((maxClientVersion >= 2) && !isValidContext()) {
 
 			if (DEBUG) Log.d(TAG, "init:GLES2を試みる");
-            config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
+			config = getConfig(2, withDepthBuffer, stencilBits, isRecordable);
             if (config == null) {
                	throw new IllegalArgumentException("chooseConfig failed");
             }

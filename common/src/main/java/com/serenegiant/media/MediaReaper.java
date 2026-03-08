@@ -170,7 +170,7 @@ public abstract class MediaReaper implements Runnable {
 			final int ix0, final int ix1, final int ix2) {
 
 			if (DEBUG) Log.v(TAG, "AudioReaper#createOutputFormat");
-	        if (ix0 >= 0) {
+			if (ix0 >= 0) {
 				if (DEBUG) Log.w(TAG, "csd may be wrong, it may be for video");
 	        }
 	        // audioの時はSTART_MARKが無いので全体をコピーして渡す
@@ -382,7 +382,7 @@ LOOP:	while (mIsRunning) {
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_BUFFERS_CHANGED) {
             	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_BUFFERS_CHANGED");
                 // エンコード時にはこれは来ないはず
-                encoderOutputBuffers = encoder.getOutputBuffers();
+				encoderOutputBuffers = encoder.getOutputBuffers();
             } else if (encoderStatus == MediaCodec.INFO_OUTPUT_FORMAT_CHANGED) {
 //            	if (DEBUG) Log.v(TAG, "INFO_OUTPUT_FORMAT_CHANGED");
             	// コーデックからの出力フォーマットが変更された時

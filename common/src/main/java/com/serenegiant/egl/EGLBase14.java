@@ -526,7 +526,7 @@ import androidx.annotation.RequiresApi;
 		final boolean withDepthBuffer, final int stencilBits, final boolean isRecordable) {
 
 		if (DEBUG) Log.v(TAG, "init:");
-        if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
+		if (mEglDisplay != EGL14.EGL_NO_DISPLAY) {
             throw new RuntimeException("EGL already set up");
         }
 

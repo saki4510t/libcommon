@@ -127,12 +127,12 @@ public final class UriHelper {
 	public static String getPath(@NonNull final Context context, final Uri uri) {
 		if (DEBUG) Log.i(TAG, "getPath:uri=" + uri);
 
-	    if (BuildCheck.isKitKat() && DocumentsContract.isDocumentUri(context, uri)) {
+		if (BuildCheck.isKitKat() && DocumentsContract.isDocumentUri(context, uri)) {
 			// DocumentProvider
 			if (DEBUG) Log.i(TAG, "getPath:isDocumentUri,getAuthority=" + uri.getAuthority());
-	        // ExternalStorageProvider
-	        if (isExternalStorageDocument(uri)) {
-	            final String docId = DocumentsContract.getDocumentId(uri);
+			// ExternalStorageProvider
+			if (isExternalStorageDocument(uri)) {
+				final String docId = DocumentsContract.getDocumentId(uri);
 				if (DEBUG) Log.i(TAG, "getPath:isDocumentUri,docId=" + docId);
 				if (BuildCheck.isLollipop() && DEBUG) {
 					Log.i(TAG, "getPath:isDocumentUri,getTreeDocumentId="

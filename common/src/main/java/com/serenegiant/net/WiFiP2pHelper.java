@@ -520,14 +520,14 @@ public class WiFiP2pHelper {
 				} catch (final Exception e) {
 					mParent.callOnError(e);
 				}
-	        } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+			} else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
 				if (DEBUG) Log.v(TAG, "onReceive:WIFI_P2P_PEERS_CHANGED_ACTION");
-	        	// p2pピアが変化した時
-	            // request available peers from the wifi p2p manager. This is an
-	            // asynchronous call and the calling activity is notified with a
-	            // callback on PeerListListener.onPeersAvailable()
-	            try {
-                	mManager.requestPeers(mChannel, mParent.mPeerListListener);
+				// p2pピアが変化した時
+				// request available peers from the wifi p2p manager. This is an
+				// asynchronous call and the calling activity is notified with a
+				// callback on PeerListListener.onPeersAvailable()
+				try {
+					mManager.requestPeers(mChannel, mParent.mPeerListListener);
 				} catch (final Exception e) {
 					mParent.callOnError(e);
 				}
@@ -554,7 +554,7 @@ public class WiFiP2pHelper {
 	        } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
 				if (DEBUG) Log.v(TAG, "onReceive:WIFI_P2P_THIS_DEVICE_CHANGED_ACTION");
 	        	// 自デバイスの状態が変化した時
-	        	try {
+				try {
 					final WifiP2pDevice device = IntentCompat.getParcelableExtra(intent,
 						WifiP2pManager.EXTRA_WIFI_P2P_DEVICE, WifiP2pDevice.class);
 					mParent.updateDevice(device);
