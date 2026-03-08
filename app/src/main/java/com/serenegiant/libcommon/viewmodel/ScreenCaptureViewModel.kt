@@ -23,13 +23,16 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.serenegiant.service.ScreenRecorderService
 
+@RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class ScreenCaptureViewModel(application: Application) : AndroidViewModel(application) {
 
 	var isRecording = false
