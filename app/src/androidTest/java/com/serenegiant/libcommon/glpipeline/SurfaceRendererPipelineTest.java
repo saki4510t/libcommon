@@ -122,6 +122,8 @@ public class SurfaceRendererPipelineTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 			fail();
+		} finally {
+			renderer.release();
 		}
 	}
 
@@ -187,6 +189,9 @@ public class SurfaceRendererPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			renderer.release();
 		}
 	}
 

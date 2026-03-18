@@ -97,6 +97,7 @@ public class GLBitmapImageReaderTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
 			= new GLBitmapImageReader(WIDTH, HEIGHT, NUM_FRAMES);
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -105,6 +106,7 @@ public class GLBitmapImageReaderTest {
 				if (bitmap != null) {
 					try {
 						if (cnt.incrementAndGet() == NUM_FRAMES) {
+							requestStop.set(true);
 							result.set(Bitmap.createBitmap(bitmap));
 							sem.release();
 						}
@@ -119,7 +121,6 @@ public class GLBitmapImageReaderTest {
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
@@ -132,6 +133,8 @@ public class GLBitmapImageReaderTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			receiver.release();
 		}
 	}
 
@@ -151,6 +154,7 @@ public class GLBitmapImageReaderTest {
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final GLBitmapImageReader reader
 			= new GLBitmapImageReader(WIDTH, HEIGHT, NUM_FRAMES, true/*useOffscreenRendering*/);
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		reader.setOnImageAvailableListener(new ImageReader.OnImageAvailableListener<Bitmap>() {
 			final AtomicInteger cnt = new AtomicInteger();
 			@Override
@@ -159,6 +163,7 @@ public class GLBitmapImageReaderTest {
 				if (bitmap != null) {
 					try {
 						if (cnt.incrementAndGet() == NUM_FRAMES) {
+							requestStop.set(true);
 							result.set(Bitmap.createBitmap(bitmap));
 							sem.release();
 						}
@@ -173,7 +178,6 @@ public class GLBitmapImageReaderTest {
 		final Surface surface = receiver.getSurface();
 		assertNotNull(surface);
 
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
@@ -186,6 +190,8 @@ public class GLBitmapImageReaderTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			receiver.release();
 		}
 	}
 }

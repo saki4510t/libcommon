@@ -131,6 +131,8 @@ public class CapturePipelineTest {
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			capturePipeline.release();
 		}
 	}
 
@@ -177,10 +179,12 @@ public class CapturePipelineTest {
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == 1) {
+					requestStop.set(true);
 					result.set(Bitmap.createBitmap(bitmap));
 					sem.release();
 				}
@@ -194,7 +198,6 @@ public class CapturePipelineTest {
 		});
 
 		// 実際の映像はSurfaceを経由して映像を書き込む
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
 
 		source.setPipeline(capturePipeline);
@@ -206,7 +209,6 @@ public class CapturePipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(1, cnt.get());
 			final Bitmap b = result.get();
@@ -214,6 +216,9 @@ public class CapturePipelineTest {
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			capturePipeline.release();
 		}
 	}
 
@@ -262,7 +267,6 @@ public class CapturePipelineTest {
 		try {
 			// 9回x100ミリ秒なので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(1200, TimeUnit.MILLISECONDS));
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
@@ -270,6 +274,9 @@ public class CapturePipelineTest {
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			capturePipeline.release();
 		}
 	}
 
@@ -316,10 +323,12 @@ public class CapturePipelineTest {
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		final CapturePipeline capturePipeline = new CapturePipeline(new CapturePipeline.Callback() {
 			@Override
 			public void onCapture(@NonNull final Bitmap bitmap) {
 				if (cnt.incrementAndGet() == NUM_FRAMES) {
+					requestStop.set(true);
 					result.set(Bitmap.createBitmap(bitmap));
 					sem.release();
 				}
@@ -334,7 +343,6 @@ public class CapturePipelineTest {
 
 		// 実際の映像はSurfaceを経由して映像を書き込む
 		// 100ミリ秒間隔でNUM_FRAMES枚キャプチャなので余分に書き込まないといけない
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, inputSurface, NUM_FRAMES * 5, requestStop);
 
 		source.setPipeline(capturePipeline);
@@ -345,7 +353,6 @@ public class CapturePipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 500L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
@@ -353,6 +360,10 @@ public class CapturePipelineTest {
 			assertTrue(bitmapEquals(original, b, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			capturePipeline.cancel();
+			capturePipeline.release();
 		}
 	}
 }

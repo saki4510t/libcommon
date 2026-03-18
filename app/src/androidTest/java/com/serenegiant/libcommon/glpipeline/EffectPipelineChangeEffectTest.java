@@ -117,27 +117,33 @@ public class EffectPipelineChangeEffectTest {
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
-		source.setPipeline(pipeline1);
-		pipeline1.setPipeline(proxy);
+		try {
+			source.setPipeline(pipeline1);
+			pipeline1.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
+			assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 
@@ -169,30 +175,37 @@ public class EffectPipelineChangeEffectTest {
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
-		source.setPipeline(pipeline1);
-		pipeline1.setPipeline(pipeline2);
-		pipeline2.setPipeline(proxy);
+		try {
+			source.setPipeline(pipeline1);
+			pipeline1.setPipeline(pipeline2);
+			pipeline2.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
+			assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				assertEquals(NUM_FRAMES, cnt.get());
-				// パイプラインを経由して読み取った映像データをビットマップに戻す
-				final Bitmap resultBitmap = result.get();
-	//			dump(resultBitmap);
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					assertEquals(NUM_FRAMES, cnt.get());
+					// パイプラインを経由して読み取った映像データをビットマップに戻す
+					final Bitmap resultBitmap = result.get();
+//					dump(resultBitmap);
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
 	}
 
@@ -225,30 +238,38 @@ public class EffectPipelineChangeEffectTest {
 		final AtomicInteger cnt = new AtomicInteger();
 		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
-		source.setPipeline(pipeline1);
-		pipeline1.setPipeline(pipeline2);
-		pipeline2.setPipeline(pipeline3);
-		pipeline3.setPipeline(proxy);
+		try {
+			source.setPipeline(pipeline1);
+			pipeline1.setPipeline(pipeline2);
+			pipeline2.setPipeline(pipeline3);
+			pipeline3.setPipeline(proxy);
 
-		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
+			assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-	//			dump(resultBitmap);
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+//					dump(resultBitmap);
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
 	}
 
@@ -302,32 +323,37 @@ public class EffectPipelineChangeEffectTest {
 		// 検証するEffectPipelineを生成
 		final EffectPipeline pipeline1 = new EffectPipeline(manager);
 
-		GLPipeline.append(source, pipeline1);
-		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
+		try {
+			GLPipeline.append(source, pipeline1);
+			GLPipeline.append(source, proxy);
+			assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			// 実際の映像はSurfaceを経由して映像を書き込む
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				// 実際の映像はSurfaceを経由して映像を書き込む
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-//				dump(result);
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+//					dump(result);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
-		source.release();
 	}
 
 	/**
@@ -381,33 +407,39 @@ public class EffectPipelineChangeEffectTest {
 		final EffectPipeline pipeline1 = new EffectPipeline(manager);
 		final EffectPipeline pipeline2 = new EffectPipeline(manager);
 
-		GLPipeline.append(source, pipeline1);
-		GLPipeline.append(source, pipeline2);
-		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
+		try {
+			GLPipeline.append(source, pipeline1);
+			GLPipeline.append(source, pipeline2);
+			GLPipeline.append(source, proxy);
+			assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			// 実際の映像はSurfaceを経由して映像を書き込む
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				// 実際の映像はSurfaceを経由して映像を書き込む
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-	//			dump(result);
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+//					dump(result);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
-		source.release();
 	}
 
 	/**
@@ -462,34 +494,41 @@ public class EffectPipelineChangeEffectTest {
 		final EffectPipeline pipeline2 = new EffectPipeline(manager);
 		final EffectPipeline pipeline3 = new EffectPipeline(manager);
 
-		GLPipeline.append(source, pipeline1);
-		GLPipeline.append(source, pipeline2);
-		GLPipeline.append(source, pipeline3);
-		GLPipeline.append(source, proxy);
-		assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
+		try {
+			GLPipeline.append(source, pipeline1);
+			GLPipeline.append(source, pipeline2);
+			GLPipeline.append(source, pipeline3);
+			GLPipeline.append(source, proxy);
+			assertTrue(validatePipelineOrder(source, source, pipeline1, pipeline2, pipeline3, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			// 実際の映像はSurfaceを経由して映像を書き込む
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
-			cnt.set(0);
-			result.set(null);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				// 実際の映像はSurfaceを経由して映像を書き込む
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+				cnt.set(0);
+				result.set(null);
 
-			try {
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-//				dump(result);
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+//					dump(result);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					// EFFECT_NON以外は元のビットマップとは一致しないのでチェックしない
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
-		source.release();
 	}
 
 	/**
@@ -532,34 +571,42 @@ public class EffectPipelineChangeEffectTest {
 		final GLSurfaceReceiver bitmapReceiver = createGLSurfaceReceiver(
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
 		assertNotNull(bitmapReceiver);
-		final Surface receiverSurface = bitmapReceiver.getSurface();
-		assertNotNull(receiverSurface);
-		pipeline.setSurface(receiverSurface);
 
-		source.setPipeline(pipeline);
-		assertTrue(validatePipelineOrder(source, source, pipeline, proxy));
+		try {
+			final Surface receiverSurface = bitmapReceiver.getSurface();
+			assertNotNull(receiverSurface);
+			pipeline.setSurface(receiverSurface);
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline.setEffect(effect);
-			cnt1.set(0);
-			result1.set(null);
-			cnt2.set(0);
-			result2.set(null);
+			source.setPipeline(pipeline);
+			assertTrue(validatePipelineOrder(source, source, pipeline, proxy));
 
-			try {
-				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				assertTrue(cnt1.get() >= NUM_FRAMES);
-				assertTrue(cnt2.get() >= NUM_FRAMES);
-				final Bitmap resultBitmap1 = result1.get();
-				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result2.get();
-				assertNotNull(resultBitmap2);
-				// FIXME resultBitmap1とresultBitmap2は一致するはず?
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline.setEffect(effect);
+				cnt1.set(0);
+				result1.set(null);
+				cnt2.set(0);
+				result2.set(null);
+
+				try {
+					assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					assertTrue(cnt1.get() >= NUM_FRAMES);
+					assertTrue(cnt2.get() >= NUM_FRAMES);
+					final Bitmap resultBitmap1 = result1.get();
+					assertNotNull(resultBitmap1);
+					final Bitmap resultBitmap2 = result2.get();
+					assertNotNull(resultBitmap2);
+					// FIXME resultBitmap1とresultBitmap2は一致するはず?
 //				assertTrue(bitmapEquals(resultBitmap1, resultBitmap2, true));
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline.release();
+			proxy.release();
+			bitmapReceiver.release();
 		}
 	}
 
@@ -629,35 +676,41 @@ public class EffectPipelineChangeEffectTest {
 		assertNotNull(receiverSurface);
 		pipeline1.setSurface(receiverSurface);
 
-		source.setPipeline(pipeline1);
-		assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
+		try {
+			source.setPipeline(pipeline1);
+			assertTrue(validatePipelineOrder(source, source, pipeline1, proxy));
 
-		for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
-			pipeline1.setEffect(effect);
-			cnt1.set(0);
-			result1.set(null);
-			cnt2.set(0);
-			result2.set(null);
-			// 実際の映像はSurfaceを経由して映像を書き込む
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
+			for (int effect = GLEffect.EFFECT_NON; effect < GLEffect.EFFECT_NUM; effect++) {
+				pipeline1.setEffect(effect);
+				cnt1.set(0);
+				result1.set(null);
+				cnt2.set(0);
+				result2.set(null);
+				// 実際の映像はSurfaceを経由して映像を書き込む
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, inputSurface, NUM_FRAMES + 2, requestStop);
 
-			try {
-				assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-				assertTrue(cnt1.get() >= NUM_FRAMES);
-				assertTrue(cnt2.get() >= NUM_FRAMES);
-				final Bitmap resultBitmap1 = result1.get();
-				assertNotNull(resultBitmap1);
-				final Bitmap resultBitmap2 = result2.get();
-				assertNotNull(resultBitmap2);
-				// FIXME resultBitmap1とresultBitmap2は一致するはず?
+				try {
+					assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+					assertTrue(cnt1.get() >= NUM_FRAMES);
+					assertTrue(cnt2.get() >= NUM_FRAMES);
+					final Bitmap resultBitmap1 = result1.get();
+					assertNotNull(resultBitmap1);
+					final Bitmap resultBitmap2 = result2.get();
+					assertNotNull(resultBitmap2);
+					// FIXME resultBitmap1とresultBitmap2は一致するはず?
 //				assertTrue(bitmapEquals(resultBitmap1, resultBitmap2, true));
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
+			bitmapReceiver.release();
 		}
-		source.release();
 	}
 }

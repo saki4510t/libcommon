@@ -145,6 +145,9 @@ public class SurfaceEffectSourcePipelineTest {
 //			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
+			proxy.release();
 		}
 	}
 }

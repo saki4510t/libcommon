@@ -142,6 +142,8 @@ public class ImageSourcePipelineTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 			fail();
+		} finally {
+			pipeline.release();
 		}
 	}
 
@@ -182,6 +184,8 @@ public class ImageSourcePipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			proxy.release();
 		}
 	}
 
@@ -239,6 +243,8 @@ public class ImageSourcePipelineTest {
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
 			fail();
+		} finally {
+			pipeline.release();
 		}
 	}
 }

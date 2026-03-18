@@ -170,6 +170,8 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			proxy.release();
 		}
 	}
 
@@ -204,7 +206,6 @@ public class DrawerPipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			pipeline1.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -212,6 +213,9 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 
@@ -248,8 +252,6 @@ public class DrawerPipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			pipeline1.release();
-			pipeline2.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -257,6 +259,10 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
 	}
 
@@ -295,9 +301,6 @@ public class DrawerPipelineTest {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			pipeline1.release();
-			pipeline2.release();
-			pipeline3.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
 			final Bitmap resultBitmap = result.get();
@@ -305,6 +308,11 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
 	}
 
@@ -364,7 +372,6 @@ public class DrawerPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -372,6 +379,9 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			proxy.release();
 		}
 	}
 
@@ -436,7 +446,6 @@ public class DrawerPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -444,6 +453,10 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 
@@ -510,7 +523,6 @@ public class DrawerPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -518,6 +530,11 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
 	}
 
@@ -586,7 +603,6 @@ public class DrawerPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -594,6 +610,12 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
 	}
 
@@ -644,6 +666,7 @@ public class DrawerPipelineTest {
 
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
 			final Bitmap resultBitmap1 = result1.get();
@@ -654,6 +677,9 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline.release();
+			proxy.release();
 		}
 	}
 
@@ -744,6 +770,9 @@ public class DrawerPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 

@@ -125,7 +125,6 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			renderer.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
@@ -133,6 +132,10 @@ public class GLSurfaceRendererTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			renderer.release();
+			receiver.release();
+			bitmapReceiver.release();
 		}
 	}
 
@@ -197,7 +200,6 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			renderer.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
 			assertEquals(NUM_FRAMES, cnt1.get());
 			assertEquals(NUM_FRAMES, cnt2.get());
@@ -211,6 +213,11 @@ public class GLSurfaceRendererTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			renderer.release();
+			receiver.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -277,7 +284,6 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			renderer.release();
 			// それぞれのSurfaceが受け取った映像フレーム数を確認
 			assertEquals(NUM_FRAMES, cnt1.get());
 			assertEquals(NUM_FRAMES, cnt2.get());
@@ -291,6 +297,11 @@ public class GLSurfaceRendererTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			renderer.release();
+			receiver.release();
+			bitmapReceiver1.release();
+			bitmapReceiver2.release();
 		}
 	}
 
@@ -343,7 +354,6 @@ public class GLSurfaceRendererTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			renderer.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
 			assertNotNull(resultBitmap);
@@ -351,6 +361,9 @@ public class GLSurfaceRendererTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			renderer.release();
+			bitmapReceiver.release();
 		}
 	}
 }

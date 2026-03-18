@@ -126,9 +126,13 @@ public class RendererHolderTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.removeSurface(surface.hashCode());
+			source.release();
+			rendererHolder.removeSurface(readerSurface.hashCode());
+			rendererHolder.release();
+			receiver.release();
 		}
-		source.removeSurface(surface.hashCode());
-		rendererHolder.removeSurface(readerSurface.hashCode());
 	}
 
 	/**
@@ -178,9 +182,13 @@ public class RendererHolderTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.setSurface(null);
+			source.release();
+			rendererHolder.removeSurface(readerSurface.hashCode());
+			rendererHolder.release();
+			receiver.release();
 		}
-		source.setSurface(null);
-		rendererHolder.removeSurface(readerSurface.hashCode());
 	}
 
 	/**
@@ -247,9 +255,14 @@ public class RendererHolderTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.setSurface(null);
+			source.release();
+			rendererHolder.removeSurface(readerSurface1.hashCode());
+			rendererHolder.release();
+			receiver1.release();
+			receiver2.release();
 		}
-		source.setSurface(null);
-		rendererHolder.removeSurface(readerSurface1.hashCode());
 	}
 
 	/**
@@ -274,34 +287,41 @@ public class RendererHolderTest {
 
 		// テストするRendererHolderを生成
 		final RendererHolder rendererHolder = new RendererHolder(WIDTH, HEIGHT, null);
-		for (int i = 0; i < 3; i++) {
-			cnt.set(0);
-			final Bitmap original = BitmapHelper.makeCheckBitmap(
-				WIDTH, HEIGHT, 15 + i, 12, Bitmap.Config.ARGB_8888);
+		try {
+			for (int i = 0; i < 3; i++) {
+				cnt.set(0);
+				final Bitmap original = BitmapHelper.makeCheckBitmap(
+					WIDTH, HEIGHT, 15 + i, 12, Bitmap.Config.ARGB_8888);
 //			dump(bitmap);
-			// 映像ソースとしてStaticTextureSourceを生成
-			final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
-			final Surface surface = rendererHolder.getSurface();
-			assertNotNull(surface);
-			// StaticTextureSource →　RendererHolder　→ SurfaceReaderと繋ぐ
-			source.addSurface(surface.hashCode(), surface, false);
-			rendererHolder.addSurface(readerSurface.hashCode(), readerSurface, false);
+				// 映像ソースとしてStaticTextureSourceを生成
+				final StaticTextureSource source = new StaticTextureSource(manager, original, new Fraction(30));
+				final Surface surface = rendererHolder.getSurface();
+				assertNotNull(surface);
+				// StaticTextureSource →　RendererHolder　→ SurfaceReaderと繋ぐ
+				source.addSurface(surface.hashCode(), surface, false);
+				rendererHolder.addSurface(readerSurface.hashCode(), readerSurface, false);
 
-			try {
-				// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap b = result.get();
-	//			dump(b);
-				assertNotNull(b);
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, b));
-			} catch (final InterruptedException e) {
-				Log.d(TAG, "interrupted", e);
+				try {
+					// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap b = result.get();
+					//			dump(b);
+					assertNotNull(b);
+					// 元のビットマップと同じかどうかを検証
+					assertTrue(bitmapEquals(original, b));
+				} catch (final InterruptedException e) {
+					Log.d(TAG, "interrupted", e);
+				} finally {
+					source.removeSurface(surface.hashCode());
+					source.release();
+					rendererHolder.removeSurface(readerSurface.hashCode());
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			source.removeSurface(surface.hashCode());
-			rendererHolder.removeSurface(readerSurface.hashCode());
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			rendererHolder.release();
+			receiver.release();
 		}
 	}
 

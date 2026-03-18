@@ -127,6 +127,8 @@ public class GLHistogramTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			histogram[0].release();
 		}
 	}
 }

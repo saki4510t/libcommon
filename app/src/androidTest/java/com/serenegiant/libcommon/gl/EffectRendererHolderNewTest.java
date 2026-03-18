@@ -132,7 +132,6 @@ public class EffectRendererHolderNewTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			rendererHolder.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt.get() >= NUM_FRAMES);
 			// 受け取った映像を検証
@@ -142,6 +141,9 @@ public class EffectRendererHolderNewTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			rendererHolder.release();
+			receiver.release();
 		}
 	}
 
@@ -200,7 +202,6 @@ public class EffectRendererHolderNewTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			rendererHolder.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -214,6 +215,10 @@ public class EffectRendererHolderNewTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			rendererHolder.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -284,6 +289,7 @@ public class EffectRendererHolderNewTest {
 			fail();
 		} finally {
 			rendererHolder.release();
+			receiver.release();
 		}
 	}
 
@@ -342,7 +348,6 @@ public class EffectRendererHolderNewTest {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.removeSurface(inputSurface.hashCode());
 			source.release();
-			rendererHolder.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -356,6 +361,10 @@ public class EffectRendererHolderNewTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			rendererHolder.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -413,7 +422,6 @@ public class EffectRendererHolderNewTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.release();
-			rendererHolder.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -427,6 +435,10 @@ public class EffectRendererHolderNewTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			rendererHolder.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -516,6 +528,8 @@ public class EffectRendererHolderNewTest {
 			}
 		} finally {
 			rendererHolder.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 

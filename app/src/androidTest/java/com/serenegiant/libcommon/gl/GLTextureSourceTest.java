@@ -121,6 +121,8 @@ public class GLTextureSourceTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
 		}
 	}
 
@@ -227,6 +229,8 @@ public class GLTextureSourceTest {
 			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
 		}
 	}
 }

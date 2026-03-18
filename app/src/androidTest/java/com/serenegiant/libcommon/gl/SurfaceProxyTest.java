@@ -125,6 +125,9 @@ public class SurfaceProxyTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			receiver.release();
+			proxy.release();
 		}
 
 	}
@@ -177,6 +180,9 @@ public class SurfaceProxyTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			receiver.release();
+			proxy.release();
 		}
 	}
 

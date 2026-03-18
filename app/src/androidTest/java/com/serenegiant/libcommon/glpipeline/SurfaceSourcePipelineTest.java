@@ -139,6 +139,9 @@ public class SurfaceSourcePipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
+			proxy.release();
 		}
 	}
 }

@@ -121,6 +121,10 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 
@@ -169,6 +173,11 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
 	}
 
@@ -219,6 +228,12 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
 	}
 
@@ -283,7 +298,6 @@ public class EffectPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -291,6 +305,10 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 
@@ -357,7 +375,6 @@ public class EffectPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -365,6 +382,11 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			proxy.release();
 		}
 	}
 
@@ -433,7 +455,6 @@ public class EffectPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 //			dump(result);
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap resultBitmap = result.get();
@@ -441,6 +462,12 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			pipeline2.release();
+			pipeline3.release();
+			proxy.release();
 		}
 	}
 
@@ -503,6 +530,10 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline.release();
+			proxy.release();
 		}
 	}
 
@@ -582,7 +613,6 @@ public class EffectPipelineTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			source.release();
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
 			final Bitmap resultBitmap1 = result1.get();
@@ -593,6 +623,10 @@ public class EffectPipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			source.release();
+			pipeline1.release();
+			proxy.release();
 		}
 	}
 }

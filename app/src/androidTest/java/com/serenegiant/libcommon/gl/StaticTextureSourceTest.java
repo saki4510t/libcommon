@@ -105,6 +105,7 @@ public class StaticTextureSourceTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.removeSurface(surface.hashCode());
 			source.release();
 			assertEquals(NUM_FRAMES, cnt.get());
 			final Bitmap b = result.get();
@@ -114,8 +115,9 @@ public class StaticTextureSourceTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			receiver.release();
 		}
-		source.removeSurface(surface.hashCode());
 	}
 
 	/**
@@ -157,6 +159,8 @@ public class StaticTextureSourceTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.removeSurface(surface1.hashCode());
+			source.removeSurface(surface2.hashCode());
 			source.release();
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			final Bitmap b1 = result1.get();
@@ -173,9 +177,10 @@ public class StaticTextureSourceTest {
 			assertTrue(bitmapEquals(original, b2));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			receiver1.release();
+			receiver2.release();
 		}
-		source.removeSurface(surface1.hashCode());
-		source.removeSurface(surface2.hashCode());
 	}
 
 	@Test(timeout = 30000)
@@ -278,6 +283,9 @@ public class StaticTextureSourceTest {
 			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
+			receiver.release();
 		}
 	}
 }

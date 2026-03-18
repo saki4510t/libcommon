@@ -99,6 +99,7 @@ public class GLSurfaceCaptureTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		final GLSurfaceCapture capture = new GLSurfaceCapture(
 			manager, WIDTH, HEIGHT,
 			new ImageReader.OnImageAvailableListener<Bitmap>() {
@@ -109,6 +110,7 @@ public class GLSurfaceCaptureTest {
 					if (bitmap != null) {
 						try {
 							if (cnt.incrementAndGet() == NUM_FRAMES) {
+								requestStop.set(true);
 								result.set(Bitmap.createBitmap(bitmap));
 								sem.release();
 							}
@@ -124,13 +126,11 @@ public class GLSurfaceCaptureTest {
 		final Surface surface = capture.getSurface();
 		assertNotNull(surface);
 
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
 			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			capture.release();
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -138,6 +138,8 @@ public class GLSurfaceCaptureTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			capture.release();
 		}
 	}
 
@@ -156,6 +158,7 @@ public class GLSurfaceCaptureTest {
 		// 映像受け取り用にSurfaceReaderを生成
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
+		final AtomicBoolean requestStop = new AtomicBoolean();
 		final GLSurfaceCapture capture = new GLSurfaceCapture(
 			manager, WIDTH, HEIGHT,
 			new ImageReader.OnImageAvailableListener<Bitmap>() {
@@ -166,6 +169,7 @@ public class GLSurfaceCaptureTest {
 					if (bitmap != null) {
 						try {
 							if (cnt.incrementAndGet() == NUM_FRAMES) {
+								requestStop.set(true);
 								result.set(Bitmap.createBitmap(bitmap));
 								sem.release();
 							}
@@ -181,13 +185,11 @@ public class GLSurfaceCaptureTest {
 		final Surface surface = capture.getSurface();
 		assertNotNull(surface);
 
-		final AtomicBoolean requestStop = new AtomicBoolean();
 		inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
 		try {
 			assertTrue(sem.tryAcquire(MAX_WAIT_MS, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			capture.release();
 			final Bitmap b = result.get();
 //			dump(b);
 			assertNotNull(b);
@@ -195,6 +197,8 @@ public class GLSurfaceCaptureTest {
 			assertTrue(bitmapEquals(original, b));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			capture.release();
 		}
 	}
 }

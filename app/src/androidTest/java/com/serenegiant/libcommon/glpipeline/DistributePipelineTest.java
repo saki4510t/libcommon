@@ -114,6 +114,7 @@ public class DistributePipelineTest {
 		try {
 			// 30fpsなので約1秒以内に抜けてくるはず(多少の遅延・タイムラグを考慮して少し長めに)
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+			source.release();
 			assertEquals(NUM_FRAMES, cnt1.get());
 			assertEquals(NUM_FRAMES, cnt2.get());
 			// パイプラインを経由して読み取った映像データをビットマップに戻す
@@ -129,6 +130,10 @@ public class DistributePipelineTest {
 			assertTrue(bitmapEquals(original, resultBitmap2, true));
 		} catch (final InterruptedException e) {
 			Log.d(TAG, "interrupted", e);
+		} finally {
+			pipeline1.release();
+			pipeline2.release();
+			distributor.release();
 		}
 	}
 

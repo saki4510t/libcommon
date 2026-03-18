@@ -126,6 +126,8 @@ public class ImageTextureSourceTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
 		}
 	}
 
@@ -164,6 +166,9 @@ public class ImageTextureSourceTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
+			receiver.release();
 		}
 	}
 
@@ -266,6 +271,9 @@ public class ImageTextureSourceTest {
 			assertTrue((fps > requestFps * 0.90f) && (fps < requestFps * 1.1f));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			source.release();
+			receiver.release();
 		}
 	}
 }

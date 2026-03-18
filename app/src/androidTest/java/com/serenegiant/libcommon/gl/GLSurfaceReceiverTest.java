@@ -112,6 +112,8 @@ public class GLSurfaceReceiverTest {
 			assertTrue(bitmapEquals(original, resultBitmap, true));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			receiver.release();
 		}
 	}
 
@@ -134,38 +136,40 @@ public class GLSurfaceReceiverTest {
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(receiver);
 
-		for (int i = 0; i < 3; i++) {
-			Log.v(TAG, "surfaceReaderChangeSourceTest1:" + i);
-			cnt.set(0);
-			result.set(null);
-			final Surface surface = receiver.getSurface();
-			assertNotNull(surface);
-			final Bitmap original = BitmapHelper.makeGradientBitmap(
-				WIDTH, HEIGHT, 0xff000000 + (0x003f0000) * i, 0xffffffff, Bitmap.Config.ARGB_8888);
-//			dump(original);
+		try {
+			for (int i = 0; i < 3; i++) {
+				Log.v(TAG, "surfaceReaderChangeSourceTest1:" + i);
+				cnt.set(0);
+				result.set(null);
+				final Surface surface = receiver.getSurface();
+				assertNotNull(surface);
+				final Bitmap original = BitmapHelper.makeGradientBitmap(
+					WIDTH, HEIGHT, 0xff000000 + (0x003f0000) * i, 0xffffffff, Bitmap.Config.ARGB_8888);
+//				dump(original);
 
-			final AtomicBoolean requestStop = new AtomicBoolean();
-			inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
+				final AtomicBoolean requestStop = new AtomicBoolean();
+				inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
-			try {
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				assertFalse(resultBitmap.isRecycled());
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, resultBitmap, true));
-				resultBitmap.recycle();
-				// 映像入力用SurfaceTexture/Surfaceを強制的に再生成させる
-				receiver.reCreateInputSurface();
-			} catch (final InterruptedException e) {
-				fail();
+				try {
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					assertFalse(resultBitmap.isRecycled());
+					// 元のビットマップと同じかどうかを検証
+					assertTrue(bitmapEquals(original, resultBitmap, true));
+					resultBitmap.recycle();
+					// 映像入力用SurfaceTexture/Surfaceを強制的に再生成させる
+					receiver.reCreateInputSurface();
+				} catch (final InterruptedException e) {
+					fail();
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			receiver.release();
 		}
-
-		receiver.release();
 	}
 
 	/**
@@ -187,42 +191,44 @@ public class GLSurfaceReceiverTest {
 			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		assertNotNull(receiver);
 
-		for (int i = 0; i < 3; i++) {
-			Log.v(TAG, "surfaceReaderChangeSourceTest2:" + i);
-			cnt.set(0);
-			result.set(null);
-			// 映像受け取り用SurfaceTextureを取得する
-			final SurfaceTexture st = receiver.getSurfaceTexture();
-			assertNotNull(st);
-			final Surface surface = new Surface(st);
-			assertNotNull(surface);
-			try {
-				final Bitmap original = BitmapHelper.makeGradientBitmap(
-					WIDTH, HEIGHT, 0xff000000 + (0x003f0000) * i, 0xffffffff, Bitmap.Config.ARGB_8888);
-//				dump(original);
+		try {
+			for (int i = 0; i < 3; i++) {
+				Log.v(TAG, "surfaceReaderChangeSourceTest2:" + i);
+				cnt.set(0);
+				result.set(null);
+				// 映像受け取り用SurfaceTextureを取得する
+				final SurfaceTexture st = receiver.getSurfaceTexture();
+				assertNotNull(st);
+				final Surface surface = new Surface(st);
+				assertNotNull(surface);
+				try {
+					final Bitmap original = BitmapHelper.makeGradientBitmap(
+						WIDTH, HEIGHT, 0xff000000 + (0x003f0000) * i, 0xffffffff, Bitmap.Config.ARGB_8888);
+//					dump(original);
 
-				final AtomicBoolean requestStop = new AtomicBoolean();
-				inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
+					final AtomicBoolean requestStop = new AtomicBoolean();
+					inputImagesAsync(original, surface, NUM_FRAMES, requestStop);
 
-				assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
-				requestStop.set(true);
-				assertEquals(NUM_FRAMES, cnt.get());
-				final Bitmap resultBitmap = result.get();
-				assertNotNull(resultBitmap);
-				assertFalse(resultBitmap.isRecycled());
-				// 元のビットマップと同じかどうかを検証
-				assertTrue(bitmapEquals(original, resultBitmap, true));
-				resultBitmap.recycle();
-			} catch (final InterruptedException e) {
-				fail();
-			} finally {
-				// ここでSurfaceを破棄しないと2回目以降Canvas経由で画像を書き込もうとしたときにalready connectedの例外生成する
-				surface.release();
+					assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
+					requestStop.set(true);
+					assertEquals(NUM_FRAMES, cnt.get());
+					final Bitmap resultBitmap = result.get();
+					assertNotNull(resultBitmap);
+					assertFalse(resultBitmap.isRecycled());
+					// 元のビットマップと同じかどうかを検証
+					assertTrue(bitmapEquals(original, resultBitmap, true));
+					resultBitmap.recycle();
+				} catch (final InterruptedException e) {
+					fail();
+				} finally {
+					// ここでSurfaceを破棄しないと2回目以降Canvas経由で画像を書き込もうとしたときにalready connectedの例外生成する
+					surface.release();
+				}
+				ThreadUtils.NoThrowSleep(100L);
 			}
-			ThreadUtils.NoThrowSleep(100L);
+		} finally {
+			receiver.release();
 		}
-
-		receiver.release();
 	}
 
 }

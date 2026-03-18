@@ -130,7 +130,6 @@ public class SurfaceDistributorTest {
 		try {
 			assertTrue(sem.tryAcquire(NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			distributor.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt.get() >= NUM_FRAMES);
 			// 受け取った映像を検証
@@ -140,6 +139,9 @@ public class SurfaceDistributorTest {
 			assertTrue(bitmapEquals(original, resultBitmap));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			distributor.release();
+			receiver.release();
 		}
 	}
 
@@ -200,7 +202,6 @@ public class SurfaceDistributorTest {
 		try {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			requestStop.set(true);
-			distributor.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -214,6 +215,10 @@ public class SurfaceDistributorTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			distributor.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -286,6 +291,7 @@ public class SurfaceDistributorTest {
 			fail();
 		} finally {
 			distributor.release();
+			receiver.release();
 		}
 	}
 
@@ -348,7 +354,6 @@ public class SurfaceDistributorTest {
 			assertTrue(sem.tryAcquire(2, NUM_FRAMES * 50L, TimeUnit.MILLISECONDS));
 			source.removeSurface(inputSurface.hashCode());
 			source.release();
-			distributor.release();
 			// Surfaceが受け取った映像フレーム数を確認
 			assertTrue(cnt1.get() >= NUM_FRAMES);
 			assertTrue(cnt2.get() >= NUM_FRAMES);
@@ -362,6 +367,10 @@ public class SurfaceDistributorTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			distributor.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -437,6 +446,9 @@ public class SurfaceDistributorTest {
 			assertTrue(bitmapEquals(original, resultBitmap2));
 		} catch (final InterruptedException e) {
 			fail();
+		} finally {
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
@@ -531,6 +543,8 @@ public class SurfaceDistributorTest {
 			}
 		} finally {
 			distributor.release();
+			receiver1.release();
+			receiver2.release();
 		}
 	}
 
