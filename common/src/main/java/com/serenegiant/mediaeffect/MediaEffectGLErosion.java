@@ -200,7 +200,7 @@ public class MediaEffectGLErosion extends MediaEffectGLBase {
 		varying       vec2 vTextureCoord;
 		uniform vec2  uTexOffset[41];
 		uniform sampler2D sTexture;
-		void main() "{
+		void main() {
 			vec4 minValue = texture2D(sTexture, vTextureCoord + uTexOffset[0]);
 			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[1]));
 			minValue = min(minValue, texture2D(sTexture, vTextureCoord + uTexOffset[2]));
