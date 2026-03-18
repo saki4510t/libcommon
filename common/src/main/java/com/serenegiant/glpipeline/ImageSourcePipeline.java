@@ -60,15 +60,7 @@ public class ImageSourcePipeline extends ProxyPipeline implements GLPipelineSour
 		@Nullable final Bitmap bitmap, @Nullable final Fraction fps) {
 		super();
 		if (DEBUG) Log.v(TAG, "コンストラクタ:" + bitmap);
-		mSource = new GLTextureSource(manager, bitmap, fps, new GLFrameAvailableCallback() {
-			@Override
-			public void onFrameAvailable(
-				final boolean isGLES3, final boolean isOES,
-				final int width, final int height,
-				final int texId, @NonNull final float[] texMatrix) {
-				ImageSourcePipeline.this.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
-			}
-		});
+		mSource = new GLTextureSource(manager, bitmap, fps, this);
 	}
 
 	/**
