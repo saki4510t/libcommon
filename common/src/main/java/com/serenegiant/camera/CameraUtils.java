@@ -31,6 +31,7 @@ import android.view.SurfaceView;
 import android.view.View;
 
 import com.serenegiant.gl.WrappedSurfaceHolder;
+import com.serenegiant.graphics.ImageFormatUtils;
 import com.serenegiant.view.ViewUtils;
 
 import java.io.IOException;
@@ -404,28 +405,7 @@ cameraLoop:
 	public static void dumpSupportedPictureFormats(@NonNull final Camera.Parameters params) {
 		final List<Integer> formats = params.getSupportedPictureFormats();
 		for (final int format: formats) {
-			switch (format) {
-			case ImageFormat.DEPTH16 -> Log.i(TAG, "supported: DEPTH16");
-			case ImageFormat.DEPTH_POINT_CLOUD -> Log.i(TAG, "supported: DEPTH_POINT_CLOUD");
-			case ImageFormat.FLEX_RGBA_8888 -> Log.i(TAG, "supported: FLEX_RGBA_8888");
-			case ImageFormat.FLEX_RGB_888 -> Log.i(TAG, "supported: FLEX_RGB_888");
-			case ImageFormat.JPEG -> Log.i(TAG, "supported: JPEG");
-			case ImageFormat.NV16 -> Log.i(TAG, "supported: NV16");
-			case ImageFormat.NV21 -> Log.i(TAG, "supported: NV21");
-			case ImageFormat.PRIVATE -> Log.i(TAG, "supported: PRIVATE");
-			case ImageFormat.RAW10 -> Log.i(TAG, "supported: RAW10");
-			case ImageFormat.RAW12 -> Log.i(TAG, "supported: RAW12");
-			case ImageFormat.RAW_PRIVATE -> Log.i(TAG, "supported: RAW_PRIVATE");
-			case ImageFormat.RAW_SENSOR -> Log.i(TAG, "supported: RAW_SENSOR");
-			case ImageFormat.RGB_565 -> Log.i(TAG, "supported: RGB_565");
-			case ImageFormat.UNKNOWN -> Log.i(TAG, "supported: UNKNOWN");
-			case ImageFormat.YUV_420_888 -> Log.i(TAG, "supported: YUV_420_888");
-			case ImageFormat.YUV_422_888 -> Log.i(TAG, "supported: YUV_422_888");
-			case ImageFormat.YUV_444_888 -> Log.i(TAG, "supported: YUV_444_888");
-			case ImageFormat.YUY2 -> Log.i(TAG, "supported: YUY2");
-			case ImageFormat.YV12 -> Log.i(TAG, "supported: YV12");
-			default -> Log.i(TAG, String.format("supported: unknown, %08x", format));
-			}
+			Log.i(TAG, "picture: " + ImageFormatUtils.toImageFormatString(format));
 		}
 	}
 
@@ -436,28 +416,7 @@ cameraLoop:
 	public static void dumpSupportedPreviewFormats(@NonNull final Camera.Parameters params) {
 		final List<Integer> formats = params.getSupportedPreviewFormats();
 		for (final int format: formats) {
-			switch (format) {
-			case ImageFormat.DEPTH16 -> Log.i(TAG, "supported: DEPTH16");
-			case ImageFormat.DEPTH_POINT_CLOUD -> Log.i(TAG, "supported: DEPTH_POINT_CLOUD");
-			case ImageFormat.FLEX_RGBA_8888 -> Log.i(TAG, "supported: FLEX_RGBA_8888");
-			case ImageFormat.FLEX_RGB_888 -> Log.i(TAG, "supported: FLEX_RGB_888");
-			case ImageFormat.JPEG -> Log.i(TAG, "supported: JPEG");
-			case ImageFormat.NV16 -> Log.i(TAG, "supported: NV16");
-			case ImageFormat.NV21 -> Log.i(TAG, "supported: NV21");
-			case ImageFormat.PRIVATE -> Log.i(TAG, "supported: PRIVATE");
-			case ImageFormat.RAW10 -> Log.i(TAG, "supported: RAW10");
-			case ImageFormat.RAW12 -> Log.i(TAG, "supported: RAW12");
-			case ImageFormat.RAW_PRIVATE -> Log.i(TAG, "supported: RAW_PRIVATE");
-			case ImageFormat.RAW_SENSOR -> Log.i(TAG, "supported: RAW_SENSOR");
-			case ImageFormat.RGB_565 -> Log.i(TAG, "supported: RGB_565");
-			case ImageFormat.UNKNOWN -> Log.i(TAG, "supported: UNKNOWN");
-			case ImageFormat.YUV_420_888 -> Log.i(TAG, "supported: YUV_420_888");
-			case ImageFormat.YUV_422_888 -> Log.i(TAG, "supported: YUV_422_888");
-			case ImageFormat.YUV_444_888 -> Log.i(TAG, "supported: YUV_444_888");
-			case ImageFormat.YUY2 -> Log.i(TAG, "supported: YUY2");
-			case ImageFormat.YV12 -> Log.i(TAG, "supported: YV12");
-			default -> Log.i(TAG, String.format("supported: unknown, %08x", format));
-			}
+			Log.i(TAG, "preview: " + ImageFormatUtils.toImageFormatString(format));
 		}
 	}
 }
