@@ -28,6 +28,7 @@
 	<string name="title_usb_permission" translatable="false">UsbDetector+UsbPermission</string>
 	<string name="title_window_insets" translatable="false">WindowInsets</string>
 	<string name="title_audio_record" translatable="false">AudioRecord</string>
+	<string name="title_camera_info" translatable="false">CameraInfo</string>
 	<string name="title_camera" translatable="false">Camera</string>
 	<string name="title_camera_rec" translatable="false">Camera(MediaAVRecorder)</string>
 	<string name="title_camera_rec_split" translatable="false">Camera(SplitRec)</string>
@@ -70,6 +71,7 @@
 		<item>@string/title_window_insets</item>
 		<item>@string/title_audio_record</item>
 		<item>@string/title_color_picker</item>
+		<item>@string/title_camera_info</item>
 		<item>@string/title_camera</item>
 		<item>@string/title_camera_rec</item>
 		<item>@string/title_camera_rec_split</item>

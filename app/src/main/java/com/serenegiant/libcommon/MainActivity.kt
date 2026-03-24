@@ -211,6 +211,14 @@ class MainActivity
 			R.string.title_color_picker -> {
 				fragment = ColorPickerFragment.newInstance()
 			}
+			R.string.title_camera_info -> {
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraInfoFragment.newInstance()
+			}
 			R.string.title_camera -> {	// Camera
 				if (!checkPermissionCamera()
 					|| !checkPermissionWriteExternalStorage()
