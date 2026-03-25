@@ -638,7 +638,7 @@ public abstract class AbstractRendererHolder implements IRendererHolder {
 		protected void handleResize(final int width, final int height) {
 			if (DEBUG) Log.v(TAG, String.format("handleResize:(%d,%d)", width, height));
 			super.handleResize(width, height);
-			if (BuildCheck.isAndroid4_1()) {
+			if (BuildCheck.isAndroid4_1() && (mInputTexture != null)) {
 				mInputTexture.setDefaultBufferSize(width, height);
 			}
 		}

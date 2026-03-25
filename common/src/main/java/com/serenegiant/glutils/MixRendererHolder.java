@@ -401,11 +401,13 @@ public class MixRendererHolder extends AbstractRendererHolder {
 		protected void handleResize(final int width, final int height) {
 			super.handleResize(width, height);
 			if (DEBUG) Log.v(TAG, String.format("handleResize:(%dx%d)", width, height));
-			if (mMasterTexture2 != null) {
-				mMasterTexture2.setDefaultBufferSize(width(), height());
-			}
-			if (mMaskTexture != null) {
-				mMaskTexture.setDefaultBufferSize(width(), height());
+			if (BuildCheck.isAndroid4_1()) {
+				if (mMasterTexture2 != null) {
+					mMasterTexture2.setDefaultBufferSize(width(), height());
+				}
+				if (mMaskTexture != null) {
+					mMaskTexture.setDefaultBufferSize(width(), height());
+				}
 			}
 		}
 

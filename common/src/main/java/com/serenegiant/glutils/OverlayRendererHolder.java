@@ -32,6 +32,7 @@ import com.serenegiant.egl.EGLBase;
 import com.serenegiant.egl.EGLConst;
 import com.serenegiant.gl.GLDrawer2D;
 import com.serenegiant.gl.GLUtils;
+import com.serenegiant.system.BuildCheck;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -298,7 +299,7 @@ public class OverlayRendererHolder extends AbstractRendererHolder {
 		protected void handleResize(final int width, final int height) {
 			super.handleResize(width, height);
 			if (DEBUG) Log.v(TAG, String.format("handleResize:(%dx%d)", width, height));
-			if (mOverlayTexture != null) {
+			if (BuildCheck.isAndroid4_1() && (mOverlayTexture != null)) {
 				mOverlayTexture.setDefaultBufferSize(width(), height());
 			}
 		}
