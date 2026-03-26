@@ -95,7 +95,7 @@ public class CameraUtils implements CameraConst {
 	public static Camera setupCamera(@NonNull final Context context,
 		 final int face, final int width, final int height) throws IOException {
 
-		final int cameraId = findCamera(CameraConst.FACING_BACK);
+		final int cameraId = findCamera(face);
 		final Camera camera = Camera.open(cameraId);
 		final Camera.Parameters params = camera.getParameters();
 		if (params != null) {
