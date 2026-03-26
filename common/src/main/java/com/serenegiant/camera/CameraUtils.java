@@ -86,17 +86,15 @@ public class CameraUtils implements CameraConst {
 	 * カメラを初期化する
 	 *
 	 * @param context
-	 * @param face
+	 * @param cameraId
+	 * @param camera
 	 * @param width
 	 * @param height
 	 * @return
-	 * @throws IOException
 	 */
 	public static Camera setupCamera(@NonNull final Context context,
-		 final int face, final int width, final int height) throws IOException {
+		final int cameraId, @NonNull final Camera camera, final int width, final int height) {
 
-		final int cameraId = findCamera(face);
-		final Camera camera = Camera.open(cameraId);
 		final Camera.Parameters params = camera.getParameters();
 		if (params != null) {
 			final List<String> focusModes = params.getSupportedFocusModes();
@@ -120,6 +118,28 @@ public class CameraUtils implements CameraConst {
 				previewSize.width, previewSize.height, fps[0], fps[1]));
 		}
 		return camera;
+	}
+
+	/**
+	 * カメラを初期化する
+	 *
+	 * @param context
+	 * @param face
+	 * @param width
+	 * @param height
+	 * @return
+	 * @throws IOException
+	 */
+	public static Camera setupCamera(@NonNull final Context context,
+		 final int face, final int width, final int height) throws IOException {
+
+		final int cameraId = findCamera(face);
+		final Camera camera = Camera.open(cameraId);
+		if (camera != null) {
+			return setupCamera(context, cameraId, camera, width, height);
+		} else {
+			return camera;
+		}
 	}
 
 	/**
