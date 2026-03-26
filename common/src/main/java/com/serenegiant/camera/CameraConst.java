@@ -18,8 +18,6 @@ package com.serenegiant.camera;
  *  limitations under the License.
 */
 
-import android.hardware.Camera;
-
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -30,10 +28,8 @@ import androidx.annotation.IntDef;
  */
 public interface CameraConst {
 	public static final int FACING_UNSPECIFIED = -1;
-	@SuppressWarnings("deprecation")
-	public static final int FACING_BACK = Camera.CameraInfo.CAMERA_FACING_BACK;
-	@SuppressWarnings("deprecation")
-	public static final int FACING_FRONT = Camera.CameraInfo.CAMERA_FACING_FRONT;
+	public static final int FACING_BACK = 0; // Camera.CameraInfo.CAMERA_FACING_BACK;
+	public static final int FACING_FRONT = 1; // Camera.CameraInfo.CAMERA_FACING_FRONT;
 
 	@IntDef({
 		FACING_UNSPECIFIED,
