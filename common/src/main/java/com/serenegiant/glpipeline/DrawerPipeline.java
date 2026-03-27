@@ -214,15 +214,20 @@ public class DrawerPipeline extends ProxyPipeline
 		@Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "setSurface:" + surface);
-		if (!isValid()) {
-			throw new IllegalStateException("already released?");
-		}
 		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(() -> {
-			createTargetOnGL(surface, maxFps);
-		});
+		if (isValid()) {
+			mManager.runOnGLThread(() -> {
+				try {
+					createTargetOnGL(surface, maxFps);
+				} catch (final Exception e) {
+					/*if (DEBUG)*/ Log.v(TAG, "setSurface:", e);
+				}
+			});
+		} else {
+			throw new IllegalStateException("already released?");
+		}
 	}
 
 	/**
@@ -486,6 +491,8 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (!mPathThrough) {
 				if (DEBUG) Log.v(TAG, String.format("reCreateTargetOnGL:create GLSurface as offscreen(%dx%d)", getWidth(), getHeight()));
+				// FIXME setSurfaceから呼ばれたとときにglコンテキストが無くなっていて
+				//       フレームバッファ生成が正常に実行できずクラッシュするときがある
 				mOffscreenSurface = GLOffscreen.newInstance(
 					mManager.isGLES3(), GLES20.GL_TEXTURE0,
 					getWidth(), getHeight());
