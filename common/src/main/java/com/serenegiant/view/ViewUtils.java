@@ -169,6 +169,7 @@ public class ViewUtils {
 
 	/**
 	 * 画面の回転状態を取得
+	 * 端末の物理的な向きではない。例えばスマホで縦画面固定にしていれば端末をどの方向に回転させても常にSurface.ROTATION_0
 	 * @param view
 	 * @return Surface.ROTATION_0, Surface.ROTATION_90, Surface.ROTATION_180, Surface.ROTATION_270のいずれか
 	 */
@@ -189,6 +190,7 @@ public class ViewUtils {
 
 	/**
 	 * 画面の回転状態を取得
+	 * 端末の物理的な向きではない。例えばスマホで縦画面固定にしていれば端末をどの方向に回転させても常にSurface.ROTATION_0
 	 * @param context
 	 * @return Surface.ROTATION_0, Surface.ROTATION_90, Surface.ROTATION_180, Surface.ROTATION_270のいずれか
 	 */
@@ -203,6 +205,7 @@ public class ViewUtils {
 
 	/**
 	 * 画面の回転状態を角度として取得
+	 * 端末の物理的な向きではない。例えばスマホで縦画面固定にしていれば端末をどの方向に回転させても常に0[度]
 	 * @param view
 	 * @return 0, 90, 180, 270[度]
 	 */
@@ -212,6 +215,7 @@ public class ViewUtils {
 
 	/**
 	 * 画面の回転状態を角度として取得
+	 * 端末の物理的な向きではない。例えばスマホで縦画面固定にしていれば端末をどの方向に回転させても常に0[度]
 	 * @param context
 	 * @return 0, 90, 180, 270[度]
 	 */
@@ -220,11 +224,11 @@ public class ViewUtils {
 	}
 
 	/**
-	 * 画面の回転状態から回転角度を取得
+	 * 画面の回転状態(Surface.ROTATION_XX)から回転角度を取得
 	 * @param rotation
-	 * @return
+	 * @return 0, 90, 180, 270[度]
 	 */
-	private static int rotation2Degrees(@Rotation final int rotation) {
+	public static int rotation2Degrees(@Rotation final int rotation) {
 		final int degrees = switch (rotation) {
 			case Surface.ROTATION_0 -> 0;
 			case Surface.ROTATION_90 -> 90;

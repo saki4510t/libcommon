@@ -335,6 +335,8 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * マスターコンテキストを選択
+	 * XXX 何も描画しないとハングアップする端末があるので実行内容上描画不要な場合でも
+	 *      最低でもglClearで塗りつぶすなどしないといけない
 	 * @throws IllegalStateException
 	 */
 	@WorkerThread
@@ -353,6 +355,8 @@ public class GLContext implements EGLConst {
 
 	/**
 	 * マスターコンテキストをswap
+	 * XXX 何も描画しないとハングアップする端末があるので実行内容上描画不要な場合でも
+	 *      最低でもglClearで塗りつぶすなどしないといけない
 	 * @throws IllegalStateException
 	 */
 	@WorkerThread

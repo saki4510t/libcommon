@@ -420,6 +420,8 @@ public class GLManager {
 
 	/**
 	 * GLContext#makeDefaultを呼び出すためのヘルパーメソッド
+	 * XXX 何も描画しないとハングアップする端末があるので実行内容上描画不要な場合でも
+	 *      最低でもglClearで塗りつぶすなどしないといけない
 	 * @throws IllegalStateException
 	 */
 	public void makeDefault() throws IllegalStateException {
@@ -447,6 +449,8 @@ public class GLManager {
 
 	/**
 	 * GLContext#swapを呼び出すためのヘルパーメソッド
+	 * XXX 何も描画しないとハングアップする端末があるので実行内容上描画不要な場合でも
+	 *      最低でもglClearで塗りつぶすなどしないといけない
 	 * @throws IllegalStateException
 	 */
 	public void swap() throws IllegalStateException {
