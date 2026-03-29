@@ -124,7 +124,9 @@ cameraLoop:
 				}
 			}
 			if (!TextUtils.isEmpty(cameraId)) {
-				info = new CameraInfo(cameraId, face, orientation,
+				info = new CameraInfo(cameraId,
+					face == CameraCharacteristics.LENS_FACING_BACK ? FACING_BACK : FACING_FRONT,
+					orientation,
 					CameraConst.DEFAULT_WIDTH, CameraConst.DEFAULT_HEIGHT);
 			}
 		}
@@ -175,12 +177,12 @@ cameraLoop:
 		@NonNull final Class<?> clazz)
 			throws CameraAccessException {
 
-		if (DEBUG) Log.v(TAG, String.format("findCamera:preferedFace=%d,Size(%dx%d),degrees=%d",
-			preferedFace, width, height, degrees));
+		if (DEBUG) Log.v(TAG, String.format("findCamera:preferedFace=%s/%d,Size(%dx%d),degrees=%d",
+			CameraConst.faceString(preferedFace), preferedFace, width, height, degrees));
 
 		String cameraId = null;
 		Size previewSize = null;
-		int targetFace = -1;
+		int cameraFace = -1;	// これはCameraCharacteristics.LENS_FACING_XXX
 		int orientation = 0;
 		final String[] cameraIds = manager.getCameraIdList();
 		if ((cameraIds != null) && (cameraIds.length > 0)) {
@@ -188,23 +190,26 @@ cameraLoop:
 				? CameraCharacteristics.LENS_FACING_BACK
 				: CameraCharacteristics.LENS_FACING_FRONT);
 			boolean triedAllCameras = false;
-			targetFace = face;
+			cameraFace = face;
 cameraLoop:
 			for (; !triedAllCameras ;) {
 				for (final String id: cameraIds) {
 					final CameraCharacteristics characteristics
 						= manager.getCameraCharacteristics(id);
-					if (characteristics.get(CameraCharacteristics.LENS_FACING) == targetFace) {
+					if ((characteristics.get(CameraCharacteristics.LENS_FACING) == cameraFace)
+						&& StreamConfigurationMap.isOutputSupportedFor(clazz)) {
 						final StreamConfigurationMap map = characteristics.get(
 								CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
 						previewSize = chooseOptimalSize(characteristics, map, width, height, degrees, clazz);
-						orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-						cameraId = id;
-						break cameraLoop;
+						if (previewSize != null) {
+							orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+							cameraId = id;
+							break cameraLoop;
+						}
 					}
 				}
-				if ((cameraId == null) && (targetFace == face)) {
-					targetFace = (face == CameraCharacteristics.LENS_FACING_BACK
+				if ((cameraId == null) && (cameraFace == face)) {
+					cameraFace = (face == CameraCharacteristics.LENS_FACING_BACK
 						? CameraCharacteristics.LENS_FACING_FRONT
 						: CameraCharacteristics.LENS_FACING_BACK);
 				} else {
@@ -213,7 +218,9 @@ cameraLoop:
 			}
 		}
 		if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
-			return new CameraInfo(cameraId, targetFace, orientation,
+			return new CameraInfo(cameraId,
+				cameraFace == CameraCharacteristics.LENS_FACING_BACK ? FACING_BACK : FACING_FRONT,
+				orientation,
 				previewSize.getWidth(), previewSize.getHeight());
 		}
 		if (DEBUG) Log.w(TAG, "findCamera: not found");
@@ -266,17 +273,20 @@ cameraLoop:
 			String.format("chooseOptimalSize:Size(%dx%d),targetFace=%d,degrees=%d",
 				width, height, targetFace, degrees));
 
-		final CameraCharacteristics characteristics
-			= manager.getCameraCharacteristics(cameraId);
-		final StreamConfigurationMap map = characteristics.get(
+		if (StreamConfigurationMap.isOutputSupportedFor(clazz)) {
+			final CameraCharacteristics characteristics
+				= manager.getCameraCharacteristics(cameraId);
+			final StreamConfigurationMap map = characteristics.get(
 				CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-		final Size previewSize
-			= chooseOptimalSize(characteristics, map, width, height, degrees, clazz);
-		final int orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
-		if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
-			return new CameraInfo(cameraId, targetFace, orientation,
-				previewSize.getWidth(), previewSize.getHeight());
+			final Size previewSize
+				= chooseOptimalSize(characteristics, map, width, height, degrees, clazz);
+			final int orientation = characteristics.get(CameraCharacteristics.SENSOR_ORIENTATION);
+			if (!TextUtils.isEmpty(cameraId) && (previewSize != null)) {
+				return new CameraInfo(cameraId, targetFace, orientation,
+					previewSize.getWidth(), previewSize.getHeight());
+			}
 		}
+
 		return null;
 	}
 
@@ -348,69 +358,71 @@ cameraLoop:
 		Size selectedSize = null;
 		long areas;
 
-		// SurfaceTextureへの描画用の解像度を一覧を取得
-		sizes = map.getOutputSizes(clazz);
-		if (DEBUG) { for (final Size sz : sizes) { Log.v(TAG, "chooseOptimalSize:getOutputSizes(SurfaceTexture)=" + sz); } }
+		if (StreamConfigurationMap.isOutputSupportedFor(clazz)) {
+			// 指定したクラスへの描画用の解像度を一覧を取得
+			sizes = map.getOutputSizes(clazz);
+			if (DEBUG) { for (final Size sz : sizes) { Log.v(TAG, "chooseOptimalSize:getOutputSizes(SurfaceTexture)=" + sz); } }
 
-		// サイズが一致するものを探す
-		for (Size sz : sizes) {
-			if ((sz.getWidth() == videoWidth) && (sz.getHeight() == videoHeight)) {
-				selectedSize = sz;
-				if (DEBUG) Log.v(TAG, "chooseOptimalSize:found(" + selectedSize + ")");
-				return selectedSize;
-			}
-		}
-
-		final List<Size> possible = new ArrayList<Size>();
-		if (selectedSize == null) {
-			// 指定幅と同じでアスペクト比の小さいものを探す
+			// サイズが一致するものを探す
 			for (Size sz : sizes) {
-				a = sz.getWidth() / (double)sz.getHeight();
-				areas = sz.getWidth() * (long)sz.getHeight();
-				r = Math.abs(a - aspect) / aspect;
+				if ((sz.getWidth() == videoWidth) && (sz.getHeight() == videoHeight)) {
+					selectedSize = sz;
+					if (DEBUG) Log.v(TAG, "chooseOptimalSize:found(" + selectedSize + ")");
+					return selectedSize;
+				}
+			}
+
+			final List<Size> possible = new ArrayList<Size>();
+			if (selectedSize == null) {
+				// 指定幅と同じでアスペクト比の小さいものを探す
+				for (Size sz : sizes) {
+					a = sz.getWidth() / (double)sz.getHeight();
+					areas = sz.getWidth() * (long)sz.getHeight();
+					r = Math.abs(a - aspect) / aspect;
 //				if (DEBUG) Log.v(TAG, String.format("getOutputSizes(SurfaceTexture):%dx%d,a=%6.4f,r=%6.4f",
 //					sz.getWidth(), sz.getHeight(), a, r));
-				// 画素数が指定値以下でアスペクト比の差が0.2未満のを保存しておく
-				if ((r < 0.2) && (areas <= max_areas)) {
-					possible.add(sz);
-				}
-				// 指定幅と同じであればよりアスペクト比の差が小さいものを保持する
-				if (sz.getWidth() == videoWidth) {
-					if (r < selectedDelta) {
-						selectedSize = sz;
-						selectedDelta = r;
+					// 画素数が指定値以下でアスペクト比の差が0.2未満のを保存しておく
+					if ((r < 0.2) && (areas <= max_areas)) {
+						possible.add(sz);
+					}
+					// 指定幅と同じであればよりアスペクト比の差が小さいものを保持する
+					if (sz.getWidth() == videoWidth) {
+						if (r < selectedDelta) {
+							selectedSize = sz;
+							selectedDelta = r;
+						}
 					}
 				}
 			}
-		}
 
-		// 指定幅と同じでアスペクト比の差が5%未満のものがなければ高さ基準で再度探す
-		if ((selectedSize == null) || (selectedDelta >= 0.05)) {
-			// heightが同じでアスペクト比が+/-5%未満のを探す
-			selectedDelta = Double.MAX_VALUE;
-			selectedSize = null;
-			for (Size sz : sizes) {
-				if (sz.getWidth() == videoWidth) {
-					a = sz.getWidth() / (double)sz.getHeight();
-					r = Math.abs(a - aspect) / aspect;
-					if (r < selectedDelta) {
-						selectedSize = sz;
-						selectedDelta = r;
+			// 指定幅と同じでアスペクト比の差が5%未満のものがなければ高さ基準で再度探す
+			if ((selectedSize == null) || (selectedDelta >= 0.05)) {
+				// heightが同じでアスペクト比が+/-5%未満のを探す
+				selectedDelta = Double.MAX_VALUE;
+				selectedSize = null;
+				for (Size sz : sizes) {
+					if (sz.getWidth() == videoWidth) {
+						a = sz.getWidth() / (double)sz.getHeight();
+						r = Math.abs(a - aspect) / aspect;
+						if (r < selectedDelta) {
+							selectedSize = sz;
+							selectedDelta = r;
+						}
 					}
 				}
 			}
-		}
-		// アスペクト比の差が+/-5%未満のがあればそれを選択する
-		if ((selectedSize != null) && (selectedDelta < 0.05)) {
-			if (DEBUG) Log.d(TAG, String.format("chooseOptimalSize:select(%dx%d), request(%d,%d)",
-				selectedSize.getWidth(), selectedSize.getHeight(), videoWidth, videoHeight));
-			return selectedSize;
-		}
-		// アスペクト比の差が0.2未満の中で最大解像度を取得する
-		try {
-			selectedSize = Collections.max(possible, new CompareSizesByArea());
-		} catch (Exception e) {
-			if (DEBUG) Log.w(TAG, e);
+			// アスペクト比の差が+/-5%未満のがあればそれを選択する
+			if ((selectedSize != null) && (selectedDelta < 0.05)) {
+				if (DEBUG) Log.d(TAG, String.format("chooseOptimalSize:select(%dx%d), request(%d,%d)",
+					selectedSize.getWidth(), selectedSize.getHeight(), videoWidth, videoHeight));
+				return selectedSize;
+			}
+			// アスペクト比の差が0.2未満の中で最大解像度を取得する
+			try {
+				selectedSize = Collections.max(possible, new CompareSizesByArea());
+			} catch (Exception e) {
+				if (DEBUG) Log.w(TAG, e);
+			}
 		}
 		// ここまで見つからなければMediaCodec用の最大解像度を使う・・・1080p以下に制限した方が良いかもしれない
 		if (selectedSize == null) {

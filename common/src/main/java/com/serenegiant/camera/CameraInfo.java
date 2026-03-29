@@ -61,7 +61,9 @@ public final class CameraInfo {
 	 * @param height
 	 */
 	public CameraInfo(
-		final String id, final int face, final int orientation,
+		final String id,
+		@CameraConst.FaceType final int face,
+		final int orientation,
 		final int width, final int height) {
 
 		this.id = id;
@@ -77,7 +79,10 @@ public final class CameraInfo {
 	 * @param face
 	 * @param orientation
 	 */
-	public CameraInfo(final String id, final int face, final int orientation) {
+	public CameraInfo(
+		final String id,
+		@CameraConst.FaceType final int face,
+		final int orientation) {
 		this.id = id;
 		this.face = face;
 		this.orientation = orientation;
@@ -92,7 +97,9 @@ public final class CameraInfo {
 	 * @param height
 	 */
 	public void set(
-		final String id, final int face, final int orientation,
+		final String id,
+		@CameraConst.FaceType final int face,
+		final int orientation,
 		final int width, final int height) {
 
 		this.id = id;
@@ -109,6 +116,7 @@ public final class CameraInfo {
 	public void set(@Nullable final CameraInfo other) {
 		if (other == null) {
 			id = null;
+			face = CameraConst.FACING_UNSPECIFIED;
 			width = height = 0;
 			canDisableShutterSound = false;
 		} else if (other != this) {
