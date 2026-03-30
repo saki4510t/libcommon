@@ -162,15 +162,20 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 		@Nullable final Fraction maxFps) throws IllegalStateException, IllegalArgumentException {
 
 		if (DEBUG) Log.v(TAG, "setSurface:" + surface);
-		if (!isValid()) {
-			throw new IllegalStateException("already released?");
-		}
 		if ((surface != null) && !RendererTarget.isSupportedSurface(surface)) {
 			throw new IllegalArgumentException("Unsupported surface type!," + surface);
 		}
-		mManager.runOnGLThread(() -> {
-			createTargetOnGL(surface, maxFps);
-		});
+		if (isValid()) {
+			mManager.runOnGLThread(() -> {
+				try {
+					createTargetOnGL(surface, maxFps);
+				} catch (final Exception e) {
+					/*if (DEBUG)*/ Log.v(TAG, "setSurface:", e);
+				}
+			});
+		} else {
+			throw new IllegalStateException("already released?");
+		}
 	}
 
 	@Override
@@ -249,7 +254,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 
 		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 		if (isValid()) {
-			if ((mDrawer == null) || isOES != mDrawer.isOES()) {
+			if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
 					mDrawer.release();
@@ -257,16 +262,24 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				if (DEBUG) Log.v(TAG, "onFrameAvailable:create GLDrawer2D");
 				mDrawer = mDrawerFactory.create(isGLES3, isOES);
 				mDrawer.setMvpMatrix(mMvpMatrix, 0);
+				if (!isOES) {
+					// XXX DrawerPipelineTestでGL_TEXTURE_2D/GL_TEXTURE_EXTERNAL_OESを映像ソースとして
+					//     GLUtils#glCopyTextureToBitmapでBitmap変換時のテクスチャ変換行列適用と
+					//     DrawerPipelineを0, 1, 2, 3個連結した場合の結果から全ての組み合わせでテストが通るのは、
+					//     GLUtils#glCopyTextureToBitmapとは逆で、
+					//     ・GL_TEXTURE_EXTERNAL_OESの時はそのまま
+					//     ・GL_TEXTURE_2Dの時は上下反転させないとだめみたい
+					mDrawer.setMirror(MIRROR_VERTICAL);
+				}
 				if (mDrawer instanceof GLEffectDrawer2D) {
 					((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
 				}
 			}
-			@NonNull
 			final GLDrawer2D drawer = mDrawer;
 			@Nullable
 			final RendererTarget target = mRendererTarget;
-			if ((target != null)
-				&& target.canDraw()) {
+			if ((drawer != null)
+				&& (target != null) && target.canDraw()) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
@@ -311,7 +324,7 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 				mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);
 		}
 		if (mRendererTarget != null) {
-			mRendererTarget.setMirror(mMirror);
+			mRendererTarget.setMirror(IMirror.flipVertical(mMirror));
 			mLock.lock();
 			try {
 				mSurfaceId = mRendererTarget.getId();
