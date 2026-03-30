@@ -451,6 +451,7 @@ public class DrawerPipeline extends ProxyPipeline
 			mOffscreenSurface = null;
 		}
 		mPathThrough = true;
+		mManager.makeDefault();
 	}
 
 	/**
@@ -491,8 +492,6 @@ public class DrawerPipeline extends ProxyPipeline
 			}
 			if (!mPathThrough) {
 				if (DEBUG) Log.v(TAG, String.format("reCreateTargetOnGL:create GLSurface as offscreen(%dx%d)", getWidth(), getHeight()));
-				// FIXME setSurfaceから呼ばれたとときにglコンテキストが無くなっていて
-				//       フレームバッファ生成が正常に実行できずクラッシュするときがある
 				mOffscreenSurface = GLOffscreen.newInstance(
 					mManager.isGLES3(), GLES20.GL_TEXTURE0,
 					getWidth(), getHeight());

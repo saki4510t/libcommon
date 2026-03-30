@@ -498,6 +498,7 @@ public class SurfaceDrawable extends Drawable {
 			mOffscreenSurface.release();
 			mOffscreenSurface = null;
 		}
+		mGlManager.makeDefault();
 	}
 
 	/**

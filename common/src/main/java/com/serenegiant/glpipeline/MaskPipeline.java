@@ -369,6 +369,7 @@ public class MaskPipeline extends ProxyPipeline implements GLSurfacePipeline {
 				work.release();
 				work = null;
 			}
+			mManager.makeDefault();
 			if (RendererTarget.isSupportedSurface(surface)) {
 				mRendererTarget = RendererTarget.newInstance(
 					mManager.getEgl(), surface, maxFps != null ? maxFps.asFloat() : 0);

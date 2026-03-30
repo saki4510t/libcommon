@@ -273,6 +273,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				mWorkBitmap.recycle();
 				mWorkBitmap = null;
 			}
+			mManager.makeDefault();
 			if (DEBUG) Log.v(TAG, "createTarget:create IEglSurface as work offscreen");
 			offscreen = mManager.getEgl().createOffscreen(width, height);
 			mRendererTarget = RendererTarget.newInstance(
@@ -333,6 +334,7 @@ public class FaceDetectPipeline extends ProxyPipeline {
 				Log.w(TAG, "releaseTarget:unexpectedly GLManager is already released!");
 			}
 		}
+		mManager.makeDefault();
 	}
 
 	/**

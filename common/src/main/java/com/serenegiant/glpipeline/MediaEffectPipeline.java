@@ -541,6 +541,7 @@ public class MediaEffectPipeline extends ProxyPipeline
 			mSurfaceTarget = null;
 		}
 		mPathThrough = true;
+		mManager.makeDefault();
 	}
 
 	/**

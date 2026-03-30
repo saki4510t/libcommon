@@ -650,6 +650,7 @@ public abstract class SurfaceProxy implements GLConst, IMirror {
 					Log.w(TAG, "releaseTargetOnGL:unexpectedly GLManager is already released!");
 				}
 			}
+			mManager.makeDefault();
 		}
 	}
 }

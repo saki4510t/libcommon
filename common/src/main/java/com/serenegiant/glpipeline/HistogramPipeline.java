@@ -382,6 +382,7 @@ public class HistogramPipeline extends ProxyPipeline
 			mOffscreenSurface = null;
 		}
 		mPathThrough = true;
+		mManager.makeDefault();
 	}
 
 	/**

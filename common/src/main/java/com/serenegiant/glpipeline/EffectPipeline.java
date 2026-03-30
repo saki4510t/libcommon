@@ -584,6 +584,7 @@ public class EffectPipeline extends ProxyPipeline
 			mOffscreenSurface = null;
 		}
 		mPathThrough = true;
+		mManager.makeDefault();
 	}
 
 	/**
