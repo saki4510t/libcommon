@@ -28,6 +28,7 @@ import com.serenegiant.graphics.MatrixUtils;
 import com.serenegiant.utils.BufferHelper;
 
 import java.nio.FloatBuffer;
+import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -158,6 +159,10 @@ public class GLDrawer2D implements GLConst {
 	}
 
 	/**
+	 * モデルビュー変換行列の排他制御用
+	 */
+	private final ReentrantLock mLock = new ReentrantLock();
+	/**
 	 * 頂点座標用バッファオブジェクト名
 	 */
 	private int mBufVertex = GL_NO_BUFFER;
@@ -216,7 +221,7 @@ public class GLDrawer2D implements GLConst {
 	/**
 	 * モデルビュー変換行列
 	 */
-	@Size(min=16)
+	@Size(value=16)
     @NonNull
 	private final float[] mMvpMatrix = new float[16];
 	/**
@@ -301,7 +306,12 @@ public class GLDrawer2D implements GLConst {
 	 * @return
 	 */
 	public GLDrawer2D setMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
-		System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+		mLock.lock();
+		try {
+			System.arraycopy(matrix, offset, mMvpMatrix, 0, 16);
+		} finally {
+			mLock.unlock();
+		}
 		return this;
 	}
 
@@ -311,7 +321,12 @@ public class GLDrawer2D implements GLConst {
 	 * @param offset
 	 */
 	public void copyMvpMatrix(@NonNull @Size(min=16) final float[] matrix, final int offset) {
-		System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
+		mLock.lock();
+		try {
+			System.arraycopy(mMvpMatrix, 0, matrix, offset, 16);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -321,7 +336,12 @@ public class GLDrawer2D implements GLConst {
 	 */
 	public void setMirror(@IMirror.MirrorMode final int mirror) {
 		mMirror = mirror;
-		MatrixUtils.setMirror(mMvpMatrix, mirror);
+		mLock.lock();
+		try {
+			MatrixUtils.setMirror(mMvpMatrix, mirror);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -339,7 +359,12 @@ public class GLDrawer2D implements GLConst {
 	 * @param degrees
 	 */
 	public void rotate(final int degrees) {
-		MatrixUtils.rotate(mMvpMatrix, degrees);
+		mLock.lock();
+		try {
+			MatrixUtils.rotate(mMvpMatrix, degrees);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -348,7 +373,12 @@ public class GLDrawer2D implements GLConst {
 	 * @param degrees
 	 */
 	public void setRotation(final int degrees) {
-		MatrixUtils.setRotation(mMvpMatrix, degrees);
+		mLock.lock();
+		try {
+			MatrixUtils.setRotation(mMvpMatrix, degrees);
+		} finally {
+			mLock.unlock();
+		}
 	}
 
 	/**
@@ -377,7 +407,7 @@ public class GLDrawer2D implements GLConst {
 	 * @param texMatrix
 	 * @param offset
 	 */
-	public final synchronized void draw(
+	public final void draw(
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int offset) {
 
@@ -393,14 +423,19 @@ public class GLDrawer2D implements GLConst {
 	 * @param mvpMatrix
 	 * @param mvpOffset
 	 */
-	public final synchronized void draw(
+	public final void draw(
 		@TexUnit final int texUnit, final int texId,
 		@Nullable @Size(min=16) final float[] texMatrix, final int texOffset,
 		@Nullable @Size(min=16) final float[] mvpMatrix, final int mvpOffset) {
 
 //		if (DEBUG) Log.v(TAG, "draw");
 		if (hProgram < 0) return;
-		prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
+		mLock.lock();
+		try {
+			prepareDraw(texUnit, texId, texMatrix, texOffset, mvpMatrix, mvpOffset);
+		} finally {
+			mLock.unlock();
+		}
 		if (validateProgram(hProgram)) {
 			drawVertices();
 			errCnt = 0;
@@ -690,11 +725,13 @@ public class GLDrawer2D implements GLConst {
 		muTextureLoc = GLES20.glGetAttribLocation(hProgram, "sTexture");
 		muMVPMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uMVPMatrix");
 		muTexMatrixLoc = GLES20.glGetUniformLocation(hProgram, "uTexMatrix");
-		//
+		final float[] matrix = new float[16];
+		Matrix.setIdentityM(matrix, 0);
+		// 単位行列をセットする
 		GLES20.glUniformMatrix4fv(muMVPMatrixLoc,
-			1, false, mMvpMatrix, 0);
+			1, false, matrix, 0);
 		GLES20.glUniformMatrix4fv(muTexMatrixLoc,
-			1, false, mMvpMatrix, 0);
+			1, false, matrix, 0);
 		updateVertices();
 	}
 
