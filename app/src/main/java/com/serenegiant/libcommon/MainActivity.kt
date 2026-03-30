@@ -393,6 +393,14 @@ class MainActivity
 				fragment = CameraFragment.newInstance(
 					R.layout.fragment_camera_dummy_source, R.string.title_dummy_camera_source)
 			}
+			R.string.title_camera_source_pipeline -> {
+				if (!checkPermissionCamera()
+					|| !checkPermissionWriteExternalStorage()
+					|| !checkPermissionAudio()) {
+					return
+				}
+				fragment = CameraSourcePipelineFragment.newInstance()
+			}
 			R.string.title_galley -> {	// Galley
 				if (!checkPermissionReadExternalStorage()) {
 					return
