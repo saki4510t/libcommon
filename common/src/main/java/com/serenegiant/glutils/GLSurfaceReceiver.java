@@ -31,6 +31,7 @@ import com.serenegiant.gl.GLManager;
 import com.serenegiant.gl.GLUtils;
 import com.serenegiant.system.BuildCheck;
 
+import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
@@ -260,11 +261,23 @@ public class GLSurfaceReceiver {
 	/**
 	 * 関連するリソースを破棄する
 	 */
-	protected void internalRelease() {
+	private void internalRelease() {
 		if (mGLManager.isValid()) {
+			final CountDownLatch latch = new CountDownLatch(1);
 			mGLHandler.postAtFrontOfQueue(() -> {
-				handleOnStopOnGL();
+				try {
+					handleOnStopOnGL();
+				} finally {
+					latch.countDown();
+				}
 			});
+			try {
+				if (!latch.await(1000L, TimeUnit.MILLISECONDS)) {
+					if (DEBUG) Log.w(TAG, "internalRelease:timeout");
+				}
+			} catch (InterruptedException e) {
+				// ignore
+			}
 		}
 	}
 
