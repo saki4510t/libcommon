@@ -450,13 +450,13 @@ public class SurfaceDrawable extends Drawable {
 		mDrawer = GLDrawer2D.create(isGLES3(), true);
 		mTexId = GLUtils.initTex(GL_TEXTURE_EXTERNAL_OES, GLES20.GL_TEXTURE0, GLES20.GL_NEAREST);
 		mInputTexture = new SurfaceTexture(mTexId);
-		mInputSurface = new Surface(mInputTexture);
 		if (DEBUG) Log.v(TAG, String.format("handleReCreateInputSurface:video(%dx%d),intrinsic(%dx%d)",
 			mImageWidth, mImageHeight, getIntrinsicWidth(), getIntrinsicHeight()));
 		if (BuildCheck.isAndroid4_1()) {
 			// XXX getIntrinsicWidth/getIntrinsicHeightの代わりにmImageWidth/mImageHeightを使うべきかも?
 			mInputTexture.setDefaultBufferSize(getIntrinsicWidth(), getIntrinsicHeight());
 		}
+		mInputSurface = new Surface(mInputTexture);
 		mInputTexture.setOnFrameAvailableListener(mOnFrameAvailableListener);
 		onCreateSurface(mInputSurface);
 	}
