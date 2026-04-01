@@ -221,7 +221,7 @@ public class CapturePipeline extends ProxyPipeline {
 		}
 		if (needCapture) {
 			doCapture(isGLES3,
-				getWidth(), getHeight(),
+				width, height,
 				isOES, texId, texMatrix);
 		}
 	}
