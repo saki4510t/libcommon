@@ -211,24 +211,27 @@ public class EncodePipeline extends AbstractVideoEncoder implements GLPipeline {
 	@Override
 	public void remove() {
 		if (DEBUG) Log.v(TAG, "remove:");
+		final GLPipeline first = GLPipeline.findFirst(this);
 		GLPipeline parent;
+		GLPipeline pipeline;
 		mLock.lock();
 		try {
 			parent = mParent;
-			if (mParent instanceof DistributePipeline) {
-				// 親がDistributePipelineの時は自分を取り除くだけ
-				((DistributePipeline) mParent).removePipeline(this);
-			} else if (mParent != null) {
-				// その他のGLPipelineの時は下流を繋ぐ
-				mParent.setPipeline(mPipeline);
-			}
+			pipeline = mPipeline;
 			mParent = null;
 			mPipeline = null;
 		} finally {
 			mLock.unlock();
 		}
-		if (parent != null) {
-			parent = GLPipeline.findFirst(parent);
+		if (parent instanceof DistributePipeline) {
+			// 親がDistributePipelineの時は自分を取り除くだけ
+			((DistributePipeline) parent).removePipeline(this);
+		} else if (parent != null) {
+			// その他のGLPipelineの時は下流を繋ぐ
+			parent.setPipeline(pipeline);
+		}
+		if (first != this) {
+			GLPipeline.validatePipelineChain(first);
 			parent.refresh();
 		}
 	}

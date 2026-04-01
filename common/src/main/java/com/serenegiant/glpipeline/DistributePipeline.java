@@ -250,21 +250,23 @@ public class DistributePipeline implements GLPipeline {
 		if (DEBUG) Log.v(TAG, "remove:" + this);
 		final GLPipeline first = GLPipeline.findFirst(this);
 		GLPipeline parent;
+		final int numPipeline;
 		mLock.lock();
 		try {
 			parent = mParent;
-			if (mParent != null) {
-				if (mPipelines.size() == 1) {
-					// 下流が1つだけならつなぎ替える
-					mParent.setPipeline(getPipeline());
-				} else {
-					mParent.setPipeline(null);
-					Log.d(TAG, "#remove can't rebuild pipeline chain!");
-				}
-			}
 			mParent = null;
+			numPipeline = mPipelines.size();
 		} finally {
 			mLock.unlock();
+		}
+		if (parent != null) {
+			if (numPipeline == 1) {
+				// 下流が1つだけならつなぎ替える
+				parent.setPipeline(getPipeline());
+			} else {
+				parent.setPipeline(null);
+				Log.d(TAG, "#remove can't rebuild pipeline chain!");
+			}
 		}
 		if (first != this) {
 			GLPipeline.validatePipelineChain(first);
