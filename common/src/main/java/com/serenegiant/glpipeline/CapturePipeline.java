@@ -33,6 +33,7 @@ import com.serenegiant.utils.Pool;
 import com.serenegiant.utils.ThreadPool;
 
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.concurrent.locks.ReentrantLock;
 
 import androidx.annotation.NonNull;
@@ -242,7 +243,7 @@ public class CapturePipeline extends ProxyPipeline {
 
 		final int bytes = width * height * BitmapHelper.getPixelBytes(Bitmap.Config.ARGB_8888);
 		if ((mWorkBuffer == null) || (mWorkBuffer.capacity() < bytes)) {
-			mWorkBuffer = ByteBuffer.allocateDirect(bytes);
+			mWorkBuffer = ByteBuffer.allocateDirect(bytes).order(ByteOrder.LITTLE_ENDIAN);
 		}
 		if ((mWorkBitmap == null) || (mWorkBitmap.getByteCount() < bytes)) {
 			mWorkBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
