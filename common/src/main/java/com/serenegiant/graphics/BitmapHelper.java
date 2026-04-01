@@ -1233,7 +1233,7 @@ public final class BitmapHelper {
 		return switch (config) {
 			case ALPHA_8 -> 1;
 			case RGB_565, ARGB_4444 -> 2;
-			case ARGB_8888 -> 4;
+			case ARGB_8888, RGBA_1010102 -> 4;
 			case RGBA_F16 -> 8;
 			default -> throw new IllegalArgumentException("Unexpected config type" + config);
 		};
