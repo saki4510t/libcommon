@@ -103,12 +103,12 @@ public class DistributePipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final GLPipeline pipeline1 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		final GLPipeline pipeline1 = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
 		distributor.addPipeline(pipeline1);
 
 		final AtomicReference<Bitmap> result2 = new AtomicReference<>();
 		final AtomicInteger cnt2 = new AtomicInteger();
-		final GLPipeline pipeline2 = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
+		final GLPipeline pipeline2 = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result2, cnt2);
 		distributor.addPipeline(pipeline2);
 
 		try {

@@ -128,7 +128,7 @@ public class SurfaceDistributePipelineTest {
 		final AtomicReference<Bitmap> result3 = new AtomicReference<>();
 		final AtomicInteger cnt3 = new AtomicInteger();
 		final GLPipeline proxy = createImageReceivePipeline(
-			WIDTH, HEIGHT, NUM_FRAMES, sem, result3, cnt3);
+			manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result3, cnt3);
 		GLPipeline.append(source, proxy);
 		assertTrue(validatePipelineOrder(source, source, distributor, proxy));
 

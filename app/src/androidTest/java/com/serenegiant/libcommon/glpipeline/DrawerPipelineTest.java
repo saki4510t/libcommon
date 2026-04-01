@@ -151,7 +151,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -192,7 +192,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -236,7 +236,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -283,7 +283,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);
@@ -336,7 +336,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
@@ -406,7 +406,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
@@ -481,7 +481,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
@@ -559,7 +559,7 @@ public class DrawerPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final SurfaceSourcePipeline source = new SurfaceSourcePipeline(
@@ -647,7 +647,7 @@ public class DrawerPipelineTest {
 		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
 		assertNotNull(proxy);
 		pipeline.setPipeline(proxy);
 
@@ -735,7 +735,7 @@ public class DrawerPipelineTest {
 		// パイプラインを経由した映像の受け取り用にProxyPipelineを生成する
 		final AtomicReference<Bitmap> result1 = new AtomicReference<>();
 		final AtomicInteger cnt1 = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result1, cnt1);
 		assertNotNull(proxy);
 		pipeline1.setPipeline(proxy);
 

@@ -167,7 +167,7 @@ public class SurfaceRendererPipelineTest {
 		final Semaphore sem = new Semaphore(0);
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 
 		// 映像ソースを生成
 		final ImageSourcePipeline source = new ImageSourcePipeline(manager, original, null);

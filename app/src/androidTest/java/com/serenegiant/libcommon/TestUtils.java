@@ -391,6 +391,7 @@ LOOP:	for (int y = 0; y < height; y++) {
 					final int texId, @NonNull final float[] texMatrix) {
 
 					if (cnt.incrementAndGet() == numFrames) {
+						manager.makeDefault();
 						Log.v(TAG, "createGLSurfaceReceiver:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 						if (useOffscreenRendering) {
 							result.set(GLUtils.glDrawTextureToBitmap(isGLES3, isOES, width, height, texId, texMatrix, null));
@@ -419,6 +420,7 @@ LOOP:	for (int y = 0; y < height; y++) {
 	 * @return
 	 */
 	public static GLPipeline createImageReceivePipeline(
+		@NonNull final GLManager manager,
 		final int width, final int height,
 		final int numFrames,
 		@NonNull final Semaphore sem,
@@ -440,6 +442,7 @@ LOOP:	for (int y = 0; y < height; y++) {
 				final int texId, @NonNull final float[] texMatrix) {
 				super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
 				if (cnt.incrementAndGet() == numFrames) {
+					manager.makeDefault();
 					Log.v(TAG, "createImageReceivePipeline:create Bitmap from texture,isOES=" + isOES + ",texMatrix=" + MatrixUtils.toGLMatrixString(texMatrix));
 					result.set(GLUtils.glCopyTextureToBitmap(isOES, width, height, texId, texMatrix, null));
 					sem.release();

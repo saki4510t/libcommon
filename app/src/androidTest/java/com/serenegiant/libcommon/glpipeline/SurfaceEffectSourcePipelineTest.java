@@ -125,7 +125,7 @@ public class SurfaceEffectSourcePipelineTest {
 
 		final AtomicReference<Bitmap> result = new AtomicReference<>();
 		final AtomicInteger cnt = new AtomicInteger();
-		final GLPipeline proxy = createImageReceivePipeline(WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
+		final GLPipeline proxy = createImageReceivePipeline(manager, WIDTH, HEIGHT, NUM_FRAMES, sem, result, cnt);
 		source.setPipeline(proxy);
 		// 想定したとおりに接続されているかどうかを検証
 		assertTrue(validatePipelineOrder(source, source, proxy));
