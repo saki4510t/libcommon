@@ -253,7 +253,9 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 		final int texId, @NonNull @Size(min=16) final float[] texMatrix) {
 
 		super.onFrameAvailable(isGLES3, isOES, width, height, texId, texMatrix);
-		if (isValid()) {
+		@Nullable
+		final RendererTarget target = mRendererTarget;
+		if (isValid() && (target != null) && target.canDraw()) {
 			if ((mDrawer == null) || (isGLES3 != mDrawer.isGLES3) || (isOES != mDrawer.isOES())) {
 				// 初回またはGLPipelineを繋ぎ変えたあとにテクスチャが変わるかもしれない
 				if (mDrawer != null) {
@@ -275,11 +277,9 @@ public class SurfaceRendererPipeline extends ProxyPipeline
 					((GLEffectDrawer2D) mDrawer).setTexSize(width, height);
 				}
 			}
-			final GLDrawer2D drawer = mDrawer;
 			@Nullable
-			final RendererTarget target = mRendererTarget;
-			if ((drawer != null)
-				&& (target != null) && target.canDraw()) {
+			final GLDrawer2D drawer = mDrawer;
+			if (drawer != null) {
 				target.draw(drawer, GLES20.GL_TEXTURE0, texId, texMatrix);
 				if (DEBUG && (++cnt % 100) == 0) {
 					Log.v(TAG, "onFrameAvailable:" + cnt);
