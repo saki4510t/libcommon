@@ -20,7 +20,10 @@ package com.serenegiant.libcommon
 
 import android.os.Bundle
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.serenegiant.libcommon.TestUtils.*
+import com.serenegiant.libcommon.TestUtils.Value
+import com.serenegiant.libcommon.TestUtils.BothValue
+import com.serenegiant.libcommon.TestUtils.ParcelableValue
+import com.serenegiant.libcommon.TestUtils.SerializableValue
 import com.serenegiant.utils.ArrayUtils
 import org.junit.Assert.*
 import org.junit.Test
